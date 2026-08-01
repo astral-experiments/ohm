@@ -4,7 +4,7 @@ Ohm is an experimental Rust toolchain for faster local incremental builds. This 
 release coordinator for two source repositories:
 
 - [`astral-sh/ohm-rust`](https://github.com/astral-sh/ohm-rust) contains the Rust compiler,
-  standard library, and bootstrap changes.
+  standard library, exact-tree Clippy, and bootstrap changes.
 - [`astral-sh/ohm-cargo`](https://github.com/astral-sh/ohm-cargo) contains the matching Cargo
   changes.
 - `astral-sh/ohm` pins one exact revision of each repository, coordinates candidate builds, and
@@ -19,10 +19,11 @@ release coordinator for two source repositories:
 cargo test                         # the project's normal Rust toolchain
 cargo +ohm-1.97.1-1 test           # an exact Ohm toolchain
 cargo +ohm test                    # a moving local alias, if one has been registered
+cargo +ohm clippy                  # the matching Clippy from the Ohm Rust source tree
 ```
 
 Installing or linking Ohm does not replace the default Rust toolchain. An Ohm toolchain directory
-contains both the forked Cargo binary and the matching compiler and sysroot.
+contains the forked Cargo binary, matching compiler and Clippy binaries, and sysroot.
 
 Selecting the toolchain alone does not enable the current acceleration prototypes. The measured uv
 configuration currently requires the rustc public-API hash, Cargo's cached-relink mode, and uv's

@@ -5,7 +5,7 @@ profile = "dist"
 [build]
 description = "Ohm"
 locked-deps = true
-tools = ["cargo"]
+tools = ["cargo", "clippy"]
 
 # Ohm exposes its experimental build acceleration through explicit `-Z` flags.
 # Build both rustc and Cargo for the dev channel so those opt-in interfaces are
