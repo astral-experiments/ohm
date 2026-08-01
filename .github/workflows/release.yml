@@ -150,6 +150,14 @@ jobs:
             --set "build.description=$OHM_TOOLCHAIN" \
             extended
 
+      - name: Smoke test Ohm acceleration flags
+        run: |
+          unset RUSTC_BOOTSTRAP
+          source/rust/build/"$OHM_TARGET"/stage2/bin/rustc -Z help \
+            | grep -F 'public-api-hash' >/dev/null
+          source/rust/build/"$OHM_TARGET"/stage2-tools-bin/cargo -Z help \
+            | grep -F 'relink-only' >/dev/null
+
       - name: Write build provenance
         env:
           CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}

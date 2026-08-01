@@ -25,6 +25,21 @@ jobs:
       - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           enable-cache: true
+      - name: Validate release bootstrap configuration
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import tomllib
+
+          config = tomllib.loads(pathlib.Path("release/bootstrap.toml").read_text())
+          rust = config.get("rust", {})
+          if rust.get("channel") != "dev":
+              raise SystemExit(
+                  "Ohm releases must use the dev channel so their opt-in -Z flags are available"
+              )
+          if rust.get("omit-git-hash") is not False:
+              raise SystemExit("Ohm releases must retain their source Git revision")
+          PY
       - name: Validate toolchain manifests
         run: |
           mapfile -d '' manifests < <(
