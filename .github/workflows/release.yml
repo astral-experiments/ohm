@@ -1,0 +1,204 @@
+name: Build release candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: Versioned manifest to build
+        required: true
+        default: toolchains/1.97.1/1.json
+        type: string
+      build:
+        description: Run the full x.py dist extended build
+        required: true
+        default: false
+        type: boolean
+
+permissions: {}
+
+concurrency:
+  group: ohm-release-${{ inputs.manifest }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    environment: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      rust-revision: ${{ steps.manifest.outputs.rust-revision }}
+      cargo-revision: ${{ steps.manifest.outputs.cargo-revision }}
+      manifest: ${{ steps.manifest.outputs.manifest }}
+      toolchain: ${{ steps.manifest.outputs.toolchain }}
+    steps:
+      - name: Check out release coordinator
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Require protected main branch
+        env:
+          RELEASE_REF: ${{ github.ref }}
+        run: |
+          if [[ "$RELEASE_REF" != "refs/heads/main" ]]; then
+            echo "release candidates must be built from the protected main branch" >&2
+            exit 1
+          fi
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Read and validate manifest
+        id: manifest
+        env:
+          MANIFEST_PATH: ${{ inputs.manifest }}
+        run: |
+          if [[ ! "$MANIFEST_PATH" =~ ^toolchains/[0-9]+\.[0-9]+\.[0-9]+/[1-9][0-9]*\.json$ ]]; then
+            echo "invalid versioned manifest path: $MANIFEST_PATH" >&2
+            exit 1
+          fi
+          ./scripts/validate-release-manifest.sh --require-pinned "$MANIFEST_PATH"
+          echo "rust-revision=$(jq -er '.sources.rust.revision' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
+          echo "cargo-revision=$(jq -er '.sources.cargo.revision' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
+          echo "manifest=$MANIFEST_PATH" >> "$GITHUB_OUTPUT"
+          echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
+
+      - name: Check out pinned ohm-rust
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: astral-sh/ohm-rust
+          ref: ${{ steps.manifest.outputs.rust-revision }}
+          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          persist-credentials: false
+          path: source/rust
+
+      - name: Check out pinned ohm-cargo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: astral-sh/ohm-cargo
+          ref: ${{ steps.manifest.outputs.cargo-revision }}
+          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          persist-credentials: false
+          path: source/cargo
+
+      - name: Verify source revisions
+        env:
+          MANIFEST_PATH: ${{ steps.manifest.outputs.manifest }}
+        run: |
+          ./scripts/verify-release-sources.sh \
+            "$MANIFEST_PATH" \
+            source/rust \
+            source/cargo
+
+  build:
+    if: inputs.build
+    needs: plan
+    environment: release
+    timeout-minutes: 360
+    runs-on: [self-hosted, macOS, ARM64, ohm-builder]
+    permissions:
+      contents: read
+    env:
+      OHM_TARGET: aarch64-apple-darwin
+    steps:
+      - name: Check out release coordinator
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Check out pinned ohm-rust
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: astral-sh/ohm-rust
+          ref: ${{ needs.plan.outputs.rust-revision }}
+          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          persist-credentials: false
+          path: source/rust
+
+      - name: Check out pinned ohm-cargo into the Rust source tree
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: astral-sh/ohm-cargo
+          ref: ${{ needs.plan.outputs.cargo-revision }}
+          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          persist-credentials: false
+          path: source/rust/src/tools/cargo
+
+      - name: Verify source revisions
+        env:
+          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+        run: |
+          ./scripts/verify-release-sources.sh \
+            "$MANIFEST_PATH" \
+            source/rust \
+            source/rust/src/tools/cargo
+
+      - name: Build extended Rust distribution
+        env:
+          OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+        run: |
+          python3 source/rust/x.py dist \
+            --config "$GITHUB_WORKSPACE/release/bootstrap.toml" \
+            --host "$OHM_TARGET" \
+            --target "$OHM_TARGET" \
+            --set "build.description=$OHM_TOOLCHAIN" \
+            extended
+
+      - name: Write build provenance
+        env:
+          CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
+          COORDINATOR_REPOSITORY: ${{ github.repository }}
+          COORDINATOR_REVISION: ${{ github.sha }}
+          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+          OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+          RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
+        run: |
+          manifest_sha256="$(shasum -a 256 "$MANIFEST_PATH" | awk '{print $1}')"
+          jq -n \
+            --arg toolchain "$OHM_TOOLCHAIN" \
+            --arg target "$OHM_TARGET" \
+            --arg coordinator_repository "$COORDINATOR_REPOSITORY" \
+            --arg coordinator_revision "$COORDINATOR_REVISION" \
+            --arg manifest_path "$MANIFEST_PATH" \
+            --arg manifest_sha256 "$manifest_sha256" \
+            --arg rust_revision "$RUST_REVISION" \
+            --arg cargo_revision "$CARGO_REVISION" \
+            '{
+              schema_version: 1,
+              toolchain: $toolchain,
+              target: $target,
+              coordinator: {
+                repository: $coordinator_repository,
+                revision: $coordinator_revision
+              },
+              manifest: {
+                path: $manifest_path,
+                sha256: $manifest_sha256
+              },
+              sources: {
+                rust: { revision: $rust_revision },
+                cargo: { revision: $cargo_revision }
+              }
+            }' > source/rust/build/dist/ohm-provenance.json
+
+      - name: Create checksums
+        working-directory: source/rust/build/dist
+        run: |
+          find . -maxdepth 1 -type f ! -name SHA256SUMS -print \
+            | LC_ALL=C sort \
+            | while IFS= read -r artifact; do shasum -a 256 "$artifact"; done \
+            > SHA256SUMS
+
+      - name: Retain distribution artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4.7.1
+        with:
+          name: ${{ needs.plan.outputs.toolchain }}-aarch64-apple-darwin
+          path: source/rust/build/dist/
+          if-no-files-found: error
+          retention-days: 7

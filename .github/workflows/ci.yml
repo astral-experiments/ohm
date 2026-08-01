@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+      - name: Validate toolchain manifests
+        run: |
+          mapfile -d '' manifests < <(
+            find toolchains -mindepth 2 -maxdepth 2 -type f -name '*.json' -print0 \
+              | sort -z
+          )
+          if [[ ${#manifests[@]} -eq 0 ]]; then
+            echo "no versioned toolchain manifests found" >&2
+            exit 1
+          fi
+          uvx --from check-jsonschema==0.37.4 check-jsonschema \
+            --check-metaschema toolchains/manifest.schema.json
+          for manifest in "${manifests[@]}"; do
+            ./scripts/validate-release-manifest.sh "$manifest"
+          done
+      - name: Protect existing toolchain manifests
+        env:
+          BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+        run: ./scripts/check-manifest-history.sh "$BASE_REVISION"
+      - name: Check shell syntax
+        run: bash -n scripts/*.sh

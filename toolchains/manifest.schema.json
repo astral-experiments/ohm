@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/astral-sh/ohm/blob/main/toolchains/manifest.schema.json",
+  "title": "Ohm release source manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schema_version", "status", "release", "sources"],
+  "properties": {
+    "$schema": {
+      "const": "../manifest.schema.json"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "enum": ["draft", "pinned"]
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["upstream_rust_version", "ohm_revision", "toolchain_name"],
+      "properties": {
+        "upstream_rust_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "ohm_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "toolchain_name": {
+          "type": "string",
+          "pattern": "^ohm-[0-9]+\\.[0-9]+\\.[0-9]+-[1-9][0-9]*$"
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rust", "cargo"],
+      "properties": {
+        "rust": {
+          "$ref": "#/$defs/rust_source"
+        },
+        "cargo": {
+          "$ref": "#/$defs/cargo_source"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "rust_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision"],
+      "properties": {
+        "repository": {
+          "const": "https://github.com/astral-sh/ohm-rust"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    },
+    "cargo_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision"],
+      "properties": {
+        "repository": {
+          "const": "https://github.com/astral-sh/ohm-cargo"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    }
+  }
+}
