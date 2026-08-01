@@ -162,6 +162,10 @@ jobs:
             | grep -F "$rust_revision" >/dev/null
           source/rust/build/"$OHM_TARGET"/stage2/bin/clippy-driver --version \
             | grep -F "$rust_revision" >/dev/null
+          rustfmt_version="$(source/rust/build/"$OHM_TARGET"/stage2/bin/rustfmt --version)"
+          cargo_fmt_version="$(source/rust/build/"$OHM_TARGET"/stage2/bin/cargo-fmt --version)"
+          grep -F 'rustfmt ' <<< "$rustfmt_version" >/dev/null
+          [[ "$cargo_fmt_version" == "$rustfmt_version" ]]
 
       - name: Write build provenance
         env:

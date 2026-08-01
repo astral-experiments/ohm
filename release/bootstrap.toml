@@ -5,7 +5,11 @@ profile = "dist"
 [build]
 description = "Ohm"
 locked-deps = true
-tools = ["cargo", "clippy"]
+# Rust's combined macOS and Windows installers still require the deprecated
+# rust-analysis compatibility component even though it only contains a removal
+# notice. Keep it alongside the user-facing tools so `x.py dist extended` can
+# assemble every supported installer format.
+tools = ["analysis", "cargo", "clippy", "rustfmt"]
 
 # Ohm exposes its experimental build acceleration through explicit `-Z` flags.
 # Build both rustc and Cargo for the dev channel so those opt-in interfaces are

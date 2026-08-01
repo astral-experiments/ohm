@@ -34,7 +34,7 @@ jobs:
           config = tomllib.loads(pathlib.Path("release/bootstrap.toml").read_text())
           build = config.get("build", {})
           tools = set(build.get("tools", []))
-          missing_tools = {"cargo", "clippy"} - tools
+          missing_tools = {"analysis", "cargo", "clippy", "rustfmt"} - tools
           if missing_tools:
               missing = ", ".join(sorted(missing_tools))
               raise SystemExit(f"Ohm releases must include these tools: {missing}")
