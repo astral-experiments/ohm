@@ -36,6 +36,8 @@ RUSTFLAGS="-Zpublic-api-hash" \
 
 `--profile fast-build` is specific to the measured uv workflow. The Rust and Cargo flags are still
 unstable prototype interfaces; a future Cargo-owned Ohm flag or launcher should coordinate them.
+Ohm distributions are built using Rust's `dev` channel so these explicit `-Z` flags work without
+setting `RUSTC_BOOTSTRAP`; selecting the toolchain still leaves the prototypes disabled by default.
 
 There is no released Ohm toolchain or installer yet. After building one locally, rustup can
 register an extracted toolchain directory with:
