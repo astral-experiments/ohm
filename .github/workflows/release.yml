@@ -29,6 +29,7 @@ jobs:
     outputs:
       rust-revision: ${{ steps.manifest.outputs.rust-revision }}
       cargo-revision: ${{ steps.manifest.outputs.cargo-revision }}
+      clippy-revision: ${{ steps.manifest.outputs.clippy-revision }}
       manifest: ${{ steps.manifest.outputs.manifest }}
       toolchain: ${{ steps.manifest.outputs.toolchain }}
     steps:
@@ -62,6 +63,7 @@ jobs:
           ./scripts/validate-release-manifest.sh --require-pinned "$MANIFEST_PATH"
           echo "rust-revision=$(jq -er '.sources.rust.revision' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
           echo "cargo-revision=$(jq -er '.sources.cargo.revision' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
+          echo "clippy-revision=$(jq -er '.sources.clippy.revision' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
           echo "manifest=$MANIFEST_PATH" >> "$GITHUB_OUTPUT"
           echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
 
@@ -83,6 +85,15 @@ jobs:
           persist-credentials: false
           path: source/cargo
 
+      - name: Check out pinned ohm-rust-clippy
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: astral-sh/ohm-rust-clippy
+          ref: ${{ steps.manifest.outputs.clippy-revision }}
+          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          persist-credentials: false
+          path: source/clippy
+
       - name: Verify source revisions
         env:
           MANIFEST_PATH: ${{ steps.manifest.outputs.manifest }}
@@ -90,7 +101,8 @@ jobs:
           ./scripts/verify-release-sources.sh \
             "$MANIFEST_PATH" \
             source/rust \
-            source/cargo
+            source/cargo \
+            source/clippy
 
   build:
     if: inputs.build
@@ -130,6 +142,15 @@ jobs:
           persist-credentials: false
           path: source/rust/src/tools/cargo
 
+      - name: Check out pinned ohm-rust-clippy into the Rust source tree
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: astral-sh/ohm-rust-clippy
+          ref: ${{ needs.plan.outputs.clippy-revision }}
+          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          persist-credentials: false
+          path: source/rust/src/tools/clippy
+
       - name: Verify source revisions
         env:
           MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
@@ -137,7 +158,8 @@ jobs:
           ./scripts/verify-release-sources.sh \
             "$MANIFEST_PATH" \
             source/rust \
-            source/rust/src/tools/cargo
+            source/rust/src/tools/cargo \
+            source/rust/src/tools/clippy
 
       - name: Build extended Rust distribution
         env:
@@ -289,6 +311,7 @@ jobs:
       - name: Write build provenance
         env:
           CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
+          CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
           COORDINATOR_REPOSITORY: ${{ github.repository }}
           COORDINATOR_REVISION: ${{ github.sha }}
           MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
@@ -305,6 +328,7 @@ jobs:
             --arg manifest_sha256 "$manifest_sha256" \
             --arg rust_revision "$RUST_REVISION" \
             --arg cargo_revision "$CARGO_REVISION" \
+            --arg clippy_revision "$CLIPPY_REVISION" \
             '{
               schema_version: 1,
               toolchain: $toolchain,
@@ -319,7 +343,8 @@ jobs:
               },
               sources: {
                 rust: { revision: $rust_revision },
-                cargo: { revision: $cargo_revision }
+                cargo: { revision: $cargo_revision },
+                clippy: { revision: $clippy_revision }
               }
             }' > source/rust/build/dist/ohm-provenance.json
 

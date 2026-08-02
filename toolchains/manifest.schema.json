@@ -37,13 +37,16 @@
     "sources": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rust", "cargo"],
+      "required": ["rust", "cargo", "clippy"],
       "properties": {
         "rust": {
           "$ref": "#/$defs/rust_source"
         },
         "cargo": {
           "$ref": "#/$defs/cargo_source"
+        },
+        "clippy": {
+          "$ref": "#/$defs/clippy_source"
         }
       }
     }
@@ -73,6 +76,19 @@
       "properties": {
         "repository": {
           "const": "https://github.com/astral-sh/ohm-cargo"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    },
+    "clippy_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision"],
+      "properties": {
+        "repository": {
+          "const": "https://github.com/astral-sh/ohm-rust-clippy"
         },
         "revision": {
           "$ref": "#/$defs/revision"
