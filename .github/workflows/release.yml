@@ -519,10 +519,51 @@ jobs:
             exit 0
           fi
 
+          release_url="https://labs.astral.sh/ohm/releases/$OHM_TOOLCHAIN"
+          notes_file="$RUNNER_TEMP/ohm-release-notes.md"
+          printf '%s\n' \
+            '> [!WARNING]' \
+            '> Ohm is an experimental Rust toolchain intended only for local development.' \
+            '> Its optimizations may be unsound; never use it for production builds,' \
+            '> releases, CI correctness validation, or final test results.' \
+            '' \
+            "## Install Ohm $OHM_TOOLCHAIN" \
+            '' \
+            '### Install prebuilt binaries via shell script' \
+            '' \
+            'Requires rustup and Apple Silicon macOS.' \
+            '' \
+            '```sh' \
+            "curl --proto '=https' --tlsv1.2 -LsSf $release_url/install.sh | sh" \
+            '```' \
+            '' \
+            '### Use Ohm for local development' \
+            '' \
+            '```sh' \
+            'cargo +ohm test' \
+            'cargo +ohm check' \
+            'cargo +ohm clippy' \
+            'cargo +ohm fmt' \
+            '```' \
+            '' \
+            'Disable the experimental defaults for a local comparison:' \
+            '' \
+            '```sh' \
+            'cargo +ohm -Zohm-defaults=no test' \
+            '```' \
+            '' \
+            "## Download Ohm $OHM_TOOLCHAIN" \
+            '' \
+            '| File | Platform | Checksum |' \
+            '|------|----------|----------|' \
+            "| [$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz]($release_url/$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz) | Apple Silicon macOS | [checksum]($release_url/SHA256SUMS) |" \
+            > "$notes_file"
+
           gh release create "$OHM_TOOLCHAIN" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$RELEASE_COMMIT" \
             --title "$OHM_TOOLCHAIN" \
+            --notes-file "$notes_file" \
             --generate-notes \
             "$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
             ohm-installer.sh \
