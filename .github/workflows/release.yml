@@ -223,6 +223,7 @@ jobs:
           python3 source/rust/x.py dist \
             --ci false \
             --config "$GITHUB_WORKSPACE/release/bootstrap.toml" \
+            --build-dir "$GITHUB_WORKSPACE/source/rust/build" \
             --host "$OHM_TARGET" \
             --target "$OHM_TARGET" \
             --set "build.description=$OHM_TOOLCHAIN" \
