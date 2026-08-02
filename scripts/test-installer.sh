@@ -119,7 +119,7 @@ if [ -z "$output" ] || [ -z "$url" ]; then
   exit 1
 fi
 
-expected_url="https://releases.astral.sh/github/ohm/releases/download/$OHM_TEST_VERSION/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz"
+expected_url="https://labs.astral.sh/ohm/releases/$OHM_TEST_VERSION/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz"
 [ "$url" = "$expected_url" ] || { echo "unexpected public release URL: $url" >&2; exit 1; }
 [ "${OHM_TEST_CURL_FAILURE:-0}" != 1 ] || { echo 'public archive download failed' >&2; exit 22; }
 cp "$OHM_TEST_RELEASE_DIRECTORY/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz" "$output"
@@ -283,9 +283,11 @@ unset OHM_TEST_DOWNLOAD_URL
 assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
   'api.github.com'
 assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
+  'releases.astral.sh'
+assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
   'SHA256SUMS'
 assert_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
-  "https://releases.astral.sh/github/ohm/releases/download/$version/$archive_name"
+  "https://labs.astral.sh/ohm/releases/$version/$archive_name"
 assert_contains "$temporary_directory/cases/embedded-public-latest/curl.log" '--retry '
 assert_contains "$temporary_directory/cases/embedded-public-latest/rustup.log" \
   "toolchain link $version "

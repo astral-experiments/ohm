@@ -27,7 +27,7 @@ Ohm supports Apple Silicon macOS, including terminals running under Rosetta. Ins
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://releases.astral.sh/installers/ohm/latest/ohm-installer.sh | sh
+  https://labs.astral.sh/ohm/install.sh | sh
 ```
 
 The release-specific installer verifies its embedded archive checksum, installs the complete Rust
@@ -40,14 +40,14 @@ installer:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  "https://releases.astral.sh/github/ohm/releases/download/$OHM_VERSION/ohm-installer.sh" | sh
+  "https://labs.astral.sh/ohm/releases/$OHM_VERSION/install.sh" | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://releases.astral.sh/installers/ohm/latest/ohm-installer.sh \
+  https://labs.astral.sh/ohm/install.sh \
   | env OHM_INSTALL_DIR=/path/to/toolchain sh
 ```
 

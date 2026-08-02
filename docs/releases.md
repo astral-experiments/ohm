@@ -22,12 +22,18 @@ manifest="toolchains/${RUST_VERSION:?}/${OHM_REVISION:?}.json"
 ```
 
 The protected `release` environment needs `OHM_REPOSITORIES_TOKEN` with read access to the Rust,
-Cargo, and Clippy source repositories, plus these Cloudflare R2 credentials:
+Cargo, and Clippy source repositories. Store the Cloudflare R2 credentials as environment secrets:
 
 - `MIRROR_R2_ACCESS_KEY_ID`
 - `MIRROR_R2_SECRET_ACCESS_KEY`
+
+Store the Cloudflare account and bucket configuration as environment variables:
+
 - `MIRROR_R2_CLOUDFLARE_ACCOUNT_ID`
 - `MIRROR_R2_BUCKET_NAME`
+
+The bucket is served publicly from `labs.astral.sh` and should be separate from Astral's production
+release bucket. Its credentials should only grant access to the experimental release bucket.
 
 The Apple Silicon build uses the shared `depot-macos-15` runner and needs at least 50 GiB of
 available disk space. Planning and publication use `depot-ubuntu-24.04-4` runners.
@@ -54,9 +60,11 @@ publication. The private release includes:
 
 Only the installer, archive, and a public-only `SHA256SUMS` file containing their checksums are
 copied to Cloudflare R2. Versioned assets are served publicly from
-`https://releases.astral.sh/github/ohm/releases/download/<version>/` and cached immutably for one
-year. The latest installer is available at
-`https://releases.astral.sh/installers/ohm/latest/ohm-installer.sh` and cached for five minutes.
+`https://labs.astral.sh/ohm/releases/<version>/` and cached immutably for one year. The
+release-specific installer is available at
+`https://labs.astral.sh/ohm/releases/<version>/install.sh`; its archive is available at
+`https://labs.astral.sh/ohm/releases/<version>/<version>-aarch64-apple-darwin.tar.gz`. The latest
+installer is available at `https://labs.astral.sh/ohm/install.sh` and cached for five minutes.
 Source repositories, GitHub Releases, release manifests, and source provenance remain private.
 
 The public installer and its embedded archive checksum share Cloudflare R2 as their trust root.

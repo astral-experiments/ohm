@@ -46,10 +46,11 @@ jobs:
           sha256sum --check --strict SHA256SUMS
 
           public_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-public-release.XXXXXX")"
-          cp "$archive_name" ohm-installer.sh "$public_directory/"
+          cp "$archive_name" "$public_directory/"
+          cp ohm-installer.sh "$public_directory/install.sh"
           (
             cd "$public_directory"
-            sha256sum "$archive_name" ohm-installer.sh > SHA256SUMS
+            sha256sum "$archive_name" install.sh > SHA256SUMS
           )
           echo "directory=$public_directory" >> "$GITHUB_OUTPUT"
 
@@ -57,26 +58,26 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.MIRROR_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MIRROR_R2_SECRET_ACCESS_KEY }}
-          AWS_ENDPOINT_URL: https://${{ secrets.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          AWS_ENDPOINT_URL: https://${{ vars.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
           AWS_DEFAULT_REGION: auto
           PUBLIC_DIRECTORY: ${{ steps.assets.outputs.directory }}
-          R2_BUCKET: ${{ secrets.MIRROR_R2_BUCKET_NAME }}
+          R2_BUCKET: ${{ vars.MIRROR_R2_BUCKET_NAME }}
         run: |
           aws s3 cp --recursive --output table --color on \
             --cache-control "public, max-age=31536000, immutable" \
             "$PUBLIC_DIRECTORY/" \
-            "s3://$R2_BUCKET/github/ohm/releases/download/$OHM_TOOLCHAIN/"
+            "s3://$R2_BUCKET/ohm/releases/$OHM_TOOLCHAIN/"
 
       - name: Publish latest release installer
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.MIRROR_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MIRROR_R2_SECRET_ACCESS_KEY }}
-          AWS_ENDPOINT_URL: https://${{ secrets.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          AWS_ENDPOINT_URL: https://${{ vars.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
           AWS_DEFAULT_REGION: auto
           PUBLIC_DIRECTORY: ${{ steps.assets.outputs.directory }}
-          R2_BUCKET: ${{ secrets.MIRROR_R2_BUCKET_NAME }}
+          R2_BUCKET: ${{ vars.MIRROR_R2_BUCKET_NAME }}
         run: |
           aws s3 cp --output table --color on \
             --cache-control "public, max-age=300" \
-            "$PUBLIC_DIRECTORY/ohm-installer.sh" \
-            "s3://$R2_BUCKET/installers/ohm/latest/ohm-installer.sh"
+            "$PUBLIC_DIRECTORY/install.sh" \
+            "s3://$R2_BUCKET/ohm/install.sh"
