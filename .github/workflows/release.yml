@@ -349,11 +349,11 @@ jobs:
             | grep -F 'public-api-hash' >/dev/null
           cargo +"$OHM_TOOLCHAIN" -Z help \
             | grep -F 'relink-only' >/dev/null
-          rust_revision="$(git -C source/rust rev-parse --short=10 HEAD)"
+          clippy_revision="$(git -C source/rust/src/tools/clippy rev-parse --short=10 HEAD)"
           "$toolchain_root/bin/cargo-clippy" --version \
-            | grep -F "$rust_revision" >/dev/null
+            | grep -F "$clippy_revision" >/dev/null
           "$toolchain_root/bin/clippy-driver" --version \
-            | grep -F "$rust_revision" >/dev/null
+            | grep -F "$clippy_revision" >/dev/null
           rustfmt_version="$("$toolchain_root/bin/rustfmt" --version)"
           cargo_fmt_version="$("$toolchain_root/bin/cargo-fmt" --version)"
           grep -F 'rustfmt ' <<< "$rustfmt_version" >/dev/null
