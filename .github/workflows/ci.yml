@@ -52,6 +52,10 @@ jobs:
               )
           if rust.get("omit-git-hash") is not False:
               raise SystemExit("Ohm releases must retain their source Git revision")
+          if config.get("dist", {}).get("compression-formats") != ["gz"]:
+              raise SystemExit(
+                  "Ohm releases must produce one deterministic gzip-compressed archive"
+              )
           PY
       - name: Validate toolchain manifests
         run: |
@@ -73,6 +77,10 @@ jobs:
           BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
         run: ./scripts/check-manifest-history.sh "$BASE_REVISION"
       - name: Check shell syntax
-        run: bash -n scripts/*.sh
+        run: |
+          bash -n scripts/*.sh
+          sh -n scripts/install.sh
       - name: Test release source verification
         run: ./scripts/test-release-sources.sh
+      - name: Test the Ohm installer
+        run: bash scripts/test-installer.sh

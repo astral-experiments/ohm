@@ -23,7 +23,7 @@ concurrency:
 jobs:
   plan:
     environment: release
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-24.04-4
     permissions:
       contents: read
     outputs:
@@ -109,7 +109,7 @@ jobs:
     needs: plan
     environment: release
     timeout-minutes: 360
-    runs-on: [self-hosted, macOS, ARM64, ohm-builder]
+    runs-on: depot-macos-15
     permissions:
       contents: read
     env:
@@ -172,55 +172,124 @@ jobs:
             --set "build.description=$OHM_TOOLCHAIN" \
             extended
 
+      - name: Write build provenance
+        env:
+          CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
+          CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
+          COORDINATOR_REPOSITORY: ${{ github.repository }}
+          COORDINATOR_REVISION: ${{ github.sha }}
+          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+          OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+          RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
+        run: |
+          manifest_sha256="$(shasum -a 256 "$MANIFEST_PATH" | awk '{print $1}')"
+          jq -n \
+            --arg toolchain "$OHM_TOOLCHAIN" \
+            --arg target "$OHM_TARGET" \
+            --arg coordinator_repository "$COORDINATOR_REPOSITORY" \
+            --arg coordinator_revision "$COORDINATOR_REVISION" \
+            --arg manifest_path "$MANIFEST_PATH" \
+            --arg manifest_sha256 "$manifest_sha256" \
+            --arg rust_revision "$RUST_REVISION" \
+            --arg cargo_revision "$CARGO_REVISION" \
+            --arg clippy_revision "$CLIPPY_REVISION" \
+            '{
+              schema_version: 1,
+              toolchain: $toolchain,
+              target: $target,
+              coordinator: {
+                repository: $coordinator_repository,
+                revision: $coordinator_revision
+              },
+              manifest: {
+                path: $manifest_path,
+                sha256: $manifest_sha256
+              },
+              sources: {
+                rust: { revision: $rust_revision },
+                cargo: { revision: $cargo_revision },
+                clippy: { revision: $clippy_revision }
+              }
+            }' > source/rust/build/dist/ohm-provenance.json
+
+      - name: Stage versioned distribution assets
+        id: assets
+        env:
+          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+          OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+        run: |
+          rust_version="$(tr -d '\r\n' < source/rust/src/version)"
+          combined_archive="source/rust/build/dist/rust-$rust_version-dev-$OHM_TARGET.tar.gz"
+          if [[ ! -f "$combined_archive" ]]; then
+            echo "combined Ohm archive not found: $combined_archive" >&2
+            exit 1
+          fi
+
+          release_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-release.XXXXXX")"
+          archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
+          manifest_name="$OHM_TOOLCHAIN.json"
+          provenance_name="$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
+          cp "$combined_archive" "$release_directory/$archive_name"
+          cp "$MANIFEST_PATH" "$release_directory/$manifest_name"
+          cp source/rust/build/dist/ohm-provenance.json \
+            "$release_directory/$provenance_name"
+
+          archive_sha256="$(shasum -a 256 "$release_directory/$archive_name" | awk '{print $1}')"
+          awk -v version="$OHM_TOOLCHAIN" -v archive_sha256="$archive_sha256" '
+            $0 == "embedded_version=" {
+              print "embedded_version=" version
+              ++version_count
+              next
+            }
+            $0 == "embedded_archive_sha256=" {
+              print "embedded_archive_sha256=" archive_sha256
+              ++archive_sha256_count
+              next
+            }
+            { print }
+            END {
+              if (version_count != 1 || archive_sha256_count != 1) {
+                exit 1
+              }
+            }
+          ' scripts/install.sh > "$release_directory/ohm-installer.sh"
+          sh -n "$release_directory/ohm-installer.sh"
+          grep -Fx "embedded_version=$OHM_TOOLCHAIN" "$release_directory/ohm-installer.sh" >/dev/null
+          grep -Fx "embedded_archive_sha256=$archive_sha256" "$release_directory/ohm-installer.sh" >/dev/null
+
+          (
+            cd "$release_directory"
+            shasum -a 256 \
+              "$archive_name" \
+              ohm-installer.sh \
+              "$manifest_name" \
+              "$provenance_name" > SHA256SUMS
+          )
+
+          echo "directory=$release_directory" >> "$GITHUB_OUTPUT"
+
       - name: Smoke test Ohm toolchain
+        env:
+          OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+          RELEASE_DIRECTORY: ${{ steps.assets.outputs.directory }}
         run: |
           smoke_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-smoke.XXXXXX")"
           trap 'rm -rf "$smoke_root"' EXIT
 
-          rust_version="$(tr -d '\r\n' < source/rust/src/version)"
-          combined_archive=
-          for candidate in \
-            source/rust/build/dist/"rust-$rust_version-dev-$OHM_TARGET.tar."*; do
-            if [[ -f "$candidate" ]]; then
-              if [[ -n "$combined_archive" ]]; then
-                echo "multiple combined Ohm archives found" >&2
-                exit 1
-              fi
-              combined_archive="$candidate"
-            fi
-          done
-          if [[ -z "$combined_archive" ]]; then
-            echo "combined Ohm archive not found" >&2
-            exit 1
-          fi
-
-          archive_root="$smoke_root/archive"
           toolchain_root="$smoke_root/toolchain"
-          mkdir -p "$archive_root" "$toolchain_root"
-          tar -xf "$combined_archive" -C "$archive_root"
-
-          installer=
-          for candidate in "$archive_root"/*/install.sh; do
-            if [[ -f "$candidate" ]]; then
-              installer="$candidate"
-              break
-            fi
-          done
-          if [[ -z "$installer" ]]; then
-            echo "combined Ohm installer not found" >&2
-            exit 1
-          fi
-          sh "$installer" --prefix="$toolchain_root" --disable-ldconfig
-
           export CARGO_HOME="$smoke_root/cargo-home"
           export RUSTUP_HOME="$smoke_root/rustup-home"
           mkdir -p "$CARGO_HOME" "$RUSTUP_HOME"
-          rustup toolchain link installed-ohm "$toolchain_root"
+          sh "$RELEASE_DIRECTORY/ohm-installer.sh" \
+            --archive "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
+            --checksums "$RELEASE_DIRECTORY/SHA256SUMS" \
+            --prefix "$toolchain_root" \
+            --no-alias
 
           unset RUSTC_BOOTSTRAP
-          rustc +installed-ohm -Z help \
+          rustc +"$OHM_TOOLCHAIN" -Z help \
             | grep -F 'public-api-hash' >/dev/null
-          cargo +installed-ohm -Z help \
+          cargo +"$OHM_TOOLCHAIN" -Z help \
             | grep -F 'relink-only' >/dev/null
           rust_revision="$(git -C source/rust rev-parse --short=10 HEAD)"
           "$toolchain_root/bin/cargo-clippy" --version \
@@ -296,7 +365,7 @@ jobs:
             OHM_RUSTC_LOG="$defaults_log" \
             RUSTC_WRAPPER="$rustc_wrapper" \
             CARGO_TARGET_DIR="$smoke_root/defaults-target" \
-            cargo +installed-ohm build --manifest-path "$smoke_crate/Cargo.toml"
+            cargo +"$OHM_TOOLCHAIN" build --manifest-path "$smoke_crate/Cargo.toml"
           grep -Fx enabled "$defaults_log" >/dev/null
 
           disabled_log="$smoke_root/disabled-rustc-args"
@@ -304,62 +373,77 @@ jobs:
             OHM_RUSTC_LOG="$disabled_log" \
             RUSTC_WRAPPER="$rustc_wrapper" \
             CARGO_TARGET_DIR="$smoke_root/disabled-target" \
-            cargo +installed-ohm -Zohm-defaults=no build \
+            cargo +"$OHM_TOOLCHAIN" -Zohm-defaults=no build \
               --manifest-path "$smoke_crate/Cargo.toml"
           grep -Fx disabled "$disabled_log" >/dev/null
-
-      - name: Write build provenance
-        env:
-          CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
-          CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
-          COORDINATOR_REPOSITORY: ${{ github.repository }}
-          COORDINATOR_REVISION: ${{ github.sha }}
-          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
-          OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
-          RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
-        run: |
-          manifest_sha256="$(shasum -a 256 "$MANIFEST_PATH" | awk '{print $1}')"
-          jq -n \
-            --arg toolchain "$OHM_TOOLCHAIN" \
-            --arg target "$OHM_TARGET" \
-            --arg coordinator_repository "$COORDINATOR_REPOSITORY" \
-            --arg coordinator_revision "$COORDINATOR_REVISION" \
-            --arg manifest_path "$MANIFEST_PATH" \
-            --arg manifest_sha256 "$manifest_sha256" \
-            --arg rust_revision "$RUST_REVISION" \
-            --arg cargo_revision "$CARGO_REVISION" \
-            --arg clippy_revision "$CLIPPY_REVISION" \
-            '{
-              schema_version: 1,
-              toolchain: $toolchain,
-              target: $target,
-              coordinator: {
-                repository: $coordinator_repository,
-                revision: $coordinator_revision
-              },
-              manifest: {
-                path: $manifest_path,
-                sha256: $manifest_sha256
-              },
-              sources: {
-                rust: { revision: $rust_revision },
-                cargo: { revision: $cargo_revision },
-                clippy: { revision: $clippy_revision }
-              }
-            }' > source/rust/build/dist/ohm-provenance.json
-
-      - name: Create checksums
-        working-directory: source/rust/build/dist
-        run: |
-          find . -maxdepth 1 -type f ! -name SHA256SUMS -print \
-            | LC_ALL=C sort \
-            | while IFS= read -r artifact; do shasum -a 256 "$artifact"; done \
-            > SHA256SUMS
 
       - name: Retain distribution artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4.7.1
         with:
           name: ${{ needs.plan.outputs.toolchain }}-aarch64-apple-darwin
-          path: source/rust/build/dist/
+          path: ${{ steps.assets.outputs.directory }}/
           if-no-files-found: error
           retention-days: 7
+
+  publish:
+    if: inputs.build
+    needs:
+      - plan
+      - build
+    environment: release
+    runs-on: depot-ubuntu-24.04-4
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OHM_TARGET: aarch64-apple-darwin
+      OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+    steps:
+      - name: Download verified distribution assets
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.plan.outputs.toolchain }}-aarch64-apple-darwin
+          path: release
+
+      - name: Verify release assets
+        working-directory: release
+        run: |
+          archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
+          manifest_name="$OHM_TOOLCHAIN.json"
+          provenance_name="$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
+
+          for asset in "$archive_name" ohm-installer.sh "$manifest_name" "$provenance_name" SHA256SUMS; do
+            if [[ ! -f "$asset" || -L "$asset" ]]; then
+              echo "missing or unsafe release asset: $asset" >&2
+              exit 1
+            fi
+          done
+
+          sha256sum --check --strict SHA256SUMS
+
+      - name: Publish GitHub Release
+        working-directory: release
+        env:
+          RELEASE_COMMIT: ${{ github.sha }}
+          RELEASE_REF: ${{ github.ref }}
+        run: |
+          if [[ "$RELEASE_REF" != "refs/heads/main" ]]; then
+            echo "Ohm releases must be published from the protected main branch" >&2
+            exit 1
+          fi
+
+          if gh release view "$OHM_TOOLCHAIN" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Ohm release already exists: $OHM_TOOLCHAIN" >&2
+            exit 1
+          fi
+
+          gh release create "$OHM_TOOLCHAIN" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$RELEASE_COMMIT" \
+            --title "$OHM_TOOLCHAIN" \
+            --generate-notes \
+            "$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
+            ohm-installer.sh \
+            "$OHM_TOOLCHAIN.json" \
+            "$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json" \
+            SHA256SUMS
