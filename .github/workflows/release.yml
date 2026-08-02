@@ -219,14 +219,14 @@ jobs:
           OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
         run: |
           rust_version="$(tr -d '\r\n' < source/rust/src/version)"
-          combined_archive="source/rust/build/dist/rust-$rust_version-dev-$OHM_TARGET.tar.xz"
+          combined_archive="source/rust/build/dist/rust-$rust_version-dev-$OHM_TARGET.tar.gz"
           if [[ ! -f "$combined_archive" ]]; then
             echo "combined Ohm archive not found: $combined_archive" >&2
             exit 1
           fi
 
           release_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-release.XXXXXX")"
-          archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.xz"
+          archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
           manifest_name="$OHM_TOOLCHAIN.json"
           provenance_name="$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
           cp "$combined_archive" "$release_directory/$archive_name"
@@ -281,7 +281,7 @@ jobs:
           export RUSTUP_HOME="$smoke_root/rustup-home"
           mkdir -p "$CARGO_HOME" "$RUSTUP_HOME"
           sh "$RELEASE_DIRECTORY/ohm-installer.sh" \
-            --archive "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN-$OHM_TARGET.tar.xz" \
+            --archive "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
             --checksums "$RELEASE_DIRECTORY/SHA256SUMS" \
             --prefix "$toolchain_root" \
             --no-alias
@@ -408,7 +408,7 @@ jobs:
       - name: Verify release assets
         working-directory: release
         run: |
-          archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.xz"
+          archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
           manifest_name="$OHM_TOOLCHAIN.json"
           provenance_name="$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
 
@@ -442,7 +442,7 @@ jobs:
             --target "$RELEASE_COMMIT" \
             --title "$OHM_TOOLCHAIN" \
             --generate-notes \
-            "$OHM_TOOLCHAIN-$OHM_TARGET.tar.xz" \
+            "$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
             ohm-installer.sh \
             "$OHM_TOOLCHAIN.json" \
             "$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json" \

@@ -208,14 +208,14 @@ if [ -n "$workflow_run" ]; then
     fi
 
     archive_candidates=$temporary_directory/archive-candidates
-    find "$download_directory" -type f -name "ohm-*-$host_target.tar.xz" -print \
+    find "$download_directory" -type f -name "ohm-*-$host_target.tar.gz" -print \
         > "$archive_candidates"
     archive_count=$(awk 'END { print NR }' "$archive_candidates")
     [ "$archive_count" -eq 1 ] ||
         fail 'the workflow artifact must contain exactly one matching Ohm archive'
     archive_path=$(sed -n '1p' "$archive_candidates")
     archive_name=${archive_path##*/}
-    inferred_version=${archive_name%-"$host_target".tar.xz}
+    inferred_version=${archive_name%-"$host_target".tar.gz}
     inferred_version=$(normalize_version "$inferred_version")
 
     if [ -n "$version" ]; then
@@ -251,7 +251,7 @@ elif [ -z "$archive_path" ]; then
         version=$(normalize_version "$release_tag")
     fi
 
-    archive_name=$version-$host_target.tar.xz
+    archive_name=$version-$host_target.tar.gz
     archive_path=$temporary_directory/$archive_name
     release_url=https://github.com/$repository/releases/download/$version
 

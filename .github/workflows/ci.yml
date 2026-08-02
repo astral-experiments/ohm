@@ -52,9 +52,9 @@ jobs:
               )
           if rust.get("omit-git-hash") is not False:
               raise SystemExit("Ohm releases must retain their source Git revision")
-          if config.get("dist", {}).get("compression-formats") != ["xz"]:
+          if config.get("dist", {}).get("compression-formats") != ["gz"]:
               raise SystemExit(
-                  "Ohm releases must produce one deterministic xz-compressed archive"
+                  "Ohm releases must produce one deterministic gzip-compressed archive"
               )
           PY
       - name: Validate toolchain manifests

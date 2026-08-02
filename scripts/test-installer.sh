@@ -10,7 +10,7 @@ release_directory="$temporary_directory/release"
 fixture_directory="$temporary_directory/fixture"
 mock_directory="$temporary_directory/mocks"
 version="ohm-1.97.1-2"
-archive_name="$version-aarch64-apple-darwin.tar.xz"
+archive_name="$version-aarch64-apple-darwin.tar.gz"
 archive_root="rust-1.97.1-dev-aarch64-apple-darwin"
 mkdir -p "$release_directory" "$fixture_directory/$archive_root" "$mock_directory"
 
@@ -43,7 +43,7 @@ for binary in rustc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; do
 done
 EOF
 chmod +x "$fixture_directory/$archive_root/install.sh"
-tar -cJf "$release_directory/$archive_name" -C "$fixture_directory" "$archive_root"
+tar -czf "$release_directory/$archive_name" -C "$fixture_directory" "$archive_root"
 cp "$installer" "$release_directory/ohm-installer.sh"
 printf '{"toolchain":"%s"}\n' "$version" > "$release_directory/$version.json"
 printf '{"toolchain":"%s"}\n' "$version" \
@@ -134,12 +134,12 @@ case "$url" in
     fi
     printf '{"tag_name":"%s"}\n' "$OHM_TEST_VERSION" > "$output"
     ;;
-  "https://github.com/astral-sh/ohm/releases/download/$OHM_TEST_VERSION/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.xz")
+  "https://github.com/astral-sh/ohm/releases/download/$OHM_TEST_VERSION/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz")
     if [ "${OHM_TEST_CURL_FAILURE:-}" = archive ]; then
       echo 'public archive download failed' >&2
       exit 22
     fi
-    cp "$OHM_TEST_RELEASE_DIRECTORY/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.xz" \
+    cp "$OHM_TEST_RELEASE_DIRECTORY/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz" \
       "$output"
     ;;
   "https://github.com/astral-sh/ohm/releases/download/$OHM_TEST_VERSION/SHA256SUMS")
@@ -148,7 +148,7 @@ case "$url" in
       exit 22
     fi
     if [ "${OHM_TEST_PUBLIC_BAD_CHECKSUM:-0}" = 1 ]; then
-      printf '%064d  %s-aarch64-apple-darwin.tar.xz\n' 0 "$OHM_TEST_VERSION" \
+      printf '%064d  %s-aarch64-apple-darwin.tar.gz\n' 0 "$OHM_TEST_VERSION" \
         > "$output"
     else
       cp "$OHM_TEST_RELEASE_DIRECTORY/SHA256SUMS" "$output"
@@ -572,7 +572,7 @@ assert_no_links duplicate-checksum
 
 ln -s /tmp "$fixture_directory/$archive_root/unsafe-link"
 unsafe_archive="$temporary_directory/$archive_name"
-tar -cJf "$unsafe_archive" -C "$fixture_directory" "$archive_root"
+tar -czf "$unsafe_archive" -C "$fixture_directory" "$archive_root"
 unsafe_checksums="$temporary_directory/unsafe-checksums"
 (
   cd "$temporary_directory"

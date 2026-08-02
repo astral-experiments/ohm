@@ -102,7 +102,7 @@ file. GitHub authentication is not required in this mode:
 ```console
 sh scripts/install.sh \
   --version ohm-1.97.1-2 \
-  --archive ohm-1.97.1-2-aarch64-apple-darwin.tar.xz \
+  --archive ohm-1.97.1-2-aarch64-apple-darwin.tar.gz \
   --checksums SHA256SUMS
 ```
 
