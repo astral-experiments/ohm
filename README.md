@@ -31,20 +31,30 @@ cargo +ohm fmt                     # the matching rustfmt from the Ohm Rust sour
 Installing or linking Ohm does not replace the default Rust toolchain. An Ohm toolchain directory
 contains the forked Cargo binary, matching compiler, Clippy and rustfmt binaries, and sysroot.
 
-Selecting the toolchain alone does not enable the current acceleration prototypes. The measured uv
-configuration currently requires the rustc public-API hash, Cargo's cached-relink mode, and uv's
-existing fast-build profile:
+Cargo shipped in an Ohm distribution enables the complete Ohm workflow by default: Cargo's
+`-Zrelink-only` reuses cached code generation when a unit only needs to be relinked, rustc's
+`-Zpublic-api-hash` uses public-API hashes for dependency invalidation, and
+`-Zcache-proc-macros` caches derive proc-macro invocations. No additional performance flags are
+required:
 
 ```console
-RUSTFLAGS="-Zpublic-api-hash" \
-  cargo +ohm-1.97.1-1 -Zrelink-only \
-  test --profile fast-build -p uv --lib TEST_NAME -- --exact
+cargo +ohm test
 ```
 
-`--profile fast-build` is specific to the measured uv workflow. The Rust and Cargo flags are still
-unstable prototype interfaces; a future Cargo-owned Ohm flag or launcher should coordinate them.
-Ohm distributions are built using Rust's `dev` channel so these explicit `-Z` flags work without
-setting `RUSTC_BOOTSTRAP`; selecting the toolchain still leaves the prototypes disabled by default.
+For a controlled comparison with the same Cargo and compiler binaries, disable all of those defaults
+for one invocation:
+
+```console
+cargo +ohm -Zohm-defaults=no test
+```
+
+rustc labels `-Zcache-proc-macros` as potentially unsound. Ohm is experimental; use the aggregate
+opt-out above for invocations where that risk is unacceptable or when investigating cache-related
+behavior.
+
+The individual unstable flags are implementation details of this bundle. Repository-specific
+options such as uv's `--profile fast-build` remain separate and should only be used when appropriate
+for that repository.
 
 There is no released Ohm toolchain or installer yet. After building one locally, rustup can
 register an extracted toolchain directory with:
@@ -53,7 +63,8 @@ register an extracted toolchain directory with:
 rustup toolchain link ohm-1.97.1-1 /path/to/ohm-toolchain
 ```
 
-The exact archive layout and installer command are still to be implemented and tested.
+The release workflow smoke-tests Rust's generated combined installer, but no user-facing download or
+installer command has been published yet.
 
 ## Versions and source pins
 
@@ -88,6 +99,10 @@ A new manifest may be checked in as a draft while its source revisions are being
 release workflow rejects drafts. `toolchains/1.97.1/1.json` now pins the first complete candidate
 source pair; it does not imply that an Ohm archive has been built or released.
 
+[`toolchains/1.97.1/2.json`](toolchains/1.97.1/2.json) reserves the revision for the default Ohm
+workflow. It remains a draft until the Cargo and Rust stacks are squash-merged and their final
+source revisions can be pinned.
+
 ## Validation
 
 Validate the manifest structure and derived toolchain name:
@@ -114,8 +129,8 @@ The manual [`release.yml`](.github/workflows/release.yml) workflow accepts the p
 manifest and currently provides three pieces of release scaffolding:
 
 1. select a versioned manifest, then check out and verify its exact private source revisions; and
-2. optionally run Rust bootstrap's full `x.py dist extended` build for the configured native target
-   and retain its distribution artifacts; and
+2. optionally run Rust bootstrap's full `x.py dist extended` build for the configured native target,
+   smoke-install the combined archive, and retain its distribution artifacts; and
 3. write checksummed provenance containing the coordinator revision, manifest digest, and exact
    Rust and Cargo revisions.
 
@@ -131,5 +146,5 @@ configuration builds the stage-2 compiler, sysroot, combined extended archive, a
 while reusing the matching Rust CI LLVM rather than rebuilding unchanged LLVM.
 
 The workflow deliberately does **not** create a GitHub release, publish artifacts, update a moving
-`ohm` alias, or install the resulting distribution. Archive smoke tests, an installer, artifact
+`ohm` alias, or install the resulting distribution persistently. A user-facing installer, artifact
 signing or attestation, and publication remain required before the first release.
