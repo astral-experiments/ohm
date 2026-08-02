@@ -4,12 +4,7 @@ set -eu
 repository=astral-sh/ohm
 embedded_version=
 embedded_archive_sha256=
-requested_version=
-archive_path=
-checksums_path=
-installation_prefix=
-workflow_run=
-install_alias=true
+installation_prefix=${OHM_INSTALL_DIR:-}
 temporary_directory=
 staging_directory=
 activated_prefix=
@@ -23,12 +18,10 @@ fail() {
 
 usage() {
     printf '%s\n' \
-        'Usage: install.sh [--version VERSION] [--run RUN_ID]' \
-        '                  [--archive PATH --checksums PATH] [--prefix PATH] [--no-alias]' \
+        'Usage: install.sh [--help]' \
         '' \
-        'Install an Ohm macOS Apple Silicon toolchain.' \
-        'Use --run RUN_ID to install a private GitHub Actions build artifact.' \
-        'Without --run or --archive, install the latest public GitHub release.'
+        'Install the embedded, checksum-pinned Ohm macOS Apple Silicon toolchain.' \
+        'Set OHM_INSTALL_DIR to override its installation directory.'
 }
 
 cleanup() {
@@ -75,10 +68,6 @@ cleanup() {
 trap cleanup 0
 trap 'exit 130' HUP INT TERM
 
-require_argument() {
-    [ "$#" -ge 2 ] || fail "$1 requires an argument"
-}
-
 normalize_version() {
     case "$1" in
         ohm-*) normalized=$1 ;;
@@ -95,45 +84,16 @@ normalize_version() {
 }
 
 main() {
-while [ "$#" -gt 0 ]; do
-    case "$1" in
-        --version)
-            require_argument "$@"
-            requested_version=$2
-            shift 2
-            ;;
-        --archive)
-            require_argument "$@"
-            archive_path=$2
-            shift 2
-            ;;
-        --checksums)
-            require_argument "$@"
-            checksums_path=$2
-            shift 2
-            ;;
-        --prefix)
-            require_argument "$@"
-            installation_prefix=$2
-            shift 2
-            ;;
-        --run)
-            require_argument "$@"
-            workflow_run=$2
-            shift 2
-            ;;
-        --no-alias)
-            install_alias=false
-            shift
-            ;;
-        --help|-h)
-            usage
-            script_complete=true
-            return 0
-            ;;
-        *) fail "unrecognized option: $1" ;;
-    esac
-done
+case "$#" in
+    0) ;;
+    1)
+        [ "$1" = --help ] || fail "unrecognized option: $1"
+        usage
+        script_complete=true
+        return 0
+        ;;
+    *) fail 'the release installer does not accept additional arguments' ;;
+esac
 
 [ "$(uname -s)" = Darwin ] || fail 'only macOS is currently supported'
 case "$(uname -m)" in
@@ -150,134 +110,44 @@ command -v rustup >/dev/null 2>&1 || fail 'rustup is required to register the in
 [ -n "${HOME:-}" ] || [ -n "${RUSTUP_HOME:-}" ] ||
     fail 'HOME or RUSTUP_HOME must be set to register the installed toolchain'
 
-version=
-if [ -n "$requested_version" ]; then
-    version=$(normalize_version "$requested_version")
-fi
-if [ -n "$embedded_version" ]; then
-    release_version=$(normalize_version "$embedded_version")
-    [ -z "$version" ] || [ "$version" = "$release_version" ] ||
-        fail 'requested Ohm version does not match the embedded release version'
-    version=$release_version
-fi
-if [ -n "$embedded_archive_sha256" ]; then
-    printf '%s\n' "$embedded_archive_sha256" | awk '
-        NR == 1 && length($0) == 64 && $0 ~ /^[[:xdigit:]]+$/ { valid = 1 }
-        NR != 1 { invalid = 1 }
-        END { exit invalid || !valid }
-    ' || fail 'the embedded archive checksum is invalid'
-fi
+[ -n "$embedded_version" ] && [ -n "$embedded_archive_sha256" ] ||
+    fail 'a release-specific installer with an embedded checksum is required'
+version=$(normalize_version "$embedded_version")
+printf '%s\n' "$embedded_archive_sha256" | awk '
+    NR == 1 && length($0) == 64 && $0 ~ /^[[:xdigit:]]+$/ { valid = 1 }
+    NR != 1 { invalid = 1 }
+    END { exit invalid || !valid }
+' || fail 'the embedded archive checksum is invalid'
 
-if [ -n "$workflow_run" ]; then
-    printf '%s\n' "$workflow_run" | awk '
-        NR == 1 && /^[0-9]+$/ { valid = 1 }
-        NR != 1 { invalid = 1 }
-        END { exit invalid || !valid }
-    ' ||
-        fail 'GitHub Actions run IDs must contain only digits'
-    [ -z "$archive_path" ] && [ -z "$checksums_path" ] ||
-        fail '--run cannot be combined with --archive or --checksums'
-    command -v gh >/dev/null 2>&1 || fail 'GitHub CLI is required for private Actions artifacts'
-elif [ -n "$archive_path" ] || [ -n "$checksums_path" ]; then
-    [ -n "$archive_path" ] && [ -n "$checksums_path" ] ||
-        fail '--archive and --checksums must be provided together'
-    [ -n "$version" ] || fail '--archive requires --version'
-else
-    command -v curl >/dev/null 2>&1 || fail 'curl is required to download public Ohm releases'
-fi
+download_url=${OHM_DOWNLOAD_URL:-https://github.com/$repository/releases/download/$version}
+case "$download_url" in
+    https://*) command -v curl >/dev/null 2>&1 || fail 'curl is required to download Ohm' ;;
+    file:///*) ;;
+    *) fail 'OHM_DOWNLOAD_URL must use an HTTPS URL or an absolute file URL' ;;
+esac
 
 temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/ohm-installer.XXXXXXXX") ||
     fail 'could not create a temporary directory'
 
-if [ -n "$workflow_run" ]; then
-    download_directory=$temporary_directory/download
-    mkdir -p "$download_directory"
-
-    if [ -n "$version" ]; then
-        GH_PROMPT_DISABLED=1 gh run download "$workflow_run" \
-            --repo "$repository" \
-            --name "$version-$host_target" \
-            --dir "$download_directory" ||
-            fail 'could not download the private GitHub Actions artifact; check GitHub authentication'
-    else
-        GH_PROMPT_DISABLED=1 gh run download "$workflow_run" \
-            --repo "$repository" \
-            --pattern "*-$host_target" \
-            --dir "$download_directory" ||
-            fail 'could not download the private GitHub Actions artifact; check GitHub authentication'
-    fi
-
-    archive_candidates=$temporary_directory/archive-candidates
-    find "$download_directory" -type f -name "ohm-*-$host_target.tar.gz" -print \
-        > "$archive_candidates"
-    archive_count=$(awk 'END { print NR }' "$archive_candidates")
-    [ "$archive_count" -eq 1 ] ||
-        fail 'the workflow artifact must contain exactly one matching Ohm archive'
-    archive_path=$(sed -n '1p' "$archive_candidates")
-    archive_name=${archive_path##*/}
-    inferred_version=${archive_name%-"$host_target".tar.gz}
-    inferred_version=$(normalize_version "$inferred_version")
-
-    if [ -n "$version" ]; then
-        [ "$version" = "$inferred_version" ] ||
-            fail 'workflow archive version does not match the requested version'
-    else
-        version=$inferred_version
-    fi
-
-    checksums_path=${archive_path%/*}/SHA256SUMS
-    [ -f "$checksums_path" ] || fail 'the workflow artifact does not include SHA256SUMS'
-elif [ -z "$archive_path" ]; then
-    if [ -z "$version" ]; then
-        release_metadata=$temporary_directory/latest-release.json
+archive_name=$version-$host_target.tar.gz
+archive_path=$temporary_directory/$archive_name
+case "$download_url" in
+    https://*)
         curl --fail --silent --show-error --location \
             --retry 3 --retry-delay 1 \
             --proto '=https' --tlsv1.2 \
-            --output "$release_metadata" \
-            "https://api.github.com/repos/$repository/releases/latest" ||
-            fail 'could not retrieve the latest public Ohm release'
-
-        release_tag=$(awk '
-            /"tag_name"[[:space:]]*:/ {
-                tag = $0
-                sub(/^.*"tag_name"[[:space:]]*:[[:space:]]*"/, "", tag)
-                sub(/".*$/, "", tag)
-                print tag
-                found = 1
-                exit
-            }
-            END { if (!found) exit 1 }
-        ' "$release_metadata") || fail 'the latest release metadata does not contain a valid tag'
-        version=$(normalize_version "$release_tag")
-    fi
-
-    archive_name=$version-$host_target.tar.gz
-    archive_path=$temporary_directory/$archive_name
-    release_url=https://github.com/$repository/releases/download/$version
-
-    curl --fail --silent --show-error --location \
-        --retry 3 --retry-delay 1 \
-        --proto '=https' --tlsv1.2 \
-        --output "$archive_path" "$release_url/$archive_name" ||
-        fail 'could not download the public Ohm release archive'
-    if [ -z "$embedded_archive_sha256" ]; then
-        checksums_path=$temporary_directory/SHA256SUMS
-        curl --fail --silent --show-error --location \
-            --retry 3 --retry-delay 1 \
-            --proto '=https' --tlsv1.2 \
-            --output "$checksums_path" "$release_url/SHA256SUMS" ||
-            fail 'could not download the public Ohm release checksums'
-    fi
-fi
-
+            --output "$archive_path" "${download_url%/}/$archive_name" ||
+            fail 'could not download the public Ohm release archive'
+        ;;
+    file:///*)
+        cp "${download_url#file://}/$archive_name" "$archive_path" ||
+            fail 'could not copy the local Ohm release archive'
+        ;;
+esac
 [ -f "$archive_path" ] || fail "archive not found: $archive_path"
-if [ -z "$embedded_archive_sha256" ] || [ -n "$checksums_path" ]; then
-    [ -f "$checksums_path" ] || fail "checksums not found: $checksums_path"
-fi
-archive_name=${archive_path##*/}
 
 if [ -z "$installation_prefix" ]; then
-    [ -n "${HOME:-}" ] || fail 'HOME must be set when --prefix is omitted'
+    [ -n "${HOME:-}" ] || fail 'HOME must be set when OHM_INSTALL_DIR is omitted'
     installation_prefix=${XDG_DATA_HOME:-"$HOME/.local/share"}/ohm/toolchains/$version
 fi
 while [ "$installation_prefix" != / ] && [ "${installation_prefix%/}" != "$installation_prefix" ]; do
@@ -286,7 +156,7 @@ done
 
 case "$installation_prefix" in
     /*) ;;
-    *) fail '--prefix must be an absolute path' ;;
+    *) fail 'OHM_INSTALL_DIR must be an absolute path' ;;
 esac
 case "$installation_prefix" in
     /|/Users|/private|/tmp|/private/tmp|"${HOME:-}"|"${HOME:-}/"|"${RUSTUP_HOME:-}"|"${CARGO_HOME:-}")
@@ -302,39 +172,11 @@ printf '%s\n' "$installation_prefix" | awk '
             }
         }
     }
-' || fail '--prefix must not contain relative path components'
+' || fail 'OHM_INSTALL_DIR must not contain relative path components'
 
-if [ -n "$checksums_path" ]; then
-    expected_checksum=$(awk -v wanted="$archive_name" '
-    {
-        checksum = $1
-        filename = $0
-        sub(/^[^[:space:]]+[[:space:]]+\*?/, "", filename)
-        if (filename == wanted) {
-            if (length(checksum) != 64 || checksum !~ /^[[:xdigit:]]+$/) {
-                invalid = 1
-            }
-            count++
-            match_checksum = tolower(checksum)
-        }
-    }
-    END {
-        if (invalid || count != 1) {
-            exit 1
-        }
-        print match_checksum
-    }
-' "$checksums_path") || fail 'the checksum manifest has no unique valid entry for the archive'
-else
-    expected_checksum=$embedded_archive_sha256
-fi
-if [ -n "$embedded_archive_sha256" ]; then
-    [ "$expected_checksum" = "$embedded_archive_sha256" ] ||
-        fail 'the checksum manifest does not match the embedded archive checksum'
-fi
 actual_checksum=$(shasum -a 256 "$archive_path" | awk '{ print tolower($1) }') ||
     fail 'could not calculate the archive checksum'
-[ "$actual_checksum" = "$expected_checksum" ] || fail 'archive checksum verification failed'
+[ "$actual_checksum" = "$embedded_archive_sha256" ] || fail 'archive checksum verification failed'
 
 upstream_version=${version#ohm-}
 upstream_version=${upstream_version%-*}
@@ -409,7 +251,8 @@ else
         fail 'could not create an installation staging directory'
     extracted_directory=$temporary_directory/extracted
     mkdir -p "$extracted_directory"
-    tar -xf "$archive_path" -C "$extracted_directory" || fail 'could not extract the archive'
+    tar --no-same-owner -xf "$archive_path" -C "$extracted_directory" ||
+        fail 'could not extract the archive'
     inner_installer=$extracted_directory/$archive_root/install.sh
     [ -f "$inner_installer" ] && [ ! -L "$inner_installer" ] ||
         fail 'the archive does not contain a regular Rust installation script'
@@ -481,16 +324,11 @@ link_toolchain() {
 }
 
 link_toolchain "$version"
-if [ "$install_alias" = true ]; then
-    link_toolchain ohm
-fi
+link_toolchain ohm
 
 printf 'Installed %s at %s\n' "$version" "$installation_prefix"
-if [ "$install_alias" = true ]; then
-    printf 'Run: cargo +ohm --version\n'
-else
-    printf 'Run: cargo +%s --version\n' "$version"
-fi
+printf '%s\n' 'Warning: Ohm is experimental; use it only for development iteration.'
+printf 'Run: cargo +ohm --version\n'
 script_complete=true
 }
 

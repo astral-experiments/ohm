@@ -34,7 +34,7 @@ jobs:
       toolchain: ${{ steps.manifest.outputs.toolchain }}
     steps:
       - name: Check out release coordinator
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -47,7 +47,7 @@ jobs:
             exit 1
           fi
 
-      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: true
 
@@ -68,7 +68,7 @@ jobs:
           echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
 
       - name: Check out pinned ohm-rust
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: astral-sh/ohm-rust
           ref: ${{ steps.manifest.outputs.rust-revision }}
@@ -77,7 +77,7 @@ jobs:
           path: source/rust
 
       - name: Check out pinned ohm-cargo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: astral-sh/ohm-cargo
           ref: ${{ steps.manifest.outputs.cargo-revision }}
@@ -86,7 +86,7 @@ jobs:
           path: source/cargo
 
       - name: Check out pinned ohm-rust-clippy
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: astral-sh/ohm-rust-clippy
           ref: ${{ steps.manifest.outputs.clippy-revision }}
@@ -116,16 +116,16 @@ jobs:
       OHM_TARGET: aarch64-apple-darwin
     steps:
       - name: Check out release coordinator
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: true
 
       - name: Check out pinned ohm-rust
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: astral-sh/ohm-rust
           ref: ${{ needs.plan.outputs.rust-revision }}
@@ -134,7 +134,7 @@ jobs:
           path: source/rust
 
       - name: Check out pinned ohm-cargo into the Rust source tree
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: astral-sh/ohm-cargo
           ref: ${{ needs.plan.outputs.cargo-revision }}
@@ -280,11 +280,9 @@ jobs:
           export CARGO_HOME="$smoke_root/cargo-home"
           export RUSTUP_HOME="$smoke_root/rustup-home"
           mkdir -p "$CARGO_HOME" "$RUSTUP_HOME"
-          sh "$RELEASE_DIRECTORY/ohm-installer.sh" \
-            --archive "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
-            --checksums "$RELEASE_DIRECTORY/SHA256SUMS" \
-            --prefix "$toolchain_root" \
-            --no-alias
+          OHM_DOWNLOAD_URL="file://$RELEASE_DIRECTORY" \
+            OHM_INSTALL_DIR="$toolchain_root" \
+            sh "$RELEASE_DIRECTORY/ohm-installer.sh"
 
           unset RUSTC_BOOTSTRAP
           rustc +"$OHM_TOOLCHAIN" -Z help \
@@ -377,8 +375,11 @@ jobs:
               --manifest-path "$smoke_crate/Cargo.toml"
           grep -Fx disabled "$disabled_log" >/dev/null
 
+          cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
+          cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
+
       - name: Retain distribution artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4.7.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ needs.plan.outputs.toolchain }}-aarch64-apple-darwin
           path: ${{ steps.assets.outputs.directory }}/
