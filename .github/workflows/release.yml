@@ -172,6 +172,8 @@ jobs:
           repository: astral-sh/ohm-rust
           ref: ${{ needs.plan.outputs.rust-revision }}
           token: ${{ steps.source-token.outputs.token }}
+          # Bootstrap needs the upstream history to locate a compatible LLVM artifact.
+          fetch-depth: 0
           persist-credentials: false
           path: source/rust
 
@@ -217,7 +219,9 @@ jobs:
         env:
           OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
         run: |
+          # Ohm builds on GitHub Actions, but is not a rust-lang CI merge commit.
           python3 source/rust/x.py dist \
+            --ci false \
             --config "$GITHUB_WORKSPACE/release/bootstrap.toml" \
             --host "$OHM_TARGET" \
             --target "$OHM_TARGET" \
