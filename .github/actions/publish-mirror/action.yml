@@ -1,0 +1,70 @@
+name: Publish public Ohm release assets
+description: Mirror verified immutable Ohm release assets to Cloudflare R2.
+
+inputs:
+  version:
+    description: Exact published Ohm toolchain version
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Download published release assets
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        OHM_TOOLCHAIN: ${{ inputs.version }}
+      run: |
+        if [[ ! "$OHM_TOOLCHAIN" =~ ^ohm-[0-9]+\.[0-9]+\.[0-9]+-[1-9][0-9]*$ ]]; then
+          echo "invalid Ohm toolchain version: $OHM_TOOLCHAIN" >&2
+          exit 1
+        fi
+
+        gh release download "$OHM_TOOLCHAIN" --repo "$GITHUB_REPOSITORY" --dir release
+
+    - name: Verify and isolate public release assets
+      id: assets
+      shell: bash
+      working-directory: release
+      env:
+        OHM_TOOLCHAIN: ${{ inputs.version }}
+      run: |
+        archive_name="$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz"
+        for asset in "$archive_name" ohm-installer.sh SHA256SUMS; do
+          if [[ ! -f "$asset" || -L "$asset" ]]; then
+            echo "missing or unsafe release asset: $asset" >&2
+            exit 1
+          fi
+        done
+
+        sha256sum --check --strict SHA256SUMS
+
+        public_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-public-release.XXXXXX")"
+        cp "$archive_name" "$public_directory/"
+        cp ohm-installer.sh "$public_directory/install.sh"
+        (
+          cd "$public_directory"
+          sha256sum "$archive_name" install.sh > SHA256SUMS
+        )
+        echo "directory=$public_directory" >> "$GITHUB_OUTPUT"
+
+    - name: Publish immutable release assets
+      shell: bash
+      env:
+        OHM_TOOLCHAIN: ${{ inputs.version }}
+        PUBLIC_DIRECTORY: ${{ steps.assets.outputs.directory }}
+      run: |
+        aws s3 cp --recursive --output table --color on \
+          --cache-control "public, max-age=31536000, immutable" \
+          "$PUBLIC_DIRECTORY/" \
+          "s3://$R2_BUCKET/ohm/releases/$OHM_TOOLCHAIN/"
+
+    - name: Publish latest release installer
+      shell: bash
+      env:
+        PUBLIC_DIRECTORY: ${{ steps.assets.outputs.directory }}
+      run: |
+        aws s3 cp --output table --color on \
+          --cache-control "public, max-age=300" \
+          "$PUBLIC_DIRECTORY/install.sh" \
+          "s3://$R2_BUCKET/ohm/install.sh"
