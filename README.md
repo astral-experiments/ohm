@@ -59,48 +59,41 @@ for that repository.
 
 ## Installation
 
-Ohm currently supports Apple Silicon macOS. Install [rustup](https://rustup.rs/) and authenticate
-the [GitHub CLI](https://cli.github.com/) with an account that can access the private
-`astral-sh/ohm` repository. Successful distribution builds retain their installable artifacts for
-seven days. Download the artifact from a specific workflow run and install its verified archive:
+Ohm currently supports Apple Silicon macOS. Install [rustup](https://rustup.rs/), then install the
+latest Ohm release with:
 
 ```console
-version=ohm-1.97.1-2
-directory="$(mktemp -d)"
-gh run download 123456789 -R astral-sh/ohm \
-  -n "$version-aarch64-apple-darwin" -D "$directory"
-sh "$directory/ohm-installer.sh" \
-  --version "$version" \
-  --archive "$directory/$version-aarch64-apple-darwin.tar.xz" \
-  --checksums "$directory/SHA256SUMS"
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/astral-sh/ohm/releases/latest/download/ohm-installer.sh | sh
 ```
 
-Replace `123456789` with the successful workflow run ID. The installer verifies the archive's
-SHA-256 checksum before installing the complete compiler, Cargo, Clippy, and rustfmt toolchain. By
-default, versions are installed under `${XDG_DATA_HOME:-$HOME/.local/share}/ohm/toolchains/` and
-registered with rustup under both their immutable version and the moving `ohm` alias:
+Each release publishes its own installer with the exact Ohm version and archive checksum embedded.
+The installer downloads the matching Apple Silicon archive, verifies its SHA-256 checksum, and
+installs the complete compiler, Cargo, Clippy, and rustfmt toolchain. No GitHub account, GitHub
+CLI, or GitHub API request is required. By default, versions are installed under
+`${XDG_DATA_HOME:-$HOME/.local/share}/ohm/toolchains/` and registered with rustup under both their
+immutable version and the moving `ohm` alias:
 
 ```console
 cargo +ohm-1.97.1-2 test
 cargo +ohm test
 ```
 
-Your default Rust toolchain is never changed. From an Ohm checkout, the installer can download and
-verify the artifact for a particular run directly:
+Your default Rust toolchain is never changed. To install an exact Ohm version, download the
+installer from that version's GitHub Release:
 
 ```console
-sh scripts/install.sh --run 123456789 --version ohm-1.97.1-2
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/astral-sh/ohm/releases/download/ohm-1.97.1-2/ohm-installer.sh | sh
 ```
 
 Pass `--no-alias` to retain an existing `ohm` alias while registering the exact version, or `--prefix`
 to choose the exact directory in which that version is installed:
 
 ```console
-sh scripts/install.sh \
-  --run 123456789 \
-  --version 1.97.1-2 \
-  --prefix /path/to/ohm-1.97.1-2 \
-  --no-alias
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/astral-sh/ohm/releases/latest/download/ohm-installer.sh \
+  | sh -s -- --prefix /path/to/ohm-1.97.1-2 --no-alias
 ```
 
 For an offline installation, provide the downloaded archive and its accompanying `SHA256SUMS`
@@ -111,6 +104,13 @@ sh scripts/install.sh \
   --version ohm-1.97.1-2 \
   --archive ohm-1.97.1-2-aarch64-apple-darwin.tar.xz \
   --checksums SHA256SUMS
+```
+
+Maintainers can also install an unpublished GitHub Actions build by providing its workflow run ID.
+This mode requires the [GitHub CLI](https://cli.github.com/) and access to the workflow artifact:
+
+```console
+sh scripts/install.sh --run 123456789 --version ohm-1.97.1-2
 ```
 
 ## Versions and source pins
@@ -181,9 +181,11 @@ manifest and:
 2. optionally runs Rust bootstrap's full `x.py dist extended` build for the configured native
    target, smoke-installs the combined archive, and prepares its distribution artifacts;
 3. writes checksummed provenance containing the coordinator revision, manifest digest, and exact
-   Rust, Cargo, and Clippy revisions; and
+   Rust, Cargo, and Clippy revisions;
 4. retains the combined archive, its checksums, provenance, manifest, and Ohm installer as a
-   private GitHub Actions artifact for seven days.
+   private GitHub Actions artifact for seven days; and
+5. publishes those verified assets as a versioned public GitHub Release, including an installer
+   containing the release version and archive checksum.
 
 Cross-repository checkout currently requires an `OHM_REPOSITORIES_TOKEN` secret in a protected
 `release` Environment. It must be a read-only, fine-grained token scoped only to `ohm-rust`,
@@ -191,10 +193,12 @@ Cross-repository checkout currently requires an `OHM_REPOSITORIES_TOKEN` secret 
 with a short-lived token minted per run by a GitHub App. The Environment must require the protected
 `main` branch and an approval before exposing the credential.
 
-The distribution build uses a self-hosted Apple Silicon runner with the labels `self-hosted`,
-`macOS`, `ARM64`, and `ohm-builder`. It must have at least 50 GiB of free disk space. The bootstrap
-configuration builds the stage-2 compiler, sysroot, combined extended archive, and pinned Cargo,
-while reusing the matching Rust CI LLVM rather than rebuilding unchanged LLVM.
+The distribution build uses Astral's shared `namespace-profile-macos-15` Apple Silicon runner.
+The runner needs at least 50 GiB of free disk space for Rust bootstrap, which builds the stage-2
+compiler, sysroot, combined extended archive, and pinned Cargo while reusing the matching Rust CI
+LLVM rather than rebuilding unchanged LLVM. Release planning and publication use Astral's shared
+`depot-ubuntu-24.04-4` Linux runners.
 
-The workflow does not create GitHub Releases or publish toolchains publicly. Accessing its artifacts
-requires authentication because the coordinator repository is private.
+Only the protected release-publication job can write repository contents. Public release assets can
+be downloaded without authentication; unpublished GitHub Actions artifacts still require repository
+access.

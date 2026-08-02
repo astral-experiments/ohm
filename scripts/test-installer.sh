@@ -68,6 +68,18 @@ case "${1:-}" in
 esac
 EOF
 
+cat > "$mock_directory/sysctl" <<'EOF'
+#!/bin/sh
+set -eu
+
+if [ "${1:-}" != -n ] || [ "${2:-}" != hw.optional.arm64 ]; then
+  echo "unexpected sysctl invocation: $*" >&2
+  exit 1
+fi
+
+printf '%s\n' "${OHM_TEST_APPLE_SILICON:-0}"
+EOF
+
 cat > "$mock_directory/rustup" <<'EOF'
 #!/bin/sh
 set -eu
@@ -78,8 +90,110 @@ if [ "${1:-}" != "toolchain" ] || [ "${2:-}" != "link" ]; then
   exit 1
 fi
 
+if [ "$3" = ohm ] && [ "${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" = 1 ] && \
+   [ ! -e "$OHM_TEST_RUSTUP_LOG.alias-failed" ]; then
+  : > "$OHM_TEST_RUSTUP_LOG.alias-failed"
+  echo 'mock rustup alias registration failed' >&2
+  exit 1
+fi
+
 mkdir -p "$RUSTUP_HOME/toolchains"
 ln -s "$4" "$RUSTUP_HOME/toolchains/$3"
+EOF
+
+cat > "$mock_directory/curl" <<'EOF'
+#!/bin/sh
+set -eu
+
+printf '%s\n' "$*" >> "${OHM_TEST_CURL_LOG:?}"
+output=
+url=
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --fail|--silent|--show-error|--location|--tlsv1.2|-fsSL|--retry-all-errors)
+      shift
+      ;;
+    --proto) shift 2 ;;
+    --retry|--retry-delay|--connect-timeout|--max-time) shift 2 ;;
+    --output|-o) output=$2; shift 2 ;;
+    https://*) url=$1; shift ;;
+    *) echo "unexpected curl argument: $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ -z "$output" ] || [ -z "$url" ]; then
+  echo 'missing curl output or URL' >&2
+  exit 1
+fi
+
+case "$url" in
+  https://api.github.com/repos/astral-sh/ohm/releases/latest)
+    if [ "${OHM_TEST_CURL_FAILURE:-}" = latest ]; then
+      echo 'GitHub latest release request failed' >&2
+      exit 22
+    fi
+    printf '{"tag_name":"%s"}\n' "$OHM_TEST_VERSION" > "$output"
+    ;;
+  "https://github.com/astral-sh/ohm/releases/download/$OHM_TEST_VERSION/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.xz")
+    if [ "${OHM_TEST_CURL_FAILURE:-}" = archive ]; then
+      echo 'public archive download failed' >&2
+      exit 22
+    fi
+    cp "$OHM_TEST_RELEASE_DIRECTORY/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.xz" \
+      "$output"
+    ;;
+  "https://github.com/astral-sh/ohm/releases/download/$OHM_TEST_VERSION/SHA256SUMS")
+    if [ "${OHM_TEST_CURL_FAILURE:-}" = checksums ]; then
+      echo 'public checksum download failed' >&2
+      exit 22
+    fi
+    if [ "${OHM_TEST_PUBLIC_BAD_CHECKSUM:-0}" = 1 ]; then
+      printf '%064d  %s-aarch64-apple-darwin.tar.xz\n' 0 "$OHM_TEST_VERSION" \
+        > "$output"
+    else
+      cp "$OHM_TEST_RELEASE_DIRECTORY/SHA256SUMS" "$output"
+    fi
+    ;;
+  *) echo "unexpected public release URL: $url" >&2; exit 1 ;;
+esac
+EOF
+
+cat > "$mock_directory/mkdir" <<'EOF'
+#!/bin/sh
+set -eu
+
+if [ "${OHM_TEST_ACTIVATION_RACE:-0}" = 1 ]; then
+  destination=
+  for argument in "$@"; do
+    destination=$argument
+  done
+
+  if [ "$destination" = "${OHM_TEST_ACTIVATION_DESTINATION:-}" ]; then
+    /bin/mkdir -p "$destination"
+    printf '%s\n' 'preserve the competing destination' > "$destination/race-marker"
+  fi
+fi
+
+exec /bin/mkdir "$@"
+EOF
+
+cat > "$mock_directory/mv" <<'EOF'
+#!/bin/sh
+set -eu
+
+if [ "${OHM_TEST_ACTIVATION_RACE:-0}" = 1 ]; then
+  destination=
+  for argument in "$@"; do
+    destination=$argument
+  done
+
+  if [ "$destination" = "${OHM_TEST_ACTIVATION_DESTINATION:-}" ]; then
+    mkdir -p "$destination"
+    printf '%s\n' 'preserve the competing destination' > "$destination/race-marker"
+  fi
+fi
+
+exec /bin/mv "$@"
 EOF
 
 cat > "$mock_directory/gh" <<'EOF'
@@ -144,7 +258,9 @@ case "${1:-}:${2:-}" in
   *) echo "unexpected GitHub CLI invocation: $*" >&2; exit 1 ;;
 esac
 EOF
-chmod +x "$mock_directory/uname" "$mock_directory/rustup" "$mock_directory/gh"
+chmod +x "$mock_directory/uname" "$mock_directory/sysctl" "$mock_directory/rustup" \
+  "$mock_directory/curl" "$mock_directory/mkdir" "$mock_directory/mv" \
+  "$mock_directory/gh"
 
 run_case() {
   case_name=$1
@@ -155,9 +271,11 @@ run_case() {
   mkdir -p "$case_directory"
   rustup_log="$case_directory/rustup.log"
   github_log="$case_directory/github.log"
+  curl_log="$case_directory/curl.log"
   output="$case_directory/output.log"
   : > "$rustup_log"
   : > "$github_log"
+  : > "$curl_log"
 
   if env \
     PATH="$mock_directory:$PATH" \
@@ -167,15 +285,22 @@ run_case() {
     GH_PROMPT_DISABLED=1 \
     OHM_TEST_SYSTEM="${OHM_TEST_SYSTEM:-Darwin}" \
     OHM_TEST_ARCHITECTURE="${OHM_TEST_ARCHITECTURE:-arm64}" \
+    OHM_TEST_APPLE_SILICON="${OHM_TEST_APPLE_SILICON:-0}" \
     OHM_TEST_GH_FAILURE="${OHM_TEST_GH_FAILURE:-0}" \
+    OHM_TEST_CURL_FAILURE="${OHM_TEST_CURL_FAILURE:-}" \
+    OHM_TEST_PUBLIC_BAD_CHECKSUM="${OHM_TEST_PUBLIC_BAD_CHECKSUM:-0}" \
     OHM_TEST_VERSION="${OHM_TEST_VERSION:-$version}" \
     OHM_TEST_RUSTC_BRAND="${OHM_TEST_RUSTC_BRAND:-$version}" \
     OHM_TEST_RUSTC_UPSTREAM_VERSION="${OHM_TEST_RUSTC_UPSTREAM_VERSION:-1.97.1}" \
+    OHM_TEST_RUSTUP_ALIAS_FAILURE="${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" \
+    OHM_TEST_ACTIVATION_RACE="${OHM_TEST_ACTIVATION_RACE:-0}" \
+    OHM_TEST_ACTIVATION_DESTINATION="${OHM_TEST_ACTIVATION_DESTINATION:-}" \
     OHM_TEST_RELEASE_DIRECTORY="$release_directory" \
     OHM_TEST_RUSTUP_LOG="$rustup_log" \
     OHM_TEST_GH_LOG="$github_log" \
+    OHM_TEST_CURL_LOG="$curl_log" \
     GH_TOKEN="${OHM_TEST_SECRET:-}" \
-    sh "$installer" "$@" > "$output" 2>&1; then
+    sh "${OHM_TEST_INSTALLER:-$installer}" "$@" > "$output" 2>&1; then
     actual=success
   else
     actual=failure
@@ -210,6 +335,47 @@ assert_no_links() {
   fi
 }
 
+run_case help success --help
+assert_contains "$temporary_directory/cases/help/output.log" 'Usage: install.sh'
+assert_no_links help
+
+truncated_installer="$temporary_directory/truncated-installer.sh"
+awk '
+  /^main "\$@"/ { found = 1; exit }
+  { print }
+  END { if (!found) exit 1 }
+' "$installer" > "$truncated_installer"
+OHM_TEST_INSTALLER=$truncated_installer
+run_case truncated-installer failure --version "$version" \
+  --archive "$release_directory/$archive_name" \
+  --checksums "$release_directory/SHA256SUMS" \
+  --prefix "$temporary_directory/cases/truncated-installer/toolchain"
+unset OHM_TEST_INSTALLER
+assert_no_links truncated-installer
+if [ -e "$temporary_directory/cases/truncated-installer/toolchain" ]; then
+  echo 'truncated installer unexpectedly installed a toolchain' >&2
+  exit 1
+fi
+
+saved_path=$PATH
+mv "$mock_directory/rustup" "$mock_directory/rustup-hidden"
+PATH=/usr/bin:/bin
+run_case missing-rustup failure --version "$version" \
+  --archive "$release_directory/$archive_name" \
+  --checksums "$release_directory/SHA256SUMS" \
+  --prefix "$temporary_directory/cases/missing-rustup/toolchain"
+PATH=$saved_path
+mv "$mock_directory/rustup-hidden" "$mock_directory/rustup"
+assert_no_links missing-rustup
+if [ -e "$temporary_directory/cases/missing-rustup/toolchain" ]; then
+  echo 'installer wrote a toolchain before checking for rustup' >&2
+  exit 1
+fi
+if [ -s "$temporary_directory/cases/missing-rustup/curl.log" ]; then
+  echo 'installer downloaded an archive before checking for rustup' >&2
+  exit 1
+fi
+
 OHM_TEST_SYSTEM=Linux
 run_case unsupported-platform failure --version "$version" \
   --archive "$release_directory/$archive_name" \
@@ -227,11 +393,127 @@ run_case unsupported-architecture failure --version "$version" \
 unset OHM_TEST_ARCHITECTURE
 assert_no_links unsupported-architecture
 
+OHM_TEST_ARCHITECTURE=x86_64
+OHM_TEST_APPLE_SILICON=1
+run_case rosetta-apple-silicon success --version "$version" \
+  --archive "$release_directory/$archive_name" \
+  --checksums "$release_directory/SHA256SUMS" \
+  --prefix "$temporary_directory/cases/rosetta-apple-silicon/toolchain" \
+  --no-alias
+unset OHM_TEST_ARCHITECTURE OHM_TEST_APPLE_SILICON
+assert_contains "$temporary_directory/cases/rosetta-apple-silicon/rustup.log" \
+  "toolchain link $version "
+
+run_case public-latest success
+assert_contains "$temporary_directory/cases/public-latest/curl.log" \
+  'https://api.github.com/repos/astral-sh/ohm/releases/latest'
+assert_contains "$temporary_directory/cases/public-latest/curl.log" \
+  "https://github.com/astral-sh/ohm/releases/download/$version/$archive_name"
+assert_contains "$temporary_directory/cases/public-latest/curl.log" \
+  "https://github.com/astral-sh/ohm/releases/download/$version/SHA256SUMS"
+assert_contains "$temporary_directory/cases/public-latest/curl.log" '--retry '
+assert_contains "$temporary_directory/cases/public-latest/rustup.log" \
+  "toolchain link $version "
+assert_contains "$temporary_directory/cases/public-latest/rustup.log" \
+  'toolchain link ohm '
+if [ -s "$temporary_directory/cases/public-latest/github.log" ]; then
+  echo 'public installation unexpectedly required GitHub CLI authentication' >&2
+  exit 1
+fi
+
+run_case public-pinned success --version 1.97.1-2 --no-alias
+assert_not_contains "$temporary_directory/cases/public-pinned/curl.log" \
+  'api.github.com'
+assert_contains "$temporary_directory/cases/public-pinned/curl.log" \
+  "https://github.com/astral-sh/ohm/releases/download/$version/$archive_name"
+assert_not_contains "$temporary_directory/cases/public-pinned/rustup.log" \
+  'toolchain link ohm '
+if [ -s "$temporary_directory/cases/public-pinned/github.log" ]; then
+  echo 'version-pinned public installation unexpectedly used GitHub CLI' >&2
+  exit 1
+fi
+
+archive_checksum="$(awk -v archive="$archive_name" '$2 == archive { print $1 }' \
+  "$release_directory/SHA256SUMS")"
+embedded_installer="$temporary_directory/embedded-installer.sh"
+sed \
+  -e "s/^embedded_version=$/embedded_version=$version/" \
+  -e "s/^embedded_archive_sha256=$/embedded_archive_sha256=$archive_checksum/" \
+  "$installer" > "$embedded_installer"
+assert_contains "$embedded_installer" "embedded_version=$version"
+assert_contains "$embedded_installer" "embedded_archive_sha256=$archive_checksum"
+
+OHM_TEST_INSTALLER=$embedded_installer
+run_case embedded-public-latest success
+unset OHM_TEST_INSTALLER
+assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
+  'api.github.com'
+assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
+  'SHA256SUMS'
+assert_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
+  "https://github.com/astral-sh/ohm/releases/download/$version/$archive_name"
+assert_contains "$temporary_directory/cases/embedded-public-latest/rustup.log" \
+  "toolchain link $version "
+if [ -s "$temporary_directory/cases/embedded-public-latest/github.log" ]; then
+  echo 'embedded release installer unexpectedly used GitHub CLI' >&2
+  exit 1
+fi
+
+OHM_TEST_INSTALLER=$embedded_installer
+run_case mismatched-embedded-version failure --version ohm-1.97.1-1
+unset OHM_TEST_INSTALLER
+assert_no_links mismatched-embedded-version
+if [ -s "$temporary_directory/cases/mismatched-embedded-version/curl.log" ]; then
+  echo 'mismatched embedded installer version unexpectedly downloaded an archive' >&2
+  exit 1
+fi
+
+bad_embedded_installer="$temporary_directory/bad-embedded-installer.sh"
+sed "s/^embedded_archive_sha256=.*/embedded_archive_sha256=$(printf '%064d' 0)/" \
+  "$embedded_installer" > "$bad_embedded_installer"
+OHM_TEST_INSTALLER=$bad_embedded_installer
+run_case mismatched-embedded-checksum failure
+unset OHM_TEST_INSTALLER
+assert_no_links mismatched-embedded-checksum
+
+OHM_TEST_VERSION=../../unsafe
+run_case unsafe-public-version failure
+unset OHM_TEST_VERSION
+assert_no_links unsafe-public-version
+
+OHM_TEST_CURL_FAILURE=latest
+run_case latest-release-failure failure
+unset OHM_TEST_CURL_FAILURE
+assert_no_links latest-release-failure
+
+OHM_TEST_CURL_FAILURE=archive
+run_case public-archive-failure failure --version "$version"
+unset OHM_TEST_CURL_FAILURE
+assert_no_links public-archive-failure
+
+OHM_TEST_CURL_FAILURE=checksums
+run_case public-checksums-failure failure --version "$version"
+unset OHM_TEST_CURL_FAILURE
+assert_no_links public-checksums-failure
+
+OHM_TEST_PUBLIC_BAD_CHECKSUM=1
+run_case public-checksum-mismatch failure --version "$version"
+unset OHM_TEST_PUBLIC_BAD_CHECKSUM
+assert_no_links public-checksum-mismatch
+
 run_case unsafe-version failure --version '../1.97.1-2' \
   --archive "$release_directory/$archive_name" \
   --checksums "$release_directory/SHA256SUMS" \
   --prefix "$temporary_directory/cases/unsafe-version/toolchain"
 assert_no_links unsafe-version
+
+multiline_version="$(printf '%s\n%s' "$version" invalid)"
+run_case multiline-version failure --version "$multiline_version" \
+  --archive "$release_directory/$archive_name" \
+  --checksums "$release_directory/SHA256SUMS" \
+  --prefix "$temporary_directory/cases/multiline-version/toolchain"
+assert_no_links multiline-version
+assert_not_contains "$temporary_directory/cases/multiline-version/curl.log" 'https://'
 
 run_case unsafe-prefix failure --version "$version" \
   --archive "$release_directory/$archive_name" \
@@ -243,6 +525,14 @@ run_case unsafe-run-id failure --run '../123456789' --version "$version"
 assert_no_links unsafe-run-id
 if [ -s "$temporary_directory/cases/unsafe-run-id/github.log" ]; then
   echo 'unsafe workflow run ID unexpectedly accessed GitHub' >&2
+  exit 1
+fi
+
+multiline_run_id="$(printf '123456789\ninvalid')"
+run_case multiline-run-id failure --run "$multiline_run_id" --version "$version"
+assert_no_links multiline-run-id
+if [ -s "$temporary_directory/cases/multiline-run-id/github.log" ]; then
+  echo 'multiline workflow run ID unexpectedly accessed GitHub' >&2
   exit 1
 fi
 
@@ -320,6 +610,16 @@ unset OHM_TEST_RUSTC_BRAND
 assert_contains "$temporary_directory/cases/matching-rustc-version/rustup.log" \
   "toolchain link $version "
 
+run_case trailing-slash-prefix success --version "$version" \
+  --archive "$release_directory/$archive_name" \
+  --checksums "$release_directory/SHA256SUMS" \
+  --prefix "$temporary_directory/cases/trailing-slash-prefix/toolchain/" \
+  --no-alias
+if [ ! -x "$temporary_directory/cases/trailing-slash-prefix/toolchain/bin/rustc" ]; then
+  echo 'trailing-slash prefix did not receive the installed toolchain' >&2
+  exit 1
+fi
+
 run_case local-no-alias success --version 1.97.1-2 \
   --archive "$release_directory/$archive_name" \
   --checksums "$release_directory/SHA256SUMS" \
@@ -349,6 +649,22 @@ run_case incomplete-prefix failure --version "$version" \
   --prefix "$incomplete_prefix"
 assert_no_links incomplete-prefix
 
+activation_race_prefix="$temporary_directory/cases/activation-race/toolchain"
+OHM_TEST_ACTIVATION_RACE=1
+OHM_TEST_ACTIVATION_DESTINATION=$activation_race_prefix
+run_case activation-race failure --version "$version" \
+  --archive "$release_directory/$archive_name" \
+  --checksums "$release_directory/SHA256SUMS" \
+  --prefix "$activation_race_prefix" \
+  --no-alias
+unset OHM_TEST_ACTIVATION_RACE OHM_TEST_ACTIVATION_DESTINATION
+assert_no_links activation-race
+if [ ! -f "$activation_race_prefix/race-marker" ] || \
+   [ -e "$activation_race_prefix/bin/rustc" ]; then
+  echo 'installer overwrote the competing activation destination' >&2
+  exit 1
+fi
+
 existing_alias_directory="$temporary_directory/cases/replace-alias/rustup-home/toolchains"
 existing_alias_target="$temporary_directory/cases/replace-alias/previous-toolchain"
 mkdir -p "$existing_alias_directory" "$existing_alias_target"
@@ -362,6 +678,22 @@ assert_contains "$temporary_directory/cases/replace-alias/rustup.log" \
 if [ "$(readlink "$existing_alias_directory/ohm")" != \
      "$temporary_directory/cases/replace-alias/toolchain" ]; then
   echo 'existing custom rustup alias was not updated to the new Ohm toolchain' >&2
+  exit 1
+fi
+
+failing_alias_directory="$temporary_directory/cases/failed-alias/rustup-home/toolchains"
+failing_alias_target="$temporary_directory/cases/failed-alias/previous-toolchain"
+mkdir -p "$failing_alias_directory" "$failing_alias_target"
+ln -s "$failing_alias_target" "$failing_alias_directory/ohm"
+OHM_TEST_RUSTUP_ALIAS_FAILURE=1
+run_case failed-alias failure --version "$version" \
+  --archive "$release_directory/$archive_name" \
+  --checksums "$release_directory/SHA256SUMS" \
+  --prefix "$temporary_directory/cases/failed-alias/toolchain"
+unset OHM_TEST_RUSTUP_ALIAS_FAILURE
+if [ ! -L "$failing_alias_directory/ohm" ] || \
+   [ "$(readlink "$failing_alias_directory/ohm")" != "$failing_alias_target" ]; then
+  echo 'failed rustup registration replaced the existing Ohm alias' >&2
   exit 1
 fi
 
