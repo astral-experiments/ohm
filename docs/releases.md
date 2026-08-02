@@ -9,6 +9,9 @@ exact revisions in `toolchains/<rust-version>/<ohm-revision>.json`. The Rust rev
 same Cargo revision through its `src/tools/cargo` gitlink, and Cargo must support the `ohm-defaults`
 feature required by [`release/bootstrap.toml`](../release/bootstrap.toml).
 
+A pinned manifest's source revisions can be updated until its immutable release tag is published.
+After publication, the release identity and source revisions cannot change.
+
 Validate a compatible pinned manifest and its checked-out source revisions:
 
 ```console

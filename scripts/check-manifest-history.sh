@@ -34,15 +34,28 @@ while IFS= read -r manifest; do
   current_status="$(jq -er '.status' "$manifest")"
 
   case "$previous_status:$current_status" in
-    pinned:pinned | draft:draft)
+    pinned:pinned)
       if cmp -s <(git show "$base_revision:$manifest") "$manifest"; then
         continue
       fi
 
-      previous_manifest="$(git show "$base_revision:$manifest" | jq -S .)"
-      current_without_clippy="$(jq -S 'del(.sources.clippy)' "$manifest")"
-      if [[ "$previous_manifest" != "$current_without_clippy" ]]; then
-        echo "existing $previous_status manifest changed beyond its Clippy source: $manifest" >&2
+      release_tag="$(git show "$base_revision:$manifest" | jq -er '.release.toolchain_name')"
+      if git show-ref --verify --quiet "refs/tags/$release_tag"; then
+        echo "published toolchain manifest changed: $manifest" >&2
+        exit 1
+      fi
+
+      revision_fields='del(.sources.rust.revision, .sources.cargo.revision, .sources.clippy.revision)'
+      previous_identity="$(git show "$base_revision:$manifest" | jq -S "$revision_fields")"
+      current_identity="$(jq -S "$revision_fields" "$manifest")"
+      if [[ "$previous_identity" != "$current_identity" ]]; then
+        echo "unpublished pinned manifest changed beyond its source revisions: $manifest" >&2
+        exit 1
+      fi
+      ;;
+    draft:draft)
+      if ! cmp -s <(git show "$base_revision:$manifest") "$manifest"; then
+        echo "existing draft manifest changed: $manifest" >&2
         exit 1
       fi
       ;;

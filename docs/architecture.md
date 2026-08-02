@@ -48,5 +48,6 @@ Toolchains are named `ohm-<rust-version>-<ohm-revision>`. Each release is descri
 [`manifest schema`](../toolchains/manifest.schema.json).
 
 A manifest starts as a draft and becomes pinned when its Rust, Cargo, and Clippy revisions are
-finalized. Only compatible pinned manifests can be released. Existing release identities and source
-pins are immutable; publishing another revision requires a new manifest.
+finalized. Only compatible pinned manifests can be released. Source revisions can be updated until
+the release is published; afterward, its release identity and source pins are immutable. Publishing
+another revision requires a new manifest.

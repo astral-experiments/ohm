@@ -79,6 +79,7 @@ Repository-specific optimizations, such as uv's `--profile fast-build`, remain s
 
 - [Architecture](docs/architecture.md): source repositories, compiler integration, and versioned
   release manifests.
+- [Upstream changes](docs/upstream-changes.md): pull requests maintained in each Ohm source fork.
 - [Releases](docs/releases.md): validating, building, and publishing a pinned Ohm toolchain.
 - [Security](SECURITY.md): reporting vulnerabilities and experimental safety boundaries.
 
