@@ -38,10 +38,17 @@ jobs:
           if missing_tools:
               missing = ", ".join(sorted(missing_tools))
               raise SystemExit(f"Ohm releases must include these tools: {missing}")
+          cargo_features = set(
+              build.get("tool", {}).get("cargo", {}).get("features", [])
+          )
+          if "ohm-defaults" not in cargo_features:
+              raise SystemExit(
+                  "Ohm releases must enable Cargo's ohm-defaults feature"
+              )
           rust = config.get("rust", {})
           if rust.get("channel") != "dev":
               raise SystemExit(
-                  "Ohm releases must use the dev channel so their opt-in -Z flags are available"
+                  "Ohm releases must use the dev channel so their unstable interfaces are available"
               )
           if rust.get("omit-git-hash") is not False:
               raise SystemExit("Ohm releases must retain their source Git revision")

@@ -152,20 +152,139 @@ jobs:
 
       - name: Smoke test Ohm toolchain
         run: |
+          smoke_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-smoke.XXXXXX")"
+          trap 'rm -rf "$smoke_root"' EXIT
+
+          rust_version="$(tr -d '\r\n' < source/rust/src/version)"
+          combined_archive=
+          for candidate in \
+            source/rust/build/dist/"rust-$rust_version-dev-$OHM_TARGET.tar."*; do
+            if [[ -f "$candidate" ]]; then
+              if [[ -n "$combined_archive" ]]; then
+                echo "multiple combined Ohm archives found" >&2
+                exit 1
+              fi
+              combined_archive="$candidate"
+            fi
+          done
+          if [[ -z "$combined_archive" ]]; then
+            echo "combined Ohm archive not found" >&2
+            exit 1
+          fi
+
+          archive_root="$smoke_root/archive"
+          toolchain_root="$smoke_root/toolchain"
+          mkdir -p "$archive_root" "$toolchain_root"
+          tar -xf "$combined_archive" -C "$archive_root"
+
+          installer=
+          for candidate in "$archive_root"/*/install.sh; do
+            if [[ -f "$candidate" ]]; then
+              installer="$candidate"
+              break
+            fi
+          done
+          if [[ -z "$installer" ]]; then
+            echo "combined Ohm installer not found" >&2
+            exit 1
+          fi
+          sh "$installer" --prefix="$toolchain_root" --disable-ldconfig
+
+          export CARGO_HOME="$smoke_root/cargo-home"
+          export RUSTUP_HOME="$smoke_root/rustup-home"
+          mkdir -p "$CARGO_HOME" "$RUSTUP_HOME"
+          rustup toolchain link installed-ohm "$toolchain_root"
+
           unset RUSTC_BOOTSTRAP
-          source/rust/build/"$OHM_TARGET"/stage2/bin/rustc -Z help \
+          rustc +installed-ohm -Z help \
             | grep -F 'public-api-hash' >/dev/null
-          source/rust/build/"$OHM_TARGET"/stage2-tools-bin/cargo -Z help \
+          cargo +installed-ohm -Z help \
             | grep -F 'relink-only' >/dev/null
           rust_revision="$(git -C source/rust rev-parse --short=10 HEAD)"
-          source/rust/build/"$OHM_TARGET"/stage2/bin/cargo-clippy --version \
+          "$toolchain_root/bin/cargo-clippy" --version \
             | grep -F "$rust_revision" >/dev/null
-          source/rust/build/"$OHM_TARGET"/stage2/bin/clippy-driver --version \
+          "$toolchain_root/bin/clippy-driver" --version \
             | grep -F "$rust_revision" >/dev/null
-          rustfmt_version="$(source/rust/build/"$OHM_TARGET"/stage2/bin/rustfmt --version)"
-          cargo_fmt_version="$(source/rust/build/"$OHM_TARGET"/stage2/bin/cargo-fmt --version)"
+          rustfmt_version="$("$toolchain_root/bin/rustfmt" --version)"
+          cargo_fmt_version="$("$toolchain_root/bin/cargo-fmt" --version)"
           grep -F 'rustfmt ' <<< "$rustfmt_version" >/dev/null
           [[ "$cargo_fmt_version" == "$rustfmt_version" ]]
+
+          smoke_crate="$smoke_root/crate"
+          mkdir -p "$smoke_crate/src"
+          cat > "$smoke_crate/Cargo.toml" <<'EOF'
+          [package]
+          name = "ohm-smoke"
+          version = "0.0.0"
+          edition = "2024"
+          EOF
+          cat > "$smoke_crate/src/main.rs" <<'EOF'
+          fn main() {}
+          EOF
+
+          rustc_wrapper="$smoke_root/rustc-wrapper"
+          cat > "$rustc_wrapper" <<'EOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          crate_name=
+          has_public_api_hash=false
+          has_proc_macro_cache=false
+          previous_argument=
+          for argument in "$@"; do
+            if [[ "$previous_argument" == "--crate-name" ]]; then
+              crate_name="$argument"
+            fi
+            case "$argument" in
+              -Zpublic-api-hash) has_public_api_hash=true ;;
+              -Zcache-proc-macros) has_proc_macro_cache=true ;;
+            esac
+            previous_argument="$argument"
+          done
+
+          if [[ "$crate_name" == "ohm_smoke" ]]; then
+            case "${OHM_EXPECT_DEFAULTS:?}" in
+              enabled)
+                if [[ "$has_public_api_hash" != true || "$has_proc_macro_cache" != true ]]; then
+                  echo "Ohm defaults missing from ohm_smoke rustc invocation" >&2
+                  exit 1
+                fi
+                ;;
+              disabled)
+                if [[ "$has_public_api_hash" == true || "$has_proc_macro_cache" == true ]]; then
+                  echo "Ohm defaults present on disabled ohm_smoke rustc invocation" >&2
+                  exit 1
+                fi
+                ;;
+              *)
+                echo "invalid OHM_EXPECT_DEFAULTS value" >&2
+                exit 1
+                ;;
+            esac
+            printf '%s\n' "$OHM_EXPECT_DEFAULTS" >> "${OHM_RUSTC_LOG:?}"
+          fi
+
+          exec "$@"
+          EOF
+          chmod +x "$rustc_wrapper"
+
+          unset CARGO_BUILD_RUSTFLAGS CARGO_ENCODED_RUSTFLAGS RUSTFLAGS RUSTC_WORKSPACE_WRAPPER
+          defaults_log="$smoke_root/defaults-rustc-args"
+          OHM_EXPECT_DEFAULTS=enabled \
+            OHM_RUSTC_LOG="$defaults_log" \
+            RUSTC_WRAPPER="$rustc_wrapper" \
+            CARGO_TARGET_DIR="$smoke_root/defaults-target" \
+            cargo +installed-ohm build --manifest-path "$smoke_crate/Cargo.toml"
+          grep -Fx enabled "$defaults_log" >/dev/null
+
+          disabled_log="$smoke_root/disabled-rustc-args"
+          OHM_EXPECT_DEFAULTS=disabled \
+            OHM_RUSTC_LOG="$disabled_log" \
+            RUSTC_WRAPPER="$rustc_wrapper" \
+            CARGO_TARGET_DIR="$smoke_root/disabled-target" \
+            cargo +installed-ohm -Zohm-defaults=no build \
+              --manifest-path "$smoke_crate/Cargo.toml"
+          grep -Fx disabled "$disabled_log" >/dev/null
 
       - name: Write build provenance
         env:

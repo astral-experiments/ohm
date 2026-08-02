@@ -11,8 +11,12 @@ locked-deps = true
 # assemble every supported installer format.
 tools = ["analysis", "cargo", "clippy", "rustfmt"]
 
-# Ohm exposes its experimental build acceleration through explicit `-Z` flags.
-# Build both rustc and Cargo for the dev channel so those opt-in interfaces are
+# Package Cargo so selecting an Ohm toolchain activates the complete workflow.
+[build.tool.cargo]
+features = ["ohm-defaults"]
+
+# Ohm exposes its experimental build acceleration through unstable interfaces.
+# Build both rustc and Cargo for the dev channel so those interfaces are
 # available without requiring RUSTC_BOOTSTRAP.
 [rust]
 channel = "dev"
