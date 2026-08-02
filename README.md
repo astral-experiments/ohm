@@ -57,15 +57,61 @@ The individual unstable flags are implementation details of this bundle. Reposit
 options such as uv's `--profile fast-build` remain separate and should only be used when appropriate
 for that repository.
 
-There is no released Ohm toolchain or installer yet. After building one locally, rustup can
-register an extracted toolchain directory with:
+## Installation
+
+Ohm currently supports Apple Silicon macOS. Install [rustup](https://rustup.rs/) and authenticate
+the [GitHub CLI](https://cli.github.com/) with an account that can access the private
+`astral-sh/ohm` repository. Successful distribution builds retain their installable artifacts for
+seven days. Download the artifact from a specific workflow run and install its verified archive:
 
 ```console
-rustup toolchain link ohm-1.97.1-1 /path/to/ohm-toolchain
+version=ohm-1.97.1-2
+directory="$(mktemp -d)"
+gh run download 123456789 -R astral-sh/ohm \
+  -n "$version-aarch64-apple-darwin" -D "$directory"
+sh "$directory/ohm-installer.sh" \
+  --version "$version" \
+  --archive "$directory/$version-aarch64-apple-darwin.tar.xz" \
+  --checksums "$directory/SHA256SUMS"
 ```
 
-The release workflow smoke-tests Rust's generated combined installer, but no user-facing download or
-installer command has been published yet.
+Replace `123456789` with the successful workflow run ID. The installer verifies the archive's
+SHA-256 checksum before installing the complete compiler, Cargo, Clippy, and rustfmt toolchain. By
+default, versions are installed under `${XDG_DATA_HOME:-$HOME/.local/share}/ohm/toolchains/` and
+registered with rustup under both their immutable version and the moving `ohm` alias:
+
+```console
+cargo +ohm-1.97.1-2 test
+cargo +ohm test
+```
+
+Your default Rust toolchain is never changed. From an Ohm checkout, the installer can download and
+verify the artifact for a particular run directly:
+
+```console
+sh scripts/install.sh --run 123456789 --version ohm-1.97.1-2
+```
+
+Pass `--no-alias` to retain an existing `ohm` alias while registering the exact version, or `--prefix`
+to choose the exact directory in which that version is installed:
+
+```console
+sh scripts/install.sh \
+  --run 123456789 \
+  --version 1.97.1-2 \
+  --prefix /path/to/ohm-1.97.1-2 \
+  --no-alias
+```
+
+For an offline installation, provide the downloaded archive and its accompanying `SHA256SUMS`
+file. GitHub authentication is not required in this mode:
+
+```console
+sh scripts/install.sh \
+  --version ohm-1.97.1-2 \
+  --archive ohm-1.97.1-2-aarch64-apple-darwin.tar.xz \
+  --checksums SHA256SUMS
+```
 
 ## Versions and source pins
 
@@ -129,13 +175,15 @@ manifest.
 ## Release workflow status
 
 The manual [`release.yml`](.github/workflows/release.yml) workflow accepts the path to one versioned
-manifest and currently provides three pieces of release scaffolding:
+manifest and:
 
-1. select a versioned manifest, then check out and verify its exact private source revisions; and
-2. optionally run Rust bootstrap's full `x.py dist extended` build for the configured native target,
-   smoke-install the combined archive, and retain its distribution artifacts; and
-3. write checksummed provenance containing the coordinator revision, manifest digest, and exact
-   Rust, Cargo, and Clippy revisions.
+1. selects a versioned manifest, then checks out and verifies its exact private source revisions;
+2. optionally runs Rust bootstrap's full `x.py dist extended` build for the configured native
+   target, smoke-installs the combined archive, and prepares its distribution artifacts;
+3. writes checksummed provenance containing the coordinator revision, manifest digest, and exact
+   Rust, Cargo, and Clippy revisions; and
+4. retains the combined archive, its checksums, provenance, manifest, and Ohm installer as a
+   private GitHub Actions artifact for seven days.
 
 Cross-repository checkout currently requires an `OHM_REPOSITORIES_TOKEN` secret in a protected
 `release` Environment. It must be a read-only, fine-grained token scoped only to `ohm-rust`,
@@ -148,6 +196,5 @@ The distribution build uses a self-hosted Apple Silicon runner with the labels `
 configuration builds the stage-2 compiler, sysroot, combined extended archive, and pinned Cargo,
 while reusing the matching Rust CI LLVM rather than rebuilding unchanged LLVM.
 
-The workflow deliberately does **not** create a GitHub release, publish artifacts, update a moving
-`ohm` alias, or install the resulting distribution persistently. A user-facing installer, artifact
-signing or attestation, and publication remain required before the first release.
+The workflow does not create GitHub Releases or publish toolchains publicly. Accessing its artifacts
+requires authentication because the coordinator repository is private.
