@@ -61,11 +61,13 @@ jobs:
             exit 1
           fi
           ./scripts/validate-release-manifest.sh --require-pinned "$MANIFEST_PATH"
-          echo "rust-revision=$(jq -er '.sources.rust.revision' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
-          echo "cargo-revision=$(jq -er '.sources.cargo.revision' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
-          echo "clippy-revision=$(jq -er '.sources.clippy.revision' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
-          echo "manifest=$MANIFEST_PATH" >> "$GITHUB_OUTPUT"
-          echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")" >> "$GITHUB_OUTPUT"
+          {
+            echo "rust-revision=$(jq -er '.sources.rust.revision' "$MANIFEST_PATH")"
+            echo "cargo-revision=$(jq -er '.sources.cargo.revision' "$MANIFEST_PATH")"
+            echo "clippy-revision=$(jq -er '.sources.clippy.revision' "$MANIFEST_PATH")"
+            echo "manifest=$MANIFEST_PATH"
+            echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Check out pinned ohm-rust
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
