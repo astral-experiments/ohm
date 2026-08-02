@@ -1,0 +1,19 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "github>astral-sh/renovate-config",
+    "customManagers:githubActionsVersions",
+  ],
+  enabledManagers: ["github-actions", "custom.regex"],
+  packageRules: [
+    {
+      matchDepTypes: ["action"],
+      pinDigests: true,
+    },
+    {
+      extends: ["helpers:pinGitHubActionDigests"],
+      extractVersion: "^(?<version>v?\\d+\\.\\d+\\.\\d+)$",
+      versioning: "regex:^v?(?<major>\\d+)(\\.(?<minor>\\d+)\\.(?<patch>\\d+))?$",
+    },
+  ],
+}
