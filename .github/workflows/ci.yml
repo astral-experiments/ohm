@@ -76,6 +76,8 @@ jobs:
         env:
           BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
         run: ./scripts/check-manifest-history.sh "$BASE_REVISION"
+      - name: Test toolchain manifest history
+        run: bash scripts/test-manifest-history.sh
       - name: Check shell syntax
         run: |
           bash -n scripts/*.sh
