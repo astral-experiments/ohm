@@ -119,7 +119,7 @@ if [ -z "$output" ] || [ -z "$url" ]; then
   exit 1
 fi
 
-expected_url="https://github.com/astral-sh/ohm/releases/download/$OHM_TEST_VERSION/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz"
+expected_url="https://labs.astral.sh/ohm/releases/$OHM_TEST_VERSION/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz"
 [ "$url" = "$expected_url" ] || { echo "unexpected public release URL: $url" >&2; exit 1; }
 [ "${OHM_TEST_CURL_FAILURE:-0}" != 1 ] || { echo 'public archive download failed' >&2; exit 22; }
 cp "$OHM_TEST_RELEASE_DIRECTORY/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz" "$output"
@@ -166,7 +166,7 @@ run_case() {
     RUSTUP_HOME="$case_directory/rustup-home" \
     XDG_DATA_HOME="$case_directory/data" \
     OHM_INSTALL_DIR="${OHM_TEST_INSTALL_DIR:-$case_directory/toolchain}" \
-    OHM_DOWNLOAD_URL="${OHM_TEST_DOWNLOAD_URL:-file://$release_directory}" \
+    OHM_DOWNLOAD_URL="${OHM_TEST_DOWNLOAD_URL-file://$release_directory}" \
     OHM_TEST_SYSTEM="${OHM_TEST_SYSTEM:-Darwin}" \
     OHM_TEST_ARCHITECTURE="${OHM_TEST_ARCHITECTURE:-arm64}" \
     OHM_TEST_APPLE_SILICON="${OHM_TEST_APPLE_SILICON:-0}" \
@@ -277,15 +277,17 @@ run_case unversioned-installer failure
 unset OHM_TEST_INSTALLER
 assert_no_links unversioned-installer
 
-OHM_TEST_DOWNLOAD_URL="https://github.com/astral-sh/ohm/releases/download/$version"
+OHM_TEST_DOWNLOAD_URL=
 run_case embedded-public-latest success
 unset OHM_TEST_DOWNLOAD_URL
 assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
   'api.github.com'
 assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
+  'releases.astral.sh'
+assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
   'SHA256SUMS'
 assert_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
-  "https://github.com/astral-sh/ohm/releases/download/$version/$archive_name"
+  "https://labs.astral.sh/ohm/releases/$version/$archive_name"
 assert_contains "$temporary_directory/cases/embedded-public-latest/curl.log" '--retry '
 assert_contains "$temporary_directory/cases/embedded-public-latest/rustup.log" \
   "toolchain link $version "
@@ -309,7 +311,7 @@ unset OHM_TEST_INSTALLER
 assert_no_links invalid-embedded-checksum
 assert_not_contains "$temporary_directory/cases/invalid-embedded-checksum/curl.log" 'https://'
 
-OHM_TEST_DOWNLOAD_URL="https://github.com/astral-sh/ohm/releases/download/$version"
+OHM_TEST_DOWNLOAD_URL=
 OHM_TEST_CURL_FAILURE=1
 run_case public-archive-failure failure
 unset OHM_TEST_CURL_FAILURE

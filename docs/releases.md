@@ -4,10 +4,11 @@ Ohm releases are built from protected `main` using an immutable, pinned toolchai
 
 ## Prepare a release
 
-Finalize the matching changes in `ohm-rust`, `ohm-cargo`, and `ohm-rust-clippy`, then record their
-exact revisions in `toolchains/<rust-version>/<ohm-revision>.json`. The Rust revision must pin the
-same Cargo revision through its `src/tools/cargo` gitlink, and Cargo must support the `ohm-defaults`
-feature required by [`release/bootstrap.toml`](../release/bootstrap.toml).
+Finalize the matching changes in `ohm-rust`, `ohm-cargo`, `ohm-rust-clippy`, and `ohm-rustfmt`,
+then record their exact revisions in `toolchains/<rust-version>/<ohm-revision>.json`. The Rust
+revision must pin the same Cargo revision through its `src/tools/cargo` gitlink, and Cargo must
+support the `ohm-defaults` feature required by
+[`release/bootstrap.toml`](../release/bootstrap.toml).
 
 A pinned manifest's source revisions can be updated until its immutable release tag is published.
 After publication, the release identity and source revisions cannot change.
@@ -18,13 +19,31 @@ Validate a compatible pinned manifest and its checked-out source revisions:
 manifest="toolchains/${RUST_VERSION:?}/${OHM_REVISION:?}.json"
 ./scripts/validate-release-manifest.sh --require-pinned "$manifest"
 ./scripts/verify-release-sources.sh "$manifest" /path/to/ohm-rust /path/to/ohm-cargo \
-  /path/to/ohm-rust-clippy
+  /path/to/ohm-rust-clippy /path/to/ohm-rustfmt
 ```
 
-The protected `release` environment needs an `OHM_REPOSITORIES_TOKEN` with read access to the Rust,
-Cargo, and Clippy source repositories. The Apple Silicon build uses the shared `depot-macos-15`
-runner and needs at least 50 GiB of available disk space. Planning and publication use
-`depot-ubuntu-24.04-4` runners.
+A dedicated GitHub App needs read-only contents access to the four source repositories. Release
+jobs generate short-lived installation tokens scoped to those repositories.
+
+Store the GitHub App private key and Cloudflare R2 credentials as protected `release` environment
+secrets:
+
+- `OHM_RELEASE_APP_PRIVATE_KEY`
+- `MIRROR_R2_ACCESS_KEY_ID`
+- `MIRROR_R2_SECRET_ACCESS_KEY`
+
+Store the GitHub App client ID and Cloudflare account and bucket configuration as protected
+`release` environment variables:
+
+- `OHM_RELEASE_APP_CLIENT_ID`
+- `MIRROR_R2_CLOUDFLARE_ACCOUNT_ID`
+- `MIRROR_R2_BUCKET_NAME`
+
+The bucket is served publicly from `labs.astral.sh` and should be separate from Astral's production
+release bucket. Its credentials should only grant access to the experimental release bucket.
+
+The Apple Silicon build uses the shared `depot-macos-15` runner and needs at least 50 GiB of
+available disk space. Planning and publication use `depot-ubuntu-24.04-4` runners.
 
 ## Build and publish
 
@@ -37,17 +56,27 @@ gh workflow run release.yml --repo astral-sh/ohm --ref main \
 ```
 
 The workflow verifies source revisions, builds the complete stage-2 Rust distribution, smoke-tests
-the installed toolchain, and creates a GitHub Release named after the immutable toolchain version.
-Its internal smoke test uses `OHM_DOWNLOAD_URL` to read staged artifacts before publication.
-Each release includes:
+the installed toolchain, and creates a private GitHub Release named after the immutable toolchain
+version. Its internal smoke test uses `OHM_DOWNLOAD_URL` to read staged artifacts before
+publication. The private release includes:
 
 - an Apple Silicon macOS `.tar.gz` archive;
 - `ohm-installer.sh`, with the release version and archive checksum embedded;
 - the release manifest and source provenance; and
-- `SHA256SUMS` for the published assets.
+- `SHA256SUMS` for the release assets.
 
-The installer and archive checksum share GitHub Releases as their trust root. HTTPS and checksums
-verify transport and artifact integrity; they are not independent signatures or attestations.
+Only the installer, archive, and a public-only `SHA256SUMS` file containing their checksums are
+copied to Cloudflare R2. Versioned assets are served publicly from
+`https://labs.astral.sh/ohm/releases/<version>/` and cached immutably for one year. The
+release-specific installer is available at
+`https://labs.astral.sh/ohm/releases/<version>/install.sh`; its archive is available at
+`https://labs.astral.sh/ohm/releases/<version>/<version>-aarch64-apple-darwin.tar.gz`. The latest
+installer is available at `https://labs.astral.sh/ohm/install.sh` and cached for five minutes.
+Source repositories, GitHub Releases, release manifests, and source provenance remain private.
+
+The public installer and its embedded archive checksum share Cloudflare R2 as their trust root.
+HTTPS and checksums verify transport and artifact integrity; they are not independent signatures or
+attestations.
 
 Release versions cannot be republished. If source revisions or release inputs change, prepare a new
 Ohm revision and repeat the protected release workflow.

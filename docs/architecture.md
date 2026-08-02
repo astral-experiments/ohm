@@ -12,12 +12,11 @@ uses those binaries without replacing the default Rust toolchain.
   changes and is pinned by the Rust repository's `src/tools/cargo` gitlink.
 - [`astral-sh/ohm-rust-clippy`](https://github.com/astral-sh/ohm-rust-clippy) contains the Clippy
   revision overlaid onto Rust's vendored Clippy source during a release build.
-- [`astral-sh/ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt) stages rustfmt changes before
-  they are incorporated into `ohm-rust`. Releases build rustfmt directly from the pinned Rust source
-  tree; rustfmt is not separately pinned or overlaid.
+- [`astral-sh/ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt) contains the rustfmt revision
+  overlaid onto Rust's vendored rustfmt source during a release build.
 
-This coordinator records exact Rust, Cargo, and Clippy commits in an immutable release manifest.
-Source repositories retain an `upstream-<rust-version>` branch for upstream Rust and an
+This coordinator records exact Rust, Cargo, Clippy, and rustfmt commits in an immutable release
+manifest. Source repositories retain an `upstream-<rust-version>` branch for upstream Rust and an
 `ohm-<rust-version>` branch for Ohm changes.
 
 ## Incremental compilation
@@ -47,7 +46,7 @@ Toolchains are named `ohm-<rust-version>-<ohm-revision>`. Each release is descri
 `toolchains/<rust-version>/<ohm-revision>.json`, using the
 [`manifest schema`](../toolchains/manifest.schema.json).
 
-A manifest starts as a draft and becomes pinned when its Rust, Cargo, and Clippy revisions are
-finalized. Only compatible pinned manifests can be released. Source revisions can be updated until
-the release is published; afterward, its release identity and source pins are immutable. Publishing
-another revision requires a new manifest.
+A manifest starts as a draft and becomes pinned when its Rust, Cargo, Clippy, and rustfmt revisions
+are finalized. Only compatible pinned manifests can be released. Source revisions can be updated
+until the release is published; afterward, its release identity and source pins are immutable.
+Publishing another revision requires a new manifest.

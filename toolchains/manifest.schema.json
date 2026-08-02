@@ -47,10 +47,31 @@
         },
         "clippy": {
           "$ref": "#/$defs/clippy_source"
+        },
+        "rustfmt": {
+          "$ref": "#/$defs/rustfmt_source"
         }
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "pinned"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "sources": {
+            "required": ["rustfmt"]
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "revision": {
       "type": "string",
@@ -89,6 +110,19 @@
       "properties": {
         "repository": {
           "const": "https://github.com/astral-sh/ohm-rust-clippy"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    },
+    "rustfmt_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision"],
+      "properties": {
+        "repository": {
+          "const": "https://github.com/astral-sh/ohm-rustfmt"
         },
         "revision": {
           "$ref": "#/$defs/revision"

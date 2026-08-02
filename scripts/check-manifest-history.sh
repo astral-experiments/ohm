@@ -45,8 +45,26 @@ while IFS= read -r manifest; do
         exit 1
       fi
 
-      revision_fields='del(.sources.rust.revision, .sources.cargo.revision, .sources.clippy.revision)'
-      previous_identity="$(git show "$base_revision:$manifest" | jq -S "$revision_fields")"
+      rustfmt_repository='https://github.com/astral-sh/ohm-rustfmt'
+      revision_fields='
+        del(
+          .sources.rust.revision,
+          .sources.cargo.revision,
+          .sources.clippy.revision,
+          .sources.rustfmt.revision
+        )
+      '
+      previous_identity="$(
+        git show "$base_revision:$manifest" |
+          jq -S --arg repository "$rustfmt_repository" "
+            if .sources | has(\"rustfmt\") then
+              .
+            else
+              .sources.rustfmt = {repository: \$repository}
+            end |
+            $revision_fields
+          "
+      )"
       current_identity="$(jq -S "$revision_fields" "$manifest")"
       if [[ "$previous_identity" != "$current_identity" ]]; then
         echo "unpublished pinned manifest changed beyond its source revisions: $manifest" >&2
