@@ -21,10 +21,16 @@ manifest="toolchains/${RUST_VERSION:?}/${OHM_REVISION:?}.json"
   /path/to/ohm-rust-clippy
 ```
 
-The protected `release` environment needs an `OHM_REPOSITORIES_TOKEN` with read access to the Rust,
-Cargo, and Clippy source repositories. The Apple Silicon build uses the shared `depot-macos-15`
-runner and needs at least 50 GiB of available disk space. Planning and publication use
-`depot-ubuntu-24.04-4` runners.
+The protected `release` environment needs `OHM_REPOSITORIES_TOKEN` with read access to the Rust,
+Cargo, and Clippy source repositories, plus these Cloudflare R2 credentials:
+
+- `MIRROR_R2_ACCESS_KEY_ID`
+- `MIRROR_R2_SECRET_ACCESS_KEY`
+- `MIRROR_R2_CLOUDFLARE_ACCOUNT_ID`
+- `MIRROR_R2_BUCKET_NAME`
+
+The Apple Silicon build uses the shared `depot-macos-15` runner and needs at least 50 GiB of
+available disk space. Planning and publication use `depot-ubuntu-24.04-4` runners.
 
 ## Build and publish
 
@@ -37,17 +43,25 @@ gh workflow run release.yml --repo astral-sh/ohm --ref main \
 ```
 
 The workflow verifies source revisions, builds the complete stage-2 Rust distribution, smoke-tests
-the installed toolchain, and creates a GitHub Release named after the immutable toolchain version.
-Its internal smoke test uses `OHM_DOWNLOAD_URL` to read staged artifacts before publication.
-Each release includes:
+the installed toolchain, and creates a private GitHub Release named after the immutable toolchain
+version. Its internal smoke test uses `OHM_DOWNLOAD_URL` to read staged artifacts before
+publication. The private release includes:
 
 - an Apple Silicon macOS `.tar.gz` archive;
 - `ohm-installer.sh`, with the release version and archive checksum embedded;
 - the release manifest and source provenance; and
-- `SHA256SUMS` for the published assets.
+- `SHA256SUMS` for the release assets.
 
-The installer and archive checksum share GitHub Releases as their trust root. HTTPS and checksums
-verify transport and artifact integrity; they are not independent signatures or attestations.
+Only the installer, archive, and a public-only `SHA256SUMS` file containing their checksums are
+copied to Cloudflare R2. Versioned assets are served publicly from
+`https://releases.astral.sh/github/ohm/releases/download/<version>/` and cached immutably for one
+year. The latest installer is available at
+`https://releases.astral.sh/installers/ohm/latest/ohm-installer.sh` and cached for five minutes.
+Source repositories, GitHub Releases, release manifests, and source provenance remain private.
+
+The public installer and its embedded archive checksum share Cloudflare R2 as their trust root.
+HTTPS and checksums verify transport and artifact integrity; they are not independent signatures or
+attestations.
 
 Release versions cannot be republished. If source revisions or release inputs change, prepare a new
 Ohm revision and repeat the protected release workflow.

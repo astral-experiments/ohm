@@ -435,9 +435,35 @@ jobs:
             exit 1
           fi
 
-          if gh release view "$OHM_TOOLCHAIN" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Ohm release already exists: $OHM_TOOLCHAIN" >&2
-            exit 1
+          if existing_release="$(
+            gh release view "$OHM_TOOLCHAIN" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json targetCommitish,assets 2>/dev/null
+          )"; then
+            if ! jq -e --arg commit "$RELEASE_COMMIT" \
+              '.targetCommitish == $commit' <<< "$existing_release" >/dev/null; then
+              echo "existing Ohm release targets a different commit: $OHM_TOOLCHAIN" >&2
+              exit 1
+            fi
+
+            for asset in \
+              "$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
+              ohm-installer.sh \
+              "$OHM_TOOLCHAIN.json" \
+              "$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json" \
+              SHA256SUMS; do
+              expected_digest="sha256:$(sha256sum "$asset" | awk '{print $1}')"
+              if ! jq -e --arg name "$asset" --arg digest "$expected_digest" '
+                [.assets[] | select(.name == $name)]
+                | length == 1 and .[0].digest == $digest
+              ' <<< "$existing_release" >/dev/null; then
+                echo "existing Ohm release contains a different asset: $asset" >&2
+                exit 1
+              fi
+            done
+
+            echo "Ohm release already exists with matching assets: $OHM_TOOLCHAIN"
+            exit 0
           fi
 
           gh release create "$OHM_TOOLCHAIN" \
@@ -450,3 +476,14 @@ jobs:
             "$OHM_TOOLCHAIN.json" \
             "$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json" \
             SHA256SUMS
+
+  publish-mirror:
+    if: inputs.build
+    needs:
+      - plan
+      - publish
+    uses: ./.github/workflows/publish-mirror.yml
+    with:
+      version: ${{ needs.plan.outputs.toolchain }}
+    permissions:
+      contents: read

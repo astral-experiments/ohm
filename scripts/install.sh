@@ -1,7 +1,6 @@
 #!/bin/sh
 set -eu
 
-repository=astral-sh/ohm
 embedded_version=
 embedded_archive_sha256=
 installation_prefix=${OHM_INSTALL_DIR:-}
@@ -119,7 +118,7 @@ printf '%s\n' "$embedded_archive_sha256" | awk '
     END { exit invalid || !valid }
 ' || fail 'the embedded archive checksum is invalid'
 
-download_url=${OHM_DOWNLOAD_URL:-https://github.com/$repository/releases/download/$version}
+download_url=${OHM_DOWNLOAD_URL:-https://releases.astral.sh/github/ohm/releases/download/$version}
 case "$download_url" in
     https://*) command -v curl >/dev/null 2>&1 || fail 'curl is required to download Ohm' ;;
     file:///*) ;;
