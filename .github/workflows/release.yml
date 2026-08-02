@@ -150,13 +150,22 @@ jobs:
             --set "build.description=$OHM_TOOLCHAIN" \
             extended
 
-      - name: Smoke test Ohm acceleration flags
+      - name: Smoke test Ohm toolchain
         run: |
           unset RUSTC_BOOTSTRAP
           source/rust/build/"$OHM_TARGET"/stage2/bin/rustc -Z help \
             | grep -F 'public-api-hash' >/dev/null
           source/rust/build/"$OHM_TARGET"/stage2-tools-bin/cargo -Z help \
             | grep -F 'relink-only' >/dev/null
+          rust_revision="$(git -C source/rust rev-parse --short=10 HEAD)"
+          source/rust/build/"$OHM_TARGET"/stage2/bin/cargo-clippy --version \
+            | grep -F "$rust_revision" >/dev/null
+          source/rust/build/"$OHM_TARGET"/stage2/bin/clippy-driver --version \
+            | grep -F "$rust_revision" >/dev/null
+          rustfmt_version="$(source/rust/build/"$OHM_TARGET"/stage2/bin/rustfmt --version)"
+          cargo_fmt_version="$(source/rust/build/"$OHM_TARGET"/stage2/bin/cargo-fmt --version)"
+          grep -F 'rustfmt ' <<< "$rustfmt_version" >/dev/null
+          [[ "$cargo_fmt_version" == "$rustfmt_version" ]]
 
       - name: Write build provenance
         env:

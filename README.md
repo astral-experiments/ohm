@@ -1,14 +1,19 @@
 # Ohm
 
-Ohm is an experimental Rust toolchain for faster local incremental builds. This repository is the
-release coordinator for two source repositories:
+Ohm is an experimental Rust toolchain for faster local incremental builds. Its source is split
+across four repositories:
 
 - [`astral-sh/ohm-rust`](https://github.com/astral-sh/ohm-rust) contains the Rust compiler,
-  standard library, and bootstrap changes.
+  standard library, vendored Clippy and rustfmt snapshots, and bootstrap changes.
 - [`astral-sh/ohm-cargo`](https://github.com/astral-sh/ohm-cargo) contains the matching Cargo
   changes.
-- `astral-sh/ohm` pins one exact revision of each repository, coordinates candidate builds, and
-  will eventually publish the combined toolchain.
+- [`astral-sh/ohm-rust-clippy`](https://github.com/astral-sh/ohm-rust-clippy) and
+  [`astral-sh/ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt) carry tool-specific changes
+  before their exact source trees are synced into `ohm-rust`.
+
+This repository pins exact `ohm-rust` and `ohm-cargo` revisions, coordinates candidate builds, and
+will eventually publish the combined toolchain. Because Rust vendors Clippy and rustfmt as source
+subtrees, the pinned `ohm-rust` revision also pins their exact contents.
 
 ## `cargo +ohm`
 
@@ -19,10 +24,12 @@ release coordinator for two source repositories:
 cargo test                         # the project's normal Rust toolchain
 cargo +ohm-1.97.1-1 test           # an exact Ohm toolchain
 cargo +ohm test                    # a moving local alias, if one has been registered
+cargo +ohm clippy                  # the matching Clippy from the Ohm Rust source tree
+cargo +ohm fmt                     # the matching rustfmt from the Ohm Rust source tree
 ```
 
 Installing or linking Ohm does not replace the default Rust toolchain. An Ohm toolchain directory
-contains both the forked Cargo binary and the matching compiler and sysroot.
+contains the forked Cargo binary, matching compiler, Clippy and rustfmt binaries, and sysroot.
 
 Selecting the toolchain alone does not enable the current acceleration prototypes. The measured uv
 configuration currently requires the rustc public-API hash, Cargo's cached-relink mode, and uv's
@@ -64,8 +71,10 @@ Each immutable release has a manifest at
 described by [`toolchains/manifest.schema.json`](toolchains/manifest.schema.json).
 
 A versioned manifest records the upstream Rust version, the downstream Ohm revision, and full
-commit IDs for `ohm-rust` and `ohm-cargo`. Publishing a later Ohm revision adds another manifest;
-it does not replace the earlier release record.
+commit IDs for `ohm-rust` and `ohm-cargo`. Clippy and rustfmt are built from the exact snapshots
+vendored by that `ohm-rust` commit rather than checked out independently at release time.
+Publishing a later Ohm revision adds another manifest; it does not replace the earlier release
+record.
 
 CI treats pinned manifests as immutable. A checked-in draft may remain byte-for-byte unchanged or
 transition once to `pinned`; that transition may fill the source revisions but cannot change the
