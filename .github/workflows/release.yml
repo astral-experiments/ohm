@@ -109,7 +109,7 @@ jobs:
     needs: plan
     environment: release
     timeout-minutes: 360
-    runs-on: namespace-profile-macos-15
+    runs-on: depot-macos-15
     permissions:
       contents: read
     env:

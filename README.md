@@ -193,7 +193,7 @@ Cross-repository checkout currently requires an `OHM_REPOSITORIES_TOKEN` secret 
 with a short-lived token minted per run by a GitHub App. The Environment must require the protected
 `main` branch and an approval before exposing the credential.
 
-The distribution build uses Astral's shared `namespace-profile-macos-15` Apple Silicon runner.
+The distribution build uses Astral's shared `depot-macos-15` Apple Silicon runner.
 The runner needs at least 50 GiB of free disk space for Rust bootstrap, which builds the stage-2
 compiler, sysroot, combined extended archive, and pinned Cargo while reusing the matching Rust CI
 LLVM rather than rebuilding unchanged LLVM. Release planning and publication use Astral's shared
