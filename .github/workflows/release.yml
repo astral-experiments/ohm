@@ -30,6 +30,7 @@ jobs:
       rust-revision: ${{ steps.manifest.outputs.rust-revision }}
       cargo-revision: ${{ steps.manifest.outputs.cargo-revision }}
       clippy-revision: ${{ steps.manifest.outputs.clippy-revision }}
+      rustfmt-revision: ${{ steps.manifest.outputs.rustfmt-revision }}
       manifest: ${{ steps.manifest.outputs.manifest }}
       toolchain: ${{ steps.manifest.outputs.toolchain }}
     steps:
@@ -65,16 +66,31 @@ jobs:
             echo "rust-revision=$(jq -er '.sources.rust.revision' "$MANIFEST_PATH")"
             echo "cargo-revision=$(jq -er '.sources.cargo.revision' "$MANIFEST_PATH")"
             echo "clippy-revision=$(jq -er '.sources.clippy.revision' "$MANIFEST_PATH")"
+            echo "rustfmt-revision=$(jq -er '.sources.rustfmt.revision' "$MANIFEST_PATH")"
             echo "manifest=$MANIFEST_PATH"
             echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Create read-only source repository token
+        id: source-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.OHM_RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.OHM_RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            ohm-rust
+            ohm-cargo
+            ohm-rust-clippy
+            ohm-rustfmt
+          permission-contents: read
 
       - name: Check out pinned ohm-rust
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: astral-sh/ohm-rust
           ref: ${{ steps.manifest.outputs.rust-revision }}
-          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
           path: source/rust
 
@@ -83,7 +99,7 @@ jobs:
         with:
           repository: astral-sh/ohm-cargo
           ref: ${{ steps.manifest.outputs.cargo-revision }}
-          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
           path: source/cargo
 
@@ -92,9 +108,18 @@ jobs:
         with:
           repository: astral-sh/ohm-rust-clippy
           ref: ${{ steps.manifest.outputs.clippy-revision }}
-          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
           path: source/clippy
+
+      - name: Check out pinned ohm-rustfmt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: astral-sh/ohm-rustfmt
+          ref: ${{ steps.manifest.outputs.rustfmt-revision }}
+          token: ${{ steps.source-token.outputs.token }}
+          persist-credentials: false
+          path: source/rustfmt
 
       - name: Verify source revisions
         env:
@@ -104,7 +129,8 @@ jobs:
             "$MANIFEST_PATH" \
             source/rust \
             source/cargo \
-            source/clippy
+            source/clippy \
+            source/rustfmt
 
   build:
     if: inputs.build
@@ -126,12 +152,26 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Create read-only source repository token
+        id: source-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.OHM_RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.OHM_RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            ohm-rust
+            ohm-cargo
+            ohm-rust-clippy
+            ohm-rustfmt
+          permission-contents: read
+
       - name: Check out pinned ohm-rust
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: astral-sh/ohm-rust
           ref: ${{ needs.plan.outputs.rust-revision }}
-          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
           path: source/rust
 
@@ -140,7 +180,7 @@ jobs:
         with:
           repository: astral-sh/ohm-cargo
           ref: ${{ needs.plan.outputs.cargo-revision }}
-          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
           path: source/rust/src/tools/cargo
 
@@ -149,9 +189,18 @@ jobs:
         with:
           repository: astral-sh/ohm-rust-clippy
           ref: ${{ needs.plan.outputs.clippy-revision }}
-          token: ${{ secrets.OHM_REPOSITORIES_TOKEN }}
+          token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
           path: source/rust/src/tools/clippy
+
+      - name: Check out pinned ohm-rustfmt into the Rust source tree
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: astral-sh/ohm-rustfmt
+          ref: ${{ needs.plan.outputs.rustfmt-revision }}
+          token: ${{ steps.source-token.outputs.token }}
+          persist-credentials: false
+          path: source/rust/src/tools/rustfmt
 
       - name: Verify source revisions
         env:
@@ -161,7 +210,8 @@ jobs:
             "$MANIFEST_PATH" \
             source/rust \
             source/rust/src/tools/cargo \
-            source/rust/src/tools/clippy
+            source/rust/src/tools/clippy \
+            source/rust/src/tools/rustfmt
 
       - name: Build extended Rust distribution
         env:
@@ -183,6 +233,7 @@ jobs:
           MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
           OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
           RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
+          RUSTFMT_REVISION: ${{ needs.plan.outputs.rustfmt-revision }}
         run: |
           manifest_sha256="$(shasum -a 256 "$MANIFEST_PATH" | awk '{print $1}')"
           jq -n \
@@ -195,6 +246,7 @@ jobs:
             --arg rust_revision "$RUST_REVISION" \
             --arg cargo_revision "$CARGO_REVISION" \
             --arg clippy_revision "$CLIPPY_REVISION" \
+            --arg rustfmt_revision "$RUSTFMT_REVISION" \
             '{
               schema_version: 1,
               toolchain: $toolchain,
@@ -210,7 +262,8 @@ jobs:
               sources: {
                 rust: { revision: $rust_revision },
                 cargo: { revision: $cargo_revision },
-                clippy: { revision: $clippy_revision }
+                clippy: { revision: $clippy_revision },
+                rustfmt: { revision: $rustfmt_revision }
               }
             }' > source/rust/build/dist/ohm-provenance.json
 

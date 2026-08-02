@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 4 ]]; then
-  echo "usage: verify-release-sources.sh MANIFEST OHM_RUST_CHECKOUT OHM_CARGO_CHECKOUT OHM_CLIPPY_CHECKOUT" >&2
+if [[ $# -ne 5 ]]; then
+  echo "usage: verify-release-sources.sh MANIFEST OHM_RUST_CHECKOUT OHM_CARGO_CHECKOUT OHM_CLIPPY_CHECKOUT OHM_RUSTFMT_CHECKOUT" >&2
   exit 2
 fi
 
@@ -10,6 +10,7 @@ manifest="$1"
 rust_checkout="$2"
 cargo_checkout="$3"
 clippy_checkout="$4"
+rustfmt_checkout="$5"
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 "$script_dir/validate-release-manifest.sh" --require-pinned "$manifest"
@@ -17,19 +18,30 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 rust_revision="$(jq -er '.sources.rust.revision' "$manifest")"
 cargo_revision="$(jq -er '.sources.cargo.revision' "$manifest")"
 clippy_revision="$(jq -er '.sources.clippy.revision' "$manifest")"
+rustfmt_revision="$(jq -er '.sources.rustfmt.revision' "$manifest")"
 rust_version="$(jq -er '.release.upstream_rust_version' "$manifest")"
 expected_cargo_repository="$(jq -er '.sources.cargo.repository' "$manifest")"
 
-for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout"; do
+for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout"; do
   if ! git -C "$checkout" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "not a Git checkout: $checkout" >&2
     exit 1
   fi
 
-  if [[ "$checkout" == "$rust_checkout" &&
-    "$(cd -- "$clippy_checkout" && pwd -P)" == "$(cd -- "$rust_checkout" && pwd -P)/src/tools/clippy" ]]; then
+  if [[ "$checkout" == "$rust_checkout" ]]; then
+    checkout_paths=(.)
+    rust_checkout_path="$(cd -- "$rust_checkout" && pwd -P)"
+
+    if [[ "$(cd -- "$clippy_checkout" && pwd -P)" == "$rust_checkout_path/src/tools/clippy" ]]; then
+      checkout_paths+=(':(exclude)src/tools/clippy')
+    fi
+
+    if [[ "$(cd -- "$rustfmt_checkout" && pwd -P)" == "$rust_checkout_path/src/tools/rustfmt" ]]; then
+      checkout_paths+=(':(exclude)src/tools/rustfmt')
+    fi
+
     checkout_status="$(git -C "$checkout" status --porcelain --untracked-files=normal \
-      -- . ':(exclude)src/tools/clippy')"
+      -- "${checkout_paths[@]}")"
   else
     checkout_status="$(git -C "$checkout" status --porcelain --untracked-files=normal)"
   fi
@@ -56,6 +68,12 @@ fi
 actual_clippy_revision="$(git -C "$clippy_checkout" rev-parse HEAD)"
 if [[ "$actual_clippy_revision" != "$clippy_revision" ]]; then
   echo "ohm-rust-clippy is at $actual_clippy_revision, expected $clippy_revision" >&2
+  exit 1
+fi
+
+actual_rustfmt_revision="$(git -C "$rustfmt_checkout" rev-parse HEAD)"
+if [[ "$actual_rustfmt_revision" != "$rustfmt_revision" ]]; then
+  echo "ohm-rustfmt is at $actual_rustfmt_revision, expected $rustfmt_revision" >&2
   exit 1
 fi
 
@@ -89,4 +107,4 @@ if [[ "$cargo_repository" != "$expected_cargo_repository" ]]; then
   exit 1
 fi
 
-echo "verified ohm-rust $rust_revision with ohm-cargo $cargo_revision and ohm-rust-clippy $clippy_revision"
+echo "verified ohm-rust $rust_revision with ohm-cargo $cargo_revision, ohm-rust-clippy $clippy_revision, and ohm-rustfmt $rustfmt_revision"

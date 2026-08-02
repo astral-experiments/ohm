@@ -4,10 +4,11 @@ Ohm releases are built from protected `main` using an immutable, pinned toolchai
 
 ## Prepare a release
 
-Finalize the matching changes in `ohm-rust`, `ohm-cargo`, and `ohm-rust-clippy`, then record their
-exact revisions in `toolchains/<rust-version>/<ohm-revision>.json`. The Rust revision must pin the
-same Cargo revision through its `src/tools/cargo` gitlink, and Cargo must support the `ohm-defaults`
-feature required by [`release/bootstrap.toml`](../release/bootstrap.toml).
+Finalize the matching changes in `ohm-rust`, `ohm-cargo`, `ohm-rust-clippy`, and `ohm-rustfmt`,
+then record their exact revisions in `toolchains/<rust-version>/<ohm-revision>.json`. The Rust
+revision must pin the same Cargo revision through its `src/tools/cargo` gitlink, and Cargo must
+support the `ohm-defaults` feature required by
+[`release/bootstrap.toml`](../release/bootstrap.toml).
 
 A pinned manifest's source revisions can be updated until its immutable release tag is published.
 After publication, the release identity and source revisions cannot change.
@@ -18,17 +19,23 @@ Validate a compatible pinned manifest and its checked-out source revisions:
 manifest="toolchains/${RUST_VERSION:?}/${OHM_REVISION:?}.json"
 ./scripts/validate-release-manifest.sh --require-pinned "$manifest"
 ./scripts/verify-release-sources.sh "$manifest" /path/to/ohm-rust /path/to/ohm-cargo \
-  /path/to/ohm-rust-clippy
+  /path/to/ohm-rust-clippy /path/to/ohm-rustfmt
 ```
 
-The protected `release` environment needs `OHM_REPOSITORIES_TOKEN` with read access to the Rust,
-Cargo, and Clippy source repositories. Store the Cloudflare R2 credentials as environment secrets:
+A dedicated GitHub App needs read-only contents access to the four source repositories. Release
+jobs generate short-lived installation tokens scoped to those repositories.
 
+Store the GitHub App private key and Cloudflare R2 credentials as protected `release` environment
+secrets:
+
+- `OHM_RELEASE_APP_PRIVATE_KEY`
 - `MIRROR_R2_ACCESS_KEY_ID`
 - `MIRROR_R2_SECRET_ACCESS_KEY`
 
-Store the Cloudflare account and bucket configuration as environment variables:
+Store the GitHub App client ID and Cloudflare account and bucket configuration as protected
+`release` environment variables:
 
+- `OHM_RELEASE_APP_CLIENT_ID`
 - `MIRROR_R2_CLOUDFLARE_ACCOUNT_ID`
 - `MIRROR_R2_BUCKET_NAME`
 
