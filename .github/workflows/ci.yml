@@ -74,3 +74,5 @@ jobs:
         run: ./scripts/check-manifest-history.sh "$BASE_REVISION"
       - name: Check shell syntax
         run: bash -n scripts/*.sh
+      - name: Test release source verification
+        run: ./scripts/test-release-sources.sh

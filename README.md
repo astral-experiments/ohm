@@ -7,13 +7,14 @@ across four repositories:
   standard library, vendored Clippy and rustfmt snapshots, and bootstrap changes.
 - [`astral-sh/ohm-cargo`](https://github.com/astral-sh/ohm-cargo) contains the matching Cargo
   changes.
-- [`astral-sh/ohm-rust-clippy`](https://github.com/astral-sh/ohm-rust-clippy) and
-  [`astral-sh/ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt) carry tool-specific changes
-  before their exact source trees are synced into `ohm-rust`.
+- [`astral-sh/ohm-rust-clippy`](https://github.com/astral-sh/ohm-rust-clippy) contains the matching
+  Clippy changes, which are overlaid onto Rust's vendored Clippy source tree during release builds.
+- [`astral-sh/ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt) carries rustfmt-specific
+  changes before their exact source tree is synced into `ohm-rust`.
 
-This repository pins exact `ohm-rust` and `ohm-cargo` revisions, coordinates candidate builds, and
-will eventually publish the combined toolchain. Because Rust vendors Clippy and rustfmt as source
-subtrees, the pinned `ohm-rust` revision also pins their exact contents.
+This repository pins exact `ohm-rust`, `ohm-cargo`, and `ohm-rust-clippy` revisions, coordinates
+candidate builds, and will eventually publish the combined toolchain. rustfmt is built from the
+exact snapshot vendored by the pinned `ohm-rust` revision.
 
 ## `cargo +ohm`
 
@@ -82,14 +83,15 @@ Each immutable release has a manifest at
 described by [`toolchains/manifest.schema.json`](toolchains/manifest.schema.json).
 
 A versioned manifest records the upstream Rust version, the downstream Ohm revision, and full
-commit IDs for `ohm-rust` and `ohm-cargo`. Clippy and rustfmt are built from the exact snapshots
-vendored by that `ohm-rust` commit rather than checked out independently at release time.
+commit IDs for `ohm-rust`, `ohm-cargo`, and `ohm-rust-clippy`. The pinned Clippy checkout replaces
+the Rust source tree's vendored Clippy snapshot before bootstrap builds the toolchain.
 Publishing a later Ohm revision adds another manifest; it does not replace the earlier release
 record.
 
-CI treats pinned manifests as immutable. A checked-in draft may remain byte-for-byte unchanged or
-transition once to `pinned`; that transition may fill the source revisions but cannot change the
-release identity. New versioned manifests remain allowed.
+CI treats pinned manifests as immutable. A checked-in draft may remain unchanged or transition once
+to `pinned`; pinning may fill the source revisions but cannot change the release identity. Existing
+pre-release manifests may add the mandatory Clippy source without changing their other contents.
+New versioned manifests remain allowed.
 
 The Rust revision must pin the same Cargo revision through its `src/tools/cargo` gitlink. Its
 `.gitmodules` entry must also point to `astral-sh/ohm-cargo`. This gives one Rust commit a complete,
@@ -100,8 +102,8 @@ release workflow rejects drafts. `toolchains/1.97.1/1.json` now pins the first c
 source pair; it does not imply that an Ohm archive has been built or released.
 
 [`toolchains/1.97.1/2.json`](toolchains/1.97.1/2.json) reserves the revision for the default Ohm
-workflow. It remains a draft until the Cargo and Rust stacks are squash-merged and their final
-source revisions can be pinned.
+workflow. It remains a draft until the Cargo, Rust, and Clippy stacks are squash-merged and their
+final source revisions can be pinned.
 
 ## Validation
 
@@ -117,7 +119,8 @@ After checking out the pinned repositories, verify their exact revisions and the
 ./scripts/verify-release-sources.sh \
   toolchains/1.97.1/1.json \
   /path/to/ohm-rust \
-  /path/to/ohm-cargo
+  /path/to/ohm-cargo \
+  /path/to/ohm-rust-clippy
 ```
 
 The source check also verifies that `ohm-rust/src/version` matches the upstream Rust version in the
@@ -132,13 +135,13 @@ manifest and currently provides three pieces of release scaffolding:
 2. optionally run Rust bootstrap's full `x.py dist extended` build for the configured native target,
    smoke-install the combined archive, and retain its distribution artifacts; and
 3. write checksummed provenance containing the coordinator revision, manifest digest, and exact
-   Rust and Cargo revisions.
+   Rust, Cargo, and Clippy revisions.
 
 Cross-repository checkout currently requires an `OHM_REPOSITORIES_TOKEN` secret in a protected
-`release` Environment. It must be a read-only, fine-grained token scoped only to `ohm-rust` and
-`ohm-cargo`. Before publication, we should replace this stored credential with a short-lived token
-minted per run by a GitHub App. The Environment must require the protected `main` branch and an
-approval before exposing the credential.
+`release` Environment. It must be a read-only, fine-grained token scoped only to `ohm-rust`,
+`ohm-cargo`, and `ohm-rust-clippy`. Before publication, we should replace this stored credential
+with a short-lived token minted per run by a GitHub App. The Environment must require the protected
+`main` branch and an approval before exposing the credential.
 
 The distribution build uses a self-hosted Apple Silicon runner with the labels `self-hosted`,
 `macOS`, `ARM64`, and `ohm-builder`. It must have at least 50 GiB of free disk space. The bootstrap

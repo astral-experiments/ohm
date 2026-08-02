@@ -35,8 +35,14 @@ while IFS= read -r manifest; do
 
   case "$previous_status:$current_status" in
     pinned:pinned | draft:draft)
-      if ! cmp -s <(git show "$base_revision:$manifest") "$manifest"; then
-        echo "existing $previous_status manifest changed: $manifest" >&2
+      if cmp -s <(git show "$base_revision:$manifest") "$manifest"; then
+        continue
+      fi
+
+      previous_manifest="$(git show "$base_revision:$manifest" | jq -S .)"
+      current_without_clippy="$(jq -S 'del(.sources.clippy)' "$manifest")"
+      if [[ "$previous_manifest" != "$current_without_clippy" ]]; then
+        echo "existing $previous_status manifest changed beyond its Clippy source: $manifest" >&2
         exit 1
       fi
       ;;
