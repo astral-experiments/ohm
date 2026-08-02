@@ -8,7 +8,7 @@ sources of truth for the current changes and release revisions.
 
 ## ohm-rust
 
-- [#6: Add fork-safe compiler CI](https://github.com/astral-sh/ohm-rust/pull/6)
+- [#6: Set up fork-owned Rust CI](https://github.com/astral-sh/ohm-rust/pull/6)
 - [#1: Add reachability-based public API hashing](https://github.com/astral-sh/ohm-rust/pull/1)
 - [#2: Pin Ohm Cargo for Rust 1.97.1](https://github.com/astral-sh/ohm-rust/pull/2)
 - [#4: Pin Ohm Cargo check cutoff](https://github.com/astral-sh/ohm-rust/pull/4)
@@ -25,7 +25,7 @@ sources of truth for the current changes and release revisions.
 
 ## ohm-rust-clippy
 
-- [#31: Add fork-compatible Clippy CI](https://github.com/astral-sh/ohm-rust-clippy/pull/31)
+- [#31: Set up fork-owned Clippy CI](https://github.com/astral-sh/ohm-rust-clippy/pull/31)
 - [#1: Backport statically combined late lint passes](https://github.com/astral-sh/ohm-rust-clippy/pull/1)
 - [#2: Backport statically combined early lint passes](https://github.com/astral-sh/ohm-rust-clippy/pull/2)
 - [#3: Backport cached macro-backtrace lookups](https://github.com/astral-sh/ohm-rust-clippy/pull/3)
@@ -58,4 +58,4 @@ sources of truth for the current changes and release revisions.
 
 ## ohm-rustfmt
 
-- [#1: Add fork-specific rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/1)
+- [#1: Set up fork-owned rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/1)
