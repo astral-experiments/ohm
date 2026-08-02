@@ -577,12 +577,27 @@ jobs:
             SHA256SUMS
 
   publish-mirror:
-    if: inputs.build
+    if: inputs.build && github.ref == 'refs/heads/main'
     needs:
       - plan
       - publish
-    uses: ./.github/workflows/publish-mirror.yml
-    with:
-      version: ${{ needs.plan.outputs.toolchain }}
+    environment: release
+    runs-on: depot-ubuntu-24.04-4
     permissions:
       contents: read
+    steps:
+      - name: Check out release coordinator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Publish verified public release assets
+        uses: ./.github/actions/publish-mirror
+        with:
+          version: ${{ needs.plan.outputs.toolchain }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.MIRROR_R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.MIRROR_R2_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL: https://${{ vars.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          AWS_DEFAULT_REGION: auto
+          R2_BUCKET: ${{ vars.MIRROR_R2_BUCKET_NAME }}
