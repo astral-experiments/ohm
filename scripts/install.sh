@@ -16,6 +16,10 @@ fail() {
     exit 1
 }
 
+info() {
+    printf 'ohm: %s\n' "$*" >&2
+}
+
 usage() {
     printf '%s\n' \
         'Usage: install.sh [--help]' \
@@ -148,13 +152,19 @@ archive_name=$version-$host_target.tar.gz
 archive_path=$temporary_directory/$archive_name
 case "$download_url" in
     https://*)
-        curl --fail --silent --show-error --location \
+        info "downloading $version for $host_target"
+        curl_progress=--silent
+        if [ -t 2 ]; then
+            curl_progress=--progress-bar
+        fi
+        curl --fail "$curl_progress" --show-error --location \
             --retry 3 --retry-delay 1 \
             --proto '=https' --tlsv1.2 \
             --output "$archive_path" "${download_url%/}/$archive_name" ||
             fail 'could not download the public Ohm release archive'
         ;;
     file:///*)
+        info "copying $version for $host_target"
         cp "${download_url#file://}/$archive_name" "$archive_path" ||
             fail 'could not copy the local Ohm release archive'
         ;;
@@ -189,6 +199,7 @@ printf '%s\n' "$installation_prefix" | awk '
     }
 ' || fail 'OHM_INSTALL_DIR must not contain relative path components'
 
+info 'verifying archive checksum'
 if command -v sha256sum >/dev/null 2>&1; then
     actual_checksum=$(sha256sum "$archive_path" | awk '{ print tolower($1) }') ||
         fail 'could not calculate the archive checksum'
@@ -204,6 +215,7 @@ upstream_version=${version#ohm-}
 upstream_version=${upstream_version%-*}
 archive_root=rust-$upstream_version-dev-$host_target
 
+info 'inspecting archive contents'
 tar -tf "$archive_path" > "$temporary_directory/members" || fail 'could not inspect the archive'
 awk -v expected_root="$archive_root" '
     {
@@ -273,12 +285,14 @@ else
         fail 'could not create an installation staging directory'
     extracted_directory=$temporary_directory/extracted
     mkdir -p "$extracted_directory"
+    info 'extracting toolchain'
     tar --no-same-owner -xf "$archive_path" -C "$extracted_directory" ||
         fail 'could not extract the archive'
     inner_installer=$extracted_directory/$archive_root/install.sh
     [ -f "$inner_installer" ] && [ ! -L "$inner_installer" ] ||
         fail 'the archive does not contain a regular Rust installation script'
     staged_prefix=$staging_directory/toolchain
+    info 'installing toolchain components'
     sh "$inner_installer" --prefix="$staged_prefix" --disable-ldconfig ||
         fail 'the Rust distribution installer failed'
     verify_installation "$staged_prefix"
@@ -345,6 +359,7 @@ link_toolchain() {
     fi
 }
 
+info 'registering toolchains with rustup'
 link_toolchain "$version"
 link_toolchain ohm
 

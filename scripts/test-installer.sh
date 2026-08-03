@@ -121,7 +121,7 @@ output=
 url=
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --fail|--silent|--show-error|--location|--tlsv1.2|-fsSL|--retry-all-errors)
+    --fail|--silent|--progress-bar|--show-error|--location|--tlsv1.2|-fsSL|--retry-all-errors)
       shift
       ;;
     --proto) shift 2 ;;
@@ -233,6 +233,24 @@ assert_not_contains() {
   fi
 }
 
+assert_lines_in_order() {
+  file=$1
+  shift
+  previous_line=0
+
+  for expected_line in "$@"; do
+    line_number=$(awk -v expected="$expected_line" -v previous="$previous_line" '
+      NR > previous && $0 == expected { print NR; exit }
+    ' "$file")
+    if [ -z "$line_number" ]; then
+      echo "expected installer progress messages in order in '$file'" >&2
+      sed -n '1,100p' "$file" >&2
+      exit 1
+    fi
+    previous_line=$line_number
+  done
+}
+
 assert_no_links() {
   if [ -s "$temporary_directory/cases/$1/rustup.log" ]; then
     echo "unexpected rustup changes for '$1'" >&2
@@ -335,6 +353,15 @@ assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log"
 assert_contains "$temporary_directory/cases/embedded-public-latest/curl.log" \
   "https://labs.astral.sh/ohm/releases/$version/$archive_name"
 assert_contains "$temporary_directory/cases/embedded-public-latest/curl.log" '--retry '
+assert_contains "$temporary_directory/cases/embedded-public-latest/curl.log" '--silent'
+assert_not_contains "$temporary_directory/cases/embedded-public-latest/curl.log" '--progress-bar'
+assert_lines_in_order "$temporary_directory/cases/embedded-public-latest/output.log" \
+  "ohm: downloading $version for aarch64-apple-darwin" \
+  'ohm: verifying archive checksum' \
+  'ohm: inspecting archive contents' \
+  'ohm: extracting toolchain' \
+  'ohm: installing toolchain components' \
+  'ohm: registering toolchains with rustup'
 assert_contains "$temporary_directory/cases/embedded-public-latest/rustup.log" \
   "toolchain link $version "
 assert_contains "$temporary_directory/cases/embedded-public-latest/rustup.log" \
@@ -449,6 +476,9 @@ if [ ! -x "$temporary_directory/cases/trailing-slash-prefix/toolchain/bin/rustc"
 fi
 
 run_case local-install success
+assert_contains "$temporary_directory/cases/local-install/output.log" \
+  "ohm: copying $version for aarch64-apple-darwin"
+assert_not_contains "$temporary_directory/cases/local-install/output.log" 'ohm: downloading'
 assert_contains "$temporary_directory/cases/local-install/rustup.log" \
   "toolchain link $version "
 assert_contains "$temporary_directory/cases/local-install/rustup.log" 'toolchain link ohm '
