@@ -3,45 +3,43 @@
 [![CI](https://github.com/astral-sh/ohm/actions/workflows/ci.yml/badge.svg)](https://github.com/astral-sh/ohm/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
-An experimental fork of the Rust toolchain, designed for extremely fast local development:
-[up to 20× faster incremental builds](#benchmarks) after changes to shared dependencies.
+An experimental fork of the Rust toolchain, designed for extremely fast local development.
 
-**Experimental:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations
-that may be unsound. Use it only for local development, at your own risk.
+With Ohm, incremental builds can be 5x, 10, or even 20x faster for common commands in large
+workspaces. Compared to Rust 1.97.1:
 
-- Reduces dependency rebuilds and reuses code generation between incremental Rust builds.
-- Includes matching Cargo, Clippy, rustfmt, and compiler binaries in a single rustup toolchain.
-- Keeps the project's normal Rust toolchain unchanged.
-- Supports Apple Silicon macOS, including terminals running under Rosetta.
+| Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
+| ------- | -------------- | ----------: | -----: | ------: |
+| uv      | `cargo check`  |      4.47 s | 0.43 s |  10.38× |
+| uv      | `cargo clippy` |      8.58 s | 0.44 s |  19.66× |
+| uv      | `cargo test`   |      9.15 s | 1.13 s |   8.10× |
+| Codex   | `cargo check`  |      4.68 s | 0.61 s |   7.70× |
+| Codex   | `just clippy`  |      8.33 s | 0.68 s |  12.19× |
+| Codex   | `just test`    |      8.30 s | 1.97 s |   4.22× |
 
-> [!WARNING]
-> Ohm's optimizations can produce stale or incorrect build output. Its default proc-macro cache, for
-> example, is explicitly labeled potentially unsound by Rust. Never rely on Ohm for production
-> builds, releases, CI correctness validation, or final test results. The normal Rust toolchain must
-> remain authoritative. Disable Ohm's bundled defaults for a local comparison with
-> `cargo +ohm -Zohm-defaults=no test`.
+**Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
+be unsound, including a
+[Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790) implementation. Use
+it only for local development, at your own risk.
 
 ## Installation
 
-Ohm supports Apple Silicon macOS, including terminals running under Rosetta. Install
-[rustup](https://rustup.rs/), then install the latest Ohm release:
+Install [rustup](https://rustup.rs/), then install the latest Ohm release with our standalone
+installers:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
   https://labs.astral.sh/ohm/install.sh | sh
 ```
 
-The release-specific installer verifies its embedded archive checksum, installs the complete Rust
-toolchain, and registers an exact version and the moving `ohm` alias with rustup. Your default Rust
-toolchain is not changed. Installations are stored under
-`${XDG_DATA_HOME:-$HOME/.local/share}/ohm/toolchains/`.
+Ohm's installer verifies its embedded archive checksum, installs the complete Rust toolchain, and
+registers an exact version and a moving `ohm` alias with rustup.
 
-To install an exact version, set `OHM_VERSION` to a published release and use that release's
-installer:
+To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  "https://labs.astral.sh/ohm/releases/$OHM_VERSION/install.sh" | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-1/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -54,7 +52,7 @@ curl --proto '=https' --tlsv1.2 -LsSf \
 
 ## Usage
 
-Use rustup's `+toolchain` syntax to select Ohm without replacing the normal project toolchain:
+Use rustup's `+toolchain` syntax to select Ohm:
 
 ```console
 cargo +ohm test
@@ -64,8 +62,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-1 test` selects that specific installed revision. Running `cargo test` without a
-toolchain selector continues to use the project's normal Rust toolchain.
+`cargo +ohm-1.97.1-1 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, and proc-macro caching by default.
 Use its aggregate opt-out to compare against the same compiler and Cargo without those defaults:
@@ -74,11 +71,9 @@ Use its aggregate opt-out to compare against the same compiler and Cargo without
 cargo +ohm -Zohm-defaults=no test
 ```
 
-Repository-specific optimizations, such as uv's `--profile fast-build`, remain separate.
-
 ## Philosophy
 
-Rust's compile times are a bottleneck for day-to-day development, especially in large workspaces
+Rust's compile times are a bottleneck in day-to-day development, especially in large workspaces
 where changing one crate can trigger unnecessary work throughout the dependency graph.
 
 Ohm makes a deliberate tradeoff: faster local iteration is more valuable than waiting for every
@@ -86,7 +81,7 @@ optimization to meet upstream Rust's standards for completeness and correctness.
 improvements from newer Rust releases, pull forward work that has not yet landed upstream, and
 experiment with optimizations that may still contain bugs.
 
-Current examples include:
+At present, Ohm includes implementations for:
 
 - [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790): avoid rebuilding
   dependent crates when a dependency's public interface is unchanged.
@@ -95,55 +90,21 @@ Current examples include:
 - Experimental procedural-macro caching.
 - Backported Clippy optimizations, including combined lint passes.
 
-These optimizations can produce stale or incorrect results. Ohm is exclusively for local development:
-never use it for production builds, releases, CI, or final validation. Always verify your work with
-the official Rust toolchain.
+Ohm is exclusively intended for local development: never use it for production builds or releases,
+and always verify your work with the official Rust toolchain.
 
-Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes available,
-we replay the optimizations that remain relevant and drop those that have already landed upstream.
-Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-1` and
+Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
+available, we replay the optimizations that remain relevant and drop those that have already landed
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-1` and
 `ohm-1.97.1-2`.
 
-See [Changes from upstream](docs/upstream-changes.md) for the complete list of included patches.
-
-## Benchmarks
-
-Ohm avoids unnecessary downstream work when an edit to a shared dependency leaves its public API
-unchanged. Compared with Rust 1.97.1:
-
-| Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
-| ------- | -------------- | ----------: | -----: | ------: |
-| uv      | `cargo check`  |      4.47 s | 0.43 s |  10.38× |
-| uv      | `cargo clippy` |      8.58 s | 0.44 s |  19.66× |
-| uv      | `cargo test`   |      9.15 s | 1.13 s |   8.10× |
-| Codex   | `cargo check`  |      4.68 s | 0.61 s |   7.70× |
-| Codex   | `just clippy`  |      8.33 s | 0.68 s |  12.19× |
-| Codex   | `just test`    |      8.30 s | 1.97 s |   4.22× |
-
-Cold builds and direct edits to the target crate can be slower. See the
-[full results and methodology](BENCHMARKS.md).
-
-## Source repositories
-
-Ohm combines version-matched forks of Rust and its development tools:
+See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
+patches are maintained in peer repositories:
 
 - [`ohm-rust`](https://github.com/astral-sh/ohm-rust): Rust compiler and standard library.
 - [`ohm-cargo`](https://github.com/astral-sh/ohm-cargo): Cargo.
 - [`ohm-rust-clippy`](https://github.com/astral-sh/ohm-rust-clippy): Clippy.
 - [`ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt): rustfmt.
-
-## Documentation
-
-- [Architecture](docs/architecture.md): source repositories, compiler integration, and versioned
-  release manifests.
-- [Upstream changes](docs/upstream-changes.md): pull requests maintained in each Ohm source fork.
-- [Releases](docs/releases.md): validating, building, and publishing a pinned Ohm toolchain.
-- [Security](SECURITY.md): reporting vulnerabilities and experimental safety boundaries.
-
-## Contributing
-
-See the [contributing guide](CONTRIBUTING.md) for repository setup, validation, and contribution
-expectations.
 
 ## License
 
