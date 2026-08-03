@@ -344,6 +344,27 @@ jobs:
             OHM_INSTALL_DIR="$toolchain_root" \
             sh "$RELEASE_DIRECTORY/ohm-installer.sh"
 
+          case "$OHM_TARGET" in
+            *-apple-darwin)
+              otool -L "$toolchain_root/bin/cargo" | awk '
+                NR == 1 { next }
+                $1 ~ /^\/usr\/lib\// || $1 ~ /^\/System\/Library\// { next }
+                {
+                  print "non-system Cargo dependency: " $1 > "/dev/stderr"
+                  invalid = 1
+                }
+                END { exit invalid }
+              '
+              ;;
+            *-unknown-linux-gnu)
+              if ldd "$toolchain_root/bin/cargo" \
+                | grep -E '(^|[[:space:]])lib(ssl|crypto|curl|git2|ssh2|z|zstd)[.-]'; then
+                echo 'Cargo links against nonportable native libraries' >&2
+                exit 1
+              fi
+              ;;
+          esac
+
           unset RUSTC_BOOTSTRAP
           rustc +"$OHM_TOOLCHAIN" -Z help \
             | grep -F 'public-api-hash' >/dev/null
