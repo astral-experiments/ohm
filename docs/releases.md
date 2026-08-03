@@ -56,11 +56,12 @@ gh workflow run release.yml --repo astral-sh/ohm --ref main \
   -f manifest="$manifest" -F build=true
 ```
 
-The workflow verifies source revisions, builds the complete stage-2 Rust distribution, smoke-tests
-the installed toolchain, and creates a private GitHub Release named after the immutable toolchain
-version. Release notes include version-pinned installation instructions, usage examples, the
-development-only safety warning, and public download links alongside the generated changelog. The
-internal smoke test uses `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private
+The workflow verifies source revisions, builds both complete stage-2 Rust distributions, and
+generates one universal installer with both archive checksums embedded. It smoke-tests that exact
+installer on macOS and Linux before creating a private GitHub Release named after the immutable
+toolchain version. Release notes include version-pinned installation instructions, usage examples,
+the development-only safety warning, and public download links alongside the generated changelog.
+Internal smoke tests use `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private
 release includes:
 
 - Apple Silicon macOS and x86_64 Linux (glibc) `.tar.gz` archives and `.sha256` sidecars;
