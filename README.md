@@ -72,6 +72,14 @@ Use its aggregate opt-out to compare against the same compiler and Cargo without
 cargo +ohm -Zohm-defaults=no test
 ```
 
+To use Ohm with coding agents, add the following to your project's `AGENTS.md`:
+
+```markdown
+Use `cargo +ohm` for all local Cargo commands, including `check`, `test`, `clippy`, `fmt`, and
+external subcommands. Ohm enables its optimizations automatically; do not add `-Z` flags manually.
+Use the normal Rust toolchain for CI, releases, and final correctness validation.
+```
+
 ## Philosophy
 
 Rust's compile times are a bottleneck in day-to-day development, especially in large workspaces
