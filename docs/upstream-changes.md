@@ -13,6 +13,8 @@ sources of truth for the current changes and release revisions.
 - [#2: Pin Ohm Cargo for Rust 1.97.1](https://github.com/astral-sh/ohm-rust/pull/2)
 - [#4: Pin Ohm Cargo check cutoff](https://github.com/astral-sh/ohm-rust/pull/4)
 - [#5: Pin Cargo with Ohm build defaults](https://github.com/astral-sh/ohm-rust/pull/5)
+- [#9: Skip query machinery when promoting disk-cached values](https://github.com/astral-sh/ohm-rust/pull/9)
+- [#8: Emit reusable link state while linking normally](https://github.com/astral-sh/ohm-rust/pull/8)
 
 ## ohm-cargo
 
@@ -22,6 +24,17 @@ sources of truth for the current changes and release revisions.
 - [#2: Prototype cached relinking for dependency-only rebuilds](https://github.com/astral-sh/ohm-cargo/pull/2)
 - [#4: Enable RDR early cutoff for check and Clippy](https://github.com/astral-sh/ohm-cargo/pull/4)
 - [#5: Enable Ohm build defaults](https://github.com/astral-sh/ohm-cargo/pull/5)
+- [#9: Avoid cloning manifests when preparing diagnostics](https://github.com/astral-sh/ohm-cargo/pull/9)
+- [#10: Avoid cloning parsed TOML manifests](https://github.com/astral-sh/ohm-cargo/pull/10)
+- [#11: Use FxHash collections throughout Cargo](https://github.com/astral-sh/ohm-cargo/pull/11)
+- [#12: Index workspace members for faster discovery](https://github.com/astral-sh/ohm-cargo/pull/12)
+- [#13: Avoid parsing unchanged lockfiles](https://github.com/astral-sh/ohm-cargo/pull/13)
+- [#14: Initialize Git HTTP transports only when needed](https://github.com/astral-sh/ohm-cargo/pull/14)
+- [#15: Deserialize remote manifests without retaining TOML documents](https://github.com/astral-sh/ohm-cargo/pull/15)
+- [#19: Avoid cloning registry index summaries](https://github.com/astral-sh/ohm-cargo/pull/19)
+- [#20: Preallocate registry and target vectors](https://github.com/astral-sh/ohm-cargo/pull/20)
+- [#18: Initialize cached relinking in one compiler invocation](https://github.com/astral-sh/ohm-cargo/pull/18)
+- [#16: Cache workspace resolution across Cargo invocations](https://github.com/astral-sh/ohm-cargo/pull/16)
 
 ## ohm-rust-clippy
 
