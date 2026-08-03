@@ -33,6 +33,10 @@ jobs:
 
           config = tomllib.loads(pathlib.Path("release/bootstrap.toml").read_text())
           build = config.get("build", {})
+          if build.get("cargo-native-static") is not True:
+              raise SystemExit(
+                  "Ohm releases must statically link Cargo's native dependencies"
+              )
           tools = set(build.get("tools", []))
           missing_tools = {"analysis", "cargo", "clippy", "rustfmt"} - tools
           if missing_tools:

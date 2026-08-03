@@ -5,6 +5,9 @@ profile = "dist"
 [build]
 description = "Ohm"
 locked-deps = true
+# Match upstream Rust releases: vendor Cargo's native dependencies instead of
+# relying on libraries that are installed only on the build machine.
+cargo-native-static = true
 # Rust's combined macOS and Windows installers still require the deprecated
 # rust-analysis compatibility component even though it only contains a removal
 # notice. Keep it alongside the user-facing tools so `x.py dist extended` can
