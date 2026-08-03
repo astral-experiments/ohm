@@ -79,18 +79,22 @@ Replace `+1.97.1` with `+ohm`, or set `RUSTUP_TOOLCHAIN=ohm`, to run the Ohm var
 
 ## Reproducing the benchmarks
 
-The benchmark runner requires [uv](https://docs.astral.sh/uv/), the upstream Rust and Ohm toolchains,
-and checkouts of uv and Codex. The Codex workflows also require
-[`just`](https://github.com/casey/just) and `cargo-nextest`. Run it from the Ohm repository:
+The benchmark runner requires [uv](https://docs.astral.sh/uv/), Git, and the upstream Rust and Ohm
+toolchains. The Codex workflows also require [`just`](https://github.com/casey/just) and
+`cargo-nextest`. Run it from the Ohm repository:
 
 ```console
-uv run scripts/benchmark.py --uv-path ../uv --codex-path ../codex --dry-run
-uv run scripts/benchmark.py --uv-path ../uv --codex-path ../codex
+uv run scripts/benchmark.py --dry-run
+uv run scripts/benchmark.py
 ```
 
-Benchmark commands run offline, so dependencies must already be cached. The selected source files
-must be clean and contain the expected implementation fragments; `--dry-run` verifies them without
-running a build.
+The runner clones the public repositories at exact benchmark-compatible source revisions:
+
+- [uv `c22e6b71933443e9cd299d4b6ac8de035ed4825b`](https://github.com/astral-sh/uv/commit/c22e6b71933443e9cd299d4b6ac8de035ed4825b)
+- [Codex `5157493c23713ac12034cf250ffb0a8ce0670277`](https://github.com/openai/codex/commit/5157493c23713ac12034cf250ffb0a8ce0670277)
+
+Cloning requires network access, but the benchmark commands run offline, so Cargo dependencies must
+already be cached. `--dry-run` prints the benchmark plan without cloning or running a build.
 
 By default, the runner compares Rust 1.97.1 against `+ohm` across `uv`, `codex-tools`, and
 `codex-core`, using eight build jobs. Each workflow includes one cold build, three no-op runs, seven
@@ -98,14 +102,14 @@ dependency edits, and five direct edits. Use `--project` to run a smaller matrix
 
 ```console
 uv run scripts/benchmark.py \
-  --uv-path ../uv \
-  --codex-path ../codex \
   --project codex-core
 ```
 
-Use `--upstream` and `--ohm` to select different toolchains; `--jobs`, `--cold-runs`, `--noop-runs`,
-`--dependency-runs`, and `--direct-runs` to control the sample counts; and `--output-dir` to choose
-a new or empty directory for the JSON results and Markdown summary.
+Use `--uv-path` and `--codex-path` to reuse existing local repositories, or `--uv-rev` and
+`--codex-rev` to override the pinned commits. Use `--upstream` and `--ohm` to select different
+toolchains; `--jobs`, `--cold-runs`, `--noop-runs`, `--dependency-runs`, and `--direct-runs` to
+control the sample counts; and `--output-dir` to choose a new or empty directory for the JSON results
+and Markdown summary.
 
 The runner creates temporary Git worktrees, isolates Cargo target directories by workflow and
 toolchain, and applies reversible edits without modifying the original checkouts. Run benchmarks

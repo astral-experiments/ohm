@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import sys
 import tempfile
 import unittest
@@ -205,61 +207,293 @@ class SourcePreflightTests(unittest.TestCase):
         temporary_directory = tempfile.TemporaryDirectory()
         self.addCleanup(temporary_directory.cleanup)
         self.repository = Path(temporary_directory.name).resolve()
-        (self.repository / "Cargo.toml").write_text("[workspace]\n", encoding="utf-8")
+        self.revision = "a" * 40
         self.workload = benchmark.WORKLOADS["uv"]
+        self.blobs = {"Cargo.toml": "[workspace]\n"}
+        (self.repository / "Cargo.toml").write_text(
+            self.blobs["Cargo.toml"], encoding="utf-8"
+        )
         for edit in (self.workload.dependency, self.workload.direct):
             source = self.repository / edit.path
             source.parent.mkdir(parents=True, exist_ok=True)
             source.write_text(edit.before, encoding="utf-8")
+            self.blobs[edit.path] = edit.before
 
-    def test_rejects_dirty_benchmark_sources_before_detaching_worktrees(self) -> None:
-        arguments = benchmark.parser().parse_args(
-            ["--project", "uv", "--uv-path", str(self.repository)]
+    def options(self) -> object:
+        return benchmark.parser().parse_args(
+            [
+                "--project",
+                "uv",
+                "--uv-path",
+                str(self.repository),
+                "--uv-rev",
+                self.revision,
+            ]
         )
 
-        def git_output(command: list[str], *, cwd: Path) -> str:
-            if command[1] == "rev-parse":
-                return str(self.repository)
-            if command[1] == "status":
-                return f" M {self.workload.dependency.path}"
-            self.fail(f"unexpected Git command: {command}")
+    def git_output(self, command: list[str], *, cwd: Path) -> str:
+        if command[1:3] == ["rev-parse", "--show-toplevel"]:
+            return str(self.repository)
+        if command[1:3] == ["rev-parse", "--verify"]:
+            return self.revision
+        if command[1] == "show":
+            revision, _, relative = command[-1].partition(":")
+            self.assertEqual(revision, self.revision)
+            return self.blobs[Path(relative).as_posix()]
+        self.fail(f"unexpected Git command: {command}")
 
-        with mock.patch.object(benchmark, "command_output", side_effect=git_output):
-            with self.assertRaisesRegex(benchmark.BenchmarkError, "uncommitted"):
-                benchmark.Study(arguments)
+    def test_validates_pinned_commit_without_mutating_dirty_checkout(self) -> None:
+        dependency = self.repository / self.workload.dependency.path
+        dirty_source = "// unrelated local changes\n"
+        dependency.write_text(dirty_source, encoding="utf-8")
 
-    def test_ignores_unrelated_dirty_repository_files(self) -> None:
-        (self.repository / "unrelated.txt").write_text("dirty", encoding="utf-8")
-        arguments = benchmark.parser().parse_args(
-            ["--project", "uv", "--uv-path", str(self.repository)]
-        )
-        status_commands: list[list[str]] = []
-
-        def git_output(command: list[str], *, cwd: Path) -> str:
-            if command[1] == "rev-parse":
-                return str(self.repository)
-            if command[1] == "status":
-                status_commands.append(command)
-                return ""
-            self.fail(f"unexpected Git command: {command}")
-
-        with mock.patch.object(benchmark, "command_output", side_effect=git_output):
-            study = benchmark.Study(arguments)
+        with mock.patch.object(
+            benchmark, "command_output", side_effect=self.git_output
+        ) as command_output:
+            study = benchmark.Study(self.options())
 
         self.assertEqual(study.sources["uv"], self.repository)
-        self.assertEqual(
-            status_commands,
-            [
-                [
-                    "git",
-                    "status",
-                    "--porcelain",
-                    "--",
-                    self.workload.dependency.path,
-                    self.workload.direct.path,
-                ]
-            ],
+        self.assertEqual(study.revisions["uv"], self.revision)
+        self.assertEqual(dependency.read_text(encoding="utf-8"), dirty_source)
+        self.assertFalse(
+            any(call.args[0][1] == "status" for call in command_output.call_args_list)
         )
+
+    def test_rejects_markers_missing_from_the_pinned_commit(self) -> None:
+        self.blobs[self.workload.dependency.path] = "// marker changed upstream\n"
+
+        with mock.patch.object(
+            benchmark, "command_output", side_effect=self.git_output
+        ):
+            with self.assertRaises(benchmark.BenchmarkError):
+                benchmark.Study(self.options())
+
+    def test_rejects_revision_that_resolves_to_a_different_commit(self) -> None:
+        def mismatched_revision(command: list[str], *, cwd: Path) -> str:
+            if command[1:3] == ["rev-parse", "--verify"]:
+                return "b" * 40
+            return self.git_output(command, cwd=cwd)
+
+        with mock.patch.object(
+            benchmark, "command_output", side_effect=mismatched_revision
+        ):
+            with self.assertRaisesRegex(benchmark.BenchmarkError, "exactly"):
+                benchmark.Study(self.options())
+
+    def test_detaches_both_toolchains_from_the_same_exact_revision(self) -> None:
+        with mock.patch.object(
+            benchmark, "command_output", side_effect=self.git_output
+        ):
+            study = benchmark.Study(self.options())
+        study.output = self.repository / "output"
+
+        with mock.patch.object(benchmark, "command_output", return_value="") as git:
+            with study.managed_worktrees():
+                self.assertEqual(set(study.worktrees), {("uv", "stock"), ("uv", "ohm")})
+
+        additions = [
+            call.args[0]
+            for call in git.call_args_list
+            if call.args[0][1:3] == ["worktree", "add"]
+        ]
+        self.assertEqual(len(additions), 2)
+        self.assertTrue(all(command[-1] == self.revision for command in additions))
+
+
+class PublicRepositoryTests(unittest.TestCase):
+    def test_default_repositories_use_exact_public_pinned_revisions(self) -> None:
+        self.assertEqual(
+            benchmark.REPOSITORIES,
+            {
+                "uv": {
+                    "url": "https://github.com/astral-sh/uv.git",
+                    "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+                },
+                "codex": {
+                    "url": "https://github.com/openai/codex.git",
+                    "revision": "5157493c23713ac12034cf250ffb0a8ce0670277",
+                },
+            },
+        )
+        arguments = benchmark.parser().parse_args([])
+        self.assertIsNone(arguments.uv_path)
+        self.assertIsNone(arguments.codex_path)
+        self.assertEqual(arguments.uv_rev, benchmark.REPOSITORIES["uv"]["revision"])
+        self.assertEqual(
+            arguments.codex_rev, benchmark.REPOSITORIES["codex"]["revision"]
+        )
+
+    def test_omitted_paths_dry_run_never_accesses_git_or_creates_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "benchmark-output"
+            arguments = benchmark.parser().parse_args(
+                ["--project", "uv", "--output-dir", str(output), "--dry-run"]
+            )
+
+            with (
+                mock.patch.object(benchmark, "command_output") as git,
+                contextlib.redirect_stdout(io.StringIO()) as console,
+            ):
+                study = benchmark.Study(arguments)
+                study.describe()
+
+            git.assert_not_called()
+            self.assertFalse(output.exists())
+            self.assertEqual(study.sources, {})
+            self.assertIn(benchmark.REPOSITORIES["uv"]["url"], console.getvalue())
+            self.assertIn(benchmark.REPOSITORIES["uv"]["revision"], console.getvalue())
+
+    def test_rejects_branches_and_abbreviated_source_revisions(self) -> None:
+        for revision in ("main", "abcdef123456", "a" * 39):
+            with self.subTest(revision=revision):
+                arguments = benchmark.parser().parse_args(
+                    ["--project", "uv", "--uv-rev", revision]
+                )
+
+                with mock.patch.object(benchmark, "command_output") as git:
+                    with self.assertRaisesRegex(benchmark.BenchmarkError, "full Git"):
+                        benchmark.Study(arguments)
+
+                git.assert_not_called()
+
+
+class RepositoryCloneTests(unittest.TestCase):
+    def setUp(self) -> None:
+        temporary_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary_directory.cleanup)
+        self.directory = Path(temporary_directory.name).resolve()
+        self.output = self.directory / "output"
+        self.revision = "a" * 40
+        self.workload = benchmark.WORKLOADS["uv"]
+        arguments = benchmark.parser().parse_args(
+            [
+                "--project",
+                "uv",
+                "--uv-rev",
+                self.revision,
+                "--output-dir",
+                str(self.output),
+            ]
+        )
+        self.study = benchmark.Study(arguments)
+
+    def git_output(self, command: list[str], *, cwd: Path | None = None) -> str:
+        if "clone" in command:
+            Path(command[-1]).mkdir(parents=True)
+            return ""
+        if "fetch" in command:
+            self.assertEqual(command[-1], self.revision)
+            return ""
+        if command[1:3] == ["rev-parse", "--verify"]:
+            return self.revision
+        if command[1] == "show":
+            _, _, relative = command[-1].partition(":")
+            if Path(relative).name == "Cargo.toml":
+                return "[workspace]\n"
+            for edit in (self.workload.dependency, self.workload.direct):
+                if relative == edit.path:
+                    return edit.before
+        self.fail(f"unexpected Git command: {command}")
+
+    def assert_preserves_public_https(self, command: list[str], url: str) -> None:
+        prefix = url.rsplit("/", 1)[0] + "/"
+        configuration = f"url.{prefix}.insteadOf={prefix}"
+        self.assertEqual(command[:4], ["git", "-c", configuration, "clone"])
+        self.assertEqual(command[command.index("--config") + 1], configuration)
+        self.assertIn(url, command)
+
+    def test_clones_public_source_and_fetches_exact_pinned_revision(self) -> None:
+        with (
+            mock.patch.object(
+                benchmark, "command_output", side_effect=self.git_output
+            ) as git,
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            self.study.prepare_sources()
+
+        destination = self.output / "sources" / "uv"
+        self.assertEqual(self.study.sources, {"uv": destination})
+        self.assertTrue(destination.is_dir())
+        self.assertEqual(list(destination.parent.iterdir()), [destination])
+        clone = next(
+            call.args[0] for call in git.call_args_list if "clone" in call.args[0]
+        )
+        self.assert_preserves_public_https(clone, benchmark.REPOSITORIES["uv"]["url"])
+        fetch = next(
+            call.args[0] for call in git.call_args_list if "fetch" in call.args[0]
+        )
+        self.assertEqual(fetch[-1], self.revision)
+
+    def test_public_codex_clone_persists_its_owner_specific_https_override(
+        self,
+    ) -> None:
+        self.workload = benchmark.WORKLOADS["codex-core"]
+        arguments = benchmark.parser().parse_args(
+            [
+                "--project",
+                "codex-core",
+                "--codex-rev",
+                self.revision,
+                "--output-dir",
+                str(self.output),
+            ]
+        )
+        study = benchmark.Study(arguments)
+
+        with (
+            mock.patch.object(
+                benchmark, "command_output", side_effect=self.git_output
+            ) as git,
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            study.prepare_sources()
+
+        clone = next(
+            call.args[0] for call in git.call_args_list if "clone" in call.args[0]
+        )
+        self.assert_preserves_public_https(
+            clone, benchmark.REPOSITORIES["codex"]["url"]
+        )
+        self.assertEqual(study.sources["codex"], self.output / "sources" / "codex")
+
+    def test_failed_fetch_removes_only_the_owned_partial_checkout(self) -> None:
+        user_source = self.directory / "user-source"
+        user_source.mkdir()
+        sentinel = user_source / "uncommitted.rs"
+        sentinel.write_text("preserve local edits", encoding="utf-8")
+
+        def fail_fetch(command: list[str], *, cwd: Path | None = None) -> str:
+            if "fetch" in command:
+                raise benchmark.BenchmarkError("pinned revision fetch failed")
+            return self.git_output(command, cwd=cwd)
+
+        with (
+            mock.patch.object(benchmark, "command_output", side_effect=fail_fetch),
+            contextlib.redirect_stdout(io.StringIO()),
+            self.assertRaisesRegex(benchmark.BenchmarkError, "fetch failed"),
+        ):
+            self.study.prepare_sources()
+
+        self.assertEqual(self.study.sources, {})
+        self.assertEqual(list((self.output / "sources").iterdir()), [])
+        self.assertEqual(sentinel.read_text(encoding="utf-8"), "preserve local edits")
+
+    def test_failed_clone_removes_its_partially_created_checkout(self) -> None:
+        def fail_clone(command: list[str], *, cwd: Path | None = None) -> str:
+            if "clone" in command:
+                Path(command[-1]).mkdir(parents=True)
+                raise benchmark.BenchmarkError("public repository clone failed")
+            return self.git_output(command, cwd=cwd)
+
+        with (
+            mock.patch.object(benchmark, "command_output", side_effect=fail_clone),
+            contextlib.redirect_stdout(io.StringIO()),
+            self.assertRaisesRegex(benchmark.BenchmarkError, "clone failed"),
+        ):
+            self.study.prepare_sources()
+
+        self.assertEqual(self.study.sources, {})
+        self.assertEqual(list((self.output / "sources").iterdir()), [])
 
 
 class CommandLineTests(unittest.TestCase):

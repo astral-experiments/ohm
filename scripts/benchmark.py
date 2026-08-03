@@ -49,6 +49,18 @@ class Workload:
     selected_test: str
 
 
+REPOSITORIES = {
+    "uv": {
+        "url": "https://github.com/astral-sh/uv.git",
+        "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+    },
+    "codex": {
+        "url": "https://github.com/openai/codex.git",
+        "revision": "5157493c23713ac12034cf250ffb0a8ce0670277",
+    },
+}
+
+
 UV_DEPENDENCY = Edit(
     "crates/uv-normalize/src/lib.rs",
     "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
@@ -189,8 +201,12 @@ def validate_output(
 
 def parser() -> argparse.ArgumentParser:
     argument_parser = argparse.ArgumentParser(description=__doc__)
-    argument_parser.add_argument("--uv-path", type=Path, default=Path("../uv"))
-    argument_parser.add_argument("--codex-path", type=Path, default=Path("../codex"))
+    argument_parser.add_argument("--uv-path", type=Path)
+    argument_parser.add_argument("--codex-path", type=Path)
+    argument_parser.add_argument("--uv-rev", default=REPOSITORIES["uv"]["revision"])
+    argument_parser.add_argument(
+        "--codex-rev", default=REPOSITORIES["codex"]["revision"]
+    )
     argument_parser.add_argument("--upstream", default="1.97.1")
     argument_parser.add_argument("--ohm", default="ohm")
     argument_parser.add_argument(
@@ -225,6 +241,8 @@ class Study:
         self.toolchains = (("stock", options.upstream), ("ohm", options.ohm))
         self.output = options.output_dir.expanduser().resolve()
         self.sources: dict[str, Path] = {}
+        self.revisions: dict[str, str] = {}
+        self.source_urls: dict[str, str] = {}
         self.worktrees: dict[tuple[str, str], Path] = {}
         self.samples: list[dict[str, object]] = []
         self.metadata: dict[str, object] = {}
@@ -249,42 +267,97 @@ class Study:
             raise BenchmarkError("upstream and Ohm toolchains must be distinct")
 
         for workload in self.workloads:
-            if workload.repository not in self.sources:
-                configured = (
-                    options.uv_path
-                    if workload.repository == "uv"
-                    else options.codex_path
-                ).expanduser()
+            name = workload.repository
+            if name in self.revisions:
+                continue
+            revision = options.uv_rev if name == "uv" else options.codex_rev
+            if re.fullmatch(r"[0-9a-f]{40}", revision) is None:
+                raise BenchmarkError(
+                    f"source revision must be a full Git SHA: {revision!r}"
+                )
+            self.revisions[name] = revision
+            self.source_urls[name] = REPOSITORIES[name]["url"]
+            configured = options.uv_path if name == "uv" else options.codex_path
+            if configured is not None:
+                configured = configured.expanduser()
                 if not configured.is_dir():
                     raise BenchmarkError(
                         f"source repository does not exist: {configured}"
                     )
-                repository = Path(
+                self.sources[name] = Path(
                     command_output(
                         ["git", "rev-parse", "--show-toplevel"], cwd=configured
                     )
                 ).resolve()
-                self.sources[workload.repository] = repository
-            repository = self.sources[workload.repository]
-            if not (repository / workload.workspace / "Cargo.toml").is_file():
-                raise BenchmarkError(f"workspace has no Cargo.toml: {repository}")
-            changed = command_output(
-                [
-                    "git",
-                    "status",
-                    "--porcelain",
-                    "--",
-                    workload.dependency.path,
-                    workload.direct.path,
-                ],
-                cwd=repository,
+
+        for name in self.sources:
+            self.validate_source(name)
+
+    def validate_source(self, name: str) -> None:
+        repository = self.sources[name]
+        revision = self.revisions[name]
+        resolved = command_output(
+            ["git", "rev-parse", "--verify", f"{revision}^{{commit}}"],
+            cwd=repository,
+        )
+        if resolved != revision:
+            raise BenchmarkError(
+                f"source revision does not resolve exactly: {revision}"
             )
-            if changed:
-                raise BenchmarkError(
-                    f"benchmark source files have uncommitted changes in {repository}"
+        for workload in self.workloads:
+            if workload.repository != name:
+                continue
+            manifest = Path(workload.workspace) / "Cargo.toml"
+            command_output(["git", "show", f"{revision}:{manifest}"], cwd=repository)
+            for edit in (workload.dependency, workload.direct):
+                source = command_output(
+                    ["git", "show", f"{revision}:{edit.path}"], cwd=repository
                 )
-            edit_contents(repository, workload.dependency)
-            edit_contents(repository, workload.direct)
+                if (count := source.count(edit.before)) != 1:
+                    raise BenchmarkError(
+                        f"expected exactly one source match in {revision}:{edit.path}; "
+                        f"found {count}"
+                    )
+
+    def prepare_sources(self) -> None:
+        for name, revision in self.revisions.items():
+            if name in self.sources:
+                continue
+            repository = self.output / "sources" / name
+            repository.parent.mkdir(parents=True, exist_ok=True)
+            print(f"Cloning {self.source_urls[name]} at {revision}", flush=True)
+            public_prefix = self.source_urls[name].rsplit("/", 1)[0] + "/"
+            preserve_https = f"url.{public_prefix}.insteadOf={public_prefix}"
+            with tempfile.TemporaryDirectory(
+                prefix=f".{name}-", dir=repository.parent
+            ) as temporary:
+                checkout = Path(temporary) / "checkout"
+                command_output(
+                    [
+                        "git",
+                        "-c",
+                        preserve_https,
+                        "clone",
+                        "--config",
+                        preserve_https,
+                        "--no-checkout",
+                        "--filter=blob:none",
+                        "--depth=1",
+                        self.source_urls[name],
+                        str(checkout),
+                    ]
+                )
+                command_output(
+                    ["git", "fetch", "--depth=1", "origin", revision], cwd=checkout
+                )
+                self.sources[name] = checkout
+                try:
+                    self.validate_source(name)
+                    checkout.rename(repository)
+                except BaseException:
+                    self.sources.pop(name, None)
+                    raise
+                self.sources[name] = repository
 
     def describe(self) -> None:
         print(f"upstream: {self.options.upstream}")
@@ -297,7 +370,10 @@ class Study:
             + self.options.direct_runs
         )
         for workload in self.workloads:
-            print(f"\n{workload.name}: {self.sources[workload.repository]}")
+            name = workload.repository
+            source = self.sources.get(name, self.source_urls[name])
+            print(f"\n{workload.name}: {source}")
+            print(f"  revision: {self.revisions[name]}")
             print(f"  dependency edit: {workload.dependency.path}")
             print(f"  direct edit: {workload.direct.path}")
             print(f"  workflows: {', '.join(WORKFLOWS)}")
@@ -326,7 +402,14 @@ class Study:
                     path = self.output / "worktrees" / name / label
                     path.parent.mkdir(parents=True, exist_ok=True)
                     command_output(
-                        ["git", "worktree", "add", "--detach", str(path), "HEAD"],
+                        [
+                            "git",
+                            "worktree",
+                            "add",
+                            "--detach",
+                            str(path),
+                            self.revisions[name],
+                        ],
                         cwd=repository,
                     )
                     cleanup.callback(
@@ -595,6 +678,7 @@ class Study:
                 f"output directory is not empty: {self.output}; choose a new --output-dir"
             )
         (self.output / "logs").mkdir(parents=True, exist_ok=True)
+        self.prepare_sources()
         self.metadata = {
             "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "jobs": self.options.jobs,
@@ -613,9 +697,8 @@ class Study:
             "repositories": {
                 name: {
                     "path": str(repository),
-                    "revision": command_output(
-                        ["git", "rev-parse", "HEAD"], cwd=repository
-                    ),
+                    "url": self.source_urls[name],
+                    "revision": self.revisions[name],
                 }
                 for name, repository in self.sources.items()
             },
