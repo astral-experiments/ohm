@@ -75,6 +75,23 @@ cargo +ohm -Zohm-defaults=no test
 
 Repository-specific optimizations, such as uv's `--profile fast-build`, remain separate.
 
+## Benchmarks
+
+Ohm avoids unnecessary downstream work when an edit to a shared dependency leaves its public API
+unchanged. Compared with Rust 1.97.1:
+
+| Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
+| ------- | -------------- | ----------: | -----: | ------: |
+| uv      | `cargo check`  |      4.47 s | 0.43 s |  10.38× |
+| uv      | `cargo clippy` |      8.58 s | 0.44 s |  19.66× |
+| uv      | `cargo test`   |      9.15 s | 1.13 s |   8.10× |
+| Codex   | `cargo check`  |      4.68 s | 0.61 s |   7.70× |
+| Codex   | `just clippy`  |      8.33 s | 0.68 s |  12.19× |
+| Codex   | `just test`    |      8.30 s | 1.97 s |   4.22× |
+
+Cold builds and direct edits to the target crate can be slower. See the
+[full results and methodology](BENCHMARKS.md).
+
 ## Documentation
 
 - [Architecture](docs/architecture.md): source repositories, compiler integration, and versioned
