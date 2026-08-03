@@ -42,8 +42,9 @@ Store the GitHub App client ID and Cloudflare account and bucket configuration a
 The bucket is served publicly from `labs.astral.sh` and should be separate from Astral's production
 release bucket. Its credentials should only grant access to the experimental release bucket.
 
-The Apple Silicon build uses the shared `depot-macos-15` runner and needs at least 50 GiB of
-available disk space. Planning and publication use `depot-ubuntu-24.04-4` runners.
+Apple Silicon builds use the shared `depot-macos-15` runner; x86_64 Linux builds use
+`depot-ubuntu-24.04-16`. Both need at least 50 GiB of available disk space. Planning and publication
+use `depot-ubuntu-24.04-4` runners.
 
 ## Build and publish
 
@@ -55,26 +56,28 @@ gh workflow run release.yml --repo astral-sh/ohm --ref main \
   -f manifest="$manifest" -F build=true
 ```
 
-The workflow verifies source revisions, builds the complete stage-2 Rust distribution, smoke-tests
-the installed toolchain, and creates a private GitHub Release named after the immutable toolchain
-version. Release notes include version-pinned installation instructions, usage examples, the
-development-only safety warning, and public download links alongside the generated changelog. The
-internal smoke test uses `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private
+The workflow verifies source revisions, builds both complete stage-2 Rust distributions, and
+generates one universal installer with both archive checksums embedded. It smoke-tests that exact
+installer on macOS and Linux before creating a private GitHub Release named after the immutable
+toolchain version. Release notes include version-pinned installation instructions, usage examples,
+the development-only safety warning, and public download links alongside the generated changelog.
+Internal smoke tests use `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private
 release includes:
 
-- an Apple Silicon macOS `.tar.gz` archive;
-- `ohm-installer.sh`, with the release version and archive checksum embedded;
-- the release manifest and source provenance; and
+- Apple Silicon macOS and x86_64 Linux (glibc) `.tar.gz` archives and `.sha256` sidecars;
+- `ohm-installer.sh`, with the release version and both archive checksums embedded;
+- the release manifest and platform-specific source provenance; and
 - `SHA256SUMS` for the release assets.
 
-Only the installer, archive, and a public-only `SHA256SUMS` file containing their checksums are
-copied to Cloudflare R2. Versioned assets are served publicly from
+Only the installer, archives, checksum sidecars, and a public-only `SHA256SUMS` file are copied to
+Cloudflare R2. Versioned assets are served publicly from
 `https://labs.astral.sh/ohm/releases/<version>/` and cached immutably for one year. The
 release-specific installer is available at
-`https://labs.astral.sh/ohm/releases/<version>/install.sh`; its archive is available at
-`https://labs.astral.sh/ohm/releases/<version>/<version>-aarch64-apple-darwin.tar.gz`. The latest
-installer is available at `https://labs.astral.sh/ohm/install.sh` and cached for five minutes.
-Source repositories, GitHub Releases, release manifests, and source provenance remain private.
+`https://labs.astral.sh/ohm/releases/<version>/install.sh`. Its archives are available at
+`https://labs.astral.sh/ohm/releases/<version>/<version>-aarch64-apple-darwin.tar.gz` and
+`https://labs.astral.sh/ohm/releases/<version>/<version>-x86_64-unknown-linux-gnu.tar.gz`. The latest
+installer is available at `https://labs.astral.sh/ohm/install.sh` and cached for five minutes. Source
+repositories, GitHub Releases, release manifests, and source provenance remain private.
 
 The public installer and its embedded archive checksum share Cloudflare R2 as their trust root.
 HTTPS and checksums verify transport and artifact integrity; they are not independent signatures or

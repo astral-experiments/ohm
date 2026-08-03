@@ -137,11 +137,19 @@ jobs:
     needs: plan
     environment: release
     timeout-minutes: 360
-    runs-on: depot-macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            runner: depot-macos-15
+          - target: x86_64-unknown-linux-gnu
+            runner: depot-ubuntu-24.04-16
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
     env:
-      OHM_TARGET: aarch64-apple-darwin
+      OHM_TARGET: ${{ matrix.target }}
     steps:
       - name: Check out release coordinator
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -275,7 +283,6 @@ jobs:
       - name: Stage versioned distribution assets
         id: assets
         env:
-          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
           OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
         run: |
           rust_version="$(tr -d '\r\n' < source/rust/src/version)"
@@ -287,52 +294,181 @@ jobs:
 
           release_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-release.XXXXXX")"
           archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
-          manifest_name="$OHM_TOOLCHAIN.json"
           provenance_name="$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
           cp "$combined_archive" "$release_directory/$archive_name"
-          cp "$MANIFEST_PATH" "$release_directory/$manifest_name"
           cp source/rust/build/dist/ohm-provenance.json \
             "$release_directory/$provenance_name"
 
-          archive_sha256="$(shasum -a 256 "$release_directory/$archive_name" | awk '{print $1}')"
-          awk -v version="$OHM_TOOLCHAIN" -v archive_sha256="$archive_sha256" '
+          (
+            cd "$release_directory"
+            shasum -a 256 "$archive_name" > "$archive_name.sha256"
+            shasum -a 256 "$provenance_name" > "$provenance_name.sha256"
+          )
+
+          echo "directory=$release_directory" >> "$GITHUB_OUTPUT"
+
+      - name: Retain distribution artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}
+          path: |
+            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz
+            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz.sha256
+            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json
+            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+  assemble:
+    if: inputs.build
+    needs:
+      - plan
+      - build
+    runs-on: depot-ubuntu-24.04-4
+    permissions:
+      contents: read
+    env:
+      MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+      OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+    steps:
+      - name: Check out release coordinator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download verified distribution assets
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: ${{ needs.plan.outputs.toolchain }}-*
+          path: release
+          merge-multiple: true
+
+      - name: Verify and assemble release assets
+        working-directory: release
+        run: |
+          targets=(aarch64-apple-darwin x86_64-unknown-linux-gnu)
+          for target in "${targets[@]}"; do
+            archive_name="$OHM_TOOLCHAIN-$target.tar.gz"
+            provenance_name="$OHM_TOOLCHAIN-$target-provenance.json"
+
+            for asset in \
+              "$archive_name" \
+              "$archive_name.sha256" \
+              "$provenance_name" \
+              "$provenance_name.sha256"; do
+              if [[ ! -f "$asset" || -L "$asset" ]]; then
+                echo "missing or unsafe release asset: $asset" >&2
+                exit 1
+              fi
+            done
+
+            sha256sum --check --strict "$archive_name.sha256" "$provenance_name.sha256"
+          done
+
+          macos_archive="$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz"
+          linux_archive="$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz"
+          macos_sha256="$(awk '{print $1}' "$macos_archive.sha256")"
+          linux_sha256="$(awk '{print $1}' "$linux_archive.sha256")"
+
+          awk -v version="$OHM_TOOLCHAIN" \
+            -v macos_sha256="$macos_sha256" \
+            -v linux_sha256="$linux_sha256" '
             $0 == "embedded_version=" {
               print "embedded_version=" version
               ++version_count
               next
             }
-            $0 == "embedded_archive_sha256=" {
-              print "embedded_archive_sha256=" archive_sha256
-              ++archive_sha256_count
+            $0 == "embedded_archive_sha256_aarch64_apple_darwin=" {
+              print "embedded_archive_sha256_aarch64_apple_darwin=" macos_sha256
+              ++macos_count
+              next
+            }
+            $0 == "embedded_archive_sha256_x86_64_unknown_linux_gnu=" {
+              print "embedded_archive_sha256_x86_64_unknown_linux_gnu=" linux_sha256
+              ++linux_count
               next
             }
             { print }
             END {
-              if (version_count != 1 || archive_sha256_count != 1) {
+              if (version_count != 1 || macos_count != 1 || linux_count != 1) {
                 exit 1
               }
             }
-          ' scripts/install.sh > "$release_directory/ohm-installer.sh"
-          sh -n "$release_directory/ohm-installer.sh"
-          grep -Fx "embedded_version=$OHM_TOOLCHAIN" "$release_directory/ohm-installer.sh" >/dev/null
-          grep -Fx "embedded_archive_sha256=$archive_sha256" "$release_directory/ohm-installer.sh" >/dev/null
+          ' "$GITHUB_WORKSPACE/scripts/install.sh" > ohm-installer.sh
+          sh -n ohm-installer.sh
+          grep -Fx "embedded_version=$OHM_TOOLCHAIN" ohm-installer.sh >/dev/null
+          grep -Fx "embedded_archive_sha256_aarch64_apple_darwin=$macos_sha256" \
+            ohm-installer.sh >/dev/null
+          grep -Fx "embedded_archive_sha256_x86_64_unknown_linux_gnu=$linux_sha256" \
+            ohm-installer.sh >/dev/null
 
-          (
-            cd "$release_directory"
-            shasum -a 256 \
-              "$archive_name" \
-              ohm-installer.sh \
-              "$manifest_name" \
-              "$provenance_name" > SHA256SUMS
-          )
+          manifest_name="$OHM_TOOLCHAIN.json"
+          cp "$GITHUB_WORKSPACE/$MANIFEST_PATH" "$manifest_name"
+          sha256sum \
+            "$macos_archive" \
+            "$macos_archive.sha256" \
+            "$linux_archive" \
+            "$linux_archive.sha256" \
+            ohm-installer.sh \
+            "$manifest_name" \
+            "$OHM_TOOLCHAIN-aarch64-apple-darwin-provenance.json" \
+            "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu-provenance.json" > SHA256SUMS
+          sha256sum --check --strict SHA256SUMS
 
-          echo "directory=$release_directory" >> "$GITHUB_OUTPUT"
+      - name: Retain global release assets
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ needs.plan.outputs.toolchain }}-global
+          path: |
+            release/ohm-installer.sh
+            release/${{ needs.plan.outputs.toolchain }}.json
+            release/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 7
+
+  smoke-test:
+    if: inputs.build
+    needs:
+      - plan
+      - assemble
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            runner: depot-macos-15
+          - target: x86_64-unknown-linux-gnu
+            runner: depot-ubuntu-24.04-4
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    env:
+      CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
+      OHM_TARGET: ${{ matrix.target }}
+      OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+    steps:
+      - name: Download platform distribution assets
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}
+          path: release
+
+      - name: Download universal release installer
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.plan.outputs.toolchain }}-global
+          path: release
 
       - name: Smoke test Ohm toolchain
         env:
-          OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
-          RELEASE_DIRECTORY: ${{ steps.assets.outputs.directory }}
+          RELEASE_DIRECTORY: ${{ github.workspace }}/release
         run: |
+          (
+            cd "$RELEASE_DIRECTORY"
+            shasum -a 256 --check "$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz.sha256"
+            grep '  ohm-installer\.sh$' SHA256SUMS | shasum -a 256 --check
+          )
+
           smoke_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-smoke.XXXXXX")"
           trap 'rm -rf "$smoke_root"' EXIT
 
@@ -370,7 +506,7 @@ jobs:
             | grep -F 'public-api-hash' >/dev/null
           cargo +"$OHM_TOOLCHAIN" -Z help \
             | grep -F 'relink-only' >/dev/null
-          clippy_revision="$(git -C source/rust/src/tools/clippy rev-parse --short=10 HEAD)"
+          clippy_revision="${CLIPPY_REVISION:0:10}"
           "$toolchain_root/bin/cargo-clippy" --version \
             | grep -F "$clippy_revision" >/dev/null
           "$toolchain_root/bin/clippy-driver" --version \
@@ -459,49 +595,29 @@ jobs:
           cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
           cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
 
-      - name: Retain distribution artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: ${{ needs.plan.outputs.toolchain }}-aarch64-apple-darwin
-          path: ${{ steps.assets.outputs.directory }}/
-          if-no-files-found: error
-          retention-days: 7
-
   publish:
     if: inputs.build
     needs:
       - plan
-      - build
+      - smoke-test
     environment: release
     runs-on: depot-ubuntu-24.04-4
     permissions:
       contents: write
     env:
       GH_TOKEN: ${{ github.token }}
-      OHM_TARGET: aarch64-apple-darwin
       OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
     steps:
       - name: Download verified distribution assets
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: ${{ needs.plan.outputs.toolchain }}-aarch64-apple-darwin
+          pattern: ${{ needs.plan.outputs.toolchain }}-*
           path: release
+          merge-multiple: true
 
       - name: Verify release assets
         working-directory: release
-        run: |
-          archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
-          manifest_name="$OHM_TOOLCHAIN.json"
-          provenance_name="$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
-
-          for asset in "$archive_name" ohm-installer.sh "$manifest_name" "$provenance_name" SHA256SUMS; do
-            if [[ ! -f "$asset" || -L "$asset" ]]; then
-              echo "missing or unsafe release asset: $asset" >&2
-              exit 1
-            fi
-          done
-
-          sha256sum --check --strict SHA256SUMS
+        run: sha256sum --check --strict SHA256SUMS
 
       - name: Publish GitHub Release
         working-directory: release
@@ -526,10 +642,14 @@ jobs:
             fi
 
             for asset in \
-              "$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
+              "$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz" \
+              "$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz.sha256" \
+              "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz" \
+              "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz.sha256" \
               ohm-installer.sh \
               "$OHM_TOOLCHAIN.json" \
-              "$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json" \
+              "$OHM_TOOLCHAIN-aarch64-apple-darwin-provenance.json" \
+              "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu-provenance.json" \
               SHA256SUMS; do
               expected_digest="sha256:$(sha256sum "$asset" | awk '{print $1}')"
               if ! jq -e --arg name "$asset" --arg digest "$expected_digest" '
@@ -557,7 +677,7 @@ jobs:
             '' \
             '### Install prebuilt binaries via shell script' \
             '' \
-            'Requires rustup and Apple Silicon macOS.' \
+            'Requires rustup and Apple Silicon macOS or x86_64 Linux.' \
             '' \
             '```sh' \
             "curl --proto '=https' --tlsv1.2 -LsSf $release_url/install.sh | sh" \
@@ -582,7 +702,8 @@ jobs:
             '' \
             '| File | Platform | Checksum |' \
             '|------|----------|----------|' \
-            "| [$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz]($release_url/$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz) | Apple Silicon macOS | [checksum]($release_url/SHA256SUMS) |" \
+            "| [$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz]($release_url/$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz) | Apple Silicon macOS | [checksum]($release_url/$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz.sha256) |" \
+            "| [$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz]($release_url/$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz) | x86_64 Linux | [checksum]($release_url/$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz.sha256) |" \
             > "$notes_file"
 
           gh release create "$OHM_TOOLCHAIN" \
@@ -591,10 +712,14 @@ jobs:
             --title "$OHM_TOOLCHAIN" \
             --notes-file "$notes_file" \
             --generate-notes \
-            "$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz" \
+            "$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz" \
+            "$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz.sha256" \
+            "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz" \
+            "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz.sha256" \
             ohm-installer.sh \
             "$OHM_TOOLCHAIN.json" \
-            "$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json" \
+            "$OHM_TOOLCHAIN-aarch64-apple-darwin-provenance.json" \
+            "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu-provenance.json" \
             SHA256SUMS
 
   publish-mirror:

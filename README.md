@@ -24,8 +24,8 @@ local development, and at your own risk.
 
 ## Installation
 
-Install [rustup](https://rustup.rs/), then install the latest Ohm release with our standalone
-installers:
+Ohm supports Apple Silicon macOS and x86_64 Linux (glibc). Install [rustup](https://rustup.rs/), then
+install the latest Ohm release with our standalone installer:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \

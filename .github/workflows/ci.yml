@@ -58,7 +58,7 @@ jobs:
               raise SystemExit("Ohm releases must retain their source Git revision")
           if config.get("dist", {}).get("compression-formats") != ["gz"]:
               raise SystemExit(
-                  "Ohm releases must produce one deterministic gzip-compressed archive"
+                  "Ohm releases must use deterministic gzip-compressed archives"
               )
           PY
       - name: Validate toolchain manifests

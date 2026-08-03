@@ -17,14 +17,14 @@ jobs:
     permissions:
       contents: read
     env:
-      OHM_TARGET: aarch64-apple-darwin
       OHM_TOOLCHAIN: ${{ inputs.version }}
     steps:
       - name: Download published release artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: ${{ inputs.version }}-aarch64-apple-darwin
+          pattern: ${{ inputs.version }}-*
           path: release
+          merge-multiple: true
 
       - name: Verify and isolate public release assets
         id: assets
@@ -35,8 +35,15 @@ jobs:
             exit 1
           fi
 
-          archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
-          for asset in "$archive_name" ohm-installer.sh SHA256SUMS; do
+          macos_archive="$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz"
+          linux_archive="$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz"
+          for asset in \
+            "$macos_archive" \
+            "$macos_archive.sha256" \
+            "$linux_archive" \
+            "$linux_archive.sha256" \
+            ohm-installer.sh \
+            SHA256SUMS; do
             if [[ ! -f "$asset" || -L "$asset" ]]; then
               echo "missing or unsafe release asset: $asset" >&2
               exit 1
@@ -46,11 +53,21 @@ jobs:
           sha256sum --check --strict SHA256SUMS
 
           public_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-public-release.XXXXXX")"
-          cp "$archive_name" "$public_directory/"
+          cp \
+            "$macos_archive" \
+            "$macos_archive.sha256" \
+            "$linux_archive" \
+            "$linux_archive.sha256" \
+            "$public_directory/"
           cp ohm-installer.sh "$public_directory/install.sh"
           (
             cd "$public_directory"
-            sha256sum "$archive_name" install.sh > SHA256SUMS
+            sha256sum \
+              "$macos_archive" \
+              "$macos_archive.sha256" \
+              "$linux_archive" \
+              "$linux_archive.sha256" \
+              install.sh > SHA256SUMS
           )
           echo "directory=$public_directory" >> "$GITHUB_OUTPUT"
 
