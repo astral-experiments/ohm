@@ -3,7 +3,8 @@
 [![CI](https://github.com/astral-sh/ohm/actions/workflows/ci.yml/badge.svg)](https://github.com/astral-sh/ohm/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
-An experimental fork of the Rust toolchain, designed for extremely fast local development.
+An experimental fork of the Rust toolchain, designed for extremely fast local development:
+[up to 20× faster incremental builds](#benchmarks) after changes to shared dependencies.
 
 **Experimental:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations
 that may be unsound. Use it only for local development, at your own risk.
@@ -74,6 +75,36 @@ cargo +ohm -Zohm-defaults=no test
 ```
 
 Repository-specific optimizations, such as uv's `--profile fast-build`, remain separate.
+
+## Philosophy
+
+Rust's compile times are a bottleneck for day-to-day development, especially in large workspaces
+where changing one crate can trigger unnecessary work throughout the dependency graph.
+
+Ohm makes a deliberate tradeoff: faster local iteration is more valuable than waiting for every
+optimization to meet upstream Rust's standards for completeness and correctness. We backport
+improvements from newer Rust releases, pull forward work that has not yet landed upstream, and
+experiment with optimizations that may still contain bugs.
+
+Current examples include:
+
+- [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790): avoid rebuilding
+  dependent crates when a dependency's public interface is unchanged.
+- Cached relinking: reuse existing code generation when only the final binary needs to change.
+- Early cutoff for `cargo check` and `cargo clippy`.
+- Experimental procedural-macro caching.
+- Backported Clippy optimizations, including combined lint passes.
+
+These optimizations can produce stale or incorrect results. Ohm is exclusively for local development:
+never use it for production builds, releases, CI, or final validation. Always verify your work with
+the official Rust toolchain.
+
+Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes available,
+we replay the optimizations that remain relevant and drop those that have already landed upstream.
+Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-1` and
+`ohm-1.97.1-2`.
+
+See [Changes from upstream](docs/upstream-changes.md) for the complete list of included patches.
 
 ## Benchmarks
 
