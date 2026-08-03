@@ -15,6 +15,8 @@ sources of truth for the current changes and release revisions.
 - [#5: Pin Cargo with Ohm build defaults](https://github.com/astral-sh/ohm-rust/pull/5)
 - [#9: Skip query machinery when promoting disk-cached values](https://github.com/astral-sh/ohm-rust/pull/9)
 - [#8: Emit reusable link state while linking normally](https://github.com/astral-sh/ohm-rust/pull/8)
+- [#10: Skip codegen objects when indexing crate search paths](https://github.com/astral-sh/ohm-rust/pull/10)
+- [#11: Reuse green-marking edges during incremental query promotion](https://github.com/astral-sh/ohm-rust/pull/11)
 
 ## ohm-cargo
 
@@ -35,6 +37,8 @@ sources of truth for the current changes and release revisions.
 - [#20: Preallocate registry and target vectors](https://github.com/astral-sh/ohm-cargo/pull/20)
 - [#18: Initialize cached relinking in one compiler invocation](https://github.com/astral-sh/ohm-cargo/pull/18)
 - [#16: Cache workspace resolution across Cargo invocations](https://github.com/astral-sh/ohm-cargo/pull/16)
+- [#21: Keep cached relink objects out of dependency search paths](https://github.com/astral-sh/ohm-cargo/pull/21)
+- [#22: Avoid embedding crate metadata in Ohm library artifacts](https://github.com/astral-sh/ohm-cargo/pull/22)
 
 ## ohm-rust-clippy
 
