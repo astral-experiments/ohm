@@ -10,6 +10,10 @@ revision must pin the same Cargo revision through its `src/tools/cargo` gitlink,
 support the `ohm-defaults` feature required by
 [`release/bootstrap.toml`](../release/bootstrap.toml).
 
+Pin source revisions with fork-owned CI. In particular, the rustfmt checkout must not contain its
+upstream tag-triggered release workflow, which would start unrelated builds when source tags are
+created.
+
 A pinned manifest's source revisions can be updated until its immutable release tag is published.
 After publication, the release identity and source revisions cannot change.
 
@@ -59,9 +63,10 @@ gh workflow run release.yml --repo astral-sh/ohm --ref main \
 
 The workflow verifies source revisions, builds both complete stage-2 Rust distributions, and
 generates one universal installer with both archive checksums embedded. It smoke-tests that exact
-installer on macOS and Linux before tagging each source repository at its pinned revision using the
-toolchain name and creating the private GitHub Release. Existing tags at the expected commit are
-reused; conflicting tags fail the release without being moved or deleted.
+installer on macOS and Linux before creating the private GitHub Release. It then tags each source
+repository at its pinned revision using the toolchain name before publishing the public assets.
+Existing tags at the expected commit are reused; conflicting tags fail the release without being moved
+or deleted.
 
 Release notes include version-pinned installation instructions, usage examples, the development-only
 safety warning, and public download links alongside the generated changelog. Internal smoke tests use
