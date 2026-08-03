@@ -1,0 +1,660 @@
+#!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.11"
+# dependencies = []
+# ///
+
+"""Compare stock Rust and Ohm against representative uv and Codex workflows."""
+
+from __future__ import annotations
+
+import argparse
+import contextlib
+import dataclasses
+import datetime
+import json
+import os
+import re
+import shutil
+import statistics
+import subprocess
+import sys
+import tempfile
+import time
+from collections import defaultdict
+from collections.abc import Callable, Iterator
+from pathlib import Path
+
+
+class BenchmarkError(Exception):
+    """A benchmark configuration or measurement cannot be trusted."""
+
+
+@dataclasses.dataclass(frozen=True)
+class Edit:
+    path: str
+    before: str
+    after: str
+    crate: str
+
+
+@dataclasses.dataclass(frozen=True)
+class Workload:
+    name: str
+    repository: str
+    package: str
+    workspace: str
+    dependency: Edit
+    direct: Edit
+    selected_test: str
+
+
+UV_DEPENDENCY = Edit(
+    "crates/uv-normalize/src/lib.rs",
+    "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+    "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+    "uv-normalize",
+)
+CODEX_DEPENDENCY = Edit(
+    "codex-rs/utils/string/src/lib.rs",
+    "matches!(ch, '.' | '_' | '-' | '/')",
+    "matches!(ch, '_' | '.' | '-' | '/')",
+    "codex-utils-string",
+)
+WORKLOADS = {
+    "uv": Workload(
+        "uv",
+        "uv",
+        "uv",
+        ".",
+        UV_DEPENDENCY,
+        Edit(
+            "crates/uv/src/install_source.rs",
+            "component == cellar && next == formula",
+            "next == formula && component == cellar",
+            "uv",
+        ),
+        "install_source::tests::detects_homebrew_cellar",
+    ),
+    "codex-tools": Workload(
+        "codex-tools",
+        "codex",
+        "codex-tools",
+        "codex-rs",
+        CODEX_DEPENDENCY,
+        Edit(
+            "codex-rs/tools/src/tool_spec.rs",
+            'ToolSpec::ToolSearch { .. } => "tool_search",\n'
+            '            ToolSpec::WebSearch { .. } => "web_search",',
+            'ToolSpec::WebSearch { .. } => "web_search",\n'
+            '            ToolSpec::ToolSearch { .. } => "tool_search",',
+            "codex-tools",
+        ),
+        "tool_spec_name_covers_all_variants",
+    ),
+    "codex-core": Workload(
+        "codex-core",
+        "codex",
+        "codex-core",
+        "codex-rs",
+        CODEX_DEPENDENCY,
+        Edit(
+            "codex-rs/core/src/audio_preparation.rs",
+            'if mime.eq_ignore_ascii_case("audio/wav")\n'
+            '        || mime.eq_ignore_ascii_case("audio/x-wav")',
+            'if mime.eq_ignore_ascii_case("audio/x-wav")\n'
+            '        || mime.eq_ignore_ascii_case("audio/wav")',
+            "codex-core",
+        ),
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls",
+    ),
+}
+WORKFLOWS = ("check", "clippy", "test")
+COMPILATION = re.compile(r"^\s*(?:Checking|Compiling)\s+([^\s]+)", re.MULTILINE)
+TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")
+
+
+def command_output(arguments: list[str], *, cwd: Path | None = None) -> str:
+    try:
+        result = subprocess.run(
+            arguments,
+            cwd=cwd,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise BenchmarkError(
+            f"command failed: {' '.join(arguments)}: {error}"
+        ) from error
+    return result.stdout.strip()
+
+
+def edit_contents(worktree: Path, edit: Edit) -> tuple[Path, bytes, bytes]:
+    relative = Path(edit.path)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise BenchmarkError(f"edit path must remain within its worktree: {relative}")
+    path = (worktree / relative).resolve()
+    if not path.is_relative_to(worktree.resolve()) or not path.is_file():
+        raise BenchmarkError(
+            f"edited source file does not exist in its worktree: {path}"
+        )
+    if not edit.before or edit.before == edit.after:
+        raise BenchmarkError(f"invalid reversible source edit: {path}")
+    original = path.read_bytes()
+    before = edit.before.encode()
+    if (count := original.count(before)) != 1:
+        raise BenchmarkError(
+            f"expected exactly one source match in {path}; found {count}"
+        )
+    return path, original, original.replace(before, edit.after.encode(), 1)
+
+
+@contextlib.contextmanager
+def reversible_edit(worktree: Path, edit: Edit) -> Iterator[Callable[[bool], None]]:
+    path, original, alternate = edit_contents(worktree, edit)
+
+    def activate(changed: bool) -> None:
+        contents = alternate if changed else original
+        if path.read_bytes() != contents:
+            path.write_bytes(contents)
+            os.utime(path, None)
+
+    try:
+        yield activate
+    finally:
+        if path.exists() and path.read_bytes() != original:
+            path.write_bytes(original)
+            os.utime(path, None)
+
+
+def validate_output(
+    output: str, *, expected_crate: str | None, selected_test: str | None
+) -> None:
+    if "blocking waiting for file lock" in output.lower():
+        raise BenchmarkError(
+            "benchmark encountered Cargo package or target cache contention"
+        )
+    if expected_crate is not None and expected_crate not in COMPILATION.findall(output):
+        raise BenchmarkError(f"edited crate {expected_crate!r} was not rebuilt")
+    if selected_test is not None:
+        counts = [int(match.group(1)) for match in TEST_COUNT.finditer(output)]
+        if not counts or any(count != 1 for count in counts):
+            raise BenchmarkError("benchmark must execute exactly one existing test")
+        test_name = rf"(?<![A-Za-z0-9_]){re.escape(selected_test)}(?![A-Za-z0-9_])"
+        if re.search(test_name, output) is None:
+            raise BenchmarkError(f"selected test {selected_test!r} was not executed")
+
+
+def parser() -> argparse.ArgumentParser:
+    argument_parser = argparse.ArgumentParser(description=__doc__)
+    argument_parser.add_argument("--uv-path", type=Path, default=Path("../uv"))
+    argument_parser.add_argument("--codex-path", type=Path, default=Path("../codex"))
+    argument_parser.add_argument("--upstream", default="1.97.1")
+    argument_parser.add_argument("--ohm", default="ohm")
+    argument_parser.add_argument(
+        "--project",
+        action="append",
+        choices=WORKLOADS,
+        help="repeat to select projects",
+    )
+    argument_parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path(tempfile.gettempdir()) / "ohm-benchmarks",
+    )
+    argument_parser.add_argument("--jobs", type=int, default=8)
+    argument_parser.add_argument("--cold-runs", type=int, default=1)
+    argument_parser.add_argument("--noop-runs", type=int, default=3)
+    argument_parser.add_argument("--dependency-runs", type=int, default=7)
+    argument_parser.add_argument("--direct-runs", type=int, default=5)
+    argument_parser.add_argument("--minimum-free-gb", type=int, default=10)
+    argument_parser.add_argument("--timeout", type=int, default=1800)
+    argument_parser.add_argument("--dry-run", action="store_true")
+    return argument_parser
+
+
+class Study:
+    def __init__(self, options: argparse.Namespace) -> None:
+        self.options = options
+        selected = options.project or list(WORKLOADS)
+        if len(set(selected)) != len(selected):
+            raise BenchmarkError("benchmark projects must not be repeated")
+        self.workloads = [WORKLOADS[name] for name in selected]
+        self.toolchains = (("stock", options.upstream), ("ohm", options.ohm))
+        self.output = options.output_dir.expanduser().resolve()
+        self.sources: dict[str, Path] = {}
+        self.worktrees: dict[tuple[str, str], Path] = {}
+        self.samples: list[dict[str, object]] = []
+        self.metadata: dict[str, object] = {}
+
+        for name in (
+            "jobs",
+            "cold_runs",
+            "noop_runs",
+            "dependency_runs",
+            "direct_runs",
+        ):
+            if getattr(options, name) < 1:
+                raise BenchmarkError(f"--{name.replace('_', '-')} must be positive")
+        if options.timeout < 1 or options.minimum_free_gb < 0:
+            raise BenchmarkError(
+                "timeout must be positive and minimum free space nonnegative"
+            )
+        for _, selector in self.toolchains:
+            if not selector or selector.startswith("-"):
+                raise BenchmarkError(f"invalid Rust toolchain selector: {selector!r}")
+        if self.toolchains[0][1] == self.toolchains[1][1]:
+            raise BenchmarkError("upstream and Ohm toolchains must be distinct")
+
+        for workload in self.workloads:
+            if workload.repository not in self.sources:
+                configured = (
+                    options.uv_path
+                    if workload.repository == "uv"
+                    else options.codex_path
+                ).expanduser()
+                if not configured.is_dir():
+                    raise BenchmarkError(
+                        f"source repository does not exist: {configured}"
+                    )
+                repository = Path(
+                    command_output(
+                        ["git", "rev-parse", "--show-toplevel"], cwd=configured
+                    )
+                ).resolve()
+                self.sources[workload.repository] = repository
+            repository = self.sources[workload.repository]
+            if not (repository / workload.workspace / "Cargo.toml").is_file():
+                raise BenchmarkError(f"workspace has no Cargo.toml: {repository}")
+            changed = command_output(
+                [
+                    "git",
+                    "status",
+                    "--porcelain",
+                    "--",
+                    workload.dependency.path,
+                    workload.direct.path,
+                ],
+                cwd=repository,
+            )
+            if changed:
+                raise BenchmarkError(
+                    f"benchmark source files have uncommitted changes in {repository}"
+                )
+            edit_contents(repository, workload.dependency)
+            edit_contents(repository, workload.direct)
+
+    def describe(self) -> None:
+        print(f"upstream: {self.options.upstream}")
+        print(f"ohm: {self.options.ohm}")
+        print(f"output: {self.output}")
+        repetitions = (
+            self.options.cold_runs
+            + self.options.noop_runs
+            + self.options.dependency_runs
+            + self.options.direct_runs
+        )
+        for workload in self.workloads:
+            print(f"\n{workload.name}: {self.sources[workload.repository]}")
+            print(f"  dependency edit: {workload.dependency.path}")
+            print(f"  direct edit: {workload.direct.path}")
+            print(f"  workflows: {', '.join(WORKFLOWS)}")
+            print(f"  selected test: {workload.selected_test}")
+        print(
+            f"\ntimed samples: {len(self.workloads) * len(WORKFLOWS) * 2 * repetitions}"
+        )
+
+    def check_disk(self) -> None:
+        candidate = self.output
+        while not candidate.exists():
+            candidate = candidate.parent
+        free = shutil.disk_usage(candidate).free
+        minimum = self.options.minimum_free_gb * 1024**3
+        if free < minimum:
+            raise BenchmarkError(
+                f"only {free / 1024**3:.1f} GiB available; "
+                f"at least {self.options.minimum_free_gb} GiB required"
+            )
+
+    @contextlib.contextmanager
+    def managed_worktrees(self) -> Iterator[None]:
+        with contextlib.ExitStack() as cleanup:
+            for name, repository in self.sources.items():
+                for label, _ in self.toolchains:
+                    path = self.output / "worktrees" / name / label
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    command_output(
+                        ["git", "worktree", "add", "--detach", str(path), "HEAD"],
+                        cwd=repository,
+                    )
+                    cleanup.callback(
+                        command_output,
+                        ["git", "worktree", "remove", "--force", str(path)],
+                        cwd=repository,
+                    )
+                    self.worktrees[name, label] = path
+            yield
+
+    def command(self, workload: Workload, workflow: str, selector: str) -> list[str]:
+        arguments = ["-p", workload.package, "--lib", "--locked", "--offline"]
+        if workload.repository == "uv":
+            command = ["cargo", f"+{selector}", workflow, *arguments]
+            if workflow == "test":
+                command.extend([workload.selected_test, "--", "--exact"])
+            return command
+        if workflow == "check":
+            return ["cargo", f"+{selector}", workflow, *arguments]
+        if workflow == "clippy":
+            return ["just", "clippy", "-p", workload.package, "--locked", "--offline"]
+        return [
+            "just",
+            "test",
+            *arguments,
+            "--no-tests",
+            "fail",
+            workload.selected_test,
+        ]
+
+    def target(self, workload: Workload, workflow: str, label: str) -> Path:
+        return self.output / "targets" / workload.name / workflow / label
+
+    def reset_target(self, workload: Workload, workflow: str, label: str) -> None:
+        target = self.target(workload, workflow, label)
+        root = (self.output / "targets").resolve()
+        if target.is_symlink() or not target.resolve().is_relative_to(root):
+            raise BenchmarkError(
+                f"refusing to remove unsafe benchmark target: {target}"
+            )
+        if not target.is_dir():
+            raise BenchmarkError(
+                f"previous cold benchmark target does not exist: {target}"
+            )
+        shutil.rmtree(target)
+
+    def ordered_toolchains(self, index: int) -> tuple[tuple[str, str], ...]:
+        return self.toolchains if index % 2 == 0 else self.toolchains[::-1]
+
+    def execute(
+        self,
+        workload: Workload,
+        workflow: str,
+        label: str,
+        selector: str,
+        *,
+        phase: str,
+        repetition: int,
+        expected_crate: str | None,
+        record: bool = True,
+    ) -> None:
+        self.check_disk()
+        worktree = self.worktrees[workload.repository, label]
+        directory = self.target(workload, workflow, label)
+        directory.mkdir(parents=True, exist_ok=True)
+        arguments = self.command(workload, workflow, selector)
+        workspace = worktree / workload.workspace
+        cwd = worktree if arguments[0] == "just" else workspace
+        environment = os.environ.copy()
+        environment.update(
+            {
+                "CARGO_TARGET_DIR": str(directory),
+                "CARGO_BUILD_JOBS": str(self.options.jobs),
+                "CARGO_INCREMENTAL": "1",
+                "CARGO_TERM_COLOR": "never",
+                "RUSTUP_TOOLCHAIN": selector,
+            }
+        )
+        identifier = (
+            f"{len(self.samples) + 1:04d}-{workload.name}-{workflow}-{phase}-{label}"
+        )
+        log = self.output / "logs" / f"{identifier}.log"
+        print(
+            f"{workload.name} {workflow} {phase} {label}: {' '.join(arguments)}",
+            flush=True,
+        )
+        started = time.perf_counter()
+        try:
+            result = subprocess.run(
+                arguments,
+                cwd=cwd,
+                env=environment,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                timeout=self.options.timeout,
+                check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired) as error:
+            raise BenchmarkError(f"benchmark command failed: {error}") from error
+        duration = time.perf_counter() - started
+        log.write_text(result.stdout, encoding="utf-8")
+
+        failure: str | None = None
+        if result.returncode:
+            failure = f"benchmark command exited {result.returncode}; inspect {log}"
+        else:
+            try:
+                validate_output(
+                    result.stdout,
+                    expected_crate=expected_crate,
+                    selected_test=workload.selected_test
+                    if workflow == "test"
+                    else None,
+                )
+            except BenchmarkError as error:
+                failure = f"{error}; inspect {log}"
+
+        if record:
+            self.samples.append(
+                {
+                    "project": workload.name,
+                    "workflow": workflow,
+                    "phase": phase,
+                    "toolchain": label,
+                    "selector": selector,
+                    "repetition": repetition,
+                    "wall_seconds": duration,
+                    "returncode": result.returncode,
+                    "valid": failure is None,
+                    "command": arguments,
+                    "target_directory": str(directory),
+                    "log": str(log),
+                }
+            )
+            self.write_results()
+        if failure is not None:
+            raise BenchmarkError(failure)
+        print(f"  {duration:.3f}s", flush=True)
+
+    def run_edits(self, workload: Workload, workflow: str, *, direct: bool) -> None:
+        edit = workload.direct if direct else workload.dependency
+        phase = "direct" if direct else "dependency"
+        count = self.options.direct_runs if direct else self.options.dependency_runs
+        with contextlib.ExitStack() as cleanup:
+            edits = {
+                label: cleanup.enter_context(
+                    reversible_edit(self.worktrees[workload.repository, label], edit)
+                )
+                for label, _ in self.toolchains
+            }
+            for repetition in range(count):
+                for label, selector in self.ordered_toolchains(repetition):
+                    edits[label](repetition % 2 == 0)
+                    self.execute(
+                        workload,
+                        workflow,
+                        label,
+                        selector,
+                        phase=phase,
+                        repetition=repetition,
+                        expected_crate=edit.crate,
+                    )
+
+    def run_workflow(self, workload: Workload, workflow: str, index: int) -> None:
+        for phase, count in (
+            ("cold", self.options.cold_runs),
+            ("noop", self.options.noop_runs),
+        ):
+            for repetition in range(count):
+                for label, selector in self.ordered_toolchains(index + repetition):
+                    if phase == "cold" and repetition > 0:
+                        self.reset_target(workload, workflow, label)
+                    self.execute(
+                        workload,
+                        workflow,
+                        label,
+                        selector,
+                        phase=phase,
+                        repetition=repetition,
+                        expected_crate=None,
+                    )
+        self.run_edits(workload, workflow, direct=False)
+        for label, selector in self.toolchains:
+            self.execute(
+                workload,
+                workflow,
+                label,
+                selector,
+                phase="warmup",
+                repetition=0,
+                expected_crate=None,
+                record=False,
+            )
+        self.run_edits(workload, workflow, direct=True)
+
+    def comparisons(self) -> list[dict[str, object]]:
+        grouped: dict[tuple[str, str, str, str], list[float]] = defaultdict(list)
+        for sample in self.samples:
+            if sample["valid"]:
+                key = (
+                    str(sample["project"]),
+                    str(sample["workflow"]),
+                    str(sample["phase"]),
+                    str(sample["toolchain"]),
+                )
+                grouped[key].append(float(sample["wall_seconds"]))
+        rows = []
+        for workload in self.workloads:
+            for workflow in WORKFLOWS:
+                for phase in ("cold", "noop", "dependency", "direct"):
+                    stock = grouped.get((workload.name, workflow, phase, "stock"))
+                    ohm = grouped.get((workload.name, workflow, phase, "ohm"))
+                    if stock and ohm:
+                        stock_median = statistics.median(stock)
+                        ohm_median = statistics.median(ohm)
+                        rows.append(
+                            {
+                                "project": workload.name,
+                                "workflow": workflow,
+                                "phase": phase,
+                                "stock_seconds": stock_median,
+                                "ohm_seconds": ohm_median,
+                                "speedup": stock_median / ohm_median,
+                                "samples": min(len(stock), len(ohm)),
+                            }
+                        )
+        return rows
+
+    def write_results(self) -> None:
+        comparisons = self.comparisons()
+        payload = {
+            "metadata": self.metadata,
+            "samples": self.samples,
+            "comparisons": comparisons,
+        }
+        (self.output / "results.json").write_text(
+            json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+        )
+        lines = ["# Ohm benchmark results", ""]
+        for workload in self.workloads:
+            rows = [row for row in comparisons if row["project"] == workload.name]
+            if not rows:
+                continue
+            lines.extend(
+                [
+                    f"## {workload.name}",
+                    "",
+                    "| Workflow | Phase | Stock | Ohm | Speedup | Samples |",
+                    "| --- | --- | ---: | ---: | ---: | ---: |",
+                ]
+            )
+            for row in rows:
+                lines.append(
+                    f"| {row['workflow']} | {row['phase']} | "
+                    f"{row['stock_seconds']:.3f}s | {row['ohm_seconds']:.3f}s | "
+                    f"{row['speedup']:.2f}× | {row['samples']} |"
+                )
+            lines.append("")
+        (self.output / "summary.md").write_text("\n".join(lines), encoding="utf-8")
+
+    def run(self) -> None:
+        self.check_disk()
+        if self.output.exists() and any(self.output.iterdir()):
+            raise BenchmarkError(
+                f"output directory is not empty: {self.output}; choose a new --output-dir"
+            )
+        (self.output / "logs").mkdir(parents=True, exist_ok=True)
+        self.metadata = {
+            "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "jobs": self.options.jobs,
+            "toolchains": {
+                label: {
+                    "selector": selector,
+                    "cargo": command_output(
+                        ["cargo", f"+{selector}", "--version", "--verbose"]
+                    ),
+                    "rustc": command_output(
+                        ["rustc", f"+{selector}", "--version", "--verbose"]
+                    ),
+                }
+                for label, selector in self.toolchains
+            },
+            "repositories": {
+                name: {
+                    "path": str(repository),
+                    "revision": command_output(
+                        ["git", "rev-parse", "HEAD"], cwd=repository
+                    ),
+                }
+                for name, repository in self.sources.items()
+            },
+            "repetitions": {
+                "cold": self.options.cold_runs,
+                "noop": self.options.noop_runs,
+                "dependency": self.options.dependency_runs,
+                "direct": self.options.direct_runs,
+            },
+        }
+        self.write_results()
+        with self.managed_worktrees():
+            for index, (workload, workflow) in enumerate(
+                (workload, workflow)
+                for workload in self.workloads
+                for workflow in WORKFLOWS
+            ):
+                self.run_workflow(workload, workflow, index)
+        self.metadata["finished_at"] = datetime.datetime.now(
+            datetime.timezone.utc
+        ).isoformat()
+        self.write_results()
+        print(f"\nResults: {self.output / 'results.json'}")
+        print(f"Summary: {self.output / 'summary.md'}")
+
+
+def main() -> int:
+    try:
+        options = parser().parse_args()
+        study = Study(options)
+        if options.dry_run:
+            study.describe()
+        else:
+            study.run()
+        return 0
+    except BenchmarkError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
