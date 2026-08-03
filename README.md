@@ -123,6 +123,15 @@ unchanged. Compared with Rust 1.97.1:
 Cold builds and direct edits to the target crate can be slower. See the
 [full results and methodology](BENCHMARKS.md).
 
+## Source repositories
+
+Ohm combines version-matched forks of Rust and its development tools:
+
+- [`ohm-rust`](https://github.com/astral-sh/ohm-rust): Rust compiler and standard library.
+- [`ohm-cargo`](https://github.com/astral-sh/ohm-cargo): Cargo.
+- [`ohm-rust-clippy`](https://github.com/astral-sh/ohm-rust-clippy): Clippy.
+- [`ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt): rustfmt.
+
 ## Documentation
 
 - [Architecture](docs/architecture.md): source repositories, compiler integration, and versioned
