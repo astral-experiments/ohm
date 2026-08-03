@@ -3,7 +3,7 @@
 [![CI](https://github.com/astral-sh/ohm/actions/workflows/ci.yml/badge.svg)](https://github.com/astral-sh/ohm/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
-An alternative Rust toolchain for faster development-only iteration.
+An experimental fork of the Rust toolchain, designed for extremely fast local development.
 
 **Experimental:** Ohm backports and pulls forward Rust and Cargo performance optimizations that may
 be unsound. Use it only for local development, at your own risk.
