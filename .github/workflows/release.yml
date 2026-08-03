@@ -595,11 +595,56 @@ jobs:
           cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
           cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
 
+  tag-sources:
+    if: inputs.build
+    needs:
+      - plan
+      - smoke-test
+    environment: release
+    runs-on: depot-ubuntu-24.04-4
+    permissions:
+      contents: read
+    steps:
+      - name: Check out release coordinator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Require protected main branch
+        env:
+          RELEASE_REF: ${{ github.ref }}
+        run: |
+          if [[ "$RELEASE_REF" != "refs/heads/main" ]]; then
+            echo "source repositories can only be tagged from the protected main branch" >&2
+            exit 1
+          fi
+
+      - name: Create source repository tagging token
+        id: source-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.OHM_RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.OHM_RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            ohm-rust
+            ohm-cargo
+            ohm-rust-clippy
+            ohm-rustfmt
+          permission-contents: write
+
+      - name: Tag release source revisions
+        env:
+          GH_TOKEN: ${{ steps.source-token.outputs.token }}
+          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+        run: ./scripts/tag-release-sources.sh "$MANIFEST_PATH"
+
   publish:
     if: inputs.build
     needs:
       - plan
       - smoke-test
+      - tag-sources
     environment: release
     runs-on: depot-ubuntu-24.04-4
     permissions:

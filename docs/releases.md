@@ -22,8 +22,9 @@ manifest="toolchains/${RUST_VERSION:?}/${OHM_REVISION:?}.json"
   /path/to/ohm-rust-clippy /path/to/ohm-rustfmt
 ```
 
-A dedicated GitHub App needs read-only contents access to the four source repositories. Release
-jobs generate short-lived installation tokens scoped to those repositories.
+A dedicated GitHub App needs Contents read and write access to the four source repositories.
+Planning and build jobs request short-lived, read-only installation tokens; source tagging uses a
+separate, write-scoped token after the distribution has been built and tested.
 
 Store the GitHub App private key and Cloudflare R2 credentials as protected `release` environment
 secrets:
@@ -58,11 +59,13 @@ gh workflow run release.yml --repo astral-sh/ohm --ref main \
 
 The workflow verifies source revisions, builds both complete stage-2 Rust distributions, and
 generates one universal installer with both archive checksums embedded. It smoke-tests that exact
-installer on macOS and Linux before creating a private GitHub Release named after the immutable
-toolchain version. Release notes include version-pinned installation instructions, usage examples,
-the development-only safety warning, and public download links alongside the generated changelog.
-Internal smoke tests use `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private
-release includes:
+installer on macOS and Linux before tagging each source repository at its pinned revision using the
+toolchain name and creating the private GitHub Release. Existing tags at the expected commit are
+reused; conflicting tags fail the release without being moved or deleted.
+
+Release notes include version-pinned installation instructions, usage examples, the development-only
+safety warning, and public download links alongside the generated changelog. Internal smoke tests use
+`OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private release includes:
 
 - Apple Silicon macOS and x86_64 Linux (glibc) `.tar.gz` archives and `.sha256` sidecars;
 - `ohm-installer.sh`, with the release version and both archive checksums embedded;
