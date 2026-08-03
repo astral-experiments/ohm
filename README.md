@@ -6,7 +6,7 @@
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
 incremental builds can be 5x, 10, or even 20x faster for common commands in large workspaces.
 
-Compared to Rust 1.97.1:
+Compared to [Rust 1.97.1](./BENCHMARKS.md):
 
 | Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
 | ------- | -------------- | ----------: | -----: | ------: |
@@ -20,7 +20,7 @@ Compared to Rust 1.97.1:
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
 [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790). Use it only for
-local development, at your own risk.
+local development, and at your own risk.
 
 ## Installation
 
