@@ -82,13 +82,14 @@ optimization to meet upstream Rust's standards for completeness and correctness.
 improvements from newer Rust releases, pull forward work that has not yet landed upstream, and
 experiment with optimizations that may still contain bugs.
 
-At present, Ohm includes implementations for:
+At present, Ohm includes the following optimizations, all enabled by default:
 
 - [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790): avoid rebuilding
-  dependent crates when a dependency's public interface is unchanged.
-- Cached relinking: reuse existing code generation when only the final binary needs to change.
+  dependent crates when a dependency's public interface is unchanged (`rustc -Zpublic-api-hash`).
+- Cached relinking: reuse existing code generation when only the final binary needs to change
+  (`cargo -Zrelink-only`).
 - Early cutoff for `cargo check` and `cargo clippy`.
-- Experimental procedural-macro caching.
+- Experimental procedural-macro caching (`rustc -Zcache-proc-macros`).
 - Backported Clippy optimizations, including combined lint passes.
 
 Ohm is exclusively intended for local development: never use it for production builds or releases,
