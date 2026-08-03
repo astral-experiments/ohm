@@ -3,10 +3,10 @@
 [![CI](https://github.com/astral-sh/ohm/actions/workflows/ci.yml/badge.svg)](https://github.com/astral-sh/ohm/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
-An experimental fork of the Rust toolchain, designed for extremely fast local development.
+An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
+incremental builds can be 5x, 10, or even 20x faster for common commands in large workspaces.
 
-With Ohm, incremental builds can be 5x, 10, or even 20x faster for common commands in large
-workspaces. Compared to Rust 1.97.1:
+Compared to Rust 1.97.1:
 
 | Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
 | ------- | -------------- | ----------: | -----: | ------: |
@@ -18,9 +18,9 @@ workspaces. Compared to Rust 1.97.1:
 | Codex   | `just test`    |      8.30 s | 1.97 s |   4.22× |
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
-be unsound, including a
-[Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790) implementation. Use
-it only for local development, at your own risk.
+be unsound, including an implementation of
+[Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790). Use it only for
+local development, at your own risk.
 
 ## Installation
 
@@ -33,7 +33,8 @@ curl --proto '=https' --tlsv1.2 -LsSf \
 ```
 
 Ohm's installer verifies its embedded archive checksum, installs the complete Rust toolchain, and
-registers an exact version and a moving `ohm` alias with rustup.
+registers an exact version and a moving `ohm` alias with rustup, enabling `cargo +ohm` invocations
+(e.g., `cargo +ohm check`).
 
 To install an exact version:
 
