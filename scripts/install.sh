@@ -2,7 +2,8 @@
 set -eu
 
 embedded_version=
-embedded_archive_sha256=
+embedded_archive_sha256_aarch64_apple_darwin=
+embedded_archive_sha256_x86_64_unknown_linux_gnu=
 installation_prefix=${OHM_INSTALL_DIR:-}
 temporary_directory=
 staging_directory=
@@ -19,7 +20,7 @@ usage() {
     printf '%s\n' \
         'Usage: install.sh [--help]' \
         '' \
-        'Install the embedded, checksum-pinned Ohm macOS Apple Silicon toolchain.' \
+        'Install the embedded, checksum-pinned Ohm toolchain for this platform.' \
         'Set OHM_INSTALL_DIR to override its installation directory.'
 }
 
@@ -94,15 +95,30 @@ case "$#" in
     *) fail 'the release installer does not accept additional arguments' ;;
 esac
 
-[ "$(uname -s)" = Darwin ] || fail 'only macOS is currently supported'
-case "$(uname -m)" in
-    arm64|aarch64) host_target=aarch64-apple-darwin ;;
-    x86_64)
-        [ "$(sysctl -n hw.optional.arm64 2>/dev/null || true)" = 1 ] ||
-            fail 'Intel macOS artifacts are not currently available'
-        host_target=aarch64-apple-darwin
+case "$(uname -s)" in
+    Darwin)
+        case "$(uname -m)" in
+            arm64|aarch64) host_target=aarch64-apple-darwin ;;
+            x86_64)
+                [ "$(sysctl -n hw.optional.arm64 2>/dev/null || true)" = 1 ] ||
+                    fail 'Intel macOS artifacts are not currently available'
+                host_target=aarch64-apple-darwin
+                ;;
+            *) fail 'unsupported macOS architecture' ;;
+        esac
+        embedded_archive_sha256=$embedded_archive_sha256_aarch64_apple_darwin
         ;;
-    *) fail 'unsupported macOS architecture' ;;
+    Linux)
+        case "$(uname -m)" in
+            x86_64|amd64) host_target=x86_64-unknown-linux-gnu ;;
+            *) fail 'only x86_64 Linux is currently supported' ;;
+        esac
+        if command -v ldd >/dev/null 2>&1 && ldd --version 2>&1 | grep -qi musl; then
+            fail 'musl-based Linux distributions are not currently supported'
+        fi
+        embedded_archive_sha256=$embedded_archive_sha256_x86_64_unknown_linux_gnu
+        ;;
+    *) fail 'only macOS and Linux are currently supported' ;;
 esac
 
 command -v rustup >/dev/null 2>&1 || fail 'rustup is required to register the installed toolchain'
@@ -158,7 +174,7 @@ case "$installation_prefix" in
     *) fail 'OHM_INSTALL_DIR must be an absolute path' ;;
 esac
 case "$installation_prefix" in
-    /|/Users|/private|/tmp|/private/tmp|"${HOME:-}"|"${HOME:-}/"|"${RUSTUP_HOME:-}"|"${CARGO_HOME:-}")
+    /|/Users|/home|/root|/usr|/usr/local|/var|/opt|/etc|/bin|/sbin|/private|/tmp|/private/tmp|"${HOME:-}"|"${HOME:-}/"|"${RUSTUP_HOME:-}"|"${CARGO_HOME:-}")
         fail 'refusing to install into a broad or managed directory'
         ;;
 esac
@@ -173,8 +189,15 @@ printf '%s\n' "$installation_prefix" | awk '
     }
 ' || fail 'OHM_INSTALL_DIR must not contain relative path components'
 
-actual_checksum=$(shasum -a 256 "$archive_path" | awk '{ print tolower($1) }') ||
-    fail 'could not calculate the archive checksum'
+if command -v sha256sum >/dev/null 2>&1; then
+    actual_checksum=$(sha256sum "$archive_path" | awk '{ print tolower($1) }') ||
+        fail 'could not calculate the archive checksum'
+elif command -v shasum >/dev/null 2>&1; then
+    actual_checksum=$(shasum -a 256 "$archive_path" | awk '{ print tolower($1) }') ||
+        fail 'could not calculate the archive checksum'
+else
+    fail 'sha256sum or shasum is required to verify the archive checksum'
+fi
 [ "$actual_checksum" = "$embedded_archive_sha256" ] || fail 'archive checksum verification failed'
 
 upstream_version=${version#ohm-}

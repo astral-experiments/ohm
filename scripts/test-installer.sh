@@ -12,6 +12,8 @@ mock_directory="$temporary_directory/mocks"
 version="ohm-1.97.1-2"
 archive_name="$version-aarch64-apple-darwin.tar.gz"
 archive_root="rust-1.97.1-dev-aarch64-apple-darwin"
+linux_archive_name="$version-x86_64-unknown-linux-gnu.tar.gz"
+linux_archive_root="rust-1.97.1-dev-x86_64-unknown-linux-gnu"
 mkdir -p "$release_directory" "$fixture_directory/$archive_root" "$mock_directory"
 
 cat > "$fixture_directory/$archive_root/install.sh" <<'EOF'
@@ -45,11 +47,16 @@ EOF
 chmod +x "$fixture_directory/$archive_root/install.sh"
 tar -czf "$release_directory/$archive_name" -C "$fixture_directory" "$archive_root"
 archive_checksum="$(shasum -a 256 "$release_directory/$archive_name" | awk '{ print $1 }')"
+mkdir -p "$fixture_directory/$linux_archive_root"
+cp "$fixture_directory/$archive_root/install.sh" "$fixture_directory/$linux_archive_root/install.sh"
+tar -czf "$release_directory/$linux_archive_name" -C "$fixture_directory" "$linux_archive_root"
+linux_archive_checksum="$(shasum -a 256 "$release_directory/$linux_archive_name" | awk '{ print $1 }')"
 source_installer=$installer
 installer="$temporary_directory/release-installer.sh"
 sed \
   -e "s/^embedded_version=$/embedded_version=$version/" \
-  -e "s/^embedded_archive_sha256=$/embedded_archive_sha256=$archive_checksum/" \
+  -e "s/^embedded_archive_sha256_aarch64_apple_darwin=$/embedded_archive_sha256_aarch64_apple_darwin=$archive_checksum/" \
+  -e "s/^embedded_archive_sha256_x86_64_unknown_linux_gnu=$/embedded_archive_sha256_x86_64_unknown_linux_gnu=$linux_archive_checksum/" \
   "$source_installer" > "$installer"
 
 cat > "$mock_directory/uname" <<'EOF'
@@ -73,6 +80,17 @@ if [ "${1:-}" != -n ] || [ "${2:-}" != hw.optional.arm64 ]; then
 fi
 
 printf '%s\n' "${OHM_TEST_APPLE_SILICON:-0}"
+EOF
+
+cat > "$mock_directory/ldd" <<'EOF'
+#!/bin/sh
+set -eu
+
+case "${OHM_TEST_LIBC:-glibc}" in
+  glibc) printf '%s\n' 'ldd (GNU libc) 2.39' ;;
+  musl) printf '%s\n' 'musl libc (x86_64)' ;;
+  *) echo "unsupported libc fixture: $OHM_TEST_LIBC" >&2; exit 1 ;;
+esac
 EOF
 
 cat > "$mock_directory/rustup" <<'EOF'
@@ -119,10 +137,15 @@ if [ -z "$output" ] || [ -z "$url" ]; then
   exit 1
 fi
 
-expected_url="https://labs.astral.sh/ohm/releases/$OHM_TEST_VERSION/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz"
+case "$OHM_TEST_SYSTEM" in
+  Linux) target=x86_64-unknown-linux-gnu ;;
+  *) target=aarch64-apple-darwin ;;
+esac
+expected_archive="$OHM_TEST_VERSION-$target.tar.gz"
+expected_url="https://labs.astral.sh/ohm/releases/$OHM_TEST_VERSION/$expected_archive"
 [ "$url" = "$expected_url" ] || { echo "unexpected public release URL: $url" >&2; exit 1; }
 [ "${OHM_TEST_CURL_FAILURE:-0}" != 1 ] || { echo 'public archive download failed' >&2; exit 22; }
-cp "$OHM_TEST_RELEASE_DIRECTORY/$OHM_TEST_VERSION-aarch64-apple-darwin.tar.gz" "$output"
+cp "$OHM_TEST_RELEASE_DIRECTORY/$expected_archive" "$output"
 EOF
 
 cat > "$mock_directory/mkdir" <<'EOF'
@@ -144,7 +167,8 @@ fi
 exec /bin/mkdir "$@"
 EOF
 
-chmod +x "$mock_directory/uname" "$mock_directory/sysctl" "$mock_directory/rustup" \
+chmod +x "$mock_directory/uname" "$mock_directory/sysctl" "$mock_directory/ldd" \
+  "$mock_directory/rustup" \
   "$mock_directory/curl" "$mock_directory/mkdir"
 
 run_case() {
@@ -170,6 +194,7 @@ run_case() {
     OHM_TEST_SYSTEM="${OHM_TEST_SYSTEM:-Darwin}" \
     OHM_TEST_ARCHITECTURE="${OHM_TEST_ARCHITECTURE:-arm64}" \
     OHM_TEST_APPLE_SILICON="${OHM_TEST_APPLE_SILICON:-0}" \
+    OHM_TEST_LIBC="${OHM_TEST_LIBC:-glibc}" \
     OHM_TEST_CURL_FAILURE="${OHM_TEST_CURL_FAILURE:-}" \
     OHM_TEST_VERSION="${OHM_TEST_VERSION:-$version}" \
     OHM_TEST_RUSTC_BRAND="${OHM_TEST_RUSTC_BRAND:-$version}" \
@@ -255,10 +280,24 @@ if [ -s "$temporary_directory/cases/missing-rustup/curl.log" ]; then
   exit 1
 fi
 
-OHM_TEST_SYSTEM=Linux
+OHM_TEST_SYSTEM=FreeBSD
 run_case unsupported-platform failure
 unset OHM_TEST_SYSTEM
 assert_no_links unsupported-platform
+
+OHM_TEST_SYSTEM=Linux
+OHM_TEST_ARCHITECTURE=aarch64
+run_case unsupported-linux-architecture failure
+unset OHM_TEST_SYSTEM OHM_TEST_ARCHITECTURE
+assert_no_links unsupported-linux-architecture
+
+OHM_TEST_SYSTEM=Linux
+OHM_TEST_ARCHITECTURE=x86_64
+OHM_TEST_LIBC=musl
+run_case unsupported-linux-musl failure
+unset OHM_TEST_SYSTEM OHM_TEST_ARCHITECTURE OHM_TEST_LIBC
+assert_no_links unsupported-linux-musl
+assert_not_contains "$temporary_directory/cases/unsupported-linux-musl/curl.log" 'https://'
 
 OHM_TEST_ARCHITECTURE=x86_64
 run_case unsupported-architecture failure
@@ -270,6 +309,13 @@ OHM_TEST_APPLE_SILICON=1
 run_case rosetta-apple-silicon success
 unset OHM_TEST_ARCHITECTURE OHM_TEST_APPLE_SILICON
 assert_contains "$temporary_directory/cases/rosetta-apple-silicon/rustup.log" \
+  "toolchain link $version "
+
+OHM_TEST_SYSTEM=Linux
+OHM_TEST_ARCHITECTURE=x86_64
+run_case linux-x86_64 success
+unset OHM_TEST_SYSTEM OHM_TEST_ARCHITECTURE
+assert_contains "$temporary_directory/cases/linux-x86_64/rustup.log" \
   "toolchain link $version "
 
 OHM_TEST_INSTALLER=$source_installer
@@ -294,8 +340,16 @@ assert_contains "$temporary_directory/cases/embedded-public-latest/rustup.log" \
 assert_contains "$temporary_directory/cases/embedded-public-latest/rustup.log" \
   'toolchain link ohm '
 
+OHM_TEST_SYSTEM=Linux
+OHM_TEST_ARCHITECTURE=x86_64
+OHM_TEST_DOWNLOAD_URL=
+run_case linux-public-archive success
+unset OHM_TEST_SYSTEM OHM_TEST_ARCHITECTURE OHM_TEST_DOWNLOAD_URL
+assert_contains "$temporary_directory/cases/linux-public-archive/curl.log" \
+  "https://labs.astral.sh/ohm/releases/$version/$linux_archive_name"
+
 bad_embedded_installer="$temporary_directory/bad-embedded-installer.sh"
-sed "s/^embedded_archive_sha256=.*/embedded_archive_sha256=$(printf '%064d' 0)/" \
+sed "s/^embedded_archive_sha256_aarch64_apple_darwin=.*/embedded_archive_sha256_aarch64_apple_darwin=$(printf '%064d' 0)/" \
   "$installer" > "$bad_embedded_installer"
 OHM_TEST_INSTALLER=$bad_embedded_installer
 run_case mismatched-embedded-checksum failure
@@ -303,13 +357,23 @@ unset OHM_TEST_INSTALLER
 assert_no_links mismatched-embedded-checksum
 
 invalid_embedded_installer="$temporary_directory/invalid-embedded-installer.sh"
-sed 's/^embedded_archive_sha256=.*/embedded_archive_sha256=not-a-checksum/' \
+sed 's/^embedded_archive_sha256_aarch64_apple_darwin=.*/embedded_archive_sha256_aarch64_apple_darwin=not-a-checksum/' \
   "$installer" > "$invalid_embedded_installer"
 OHM_TEST_INSTALLER=$invalid_embedded_installer
 run_case invalid-embedded-checksum failure
 unset OHM_TEST_INSTALLER
 assert_no_links invalid-embedded-checksum
 assert_not_contains "$temporary_directory/cases/invalid-embedded-checksum/curl.log" 'https://'
+
+wrong_platform_installer="$temporary_directory/wrong-platform-installer.sh"
+sed "s/^embedded_archive_sha256_x86_64_unknown_linux_gnu=.*/embedded_archive_sha256_x86_64_unknown_linux_gnu=$archive_checksum/" \
+  "$installer" > "$wrong_platform_installer"
+OHM_TEST_SYSTEM=Linux
+OHM_TEST_ARCHITECTURE=x86_64
+OHM_TEST_INSTALLER=$wrong_platform_installer
+run_case wrong-platform-checksum failure
+unset OHM_TEST_SYSTEM OHM_TEST_ARCHITECTURE OHM_TEST_INSTALLER
+assert_no_links wrong-platform-checksum
 
 OHM_TEST_DOWNLOAD_URL=
 OHM_TEST_CURL_FAILURE=1
@@ -358,7 +422,7 @@ unsafe_archive="$temporary_directory/$archive_name"
 tar -czf "$unsafe_archive" -C "$fixture_directory" "$archive_root"
 unsafe_checksum="$(shasum -a 256 "$unsafe_archive" | awk '{ print $1 }')"
 unsafe_archive_installer="$temporary_directory/unsafe-archive-installer.sh"
-sed "s/^embedded_archive_sha256=.*/embedded_archive_sha256=$unsafe_checksum/" \
+sed "s/^embedded_archive_sha256_aarch64_apple_darwin=.*/embedded_archive_sha256_aarch64_apple_darwin=$unsafe_checksum/" \
   "$installer" > "$unsafe_archive_installer"
 OHM_TEST_INSTALLER=$unsafe_archive_installer
 OHM_TEST_DOWNLOAD_URL="file://$temporary_directory"
