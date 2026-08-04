@@ -10,6 +10,10 @@ revision must pin the same Cargo revision through its `src/tools/cargo` gitlink,
 support the `ohm-defaults` feature required by
 [`release/bootstrap.toml`](../release/bootstrap.toml).
 
+Pin source revisions with fork-owned CI. In particular, the rustfmt checkout must not contain its
+upstream tag-triggered release workflow, which would start unrelated builds when source tags are
+created.
+
 A pinned manifest's source revisions can be updated until its immutable release tag is published.
 After publication, the release identity and source revisions cannot change.
 
@@ -22,8 +26,9 @@ manifest="toolchains/${RUST_VERSION:?}/${OHM_REVISION:?}.json"
   /path/to/ohm-rust-clippy /path/to/ohm-rustfmt
 ```
 
-A dedicated GitHub App needs read-only contents access to the four source repositories. Release
-jobs generate short-lived installation tokens scoped to those repositories.
+A dedicated GitHub App needs Contents read and write access to the four source repositories.
+Planning and build jobs request short-lived, read-only installation tokens; source tagging uses a
+separate, write-scoped token after the distribution has been built and tested.
 
 Store the GitHub App private key and Cloudflare R2 credentials as protected `release` environment
 secrets:
@@ -58,11 +63,14 @@ gh workflow run release.yml --repo astral-sh/ohm --ref main \
 
 The workflow verifies source revisions, builds both complete stage-2 Rust distributions, and
 generates one universal installer with both archive checksums embedded. It smoke-tests that exact
-installer on macOS and Linux before creating a private GitHub Release named after the immutable
-toolchain version. Release notes include version-pinned installation instructions, usage examples,
-the development-only safety warning, and public download links alongside the generated changelog.
-Internal smoke tests use `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private
-release includes:
+installer on macOS and Linux before checking existing source tags across all four repositories and
+tagging any missing pinned revisions with the toolchain name. Existing tags at the expected commit
+are reused; conflicting immutable tags fail the release before any new source tags are created. The
+workflow then creates the private GitHub Release and publishes the public assets.
+
+Release notes include version-pinned installation instructions, usage examples, the development-only
+safety warning, and public download links alongside the generated changelog. Internal smoke tests use
+`OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private release includes:
 
 - Apple Silicon macOS and x86_64 Linux (glibc) `.tar.gz` archives and `.sha256` sidecars;
 - `ohm-installer.sh`, with the release version and both archive checksums embedded;

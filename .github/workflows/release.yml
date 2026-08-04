@@ -619,6 +619,65 @@ jobs:
         working-directory: release
         run: sha256sum --check --strict SHA256SUMS
 
+      - name: Create source repository tagging token
+        id: source-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.OHM_RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.OHM_RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            ohm-rust
+            ohm-cargo
+            ohm-rust-clippy
+            ohm-rustfmt
+          permission-contents: write
+
+      - name: Tag release source revisions
+        env:
+          CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
+          CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
+          GH_TOKEN: ${{ steps.source-token.outputs.token }}
+          RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
+          RUSTFMT_REVISION: ${{ needs.plan.outputs.rustfmt-revision }}
+          SOURCE_OWNER: ${{ github.repository_owner }}
+        run: |
+          sources=(
+            "ohm-rust:$RUST_REVISION"
+            "ohm-cargo:$CARGO_REVISION"
+            "ohm-rust-clippy:$CLIPPY_REVISION"
+            "ohm-rustfmt:$RUSTFMT_REVISION"
+          )
+          missing_sources=()
+
+          for source in "${sources[@]}"; do
+            repository="${source%%:*}"
+            revision="${source#*:}"
+            existing_revision="$(
+              gh api "repos/$SOURCE_OWNER/$repository/git/matching-refs/tags/$OHM_TOOLCHAIN" \
+                --jq ".[] | select(.ref == \"refs/tags/$OHM_TOOLCHAIN\") | .object.sha"
+            )"
+
+            if [[ "$existing_revision" == "$revision" ]]; then
+              echo "$repository: reusing $OHM_TOOLCHAIN at $revision"
+            elif [[ -n "$existing_revision" ]]; then
+              echo "$repository: $OHM_TOOLCHAIN points at $existing_revision, expected $revision" >&2
+              exit 1
+            else
+              missing_sources+=("$source")
+            fi
+          done
+
+          for source in "${missing_sources[@]}"; do
+            repository="${source%%:*}"
+            revision="${source#*:}"
+            gh api --method POST "repos/$SOURCE_OWNER/$repository/git/refs" \
+              -f "ref=refs/tags/$OHM_TOOLCHAIN" \
+              -f "sha=$revision" \
+              --silent
+            echo "$repository: tagged $OHM_TOOLCHAIN at $revision"
+          done
+
       - name: Publish GitHub Release
         working-directory: release
         env:
