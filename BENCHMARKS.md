@@ -114,5 +114,7 @@ and Markdown summary.
 The runner creates temporary Git worktrees, isolates Cargo target directories by workflow and
 toolchain, and applies reversible edits without modifying the original checkouts. Pass
 `--require-idle` to wait for other Rust builds to finish and reject overlapping samples;
-`--idle-timeout` controls the maximum wait, which defaults to 900 seconds. Cargo lock contention
-also invalidates affected samples.
+`--idle-timeout` controls the maximum wait, `--quiet-seconds` sets the required quiet window, and
+`--contention-retries` controls how often an interrupted workflow restarts from a cold build. Pass
+`--discard-targets` to remove each completed workflow's isolated build artifacts while preserving
+its results and logs.

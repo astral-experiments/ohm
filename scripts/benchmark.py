@@ -31,6 +31,10 @@ class BenchmarkError(Exception):
     """A benchmark configuration or measurement cannot be trusted."""
 
 
+class ContaminatedBenchmarkError(BenchmarkError):
+    """An unrelated compiler overlapped an otherwise valid measurement."""
+
+
 @dataclasses.dataclass(frozen=True)
 class Edit:
     path: str
@@ -291,6 +295,13 @@ def parser() -> argparse.ArgumentParser:
         help="wait for unrelated Rust builds and reject samples that overlap them",
     )
     argument_parser.add_argument("--idle-timeout", type=int, default=900)
+    argument_parser.add_argument("--contention-retries", type=int, default=3)
+    argument_parser.add_argument("--quiet-seconds", type=int, default=10)
+    argument_parser.add_argument(
+        "--discard-targets",
+        action="store_true",
+        help="remove owned build artifacts after each completed workflow",
+    )
     argument_parser.add_argument("--dry-run", action="store_true")
     return argument_parser
 
@@ -324,9 +335,12 @@ class Study:
             options.timeout < 1
             or options.idle_timeout < 1
             or options.minimum_free_gb < 0
+            or options.contention_retries < 0
+            or options.quiet_seconds < 0
         ):
             raise BenchmarkError(
-                "timeouts must be positive and minimum free space nonnegative"
+                "timeouts must be positive; minimum free space, contention retries, "
+                "and quiet seconds must be nonnegative"
             )
         for _, selector in self.toolchains:
             if not selector or selector.startswith("-"):
@@ -527,15 +541,17 @@ class Study:
     def ordered_toolchains(self, index: int) -> tuple[tuple[str, str], ...]:
         return self.toolchains if index % 2 == 0 else self.toolchains[::-1]
 
-    def wait_until_idle(self) -> None:
-        if not (active := competing_processes()):
+    def wait_until_idle(self, *, quiet_seconds: int = 0) -> None:
+        active = competing_processes()
+        if not active and quiet_seconds == 0:
             return
-        print(
-            "Waiting for unrelated compiler processes: " + ", ".join(active),
-            flush=True,
-        )
+        if active:
+            print(
+                "Waiting for unrelated compiler processes: " + ", ".join(active),
+                flush=True,
+            )
         deadline = time.monotonic() + self.options.idle_timeout
-        idle_since: float | None = None
+        idle_since: float | None = None if active else time.monotonic()
         while time.monotonic() < deadline:
             time.sleep(0.5)
             if competing_processes():
@@ -544,7 +560,7 @@ class Study:
             now = time.monotonic()
             if idle_since is None:
                 idle_since = now
-            elif now - idle_since >= 2:
+            elif now - idle_since >= max(2, quiet_seconds):
                 return
         raise BenchmarkError("timed out waiting for unrelated compiler processes")
 
@@ -630,20 +646,11 @@ class Study:
         failure: str | None = None
         if monitor_errors:
             failure = "compiler interference monitor failed: " + monitor_errors[0]
-        elif interference:
-            failure = "unrelated compiler overlapped benchmark: " + ", ".join(
-                interference
-            )
-        elif self.options.require_idle:
+        elif self.options.require_idle and not interference:
             try:
                 interference = competing_processes()
             except BenchmarkError as error:
                 failure = f"compiler interference monitor failed: {error}"
-            else:
-                if interference:
-                    failure = "unrelated compiler overlapped benchmark: " + ", ".join(
-                        interference
-                    )
         if failure is None and result.returncode:
             failure = f"benchmark command exited {result.returncode}; inspect {log}"
         elif failure is None:
@@ -657,6 +664,11 @@ class Study:
                 )
             except BenchmarkError as error:
                 failure = f"{error}; inspect {log}"
+        contaminated = failure is None and bool(interference)
+        if contaminated:
+            failure = "unrelated compiler overlapped benchmark: " + ", ".join(
+                interference
+            )
 
         if record:
             self.samples.append(
@@ -678,6 +690,8 @@ class Study:
             )
             self.write_results()
         if failure is not None:
+            if contaminated:
+                raise ContaminatedBenchmarkError(failure)
             raise BenchmarkError(failure)
         print(f"  {duration:.3f}s", flush=True)
 
@@ -736,6 +750,42 @@ class Study:
                 record=False,
             )
         self.run_edits(workload, workflow, direct=True)
+
+    def run_workflow_with_retries(
+        self, workload: Workload, workflow: str, index: int
+    ) -> None:
+        for attempt in range(self.options.contention_retries + 1):
+            if self.options.require_idle:
+                self.wait_until_idle(quiet_seconds=self.options.quiet_seconds)
+            first_sample = len(self.samples)
+            try:
+                self.run_workflow(workload, workflow, index)
+            except ContaminatedBenchmarkError as error:
+                reason = (
+                    "discarded entire workflow attempt because an unrelated "
+                    f"compiler overlapped a sample: {error}"
+                )
+                for sample in self.samples[first_sample:]:
+                    sample["valid"] = False
+                    sample["discard_reason"] = reason
+                self.write_results()
+                if attempt >= self.options.contention_retries:
+                    raise
+                print(
+                    f"Restarting {workload.name} {workflow} from cold after "
+                    f"compiler interference (retry {attempt + 1}/"
+                    f"{self.options.contention_retries})",
+                    flush=True,
+                )
+                for label, _ in self.toolchains:
+                    target = self.target(workload, workflow, label)
+                    if target.exists() or target.is_symlink():
+                        self.reset_target(workload, workflow, label)
+            else:
+                if self.options.discard_targets:
+                    for label, _ in self.toolchains:
+                        self.reset_target(workload, workflow, label)
+                return
 
     def comparisons(self) -> list[dict[str, object]]:
         grouped: dict[tuple[str, str, str, str], list[float]] = defaultdict(list)
@@ -813,6 +863,7 @@ class Study:
         self.metadata = {
             "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "jobs": self.options.jobs,
+            "discard_targets": self.options.discard_targets,
             "toolchains": {
                 label: {
                     "selector": selector,
@@ -847,7 +898,7 @@ class Study:
                 for workload in self.workloads
                 for workflow in WORKFLOWS
             ):
-                self.run_workflow(workload, workflow, index)
+                self.run_workflow_with_retries(workload, workflow, index)
         self.metadata["finished_at"] = datetime.datetime.now(
             datetime.timezone.utc
         ).isoformat()

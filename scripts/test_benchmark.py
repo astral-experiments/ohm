@@ -138,7 +138,9 @@ class CompilerInterferenceTests(unittest.TestCase):
                 mock.patch.object(benchmark.subprocess, "run", return_value=result),
                 contextlib.redirect_stdout(io.StringIO()),
             ):
-                with self.assertRaisesRegex(benchmark.BenchmarkError, "overlapped"):
+                with self.assertRaisesRegex(
+                    benchmark.ContaminatedBenchmarkError, "overlapped"
+                ):
                     study.execute(
                         workload,
                         "check",
@@ -152,6 +154,274 @@ class CompilerInterferenceTests(unittest.TestCase):
             self.assertFalse(study.samples[0]["valid"])
             self.assertEqual(study.samples[0]["external_compilation"], ["100 cargo"])
             self.assertTrue((output / "results.json").is_file())
+
+    def test_real_failures_remain_terminal_when_a_compiler_also_overlaps(self) -> None:
+        for returncode, standard_output, expected in (
+            (101, "compilation failed\n", "exited 101"),
+            (0, "    Finished dev profile\n", "was not rebuilt"),
+        ):
+            with self.subTest(returncode=returncode):
+                with tempfile.TemporaryDirectory() as directory:
+                    output = Path(directory) / "results"
+                    (output / "logs").mkdir(parents=True)
+                    worktree = Path(directory) / "source"
+                    worktree.mkdir()
+                    workload = benchmark.WORKLOADS["uv"]
+                    study = object.__new__(benchmark.Study)
+                    study.options = benchmark.parser().parse_args(
+                        ["--require-idle", "--output-dir", str(output)]
+                    )
+                    study.output = output
+                    study.workloads = [workload]
+                    study.toolchains = (("stock", "1.97.1"), ("ohm", "ohm"))
+                    study.worktrees = {("uv", "stock"): worktree}
+                    study.samples = []
+                    study.metadata = {}
+                    result = subprocess.CompletedProcess(
+                        [], returncode, stdout=standard_output
+                    )
+
+                    with (
+                        mock.patch.object(study, "wait_until_idle"),
+                        mock.patch.object(
+                            benchmark,
+                            "competing_processes",
+                            return_value=["100 cargo"],
+                        ),
+                        mock.patch.object(
+                            benchmark.subprocess, "run", return_value=result
+                        ),
+                        contextlib.redirect_stdout(io.StringIO()),
+                        self.assertRaisesRegex(
+                            benchmark.BenchmarkError, expected
+                        ) as raised,
+                    ):
+                        study.execute(
+                            workload,
+                            "check",
+                            "stock",
+                            "1.97.1",
+                            phase="dependency",
+                            repetition=0,
+                            expected_crate="uv-normalize",
+                        )
+
+                    self.assertNotIsInstance(
+                        raised.exception, benchmark.ContaminatedBenchmarkError
+                    )
+                    self.assertFalse(study.samples[0]["valid"])
+                    self.assertEqual(
+                        study.samples[0]["external_compilation"], ["100 cargo"]
+                    )
+
+
+class WorkflowRetryTests(unittest.TestCase):
+    def setUp(self) -> None:
+        temporary_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary_directory.cleanup)
+        self.output = Path(temporary_directory.name) / "results"
+        self.output.mkdir()
+        arguments = benchmark.parser().parse_args(
+            [
+                "--project",
+                "uv",
+                "--require-idle",
+                "--contention-retries",
+                "2",
+                "--quiet-seconds",
+                "10",
+                "--output-dir",
+                str(self.output),
+            ]
+        )
+        self.study = benchmark.Study(arguments)
+        self.workload = benchmark.WORKLOADS["uv"]
+        self.calls = 0
+
+    def sample(self, *, valid: bool, label: str = "stock") -> dict[str, object]:
+        return {
+            "project": self.workload.name,
+            "workflow": "check",
+            "phase": "cold",
+            "toolchain": label,
+            "wall_seconds": 1.0,
+            "valid": valid,
+        }
+
+    def test_discards_full_attempt_and_restarts_both_targets_from_cold(self) -> None:
+        stock = self.study.target(self.workload, "check", "stock")
+        ohm = self.study.target(self.workload, "check", "ohm")
+        unrelated = self.study.target(self.workload, "clippy", "stock")
+        unrelated.mkdir(parents=True)
+        sentinel = unrelated / "preserve"
+        sentinel.write_text("unrelated workflow", encoding="utf-8")
+
+        def execute_attempt(*_: object) -> None:
+            self.calls += 1
+            if self.calls == 1:
+                stock.mkdir(parents=True)
+                ohm.mkdir(parents=True)
+                self.study.samples.extend(
+                    [self.sample(valid=True), self.sample(valid=False, label="ohm")]
+                )
+                raise benchmark.ContaminatedBenchmarkError("overlapped: 123 cargo")
+            self.assertFalse(stock.exists())
+            self.assertFalse(ohm.exists())
+            self.study.samples.extend(
+                [self.sample(valid=True), self.sample(valid=True, label="ohm")]
+            )
+
+        with (
+            mock.patch.object(self.study, "run_workflow", side_effect=execute_attempt),
+            mock.patch.object(self.study, "wait_until_idle") as wait,
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            self.study.run_workflow_with_retries(self.workload, "check", 0)
+
+        self.assertEqual(self.calls, 2)
+        self.assertEqual(
+            [sample["valid"] for sample in self.study.samples],
+            [False, False, True, True],
+        )
+        for sample in self.study.samples[:2]:
+            self.assertIn("entire workflow", str(sample["discard_reason"]))
+        self.assertNotIn("discard_reason", self.study.samples[2])
+        self.assertEqual(sentinel.read_text(encoding="utf-8"), "unrelated workflow")
+        self.assertEqual(
+            wait.call_args_list,
+            [mock.call(quiet_seconds=10), mock.call(quiet_seconds=10)],
+        )
+        self.assertEqual(self.study.comparisons()[0]["samples"], 1)
+
+    def test_stops_after_bounded_contamination_retries(self) -> None:
+        def contaminated(*_: object) -> None:
+            self.calls += 1
+            self.study.samples.append(self.sample(valid=False))
+            raise benchmark.ContaminatedBenchmarkError("persistent overlap")
+
+        with (
+            mock.patch.object(self.study, "run_workflow", side_effect=contaminated),
+            mock.patch.object(self.study, "wait_until_idle"),
+            contextlib.redirect_stdout(io.StringIO()),
+            self.assertRaisesRegex(
+                benchmark.ContaminatedBenchmarkError, "persistent overlap"
+            ),
+        ):
+            self.study.run_workflow_with_retries(self.workload, "check", 0)
+
+        self.assertEqual(self.calls, 3)
+        self.assertTrue(all(not sample["valid"] for sample in self.study.samples))
+
+    def test_real_build_failures_never_retry_or_remove_artifacts(self) -> None:
+        target = self.study.target(self.workload, "check", "stock")
+        target.mkdir(parents=True)
+        artifact = target / "preserve"
+        artifact.write_text("diagnostic artifact", encoding="utf-8")
+
+        with (
+            mock.patch.object(
+                self.study,
+                "run_workflow",
+                side_effect=benchmark.BenchmarkError("real compilation failure"),
+            ) as workflow,
+            mock.patch.object(self.study, "wait_until_idle"),
+            self.assertRaisesRegex(benchmark.BenchmarkError, "real compilation"),
+        ):
+            self.study.run_workflow_with_retries(self.workload, "check", 0)
+
+        workflow.assert_called_once()
+        self.assertEqual(artifact.read_text(encoding="utf-8"), "diagnostic artifact")
+
+    def test_retry_rejects_symlinked_target_without_touching_destination(self) -> None:
+        target = self.study.target(self.workload, "check", "stock")
+        outside = self.output.parent / "outside"
+        outside.mkdir()
+        sentinel = outside / "preserve"
+        sentinel.write_text("user artifact", encoding="utf-8")
+        target.parent.mkdir(parents=True)
+        target.symlink_to(outside, target_is_directory=True)
+
+        with (
+            mock.patch.object(
+                self.study,
+                "run_workflow",
+                side_effect=benchmark.ContaminatedBenchmarkError("overlap"),
+            ),
+            mock.patch.object(self.study, "wait_until_idle"),
+            contextlib.redirect_stdout(io.StringIO()),
+            self.assertRaisesRegex(benchmark.BenchmarkError, "unsafe"),
+        ):
+            self.study.run_workflow_with_retries(self.workload, "check", 0)
+
+        self.assertEqual(sentinel.read_text(encoding="utf-8"), "user artifact")
+
+    def test_discards_only_completed_workflow_targets_when_requested(self) -> None:
+        self.study.options.discard_targets = True
+        stock = self.study.target(self.workload, "check", "stock")
+        ohm = self.study.target(self.workload, "check", "ohm")
+        unrelated = self.study.target(self.workload, "clippy", "stock")
+        unrelated.mkdir(parents=True)
+        sentinel = unrelated / "preserve"
+        sentinel.write_text("unrelated workflow", encoding="utf-8")
+
+        def complete(*_: object) -> None:
+            stock.mkdir(parents=True)
+            ohm.mkdir(parents=True)
+            self.study.samples.extend(
+                [self.sample(valid=True), self.sample(valid=True, label="ohm")]
+            )
+            self.study.write_results()
+
+        with (
+            mock.patch.object(self.study, "run_workflow", side_effect=complete),
+            mock.patch.object(self.study, "wait_until_idle"),
+        ):
+            self.study.run_workflow_with_retries(self.workload, "check", 0)
+
+        self.assertFalse(stock.exists())
+        self.assertFalse(ohm.exists())
+        self.assertEqual(sentinel.read_text(encoding="utf-8"), "unrelated workflow")
+        self.assertTrue((self.output / "results.json").is_file())
+        self.assertTrue((self.output / "summary.md").is_file())
+        self.assertEqual(self.study.comparisons()[0]["samples"], 1)
+
+    def test_retains_completed_targets_by_default(self) -> None:
+        stock = self.study.target(self.workload, "check", "stock")
+        ohm = self.study.target(self.workload, "check", "ohm")
+
+        def complete(*_: object) -> None:
+            stock.mkdir(parents=True)
+            ohm.mkdir(parents=True)
+
+        with (
+            mock.patch.object(self.study, "run_workflow", side_effect=complete),
+            mock.patch.object(self.study, "wait_until_idle"),
+        ):
+            self.study.run_workflow_with_retries(self.workload, "check", 0)
+
+        self.assertTrue(stock.is_dir())
+        self.assertTrue(ohm.is_dir())
+
+    def test_completed_workflow_refuses_to_discard_symlinked_target(self) -> None:
+        self.study.options.discard_targets = True
+        stock = self.study.target(self.workload, "check", "stock")
+        outside = self.output.parent / "outside"
+        outside.mkdir()
+        sentinel = outside / "preserve"
+        sentinel.write_text("user artifact", encoding="utf-8")
+
+        def complete(*_: object) -> None:
+            stock.parent.mkdir(parents=True)
+            stock.symlink_to(outside, target_is_directory=True)
+
+        with (
+            mock.patch.object(self.study, "run_workflow", side_effect=complete),
+            mock.patch.object(self.study, "wait_until_idle"),
+            self.assertRaisesRegex(benchmark.BenchmarkError, "unsafe"),
+        ):
+            self.study.run_workflow_with_retries(self.workload, "check", 0)
+
+        self.assertEqual(sentinel.read_text(encoding="utf-8"), "user artifact")
 
 
 class ReversibleEditTests(unittest.TestCase):
