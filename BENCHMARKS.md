@@ -96,9 +96,9 @@ The runner clones the public repositories at exact benchmark-compatible source r
 Cloning requires network access, but the benchmark commands run offline, so Cargo dependencies must
 already be cached. `--dry-run` prints the benchmark plan without cloning or running a build.
 
-By default, the runner compares Rust 1.97.1 against `+ohm` across `uv`, `codex-tools`, and
-`codex-core`, using eight build jobs. Each workflow includes one cold build, three no-op runs, seven
-dependency edits, and five direct edits. Use `--project` to run a smaller matrix:
+By default, the runner compares Rust 1.97.1 against `+ohm` across `uv` and `codex-core`, using eight
+build jobs. Each workflow includes one cold build, three no-op runs, seven dependency edits, and five
+direct edits. Use `--project` to run a smaller matrix:
 
 ```console
 uv run scripts/benchmark.py \

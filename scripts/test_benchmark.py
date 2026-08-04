@@ -900,6 +900,23 @@ class RepositoryCloneTests(unittest.TestCase):
 
 
 class CommandLineTests(unittest.TestCase):
+    def test_default_matrix_contains_only_uv_and_codex_core(self) -> None:
+        arguments = benchmark.parser().parse_args([])
+
+        with (
+            mock.patch.object(benchmark, "command_output") as command_output,
+            contextlib.redirect_stdout(io.StringIO()) as console,
+        ):
+            study = benchmark.Study(arguments)
+            study.describe()
+
+        command_output.assert_not_called()
+        self.assertEqual(
+            [workload.name for workload in study.workloads], ["uv", "codex-core"]
+        )
+        self.assertIn("timed samples: 192", console.getvalue())
+        self.assertNotIn("codex-tools", console.getvalue())
+
     def test_rejects_duplicate_projects_before_accessing_repositories(self) -> None:
         arguments = benchmark.parser().parse_args(
             ["--project", "uv", "--project", "uv", "--uv-path", "/does/not/exist"]

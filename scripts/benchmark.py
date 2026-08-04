@@ -93,22 +93,6 @@ WORKLOADS = {
         ),
         "install_source::tests::detects_homebrew_cellar",
     ),
-    "codex-tools": Workload(
-        "codex-tools",
-        "codex",
-        "codex-tools",
-        "codex-rs",
-        CODEX_DEPENDENCY,
-        Edit(
-            "codex-rs/tools/src/tool_spec.rs",
-            'ToolSpec::ToolSearch { .. } => "tool_search",\n'
-            '            ToolSpec::WebSearch { .. } => "web_search",',
-            'ToolSpec::WebSearch { .. } => "web_search",\n'
-            '            ToolSpec::ToolSearch { .. } => "tool_search",',
-            "codex-tools",
-        ),
-        "tool_spec_name_covers_all_variants",
-    ),
     "codex-core": Workload(
         "codex-core",
         "codex",
