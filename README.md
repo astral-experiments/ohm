@@ -18,7 +18,7 @@ incremental builds can be 5x, 10x, or even 35x faster for common commands in lar
   <i>Checking, linting, and testing <code>codex-core</code> after editing a dependency.</i>
 </p>
 
-Compared to [Rust 1.97.1](./BENCHMARKS.md):
+Incremental builds after editing a dependency, compared to [Rust 1.97.1](./BENCHMARKS.md):
 
 | Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
 | ------- | -------------- | ----------: | -----: | ------: |
