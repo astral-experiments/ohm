@@ -20,6 +20,7 @@ import statistics
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from collections import defaultdict
 from collections.abc import Callable, Iterator
@@ -124,6 +125,21 @@ WORKLOADS = {
 WORKFLOWS = ("check", "clippy", "test")
 COMPILATION = re.compile(r"^\s*(?:Checking|Compiling)\s+([^\s]+)", re.MULTILINE)
 TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")
+COMPILER_PROCESSES = {
+    "cargo",
+    "cargo-nextest",
+    "nextest",
+    "rustc",
+    "rustdoc",
+    "clippy-driver",
+    "rust-lld",
+    "ld",
+    "ld64",
+    "clang",
+    "clang++",
+    "cc1",
+    "cc1plus",
+}
 
 
 def command_output(arguments: list[str], *, cwd: Path | None = None) -> str:
@@ -136,11 +152,53 @@ def command_output(arguments: list[str], *, cwd: Path | None = None) -> str:
             stderr=subprocess.PIPE,
             check=True,
         )
-    except (OSError, subprocess.CalledProcessError) as error:
+    except subprocess.CalledProcessError as error:
+        detail = error.stderr.strip() if error.stderr else str(error)
+        detail = re.sub(r"(https?://)[^/\s@]+@", r"\1<redacted>@", detail)
+        raise BenchmarkError(
+            f"command failed: {' '.join(arguments)}: {detail}"
+        ) from error
+    except OSError as error:
         raise BenchmarkError(
             f"command failed: {' '.join(arguments)}: {error}"
         ) from error
     return result.stdout.strip()
+
+
+def competing_processes(owner: int | None = None) -> list[str]:
+    """Return compiler processes outside this benchmark's own process tree."""
+    owner = os.getpid() if owner is None else owner
+    output = command_output(["ps", "-ax", "-o", "pid=,ppid=,comm="])
+    if not output:
+        raise BenchmarkError("process inspection returned no process information")
+
+    processes: dict[int, tuple[int, str]] = {}
+    for line in output.splitlines():
+        parts = line.split(None, 2)
+        if len(parts) != 3:
+            raise BenchmarkError(f"invalid process inspection result: {line!r}")
+        try:
+            process, parent = int(parts[0]), int(parts[1])
+        except ValueError as error:
+            raise BenchmarkError(
+                f"invalid process inspection result: {line!r}"
+            ) from error
+        processes[process] = parent, Path(parts[2]).name
+
+    def belongs_to_benchmark(process: int) -> bool:
+        visited: set[int] = set()
+        while process in processes and process not in visited:
+            if process == owner:
+                return True
+            visited.add(process)
+            process = processes[process][0]
+        return process == owner
+
+    return [
+        f"{process} {name}"
+        for process, (_, name) in processes.items()
+        if name in COMPILER_PROCESSES and not belongs_to_benchmark(process)
+    ]
 
 
 def edit_contents(worktree: Path, edit: Edit) -> tuple[Path, bytes, bytes]:
@@ -227,6 +285,12 @@ def parser() -> argparse.ArgumentParser:
     argument_parser.add_argument("--direct-runs", type=int, default=5)
     argument_parser.add_argument("--minimum-free-gb", type=int, default=10)
     argument_parser.add_argument("--timeout", type=int, default=1800)
+    argument_parser.add_argument(
+        "--require-idle",
+        action="store_true",
+        help="wait for unrelated Rust builds and reject samples that overlap them",
+    )
+    argument_parser.add_argument("--idle-timeout", type=int, default=900)
     argument_parser.add_argument("--dry-run", action="store_true")
     return argument_parser
 
@@ -256,9 +320,13 @@ class Study:
         ):
             if getattr(options, name) < 1:
                 raise BenchmarkError(f"--{name.replace('_', '-')} must be positive")
-        if options.timeout < 1 or options.minimum_free_gb < 0:
+        if (
+            options.timeout < 1
+            or options.idle_timeout < 1
+            or options.minimum_free_gb < 0
+        ):
             raise BenchmarkError(
-                "timeout must be positive and minimum free space nonnegative"
+                "timeouts must be positive and minimum free space nonnegative"
             )
         for _, selector in self.toolchains:
             if not selector or selector.startswith("-"):
@@ -459,6 +527,27 @@ class Study:
     def ordered_toolchains(self, index: int) -> tuple[tuple[str, str], ...]:
         return self.toolchains if index % 2 == 0 else self.toolchains[::-1]
 
+    def wait_until_idle(self) -> None:
+        if not (active := competing_processes()):
+            return
+        print(
+            "Waiting for unrelated compiler processes: " + ", ".join(active),
+            flush=True,
+        )
+        deadline = time.monotonic() + self.options.idle_timeout
+        idle_since: float | None = None
+        while time.monotonic() < deadline:
+            time.sleep(0.5)
+            if competing_processes():
+                idle_since = None
+                continue
+            now = time.monotonic()
+            if idle_since is None:
+                idle_since = now
+            elif now - idle_since >= 2:
+                return
+        raise BenchmarkError("timed out waiting for unrelated compiler processes")
+
     def execute(
         self,
         workload: Workload,
@@ -472,6 +561,8 @@ class Study:
         record: bool = True,
     ) -> None:
         self.check_disk()
+        if self.options.require_idle:
+            self.wait_until_idle()
         worktree = self.worktrees[workload.repository, label]
         directory = self.target(workload, workflow, label)
         directory.mkdir(parents=True, exist_ok=True)
@@ -496,6 +587,25 @@ class Study:
             f"{workload.name} {workflow} {phase} {label}: {' '.join(arguments)}",
             flush=True,
         )
+        interference: list[str] = []
+        monitor_errors: list[str] = []
+        stop_monitor = threading.Event()
+
+        def monitor_compilers() -> None:
+            while not stop_monitor.wait(0.5):
+                try:
+                    active = competing_processes()
+                except BenchmarkError as error:
+                    monitor_errors.append(str(error))
+                    return
+                if active:
+                    interference.extend(active)
+                    return
+
+        monitor: threading.Thread | None = None
+        if self.options.require_idle:
+            monitor = threading.Thread(target=monitor_compilers, daemon=True)
+            monitor.start()
         started = time.perf_counter()
         try:
             result = subprocess.run(
@@ -510,13 +620,33 @@ class Study:
             )
         except (OSError, subprocess.TimeoutExpired) as error:
             raise BenchmarkError(f"benchmark command failed: {error}") from error
-        duration = time.perf_counter() - started
+        finally:
+            duration = time.perf_counter() - started
+            stop_monitor.set()
+            if monitor is not None:
+                monitor.join()
         log.write_text(result.stdout, encoding="utf-8")
 
         failure: str | None = None
-        if result.returncode:
+        if monitor_errors:
+            failure = "compiler interference monitor failed: " + monitor_errors[0]
+        elif interference:
+            failure = "unrelated compiler overlapped benchmark: " + ", ".join(
+                interference
+            )
+        elif self.options.require_idle:
+            try:
+                interference = competing_processes()
+            except BenchmarkError as error:
+                failure = f"compiler interference monitor failed: {error}"
+            else:
+                if interference:
+                    failure = "unrelated compiler overlapped benchmark: " + ", ".join(
+                        interference
+                    )
+        if failure is None and result.returncode:
             failure = f"benchmark command exited {result.returncode}; inspect {log}"
-        else:
+        elif failure is None:
             try:
                 validate_output(
                     result.stdout,
@@ -539,6 +669,7 @@ class Study:
                     "repetition": repetition,
                     "wall_seconds": duration,
                     "returncode": result.returncode,
+                    "external_compilation": interference,
                     "valid": failure is None,
                     "command": arguments,
                     "target_directory": str(directory),

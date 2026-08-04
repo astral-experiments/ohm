@@ -5,6 +5,7 @@ from __future__ import annotations
 import contextlib
 import importlib.util
 import io
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -19,6 +20,138 @@ if SPEC is None or SPEC.loader is None:
 benchmark = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = benchmark
 SPEC.loader.exec_module(benchmark)
+
+
+class CommandOutputTests(unittest.TestCase):
+    def test_reports_captured_error_without_exposing_url_credentials(self) -> None:
+        command = ["git", "clone", "https://github.com/astral-sh/uv.git"]
+        failure = subprocess.CalledProcessError(
+            128,
+            command,
+            stderr="fatal: unable to access https://secret-token@github.com/astral-sh/uv.git: TLS handshake timeout",
+        )
+
+        with mock.patch.object(benchmark.subprocess, "run", side_effect=failure):
+            with self.assertRaises(benchmark.BenchmarkError) as raised:
+                benchmark.command_output(command)
+
+        message = str(raised.exception)
+        self.assertIn("TLS handshake timeout", message)
+        self.assertIn("https://<redacted>@github.com/astral-sh/uv.git", message)
+        self.assertNotIn("secret-token", message)
+
+
+class CompilerInterferenceTests(unittest.TestCase):
+    def test_ignores_only_compilers_in_the_benchmark_process_tree(self) -> None:
+        processes = "\n".join(
+            [
+                "10 1 uv",
+                "20 10 python3",
+                "30 20 cargo",
+                "40 30 rustc",
+                "50 1 cargo-nextest",
+                "60 50 cargo",
+                "70 60 rustc",
+                "80 1 clang",
+                "90 1 unrelated",
+            ]
+        )
+
+        with mock.patch.object(benchmark, "command_output", return_value=processes):
+            active = benchmark.competing_processes(owner=20)
+
+        self.assertEqual(
+            active, ["50 cargo-nextest", "60 cargo", "70 rustc", "80 clang"]
+        )
+
+    def test_process_inspection_fails_closed(self) -> None:
+        with mock.patch.object(
+            benchmark,
+            "command_output",
+            side_effect=benchmark.BenchmarkError("process visibility denied"),
+        ):
+            with self.assertRaisesRegex(benchmark.BenchmarkError, "visibility denied"):
+                benchmark.competing_processes(owner=20)
+
+        for output in ("", "invalid process"):
+            with self.subTest(output=output):
+                with mock.patch.object(
+                    benchmark, "command_output", return_value=output
+                ):
+                    with self.assertRaises(benchmark.BenchmarkError):
+                        benchmark.competing_processes(owner=20)
+
+    def test_idle_machine_starts_without_waiting(self) -> None:
+        study = object.__new__(benchmark.Study)
+        study.options = benchmark.parser().parse_args(["--require-idle"])
+
+        with (
+            mock.patch.object(benchmark, "competing_processes", return_value=[]),
+            mock.patch.object(benchmark.time, "sleep") as sleep,
+        ):
+            study.wait_until_idle()
+
+        sleep.assert_not_called()
+
+    def test_busy_machine_times_out_without_modifying_processes(self) -> None:
+        study = object.__new__(benchmark.Study)
+        study.options = benchmark.parser().parse_args(
+            ["--require-idle", "--idle-timeout", "600"]
+        )
+
+        with (
+            mock.patch.object(
+                benchmark, "competing_processes", return_value=["100 cargo"]
+            ),
+            mock.patch.object(benchmark.time, "monotonic", side_effect=[0, 601]),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            with self.assertRaisesRegex(benchmark.BenchmarkError, "timed out"):
+                study.wait_until_idle()
+
+    def test_overlapping_compiler_invalidates_and_persists_the_sample(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "results"
+            (output / "logs").mkdir(parents=True)
+            worktree = Path(directory) / "source"
+            worktree.mkdir()
+            workload = benchmark.WORKLOADS["uv"]
+            study = object.__new__(benchmark.Study)
+            study.options = benchmark.parser().parse_args(
+                ["--require-idle", "--output-dir", str(output)]
+            )
+            study.output = output
+            study.workloads = [workload]
+            study.toolchains = (("stock", "1.97.1"), ("ohm", "ohm"))
+            study.worktrees = {("uv", "stock"): worktree}
+            study.samples = []
+            study.metadata = {}
+            result = subprocess.CompletedProcess(
+                [], 0, stdout="    Finished dev profile\n"
+            )
+
+            with (
+                mock.patch.object(study, "wait_until_idle"),
+                mock.patch.object(
+                    benchmark, "competing_processes", return_value=["100 cargo"]
+                ),
+                mock.patch.object(benchmark.subprocess, "run", return_value=result),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                with self.assertRaisesRegex(benchmark.BenchmarkError, "overlapped"):
+                    study.execute(
+                        workload,
+                        "check",
+                        "stock",
+                        "1.97.1",
+                        phase="noop",
+                        repetition=0,
+                        expected_crate=None,
+                    )
+
+            self.assertFalse(study.samples[0]["valid"])
+            self.assertEqual(study.samples[0]["external_compilation"], ["100 cargo"])
+            self.assertTrue((output / "results.json").is_file())
 
 
 class ReversibleEditTests(unittest.TestCase):

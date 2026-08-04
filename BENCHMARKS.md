@@ -112,5 +112,7 @@ control the sample counts; and `--output-dir` to choose a new or empty directory
 and Markdown summary.
 
 The runner creates temporary Git worktrees, isolates Cargo target directories by workflow and
-toolchain, and applies reversible edits without modifying the original checkouts. Run benchmarks
-without other active Rust builds; Cargo lock contention invalidates the affected samples.
+toolchain, and applies reversible edits without modifying the original checkouts. Pass
+`--require-idle` to wait for other Rust builds to finish and reject overlapping samples;
+`--idle-timeout` controls the maximum wait, which defaults to 900 seconds. Cargo lock contention
+also invalidates affected samples.
