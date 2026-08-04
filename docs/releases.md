@@ -63,10 +63,10 @@ gh workflow run release.yml --repo astral-sh/ohm --ref main \
 
 The workflow verifies source revisions, builds both complete stage-2 Rust distributions, and
 generates one universal installer with both archive checksums embedded. It smoke-tests that exact
-installer on macOS and Linux before creating the private GitHub Release. It then tags each source
-repository at its pinned revision using the toolchain name before publishing the public assets.
-Existing tags at the expected commit are reused; conflicting tags fail the release without being moved
-or deleted.
+installer on macOS and Linux before checking existing source tags across all four repositories and
+tagging any missing pinned revisions with the toolchain name. Existing tags at the expected commit
+are reused; conflicting immutable tags fail the release before any new source tags are created. The
+workflow then creates the private GitHub Release and publishes the public assets.
 
 Release notes include version-pinned installation instructions, usage examples, the development-only
 safety warning, and public download links alongside the generated changelog. Internal smoke tests use
