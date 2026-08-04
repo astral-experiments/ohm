@@ -10,12 +10,12 @@ incremental builds can be 5x, 10x, or even 35x faster for common commands in lar
   <picture align="center">
     <source media="(prefers-color-scheme: dark)" srcset="./assets/svg/Benchmark-Dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="./assets/svg/Benchmark-Light.svg">
-    <img alt="Shows a bar chart comparing codex-core Clippy times." src="./assets/svg/Benchmark-Light.svg">
+    <img alt="Shows a bar chart comparing codex-core check, Clippy, and test times." src="./assets/svg/Benchmark-Light.svg">
   </picture>
 </p>
 
 <p align="center">
-  <i>Linting <code>codex-core</code> after editing a dependency.</i>
+  <i>Checking, linting, and testing <code>codex-core</code> after editing a dependency.</i>
 </p>
 
 Compared to [Rust 1.97.1](./BENCHMARKS.md):

@@ -1,29 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="550" height="70" viewBox="0 0 550 70" role="img" aria-labelledby="benchmark-title benchmark-description">
-  <title id="benchmark-title">Incremental codex-core Clippy benchmark</title>
-  <desc id="benchmark-description">After editing a dependency, Clippy takes 0.64 seconds with Ohm and 22.61 seconds with Rust 1.97.1.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="570" height="166" viewBox="0 0 570 166" role="img" aria-labelledby="benchmark-title benchmark-description">
+  <title id="benchmark-title">Incremental codex-core build benchmarks</title>
+  <desc id="benchmark-description">After editing a dependency, checking takes 0.52 seconds with Ohm and 7.74 seconds with Rust 1.97.1, Clippy takes 0.64 seconds with Ohm and 22.61 seconds with Rust 1.97.1, and testing takes 4.22 seconds with Ohm and 22.28 seconds with Rust 1.97.1.</desc>
 
   <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji'" font-size="12" fill="#333333">
     <g aria-hidden="true" fill="none" stroke="rgba(127,127,127,0.25)" stroke-width="1">
-      <path d="M105.5 2v46M265.5 2v46M425.5 2v46M505.5 2v46"/>
+      <path d="M125.5 2v136M285.5 2v136M445.5 2v136M525.5 2v136"/>
     </g>
 
-    <g aria-label="Ohm: 0.64 seconds">
-      <text x="95" y="18.5" text-anchor="end" font-weight="bold">Ohm</text>
-      <path d="M105 8h10.24v13h-10.24Z" fill="#E15759"/>
-      <text x="121.24" y="18.5" font-weight="bold">0.64s</text>
+    <g aria-label="check with Ohm: 0.52 seconds">
+      <text x="114" y="18.5" text-anchor="end" font-weight="bold">check · Ohm</text>
+      <path d="M125 8h8.32v13h-8.32Z" fill="#E15759"/>
+      <text x="139.32" y="18.5" font-weight="bold">0.52s</text>
+    </g>
+    <g aria-label="check with Rust 1.97.1: 7.74 seconds">
+      <text x="114" y="41" text-anchor="end">check · Rust</text>
+      <path d="M125 30.5h123.84v13h-123.84Z" fill="#E15759"/>
+      <text x="254.84" y="41">7.74s</text>
     </g>
 
-    <g aria-label="Rust 1.97.1: 22.61 seconds">
-      <text x="95" y="41" text-anchor="end">Rust 1.97.1</text>
-      <path d="M105 30.5h361.76v13h-361.76Z" fill="#E15759"/>
-      <text x="472.76" y="41">22.61s</text>
+    <g aria-label="Clippy with Ohm: 0.64 seconds">
+      <text x="114" y="63.5" text-anchor="end" font-weight="bold">clippy · Ohm</text>
+      <path d="M125 53h10.24v13h-10.24Z" fill="#E15759"/>
+      <text x="141.24" y="63.5" font-weight="bold">0.64s</text>
+    </g>
+    <g aria-label="Clippy with Rust 1.97.1: 22.61 seconds">
+      <text x="114" y="86" text-anchor="end">clippy · Rust</text>
+      <path d="M125 75.5h361.76v13h-361.76Z" fill="#E15759"/>
+      <text x="492.76" y="86">22.61s</text>
+    </g>
+
+    <g aria-label="test with Ohm: 4.22 seconds">
+      <text x="114" y="108.5" text-anchor="end" font-weight="bold">test · Ohm</text>
+      <path d="M125 98h67.52v13h-67.52Z" fill="#E15759"/>
+      <text x="198.52" y="108.5" font-weight="bold">4.22s</text>
+    </g>
+    <g aria-label="test with Rust 1.97.1: 22.28 seconds">
+      <text x="114" y="131" text-anchor="end">test · Rust</text>
+      <path d="M125 120.5h356.48v13h-356.48Z" fill="#E15759"/>
+      <text x="487.48" y="131">22.28s</text>
     </g>
 
     <g aria-hidden="true" text-anchor="middle">
-      <text x="105" y="63">0s</text>
-      <text x="265" y="63">10s</text>
-      <text x="425" y="63">20s</text>
-      <text x="505" y="63">25s</text>
+      <text x="125" y="154">0s</text>
+      <text x="285" y="154">10s</text>
+      <text x="445" y="154">20s</text>
+      <text x="525" y="154">25s</text>
     </g>
   </g>
 </svg>
