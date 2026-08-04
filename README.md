@@ -6,6 +6,18 @@
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
 incremental builds can be 5x, 10x, or even 35x faster for common commands in large workspaces.
 
+<p align="center">
+  <picture align="center">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/svg/Benchmark-Dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="./assets/svg/Benchmark-Light.svg">
+    <img alt="Compares Rust and Ohm check, Clippy, and test times after a codex-core dependency edit." src="./assets/svg/Benchmark-Light.svg">
+  </picture>
+</p>
+
+<p align="center">
+  <i>Incremental <code>codex-core</code> builds after editing a dependency.</i>
+</p>
+
 Compared to [Rust 1.97.1](./BENCHMARKS.md):
 
 | Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
