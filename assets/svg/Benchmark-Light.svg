@@ -1,58 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="254" viewBox="0 0 640 254" role="img" aria-labelledby="benchmark-title benchmark-description">
-  <title id="benchmark-title">Incremental codex-core builds with Rust and Ohm</title>
-  <desc id="benchmark-description">After editing a dependency, cargo check takes 7.74 seconds with Rust and 0.52 seconds with Ohm, a 15.01 times speedup. Clippy takes 22.61 seconds with Rust and 0.64 seconds with Ohm, a 35.24 times speedup. Tests take 22.28 seconds with Rust and 4.22 seconds with Ohm, a 5.28 times speedup.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="550" height="70" viewBox="0 0 550 70" role="img" aria-labelledby="benchmark-title benchmark-description">
+  <title id="benchmark-title">Incremental codex-core Clippy benchmark</title>
+  <desc id="benchmark-description">After editing a dependency, Clippy takes 0.64 seconds with Ohm and 22.61 seconds with Rust 1.97.1.</desc>
 
-  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#333333">
-    <text x="10" y="20" font-size="13" font-weight="600">Incremental builds after a dependency edit</text>
-    <text x="631" y="20" text-anchor="end" fill="#59636E">codex-core</text>
-
-    <g aria-hidden="true" fill="none" stroke="rgba(127,127,127,0.20)" stroke-width="1">
-      <path d="M192.5 40v172M270.5 40v172M348.5 40v172M426.5 40v172M504.5 40v172M582.5 40v172"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji'" font-size="12" fill="#333333">
+    <g aria-hidden="true" fill="none" stroke="rgba(127,127,127,0.25)" stroke-width="1">
+      <path d="M105.5 2v46M265.5 2v46M425.5 2v46M505.5 2v46"/>
     </g>
 
-    <g aria-label="cargo check: Rust 7.74 seconds, Ohm 0.52 seconds, 15.01 times faster">
-      <text x="10" y="56" font-weight="600">cargo check</text>
-      <rect x="10" y="64" width="61" height="18" rx="9" fill="#DDF5F2"/>
-      <text x="40.5" y="76.5" text-anchor="middle" font-size="11" font-weight="600" fill="#08756F">15.01×</text>
-      <text x="179" y="57.5" text-anchor="end" fill="#59636E">Rust 1.97.1</text>
-      <rect x="192" y="47" width="120.74" height="13" rx="2" fill="#E47778"/>
-      <text x="320.74" y="57.5">7.74s</text>
-      <text x="179" y="79.5" text-anchor="end" font-weight="600">Ohm</text>
-      <rect x="192" y="69" width="8.11" height="13" rx="2" fill="#078E87"/>
-      <text x="208.11" y="79.5" font-weight="600">0.52s</text>
+    <g aria-label="Ohm: 0.64 seconds">
+      <text x="95" y="18.5" text-anchor="end" font-weight="bold">Ohm</text>
+      <path d="M105 8h10.24v13h-10.24Z" fill="#E15759"/>
+      <text x="121.24" y="18.5" font-weight="bold">0.64s</text>
     </g>
 
-    <g aria-label="just clippy: Rust 22.61 seconds, Ohm 0.64 seconds, 35.24 times faster">
-      <text x="10" y="119" font-weight="600">just clippy</text>
-      <rect x="10" y="127" width="61" height="18" rx="9" fill="#DDF5F2"/>
-      <text x="40.5" y="139.5" text-anchor="middle" font-size="11" font-weight="600" fill="#08756F">35.24×</text>
-      <text x="179" y="120.5" text-anchor="end" fill="#59636E">Rust 1.97.1</text>
-      <rect x="192" y="110" width="352.72" height="13" rx="2" fill="#E47778"/>
-      <text x="552.72" y="120.5">22.61s</text>
-      <text x="179" y="142.5" text-anchor="end" font-weight="600">Ohm</text>
-      <rect x="192" y="132" width="9.98" height="13" rx="2" fill="#078E87"/>
-      <text x="209.98" y="142.5" font-weight="600">0.64s</text>
+    <g aria-label="Rust 1.97.1: 22.61 seconds">
+      <text x="95" y="41" text-anchor="end">Rust 1.97.1</text>
+      <path d="M105 30.5h361.76v13h-361.76Z" fill="#E15759"/>
+      <text x="472.76" y="41">22.61s</text>
     </g>
 
-    <g aria-label="just test: Rust 22.28 seconds, Ohm 4.22 seconds, 5.28 times faster">
-      <text x="10" y="182" font-weight="600">just test</text>
-      <rect x="10" y="190" width="55" height="18" rx="9" fill="#DDF5F2"/>
-      <text x="37.5" y="202.5" text-anchor="middle" font-size="11" font-weight="600" fill="#08756F">5.28×</text>
-      <text x="179" y="183.5" text-anchor="end" fill="#59636E">Rust 1.97.1</text>
-      <rect x="192" y="173" width="347.57" height="13" rx="2" fill="#E47778"/>
-      <text x="547.57" y="183.5">22.28s</text>
-      <text x="179" y="205.5" text-anchor="end" font-weight="600">Ohm</text>
-      <rect x="192" y="195" width="65.83" height="13" rx="2" fill="#078E87"/>
-      <text x="265.83" y="205.5" font-weight="600">4.22s</text>
-    </g>
-
-    <g aria-hidden="true" fill="#59636E" font-size="11" text-anchor="middle">
-      <text x="192" y="231">0s</text>
-      <text x="270" y="231">5s</text>
-      <text x="348" y="231">10s</text>
-      <text x="426" y="231">15s</text>
-      <text x="504" y="231">20s</text>
-      <text x="582" y="231">25s</text>
+    <g aria-hidden="true" text-anchor="middle">
+      <text x="105" y="63">0s</text>
+      <text x="265" y="63">10s</text>
+      <text x="425" y="63">20s</text>
+      <text x="505" y="63">25s</text>
     </g>
   </g>
 </svg>
