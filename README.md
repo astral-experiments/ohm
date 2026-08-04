@@ -4,18 +4,21 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
-incremental builds can be 5x, 10, or even 20x faster for common commands in large workspaces.
+incremental builds can be 5x, 10x, or even 35x faster for common commands in large workspaces.
 
 Compared to [Rust 1.97.1](./BENCHMARKS.md):
 
-| Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
-| ------- | -------------- | ----------: | -----: | ------: |
-| uv      | `cargo check`  |      4.47 s | 0.43 s |  10.38× |
-| uv      | `cargo clippy` |      8.58 s | 0.44 s |  19.66× |
-| uv      | `cargo test`   |      9.15 s | 1.13 s |   8.10× |
-| Codex   | `cargo check`  |      4.68 s | 0.61 s |   7.70× |
-| Codex   | `just clippy`  |      8.33 s | 0.68 s |  12.19× |
-| Codex   | `just test`    |      8.30 s | 1.97 s |   4.22× |
+| Project       | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
+| ------------- | -------------- | ----------: | -----: | ------: |
+| uv            | `cargo check`  |      4.62 s | 0.32 s |  14.38× |
+| uv            | `cargo clippy` |      8.63 s | 0.34 s |  25.04× |
+| uv            | `cargo test`   |      9.23 s | 1.10 s |   8.42× |
+| Codex (tools) | `cargo check`  |      4.51 s | 0.43 s |  10.61× |
+| Codex (tools) | `just clippy`  |      8.69 s | 0.53 s |  16.49× |
+| Codex (tools) | `just test`    |      8.30 s | 1.67 s |   4.97× |
+| Codex (core)  | `cargo check`  |      7.74 s | 0.52 s |  15.01× |
+| Codex (core)  | `just clippy`  |     22.61 s | 0.64 s |  35.24× |
+| Codex (core)  | `just test`    |     22.28 s | 4.22 s |   5.28× |
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
