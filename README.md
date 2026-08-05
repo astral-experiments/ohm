@@ -8,14 +8,20 @@ incremental builds can be 5x, 10x, or even 35x faster for common commands in lar
 
 Compared to [Rust 1.97.1](./BENCHMARKS.md):
 
-| Project | Workflow       | Rust 1.97.1 |    Ohm | Speedup |
-| ------- | -------------- | ----------: | -----: | ------: |
-| uv      | `cargo check`  |      4.62 s | 0.32 s |  14.38× |
-| uv      | `cargo clippy` |      8.63 s | 0.34 s |  25.04× |
-| uv      | `cargo test`   |      9.23 s | 1.10 s |   8.42× |
-| Codex   | `cargo check`  |      7.74 s | 0.52 s |  15.01× |
-| Codex   | `just clippy`  |     22.61 s | 0.64 s |  35.24× |
-| Codex   | `just test`    |     22.28 s | 4.22 s |   5.28× |
+| Project | Workflow       | Edited crate                      | Rust 1.97.1 | Ohm 1.97.1-5 | Speedup |
+| ------- | -------------- | --------------------------------- | ----------: | -----------: | ------: |
+| uv      | `cargo check`  | `uv` (target)                     |      0.92 s |       1.11 s |   0.82× |
+| uv      | `cargo check`  | `uv-normalize` (dependency)       |      4.62 s |       0.32 s |  14.38× |
+| uv      | `cargo clippy` | `uv` (target)                     |      1.96 s |       1.57 s |   1.25× |
+| uv      | `cargo clippy` | `uv-normalize` (dependency)       |      8.63 s |       0.34 s |  25.04× |
+| uv      | `cargo test`   | `uv` (target)                     |      2.73 s |       3.08 s |   0.88× |
+| uv      | `cargo test`   | `uv-normalize` (dependency)       |      9.23 s |       1.10 s |   8.42× |
+| Codex   | `cargo check`  | `codex-core` (target)             |      1.90 s |       2.36 s |   0.80× |
+| Codex   | `cargo check`  | `codex-utils-string` (dependency) |      7.74 s |       0.52 s |  15.01× |
+| Codex   | `just clippy`  | `codex-core` (target)             |     10.93 s |       6.87 s |   1.59× |
+| Codex   | `just clippy`  | `codex-utils-string` (dependency) |     22.61 s |       0.64 s |  35.24× |
+| Codex   | `just test`    | `codex-core` (target)             |     11.14 s |      14.85 s |   0.75× |
+| Codex   | `just test`    | `codex-utils-string` (dependency) |     22.28 s |       4.22 s |   5.28× |
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
