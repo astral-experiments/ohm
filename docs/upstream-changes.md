@@ -22,6 +22,8 @@ sources of truth for the current changes and release revisions.
 - [#14: Skip irrelevant foreign specialization impls](https://github.com/astral-sh/ohm-rust/pull/14)
 - [#15: Cache successful privacy walks within each module](https://github.com/astral-sh/ohm-rust/pull/15)
 - [#16: Avoid allocating when compiler strings need no escaping](https://github.com/astral-sh/ohm-rust/pull/16)
+- [#17: Prune unreachable metadata before public API hashing](https://github.com/astral-sh/ohm-rust/pull/17)
+- [#18: Pin Cargo with terminal public API hash optimization](https://github.com/astral-sh/ohm-rust/pull/18)
 
 ## ohm-cargo
 
@@ -45,6 +47,7 @@ sources of truth for the current changes and release revisions.
 - [#21: Keep cached relink objects out of dependency search paths](https://github.com/astral-sh/ohm-cargo/pull/21)
 - [#22: Avoid embedding crate metadata in Ohm library artifacts](https://github.com/astral-sh/ohm-cargo/pull/22)
 - [#25: Avoid saving unnecessary temporaries for cached relinking](https://github.com/astral-sh/ohm-cargo/pull/25)
+- [#26: Skip public API hashing for terminal check targets](https://github.com/astral-sh/ohm-cargo/pull/26)
 
 ## ohm-rust-clippy
 
