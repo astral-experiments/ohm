@@ -17,6 +17,11 @@ sources of truth for the current changes and release revisions.
 - [#8: Emit reusable link state while linking normally](https://github.com/astral-sh/ohm-rust/pull/8)
 - [#10: Skip codegen objects when indexing crate search paths](https://github.com/astral-sh/ohm-rust/pull/10)
 - [#11: Reuse green-marking edges during incremental query promotion](https://github.com/astral-sh/ohm-rust/pull/11)
+- [#12: Preserve reusable link objects without saving all compiler temporaries](https://github.com/astral-sh/ohm-rust/pull/12)
+- [#13: Index loaded crates by name and public API hash](https://github.com/astral-sh/ohm-rust/pull/13)
+- [#14: Skip irrelevant foreign specialization impls](https://github.com/astral-sh/ohm-rust/pull/14)
+- [#15: Cache successful privacy walks within each module](https://github.com/astral-sh/ohm-rust/pull/15)
+- [#16: Avoid allocating when compiler strings need no escaping](https://github.com/astral-sh/ohm-rust/pull/16)
 
 ## ohm-cargo
 
@@ -39,6 +44,7 @@ sources of truth for the current changes and release revisions.
 - [#16: Cache workspace resolution across Cargo invocations](https://github.com/astral-sh/ohm-cargo/pull/16)
 - [#21: Keep cached relink objects out of dependency search paths](https://github.com/astral-sh/ohm-cargo/pull/21)
 - [#22: Avoid embedding crate metadata in Ohm library artifacts](https://github.com/astral-sh/ohm-cargo/pull/22)
+- [#25: Avoid saving unnecessary temporaries for cached relinking](https://github.com/astral-sh/ohm-cargo/pull/25)
 
 ## ohm-rust-clippy
 
