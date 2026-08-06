@@ -24,6 +24,8 @@ sources of truth for the current changes and release revisions.
 - [#16: Avoid allocating when compiler strings need no escaping](https://github.com/astral-sh/ohm-rust/pull/16)
 - [#17: Prune unreachable metadata before public API hashing](https://github.com/astral-sh/ohm-rust/pull/17)
 - [#18: Pin Cargo with terminal public API hash optimization](https://github.com/astral-sh/ohm-rust/pull/18)
+- [#19: Restore generic sharing under public API hashing](https://github.com/astral-sh/ohm-rust/pull/19)
+- [#20: Pin Cargo with conditional metadata pipelining](https://github.com/astral-sh/ohm-rust/pull/20)
 
 ## ohm-cargo
 
@@ -48,6 +50,7 @@ sources of truth for the current changes and release revisions.
 - [#22: Avoid embedding crate metadata in Ohm library artifacts](https://github.com/astral-sh/ohm-cargo/pull/22)
 - [#25: Avoid saving unnecessary temporaries for cached relinking](https://github.com/astral-sh/ohm-cargo/pull/25)
 - [#26: Skip public API hashing for terminal check targets](https://github.com/astral-sh/ohm-cargo/pull/26)
+- [#27: Pipeline early-cutoff dependencies when public APIs change](https://github.com/astral-sh/ohm-cargo/pull/27)
 
 ## ohm-rust-clippy
 
