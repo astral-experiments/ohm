@@ -26,6 +26,12 @@ sources of truth for the current changes and release revisions.
 - [#18: Pin Cargo with terminal public API hash optimization](https://github.com/astral-sh/ohm-rust/pull/18)
 - [#19: Restore generic sharing under public API hashing](https://github.com/astral-sh/ohm-rust/pull/19)
 - [#20: Pin Cargo with conditional metadata pipelining](https://github.com/astral-sh/ohm-rust/pull/20)
+- [#22: Reuse monomorphization partitions across incremental builds](https://github.com/astral-sh/ohm-rust/pull/22)
+- [#21: Skip unnecessary integration-test relinking](https://github.com/astral-sh/ohm-rust/pull/21)
+- [#23: Reuse monomorphization partitions after library closure edits](https://github.com/astral-sh/ohm-rust/pull/23)
+- [#24: Reuse metadata prefixes across incremental builds](https://github.com/astral-sh/ohm-rust/pull/24)
+- [#26: Pin Cargo with unused integration dependency reuse](https://github.com/astral-sh/ohm-rust/pull/26)
+- [#25: Add explicit focused test-harness compilation](https://github.com/astral-sh/ohm-rust/pull/25)
 
 ## ohm-cargo
 
@@ -51,6 +57,8 @@ sources of truth for the current changes and release revisions.
 - [#25: Avoid saving unnecessary temporaries for cached relinking](https://github.com/astral-sh/ohm-cargo/pull/25)
 - [#26: Skip public API hashing for terminal check targets](https://github.com/astral-sh/ohm-cargo/pull/26)
 - [#27: Pipeline early-cutoff dependencies when public APIs change](https://github.com/astral-sh/ohm-cargo/pull/27)
+- [#28: Skip relinking integration tests with unused package libraries](https://github.com/astral-sh/ohm-cargo/pull/28)
+- [#29: Reuse integration executables across unused dependency changes](https://github.com/astral-sh/ohm-cargo/pull/29)
 
 ## ohm-rust-clippy
 
