@@ -704,6 +704,13 @@ class SourcePreflightTests(unittest.TestCase):
 
 
 class PublicRepositoryTests(unittest.TestCase):
+    def test_uv_direct_edit_expands_homebrew_formula_detection(self) -> None:
+        edit = benchmark.WORKLOADS["uv"].direct
+
+        self.assertEqual(edit.before, "component == cellar && next == formula")
+        self.assertIn('next == OsStr::new("uv-preview")', edit.after)
+        self.assertIn("\n", edit.after)
+
     def test_default_repositories_use_exact_public_pinned_revisions(self) -> None:
         self.assertEqual(
             benchmark.REPOSITORIES,
