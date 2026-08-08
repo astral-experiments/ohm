@@ -32,6 +32,9 @@ sources of truth for the current changes and release revisions.
 - [#24: Reuse metadata prefixes across incremental builds](https://github.com/astral-sh/ohm-rust/pull/24)
 - [#26: Pin Cargo with unused integration dependency reuse](https://github.com/astral-sh/ohm-rust/pull/26)
 - [#25: Add explicit focused test-harness compilation](https://github.com/astral-sh/ohm-rust/pull/25)
+- [#27: Partition upstream generics by their local callers](https://github.com/astral-sh/ohm-rust/pull/27)
+- [#28: Keep incremental codegen-unit merges stable across edits](https://github.com/astral-sh/ohm-rust/pull/28)
+- [#29: Pin Cargo with incremental codegen defaults](https://github.com/astral-sh/ohm-rust/pull/29)
 
 ## ohm-cargo
 
@@ -59,6 +62,8 @@ sources of truth for the current changes and release revisions.
 - [#27: Pipeline early-cutoff dependencies when public APIs change](https://github.com/astral-sh/ohm-cargo/pull/27)
 - [#28: Skip relinking integration tests with unused package libraries](https://github.com/astral-sh/ohm-cargo/pull/28)
 - [#29: Reuse integration executables across unused dependency changes](https://github.com/astral-sh/ohm-cargo/pull/29)
+- [#30: Add opt-in focused test compilation](https://github.com/astral-sh/ohm-cargo/pull/30)
+- [#31: Enable incremental codegen optimizations for workspace builds](https://github.com/astral-sh/ohm-cargo/pull/31)
 
 ## ohm-rust-clippy
 

@@ -52,7 +52,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-9/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-10/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -75,7 +75,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-9 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-10 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, and proc-macro caching by default.
 Use its aggregate opt-out to compare against the same compiler and Cargo without those defaults:
@@ -112,6 +112,8 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Reachability-pruned public API hashing for crates that still require it.
 - Shared generic monomorphizations across crates, with public API hashes tracking reusable symbols.
 - Reused monomorphization partitions after private function and library-closure edits.
+- Caller-local partitioning of upstream generic instances that capture local closures.
+- Stable incremental codegen-unit merging that preserves reusable work products across edits.
 - Reused encoded metadata prefixes when private edits preserve metadata dependencies.
 - Conditional metadata pipelining when a dependency's public API changes, with crash-safe recovery.
 - Reused integration-test executables when changed package or workspace libraries are unused.
@@ -119,17 +121,23 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Experimental procedural-macro caching (`rustc -Zcache-proc-macros`).
 - Backported Clippy optimizations, including combined lint passes.
 
-Ohm also includes an explicitly requested, experimental exact-test harness filter
-(`rustc -Ztest-harness-filter=<full-test-name>`). It is not enabled by default, does not support
-normal Cargo or nextest discovery, and can omit backend or linker diagnostics from unselected tests.
+Ohm also includes explicitly requested, experimental focused test compilation. To compile only one
+exact library test, pass `-Zohm-focused-tests` before the Cargo subcommand:
+
+```console
+cargo +ohm -Zohm-focused-tests test -p <package> --lib <full-test-name> -- --exact
+```
+
+This mode is not enabled by default, does not support nextest discovery or coverage, and can omit
+backend or linker diagnostics from unselected tests.
 
 Ohm is exclusively intended for local development: never use it for production builds or releases,
 and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-8` and
-`ohm-1.97.1-9`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-9` and
+`ohm-1.97.1-10`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:
