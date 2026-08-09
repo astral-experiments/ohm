@@ -88,7 +88,9 @@ WORKLOADS = {
         Edit(
             "crates/uv/src/install_source.rs",
             "component == cellar && next == formula",
-            "next == formula && component == cellar",
+            "{\n"
+            '                component == cellar && (next == formula || next == OsStr::new("uv-preview"))\n'
+            "            }",
             "uv",
         ),
         "install_source::tests::detects_homebrew_cellar",
