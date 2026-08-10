@@ -896,6 +896,13 @@ class FeatureWorkflowTests(unittest.TestCase):
 
         with (
             mock.patch.object(
+                benchmark.shutil, "which", return_value="/trusted/rustup/bin/cargo"
+            ),
+            mock.patch.dict(
+                benchmark.os.environ,
+                {"PATH": "/opaque/virtualenv/bin:/trusted/rustup/bin:/usr/bin"},
+            ),
+            mock.patch.object(
                 self.study,
                 "managed_shared_worktrees",
                 return_value=contextlib.nullcontext(peers),
@@ -909,10 +916,12 @@ class FeatureWorkflowTests(unittest.TestCase):
             ["seed", "seed", "reuse", "reuse"],
         )
         build_roots: dict[str, set[str]] = {"stock": set(), "ohm": set()}
+        executable_paths: dict[str, set[str]] = {"stock": set(), "ohm": set()}
         targets: dict[str, list[Path]] = {"stock": [], "ohm": []}
         for call in execute.call_args_list:
             label = str(call.args[2])
             build_root = call.kwargs["extra_environment"]["CARGO_BUILD_BUILD_DIR"]
+            executable_paths[label].add(call.kwargs["extra_environment"]["PATH"])
             target = call.kwargs["target_directory"]
             build_roots[label].add(build_root)
             targets[label].append(target)
@@ -923,12 +932,30 @@ class FeatureWorkflowTests(unittest.TestCase):
                 self.assertEqual(call.kwargs["worktree"], peers[label])
         self.assertEqual(len(build_roots["stock"]), 1)
         self.assertEqual(len(build_roots["ohm"]), 1)
+        expected_path = {"/trusted/rustup/bin:/usr/bin:/bin"}
+        self.assertEqual(executable_paths["stock"], expected_path)
+        self.assertEqual(executable_paths["ohm"], expected_path)
         self.assertNotEqual(build_roots["stock"], build_roots["ohm"])
         self.assertNotEqual(targets["stock"][0], targets["stock"][1])
         self.assertNotEqual(targets["ohm"][0], targets["ohm"][1])
         for peer in peers.values():
             source = peer / workload.direct.path
             self.assertEqual(source.read_text(encoding="utf-8"), workload.direct.before)
+
+    def test_shared_build_rejects_missing_or_relative_cargo_proxy(self) -> None:
+        workload = benchmark.WORKLOADS["uv"]
+        for cargo in (None, "relative/cargo"):
+            with self.subTest(cargo=cargo):
+                with (
+                    mock.patch.object(benchmark.shutil, "which", return_value=cargo),
+                    mock.patch.object(self.study, "managed_shared_worktrees") as peers,
+                    self.assertRaisesRegex(
+                        benchmark.BenchmarkError, "absolute Cargo executable"
+                    ),
+                ):
+                    self.study.run_shared_build(workload, 0)
+
+                peers.assert_not_called()
 
     def test_shared_build_rejects_marker_without_immutable_registry_artifacts(
         self,

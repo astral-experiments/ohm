@@ -99,7 +99,8 @@ CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
 ```
 
 Workspace artifacts and final outputs remain private to each checkout. Sharing is disabled when the
-build directory overlaps a checkout's target directory or Ohm's defaults are turned off.
+build directory overlaps a checkout's target directory, Ohm's defaults are turned off, or native
+build tools resolve to unverified user-controlled wrappers.
 
 ## Philosophy
 

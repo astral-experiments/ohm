@@ -929,6 +929,14 @@ class Study:
 
     def run_shared_build(self, workload: Workload, index: int) -> None:
         workflow = "shared-build"
+        # Keep both arms on the same rustup proxy and trusted system tools; an
+        # unrelated virtualenv CMake wrapper must not disable registry sharing.
+        cargo = shutil.which("cargo")
+        if cargo is None or not Path(cargo).is_absolute():
+            raise BenchmarkError("shared builds require an absolute Cargo executable")
+        executable_path = os.pathsep.join(
+            dict.fromkeys((str(Path(cargo).parent), "/usr/bin", "/bin"))
+        )
         with self.managed_shared_worktrees(workload) as worktrees:
             for label, selector in self.ordered_toolchains(index):
                 root = self.target(workload, workflow, label)
@@ -943,7 +951,8 @@ class Study:
                     record=False,
                     target_directory=root / "primary-target",
                     extra_environment={
-                        "CARGO_BUILD_BUILD_DIR": str(root / "shared-build")
+                        "CARGO_BUILD_BUILD_DIR": str(root / "shared-build"),
+                        "PATH": executable_path,
                     },
                 )
                 if label == "ohm":
@@ -974,7 +983,8 @@ class Study:
                         worktree=worktrees[label],
                         target_directory=root / "secondary-target",
                         extra_environment={
-                            "CARGO_BUILD_BUILD_DIR": str(root / "shared-build")
+                            "CARGO_BUILD_BUILD_DIR": str(root / "shared-build"),
+                            "PATH": executable_path,
                         },
                     )
 

@@ -119,8 +119,10 @@ the existing check, Clippy, and test matrix:
   real incremental-formatting snapshot before its results are accepted.
 - **Shared-worktree builds:** Build `uv` or `codex-core` in one checkout, then measure a build with a
   real workspace edit in a second checkout at the same revision. Both toolchains receive the same
-  explicit `CARGO_BUILD_BUILD_DIR` and separate checkout-private target directories. Ohm must
-  publish its shared-cache marker and immutable registry artifacts before its results are accepted.
+  explicit `CARGO_BUILD_BUILD_DIR`, separate checkout-private target directories, and a trusted
+  system-native-tool `PATH`. Unverified user-installed native-tool wrappers disable sharing; Ohm
+  must publish its shared-cache marker and immutable registry artifacts before its results are
+  accepted.
 
 Together these workflows add 24 matched samples to the original 192-sample matrix, for a default
 total of 216 samples. The generated JSON results and Markdown summary report their measurements
