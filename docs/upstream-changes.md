@@ -35,6 +35,7 @@ sources of truth for the current changes and release revisions.
 - [#27: Partition upstream generics by their local callers](https://github.com/astral-sh/ohm-rust/pull/27)
 - [#28: Keep incremental codegen-unit merges stable across edits](https://github.com/astral-sh/ohm-rust/pull/28)
 - [#29: Pin Cargo with incremental codegen defaults](https://github.com/astral-sh/ohm-rust/pull/29)
+- [#30: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rust/pull/30)
 
 ## ohm-cargo
 
@@ -64,6 +65,8 @@ sources of truth for the current changes and release revisions.
 - [#29: Reuse integration executables across unused dependency changes](https://github.com/astral-sh/ohm-cargo/pull/29)
 - [#30: Add opt-in focused test compilation](https://github.com/astral-sh/ohm-cargo/pull/30)
 - [#31: Enable incremental codegen optimizations for workspace builds](https://github.com/astral-sh/ohm-cargo/pull/31)
+- [#32: Reuse built registry dependencies during checks](https://github.com/astral-sh/ohm-cargo/pull/32)
+- [#33: Share immutable registry artifacts across worktrees](https://github.com/astral-sh/ohm-cargo/pull/33)
 
 ## ohm-rust-clippy
 
@@ -101,3 +104,4 @@ sources of truth for the current changes and release revisions.
 ## ohm-rustfmt
 
 - [#1: Set up fork-owned rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/1)
+- [#2: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rustfmt/pull/2)
