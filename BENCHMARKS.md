@@ -20,6 +20,11 @@ Each test workflow builds and runs one existing test. The current uv workflow ru
 integration test against the compiled `uv` executable; Codex runs a library test. Codex normally
 pins Rust 1.95.0; these benchmarks use Rust 1.97.1 for both projects to match Ohm's Rust base.
 
+The tables below come from a complete 192-sample study of these existing workflows. The benchmark
+runner now also collects 24 targeted samples for build-to-check reuse, incremental formatting, and
+cross-worktree artifact sharing; those additional workflows are described below and are not included
+in the historical results.
+
 ## uv
 
 These benchmarks target the `uv` crate. Dependency edits change `uv-normalize`; direct edits change
@@ -100,6 +105,27 @@ RUSTUP_TOOLCHAIN=1.97.1 just test -p codex-core --lib --locked --offline \
 
 Replace `+1.97.1` with `+ohm`, or set `RUSTUP_TOOLCHAIN=ohm`, to run the Ohm variants.
 
+## Additional feature workflows
+
+The benchmark runner includes three additional workflows that exercise optimizations not covered by
+the existing check, Clippy, and test matrix:
+
+- **Build-to-check reuse:** Build `uv` or `codex-core` without timing, then measure the first
+  `cargo check` against the same target directory. This measures whether already-built registry
+  dependencies can be reused across commands.
+- **Incremental formatting:** Run Codex's actual
+  `cargo fmt -- --config imports_granularity=Item --check` command. After an untimed warmup, measure
+  three unchanged runs and five reversible, correctly formatted source edits. Ohm must publish a
+  real incremental-formatting snapshot before its results are accepted.
+- **Shared-worktree builds:** Build `uv` or `codex-core` in one checkout, then measure a build with a
+  real workspace edit in a second checkout at the same revision. Both toolchains receive the same
+  explicit `CARGO_BUILD_BUILD_DIR` and separate checkout-private target directories. Ohm must
+  publish its shared-cache marker and immutable registry artifacts before its results are accepted.
+
+Together these workflows add 24 matched samples to the original 192-sample matrix, for a default
+total of 216 samples. The generated JSON results and Markdown summary report their measurements
+separately from the historical workflows.
+
 ## Reproducing the benchmarks
 
 The benchmark runner requires [uv](https://docs.astral.sh/uv/), Git, and the upstream Rust and Ohm
@@ -120,8 +146,9 @@ Cloning requires network access, but the benchmark commands run offline, so Carg
 already be cached. `--dry-run` prints the benchmark plan without cloning or running a build.
 
 By default, the runner compares Rust 1.97.1 against `+ohm` across `uv` and `codex-core`, using eight
-build jobs. Each workflow includes one cold build, three no-op runs, seven dependency edits, and five
-direct edits. Use `--project` to run a smaller matrix:
+build jobs. Each original workflow includes one cold build, three no-op runs, seven dependency edits,
+and five direct edits; the three additional feature workflows run afterward. Use `--project` to run a
+smaller matrix:
 
 ```console
 uv run scripts/benchmark.py \

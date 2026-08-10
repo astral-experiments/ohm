@@ -54,6 +54,8 @@ class CompilerInterferenceTests(unittest.TestCase):
                 "70 60 rustc",
                 "80 1 clang",
                 "90 1 unrelated",
+                "100 1 rustfmt",
+                "110 1 cargo-fmt",
             ]
         )
 
@@ -61,7 +63,15 @@ class CompilerInterferenceTests(unittest.TestCase):
             active = benchmark.competing_processes(owner=20)
 
         self.assertEqual(
-            active, ["50 cargo-nextest", "60 cargo", "70 rustc", "80 clang"]
+            active,
+            [
+                "50 cargo-nextest",
+                "60 cargo",
+                "70 rustc",
+                "80 clang",
+                "100 rustfmt",
+                "110 cargo-fmt",
+            ],
         )
 
     def test_process_inspection_fails_closed(self) -> None:
@@ -213,6 +223,206 @@ class CompilerInterferenceTests(unittest.TestCase):
                     self.assertEqual(
                         study.samples[0]["external_compilation"], ["100 cargo"]
                     )
+
+    def test_package_cache_contention_invalidates_and_retries_as_contamination(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "results"
+            (output / "logs").mkdir(parents=True)
+            worktree = Path(directory) / "source"
+            worktree.mkdir()
+            workload = benchmark.WORKLOADS["uv"]
+            arguments = benchmark.parser().parse_args(
+                ["--project", "uv", "--output-dir", str(output)]
+            )
+            study = benchmark.Study(arguments)
+            study.worktrees["uv", "stock"] = worktree
+            result = subprocess.CompletedProcess(
+                [], 0, stdout="Blocking waiting for file lock on package cache\n"
+            )
+
+            with (
+                mock.patch.object(benchmark.subprocess, "run", return_value=result),
+                contextlib.redirect_stdout(io.StringIO()),
+                self.assertRaisesRegex(
+                    benchmark.ContaminatedBenchmarkError, "cache contention"
+                ),
+            ):
+                study.execute(
+                    workload,
+                    "check",
+                    "stock",
+                    "1.97.1",
+                    phase="noop",
+                    repetition=0,
+                    expected_crate=None,
+                )
+
+            self.assertEqual(len(study.samples), 1)
+            self.assertFalse(study.samples[0]["valid"])
+
+    def test_nonzero_package_cache_contention_retries_the_entire_workflow(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "results"
+            (output / "logs").mkdir(parents=True)
+            worktree = Path(directory) / "source"
+            worktree.mkdir()
+            workload = benchmark.WORKLOADS["uv"]
+            arguments = benchmark.parser().parse_args(
+                ["--project", "uv", "--output-dir", str(output)]
+            )
+            study = benchmark.Study(arguments)
+            study.worktrees["uv", "stock"] = worktree
+            result = subprocess.CompletedProcess(
+                [], 101, stdout="Blocking waiting for file lock on package cache\n"
+            )
+
+            with (
+                mock.patch.object(benchmark.subprocess, "run", return_value=result),
+                contextlib.redirect_stdout(io.StringIO()),
+                self.assertRaisesRegex(
+                    benchmark.ContaminatedBenchmarkError, "cache contention"
+                ),
+            ):
+                study.execute(
+                    workload,
+                    "check",
+                    "stock",
+                    "1.97.1",
+                    phase="noop",
+                    repetition=0,
+                    expected_crate=None,
+                )
+
+            self.assertEqual(study.samples[0]["returncode"], 101)
+            self.assertFalse(study.samples[0]["valid"])
+
+    def test_real_failure_after_a_lock_warning_remains_terminal(self) -> None:
+        for diagnostic in (
+            "error[E0308]: mismatched types",
+            "error[E0425]: cannot find value `lock` in this scope",
+            "error: could not compile `uv`",
+            "Diff in /workspace/src/lib.rs:1:",
+        ):
+            with self.subTest(diagnostic=diagnostic):
+                with tempfile.TemporaryDirectory() as directory:
+                    output = Path(directory) / "results"
+                    (output / "logs").mkdir(parents=True)
+                    worktree = Path(directory) / "source"
+                    worktree.mkdir()
+                    workload = benchmark.WORKLOADS["uv"]
+                    arguments = benchmark.parser().parse_args(
+                        ["--project", "uv", "--output-dir", str(output)]
+                    )
+                    study = benchmark.Study(arguments)
+                    study.worktrees["uv", "stock"] = worktree
+                    result = subprocess.CompletedProcess(
+                        [],
+                        101,
+                        stdout=(
+                            "Blocking waiting for file lock on package cache\n"
+                            f"{diagnostic}\n"
+                        ),
+                    )
+
+                    with (
+                        mock.patch.object(
+                            benchmark.subprocess, "run", return_value=result
+                        ),
+                        contextlib.redirect_stdout(io.StringIO()),
+                        self.assertRaisesRegex(
+                            benchmark.BenchmarkError, "exited 101"
+                        ) as raised,
+                    ):
+                        study.execute(
+                            workload,
+                            "check",
+                            "stock",
+                            "1.97.1",
+                            phase="noop",
+                            repetition=0,
+                            expected_crate=None,
+                        )
+
+                    self.assertNotIsInstance(
+                        raised.exception, benchmark.ContaminatedBenchmarkError
+                    )
+
+    def test_package_cache_lock_timeout_is_contamination_but_real_timeout_is_not(
+        self,
+    ) -> None:
+        for captured, exception in (
+            (
+                b"Blocking waiting for file lock on package cache\n",
+                benchmark.ContaminatedBenchmarkError,
+            ),
+            (b"Compiling uv v0.0.0\n", benchmark.BenchmarkError),
+            (
+                b"Blocking waiting for file lock on package cache\n"
+                b"error[E0308]: mismatched types\n",
+                benchmark.BenchmarkError,
+            ),
+        ):
+            with self.subTest(captured=captured):
+                with tempfile.TemporaryDirectory() as directory:
+                    output = Path(directory) / "results"
+                    (output / "logs").mkdir(parents=True)
+                    worktree = Path(directory) / "source"
+                    worktree.mkdir()
+                    workload = benchmark.WORKLOADS["uv"]
+                    arguments = benchmark.parser().parse_args(
+                        ["--project", "uv", "--output-dir", str(output)]
+                    )
+                    study = benchmark.Study(arguments)
+                    study.worktrees["uv", "stock"] = worktree
+                    timeout = subprocess.TimeoutExpired(
+                        ["cargo"], timeout=1, output=captured
+                    )
+
+                    with (
+                        mock.patch.object(
+                            benchmark.subprocess, "run", side_effect=timeout
+                        ),
+                        contextlib.redirect_stdout(io.StringIO()),
+                        self.assertRaises(exception) as raised,
+                    ):
+                        study.execute(
+                            workload,
+                            "check",
+                            "stock",
+                            "1.97.1",
+                            phase="noop",
+                            repetition=0,
+                            expected_crate=None,
+                        )
+
+                    if exception is benchmark.BenchmarkError:
+                        self.assertNotIsInstance(
+                            raised.exception, benchmark.ContaminatedBenchmarkError
+                        )
+
+    def test_cache_lock_diagnostics_do_not_match_unrelated_lock_identifiers(
+        self,
+    ) -> None:
+        blocked = "Blocking waiting for file lock on package cache\n"
+        self.assertTrue(benchmark.cache_contention_only(blocked))
+        self.assertTrue(
+            benchmark.cache_contention_only(
+                blocked + "error: failed to lock package cache\n"
+            )
+        )
+        for diagnostic in (
+            "error[E0425]: cannot find value `lock` in this scope",
+            "error: function `lock` returned the wrong type",
+            "Diff in /workspace/lock.rs:1:",
+        ):
+            with self.subTest(diagnostic=diagnostic):
+                self.assertFalse(
+                    benchmark.cache_contention_only(blocked + diagnostic + "\n")
+                )
 
 
 class WorkflowRetryTests(unittest.TestCase):
@@ -424,6 +634,492 @@ class WorkflowRetryTests(unittest.TestCase):
         self.assertEqual(sentinel.read_text(encoding="utf-8"), "user artifact")
 
 
+class FeatureWorkflowTests(unittest.TestCase):
+    def setUp(self) -> None:
+        temporary_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary_directory.cleanup)
+        self.directory = Path(temporary_directory.name)
+        arguments = benchmark.parser().parse_args(
+            [
+                "--output-dir",
+                str(self.directory / "results"),
+                "--noop-runs",
+                "2",
+                "--direct-runs",
+                "2",
+            ]
+        )
+        self.study = benchmark.Study(arguments)
+        for workload in self.study.workloads:
+            repository = self.directory / "sources" / workload.repository
+            repository.mkdir(parents=True, exist_ok=True)
+            self.study.sources[workload.repository] = repository
+            for label, _ in self.study.toolchains:
+                worktree = self.study.output / "worktrees" / workload.repository / label
+                worktree.mkdir(parents=True)
+                source = worktree / workload.direct.path
+                source.parent.mkdir(parents=True, exist_ok=True)
+                source.write_text(workload.direct.before, encoding="utf-8")
+                self.study.worktrees[workload.repository, label] = worktree
+
+    def test_only_codex_includes_the_actual_formatter_workflow(self) -> None:
+        self.assertEqual(
+            self.study.feature_workflows(benchmark.WORKLOADS["uv"]),
+            ("build-check", "shared-build"),
+        )
+        self.assertEqual(
+            self.study.feature_workflows(benchmark.WORKLOADS["codex-core"]),
+            ("build-check", "fmt", "shared-build"),
+        )
+        self.assertEqual(
+            self.study.command(benchmark.WORKLOADS["codex-core"], "fmt", "1.97.1"),
+            [
+                "cargo",
+                "+1.97.1",
+                "fmt",
+                "--",
+                "--config",
+                "imports_granularity=Item",
+                "--check",
+            ],
+        )
+
+    def test_formatter_and_build_arms_ignore_ambient_unowned_tool_overrides(
+        self,
+    ) -> None:
+        (self.study.output / "logs").mkdir(parents=True)
+        ambient = {
+            "CARGO_BUILD_BUILD_DIR": str(self.directory / "unowned-cache"),
+            "RUSTFMT": "/unowned/ohm-rustfmt",
+            "RUSTFMT_WRAPPER": "/unowned/formatter-wrapper",
+        }
+        for workflow, workload in (
+            ("check", benchmark.WORKLOADS["uv"]),
+            ("build-check", benchmark.WORKLOADS["uv"]),
+            ("fmt", benchmark.WORKLOADS["codex-core"]),
+        ):
+            with self.subTest(workflow=workflow):
+                result = subprocess.CompletedProcess([], 0, stdout="")
+                with (
+                    mock.patch.dict(benchmark.os.environ, ambient),
+                    mock.patch.object(
+                        benchmark.subprocess, "run", return_value=result
+                    ) as command,
+                    contextlib.redirect_stdout(io.StringIO()),
+                ):
+                    self.study.execute(
+                        workload,
+                        workflow,
+                        "stock",
+                        "1.97.1",
+                        phase="noop",
+                        repetition=0,
+                        expected_crate=None,
+                    )
+
+                environment = command.call_args.kwargs["env"]
+                self.assertNotIn("CARGO_BUILD_BUILD_DIR", environment)
+                if workflow == "fmt":
+                    self.assertNotIn("RUSTFMT", environment)
+                    self.assertNotIn("RUSTFMT_WRAPPER", environment)
+                else:
+                    self.assertEqual(environment["RUSTFMT"], ambient["RUSTFMT"])
+                    self.assertEqual(
+                        environment["RUSTFMT_WRAPPER"], ambient["RUSTFMT_WRAPPER"]
+                    )
+
+    def test_build_check_seeds_both_toolchains_before_timed_checks(self) -> None:
+        workload = benchmark.WORKLOADS["uv"]
+
+        with mock.patch.object(self.study, "execute") as execute:
+            self.study.run_build_check(workload, 1)
+
+        self.assertEqual(
+            [call.kwargs["phase"] for call in execute.call_args_list],
+            ["seed", "seed", "transition", "transition"],
+        )
+        self.assertEqual(
+            [call.args[2] for call in execute.call_args_list],
+            ["ohm", "stock", "ohm", "stock"],
+        )
+        for call in execute.call_args_list[:2]:
+            self.assertFalse(call.kwargs["record"])
+            self.assertEqual(call.kwargs["arguments"][2], "build")
+            self.assertIn("--offline", call.kwargs["arguments"])
+        for call in execute.call_args_list:
+            self.assertEqual(call.args[1], "build-check")
+            self.assertEqual(call.kwargs["expected_crate"], workload.package)
+
+    def test_formatter_uses_real_reversible_edit_and_isolated_offline_cache(
+        self,
+    ) -> None:
+        workload = benchmark.WORKLOADS["codex-core"]
+        observations: list[tuple[str, str, int, str]] = []
+
+        def record(*arguments: object, **options: object) -> None:
+            label = str(arguments[2])
+            source = (
+                self.study.worktrees[workload.repository, label] / workload.direct.path
+            )
+            observations.append(
+                (
+                    str(options["phase"]),
+                    label,
+                    int(options["repetition"]),
+                    source.read_text(encoding="utf-8"),
+                )
+            )
+            environment = options["extra_environment"]
+            self.assertEqual(environment["CARGO_NET_OFFLINE"], "true")
+            self.assertEqual(
+                environment["OHM_INCREMENTAL_FMT_CACHE_DIR"],
+                str(self.study.target(workload, "fmt", label) / "formatter-cache"),
+            )
+            if label == "ohm" and options["phase"] == "warmup":
+                cache = Path(environment["OHM_INCREMENTAL_FMT_CACHE_DIR"])
+                cache.mkdir(parents=True)
+                (cache / "published.json").write_text("{}", encoding="utf-8")
+
+        with mock.patch.object(self.study, "execute", side_effect=record):
+            self.study.run_format(workload, 0)
+
+        self.assertEqual(
+            [phase for phase, _, _, _ in observations],
+            ["warmup"] * 2 + ["noop"] * 4 + ["direct"] * 4,
+        )
+        for phase, _, repetition, contents in observations:
+            if phase == "direct":
+                expected = (
+                    workload.direct.after if repetition == 0 else workload.direct.before
+                )
+                self.assertEqual(contents, expected)
+        for label, _ in self.study.toolchains:
+            source = (
+                self.study.worktrees[workload.repository, label] / workload.direct.path
+            )
+            self.assertEqual(source.read_text(encoding="utf-8"), workload.direct.before)
+
+    def test_formatter_rejects_fallback_without_a_published_snapshot(self) -> None:
+        workload = benchmark.WORKLOADS["codex-core"]
+
+        def leave_only_lock(*arguments: object, **options: object) -> None:
+            if arguments[2] == "ohm" and options["phase"] == "warmup":
+                cache = Path(
+                    options["extra_environment"]["OHM_INCREMENTAL_FMT_CACHE_DIR"]
+                )
+                cache.mkdir(parents=True)
+                (cache / ".lock").write_text("", encoding="utf-8")
+
+        with (
+            mock.patch.object(self.study, "execute", side_effect=leave_only_lock),
+            self.assertRaisesRegex(benchmark.BenchmarkError, "cache snapshot"),
+        ):
+            self.study.run_format(workload, 0)
+
+    def test_shared_worktrees_detach_and_clean_exact_pinned_revision(self) -> None:
+        workload = benchmark.WORKLOADS["uv"]
+
+        with mock.patch.object(benchmark, "command_output", return_value="") as git:
+            with self.study.managed_shared_worktrees(workload) as worktrees:
+                self.assertEqual(set(worktrees), {"stock", "ohm"})
+                for label, path in worktrees.items():
+                    self.assertEqual(path.name, f"{label}-shared")
+
+        additions = [
+            call.args[0]
+            for call in git.call_args_list
+            if call.args[0][1:3] == ["worktree", "add"]
+        ]
+        removals = [
+            call.args[0]
+            for call in git.call_args_list
+            if call.args[0][1:3] == ["worktree", "remove"]
+        ]
+        self.assertEqual(len(additions), 2)
+        self.assertEqual(len(removals), 2)
+        self.assertTrue(
+            all(command[-1] == self.study.revisions["uv"] for command in additions)
+        )
+
+    def test_shared_worktree_creation_failure_cleans_only_completed_peer(
+        self,
+    ) -> None:
+        workload = benchmark.WORKLOADS["uv"]
+
+        def run_git(arguments: list[str], *, cwd: Path) -> str:
+            if arguments[1:3] == ["worktree", "add"] and "ohm-shared" in arguments[-2]:
+                raise benchmark.BenchmarkError("unable to detach peer")
+            return ""
+
+        with (
+            mock.patch.object(benchmark, "command_output", side_effect=run_git) as git,
+            self.assertRaisesRegex(benchmark.BenchmarkError, "detach peer"),
+        ):
+            with self.study.managed_shared_worktrees(workload):
+                self.fail("peer creation unexpectedly succeeded")
+
+        removals = [
+            call.args[0]
+            for call in git.call_args_list
+            if call.args[0][1:3] == ["worktree", "remove"]
+        ]
+        self.assertEqual(len(removals), 1)
+        self.assertEqual(Path(removals[0][-1]).name, "stock-shared")
+
+    def test_shared_build_has_private_targets_and_identical_per_arm_build_root(
+        self,
+    ) -> None:
+        workload = benchmark.WORKLOADS["uv"]
+        peers = {
+            label: self.directory / f"{label}-peer"
+            for label, _ in self.study.toolchains
+        }
+        for peer in peers.values():
+            source = peer / workload.direct.path
+            source.parent.mkdir(parents=True)
+            source.write_text(workload.direct.before, encoding="utf-8")
+
+        def publish(*arguments: object, **options: object) -> None:
+            label = str(arguments[2])
+            if label == "ohm" and options["phase"] == "seed":
+                root = Path(options["extra_environment"]["CARGO_BUILD_BUILD_DIR"])
+                (root / "debug" / "build" / "registries").mkdir(parents=True)
+                (root / ".ohm-shared-registry-cache-v1").write_text(
+                    "", encoding="utf-8"
+                )
+            if options["phase"] == "reuse":
+                for peer in peers.values():
+                    source = peer / workload.direct.path
+                    self.assertEqual(
+                        source.read_text(encoding="utf-8"), workload.direct.after
+                    )
+
+        with (
+            mock.patch.object(
+                self.study,
+                "managed_shared_worktrees",
+                return_value=contextlib.nullcontext(peers),
+            ),
+            mock.patch.object(self.study, "execute", side_effect=publish) as execute,
+        ):
+            self.study.run_shared_build(workload, 0)
+
+        self.assertEqual(
+            [call.kwargs["phase"] for call in execute.call_args_list],
+            ["seed", "seed", "reuse", "reuse"],
+        )
+        build_roots: dict[str, set[str]] = {"stock": set(), "ohm": set()}
+        targets: dict[str, list[Path]] = {"stock": [], "ohm": []}
+        for call in execute.call_args_list:
+            label = str(call.args[2])
+            build_root = call.kwargs["extra_environment"]["CARGO_BUILD_BUILD_DIR"]
+            target = call.kwargs["target_directory"]
+            build_roots[label].add(build_root)
+            targets[label].append(target)
+            self.assertFalse(target.is_relative_to(build_root))
+            self.assertFalse(Path(build_root).is_relative_to(target))
+            self.assertEqual(call.kwargs["expected_crate"], workload.package)
+            if call.kwargs["phase"] == "reuse":
+                self.assertEqual(call.kwargs["worktree"], peers[label])
+        self.assertEqual(len(build_roots["stock"]), 1)
+        self.assertEqual(len(build_roots["ohm"]), 1)
+        self.assertNotEqual(build_roots["stock"], build_roots["ohm"])
+        self.assertNotEqual(targets["stock"][0], targets["stock"][1])
+        self.assertNotEqual(targets["ohm"][0], targets["ohm"][1])
+        for peer in peers.values():
+            source = peer / workload.direct.path
+            self.assertEqual(source.read_text(encoding="utf-8"), workload.direct.before)
+
+    def test_shared_build_rejects_marker_without_immutable_registry_artifacts(
+        self,
+    ) -> None:
+        workload = benchmark.WORKLOADS["uv"]
+        peers = {
+            label: self.directory / f"{label}-peer"
+            for label, _ in self.study.toolchains
+        }
+
+        def publish_marker_only(*arguments: object, **options: object) -> None:
+            if arguments[2] == "ohm" and options["phase"] == "seed":
+                root = Path(options["extra_environment"]["CARGO_BUILD_BUILD_DIR"])
+                root.mkdir(parents=True)
+                (root / ".ohm-shared-registry-cache-v1").write_text(
+                    "", encoding="utf-8"
+                )
+
+        with (
+            mock.patch.object(
+                self.study,
+                "managed_shared_worktrees",
+                return_value=contextlib.nullcontext(peers),
+            ),
+            mock.patch.object(self.study, "execute", side_effect=publish_marker_only),
+            self.assertRaisesRegex(benchmark.BenchmarkError, "immutable artifacts"),
+        ):
+            self.study.run_shared_build(workload, 0)
+
+    def test_shared_sample_records_actual_peer_build_root_and_private_target(
+        self,
+    ) -> None:
+        workload = benchmark.WORKLOADS["uv"]
+        (self.study.output / "logs").mkdir(parents=True)
+        peer = self.directory / "peer"
+        peer.mkdir()
+        root = self.study.target(workload, "shared-build", "stock")
+        target = root / "secondary-target"
+        build_directory = root / "shared-build"
+        result = subprocess.CompletedProcess(
+            [], 0, stdout="   Compiling uv v0.0.0 (/workspace/uv)\n"
+        )
+
+        with (
+            mock.patch.dict(
+                benchmark.os.environ,
+                {"CARGO_BUILD_BUILD_DIR": str(self.directory / "unowned-cache")},
+            ),
+            mock.patch.object(
+                benchmark.subprocess, "run", return_value=result
+            ) as command,
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            self.study.execute(
+                workload,
+                "shared-build",
+                "stock",
+                "1.97.1",
+                phase="reuse",
+                repetition=0,
+                expected_crate="uv",
+                worktree=peer,
+                target_directory=target,
+                extra_environment={"CARGO_BUILD_BUILD_DIR": str(build_directory)},
+            )
+
+        self.assertEqual(command.call_args.kwargs["cwd"], peer)
+        environment = command.call_args.kwargs["env"]
+        self.assertEqual(environment["CARGO_TARGET_DIR"], str(target))
+        self.assertEqual(environment["CARGO_BUILD_BUILD_DIR"], str(build_directory))
+        sample = self.study.samples[0]
+        self.assertEqual(sample["worktree"], str(peer))
+        self.assertEqual(sample["target_directory"], str(target))
+        self.assertEqual(sample["shared_build_directory"], str(build_directory))
+
+    def test_build_check_readiness_marker_is_optional_for_released_ohm(self) -> None:
+        workload = benchmark.WORKLOADS["uv"]
+        (self.study.output / "logs").mkdir(parents=True)
+        result = subprocess.CompletedProcess(
+            [], 0, stdout="   Checking uv v0.0.0 (/workspace/uv)\n"
+        )
+
+        with (
+            mock.patch.object(benchmark.subprocess, "run", return_value=result),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            self.study.execute(
+                workload,
+                "build-check",
+                "ohm",
+                "ohm",
+                phase="transition",
+                repetition=0,
+                expected_crate="uv",
+            )
+            marker = (
+                self.study.target(workload, "build-check", "ohm")
+                / ".ohm-built-registry-ready"
+            )
+            marker.write_text("", encoding="utf-8")
+            self.study.execute(
+                workload,
+                "build-check",
+                "ohm",
+                "ohm",
+                phase="transition",
+                repetition=1,
+                expected_crate="uv",
+            )
+
+        self.assertEqual(
+            [sample["registry_build_ready"] for sample in self.study.samples],
+            [False, True],
+        )
+
+    def test_feature_comparisons_preserve_core_rows_and_include_new_phases(
+        self,
+    ) -> None:
+        workload = benchmark.WORKLOADS["codex-core"]
+        for workflow, phase in (
+            ("check", "noop"),
+            ("build-check", "transition"),
+            ("fmt", "noop"),
+            ("fmt", "direct"),
+            ("shared-build", "reuse"),
+        ):
+            for label, duration in (("stock", 2.0), ("ohm", 1.0)):
+                self.study.samples.append(
+                    {
+                        "project": workload.name,
+                        "workflow": workflow,
+                        "phase": phase,
+                        "toolchain": label,
+                        "wall_seconds": duration,
+                        "valid": True,
+                    }
+                )
+
+        comparisons = self.study.comparisons()
+
+        self.assertEqual(
+            [(row["workflow"], row["phase"]) for row in comparisons],
+            [
+                ("check", "noop"),
+                ("build-check", "transition"),
+                ("fmt", "noop"),
+                ("fmt", "direct"),
+                ("shared-build", "reuse"),
+            ],
+        )
+        self.assertTrue(all(row["speedup"] == 2.0 for row in comparisons))
+
+    def test_run_keeps_all_historical_workflows_before_feature_workflows(self) -> None:
+        output = self.directory / "ordered-results"
+        options = benchmark.parser().parse_args(["--output-dir", str(output)])
+        study = benchmark.Study(options)
+
+        with (
+            mock.patch.object(study, "prepare_sources"),
+            mock.patch.object(
+                study, "managed_worktrees", return_value=contextlib.nullcontext()
+            ),
+            mock.patch.object(study, "write_results"),
+            mock.patch.object(study, "run_workflow_with_retries") as workflow,
+            mock.patch.object(benchmark, "command_output", return_value="version"),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            study.run()
+
+        self.assertEqual(
+            [(call.args[0].name, call.args[1]) for call in workflow.call_args_list],
+            [
+                ("uv", "check"),
+                ("uv", "clippy"),
+                ("uv", "test"),
+                ("codex-core", "check"),
+                ("codex-core", "clippy"),
+                ("codex-core", "test"),
+                ("uv", "build-check"),
+                ("uv", "shared-build"),
+                ("codex-core", "build-check"),
+                ("codex-core", "fmt"),
+                ("codex-core", "shared-build"),
+            ],
+        )
+        self.assertEqual(
+            study.metadata["feature_workflows"]["codex-core"],
+            ("build-check", "fmt", "shared-build"),
+        )
+
+
 class ReversibleEditTests(unittest.TestCase):
     def setUp(self) -> None:
         temporary_directory = tempfile.TemporaryDirectory()
@@ -507,7 +1203,7 @@ class OutputValidationTests(unittest.TestCase):
         )
 
     def test_rejects_package_cache_lock_contention(self) -> None:
-        with self.assertRaises(benchmark.BenchmarkError):
+        with self.assertRaises(benchmark.ContaminatedBenchmarkError):
             benchmark.validate_output(
                 "Blocking waiting for file lock on package cache\n",
                 expected_crate=None,
@@ -946,7 +1642,12 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual(
             [workload.name for workload in study.workloads], ["uv", "codex-core"]
         )
-        self.assertIn("timed samples: 192", console.getvalue())
+        self.assertIn("core timed samples: 192", console.getvalue())
+        self.assertIn("feature timed samples: 24", console.getvalue())
+        self.assertIn("timed samples: 216", console.getvalue())
+        self.assertIn(
+            "feature workflows: build-check, fmt, shared-build", console.getvalue()
+        )
         self.assertNotIn("codex-tools", console.getvalue())
 
     def test_rejects_duplicate_projects_before_accessing_repositories(self) -> None:

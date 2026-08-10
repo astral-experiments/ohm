@@ -6,6 +6,9 @@
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
 incremental builds can be up to 22x faster for common commands in large workspaces.
 
+The tables summarize a complete 192-sample study; additional formatting, build-to-check, and
+shared-worktree scenarios are described in the [benchmark methodology](BENCHMARKS.md).
+
 **Direct edits** modify the crate being checked, linted, or tested:
 
 | Project | Workflow       | Edited crate | Rust 1.97.1 | Ohm 1.97.1-11 | Speedup |

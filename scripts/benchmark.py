@@ -32,7 +32,7 @@ class BenchmarkError(Exception):
 
 
 class ContaminatedBenchmarkError(BenchmarkError):
-    """An unrelated compiler overlapped an otherwise valid measurement."""
+    """Compiler activity or cache contention invalidated a measurement."""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -113,14 +113,31 @@ WORKLOADS = {
     ),
 }
 WORKFLOWS = ("check", "clippy", "test")
+FEATURE_WORKFLOWS = ("build-check", "fmt", "shared-build")
+WORKFLOW_PHASES = {
+    **{workflow: ("cold", "noop", "dependency", "direct") for workflow in WORKFLOWS},
+    "build-check": ("transition",),
+    "fmt": ("noop", "direct"),
+    "shared-build": ("reuse",),
+}
 COMPILATION = re.compile(r"^\s*(?:Checking|Compiling)\s+([^\s]+)", re.MULTILINE)
 TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")
+FAILURE_DIAGNOSTIC = re.compile(
+    r"(?im)^\s*(?:error(?:\[[^\]]+\])?:|fatal(?: error)?:|diff in\b|"
+    r"error writing files\b|thread .* panicked at\b|aborting due to\b)"
+)
+CACHE_FAILURE_DIAGNOSTIC = re.compile(
+    r"(?i)\b(?:failed to (?:acquire|obtain|lock)|timed out (?:while )?waiting "
+    r"for|blocking waiting for)\b.*\b(?:file lock|package cache|target cache|lock)\b"
+)
 COMPILER_PROCESSES = {
     "cargo",
     "cargo-nextest",
     "nextest",
     "rustc",
     "rustdoc",
+    "rustfmt",
+    "cargo-fmt",
     "clippy-driver",
     "rust-lld",
     "ld",
@@ -233,7 +250,7 @@ def validate_output(
     output: str, *, expected_crate: str | None, selected_test: str | None
 ) -> None:
     if "blocking waiting for file lock" in output.lower():
-        raise BenchmarkError(
+        raise ContaminatedBenchmarkError(
             "benchmark encountered Cargo package or target cache contention"
         )
     if expected_crate is not None and expected_crate not in COMPILATION.findall(output):
@@ -245,6 +262,16 @@ def validate_output(
         test_name = rf"(?<![A-Za-z0-9_]){re.escape(selected_test)}(?![A-Za-z0-9_])"
         if re.search(test_name, output) is None:
             raise BenchmarkError(f"selected test {selected_test!r} was not executed")
+
+
+def cache_contention_only(output: str) -> bool:
+    if "blocking waiting for file lock" not in output.lower():
+        return False
+    return all(
+        CACHE_FAILURE_DIAGNOSTIC.search(line) is not None
+        for line in output.splitlines()
+        if FAILURE_DIAGNOSTIC.match(line)
+    )
 
 
 def parser() -> argparse.ArgumentParser:
@@ -437,6 +464,13 @@ class Study:
             + self.options.dependency_runs
             + self.options.direct_runs
         )
+        core_samples = len(self.workloads) * len(WORKFLOWS) * 2 * repetitions
+        feature_samples = len(self.workloads) * 4
+        feature_samples += sum(
+            2 * (self.options.noop_runs + self.options.direct_runs)
+            for workload in self.workloads
+            if workload.repository == "codex"
+        )
         for workload in self.workloads:
             name = workload.repository
             source = self.sources.get(name, self.source_urls[name])
@@ -445,9 +479,18 @@ class Study:
             print(f"  dependency edit: {workload.dependency.path}")
             print(f"  direct edit: {workload.direct.path}")
             print(f"  workflows: {', '.join(WORKFLOWS)}")
+            print("  feature workflows: " + ", ".join(self.feature_workflows(workload)))
             print(f"  selected test: {workload.selected_test}")
-        print(
-            f"\ntimed samples: {len(self.workloads) * len(WORKFLOWS) * 2 * repetitions}"
+        print(f"\ncore timed samples: {core_samples}")
+        print(f"feature timed samples: {feature_samples}")
+        print(f"timed samples: {core_samples + feature_samples}")
+
+    @staticmethod
+    def feature_workflows(workload: Workload) -> tuple[str, ...]:
+        return tuple(
+            workflow
+            for workflow in FEATURE_WORKFLOWS
+            if workflow != "fmt" or workload.repository == "codex"
         )
 
     def check_disk(self) -> None:
@@ -488,6 +531,35 @@ class Study:
                     self.worktrees[name, label] = path
             yield
 
+    @contextlib.contextmanager
+    def managed_shared_worktrees(self, workload: Workload) -> Iterator[dict[str, Path]]:
+        repository = self.sources[workload.repository]
+        worktrees: dict[str, Path] = {}
+        with contextlib.ExitStack() as cleanup:
+            for label, _ in self.toolchains:
+                path = (
+                    self.output / "worktrees" / workload.repository / f"{label}-shared"
+                )
+                path.parent.mkdir(parents=True, exist_ok=True)
+                command_output(
+                    [
+                        "git",
+                        "worktree",
+                        "add",
+                        "--detach",
+                        str(path),
+                        self.revisions[workload.repository],
+                    ],
+                    cwd=repository,
+                )
+                cleanup.callback(
+                    command_output,
+                    ["git", "worktree", "remove", "--force", str(path)],
+                    cwd=repository,
+                )
+                worktrees[label] = path
+            yield worktrees
+
     def command(self, workload: Workload, workflow: str, selector: str) -> list[str]:
         target = (
             ["--test", "it"]
@@ -495,6 +567,20 @@ class Study:
             else ["--lib"]
         )
         arguments = ["-p", workload.package, *target, "--locked", "--offline"]
+        if workflow == "fmt":
+            return [
+                "cargo",
+                f"+{selector}",
+                "fmt",
+                "--",
+                "--config",
+                "imports_granularity=Item",
+                "--check",
+            ]
+        if workflow == "build-check":
+            return ["cargo", f"+{selector}", "check", *arguments]
+        if workflow == "shared-build":
+            return ["cargo", f"+{selector}", "build", *arguments]
         if workload.repository == "uv":
             command = ["cargo", f"+{selector}", workflow, *arguments]
             if workflow == "test":
@@ -566,17 +652,31 @@ class Study:
         repetition: int,
         expected_crate: str | None,
         record: bool = True,
+        arguments: list[str] | None = None,
+        worktree: Path | None = None,
+        target_directory: Path | None = None,
+        extra_environment: dict[str, str] | None = None,
     ) -> None:
         self.check_disk()
         if self.options.require_idle:
             self.wait_until_idle()
-        worktree = self.worktrees[workload.repository, label]
-        directory = self.target(workload, workflow, label)
+        if worktree is None:
+            worktree = self.worktrees[workload.repository, label]
+        directory = (
+            self.target(workload, workflow, label)
+            if target_directory is None
+            else target_directory
+        )
         directory.mkdir(parents=True, exist_ok=True)
-        arguments = self.command(workload, workflow, selector)
+        if arguments is None:
+            arguments = self.command(workload, workflow, selector)
         workspace = worktree / workload.workspace
         cwd = worktree if arguments[0] == "just" else workspace
         environment = os.environ.copy()
+        environment.pop("CARGO_BUILD_BUILD_DIR", None)
+        if workflow == "fmt":
+            environment.pop("RUSTFMT", None)
+            environment.pop("RUSTFMT_WRAPPER", None)
         environment.update(
             {
                 "CARGO_TARGET_DIR": str(directory),
@@ -586,6 +686,8 @@ class Study:
                 "RUSTUP_TOOLCHAIN": selector,
             }
         )
+        if extra_environment is not None:
+            environment.update(extra_environment)
         identifier = (
             f"{len(self.samples) + 1:04d}-{workload.name}-{workflow}-{phase}-{label}"
         )
@@ -625,7 +727,16 @@ class Study:
                 timeout=self.options.timeout,
                 check=False,
             )
-        except (OSError, subprocess.TimeoutExpired) as error:
+        except subprocess.TimeoutExpired as error:
+            captured = error.output or ""
+            if isinstance(captured, bytes):
+                captured = captured.decode(errors="replace")
+            if cache_contention_only(captured):
+                raise ContaminatedBenchmarkError(
+                    "benchmark timed out during Cargo package or target cache contention"
+                ) from error
+            raise BenchmarkError(f"benchmark command failed: {error}") from error
+        except OSError as error:
             raise BenchmarkError(f"benchmark command failed: {error}") from error
         finally:
             duration = time.perf_counter() - started
@@ -635,6 +746,7 @@ class Study:
         log.write_text(result.stdout, encoding="utf-8")
 
         failure: str | None = None
+        cache_contention = False
         if monitor_errors:
             failure = "compiler interference monitor failed: " + monitor_errors[0]
         elif self.options.require_idle and not interference:
@@ -643,7 +755,14 @@ class Study:
             except BenchmarkError as error:
                 failure = f"compiler interference monitor failed: {error}"
         if failure is None and result.returncode:
-            failure = f"benchmark command exited {result.returncode}; inspect {log}"
+            if cache_contention_only(result.stdout):
+                failure = (
+                    "benchmark encountered Cargo package or target cache contention; "
+                    f"inspect {log}"
+                )
+                cache_contention = True
+            else:
+                failure = f"benchmark command exited {result.returncode}; inspect {log}"
         elif failure is None:
             try:
                 validate_output(
@@ -655,30 +774,37 @@ class Study:
                 )
             except BenchmarkError as error:
                 failure = f"{error}; inspect {log}"
-        contaminated = failure is None and bool(interference)
-        if contaminated:
+                cache_contention = isinstance(error, ContaminatedBenchmarkError)
+        contaminated = cache_contention or (failure is None and bool(interference))
+        if contaminated and failure is None:
             failure = "unrelated compiler overlapped benchmark: " + ", ".join(
                 interference
             )
 
         if record:
-            self.samples.append(
-                {
-                    "project": workload.name,
-                    "workflow": workflow,
-                    "phase": phase,
-                    "toolchain": label,
-                    "selector": selector,
-                    "repetition": repetition,
-                    "wall_seconds": duration,
-                    "returncode": result.returncode,
-                    "external_compilation": interference,
-                    "valid": failure is None,
-                    "command": arguments,
-                    "target_directory": str(directory),
-                    "log": str(log),
-                }
-            )
+            sample = {
+                "project": workload.name,
+                "workflow": workflow,
+                "phase": phase,
+                "toolchain": label,
+                "selector": selector,
+                "repetition": repetition,
+                "wall_seconds": duration,
+                "returncode": result.returncode,
+                "external_compilation": interference,
+                "valid": failure is None,
+                "command": arguments,
+                "target_directory": str(directory),
+                "log": str(log),
+            }
+            if workflow == "shared-build":
+                sample["worktree"] = str(worktree)
+                sample["shared_build_directory"] = environment["CARGO_BUILD_BUILD_DIR"]
+            elif workflow == "build-check" and label == "ohm":
+                sample["registry_build_ready"] = (
+                    directory / ".ohm-built-registry-ready"
+                ).is_file()
+            self.samples.append(sample)
             self.write_results()
         if failure is not None:
             if contaminated:
@@ -710,7 +836,158 @@ class Study:
                         expected_crate=edit.crate,
                     )
 
+    def run_build_check(self, workload: Workload, index: int) -> None:
+        workflow = "build-check"
+        for label, selector in self.ordered_toolchains(index):
+            self.execute(
+                workload,
+                workflow,
+                label,
+                selector,
+                phase="seed",
+                repetition=0,
+                expected_crate=workload.package,
+                record=False,
+                arguments=self.command(workload, "shared-build", selector),
+            )
+        for label, selector in self.ordered_toolchains(index):
+            self.execute(
+                workload,
+                workflow,
+                label,
+                selector,
+                phase="transition",
+                repetition=0,
+                expected_crate=workload.package,
+            )
+
+    def run_format(self, workload: Workload, index: int) -> None:
+        workflow = "fmt"
+        environments = {
+            label: {
+                "CARGO_NET_OFFLINE": "true",
+                "OHM_INCREMENTAL_FMT_CACHE_DIR": str(
+                    self.target(workload, workflow, label) / "formatter-cache"
+                ),
+            }
+            for label, _ in self.toolchains
+        }
+        for label, selector in self.ordered_toolchains(index):
+            self.execute(
+                workload,
+                workflow,
+                label,
+                selector,
+                phase="warmup",
+                repetition=0,
+                expected_crate=None,
+                record=False,
+                extra_environment=environments[label],
+            )
+            if label == "ohm":
+                cache = Path(environments[label]["OHM_INCREMENTAL_FMT_CACHE_DIR"])
+                if not any(path.is_file() for path in cache.glob("*.json")):
+                    raise BenchmarkError(
+                        "Ohm incremental formatting did not publish a cache snapshot: "
+                        f"{cache}"
+                    )
+        for repetition in range(self.options.noop_runs):
+            for label, selector in self.ordered_toolchains(index + repetition):
+                self.execute(
+                    workload,
+                    workflow,
+                    label,
+                    selector,
+                    phase="noop",
+                    repetition=repetition,
+                    expected_crate=None,
+                    extra_environment=environments[label],
+                )
+
+        with contextlib.ExitStack() as cleanup:
+            edits = {
+                label: cleanup.enter_context(
+                    reversible_edit(
+                        self.worktrees[workload.repository, label], workload.direct
+                    )
+                )
+                for label, _ in self.toolchains
+            }
+            for repetition in range(self.options.direct_runs):
+                for label, selector in self.ordered_toolchains(index + repetition):
+                    edits[label](repetition % 2 == 0)
+                    self.execute(
+                        workload,
+                        workflow,
+                        label,
+                        selector,
+                        phase="direct",
+                        repetition=repetition,
+                        expected_crate=None,
+                        extra_environment=environments[label],
+                    )
+
+    def run_shared_build(self, workload: Workload, index: int) -> None:
+        workflow = "shared-build"
+        with self.managed_shared_worktrees(workload) as worktrees:
+            for label, selector in self.ordered_toolchains(index):
+                root = self.target(workload, workflow, label)
+                self.execute(
+                    workload,
+                    workflow,
+                    label,
+                    selector,
+                    phase="seed",
+                    repetition=0,
+                    expected_crate=workload.package,
+                    record=False,
+                    target_directory=root / "primary-target",
+                    extra_environment={
+                        "CARGO_BUILD_BUILD_DIR": str(root / "shared-build")
+                    },
+                )
+                if label == "ohm":
+                    build_directory = root / "shared-build"
+                    marker = build_directory / ".ohm-shared-registry-cache-v1"
+                    registries = build_directory / "debug" / "build" / "registries"
+                    if not marker.is_file() or not registries.is_dir():
+                        raise BenchmarkError(
+                            "Ohm shared registry caching did not publish immutable "
+                            f"artifacts: {build_directory}"
+                        )
+            with contextlib.ExitStack() as cleanup:
+                for label, _ in self.toolchains:
+                    edit = cleanup.enter_context(
+                        reversible_edit(worktrees[label], workload.direct)
+                    )
+                    edit(True)
+                for label, selector in self.ordered_toolchains(index):
+                    root = self.target(workload, workflow, label)
+                    self.execute(
+                        workload,
+                        workflow,
+                        label,
+                        selector,
+                        phase="reuse",
+                        repetition=0,
+                        expected_crate=workload.package,
+                        worktree=worktrees[label],
+                        target_directory=root / "secondary-target",
+                        extra_environment={
+                            "CARGO_BUILD_BUILD_DIR": str(root / "shared-build")
+                        },
+                    )
+
     def run_workflow(self, workload: Workload, workflow: str, index: int) -> None:
+        if workflow == "build-check":
+            self.run_build_check(workload, index)
+            return
+        if workflow == "fmt":
+            self.run_format(workload, index)
+            return
+        if workflow == "shared-build":
+            self.run_shared_build(workload, index)
+            return
         for phase, count in (
             ("cold", self.options.cold_runs),
             ("noop", self.options.noop_runs),
@@ -753,8 +1030,8 @@ class Study:
                 self.run_workflow(workload, workflow, index)
             except ContaminatedBenchmarkError as error:
                 reason = (
-                    "discarded entire workflow attempt because an unrelated "
-                    f"compiler overlapped a sample: {error}"
+                    "discarded entire workflow attempt because a measurement "
+                    f"was contaminated: {error}"
                 )
                 for sample in self.samples[first_sample:]:
                     sample["valid"] = False
@@ -764,7 +1041,7 @@ class Study:
                     raise
                 print(
                     f"Restarting {workload.name} {workflow} from cold after "
-                    f"compiler interference (retry {attempt + 1}/"
+                    f"measurement contamination (retry {attempt + 1}/"
                     f"{self.options.contention_retries})",
                     flush=True,
                 )
@@ -791,8 +1068,8 @@ class Study:
                 grouped[key].append(float(sample["wall_seconds"]))
         rows = []
         for workload in self.workloads:
-            for workflow in WORKFLOWS:
-                for phase in ("cold", "noop", "dependency", "direct"):
+            for workflow in (*WORKFLOWS, *self.feature_workflows(workload)):
+                for phase in WORKFLOW_PHASES[workflow]:
                     stock = grouped.get((workload.name, workflow, phase, "stock"))
                     ohm = grouped.get((workload.name, workflow, phase, "ohm"))
                     if stock and ohm:
@@ -881,14 +1158,24 @@ class Study:
                 "dependency": self.options.dependency_runs,
                 "direct": self.options.direct_runs,
             },
+            "feature_workflows": {
+                workload.name: self.feature_workflows(workload)
+                for workload in self.workloads
+            },
         }
         self.write_results()
         with self.managed_worktrees():
-            for index, (workload, workflow) in enumerate(
+            core = [
                 (workload, workflow)
                 for workload in self.workloads
                 for workflow in WORKFLOWS
-            ):
+            ]
+            features = [
+                (workload, workflow)
+                for workload in self.workloads
+                for workflow in self.feature_workflows(workload)
+            ]
+            for index, (workload, workflow) in enumerate((*core, *features)):
                 self.run_workflow_with_retries(workload, workflow, index)
         self.metadata["finished_at"] = datetime.datetime.now(
             datetime.timezone.utc
