@@ -1,6 +1,6 @@
 # Benchmarks
 
-These benchmarks compare stock Rust 1.97.1 with `ohm-1.97.1-10` across the
+These benchmarks compare stock Rust 1.97.1 with `ohm-1.97.1-11` across the
 [uv](https://github.com/astral-sh/uv) and [Codex](https://github.com/openai/codex) codebases.
 A separate uv integration-test follow-up also reports `ohm-1.97.1-12` results on Linux.
 
@@ -28,18 +28,18 @@ current integration-test workflow is measured separately below.
 
 | Workflow                  | Rust 1.97.1 |     Ohm | Speedup |
 | ------------------------- | ----------: | ------: | ------: |
-| Cold `cargo check`        |     41.39 s | 48.79 s |   0.85× |
-| Dependency edit, `check`  |      4.86 s |  0.33 s |  14.69× |
-| Direct edit, `check`      |      1.01 s |  0.92 s |   1.10× |
-| No-op `cargo check`       |      0.32 s |  0.29 s |   1.10× |
-| Cold `cargo clippy`       |     42.48 s | 40.56 s |   1.05× |
-| Dependency edit, `clippy` |      8.72 s |  0.35 s |  24.59× |
-| Direct edit, `clippy`     |      2.04 s |  1.32 s |   1.55× |
-| No-op `cargo clippy`      |      0.32 s |  0.28 s |   1.15× |
-| Cold `cargo test`         |     63.16 s | 64.96 s |   0.97× |
-| Dependency edit, `test`   |     10.28 s |  1.68 s |   6.11× |
-| Direct edit, `test`       |      7.31 s |  3.83 s |   1.91× |
-| No-op `cargo test`        |      0.30 s |  0.25 s |   1.19× |
+| Cold `cargo check`        |     41.72 s | 42.13 s |   0.99× |
+| Dependency edit, `check`  |      4.50 s |  0.47 s |   9.49× |
+| Direct edit, `check`      |      0.94 s |  1.02 s |   0.93× |
+| No-op `cargo check`       |      0.29 s |  0.38 s |   0.76× |
+| Cold `cargo clippy`       |     42.34 s | 41.72 s |   1.01× |
+| Dependency edit, `clippy` |      8.82 s |  0.53 s |  16.68× |
+| Direct edit, `clippy`     |      2.08 s |  1.49 s |   1.40× |
+| No-op `cargo clippy`      |      0.33 s |  0.42 s |   0.78× |
+| Cold `cargo test`         |     65.01 s | 66.29 s |   0.98× |
+| Dependency edit, `test`   |     10.56 s |  1.71 s |   6.18× |
+| Direct edit, `test`       |      7.12 s |  3.24 s |   2.20× |
+| No-op `cargo test`        |      0.34 s |  0.29 s |   1.16× |
 
 The measured commands are:
 
@@ -76,18 +76,18 @@ edits change `codex-core` itself.
 
 | Workflow                  | Rust 1.97.1 |      Ohm | Speedup |
 | ------------------------- | ----------: | -------: | ------: |
-| Cold `cargo check`        |     63.73 s |  66.47 s |   0.96× |
-| Dependency edit, `check`  |      7.84 s |   0.54 s |  14.43× |
-| Direct edit, `check`      |      1.95 s |   1.76 s |   1.10× |
-| No-op `cargo check`       |      0.57 s |   0.46 s |   1.23× |
-| Cold `just clippy`        |     95.95 s |  87.67 s |   1.09× |
-| Dependency edit, `clippy` |     24.57 s |   0.74 s |  33.36× |
-| Direct edit, `clippy`     |     11.14 s |   6.79 s |   1.64× |
-| No-op `just clippy`       |      0.66 s |   0.56 s |   1.17× |
-| Cold `just test`          |    129.80 s | 133.92 s |   0.97× |
-| Dependency edit, `test`   |     28.67 s |   6.70 s |   4.28× |
-| Direct edit, `test`       |     16.09 s |  13.15 s |   1.22× |
-| No-op `just test`         |      1.23 s |   1.01 s |   1.22× |
+| Cold `cargo check`        |     64.73 s |  68.17 s |   0.95× |
+| Dependency edit, `check`  |      7.83 s |   0.87 s |   9.02× |
+| Direct edit, `check`      |      1.93 s |   2.09 s |   0.92× |
+| No-op `cargo check`       |      0.57 s |   0.79 s |   0.72× |
+| Cold `just clippy`        |     97.34 s |  89.41 s |   1.09× |
+| Dependency edit, `clippy` |     23.44 s |   1.06 s |  22.11× |
+| Direct edit, `clippy`     |     12.18 s |   8.31 s |   1.47× |
+| No-op `just clippy`       |      0.65 s |   0.89 s |   0.72× |
+| Cold `just test`          |    128.57 s | 129.83 s |   0.99× |
+| Dependency edit, `test`   |     26.44 s |   6.21 s |   4.26× |
+| Direct edit, `test`       |     15.10 s |  13.08 s |   1.15× |
+| No-op `just test`         |      1.33 s |   1.10 s |   1.21× |
 
 The measured commands follow Codex's existing development workflows:
 
