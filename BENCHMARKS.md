@@ -117,9 +117,10 @@ the existing check, Clippy, and test matrix:
   `cargo fmt -- --config imports_granularity=Item --check` command. After an untimed warmup, measure
   three unchanged runs and five reversible, correctly formatted source edits. Ohm must publish a
   real incremental-formatting snapshot before its results are accepted.
-- **Shared-worktree builds:** Build `uv` or `codex-core` in one checkout, then measure a build with a
-  real workspace edit in a second checkout at the same revision. Both toolchains receive the same
-  explicit `CARGO_BUILD_BUILD_DIR`, separate checkout-private target directories, and a trusted
+- **Shared-worktree builds:** Build a real workspace dependency (`uv-normalize` or
+  `codex-utils-string`) in one checkout, then measure a build with a real edit to that dependency in
+  a second checkout at the same revision. Both toolchains receive the same explicit
+  `CARGO_BUILD_BUILD_DIR`, separate checkout-private target directories, and a trusted
   system-native-tool `PATH`. Unverified user-installed native-tool wrappers disable sharing; Ohm
   must publish its shared-cache marker and immutable registry artifacts before its results are
   accepted.

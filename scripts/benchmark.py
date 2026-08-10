@@ -798,6 +798,7 @@ class Study:
                 "log": str(log),
             }
             if workflow == "shared-build":
+                sample["package"] = workload.package
                 sample["worktree"] = str(worktree)
                 sample["shared_build_directory"] = environment["CARGO_BUILD_BUILD_DIR"]
             elif workflow == "build-check" and label == "ohm":
@@ -928,6 +929,11 @@ class Study:
                     )
 
     def run_shared_build(self, workload: Workload, index: int) -> None:
+        # Exercise a real workspace member without root-only native allocators,
+        # keeping released and future toolchains directly comparable.
+        workload = dataclasses.replace(
+            workload, package=workload.dependency.crate, direct=workload.dependency
+        )
         workflow = "shared-build"
         # Keep both arms on the same rustup proxy and trusted system tools; an
         # unrelated virtualenv CMake wrapper must not disable registry sharing.

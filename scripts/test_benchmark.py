@@ -875,9 +875,9 @@ class FeatureWorkflowTests(unittest.TestCase):
             for label, _ in self.study.toolchains
         }
         for peer in peers.values():
-            source = peer / workload.direct.path
+            source = peer / workload.dependency.path
             source.parent.mkdir(parents=True)
-            source.write_text(workload.direct.before, encoding="utf-8")
+            source.write_text(workload.dependency.before, encoding="utf-8")
 
         def publish(*arguments: object, **options: object) -> None:
             label = str(arguments[2])
@@ -889,9 +889,9 @@ class FeatureWorkflowTests(unittest.TestCase):
                 )
             if options["phase"] == "reuse":
                 for peer in peers.values():
-                    source = peer / workload.direct.path
+                    source = peer / workload.dependency.path
                     self.assertEqual(
-                        source.read_text(encoding="utf-8"), workload.direct.after
+                        source.read_text(encoding="utf-8"), workload.dependency.after
                     )
 
         with (
@@ -920,6 +920,8 @@ class FeatureWorkflowTests(unittest.TestCase):
         targets: dict[str, list[Path]] = {"stock": [], "ohm": []}
         for call in execute.call_args_list:
             label = str(call.args[2])
+            self.assertEqual(call.args[0].name, workload.name)
+            self.assertEqual(call.args[0].package, workload.dependency.crate)
             build_root = call.kwargs["extra_environment"]["CARGO_BUILD_BUILD_DIR"]
             executable_paths[label].add(call.kwargs["extra_environment"]["PATH"])
             target = call.kwargs["target_directory"]
@@ -927,7 +929,7 @@ class FeatureWorkflowTests(unittest.TestCase):
             targets[label].append(target)
             self.assertFalse(target.is_relative_to(build_root))
             self.assertFalse(Path(build_root).is_relative_to(target))
-            self.assertEqual(call.kwargs["expected_crate"], workload.package)
+            self.assertEqual(call.kwargs["expected_crate"], workload.dependency.crate)
             if call.kwargs["phase"] == "reuse":
                 self.assertEqual(call.kwargs["worktree"], peers[label])
         self.assertEqual(len(build_roots["stock"]), 1)
@@ -939,8 +941,58 @@ class FeatureWorkflowTests(unittest.TestCase):
         self.assertNotEqual(targets["stock"][0], targets["stock"][1])
         self.assertNotEqual(targets["ohm"][0], targets["ohm"][1])
         for peer in peers.values():
-            source = peer / workload.direct.path
-            self.assertEqual(source.read_text(encoding="utf-8"), workload.direct.before)
+            source = peer / workload.dependency.path
+            self.assertEqual(
+                source.read_text(encoding="utf-8"), workload.dependency.before
+            )
+
+    def test_shared_codex_build_targets_existing_workspace_dependency_member(
+        self,
+    ) -> None:
+        workload = benchmark.WORKLOADS["codex-core"]
+        peers = {
+            label: self.directory / f"codex-{label}-peer"
+            for label, _ in self.study.toolchains
+        }
+        for peer in peers.values():
+            source = peer / workload.dependency.path
+            source.parent.mkdir(parents=True)
+            source.write_text(workload.dependency.before, encoding="utf-8")
+
+        def publish(*arguments: object, **options: object) -> None:
+            if arguments[2] == "ohm" and options["phase"] == "seed":
+                root = Path(options["extra_environment"]["CARGO_BUILD_BUILD_DIR"])
+                (root / "debug" / "build" / "registries").mkdir(parents=True)
+                (root / ".ohm-shared-registry-cache-v1").write_text(
+                    "", encoding="utf-8"
+                )
+
+        with (
+            mock.patch.object(
+                self.study,
+                "managed_shared_worktrees",
+                return_value=contextlib.nullcontext(peers),
+            ),
+            mock.patch.object(self.study, "execute", side_effect=publish) as execute,
+        ):
+            self.study.run_shared_build(workload, 0)
+
+        for call in execute.call_args_list:
+            selected_workload = call.args[0]
+            self.assertEqual(selected_workload.name, "codex-core")
+            self.assertEqual(selected_workload.package, "codex-utils-string")
+            self.assertEqual(call.kwargs["expected_crate"], "codex-utils-string")
+            self.assertIn(
+                "codex-utils-string",
+                self.study.command(
+                    selected_workload, "shared-build", str(call.args[3])
+                ),
+            )
+        for peer in peers.values():
+            source = peer / workload.dependency.path
+            self.assertEqual(
+                source.read_text(encoding="utf-8"), workload.dependency.before
+            )
 
     def test_shared_build_rejects_missing_or_relative_cargo_proxy(self) -> None:
         workload = benchmark.WORKLOADS["uv"]
@@ -1027,6 +1079,7 @@ class FeatureWorkflowTests(unittest.TestCase):
         self.assertEqual(environment["CARGO_TARGET_DIR"], str(target))
         self.assertEqual(environment["CARGO_BUILD_BUILD_DIR"], str(build_directory))
         sample = self.study.samples[0]
+        self.assertEqual(sample["package"], "uv")
         self.assertEqual(sample["worktree"], str(peer))
         self.assertEqual(sample["target_directory"], str(target))
         self.assertEqual(sample["shared_build_directory"], str(build_directory))
