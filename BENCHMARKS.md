@@ -22,8 +22,7 @@ pins Rust 1.95.0; these benchmarks use Rust 1.97.1 for both projects to match Oh
 
 The tables below come from a complete 192-sample study of these existing workflows. The benchmark
 runner now also collects 24 targeted samples for build-to-check reuse, incremental formatting, and
-cross-worktree artifact sharing; those additional workflows are described below and are not included
-in the historical results.
+cross-worktree artifact sharing; their separately collected results are reported below.
 
 ## uv
 
@@ -126,9 +125,22 @@ the existing check, Clippy, and test matrix:
   `PATH`. Unverified user-installed native-tool wrappers disable sharing; Ohm must publish its
   shared-cache marker and immutable registry artifacts before its results are accepted.
 
+The feature study used the same released toolchains, pinned repositories, and eight build jobs as
+the core study. Four preliminary shared-worktree samples were discarded because stock Cargo shared
+private workspace artifacts; the replacement samples use equivalent workspace isolation.
+
+| Project | Workflow                 | Package              | Rust 1.97.1 | Ohm 1.97.1-11 | Speedup | Samples |
+| ------- | ------------------------ | -------------------- | ----------: | ------------: | ------: | ------: |
+| uv      | Build, then check        | `uv`                 |     37.90 s |       17.18 s |   2.21× |       1 |
+| uv      | Shared-worktree build    | `uv-normalize`       |      4.36 s |        3.05 s |   1.43× |       1 |
+| Codex   | Build, then check        | `codex-core`         |     65.11 s |       39.58 s |   1.65× |       1 |
+| Codex   | No-op formatting         | Workspace            |      5.16 s |        0.85 s |   6.06× |       3 |
+| Codex   | Formatting after an edit | `codex-core`         |      5.28 s |        3.06 s |   1.72× |       5 |
+| Codex   | Shared-worktree build    | `codex-utils-string` |      1.67 s |        0.37 s |   4.56× |       1 |
+
 Together these workflows add 24 matched samples to the original 192-sample matrix, for a default
-total of 216 samples. The generated JSON results and Markdown summary report their measurements
-separately from the historical workflows.
+total of 216 samples. The core and feature measurements above were collected as separate complete
+studies; the generated JSON results and Markdown summary distinguish the individual workflows.
 
 ## Reproducing the benchmarks
 

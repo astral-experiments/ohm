@@ -32,6 +32,10 @@ avoid rebuilding unchanged dependents:
 | Codex   | `just clippy`  | `codex-utils-string` |     23.44 s |        1.06 s |  22.11× |
 | Codex   | `just test`    | `codex-utils-string` |     26.44 s |        6.21 s |   4.26× |
 
+Targeted feature benchmarks additionally show up to 2.21× faster build-to-check transitions, 6.06×
+faster unchanged Codex formatting (1.72× after an edit), and 4.56× faster workspace-isolated
+cross-worktree builds.
+
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
 [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790). Use it only for
