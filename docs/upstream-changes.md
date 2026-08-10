@@ -6,6 +6,9 @@ repository's stack to its tip, including the fork-specific CI foundation.
 This is a point-in-time inventory. The linked pull requests and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
+Revision 12 refines the existing Rust and Cargo pull requests with readiness-gated registry reuse,
+authenticated Linux LLVM tools, and standard pthread linkage in workspace-isolated shared builds.
+
 ## ohm-rust
 
 - [#6: Set up fork-owned Rust CI](https://github.com/astral-sh/ohm-rust/pull/6)
