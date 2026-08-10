@@ -946,6 +946,11 @@ class Study:
         with self.managed_shared_worktrees(workload) as worktrees:
             for label, selector in self.ordered_toolchains(index):
                 root = self.target(workload, workflow, label)
+                # Stock Cargo cannot safely share workspace artifacts between
+                # worktrees, so match Ohm's correctness with private roots.
+                build_directory = root / (
+                    "shared-build" if label == "ohm" else "primary-build"
+                )
                 self.execute(
                     workload,
                     workflow,
@@ -957,12 +962,11 @@ class Study:
                     record=False,
                     target_directory=root / "primary-target",
                     extra_environment={
-                        "CARGO_BUILD_BUILD_DIR": str(root / "shared-build"),
+                        "CARGO_BUILD_BUILD_DIR": str(build_directory),
                         "PATH": executable_path,
                     },
                 )
                 if label == "ohm":
-                    build_directory = root / "shared-build"
                     marker = build_directory / ".ohm-shared-registry-cache-v1"
                     registries = build_directory / "debug" / "build" / "registries"
                     if not marker.is_file() or not registries.is_dir():
@@ -978,6 +982,9 @@ class Study:
                     edit(True)
                 for label, selector in self.ordered_toolchains(index):
                     root = self.target(workload, workflow, label)
+                    build_directory = root / (
+                        "shared-build" if label == "ohm" else "secondary-build"
+                    )
                     self.execute(
                         workload,
                         workflow,
@@ -989,7 +996,7 @@ class Study:
                         worktree=worktrees[label],
                         target_directory=root / "secondary-target",
                         extra_environment={
-                            "CARGO_BUILD_BUILD_DIR": str(root / "shared-build"),
+                            "CARGO_BUILD_BUILD_DIR": str(build_directory),
                             "PATH": executable_path,
                         },
                     )

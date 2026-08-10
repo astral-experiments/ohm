@@ -932,8 +932,14 @@ class FeatureWorkflowTests(unittest.TestCase):
             self.assertEqual(call.kwargs["expected_crate"], workload.dependency.crate)
             if call.kwargs["phase"] == "reuse":
                 self.assertEqual(call.kwargs["worktree"], peers[label])
-        self.assertEqual(len(build_roots["stock"]), 1)
+        self.assertEqual(
+            {Path(path).name for path in build_roots["stock"]},
+            {"primary-build", "secondary-build"},
+        )
         self.assertEqual(len(build_roots["ohm"]), 1)
+        self.assertEqual(
+            {Path(path).name for path in build_roots["ohm"]}, {"shared-build"}
+        )
         expected_path = {"/trusted/rustup/bin:/usr/bin:/bin"}
         self.assertEqual(executable_paths["stock"], expected_path)
         self.assertEqual(executable_paths["ohm"], expected_path)

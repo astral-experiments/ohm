@@ -119,11 +119,12 @@ the existing check, Clippy, and test matrix:
   real incremental-formatting snapshot before its results are accepted.
 - **Shared-worktree builds:** Build a real workspace dependency (`uv-normalize` or
   `codex-utils-string`) in one checkout, then measure a build with a real edit to that dependency in
-  a second checkout at the same revision. Both toolchains receive the same explicit
-  `CARGO_BUILD_BUILD_DIR`, separate checkout-private target directories, and a trusted
-  system-native-tool `PATH`. Unverified user-installed native-tool wrappers disable sharing; Ohm
-  must publish its shared-cache marker and immutable registry artifacts before its results are
-  accepted.
+  a second checkout at the same revision. Stock Rust uses separate build directories for each
+  checkout; Ohm shares one build directory while keeping workspace outputs private. This gives both
+  toolchains equivalent workspace isolation while allowing Ohm to reuse immutable registry
+  artifacts. Both receive separate target directories and the same trusted system-native-tool
+  `PATH`. Unverified user-installed native-tool wrappers disable sharing; Ohm must publish its
+  shared-cache marker and immutable registry artifacts before its results are accepted.
 
 Together these workflows add 24 matched samples to the original 192-sample matrix, for a default
 total of 216 samples. The generated JSON results and Markdown summary report their measurements
