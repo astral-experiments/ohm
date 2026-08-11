@@ -129,8 +129,7 @@ for details.
   receive Cargo's defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
   separate shared path for worktrees using the same repository and Ohm toolchain.
-- For one known, fully qualified library test, use focused compilation only when the user explicitly
-  requests or authorizes it:
+- When iterating on one known, fully qualified library test, use focused compilation:
   `cargo +ohm -Zohm-focused-tests test -p <package> --lib <full::test::name> -- --exact`. Do not use
   focused compilation with nextest, integration tests, `--no-run`, coverage, or final validation: it
   can omit backend and linker errors from unselected tests.
