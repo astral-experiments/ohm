@@ -31,14 +31,14 @@ avoid rebuilding unchanged dependents:
 
 **Other common cases** include build-to-check reuse, formatting, and safe cross-worktree builds:
 
-| Project | Workflow                 | Package              | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup | Samples |
-| ------- | ------------------------ | -------------------- | ----------: | ------------: | ------: | ------: |
-| uv      | Build, then check        | `uv`                 |     36.45 s |       17.14 s |   2.13× |       1 |
-| uv      | Shared-worktree build    | `uv-normalize`       |      4.01 s |        2.97 s |   1.35× |       1 |
-| Codex   | Build, then check        | `codex-core`         |     60.93 s |       37.14 s |   1.64× |       1 |
-| Codex   | No-op formatting         | Workspace            |      5.04 s |        0.89 s |   5.67× |       3 |
-| Codex   | Formatting after an edit | `codex-core`         |      5.12 s |        3.11 s |   1.65× |       5 |
-| Codex   | Shared-worktree build    | `codex-utils-string` |      1.62 s |        0.32 s |   5.01× |       1 |
+| Project | Workflow                 | Package              | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup |
+| ------- | ------------------------ | -------------------- | ----------: | ------------: | ------: |
+| uv      | Build, then check        | `uv`                 |     36.45 s |       17.14 s |   2.13× |
+| uv      | Shared-worktree build    | `uv-normalize`       |      4.01 s |        2.97 s |   1.35× |
+| Codex   | Build, then check        | `codex-core`         |     60.93 s |       37.14 s |   1.64× |
+| Codex   | No-op formatting         | Workspace            |      5.04 s |        0.89 s |   5.67× |
+| Codex   | Formatting after an edit | `codex-core`         |      5.12 s |        3.11 s |   1.65× |
+| Codex   | Shared-worktree build    | `codex-utils-string` |      1.62 s |        0.32 s |   5.01× |
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
