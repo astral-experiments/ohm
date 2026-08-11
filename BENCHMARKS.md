@@ -2,6 +2,7 @@
 
 These benchmarks compare stock Rust 1.97.1 with `ohm-1.97.1-10` across the
 [uv](https://github.com/astral-sh/uv) and [Codex](https://github.com/openai/codex) codebases.
+A separate uv integration-test follow-up also reports `ohm-1.97.1-12` results on Linux.
 
 Results were collected on an Apple M5 Max with 128 GB of memory and eight build jobs. Both toolchains
 use the same source revision, default development profiles, and separate Cargo target directories.
@@ -15,13 +16,15 @@ discarded.
   be recompiled.
 - **No-op:** Median of three runs without source changes.
 
-Each test workflow builds and runs one existing unit test. Codex normally pins Rust 1.95.0; these
-benchmarks use Rust 1.97.1 for both projects to match Ohm's Rust base.
+Each test workflow builds and runs one existing test. The current uv workflow runs a black-box
+integration test against the compiled `uv` executable; Codex runs a library test. Codex normally
+pins Rust 1.95.0; these benchmarks use Rust 1.97.1 for both projects to match Ohm's Rust base.
 
 ## uv
 
 These benchmarks target the `uv` crate. Dependency edits change `uv-normalize`; direct edits change
-`uv` itself.
+`uv` itself. The historical `test` rows in this table used the previous library-test workflow; the
+current integration-test workflow is measured separately below.
 
 | Workflow                  | Rust 1.97.1 |     Ohm | Speedup |
 | ------------------------- | ----------: | ------: | ------: |
@@ -43,11 +46,28 @@ The measured commands are:
 ```console
 cargo +1.97.1 check -p uv --lib --locked --offline
 cargo +1.97.1 clippy -p uv --lib --locked --offline
-cargo +1.97.1 test -p uv --lib --locked --offline \
-  install_source::tests::detects_homebrew_cellar -- --exact
+cargo +1.97.1 test -p uv --test it --locked --offline help::help -- --exact
 ```
 
 Replace `+1.97.1` with `+ohm` to run the Ohm variants.
+
+### uv integration tests
+
+The current uv test workflow selects the existing `help::help` integration test, which executes the
+real `uv` CLI. Changing `crates/uv/src/install_source.rs` still recompiles the application and
+relinks its executable, while Ohm can reuse the integration-test executable because it does not use
+the package library. Changing `uv-normalize` retains the existing dependency-edit workload.
+
+The following separate 32-sample comparison used Rust 1.97.1 and `ohm-1.97.1-12` on a Linux AMD
+EPYC 7763 machine with eight build jobs. Both toolchains used the same pinned uv revision, the same
+integration test, offline dependencies, isolated target directories, and uncontaminated samples.
+
+| Phase           | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup | Samples |
+| --------------- | ----------: | ------------: | ------: | ------: |
+| Cold            |    119.06 s |      144.88 s |   0.82× |       1 |
+| No-op           |      1.21 s |        1.07 s |   1.13× |       3 |
+| Dependency edit |     19.78 s |        4.05 s |   4.88× |       7 |
+| Direct edit     |     16.03 s |       11.40 s |   1.41× |       5 |
 
 ## Codex
 
