@@ -111,6 +111,25 @@ Workspace artifacts and final outputs remain private to each checkout. Sharing i
 build directory overlaps a checkout's target directory, Ohm's defaults are turned off, or native
 build tools resolve to unverified user-controlled wrappers.
 
+### `AGENTS.md`
+
+To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS.md`:
+
+```markdown
+## Ohm Rust toolchain
+
+- Use `cargo +ohm <command>` for all local Cargo commands, including `check`, `test`, `clippy`,
+  `fmt`, `metadata`, and external subcommands. Use `rustc +ohm` for direct compiler calls and
+  `RUSTUP_TOOLCHAIN=ohm just <recipe>` for task runners.
+- Ohm automatically enables `-Zrelink-only`, `-Zpublic-api-hash`, and `-Zcache-proc-macros` when
+  compiling. Do not inject these flags manually or through `RUSTFLAGS`; direct `rustc +ohm` does not
+  receive Cargo's defaults.
+- Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
+  separate shared path for worktrees using the same repository and Ohm toolchain.
+- Use `cargo +ohm -Zohm-defaults=no <command>` to disable Ohm's automatic experimental defaults. Use
+  plain `cargo <command>` and the repository's normal toolchain for CI and production builds.
+```
+
 ## Philosophy
 
 Rust's compile times are a bottleneck in day-to-day development, especially in large workspaces
