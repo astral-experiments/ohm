@@ -129,19 +129,13 @@ for details.
   receive Cargo's defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
   separate shared path for worktrees using the same repository and Ohm toolchain.
-- Run relevant existing integration tests normally; Ohm automatically reuses eligible integration
-  executables while rebuilding the application.
 - For one known, fully qualified library test, use focused compilation only when the user explicitly
   requests or authorizes it:
   `cargo +ohm -Zohm-focused-tests test -p <package> --lib <full::test::name> -- --exact`. Do not use
   focused compilation with nextest, integration tests, `--no-run`, coverage, or final validation: it
   can omit backend and linker errors from unselected tests.
-- Use `cargo +ohm -Zohm-defaults=no <command>` to disable Ohm's automatic experimental defaults,
-  including potentially unsound procedural-macro caching. Use plain `cargo <command>` and the
-  repository's normal toolchain for CI, production builds, releases, and final correctness
-  validation. If Ohm is unavailable or incompatible, report the fallback.
-- Incremental formatting is automatic; keep the existing worktree `CARGO_TARGET_DIR` for
-  `cargo +ohm fmt`, or set `OHM_INCREMENTAL_FMT=0` to disable it.
+- Use `cargo +ohm -Zohm-defaults=no <command>` to disable Ohm's automatic experimental defaults. Use
+  plain `cargo <command>` and the repository's normal toolchain for CI and production builds.
 ```
 
 ## Philosophy
