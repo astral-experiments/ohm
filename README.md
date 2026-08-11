@@ -111,12 +111,9 @@ Workspace artifacts and final outputs remain private to each checkout. Sharing i
 build directory overlaps a checkout's target directory, Ohm's defaults are turned off, or native
 build tools resolve to unverified user-controlled wrappers.
 
-### Coding agents
+### `AGENTS.md`
 
-To make Codex use Ohm consistently, add the following to your repository-root `AGENTS.md` or to
-`~/.codex/AGENTS.md` for all projects. See
-[Codex's custom instructions documentation](https://developers.openai.com/codex/guides/agents-md)
-for details.
+To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS.md`:
 
 ```markdown
 ## Ohm Rust toolchain
@@ -129,10 +126,6 @@ for details.
   receive Cargo's defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
   separate shared path for worktrees using the same repository and Ohm toolchain.
-- When iterating on one known, fully qualified library test, use focused compilation:
-  `cargo +ohm -Zohm-focused-tests test -p <package> --lib <full::test::name> -- --exact`. Do not use
-  focused compilation with nextest, integration tests, `--no-run`, coverage, or final validation: it
-  can omit backend and linker errors from unselected tests.
 - Use `cargo +ohm -Zohm-defaults=no <command>` to disable Ohm's automatic experimental defaults. Use
   plain `cargo <command>` and the repository's normal toolchain for CI and production builds.
 ```
