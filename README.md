@@ -4,30 +4,39 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
-incremental builds can be up to 33x faster for common commands in large workspaces.
+incremental builds can be up to 32x faster for common commands in large workspaces.
+
+The tables summarize the 192 core samples from one complete 216-sample study; additional
+formatting, build-to-check, and shared-worktree scenarios are described in the
+[benchmark methodology](BENCHMARKS.md). The uv test workflow runs a real integration test against
+the compiled uv CLI.
 
 **Direct edits** modify the crate being checked, linted, or tested:
 
-| Project | Workflow       | Edited crate | Rust 1.97.1 | Ohm 1.97.1-10 | Speedup |
+| Project | Workflow       | Edited crate | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup |
 | ------- | -------------- | ------------ | ----------: | ------------: | ------: |
-| uv      | `cargo check`  | `uv`         |      1.01 s |        0.92 s |   1.10× |
-| uv      | `cargo clippy` | `uv`         |      2.04 s |        1.32 s |   1.55× |
-| uv      | `cargo test`   | `uv`         |      7.31 s |        3.83 s |   1.91× |
-| Codex   | `cargo check`  | `codex-core` |      1.95 s |        1.76 s |   1.10× |
-| Codex   | `just clippy`  | `codex-core` |     11.14 s |        6.79 s |   1.64× |
-| Codex   | `just test`    | `codex-core` |     16.09 s |       13.15 s |   1.22× |
+| uv      | `cargo check`  | `uv`         |      0.95 s |        0.87 s |   1.10× |
+| uv      | `cargo clippy` | `uv`         |      2.07 s |        1.32 s |   1.57× |
+| uv      | `cargo test`   | `uv`         |      8.49 s |        5.87 s |   1.45× |
+| Codex   | `cargo check`  | `codex-core` |      2.10 s |        2.07 s |   1.02× |
+| Codex   | `just clippy`  | `codex-core` |     11.67 s |        7.36 s |   1.58× |
+| Codex   | `just test`    | `codex-core` |     14.43 s |       12.12 s |   1.19× |
 
 **Indirect edits** modify a dependency's implementation without changing its public API, so Ohm can
 avoid rebuilding unchanged dependents:
 
-| Project | Workflow       | Edited dependency    | Rust 1.97.1 | Ohm 1.97.1-10 | Speedup |
+| Project | Workflow       | Edited dependency    | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup |
 | ------- | -------------- | -------------------- | ----------: | ------------: | ------: |
-| uv      | `cargo check`  | `uv-normalize`       |      4.86 s |        0.33 s |  14.69× |
-| uv      | `cargo clippy` | `uv-normalize`       |      8.72 s |        0.35 s |  24.59× |
-| uv      | `cargo test`   | `uv-normalize`       |     10.28 s |        1.68 s |   6.11× |
-| Codex   | `cargo check`  | `codex-utils-string` |      7.84 s |        0.54 s |  14.43× |
-| Codex   | `just clippy`  | `codex-utils-string` |     24.57 s |        0.74 s |  33.36× |
-| Codex   | `just test`    | `codex-utils-string` |     28.67 s |        6.70 s |   4.28× |
+| uv      | `cargo check`  | `uv-normalize`       |      4.51 s |        0.32 s |  14.15× |
+| uv      | `cargo clippy` | `uv-normalize`       |      8.99 s |        0.37 s |  24.16× |
+| uv      | `cargo test`   | `uv-normalize`       |     13.28 s |        3.97 s |   3.35× |
+| Codex   | `cargo check`  | `codex-utils-string` |      7.93 s |        0.57 s |  14.03× |
+| Codex   | `just clippy`  | `codex-utils-string` |     23.57 s |        0.73 s |  32.07× |
+| Codex   | `just test`    | `codex-utils-string` |     26.35 s |        6.41 s |   4.11× |
+
+Targeted feature benchmarks additionally show up to 2.13× faster build-to-check transitions, 5.67×
+faster unchanged Codex formatting (1.65× after an edit), and 5.01× faster workspace-isolated
+cross-worktree builds.
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
@@ -96,7 +105,8 @@ CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
 ```
 
 Workspace artifacts and final outputs remain private to each checkout. Sharing is disabled when the
-build directory overlaps a checkout's target directory or Ohm's defaults are turned off.
+build directory overlaps a checkout's target directory, Ohm's defaults are turned off, or native
+build tools resolve to unverified user-controlled wrappers.
 
 ## Philosophy
 

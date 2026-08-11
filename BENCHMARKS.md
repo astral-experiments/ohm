@@ -1,6 +1,6 @@
 # Benchmarks
 
-These benchmarks compare stock Rust 1.97.1 with `ohm-1.97.1-10` across the
+These benchmarks compare stock Rust 1.97.1 with `ohm-1.97.1-12` across the
 [uv](https://github.com/astral-sh/uv) and [Codex](https://github.com/openai/codex) codebases.
 A separate uv integration-test follow-up also reports `ohm-1.97.1-12` results on Linux.
 
@@ -20,26 +20,29 @@ Each test workflow builds and runs one existing test. The current uv workflow ru
 integration test against the compiled `uv` executable; Codex runs a library test. Codex normally
 pins Rust 1.95.0; these benchmarks use Rust 1.97.1 for both projects to match Ohm's Rust base.
 
+The tables below come from one complete 216-sample study: 192 samples cover these existing
+workflows, and 24 targeted samples measure build-to-check reuse, incremental formatting, and
+cross-worktree artifact sharing.
+
 ## uv
 
 These benchmarks target the `uv` crate. Dependency edits change `uv-normalize`; direct edits change
-`uv` itself. The historical `test` rows in this table used the previous library-test workflow; the
-current integration-test workflow is measured separately below.
+`uv` itself. The `test` rows execute the `help::help` integration test against the compiled uv CLI.
 
 | Workflow                  | Rust 1.97.1 |     Ohm | Speedup |
 | ------------------------- | ----------: | ------: | ------: |
-| Cold `cargo check`        |     41.39 s | 48.79 s |   0.85× |
-| Dependency edit, `check`  |      4.86 s |  0.33 s |  14.69× |
-| Direct edit, `check`      |      1.01 s |  0.92 s |   1.10× |
-| No-op `cargo check`       |      0.32 s |  0.29 s |   1.10× |
-| Cold `cargo clippy`       |     42.48 s | 40.56 s |   1.05× |
-| Dependency edit, `clippy` |      8.72 s |  0.35 s |  24.59× |
-| Direct edit, `clippy`     |      2.04 s |  1.32 s |   1.55× |
-| No-op `cargo clippy`      |      0.32 s |  0.28 s |   1.15× |
-| Cold `cargo test`         |     63.16 s | 64.96 s |   0.97× |
-| Dependency edit, `test`   |     10.28 s |  1.68 s |   6.11× |
-| Direct edit, `test`       |      7.31 s |  3.83 s |   1.91× |
-| No-op `cargo test`        |      0.30 s |  0.25 s |   1.19× |
+| Cold `cargo check`        |     40.26 s | 41.07 s |   0.98× |
+| Dependency edit, `check`  |      4.51 s |  0.32 s |  14.15× |
+| Direct edit, `check`      |      0.95 s |  0.87 s |   1.10× |
+| No-op `cargo check`       |      0.31 s |  0.24 s |   1.30× |
+| Cold `cargo clippy`       |     44.96 s | 43.40 s |   1.04× |
+| Dependency edit, `clippy` |      8.99 s |  0.37 s |  24.16× |
+| Direct edit, `clippy`     |      2.07 s |  1.32 s |   1.57× |
+| No-op `cargo clippy`      |      0.35 s |  0.29 s |   1.19× |
+| Cold `cargo test`         |     70.36 s | 71.39 s |   0.99× |
+| Dependency edit, `test`   |     13.28 s |  3.97 s |   3.35× |
+| Direct edit, `test`       |      8.49 s |  5.87 s |   1.45× |
+| No-op `cargo test`        |      2.29 s |  2.25 s |   1.02× |
 
 The measured commands are:
 
@@ -76,18 +79,18 @@ edits change `codex-core` itself.
 
 | Workflow                  | Rust 1.97.1 |      Ohm | Speedup |
 | ------------------------- | ----------: | -------: | ------: |
-| Cold `cargo check`        |     63.73 s |  66.47 s |   0.96× |
-| Dependency edit, `check`  |      7.84 s |   0.54 s |  14.43× |
-| Direct edit, `check`      |      1.95 s |   1.76 s |   1.10× |
-| No-op `cargo check`       |      0.57 s |   0.46 s |   1.23× |
-| Cold `just clippy`        |     95.95 s |  87.67 s |   1.09× |
-| Dependency edit, `clippy` |     24.57 s |   0.74 s |  33.36× |
-| Direct edit, `clippy`     |     11.14 s |   6.79 s |   1.64× |
-| No-op `just clippy`       |      0.66 s |   0.56 s |   1.17× |
-| Cold `just test`          |    129.80 s | 133.92 s |   0.97× |
-| Dependency edit, `test`   |     28.67 s |   6.70 s |   4.28× |
-| Direct edit, `test`       |     16.09 s |  13.15 s |   1.22× |
-| No-op `just test`         |      1.23 s |   1.01 s |   1.22× |
+| Cold `cargo check`        |     65.55 s |  68.89 s |   0.95× |
+| Dependency edit, `check`  |      7.93 s |   0.57 s |  14.03× |
+| Direct edit, `check`      |      2.10 s |   2.07 s |   1.02× |
+| No-op `cargo check`       |      0.58 s |   0.46 s |   1.26× |
+| Cold `just clippy`        |    107.45 s |  90.30 s |   1.19× |
+| Dependency edit, `clippy` |     23.57 s |   0.73 s |  32.07× |
+| Direct edit, `clippy`     |     11.67 s |   7.36 s |   1.58× |
+| No-op `just clippy`       |      0.69 s |   0.57 s |   1.21× |
+| Cold `just test`          |    138.16 s | 142.49 s |   0.97× |
+| Dependency edit, `test`   |     26.35 s |   6.41 s |   4.11× |
+| Direct edit, `test`       |     14.43 s |  12.12 s |   1.19× |
+| No-op `just test`         |      1.51 s |   1.13 s |   1.34× |
 
 The measured commands follow Codex's existing development workflows:
 
@@ -99,6 +102,43 @@ RUSTUP_TOOLCHAIN=1.97.1 just test -p codex-core --lib --locked --offline \
 ```
 
 Replace `+1.97.1` with `+ohm`, or set `RUSTUP_TOOLCHAIN=ohm`, to run the Ohm variants.
+
+## Additional feature workflows
+
+The benchmark runner includes three additional workflows that exercise optimizations not covered by
+the existing check, Clippy, and test matrix:
+
+- **Build-to-check reuse:** Build `uv` or `codex-core` without timing, then measure the first
+  `cargo check` against the same target directory. This measures whether already-built registry
+  dependencies can be reused across commands.
+- **Incremental formatting:** Run Codex's actual
+  `cargo fmt -- --config imports_granularity=Item --check` command. After an untimed warmup, measure
+  three unchanged runs and five reversible, correctly formatted source edits. Ohm must publish a
+  real incremental-formatting snapshot before its results are accepted.
+- **Shared-worktree builds:** Build a real workspace dependency (`uv-normalize` or
+  `codex-utils-string`) in one checkout, then measure a build with a real edit to that dependency in
+  a second checkout at the same revision. Stock Rust uses separate build directories for each
+  checkout; Ohm shares one build directory while keeping workspace outputs private. This gives both
+  toolchains equivalent workspace isolation while allowing Ohm to reuse immutable registry
+  artifacts. Both receive separate target directories and the same trusted system-native-tool
+  `PATH`. Unverified user-installed native-tool wrappers disable sharing; Ohm must publish its
+  shared-cache marker and immutable registry artifacts before its results are accepted.
+
+All 24 feature samples were collected with the same released toolchains, pinned repositories, and
+eight build jobs as the 192 core samples in one complete, uncontaminated study.
+
+| Project | Workflow                 | Package              | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup | Samples |
+| ------- | ------------------------ | -------------------- | ----------: | ------------: | ------: | ------: |
+| uv      | Build, then check        | `uv`                 |     36.45 s |       17.14 s |   2.13× |       1 |
+| uv      | Shared-worktree build    | `uv-normalize`       |      4.01 s |        2.97 s |   1.35× |       1 |
+| Codex   | Build, then check        | `codex-core`         |     60.93 s |       37.14 s |   1.64× |       1 |
+| Codex   | No-op formatting         | Workspace            |      5.04 s |        0.89 s |   5.67× |       3 |
+| Codex   | Formatting after an edit | `codex-core`         |      5.12 s |        3.11 s |   1.65× |       5 |
+| Codex   | Shared-worktree build    | `codex-utils-string` |      1.62 s |        0.32 s |   5.01× |       1 |
+
+Together these workflows add 24 matched samples to the original 192-sample matrix, for a default
+total of 216 samples. The generated JSON results and Markdown summary distinguish the individual
+workflows within the same complete study.
 
 ## Reproducing the benchmarks
 
@@ -120,8 +160,9 @@ Cloning requires network access, but the benchmark commands run offline, so Carg
 already be cached. `--dry-run` prints the benchmark plan without cloning or running a build.
 
 By default, the runner compares Rust 1.97.1 against `+ohm` across `uv` and `codex-core`, using eight
-build jobs. Each workflow includes one cold build, three no-op runs, seven dependency edits, and five
-direct edits. Use `--project` to run a smaller matrix:
+build jobs. Each original workflow includes one cold build, three no-op runs, seven dependency edits,
+and five direct edits; the three additional feature workflows run afterward. Use `--project` to run a
+smaller matrix:
 
 ```console
 uv run scripts/benchmark.py \
