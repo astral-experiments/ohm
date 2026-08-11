@@ -63,7 +63,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-12/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-13/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -86,7 +86,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-12 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-13 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, and reuse of
 previously built registry dependencies by default. Use its aggregate opt-out to compare against the
@@ -96,8 +96,9 @@ same compiler and Cargo without those defaults:
 cargo +ohm -Zohm-defaults=no test
 ```
 
-`cargo +ohm fmt` also formats only the workspace packages that changed. Set
-`OHM_INCREMENTAL_FMT=0` to disable incremental formatting.
+`cargo +ohm fmt` also formats only changed workspace packages and, when rustfmt can safely verify a
+changed module in isolation, just that module. Set `OHM_INCREMENTAL_FMT=0` to disable incremental
+formatting.
 
 To share immutable registry artifacts across worktrees, configure the same separate build directory
 for each checkout:
@@ -144,11 +145,13 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Conditional metadata pipelining when a dependency's public API changes, with crash-safe recovery.
 - Reused integration-test executables when changed package or workspace libraries are unused.
 - Early cutoff for `cargo check` and `cargo clippy`.
-- Reused immutable registry dependencies between builds, checks, and Clippy invocations, without
-  speculative dependency resolution before a prior build.
+- Reused immutable registry dependencies between builds, checks, and Clippy invocations, including
+  active dependency graphs and audited procedural-macro closures, without speculative dependency
+  resolution before a prior build.
 - Shared immutable registry artifacts across worktrees with an explicitly configured build directory,
   including standard native pthread linkage and authenticated Linux LLVM tools.
-- Incremental workspace formatting backed by rustfmt's authoritative module graph.
+- Incremental workspace formatting that formats individual changed modules when rustfmt's
+  authoritative module graph confirms their ownership and topology.
 - Experimental procedural-macro caching (`rustc -Zcache-proc-macros`).
 - Backported Clippy optimizations, including combined lint passes.
 
@@ -167,8 +170,8 @@ and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-11` and
-`ohm-1.97.1-12`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-12` and
+`ohm-1.97.1-13`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:
