@@ -907,6 +907,31 @@ class RepositoryCloneTests(unittest.TestCase):
 
 
 class CommandLineTests(unittest.TestCase):
+    def test_uv_test_workflow_runs_a_real_integration_test(self) -> None:
+        study = object.__new__(benchmark.Study)
+        workload = benchmark.WORKLOADS["uv"]
+
+        self.assertEqual(
+            study.command(workload, "test", "1.97.1"),
+            [
+                "cargo",
+                "+1.97.1",
+                "test",
+                "-p",
+                "uv",
+                "--test",
+                "it",
+                "--locked",
+                "--offline",
+                "help::help",
+                "--",
+                "--exact",
+            ],
+        )
+        for workflow in ("check", "clippy"):
+            with self.subTest(workflow=workflow):
+                self.assertIn("--lib", study.command(workload, workflow, "1.97.1"))
+
     def test_default_matrix_contains_only_uv_and_codex_core(self) -> None:
         arguments = benchmark.parser().parse_args([])
 

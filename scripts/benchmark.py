@@ -93,7 +93,7 @@ WORKLOADS = {
             "            }",
             "uv",
         ),
-        "install_source::tests::detects_homebrew_cellar",
+        "help::help",
     ),
     "codex-core": Workload(
         "codex-core",
@@ -489,7 +489,12 @@ class Study:
             yield
 
     def command(self, workload: Workload, workflow: str, selector: str) -> list[str]:
-        arguments = ["-p", workload.package, "--lib", "--locked", "--offline"]
+        target = (
+            ["--test", "it"]
+            if workload.repository == "uv" and workflow == "test"
+            else ["--lib"]
+        )
+        arguments = ["-p", workload.package, *target, "--locked", "--offline"]
         if workload.repository == "uv":
             command = ["cargo", f"+{selector}", workflow, *arguments]
             if workflow == "test":
