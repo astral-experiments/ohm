@@ -1,13 +1,14 @@
 # Changes from upstream
 
-The Ohm source repositories are based on Rust 1.97.1. Pull requests are listed from the base of each
+The Ohm source repositories are based on Rust 1.97.1. Source changes are listed from the base of each
 repository's stack to its tip, including the fork-specific CI foundation.
 
-This is a point-in-time inventory. The linked pull requests and pinned release manifest remain the
+This is a point-in-time inventory. The linked source changes and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
-Revision 12 refines the existing Rust and Cargo pull requests with readiness-gated registry reuse,
-authenticated Linux LLVM tools, and standard pthread linkage in workspace-isolated shared builds.
+Revision 13 extends registry build-to-check reuse to active dependency graphs and audited procedural
+macros, and formats individual changed Rust modules after authoritative ownership and topology
+checks.
 
 ## ohm-rust
 
@@ -39,6 +40,7 @@ authenticated Linux LLVM tools, and standard pthread linkage in workspace-isolat
 - [#28: Keep incremental codegen-unit merges stable across edits](https://github.com/astral-sh/ohm-rust/pull/28)
 - [#29: Pin Cargo with incremental codegen defaults](https://github.com/astral-sh/ohm-rust/pull/29)
 - [#30: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rust/pull/30)
+- [Pin Cargo with expanded registry reuse](https://github.com/astral-sh/ohm-rust/commit/9eefe89af10df459e4a3ab581506f22d7dacf0ba)
 
 ## ohm-cargo
 
@@ -70,6 +72,7 @@ authenticated Linux LLVM tools, and standard pthread linkage in workspace-isolat
 - [#31: Enable incremental codegen optimizations for workspace builds](https://github.com/astral-sh/ohm-cargo/pull/31)
 - [#32: Reuse built registry dependencies during checks](https://github.com/astral-sh/ohm-cargo/pull/32)
 - [#33: Share immutable registry artifacts across worktrees](https://github.com/astral-sh/ohm-cargo/pull/33)
+- [#35: Expand registry reuse across active dependency graphs](https://github.com/astral-sh/ohm-cargo/pull/35)
 
 ## ohm-rust-clippy
 
@@ -108,3 +111,4 @@ authenticated Linux LLVM tools, and standard pthread linkage in workspace-isolat
 
 - [#1: Set up fork-owned rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/1)
 - [#2: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rustfmt/pull/2)
+- [#3: Format only changed Cargo workspace modules](https://github.com/astral-sh/ohm-rustfmt/pull/3)
