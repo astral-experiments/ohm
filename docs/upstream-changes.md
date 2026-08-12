@@ -6,9 +6,9 @@ repository's stack to its tip, including the fork-specific CI foundation.
 This is a point-in-time inventory. The linked source changes and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
-Revision 13 extends registry build-to-check reuse to active dependency graphs and audited procedural
-macros, and formats individual changed Rust modules after authoritative ownership and topology
-checks.
+Revision 14 speeds up incremental formatting with buffered snapshots and module manifests, reuses
+verified source observations, indexes locked dependencies by package name, and deduplicates
+authenticated compiler-driver validation for reused registry artifacts.
 
 ## ohm-rust
 
@@ -41,6 +41,7 @@ checks.
 - [#29: Pin Cargo with incremental codegen defaults](https://github.com/astral-sh/ohm-rust/pull/29)
 - [#30: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rust/pull/30)
 - [Pin Cargo with expanded registry reuse](https://github.com/astral-sh/ohm-rust/commit/9eefe89af10df459e4a3ab581506f22d7dacf0ba)
+- [Pin Cargo with faster dependency resolution and driver validation](https://github.com/astral-sh/ohm-rust/commit/c1bf85f38d6f23d86b1710e4485a70567e6805bf)
 
 ## ohm-cargo
 
@@ -73,6 +74,8 @@ checks.
 - [#32: Reuse built registry dependencies during checks](https://github.com/astral-sh/ohm-cargo/pull/32)
 - [#33: Share immutable registry artifacts across worktrees](https://github.com/astral-sh/ohm-cargo/pull/33)
 - [#35: Expand registry reuse across active dependency graphs](https://github.com/astral-sh/ohm-cargo/pull/35)
+- [#36: Index locked packages by dependency name](https://github.com/astral-sh/ohm-cargo/pull/36)
+- [#37: Deduplicate compiler-driver validation for reused dependencies](https://github.com/astral-sh/ohm-cargo/pull/37)
 
 ## ohm-rust-clippy
 
@@ -111,4 +114,4 @@ checks.
 
 - [#1: Set up fork-owned rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/1)
 - [#2: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rustfmt/pull/2)
-- [#3: Format only changed Cargo workspace modules](https://github.com/astral-sh/ohm-rustfmt/pull/3)
+- [#3: Format only changed Cargo workspace modules with buffered cache and manifest I/O](https://github.com/astral-sh/ohm-rustfmt/pull/3)
