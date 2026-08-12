@@ -133,6 +133,8 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
   receive Cargo's defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
   separate shared path for worktrees using the same repository and Ohm toolchain.
+- Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` to maximize authenticated registry procedural-macro
+  reuse across worktrees. This opt-in is potentially unsound; avoid it for CI, releases, etc.
 - Use `cargo +ohm -Zohm-defaults=no <command>` to disable Ohm's automatic experimental defaults. Use
   plain `cargo <command>` and the repository's normal toolchain for CI and production builds.
 ```
