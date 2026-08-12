@@ -6,9 +6,10 @@ repository's stack to its tip, including the fork-specific CI foundation.
 This is a point-in-time inventory. The linked source changes and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
-Revision 14 speeds up incremental formatting with buffered snapshots and module manifests, reuses
-verified source observations, indexes locked dependencies by package name, and deduplicates
-authenticated compiler-driver validation for reused registry artifacts.
+Revision 15 shares individually audited procedural macros and authenticated runtime dependencies
+across worktrees, with an explicitly selected and potentially unsound trust-all policy. It also
+avoids unnecessary Clippy redundant-clone analysis for literal receivers and lazily initializes
+borrower analysis.
 
 ## ohm-rust
 
@@ -40,8 +41,8 @@ authenticated compiler-driver validation for reused registry artifacts.
 - [#28: Keep incremental codegen-unit merges stable across edits](https://github.com/astral-sh/ohm-rust/pull/28)
 - [#29: Pin Cargo with incremental codegen defaults](https://github.com/astral-sh/ohm-rust/pull/29)
 - [#30: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rust/pull/30)
-- [Pin Cargo with expanded registry reuse](https://github.com/astral-sh/ohm-rust/commit/9eefe89af10df459e4a3ab581506f22d7dacf0ba)
-- [Pin Cargo with faster dependency resolution and driver validation](https://github.com/astral-sh/ohm-rust/commit/c1bf85f38d6f23d86b1710e4485a70567e6805bf)
+- [#31: Pin Cargo with expanded registry reuse and driver validation](https://github.com/astral-sh/ohm-rust/pull/31)
+- [#32: Pin Cargo with audited procedural-macro sharing](https://github.com/astral-sh/ohm-rust/pull/32)
 
 ## ohm-cargo
 
@@ -76,6 +77,7 @@ authenticated compiler-driver validation for reused registry artifacts.
 - [#35: Expand registry reuse across active dependency graphs](https://github.com/astral-sh/ohm-cargo/pull/35)
 - [#36: Index locked packages by dependency name](https://github.com/astral-sh/ohm-cargo/pull/36)
 - [#37: Deduplicate compiler-driver validation for reused dependencies](https://github.com/astral-sh/ohm-cargo/pull/37)
+- [#38: Share audited procedural macros across worktrees](https://github.com/astral-sh/ohm-cargo/pull/38)
 
 ## ohm-rust-clippy
 
@@ -86,7 +88,7 @@ authenticated compiler-driver validation for reused registry artifacts.
 - [#4: Backport doc-markdown lint early exit](https://github.com/astral-sh/ohm-rust-clippy/pull/4)
 - [#5: Backport boxed-local parameter prefilter](https://github.com/astral-sh/ohm-rust-clippy/pull/5)
 - [#6: Backport allocation-free associated item descriptions](https://github.com/astral-sh/ohm-rust-clippy/pull/6)
-- [#7: Skip redundant-clone analysis for clone-free functions](https://github.com/astral-sh/ohm-rust-clippy/pull/7)
+- [#7: Skip redundant-clone analysis for clone-free functions and literal receivers](https://github.com/astral-sh/ohm-rust-clippy/pull/7)
 - [#13: Backport disabled documentation-lint guards](https://github.com/astral-sh/ohm-rust-clippy/pull/13)
 - [#14: Backport allocation-free MinifyingSugg zero checks](https://github.com/astral-sh/ohm-rust-clippy/pull/14)
 - [#15: Backport allocation-free documentation tab scanning](https://github.com/astral-sh/ohm-rust-clippy/pull/15)
