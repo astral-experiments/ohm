@@ -63,7 +63,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-13/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-14/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -86,7 +86,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-13 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-14 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, and reuse of
 previously built registry dependencies by default. Use its aggregate opt-out to compare against the
@@ -151,6 +151,7 @@ At present, Ohm includes the following optimizations, all enabled by default:
   Codex and uv target-directory comparisons.
 - Faster crate discovery by ignoring generated object files during compiler search-path indexing.
 - Indexed crate lookup by name and public API hash (13% faster on a Codex dependency-graph fixture).
+- Indexed locked dependencies by package name while preserving aliases and multiple versions.
 - Reused incremental query dependency edges during compiler cache promotion.
 - Deduplicated metadata for registry and Git dependency libraries.
 - Backported compiler fast paths for specialization, privacy checking, and string escaping.
@@ -167,10 +168,12 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Reused immutable registry dependencies between builds, checks, and Clippy invocations, including
   active dependency graphs and audited procedural-macro closures, without speculative dependency
   resolution before a prior build.
+- Deduplicated authenticated compiler-driver validation across reused registry dependencies.
 - Shared immutable registry artifacts across worktrees with an explicitly configured build directory,
   including standard native pthread linkage and authenticated Linux LLVM tools.
 - Incremental workspace formatting that formats individual changed modules when rustfmt's
-  authoritative module graph confirms their ownership and topology.
+  authoritative module graph confirms their ownership and topology, with buffered incremental state
+  and module manifests and reused source observations.
 - Experimental procedural-macro caching (`rustc -Zcache-proc-macros`).
 - Backported Clippy optimizations, including combined lint passes.
 
@@ -189,8 +192,8 @@ and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-12` and
-`ohm-1.97.1-13`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-13` and
+`ohm-1.97.1-14`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:
