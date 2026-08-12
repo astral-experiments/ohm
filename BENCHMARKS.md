@@ -1,6 +1,6 @@
 # Benchmarks
 
-These benchmarks compare stock Rust 1.97.1 with `ohm-1.97.1-12` across the
+These benchmarks compare stock Rust 1.97.1 with `ohm-1.97.1-14` across the
 [uv](https://github.com/astral-sh/uv) and [Codex](https://github.com/openai/codex) codebases.
 A separate uv integration-test follow-up also reports `ohm-1.97.1-12` results on Linux.
 
@@ -31,18 +31,18 @@ These benchmarks target the `uv` crate. Dependency edits change `uv-normalize`; 
 
 | Workflow                  | Rust 1.97.1 |     Ohm | Speedup |
 | ------------------------- | ----------: | ------: | ------: |
-| Cold `cargo check`        |     40.26 s | 41.07 s |   0.98× |
-| Dependency edit, `check`  |      4.51 s |  0.32 s |  14.15× |
-| Direct edit, `check`      |      0.95 s |  0.87 s |   1.10× |
-| No-op `cargo check`       |      0.31 s |  0.24 s |   1.30× |
-| Cold `cargo clippy`       |     44.96 s | 43.40 s |   1.04× |
-| Dependency edit, `clippy` |      8.99 s |  0.37 s |  24.16× |
-| Direct edit, `clippy`     |      2.07 s |  1.32 s |   1.57× |
-| No-op `cargo clippy`      |      0.35 s |  0.29 s |   1.19× |
-| Cold `cargo test`         |     70.36 s | 71.39 s |   0.99× |
-| Dependency edit, `test`   |     13.28 s |  3.97 s |   3.35× |
-| Direct edit, `test`       |      8.49 s |  5.87 s |   1.45× |
-| No-op `cargo test`        |      2.29 s |  2.25 s |   1.02× |
+| Cold `cargo check`        |     41.27 s | 40.66 s |   1.01× |
+| Dependency edit, `check`  |      4.48 s |  0.31 s |  14.57× |
+| Direct edit, `check`      |      0.96 s |  0.89 s |   1.08× |
+| No-op `cargo check`       |      0.31 s |  0.26 s |   1.23× |
+| Cold `cargo clippy`       |     42.77 s | 40.64 s |   1.05× |
+| Dependency edit, `clippy` |      8.73 s |  0.38 s |  23.02× |
+| Direct edit, `clippy`     |      2.14 s |  1.40 s |   1.53× |
+| No-op `cargo clippy`      |      0.32 s |  0.27 s |   1.21× |
+| Cold `cargo test`         |     71.39 s | 69.27 s |   1.03× |
+| Dependency edit, `test`   |     13.09 s |  4.00 s |   3.27× |
+| Direct edit, `test`       |      8.71 s |  5.92 s |   1.47× |
+| No-op `cargo test`        |      2.37 s |  2.29 s |   1.03× |
 
 The measured commands are:
 
@@ -79,18 +79,18 @@ edits change `codex-core` itself.
 
 | Workflow                  | Rust 1.97.1 |      Ohm | Speedup |
 | ------------------------- | ----------: | -------: | ------: |
-| Cold `cargo check`        |     65.55 s |  68.89 s |   0.95× |
-| Dependency edit, `check`  |      7.93 s |   0.57 s |  14.03× |
-| Direct edit, `check`      |      2.10 s |   2.07 s |   1.02× |
-| No-op `cargo check`       |      0.58 s |   0.46 s |   1.26× |
-| Cold `just clippy`        |    107.45 s |  90.30 s |   1.19× |
-| Dependency edit, `clippy` |     23.57 s |   0.73 s |  32.07× |
-| Direct edit, `clippy`     |     11.67 s |   7.36 s |   1.58× |
-| No-op `just clippy`       |      0.69 s |   0.57 s |   1.21× |
-| Cold `just test`          |    138.16 s | 142.49 s |   0.97× |
-| Dependency edit, `test`   |     26.35 s |   6.41 s |   4.11× |
-| Direct edit, `test`       |     14.43 s |  12.12 s |   1.19× |
-| No-op `just test`         |      1.51 s |   1.13 s |   1.34× |
+| Cold `cargo check`        |     64.71 s |  66.76 s |   0.97× |
+| Dependency edit, `check`  |      8.34 s |   0.63 s |  13.20× |
+| Direct edit, `check`      |      2.06 s |   1.87 s |   1.10× |
+| No-op `cargo check`       |      0.59 s |   0.46 s |   1.27× |
+| Cold `just clippy`        |     99.06 s |  87.60 s |   1.13× |
+| Dependency edit, `clippy` |     22.94 s |   0.67 s |  34.18× |
+| Direct edit, `clippy`     |     11.08 s |   6.76 s |   1.64× |
+| No-op `just clippy`       |      0.73 s |   0.58 s |   1.27× |
+| Cold `just test`          |    133.19 s | 127.57 s |   1.04× |
+| Dependency edit, `test`   |     26.62 s |   6.31 s |   4.22× |
+| Direct edit, `test`       |     14.80 s |  12.63 s |   1.17× |
+| No-op `just test`         |      1.32 s |   1.07 s |   1.24× |
 
 The measured commands follow Codex's existing development workflows:
 
@@ -127,14 +127,14 @@ the existing check, Clippy, and test matrix:
 All 24 feature samples were collected with the same released toolchains, pinned repositories, and
 eight build jobs as the 192 core samples in one complete, uncontaminated study.
 
-| Project | Workflow                 | Package              | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup | Samples |
+| Project | Workflow                 | Package              | Rust 1.97.1 | Ohm 1.97.1-14 | Speedup | Samples |
 | ------- | ------------------------ | -------------------- | ----------: | ------------: | ------: | ------: |
-| uv      | Build, then check        | `uv`                 |     36.45 s |       17.14 s |   2.13× |       1 |
-| uv      | Shared-worktree build    | `uv-normalize`       |      4.01 s |        2.97 s |   1.35× |       1 |
-| Codex   | Build, then check        | `codex-core`         |     60.93 s |       37.14 s |   1.64× |       1 |
-| Codex   | No-op formatting         | Workspace            |      5.04 s |        0.89 s |   5.67× |       3 |
-| Codex   | Formatting after an edit | `codex-core`         |      5.12 s |        3.11 s |   1.65× |       5 |
-| Codex   | Shared-worktree build    | `codex-utils-string` |      1.62 s |        0.32 s |   5.01× |       1 |
+| uv      | Build, then check        | `uv`                 |     35.92 s |       14.64 s |   2.45× |       1 |
+| uv      | Shared-worktree build    | `uv-normalize`       |      4.00 s |        2.95 s |   1.36× |       1 |
+| Codex   | Build, then check        | `codex-core`         |     59.57 s |       33.15 s |   1.80× |       1 |
+| Codex   | No-op formatting         | Workspace            |      5.00 s |        0.15 s |  33.38× |       3 |
+| Codex   | Formatting after an edit | `codex-core`         |      5.13 s |        0.23 s |  22.03× |       5 |
+| Codex   | Shared-worktree build    | `codex-utils-string` |      1.61 s |        0.31 s |   5.23× |       1 |
 
 Together these workflows add 24 matched samples to the original 192-sample matrix, for a default
 total of 216 samples. The generated JSON results and Markdown summary distinguish the individual
