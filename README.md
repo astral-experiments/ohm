@@ -63,7 +63,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-15/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-16/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -86,7 +86,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-15 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-16 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, and reuse of
 previously built registry dependencies by default. Use its aggregate opt-out to compare against the
@@ -108,8 +108,16 @@ CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
 ```
 
 Workspace artifacts and final outputs remain private to each checkout. Sharing is disabled when the
-build directory overlaps a checkout's target directory, Ohm's defaults are turned off, or native
-build tools resolve to unverified user-controlled wrappers.
+build directory overlaps a checkout's target directory or Ohm's defaults are turned off. Unverified
+native build tools isolate their helper crates, build scripts, and affected dependents without
+preventing unrelated registry packages from being shared.
+
+Native-tool trust defaults to `strict`. To additionally trust authenticated registry build scripts,
+set `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=build-scripts`; known native-tool helpers and their
+dependents remain isolated. Set it to `all` to trust those helpers as well. Both opt-ins are
+potentially unsound: build scripts and native tools can observe untracked files, environment
+variables, or executable changes and produce stale generated code or native objects. Each policy
+uses a separate cache namespace.
 
 Registry procedural macros and their runtime dependencies are shared only after source and checksum
 verification. By default, Ohm limits sharing to individually audited macro releases. To explicitly
@@ -179,8 +187,8 @@ At present, Ohm includes the following optimizations, all enabled by default:
   resolution before a prior build.
 - Deduplicated authenticated compiler-driver validation across reused registry dependencies.
 - Shared immutable registry artifacts across worktrees with an explicitly configured build directory,
-  including audited procedural-macro and runtime-dependency closures, standard native pthread
-  linkage, and authenticated Linux LLVM tools.
+  including audited procedural-macro and runtime-dependency closures, dependency-scoped native-tool
+  isolation, standard native pthread linkage, and authenticated Linux LLVM tools.
 - Incremental workspace formatting that formats individual changed modules when rustfmt's
   authoritative module graph confirms their ownership and topology, with buffered incremental state
   and module manifests and reused source observations.
@@ -202,8 +210,8 @@ and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-14` and
-`ohm-1.97.1-15`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-15` and
+`ohm-1.97.1-16`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:
