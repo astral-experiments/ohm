@@ -6,10 +6,10 @@ repository's stack to its tip, including the fork-specific CI foundation.
 This is a point-in-time inventory. The linked source changes and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
-Revision 15 shares individually audited procedural macros and authenticated runtime dependencies
-across worktrees, with an explicitly selected and potentially unsound trust-all policy. It also
-avoids unnecessary Clippy redundant-clone analysis for literal receivers and lazily initializes
-borrower analysis.
+Revision 16 scopes unverified native build tools to their helper crates, build scripts, and affected
+dependents, allowing unrelated registry artifacts to remain shared across worktrees. Explicit,
+isolated `build-scripts` and `all` trust policies enable additional authenticated registry reuse
+when their potentially unsound behavior is acceptable for local development.
 
 ## ohm-rust
 
@@ -43,6 +43,7 @@ borrower analysis.
 - [#30: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rust/pull/30)
 - [#31: Pin Cargo with expanded registry reuse and driver validation](https://github.com/astral-sh/ohm-rust/pull/31)
 - [#32: Pin Cargo with audited procedural-macro sharing](https://github.com/astral-sh/ohm-rust/pull/32)
+- [#33: Pin Cargo with native-tool-aware registry sharing](https://github.com/astral-sh/ohm-rust/pull/33)
 
 ## ohm-cargo
 
@@ -78,6 +79,7 @@ borrower analysis.
 - [#36: Index locked packages by dependency name](https://github.com/astral-sh/ohm-cargo/pull/36)
 - [#37: Deduplicate compiler-driver validation for reused dependencies](https://github.com/astral-sh/ohm-cargo/pull/37)
 - [#38: Share audited procedural macros across worktrees](https://github.com/astral-sh/ohm-cargo/pull/38)
+- [#39: Scope opaque native tools to affected registry dependencies](https://github.com/astral-sh/ohm-cargo/pull/39)
 
 ## ohm-rust-clippy
 
