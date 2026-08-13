@@ -4,41 +4,41 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
-incremental builds can be up to 32x faster for common commands in large workspaces.
+incremental builds can be up to 34x faster for common commands in large workspaces.
 
 **Direct edits** modify the crate being checked, linted, or tested:
 
-| Project | Workflow               | Edited crate | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup |
+| Project | Workflow               | Edited crate | Rust 1.97.1 | Ohm 1.97.1-14 | Speedup |
 | ------- | ---------------------- | ------------ | ----------: | ------------: | ------: |
-| uv      | `cargo check`          | `uv`         |      0.95 s |        0.87 s |   1.10× |
-| uv      | `cargo clippy`         | `uv`         |      2.07 s |        1.32 s |   1.57× |
-| uv      | `cargo test --test it` | `uv`         |      8.49 s |        5.87 s |   1.45× |
-| Codex   | `cargo check`          | `codex-core` |      2.10 s |        2.07 s |   1.02× |
-| Codex   | `just clippy`          | `codex-core` |     11.67 s |        7.36 s |   1.58× |
-| Codex   | `just test`            | `codex-core` |     14.43 s |       12.12 s |   1.19× |
+| uv      | `cargo check`          | `uv`         |      0.96 s |        0.89 s |   1.08× |
+| uv      | `cargo clippy`         | `uv`         |      2.14 s |        1.40 s |   1.53× |
+| uv      | `cargo test --test it` | `uv`         |      8.71 s |        5.92 s |   1.47× |
+| Codex   | `cargo check`          | `codex-core` |      2.06 s |        1.87 s |   1.10× |
+| Codex   | `just clippy`          | `codex-core` |     11.08 s |        6.76 s |   1.64× |
+| Codex   | `just test`            | `codex-core` |     14.80 s |       12.63 s |   1.17× |
 
 **Indirect edits** modify a dependency's implementation without changing its public API, so Ohm can
 avoid rebuilding unchanged dependents:
 
-| Project | Workflow               | Edited dependency    | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup |
+| Project | Workflow               | Edited dependency    | Rust 1.97.1 | Ohm 1.97.1-14 | Speedup |
 | ------- | ---------------------- | -------------------- | ----------: | ------------: | ------: |
-| uv      | `cargo check`          | `uv-normalize`       |      4.51 s |        0.32 s |  14.15× |
-| uv      | `cargo clippy`         | `uv-normalize`       |      8.99 s |        0.37 s |  24.16× |
-| uv      | `cargo test --test it` | `uv-normalize`       |     13.28 s |        3.97 s |   3.35× |
-| Codex   | `cargo check`          | `codex-utils-string` |      7.93 s |        0.57 s |  14.03× |
-| Codex   | `just clippy`          | `codex-utils-string` |     23.57 s |        0.73 s |  32.07× |
-| Codex   | `just test`            | `codex-utils-string` |     26.35 s |        6.41 s |   4.11× |
+| uv      | `cargo check`          | `uv-normalize`       |      4.48 s |        0.31 s |  14.57× |
+| uv      | `cargo clippy`         | `uv-normalize`       |      8.73 s |        0.38 s |  23.02× |
+| uv      | `cargo test --test it` | `uv-normalize`       |     13.09 s |        4.00 s |   3.27× |
+| Codex   | `cargo check`          | `codex-utils-string` |      8.34 s |        0.63 s |  13.20× |
+| Codex   | `just clippy`          | `codex-utils-string` |     22.94 s |        0.67 s |  34.18× |
+| Codex   | `just test`            | `codex-utils-string` |     26.62 s |        6.31 s |   4.22× |
 
 **Other common cases** include build-to-check reuse, formatting, and safe cross-worktree builds:
 
-| Project | Workflow                 | Package              | Rust 1.97.1 | Ohm 1.97.1-12 | Speedup |
+| Project | Workflow                 | Package              | Rust 1.97.1 | Ohm 1.97.1-14 | Speedup |
 | ------- | ------------------------ | -------------------- | ----------: | ------------: | ------: |
-| uv      | Build, then check        | `uv`                 |     36.45 s |       17.14 s |   2.13× |
-| uv      | Shared-worktree build    | `uv-normalize`       |      4.01 s |        2.97 s |   1.35× |
-| Codex   | Build, then check        | `codex-core`         |     60.93 s |       37.14 s |   1.64× |
-| Codex   | No-op formatting         | Workspace            |      5.04 s |        0.89 s |   5.67× |
-| Codex   | Formatting after an edit | `codex-core`         |      5.12 s |        3.11 s |   1.65× |
-| Codex   | Shared-worktree build    | `codex-utils-string` |      1.62 s |        0.32 s |   5.01× |
+| uv      | Build, then check        | `uv`                 |     35.92 s |       14.64 s |   2.45× |
+| uv      | Shared-worktree build    | `uv-normalize`       |      4.00 s |        2.95 s |   1.36× |
+| Codex   | Build, then check        | `codex-core`         |     59.57 s |       33.15 s |   1.80× |
+| Codex   | No-op formatting         | Workspace            |      5.00 s |        0.15 s |  33.38× |
+| Codex   | Formatting after an edit | `codex-core`         |      5.13 s |        0.23 s |  22.03× |
+| Codex   | Shared-worktree build    | `codex-utils-string` |      1.61 s |        0.31 s |   5.23× |
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
