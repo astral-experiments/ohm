@@ -63,7 +63,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-14/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-15/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -86,7 +86,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-14 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-15 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, and reuse of
 previously built registry dependencies by default. Use its aggregate opt-out to compare against the
@@ -111,6 +111,13 @@ Workspace artifacts and final outputs remain private to each checkout. Sharing i
 build directory overlaps a checkout's target directory, Ohm's defaults are turned off, or native
 build tools resolve to unverified user-controlled wrappers.
 
+Registry procedural macros and their runtime dependencies are shared only after source and checksum
+verification. By default, Ohm limits sharing to individually audited macro releases. To explicitly
+trust all authenticated registry macros, use `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` or
+`cargo +ohm -Zohm-proc-macro-trust=all build`. This mode is potentially unsound: macros can read
+untracked files or environment variables, use randomness, and produce stale generated code or omit
+diagnostics. Strict and permissive artifacts remain isolated; build-to-check reuse stays audited.
+
 ### `AGENTS.md`
 
 To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS.md`:
@@ -126,6 +133,8 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
   receive Cargo's defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
   separate shared path for worktrees using the same repository and Ohm toolchain.
+- Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` to maximize authenticated registry procedural-macro
+  reuse across worktrees. This opt-in is potentially unsound; avoid it for CI, releases, etc.
 - Use `cargo +ohm -Zohm-defaults=no <command>` to disable Ohm's automatic experimental defaults. Use
   plain `cargo <command>` and the repository's normal toolchain for CI and production builds.
 ```
@@ -170,12 +179,13 @@ At present, Ohm includes the following optimizations, all enabled by default:
   resolution before a prior build.
 - Deduplicated authenticated compiler-driver validation across reused registry dependencies.
 - Shared immutable registry artifacts across worktrees with an explicitly configured build directory,
-  including standard native pthread linkage and authenticated Linux LLVM tools.
+  including audited procedural-macro and runtime-dependency closures, standard native pthread
+  linkage, and authenticated Linux LLVM tools.
 - Incremental workspace formatting that formats individual changed modules when rustfmt's
   authoritative module graph confirms their ownership and topology, with buffered incremental state
   and module manifests and reused source observations.
 - Experimental procedural-macro caching (`rustc -Zcache-proc-macros`).
-- Backported Clippy optimizations, including combined lint passes.
+- Backported Clippy optimizations, including combined lint passes and redundant-clone fast paths.
 
 Ohm also includes explicitly requested, experimental focused test compilation. To compile only one
 exact library test, pass `-Zohm-focused-tests` before the Cargo subcommand:
@@ -192,8 +202,8 @@ and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-13` and
-`ohm-1.97.1-14`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-14` and
+`ohm-1.97.1-15`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:
