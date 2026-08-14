@@ -11,8 +11,9 @@ bolt_directory="$test_directory/llvm bolt"
 bootstrap_config="$test_directory/bootstrap.toml"
 toolchain='ohm-1.97.1-16'
 trace="$rust_checkout/commands.jsonl"
+source_root="$test_directory/public source overrides"
 
-mkdir -p "$rust_checkout" "$bolt_directory/bin" "$bolt_directory/lib"
+mkdir -p "$rust_checkout" "$bolt_directory/bin" "$bolt_directory/lib" "$source_root"
 cp "$repository_root/release/bootstrap.toml" "$bootstrap_config"
 cp "$bootstrap_config" "$test_directory/original-bootstrap.toml"
 
@@ -27,8 +28,13 @@ import sys
 checkout = pathlib.Path(__file__).resolve().parent
 arguments = sys.argv[1:]
 
-if "opt-dist" not in arguments or "src/llvm-project" not in arguments:
-    raise SystemExit("bootstrap must build opt-dist and download the matching LLVM")
+if any(
+    required not in arguments
+    for required in ("opt-dist", "src/llvm-project", "src/tools/cargo")
+):
+    raise SystemExit("bootstrap must build opt-dist, matching LLVM, and Ohm Cargo")
+if arguments[arguments.index("--stage") + 1] != "1":
+    raise SystemExit("Ohm Cargo must be built with the downloaded stage-zero compiler")
 
 build_directory = pathlib.Path(arguments[arguments.index("--build-dir") + 1])
 target = arguments[arguments.index("--target") + 1]
@@ -50,6 +56,16 @@ with (checkout / "commands.jsonl").open("a", encoding="utf-8") as output:
 tools = build_directory / target / "stage1-tools-bin"
 tools.mkdir(parents=True, exist_ok=True)
 shutil.copy2(checkout / "fixture-opt-dist", tools / "opt-dist")
+if os.environ.get("FIXTURE_SKIP_OHM_CARGO") != "1":
+    shutil.copy2(checkout / "fixture-llvm-tool", tools / "cargo")
+
+stage0 = build_directory / target / "stage0"
+(stage0 / "bin").mkdir(parents=True, exist_ok=True)
+(stage0 / "lib").mkdir(parents=True, exist_ok=True)
+if os.environ.get("FIXTURE_SKIP_STAGE0_CARGO") != "1":
+    shutil.copy2(checkout / "fixture-llvm-tool", stage0 / "bin" / "cargo")
+if os.environ.get("FIXTURE_SKIP_STAGE0_RUSTC") != "1":
+    shutil.copy2(checkout / "fixture-llvm-tool", stage0 / "bin" / "rustc")
 
 llvm = build_directory / target / "ci-llvm" / "bin"
 llvm.mkdir(parents=True, exist_ok=True)
@@ -119,10 +135,13 @@ run_optimized_build() {
     MIRROR_R2_SECRET_ACCESS_KEY='fixture-r2-secret-must-not-leak' \
     GH_TOKEN='fixture-github-token-must-not-leak' \
     ACTIONS_RUNTIME_TOKEN='fixture-runtime-token-must-not-leak' \
+    CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST='all' \
     EXAMPLE_PASSWORD='fixture-password-must-not-leak' \
     UNRELATED_ENVIRONMENT_VALUE='fixture-unrelated-value-must-not-leak' \
     DEVELOPER_DIR='/fixture/Xcode.app/Contents/Developer' \
     MACOSX_STD_DEPLOYMENT_TARGET='11.0' \
+    CARGO_BUILD_JOBS='16' \
+    OHM_DEVELOPMENT_SOURCE_ROOT="$source_root" \
     "$@" \
     bash "$script_directory/build-optimized-dist.sh" \
     "$target" "$toolchain" "$rust_checkout" "$bootstrap_config" \
@@ -136,7 +155,7 @@ assert_optimized_build() {
   local output="$4"
 
   python3 - "$trace" "$bootstrap_config" "$rust_checkout" "$toolchain" \
-    "$target" "$expected_llvm_directory" "$expect_bolt" "$output" <<'PY'
+    "$target" "$expected_llvm_directory" "$expect_bolt" "$output" "$source_root" <<'PY'
 import json
 import pathlib
 import sys
@@ -151,6 +170,7 @@ import tomllib
     expected_llvm,
     expect_bolt,
     output_path,
+    source_root,
 ) = sys.argv[1:]
 checkout = pathlib.Path(checkout).resolve()
 generated_config = checkout / "build" / "ohm-release-bootstrap.toml"
@@ -175,8 +195,10 @@ bootstrap = events[0]
 bootstrap_arguments = bootstrap["arguments"]
 if not bootstrap_arguments or bootstrap_arguments[0] != "build":
     raise SystemExit(f"expected an upstream bootstrap build: {bootstrap_arguments}")
-if bootstrap_arguments[-2:] != ["opt-dist", "src/llvm-project"]:
-    raise SystemExit(f"bootstrap must explicitly request opt-dist and LLVM: {bootstrap_arguments}")
+if bootstrap_arguments[-3:] != ["opt-dist", "src/llvm-project", "src/tools/cargo"]:
+    raise SystemExit(f"bootstrap must request opt-dist, LLVM, and Ohm Cargo: {bootstrap_arguments}")
+if option(bootstrap_arguments, "--stage") != "1":
+    raise SystemExit("Ohm Cargo must be built with the downloaded stage-zero compiler")
 if option(bootstrap_arguments, "--ci") != "false":
     raise SystemExit("bootstrap must not impersonate Rust's protected CI")
 if option(bootstrap_arguments, "--config") != str(generated_config):
@@ -220,6 +242,18 @@ if option(pipeline_arguments, "--artifact-dir") != "build/opt-artifacts":
     raise SystemExit("optimization artifacts escaped the isolated Rust build directory")
 if option(pipeline_arguments, "--build-dir") != "build":
     raise SystemExit("opt-dist used a build directory inconsistent with bootstrap")
+stage0_proxy_root = checkout / "build" / target / "ohm-pgo-stage0"
+if option(pipeline_arguments, "--stage0-root") != str(stage0_proxy_root):
+    raise SystemExit("opt-dist did not use its supported stage-zero Cargo profiling proxy")
+stage0_root = checkout / "build" / target / "stage0"
+if (stage0_proxy_root / "bin" / "rustc").resolve() != (stage0_root / "bin" / "rustc").resolve():
+    raise SystemExit("profiling proxy changed upstream's stage-zero compiler")
+if (stage0_proxy_root / "lib").resolve() != (stage0_root / "lib").resolve():
+    raise SystemExit("profiling proxy did not preserve the upstream compiler sysroot")
+if (stage0_proxy_root / "bin" / "cargo").resolve().name != "pgo-stage0-cargo.py":
+    raise SystemExit("profiling proxy did not install the transparent stage-zero Cargo wrapper")
+if not (checkout / "build" / target / "stage1-tools-bin" / "cargo").is_file():
+    raise SystemExit("the feature-enabled Ohm Cargo training executable is missing")
 if option(pipeline_arguments, "--build-llvm") != "false":
     raise SystemExit("opt-dist must reuse Rust's matching preoptimized CI LLVM")
 if option(pipeline_arguments, "--llvm-shared") != "false":
@@ -264,6 +298,10 @@ if environment.get("DEVELOPER_DIR") != "/fixture/Xcode.app/Contents/Developer":
     raise SystemExit("internal PGO stages changed the selected macOS developer tools")
 if environment.get("MACOSX_STD_DEPLOYMENT_TARGET") != "11.0":
     raise SystemExit("internal PGO stages changed the macOS standard-library deployment target")
+if environment.get("CARGO_BUILD_JOBS") != "16":
+    raise SystemExit("optimized release did not preserve its bounded Cargo job count")
+if environment.get("OHM_DEVELOPMENT_SOURCE_ROOT") != str(pathlib.Path(source_root).resolve()):
+    raise SystemExit("optimized release did not preserve its safe local public-source override")
 for sensitive in (
     "OHM_RELEASE_APP_PRIVATE_KEY",
     "MIRROR_R2_SECRET_ACCESS_KEY",
@@ -272,6 +310,7 @@ for sensitive in (
     "EXAMPLE_PASSWORD",
     "UNRELATED_ENVIRONMENT_VALUE",
     "OHM_BOLT_LLVM_DIR",
+    "CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST",
 ):
     if sensitive in environment:
         raise SystemExit(f"upstream opt-dist would expose an inherited environment value: {sensitive}")
@@ -322,6 +361,25 @@ expect_failure() {
 }
 
 expect_failure 'an unsupported host target' 'aarch64-unknown-linux-gnu'
+
+for missing_stage0 in cargo rustc; do
+  stage0_binary="$rust_checkout/build/$linux_target/stage0/bin/$missing_stage0"
+  mv "$stage0_binary" "$stage0_binary.hidden"
+  if [[ "$missing_stage0" == cargo ]]; then
+    expect_failure 'a missing upstream stage-zero Cargo' "$linux_target" \
+      FIXTURE_SKIP_STAGE0_CARGO=1
+  else
+    expect_failure 'a missing upstream stage-zero compiler' "$linux_target" \
+      FIXTURE_SKIP_STAGE0_RUSTC=1
+  fi
+  mv "$stage0_binary.hidden" "$stage0_binary"
+done
+
+ohm_cargo="$rust_checkout/build/$linux_target/stage1-tools-bin/cargo"
+mv "$ohm_cargo" "$ohm_cargo.hidden"
+expect_failure 'a missing feature-enabled Ohm Cargo' "$linux_target" \
+  FIXTURE_SKIP_OHM_CARGO=1
+mv "$ohm_cargo.hidden" "$ohm_cargo"
 
 for missing_binary in llvm-bolt merge-fdata; do
   mv "$bolt_directory/bin/$missing_binary" \

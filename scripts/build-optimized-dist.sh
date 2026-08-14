@@ -10,6 +10,9 @@ target="$1"
 toolchain="$2"
 rust_checkout="$3"
 bootstrap_config="$4"
+script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+stage0_cargo_proxy="$script_directory/pgo-stage0-cargo.py"
+development_runner="$script_directory/profile-development-workflows.py"
 
 case "$target" in
   aarch64-apple-darwin) use_bolt=false ;;
@@ -33,6 +36,19 @@ fi
 if [[ ! -f "$bootstrap_config" ]]; then
   echo "release bootstrap configuration not found: $bootstrap_config" >&2
   exit 1
+fi
+
+if [[ ! -x "$stage0_cargo_proxy" || ! -x "$development_runner" ]]; then
+  echo 'Ohm development profiling tools are missing or not executable' >&2
+  exit 1
+fi
+
+if [[ ${OHM_DEVELOPMENT_SOURCE_ROOT+x} == x ]]; then
+  if [[ ! -d "$OHM_DEVELOPMENT_SOURCE_ROOT" ]]; then
+    echo "local development corpus root not found: $OHM_DEVELOPMENT_SOURCE_ROOT" >&2
+    exit 1
+  fi
+  OHM_DEVELOPMENT_SOURCE_ROOT="$(cd -- "$OHM_DEVELOPMENT_SOURCE_ROOT" && pwd -P)"
 fi
 
 rust_checkout="$(cd -- "$rust_checkout" && pwd -P)"
@@ -92,14 +108,18 @@ cd -- "$rust_checkout"
 # `opt-dist` is a bootstrap-only tool and does not itself require LLVM. Ask for
 # LLVM explicitly so bootstrap downloads its already-optimized CI artifact
 # before the optimization pipeline needs the matching llvm-profdata executable.
+# Build Cargo with stage zero so the release configuration's ohm-defaults
+# feature is available without building an additional compiler first.
 python3 "$rust_checkout/x.py" build \
   --ci false \
   --config "$release_config" \
   --build-dir "$build_dir" \
   --host "$target" \
   --target "$target" \
+  --stage 1 \
   opt-dist \
-  src/llvm-project
+  src/llvm-project \
+  src/tools/cargo
 
 opt_dist="$build_dir/$target/stage1-tools-bin/opt-dist"
 if [[ ! -x "$opt_dist" ]]; then
@@ -113,6 +133,52 @@ if [[ ! -x "$llvm_profdata" ]]; then
   echo "matching CI LLVM profile tool was not downloaded: $llvm_profdata" >&2
   exit 1
 fi
+
+target_build_dir="$build_dir/$target"
+upstream_stage0_root="$target_build_dir/stage0"
+upstream_stage0_cargo="$upstream_stage0_root/bin/cargo"
+upstream_stage0_rustc="$upstream_stage0_root/bin/rustc"
+ohm_cargo="$target_build_dir/stage1-tools-bin/cargo"
+
+if [[ ! -x "$upstream_stage0_cargo" || ! -x "$upstream_stage0_rustc" ]]; then
+  echo "upstream stage-zero compiler tools were not downloaded: $upstream_stage0_root" >&2
+  exit 1
+fi
+if [[ ! -d "$upstream_stage0_root/lib" ]]; then
+  echo "upstream stage-zero compiler libraries are missing: $upstream_stage0_root/lib" >&2
+  exit 1
+fi
+if [[ ! -x "$ohm_cargo" ]]; then
+  echo "feature-enabled stage-one Ohm Cargo was not built: $ohm_cargo" >&2
+  exit 1
+fi
+
+stage0_proxy_root="$target_build_dir/ohm-pgo-stage0"
+mkdir -p "$stage0_proxy_root/bin"
+
+ensure_stage0_link() {
+  local destination="$1"
+  local source="$2"
+
+  if [[ -e "$destination" || -L "$destination" ]]; then
+    if [[ ! "$destination" -ef "$source" ]]; then
+      echo "stage-zero profiling link has an unexpected destination: $destination" >&2
+      return 1
+    fi
+  else
+    ln -s "$source" "$destination"
+  fi
+}
+
+ensure_stage0_link "$stage0_proxy_root/bin/cargo" "$stage0_cargo_proxy"
+ensure_stage0_link "$stage0_proxy_root/bin/rustc" "$upstream_stage0_rustc"
+for directory in lib libexec etc share; do
+  if [[ -d "$upstream_stage0_root/$directory" ]]; then
+    ensure_stage0_link \
+      "$stage0_proxy_root/$directory" \
+      "$upstream_stage0_root/$directory"
+  fi
+done
 
 llvm_dir="$ci_llvm_dir"
 if [[ "$use_bolt" == true ]]; then
@@ -181,6 +247,7 @@ for variable in \
   RUNNER_TEMP \
   GITHUB_STEP_SUMMARY \
   CARGO_HOME \
+  CARGO_BUILD_JOBS \
   RUSTUP_HOME \
   CC \
   CXX \
@@ -192,7 +259,8 @@ for variable in \
   DEVELOPER_DIR \
   SDKROOT \
   MACOSX_DEPLOYMENT_TARGET \
-  MACOSX_STD_DEPLOYMENT_TARGET; do
+  MACOSX_STD_DEPLOYMENT_TARGET \
+  OHM_DEVELOPMENT_SOURCE_ROOT; do
   if [[ ${!variable+x} == x ]]; then
     safe_environment+=("$variable=${!variable}")
   fi
@@ -208,6 +276,7 @@ opt_dist_arguments=(
   --llvm-dir "$llvm_dir"
   --artifact-dir build/opt-artifacts
   --build-dir build
+  --stage0-root "$stage0_proxy_root"
   --build-llvm=false
   --llvm-shared=false
 )

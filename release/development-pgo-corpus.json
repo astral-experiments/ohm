@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "projects": [
+    {
+      "name": "ruff",
+      "repository": "https://github.com/astral-sh/ruff.git",
+      "revision": "25b10f9d01a15357ff5c8b54461244fa6664a552",
+      "edit_revision": "6e29838d4bd65a2ece1d93d44ce85d8ee0105117",
+      "edit_paths": ["crates/ruff_python_parser/src/lexer.rs"],
+      "working_directory": ".",
+      "commands": [
+        ["check", "-p", "ruff_python_parser", "--locked"],
+        ["test", "-p", "ruff_python_parser", "--lib", "--no-run", "--locked"]
+      ]
+    },
+    {
+      "name": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+      "edit_revision": "67391e883c5443620caef94923298ddd08a0d878",
+      "edit_paths": ["crates/uv-pypi-types/src/simple_json/parser.rs"],
+      "working_directory": ".",
+      "commands": [
+        ["check", "-p", "uv-metadata", "--locked"],
+        ["test", "-p", "uv-pypi-types", "--lib", "--no-run", "--locked"]
+      ]
+    },
+    {
+      "name": "codex",
+      "repository": "https://github.com/openai/codex.git",
+      "revision": "1829ed11228d9ffad6bf7d6db615324126065b23",
+      "edit_revision": "5a56caf18cb773b3d1c60e66d594e9512c7f18e7",
+      "edit_paths": ["codex-rs/async-utils/src/lib.rs"],
+      "working_directory": "codex-rs",
+      "commands": [
+        ["check", "-p", "codex-async-utils", "--locked"],
+        ["test", "-p", "codex-async-utils", "--lib", "--no-run", "--locked"]
+      ]
+    }
+  ]
+}
