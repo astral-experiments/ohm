@@ -233,6 +233,7 @@ safe_environment=(
   "PATH=$PATH"
   "HOME=$HOME"
   "RUST_BOOTSTRAP_CONFIG=$release_config"
+  "OHM_PGO_TARGET_ROOT=$target_build_dir"
   'GITHUB_ACTIONS=false'
 )
 

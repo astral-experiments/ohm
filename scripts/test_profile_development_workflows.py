@@ -657,7 +657,7 @@ class WorkflowTests(unittest.TestCase):
 
 class StageZeroProxyTests(unittest.TestCase):
     def fixture(self, directory: str) -> tuple[Path, Path, Path, Path, list[str]]:
-        target_root = Path(directory) / "target"
+        target_root = (Path(directory) / "target").resolve()
         invoked = target_root / "ohm-pgo-stage0/bin/cargo"
         upstream = target_root / "stage0/bin/cargo"
         ohm = target_root / "stage1-tools-bin/cargo"
@@ -701,6 +701,7 @@ class StageZeroProxyTests(unittest.TestCase):
                 target_root, invoked, upstream, ohm, collector = self.fixture(directory)
                 source_root = str(Path(directory) / "sources")
                 inherited["OHM_DEVELOPMENT_SOURCE_ROOT"] = source_root
+                inherited["OHM_PGO_TARGET_ROOT"] = str(target_root)
 
                 with (
                     mock.patch.object(proxy.sys, "argv", [str(invoked), *collector]),
@@ -744,11 +745,14 @@ class StageZeroProxyTests(unittest.TestCase):
         self,
     ) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            _, invoked, upstream, _, _ = self.fixture(directory)
+            target_root, invoked, upstream, _, _ = self.fixture(directory)
             nested = ["build", "-p", "collector", "--release"]
 
             with (
                 mock.patch.object(proxy.sys, "argv", [str(invoked), *nested]),
+                mock.patch.dict(
+                    os.environ, {"OHM_PGO_TARGET_ROOT": str(target_root)}, clear=True
+                ),
                 mock.patch.object(
                     proxy.subprocess,
                     "run",
@@ -759,11 +763,68 @@ class StageZeroProxyTests(unittest.TestCase):
 
             run.assert_called_once_with([str(upstream), *nested], check=False)
 
+    def test_forwards_a_real_canonicalized_collector_cargo_invocation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            target_root, invoked, upstream, _, _ = self.fixture(directory)
+            trace = target_root / "nested-arguments.txt"
+            upstream.write_text(
+                '#!/bin/sh\nprintf "%s\\n" "$@" > "$OHM_PGO_TEST_TRACE"\n',
+                encoding="utf-8",
+            )
+            nested = ["pkgid", "--manifest-path", "/fixture/Cargo.toml"]
+
+            result = subprocess.run(
+                [str(invoked.resolve()), *nested],
+                check=False,
+                capture_output=True,
+                text=True,
+                env={
+                    "PATH": os.environ["PATH"],
+                    "OHM_PGO_TARGET_ROOT": str(target_root),
+                    "OHM_PGO_TEST_TRACE": str(trace),
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                },
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(trace.read_text(encoding="utf-8").splitlines(), nested)
+
+    def test_rejects_missing_invalid_or_mismatched_target_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            target_root, invoked, _, _, _ = self.fixture(directory)
+            wrong_root = target_root.parent / "different-target"
+            wrong_proxy = wrong_root / "ohm-pgo-stage0" / "bin" / "cargo"
+            wrong_proxy.parent.mkdir(parents=True)
+            wrong_proxy.symlink_to(PROXY_SCRIPT)
+
+            for value, expected in (
+                (None, "target root is missing"),
+                ("relative-target", "invalid stage-zero profiling target root"),
+                (str(target_root.parent / "missing"), "invalid stage-zero profiling"),
+                (str(wrong_root), "does not match its Cargo proxy"),
+            ):
+                with self.subTest(value=value):
+                    inherited = {} if value is None else {"OHM_PGO_TARGET_ROOT": value}
+                    stderr = io.StringIO()
+                    with (
+                        mock.patch.object(proxy.sys, "argv", [str(invoked), "pkgid"]),
+                        mock.patch.dict(os.environ, inherited, clear=True),
+                        mock.patch.object(proxy.subprocess, "run") as run,
+                        contextlib.redirect_stderr(stderr),
+                    ):
+                        self.assertEqual(proxy.main(), 1)
+
+                    self.assertIn(expected, stderr.getvalue())
+                    run.assert_not_called()
+
     def test_failed_upstream_training_never_runs_supplemental_workloads(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            _, invoked, _, _, collector = self.fixture(directory)
+            target_root, invoked, _, _, collector = self.fixture(directory)
             with (
                 mock.patch.object(proxy.sys, "argv", [str(invoked), *collector]),
+                mock.patch.dict(
+                    os.environ, {"OHM_PGO_TARGET_ROOT": str(target_root)}, clear=True
+                ),
                 mock.patch.object(
                     proxy.subprocess,
                     "run",
@@ -776,10 +837,13 @@ class StageZeroProxyTests(unittest.TestCase):
 
     def test_rejects_a_non_instrumented_compiler(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            _, invoked, _, _, collector = self.fixture(directory)
+            target_root, invoked, _, _, collector = self.fixture(directory)
             collector[8] = str(Path(directory) / "different-rustc")
             with (
                 mock.patch.object(proxy.sys, "argv", [str(invoked), *collector]),
+                mock.patch.dict(
+                    os.environ, {"OHM_PGO_TARGET_ROOT": str(target_root)}, clear=True
+                ),
                 mock.patch.object(
                     proxy.subprocess,
                     "run",
@@ -793,10 +857,13 @@ class StageZeroProxyTests(unittest.TestCase):
 
     def test_does_not_supplement_llvm_or_custom_profile_training(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            _, invoked, _, _, collector = self.fixture(directory)
+            target_root, invoked, _, _, collector = self.fixture(directory)
             collector[collector.index("--profiles") + 1] = "Debug,Opt"
             with (
                 mock.patch.object(proxy.sys, "argv", [str(invoked), *collector]),
+                mock.patch.dict(
+                    os.environ, {"OHM_PGO_TARGET_ROOT": str(target_root)}, clear=True
+                ),
                 mock.patch.object(
                     proxy.subprocess,
                     "run",

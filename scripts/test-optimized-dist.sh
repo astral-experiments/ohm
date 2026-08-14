@@ -142,6 +142,7 @@ run_optimized_build() {
     MACOSX_STD_DEPLOYMENT_TARGET='11.0' \
     CARGO_BUILD_JOBS='16' \
     OHM_DEVELOPMENT_SOURCE_ROOT="$source_root" \
+    OHM_PGO_TARGET_ROOT='/untrusted/inherited/profiling/root' \
     "$@" \
     bash "$script_directory/build-optimized-dist.sh" \
     "$target" "$toolchain" "$rust_checkout" "$bootstrap_config" \
@@ -300,6 +301,8 @@ if environment.get("MACOSX_STD_DEPLOYMENT_TARGET") != "11.0":
     raise SystemExit("internal PGO stages changed the macOS standard-library deployment target")
 if environment.get("CARGO_BUILD_JOBS") != "16":
     raise SystemExit("optimized release did not preserve its bounded Cargo job count")
+if environment.get("OHM_PGO_TARGET_ROOT") != str(checkout / "build" / target):
+    raise SystemExit("optimized release did not derive its trusted profiling target root")
 if environment.get("OHM_DEVELOPMENT_SOURCE_ROOT") != str(pathlib.Path(source_root).resolve()):
     raise SystemExit("optimized release did not preserve its safe local public-source override")
 for sensitive in (

@@ -41,8 +41,46 @@ def is_rustc_training(arguments: Sequence[str]) -> bool:
 
 def main(arguments: Sequence[str] | None = None) -> int:
     forwarded = list(sys.argv[1:] if arguments is None else arguments)
+    configured_target_root = os.environ.get("OHM_PGO_TARGET_ROOT")
+    if not configured_target_root:
+        print(
+            "stage-zero profiling target root is missing: OHM_PGO_TARGET_ROOT",
+            file=sys.stderr,
+        )
+        return 1
+
+    configured_path = Path(configured_target_root)
+    if not configured_path.is_absolute() or not configured_path.is_dir():
+        print(
+            f"invalid stage-zero profiling target root: {configured_target_root}",
+            file=sys.stderr,
+        )
+        return 1
+    target_root = configured_path.resolve()
+
+    # rustc-perf canonicalizes its Cargo executable before running nested
+    # commands, so argv[0] can be either this symlink or its resolved script.
     invoked_cargo = Path(sys.argv[0]).absolute()
-    target_root = invoked_cargo.parent.parent.parent
+    configured_proxy = target_root / "ohm-pgo-stage0" / "bin" / "cargo"
+    actual_proxy = Path(__file__).resolve()
+    try:
+        proxy_matches = configured_proxy.samefile(actual_proxy)
+        invocation_matches = invoked_cargo.samefile(actual_proxy)
+    except OSError:
+        proxy_matches = False
+        invocation_matches = False
+    if (
+        not proxy_matches
+        or not invocation_matches
+        or invoked_cargo not in (configured_proxy, actual_proxy)
+    ):
+        print(
+            "stage-zero profiling target root does not match its Cargo proxy: "
+            f"{target_root}",
+            file=sys.stderr,
+        )
+        return 1
+
     upstream_cargo = target_root / "stage0" / "bin" / "cargo"
     if not upstream_cargo.is_file() or not os.access(upstream_cargo, os.X_OK):
         print(
