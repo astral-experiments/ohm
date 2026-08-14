@@ -63,7 +63,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-16/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-17/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -86,7 +86,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-16 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-17 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, and reuse of
 previously built registry dependencies by default. Use its aggregate opt-out to compare against the
@@ -159,6 +159,8 @@ experiment with optimizations that may still contain bugs.
 
 At present, Ohm includes the following optimizations, all enabled by default:
 
+- Release compilers optimized with Rust's upstream profile-guided optimization corpus on macOS and
+  Linux, with additional BOLT binary optimization on Linux.
 - [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790): avoid rebuilding
   dependent crates when a dependency's public interface is unchanged (`rustc -Zpublic-api-hash`).
 - Cached relinking: reuse existing code generation when only the final binary needs to change
@@ -181,7 +183,7 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Reused encoded metadata prefixes when private edits preserve metadata dependencies.
 - Conditional metadata pipelining when a dependency's public API changes, with crash-safe recovery.
 - Reused integration-test executables when changed package or workspace libraries are unused.
-- Early cutoff for `cargo check` and `cargo clippy`.
+- Early cutoff for `cargo check` and `cargo clippy`, including with shared registry caches.
 - Reused immutable registry dependencies between builds, checks, and Clippy invocations, including
   active dependency graphs and audited procedural-macro closures, without speculative dependency
   resolution before a prior build.
@@ -190,8 +192,9 @@ At present, Ohm includes the following optimizations, all enabled by default:
   including audited procedural-macro and runtime-dependency closures, dependency-scoped native-tool
   isolation, standard native pthread linkage, and authenticated Linux LLVM tools.
 - Incremental workspace formatting that formats individual changed modules when rustfmt's
-  authoritative module graph confirms their ownership and topology, with buffered incremental state
-  and module manifests and reused source observations.
+  authoritative module graph confirms their ownership and topology, with buffered incremental state,
+  reused clean checks and configuration snapshots, batched independent leaf modules, and avoided
+  unnecessary topology discovery and no-write reverification.
 - Experimental procedural-macro caching (`rustc -Zcache-proc-macros`).
 - Backported Clippy optimizations, including combined lint passes and redundant-clone fast paths.
 
@@ -210,8 +213,8 @@ and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-15` and
-`ohm-1.97.1-16`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-16` and
+`ohm-1.97.1-17`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:
