@@ -6,15 +6,17 @@ repository's stack to its tip, including the fork-specific CI foundation.
 This is a point-in-time inventory. The linked source changes and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
-Revision 17 builds macOS and Linux compilers with Rust's upstream profile-guided optimization corpus
-and additionally applies BOLT on Linux. It restores early cutoff when registry dependencies are
-shared and improves incremental formatting through reused clean checks and configuration snapshots,
-batched independently certified leaf modules, and reduced module-topology discovery and clean-run
-reverification.
+Revision 18 skips public API hashing for terminal test harnesses and authenticated immutable registry
+libraries, reuses compatible registry dependencies across mixed test graphs, and preserves resolver
+cache entries when execution-only settings change. It also scales shared-build lock budgets to the
+process file-descriptor limit and moves macOS CI and release jobs to Namespace runners. Avoiding
+immutable-registry hashing improved a representative cold uv build by 6.2%, with no measured
+improvement for warmed workflows.
 
 ## ohm-rust
 
 - [#6: Set up fork-owned Rust CI](https://github.com/astral-sh/ohm-rust/pull/6)
+- [#36: Run compiler regression tests on Namespace macOS runners](https://github.com/astral-sh/ohm-rust/pull/36)
 - [#1: Add reachability-based public API hashing](https://github.com/astral-sh/ohm-rust/pull/1)
 - [#2: Pin Ohm Cargo for Rust 1.97.1](https://github.com/astral-sh/ohm-rust/pull/2)
 - [#4: Pin Ohm Cargo check cutoff](https://github.com/astral-sh/ohm-rust/pull/4)
@@ -46,10 +48,12 @@ reverification.
 - [#32: Pin Cargo with audited procedural-macro sharing](https://github.com/astral-sh/ohm-rust/pull/32)
 - [#33: Pin Cargo with native-tool-aware registry sharing](https://github.com/astral-sh/ohm-rust/pull/33)
 - [#34: Pin Cargo with shared-registry early cutoff](https://github.com/astral-sh/ohm-rust/pull/34)
+- [#37: Pin Cargo with immutable registry reuse and stable resolver caching](https://github.com/astral-sh/ohm-rust/pull/37)
 
 ## ohm-cargo
 
 - [#7: Set up fork-owned Cargo CI](https://github.com/astral-sh/ohm-cargo/pull/7)
+- [#43: Use Namespace runners for macOS CI](https://github.com/astral-sh/ohm-cargo/pull/43)
 - [#1: Prototype reduced dependency rebuilds with public API hashes](https://github.com/astral-sh/ohm-cargo/pull/1)
 - [#6: Preserve semantic metadata and transitive link generations](https://github.com/astral-sh/ohm-cargo/pull/6)
 - [#2: Prototype cached relinking for dependency-only rebuilds](https://github.com/astral-sh/ohm-cargo/pull/2)
@@ -83,10 +87,16 @@ reverification.
 - [#38: Share audited procedural macros across worktrees](https://github.com/astral-sh/ohm-cargo/pull/38)
 - [#39: Scope opaque native tools to affected registry dependencies](https://github.com/astral-sh/ohm-cargo/pull/39)
 - [#40: Restore early cutoff with shared registry caching](https://github.com/astral-sh/ohm-cargo/pull/40)
+- [#44: Skip public API hashing for terminal test harnesses](https://github.com/astral-sh/ohm-cargo/pull/44)
+- [#45: Preserve compatible registry reuse across mixed test graphs](https://github.com/astral-sh/ohm-cargo/pull/45)
+- [#46: Scale file descriptor budgets for fine-grained build locks](https://github.com/astral-sh/ohm-cargo/pull/46)
+- [#41: Skip public API hashing for immutable registry libraries](https://github.com/astral-sh/ohm-cargo/pull/41)
+- [#42: Avoid resolver cache misses for execution-only settings](https://github.com/astral-sh/ohm-cargo/pull/42)
 
 ## ohm-rust-clippy
 
 - [#31: Set up fork-owned Clippy CI](https://github.com/astral-sh/ohm-rust-clippy/pull/31)
+- [#35: Run Clippy tests on Namespace macOS runners](https://github.com/astral-sh/ohm-rust-clippy/pull/35)
 - [#1: Backport statically combined late lint passes](https://github.com/astral-sh/ohm-rust-clippy/pull/1)
 - [#2: Backport statically combined early lint passes](https://github.com/astral-sh/ohm-rust-clippy/pull/2)
 - [#3: Backport cached macro-backtrace lookups](https://github.com/astral-sh/ohm-rust-clippy/pull/3)
@@ -120,6 +130,7 @@ reverification.
 ## ohm-rustfmt
 
 - [#1: Set up fork-owned rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/1)
+- [#12: Use Namespace macOS runners for rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/12)
 - [#2: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rustfmt/pull/2)
 - [#3: Format only changed Cargo workspace modules with buffered cache and manifest I/O](https://github.com/astral-sh/ohm-rustfmt/pull/3)
 - [#5: Avoid reverifying clean formatter checks](https://github.com/astral-sh/ohm-rustfmt/pull/5)
