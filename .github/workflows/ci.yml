@@ -29,6 +29,8 @@ jobs:
         run: |
           uv run scripts/benchmark.py --help
           python3 scripts/test_benchmark.py
+          uv run scripts/replay_sessions.py --help
+          python3 scripts/test_replay_sessions.py
       - name: Validate release bootstrap configuration
         run: |
           python3 - <<'PY'

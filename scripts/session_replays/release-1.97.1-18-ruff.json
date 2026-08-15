@@ -1,0 +1,388 @@
+{
+  "rust_version": "1.97.1",
+  "ohm_release": "ohm-1.97.1-18",
+  "host": {
+    "platform": "linux-x86_64",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC 7763 64-Core Processor"
+  },
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    ["stock", "ohm"],
+    ["ohm", "stock"]
+  ],
+  "sessions": [
+    {
+      "project": "ruff",
+      "session_id": "ruff-component-fixed-points",
+      "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+      "commands": 12,
+      "edits": 3,
+      "warmups": 1
+    }
+  ],
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_LTO": "off",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only",
+    "INSTA_FORCE_PASS": "0",
+    "INSTA_UPDATE": "no",
+    "MDTEST_UPDATE_SNAPSHOTS": "0"
+  },
+  "timed_session_seconds": {
+    "ruff": {
+      "stock": [426.0401001041755, 432.8425222132355],
+      "ohm": [375.08576405094936, 372.4663691627793]
+    }
+  },
+  "timed_command_seconds": {
+    "ruff": {
+      "stock": [425.79048099182546, 432.59283972438425],
+      "ohm": [374.8332458753139, 372.21643681265414]
+    }
+  },
+  "timed_edit_seconds": {
+    "ruff": {
+      "stock": [0.0446137273684144, 0.04515667771920562],
+      "ohm": [0.04503998393192887, 0.04378904076293111]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "ruff": {
+      "stock": [124.28541194694117, 125.6306831119582],
+      "ohm": [127.83161367010325, 127.37238903902471]
+    }
+  },
+  "commands": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Establish the focused cycle and attribute baseline",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [1.5643700519576669, 1.588788561988622],
+          "ohm": [1.582343873102218, 1.607081815134734]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Validate the simplified cycle and attribute inference",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [23.390842663589865, 23.922280779108405],
+          "ohm": [24.174604882020503, 24.310115228872746]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run affected-package tests after simplification",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [30.679131175857037, 31.280235342681408],
+          "ohm": [30.07824220508337, 30.086336901877075]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Run strict Clippy after simplification",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [70.04670928791165, 69.7474195570685],
+          "ohm": [47.84966852515936, 47.10382334375754]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 7,
+        "label": "Validate the indexed cycle and attribute inference",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [38.098106261808425, 39.478979479987174],
+          "ohm": [39.22132697608322, 38.981388225220144]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Run affected-package tests after dependency indexing",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [45.87383844703436, 47.55459038168192],
+          "ohm": [46.611484826076776, 46.809582851827145]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Run strict Clippy after dependency indexing",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [50.02611726289615, 49.88237561378628],
+          "ohm": [30.830745309125632, 30.908990821801126]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Run the expanded component-cycle regressions",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--status-level",
+          "fail",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [44.9626503540203, 46.23062189202756],
+          "ohm": [48.136461172718555, 46.921195259317756]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Run all semantic mdtests after the fixed-point rewrite",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [6.354671864770353, 6.395238945260644],
+          "ohm": [6.423187382053584, 6.568651784211397]
+        },
+        "tests_started": {
+          "stock": [482, 482],
+          "ohm": [482, 482]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Validate the complete core and semantic packages",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [53.202289463952184, 54.96552609791979],
+          "ohm": [55.12554106814787, 54.80605772975832]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Run final strict Clippy for both affected packages",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [55.07297330489382, 55.08366157999262],
+          "ohm": [37.62563691101968, 36.97712723677978]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Verify final workspace formatting",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [6.518780853133649, 6.463121492881328],
+          "ohm": [7.174002744723111, 7.136085614096373]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      }
+    ]
+  },
+  "provenance": {
+    "raw_results_sha256": "0c4b79bc15d4bf5646ac1bf04c0f2f5a79c9dc8f176977e8d53e62c68a9b355c",
+    "runner_sha256": "5c91e2fccda04f94b9eccf7b8f92eabdcc3aac67b69017460586e7f60f46b564",
+    "fixture_sha256": "691dac32ea24dd015dbfcccbaacd8549e4dd63bf8560978376ce77c96283fb17",
+    "published_fixture_sha256": "fb0af78dd9a6ea69ebcc6cada736f26a439067e1e26b8421e5a7259c7ce8cef1",
+    "fixture_changes": "Only the source hint and descriptive session metadata were renamed after measurement; revisions, environment, warmups, and steps are unchanged.",
+    "stock_rustc_revision": "8bab26f4f68e0e26f0bb7960be334d5b520ea452",
+    "ohm_rustc_revision": "bc0de8a93b2f370bd01bc7b5d6166865aa62371b",
+    "ohm_cargo_revision": "c835cbb2a58e1285fe4e28cbe35c2729378a6df1",
+    "nextest_version": "0.9.140",
+    "nextest_sha256": "0b725b8f24090903be3e0e0d20784df6a8aa04fb36104be1b447449c34228ba0"
+  },
+  "methodology": {
+    "headline_includes_source_edits": true,
+    "baseline_warmups_timed": false,
+    "compiler_accounting": "status",
+    "cargo_status_messages_prove_compiler_invocations": false,
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "soft_open_file_limit": 65536,
+    "separate_host_from_historical_release_study": true,
+    "rejected_attempts": [
+      {
+        "reason": "Competing compilation on the first host during an untimed warmup",
+        "accepted_samples": 0
+      }
+    ],
+    "source": "Completed current Ruff session replay; private host name, worktree paths, and log paths are omitted."
+  }
+}

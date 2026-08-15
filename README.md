@@ -40,6 +40,20 @@ avoid rebuilding unchanged dependents:
 | Codex   | Formatting after an edit | `codex-core`         |      4.44 s |        0.22 s |  20.11× |
 | Codex   | Shared-worktree build    | `codex-utils-string` |      1.31 s |        0.30 s |   4.42× |
 
+And **replayed development sessions** measure the impact in real-world workflows:
+
+| Scope                                      | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| ------------------------------------------ | ----------: | ------------: | ---------: | --------: |
+| Ruff session                               |    429.44 s |      373.78 s |    55.67 s |    12.96% |
+| uv session                                 |    139.58 s |      124.88 s |    14.70 s |    10.53% |
+| Codex session                              |    497.95 s |      408.54 s |    89.40 s |    17.95% |
+| All sessions                               |  1,066.97 s |      907.20 s |   159.77 s |    14.97% |
+| `cargo check`                              |    133.67 s |      100.30 s |    33.37 s |    24.96% |
+| `cargo test`, `cargo nextest`, `just test` |    542.64 s |      537.70 s |     4.94 s |     0.91% |
+| `cargo clippy`                             |    373.31 s |      257.29 s |   116.02 s |    31.08% |
+| `cargo fmt`                                |     16.64 s |       11.20 s |     5.44 s |    32.71% |
+| All commands                               |  1,066.25 s |      906.48 s |   159.77 s |    14.98% |
+
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
 [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790). Use it only for

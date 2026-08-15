@@ -1,0 +1,244 @@
+{
+  "project": "ruff",
+  "repository": "https://github.com/astral-sh/ruff.git",
+  "source_hint": "ruff",
+  "session": {
+    "id": "ruff-component-fixed-points",
+    "description": "Replay three recent committed checkpoints from Ruff PR #27736: simplify recursive attribute inference, index its dependencies per class, and infer component fixed points. Use the focused mdtests and affected-package validation commands observed in that development session, with the pinned AGENTS.md development profile and snapshot updates disabled."
+  },
+  "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+  "fetch_refs": ["refs/pull/27736/head"],
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_LTO": "off",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only",
+    "INSTA_FORCE_PASS": "0",
+    "INSTA_UPDATE": "no",
+    "MDTEST_UPDATE_SNAPSHOTS": "0"
+  },
+  "warmup": [
+    {
+      "kind": "command",
+      "label": "Warm the unmodified core and semantic package tests",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "-p",
+        "ty_python_core",
+        "--status-level",
+        "fail"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "kind": "command",
+      "label": "Establish the focused cycle and attribute baseline",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "-E",
+        "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+        "--status-level",
+        "fail"
+      ]
+    },
+    {
+      "kind": "edit",
+      "label": "Simplify and document recursive attribute inference",
+      "parent": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+      "commit": "c0a91dd16d5b32a254cbf6bcd268f6dbaf0fef0f"
+    },
+    {
+      "kind": "command",
+      "label": "Validate the simplified cycle and attribute inference",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "-E",
+        "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+        "--status-level",
+        "fail"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Run affected-package tests after simplification",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "-p",
+        "ty_python_core",
+        "--status-level",
+        "fail"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Run strict Clippy after simplification",
+      "program": "cargo",
+      "args": [
+        "clippy",
+        "-p",
+        "ty_python_semantic",
+        "-p",
+        "ty_python_core",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "kind": "edit",
+      "label": "Index implicit attribute dependencies per class",
+      "parent": "c0a91dd16d5b32a254cbf6bcd268f6dbaf0fef0f",
+      "commit": "38c87bfba12aa635e3f273f248ca1f114391f504"
+    },
+    {
+      "kind": "command",
+      "label": "Validate the indexed cycle and attribute inference",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "-E",
+        "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+        "--status-level",
+        "fail"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Run affected-package tests after dependency indexing",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "-p",
+        "ty_python_core",
+        "--status-level",
+        "fail"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Run strict Clippy after dependency indexing",
+      "program": "cargo",
+      "args": [
+        "clippy",
+        "-p",
+        "ty_python_semantic",
+        "-p",
+        "ty_python_core",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "kind": "edit",
+      "label": "Infer recursive implicit attributes with component fixed points",
+      "parent": "38c87bfba12aa635e3f273f248ca1f114391f504",
+      "commit": "4b00c689c3d91bb17866ec08de549479d6d8dcca"
+    },
+    {
+      "kind": "command",
+      "label": "Run the expanded component-cycle regressions",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "--status-level",
+        "fail",
+        "--",
+        "mdtest::cycle.md"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Run all semantic mdtests after the fixed-point rewrite",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--failure-output",
+        "immediate-final"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Validate the complete core and semantic packages",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "-p",
+        "ty_python_core",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--failure-output",
+        "immediate-final"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Run final strict Clippy for both affected packages",
+      "program": "cargo",
+      "args": [
+        "clippy",
+        "-p",
+        "ty_python_semantic",
+        "-p",
+        "ty_python_core",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Verify final workspace formatting",
+      "program": "cargo",
+      "args": ["fmt", "--all", "--", "--check"]
+    }
+  ]
+}
