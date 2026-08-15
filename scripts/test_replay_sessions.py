@@ -167,10 +167,6 @@ class FixtureValidationTests(ReplayTestCase):
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(baseline["jobs"], replay.parser().get_default("jobs"))
         self.assertIn(
-            f"using {baseline['jobs']} build",
-            (SCRIPTS.parent / "README.md").read_text(),
-        )
-        self.assertIn(
             f"--jobs {baseline['jobs']} \\",
             (SCRIPTS / "session_replays" / "README.md").read_text(),
         )
@@ -308,11 +304,6 @@ class FixtureValidationTests(ReplayTestCase):
                 statistics.fmean(baseline["timed_session_seconds"][project]["stock"]),
                 statistics.fmean(baseline["timed_session_seconds"][project]["ohm"]),
             )
-            assert_row(
-                label,
-                command_seconds(project, "stock", {"check", "test"}),
-                command_seconds(project, "ohm", {"check", "test"}),
-            )
 
         for category, label in (
             ("check", "`cargo check`"),
@@ -340,13 +331,6 @@ class FixtureValidationTests(ReplayTestCase):
                     statistics.fmean(baseline[field][p]["ohm"]) for p in replay.PROJECTS
                 ),
             )
-        assert_row(
-            "Total",
-            sum(
-                command_seconds(p, "stock", {"check", "test"}) for p in replay.PROJECTS
-            ),
-            sum(command_seconds(p, "ohm", {"check", "test"}) for p in replay.PROJECTS),
-        )
 
     def test_rejects_incomplete_or_uppercase_commit_shas(self) -> None:
         for revision in ("abc123", "A" * 40, None):

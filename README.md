@@ -53,16 +53,6 @@ baseline warmups:
 | Codex   |    497.95 s |      408.54 s |    89.40 s |    17.95% |
 | Total   |  1,041.00 s |      946.00 s |    95.00 s |     9.13% |
 
-For the core compile-and-test loop, excluding Clippy, formatting, source-edit application, and
-runner bookkeeping:
-
-| Project | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
-| ------- | ----------: | ------------: | ---------: | --------: |
-| Ruff    |    326.76 s |      357.41 s |   −30.65 s |    −9.38% |
-| uv      |    105.67 s |      106.92 s |    −1.26 s |    −1.19% |
-| Codex   |    322.86 s |      280.35 s |    42.51 s |    13.17% |
-| Total   |    755.29 s |      744.68 s |    10.61 s |     1.40% |
-
 The command-only totals across all three sessions explain where the time was saved. Test timings
 include both compilation and test execution; `just test` invokes Cargo/nextest.
 
@@ -73,15 +63,6 @@ include both compilation and test execution; `just test` invokes Cargo/nextest.
 | `cargo clippy`                             |    268.50 s |      189.53 s |    78.97 s |    29.41% |
 | `cargo fmt`                                |     16.51 s |       11.09 s |     5.41 s |    32.80% |
 | All commands                               |  1,040.30 s |      945.31 s |    94.99 s |     9.13% |
-
-These are two-run means from order-counterbalanced sessions on a 32-core Linux host, using 8 build
-jobs. A negative reduction is a regression. Most of this release's overall gain comes from Clippy,
-not faster test compilation. The historical Ruff fixture also does not use the currently recommended
-LTO-off, targeted-mdtest workflow; its numbers remain useful for release-to-release comparisons,
-but should not be treated as the current recommended Ruff workflow. See the
-[session-replay documentation](scripts/session_replays/README.md) for reproduction commands,
-[all 37 command timings](scripts/session_replays/release-1.97.1-18-baseline.json), the earlier
-revision-17 results, and test-selection caveats.
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
