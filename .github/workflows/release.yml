@@ -142,7 +142,8 @@ jobs:
       matrix:
         include:
           - target: aarch64-apple-darwin
-            runner: namespace-profile-macos-15
+            # Namespace Apple Silicon runners crash PGO-instrumented binaries.
+            runner: depot-macos-15
           - target: x86_64-unknown-linux-gnu
             runner: github-ubuntu-24.04-x86_64-8
     runs-on: ${{ matrix.runner }}
