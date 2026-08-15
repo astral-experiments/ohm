@@ -68,6 +68,43 @@ current `huff` revision or change the recorded commands. A new workload needs a
 separate JSON fixture with pinned source revisions, actual edits, commands, and
 environment. Keep the existing fixture unchanged when comparing old releases.
 
+## Current Ruff/Huff workflow
+
+[`ruff-huff.json`](ruff-huff.json) records a newer sequence from
+[Ruff PR #27736](https://github.com/astral-sh/ruff/pull/27736): simplifying
+recursive attribute inference, indexing its dependencies per class, and
+implementing component fixed points. It starts at `21c9b077ab` and applies the
+three complete committed edits through `4b00c689c3`. The selected validation
+commands come from that development session, rather than modifying the older
+fixture and attributing its existing measurements to different work.
+
+Both toolchains use the pinned `AGENTS.md` development profile: opt-level 1,
+`CARGO_PROFILE_DEV_LTO=off`, and line-table debug information. Focused runs select
+`--test mdtest`; complete affected-package validation remains broad. Snapshot
+updates and forced passes are disabled, so a changed expectation fails the
+replay. There are eight nextest commands, three Clippy commands, and one format
+check. No standalone `cargo check` is invented for this session; its primary
+check-and-test metric consists of the eight nextest commands, including their
+actual test execution.
+
+```sh
+ulimit -n 65536
+python3 scripts/replay_sessions.py \
+  --project ruff \
+  --scenario scripts/session_replays/ruff-huff.json \
+  --source-path ruff=/path/to/huff \
+  --upstream 1.97.1 \
+  --ohm ohm-1.97.1-18 \
+  --output-dir /tmp/ohm-huff-session-benchmarks \
+  --jobs 8 \
+  --repetitions 2 \
+  --require-idle \
+  --background
+```
+
+The default `ruff.json` remains the historical release-comparison fixture.
+Select `ruff-huff.json` explicitly when measuring the newer workflow.
+
 ## Compiler-work attribution
 
 Cargo can print `Checking package` before early cutoff discovers that rustc does

@@ -106,6 +106,56 @@ class FixtureValidationTests(ReplayTestCase):
         self.assertRegex(scenario.session["id"], r"^[a-z][a-z0-9-]+$")
         self.assertNotIn("recorded_at", scenario.session)
 
+    def test_current_huff_fixture_preserves_the_historical_ruff_workload(self) -> None:
+        historical = replay.load_scenario(SCRIPTS / "session_replays" / "ruff.json")
+        current = replay.load_scenario(SCRIPTS / "session_replays" / "ruff-huff.json")
+        self.assertEqual(current.project, "ruff")
+        self.assertNotEqual(current.session["id"], historical.session["id"])
+        self.assertNotEqual(current.base_revision, historical.base_revision)
+        self.assertNotIn("CARGO_PROFILE_DEV_LTO", historical.environment)
+        self.assertEqual(
+            current.environment,
+            {
+                "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+                "CARGO_PROFILE_DEV_LTO": "off",
+                "CARGO_PROFILE_DEV_DEBUG": "line-tables-only",
+                "INSTA_FORCE_PASS": "0",
+                "INSTA_UPDATE": "no",
+                "MDTEST_UPDATE_SNAPSHOTS": "0",
+            },
+        )
+        revision = current.base_revision
+        edits = [step for step in current.steps if step["kind"] == "edit"]
+        self.assertEqual(len(edits), 3)
+        for step in edits:
+            self.assertEqual(step["parent"], revision)
+            revision = step["commit"]
+        self.assertEqual(revision, "4b00c689c3d91bb17866ec08de549479d6d8dcca")
+        for step in (*current.warmup, *current.steps):
+            if step["kind"] != "command":
+                continue
+            arguments = step["args"]
+            if any("mdtest::" in argument for argument in arguments):
+                target = arguments.index("--test")
+                self.assertEqual(arguments[target + 1], "mdtest")
+
+        options = replay.parser().parse_args(
+            [
+                "--project",
+                "ruff",
+                "--scenario",
+                str(current.path),
+                "--output-dir",
+                str(self.directory / "huff-output"),
+            ]
+        )
+        runner = replay.Replay(options)
+        self.assertEqual(runner.scenarios, [current])
+        for label, selector in runner.toolchains:
+            environment = runner.environment(current, label, selector, 0)
+            for key, value in current.environment.items():
+                self.assertEqual(environment[key], value)
+
     def test_checked_in_release_baseline_contains_paired_real_sessions(self) -> None:
         baseline = json.loads(
             (
