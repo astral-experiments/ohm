@@ -7,8 +7,8 @@ Cargo commands observed between those changes.
 
 The bundled scenarios cover:
 
-- Ruff/ty: inherited-attribute inference changes, focused mdtests, checks,
-  Clippy, and package-wide tests.
+- Ruff/ty: recursive attribute inference changes, focused mdtests, Clippy,
+  formatting, and package-wide tests.
 - uv: the PyPI Simple API JSON parser, parser and registry-client tests,
   Clippy, and a localhost-only installation test.
 - Codex: a publicly exported TUI rendering change, focused nextest workflows,
@@ -63,14 +63,14 @@ If your shell sets `PYTHONSAFEPATH=1`, run the trusted repository script with
 `env -u PYTHONSAFEPATH python3 scripts/replay_sessions.py ...` so Python can
 import its sibling `benchmark.py` module.
 
-`--source-path ruff=/path/to/huff` supplies Git objects; it does not select the
-current `huff` revision or change the recorded commands. A new workload needs a
+`--source-path ruff=/path/to/ruff` supplies Git objects; it does not select the
+checkout's current revision or change the recorded commands. A new workload needs a
 separate JSON fixture with pinned source revisions, actual edits, commands, and
 environment. Keep the existing fixture unchanged when comparing old releases.
 
-## Current Ruff/Huff workflow
+## Ruff workflow
 
-[`ruff-huff.json`](ruff-huff.json) records a newer sequence from
+[`ruff.json`](ruff.json) records a sequence from
 [Ruff PR #27736](https://github.com/astral-sh/ruff/pull/27736): simplifying
 recursive attribute inference, indexing its dependencies per class, and
 implementing component fixed points. It starts at `21c9b077ab` and applies the
@@ -91,23 +91,24 @@ actual test execution.
 ulimit -n 65536
 python3 scripts/replay_sessions.py \
   --project ruff \
-  --scenario scripts/session_replays/ruff-huff.json \
-  --source-path ruff=/path/to/huff \
+  --source-path ruff=/path/to/ruff \
   --upstream 1.97.1 \
   --ohm ohm-1.97.1-18 \
-  --output-dir /tmp/ohm-huff-session-benchmarks \
+  --output-dir /tmp/ohm-ruff-session-benchmarks \
   --jobs 8 \
   --repetitions 2 \
   --require-idle \
   --background
 ```
 
-The default `ruff.json` remains the historical release-comparison fixture.
-Select `ruff-huff.json` explicitly when measuring the newer workflow.
+This is the default Ruff replay, alongside `uv.json` and `codex.json`. To
+reproduce the older release-comparison workload, pass
+`--scenario scripts/session_replays/ruff-historical.json` instead. Its original
+edits, commands, and recorded results remain unchanged.
 
 ### Revision 18 measurements
 
-The [complete Huff results](release-1.97.1-18-huff.json) contain both
+The [complete Ruff results](release-1.97.1-18-ruff.json) contain both
 counterbalanced repetitions and all 12 per-command timings. This study used a
 separate, idle Linux devbox with 32 logical CPUs (AMD EPYC 7763) and eight build
 jobs. All commands passed, paired test counts matched, and the interference
@@ -139,7 +140,10 @@ The two-run means show a 12.96% whole-session improvement, but not an
 edit-to-test improvement: the check-and-test total is 1.19% slower. Baseline
 warmups are excluded from all these tables. Because both the source-edit
 sequence and the machine differ, these results do not replace a row in the
-historical three-project aggregate below.
+historical three-project aggregate below. The main README instead combines this
+new Ruff result with the recorded revision-18 uv and Codex results. Its totals
+sum those three paired project means; they are not a new simultaneous run on
+one host.
 
 ## Compiler-work attribution
 
@@ -164,9 +168,9 @@ per-command log when assigning a cause. Verbose output has its own overhead:
 compare verbose samples only against equally verbose samples, and keep the
 default nonverbose mode for headline session timings.
 
-## Ohm 1.97.1 revision 18 results
+## Historical Ohm 1.97.1 revision 18 results
 
-The checked-in [revision 18 results](release-1.97.1-18-baseline.json) contain all
+The checked-in [historical revision 18 results](release-1.97.1-18-baseline.json) contain all
 12 completed samples, source revisions, excluded warmup times, and the exact
 public command and both timings for each of the 37 recorded command steps.
 Private session identifiers, machine names, and artifact paths are omitted.
@@ -210,11 +214,12 @@ were 6.65% faster.
 
 The historical Ruff commands omit `CARGO_PROFILE_DEV_LTO=off` and usually omit
 `--test mdtest`, unlike Ruff's current recommended workflow. The recorded
-fixture is retained for reproducible release comparisons and because it exposed
+[`ruff-historical.json`](ruff-historical.json) fixture is retained for
+reproducible release comparisons and because it exposed
 revision 18's `check` → `nextest` → unchanged `check` graph regression. A newer
-Ruff/ty session should use a separately pinned fixture and apply the recommended
-profile and target selection equally to both toolchains. Do not replace these
-measurements with numbers from that different workload.
+Ruff/ty session is measured [above](#ruff-workflow), using the recommended
+profile and target selection equally for both toolchains. Its different workload
+does not replace these historical measurements.
 
 The devbox's historical wrapper excluded the same 11 host-sensitive or flaky
 Codex tests from both toolchains. The final package command reported 3,440 and
@@ -230,7 +235,7 @@ byte-identical to that historical wrapper. Cargo progress messages in this
 study do not prove actual rustc invocations; use the separate verbose
 attribution mode above for that purpose.
 
-## Ohm 1.97.1 revision 17 baseline
+## Historical Ohm 1.97.1 revision 17 baseline
 
 The checked-in [revision 17 baseline](release-1.97.1-17-baseline.json) contains
 both repetitions and the exact untimed warmups. The two-run session means were:
@@ -248,7 +253,7 @@ these end-to-end numbers do not demonstrate a general compiler speedup.
 
 The first stock uv warmup was contaminated by a resumed, previously warmed
 target. It is excluded from the checked-in cold-start data, while its timed
-session remains valid. Ruff's fixture intentionally does not prewarm formatting:
+session remains valid. The historical Ruff fixture intentionally does not prewarm formatting:
 its first timed formatter therefore includes cold initialization, matching this
 baseline.
 Ten Codex snapshots depended on an unrelated host-level Git repository and were

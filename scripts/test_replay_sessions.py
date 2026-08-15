@@ -107,9 +107,11 @@ class FixtureValidationTests(ReplayTestCase):
         self.assertRegex(scenario.session["id"], r"^[a-z][a-z0-9-]+$")
         self.assertNotIn("recorded_at", scenario.session)
 
-    def test_current_huff_fixture_preserves_the_historical_ruff_workload(self) -> None:
-        historical = replay.load_scenario(SCRIPTS / "session_replays" / "ruff.json")
-        current = replay.load_scenario(SCRIPTS / "session_replays" / "ruff-huff.json")
+    def test_default_ruff_fixture_preserves_the_historical_workload(self) -> None:
+        historical = replay.load_scenario(
+            SCRIPTS / "session_replays" / "ruff-historical.json"
+        )
+        current = replay.load_scenario(SCRIPTS / "session_replays" / "ruff.json")
         self.assertEqual(current.project, "ruff")
         self.assertNotEqual(current.session["id"], historical.session["id"])
         self.assertNotEqual(current.base_revision, historical.base_revision)
@@ -144,10 +146,8 @@ class FixtureValidationTests(ReplayTestCase):
             [
                 "--project",
                 "ruff",
-                "--scenario",
-                str(current.path),
                 "--output-dir",
-                str(self.directory / "huff-output"),
+                str(self.directory / "ruff-output"),
             ]
         )
         runner = replay.Replay(options)
@@ -157,19 +157,20 @@ class FixtureValidationTests(ReplayTestCase):
             for key, value in current.environment.items():
                 self.assertEqual(environment[key], value)
 
-    def test_current_huff_results_match_the_fixture_and_tables(self) -> None:
-        fixture = SCRIPTS / "session_replays" / "ruff-huff.json"
+    def test_current_ruff_results_match_the_fixture_and_tables(self) -> None:
+        fixture = SCRIPTS / "session_replays" / "ruff.json"
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.97.1-18-huff.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.97.1-18-ruff.json").read_text()
         )
         self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-18")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(baseline["environment"], scenario.environment)
         self.assertEqual(
-            baseline["provenance"]["fixture_sha256"],
+            baseline["provenance"]["published_fixture_sha256"],
             hashlib.sha256(fixture.read_bytes()).hexdigest(),
         )
+        self.assertEqual(baseline["sessions"][0]["session_id"], scenario.session["id"])
         self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
         self.assertEqual(baseline["methodology"]["external_compilations_observed"], 0)
         commands = baseline["commands"]["ruff"]
@@ -227,7 +228,7 @@ class FixtureValidationTests(ReplayTestCase):
         session = baseline["timed_session_seconds"]["ruff"]
         stock = statistics.fmean(session["stock"])
         ohm = statistics.fmean(session["ohm"])
-        assert_row(main_rows, "Ruff/Huff", stock, ohm)
+        assert_row(main_rows, "Ruff session", stock, ohm)
         assert_row(detailed_rows, "Complete session", stock, ohm)
         timed = baseline["timed_command_seconds"]["ruff"]
         assert_row(
@@ -306,13 +307,15 @@ class FixtureValidationTests(ReplayTestCase):
             baseline["methodology"]["cargo_status_messages_prove_compiler_invocations"]
         )
 
-    def test_ruff_fixture_matches_release_baseline_warmups(self) -> None:
+    def test_historical_ruff_fixture_matches_release_baseline_warmups(self) -> None:
         baseline = json.loads(
             (
                 SCRIPTS / "session_replays" / "release-1.97.1-17-baseline.json"
             ).read_text()
         )
-        scenario = replay.load_scenario(SCRIPTS / "session_replays" / "ruff.json")
+        scenario = replay.load_scenario(
+            SCRIPTS / "session_replays" / "ruff-historical.json"
+        )
 
         self.assertEqual(len(scenario.warmup), 2)
         self.assertEqual(
@@ -337,8 +340,9 @@ class FixtureValidationTests(ReplayTestCase):
 
         for project in replay.PROJECTS:
             with self.subTest(project=project):
+                fixture = "ruff-historical" if project == "ruff" else project
                 scenario = replay.load_scenario(
-                    SCRIPTS / "session_replays" / f"{project}.json"
+                    SCRIPTS / "session_replays" / f"{fixture}.json"
                 )
                 commands = baseline["commands"][project]
                 expected = [
@@ -388,17 +392,22 @@ class FixtureValidationTests(ReplayTestCase):
                             ],
                         )
 
-    def test_readme_revision_18_table_matches_recorded_results(self) -> None:
-        baseline = json.loads(
+    def test_readme_selected_session_table_matches_recorded_results(self) -> None:
+        historical = json.loads(
             (
                 SCRIPTS / "session_replays" / "release-1.97.1-18-baseline.json"
             ).read_text()
         )
+        current_ruff = json.loads(
+            (SCRIPTS / "session_replays" / "release-1.97.1-18-ruff.json").read_text()
+        )
+        baselines = {"ruff": current_ruff, "uv": historical, "codex": historical}
         rows = [
             [cell.strip() for cell in line.strip("|").split("|")]
             for line in (SCRIPTS.parent / "README.md").read_text().splitlines()
             if line.startswith("|")
         ]
+        self.assertEqual(sum(row[0] == "Ruff session" for row in rows), 1)
 
         def assert_row(label: str, stock: float, ohm: float) -> None:
             saved = stock - ohm
@@ -419,7 +428,7 @@ class FixtureValidationTests(ReplayTestCase):
         ) -> float:
             return sum(
                 statistics.fmean(command["wall_seconds"][toolchain])
-                for command in baseline["commands"][project]
+                for command in baselines[project]["commands"][project]
                 if command["category"] in categories
             )
 
@@ -430,8 +439,12 @@ class FixtureValidationTests(ReplayTestCase):
         ):
             assert_row(
                 label,
-                statistics.fmean(baseline["timed_session_seconds"][project]["stock"]),
-                statistics.fmean(baseline["timed_session_seconds"][project]["ohm"]),
+                statistics.fmean(
+                    baselines[project]["timed_session_seconds"][project]["stock"]
+                ),
+                statistics.fmean(
+                    baselines[project]["timed_session_seconds"][project]["ohm"]
+                ),
             )
 
         for category, label in (
@@ -453,11 +466,12 @@ class FixtureValidationTests(ReplayTestCase):
             assert_row(
                 label,
                 sum(
-                    statistics.fmean(baseline[field][p]["stock"])
+                    statistics.fmean(baselines[p][field][p]["stock"])
                     for p in replay.PROJECTS
                 ),
                 sum(
-                    statistics.fmean(baseline[field][p]["ohm"]) for p in replay.PROJECTS
+                    statistics.fmean(baselines[p][field][p]["ohm"])
+                    for p in replay.PROJECTS
                 ),
             )
 

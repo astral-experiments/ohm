@@ -1,0 +1,201 @@
+{
+  "project": "ruff",
+  "repository": "https://github.com/astral-sh/ruff.git",
+  "source_hint": "ruff",
+  "session": {
+    "id": "ruff-inherited-attribute-inference",
+    "description": "Replay three consecutive, real ty inherited-attribute inference changes from Ruff PR #27736, interleaved with the focused mdtests, cargo checks, formatting, Clippy, and package-wide validation used in the original session."
+  },
+  "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+  "fetch_refs": ["refs/pull/27736/head"],
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+  },
+  "warmup": [
+    {
+      "kind": "command",
+      "label": "Warm the semantic crate at the unmodified session baseline",
+      "program": "cargo",
+      "args": ["check", "-p", "ty_python_semantic"]
+    },
+    {
+      "kind": "command",
+      "label": "Warm the baseline inference-cycle mdtest harness",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--",
+        "mdtest::cycle.md"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "kind": "command",
+      "label": "Check the semantic crate before editing",
+      "program": "cargo",
+      "args": ["check", "-p", "ty_python_semantic"]
+    },
+    {
+      "kind": "command",
+      "label": "Establish the focused attribute-cycle baseline",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--",
+        "mdtest::cycle.md"
+      ]
+    },
+    {
+      "kind": "edit",
+      "label": "Stabilize same-class attribute inference cycles",
+      "parent": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+      "commit": "d7f442ca70c8b302c8911d55ac17cc96f37fe765"
+    },
+    {
+      "kind": "command",
+      "label": "Run focused instance-attribute mdtests",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--",
+        "mdtest::attributes.md"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Recheck focused inference-cycle mdtests",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--",
+        "mdtest::cycle.md"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Check core and semantic crates after the core dependency edit",
+      "program": "cargo",
+      "args": ["check", "-p", "ty_python_core", "-p", "ty_python_semantic"]
+    },
+    {
+      "kind": "edit",
+      "label": "Key recursive attribute inference by its explicit context",
+      "parent": "d7f442ca70c8b302c8911d55ac17cc96f37fe765",
+      "commit": "afc677599c5008de1de2f1540c04f7746a869e6e"
+    },
+    {
+      "kind": "command",
+      "label": "Run the original cycle, hasattr, and subtype regression slice",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--failure-output",
+        "immediate-final",
+        "--",
+        "mdtest::cycle.md",
+        "mdtest::narrow/hasattr.md",
+        "mdtest::type_properties/is_subtype_of.md"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Recheck semantic analysis after the recursive-inference edit",
+      "program": "cargo",
+      "args": ["check", "-p", "ty_python_semantic"]
+    },
+    {
+      "kind": "edit",
+      "label": "Stabilize mutually dependent instance attributes",
+      "parent": "afc677599c5008de1de2f1540c04f7746a869e6e",
+      "commit": "8760753854989e6ceb42f236c93a0d1d1610e67d"
+    },
+    {
+      "kind": "command",
+      "label": "Run the expanded inference-cycle regression file",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--",
+        "mdtest::cycle.md"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Recheck instance-attribute regressions",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--",
+        "mdtest::attributes.md"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Run strict Clippy for the changed core and semantic crates",
+      "program": "cargo",
+      "args": [
+        "clippy",
+        "-p",
+        "ty_python_core",
+        "-p",
+        "ty_python_semantic",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "kind": "command",
+      "label": "Verify Rust formatting across the workspace",
+      "program": "cargo",
+      "args": ["fmt", "--all", "--", "--check"]
+    },
+    {
+      "kind": "command",
+      "label": "Validate all core and semantic package tests",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_core",
+        "-p",
+        "ty_python_semantic",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--failure-output",
+        "immediate-final"
+      ]
+    }
+  ]
+}
