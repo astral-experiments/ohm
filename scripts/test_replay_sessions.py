@@ -6,6 +6,7 @@ import dataclasses
 import importlib.util
 import json
 import os
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -148,6 +149,154 @@ class FixtureValidationTests(ReplayTestCase):
         )
         self.assertFalse(baseline["methodology"]["ruff_warmup_included_formatting"])
         self.assertFalse(any(step["args"][0] == "fmt" for step in scenario.warmup))
+
+    def test_revision_18_results_preserve_every_recorded_command(self) -> None:
+        baseline = json.loads(
+            (
+                SCRIPTS / "session_replays" / "release-1.97.1-18-baseline.json"
+            ).read_text()
+        )
+        self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-18")
+        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
+        self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
+        self.assertEqual(baseline["methodology"]["external_compilations_observed"], 0)
+        self.assertFalse(
+            baseline["methodology"]["cargo_status_messages_prove_compiler_invocations"]
+        )
+
+        for project in replay.PROJECTS:
+            with self.subTest(project=project):
+                scenario = replay.load_scenario(
+                    SCRIPTS / "session_replays" / f"{project}.json"
+                )
+                commands = baseline["commands"][project]
+                expected = [
+                    (index, step)
+                    for index, step in enumerate(scenario.steps, start=1)
+                    if step["kind"] == "command"
+                ]
+                self.assertEqual(len(commands), len(expected))
+                for command, (index, step) in zip(commands, expected, strict=True):
+                    self.assertEqual(command["index"], index)
+                    self.assertEqual(command["label"], step["label"])
+                    original = [step["program"], *step["args"]]
+                    if project == "codex" and index == len(scenario.steps):
+                        self.assertEqual(command["command"][: len(original)], original)
+                        self.assertEqual(command["command"][len(original)], "-E")
+                        self.assertEqual(len(command["command"]), len(original) + 2)
+                    else:
+                        self.assertEqual(command["command"], original)
+                    category = {
+                        "check": "check",
+                        "test": "test",
+                        "nextest": "test",
+                        "clippy": "clippy",
+                        "fmt": "formatting",
+                    }[original[1]]
+                    self.assertEqual(command["category"], category)
+
+                for toolchain in ("stock", "ohm"):
+                    for repetition in range(baseline["repetitions"]):
+                        total = sum(
+                            command["wall_seconds"][toolchain][repetition]
+                            for command in commands
+                        )
+                        self.assertAlmostEqual(
+                            total,
+                            baseline["timed_command_seconds"][project][toolchain][
+                                repetition
+                            ],
+                        )
+                        self.assertGreaterEqual(
+                            baseline["timed_session_seconds"][project][toolchain][
+                                repetition
+                            ],
+                            total
+                            + baseline["timed_edit_seconds"][project][toolchain][
+                                repetition
+                            ],
+                        )
+
+    def test_readme_revision_18_tables_match_recorded_results(self) -> None:
+        baseline = json.loads(
+            (
+                SCRIPTS / "session_replays" / "release-1.97.1-18-baseline.json"
+            ).read_text()
+        )
+        rows = [
+            [cell.strip() for cell in line.strip("|").split("|")]
+            for line in (SCRIPTS.parent / "README.md").read_text().splitlines()
+            if line.startswith("|")
+        ]
+
+        def assert_row(label: str, stock: float, ohm: float) -> None:
+            saved = stock - ohm
+            sign = "−" if saved < 0 else ""
+            self.assertIn(
+                [
+                    label,
+                    f"{stock:,.2f} s",
+                    f"{ohm:,.2f} s",
+                    f"{sign}{abs(saved):,.2f} s",
+                    f"{sign}{abs(100 * saved / stock):.2f}%",
+                ],
+                rows,
+            )
+
+        def command_seconds(
+            project: str, toolchain: str, categories: set[str]
+        ) -> float:
+            return sum(
+                statistics.fmean(command["wall_seconds"][toolchain])
+                for command in baseline["commands"][project]
+                if command["category"] in categories
+            )
+
+        for project, label in (("ruff", "Ruff"), ("uv", "uv"), ("codex", "Codex")):
+            assert_row(
+                label,
+                statistics.fmean(baseline["timed_session_seconds"][project]["stock"]),
+                statistics.fmean(baseline["timed_session_seconds"][project]["ohm"]),
+            )
+            assert_row(
+                label,
+                command_seconds(project, "stock", {"check", "test"}),
+                command_seconds(project, "ohm", {"check", "test"}),
+            )
+
+        for category, label in (
+            ("check", "`cargo check`"),
+            ("test", "`cargo test`, `cargo nextest`, `just test`"),
+            ("clippy", "`cargo clippy`"),
+            ("formatting", "`cargo fmt`"),
+        ):
+            assert_row(
+                label,
+                sum(command_seconds(p, "stock", {category}) for p in replay.PROJECTS),
+                sum(command_seconds(p, "ohm", {category}) for p in replay.PROJECTS),
+            )
+
+        for field, label in (
+            ("timed_session_seconds", "Total"),
+            ("timed_command_seconds", "All commands"),
+        ):
+            assert_row(
+                label,
+                sum(
+                    statistics.fmean(baseline[field][p]["stock"])
+                    for p in replay.PROJECTS
+                ),
+                sum(
+                    statistics.fmean(baseline[field][p]["ohm"]) for p in replay.PROJECTS
+                ),
+            )
+        assert_row(
+            "Total",
+            sum(
+                command_seconds(p, "stock", {"check", "test"}) for p in replay.PROJECTS
+            ),
+            sum(command_seconds(p, "ohm", {"check", "test"}) for p in replay.PROJECTS),
+        )
 
     def test_rejects_incomplete_or_uppercase_commit_shas(self) -> None:
         for revision in ("abc123", "A" * 40, None):

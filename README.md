@@ -40,22 +40,48 @@ avoid rebuilding unchanged dependents:
 | Codex   | Formatting after an edit | `codex-core`         |      4.44 s |        0.22 s |  20.11× |
 | Codex   | Shared-worktree build    | `codex-utils-string` |      1.31 s |        0.30 s |   4.42× |
 
-**Complete recorded development sessions** replay real source edits and the intervening checks,
-tests, Clippy commands, and formatting from representative Ruff, uv, and Codex sessions:
+**Complete recorded development sessions** replay actual source edits and the commands run between
+them. These historical Ruff/ty, uv, and Codex sessions contain nine real edits and 37 commands,
+including focused tests, package-wide validation, checks, Clippy, and formatting. The complete
+session clock includes applying the edits and running the tests, but excludes initial setup and
+baseline warmups:
 
-| Project | Real edits | Cargo commands | Rust 1.97.1 | Ohm 1.97.1-17 | Improvement |
-| ------- | ---------: | -------------: | ----------: | ------------: | ----------: |
-| Ruff    |          3 |             12 |    391.75 s |      381.09 s |        2.7% |
-| uv      |          3 |             14 |    137.57 s |      122.59 s |       10.9% |
-| Codex   |          3 |             11 |    491.99 s |      459.41 s |        6.6% |
-| Total   |          9 |             37 |  1,021.32 s |      963.09 s |        5.7% |
+| Project | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| ------- | ----------: | ------------: | ---------: | --------: |
+| Ruff    |    403.47 s |      412.58 s |    −9.11 s |    −2.26% |
+| uv      |    139.58 s |      124.88 s |    14.70 s |    10.53% |
+| Codex   |    497.95 s |      408.54 s |    89.40 s |    17.95% |
+| Total   |  1,041.00 s |      946.00 s |    95.00 s |     9.13% |
+
+For the core compile-and-test loop, excluding Clippy, formatting, source-edit application, and
+runner bookkeeping:
+
+| Project | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| ------- | ----------: | ------------: | ---------: | --------: |
+| Ruff    |    326.76 s |      357.41 s |   −30.65 s |    −9.38% |
+| uv      |    105.67 s |      106.92 s |    −1.26 s |    −1.19% |
+| Codex   |    322.86 s |      280.35 s |    42.51 s |    13.17% |
+| Total   |    755.29 s |      744.68 s |    10.61 s |     1.40% |
+
+The command-only totals across all three sessions explain where the time was saved. Test timings
+include both compilation and test execution; `just test` invokes Cargo/nextest.
+
+| Command                                    | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| ------------------------------------------ | ----------: | ------------: | ---------: | --------: |
+| `cargo check`                              |    164.68 s |      155.62 s |     9.06 s |     5.50% |
+| `cargo test`, `cargo nextest`, `just test` |    590.61 s |      589.07 s |     1.54 s |     0.26% |
+| `cargo clippy`                             |    268.50 s |      189.53 s |    78.97 s |    29.41% |
+| `cargo fmt`                                |     16.51 s |       11.09 s |     5.41 s |    32.80% |
+| All commands                               |  1,040.30 s |      945.31 s |    94.99 s |     9.13% |
 
 These are two-run means from order-counterbalanced sessions on a 32-core Linux host, using 8 build
-jobs and untimed warmups. Across these workflows, checks and tests together were 1.3% slower with
-Ohm; the net improvement came from 23.4% faster Clippy commands and 32.8% faster formatting. The
-sessions were held out from revision 17's upstream Rust PGO training corpus. See the
-[session-replay documentation](scripts/session_replays/README.md) for the exact reproduction
-command, per-command compiler attribution, complete samples, and test-selection caveats.
+jobs. A negative reduction is a regression. Most of this release's overall gain comes from Clippy,
+not faster test compilation. The historical Ruff fixture also does not use the currently recommended
+LTO-off, targeted-mdtest workflow; its numbers remain useful for release-to-release comparisons,
+but should not be treated as the current recommended Ruff workflow. See the
+[session-replay documentation](scripts/session_replays/README.md) for reproduction commands,
+[all 37 command timings](scripts/session_replays/release-1.97.1-18-baseline.json), the earlier
+revision-17 results, and test-selection caveats.
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of

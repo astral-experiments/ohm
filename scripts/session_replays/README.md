@@ -20,7 +20,7 @@ Run all three scenarios against existing repository checkouts:
 ulimit -n 65536
 python3 scripts/replay_sessions.py \
   --upstream 1.97.1 \
-  --ohm ohm-1.97.1-17 \
+  --ohm ohm-1.97.1-18 \
   --source-path ruff=/path/to/ruff \
   --source-path uv=/path/to/uv \
   --source-path codex=/path/to/codex \
@@ -59,6 +59,15 @@ requires `just`. Revision 17's fine-grained locking can exceed the default
 1,024-descriptor limit on Codex's 1,029-crate test graph; raise the soft limit
 before starting a complete replay.
 
+If your shell sets `PYTHONSAFEPATH=1`, run the trusted repository script with
+`env -u PYTHONSAFEPATH python3 scripts/replay_sessions.py ...` so Python can
+import its sibling `benchmark.py` module.
+
+`--source-path ruff=/path/to/huff` supplies Git objects; it does not select the
+current `huff` revision or change the recorded commands. A new workload needs a
+separate JSON fixture with pinned source revisions, actual edits, commands, and
+environment. Keep the existing fixture unchanged when comparing old releases.
+
 ## Compiler-work attribution
 
 Cargo can print `Checking package` before early cutoff discovers that rustc does
@@ -81,6 +90,72 @@ early cutoff; it can also reflect a build-script-only action, so inspect the
 per-command log when assigning a cause. Verbose output has its own overhead:
 compare verbose samples only against equally verbose samples, and keep the
 default nonverbose mode for headline session timings.
+
+## Ohm 1.97.1 revision 18 results
+
+The checked-in [revision 18 results](release-1.97.1-18-baseline.json) contain all
+12 completed samples, source revisions, excluded warmup times, and the exact
+public command and both timings for each of the 37 recorded command steps.
+Private session identifiers, machine names, and artifact paths are omitted.
+
+The study used the same 32-core Linux host, eight build jobs, pinned source
+edits, and stock-first/Ohm-first order as the revision-17 study. Every command
+succeeded, and the interference guard observed no competing compilations.
+Whole-session times include the three source edits per project and runner
+bookkeeping; command-only times exclude those costs. Both include the actual
+test execution. Initial checkouts and baseline warmups are not timed.
+
+| Scope                 | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| --------------------- | ----------: | ------------: | ---------: | --------: |
+| Complete sessions     |  1,041.00 s |      946.00 s |    95.00 s |     9.13% |
+| All recorded commands |  1,040.30 s |      945.31 s |    94.99 s |     9.13% |
+| Checks and tests only |    755.29 s |      744.68 s |    10.61 s |     1.40% |
+
+The following table breaks the command-only results down by project. Each cell
+is the sum of the per-command means across two repetitions. Negative savings
+are regressions, and the total reduction is calculated from summed times rather
+than averaging project percentages.
+
+| Project / command   | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| ------------------- | ----------: | ------------: | ---------: | --------: |
+| Ruff / `check`      |     31.02 s |       55.32 s |   −24.30 s |   −78.35% |
+| Ruff / `nextest`    |    295.74 s |      302.09 s |    −6.34 s |    −2.15% |
+| Ruff / `clippy`     |     70.12 s |       47.89 s |    22.23 s |    31.70% |
+| Ruff / `fmt`        |      6.36 s |        7.05 s |    −0.69 s |   −10.90% |
+| uv / `test`         |    105.67 s |      106.92 s |    −1.26 s |    −1.19% |
+| uv / `clippy`       |     23.59 s |       13.74 s |     9.85 s |    41.75% |
+| uv / `fmt`          |     10.15 s |        4.04 s |     6.11 s |    60.16% |
+| Codex / `check`     |    133.67 s |      100.30 s |    33.37 s |    24.96% |
+| Codex / `just test` |    189.20 s |      180.05 s |     9.15 s |     4.83% |
+| Codex / `clippy`    |    174.78 s |      127.89 s |    46.89 s |    26.83% |
+
+Across all projects, tests alone improved by 0.26%, checks and tests together by
+1.40%, Clippy by 29.41%, and formatting by 32.80%. In particular, uv's 10.53%
+whole-session improvement is not a test-compilation improvement: its test
+commands were 1.19% slower. Excluding formatting, its tests and Clippy together
+were 6.65% faster.
+
+The historical Ruff commands omit `CARGO_PROFILE_DEV_LTO=off` and usually omit
+`--test mdtest`, unlike Ruff's current recommended workflow. The recorded
+fixture is retained for reproducible release comparisons and because it exposed
+revision 18's `check` → `nextest` → unchanged `check` graph regression. A newer
+Ruff/ty session should use a separately pinned fixture and apply the recommended
+profile and target selection equally to both toolchains. Do not replace these
+measurements with numbers from that different workload.
+
+The devbox's historical wrapper excluded the same 11 host-sensitive or flaky
+Codex tests from both toolchains. The final package command reported 3,440 and
+3,439 test starts for stock, and 3,439 in both Ohm runs; these small differences
+are retained in the data rather than claimed as exact test-count parity. The
+full exclusion expression and per-step test counts are included in the results
+file. The general `codex.json` fixture does not apply those host-specific
+exclusions. To reproduce the recorded selection, make a separate Codex scenario
+with the final command from `commands.codex[-1].command` in the results file,
+then pass it with `--scenario PATH`. The results also retain checksums of the
+original runner and fixtures; the cleaned-up runner in this branch is not
+byte-identical to that historical wrapper. Cargo progress messages in this
+study do not prove actual rustc invocations; use the separate verbose
+attribution mode above for that purpose.
 
 ## Ohm 1.97.1 revision 17 baseline
 
