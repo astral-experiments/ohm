@@ -47,7 +47,8 @@ Store the GitHub App client ID and Cloudflare account and bucket configuration a
 The bucket is served publicly from `labs.astral.sh` and should be separate from Astral's production
 release bucket. Its credentials should only grant access to the experimental release bucket.
 
-Apple Silicon builds use the shared `namespace-profile-macos-15` runner; x86_64 Linux builds use
+Apple Silicon builds use `depot-macos-15` because PGO-instrumented binaries crash on Namespace
+runners; macOS smoke tests still use `namespace-profile-macos-15`. x86_64 Linux builds use
 `github-ubuntu-24.04-x86_64-8`. macOS builds need at least 50 GiB of available disk space, while
 Linux builds need at least 150 GiB for the temporary BOLT profiling corpus. Planning and publication
 use `depot-ubuntu-24.04-4` runners.
