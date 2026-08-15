@@ -40,12 +40,7 @@ avoid rebuilding unchanged dependents:
 | Codex   | Formatting after an edit | `codex-core`         |      4.44 s |        0.22 s |  20.11× |
 | Codex   | Shared-worktree build    | `codex-utils-string` |      1.31 s |        0.30 s |   4.42× |
 
-**Complete recorded development sessions** replay nine real edits and 37 commands across Ruff/ty,
-uv, and Codex. Ruff uses the current LTO-off profile and targeted mdtests. Session totals include
-applying edits and running tests, but exclude initial setup and baseline warmups; the command rows
-break down the same sessions. The totals sum each project's paired means, with Ruff measured
-separately. See the [replay documentation](scripts/session_replays/README.md) for the pinned workloads,
-reproduction commands, and detailed timings.
+And **replayed development sessions** measure the impact in real-world workflows:
 
 | Scope                                      | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
 | ------------------------------------------ | ----------: | ------------: | ---------: | --------: |
