@@ -1,0 +1,61 @@
+{
+  "project": "uv",
+  "repository": "https://github.com/astral-sh/uv.git",
+  "source_hint": "uv",
+  "session": {
+    "id": "uv-pypi-simple-json-parser-feature-ablation",
+    "description": "Replay one real, private-only PyPI Simple API parser simplification and separately measure downstream check cutoff and focused derive-heavy parser tests."
+  },
+  "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+  "fetch_refs": ["refs/heads/charlie/simple-api-json-parser"],
+  "environment": {},
+  "warmup": [
+    {
+      "kind": "command",
+      "label": "Warm downstream registry-client checking and its existing parser dependency",
+      "program": "cargo",
+      "args": ["check", "-p", "uv-client", "--locked"]
+    },
+    {
+      "kind": "command",
+      "label": "Warm focused Simple API parser library tests",
+      "program": "cargo",
+      "args": [
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "kind": "edit",
+      "label": "Simplify private Simple API JSON parser internals without changing public signatures",
+      "parent": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+      "commit": "67391e883c5443620caef94923298ddd08a0d878",
+      "paths": ["crates/uv-pypi-types/src/simple_json/parser.rs"]
+    },
+    {
+      "kind": "command",
+      "label": "Recheck downstream registry-client dependencies after the private parser edit",
+      "program": "cargo",
+      "args": ["check", "-p", "uv-client", "--locked"]
+    },
+    {
+      "kind": "command",
+      "label": "Retest the directly changed Simple API parser library",
+      "program": "cargo",
+      "args": [
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ]
+    }
+  ]
+}

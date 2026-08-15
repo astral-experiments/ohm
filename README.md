@@ -40,6 +40,23 @@ avoid rebuilding unchanged dependents:
 | Codex   | Formatting after an edit | `codex-core`         |      4.44 s |        0.22 s |  20.11× |
 | Codex   | Shared-worktree build    | `codex-utils-string` |      1.31 s |        0.30 s |   4.42× |
 
+**Complete recorded development sessions** replay real source edits and the intervening checks,
+tests, Clippy commands, and formatting from representative Ruff, uv, and Codex sessions:
+
+| Project | Real edits | Cargo commands | Rust 1.97.1 | Ohm 1.97.1-17 | Improvement |
+| ------- | ---------: | -------------: | ----------: | ------------: | ----------: |
+| Ruff    |          3 |             12 |    391.75 s |      381.09 s |        2.7% |
+| uv      |          3 |             14 |    137.57 s |      122.59 s |       10.9% |
+| Codex   |          3 |             11 |    491.99 s |      459.41 s |        6.6% |
+| Total   |          9 |             37 |  1,021.32 s |      963.09 s |        5.7% |
+
+These are two-run means from order-counterbalanced sessions on a 32-core Linux host, using 8 build
+jobs and untimed warmups. Across these workflows, checks and tests together were 1.3% slower with
+Ohm; the net improvement came from 23.4% faster Clippy commands and 32.8% faster formatting. The
+sessions were held out from revision 17's upstream Rust PGO training corpus. See the
+[session-replay documentation](scripts/session_replays/README.md) for the exact reproduction
+command, per-command compiler attribution, complete samples, and test-selection caveats.
+
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
 [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790). Use it only for
