@@ -51,23 +51,17 @@ workload, reproduction command, and detailed timings.
 | Ruff/Huff |    429.44 s |      373.78 s |    55.67 s |    12.96% |
 
 **Complete historical development sessions** replay actual source edits and the commands run between
-them. These historical Ruff/ty, uv, and Codex sessions contain nine real edits and 37 commands,
-including focused tests, package-wide validation, checks, Clippy, and formatting. The complete
-session clock includes applying the edits and running the tests, but excludes initial setup and
-baseline warmups:
+them: nine real edits and 37 commands across Ruff/ty, uv, and Codex. Session totals include applying
+edits and running tests, but exclude initial setup and baseline warmups. The command rows break down
+the same sessions, excluding edit application and runner bookkeeping. Test timings include compilation
+and execution; `just test` invokes Cargo/nextest.
 
-| Project | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
-| ------- | ----------: | ------------: | ---------: | --------: |
-| Ruff    |    403.47 s |      412.58 s |    −9.11 s |    −2.26% |
-| uv      |    139.58 s |      124.88 s |    14.70 s |    10.53% |
-| Codex   |    497.95 s |      408.54 s |    89.40 s |    17.95% |
-| Total   |  1,041.00 s |      946.00 s |    95.00 s |     9.13% |
-
-The command-only totals across all three sessions explain where the time was saved. Test timings
-include both compilation and test execution; `just test` invokes Cargo/nextest.
-
-| Command                                    | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| Scope                                      | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
 | ------------------------------------------ | ----------: | ------------: | ---------: | --------: |
+| Ruff session                               |    403.47 s |      412.58 s |    −9.11 s |    −2.26% |
+| uv session                                 |    139.58 s |      124.88 s |    14.70 s |    10.53% |
+| Codex session                              |    497.95 s |      408.54 s |    89.40 s |    17.95% |
+| All sessions                               |  1,041.00 s |      946.00 s |    95.00 s |     9.13% |
 | `cargo check`                              |    164.68 s |      155.62 s |     9.06 s |     5.50% |
 | `cargo test`, `cargo nextest`, `just test` |    590.61 s |      589.07 s |     1.54 s |     0.26% |
 | `cargo clippy`                             |    268.50 s |      189.53 s |    78.97 s |    29.41% |

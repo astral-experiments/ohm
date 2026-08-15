@@ -388,7 +388,7 @@ class FixtureValidationTests(ReplayTestCase):
                             ],
                         )
 
-    def test_readme_revision_18_tables_match_recorded_results(self) -> None:
+    def test_readme_revision_18_table_matches_recorded_results(self) -> None:
         baseline = json.loads(
             (
                 SCRIPTS / "session_replays" / "release-1.97.1-18-baseline.json"
@@ -423,7 +423,11 @@ class FixtureValidationTests(ReplayTestCase):
                 if command["category"] in categories
             )
 
-        for project, label in (("ruff", "Ruff"), ("uv", "uv"), ("codex", "Codex")):
+        for project, label in (
+            ("ruff", "Ruff session"),
+            ("uv", "uv session"),
+            ("codex", "Codex session"),
+        ):
             assert_row(
                 label,
                 statistics.fmean(baseline["timed_session_seconds"][project]["stock"]),
@@ -443,7 +447,7 @@ class FixtureValidationTests(ReplayTestCase):
             )
 
         for field, label in (
-            ("timed_session_seconds", "Total"),
+            ("timed_session_seconds", "All sessions"),
             ("timed_command_seconds", "All commands"),
         ):
             assert_row(
