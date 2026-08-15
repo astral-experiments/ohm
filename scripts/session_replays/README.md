@@ -105,6 +105,42 @@ python3 scripts/replay_sessions.py \
 The default `ruff.json` remains the historical release-comparison fixture.
 Select `ruff-huff.json` explicitly when measuring the newer workflow.
 
+### Revision 18 measurements
+
+The [complete Huff results](release-1.97.1-18-huff.json) contain both
+counterbalanced repetitions and all 12 per-command timings. This study used a
+separate, idle Linux devbox with 32 logical CPUs (AMD EPYC 7763) and eight build
+jobs. All commands passed, paired test counts matched, and the interference
+guard observed no competing compilations. An earlier attempt on the historical
+study's host was rejected during warmup when another build began; none of that
+attempt is included here.
+
+| Scope                        | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| ---------------------------- | ----------: | ------------: | ---------: | --------: |
+| Complete session             |    429.44 s |      373.78 s |    55.67 s |    12.96% |
+| All recorded commands        |    429.19 s |      373.52 s |    55.67 s |    12.97% |
+| Checks and tests (`nextest`) |    247.77 s |      250.72 s |    −2.95 s |    −1.19% |
+| `cargo clippy`               |    174.93 s |      115.65 s |    59.28 s |    33.89% |
+| `cargo fmt`                  |      6.49 s |        7.16 s |    −0.66 s |   −10.23% |
+
+The primary check-and-test total includes the unchanged focused baseline and
+the following three edit-to-test phases. Clippy and formatting are excluded
+from this breakdown. Each phase includes the actual selected tests, not just
+compiler time.
+
+| Check/test phase           | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| -------------------------- | ----------: | ------------: | ---------: | --------: |
+| Unchanged focused baseline |      1.58 s |        1.59 s |    −0.02 s |    −1.15% |
+| Simplification             |     54.64 s |       54.32 s |     0.31 s |     0.57% |
+| Dependency indexing        |     85.50 s |       85.81 s |    −0.31 s |    −0.36% |
+| Component fixed points     |    106.06 s |      108.99 s |    −2.94 s |    −2.77% |
+
+The two-run means show a 12.96% whole-session improvement, but not an
+edit-to-test improvement: the check-and-test total is 1.19% slower. Baseline
+warmups are excluded from all these tables. Because both the source-edit
+sequence and the machine differ, these results do not replace a row in the
+historical three-project aggregate below.
+
 ## Compiler-work attribution
 
 Cargo can print `Checking package` before early cutoff discovers that rustc does

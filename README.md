@@ -40,7 +40,17 @@ avoid rebuilding unchanged dependents:
 | Codex   | Formatting after an edit | `codex-core`         |      4.44 s |        0.22 s |  20.11× |
 | Codex   | Shared-worktree build    | `codex-utils-string` |      1.31 s |        0.30 s |   4.42× |
 
-**Complete recorded development sessions** replay actual source edits and the commands run between
+**Current Ruff/ty development session:** a separately measured Huff replay follows three recent
+source edits using the recommended LTO-off profile and targeted mdtests. The complete-session
+measurement includes tests, Clippy, and formatting; see the
+[replay documentation](scripts/session_replays/README.md#current-ruffhuff-workflow) for the pinned
+workload, reproduction command, and detailed timings.
+
+| Project   | Rust 1.97.1 | Ohm 1.97.1-18 | Time saved | Reduction |
+| --------- | ----------: | ------------: | ---------: | --------: |
+| Ruff/Huff |    429.44 s |      373.78 s |    55.67 s |    12.96% |
+
+**Complete historical development sessions** replay actual source edits and the commands run between
 them. These historical Ruff/ty, uv, and Codex sessions contain nine real edits and 37 commands,
 including focused tests, package-wide validation, checks, Clippy, and formatting. The complete
 session clock includes applying the edits and running the tests, but excludes initial setup and

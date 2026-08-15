@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import importlib.util
 import json
 import os
@@ -155,6 +156,130 @@ class FixtureValidationTests(ReplayTestCase):
             environment = runner.environment(current, label, selector, 0)
             for key, value in current.environment.items():
                 self.assertEqual(environment[key], value)
+
+    def test_current_huff_results_match_the_fixture_and_tables(self) -> None:
+        fixture = SCRIPTS / "session_replays" / "ruff-huff.json"
+        scenario = replay.load_scenario(fixture)
+        baseline = json.loads(
+            (SCRIPTS / "session_replays" / "release-1.97.1-18-huff.json").read_text()
+        )
+        self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-18")
+        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
+        self.assertEqual(baseline["environment"], scenario.environment)
+        self.assertEqual(
+            baseline["provenance"]["fixture_sha256"],
+            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+        )
+        self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
+        self.assertEqual(baseline["methodology"]["external_compilations_observed"], 0)
+        commands = baseline["commands"]["ruff"]
+        expected = [
+            (index, step)
+            for index, step in enumerate(scenario.steps, start=1)
+            if step["kind"] == "command"
+        ]
+        self.assertEqual(len(commands), 12)
+        for command, (index, step) in zip(commands, expected, strict=True):
+            self.assertEqual(command["index"], index)
+            self.assertEqual(command["command"], [step["program"], *step["args"]])
+            self.assertEqual(
+                command["tests_started"]["stock"], command["tests_started"]["ohm"]
+            )
+        for toolchain in ("stock", "ohm"):
+            self.assertEqual(
+                len(baseline["timed_session_seconds"]["ruff"][toolchain]), 2
+            )
+            for repetition in range(2):
+                self.assertAlmostEqual(
+                    sum(
+                        command["wall_seconds"][toolchain][repetition]
+                        for command in commands
+                    ),
+                    baseline["timed_command_seconds"]["ruff"][toolchain][repetition],
+                )
+
+        def rows(document: Path) -> list[list[str]]:
+            return [
+                [cell.strip() for cell in line.strip("|").split("|")]
+                for line in document.read_text().splitlines()
+                if line.startswith("|")
+            ]
+
+        main_rows = rows(SCRIPTS.parent / "README.md")
+        detailed_rows = rows(SCRIPTS / "session_replays" / "README.md")
+
+        def assert_row(
+            table: list[list[str]], label: str, stock: float, ohm: float
+        ) -> None:
+            saved = stock - ohm
+            sign = "−" if saved < 0 else ""
+            self.assertIn(
+                [
+                    label,
+                    f"{stock:,.2f} s",
+                    f"{ohm:,.2f} s",
+                    f"{sign}{abs(saved):,.2f} s",
+                    f"{sign}{abs(100 * saved / stock):.2f}%",
+                ],
+                table,
+            )
+
+        session = baseline["timed_session_seconds"]["ruff"]
+        stock = statistics.fmean(session["stock"])
+        ohm = statistics.fmean(session["ohm"])
+        assert_row(main_rows, "Ruff/Huff", stock, ohm)
+        assert_row(detailed_rows, "Complete session", stock, ohm)
+        timed = baseline["timed_command_seconds"]["ruff"]
+        assert_row(
+            detailed_rows,
+            "All recorded commands",
+            statistics.fmean(timed["stock"]),
+            statistics.fmean(timed["ohm"]),
+        )
+
+        def command_seconds(toolchain: str, indices: set[int]) -> float:
+            return sum(
+                statistics.fmean(command["wall_seconds"][toolchain])
+                for command in commands
+                if command["index"] in indices
+            )
+
+        for label, indices in (
+            (
+                "Checks and tests (`nextest`)",
+                {
+                    command["index"]
+                    for command in commands
+                    if command["category"] == "test"
+                },
+            ),
+            (
+                "`cargo clippy`",
+                {
+                    command["index"]
+                    for command in commands
+                    if command["category"] == "clippy"
+                },
+            ),
+            (
+                "`cargo fmt`",
+                {
+                    command["index"]
+                    for command in commands
+                    if command["category"] == "formatting"
+                },
+            ),
+            ("Unchanged focused baseline", {1}),
+            ("Simplification", {3, 4}),
+            ("Dependency indexing", {7, 8}),
+            ("Component fixed points", {11, 12, 13}),
+        ):
+            assert_row(
+                detailed_rows,
+                label,
+                command_seconds("stock", indices),
+                command_seconds("ohm", indices),
+            )
 
     def test_checked_in_release_baseline_contains_paired_real_sessions(self) -> None:
         baseline = json.loads(
