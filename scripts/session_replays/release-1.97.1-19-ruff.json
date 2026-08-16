@@ -1,0 +1,372 @@
+{
+  "rust_version": "1.97.1",
+  "ohm_release": "ohm-1.97.1-19",
+  "host": {
+    "platform": "linux-x86_64",
+    "logical_cpus": 32
+  },
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    ["stock", "ohm"],
+    ["ohm", "stock"]
+  ],
+  "sessions": [
+    {
+      "project": "ruff",
+      "session_id": "ruff-component-fixed-points",
+      "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+      "commands": 12,
+      "edits": 3,
+      "warmups": 1
+    }
+  ],
+  "timed_session_seconds": {
+    "ruff": {
+      "stock": [475.7013804381713, 471.4840144338086],
+      "ohm": [421.52075745072216, 421.919791135937]
+    }
+  },
+  "timed_command_seconds": {
+    "ruff": {
+      "stock": [474.0457273647189, 471.21514664776623],
+      "ohm": [421.25413594488055, 421.6525158882141]
+    }
+  },
+  "timed_edit_seconds": {
+    "ruff": {
+      "stock": [0.04851795919239521, 0.049119689501821995],
+      "ohm": [0.047615526244044304, 0.046675343066453934]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "ruff": {
+      "stock": [135.05622562300414, 135.24691572319716],
+      "ohm": [139.63331756275147, 140.09612390771508]
+    }
+  },
+  "commands": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Establish the focused cycle and attribute baseline",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [1.585112233646214, 1.6282400097697973],
+          "ohm": [1.647139623761177, 1.5293893860653043]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Validate the simplified cycle and attribute inference",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [26.838703899644315, 26.462726401165128],
+          "ohm": [27.850892087444663, 27.727426971308887]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run affected-package tests after simplification",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [33.269744366407394, 32.76433665771037],
+          "ohm": [32.92451861221343, 33.08833811245859]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Run strict Clippy after simplification",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [77.43851679097861, 76.11394800618291],
+          "ohm": [53.34478733036667, 53.55847067665309]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 7,
+        "label": "Validate the indexed cycle and attribute inference",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [43.21761100459844, 43.33273197337985],
+          "ohm": [45.77219479344785, 45.95839642267674]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Run affected-package tests after dependency indexing",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [51.10301893763244, 50.71484223473817],
+          "ohm": [52.490813326090574, 52.601255372166634]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Run strict Clippy after dependency indexing",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [55.80374148581177, 56.32750018313527],
+          "ohm": [36.39361516945064, 36.52988143265247]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Run the expanded component-cycle regressions",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--status-level",
+          "fail",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [51.4738680049777, 50.91730943508446],
+          "ohm": [53.5890954695642, 53.77211631461978]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Run all semantic mdtests after the fixed-point rewrite",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [5.915234748274088, 5.887511606328189],
+          "ohm": [5.947395735420287, 5.868477126583457]
+        },
+        "tests_started": {
+          "stock": [482, 482],
+          "ohm": [482, 482]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Validate the complete core and semantic packages",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [58.75768953748047, 58.92150765005499],
+          "ohm": [60.32166174892336, 60.307510930113494]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Run final strict Clippy for both affected packages",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [62.18472222518176, 61.73134383186698],
+          "ohm": [43.92068328987807, 43.699024233967066]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Verify final workspace formatting",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [6.457764130085707, 6.41314865835011],
+          "ohm": [7.051338758319616, 7.0122289089486]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      }
+    ]
+  },
+  "methodology": {
+    "headline_includes_source_edits": true,
+    "baseline_warmups_timed": false,
+    "compiler_accounting": "status",
+    "cargo_status_messages_prove_compiler_invocations": false,
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "matching_test_counts_within_pairs": true
+  },
+  "provenance": {
+    "raw_results_sha256": "5f2e4dd9ac8d2c0eb5ffda86d6b398afeaf17d6bdcd99aa97c441c7e797bc40e",
+    "fixture_sha256": "fb0af78dd9a6ea69ebcc6cada736f26a439067e1e26b8421e5a7259c7ce8cef1",
+    "runner_sha256": "5c91e2fccda04f94b9eccf7b8f92eabdcc3aac67b69017460586e7f60f46b564",
+    "published_fixture_sha256": "fb0af78dd9a6ea69ebcc6cada736f26a439067e1e26b8421e5a7259c7ce8cef1"
+  },
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_LTO": "off",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only",
+    "INSTA_FORCE_PASS": "0",
+    "INSTA_UPDATE": "no",
+    "MDTEST_UPDATE_SNAPSHOTS": "0"
+  }
+}

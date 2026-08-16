@@ -161,9 +161,9 @@ class FixtureValidationTests(ReplayTestCase):
         fixture = SCRIPTS / "session_replays" / "ruff.json"
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.97.1-18-ruff.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.97.1-19-ruff.json").read_text()
         )
-        self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-18")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-19")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(baseline["environment"], scenario.environment)
         self.assertEqual(
@@ -395,11 +395,11 @@ class FixtureValidationTests(ReplayTestCase):
     def test_readme_selected_session_table_matches_recorded_results(self) -> None:
         historical = json.loads(
             (
-                SCRIPTS / "session_replays" / "release-1.97.1-18-baseline.json"
+                SCRIPTS / "session_replays" / "release-1.97.1-19-baseline.json"
             ).read_text()
         )
         current_ruff = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.97.1-18-ruff.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.97.1-19-ruff.json").read_text()
         )
         baselines = {"ruff": current_ruff, "uv": historical, "codex": historical}
         rows = [
