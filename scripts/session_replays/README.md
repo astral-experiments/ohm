@@ -20,7 +20,7 @@ Run all three scenarios against existing repository checkouts:
 ulimit -n 65536
 python3 scripts/replay_sessions.py \
   --upstream 1.97.1 \
-  --ohm ohm-1.97.1-18 \
+  --ohm ohm-1.97.1-19 \
   --source-path ruff=/path/to/ruff \
   --source-path uv=/path/to/uv \
   --source-path codex=/path/to/codex \
@@ -93,7 +93,7 @@ python3 scripts/replay_sessions.py \
   --project ruff \
   --source-path ruff=/path/to/ruff \
   --upstream 1.97.1 \
-  --ohm ohm-1.97.1-18 \
+  --ohm ohm-1.97.1-19 \
   --output-dir /tmp/ohm-ruff-session-benchmarks \
   --jobs 8 \
   --repetitions 2 \
