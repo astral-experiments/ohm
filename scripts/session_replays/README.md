@@ -106,6 +106,29 @@ reproduce the older release-comparison workload, pass
 `--scenario scripts/session_replays/ruff-historical.json` instead. Its original
 edits, commands, and recorded results remain unchanged.
 
+### Revision 19 measurements
+
+The [complete Ruff results](release-1.97.1-19-ruff.json) contain both counterbalanced repetitions and all recorded commands. Baseline warmups are excluded; each compared test command ran the same selected tests.
+
+| Scope                        | Rust 1.97.1 | Ohm 1.97.1-19 | Time saved | Reduction |
+| ---------------------------- | ----------: | ------------: | ---------: | --------: |
+| Complete session             |    473.59 s |      421.72 s |    51.87 s |    10.95% |
+| All recorded commands        |    472.63 s |      421.45 s |    51.18 s |    10.83% |
+| Checks and tests (`nextest`) |    271.40 s |      280.70 s |    −9.30 s |    −3.43% |
+| `cargo clippy`               |    194.80 s |      133.72 s |    61.08 s |    31.35% |
+| `cargo fmt`                  |      6.44 s |        7.03 s |    −0.60 s |    −9.27% |
+
+The check-and-test breakdown includes actual test execution and excludes Clippy and formatting:
+
+| Check/test phase           | Rust 1.97.1 | Ohm 1.97.1-19 | Time saved | Reduction |
+| -------------------------- | ----------: | ------------: | ---------: | --------: |
+| Unchanged focused baseline |      1.61 s |        1.59 s |     0.02 s |     1.15% |
+| Simplification             |     59.67 s |       60.80 s |    −1.13 s |    −1.89% |
+| Dependency indexing        |     94.18 s |       98.41 s |    −4.23 s |    −4.49% |
+| Component fixed points     |    115.94 s |      119.90 s |    −3.97 s |    −3.42% |
+
+Revision-18 measurements remain below as immutable historical evidence.
+
 ### Revision 18 measurements
 
 The [complete Ruff results](release-1.97.1-18-ruff.json) contain both
@@ -140,10 +163,28 @@ The two-run means show a 12.96% whole-session improvement, but not an
 edit-to-test improvement: the check-and-test total is 1.19% slower. Baseline
 warmups are excluded from all these tables. Because both the source-edit
 sequence and the machine differ, these results do not replace a row in the
-historical three-project aggregate below. The main README instead combines this
+historical three-project aggregate below. At the time, the main README combined this
 new Ruff result with the recorded revision-18 uv and Codex results. Its totals
 sum those three paired project means; they are not a new simultaneous run on
 one host.
+
+## Revision 19 complete development-session results
+
+Each project uses its current, recorded development-session fixture. Both toolchains execute the same commands, edits, and tests; the measurements include the complete recorded session rather than only selected compiler work. The sanitized per-command results are recorded in [`release-1.97.1-19-baseline.json`](release-1.97.1-19-baseline.json).
+
+| Scope                                      | Rust 1.97.1 | Ohm 1.97.1-19 | Time saved | Reduction |
+| ------------------------------------------ | ----------: | ------------: | ---------: | --------: |
+| Ruff session                               |    473.59 s |      421.72 s |    51.87 s |    10.95% |
+| uv session                                 |    151.07 s |      135.45 s |    15.62 s |    10.34% |
+| Codex session                              |    550.39 s |      462.98 s |    87.40 s |    15.88% |
+| All sessions                               |  1,175.05 s |    1,020.15 s |   154.90 s |    13.18% |
+| `cargo check`                              |    150.82 s |      115.73 s |    35.09 s |    23.27% |
+| `cargo test`, `cargo nextest`, `just test` |    594.57 s |      597.99 s |    −3.42 s |    −0.58% |
+| `cargo clippy`                             |    411.85 s |      294.75 s |   117.11 s |    28.43% |
+| `cargo fmt`                                |     16.51 s |       11.08 s |     5.43 s |    32.89% |
+| All commands                               |  1,173.75 s |    1,019.55 s |   154.20 s |    13.14% |
+
+The final Codex package test uses the same 11 documented host-sensitive or flaky-test exclusions for both toolchains as the revision-18 baseline. Its two repetitions started 3,439, 3,439 stock tests and 3,439, 3,439 Ohm tests; actual differences are retained rather than presented as exact test-count parity. The results include both canonical and effective scenario hashes, the complete exclusion expression, and every observed test count.
 
 ## Compiler-work attribution
 
@@ -167,6 +208,26 @@ early cutoff; it can also reflect a build-script-only action, so inspect the
 per-command log when assigning a cause. Verbose output has its own overhead:
 compare verbose samples only against equally verbose samples, and keep the
 default nonverbose mode for headline session timings.
+
+## Historical Ruff workflow with revision 19
+
+The separate [revision-19 historical Ruff replay](release-1.97.1-19-ruff-historical.json) reruns the unchanged historical fixture, including its check-to-test-to-check transitions. Its source revisions and commands are distinct from the current Ruff workflow and are not substituted into the headline session table.
+
+| Scope            | Rust 1.97.1 | Ohm 1.97.1-19 | Time saved | Reduction |
+| ---------------- | ----------: | ------------: | ---------: | --------: |
+| Complete session |    417.90 s |      407.89 s |    10.01 s |     2.39% |
+| `cargo check`    |     33.06 s |       33.78 s |    −0.72 s |    −2.17% |
+| `cargo nextest`  |    304.61 s |      315.84 s |   −11.23 s |    −3.69% |
+| `cargo clippy`   |     72.98 s |       51.05 s |    21.93 s |    30.05% |
+| `cargo fmt`      |      6.36 s |        7.00 s |    −0.64 s |   −10.06% |
+
+The individual check transitions below compare this release directly with stock Rust. They are measured commands from the same complete session, not separate microbenchmarks; whole-session differences cannot be attributed to these checks. Restoring Ohm's earlier check-graph regression was measured against a previous Ohm revision, not against stock Rust.
+
+| Check transition                   | Rust 1.97.1 | Ohm 1.97.1-19 | Time saved | Reduction |
+| ---------------------------------- | ----------: | ------------: | ---------: | --------: |
+| Unchanged baseline                 |      0.27 s |        0.49 s |    −0.23 s |   −85.35% |
+| Workspace dependency and root edit |     16.96 s |       17.24 s |    −0.28 s |    −1.66% |
+| Workspace root-only edit           |     15.83 s |       16.04 s |    −0.21 s |    −1.33% |
 
 ## Historical Ohm 1.97.1 revision 18 results
 
