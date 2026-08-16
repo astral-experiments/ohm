@@ -6,12 +6,15 @@ repository's stack to its tip, including the fork-specific CI foundation.
 This is a point-in-time inventory. The linked source changes and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
-Revision 18 skips public API hashing for terminal test harnesses and authenticated immutable registry
-libraries, reuses compatible registry dependencies across mixed test graphs, and preserves resolver
-cache entries when execution-only settings change. It also scales shared-build lock budgets to the
-process file-descriptor limit and moves macOS CI and release jobs to Namespace runners. Avoiding
-immutable-registry hashing improved a representative cold uv build by 6.2%, with no measured
-improvement for warmed workflows.
+Revision 19 preserves established `cargo check` dependency graphs after test builds, including
+unchanged checks and edits to workspace crates or their local dependencies. Shared registry
+fingerprint reads use per-unit locks, while cold graphs avoid speculative dependency preparation. In
+representative individual Ruff checks, a root-only edit improved from 24.49 seconds to 14.33 seconds,
+reducing compiler invocations from 37 to one, and a root-plus-dependency edit improved from 24.42
+seconds to 15.51 seconds, reducing invocations from 37 to two. An unchanged post-test check improved
+from 24.73 seconds to 0.53 seconds without invoking the compiler. These are individual command
+measurements, not complete development-session speedups. The coordinator also documents reproducible
+Ruff, uv, and Codex session replays ([#66](https://github.com/astral-sh/ohm/pull/66)).
 
 ## ohm-rust
 
@@ -49,6 +52,7 @@ improvement for warmed workflows.
 - [#33: Pin Cargo with native-tool-aware registry sharing](https://github.com/astral-sh/ohm-rust/pull/33)
 - [#34: Pin Cargo with shared-registry early cutoff](https://github.com/astral-sh/ohm-rust/pull/34)
 - [#37: Pin Cargo with immutable registry reuse and stable resolver caching](https://github.com/astral-sh/ohm-rust/pull/37)
+- [#38: Pin Cargo with preserved post-test check graphs](https://github.com/astral-sh/ohm-rust/pull/38)
 
 ## ohm-cargo
 
@@ -92,6 +96,7 @@ improvement for warmed workflows.
 - [#46: Scale file descriptor budgets for fine-grained build locks](https://github.com/astral-sh/ohm-cargo/pull/46)
 - [#41: Skip public API hashing for immutable registry libraries](https://github.com/astral-sh/ohm-cargo/pull/41)
 - [#42: Avoid resolver cache misses for execution-only settings](https://github.com/astral-sh/ohm-cargo/pull/42)
+- [#47: Preserve established check graphs after test builds](https://github.com/astral-sh/ohm-cargo/pull/47)
 
 ## ohm-rust-clippy
 

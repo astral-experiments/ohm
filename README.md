@@ -77,7 +77,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-18/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-19/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -100,7 +100,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-18 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-19 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, and reuse of
 previously built registry dependencies by default. Use its aggregate opt-out to compare against the
@@ -202,6 +202,8 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Reused immutable registry dependencies between builds, checks, test graphs, and Clippy invocations,
   including active dependency graphs and audited procedural-macro closures, without speculative
   dependency resolution before a prior build.
+- Preserved established check graphs across test builds and workspace edits, with lock-safe shared
+  registry fingerprints and cold-build fallback.
 - Resolver cache reuse across changes to execution-only stack, job, and display settings.
 - File-descriptor-aware fine-grained build locking that stays within the process limit.
 - Deduplicated authenticated compiler-driver validation across reused registry dependencies.
@@ -230,8 +232,8 @@ and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-17` and
-`ohm-1.97.1-18`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-18` and
+`ohm-1.97.1-19`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:
