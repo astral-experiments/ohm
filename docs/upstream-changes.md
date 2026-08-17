@@ -6,6 +6,13 @@ repository's stack to its tip, including the fork-specific CI foundation.
 This is a point-in-time inventory. The linked source changes and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
+Revision 21 fixes query-depth overflows when the parallel compiler frontend evaluates valid nested
+layouts or constants in a different order than the serial frontend. Crates that use Rust's default
+recursion limit receive a separate, bounded parallel-query budget of 512; macro expansion, trait
+solving, explicit crate recursion limits, explicitly configured minimum limits, and serial
+compilations keep their existing behavior. The revision-20 benchmark results and recorded source
+fixtures remain unchanged.
+
 Revision 20 enables Rust's parallel compiler frontend by default and reuses fresh, already-built
 workspace libraries during subsequent `cargo check` commands. In counterbalanced, complete Ruff, uv,
 and Codex development-session replays on a 32-logical-CPU Linux machine, enabling frontend
@@ -58,6 +65,7 @@ source fixtures remain unchanged.
 - [#37: Pin Cargo with immutable registry reuse and stable resolver caching](https://github.com/astral-sh/ohm-rust/pull/37)
 - [#38: Pin Cargo with preserved post-test check graphs](https://github.com/astral-sh/ohm-rust/pull/38)
 - [#39: Pin Cargo with parallel frontend and built artifact reuse](https://github.com/astral-sh/ohm-rust/pull/39)
+- [#40: Preserve recursion limits during parallel query evaluation](https://github.com/astral-sh/ohm-rust/pull/40)
 
 ## ohm-cargo
 
