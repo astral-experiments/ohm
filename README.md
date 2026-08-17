@@ -77,7 +77,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-19/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-20/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -100,11 +100,11 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-19 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-20 test` selects that specific installed revision.
 
-Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, and reuse of
-previously built registry dependencies by default. Use its aggregate opt-out to compare against the
-same compiler and Cargo without those defaults:
+Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, parallel
+compiler frontends, and reuse of previously built registry and workspace dependencies by default.
+Use its aggregate opt-out to compare against the same compiler and Cargo without those defaults:
 
 ```console
 cargo +ohm -Zohm-defaults=no test
@@ -138,7 +138,8 @@ verification. By default, Ohm limits sharing to individually audited macro relea
 trust all authenticated registry macros, use `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` or
 `cargo +ohm -Zohm-proc-macro-trust=all build`. This mode is potentially unsound: macros can read
 untracked files or environment variables, use randomness, and produce stale generated code or omit
-diagnostics. Strict and permissive artifacts remain isolated; build-to-check reuse stays audited.
+diagnostics. Strict and permissive artifacts remain isolated. Build-to-check reuse follows the same
+explicitly selected policy, while the default remains audited.
 
 ### `AGENTS.md`
 
@@ -150,9 +151,9 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 - Use `cargo +ohm <command>` for all local Cargo commands, including `check`, `test`, `clippy`,
   `fmt`, `metadata`, and external subcommands. Use `rustc +ohm` for direct compiler calls and
   `RUSTUP_TOOLCHAIN=ohm just <recipe>` for task runners.
-- Ohm automatically enables `-Zrelink-only`, `-Zpublic-api-hash`, and `-Zcache-proc-macros` when
-  compiling. Do not inject these flags manually or through `RUSTFLAGS`; direct `rustc +ohm` does not
-  receive Cargo's defaults.
+- Ohm automatically enables `-Zrelink-only`, `-Zpublic-api-hash`, `-Zcache-proc-macros`, and
+  `-Zthreads=8` when compiling. Do not inject these flags manually or through `RUSTFLAGS`; direct
+  `rustc +ohm` does not receive Cargo's defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
   separate shared path for worktrees using the same repository and Ohm toolchain.
 - Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` to maximize authenticated registry procedural-macro
@@ -175,6 +176,7 @@ At present, Ohm includes the following optimizations, all enabled by default:
 
 - Release compilers optimized with Rust's upstream profile-guided optimization corpus on macOS and
   Linux, with additional BOLT binary optimization on Linux.
+- Parallel compiler frontends enabled by default, while preserving explicit thread-count overrides.
 - [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790): avoid rebuilding
   dependent crates when a dependency's public interface is unchanged (`rustc -Zpublic-api-hash`).
 - Cached relinking: reuse existing code generation when only the final binary needs to change
@@ -202,6 +204,8 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Reused immutable registry dependencies between builds, checks, test graphs, and Clippy invocations,
   including active dependency graphs and audited procedural-macro closures, without speculative
   dependency resolution before a prior build.
+- Reused fresh, already-built workspace dependency libraries during subsequent checks, with complete
+  fingerprint validation and the explicitly selected authenticated procedural-macro trust policy.
 - Preserved established check graphs across test builds and workspace edits, with lock-safe shared
   registry fingerprints and cold-build fallback.
 - Resolver cache reuse across changes to execution-only stack, job, and display settings.
@@ -232,8 +236,8 @@ and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-18` and
-`ohm-1.97.1-19`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-19` and
+`ohm-1.97.1-20`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:

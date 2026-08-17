@@ -6,15 +6,19 @@ repository's stack to its tip, including the fork-specific CI foundation.
 This is a point-in-time inventory. The linked source changes and pinned release manifest remain the
 sources of truth for the current changes and release revisions.
 
-Revision 19 preserves established `cargo check` dependency graphs after test builds, including
-unchanged checks and edits to workspace crates or their local dependencies. Shared registry
-fingerprint reads use per-unit locks, while cold graphs avoid speculative dependency preparation. In
-representative individual Ruff checks, a root-only edit improved from 24.49 seconds to 14.33 seconds,
-reducing compiler invocations from 37 to one, and a root-plus-dependency edit improved from 24.42
-seconds to 15.51 seconds, reducing invocations from 37 to two. An unchanged post-test check improved
-from 24.73 seconds to 0.53 seconds without invoking the compiler. These are individual command
-measurements, not complete development-session speedups. The coordinator also documents reproducible
-Ruff, uv, and Codex session replays ([#66](https://github.com/astral-sh/ohm/pull/66)).
+Revision 20 enables Rust's parallel compiler frontend by default and reuses fresh, already-built
+workspace libraries during subsequent `cargo check` commands. In counterbalanced, complete Ruff, uv,
+and Codex development-session replays on a 32-logical-CPU Linux machine, enabling frontend
+parallelism reduced combined session time from 1,032.37 seconds to 720.42 seconds (30.22%). Those
+measurements isolate the frontend setting rather than measuring the complete revision-20 release.
+
+In separate counterbalanced Codex TUI test-build-to-check measurements, subsequent checks improved
+from 65.83 seconds to 38.72 seconds (41.18%), while rebuilt compiler artifacts fell from 291 to 78.
+These individual-command measurements used the existing, explicitly selected
+`CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` policy and include both workspace-artifact reuse and
+authenticated registry procedural-macro reuse. The default policy remains audited; the existing
+`all` opt-in is potentially unsound. Existing revision-19 complete-session measurements and recorded
+source fixtures remain unchanged.
 
 ## ohm-rust
 
@@ -53,6 +57,7 @@ Ruff, uv, and Codex session replays ([#66](https://github.com/astral-sh/ohm/pull
 - [#34: Pin Cargo with shared-registry early cutoff](https://github.com/astral-sh/ohm-rust/pull/34)
 - [#37: Pin Cargo with immutable registry reuse and stable resolver caching](https://github.com/astral-sh/ohm-rust/pull/37)
 - [#38: Pin Cargo with preserved post-test check graphs](https://github.com/astral-sh/ohm-rust/pull/38)
+- [#39: Pin Cargo with parallel frontend and built artifact reuse](https://github.com/astral-sh/ohm-rust/pull/39)
 
 ## ohm-cargo
 
@@ -97,6 +102,8 @@ Ruff, uv, and Codex session replays ([#66](https://github.com/astral-sh/ohm/pull
 - [#41: Skip public API hashing for immutable registry libraries](https://github.com/astral-sh/ohm-cargo/pull/41)
 - [#42: Avoid resolver cache misses for execution-only settings](https://github.com/astral-sh/ohm-cargo/pull/42)
 - [#47: Preserve established check graphs after test builds](https://github.com/astral-sh/ohm-cargo/pull/47)
+- [#48: Enable the parallel frontend in Ohm defaults](https://github.com/astral-sh/ohm-cargo/pull/48)
+- [#49: Reuse built workspace dependencies during checks](https://github.com/astral-sh/ohm-cargo/pull/49)
 
 ## ohm-rust-clippy
 
