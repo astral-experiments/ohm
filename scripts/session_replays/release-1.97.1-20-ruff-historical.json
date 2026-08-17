@@ -1,0 +1,330 @@
+{
+  "rust_version": "1.97.1",
+  "ohm_release": "ohm-1.97.1-20",
+  "host": {
+    "platform": "linux-x86_64",
+    "logical_cpus": 32
+  },
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    ["stock", "ohm"],
+    ["ohm", "stock"]
+  ],
+  "sessions": [
+    {
+      "project": "ruff",
+      "session_id": "ruff-inherited-attribute-inference",
+      "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+      "commands": 12,
+      "edits": 3,
+      "warmups": 2
+    }
+  ],
+  "timed_session_seconds": {
+    "ruff": {
+      "stock": [421.5155540588312, 419.873135920614],
+      "ohm": [287.8499037111178, 286.8118925928138]
+    }
+  },
+  "timed_command_seconds": {
+    "ruff": {
+      "stock": [421.251994676888, 419.61007319903],
+      "ohm": [287.58722972264513, 286.5482796463184]
+    }
+  },
+  "timed_edit_seconds": {
+    "ruff": {
+      "stock": [0.05045077716931701, 0.0507927630096674],
+      "ohm": [0.04997243918478489, 0.04920113971456885]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "ruff": {
+      "stock": [178.4153601094149, 177.30487397359684],
+      "ohm": [142.06288556102663, 143.22475561778992]
+    }
+  },
+  "commands": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Check the semantic crate before editing",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [0.2595728598535061, 0.32173484982922673],
+          "ohm": [0.422820049803704, 1.0149906291626394]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Establish the focused attribute-cycle baseline",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [0.9664298808202147, 0.9687256100587547],
+          "ohm": [1.0772892511449754, 1.0144203649833798]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run focused instance-attribute mdtests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::attributes.md"
+        ],
+        "wall_seconds": {
+          "stock": [117.68607269693166, 115.5346343908459],
+          "ohm": [88.7737034438178, 88.53944799909368]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Recheck focused inference-cycle mdtests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [0.9860801110044122, 1.0054897051304579],
+          "ohm": [1.0564940087497234, 0.9097440489567816]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 6,
+        "label": "Check core and semantic crates after the core dependency edit",
+        "category": "check",
+        "command": [
+          "cargo",
+          "check",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic"
+        ],
+        "wall_seconds": {
+          "stock": [17.44451941875741, 17.195372371934354],
+          "ohm": [8.17341144895181, 8.303418391849846]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Run the original cycle, hasattr, and subtype regression slice",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final",
+          "--",
+          "mdtest::cycle.md",
+          "mdtest::narrow/hasattr.md",
+          "mdtest::type_properties/is_subtype_of.md"
+        ],
+        "wall_seconds": {
+          "stock": [57.840902803931385, 58.20240978896618],
+          "ohm": [45.46013596979901, 45.69260472804308]
+        },
+        "tests_started": {
+          "stock": [3, 3],
+          "ohm": [3, 3]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Recheck semantic analysis after the recursive-inference edit",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [15.996902422048151, 16.14601517096162],
+          "ohm": [7.771808342076838, 7.6835024589672685]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Run the expanded inference-cycle regression file",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [113.7319811261259, 114.53067495534196],
+          "ohm": [87.59312000405043, 86.34508094238117]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Recheck instance-attribute regressions",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::attributes.md"
+        ],
+        "wall_seconds": {
+          "stock": [1.3787987502291799, 1.4257908146828413],
+          "ohm": [1.4369400111027062, 1.3572843070141971]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Run strict Clippy for the changed core and semantic crates",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [73.93130352394655, 73.5224065091461],
+          "ohm": [25.623191140126437, 25.348961813841015]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Verify Rust formatting across the workspace",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [6.392110479064286, 6.3646553959697485],
+          "ohm": [7.068509827833623, 7.0956168421544135]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Validate all core and semantic package tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [14.63732060417533, 14.392163636162877],
+          "ohm": [13.129806225188076, 13.243207119870931]
+        },
+        "tests_started": {
+          "stock": [867, 867],
+          "ohm": [867, 867]
+        }
+      }
+    ]
+  },
+  "methodology": {
+    "headline_includes_source_edits": true,
+    "baseline_warmups_timed": false,
+    "compiler_accounting": "status",
+    "cargo_status_messages_prove_compiler_invocations": false,
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all"
+  },
+  "provenance": {
+    "raw_results_sha256": "1522d14959e28f68a33ac6ec639194bc3dcdfa39a5f74debe80fae654aa5fdf9",
+    "fixture_sha256": {
+      "ruff": "7333e04725b6cd4b5a02ea2f3c5cd95d41043581be36b52d2337d4115b1eb2a3"
+    },
+    "runner_sha256": "5c91e2fccda04f94b9eccf7b8f92eabdcc3aac67b69017460586e7f60f46b564",
+    "published_fixture_sha256": "7333e04725b6cd4b5a02ea2f3c5cd95d41043581be36b52d2337d4115b1eb2a3"
+  },
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+  }
+}
