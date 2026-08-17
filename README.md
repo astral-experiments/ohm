@@ -29,7 +29,7 @@ avoid rebuilding unchanged dependents:
 | Codex   | `just clippy`          | `codex-utils-string` |           — |       not run |       — |
 | Codex   | `just test`            | `codex-utils-string` |     22.44 s |        3.04 s |   7.39× |
 
-> **Revision 20 correctness regression:** On the pinned Codex benchmark revision, `just clippy -p codex-core --locked --offline` succeeds with stock Rust but fails reproducibly with Ohm's newly enabled parallel frontend (`queries overflow the depth limit!`). Its direct- and dependency-edit rows were not run and have no reported speedup.
+> **Revision 20 correctness regression:** On the pinned Codex benchmark revision, `just clippy -p codex-core --locked --offline` succeeds with stock Rust but fails reproducibly with Ohm's newly enabled parallel frontend (`queries overflow the depth limit!`). Its direct- and dependency-edit rows were not run and have no reported speedup. Revision 21 fixes the query overflow while preserving the parallel frontend; the revision-20 measurements above remain unchanged.
 
 **Other common cases** include build-to-check reuse, formatting, and safe cross-worktree builds:
 
@@ -79,7 +79,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.97.1-20/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.97.1-21/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -102,7 +102,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.97.1-20 test` selects that specific installed revision.
+`cargo +ohm-1.97.1-21 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, parallel
 compiler frontends, and reuse of previously built registry and workspace dependencies by default.
@@ -178,7 +178,8 @@ At present, Ohm includes the following optimizations, all enabled by default:
 
 - Release compilers optimized with Rust's upstream profile-guided optimization corpus on macOS and
   Linux, with additional BOLT binary optimization on Linux.
-- Parallel compiler frontends enabled by default, while preserving explicit thread-count overrides.
+- Parallel compiler frontends enabled by default, with bounded parallel-query recursion and
+  preserved explicit thread-count and crate recursion-limit overrides.
 - [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790): avoid rebuilding
   dependent crates when a dependency's public interface is unchanged (`rustc -Zpublic-api-hash`).
 - Cached relinking: reuse existing code generation when only the final binary needs to change
@@ -238,8 +239,8 @@ and always verify your work with the official Rust toolchain.
 
 Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
 available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-19` and
-`ohm-1.97.1-20`.
+upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-20` and
+`ohm-1.97.1-21`.
 
 See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
 patches are maintained in peer repositories:
