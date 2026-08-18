@@ -4,14 +4,24 @@
     "github>astral-sh/renovate-config",
     "customManagers:githubActionsVersions",
   ],
-  enabledManagers: ["github-actions", "custom.regex"],
+  enabledManagers: ["github-actions", "npm", "custom.regex"],
   packageRules: [
+    {
+      matchManagers: ["npm"],
+      enabled: false,
+    },
+    {
+      matchManagers: ["npm"],
+      matchFileNames: ["package.json"],
+      enabled: true,
+    },
     {
       matchDepTypes: ["action"],
       pinDigests: true,
     },
     {
       extends: ["helpers:pinGitHubActionDigests"],
+      matchDepTypes: ["action"],
       extractVersion: "^(?<version>v?\\d+\\.\\d+\\.\\d+)$",
       versioning: "regex:^v?(?<major>\\d+)(\\.(?<minor>\\d+)\\.(?<patch>\\d+))?$",
     },
