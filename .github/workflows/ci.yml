@@ -152,7 +152,7 @@ jobs:
           uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
             shellcheck --shell=bash "${bash_scripts[@]}"
       - name: Check Markdown, YAML, and JSON formatting
-        run: npx --yes "prettier@$PRETTIER_VERSION" --check .
+        run: npx --yes --ignore-scripts "prettier@$PRETTIER_VERSION" --check .
       - name: Audit GitHub Actions workflows
         uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
         with:
