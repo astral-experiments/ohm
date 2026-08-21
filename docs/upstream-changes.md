@@ -1,8 +1,8 @@
 # Changes from upstream
 
-The Ohm source repositories are based on the exact Rust 1.98.0 release sources. Changes are listed from each fork-specific CI foundation through its fresh Rust 1.98 pull-request stack.
+Ohm 1.98.0-1 is the first Ohm release based on Rust 1.98.0. Its source repositories use the exact upstream release sources, and changes are listed from each fork-specific CI foundation through its fresh Rust 1.98 pull-request stack.
 
-The first Rust 1.98 release preserves the parallel compiler frontend, its bounded query-depth crash fix, audited procedural-macro reuse, and the existing Cargo and formatter optimizations. Changes already included upstream are omitted, and the historical intermediate Cargo pins are replaced by one final compiler-to-Cargo pin.
+This release preserves the parallel compiler frontend, its bounded query-depth crash fix, audited procedural-macro reuse, and the existing Cargo and formatter optimizations. Changes already included upstream are omitted, and the historical intermediate Cargo pins are replaced by one final compiler-to-Cargo pin.
 
 Published Rust 1.97.1 benchmark measurements, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of Rust 1.98.
 
