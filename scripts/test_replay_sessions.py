@@ -963,7 +963,7 @@ class ResumeTests(ReplayTestCase):
             "project": "ruff",
             "session_id": "real-session",
             "toolchain": label,
-            "selector": "1.97.1" if label == "stock" else "ohm",
+            "selector": "1.98.0" if label == "stock" else "ohm",
             "repetition": 0,
             "wall_seconds": 1.0,
         }
@@ -1095,7 +1095,7 @@ class ResumeTests(ReplayTestCase):
             with mock.patch.object(
                 resumed, "run_command", side_effect=result
             ) as command:
-                observed = resumed.run_session(scenario, "stock", "1.97.1", 0)
+                observed = resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         self.assertEqual(len(command.call_args_list), 2)
         self.assertEqual(command.call_args_list[0].kwargs["phase"], "warmup")
@@ -1223,7 +1223,7 @@ class ResumeTests(ReplayTestCase):
                     "tests_started": 1,
                 },
             ):
-                resumed.run_session(scenario, "stock", "1.97.1", 0)
+                resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         archive = initial.output / "interrupted" / "ruff" / "stock" / "0" / "0"
         self.assertEqual(
@@ -1244,7 +1244,7 @@ class ResumeTests(ReplayTestCase):
             resumed = self.runner("--resume")
         resumed.sources["ruff"] = source
         with self.assertRaisesRegex(replay.BenchmarkError, "already completed"):
-            resumed.run_session(scenario, "stock", "1.97.1", 0)
+            resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
 
@@ -1271,7 +1271,7 @@ class ResumeTests(ReplayTestCase):
                     "tests_started": 1,
                 },
             ):
-                resumed.run_session(scenario, "stock", "1.97.1", 0)
+                resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         archived = (
             initial.output
@@ -1303,7 +1303,7 @@ class ResumeTests(ReplayTestCase):
             resumed = self.runner("--resume")
         resumed.sources["ruff"] = source
         with self.assertRaisesRegex(replay.BenchmarkError, "owned artifact"):
-            resumed.run_session(scenario, "stock", "1.97.1", 0)
+            resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
         self.assertEqual(
@@ -1331,7 +1331,7 @@ class ResumeTests(ReplayTestCase):
         resumed.sources["ruff"] = source
 
         with self.assertRaisesRegex(replay.BenchmarkError, "exact base revision"):
-            resumed.run_session(scenario, "stock", "1.97.1", 0)
+            resumed.run_session(scenario, "stock", "1.98.0", 0)
         with self.assertRaisesRegex(replay.BenchmarkError, "different source"):
             resumed.run_session(scenario, "ohm", "ohm", 0)
 
@@ -1347,7 +1347,7 @@ class ResumeTests(ReplayTestCase):
 
         self.assertFalse(runner.options.resume)
         with self.assertRaisesRegex(replay.BenchmarkError, "already exists"):
-            runner.run_session(scenario, "stock", "1.97.1", 0)
+            runner.run_session(scenario, "stock", "1.98.0", 0)
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
 
 

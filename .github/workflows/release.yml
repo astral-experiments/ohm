@@ -6,7 +6,7 @@ on:
       manifest:
         description: Versioned manifest to build
         required: true
-        default: toolchains/1.97.1/21.json
+        default: toolchains/1.98.0/1.json
         type: string
       build:
         description: Run the full x.py dist extended build
@@ -762,11 +762,20 @@ jobs:
 
           release_url="https://labs.astral.sh/ohm/releases/$OHM_TOOLCHAIN"
           notes_file="$RUNNER_TEMP/ohm-release-notes.md"
+          upstream_rust_version="$(jq -er '.release.upstream_rust_version' "$OHM_TOOLCHAIN.json")"
+          ohm_revision="$(jq -er '.release.ohm_revision' "$OHM_TOOLCHAIN.json")"
+          if [[ "$ohm_revision" == 1 ]]; then
+            release_summary="This is the first Ohm release based on Rust $upstream_rust_version."
+          else
+            release_summary="Based on Rust $upstream_rust_version."
+          fi
           printf '%s\n' \
             '> [!WARNING]' \
             '> Ohm is an experimental Rust toolchain intended only for local development.' \
             '> Its optimizations may be unsound; never use it for production builds,' \
             '> releases, CI correctness validation, or final test results.' \
+            '' \
+            "$release_summary" \
             '' \
             "## Install Ohm $OHM_TOOLCHAIN" \
             '' \

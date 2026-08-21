@@ -19,8 +19,8 @@ Run all three scenarios against existing repository checkouts:
 ```sh
 ulimit -n 65536
 python3 scripts/replay_sessions.py \
-  --upstream 1.97.1 \
-  --ohm ohm-1.97.1-21 \
+  --upstream 1.98.0 \
+  --ohm ohm-1.98.0-1 \
   --source-path ruff=/path/to/ruff \
   --source-path uv=/path/to/uv \
   --source-path codex=/path/to/codex \
@@ -92,8 +92,8 @@ ulimit -n 65536
 python3 scripts/replay_sessions.py \
   --project ruff \
   --source-path ruff=/path/to/ruff \
-  --upstream 1.97.1 \
-  --ohm ohm-1.97.1-21 \
+  --upstream 1.98.0 \
+  --ohm ohm-1.98.0-1 \
   --output-dir /tmp/ohm-ruff-session-benchmarks \
   --jobs 8 \
   --repetitions 2 \
