@@ -157,18 +157,80 @@ class FixtureValidationTests(ReplayTestCase):
             for key, value in current.environment.items():
                 self.assertEqual(environment[key], value)
 
-    def test_current_ruff_results_match_the_fixture_and_tables(self) -> None:
-        fixture = SCRIPTS / "session_replays" / "ruff.json"
+    def test_rust_1_98_ruff_fixtures_only_allow_the_new_clippy_lint(self) -> None:
+        for original_name, compatible_name in (
+            ("ruff.json", "ruff-rust-1.98.json"),
+            ("ruff-historical.json", "ruff-historical-rust-1.98.json"),
+        ):
+            with self.subTest(fixture=original_name):
+                original_path = SCRIPTS / "session_replays" / original_name
+                compatible_path = SCRIPTS / "session_replays" / compatible_name
+                expected = json.loads(original_path.read_text())
+                for step in expected["steps"]:
+                    if (
+                        step["kind"] == "command"
+                        and step["program"] == "cargo"
+                        and step["args"][0] == "clippy"
+                    ):
+                        step["args"].extend(["-A", "clippy::format_push_string"])
+
+                self.assertEqual(json.loads(compatible_path.read_text()), expected)
+                self.assertEqual(replay.load_scenario(compatible_path).project, "ruff")
+
+    def test_historical_ruff_results_match_the_rust_1_98_fixture(self) -> None:
+        fixture = SCRIPTS / "session_replays" / "ruff-historical-rust-1.98.json"
+        published_fixture = SCRIPTS / "session_replays" / "ruff-historical.json"
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.97.1-20-ruff.json").read_text()
+            (
+                SCRIPTS / "session_replays" / "release-1.98.0-1-ruff-historical.json"
+            ).read_text()
         )
-        self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-20")
+
+        self.assertEqual(baseline["rust_version"], "1.98.0")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-1")
+        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
+        self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
+        self.assertEqual(
+            baseline["provenance"]["published_fixture_sha256"],
+            hashlib.sha256(published_fixture.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(
+            baseline["provenance"]["effective_fixture_sha256"]["ruff"],
+            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+        )
+        commands = baseline["commands"]["ruff"]
+        expected = [
+            (index, step)
+            for index, step in enumerate(scenario.steps, start=1)
+            if step["kind"] == "command"
+        ]
+        self.assertEqual(len(commands), len(expected))
+        for command, (index, step) in zip(commands, expected, strict=True):
+            self.assertEqual(command["index"], index)
+            self.assertEqual(command["command"], [step["program"], *step["args"]])
+
+    def test_current_ruff_results_match_the_fixture_and_tables(self) -> None:
+        fixture = SCRIPTS / "session_replays" / "ruff-rust-1.98.json"
+        published_fixture = SCRIPTS / "session_replays" / "ruff.json"
+        scenario = replay.load_scenario(fixture)
+        baseline = json.loads(
+            (SCRIPTS / "session_replays" / "release-1.98.0-1-ruff.json").read_text()
+        )
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-1")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(baseline["environment"], scenario.environment)
         self.assertEqual(
             baseline["provenance"]["published_fixture_sha256"],
+            hashlib.sha256(published_fixture.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(
+            baseline["provenance"]["effective_fixture_sha256"]["ruff"],
             hashlib.sha256(fixture.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(
+            baseline["methodology"]["ruff_rust_1_98_clippy_allow"],
+            ["clippy::format_push_string"],
         )
         self.assertEqual(baseline["sessions"][0]["session_id"], scenario.session["id"])
         self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
@@ -393,15 +455,10 @@ class FixtureValidationTests(ReplayTestCase):
                         )
 
     def test_readme_selected_session_table_matches_recorded_results(self) -> None:
-        historical = json.loads(
-            (
-                SCRIPTS / "session_replays" / "release-1.97.1-20-baseline.json"
-            ).read_text()
+        baseline = json.loads(
+            (SCRIPTS / "session_replays" / "release-1.98.0-1-baseline.json").read_text()
         )
-        current_ruff = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.97.1-20-ruff.json").read_text()
-        )
-        baselines = {"ruff": current_ruff, "uv": historical, "codex": historical}
+        baselines = {project: baseline for project in replay.PROJECTS}
         rows = [
             [cell.strip() for cell in line.strip("|").split("|")]
             for line in (SCRIPTS.parent / "README.md").read_text().splitlines()
