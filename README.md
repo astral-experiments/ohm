@@ -6,6 +6,20 @@
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
 incremental builds can be up to 30x faster for common commands in large workspaces.
 
+**Replayed development sessions** measure the impact in real-world workflows:
+
+| Scope                                      | Rust 1.98.0 | Ohm 1.98.0-1 | Time saved | Reduction |
+| ------------------------------------------ | ----------: | -----------: | ---------: | --------: |
+| Ruff session                               |    526.72 s |     353.30 s |   173.43 s |    32.93% |
+| uv session                                 |    142.40 s |     108.55 s |    33.85 s |    23.77% |
+| Codex session                              |    497.53 s |     288.97 s |   208.55 s |    41.92% |
+| All sessions                               |  1,166.65 s |     750.82 s |   415.83 s |    35.64% |
+| `cargo check`                              |    142.73 s |      50.84 s |    91.89 s |    64.38% |
+| `cargo test`, `cargo nextest`, `just test` |    650.80 s |     509.87 s |   140.94 s |    21.66% |
+| `cargo clippy`                             |    354.66 s |     177.00 s |   177.66 s |    50.09% |
+| `cargo fmt`                                |     17.39 s |      12.05 s |     5.35 s |    30.73% |
+| All commands                               |  1,165.59 s |     749.75 s |   415.84 s |    35.68% |
+
 **Direct edits** modify the crate being checked, linted, or tested:
 
 | Project | Workflow               | Edited crate | Rust 1.98.0 | Ohm 1.98.0-1 | Speedup |
@@ -39,20 +53,6 @@ avoid rebuilding unchanged dependents:
 | Codex   | No-op formatting         | Workspace            |      5.23 s |       0.16 s |  33.30× |
 | Codex   | Formatting after an edit | `codex-core`         |      5.48 s |       0.68 s |   8.08× |
 | Codex   | Shared-worktree build    | `codex-utils-string` |      1.72 s |       0.52 s |   3.33× |
-
-And **replayed development sessions** measure the impact in real-world workflows:
-
-| Scope                                      | Rust 1.98.0 | Ohm 1.98.0-1 | Time saved | Reduction |
-| ------------------------------------------ | ----------: | -----------: | ---------: | --------: |
-| Ruff session                               |    526.72 s |     353.30 s |   173.43 s |    32.93% |
-| uv session                                 |    142.40 s |     108.55 s |    33.85 s |    23.77% |
-| Codex session                              |    497.53 s |     288.97 s |   208.55 s |    41.92% |
-| All sessions                               |  1,166.65 s |     750.82 s |   415.83 s |    35.64% |
-| `cargo check`                              |    142.73 s |      50.84 s |    91.89 s |    64.38% |
-| `cargo test`, `cargo nextest`, `just test` |    650.80 s |     509.87 s |   140.94 s |    21.66% |
-| `cargo clippy`                             |    354.66 s |     177.00 s |   177.66 s |    50.09% |
-| `cargo fmt`                                |     17.39 s |      12.05 s |     5.35 s |    30.73% |
-| All commands                               |  1,165.59 s |     749.75 s |   415.84 s |    35.68% |
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
