@@ -21,11 +21,9 @@ integration test against the compiled `uv` executable; Codex runs a library test
 pins Rust 1.95.0; these benchmarks use Rust 1.98.0 for both projects to match Ohm's Rust base.
 
 The Rust 1.98.0 study completed all 216 planned samples: 192 successful core-workflow samples and
-all 24 targeted build-to-check, formatting, and cross-worktree samples. This includes all 32 Codex
-Clippy samples, which could not be collected with Ohm 1.97.1-20 because its parallel frontend
-overflowed the query-depth limit. The Rust 1.98 release preserves the parallel frontend and fixes
-the overflow. An additional 100 uncontaminated Linux uv samples cover every check, Clippy, test,
-build-to-check, and cross-worktree workflow.
+all 24 targeted build-to-check, formatting, and cross-worktree samples. An additional 100
+uncontaminated Linux uv samples cover every check, Clippy, test, build-to-check, and cross-worktree
+workflow.
 
 ## uv
 
@@ -103,8 +101,6 @@ The previous Rust 1.97.1 comparison is preserved as historical evidence:
 
 These benchmarks target the `codex-core` crate. Dependency edits change `codex-utils-string`; direct
 edits change `codex-core` itself.
-
-> **Previous release regression resolved:** At pinned Codex revision `5157493c23713ac12034cf250ffb0a8ce0670277`, Ohm 1.97.1-20 reproducibly failed `just clippy -p codex-core --locked --offline` with `queries overflow the depth limit!`. Ohm 1.98.0-1 completes the same command with the parallel frontend enabled and passes all 32 previously unavailable Clippy samples.
 
 | Workflow                  | Rust 1.98.0 |      Ohm | Speedup |
 | ------------------------- | ----------: | -------: | ------: |

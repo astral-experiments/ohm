@@ -29,8 +29,6 @@ avoid rebuilding unchanged dependents:
 | Codex   | `just clippy`          | `codex-utils-string` |     22.19 s |       0.75 s |  29.66× |
 | Codex   | `just test`            | `codex-utils-string` |     25.30 s |       3.27 s |   7.73× |
 
-> **Codex Clippy:** The pinned `just clippy -p codex-core --locked --offline` workflow now completes successfully with Ohm's parallel frontend enabled. All 216 macOS samples and 100 additional Linux uv samples pass, including the 32 Codex Clippy samples unavailable in Ohm 1.97.1-20.
-
 **Other common cases** include build-to-check reuse, formatting, and safe cross-worktree builds:
 
 | Project | Workflow                 | Package              | Rust 1.98.0 | Ohm 1.98.0-1 | Speedup |
