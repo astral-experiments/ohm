@@ -1,6 +1,6 @@
 # Changes from upstream
 
-Ohm 1.98.0-1 is the first Ohm release based on Rust 1.98.0. Its source repositories use the exact upstream release sources, and changes are listed from each fork-specific CI foundation through its fresh Rust 1.98 pull-request stack.
+Ohm 1.98.0-2 extends profile-guided optimization to Cargo, rustdoc, Clippy, rustfmt, and incremental `cargo fmt`. Like revision 1, its source repositories use the exact upstream release sources, and changes are listed from each fork-specific CI foundation through the Rust 1.98 pull-request stack.
 
 This release preserves the parallel compiler frontend, its bounded query-depth crash fix, audited procedural-macro reuse, and the existing Cargo and formatter optimizations. Changes already included upstream are omitted, and the historical intermediate Cargo pins are replaced by one final compiler-to-Cargo pin.
 
@@ -31,6 +31,7 @@ Published Rust 1.97.1 benchmark measurements, historical failure disclosures, re
 - [#61: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rust/pull/61)
 - [#62: Preserve recursion limits during parallel query evaluation](https://github.com/astral-sh/ohm-rust/pull/62)
 - [#63: Pin the Rust 1.98 Ohm Cargo stack](https://github.com/astral-sh/ohm-rust/pull/63)
+- [#67: Profile-optimize Cargo, rustdoc, Clippy, and rustfmt](https://github.com/astral-sh/ohm-rust/pull/67)
 
 ## ohm-cargo
 
