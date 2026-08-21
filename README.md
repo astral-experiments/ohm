@@ -6,7 +6,7 @@
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
 incremental builds can be up to 30x faster for common commands in large workspaces.
 
-**Replayed development sessions** measure the impact in real-world workflows:
+Benchmarking Ohm against stock Rust on replayed development sessions:
 
 | Scope                                      | Rust 1.98.0 | Ohm 1.98.0-1 | Time saved | Reduction |
 | ------------------------------------------ | ----------: | -----------: | ---------: | --------: |
