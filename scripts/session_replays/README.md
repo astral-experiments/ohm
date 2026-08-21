@@ -21,6 +21,7 @@ ulimit -n 65536
 python3 scripts/replay_sessions.py \
   --upstream 1.98.0 \
   --ohm ohm-1.98.0-1 \
+  --scenario scripts/session_replays/ruff-rust-1.98.json \
   --source-path ruff=/path/to/ruff \
   --source-path uv=/path/to/uv \
   --source-path codex=/path/to/codex \
@@ -87,10 +88,18 @@ check. No standalone `cargo check` is invented for this session; its primary
 check-and-test metric consists of the eight nextest commands, including their
 actual test execution.
 
+Rust 1.98 introduces Clippy's `format_push_string` lint, which fails the pinned
+historical Ruff source under `-D warnings` with both stock Rust and Ohm. The
+separate [Rust 1.98-compatible fixture](ruff-rust-1.98.json) preserves every
+recorded source revision, edit, test, and profile while allowing only that new
+lint for both toolchains' three Clippy commands. The canonical
+[`ruff.json`](ruff.json) and all historical measurements remain unchanged.
+
 ```sh
 ulimit -n 65536
 python3 scripts/replay_sessions.py \
   --project ruff \
+  --scenario scripts/session_replays/ruff-rust-1.98.json \
   --source-path ruff=/path/to/ruff \
   --upstream 1.98.0 \
   --ohm ohm-1.98.0-1 \
@@ -102,9 +111,36 @@ python3 scripts/replay_sessions.py \
 ```
 
 This is the default Ruff replay, alongside `uv.json` and `codex.json`. To
-reproduce the older release-comparison workload, pass
-`--scenario scripts/session_replays/ruff-historical.json` instead. Its original
-edits, commands, and recorded results remain unchanged.
+reproduce the older release-comparison workload on Rust 1.98, pass
+`--scenario scripts/session_replays/ruff-historical-rust-1.98.json` instead;
+this applies the same narrow Clippy compatibility adjustment. The original
+`ruff-historical.json` edits, commands, and recorded results remain unchanged.
+
+### Rust 1.98.0 revision 1 measurements
+
+The [complete Rust 1.98 Ruff results](release-1.98.0-1-ruff.json) contain both
+counterbalanced repetitions and every recorded command. Baseline warmups are
+excluded; each compared test command ran the same selected tests. Both
+toolchains use the same narrow compatibility allowance for the new
+`format_push_string` Clippy lint.
+
+| Scope                        | Rust 1.98.0 | Ohm 1.98.0-1 | Time saved | Reduction |
+| ---------------------------- | ----------: | -----------: | ---------: | --------: |
+| Complete session             |    526.72 s |     353.30 s |   173.43 s |    32.93% |
+| All recorded commands        |    526.05 s |     352.61 s |   173.43 s |    32.97% |
+| Checks and tests (`nextest`) |    332.53 s |     255.66 s |    76.87 s |    23.12% |
+| `cargo clippy`               |    186.31 s |      89.10 s |    97.21 s |    52.18% |
+| `cargo fmt`                  |      7.22 s |       7.86 s |    −0.64 s |    −8.92% |
+
+The check-and-test breakdown includes actual test execution and excludes Clippy
+and formatting:
+
+| Check/test phase           | Rust 1.98.0 | Ohm 1.98.0-1 | Time saved | Reduction |
+| -------------------------- | ----------: | -----------: | ---------: | --------: |
+| Unchanged focused baseline |      1.91 s |       1.81 s |     0.09 s |     4.91% |
+| Simplification             |     75.72 s |      66.35 s |     9.37 s |    12.37% |
+| Dependency indexing        |    115.21 s |      85.79 s |    29.42 s |    25.54% |
+| Component fixed points     |    139.69 s |     101.71 s |    37.98 s |    27.19% |
 
 ### Revision 20 measurements
 
@@ -191,6 +227,34 @@ new Ruff result with the recorded revision-18 uv and Codex results. Its totals
 sum those three paired project means; they are not a new simultaneous run on
 one host.
 
+## Rust 1.98.0 revision 1 complete development-session results
+
+Each project uses its recorded development-session fixture on a separate quiet
+Linux host. Both toolchains execute the same commands, edits, and tests; the
+measurements include the complete recorded session rather than only selected
+compiler work. The sanitized per-command results are recorded in
+[`release-1.98.0-1-baseline.json`](release-1.98.0-1-baseline.json).
+
+| Scope                                      | Rust 1.98.0 | Ohm 1.98.0-1 | Time saved | Reduction |
+| ------------------------------------------ | ----------: | -----------: | ---------: | --------: |
+| Ruff session                               |    526.72 s |     353.30 s |   173.43 s |    32.93% |
+| uv session                                 |    142.40 s |     108.55 s |    33.85 s |    23.77% |
+| Codex session                              |    497.53 s |     288.97 s |   208.55 s |    41.92% |
+| All sessions                               |  1,166.65 s |     750.82 s |   415.83 s |    35.64% |
+| `cargo check`                              |    142.73 s |      50.84 s |    91.89 s |    64.38% |
+| `cargo test`, `cargo nextest`, `just test` |    650.80 s |     509.87 s |   140.94 s |    21.66% |
+| `cargo clippy`                             |    354.66 s |     177.00 s |   177.66 s |    50.09% |
+| `cargo fmt`                                |     17.39 s |      12.05 s |     5.35 s |    30.73% |
+| All commands                               |  1,165.59 s |     749.75 s |   415.84 s |    35.68% |
+
+The final Codex package test uses the same 11 documented host-sensitive or
+flaky-test exclusions for both toolchains as the previous baselines. Its two
+repetitions started 3,440, 3,440 stock tests and 3,439, 3,439 Ohm tests; actual
+differences are retained rather than presented as exact test-count parity. The
+results include canonical and effective scenario hashes, the complete exclusion
+expression, the Ruff Clippy compatibility allowance, and every observed test
+count.
+
 ## Revision 20 complete development-session results
 
 Each project uses its current, recorded development-session fixture. Both toolchains execute the same commands, edits, and tests; the measurements include the complete recorded session rather than only selected compiler work. The sanitized per-command results are recorded in [`release-1.97.1-20-baseline.json`](release-1.97.1-20-baseline.json).
@@ -249,6 +313,34 @@ early cutoff; it can also reflect a build-script-only action, so inspect the
 per-command log when assigning a cause. Verbose output has its own overhead:
 compare verbose samples only against equally verbose samples, and keep the
 default nonverbose mode for headline session timings.
+
+## Historical Ruff workflow with Rust 1.98.0 revision 1
+
+The separate [Rust 1.98 historical Ruff replay](release-1.98.0-1-ruff-historical.json)
+reruns the historical fixture, including its check-to-test-to-check transitions.
+Both toolchains use the same narrow allowance for Rust 1.98's new
+`format_push_string` lint. Its source revisions and commands remain distinct
+from the current Ruff workflow and are not substituted into the headline
+session table.
+
+| Scope            | Rust 1.98.0 | Ohm 1.98.0-1 | Time saved | Reduction |
+| ---------------- | ----------: | -----------: | ---------: | --------: |
+| Complete session |    415.01 s |     292.27 s |   122.73 s |    29.57% |
+| `cargo check`    |     33.84 s |      15.56 s |    18.28 s |    54.01% |
+| `cargo nextest`  |    317.49 s |     244.59 s |    72.90 s |    22.96% |
+| `cargo clippy`   |     56.98 s |      24.64 s |    32.35 s |    56.76% |
+| `cargo fmt`      |      6.40 s |       7.19 s |    −0.79 s |   −12.39% |
+
+The individual check transitions below compare this release directly with stock
+Rust. They are measured commands from the same complete session, not separate
+microbenchmarks; whole-session differences cannot be attributed to these
+checks.
+
+| Check transition                   | Rust 1.98.0 | Ohm 1.98.0-1 | Time saved | Reduction |
+| ---------------------------------- | ----------: | -----------: | ---------: | --------: |
+| Unchanged baseline                 |      0.30 s |       0.42 s |    −0.12 s |   −39.84% |
+| Workspace dependency and root edit |     17.50 s |       7.94 s |     9.55 s |    54.61% |
+| Workspace root-only edit           |     16.05 s |       7.21 s |     8.84 s |    55.10% |
 
 ## Historical Ruff workflow with revision 20
 
