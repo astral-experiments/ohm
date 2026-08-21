@@ -41,6 +41,14 @@ bootstrap_config="$(
   printf '%s/%s\n' "$PWD" "$(basename -- "$bootstrap_config")"
 )"
 
+# Older immutable Rust source revisions only train rustc. Detect the explicit
+# component-training contract before bootstrapping so those releases remain
+# reproducible without weakening verification for newer source revisions.
+component_pgo=false
+if [[ -f "$rust_checkout/src/tools/opt-dist/component-pgo-v1" ]]; then
+  component_pgo=true
+fi
+
 if [[ "$use_bolt" == true ]]; then
   if [[ -z "${OHM_BOLT_LLVM_DIR:-}" ]]; then
     echo 'Linux optimized releases require OHM_BOLT_LLVM_DIR' >&2
@@ -167,6 +175,7 @@ safe_environment=(
   "PATH=$PATH"
   "HOME=$HOME"
   "RUST_BOOTSTRAP_CONFIG=$release_config"
+  'DIST_TRY_BUILD=0'
   'GITHUB_ACTIONS=false'
 )
 
@@ -226,3 +235,59 @@ env -i "${safe_environment[@]}" \
   --target "$target" \
   --set "build.description=$toolchain" \
   extended
+
+# Cargo is instrumented alongside rustc and consumes the merged rustc profile.
+# Likewise, cargo-fmt and rustfmt share the formatting profile. Check executed
+# crate symbols instead of merely accepting any nonempty LLVM profile: another
+# instrumented process can otherwise create a valid but unrelated profile.
+components=(rustc)
+if [[ "$component_pgo" == true ]]; then
+  components+=(rustdoc clippy rustfmt)
+fi
+
+for component in "${components[@]}"; do
+  profile="$build_dir/opt-artifacts/$component-pgo.profdata"
+  if [[ ! -f "$profile" || -L "$profile" || ! -s "$profile" ]]; then
+    echo "optimized release has a missing or invalid merged $component PGO profile: $profile" >&2
+    exit 1
+  fi
+
+  # `llvm-profdata show --covered --function=...` ignores its function filter,
+  # so inspect the complete covered-function stream once per merged profile.
+  if ! "$llvm_profdata" show --covered "$profile" | awk \
+    -v component="$component" \
+    -v component_pgo="$component_pgo" '
+      component == "rustc" && index($0, "rustc_driver") { primary = 1 }
+      component == "rustc" && index($0, "_5cargo") { cargo = 1 }
+      component == "rustdoc" && index($0, "_7rustdoc") { primary = 1 }
+      component == "clippy" && index($0, "_12clippy_lints") { primary = 1 }
+      component == "rustfmt" &&
+          (index($0, "_15rustfmt_nightly") || index($0, "_7rustfmt")) {
+        primary = 1
+      }
+      component == "rustfmt" && index($0, "_9cargo_fmt") { cargo_fmt = 1 }
+      END {
+        if (!primary) {
+          print "no executed " component " functions in merged PGO profile" > "/dev/stderr"
+          exit 1
+        }
+        if (component == "rustc" && component_pgo == "true" && !cargo) {
+          print "no executed Cargo functions in shared rustc PGO profile" > "/dev/stderr"
+          exit 1
+        }
+        if (component == "rustfmt" && !cargo_fmt) {
+          print "no executed cargo-fmt functions in shared rustfmt PGO profile" > "/dev/stderr"
+          exit 1
+        }
+      }
+    '; then
+    echo "optimized release has a corrupt or incomplete merged $component PGO profile: $profile" >&2
+    exit 1
+  fi
+done
+
+if [[ "$component_pgo" == true ]]; then
+  echo 'verified executed PGO profile coverage for rustc, rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt'
+else
+  echo 'verified executed rustc PGO profile coverage for a legacy Rust source revision'
+fi

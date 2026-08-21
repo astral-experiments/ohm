@@ -33,10 +33,16 @@ if [ -z "$prefix" ]; then
 fi
 
 mkdir -p "$prefix/bin"
-for binary in rustc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; do
+for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; do
+  if [ "$binary" = rustdoc ] && [ "${OHM_TEST_RUSTDOC:-present}" = missing ]; then
+    continue
+  fi
+
   if [ "$binary" = rustc ]; then
     printf '#!/bin/sh\nprintf "rustc %%s-dev (ohm installer fixture) (%%s)\\n" "${OHM_TEST_RUSTC_UPSTREAM_VERSION:?}" "${OHM_TEST_RUSTC_BRAND:?}"\n' \
       > "$prefix/bin/$binary"
+  elif [ "$binary" = rustdoc ] && [ "${OHM_TEST_RUSTDOC:-present}" = broken ]; then
+    printf '#!/bin/sh\nexit 1\n' > "$prefix/bin/$binary"
   else
     printf '#!/bin/sh\nprintf "%s 1.97.1\\n"\n' "$binary" \
       > "$prefix/bin/$binary"
@@ -199,6 +205,7 @@ run_case() {
     OHM_TEST_VERSION="${OHM_TEST_VERSION:-$version}" \
     OHM_TEST_RUSTC_BRAND="${OHM_TEST_RUSTC_BRAND:-$version}" \
     OHM_TEST_RUSTC_UPSTREAM_VERSION="${OHM_TEST_RUSTC_UPSTREAM_VERSION:-1.97.1}" \
+    OHM_TEST_RUSTDOC="${OHM_TEST_RUSTDOC:-present}" \
     OHM_TEST_RUSTUP_ALIAS_FAILURE="${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" \
     OHM_TEST_ACTIVATION_RACE="${OHM_TEST_ACTIVATION_RACE:-0}" \
     OHM_TEST_ACTIVATION_DESTINATION="${OHM_TEST_ACTIVATION_DESTINATION:-}" \
@@ -467,6 +474,20 @@ run_case mismatched-rustc-upstream failure
 unset OHM_TEST_RUSTC_UPSTREAM_VERSION
 assert_no_links mismatched-rustc-upstream
 
+OHM_TEST_RUSTDOC=missing
+run_case missing-rustdoc failure
+unset OHM_TEST_RUSTDOC
+assert_contains "$temporary_directory/cases/missing-rustdoc/output.log" \
+  'installed tool is missing or not executable: rustdoc'
+assert_no_links missing-rustdoc
+
+OHM_TEST_RUSTDOC=broken
+run_case broken-rustdoc failure
+unset OHM_TEST_RUSTDOC
+assert_contains "$temporary_directory/cases/broken-rustdoc/output.log" \
+  'installed tool did not start successfully: rustdoc'
+assert_no_links broken-rustdoc
+
 OHM_TEST_INSTALL_DIR="$temporary_directory/cases/trailing-slash-prefix/toolchain/"
 run_case trailing-slash-prefix success
 unset OHM_TEST_INSTALL_DIR
@@ -478,6 +499,10 @@ fi
 run_case local-install success
 assert_contains "$temporary_directory/cases/local-install/output.log" \
   "ohm: copying $version for aarch64-apple-darwin"
+if [ ! -x "$temporary_directory/cases/local-install/toolchain/bin/rustdoc" ]; then
+  echo 'historical-version fixture did not install rustdoc' >&2
+  exit 1
+fi
 assert_not_contains "$temporary_directory/cases/local-install/output.log" 'ohm: downloading'
 assert_contains "$temporary_directory/cases/local-install/rustup.log" \
   "toolchain link $version "
