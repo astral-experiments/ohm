@@ -1245,7 +1245,7 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         help="preserve completed results and restart interrupted cells from fresh artifacts",
     )
-    result.add_argument("--upstream", default="1.97.1")
+    result.add_argument("--upstream", default="1.98.0")
     result.add_argument("--ohm", default="ohm")
     result.add_argument(
         "--feature-matrix",

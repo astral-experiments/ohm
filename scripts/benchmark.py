@@ -282,7 +282,7 @@ def parser() -> argparse.ArgumentParser:
     argument_parser.add_argument(
         "--codex-rev", default=REPOSITORIES["codex"]["revision"]
     )
-    argument_parser.add_argument("--upstream", default="1.97.1")
+    argument_parser.add_argument("--upstream", default="1.98.0")
     argument_parser.add_argument("--ohm", default="ohm")
     argument_parser.add_argument(
         "--project",
