@@ -175,8 +175,9 @@ experiment with optimizations that may still contain bugs.
 
 At present, Ohm includes the following optimizations, all enabled by default:
 
-- Release compilers optimized with Rust's upstream profile-guided optimization corpus on macOS and
-  Linux, with additional BOLT binary optimization on Linux.
+- Release compilers optimized with profile-guided training on macOS and Linux, with
+  component-PGO-capable Rust revisions additionally optimizing rustdoc, Cargo, Clippy, rustfmt,
+  and cargo-fmt. Linux releases also apply compiler BOLT optimization.
 - Parallel compiler frontends enabled by default, with bounded parallel-query recursion and
   preserved explicit thread-count and crate recursion-limit overrides.
 - [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790): avoid rebuilding

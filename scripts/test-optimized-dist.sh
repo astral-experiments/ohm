@@ -65,12 +65,77 @@ import pathlib
 import sys
 
 checkout = pathlib.Path(__file__).resolve().parents[3]
+arguments = sys.argv[1:]
+artifact_directory = checkout / arguments[arguments.index("--artifact-dir") + 1]
+artifact_directory.mkdir(parents=True, exist_ok=True)
+
+
+def fixture_component(name: str) -> str:
+    marker = checkout / f"fixture-{name}-pgo-component"
+    return marker.read_text(encoding="utf-8").strip() if marker.exists() else ""
+
+
+component_pgo = (checkout / "src/tools/opt-dist/component-pgo-v1").is_file()
+profiles = {"rustc": "rustc"}
+if component_pgo:
+    profiles.update({"rustdoc": "rustdoc", "cargo": "rustc"})
+    if os.environ.get("DIST_TRY_BUILD", "0") == "0":
+        profiles.update({component: component for component in ("clippy", "rustfmt")})
+
+profile_functions = {
+    "rustc": ["_RNvCs_17rustc_driver_impl12run_compiler"],
+    "rustdoc": ["_RNvCs_7rustdoc4main"],
+    "clippy": ["_RNvCs_12clippy_lints4main"],
+    "rustfmt": ["_RNvCs_15rustfmt_nightly6format", "_RNvCs_9cargo_fmt11incremental"],
+}
+if component_pgo:
+    profile_functions["rustc"].append("_RNvCs_5cargo4main")
+
+missing_component = fixture_component("missing")
+empty_component = fixture_component("empty")
+symlink_component = fixture_component("symlink")
+corrupt_component = fixture_component("corrupt")
+wrong_component = fixture_component("wrong")
+missing_coverage = fixture_component("missing-coverage")
+for component in ("rustc", "rustdoc", "clippy", "rustfmt"):
+    profile = artifact_directory / f"{component}-pgo.profdata"
+    profile.unlink(missing_ok=True)
+    if component not in profiles or component == missing_component:
+        continue
+    if component == symlink_component:
+        external_profile = checkout / "fixture-external.profdata"
+        external_profile.write_bytes(b"fixture external profile\n")
+        profile.symlink_to(external_profile)
+    elif component == empty_component:
+        profile.write_bytes(b"")
+    elif component == corrupt_component:
+        profile.write_bytes(b"not a valid LLVM instrumentation profile\n")
+    else:
+        function_component = component
+        if component == wrong_component:
+            function_component = {
+                "rustc": "rustdoc",
+                "rustdoc": "rustc",
+                "clippy": "rustfmt",
+                "rustfmt": "clippy",
+            }[component]
+        functions = profile_functions[function_component]
+        if missing_coverage == "cargo" and component == "rustc":
+            functions = [function for function in functions if "_5cargo" not in function]
+        if missing_coverage == "cargo-fmt" and component == "rustfmt":
+            functions = [function for function in functions if "_9cargo_fmt" not in function]
+        profile.write_text(
+            "fixture LLVM instrumentation profile\n" + "\n".join(functions) + "\n",
+            encoding="utf-8",
+        )
+
 with (checkout / "commands.jsonl").open("a", encoding="utf-8") as output:
     json.dump(
         {
             "kind": "opt-dist",
-            "arguments": sys.argv[1:],
+            "arguments": arguments,
             "environment": dict(os.environ),
+            "profiles": profiles,
         },
         output,
     )
@@ -85,12 +150,29 @@ cat > "$rust_checkout/fixture-llvm-tool" <<'SH'
 #!/usr/bin/env bash
 set -euo pipefail
 
+tool="$(basename -- "$0")"
+if [[ "$tool" == 'llvm-profdata' && "${1:-}" == 'show' ]]; then
+  if [[ $# -ne 3 || "$2" != '--covered' ]]; then
+    echo "unexpected LLVM profile fixture invocation: $*" >&2
+    exit 1
+  fi
+
+  if ! IFS= read -r profile_header < "$3" || \
+    [[ "$profile_header" != 'fixture LLVM instrumentation profile' ]]; then
+    echo "invalid instrumentation profile: $3" >&2
+    exit 1
+  fi
+
+  tail -n +2 "$3"
+  exit 0
+fi
+
 if [[ "${1:-}" != '--version' ]]; then
   echo "unexpected LLVM fixture invocation: $*" >&2
   exit 1
 fi
 
-case "$(basename -- "$0")" in
+case "$tool" in
   llvm-bolt) version="${FIXTURE_BOLT_MAJOR:-22}.1.8" ;;
   merge-fdata) version="${FIXTURE_MERGE_MAJOR:-22}.1.8" ;;
   llvm-profdata) version="${FIXTURE_PROFDATA_MAJOR:-22}.1.6-rust-1.97.1-stable" ;;
@@ -121,6 +203,7 @@ run_optimized_build() {
     ACTIONS_RUNTIME_TOKEN='fixture-runtime-token-must-not-leak' \
     EXAMPLE_PASSWORD='fixture-password-must-not-leak' \
     UNRELATED_ENVIRONMENT_VALUE='fixture-unrelated-value-must-not-leak' \
+    DIST_TRY_BUILD=1 \
     DEVELOPER_DIR='/fixture/Xcode.app/Contents/Developer' \
     MACOSX_STD_DEPLOYMENT_TARGET='11.0' \
     "$@" \
@@ -133,10 +216,11 @@ assert_optimized_build() {
   local target="$1"
   local expected_llvm_directory="$2"
   local expect_bolt="$3"
-  local output="$4"
+  local component_pgo="$4"
+  local output="$5"
 
   python3 - "$trace" "$bootstrap_config" "$rust_checkout" "$toolchain" \
-    "$target" "$expected_llvm_directory" "$expect_bolt" "$output" <<'PY'
+    "$target" "$expected_llvm_directory" "$expect_bolt" "$component_pgo" "$output" <<'PY'
 import json
 import pathlib
 import sys
@@ -150,6 +234,7 @@ import tomllib
     target,
     expected_llvm,
     expect_bolt,
+    component_pgo,
     output_path,
 ) = sys.argv[1:]
 checkout = pathlib.Path(checkout).resolve()
@@ -197,13 +282,48 @@ if generated.get("build", {}).get("description") != toolchain:
 if generated.get("build", {}).get("metrics") is not True:
     raise SystemExit("upstream opt-dist requires bootstrap build metrics")
 if generated.get("build", {}).get("profiler") is not True:
-    raise SystemExit("upstream rustc PGO requires Rust's profiler runtime")
+    raise SystemExit("component-specific PGO requires Rust's profiler runtime")
+if generated.get("build", {}).get("cargo-native-static") is not True:
+    raise SystemExit("optimized Cargo must retain its static native dependencies")
+if generated.get("build", {}).get("locked-deps") is not True:
+    raise SystemExit("component PGO must preserve locked release dependencies")
+if generated.get("llvm", {}).get("download-ci-llvm") is not True:
+    raise SystemExit("component PGO must reuse Rust's optimized CI LLVM")
+required_tools = {"analysis", "cargo", "clippy", "rustdoc", "rustfmt"}
+if not required_tools.issubset(generated.get("build", {}).get("tools", [])):
+    raise SystemExit("component PGO must preserve every packaged release tool")
+if "ohm-defaults" not in generated.get("build", {}).get("tool", {}).get(
+    "cargo", {}
+).get("features", []):
+    raise SystemExit("optimized Cargo must preserve Ohm's default features")
 generated["build"]["description"] = original["build"]["description"]
 if generated != original:
     raise SystemExit("generated bootstrap configuration changed more than its build description")
 
 optimized = events[1]
 arguments = optimized["arguments"]
+expected_profiles = {"rustc": "rustc"}
+if component_pgo == "true":
+    expected_profiles.update(
+        {
+            "rustdoc": "rustdoc",
+            "cargo": "rustc",
+            "clippy": "clippy",
+            "rustfmt": "rustfmt",
+        }
+    )
+if optimized.get("profiles") != expected_profiles:
+    raise SystemExit(f"release produced unexpected PGO component profiles: {optimized}")
+for component in set(expected_profiles.values()):
+    profile = checkout / "build" / "opt-artifacts" / f"{component}-pgo.profdata"
+    if not profile.is_file() or profile.is_symlink() or profile.stat().st_size == 0:
+        raise SystemExit(f"release has an invalid {component} PGO profile: {profile}")
+if (checkout / "build" / "opt-artifacts" / "cargo-pgo.profdata").exists():
+    raise SystemExit("Cargo must consume rustc's profile instead of a separate Cargo profile")
+if component_pgo == "false":
+    for component in ("rustdoc", "clippy", "rustfmt"):
+        if (checkout / "build" / "opt-artifacts" / f"{component}-pgo.profdata").exists():
+            raise SystemExit(f"legacy Rust revision unexpectedly produced a {component} profile")
 if not arguments or arguments[0] != "local":
     raise SystemExit(f"expected upstream opt-dist local: {arguments}")
 separator = arguments.index("--")
@@ -258,6 +378,8 @@ if distribution_arguments[-1] != "extended":
 environment = optimized["environment"]
 if environment.get("RUST_BOOTSTRAP_CONFIG") != str(generated_config):
     raise SystemExit("internal PGO stages will not inherit the complete release configuration")
+if environment.get("DIST_TRY_BUILD") != "0":
+    raise SystemExit("release mode must never skip optional Clippy or rustfmt profiles")
 if environment.get("GITHUB_ACTIONS") != "false":
     raise SystemExit("internal PGO stages would incorrectly impersonate Rust's protected CI")
 if environment.get("DEVELOPER_DIR") != "/fixture/Xcode.app/Contents/Developer":
@@ -279,6 +401,11 @@ for sensitive in (
 output = pathlib.Path(output_path).read_text(encoding="utf-8")
 if "must-not-leak" in output:
     raise SystemExit("upstream opt-dist printed an inherited release credential")
+if component_pgo == "true":
+    if "verified executed PGO profile coverage for rustc, rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt" not in output:
+        raise SystemExit("component-specific release did not verify every executed tool")
+elif "verified executed rustc PGO profile coverage for a legacy Rust source revision" not in output:
+    raise SystemExit("legacy release did not verify its executed rustc profile")
 PY
 
   if ! cmp -s "$bootstrap_config" "$test_directory/original-bootstrap.toml"; then
@@ -289,11 +416,12 @@ PY
 
 linux_target='x86_64-unknown-linux-gnu'
 macos_target='aarch64-apple-darwin'
+component_pgo_marker="$rust_checkout/src/tools/opt-dist/component-pgo-v1"
 
 : > "$trace"
-linux_output="$test_directory/linux-output.log"
-run_optimized_build "$linux_target" "$linux_output"
-assert_optimized_build "$linux_target" "$bolt_directory" true "$linux_output"
+legacy_linux_output="$test_directory/legacy-linux-output.log"
+run_optimized_build "$linux_target" "$legacy_linux_output"
+assert_optimized_build "$linux_target" "$bolt_directory" true false "$legacy_linux_output"
 
 if [[ ! "$bolt_directory/bin/llvm-profdata" -ef \
   "$rust_checkout/build/$linux_target/ci-llvm/bin/llvm-profdata" ]]; then
@@ -302,12 +430,31 @@ if [[ ! "$bolt_directory/bin/llvm-profdata" -ef \
 fi
 
 : > "$trace"
+legacy_macos_output="$test_directory/legacy-macos-output.log"
+run_optimized_build "$macos_target" "$legacy_macos_output"
+assert_optimized_build \
+  "$macos_target" \
+  "$rust_checkout/build/$macos_target/ci-llvm" \
+  false \
+  false \
+  "$legacy_macos_output"
+
+mkdir -p "$(dirname -- "$component_pgo_marker")"
+printf '%s\n' 'fixture component-specific PGO capability' > "$component_pgo_marker"
+
+: > "$trace"
+linux_output="$test_directory/linux-output.log"
+run_optimized_build "$linux_target" "$linux_output"
+assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output"
+
+: > "$trace"
 macos_output="$test_directory/macos-output.log"
 run_optimized_build "$macos_target" "$macos_output"
 assert_optimized_build \
   "$macos_target" \
   "$rust_checkout/build/$macos_target/ci-llvm" \
   false \
+  true \
   "$macos_output"
 
 expect_failure() {
@@ -320,6 +467,36 @@ expect_failure() {
     exit 1
   fi
 }
+
+for component in rustc rustdoc clippy rustfmt; do
+  printf '%s\n' "$component" > "$rust_checkout/fixture-missing-pgo-component"
+  expect_failure "a missing $component profile" "$linux_target"
+  : > "$rust_checkout/fixture-missing-pgo-component"
+
+  printf '%s\n' "$component" > "$rust_checkout/fixture-empty-pgo-component"
+  expect_failure "an empty $component profile" "$macos_target"
+  : > "$rust_checkout/fixture-empty-pgo-component"
+
+  printf '%s\n' "$component" > "$rust_checkout/fixture-corrupt-pgo-component"
+  expect_failure "a corrupt $component profile" "$linux_target"
+  : > "$rust_checkout/fixture-corrupt-pgo-component"
+
+  printf '%s\n' "$component" > "$rust_checkout/fixture-wrong-pgo-component"
+  expect_failure "a valid $component profile containing another component's functions" "$macos_target"
+  : > "$rust_checkout/fixture-wrong-pgo-component"
+done
+
+printf '%s\n' 'rustfmt' > "$rust_checkout/fixture-symlink-pgo-component"
+expect_failure 'a rustfmt profile escaping the artifact directory' "$linux_target"
+: > "$rust_checkout/fixture-symlink-pgo-component"
+
+printf '%s\n' 'cargo' > "$rust_checkout/fixture-missing-coverage-pgo-component"
+expect_failure 'a rustc profile without executed Cargo coverage' "$linux_target"
+: > "$rust_checkout/fixture-missing-coverage-pgo-component"
+
+printf '%s\n' 'cargo-fmt' > "$rust_checkout/fixture-missing-coverage-pgo-component"
+expect_failure 'a rustfmt profile without executed cargo-fmt coverage' "$macos_target"
+: > "$rust_checkout/fixture-missing-coverage-pgo-component"
 
 expect_failure 'an unsupported host target' 'aarch64-unknown-linux-gnu'
 

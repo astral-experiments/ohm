@@ -6,7 +6,7 @@ on:
       manifest:
         description: Versioned manifest to build
         required: true
-        default: toolchains/1.98.0/1.json
+        default: toolchains/1.98.0/2.json
         type: string
       build:
         description: Run the full x.py dist extended build
@@ -540,6 +540,7 @@ jobs:
           unset RUSTC_BOOTSTRAP
           rustc +"$OHM_TOOLCHAIN" -Z help \
             | grep -F 'public-api-hash' >/dev/null
+          rustdoc +"$OHM_TOOLCHAIN" --version
           cargo +"$OHM_TOOLCHAIN" -Z help \
             | grep -F 'relink-only' >/dev/null
           clippy_revision="${CLIPPY_REVISION:0:10}"
@@ -629,6 +630,7 @@ jobs:
           grep -Fx disabled "$disabled_log" >/dev/null
 
           cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
+          cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"
           cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
 
   publish:
