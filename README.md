@@ -21,14 +21,6 @@ Benchmarking Ohm against stock Rust on replayed development sessions:
 | `cargo fmt`                                |     18.47 s |      12.75 s |     5.72 s |    30.96% |
 | All commands                               |  1,394.85 s |     880.07 s |   514.78 s |    36.91% |
 
-The session replays use a shared build directory and explicitly trust all authenticated registry
-procedural macros, a potentially unsound developer opt-in beyond the packaged defaults. Each project
-uses two runs per toolchain; totals sum the project means. See the
-[replay methodology](scripts/session_replays/README.md).
-
-The incremental-workflow tables below were measured on macOS. The [full benchmark results](BENCHMARKS.md)
-also include a complete Linux uv comparison.
-
 **Direct edits** modify the crate being checked, linted, or tested:
 
 | Project | Workflow               | Edited crate | Rust 1.98.0 | Ohm 1.98.0-2 | Speedup |
