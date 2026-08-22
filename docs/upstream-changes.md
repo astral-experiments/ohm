@@ -4,6 +4,8 @@ Ohm 1.98.0-2 extends profile-guided optimization to Cargo, rustdoc, Clippy, rust
 
 Ohm Cargo enables the new partition reuse automatically for compatible compilers and eligible incremental workspace builds, including terminal test harnesses that skip public-API hashing. Explicit compiler overrides and the aggregate Ohm opt-out remain supported. Changed bodies still compile and run normally; no test bodies are omitted. The separate parallel query-cache promotion experiment is not included.
 
+Ohm Cargo also accepts compiler wrappers that successfully skip compilation without producing object files, as rustc-perf does while preparing PGO workloads. These invocations leave the relink cache invalid, while normal compilation and relink reuse remain enabled.
+
 This release preserves the parallel compiler frontend, its bounded query-depth crash fix, audited procedural-macro reuse, and the existing Cargo and formatter optimizations. Changes already included upstream are omitted, and the compiler's Cargo gitlink selects the exact Cargo revision in the release manifest.
 
 Published Rust 1.97.1 and Ohm 1.98.0-1 benchmark measurements, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
@@ -35,7 +37,7 @@ Published Rust 1.97.1 and Ohm 1.98.0-1 benchmark measurements, historical failur
 - [#63: Pin the Rust 1.98 Ohm Cargo stack](https://github.com/astral-sh/ohm-rust/pull/63)
 - [#67: Profile-optimize Cargo, rustdoc, Clippy, and rustfmt](https://github.com/astral-sh/ohm-rust/pull/67)
 - [#65: Reuse monomorphization partitions in incremental test builds](https://github.com/astral-sh/ohm-rust/pull/65)
-- [#69: Pin Cargo test monomorphization defaults](https://github.com/astral-sh/ohm-rust/pull/69)
+- [#69: Pin Cargo test defaults and skipped-wrapper repair](https://github.com/astral-sh/ohm-rust/pull/69)
 
 ## ohm-cargo
 
@@ -83,6 +85,7 @@ Published Rust 1.97.1 and Ohm 1.98.0-1 benchmark measurements, historical failur
 - [#90: Enable the parallel frontend in Ohm defaults](https://github.com/astral-sh/ohm-cargo/pull/90)
 - [#91: Reuse built workspace dependencies during checks](https://github.com/astral-sh/ohm-cargo/pull/91)
 - [#93: Enable test-binary monomorphization reuse in Ohm defaults](https://github.com/astral-sh/ohm-cargo/pull/93)
+- [#94: Handle skipped compiler invocations in relink-only builds](https://github.com/astral-sh/ohm-cargo/pull/94)
 
 ## ohm-rust-clippy
 
