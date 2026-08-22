@@ -1,0 +1,68 @@
+diff --git a/codex-rs/tui/src/app/tests/safety_buffering.rs b/codex-rs/tui/src/app/tests/safety_buffering.rs
+--- a/codex-rs/tui/src/app/tests/safety_buffering.rs
++++ b/codex-rs/tui/src/app/tests/safety_buffering.rs
+@@ -15,6 +15,7 @@
+ use core_test_support::streaming_sse::start_streaming_sse_server;
+ use pretty_assertions::assert_eq;
+ use serde_json::Value;
++use std::time::Instant;
+ use tokio::sync::oneshot;
+ 
+ const CURRENT_MODEL: &str = "gpt-5.2";
+@@ -453,6 +454,8 @@
+     )
+     .await
+     .expect("state db should initialize");
++    // Include all goal-active work in the wall-clock upper bound.
++    let goal_started_at = Instant::now();
+     state_db
+         .thread_goals()
+         .replace_thread_goal(
+@@ -517,6 +520,8 @@
+         assert_eq!(user_message_count(&source, committed_steer), 1);
+     }
+ 
++    // The gated source request cannot finish until the retry interrupts it.
++    let active_source_started_at = Instant::now();
+     app.handle_app_server_event(
+         &app_server,
+         AppServerEvent::ServerNotification(Box::new(
+@@ -572,6 +577,10 @@
+     app.primary_thread_id = Some(source_thread_id);
+     while app_event_rx.try_recv().is_ok() {}
+ 
++    // Forking flushes at least this much real work from the source goal.
++    let minimum_goal_time_seconds = 12
++        + i64::try_from(active_source_started_at.elapsed().as_secs())
++            .expect("test duration should fit in i64");
+     Box::pin(app.retry_safety_buffered_turn(
+         &mut tui,
+         &mut app_server,
+@@ -744,13 +753,25 @@
+         .await?
+         .goal
+         .expect("retry goal");
++    let maximum_goal_time_seconds = 12
++        + i64::try_from(goal_started_at.elapsed().as_secs())
++            .expect("test duration should fit in i64");
++    let expected_goal_time = minimum_goal_time_seconds..=maximum_goal_time_seconds;
+     let expected_source_tokens = if committed_steer.is_some() { 150 } else { 50 };
+     assert_eq!(source_goal.objective, RETRY_GOAL);
+     assert_eq!(source_goal.tokens_used, expected_source_tokens);
+-    assert_eq!(source_goal.time_used_seconds, 12);
++    assert!(
++        expected_goal_time.contains(&source_goal.time_used_seconds),
++        "source goal time {} should be in {expected_goal_time:?}",
++        source_goal.time_used_seconds,
++    );
+     assert_eq!(retry_goal.objective, RETRY_GOAL);
+     assert!(retry_goal.tokens_used >= expected_source_tokens);
+-    assert!(retry_goal.time_used_seconds >= 12);
++    assert!(
++        expected_goal_time.contains(&retry_goal.time_used_seconds),
++        "retry goal time {} should be in {expected_goal_time:?}",
++        retry_goal.time_used_seconds,
++    );
+ 
+     let request_bodies = server
+         .requests()
