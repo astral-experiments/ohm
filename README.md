@@ -96,6 +96,15 @@ for each checkout:
 CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
 ```
 
+To compile only one exact library test, enable experimental focused test compilation:
+
+```console
+cargo +ohm -Zohm-focused-tests test -p <package> --lib <full-test-name> -- --exact
+```
+
+This mode is not enabled by default, does not support nextest discovery or coverage, and can omit
+backend or linker diagnostics from unselected tests.
+
 ### `AGENTS.md`
 
 To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS.md`:
@@ -215,16 +224,6 @@ At present, Ohm includes the following optimizations, all enabled by default:
   unnecessary topology discovery and no-write reverification.
 - Experimental procedural-macro caching (`rustc -Zcache-proc-macros`).
 - Backported Clippy optimizations, including combined lint passes and redundant-clone fast paths.
-
-Ohm also includes explicitly requested, experimental focused test compilation. To compile only one
-exact library test, pass `-Zohm-focused-tests` before the Cargo subcommand:
-
-```console
-cargo +ohm -Zohm-focused-tests test -p <package> --lib <full-test-name> -- --exact
-```
-
-This mode is not enabled by default, does not support nextest discovery or coverage, and can omit
-backend or linker diagnostics from unselected tests.
 
 Ohm is exclusively intended for local development: never use it for production builds or releases,
 and always verify your work with the official Rust toolchain.
