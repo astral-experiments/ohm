@@ -21,6 +21,14 @@ Benchmarking Ohm against stock Rust on replayed development sessions:
 | `cargo fmt`                                |     17.39 s |      12.05 s |     5.35 s |    30.73% |
 | All commands                               |  1,165.59 s |     749.75 s |   415.84 s |    35.68% |
 
+Compared to the stock Rust toolchain, Ohm:
+
+- Enables existing experimental features by default, such as parallel compiler frontends.
+- Implements performance features proposed upstream, such as
+  [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790).
+- Adds optimizations identified by Codex, such as reusing build artifacts between `cargo build`
+  and `cargo check`, and skipping rustfmt for unchanged files.
+
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
 [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790). Use it only for
