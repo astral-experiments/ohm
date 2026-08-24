@@ -88,26 +88,6 @@ for each checkout:
 CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
 ```
 
-Workspace artifacts and final outputs remain private to each checkout. Sharing is disabled when the
-build directory overlaps a checkout's target directory or Ohm's defaults are turned off. Unverified
-native build tools isolate their helper crates, build scripts, and affected dependents without
-preventing unrelated registry packages from being shared.
-
-Native-tool trust defaults to `strict`. To additionally trust authenticated registry build scripts,
-set `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=build-scripts`; known native-tool helpers and their
-dependents remain isolated. Set it to `all` to trust those helpers as well. Both opt-ins are
-potentially unsound: build scripts and native tools can observe untracked files, environment
-variables, or executable changes and produce stale generated code or native objects. Each policy
-uses a separate cache namespace.
-
-Registry procedural macros and their runtime dependencies are shared only after source and checksum
-verification. By default, Ohm limits sharing to individually audited macro releases. To explicitly
-trust all authenticated registry macros, use `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` or
-`cargo +ohm -Zohm-proc-macro-trust=all build`. This mode is potentially unsound: macros can read
-untracked files or environment variables, use randomness, and produce stale generated code or omit
-diagnostics. Strict and permissive artifacts remain isolated. Build-to-check reuse follows the same
-explicitly selected policy, while the default remains audited.
-
 ### `AGENTS.md`
 
 To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS.md`:
