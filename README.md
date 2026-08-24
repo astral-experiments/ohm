@@ -21,39 +21,13 @@ Benchmarking Ohm against stock Rust on replayed development sessions:
 | `cargo fmt`                                |     17.39 s |      12.05 s |     5.35 s |    30.73% |
 | All commands                               |  1,165.59 s |     749.75 s |   415.84 s |    35.68% |
 
-**Direct edits** modify the crate being checked, linted, or tested:
+Compared to the stock Rust toolchain, Ohm:
 
-| Project | Workflow               | Edited crate | Rust 1.98.0 | Ohm 1.98.0-1 | Speedup |
-| ------- | ---------------------- | ------------ | ----------: | -----------: | ------: |
-| uv      | `cargo check`          | `uv`         |      1.50 s |       1.41 s |   1.06× |
-| uv      | `cargo clippy`         | `uv`         |      1.79 s |       1.83 s |   0.98× |
-| uv      | `cargo test --test it` | `uv`         |     11.70 s |       5.06 s |   2.31× |
-| Codex   | `cargo check`          | `codex-core` |      2.19 s |       1.96 s |   1.12× |
-| Codex   | `just clippy`          | `codex-core` |      9.86 s |       7.64 s |   1.29× |
-| Codex   | `just test`            | `codex-core` |     12.58 s |       9.96 s |   1.26× |
-
-**Indirect edits** modify a dependency's implementation without changing its public API, so Ohm can
-avoid rebuilding unchanged dependents:
-
-| Project | Workflow               | Edited dependency    | Rust 1.98.0 | Ohm 1.98.0-1 | Speedup |
-| ------- | ---------------------- | -------------------- | ----------: | -----------: | ------: |
-| uv      | `cargo check`          | `uv-normalize`       |      7.91 s |       0.61 s |  12.87× |
-| uv      | `cargo clippy`         | `uv-normalize`       |     10.45 s |       0.51 s |  20.58× |
-| uv      | `cargo test --test it` | `uv-normalize`       |     14.26 s |       2.16 s |   6.60× |
-| Codex   | `cargo check`          | `codex-utils-string` |     11.21 s |       0.68 s |  16.38× |
-| Codex   | `just clippy`          | `codex-utils-string` |     22.19 s |       0.75 s |  29.66× |
-| Codex   | `just test`            | `codex-utils-string` |     25.30 s |       3.27 s |   7.73× |
-
-**Other common cases** include build-to-check reuse, formatting, and safe cross-worktree builds:
-
-| Project | Workflow                 | Package              | Rust 1.98.0 | Ohm 1.98.0-1 | Speedup |
-| ------- | ------------------------ | -------------------- | ----------: | -----------: | ------: |
-| uv      | Build, then check        | `uv`                 |     43.91 s |      10.69 s |   4.11× |
-| uv      | Shared-worktree build    | `uv-normalize`       |      3.92 s |       0.30 s |  12.97× |
-| Codex   | Build, then check        | `codex-core`         |     70.43 s |      28.08 s |   2.51× |
-| Codex   | No-op formatting         | Workspace            |      5.23 s |       0.16 s |  33.30× |
-| Codex   | Formatting after an edit | `codex-core`         |      5.48 s |       0.68 s |   8.08× |
-| Codex   | Shared-worktree build    | `codex-utils-string` |      1.72 s |       0.52 s |   3.33× |
+- Enables (by default) existing experimental features (e.g., parallel compiler frontends).
+- Implements experimental, performance-oriented features proposed upstream (e.g.,
+  [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790)).
+- Implements additional optimizations identified by Codex (e.g., reusing build artifacts between
+  `cargo build` and `cargo check`, avoiding rustfmt on unchanged files).
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
 be unsound, including an implementation of
@@ -122,25 +96,14 @@ for each checkout:
 CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
 ```
 
-Workspace artifacts and final outputs remain private to each checkout. Sharing is disabled when the
-build directory overlaps a checkout's target directory or Ohm's defaults are turned off. Unverified
-native build tools isolate their helper crates, build scripts, and affected dependents without
-preventing unrelated registry packages from being shared.
+To compile only one exact library test, enable experimental focused test compilation:
 
-Native-tool trust defaults to `strict`. To additionally trust authenticated registry build scripts,
-set `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=build-scripts`; known native-tool helpers and their
-dependents remain isolated. Set it to `all` to trust those helpers as well. Both opt-ins are
-potentially unsound: build scripts and native tools can observe untracked files, environment
-variables, or executable changes and produce stale generated code or native objects. Each policy
-uses a separate cache namespace.
+```console
+cargo +ohm -Zohm-focused-tests test -p <package> --lib <full-test-name> -- --exact
+```
 
-Registry procedural macros and their runtime dependencies are shared only after source and checksum
-verification. By default, Ohm limits sharing to individually audited macro releases. To explicitly
-trust all authenticated registry macros, use `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` or
-`cargo +ohm -Zohm-proc-macro-trust=all build`. This mode is potentially unsound: macros can read
-untracked files or environment variables, use randomness, and produce stale generated code or omit
-diagnostics. Strict and permissive artifacts remain isolated. Build-to-check reuse follows the same
-explicitly selected policy, while the default remains audited.
+This mode is not enabled by default, does not support nextest discovery or coverage, and can omit
+backend or linker diagnostics from unselected tests.
 
 ### `AGENTS.md`
 
@@ -162,6 +125,44 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 - Use `cargo +ohm -Zohm-defaults=no <command>` to disable Ohm's automatic experimental defaults. Use
   plain `cargo <command>` and the repository's normal toolchain for CI and production builds.
 ```
+
+## Benchmarks
+
+See the [benchmark documentation](./BENCHMARKS.md) for the full results and methodology.
+
+**Direct edits** modify the crate being checked, linted, or tested:
+
+| Project | Workflow               | Edited crate | Rust 1.98.0 | Ohm 1.98.0-1 | Speedup |
+| ------- | ---------------------- | ------------ | ----------: | -----------: | ------: |
+| uv      | `cargo check`          | `uv`         |      1.50 s |       1.41 s |   1.06× |
+| uv      | `cargo clippy`         | `uv`         |      1.79 s |       1.83 s |   0.98× |
+| uv      | `cargo test --test it` | `uv`         |     11.70 s |       5.06 s |   2.31× |
+| Codex   | `cargo check`          | `codex-core` |      2.19 s |       1.96 s |   1.12× |
+| Codex   | `just clippy`          | `codex-core` |      9.86 s |       7.64 s |   1.29× |
+| Codex   | `just test`            | `codex-core` |     12.58 s |       9.96 s |   1.26× |
+
+**Indirect edits** modify a dependency's implementation without changing its public API, so Ohm can
+avoid rebuilding unchanged dependents:
+
+| Project | Workflow               | Edited dependency    | Rust 1.98.0 | Ohm 1.98.0-1 | Speedup |
+| ------- | ---------------------- | -------------------- | ----------: | -----------: | ------: |
+| uv      | `cargo check`          | `uv-normalize`       |      7.91 s |       0.61 s |  12.87× |
+| uv      | `cargo clippy`         | `uv-normalize`       |     10.45 s |       0.51 s |  20.58× |
+| uv      | `cargo test --test it` | `uv-normalize`       |     14.26 s |       2.16 s |   6.60× |
+| Codex   | `cargo check`          | `codex-utils-string` |     11.21 s |       0.68 s |  16.38× |
+| Codex   | `just clippy`          | `codex-utils-string` |     22.19 s |       0.75 s |  29.66× |
+| Codex   | `just test`            | `codex-utils-string` |     25.30 s |       3.27 s |   7.73× |
+
+**Other common cases** include build-to-check reuse, formatting, and safe cross-worktree builds:
+
+| Project | Workflow                 | Package              | Rust 1.98.0 | Ohm 1.98.0-1 | Speedup |
+| ------- | ------------------------ | -------------------- | ----------: | -----------: | ------: |
+| uv      | Build, then check        | `uv`                 |     43.91 s |      10.69 s |   4.11× |
+| uv      | Shared-worktree build    | `uv-normalize`       |      3.92 s |       0.30 s |  12.97× |
+| Codex   | Build, then check        | `codex-core`         |     70.43 s |      28.08 s |   2.51× |
+| Codex   | No-op formatting         | Workspace            |      5.23 s |       0.16 s |  33.30× |
+| Codex   | Formatting after an edit | `codex-core`         |      5.48 s |       0.68 s |   8.08× |
+| Codex   | Shared-worktree build    | `codex-utils-string` |      1.72 s |       0.52 s |   3.33× |
 
 ## Philosophy
 
@@ -223,16 +224,6 @@ At present, Ohm includes the following optimizations, all enabled by default:
   unnecessary topology discovery and no-write reverification.
 - Experimental procedural-macro caching (`rustc -Zcache-proc-macros`).
 - Backported Clippy optimizations, including combined lint passes and redundant-clone fast paths.
-
-Ohm also includes explicitly requested, experimental focused test compilation. To compile only one
-exact library test, pass `-Zohm-focused-tests` before the Cargo subcommand:
-
-```console
-cargo +ohm -Zohm-focused-tests test -p <package> --lib <full-test-name> -- --exact
-```
-
-This mode is not enabled by default, does not support nextest discovery or coverage, and can omit
-backend or linker diagnostics from unselected tests.
 
 Ohm is exclusively intended for local development: never use it for production builds or releases,
 and always verify your work with the official Rust toolchain.
