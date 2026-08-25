@@ -10,12 +10,14 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import hashlib
 import json
 import os
 import platform
 import re
 import shlex
 import shutil
+import stat
 import statistics
 import subprocess
 import sys
@@ -35,6 +37,7 @@ CARGO_STATUS = re.compile(
 VERBOSE_COMMAND = re.compile(r"^\s*Running\s+`(?P<command>.+)`\s*$", re.MULTILINE)
 TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")
 SAFE_REVISION = re.compile(r"^[0-9a-f]{40}$")
+SAFE_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 FEATURE_MATRIX: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("ohm-all", ()),
     ("ohm-no-public-api-hash", ("-Zpublic-api-hash=no",)),
@@ -160,6 +163,7 @@ class Scenario:
     session: dict[str, Any]
     warmup: tuple[dict[str, Any], ...]
     steps: tuple[dict[str, Any], ...]
+    setup_patches: tuple[dict[str, Any], ...] = ()
 
 
 def command_output(arguments: list[str], *, cwd: Path | None = None) -> str:
@@ -197,6 +201,93 @@ def safe_relative(value: object, *, field: str) -> Path:
     return path
 
 
+def setup_relative(value: object) -> Path:
+    path = safe_relative(value, field="setup patch path")
+    if not path.parts or path.as_posix() != value or "\0" in str(value):
+        raise BenchmarkError("setup patch paths must be canonical relative paths")
+    return path
+
+
+def setup_file(root: Path, relative: str) -> Path:
+    candidate = root
+    for part in setup_relative(relative).parts:
+        candidate /= part
+        if candidate.is_symlink():
+            raise BenchmarkError(
+                f"setup patch paths cannot contain symlinks: {relative}"
+            )
+    if not candidate.is_file() or not candidate.resolve().is_relative_to(
+        root.resolve()
+    ):
+        raise BenchmarkError(
+            f"setup patch requires an existing regular file: {relative}"
+        )
+    return candidate
+
+
+def setup_patch_bytes(directory: Path, descriptor: dict[str, Any]) -> bytes:
+    try:
+        patch = setup_file(directory, descriptor["patch"]).read_bytes()
+    except OSError as error:
+        raise BenchmarkError(f"cannot read setup patch: {error}") from error
+    if not patch or hashlib.sha256(patch).hexdigest() != descriptor["sha256"]:
+        raise BenchmarkError("setup patch is empty or does not match its SHA-256")
+    return patch
+
+
+def setup_file_identity(root: Path, relative: str) -> dict[str, str]:
+    try:
+        path = setup_file(root, relative)
+        with path.open("rb") as source:
+            mode = os.fstat(source.fileno()).st_mode
+            if not stat.S_ISREG(mode):
+                raise BenchmarkError(f"setup patch source is not regular: {relative}")
+            return {
+                "sha256": hashlib.sha256(source.read()).hexdigest(),
+                "mode": f"{mode:06o}",
+            }
+    except OSError as error:
+        raise BenchmarkError(
+            f"cannot inspect setup patch source {relative}: {error}"
+        ) from error
+
+
+def validate_setup_proofs(scenario: Scenario, proofs: object) -> None:
+    if not isinstance(proofs, list) or len(proofs) != len(scenario.setup_patches):
+        raise BenchmarkError("session has missing or unexpected setup patch proofs")
+    previous: dict[str, dict[str, str]] = {}
+    for descriptor, proof in zip(scenario.setup_patches, proofs, strict=True):
+        if (
+            not isinstance(proof, dict)
+            or set(proof) != {"descriptor", "files"}
+            or proof["descriptor"] != descriptor
+            or not isinstance(proof["files"], dict)
+            or set(proof["files"]) != set(descriptor["paths"])
+        ):
+            raise BenchmarkError("session has incompatible setup patch proofs")
+        for path, change in proof["files"].items():
+            if not isinstance(change, dict) or set(change) != {"before", "after"}:
+                raise BenchmarkError("session has invalid setup file proofs")
+            for identity in change.values():
+                if (
+                    not isinstance(identity, dict)
+                    or set(identity) != {"sha256", "mode"}
+                    or not isinstance(identity["sha256"], str)
+                    or SAFE_SHA256.fullmatch(identity["sha256"]) is None
+                    or not isinstance(identity["mode"], str)
+                    or re.fullmatch(r"100[0-7]{3}", identity["mode"]) is None
+                ):
+                    raise BenchmarkError("session has invalid setup file identities")
+            before, after = change["before"], change["after"]
+            if (
+                before["mode"] != after["mode"]
+                or before["sha256"] == after["sha256"]
+                or (path in previous and before != previous[path])
+            ):
+                raise BenchmarkError("session has inconsistent setup file proofs")
+            previous[path] = after
+
+
 def load_scenario(path: Path) -> Scenario:
     try:
         data = json.loads(path.read_text())
@@ -229,6 +320,30 @@ def load_scenario(path: Path) -> Scenario:
         isinstance(ref, str) and ref.startswith("refs/") for ref in fetch_refs
     ):
         raise BenchmarkError(f"session replay fetch references are invalid: {path}")
+
+    setup_patches = data.get("setup_patches", [])
+    if not isinstance(setup_patches, list):
+        raise BenchmarkError("session setup_patches must be a list")
+    labels: set[str] = set()
+    for descriptor in setup_patches:
+        if (
+            not isinstance(descriptor, dict)
+            or set(descriptor) != {"label", "patch", "sha256", "paths"}
+            or not isinstance(descriptor["label"], str)
+            or not descriptor["label"].strip()
+            or descriptor["label"] in labels
+            or not isinstance(descriptor["sha256"], str)
+            or SAFE_SHA256.fullmatch(descriptor["sha256"]) is None
+            or not isinstance(descriptor["paths"], list)
+            or not descriptor["paths"]
+        ):
+            raise BenchmarkError("session has an invalid setup patch descriptor")
+        labels.add(descriptor["label"])
+        for relative in descriptor["paths"]:
+            setup_relative(relative)
+        if len(set(descriptor["paths"])) != len(descriptor["paths"]):
+            raise BenchmarkError("setup patch source paths must be unique")
+        setup_patch_bytes(path.resolve().parent, descriptor)
 
     warmup = data.get("warmup", [])
     if not isinstance(warmup, list):
@@ -286,6 +401,7 @@ def load_scenario(path: Path) -> Scenario:
         session=session,
         warmup=tuple(warmup),
         steps=tuple(steps),
+        setup_patches=tuple(setup_patches),
     )
 
 
@@ -395,11 +511,21 @@ class Replay:
                 raise BenchmarkError(
                     f"cannot resume a different {scenario.project} session scenario"
                 )
+            if recorded.get("setup_patches", []) != list(scenario.setup_patches):
+                raise BenchmarkError("cannot resume with different setup patches")
+            if scenario.setup_patches and recorded.get("warmup_enabled") is not (
+                not self.options.no_warmup
+            ):
+                raise BenchmarkError(
+                    "cannot resume prepared sources with different warmups"
+                )
 
         samples = data.get("samples")
         if not isinstance(samples, list):
             raise BenchmarkError("existing session results have invalid samples")
         selectors = dict(self.toolchains)
+        scenarios = {scenario.project: scenario for scenario in self.scenarios}
+        setup_proofs: dict[str, list[dict[str, Any]]] = {}
         completed: set[tuple[str, str, int]] = set()
         for sample in samples:
             if not isinstance(sample, dict):
@@ -424,6 +550,13 @@ class Replay:
                     "existing session results contain duplicate samples"
                 )
             completed.add(identity)
+            proofs = sample.get("setup_patches", [])
+            validate_setup_proofs(scenarios[project], proofs)
+            if project in setup_proofs and proofs != setup_proofs[project]:
+                raise BenchmarkError(
+                    "completed cells have different setup patch proofs"
+                )
+            setup_proofs[project] = proofs
         self.samples = samples
         print(f"Resuming {len(samples)} completed session samples", flush=True)
 
@@ -705,10 +838,8 @@ class Replay:
             )
         return result.stdout
 
-    def apply_edit(
-        self, scenario: Scenario, source: Path, worktree: Path, step: dict[str, Any]
-    ) -> dict[str, Any]:
-        patch = self.patch_bytes(scenario, source, step)
+    @staticmethod
+    def apply_patch(worktree: Path, patch: bytes, label: str) -> float:
         checked = subprocess.run(
             ["git", "apply", "--check", "-"],
             cwd=worktree,
@@ -719,7 +850,7 @@ class Replay:
         )
         if checked.returncode:
             raise BenchmarkError(
-                f"real edit does not apply cleanly: {step['label']}: "
+                f"real edit does not apply cleanly: {label}: "
                 f"{checked.stderr.decode(errors='replace').strip()}"
             )
         started = time.perf_counter()
@@ -734,11 +865,83 @@ class Replay:
         duration = time.perf_counter() - started
         if applied.returncode:
             raise BenchmarkError(
-                f"cannot apply real edit: {step['label']}: "
+                f"cannot apply real edit: {label}: "
                 f"{applied.stderr.decode(errors='replace').strip()}"
             )
+        return duration
+
+    def apply_edit(
+        self, scenario: Scenario, source: Path, worktree: Path, step: dict[str, Any]
+    ) -> dict[str, Any]:
+        patch = self.patch_bytes(scenario, source, step)
+        duration = self.apply_patch(worktree, patch, step["label"])
         files = sum(line.startswith(b"diff --git ") for line in patch.splitlines())
         return {"kind": "edit", "wall_seconds": duration, "files_changed": files}
+
+    def apply_setup_patches(
+        self, scenario: Scenario, worktree: Path
+    ) -> list[dict[str, Any]]:
+        proofs: list[dict[str, Any]] = []
+        for descriptor in scenario.setup_patches:
+            patch = setup_patch_bytes(scenario.path.parent, descriptor)
+            inspected = []
+            for option in ("--numstat", "--summary"):
+                result = subprocess.run(
+                    ["git", "apply", option, "-z", "-"],
+                    cwd=worktree,
+                    input=patch,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=False,
+                )
+                if result.returncode:
+                    raise BenchmarkError("cannot inspect setup patch scope")
+                inspected.append(result.stdout)
+            numstat, summary = inspected
+            records = [
+                record.split(b"\t", 2) for record in numstat.rstrip(b"\0").split(b"\0")
+            ]
+            if (
+                summary
+                or not numstat.endswith(b"\0")
+                or any(
+                    len(record) != 3
+                    or not record[0].isdigit()
+                    or not record[1].isdigit()
+                    or int(record[0]) + int(record[1]) == 0
+                    for record in records
+                )
+                or sorted(record[2] for record in records)
+                != sorted(path.encode() for path in descriptor["paths"])
+            ):
+                raise BenchmarkError(
+                    "setup patch must only modify its declared existing files, without structural changes"
+                )
+            before = {
+                path: setup_file_identity(worktree, path)
+                for path in descriptor["paths"]
+            }
+            self.apply_patch(worktree, patch, descriptor["label"])
+            proofs.append(
+                {
+                    "descriptor": descriptor,
+                    "files": {
+                        path: {
+                            "before": before[path],
+                            "after": setup_file_identity(worktree, path),
+                        }
+                        for path in descriptor["paths"]
+                    },
+                }
+            )
+        validate_setup_proofs(scenario, proofs)
+        for sample in self.samples:
+            if (
+                sample["project"] == scenario.project
+                and sample.get("setup_patches", []) != proofs
+            ):
+                raise BenchmarkError("new cell has different setup patch proofs")
+        return proofs
 
     def run_command(
         self,
@@ -972,6 +1175,7 @@ class Replay:
             cwd=source,
         )
         print(f"\n{scenario.project} / {label} / replay {repetition + 1}", flush=True)
+        setup_proofs = self.apply_setup_patches(scenario, worktree)
         warmup_steps: list[dict[str, Any]] = []
         if not self.options.no_warmup:
             for index, step in enumerate(scenario.warmup, start=1):
@@ -1059,6 +1263,8 @@ class Replay:
             "warmup_steps": warmup_steps,
             "steps": steps,
         }
+        if scenario.setup_patches:
+            sample["setup_patches"] = setup_proofs
         self.samples.append(sample)
         self.persist()
         print(f"  Complete workflow: {total:.2f}s", flush=True)
@@ -1085,6 +1291,14 @@ class Replay:
                     ),
                     "edits": sum(step["kind"] == "edit" for step in scenario.steps),
                     "warmups": len(scenario.warmup),
+                    **(
+                        {
+                            "setup_patches": list(scenario.setup_patches),
+                            "warmup_enabled": not self.options.no_warmup,
+                        }
+                        if scenario.setup_patches
+                        else {}
+                    ),
                 }
                 for scenario in self.scenarios
             ],
@@ -1201,6 +1415,11 @@ class Replay:
         if self.options.dry_run:
             for scenario in self.scenarios:
                 print(f"{scenario.project}: {scenario.session['id']}")
+                for descriptor in scenario.setup_patches:
+                    setup_patch_bytes(scenario.path.parent, descriptor)
+                    print(
+                        f"  setup (untimed): {descriptor['label']} [{descriptor['sha256']}]"
+                    )
                 for index, step in enumerate(scenario.steps, start=1):
                     print(f"  {index:02d}. {step['kind']}: {step['label']}")
             return
