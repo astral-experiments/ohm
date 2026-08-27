@@ -53,6 +53,12 @@ runners; macOS smoke tests still use `namespace-profile-macos-15`. x86_64 Linux 
 Linux builds need at least 150 GiB for the temporary BOLT profiling corpus. Planning and publication
 use `depot-ubuntu-24.04-4` runners.
 
+Component-PGO-capable Rust source revisions additionally optimize rustdoc, Cargo, Clippy, rustfmt,
+and cargo-fmt on both platforms; historical source revisions retain rustc-only PGO. Cargo shares
+the compiler's training profile, rustfmt shares its profile with cargo-fmt, and rustdoc and Clippy
+each train on their own workloads. Release builds reject missing, invalid, or misattributed merged
+profiles, reuse Rust's optimized CI LLVM, and additionally optimize the compiler with BOLT on Linux.
+
 ## Build and publish
 
 Run the release workflow from `main` with the pinned manifest and enable the full distribution

@@ -1,0 +1,1060 @@
+{
+  "rust_version": "1.98.0",
+  "ohm_release": "ohm-1.98.0-2",
+  "host": {
+    "platform": "linux-x86_64",
+    "host_count": 2,
+    "logical_cpus_by_project": {
+      "ruff": 32,
+      "uv": 16,
+      "codex": 32
+    },
+    "host_id_by_project": {
+      "ruff": "linux-1",
+      "uv": "linux-2",
+      "codex": "linux-1"
+    },
+    "cpu_model_by_project": {
+      "ruff": "AMD EPYC-Milan Processor",
+      "uv": "AMD EPYC-Milan Processor",
+      "codex": "AMD EPYC-Milan Processor"
+    }
+  },
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    ["stock", "ohm"],
+    ["ohm", "stock"]
+  ],
+  "sessions": [
+    {
+      "project": "ruff",
+      "session_id": "ruff-component-fixed-points",
+      "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+      "commands": 12,
+      "edits": 3,
+      "warmups": 1
+    },
+    {
+      "project": "uv",
+      "session_id": "uv-pypi-simple-json-parser",
+      "base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+      "commands": 14,
+      "edits": 3,
+      "warmups": 6
+    },
+    {
+      "project": "codex",
+      "session_id": "codex-tui-active-cell-layout",
+      "base_revision": "74004b5397b24662a87a5264a6ae80664168c7f3",
+      "commands": 11,
+      "edits": 3,
+      "warmups": 1
+    }
+  ],
+  "timed_session_seconds": {
+    "ruff": {
+      "stock": [528.1394862100715, 530.5649706299882],
+      "ohm": [347.80984911799897, 347.4086684139911]
+    },
+    "uv": {
+      "stock": [183.8677357380002, 179.80615922700235],
+      "ohm": [137.04821405700204, 134.01067493799928]
+    },
+    "codex": {
+      "stock": [667.7565880870679, 702.9978386150906],
+      "ohm": [401.7778938600095, 395.5330107809277]
+    }
+  },
+  "timed_command_seconds": {
+    "ruff": {
+      "stock": [527.4450882021338, 529.8706234912388],
+      "ohm": [347.13127024821006, 346.67423719272483]
+    },
+    "uv": {
+      "stock": [183.3644321709944, 179.354169019025],
+      "ohm": [136.60940321700036, 133.56483502401534]
+    },
+    "codex": {
+      "stock": [667.2048761980841, 702.4615788588999],
+      "ohm": [401.2629676259821, 394.89289502589963]
+    }
+  },
+  "timed_edit_seconds": {
+    "ruff": {
+      "stock": [0.05885973398108035, 0.050286529934965074],
+      "ohm": [0.05111235403455794, 0.05079262505751103]
+    },
+    "uv": {
+      "stock": [0.033501360994705465, 0.01758280999638373],
+      "ohm": [0.015369776992883999, 0.01652202299737837]
+    },
+    "codex": {
+      "stock": [0.013428941136226058, 0.012727517983876169],
+      "ohm": [0.01263618201483041, 0.015033761039376259]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "ruff": {
+      "stock": [163.04195192304906, 159.33063482900616],
+      "ohm": [129.06625528505538, 128.60859119601082]
+    },
+    "uv": {
+      "stock": [259.7443350780086, 256.6647994290033],
+      "ohm": [211.7824313309975, 209.7250674770039]
+    },
+    "codex": {
+      "stock": [359.6915561319329, 384.08193157601636],
+      "ohm": [309.53033282095566, 309.56535849394277]
+    }
+  },
+  "commands": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Establish the focused cycle and attribute baseline",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [1.9293753390666097, 1.982005855999887],
+          "ohm": [1.7905030379770324, 1.8903011539950967]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Validate the simplified cycle and attribute inference",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [34.13816135202069, 34.63086698099505],
+          "ohm": [29.570869121002033, 28.949063090025447]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run affected-package tests after simplification",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [40.935315626091324, 41.072118030977435],
+          "ohm": [35.18013039708603, 35.76161459495779]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Run strict Clippy after simplification",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string"
+        ],
+        "wall_seconds": {
+          "stock": [72.64011973398738, 73.03037002100609],
+          "ohm": [31.05805850296747, 30.99341508001089]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 7,
+        "label": "Validate the indexed cycle and attribute inference",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [55.44614410994109, 55.51068109204061],
+          "ohm": [41.02641335898079, 39.883906433940865]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Run affected-package tests after dependency indexing",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [61.534456391003914, 61.49990727403201],
+          "ohm": [46.87326059199404, 45.860587994917296]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Run strict Clippy after dependency indexing",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string"
+        ],
+        "wall_seconds": {
+          "stock": [52.395907088997774, 52.72526076401118],
+          "ohm": [25.153774069040082, 25.305554960970767]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Run the expanded component-cycle regressions",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--status-level",
+          "fail",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [63.91672107204795, 64.14597590803169],
+          "ohm": [44.15658942901064, 44.17917016102001]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Run all semantic mdtests after the fixed-point rewrite",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [5.894700846984051, 6.077471503056586],
+          "ohm": [5.860345319029875, 5.776036574970931]
+        },
+        "tests_started": {
+          "stock": [482, 482],
+          "ohm": [482, 482]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Validate the complete core and semantic packages",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [70.69359267107211, 70.97733663301915],
+          "ohm": [50.40737932105549, 51.59364607895259]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Run final strict Clippy for both affected packages",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string"
+        ],
+        "wall_seconds": {
+          "stock": [60.71742295392323, 61.0977325909771],
+          "ohm": [27.978824128047563, 28.356388487038203]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Verify final workspace formatting",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [7.203171016997658, 7.120896837092005],
+          "ohm": [8.075122972019017, 8.124552581924945]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      }
+    ],
+    "uv": [
+      {
+        "index": 2,
+        "label": "Run focused Simple API parser tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [6.584316503998707, 5.764322880000691],
+          "ohm": [4.708135048000258, 4.084801964003418]
+        },
+        "tests_started": {
+          "stock": [9, 9],
+          "ohm": [9, 9]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Run all PyPI types tests",
+        "category": "test",
+        "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
+        "wall_seconds": {
+          "stock": [0.5415432160007185, 0.5291695620035171],
+          "ohm": [0.3836672350007575, 0.3837137820009957]
+        },
+        "tests_started": {
+          "stock": [55, 55],
+          "ohm": [55, 55]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run registry project-status regression",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-client",
+          "project_status_pypi_json",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [24.623890319002385, 22.178134654001042],
+          "ohm": [16.167509239996434, 16.100266882000142]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Check parser and registry-client Clippy warnings",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "uv-pypi-types",
+          "-p",
+          "uv-client",
+          "--all-targets",
+          "--locked",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [11.43892581199907, 10.621600414000568],
+          "ohm": [8.194339096000476, 7.179775128999609]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 6,
+        "label": "Check workspace formatting",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [3.6381742160010617, 3.6474869810044765],
+          "ohm": [4.096937766000337, 4.097332669000025]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Rerun focused Simple API parser tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [2.475091522996081, 2.1427873430002364],
+          "ohm": [1.9737671300026705, 1.9948481070023263]
+        },
+        "tests_started": {
+          "stock": [9, 9],
+          "ohm": [9, 9]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Rerun parser and registry-client Clippy",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "uv-pypi-types",
+          "-p",
+          "uv-client",
+          "--all-targets",
+          "--locked",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [5.897710314995493, 5.952433085003577],
+          "ohm": [1.4499066659991513, 1.4546945680049248]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 10,
+        "label": "Run registry-client unit tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-client",
+          "registry_client::tests::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [8.839405671998975, 8.813574764004443],
+          "ohm": [9.198054373999184, 9.298972964003042]
+        },
+        "tests_started": {
+          "stock": [12, 12],
+          "ohm": [12, 12]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Recheck workspace formatting",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [3.848259714002779, 3.8931986919997144],
+          "ohm": [0.27956343100231607, 0.2864889830016182]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Rerun all PyPI types tests",
+        "category": "test",
+        "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
+        "wall_seconds": {
+          "stock": [3.1280109910003375, 3.0948242509984993],
+          "ohm": [2.2754399969999213, 2.28837155400106]
+        },
+        "tests_started": {
+          "stock": [55, 55],
+          "ohm": [55, 55]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Recheck parser and registry-client Clippy",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "uv-pypi-types",
+          "-p",
+          "uv-client",
+          "--all-targets",
+          "--locked",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "wall_seconds": {
+          "stock": [6.381158493997646, 6.277947711001616],
+          "ohm": [5.907058878001408, 5.8968577179985004]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Run local-mock-index installation integration test",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "pip_install",
+          "pip_install::registry_wheel_size_is_advisory",
+          "--locked",
+          "--",
+          "--exact"
+        ],
+        "wall_seconds": {
+          "stock": [92.35434360599902, 92.84225350700581],
+          "ohm": [72.14431358999718, 71.06041501999425]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 16,
+        "label": "Rerun registry-client unit tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-client",
+          "registry_client::tests::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [9.773370301001705, 9.844953714004077],
+          "ohm": [9.55742211300094, 9.16452027100604]
+        },
+        "tests_started": {
+          "stock": [12, 12],
+          "ohm": [12, 12]
+        }
+      },
+      {
+        "index": 17,
+        "label": "Perform final workspace formatting check",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [3.840231488000427, 3.751481460996729],
+          "ohm": [0.2732886529993266, 0.27377541299938457]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      }
+    ],
+    "codex": [
+      {
+        "index": 1,
+        "label": "Run the existing focused startup tests before editing",
+        "category": "test",
+        "command": ["just", "test", "-p", "codex-tui", "startup"],
+        "wall_seconds": {
+          "stock": [11.027586359996349, 10.653728935983963],
+          "ohm": [9.476953528006561, 11.814482257002965]
+        },
+        "tests_started": {
+          "stock": [75, 75],
+          "ohm": [75, 75]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Recheck focused startup behavior after the transcript edit",
+        "category": "test",
+        "command": ["just", "test", "-p", "codex-tui", "startup"],
+        "wall_seconds": {
+          "stock": [115.44734752201475, 117.6114093279466],
+          "ohm": [82.57325253100134, 80.50096842402127]
+        },
+        "tests_started": {
+          "stock": [75, 75],
+          "ohm": [75, 75]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Check the edited TUI library",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "codex-tui"],
+        "wall_seconds": {
+          "stock": [179.445541477995, 182.08128271298483],
+          "ohm": [72.89895645400975, 67.99165310605895]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 6,
+        "label": "Run the exact custom-height regression from the recorded session",
+        "category": "test",
+        "command": [
+          "just",
+          "test",
+          "-p",
+          "codex-tui",
+          "active_cell_layout_preserves_custom_height_and_bottom_scroll"
+        ],
+        "wall_seconds": {
+          "stock": [72.64268128201365, 86.1970150420675],
+          "ohm": [52.23043232795317, 50.49158248107415]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 7,
+        "label": "Run the focused active-cell rendering tests",
+        "category": "test",
+        "command": [
+          "just",
+          "test",
+          "-p",
+          "codex-tui",
+          "chatwidget::rendering::tests"
+        ],
+        "wall_seconds": {
+          "stock": [3.529106399975717, 4.0605303139891475],
+          "ohm": [3.158226947998628, 2.555401125922799]
+        },
+        "tests_started": {
+          "stock": [5, 5],
+          "ohm": [5, 5]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Confirm animated active cells continue rendering",
+        "category": "test",
+        "command": [
+          "just",
+          "test",
+          "-p",
+          "codex-tui",
+          "active_cell_layout_reuses_heights_without_freezing_animation"
+        ],
+        "wall_seconds": {
+          "stock": [2.9367840050254017, 3.0062757809646428],
+          "ohm": [2.7996612249407917, 2.4345118700293824]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 10,
+        "label": "Recheck the exact custom-height regression after integrating the widget",
+        "category": "test",
+        "command": [
+          "just",
+          "test",
+          "-p",
+          "codex-tui",
+          "active_cell_layout_preserves_custom_height_and_bottom_scroll"
+        ],
+        "wall_seconds": {
+          "stock": [50.17807974200696, 50.2632440229645],
+          "ohm": [43.46164276904892, 43.57846906897612]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Validate active-cell removal cache invalidation",
+        "category": "test",
+        "command": [
+          "just",
+          "test",
+          "-p",
+          "codex-tui",
+          "removing_active_cell_invalidates_layout_before_reusing_its_identity"
+        ],
+        "wall_seconds": {
+          "stock": [3.7629582630470395, 3.566095831920393],
+          "ohm": [2.4040792851010337, 2.409957247902639]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Rerun the complete focused rendering regression module",
+        "category": "test",
+        "command": [
+          "just",
+          "test",
+          "-p",
+          "codex-tui",
+          "chatwidget::rendering::tests"
+        ],
+        "wall_seconds": {
+          "stock": [3.7218685880070552, 3.390584258013405],
+          "ohm": [2.3957213279791176, 2.6153596650110558]
+        },
+        "tests_started": {
+          "stock": [5, 5],
+          "ohm": [5, 5]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Run the exact strict Clippy lint used during the original CI fix",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "--tests",
+          "-p",
+          "codex-tui",
+          "--",
+          "-D",
+          "clippy::redundant_closure_for_method_calls"
+        ],
+        "wall_seconds": {
+          "stock": [194.69744974200148, 205.9819084800547],
+          "ohm": [98.1458334029885, 100.39416683895979]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Validate the entire TUI package once",
+        "category": "test",
+        "command": [
+          "just",
+          "test",
+          "-p",
+          "codex-tui",
+          "-E",
+          "not (test(=chatwidget::tests::status_surface_previews::missing_project_root_uses_different_status_and_title_preview_sources) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::terminal_title_setup_popup_mixed_snapshot) | test(=chatwidget::tests::terminal_title::terminal_title_activity_indicators_do_not_animate_when_animations_are_disabled) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_blinks_when_animations_are_enabled) | test(=chatwidget::tests::terminal_title::terminal_title_shows_action_required_while_exec_approval_is_pending) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_respects_spinner_setting) | test(=app::tests::safety_buffering::safety_retry_preserves_a_committed_steer_from_the_interrupted_turn))"
+        ],
+        "wall_seconds": {
+          "stock": [29.815472816000693, 35.649504152010195],
+          "ohm": [31.718207826954313, 30.10634294094052]
+        },
+        "tests_started": {
+          "stock": [3439, 3439],
+          "ohm": [3439, 3439]
+        }
+      }
+    ]
+  },
+  "methodology": {
+    "headline_includes_source_edits": true,
+    "baseline_warmups_timed": false,
+    "compiler_accounting": "status",
+    "cargo_status_messages_prove_compiler_invocations": false,
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "matching_test_counts_by_project": {
+      "ruff": true,
+      "uv": true,
+      "codex": true
+    },
+    "codex_final_test_exclusions": [
+      "chatwidget::tests::status_surface_previews::missing_project_root_uses_different_status_and_title_preview_sources",
+      "chatwidget::tests::status_surface_previews::status_line_setup_popup_mixed_snapshot",
+      "chatwidget::tests::status_surface_previews::status_surface_preview_lines_mixed_snapshot",
+      "chatwidget::tests::status_surface_previews::status_surface_preview_lines_hardcoded_only_snapshot",
+      "chatwidget::tests::status_surface_previews::status_line_setup_popup_hardcoded_only_snapshot",
+      "chatwidget::tests::status_surface_previews::terminal_title_setup_popup_mixed_snapshot",
+      "chatwidget::tests::terminal_title::terminal_title_activity_indicators_do_not_animate_when_animations_are_disabled",
+      "chatwidget::tests::terminal_title::terminal_title_action_required_blinks_when_animations_are_enabled",
+      "chatwidget::tests::terminal_title::terminal_title_shows_action_required_while_exec_approval_is_pending",
+      "chatwidget::tests::terminal_title::terminal_title_action_required_respects_spinner_setting",
+      "app::tests::safety_buffering::safety_retry_preserves_a_committed_steer_from_the_interrupted_turn"
+    ],
+    "untimed_setup_before_warmup_by_project": {
+      "codex": true
+    },
+    "codex_final_nextest_inventory": {
+      "step_index": 14,
+      "selected_tests": 3439,
+      "inventory_sha256": "f7208b36d9d5d071bb753d2403ca5a79fb166b057df690411a36922f1786e1bf",
+      "matching_all_four_cells": true,
+      "cells": [
+        {
+          "toolchain": "stock",
+          "repetition": 0,
+          "raw_tests_started": 3439,
+          "flaky_tests": 0,
+          "nested_retry_stdout_count": 0,
+          "failed_retry_attempts": 0
+        },
+        {
+          "toolchain": "ohm",
+          "repetition": 0,
+          "raw_tests_started": 3439,
+          "flaky_tests": 0,
+          "nested_retry_stdout_count": 0,
+          "failed_retry_attempts": 0
+        },
+        {
+          "toolchain": "ohm",
+          "repetition": 1,
+          "raw_tests_started": 3439,
+          "flaky_tests": 0,
+          "nested_retry_stdout_count": 0,
+          "failed_retry_attempts": 0
+        },
+        {
+          "toolchain": "stock",
+          "repetition": 1,
+          "raw_tests_started": 3439,
+          "flaky_tests": 0,
+          "nested_retry_stdout_count": 0,
+          "failed_retry_attempts": 0
+        }
+      ]
+    },
+    "ruff_rust_1_98_clippy_allow": ["clippy::format_push_string"]
+  },
+  "provenance": {
+    "raw_results_sha256": "f21802d9adec5ecec60d7ddd2861494981c0da3e3b1ae40e01fea349fbe98f41",
+    "fixture_sha256": {
+      "ruff": "fb0af78dd9a6ea69ebcc6cada736f26a439067e1e26b8421e5a7259c7ce8cef1",
+      "uv": "255bad17342d05790e7c2bbd0da96e019a2e0750bafb36b2e5d8761012790904",
+      "codex": "3b314ac02dbfbfead461b48d5f684074d6921c5caa0a4e0824587a8a79e4cd0b"
+    },
+    "runner_sha256_by_study": {
+      "ruff": "66a9f2d201f9edc3067d56cf3d3a68c4d9bc2375cd3e62f38cac8fdb9e817ab3",
+      "uv": "66a9f2d201f9edc3067d56cf3d3a68c4d9bc2375cd3e62f38cac8fdb9e817ab3",
+      "codex": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+    },
+    "benchmark_module_sha256": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+    "evidence_sha256": "bacf1f6a46c6419b8d9da23e7fa3eb35ee67e7b3ac6f76b9c8d1ba250cf38278",
+    "final_receipt_sha256_by_study": {
+      "ruff": "810fd640db348eb8ecf931a2e331c888ae7f443d42cf0a12c25c7fc5d7e32ffc",
+      "uv": "a77b4d640f086f7ffbb4077e8f9ebae0e280f78ab6d81e47090b1d925146e7bd",
+      "codex": "aa7065df5e958fd4120218e49e5e3582009e78d4fa1a20bb88e795077544d6a5"
+    },
+    "raw_results_sha256_by_project": {
+      "ruff": "a9e7f6a8980f5ba99d1a99829dc25d49be9bc08ab5bdd2433fc50c42bd4c3e0e",
+      "uv": "adf4cc7d50ede2875eacecab213b340be76ca63958b81c80caf91df6f139bd7d",
+      "codex": "775ab71befb1a986c7f47a3e3fa5ac82305c264828a286ea778a77a62365bec0"
+    },
+    "codex_final_nextest_inventory": {
+      "supplement_sha256": "f13ec1f319ab1d67f460c696c72d8e27ad59c1dc7081261e8d06c9c5b1201ebd",
+      "attestor_sha256": "1001a8ce7ae5ab78f2e6bbe0fb48f70725b357dbe72a37439619d236fe6bfad6",
+      "transfer_receipt_sha256": "7edd3d73eac290ada24c18d80ae00e2318fed06c040d22a4df2dcbf932f0a4ee",
+      "remote_inventory_sha256": "ad4d3a22561ed150bda378d68c12cd3b471881e920f4c49f6cc0f27f71a50db3"
+    },
+    "setup_patches_by_project": {
+      "codex": [
+        {
+          "descriptor": {
+            "label": "Bound safety-retry goal accounting by elapsed wall time",
+            "patch": "patches/codex-safety-retry-goal-accounting.patch",
+            "sha256": "af822ae0a81f239b71e5b3c0d7f947ccce96fea032571d24f809a151af98af3a",
+            "paths": ["codex-rs/tui/src/app/tests/safety_buffering.rs"]
+          },
+          "files": {
+            "codex-rs/tui/src/app/tests/safety_buffering.rs": {
+              "before": {
+                "sha256": "3a71569b781197941a2492d202ef41082ec3840012d0c5a4bc5a060ad99161e5",
+                "mode": "100600"
+              },
+              "after": {
+                "sha256": "477211c6b77fca2f406407fc9796719faf0aac6292a8e2ce5481994b80105a26",
+                "mode": "100600"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "effective_fixture_sha256": {
+      "ruff": "7ee256b01d4cad37af2468e5562b133b0e99417240f56510be9cf940e4ee0479",
+      "uv": "255bad17342d05790e7c2bbd0da96e019a2e0750bafb36b2e5d8761012790904",
+      "codex": "67bdc1b05332f7bf45c58533d34183a63dcb5fde74e1119417c855a800693605"
+    },
+    "coordinator_revision": "d216416a231270d8d722222137874f059d32c1f4",
+    "release_archive_sha256": "4ce41108ce0b4166181706865b8d033675a063a4fd532e3de90431532cfdee4f",
+    "stock_source_revisions": {
+      "rustc": "88d9e12ae178fab0fb5cc050a94da85685d449ea",
+      "cargo": "797e8a9bca276c1c9f9f738d2a20f484fa4eea9d"
+    },
+    "release_source_revisions": {
+      "rust": {
+        "repository": "https://github.com/astral-sh/ohm-rust",
+        "revision": "e03456bd220c9c4b4b7d6f74d0a047cc708bc633"
+      },
+      "cargo": {
+        "repository": "https://github.com/astral-sh/ohm-cargo",
+        "revision": "dec98a3fe282e710dee7d89b9db4a91b4378c45a"
+      },
+      "clippy": {
+        "repository": "https://github.com/astral-sh/ohm-rust-clippy",
+        "revision": "ab5432c39736836fc2120c08c1d51b1f9fa061a0"
+      },
+      "rustfmt": {
+        "repository": "https://github.com/astral-sh/ohm-rustfmt",
+        "revision": "214f9b7ec9812bbe6235184c037c2387217dcc59"
+      }
+    }
+  }
+}

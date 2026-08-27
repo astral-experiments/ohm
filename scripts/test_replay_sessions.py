@@ -157,18 +157,113 @@ class FixtureValidationTests(ReplayTestCase):
             for key, value in current.environment.items():
                 self.assertEqual(environment[key], value)
 
-    def test_current_ruff_results_match_the_fixture_and_tables(self) -> None:
-        fixture = SCRIPTS / "session_replays" / "ruff.json"
+    def test_rust_1_98_ruff_fixtures_only_allow_the_new_clippy_lint(self) -> None:
+        for original_name, compatible_name in (
+            ("ruff.json", "ruff-rust-1.98.json"),
+            ("ruff-historical.json", "ruff-historical-rust-1.98.json"),
+        ):
+            with self.subTest(fixture=original_name):
+                original_path = SCRIPTS / "session_replays" / original_name
+                compatible_path = SCRIPTS / "session_replays" / compatible_name
+                expected = json.loads(original_path.read_text())
+                for step in expected["steps"]:
+                    if (
+                        step["kind"] == "command"
+                        and step["program"] == "cargo"
+                        and step["args"][0] == "clippy"
+                    ):
+                        step["args"].extend(["-A", "clippy::format_push_string"])
+
+                self.assertEqual(json.loads(compatible_path.read_text()), expected)
+                self.assertEqual(replay.load_scenario(compatible_path).project, "ruff")
+
+    def test_codex_fixture_preserves_published_command_and_reviewed_setup(self) -> None:
+        directory = SCRIPTS / "session_replays"
+        fixture = directory / "codex-stable-goal-accounting.json"
+        expected = json.loads((directory / "codex.json").read_text())
+        baseline = json.loads(
+            (directory / "release-1.98.0-1-baseline.json").read_text()
+        )
+        command = baseline["commands"]["codex"][-1]["command"]
+        expected["steps"][-1].update(program=command[0], args=command[1:])
+        descriptor = {
+            "label": "Bound safety-retry goal accounting by elapsed wall time",
+            "patch": "patches/codex-safety-retry-goal-accounting.patch",
+            "sha256": (
+                "af822ae0a81f239b71e5b3c0d7f947ccce96fea032571d24f809a151af98af3a"
+            ),
+            "paths": ["codex-rs/tui/src/app/tests/safety_buffering.rs"],
+        }
+        expected["setup_patches"] = [descriptor]
+
+        self.assertEqual(json.loads(fixture.read_text()), expected)
+        self.assertEqual(replay.load_scenario(fixture).project, "codex")
+        patch_path = directory / descriptor["patch"]
+        patch = patch_path.read_bytes()
+        self.assertEqual(hashlib.sha256(patch).hexdigest(), descriptor["sha256"])
+        self.assertEqual(replay.setup_patch_bytes(directory, descriptor), patch)
+        scope = replay.command_output(
+            ["git", "apply", "--numstat", str(patch_path)], cwd=self.directory
+        )
+        self.assertEqual(
+            [line.split("\t", 2)[2] for line in scope.splitlines()],
+            descriptor["paths"],
+        )
+
+    def test_historical_ruff_results_match_the_rust_1_98_fixture(self) -> None:
+        fixture = SCRIPTS / "session_replays" / "ruff-historical-rust-1.98.json"
+        published_fixture = SCRIPTS / "session_replays" / "ruff-historical.json"
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.97.1-20-ruff.json").read_text()
+            (
+                SCRIPTS / "session_replays" / "release-1.98.0-2-ruff-historical.json"
+            ).read_text()
         )
-        self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-20")
+
+        self.assertEqual(baseline["rust_version"], "1.98.0")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-2")
+        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
+        self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
+        self.assertEqual(
+            baseline["provenance"]["published_fixture_sha256"],
+            hashlib.sha256(published_fixture.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(
+            baseline["provenance"]["effective_fixture_sha256"]["ruff"],
+            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+        )
+        commands = baseline["commands"]["ruff"]
+        expected = [
+            (index, step)
+            for index, step in enumerate(scenario.steps, start=1)
+            if step["kind"] == "command"
+        ]
+        self.assertEqual(len(commands), len(expected))
+        for command, (index, step) in zip(commands, expected, strict=True):
+            self.assertEqual(command["index"], index)
+            self.assertEqual(command["command"], [step["program"], *step["args"]])
+
+    def test_current_ruff_results_match_the_fixture_and_tables(self) -> None:
+        fixture = SCRIPTS / "session_replays" / "ruff-rust-1.98.json"
+        published_fixture = SCRIPTS / "session_replays" / "ruff.json"
+        scenario = replay.load_scenario(fixture)
+        baseline = json.loads(
+            (SCRIPTS / "session_replays" / "release-1.98.0-2-ruff.json").read_text()
+        )
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-2")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(baseline["environment"], scenario.environment)
         self.assertEqual(
             baseline["provenance"]["published_fixture_sha256"],
+            hashlib.sha256(published_fixture.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(
+            baseline["provenance"]["effective_fixture_sha256"]["ruff"],
             hashlib.sha256(fixture.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(
+            baseline["methodology"]["ruff_rust_1_98_clippy_allow"],
+            ["clippy::format_push_string"],
         )
         self.assertEqual(baseline["sessions"][0]["session_id"], scenario.session["id"])
         self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
@@ -393,15 +488,10 @@ class FixtureValidationTests(ReplayTestCase):
                         )
 
     def test_readme_selected_session_table_matches_recorded_results(self) -> None:
-        historical = json.loads(
-            (
-                SCRIPTS / "session_replays" / "release-1.97.1-20-baseline.json"
-            ).read_text()
+        baseline = json.loads(
+            (SCRIPTS / "session_replays" / "release-1.98.0-2-baseline.json").read_text()
         )
-        current_ruff = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.97.1-20-ruff.json").read_text()
-        )
-        baselines = {"ruff": current_ruff, "uv": historical, "codex": historical}
+        baselines = {project: baseline for project in replay.PROJECTS}
         rows = [
             [cell.strip() for cell in line.strip("|").split("|")]
             for line in (SCRIPTS.parent / "README.md").read_text().splitlines()
@@ -963,7 +1053,7 @@ class ResumeTests(ReplayTestCase):
             "project": "ruff",
             "session_id": "real-session",
             "toolchain": label,
-            "selector": "1.97.1" if label == "stock" else "ohm",
+            "selector": "1.98.0" if label == "stock" else "ohm",
             "repetition": 0,
             "wall_seconds": 1.0,
         }
@@ -1095,7 +1185,7 @@ class ResumeTests(ReplayTestCase):
             with mock.patch.object(
                 resumed, "run_command", side_effect=result
             ) as command:
-                observed = resumed.run_session(scenario, "stock", "1.97.1", 0)
+                observed = resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         self.assertEqual(len(command.call_args_list), 2)
         self.assertEqual(command.call_args_list[0].kwargs["phase"], "warmup")
@@ -1223,7 +1313,7 @@ class ResumeTests(ReplayTestCase):
                     "tests_started": 1,
                 },
             ):
-                resumed.run_session(scenario, "stock", "1.97.1", 0)
+                resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         archive = initial.output / "interrupted" / "ruff" / "stock" / "0" / "0"
         self.assertEqual(
@@ -1244,7 +1334,7 @@ class ResumeTests(ReplayTestCase):
             resumed = self.runner("--resume")
         resumed.sources["ruff"] = source
         with self.assertRaisesRegex(replay.BenchmarkError, "already completed"):
-            resumed.run_session(scenario, "stock", "1.97.1", 0)
+            resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
 
@@ -1271,7 +1361,7 @@ class ResumeTests(ReplayTestCase):
                     "tests_started": 1,
                 },
             ):
-                resumed.run_session(scenario, "stock", "1.97.1", 0)
+                resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         archived = (
             initial.output
@@ -1303,7 +1393,7 @@ class ResumeTests(ReplayTestCase):
             resumed = self.runner("--resume")
         resumed.sources["ruff"] = source
         with self.assertRaisesRegex(replay.BenchmarkError, "owned artifact"):
-            resumed.run_session(scenario, "stock", "1.97.1", 0)
+            resumed.run_session(scenario, "stock", "1.98.0", 0)
 
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
         self.assertEqual(
@@ -1331,7 +1421,7 @@ class ResumeTests(ReplayTestCase):
         resumed.sources["ruff"] = source
 
         with self.assertRaisesRegex(replay.BenchmarkError, "exact base revision"):
-            resumed.run_session(scenario, "stock", "1.97.1", 0)
+            resumed.run_session(scenario, "stock", "1.98.0", 0)
         with self.assertRaisesRegex(replay.BenchmarkError, "different source"):
             resumed.run_session(scenario, "ohm", "ohm", 0)
 
@@ -1347,8 +1437,456 @@ class ResumeTests(ReplayTestCase):
 
         self.assertFalse(runner.options.resume)
         with self.assertRaisesRegex(replay.BenchmarkError, "already exists"):
-            runner.run_session(scenario, "stock", "1.97.1", 0)
+            runner.run_session(scenario, "stock", "1.98.0", 0)
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
+
+
+class SetupPatchTests(ReplayTestCase):
+    git = staticmethod(ResumeTests.git)
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.source, self.revision = ResumeTests.repository(self)
+        self.before = (self.source / "README.md").read_bytes()
+        self.after = b"session replay prepared\n"
+        (self.source / "README.md").write_bytes(self.after)
+        self.patch = (self.git(self.source, "diff", "--", "README.md") + "\n").encode()
+        (self.source / "README.md").write_bytes(self.before)
+        self.patch_file = self.directory / "setup.patch"
+        self.descriptor = self.write_patch(self.patch)
+        self.scenario(base_revision=self.revision, setup_patches=[self.descriptor])
+
+    def write_patch(self, patch: bytes, **changes: object) -> dict[str, object]:
+        self.patch_file.write_bytes(patch)
+        return {
+            "label": "Prepare deterministic test timing",
+            "patch": "setup.patch",
+            "sha256": hashlib.sha256(patch).hexdigest(),
+            "paths": ["README.md"],
+            **changes,
+        }
+
+    @staticmethod
+    def command_result() -> dict[str, object]:
+        return {
+            "kind": "command",
+            "wall_seconds": 0.01,
+            "cargo_reported_crates": [],
+            "actual_compiler_invocations": None,
+            "tests_started": 1,
+        }
+
+    def complete_cells(self) -> object:
+        runner = self.runner()
+        runner.sources["ruff"] = self.source
+        with (
+            mock.patch.object(
+                runner,
+                "run_command",
+                side_effect=lambda *args, **kwargs: self.command_result(),
+            ),
+            mock.patch("builtins.print"),
+        ):
+            for label, selector in runner.toolchains:
+                runner.run_session(runner.scenarios[0], label, selector, 0)
+        return runner
+
+    def test_setup_descriptors_require_exact_hashes_and_canonical_paths(self) -> None:
+        invalid = [
+            None,
+            {},
+            [None],
+            [{**self.descriptor, "label": " "}],
+            [{**self.descriptor, "sha256": "A" * 64}],
+            [{**self.descriptor, "sha256": "0" * 64}],
+            [{key: value for key, value in self.descriptor.items() if key != "sha256"}],
+            [{**self.descriptor, "unexpected": True}],
+            [self.descriptor, self.descriptor],
+        ]
+        for paths in (
+            [],
+            "README.md",
+            [None],
+            ["README.md", "README.md"],
+            ["."],
+            ["./README.md"],
+            ["../README.md"],
+            ["/README.md"],
+            ["a//README.md"],
+            ["a/../README.md"],
+        ):
+            invalid.append([{**self.descriptor, "paths": paths}])
+        for patch in (
+            "../setup.patch",
+            "./setup.patch",
+            "/setup.patch",
+            "missing.patch",
+            ".",
+        ):
+            invalid.append([{**self.descriptor, "patch": patch}])
+        for descriptors in invalid:
+            with self.subTest(descriptors=descriptors):
+                with self.assertRaises(replay.BenchmarkError):
+                    self.scenario(setup_patches=descriptors)
+
+        empty = self.write_patch(b"")
+        with self.assertRaisesRegex(replay.BenchmarkError, "empty"):
+            self.scenario(setup_patches=[empty])
+
+    def test_setup_patch_inputs_reject_symlink_files_and_directories(self) -> None:
+        (self.directory / "linked.patch").symlink_to(self.patch_file)
+        (self.directory / "linked-directory").symlink_to(
+            self.directory, target_is_directory=True
+        )
+        for patch in ("linked.patch", "linked-directory/setup.patch"):
+            with self.subTest(patch=patch):
+                with self.assertRaisesRegex(replay.BenchmarkError, "symlinks"):
+                    self.scenario(setup_patches=[{**self.descriptor, "patch": patch}])
+
+    def test_setup_rejects_undeclared_or_structural_edits_before_application(
+        self,
+    ) -> None:
+        patches = {
+            "undeclared file": self.patch
+            + self.patch.replace(b"README.md", b"other.txt"),
+            "missing declared file": self.patch,
+            "duplicate file": self.patch + self.patch,
+            "mode change": b"diff --git a/README.md b/README.md\nold mode 100644\nnew mode 100755\n",
+            "rename": b"diff --git a/README.md b/moved.md\nsimilarity index 100%\nrename from README.md\nrename to moved.md\n",
+            "addition": b"diff --git a/new.txt b/new.txt\nnew file mode 100644\n--- /dev/null\n+++ b/new.txt\n@@ -0,0 +1 @@\n+new\n",
+            "deletion": b"diff --git a/README.md b/README.md\ndeleted file mode 100644\n--- a/README.md\n+++ /dev/null\n@@ -1 +0,0 @@\n-session replay source\n",
+            "symlink": b"diff --git a/link b/link\nnew file mode 120000\n--- /dev/null\n+++ b/link\n@@ -0,0 +1 @@\n+README.md\n",
+            "empty content edit": b"diff --git a/README.md b/README.md\n--- a/README.md\n+++ b/README.md\n@@ -1 +1 @@\n session replay source\n",
+        }
+        (self.source / "README.md").write_bytes(b"\0binary\0\n")
+        patches["binary"] = (self.git(self.source, "diff", "--binary") + "\n").encode()
+        (self.source / "README.md").write_bytes(self.before)
+        worktree = ResumeTests.owned_worktree(self, self.source, self.revision)
+        for reason, patch in patches.items():
+            with self.subTest(reason=reason):
+                paths = (
+                    ["README.md", "missing.txt"]
+                    if reason == "missing declared file"
+                    else ["README.md"]
+                )
+                scenario = self.scenario(
+                    setup_patches=[self.write_patch(patch, paths=paths)]
+                )
+                with self.assertRaises(replay.BenchmarkError):
+                    self.runner().apply_setup_patches(scenario, worktree)
+                self.assertEqual((worktree / "README.md").read_bytes(), self.before)
+                self.assertEqual(self.git(worktree, "status", "--porcelain"), "")
+
+    def test_setup_requires_existing_regular_source_files_and_no_symlink_parents(
+        self,
+    ) -> None:
+        worktree = ResumeTests.owned_worktree(self, self.source, self.revision)
+        scenario = self.scenario()
+        runner = self.runner()
+        source_file = worktree / "README.md"
+        source_file.unlink()
+        with self.assertRaisesRegex(replay.BenchmarkError, "existing regular file"):
+            runner.apply_setup_patches(scenario, worktree)
+        source_file.mkdir()
+        with self.assertRaisesRegex(replay.BenchmarkError, "existing regular file"):
+            runner.apply_setup_patches(scenario, worktree)
+        source_file.rmdir()
+        source_file.symlink_to(self.source / "README.md")
+        with self.assertRaisesRegex(replay.BenchmarkError, "symlinks"):
+            runner.apply_setup_patches(scenario, worktree)
+        (worktree / "linked").symlink_to(self.source, target_is_directory=True)
+        nested = self.write_patch(
+            self.patch.replace(b"README.md", b"linked/README.md"),
+            paths=["linked/README.md"],
+        )
+        with self.assertRaisesRegex(replay.BenchmarkError, "symlinks"):
+            runner.apply_setup_patches(self.scenario(setup_patches=[nested]), worktree)
+        self.assertEqual((self.source / "README.md").read_bytes(), self.before)
+
+    def test_setup_is_identical_in_all_four_cells_and_outside_every_timed_metric(
+        self,
+    ) -> None:
+        runner = self.runner("--repetitions", "2")
+        clock = 0.0
+        phases = []
+        apply_patch = runner.apply_patch
+
+        def prepare(*args: object) -> float:
+            nonlocal clock
+            result = apply_patch(*args)
+            clock += 100.0
+            return result
+
+        def command(
+            scenario: object, worktree: Path, *args: object, phase: str = "step"
+        ) -> dict[str, object]:
+            nonlocal clock
+            self.assertEqual((worktree / "README.md").read_bytes(), self.after)
+            phases.append(phase)
+            duration = 50.0 if phase == "warmup" else 3.0
+            clock += duration
+            return {**self.command_result(), "wall_seconds": duration}
+
+        with (
+            mock.patch.object(runner, "check_disk"),
+            mock.patch.object(runner, "prepare_source", return_value=self.source),
+            mock.patch.object(runner, "apply_patch", side_effect=prepare),
+            mock.patch.object(runner, "run_command", side_effect=command),
+            mock.patch.object(replay.time, "perf_counter", side_effect=lambda: clock),
+            mock.patch("builtins.print"),
+        ):
+            runner.run()
+        self.assertEqual(phases, ["warmup", "step"] * 4)
+        self.assertEqual(
+            [(sample["toolchain"], sample["repetition"]) for sample in runner.samples],
+            [("stock", 0), ("ohm", 0), ("ohm", 1), ("stock", 1)],
+        )
+        for sample in runner.samples:
+            self.assertEqual(sample["wall_seconds"], 3.0)
+            self.assertEqual(sample["command_seconds"], 3.0)
+            self.assertEqual(sample["edit_seconds"], 0)
+            self.assertEqual(sample["warmup_seconds"], 50.0)
+            self.assertEqual(len(sample["steps"]), 1)
+            self.assertEqual(
+                sample["setup_patches"], runner.samples[0]["setup_patches"]
+            )
+            proof = sample["setup_patches"][0]
+            self.assertEqual(proof["descriptor"], self.descriptor)
+            self.assertEqual(
+                proof["files"]["README.md"],
+                {
+                    "before": {
+                        "sha256": hashlib.sha256(self.before).hexdigest(),
+                        "mode": "100644",
+                    },
+                    "after": {
+                        "sha256": hashlib.sha256(self.after).hexdigest(),
+                        "mode": "100644",
+                    },
+                },
+            )
+        self.assertEqual((self.source / "README.md").read_bytes(), self.before)
+        data = json.loads((runner.output / "results.json").read_text())
+        self.assertEqual(data["sessions"][0]["setup_patches"], [self.descriptor])
+        self.assertEqual(
+            (
+                data["sessions"][0]["commands"],
+                data["sessions"][0]["edits"],
+                data["sessions"][0]["warmups"],
+            ),
+            (1, 0, 1),
+        )
+
+    def test_setup_applies_even_when_warmups_are_disabled(self) -> None:
+        runner = self.runner("--no-warmup")
+        runner.sources["ruff"] = self.source
+        with (
+            mock.patch.object(
+                runner,
+                "run_command",
+                side_effect=lambda *args, **kwargs: self.command_result(),
+            ) as command,
+            mock.patch("builtins.print"),
+        ):
+            sample = runner.run_session(runner.scenarios[0], "stock", "1.98.0", 0)
+        self.assertEqual(command.call_count, 1)
+        self.assertEqual(sample["warmup_steps"], [])
+        self.assertEqual(
+            (Path(sample["worktree"]) / "README.md").read_bytes(), self.after
+        )
+        with self.assertRaisesRegex(replay.BenchmarkError, "different warmups"):
+            self.runner("--resume")
+
+    def test_setup_rehashes_before_apply_and_dry_run(self) -> None:
+        runner = self.runner()
+        runner.sources["ruff"] = self.source
+        self.patch_file.write_bytes(self.patch + b"tampered\n")
+        with mock.patch.object(runner, "run_command") as command:
+            with self.assertRaisesRegex(replay.BenchmarkError, "SHA-256"):
+                runner.run_session(runner.scenarios[0], "stock", "1.98.0", 0)
+        command.assert_not_called()
+        self.assertEqual(runner.samples, [])
+        worktree = runner.output / "worktrees" / "ruff" / "stock" / "0"
+        self.assertEqual((worktree / "README.md").read_bytes(), self.before)
+
+        self.patch_file.write_bytes(self.patch)
+        dry_run = self.runner("--dry-run")
+        self.patch_file.write_bytes(b"changed after load")
+        with (
+            mock.patch.object(dry_run, "check_disk"),
+            mock.patch.object(dry_run, "prepare_source", return_value=self.source),
+            mock.patch.object(dry_run, "run_session") as session,
+        ):
+            with self.assertRaisesRegex(replay.BenchmarkError, "SHA-256"):
+                dry_run.run()
+        session.assert_not_called()
+
+    def test_setup_check_and_apply_use_the_same_authenticated_bytes(self) -> None:
+        runner = self.runner()
+        worktree = ResumeTests.owned_worktree(self, self.source, self.revision)
+        run = replay.subprocess.run
+        inputs = []
+
+        def capture(arguments: list[str], **kwargs: object) -> object:
+            if arguments in (["git", "apply", "--check", "-"], ["git", "apply", "-"]):
+                inputs.append(kwargs["input"])
+                self.patch_file.write_bytes(b"changed after verification")
+            return run(arguments, **kwargs)
+
+        with mock.patch.object(replay.subprocess, "run", side_effect=capture):
+            runner.apply_setup_patches(runner.scenarios[0], worktree)
+        self.assertEqual(inputs, [self.patch, self.patch])
+        self.assertIs(inputs[0], inputs[1])
+        self.assertEqual((worktree / "README.md").read_bytes(), self.after)
+
+    def test_setup_context_failure_does_not_apply_or_run_commands(self) -> None:
+        runner = self.runner()
+        worktree = ResumeTests.owned_worktree(self, self.source, self.revision)
+        (worktree / "README.md").write_bytes(b"unexpected concurrent content\n")
+        with self.assertRaisesRegex(replay.BenchmarkError, "does not apply cleanly"):
+            runner.apply_setup_patches(runner.scenarios[0], worktree)
+        self.assertEqual(
+            (worktree / "README.md").read_bytes(), b"unexpected concurrent content\n"
+        )
+        self.assertEqual(runner.samples, [])
+
+    def test_resume_binds_descriptors_and_complete_matching_file_proofs(self) -> None:
+        runner = self.complete_cells()
+        destination = runner.output / "results.json"
+        baseline = json.loads(destination.read_text())
+        with mock.patch("builtins.print"):
+            resumed = self.runner("--resume")
+        self.assertEqual(resumed.samples, runner.samples)
+
+        mutations = {
+            "missing descriptors": lambda data: data["sessions"][0].pop(
+                "setup_patches"
+            ),
+            "changed descriptors": lambda data: data["sessions"][0]["setup_patches"][
+                0
+            ].update(label="changed"),
+            "missing warmup mode": lambda data: data["sessions"][0].pop(
+                "warmup_enabled"
+            ),
+            "missing proof": lambda data: data["samples"][0].pop("setup_patches"),
+            "wrong proof descriptor": lambda data: data["samples"][0]["setup_patches"][
+                0
+            ]["descriptor"].update(sha256="0" * 64),
+            "missing file": lambda data: data["samples"][0]["setup_patches"][0][
+                "files"
+            ].clear(),
+            "invalid digest": lambda data: data["samples"][0]["setup_patches"][0][
+                "files"
+            ]["README.md"]["after"].update(sha256=True),
+            "wrong mode": lambda data: data["samples"][0]["setup_patches"][0]["files"][
+                "README.md"
+            ]["after"].update(mode="120000"),
+            "changed mode": lambda data: data["samples"][0]["setup_patches"][0][
+                "files"
+            ]["README.md"]["after"].update(mode="100755"),
+            "different cell": lambda data: data["samples"][1]["setup_patches"][0][
+                "files"
+            ]["README.md"]["after"].update(sha256="0" * 64),
+        }
+        for reason, mutate in mutations.items():
+            with self.subTest(reason=reason):
+                data = json.loads(json.dumps(baseline))
+                mutate(data)
+                destination.write_text(json.dumps(data))
+                with self.assertRaises(replay.BenchmarkError):
+                    self.runner("--resume")
+        destination.write_text(json.dumps(baseline))
+        self.scenario(setup_patches=[])
+        with self.assertRaisesRegex(replay.BenchmarkError, "different setup patches"):
+            self.runner("--resume")
+
+    def test_new_cell_must_match_completed_preparation_before_warmup(self) -> None:
+        runner = self.complete_cells()
+        runner.options.repetitions = 2
+        runner.sources["ruff"] = self.source
+        runner.samples[0]["setup_patches"][0]["files"]["README.md"]["after"][
+            "sha256"
+        ] = "0" * 64
+        with mock.patch.object(runner, "run_command") as command:
+            with self.assertRaisesRegex(
+                replay.BenchmarkError, "different setup patch proofs"
+            ):
+                runner.run_session(runner.scenarios[0], "stock", "1.98.0", 1)
+        command.assert_not_called()
+
+    def test_ordered_overlapping_setup_patches_require_a_consistent_hash_chain(
+        self,
+    ) -> None:
+        second_patch = self.patch.replace(
+            self.before.strip(), self.after.strip()
+        ).replace(b"+session replay prepared", b"+session replay prepared twice")
+        (self.directory / "second.patch").write_bytes(second_patch)
+        second = {
+            **self.descriptor,
+            "label": "Second setup",
+            "patch": "second.patch",
+            "sha256": hashlib.sha256(second_patch).hexdigest(),
+        }
+        self.scenario(setup_patches=[self.descriptor, second])
+        runner = self.complete_cells()
+        proof = runner.samples[0]["setup_patches"]
+        self.assertEqual(
+            proof[0]["files"]["README.md"]["after"],
+            proof[1]["files"]["README.md"]["before"],
+        )
+        with mock.patch("builtins.print"):
+            self.runner("--resume")
+        data = json.loads((runner.output / "results.json").read_text())
+        data["samples"][0]["setup_patches"][1]["files"]["README.md"]["before"][
+            "sha256"
+        ] = "0" * 64
+        (runner.output / "results.json").write_text(json.dumps(data))
+        with self.assertRaisesRegex(
+            replay.BenchmarkError, "inconsistent setup file proofs"
+        ):
+            self.runner("--resume")
+        runner.persist()
+        self.scenario(setup_patches=[second, self.descriptor])
+        with self.assertRaisesRegex(replay.BenchmarkError, "different setup patches"):
+            self.runner("--resume")
+
+    def test_resume_archives_partial_prepared_source_then_prepares_fresh_base(
+        self,
+    ) -> None:
+        runner = self.runner()
+        runner.persist()
+        worktree = ResumeTests.owned_worktree(self, self.source, self.revision)
+        runner.apply_setup_patches(runner.scenarios[0], worktree)
+        (worktree / "README.md").write_bytes(self.after + b"interrupted edit\n")
+        resumed = self.runner("--resume")
+        resumed.sources["ruff"] = self.source
+        with (
+            mock.patch.object(
+                resumed,
+                "run_command",
+                side_effect=lambda *args, **kwargs: self.command_result(),
+            ),
+            mock.patch("builtins.print"),
+        ):
+            sample = resumed.run_session(resumed.scenarios[0], "stock", "1.98.0", 0)
+        archived = list((runner.output / "interrupted").rglob("README.md"))
+        self.assertEqual(len(archived), 1)
+        self.assertEqual(archived[0].read_bytes(), self.after + b"interrupted edit\n")
+        self.assertEqual(
+            (Path(sample["worktree"]) / "README.md").read_bytes(), self.after
+        )
+
+    def test_no_setup_preserves_legacy_result_shape(self) -> None:
+        self.scenario(setup_patches=[])
+        runner = self.complete_cells()
+        data = json.loads((runner.output / "results.json").read_text())
+        self.assertNotIn("setup_patches", data["sessions"][0])
+        self.assertNotIn("warmup_enabled", data["sessions"][0])
+        self.assertTrue(
+            all("setup_patches" not in sample for sample in data["samples"])
+        )
+        with mock.patch("builtins.print"):
+            self.runner("--resume")
 
 
 class SourceAndPatchSafetyTests(ReplayTestCase):
