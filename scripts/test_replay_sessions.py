@@ -216,12 +216,12 @@ class FixtureValidationTests(ReplayTestCase):
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
             (
-                SCRIPTS / "session_replays" / "release-1.98.0-2-ruff-historical.json"
+                SCRIPTS / "session_replays" / "release-1.98.0-3-ruff-historical.json"
             ).read_text()
         )
 
         self.assertEqual(baseline["rust_version"], "1.98.0")
-        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-2")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-3")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
@@ -248,9 +248,9 @@ class FixtureValidationTests(ReplayTestCase):
         published_fixture = SCRIPTS / "session_replays" / "ruff.json"
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.98.0-2-ruff.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.98.0-3-ruff.json").read_text()
         )
-        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-2")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-3")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(baseline["environment"], scenario.environment)
         self.assertEqual(
@@ -294,15 +294,21 @@ class FixtureValidationTests(ReplayTestCase):
                     baseline["timed_command_seconds"]["ruff"][toolchain][repetition],
                 )
 
-        def rows(document: Path) -> list[list[str]]:
+        def rows(document: Path, section: str | None = None) -> list[list[str]]:
+            text = document.read_text()
+            if section is not None:
+                text = text.split(f"### {section}\n", 1)[1].split("\n### ", 1)[0]
             return [
                 [cell.strip() for cell in line.strip("|").split("|")]
-                for line in document.read_text().splitlines()
+                for line in text.splitlines()
                 if line.startswith("|")
             ]
 
         main_rows = rows(SCRIPTS.parent / "README.md")
-        detailed_rows = rows(SCRIPTS / "session_replays" / "README.md")
+        detailed_rows = rows(
+            SCRIPTS / "session_replays" / "README.md",
+            "Rust 1.98.0 revision 3 measurements",
+        )
 
         def assert_row(
             table: list[list[str]], label: str, stock: float, ohm: float
@@ -489,7 +495,7 @@ class FixtureValidationTests(ReplayTestCase):
 
     def test_readme_selected_session_table_matches_recorded_results(self) -> None:
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.98.0-2-baseline.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.98.0-3-baseline.json").read_text()
         )
         baselines = {project: baseline for project in replay.PROJECTS}
         rows = [
@@ -498,6 +504,9 @@ class FixtureValidationTests(ReplayTestCase):
             if line.startswith("|")
         ]
         self.assertEqual(sum(row[0] == "Ruff session" for row in rows), 1)
+        self.assertIn(
+            ["Scope", "Rust 1.98.0", "Ohm 1.98.0-3", "Time saved", "Reduction"], rows
+        )
 
         def assert_row(label: str, stock: float, ohm: float) -> None:
             saved = stock - ohm
