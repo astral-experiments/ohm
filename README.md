@@ -90,11 +90,18 @@ changed module in isolation, just that module. Set `OHM_INCREMENTAL_FMT=0` to di
 formatting.
 
 To share immutable registry artifacts across worktrees, configure the same separate build directory
-for each checkout:
+for each checkout, while keeping each checkout's target directory distinct:
 
 ```console
+CARGO_TARGET_DIR=/path/to/this-worktree-target \
 CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
 ```
+
+Sharing avoids duplicating eligible dependency artifacts in each worktree. Rough
+[disk-space estimates](./BENCHMARKS.md#cross-worktree-disk-space-estimates) for Ohm 1.98.0-3 on Apple
+Silicon macOS range from hundreds of MiB to a few GiB per additional worktree. These assume a warm
+shared cache and the trust settings documented there; workspace artifacts, incremental state, and
+final binaries remain private.
 
 To compile only one exact library test, enable experimental focused test compilation:
 

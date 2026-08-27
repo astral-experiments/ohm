@@ -1,6 +1,6 @@
 # Benchmarks
 
-These benchmarks compare stock Rust 1.98.0 with `ohm-1.98.0-2` across the
+The timing benchmarks compare stock Rust 1.98.0 with `ohm-1.98.0-2` across the
 [uv](https://github.com/astral-sh/uv) and [Codex](https://github.com/openai/codex) codebases.
 The main uv and Codex tables below come from one fresh Linux devbox study.
 The separately dated earlier Linux uv study is retained in the historical appendix.
@@ -127,6 +127,37 @@ eight build jobs as the 192 completed core samples.
 
 Together these workflows add 24 matched samples to the completed 192-sample core matrix, for a
 full-study total of 216 successful samples.
+
+## Cross-worktree disk-space estimates
+
+The following estimates, collected on August 27, 2026, describe duplicate dependency storage
+avoided with `ohm-1.98.0-3` on Apple Silicon macOS. They apply to each **additional worktree** after
+the shared cache is warm, compared with keeping separate copies of those dependency artifacts.
+They are not measurements of Ohm's total disk usage relative to stock Rust.
+
+| Workspace | Check-only worktree | Build/test-heavy worktree |
+| --------- | ------------------: | ------------------------: |
+| uv        |            ~0.5 GiB |                   2–3 GiB |
+| Ruff      |            ~0.5 GiB |                 0.5–1 GiB |
+| Codex     |  ~1.1 GiB (partial) |                   2–4 GiB |
+
+These are planning estimates from existing artifact inventories, not fresh paired clean builds.
+The check-only estimates use artifacts for `cargo check --workspace --all-targets`, with package
+versions, features, profiles, and compile modes matched to release 3's verified cache-placement
+decisions. The build/test ranges project from accumulated development artifacts built with earlier
+toolchains. The Codex check-only inventory is incomplete because an earlier V8 download failed.
+Allocated file sizes were counted once per hard-linked file; APFS shared clone extents were not
+measured.
+
+The estimates assume matching dependency versions, features, targets, profiles, and toolchains;
+a common `CARGO_BUILD_BUILD_DIR`; distinct per-worktree `CARGO_TARGET_DIR` paths; and both
+`CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` and `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all`.
+These trust opt-ins are potentially unsound and intended only for local development, not CI or
+releases.
+
+The shared cache is stored once, so five comparable worktrees would avoid roughly four times the
+duplicate dependency storage shown above. Workspace and Git dependency artifacts, incremental
+state, retained relink objects, and final binaries remain worktree-private.
 
 ## Reproducing the benchmarks
 
