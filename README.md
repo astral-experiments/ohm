@@ -4,13 +4,10 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
-incremental builds can be up to 33× faster, and replayed development sessions take around 40% less
-time.
+incremental builds can be up to 30× faster, and real-world development sessions see around a 40%
+speed-up.
 
 Benchmarking Ohm against stock Rust on replayed development sessions:
-
-These replays enable a shared build directory and the potentially unsound procedural-macro trust
-opt-in beyond packaged defaults; see the [session methodology](scripts/session_replays/README.md).
 
 | Scope                                      | Rust 1.98.0 | Ohm 1.98.0-3 | Time saved | Reduction |
 | ------------------------------------------ | ----------: | -----------: | ---------: | --------: |
