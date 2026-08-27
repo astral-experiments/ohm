@@ -122,6 +122,9 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
   separate shared path for worktrees using the same repository and Ohm toolchain.
 - Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` to maximize authenticated registry procedural-macro
   reuse across worktrees. This opt-in is potentially unsound; avoid it for CI, releases, etc.
+- Set `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all` to maximize reuse of authenticated registry build
+  scripts and native-tool helpers across worktrees. This opt-in is potentially unsound; avoid it for
+  CI, releases, etc.
 - Use `cargo +ohm -Zohm-defaults=no <command>` to disable Ohm's automatic experimental defaults. Use
   plain `cargo <command>` and the repository's normal toolchain for CI and production builds.
 ```
