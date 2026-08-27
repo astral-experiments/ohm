@@ -7,6 +7,9 @@ An experimental fork of the Rust toolchain, designed for extremely fast local de
 incremental builds can be up to 30× faster, and real-world development sessions see around a 40%
 speed-up.
 
+With a [shared build directory](#usage), Ohm shares immutable dependency artifacts across projects,
+which can save multiple gigabytes per worktree.
+
 Benchmarking Ohm against stock Rust on replayed development sessions:
 
 | Scope                                      | Rust 1.98.0 | Ohm 1.98.0-3 | Time saved | Reduction |
