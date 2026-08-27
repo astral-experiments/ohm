@@ -89,8 +89,8 @@ cargo +ohm -Zohm-defaults=no test
 changed module in isolation, just that module. Set `OHM_INCREMENTAL_FMT=0` to disable incremental
 formatting.
 
-To share immutable registry artifacts across worktrees, configure the same separate build directory
-for each checkout:
+To share immutable registry artifacts across projects and worktrees using the same Ohm toolchain,
+configure the same separate build directory for each checkout:
 
 ```console
 CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
@@ -119,7 +119,9 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
   `-Zthreads=8` when compiling. Do not inject these flags manually or through `RUSTFLAGS`; direct
   `rustc +ohm` does not receive Cargo's defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
-  separate shared path for worktrees using the same repository and Ohm toolchain.
+  separate shared path for all trusted local projects and worktrees using the same Ohm toolchain.
+  Keep the shared build directory separate from every worktree target directory, and do not delete
+  it when cleaning up an individual project or worktree.
 - Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` to maximize authenticated registry procedural-macro
   reuse across worktrees. This opt-in is potentially unsound; avoid it for CI, releases, etc.
 - Set `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all` to maximize reuse of authenticated registry build
