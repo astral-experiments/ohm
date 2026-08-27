@@ -1,14 +1,16 @@
 # Changes from upstream
 
-Ohm 1.98.0-2 extends profile-guided optimization to Cargo, rustdoc, Clippy, rustfmt, and incremental `cargo fmt`, and reuses unchanged monomorphization partitions in incremental development and test builds. Like revision 1, its source repositories use the exact upstream release sources, and changes are listed from each fork-specific CI foundation through the Rust 1.98 pull-request stack.
+Ohm 1.98.0-3 expands shared dependency reuse to checksum-authenticated crates.io packages fetched through HTTP(S) registry mirrors and avoids duplicate compilation for concurrent cache misses on registry libraries without dependencies. Its source repositories use the exact upstream Rust 1.98.0 release sources, and changes are listed from each fork-specific CI foundation through the selected pull-request stacks.
 
-Ohm Cargo enables the new partition reuse automatically for compatible compilers and eligible incremental workspace builds, including terminal test harnesses that skip public-API hashing. Explicit compiler overrides and the aggregate Ohm opt-out remain supported. Changed bodies still compile and run normally; no test bodies are omitted. The separate parallel query-cache promotion experiment is not included.
+Mirrored dependencies retain canonical crates.io identities, matching archive and lockfile checksums, and the existing procedural-macro and native-tool trust policies. Local and vendored replacements remain ineligible, and effective registry identities isolate artifacts fetched from different mirrors.
 
-Ohm Cargo also accepts compiler wrappers that successfully skip compilation without producing object files, as rustc-perf does while preparing PGO workloads. These invocations leave the relink cache invalid, while normal compilation and relink reuse remain enabled.
+Concurrent cache misses are rechecked after acquiring the exclusive unit lock. A completed artifact can be reused with its diagnostics instead of invoking rustc again; forced rebuilds and unsupported runtime inputs retain the normal compilation path. This avoids duplicate work without changing the existing lock lifetime.
 
-This release preserves the parallel compiler frontend, its bounded query-depth crash fix, audited procedural-macro reuse, and the existing Cargo and formatter optimizations. Changes already included upstream are omitted, and the compiler's Cargo gitlink selects the exact Cargo revision in the release manifest.
+An optional parsed-lockfile cache is available through `CARGO_EXPERIMENTAL_LOCKFILE_PARSE_CACHE=1`. It caches only the parsed representation of large lockfiles while still reading and locking the original file, validating its contents, and reconstructing the resolution against the current workspace. The experiment remains disabled by default because initial measurements did not demonstrate a meaningful end-to-end speedup.
 
-Published Rust 1.97.1 and Ohm 1.98.0-1 benchmark measurements, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
+This release preserves component profile-guided optimization, incremental monomorphization partition reuse, the parallel compiler frontend and its bounded query-depth crash fix, audited procedural-macro reuse, skipped-wrapper handling for PGO preparation, and the existing Cargo and formatter optimizations. The compiler's Cargo gitlink selects the exact Cargo revision in the release manifest. The separate parallel query-cache promotion experiment remains excluded.
+
+Published Rust 1.97.1 and Ohm 1.98.0-1 and 1.98.0-2 benchmark measurements, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
 
 ## ohm-rust
 
@@ -38,6 +40,7 @@ Published Rust 1.97.1 and Ohm 1.98.0-1 benchmark measurements, historical failur
 - [#67: Profile-optimize Cargo, rustdoc, Clippy, and rustfmt](https://github.com/astral-sh/ohm-rust/pull/67)
 - [#65: Reuse monomorphization partitions in incremental test builds](https://github.com/astral-sh/ohm-rust/pull/65)
 - [#69: Pin Cargo test defaults and skipped-wrapper repair](https://github.com/astral-sh/ohm-rust/pull/69)
+- [#70: Pin Cargo for Ohm 1.98.0-3](https://github.com/astral-sh/ohm-rust/pull/70)
 
 ## ohm-cargo
 
@@ -86,6 +89,9 @@ Published Rust 1.97.1 and Ohm 1.98.0-1 benchmark measurements, historical failur
 - [#91: Reuse built workspace dependencies during checks](https://github.com/astral-sh/ohm-cargo/pull/91)
 - [#93: Enable test-binary monomorphization reuse in Ohm defaults](https://github.com/astral-sh/ohm-cargo/pull/93)
 - [#94: Handle skipped compiler invocations in relink-only builds](https://github.com/astral-sh/ohm-cargo/pull/94)
+- [#99: Trust authenticated crates.io packages from registry mirrors](https://github.com/astral-sh/ohm-cargo/pull/99)
+- [#96: Coalesce concurrent misses for shared registry libraries](https://github.com/astral-sh/ohm-cargo/pull/96)
+- [#97: Experiment with caching parsed lockfiles](https://github.com/astral-sh/ohm-cargo/pull/97)
 
 ## ohm-rust-clippy
 

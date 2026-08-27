@@ -52,7 +52,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.98.0-2/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.98.0-3/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -75,7 +75,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.98.0-2 test` selects that specific installed revision.
+`cargo +ohm-1.98.0-3 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, parallel
 compiler frontends, and reuse of previously built registry and workspace dependencies by default.
@@ -220,7 +220,10 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Deduplicated authenticated compiler-driver validation across reused registry dependencies.
 - Shared immutable registry artifacts across worktrees with an explicitly configured build directory,
   including audited procedural-macro and runtime-dependency closures, dependency-scoped native-tool
-  isolation, standard native pthread linkage, and authenticated Linux LLVM tools.
+  isolation, standard native pthread linkage, authenticated Linux LLVM tools, and checksum-authenticated
+  crates.io packages fetched through HTTP(S) registry mirrors.
+- Coalesced concurrent cache misses for authenticated registry libraries without dependencies,
+  avoiding duplicate compilation when another Cargo invocation completes the same shared artifact.
 - Incremental workspace formatting that formats individual changed modules when rustfmt's
   authoritative module graph confirms their ownership and topology, with buffered incremental state,
   reused clean checks and configuration snapshots, batched independent leaf modules, and avoided
