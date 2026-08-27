@@ -150,7 +150,7 @@ Allocated file sizes were counted once per hard-linked file; APFS shared clone e
 measured.
 
 The estimates assume matching dependency versions, features, targets, profiles, and toolchains;
-a common `CARGO_BUILD_BUILD_DIR`; distinct per-worktree `CARGO_TARGET_DIR` paths; and both
+a common `CARGO_BUILD_BUILD_DIR`; separate target directories (Cargo's default for each workspace); and both
 `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` and `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all`.
 These trust opt-ins are potentially unsound and intended only for local development, not CI or
 releases.

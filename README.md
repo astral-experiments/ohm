@@ -90,10 +90,9 @@ changed module in isolation, just that module. Set `OHM_INCREMENTAL_FMT=0` to di
 formatting.
 
 To share immutable registry artifacts across worktrees, configure the same separate build directory
-for each checkout, while keeping each checkout's target directory distinct:
+for each checkout:
 
 ```console
-CARGO_TARGET_DIR=/path/to/this-worktree-target \
 CARGO_BUILD_BUILD_DIR=/path/to/shared-build cargo +ohm build
 ```
 
