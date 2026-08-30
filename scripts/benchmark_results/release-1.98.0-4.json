@@ -1,0 +1,4392 @@
+{
+  "rust_version": "1.98.0",
+  "ohm_release": "ohm-1.98.0-4",
+  "jobs": 8,
+  "started_at": "2026-08-30T19:42:54.837794+00:00",
+  "finished_at": "2026-08-30T20:57:34.358647+00:00",
+  "repetitions": {
+    "cold": 1,
+    "noop": 3,
+    "dependency": 7,
+    "direct": 5
+  },
+  "repositories": {
+    "uv": {
+      "url": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    },
+    "codex": {
+      "url": "https://github.com/openai/codex.git",
+      "revision": "5157493c23713ac12034cf250ffb0a8ce0670277"
+    }
+  },
+  "valid_samples": 216,
+  "discarded_samples": 0,
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": true,
+    "summary_statistic": "median per compiler and workflow phase",
+    "single_sample_cases": ["cold", "build-check", "shared-build"],
+    "ohm_proc_macro_trust_override": false,
+    "ohm_native_tool_trust_override": false,
+    "shared_build_scope": "shared-worktree feature workflow only"
+  },
+  "comparisons": [
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "cold",
+      "stock_seconds": 66.00942938867956,
+      "ohm_seconds": 61.387900290079415,
+      "speedup": 1.0752840393100562,
+      "samples": 1
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "noop",
+      "stock_seconds": 0.5608779909089208,
+      "ohm_seconds": 0.39689543284475803,
+      "speedup": 1.4131631268437976,
+      "samples": 3
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "stock_seconds": 10.26871984731406,
+      "ohm_seconds": 0.5744191557168961,
+      "speedup": 17.8767016126026,
+      "samples": 7
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "stock_seconds": 2.207906357012689,
+      "ohm_seconds": 2.0358327561989427,
+      "speedup": 1.0845224639842328,
+      "samples": 5
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "cold",
+      "stock_seconds": 68.81836066581309,
+      "ohm_seconds": 61.88914115447551,
+      "speedup": 1.111961797854687,
+      "samples": 1
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "noop",
+      "stock_seconds": 0.59614054299891,
+      "ohm_seconds": 0.4439034294337034,
+      "speedup": 1.3429509741779164,
+      "samples": 3
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "stock_seconds": 14.347224546596408,
+      "ohm_seconds": 0.6373420683667064,
+      "speedup": 22.511027058614733,
+      "samples": 7
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "stock_seconds": 3.3939403258264065,
+      "ohm_seconds": 2.960105350241065,
+      "speedup": 1.146560653846327,
+      "samples": 5
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "cold",
+      "stock_seconds": 131.06398498639464,
+      "ohm_seconds": 123.0545848114416,
+      "speedup": 1.0650881898242635,
+      "samples": 1
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "noop",
+      "stock_seconds": 1.3141863644123077,
+      "ohm_seconds": 1.1526262136176229,
+      "speedup": 1.140166993328751,
+      "samples": 3
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "stock_seconds": 20.42166165728122,
+      "ohm_seconds": 4.106154076755047,
+      "speedup": 4.973427999910749,
+      "samples": 7
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "stock_seconds": 17.903575034812093,
+      "ohm_seconds": 10.84602639451623,
+      "speedup": 1.6507036202552643,
+      "samples": 5
+    },
+    {
+      "project": "uv",
+      "workflow": "build-check",
+      "phase": "transition",
+      "stock_seconds": 63.75724242348224,
+      "ohm_seconds": 17.95546161569655,
+      "speedup": 3.5508550984702096,
+      "samples": 1
+    },
+    {
+      "project": "uv",
+      "workflow": "shared-build",
+      "phase": "reuse",
+      "stock_seconds": 6.881912229582667,
+      "ohm_seconds": 0.4872661745175719,
+      "speedup": 14.123517267325704,
+      "samples": 1
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "cold",
+      "stock_seconds": 112.10358967538923,
+      "ohm_seconds": 94.26006353832781,
+      "speedup": 1.189301019617984,
+      "samples": 1
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "noop",
+      "stock_seconds": 1.147341494448483,
+      "ohm_seconds": 0.8182220216840506,
+      "speedup": 1.4022373683942708,
+      "samples": 3
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "stock_seconds": 17.56509675178677,
+      "ohm_seconds": 1.000120165757835,
+      "speedup": 17.56298628223032,
+      "samples": 7
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "stock_seconds": 4.4402956906706095,
+      "ohm_seconds": 3.8946169586852193,
+      "speedup": 1.1401110141957593,
+      "samples": 5
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "cold",
+      "stock_seconds": 170.0743392277509,
+      "ohm_seconds": 122.93791454844177,
+      "speedup": 1.3834164980953516,
+      "samples": 1
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "noop",
+      "stock_seconds": 1.2834959933534265,
+      "ohm_seconds": 0.9410442681983113,
+      "speedup": 1.3639060740583018,
+      "samples": 3
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "stock_seconds": 38.70385883003473,
+      "ohm_seconds": 1.1814985135570168,
+      "speedup": 32.7582797489207,
+      "samples": 7
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "stock_seconds": 18.838376488536596,
+      "ohm_seconds": 14.278310464695096,
+      "speedup": 1.3193701408242124,
+      "samples": 5
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "cold",
+      "stock_seconds": 227.15469087753445,
+      "ohm_seconds": 194.02351523656398,
+      "speedup": 1.1707585577994253,
+      "samples": 1
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "noop",
+      "stock_seconds": 2.5022193547338247,
+      "ohm_seconds": 1.8955796277150512,
+      "speedup": 1.3200286171834537,
+      "samples": 3
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "stock_seconds": 45.54104065243155,
+      "ohm_seconds": 7.091351879760623,
+      "speedup": 6.422053428544409,
+      "samples": 7
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "stock_seconds": 26.046161795966327,
+      "ohm_seconds": 23.456096154637635,
+      "speedup": 1.1104218546962512,
+      "samples": 5
+    },
+    {
+      "project": "codex-core",
+      "workflow": "build-check",
+      "phase": "transition",
+      "stock_seconds": 104.50278982892632,
+      "ohm_seconds": 46.77137176133692,
+      "speedup": 2.2343323681456035,
+      "samples": 1
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "noop",
+      "stock_seconds": 11.084635429084301,
+      "ohm_seconds": 0.32341408263891935,
+      "speedup": 34.273818068274764,
+      "samples": 3
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "stock_seconds": 11.038721526041627,
+      "ohm_seconds": 0.5247622337192297,
+      "speedup": 21.035663042679662,
+      "samples": 5
+    },
+    {
+      "project": "codex-core",
+      "workflow": "shared-build",
+      "phase": "reuse",
+      "stock_seconds": 2.8263700241222978,
+      "ohm_seconds": 0.6049814857542515,
+      "speedup": 4.67182895787061,
+      "samples": 1
+    }
+  ],
+  "samples": [
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "cold",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 66.00942938867956,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "cold",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 61.387900290079415,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 0.5580682894214988,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.4023483181372285,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 0.3911766540259123,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 0.5640020640566945,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 0.5608779909089208,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.39689543284475803,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 10.224521324038506,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.5761011270806193,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 0.5744191557168961,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 10.255911004729569,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 10.335996620357037,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.575778846628964,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 0.5761828226968646,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 10.26871984731406,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 10.3013257374987,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 0.5727826859802008,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 5,
+      "wall_seconds": 0.5720507437363267,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 5,
+      "wall_seconds": 10.265731512568891,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 6,
+      "wall_seconds": 10.308435978367925,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 6,
+      "wall_seconds": 0.573666675016284,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 2.2095775697380304,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 2.0358327561989427,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 2.0387313002720475,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 2.186200917698443,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 2.19141807500273,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 2.012288481928408,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 2.0171850360929966,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 2.2126809619367123,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 2.207906357012689,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 2.0418091379106045,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "cold",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 61.88914115447551,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "cold",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 68.81836066581309,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.4451681971549988,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 0.59614054299891,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 0.593809743411839,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 0.43907855823636055,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.4439034294337034,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 0.6039301892742515,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 14.252526109106839,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.6340414062142372,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 0.6373420683667064,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 14.372706349939108,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 14.297093107365072,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.6402855403721333,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 0.638095642440021,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 14.373849644325674,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 14.433423872105777,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 0.635537751019001,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 5,
+      "wall_seconds": 0.6322732921689749,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 5,
+      "wall_seconds": 14.347224546596408,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 6,
+      "wall_seconds": 14.330520313233137,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 6,
+      "wall_seconds": 0.6383942253887653,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 3.3939403258264065,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 2.902327054180205,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 2.966283910907805,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 3.3921614913269877,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 3.414072376675904,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 2.960105350241065,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 2.969540888443589,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 3.413574682548642,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 3.385090579278767,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 2.9270376982167363,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "clippy",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "cold",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 131.06398498639464,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "cold",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 123.0545848114416,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 1.3090256350114942,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 1.0748170083388686,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 1.1529611265286803,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 1.3141863644123077,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 1.3351684734225273,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 1.1526262136176229,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 20.932302058674395,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 4.134172227233648,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 3.977687501348555,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 20.763491903431714,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 20.58458188083023,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 4.05605529807508,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 4.137282659299672,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 20.32096526492387,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 20.294042623601854,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 4.05188849568367,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 5,
+      "wall_seconds": 4.161915101110935,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 5,
+      "wall_seconds": 20.42166165728122,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 6,
+      "wall_seconds": 20.259036295115948,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 6,
+      "wall_seconds": 4.106154076755047,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 18.347067007794976,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 10.84602639451623,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 10.988334799185395,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 17.956888953223825,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 17.903575034812093,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 10.866942649707198,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 10.580391675233841,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 17.842581779696047,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 17.598684949800372,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 10.556236170232296,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "it",
+        "--locked",
+        "--offline",
+        "help::help",
+        "--",
+        "--exact"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "cold",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 94.26006353832781,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "cold",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 112.10358967538923,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.8182220216840506,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 1.1631944058462977,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 1.147341494448483,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 0.8108475999906659,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.8187364339828491,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 1.1299401745200157,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 17.50329766329378,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.9981115069240332,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 1.0073856599628925,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 17.63101244159043,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 17.559318719431758,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.9986291415989399,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 1.0057734195142984,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 17.61287617404014,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 17.517607278190553,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 1.000120165757835,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 5,
+      "wall_seconds": 1.0056031318381429,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 5,
+      "wall_seconds": 17.59124002419412,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 6,
+      "wall_seconds": 17.56509675178677,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 6,
+      "wall_seconds": 0.9989052908495069,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 4.470893405377865,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 3.852557696402073,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 3.878502777777612,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 4.4530216520652175,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 4.415349927730858,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 3.8946169586852193,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 3.942674847319722,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 4.397019772790372,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 4.4402956906706095,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 3.9278541896492243,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "cold",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 170.0743392277509,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "cold",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 122.93791454844177,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 1.3094865772873163,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.9410442681983113,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 0.9423406217247248,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 1.2770400177687407,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 1.2834959933534265,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.9288453906774521,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 38.76948557514697,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 1.1881570471450686,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 1.178848423063755,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 38.577339564450085,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 38.63033000100404,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 1.1764571964740753,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 1.1977472649887204,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 38.70385883003473,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 38.48943792935461,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 1.1814985135570168,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 5,
+      "wall_seconds": 1.1884649535641074,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 5,
+      "wall_seconds": 38.845522665418684,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 6,
+      "wall_seconds": 38.83904332667589,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 6,
+      "wall_seconds": 1.1761727761477232,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 18.93672050535679,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 14.206310479901731,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 14.352889684960246,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 18.78188988380134,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 18.74684219621122,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 14.235907568596303,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 14.302774132229388,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 18.913718966767192,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 18.838376488536596,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 14.278310464695096,
+      "command": ["just", "clippy", "-p", "codex-core", "--locked", "--offline"]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "cold",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 194.02351523656398,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "cold",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 227.15469087753445,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 1.911736804060638,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 2.5022193547338247,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 2.5149844735860825,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 1.8639303771778941,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 1.8955796277150512,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 2.4784373808652163,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 45.00641623605043,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 7.201579581014812,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 7.073404172435403,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 45.74632491078228,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 45.66022077854723,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 7.077782207168639,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 7.1054612109437585,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 45.38027373328805,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 45.38253858499229,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 7.086071347817779,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 5,
+      "wall_seconds": 7.091351879760623,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 5,
+      "wall_seconds": 45.54384348355234,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 6,
+      "wall_seconds": 45.54104065243155,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 6,
+      "wall_seconds": 7.097926623187959,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 25.556814310140908,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 23.288284284994006,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 23.3119241790846,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 25.85571337956935,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 26.046161795966327,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 23.456096154637635,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 23.501530222594738,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 26.33449513372034,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 26.35115679819137,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 23.688441585749388,
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-tests",
+        "fail",
+        "preparation_canonicalizes_data_urls_and_rejects_remote_urls"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "build-check",
+      "phase": "transition",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 63.75724242348224,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "build-check",
+      "phase": "transition",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 17.95546161569655,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "uv",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "shared-build",
+      "phase": "reuse",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.4872661745175719,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "build",
+        "-p",
+        "uv-normalize",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "uv",
+      "workflow": "shared-build",
+      "phase": "reuse",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 6.881912229582667,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "build",
+        "-p",
+        "uv-normalize",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "build-check",
+      "phase": "transition",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 104.50278982892632,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "build-check",
+      "phase": "transition",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 46.77137176133692,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "check",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.3240749668329954,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 11.023925803601742,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 11.084635429084301,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 0.32341408263891935,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "noop",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.32316739205271006,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "noop",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 11.154550293460488,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.5247622337192297,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 11.03068905416876,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 1,
+      "wall_seconds": 11.038721526041627,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 1,
+      "wall_seconds": 0.5263501815497875,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 2,
+      "wall_seconds": 0.5237013678997755,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 2,
+      "wall_seconds": 11.097815731540322,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 3,
+      "wall_seconds": 11.050870572216809,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 3,
+      "wall_seconds": 0.5279618166387081,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 4,
+      "wall_seconds": 0.5224997512996197,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 4,
+      "wall_seconds": 11.025878511369228,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "fmt",
+        "--",
+        "--config",
+        "imports_granularity=Item",
+        "--check"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "shared-build",
+      "phase": "reuse",
+      "toolchain": "stock",
+      "selector": "1.98.0",
+      "repetition": 0,
+      "wall_seconds": 2.8263700241222978,
+      "command": [
+        "cargo",
+        "+1.98.0",
+        "build",
+        "-p",
+        "codex-utils-string",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    },
+    {
+      "project": "codex-core",
+      "workflow": "shared-build",
+      "phase": "reuse",
+      "toolchain": "ohm",
+      "selector": "ohm-1.98.0-4",
+      "repetition": 0,
+      "wall_seconds": 0.6049814857542515,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-4",
+        "build",
+        "-p",
+        "codex-utils-string",
+        "--lib",
+        "--locked",
+        "--offline"
+      ]
+    }
+  ],
+  "provenance": {
+    "coordinator_revision": "8c9c2ed5b59b95490b1c1d6d90e21e964ac6edaf",
+    "release_manifest_sha256": "18e674c937ae7a0bca388da9fb5941ccd07611933e4e5f9aaac7d8570f189ab5",
+    "source_pins": {
+      "rust": "554cfe7a5297eb6353b698462192efa2969ca7d2",
+      "cargo": "28c2ed4019fcab541915f65017f6af556afdda7e",
+      "clippy": "5bd3512dc93cb5450b628f2c66cbee42aaffd974",
+      "rustfmt": "214f9b7ec9812bbe6235184c037c2387217dcc59"
+    },
+    "benchmark_runner_sha256": {
+      "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+      "replay_sessions.py": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+    },
+    "raw_results_sha256": "950e14434a93ce48573c7b89f5608f0d0abf6a331be43ca51cf0ed08033fc76e",
+    "raw_audit_sha256": "862dd5523f1401bcfd10f26e50c5dc525c0b35dcf10dac8e58eefa281ff2787b",
+    "installer_sha256": "191a0cf0fdd805214eb5446c375bebf4ff77154650e1f81f1e10dc1c8e0d4741",
+    "release_archive_sha256": "dbe57f4aa34f3e79cdd997c7c65f23d707fc114dfc9ca8f733a19d1f232a6a7a",
+    "release_archive_bytes": 300577327,
+    "helpers": {
+      "just": {
+        "version": "just 1.58.0",
+        "sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042"
+      },
+      "nextest": {
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "sha256": "0b725b8f24090903be3e0e0d20784df6a8aa04fb36104be1b447449c34228ba0"
+      }
+    },
+    "toolchains": {
+      "1.98.0": {
+        "cargo": {
+          "version": "cargo 1.98.0 (797e8a9bc 2026-08-05)\nrelease: 1.98.0\ncommit-hash: 797e8a9bca276c1c9f9f738d2a20f484fa4eea9d\ncommit-date: 2026-08-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0\nLLVM version: 22.1.8",
+          "sha256": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (88d9e12ae1 2026-08-18)",
+          "sha256": "f3d6f504333820cb4dbaccb5e4742d98c826f6a199c81964affe53639d19e734"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-stable (88d9e12ae1 2026-08-18)",
+          "sha256": "5005cdcd39ded526dca8fa6ccd716d42fc7da54469034e055dbf54649bec7877"
+        }
+      },
+      "ohm-1.98.0-4": {
+        "cargo": {
+          "version": "cargo 1.98.0-dev (28c2ed401 2026-08-29) (ohm-1.98.0-4)\nrelease: 1.98.0-dev\ncommit-hash: 28c2ed4019fcab541915f65017f6af556afdda7e\ncommit-date: 2026-08-29\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "196bc86040dabe5719714f66ae5b2de274edf6e6edc98dd98165269554e37d42"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0-dev (554cfe7a5 2026-08-30) (ohm-1.98.0-4)\nbinary: rustc\ncommit-hash: 554cfe7a5297eb6353b698462192efa2969ca7d2\ncommit-date: 2026-08-30\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-dev\nLLVM version: 22.1.8",
+          "sha256": "07ea09c88c806b4c42c244e80c03f49b03b32852777a64bc994cc13035ce23d5"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (5bd3512dc9 2026-08-30)",
+          "sha256": "e182c636d1d997b938e6647a46bbb57df1344bf0680a394de20e4459f6503f5c"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-dev (214f9b7ec9 2026-08-21)",
+          "sha256": "3e8424a9672bbc8e76d4edf2b2a722402c459a6c5bfea6c133e6a2f25cd6a54e"
+        }
+      }
+    },
+    "input_receipt_sha256": {
+      "bootstrap-status.json": "67ff6dcc763d63cfd789c8d958eb71ff60adfbeaa900507ed1eb8bc9a0873660",
+      "direct-completed.json": "9fab6a84ca81159090d6dd4a104f9dde60704060f1cd87599ee83aa7f73cf4a5",
+      "direct-prepared.json": "e4d4a41efdec2f38a54c858342fec068297fb4f02898fdcab00d483bd47da26d",
+      "direct-quiet-1788118974660775722.json": "7e9690602791ddf275248e12813753c0082593f53df9ac7865f4a48188f40e18",
+      "direct-quiet-1788123485255295875.json": "b7f750699f5f2159d18db76eaadb1ed37d8f393792f417b47cda4941c6cd37d6",
+      "direct-ready.json": "35f10aaee1eb436f8ded58b21242009a46227c0a192f065f0318fdaa501f975c",
+      "direct-started.json": "983f74aafb81b72a352c51d2824c5422711d73d8d6c6cc615cbcc91c8fb1cf08",
+      "github-assets.json": "0a5fe20a4eb63940acb4707be6a96b090a4b5e0fbecc13b527e053399a4057ed",
+      "global-rustup-before-2200949.json": "9af4ed08c37c4b8eba0359cec246d274fb104774d909c9329b9840e549b18a03",
+      "global-rustup-before-2201157.json": "9af4ed08c37c4b8eba0359cec246d274fb104774d909c9329b9840e549b18a03",
+      "historical-completed.json": "9f9906e01f33308f7307c6aca19bf8f2a120e2ce823f597dc2322219f1ce817c",
+      "historical-ready.json": "b74764faf21d72eed27beca566c61f7a02bba3d1496311698e5836022305da13",
+      "historical-started-20260830T205805.292692Z.json": "1491fe74921f2ddd125131a23ddbea47fc208039f62167073e50c73719210a33",
+      "suite-status.json": "74b424a2b4807ea624ed5ff8a9f760ac7f9fedc59e4cc9a85e36e827742f5369",
+      "toolchains.json": "caf4512e18de74853f749343f466dee4b09b1edc3e5a9d5b00121322df2395f6"
+    },
+    "host": {
+      "platform": "linux-x86_64",
+      "id": "linux-2",
+      "logical_cpus": 32,
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor"
+    }
+  }
+}
