@@ -1,16 +1,18 @@
 # Changes from upstream
 
-Ohm 1.98.0-3 expands shared dependency reuse to checksum-authenticated crates.io packages fetched through HTTP(S) registry mirrors and avoids duplicate compilation for concurrent cache misses on registry libraries without dependencies. Its source repositories use the exact upstream Rust 1.98.0 release sources, and changes are listed from each fork-specific CI foundation through the selected pull-request stacks.
+Ohm 1.98.0-4 caches diagnostics from audited Clippy passes across edits, fixes shared registry cache deadlocks between concurrent worktrees, and reduces allocations when checking well-formedness obligations. Its source repositories use the exact upstream Rust 1.98.0 release sources, and changes are listed from each fork-specific CI foundation through the selected pull-request stacks.
 
-Mirrored dependencies retain canonical crates.io identities, matching archive and lockfile checksums, and the existing procedural-macro and native-tool trust policies. Local and vendored replacements remain ineligible, and effective registry identities isolate artifacts fetched from different mirrors.
+Clippy runs 56 audited late passes covering 62 lint kinds through incremental module queries. Unchanged modules can replay their diagnostics without rerunning those passes. Compiler-driver inputs participate in cache compatibility, and source-sensitive suggestions track the files they read, including comment and macro-context changes. Other passes retain their existing traversal; compilers without the required hooks also retain the existing path.
 
-Concurrent cache misses are rechecked after acquiring the exclusive unit lock. A completed artifact can be reused with its diagnostics instead of invoking rustc again; forced rebuilds and unsupported runtime inputs retain the normal compilation path. This avoids duplicate work without changing the existing lock lifetime.
+Module lint queries now observe individual effective-visibility entries instead of the entire map. Adding an unrelated exported item no longer invalidates every module through that dependency, while changes to a relevant item's visibility still update its diagnostics. Whole-crate passes and nonincremental builds retain direct map lookups.
 
-An optional parsed-lockfile cache is available through `CARGO_EXPERIMENTAL_LOCKFILE_PARSE_CACHE=1`. It caches only the parsed representation of large lockfiles while still reading and locking the original file, validating its contents, and reconstructing the resolution against the current workspace. The experiment remains disabled by default because initial measurements did not demonstrate a meaningful end-to-end speedup.
+Cargo reserves shared registry unit locks in a consistent order, retaining read locks for fresh units and write locks for dirty units. This repairs deadlocks between simultaneous cold worktrees and keeps the locks alive for scheduled compiler, build-script, and rustdoc children on Linux and macOS. Nested builds fall back to private artifacts. The shared-cache namespace changes, so the first build repopulates affected artifacts; this is a correctness repair, and lock preparation can add overhead to unchanged builds.
 
-This release preserves component profile-guided optimization, incremental monomorphization partition reuse, the parallel compiler frontend and its bounded query-depth crash fix, audited procedural-macro reuse, skipped-wrapper handling for PGO preparation, and the existing Cargo and formatter optimizations. The compiler's Cargo gitlink selects the exact Cargo revision in the release manifest. The separate parallel query-cache promotion experiment remains excluded.
+Well-formedness checking collects ancestor predicate slices once and instantiates them directly into the final obligations, preserving substitution, diagnostic spans, ordering, and escaping-bound-variable filtering. The compiler's Cargo gitlink selects the exact Cargo revision in the release manifest. The existing component profile-guided optimization, parallel compiler frontend, dependency reuse, and formatter optimizations remain enabled.
 
-Published Rust 1.97.1 and Ohm 1.98.0-1 and 1.98.0-2 benchmark measurements, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
+The optional parsed-lockfile cache remains disabled by default and is available through `CARGO_EXPERIMENTAL_LOCKFILE_PARSE_CACHE=1`. The parallel query-cache promotion experiment is stacked above the selected compiler revision and remains excluded until its independent release performance benefit is established.
+
+Published Rust 1.97.1 and Ohm 1.98.0-1, 1.98.0-2, and 1.98.0-3 benchmark measurements, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
 
 ## ohm-rust
 
@@ -41,6 +43,11 @@ Published Rust 1.97.1 and Ohm 1.98.0-1 and 1.98.0-2 benchmark measurements, hist
 - [#65: Reuse monomorphization partitions in incremental test builds](https://github.com/astral-sh/ohm-rust/pull/65)
 - [#69: Pin Cargo test defaults and skipped-wrapper repair](https://github.com/astral-sh/ohm-rust/pull/69)
 - [#70: Pin Cargo for Ohm 1.98.0-3](https://github.com/astral-sh/ohm-rust/pull/70)
+- [#71: Track external driver inputs in incremental cache compatibility](https://github.com/astral-sh/ohm-rust/pull/71)
+- [#73: Track source files as incremental query inputs](https://github.com/astral-sh/ohm-rust/pull/73)
+- [#74: Track individual visibility inputs for module lints](https://github.com/astral-sh/ohm-rust/pull/74)
+- [#72: Stream well-formedness obligations](https://github.com/astral-sh/ohm-rust/pull/72)
+- [#75: Pin Cargo for Ohm 1.98.0-4](https://github.com/astral-sh/ohm-rust/pull/75)
 
 ## ohm-cargo
 
@@ -92,6 +99,7 @@ Published Rust 1.97.1 and Ohm 1.98.0-1 and 1.98.0-2 benchmark measurements, hist
 - [#99: Trust authenticated crates.io packages from registry mirrors](https://github.com/astral-sh/ohm-cargo/pull/99)
 - [#96: Coalesce concurrent misses for shared registry libraries](https://github.com/astral-sh/ohm-cargo/pull/96)
 - [#97: Experiment with caching parsed lockfiles](https://github.com/astral-sh/ohm-cargo/pull/97)
+- [#100: Fix shared registry cache deadlocks](https://github.com/astral-sh/ohm-cargo/pull/100)
 
 ## ohm-rust-clippy
 
@@ -108,6 +116,8 @@ Published Rust 1.97.1 and Ohm 1.98.0-1 and 1.98.0-2 benchmark measurements, hist
 - [#44: Skip nonstandard-macro analysis when the lint is disabled](https://github.com/astral-sh/ohm-rust-clippy/pull/44)
 - [#45: Backport deferred MSRV checks](https://github.com/astral-sh/ohm-rust-clippy/pull/45)
 - [#46: Experiment with empty-attribute MSRV parsing fast path](https://github.com/astral-sh/ohm-rust-clippy/pull/46)
+- [#48: Cache audited Clippy late passes per module](https://github.com/astral-sh/ohm-rust-clippy/pull/48)
+- [#49: Cache source-sensitive Clippy passes per module](https://github.com/astral-sh/ohm-rust-clippy/pull/49)
 
 ## ohm-rustfmt
 
