@@ -1,6 +1,14 @@
 # Changes from upstream
 
-Ohm 1.98.0-4 caches diagnostics from audited Clippy passes across edits, fixes shared registry cache deadlocks between concurrent worktrees, and reduces allocations when checking well-formedness obligations. Its source repositories use the exact upstream Rust 1.98.0 release sources, and changes are listed from each fork-specific CI foundation through the selected pull-request stacks.
+Ohm 1.98.0-5 reuses unchanged compiler type arguments, avoids unnecessary type-operation setup, clones directory trees on macOS, and includes experimental parallel query-cache promotion. Its source repositories use the exact upstream Rust 1.98.0 release sources, and changes are listed from each fork-specific CI foundation through the selected pull-request stacks.
+
+Type relations, projection, and rebasing reuse existing interned generic argument lists when their arguments are unchanged. Query type operations that hit their fast path avoid creating an empty obligation context or inference snapshot, preserving relation evaluation, diagnostics, and region-constraint collection and resolution.
+
+Cranelift preparation, bootstrap directory copies, and incremental compilation sessions can clone fresh directory trees on macOS. Unsupported filesystems and populated destination directories retain their copy or merge paths. Changes to cloned files do not modify the originals.
+
+Eligible incremental query-cache entries can be promoted in parallel. This experiment was excluded from Ohm 1.98.0-4 and is included in the selected compiler stack for this release. It passes current correctness checks, but an independent parallel speedup in the optimized release configuration has not been established.
+
+The compiler fork now runs CodSpeed benchmarks for eight check scenarios across `bitmaps` and `syn`, with profile audits that verify the measured compiler process. These use single-threaded compiler invocations and an optimized stage-1 compiler; their simulated instruction counts are separate from end-to-end release timing measurements.
 
 Clippy runs 56 audited late passes covering 62 lint kinds through incremental module queries. Unchanged modules can replay their diagnostics without rerunning those passes. Compiler-driver inputs participate in cache compatibility, and source-sensitive suggestions track the files they read, including comment and macro-context changes. Other passes retain their existing traversal; compilers without the required hooks also retain the existing path.
 
@@ -10,7 +18,7 @@ Cargo reserves shared registry unit locks in a consistent order, retaining read 
 
 Well-formedness checking collects ancestor predicate slices once and instantiates them directly into the final obligations, preserving substitution, diagnostic spans, ordering, and escaping-bound-variable filtering. The compiler's Cargo gitlink selects the exact Cargo revision in the release manifest. The existing component profile-guided optimization, parallel compiler frontend, dependency reuse, and formatter optimizations remain enabled.
 
-The optional parsed-lockfile cache remains disabled by default and is available through `CARGO_EXPERIMENTAL_LOCKFILE_PARSE_CACHE=1`. The parallel query-cache promotion experiment is stacked above the selected compiler revision and remains excluded until its independent release performance benefit is established.
+The optional parsed-lockfile cache remains disabled by default and is available through `CARGO_EXPERIMENTAL_LOCKFILE_PARSE_CACHE=1`.
 
 Published Rust 1.97.1 and Ohm 1.98.0-1, 1.98.0-2, and 1.98.0-3 benchmark measurements, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
 
@@ -18,6 +26,7 @@ Published Rust 1.97.1 and Ohm 1.98.0-1, 1.98.0-2, and 1.98.0-3 benchmark measure
 
 - [#6: Set up fork-owned Rust CI](https://github.com/astral-sh/ohm-rust/pull/6)
 - [#36: Run compiler regression tests on Namespace macOS runners](https://github.com/astral-sh/ohm-rust/pull/36)
+- [#80: Add CodSpeed compiler benchmarks](https://github.com/astral-sh/ohm-rust/pull/80)
 - [#43: Add reachability-based public API hashing](https://github.com/astral-sh/ohm-rust/pull/43)
 - [#44: Skip query machinery when promoting disk-cached values](https://github.com/astral-sh/ohm-rust/pull/44)
 - [#45: Emit reusable link state while linking normally](https://github.com/astral-sh/ohm-rust/pull/45)
@@ -48,6 +57,11 @@ Published Rust 1.97.1 and Ohm 1.98.0-1, 1.98.0-2, and 1.98.0-3 benchmark measure
 - [#74: Track individual visibility inputs for module lints](https://github.com/astral-sh/ohm-rust/pull/74)
 - [#72: Stream well-formedness obligations](https://github.com/astral-sh/ohm-rust/pull/72)
 - [#75: Pin Cargo for Ohm 1.98.0-4](https://github.com/astral-sh/ohm-rust/pull/75)
+- [#66: Promote unchanged incremental query results in parallel](https://github.com/astral-sh/ohm-rust/pull/66)
+- [#77: Clone Cranelift preparation directories on macOS](https://github.com/astral-sh/ohm-rust/pull/77)
+- [#78: Clone bootstrap directory trees on macOS](https://github.com/astral-sh/ohm-rust/pull/78)
+- [#79: Clone incremental compilation sessions on macOS](https://github.com/astral-sh/ohm-rust/pull/79)
+- [#81: Avoid redundant interning and type operation setup](https://github.com/astral-sh/ohm-rust/pull/81)
 
 ## ohm-cargo
 
