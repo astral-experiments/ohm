@@ -133,7 +133,7 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 
 ## Benchmarks
 
-These results were measured with Ohm 1.98.0-5, not the current release. See the
+See the
 [benchmark documentation](./BENCHMARKS.md) for the full results and methodology.
 
 **Direct edits (Linux devbox)** modify the crate being checked, linted, or tested:
