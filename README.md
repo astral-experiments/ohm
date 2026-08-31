@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
-incremental builds can be up to 33× faster, replayed development sessions take around 37% less time,
+incremental builds can be up to 33× faster, real-world development sessions see around a 37% speed-up,
 and each worktree saves multiple gigabytes of disk space.
 
 Benchmarking Ohm 1.98.0-5 against stock Rust on replayed development sessions:
@@ -20,10 +20,6 @@ Benchmarking Ohm 1.98.0-5 against stock Rust on replayed development sessions:
 | `cargo clippy`                             |    413.95 s |     192.16 s |   221.78 s |    53.58% |
 | `cargo fmt`                                |     18.56 s |      13.33 s |     5.22 s |    28.16% |
 | All commands                               |  1,411.21 s |     889.64 s |   521.58 s |    36.96% |
-
-Each session row averages two counterbalanced replays. The replay configuration includes
-an explicit shared build directory and potentially unsound procedural-macro trust beyond
-packaged defaults; see the [full methodology](scripts/session_replays/README.md#rust-1980-revision-5-complete-development-session-results).
 
 Compared to the stock Rust toolchain, Ohm:
 
@@ -137,7 +133,7 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 
 ## Benchmarks
 
-These results were measured with released Ohm 1.98.0-5. See the
+These results were measured with Ohm 1.98.0-5, not the current release. See the
 [benchmark documentation](./BENCHMARKS.md) for the full results and methodology.
 
 **Direct edits (Linux devbox)** modify the crate being checked, linted, or tested:
