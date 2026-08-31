@@ -1,0 +1,373 @@
+{
+  "rust_version": "1.98.0",
+  "ohm_release": "ohm-1.98.0-5",
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    [
+      "ohm-all",
+      "ohm-no-public-api-hash",
+      "ohm-neither",
+      "ohm-no-proc-macro-cache"
+    ],
+    [
+      "ohm-no-public-api-hash",
+      "ohm-no-proc-macro-cache",
+      "ohm-all",
+      "ohm-neither"
+    ]
+  ],
+  "sessions": [
+    {
+      "project": "uv",
+      "session_id": "uv-pypi-simple-json-parser-feature-ablation",
+      "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+      "commands": 2,
+      "edits": 1,
+      "warmups": 2
+    }
+  ],
+  "timed_session_seconds": {
+    "uv": {
+      "ohm-all": [3.3885072849225253, 4.032819407060742],
+      "ohm-no-public-api-hash": [5.956848146859556, 6.156426813919097],
+      "ohm-no-proc-macro-cache": [3.6169915080536157, 3.507173630176112],
+      "ohm-neither": [6.25201288308017, 6.343774759909138]
+    }
+  },
+  "timed_command_seconds": {
+    "uv": {
+      "ohm-all": [3.294951702002436, 3.937527121976018],
+      "ohm-no-public-api-hash": [5.86482468387112, 6.064300420926884],
+      "ohm-no-proc-macro-cache": [3.5235036311205477, 3.414680992718786],
+      "ohm-neither": [6.162086965981871, 6.250910557806492]
+    }
+  },
+  "timed_edit_seconds": {
+    "uv": {
+      "ohm-all": [0.004068383015692234, 0.004487077007070184],
+      "ohm-no-public-api-hash": [0.004503929056227207, 0.004244391806423664],
+      "ohm-no-proc-macro-cache": [0.004158101975917816, 0.004775806097313762],
+      "ohm-neither": [0.00452933507040143, 0.004052404081448913]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "uv": {
+      "ohm-all": [66.77096000011079, 66.70505144819617],
+      "ohm-no-public-api-hash": [66.74500578502193, 66.3458633958362],
+      "ohm-no-proc-macro-cache": [65.80934859695844, 67.53160154516809],
+      "ohm-neither": [66.47363973478787, 65.938980598934]
+    }
+  },
+  "commands": {
+    "uv": [
+      {
+        "index": 2,
+        "label": "Recheck downstream registry-client dependencies after the private parser edit",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "uv-client", "--locked"],
+        "wall_seconds": {
+          "ohm-all": [1.5045658720191568, 2.024393192026764],
+          "ohm-no-public-api-hash": [4.068102331832051, 4.218429422937334],
+          "ohm-no-proc-macro-cache": [1.558309830026701, 1.5590917468070984],
+          "ohm-neither": [4.295372017892078, 4.2936692028306425]
+        },
+        "tests_started": {
+          "ohm-all": [0, 0],
+          "ohm-no-public-api-hash": [0, 0],
+          "ohm-no-proc-macro-cache": [0, 0],
+          "ohm-neither": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [8, 8],
+          "ohm-no-public-api-hash": [8, 8],
+          "ohm-no-proc-macro-cache": [8, 8],
+          "ohm-neither": [8, 8]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Retest the directly changed Simple API parser library",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "--lib",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "ohm-all": [1.790385829983279, 1.9131339299492538],
+          "ohm-no-public-api-hash": [1.796722352039069, 1.8458709979895502],
+          "ohm-no-proc-macro-cache": [1.9651938010938466, 1.8555892459116876],
+          "ohm-neither": [1.8667149480897933, 1.9572413549758494]
+        },
+        "tests_started": {
+          "ohm-all": [9, 9],
+          "ohm-no-public-api-hash": [9, 9],
+          "ohm-no-proc-macro-cache": [9, 9],
+          "ohm-neither": [9, 9]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [1, 1],
+          "ohm-no-public-api-hash": [1, 1],
+          "ohm-no-proc-macro-cache": [1, 1],
+          "ohm-neither": [1, 1]
+        }
+      }
+    ]
+  },
+  "warmups": {
+    "uv": [
+      {
+        "index": 1,
+        "label": "Warm downstream registry-client checking and its existing parser dependency",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "uv-client", "--locked"],
+        "wall_seconds": {
+          "ohm-all": [46.60997929703444, 46.01202252111398],
+          "ohm-no-public-api-hash": [46.91169397206977, 46.47629583487287],
+          "ohm-no-proc-macro-cache": [46.098850515903905, 47.35255363606848],
+          "ohm-neither": [46.55304923187941, 46.035843030083925]
+        },
+        "tests_started": {
+          "ohm-all": [0, 0],
+          "ohm-no-public-api-hash": [0, 0],
+          "ohm-no-proc-macro-cache": [0, 0],
+          "ohm-neither": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [410, 410],
+          "ohm-no-public-api-hash": [410, 410],
+          "ohm-no-proc-macro-cache": [410, 410],
+          "ohm-neither": [410, 410]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Warm focused Simple API parser library tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "--lib",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "ohm-all": [20.160980703076348, 20.693028927082196],
+          "ohm-no-public-api-hash": [19.83331181295216, 19.869567560963333],
+          "ohm-no-proc-macro-cache": [19.71049808105454, 20.17904790909961],
+          "ohm-neither": [19.920590502908453, 19.90313756885007]
+        },
+        "tests_started": {
+          "ohm-all": [9, 9],
+          "ohm-no-public-api-hash": [9, 9],
+          "ohm-no-proc-macro-cache": [9, 9],
+          "ohm-neither": [9, 9]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [173, 173],
+          "ohm-no-public-api-hash": [173, 173],
+          "ohm-no-proc-macro-cache": [173, 173],
+          "ohm-neither": [173, 173]
+        }
+      }
+    ]
+  },
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "baseline_warmups_excluded": true,
+    "session_totals_include_edits_and_runner_overhead": true,
+    "compiler_accounting": "cargo status messages; not compiler invocations",
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust_enabled": false,
+    "optional_lockfile_parse_cache_enabled": false,
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": false,
+    "test_count_semantics": "Observed test starts, including retries and nested runner output; not unique selected tests.",
+    "cargo_status_messages_prove_compiler_invocations": false,
+    "rejected_preflight": {
+      "phase": "before_benchmark_launch",
+      "reason": "sixth interval below idle threshold",
+      "rejected_preflights": 1,
+      "failed_interval": 6,
+      "interval_seconds": 5,
+      "idle_percent": 94.3797374745794,
+      "required_idle_percent": 95,
+      "iowait_and_steal_within_limits": true,
+      "compiler_processes_observed": 0,
+      "ablation_warmup_commands_started": 0,
+      "ablation_timed_commands_started": 0,
+      "actual_ablation_launches": 1,
+      "used_resume": false,
+      "timed_work_interrupted": false,
+      "successful_launch_passed_unchanged_quiet_gate": true,
+      "completed_current_replays": 12,
+      "current_results_sha256_before": "abf9683b7a0ba68ddb32a1adb95e3fe57ee4e273b629db69d2d4492f48083382",
+      "current_results_sha256_after": "abf9683b7a0ba68ddb32a1adb95e3fe57ee4e273b629db69d2d4492f48083382",
+      "controller_sha256": "2a73d2c60e61239fa1e79017babee9fc74f15083e14d68b252b7b324241f0687",
+      "ready_sha256": "6612194b34c8d12d80104e76cf9e33dfc6733a603602f4ffa2d28e96f891c7e4",
+      "rejection_sha256": "d90797ca07d8c08a73fdf0a05801117fa805f4e190391a647e6be873fc65374b",
+      "recovery_sha256": "00282d28e940c39ebf05e4885b1c144721fce922fedf4c5d2cd1f835c446488e",
+      "quiet_receipt_sha256": "e9952ebb8e0562cddf7c9e45306e4f619616a1af24141ea1a713ffa80c8e540a",
+      "rejected_log_sha256": "83f5410e0c6e21cc691a5061dbae5bf782e04ecf01f9aa9901ee402d77e3efcd",
+      "failed_suite_status_sha256": "55afa20af5a4c401b7709e62beb0cfb9a35ec072fb8c2e23aec11088ef464e28",
+      "recovery_wrapper_sha256": "6f6a0505120f548883b3687e86f196d81015dd87696afdbc768aeed7faad4584",
+      "current_completed_sha256": "5862151e67c53b7e1c92d6a38a0a3a122ddce8fbabb3544e29444dbfbac61e4c",
+      "ablation_launch_sha256": "43eae149f06bcc3a385855916f6c4f7a3a62c31acd0a1711f1f766264a574ec1",
+      "ablation_results_sha256": "248457a0406d7ce0e6d33fc118222a35ace4fb4c7a182b81aa8f835a9b07fd4a"
+    }
+  },
+  "feature_overrides": {
+    "ohm-all": [],
+    "ohm-no-public-api-hash": ["-Zpublic-api-hash=no"],
+    "ohm-no-proc-macro-cache": ["-Zcache-proc-macros=no"],
+    "ohm-neither": ["-Zpublic-api-hash=no", "-Zcache-proc-macros=no"]
+  },
+  "environment": {},
+  "provenance": {
+    "effective_fixture_sha256": {
+      "uv": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+    },
+    "canonical_fixture_sha256": {
+      "uv": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+    },
+    "setup_patches_by_project": {},
+    "setup_proofs_by_project": {},
+    "published_fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+    "coordinator_revision": "d172b411f28dc2dd0ddc0c55cd394485b56f570e",
+    "release_manifest_sha256": "ef18ae11907720dc2f484dac7768ce7f2f4f2b724fe4699367164bddfd3ac4a8",
+    "source_pins": {
+      "rust": "053ba856ab0c9c8f0268259a6ad5519f4e67ba8c",
+      "cargo": "28c2ed4019fcab541915f65017f6af556afdda7e",
+      "clippy": "5bd3512dc93cb5450b628f2c66cbee42aaffd974",
+      "rustfmt": "214f9b7ec9812bbe6235184c037c2387217dcc59"
+    },
+    "benchmark_runner_sha256": {
+      "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+      "replay_sessions.py": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+    },
+    "raw_results_sha256": "248457a0406d7ce0e6d33fc118222a35ace4fb4c7a182b81aa8f835a9b07fd4a",
+    "raw_audit_sha256": "1e2f377a5f6d44b97a1058d43d20642a2630545be4ce7edfcbdbfc9e1c132e05",
+    "exporter_sha256": "d5298a83f69abfb1ba15e269a4e4015f19f66fd0673f4f3a44ebee862bcc7cc2",
+    "installer_sha256": "83ca01420c2db02fa47728fa7bca00fd501a42c1a3dc1bc2bc27dfa2292dd1c3",
+    "release_archive_sha256": "ff04bf7a4eee4234ebb7158cb34b1e42975f01f7dcaa2f96e8b080ceba078e83",
+    "release_archive_bytes": 300565772,
+    "release_asset_staging_source": "github",
+    "release_assets": [
+      {
+        "asset_id": 538247239,
+        "name": "install.sh",
+        "sha256": "83ca01420c2db02fa47728fa7bca00fd501a42c1a3dc1bc2bc27dfa2292dd1c3",
+        "bytes": 14627,
+        "source": "github"
+      },
+      {
+        "asset_id": 538247234,
+        "name": "ohm-1.98.0-5-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "ff04bf7a4eee4234ebb7158cb34b1e42975f01f7dcaa2f96e8b080ceba078e83",
+        "bytes": 300565772,
+        "source": "github"
+      }
+    ],
+    "helpers": {
+      "just": {
+        "version": "just 1.58.0",
+        "sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042"
+      },
+      "cargo-nextest": {
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a"
+      },
+      "uv": {
+        "version": "uv 0.11.33 (x86_64-unknown-linux-gnu)",
+        "sha256": "4f5e568281d9b5b411534bb4f056109f0938a9dccf52b112c294e6a627a76dfe"
+      },
+      "python3.12": {
+        "version": "Python 3.12.13",
+        "sha256": "7d43f6e86a6c6dd12005ec77eb2055f1be3f1bb3adedf8afe0a87973fa7371ce"
+      }
+    },
+    "toolchains": {
+      "1.98.0": {
+        "cargo": {
+          "version": "cargo 1.98.0 (797e8a9bc 2026-08-05)\nrelease: 1.98.0\ncommit-hash: 797e8a9bca276c1c9f9f738d2a20f484fa4eea9d\ncommit-date: 2026-08-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0\nLLVM version: 22.1.8",
+          "sha256": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (88d9e12ae1 2026-08-18)",
+          "sha256": "f3d6f504333820cb4dbaccb5e4742d98c826f6a199c81964affe53639d19e734"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-stable (88d9e12ae1 2026-08-18)",
+          "sha256": "5005cdcd39ded526dca8fa6ccd716d42fc7da54469034e055dbf54649bec7877"
+        }
+      },
+      "ohm-1.98.0-5": {
+        "cargo": {
+          "version": "cargo 1.98.0-dev (28c2ed401 2026-08-29) (ohm-1.98.0-5)\nrelease: 1.98.0-dev\ncommit-hash: 28c2ed4019fcab541915f65017f6af556afdda7e\ncommit-date: 2026-08-29\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "8147891896e49cd01209b0e0bd04a033bad4d9023a34b6c05b419fcce8715717"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0-dev (053ba856a 2026-08-31) (ohm-1.98.0-5)\nbinary: rustc\ncommit-hash: 053ba856ab0c9c8f0268259a6ad5519f4e67ba8c\ncommit-date: 2026-08-31\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-dev\nLLVM version: 22.1.8",
+          "sha256": "f41af7fa9b269e90d552a2dd1b1495478a01ce2cad3254271fe18ec1d6000987"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (5bd3512dc9 2026-08-30)",
+          "sha256": "a142c2ec2c96624135286af4453b280bd9732e37644864bc0fbe3604b9956e1a"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-dev (214f9b7ec9 2026-08-21)",
+          "sha256": "2acded3d409b045f0670ed4171c3fb7ea768c0c337de434571484e1931a1076c"
+        }
+      }
+    },
+    "global_moving_aliases_unchanged": true,
+    "global_helpers_unchanged": true,
+    "paired_arms_share_helper_environment": true,
+    "standalone_uv_fixture_commands": 0,
+    "input_receipt_sha256": {
+      "ablation-completed.json": "3ca957e893f54035e6eeff972a2ba87aa583f78c5e462c036f549efbb809faab",
+      "ablation-preflight-recovery.json": "00282d28e940c39ebf05e4885b1c144721fce922fedf4c5d2cd1f835c446488e",
+      "ablation-preflight-rejected-status.json": "55afa20af5a4c401b7709e62beb0cfb9a35ec072fb8c2e23aec11088ef464e28",
+      "ablation-preflight-rejection.json": "d90797ca07d8c08a73fdf0a05801117fa805f4e190391a647e6be873fc65374b",
+      "ablation-ready.json": "6612194b34c8d12d80104e76cf9e33dfc6733a603602f4ffa2d28e96f891c7e4",
+      "ablation-started-20260831T191523.004089Z.json": "43eae149f06bcc3a385855916f6c4f7a3a62c31acd0a1711f1f766264a574ec1",
+      "bootstrap-status.json": "b58aca9b6278a0ea8594a89963bc4b1c612d5201be9b03a6b2722fa9bdfed754",
+      "current-completed.json": "5862151e67c53b7e1c92d6a38a0a3a122ddce8fbabb3544e29444dbfbac61e4c",
+      "current-ready.json": "ad2a7a9036ddbd26ee179ac244860225aeedf0a047f40478364481f10a0c5ca3",
+      "current-started-20260831T170015.160054Z.json": "b1c7218313105f1ce805de8de76f59803c6f811a992b16c384e28f6967b3df01",
+      "direct-prepared.json": "a68dbd063dc333d4dba8083d1110f3fb3a61344e796155e0906913c3681c74b6",
+      "direct-quiet-1788195615156571249.json": "9f8a1e6d1d81414245738d119ab169c0f94b2e654a1b533f0e6913bbff702216",
+      "direct-quiet-1788203210040422516.json": "e9952ebb8e0562cddf7c9e45306e4f619616a1af24141ea1a713ffa80c8e540a",
+      "direct-quiet-1788203723002272035.json": "9c5fa902e6b689e4f872fe993f771d3366ae1c0cd5cbbd7365ce7567bcdad033",
+      "global-rustup-before-131118.json": "b89ae9c718499091edca8be4bad763965cdc9a111ff1d886869b7d8e8e3893e8",
+      "helpers.json": "7b6dd4ff469969d8badd00fab5607e1af24081a413b6be0922131490d9782eb9",
+      "release-assets.json": "f7a406571690f01abcde5314e87bc721a416862a6d39fc82520492be913e36de",
+      "suite-status.json": "be509b1dde69085f1213a50bd50abda3f4aef274db5d04e725372bd75970499b",
+      "toolchains.json": "c3829900ace409c7f1b459ab05c1a09e160535c49ad4643a1ebdd6962356c898"
+    },
+    "ablation_preflight_rejection_sha256": "d90797ca07d8c08a73fdf0a05801117fa805f4e190391a647e6be873fc65374b",
+    "ablation_preflight_recovery_sha256": "00282d28e940c39ebf05e4885b1c144721fce922fedf4c5d2cd1f835c446488e",
+    "ablation_preflight_wrapper_sha256": "6f6a0505120f548883b3687e86f196d81015dd87696afdbc768aeed7faad4584"
+  },
+  "host": {
+    "platform": "linux-x86_64",
+    "id": "linux-1",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC-Milan Processor"
+  },
+  "completed_at": "2026-08-31T19:24:57.978929+00:00"
+}
