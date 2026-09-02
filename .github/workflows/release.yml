@@ -483,6 +483,16 @@ jobs:
       OHM_TARGET: ${{ matrix.target }}
       OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
     steps:
+      - name: Check out release coordinator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@6c6fd71fe4fb72c3697d269963d0e15df8adedad # v2.85.10
+        with:
+          tool: cargo-nextest@0.9.133
+
       - name: Download platform distribution assets
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -632,6 +642,24 @@ jobs:
           cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
           cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"
           cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
+
+          # Older manifests predate this opt-in feature. Once Cargo exposes it,
+          # require the assembled compiler and Clippy driver to pass the suite.
+          python3 "$GITHUB_WORKSPACE/scripts/test_clippy_codegen.py" \
+            --if-supported \
+            --cargo "$toolchain_root/bin/cargo" \
+            --rustc "$toolchain_root/bin/rustc" \
+            --artifact-root "$smoke_root/clippy-codegen" \
+            --evidence-dir "$RUNNER_TEMP/clippy-codegen-evidence"
+
+      - name: Retain Clippy/codegen smoke evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: clippy-codegen-smoke-${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}
+          path: ${{ runner.temp }}/clippy-codegen-evidence
+          if-no-files-found: ignore
+          retention-days: 7
 
   publish:
     if: inputs.build

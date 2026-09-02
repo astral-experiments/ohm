@@ -25,12 +25,13 @@ jobs:
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: true
-      - name: Check benchmark runner
+      - name: Check Python runners
         run: |
           uv run scripts/benchmark.py --help
           python3 scripts/test_benchmark.py
           uv run scripts/replay_sessions.py --help
           python3 scripts/test_replay_sessions.py
+          python3 scripts/test_clippy_codegen.py --help
       - name: Validate release bootstrap configuration
         run: |
           python3 - <<'PY'
