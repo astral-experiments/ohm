@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
-incremental builds can be up to 31.04× faster, real-world development sessions see around a 39% speed-up,
+incremental builds can be up to 30× faster, real-world development sessions see around a 39% speed-up,
 and each worktree saves multiple gigabytes of disk space.
 
 Benchmarking Ohm 1.98.0-6 against stock Rust on replayed development sessions:
