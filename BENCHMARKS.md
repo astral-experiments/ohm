@@ -1,10 +1,12 @@
 # Benchmarks
 
-These benchmarks compare stock Rust 1.98.0 with `ohm-1.98.0-6` across the
+The timing benchmarks below compare stock Rust 1.98.0 with `ohm-1.98.0-6` across the
 [uv](https://github.com/astral-sh/uv) and [Codex](https://github.com/openai/codex) codebases.
 The main uv and Codex tables below come from one fresh Linux devbox study.
 The earlier August 31, August 27, and August 24 complete studies and August 22 Linux uv study are retained
 in the historical appendices.
+The separate [disk-usage study](#disk-usage-ohm-1980-7-on-macosapfs) measures
+`ohm-1.98.0-7` against stock Rust in Ruff/ty and uv development sessions on macOS/APFS.
 
 The fresh Linux study finished on September 2, 2026 (UTC), on an AMD EPYC 9V74 devbox with 32 logical
 CPUs and eight build jobs. Both toolchains use the same source revision, default development
@@ -179,6 +181,200 @@ toolchain, and applies reversible edits without modifying the original checkouts
 `--contention-retries` controls how often an interrupted workflow restarts from a cold build. Pass
 `--discard-targets` to remove each completed workflow's isolated build artifacts while preserving
 its results and logs.
+
+## Disk usage: Ohm 1.98.0-7 on macOS/APFS
+
+This study measures actual allocated disk space throughout recorded development sessions and
+across ten real worktrees. It compares the published
+[Ohm 1.98.0-7 release](https://github.com/astral-sh/ohm/releases/tag/ohm-1.98.0-7) with stock
+Rust 1.98.0. It ran on September 2, 2026, on an Apple Silicon Mac (Mac17,6, 18 logical CPUs,
+128 GiB RAM, macOS 26.6.2), with eight build jobs per project. Both toolchains target
+`aarch64-apple-darwin` and use LLVM 22.1.8. These results are independent of the revision 6
+Linux timing study above.
+
+The [machine-readable results](scripts/benchmark_results/disk-1.98.0-7.json) retain exact bytes,
+source and toolchain pins, workload details, measurement timing, and audit provenance.
+The [README table](README.md) summarizes the completed sessions and two- and
+ten-worktree totals.
+
+### Session progression
+
+Every project/toolchain/scenario combination starts on a separate empty APFS volume. The totals
+include source checkouts, all target directories, Ohm's shared artifacts, and session temporary
+files and runtime caches. Compilers, Cargo source downloads, Python, Cargo extensions, and common
+Git objects and worktree administrative files are already available outside the measured volumes.
+Thus “from empty” means an empty project workspace and build state, rather than a new machine
+without development tools. No compiled project artifacts are imported and no manual cleanup runs
+during a session.
+
+Ruff/ty replays three edits from [Ruff PR #27736](https://github.com/astral-sh/ruff/pull/27736):
+simplifying recursive attribute inference, indexing implicit attribute dependencies, and
+introducing component fixed points. This exercises **ty semantic development inside Ruff**.
+The full session has 13 Cargo commands: focused cycle/attribute mdtests, affected-package tests,
+all semantic mdtests, strict Clippy, and formatting. Both toolchains use the recorded developer
+profile: `opt-level=1`, `lto=off`, and `debug=line-tables-only`. Snapshot updates are disabled;
+the existing `clippy::format_push_string` allowance is identical in both runs.
+
+uv replays implementation and simplification of a dedicated PyPI Simple API JSON parser. Its
+20-command session includes parser and PyPI types tests, registry-client tests, strict Clippy,
+formatting, and an installation integration test against a local mock index. Both toolchains use
+the repository's normal development profile, including full debug information. Python 3.12 is
+fixed and Python downloads are disabled. Source edits, command arguments, test selectors,
+features, and requested profiles match within each pair.
+
+All sizes below are GiB (2^30 bytes). The edit rows include that edit's complete validation;
+the final idle row is a separate observation after the session finishes.
+
+| Stage                   | Ruff stock | Ruff Ohm | Less disk | uv stock | uv Ohm | Less disk |
+| ----------------------- | ---------: | -------: | --------: | -------: | -----: | --------: |
+| Source checkout         |       0.11 |     0.11 |      0.0% |     0.04 |   0.04 |      0.0% |
+| Cold baseline completed |       2.80 |     2.68 |      4.2% |     7.94 |   6.70 |     15.6% |
+| Edit 1 validated        |       4.78 |     3.27 |     31.5% |     8.93 |   7.60 |     14.9% |
+| Edit 2 validated        |       5.54 |     3.31 |     40.3% |     9.48 |   7.59 |     19.9% |
+| Edit 3 validated        |       5.99 |     3.41 |     43.1% |    13.04 |  10.83 |     17.0% |
+| Final idle endpoint     |       5.97 |     3.36 |     43.7% |    13.01 |  10.80 |     17.0% |
+
+Ruff/ty's retained footprint separates further through the edit/test/Clippy cycle. uv's largest
+increase follows the installation integration test, which builds a much larger part of the
+workspace. These measurements describe the complete workflows; they do not isolate individual
+compiler features.
+
+### Ten actual worktrees
+
+Each toolchain independently builds a cold donor, applies edit 1, and completes its validation.
+That donor then stays paused. Nine sibling worktrees are created sequentially from its first-edit
+revision; each performs edits 2 and 3 and their validation commands. All earlier worktrees and
+outputs remain present. A two-tree result is therefore one paused donor plus one completed
+continuation; a ten-tree result is one donor plus nine completed continuations. The nine siblings
+replay the same continuation, rather than sampling nine different developer histories.
+
+Ohm uses its automatic experimental defaults, one initially empty shared build directory per
+project/scenario, and a separate private target directory for every worktree. Both
+`CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` and `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all` are enabled
+as development trust opt-ins. Stock Rust uses independent worktree targets. Ruff and uv have
+separate shared stores, so these totals do not include cross-project sharing.
+
+**Workspace snapshot seeding did not occur.** These graphs contain workspace-local procedural
+macros (`ruff_macros` and `uv_macros`), which the
+[released admission policy](https://github.com/astral-sh/ohm-cargo/blob/bbf4a22e66d6d134b07b5c39bfde2c65c0f8e95f/src/doc/src/reference/unstable.md#L2037)
+excludes from workspace snapshot seeding. Every Ohm sibling creation reported no compatible
+snapshot. Immutable registry artifacts were nevertheless shared: every sibling's continuation
+had zero registry compiler invocations while referencing donor-produced registry artifacts.
+The final inventories confirmed ten separate private workspace namespaces without shared
+regular-file inodes between them. The savings should not be attributed to workspace snapshots.
+
+These totals are actual after-operation measurements, including the newly completed sibling's
+source and build outputs. The one-tree donor is a different endpoint from the full single-session
+row above.
+
+| Active worktrees | Ruff stock | Ruff Ohm | Less disk | uv stock | uv Ohm | Less disk |
+| ---------------- | ---------: | -------: | --------: | -------: | -----: | --------: |
+| 1 (donor)        |       4.76 |     3.23 |     32.1% |     8.93 |   7.60 |     14.9% |
+| 2                |      10.28 |     6.22 |     39.4% |    17.43 |  12.54 |     28.0% |
+| 3                |      15.77 |     9.18 |     41.8% |    25.93 |  17.46 |     32.7% |
+| 4                |      21.24 |    12.17 |     42.7% |    34.42 |  22.38 |     35.0% |
+| 5                |      26.74 |    15.12 |     43.5% |    42.92 |  27.30 |     36.4% |
+| 6                |      32.20 |    18.07 |     43.9% |    51.42 |  32.22 |     37.3% |
+| 7                |      37.69 |    21.06 |     44.1% |    59.91 |  37.15 |     38.0% |
+| 8                |      43.18 |    23.98 |     44.5% |    68.41 |  42.07 |     38.5% |
+| 9                |      48.67 |    26.94 |     44.6% |    76.91 |  46.99 |     38.9% |
+| 10               |      54.16 |    29.91 |     44.8% |    85.41 |  51.92 |     39.2% |
+
+The marginal costs below subtract the independently measured donor. Creation-only captures the
+new checkout before its first build. The nine-sibling mean is the actual increase divided by nine;
+the ten-tree total was measured directly, not extrapolated from this mean.
+
+| Project | Added disk above donor           | Stock GiB | Ohm GiB |
+| ------- | -------------------------------- | --------: | ------: |
+| Ruff/ty | Create first sibling             |     0.114 |   0.115 |
+| Ruff/ty | Create and develop first sibling |     5.516 |   2.993 |
+| Ruff/ty | Mean per sibling across all nine |     5.488 |   2.964 |
+| uv      | Create first sibling             |     0.037 |   0.035 |
+| uv      | Create and develop first sibling |     8.502 |   4.944 |
+| uv      | Mean per sibling across all nine |     8.498 |   4.924 |
+
+### Physical accounting and validation
+
+The primary measurement is APFS's volume allocation counter, `ATTR_VOL_SPACEUSED`, minus the
+initial empty-volume baseline. A separate container-allocation delta cross-checks it. This counts
+shared filesystem blocks once; apparent file sizes, `du`, and summed inode allocations do not
+reliably account for APFS clones. A small calibration confirmed that adding a 16 MiB clone and
+hardlink consumed no additional physical blocks, while changing 4 KiB in the clone allocated
+16 KiB. See [Apple's allocation-counter documentation](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/man/man2/getattrlist.2).
+
+Each checkpoint flushes the volume and waits for stable allocation samples. The README's full
+single-session and ten-tree results use separate final captures after at least 30 seconds idle,
+with five stable samples. Intermediate points, including two trees and the scaling table above,
+use the historical after-operation checkpoints. APFS can release preallocated tails later: the
+single-session idle totals fell by 10–47 MiB. Three ten-tree totals were unchanged; Ruff Ohm grew
+by 116 KiB. These differences do not change the README's rounded GiB values. Percentages always use
+unrounded bytes. Seven idle container deltas match their volume deltas exactly; Ruff Ohm's ten-tree
+container delta is one 4 KiB block larger.
+
+One-second allocator sampling also recorded transient lower bounds:
+
+| Project | Cohort              | Stock sampled peak GiB | Ohm sampled peak GiB |
+| ------- | ------------------- | ---------------------: | -------------------: |
+| Ruff/ty | Full single session |                   5.99 |                 3.86 |
+| Ruff/ty | Ten worktrees       |                  54.24 |                30.32 |
+| uv      | Full single session |                  13.04 |                10.88 |
+| uv      | Ten worktrees       |                  85.43 |                52.03 |
+
+These are sampled peaks, not exact maximum free-space requirements. The study ran two project
+queues concurrently and makes no wall-time or speedup claim.
+
+All eight cohorts completed: **404 successful Cargo commands, 53,664 repeated test executions,
+and 592 accepted operation checkpoints**, plus eight final idle captures. The independent audit
+passed source/profile/command equivalence, nonempty test selections, matching pass/fail/skip
+counts, output containment, actual worktree counts, allocation arithmetic, and shared-versus-private
+artifact checks. Repeated tests are execution counts, not counts of distinct cases. Four
+independently cold-started single-session/donor prefix pairs agreed within 1.3% at every matched
+command checkpoint. These correlated prefix observations are not full-session repeats or
+statistical confidence intervals.
+
+One stock Ruff nextest command passed all 482 tests with zero skips but reported two handle-leak
+diagnostics; its Ohm counterpart reported none. The recorded output does not identify the tests,
+so their historical cause is unknown. A later scoped inspection found no matching surviving
+process or open handle and no retained runtime files. The stock final disk measurement, about
+162 seconds later, matched its idle measurement. The audit preserves this reviewed diagnostic
+difference while requiring matching test outcomes.
+
+Preparation and measurement corrections are recorded separately from command outcomes. An
+initial offline registry-configuration mismatch caused the first two lanes to be excluded and
+restarted on fresh empty volumes. The observer was versioned to inventory files before flushing
+and sampling, because inventory access times and delayed APFS trimming could otherwise perturb
+its stability check. A donor-verification correction accounted for legitimate Git checkout CRLF
+filters; a rejected resume restored the recorded Python interpreter and `PATH` before proceeding.
+These corrections changed no measured source edits or test expectations, and successful commands
+were not rerun to repair measurements.
+
+### Disk-study inputs and limits
+
+The exact replay fixtures and their source revisions are:
+
+| Project | Base revision                                                                                                                   | Replay fixture                                                     |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Ruff/ty | [`21c9b077ab3b10dd9007710ffa471cd12f7eceab`](https://github.com/astral-sh/ruff/commit/21c9b077ab3b10dd9007710ffa471cd12f7eceab) | [ruff-rust-1.98.json](scripts/session_replays/ruff-rust-1.98.json) |
+| uv      | [`a50af60fb4162d7f94812d64c481c30a0200b6d8`](https://github.com/astral-sh/uv/commit/a50af60fb4162d7f94812d64c481c30a0200b6d8)   | [uv.json](scripts/session_replays/uv.json)                         |
+
+The installed release was verified against the [revision 7 manifest](toolchains/1.98.0/7.json).
+The compiler and Cargo source pins are:
+
+| Toolchain    | rustc commit                               | Cargo commit                               |
+| ------------ | ------------------------------------------ | ------------------------------------------ |
+| Rust 1.98.0  | `88d9e12ae178fab0fb5cc050a94da85685d449ea` | `797e8a9bca276c1c9f9f738d2a20f484fa4eea9d` |
+| Ohm 1.98.0-7 | `26568fdc7faa53e40722c29fddf0c840b7eb09e4` | `bbf4a22e66d6d134b07b5c39bfde2c65c0f8e95f` |
+
+The compact results preserve fixture and tool hashes alongside the measured data. They document
+this disk study; the timing-runner command above does not reproduce its dedicated-volume meter
+and worktree schedule.
+
+The conclusions apply to this released configuration and these two fixed macOS/APFS workflows.
+They do not measure an isolated contribution from either disk-fix PR, a revision 6-to-7 change,
+Linux/Windows filesystems, or long-term cache growth across dependency upgrades and unrelated
+projects. Excluded prerequisites were inventoried separately, but installed toolchain components
+and pre-existing clone relationships were not controlled for a cold-install comparison. Their
+descriptive inode allocations must not be added to the measured physical totals.
 
 ## Earlier Ohm 1.98.0-5 direct study — August 31, 2026
 
