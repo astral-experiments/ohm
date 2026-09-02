@@ -1,6 +1,12 @@
 # Changes from upstream
 
-Ohm 1.98.0-6 adds `cargo worktree add` to seed new Git worktrees with reusable build state, preserves compiler codegen reuse when output directories move, and reduces repeated type interning, folding, and obligation allocations. Its source repositories use the exact upstream Rust 1.98.0 release sources, and changes are listed from each fork-specific CI foundation through the selected pull-request stacks.
+Ohm 1.98.0-7 reduces disk growth during incremental development. It collects superseded completed compilation sessions and prevents retained unpacked debug objects from accumulating across rebuilds. Its source repositories use the exact upstream Rust 1.98.0 release sources, and changes are listed from each fork-specific CI foundation through the selected pull-request stacks.
+
+After a successful serial incremental build, the compiler keeps one completed session instead of retaining both the new session and its predecessor. Active sessions remain protected, and locked snapshots are retained for overlapping compilations. This reduces steady-state dependency-graph and query-cache storage; the previous snapshot is still needed while compiling its replacement.
+
+Incremental builds with unpacked debuginfo now reuse stable paths for retained debug objects, unlinking the previous entry before writing or restoring it so hard-linked incremental work products remain immutable. This prevents a new randomly named set of objects from accumulating on every rebuild. Explicit object outputs, saved temporaries, and saved link state retain their existing filenames. Existing leaked files are not removed, and builds with debug information disabled do not benefit from this object-file change.
+
+Audits of existing macOS development caches estimated about 3.8 GiB less retained dependency-graph and query-cache data for a Ruff/ty worktree and 1.8 GiB for a uv worktree after rebuilding the represented variants. Separately, retained debug-object histories suggested roughly 1–2 GB of physical storage growth avoided over 20–30 ty library recompilations. These are estimates from different existing workloads, not a combined saving measured in one session. Narrower sessions save less, and an independent release-build speedup has not been established.
 
 `cargo +ohm worktree add -b charlie/my-change ../my-change --target-dir /path/to/targets/my-change` creates a Git worktree and copies compatible private artifacts and incremental state into independently writable storage, using filesystem clones where supported. Use the same separate `CARGO_BUILD_BUILD_DIR` for donor and recipient builds and a distinct `CARGO_TARGET_DIR` for each worktree. Branch selection follows `git worktree add`, including existing branches and explicit `--detach`.
 
@@ -28,9 +34,9 @@ Well-formedness checking collects ancestor predicate slices once and instantiate
 
 The optional parsed-lockfile cache remains disabled by default and is available through `CARGO_EXPERIMENTAL_LOCKFILE_PARSE_CACHE=1`.
 
-Published benchmark measurements through Ohm 1.98.0-5, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
+Published benchmark measurements through Ohm 1.98.0-6, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
 
-The recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://github.com/astral-sh/ohm-rust/pull/94) remains above the release pin and outside this release; its exploratory measurements did not show an improvement. All component PRs remain open in one review stack per repository.
+The recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://github.com/astral-sh/ohm-rust/pull/94) remains above the release pin and outside this release; its exploratory measurements did not show an improvement. The opt-in combined Clippy/codegen experiment in [ohm-rust#96](https://github.com/astral-sh/ohm-rust/pull/96), [ohm-cargo#102](https://github.com/astral-sh/ohm-cargo/pull/102), and [ohm-rust-clippy#51](https://github.com/astral-sh/ohm-rust-clippy/pull/51) also remains above the release pins. All component PRs remain open in one review stack per repository.
 
 ## ohm-rust
 
@@ -78,6 +84,8 @@ The recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://
 - [#88: Cache region-only freshening and inline interner lookups](https://github.com/astral-sh/ohm-rust/pull/88)
 - [#91: Preserve codegen reuse when output directories move](https://github.com/astral-sh/ohm-rust/pull/91)
 - [#95: Pin Cargo worktree seeding for Ohm 1.98.0-6](https://github.com/astral-sh/ohm-rust/pull/95)
+- [#97: Collect superseded incremental compilation sessions](https://github.com/astral-sh/ohm-rust/pull/97)
+- [#98: Prevent unpacked debug objects from accumulating across rebuilds](https://github.com/astral-sh/ohm-rust/pull/98)
 
 ## ohm-cargo
 
