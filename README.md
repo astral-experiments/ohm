@@ -122,6 +122,12 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
   separate shared path for all trusted local projects and worktrees using the same Ohm toolchain.
   Keep the shared build directory separate from every worktree target directory, and do not delete
   it when cleaning up an individual project or worktree.
+- Create worktrees for local Rust development from an existing Cargo workspace with
+  `cargo +ohm worktree add -b <branch> <path> --target-dir <target-dir> <base>`.
+  Normal Ohm builds prepare reusable state automatically. Keep the existing
+  `CARGO_TARGET_DIR` while running the command; `--target-dir` selects the destination.
+  In the new worktree, set `CARGO_TARGET_DIR` to that destination and keep
+  `CARGO_BUILD_BUILD_DIR` unchanged.
 - Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` to maximize authenticated registry procedural-macro
   reuse across worktrees. This opt-in is potentially unsound; avoid it for CI, releases, etc.
 - Set `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all` to maximize reuse of authenticated registry build
