@@ -21,7 +21,7 @@ Benchmarking Ohm 1.98.0-6 against stock Rust on replayed development sessions:
 | `cargo fmt`                                |     16.69 s |      12.07 s |     4.61 s |    27.66% |
 | All commands                               |  1,085.40 s |     659.04 s |   426.36 s |    39.28% |
 
-Retained disk usage with Ohm 1.98.0-7 on Apple Silicon macOS/APFS:
+And comparing disk usage on APFS:
 
 | Scope                 | Rust 1.98.0 | Ohm 1.98.0-7 | Disk saved | Reduction |
 | --------------------- | ----------: | -----------: | ---------: | --------: |
@@ -31,11 +31,6 @@ Retained disk usage with Ohm 1.98.0-7 on Apple Silicon macOS/APFS:
 | uv session            |   13.01 GiB |    10.80 GiB |   2.21 GiB |    16.99% |
 | uv, 2 worktrees       |   17.43 GiB |    12.54 GiB |   4.88 GiB |    28.03% |
 | uv, 10 worktrees      |   85.41 GiB |    51.92 GiB |  33.49 GiB |    39.21% |
-
-Measured from empty build state. Worktree runs retain a paused donor and one or nine built and tested
-continuations, with immutable dependencies shared. See the
-[disk benchmark methodology](BENCHMARKS.md#disk-usage-ohm-1980-7-on-macosapfs) for the workloads,
-configuration, and accounting scope.
 
 Compared to the stock Rust toolchain, Ohm:
 
