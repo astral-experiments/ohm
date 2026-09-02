@@ -19,7 +19,7 @@ The draft implementation uses these matching component revisions:
 | --------- | -------------------------------------------------------------------------- | ------------------------------------------ |
 | Compiler  | [ohm-rust#96](https://github.com/astral-sh/ohm-rust/pull/96)               | `fc8a9b7d921e23525d440459ab66d14ff7ad5531` |
 | Cargo     | [ohm-cargo#102](https://github.com/astral-sh/ohm-cargo/pull/102)           | `19a17825cb1d62d5e85771c368fd5d651b940be7` |
-| Clippy    | [ohm-rust-clippy#51](https://github.com/astral-sh/ohm-rust-clippy/pull/51) | `33adb72eeb96282e533d5a5c582df9727fa42a7d` |
+| Clippy    | [ohm-rust-clippy#51](https://github.com/astral-sh/ohm-rust-clippy/pull/51) | `139538ac1bb36d5f844669badaae4965b5a779e2` |
 
 The compiler's Cargo gitlink matches the Cargo revision above. A future release
 manifest must select these components together; the current release selection
@@ -111,9 +111,9 @@ Clippy tests cover MIR-dependent lints and formatting expressions transformed
 by normal lowering. Cargo tests cover selection, capability checks, wrapper
 conflicts, artifact identities, and propagation to external commands.
 
-Local validation passed 25 cross-component checks, including configured lint
-denial, the compiler ownership and
-codegen checks, and Clippy's diagnostic/codegen harness. Three existing Clippy
+Local validation passed all 25 cross-component smoke checks, including configured
+lint denial. The separate compiler ownership and codegen checks and Clippy's
+diagnostic/codegen harness also passed. Three existing Clippy
 formatting fixtures produced 89 exactly matching diagnostics. The codegen
 comparison covers an exported library body; binary inline-assembly source
 location metadata can differ because Clippy loads additional source files.
