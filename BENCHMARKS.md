@@ -307,9 +307,10 @@ single-session and ten-tree results use separate final captures after at least 3
 with five stable samples. Intermediate points, including two trees and the scaling table above,
 use the historical after-operation checkpoints. APFS can release preallocated tails later: the
 single-session idle totals fell by 10–47 MiB. Three ten-tree totals were unchanged; Ruff Ohm grew
-by 116 KiB. These differences do not change the README's rounded GiB values. Percentages always use
-unrounded bytes. Seven idle container deltas match their volume deltas exactly; Ruff Ohm's ten-tree
-container delta is one 4 KiB block larger.
+by 116 KiB. The README uses these idle endpoints for completed cohorts. Its disk savings and
+reductions are calculated from unrounded bytes and displayed to two decimal places. Seven idle
+container deltas match their volume deltas exactly; Ruff Ohm's ten-tree container delta is one
+4 KiB block larger.
 
 One-second allocator sampling also recorded transient lower bounds:
 

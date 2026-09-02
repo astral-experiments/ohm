@@ -23,14 +23,14 @@ Benchmarking Ohm 1.98.0-6 against stock Rust on replayed development sessions:
 
 Retained disk usage with Ohm 1.98.0-7 on Apple Silicon macOS/APFS:
 
-| Project | Scenario                 | Rust 1.98.0 | Ohm 1.98.0-7 | Less disk |
-| ------- | ------------------------ | ----------: | -----------: | --------: |
-| Ruff/ty | Full session, 1 worktree |     6.0 GiB |      3.4 GiB |       44% |
-| Ruff/ty | 2 worktrees              |    10.3 GiB |      6.2 GiB |       39% |
-| Ruff/ty | 10 worktrees             |    54.2 GiB |     29.9 GiB |       45% |
-| uv      | Full session, 1 worktree |    13.0 GiB |     10.8 GiB |       17% |
-| uv      | 2 worktrees              |    17.4 GiB |     12.5 GiB |       28% |
-| uv      | 10 worktrees             |    85.4 GiB |     51.9 GiB |       39% |
+| Scope                 | Rust 1.98.0 | Ohm 1.98.0-7 | Disk saved | Reduction |
+| --------------------- | ----------: | -----------: | ---------: | --------: |
+| Ruff/ty session       |    5.97 GiB |     3.36 GiB |   2.61 GiB |    43.72% |
+| Ruff/ty, 2 worktrees  |   10.28 GiB |     6.22 GiB |   4.05 GiB |    39.44% |
+| Ruff/ty, 10 worktrees |   54.16 GiB |    29.91 GiB |  24.25 GiB |    44.78% |
+| uv session            |   13.01 GiB |    10.80 GiB |   2.21 GiB |    16.99% |
+| uv, 2 worktrees       |   17.43 GiB |    12.54 GiB |   4.88 GiB |    28.03% |
+| uv, 10 worktrees      |   85.41 GiB |    51.92 GiB |  33.49 GiB |    39.21% |
 
 Measured from empty build state. Worktree runs retain a paused donor and one or nine built and tested
 continuations, with immutable dependencies shared. See the
