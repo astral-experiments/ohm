@@ -2272,16 +2272,22 @@ class BackgroundExecutionTests(ReplayTestCase):
         status_path = output / "status.json"
         deadline = time.monotonic() + 5
         status: dict[str, object] | None = None
+        log = ""
         while time.monotonic() < deadline:
             if status_path.exists():
                 status = json.loads(status_path.read_text())
-                if status["state"] in ("succeeded", "failed"):
+                if status["state"] == "failed":
                     break
+                if status["state"] == "succeeded":
+                    # The child can publish status before stdout finishes flushing.
+                    log = (output / "run.log").read_text()
+                    if "ruff: real-session" in log:
+                        break
             time.sleep(0.02)
 
         self.assertIsNotNone(status, "background replay never wrote its status")
         self.assertEqual(status["state"], "succeeded")
-        self.assertIn("ruff: real-session", (output / "run.log").read_text())
+        self.assertIn("ruff: real-session", log)
         self.assertTrue((output / "results.json").is_file())
 
 
