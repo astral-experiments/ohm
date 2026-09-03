@@ -216,12 +216,12 @@ class FixtureValidationTests(ReplayTestCase):
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
             (
-                SCRIPTS / "session_replays" / "release-1.98.0-7-ruff-historical.json"
+                SCRIPTS / "session_replays" / "release-1.98.0-8-ruff-historical.json"
             ).read_text()
         )
 
         self.assertEqual(baseline["rust_version"], "1.98.0")
-        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-7")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-8")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
@@ -248,9 +248,9 @@ class FixtureValidationTests(ReplayTestCase):
         published_fixture = SCRIPTS / "session_replays" / "ruff.json"
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.98.0-7-ruff.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.98.0-8-ruff.json").read_text()
         )
-        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-7")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-8")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(baseline["environment"], scenario.environment)
         self.assertEqual(
@@ -307,7 +307,7 @@ class FixtureValidationTests(ReplayTestCase):
         main_rows = rows(SCRIPTS.parent / "README.md")
         detailed_rows = rows(
             SCRIPTS / "session_replays" / "README.md",
-            "Rust 1.98.0 revision 7 measurements",
+            "Rust 1.98.0 revision 8 measurements",
         )
 
         def assert_row(
@@ -495,7 +495,7 @@ class FixtureValidationTests(ReplayTestCase):
 
     def test_readme_selected_session_table_matches_recorded_results(self) -> None:
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.98.0-7-baseline.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.98.0-8-baseline.json").read_text()
         )
         baselines = {project: baseline for project in replay.PROJECTS}
         rows = [
@@ -505,7 +505,7 @@ class FixtureValidationTests(ReplayTestCase):
         ]
         self.assertEqual(sum(row[0] == "Ruff session" for row in rows), 1)
         self.assertIn(
-            ["Scope", "Rust 1.98.0", "Ohm 1.98.0-7", "Time saved", "Reduction"], rows
+            ["Scope", "Rust 1.98.0", "Ohm 1.98.0-8", "Time saved", "Reduction"], rows
         )
 
         def assert_row(label: str, stock: float, ohm: float) -> None:
@@ -2272,16 +2272,22 @@ class BackgroundExecutionTests(ReplayTestCase):
         status_path = output / "status.json"
         deadline = time.monotonic() + 5
         status: dict[str, object] | None = None
+        log = ""
         while time.monotonic() < deadline:
             if status_path.exists():
                 status = json.loads(status_path.read_text())
-                if status["state"] in ("succeeded", "failed"):
+                if status["state"] == "failed":
                     break
+                if status["state"] == "succeeded":
+                    # The child can publish status before stdout finishes flushing.
+                    log = (output / "run.log").read_text()
+                    if "ruff: real-session" in log:
+                        break
             time.sleep(0.02)
 
         self.assertIsNotNone(status, "background replay never wrote its status")
         self.assertEqual(status["state"], "succeeded")
-        self.assertIn("ruff: real-session", (output / "run.log").read_text())
+        self.assertIn("ruff: real-session", log)
         self.assertTrue((output / "results.json").is_file())
 
 
