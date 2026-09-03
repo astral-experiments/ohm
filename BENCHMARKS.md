@@ -1,21 +1,13 @@
 # Benchmarks
 
-The timing benchmarks below compare stock Rust 1.98.0 with `ohm-1.98.0-7` across the
+The timing benchmarks below compare stock Rust 1.98.0 with `ohm-1.98.0-8` across the
 [uv](https://github.com/astral-sh/uv) and [Codex](https://github.com/openai/codex) codebases.
 The main uv and Codex tables below come from one fresh Linux devbox study.
-The earlier September 2, August 31, August 27, and August 24 complete studies and August 22 Linux uv study are retained
-in the historical appendices.
-The separate [disk-usage study](#disk-usage-ohm-1980-7-on-macosapfs) measures
-`ohm-1.98.0-7` against stock Rust in Ruff/ty and uv development sessions on macOS/APFS.
+Earlier complete studies and the August 22 Linux uv study are retained in the historical appendices.
+The separate [disk-usage study](#disk-usage-ohm-1980-8-on-macosapfs) measures
+`ohm-1.98.0-8` against stock Rust in Ruff/ty and uv development sessions on macOS/APFS.
 
-The fresh Linux study finished on September 2, 2026 (UTC), on an AMD EPYC 9V74 devbox with 32 logical
-CPUs and eight build jobs. Both toolchains use the same source revision, default development
-profiles, and separate Cargo target directories. Dependencies are cached before timing begins.
-The study started after six consecutive five-second CPU samples, each with at least 95% idle,
-at most 0.5% I/O wait and 0.1% steal time, and no unrelated compiler processes. Samples
-contaminated by concurrent builds are discarded. These are fresh paired comparisons against
-stock Rust, not a controlled comparison of Ohm revisions 6 and 7. The exact released toolchains were verified against the
-[revision 7 manifest](toolchains/1.98.0/7.json).
+The fresh Linux study finished on September 3, 2026 (UTC), on a Linux host (AMD EPYC 9V74 80-Core Processor, 32 logical CPUs), with eight build jobs. Both toolchains use the same source revision, default development profiles, and separate Cargo target directories. Dependencies are cached before timing begins. The study started after six consecutive five-second CPU samples, each with at least 95% idle, at most 0.5% I/O wait and 0.1% steal time, and no unrelated compiler processes. Samples contaminated by concurrent builds are discarded. These are fresh paired comparisons against stock Rust, not a controlled comparison between Ohm releases. The Ohm installation was verified against the [revision 8 manifest](toolchains/1.98.0/8.json); both toolchains' versions and executable hashes are recorded in the results.
 
 - **Cold:** One build from an empty target directory.
 - **Dependency (indirect) edit:** Median of seven implementation-only edits to a crate the target
@@ -30,7 +22,7 @@ revision uses Rust 1.95.0; these benchmarks use Rust 1.98.0 for both projects to
 
 The fresh Linux study completed all 216 planned samples: 192 successful core-workflow samples
 and all 24 targeted build-to-check, formatting, and cross-worktree samples. All 216 passed
-validation. None were discarded for interference. The [per-sample results](scripts/benchmark_results/release-1.98.0-7.json)
+validation. None were discarded for interference. One initial quiet preflight was rejected before any benchmark command or sample. The original logs and state were preserved, and the unchanged full quiet gate passed before the actual benchmark launch. The [per-sample results](scripts/benchmark_results/release-1.98.0-8.json)
 retain all timings, commands, source pins, and toolchain hashes.
 The 216 samples include 100 uv samples and 116 Codex samples. Earlier studies are separate
 historical evidence and are not pooled with these measurements. The benchmark runner and fixtures
@@ -43,18 +35,18 @@ These benchmarks target the `uv` crate. Dependency edits change `uv-normalize`; 
 
 | Workflow                  | Rust 1.98.0 |      Ohm | Speedup |
 | ------------------------- | ----------: | -------: | ------: |
-| Cold `cargo check`        |     66.92 s |  60.59 s |   1.10× |
-| Dependency edit, `check`  |     10.38 s |   0.59 s |  17.57× |
-| Direct edit, `check`      |      2.24 s |   2.10 s |   1.07× |
-| No-op `cargo check`       |      0.55 s |   0.42 s |   1.31× |
-| Cold `cargo clippy`       |     69.78 s |  62.45 s |   1.12× |
-| Dependency edit, `clippy` |     14.56 s |   0.67 s |  21.59× |
-| Direct edit, `clippy`     |      3.52 s |   3.13 s |   1.13× |
-| No-op `cargo clippy`      |      0.59 s |   0.46 s |   1.28× |
-| Cold `cargo test`         |    133.02 s | 120.55 s |   1.10× |
-| Dependency edit, `test`   |     20.76 s |   4.27 s |   4.86× |
-| Direct edit, `test`       |     18.24 s |  10.96 s |   1.66× |
-| No-op `cargo test`        |      1.31 s |   1.14 s |   1.15× |
+| Cold `cargo check`        |     67.29 s |  62.39 s |   1.08× |
+| Dependency edit, `check`  |     10.52 s |   0.60 s |  17.48× |
+| Direct edit, `check`      |      2.31 s |   2.12 s |   1.09× |
+| No-op `cargo check`       |      0.56 s |   0.41 s |   1.35× |
+| Cold `cargo clippy`       |     71.94 s |  63.35 s |   1.14× |
+| Dependency edit, `clippy` |     14.70 s |   0.69 s |  21.18× |
+| Direct edit, `clippy`     |      3.54 s |   3.08 s |   1.15× |
+| No-op `cargo clippy`      |      0.59 s |   0.47 s |   1.27× |
+| Cold `cargo test`         |    136.68 s | 123.86 s |   1.10× |
+| Dependency edit, `test`   |     21.33 s |   4.40 s |   4.84× |
+| Direct edit, `test`       |     18.70 s |  11.03 s |   1.70× |
+| No-op `cargo test`        |      1.32 s |   1.17 s |   1.13× |
 
 The measured commands are:
 
@@ -64,7 +56,7 @@ cargo +1.98.0 clippy -p uv --lib --locked --offline
 cargo +1.98.0 test -p uv --test it --locked --offline help::help -- --exact
 ```
 
-Replace `+1.98.0` with `+ohm-1.98.0-7` to run the Ohm variants.
+Replace `+1.98.0` with `+ohm-1.98.0-8` to run the Ohm variants.
 
 ## Codex
 
@@ -73,18 +65,18 @@ edits change `codex-core` itself.
 
 | Workflow                  | Rust 1.98.0 |      Ohm | Speedup |
 | ------------------------- | ----------: | -------: | ------: |
-| Cold `cargo check`        |    112.75 s |  91.85 s |   1.23× |
-| Dependency edit, `check`  |     17.44 s |   1.04 s |  16.72× |
-| Direct edit, `check`      |      4.42 s |   3.88 s |   1.14× |
-| No-op `cargo check`       |      1.14 s |   0.86 s |   1.32× |
-| Cold `just clippy`        |    171.67 s | 117.96 s |   1.46× |
-| Dependency edit, `clippy` |     38.74 s |   1.26 s |  30.63× |
-| Direct edit, `clippy`     |     18.89 s |  14.81 s |   1.28× |
-| No-op `just clippy`       |      1.28 s |   1.01 s |   1.27× |
-| Cold `just test`          |    227.70 s | 189.60 s |   1.20× |
-| Dependency edit, `test`   |     45.05 s |   7.17 s |   6.28× |
-| Direct edit, `test`       |     25.40 s |  22.61 s |   1.12× |
-| No-op `just test`         |      2.46 s |   1.90 s |   1.29× |
+| Cold `cargo check`        |    115.88 s |  93.60 s |   1.24× |
+| Dependency edit, `check`  |     17.98 s |   1.06 s |  16.96× |
+| Direct edit, `check`      |      4.64 s |   3.95 s |   1.17× |
+| No-op `cargo check`       |      1.14 s |   0.87 s |   1.31× |
+| Cold `just clippy`        |    175.31 s | 118.51 s |   1.48× |
+| Dependency edit, `clippy` |     39.17 s |   1.28 s |  30.66× |
+| Direct edit, `clippy`     |     19.14 s |  15.23 s |   1.26× |
+| No-op `just clippy`       |      1.29 s |   1.01 s |   1.28× |
+| Cold `just test`          |    232.76 s | 192.98 s |   1.21× |
+| Dependency edit, `test`   |     46.66 s |   7.52 s |   6.21× |
+| Direct edit, `test`       |     26.22 s |  23.84 s |   1.10× |
+| No-op `just test`         |      2.50 s |   1.92 s |   1.30× |
 
 The measured commands follow Codex's existing development workflows:
 
@@ -95,7 +87,7 @@ RUSTUP_TOOLCHAIN=1.98.0 just test -p codex-core --lib --locked --offline \
   --no-tests fail preparation_canonicalizes_data_urls_and_rejects_remote_urls
 ```
 
-Replace `+1.98.0` with `+ohm-1.98.0-7`, or set `RUSTUP_TOOLCHAIN=ohm-1.98.0-7`,
+Replace `+1.98.0` with `+ohm-1.98.0-8`, or set `RUSTUP_TOOLCHAIN=ohm-1.98.0-8`,
 to run the Ohm variants.
 
 ## Additional feature workflows
@@ -122,14 +114,14 @@ the existing check, Clippy, and test matrix:
 All 24 feature samples were collected with the same released toolchains, pinned repositories, and
 eight build jobs as the 192 completed core samples.
 
-| Project | Workflow                 | Package              | Rust 1.98.0 | Ohm 1.98.0-7 | Speedup | Samples |
+| Project | Workflow                 | Package              | Rust 1.98.0 | Ohm 1.98.0-8 | Speedup | Samples |
 | ------- | ------------------------ | -------------------- | ----------: | -----------: | ------: | ------: |
-| uv      | Build, then check        | `uv`                 |     63.94 s |      17.55 s |   3.64× |       1 |
-| uv      | Shared-worktree build    | `uv-normalize`       |      6.90 s |       0.49 s |  13.98× |       1 |
-| Codex   | Build, then check        | `codex-core`         |    104.08 s |      44.93 s |   2.32× |       1 |
-| Codex   | No-op formatting         | Workspace            |     11.09 s |       0.32 s |  34.69× |       3 |
-| Codex   | Formatting after an edit | `codex-core`         |     11.08 s |       0.52 s |  21.20× |       5 |
-| Codex   | Shared-worktree build    | `codex-utils-string` |      2.81 s |       0.63 s |   4.46× |       1 |
+| uv      | Build, then check        | `uv`                 |     63.65 s |      18.51 s |   3.44× |       1 |
+| uv      | Shared-worktree build    | `uv-normalize`       |      6.95 s |       0.51 s |  13.52× |       1 |
+| Codex   | Build, then check        | `codex-core`         |    105.07 s |      44.65 s |   2.35× |       1 |
+| Codex   | No-op formatting         | Workspace            |     11.51 s |       0.33 s |  35.11× |       3 |
+| Codex   | Formatting after an edit | `codex-core`         |     11.17 s |       0.53 s |  21.00× |       5 |
+| Codex   | Shared-worktree build    | `codex-utils-string` |      2.89 s |       0.61 s |   4.76× |       1 |
 
 Together these workflows add 24 matched samples to the completed 192-sample core matrix, for a
 full-study total of 216 successful samples. Cold builds, build-to-check transitions, and
@@ -145,7 +137,7 @@ Run it from the Ohm repository:
 ```console
 uv run scripts/benchmark.py --dry-run
 uv run scripts/benchmark.py \
-  --upstream 1.98.0 --ohm ohm-1.98.0-7 --jobs 8 \
+  --upstream 1.98.0 --ohm ohm-1.98.0-8 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -182,7 +174,205 @@ toolchain, and applies reversible edits without modifying the original checkouts
 `--discard-targets` to remove each completed workflow's isolated build artifacts while preserving
 its results and logs.
 
+## Disk usage: Ohm 1.98.0-8 on macOS/APFS
+
+This study compares the published [Ohm 1.98.0-8 release](https://github.com/astral-sh/ohm/releases/tag/ohm-1.98.0-8)
+with stock Rust 1.98.0 through complete Ruff/ty and uv development sessions and ten actual worktrees.
+It finished on September 3, 2026, on an Apple Silicon Mac (Mac17,6, 18 logical CPUs,
+128 GiB RAM, macOS 26.6.2), with eight build jobs. Both toolchains target
+`aarch64-apple-darwin`. The [machine-readable results](scripts/benchmark_results/disk-1.98.0-8.json)
+retain exact bytes, source and toolchain pins, workload details, and audit provenance.
+
+### Session progression
+
+Each project/toolchain/scenario starts on a separate empty APFS volume. Totals include source
+checkouts, all target directories, shared artifacts, and session temporary files and runtime caches.
+Compilers, Cargo source downloads and registry indexes, Python, Cargo extensions, and common Git
+objects and worktree administrative files are already available outside the measured volumes.
+“From empty” therefore means an empty project workspace and build state. No compiled project
+artifacts from earlier cohorts or runs are imported, and no manual cleanup runs within a measured cohort.
+
+Ruff/ty replays three edits from [Ruff PR #27736](https://github.com/astral-sh/ruff/pull/27736):
+simplifying recursive attribute inference, indexing implicit attribute dependencies, and introducing
+component fixed points. Its 13 Cargo commands exercise focused cycle/attribute mdtests,
+affected-package tests, all semantic mdtests, strict Clippy, and formatting. Both toolchains use the
+recorded profile: `opt-level=1`, `lto=off`, and `debug=line-tables-only`. Snapshot updates are disabled;
+the existing `clippy::format_push_string` allowance is identical in both runs.
+
+uv replays implementation and simplification of a dedicated PyPI Simple API JSON parser. Its
+20-command session includes parser and PyPI types tests, registry-client tests, strict Clippy,
+formatting, and an installation integration test against a local mock index. Both toolchains use
+the normal development profile with full debug information, fixed Python 3.12.13, and disabled
+Python downloads.
+
+Both uv arms include the same [runtime binary-path fix](scripts/session_replays/patches/uv-runtime-bin-path.patch)
+from [uv PR #21432](https://github.com/astral-sh/uv/pull/21432), applied before any builds. It lets
+compiled integration tests locate the current worktree's executable after target relocation.
+The original parser edits, command arguments, test selectors, features, and profiles are unchanged.
+This adjustment applies only to the APFS study; the Linux timing fixtures remain unchanged.
+
+All sizes below are GiB (2^30 bytes). Each edit row includes that edit's complete validation.
+
+| Stage                   | Ruff stock | Ruff Ohm | Less disk | uv stock | uv Ohm | Less disk |
+| ----------------------- | ---------: | -------: | --------: | -------: | -----: | --------: |
+| Source checkout         |       0.11 |     0.11 |      0.0% |     0.04 |   0.04 |      0.0% |
+| Cold baseline completed |       2.83 |     2.68 |      5.3% |     7.93 |   6.74 |     15.1% |
+| Edit 1 validated        |       4.81 |     3.26 |     32.3% |     8.95 |   7.63 |     14.7% |
+| Edit 2 validated        |       5.60 |     3.29 |     41.2% |     9.49 |   7.62 |     19.7% |
+| Edit 3 validated        |       6.05 |     3.41 |     43.6% |    13.05 |  10.88 |     16.6% |
+| Final idle endpoint     |       6.05 |     3.41 |     43.6% |    13.04 |  10.88 |     16.5% |
+
+### Ten actual worktrees
+
+Each toolchain independently builds a cold donor, applies edit 1, and completes its validation.
+That donor stays paused while nine sibling worktrees are created from its first-edit revision.
+Every sibling performs edits 2 and 3 and their validation commands. All earlier worktrees and
+outputs remain present through the cohort's final measurement. Two trees means one paused donor
+plus one completed continuation; ten means one donor plus nine completed continuations. The siblings
+repeat the same recorded continuation, rather than sampling nine independent developer histories.
+
+Ohm uses its automatic defaults, one initially empty shared build directory per project/scenario,
+and separate private targets for every worktree. `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` and
+`CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all` are enabled throughout, including `cargo worktree add`.
+These are unsafe development trust opt-ins. Stock Rust uses independent worktree targets, and the
+projects have separate shared stores. This study does not include cross-project sharing.
+
+The worktree creation logs record the following workspace snapshot imports. Files cloned on APFS
+can share blocks while retaining separate inodes; file counts and logical sizes are not physical
+disk measurements.
+
+| Project | Siblings seeded (of 9) | Files seeded across siblings | Files cloned across siblings |
+| ------- | ---------------------: | ---------------------------: | ---------------------------: |
+| Ruff/ty |                      0 |                            0 |                            0 |
+| uv      |                      0 |                            0 |                            0 |
+
+Both donors' Clippy validation triggered the separate
+[compiler-wrapper admission guard](https://github.com/astral-sh/ohm-cargo/blob/1570321097f84278436d3c2bdf8962e8896d0970/src/cargo/core/compiler/build_runner/compilation_files.rs#L669-L676).
+The local procedural-macro trust opt-in does not override that guard. Consequently these recorded
+workflows shared immutable registry dependencies but imported no workspace snapshots. The results
+include this limitation of the released toolchain.
+
+The totals below are measured after each continuation completes. The one-tree donor is a different
+endpoint from the complete single-session row above.
+
+| Active worktrees | Ruff stock | Ruff Ohm | Less disk | uv stock | uv Ohm | Less disk |
+| ---------------- | ---------: | -------: | --------: | -------: | -----: | --------: |
+| 1 (donor)        |       4.82 |     3.27 |     32.0% |     8.94 |   7.61 |     14.9% |
+| 2                |      10.34 |     6.29 |     39.2% |    17.44 |  12.55 |     28.1% |
+| 3                |      15.84 |     9.24 |     41.7% |    25.95 |  17.47 |     32.7% |
+| 4                |      21.29 |    12.25 |     42.5% |    34.44 |  22.42 |     34.9% |
+| 5                |      26.72 |    15.26 |     42.9% |    42.94 |  27.33 |     36.3% |
+| 6                |      32.20 |    18.26 |     43.3% |    51.44 |  32.27 |     37.3% |
+| 7                |      37.69 |    21.25 |     43.6% |    59.94 |  37.20 |     37.9% |
+| 8                |      43.21 |    24.03 |     44.4% |    68.44 |  42.13 |     38.4% |
+| 9                |      48.71 |    26.99 |     44.6% |    76.94 |  47.06 |     38.8% |
+| 10               |      54.21 |    29.95 |     44.7% |    85.45 |  52.00 |     39.1% |
+
+Marginal costs subtract the donor's earlier measurement on the same volume. Creation-only captures the new checkout
+and any seeded artifacts before its first build. The nine-sibling mean is the observed total increase
+divided by nine; the ten-tree total was measured directly.
+
+| Project | Added disk above donor           | Stock GiB | Ohm GiB |
+| ------- | -------------------------------- | --------: | ------: |
+| Ruff/ty | Create first sibling             |     0.114 |   0.114 |
+| Ruff/ty | Create and develop first sibling |     5.523 |   3.014 |
+| Ruff/ty | Mean per sibling across all nine |     5.488 |   2.964 |
+| uv      | Create first sibling             |     0.035 |   0.036 |
+| uv      | Create and develop first sibling |     8.498 |   4.939 |
+| uv      | Mean per sibling across all nine |     8.500 |   4.932 |
+
+### Physical accounting and validation
+
+The primary metric is APFS's volume allocation counter, `ATTR_VOL_SPACEUSED`, minus the empty-volume
+baseline. Shared filesystem blocks count once; apparent file sizes, `du`, and summed inode
+allocations do not reliably account for APFS clones. The inventory policy and primary metric are
+unchanged from the previous study: inventory first, then flush the volume and sample allocation.
+
+This run exposed a problem in the earlier meter's secondary `statvfs` counter. Sparse images can
+cap reported free space to the backing host's availability, so subtracting that value from image
+capacity does not necessarily measure container allocation. The ten-tree stock Ruff idle capture
+was rejected six times: its primary volume counter stayed constant while the secondary value drifted.
+A normal remount preserved the volume, device, mount options, and recorded files but did not remove
+the cap. Every rejected capture and the remount evidence are retained.
+
+Meter version 3 uses native APFS `APFSContainerSize - APFSContainerFree` for the cross-check and
+requires both volume and container allocation to stabilize. Native `CapacityInUse` must also agree
+with `ATTR_VOL_SPACEUSED`. The stock Ruff ten-tree idle endpoint and the five remaining cohorts use
+this corrected meter. Earlier accepted measurements remain intact, with the same primary metric;
+legacy `statvfs` fields are diagnostics. No native historical baseline or delta is inferred.
+
+The README's full-session and ten-tree rows use separate final captures after at least 30 seconds
+idle, with five stable samples. Intermediate points, including two trees and the scaling table,
+use after-operation checkpoints. Savings and reductions are computed from unrounded bytes.
+
+Background allocator sampling, with a one-second requested interval, also recorded transient lower bounds:
+
+| Project | Cohort              | Stock sampled peak GiB | Ohm sampled peak GiB |
+| ------- | ------------------- | ---------------------: | -------------------: |
+| Ruff/ty | Full single session |                   6.05 |                 3.82 |
+| Ruff/ty | Ten worktrees       |                  54.24 |                30.39 |
+| uv      | Full single session |                  13.05 |                10.94 |
+| uv      | Ten worktrees       |                  85.48 |                52.13 |
+
+Query overhead lengthens the sampling interval. These are sampled peaks, not exact maximum
+free-space requirements. Cohorts ran sequentially.
+Only after a cohort finished, its idle endpoint was captured, and its complete evidence archive
+passed independent verification was that cohort's temporary volume removed. The raw logs,
+inventories, source proofs, and measurements remain available. This study makes no wall-time claim.
+
+All eight cohorts completed: **404 successful Cargo commands, 53,664 repeated test executions,
+and 592 accepted operation checkpoints**, plus eight final idle captures. The independent audit
+checked source/profile/command equivalence, nonempty test selections, matching test outcomes,
+output containment, actual worktree counts, allocation arithmetic, and shared versus private
+artifacts. Test execution counts include repeats. There were 59 retries of unsettled workload
+checkpoints, plus 6 rejected legacy idle captures during the accounting investigation.
+There were 2 other rejected idle captures. Separately, 6 meter launch attempts
+failed before the Ohm Ruff fork cohort's first checkpoint because the new script lacked its executable bit;
+fixing the file mode preserved the script's contents, and no workload commands had run.
+Successful build or test commands were not rerun to repair measurements. The recovered stock Ruff
+ten-tree endpoint was captured 137.2 minutes after the cohort finished; its
+primary retained footprint changed by -18,202,624 bytes
+(-17.359 MiB) from the immediate final capture.
+
+Two Ruff nextest summaries differed by one `passed (1 leaky)` annotation, once on each toolchain.
+Both commands exited successfully with 868 passed and 34 skipped. Nextest
+[treats this as a passing test with output handles still open after exit](https://nexte.st/docs/features/leaky-tests/).
+The fixture's failure-only status output did not record the test identity or subprocess cause.
+Only those two explicitly reviewed, hash-bound annotation differences were accepted; the raw
+summaries and this limitation are preserved. No tests were rerun to remove the annotations.
+
+After the physical endpoints, 22 additional checks ran the existing compiled uv test executable
+across every uv checkout. A recording wrapper confirmed that runtime binary lookup selected that
+checkout's actual CLI. These checks ran no Cargo builds and are separate from the 404-command
+workloads, their test counts, and their recorded disk endpoints.
+
+The four independently cold-started single-session/donor prefix pairs agreed within
+0.65% at their matched command checkpoints. These correlated prefix observations
+are not full-session repetitions or statistical confidence intervals.
+
+### Disk-study inputs and limits
+
+The Ruff source starts at [`21c9b077ab3b10dd9007710ffa471cd12f7eceab`](https://github.com/astral-sh/ruff/commit/21c9b077ab3b10dd9007710ffa471cd12f7eceab)
+and uses [ruff-rust-1.98.json](scripts/session_replays/ruff-rust-1.98.json).
+uv starts from [`a50af60fb4162d7f94812d64c481c30a0200b6d8`](https://github.com/astral-sh/uv/commit/a50af60fb4162d7f94812d64c481c30a0200b6d8)
+plus the common runtime-path setup. Its [effective fixture](scripts/session_replays/disk-1.98.0-8-uv.json)
+records the original and prepared revisions. The compact results retain the exact prepared commit
+objects; applying the setup patch to the original baseline and first-edit trees reconstructs them.
+
+The Ohm installation was verified against the [revision 8 manifest](toolchains/1.98.0/8.json).
+Both toolchains' compiler and Cargo versions, executable hashes, the effective fixtures, and raw evidence archive
+checksums are retained in the compact results. The Linux timing-runner command above does not
+reproduce this dedicated-volume meter and worktree schedule.
+
+These results describe two fixed macOS/APFS development workflows with one complete session and
+one fork cohort per project/toolchain. They do not isolate the contribution of an individual
+optimization or constitute a controlled revision-7-to-revision-8 comparison. They do not measure
+Linux/Windows disk behavior, a fresh machine installation, or long-term cache growth across
+dependency upgrades and unrelated projects.
+
 ## Disk usage: Ohm 1.98.0-7 on macOS/APFS
+
+The following revision 7 study is retained as historical evidence.
 
 This study measures actual allocated disk space throughout recorded development sessions and
 across ten real worktrees. It compares the published
@@ -376,6 +566,55 @@ Linux/Windows filesystems, or long-term cache growth across dependency upgrades 
 projects. Excluded prerequisites were inventoried separately, but installed toolchain components
 and pre-existing clone relationships were not controlled for a cold-install comparison. Their
 descriptive inode allocations must not be added to the measured physical totals.
+
+## Earlier Ohm 1.98.0-7 direct study — September 2, 2026
+
+These measurements are preserved from the previous publication. This study used an AMD EPYC 9V74 Linux devbox with 32 logical CPUs and eight build jobs, the same pinned uv and Codex source revisions, default development profiles, and separate target directories. All 216 samples passed, with none discarded for interference. Dependency edits report seven-run medians, direct edits five-run medians, and no-op runs three-run medians. Cold builds, build-to-check transitions, and shared-worktree builds have one sample per compiler. These results are not pooled with the new study.
+
+### uv
+
+| Workflow                  | Rust 1.98.0 | Ohm 1.98.0-7 | Speedup |
+| ------------------------- | ----------: | -----------: | ------: |
+| Cold `cargo check`        |     66.92 s |      60.59 s |   1.10× |
+| Dependency edit, `check`  |     10.38 s |       0.59 s |  17.57× |
+| Direct edit, `check`      |      2.24 s |       2.10 s |   1.07× |
+| No-op `cargo check`       |      0.55 s |       0.42 s |   1.31× |
+| Cold `cargo clippy`       |     69.78 s |      62.45 s |   1.12× |
+| Dependency edit, `clippy` |     14.56 s |       0.67 s |  21.59× |
+| Direct edit, `clippy`     |      3.52 s |       3.13 s |   1.13× |
+| No-op `cargo clippy`      |      0.59 s |       0.46 s |   1.28× |
+| Cold `cargo test`         |    133.02 s |     120.55 s |   1.10× |
+| Dependency edit, `test`   |     20.76 s |       4.27 s |   4.86× |
+| Direct edit, `test`       |     18.24 s |      10.96 s |   1.66× |
+| No-op `cargo test`        |      1.31 s |       1.14 s |   1.15× |
+
+### Codex
+
+| Workflow                  | Rust 1.98.0 | Ohm 1.98.0-7 | Speedup |
+| ------------------------- | ----------: | -----------: | ------: |
+| Cold `cargo check`        |    112.75 s |      91.85 s |   1.23× |
+| Dependency edit, `check`  |     17.44 s |       1.04 s |  16.72× |
+| Direct edit, `check`      |      4.42 s |       3.88 s |   1.14× |
+| No-op `cargo check`       |      1.14 s |       0.86 s |   1.32× |
+| Cold `just clippy`        |    171.67 s |     117.96 s |   1.46× |
+| Dependency edit, `clippy` |     38.74 s |       1.26 s |  30.63× |
+| Direct edit, `clippy`     |     18.89 s |      14.81 s |   1.28× |
+| No-op `just clippy`       |      1.28 s |       1.01 s |   1.27× |
+| Cold `just test`          |    227.70 s |     189.60 s |   1.20× |
+| Dependency edit, `test`   |     45.05 s |       7.17 s |   6.28× |
+| Direct edit, `test`       |     25.40 s |      22.61 s |   1.12× |
+| No-op `just test`         |      2.46 s |       1.90 s |   1.29× |
+
+### Additional feature workflows
+
+| Project | Workflow                 | Package              | Rust 1.98.0 | Ohm 1.98.0-7 | Speedup | Samples |
+| ------- | ------------------------ | -------------------- | ----------: | -----------: | ------: | ------: |
+| uv      | Build, then check        | `uv`                 |     63.94 s |      17.55 s |   3.64× |       1 |
+| uv      | Shared-worktree build    | `uv-normalize`       |      6.90 s |       0.49 s |  13.98× |       1 |
+| Codex   | Build, then check        | `codex-core`         |    104.08 s |      44.93 s |   2.32× |       1 |
+| Codex   | No-op formatting         | Workspace            |     11.09 s |       0.32 s |  34.69× |       3 |
+| Codex   | Formatting after an edit | `codex-core`         |     11.08 s |       0.52 s |  21.20× |       5 |
+| Codex   | Shared-worktree build    | `codex-utils-string` |      2.81 s |       0.63 s |   4.46× |       1 |
 
 ## Earlier Ohm 1.98.0-6 direct study — September 2, 2026
 
