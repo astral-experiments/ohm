@@ -63,7 +63,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.98.0-7/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.98.0-8/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -86,7 +86,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.98.0-7 test` selects that specific installed revision.
+`cargo +ohm-1.98.0-8 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, parallel
 compiler frontends, and reuse of previously built registry and workspace dependencies by default.
@@ -137,7 +137,9 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
   `cargo +ohm worktree add -b <branch> <path> <base>` to seed reusable build state automatically.
   If using custom target directories, pass the new worktree's target directory via `--target-dir`.
 - Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` to maximize authenticated registry procedural-macro
-  reuse across worktrees. This opt-in is potentially unsound; avoid it for CI, releases, etc.
+  reuse across worktrees. On `cargo +ohm worktree add`, this also opts into importing snapshots
+  containing local procedural macros. This opt-in is potentially unsound; avoid it for CI, releases,
+  etc.
 - Set `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all` to maximize reuse of authenticated registry build
   scripts and native-tool helpers across worktrees. This opt-in is potentially unsound; avoid it for
   CI, releases, etc.
