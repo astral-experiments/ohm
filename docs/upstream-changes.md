@@ -34,7 +34,7 @@ Well-formedness checking collects ancestor predicate slices once and instantiate
 
 The optional parsed-lockfile cache remains disabled by default and is available through `CARGO_EXPERIMENTAL_LOCKFILE_PARSE_CACHE=1`.
 
-Published benchmark measurements through Ohm 1.98.0-6, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. They are historical results and are not represented as measurements of this release.
+Fresh [benchmark measurements](../BENCHMARKS.md) compare Ohm 1.98.0-7 with stock Rust 1.98.0 across the direct workflows and recorded development sessions. Earlier measurements through Ohm 1.98.0-6, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
 
 The recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://github.com/astral-sh/ohm-rust/pull/94) remains above the release pin and outside this release; its exploratory measurements did not show an improvement. The opt-in combined Clippy/codegen experiment in [ohm-rust#96](https://github.com/astral-sh/ohm-rust/pull/96), [ohm-cargo#102](https://github.com/astral-sh/ohm-cargo/pull/102), and [ohm-rust-clippy#51](https://github.com/astral-sh/ohm-rust-clippy/pull/51) also remains above the release pins. All component PRs remain open in one review stack per repository.
 

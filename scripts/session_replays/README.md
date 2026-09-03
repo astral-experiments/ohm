@@ -18,17 +18,17 @@ Run all three scenarios against existing repository checkouts:
 
 ```sh
 ulimit -n 65536
-install -d -m 700 /tmp/ohm-r6
-export TMPDIR=/tmp/ohm-r6
+install -d -m 700 /tmp/ohm-r7
+export TMPDIR=/tmp/ohm-r7
 python3 scripts/replay_sessions.py \
   --upstream 1.98.0 \
-  --ohm ohm-1.98.0-6 \
+  --ohm ohm-1.98.0-7 \
   --scenario scripts/session_replays/ruff-rust-1.98.json \
   --scenario scripts/session_replays/codex-stable-goal-accounting.json \
   --source-path ruff=/path/to/ruff \
   --source-path uv=/path/to/uv \
   --source-path codex=/path/to/codex \
-  --output-dir /tmp/ohm-real-session-benchmarks-r6 \
+  --output-dir /tmp/ohm-real-session-benchmarks-r7 \
   --jobs 8 \
   --repetitions 2 \
   --require-idle
@@ -36,8 +36,8 @@ python3 scripts/replay_sessions.py \
 
 Use a real, private short temporary directory for the Codex replay, as above,
 not a symlink to a longer path. Two existing tests depend on temporary-path
-length or its encoded representation. The revision 6 measurements used
-`TMPDIR=/tmp/ohm-r6` for both compilers and all three projects; use a fresh output
+length or its encoded representation. The revision 7 measurements used
+`TMPDIR=/tmp/ohm-r7` for both compilers and all three projects; use a fresh output
 directory when changing that environment.
 
 Source checkouts are never edited. The runner creates private Git mirrors and
@@ -141,8 +141,8 @@ python3 scripts/replay_sessions.py \
   --scenario scripts/session_replays/ruff-rust-1.98.json \
   --source-path ruff=/path/to/ruff \
   --upstream 1.98.0 \
-  --ohm ohm-1.98.0-6 \
-  --output-dir /tmp/ohm-ruff-session-benchmarks-r6 \
+  --ohm ohm-1.98.0-7 \
+  --output-dir /tmp/ohm-ruff-session-benchmarks-r7 \
   --jobs 8 \
   --repetitions 2 \
   --require-idle \
@@ -154,6 +154,33 @@ reproduce the older release-comparison workload on Rust 1.98, pass
 `--scenario scripts/session_replays/ruff-historical-rust-1.98.json` instead;
 this applies the same narrow Clippy compatibility adjustment. The original
 `ruff-historical.json` edits, commands, and recorded results remain unchanged.
+
+### Rust 1.98.0 revision 7 measurements
+
+The [complete revision 7 Ruff results](release-1.98.0-7-ruff.json) contain both
+counterbalanced repetitions and every recorded command, as a subset of the
+three-project study below. The study finished on September 3, 2026 (UTC), on an
+AMD EPYC 9V74 Linux host with 32 logical CPUs and eight build jobs. Baseline
+warmups are excluded. Both compilers use the same test selectors, report matching
+test counts, and retain only the existing `format_push_string` Clippy allowance.
+
+| Scope                        | Rust 1.98.0 | Ohm 1.98.0-7 | Time saved | Reduction |
+| ---------------------------- | ----------: | -----------: | ---------: | --------: |
+| Complete session             |    442.41 s |     276.47 s |   165.94 s |    37.51% |
+| All recorded commands        |    442.11 s |     276.17 s |   165.94 s |    37.53% |
+| Checks and tests (`nextest`) |    280.06 s |     207.68 s |    72.38 s |    25.85% |
+| `cargo clippy`               |    155.51 s |      60.86 s |    94.65 s |    60.86% |
+| `cargo fmt`                  |      6.54 s |       7.63 s |    −1.09 s |   −16.63% |
+
+The check-and-test breakdown includes actual test execution and excludes Clippy
+and formatting. Slower measurements remain included:
+
+| Check/test phase           | Rust 1.98.0 | Ohm 1.98.0-7 | Time saved | Reduction |
+| -------------------------- | ----------: | -----------: | ---------: | --------: |
+| Unchanged focused baseline |      1.61 s |       1.61 s |     0.00 s |     0.11% |
+| Simplification             |     61.44 s |      52.42 s |     9.02 s |    14.69% |
+| Dependency indexing        |     97.76 s |      68.86 s |    28.90 s |    29.57% |
+| Component fixed points     |    119.25 s |      84.80 s |    34.45 s |    28.89% |
 
 ### Rust 1.98.0 revision 6 measurements
 
@@ -380,6 +407,98 @@ historical three-project aggregate below. At the time, the main README combined 
 new Ruff result with the recorded revision-18 uv and Codex results. Its totals
 sum those three paired project means; they are not a new simultaneous run on
 one host.
+
+## Rust 1.98.0 revision 7 complete development-session results
+
+The [complete revision 7 results](release-1.98.0-7-baseline.json) compare released
+Ohm 1.98.0-7 with stock Rust 1.98.0, completing on September 3, 2026 (UTC).
+All three projects ran sequentially on one AMD EPYC 9V74 Linux host with 32 logical CPUs,
+eight build jobs, and two counterbalanced repetitions per compiler. The launch passed six
+five-second CPU checks with at least 95% idle, at most 0.5% I/O wait and 0.1% steal time,
+and no unrelated compiler processes. All 12 accepted replays, 148 timed commands, and 32 excluded
+warmup commands passed without observed external compilation.
+
+| Scope                                      | Rust 1.98.0 | Ohm 1.98.0-7 | Time saved | Reduction |
+| ------------------------------------------ | ----------: | -----------: | ---------: | --------: |
+| Ruff session                               |    442.41 s |     276.47 s |   165.94 s |    37.51% |
+| uv session                                 |    150.42 s |     109.24 s |    41.18 s |    27.38% |
+| Codex session                              |    532.66 s |     294.31 s |   238.35 s |    44.75% |
+| All sessions                               |  1,125.49 s |     680.02 s |   445.47 s |    39.58% |
+| `cargo check`                              |    154.42 s |      52.29 s |   102.13 s |    66.14% |
+| `cargo test`, `cargo nextest`, `just test` |    615.95 s |     469.97 s |   145.98 s |    23.70% |
+| `cargo clippy`                             |    337.66 s |     145.02 s |   192.64 s |    57.05% |
+| `cargo fmt`                                |     16.79 s |      12.06 s |     4.72 s |    28.13% |
+| All commands                               |  1,124.81 s |     679.35 s |   445.47 s |    39.60% |
+
+Each project row is the mean of two complete sessions, including the recorded source edits
+and runner overhead but excluding baseline warmups. The aggregate sums those three project
+means; command-category rows omit source edits and runner overhead. Two repetitions give
+preliminary estimates, not confidence intervals. Both compilers execute the same pinned
+sources, edits, commands, and tests. Dependencies were prefetched with locked manifests,
+but replay commands remain online. The replay used Python 3.12.13, just 1.58.0, and
+cargo-nextest 0.9.140. Both hosts retained uv 0.11.20; each compiler pair used the same helpers. The fixtures
+invoke Cargo and just directly. Helper versions and binary hashes are recorded in the artifacts. The Ohm configuration retains the explicit shared build directory
+and potentially unsound procedural-macro trust `all`; it does not measure packaged defaults
+alone. Native-tool trust and the optional lockfile parse cache were not enabled. Cargo
+status messages are not compiler-invocation counts.
+
+All four Codex runs use the unchanged
+[`codex-stable-goal-accounting.json`](codex-stable-goal-accounting.json) fixture,
+its hash-pinned setup patch, and the same 11 published test exclusions. Independent nextest
+inventories confirm the same 3,439 unique tests in every final package run. The artifacts
+retain every observed test-start count and the inventory hash. The six final edited source
+files match across all four runs. All replays used a short, private temporary directory.
+
+The separate [historical Ruff study](release-1.98.0-7-ruff-historical.json) adds four
+replays and 48 timed commands and is excluded from the headline aggregate. The standard
+refresh covers 16 replays, 196 timed commands, and 40 untimed warmup commands. A separate
+[uv feature ablation](release-1.98.0-7-uv-feature-ablation.json) adds eight replays with
+16 timed commands and 16 warmups; it is also excluded from the headline aggregate.
+
+The benchmark runners, source fixtures, setup patch, and test exclusions are unchanged from
+[the release coordinator](https://github.com/astral-sh/ohm/commit/d172b411f28dc2dd0ddc0c55cd394485b56f570e).
+The artifacts retain source, fixture, setup, runner, release-archive, toolchain, inventory,
+and execution-receipt hashes. Both hosts used the identical GitHub release assets after their public
+mirror downloads timed out; both verified SHA-256 hashes before timing.
+
+These are fresh stock
+comparisons, not a controlled revision-6-versus-revision-7 experiment. All historical results
+remain unchanged.
+
+## uv feature ablation with Rust 1.98.0 revision 7
+
+The [feature-ablation results](release-1.98.0-7-uv-feature-ablation.json) replay the
+existing [`uv-feature-ablation.json`](uv-feature-ablation.json) fixture with four Ohm flag
+combinations. They completed on September 3, 2026 (UTC), on the current-session
+host after the three-project suite. This is an Ohm-only experiment, separate from the stock
+comparison and headline aggregate. Each cell starts with fresh build artifacts and two
+untimed warmup commands, then applies the same private parser edit, checks the downstream
+`uv-client` crate, and runs the directly edited parser tests.
+
+| Public API hashing | Proc-macro cache | Downstream check | Parser tests | Complete session |
+| ------------------ | ---------------- | ---------------: | -----------: | ---------------: |
+| On                 | On               |           1.64 s |       1.59 s |           3.26 s |
+| Off                | On               |           3.86 s |       1.61 s |           5.50 s |
+| On                 | Off              |           1.76 s |       1.66 s |           3.46 s |
+| Off                | Off              |           3.95 s |       1.67 s |           5.65 s |
+
+Each row averages two repetitions. All eight replays, 16 timed commands, and 16 warmups
+passed with matching test counts and no observed external compilation. The runner rotates
+the four configurations between repetitions; the artifact records their exact order and
+`-Zpublic-api-hash=no` / `-Zcache-proc-macros=no` overrides. Other Ohm defaults, the shared
+build directory, and explicit procedural-macro trust remain unchanged. This small fixture
+measures these feature combinations; it does not isolate individual changes in revision 7
+or establish an effect across other workloads.
+
+To reproduce it with the same installed tools and private temporary directory:
+
+```sh
+python3 scripts/replay_sessions.py \
+  --project uv --scenario scripts/session_replays/uv-feature-ablation.json \
+  --source-path uv=/path/to/uv --ohm ohm-1.98.0-7 \
+  --feature-matrix --jobs 8 --repetitions 2 --require-idle \
+  --output-dir /path/to/new-empty-ablation-results
+```
 
 ## Rust 1.98.0 revision 6 complete development-session results
 
@@ -764,6 +883,38 @@ early cutoff; it can also reflect a build-script-only action, so inspect the
 per-command log when assigning a cause. Verbose output has its own overhead:
 compare verbose samples only against equally verbose samples, and keep the
 default nonverbose mode for headline session timings.
+
+## Historical Ruff workflow with Rust 1.98.0 revision 7
+
+The separate [revision 7 historical Ruff replay](release-1.98.0-7-ruff-historical.json)
+reruns the unchanged Rust 1.98-compatible historical fixture, including its
+check-to-test-to-check transitions. It completed on September 3, 2026 (UTC),
+on an AMD EPYC 9V74 Linux host with 32 logical CPUs and eight build jobs, after that
+host finished the direct workflow suite. Both compilers use the same sources, commands,
+test selections, and narrow Clippy allowance, with two counterbalanced repetitions. All
+48 timed commands and eight untimed warmups in the accepted replays passed, with matching test counts and no
+observed external compilation.
+
+| Scope            | Rust 1.98.0 | Ohm 1.98.0-7 | Time saved | Reduction |
+| ---------------- | ----------: | -----------: | ---------: | --------: |
+| Complete session |    395.82 s |     274.06 s |   121.76 s |    30.76% |
+| `cargo check`    |     31.57 s |      14.46 s |    17.11 s |    54.19% |
+| `cargo nextest`  |    301.46 s |     230.17 s |    71.29 s |    23.65% |
+| `cargo clippy`   |     56.12 s |      21.58 s |    34.53 s |    61.54% |
+| `cargo fmt`      |      6.41 s |       7.58 s |    −1.17 s |   −18.24% |
+
+One incomplete stock Ruff replay was rejected when an unrelated Cargo process overlapped its final timed command. The runner preserved the rejected logs, worktree, and build state, then repeated the entire replay from fresh state after a new quiet check. One recovery quiet preflight was rejected before timing began. All four accepted replays retain the same fixtures, test selections, and interference guards; the 216 completed direct measurements were unchanged.
+
+These are measured commands from complete historical sessions, not separate microbenchmarks.
+All commands remain included, including any slower cases. The historical workload is not part
+of the three-project headline, and its whole-session gain cannot be attributed solely to
+check reuse.
+
+| Check transition                   | Rust 1.98.0 | Ohm 1.98.0-7 | Time saved | Reduction |
+| ---------------------------------- | ----------: | -----------: | ---------: | --------: |
+| Unchanged baseline                 |      0.28 s |       0.53 s |    −0.25 s |   −88.36% |
+| Workspace dependency and root edit |     16.32 s |       7.29 s |     9.03 s |    55.31% |
+| Workspace root-only edit           |     14.97 s |       6.64 s |     8.33 s |    55.64% |
 
 ## Historical Ruff workflow with Rust 1.98.0 revision 6
 
