@@ -297,8 +297,14 @@ if "ohm-defaults" not in generated.get("build", {}).get("tool", {}).get(
 ).get("features", []):
     raise SystemExit("optimized Cargo must preserve Ohm's default features")
 generated["build"]["description"] = original["build"]["description"]
+supports_mimalloc = (checkout / "compiler/rustc/mimalloc-v1").is_file()
+if target == "x86_64-unknown-linux-gnu" and supports_mimalloc:
+    if generated["rust"].pop("mimalloc", None) is not True:
+        raise SystemExit("Linux rustc must use the supported mimalloc allocator")
+if generated["rust"].get("jemalloc") is not True:
+    raise SystemExit("rustdoc and Clippy must retain jemalloc")
 if generated != original:
-    raise SystemExit("generated bootstrap configuration changed more than its build description")
+    raise SystemExit("generated bootstrap configuration changed unrelated release settings")
 
 optimized = events[1]
 arguments = optimized["arguments"]
@@ -456,6 +462,22 @@ assert_optimized_build \
   false \
   true \
   "$macos_output"
+
+allocator_marker="$rust_checkout/compiler/rustc/mimalloc-v1"
+mkdir -p "$(dirname -- "$allocator_marker")"
+touch "$allocator_marker"
+
+: > "$trace"
+mimalloc_linux_output="$test_directory/mimalloc-linux-output.log"
+run_optimized_build "$linux_target" "$mimalloc_linux_output"
+assert_optimized_build "$linux_target" "$bolt_directory" true true "$mimalloc_linux_output"
+
+: > "$trace"
+mimalloc_macos_output="$test_directory/mimalloc-macos-output.log"
+run_optimized_build "$macos_target" "$mimalloc_macos_output"
+assert_optimized_build "$macos_target" "$rust_checkout/build/$macos_target/ci-llvm" false true "$mimalloc_macos_output"
+
+rm "$allocator_marker"
 
 expect_failure() {
   local description="$1"

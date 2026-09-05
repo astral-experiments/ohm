@@ -49,6 +49,14 @@ if [[ -f "$rust_checkout/src/tools/opt-dist/component-pgo-v1" ]]; then
   component_pgo=true
 fi
 
+# Keep older pinned sources reproducible; the marker guarantees that rustc can
+# select mimalloc without changing the allocator used by rustdoc and Clippy.
+use_mimalloc=false
+if [[ "$target" == x86_64-unknown-linux-gnu && \
+  -f "$rust_checkout/compiler/rustc/mimalloc-v1" ]]; then
+  use_mimalloc=true
+fi
+
 if [[ "$use_bolt" == true ]]; then
   if [[ -z "${OHM_BOLT_LLVM_DIR:-}" ]]; then
     echo 'Linux optimized releases require OHM_BOLT_LLVM_DIR' >&2
@@ -81,14 +89,21 @@ release_config="$build_dir/ohm-release-bootstrap.toml"
 # Keep the complete release configuration visible to both bootstrap.py and the
 # Rust bootstrap executable. bootstrap.py does not resolve TOML includes, so an
 # include-based override would silently drop release-critical configuration.
-if ! awk -v toolchain="$toolchain" '
+if ! awk -v toolchain="$toolchain" -v use_mimalloc="$use_mimalloc" '
   /^description[[:space:]]*=[[:space:]]*"Ohm"[[:space:]]*$/ {
     print "description = \"" toolchain "\""
     replacements++
     next
   }
   { print }
-  END { if (replacements != 1) exit 1 }
+  /^\[rust\][[:space:]]*$/ && use_mimalloc == "true" {
+    print "mimalloc = true"
+    allocator_replacements++
+  }
+  END {
+    if (replacements != 1) exit 1
+    if (use_mimalloc == "true" && allocator_replacements != 1) exit 1
+  }
 ' "$bootstrap_config" >"$release_config"; then
   echo 'release bootstrap configuration must contain exactly one Ohm build description' >&2
   exit 1
