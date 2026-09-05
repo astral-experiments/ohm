@@ -4,7 +4,7 @@ Ohm 1.98.0-9 updates the compiler and Cargo stacks and adds mimalloc 3.5.1 for A
 
 Cargo uses mimalloc on macOS Apple Silicon and the system allocator on Linux. rustc uses mimalloc on x86_64 Linux and jemalloc on macOS; LLVM allocations inside rustc follow that choice. rustdoc and Clippy retain jemalloc on both platforms, while rustfmt and standalone LLVM tools retain their existing allocators.
 
-Matched PGO/BOLT builds using revision 8 sources found Apple Silicon Cargo commands 4.6–8.3% faster with mimalloc. On x86_64 Linux, mimalloc reduced compiler wall time by 5.3% for a Ruff/ty check rebuild, 9.8% for a uv executable rebuild, and 7.8% for a uv edit-and-test command. Some Linux compiler workloads used 21–25% more peak process memory. These allocator comparisons predate the later compiler changes in this release and are not measurements of revision 9 against revision 8.
+Matched release builds using revision 8 sources, with PGO on both platforms and BOLT on Linux, found Apple Silicon Cargo commands 4.6–8.3% faster with mimalloc. On x86_64 Linux, mimalloc reduced compiler wall time by 5.3% for a Ruff/ty check rebuild, 9.8% for a uv executable rebuild, and 7.8% for a uv edit-and-test command. Some Linux compiler workloads used 21–25% more peak process memory. These allocator comparisons predate the later compiler changes in this release and are not measurements of revision 9 against revision 8.
 
 The compiler avoids repeated trait lookups, substitutions, and dependency-read tracking. It skips type-checker and borrow-checker work when the result is already known, while retaining independent borrow-checker worklists and full checking for contextual associated-type bounds. Cargo reuses its source-checksum buffer across files.
 
