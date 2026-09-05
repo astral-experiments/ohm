@@ -1,6 +1,16 @@
 # Changes from upstream
 
-Ohm 1.98.0-8 adds an explicit unsafe opt-in for importing worktree snapshots that contain local procedural macros. It retains the compiler behavior, disk-space improvements, Clippy, and rustfmt from Ohm 1.98.0-7; the compiler source changes only to pin the updated Cargo. The sources remain based on the exact upstream Rust 1.98.0 release, and changes included at the selected release pins are listed below.
+Ohm 1.98.0-9 updates the compiler and Cargo stacks and adds mimalloc 3.5.1 for Apple Silicon Cargo and x86_64 Linux rustc. It also includes improvements to compiler analysis, incremental cache serialization, and code generation. The sources remain based on the exact upstream Rust 1.98.0 release; the selected changes are listed below.
+
+Cargo uses mimalloc on macOS Apple Silicon and the system allocator on Linux. rustc uses mimalloc on x86_64 Linux and jemalloc on macOS; LLVM allocations inside rustc follow that choice. rustdoc and Clippy retain jemalloc on both platforms, while rustfmt and standalone LLVM tools retain their existing allocators.
+
+Matched PGO/BOLT builds using revision 8 sources found Apple Silicon Cargo commands 4.6–8.3% faster with mimalloc. On x86_64 Linux, mimalloc reduced compiler wall time by 5.3% for a Ruff/ty check rebuild, 9.8% for a uv executable rebuild, and 7.8% for a uv edit-and-test command. Some Linux compiler workloads used 21–25% more peak process memory. These allocator comparisons predate the later compiler changes in this release and are not measurements of revision 9 against revision 8.
+
+The compiler avoids repeated trait lookups, substitutions, and dependency-read tracking. It skips type-checker and borrow-checker work when the result is already known, while retaining independent borrow-checker worklists and full checking for contextual associated-type bounds. Cargo reuses its source-checksum buffer across files.
+
+Incremental cache promotion visits saved query values and can retain serialized bytes for up to three cache generations before compacting them. Fingerprint checks remain in place, and retained allocations share decoding state with newly encoded values to preserve identity.
+
+Metadata-only compilation can export coroutine runtime layouts without constructing executable resume and drop bodies. Unoptimized code generation skips empty cleanup paths and splits temporary aggregates while preserving debug information. Non-incremental codegen-unit merging uses MIR basic-block counts, and eligible optimized LLVM pipelines merge equivalent functions before inlining.
 
 After a successful serial incremental build, the compiler keeps one completed session instead of retaining both the new session and its predecessor. Active sessions remain protected, and locked snapshots are retained for overlapping compilations. This reduces steady-state dependency-graph and query-cache storage; the previous snapshot is still needed while compiling its replacement.
 
@@ -24,7 +34,7 @@ Cranelift preparation, bootstrap directory copies, and incremental compilation s
 
 Eligible incremental query-cache entries can be promoted in parallel. This experiment was excluded from Ohm 1.98.0-4 and is included in the selected compiler stack for this release. It passes current correctness checks, but an independent parallel speedup in the optimized release configuration has not been established.
 
-The compiler fork runs CodSpeed Walltime benchmarks for eight check scenarios across `bitmaps` and `syn`, with profile audits that verify the measured compiler process. These use single-threaded compiler invocations and an optimized stage-1 compiler. Earlier simulated instruction counts and these benchmark timings are separate from end-to-end release measurements.
+The compiler fork runs 22 CodSpeed Walltime scenarios across `bitmaps`, `syn`, `serde`, `regex-automata`, Ruff’s `ty_python_semantic`, and `uv-resolver`, including check and unoptimized codegen workloads. Profile audits verify the measured compiler process. These use single-threaded compiler invocations and an optimized stage-1 compiler without release PGO/BOLT; they are separate from end-to-end release measurements.
 
 Clippy runs 56 audited late passes covering 62 lint kinds through incremental module queries. Unchanged modules can replay their diagnostics without rerunning those passes. Compiler-driver inputs participate in cache compatibility, and source-sensitive suggestions track the files they read, including comment and macro-context changes. Other passes retain their existing traversal; compilers without the required hooks also retain the existing path.
 
@@ -36,9 +46,13 @@ Well-formedness checking collects ancestor predicate slices once and instantiate
 
 The optional parsed-lockfile cache remains disabled by default and is available through `CARGO_EXPERIMENTAL_LOCKFILE_PARSE_CACHE=1`.
 
-Fresh [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-8 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Earlier measurements through Ohm 1.98.0-7, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
+The existing [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-8 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Earlier measurements through Ohm 1.98.0-7, historical failure disclosures, replay artifacts, and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
 
-The recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://github.com/astral-sh/ohm-rust/pull/94) remains outside this release; its exploratory measurements did not show an improvement. The opt-in combined Clippy/codegen experiment in [ohm-rust#96](https://github.com/astral-sh/ohm-rust/pull/96), [ohm-cargo#102](https://github.com/astral-sh/ohm-cargo/pull/102), and [ohm-rust-clippy#51](https://github.com/astral-sh/ohm-rust-clippy/pull/51) is also excluded. Release pins are selected independently of those experimental review branches.
+The combined Clippy/codegen experiment is available through `cargo -Zohm-clippy-codegen build` and `cargo -Zohm-clippy-codegen test`; ordinary commands retain their existing behavior. The mode produces normal build artifacts without injecting `cfg(clippy)`, so diagnostics can differ from standalone Clippy.
+
+Unused incremental configuration expiry is available through `-Zohm-incremental-gc` and `cargo -Zohm-incremental-gc clean incremental --max-age '30 days'`. Tracking is disabled by default. Collection preserves finished artifacts and fingerprints, skips busy profiles and unknown ownership records, and trades retained incremental state for slower subsequent edits.
+
+The selected compiler stack also includes the recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://github.com/astral-sh/ohm-rust/pull/94). Its initial exploratory measurements showed regressions and did not establish a performance benefit; no independent speedup is claimed for it here.
 
 ## ohm-rust
 
@@ -89,6 +103,24 @@ The recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://
 - [#97: Collect superseded incremental compilation sessions](https://github.com/astral-sh/ohm-rust/pull/97)
 - [#98: Prevent unpacked debug objects from accumulating across rebuilds](https://github.com/astral-sh/ohm-rust/pull/98)
 - [#102: Pin Cargo macro trust for Ohm 1.98.0-8](https://github.com/astral-sh/ohm-rust/pull/102)
+- [#96: Retain independent MIR for Clippy during code generation](https://github.com/astral-sh/ohm-rust/pull/96)
+- [#94: Reuse recent type folds and inline shallow resolution](https://github.com/astral-sh/ohm-rust/pull/94)
+- [#99: Separate coroutine runtime layouts from executable MIR](https://github.com/astral-sh/ohm-rust/pull/99)
+- [#101: Reduce unoptimized codegen and monomorphization overhead](https://github.com/astral-sh/ohm-rust/pull/101)
+- [#100: Reduce fast-rejection overhead for single generic arguments](https://github.com/astral-sh/ohm-rust/pull/100)
+- [#103: Reduce trait selection and region graph overhead](https://github.com/astral-sh/ohm-rust/pull/103)
+- [#104: Reduce trait and dataflow overhead](https://github.com/astral-sh/ohm-rust/pull/104)
+- [#105: Skip uncached nodes during cache promotion](https://github.com/astral-sh/ohm-rust/pull/105)
+- [#106: Retain serialized query values during cache promotion](https://github.com/astral-sh/ohm-rust/pull/106)
+- [#107: Cache repeated trait lookups and substitutions](https://github.com/astral-sh/ohm-rust/pull/107)
+- [#110: Skip redundant work for literal consts and fieldless const generics](https://github.com/astral-sh/ohm-rust/pull/110)
+- [#108: Merge equivalent functions before LLVM inlining](https://github.com/astral-sh/ohm-rust/pull/108)
+- [#115: Balance codegen units with MIR basic-block counts](https://github.com/astral-sh/ohm-rust/pull/115)
+- [#112: Skip redundant per-body work in Rust analysis](https://github.com/astral-sh/ohm-rust/pull/112)
+- [#117: Cache bounds checks for closed associated types](https://github.com/astral-sh/ohm-rust/pull/117)
+- [#118: Reduce repeated work in compiler dependency tracking](https://github.com/astral-sh/ohm-rust/pull/118)
+- [#109: Use mimalloc 3.5.1 for Linux rustc builds](https://github.com/astral-sh/ohm-rust/pull/109)
+- [#120: Pin Cargo for Ohm 1.98.0-9](https://github.com/astral-sh/ohm-rust/pull/120)
 
 ## ohm-cargo
 
@@ -143,6 +175,10 @@ The recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://
 - [#100: Fix shared registry cache deadlocks](https://github.com/astral-sh/ohm-cargo/pull/100)
 - [#101: Seed Git worktrees with reusable Cargo build state](https://github.com/astral-sh/ohm-cargo/pull/101)
 - [#103: Allow trusted local macro snapshots in new worktrees](https://github.com/astral-sh/ohm-cargo/pull/103)
+- [#105: Reuse the source checksum buffer across files](https://github.com/astral-sh/ohm-cargo/pull/105)
+- [#106: Use mimalloc for Apple Silicon Cargo builds](https://github.com/astral-sh/ohm-cargo/pull/106)
+- [#104: Prototype expiry of unused incremental configurations](https://github.com/astral-sh/ohm-cargo/pull/104)
+- [#102: Add opt-in Clippy analysis to build and test compilation](https://github.com/astral-sh/ohm-cargo/pull/102)
 
 ## ohm-rust-clippy
 
@@ -161,6 +197,7 @@ The recent-type-fold and shallow-resolution experiment in [ohm-rust#94](https://
 - [#46: Experiment with empty-attribute MSRV parsing fast path](https://github.com/astral-sh/ohm-rust-clippy/pull/46)
 - [#48: Cache audited Clippy late passes per module](https://github.com/astral-sh/ohm-rust-clippy/pull/48)
 - [#49: Cache source-sensitive Clippy passes per module](https://github.com/astral-sh/ohm-rust-clippy/pull/49)
+- [#51: Support Clippy analysis during code generation](https://github.com/astral-sh/ohm-rust-clippy/pull/51)
 
 ## ohm-rustfmt
 
