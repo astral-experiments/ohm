@@ -49,6 +49,12 @@ for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; 
   fi
   chmod +x "$prefix/bin/$binary"
 done
+if [ "${OHM_TEST_WILD:-missing}" != missing ]; then
+  wild_directory=$prefix/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld
+  mkdir -p "$wild_directory"
+  printf '#!/bin/sh\nprintf "Wild %s (compatible with GNU linkers)\\n"\n' "$OHM_TEST_WILD" > "$wild_directory/ld.bfd"
+  chmod +x "$wild_directory/ld.bfd"
+fi
 EOF
 chmod +x "$fixture_directory/$archive_root/install.sh"
 tar -czf "$release_directory/$archive_name" -C "$fixture_directory" "$archive_root"
@@ -206,6 +212,7 @@ run_case() {
     OHM_TEST_RUSTC_BRAND="${OHM_TEST_RUSTC_BRAND:-$version}" \
     OHM_TEST_RUSTC_UPSTREAM_VERSION="${OHM_TEST_RUSTC_UPSTREAM_VERSION:-1.97.1}" \
     OHM_TEST_RUSTDOC="${OHM_TEST_RUSTDOC:-present}" \
+    OHM_TEST_WILD="${OHM_TEST_WILD:-missing}" \
     OHM_TEST_RUSTUP_ALIAS_FAILURE="${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" \
     OHM_TEST_ACTIVATION_RACE="${OHM_TEST_ACTIVATION_RACE:-0}" \
     OHM_TEST_ACTIVATION_DESTINATION="${OHM_TEST_ACTIVATION_DESTINATION:-}" \
@@ -562,5 +569,19 @@ if [ ! -d "$managed_alias_directory" ] || [ -L "$managed_alias_directory" ]; the
   echo 'installer replaced a managed rustup toolchain' >&2
   exit 1
 fi
+
+wild_installer="$temporary_directory/wild-installer.sh"
+sed 's/^embedded_wild_version=$/embedded_wild_version=0.10.0/' "$installer" > "$wild_installer"
+OHM_TEST_INSTALLER="$wild_installer"
+OHM_TEST_SYSTEM=Linux
+OHM_TEST_ARCHITECTURE=x86_64
+run_case missing-wild failure
+assert_contains "$output" 'bundled Wild linker is missing'
+OHM_TEST_WILD=0.9.0
+run_case wrong-wild-version failure
+assert_contains "$output" 'bundled Wild linker has an unexpected version'
+OHM_TEST_WILD=0.10.0
+run_case bundled-wild success
+unset OHM_TEST_INSTALLER OHM_TEST_SYSTEM OHM_TEST_ARCHITECTURE OHM_TEST_WILD
 
 echo 'Ohm installer tests passed'

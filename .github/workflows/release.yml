@@ -263,6 +263,14 @@ jobs:
 
           printf 'OHM_BOLT_LLVM_DIR=%s\n' "$bolt_llvm_dir" >> "$GITHUB_ENV"
 
+      - name: Prepare pinned Wild linker
+        env:
+          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+        run: |
+          wild_directory="$(python3 scripts/prepare-wild.py \
+            "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
+          printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
+
       - name: Build optimized extended Rust distribution
         env:
           OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
@@ -296,10 +304,13 @@ jobs:
             --arg cargo_revision "$CARGO_REVISION" \
             --arg clippy_revision "$CLIPPY_REVISION" \
             --arg rustfmt_revision "$RUSTFMT_REVISION" \
+            --argjson bundled_tools "$(jq --arg target "$OHM_TARGET" \
+              'if $target == "x86_64-unknown-linux-gnu" then .bundled_tools // {} else {} end' "$MANIFEST_PATH")" \
             '{
               schema_version: 1,
               toolchain: $toolchain,
               target: $target,
+              bundled_tools: $bundled_tools,
               coordinator: {
                 repository: $coordinator_repository,
                 revision: $coordinator_revision
@@ -405,10 +416,17 @@ jobs:
           linux_archive="$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz"
           macos_sha256="$(awk '{print $1}' "$macos_archive.sha256")"
           linux_sha256="$(awk '{print $1}' "$linux_archive.sha256")"
+          wild_version="$(jq -r '.bundled_tools.wild.version // empty' "$GITHUB_WORKSPACE/$MANIFEST_PATH")"
 
           awk -v version="$OHM_TOOLCHAIN" \
             -v macos_sha256="$macos_sha256" \
-            -v linux_sha256="$linux_sha256" '
+            -v linux_sha256="$linux_sha256" \
+            -v wild_version="$wild_version" '
+            $0 == "embedded_wild_version=" {
+              print "embedded_wild_version=" wild_version
+              ++wild_count
+              next
+            }
             $0 == "embedded_version=" {
               print "embedded_version=" version
               ++version_count
@@ -426,7 +444,7 @@ jobs:
             }
             { print }
             END {
-              if (version_count != 1 || macos_count != 1 || linux_count != 1) {
+              if (version_count != 1 || macos_count != 1 || linux_count != 1 || wild_count != 1) {
                 exit 1
               }
             }
@@ -628,6 +646,18 @@ jobs:
             cargo +"$OHM_TOOLCHAIN" -Zohm-defaults=no build \
               --manifest-path "$smoke_crate/Cargo.toml"
           grep -Fx disabled "$disabled_log" >/dev/null
+
+          if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] && \
+            jq -e '.bundled_tools.wild' "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+            for linker in wild lld; do
+              CARGO_TARGET_DIR="$smoke_root/linker-target" \
+                cargo +"$OHM_TOOLCHAIN" -Zohm-linker="$linker" run \
+                --manifest-path "$smoke_crate/Cargo.toml"
+              CARGO_TARGET_DIR="$smoke_root/linker-target" \
+                cargo +"$OHM_TOOLCHAIN" -Zohm-linker="$linker" test \
+                --manifest-path "$smoke_crate/Cargo.toml"
+            done
+          fi
 
           cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
           cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"

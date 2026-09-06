@@ -52,6 +52,27 @@
           "$ref": "#/$defs/rustfmt_source"
         }
       }
+    },
+    "bundled_tools": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "wild": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "sha256"],
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
     }
   },
   "allOf": [
