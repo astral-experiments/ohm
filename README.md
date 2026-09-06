@@ -131,7 +131,7 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 
 ## Benchmarks
 
-See the [benchmark documentation](./BENCHMARKS.md) for the full results and methodology.
+See the [benchmark documentation](./BENCHMARKS.md) for instructions on running these benchmarks.
 
 **Direct edits** modify the crate being checked, linted, or tested:
 
