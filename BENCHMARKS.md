@@ -30,7 +30,7 @@ Run both projects:
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.98.0 --ohm ohm-1.98.0-8 --jobs 8 \
+  --upstream 1.98.0 --ohm ohm-1.98.0-9 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -88,3 +88,7 @@ Rust does not isolate changes between Ohm releases.
 The result files record the measured versions, source revisions, configuration, and methodology. The
 historical macOS/APFS disk studies used a separate volume-allocation meter and worktree schedule;
 `benchmark.py` measures elapsed time and does not reproduce those studies.
+
+Revision 9 results cover [216 workflow samples](scripts/benchmark_results/release-1.98.0-9.json), [12 current-session replays](scripts/session_replays/release-1.98.0-9-baseline.json), [four historical Ruff replays](scripts/session_replays/release-1.98.0-9-ruff-historical.json), and [eight uv ablation replays](scripts/session_replays/release-1.98.0-9-uv-feature-ablation.json). Linux timings use eight jobs on a 32-CPU AMD EPYC-Milan host. Each suite passed six five-second preflight checks requiring at least 95% idle, at most 0.5% I/O wait and 0.1% steal, and no unrelated compiler processes. All accepted commands passed without competing compilations. The files also record two wholly excluded attempts and rejected replay preflights.
+
+The [APFS study](scripts/benchmark_results/disk-1.98.0-9.json) measures physical allocation across eight cohorts and 44 worktrees. The meter preserves unsettled readings and retries measurement after successful commands. Its [uv fixture](scripts/session_replays/disk-1.98.0-9-uv.json) applies the same test patch to both toolchains. Three passing nextest commands had a `leaky` annotation; the exact differences remain in the results. A preceding Clippy command blocked workspace-snapshot import for all nine siblings in each Ohm cohort, so these numbers include that fallback. The comparisons do not isolate revision 9 or allocator changes from revision 8.

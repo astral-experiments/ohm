@@ -216,12 +216,12 @@ class FixtureValidationTests(ReplayTestCase):
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
             (
-                SCRIPTS / "session_replays" / "release-1.98.0-8-ruff-historical.json"
+                SCRIPTS / "session_replays" / "release-1.98.0-9-ruff-historical.json"
             ).read_text()
         )
 
         self.assertEqual(baseline["rust_version"], "1.98.0")
-        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-8")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-9")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
@@ -248,9 +248,9 @@ class FixtureValidationTests(ReplayTestCase):
         published_fixture = SCRIPTS / "session_replays" / "ruff.json"
         scenario = replay.load_scenario(fixture)
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.98.0-8-ruff.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.98.0-9-ruff.json").read_text()
         )
-        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-8")
+        self.assertEqual(baseline["ohm_release"], "ohm-1.98.0-9")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(baseline["environment"], scenario.environment)
         self.assertEqual(
@@ -406,7 +406,7 @@ class FixtureValidationTests(ReplayTestCase):
 
     def test_readme_selected_session_table_matches_recorded_results(self) -> None:
         baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.98.0-8-baseline.json").read_text()
+            (SCRIPTS / "session_replays" / "release-1.98.0-9-baseline.json").read_text()
         )
         baselines = {project: baseline for project in replay.PROJECTS}
         rows = [
@@ -416,7 +416,7 @@ class FixtureValidationTests(ReplayTestCase):
         ]
         self.assertEqual(sum(row[0] == "Ruff session" for row in rows), 1)
         self.assertIn(
-            ["Scope", "Rust 1.98.0", "Ohm 1.98.0-8", "Time saved"], rows
+            ["Scope", "Rust 1.98.0", "Ohm 1.98.0-9", "Time saved"], rows
         )
 
         def assert_row(label: str, stock: float, ohm: float) -> None:
