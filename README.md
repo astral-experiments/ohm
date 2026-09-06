@@ -4,6 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
+
 With Ohm, incremental builds can be up to 30× faster, real-world development sessions see around a
 40% speed-up, and `target/` disk usage decreases by around 40%.
 
@@ -170,16 +171,17 @@ avoid rebuilding unchanged dependents:
 ## Philosophy
 
 Rust's compile times and disk usage are increasingly viewed as bottlenecks in day-to-day
-development, especially as agents enable us to parallelize across worktrees.
+development, especially as agents enable us to parallelize across dozens of worktrees.
 
 Ohm enables experimental optimizations to improve Rust's iteration speed and throughput. This is a
-deliberate tradeoff: we accept the risks of unvetted implementations in local development, where the
-blast radius of bugs is comparatively limited and the benefits of faster iteration are substantial.
+deliberate tradeoff: we accept the risks of experimental implementations in local development, where
+the blast radius of bugs is comparatively limited and the benefits of faster iteration are
+substantial (while continuing to use the official toolchain for production builds).
 
-Ohm enables us to benefit from faster builds and reduced disk space now, exploring ideas before they
-meet upstream's standards for completeness and correctness, while continuing to use the official
-toolchain for production builds. (Agents lower the cost of implementing, testing, and refining those
-ideas; good ideas can then be proven out and ultimately proposed upstream.)
+Ohm is authored entirely by GPT-6 Astra in Codex. Agents lower the cost of implementing, testing,
+and refining the ideas explored in this project; good ideas can then be proven out and ultimately
+proposed upstream. And by forking the toolchain itself, we can change _anything_; we aren't bounded
+by the limitations we'd experience as, e.g., a Cargo wrapper.
 
 At present, Ohm includes the following optimizations, all enabled by default:
 
