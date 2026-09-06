@@ -4,6 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
+
 With Ohm, incremental builds can be up to 30× faster, real-world development sessions see around a
 40% speed-up, and `target/` disk usage decreases by around 40%.
 
@@ -23,14 +24,14 @@ Benchmarking Ohm 1.98.0-8 against stock Rust on replayed development sessions:
 
 And comparing disk usage (on APFS):
 
-| Scope                 | Rust 1.98.0 | Ohm 1.98.0-8 | Disk space saved |
-| --------------------- | ----------: | -----------: | ---------------: |
-| Ruff/ty session       |    6.05 GiB |     3.41 GiB |           43.60% |
-| Ruff/ty, 2 worktrees  |   10.34 GiB |     6.29 GiB |           39.17% |
-| Ruff/ty, 10 worktrees |   54.16 GiB |    29.95 GiB |           44.70% |
-| uv session            |   13.04 GiB |    10.88 GiB |           16.55% |
-| uv, 2 worktrees       |   17.44 GiB |    12.55 GiB |           28.07% |
-| uv, 10 worktrees      |   85.45 GiB |    52.00 GiB |           39.15% |
+| Scope                 | Rust 1.98.0 | Ohm 1.98.0-8 | Space saved |
+| --------------------- | ----------: | -----------: | ----------: |
+| Ruff/ty session       |    6.05 GiB |     3.41 GiB |      43.60% |
+| Ruff/ty, 2 worktrees  |   10.34 GiB |     6.29 GiB |      39.17% |
+| Ruff/ty, 10 worktrees |   54.16 GiB |    29.95 GiB |      44.70% |
+| uv session            |   13.04 GiB |    10.88 GiB |      16.55% |
+| uv, 2 worktrees       |   17.44 GiB |    12.55 GiB |      28.07% |
+| uv, 10 worktrees      |   85.45 GiB |    52.00 GiB |      39.15% |
 
 Compared to the stock Rust toolchain, Ohm:
 
@@ -170,16 +171,17 @@ avoid rebuilding unchanged dependents:
 ## Philosophy
 
 Rust's compile times and disk usage are increasingly viewed as bottlenecks in day-to-day
-development, especially as agents enable us to parallelize across worktrees.
+development, especially as agents enable us to parallelize across (dozens of) worktrees.
 
 Ohm enables experimental optimizations to improve Rust's iteration speed and throughput. This is a
-deliberate tradeoff: we accept the risks of unvetted implementations in local development, where the
-blast radius of bugs is comparatively limited and the benefits of faster iteration are substantial.
+deliberate tradeoff: we accept the risks of experimental implementations in local development, where
+the blast radius of bugs is comparatively limited and the benefits of faster iteration are
+substantial (while continuing to use the official toolchain for production builds).
 
-Ohm enables us to benefit from faster builds and reduced disk space now, exploring ideas before they
-meet upstream's standards for completeness and correctness, while continuing to use the official
-toolchain for production builds. (Agents lower the cost of implementing, testing, and refining those
-ideas; good ideas can then be proven out and ultimately proposed upstream.)
+Ohm is authored entirely by GPT-6 Astra in Codex. Agents lower the cost of implementing, testing,
+and refining the ideas explored in this project; good ideas can then be proven out and ultimately
+proposed upstream. And by forking the toolchain itself, we can change _anything_; we aren't bounded
+by the limitations we'd experience as, e.g., a Cargo wrapper.
 
 At present, Ohm includes the following optimizations, all enabled by default:
 
