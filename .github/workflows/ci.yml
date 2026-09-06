@@ -118,6 +118,8 @@ jobs:
         run: ./scripts/test-release-sources.sh
       - name: Test optimized release builds
         run: bash scripts/test-optimized-dist.sh
+      - name: Test compiler development assets
+        run: python3 scripts/test-rustc-dev.py
       - name: Test the Ohm installer
         run: bash scripts/test-installer.sh
 

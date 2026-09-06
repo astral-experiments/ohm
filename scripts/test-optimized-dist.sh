@@ -378,8 +378,8 @@ if option(distribution_arguments, "--target") != target:
     raise SystemExit("final distribution used the wrong target")
 if option(distribution_arguments, "--set") != f"build.description={toolchain}":
     raise SystemExit("final distribution changed the immutable toolchain identity")
-if distribution_arguments[-1] != "extended":
-    raise SystemExit("optimized releases must contain the complete extended distribution")
+if distribution_arguments[-2:] != ["extended", "rustc-dev"]:
+    raise SystemExit("final optimized distribution must include matching rustc-dev metadata")
 
 environment = optimized["environment"]
 if environment.get("RUST_BOOTSTRAP_CONFIG") != str(generated_config):

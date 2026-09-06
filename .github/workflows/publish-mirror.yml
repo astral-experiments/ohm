@@ -37,11 +37,17 @@ jobs:
 
           macos_archive="$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz"
           linux_archive="$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz"
+          macos_dev="$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz"
+          linux_dev="$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz"
           for asset in \
             "$macos_archive" \
             "$macos_archive.sha256" \
             "$linux_archive" \
             "$linux_archive.sha256" \
+            "$macos_dev" \
+            "$macos_dev.sha256" \
+            "$linux_dev" \
+            "$linux_dev.sha256" \
             ohm-installer.sh \
             SHA256SUMS; do
             if [[ ! -f "$asset" || -L "$asset" ]]; then
@@ -58,6 +64,10 @@ jobs:
             "$macos_archive.sha256" \
             "$linux_archive" \
             "$linux_archive.sha256" \
+            "$macos_dev" \
+            "$macos_dev.sha256" \
+            "$linux_dev" \
+            "$linux_dev.sha256" \
             "$public_directory/"
           cp ohm-installer.sh "$public_directory/install.sh"
           (
@@ -67,6 +77,10 @@ jobs:
               "$macos_archive.sha256" \
               "$linux_archive" \
               "$linux_archive.sha256" \
+              "$macos_dev" \
+              "$macos_dev.sha256" \
+              "$linux_dev" \
+              "$linux_dev.sha256" \
               install.sh > SHA256SUMS
           )
           echo "directory=$public_directory" >> "$GITHUB_OUTPUT"

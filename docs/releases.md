@@ -81,9 +81,30 @@ safety warning, and public download links alongside the generated changelog. Int
 `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private release includes:
 
 - Apple Silicon macOS and x86_64 Linux (glibc) `.tar.gz` archives and `.sha256` sidecars;
+- optional matching `rustc-dev` archives and checksums for both platforms;
 - `ohm-installer.sh`, with the release version and both archive checksums embedded;
 - the release manifest and platform-specific source provenance; and
 - `SHA256SUMS` for the release assets.
+
+The final optimized distribution phase builds `extended` and `rustc-dev` together. Before staging
+`<version>-rustc-dev-<target>.tar.gz`, `scripts/stage-rustc-dev.py` checks that its compiler driver
+has the same filename and SHA-256 as the driver in the final compiler installer, including Linux
+BOLT optimization. It also requires the compiler session and driver implementation metadata. The
+component provenance records the compiler archive hash, driver hash, and pinned source provenance.
+A mismatch stops release staging. Bootstrap attempts to hard-link compiler artifacts into the
+sysroot, and BOLT updates the driver in place. The comparison verifies that the development
+component received those final bytes, and catches differences if bootstrap fell back to copying.
+The public development archive contains target compiler libraries
+and metadata, plus an explicit set of installer controls and licenses. Staging excludes the compiler
+source tree, build configuration, source provenance, and unexpected root files, and regenerates the
+installer's file manifest to match the retained libraries.
+
+The development component is a separate download for tools that embed this exact Ohm compiler.
+The standard installer uses the combined runtime archive. Development archives become available
+when a release is built and published with this pipeline; stock Rust metadata cannot substitute for
+an Ohm build. Their public URLs use
+`https://labs.astral.sh/ohm/releases/<version>/<version>-rustc-dev-<target>.tar.gz`, with matching
+`.sha256` sidecars. Component source provenance stays with the private GitHub release.
 
 Only the installer, archives, checksum sidecars, and a public-only `SHA256SUMS` file are copied to
 Cloudflare R2. Versioned assets are served publicly from

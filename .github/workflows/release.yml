@@ -334,6 +334,13 @@ jobs:
           cp "$combined_archive" "$release_directory/$archive_name"
           cp source/rust/build/dist/ohm-provenance.json \
             "$release_directory/$provenance_name"
+          python3 scripts/stage-rustc-dev.py \
+            --toolchain "$OHM_TOOLCHAIN" \
+            --target "$OHM_TARGET" \
+            --combined "$combined_archive" \
+            --development "source/rust/build/dist/rustc-dev-$rust_version-dev-$OHM_TARGET.tar.gz" \
+            --provenance source/rust/build/dist/ohm-provenance.json \
+            --output "$release_directory"
 
           (
             cd "$release_directory"
@@ -352,6 +359,10 @@ jobs:
             ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz.sha256
             ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json
             ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json.sha256
+            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-rustc-dev-${{ matrix.target }}.tar.gz
+            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-rustc-dev-${{ matrix.target }}.tar.gz.sha256
+            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-rustc-dev-${{ matrix.target }}-provenance.json
+            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-rustc-dev-${{ matrix.target }}-provenance.json.sha256
           if-no-files-found: error
           retention-days: 7
 
@@ -386,19 +397,26 @@ jobs:
           for target in "${targets[@]}"; do
             archive_name="$OHM_TOOLCHAIN-$target.tar.gz"
             provenance_name="$OHM_TOOLCHAIN-$target-provenance.json"
+            dev_archive="$OHM_TOOLCHAIN-rustc-dev-$target.tar.gz"
+            dev_provenance="$OHM_TOOLCHAIN-rustc-dev-$target-provenance.json"
 
             for asset in \
               "$archive_name" \
               "$archive_name.sha256" \
               "$provenance_name" \
-              "$provenance_name.sha256"; do
+              "$provenance_name.sha256" \
+              "$dev_archive" \
+              "$dev_archive.sha256" \
+              "$dev_provenance" \
+              "$dev_provenance.sha256"; do
               if [[ ! -f "$asset" || -L "$asset" ]]; then
                 echo "missing or unsafe release asset: $asset" >&2
                 exit 1
               fi
             done
 
-            sha256sum --check --strict "$archive_name.sha256" "$provenance_name.sha256"
+            sha256sum --check --strict "$archive_name.sha256" "$provenance_name.sha256" \
+              "$dev_archive.sha256" "$dev_provenance.sha256"
           done
 
           macos_archive="$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz"
@@ -448,6 +466,12 @@ jobs:
             ohm-installer.sh \
             "$manifest_name" \
             "$OHM_TOOLCHAIN-aarch64-apple-darwin-provenance.json" \
+            "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz" \
+            "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz.sha256" \
+            "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz" \
+            "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz.sha256" \
+            "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin-provenance.json" \
+            "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu-provenance.json" \
             "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu-provenance.json" > SHA256SUMS
           sha256sum --check --strict SHA256SUMS
 
@@ -746,6 +770,12 @@ jobs:
               ohm-installer.sh \
               "$OHM_TOOLCHAIN.json" \
               "$OHM_TOOLCHAIN-aarch64-apple-darwin-provenance.json" \
+              "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz" \
+              "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz.sha256" \
+              "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz" \
+              "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz.sha256" \
+              "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin-provenance.json" \
+              "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu-provenance.json" \
               "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu-provenance.json" \
               SHA256SUMS; do
               expected_digest="sha256:$(sha256sum "$asset" | awk '{print $1}')"
@@ -810,6 +840,8 @@ jobs:
             '|------|----------|----------|' \
             "| [$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz]($release_url/$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz) | Apple Silicon macOS | [checksum]($release_url/$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz.sha256) |" \
             "| [$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz]($release_url/$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz) | x86_64 Linux | [checksum]($release_url/$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz.sha256) |" \
+            "| [$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz]($release_url/$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz) | Optional compiler metadata for Apple Silicon macOS | [checksum]($release_url/$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz.sha256) |" \
+            "| [$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz]($release_url/$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz) | Optional compiler metadata for x86_64 Linux | [checksum]($release_url/$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz.sha256) |" \
             > "$notes_file"
 
           gh release create "$OHM_TOOLCHAIN" \
@@ -825,6 +857,12 @@ jobs:
             ohm-installer.sh \
             "$OHM_TOOLCHAIN.json" \
             "$OHM_TOOLCHAIN-aarch64-apple-darwin-provenance.json" \
+            "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz" \
+            "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin.tar.gz.sha256" \
+            "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz" \
+            "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu.tar.gz.sha256" \
+            "$OHM_TOOLCHAIN-rustc-dev-aarch64-apple-darwin-provenance.json" \
+            "$OHM_TOOLCHAIN-rustc-dev-x86_64-unknown-linux-gnu-provenance.json" \
             "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu-provenance.json" \
             SHA256SUMS
 
