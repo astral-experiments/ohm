@@ -172,9 +172,9 @@ avoid rebuilding unchanged dependents:
 Rust's compile times and disk usage are increasingly viewed as bottlenecks in day-to-day
 development, especially as agents enable us to parallelize across worktrees.
 
-Ohm is designed to increase Rust's iteration speed and throughput by making a deliberate tradeoff:
-enabling experimental optimizations for local development, where the risks are (comparatively) low
-and the benefits of faster iteration are substantial.
+Ohm enables experimental optimizations to improve Rust's iteration speed and throughput. This is a
+deliberate tradeoff: in local development, the risks are comparatively low and the benefits of
+faster iteration are substantial.
 
 Ohm enables us to benefit from faster builds and reduced disk space now, exploring ideas before they
 meet upstream's standards for completeness and correctness, while continuing to use the official
