@@ -311,25 +311,27 @@ class FixtureValidationTests(ReplayTestCase):
         )
 
         def assert_row(
-            table: list[list[str]], label: str, stock: float, ohm: float
+            table: list[list[str]],
+            label: str,
+            stock: float,
+            ohm: float,
+            *,
+            include_absolute_savings: bool = True,
         ) -> None:
             saved = stock - ohm
             sign = "−" if saved < 0 else ""
-            self.assertIn(
-                [
-                    label,
-                    f"{stock:,.2f} s",
-                    f"{ohm:,.2f} s",
-                    f"{sign}{abs(saved):,.2f} s",
-                    f"{sign}{abs(100 * saved / stock):.2f}%",
-                ],
-                table,
-            )
+            expected = [label, f"{stock:,.2f} s", f"{ohm:,.2f} s"]
+            if include_absolute_savings:
+                expected.append(f"{sign}{abs(saved):,.2f} s")
+            expected.append(f"{sign}{abs(100 * saved / stock):.2f}%")
+            self.assertIn(expected, table)
 
         session = baseline["timed_session_seconds"]["ruff"]
         stock = statistics.fmean(session["stock"])
         ohm = statistics.fmean(session["ohm"])
-        assert_row(main_rows, "Ruff session", stock, ohm)
+        assert_row(
+            main_rows, "Ruff session", stock, ohm, include_absolute_savings=False
+        )
         assert_row(detailed_rows, "Complete session", stock, ohm)
         timed = baseline["timed_command_seconds"]["ruff"]
         assert_row(
@@ -505,7 +507,7 @@ class FixtureValidationTests(ReplayTestCase):
         ]
         self.assertEqual(sum(row[0] == "Ruff session" for row in rows), 1)
         self.assertIn(
-            ["Scope", "Rust 1.98.0", "Ohm 1.98.0-8", "Time saved", "Reduction"], rows
+            ["Scope", "Rust 1.98.0", "Ohm 1.98.0-8", "Time saved"], rows
         )
 
         def assert_row(label: str, stock: float, ohm: float) -> None:
@@ -516,7 +518,6 @@ class FixtureValidationTests(ReplayTestCase):
                     label,
                     f"{stock:,.2f} s",
                     f"{ohm:,.2f} s",
-                    f"{sign}{abs(saved):,.2f} s",
                     f"{sign}{abs(100 * saved / stock):.2f}%",
                 ],
                 rows,
