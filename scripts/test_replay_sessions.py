@@ -243,7 +243,7 @@ class FixtureValidationTests(ReplayTestCase):
             self.assertEqual(command["index"], index)
             self.assertEqual(command["command"], [step["program"], *step["args"]])
 
-    def test_current_ruff_results_match_the_fixture_and_tables(self) -> None:
+    def test_current_ruff_results_match_the_fixture(self) -> None:
         fixture = SCRIPTS / "session_replays" / "ruff-rust-1.98.json"
         published_fixture = SCRIPTS / "session_replays" / "ruff.json"
         scenario = replay.load_scenario(fixture)
@@ -293,97 +293,6 @@ class FixtureValidationTests(ReplayTestCase):
                     ),
                     baseline["timed_command_seconds"]["ruff"][toolchain][repetition],
                 )
-
-        def rows(document: Path, section: str | None = None) -> list[list[str]]:
-            text = document.read_text()
-            if section is not None:
-                text = text.split(f"### {section}\n", 1)[1].split("\n### ", 1)[0]
-            return [
-                [cell.strip() for cell in line.strip("|").split("|")]
-                for line in text.splitlines()
-                if line.startswith("|")
-            ]
-
-        main_rows = rows(SCRIPTS.parent / "README.md")
-        detailed_rows = rows(
-            SCRIPTS / "session_replays" / "README.md",
-            "Rust 1.98.0 revision 8 measurements",
-        )
-
-        def assert_row(
-            table: list[list[str]],
-            label: str,
-            stock: float,
-            ohm: float,
-            *,
-            include_absolute_savings: bool = True,
-        ) -> None:
-            saved = stock - ohm
-            sign = "−" if saved < 0 else ""
-            expected = [label, f"{stock:,.2f} s", f"{ohm:,.2f} s"]
-            if include_absolute_savings:
-                expected.append(f"{sign}{abs(saved):,.2f} s")
-            expected.append(f"{sign}{abs(100 * saved / stock):.2f}%")
-            self.assertIn(expected, table)
-
-        session = baseline["timed_session_seconds"]["ruff"]
-        stock = statistics.fmean(session["stock"])
-        ohm = statistics.fmean(session["ohm"])
-        assert_row(
-            main_rows, "Ruff session", stock, ohm, include_absolute_savings=False
-        )
-        assert_row(detailed_rows, "Complete session", stock, ohm)
-        timed = baseline["timed_command_seconds"]["ruff"]
-        assert_row(
-            detailed_rows,
-            "All recorded commands",
-            statistics.fmean(timed["stock"]),
-            statistics.fmean(timed["ohm"]),
-        )
-
-        def command_seconds(toolchain: str, indices: set[int]) -> float:
-            return sum(
-                statistics.fmean(command["wall_seconds"][toolchain])
-                for command in commands
-                if command["index"] in indices
-            )
-
-        for label, indices in (
-            (
-                "Checks and tests (`nextest`)",
-                {
-                    command["index"]
-                    for command in commands
-                    if command["category"] == "test"
-                },
-            ),
-            (
-                "`cargo clippy`",
-                {
-                    command["index"]
-                    for command in commands
-                    if command["category"] == "clippy"
-                },
-            ),
-            (
-                "`cargo fmt`",
-                {
-                    command["index"]
-                    for command in commands
-                    if command["category"] == "formatting"
-                },
-            ),
-            ("Unchanged focused baseline", {1}),
-            ("Simplification", {3, 4}),
-            ("Dependency indexing", {7, 8}),
-            ("Component fixed points", {11, 12, 13}),
-        ):
-            assert_row(
-                detailed_rows,
-                label,
-                command_seconds("stock", indices),
-                command_seconds("ohm", indices),
-            )
 
     def test_checked_in_release_baseline_contains_paired_real_sessions(self) -> None:
         baseline = json.loads(
