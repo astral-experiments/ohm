@@ -117,7 +117,9 @@ jobs:
       - name: Test release source verification
         run: ./scripts/test-release-sources.sh
       - name: Test optimized release builds
-        run: bash scripts/test-optimized-dist.sh
+        run: |
+          bash scripts/test-optimized-dist.sh
+          python3 scripts/test_prepare_wild.py
       - name: Test the Ohm installer
         run: bash scripts/test-installer.sh
 

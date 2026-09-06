@@ -239,6 +239,21 @@ if [[ "$use_bolt" == true ]]; then
   opt_dist_arguments+=(--use-bolt)
 fi
 
+dist_arguments=(--set "build.description=$toolchain")
+if [[ -n "${OHM_WILD_LINKER_DIR:-}" ]]; then
+  if [[ "$target" != x86_64-unknown-linux-gnu || ! -x "$OHM_WILD_LINKER_DIR/wild" ]]; then
+    echo 'bundled Wild requires a Linux x86-64 target and an executable payload' >&2
+    exit 1
+  fi
+  for license in LICENSE-APACHE LICENSE-MIT; do
+    [[ -f "$OHM_WILD_LINKER_DIR/$license" ]] || {
+      echo "missing Wild license: $license" >&2
+      exit 1
+    }
+  done
+  dist_arguments+=(--set "target.$target.ohm-wild-linker=$OHM_WILD_LINKER_DIR")
+fi
+
 env -i "${safe_environment[@]}" \
   "$opt_dist" "${opt_dist_arguments[@]}" \
   -- \
@@ -248,7 +263,7 @@ env -i "${safe_environment[@]}" \
   --build-dir "$build_dir" \
   --host "$target" \
   --target "$target" \
-  --set "build.description=$toolchain" \
+  "${dist_arguments[@]}" \
   extended
 
 # Cargo is instrumented alongside rustc and consumes the merged rustc profile.
