@@ -3,9 +3,9 @@
 [![CI](https://github.com/astral-sh/ohm/actions/workflows/ci.yml/badge.svg)](https://github.com/astral-sh/ohm/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
-An experimental fork of the Rust toolchain, designed for extremely fast local development. With Ohm,
-incremental builds can be up to 30× faster, real-world development sessions see around a 40%
-speed-up, and `target/` disk usage decreases by around 40%.
+An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
+With Ohm, incremental builds can be up to 30× faster, real-world development sessions see around a
+40% speed-up, and `target/` disk usage decreases by around 40%.
 
 Benchmarking Ohm 1.98.0-8 against stock Rust on replayed development sessions:
 
