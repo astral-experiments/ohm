@@ -1,0 +1,655 @@
+{
+  "rust_version": "1.98.0",
+  "ohm_release": "ohm-1.98.0-9",
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    ["stock", "ohm"],
+    ["ohm", "stock"]
+  ],
+  "sessions": [
+    {
+      "project": "ruff",
+      "session_id": "ruff-inherited-attribute-inference",
+      "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+      "commands": 12,
+      "edits": 3,
+      "warmups": 2
+    }
+  ],
+  "timed_session_seconds": {
+    "ruff": {
+      "stock": [530.8494640180015, 512.1965761850006],
+      "ohm": [354.0440736399996, 353.31412104599985]
+    }
+  },
+  "timed_command_seconds": {
+    "ruff": {
+      "stock": [530.231361648006, 511.5618226129973],
+      "ohm": [353.33967157099505, 352.46064597599616]
+    }
+  },
+  "timed_edit_seconds": {
+    "ruff": {
+      "stock": [0.04287012100030552, 0.0460043989969563],
+      "ohm": [0.044946515998162795, 0.05097445499814057]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "ruff": {
+      "stock": [229.1670059579992, 226.0364219619987],
+      "ohm": [162.362849526, 165.90870993799945]
+    }
+  },
+  "commands": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Check the semantic crate before editing",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [0.3088082829999621, 0.3214660609992279],
+          "ohm": [0.9746173550011008, 0.5769895499997801]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Establish the focused attribute-cycle baseline",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [1.1700412110003526, 1.1819679149994045],
+          "ohm": [1.171849480999299, 1.6774634569992486]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run focused instance-attribute mdtests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::attributes.md"
+        ],
+        "wall_seconds": {
+          "stock": [154.16105985600007, 148.36471892899863],
+          "ohm": [111.36593967699991, 110.72416991199862]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [3, 3],
+          "ohm": [3, 3]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Recheck focused inference-cycle mdtests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [1.2526958250000462, 1.3535535840001103],
+          "ohm": [1.6716160369996942, 1.7397232559997065]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 6,
+        "label": "Check core and semantic crates after the core dependency edit",
+        "category": "check",
+        "command": [
+          "cargo",
+          "check",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic"
+        ],
+        "wall_seconds": {
+          "stock": [23.243285391001336, 23.00108521200127],
+          "ohm": [11.569664208998802, 9.772900470999957]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Run the original cycle, hasattr, and subtype regression slice",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final",
+          "--",
+          "mdtest::cycle.md",
+          "mdtest::narrow/hasattr.md",
+          "mdtest::type_properties/is_subtype_of.md"
+        ],
+        "wall_seconds": {
+          "stock": [78.47421038900029, 73.339643497],
+          "ohm": [53.69932221499948, 55.28961267200066]
+        },
+        "tests_started": {
+          "stock": [3, 3],
+          "ohm": [3, 3]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Recheck semantic analysis after the recursive-inference edit",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [21.31616628300071, 21.49731519299894],
+          "ohm": [10.032612413999232, 9.95690047700009]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Run the expanded inference-cycle regression file",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [149.4470418280016, 145.01619768399905],
+          "ohm": [105.45892321899919, 104.42630684399955]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Recheck instance-attribute regressions",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::attributes.md"
+        ],
+        "wall_seconds": {
+          "stock": [1.7706624710008327, 1.7020678669996414],
+          "ohm": [2.2733521570007724, 2.3549661149991152]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Run strict Clippy for the changed core and semantic crates",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string"
+        ],
+        "wall_seconds": {
+          "stock": [75.13292852700033, 72.60053264599992],
+          "ohm": [30.587236511999436, 31.25047239199921]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [92, 92],
+          "ohm": [25, 25]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Verify Rust formatting across the workspace",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [7.108428991999972, 7.136030966001272],
+          "ohm": [8.982127662999119, 8.465015564999703]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Validate all core and semantic package tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [16.846032592000483, 16.04724305899981],
+          "ohm": [15.55241063199901, 16.22612526500052]
+        },
+        "tests_started": {
+          "stock": [867, 867],
+          "ohm": [867, 867]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      }
+    ]
+  },
+  "warmups": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Warm the semantic crate at the unmodified session baseline",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [42.857403390999025, 40.745661091999864],
+          "ohm": [25.46030314699965, 24.661693037000077]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [179, 179],
+          "ohm": [179, 179]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Warm the baseline inference-cycle mdtest harness",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [186.30960256700018, 185.29076086999885],
+          "ohm": [136.90254637900034, 141.24701690099937]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [193, 193],
+          "ohm": [193, 193]
+        }
+      }
+    ]
+  },
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "baseline_warmups_excluded": true,
+    "session_totals_include_edits_and_runner_overhead": true,
+    "compiler_accounting": "cargo status messages; not compiler invocations",
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust_enabled": false,
+    "optional_lockfile_parse_cache_enabled": false,
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": false,
+    "test_count_semantics": "Observed test starts, including retries and nested runner output; not unique selected tests.",
+    "cargo_status_messages_prove_compiler_invocations": false,
+    "ruff_rust_1_98_clippy_allow": ["clippy::format_push_string"]
+  },
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+  },
+  "provenance": {
+    "effective_fixture_sha256": {
+      "ruff": "325b08b4208f8696e4d87bdc1e792b32ab3a25d6cafec3b82df31e6dbc0051ab"
+    },
+    "canonical_fixture_sha256": {
+      "ruff": "7333e04725b6cd4b5a02ea2f3c5cd95d41043581be36b52d2337d4115b1eb2a3"
+    },
+    "setup_patches_by_project": {},
+    "setup_proofs_by_project": {},
+    "published_fixture_sha256": "7333e04725b6cd4b5a02ea2f3c5cd95d41043581be36b52d2337d4115b1eb2a3",
+    "coordinator_revision": "d172b411f28dc2dd0ddc0c55cd394485b56f570e",
+    "publication_base_revision": "5775168635c697e081b5d211bcb65af4fd1a751a",
+    "benchmark_preparation_base_revision": "d040b2560fe7b6595fdbd680dee4047864359c3d",
+    "audit_inputs_sha256": "24cc3a07e9eae845e5f0855a65762c1ae3cf49f3cd3df89154a128d7d548f36a",
+    "release_manifest_sha256": "42a809d7508bb82d80f62d5ea712937eb7f5bb11125d5ae941d94d8b737b7c71",
+    "source_pins": {
+      "rust": "d37229159e545bbdec917dd7efdf5d26da40d2bc",
+      "cargo": "49a7295fc6b46da600c6dca91d188a972d6abcc7",
+      "clippy": "e536600c269ff7166449a331ee6e94bf6c2fe5fb",
+      "rustfmt": "214f9b7ec9812bbe6235184c037c2387217dcc59"
+    },
+    "benchmark_runner_sha256": {
+      "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+      "replay_sessions.py": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+    },
+    "raw_results_sha256": "57f77b94cbfb44fa0e7f7ca899686846dc566a5ecf8b46a445f0d1f511c66cac",
+    "raw_audit_sha256": "4ace242d2927564bc8117e65705191e429c1491af505a301a7cd939cb0116a2e",
+    "exporter_sha256": "73ba6f166cc29d25eddbb14d32ab45175f73511523c3a86a85e4370cac6be7e0",
+    "replay_recovery_verifier_sha256": "6741a8f05aa42f7110c7be79e5076d58e5f3a2291a65365839c3a5e8cbbe22f5",
+    "installer_sha256": "573e00024783ab952f7c2d629f12f9e0ba61be96843f7e692dc056642a72affe",
+    "release_archive_sha256": "dd59d6ff3afcdbae1c27d009b2f76a06a544cbe01b3708e9bc8a6675cf3b4757",
+    "release_archive_bytes": 301502723,
+    "release_asset_staging_source": "github",
+    "release_assets": [
+      {
+        "asset_id": 546238007,
+        "name": "install.sh",
+        "sha256": "573e00024783ab952f7c2d629f12f9e0ba61be96843f7e692dc056642a72affe",
+        "bytes": 14627,
+        "source": "github"
+      },
+      {
+        "asset_id": 546237999,
+        "name": "ohm-1.98.0-9-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "dd59d6ff3afcdbae1c27d009b2f76a06a544cbe01b3708e9bc8a6675cf3b4757",
+        "bytes": 301502723,
+        "source": "github"
+      }
+    ],
+    "helpers": {
+      "just": {
+        "version": "just 1.58.0",
+        "sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042"
+      },
+      "cargo-nextest": {
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a"
+      },
+      "uv": {
+        "version": "uv 0.11.33 (x86_64-unknown-linux-gnu)",
+        "sha256": "4f5e568281d9b5b411534bb4f056109f0938a9dccf52b112c294e6a627a76dfe"
+      },
+      "python3.12": {
+        "version": "Python 3.12.13",
+        "sha256": "7d43f6e86a6c6dd12005ec77eb2055f1be3f1bb3adedf8afe0a87973fa7371ce"
+      }
+    },
+    "toolchains": {
+      "1.98.0": {
+        "cargo": {
+          "version": "cargo 1.98.0 (797e8a9bc 2026-08-05)\nrelease: 1.98.0\ncommit-hash: 797e8a9bca276c1c9f9f738d2a20f484fa4eea9d\ncommit-date: 2026-08-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0\nLLVM version: 22.1.8",
+          "sha256": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (88d9e12ae1 2026-08-18)",
+          "sha256": "f3d6f504333820cb4dbaccb5e4742d98c826f6a199c81964affe53639d19e734"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-stable (88d9e12ae1 2026-08-18)",
+          "sha256": "5005cdcd39ded526dca8fa6ccd716d42fc7da54469034e055dbf54649bec7877"
+        }
+      },
+      "ohm-1.98.0-9": {
+        "cargo": {
+          "version": "cargo 1.98.0-dev (49a7295fc 2026-09-05) (ohm-1.98.0-9)\nrelease: 1.98.0-dev\ncommit-hash: 49a7295fc6b46da600c6dca91d188a972d6abcc7\ncommit-date: 2026-09-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "9b807eae6b6ecec61c07cc1e716ade018d17e839db36e3c6d8ac617ffe2965c1"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0-dev (d37229159 2026-09-05) (ohm-1.98.0-9)\nbinary: rustc\ncommit-hash: d37229159e545bbdec917dd7efdf5d26da40d2bc\ncommit-date: 2026-09-05\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-dev\nLLVM version: 22.1.8",
+          "sha256": "4d75695b40cf14e7e7122fb8c87a66942ee05ba309c26d644a0a217b98d96456"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (e536600c26 2026-09-02)",
+          "sha256": "cec32fbb53331b6db1950965d26556cd0140584d1d1cc6c17be0aae2f19dd942"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-dev (214f9b7ec9 2026-08-21)",
+          "sha256": "01882abc0651614629f6da32cb58cf1f7ba227798becd25bc724ad703c53abda"
+        }
+      }
+    },
+    "global_moving_aliases_unchanged": true,
+    "global_helpers_unchanged": true,
+    "paired_arms_share_helper_environment": true,
+    "standalone_uv_fixture_commands": 0,
+    "parent_source_configuration": {
+      "scope": "registry source replacement only",
+      "configuration_sha256": "24095bd6315880162c8f660917100ac36638cb73778dd9ec6f1c9026ea87b178",
+      "build_profile_environment_overrides": false,
+      "timed_commands_before_admission": 0,
+      "admission_proof_sha256": "ffad7d9df1705f1f2ee371260ccb67e8518f9aa0d4a528ed881b64fd794ed58c",
+      "verifier_sha256": "8376a3e88d41752e9dc86c1033c9acb5b84381b7dcecdcf95d8305628e141105"
+    },
+    "excluded_execution_attempt": {
+      "status": "excluded_incomplete_execution_attempt",
+      "accepted_samples_excluded": 20,
+      "samples_used_in_publication": 0,
+      "observed_execution_seconds": 301.016872,
+      "reason": "The VM execution stopped after five minutes and attempted to restart; exclusive evidence creation blocked the second launch.",
+      "archive_sha256": "ba19d740c8ddb45456eb3bb0c312d6114e31f9a8efb0948704e90922ea33c9c2",
+      "archive_bytes": 82459,
+      "archive_execution_receipt_sha256": "6f3c2181a454a313f980ffb1aac16cede15b89bad65b1eab332acbce84f739a7",
+      "raw_results_sha256": "b5070ed1d3a4092250e470e4d45c1db943e8ceed798789627f07b95a5c080311",
+      "detached_worker_sha256": "1c4f2740cf540689a9a9bafe8aab40a4ddb24244a0a55b829caba921a42d667f",
+      "detachment_canary_seconds": 360.07206911000003,
+      "input_admission_sha256": "f7f017256576d43105174adf9348452b54f49cdd829d76cc310932035b751293",
+      "verifier_sha256": "5cccf0d5ed16066681d8fb68cbf901f3415bf873730eb57a85452690427562ca"
+    },
+    "input_receipt_sha256": {
+      "ablation-completed.json": "8122c25d50996cabc57304380daf79095301d4b5d670cda0973b2d0c996cf49b",
+      "ablation-prelaunch-recovery-1.json": "25a500ba212f55647763c74d333b0df1e372124b1423829984279e59328715d9",
+      "ablation-ready.json": "40cd3f9d4d4da6aac6e8cc928d687298c69011192076e6a4760869825f96dc34",
+      "ablation-started-20260906T061515.291341Z.json": "edbb4cd734042e507e48235cf02383de0a6c9ff26a6e1a58f37f84c44197f722",
+      "bootstrap-public-failure.json": "cd7a5fb664184748bece24f0b8134fd0cf24fadf8056c259bada4920952f58c5",
+      "bootstrap-status.json": "c3e7b9e187f2731c9008317255b0c8762141e0a60c3c4a987df81af8db549d75",
+      "current-completed.json": "4b7d04e0169c1f01505eab4c5dbd2cf1791ff41ab7769432c9f1d2d6ba90ed1e",
+      "current-prelaunch-recovery-1.json": "06e9b44a9c7e5532d5759fcd4f466fc21ad22f39b2ae6cc3aeddd36a8e31117f",
+      "current-ready.json": "b11bbc78cd4bd2943f2695d6f06e62d6e9dbf4241e4e95116ab8bf706cee0b09",
+      "current-started-20260906T040945.467725Z.json": "9a5c1fedba5ef66ac25001dc27f50ce81209afe99ea03399036b8b9decc95bec",
+      "detached-execution-admission.json": "f7f017256576d43105174adf9348452b54f49cdd829d76cc310932035b751293",
+      "detached-worker-start.json": "989bf939139e1e4120345b121cb07bc7d208ddc996ca089570983405f8d17aff",
+      "direct-completed.json": "edb52b77024ad683e0260b61281dbfa41120e5dd1f9220536631210dceee0532",
+      "direct-prepared.json": "232375297410ea3b32414854d92e4bf7fccf62dd63a7978816c0b184f0b95f6b",
+      "direct-quiet-1788658854287692616.json": "b4e312b85c31408b47f5815ffa3e9bd9591ba244bd1b78da4ad10c91086d5831",
+      "direct-quiet-1788664910113567784.json": "04a26573fc37c4c11f6c73a890d2bcdf0985df23d5f06db38733e402627641a1",
+      "direct-quiet-1788665214644890900.json": "7b30a5bab07a9a6d814ca118df32ae90b297f91aa476d86af4a64959039a39a2",
+      "direct-quiet-1788667785465688491.json": "42a02c4ea3ee68057efb43f5e1a2fc556fc76ff5df54d49f1f57967acbb0af26",
+      "direct-quiet-1788675315283279256.json": "bf299c6c63be018656e7b4c194520f55b5642ea259de06a4c0d5980114f87ae1",
+      "direct-ready.json": "19ec02cc7b1075425e3928e855c46f110e5c5582389e931fb6d45cad7d4aaf42",
+      "direct-started.json": "cee08d7c0f5e5e26ced00382df31bf6ea6b375e96d3d717d3c2d6083ad8a7702",
+      "global-rustup-before-5850.json": "b89ae9c718499091edca8be4bad763965cdc9a111ff1d886869b7d8e8e3893e8",
+      "helpers.json": "c596917a987502df0c14be93f820345c954e7f313353f6c04f0c35e7ac819fb6",
+      "historical-completed.json": "b1f1b20321b974b3279a008d84078e1511105e5b0dd5986288f008c6bf54efb0",
+      "historical-prelaunch-recovery-1.json": "9a2f5d6cf7346331d49f2dda3acd9fab5a3a08f81355bb402db47d10956c20c3",
+      "historical-prelaunch-recovery-completed.json": "d56505567864787a7d2730a704410a2342c0d7412d66bd780d85f796688071ce",
+      "historical-prelaunch-recovery-initial.json": "f05ec73f2489b8906001ad7dacf725dc864428f08ad86af4c3503fcd8e2f30c4",
+      "historical-ready.json": "b0ff0b16a002b33741f76a88aaf3cbbe87b1ddcb89321e1d731d5f95ee6288cf",
+      "historical-started-20260906T032654.648957Z.json": "2ac35d26c0e702278369e01fa9f73d7bda7169f4ff151662beffc12237125597",
+      "launcher-source-config.json": "da393cb9a8ec80c1525e3c1ca7134df2ac8ae131e115823839a12b856f0166c3",
+      "launcher.json": "0ce1684a62a15673d21496b0487c45b27636190ccdc68c090dfb9f895759c762",
+      "parent-source-configuration-admission.json": "ffad7d9df1705f1f2ee371260ccb67e8518f9aa0d4a528ed881b64fd794ed58c",
+      "release-assets.json": "a1c68cbf1a725564d63c65df9b3eb3778b8065f3b314173bd642e43a779430b6",
+      "suite-status.json": "cb472dfb7d712cf456059b155d9b9f3b82edda5810512fab2d0feefefa84ddf0",
+      "toolchains.json": "dc8718f229631d58573d223410aea1b6692c6deeca9f342ad858146986ff8211"
+    },
+    "prelaunch_quiet_gate": {
+      "scope": "historical",
+      "phase": "before_benchmark_launch",
+      "benchmark_commands_before_retry": 0,
+      "timed_samples_before_retry": 0,
+      "actual_benchmark_launches": 1,
+      "fresh_full_quiet_gate_passed": true,
+      "guard_and_inputs_unchanged": true,
+      "accepted_evidence_unchanged": true,
+      "accepted_samples_preserved": 216,
+      "rejected_quiet_preflights": 1,
+      "rejections": [
+        {
+          "quiet_receipt_sha256": "04a26573fc37c4c11f6c73a890d2bcdf0985df23d5f06db38733e402627641a1",
+          "failed_intervals": [1, 6]
+        }
+      ],
+      "required_idle_percent": 95,
+      "maximum_iowait_percent": 0.5,
+      "maximum_steal_percent": 0.1,
+      "interval_seconds": 5,
+      "quiet_intervals": 6,
+      "prelaunch_review_sha256": "5f92a1b6168eeeaed99204dbf61d7750e4d77cd18da264142c32cd72839d092b",
+      "recovery_wrapper_sha256": "e5fa68d8da8d85b01105d70f4bcb41a80157cde321baf40d9de7e61aeb52ac4a",
+      "recovery_exec_receipt_sha256": "0d3487047f48363d865556d003d67cfe1311d9a05dc8b1a45e1f492da7162b40",
+      "ready_sha256": "b0ff0b16a002b33741f76a88aaf3cbbe87b1ddcb89321e1d731d5f95ee6288cf",
+      "launch_receipt_sha256": "2ac35d26c0e702278369e01fa9f73d7bda7169f4ff151662beffc12237125597",
+      "fresh_quiet_receipt_sha256": "7b30a5bab07a9a6d814ca118df32ae90b297f91aa476d86af4a64959039a39a2"
+    },
+    "excluded_initial_host_attempt": {
+      "status": "excluded_incomplete_attempt",
+      "reason": "Repeated compiler interference stopped the initial host run. A separate Ruff test job was independently observed; the final rejected process matches that job.",
+      "otherwise_valid_samples_excluded": 128,
+      "discarded_samples": 4,
+      "affected_workflow": "stock Codex cold Clippy",
+      "samples_used_in_published_timings": 0,
+      "replay_suites_started": 0,
+      "archive_sha256": "b7dcab9e85749e546bc4f660d05eb467a4826e978fdaf1ff6b9f23c2b6ffba9a",
+      "archive_bytes": 157373,
+      "raw_results_sha256": "75ef155bb69e8a72e0abd342419d9b930a943ac576db4ad029f8ad9d01231e54",
+      "process_observation_sha256": "981c158a233a530cde57a5fb833f0998537b975a616fee9bdf830a9a49aa3122",
+      "archive_execution_receipt_sha256": "f54801213b97faabb206fdd764c5a632df33abb4eba18c87fcaabb0d151c2e3d",
+      "verifier_sha256": "6be54a632b010499950b4ee3735dbb7073dda6ae8d996fc262fb8e7b6af40bb2"
+    },
+    "coordinator_manifest_metadata_correction": {
+      "reviewed_at": "2026-09-06T06:29:15.658932+00:00",
+      "scope": "coordinator metadata only; measured inputs and raw results unchanged",
+      "reason": "The release manifest checksum was copied from revision 8. All four frozen source pins and installed binary revisions already matched revision 9.",
+      "original_audit_inputs_sha256": "732046029d3fa4f9bf7e7dad8faddc6ca0fbae32c8a76a884f1c0606ede5a5ee",
+      "corrected_audit_inputs_sha256": "24cc3a07e9eae845e5f0855a65762c1ae3cf49f3cd3df89154a128d7d548f36a",
+      "original_release_manifest_sha256": "51cd50977b7234b31036a5b457f132a5f2a0ea655365fb3e429fff58322f8095",
+      "correct_release_manifest_sha256": "42a809d7508bb82d80f62d5ea712937eb7f5bb11125d5ae941d94d8b737b7c71",
+      "manifest_identical_at_preparation_and_publication_bases": true,
+      "all_installed_source_revisions_match_revision9": true
+    }
+  },
+  "host": {
+    "platform": "linux-x86_64",
+    "id": "linux-1",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC-Milan Processor"
+  },
+  "completed_at": "2026-09-06T04:09:14.297910+00:00"
+}

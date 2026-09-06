@@ -23,7 +23,7 @@ install -d -m 700 /tmp/ohm-replay
 export TMPDIR=/tmp/ohm-replay
 python3 scripts/replay_sessions.py \
   --upstream 1.98.0 \
-  --ohm ohm-1.98.0-8 \
+  --ohm ohm-1.98.0-9 \
   --scenario scripts/session_replays/ruff-rust-1.98.json \
   --scenario scripts/session_replays/codex-stable-goal-accounting.json \
   --source-path ruff=/path/to/ruff \
@@ -110,7 +110,7 @@ python3 scripts/replay_sessions.py \
   --project uv \
   --scenario scripts/session_replays/uv-feature-ablation.json \
   --source-path uv=/path/to/uv \
-  --ohm ohm-1.98.0-8 \
+  --ohm ohm-1.98.0-9 \
   --output-dir /path/to/new-empty-ablation-results \
   --feature-matrix \
   --jobs 8 \
