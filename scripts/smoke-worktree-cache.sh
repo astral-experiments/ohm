@@ -65,12 +65,52 @@ find "$CARGO_BUILD_BUILD_DIR" -name query-cache.bin -type f \
   -exec shasum -a 256 {} + > "$smoke_root/donor-cache.sha256"
 [[ -s "$smoke_root/donor-cache.sha256" ]]
 
+# Automatic imports must clone their payloads, or leave the recipient unseeded.
+cargo +"$toolchain" worktree add --detach "$smoke_root/automatic-child" \
+  --target-dir "$smoke_root/automatic-target" HEAD 2>&1 | tee "$smoke_root/automatic-seed.log"
+automatic_seeded=false
+if grep -E 'Seeded [1-9][0-9]* files' "$smoke_root/automatic-seed.log" >/dev/null; then
+  grep -E '[1-9][0-9]* reflinked files' "$smoke_root/automatic-seed.log" >/dev/null
+  automatic_seeded=true
+else
+  grep -F 'build profiles without copy-on-write support' "$smoke_root/automatic-seed.log" >/dev/null
+  for namespace in "$CARGO_BUILD_BUILD_DIR/debug/build/workspaces/"*; do
+    [[ ! -d "$namespace" || "$namespace" == "$donor_namespace" ]]
+  done
+  for namespace in "$CARGO_BUILD_BUILD_DIR/debug/incremental/"*; do
+    [[ ! -d "$namespace" || "${namespace##*/}" == "${donor_namespace##*/}" ]]
+  done
+fi
+for stage in "$CARGO_BUILD_BUILD_DIR/debug/build/workspaces/.ohm-worktree-seed-"*; do
+  [[ ! -e "$stage" ]]
+done
+export CARGO_TARGET_DIR="$smoke_root/automatic-target"
+cd "$smoke_root/automatic-child"
+cargo +"$toolchain" build --offline -vv 2>&1 | tee "$smoke_root/automatic-child.log"
+if "$automatic_seeded"; then
+  grep -F 'Fresh ohm-worktree-smoke ' "$smoke_root/automatic-child.log" >/dev/null
+else
+  grep -F 'Compiling ohm-worktree-smoke ' "$smoke_root/automatic-child.log" >/dev/null
+fi
+[[ "$("$CARGO_TARGET_DIR/debug/ohm-worktree-smoke")" == 1 ]]
+automatic_namespace=
+for namespace in "$CARGO_BUILD_BUILD_DIR/debug/build/workspaces/"*; do
+  [[ -d "$namespace" && "$namespace" != "$donor_namespace" ]] || continue
+  [[ -z "$automatic_namespace" ]]
+  automatic_namespace="$namespace"
+done
+[[ -n "$automatic_namespace" && ! -e "$automatic_namespace/.ohm-clippy-v1" ]]
+[[ ! -e "$CARGO_BUILD_BUILD_DIR/debug/incremental/${automatic_namespace##*/}/.ohm-clippy-v1" ]]
+
+# Explicit copying keeps the full reuse/isolation check active on non-CoW CI.
+export CARGO_TARGET_DIR="$smoke_root/donor-target"
+cd "$smoke_root/donor"
 cargo +"$toolchain" worktree add --detach "$smoke_root/child" \
-  --target-dir "$smoke_root/child-target" HEAD 2>&1 | tee "$smoke_root/seed.log"
+  --copy-build-state --target-dir "$smoke_root/child-target" HEAD 2>&1 | tee "$smoke_root/seed.log"
 grep -E 'Seeded [1-9][0-9]* files' "$smoke_root/seed.log" >/dev/null
 child_namespace=
 for namespace in "$CARGO_BUILD_BUILD_DIR/debug/build/workspaces/"*; do
-  [[ -d "$namespace" && "$namespace" != "$donor_namespace" ]] || continue
+  [[ -d "$namespace" && "$namespace" != "$donor_namespace" && "$namespace" != "$automatic_namespace" ]] || continue
   [[ -z "$child_namespace" ]]
   child_namespace="$namespace"
 done
