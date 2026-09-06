@@ -9,28 +9,28 @@ With Ohm, incremental builds can be up to 30× faster, real-world development se
 
 Benchmarking Ohm 1.98.0-8 against stock Rust on replayed development sessions:
 
-| Scope                                      | Rust 1.98.0 | Ohm 1.98.0-8 | Time saved | Reduction |
-| ------------------------------------------ | ----------: | -----------: | ---------: | --------: |
-| Ruff session                               |    442.80 s |     276.29 s |   166.52 s |    37.60% |
-| uv session                                 |    150.58 s |     109.66 s |    40.92 s |    27.18% |
-| Codex session                              |    535.54 s |     294.60 s |   240.94 s |    44.99% |
-| All sessions                               |  1,128.92 s |     680.55 s |   448.38 s |    39.72% |
-| `cargo check`                              |    155.60 s |      53.13 s |   102.47 s |    65.85% |
-| `cargo test`, `cargo nextest`, `just test` |    617.10 s |     469.02 s |   148.08 s |    24.00% |
-| `cargo clippy`                             |    338.82 s |     145.59 s |   193.22 s |    57.03% |
-| `cargo fmt`                                |     16.71 s |      12.12 s |     4.60 s |    27.49% |
-| All commands                               |  1,128.23 s |     679.86 s |   448.37 s |    39.74% |
+| Scope                                      | Rust 1.98.0 | Ohm 1.98.0-8 | Time saved |
+| ------------------------------------------ | ----------: | -----------: | ---------: |
+| Ruff session                               |    442.80 s |     276.29 s |     37.60% |
+| uv session                                 |    150.58 s |     109.66 s |     27.18% |
+| Codex session                              |    535.54 s |     294.60 s |     44.99% |
+| All sessions                               |  1,128.92 s |     680.55 s |     39.72% |
+| `cargo check`                              |    155.60 s |      53.13 s |     65.85% |
+| `cargo test`, `cargo nextest`, `just test` |    617.10 s |     469.02 s |     24.00% |
+| `cargo clippy`                             |    338.82 s |     145.59 s |     57.03% |
+| `cargo fmt`                                |     16.71 s |      12.12 s |     27.49% |
+| All commands                               |  1,128.23 s |     679.86 s |     39.74% |
 
 And comparing disk usage (on APFS):
 
-| Scope                 | Rust 1.98.0 | Ohm 1.98.0-8 | Disk saved | Reduction |
-| --------------------- | ----------: | -----------: | ---------: | --------: |
-| Ruff/ty session       |    6.05 GiB |     3.41 GiB |   2.64 GiB |    43.60% |
-| Ruff/ty, 2 worktrees  |   10.34 GiB |     6.29 GiB |   4.05 GiB |    39.17% |
-| Ruff/ty, 10 worktrees |   54.16 GiB |    29.95 GiB |  24.21 GiB |    44.70% |
-| uv session            |   13.04 GiB |    10.88 GiB |   2.16 GiB |    16.55% |
-| uv, 2 worktrees       |   17.44 GiB |    12.55 GiB |   4.90 GiB |    28.07% |
-| uv, 10 worktrees      |   85.45 GiB |    52.00 GiB |  33.45 GiB |    39.15% |
+| Scope                 | Rust 1.98.0 | Ohm 1.98.0-8 | Disk space saved |
+| --------------------- | ----------: | -----------: | ---------------: |
+| Ruff/ty session       |    6.05 GiB |     3.41 GiB |           43.60% |
+| Ruff/ty, 2 worktrees  |   10.34 GiB |     6.29 GiB |           39.17% |
+| Ruff/ty, 10 worktrees |   54.16 GiB |    29.95 GiB |           44.70% |
+| uv session            |   13.04 GiB |    10.88 GiB |           16.55% |
+| uv, 2 worktrees       |   17.44 GiB |    12.55 GiB |           28.07% |
+| uv, 10 worktrees      |   85.45 GiB |    52.00 GiB |           39.15% |
 
 Compared to the stock Rust toolchain, Ohm:
 
