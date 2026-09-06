@@ -76,6 +76,16 @@ tagging any missing pinned revisions with the toolchain name. Existing tags at t
 are reused; conflicting immutable tags fail the release before any new source tags are created. The
 workflow then creates the private GitHub Release and publishes the public assets.
 
+For compilers supporting `ohm-cloned-query-cache-prefix`, the installed-toolchain smoke test also
+checks Cargo's cache defaults, ordinary build reuse after Clippy, child-worktree lint configuration,
+and donor cache immutability. To run that check against a locally installed candidate:
+
+```console
+bash scripts/smoke-worktree-cache.sh "$candidate_toolchain" /path/to/new-smoke-directory
+```
+
+The directory must not already exist. It retains the fixture, logs, and donor checksums for review.
+
 Release notes include version-pinned installation instructions, usage examples, the development-only
 safety warning, and public download links alongside the generated changelog. Internal smoke tests use
 `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private release includes:
