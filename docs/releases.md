@@ -77,10 +77,10 @@ are reused; conflicting immutable tags fail the release before any new source ta
 workflow then creates the private GitHub Release and publishes the public assets.
 
 For compilers supporting `ohm-cloned-query-cache-prefix`, the installed-toolchain smoke test also
-checks Cargo's cache defaults, clone-required automatic seeding, explicit copy fallback, ordinary
-build reuse after Clippy, child-worktree lint configuration, and donor cache immutability.
-Automatic imports skip profiles when filesystem cloning is unavailable; `--copy-build-state`
-explicitly permits byte copies. To run that check against a locally installed candidate:
+checks Cargo's cache defaults, automatic and explicit Clippy isolation, ordinary build reuse after
+Clippy, child-worktree lint configuration, and donor cache immutability. Automatic isolation requires
+clone-capable storage; `-Zohm-clippy-seed-isolation=yes` also exercises snapshot reuse through byte
+copies on filesystems without cloning. To run that check against a locally installed candidate:
 
 ```console
 bash scripts/smoke-worktree-cache.sh "$candidate_toolchain" /path/to/new-smoke-directory
