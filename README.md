@@ -174,7 +174,7 @@ development, especially as agents enable us to parallelize across worktrees.
 
 Ohm enables experimental optimizations to improve Rust's iteration speed and throughput. This is a
 deliberate tradeoff: we accept the risks of unvetted implementations in local development, where the
-consequences of bugs are comparatively limited and the benefits of faster iteration are substantial.
+blast radius of bugs is comparatively limited and the benefits of faster iteration are substantial.
 
 Ohm enables us to benefit from faster builds and reduced disk space now, exploring ideas before they
 meet upstream's standards for completeness and correctness, while continuing to use the official
