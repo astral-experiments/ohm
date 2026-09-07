@@ -2,6 +2,7 @@
 set -eu
 
 embedded_version=
+embedded_wild_version=
 embedded_archive_sha256_aarch64_apple_darwin=
 embedded_archive_sha256_x86_64_unknown_linux_gnu=
 installation_prefix=${OHM_INSTALL_DIR:-}
@@ -265,6 +266,17 @@ verify_installation() {
                 fail "installed tool did not start successfully: $executable"
         fi
     done
+    if [ "$host_target" = x86_64-unknown-linux-gnu ] && [ -n "$embedded_wild_version" ]; then
+        wild_path=$installation_directory/lib/rustlib/$host_target/bin/wild-ld/ld.bfd
+        [ -f "$wild_path" ] && [ -x "$wild_path" ] ||
+            fail 'the bundled Wild linker is missing or not executable'
+        wild_version=$("$wild_path" --version) ||
+            fail 'the bundled Wild linker did not start successfully'
+        case "$wild_version" in
+            "Wild $embedded_wild_version"|"Wild $embedded_wild_version "*) ;;
+            *) fail 'the bundled Wild linker has an unexpected version' ;;
+        esac
+    fi
 }
 
 if [ -e "$installation_prefix" ] || [ -L "$installation_prefix" ]; then

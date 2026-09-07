@@ -556,4 +556,22 @@ if env OHM_BOLT_LLVM_DIR="$bolt_directory" \
   exit 1
 fi
 
+wild_directory="$test_directory/wild payload"
+mkdir -p "$wild_directory"
+cp "$rust_checkout/fixture-llvm-tool" "$wild_directory/wild"
+touch "$wild_directory/LICENSE-APACHE" "$wild_directory/LICENSE-MIT"
+run_optimized_build "$linux_target" "$test_directory/wild-output.log" \
+  OHM_WILD_LINKER_DIR="$wild_directory"
+python3 - "$trace" "$wild_directory" <<'PY'
+import json
+import pathlib
+import sys
+events = [json.loads(line) for line in pathlib.Path(sys.argv[1]).read_text().splitlines()]
+event = events[-1]
+assert f"target.x86_64-unknown-linux-gnu.ohm-wild-linker={sys.argv[2]}" in event["arguments"]
+assert "OHM_WILD_LINKER_DIR" not in event["environment"]
+assert event["environment"]["CARGO_UNSTABLE_OHM_LINKER"] == "lld"
+PY
+expect_failure 'a Wild payload on macOS' "$macos_target" OHM_WILD_LINKER_DIR="$wild_directory"
+
 echo 'optimized release build tests passed'
