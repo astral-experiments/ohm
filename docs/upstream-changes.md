@@ -1,6 +1,6 @@
 # Changes from upstream
 
-Ohm 1.98.0-10 enables upstream Wild 0.10.0 by default for native x86_64 Linux GNU builds, preserves worktree snapshots after Clippy on clone-capable storage, and reduces sparse compiler metadata. It retains mimalloc 3.5.1 for Apple Silicon Cargo and x86_64 Linux rustc. The sources remain based on the exact upstream Rust 1.98.0 release; the selected changes are listed below.
+Ohm 1.98.0-10 enables upstream Wild 0.10.0 by default for native x86_64 Linux GNU builds, preserves worktree snapshots after Clippy on clone-capable storage, reduces sparse compiler metadata, and uses indexed Cargo dependency scheduling. It retains mimalloc 3.5.1 for Apple Silicon Cargo and x86_64 Linux rustc. The sources remain based on the exact upstream Rust 1.98.0 release; the selected changes are listed below.
 
 Linux distributions include the checksum-pinned upstream Wild executable and its licenses. Cargo uses it for native rustc invocations, including build scripts, procedural macros, and test binaries. Explicit linker settings take precedence; `-Zohm-linker=lld` selects LLD, and `-Zohm-defaults=no` disables automatic selection. Rustdoc doctests, native compilation inside build scripts, and other targets retain their existing configuration. This uses full linking. The experimental ohm-wild fork and Mach-O linker are excluded.
 
@@ -50,13 +50,15 @@ Cargo reserves shared registry unit locks in a consistent order, retaining read 
 
 Well-formedness checking collects ancestor predicate slices once and instantiates them directly into the final obligations, preserving substitution, diagnostic spans, ordering, and escaping-bound-variable filtering. The compiler's Cargo gitlink selects the exact Cargo revision in the release manifest. The existing component profile-guided optimization, parallel compiler frontend, dependency reuse, and formatter optimizations remain enabled.
 
-This release removes the parsed-lockfile-cache and recent-type-fold experiments from the selected source stacks. Draft scheduling and prefix-cloning experiments are excluded.
+This release removes the parsed-lockfile-cache and recent-type-fold experiments from the selected source stacks. The draft prefix-cloning experiments are excluded.
 
 Fresh [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-9 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Earlier result artifacts through Ohm 1.98.0-8 and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
 
-The combined Clippy/codegen experiment is available through `cargo -Zohm-clippy-codegen build` and `cargo -Zohm-clippy-codegen test`; ordinary commands retain their existing behavior. The mode produces normal build artifacts without injecting `cfg(clippy)`, so diagnostics can differ from standalone Clippy.
+The combined Clippy/codegen experiment remains opt-in for this release. Enable it through `cargo -Zohm-clippy-codegen build` and `cargo -Zohm-clippy-codegen test`; ordinary commands retain their existing behavior. The mode produces normal build artifacts without injecting `cfg(clippy)`, so diagnostics can differ from standalone Clippy.
 
 Unused incremental configuration expiry is available through `-Zohm-incremental-gc` and `cargo -Zohm-incremental-gc clean incremental --max-age '30 days'`. Tracking is disabled by default. Collection preserves finished artifacts and fingerprints, skips busy profiles and unknown ownership records, and trades retained incremental state for slower subsequent edits.
+
+Cargo schedules dependencies using dense job indices, per-artifact dependency counters, and a ready heap. Sparse bitmaps preserve the existing transitive-dependent priorities; insertion indices break equal-priority ties. [ohm-cargo#115](https://github.com/astral-sh/ohm-cargo/pull/115) measured 0.27% fewer whole-Cargo instructions for a warm Ruff check and 0.66% for a warm uv check against its revision-9 parent. Native elapsed-time measurements were inconclusive; these results do not establish a release speedup.
 
 ## ohm-rust
 
@@ -185,6 +187,7 @@ Unused incremental configuration expiry is available through `-Zohm-incremental-
 - [#102: Add opt-in Clippy analysis to build and test compilation](https://github.com/astral-sh/ohm-cargo/pull/102)
 - [#108: Preserve worktree snapshots after Clippy on clone-capable storage](https://github.com/astral-sh/ohm-cargo/pull/108)
 - [#114: Select bundled upstream Wild by default on Linux](https://github.com/astral-sh/ohm-cargo/pull/114)
+- [#115: Use indexed dependency scheduling](https://github.com/astral-sh/ohm-cargo/pull/115)
 
 ## ohm-rust-clippy
 
