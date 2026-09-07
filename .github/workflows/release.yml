@@ -6,7 +6,7 @@ on:
       manifest:
         description: Versioned manifest to build
         required: true
-        default: toolchains/1.98.0/9.json
+        default: toolchains/1.98.0/10.json
         type: string
       build:
         description: Run the full x.py dist extended build
@@ -649,13 +649,17 @@ jobs:
 
           if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] && \
             jq -e '.bundled_tools.wild' "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
-            for linker in wild lld; do
+            readelf --string-dump=.comment "$smoke_root/defaults-target/debug/ohm-smoke" \
+              | grep -i 'Wild' >/dev/null
+            for linker in lld wild; do
               CARGO_TARGET_DIR="$smoke_root/linker-target" \
                 cargo +"$OHM_TOOLCHAIN" -Zohm-linker="$linker" run \
                 --manifest-path "$smoke_crate/Cargo.toml"
               CARGO_TARGET_DIR="$smoke_root/linker-target" \
                 cargo +"$OHM_TOOLCHAIN" -Zohm-linker="$linker" test \
                 --manifest-path "$smoke_crate/Cargo.toml"
+              readelf --string-dump=.comment "$smoke_root/linker-target/debug/ohm-smoke" \
+                | grep -i "$linker" >/dev/null
             done
           fi
 

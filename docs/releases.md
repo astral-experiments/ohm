@@ -14,12 +14,13 @@ The version-specific installer verifies Wild's version, and release smoke tests
 build and run with both Wild and LLD. Provenance records the Wild version and
 archive checksum. Older manifests and macOS distributions omit Wild.
 
-With a toolchain containing the Cargo opt-in, use
-`cargo +ohm -Zohm-linker=wild test` or `cargo +ohm -Zohm-linker=lld test`.
-Selection is opt-in, applies to native Linux x86-64 rustc invocations, and yields
-to explicit linker configuration. Rustdoc doctests and native compilation inside
-build scripts retain their existing configuration. This uses Wild's full linker;
-incremental linking is not enabled.
+Starting with Ohm 1.98.0-10, `cargo +ohm test` selects upstream Wild by default
+for native Linux x86-64 GNU rustc invocations. Use `-Zohm-linker=lld` to select
+the bundled LLD, or `-Zohm-defaults=no` to disable automatic selection with the
+other Ohm defaults. Explicit linker configuration takes precedence. Rustdoc
+doctests and native compilation inside build scripts retain their existing
+configuration. This uses Wild's full linker; incremental linking is not enabled.
+The experimental ohm-wild fork and Mach-O linker are not packaged.
 
 Ohm releases are built from protected `main` using an immutable, pinned toolchain manifest.
 

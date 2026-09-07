@@ -570,6 +570,7 @@ events = [json.loads(line) for line in pathlib.Path(sys.argv[1]).read_text().spl
 event = events[-1]
 assert f"target.x86_64-unknown-linux-gnu.ohm-wild-linker={sys.argv[2]}" in event["arguments"]
 assert "OHM_WILD_LINKER_DIR" not in event["environment"]
+assert event["environment"]["CARGO_UNSTABLE_OHM_LINKER"] == "lld"
 PY
 expect_failure 'a Wild payload on macOS' "$macos_target" OHM_WILD_LINKER_DIR="$wild_directory"
 

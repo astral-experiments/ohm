@@ -252,6 +252,9 @@ if [[ -n "${OHM_WILD_LINKER_DIR:-}" ]]; then
     }
   done
   dist_arguments+=(--set "target.$target.ohm-wild-linker=$OHM_WILD_LINKER_DIR")
+  # PGO runs the newly built Cargo before the distribution installs Wild into
+  # its sysroot. Use LLD for training; the packaged Cargo retains its Wild default.
+  safe_environment+=('CARGO_UNSTABLE_OHM_LINKER=lld')
 fi
 
 env -i "${safe_environment[@]}" \
