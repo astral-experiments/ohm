@@ -56,7 +56,7 @@ This release removes the parsed-lockfile-cache and recent-type-fold experiments 
 
 Fresh [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-9 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Earlier result artifacts through Ohm 1.98.0-8 and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
 
-The combined Clippy/codegen experiment remains opt-in for this release. Enable it through `cargo -Zohm-clippy-codegen build` and `cargo -Zohm-clippy-codegen test`; ordinary commands retain their existing behavior. The mode produces normal build artifacts without injecting `cfg(clippy)`, so diagnostics can differ from standalone Clippy.
+Ohm 1.98.0-11 removes the combined Clippy/codegen experiment. Run standalone `cargo +ohm clippy` for linting. The experimental compiler, Cargo, and Clippy changes remain available as draft PRs.
 
 Unused incremental configuration expiry is available through `-Zohm-incremental-gc` and `cargo -Zohm-incremental-gc clean incremental --max-age '30 days'`. Tracking is disabled by default. Collection preserves finished artifacts and fingerprints, skips busy profiles and unknown ownership records, and trades retained incremental state for slower subsequent edits.
 
