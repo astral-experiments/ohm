@@ -52,7 +52,7 @@ Well-formedness checking collects ancestor predicate slices once and instantiate
 
 This release removes the parsed-lockfile-cache and recent-type-fold experiments from the selected source stacks. The draft prefix-cloning experiments are excluded.
 
-Fresh [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-9 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Earlier result artifacts through Ohm 1.98.0-8 and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
+The [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-10 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Four Linux shared-worktree cells are unmeasured because default Wild flags failed the immutable-registry readiness check. The recorded source fixtures match the prior study. These measurements do not isolate individual changes between Ohm releases.
 
 The combined Clippy/codegen experiment remains opt-in for this release. Enable it through `cargo -Zohm-clippy-codegen build` and `cargo -Zohm-clippy-codegen test`; ordinary commands retain their existing behavior. The mode produces normal build artifacts without injecting `cfg(clippy)`, so diagnostics can differ from standalone Clippy.
 

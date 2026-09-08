@@ -1,0 +1,1154 @@
+{
+  "rust_version": "1.98.0",
+  "ohm_release": "ohm-1.98.0-10",
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    ["stock", "ohm"],
+    ["ohm", "stock"]
+  ],
+  "sessions": [
+    {
+      "project": "ruff",
+      "session_id": "ruff-component-fixed-points",
+      "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+      "commands": 12,
+      "edits": 3,
+      "warmups": 1
+    }
+  ],
+  "timed_session_seconds": {
+    "ruff": {
+      "stock": [528.7273687420002, 553.1166147820004],
+      "ohm": [353.13153661900105, 364.22036361900246]
+    }
+  },
+  "timed_command_seconds": {
+    "ruff": {
+      "stock": [528.0385008779995, 552.4106475470035],
+      "ohm": [352.3440286670011, 363.2211371320045]
+    }
+  },
+  "timed_edit_seconds": {
+    "ruff": {
+      "stock": [0.052145171001029667, 0.05130452400408103],
+      "ohm": [0.05868413700227393, 0.05621918500037282]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "ruff": {
+      "stock": [165.38000730800013, 165.93882746500094],
+      "ohm": [119.21877661500002, 122.98051855399899]
+    }
+  },
+  "commands": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Establish the focused cycle and attribute baseline",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [1.9519423949986958, 2.0020282650002628],
+          "ohm": [1.9592968480010313, 2.344924009998067]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Validate the simplified cycle and attribute inference",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [34.03414520899969, 34.72639225400053],
+          "ohm": [30.368194781000057, 30.647054383000068]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run affected-package tests after simplification",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [41.73963931199978, 41.721220013001584],
+          "ohm": [35.08956509100062, 34.404900530000305]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Run strict Clippy after simplification",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string"
+        ],
+        "wall_seconds": {
+          "stock": [72.62872698200044, 75.18676775399945],
+          "ohm": [38.45653588099958, 40.59355632600273]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [191, 191],
+          "ohm": [191, 191]
+        }
+      },
+      {
+        "index": 7,
+        "label": "Validate the indexed cycle and attribute inference",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "-E",
+          "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [55.83612987000015, 56.656611456000974],
+          "ohm": [40.14897408499928, 40.90063021400056]
+        },
+        "tests_started": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Run affected-package tests after dependency indexing",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [60.586724709999544, 64.24991151699942],
+          "ohm": [45.21825391099992, 46.0073606090009]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Run strict Clippy after dependency indexing",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string"
+        ],
+        "wall_seconds": {
+          "stock": [52.510133257001144, 57.360837757998524],
+          "ohm": [25.02942349800105, 27.509055139998964]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Run the expanded component-cycle regressions",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--status-level",
+          "fail",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [63.51853297100024, 65.42086767300134],
+          "ohm": [43.93755685799988, 43.62907469599668]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Run all semantic mdtests after the fixed-point rewrite",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [5.895092210999792, 5.962314938999043],
+          "ohm": [7.642715169000439, 7.478984663001029]
+        },
+        "tests_started": {
+          "stock": [482, 482],
+          "ohm": [482, 482]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Validate the complete core and semantic packages",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [72.30088205600077, 74.79013637599928],
+          "ohm": [51.38533964599992, 50.19831210900156]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Run final strict Clippy for both affected packages",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string"
+        ],
+        "wall_seconds": {
+          "stock": [59.82324813299965, 67.12168626200219],
+          "ohm": [24.38272165499984, 30.09783666700241]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Verify final workspace formatting",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [7.213303771999563, 7.211873280000873],
+          "ohm": [8.725451243999487, 9.409447785001248]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      }
+    ]
+  },
+  "warmups": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Warm the unmodified core and semantic package tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "-p",
+          "ty_python_core",
+          "--status-level",
+          "fail"
+        ],
+        "wall_seconds": {
+          "stock": [165.38000730800013, 165.93882746500094],
+          "ohm": [119.21877661500002, 122.98051855399899]
+        },
+        "tests_started": {
+          "stock": [868, 868],
+          "ohm": [868, 868]
+        },
+        "cargo_status_message_counts": {
+          "stock": [240, 240],
+          "ohm": [240, 240]
+        }
+      }
+    ]
+  },
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "baseline_warmups_excluded": true,
+    "session_totals_include_edits_and_runner_overhead": true,
+    "compiler_accounting": "cargo status messages; not compiler invocations",
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust_enabled": false,
+    "optional_lockfile_parse_cache_enabled": false,
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": false,
+    "test_count_semantics": "Observed test starts, including retries and nested runner output; not unique selected tests.",
+    "cargo_status_messages_prove_compiler_invocations": false,
+    "ruff_rust_1_98_clippy_allow": ["clippy::format_push_string"]
+  },
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_LTO": "off",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only",
+    "INSTA_FORCE_PASS": "0",
+    "INSTA_UPDATE": "no",
+    "MDTEST_UPDATE_SNAPSHOTS": "0"
+  },
+  "provenance": {
+    "effective_fixture_sha256": {
+      "ruff": "7ee256b01d4cad37af2468e5562b133b0e99417240f56510be9cf940e4ee0479"
+    },
+    "canonical_fixture_sha256": {
+      "ruff": "fb0af78dd9a6ea69ebcc6cada736f26a439067e1e26b8421e5a7259c7ce8cef1"
+    },
+    "setup_patches_by_project": {},
+    "setup_proofs_by_project": {},
+    "published_fixture_sha256": "fb0af78dd9a6ea69ebcc6cada736f26a439067e1e26b8421e5a7259c7ce8cef1",
+    "coordinator_revision": "73c4ca78849488a613c7837ecb5d11f7fe32d8f1",
+    "publication_base_revision": "73c4ca78849488a613c7837ecb5d11f7fe32d8f1",
+    "benchmark_preparation_base_revision": "73c4ca78849488a613c7837ecb5d11f7fe32d8f1",
+    "audit_inputs_sha256": "7ced938166536cb38444d02df944396069f2d8fbed34ca23b8d8aeb9aedefe65",
+    "release_manifest_sha256": "4aa4f508d2afd559d58f88549c71426b7e8dc5142e801b37db214355888f5f99",
+    "source_pins": {
+      "rust": "3952fdaaec919ddff5504f63e3cac74692779084",
+      "cargo": "65b7b12d192a975bf174368036300179cd26502a",
+      "clippy": "e536600c269ff7166449a331ee6e94bf6c2fe5fb",
+      "rustfmt": "214f9b7ec9812bbe6235184c037c2387217dcc59"
+    },
+    "benchmark_runner_sha256": {
+      "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+      "replay_sessions.py": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+    },
+    "raw_results_sha256": "5467325a5944f05963ea19fe1338d9f6a62a020828acde306325f8cbedb33ee0",
+    "raw_audit_sha256": "11a683e647695cf72b7edb7c1b5c7377da7947154c8cdf6a8bfb7ab43e928cba",
+    "exporter_sha256": "1eeceab5c1b9a7ae2ac602158770861d0aa361f6447dd09da72a306dc7e7a8fa",
+    "installer_sha256": "dd785f4e3ed4272ff9ea75ce368e3d0324ab172549247f64c736ac45287ce6ea",
+    "release_archive_sha256": "7f45ae799eda19ab95e6fbacc0fff189e33f68e2695c27c331854fd7b93ef960",
+    "release_archive_bytes": 304736620,
+    "release_asset_staging_source": "github",
+    "release_assets": [
+      {
+        "asset_id": 549391625,
+        "name": "install.sh",
+        "sha256": "dd785f4e3ed4272ff9ea75ce368e3d0324ab172549247f64c736ac45287ce6ea",
+        "bytes": 15288,
+        "source": "github"
+      },
+      {
+        "asset_id": 549391626,
+        "name": "ohm-1.98.0-10-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "7f45ae799eda19ab95e6fbacc0fff189e33f68e2695c27c331854fd7b93ef960",
+        "bytes": 304736620,
+        "source": "github"
+      }
+    ],
+    "helpers": {
+      "just": {
+        "version": "just 1.58.0",
+        "sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042"
+      },
+      "cargo-nextest": {
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a"
+      },
+      "uv": {
+        "version": "uv 0.11.33 (x86_64-unknown-linux-gnu)",
+        "sha256": "4f5e568281d9b5b411534bb4f056109f0938a9dccf52b112c294e6a627a76dfe"
+      },
+      "python3.12": {
+        "version": "Python 3.12.13",
+        "sha256": "7d43f6e86a6c6dd12005ec77eb2055f1be3f1bb3adedf8afe0a87973fa7371ce"
+      }
+    },
+    "toolchains": {
+      "1.98.0": {
+        "cargo": {
+          "version": "cargo 1.98.0 (797e8a9bc 2026-08-05)\nrelease: 1.98.0\ncommit-hash: 797e8a9bca276c1c9f9f738d2a20f484fa4eea9d\ncommit-date: 2026-08-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0\nLLVM version: 22.1.8",
+          "sha256": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (88d9e12ae1 2026-08-18)",
+          "sha256": "f3d6f504333820cb4dbaccb5e4742d98c826f6a199c81964affe53639d19e734"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-stable (88d9e12ae1 2026-08-18)",
+          "sha256": "5005cdcd39ded526dca8fa6ccd716d42fc7da54469034e055dbf54649bec7877"
+        }
+      },
+      "ohm-1.98.0-10": {
+        "cargo": {
+          "version": "cargo 1.98.0-dev (65b7b12d1 2026-09-07) (ohm-1.98.0-10)\nrelease: 1.98.0-dev\ncommit-hash: 65b7b12d192a975bf174368036300179cd26502a\ncommit-date: 2026-09-07\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "695dc5ca4124aa43cda330c29420b430d495eb2e1bef7fbb25eb4975536ca0aa"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0-dev (3952fdaae 2026-09-07) (ohm-1.98.0-10)\nbinary: rustc\ncommit-hash: 3952fdaaec919ddff5504f63e3cac74692779084\ncommit-date: 2026-09-07\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-dev\nLLVM version: 22.1.8",
+          "sha256": "4027d9d1379776707927d17bbc8e2183c19c6bb666aec12b35e5b5ae73cd730e"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (e536600c26 2026-09-02)",
+          "sha256": "6438f19aff6d9d6e5cf8e51356485d55afff69d79bb1b41262f0366810a363ea"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-dev (214f9b7ec9 2026-08-21)",
+          "sha256": "3652eb60d9b71de0f81673003119d2a8c92a1abdf65d9d294ba5246436aedd5c"
+        }
+      }
+    },
+    "global_moving_aliases_unchanged": true,
+    "global_helpers_unchanged": true,
+    "paired_arms_share_helper_environment": true,
+    "standalone_uv_fixture_commands": 0,
+    "parent_source_configuration": {
+      "source_only": true,
+      "sha256": "24095bd6315880162c8f660917100ac36638cb73778dd9ec6f1c9026ea87b178"
+    },
+    "native_download_preparation": {
+      "completed_before_timing": true,
+      "measured_targets_reused": false,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-10",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--no-run",
+        "--locked",
+        "--offline"
+      ],
+      "log_sha256": "34fcb2c24f134977dfa4259498f40d3266ec96cfe21f143063183e1c85b41f1f",
+      "receipt_sha256": "5de06be2609ac81183435f531c6bd7daf3e540cdb1a60dc73066e3fee3d7365e"
+    },
+    "continuous_host_monitor": {
+      "intervals": 3685,
+      "trace_sha256": "5d0da763c59edaa93b2d39dc074e3f318dd10d9739ad2663f0f0f202f8e9abef",
+      "implementation_sha256": "dae686754c1e5d3ebb76b27e3793f67238ed952368c6c38c9b5dcbee5dfa84df",
+      "outside_user_cpu_limit_fraction": 0.05,
+      "system_cpu_attribution_retained": true,
+      "violations": 0,
+      "intervals_with_periodic_maintenance": 392,
+      "maximum_outside_user_cpu_fraction": 0.008082050768703128,
+      "maximum_outside_system_and_user_cpu_fraction": 0.29181093624347815
+    },
+    "input_receipt_sha256": {
+      "ablation-completed.json": "d38f787383ea4b41d7c44059c9eb2e0e4054b07d3121b4afd8b82364a6b74a42",
+      "ablation-host-monitor.json": "fce7638275c4ebb452b31b23712c2d61af6d0fcf746d0c075c02b59c2c3d66c8",
+      "ablation-ready-before-tmpdir-fix.json": "0ac192c176549fd77d44b371e9583dbaa16398c6c9ac2d5dc768a902d157c047",
+      "ablation-ready.json": "86c5aa18e5412cc191b86a0ef2481ea2900b9549d5a0d2d1331e4fbbd0d547c8",
+      "ablation-started-20260908T034325.571373Z.json": "056edeaf44b8d92ea6cdcff3b170030b8bd39ca146bcf2365c874a4942d1c0f1",
+      "background-service-review.json": "42823b20ffc1cd66e77b5333b67d4d74766fca199aaf512f53875fb4519068c8",
+      "bootstrap-status.json": "195a63e78e1d092205ed8e018cb844914a4a83dc47a48092e3b6ada55a9cb0a0",
+      "continuation-inputs.json": "ce4d02b991897def49256b40e7910c4f494211073f312693e86a462f605c396b",
+      "current-completed.json": "f73bb998c817de4c394daff8a23f0aad92ae6749aa3006a49f602ef19d151104",
+      "current-host-monitor.json": "fb8932aa24d055c201fd79d585f9638ed2a15e6c950bfe16432004f16a9a5bef",
+      "current-ready-before-tmpdir-fix.json": "50a19bbc16856c8b1f66b47e8873c716907b85e0afcebf1653af3cda0d486dd5",
+      "current-ready.json": "71e1b54c24cae6f1326946e5203770b81d51b0d0e65eb527c6f54cc47e05eaaa",
+      "current-started-20260908T013353.693617Z.json": "ed92c25dcde04e944c87002cb420d27e8dbd68db336383a379d2c5fa7ffcf37d",
+      "direct-host-monitor-preflight-rejected-1788818996590627663.json": "3d563348272856fb5e236affeabdddd244f11654accc207641891aa5788e3b1e",
+      "direct-host-monitor.json": "b282e9d7a3445b61467f4a5eb1a1944ad9cd4df8c1e55edc9d9bd4832387f3d3",
+      "direct-prepared.json": "c846c280ec7d873af40a3f2dc20dd2fb13b5f532e2b5a5d9d0825b64b549f1a6",
+      "direct-quiet-1788818620386925277.json": "4f9a3641f3346a236c3608f571e86282d2f307f50a4d11279a02a4091ac8cf22",
+      "direct-quiet-1788818846602233608.json": "2fb505778d2bf4a0f80e7c26c3946584dd870b87961f4b7098a86bc967097623",
+      "direct-quiet-1788819027659921430.json": "e32806f48e54b04d9a0ad78061fa583f456d6ee4d463435f69e20234c80dae3e",
+      "direct-quiet-1788819633604881302.json": "09d14c0d28724b31a3e3835d6d4b2975c9aa814e27cda3380da31ea5523e9c12",
+      "direct-quiet-1788820012098650988.json": "4fe7e2bcb87fdca66eaef145f33645e364927ac0cb2c42ce2c4fd44a1065e7b5",
+      "direct-quiet-1788827785811351803.json": "37005c9f279d6de20eb94306962754c907edfd9467cd6485ab5c4d86ae2ef2de",
+      "direct-quiet-1788827847072384914.json": "66b6885ec2a665f4f1716a812912fbb328af55a13001828e95698d6cd305bdc0",
+      "direct-quiet-1788828682923426405.json": "a7a612bd7b9466556152cdebedb1d1e3583a323cb64b68bb5f04fd678ec99247",
+      "direct-quiet-1788828744479230843.json": "f7be0b478f8aab707cd4f4fc8fef96cf2ace00a5487bd066a6500eebb6f40464",
+      "direct-quiet-1788831233687298751.json": "0c45c8d407b4c065a5f9bc08a5e0b0b277a42116d196b0d97c59ec6dfd76fe28",
+      "direct-quiet-1788839005563347516.json": "7d3b8ca1409091b7349f8b6102a67c547de1867d6c1c2711ca2af98d47b4178f",
+      "direct-ready.json": "7b4ae835486393dc4c8b13c3e0d2cb925c919217a29b568dc31c6a51708c15e3",
+      "direct-started.json": "f7dd94c128fcf12537c381d17f4bc9820131537806491b9449075375a0e7650b",
+      "direct-unaffected-completed.json": "a1be4f095cf7d44e9789daff056356438933c7e182829522728ad9302f391340",
+      "direct-unaffected-host-monitor-preflight-rejected-1788827786478797680.json": "4ee8fff4e2a7416cb76c48db269a90144b35f377a901050f933b2f420c28fbba",
+      "direct-unaffected-host-monitor.json": "da4bd2fb839ed7650212bf8dc4138656a8e6a8a86bc022975701331d413896bc",
+      "direct-unaffected-started.json": "e9b71fd896401d2a90d65d2ad33df7c3f0c3897c8910becf03d8d6450574c32e",
+      "excluded-direct-cpu-host-monitor.json": "9bf8390d96f6786c78d20b141c95c799c446fbd1c9d97bf1c9296f7ab263a7e0",
+      "excluded-direct-cpu-monitor-source.json": "660b4386e57d4387e9b5776b552ef100f6d10bd63400db9f4a4b99a38a2d6595",
+      "excluded-direct-cpu-results.json": "60301735c2ac5654e5570e65517eb9f992f6307f04642a7e92b48a9662a89622",
+      "excluded-direct-cpu-review.json": "452c66d9f465057d1134cd25db2dfe1ab04e54c69b008eb1131ca1c759ea14ec",
+      "excluded-direct-cpu-started.json": "bc1fbd303dbd62501d86e947bd31995c44a2d35eabcfdbdfb815add6ba834dd5",
+      "excluded-direct-cpu-state.json": "6571e749eaf1671a80e1e441288d480a724c39011ea606250cf3fa30226b20a4",
+      "excluded-direct-maintenance-host-monitor.json": "376def9a27899bcf3bd5c4165932e5eefea139b9099513b6d780665cf4532cfa",
+      "excluded-direct-maintenance-monitor-source.json": "6d13f9c2807873a7d79b23b6e56df69078953903d7e400f6f318b15776834008",
+      "excluded-direct-maintenance-results.json": "f9fb55e24eda8f7c7beab8865b3d9558af594f40e3cc502750617e81723f388c",
+      "excluded-direct-maintenance-review.json": "2972ef90faaaba7fbc9fa5de7573249b73ab77e68c82d967fa44aa6aecb124be",
+      "excluded-direct-maintenance-started.json": "402f9738cabc89ba260fb094cbfd1afe5fda606170ba677ebe5912df8d17b428",
+      "excluded-direct-maintenance-state.json": "4a00bcbc781555990a27fc76cd39069e362952c3e9a9906bf9ccb566789a5aa4",
+      "experimental-codex-environment-evidence.json": "06a3cd6d9d8b6c9acbe54152c0c0d211960231337c7bfe90468d0d7e2c5c5555",
+      "global-rustup-before-7491.json": "b89ae9c718499091edca8be4bad763965cdc9a111ff1d886869b7d8e8e3893e8",
+      "helpers.json": "828cf8ef2d265f08d3f4d2a54b3a294f07af80c379ce71a1b7aba19f0022a758",
+      "historical-completed.json": "c31a9859905761b3150f57f0f78d03e2e7c1fb489ab34fae982e6599ebd79566",
+      "historical-host-monitor-preflight-rejected-1788828683093343577.json": "49b1587efb92ba8ed378da569809136205c976ea2317a11fe7a500b505cb1b64",
+      "historical-host-monitor.json": "e19832ebd80bf93e5a01ff713db41ab6fc633c557683b373936c82474b69ff6a",
+      "historical-ready-before-tmpdir-fix.json": "60e463d95cb56b0ee67b66558260e96376fa242ec823fb41c3aa37c392d6c63f",
+      "historical-ready.json": "c282a8f45a0a3339070030af0bc524573c542b42686d7a1a07f0477cec1c54cf",
+      "historical-started-20260908T005224.483021Z.json": "318a37d95cf423081169c35629e56f362b7beddddf87fa441c5b974367d9592c",
+      "maintenance-preflight-direct-host-monitor.json": "acd47ef8084e9790098f269c289ab5853a8d322268454556fee92bffaedcf95e",
+      "maintenance-preflight-review.json": "b8e8b38da78410aaaf31743c54dbee32bc7f5dd5a20524ff515770e3e435ab13",
+      "maintenance-preflight-suite-status.json": "4ecae2b8fe1d7b4a04926387c6d9231f5ecdd8bdf5be928e8a02f859e02c453d",
+      "native-preparation.json": "5de06be2609ac81183435f531c6bd7daf3e540cdb1a60dc73066e3fee3d7365e",
+      "preflight-retry-direct-1788818996590627663.json": "fba24af136ba60681e5a28a3f6c3bef9c886af9592a8722af8698b5b92e2649d",
+      "preflight-retry-direct-unaffected-1788827786478797680.json": "70d40ccd4529731efdb6a97455a4749235b8757834eaa96aaf1de016bfb13d0c",
+      "preflight-retry-historical-1788828683093343577.json": "c320a7bb7291fbab7ba249e7a0661a2d1115fe3f19c0f83919c98ff87e060a5a",
+      "prelaunch-direct-host-monitor.json": "f9ce2a1d4cd7e5a16aaaab8897fac0bebaf5bf1660456105b77aeea758d6d492",
+      "prelaunch-review.json": "674398548b069a67dbb83a20fec307550a13d4c15e24c01874a85bdb613faedd",
+      "quiet-prelaunch-state.json": "7c26f777cb0fd9dacd719f88a7c940cd40e322e721834f58126677e29bafdf3a",
+      "release-assets.json": "945e4048556bc999cdb1ce9f344c9aea817f51843a75d5d73c36164d427f79e4",
+      "replay-readiness-withdrawal.json": "09e0c3c096c2801f1c8ecc8df58bfd7c18fd29195366af3fcae4e98f05d48d53",
+      "replay-tmpdir-correction.json": "aadd2d711b2f3e9b2c0c1cbf895108fba73f4b8c650a3d6ccccb77488dc11d2f",
+      "suite-inputs.json": "4c6fec126dde0253597b8f3a0cdd0305364ea1efe11c65d57fcc750adde974e7",
+      "suite-remaining-inputs-1788818996527290502.json": "d3c6b79e854ad2c2cb081504b64a5c6df7f188f86b1c7506f2b4e29c9d8e2235",
+      "suite-remaining-inputs-1788819364428961082.json": "eb65b34534497d7fee300d51477fa5cd4d5c31b44b4c0e273248a0c1108c3aba",
+      "suite-remaining-inputs-1788819602506472957.json": "eb65b34534497d7fee300d51477fa5cd4d5c31b44b4c0e273248a0c1108c3aba",
+      "suite-remaining-inputs-1788819981017710328.json": "b5617c53c94137163e56b71d0f5b2416c708e324078cb32de67264a8bdfa4474",
+      "suite-retry-inputs.json": "2c443c976847caf1563c6dbed7bac60ce512d019c86645a2d84fb2ad6801bb96",
+      "suite-status-direct-readiness-failure.json": "5d0098d3c8e345f25ea3475f490acf71b1d7100eba3da18efb7d118c74e94102",
+      "suite-status.json": "c64f5acde40f4f1d1cfa6225c2a8e261dad2eaac9c14584b3df188ab705f539e",
+      "toolchains.json": "86279d6440a5d01ad71172364769afa46610e6783d0d6301338c5c14cceb0087"
+    },
+    "replay_environment_correction": {
+      "receipt_sha256": "aadd2d711b2f3e9b2c0c1cbf895108fba73f4b8c650a3d6ccccb77488dc11d2f",
+      "diagnostic_sha256": "06a3cd6d9d8b6c9acbe54152c0c0d211960231337c7bfe90468d0d7e2c5c5555",
+      "replay_controller_sha256": "bbce6c849214d8e5fa0c19e7d0c81beb0d5540e07c8ef659b726f3ded439e7ee",
+      "reason": "The unchanged Kitty test can match cG5n in the encoded temporary pathname.",
+      "timed_replay_samples_before_correction": 0,
+      "same_temporary_path_for_both_arms": true,
+      "umask": "0077",
+      "fixtures_sources_helpers_profiles_tests_unchanged": true
+    },
+    "background_services": {
+      "periodic_infrastructure_reconciliation": true,
+      "services_modified": false,
+      "service_review_sha256": "42823b20ffc1cd66e77b5333b67d4d74766fca199aaf512f53875fb4519068c8",
+      "timing_scope": "Dedicated benchmark host with normal periodic infrastructure services; unrelated user workloads and compiler jobs are rejected."
+    },
+    "supplemental_controllers": {
+      "attest_codex_r10.py": "b2f30bbc3591b1ec395de55ffe99b38a081d8516f2c43b80aa16f8b55d2d6679",
+      "continue-linux-4.py": "d2eb0a4d7f85e5b03459aaf23417a0cb82cc3dd1a3e9c3a90b0bb6b5320f8607",
+      "finish-linux.py": "7fa0e58ba656e4dd6156a870580f6c9a5f30ac85838a06d48f41640167f8b8b4",
+      "finish-r10-continuation.py": "065316e0f1a3a46186a2af60f6924e297e7be25d42703a20ff07465d1906f757",
+      "prepare-r10-continuation.py": "93a1930a7b1bd4dad78d094c0bc1c296e2b57f0214c8d7a5137321e30039725d",
+      "replay-control-r10.py": "bbce6c849214d8e5fa0c19e7d0c81beb0d5540e07c8ef659b726f3ded439e7ee",
+      "run-direct-ready.py": "e32c21d54d85b56cd3cc4ce5351c355504d0c6c6ab47b889f5092e469db787a2",
+      "run-unaffected-r10.py": "f920d218838f30407eeaeb1ddf3598fb33dbe412f5ee26080e4b9cf860aa60ee"
+    },
+    "final_replay_sources": {
+      "audit_sha256": "8b37b2aade8b3af9d2671a3f2aea00a6222d0182bcf700de5a22275a1bcbec5a",
+      "audit_implementation_sha256": "c3272a48381e6b7828df3901343ae4e6a8498ececff6d823bf1861d119a6339d",
+      "scope": "Final tracked and non-ignored untracked files match an independent index reconstructed from each frozen fixture baseline, setup patch, and edit. Original source trees and indexes were not changed.",
+      "verified_worktrees": 12,
+      "samples": [
+        {
+          "stage": "current",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "selector": "1.98.0",
+          "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+          "fixture": "ruff-rust-1.98.json",
+          "fixture_sha256": "7ee256b01d4cad37af2468e5562b133b0e99417240f56510be9cf940e4ee0479",
+          "expected_tree_oid": "f4a8769623ce0d3dd1fa9bac086a5509e8904d43",
+          "patch_sha256s": [
+            "b1868f3d90e07755734e1ce402f4daf8baef4eb6973b3d2fdd89bae1ca899115",
+            "470958e2db97ffac29eaccb007751cb7b571fa4fab6969edf1833c318268ca72",
+            "102cbf43936e3eb448548587ec9fbea534eb7b171b974b542b077047fe1af031"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "selector": "ohm-1.98.0-10",
+          "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+          "fixture": "ruff-rust-1.98.json",
+          "fixture_sha256": "7ee256b01d4cad37af2468e5562b133b0e99417240f56510be9cf940e4ee0479",
+          "expected_tree_oid": "f4a8769623ce0d3dd1fa9bac086a5509e8904d43",
+          "patch_sha256s": [
+            "b1868f3d90e07755734e1ce402f4daf8baef4eb6973b3d2fdd89bae1ca899115",
+            "470958e2db97ffac29eaccb007751cb7b571fa4fab6969edf1833c318268ca72",
+            "102cbf43936e3eb448548587ec9fbea534eb7b171b974b542b077047fe1af031"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "uv",
+          "toolchain": "stock",
+          "repetition": 0,
+          "selector": "1.98.0",
+          "base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+          "fixture": "uv.json",
+          "fixture_sha256": "255bad17342d05790e7c2bbd0da96e019a2e0750bafb36b2e5d8761012790904",
+          "expected_tree_oid": "0845f4a2886f442d57782632c32b3fd30f8646a1",
+          "patch_sha256s": [
+            "631f6633bcb9847cc44dc235da60678fb9f6a407a0b5fa3cd6d3f2fb41903df6",
+            "e89ec89bd37037b11ef51125278c5cb780455cf1f629a53d21404fab4270ae60",
+            "8f93251521da7bc006c0857ee9e191b6e5d730f96dcd76208dc18ae8c4f670a8"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "uv",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "selector": "ohm-1.98.0-10",
+          "base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+          "fixture": "uv.json",
+          "fixture_sha256": "255bad17342d05790e7c2bbd0da96e019a2e0750bafb36b2e5d8761012790904",
+          "expected_tree_oid": "0845f4a2886f442d57782632c32b3fd30f8646a1",
+          "patch_sha256s": [
+            "631f6633bcb9847cc44dc235da60678fb9f6a407a0b5fa3cd6d3f2fb41903df6",
+            "e89ec89bd37037b11ef51125278c5cb780455cf1f629a53d21404fab4270ae60",
+            "8f93251521da7bc006c0857ee9e191b6e5d730f96dcd76208dc18ae8c4f670a8"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "stock",
+          "repetition": 0,
+          "selector": "1.98.0",
+          "base_revision": "74004b5397b24662a87a5264a6ae80664168c7f3",
+          "fixture": "codex-stable-goal-accounting.json",
+          "fixture_sha256": "67bdc1b05332f7bf45c58533d34183a63dcb5fde74e1119417c855a800693605",
+          "expected_tree_oid": "05e819960d59e1063c70fa3b8e6224f69badb3b9",
+          "patch_sha256s": [
+            "af822ae0a81f239b71e5b3c0d7f947ccce96fea032571d24f809a151af98af3a",
+            "52af07ea549e6f933d5dfcad064d7aa45c247e1fecbec6f33f6034840232d375",
+            "6dca866b379054ac80fade6b95dfcbef9a92038a31264cee9fd7b79e2b8f9683",
+            "92a818c4b8b3df15f57d4b7cf0e8ea7fc93584a07de743a4f5161e04e6026364"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "selector": "ohm-1.98.0-10",
+          "base_revision": "74004b5397b24662a87a5264a6ae80664168c7f3",
+          "fixture": "codex-stable-goal-accounting.json",
+          "fixture_sha256": "67bdc1b05332f7bf45c58533d34183a63dcb5fde74e1119417c855a800693605",
+          "expected_tree_oid": "05e819960d59e1063c70fa3b8e6224f69badb3b9",
+          "patch_sha256s": [
+            "af822ae0a81f239b71e5b3c0d7f947ccce96fea032571d24f809a151af98af3a",
+            "52af07ea549e6f933d5dfcad064d7aa45c247e1fecbec6f33f6034840232d375",
+            "6dca866b379054ac80fade6b95dfcbef9a92038a31264cee9fd7b79e2b8f9683",
+            "92a818c4b8b3df15f57d4b7cf0e8ea7fc93584a07de743a4f5161e04e6026364"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "selector": "ohm-1.98.0-10",
+          "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+          "fixture": "ruff-rust-1.98.json",
+          "fixture_sha256": "7ee256b01d4cad37af2468e5562b133b0e99417240f56510be9cf940e4ee0479",
+          "expected_tree_oid": "f4a8769623ce0d3dd1fa9bac086a5509e8904d43",
+          "patch_sha256s": [
+            "b1868f3d90e07755734e1ce402f4daf8baef4eb6973b3d2fdd89bae1ca899115",
+            "470958e2db97ffac29eaccb007751cb7b571fa4fab6969edf1833c318268ca72",
+            "102cbf43936e3eb448548587ec9fbea534eb7b171b974b542b077047fe1af031"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "selector": "1.98.0",
+          "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+          "fixture": "ruff-rust-1.98.json",
+          "fixture_sha256": "7ee256b01d4cad37af2468e5562b133b0e99417240f56510be9cf940e4ee0479",
+          "expected_tree_oid": "f4a8769623ce0d3dd1fa9bac086a5509e8904d43",
+          "patch_sha256s": [
+            "b1868f3d90e07755734e1ce402f4daf8baef4eb6973b3d2fdd89bae1ca899115",
+            "470958e2db97ffac29eaccb007751cb7b571fa4fab6969edf1833c318268ca72",
+            "102cbf43936e3eb448548587ec9fbea534eb7b171b974b542b077047fe1af031"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "uv",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "selector": "ohm-1.98.0-10",
+          "base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+          "fixture": "uv.json",
+          "fixture_sha256": "255bad17342d05790e7c2bbd0da96e019a2e0750bafb36b2e5d8761012790904",
+          "expected_tree_oid": "0845f4a2886f442d57782632c32b3fd30f8646a1",
+          "patch_sha256s": [
+            "631f6633bcb9847cc44dc235da60678fb9f6a407a0b5fa3cd6d3f2fb41903df6",
+            "e89ec89bd37037b11ef51125278c5cb780455cf1f629a53d21404fab4270ae60",
+            "8f93251521da7bc006c0857ee9e191b6e5d730f96dcd76208dc18ae8c4f670a8"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "uv",
+          "toolchain": "stock",
+          "repetition": 1,
+          "selector": "1.98.0",
+          "base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+          "fixture": "uv.json",
+          "fixture_sha256": "255bad17342d05790e7c2bbd0da96e019a2e0750bafb36b2e5d8761012790904",
+          "expected_tree_oid": "0845f4a2886f442d57782632c32b3fd30f8646a1",
+          "patch_sha256s": [
+            "631f6633bcb9847cc44dc235da60678fb9f6a407a0b5fa3cd6d3f2fb41903df6",
+            "e89ec89bd37037b11ef51125278c5cb780455cf1f629a53d21404fab4270ae60",
+            "8f93251521da7bc006c0857ee9e191b6e5d730f96dcd76208dc18ae8c4f670a8"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "selector": "ohm-1.98.0-10",
+          "base_revision": "74004b5397b24662a87a5264a6ae80664168c7f3",
+          "fixture": "codex-stable-goal-accounting.json",
+          "fixture_sha256": "67bdc1b05332f7bf45c58533d34183a63dcb5fde74e1119417c855a800693605",
+          "expected_tree_oid": "05e819960d59e1063c70fa3b8e6224f69badb3b9",
+          "patch_sha256s": [
+            "af822ae0a81f239b71e5b3c0d7f947ccce96fea032571d24f809a151af98af3a",
+            "52af07ea549e6f933d5dfcad064d7aa45c247e1fecbec6f33f6034840232d375",
+            "6dca866b379054ac80fade6b95dfcbef9a92038a31264cee9fd7b79e2b8f9683",
+            "92a818c4b8b3df15f57d4b7cf0e8ea7fc93584a07de743a4f5161e04e6026364"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "stock",
+          "repetition": 1,
+          "selector": "1.98.0",
+          "base_revision": "74004b5397b24662a87a5264a6ae80664168c7f3",
+          "fixture": "codex-stable-goal-accounting.json",
+          "fixture_sha256": "67bdc1b05332f7bf45c58533d34183a63dcb5fde74e1119417c855a800693605",
+          "expected_tree_oid": "05e819960d59e1063c70fa3b8e6224f69badb3b9",
+          "patch_sha256s": [
+            "af822ae0a81f239b71e5b3c0d7f947ccce96fea032571d24f809a151af98af3a",
+            "52af07ea549e6f933d5dfcad064d7aa45c247e1fecbec6f33f6034840232d375",
+            "6dca866b379054ac80fade6b95dfcbef9a92038a31264cee9fd7b79e2b8f9683",
+            "92a818c4b8b3df15f57d4b7cf0e8ea7fc93584a07de743a4f5161e04e6026364"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        }
+      ]
+    },
+    "command_cpu_observations": {
+      "audit_sha256": "f45c37e3f6bdbb4cdc330a39ae349b8cafa92e6a77d43932a70bd98599b222f4",
+      "audit_implementation_sha256": "a4dbfea60a423fb8ec1f3d61ea9ce25f3dd964b7167ad72119788c9b38df54d1",
+      "scope": "Timed commands only. Approximate command windows use log final-write mtime minus measured duration; logs are written immediately after completion. Two-second telemetry intervals and short-lived process exits limit attribution. Overlapping intervals are clipped to their chronological union. Same-UID versus other-UID CPU is process ownership, not user-mode versus kernel-mode time. This audit describes overlap and does not alter sample acceptance.",
+      "timed_commands": 148,
+      "minimum_coverage_fraction": 0.9769096102355881,
+      "maximum_mean_outside_cpu_fraction": 0.14478330047898327,
+      "commands_with_mean_outside_cpu_above_five_percent": [
+        {
+          "stage": "current",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 12,
+          "label": "Run all semantic mdtests after the fixed-point rewrite",
+          "wall_seconds": 7.642715169000439,
+          "log_sha256": "8c88ea916867da5a2238613dd84a53b57f7b77eb63ffc2b4a090d9c88e47fde5",
+          "mean_outside_cpu_fraction": 0.054838106592860876,
+          "mean_outside_same_uid_cpu_fraction": 0.0006515634924815922,
+          "mean_outside_other_uid_cpu_fraction": 0.05418654310037929,
+          "peak_outside_cpu_fraction": 0.09371756188111642
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 7,
+          "label": "Run the focused active-cell rendering tests",
+          "wall_seconds": 2.946469120000984,
+          "log_sha256": "f6d8b5d8f4f60952b77df18465653c359e2ecf58b216f421e9c7e900bfbc319e",
+          "mean_outside_cpu_fraction": 0.06967153072493042,
+          "mean_outside_same_uid_cpu_fraction": 0.00010607914175612149,
+          "mean_outside_other_uid_cpu_fraction": 0.06956545158317429,
+          "peak_outside_cpu_fraction": 0.07820255277484321
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 11,
+          "label": "Validate active-cell removal cache invalidation",
+          "wall_seconds": 3.453544280000642,
+          "log_sha256": "500227f1a67f2b48b44b69180fdbb695d0317ad7e910b3f68eef9e1f3a548dfb",
+          "mean_outside_cpu_fraction": 0.09173567711057247,
+          "mean_outside_same_uid_cpu_fraction": 0.00012374883189162345,
+          "mean_outside_other_uid_cpu_fraction": 0.09161192827868085,
+          "peak_outside_cpu_fraction": 0.10443742448009732
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 14,
+          "label": "Validate the entire TUI package once",
+          "wall_seconds": 38.29130025700215,
+          "log_sha256": "5349f2b96008da38c88cb2037cc9103d2bfd380dd196cb6b549e3d66df839d39",
+          "mean_outside_cpu_fraction": 0.13227638409324607,
+          "mean_outside_same_uid_cpu_fraction": 4.746252139234213e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.13222892157185373,
+          "peak_outside_cpu_fraction": 0.2716002479262621
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 7,
+          "label": "Run the focused active-cell rendering tests",
+          "wall_seconds": 4.248856821999652,
+          "log_sha256": "2a90e8858f4a7baf6079a421294e6ee4ed835e6469195a565d5459351a61552c",
+          "mean_outside_cpu_fraction": 0.08641481746755565,
+          "mean_outside_same_uid_cpu_fraction": 0.00022367434849618087,
+          "mean_outside_other_uid_cpu_fraction": 0.08619114311905947,
+          "peak_outside_cpu_fraction": 0.09752029631830687
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 11,
+          "label": "Validate active-cell removal cache invalidation",
+          "wall_seconds": 3.937264513999253,
+          "log_sha256": "fce7f278fc5c7f39a45f2a823a91c60ece3efb6d3859859603af020b9dbabbee",
+          "mean_outside_cpu_fraction": 0.08300696432603848,
+          "mean_outside_same_uid_cpu_fraction": 0.0006984689897005686,
+          "mean_outside_other_uid_cpu_fraction": 0.0823084953363379,
+          "peak_outside_cpu_fraction": 0.09481034917514858
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 14,
+          "label": "Validate the entire TUI package once",
+          "wall_seconds": 32.07560733600258,
+          "log_sha256": "3250f35268d5b31add5d39b61feb4867f5c10a20452679775e0cd5aef423d6ee",
+          "mean_outside_cpu_fraction": 0.14478330047898327,
+          "mean_outside_same_uid_cpu_fraction": 6.849366838233739e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.14471480681060092,
+          "peak_outside_cpu_fraction": 0.26345345980162277
+        },
+        {
+          "stage": "current",
+          "project": "uv",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 11,
+          "label": "Recheck workspace formatting",
+          "wall_seconds": 0.5549955579990637,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mean_outside_cpu_fraction": 0.05219082436230578,
+          "mean_outside_same_uid_cpu_fraction": 0.00014911664103515936,
+          "mean_outside_other_uid_cpu_fraction": 0.05204170772127062,
+          "peak_outside_cpu_fraction": 0.05219082436230578
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 7,
+          "label": "Run the focused active-cell rendering tests",
+          "wall_seconds": 4.280655905997264,
+          "log_sha256": "f706f28196e745c29559a537c0aa5270ab5d7e5f7ec6f18d66da8fb2a409a5fa",
+          "mean_outside_cpu_fraction": 0.07952861656163453,
+          "mean_outside_same_uid_cpu_fraction": 0.0002500318255411194,
+          "mean_outside_other_uid_cpu_fraction": 0.07927858473609341,
+          "peak_outside_cpu_fraction": 0.08995909762458597
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 11,
+          "label": "Validate active-cell removal cache invalidation",
+          "wall_seconds": 3.3063947269984055,
+          "log_sha256": "f2db5d59fcbf104aa9738a830dee72e3ec94d94931bcddc9a3acde558b9fb9c9",
+          "mean_outside_cpu_fraction": 0.07992300795863533,
+          "mean_outside_same_uid_cpu_fraction": 0.00017608672085529507,
+          "mean_outside_other_uid_cpu_fraction": 0.07974692123778003,
+          "peak_outside_cpu_fraction": 0.08642396193314852
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 14,
+          "label": "Validate the entire TUI package once",
+          "wall_seconds": 32.82164379799724,
+          "log_sha256": "86b5a0cf0efce3fc1a5798623431e414d4fed2a13b1d8f4a3b8b240fb3ed80af",
+          "mean_outside_cpu_fraction": 0.1429544440921345,
+          "mean_outside_same_uid_cpu_fraction": 4.761521826044113e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.14290682887387407,
+          "peak_outside_cpu_fraction": 0.29181093624347815
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 7,
+          "label": "Run the focused active-cell rendering tests",
+          "wall_seconds": 3.6468975650022912,
+          "log_sha256": "08a2f2af96c78004c8fdcc123bd252356ebd89901df5a1e336bb1ed3bc8a9d18",
+          "mean_outside_cpu_fraction": 0.07258571379369065,
+          "mean_outside_same_uid_cpu_fraction": 0.0,
+          "mean_outside_other_uid_cpu_fraction": 0.07258571379369065,
+          "peak_outside_cpu_fraction": 0.08311849157708351
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 11,
+          "label": "Validate active-cell removal cache invalidation",
+          "wall_seconds": 3.6531565000004775,
+          "log_sha256": "04646fa7ebc74e81caab34b08b0b7e6a8aff6f80c401dfb7c77211e8b635ba2a",
+          "mean_outside_cpu_fraction": 0.060485840175446275,
+          "mean_outside_same_uid_cpu_fraction": 8.299839059983223e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.06040284178484644,
+          "peak_outside_cpu_fraction": 0.06705124352657454
+        },
+        {
+          "stage": "current",
+          "project": "codex",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 14,
+          "label": "Validate the entire TUI package once",
+          "wall_seconds": 33.252328495000256,
+          "log_sha256": "4c95e777d02df15460cf43840d963007eb5a802b8ff1cc57f75a22b7baea247c",
+          "mean_outside_cpu_fraction": 0.14295988547164326,
+          "mean_outside_same_uid_cpu_fraction": 0.00012229375615807516,
+          "mean_outside_other_uid_cpu_fraction": 0.14283759171548518,
+          "peak_outside_cpu_fraction": 0.24644900237705272
+        }
+      ]
+    },
+    "excluded_host_preflight": {
+      "reason": "Unrelated hash benchmarks started after initial machine inspection; the strict quiet preflight rejected the attempt before any timed sample.",
+      "timed_samples": 0,
+      "suite_started": false,
+      "quiet_gate_required_idle_percent": 95,
+      "observed_idle_percent": [
+        87.44361366866465, 89.01691591076244, 87.26836175583328,
+        89.11990187059185, 87.3258372036177, 89.46530287254241
+      ],
+      "archive_filename": "excluded-prelaunch.tar.gz",
+      "archive_sha256": "1e4e57d5d4cab25f31199b3fc89b9fe3a8d347a2e2c58c10bd1c3bb2a86c0f9a",
+      "released_toolchain": "ohm-1.98.0-10",
+      "new_host_uses_same_workloads_and_source_pins": true
+    }
+  },
+  "host": {
+    "platform": "linux-x86_64",
+    "id": "linux-1",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC-Milan Processor"
+  },
+  "completed_at": "2026-09-08T03:42:52.115864+00:00"
+}
