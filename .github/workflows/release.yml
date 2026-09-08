@@ -686,7 +686,8 @@ jobs:
           EOF
           (
             set -euo pipefail
-            export PATH="$(dirname "$(command -v cargo)"):/usr/bin:/bin"
+            cargo_bin="$(dirname "$(command -v cargo)")"
+            export PATH="$cargo_bin:/usr/bin:/bin"
             export CARGO_BUILD_BUILD_DIR="$smoke_root/shared-build"
             export CARGO_TARGET_DIR="$smoke_root/registry-target"
             cargo +"$OHM_TOOLCHAIN" build --manifest-path "$registry_crate/Cargo.toml" -v \
