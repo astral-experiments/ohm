@@ -31,6 +31,10 @@ jobs:
           python3 scripts/test_benchmark.py
           uv run scripts/replay_sessions.py --help
           python3 scripts/test_replay_sessions.py
+          python3 scripts/benchmark_clippy_codegen.py workflows --help
+          python3 scripts/test_benchmark_clippy_codegen.py
+          python3 scripts/benchmark_clippy_codegen_matrix.py workflows --help
+          python3 scripts/test_benchmark_clippy_codegen_matrix.py
       - name: Validate release bootstrap configuration
         run: |
           python3 - <<'PY'
