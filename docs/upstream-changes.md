@@ -56,7 +56,7 @@ This release removes the parsed-lockfile-cache and recent-type-fold experiments 
 
 Fresh [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-9 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Earlier result artifacts through Ohm 1.98.0-8 and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
 
-Ohm 1.98.0-11 removes the combined Clippy/codegen experiment. Run standalone `cargo +ohm clippy` for linting. The experimental compiler, Cargo, and Clippy changes remain available as draft PRs.
+Ohm 1.98.0-11 removes the combined Clippy/codegen experiment. Run standalone `cargo +ohm clippy` for linting. The experimental changes remain available in [Rust #96](https://github.com/astral-sh/ohm-rust/pull/96), [Cargo #102](https://github.com/astral-sh/ohm-cargo/pull/102), and [Clippy #51](https://github.com/astral-sh/ohm-rust-clippy/pull/51) as draft PRs.
 
 Unused incremental configuration expiry is available through `-Zohm-incremental-gc` and `cargo -Zohm-incremental-gc clean incremental --max-age '30 days'`. Tracking is disabled by default. Collection preserves finished artifacts and fingerprints, skips busy profiles and unknown ownership records, and trades retained incremental state for slower subsequent edits.
 
@@ -111,7 +111,6 @@ Cargo schedules dependencies using dense job indices, per-artifact dependency co
 - [#97: Collect superseded incremental compilation sessions](https://github.com/astral-sh/ohm-rust/pull/97)
 - [#98: Prevent unpacked debug objects from accumulating across rebuilds](https://github.com/astral-sh/ohm-rust/pull/98)
 - [#102: Pin Cargo macro trust for Ohm 1.98.0-8](https://github.com/astral-sh/ohm-rust/pull/102)
-- [#96: Retain independent MIR for Clippy during code generation](https://github.com/astral-sh/ohm-rust/pull/96)
 - [#99: Separate coroutine runtime layouts from executable MIR](https://github.com/astral-sh/ohm-rust/pull/99)
 - [#101: Reduce unoptimized codegen and monomorphization overhead](https://github.com/astral-sh/ohm-rust/pull/101)
 - [#100: Reduce fast-rejection overhead for single generic arguments](https://github.com/astral-sh/ohm-rust/pull/100)
@@ -130,6 +129,7 @@ Cargo schedules dependencies using dense job indices, per-artifact dependency co
 - [#120: Pin Cargo for Ohm 1.98.0-9](https://github.com/astral-sh/ohm-rust/pull/120)
 - [#123: Encode sparse metadata tables with bitmaps](https://github.com/astral-sh/ohm-rust/pull/123)
 - [#126: Bundle upstream Wild in Linux distributions](https://github.com/astral-sh/ohm-rust/pull/126)
+- [#130: Pin Cargo cache fix for bundled Wild](https://github.com/astral-sh/ohm-rust/pull/130)
 
 ## ohm-cargo
 
@@ -186,10 +186,10 @@ Cargo schedules dependencies using dense job indices, per-artifact dependency co
 - [#105: Reuse the source checksum buffer across files](https://github.com/astral-sh/ohm-cargo/pull/105)
 - [#106: Use mimalloc for Apple Silicon Cargo builds](https://github.com/astral-sh/ohm-cargo/pull/106)
 - [#104: Prototype expiry of unused incremental configurations](https://github.com/astral-sh/ohm-cargo/pull/104)
-- [#102: Add opt-in Clippy analysis to build and test compilation](https://github.com/astral-sh/ohm-cargo/pull/102)
 - [#108: Preserve worktree snapshots after Clippy on clone-capable storage](https://github.com/astral-sh/ohm-cargo/pull/108)
 - [#114: Select bundled upstream Wild by default on Linux](https://github.com/astral-sh/ohm-cargo/pull/114)
 - [#115: Use indexed dependency scheduling](https://github.com/astral-sh/ohm-cargo/pull/115)
+- [#123: Preserve shared caching with bundled Wild](https://github.com/astral-sh/ohm-cargo/pull/123)
 
 ## ohm-rust-clippy
 
@@ -208,7 +208,6 @@ Cargo schedules dependencies using dense job indices, per-artifact dependency co
 - [#46: Experiment with empty-attribute MSRV parsing fast path](https://github.com/astral-sh/ohm-rust-clippy/pull/46)
 - [#48: Cache audited Clippy late passes per module](https://github.com/astral-sh/ohm-rust-clippy/pull/48)
 - [#49: Cache source-sensitive Clippy passes per module](https://github.com/astral-sh/ohm-rust-clippy/pull/49)
-- [#51: Support Clippy analysis during code generation](https://github.com/astral-sh/ohm-rust-clippy/pull/51)
 
 ## ohm-rustfmt
 
