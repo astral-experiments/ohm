@@ -667,6 +667,61 @@ jobs:
           cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"
           cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
 
+          # Exercise cache admission with the installed compiler, without a wrapper.
+          registry_crate="$smoke_root/registry-crate"
+          mkdir -p "$registry_crate/src"
+          cat > "$registry_crate/Cargo.toml" <<'EOF'
+          [package]
+          name = "ohm-registry-smoke"
+          version = "0.0.0"
+          edition = "2024"
+
+          [dependencies]
+          itoa = "=1.0.15"
+          EOF
+          cat > "$registry_crate/src/main.rs" <<'EOF'
+          fn main() {
+              println!("{}", itoa::Buffer::new().format(42));
+          }
+          EOF
+          (
+            set -euo pipefail
+            cargo_bin="$(dirname "$(command -v cargo)")"
+            export PATH="$cargo_bin:/usr/bin:/bin"
+            export CARGO_BUILD_BUILD_DIR="$smoke_root/shared-build"
+            export CARGO_TARGET_DIR="$smoke_root/registry-target"
+            cargo +"$OHM_TOOLCHAIN" build --manifest-path "$registry_crate/Cargo.toml" -v \
+              2>&1 | tee "$smoke_root/registry-build.log"
+            if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]]; then
+              grep -F 'bin/wild-ld' "$smoke_root/registry-build.log"
+            fi
+            registry_outputs="$CARGO_BUILD_BUILD_DIR/debug/build/registries"
+            test -d "$registry_outputs"
+            find "$registry_outputs" -name 'libitoa-*.rmeta' | grep . >/dev/null
+
+            cp -R "$registry_crate" "$smoke_root/registry-sibling"
+            export CARGO_TARGET_DIR="$smoke_root/registry-sibling-target"
+            cargo +"$OHM_TOOLCHAIN" build --locked --offline \
+              --manifest-path "$smoke_root/registry-sibling/Cargo.toml" -v \
+              2>&1 | tee "$smoke_root/registry-sibling.log"
+            grep -E 'Fresh itoa v1\.0\.15' "$smoke_root/registry-sibling.log"
+            if grep -E 'Compiling itoa ' "$smoke_root/registry-sibling.log"; then
+              exit 1
+            fi
+
+            cargo +"$OHM_TOOLCHAIN" check --locked --offline \
+              --manifest-path "$smoke_root/registry-sibling/Cargo.toml" -v \
+              2>&1 | tee "$smoke_root/registry-check.log"
+            grep -E 'Fresh itoa v1\.0\.15' "$smoke_root/registry-check.log"
+            if grep -E '(Checking|Compiling) itoa ' "$smoke_root/registry-check.log"; then
+              exit 1
+            fi
+            if find "$CARGO_BUILD_BUILD_DIR/debug/build/workspaces" \
+              -name '.ohm-worktree-seed-deny-v7' | grep .; then
+              exit 1
+            fi
+          )
+
   publish:
     if: inputs.build
     needs:
