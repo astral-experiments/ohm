@@ -1,6 +1,8 @@
 # Changes from upstream
 
-Ohm 1.98.0-10 enables upstream Wild 0.10.0 by default for native x86_64 Linux GNU builds, preserves worktree snapshots after Clippy on clone-capable storage, reduces sparse compiler metadata, and uses indexed Cargo dependency scheduling. It retains mimalloc 3.5.1 for Apple Silicon Cargo and x86_64 Linux rustc. The sources remain based on the exact upstream Rust 1.98.0 release; the selected changes are listed below.
+Ohm 1.98.0-11 fixes a regression in revision 10 that disabled immutable registry artifact sharing and build-to-check reuse when the bundled Wild linker was selected. [ohm-cargo#123](https://github.com/astral-sh/ohm-cargo/pull/123) recognizes Cargo's generated linker flags during cache admission while retaining the flags in compiler invocations and fingerprints. Explicit user overrides keep their existing checks. [ohm#113](https://github.com/astral-sh/ohm/pull/113) adds installed-toolchain release tests for shared registry artifacts, reuse between worktrees, and build-to-check reuse with Wild enabled.
+
+Ohm 1.98.0-11 retains upstream Wild 0.10.0 by default for native x86_64 Linux GNU builds, preserves worktree snapshots after Clippy on clone-capable storage, reduces sparse compiler metadata, and uses indexed Cargo dependency scheduling. It retains mimalloc 3.5.1 for Apple Silicon Cargo and x86_64 Linux rustc. The sources remain based on the exact upstream Rust 1.98.0 release; the selected changes are listed below.
 
 Linux distributions include the checksum-pinned upstream Wild executable and its licenses. Cargo uses it for native rustc invocations, including build scripts, procedural macros, and test binaries. Explicit linker settings take precedence; `-Zohm-linker=lld` selects LLD, and `-Zohm-defaults=no` disables automatic selection. Rustdoc doctests, native compilation inside build scripts, and other targets retain their existing configuration. This uses full linking. The experimental ohm-wild fork and Mach-O linker are excluded.
 
@@ -54,7 +56,7 @@ This release removes the parsed-lockfile-cache and recent-type-fold experiments 
 
 Fresh [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-9 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Earlier result artifacts through Ohm 1.98.0-8 and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
 
-The combined Clippy/codegen experiment remains opt-in for this release. Enable it through `cargo -Zohm-clippy-codegen build` and `cargo -Zohm-clippy-codegen test`; ordinary commands retain their existing behavior. The mode produces normal build artifacts without injecting `cfg(clippy)`, so diagnostics can differ from standalone Clippy.
+Ohm 1.98.0-11 removes the combined Clippy/codegen experiment. Run standalone `cargo +ohm clippy` for linting. The experimental compiler, Cargo, and Clippy changes remain available as draft PRs.
 
 Unused incremental configuration expiry is available through `-Zohm-incremental-gc` and `cargo -Zohm-incremental-gc clean incremental --max-age '30 days'`. Tracking is disabled by default. Collection preserves finished artifacts and fingerprints, skips busy profiles and unknown ownership records, and trades retained incremental state for slower subsequent edits.
 
