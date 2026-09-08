@@ -54,7 +54,7 @@ Well-formedness checking collects ancestor predicate slices once and instantiate
 
 This release removes the parsed-lockfile-cache and recent-type-fold experiments from the selected source stacks. The draft prefix-cloning experiments are excluded.
 
-Fresh [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-9 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. Earlier result artifacts through Ohm 1.98.0-8 and recorded source fixtures remain unchanged. These are paired comparisons against stock Rust, not controlled comparisons between Ohm releases.
+The [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.0-11 with stock Rust 1.98.0 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. The recorded source fixtures match the prior study. These comparisons do not isolate individual changes between Ohm releases.
 
 Ohm 1.98.0-11 removes the combined Clippy/codegen experiment. Run standalone `cargo +ohm clippy` for linting. The experimental changes remain available in [Rust #96](https://github.com/astral-sh/ohm-rust/pull/96), [Cargo #102](https://github.com/astral-sh/ohm-cargo/pull/102), and [Clippy #51](https://github.com/astral-sh/ohm-rust-clippy/pull/51) as draft PRs.
 

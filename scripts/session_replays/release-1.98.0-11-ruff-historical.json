@@ -1,0 +1,1756 @@
+{
+  "rust_version": "1.98.0",
+  "ohm_release": "ohm-1.98.0-11",
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    ["stock", "ohm"],
+    ["ohm", "stock"]
+  ],
+  "sessions": [
+    {
+      "project": "ruff",
+      "session_id": "ruff-inherited-attribute-inference",
+      "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+      "commands": 12,
+      "edits": 3,
+      "warmups": 2
+    }
+  ],
+  "timed_session_seconds": {
+    "ruff": {
+      "stock": [512.7269692929985, 513.2664221810119],
+      "ohm": [342.1333413689863, 336.56785745100933]
+    }
+  },
+  "timed_command_seconds": {
+    "ruff": {
+      "stock": [511.8661813471408, 512.5790641450149],
+      "ohm": [341.4060592309979, 335.78968902592896]
+    }
+  },
+  "timed_edit_seconds": {
+    "ruff": {
+      "stock": [0.0476208160398528, 0.045011054986389354],
+      "ohm": [0.04424110599211417, 0.049175498978002]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "ruff": {
+      "stock": [225.24892230003024, 220.54493253698456],
+      "ohm": [157.77291115702246, 155.79007246898254]
+    }
+  },
+  "commands": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Check the semantic crate before editing",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [0.31494411602034234, 0.39284030001726933],
+          "ohm": [0.5565610319899861, 0.5845263770024758]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Establish the focused attribute-cycle baseline",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [1.1867055679904297, 1.344138357002521],
+          "ohm": [1.6478618900000583, 1.6426093539921567]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run focused instance-attribute mdtests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::attributes.md"
+        ],
+        "wall_seconds": {
+          "stock": [148.32206836601836, 150.7512019109854],
+          "ohm": [105.55588710098527, 102.59622571000364]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [3, 3],
+          "ohm": [3, 3]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Recheck focused inference-cycle mdtests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [1.2287309130188078, 1.4929792559996713],
+          "ohm": [1.4329469219956081, 1.1750294159865007]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 6,
+        "label": "Check core and semantic crates after the core dependency edit",
+        "category": "check",
+        "command": [
+          "cargo",
+          "check",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic"
+        ],
+        "wall_seconds": {
+          "stock": [23.222318680025637, 23.093560153007274],
+          "ohm": [11.372890460013878, 11.647844960010843]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Run the original cycle, hasattr, and subtype regression slice",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final",
+          "--",
+          "mdtest::cycle.md",
+          "mdtest::narrow/hasattr.md",
+          "mdtest::type_properties/is_subtype_of.md"
+        ],
+        "wall_seconds": {
+          "stock": [73.85096581300604, 72.13166537199868],
+          "ohm": [52.28261847200338, 51.77833123598248]
+        },
+        "tests_started": {
+          "stock": [3, 3],
+          "ohm": [3, 3]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Recheck semantic analysis after the recursive-inference edit",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [20.791527510999003, 21.29626615199959],
+          "ohm": [11.116430222988129, 10.39368719299091]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Run the expanded inference-cycle regression file",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [144.90293579400168, 144.77904177299934],
+          "ohm": [101.82152165600564, 99.53702835799777]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Recheck instance-attribute regressions",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::attributes.md"
+        ],
+        "wall_seconds": {
+          "stock": [1.6940585210104473, 1.7544332160032354],
+          "ohm": [1.961172681010794, 2.101532848988427]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Run strict Clippy for the changed core and semantic crates",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string"
+        ],
+        "wall_seconds": {
+          "stock": [72.74664430500707, 72.1544023710012],
+          "ohm": [30.547732901002746, 29.784725443983916]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [92, 92],
+          "ohm": [25, 25]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Verify Rust formatting across the workspace",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [7.025877713022055, 7.091563888010569],
+          "ohm": [8.526186016999418, 8.985770260012941]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Validate all core and semantic package tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [16.579404047020944, 16.296971395990113],
+          "ohm": [14.584249876003014, 15.56237786897691]
+        },
+        "tests_started": {
+          "stock": [867, 867],
+          "ohm": [867, 867]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      }
+    ]
+  },
+  "warmups": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Warm the semantic crate at the unmodified session baseline",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [41.058696064021206, 38.87181508098729],
+          "ohm": [25.992274821008323, 25.22669616198982]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [179, 179],
+          "ohm": [179, 179]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Warm the baseline inference-cycle mdtest harness",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [184.19022623600904, 181.67311745599727],
+          "ohm": [131.78063633601414, 130.56337630699272]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [193, 193],
+          "ohm": [193, 193]
+        }
+      }
+    ]
+  },
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "baseline_warmups_excluded": true,
+    "session_totals_include_edits_and_runner_overhead": true,
+    "compiler_accounting": "cargo status messages; not compiler invocations",
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust_enabled": false,
+    "optional_lockfile_parse_cache_enabled": false,
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": false,
+    "test_count_semantics": "Observed test starts, including retries and nested runner output; not unique selected tests.",
+    "cargo_status_messages_prove_compiler_invocations": false,
+    "ruff_rust_1_98_clippy_allow": ["clippy::format_push_string"]
+  },
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+  },
+  "provenance": {
+    "effective_fixture_sha256": {
+      "ruff": "325b08b4208f8696e4d87bdc1e792b32ab3a25d6cafec3b82df31e6dbc0051ab"
+    },
+    "canonical_fixture_sha256": {
+      "ruff": "7333e04725b6cd4b5a02ea2f3c5cd95d41043581be36b52d2337d4115b1eb2a3"
+    },
+    "setup_patches_by_project": {},
+    "setup_proofs_by_project": {},
+    "published_fixture_sha256": "7333e04725b6cd4b5a02ea2f3c5cd95d41043581be36b52d2337d4115b1eb2a3",
+    "coordinator_revision": "73c4ca78849488a613c7837ecb5d11f7fe32d8f1",
+    "publication_base_revision": "3f2582f7af57de1eaea13ffb54859a394e835ad4",
+    "benchmark_preparation_base_revision": "3f2582f7af57de1eaea13ffb54859a394e835ad4",
+    "audit_inputs_sha256": "e2f7888cd2ee54f69f43bf11a8da371ee776d6302ac14d7ef0e9be9bb6a090f0",
+    "release_manifest_sha256": "2a1e0aa628a49f790a9a73c5c6988c962d94b2bfe03200267f6d942d99c4c059",
+    "source_pins": {
+      "rust": "ce7f658e083b833845336a7d9c04002135748fc9",
+      "cargo": "f7e7a7859b2ff96a4301525dd84157ad55ed1d7d",
+      "clippy": "5bd3512dc93cb5450b628f2c66cbee42aaffd974",
+      "rustfmt": "214f9b7ec9812bbe6235184c037c2387217dcc59"
+    },
+    "benchmark_runner_sha256": {
+      "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+      "replay_sessions.py": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+    },
+    "raw_results_sha256": "c6296e562156055edce92103b36bfca02788e23a346f726a6ac33bebea78876d",
+    "raw_audit_sha256": "ae6cfd90200a7924a91a48a1983b09147fd8b7e624fb8bc59fbaac8e9e39224a",
+    "exporter_sha256": "19c479a9899d8cba2b5c975fbe5dde21c33358e8be8270c5d7ea2c53021e5de9",
+    "installer_sha256": "07cf3e490f110ce36003f58e1982ce0c32e84a63cbf2f538f17063a8cff14b05",
+    "release_archive_sha256": "08c9a9be882c01e418a274c2eedde4b256f98288d1591959290b08ffce1215f3",
+    "release_archive_bytes": 304682479,
+    "release_asset_staging_source": "github",
+    "release_assets": [
+      {
+        "asset_id": 550645545,
+        "name": "install.sh",
+        "sha256": "07cf3e490f110ce36003f58e1982ce0c32e84a63cbf2f538f17063a8cff14b05",
+        "bytes": 15288,
+        "source": "github"
+      },
+      {
+        "asset_id": 550645548,
+        "name": "ohm-1.98.0-11-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "08c9a9be882c01e418a274c2eedde4b256f98288d1591959290b08ffce1215f3",
+        "bytes": 304682479,
+        "source": "github"
+      }
+    ],
+    "helpers": {
+      "just": {
+        "version": "just 1.58.0",
+        "sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042"
+      },
+      "cargo-nextest": {
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a"
+      },
+      "uv": {
+        "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
+        "sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d"
+      },
+      "python3.12": {
+        "version": "Python 3.12.13",
+        "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7"
+      }
+    },
+    "toolchains": {
+      "1.98.0": {
+        "cargo": {
+          "version": "cargo 1.98.0 (797e8a9bc 2026-08-05)\nrelease: 1.98.0\ncommit-hash: 797e8a9bca276c1c9f9f738d2a20f484fa4eea9d\ncommit-date: 2026-08-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0\nLLVM version: 22.1.8",
+          "sha256": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (88d9e12ae1 2026-08-18)",
+          "sha256": "f3d6f504333820cb4dbaccb5e4742d98c826f6a199c81964affe53639d19e734"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-stable (88d9e12ae1 2026-08-18)",
+          "sha256": "5005cdcd39ded526dca8fa6ccd716d42fc7da54469034e055dbf54649bec7877"
+        }
+      },
+      "ohm-1.98.0-11": {
+        "cargo": {
+          "version": "cargo 1.98.0-dev (f7e7a7859 2026-09-08) (ohm-1.98.0-11)\nrelease: 1.98.0-dev\ncommit-hash: f7e7a7859b2ff96a4301525dd84157ad55ed1d7d\ncommit-date: 2026-09-08\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "8c668f13b1e644086295fdb1359b1f3db261260ddd6ca69dca2f6f7c2a0ec622"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0-dev (ce7f658e0 2026-09-08) (ohm-1.98.0-11)\nbinary: rustc\ncommit-hash: ce7f658e083b833845336a7d9c04002135748fc9\ncommit-date: 2026-09-08\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-dev\nLLVM version: 22.1.8",
+          "sha256": "f0e1540d96022c4e68c2cb9055dcf5dfcc9adab033f800d2dcdf53e8e275ee70"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (5bd3512dc9 2026-08-30)",
+          "sha256": "c81173c326037120e5ad84483d255787da3e873a98d05331159ff35cef7f9bbc"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-dev (214f9b7ec9 2026-08-21)",
+          "sha256": "cfa3c8d750aee16d53762154fb14af1fc6f9a47626bfda506415b6a179aeef94"
+        }
+      }
+    },
+    "global_moving_aliases_unchanged": true,
+    "global_helpers_unchanged": true,
+    "paired_arms_share_helper_environment": true,
+    "standalone_uv_fixture_commands": 0,
+    "parent_source_configuration": {
+      "source_only": true,
+      "sha256": "24095bd6315880162c8f660917100ac36638cb73778dd9ec6f1c9026ea87b178"
+    },
+    "native_download_preparation": {
+      "completed_before_timing": true,
+      "measured_targets_reused": false,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-11",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--no-run",
+        "--locked",
+        "--offline"
+      ],
+      "log_sha256": "aab0614e6d6dc4910711d532b5ce248c3bb766102796d6a6eb8a37c9fc57d1a4",
+      "receipt_sha256": "996c3bd8c9b7c4132c78fd99103fd295f692c005c9fc1132fcb99ec00be67a78"
+    },
+    "continuous_host_monitor": {
+      "samples": 1190,
+      "passed": true,
+      "violations": [],
+      "trace_sha256": "166afe3ea1dea796dc773e7af8841ad23486f95146095388e5726d92b9104637",
+      "monitor_sha256": "2407c184cda83ab94a6438fbc253520f286f551f474a1c772329a55dab6da613",
+      "returncode": 0,
+      "clock_ticks_per_second": 100,
+      "policy": {
+        "preflight_samples": 6,
+        "interval_seconds": 5,
+        "minimum_idle_percent": 95,
+        "maximum_iowait_percent": 0.5,
+        "maximum_steal_percent": 0.1,
+        "continuous_interval_seconds": 2,
+        "maximum_external_user_cpu_fraction": 0.05,
+        "external_busy_consecutive_intervals": 3,
+        "unrelated_compilers_permitted": 0,
+        "maximum_external_nonsecurity_cpu_fraction": 0.05,
+        "recorded_security_service": {
+          "uid": 0,
+          "name": "falcon-sensor-b",
+          "cgroup": "0::/system.slice/falcon-sensor.service/sensor.falcon"
+        },
+        "security_service_cpu_included_in_timings": true,
+        "security_service_cpu_excluded_from_rejection_only": true
+      }
+    },
+    "input_receipt_sha256": {
+      "ablation-completed.json": "48198b9860d42e977d7282230d470f8f187d41e96ebebb2ae2d8f00e51cb3679",
+      "ablation-host-monitor.json": "4991b314322bc7aeaa99199c571ba2e11911ef6e906edf28f4c24d54a16bd806",
+      "ablation-ready.json": "c941e5438ffab0a3831ad1ac519c78b3aa5cda35a4adb955a75922bc96a93cda",
+      "ablation-started-20260908T201650.466410Z.json": "bdb3c19745ce0727858565cee2fb25e7fcdbf75c6d4d9e40f425ef72ca77ba3d",
+      "bootstrap-status.json": "b42cf536cbec0e452e2cfdd550faa880550c55de0e2203c5602928edf92529ea",
+      "current-before-resume-results.json": "393c658b517864b92b783877f1c68cd9c3e8cb7b2790b307aef252c66a75fe99",
+      "current-before-resume-suite-status.json": "dc1ef5c0f677b852a90116eec87ddce688d4ea6b04fd9a3e2cebc105d60e52c3",
+      "current-completed.json": "6683023c737661798a802368c19f657c81889035cd17a0f036b304a1f4db194b",
+      "current-host-monitor.json": "956d05d6e78ec87cdb834407de2e4f9fb4653defc4de38f065f9ee6440688dea",
+      "current-ready.json": "8efc2271d0d19fbe3b02197f260d48e1524e468057f91c0a95ef5502e2279edd",
+      "current-recovery-controller-inputs.json": "e21aa48ac1b79efe419e589737142c4857662ad85ee3dad821bfa1bc3b80cc33",
+      "current-resume-before.json": "8c99581ea82981746c8a7130607afd3cb9629899d841b1c1770671a9b3bf8135",
+      "current-resume-host-monitor.json": "42f5c5fcd2465e0a54457390a025eb4a91b837889a29ad734fcd21ceac85035b",
+      "current-resume-preflight-recovery.json": "4e453016c9146d40e66f3a14627ec03663b87e4043a7019c6f4194f65163f892",
+      "current-resume-quiet-retry-1-host-monitor.json": "adcaf2e9c783d8f1da0ae00f6beaf1c7a9f9fbf4d4c17c6c15ef4917f3700397",
+      "current-resume-quiet-retry-1-rejected.json": "815956116380aef539455a5a5f3785b0dc746c3de9fd572f0cf6a3cabb2ee45d",
+      "current-resume-quiet-retry-2-host-monitor.json": "d7450c414e31ddfebde6f4a3f9d4e17514151918567eded68e1fb238f30ee578",
+      "current-resume-review.json": "2356350a9858f0da43999844b593b7278fd59fafcdcf150a9081381a4f8be5f3",
+      "current-started-20260908T174440.560858Z.json": "3f2595d3fe28b7d2bb567f7ee7fea0300397cf7bc980cd1d8485f0f059a1c02a",
+      "current-started-20260908T184509.542531Z.json": "332562d58b7d5892684222250e522f0e205a82f6b4bba495b794e9670611c6eb",
+      "direct-completed.json": "38d4b6f832594dfa52bf98830375b2883082ded6f1fb520cf2208143d79def64",
+      "direct-host-monitor.json": "ff825d8703e0fac0d5cec4fc59c0ef5dc37c5b9f43d35de36d5246dde1e9d82b",
+      "direct-prepared.json": "f4e64b9c336633e429a9950520d8768188677aae089d1dc576649240d6e63f87",
+      "direct-quiet-1788879462859281151.json": "aed5813f401c80169bb7f965387bee7ff49846738922bb8e1dffcdbdcc5067b6",
+      "direct-quiet-1788879598228032235.json": "28618fbe4ea56b77ec2487a2cee82f856fbd587dce407a014c81968b9d227350",
+      "direct-quiet-1788880147749817260.json": "cc3b7efbb616291729bff0a7f2b5031806dea4e539624336312c593c05ca574a",
+      "direct-quiet-1788886977031401414.json": "38deb1357c6fc432c38257e0f86ea506767071b7f084ea25674fbc2a46c7f934",
+      "direct-quiet-1788889480558748240.json": "abc2c63143b6d4f1f54dd7aa8996242931d9aa903daffb35537ff65bc5afe69c",
+      "direct-quiet-1788892672067484625.json": "5213c41e04be5f51641068731cbac667bd978fc5a97bafb8244c372d05a04ad8",
+      "direct-quiet-1788893017778984883.json": "b1a116b0e818cc41d5522e55fc1a0d71b1fd024e252fec74fbd77dc6ae5876df",
+      "direct-quiet-1788893109536764015.json": "43b92d013d39301c6a3ed13e013afe14167227b479d6fe245c1548371eefaec7",
+      "direct-quiet-1788898610460977734.json": "bb5297e8aaca58ef6e6069740f9499c6b785b067b641c66a050d2fbb1da7fc37",
+      "direct-ready.json": "0df0ef6dbad46db9843f70bd0580169fd19941385558fb437668172ac832deaa",
+      "direct-started.json": "3325843ade3650b412a993de1af47c063c4b3b530b7f2e9ef35575931f039413",
+      "global-rustup-before-1764288.json": "90b02cd9d5c0a85ff56f21b563840d95cc6f38a0ffdb7b3cc66fd3549809c833",
+      "helpers.json": "dd43e32cc6eac3a5b2d6408f231c14da4bf6c4e8b4dbdb1b8aa171548af72ec9",
+      "historical-completed.json": "902bd280a5af2434b75cec31e0c0cd9c25a8516c2a91b566fec40397e7b5ce15",
+      "historical-host-monitor.json": "d49350ed23e1a319dd1c867b40ea82821364ff5ecf889e2194083a5bb9237ad0",
+      "historical-ready.json": "4b7ddbdbb70b7ea00cb8368528f67290ffe65cd448477df23f41f71357fc25d9",
+      "historical-started-20260908T170257.042707Z.json": "61fd069f7ec48db76279c47e52363f8d3e9be1b56822047bc941cf9a8f1ae27e",
+      "native-preparation.json": "996c3bd8c9b7c4132c78fd99103fd295f692c005c9fc1132fcb99ec00be67a78",
+      "preflight-rejected-direct-host-monitor.json": "f6c261f1227ea3ebaffe0281d1ab96b2548ab1afde884d76e2650b4e465d5d7e",
+      "preflight-rejected-suite-inputs.json": "6cdbbda75d9da99a789d09174dbf6df53ef58bf8a7ed6e36a2f75618f5d1acb5",
+      "preflight-rejected-suite-status.json": "aa1a6d813ceeeae6bb9098dacf0a88439e907852110af84ec3065dd07b9143e4",
+      "preflight-rejection-review.json": "71f2a8dba3b3fabb02ce2fa8cad390a095b4c50f810ceba1994be1899ae5b93d",
+      "release-assets.json": "52ef24fc8a0c88641e44a858d2e99f6abf76d03dfa7038f607470a5c0f2da6ce",
+      "resume-controller-inputs.json": "7785758be903c09d6f79608a7c095672d12a8217f30d9f60e9276da96c400d93",
+      "security-service-policy-change.json": "2f6a1dfb20150e5deb617c17b2d3ecd128e2b2d6cb842f4a1a08c96b8b7a84f1",
+      "strict-system-cpu-direct-host-monitor.json": "d876f57a1379c798a0ae4a4a6b8c3f9b057542429868521c9d31f31006fc8f8c",
+      "strict-system-cpu-direct-started.json": "c331fd8583f944cd2f5a11906fd89dbfb0b6834f4fb29dabda088cb869fb811c",
+      "strict-system-cpu-suite-inputs.json": "ede8b5ba2374a307140c014d19e0bfcd674e3690919ba5780df2fd20d1c9a56e",
+      "strict-system-cpu-suite-status.json": "9cecaa66e132f9d93d23b6bea4df5570e0640ac6befc8bf7dd4aefcfc23fdcec",
+      "suite-inputs.json": "df17025317e7ecd9eb459aa3da3e15c2641151f35ca5a9279ea5894a4ce0d6f1",
+      "suite-status.json": "348d5646083064c65391e8b9071af225b905ec7d8b85a9536c43449558b5c24b",
+      "toolchains.json": "458c4cbea7b4bf38a079c7750bf52b17070be64e0caf7d52ab68ceabb88edd12"
+    },
+    "replay_source_audit": {
+      "audit_sha256": "daac56006a90fa87dd131469a942e0ea1623b0674e98e7a9b1f3948960b852ca",
+      "audit_implementation_sha256": "6dcaa6cd13da271468c183978f84ebbd85de8f45482ad42902554633dff402b4",
+      "scope": "Final tracked and non-ignored untracked files match an independent index reconstructed from each frozen fixture baseline, setup patch, and edit. Original source trees and indexes were not changed.",
+      "verified_worktrees": 4,
+      "samples": [
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "selector": "1.98.0",
+          "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+          "fixture": "ruff-historical-rust-1.98.json",
+          "fixture_sha256": "325b08b4208f8696e4d87bdc1e792b32ab3a25d6cafec3b82df31e6dbc0051ab",
+          "expected_tree_oid": "a1f7c91f2737804cc2407f5a8699e84cf634bec3",
+          "patch_sha256s": [
+            "97c8da1b636759067384373757844e984ce5e61db6fc96641745c480a30d6182",
+            "e23a9caddd61fe72096a2240cedfd0c0ef00b34834824858f2c69de562722121",
+            "0b61e7ed0f3790d35664d9504364cbe8bb7eb90fe28af3670bd73fa82c5aa3a4"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+          "fixture": "ruff-historical-rust-1.98.json",
+          "fixture_sha256": "325b08b4208f8696e4d87bdc1e792b32ab3a25d6cafec3b82df31e6dbc0051ab",
+          "expected_tree_oid": "a1f7c91f2737804cc2407f5a8699e84cf634bec3",
+          "patch_sha256s": [
+            "97c8da1b636759067384373757844e984ce5e61db6fc96641745c480a30d6182",
+            "e23a9caddd61fe72096a2240cedfd0c0ef00b34834824858f2c69de562722121",
+            "0b61e7ed0f3790d35664d9504364cbe8bb7eb90fe28af3670bd73fa82c5aa3a4"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+          "fixture": "ruff-historical-rust-1.98.json",
+          "fixture_sha256": "325b08b4208f8696e4d87bdc1e792b32ab3a25d6cafec3b82df31e6dbc0051ab",
+          "expected_tree_oid": "a1f7c91f2737804cc2407f5a8699e84cf634bec3",
+          "patch_sha256s": [
+            "97c8da1b636759067384373757844e984ce5e61db6fc96641745c480a30d6182",
+            "e23a9caddd61fe72096a2240cedfd0c0ef00b34834824858f2c69de562722121",
+            "0b61e7ed0f3790d35664d9504364cbe8bb7eb90fe28af3670bd73fa82c5aa3a4"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "selector": "1.98.0",
+          "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+          "fixture": "ruff-historical-rust-1.98.json",
+          "fixture_sha256": "325b08b4208f8696e4d87bdc1e792b32ab3a25d6cafec3b82df31e6dbc0051ab",
+          "expected_tree_oid": "a1f7c91f2737804cc2407f5a8699e84cf634bec3",
+          "patch_sha256s": [
+            "97c8da1b636759067384373757844e984ce5e61db6fc96641745c480a30d6182",
+            "e23a9caddd61fe72096a2240cedfd0c0ef00b34834824858f2c69de562722121",
+            "0b61e7ed0f3790d35664d9504364cbe8bb7eb90fe28af3670bd73fa82c5aa3a4"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        }
+      ]
+    },
+    "system_cpu": {
+      "audit_sha256": "15cc713262c3e4f003c1d5308c5d633caa8d8df786600d026f3507fd406ee2a3",
+      "audit_implementation_sha256": "8bb1d76ec18a46830f97680ccd7717c9315467ea1dbb847dc5e8b9e0c370b869",
+      "scope": "Timed commands only. Approximate command windows use log final-write mtime minus measured duration; logs are written immediately after completion. Two-second telemetry intervals and short-lived process exits limit attribution. Overlapping intervals are clipped to their chronological union. Same-UID versus other-UID CPU is process ownership, not user-mode versus kernel-mode time. This audit describes overlap and does not alter sample acceptance.",
+      "commands": [
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 1,
+          "label": "Check the semantic crate before editing",
+          "wall_seconds": 0.31494411602034234,
+          "log_sha256": "abaa91ca2b8a858bf11bc44b1937b3cd71ab41dcf2820a9bf5b30fb2529586ca",
+          "approximate_start_at": 1788887204.400056,
+          "log_written_at": 1788887204.715,
+          "covered_seconds": 0.3149440288543701,
+          "coverage_fraction": 0.9999997232335269,
+          "mean_outside_cpu_fraction": 0.029147040797210123,
+          "mean_outside_same_uid_cpu_fraction": 0.0,
+          "mean_outside_other_uid_cpu_fraction": 0.029147040797210123,
+          "mean_security_service_cpu_fraction": 0.028250208772680578,
+          "mean_outside_nonsecurity_cpu_fraction": 0.000896832024529542,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0008968320245295421,
+          "peak_outside_cpu_fraction": 0.02914704079721012
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 2,
+          "label": "Establish the focused attribute-cycle baseline",
+          "wall_seconds": 1.1867055679904297,
+          "log_sha256": "30a1d437e5f9db951fc200b8c4fd28a9c1175d79885f87d5bd6ef29cfa234d08",
+          "approximate_start_at": 1788887204.7562945,
+          "log_written_at": 1788887205.943,
+          "covered_seconds": 1.1744496822357178,
+          "coverage_fraction": 0.9896723449478154,
+          "mean_outside_cpu_fraction": 0.026065870925326376,
+          "mean_outside_same_uid_cpu_fraction": 6.169656619435766e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.026004174359132014,
+          "mean_security_service_cpu_fraction": 0.02486044350250707,
+          "mean_outside_nonsecurity_cpu_fraction": 0.001205427422819304,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0031417782222525623,
+          "peak_outside_cpu_fraction": 0.02914704079721012
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 4,
+          "label": "Run focused instance-attribute mdtests",
+          "wall_seconds": 148.32206836601836,
+          "log_sha256": "79d156ad8ab4c11a7b10247fe41279f781ef8338c4c19bb68aed2b3789c13268",
+          "approximate_start_at": 1788887206.2549314,
+          "log_written_at": 1788887354.577,
+          "covered_seconds": 148.20439171791077,
+          "coverage_fraction": 0.9992066140298341,
+          "mean_outside_cpu_fraction": 0.0034093137863055343,
+          "mean_outside_same_uid_cpu_fraction": 8.760494286677769e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.0033217088434387572,
+          "mean_security_service_cpu_fraction": 0.002187673031047842,
+          "mean_outside_nonsecurity_cpu_fraction": 0.001221640755257692,
+          "peak_outside_nonsecurity_cpu_fraction": 0.005847167511353322,
+          "peak_outside_cpu_fraction": 0.017833240440484205
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 5,
+          "label": "Recheck focused inference-cycle mdtests",
+          "wall_seconds": 1.2287309130188078,
+          "log_sha256": "ab8760a6b3f2cd9b473da4163743ef5fc960268ff0a3b50a9139cb17947a74d3",
+          "approximate_start_at": 1788887354.616269,
+          "log_written_at": 1788887355.845,
+          "covered_seconds": 1.2287309169769287,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.014391304831187468,
+          "mean_outside_same_uid_cpu_fraction": 0.00014990942532486947,
+          "mean_outside_other_uid_cpu_fraction": 0.014241395405862597,
+          "mean_security_service_cpu_fraction": 0.013491848279238253,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0008994565519492168,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0008994565519492168,
+          "peak_outside_cpu_fraction": 0.014391304831187468
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 6,
+          "label": "Check core and semantic crates after the core dependency edit",
+          "wall_seconds": 23.222318680025637,
+          "log_sha256": "c66ab261f5346cce626aeb1034165daf2e4abf54d60678f6b1dd9062b09a3827",
+          "approximate_start_at": 1788887355.8856814,
+          "log_written_at": 1788887379.108,
+          "covered_seconds": 23.19783902168274,
+          "coverage_fraction": 0.9989458564116617,
+          "mean_outside_cpu_fraction": 0.0027526387025910946,
+          "mean_outside_same_uid_cpu_fraction": 5.556821662907376e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.0026970704859620204,
+          "mean_security_service_cpu_fraction": 0.0014895578188125983,
+          "mean_outside_nonsecurity_cpu_fraction": 0.001263080883778496,
+          "peak_outside_nonsecurity_cpu_fraction": 0.004196506145403945,
+          "peak_outside_cpu_fraction": 0.014391304831187468
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 8,
+          "label": "Run the original cycle, hasattr, and subtype regression slice",
+          "wall_seconds": 73.85096581300604,
+          "log_sha256": "39884721a9da8b584c94ec1d2a13208780680c7e56478ef1ab6bad4a203bcd2b",
+          "approximate_start_at": 1788887379.2020342,
+          "log_written_at": 1788887453.053,
+          "covered_seconds": 73.80809140205383,
+          "coverage_fraction": 0.9994194468483897,
+          "mean_outside_cpu_fraction": 0.007332181856912709,
+          "mean_outside_same_uid_cpu_fraction": 8.440698157660895e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.0072477748753361024,
+          "mean_security_service_cpu_fraction": 0.0052333103705664965,
+          "mean_outside_nonsecurity_cpu_fraction": 0.002098871486346211,
+          "peak_outside_nonsecurity_cpu_fraction": 0.014826921850902716,
+          "peak_outside_cpu_fraction": 0.03189500874868941
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 9,
+          "label": "Recheck semantic analysis after the recursive-inference edit",
+          "wall_seconds": 20.791527510999003,
+          "log_sha256": "20a8fd83dd94636fa09edb91969e142fea3903815f9df9b3abdbb6c8a845bd4e",
+          "approximate_start_at": 1788887453.0934725,
+          "log_written_at": 1788887473.885,
+          "covered_seconds": 20.785189867019653,
+          "coverage_fraction": 0.9996951814157956,
+          "mean_outside_cpu_fraction": 0.0036798966312401094,
+          "mean_outside_same_uid_cpu_fraction": 6.0134920587868154e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.003619761710652242,
+          "mean_security_service_cpu_fraction": 0.002751111593129641,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0009287850381104685,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0014994481793317374,
+          "peak_outside_cpu_fraction": 0.01154269390878145
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 11,
+          "label": "Run the expanded inference-cycle regression file",
+          "wall_seconds": 144.90293579400168,
+          "log_sha256": "f28bb8d1a550fb3bab9c36eb1167edb176a29cc6d2738efb6e23b4319e27beb7",
+          "approximate_start_at": 1788887473.9730642,
+          "log_written_at": 1788887618.876,
+          "covered_seconds": 144.7938539981842,
+          "coverage_fraction": 0.9992472078276416,
+          "mean_outside_cpu_fraction": 0.0034504635248697093,
+          "mean_outside_same_uid_cpu_fraction": 8.600825291562222e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.003364455271954087,
+          "mean_security_service_cpu_fraction": 0.0021342057314663494,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0013162577934033592,
+          "peak_outside_nonsecurity_cpu_fraction": 0.005689962898148222,
+          "peak_outside_cpu_fraction": 0.028485150882326435
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 12,
+          "label": "Recheck instance-attribute regressions",
+          "wall_seconds": 1.6940585210104473,
+          "log_sha256": "8e00e5469e26e3a6849eacfdedeb56a575cae9a376125798cf7e6d785348f4c0",
+          "approximate_start_at": 1788887618.9159415,
+          "log_written_at": 1788887620.61,
+          "covered_seconds": 1.6913981437683105,
+          "coverage_fraction": 0.998429583624685,
+          "mean_outside_cpu_fraction": 0.008414949082967065,
+          "mean_outside_same_uid_cpu_fraction": 1.4367077617255859e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.00840058200534981,
+          "mean_security_service_cpu_fraction": 0.007323744250846431,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0010912048321206338,
+          "peak_outside_nonsecurity_cpu_fraction": 0.001499218467490865,
+          "peak_outside_cpu_fraction": 0.028485150882326435
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 13,
+          "label": "Run strict Clippy for the changed core and semantic crates",
+          "wall_seconds": 72.74664430500707,
+          "log_sha256": "c0b6ce3c21d061625448ab508c73c3de158f8ab34ccdb1d629d7c08d1715d8ce",
+          "approximate_start_at": 1788887620.6513557,
+          "log_written_at": 1788887693.398,
+          "covered_seconds": 72.72537732124329,
+          "coverage_fraction": 0.9997076568415361,
+          "mean_outside_cpu_fraction": 0.0036755158676765013,
+          "mean_outside_same_uid_cpu_fraction": 8.591581954214262e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.0035896000481343586,
+          "mean_security_service_cpu_fraction": 0.002310711594272444,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0013648042734040577,
+          "peak_outside_nonsecurity_cpu_fraction": 0.005093777486239846,
+          "peak_outside_cpu_fraction": 0.018390485845529374
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 14,
+          "label": "Verify Rust formatting across the workspace",
+          "wall_seconds": 7.025877713022055,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "approximate_start_at": 1788887693.4391222,
+          "log_written_at": 1788887700.465,
+          "covered_seconds": 7.0225865840911865,
+          "coverage_fraction": 0.9995315704221882,
+          "mean_outside_cpu_fraction": 0.004027894941899342,
+          "mean_outside_same_uid_cpu_fraction": 4.44624849383961e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.003983432456960946,
+          "mean_security_service_cpu_fraction": 0.0025564092963161053,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0014714856455832362,
+          "peak_outside_nonsecurity_cpu_fraction": 0.002694662703130826,
+          "peak_outside_cpu_fraction": 0.012874499581625058
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "index": 15,
+          "label": "Validate all core and semantic package tests",
+          "wall_seconds": 16.579404047020944,
+          "log_sha256": "210b191d228d62508e903ecd5a411fbdc15f7e078d82d7f8ad9748fd40a2027c",
+          "approximate_start_at": 1788887700.5065958,
+          "log_written_at": 1788887717.086,
+          "covered_seconds": 16.52904987335205,
+          "coverage_fraction": 0.9969628477883714,
+          "mean_outside_cpu_fraction": 0.03813116385486802,
+          "mean_outside_same_uid_cpu_fraction": 9.453054113055901e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.03803663331373747,
+          "mean_security_service_cpu_fraction": 0.03370676300992976,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0044244008449382645,
+          "peak_outside_nonsecurity_cpu_fraction": 0.008782185881084542,
+          "peak_outside_cpu_fraction": 0.10551351531011897
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 1,
+          "label": "Check the semantic crate before editing",
+          "wall_seconds": 0.5565610319899861,
+          "log_sha256": "81889bb574209b72b7186751f74a79de612cf8558d6a7a6781effcdf75e77820",
+          "approximate_start_at": 1788887876.433439,
+          "log_written_at": 1788887876.99,
+          "covered_seconds": 0.5376052856445312,
+          "coverage_fraction": 0.9659412979782676,
+          "mean_outside_cpu_fraction": 0.027704235555311808,
+          "mean_outside_same_uid_cpu_fraction": 0.00049036445885368,
+          "mean_outside_other_uid_cpu_fraction": 0.02721387109645813,
+          "mean_security_service_cpu_fraction": 0.024932144852721425,
+          "mean_outside_nonsecurity_cpu_fraction": 0.002772090702590386,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0038907250847598964,
+          "peak_outside_cpu_fraction": 0.029645121162253808
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 2,
+          "label": "Establish the focused attribute-cycle baseline",
+          "wall_seconds": 1.6478618900000583,
+          "log_sha256": "87352181a39dd64268dd78f4ea389eba923d988cde68a2c67da6df4156e04df4",
+          "approximate_start_at": 1788887877.032138,
+          "log_written_at": 1788887878.68,
+          "covered_seconds": 1.6478619575500488,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.01257003488922428,
+          "mean_outside_same_uid_cpu_fraction": 0.0008978596349445914,
+          "mean_outside_other_uid_cpu_fraction": 0.01167217525427969,
+          "mean_security_service_cpu_fraction": 0.008679309804464384,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0038907250847598964,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0038907250847598964,
+          "peak_outside_cpu_fraction": 0.01257003488922428
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 4,
+          "label": "Run focused instance-attribute mdtests",
+          "wall_seconds": 105.55588710098527,
+          "log_sha256": "07755325f07b23a0328d4d2a3b36154c9f5ac5c2399c43d71c4b272e51b7271c",
+          "approximate_start_at": 1788887878.802113,
+          "log_written_at": 1788887984.358,
+          "covered_seconds": 104.9477641582489,
+          "coverage_fraction": 0.9942388533748517,
+          "mean_outside_cpu_fraction": 0.0068097053016565705,
+          "mean_outside_same_uid_cpu_fraction": 0.0003626062239842243,
+          "mean_outside_other_uid_cpu_fraction": 0.006447099077672347,
+          "mean_security_service_cpu_fraction": 0.0038124937056557597,
+          "mean_outside_nonsecurity_cpu_fraction": 0.002997211596000811,
+          "peak_outside_nonsecurity_cpu_fraction": 0.008224569603210385,
+          "peak_outside_cpu_fraction": 0.02923181589394948
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 5,
+          "label": "Recheck focused inference-cycle mdtests",
+          "wall_seconds": 1.4329469219956081,
+          "log_sha256": "2cf7098c7212ae40b65a0a5377775f1ee7a64f04b9cd6171e1c451bed570ef4c",
+          "approximate_start_at": 1788887984.403053,
+          "log_written_at": 1788887985.836,
+          "covered_seconds": 1.432279348373413,
+          "coverage_fraction": 0.9995341253664404,
+          "mean_outside_cpu_fraction": 0.024539994055389806,
+          "mean_outside_same_uid_cpu_fraction": 0.002728635110624894,
+          "mean_outside_other_uid_cpu_fraction": 0.021811358944764905,
+          "mean_security_service_cpu_fraction": 0.016978845792785635,
+          "mean_outside_nonsecurity_cpu_fraction": 0.007561148262604168,
+          "peak_outside_nonsecurity_cpu_fraction": 0.010679110884295979,
+          "peak_outside_cpu_fraction": 0.02923181589394948
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 6,
+          "label": "Check core and semantic crates after the core dependency edit",
+          "wall_seconds": 11.372890460013878,
+          "log_sha256": "0bfe37973e57b1fe91319e3cbc40ec33d45f2c0a852e9caa329f6d953b514b56",
+          "approximate_start_at": 1788887985.8871095,
+          "log_written_at": 1788887997.26,
+          "covered_seconds": 11.353010416030884,
+          "coverage_fraction": 0.9982519796481915,
+          "mean_outside_cpu_fraction": 0.010286844345357472,
+          "mean_outside_same_uid_cpu_fraction": 0.001042488397836355,
+          "mean_outside_other_uid_cpu_fraction": 0.009244355947521116,
+          "mean_security_service_cpu_fraction": 0.005275248302601764,
+          "mean_outside_nonsecurity_cpu_fraction": 0.005011596042755706,
+          "peak_outside_nonsecurity_cpu_fraction": 0.010679110884295979,
+          "peak_outside_cpu_fraction": 0.0219515057066084
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 8,
+          "label": "Run the original cycle, hasattr, and subtype regression slice",
+          "wall_seconds": 52.28261847200338,
+          "log_sha256": "d2eb90643afcce733bde27bc111f6caa87ce6f93301d5cc56c14d0ce3c99ccdd",
+          "approximate_start_at": 1788887997.3553815,
+          "log_written_at": 1788888049.638,
+          "covered_seconds": 51.829153299331665,
+          "coverage_fraction": 0.9913266552838295,
+          "mean_outside_cpu_fraction": 0.013374870430219924,
+          "mean_outside_same_uid_cpu_fraction": 0.00038192061029981817,
+          "mean_outside_other_uid_cpu_fraction": 0.01299294981992011,
+          "mean_security_service_cpu_fraction": 0.0091735397539503,
+          "mean_outside_nonsecurity_cpu_fraction": 0.004201330676269626,
+          "peak_outside_nonsecurity_cpu_fraction": 0.009739660628124064,
+          "peak_outside_cpu_fraction": 0.03909695816289014
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 9,
+          "label": "Recheck semantic analysis after the recursive-inference edit",
+          "wall_seconds": 11.116430222988129,
+          "log_sha256": "e54a8ce640916b66cdd9fb4fea5b551b9bdcbebbcb915bae5d8998776d85844f",
+          "approximate_start_at": 1788888049.6805696,
+          "log_written_at": 1788888060.797,
+          "covered_seconds": 11.064399719238281,
+          "coverage_fraction": 0.9953194953140396,
+          "mean_outside_cpu_fraction": 0.00977289775794518,
+          "mean_outside_same_uid_cpu_fraction": 0.0005903129582416434,
+          "mean_outside_other_uid_cpu_fraction": 0.009182584799703537,
+          "mean_security_service_cpu_fraction": 0.00454261885237901,
+          "mean_outside_nonsecurity_cpu_fraction": 0.005230278905566169,
+          "peak_outside_nonsecurity_cpu_fraction": 0.010179138383621555,
+          "peak_outside_cpu_fraction": 0.020665126697148515
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 11,
+          "label": "Run the expanded inference-cycle regression file",
+          "wall_seconds": 101.82152165600564,
+          "log_sha256": "9ef2dd2c1e771383f73f91145cae3da548a2a14ba45f759a883faf3b2690d28c",
+          "approximate_start_at": 1788888060.8934782,
+          "log_written_at": 1788888162.715,
+          "covered_seconds": 101.21377491950989,
+          "coverage_fraction": 0.9940312546246464,
+          "mean_outside_cpu_fraction": 0.00706677830560081,
+          "mean_outside_same_uid_cpu_fraction": 0.0003850065640758436,
+          "mean_outside_other_uid_cpu_fraction": 0.006681771741524963,
+          "mean_security_service_cpu_fraction": 0.0038872513838418147,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0031795269217589923,
+          "peak_outside_nonsecurity_cpu_fraction": 0.02357890319348953,
+          "peak_outside_cpu_fraction": 0.03372678558056097
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 12,
+          "label": "Recheck instance-attribute regressions",
+          "wall_seconds": 1.961172681010794,
+          "log_sha256": "36156bf3ce0152feff812b76346d348cc034aee50cab5e346cd8a315f154f6dd",
+          "approximate_start_at": 1788888162.7598274,
+          "log_written_at": 1788888164.721,
+          "covered_seconds": 1.93550705909729,
+          "coverage_fraction": 0.9869131249063312,
+          "mean_outside_cpu_fraction": 0.02449651638428732,
+          "mean_outside_same_uid_cpu_fraction": 0.0004461484442786879,
+          "mean_outside_other_uid_cpu_fraction": 0.024050367940008626,
+          "mean_security_service_cpu_fraction": 0.017890174283169472,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0066063421011178436,
+          "peak_outside_nonsecurity_cpu_fraction": 0.008518842154969335,
+          "peak_outside_cpu_fraction": 0.028499712314866397
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 13,
+          "label": "Run strict Clippy for the changed core and semantic crates",
+          "wall_seconds": 30.547732901002746,
+          "log_sha256": "5c57c513c409f3e6a49d350c9764fcef3b183b623ade7c5d4c4b60831eedebbb",
+          "approximate_start_at": 1788888164.779267,
+          "log_written_at": 1788888195.327,
+          "covered_seconds": 30.4633469581604,
+          "coverage_fraction": 0.9972375710133443,
+          "mean_outside_cpu_fraction": 0.007775828799598635,
+          "mean_outside_same_uid_cpu_fraction": 0.00023800403481942742,
+          "mean_outside_other_uid_cpu_fraction": 0.007537824764779206,
+          "mean_security_service_cpu_fraction": 0.004912443683195467,
+          "mean_outside_nonsecurity_cpu_fraction": 0.002863385116403168,
+          "peak_outside_nonsecurity_cpu_fraction": 0.008518842154969335,
+          "peak_outside_cpu_fraction": 0.02804443254719018
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 14,
+          "label": "Verify Rust formatting across the workspace",
+          "wall_seconds": 8.526186016999418,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "approximate_start_at": 1788888195.370814,
+          "log_written_at": 1788888203.897,
+          "covered_seconds": 8.48849630355835,
+          "coverage_fraction": 0.9955795342294992,
+          "mean_outside_cpu_fraction": 0.006392364471583337,
+          "mean_outside_same_uid_cpu_fraction": 0.0002790244580950594,
+          "mean_outside_other_uid_cpu_fraction": 0.006113340013488277,
+          "mean_security_service_cpu_fraction": 0.003524951336380563,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0028674131352027753,
+          "peak_outside_nonsecurity_cpu_fraction": 0.005682633210089694,
+          "peak_outside_cpu_fraction": 0.009570750669624747
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "index": 15,
+          "label": "Validate all core and semantic package tests",
+          "wall_seconds": 14.584249876003014,
+          "log_sha256": "3e12115d0216564d64602f2fe5c2dc0f3b0e5803ee93815603b0494f98083130",
+          "approximate_start_at": 1788888203.93975,
+          "log_written_at": 1788888218.524,
+          "covered_seconds": 14.477346658706665,
+          "coverage_fraction": 0.992669954354509,
+          "mean_outside_cpu_fraction": 0.029970643106550714,
+          "mean_outside_same_uid_cpu_fraction": 0.0004507159606926732,
+          "mean_outside_other_uid_cpu_fraction": 0.029519927145858035,
+          "mean_security_service_cpu_fraction": 0.02578039583076395,
+          "mean_outside_nonsecurity_cpu_fraction": 0.004190247275786769,
+          "peak_outside_nonsecurity_cpu_fraction": 0.009910567787163541,
+          "peak_outside_cpu_fraction": 0.08846115670405416
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 1,
+          "label": "Check the semantic crate before editing",
+          "wall_seconds": 0.5845263770024758,
+          "log_sha256": "8767c87529870ffe39b4a0c96fc276e0fe4c96731b6b6fd4fd1271069b3addd8",
+          "approximate_start_at": 1788888376.5074737,
+          "log_written_at": 1788888377.092,
+          "covered_seconds": 0.5845263004302979,
+          "coverage_fraction": 0.9999998690013301,
+          "mean_outside_cpu_fraction": 0.06165857187429759,
+          "mean_outside_same_uid_cpu_fraction": 0.0,
+          "mean_outside_other_uid_cpu_fraction": 0.06165857187429759,
+          "mean_security_service_cpu_fraction": 0.058176676050807855,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0034818958234897465,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0034818958234897465,
+          "peak_outside_cpu_fraction": 0.061658571874297595
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 2,
+          "label": "Establish the focused attribute-cycle baseline",
+          "wall_seconds": 1.6426093539921567,
+          "log_sha256": "c357d8894e84c3fa5d039829ec2c844fa60d770981a59256a85b862111bac2a7",
+          "approximate_start_at": 1788888377.1353908,
+          "log_written_at": 1788888378.778,
+          "covered_seconds": 1.6261403560638428,
+          "coverage_fraction": 0.9899738803457511,
+          "mean_outside_cpu_fraction": 0.050066723302388254,
+          "mean_outside_same_uid_cpu_fraction": 0.0017681680729947269,
+          "mean_outside_other_uid_cpu_fraction": 0.048298555229393525,
+          "mean_security_service_cpu_fraction": 0.029979331997082893,
+          "mean_outside_nonsecurity_cpu_fraction": 0.02008739130530535,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0203202587335096,
+          "peak_outside_cpu_fraction": 0.061658571874297595
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 4,
+          "label": "Run focused instance-attribute mdtests",
+          "wall_seconds": 102.59622571000364,
+          "log_sha256": "99ca58434d90b68ae7de87f4946c0cbd169b15e6cdf38147fa3db09743200f87",
+          "approximate_start_at": 1788888378.9127743,
+          "log_written_at": 1788888481.509,
+          "covered_seconds": 102.11076879501343,
+          "coverage_fraction": 0.9952682770576533,
+          "mean_outside_cpu_fraction": 0.008069790966046672,
+          "mean_outside_same_uid_cpu_fraction": 0.00042661744054425734,
+          "mean_outside_other_uid_cpu_fraction": 0.007643173525502414,
+          "mean_security_service_cpu_fraction": 0.004575724805643888,
+          "mean_outside_nonsecurity_cpu_fraction": 0.003494066160402784,
+          "peak_outside_nonsecurity_cpu_fraction": 0.021098011936994468,
+          "peak_outside_cpu_fraction": 0.04990416483082505
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 5,
+          "label": "Recheck focused inference-cycle mdtests",
+          "wall_seconds": 1.1750294159865007,
+          "log_sha256": "5ca8bba94ccaa29ea84b9277053fa9c30d018e8314b053d41ba769f30789f1c6",
+          "approximate_start_at": 1788888481.5519705,
+          "log_written_at": 1788888482.727,
+          "covered_seconds": 1.1750295162200928,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.032324699904688545,
+          "mean_outside_same_uid_cpu_fraction": 0.0009880912634620954,
+          "mean_outside_other_uid_cpu_fraction": 0.03133660864122645,
+          "mean_security_service_cpu_fraction": 0.023855346217870586,
+          "mean_outside_nonsecurity_cpu_fraction": 0.008469353686817959,
+          "peak_outside_nonsecurity_cpu_fraction": 0.008469353686817959,
+          "peak_outside_cpu_fraction": 0.032324699904688545
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 6,
+          "label": "Check core and semantic crates after the core dependency edit",
+          "wall_seconds": 11.647844960010843,
+          "log_sha256": "5279ba63cb67a627221903ef293bf66e0da6bbac79e461106466993b94602fa8",
+          "approximate_start_at": 1788888482.769155,
+          "log_written_at": 1788888494.417,
+          "covered_seconds": 11.612840414047241,
+          "coverage_fraction": 0.9969947620281882,
+          "mean_outside_cpu_fraction": 0.0070628247836341945,
+          "mean_outside_same_uid_cpu_fraction": 0.00030042825839768497,
+          "mean_outside_other_uid_cpu_fraction": 0.006762396525236511,
+          "mean_security_service_cpu_fraction": 0.003930333942085624,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0031324908415485708,
+          "peak_outside_nonsecurity_cpu_fraction": 0.008469353686817959,
+          "peak_outside_cpu_fraction": 0.032324699904688545
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 8,
+          "label": "Run the original cycle, hasattr, and subtype regression slice",
+          "wall_seconds": 51.77833123598248,
+          "log_sha256": "14e719896ff86fcc0af47a0b0a755b1ceadb6d73d04fb0a0273c100f3e7edc27",
+          "approximate_start_at": 1788888494.5166688,
+          "log_written_at": 1788888546.295,
+          "covered_seconds": 51.447319746017456,
+          "coverage_fraction": 0.9936071425620803,
+          "mean_outside_cpu_fraction": 0.006303980079880337,
+          "mean_outside_same_uid_cpu_fraction": 0.0003987286596060627,
+          "mean_outside_other_uid_cpu_fraction": 0.005905251420274277,
+          "mean_security_service_cpu_fraction": 0.0034420973643575184,
+          "mean_outside_nonsecurity_cpu_fraction": 0.002861882715522818,
+          "peak_outside_nonsecurity_cpu_fraction": 0.00972605345724154,
+          "peak_outside_cpu_fraction": 0.02498847580552826
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 9,
+          "label": "Recheck semantic analysis after the recursive-inference edit",
+          "wall_seconds": 10.39368719299091,
+          "log_sha256": "55106503bd23d16671258fe52b3337be9f98ed22722f13142d68b5adeb2ebba7",
+          "approximate_start_at": 1788888546.3383129,
+          "log_written_at": 1788888556.732,
+          "covered_seconds": 10.347908735275269,
+          "coverage_fraction": 0.9955955517165734,
+          "mean_outside_cpu_fraction": 0.007832838577183171,
+          "mean_outside_same_uid_cpu_fraction": 0.0004894576435087919,
+          "mean_outside_other_uid_cpu_fraction": 0.007343380933674381,
+          "mean_security_service_cpu_fraction": 0.004096391844244544,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0037364467329386295,
+          "peak_outside_nonsecurity_cpu_fraction": 0.00972605345724154,
+          "peak_outside_cpu_fraction": 0.02498847580552826
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 11,
+          "label": "Run the expanded inference-cycle regression file",
+          "wall_seconds": 99.53702835799777,
+          "log_sha256": "323c2952421a40146e4e6d787b64adc56bf8c695510a2bf7568a9ad79ea20c19",
+          "approximate_start_at": 1788888556.8369718,
+          "log_written_at": 1788888656.374,
+          "covered_seconds": 99.04289841651917,
+          "coverage_fraction": 0.9950357173643822,
+          "mean_outside_cpu_fraction": 0.006556187106034615,
+          "mean_outside_same_uid_cpu_fraction": 0.0004840160829213092,
+          "mean_outside_other_uid_cpu_fraction": 0.006072171023113305,
+          "mean_security_service_cpu_fraction": 0.0035741459709511176,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0029820411350834947,
+          "peak_outside_nonsecurity_cpu_fraction": 0.009254435645047623,
+          "peak_outside_cpu_fraction": 0.03088042884539294
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 12,
+          "label": "Recheck instance-attribute regressions",
+          "wall_seconds": 2.101532848988427,
+          "log_sha256": "cb4e8080ef57e611af06f1abc1661aad8157f4c21134c0a4f5b2812b0600a887",
+          "approximate_start_at": 1788888656.418467,
+          "log_written_at": 1788888658.52,
+          "covered_seconds": 2.0946743488311768,
+          "coverage_fraction": 0.9967364297157899,
+          "mean_outside_cpu_fraction": 0.021058553721079343,
+          "mean_outside_same_uid_cpu_fraction": 0.00024827219014599515,
+          "mean_outside_other_uid_cpu_fraction": 0.020810281530933353,
+          "mean_security_service_cpu_fraction": 0.01692587552380935,
+          "mean_outside_nonsecurity_cpu_fraction": 0.004132678197269992,
+          "peak_outside_nonsecurity_cpu_fraction": 0.005629893208104158,
+          "peak_outside_cpu_fraction": 0.03088042884539294
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 13,
+          "label": "Run strict Clippy for the changed core and semantic crates",
+          "wall_seconds": 29.784725443983916,
+          "log_sha256": "36d405d327df048d49088ff1f1bf11243fca4847a11781067af9587b13c23c4d",
+          "approximate_start_at": 1788888658.5682745,
+          "log_written_at": 1788888688.353,
+          "covered_seconds": 29.666373252868652,
+          "coverage_fraction": 0.9960264132252,
+          "mean_outside_cpu_fraction": 0.010128691402880485,
+          "mean_outside_same_uid_cpu_fraction": 0.0007401249839418628,
+          "mean_outside_other_uid_cpu_fraction": 0.009388566418938621,
+          "mean_security_service_cpu_fraction": 0.006407661383632057,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0037210300192484294,
+          "peak_outside_nonsecurity_cpu_fraction": 0.010337672757988288,
+          "peak_outside_cpu_fraction": 0.03248982866796319
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 14,
+          "label": "Verify Rust formatting across the workspace",
+          "wall_seconds": 8.985770260012941,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "approximate_start_at": 1788888688.4412298,
+          "log_written_at": 1788888697.427,
+          "covered_seconds": 8.939471244812012,
+          "coverage_fraction": 0.9948475184807515,
+          "mean_outside_cpu_fraction": 0.01075708266105951,
+          "mean_outside_same_uid_cpu_fraction": 0.00036300911638456227,
+          "mean_outside_other_uid_cpu_fraction": 0.01039407354467495,
+          "mean_security_service_cpu_fraction": 0.005695335807421212,
+          "mean_outside_nonsecurity_cpu_fraction": 0.005061746853638301,
+          "peak_outside_nonsecurity_cpu_fraction": 0.01271334709889425,
+          "peak_outside_cpu_fraction": 0.02587540056598477
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "index": 15,
+          "label": "Validate all core and semantic package tests",
+          "wall_seconds": 15.56237786897691,
+          "log_sha256": "724a14c131bb336a99c0a573da74823db32c98f9b5d831557479cc0374c57ceb",
+          "approximate_start_at": 1788888697.470622,
+          "log_written_at": 1788888713.033,
+          "covered_seconds": 15.452662467956543,
+          "coverage_fraction": 0.9929499590651194,
+          "mean_outside_cpu_fraction": 0.04958988808668282,
+          "mean_outside_same_uid_cpu_fraction": 0.0012278740793245143,
+          "mean_outside_other_uid_cpu_fraction": 0.0483620140073583,
+          "mean_security_service_cpu_fraction": 0.04059163186833577,
+          "mean_outside_nonsecurity_cpu_fraction": 0.008998256218347043,
+          "peak_outside_nonsecurity_cpu_fraction": 0.022496994994200527,
+          "peak_outside_cpu_fraction": 0.11027938722647318
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 1,
+          "label": "Check the semantic crate before editing",
+          "wall_seconds": 0.39284030001726933,
+          "log_sha256": "d659cceb5d9e26c34dd7d61eb458c8ba7226079e93a33a5b97b6ec89c0ae2c31",
+          "approximate_start_at": 1788888935.5841596,
+          "log_written_at": 1788888935.977,
+          "covered_seconds": 0.3928403854370117,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.030637577453761427,
+          "mean_outside_same_uid_cpu_fraction": 0.0008967095840125296,
+          "mean_outside_other_uid_cpu_fraction": 0.0297408678697489,
+          "mean_security_service_cpu_fraction": 0.028096900299059258,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0025406771547021676,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0025406771547021676,
+          "peak_outside_cpu_fraction": 0.030637577453761427
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 2,
+          "label": "Establish the focused attribute-cycle baseline",
+          "wall_seconds": 1.344138357002521,
+          "log_sha256": "4c18824af75fd4f682ec813b7cfa31740edfab0e08f55e2d7e82ba66f0103ffb",
+          "approximate_start_at": 1788888936.0208616,
+          "log_written_at": 1788888937.365,
+          "covered_seconds": 1.3441383838653564,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.016464096669805403,
+          "mean_outside_same_uid_cpu_fraction": 0.00048227196690250933,
+          "mean_outside_other_uid_cpu_fraction": 0.015981824702902894,
+          "mean_security_service_cpu_fraction": 0.014434744994761939,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0020293516750434656,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0025406771547021676,
+          "peak_outside_cpu_fraction": 0.030637577453761427
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 4,
+          "label": "Run focused instance-attribute mdtests",
+          "wall_seconds": 150.7512019109854,
+          "log_sha256": "1209e22623583a747cd63f81ad6e8a051bf1a69573b04ea4e829db1cbadc5a8b",
+          "approximate_start_at": 1788888937.483798,
+          "log_written_at": 1788889088.235,
+          "covered_seconds": 150.18435049057007,
+          "coverage_fraction": 0.9962398215521356,
+          "mean_outside_cpu_fraction": 0.006404056052579216,
+          "mean_outside_same_uid_cpu_fraction": 0.00021605826058425528,
+          "mean_outside_other_uid_cpu_fraction": 0.0061879977919949624,
+          "mean_security_service_cpu_fraction": 0.0042297265074275675,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0021743295451516513,
+          "peak_outside_nonsecurity_cpu_fraction": 0.01420595183698298,
+          "peak_outside_cpu_fraction": 0.03122844845583432
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 5,
+          "label": "Recheck focused inference-cycle mdtests",
+          "wall_seconds": 1.4929792559996713,
+          "log_sha256": "4a1eda4402f8819e2722784f2c89127738ab92c35b59c2287fd61febe03aca4c",
+          "approximate_start_at": 1788889088.2790208,
+          "log_written_at": 1788889089.772,
+          "covered_seconds": 1.4929792881011963,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.01323773828379523,
+          "mean_outside_same_uid_cpu_fraction": 0.0007354299046552906,
+          "mean_outside_other_uid_cpu_fraction": 0.012502308379139938,
+          "mean_security_service_cpu_fraction": 0.0108843625888983,
+          "mean_outside_nonsecurity_cpu_fraction": 0.00235337569489693,
+          "peak_outside_nonsecurity_cpu_fraction": 0.00235337569489693,
+          "peak_outside_cpu_fraction": 0.01323773828379523
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 6,
+          "label": "Check core and semantic crates after the core dependency edit",
+          "wall_seconds": 23.093560153007274,
+          "log_sha256": "282f573e2dacabbf6bdd43abadc4a7fa0c3c694cdfb2a2f7d5f580a13d305e84",
+          "approximate_start_at": 1788889089.8184397,
+          "log_written_at": 1788889112.912,
+          "covered_seconds": 23.05505633354187,
+          "coverage_fraction": 0.9983327031774099,
+          "mean_outside_cpu_fraction": 0.0035589713501748598,
+          "mean_outside_same_uid_cpu_fraction": 0.00017805172572195538,
+          "mean_outside_other_uid_cpu_fraction": 0.0033809196244529043,
+          "mean_security_service_cpu_fraction": 0.0016613628019511075,
+          "mean_outside_nonsecurity_cpu_fraction": 0.001897608548223752,
+          "peak_outside_nonsecurity_cpu_fraction": 0.004788205120813312,
+          "peak_outside_cpu_fraction": 0.01323773828379523
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 8,
+          "label": "Run the original cycle, hasattr, and subtype regression slice",
+          "wall_seconds": 72.13166537199868,
+          "log_sha256": "7d1f97d13872ac82547a3f01f6acfccc53ef1629f25a267003eb4e2add93bc07",
+          "approximate_start_at": 1788889113.0093346,
+          "log_written_at": 1788889185.141,
+          "covered_seconds": 72.02105450630188,
+          "coverage_fraction": 0.9984665421888382,
+          "mean_outside_cpu_fraction": 0.0033572238034977582,
+          "mean_outside_same_uid_cpu_fraction": 0.00014739710044627915,
+          "mean_outside_other_uid_cpu_fraction": 0.0032098267030514775,
+          "mean_security_service_cpu_fraction": 0.0019862877131742954,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0013709360903234624,
+          "peak_outside_nonsecurity_cpu_fraction": 0.004340016119289723,
+          "peak_outside_cpu_fraction": 0.011982101910633388
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 9,
+          "label": "Recheck semantic analysis after the recursive-inference edit",
+          "wall_seconds": 21.29626615199959,
+          "log_sha256": "c7d8c3695a41475ea601a1907623527b89ab66dba64cdbdcf6a42642e3558cfd",
+          "approximate_start_at": 1788889185.1847339,
+          "log_written_at": 1788889206.481,
+          "covered_seconds": 21.26871371269226,
+          "coverage_fraction": 0.9987062314534071,
+          "mean_outside_cpu_fraction": 0.002963243620530893,
+          "mean_outside_same_uid_cpu_fraction": 6.791257869432356e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.002895331041836569,
+          "mean_security_service_cpu_fraction": 0.0017863989359537655,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0011768446845771272,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0023788807666253646,
+          "peak_outside_cpu_fraction": 0.011982101910633388
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 11,
+          "label": "Run the expanded inference-cycle regression file",
+          "wall_seconds": 144.77904177299934,
+          "log_sha256": "6b63ddbc8b505f77dabc88bd83aeacc036dee88af3a4b32d7b5c6605e295c884",
+          "approximate_start_at": 1788889206.567958,
+          "log_written_at": 1788889351.347,
+          "covered_seconds": 144.4145359992981,
+          "coverage_fraction": 0.9974823305276964,
+          "mean_outside_cpu_fraction": 0.0046836982222116744,
+          "mean_outside_same_uid_cpu_fraction": 0.0001493048005586149,
+          "mean_outside_other_uid_cpu_fraction": 0.004534393421653057,
+          "mean_security_service_cpu_fraction": 0.0029880794253445463,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0016956187968671273,
+          "peak_outside_nonsecurity_cpu_fraction": 0.009859772725179867,
+          "peak_outside_cpu_fraction": 0.04675922519668633
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 12,
+          "label": "Recheck instance-attribute regressions",
+          "wall_seconds": 1.7544332160032354,
+          "log_sha256": "86013b4f9f8765a10ad3102ffae6af46410dd86de5165a29cf9ca046af2ea8ef",
+          "approximate_start_at": 1788889351.3885667,
+          "log_written_at": 1788889353.143,
+          "covered_seconds": 1.7544331550598145,
+          "coverage_fraction": 0.9999999652631856,
+          "mean_outside_cpu_fraction": 0.044518723463394125,
+          "mean_outside_same_uid_cpu_fraction": 0.0001474129916006428,
+          "mean_outside_other_uid_cpu_fraction": 0.044371310471793476,
+          "mean_security_service_cpu_fraction": 0.04068598568177741,
+          "mean_outside_nonsecurity_cpu_fraction": 0.003832737781616713,
+          "peak_outside_nonsecurity_cpu_fraction": 0.003832737781616713,
+          "peak_outside_cpu_fraction": 0.044518723463394125
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 13,
+          "label": "Run strict Clippy for the changed core and semantic crates",
+          "wall_seconds": 72.1544023710012,
+          "log_sha256": "371b94f201b9e996c934f0393906afb9f279db5ddd075436bf2f77a655ec7bd6",
+          "approximate_start_at": 1788889353.1855977,
+          "log_written_at": 1788889425.34,
+          "covered_seconds": 72.10402822494507,
+          "coverage_fraction": 0.99930185623606,
+          "mean_outside_cpu_fraction": 0.0061417750119477435,
+          "mean_outside_same_uid_cpu_fraction": 0.00010196877375643903,
+          "mean_outside_other_uid_cpu_fraction": 0.006039806238191305,
+          "mean_security_service_cpu_fraction": 0.004123995385177212,
+          "mean_outside_nonsecurity_cpu_fraction": 0.00201777962677053,
+          "peak_outside_nonsecurity_cpu_fraction": 0.014080098341949357,
+          "peak_outside_cpu_fraction": 0.047065113632055636
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 14,
+          "label": "Verify Rust formatting across the workspace",
+          "wall_seconds": 7.091563888010569,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "approximate_start_at": 1788889425.381436,
+          "log_written_at": 1788889432.473,
+          "covered_seconds": 7.088555812835693,
+          "coverage_fraction": 0.9995758234400227,
+          "mean_outside_cpu_fraction": 0.003028761733923755,
+          "mean_outside_same_uid_cpu_fraction": 0.00014307836613691523,
+          "mean_outside_other_uid_cpu_fraction": 0.00288568336778684,
+          "mean_security_service_cpu_fraction": 0.0016108008594431058,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0014179608744806494,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0025448688960899904,
+          "peak_outside_cpu_fraction": 0.004940039621821746
+        },
+        {
+          "stage": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "index": 15,
+          "label": "Validate all core and semantic package tests",
+          "wall_seconds": 16.296971395990113,
+          "log_sha256": "7c2a8e136cd0f0770b05a47a9aaf60c1e49d8c8034ccd718557d3b1ab4a10989",
+          "approximate_start_at": 1788889432.5120287,
+          "log_written_at": 1788889448.809,
+          "covered_seconds": 16.25164270401001,
+          "coverage_fraction": 0.9972185818531132,
+          "mean_outside_cpu_fraction": 0.020390277627850808,
+          "mean_outside_same_uid_cpu_fraction": 4.363816259720184e-5,
+          "mean_outside_other_uid_cpu_fraction": 0.020346639465253606,
+          "mean_security_service_cpu_fraction": 0.01870794910691469,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0016823285209361188,
+          "peak_outside_nonsecurity_cpu_fraction": 0.004187504280192281,
+          "peak_outside_cpu_fraction": 0.09421884630432631
+        }
+      ]
+    },
+    "excluded_host_attempts": [
+      {
+        "archive_sha256": "de657568f6e0d395643f8329b14e2a1696166aea93c1120f222407d5de41df4b",
+        "bytes": 94232,
+        "samples_collected": 2,
+        "samples_used_for_publication": 0,
+        "reason": "Sustained outside CPU use dominated by the Falcon security service exceeded the predeclared load limit."
+      },
+      {
+        "archive_sha256": "d067f952e0be354efa8501b2791d2df22ad3227452c9ec0ffc4793d9a627b89e",
+        "bytes": 93825,
+        "samples_collected": 1,
+        "samples_used_for_publication": 0,
+        "reason": "The original all-process CPU limit rejected sustained Falcon activity while system maintenance was also active."
+      }
+    ]
+  },
+  "host": {
+    "platform": "linux-x86_64",
+    "id": "linux-study-1",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC-Milan Processor"
+  },
+  "completed_at": "2026-09-08T17:44:08.844044+00:00"
+}
