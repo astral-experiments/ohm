@@ -1,0 +1,922 @@
+{
+  "rust_version": "1.98.0",
+  "ohm_release": "ohm-1.98.0-11",
+  "jobs": 8,
+  "repetitions": 2,
+  "order": [
+    [
+      "ohm-all",
+      "ohm-no-public-api-hash",
+      "ohm-neither",
+      "ohm-no-proc-macro-cache"
+    ],
+    [
+      "ohm-no-public-api-hash",
+      "ohm-no-proc-macro-cache",
+      "ohm-all",
+      "ohm-neither"
+    ]
+  ],
+  "sessions": [
+    {
+      "project": "uv",
+      "session_id": "uv-pypi-simple-json-parser-feature-ablation",
+      "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+      "commands": 2,
+      "edits": 1,
+      "warmups": 2
+    }
+  ],
+  "timed_session_seconds": {
+    "uv": {
+      "ohm-all": [3.937130474980222, 3.5730513820017222],
+      "ohm-no-public-api-hash": [6.475713933003135, 7.350606429972686],
+      "ohm-no-proc-macro-cache": [3.921404490014538, 3.8630133059923537],
+      "ohm-neither": [6.806904619996203, 7.207747799984645]
+    }
+  },
+  "timed_command_seconds": {
+    "uv": {
+      "ohm-all": [3.830283656017855, 3.470110405003652],
+      "ohm-no-public-api-hash": [6.36930464496254, 7.23002044801251],
+      "ohm-no-proc-macro-cache": [3.8191755749867298, 3.759267646004446],
+      "ohm-neither": [6.688527669030009, 7.09624229799374]
+    }
+  },
+  "timed_edit_seconds": {
+    "uv": {
+      "ohm-all": [0.004915757977869362, 0.004324753012042493],
+      "ohm-no-public-api-hash": [0.004360590013675392, 0.004348257003584877],
+      "ohm-no-proc-macro-cache": [0.003981261979788542, 0.004355481010861695],
+      "ohm-neither": [0.005549972993321717, 0.004631315998267382]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "uv": {
+      "ohm-all": [65.85897707301774, 63.411985237995395],
+      "ohm-no-public-api-hash": [64.66236901798402, 65.45141694700578],
+      "ohm-no-proc-macro-cache": [64.28105270100059, 63.67857380001806],
+      "ohm-neither": [63.56451445599669, 64.02068509397213]
+    }
+  },
+  "commands": {
+    "uv": [
+      {
+        "index": 2,
+        "label": "Recheck downstream registry-client dependencies after the private parser edit",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "uv-client", "--locked"],
+        "wall_seconds": {
+          "ohm-all": [2.182326197013026, 1.865443629998481],
+          "ohm-no-public-api-hash": [4.52548952397774, 5.049467008007923],
+          "ohm-no-proc-macro-cache": [2.0533013970125467, 1.9606363210186828],
+          "ohm-neither": [4.8573683600116055, 4.710829769988777]
+        },
+        "tests_started": {
+          "ohm-all": [0, 0],
+          "ohm-no-public-api-hash": [0, 0],
+          "ohm-no-proc-macro-cache": [0, 0],
+          "ohm-neither": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [8, 8],
+          "ohm-no-public-api-hash": [8, 8],
+          "ohm-no-proc-macro-cache": [8, 8],
+          "ohm-neither": [8, 8]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Retest the directly changed Simple API parser library",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "--lib",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "ohm-all": [1.6479574590048287, 1.604666775005171],
+          "ohm-no-public-api-hash": [1.8438151209848002, 2.180553440004587],
+          "ohm-no-proc-macro-cache": [1.7658741779741831, 1.798631324985763],
+          "ohm-neither": [1.8311593090184033, 2.385412528004963]
+        },
+        "tests_started": {
+          "ohm-all": [9, 9],
+          "ohm-no-public-api-hash": [9, 9],
+          "ohm-no-proc-macro-cache": [9, 9],
+          "ohm-neither": [9, 9]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [1, 1],
+          "ohm-no-public-api-hash": [1, 1],
+          "ohm-no-proc-macro-cache": [1, 1],
+          "ohm-neither": [1, 1]
+        }
+      }
+    ]
+  },
+  "warmups": {
+    "uv": [
+      {
+        "index": 1,
+        "label": "Warm downstream registry-client checking and its existing parser dependency",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "uv-client", "--locked"],
+        "wall_seconds": {
+          "ohm-all": [47.989382169995224, 44.772408914985135],
+          "ohm-no-public-api-hash": [46.22651419098838, 46.236606952996226],
+          "ohm-no-proc-macro-cache": [45.29714712998248, 44.406683348992374],
+          "ohm-neither": [45.31789822000428, 45.31648659097846]
+        },
+        "tests_started": {
+          "ohm-all": [0, 0],
+          "ohm-no-public-api-hash": [0, 0],
+          "ohm-no-proc-macro-cache": [0, 0],
+          "ohm-neither": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [410, 410],
+          "ohm-no-public-api-hash": [410, 410],
+          "ohm-no-proc-macro-cache": [410, 410],
+          "ohm-neither": [410, 410]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Warm focused Simple API parser library tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "--lib",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "ohm-all": [17.869594903022517, 18.63957632301026],
+          "ohm-no-public-api-hash": [18.435854826995637, 19.214809994009556],
+          "ohm-no-proc-macro-cache": [18.983905571018113, 19.271890451025683],
+          "ohm-neither": [18.246616235992406, 18.704198502993677]
+        },
+        "tests_started": {
+          "ohm-all": [9, 9],
+          "ohm-no-public-api-hash": [9, 9],
+          "ohm-no-proc-macro-cache": [9, 9],
+          "ohm-neither": [9, 9]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [173, 173],
+          "ohm-no-public-api-hash": [173, 173],
+          "ohm-no-proc-macro-cache": [173, 173],
+          "ohm-neither": [173, 173]
+        }
+      }
+    ]
+  },
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "baseline_warmups_excluded": true,
+    "session_totals_include_edits_and_runner_overhead": true,
+    "compiler_accounting": "cargo status messages; not compiler invocations",
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust_enabled": false,
+    "optional_lockfile_parse_cache_enabled": false,
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": false,
+    "test_count_semantics": "Observed test starts, including retries and nested runner output; not unique selected tests.",
+    "cargo_status_messages_prove_compiler_invocations": false
+  },
+  "feature_overrides": {
+    "ohm-all": [],
+    "ohm-no-public-api-hash": ["-Zpublic-api-hash=no"],
+    "ohm-no-proc-macro-cache": ["-Zcache-proc-macros=no"],
+    "ohm-neither": ["-Zpublic-api-hash=no", "-Zcache-proc-macros=no"]
+  },
+  "environment": {},
+  "provenance": {
+    "effective_fixture_sha256": {
+      "uv": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+    },
+    "canonical_fixture_sha256": {
+      "uv": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+    },
+    "setup_patches_by_project": {},
+    "setup_proofs_by_project": {},
+    "published_fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+    "coordinator_revision": "73c4ca78849488a613c7837ecb5d11f7fe32d8f1",
+    "publication_base_revision": "3f2582f7af57de1eaea13ffb54859a394e835ad4",
+    "benchmark_preparation_base_revision": "3f2582f7af57de1eaea13ffb54859a394e835ad4",
+    "audit_inputs_sha256": "e2f7888cd2ee54f69f43bf11a8da371ee776d6302ac14d7ef0e9be9bb6a090f0",
+    "release_manifest_sha256": "2a1e0aa628a49f790a9a73c5c6988c962d94b2bfe03200267f6d942d99c4c059",
+    "source_pins": {
+      "rust": "ce7f658e083b833845336a7d9c04002135748fc9",
+      "cargo": "f7e7a7859b2ff96a4301525dd84157ad55ed1d7d",
+      "clippy": "5bd3512dc93cb5450b628f2c66cbee42aaffd974",
+      "rustfmt": "214f9b7ec9812bbe6235184c037c2387217dcc59"
+    },
+    "benchmark_runner_sha256": {
+      "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+      "replay_sessions.py": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+    },
+    "raw_results_sha256": "18ebad35c40832276691456dd480433b9cde27c9658e07d07f69e012fb44f726",
+    "raw_audit_sha256": "ae6cfd90200a7924a91a48a1983b09147fd8b7e624fb8bc59fbaac8e9e39224a",
+    "exporter_sha256": "19c479a9899d8cba2b5c975fbe5dde21c33358e8be8270c5d7ea2c53021e5de9",
+    "installer_sha256": "07cf3e490f110ce36003f58e1982ce0c32e84a63cbf2f538f17063a8cff14b05",
+    "release_archive_sha256": "08c9a9be882c01e418a274c2eedde4b256f98288d1591959290b08ffce1215f3",
+    "release_archive_bytes": 304682479,
+    "release_asset_staging_source": "github",
+    "release_assets": [
+      {
+        "asset_id": 550645545,
+        "name": "install.sh",
+        "sha256": "07cf3e490f110ce36003f58e1982ce0c32e84a63cbf2f538f17063a8cff14b05",
+        "bytes": 15288,
+        "source": "github"
+      },
+      {
+        "asset_id": 550645548,
+        "name": "ohm-1.98.0-11-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "08c9a9be882c01e418a274c2eedde4b256f98288d1591959290b08ffce1215f3",
+        "bytes": 304682479,
+        "source": "github"
+      }
+    ],
+    "helpers": {
+      "just": {
+        "version": "just 1.58.0",
+        "sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042"
+      },
+      "cargo-nextest": {
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a"
+      },
+      "uv": {
+        "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
+        "sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d"
+      },
+      "python3.12": {
+        "version": "Python 3.12.13",
+        "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7"
+      }
+    },
+    "toolchains": {
+      "1.98.0": {
+        "cargo": {
+          "version": "cargo 1.98.0 (797e8a9bc 2026-08-05)\nrelease: 1.98.0\ncommit-hash: 797e8a9bca276c1c9f9f738d2a20f484fa4eea9d\ncommit-date: 2026-08-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0\nLLVM version: 22.1.8",
+          "sha256": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (88d9e12ae1 2026-08-18)",
+          "sha256": "f3d6f504333820cb4dbaccb5e4742d98c826f6a199c81964affe53639d19e734"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-stable (88d9e12ae1 2026-08-18)",
+          "sha256": "5005cdcd39ded526dca8fa6ccd716d42fc7da54469034e055dbf54649bec7877"
+        }
+      },
+      "ohm-1.98.0-11": {
+        "cargo": {
+          "version": "cargo 1.98.0-dev (f7e7a7859 2026-09-08) (ohm-1.98.0-11)\nrelease: 1.98.0-dev\ncommit-hash: f7e7a7859b2ff96a4301525dd84157ad55ed1d7d\ncommit-date: 2026-09-08\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+          "sha256": "8c668f13b1e644086295fdb1359b1f3db261260ddd6ca69dca2f6f7c2a0ec622"
+        },
+        "rustc": {
+          "version": "rustc 1.98.0-dev (ce7f658e0 2026-09-08) (ohm-1.98.0-11)\nbinary: rustc\ncommit-hash: ce7f658e083b833845336a7d9c04002135748fc9\ncommit-date: 2026-09-08\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-dev\nLLVM version: 22.1.8",
+          "sha256": "f0e1540d96022c4e68c2cb9055dcf5dfcc9adab033f800d2dcdf53e8e275ee70"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.98 (5bd3512dc9 2026-08-30)",
+          "sha256": "c81173c326037120e5ad84483d255787da3e873a98d05331159ff35cef7f9bbc"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.9.0-dev (214f9b7ec9 2026-08-21)",
+          "sha256": "cfa3c8d750aee16d53762154fb14af1fc6f9a47626bfda506415b6a179aeef94"
+        }
+      }
+    },
+    "global_moving_aliases_unchanged": true,
+    "global_helpers_unchanged": true,
+    "paired_arms_share_helper_environment": true,
+    "standalone_uv_fixture_commands": 0,
+    "parent_source_configuration": {
+      "source_only": true,
+      "sha256": "24095bd6315880162c8f660917100ac36638cb73778dd9ec6f1c9026ea87b178"
+    },
+    "native_download_preparation": {
+      "completed_before_timing": true,
+      "measured_targets_reused": false,
+      "command": [
+        "cargo",
+        "+ohm-1.98.0-11",
+        "test",
+        "-p",
+        "codex-core",
+        "--lib",
+        "--no-run",
+        "--locked",
+        "--offline"
+      ],
+      "log_sha256": "aab0614e6d6dc4910711d532b5ce248c3bb766102796d6a6eb8a37c9fc57d1a4",
+      "receipt_sha256": "996c3bd8c9b7c4132c78fd99103fd295f692c005c9fc1132fcb99ec00be67a78"
+    },
+    "continuous_host_monitor": {
+      "samples": 276,
+      "passed": true,
+      "violations": [],
+      "trace_sha256": "0d0e748d37f8ba78bc914a91fc47ae065c767b405d227bbd3e2b224f995294a0",
+      "monitor_sha256": "2407c184cda83ab94a6438fbc253520f286f551f474a1c772329a55dab6da613",
+      "returncode": 0,
+      "clock_ticks_per_second": 100,
+      "policy": {
+        "preflight_samples": 6,
+        "interval_seconds": 5,
+        "minimum_idle_percent": 95,
+        "maximum_iowait_percent": 0.5,
+        "maximum_steal_percent": 0.1,
+        "continuous_interval_seconds": 2,
+        "maximum_external_user_cpu_fraction": 0.05,
+        "external_busy_consecutive_intervals": 3,
+        "unrelated_compilers_permitted": 0,
+        "maximum_external_nonsecurity_cpu_fraction": 0.05,
+        "recorded_security_service": {
+          "uid": 0,
+          "name": "falcon-sensor-b",
+          "cgroup": "0::/system.slice/falcon-sensor.service/sensor.falcon"
+        },
+        "security_service_cpu_included_in_timings": true,
+        "security_service_cpu_excluded_from_rejection_only": true
+      }
+    },
+    "input_receipt_sha256": {
+      "ablation-completed.json": "48198b9860d42e977d7282230d470f8f187d41e96ebebb2ae2d8f00e51cb3679",
+      "ablation-host-monitor.json": "4991b314322bc7aeaa99199c571ba2e11911ef6e906edf28f4c24d54a16bd806",
+      "ablation-ready.json": "c941e5438ffab0a3831ad1ac519c78b3aa5cda35a4adb955a75922bc96a93cda",
+      "ablation-started-20260908T201650.466410Z.json": "bdb3c19745ce0727858565cee2fb25e7fcdbf75c6d4d9e40f425ef72ca77ba3d",
+      "bootstrap-status.json": "b42cf536cbec0e452e2cfdd550faa880550c55de0e2203c5602928edf92529ea",
+      "current-before-resume-results.json": "393c658b517864b92b783877f1c68cd9c3e8cb7b2790b307aef252c66a75fe99",
+      "current-before-resume-suite-status.json": "dc1ef5c0f677b852a90116eec87ddce688d4ea6b04fd9a3e2cebc105d60e52c3",
+      "current-completed.json": "6683023c737661798a802368c19f657c81889035cd17a0f036b304a1f4db194b",
+      "current-host-monitor.json": "956d05d6e78ec87cdb834407de2e4f9fb4653defc4de38f065f9ee6440688dea",
+      "current-ready.json": "8efc2271d0d19fbe3b02197f260d48e1524e468057f91c0a95ef5502e2279edd",
+      "current-recovery-controller-inputs.json": "e21aa48ac1b79efe419e589737142c4857662ad85ee3dad821bfa1bc3b80cc33",
+      "current-resume-before.json": "8c99581ea82981746c8a7130607afd3cb9629899d841b1c1770671a9b3bf8135",
+      "current-resume-host-monitor.json": "42f5c5fcd2465e0a54457390a025eb4a91b837889a29ad734fcd21ceac85035b",
+      "current-resume-preflight-recovery.json": "4e453016c9146d40e66f3a14627ec03663b87e4043a7019c6f4194f65163f892",
+      "current-resume-quiet-retry-1-host-monitor.json": "adcaf2e9c783d8f1da0ae00f6beaf1c7a9f9fbf4d4c17c6c15ef4917f3700397",
+      "current-resume-quiet-retry-1-rejected.json": "815956116380aef539455a5a5f3785b0dc746c3de9fd572f0cf6a3cabb2ee45d",
+      "current-resume-quiet-retry-2-host-monitor.json": "d7450c414e31ddfebde6f4a3f9d4e17514151918567eded68e1fb238f30ee578",
+      "current-resume-review.json": "2356350a9858f0da43999844b593b7278fd59fafcdcf150a9081381a4f8be5f3",
+      "current-started-20260908T174440.560858Z.json": "3f2595d3fe28b7d2bb567f7ee7fea0300397cf7bc980cd1d8485f0f059a1c02a",
+      "current-started-20260908T184509.542531Z.json": "332562d58b7d5892684222250e522f0e205a82f6b4bba495b794e9670611c6eb",
+      "direct-completed.json": "38d4b6f832594dfa52bf98830375b2883082ded6f1fb520cf2208143d79def64",
+      "direct-host-monitor.json": "ff825d8703e0fac0d5cec4fc59c0ef5dc37c5b9f43d35de36d5246dde1e9d82b",
+      "direct-prepared.json": "f4e64b9c336633e429a9950520d8768188677aae089d1dc576649240d6e63f87",
+      "direct-quiet-1788879462859281151.json": "aed5813f401c80169bb7f965387bee7ff49846738922bb8e1dffcdbdcc5067b6",
+      "direct-quiet-1788879598228032235.json": "28618fbe4ea56b77ec2487a2cee82f856fbd587dce407a014c81968b9d227350",
+      "direct-quiet-1788880147749817260.json": "cc3b7efbb616291729bff0a7f2b5031806dea4e539624336312c593c05ca574a",
+      "direct-quiet-1788886977031401414.json": "38deb1357c6fc432c38257e0f86ea506767071b7f084ea25674fbc2a46c7f934",
+      "direct-quiet-1788889480558748240.json": "abc2c63143b6d4f1f54dd7aa8996242931d9aa903daffb35537ff65bc5afe69c",
+      "direct-quiet-1788892672067484625.json": "5213c41e04be5f51641068731cbac667bd978fc5a97bafb8244c372d05a04ad8",
+      "direct-quiet-1788893017778984883.json": "b1a116b0e818cc41d5522e55fc1a0d71b1fd024e252fec74fbd77dc6ae5876df",
+      "direct-quiet-1788893109536764015.json": "43b92d013d39301c6a3ed13e013afe14167227b479d6fe245c1548371eefaec7",
+      "direct-quiet-1788898610460977734.json": "bb5297e8aaca58ef6e6069740f9499c6b785b067b641c66a050d2fbb1da7fc37",
+      "direct-ready.json": "0df0ef6dbad46db9843f70bd0580169fd19941385558fb437668172ac832deaa",
+      "direct-started.json": "3325843ade3650b412a993de1af47c063c4b3b530b7f2e9ef35575931f039413",
+      "global-rustup-before-1764288.json": "90b02cd9d5c0a85ff56f21b563840d95cc6f38a0ffdb7b3cc66fd3549809c833",
+      "helpers.json": "dd43e32cc6eac3a5b2d6408f231c14da4bf6c4e8b4dbdb1b8aa171548af72ec9",
+      "historical-completed.json": "902bd280a5af2434b75cec31e0c0cd9c25a8516c2a91b566fec40397e7b5ce15",
+      "historical-host-monitor.json": "d49350ed23e1a319dd1c867b40ea82821364ff5ecf889e2194083a5bb9237ad0",
+      "historical-ready.json": "4b7ddbdbb70b7ea00cb8368528f67290ffe65cd448477df23f41f71357fc25d9",
+      "historical-started-20260908T170257.042707Z.json": "61fd069f7ec48db76279c47e52363f8d3e9be1b56822047bc941cf9a8f1ae27e",
+      "native-preparation.json": "996c3bd8c9b7c4132c78fd99103fd295f692c005c9fc1132fcb99ec00be67a78",
+      "preflight-rejected-direct-host-monitor.json": "f6c261f1227ea3ebaffe0281d1ab96b2548ab1afde884d76e2650b4e465d5d7e",
+      "preflight-rejected-suite-inputs.json": "6cdbbda75d9da99a789d09174dbf6df53ef58bf8a7ed6e36a2f75618f5d1acb5",
+      "preflight-rejected-suite-status.json": "aa1a6d813ceeeae6bb9098dacf0a88439e907852110af84ec3065dd07b9143e4",
+      "preflight-rejection-review.json": "71f2a8dba3b3fabb02ce2fa8cad390a095b4c50f810ceba1994be1899ae5b93d",
+      "release-assets.json": "52ef24fc8a0c88641e44a858d2e99f6abf76d03dfa7038f607470a5c0f2da6ce",
+      "resume-controller-inputs.json": "7785758be903c09d6f79608a7c095672d12a8217f30d9f60e9276da96c400d93",
+      "security-service-policy-change.json": "2f6a1dfb20150e5deb617c17b2d3ecd128e2b2d6cb842f4a1a08c96b8b7a84f1",
+      "strict-system-cpu-direct-host-monitor.json": "d876f57a1379c798a0ae4a4a6b8c3f9b057542429868521c9d31f31006fc8f8c",
+      "strict-system-cpu-direct-started.json": "c331fd8583f944cd2f5a11906fd89dbfb0b6834f4fb29dabda088cb869fb811c",
+      "strict-system-cpu-suite-inputs.json": "ede8b5ba2374a307140c014d19e0bfcd674e3690919ba5780df2fd20d1c9a56e",
+      "strict-system-cpu-suite-status.json": "9cecaa66e132f9d93d23b6bea4df5570e0640ac6befc8bf7dd4aefcfc23fdcec",
+      "suite-inputs.json": "df17025317e7ecd9eb459aa3da3e15c2641151f35ca5a9279ea5894a4ce0d6f1",
+      "suite-status.json": "348d5646083064c65391e8b9071af225b905ec7d8b85a9536c43449558b5c24b",
+      "toolchains.json": "458c4cbea7b4bf38a079c7750bf52b17070be64e0caf7d52ab68ceabb88edd12"
+    },
+    "replay_source_audit": {
+      "audit_sha256": "daac56006a90fa87dd131469a942e0ea1623b0674e98e7a9b1f3948960b852ca",
+      "audit_implementation_sha256": "6dcaa6cd13da271468c183978f84ebbd85de8f45482ad42902554633dff402b4",
+      "scope": "Final tracked and non-ignored untracked files match an independent index reconstructed from each frozen fixture baseline, setup patch, and edit. Original source trees and indexes were not changed.",
+      "verified_worktrees": 8,
+      "samples": [
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-all",
+          "repetition": 0,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+          "fixture": "uv-feature-ablation.json",
+          "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+          "expected_tree_oid": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+          "patch_sha256s": [
+            "9b13b82593f4d227e52094d967dc20876a0e636fa966d534ec628042234222ea"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-public-api-hash",
+          "repetition": 0,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+          "fixture": "uv-feature-ablation.json",
+          "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+          "expected_tree_oid": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+          "patch_sha256s": [
+            "9b13b82593f4d227e52094d967dc20876a0e636fa966d534ec628042234222ea"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-neither",
+          "repetition": 0,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+          "fixture": "uv-feature-ablation.json",
+          "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+          "expected_tree_oid": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+          "patch_sha256s": [
+            "9b13b82593f4d227e52094d967dc20876a0e636fa966d534ec628042234222ea"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-proc-macro-cache",
+          "repetition": 0,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+          "fixture": "uv-feature-ablation.json",
+          "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+          "expected_tree_oid": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+          "patch_sha256s": [
+            "9b13b82593f4d227e52094d967dc20876a0e636fa966d534ec628042234222ea"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-public-api-hash",
+          "repetition": 1,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+          "fixture": "uv-feature-ablation.json",
+          "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+          "expected_tree_oid": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+          "patch_sha256s": [
+            "9b13b82593f4d227e52094d967dc20876a0e636fa966d534ec628042234222ea"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-proc-macro-cache",
+          "repetition": 1,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+          "fixture": "uv-feature-ablation.json",
+          "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+          "expected_tree_oid": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+          "patch_sha256s": [
+            "9b13b82593f4d227e52094d967dc20876a0e636fa966d534ec628042234222ea"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-all",
+          "repetition": 1,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+          "fixture": "uv-feature-ablation.json",
+          "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+          "expected_tree_oid": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+          "patch_sha256s": [
+            "9b13b82593f4d227e52094d967dc20876a0e636fa966d534ec628042234222ea"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-neither",
+          "repetition": 1,
+          "selector": "ohm-1.98.0-11",
+          "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+          "fixture": "uv-feature-ablation.json",
+          "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b",
+          "expected_tree_oid": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+          "patch_sha256s": [
+            "9b13b82593f4d227e52094d967dc20876a0e636fa966d534ec628042234222ea"
+          ],
+          "source_difference": "",
+          "unexpected_nonignored_untracked": ""
+        }
+      ]
+    },
+    "system_cpu": {
+      "audit_sha256": "15cc713262c3e4f003c1d5308c5d633caa8d8df786600d026f3507fd406ee2a3",
+      "audit_implementation_sha256": "8bb1d76ec18a46830f97680ccd7717c9315467ea1dbb847dc5e8b9e0c370b869",
+      "scope": "Timed commands only. Approximate command windows use log final-write mtime minus measured duration; logs are written immediately after completion. Two-second telemetry intervals and short-lived process exits limit attribution. Overlapping intervals are clipped to their chronological union. Same-UID versus other-UID CPU is process ownership, not user-mode versus kernel-mode time. This audit describes overlap and does not alter sample acceptance.",
+      "commands": [
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-all",
+          "repetition": 0,
+          "index": 2,
+          "label": "Recheck downstream registry-client dependencies after the private parser edit",
+          "wall_seconds": 2.182326197013026,
+          "log_sha256": "0a6f86734d866bbd569d235579f113850714a19113e7ae3d906eb5025dbb5b5c",
+          "approximate_start_at": 1788898677.296674,
+          "log_written_at": 1788898679.479,
+          "covered_seconds": 2.158860206604004,
+          "coverage_fraction": 0.9892472580674968,
+          "mean_outside_cpu_fraction": 0.01689635547494493,
+          "mean_outside_same_uid_cpu_fraction": 0.0006901832431712519,
+          "mean_outside_other_uid_cpu_fraction": 0.01620617223177368,
+          "mean_security_service_cpu_fraction": 0.011983724308526048,
+          "mean_outside_nonsecurity_cpu_fraction": 0.004912631166418884,
+          "peak_outside_nonsecurity_cpu_fraction": 0.007614036457175642,
+          "peak_outside_cpu_fraction": 0.018706829101813434
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-all",
+          "repetition": 0,
+          "index": 3,
+          "label": "Retest the directly changed Simple API parser library",
+          "wall_seconds": 1.6479574590048287,
+          "log_sha256": "c68180463cb178a1cd63dc1b6dc5ef8a331e689bb9217c8064f07ada190bbbe7",
+          "approximate_start_at": 1788898679.5250425,
+          "log_written_at": 1788898681.173,
+          "covered_seconds": 1.6479575634002686,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.015636500672264228,
+          "mean_outside_same_uid_cpu_fraction": 0.0012087306917215488,
+          "mean_outside_other_uid_cpu_fraction": 0.01442776998054268,
+          "mean_security_service_cpu_fraction": 0.008781685334765841,
+          "mean_outside_nonsecurity_cpu_fraction": 0.006854815337498388,
+          "peak_outside_nonsecurity_cpu_fraction": 0.007614036457175642,
+          "peak_outside_cpu_fraction": 0.020560362941331102
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-public-api-hash",
+          "repetition": 0,
+          "index": 2,
+          "label": "Recheck downstream registry-client dependencies after the private parser edit",
+          "wall_seconds": 4.52548952397774,
+          "log_sha256": "a963a50991d87d9a5d4b9d7fe4a8907f2ae2b4925862c4bbc1c4f2345abca18f",
+          "approximate_start_at": 1788898746.3455105,
+          "log_written_at": 1788898750.871,
+          "covered_seconds": 4.523813009262085,
+          "coverage_fraction": 0.9996295395875359,
+          "mean_outside_cpu_fraction": 0.015836505607639835,
+          "mean_outside_same_uid_cpu_fraction": 0.0003786463608517044,
+          "mean_outside_other_uid_cpu_fraction": 0.015457859246788134,
+          "mean_security_service_cpu_fraction": 0.011777105723880832,
+          "mean_outside_nonsecurity_cpu_fraction": 0.004059399883759004,
+          "peak_outside_nonsecurity_cpu_fraction": 0.006417740468352952,
+          "peak_outside_cpu_fraction": 0.026241427692820958
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-public-api-hash",
+          "repetition": 0,
+          "index": 3,
+          "label": "Retest the directly changed Simple API parser library",
+          "wall_seconds": 1.8438151209848002,
+          "log_sha256": "71c7233057497415c478a3301d1ca1bebb02514dc2c1ee555a81a91c36f387f5",
+          "approximate_start_at": 1788898750.916185,
+          "log_written_at": 1788898752.76,
+          "covered_seconds": 1.8438150882720947,
+          "coverage_fraction": 0.9999999822581424,
+          "mean_outside_cpu_fraction": 0.011689346515271993,
+          "mean_outside_same_uid_cpu_fraction": 0.0006709719306728058,
+          "mean_outside_other_uid_cpu_fraction": 0.011018374584599186,
+          "mean_security_service_cpu_fraction": 0.00850323885107366,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0031861076641983344,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0031874158969581808,
+          "peak_outside_cpu_fraction": 0.016353428356956346
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-neither",
+          "repetition": 0,
+          "index": 2,
+          "label": "Recheck downstream registry-client dependencies after the private parser edit",
+          "wall_seconds": 4.8573683600116055,
+          "log_sha256": "07bea69f2cf67f5520d1485a28079da7f49568022c7b429dd3fa5a63c2652039",
+          "approximate_start_at": 1788898816.8666315,
+          "log_written_at": 1788898821.724,
+          "covered_seconds": 4.852539777755737,
+          "coverage_fraction": 0.9990059262757135,
+          "mean_outside_cpu_fraction": 0.012562052017086264,
+          "mean_outside_same_uid_cpu_fraction": 0.0004430908602276944,
+          "mean_outside_other_uid_cpu_fraction": 0.012118961156858572,
+          "mean_security_service_cpu_fraction": 0.007553528423536217,
+          "mean_outside_nonsecurity_cpu_fraction": 0.005008523593550048,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0062457718825951625,
+          "peak_outside_cpu_fraction": 0.019606399581559027
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-neither",
+          "repetition": 0,
+          "index": 3,
+          "label": "Retest the directly changed Simple API parser library",
+          "wall_seconds": 1.8311593090184033,
+          "log_sha256": "cfe050563e5dcd6b32b3471221b0ff449e0fdc24b719e15646994a8b44bfc82d",
+          "approximate_start_at": 1788898821.7698407,
+          "log_written_at": 1788898823.601,
+          "covered_seconds": 1.8311593532562256,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.014368464346160494,
+          "mean_outside_same_uid_cpu_fraction": 0.00014513600349657063,
+          "mean_outside_other_uid_cpu_fraction": 0.014223328342663924,
+          "mean_security_service_cpu_fraction": 0.008708160209794237,
+          "mean_outside_nonsecurity_cpu_fraction": 0.005660304136366255,
+          "peak_outside_nonsecurity_cpu_fraction": 0.005660304136366255,
+          "peak_outside_cpu_fraction": 0.014368464346160494
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-proc-macro-cache",
+          "repetition": 0,
+          "index": 2,
+          "label": "Recheck downstream registry-client dependencies after the private parser edit",
+          "wall_seconds": 2.0533013970125467,
+          "log_sha256": "0455cd772f90e93a98f4707a1c82798510587e17e0a8a4d8a1d986843dbad48f",
+          "approximate_start_at": 1788898888.4136987,
+          "log_written_at": 1788898890.467,
+          "covered_seconds": 2.0531787872314453,
+          "coverage_fraction": 0.9999402865155209,
+          "mean_outside_cpu_fraction": 0.023506368083108926,
+          "mean_outside_same_uid_cpu_fraction": 0.0011925934285775977,
+          "mean_outside_other_uid_cpu_fraction": 0.02231377465453133,
+          "mean_security_service_cpu_fraction": 0.01713821516342611,
+          "mean_outside_nonsecurity_cpu_fraction": 0.006368152919682815,
+          "peak_outside_nonsecurity_cpu_fraction": 0.006377497315664368,
+          "peak_outside_cpu_fraction": 0.023581908678851966
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-proc-macro-cache",
+          "repetition": 0,
+          "index": 3,
+          "label": "Retest the directly changed Simple API parser library",
+          "wall_seconds": 1.7658741779741831,
+          "log_sha256": "5665b3f6ae1a41ef6dcd470bff94e60ff0a454625a89018860c3e4f608320975",
+          "approximate_start_at": 1788898890.5101259,
+          "log_written_at": 1788898892.276,
+          "covered_seconds": 1.7658741474151611,
+          "coverage_fraction": 0.9999999826946776,
+          "mean_outside_cpu_fraction": 0.018339355953621347,
+          "mean_outside_same_uid_cpu_fraction": 0.00045835546591480476,
+          "mean_outside_other_uid_cpu_fraction": 0.01788100048770654,
+          "mean_security_service_cpu_fraction": 0.011670519807882678,
+          "mean_outside_nonsecurity_cpu_fraction": 0.006668836145738669,
+          "peak_outside_nonsecurity_cpu_fraction": 0.006674201047424809,
+          "peak_outside_cpu_fraction": 0.023581908678851966
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-public-api-hash",
+          "repetition": 1,
+          "index": 2,
+          "label": "Recheck downstream registry-client dependencies after the private parser edit",
+          "wall_seconds": 5.049467008007923,
+          "log_sha256": "f3cb7e251f44f84a285074728cc87e59468e3bc18df9fcb3ed4a7deb71779fc7",
+          "approximate_start_at": 1788898958.246533,
+          "log_written_at": 1788898963.296,
+          "covered_seconds": 5.025748252868652,
+          "coverage_fraction": 0.9953027210393384,
+          "mean_outside_cpu_fraction": 0.015218441459874842,
+          "mean_outside_same_uid_cpu_fraction": 0.0012126958090204574,
+          "mean_outside_other_uid_cpu_fraction": 0.014005745650854383,
+          "mean_security_service_cpu_fraction": 0.009888462766094902,
+          "mean_outside_nonsecurity_cpu_fraction": 0.00532997869377994,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0056469359265731425,
+          "peak_outside_cpu_fraction": 0.02409359704294367
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-public-api-hash",
+          "repetition": 1,
+          "index": 3,
+          "label": "Retest the directly changed Simple API parser library",
+          "wall_seconds": 2.180553440004587,
+          "log_sha256": "4fa4cca0ea9bac8a34e4b0d9bfa847dc90421da11c25f48c3e9aa3f7bc61310a",
+          "approximate_start_at": 1788898963.3524466,
+          "log_written_at": 1788898965.533,
+          "covered_seconds": 2.180553436279297,
+          "coverage_fraction": 0.9999999982915849,
+          "mean_outside_cpu_fraction": 0.011150294487864374,
+          "mean_outside_same_uid_cpu_fraction": 0.00042327532709476385,
+          "mean_outside_other_uid_cpu_fraction": 0.010727019160769612,
+          "mean_security_service_cpu_fraction": 0.008166979842375703,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0029833146454886707,
+          "peak_outside_nonsecurity_cpu_fraction": 0.0056469359265731425,
+          "peak_outside_cpu_fraction": 0.012597010913124701
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-proc-macro-cache",
+          "repetition": 1,
+          "index": 2,
+          "label": "Recheck downstream registry-client dependencies after the private parser edit",
+          "wall_seconds": 1.9606363210186828,
+          "log_sha256": "c697041712678be90e8d87837c8c4bb79e8bbae5374fed1bdfc7caa460348433",
+          "approximate_start_at": 1788899029.7683637,
+          "log_written_at": 1788899031.729,
+          "covered_seconds": 1.9606363773345947,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.022381686010727767,
+          "mean_outside_same_uid_cpu_fraction": 0.0003005722903701606,
+          "mean_outside_other_uid_cpu_fraction": 0.022081113720357603,
+          "mean_security_service_cpu_fraction": 0.017153094237808524,
+          "mean_outside_nonsecurity_cpu_fraction": 0.005228591772919244,
+          "peak_outside_nonsecurity_cpu_fraction": 0.006525139568729924,
+          "peak_outside_cpu_fraction": 0.022795479886473926
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-no-proc-macro-cache",
+          "repetition": 1,
+          "index": 3,
+          "label": "Retest the directly changed Simple API parser library",
+          "wall_seconds": 1.798631324985763,
+          "log_sha256": "ddebde3348b7212142e2461329e78114d22e8a1dcf673bee300757bedae95b49",
+          "approximate_start_at": 1788899031.7743685,
+          "log_written_at": 1788899033.573,
+          "covered_seconds": 1.7915947437286377,
+          "coverage_fraction": 0.9960878134616158,
+          "mean_outside_cpu_fraction": 0.02141044420655253,
+          "mean_outside_same_uid_cpu_fraction": 0.00017382399257769908,
+          "mean_outside_other_uid_cpu_fraction": 0.02123662021397483,
+          "mean_security_service_cpu_fraction": 0.014604709048272095,
+          "mean_outside_nonsecurity_cpu_fraction": 0.006805735158280435,
+          "peak_outside_nonsecurity_cpu_fraction": 0.008174627319226042,
+          "peak_outside_cpu_fraction": 0.021460459026045084
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-all",
+          "repetition": 1,
+          "index": 2,
+          "label": "Recheck downstream registry-client dependencies after the private parser edit",
+          "wall_seconds": 1.865443629998481,
+          "log_sha256": "d00eed27221c30a94b67328da459918c6b4046829d57a2a2864898ee5dccb055",
+          "approximate_start_at": 1788899097.5305562,
+          "log_written_at": 1788899099.396,
+          "covered_seconds": 1.8654437065124512,
+          "coverage_fraction": 1.0,
+          "mean_outside_cpu_fraction": 0.018544118236392196,
+          "mean_outside_same_uid_cpu_fraction": 0.0007363080964589432,
+          "mean_outside_other_uid_cpu_fraction": 0.017807810139933256,
+          "mean_security_service_cpu_fraction": 0.014754780622540401,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0037893376138517947,
+          "peak_outside_nonsecurity_cpu_fraction": 0.003905149391532151,
+          "peak_outside_cpu_fraction": 0.02036672159178359
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-all",
+          "repetition": 1,
+          "index": 3,
+          "label": "Retest the directly changed Simple API parser library",
+          "wall_seconds": 1.604666775005171,
+          "log_sha256": "7426790eaf69f8e3f52dd0cad0ebf194e657e6e061b016ec205990b88d327c76",
+          "approximate_start_at": 1788899099.4403334,
+          "log_written_at": 1788899101.045,
+          "covered_seconds": 1.6046667098999023,
+          "coverage_fraction": 0.9999999594275462,
+          "mean_outside_cpu_fraction": 0.012293988825193808,
+          "mean_outside_same_uid_cpu_fraction": 0.0002892703252986778,
+          "mean_outside_other_uid_cpu_fraction": 0.01200471849989513,
+          "mean_security_service_cpu_fraction": 0.008388839433661656,
+          "mean_outside_nonsecurity_cpu_fraction": 0.003905149391532151,
+          "peak_outside_nonsecurity_cpu_fraction": 0.003905149391532151,
+          "peak_outside_cpu_fraction": 0.012293988825193808
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-neither",
+          "repetition": 1,
+          "index": 2,
+          "label": "Recheck downstream registry-client dependencies after the private parser edit",
+          "wall_seconds": 4.710829769988777,
+          "log_sha256": "413b37d6d88220109335f05ec534c0387517e2c319b1bd18ca8962cb42192a86",
+          "approximate_start_at": 1788899165.6081703,
+          "log_written_at": 1788899170.319,
+          "covered_seconds": 4.690439224243164,
+          "coverage_fraction": 0.9956715596314868,
+          "mean_outside_cpu_fraction": 0.014481360066823976,
+          "mean_outside_same_uid_cpu_fraction": 0.00046010924550208665,
+          "mean_outside_other_uid_cpu_fraction": 0.01402125082132189,
+          "mean_security_service_cpu_fraction": 0.009145188433728538,
+          "mean_outside_nonsecurity_cpu_fraction": 0.005336171633095437,
+          "peak_outside_nonsecurity_cpu_fraction": 0.006426052077609188,
+          "peak_outside_cpu_fraction": 0.016606666673185208
+        },
+        {
+          "stage": "ablation",
+          "project": "uv",
+          "toolchain": "ohm-neither",
+          "repetition": 1,
+          "index": 3,
+          "label": "Retest the directly changed Simple API parser library",
+          "wall_seconds": 2.385412528004963,
+          "log_sha256": "a64916107af0593c64033c1552d2b63940e2713f1bf3791115ee1d348b1b81cc",
+          "approximate_start_at": 1788899170.3685875,
+          "log_written_at": 1788899172.754,
+          "covered_seconds": 2.357104778289795,
+          "coverage_fraction": 0.9881329751634854,
+          "mean_outside_cpu_fraction": 0.014422154604436443,
+          "mean_outside_same_uid_cpu_fraction": 0.00017862783878793006,
+          "mean_outside_other_uid_cpu_fraction": 0.014243526765648514,
+          "mean_security_service_cpu_fraction": 0.011271932691710682,
+          "mean_outside_nonsecurity_cpu_fraction": 0.0031502219127257634,
+          "peak_outside_nonsecurity_cpu_fraction": 0.006426052077609188,
+          "peak_outside_cpu_fraction": 0.014750710450875636
+        }
+      ]
+    },
+    "excluded_host_attempts": [
+      {
+        "archive_sha256": "de657568f6e0d395643f8329b14e2a1696166aea93c1120f222407d5de41df4b",
+        "bytes": 94232,
+        "samples_collected": 2,
+        "samples_used_for_publication": 0,
+        "reason": "Sustained outside CPU use dominated by the Falcon security service exceeded the predeclared load limit."
+      },
+      {
+        "archive_sha256": "d067f952e0be354efa8501b2791d2df22ad3227452c9ec0ffc4793d9a627b89e",
+        "bytes": 93825,
+        "samples_collected": 1,
+        "samples_used_for_publication": 0,
+        "reason": "The original all-process CPU limit rejected sustained Falcon activity while system maintenance was also active."
+      }
+    ]
+  },
+  "host": {
+    "platform": "linux-x86_64",
+    "id": "linux-study-1",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC-Milan Processor"
+  },
+  "completed_at": "2026-09-08T20:26:12.867342+00:00"
+}
