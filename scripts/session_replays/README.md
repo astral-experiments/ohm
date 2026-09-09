@@ -19,11 +19,11 @@ work.
 
 ```sh
 ulimit -n 65536
-install -d -m 700 /tmp/ohm-replay
-export TMPDIR=/tmp/ohm-replay
+install -d -m 700 /tmp/ohm-replay-1
+export TMPDIR=/tmp/ohm-replay-1
 python3 scripts/replay_sessions.py \
-  --upstream 1.98.0 \
-  --ohm ohm-1.98.0-11 \
+  --upstream 1.98.1 \
+  --ohm ohm-1.98.1-1 \
   --scenario scripts/session_replays/ruff-rust-1.98.json \
   --scenario scripts/session_replays/codex-stable-goal-accounting.json \
   --source-path ruff=/path/to/ruff \
@@ -110,7 +110,8 @@ python3 scripts/replay_sessions.py \
   --project uv \
   --scenario scripts/session_replays/uv-feature-ablation.json \
   --source-path uv=/path/to/uv \
-  --ohm ohm-1.98.0-11 \
+  --upstream 1.98.1 \
+  --ohm ohm-1.98.1-1 \
   --output-dir /path/to/new-empty-ablation-results \
   --feature-matrix \
   --jobs 8 \
