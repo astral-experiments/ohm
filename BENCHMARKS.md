@@ -23,14 +23,14 @@ runner may need network access to clone source repositories. Cargo commands run 
 Preview the plan without cloning or building:
 
 ```console
-uv run scripts/benchmark.py --dry-run
+uv run scripts/benchmark.py --upstream 1.98.1 --ohm ohm-1.98.1-1 --dry-run
 ```
 
 Run both projects:
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.98.0 --ohm ohm-1.98.0-11 --jobs 8 \
+  --upstream 1.98.1 --ohm ohm-1.98.1-1 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -89,12 +89,18 @@ The result files record the measured versions, source revisions, configuration, 
 historical macOS/APFS disk studies used a separate volume-allocation meter and worktree schedule;
 `benchmark.py` measures elapsed time and does not reproduce those studies.
 
-Revision 11 results cover [216 workflow samples](scripts/benchmark_results/release-1.98.0-11.json), [12 current-session replays](scripts/session_replays/release-1.98.0-11-baseline.json), [four historical Ruff replays](scripts/session_replays/release-1.98.0-11-ruff-historical.json), and [eight uv ablation replays](scripts/session_replays/release-1.98.0-11-uv-feature-ablation.json). Linux timings use eight jobs on a 32-CPU AMD EPYC-Milan Processor managed devbox, with Falcon and other infrastructure services enabled.
+Ohm 1.98.1 revision 1 results cover [216 workflow samples](scripts/benchmark_results/release-1.98.1-1.json), [12 current-session replays](scripts/session_replays/release-1.98.1-1-baseline.json), [four historical Ruff replays](scripts/session_replays/release-1.98.1-1-ruff-historical.json), and [eight uv ablation replays](scripts/session_replays/release-1.98.1-1-uv-feature-ablation.json). Linux timings compare stock Rust 1.98.1 with Ohm using eight jobs on a 32-CPU AMD EPYC-Milan Processor managed devbox, with Falcon and other infrastructure services enabled.
 
-Each suite passed six five-second preflight checks requiring at least 95% idle, at most 0.5% I/O wait and 0.1% steal, and no unrelated compilers. Continuous monitoring rejects unrelated compilers, intervals with more than 5% host CPU used by other processes belonging to the benchmark user, and three consecutive two-second intervals with more than 5% outside CPU across all users excluding the recorded Falcon service. All service overhead remains in the timings. The CPU audit covers all 428 timed commands; 20 averaged more than 5% outside CPU, with a maximum of 14.86%.
+Each suite passed six five-second preflight checks requiring at least 95% idle, at most 0.5% I/O wait and 0.1% steal, and no unrelated compilers. Continuous monitoring rejects unrelated compilers, intervals with more than 5% host CPU used by other processes belonging to the benchmark user, and three consecutive two-second intervals with more than 5% outside CPU across all users excluding the recorded Falcon service. All service overhead remains in the timings. The runs retain at least 60 GiB of free space. The CPU audit records telemetry for all 428 timed commands, including gaps in their estimated measurement windows.
 
-Compiler-overlap monitoring rejected 18 samples and interrupted one Codex replay, which was restarted from fresh artifacts. Four completed replays and their logs were preserved unchanged. The evidence also retains two earlier attempts rejected by a stricter CPU limit and rejected preflights.
+Two compiler-overlap incidents caused three workflow samples to be discarded; both affected workflows were rerun from fresh artifacts. A Codex TUI test rejected an encoded temporary filename as image data. Changing only the temporary-directory path resolved the failure, and all four Codex replay cells use that same corrected path. The failed cell was restarted from fresh artifacts, while four completed Ruff and uv replays and their logs were preserved unchanged. The evidence retains the failed attempt and the diagnostic that isolated the path-dependent assertion.
 
-The [APFS study](scripts/benchmark_results/disk-1.98.0-11.json) measures physical allocation across eight cohorts and 44 worktrees. Its [uv fixture](scripts/session_replays/disk-1.98.0-11-uv.json) applies the same test patch to both toolchains. The results retain three differences in nextest's `leaky` annotation; all test commands passed. Workspace snapshots were imported into all nine sibling worktrees in each Ohm cohort. The meter retains unsettled readings and retries measurement after successful commands.
+A later compiler-overlap detection stopped the second uv/Ohm replay during warmup, before any timed commands. Eight completed sessions and their logs were preserved. The unfinished uv session restarted with fresh private and shared build directories; the interrupted warmup and its artifacts are retained on the benchmark host.
+
+The [APFS study](scripts/benchmark_results/disk-1.98.1-1.json) measures physical allocation across eight cohorts and 44 worktrees. Its [uv fixture](scripts/session_replays/disk-1.98.1-1-uv.json) applies the same test patch to both toolchains. All 404 Cargo commands and 53,664 test executions passed. Another 22 runtime checks passed after measurement. Workspace snapshots were imported into all nine sibling worktrees in each Ohm cohort.
+
+The meter reads native APFS volume allocation and cross-checks it against container allocation. The one- and ten-worktree comparisons use measurements taken after at least 30 seconds idle; the two-worktree comparisons use the checkpoint immediately after the continuation completes. The local study reports physical allocation only.
+
+The evidence retains ten allocation measurement retries after successful commands. One preflight detected unrelated compilers and prevented the next cohort from starting. Six failed meter launches and a failure in the continuation check were corrected before their workloads started; neither required workload reruns.
 
 Replays set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all`; the APFS study also sets `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all`. These comparisons use each runner's documented configuration against stock Rust and do not isolate individual optimizations or changes between Ohm releases.
