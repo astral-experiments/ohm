@@ -310,31 +310,6 @@
     "global_helpers_unchanged": true,
     "paired_arms_share_helper_environment": true,
     "standalone_uv_fixture_commands": 0,
-    "input_receipt_sha256": {
-      "ablation-completed.json": "fe53ecfb718f61671bf1de47bebbebc4a9583675fce0fb7db64ec80072dc09c3",
-      "ablation-prelaunch-recovery-1-completed.json": "fba160acd2b6e2fa07b91948b982f7f20d6dd0a34b778536a68f033cc0f7eb48",
-      "ablation-prelaunch-recovery-1-prior-postrun-status.json": "daef99ab4709fc1229c652d74ef53735afb1fa54c2e5834c80fa4f887c728cb5",
-      "ablation-prelaunch-recovery-1-prior-suite-status.json": "abb97221108a9bcd91ac0730df80850659e6e8fbce367b31e3097c4c8c0951d1",
-      "ablation-prelaunch-recovery-1.json": "5a2bebdd72a0660a3974da91e05092651d6201100801cf549de1845d956f1773",
-      "ablation-ready.json": "f0a438d32140b081c08b59c9f21fc968880d4293857dc57294cedecfd3b5ad74",
-      "ablation-started-20260903T165245.344616Z.json": "535b0bda1e1422474c8e1bce4a4cd12b6017607402b3681c0da6c1819b57d0f3",
-      "bootstrap-status.json": "913a564f49dbf0a521def7edfe6916d6ffab08054abcfed8b82ee97bd331b267",
-      "current-completed.json": "08c2ba874d992e31e89287f1187656ebebd455e5884ef7e8d97fa046c73cdf27",
-      "current-ready.json": "b4a2e13e5e7cf6131e40383aede8dd7ef80c39f1df8aead7f7fd2e9be56bcee3",
-      "current-started-20260903T134147.593109Z.json": "cadb31384480e1d0c9ad3973288ed4883202148f19c3569f09bbc7d0b1177aee",
-      "direct-prepared.json": "2732b9deb56349c741a7e1a102cf9b4565ccefdaa1b438a4949fce47c22c83e5",
-      "direct-quiet-1788442907551090641.json": "115e06be9edc84f92618ee7b33bf0f30b4de3cafa7ddfaeb3631f72129d0dc9e",
-      "direct-quiet-1788448937231458926.json": "6c3f369d6aaec2be6ce97851cd1423b455bb841b89ce44bf2958f5a761725526",
-      "direct-quiet-1788454365303020113.json": "9bf87e31cb9acc90023ff7db4c2e70cb3f602c00bd332c4fa6339c49477ac4cd",
-      "global-rustup-before-2387581.json": "9af4ed08c37c4b8eba0359cec246d274fb104774d909c9329b9840e549b18a03",
-      "helpers.json": "9a80ec2bee814775a5afb7cf116116eca5b4cc2ffccfe698077afbf481469e4e",
-      "initial-discovery.json": "4704c7fcadb3da86576a26b806274ccf727aa059abc99806c3faeb7e3c3e61ab",
-      "postrun-prelaunch-recovery-prior-status.json": "daef99ab4709fc1229c652d74ef53735afb1fa54c2e5834c80fa4f887c728cb5",
-      "postrun-prelaunch-recovery.json": "aec8b3114abd31200fa78d1404793e754dca38dd4103969cacf9bd144e48b900",
-      "release-assets.json": "d5bf82e978b25d189e895cc532d7088add3d0e8021089afe28089c0bd442ba72",
-      "suite-status.json": "a88366d719ce480dab61df78903007bce86717ecbe59675aafee24657c566537",
-      "toolchains.json": "910aec91cfb96661a33cc966f01692609fe1070e3b2bc2f83bf1d4cb9fb4394a"
-    },
     "prelaunch_quiet_gate": {
       "phase": "before_benchmark_launch",
       "scope": "ablation",
@@ -390,5 +365,11 @@
     "logical_cpus": 32,
     "cpu_model": "AMD EPYC 9V74 80-Core Processor"
   },
-  "completed_at": "2026-09-03T17:00:58.291286+00:00"
+  "completed_at": "2026-09-03T17:00:58.291286+00:00",
+  "evidence": {
+    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-evidence-1.98.1-2/benchmark-evidence-through-1.98.1-2.zip",
+    "sha256": "0e7581f8f1ae37b42e2d5a9a4d4edc626ef3218710f7ad8c1465ea49e592dac9",
+    "path": "scripts/session_replays/release-1.98.0-8-uv-feature-ablation.json",
+    "report_sha256": "d33cdd420d7a62621eeccda77f2ecd64ee0c5cf75fa48348255229c60d9cf978"
+  }
 }

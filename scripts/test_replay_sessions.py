@@ -7,7 +7,6 @@ import hashlib
 import importlib.util
 import json
 import os
-import statistics
 import subprocess
 import sys
 import tempfile
@@ -25,6 +24,8 @@ if SPEC is None or SPEC.loader is None:
 replay = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = replay
 SPEC.loader.exec_module(replay)
+
+from publish_benchmarks import latest_reports
 
 
 class ReplayTestCase(unittest.TestCase):
@@ -214,14 +215,8 @@ class FixtureValidationTests(ReplayTestCase):
         fixture = SCRIPTS / "session_replays" / "ruff-historical-rust-1.98.json"
         published_fixture = SCRIPTS / "session_replays" / "ruff-historical.json"
         scenario = replay.load_scenario(fixture)
-        baseline = json.loads(
-            (
-                SCRIPTS / "session_replays" / "release-1.98.1-2-ruff-historical.json"
-            ).read_text()
-        )
+        baseline = latest_reports()["historical"]
 
-        self.assertEqual(baseline["rust_version"], "1.98.1")
-        self.assertEqual(baseline["ohm_release"], "ohm-1.98.1-2")
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
@@ -247,23 +242,15 @@ class FixtureValidationTests(ReplayTestCase):
         fixture = SCRIPTS / "session_replays" / "ruff-rust-1.98.json"
         published_fixture = SCRIPTS / "session_replays" / "ruff.json"
         scenario = replay.load_scenario(fixture)
-        baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.98.1-2-ruff.json").read_text()
-        )
-        self.assertEqual(baseline["ohm_release"], "ohm-1.98.1-2")
+        baseline = latest_reports()["sessions"]
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
-        self.assertEqual(baseline["environment"], scenario.environment)
         self.assertEqual(
-            baseline["provenance"]["published_fixture_sha256"],
+            baseline["provenance"]["canonical_fixture_sha256"]["ruff"],
             hashlib.sha256(published_fixture.read_bytes()).hexdigest(),
         )
         self.assertEqual(
             baseline["provenance"]["effective_fixture_sha256"]["ruff"],
             hashlib.sha256(fixture.read_bytes()).hexdigest(),
-        )
-        self.assertEqual(
-            baseline["methodology"]["ruff_rust_1_98_clippy_allow"],
-            ["clippy::format_push_string"],
         )
         self.assertEqual(baseline["sessions"][0]["session_id"], scenario.session["id"])
         self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
@@ -403,86 +390,6 @@ class FixtureValidationTests(ReplayTestCase):
                                 repetition
                             ],
                         )
-
-    def test_readme_selected_session_table_matches_recorded_results(self) -> None:
-        baseline = json.loads(
-            (SCRIPTS / "session_replays" / "release-1.98.1-2-baseline.json").read_text()
-        )
-        baselines = {project: baseline for project in replay.PROJECTS}
-        rows = [
-            [cell.strip() for cell in line.strip("|").split("|")]
-            for line in (SCRIPTS.parent / "README.md").read_text().splitlines()
-            if line.startswith("|")
-        ]
-        self.assertEqual(sum(row[0] == "Ruff session" for row in rows), 1)
-        self.assertIn(
-            ["Scope", "Rust 1.98.1", "Ohm 1.98.1-2", "Time saved"], rows
-        )
-
-        def assert_row(label: str, stock: float, ohm: float) -> None:
-            saved = stock - ohm
-            sign = "−" if saved < 0 else ""
-            self.assertIn(
-                [
-                    label,
-                    f"{stock:,.2f} s",
-                    f"{ohm:,.2f} s",
-                    f"{sign}{abs(100 * saved / stock):.2f}%",
-                ],
-                rows,
-            )
-
-        def command_seconds(
-            project: str, toolchain: str, categories: set[str]
-        ) -> float:
-            return sum(
-                statistics.fmean(command["wall_seconds"][toolchain])
-                for command in baselines[project]["commands"][project]
-                if command["category"] in categories
-            )
-
-        for project, label in (
-            ("ruff", "Ruff session"),
-            ("uv", "uv session"),
-            ("codex", "Codex session"),
-        ):
-            assert_row(
-                label,
-                statistics.fmean(
-                    baselines[project]["timed_session_seconds"][project]["stock"]
-                ),
-                statistics.fmean(
-                    baselines[project]["timed_session_seconds"][project]["ohm"]
-                ),
-            )
-
-        for category, label in (
-            ("check", "`cargo check`"),
-            ("test", "`cargo test`, `cargo nextest`, `just test`"),
-            ("clippy", "`cargo clippy`"),
-            ("formatting", "`cargo fmt`"),
-        ):
-            assert_row(
-                label,
-                sum(command_seconds(p, "stock", {category}) for p in replay.PROJECTS),
-                sum(command_seconds(p, "ohm", {category}) for p in replay.PROJECTS),
-            )
-
-        for field, label in (
-            ("timed_session_seconds", "All sessions"),
-            ("timed_command_seconds", "All commands"),
-        ):
-            assert_row(
-                label,
-                sum(
-                    statistics.fmean(baselines[p][field][p]["stock"])
-                    for p in replay.PROJECTS
-                ),
-                sum(
-                    statistics.fmean(baselines[p][field][p]["ohm"])
-                    for p in replay.PROJECTS
-                ),
-            )
 
     def test_rejects_incomplete_or_uppercase_commit_shas(self) -> None:
         for revision in ("abc123", "A" * 40, None):
