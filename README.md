@@ -66,7 +66,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.98.1-1/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.98.1-2/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -89,7 +89,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.98.1-1 test` selects that specific installed revision.
+`cargo +ohm-1.98.1-2 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, parallel
 compiler frontends, and reuse of previously built registry and workspace dependencies by default.
@@ -98,6 +98,10 @@ Opt out with `-Zohm-defaults=no`:
 ```console
 cargo +ohm -Zohm-defaults=no test
 ```
+
+Development and test builds default to `debug = "line-tables-only"`, preserving file-and-line
+backtraces. Set `[profile.dev] debug = true` for full type and variable debug information; explicit
+profile settings retain their normal precedence.
 
 Native x86_64 Linux GNU builds use the bundled upstream Wild linker by default.
 Use `-Zohm-linker=lld` to select LLD; explicit linker settings take precedence.
