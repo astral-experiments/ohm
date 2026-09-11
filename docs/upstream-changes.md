@@ -1,238 +1,73 @@
 # Changes from upstream
 
-Ohm 1.98.1-2 defaults development builds to line-table debug information, requires filesystem cloning for worktree seeds, and improves incremental reuse after async code moves within a file. It remains based on the exact upstream Rust 1.98.1 release. Clippy, rustfmt, and bundled Wild retain their revision-1 pins.
+Ohm combines experimental Rust, Cargo, Clippy, and rustfmt changes for local development.
+Each release pins the complete set of sources in its [toolchain manifest](../toolchains/).
+Use the official Rust toolchain for production builds and final validation.
 
-[ohm-cargo#127](https://github.com/astral-sh/ohm-cargo/pull/127) changes the built-in `dev` debug level to `line-tables-only`. The `test` profile and custom profiles inheriting from `dev` inherit this default, including for dependencies. File-and-line backtraces remain available; type and variable information used for interactive debugging is omitted. Explicit manifest, Cargo config, environment, and package settings retain their normal precedence. Set `[profile.dev] debug = true` for full debug information, or use `-Zohm-defaults=no` to restore Cargo's ordinary defaults.
+## In Ohm 1.98.1-2
 
-[ohm-cargo#126](https://github.com/astral-sh/ohm-cargo/pull/126) requires copy-on-write filesystem cloning when importing worktree build state. If any snapshot file cannot be cloned, Cargo discards that profile's staged build and incremental trees and creates the worktree without that seed. The recipient then builds normally. Ordinary I/O errors still surface as errors.
+- **Line-table debug information by default.** Development and test builds retain file-and-line
+  backtraces while omitting interactive debugger type and variable information. Explicit profile,
+  Cargo configuration, environment, and package overrides keep their normal precedence. Set
+  `[profile.dev] debug = true` for full debug information. [Cargo #127](https://github.com/astral-sh/ohm-cargo/pull/127)
+- **Clone-only worktree seeds.** Build state is imported only when the filesystem can clone every
+  snapshot file. A profile that cannot be cloned builds normally without a seed; ordinary I/O errors
+  still surface. [Cargo #126](https://github.com/astral-sh/ohm-cargo/pull/126)
+- **Reuse after moving async code.** Coroutine code generation no longer depends on debug names
+  and source locations. `-Zdebug-info-type-line-numbers=true` restores coroutine state declaration
+  locations when needed. [Rust #132](https://github.com/astral-sh/ohm-rust/pull/132)
 
-[ohm-rust#132](https://github.com/astral-sh/ohm-rust/pull/132) separates coroutine codegen layout from debug names and source locations, allowing unchanged async code to reuse generated code after moving within a file. Coroutine state declaration locations are omitted by default and can be restored with `-Zdebug-info-type-line-numbers=true`; state names, saved fields, and instruction locations remain available when the selected debug level includes them. Targeted replay results are documented in the PR; a whole-release speedup against revision 1 has not been measured.
+This release uses upstream Rust 1.98.1. Clippy, rustfmt, and bundled Wild retain their revision-1 pins.
+The [benchmarks](../BENCHMARKS.md) compare the complete release with stock Rust; they do not isolate
+these changes from previous Ohm releases.
 
-Ohm 1.98.1-1 ports the released Ohm 1.98.0-11 feature set to the exact upstream Rust 1.98.1 release, including its [fix for incorrect vtable generation](https://github.com/rust-lang/rust/issues/161441). The selected component changes are listed below.
+## Incremental builds
 
-Ohm 1.98.0-11 fixed a regression in revision 10 that disabled immutable registry artifact sharing and build-to-check reuse when the bundled Wild linker was selected. [ohm-cargo#123](https://github.com/astral-sh/ohm-cargo/pull/123) recognizes Cargo's generated linker flags during cache admission while retaining the flags in compiler invocations and fingerprints. Explicit user overrides keep their existing checks. [ohm#113](https://github.com/astral-sh/ohm/pull/113) adds installed-toolchain release tests for shared registry artifacts, reuse between worktrees, and build-to-check reuse with Wild enabled.
+Public API hashes avoid rebuilding dependents when an edit leaves their relevant interface unchanged.
+Cached relinking reuses generated code when only the final executable needs to change. Ohm also reuses
+compatible generic-function partitions, metadata, and compiler query results across edits.
 
-Ohm retains upstream Wild 0.10.0 by default for native x86_64 Linux GNU builds, preserves worktree snapshots after Clippy on clone-capable storage, reduces sparse compiler metadata, and uses indexed Cargo dependency scheduling. It retains mimalloc 3.5.1 for Apple Silicon Cargo and x86_64 Linux rustc.
+Cargo reuses compiled dependencies across builds, checks, tests, and Clippy. It preserves check graphs
+across test builds, avoids relinking unaffected integration tests, and skips redundant dependency
+resolution. Procedural-macro caching reuses expansions subject to the configured trust policy.
 
-Linux distributions include the checksum-pinned upstream Wild executable and its licenses. Cargo uses it for native rustc invocations, including build scripts, procedural macros, and test binaries. Explicit linker settings take precedence; `-Zohm-linker=lld` selects LLD, and `-Zohm-defaults=no` disables automatic selection. Rustdoc doctests, native compilation inside build scripts, and other targets retain their existing configuration. This uses full linking. The experimental ohm-wild fork and Mach-O linker are excluded.
+## Worktrees and disk usage
 
-Cargo automatically isolates matching bundled Clippy outputs when the shared snapshot storage supports filesystem cloning. Ordinary build/test snapshots remain eligible for worktree import; Clippy lint state remains private. Unsupported storage retains conservative behavior. The cache namespace changes, so existing state must be rebuilt before benefiting. The paired APFS study in [ohm-cargo#108](https://github.com/astral-sh/ohm-cargo/pull/108) found lower retained allocation and whole-workflow time, with additional repeated donor-Clippy overhead; these results are scoped to that workflow.
+Shared registry artifacts live in a separate build directory; each worktree keeps its own target
+directory. Fine-grained locks coordinate concurrent builds. `cargo +ohm worktree add` seeds compatible
+workspace and incremental state using filesystem clones, then revalidates source and build inputs.
+Matching Clippy state stays separate from reusable build and test state.
 
-The compiler stores sparse metadata tables as bitmaps, rank indexes, and compact payloads, retaining dense encoding when it is smaller. [ohm-rust#123](https://github.com/astral-sh/ohm-rust/pull/123) measured 21.56–38.32% smaller individual metadata files and 1.84–2.64% less allocated space across complete incremental targets, with a 0.024–0.156% compiler instruction increase. These are targeted measurements, not a whole-release speedup claim.
+The compiler reduces sparse metadata, retires superseded incremental sessions, and reuses stable
+paths for retained debug objects. Optional `-Zohm-incremental-gc` tracking allows age-based collection
+with `cargo -Zohm-incremental-gc clean incremental --max-age '30 days'`; tracking is disabled by default.
 
-Cargo uses mimalloc on macOS Apple Silicon and the system allocator on Linux. rustc uses mimalloc on x86_64 Linux and jemalloc on macOS; LLVM allocations inside rustc follow that choice. rustdoc and Clippy retain jemalloc on both platforms, while rustfmt and standalone LLVM tools retain their existing allocators.
+See the [usage guidance](../README.md#usage) for target-directory layout, trust settings, and worktree
+commands.
 
-Matched release builds using revision 8 sources, with PGO on both platforms and BOLT on Linux, found Apple Silicon Cargo commands 4.6–8.3% faster with mimalloc. On x86_64 Linux, mimalloc reduced compiler wall time by 5.3% for a Ruff/ty check rebuild, 9.8% for a uv executable rebuild, and 7.8% for a uv edit-and-test command. Some Linux compiler workloads used 21–25% more peak process memory. These allocator comparisons predate the later compiler changes in this release and are not measurements of revision 9 against revision 8.
+## Compiler and tools
 
-The compiler avoids repeated trait lookups, substitutions, and dependency-read tracking. It skips type-checker and borrow-checker work when the result is already known, while retaining independent borrow-checker worklists and full checking for contextual associated-type bounds. Cargo reuses its source-checksum buffer across files.
+Ohm enables parallel compiler frontends and reduces repeated work in trait selection, type folding,
+borrow checking, metadata handling, and dependency scheduling. Clippy can replay eligible diagnostics
+for unchanged modules; rustfmt can skip unchanged packages and format individual changed modules.
 
-Incremental cache promotion visits saved query values and can retain serialized bytes for up to three cache generations before compacting them. Fingerprint checks remain in place, and retained allocations share decoding state with newly encoded values to preserve identity.
+Release compilers use PGO, with BOLT on Linux, and component PGO where supported. Native x86_64 Linux
+GNU builds use bundled upstream Wild for full linking; explicit linker settings take precedence.
+`-Zohm-linker=lld` selects LLD. `-Zohm-defaults=no` disables Cargo's automatic experimental defaults.
+See [release documentation](releases.md) for the build and packaging details.
 
-Metadata-only compilation can export coroutine runtime layouts without constructing executable resume and drop bodies. Unoptimized code generation skips empty cleanup paths and splits temporary aggregates while preserving debug information. Non-incremental codegen-unit merging uses MIR basic-block counts, and eligible optimized LLVM pipelines merge equivalent functions before inlining.
+## Included patches
 
-After a successful serial incremental build, the compiler keeps one completed session instead of retaining both the new session and its predecessor. Active sessions remain protected, and locked snapshots are retained for overlapping compilations. This reduces steady-state dependency-graph and query-cache storage; the previous snapshot is still needed while compiling its replacement.
+Generate the exact component commit inventory from any pinned manifest:
 
-Incremental builds with unpacked debuginfo now reuse stable paths for retained debug objects, unlinking the previous entry before writing or restoring it so hard-linked incremental work products remain immutable. This prevents a new randomly named set of objects from accumulating on every rebuild. Explicit object outputs, saved temporaries, and saved link state retain their existing filenames. Existing leaked files are not removed, and builds with debug information disabled do not benefit from this object-file change.
+```console
+python3 scripts/list_patches.py toolchains/1.98.1/2.json
+```
 
-Audits of existing macOS development caches estimated about 3.8 GiB less retained dependency-graph and query-cache data for a Ruff/ty worktree and 1.8 GiB for a uv worktree after rebuilding the represented variants. Separately, retained debug-object histories suggested roughly 1–2 GB of physical storage growth avoided over 20–30 ty library recompilations. These are estimates from different existing workloads, not a combined saving measured in one session. Narrower sessions save less, and an independent release-build speedup has not been established.
+The command uses `gh-auto` to compare each pinned component with the corresponding revision in the
+upstream Rust release. It prints commit links in source-history order, including setup and CI changes.
+This avoids maintaining a second list of release contents as PR titles and branches change.
 
-`cargo +ohm worktree add -b charlie/my-change ../my-change --target-dir /path/to/targets/my-change` creates a Git worktree and clones compatible private artifacts and incremental state into independently writable storage. Import requires copy-on-write filesystem cloning; profiles that cannot be cloned remain unseeded. Use the same separate `CARGO_BUILD_BUILD_DIR` for donor and recipient builds and a distinct `CARGO_TARGET_DIR` for each worktree. Branch selection follows `git worktree add`, including existing branches and explicit `--detach`.
-
-Normal Ohm builds prepare worktree seeds automatically. Build the donor once with this release before creating a seeded worktree; enabling preparation can rebuild existing artifacts. Source checksums and stable compiler paths allow equivalent checkouts to reuse artifacts despite changed timestamps and locations. Build scripts rerun in the recipient; matching generated bytes and settings can preserve consumers after source and environment revalidation. Mutable artifacts remain private, and unsupported or untrusted inputs retain conservative rebuilds. Preparation reads source contents and remaps compiler working-directory paths, which can affect debugger source lookup. Use `-Zohm-worktree-seeds=no` to opt out, or `-Zohm-defaults=no` to disable all Ohm defaults.
-
-Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` on `cargo +ohm worktree add` to admit snapshots containing local procedural macros. This local snapshot admission requires the option only when creating the worktree, not during donor preparation or subsequent recipient builds. Local-macro history survives later builds and removal of the macro, so another fork requires its own opt-in. This is potentially unsound: macros can read untracked files or environment variables, and the recipient can retain donor-specific expansions. Imported artifacts remain independently writable. Compiler wrappers, custom backends, unsupported Cargo-generated paths, and nonshared macros from non-path sources still exclude the profile. Profiles with local-macro history retain conservative consumer rebuilds after build-script reruns, even when the script outputs match. Preparation markers, Cargo fingerprints, and compiler-visible path mapping advance to v6, so older donors must be rebuilt before import. Registry-macro trust during ordinary builds is unchanged.
-
-The compiler no longer depends on output filenames when the selected debug format does not use them. This preserves unchanged LLVM codegen units after output-directory relocation on macOS, with and without debug information, while retaining the existing dependencies for CodeView and split DWARF.
-
-Compiler workers cache canonical types, predicates, generic arguments, and region-only freshening results. Cache hits check their full keys and reuse canonical values; misses retain the shared interner. Type relations and folds reuse unchanged results after the required checks, and small obligation dependency lists are stored inline. The interner hit paths and structural key operations are inlined. These changes have targeted correctness and instruction-count evidence; an independent end-to-end speedup for this release has not been established.
-
-Type relations, projection, and rebasing reuse existing interned generic argument lists when their arguments are unchanged. Query type operations that hit their fast path avoid creating an empty obligation context or inference snapshot, preserving relation evaluation, diagnostics, and region-constraint collection and resolution.
-
-Cranelift preparation, bootstrap directory copies, and incremental compilation sessions can clone fresh directory trees on macOS. Unsupported filesystems and populated destination directories retain their copy or merge paths. Changes to cloned files do not modify the originals.
-
-Eligible incremental query-cache entries can be promoted in parallel. This experiment was excluded from Ohm 1.98.0-4 and is included in the selected compiler stack for this release. It passes current correctness checks, but an independent parallel speedup in the optimized release configuration has not been established.
-
-The compiler fork runs 22 CodSpeed Walltime scenarios across `bitmaps`, `syn`, `serde`, `regex-automata`, Ruff’s `ty_python_semantic`, and `uv-resolver`, including check and unoptimized codegen workloads. Profile audits verify the measured compiler process. These use single-threaded compiler invocations and an optimized stage-1 compiler without release PGO/BOLT; they are separate from end-to-end release measurements.
-
-Clippy runs 56 audited late passes covering 62 lint kinds through incremental module queries. Unchanged modules can replay their diagnostics without rerunning those passes. Compiler-driver inputs participate in cache compatibility, and source-sensitive suggestions track the files they read, including comment and macro-context changes. Other passes retain their existing traversal; compilers without the required hooks also retain the existing path.
-
-Module lint queries now observe individual effective-visibility entries instead of the entire map. Adding an unrelated exported item no longer invalidates every module through that dependency, while changes to a relevant item's visibility still update its diagnostics. Whole-crate passes and nonincremental builds retain direct map lookups.
-
-Cargo reserves shared registry unit locks in a consistent order, retaining read locks for fresh units and write locks for dirty units. This repairs deadlocks between simultaneous cold worktrees and keeps the locks alive for scheduled compiler, build-script, and rustdoc children on Linux and macOS. Nested builds fall back to private artifacts. The shared-cache namespace changes, so the first build repopulates affected artifacts; this is a correctness repair, and lock preparation can add overhead to unchanged builds.
-
-Well-formedness checking collects ancestor predicate slices once and instantiates them directly into the final obligations, preserving substitution, diagnostic spans, ordering, and escaping-bound-variable filtering. The compiler's Cargo gitlink selects the exact Cargo revision in the release manifest. The existing component profile-guided optimization, parallel compiler frontend, dependency reuse, and formatter optimizations remain enabled.
-
-The parsed-lockfile-cache, recent-type-fold, and draft prefix-cloning experiments remain excluded.
-
-The [timing and retained-disk measurements](../BENCHMARKS.md) compare Ohm 1.98.1-2 with stock Rust 1.98.1 across direct workflows, recorded development sessions, and macOS/APFS worktree cohorts. The recorded source fixtures match the prior study. These comparisons do not isolate individual changes between Ohm releases.
-
-The combined Clippy/codegen experiment remains excluded. Run standalone `cargo +ohm clippy` for linting. The experimental changes remain available in [Rust #96](https://github.com/astral-sh/ohm-rust/pull/96), [Cargo #102](https://github.com/astral-sh/ohm-cargo/pull/102), and [Clippy #51](https://github.com/astral-sh/ohm-rust-clippy/pull/51) as draft PRs.
-
-Unused incremental configuration expiry is available through `-Zohm-incremental-gc` and `cargo -Zohm-incremental-gc clean incremental --max-age '30 days'`. Tracking is disabled by default. Collection preserves finished artifacts and fingerprints, skips busy profiles and unknown ownership records, and trades retained incremental state for slower subsequent edits.
-
-Cargo schedules dependencies using dense job indices, per-artifact dependency counters, and a ready heap. Sparse bitmaps preserve the existing transitive-dependent priorities; insertion indices break equal-priority ties. [ohm-cargo#115](https://github.com/astral-sh/ohm-cargo/pull/115) measured 0.27% fewer whole-Cargo instructions for a warm Ruff check and 0.66% for a warm uv check against its revision-9 parent. Native elapsed-time measurements were inconclusive; these results do not establish a release speedup.
-
-## ohm-rust
-
-- [#6: Set up fork-owned Rust CI](https://github.com/astral-sh/ohm-rust/pull/6)
-- [#36: Run compiler regression tests on Namespace macOS runners](https://github.com/astral-sh/ohm-rust/pull/36)
-- [#80: Add CodSpeed Walltime compiler benchmarks](https://github.com/astral-sh/ohm-rust/pull/80)
-- [#43: Add reachability-based public API hashing](https://github.com/astral-sh/ohm-rust/pull/43)
-- [#44: Skip query machinery when promoting disk-cached values](https://github.com/astral-sh/ohm-rust/pull/44)
-- [#45: Emit reusable link state while linking normally](https://github.com/astral-sh/ohm-rust/pull/45)
-- [#46: Skip codegen objects when indexing crate search paths](https://github.com/astral-sh/ohm-rust/pull/46)
-- [#47: Preserve reusable link objects without saving all compiler temporaries](https://github.com/astral-sh/ohm-rust/pull/47)
-- [#48: Index loaded crates by name and public API hash](https://github.com/astral-sh/ohm-rust/pull/48)
-- [#49: Skip irrelevant foreign specialization impls](https://github.com/astral-sh/ohm-rust/pull/49)
-- [#50: Cache successful privacy walks within each module](https://github.com/astral-sh/ohm-rust/pull/50)
-- [#51: Avoid allocating when compiler strings need no escaping](https://github.com/astral-sh/ohm-rust/pull/51)
-- [#52: Prune unreachable metadata before public API hashing](https://github.com/astral-sh/ohm-rust/pull/52)
-- [#53: Restore generic sharing under public API hashing](https://github.com/astral-sh/ohm-rust/pull/53)
-- [#54: Reuse monomorphization partitions across incremental builds](https://github.com/astral-sh/ohm-rust/pull/54)
-- [#55: Skip unnecessary integration-test relinking](https://github.com/astral-sh/ohm-rust/pull/55)
-- [#56: Reuse monomorphization partitions after library closure edits](https://github.com/astral-sh/ohm-rust/pull/56)
-- [#57: Reuse metadata prefixes across incremental builds](https://github.com/astral-sh/ohm-rust/pull/57)
-- [#58: Add explicit focused test-harness compilation](https://github.com/astral-sh/ohm-rust/pull/58)
-- [#59: Partition upstream generics by their local callers](https://github.com/astral-sh/ohm-rust/pull/59)
-- [#60: Keep incremental codegen-unit merges stable across edits](https://github.com/astral-sh/ohm-rust/pull/60)
-- [#61: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rust/pull/61)
-- [#62: Preserve recursion limits during parallel query evaluation](https://github.com/astral-sh/ohm-rust/pull/62)
-- [#63: Pin the Rust 1.98 Ohm Cargo stack](https://github.com/astral-sh/ohm-rust/pull/63)
-- [#67: Profile-optimize Cargo, rustdoc, Clippy, and rustfmt](https://github.com/astral-sh/ohm-rust/pull/67)
-- [#65: Reuse monomorphization partitions in incremental test builds](https://github.com/astral-sh/ohm-rust/pull/65)
-- [#69: Pin Cargo test defaults and skipped-wrapper repair](https://github.com/astral-sh/ohm-rust/pull/69)
-- [#70: Pin Cargo for Ohm 1.98.0-3](https://github.com/astral-sh/ohm-rust/pull/70)
-- [#71: Track external driver inputs in incremental cache compatibility](https://github.com/astral-sh/ohm-rust/pull/71)
-- [#73: Track source files as incremental query inputs](https://github.com/astral-sh/ohm-rust/pull/73)
-- [#74: Track individual visibility inputs for module lints](https://github.com/astral-sh/ohm-rust/pull/74)
-- [#72: Stream well-formedness obligations](https://github.com/astral-sh/ohm-rust/pull/72)
-- [#75: Pin Cargo for Ohm 1.98.0-4](https://github.com/astral-sh/ohm-rust/pull/75)
-- [#66: Promote unchanged incremental query results in parallel](https://github.com/astral-sh/ohm-rust/pull/66)
-- [#77: Clone Cranelift preparation directories on macOS](https://github.com/astral-sh/ohm-rust/pull/77)
-- [#78: Clone bootstrap directory trees on macOS](https://github.com/astral-sh/ohm-rust/pull/78)
-- [#79: Clone incremental compilation sessions on macOS](https://github.com/astral-sh/ohm-rust/pull/79)
-- [#81: Avoid redundant interning and type operation setup](https://github.com/astral-sh/ohm-rust/pull/81)
-- [#83: Cache interner results per worker](https://github.com/astral-sh/ohm-rust/pull/83)
-- [#84: Reuse unchanged type relation and folding results](https://github.com/astral-sh/ohm-rust/pull/84)
-- [#85: Store small obligation dependency lists inline](https://github.com/astral-sh/ohm-rust/pull/85)
-- [#88: Cache region-only freshening and inline interner lookups](https://github.com/astral-sh/ohm-rust/pull/88)
-- [#91: Preserve codegen reuse when output directories move](https://github.com/astral-sh/ohm-rust/pull/91)
-- [#95: Pin Cargo worktree seeding for Ohm 1.98.0-6](https://github.com/astral-sh/ohm-rust/pull/95)
-- [#97: Collect superseded incremental compilation sessions](https://github.com/astral-sh/ohm-rust/pull/97)
-- [#98: Prevent unpacked debug objects from accumulating across rebuilds](https://github.com/astral-sh/ohm-rust/pull/98)
-- [#102: Pin Cargo macro trust for Ohm 1.98.0-8](https://github.com/astral-sh/ohm-rust/pull/102)
-- [#99: Separate coroutine runtime layouts from executable MIR](https://github.com/astral-sh/ohm-rust/pull/99)
-- [#101: Reduce unoptimized codegen and monomorphization overhead](https://github.com/astral-sh/ohm-rust/pull/101)
-- [#100: Reduce fast-rejection overhead for single generic arguments](https://github.com/astral-sh/ohm-rust/pull/100)
-- [#103: Reduce trait selection and region graph overhead](https://github.com/astral-sh/ohm-rust/pull/103)
-- [#104: Reduce trait and dataflow overhead](https://github.com/astral-sh/ohm-rust/pull/104)
-- [#105: Skip uncached nodes during cache promotion](https://github.com/astral-sh/ohm-rust/pull/105)
-- [#106: Retain serialized query values during cache promotion](https://github.com/astral-sh/ohm-rust/pull/106)
-- [#107: Cache repeated trait lookups and substitutions](https://github.com/astral-sh/ohm-rust/pull/107)
-- [#110: Skip redundant work for literal consts and fieldless const generics](https://github.com/astral-sh/ohm-rust/pull/110)
-- [#108: Merge equivalent functions before LLVM inlining](https://github.com/astral-sh/ohm-rust/pull/108)
-- [#115: Balance codegen units with MIR basic-block counts](https://github.com/astral-sh/ohm-rust/pull/115)
-- [#112: Skip redundant per-body work in Rust analysis](https://github.com/astral-sh/ohm-rust/pull/112)
-- [#117: Cache bounds checks for closed associated types](https://github.com/astral-sh/ohm-rust/pull/117)
-- [#118: Reduce repeated work in compiler dependency tracking](https://github.com/astral-sh/ohm-rust/pull/118)
-- [#109: Use mimalloc 3.5.1 for Linux rustc builds](https://github.com/astral-sh/ohm-rust/pull/109)
-- [#120: Pin Cargo for Ohm 1.98.0-9](https://github.com/astral-sh/ohm-rust/pull/120)
-- [#123: Encode sparse metadata tables with bitmaps](https://github.com/astral-sh/ohm-rust/pull/123)
-- [#126: Bundle upstream Wild in Linux distributions](https://github.com/astral-sh/ohm-rust/pull/126)
-- [#130: Pin Cargo cache fix for bundled Wild](https://github.com/astral-sh/ohm-rust/pull/130)
-- [#132: Avoid coroutine codegen invalidation from debug locations](https://github.com/astral-sh/ohm-rust/pull/132)
-- [#140: Pin Cargo for Ohm 1.98.1-2](https://github.com/astral-sh/ohm-rust/pull/140)
-
-## ohm-cargo
-
-- [#7: Set up fork-owned Cargo CI](https://github.com/astral-sh/ohm-cargo/pull/7)
-- [#43: Use Namespace runners for macOS CI](https://github.com/astral-sh/ohm-cargo/pull/43)
-- [#53: Prototype reduced dependency rebuilds with public API hashes](https://github.com/astral-sh/ohm-cargo/pull/53)
-- [#52: Preserve semantic metadata and transitive link generations](https://github.com/astral-sh/ohm-cargo/pull/52)
-- [#51: Prototype cached relinking for dependency-only rebuilds](https://github.com/astral-sh/ohm-cargo/pull/51)
-- [#55: Enable RDR early cutoff for check and Clippy](https://github.com/astral-sh/ohm-cargo/pull/55)
-- [#54: Enable Ohm build defaults](https://github.com/astral-sh/ohm-cargo/pull/54)
-- [#56: Avoid cloning manifests when preparing diagnostics](https://github.com/astral-sh/ohm-cargo/pull/56)
-- [#57: Avoid cloning parsed TOML manifests](https://github.com/astral-sh/ohm-cargo/pull/57)
-- [#58: Use FxHash collections throughout Cargo](https://github.com/astral-sh/ohm-cargo/pull/58)
-- [#59: Index workspace members for faster discovery](https://github.com/astral-sh/ohm-cargo/pull/59)
-- [#60: Avoid parsing unchanged lockfiles](https://github.com/astral-sh/ohm-cargo/pull/60)
-- [#62: Initialize Git HTTP transports only when needed](https://github.com/astral-sh/ohm-cargo/pull/62)
-- [#61: Deserialize remote manifests without retaining TOML documents](https://github.com/astral-sh/ohm-cargo/pull/61)
-- [#63: Avoid cloning registry index summaries](https://github.com/astral-sh/ohm-cargo/pull/63)
-- [#64: Preallocate registry and target vectors](https://github.com/astral-sh/ohm-cargo/pull/64)
-- [#65: Initialize cached relinking in one compiler invocation](https://github.com/astral-sh/ohm-cargo/pull/65)
-- [#66: Cache workspace resolution across Cargo invocations](https://github.com/astral-sh/ohm-cargo/pull/66)
-- [#67: Keep cached relink objects out of dependency search paths](https://github.com/astral-sh/ohm-cargo/pull/67)
-- [#68: Avoid embedding crate metadata in Ohm library artifacts](https://github.com/astral-sh/ohm-cargo/pull/68)
-- [#70: Avoid saving unnecessary temporaries for cached relinking](https://github.com/astral-sh/ohm-cargo/pull/70)
-- [#69: Skip public API hashing for terminal check targets](https://github.com/astral-sh/ohm-cargo/pull/69)
-- [#71: Pipeline early-cutoff dependencies when public APIs change](https://github.com/astral-sh/ohm-cargo/pull/71)
-- [#72: Skip relinking integration tests with unused package libraries](https://github.com/astral-sh/ohm-cargo/pull/72)
-- [#73: Reuse integration executables across unused dependency changes](https://github.com/astral-sh/ohm-cargo/pull/73)
-- [#74: Add opt-in focused test compilation](https://github.com/astral-sh/ohm-cargo/pull/74)
-- [#76: Enable incremental codegen optimizations for workspace builds](https://github.com/astral-sh/ohm-cargo/pull/76)
-- [#75: Reuse built registry dependencies during checks](https://github.com/astral-sh/ohm-cargo/pull/75)
-- [#77: Share immutable registry artifacts across worktrees](https://github.com/astral-sh/ohm-cargo/pull/77)
-- [#78: Expand registry reuse across active dependency graphs](https://github.com/astral-sh/ohm-cargo/pull/78)
-- [#80: Index locked packages by dependency name](https://github.com/astral-sh/ohm-cargo/pull/80)
-- [#81: Deduplicate compiler-driver validation for reused dependencies](https://github.com/astral-sh/ohm-cargo/pull/81)
-- [#79: Share audited procedural macros across worktrees](https://github.com/astral-sh/ohm-cargo/pull/79)
-- [#82: Scope opaque native tools to affected registry dependencies](https://github.com/astral-sh/ohm-cargo/pull/82)
-- [#83: Restore early cutoff with shared registry caching](https://github.com/astral-sh/ohm-cargo/pull/83)
-- [#84: Skip public API hashing for terminal test harnesses](https://github.com/astral-sh/ohm-cargo/pull/84)
-- [#85: Preserve compatible registry reuse across mixed test graphs](https://github.com/astral-sh/ohm-cargo/pull/85)
-- [#86: Scale file descriptor budgets for fine-grained build locks](https://github.com/astral-sh/ohm-cargo/pull/86)
-- [#87: Skip public API hashing for immutable registry libraries](https://github.com/astral-sh/ohm-cargo/pull/87)
-- [#88: Avoid resolver cache misses for execution-only settings](https://github.com/astral-sh/ohm-cargo/pull/88)
-- [#89: Preserve established check graphs after test builds](https://github.com/astral-sh/ohm-cargo/pull/89)
-- [#90: Enable the parallel frontend in Ohm defaults](https://github.com/astral-sh/ohm-cargo/pull/90)
-- [#91: Reuse built workspace dependencies during checks](https://github.com/astral-sh/ohm-cargo/pull/91)
-- [#93: Enable test-binary monomorphization reuse in Ohm defaults](https://github.com/astral-sh/ohm-cargo/pull/93)
-- [#94: Handle skipped compiler invocations in relink-only builds](https://github.com/astral-sh/ohm-cargo/pull/94)
-- [#99: Trust authenticated crates.io packages from registry mirrors](https://github.com/astral-sh/ohm-cargo/pull/99)
-- [#96: Coalesce concurrent misses for shared registry libraries](https://github.com/astral-sh/ohm-cargo/pull/96)
-- [#100: Fix shared registry cache deadlocks](https://github.com/astral-sh/ohm-cargo/pull/100)
-- [#101: Seed Git worktrees with reusable Cargo build state](https://github.com/astral-sh/ohm-cargo/pull/101)
-- [#103: Allow trusted local macro snapshots in new worktrees](https://github.com/astral-sh/ohm-cargo/pull/103)
-- [#105: Reuse the source checksum buffer across files](https://github.com/astral-sh/ohm-cargo/pull/105)
-- [#106: Use mimalloc for Apple Silicon Cargo builds](https://github.com/astral-sh/ohm-cargo/pull/106)
-- [#104: Prototype expiry of unused incremental configurations](https://github.com/astral-sh/ohm-cargo/pull/104)
-- [#108: Preserve worktree snapshots after Clippy on clone-capable storage](https://github.com/astral-sh/ohm-cargo/pull/108)
-- [#114: Select bundled upstream Wild by default on Linux](https://github.com/astral-sh/ohm-cargo/pull/114)
-- [#115: Use indexed dependency scheduling](https://github.com/astral-sh/ohm-cargo/pull/115)
-- [#123: Preserve shared caching with bundled Wild](https://github.com/astral-sh/ohm-cargo/pull/123)
-- [#126: Require copy-on-write cloning for worktree seeds](https://github.com/astral-sh/ohm-cargo/pull/126)
-- [#127: Default to line tables for Ohm development builds](https://github.com/astral-sh/ohm-cargo/pull/127)
-
-## ohm-rust-clippy
-
-- [#31: Set up fork-owned Clippy CI](https://github.com/astral-sh/ohm-rust-clippy/pull/31)
-- [#35: Run Clippy tests on Namespace macOS runners](https://github.com/astral-sh/ohm-rust-clippy/pull/35)
-- [#38: Skip redundant-clone analysis for clone-free functions](https://github.com/astral-sh/ohm-rust-clippy/pull/38)
-- [#37: Backport allocation-free documentation tab scanning](https://github.com/astral-sh/ohm-rust-clippy/pull/37)
-- [#36: Backport ASCII fast path for Unicode lint scans](https://github.com/astral-sh/ohm-rust-clippy/pull/36)
-- [#39: Backport unnecessary_mut_passed query deferral](https://github.com/astral-sh/ohm-rust-clippy/pull/39)
-- [#40: Backport empty disallowed-methods guard](https://github.com/astral-sh/ohm-rust-clippy/pull/40)
-- [#41: Port used-underscore name prefilters](https://github.com/astral-sh/ohm-rust-clippy/pull/41)
-- [#42: Backport test-item crate prefilter](https://github.com/astral-sh/ohm-rust-clippy/pull/42)
-- [#43: Backport delayed external-macro checks](https://github.com/astral-sh/ohm-rust-clippy/pull/43)
-- [#44: Skip nonstandard-macro analysis when the lint is disabled](https://github.com/astral-sh/ohm-rust-clippy/pull/44)
-- [#45: Backport deferred MSRV checks](https://github.com/astral-sh/ohm-rust-clippy/pull/45)
-- [#46: Experiment with empty-attribute MSRV parsing fast path](https://github.com/astral-sh/ohm-rust-clippy/pull/46)
-- [#48: Cache audited Clippy late passes per module](https://github.com/astral-sh/ohm-rust-clippy/pull/48)
-- [#49: Cache source-sensitive Clippy passes per module](https://github.com/astral-sh/ohm-rust-clippy/pull/49)
-
-## ohm-rustfmt
-
-- [#1: Set up fork-owned rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/1)
-- [#12: Use Namespace macOS runners for rustfmt CI](https://github.com/astral-sh/ohm-rustfmt/pull/12)
-- [#13: Format only changed Cargo workspace packages](https://github.com/astral-sh/ohm-rustfmt/pull/13)
-- [#14: Format only changed Cargo workspace modules](https://github.com/astral-sh/ohm-rustfmt/pull/14)
-- [#15: Avoid reverifying clean formatter checks](https://github.com/astral-sh/ohm-rustfmt/pull/15)
-- [#16: Share clean formatter caches between format and check](https://github.com/astral-sh/ohm-rustfmt/pull/16)
-- [#17: Avoid redundant formatter configuration ancestor walks](https://github.com/astral-sh/ohm-rustfmt/pull/17)
-- [#18: Reuse unchanged formatter configuration snapshots](https://github.com/astral-sh/ohm-rustfmt/pull/18)
-- [#19: Batch independently certified formatter leaf modules](https://github.com/astral-sh/ohm-rustfmt/pull/19)
-- [#20: Avoid unnecessary formatter module topology discovery](https://github.com/astral-sh/ohm-rustfmt/pull/20)
-- [#21: Avoid reverifying formatter runs that rewrite no files](https://github.com/astral-sh/ohm-rustfmt/pull/21)
+The parsed-lockfile-cache, recent-type-fold, and prefix-cloning experiments remain excluded. The
+combined Clippy/codegen experiment also remains excluded; use standalone `cargo +ohm clippy`.
+The experimental ohm-wild fork and Mach-O linker are not packaged.
