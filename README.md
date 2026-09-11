@@ -10,6 +10,8 @@ With Ohm, incremental builds can be up to 32× faster, real-world development se
 
 Benchmarking Ohm 1.98.1-2 against stock Rust on replayed development sessions:
 
+<!-- benchmark:sessions -->
+
 | Scope                                      | Rust 1.98.1 | Ohm 1.98.1-2 | Time saved |
 | ------------------------------------------ | ----------: | -----------: | ---------: |
 | Ruff session                               |    540.08 s |     359.35 s |     33.46% |
@@ -22,7 +24,11 @@ Benchmarking Ohm 1.98.1-2 against stock Rust on replayed development sessions:
 | `cargo fmt`                                |     19.21 s |      14.48 s |     24.62% |
 | All commands                               |  1,409.38 s |     840.19 s |     40.39% |
 
+<!-- /benchmark:sessions -->
+
 And comparing disk usage (on APFS):
+
+<!-- benchmark:disk -->
 
 | Scope                 | Rust 1.98.1 | Ohm 1.98.1-2 | Space saved |
 | --------------------- | ----------: | -----------: | ----------: |
@@ -32,6 +38,8 @@ And comparing disk usage (on APFS):
 | uv session            |   13.04 GiB |     7.87 GiB |      39.68% |
 | uv, 2 worktrees       |   17.49 GiB |     8.60 GiB |      50.84% |
 | uv, 10 worktrees      |   85.54 GiB |    32.94 GiB |      61.49% |
+
+<!-- /benchmark:disk -->
 
 Compared to the stock Rust toolchain, Ohm:
 
@@ -143,6 +151,8 @@ See the [benchmark documentation](./BENCHMARKS.md) for instructions on running t
 
 **Direct edits** modify the crate being checked, linted, or tested:
 
+<!-- benchmark:direct -->
+
 | Project | Workflow               | Edited crate | Rust 1.98.1 | Ohm 1.98.1-2 | Speedup |
 | ------- | ---------------------- | ------------ | ----------: | -----------: | ------: |
 | uv      | `cargo check`          | `uv`         |      4.29 s |       3.57 s |   1.20× |
@@ -152,8 +162,12 @@ See the [benchmark documentation](./BENCHMARKS.md) for instructions on running t
 | Codex   | `just clippy`          | `codex-core` |     25.54 s |      17.67 s |   1.45× |
 | Codex   | `just test`            | `codex-core` |     45.16 s |      27.28 s |   1.66× |
 
+<!-- /benchmark:direct -->
+
 **Indirect edits** modify a dependency's implementation without changing its public API, so Ohm can
 avoid rebuilding unchanged dependents:
+
+<!-- benchmark:dependency -->
 
 | Project | Workflow               | Edited dependency    | Rust 1.98.1 | Ohm 1.98.1-2 | Speedup |
 | ------- | ---------------------- | -------------------- | ----------: | -----------: | ------: |
@@ -164,7 +178,11 @@ avoid rebuilding unchanged dependents:
 | Codex   | `just clippy`          | `codex-utils-string` |     52.49 s |       1.61 s |  32.70× |
 | Codex   | `just test`            | `codex-utils-string` |     67.47 s |       5.73 s |  11.78× |
 
+<!-- /benchmark:dependency -->
+
 **Other common cases** include build-to-check reuse, formatting, and safe cross-worktree builds:
+
+<!-- benchmark:features -->
 
 | Project | Workflow                 | Package              | Rust 1.98.1 | Ohm 1.98.1-2 | Speedup |
 | ------- | ------------------------ | -------------------- | ----------: | -----------: | ------: |
@@ -174,6 +192,8 @@ avoid rebuilding unchanged dependents:
 | Codex   | No-op formatting         | Workspace            |     14.69 s |       0.36 s |  40.70× |
 | Codex   | Formatting after an edit | `codex-core`         |     13.87 s |       0.51 s |  27.36× |
 | Codex   | Shared-worktree build    | `codex-utils-string` |      5.67 s |       1.36 s |   4.16× |
+
+<!-- /benchmark:features -->
 
 ## Philosophy
 

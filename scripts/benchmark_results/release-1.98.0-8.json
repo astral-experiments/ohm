@@ -4420,40 +4420,6 @@
     "global_helpers_unchanged": true,
     "paired_arms_share_helper_environment": true,
     "standalone_uv_fixture_commands": 0,
-    "input_receipt_sha256": {
-      "bootstrap-status.json": "07edf2a097410a547b983e87050843bbf6189570f49360e5f0f9539b331affc9",
-      "direct-completed.json": "1ca6351cdeea00e044d54d583d5b54939201b1494f8f22b38f8fce6ddb4b5d4f",
-      "direct-prepared.json": "f009021c570fbff946c88c07642c996c2e3fa30899d6384e6b5e22e1e018fef1",
-      "direct-quiet-1788442882774407225.json": "0b19cc6991de18fc428da1cdf8c6fff1a5704162f4125098ad8fe220e935c9f2",
-      "direct-quiet-1788443019665308095.json": "307400d72f3e3c5338dbe4da52340910aa30f12f84e6fdba36bccd71be4917c0",
-      "direct-quiet-1788447613284550184.json": "ff9de853fcb6639c6fdc5705bc6796cf651775b609e86cd019664d08f557118a",
-      "direct-quiet-1788454366262994894.json": "8435cbfcd18af82a797f0df27c6dd6d26ecc8f8ad12820dc7f357c259f899d1a",
-      "direct-quiet-1788454450505599182.json": "ec3ccfbbf4b58b9d544b25d602eaae7c2fbc7faa0962650b6ce8f91ec9c64819",
-      "direct-ready.json": "6ede7545ac97a3c49da6468645f67e84d4d1aac9087aa9757ae5977317132098",
-      "direct-started.json": "d3c996f97dd5bf2117a4095cd0dda0cfa71049cc59217be001fb1a18b22aa813",
-      "global-rustup-before-666.json": "d5e193435fd4b59a9160fe83c147be7ded387156981eb45b7b725a624bed47e6",
-      "helpers.json": "045b6ede2bf87b6f4bf4c9a6eb7a25f9c034bb49997bcdfc573904882334fe14",
-      "historical-completed.json": "4038a98ef060b263863bb8b020c7978e90dbedfe5f4e528417ffb21ae45fbe7e",
-      "historical-prelaunch-recovery-1-prior-postrun-status.json": "4a80777f1ae00c1ab900c8900f6d61d8e647fd78c3b198e57f8030ab73173f8d",
-      "historical-prelaunch-recovery-1-prior-suite-status.json": "26c3653ab1de5a2483159d9a7afd58b26f58319cf444b04bb2ff1dde7c007c68",
-      "historical-prelaunch-recovery-1.json": "15fadc062f5e3b254f8b51db29050a8df554ade87a6430c9a9802b9dca74bbd6",
-      "historical-prelaunch-recovery-2-completed.json": "cf3496e869d47d1695051794e0ac73337dc5fb98cc014cbd99e53f42ab97a3a2",
-      "historical-prelaunch-recovery-2-prior-postrun-status.json": "4a80777f1ae00c1ab900c8900f6d61d8e647fd78c3b198e57f8030ab73173f8d",
-      "historical-prelaunch-recovery-2-prior-suite-status.json": "e676829c5862f4828232a3904434f2a975563e3768c4b181f4af1899f921f891",
-      "historical-prelaunch-recovery-2.json": "ca22a207d1dacfd2d8c17db1d7882742e6626fdad3c8d47f7779896addfcc290",
-      "historical-ready.json": "f4a293d91ea1643df432a2d631892e5182d877056ceb87ff2bd0ada0baab618a",
-      "historical-started-20260903T165410.552121Z.json": "cefd79ffa6ca485d0752149e99bd9633841529d74837764b7b6780e67ed25b77",
-      "initial-discovery.json": "789f44678b702c0b8355f8dea83b9b873c147e1f62936f66d1396a1b8e90488d",
-      "postrun-prelaunch-recovery-prior-status.json": "4a80777f1ae00c1ab900c8900f6d61d8e647fd78c3b198e57f8030ab73173f8d",
-      "postrun-prelaunch-recovery.json": "70ec3dc1ff549a968c1aba0870e862bcf17b423f64193cf2b8e517529ab59add",
-      "prelaunch-recovery-proof.json": "df7988ba854a4645d706b041192bde257fe9d54d1c5d3b72072bb89cebab0a24",
-      "prelaunch-recovery.json": "0611da8407229fea907bafebd28ca41960cc63c04b56b4bd7ac8714e0c896a75",
-      "quiet-rejection-initial-raw.json": "56708a9b2a7b5c5b959a501630166e15d5ecfa4b6f7abfcbc87127705bef7321",
-      "quiet-rejection-initial.json": "6947756c2d93d232677cd6ec12ba9f2275f882d35b7aed20aa5d66c1b70007f5",
-      "release-assets.json": "be632b3ffbb1da12aca9170884025b24c8cbc8b6106005ad5d7e1be7a55a0086",
-      "suite-status.json": "7ff67002f45c5e66a736668e789988012789487466eca79fb5215238e85618a4",
-      "toolchains.json": "4dac2aecdf7dcd5c6bfae9858d6f968f5a62cfd0d273e37af2a4eb8c70e9a868"
-    },
     "prelaunch_quiet_gate": {
       "phase": "before_benchmark_launch",
       "scope": "direct",
@@ -4482,5 +4448,11 @@
     "id": "linux-2",
     "logical_cpus": 32,
     "cpu_model": "AMD EPYC 9V74 80-Core Processor"
+  },
+  "evidence": {
+    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-evidence-1.98.1-2/benchmark-evidence-through-1.98.1-2.zip",
+    "sha256": "0e7581f8f1ae37b42e2d5a9a4d4edc626ef3218710f7ad8c1465ea49e592dac9",
+    "path": "scripts/benchmark_results/release-1.98.0-8.json",
+    "report_sha256": "e9bb79f4e210164fdacabc4a5d4c2496181b753857d6ca434662983547640529"
   }
 }
