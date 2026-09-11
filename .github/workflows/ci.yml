@@ -123,8 +123,10 @@ jobs:
         run: |
           bash scripts/test-optimized-dist.sh
           python3 scripts/test_prepare_wild.py
-      - name: Test the Ohm installer
-        run: bash scripts/test-installer.sh
+      - name: Test the Ohm installer and release packaging
+        run: |
+          bash scripts/test-installer.sh
+          bash scripts/test-release-packaging.sh
 
   lint:
     runs-on: ubuntu-latest

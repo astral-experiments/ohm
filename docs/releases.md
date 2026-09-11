@@ -121,5 +121,27 @@ The public installer and its embedded archive checksum share Cloudflare R2 as th
 HTTPS and checksums verify transport and artifact integrity; they are not independent signatures or
 attestations.
 
+## Reproduce assembly and smoke tests
+
+The workflow calls ordinary scripts after building the platform distributions. With
+both platforms' archives, provenance files, and checksum sidecars in `/path/to/assets`:
+
+```console
+toolchain="$(jq -er '.release.toolchain_name' "$manifest")"
+bash scripts/assemble-release.sh "$manifest" /path/to/assets "$toolchain"
+```
+
+On a supported host, test that installer and its matching platform archive:
+
+```console
+clippy_revision="$(jq -er '.sources.clippy.revision' "$manifest")"
+bash scripts/smoke-test-release.sh /path/to/assets "$toolchain" \
+  aarch64-apple-darwin "$clippy_revision"
+```
+
+Use `x86_64-unknown-linux-gnu` on Linux. The smoke test installs into a temporary
+Rustup and Cargo home, checks the actual bundled tools and linker, and exercises
+registry sharing and build-to-check reuse. It removes its temporary files on exit.
+
 Release versions cannot be republished. If source revisions or release inputs change, prepare a new
 Ohm revision and repeat the protected release workflow.
