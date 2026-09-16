@@ -107,13 +107,6 @@ Opt out with `-Zohm-defaults=no`:
 cargo +ohm -Zohm-defaults=no test
 ```
 
-Development and test builds default to `debug = "line-tables-only"`, preserving file-and-line
-backtraces. Set `[profile.dev] debug = true` for full type and variable debug information; explicit
-profile settings retain their normal precedence.
-
-Native x86_64 Linux GNU builds use the bundled upstream Wild linker by default.
-Use `-Zohm-linker=lld` to select LLD; explicit linker settings take precedence.
-
 ### `AGENTS.md`
 
 To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS.md`:
