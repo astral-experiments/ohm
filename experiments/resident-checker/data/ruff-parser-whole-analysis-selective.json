@@ -1,0 +1,2524 @@
+{
+  "ruff_commit": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "scope": "one rustc GlobalCtxt for each Cargo library/test compilation; baseline whole analysis, each accepted source scalar-tail override then checkpoint repair, full analysis and all named function type/borrow roots demanded at every revision",
+  "important_limitation": "Fresh comparison is separate and only claims stated diagnostic fields; timings, when recorded, were measured in a development machine with other work running and are not an isolated end-to-end Cargo benchmark.",
+  "configurations": {
+    "library": {
+      "completed": true,
+      "function_bodies": 912,
+      "warm_baseline_functions_clean": true,
+      "candidate_sites_seen": 428,
+      "rejected_sites_seen": 381,
+      "rejection_reasons": {
+        "requires an inherent implementation": 36,
+        "requires an inherent implementation with only simple lifetime parameters": 20,
+        "tail must contain only source calls, paths without generic arguments, and literals": 163,
+        "requires a private non-async function without declared generic parameters": 149,
+        "tail is not the complete directly written source expression": 12,
+        "cannot establish the source tail boundaries": 1
+      },
+      "accepted_sites_seen": 47,
+      "completed_edit_restore_pairs": 47,
+      "failed_repairs": {},
+      "distinct_diagnostic_by_phase": {
+        "edit:E0308": 47
+      },
+      "provider_metrics_range": {
+        "edit:borrow_ran": {
+          "min": 1,
+          "max": 317,
+          "median": 177
+        },
+        "edit:cached": {
+          "min": 595,
+          "max": 911,
+          "median": 735
+        },
+        "edit:failed_functions": {
+          "min": 1,
+          "max": 1,
+          "median": 1
+        },
+        "edit:pointer_changed": {
+          "min": 1,
+          "max": 250,
+          "median": 177
+        },
+        "edit:skipped_borrow_due_to_type_errors": {
+          "min": 1,
+          "max": 1,
+          "median": 1
+        },
+        "edit:total": {
+          "min": 912,
+          "max": 912,
+          "median": 912
+        },
+        "edit:type_ran": {
+          "min": 1,
+          "max": 250,
+          "median": 177
+        },
+        "restore:borrow_ran": {
+          "min": 1,
+          "max": 317,
+          "median": 177
+        },
+        "restore:cached": {
+          "min": 595,
+          "max": 911,
+          "median": 735
+        },
+        "restore:failed_functions": {
+          "min": 0,
+          "max": 0,
+          "median": 0
+        },
+        "restore:pointer_changed": {
+          "min": 1,
+          "max": 250,
+          "median": 177
+        },
+        "restore:skipped_borrow_due_to_type_errors": {
+          "min": 0,
+          "max": 0,
+          "median": 0
+        },
+        "restore:total": {
+          "min": 912,
+          "max": 912,
+          "median": 912
+        },
+        "restore:type_ran": {
+          "min": 1,
+          "max": 250,
+          "median": 177
+        }
+      },
+      "timing_ms_under_shared_machine_load": {
+        "edit": {
+          "min": 11.964417,
+          "max": 347.740625,
+          "median": 233.289667
+        },
+        "restore": {
+          "min": 29.035959,
+          "max": 475.196334,
+          "median": 286.847958
+        }
+      },
+      "accepted_owners": {
+        "lexer::Lexer::<'src>::consume_ascii_character": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::eat_indentation": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_comment": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_interpolated_string_middle_or_end": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_interpolated_string_start": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_number_radix": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_string": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::push_error": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::radix_run": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::try_double_char_prefix": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::indentation::Character::new": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::indentation::Column::new": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::is_unicode_identifier_start": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::at_ts": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::bump_float": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::bump_identifier": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::bump_int": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::bump_string_value": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::current_token_text": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::expect": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::intern_normalized_name": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::is_enclosing_list_element_or_terminator": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::node_start": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::RecoveryContextKind::is_list_terminator": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::check_fstring_comments": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_atom": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_binary_expression_or_higher_recursive": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_expression_with_bitwise_or_precedence": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_generators": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_interpolated_string_elements": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_ipython_escape_command_expression": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_simple_expression": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::ExpressionContext::disallow_starred_expressions": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::ExpressionContext::with_starred_expression_allowed": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::pattern::<impl parser::Parser<'_>>::parse_attr_expr_for_match_pattern": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::pattern::<impl parser::Parser<'_>>::parse_match_pattern": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::pattern::<impl parser::Parser<'_>>::parse_match_pattern_target": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::pattern::<impl parser::Parser<'_>>::parse_parenthesized_or_sequence_pattern": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_block": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_body": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_match_body": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_match_case_blocks": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_single_simple_statement": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_with_item_optional_vars": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "string::StringParser::<'src>::parse_escaped_char": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "string::StringParser::<'src>::parse_octet": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "string::StringParser::<'src>::skip_bytes": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        }
+      }
+    },
+    "test": {
+      "completed": true,
+      "function_bodies": 1601,
+      "warm_baseline_functions_clean": true,
+      "candidate_sites_seen": 455,
+      "rejected_sites_seen": 403,
+      "rejection_reasons": {
+        "requires an inherent implementation": 37,
+        "requires an inherent implementation with only simple lifetime parameters": 20,
+        "tail must contain only source calls, paths without generic arguments, and literals": 183,
+        "requires a private non-async function without declared generic parameters": 149,
+        "tail is not the complete directly written source expression": 13,
+        "cannot establish the source tail boundaries": 1
+      },
+      "accepted_sites_seen": 52,
+      "completed_edit_restore_pairs": 52,
+      "failed_repairs": {},
+      "distinct_diagnostic_by_phase": {
+        "edit:E0308": 52
+      },
+      "provider_metrics_range": {
+        "edit:borrow_ran": {
+          "min": 1,
+          "max": 938,
+          "median": 177.0
+        },
+        "edit:cached": {
+          "min": 663,
+          "max": 1600,
+          "median": 1424.0
+        },
+        "edit:failed_functions": {
+          "min": 1,
+          "max": 1,
+          "median": 1.0
+        },
+        "edit:pointer_changed": {
+          "min": 1,
+          "max": 290,
+          "median": 177.0
+        },
+        "edit:skipped_borrow_due_to_type_errors": {
+          "min": 1,
+          "max": 1,
+          "median": 1.0
+        },
+        "edit:total": {
+          "min": 1601,
+          "max": 1601,
+          "median": 1601.0
+        },
+        "edit:type_ran": {
+          "min": 1,
+          "max": 290,
+          "median": 177.0
+        },
+        "restore:borrow_ran": {
+          "min": 1,
+          "max": 938,
+          "median": 177.0
+        },
+        "restore:cached": {
+          "min": 663,
+          "max": 1600,
+          "median": 1424.0
+        },
+        "restore:failed_functions": {
+          "min": 0,
+          "max": 0,
+          "median": 0.0
+        },
+        "restore:pointer_changed": {
+          "min": 1,
+          "max": 290,
+          "median": 177.0
+        },
+        "restore:skipped_borrow_due_to_type_errors": {
+          "min": 0,
+          "max": 0,
+          "median": 0.0
+        },
+        "restore:total": {
+          "min": 1601,
+          "max": 1601,
+          "median": 1601.0
+        },
+        "restore:type_ran": {
+          "min": 1,
+          "max": 290,
+          "median": 177.0
+        }
+      },
+      "timing_ms_under_shared_machine_load": {
+        "edit": {
+          "min": 18.233208,
+          "max": 616.4932090000001,
+          "median": 248.0736035
+        },
+        "restore": {
+          "min": 45.119834,
+          "max": 761.780333,
+          "median": 347.144813
+        }
+      },
+      "accepted_owners": {
+        "lexer::Lexer::<'src>::consume_ascii_character": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::eat_indentation": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_comment": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_interpolated_string_middle_or_end": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_interpolated_string_start": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_number_radix": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::lex_string": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::push_error": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::radix_run": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::Lexer::<'src>::try_double_char_prefix": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::indentation::Character::new": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::indentation::Column::new": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::is_unicode_identifier_start": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::tests::lex_jupyter_source": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::tests::lex_source": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::tests::lex_source_with_offset": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "lexer::tests::lex_valid": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::at_ts": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::bump_float": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::bump_identifier": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::bump_int": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::bump_string_value": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::current_token_text": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::expect": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::intern_normalized_name": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::is_enclosing_list_element_or_terminator": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::Parser::<'src>::node_start": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::RecoveryContextKind::is_list_terminator": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::check_fstring_comments": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_atom": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_binary_expression_or_higher_recursive": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_expression_with_bitwise_or_precedence": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_generators": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_interpolated_string_elements": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_ipython_escape_command_expression": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::<impl parser::Parser<'src>>::parse_simple_expression": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::ExpressionContext::disallow_starred_expressions": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::expression::ExpressionContext::with_starred_expression_allowed": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::pattern::<impl parser::Parser<'_>>::parse_attr_expr_for_match_pattern": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::pattern::<impl parser::Parser<'_>>::parse_match_pattern": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::pattern::<impl parser::Parser<'_>>::parse_match_pattern_target": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::pattern::<impl parser::Parser<'_>>::parse_parenthesized_or_sequence_pattern": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_block": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_body": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_match_body": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_match_case_blocks": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_single_simple_statement": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "parser::statement::<impl parser::Parser<'src>>::parse_with_item_optional_vars": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "string::StringParser::<'src>::parse_escaped_char": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "string::StringParser::<'src>::parse_octet": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "string::StringParser::<'src>::skip_bytes": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        },
+        "string::tests::parse_suite": {
+          "edit": {
+            "E0308": 1
+          },
+          "restore": {}
+        }
+      }
+    }
+  },
+  "fresh_comparison": {
+    "fresh_baseline": {
+      "returncode": 0,
+      "errors": []
+    },
+    "comparison": "code, diagnostic message, primary crate-relative file/start line/label; error range end and source display not compared because the resident scalar edit preserves the previous HIR tail span",
+    "metadata_only": true,
+    "eligible_count": 47,
+    "compared_count": 47,
+    "all_matched": true,
+    "sites": {
+      "lexer::Lexer::<'src>::consume_ascii_character": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                635,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::eat_indentation": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                304,
+                "expected `Option<TokenKind>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_comment": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1161,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_interpolated_string_middle_or_end": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                916,
+                "expected `Option<TokenKind>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_interpolated_string_start": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                788,
+                "expected `Option<TokenKind>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_number_radix": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1066,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_string": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1030,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::push_error": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                138,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::radix_run": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1149,
+                "expected `RadixRun`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::try_double_char_prefix": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                766,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::indentation::Character::new": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer/indentation.rs",
+                26,
+                "expected `Character`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::indentation::Column::new": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer/indentation.rs",
+                16,
+                "expected `Column`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::is_unicode_identifier_start": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1598,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::at_ts": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                698,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::bump_float": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                489,
+                "expected `f64`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::bump_identifier": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                450,
+                "expected `Name`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::bump_int": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                482,
+                "expected `Int`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::bump_string_value": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                509,
+                "expected `&str`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::current_token_text": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                522,
+                "expected `&str`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::expect": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                655,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::intern_normalized_name": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                464,
+                "expected `Name`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::is_enclosing_list_element_or_terminator": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                938,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::node_start": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                305,
+                "expected `TextSize`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::RecoveryContextKind::is_list_terminator": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                1252,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::check_fstring_comments": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                1629,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_atom": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                673,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_binary_expression_or_higher_recursive": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                320,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_expression_with_bitwise_or_precedence": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                460,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_generators": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                2552,
+                "expected `Vec<Comprehension>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_interpolated_string_elements": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                1698,
+                "expected `InterpolatedStringElements`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_ipython_escape_command_expression": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                2989,
+                "expected `ExprIpyEscapeCommand`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_simple_expression": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                239,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::ExpressionContext::disallow_starred_expressions": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                3184,
+                "expected `ExpressionContext`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::ExpressionContext::with_starred_expression_allowed": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                3203,
+                "expected `ExpressionContext`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::pattern::<impl parser::Parser<'_>>::parse_attr_expr_for_match_pattern": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/pattern.rs",
+                668,
+                "expected `Expr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::pattern::<impl parser::Parser<'_>>::parse_match_pattern": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/pattern.rs",
+                137,
+                "expected `Pattern`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::pattern::<impl parser::Parser<'_>>::parse_match_pattern_target": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/pattern.rs",
+                303,
+                "expected `Identifier`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::pattern::<impl parser::Parser<'_>>::parse_parenthesized_or_sequence_pattern": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/pattern.rs",
+                358,
+                "expected `Pattern`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_block": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                3139,
+                "expected `ThinVec<Stmt>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_body": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                3116,
+                "expected `ThinVec<Stmt>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_match_body": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                2734,
+                "expected `Vec<MatchCase>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_match_case_blocks": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                2762,
+                "expected `Vec<MatchCase>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_single_simple_statement": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                184,
+                "expected `Stmt`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_with_item_optional_vars": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                2528,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "string::StringParser::<'src>::parse_escaped_char": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/string.rs",
+                277,
+                "expected `Result<Option<EscapedChar>, ...>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "string::StringParser::<'src>::parse_octet": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/string.rs",
+                203,
+                "expected `char`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "string::StringParser::<'src>::skip_bytes": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/string.rs",
+                116,
+                "expected `&str`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "fresh_test_configuration_comparison": {
+    "fresh_baseline": {
+      "returncode": 0,
+      "errors": []
+    },
+    "comparison": "code, diagnostic message, primary crate-relative file/start line/label; error range end and source display not compared because the resident scalar edit preserves the previous HIR tail span",
+    "metadata_only": true,
+    "eligible_count": 52,
+    "compared_count": 52,
+    "all_matched": true,
+    "sites": {
+      "lexer::Lexer::<'src>::consume_ascii_character": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                635,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::eat_indentation": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                304,
+                "expected `Option<TokenKind>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_comment": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1161,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_interpolated_string_middle_or_end": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                916,
+                "expected `Option<TokenKind>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_interpolated_string_start": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                788,
+                "expected `Option<TokenKind>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_number_radix": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1066,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::lex_string": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1030,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::push_error": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                138,
+                "expected `TokenKind`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::radix_run": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1149,
+                "expected `RadixRun`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::Lexer::<'src>::try_double_char_prefix": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                766,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::indentation::Character::new": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer/indentation.rs",
+                26,
+                "expected `Character`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::indentation::Column::new": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer/indentation.rs",
+                16,
+                "expected `Column`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::is_unicode_identifier_start": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1598,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::tests::lex_jupyter_source": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1718,
+                "expected `LexerOutput`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::tests::lex_source": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1708,
+                "expected `LexerOutput`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::tests::lex_source_with_offset": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1713,
+                "expected `LexerOutput`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "lexer::tests::lex_valid": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/lexer.rs",
+                1691,
+                "expected `LexerOutput`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::at_ts": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                698,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::bump_float": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                489,
+                "expected `f64`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::bump_identifier": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                450,
+                "expected `Name`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::bump_int": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                482,
+                "expected `Int`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::bump_string_value": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                509,
+                "expected `&str`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::current_token_text": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                522,
+                "expected `&str`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::expect": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                655,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::intern_normalized_name": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                464,
+                "expected `Name`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::is_enclosing_list_element_or_terminator": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                938,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::Parser::<'src>::node_start": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                305,
+                "expected `TextSize`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::RecoveryContextKind::is_list_terminator": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/mod.rs",
+                1252,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::check_fstring_comments": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                1629,
+                "expected `bool`, found integer"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_atom": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                673,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_binary_expression_or_higher_recursive": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                320,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_expression_with_bitwise_or_precedence": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                460,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_generators": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                2552,
+                "expected `Vec<Comprehension>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_interpolated_string_elements": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                1698,
+                "expected `InterpolatedStringElements`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_ipython_escape_command_expression": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                2989,
+                "expected `ExprIpyEscapeCommand`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::<impl parser::Parser<'src>>::parse_simple_expression": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                239,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::ExpressionContext::disallow_starred_expressions": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                3184,
+                "expected `ExpressionContext`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::expression::ExpressionContext::with_starred_expression_allowed": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/expression.rs",
+                3203,
+                "expected `ExpressionContext`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::pattern::<impl parser::Parser<'_>>::parse_attr_expr_for_match_pattern": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/pattern.rs",
+                668,
+                "expected `Expr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::pattern::<impl parser::Parser<'_>>::parse_match_pattern": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/pattern.rs",
+                137,
+                "expected `Pattern`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::pattern::<impl parser::Parser<'_>>::parse_match_pattern_target": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/pattern.rs",
+                303,
+                "expected `Identifier`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::pattern::<impl parser::Parser<'_>>::parse_parenthesized_or_sequence_pattern": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/pattern.rs",
+                358,
+                "expected `Pattern`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_block": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                3139,
+                "expected `ThinVec<Stmt>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_body": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                3116,
+                "expected `ThinVec<Stmt>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_match_body": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                2734,
+                "expected `Vec<MatchCase>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_match_case_blocks": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                2762,
+                "expected `Vec<MatchCase>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_single_simple_statement": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                184,
+                "expected `Stmt`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "parser::statement::<impl parser::Parser<'src>>::parse_with_item_optional_vars": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/parser/statement.rs",
+                2528,
+                "expected `ParsedExpr`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "string::StringParser::<'src>::parse_escaped_char": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/string.rs",
+                277,
+                "expected `Result<Option<EscapedChar>, ...>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "string::StringParser::<'src>::parse_octet": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/string.rs",
+                203,
+                "expected `char`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "string::StringParser::<'src>::skip_bytes": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/string.rs",
+                116,
+                "expected `&str`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      },
+      "string::tests::parse_suite": {
+        "matched": true,
+        "resident_restore_error_count": 0,
+        "fresh_errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary": [
+              [
+                "crates/ruff_python_parser/src/string.rs",
+                542,
+                "expected `Result<ThinVec<Stmt>, ParseError>`, found `bool`"
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
