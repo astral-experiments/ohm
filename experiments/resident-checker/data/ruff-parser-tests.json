@@ -1,0 +1,153 @@
+{
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "package": "ruff_python_parser",
+  "rustc_version": "1.98.1-dev",
+  "rustc_self_reported_commit": "unknown",
+  "host": "aarch64-apple-darwin",
+  "cargo_incremental": false,
+  "package_declares_optional_features": false,
+  "syntax_fixtures_by_family": {
+    "valid": 52,
+    "invalid": 126,
+    "inline_ok": 123,
+    "inline_error": 256
+  },
+  "runs": {
+    "graph-test": {
+      "returncode": 0,
+      "counts": {
+        "unit": {
+          "passed": 245,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        },
+        "syntax_fixtures": {
+          "passed": 557,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        },
+        "inline_test_generator": {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        }
+      },
+      "total_passed": 803,
+      "captured_invocations": [
+        {
+          "target": "fixtures.bin",
+          "resident_query_graph_enabled": true
+        },
+        {
+          "target": "generate_inline_tests.test",
+          "resident_query_graph_enabled": true
+        },
+        {
+          "target": "ruff_python_parser.lib",
+          "resident_query_graph_enabled": true
+        },
+        {
+          "target": "ruff_python_parser.test",
+          "resident_query_graph_enabled": true
+        }
+      ]
+    },
+    "graph-doc": {
+      "returncode": 0,
+      "counts": {
+        "doctests": {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        }
+      },
+      "total_passed": 10,
+      "captured_invocations": [
+        {
+          "target": "doctest_compiler",
+          "resident_query_graph_enabled": true
+        },
+        {
+          "target": "doctest_compiler",
+          "resident_query_graph_enabled": true
+        }
+      ]
+    },
+    "test": {
+      "returncode": 0,
+      "counts": {
+        "unit": {
+          "passed": 245,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        },
+        "syntax_fixtures": {
+          "passed": 557,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        },
+        "inline_test_generator": {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        }
+      },
+      "total_passed": 803,
+      "captured_invocations": [
+        {
+          "target": "fixtures.bin",
+          "resident_query_graph_enabled": false
+        },
+        {
+          "target": "generate_inline_tests.test",
+          "resident_query_graph_enabled": false
+        },
+        {
+          "target": "ruff_python_parser.lib",
+          "resident_query_graph_enabled": false
+        },
+        {
+          "target": "ruff_python_parser.test",
+          "resident_query_graph_enabled": false
+        }
+      ]
+    },
+    "doc": {
+      "returncode": 0,
+      "counts": {
+        "doctests": {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 0
+        }
+      },
+      "total_passed": 10,
+      "captured_invocations": [
+        {
+          "target": "doctest_compiler",
+          "resident_query_graph_enabled": false
+        },
+        {
+          "target": "doctest_compiler",
+          "resident_query_graph_enabled": false
+        }
+      ]
+    }
+  }
+}

@@ -34,6 +34,8 @@ python3 experiments/resident-checker/compact.py \
   /path/to/uv-results/summary.json /path/to/uv-summary.json
 ```
 
+The [complete Ruff parser suite](data/ruff-parser-tests.json) passes with the resident dependency graph enabled and disabled: 245 unit tests, 557 Python syntax fixtures, one fixture-generator integration test, and 10 doctests (813 tests total in each mode). The harness verifies the compiler option for all four parser package targets and both doctest compiler invocations. The [Ruff reproduction](ruff/README.md) and [parser edit corpus](data/ruff-parser-edits.json) also cover two real edits checked and repaired twice in one compiler context. Four unrelated functions stay cached when checked explicitly; requesting whole-crate analysis after an edit still reruns every named borrow-check provider. These runs establish test compatibility and the supported edits, not arbitrary edits or faster whole-crate iteration.
+
 After regenerating checked-in reports, apply the repository's pinned JSON formatter:
 
 ```sh

@@ -1,0 +1,592 @@
+{
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "fresh_ohm_rustc_revision": "a238a09a36b8210a6633f5441429d49049e171a6",
+  "fresh_baseline": {
+    "command": "cargo +ohm -Zohm-defaults=no test --locked -p ruff_python_parser",
+    "scopes": {
+      "unit": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "data_driven_fixtures": {
+        "passed": 557,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "inline_test_generator": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "doctests": {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      }
+    },
+    "passed_total": 813,
+    "failed_total": 0
+  },
+  "fresh_rust_diagnostic_edits": {
+    "baseline_rustc_exit": 0,
+    "passed_count": 8,
+    "edits": {
+      "parser-identifier-type": {
+        "correct": true,
+        "rustc_exit": 1,
+        "error_codes": {
+          "E0308": 1
+        },
+        "errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/lexer.rs",
+                "line": 1598
+              }
+            ]
+          }
+        ]
+      },
+      "parser-numeric-type": {
+        "correct": true,
+        "rustc_exit": 1,
+        "error_codes": {
+          "E0308": 1
+        },
+        "errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/mod.rs",
+                "line": 978
+              }
+            ]
+          }
+        ]
+      },
+      "statement-method-type": {
+        "correct": true,
+        "rustc_exit": 1,
+        "error_codes": {
+          "E0308": 1
+        },
+        "errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/statement.rs",
+                "line": 873
+              }
+            ]
+          }
+        ]
+      },
+      "expression-method-type": {
+        "correct": true,
+        "rustc_exit": 1,
+        "error_codes": {
+          "E0308": 1
+        },
+        "errors": [
+          {
+            "code": "E0308",
+            "message": "`match` arms have incompatible types",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/expression.rs",
+                "line": 3114
+              }
+            ]
+          }
+        ]
+      },
+      "pattern-recursive-type": {
+        "correct": true,
+        "rustc_exit": 1,
+        "error_codes": {
+          "E0308": 1
+        },
+        "errors": [
+          {
+            "code": "E0308",
+            "message": "`match` arms have incompatible types",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/pattern.rs",
+                "line": 825
+              }
+            ]
+          }
+        ]
+      },
+      "string-method-type": {
+        "correct": true,
+        "rustc_exit": 1,
+        "error_codes": {
+          "E0308": 1
+        },
+        "errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/string.rs",
+                "line": 203
+              }
+            ]
+          }
+        ]
+      },
+      "semantic-future-type": {
+        "correct": true,
+        "rustc_exit": 1,
+        "error_codes": {
+          "E0308": 1
+        },
+        "errors": [
+          {
+            "code": "E0308",
+            "message": "mismatched types",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/semantic_errors.rs",
+                "line": 1319
+              }
+            ]
+          }
+        ]
+      },
+      "token-const-dependent": {
+        "correct": true,
+        "rustc_exit": 1,
+        "error_codes": {
+          "E0080": 9
+        },
+        "errors": [
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `141_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/expression.rs",
+                "line": 33
+              }
+            ]
+          },
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `129_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/expression.rs",
+                "line": 36
+              }
+            ]
+          },
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `145_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/expression.rs",
+                "line": 69
+              }
+            ]
+          },
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `132_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/expression.rs",
+                "line": 1291
+              }
+            ]
+          },
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `210_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/expression.rs",
+                "line": 2540
+              }
+            ]
+          },
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `218_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/pattern.rs",
+                "line": 17
+              }
+            ]
+          },
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `232_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/statement.rs",
+                "line": 25
+              }
+            ]
+          },
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `222_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/statement.rs",
+                "line": 39
+              }
+            ]
+          },
+          {
+            "code": "E0080",
+            "message": "attempt to shift left by `178_usize`, which would overflow",
+            "primary_locations": [
+              {
+                "file": "crates/ruff_python_parser/src/parser/statement.rs",
+                "line": 64
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "fresh_python_runtime_negative_controls": {
+    "description": "All edited Rust code compiled. The actual named Ruff test passed before each edit and failed after a fresh Cargo rebuild. This does not prove resident codegen or execution.",
+    "passed_count": 4,
+    "edits": {
+      "runtime-future-import": {
+        "test": "inline_ok::valid_future_feature.py",
+        "clean": {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 556
+        },
+        "modified": {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 556
+        },
+        "correct": true
+      },
+      "runtime-comparison": {
+        "test": "valid_syntax::expressions/compare.py",
+        "clean": {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 556
+        },
+        "modified": {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 556
+        },
+        "correct": true
+      },
+      "runtime-octal": {
+        "test": "string::tests::test_escape_octet",
+        "clean": {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 244
+        },
+        "modified": {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 244
+        },
+        "correct": true
+      },
+      "runtime-prefix": {
+        "test": "lexer::tests::test_fstring_prefix",
+        "clean": {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 244
+        },
+        "modified": {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 244
+        },
+        "correct": true
+      }
+    }
+  },
+  "exact_resident_real_scalar_tails": {
+    "complete": true,
+    "one_pid_and_global_context": true,
+    "controls": [
+      "strip_underscores",
+      "is_known_future_feature",
+      "is_identifier_continuation",
+      "single_char_prefix"
+    ],
+    "controls_cached_across_all_revisions": true,
+    "additional_unaffected_const_control": {
+      "owner": "is_complex_number",
+      "by_revision": {
+        "baseline": {
+          "type_calls": 1,
+          "borrow_calls": 1,
+          "type_pointer_same_as_baseline": true
+        },
+        "is_unicode_identifier_start:1:changed": {
+          "type_calls": 1,
+          "borrow_calls": 2,
+          "type_pointer_same_as_baseline": true
+        },
+        "is_unicode_identifier_start:1:restored": {
+          "type_calls": 1,
+          "borrow_calls": 3,
+          "type_pointer_same_as_baseline": true
+        },
+        "is_unicode_identifier_start:2:changed": {
+          "type_calls": 1,
+          "borrow_calls": 4,
+          "type_pointer_same_as_baseline": true
+        },
+        "is_unicode_identifier_start:2:restored": {
+          "type_calls": 1,
+          "borrow_calls": 5,
+          "type_pointer_same_as_baseline": true
+        },
+        "parse_octet:1:changed": {
+          "type_calls": 1,
+          "borrow_calls": 6,
+          "type_pointer_same_as_baseline": true
+        },
+        "parse_octet:1:restored": {
+          "type_calls": 1,
+          "borrow_calls": 7,
+          "type_pointer_same_as_baseline": true
+        },
+        "parse_octet:2:changed": {
+          "type_calls": 1,
+          "borrow_calls": 8,
+          "type_pointer_same_as_baseline": true
+        },
+        "parse_octet:2:restored": {
+          "type_calls": 1,
+          "borrow_calls": 9,
+          "type_pointer_same_as_baseline": true
+        }
+      },
+      "recorded_dependency_paths_to_edited_hir": {
+        "is_unicode_identifier_start": [
+          "mir_borrowck",
+          "mir_promoted",
+          "mir_drops_elaborated_and_const_checked",
+          "analysis",
+          "check_mod_attrs",
+          "HirBody"
+        ],
+        "parse_octet": [
+          "mir_borrowck",
+          "mir_promoted",
+          "mir_drops_elaborated_and_const_checked",
+          "analysis",
+          "check_mod_attrs",
+          "HirBody"
+        ]
+      }
+    },
+    "revisions": {
+      "baseline": {
+        "compiler_errors": 0,
+        "selected_type_provider_calls": null,
+        "selected_borrow_provider_calls": null,
+        "eviction": null,
+        "fresh_diagnostic_start_matches": null,
+        "fresh_diagnostic_span_end_matches": null
+      },
+      "is_unicode_identifier_start:1:changed": {
+        "compiler_errors": 1,
+        "selected_type_provider_calls": 2,
+        "selected_borrow_provider_calls": 1,
+        "eviction": {
+          "revision": 1,
+          "removed": 2321,
+          "uncached": 0,
+          "trait_solver_reset": false
+        },
+        "fresh_diagnostic_start_matches": true,
+        "fresh_diagnostic_span_end_matches": false
+      },
+      "is_unicode_identifier_start:1:restored": {
+        "compiler_errors": 0,
+        "selected_type_provider_calls": 3,
+        "selected_borrow_provider_calls": 2,
+        "eviction": {
+          "revision": 2,
+          "removed": 11,
+          "uncached": 2310,
+          "trait_solver_reset": false
+        },
+        "fresh_diagnostic_start_matches": null,
+        "fresh_diagnostic_span_end_matches": null
+      },
+      "is_unicode_identifier_start:2:changed": {
+        "compiler_errors": 1,
+        "selected_type_provider_calls": 4,
+        "selected_borrow_provider_calls": 2,
+        "eviction": {
+          "revision": 3,
+          "removed": 20,
+          "uncached": 2301,
+          "trait_solver_reset": false
+        },
+        "fresh_diagnostic_start_matches": true,
+        "fresh_diagnostic_span_end_matches": false
+      },
+      "is_unicode_identifier_start:2:restored": {
+        "compiler_errors": 0,
+        "selected_type_provider_calls": 5,
+        "selected_borrow_provider_calls": 3,
+        "eviction": {
+          "revision": 4,
+          "removed": 11,
+          "uncached": 2310,
+          "trait_solver_reset": false
+        },
+        "fresh_diagnostic_start_matches": null,
+        "fresh_diagnostic_span_end_matches": null
+      },
+      "parse_octet:1:changed": {
+        "compiler_errors": 1,
+        "selected_type_provider_calls": 2,
+        "selected_borrow_provider_calls": 1,
+        "eviction": {
+          "revision": 5,
+          "removed": 228,
+          "uncached": 2292,
+          "trait_solver_reset": false
+        },
+        "fresh_diagnostic_start_matches": true,
+        "fresh_diagnostic_span_end_matches": false
+      },
+      "parse_octet:1:restored": {
+        "compiler_errors": 0,
+        "selected_type_provider_calls": 3,
+        "selected_borrow_provider_calls": 2,
+        "eviction": {
+          "revision": 6,
+          "removed": 18,
+          "uncached": 2502,
+          "trait_solver_reset": false
+        },
+        "fresh_diagnostic_start_matches": null,
+        "fresh_diagnostic_span_end_matches": null
+      },
+      "parse_octet:2:changed": {
+        "compiler_errors": 1,
+        "selected_type_provider_calls": 4,
+        "selected_borrow_provider_calls": 2,
+        "eviction": {
+          "revision": 7,
+          "removed": 27,
+          "uncached": 2493,
+          "trait_solver_reset": false
+        },
+        "fresh_diagnostic_start_matches": true,
+        "fresh_diagnostic_span_end_matches": false
+      },
+      "parse_octet:2:restored": {
+        "compiler_errors": 0,
+        "selected_type_provider_calls": 5,
+        "selected_borrow_provider_calls": 3,
+        "eviction": {
+          "revision": 8,
+          "removed": 18,
+          "uncached": 2502,
+          "trait_solver_reset": false
+        },
+        "fresh_diagnostic_start_matches": null,
+        "fresh_diagnostic_span_end_matches": null
+      }
+    }
+  },
+  "exact_resident_prior_supported_grammar_sweep": {
+    "lib": {
+      "complete": true,
+      "one_context": true,
+      "whole_crate_analysis_revisions": [true],
+      "all_baseline_functions_clean": true,
+      "accepted_revisions_complete": true,
+      "all_restores_clear": true,
+      "named_functions": 912,
+      "source_edit_candidates": 154,
+      "accepted_sites": 0,
+      "no_candidate_functions": 832,
+      "rejection_reasons": {
+        "requires a non-generic inherent implementation": 91,
+        "requires a free function": 37,
+        "integer expression is outside the supported function body path": 4,
+        "requires a private non-async, non-generic free or inherent function": 21,
+        "integer edit requires a directly written built-in assert condition": 1
+      }
+    },
+    "test": {
+      "complete": true,
+      "one_context": true,
+      "whole_crate_analysis_revisions": [true],
+      "all_baseline_functions_clean": true,
+      "accepted_revisions_complete": true,
+      "all_restores_clear": true,
+      "named_functions": 1601,
+      "source_edit_candidates": 408,
+      "accepted_sites": 0,
+      "no_candidate_functions": 1289,
+      "rejection_reasons": {
+        "requires a non-generic inherent implementation": 91,
+        "requires a free function": 37,
+        "integer expression is outside the supported function body path": 17,
+        "requires a private non-async, non-generic free or inherent function": 21,
+        "integer expression has an unsupported parent expression": 31,
+        "integer edits support only source expressions and built-in assert conditions": 200,
+        "requires a private non-async, non-generic free function; const requires tracked dependencies": 2,
+        "requires an ordinary source-authored function block": 8,
+        "integer edit requires a directly written built-in assert condition": 1
+      }
+    }
+  }
+}
