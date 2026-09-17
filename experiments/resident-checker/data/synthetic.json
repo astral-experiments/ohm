@@ -1,0 +1,502 @@
+{
+  "kind": "exact patched compiler, one process per fixture",
+  "fixtures": {
+    "ordinary": {
+      "success": true,
+      "required_callers_remained_cached": true,
+      "auxiliary_helpers_remained_cached": true,
+      "diagnostic_codes": [
+        [
+          "E0308"
+        ],
+        [],
+        [
+          "E0308"
+        ],
+        []
+      ],
+      "diagnostic_owners": [
+        [
+          [
+            "selected"
+          ]
+        ],
+        [],
+        [
+          [
+            "selected"
+          ]
+        ],
+        []
+      ],
+      "providers": {
+        "selected": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            1,
+            2,
+            2,
+            3
+          ],
+          "same_type_result": false
+        },
+        "untouched": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "caller": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "transitively_calls": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        }
+      }
+    },
+    "const": {
+      "success": true,
+      "required_callers_remained_cached": true,
+      "auxiliary_helpers_remained_cached": true,
+      "diagnostic_codes": [
+        [
+          "E0308"
+        ],
+        [],
+        [
+          "E0308"
+        ],
+        []
+      ],
+      "diagnostic_owners": [
+        [
+          [
+            "downstream"
+          ]
+        ],
+        [],
+        [
+          [
+            "downstream"
+          ]
+        ],
+        []
+      ],
+      "providers": {
+        "selected": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "same_type_result": false
+        },
+        "untouched": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "caller": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "same_type_result": false
+        },
+        "downstream": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            1,
+            2,
+            2,
+            3
+          ],
+          "same_type_result": false
+        },
+        "middle": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        }
+      }
+    },
+    "opaque": {
+      "success": true,
+      "required_callers_remained_cached": true,
+      "auxiliary_helpers_remained_cached": true,
+      "diagnostic_codes": [
+        [
+          "E0277"
+        ],
+        [],
+        [
+          "E0277"
+        ],
+        []
+      ],
+      "diagnostic_owners": [
+        [
+          [
+            "caller"
+          ]
+        ],
+        [],
+        [
+          [
+            "caller"
+          ]
+        ],
+        []
+      ],
+      "providers": {
+        "selected": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "same_type_result": false
+        },
+        "untouched": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "caller": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            1,
+            2,
+            2,
+            3
+          ],
+          "same_type_result": false
+        },
+        "requires_send": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "transitively_calls": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        }
+      }
+    },
+    "opaque-indirect": {
+      "success": true,
+      "required_callers_remained_cached": true,
+      "auxiliary_helpers_remained_cached": true,
+      "diagnostic_codes": [
+        [
+          "E0277",
+          "E0277"
+        ],
+        [],
+        [
+          "E0277",
+          "E0277"
+        ],
+        []
+      ],
+      "diagnostic_owners": [
+        [
+          [
+            "first_caller"
+          ],
+          [
+            "second_caller"
+          ]
+        ],
+        [],
+        [
+          [
+            "first_caller"
+          ],
+          [
+            "second_caller"
+          ]
+        ],
+        []
+      ],
+      "providers": {
+        "selected": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "same_type_result": false
+        },
+        "untouched": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "first_caller": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            1,
+            2,
+            2,
+            3
+          ],
+          "same_type_result": false
+        },
+        "other_caller": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "other_opaque": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "requires_send": {
+          "typeck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "borrowck": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "same_type_result": true
+        },
+        "second_caller": {
+          "typeck": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "borrowck": [
+            1,
+            1,
+            2,
+            2,
+            3
+          ],
+          "same_type_result": false
+        }
+      }
+    }
+  }
+}

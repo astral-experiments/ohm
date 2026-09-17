@@ -1,0 +1,184 @@
+{
+  "kind": "whole production uv-pep440 library; exact patched compiler",
+  "uv_revision": "5d64ede21e9e835e59ecd85329ebefd43faa8211",
+  "single_resident_context": true,
+  "error_counts": {
+    "0:0": 2,
+    "1:20": 0,
+    "2:0": 2,
+    "3:20": 0
+  },
+  "constants": {
+    "parse_post": [
+      {
+        "revision": "initial",
+        "success": true,
+        "evaluation_provider_runs": 3,
+        "allocation_provider_runs": 2
+      },
+      {
+        "revision": "0:0",
+        "success": false,
+        "evaluation_provider_runs": 5,
+        "allocation_provider_runs": 4
+      },
+      {
+        "revision": "1:20",
+        "success": true,
+        "evaluation_provider_runs": 7,
+        "allocation_provider_runs": 6
+      },
+      {
+        "revision": "2:0",
+        "success": false,
+        "evaluation_provider_runs": 9,
+        "allocation_provider_runs": 8
+      },
+      {
+        "revision": "3:20",
+        "success": true,
+        "evaluation_provider_runs": 11,
+        "allocation_provider_runs": 10
+      }
+    ],
+    "parse_pre": [
+      {
+        "revision": "initial",
+        "success": true,
+        "evaluation_provider_runs": 3,
+        "allocation_provider_runs": 2
+      },
+      {
+        "revision": "0:0",
+        "success": false,
+        "evaluation_provider_runs": 5,
+        "allocation_provider_runs": 4
+      },
+      {
+        "revision": "1:20",
+        "success": true,
+        "evaluation_provider_runs": 7,
+        "allocation_provider_runs": 6
+      },
+      {
+        "revision": "2:0",
+        "success": false,
+        "evaluation_provider_runs": 9,
+        "allocation_provider_runs": 8
+      },
+      {
+        "revision": "3:20",
+        "success": true,
+        "evaluation_provider_runs": 11,
+        "allocation_provider_runs": 10
+      }
+    ]
+  },
+  "enclosing_parsers": {
+    "parse_post": {
+      "revisions": [
+        {
+          "revision": "initial",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 1
+        },
+        {
+          "revision": "0:0",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 2
+        },
+        {
+          "revision": "1:20",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 3
+        },
+        {
+          "revision": "2:0",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 4
+        },
+        {
+          "revision": "3:20",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 5
+        }
+      ],
+      "same_type_result": true
+    },
+    "parse_pre": {
+      "revisions": [
+        {
+          "revision": "initial",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 1
+        },
+        {
+          "revision": "0:0",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 2
+        },
+        {
+          "revision": "1:20",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 3
+        },
+        {
+          "revision": "2:0",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 4
+        },
+        {
+          "revision": "3:20",
+          "success": true,
+          "type_provider_runs": 1,
+          "borrow_provider_runs": 5
+        }
+      ],
+      "same_type_result": true
+    }
+  },
+  "unaffected_providers_and_pointers_stable": {
+    "parse_u64": true,
+    "sortable_tuple": true,
+    "starts_with_ignore_ascii_case": true
+  },
+  "fresh": {
+    "initial": {
+      "success": true,
+      "diagnostics": []
+    },
+    "0:0": {
+      "success": false,
+      "diagnostics": [
+        "E0080",
+        "E0080"
+      ]
+    },
+    "1:20": {
+      "success": true,
+      "diagnostics": []
+    },
+    "2:0": {
+      "success": false,
+      "diagnostics": [
+        "E0080",
+        "E0080"
+      ]
+    },
+    "3:20": {
+      "success": true,
+      "diagnostics": []
+    }
+  },
+  "raw_diagnostic_snippet_updated": false,
+  "failures": []
+}
