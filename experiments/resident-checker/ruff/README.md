@@ -10,6 +10,18 @@ An extended editor then changed the real `lexer::is_unicode_identifier_start` fu
 
 The [original whole-crate sweep](../data/ruff-parser-whole-analysis.json) found and repaired 47 supported sites in the library and 52 in the test build, with no failed repairs; these counts overlap. It still reran borrow checking for every named function: all 912 in the library and all 1,601 in the test build. After distinguishing queries that access one-use compiler values from queries that only ensure those values are available, the [new sweep](../data/ruff-parser-whole-analysis-selective.json) preserved all 47 and 52 error/repair pairs. Median borrow-check reruns fell to 177 of 912 (range 1–317) and 177 of 1,601 (range 1–938). All 47 production and 52 test-build errors were independently compared with freshly started compilers. This demonstrates selective reuse during whole-crate analysis; it is not an end-to-end Cargo timing result.
 
+The [timed comparison](../data/ruff-parser-timing.json) uses 20 rounds after two warmups for three production edits: Unicode identifier detection, octal string parsing, and expression parsing. In each of 120 paired revisions, the resident compiler and a freshly started instance of the same patched compiler both request whole-crate analysis. The failing edits report exactly one matching error; the repairs are clean. The measurements were collected on an Apple M5 Max with 128 GB of memory.
+
+| Transition           | Warm resident median | Fresh compiler median | Warm resident p95 | Fresh compiler p95 |
+| -------------------- | -------------------: | --------------------: | ----------------: | -----------------: |
+| Error-producing edit |                13 ms |                582 ms |            111 ms |             744 ms |
+| Clean repair         |                36 ms |                608 ms |            130 ms |             769 ms |
+| Both                 |                26 ms |                598 ms |            128 ms |             769 ms |
+
+The resident measurement starts when the harness sends an edit instruction and ends when diagnostics are ready; it includes communication, invalidation, and whole-crate analysis. Starting and warming the resident compiler cost 642 ms. The fresh measurement includes process startup, parsing, analysis, and exit. Neither measurement includes Cargo, metadata emission, code generation, or linking; both disable disk incremental compilation. The resident compiler patches retained HIR, so its measurement does not include receiving and parsing edited source text. Diagnostic range ends and rendered text still reflect the original source. The design follows the warmup and alternating edit pattern used by [ty's incremental benchmark](https://github.com/astral-sh/ruff/blob/fd5d636bdd58a5a42e0212988e1cdf710eec8558/crates/ruff_benchmark/benches/ty.rs#L126-L165) and [Salsa's dataflow benchmark](https://github.com/salsa-rs/salsa/blob/ba08e3fe9a7e4d332d9130753109b931baa9a7fa/benches/dataflow.rs#L137-L172). [ty's language-server benchmark](https://github.com/astral-sh/ruff/blob/fd5d636bdd58a5a42e0212988e1cdf710eec8558/scripts/ty_benchmark/src/benchmark/test_lsp_diagnostics.py#L282-L340) is the reference for a future measurement from actual source delivery to refreshed diagnostics.
+
+The separate [ordinary Cargo measurement](../data/ruff-parser-cargo-timing.json) keeps Ohm's defaults and disk incremental compilation enabled. Ten rounds after two warmups produced 30 error edits and 30 clean repairs. End-to-end `cargo +ohm check -p ruff_python_parser --lib` took 204 ms median for errors (413 ms p95) and 202 ms for repairs (329 ms p95); ten warm no-op checks had a 69 ms median. The measured process includes Cargo and normal Rust check output; the source-file write is outside the timer. These Cargo numbers are a useful developer baseline but do not mean the prototype is a resident Cargo command: its own timer still starts from a predefined HIR edit rather than a changed source file.
+
 First build the companion patched Ohm compiler and its matching standard, test, procedural macro, and rustdoc libraries in the Rust checkout:
 
 ```sh
@@ -42,3 +54,24 @@ python3 experiments/resident-checker/ruff/run_edits.py \
 ```
 
 Keep the archive and Cargo target used for `run_tests.py` in place, because the captured invocation points to them. Pass `--target` for a bootstrap host other than `aarch64-apple-darwin`. The driver writes `targeted.json` and both raw compiler streams. `--fresh-reference /path/to/fresh-diagnostics` optionally compares the errors against rustc JSON logs named `parser-identifier-type.stderr` and `string-method-type.stderr`; native-only reproduction does not need those logs.
+
+Use the same captured library invocation for the paired timing; this runner creates two fresh disposable Ruff archives and keeps raw samples, commands, and diagnostics under its output directory:
+
+```sh
+python3 experiments/resident-checker/ruff/measure.py \
+  --bootstrap /path/to/bootstrap \
+  --capture /path/to/results/graph-test/captures/ruff_python_parser.lib.json \
+  --repo /path/to/ruff --output /path/to/paired-timings \
+  --compiler-revision <patched-compiler-git-sha>
+```
+
+Measure normal warm Cargo separately. This command uses its own disposable archive and target, leaves Cargo incremental compilation enabled, and writes raw command output and samples alongside its summary:
+
+```sh
+python3 experiments/resident-checker/ruff/measure_cargo.py \
+  --repo /path/to/ruff --checkout /path/to/disposable/cargo-ruff \
+  --target /path/to/isolated/cargo-target \
+  --stage /path/to/bootstrap/aarch64-apple-darwin/stage1 \
+  --output /path/to/cargo-timings \
+  --compiler-revision <patched-compiler-git-sha>
+```

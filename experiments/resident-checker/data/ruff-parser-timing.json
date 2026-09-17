@@ -1,0 +1,600 @@
+{
+  "schema": 1,
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "compiler": {
+    "source_revision": "c67f58f8e7f233b7d83437624fbbd002efa5b4c7",
+    "reported": {
+      "release": "1.98.1-dev",
+      "commit-hash": null,
+      "commit-date": null,
+      "host": "aarch64-apple-darwin",
+      "LLVM version": "22.1.8"
+    }
+  },
+  "target": "aarch64-apple-darwin",
+  "environment": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "rounds": 20,
+  "warmup_rounds": 2,
+  "random_seed": 82413,
+  "case_execution_order": "cases and fresh/resident first mode randomized each round and revision; fixed seed",
+  "percentile_method": "nearest rank",
+  "compiler_graph": "enabled in both modes",
+  "disk_incremental": false,
+  "scopes": {
+    "resident_external": "parent writes predefined mutation or restoration request to already-warm child stdin and waits for flushed diagnostic-complete response; includes IPC, HIR patch/restore, invalidation, full-crate analysis and diagnostic output",
+    "fresh_external": "parent starts child to child exit; includes process startup and teardown, source parsing/expansion, full-crate analysis and diagnostic output; source file was written just before but outside this interval",
+    "internal_analysis": "rustc analysis(()) call only; fresh does not include startup, source parsing/expansion or process teardown in this metric",
+    "excluded_from_both": "Cargo startup, dependency work, file-watcher/source-save overhead, output metadata serialization, code generation, link and test execution",
+    "source": "fresh reads edited text in a private Ruff Git archive; resident applies a supported direct-tail replacement in retained HIR, and does not accept arbitrary edited source text",
+    "diagnostic_equality": "error count, code, message, and primary file/line/start-column in every pair; end columns and source text are not compared",
+    "warmup": "one resident baseline plus the configured paired warmup rounds; fresh OS/disk caches stay warm and every timed fresh compiler is a new process"
+  },
+  "correctness": {
+    "paired_revisions": 120,
+    "edits_produced_one_matching_e0308": 60,
+    "repairs_produced_no_errors": 60,
+    "resident_processes": 1,
+    "fresh_process_ids": 120
+  },
+  "resident_startup_ms": {
+    "external": 641.832,
+    "analysis": 540.726
+  },
+  "all_revisions": {
+    "resident": {
+      "external_ms": {
+        "count": 120,
+        "min": 4.431,
+        "median": 26.355,
+        "p95": 128.233,
+        "max": 163.31
+      },
+      "analysis_ms": {
+        "count": 120,
+        "min": 4.229,
+        "median": 25.925,
+        "p95": 123.614,
+        "max": 158.604
+      },
+      "edit_ms": {
+        "count": 120,
+        "min": 0.035,
+        "median": 0.244,
+        "p95": 3.689,
+        "max": 5.189
+      },
+      "internal_total_ms": {
+        "count": 120,
+        "min": 4.278,
+        "median": 26.223,
+        "p95": 128.121,
+        "max": 162.981
+      }
+    },
+    "fresh": {
+      "external_ms": {
+        "count": 120,
+        "min": 558.053,
+        "median": 597.968,
+        "p95": 769.331,
+        "max": 1388.689
+      },
+      "analysis_ms": {
+        "count": 120,
+        "min": 433.461,
+        "median": 471.096,
+        "p95": 611.012,
+        "max": 758.735
+      }
+    },
+    "external_speedup": {
+      "fresh_median_over_resident_median": 22.689,
+      "paired_fresh_over_resident": {
+        "count": 120,
+        "min": 4.313,
+        "median": 28.937,
+        "p95": 116.899,
+        "max": 237.352
+      }
+    }
+  },
+  "by_operation": {
+    "apply": {
+      "resident": {
+        "external_ms": {
+          "count": 60,
+          "min": 4.431,
+          "median": 13.225,
+          "p95": 110.669,
+          "max": 156.777
+        },
+        "analysis_ms": {
+          "count": 60,
+          "min": 4.229,
+          "median": 12.863,
+          "p95": 106.922,
+          "max": 151.474
+        },
+        "edit_ms": {
+          "count": 60,
+          "min": 0.038,
+          "median": 0.236,
+          "p95": 3.576,
+          "max": 5.189
+        },
+        "internal_total_ms": {
+          "count": 60,
+          "min": 4.278,
+          "median": 13.098,
+          "p95": 110.446,
+          "max": 156.663
+        }
+      },
+      "fresh": {
+        "external_ms": {
+          "count": 60,
+          "min": 558.053,
+          "median": 582.483,
+          "p95": 743.719,
+          "max": 1388.689
+        },
+        "analysis_ms": {
+          "count": 60,
+          "min": 433.461,
+          "median": 459.017,
+          "p95": 610.44,
+          "max": 758.735
+        }
+      },
+      "external_speedup": {
+        "fresh_median_over_resident_median": 44.043,
+        "paired_fresh_over_resident": {
+          "count": 60,
+          "min": 4.987,
+          "median": 44.504,
+          "p95": 124.14,
+          "max": 237.352
+        }
+      }
+    },
+    "restore": {
+      "resident": {
+        "external_ms": {
+          "count": 60,
+          "min": 13.817,
+          "median": 36.055,
+          "p95": 129.737,
+          "max": 163.31
+        },
+        "analysis_ms": {
+          "count": 60,
+          "min": 13.696,
+          "median": 35.641,
+          "p95": 126.073,
+          "max": 158.604
+        },
+        "edit_ms": {
+          "count": 60,
+          "min": 0.035,
+          "median": 0.286,
+          "p95": 3.689,
+          "max": 4.506
+        },
+        "internal_total_ms": {
+          "count": 60,
+          "min": 13.732,
+          "median": 35.931,
+          "p95": 129.614,
+          "max": 162.981
+        }
+      },
+      "fresh": {
+        "external_ms": {
+          "count": 60,
+          "min": 580.394,
+          "median": 607.641,
+          "p95": 769.331,
+          "max": 872.653
+        },
+        "analysis_ms": {
+          "count": 60,
+          "min": 458.063,
+          "median": 482.161,
+          "p95": 611.012,
+          "max": 720.745
+        }
+      },
+      "external_speedup": {
+        "fresh_median_over_resident_median": 16.853,
+        "paired_fresh_over_resident": {
+          "count": 60,
+          "min": 4.313,
+          "median": 16.659,
+          "p95": 42.884,
+          "max": 47.09
+        }
+      }
+    }
+  },
+  "cases": {
+    "unicode-identifier": {
+      "owner": "lexer::is_unicode_identifier_start",
+      "file": "src/lexer.rs",
+      "replacement": "0u8",
+      "original_expression": "is_xid_start(c)",
+      "operations": {
+        "apply": {
+          "resident": {
+            "external_ms": {
+              "count": 20,
+              "min": 4.431,
+              "median": 5.622,
+              "p95": 5.875,
+              "max": 6.87
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 4.229,
+              "median": 5.465,
+              "p95": 5.697,
+              "max": 6.663
+            },
+            "edit_ms": {
+              "count": 20,
+              "min": 0.038,
+              "median": 0.06,
+              "p95": 0.07,
+              "max": 0.07
+            },
+            "internal_total_ms": {
+              "count": 20,
+              "min": 4.278,
+              "median": 5.522,
+              "p95": 5.757,
+              "max": 6.727
+            }
+          },
+          "fresh": {
+            "external_ms": {
+              "count": 20,
+              "min": 559.717,
+              "median": 591.09,
+              "p95": 686.79,
+              "max": 1388.689
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 433.461,
+              "median": 462.882,
+              "p95": 529.707,
+              "max": 613.148
+            }
+          },
+          "external_speedup": {
+            "fresh_median_over_resident_median": 105.131,
+            "paired_fresh_over_resident": {
+              "count": 20,
+              "min": 87.662,
+              "median": 107.275,
+              "p95": 126.407,
+              "max": 237.352
+            }
+          }
+        },
+        "restore": {
+          "resident": {
+            "external_ms": {
+              "count": 20,
+              "min": 13.817,
+              "median": 15.201,
+              "p95": 17.232,
+              "max": 17.252
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 13.696,
+              "median": 15.003,
+              "p95": 16.337,
+              "max": 17.044
+            },
+            "edit_ms": {
+              "count": 20,
+              "min": 0.035,
+              "median": 0.055,
+              "p95": 0.062,
+              "max": 0.063
+            },
+            "internal_total_ms": {
+              "count": 20,
+              "min": 13.732,
+              "median": 15.052,
+              "p95": 16.394,
+              "max": 17.106
+            }
+          },
+          "fresh": {
+            "external_ms": {
+              "count": 20,
+              "min": 580.394,
+              "median": 607.396,
+              "p95": 653.563,
+              "max": 811.44
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 463.012,
+              "median": 478.373,
+              "p95": 522.251,
+              "max": 611.012
+            }
+          },
+          "external_speedup": {
+            "fresh_median_over_resident_median": 39.959,
+            "paired_fresh_over_resident": {
+              "count": 20,
+              "min": 36.666,
+              "median": 39.456,
+              "p95": 44.028,
+              "max": 47.09
+            }
+          }
+        }
+      }
+    },
+    "parse-octet": {
+      "owner": "string::StringParser::parse_octet",
+      "file": "src/string.rs",
+      "replacement": "0u8",
+      "original_expression": "char::from_u32(value).unwrap()",
+      "operations": {
+        "apply": {
+          "resident": {
+            "external_ms": {
+              "count": 20,
+              "min": 11.877,
+              "median": 13.225,
+              "p95": 15.451,
+              "max": 19.386
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 11.606,
+              "median": 12.863,
+              "p95": 15.083,
+              "max": 18.838
+            },
+            "edit_ms": {
+              "count": 20,
+              "min": 0.178,
+              "median": 0.236,
+              "p95": 0.31,
+              "max": 0.38
+            },
+            "internal_total_ms": {
+              "count": 20,
+              "min": 11.786,
+              "median": 13.098,
+              "p95": 15.329,
+              "max": 19.219
+            }
+          },
+          "fresh": {
+            "external_ms": {
+              "count": 20,
+              "min": 558.053,
+              "median": 582.483,
+              "p95": 617.91,
+              "max": 920.906
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 434.295,
+              "median": 458.023,
+              "p95": 490.598,
+              "max": 758.735
+            }
+          },
+          "external_speedup": {
+            "fresh_median_over_resident_median": 44.043,
+            "paired_fresh_over_resident": {
+              "count": 20,
+              "min": 39.991,
+              "median": 44.504,
+              "p95": 47.504,
+              "max": 48.505
+            }
+          }
+        },
+        "restore": {
+          "resident": {
+            "external_ms": {
+              "count": 20,
+              "min": 33.324,
+              "median": 36.055,
+              "p95": 41.149,
+              "max": 42.326
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 33.013,
+              "median": 35.641,
+              "p95": 40.663,
+              "max": 41.851
+            },
+            "edit_ms": {
+              "count": 20,
+              "min": 0.209,
+              "median": 0.286,
+              "p95": 0.356,
+              "max": 0.368
+            },
+            "internal_total_ms": {
+              "count": 20,
+              "min": 33.227,
+              "median": 35.931,
+              "p95": 41.015,
+              "max": 42.207
+            }
+          },
+          "fresh": {
+            "external_ms": {
+              "count": 20,
+              "min": 584.748,
+              "median": 606.287,
+              "p95": 769.331,
+              "max": 872.653
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 463.282,
+              "median": 487.464,
+              "p95": 627.606,
+              "max": 720.745
+            }
+          },
+          "external_speedup": {
+            "fresh_median_over_resident_median": 16.815,
+            "paired_fresh_over_resident": {
+              "count": 20,
+              "min": 15.142,
+              "median": 16.659,
+              "p95": 20.196,
+              "max": 21.207
+            }
+          }
+        }
+      }
+    },
+    "parse-atom": {
+      "owner": "parser::Parser::parse_atom",
+      "file": "src/parser/expression.rs",
+      "replacement": "0u8",
+      "original_expression": "lhs.into()",
+      "operations": {
+        "apply": {
+          "resident": {
+            "external_ms": {
+              "count": 20,
+              "min": 88.165,
+              "median": 94.598,
+              "p95": 117.306,
+              "max": 156.777
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 84.913,
+              "median": 90.997,
+              "p95": 113.195,
+              "max": 151.474
+            },
+            "edit_ms": {
+              "count": 20,
+              "min": 2.996,
+              "median": 3.424,
+              "p95": 4.194,
+              "max": 5.189
+            },
+            "internal_total_ms": {
+              "count": 20,
+              "min": 88.07,
+              "median": 94.394,
+              "p95": 117.21,
+              "max": 156.663
+            }
+          },
+          "fresh": {
+            "external_ms": {
+              "count": 20,
+              "min": 562.195,
+              "median": 578.33,
+              "p95": 743.719,
+              "max": 781.802
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 437.944,
+              "median": 454.827,
+              "p95": 610.44,
+              "max": 642.714
+            }
+          },
+          "external_speedup": {
+            "fresh_median_over_resident_median": 6.114,
+            "paired_fresh_over_resident": {
+              "count": 20,
+              "min": 4.987,
+              "median": 6.11,
+              "p95": 6.72,
+              "max": 6.733
+            }
+          }
+        },
+        "restore": {
+          "resident": {
+            "external_ms": {
+              "count": 20,
+              "min": 113.766,
+              "median": 119.276,
+              "p95": 159.77,
+              "max": 163.31
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 110.588,
+              "median": 115.568,
+              "p95": 155.628,
+              "max": 158.604
+            },
+            "edit_ms": {
+              "count": 20,
+              "min": 3.074,
+              "median": 3.516,
+              "p95": 4.377,
+              "max": 4.506
+            },
+            "internal_total_ms": {
+              "count": 20,
+              "min": 113.662,
+              "median": 119.143,
+              "p95": 159.635,
+              "max": 162.981
+            }
+          },
+          "fresh": {
+            "external_ms": {
+              "count": 20,
+              "min": 584.892,
+              "median": 608.769,
+              "p95": 764.683,
+              "max": 818.044
+            },
+            "analysis_ms": {
+              "count": 20,
+              "min": 458.063,
+              "median": 482.123,
+              "p95": 600.495,
+              "max": 673.319
+            }
+          },
+          "external_speedup": {
+            "fresh_median_over_resident_median": 5.104,
+            "paired_fresh_over_resident": {
+              "count": 20,
+              "min": 4.313,
+              "median": 5.035,
+              "p95": 6.083,
+              "max": 6.379
+            }
+          }
+        }
+      }
+    }
+  }
+}

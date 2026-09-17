@@ -1,0 +1,101 @@
+{
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "measurement": "normal cargo +ohm check, incremental on and resident query graph off, end-to-end process start to exit; source file write excluded; dependencies and filesystem warm after initial check",
+  "command": "cargo +ohm check --locked -p ruff_python_parser --lib --message-format=json",
+  "compiler": "rustc 1.98.1-dev",
+  "machine": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "warmup_rounds": 2,
+  "measured_rounds": 10,
+  "seed": 42,
+  "initial_seconds": 4.076,
+  "warm_noop": {
+    "samples": 10,
+    "minimum_ms": 66.623,
+    "median_ms": 69.281,
+    "p95_ms": 74.867,
+    "maximum_ms": 75.692
+  },
+  "by_operation": {
+    "apply": {
+      "samples": 30,
+      "minimum_ms": 181.566,
+      "median_ms": 204.356,
+      "p95_ms": 412.682,
+      "maximum_ms": 638.85
+    },
+    "restore": {
+      "samples": 30,
+      "minimum_ms": 182.18,
+      "median_ms": 201.59,
+      "p95_ms": 328.746,
+      "maximum_ms": 647.181
+    }
+  },
+  "by_case": {
+    "unicode-identifier": {
+      "apply": {
+        "samples": 10,
+        "minimum_ms": 181.566,
+        "median_ms": 195.017,
+        "p95_ms": 343.474,
+        "maximum_ms": 445.453
+      },
+      "restore": {
+        "samples": 10,
+        "minimum_ms": 190.823,
+        "median_ms": 208.043,
+        "p95_ms": 328.746,
+        "maximum_ms": 354.272
+      }
+    },
+    "parse-octet": {
+      "apply": {
+        "samples": 10,
+        "minimum_ms": 191.598,
+        "median_ms": 195.876,
+        "p95_ms": 452.788,
+        "maximum_ms": 638.85
+      },
+      "restore": {
+        "samples": 10,
+        "minimum_ms": 182.18,
+        "median_ms": 194.756,
+        "p95_ms": 455.493,
+        "maximum_ms": 647.181
+      }
+    },
+    "parse-atom": {
+      "apply": {
+        "samples": 10,
+        "minimum_ms": 201.263,
+        "median_ms": 209.979,
+        "p95_ms": 318.402,
+        "maximum_ms": 372.629
+      },
+      "restore": {
+        "samples": 10,
+        "minimum_ms": 185.146,
+        "median_ms": 202.548,
+        "p95_ms": 237.926,
+        "maximum_ms": 250.528
+      }
+    }
+  },
+  "validation": {
+    "all_applies_reported_exactly_one_E0308": true,
+    "all_restores_were_clean_and_recompiled_the_parser": true,
+    "all_warm_noops_marked_the_parser_fresh": true,
+    "measured_transitions": 60
+  },
+  "compiler_source_revision": "c67f58f8e7f233b7d83437624fbbd002efa5b4c7",
+  "offline": true,
+  "cargo_defaults": "Ohm defaults enabled; disk incremental on; resident query graph off",
+  "percentile_method": "linearly interpolated between closest ranks"
+}
