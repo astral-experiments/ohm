@@ -34,4 +34,10 @@ python3 experiments/resident-checker/compact.py \
   /path/to/uv-results/summary.json /path/to/uv-summary.json
 ```
 
+After regenerating checked-in reports, apply the repository's pinned JSON formatter:
+
+```sh
+npm exec -- prettier --write 'experiments/resident-checker/data/*.json'
+```
+
 The drivers default to `aarch64-apple-darwin`; pass `--target` for another supported target. They use private compiler metadata and must be built against the same patched compiler. These results do not establish arbitrary source-edit support, Cargo integration, or whole-project performance. The source text held by the resident compiler is still the original; the uv comparison checks structured diagnostics and mapped locations, not unchanged raw rendered source snippets.
