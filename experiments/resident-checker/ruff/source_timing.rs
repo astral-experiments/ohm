@@ -702,7 +702,107 @@ fn fresh(tcx: TyCtxt<'_>) {
     tcx.dcx().reset_err_count();
 }
 
-fn resident<'tcx>(tcx: TyCtxt<'tcx>) {
+#[derive(Default)]
+struct BuildGuard {
+    baseline_errors: bool,
+    errored_owners: BTreeSet<(PathBuf, usize, usize)>,
+    rejected_paths: BTreeSet<PathBuf>,
+    sources: BTreeMap<PathBuf, Vec<u8>>,
+}
+
+fn source_key(path: &Path) -> PathBuf {
+    std::fs::canonicalize(path).unwrap_or_else(|_| {
+        if path.is_absolute() {
+            path.to_owned()
+        } else {
+            std::env::current_dir().unwrap().join(path)
+        }
+    })
+}
+
+impl BuildGuard {
+    fn new(tcx: TyCtxt<'_>, baseline_errors: bool) -> Self {
+        let sources = tcx
+            .sess
+            .source_map()
+            .files()
+            .iter()
+            .filter(|source| source.src.is_some())
+            .filter_map(|source| {
+                let path = source.name.clone().into_local_path()?;
+                let path = std::fs::canonicalize(path).ok()?;
+                let bytes = std::fs::read(&path).ok()?;
+                Some((path, bytes))
+            })
+            .collect();
+        Self {
+            baseline_errors,
+            sources,
+            ..Self::default()
+        }
+    }
+
+    fn checked(&mut self, path: &Path, outcome: &Outcome) {
+        let path = source_key(path);
+        if outcome.mode == "fallback" {
+            self.rejected_paths.insert(path);
+        } else {
+            self.rejected_paths.remove(&path);
+            if let Some((start, end)) = outcome.owner_positions {
+                let owner = (path, start, end);
+                // Resident reanalysis clears rustc's global diagnostic counter. Keep a
+                // conservative per-owner error ledger so a later check in another source file
+                // cannot turn an earlier, still-active type error into a buildable crate.
+                if outcome.errors == 0 {
+                    self.errored_owners.remove(&owner);
+                } else {
+                    self.errored_owners.insert(owner);
+                }
+            }
+        }
+    }
+
+    fn rejection(
+        &self,
+        tcx: TyCtxt<'_>,
+        files: &BTreeMap<PathBuf, FileState>,
+    ) -> Option<&'static str> {
+        if self.baseline_errors {
+            return Some("initial-analysis-had-errors");
+        }
+        if !self.errored_owners.is_empty() || tcx.dcx().has_errors_or_delayed_bugs().is_some() {
+            return Some("accepted-source-has-errors");
+        }
+        for path in &self.rejected_paths {
+            let Some(baseline) = self.sources.get(path) else {
+                return Some("source-revision-requires-fresh-compiler");
+            };
+            if std::fs::read(path).as_deref().ok() != Some(baseline.as_slice()) {
+                return Some("source-revision-requires-fresh-compiler");
+            }
+        }
+        // Verify all file-backed input loaded by the initial compiler, including module files
+        // without eligible HIR owners and inputs from `include!` or `include_bytes!`. A client
+        // cannot publish a binary after saving a known source file without checking it first.
+        for (path, original) in &self.sources {
+            let accepted = files
+                .get(path)
+                .map_or(original.as_slice(), |file| file.accepted.as_bytes());
+            if std::fs::read(path).as_deref().ok() != Some(accepted) {
+                return Some("source-on-disk-does-not-match-accepted-revision");
+            }
+        }
+        None
+    }
+}
+
+enum ResidentExit {
+    Stop,
+    Build { version: String, started: Instant },
+    Rejected,
+}
+
+fn resident<'tcx>(tcx: TyCtxt<'tcx>, allow_build: bool) -> ResidentExit {
     assert!(tcx.query_system.resident.is_some());
     marker("start", "baseline");
     let started = Instant::now();
@@ -714,18 +814,44 @@ fn resident<'tcx>(tcx: TyCtxt<'tcx>) {
     let mut active = BTreeMap::new();
     let mut graph_revision = 0;
     let mut last_version = 0;
+    let mut build_guard = allow_build.then(|| {
+        BuildGuard::new(
+            tcx,
+            errors > 0 || tcx.dcx().has_errors_or_delayed_bugs().is_some(),
+        )
+    });
     stdout(format_args!("ready\t{}\t{elapsed}", std::process::id()));
     for line in io::stdin().lock().lines() {
         let line = line.unwrap();
         if line == "quit" {
             tcx.dcx().reset_err_count();
             stdout(format_args!("bye"));
-            return;
+            return ResidentExit::Stop;
         }
         let mut fields = line.splitn(3, '\t');
-        assert_eq!(fields.next(), Some("check"));
+        let command = fields.next();
         let version = fields.next().expect("version");
-        let sequence: u64 = version.parse().expect("positive integer version");
+        let sequence: u64 = version.parse().expect("nonnegative integer version");
+        if command == Some("build") {
+            let started = Instant::now();
+            marker("build-start", version);
+            let reason = match &build_guard {
+                None => Some("build-mode-is-disabled"),
+                Some(_) if fields.next().is_some() => Some("unexpected-build-argument"),
+                Some(_) if sequence != last_version => Some("source-version-is-not-current"),
+                Some(guard) => guard.rejection(tcx, &files),
+            };
+            if let Some(reason) = reason {
+                stdout(format_args!("build\t{version}\trejected\t{reason}"));
+                return ResidentExit::Rejected;
+            }
+            stdout(format_args!("build\t{version}\tready\t-"));
+            return ResidentExit::Build {
+                version: version.to_owned(),
+                started,
+            };
+        }
+        assert_eq!(command, Some("check"));
         assert!(sequence > last_version, "source versions must increase");
         last_version = sequence;
         let path = fields.next().expect("source path");
@@ -739,6 +865,9 @@ fn resident<'tcx>(tcx: TyCtxt<'tcx>) {
             &mut errors,
             &mut graph_revision,
         );
+        if let Some(guard) = &mut build_guard {
+            guard.checked(Path::new(path), &result);
+        }
         let elapsed = started.elapsed().as_nanos();
         marker("end", version);
         let positions = result.positions.map_or_else(
@@ -761,10 +890,14 @@ fn resident<'tcx>(tcx: TyCtxt<'tcx>) {
             result.diagnostic_epoch,
         ));
     }
-    panic!("parent closed stdin without sending quit");
+    panic!("parent closed stdin without sending quit or build");
 }
 
-struct Driver;
+#[derive(Default)]
+struct Driver {
+    build: Option<(String, Instant)>,
+    rejected_build: bool,
+}
 
 impl Callbacks for Driver {
     fn config(&mut self, config: &mut interface::Config) {
@@ -774,15 +907,54 @@ impl Callbacks for Driver {
 
     fn after_expansion<'tcx>(&mut self, _: &interface::Compiler, tcx: TyCtxt<'tcx>) -> Compilation {
         match std::env::var("OHM_RUFF_SOURCE_MODE").as_deref() {
-            Ok("resident") => resident(tcx),
-            Ok("fresh") => fresh(tcx),
-            _ => panic!("OHM_RUFF_SOURCE_MODE must be resident or fresh"),
+            Ok(mode @ ("resident" | "resident-build")) => {
+                match resident(tcx, mode == "resident-build") {
+                    ResidentExit::Stop => Compilation::Stop,
+                    ResidentExit::Build { version, started } => {
+                        self.build = Some((version, started));
+                        Compilation::Continue
+                    }
+                    ResidentExit::Rejected => {
+                        self.rejected_build = true;
+                        Compilation::Stop
+                    }
+                }
+            }
+            Ok("fresh") => {
+                fresh(tcx);
+                Compilation::Stop
+            }
+            _ => panic!("OHM_RUFF_SOURCE_MODE must be resident, resident-build, or fresh"),
         }
-        Compilation::Stop
+    }
+
+    fn after_analysis<'tcx>(&mut self, _: &interface::Compiler, _: TyCtxt<'tcx>) -> Compilation {
+        if let Some((version, started)) = &self.build {
+            marker("build-analysis-end", version);
+            stdout(format_args!(
+                "build-analysis\t{version}\t{}",
+                started.elapsed().as_nanos()
+            ));
+        }
+        Compilation::Continue
     }
 }
 
 fn main() -> std::process::ExitCode {
     let args = std::env::args().collect::<Vec<_>>();
-    rustc_driver::catch_with_exit_code(|| rustc_driver::run_compiler(&args, &mut Driver))
+    let mut driver = Driver::default();
+    let exit =
+        rustc_driver::catch_with_exit_code(|| rustc_driver::run_compiler(&args, &mut driver));
+    if let Some((version, started)) = &driver.build {
+        marker("build-finished", version);
+        stdout(format_args!(
+            "build-finished\t{version}\t{}",
+            started.elapsed().as_nanos()
+        ));
+    }
+    if driver.rejected_build {
+        std::process::ExitCode::FAILURE
+    } else {
+        exit
+    }
 }

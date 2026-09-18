@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "passed": 9,
+  "cases": [
+    {
+      "case": "baseline",
+      "checks": [],
+      "build_route": "ready",
+      "build_rejection": null,
+      "compiler_exit": 0,
+      "test_invoked": true,
+      "test_exit": 0,
+      "stale_artifact_preserved": null
+    },
+    {
+      "case": "behavior-edit",
+      "checks": [
+        {
+          "source": "lib.rs",
+          "route": "resident",
+          "reason": "-",
+          "errors": 0
+        }
+      ],
+      "build_route": "ready",
+      "build_rejection": null,
+      "compiler_exit": 0,
+      "test_invoked": true,
+      "test_exit": 101,
+      "stale_artifact_preserved": null
+    },
+    {
+      "case": "behavior-repair",
+      "checks": [
+        {
+          "source": "lib.rs",
+          "route": "resident",
+          "reason": "-",
+          "errors": 0
+        },
+        {
+          "source": "lib.rs",
+          "route": "resident",
+          "reason": "-",
+          "errors": 0
+        }
+      ],
+      "build_route": "ready",
+      "build_rejection": null,
+      "compiler_exit": 0,
+      "test_invoked": true,
+      "test_exit": 0,
+      "stale_artifact_preserved": null
+    },
+    {
+      "case": "type-error",
+      "checks": [
+        {
+          "source": "lib.rs",
+          "route": "resident",
+          "reason": "-",
+          "errors": 1
+        }
+      ],
+      "build_route": "rejected",
+      "build_rejection": "accepted-source-has-errors",
+      "compiler_exit": 1,
+      "test_invoked": false,
+      "test_exit": null,
+      "stale_artifact_preserved": null
+    },
+    {
+      "case": "type-error-repair",
+      "checks": [
+        {
+          "source": "lib.rs",
+          "route": "resident",
+          "reason": "-",
+          "errors": 1
+        },
+        {
+          "source": "lib.rs",
+          "route": "resident",
+          "reason": "-",
+          "errors": 0
+        }
+      ],
+      "build_route": "ready",
+      "build_rejection": null,
+      "compiler_exit": 0,
+      "test_invoked": true,
+      "test_exit": 0,
+      "stale_artifact_preserved": null
+    },
+    {
+      "case": "wrong-version",
+      "checks": [],
+      "build_route": "rejected",
+      "build_rejection": "source-version-is-not-current",
+      "compiler_exit": 1,
+      "test_invoked": false,
+      "test_exit": null,
+      "stale_artifact_preserved": true
+    },
+    {
+      "case": "unchecked-edit",
+      "checks": [],
+      "build_route": "rejected",
+      "build_rejection": "source-on-disk-does-not-match-accepted-revision",
+      "compiler_exit": 1,
+      "test_invoked": false,
+      "test_exit": null,
+      "stale_artifact_preserved": true
+    },
+    {
+      "case": "unsupported-edit",
+      "checks": [
+        {
+          "source": "other.rs",
+          "route": "fallback",
+          "reason": "change-is-not-one-complete-source-tail",
+          "errors": 0
+        }
+      ],
+      "build_route": "rejected",
+      "build_rejection": "source-revision-requires-fresh-compiler",
+      "compiler_exit": 1,
+      "test_invoked": false,
+      "test_exit": null,
+      "stale_artifact_preserved": true
+    },
+    {
+      "case": "unrelated-error",
+      "checks": [
+        {
+          "source": "other.rs",
+          "route": "resident",
+          "reason": "-",
+          "errors": 1
+        },
+        {
+          "source": "lib.rs",
+          "route": "resident",
+          "reason": "-",
+          "errors": 0
+        }
+      ],
+      "build_route": "rejected",
+      "build_rejection": "accepted-source-has-errors",
+      "compiler_exit": 1,
+      "test_invoked": false,
+      "test_exit": null,
+      "stale_artifact_preserved": true
+    }
+  ]
+}

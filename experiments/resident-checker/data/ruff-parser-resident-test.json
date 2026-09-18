@@ -1,0 +1,594 @@
+{
+  "schema": 1,
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "compiler": {
+    "source_revision": "c67f58f8e7f233b7d83437624fbbd002efa5b4c7",
+    "reported": {
+      "release": "1.98.1-dev",
+      "commit-hash": null,
+      "commit-date": null,
+      "host": "aarch64-apple-darwin",
+      "LLVM version": "22.1.8"
+    }
+  },
+  "machine": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "test": "string::tests::test_escape_octet",
+  "rounds": 5,
+  "warmup_rounds": 1,
+  "transitions_per_round": [
+    ["baseline", "good", "good", "pass"],
+    ["behavior-edit", "good", "behavior", "fail"],
+    ["behavior-repair", "behavior", "good", "pass"],
+    ["compile-error", "good", "error", "compile_error"],
+    ["compile-repair", "error", "good", "pass"]
+  ],
+  "measurement": "Each timer starts before a real source save and ends after the selected exact libtest exits, or after rustc rejects an unbuildable source. Modes run sequentially on independent disposable archives. No tests run after an unsuccessful build.",
+  "resident": "New resident test-target compiler per build, warmed through full crate analysis before timing; repair workers replay the preceding scalar source edit in the same native process before timing to restore the prior HIR checkpoint. Successful workers hand the retained compilation back to stock rustc for actual code generation and linking, then exit. Cargo's captured --test invocation preserves test, emit, profile, and dependency flags; rustc disk incremental is disabled; process restart and replay are reported separately.",
+  "cargo": "Ordinary warm cargo +ohm test --locked -p ruff_python_parser --lib --no-run --message-format=json with disk incremental enabled, followed by the exact emitted test executable. This separates build and test times; both are included in save-to-result.",
+  "timing_details": "Rustc JSON section timings are enabled only on the native driver and report codegen and link separately; native external build includes all post-check code generation, linking, and compiler shutdown. Fresh artifact metadata is verified before test execution and binary content fingerprints after the timing interval.",
+  "percentile": "nearest rank",
+  "validation": {
+    "transitions": 25,
+    "fresh_process_for_each_build": true,
+    "matched_outcomes": true,
+    "native_edits": true,
+    "native_repair_preconditions": true,
+    "successful_builds_attested_to_real_codegen_and_link": true,
+    "changed_executables_on_behavior_edit_and_repair": true,
+    "rejected_E0308_and_never_ran_existing_binary": true
+  },
+  "behavior_edit_and_repair_ms": {
+    "resident": {
+      "save_to_result_ms": {
+        "count": 10,
+        "min": 1951.181,
+        "median": 1995.112,
+        "p95": 2097.124,
+        "max": 2097.124
+      },
+      "test_ms": {
+        "count": 10,
+        "min": 62.956,
+        "median": 80.389,
+        "p95": 105.005,
+        "max": 105.005
+      },
+      "build_ms": {
+        "count": 10,
+        "min": 1783.2,
+        "median": 1847.948,
+        "p95": 1914.314,
+        "max": 1914.314
+      },
+      "save_and_check_ms": {
+        "count": 10,
+        "min": 67.354,
+        "median": 77.163,
+        "p95": 97.985,
+        "max": 97.985
+      },
+      "native_reanalysis_ms": {
+        "count": 10,
+        "min": 64.579,
+        "median": 74.254,
+        "p95": 94.853,
+        "max": 94.853
+      },
+      "restart_startup_ms": {
+        "count": 10,
+        "min": 1166.969,
+        "median": 1186.99,
+        "p95": 1268.569,
+        "max": 1268.569
+      },
+      "replay_precondition_ms": {
+        "count": 5,
+        "min": 77.599,
+        "median": 78.4,
+        "p95": 94.979,
+        "max": 94.979
+      },
+      "native_post_authorization_compile_ms": {
+        "count": 10,
+        "min": 1782.566,
+        "median": 1847.228,
+        "p95": 1913.7,
+        "max": 1913.7
+      },
+      "rustc_codegen_ms": {
+        "count": 10,
+        "min": 1650.594,
+        "median": 1711.59,
+        "p95": 1780.241,
+        "max": 1780.241
+      },
+      "rustc_link_ms": {
+        "count": 10,
+        "min": 109.407,
+        "median": 112.331,
+        "p95": 118.046,
+        "max": 118.046
+      }
+    },
+    "cargo": {
+      "save_to_result_ms": {
+        "count": 10,
+        "min": 966.97,
+        "median": 1070.414,
+        "p95": 1237.633,
+        "max": 1237.633
+      },
+      "test_ms": {
+        "count": 10,
+        "min": 290.512,
+        "median": 317.254,
+        "p95": 481.647,
+        "max": 481.647
+      },
+      "build_ms": {
+        "count": 10,
+        "min": 662.592,
+        "median": 751.927,
+        "p95": 787.802,
+        "max": 787.802
+      }
+    }
+  },
+  "all_worker_restarts_ms": {
+    "count": 25,
+    "min": 1141.544,
+    "median": 1186.303,
+    "p95": 1268.569,
+    "max": 1275.792
+  },
+  "by_phase_ms": {
+    "baseline": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 1890.275,
+          "median": 1896.477,
+          "p95": 1942.258,
+          "max": 1942.258
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 63.219,
+          "median": 67.225,
+          "p95": 69.078,
+          "max": 69.078
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 1821.645,
+          "median": 1828.028,
+          "p95": 1877.648,
+          "max": 1877.648
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 0.466,
+          "median": 0.676,
+          "p95": 0.813,
+          "max": 0.813
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "restart_startup_ms": {
+          "count": 5,
+          "min": 1152.483,
+          "median": 1200.401,
+          "p95": 1241.455,
+          "max": 1241.455
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 1821.167,
+          "median": 1827.536,
+          "p95": 1877.144,
+          "max": 1877.144
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 1682.08,
+          "median": 1693.171,
+          "p95": 1742.743,
+          "max": 1742.743
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 106.49,
+          "median": 114.101,
+          "p95": 118.585,
+          "max": 118.585
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 122.951,
+          "median": 137.774,
+          "p95": 144.79,
+          "max": 144.79
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 41.485,
+          "median": 45.307,
+          "p95": 53.327,
+          "max": 53.327
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 79.845,
+          "median": 87.133,
+          "p95": 90.812,
+          "max": 90.812
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 0.073
+    },
+    "behavior-edit": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 1951.181,
+          "median": 2042.594,
+          "p95": 2097.124,
+          "max": 2097.124
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 90.307,
+          "median": 93.91,
+          "p95": 105.005,
+          "max": 105.005
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 1783.2,
+          "median": 1868.393,
+          "p95": 1914.314,
+          "max": 1914.314
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 77.212,
+          "median": 79.131,
+          "p95": 97.985,
+          "max": 97.985
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 74.222,
+          "median": 76.273,
+          "p95": 94.853,
+          "max": 94.853
+        },
+        "restart_startup_ms": {
+          "count": 5,
+          "min": 1179.39,
+          "median": 1204.518,
+          "p95": 1268.569,
+          "max": 1268.569
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 1782.566,
+          "median": 1867.829,
+          "p95": 1913.7,
+          "max": 1913.7
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 1650.594,
+          "median": 1734.555,
+          "p95": 1780.241,
+          "max": 1780.241
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 109.843,
+          "median": 112.213,
+          "p95": 112.556,
+          "max": 112.556
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 1074.495,
+          "median": 1228.536,
+          "p95": 1237.633,
+          "max": 1237.633
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 317.845,
+          "median": 439.728,
+          "p95": 481.647,
+          "max": 481.647
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 751.545,
+          "median": 779.475,
+          "p95": 787.802,
+          "max": 787.802
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 0.601
+    },
+    "behavior-repair": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 1964.338,
+          "median": 1985.679,
+          "p95": 2034.099,
+          "max": 2034.099
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 62.956,
+          "median": 65.695,
+          "p95": 70.47,
+          "max": 70.47
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 1830.829,
+          "median": 1846.489,
+          "p95": 1892.211,
+          "max": 1892.211
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 67.354,
+          "median": 70.779,
+          "p95": 77.113,
+          "max": 77.113
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 64.579,
+          "median": 67.904,
+          "p95": 74.339,
+          "max": 74.339
+        },
+        "restart_startup_ms": {
+          "count": 5,
+          "min": 1166.969,
+          "median": 1185.797,
+          "p95": 1227.202,
+          "max": 1227.202
+        },
+        "replay_precondition_ms": {
+          "count": 5,
+          "min": 77.599,
+          "median": 78.4,
+          "p95": 94.979,
+          "max": 94.979
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 1830.218,
+          "median": 1845.875,
+          "p95": 1891.498,
+          "max": 1891.498
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 1694.808,
+          "median": 1710.415,
+          "p95": 1751.709,
+          "max": 1751.709
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 109.407,
+          "median": 114.052,
+          "p95": 118.046,
+          "max": 118.046
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 966.97,
+          "median": 977.647,
+          "p95": 1066.333,
+          "max": 1066.333
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 290.512,
+          "median": 304.809,
+          "p95": 316.663,
+          "max": 316.663
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 662.592,
+          "median": 674.953,
+          "p95": 761.396,
+          "max": 761.396
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 0.492
+    },
+    "compile-error": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 127.838,
+          "median": 130.061,
+          "p95": 144.698,
+          "max": 144.698
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 91.37,
+          "median": 92.325,
+          "p95": 108.965,
+          "max": 108.965
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 35.724,
+          "median": 36.454,
+          "p95": 37.724,
+          "max": 37.724
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 32.672,
+          "median": 33.309,
+          "p95": 34.685,
+          "max": 34.685
+        },
+        "restart_startup_ms": {
+          "count": 5,
+          "min": 1174.783,
+          "median": 1186.151,
+          "p95": 1222.405,
+          "max": 1222.405
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 91.319,
+          "median": 92.274,
+          "p95": 108.917,
+          "max": 108.917
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 348.237,
+          "median": 361.331,
+          "p95": 427.196,
+          "max": 427.196
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 348.027,
+          "median": 361.168,
+          "p95": 426.824,
+          "max": 426.824
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 2.778
+    },
+    "compile-repair": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 1953.379,
+          "median": 1998.299,
+          "p95": 2089.804,
+          "max": 2089.804
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 56.241,
+          "median": 66.327,
+          "p95": 72.946,
+          "max": 72.946
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 1813.607,
+          "median": 1855.779,
+          "p95": 1941.444,
+          "max": 1941.444
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 71.205,
+          "median": 72.963,
+          "p95": 75.092,
+          "max": 75.092
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 68.46,
+          "median": 70.231,
+          "p95": 72.411,
+          "max": 72.411
+        },
+        "restart_startup_ms": {
+          "count": 5,
+          "min": 1141.544,
+          "median": 1156.331,
+          "p95": 1275.792,
+          "max": 1275.792
+        },
+        "replay_precondition_ms": {
+          "count": 5,
+          "min": 35.171,
+          "median": 35.647,
+          "p95": 36.549,
+          "max": 36.549
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 1812.988,
+          "median": 1855.123,
+          "p95": 1940.782,
+          "max": 1940.782
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 1677.499,
+          "median": 1695.897,
+          "p95": 1802.554,
+          "max": 1802.554
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 109.701,
+          "median": 114.844,
+          "p95": 151.541,
+          "max": 151.541
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 790.787,
+          "median": 810.693,
+          "p95": 1013.675,
+          "max": 1013.675
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 293.43,
+          "median": 300.522,
+          "p95": 515.385,
+          "max": 515.385
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 481.342,
+          "median": 496.887,
+          "p95": 521.284,
+          "max": 521.284
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 0.406
+    }
+  }
+}

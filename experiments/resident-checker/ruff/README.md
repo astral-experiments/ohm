@@ -34,6 +34,20 @@ Twenty measured rounds after two warmups across three suites produced 640 saves.
 
 Native semantic edits were 4.95× faster at the median than their paired Cargo runs; their 58 ms median met the 100 ms target, but their 290 ms p95 missed the 200 ms target. The curated corpus deliberately exercises fallback: 31.25% of these saves fell back, which is not an estimate of real edit coverage. An unchanged save still writes the file; this is not comparable to the earlier 69 ms Cargo command that did not write a file. Each suite starts with clean source and establishes its persistent diagnostic before the independent edit; this does not establish startup behavior on an already broken checkout. The output still excludes metadata emission, code generation, linking, and test execution.
 
+The [one-test experiment](../data/ruff-parser-resident-test.json) uses Cargo's captured Ruff unit-test invocation, including `--test` and executable emission. It starts with the private `StringParser::parse_octet` function: replacing its final expression with `'x'` still compiles, but changes observable behavior. A `build` request leaves the resident loop and hands the retained compiler context to ordinary rustc code generation and linking once. The benchmark then runs only `string::tests::test_escape_octet` as a new process. Each build consumes its compiler; a new worker for the repair warms on canonical source and replays the previous edit before measuring the save of the original source. This isolates whether edited resident state reaches an actual executable; repeated code generation in one process, integration tests, and doctests remain separate milestones.
+
+Five measured rounds after one warmup produced 25 transitions. Both modes passed the unchanged test, failed it after the compiling behavior change, passed after repair, rejected `E0308` without running the existing executable, and passed after repairing that error. Both changed the executable's contents on the behavior edit and repair. Median save-to-result timings were:
+
+| Transition                          | Ready resident compiler | Warm Cargo |
+| ----------------------------------- | ----------------------: | ---------: |
+| Save unchanged source               |                  1.90 s |     0.14 s |
+| Behavior edit: test fails           |                  2.04 s |     1.23 s |
+| Behavior repair: test passes        |                  1.99 s |     0.98 s |
+| Rust type error: test skipped       |                  0.13 s |     0.36 s |
+| Rust type-error repair: test passes |                  2.00 s |     0.81 s |
+
+Across the behavior edit and repair together, the ready resident compiler took 2.00 s median versus 1.07 s for Cargo. Native rustc code generation took 1.71 s, linking 112 ms, and the test process 80 ms. Native workers use the patched resident graph with rustc disk incremental disabled; ordinary warm Cargo keeps it enabled. Restarting and warming each native worker cost 1.19 s median outside save-to-result, and replaying the behavior edit for repair cost another 78 ms median outside the repair timer. With five observations per transition, the nearest-rank p95 is simply the slowest observation; this establishes functionality, not a test-build speedup.
+
 First build the companion patched Ohm compiler and its matching standard, test, procedural macro, and rustdoc libraries in the Rust checkout:
 
 ```sh
@@ -97,4 +111,24 @@ python3 experiments/resident-checker/ruff/measure_source.py \
   --repo /path/to/ruff --cargo-target /path/to/isolated/cargo-target \
   --output /path/to/source-timings \
   --compiler-revision <patched-compiler-git-sha>
+```
+
+To measure the one-test code-generation proof, use the actual unit-test capture rather than the library-only check capture. The benchmark writes raw compiler, Cargo, and test output as well as separate native code-generation and linker timings:
+
+```sh
+python3 experiments/resident-checker/ruff/measure_test.py \
+  --bootstrap /path/to/bootstrap \
+  --capture /path/to/results/graph-test/captures/ruff_python_parser.test.json \
+  --repo /path/to/ruff --cargo-target /path/to/isolated/cargo-target \
+  --output /path/to/test-timings \
+  --compiler-revision <patched-compiler-git-sha>
+```
+
+The separate [build-guard runner](run_test_build_guards.py) uses the same driver with small Rust fixtures. All [nine recorded cases](../data/ruff-parser-resident-test-guards.json) passed, including stale revision numbers, disk changes that were never checked, unsupported edits, and a compile error that survives a successful edit in another file. It keeps a sentinel executable in place on rejected builds to verify that it is neither replaced nor run:
+
+```sh
+python3 experiments/resident-checker/ruff/run_test_build_guards.py \
+  --driver /path/to/test-timings/source-driver \
+  --stage /path/to/bootstrap/aarch64-apple-darwin/stage1 \
+  --output /path/to/build-guard-results
 ```
