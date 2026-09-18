@@ -1,0 +1,751 @@
+{
+  "benchmark": "arbitrary-edits-persistent-driver-vs-fresh-rustc",
+  "machine": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "compiler": [
+    "rustc 1.98.1-dev",
+    "binary: rustc",
+    "commit-hash: unknown",
+    "commit-date: unknown",
+    "host: aarch64-apple-darwin",
+    "release: 1.98.1-dev",
+    "LLVM version: 22.1.8"
+  ],
+  "profile": {
+    "debug_info": "line-tables-only",
+    "split_debug_info": "off",
+    "opt_level": 0,
+    "codegen_units": 8,
+    "separate_persistent_disk_incremental_directories": true
+  },
+  "rounds": 3,
+  "warmup_rounds": 1,
+  "matched_revisions": 54,
+  "single_driver_pid": true,
+  "single_compiler_pid": true,
+  "compiler_route": "same-process",
+  "fixture_has_no_procedural_macros": true,
+  "fresh_compiler_processes_including_warmups": 72,
+  "driver_startup_ns": 91426291,
+  "stale_artifacts_not_run_including_warmups": {
+    "persistent-driver": 15,
+    "fresh-rustc": 15
+  },
+  "medians": {
+    "persistent-driver": {
+      "compile_external_ns": 157556083,
+      "successful_compile_external_ns": 174267771,
+      "compile_error_external_ns": 39535771,
+      "test_external_ns": 281521666
+    },
+    "fresh-rustc": {
+      "compile_external_ns": 205421916,
+      "successful_compile_external_ns": 240434291,
+      "compile_error_external_ns": 94419812,
+      "test_external_ns": 269034166
+    }
+  },
+  "cases": [
+    {
+      "case": "initial-malformed",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 1,
+          "diagnostics": [
+            {
+              "code": null,
+              "message": "expected expression, found `;`"
+            }
+          ],
+          "diagnostic_locations": [
+            [
+              {
+                "file": "model.rs",
+                "line_start": 1,
+                "line_end": 1,
+                "column_start": 52,
+                "column_end": 53
+              }
+            ]
+          ],
+          "tests_executed": false,
+          "test_statuses": {},
+          "existing_stale_artifacts_not_run": 3,
+          "compile_external_median_ns": 39301917,
+          "compile_internal_median_ns": 38856125,
+          "test_external_median_ns": null
+        },
+        "fresh-rustc": {
+          "compile_status": 1,
+          "diagnostics": [
+            {
+              "code": null,
+              "message": "expected expression, found `;`"
+            }
+          ],
+          "diagnostic_locations": [
+            [
+              {
+                "file": "model.rs",
+                "line_start": 1,
+                "line_end": 1,
+                "column_start": 52,
+                "column_end": 53
+              }
+            ]
+          ],
+          "tests_executed": false,
+          "test_statuses": {},
+          "existing_stale_artifacts_not_run": 3,
+          "compile_external_median_ns": 94963750,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": null
+        }
+      }
+    },
+    {
+      "case": "initial-repair",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 268786458,
+          "compile_internal_median_ns": 267778167,
+          "test_external_median_ns": 310133417
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 352189875,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 267057958
+        }
+      }
+    },
+    {
+      "case": "multiple-function-bodies",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "FAILED",
+            "tests::helper": "FAILED"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 155516959,
+          "compile_internal_median_ns": 155061625,
+          "test_external_median_ns": 297500708
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "FAILED",
+            "tests::helper": "FAILED"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 230171792,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 335393500
+        }
+      }
+    },
+    {
+      "case": "multiple-function-repair",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 164701125,
+          "compile_internal_median_ns": 164393500,
+          "test_external_median_ns": 246795458
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 222004292,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 244628625
+        }
+      }
+    },
+    {
+      "case": "signature-and-callers",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 171401750,
+          "compile_internal_median_ns": 171049542,
+          "test_external_median_ns": 290830375
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 217503584,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 241409834
+        }
+      }
+    },
+    {
+      "case": "macro-definition",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "FAILED",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 175002917,
+          "compile_internal_median_ns": 174705292,
+          "test_external_median_ns": 307555625
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "FAILED",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 254733500,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 311301750
+        }
+      }
+    },
+    {
+      "case": "macro-repair",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 344420208,
+          "compile_internal_median_ns": 344011541,
+          "test_external_median_ns": 238768000
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 205357458,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 303752167
+        }
+      }
+    },
+    {
+      "case": "import-resolution",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "FAILED",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 177008458,
+          "compile_internal_median_ns": 176204625,
+          "test_external_median_ns": 264979042
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "FAILED",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 308817583,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 308656625
+        }
+      }
+    },
+    {
+      "case": "import-repair",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 173532625,
+          "compile_internal_median_ns": 173106542,
+          "test_external_median_ns": 284064000
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 200049292,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 267226500
+        }
+      }
+    },
+    {
+      "case": "module-added",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::extra_module": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 187330166,
+          "compile_internal_median_ns": 187048458,
+          "test_external_median_ns": 271923584
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::extra_module": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 302781084,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 245073917
+        }
+      }
+    },
+    {
+      "case": "module-behavior",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::extra_module": "FAILED",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 159007417,
+          "compile_internal_median_ns": 158758792,
+          "test_external_median_ns": 295069500
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::extra_module": "FAILED",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 384688583,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 266613875
+        }
+      }
+    },
+    {
+      "case": "module-removed",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 211249458,
+          "compile_internal_median_ns": 210906208,
+          "test_external_median_ns": 279539792
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 262748875,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 251467125
+        }
+      }
+    },
+    {
+      "case": "type-error",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 1,
+          "diagnostics": [
+            {
+              "code": "E0308",
+              "message": "mismatched types"
+            }
+          ],
+          "diagnostic_locations": [
+            [
+              {
+                "file": "model.rs",
+                "line_start": 1,
+                "line_end": 1,
+                "column_start": 70,
+                "column_end": 77
+              }
+            ]
+          ],
+          "tests_executed": false,
+          "test_statuses": {},
+          "existing_stale_artifacts_not_run": 3,
+          "compile_external_median_ns": 65178833,
+          "compile_internal_median_ns": 64639500,
+          "test_external_median_ns": null
+        },
+        "fresh-rustc": {
+          "compile_status": 1,
+          "diagnostics": [
+            {
+              "code": "E0308",
+              "message": "mismatched types"
+            }
+          ],
+          "diagnostic_locations": [
+            [
+              {
+                "file": "model.rs",
+                "line_start": 1,
+                "line_end": 1,
+                "column_start": 70,
+                "column_end": 77
+              }
+            ]
+          ],
+          "tests_executed": false,
+          "test_statuses": {},
+          "existing_stale_artifacts_not_run": 3,
+          "compile_external_median_ns": 102888625,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": null
+        }
+      }
+    },
+    {
+      "case": "type-error-repair",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 125377166,
+          "compile_internal_median_ns": 125043417,
+          "test_external_median_ns": 250286208
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 236055417,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 271500958
+        }
+      }
+    },
+    {
+      "case": "malformed-after-build",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 1,
+          "diagnostics": [
+            {
+              "code": null,
+              "message": "expected expression, found `;`"
+            }
+          ],
+          "diagnostic_locations": [
+            [
+              {
+                "file": "model.rs",
+                "line_start": 1,
+                "line_end": 1,
+                "column_start": 52,
+                "column_end": 53
+              }
+            ]
+          ],
+          "tests_executed": false,
+          "test_statuses": {},
+          "existing_stale_artifacts_not_run": 3,
+          "compile_external_median_ns": 25810875,
+          "compile_internal_median_ns": 25564542,
+          "test_external_median_ns": null
+        },
+        "fresh-rustc": {
+          "compile_status": 1,
+          "diagnostics": [
+            {
+              "code": null,
+              "message": "expected expression, found `;`"
+            }
+          ],
+          "diagnostic_locations": [
+            [
+              {
+                "file": "model.rs",
+                "line_start": 1,
+                "line_end": 1,
+                "column_start": 52,
+                "column_end": 53
+              }
+            ]
+          ],
+          "tests_executed": false,
+          "test_statuses": {},
+          "existing_stale_artifacts_not_run": 3,
+          "compile_external_median_ns": 58388958,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": null
+        }
+      }
+    },
+    {
+      "case": "malformed-repair",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 110501458,
+          "compile_internal_median_ns": 110161833,
+          "test_external_median_ns": 249226625
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 163871542,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 239095917
+        }
+      }
+    },
+    {
+      "case": "missing-module",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 1,
+          "diagnostics": [
+            {
+              "code": "E0583",
+              "message": "file not found for module `missing`"
+            }
+          ],
+          "diagnostic_locations": [
+            [
+              {
+                "file": "lib.rs",
+                "line_start": 3,
+                "line_end": 3,
+                "column_start": 1,
+                "column_end": 13
+              }
+            ]
+          ],
+          "tests_executed": false,
+          "test_statuses": {},
+          "existing_stale_artifacts_not_run": 3,
+          "compile_external_median_ns": 22846208,
+          "compile_internal_median_ns": 22609500,
+          "test_external_median_ns": null
+        },
+        "fresh-rustc": {
+          "compile_status": 1,
+          "diagnostics": [
+            {
+              "code": "E0583",
+              "message": "file not found for module `missing`"
+            }
+          ],
+          "diagnostic_locations": [
+            [
+              {
+                "file": "lib.rs",
+                "line_start": 3,
+                "line_end": 3,
+                "column_start": 1,
+                "column_end": 13
+              }
+            ]
+          ],
+          "tests_executed": false,
+          "test_statuses": {},
+          "existing_stale_artifacts_not_run": 3,
+          "compile_external_median_ns": 57976958,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": null
+        }
+      }
+    },
+    {
+      "case": "missing-module-repair",
+      "modes": {
+        "persistent-driver": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 246242875,
+          "compile_internal_median_ns": 234653333,
+          "test_external_median_ns": 257678875
+        },
+        "fresh-rustc": {
+          "compile_status": 0,
+          "diagnostics": [],
+          "diagnostic_locations": [],
+          "tests_executed": true,
+          "test_statuses": {
+            "tests::behavior": "ok",
+            "tests::helper": "ok"
+          },
+          "existing_stale_artifacts_not_run": 0,
+          "compile_external_median_ns": 197496291,
+          "compile_internal_median_ns": null,
+          "test_external_median_ns": 288077375
+        }
+      }
+    }
+  ],
+  "compiler_source_revision": "80b2622283cce8b35858728cf60d0f513e653426"
+}

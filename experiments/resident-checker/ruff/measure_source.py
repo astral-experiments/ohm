@@ -152,7 +152,7 @@ def source_map(workspace):
     return {name: (workspace / PACKAGE / name).read_text() for name in FILES}
 
 
-def build(host, output):
+def build(host, output, *, source=None, binary_name="source-driver"):
     stage0, stage1 = host / "stage0", host / "stage1"
     deps = output / "driver-deps"
     deps.mkdir(exist_ok=True)
@@ -163,11 +163,11 @@ def build(host, output):
             destination = deps / artifact.name
             if artifact.is_file() and not destination.exists():
                 destination.symlink_to(artifact)
-    binary = output / "source-driver"
+    binary = output / binary_name
     command = [
         str(stage0 / "bin/rustc"),
         "--edition=2024",
-        str(Path(__file__).with_name("source_timing.rs")),
+        str(source or Path(__file__).with_name("source_timing.rs")),
         "-L",
         f"all={deps}",
         "-C",

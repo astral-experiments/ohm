@@ -1,0 +1,401 @@
+{
+  "schema": 1,
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "compiler": {
+    "source_revision": "80b2622283cce8b35858728cf60d0f513e653426",
+    "reported": {
+      "release": "1.98.1-dev",
+      "commit-hash": null,
+      "commit-date": null,
+      "host": "aarch64-apple-darwin",
+      "LLVM version": "22.1.8"
+    }
+  },
+  "machine": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "rounds": 2,
+  "warmups": 1,
+  "test": "all 245 ruff_python_parser unit tests; macro regression must fail the octet test",
+  "target_debuginfo": "line-tables-only; split off",
+  "method": "One dispatcher PID, fresh normal rustc session for every edit, and ordinary disk incremental state; the default starts a fresh compiler subprocess per edit for procedural-macro isolation. The independent comparator starts the same rustc anew per edit with separate disk incremental state. Timers include save, compilation and test execution on successful compilations. This is not warm Cargo or semantic-query reuse in memory.",
+  "compiler_process_policy": "fresh isolated compiler process for every revision",
+  "validation": {
+    "measured_revisions": 28,
+    "same_dispatcher_pid": true,
+    "worker_compiler_processes": 28,
+    "fresh_comparator_processes": 28,
+    "all_expected_outcomes_match": true,
+    "test_counts_match": true,
+    "exact_normalized_source_diagnostics_match": true,
+    "no_test_after_compile_error": true,
+    "existing_binary_preserved_after_module_error": true,
+    "outcome_counts": {
+      "pass": 22,
+      "fail": 2,
+      "compile_error": 4
+    }
+  },
+  "save_to_result_ms": {
+    "worker": {
+      "count": 28,
+      "min": 88.384,
+      "median": 985.714,
+      "p95": 2001.251,
+      "max": 2049.573
+    },
+    "fresh": {
+      "count": 28,
+      "min": 89.334,
+      "median": 972.149,
+      "p95": 1952.173,
+      "max": 2138.155
+    }
+  },
+  "ratio_of_medians_fresh_over_worker": 0.986,
+  "by_case_ms": {
+    "initial-syntax-error": {
+      "outcome": "compile_error",
+      "worker": {
+        "count": 2,
+        "min": 88.384,
+        "median": 99.511,
+        "p95": 110.639,
+        "max": 110.639
+      },
+      "fresh": {
+        "count": 2,
+        "min": 89.334,
+        "median": 99.005,
+        "p95": 108.676,
+        "max": 108.676
+      },
+      "test_counts": null,
+      "source_error_codes": [null]
+    },
+    "syntax-repair": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 575.562,
+        "median": 738.407,
+        "p95": 901.252,
+        "max": 901.252
+      },
+      "fresh": {
+        "count": 2,
+        "min": 662.833,
+        "median": 792.067,
+        "p95": 921.301,
+        "max": 921.301
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "signature-and-caller": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 750.668,
+        "median": 998.395,
+        "p95": 1246.121,
+        "max": 1246.121
+      },
+      "fresh": {
+        "count": 2,
+        "min": 922.272,
+        "median": 1156.718,
+        "p95": 1391.164,
+        "max": 1391.164
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "signature-repair": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 916.183,
+        "median": 996.806,
+        "p95": 1077.429,
+        "max": 1077.429
+      },
+      "fresh": {
+        "count": 2,
+        "min": 685.142,
+        "median": 931.345,
+        "p95": 1177.548,
+        "max": 1177.548
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "import-and-all-references": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 830.485,
+        "median": 985.101,
+        "p95": 1139.716,
+        "max": 1139.716
+      },
+      "fresh": {
+        "count": 2,
+        "min": 766.231,
+        "median": 937.097,
+        "p95": 1107.963,
+        "max": 1107.963
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "import-repair": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 703.717,
+        "median": 884.373,
+        "p95": 1065.03,
+        "max": 1065.03
+      },
+      "fresh": {
+        "count": 2,
+        "min": 744.07,
+        "median": 939.993,
+        "p95": 1135.915,
+        "max": 1135.915
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "macro-definition-and-call": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 1699.131,
+        "median": 1874.352,
+        "p95": 2049.573,
+        "max": 2049.573
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1754.701,
+        "median": 1853.437,
+        "p95": 1952.173,
+        "max": 1952.173
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "macro-behavior-fails-test": {
+      "outcome": "fail",
+      "worker": {
+        "count": 2,
+        "min": 920.549,
+        "median": 985.714,
+        "p95": 1050.878,
+        "max": 1050.878
+      },
+      "fresh": {
+        "count": 2,
+        "min": 988.145,
+        "median": 1035.64,
+        "p95": 1083.135,
+        "max": 1083.135
+      },
+      "test_counts": {
+        "passed": 243,
+        "failed": 2,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "macro-behavior-repair": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 919.162,
+        "median": 1019.339,
+        "p95": 1119.515,
+        "max": 1119.515
+      },
+      "fresh": {
+        "count": 2,
+        "min": 884.685,
+        "median": 920.42,
+        "p95": 956.154,
+        "max": 956.154
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "macro-removal": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 1938.201,
+        "median": 1969.726,
+        "p95": 2001.251,
+        "max": 2001.251
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1407.301,
+        "median": 1772.728,
+        "p95": 2138.155,
+        "max": 2138.155
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "create-and-use-module": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 1293.185,
+        "median": 1538.042,
+        "p95": 1782.899,
+        "max": 1782.899
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1364.335,
+        "median": 1532.891,
+        "p95": 1701.447,
+        "max": 1701.447
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "delete-still-referenced-module": {
+      "outcome": "compile_error",
+      "worker": {
+        "count": 2,
+        "min": 265.256,
+        "median": 298.928,
+        "p95": 332.6,
+        "max": 332.6
+      },
+      "fresh": {
+        "count": 2,
+        "min": 267.245,
+        "median": 299.969,
+        "p95": 332.692,
+        "max": 332.692
+      },
+      "test_counts": null,
+      "source_error_codes": ["E0583"]
+    },
+    "recreate-module": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 522.926,
+        "median": 612.566,
+        "p95": 702.206,
+        "max": 702.206
+      },
+      "fresh": {
+        "count": 2,
+        "min": 534.249,
+        "median": 581.111,
+        "p95": 627.972,
+        "max": 627.972
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    },
+    "remove-module-and-references": {
+      "outcome": "pass",
+      "worker": {
+        "count": 2,
+        "min": 1358.989,
+        "median": 1398.24,
+        "p95": 1437.492,
+        "max": 1437.492
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1626.391,
+        "median": 1718.281,
+        "p95": 1810.172,
+        "max": 1810.172
+      },
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": []
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "fixture": "stateful procedural macro succeeds only on first expansion in a process",
+  "disk_incremental": false,
+  "macro_library_changed_between_revisions": false,
+  "default": {
+    "distinct_compiler_processes": 2,
+    "compiler_is_driver_process": false,
+    "revisions": [
+      {
+        "diagnostic": null,
+        "status": 0,
+        "test_executed": true,
+        "prior_executable_preserved": null
+      },
+      {
+        "diagnostic": null,
+        "status": 0,
+        "test_executed": true,
+        "prior_executable_preserved": false
+      }
+    ]
+  },
+  "explicit_process_reuse": {
+    "distinct_compiler_processes": 1,
+    "compiler_is_driver_process": true,
+    "revisions": [
+      {
+        "diagnostic": null,
+        "status": 0,
+        "test_executed": true,
+        "prior_executable_preserved": null
+      },
+      {
+        "diagnostic": "revision isolation fixture: procedural macro already ran in this process",
+        "status": 1,
+        "test_executed": false,
+        "prior_executable_preserved": true
+      }
+    ]
+  }
+}
