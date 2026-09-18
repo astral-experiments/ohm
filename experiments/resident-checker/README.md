@@ -46,6 +46,10 @@ The [repeated-test experiment](data/ruff-parser-repeated-test.json) keeps the sa
 
 [Arbitrary edits](ARBITRARY_EDITS.md) are the intended product scope. A separate correctness baseline runs rustc's normal frontend after every source change, including edits the historical private-body experiment cannot accept. It restores ordinary source locations and uses the existing disk incremental cache; the default starts a fresh compiler subprocess to isolate procedural macros. All 28 measured structural Ruff revisions matched independent fresh rustc across the complete 245-test unit suite; the dispatcher took 986 ms median versus 972 ms for fresh rustc. It does not yet retain compiler query values in memory across arbitrary revisions or provide a resident Cargo command.
 
+The [arbitrary-edit profile](data/arbitrary-ruff-profile.json) covers 30 Ruff revisions and the same complete unit suite. On passing revisions, median internal compiler activities included 27 ms for dependency-graph loading, 25 ms for lazy cached-query decoding, 111 ms for macro/module expansion, and 202 ms for LLVM. The 21 actual procedural-macro calls took 5 ms combined. These activities overlap; the experiment's [notes](ARBITRARY_EDITS.md) distinguish them from measured wall-clock time and from retained semantic state.
+
+An opt-in [mapped dependency-graph prototype](data/arbitrary-flat-dep-graph.json) then matched fresh rustc on all 28 measured Ruff revisions and loaded the extra file on every one, but it did not establish a speedup. The candidate won only 11 of 28 matched revisions, with the median paired comparison favoring stock by about 3.9%; both individual rounds also favored stock. The [corruption and physical-sharing guard](data/arbitrary-flat-dep-graph-guards.json) verifies the fallback and same-file behavior independently.
+
 After regenerating checked-in reports, apply the repository's pinned JSON formatter:
 
 ```sh

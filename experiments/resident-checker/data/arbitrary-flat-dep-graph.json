@@ -1,0 +1,686 @@
+{
+  "schema": 1,
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "compiler": {
+    "source_revision": "77f8113b45d2d83c1c1942bceced22d04d613179",
+    "reported": {
+      "release": "1.98.1-dev",
+      "commit-hash": null,
+      "commit-date": null,
+      "host": "aarch64-apple-darwin",
+      "LLVM version": "22.1.8"
+    }
+  },
+  "machine": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "rounds": 2,
+  "warmups": 1,
+  "test": "all 245 ruff_python_parser unit tests; macro regression must fail the octet test",
+  "target_debuginfo": "line-tables-only; split off",
+  "method": "One dispatcher PID, fresh normal rustc session for every edit, and ordinary disk incremental state; the default starts a fresh compiler subprocess per edit for procedural-macro isolation. The independent comparator starts the same rustc anew per edit with separate disk incremental state. Timers include save, compilation and test execution on successful compilations. This is not warm Cargo or semantic-query reuse in memory.",
+  "compiler_process_policy": "fresh isolated compiler process for every revision",
+  "experimental_flat_dep_graph": {
+    "worker_events": [
+      ["loaded"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded", "written"],
+      ["loaded"],
+      ["loaded", "written"],
+      ["loaded", "written"]
+    ],
+    "fresh_events": [
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "worker_revision_counts": {
+      "loaded": 28,
+      "written": 24,
+      "fallback": 0,
+      "write-failed": 0
+    }
+  },
+  "validation": {
+    "measured_revisions": 28,
+    "same_dispatcher_pid": true,
+    "worker_compiler_processes": 28,
+    "fresh_comparator_processes": 28,
+    "all_expected_outcomes_match": true,
+    "test_counts_match": true,
+    "outcome_counts": {
+      "pass": 22,
+      "fail": 2,
+      "compile_error": 4
+    },
+    "exact_normalized_source_diagnostics_match": true,
+    "no_test_after_compile_error": true,
+    "existing_binary_preserved_after_module_error": true
+  },
+  "save_to_result_ms": {
+    "worker": {
+      "count": 28,
+      "min": 140.921,
+      "median": 1669.361,
+      "p95": 2760.59,
+      "max": 4714.86
+    },
+    "fresh": {
+      "count": 28,
+      "min": 116.81,
+      "median": 1774.68,
+      "p95": 2736.773,
+      "max": 2785.163
+    }
+  },
+  "ratio_of_medians_fresh_over_worker": 1.063,
+  "by_case_ms": {
+    "initial-syntax-error": {
+      "outcome": "compile_error",
+      "test_counts": null,
+      "source_error_codes": [null],
+      "worker": {
+        "count": 2,
+        "min": 140.921,
+        "median": 167.508,
+        "p95": 194.096,
+        "max": 194.096
+      },
+      "fresh": {
+        "count": 2,
+        "min": 116.81,
+        "median": 118.884,
+        "p95": 120.958,
+        "max": 120.958
+      }
+    },
+    "syntax-repair": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 1264.54,
+        "median": 1491.041,
+        "p95": 1717.543,
+        "max": 1717.543
+      },
+      "fresh": {
+        "count": 2,
+        "min": 972.801,
+        "median": 1602.902,
+        "p95": 2233.003,
+        "max": 2233.003
+      }
+    },
+    "signature-and-caller": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 1400.027,
+        "median": 1714.18,
+        "p95": 2028.333,
+        "max": 2028.333
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1371.271,
+        "median": 1865.125,
+        "p95": 2358.978,
+        "max": 2358.978
+      }
+    },
+    "signature-repair": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 1524.559,
+        "median": 1908.742,
+        "p95": 2292.925,
+        "max": 2292.925
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1307.55,
+        "median": 1676.912,
+        "p95": 2046.275,
+        "max": 2046.275
+      }
+    },
+    "import-and-all-references": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 1334.494,
+        "median": 1705.855,
+        "p95": 2077.216,
+        "max": 2077.216
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1408.934,
+        "median": 1652.709,
+        "p95": 1896.484,
+        "max": 1896.484
+      }
+    },
+    "import-repair": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 1361.033,
+        "median": 1679.934,
+        "p95": 1998.836,
+        "max": 1998.836
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1292.257,
+        "median": 1490.803,
+        "p95": 1689.349,
+        "max": 1689.349
+      }
+    },
+    "macro-definition-and-call": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 2705.075,
+        "median": 2732.833,
+        "p95": 2760.59,
+        "max": 2760.59
+      },
+      "fresh": {
+        "count": 2,
+        "min": 2736.773,
+        "median": 2760.968,
+        "p95": 2785.163,
+        "max": 2785.163
+      }
+    },
+    "macro-behavior-fails-test": {
+      "outcome": "fail",
+      "test_counts": {
+        "passed": 243,
+        "failed": 2,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 1340.461,
+        "median": 1480.82,
+        "p95": 1621.179,
+        "max": 1621.179
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1281.385,
+        "median": 1305.111,
+        "p95": 1328.838,
+        "max": 1328.838
+      }
+    },
+    "macro-behavior-repair": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 1298.562,
+        "median": 1686.293,
+        "p95": 2074.024,
+        "max": 2074.024
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1302.58,
+        "median": 1839.201,
+        "p95": 2375.822,
+        "max": 2375.822
+      }
+    },
+    "macro-removal": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 2508.509,
+        "median": 3611.684,
+        "p95": 4714.86,
+        "max": 4714.86
+      },
+      "fresh": {
+        "count": 2,
+        "min": 2343.758,
+        "median": 2496.558,
+        "p95": 2649.359,
+        "max": 2649.359
+      }
+    },
+    "create-and-use-module": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 2034.431,
+        "median": 2246.002,
+        "p95": 2457.572,
+        "max": 2457.572
+      },
+      "fresh": {
+        "count": 2,
+        "min": 1904.881,
+        "median": 2143.314,
+        "p95": 2381.746,
+        "max": 2381.746
+      }
+    },
+    "delete-still-referenced-module": {
+      "outcome": "compile_error",
+      "test_counts": null,
+      "source_error_codes": ["E0583"],
+      "worker": {
+        "count": 2,
+        "min": 360.164,
+        "median": 429.385,
+        "p95": 498.606,
+        "max": 498.606
+      },
+      "fresh": {
+        "count": 2,
+        "min": 352.312,
+        "median": 453.362,
+        "p95": 554.412,
+        "max": 554.412
+      }
+    },
+    "recreate-module": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 743.201,
+        "median": 894.907,
+        "p95": 1046.614,
+        "max": 1046.614
+      },
+      "fresh": {
+        "count": 2,
+        "min": 690.435,
+        "median": 1275.222,
+        "p95": 1860.01,
+        "max": 1860.01
+      }
+    },
+    "remove-module-and-references": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "source_error_codes": [],
+      "worker": {
+        "count": 2,
+        "min": 2208.905,
+        "median": 2365.622,
+        "p95": 2522.34,
+        "max": 2522.34
+      },
+      "fresh": {
+        "count": 2,
+        "min": 2241.745,
+        "median": 2312.167,
+        "p95": 2382.589,
+        "max": 2382.589
+      }
+    }
+  },
+  "paired_timing": {
+    "ratio_definition": "fresh control divided by worker candidate; values above 1 favor the candidate. Ratios pair the same source revision before aggregation; a ratio of pooled medians can disagree with the matched comparisons.",
+    "all": {
+      "revisions": 28,
+      "save_to_result_ms": {
+        "worker": {
+          "count": 28,
+          "min": 140.921,
+          "median": 1669.361,
+          "p95": 2760.59,
+          "max": 4714.86
+        },
+        "fresh": {
+          "count": 28,
+          "min": 116.81,
+          "median": 1774.68,
+          "p95": 2736.773,
+          "max": 2785.163
+        }
+      },
+      "ratio_of_medians_fresh_over_worker": 1.0631,
+      "median_of_paired_ratios_fresh_over_worker": 0.9625,
+      "paired_ratio_fresh_over_worker": {
+        "min": 0.4971,
+        "median": 0.9625,
+        "p95": 1.3001,
+        "max": 1.7772
+      },
+      "worker_wins": 11,
+      "fresh_wins": 17,
+      "ties": 0
+    },
+    "successful_compilations": {
+      "revisions": 24,
+      "save_to_result_ms": {
+        "worker": {
+          "count": 24,
+          "min": 743.201,
+          "median": 2013.585,
+          "p95": 2760.59,
+          "max": 4714.86
+        },
+        "fresh": {
+          "count": 24,
+          "min": 690.435,
+          "median": 1900.682,
+          "p95": 2736.773,
+          "max": 2785.163
+        }
+      },
+      "ratio_of_medians_fresh_over_worker": 0.9439,
+      "median_of_paired_ratios_fresh_over_worker": 0.9625,
+      "paired_ratio_fresh_over_worker": {
+        "min": 0.4971,
+        "median": 0.9625,
+        "p95": 1.3001,
+        "max": 1.7772
+      },
+      "worker_wins": 10,
+      "fresh_wins": 14,
+      "ties": 0
+    },
+    "by_outcome": {
+      "pass": {
+        "revisions": 22,
+        "save_to_result_ms": {
+          "worker": {
+            "count": 22,
+            "min": 743.201,
+            "median": 2031.382,
+            "p95": 2760.59,
+            "max": 4714.86
+          },
+          "fresh": {
+            "count": 22,
+            "min": 690.435,
+            "median": 1975.578,
+            "p95": 2736.773,
+            "max": 2785.163
+          }
+        },
+        "ratio_of_medians_fresh_over_worker": 0.9725,
+        "median_of_paired_ratios_fresh_over_worker": 0.9743,
+        "paired_ratio_fresh_over_worker": {
+          "min": 0.4971,
+          "median": 0.9743,
+          "p95": 1.3001,
+          "max": 1.7772
+        },
+        "worker_wins": 10,
+        "fresh_wins": 12,
+        "ties": 0
+      },
+      "fail": {
+        "revisions": 2,
+        "save_to_result_ms": {
+          "worker": {
+            "count": 2,
+            "min": 1340.461,
+            "median": 1480.82,
+            "p95": 1621.179,
+            "max": 1621.179
+          },
+          "fresh": {
+            "count": 2,
+            "min": 1281.385,
+            "median": 1305.111,
+            "p95": 1328.838,
+            "max": 1328.838
+          }
+        },
+        "ratio_of_medians_fresh_over_worker": 0.8813,
+        "median_of_paired_ratios_fresh_over_worker": 0.8878,
+        "paired_ratio_fresh_over_worker": {
+          "min": 0.8197,
+          "median": 0.8878,
+          "p95": 0.9559,
+          "max": 0.9559
+        },
+        "worker_wins": 0,
+        "fresh_wins": 2,
+        "ties": 0
+      },
+      "compile_error": {
+        "revisions": 4,
+        "save_to_result_ms": {
+          "worker": {
+            "count": 4,
+            "min": 140.921,
+            "median": 277.13,
+            "p95": 498.606,
+            "max": 498.606
+          },
+          "fresh": {
+            "count": 4,
+            "min": 116.81,
+            "median": 236.635,
+            "p95": 554.412,
+            "max": 554.412
+          }
+        },
+        "ratio_of_medians_fresh_over_worker": 0.8539,
+        "median_of_paired_ratios_fresh_over_worker": 0.9036,
+        "paired_ratio_fresh_over_worker": {
+          "min": 0.6232,
+          "median": 0.9036,
+          "p95": 1.1119,
+          "max": 1.1119
+        },
+        "worker_wins": 1,
+        "fresh_wins": 3,
+        "ties": 0
+      }
+    },
+    "by_round": {
+      "1": {
+        "revisions": 14,
+        "save_to_result_ms": {
+          "worker": {
+            "count": 14,
+            "min": 140.921,
+            "median": 1350.747,
+            "p95": 2760.59,
+            "max": 2760.59
+          },
+          "fresh": {
+            "count": 14,
+            "min": 116.81,
+            "median": 1339.411,
+            "p95": 2785.163,
+            "max": 2785.163
+          }
+        },
+        "ratio_of_medians_fresh_over_worker": 0.9916,
+        "median_of_paired_ratios_fresh_over_worker": 0.9743,
+        "paired_ratio_fresh_over_worker": {
+          "min": 0.7693,
+          "median": 0.9743,
+          "p95": 1.7772,
+          "max": 1.7772
+        },
+        "worker_wins": 6,
+        "fresh_wins": 8,
+        "ties": 0
+      },
+      "2": {
+        "revisions": 14,
+        "save_to_result_ms": {
+          "worker": {
+            "count": 14,
+            "min": 194.096,
+            "median": 2031.382,
+            "p95": 4714.86,
+            "max": 4714.86
+          },
+          "fresh": {
+            "count": 14,
+            "min": 120.958,
+            "median": 1975.578,
+            "p95": 2736.773,
+            "max": 2736.773
+          }
+        },
+        "ratio_of_medians_fresh_over_worker": 0.9725,
+        "median_of_paired_ratios_fresh_over_worker": 0.9327,
+        "paired_ratio_fresh_over_worker": {
+          "min": 0.4971,
+          "median": 0.9327,
+          "p95": 1.3001,
+          "max": 1.3001
+        },
+        "worker_wins": 5,
+        "fresh_wins": 9,
+        "ties": 0
+      }
+    }
+  }
+}

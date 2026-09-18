@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "fresh_compiler_processes": 11,
+  "cache_hits": 5,
+  "stock_fallbacks": 3,
+  "same_finalized_and_working_inode_observations": 5,
+  "compile_errors_without_execution": 1,
+  "results": [
+    {
+      "name": "initial",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["written"],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": null
+    },
+    {
+      "name": "warm",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["loaded", "written"],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": true
+    },
+    {
+      "name": "structural",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["loaded", "written"],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": true
+    },
+    {
+      "name": "compile-error",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["loaded"],
+      "compile_error": true,
+      "test_ran": false,
+      "shared_source_inode_observed": true
+    },
+    {
+      "name": "repair",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["loaded", "written"],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": true
+    },
+    {
+      "name": "missing",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["fallback", "written"],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": null
+    },
+    {
+      "name": "corrupt",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["fallback", "written"],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": true
+    },
+    {
+      "name": "wrong",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["fallback", "written"],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": true
+    },
+    {
+      "name": "final-warm",
+      "mode": "candidate",
+      "fresh_compiler_process": true,
+      "events": ["loaded", "written"],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": true
+    },
+    {
+      "name": "stock-initial",
+      "mode": "stock",
+      "fresh_compiler_process": true,
+      "events": [],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": null
+    },
+    {
+      "name": "stock-warm",
+      "mode": "stock",
+      "fresh_compiler_process": true,
+      "events": [],
+      "compile_error": false,
+      "test_ran": true,
+      "shared_source_inode_observed": null
+    }
+  ]
+}

@@ -1,0 +1,2419 @@
+{
+  "schema": 1,
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "compiler": {
+    "source_revision": "80b2622283cce8b35858728cf60d0f513e653426",
+    "reported": {
+      "release": "1.98.1-dev",
+      "commit-hash": null,
+      "commit-date": null,
+      "host": "aarch64-apple-darwin",
+      "LLVM version": "22.1.8"
+    }
+  },
+  "machine": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "rounds": 2,
+  "warmups": 1,
+  "tests": "all 245 parser unit tests",
+  "method": {
+    "process_policy": "fresh isolated rustc per revision; independent persistent on-disk incremental state; one successful unprofiled baseline compile before all rounds",
+    "profile": "-Zself-profile-events=generic-activity,incr-cache-load; decoded by rust-lang/measureme summarize 12.0.3; no -Ztime-passes",
+    "time": "external compile, test and save-to-result are wall-clock durations, independent of the internal compiler clock; profiling overhead is included, so use a separate unprofiled benchmark for absolute speed",
+    "activities": "measureme cumulative inclusive durations per rustc label, except the two explicitly marked self_time; phases are diagnostic, can overlap or nest, can aggregate across invocations or threads, and must not be summed as a compiler wall-time breakdown; lazy query loads sum per-query exclusive decode times across threads",
+    "absence": "compiler errors may omit downstream activities; missing values are excluded from medians; a zero lazy-query decode means the profile observed none",
+    "debuginfo": "line-tables-only; split off",
+    "lazy_query_names": "rustc may report some cached-query labels as <unknown> with this limited event set; their decode time is included in the total and their identity is not inferred",
+    "proc_macros": "procedural_macro_calls times and counts actual procedural macro executions; derive_macro_outer is a surrounding activity and is not added to it; absent invocation events count as zero"
+  },
+  "validation": {
+    "every_outcome_matched": true,
+    "tests_never_ran_after_compile_error": true,
+    "outcomes": {
+      "pass": 24,
+      "fail": 2,
+      "compile_error": 4
+    }
+  },
+  "all": {
+    "revisions": 30,
+    "external_ms": {
+      "compile": {
+        "count": 30,
+        "min": 83.164,
+        "median": 692.655,
+        "p95": 1470.625,
+        "max": 1747.58
+      },
+      "test": {
+        "count": 26,
+        "min": 69.722,
+        "median": 80.267,
+        "p95": 111.1,
+        "max": 113.087,
+        "missing": 4
+      },
+      "save_to_result": {
+        "count": 30,
+        "min": 84.006,
+        "median": 780.63,
+        "p95": 1551.787,
+        "max": 1847.452
+      }
+    },
+    "activities_ms": {
+      "incremental": {
+        "prepare_session": {
+          "count": 30,
+          "min": 0.702,
+          "median": 0.754,
+          "p95": 1.107,
+          "max": 1.371
+        },
+        "prepare_and_load_graph": {
+          "count": 30,
+          "min": 15.988,
+          "median": 27.939,
+          "p95": 31.679,
+          "max": 32.856
+        },
+        "load_graph": {
+          "count": 30,
+          "min": 15.228,
+          "median": 27.071,
+          "p95": 30.809,
+          "max": 32.048
+        },
+        "decode_graph_reverse_index": {
+          "count": 30,
+          "min": 0.16,
+          "median": 4.282,
+          "p95": 5.431,
+          "max": 5.708
+        },
+        "open_query_result_cache": {
+          "count": 30,
+          "min": 1.808,
+          "median": 3.258,
+          "p95": 5.397,
+          "max": 5.483
+        },
+        "promote_query_cache": {
+          "count": 26,
+          "min": 1.693,
+          "median": 2.165,
+          "p95": 26.752,
+          "max": 28.422,
+          "missing": 4
+        },
+        "serialize_query_cache": {
+          "count": 26,
+          "min": 4.252,
+          "median": 10.509,
+          "p95": 15.435,
+          "max": 15.72,
+          "missing": 4
+        },
+        "persist_query_cache": {
+          "count": 26,
+          "min": 7.094,
+          "median": 14.679,
+          "p95": 41.423,
+          "max": 43.8,
+          "missing": 4
+        },
+        "serialize_graph": {
+          "count": 26,
+          "min": 7.684,
+          "median": 15.855,
+          "p95": 42.131,
+          "max": 44.458,
+          "missing": 4
+        },
+        "persist_graph": {
+          "count": 26,
+          "min": 0.577,
+          "median": 0.707,
+          "p95": 0.975,
+          "max": 1.604,
+          "missing": 4
+        },
+        "finalize_session": {
+          "count": 26,
+          "min": 4.115,
+          "median": 4.908,
+          "p95": 9.206,
+          "max": 9.71,
+          "missing": 4
+        },
+        "lazy_query_decode_self_time": {
+          "count": 30,
+          "min": 0.0,
+          "median": 20.534,
+          "p95": 43.42,
+          "max": 43.924
+        }
+      },
+      "frontend": {
+        "parse_root": {
+          "count": 30,
+          "min": 0.398,
+          "median": 0.432,
+          "p95": 0.591,
+          "max": 0.95
+        },
+        "macro_expansion_including_module_parsing": {
+          "count": 30,
+          "min": 12.314,
+          "median": 107.55,
+          "p95": 146.996,
+          "max": 147.511
+        },
+        "procedural_macro_calls": {
+          "count": 28,
+          "min": 4.797,
+          "median": 5.183,
+          "p95": 6.341,
+          "max": 6.371,
+          "missing": 2
+        },
+        "derive_macro_outer": {
+          "count": 28,
+          "min": 5.306,
+          "median": 5.732,
+          "p95": 7.149,
+          "max": 7.241,
+          "missing": 2
+        },
+        "resolve_names": {
+          "count": 28,
+          "min": 18.726,
+          "median": 20.521,
+          "p95": 28.097,
+          "max": 28.578,
+          "missing": 2
+        },
+        "type_check": {
+          "count": 28,
+          "min": 14.386,
+          "median": 24.445,
+          "p95": 90.845,
+          "max": 95.11,
+          "missing": 2
+        },
+        "coherence": {
+          "count": 28,
+          "min": 5.254,
+          "median": 10.118,
+          "p95": 19.747,
+          "max": 23.021,
+          "missing": 2
+        },
+        "borrow_check": {
+          "count": 28,
+          "min": 7.072,
+          "median": 11.95,
+          "p95": 58.259,
+          "max": 59.666,
+          "missing": 2
+        },
+        "lints": {
+          "count": 26,
+          "min": 1.357,
+          "median": 5.463,
+          "p95": 7.619,
+          "max": 9.764,
+          "missing": 4
+        },
+        "external_crate_metadata_decode_self_time": {
+          "count": 30,
+          "min": 0.0,
+          "median": 9.045,
+          "p95": 17.95,
+          "max": 18.069
+        }
+      },
+      "backend": {
+        "write_metadata": {
+          "count": 26,
+          "min": 0.119,
+          "median": 0.136,
+          "p95": 0.224,
+          "max": 0.285,
+          "missing": 4
+        },
+        "monomorphization": {
+          "count": 26,
+          "min": 16.119,
+          "median": 21.162,
+          "p95": 31.231,
+          "max": 31.349,
+          "missing": 4
+        },
+        "find_codegen_unit_reuse": {
+          "count": 26,
+          "min": 1.811,
+          "median": 2.297,
+          "p95": 2.901,
+          "max": 2.95,
+          "missing": 4
+        },
+        "codegen_main_thread": {
+          "count": 26,
+          "min": 49.522,
+          "median": 82.442,
+          "p95": 211.798,
+          "max": 220.514,
+          "missing": 4
+        },
+        "finish_codegen_main_thread": {
+          "count": 26,
+          "min": 0.043,
+          "median": 133.898,
+          "p95": 680.356,
+          "max": 704.61,
+          "missing": 4
+        },
+        "llvm_backend": {
+          "count": 26,
+          "min": 21.999,
+          "median": 202.072,
+          "p95": 794.632,
+          "max": 842.072,
+          "missing": 4
+        },
+        "link_including_overhead": {
+          "count": 26,
+          "min": 112.725,
+          "median": 132.743,
+          "p95": 156.211,
+          "max": 328.748,
+          "missing": 4
+        },
+        "run_linker": {
+          "count": 26,
+          "min": 68.368,
+          "median": 81.891,
+          "p95": 95.922,
+          "max": 211.158,
+          "missing": 4
+        }
+      }
+    },
+    "activity_counts": {
+      "procedural_macro_calls": {
+        "count": 30,
+        "min": 0,
+        "median": 21,
+        "p95": 21,
+        "max": 21
+      },
+      "derive_macro_outer": {
+        "count": 30,
+        "min": 0,
+        "median": 21,
+        "p95": 21,
+        "max": 21
+      }
+    },
+    "lazy_query_decode_types": 43,
+    "largest_lazy_query_decodes_ms": {
+      "<unknown>": {
+        "count": 30,
+        "min": 0.0,
+        "median": 0.0,
+        "p95": 22.893,
+        "max": 23.812
+      },
+      "items_of_instance": {
+        "count": 30,
+        "min": 0.0,
+        "median": 4.455,
+        "p95": 6.526,
+        "max": 6.715
+      },
+      "typeck_root": {
+        "count": 30,
+        "min": 0.0,
+        "median": 4.569,
+        "p95": 6.357,
+        "max": 8.472
+      },
+      "optimized_mir": {
+        "count": 30,
+        "min": 0.0,
+        "median": 0.29,
+        "p95": 6.264,
+        "max": 7.004
+      },
+      "type_of": {
+        "count": 30,
+        "min": 0.0,
+        "median": 0.791,
+        "p95": 1.619,
+        "max": 1.654
+      },
+      "symbol_name": {
+        "count": 30,
+        "min": 0.0,
+        "median": 0.988,
+        "p95": 1.343,
+        "max": 1.463
+      },
+      "fn_sig": {
+        "count": 30,
+        "min": 0.0,
+        "median": 0.778,
+        "p95": 0.967,
+        "max": 0.975
+      },
+      "generics_of": {
+        "count": 30,
+        "min": 0.0,
+        "median": 0.668,
+        "p95": 0.832,
+        "max": 0.856
+      },
+      "size_estimate": {
+        "count": 30,
+        "min": 0.0,
+        "median": 0.522,
+        "p95": 0.814,
+        "max": 0.905
+      },
+      "def_span": {
+        "count": 30,
+        "min": 0.0,
+        "median": 0.173,
+        "p95": 1.734,
+        "max": 1.974
+      }
+    }
+  },
+  "by_outcome": {
+    "pass": {
+      "revisions": 24,
+      "external_ms": {
+        "compile": {
+          "count": 24,
+          "min": 440.712,
+          "median": 703.895,
+          "p95": 1470.625,
+          "max": 1747.58
+        },
+        "test": {
+          "count": 24,
+          "min": 69.722,
+          "median": 80.054,
+          "p95": 111.1,
+          "max": 113.087
+        },
+        "save_to_result": {
+          "count": 24,
+          "min": 514.159,
+          "median": 786.397,
+          "p95": 1551.787,
+          "max": 1847.452
+        }
+      },
+      "activities_ms": {
+        "incremental": {
+          "prepare_session": {
+            "count": 24,
+            "min": 0.702,
+            "median": 0.754,
+            "p95": 0.869,
+            "max": 1.107
+          },
+          "prepare_and_load_graph": {
+            "count": 24,
+            "min": 15.988,
+            "median": 27.939,
+            "p95": 30.851,
+            "max": 31.679
+          },
+          "load_graph": {
+            "count": 24,
+            "min": 15.228,
+            "median": 27.071,
+            "p95": 29.908,
+            "max": 30.809
+          },
+          "decode_graph_reverse_index": {
+            "count": 24,
+            "min": 2.248,
+            "median": 4.424,
+            "p95": 5.431,
+            "max": 5.708
+          },
+          "open_query_result_cache": {
+            "count": 24,
+            "min": 1.808,
+            "median": 3.258,
+            "p95": 4.829,
+            "max": 5.397
+          },
+          "promote_query_cache": {
+            "count": 24,
+            "min": 1.693,
+            "median": 2.135,
+            "p95": 26.752,
+            "max": 28.422
+          },
+          "serialize_query_cache": {
+            "count": 24,
+            "min": 4.252,
+            "median": 10.509,
+            "p95": 15.435,
+            "max": 15.72
+          },
+          "persist_query_cache": {
+            "count": 24,
+            "min": 7.094,
+            "median": 14.679,
+            "p95": 41.423,
+            "max": 43.8
+          },
+          "serialize_graph": {
+            "count": 24,
+            "min": 7.684,
+            "median": 15.855,
+            "p95": 42.131,
+            "max": 44.458
+          },
+          "persist_graph": {
+            "count": 24,
+            "min": 0.577,
+            "median": 0.716,
+            "p95": 0.975,
+            "max": 1.604
+          },
+          "finalize_session": {
+            "count": 24,
+            "min": 4.115,
+            "median": 4.908,
+            "p95": 9.206,
+            "max": 9.71
+          },
+          "lazy_query_decode_self_time": {
+            "count": 24,
+            "min": 8.618,
+            "median": 24.543,
+            "p95": 43.42,
+            "max": 43.924
+          }
+        },
+        "frontend": {
+          "parse_root": {
+            "count": 24,
+            "min": 0.407,
+            "median": 0.43,
+            "p95": 0.536,
+            "max": 0.591
+          },
+          "macro_expansion_including_module_parsing": {
+            "count": 24,
+            "min": 98.24,
+            "median": 111.149,
+            "p95": 146.996,
+            "max": 147.511
+          },
+          "procedural_macro_calls": {
+            "count": 24,
+            "min": 4.941,
+            "median": 5.207,
+            "p95": 6.338,
+            "max": 6.341
+          },
+          "derive_macro_outer": {
+            "count": 24,
+            "min": 5.441,
+            "median": 5.765,
+            "p95": 7.108,
+            "max": 7.149
+          },
+          "resolve_names": {
+            "count": 24,
+            "min": 18.726,
+            "median": 20.63,
+            "p95": 28.097,
+            "max": 28.578
+          },
+          "type_check": {
+            "count": 24,
+            "min": 14.386,
+            "median": 24.445,
+            "p95": 90.845,
+            "max": 95.11
+          },
+          "coherence": {
+            "count": 24,
+            "min": 5.254,
+            "median": 10.118,
+            "p95": 18.522,
+            "max": 19.747
+          },
+          "borrow_check": {
+            "count": 24,
+            "min": 7.072,
+            "median": 12.215,
+            "p95": 58.259,
+            "max": 59.666
+          },
+          "lints": {
+            "count": 24,
+            "min": 1.357,
+            "median": 5.463,
+            "p95": 7.619,
+            "max": 9.764
+          },
+          "external_crate_metadata_decode_self_time": {
+            "count": 24,
+            "min": 3.199,
+            "median": 9.563,
+            "p95": 17.95,
+            "max": 18.069
+          }
+        },
+        "backend": {
+          "write_metadata": {
+            "count": 24,
+            "min": 0.119,
+            "median": 0.136,
+            "p95": 0.224,
+            "max": 0.285
+          },
+          "monomorphization": {
+            "count": 24,
+            "min": 16.119,
+            "median": 21.162,
+            "p95": 31.231,
+            "max": 31.349
+          },
+          "find_codegen_unit_reuse": {
+            "count": 24,
+            "min": 1.811,
+            "median": 2.284,
+            "p95": 2.901,
+            "max": 2.95
+          },
+          "codegen_main_thread": {
+            "count": 24,
+            "min": 49.522,
+            "median": 82.505,
+            "p95": 211.798,
+            "max": 220.514
+          },
+          "finish_codegen_main_thread": {
+            "count": 24,
+            "min": 0.043,
+            "median": 133.898,
+            "p95": 680.356,
+            "max": 704.61
+          },
+          "llvm_backend": {
+            "count": 24,
+            "min": 21.999,
+            "median": 202.072,
+            "p95": 794.632,
+            "max": 842.072
+          },
+          "link_including_overhead": {
+            "count": 24,
+            "min": 112.725,
+            "median": 131.367,
+            "p95": 156.211,
+            "max": 328.748
+          },
+          "run_linker": {
+            "count": 24,
+            "min": 68.368,
+            "median": 81.454,
+            "p95": 95.922,
+            "max": 211.158
+          }
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 24,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 24,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "lazy_query_decode_types": 43,
+      "largest_lazy_query_decodes_ms": {
+        "<unknown>": {
+          "count": 24,
+          "min": 0.0,
+          "median": 0.0,
+          "p95": 22.893,
+          "max": 23.812
+        },
+        "items_of_instance": {
+          "count": 24,
+          "min": 3.823,
+          "median": 4.508,
+          "p95": 6.526,
+          "max": 6.715
+        },
+        "typeck_root": {
+          "count": 24,
+          "min": 0.0,
+          "median": 4.761,
+          "p95": 6.357,
+          "max": 8.472
+        },
+        "optimized_mir": {
+          "count": 24,
+          "min": 0.0,
+          "median": 0.304,
+          "p95": 6.264,
+          "max": 7.004
+        },
+        "type_of": {
+          "count": 24,
+          "min": 0.524,
+          "median": 0.87,
+          "p95": 1.619,
+          "max": 1.654
+        },
+        "symbol_name": {
+          "count": 24,
+          "min": 0.49,
+          "median": 1.017,
+          "p95": 1.343,
+          "max": 1.463
+        },
+        "fn_sig": {
+          "count": 24,
+          "min": 0.543,
+          "median": 0.792,
+          "p95": 0.967,
+          "max": 0.975
+        },
+        "generics_of": {
+          "count": 24,
+          "min": 0.534,
+          "median": 0.676,
+          "p95": 0.785,
+          "max": 0.832
+        },
+        "size_estimate": {
+          "count": 24,
+          "min": 0.359,
+          "median": 0.53,
+          "p95": 0.814,
+          "max": 0.905
+        },
+        "def_span": {
+          "count": 24,
+          "min": 0.004,
+          "median": 0.194,
+          "p95": 1.734,
+          "max": 1.974
+        }
+      }
+    },
+    "fail": {
+      "revisions": 2,
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 653.45,
+          "median": 698.134,
+          "p95": 742.818,
+          "max": 742.818
+        },
+        "test": {
+          "count": 2,
+          "min": 107.04,
+          "median": 107.383,
+          "p95": 107.725,
+          "max": 107.725
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 761.147,
+          "median": 806.459,
+          "p95": 851.771,
+          "max": 851.771
+        }
+      },
+      "activities_ms": {
+        "incremental": {
+          "prepare_session": {
+            "count": 2,
+            "min": 0.822,
+            "median": 1.097,
+            "p95": 1.371,
+            "max": 1.371
+          },
+          "prepare_and_load_graph": {
+            "count": 2,
+            "min": 16.976,
+            "median": 22.212,
+            "p95": 27.448,
+            "max": 27.448
+          },
+          "load_graph": {
+            "count": 2,
+            "min": 15.642,
+            "median": 21.124,
+            "p95": 26.606,
+            "max": 26.606
+          },
+          "decode_graph_reverse_index": {
+            "count": 2,
+            "min": 4.257,
+            "median": 4.425,
+            "p95": 4.594,
+            "max": 4.594
+          },
+          "open_query_result_cache": {
+            "count": 2,
+            "min": 2.154,
+            "median": 3.819,
+            "p95": 5.483,
+            "max": 5.483
+          },
+          "promote_query_cache": {
+            "count": 2,
+            "min": 2.186,
+            "median": 13.51,
+            "p95": 24.834,
+            "max": 24.834
+          },
+          "serialize_query_cache": {
+            "count": 2,
+            "min": 8.636,
+            "median": 11.031,
+            "p95": 13.426,
+            "max": 13.426
+          },
+          "persist_query_cache": {
+            "count": 2,
+            "min": 12.526,
+            "median": 25.704,
+            "p95": 38.882,
+            "max": 38.882
+          },
+          "serialize_graph": {
+            "count": 2,
+            "min": 13.175,
+            "median": 26.329,
+            "p95": 39.483,
+            "max": 39.483
+          },
+          "persist_graph": {
+            "count": 2,
+            "min": 0.592,
+            "median": 0.616,
+            "p95": 0.64,
+            "max": 0.64
+          },
+          "finalize_session": {
+            "count": 2,
+            "min": 4.586,
+            "median": 5.11,
+            "p95": 5.635,
+            "max": 5.635
+          },
+          "lazy_query_decode_self_time": {
+            "count": 2,
+            "min": 20.513,
+            "median": 28.44,
+            "p95": 36.367,
+            "max": 36.367
+          }
+        },
+        "frontend": {
+          "parse_root": {
+            "count": 2,
+            "min": 0.432,
+            "median": 0.691,
+            "p95": 0.95,
+            "max": 0.95
+          },
+          "macro_expansion_including_module_parsing": {
+            "count": 2,
+            "min": 103.285,
+            "median": 119.03,
+            "p95": 134.775,
+            "max": 134.775
+          },
+          "procedural_macro_calls": {
+            "count": 2,
+            "min": 5.119,
+            "median": 5.745,
+            "p95": 6.371,
+            "max": 6.371
+          },
+          "derive_macro_outer": {
+            "count": 2,
+            "min": 5.643,
+            "median": 6.442,
+            "p95": 7.241,
+            "max": 7.241
+          },
+          "resolve_names": {
+            "count": 2,
+            "min": 18.912,
+            "median": 20.259,
+            "p95": 21.607,
+            "max": 21.607
+          },
+          "type_check": {
+            "count": 2,
+            "min": 21.838,
+            "median": 22.868,
+            "p95": 23.897,
+            "max": 23.897
+          },
+          "coherence": {
+            "count": 2,
+            "min": 7.252,
+            "median": 7.658,
+            "p95": 8.064,
+            "max": 8.064
+          },
+          "borrow_check": {
+            "count": 2,
+            "min": 10.132,
+            "median": 11.53,
+            "p95": 12.929,
+            "max": 12.929
+          },
+          "lints": {
+            "count": 2,
+            "min": 4.817,
+            "median": 5.846,
+            "p95": 6.875,
+            "max": 6.875
+          },
+          "external_crate_metadata_decode_self_time": {
+            "count": 2,
+            "min": 8.805,
+            "median": 9.276,
+            "p95": 9.746,
+            "max": 9.746
+          }
+        },
+        "backend": {
+          "write_metadata": {
+            "count": 2,
+            "min": 0.135,
+            "median": 0.145,
+            "p95": 0.155,
+            "max": 0.155
+          },
+          "monomorphization": {
+            "count": 2,
+            "min": 17.632,
+            "median": 19.895,
+            "p95": 22.157,
+            "max": 22.157
+          },
+          "find_codegen_unit_reuse": {
+            "count": 2,
+            "min": 2.447,
+            "median": 2.606,
+            "p95": 2.764,
+            "max": 2.764
+          },
+          "codegen_main_thread": {
+            "count": 2,
+            "min": 72.092,
+            "median": 77.302,
+            "p95": 82.512,
+            "max": 82.512
+          },
+          "finish_codegen_main_thread": {
+            "count": 2,
+            "min": 96.678,
+            "median": 128.256,
+            "p95": 159.834,
+            "max": 159.834
+          },
+          "llvm_backend": {
+            "count": 2,
+            "min": 180.494,
+            "median": 201.242,
+            "p95": 221.99,
+            "max": 221.99
+          },
+          "link_including_overhead": {
+            "count": 2,
+            "min": 138.27,
+            "median": 138.998,
+            "p95": 139.727,
+            "max": 139.727
+          },
+          "run_linker": {
+            "count": 2,
+            "min": 85.914,
+            "median": 86.596,
+            "p95": 87.279,
+            "max": 87.279
+          }
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "lazy_query_decode_types": 39,
+      "largest_lazy_query_decodes_ms": {
+        "<unknown>": {
+          "count": 2,
+          "min": 0.0,
+          "median": 10.137,
+          "p95": 20.274,
+          "max": 20.274
+        },
+        "typeck_root": {
+          "count": 2,
+          "min": 4.521,
+          "median": 5.232,
+          "p95": 5.944,
+          "max": 5.944
+        },
+        "items_of_instance": {
+          "count": 2,
+          "min": 4.285,
+          "median": 4.997,
+          "p95": 5.708,
+          "max": 5.708
+        },
+        "symbol_name": {
+          "count": 2,
+          "min": 1.099,
+          "median": 1.21,
+          "p95": 1.321,
+          "max": 1.321
+        },
+        "type_of": {
+          "count": 2,
+          "min": 0.737,
+          "median": 0.83,
+          "p95": 0.923,
+          "max": 0.923
+        },
+        "generics_of": {
+          "count": 2,
+          "min": 0.715,
+          "median": 0.786,
+          "p95": 0.856,
+          "max": 0.856
+        },
+        "fn_sig": {
+          "count": 2,
+          "min": 0.713,
+          "median": 0.774,
+          "p95": 0.834,
+          "max": 0.834
+        },
+        "size_estimate": {
+          "count": 2,
+          "min": 0.542,
+          "median": 0.6,
+          "p95": 0.659,
+          "max": 0.659
+        },
+        "trivial_const": {
+          "count": 2,
+          "min": 0.389,
+          "median": 0.467,
+          "p95": 0.544,
+          "max": 0.544
+        },
+        "codegen_fn_attrs": {
+          "count": 2,
+          "min": 0.357,
+          "median": 0.39,
+          "p95": 0.422,
+          "max": 0.422
+        }
+      }
+    },
+    "compile_error": {
+      "revisions": 4,
+      "external_ms": {
+        "compile": {
+          "count": 4,
+          "min": 83.164,
+          "median": 179.281,
+          "p95": 289.836,
+          "max": 289.836
+        },
+        "test": {
+          "count": 0,
+          "missing": 4
+        },
+        "save_to_result": {
+          "count": 4,
+          "min": 84.006,
+          "median": 179.992,
+          "p95": 290.427,
+          "max": 290.427
+        }
+      },
+      "activities_ms": {
+        "incremental": {
+          "prepare_session": {
+            "count": 4,
+            "min": 0.72,
+            "median": 0.733,
+            "p95": 0.806,
+            "max": 0.806
+          },
+          "prepare_and_load_graph": {
+            "count": 4,
+            "min": 27.119,
+            "median": 28.716,
+            "p95": 32.856,
+            "max": 32.856
+          },
+          "load_graph": {
+            "count": 4,
+            "min": 26.245,
+            "median": 27.857,
+            "p95": 32.048,
+            "max": 32.048
+          },
+          "decode_graph_reverse_index": {
+            "count": 4,
+            "min": 0.16,
+            "median": 1.709,
+            "p95": 3.263,
+            "max": 3.263
+          },
+          "open_query_result_cache": {
+            "count": 4,
+            "min": 1.92,
+            "median": 2.614,
+            "p95": 5.139,
+            "max": 5.139
+          },
+          "promote_query_cache": {
+            "count": 0,
+            "missing": 4
+          },
+          "serialize_query_cache": {
+            "count": 0,
+            "missing": 4
+          },
+          "persist_query_cache": {
+            "count": 0,
+            "missing": 4
+          },
+          "serialize_graph": {
+            "count": 0,
+            "missing": 4
+          },
+          "persist_graph": {
+            "count": 0,
+            "missing": 4
+          },
+          "finalize_session": {
+            "count": 0,
+            "missing": 4
+          },
+          "lazy_query_decode_self_time": {
+            "count": 4,
+            "min": 0.0,
+            "median": 1.631,
+            "p95": 4.24,
+            "max": 4.24
+          }
+        },
+        "frontend": {
+          "parse_root": {
+            "count": 4,
+            "min": 0.398,
+            "median": 0.423,
+            "p95": 0.445,
+            "max": 0.445
+          },
+          "macro_expansion_including_module_parsing": {
+            "count": 4,
+            "min": 12.314,
+            "median": 54.478,
+            "p95": 97.71,
+            "max": 97.71
+          },
+          "procedural_macro_calls": {
+            "count": 2,
+            "min": 4.797,
+            "median": 4.953,
+            "p95": 5.109,
+            "max": 5.109,
+            "missing": 2
+          },
+          "derive_macro_outer": {
+            "count": 2,
+            "min": 5.306,
+            "median": 5.478,
+            "p95": 5.65,
+            "max": 5.65,
+            "missing": 2
+          },
+          "resolve_names": {
+            "count": 2,
+            "min": 18.878,
+            "median": 18.969,
+            "p95": 19.059,
+            "max": 19.059,
+            "missing": 2
+          },
+          "type_check": {
+            "count": 2,
+            "min": 26.244,
+            "median": 32.237,
+            "p95": 38.23,
+            "max": 38.23,
+            "missing": 2
+          },
+          "coherence": {
+            "count": 2,
+            "min": 10.756,
+            "median": 16.889,
+            "p95": 23.021,
+            "max": 23.021,
+            "missing": 2
+          },
+          "borrow_check": {
+            "count": 2,
+            "min": 8.274,
+            "median": 8.534,
+            "p95": 8.794,
+            "max": 8.794,
+            "missing": 2
+          },
+          "lints": {
+            "count": 0,
+            "missing": 4
+          },
+          "external_crate_metadata_decode_self_time": {
+            "count": 4,
+            "min": 0.0,
+            "median": 1.561,
+            "p95": 3.168,
+            "max": 3.168
+          }
+        },
+        "backend": {
+          "write_metadata": {
+            "count": 0,
+            "missing": 4
+          },
+          "monomorphization": {
+            "count": 0,
+            "missing": 4
+          },
+          "find_codegen_unit_reuse": {
+            "count": 0,
+            "missing": 4
+          },
+          "codegen_main_thread": {
+            "count": 0,
+            "missing": 4
+          },
+          "finish_codegen_main_thread": {
+            "count": 0,
+            "missing": 4
+          },
+          "llvm_backend": {
+            "count": 0,
+            "missing": 4
+          },
+          "link_including_overhead": {
+            "count": 0,
+            "missing": 4
+          },
+          "run_linker": {
+            "count": 0,
+            "missing": 4
+          }
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 4,
+          "min": 0,
+          "median": 10.5,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 4,
+          "min": 0,
+          "median": 10.5,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "lazy_query_decode_types": 19,
+      "largest_lazy_query_decodes_ms": {
+        "associated_item": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.082,
+          "p95": 0.965,
+          "max": 0.965
+        },
+        "generics_of": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.246,
+          "p95": 0.602,
+          "max": 0.602
+        },
+        "def_span": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.082,
+          "p95": 0.778,
+          "max": 0.778
+        },
+        "type_of": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.223,
+          "p95": 0.488,
+          "max": 0.488
+        },
+        "trivial_const": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.151,
+          "p95": 0.442,
+          "max": 0.442
+        },
+        "fn_sig": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.162,
+          "p95": 0.346,
+          "max": 0.346
+        },
+        "used_trait_imports": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.129,
+          "p95": 0.267,
+          "max": 0.267
+        },
+        "lookup_stability": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.101,
+          "p95": 0.22,
+          "max": 0.22
+        },
+        "lookup_deprecation_entry": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.082,
+          "p95": 0.253,
+          "max": 0.253
+        },
+        "adt_def": {
+          "count": 4,
+          "min": 0.0,
+          "median": 0.034,
+          "p95": 0.128,
+          "max": 0.128
+        }
+      }
+    }
+  },
+  "by_case": {
+    "unchanged": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 470.107,
+          "median": 489.978,
+          "p95": 509.848,
+          "max": 509.848
+        },
+        "test": {
+          "count": 2,
+          "min": 71.286,
+          "median": 78.513,
+          "p95": 85.739,
+          "max": 85.739
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 541.892,
+          "median": 568.967,
+          "p95": 596.042,
+          "max": 596.042
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 27.969,
+          "decode_graph_reverse_index": 2.466,
+          "open_query_result_cache": 3.912,
+          "lazy_query_decode_self_time": 18.791,
+          "persist_query_cache": 22.464,
+          "serialize_graph": 23.1
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 111.298,
+          "procedural_macro_calls": 5.763,
+          "resolve_names": 20.914,
+          "type_check": 14.386,
+          "borrow_check": 7.257
+        },
+        "backend": {
+          "codegen_main_thread": 50.939,
+          "llvm_backend": 22.229,
+          "link_including_overhead": 128.353,
+          "run_linker": 79.832
+        }
+      }
+    },
+    "initial-syntax-error": {
+      "outcome": "compile_error",
+      "test_counts": null,
+      "error_codes": [null],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 83.164,
+          "median": 87.245,
+          "p95": 91.326,
+          "max": 91.326
+        },
+        "test": {
+          "count": 0,
+          "missing": 2
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 84.006,
+          "median": 88.033,
+          "p95": 92.059,
+          "max": 92.059
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 30.29,
+          "decode_graph_reverse_index": 0.186,
+          "open_query_result_cache": 3.542,
+          "lazy_query_decode_self_time": 0.0
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 13.432
+        },
+        "backend": {}
+      }
+    },
+    "syntax-repair": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 440.712,
+          "median": 482.132,
+          "p95": 523.552,
+          "max": 523.552
+        },
+        "test": {
+          "count": 2,
+          "min": 71.422,
+          "median": 72.07,
+          "p95": 72.718,
+          "max": 72.718
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 514.159,
+          "median": 554.966,
+          "p95": 595.774,
+          "max": 595.774
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 27.612,
+          "decode_graph_reverse_index": 2.454,
+          "open_query_result_cache": 3.603,
+          "lazy_query_decode_self_time": 19.918,
+          "persist_query_cache": 23.819,
+          "serialize_graph": 24.409
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 114.204,
+          "procedural_macro_calls": 5.693,
+          "resolve_names": 19.179,
+          "type_check": 14.81,
+          "borrow_check": 7.251
+        },
+        "backend": {
+          "codegen_main_thread": 50.534,
+          "llvm_backend": 22.821,
+          "link_including_overhead": 124.746,
+          "run_linker": 77.6
+        }
+      }
+    },
+    "signature-and-caller": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 689.963,
+          "median": 696.189,
+          "p95": 702.416,
+          "max": 702.416
+        },
+        "test": {
+          "count": 2,
+          "min": 81.046,
+          "median": 97.066,
+          "p95": 113.087,
+          "max": 113.087
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 784.184,
+          "median": 793.954,
+          "p95": 803.725,
+          "max": 803.725
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 26.229,
+          "decode_graph_reverse_index": 4.719,
+          "open_query_result_cache": 2.54,
+          "lazy_query_decode_self_time": 19.492,
+          "persist_query_cache": 11.525,
+          "serialize_graph": 12.356
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 99.218,
+          "procedural_macro_calls": 4.952,
+          "resolve_names": 19.451,
+          "type_check": 27.335,
+          "borrow_check": 15.337
+        },
+        "backend": {
+          "codegen_main_thread": 83.577,
+          "llvm_backend": 210.623,
+          "link_including_overhead": 140.674,
+          "run_linker": 80.102
+        }
+      }
+    },
+    "signature-repair": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 633.0,
+          "median": 671.66,
+          "p95": 710.319,
+          "max": 710.319
+        },
+        "test": {
+          "count": 2,
+          "min": 69.849,
+          "median": 75.873,
+          "p95": 81.898,
+          "max": 81.898
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 715.559,
+          "median": 748.264,
+          "p95": 780.968,
+          "max": 780.968
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 27.026,
+          "decode_graph_reverse_index": 4.117,
+          "open_query_result_cache": 3.941,
+          "lazy_query_decode_self_time": 27.11,
+          "persist_query_cache": 27.549,
+          "serialize_graph": 28.237
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 118.889,
+          "procedural_macro_calls": 5.74,
+          "resolve_names": 19.126,
+          "type_check": 24.863,
+          "borrow_check": 11.945
+        },
+        "backend": {
+          "codegen_main_thread": 75.261,
+          "llvm_backend": 188.761,
+          "link_including_overhead": 136.408,
+          "run_linker": 83.523
+        }
+      }
+    },
+    "import-and-all-references": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 640.507,
+          "median": 676.516,
+          "p95": 712.524,
+          "max": 712.524
+        },
+        "test": {
+          "count": 2,
+          "min": 69.722,
+          "median": 74.485,
+          "p95": 79.249,
+          "max": 79.249
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 710.929,
+          "median": 751.737,
+          "p95": 792.545,
+          "max": 792.545
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 26.558,
+          "decode_graph_reverse_index": 4.949,
+          "open_query_result_cache": 3.294,
+          "lazy_query_decode_self_time": 29.726,
+          "persist_query_cache": 26.059,
+          "serialize_graph": 26.755
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 109.967,
+          "procedural_macro_calls": 5.102,
+          "resolve_names": 22.021,
+          "type_check": 23.52,
+          "borrow_check": 11.386
+        },
+        "backend": {
+          "codegen_main_thread": 76.173,
+          "llvm_backend": 181.095,
+          "link_including_overhead": 142.767,
+          "run_linker": 78.244
+        }
+      }
+    },
+    "import-repair": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 668.511,
+          "median": 686.943,
+          "p95": 705.375,
+          "max": 705.375
+        },
+        "test": {
+          "count": 2,
+          "min": 82.552,
+          "median": 96.826,
+          "p95": 111.1,
+          "max": 111.1
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 780.292,
+          "median": 784.451,
+          "p95": 788.61,
+          "max": 788.61
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 28.103,
+          "decode_graph_reverse_index": 4.793,
+          "open_query_result_cache": 2.496,
+          "lazy_query_decode_self_time": 19.562,
+          "persist_query_cache": 11.354,
+          "serialize_graph": 12.049
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 115.27,
+          "procedural_macro_calls": 5.417,
+          "resolve_names": 24.304,
+          "type_check": 23.059,
+          "borrow_check": 13.691
+        },
+        "backend": {
+          "codegen_main_thread": 80.959,
+          "llvm_backend": 190.048,
+          "link_including_overhead": 124.941,
+          "run_linker": 77.263
+        }
+      }
+    },
+    "macro-definition-and-call": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 1449.494,
+          "median": 1598.537,
+          "p95": 1747.58,
+          "max": 1747.58
+        },
+        "test": {
+          "count": 2,
+          "min": 77.699,
+          "median": 88.107,
+          "p95": 98.514,
+          "max": 98.514
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 1527.927,
+          "median": 1687.689,
+          "p95": 1847.452,
+          "max": 1847.452
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 27.234,
+          "decode_graph_reverse_index": 4.578,
+          "open_query_result_cache": 4.037,
+          "lazy_query_decode_self_time": 35.377,
+          "persist_query_cache": 24.429,
+          "serialize_graph": 25.338
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 111.725,
+          "procedural_macro_calls": 5.088,
+          "resolve_names": 24.987,
+          "type_check": 88.44,
+          "borrow_check": 58.452
+        },
+        "backend": {
+          "codegen_main_thread": 216.156,
+          "llvm_backend": 811.764,
+          "link_including_overhead": 232.341,
+          "run_linker": 148.349
+        }
+      }
+    },
+    "macro-behavior-fails-test": {
+      "outcome": "fail",
+      "test_counts": {
+        "passed": 243,
+        "failed": 2,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 653.45,
+          "median": 698.134,
+          "p95": 742.818,
+          "max": 742.818
+        },
+        "test": {
+          "count": 2,
+          "min": 107.04,
+          "median": 107.383,
+          "p95": 107.725,
+          "max": 107.725
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 761.147,
+          "median": 806.459,
+          "p95": 851.771,
+          "max": 851.771
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 21.124,
+          "decode_graph_reverse_index": 4.425,
+          "open_query_result_cache": 3.819,
+          "lazy_query_decode_self_time": 28.44,
+          "persist_query_cache": 25.704,
+          "serialize_graph": 26.329
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 119.03,
+          "procedural_macro_calls": 5.745,
+          "resolve_names": 20.259,
+          "type_check": 22.868,
+          "borrow_check": 11.53
+        },
+        "backend": {
+          "codegen_main_thread": 77.302,
+          "llvm_backend": 201.242,
+          "link_including_overhead": 138.998,
+          "run_linker": 86.596
+        }
+      }
+    },
+    "macro-behavior-repair": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 695.346,
+          "median": 734.9,
+          "p95": 774.454,
+          "max": 774.454
+        },
+        "test": {
+          "count": 2,
+          "min": 75.278,
+          "median": 78.903,
+          "p95": 82.528,
+          "max": 82.528
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 771.454,
+          "median": 814.588,
+          "p95": 857.721,
+          "max": 857.721
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 26.801,
+          "decode_graph_reverse_index": 4.509,
+          "open_query_result_cache": 2.724,
+          "lazy_query_decode_self_time": 17.632,
+          "persist_query_cache": 13.572,
+          "serialize_graph": 14.326
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 147.254,
+          "procedural_macro_calls": 5.899,
+          "resolve_names": 24.147,
+          "type_check": 24.859,
+          "borrow_check": 11.376
+        },
+        "backend": {
+          "codegen_main_thread": 79.782,
+          "llvm_backend": 201.717,
+          "link_including_overhead": 138.699,
+          "run_linker": 84.894
+        }
+      }
+    },
+    "macro-removal": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 1453.597,
+          "median": 1462.111,
+          "p95": 1470.625,
+          "max": 1470.625
+        },
+        "test": {
+          "count": 2,
+          "min": 73.659,
+          "median": 76.998,
+          "p95": 80.336,
+          "max": 80.336
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 1527.988,
+          "median": 1539.888,
+          "p95": 1551.787,
+          "max": 1551.787
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 28.5,
+          "decode_graph_reverse_index": 4.821,
+          "open_query_result_cache": 4.053,
+          "lazy_query_decode_self_time": 33.608,
+          "persist_query_cache": 24.353,
+          "serialize_graph": 25.123
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 119.134,
+          "procedural_macro_calls": 5.748,
+          "resolve_names": 23.505,
+          "type_check": 90.342,
+          "borrow_check": 58.1
+        },
+        "backend": {
+          "codegen_main_thread": 206.143,
+          "llvm_backend": 755.06,
+          "link_including_overhead": 131.172,
+          "run_linker": 81.936
+        }
+      }
+    },
+    "create-and-use-module": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 1311.57,
+          "median": 1352.343,
+          "p95": 1393.115,
+          "max": 1393.115
+        },
+        "test": {
+          "count": 2,
+          "min": 73.133,
+          "median": 75.571,
+          "p95": 78.008,
+          "max": 78.008
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 1390.443,
+          "median": 1428.785,
+          "p95": 1467.127,
+          "max": 1467.127
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 27.518,
+          "decode_graph_reverse_index": 4.428,
+          "open_query_result_cache": 3.35,
+          "lazy_query_decode_self_time": 33.778,
+          "persist_query_cache": 25.686,
+          "serialize_graph": 26.988
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 118.015,
+          "procedural_macro_calls": 5.325,
+          "resolve_names": 23.553,
+          "type_check": 39.744,
+          "borrow_check": 19.3
+        },
+        "backend": {
+          "codegen_main_thread": 170.382,
+          "llvm_backend": 767.74,
+          "link_including_overhead": 137.119,
+          "run_linker": 83.284
+        }
+      }
+    },
+    "delete-still-referenced-module": {
+      "outcome": "compile_error",
+      "test_counts": null,
+      "error_codes": ["E0583"],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 267.236,
+          "median": 278.536,
+          "p95": 289.836,
+          "max": 289.836
+        },
+        "test": {
+          "count": 0,
+          "missing": 2
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 267.924,
+          "median": 279.176,
+          "p95": 290.427,
+          "max": 290.427
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 26.713,
+          "decode_graph_reverse_index": 3.234,
+          "open_query_result_cache": 2.601,
+          "lazy_query_decode_self_time": 3.75
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 96.058,
+          "procedural_macro_calls": 4.953,
+          "resolve_names": 18.969,
+          "type_check": 32.237,
+          "borrow_check": 8.534
+        },
+        "backend": {}
+      }
+    },
+    "recreate-module": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 478.602,
+          "median": 482.892,
+          "p95": 487.181,
+          "max": 487.181
+        },
+        "test": {
+          "count": 2,
+          "min": 80.609,
+          "median": 81.49,
+          "p95": 82.371,
+          "max": 82.371
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 559.88,
+          "median": 565.096,
+          "p95": 570.312,
+          "max": 570.312
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 22.448,
+          "decode_graph_reverse_index": 2.387,
+          "open_query_result_cache": 2.793,
+          "lazy_query_decode_self_time": 9.952,
+          "persist_query_cache": 9.081,
+          "serialize_graph": 9.693
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 119.483,
+          "procedural_macro_calls": 5.152,
+          "resolve_names": 25.9,
+          "type_check": 15.161,
+          "borrow_check": 8.232
+        },
+        "backend": {
+          "codegen_main_thread": 53.197,
+          "llvm_backend": 22.43,
+          "link_including_overhead": 129.838,
+          "run_linker": 82.454
+        }
+      }
+    },
+    "remove-module-and-references": {
+      "outcome": "pass",
+      "test_counts": {
+        "passed": 245,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "error_codes": [],
+      "external_ms": {
+        "compile": {
+          "count": 2,
+          "min": 1292.165,
+          "median": 1296.068,
+          "p95": 1299.972,
+          "max": 1299.972
+        },
+        "test": {
+          "count": 2,
+          "min": 79.91,
+          "median": 80.054,
+          "p95": 80.198,
+          "max": 80.198
+        },
+        "save_to_result": {
+          "count": 2,
+          "min": 1373.179,
+          "median": 1377.446,
+          "p95": 1381.713,
+          "max": 1381.713
+        }
+      },
+      "activity_counts": {
+        "procedural_macro_calls": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        },
+        "derive_macro_outer": {
+          "count": 2,
+          "min": 21,
+          "median": 21,
+          "p95": 21,
+          "max": 21
+        }
+      },
+      "activity_medians_ms": {
+        "incremental": {
+          "load_graph": 26.938,
+          "decode_graph_reverse_index": 4.699,
+          "open_query_result_cache": 3.898,
+          "lazy_query_decode_self_time": 36.463,
+          "persist_query_cache": 23.802,
+          "serialize_graph": 24.609
+        },
+        "frontend": {
+          "macro_expansion_including_module_parsing": 99.516,
+          "procedural_macro_calls": 5.2,
+          "resolve_names": 19.452,
+          "type_check": 39.359,
+          "borrow_check": 20.016
+        },
+        "backend": {
+          "codegen_main_thread": 201.215,
+          "llvm_backend": 716.634,
+          "link_including_overhead": 133.92,
+          "run_linker": 83.799
+        }
+      }
+    }
+  }
+}

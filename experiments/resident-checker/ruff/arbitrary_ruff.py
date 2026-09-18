@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import math
 import os
 import statistics
 import subprocess
@@ -267,11 +268,26 @@ def run_unit_tests(binary, workspace, output, selected):
 
 
 def execute(
-    mode, workspace, snapshot, expected, version, output, binary, invoke, selected
+    mode,
+    workspace,
+    snapshot,
+    expected,
+    version,
+    output,
+    binary,
+    invoke,
+    selected,
+    memory=None,
 ):
     previous = fingerprint(binary)
     started = clock()
     save(workspace, snapshot)
+    if memory is not None:
+        memory_started = clock()
+        memory_observation = memory.refresh()
+        memory_elapsed = clock() - memory_started
+    else:
+        memory_observation, memory_elapsed = None, None
     status, log, compiler_pid = invoke(version)
     if status == 0:
         test = run_unit_tests(binary, workspace, output, selected)
@@ -305,6 +321,19 @@ def execute(
         "test_counts": test["counts"] if test else None,
         "old_executable_preserved": status != 0 and previous is not None,
         "compiler_pid": compiler_pid,
+        **(
+            {
+                "incremental_memory": memory_observation,
+                "incremental_memory_refresh_ns": memory_elapsed,
+            }
+            if memory is not None
+            else {}
+        ),
+        "flat_dep_graph": [
+            line.removeprefix("ohm-flat-dep-graph\t")
+            for line in log.splitlines()
+            if line.startswith("ohm-flat-dep-graph\t")
+        ],
     }
 
 
@@ -330,6 +359,102 @@ def case_evidence(rows):
     return counts, cases
 
 
+def memory_evidence(rows):
+    keys = (
+        "retention",
+        "file_count",
+        "locked_files",
+        "locked_bytes",
+        "locked_page_bytes",
+        "prefaulted_bytes",
+        "mapped_page_bytes",
+        "new_prefaulted_bytes",
+        "new_files",
+        "reused_files",
+        "released_files",
+        "skipped_bytes",
+        "skipped_page_bytes",
+    )
+    result = []
+    for row in rows:
+        entry = row["modes"]["worker"]["incremental_memory"]
+        result.append(
+            {
+                "case": row["case"],
+                **{key: entry[key] for key in keys},
+                "error_count": len(entry["errors"]),
+                "file_names": sorted(
+                    {
+                        Path(path).name
+                        for item in entry["files"]
+                        for path in item["paths"]
+                    }
+                ),
+            }
+        )
+    return result
+
+
+def paired_timing_statistics(rows):
+    measured = [row for row in rows if row["round"] > 0]
+    require(measured, "paired timing needs at least one measured revision")
+
+    def group(selected):
+        elapsed = {
+            mode: [row["modes"][mode]["elapsed_ns"] for row in selected]
+            for mode in ("worker", "fresh")
+        }
+        require(
+            all(time > 0 for times in elapsed.values() for time in times),
+            "paired timings must be positive",
+        )
+        pairs = list(zip(elapsed["worker"], elapsed["fresh"], strict=True))
+        ratios = sorted(control / candidate for candidate, control in pairs)
+        median_ratio = round(statistics.median(ratios), 4)
+        return {
+            "revisions": len(selected),
+            "save_to_result_ms": {
+                mode: distribution(times, 1e6) for mode, times in elapsed.items()
+            },
+            "ratio_of_medians_fresh_over_worker": round(
+                statistics.median(elapsed["fresh"])
+                / statistics.median(elapsed["worker"]),
+                4,
+            ),
+            "median_of_paired_ratios_fresh_over_worker": median_ratio,
+            "paired_ratio_fresh_over_worker": {
+                "min": round(ratios[0], 4),
+                "median": median_ratio,
+                "p95": round(ratios[math.ceil(0.95 * len(ratios)) - 1], 4),
+                "max": round(ratios[-1], 4),
+            },
+            "worker_wins": sum(candidate < control for candidate, control in pairs),
+            "fresh_wins": sum(control < candidate for candidate, control in pairs),
+            "ties": sum(control == candidate for candidate, control in pairs),
+        }
+
+    return {
+        "ratio_definition": "fresh control divided by worker candidate; values above 1 favor the candidate. Ratios pair the same source revision before aggregation; a ratio of pooled medians can disagree with the matched comparisons.",
+        "all": group(measured),
+        "successful_compilations": group(successful)
+        if (
+            successful := [
+                row for row in measured if row["expected"] != "compile_error"
+            ]
+        )
+        else None,
+        "by_outcome": {
+            outcome: group(selected)
+            for outcome in ("pass", "fail", "compile_error")
+            if (selected := [row for row in measured if row["expected"] == outcome])
+        },
+        "by_round": {
+            str(number): group([row for row in measured if row["round"] == number])
+            for number in sorted({row["round"] for row in measured})
+        },
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("driver", "stage", "capture", "repo", "output"):
@@ -349,8 +474,33 @@ def main():
         action="store_true",
         help="research-only: proc macro dylibs and mutable global state can persist; ordinary Ruff runs must leave this disabled",
     )
+    parser.add_argument(
+        "--pin-incremental-pages",
+        action="store_true",
+        help="keep the worker's serialized stock incremental files mapped and prefaulted in this process",
+    )
+    parser.add_argument(
+        "--require-locked-pages",
+        action="store_true",
+        help="require the optional page experiment to successfully lock selected pages",
+    )
+    parser.add_argument("--memory-limit-mib", type=int, default=256)
+    parser.add_argument(
+        "--flat-dep-graph",
+        action="store_true",
+        help="opt the worker alone into the compiler's experimental mapped dependency graph sidecar",
+    )
     args = parser.parse_args()
     require(args.rounds > 0 and args.warmups >= 0, "invalid round count")
+    require(
+        args.memory_limit_mib > 0
+        and (not args.require_locked_pages or args.pin_incremental_pages),
+        "invalid incremental memory options",
+    )
+    require(
+        not (args.pin_incremental_pages and args.flat_dep_graph),
+        "measure one candidate at a time",
+    )
     args.output.mkdir(parents=True, exist_ok=False)
     capture = json.loads(args.capture.read_text())
     workspaces = {
@@ -363,6 +513,13 @@ def main():
         commands[mode] = revision_command(
             executable, capture, workspace, workspace.parent / "target", args.stage
         )
+        if args.flat_dep_graph:
+            commands[mode][1].pop("RUSTC_OHM_FLAT_DEP_GRAPH", None)
+            commands[mode][1].pop("RUSTC_OHM_FLAT_DEP_GRAPH_TRACE", None)
+            if mode == "worker":
+                commands[mode][1].update(
+                    RUSTC_OHM_FLAT_DEP_GRAPH="1", RUSTC_OHM_FLAT_DEP_GRAPH_TRACE="1"
+                )
     corpus = cases(workspaces["worker"])
     worker = Worker(
         *commands["worker"][:2],
@@ -370,6 +527,16 @@ def main():
         args.output / "worker.stderr",
         args.reuse_compiler_process,
     )
+    if args.pin_incremental_pages:
+        from incremental_memory import IncrementalMemory
+
+        memory = IncrementalMemory(
+            workspaces["worker"].parent / "target" / "incremental",
+            args.memory_limit_mib * 1024 * 1024,
+            require_lock=args.require_locked_pages,
+        )
+    else:
+        memory = None
     rows, version = [], 0
     try:
         for index in range(args.warmups + args.rounds):
@@ -410,6 +577,7 @@ def main():
                         binary,
                         worker.compile if mode == "worker" else fresh,
                         args.selected_test,
+                        memory if mode == "worker" else None,
                     )
                     row["modes"][mode] = result
                 require(
@@ -426,6 +594,8 @@ def main():
                 print(f"{version} {name} {expected}", flush=True)
     finally:
         worker.close()
+        if memory is not None:
+            memory.close()
     measured = [row for row in rows if row["round"] > 0]
     process_counts = {
         mode: len({row["modes"][mode]["compiler_pid"] for row in measured})
@@ -437,6 +607,15 @@ def main():
         and process_counts["fresh"] == len(measured),
         f"unexpected compiler process counts: {process_counts}",
     )
+    if args.flat_dep_graph:
+        candidate_events = [row["modes"]["worker"]["flat_dep_graph"] for row in rows]
+        control_events = [row["modes"]["fresh"]["flat_dep_graph"] for row in rows]
+        require(
+            any("loaded" in events for events in candidate_events)
+            and any("written" in events for events in candidate_events)
+            and not any(control_events),
+            "experimental sidecar was not both written and loaded, or contaminated the fresh control",
+        )
 
     def times(selected):
         return {
@@ -462,6 +641,46 @@ def main():
         "compiler_process_policy": "research-only shared process; no procedural-macro isolation"
         if args.reuse_compiler_process
         else "fresh isolated compiler process for every revision",
+        **(
+            {
+                "incremental_page_prefault": {
+                    "limit_bytes": args.memory_limit_mib * 1024 * 1024,
+                    "require_locked_pages": args.require_locked_pages,
+                    "refresh_ms": distribution(
+                        [
+                            row["modes"]["worker"]["incremental_memory_refresh_ns"]
+                            for row in measured
+                        ],
+                        1e6,
+                    ),
+                    "source": "The parent maps only the last finalized incremental generation. On APFS rustc normally clones that generation into a working directory with new file identities; this control does not establish that it pins the exact vnode subsequently opened by rustc.",
+                    "observations": memory_evidence(measured),
+                }
+            }
+            if memory is not None
+            else {}
+        ),
+        **(
+            {
+                "experimental_flat_dep_graph": {
+                    "worker_events": [
+                        row["modes"]["worker"]["flat_dep_graph"] for row in measured
+                    ],
+                    "fresh_events": [
+                        row["modes"]["fresh"]["flat_dep_graph"] for row in measured
+                    ],
+                    "worker_revision_counts": {
+                        event: sum(
+                            event in row["modes"]["worker"]["flat_dep_graph"]
+                            for row in measured
+                        )
+                        for event in ("loaded", "written", "fallback", "write-failed")
+                    },
+                }
+            }
+            if args.flat_dep_graph
+            else {}
+        ),
         "validation": {
             "measured_revisions": len(measured),
             "same_dispatcher_pid": True,
@@ -492,6 +711,7 @@ def main():
             ),
             3,
         ),
+        "paired_timing": paired_timing_statistics(rows),
         "by_case_ms": {
             name: {
                 "outcome": expected,
