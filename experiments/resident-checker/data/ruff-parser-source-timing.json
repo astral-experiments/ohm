@@ -1,0 +1,909 @@
+{
+  "schema": 1,
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "compiler": {
+    "source_revision": "c67f58f8e7f233b7d83437624fbbd002efa5b4c7",
+    "reported": {
+      "release": "1.98.1-dev",
+      "commit-hash": null,
+      "commit-date": null,
+      "host": "aarch64-apple-darwin",
+      "LLVM version": "22.1.8"
+    }
+  },
+  "environment": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "rounds": 20,
+  "warmup_rounds": 2,
+  "random_seed": 194121,
+  "suites": ["main", "preservation", "fallback-preservation"],
+  "measurement": "timer begins before opening and writing a real Rust source file and ends after diagnostics are parsed, projected and available; routes run sequentially on matching independent disposable archives; resident receives only a path and increasing version",
+  "fresh_oracle": "same patched compiler starts a new process and parses actual edited files for every transition; every source-bearing rustc error and warning must match in full, including all spans, children, source lines and rendered output; no-span compiler footers, metadata and build chatter are excluded",
+  "cargo": "ordinary warm cargo +ohm check --locked -p ruff_python_parser --lib --message-format=json; disk incremental enabled and resident graph disabled",
+  "percentile": "nearest rank",
+  "validation": {
+    "transitions": 640,
+    "supported": 240,
+    "fallback": 200,
+    "fallback_percent": 31.25,
+    "noop": 200,
+    "matched_complete_fresh_diagnostics": true,
+    "matched_complete_cargo_diagnostics": true,
+    "startup_diagnostics_match_fresh": true,
+    "independent_error": true,
+    "rendered_source_and_range_ends_compared": true,
+    "native_clean_edit_and_warning": true,
+    "native_error_repair": true,
+    "line_shifts_refresh_diagnostics_without_a_fresh_compiler": true,
+    "import_warning_falls_back": true,
+    "signature_falls_back": true,
+    "combined_semantic_and_trivia_falls_back": true,
+    "unresolved_fallback_keeps_using_fresh": true
+  },
+  "targets": {
+    "resident_median_under_100_ms": true,
+    "resident_p95_under_200_ms": false,
+    "cargo_median_at_least_twice_resident": true
+  },
+  "by_route_ms": {
+    "resident": {
+      "resident": {
+        "count": 240,
+        "min": 18.217,
+        "median": 58.049,
+        "p95": 290.191,
+        "max": 782.113
+      },
+      "fresh": {
+        "count": 240,
+        "min": 574.848,
+        "median": 866.157,
+        "p95": 2420.065,
+        "max": 3903.745
+      },
+      "cargo": {
+        "count": 240,
+        "min": 205.684,
+        "median": 287.597,
+        "p95": 761.302,
+        "max": 2454.428
+      },
+      "ratio_of_medians_cargo_over_resident": 4.954
+    },
+    "fallback": {
+      "resident": {
+        "count": 200,
+        "min": 587.137,
+        "median": 754.94,
+        "p95": 2160.312,
+        "max": 4475.794
+      },
+      "fresh": {
+        "count": 200,
+        "min": 575.606,
+        "median": 740.354,
+        "p95": 2179.707,
+        "max": 3813.14
+      },
+      "cargo": {
+        "count": 200,
+        "min": 198.855,
+        "median": 258.821,
+        "p95": 729.386,
+        "max": 1543.321
+      },
+      "ratio_of_medians_cargo_over_resident": 0.343
+    },
+    "noop": {
+      "resident": {
+        "count": 200,
+        "min": 2.625,
+        "median": 4.096,
+        "p95": 8.55,
+        "max": 11.583
+      },
+      "fresh": {
+        "count": 200,
+        "min": 604.671,
+        "median": 782.355,
+        "p95": 2832.254,
+        "max": 4146.764
+      },
+      "cargo": {
+        "count": 200,
+        "min": 73.207,
+        "median": 255.203,
+        "p95": 699.537,
+        "max": 1164.961
+      },
+      "ratio_of_medians_cargo_over_resident": 62.304
+    }
+  },
+  "by_case_ms": {
+    "fallback-preservation/supported-after-repair/error": {
+      "resident": {
+        "count": 20,
+        "min": 18.217,
+        "median": 23.622,
+        "p95": 39.763,
+        "max": 42.858
+      },
+      "fresh": {
+        "count": 20,
+        "min": 574.848,
+        "median": 826.626,
+        "p95": 1434.015,
+        "max": 1560.611
+      },
+      "cargo": {
+        "count": 20,
+        "min": 211.26,
+        "median": 297.405,
+        "p95": 688.978,
+        "max": 840.096
+      },
+      "ratio_of_medians_cargo_over_resident": 12.59
+    },
+    "fallback-preservation/supported-after-repair/repair": {
+      "resident": {
+        "count": 20,
+        "min": 38.453,
+        "median": 49.895,
+        "p95": 76.962,
+        "max": 115.466
+      },
+      "fresh": {
+        "count": 20,
+        "min": 615.209,
+        "median": 906.273,
+        "p95": 1618.406,
+        "max": 1737.385
+      },
+      "cargo": {
+        "count": 20,
+        "min": 219.218,
+        "median": 321.528,
+        "p95": 640.879,
+        "max": 704.199
+      },
+      "ratio_of_medians_cargo_over_resident": 6.444
+    },
+    "fallback-preservation/supported-with-pending/error": {
+      "resident": {
+        "count": 20,
+        "min": 587.137,
+        "median": 817.044,
+        "p95": 1281.138,
+        "max": 1350.061
+      },
+      "fresh": {
+        "count": 20,
+        "min": 592.345,
+        "median": 789.282,
+        "p95": 1224.238,
+        "max": 1429.976
+      },
+      "cargo": {
+        "count": 20,
+        "min": 202.281,
+        "median": 317.525,
+        "p95": 526.765,
+        "max": 534.145
+      },
+      "ratio_of_medians_cargo_over_resident": 0.389
+    },
+    "fallback-preservation/supported-with-pending/repair": {
+      "resident": {
+        "count": 20,
+        "min": 604.301,
+        "median": 767.301,
+        "p95": 1490.688,
+        "max": 1597.744
+      },
+      "fresh": {
+        "count": 20,
+        "min": 581.658,
+        "median": 885.152,
+        "p95": 1277.281,
+        "max": 1866.683
+      },
+      "cargo": {
+        "count": 20,
+        "min": 208.135,
+        "median": 292.251,
+        "p95": 621.821,
+        "max": 802.069
+      },
+      "ratio_of_medians_cargo_over_resident": 0.381
+    },
+    "fallback-preservation/unsupported-signature/establish": {
+      "resident": {
+        "count": 20,
+        "min": 599.906,
+        "median": 816.839,
+        "p95": 1512.789,
+        "max": 1884.268
+      },
+      "fresh": {
+        "count": 20,
+        "min": 575.606,
+        "median": 745.059,
+        "p95": 1419.41,
+        "max": 1467.572
+      },
+      "cargo": {
+        "count": 20,
+        "min": 202.12,
+        "median": 237.91,
+        "p95": 803.392,
+        "max": 939.397
+      },
+      "ratio_of_medians_cargo_over_resident": 0.291
+    },
+    "fallback-preservation/unsupported-signature/repair": {
+      "resident": {
+        "count": 20,
+        "min": 2.936,
+        "median": 4.014,
+        "p95": 7.123,
+        "max": 8.235
+      },
+      "fresh": {
+        "count": 20,
+        "min": 604.671,
+        "median": 811.386,
+        "p95": 1513.318,
+        "max": 1545.772
+      },
+      "cargo": {
+        "count": 20,
+        "min": 214.006,
+        "median": 313.575,
+        "p95": 591.012,
+        "max": 636.588
+      },
+      "ratio_of_medians_cargo_over_resident": 78.11
+    },
+    "main/combined-semantic-and-trivia/edit": {
+      "resident": {
+        "count": 20,
+        "min": 629.572,
+        "median": 784.065,
+        "p95": 2528.571,
+        "max": 4475.794
+      },
+      "fresh": {
+        "count": 20,
+        "min": 653.109,
+        "median": 747.175,
+        "p95": 2516.934,
+        "max": 2539.741
+      },
+      "cargo": {
+        "count": 20,
+        "min": 227.017,
+        "median": 271.715,
+        "p95": 769.819,
+        "max": 987.545
+      },
+      "ratio_of_medians_cargo_over_resident": 0.347
+    },
+    "main/combined-semantic-and-trivia/repair": {
+      "resident": {
+        "count": 20,
+        "min": 2.625,
+        "median": 3.143,
+        "p95": 6.281,
+        "max": 10.414
+      },
+      "fresh": {
+        "count": 20,
+        "min": 672.745,
+        "median": 758.175,
+        "p95": 3053.706,
+        "max": 3474.594
+      },
+      "cargo": {
+        "count": 20,
+        "min": 223.876,
+        "median": 251.383,
+        "p95": 725.42,
+        "max": 985.672
+      },
+      "ratio_of_medians_cargo_over_resident": 79.981
+    },
+    "main/lexer-import-clean/edit": {
+      "resident": {
+        "count": 20,
+        "min": 660.875,
+        "median": 765.424,
+        "p95": 2273.769,
+        "max": 2924.428
+      },
+      "fresh": {
+        "count": 20,
+        "min": 680.45,
+        "median": 756.893,
+        "p95": 1762.54,
+        "max": 3280.863
+      },
+      "cargo": {
+        "count": 20,
+        "min": 239.254,
+        "median": 274.412,
+        "p95": 735.672,
+        "max": 914.194
+      },
+      "ratio_of_medians_cargo_over_resident": 0.359
+    },
+    "main/lexer-import-clean/repair": {
+      "resident": {
+        "count": 20,
+        "min": 2.733,
+        "median": 3.453,
+        "p95": 5.674,
+        "max": 6.384
+      },
+      "fresh": {
+        "count": 20,
+        "min": 676.485,
+        "median": 769.427,
+        "p95": 1573.826,
+        "max": 2641.425
+      },
+      "cargo": {
+        "count": 20,
+        "min": 240.624,
+        "median": 296.158,
+        "p95": 554.857,
+        "max": 732.059
+      },
+      "ratio_of_medians_cargo_over_resident": 85.758
+    },
+    "main/lexer-import-error/error": {
+      "resident": {
+        "count": 20,
+        "min": 638.342,
+        "median": 712.508,
+        "p95": 1213.636,
+        "max": 2165.47
+      },
+      "fresh": {
+        "count": 20,
+        "min": 628.962,
+        "median": 732.054,
+        "p95": 1415.587,
+        "max": 2329.388
+      },
+      "cargo": {
+        "count": 20,
+        "min": 213.35,
+        "median": 233.531,
+        "p95": 357.296,
+        "max": 387.744
+      },
+      "ratio_of_medians_cargo_over_resident": 0.328
+    },
+    "main/lexer-import-error/repair": {
+      "resident": {
+        "count": 20,
+        "min": 2.669,
+        "median": 3.126,
+        "p95": 6.064,
+        "max": 8.55
+      },
+      "fresh": {
+        "count": 20,
+        "min": 639.047,
+        "median": 787.154,
+        "p95": 1853.658,
+        "max": 4146.764
+      },
+      "cargo": {
+        "count": 20,
+        "min": 215.832,
+        "median": 243.114,
+        "p95": 480.493,
+        "max": 1153.188
+      },
+      "ratio_of_medians_cargo_over_resident": 77.766
+    },
+    "main/lexer-shift-error/insert": {
+      "resident": {
+        "count": 20,
+        "min": 641.541,
+        "median": 741.934,
+        "p95": 1568.644,
+        "max": 2215.24
+      },
+      "fresh": {
+        "count": 20,
+        "min": 627.263,
+        "median": 715.18,
+        "p95": 1184.372,
+        "max": 2427.995
+      },
+      "cargo": {
+        "count": 20,
+        "min": 216.406,
+        "median": 245.519,
+        "p95": 437.093,
+        "max": 1543.321
+      },
+      "ratio_of_medians_cargo_over_resident": 0.331
+    },
+    "main/lexer-shift-error/remove": {
+      "resident": {
+        "count": 20,
+        "min": 616.845,
+        "median": 745.978,
+        "p95": 1778.258,
+        "max": 2293.004
+      },
+      "fresh": {
+        "count": 20,
+        "min": 634.608,
+        "median": 722.261,
+        "p95": 1692.456,
+        "max": 2300.488
+      },
+      "cargo": {
+        "count": 20,
+        "min": 198.855,
+        "median": 236.366,
+        "p95": 459.368,
+        "max": 486.746
+      },
+      "ratio_of_medians_cargo_over_resident": 0.317
+    },
+    "main/pattern-shift-error/insert": {
+      "resident": {
+        "count": 20,
+        "min": 4.724,
+        "median": 5.38,
+        "p95": 9.678,
+        "max": 10.53
+      },
+      "fresh": {
+        "count": 20,
+        "min": 665.438,
+        "median": 755.744,
+        "p95": 3284.994,
+        "max": 3780.668
+      },
+      "cargo": {
+        "count": 20,
+        "min": 220.07,
+        "median": 271.958,
+        "p95": 710.555,
+        "max": 831.681
+      },
+      "ratio_of_medians_cargo_over_resident": 50.548
+    },
+    "main/pattern-shift-error/remove": {
+      "resident": {
+        "count": 20,
+        "min": 4.547,
+        "median": 5.597,
+        "p95": 9.314,
+        "max": 9.331
+      },
+      "fresh": {
+        "count": 20,
+        "min": 657.154,
+        "median": 772.755,
+        "p95": 3092.648,
+        "max": 3164.898
+      },
+      "cargo": {
+        "count": 20,
+        "min": 220.887,
+        "median": 251.836,
+        "p95": 708.541,
+        "max": 1042.795
+      },
+      "ratio_of_medians_cargo_over_resident": 44.992
+    },
+    "main/pattern-type-error/error": {
+      "resident": {
+        "count": 20,
+        "min": 107.285,
+        "median": 123.849,
+        "p95": 412.446,
+        "max": 433.562
+      },
+      "fresh": {
+        "count": 20,
+        "min": 682.915,
+        "median": 769.183,
+        "p95": 2611.622,
+        "max": 3412.713
+      },
+      "cargo": {
+        "count": 20,
+        "min": 233.194,
+        "median": 249.697,
+        "p95": 616.446,
+        "max": 1199.108
+      },
+      "ratio_of_medians_cargo_over_resident": 2.016
+    },
+    "main/pattern-type-error/repair": {
+      "resident": {
+        "count": 20,
+        "min": 130.465,
+        "median": 161.362,
+        "p95": 314.434,
+        "max": 782.113
+      },
+      "fresh": {
+        "count": 20,
+        "min": 665.045,
+        "median": 763.249,
+        "p95": 3246.042,
+        "max": 3903.745
+      },
+      "cargo": {
+        "count": 20,
+        "min": 214.854,
+        "median": 237.184,
+        "p95": 457.572,
+        "max": 761.302
+      },
+      "ratio_of_medians_cargo_over_resident": 1.47
+    },
+    "main/signature/fallback": {
+      "resident": {
+        "count": 20,
+        "min": 642.867,
+        "median": 721.444,
+        "p95": 1761.007,
+        "max": 2353.373
+      },
+      "fresh": {
+        "count": 20,
+        "min": 627.909,
+        "median": 728.615,
+        "p95": 2128.601,
+        "max": 3813.14
+      },
+      "cargo": {
+        "count": 20,
+        "min": 205.431,
+        "median": 234.176,
+        "p95": 588.017,
+        "max": 851.431
+      },
+      "ratio_of_medians_cargo_over_resident": 0.325
+    },
+    "main/signature/repair": {
+      "resident": {
+        "count": 20,
+        "min": 2.738,
+        "median": 3.245,
+        "p95": 6.012,
+        "max": 9.33
+      },
+      "fresh": {
+        "count": 20,
+        "min": 629.486,
+        "median": 770.682,
+        "p95": 2247.047,
+        "max": 2832.254
+      },
+      "cargo": {
+        "count": 20,
+        "min": 214.504,
+        "median": 232.966,
+        "p95": 531.904,
+        "max": 857.454
+      },
+      "ratio_of_medians_cargo_over_resident": 71.803
+    },
+    "main/string-clean-body/edit": {
+      "resident": {
+        "count": 20,
+        "min": 39.456,
+        "median": 46.232,
+        "p95": 81.419,
+        "max": 86.569
+      },
+      "fresh": {
+        "count": 20,
+        "min": 677.802,
+        "median": 768.95,
+        "p95": 3063.434,
+        "max": 3181.656
+      },
+      "cargo": {
+        "count": 20,
+        "min": 236.949,
+        "median": 282.123,
+        "p95": 912.894,
+        "max": 976.41
+      },
+      "ratio_of_medians_cargo_over_resident": 6.102
+    },
+    "main/string-clean-body/repair": {
+      "resident": {
+        "count": 20,
+        "min": 39.5,
+        "median": 48.816,
+        "p95": 78.052,
+        "max": 78.119
+      },
+      "fresh": {
+        "count": 20,
+        "min": 677.566,
+        "median": 856.859,
+        "p95": 1889.529,
+        "max": 2796.453
+      },
+      "cargo": {
+        "count": 20,
+        "min": 242.204,
+        "median": 292.766,
+        "p95": 716.881,
+        "max": 717.196
+      },
+      "ratio_of_medians_cargo_over_resident": 5.997
+    },
+    "main/string-shift-error/insert": {
+      "resident": {
+        "count": 20,
+        "min": 639.126,
+        "median": 775.882,
+        "p95": 2211.637,
+        "max": 2278.418
+      },
+      "fresh": {
+        "count": 20,
+        "min": 626.792,
+        "median": 748.235,
+        "p95": 2616.137,
+        "max": 2774.117
+      },
+      "cargo": {
+        "count": 20,
+        "min": 209.774,
+        "median": 259.631,
+        "p95": 689.254,
+        "max": 1013.662
+      },
+      "ratio_of_medians_cargo_over_resident": 0.335
+    },
+    "main/string-shift-error/remove": {
+      "resident": {
+        "count": 20,
+        "min": 2.896,
+        "median": 3.413,
+        "p95": 6.324,
+        "max": 8.948
+      },
+      "fresh": {
+        "count": 20,
+        "min": 620.586,
+        "median": 737.683,
+        "p95": 2516.166,
+        "max": 2652.149
+      },
+      "cargo": {
+        "count": 20,
+        "min": 220.517,
+        "median": 257.1,
+        "p95": 468.949,
+        "max": 699.537
+      },
+      "ratio_of_medians_cargo_over_resident": 75.324
+    },
+    "main/string-type-error/error": {
+      "resident": {
+        "count": 20,
+        "min": 18.852,
+        "median": 23.7,
+        "p95": 41.317,
+        "max": 43.589
+      },
+      "fresh": {
+        "count": 20,
+        "min": 628.136,
+        "median": 824.796,
+        "p95": 2290.938,
+        "max": 2326.357
+      },
+      "cargo": {
+        "count": 20,
+        "min": 214.517,
+        "median": 268.289,
+        "p95": 527.662,
+        "max": 535.048
+      },
+      "ratio_of_medians_cargo_over_resident": 11.32
+    },
+    "main/string-type-error/repair": {
+      "resident": {
+        "count": 20,
+        "min": 41.12,
+        "median": 45.361,
+        "p95": 77.191,
+        "max": 84.15
+      },
+      "fresh": {
+        "count": 20,
+        "min": 698.761,
+        "median": 765.268,
+        "p95": 2420.065,
+        "max": 3684.812
+      },
+      "cargo": {
+        "count": 20,
+        "min": 211.828,
+        "median": 243.042,
+        "p95": 885.139,
+        "max": 1216.161
+      },
+      "ratio_of_medians_cargo_over_resident": 5.358
+    },
+    "main/unchanged/noop": {
+      "resident": {
+        "count": 20,
+        "min": 2.71,
+        "median": 3.219,
+        "p95": 5.391,
+        "max": 5.544
+      },
+      "fresh": {
+        "count": 20,
+        "min": 659.549,
+        "median": 795.846,
+        "p95": 2651.758,
+        "max": 3044.643
+      },
+      "cargo": {
+        "count": 20,
+        "min": 73.207,
+        "median": 88.698,
+        "p95": 293.116,
+        "max": 293.15
+      },
+      "ratio_of_medians_cargo_over_resident": 27.554
+    },
+    "preservation/existing-error/establish": {
+      "resident": {
+        "count": 20,
+        "min": 18.955,
+        "median": 30.494,
+        "p95": 36.383,
+        "max": 37.302
+      },
+      "fresh": {
+        "count": 20,
+        "min": 667.18,
+        "median": 1178.181,
+        "p95": 2871.318,
+        "max": 3033.659
+      },
+      "cargo": {
+        "count": 20,
+        "min": 205.684,
+        "median": 379.873,
+        "p95": 867.348,
+        "max": 2454.428
+      },
+      "ratio_of_medians_cargo_over_resident": 12.457
+    },
+    "preservation/existing-error/noop": {
+      "resident": {
+        "count": 20,
+        "min": 3.143,
+        "median": 5.492,
+        "p95": 8.227,
+        "max": 11.583
+      },
+      "fresh": {
+        "count": 20,
+        "min": 666.359,
+        "median": 1215.683,
+        "p95": 1928.986,
+        "max": 2985.181
+      },
+      "cargo": {
+        "count": 20,
+        "min": 210.705,
+        "median": 378.013,
+        "p95": 612.11,
+        "max": 1164.961
+      },
+      "ratio_of_medians_cargo_over_resident": 68.824
+    },
+    "preservation/existing-error/repair": {
+      "resident": {
+        "count": 20,
+        "min": 40.396,
+        "median": 59.966,
+        "p95": 73.909,
+        "max": 75.686
+      },
+      "fresh": {
+        "count": 20,
+        "min": 667.949,
+        "median": 1105.895,
+        "p95": 1596.854,
+        "max": 1855.701
+      },
+      "cargo": {
+        "count": 20,
+        "min": 215.893,
+        "median": 324.484,
+        "p95": 522.229,
+        "max": 586.408
+      },
+      "ratio_of_medians_cargo_over_resident": 5.411
+    },
+    "preservation/independent-error/error": {
+      "resident": {
+        "count": 20,
+        "min": 108.606,
+        "median": 213.328,
+        "p95": 290.191,
+        "max": 459.503
+      },
+      "fresh": {
+        "count": 20,
+        "min": 680.257,
+        "median": 1259.485,
+        "p95": 1635.781,
+        "max": 2424.92
+      },
+      "cargo": {
+        "count": 20,
+        "min": 217.229,
+        "median": 380.813,
+        "p95": 611.356,
+        "max": 780.578
+      },
+      "ratio_of_medians_cargo_over_resident": 1.785
+    },
+    "preservation/independent-error/repair": {
+      "resident": {
+        "count": 20,
+        "min": 134.589,
+        "median": 244.631,
+        "p95": 465.229,
+        "max": 501.682
+      },
+      "fresh": {
+        "count": 20,
+        "min": 649.664,
+        "median": 1195.775,
+        "p95": 1646.852,
+        "max": 3308.854
+      },
+      "cargo": {
+        "count": 20,
+        "min": 218.1,
+        "median": 362.255,
+        "p95": 819.815,
+        "max": 1413.734
+      },
+      "ratio_of_medians_cargo_over_resident": 1.481
+    }
+  },
+  "startup_ms": {
+    "main": {
+      "resident": 824.483
+    },
+    "preservation": {
+      "resident": 2274.475
+    },
+    "fallback-preservation": {
+      "resident": 932.472
+    }
+  }
+}

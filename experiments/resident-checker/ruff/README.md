@@ -18,9 +18,21 @@ The [timed comparison](../data/ruff-parser-timing.json) uses 20 rounds after two
 | Clean repair         |                36 ms |                608 ms |            130 ms |             769 ms |
 | Both                 |                26 ms |                598 ms |            128 ms |             769 ms |
 
-The resident measurement starts when the harness sends an edit instruction and ends when diagnostics are ready; it includes communication, invalidation, and whole-crate analysis. Starting and warming the resident compiler cost 642 ms. The fresh measurement includes process startup, parsing, analysis, and exit. Neither measurement includes Cargo, metadata emission, code generation, or linking; both disable disk incremental compilation. The resident compiler patches retained HIR, so its measurement does not include receiving and parsing edited source text. Diagnostic range ends and rendered text still reflect the original source. The design follows the warmup and alternating edit pattern used by [ty's incremental benchmark](https://github.com/astral-sh/ruff/blob/fd5d636bdd58a5a42e0212988e1cdf710eec8558/crates/ruff_benchmark/benches/ty.rs#L126-L165) and [Salsa's dataflow benchmark](https://github.com/salsa-rs/salsa/blob/ba08e3fe9a7e4d332d9130753109b931baa9a7fa/benches/dataflow.rs#L137-L172). [ty's language-server benchmark](https://github.com/astral-sh/ruff/blob/fd5d636bdd58a5a42e0212988e1cdf710eec8558/scripts/ty_benchmark/src/benchmark/test_lsp_diagnostics.py#L282-L340) is the reference for a future measurement from actual source delivery to refreshed diagnostics.
+The resident measurement starts when the harness sends an edit instruction and ends when diagnostics are ready; it includes communication, invalidation, and whole-crate analysis. Starting and warming the resident compiler cost 642 ms. The fresh measurement includes process startup, parsing, analysis, and exit. Neither measurement includes Cargo, metadata emission, code generation, or linking; both disable disk incremental compilation. The resident compiler patches retained HIR, so this original measurement does not include receiving and parsing edited source text; diagnostic range ends and rendered text reflect the original source. The design follows the warmup and alternating edit pattern used by [ty's incremental benchmark](https://github.com/astral-sh/ruff/blob/fd5d636bdd58a5a42e0212988e1cdf710eec8558/crates/ruff_benchmark/benches/ty.rs#L126-L165) and [Salsa's dataflow benchmark](https://github.com/salsa-rs/salsa/blob/ba08e3fe9a7e4d332d9130753109b931baa9a7fa/benches/dataflow.rs#L137-L172). [ty's language-server benchmark](https://github.com/astral-sh/ruff/blob/fd5d636bdd58a5a42e0212988e1cdf710eec8558/scripts/ty_benchmark/src/benchmark/test_lsp_diagnostics.py#L282-L340) is the reference for the source-edit experiment below.
 
 The separate [ordinary Cargo measurement](../data/ruff-parser-cargo-timing.json) keeps Ohm's defaults and disk incremental compilation enabled. Ten rounds after two warmups produced 30 error edits and 30 clean repairs. End-to-end `cargo +ohm check -p ruff_python_parser --lib` took 204 ms median for errors (413 ms p95) and 202 ms for repairs (329 ms p95); ten warm no-op checks had a 69 ms median. The measured process includes Cargo and normal Rust check output; the source-file write is outside the timer. These Cargo numbers are a useful developer baseline but do not mean the prototype is a resident Cargo command: its own timer still starts from a predefined HIR edit rather than a changed source file.
+
+The [source-edit experiment](../data/ruff-parser-source-timing.json) extends this benchmark boundary to actual file writes. Its client sends a revision and a path; the compiler process reads and parses the saved Rust module and independently identifies eligible edits. Unsupported revisions are explicitly routed to a fresh compiler. This includes signature changes and edits that might change source import usage, since native body invalidation does not rerun unused-import analysis. The client keeps using a fresh compiler for subsequent saves until the resident compiler can accept the current contents of every file with an unsupported edit. Trivia-only shifts are retained only within the active owner and in files whose macro and attribute forms pass a conservative allowlist; ambiguous diagnostic source mappings and combined body-and-surrounding-trivia edits also fall back. Macro expressions are unsupported, as are body edits that might shift a custom macro's line or column. The driver compares every source-bearing error and warning against an independently started compiler, including all spans, source text, child diagnostics, and plain rendered output. It also checks that a diagnostic that already existed survives an unrelated edit and repair, including while the service is falling back. The warm Cargo comparison receives the same source revisions and keeps disk incremental compilation enabled. This experiment still embeds private compiler APIs and is not a resident Cargo command.
+
+Twenty measured rounds after two warmups across three suites produced 640 saves. Every diagnostic matched both a fresh instance of the patched rustc and ordinary warm Cargo. Timings include the actual file write:
+
+| Route                           | Saves | Prototype median | Prototype p95 | Warm Cargo median | Warm Cargo p95 |
+| ------------------------------- | ----: | ---------------: | ------------: | ----------------: | -------------: |
+| Native semantic edit            |   240 |            58 ms |        290 ms |            288 ms |         761 ms |
+| Native unchanged or trivia-only |   200 |             4 ms |          9 ms |            255 ms |         700 ms |
+| Fresh fallback                  |   200 |           755 ms |      2,160 ms |            259 ms |         729 ms |
+
+Native semantic edits were 4.95× faster at the median than their paired Cargo runs; their 58 ms median met the 100 ms target, but their 290 ms p95 missed the 200 ms target. The curated corpus deliberately exercises fallback: 31.25% of these saves fell back, which is not an estimate of real edit coverage. An unchanged save still writes the file; this is not comparable to the earlier 69 ms Cargo command that did not write a file. Each suite starts with clean source and establishes its persistent diagnostic before the independent edit; this does not establish startup behavior on an already broken checkout. The output still excludes metadata emission, code generation, linking, and test execution.
 
 First build the companion patched Ohm compiler and its matching standard, test, procedural macro, and rustdoc libraries in the Rust checkout:
 
@@ -73,5 +85,16 @@ python3 experiments/resident-checker/ruff/measure_cargo.py \
   --target /path/to/isolated/cargo-target \
   --stage /path/to/bootstrap/aarch64-apple-darwin/stage1 \
   --output /path/to/cargo-timings \
+  --compiler-revision <patched-compiler-git-sha>
+```
+
+Measure from actual source-file writes through complete diagnostics with the same compiler capture. The output contains independent resident, fresh-oracle, and warm Cargo archives and raw per-revision diagnostics; the Cargo target can be shared across reruns of this benchmark:
+
+```sh
+python3 experiments/resident-checker/ruff/measure_source.py \
+  --bootstrap /path/to/bootstrap \
+  --capture /path/to/results/graph-test/captures/ruff_python_parser.lib.json \
+  --repo /path/to/ruff --cargo-target /path/to/isolated/cargo-target \
+  --output /path/to/source-timings \
   --compiler-revision <patched-compiler-git-sha>
 ```
