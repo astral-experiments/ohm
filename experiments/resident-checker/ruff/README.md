@@ -34,7 +34,7 @@ Twenty measured rounds after two warmups across three suites produced 640 saves.
 
 Native semantic edits were 4.95× faster at the median than their paired Cargo runs; their 58 ms median met the 100 ms target, but their 290 ms p95 missed the 200 ms target. The curated corpus deliberately exercises fallback: 31.25% of these saves fell back, which is not an estimate of real edit coverage. An unchanged save still writes the file; this is not comparable to the earlier 69 ms Cargo command that did not write a file. Each suite starts with clean source and establishes its persistent diagnostic before the independent edit; this does not establish startup behavior on an already broken checkout. The output still excludes metadata emission, code generation, linking, and test execution.
 
-The [one-test experiment](../data/ruff-parser-resident-test.json) uses Cargo's captured Ruff unit-test invocation, including `--test` and executable emission. It starts with the private `StringParser::parse_octet` function: replacing its final expression with `'x'` still compiles, but changes observable behavior. A `build` request leaves the resident loop and hands the retained compiler context to ordinary rustc code generation and linking once. The benchmark then runs only `string::tests::test_escape_octet` as a new process. Each build consumes its compiler; a new worker for the repair warms on canonical source and replays the previous edit before measuring the save of the original source. This isolates whether edited resident state reaches an actual executable; repeated code generation in one process, integration tests, and doctests remain separate milestones.
+The [one-test experiment](../data/ruff-parser-resident-test.json) uses Cargo's captured Ruff unit-test invocation, including `--test` and executable emission. It starts with the private `StringParser::parse_octet` function: replacing its final expression with `'x'` still compiles, but changes observable behavior. A `build` request leaves the resident loop and hands the retained compiler context to ordinary rustc code generation and linking once. The benchmark then runs only `string::tests::test_escape_octet` as a new process. Each build consumes its compiler; a new worker for the repair warms on canonical source and replays the previous edit before measuring the save of the original source. This isolates whether edited resident state reaches an actual executable. The repeated-build experiment below uses one compiler for multiple builds; integration tests and doctests remain separate milestones.
 
 Five measured rounds after one warmup produced 25 transitions. Both modes passed the unchanged test, failed it after the compiling behavior change, passed after repair, rejected `E0308` without running the existing executable, and passed after repairing that error. Both changed the executable's contents on the behavior edit and repair. Median save-to-result timings were:
 
@@ -47,6 +47,23 @@ Five measured rounds after one warmup produced 25 transitions. Both modes passed
 | Rust type-error repair: test passes |                  2.00 s |     0.81 s |
 
 Across the behavior edit and repair together, the ready resident compiler took 2.00 s median versus 1.07 s for Cargo. Native rustc code generation took 1.71 s, linking 112 ms, and the test process 80 ms. Native workers use the patched resident graph with rustc disk incremental disabled; ordinary warm Cargo keeps it enabled. Restarting and warming each native worker cost 1.19 s median outside save-to-result, and replaying the behavior edit for repair cost another 78 ms median outside the repair timer. With five observations per transition, the nearest-rank p95 is simply the slowest observation; this establishes functionality, not a test-build speedup.
+
+The [repeated-build experiment](../data/ruff-parser-repeated-test.json) keeps one compiler process and its compiler context alive while the source is changed and while new test executables are produced. Its correctness controls distinguish a successful build with a newly emitted executable from an unchanged executable left behind after a compile error. A separate warm Cargo archive runs the same exact Ruff test after the same source saves. The resident cache captures the rustc query reads and compiled-symbol checks of each LLVM code-generation unit and independently verifies its partition; its reports identify whether an object was built or reused and include a fingerprint of its bytes. This benchmark explicitly disables debugger information and split debugger information on both sides; resident source-map updates needed for trustworthy debugger data are out of scope. The cache also falls back to ordinary code generation for coverage, profile-driven builds, custom LLVM plugins, offloading, and link-time optimization.
+
+The compiling edit replaces `char::from_u32(value).unwrap()` with `'x'`, which also removes `char::from_u32` from the package's compiled symbols. Object reuse therefore has to account for actual changes to symbol membership, in addition to invalidating the unit containing the edited private method. The harness hashes every retained regular object independently using SHA-256 after the timer, then compares each unit with its previous successful build. These checks distinguish objects reused with identical bytes from objects rebuilt despite producing identical bytes.
+
+Five measured rounds after one warmup produced 30 paired transitions in the same resident compiler process. All outcomes matched ordinary warm Cargo. Every behavior edit and repair rebuilt exactly one of 16 LLVM units and reused 15; SHA-256 independently confirmed exactly one changed and 15 unchanged objects in every such revision. Every unchanged rebuild reused all 16 units. A Rust type error (`E0308`) never launched the existing executable in either mode, and its repair rebuilt one unit whose bytes matched the previous successful build.
+
+| Transition               | Ready resident median | Warm Cargo median |
+| ------------------------ | --------------------: | ----------------: |
+| Unchanged rebuild        |                246 ms |            150 ms |
+| Compiling behavior edit  |                539 ms |          1,159 ms |
+| Repair of behavior edit  |                464 ms |            860 ms |
+| Type error, no test run  |                 23 ms |            389 ms |
+| Repair of type error     |                475 ms |            703 ms |
+| Behavior edit and repair |                494 ms |            958 ms |
+
+Together, the ten behavior edits and repairs were 1.94× faster at the median; their p95 was 673 ms resident versus 2,090 ms for Cargo. Median resident component times for these transitions were 41 ms for reanalysis, 204 ms for code generation, 171 ms for linking, and 77 ms for the test process. Starting and warming the resident worker cost 2.50 s once, outside save-to-result. Each phase has five observations, so its nearest-rank p95 would be its slowest observation; these results cover one private edit and one selected test, not full-suite performance. This profile differs from the historical one-shot result above, so its timings should not be read as a direct comparison.
 
 First build the companion patched Ohm compiler and its matching standard, test, procedural macro, and rustdoc libraries in the Rust checkout:
 
@@ -131,4 +148,24 @@ python3 experiments/resident-checker/ruff/run_test_build_guards.py \
   --driver /path/to/test-timings/source-driver \
   --stage /path/to/bootstrap/aarch64-apple-darwin/stage1 \
   --output /path/to/build-guard-results
+```
+
+For the repeated-build benchmark, use a test-target capture produced with the matching no-debugger-information Cargo profile. Run the package-test capture above with `CARGO_PROFILE_DEV_DEBUG=0`, `CARGO_PROFILE_TEST_DEBUG=0`, `CARGO_PROFILE_DEV_SPLIT_DEBUGINFO=off`, and `CARGO_PROFILE_TEST_SPLIT_DEBUGINFO=off`, then use its `graph-test/captures/ruff_python_parser.test.json`. The harness also enforces that profile for the native target and ordinary Cargo comparison:
+
+```sh
+python3 experiments/resident-checker/ruff/measure_repeated_test.py \
+  --bootstrap /path/to/bootstrap \
+  --capture /path/to/no-debug-captures/ruff_python_parser.test.json \
+  --repo /path/to/ruff --cargo-target /path/to/isolated/cargo-target \
+  --output /path/to/repeated-test-timings \
+  --compiler-revision <patched-compiler-git-sha>
+```
+
+The small repeated-build safety fixture accepts the resulting driver and produces the separate [guard report](../data/ruff-parser-repeated-test-guards.json). It exercises 15 requests in one worker, including stale revisions, unchecked files, cross-file errors, and repairs. A separate fixture injects a real linker failure, verifies that it preserves the old executable without running it, and checks that subsequent requests are rejected until the worker restarts. That fixture uses the host `cc` on POSIX; pass `--linker` to specify another host C compiler. Pass `--no-cache` to exercise ordinary repeated LLVM builds without the object cache:
+
+```sh
+python3 experiments/resident-checker/ruff/run_repeated_build_guards.py \
+  --driver /path/to/repeated-test-timings/source-driver \
+  --stage /path/to/bootstrap/aarch64-apple-darwin/stage1 \
+  --output /path/to/repeated-build-guard-results
 ```

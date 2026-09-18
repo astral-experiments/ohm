@@ -1,0 +1,314 @@
+{
+  "schema_version": 2,
+  "passed": 15,
+  "single_compiler_process_until_quit": true,
+  "resident_codegen_cache_enabled": true,
+  "method": "One native rustc process built and linked a real two-module Rust test fixture. Every accepted build ran the emitted exact test; rejected builds never ran it and the prior executable SHA-256 stayed identical. When the resident cache is enabled, the compiler reports a stable fingerprint of regular object bytes and optional associated object files; behavior changes must rebuild and reuse different units, change an object fingerprint, and keep reused fingerprints equal to the preceding successful build. The separate linker-failure fixture uses one additional compiler process and a host C compiler wrapper to fail the next link deliberately.",
+  "requests": [
+    {
+      "name": "baseline",
+      "test_ran": true,
+      "test_exit": 0,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "compiled",
+          "hash": "2918809cb879c554c4fdc222d2652533"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "compiled",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "compiled",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "compiled",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    },
+    {
+      "name": "unchanged-same-version",
+      "test_ran": true,
+      "test_exit": 0,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "reused",
+          "hash": "2918809cb879c554c4fdc222d2652533"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "reused",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "reused",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "reused",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    },
+    {
+      "name": "wrong-version",
+      "rejected": "source-version-is-not-current",
+      "test_ran": false,
+      "stale_artifact_preserved": true
+    },
+    {
+      "name": "behavior-edit",
+      "test_ran": true,
+      "test_exit": 101,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "compiled",
+          "hash": "b24d1a357c09e0124f028fd202dd37fa"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "reused",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "reused",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "reused",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    },
+    {
+      "name": "behavior-repair",
+      "test_ran": true,
+      "test_exit": 0,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "compiled",
+          "hash": "2918809cb879c554c4fdc222d2652533"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "reused",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "reused",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "reused",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    },
+    {
+      "name": "type-error",
+      "rejected": "accepted-source-has-errors",
+      "test_ran": false,
+      "stale_artifact_preserved": true
+    },
+    {
+      "name": "error-survives-other-edit",
+      "rejected": "accepted-source-has-errors",
+      "test_ran": false,
+      "stale_artifact_preserved": true
+    },
+    {
+      "name": "error-survives-other-repair",
+      "rejected": "accepted-source-has-errors",
+      "test_ran": false,
+      "stale_artifact_preserved": true
+    },
+    {
+      "name": "type-error-repair",
+      "test_ran": true,
+      "test_exit": 0,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "compiled",
+          "hash": "2918809cb879c554c4fdc222d2652533"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "reused",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "compiled",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "reused",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    },
+    {
+      "name": "unchecked-edit",
+      "rejected": "source-on-disk-does-not-match-accepted-revision",
+      "test_ran": false,
+      "stale_artifact_preserved": true
+    },
+    {
+      "name": "unchecked-edit-restored",
+      "test_ran": true,
+      "test_exit": 0,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "reused",
+          "hash": "2918809cb879c554c4fdc222d2652533"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "reused",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "reused",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "reused",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    },
+    {
+      "name": "unsupported-edit",
+      "rejected": "source-revision-requires-fresh-compiler",
+      "test_ran": false,
+      "stale_artifact_preserved": true
+    },
+    {
+      "name": "unsupported-edit-restored",
+      "test_ran": true,
+      "test_exit": 0,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "reused",
+          "hash": "2918809cb879c554c4fdc222d2652533"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "reused",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "reused",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "reused",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    },
+    {
+      "name": "behavior-after-duplicate-check",
+      "test_ran": true,
+      "test_exit": 101,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "compiled",
+          "hash": "b24d1a357c09e0124f028fd202dd37fa"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "reused",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "reused",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "reused",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    },
+    {
+      "name": "final-repair",
+      "test_ran": true,
+      "test_exit": 0,
+      "units": [
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.0",
+          "mode": "compiled",
+          "hash": "2918809cb879c554c4fdc222d2652533"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.1",
+          "mode": "reused",
+          "hash": "004fa4f0ece311d4581ae4611f975478"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.2",
+          "mode": "reused",
+          "hash": "567a3430c7f9ba810408e788948c97bb"
+        },
+        {
+          "name": "resident_repeated_test_guard.cc0f4e84d33328ca-cgu.3",
+          "mode": "reused",
+          "hash": "a88ca0e8a7bbc37302280cd44490ff61"
+        }
+      ]
+    }
+  ],
+  "linker_failure_probe": {
+    "status": "passed",
+    "baseline": {
+      "build": "ok",
+      "test_ran": true,
+      "test_exit": 0
+    },
+    "injected_failure": {
+      "build": "failed",
+      "diagnostic_confirmed": true,
+      "test_ran": false,
+      "stale_artifact_preserved": true
+    },
+    "later_edit": {
+      "mode": "fallback",
+      "reason": "previous-codegen-failed"
+    },
+    "later_build": {
+      "mode": "rejected",
+      "reason": "previous-codegen-failed",
+      "test_ran": false,
+      "stale_artifact_preserved": true
+    },
+    "worker_exit": 0,
+    "single_compiler_process_until_quit": true
+  }
+}

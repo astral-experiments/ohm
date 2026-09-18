@@ -20,7 +20,7 @@ use rustc_driver::{Callbacks, Compilation};
 use rustc_hir::ExprKind;
 use rustc_hir::def::DefKind;
 use rustc_hir::def_id::LocalDefId;
-use rustc_interface::interface;
+use rustc_interface::{Linker, interface, passes};
 use rustc_lexer::{FrontmatterAllowed, TokenKind};
 use rustc_middle::hir::map::OhmResidentScalarTailSnapshot;
 use rustc_middle::ty::TyCtxt;
@@ -802,8 +802,87 @@ enum ResidentExit {
     Rejected,
 }
 
-fn resident<'tcx>(tcx: TyCtxt<'tcx>, allow_build: bool) -> ResidentExit {
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum BuildMode {
+    Disabled,
+    Exit,
+    Repeat,
+}
+
+fn repeat_build(
+    compiler: &interface::Compiler,
+    tcx: TyCtxt<'_>,
+    version: &str,
+    started: Instant,
+) -> bool {
+    let backend = &*compiler.codegen_backend;
+    let mut analysis_reported = false;
+    let report_analysis = || {
+        marker("build-analysis-end", version);
+        stdout(format_args!(
+            "build-analysis\t{version}\t{}",
+            started.elapsed().as_nanos()
+        ));
+    };
+    let succeeded = rustc_driver::catch_fatal_errors(|| {
+        passes::write_dep_info(tcx);
+        passes::write_interface(tcx);
+        tcx.ensure_ok().analysis(());
+        report_analysis();
+        analysis_reported = true;
+        let linker = Linker::codegen_and_build_linker(tcx, backend);
+        tcx.report_unused_features();
+        // The ordinary driver links after leaving the compiler context to free it sooner. A
+        // resident compiler deliberately retains it; linking itself only consumes this job.
+        linker.link(tcx.sess, backend);
+    })
+    .is_ok();
+    if !analysis_reported {
+        report_analysis();
+    }
+    if succeeded {
+        for unit in tcx
+            .query_system
+            .resident
+            .as_ref()
+            .unwrap()
+            .codegen_cache_report()
+        {
+            stdout(format_args!(
+                "build-codegen-unit\t{version}\t{}\t{}\t{}",
+                unit.name,
+                if unit.reused { "reused" } else { "compiled" },
+                unit.fingerprint
+            ));
+        }
+    }
+    marker("build-finished", version);
+    stdout(format_args!(
+        "build-finished\t{version}\t{}\t{}",
+        started.elapsed().as_nanos(),
+        if succeeded { "ok" } else { "failed" }
+    ));
+    succeeded
+}
+
+fn resident<'tcx>(
+    compiler: &interface::Compiler,
+    tcx: TyCtxt<'tcx>,
+    mode: BuildMode,
+) -> ResidentExit {
     assert!(tcx.query_system.resident.is_some());
+    if mode == BuildMode::Repeat
+        && let Some(cache) = std::env::var_os("OHM_RUFF_CODEGEN_CACHE")
+    {
+        let cache = PathBuf::from(cache);
+        std::fs::create_dir_all(&cache).expect("could not create private codegen cache");
+        tcx.query_system
+            .resident
+            .as_ref()
+            .unwrap()
+            .configure_codegen_cache(cache)
+            .expect("could not configure private codegen cache");
+    }
     marker("start", "baseline");
     let started = Instant::now();
     let _ = rustc_driver::catch_fatal_errors(|| tcx.ensure_ok().analysis(()));
@@ -814,12 +893,13 @@ fn resident<'tcx>(tcx: TyCtxt<'tcx>, allow_build: bool) -> ResidentExit {
     let mut active = BTreeMap::new();
     let mut graph_revision = 0;
     let mut last_version = 0;
-    let mut build_guard = allow_build.then(|| {
+    let mut build_guard = (mode != BuildMode::Disabled).then(|| {
         BuildGuard::new(
             tcx,
             errors > 0 || tcx.dcx().has_errors_or_delayed_bugs().is_some(),
         )
     });
+    let mut backend_failed = false;
     stdout(format_args!("ready\t{}\t{elapsed}", std::process::id()));
     for line in io::stdin().lock().lines() {
         let line = line.unwrap();
@@ -839,13 +919,24 @@ fn resident<'tcx>(tcx: TyCtxt<'tcx>, allow_build: bool) -> ResidentExit {
                 None => Some("build-mode-is-disabled"),
                 Some(_) if fields.next().is_some() => Some("unexpected-build-argument"),
                 Some(_) if sequence != last_version => Some("source-version-is-not-current"),
+                Some(_) if backend_failed => Some("previous-codegen-failed"),
                 Some(guard) => guard.rejection(tcx, &files),
             };
             if let Some(reason) = reason {
+                if mode == BuildMode::Repeat {
+                    marker("build-rejected", version);
+                }
                 stdout(format_args!("build\t{version}\trejected\t{reason}"));
+                if mode == BuildMode::Repeat {
+                    continue;
+                }
                 return ResidentExit::Rejected;
             }
             stdout(format_args!("build\t{version}\tready\t-"));
+            if mode == BuildMode::Repeat {
+                backend_failed = !repeat_build(compiler, tcx, version, started);
+                continue;
+            }
             return ResidentExit::Build {
                 version: version.to_owned(),
                 started,
@@ -857,14 +948,18 @@ fn resident<'tcx>(tcx: TyCtxt<'tcx>, allow_build: bool) -> ResidentExit {
         let path = fields.next().expect("source path");
         marker("start", version);
         let started = Instant::now();
-        let result = check(
-            tcx,
-            Path::new(path),
-            &mut files,
-            &mut active,
-            &mut errors,
-            &mut graph_revision,
-        );
+        let result = if backend_failed {
+            Outcome::fallback("previous-codegen-failed", errors, graph_revision)
+        } else {
+            check(
+                tcx,
+                Path::new(path),
+                &mut files,
+                &mut active,
+                &mut errors,
+                &mut graph_revision,
+            )
+        };
         if let Some(guard) = &mut build_guard {
             guard.checked(Path::new(path), &result);
         }
@@ -905,10 +1000,20 @@ impl Callbacks for Driver {
         config.opts.trimmed_def_paths = true;
     }
 
-    fn after_expansion<'tcx>(&mut self, _: &interface::Compiler, tcx: TyCtxt<'tcx>) -> Compilation {
+    fn after_expansion<'tcx>(
+        &mut self,
+        compiler: &interface::Compiler,
+        tcx: TyCtxt<'tcx>,
+    ) -> Compilation {
         match std::env::var("OHM_RUFF_SOURCE_MODE").as_deref() {
-            Ok(mode @ ("resident" | "resident-build")) => {
-                match resident(tcx, mode == "resident-build") {
+            Ok(mode @ ("resident" | "resident-build" | "resident-repeat-build")) => {
+                let mode = match mode {
+                    "resident" => BuildMode::Disabled,
+                    "resident-build" => BuildMode::Exit,
+                    "resident-repeat-build" => BuildMode::Repeat,
+                    _ => unreachable!(),
+                };
+                match resident(compiler, tcx, mode) {
                     ResidentExit::Stop => Compilation::Stop,
                     ResidentExit::Build { version, started } => {
                         self.build = Some((version, started));
@@ -924,7 +1029,9 @@ impl Callbacks for Driver {
                 fresh(tcx);
                 Compilation::Stop
             }
-            _ => panic!("OHM_RUFF_SOURCE_MODE must be resident, resident-build, or fresh"),
+            _ => panic!(
+                "OHM_RUFF_SOURCE_MODE must be resident, resident-build, resident-repeat-build, or fresh"
+            ),
         }
     }
 

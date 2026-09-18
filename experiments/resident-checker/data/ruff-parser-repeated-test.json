@@ -1,0 +1,717 @@
+{
+  "schema": 1,
+  "ruff_revision": "fd5d636bdd58a5a42e0212988e1cdf710eec8558",
+  "compiler": {
+    "source_revision": "80b2622283cce8b35858728cf60d0f513e653426",
+    "reported": {
+      "release": "1.98.1-dev",
+      "commit-hash": null,
+      "commit-date": null,
+      "host": "aarch64-apple-darwin",
+      "LLVM version": "22.1.8"
+    }
+  },
+  "machine": {
+    "os": "Darwin",
+    "kernel": "25.6.0",
+    "architecture": "arm64",
+    "logical_cpus": 18,
+    "cpu": "Apple M5 Max",
+    "memory": "128 GB"
+  },
+  "test": "string::tests::test_escape_octet",
+  "rounds": 5,
+  "warmup_rounds": 1,
+  "transitions_per_round": [
+    ["baseline", "good", "good", "pass"],
+    ["unchanged-rebuild", "good", "good", "pass"],
+    ["behavior-edit", "good", "behavior", "fail"],
+    ["behavior-repair", "behavior", "good", "pass"],
+    ["compile-error", "good", "error", "compile_error"],
+    ["compile-repair", "error", "good", "pass"]
+  ],
+  "measurement": "Each timer starts before a real source save and ends when the selected exact libtest exits or rustc rejects source. Independent disposable resident and Cargo Ruff archives alternate order each round. No tests run after an unsuccessful build. Artifact fingerprints are computed after timing.",
+  "resident": "One native compiler is started before the first warmup and serves every save, code-generation and link request without restarting; each exact libtest still runs in a separate subprocess. Source edit checks and the completed rustc link artifact are attested before running a test. Cargo's captured --test invocation preserves profile, dependency and output flags. Startup is separate from ready-process save-to-result.",
+  "cargo": "Ordinary warm cargo +ohm test --locked -p ruff_python_parser --lib --no-run --message-format=json with disk incremental enabled, then the exact emitted executable. Build and test are both in save-to-result.",
+  "timing_details": "Rustc JSON section timings report LLVM/code generation and link separately. A source error leaves the prior executable on disk but it is never run. Both executable SHA-256 values and independently hashed regular and optional global-assembly resident object files are retained per transition in raw data; object checksums are computed outside each timed operation.",
+  "profile": {
+    "resident": {
+      "debuginfo": "0",
+      "split_debuginfo": "off"
+    },
+    "cargo_dev_and_test": {
+      "debuginfo": "0",
+      "split_debuginfo": "off"
+    },
+    "reason": "Retained source mappings are not sufficient to safely emit revised debug checksums and locations; both native and Cargo measurements use the same profile settings."
+  },
+  "resident_codegen_cache_enabled": true,
+  "percentile": "nearest rank",
+  "worker_startup_ms": {
+    "external_ms": 2496.694,
+    "analysis_ms": 2042.965
+  },
+  "validation": {
+    "transitions": 30,
+    "single_compiler_pid_across_warmup_and_measured_builds": true,
+    "continuous_resident_source_versions": true,
+    "compiler_exited_successfully_only_after_final_quit": true,
+    "matched_outcomes": true,
+    "native_edits": true,
+    "successful_builds_attested_to_real_codegen_and_link": true,
+    "changed_executables_on_behavior_edit_and_repair": true,
+    "native_binary_hashes_match_execution": true,
+    "cargo_binary_hashes_match_execution": true,
+    "rejected_E0308_and_never_ran_existing_binary": true,
+    "unchanged_rebuild_reused_all_regular_codegen_units": true,
+    "every_behavior_transition_compiled_and_reused_regular_codegen_units": true,
+    "every_reported_codegen_unit_has_a_fingerprint": true,
+    "every_regular_codegen_unit_was_independently_sha256_hashed": true,
+    "every_behavior_transition_changed_an_object_and_reused_unchanged_object_bytes": true,
+    "reused_codegen_unit_fingerprints_remain_unchanged": true
+  },
+  "codegen_unit_reuse": {
+    "instrumented": true,
+    "successful_builds": 25,
+    "successful_builds_with_events": 25,
+    "dispositions_by_phase": {
+      "baseline": {
+        "compiled": 0,
+        "reused": 80
+      },
+      "unchanged-rebuild": {
+        "compiled": 0,
+        "reused": 80
+      },
+      "behavior-edit": {
+        "compiled": 5,
+        "reused": 75
+      },
+      "behavior-repair": {
+        "compiled": 5,
+        "reused": 75
+      },
+      "compile-repair": {
+        "compiled": 5,
+        "reused": 75
+      }
+    },
+    "all_events_fingerprinted": true,
+    "all_regular_cached_objects_independently_sha256_hashed": true,
+    "behavior_transitions_with_changed_and_unchanged_object_sha256": 10,
+    "fingerprint_comparisons_by_phase": {
+      "baseline": {
+        "reused_matching_previous_fingerprints": 64,
+        "reused_with_mismatched_previous_fingerprints": 0,
+        "compiled_with_changed_previous_fingerprints": 0,
+        "compiled_with_matching_previous_fingerprints": 0,
+        "reused_matching_previous_external_sha256": 64,
+        "reused_with_mismatched_previous_external_sha256": 0,
+        "compiled_with_changed_previous_external_sha256": 0,
+        "compiled_with_matching_previous_external_sha256": 0
+      },
+      "unchanged-rebuild": {
+        "reused_matching_previous_fingerprints": 80,
+        "reused_with_mismatched_previous_fingerprints": 0,
+        "compiled_with_changed_previous_fingerprints": 0,
+        "compiled_with_matching_previous_fingerprints": 0,
+        "reused_matching_previous_external_sha256": 80,
+        "reused_with_mismatched_previous_external_sha256": 0,
+        "compiled_with_changed_previous_external_sha256": 0,
+        "compiled_with_matching_previous_external_sha256": 0
+      },
+      "behavior-edit": {
+        "reused_matching_previous_fingerprints": 75,
+        "reused_with_mismatched_previous_fingerprints": 0,
+        "compiled_with_changed_previous_fingerprints": 5,
+        "compiled_with_matching_previous_fingerprints": 0,
+        "reused_matching_previous_external_sha256": 75,
+        "reused_with_mismatched_previous_external_sha256": 0,
+        "compiled_with_changed_previous_external_sha256": 5,
+        "compiled_with_matching_previous_external_sha256": 0
+      },
+      "behavior-repair": {
+        "reused_matching_previous_fingerprints": 75,
+        "reused_with_mismatched_previous_fingerprints": 0,
+        "compiled_with_changed_previous_fingerprints": 5,
+        "compiled_with_matching_previous_fingerprints": 0,
+        "reused_matching_previous_external_sha256": 75,
+        "reused_with_mismatched_previous_external_sha256": 0,
+        "compiled_with_changed_previous_external_sha256": 5,
+        "compiled_with_matching_previous_external_sha256": 0
+      },
+      "compile-repair": {
+        "reused_matching_previous_fingerprints": 75,
+        "reused_with_mismatched_previous_fingerprints": 0,
+        "compiled_with_changed_previous_fingerprints": 0,
+        "compiled_with_matching_previous_fingerprints": 5,
+        "reused_matching_previous_external_sha256": 75,
+        "reused_with_mismatched_previous_external_sha256": 0,
+        "compiled_with_changed_previous_external_sha256": 0,
+        "compiled_with_matching_previous_external_sha256": 5
+      }
+    }
+  },
+  "behavior_edit_and_repair_ms": {
+    "resident": {
+      "save_to_result_ms": {
+        "count": 10,
+        "min": 452.433,
+        "median": 494.051,
+        "p95": 672.914,
+        "max": 672.914
+      },
+      "test_ms": {
+        "count": 10,
+        "min": 59.135,
+        "median": 76.867,
+        "p95": 108.833,
+        "max": 108.833
+      },
+      "build_ms": {
+        "count": 10,
+        "min": 351.583,
+        "median": 370.656,
+        "p95": 505.123,
+        "max": 505.123
+      },
+      "save_and_check_ms": {
+        "count": 10,
+        "min": 35.315,
+        "median": 44.291,
+        "p95": 58.464,
+        "max": 58.464
+      },
+      "native_reanalysis_ms": {
+        "count": 10,
+        "min": 32.4,
+        "median": 40.875,
+        "p95": 53.355,
+        "max": 53.355
+      },
+      "native_post_authorization_compile_ms": {
+        "count": 10,
+        "min": 350.807,
+        "median": 369.838,
+        "p95": 501.75,
+        "max": 501.75
+      },
+      "rustc_codegen_ms": {
+        "count": 10,
+        "min": 181.142,
+        "median": 204.416,
+        "p95": 297.199,
+        "max": 297.199
+      },
+      "rustc_link_ms": {
+        "count": 10,
+        "min": 148.707,
+        "median": 171.099,
+        "p95": 204.883,
+        "max": 204.883
+      }
+    },
+    "cargo": {
+      "save_to_result_ms": {
+        "count": 10,
+        "min": 812.262,
+        "median": 957.623,
+        "p95": 2090.384,
+        "max": 2090.384
+      },
+      "test_ms": {
+        "count": 10,
+        "min": 52.632,
+        "median": 80.175,
+        "p95": 193.632,
+        "max": 193.632
+      },
+      "build_ms": {
+        "count": 10,
+        "min": 758.07,
+        "median": 879.586,
+        "p95": 1893.261,
+        "max": 1893.261
+      }
+    },
+    "ratio_of_medians_cargo_over_resident": 1.938
+  },
+  "by_phase_ms": {
+    "baseline": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 214.892,
+          "median": 246.137,
+          "p95": 338.346,
+          "max": 338.346
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 55.082,
+          "median": 67.359,
+          "p95": 94.168,
+          "max": 94.168
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 159.055,
+          "median": 178.409,
+          "p95": 242.813,
+          "max": 242.813
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 0.387,
+          "median": 0.552,
+          "p95": 0.762,
+          "max": 0.762
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 158.286,
+          "median": 177.718,
+          "p95": 241.293,
+          "max": 241.293
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 3.251,
+          "median": 4.079,
+          "p95": 4.86,
+          "max": 4.86
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 154.209,
+          "median": 173.305,
+          "p95": 235.938,
+          "max": 235.938
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 135.663,
+          "median": 180.245,
+          "p95": 688.067,
+          "max": 688.067
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 47.234,
+          "median": 58.52,
+          "p95": 66.76,
+          "max": 66.76
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 86.428,
+          "median": 117.796,
+          "p95": 618.621,
+          "max": 618.621
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 0.732
+    },
+    "unchanged-rebuild": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 231.729,
+          "median": 246.097,
+          "p95": 411.015,
+          "max": 411.015
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 56.333,
+          "median": 63.674,
+          "p95": 153.637,
+          "max": 153.637
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 174.504,
+          "median": 180.179,
+          "p95": 254.995,
+          "max": 254.995
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 0.526,
+          "median": 0.707,
+          "p95": 1.839,
+          "max": 1.839
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 173.392,
+          "median": 179.092,
+          "p95": 252.405,
+          "max": 252.405
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 3.56,
+          "median": 4.425,
+          "p95": 18.937,
+          "max": 18.937
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 168.489,
+          "median": 173.885,
+          "p95": 233.303,
+          "max": 233.303
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 144.237,
+          "median": 150.093,
+          "p95": 206.958,
+          "max": 206.958
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 46.797,
+          "median": 60.56,
+          "p95": 72.315,
+          "max": 72.315
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 87.815,
+          "median": 97.733,
+          "p95": 141.144,
+          "max": 141.144
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 0.61
+    },
+    "behavior-edit": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 507.14,
+          "median": 538.732,
+          "p95": 672.914,
+          "max": 672.914
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 86.012,
+          "median": 98.717,
+          "p95": 108.833,
+          "max": 108.833
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 370.845,
+          "median": 391.437,
+          "p95": 505.123,
+          "max": 505.123
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 40.742,
+          "median": 47.012,
+          "p95": 58.464,
+          "max": 58.464
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 36.879,
+          "median": 43.232,
+          "p95": 53.355,
+          "max": 53.355
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 370.093,
+          "median": 390.264,
+          "p95": 501.75,
+          "max": 501.75
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 204.275,
+          "median": 214.184,
+          "p95": 297.199,
+          "max": 297.199
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 165.178,
+          "median": 175.823,
+          "p95": 204.883,
+          "max": 204.883
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 977.291,
+          "median": 1158.517,
+          "p95": 2090.384,
+          "max": 2090.384
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 92.112,
+          "median": 98.207,
+          "p95": 193.632,
+          "max": 193.632
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 883.516,
+          "median": 1055.651,
+          "p95": 1893.261,
+          "max": 1893.261
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 2.15
+    },
+    "behavior-repair": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 452.433,
+          "median": 463.902,
+          "p95": 480.963,
+          "max": 480.963
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 59.135,
+          "median": 65.159,
+          "p95": 67.721,
+          "max": 67.721
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 351.583,
+          "median": 358.821,
+          "p95": 370.466,
+          "max": 370.466
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 35.315,
+          "median": 39.973,
+          "p95": 46.709,
+          "max": 46.709
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 32.4,
+          "median": 36.495,
+          "p95": 42.692,
+          "max": 42.692
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 350.807,
+          "median": 357.989,
+          "p95": 369.583,
+          "max": 369.583
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 181.142,
+          "median": 195.15,
+          "p95": 205.834,
+          "max": 205.834
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 148.707,
+          "median": 168.753,
+          "p95": 172.888,
+          "max": 172.888
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 812.262,
+          "median": 859.935,
+          "p95": 937.954,
+          "max": 937.954
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 52.632,
+          "median": 60.274,
+          "p95": 68.237,
+          "max": 68.237
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 758.07,
+          "median": 797.828,
+          "p95": 875.655,
+          "max": 875.655
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 1.854
+    },
+    "compile-error": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 22.217,
+          "median": 23.43,
+          "p95": 27.363,
+          "max": 27.363
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 0.055,
+          "median": 0.059,
+          "p95": 0.073,
+          "max": 0.073
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 22.122,
+          "median": 23.348,
+          "p95": 27.26,
+          "max": 27.26
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 18.811,
+          "median": 20.203,
+          "p95": 23.589,
+          "max": 23.589
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 0.001,
+          "median": 0.001,
+          "p95": 0.002,
+          "max": 0.002
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 367.806,
+          "median": 388.974,
+          "p95": 456.471,
+          "max": 456.471
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 367.57,
+          "median": 388.689,
+          "p95": 456.214,
+          "max": 456.214
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 16.602
+    },
+    "compile-repair": {
+      "resident": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 435.814,
+          "median": 474.653,
+          "p95": 633.171,
+          "max": 633.171
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 54.479,
+          "median": 63.353,
+          "p95": 70.295,
+          "max": 70.295
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 343.168,
+          "median": 371.882,
+          "p95": 531.375,
+          "max": 531.375
+        },
+        "save_and_check_ms": {
+          "count": 5,
+          "min": 28.69,
+          "median": 28.937,
+          "p95": 41.015,
+          "max": 41.015
+        },
+        "native_reanalysis_ms": {
+          "count": 5,
+          "min": 26.147,
+          "median": 26.416,
+          "p95": 37.58,
+          "max": 37.58
+        },
+        "native_post_authorization_compile_ms": {
+          "count": 5,
+          "min": 342.331,
+          "median": 370.967,
+          "p95": 530.371,
+          "max": 530.371
+        },
+        "rustc_codegen_ms": {
+          "count": 5,
+          "min": 176.152,
+          "median": 179.009,
+          "p95": 357.562,
+          "max": 357.562
+        },
+        "rustc_link_ms": {
+          "count": 5,
+          "min": 162.933,
+          "median": 173.501,
+          "p95": 199.923,
+          "max": 199.923
+        }
+      },
+      "cargo": {
+        "save_to_result_ms": {
+          "count": 5,
+          "min": 602.166,
+          "median": 702.544,
+          "p95": 765.957,
+          "max": 765.957
+        },
+        "test_ms": {
+          "count": 5,
+          "min": 56.285,
+          "median": 60.973,
+          "p95": 72.451,
+          "max": 72.451
+        },
+        "build_ms": {
+          "count": 5,
+          "min": 539.655,
+          "median": 641.397,
+          "p95": 701.149,
+          "max": 701.149
+        }
+      },
+      "ratio_of_medians_cargo_over_resident": 1.48
+    }
+  }
+}
