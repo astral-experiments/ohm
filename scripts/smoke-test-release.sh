@@ -74,16 +74,39 @@ grep -F 'rustfmt ' <<< "$rustfmt_version" >/dev/null
 [[ "$cargo_fmt_version" == "$rustfmt_version" ]]
 
 smoke_crate="$smoke_root/crate"
-mkdir -p "$smoke_crate/src"
+mkdir -p "$smoke_crate/src" "$smoke_crate/macros/src"
 cat > "$smoke_crate/Cargo.toml" <<'EOF'
 [package]
 name = "ohm-smoke"
 version = "0.0.0"
 edition = "2024"
+
+[dependencies]
+ohm-smoke-macros = { path = "macros" }
+EOF
+cat > "$smoke_crate/macros/Cargo.toml" <<'EOF'
+[package]
+name = "ohm-smoke-macros"
+version = "0.0.0"
+edition = "2024"
+
+[lib]
+proc-macro = true
+EOF
+cat > "$smoke_crate/macros/src/lib.rs" <<'EOF'
+use proc_macro::TokenStream;
+
+#[proc_macro]
+pub fn make_answer(_: TokenStream) -> TokenStream {
+    "fn answer() -> u32 { 42 }".parse().unwrap()
+}
 EOF
 cat > "$smoke_crate/src/main.rs" <<'EOF'
+ohm_smoke_macros::make_answer!();
+
 fn main() {
     assert!(invert(false));
+    assert_eq!(answer(), 42);
 }
 
 fn invert(value: bool) -> bool {
@@ -177,7 +200,7 @@ cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
 
 env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
   "${RUST_ANALYZER:?set RUST_ANALYZER to the stock rust-analyzer executable}" \
-  diagnostics --disable-build-scripts "$smoke_crate"
+  diagnostics "$smoke_crate"
 
 # Exercise cache admission with the installed compiler, without a wrapper.
 registry_crate="$smoke_root/registry-crate"

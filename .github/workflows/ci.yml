@@ -59,7 +59,9 @@ jobs:
                   "Optimized Ohm releases require Rust's profiler runtime"
               )
           tools = set(build.get("tools", []))
-          missing_tools = {"analysis", "cargo", "clippy", "rustdoc", "rustfmt"} - tools
+          missing_tools = {
+              "analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"
+          } - tools
           if missing_tools:
               missing = ", ".join(sorted(missing_tools))
               raise SystemExit(f"Ohm releases must include these tools: {missing}")

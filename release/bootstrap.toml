@@ -17,7 +17,7 @@ cargo-native-static = true
 # rust-analysis compatibility component even though it only contains a removal
 # notice. Keep it alongside the user-facing tools so `x.py dist extended` can
 # assemble every supported installer format.
-tools = ["analysis", "cargo", "clippy", "rustdoc", "rustfmt"]
+tools = ["analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"]
 
 # Package Cargo so selecting an Ohm toolchain activates the complete workflow.
 [build.tool.cargo]

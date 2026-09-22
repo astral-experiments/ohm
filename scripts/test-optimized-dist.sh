@@ -289,7 +289,9 @@ if generated.get("build", {}).get("locked-deps") is not True:
     raise SystemExit("component PGO must preserve locked release dependencies")
 if generated.get("llvm", {}).get("download-ci-llvm") is not True:
     raise SystemExit("component PGO must reuse Rust's optimized CI LLVM")
-required_tools = {"analysis", "cargo", "clippy", "rustdoc", "rustfmt"}
+required_tools = {
+    "analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"
+}
 if not required_tools.issubset(generated.get("build", {}).get("tools", [])):
     raise SystemExit("component PGO must preserve every packaged release tool")
 if "ohm-defaults" not in generated.get("build", {}).get("tool", {}).get(
