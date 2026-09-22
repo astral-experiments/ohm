@@ -98,10 +98,6 @@ tagging any missing pinned revisions with the toolchain name. Existing tags at t
 are reused; conflicting immutable tags fail the release before any new source tags are created. The
 workflow then creates the private GitHub Release and publishes the public assets.
 
-Each archive includes `rust-src` from the same pinned compiler revision. The installed-toolchain
-smoke test runs stock rust-analyzer against Ohm's sysroot; when running it locally, set
-`RUST_ANALYZER` to the absolute path of a stock rust-analyzer executable.
-
 Release notes include version-pinned installation instructions, usage examples, the development-only
 safety warning, and public download links alongside the generated changelog. Internal smoke tests use
 `OHM_DOWNLOAD_URL` to read staged artifacts before publication. The private release includes:
@@ -139,6 +135,7 @@ On a supported host, test that installer and its matching platform archive:
 
 ```console
 clippy_revision="$(jq -er '.sources.clippy.revision' "$manifest")"
+RUST_ANALYZER=/path/to/rust-analyzer \
 bash scripts/smoke-test-release.sh /path/to/assets "$toolchain" \
   aarch64-apple-darwin "$clippy_revision"
 ```

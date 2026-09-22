@@ -33,14 +33,6 @@ if [ -z "$prefix" ]; then
 fi
 
 mkdir -p "$prefix/bin"
-for source_file in Cargo.toml core/src/lib.rs alloc/src/lib.rs std/src/lib.rs; do
-  if [ "$source_file" = "${OHM_TEST_MISSING_SOURCE:-}" ]; then
-    continue
-  fi
-  destination="$prefix/lib/rustlib/src/rust/library/$source_file"
-  mkdir -p "$(dirname "$destination")"
-  printf 'fixture source\n' > "$destination"
-done
 for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; do
   if [ "$binary" = rustdoc ] && [ "${OHM_TEST_RUSTDOC:-present}" = missing ]; then
     continue
@@ -220,7 +212,6 @@ run_case() {
     OHM_TEST_RUSTC_BRAND="${OHM_TEST_RUSTC_BRAND:-$version}" \
     OHM_TEST_RUSTC_UPSTREAM_VERSION="${OHM_TEST_RUSTC_UPSTREAM_VERSION:-1.97.1}" \
     OHM_TEST_RUSTDOC="${OHM_TEST_RUSTDOC:-present}" \
-    OHM_TEST_MISSING_SOURCE="${OHM_TEST_MISSING_SOURCE:-}" \
     OHM_TEST_WILD="${OHM_TEST_WILD:-missing}" \
     OHM_TEST_RUSTUP_ALIAS_FAILURE="${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" \
     OHM_TEST_ACTIVATION_RACE="${OHM_TEST_ACTIVATION_RACE:-0}" \
@@ -489,13 +480,6 @@ OHM_TEST_RUSTC_UPSTREAM_VERSION=1.96.0
 run_case mismatched-rustc-upstream failure
 unset OHM_TEST_RUSTC_UPSTREAM_VERSION
 assert_no_links mismatched-rustc-upstream
-
-OHM_TEST_MISSING_SOURCE=core/src/lib.rs
-run_case missing-rust-src failure
-unset OHM_TEST_MISSING_SOURCE
-assert_contains "$temporary_directory/cases/missing-rust-src/output.log" \
-  'installed standard-library source is missing or empty: core/src/lib.rs'
-assert_no_links missing-rust-src
 
 OHM_TEST_RUSTDOC=missing
 run_case missing-rustdoc failure
