@@ -127,6 +127,7 @@ jobs:
         run: |
           bash scripts/test-installer.sh
           bash scripts/test-release-packaging.sh
+          python3 scripts/test_bundle_rust_src.py
 
   lint:
     runs-on: ubuntu-latest

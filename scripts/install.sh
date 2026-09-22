@@ -245,6 +245,10 @@ awk '
 
 verify_installation() {
     installation_directory=$1
+    for source_file in Cargo.toml core/src/lib.rs alloc/src/lib.rs std/src/lib.rs; do
+        [ -s "$installation_directory/lib/rustlib/src/rust/library/$source_file" ] ||
+            fail "installed standard-library source is missing or empty: $source_file"
+    done
     for executable in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; do
         executable_path=$installation_directory/bin/$executable
         [ -f "$executable_path" ] && [ -x "$executable_path" ] ||

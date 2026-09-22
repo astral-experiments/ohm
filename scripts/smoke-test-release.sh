@@ -169,6 +169,16 @@ cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D w
 cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"
 cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
 
+# Analyze through the installed sysroot, without an external source override.
+cat > "$smoke_crate/src/lib.rs" <<'EOF'
+pub fn invert(value: bool) -> bool {
+    !value
+}
+EOF
+env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
+  "${RUST_ANALYZER:?set RUST_ANALYZER to the stock rust-analyzer executable}" \
+  diagnostics --disable-build-scripts "$smoke_crate"
+
 # Exercise cache admission with the installed compiler, without a wrapper.
 registry_crate="$smoke_root/registry-crate"
 mkdir -p "$registry_crate/src"
