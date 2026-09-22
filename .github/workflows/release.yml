@@ -342,10 +342,7 @@ jobs:
           release_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-release.XXXXXX")"
           archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
           provenance_name="$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
-          python3 scripts/bundle_rust_src.py \
-            "$combined_archive" \
-            "source/rust/build/dist/rust-src-$rust_version-dev.tar.gz" \
-            "$release_directory/$archive_name"
+          cp "$combined_archive" "$release_directory/$archive_name"
           cp source/rust/build/dist/ohm-provenance.json \
             "$release_directory/$provenance_name"
 

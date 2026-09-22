@@ -267,7 +267,7 @@ env -i "${safe_environment[@]}" \
   --host "$target" \
   --target "$target" \
   "${dist_arguments[@]}" \
-  extended rust-src
+  extended
 
 # Cargo is instrumented alongside rustc and consumes the merged rustc profile.
 # Likewise, cargo-fmt and rustfmt share the formatting profile. Check executed
