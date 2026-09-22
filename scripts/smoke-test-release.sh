@@ -82,7 +82,13 @@ version = "0.0.0"
 edition = "2024"
 EOF
 cat > "$smoke_crate/src/main.rs" <<'EOF'
-fn main() {}
+fn main() {
+    assert!(invert(false));
+}
+
+fn invert(value: bool) -> bool {
+    !value
+}
 EOF
 
 rustc_wrapper="$smoke_root/rustc-wrapper"
@@ -168,6 +174,10 @@ fi
 cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
 cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"
 cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
+
+env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
+  "${RUST_ANALYZER:?set RUST_ANALYZER to the stock rust-analyzer executable}" \
+  diagnostics --disable-build-scripts "$smoke_crate"
 
 # Exercise cache admission with the installed compiler, without a wrapper.
 registry_crate="$smoke_root/registry-crate"

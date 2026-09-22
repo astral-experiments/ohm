@@ -442,6 +442,12 @@ jobs:
           name: ${{ needs.plan.outputs.toolchain }}-global
           path: release
 
+      - name: Install rust-analyzer
+        run: |
+          upstream_version="$(jq -r '.release.upstream_rust_version' "release/$OHM_TOOLCHAIN.json")"
+          rustup toolchain install "$upstream_version" --profile minimal --component rust-analyzer
+          printf 'RUST_ANALYZER=%s\n' "$(rustup which --toolchain "$upstream_version" rust-analyzer)" >> "$GITHUB_ENV"
+
       - name: Smoke test Ohm toolchain
         run: |
           bash scripts/smoke-test-release.sh release \

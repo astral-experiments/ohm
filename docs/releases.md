@@ -135,6 +135,7 @@ On a supported host, test that installer and its matching platform archive:
 
 ```console
 clippy_revision="$(jq -er '.sources.clippy.revision' "$manifest")"
+RUST_ANALYZER=/path/to/rust-analyzer \
 bash scripts/smoke-test-release.sh /path/to/assets "$toolchain" \
   aarch64-apple-darwin "$clippy_revision"
 ```
