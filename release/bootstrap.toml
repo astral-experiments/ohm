@@ -27,6 +27,7 @@ features = ["ohm-defaults"]
 # Build both rustc and Cargo for the dev channel so those interfaces are
 # available without requiring RUSTC_BOOTSTRAP.
 [rust]
+lld = true
 channel = "dev"
 omit-git-hash = false
 

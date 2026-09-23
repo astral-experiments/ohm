@@ -178,6 +178,18 @@ OHM_EXPECT_DEFAULTS=disabled \
     --manifest-path "$smoke_crate/Cargo.toml"
 grep -Fx disabled "$disabled_log" >/dev/null
 
+# Linking a Wasm executable requires both the target's std and the host's rust-lld.
+CARGO_TARGET_DIR="$smoke_root/defaults-target" \
+  cargo +"$OHM_TOOLCHAIN" build --target wasm32-unknown-unknown \
+    --manifest-path "$smoke_crate/Cargo.toml"
+python3 - "$smoke_root/defaults-target/wasm32-unknown-unknown/debug/ohm-smoke.wasm" <<'PY'
+import pathlib
+import sys
+
+with pathlib.Path(sys.argv[1]).open("rb") as wasm:
+    assert wasm.read(8) == b"\0asm\x01\0\0\0", "invalid Wasm module"
+PY
+
 if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] && \
   jq -e '.bundled_tools.wild' "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
   readelf --string-dump=.comment "$smoke_root/defaults-target/debug/ohm-smoke" \

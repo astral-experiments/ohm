@@ -289,6 +289,8 @@ if generated.get("build", {}).get("locked-deps") is not True:
     raise SystemExit("component PGO must preserve locked release dependencies")
 if generated.get("llvm", {}).get("download-ci-llvm") is not True:
     raise SystemExit("component PGO must reuse Rust's optimized CI LLVM")
+if generated.get("rust", {}).get("lld") is not True:
+    raise SystemExit("Wasm builds require the bundled rust-lld linker")
 required_tools = {
     "analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"
 }
@@ -376,8 +378,8 @@ if option(distribution_arguments, "--build-dir") != str(checkout / "build"):
     raise SystemExit("final distribution used an inconsistent build directory")
 if option(distribution_arguments, "--host") != target:
     raise SystemExit("final distribution used the wrong host")
-if option(distribution_arguments, "--target") != target:
-    raise SystemExit("final distribution used the wrong target")
+if option(distribution_arguments, "--target") != f"{target},wasm32-unknown-unknown":
+    raise SystemExit("final distribution must include the host and Wasm targets")
 if option(distribution_arguments, "--set") != f"build.description={toolchain}":
     raise SystemExit("final distribution changed the immutable toolchain identity")
 if distribution_arguments[-1] != "extended":

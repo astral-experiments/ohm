@@ -1,5 +1,13 @@
 # Releases
 
+## Bundled WebAssembly target
+
+Starting with Ohm 1.98.1-5, both host distributions include the matching
+`wasm32-unknown-unknown` standard library and `rust-lld`. This supports
+`cargo +ohm build --target wasm32-unknown-unknown` and `RUSTUP_TOOLCHAIN=ohm wasm-pack build`
+without installing another target. Rustup cannot add targets to a custom linked toolchain.
+Release smoke tests compile and link a Wasm executable using the installed package.
+
 ## Bundled Wild linker
 
 Release manifests can pin `bundled_tools.wild` with a version and the SHA-256

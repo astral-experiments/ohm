@@ -265,7 +265,7 @@ env -i "${safe_environment[@]}" \
   --config "$release_config" \
   --build-dir "$build_dir" \
   --host "$target" \
-  --target "$target" \
+  --target "$target,wasm32-unknown-unknown" \
   "${dist_arguments[@]}" \
   extended
 

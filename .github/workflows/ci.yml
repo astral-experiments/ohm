@@ -73,6 +73,8 @@ jobs:
                   "Ohm releases must enable Cargo's ohm-defaults feature"
               )
           rust = config.get("rust", {})
+          if rust.get("lld") is not True:
+              raise SystemExit("Wasm builds require the bundled rust-lld linker")
           if rust.get("channel") != "dev":
               raise SystemExit(
                   "Ohm releases must use the dev channel so their unstable interfaces are available"
