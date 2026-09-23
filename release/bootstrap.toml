@@ -27,6 +27,7 @@ features = ["ohm-defaults"]
 # Build both rustc and Cargo for the dev channel so those interfaces are
 # available without requiring RUSTC_BOOTSTRAP.
 [rust]
+lld = true
 channel = "dev"
 omit-git-hash = false
 
@@ -41,6 +42,10 @@ lto = "thin"
 # Cargo archive are still built from the pinned Ohm sources.
 [llvm]
 download-ci-llvm = true
+
+# The bare Wasm target has no C runtime for compiler-rt's profiling support.
+[target.wasm32-unknown-unknown]
+profiler = false
 
 [dist]
 compression-formats = ["gz"]
