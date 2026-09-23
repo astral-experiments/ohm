@@ -43,6 +43,10 @@ lto = "thin"
 [llvm]
 download-ci-llvm = true
 
+# The bare Wasm target has no C runtime for compiler-rt's profiling support.
+[target.wasm32-unknown-unknown]
+profiler = false
+
 [dist]
 compression-formats = ["gz"]
 compression-profile = "balanced"

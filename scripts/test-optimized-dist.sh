@@ -291,6 +291,8 @@ if generated.get("llvm", {}).get("download-ci-llvm") is not True:
     raise SystemExit("component PGO must reuse Rust's optimized CI LLVM")
 if generated.get("rust", {}).get("lld") is not True:
     raise SystemExit("Wasm builds require the bundled rust-lld linker")
+if generated.get("target", {}).get("wasm32-unknown-unknown", {}).get("profiler") is not False:
+    raise SystemExit("the bare Wasm target must not build the native profiling runtime")
 required_tools = {
     "analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"
 }
