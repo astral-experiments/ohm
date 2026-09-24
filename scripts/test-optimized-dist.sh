@@ -344,6 +344,8 @@ distribution_arguments = arguments[separator + 1 :]
 
 if option(pipeline_arguments, "--target-triple") != target:
     raise SystemExit("opt-dist used the wrong host target")
+if option(pipeline_arguments, "--std-target") != "wasm32-unknown-unknown":
+    raise SystemExit("opt-dist must build Wasm std before preserving stage1 for packaging")
 if option(pipeline_arguments, "--checkout-dir") != str(checkout):
     raise SystemExit("opt-dist used the wrong pinned Rust checkout")
 if option(pipeline_arguments, "--llvm-dir") != str(pathlib.Path(expected_llvm).resolve()):

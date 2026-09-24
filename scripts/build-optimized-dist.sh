@@ -228,6 +228,7 @@ done
 opt_dist_arguments=(
   local
   --target-triple "$target"
+  --std-target wasm32-unknown-unknown
   --checkout-dir "$rust_checkout"
   --llvm-dir "$llvm_dir"
   --artifact-dir build/opt-artifacts
