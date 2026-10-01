@@ -4,6 +4,19 @@ Ohm combines experimental Rust, Cargo, Clippy, and rustfmt changes for local dev
 Each release pins the complete set of sources in its [toolchain manifest](../toolchains/).
 Use the official Rust toolchain for production builds and final validation.
 
+## In Ohm 1.99.0-1
+
+This release updates Rust, Cargo, Clippy, and rustfmt to Rust 1.99.0 while retaining the
+features shipped in Ohm 1.98.1-5. The existing component PRs have been rebased onto the
+new upstream sources. See the [pinned manifest](../toolchains/1.99.0/1.json) for exact revisions.
+
+Bundled upstream Wild remains the default linker for native x86_64 Linux GNU builds,
+including the shared-cache fix. The allocator changes, indexed Cargo scheduling, line-table
+debug information, and clone-only worktree seeds are retained. Both distributions include
+rust-src, the rust-analyzer procedural-macro server, and the Wasm standard library and linker.
+
+The Clippy/codegen shared-cache experiment, ohm-wild fork, and Mach-O linker remain excluded.
+
 ## In Ohm 1.98.1-2
 
 - **Line-table debug information by default.** Development and test builds retain file-and-line
@@ -61,7 +74,7 @@ See [release documentation](releases.md) for the build and packaging details.
 Generate the exact component commit inventory from any pinned manifest:
 
 ```console
-python3 scripts/list_patches.py toolchains/1.98.1/2.json
+python3 scripts/list_patches.py toolchains/1.99.0/1.json
 ```
 
 The command uses `gh-auto` to compare each pinned component with the corresponding revision in the
