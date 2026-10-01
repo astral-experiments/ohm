@@ -15,6 +15,9 @@ including the shared-cache fix. The allocator changes, indexed Cargo scheduling,
 debug information, and clone-only worktree seeds are retained. Both distributions include
 rust-src, the rust-analyzer procedural-macro server, and the Wasm standard library and linker.
 
+Generic-parameter metadata is encoded in declaration order so reusing cached compiler queries
+does not change the emitted metadata.
+
 The Clippy/codegen shared-cache experiment, ohm-wild fork, and Mach-O linker remain excluded.
 
 ## In Ohm 1.98.1-2
