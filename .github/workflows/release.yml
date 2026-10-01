@@ -290,6 +290,7 @@ jobs:
           printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
 
       - name: Build optimized extended Rust distribution
+        id: distribution
         env:
           OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
         run: |
@@ -298,6 +299,30 @@ jobs:
             "$OHM_TOOLCHAIN" \
             "$GITHUB_WORKSPACE/source/rust" \
             "$GITHUB_WORKSPACE/release/bootstrap.toml"
+
+      - name: Capture macOS compiler crash
+        if: failure() && steps.distribution.outcome == 'failure' && runner.os == 'macOS'
+        continue-on-error: true
+        timeout-minutes: 3
+        run: |
+          build_dir="$GITHUB_WORKSPACE/source/rust/build"
+          rustc="$build_dir/$OHM_TARGET/stage2/bin/rustc"
+          if [[ ! -x "$rustc" ]]; then
+            exit 0
+          fi
+
+          env -i \
+            "HOME=$HOME" \
+            "PATH=$PATH" \
+            "TMPDIR=$RUNNER_TEMP" \
+            "LLVM_PROFILE_FILE=$build_dir/opt-artifacts/rustc-pgo/default_%m_%p.profraw" \
+            xcrun lldb --batch \
+              --one-line 'run' \
+              --one-line-on-crash 'thread backtrace all' \
+              --one-line-on-crash 'register read' \
+              --one-line-on-crash 'disassemble --pc' \
+              --one-line-on-crash 'image list' \
+              -- "$rustc" -vV
 
       - name: Write build provenance
         env:
