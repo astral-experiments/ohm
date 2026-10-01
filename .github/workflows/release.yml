@@ -281,7 +281,7 @@ jobs:
 
           printf 'OHM_BOLT_LLVM_DIR=%s\n' "$bolt_llvm_dir" >> "$GITHUB_ENV"
 
-      - name: Install matching Clang for native PGO
+      - name: Install matching LLVM tools for native PGO
         if: matrix.target == 'aarch64-apple-darwin'
         env:
           MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
@@ -298,7 +298,7 @@ jobs:
               ;;
           esac
 
-          # Native dependencies and Rust must use compatible PGO record layouts.
+          # Native PGO and ThinLTO require matching LLVM formats.
           clang_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-clang.XXXXXX")"
           clang_archive="$clang_root/clang.tar.xz"
           curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
@@ -309,9 +309,16 @@ jobs:
           tar -xf "$clang_archive" -C "$clang_root" --strip-components=1
           "$clang_root/bin/clang" --version
           "$clang_root/bin/clang++" --version
+          ln -s clang "$clang_root/bin/cc"
+          ln -s llvm-ar "$clang_root/bin/ar"
+          ln -s llvm-ranlib "$clang_root/bin/ranlib"
+          ln -s llvm-nm "$clang_root/bin/nm"
+          printf '%s\n' "$clang_root/bin" >> "$GITHUB_PATH"
           {
             printf 'CC=%s\n' "$clang_root/bin/clang"
             printf 'CXX=%s\n' "$clang_root/bin/clang++"
+            printf 'AR=%s\n' "$clang_root/bin/llvm-ar"
+            printf 'RANLIB=%s\n' "$clang_root/bin/llvm-ranlib"
             printf 'SDKROOT=%s\n' "$(xcrun --sdk macosx --show-sdk-path)"
           } >> "$GITHUB_ENV"
 
