@@ -281,6 +281,40 @@ jobs:
 
           printf 'OHM_BOLT_LLVM_DIR=%s\n' "$bolt_llvm_dir" >> "$GITHUB_ENV"
 
+      - name: Install matching Clang for native PGO
+        if: matrix.target == 'aarch64-apple-darwin'
+        env:
+          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+        run: |
+          case "$(jq -er '.release.upstream_rust_version' "$MANIFEST_PATH")" in
+            1.97.* | 1.98.*) exit 0 ;;
+            1.99.*)
+              clang_version=23.1.2
+              clang_sha256=d7c26fc6177e42842e2d1ffaad31aec057c56a924392b1a23d830abe2c5d53b1
+              ;;
+            *)
+              echo 'Pin matching Clang for this Rust version' >&2
+              exit 1
+              ;;
+          esac
+
+          # Native dependencies and Rust must use compatible PGO record layouts.
+          clang_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-clang.XXXXXX")"
+          clang_archive="$clang_root/clang.tar.xz"
+          curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
+            --fail --location --retry 3 --show-error --silent \
+            --output "$clang_archive" \
+            "https://github.com/llvm/llvm-project/releases/download/llvmorg-$clang_version/LLVM-$clang_version-macOS-ARM64.tar.xz"
+          printf '%s  %s\n' "$clang_sha256" "$clang_archive" | shasum -a 256 --check
+          tar -xf "$clang_archive" -C "$clang_root" --strip-components=1
+          "$clang_root/bin/clang" --version
+          "$clang_root/bin/clang++" --version
+          {
+            printf 'CC=%s\n' "$clang_root/bin/clang"
+            printf 'CXX=%s\n' "$clang_root/bin/clang++"
+            printf 'SDKROOT=%s\n' "$(xcrun --sdk macosx --show-sdk-path)"
+          } >> "$GITHUB_ENV"
+
       - name: Prepare pinned Wild linker
         env:
           MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
