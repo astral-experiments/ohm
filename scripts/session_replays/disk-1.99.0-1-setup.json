@@ -1,0 +1,78 @@
+{
+  "reason": "Rustfmt enables upstream cfg_select formatting on the development channel. Both benchmark lanes start from the same formatting accepted by stock Rust 1.99 and Ohm 1.99.0-1.",
+  "projects": {
+    "ruff": {
+      "input_fixture": "ruff-rust-1.99.json",
+      "input_fixture_sha256": "1aca6e92472615487452d8fb78d2d2f2308614990525a5efd2de477ca903f859",
+      "prepared_fixture": "disk-1.99.0-1-ruff.json",
+      "prepared_fixture_sha256": "01336ef5b8031ada7cdd206335b2e74a7b78a2e98a28c5fd0fbbfb3c0c170e88",
+      "formatting_patch": {
+        "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+        "patch": "patches/rust-1.99-ruff-cfg-select.patch",
+        "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+        "paths": ["crates/ty_python_core/src/ast_node_ref.rs"]
+      },
+      "derived": {
+        "base": {
+          "original_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+          "tree": "dca8699f95b45b4a22321ef3b9ac12c76279488b",
+          "derived_revision": "2ad13360a9826f08a75bd80f2ca7e3e7ca075256",
+          "commit_object": "tree dca8699f95b45b4a22321ef3b9ac12c76279488b\nparent 21c9b077ab3b10dd9007710ffa471cd12f7eceab\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\n\nPrepare Rust 1.99 benchmark formatting\n",
+          "commit_object_sha256": "65f3a7f8c82e3e0325b59ef81685db049acfeccb1b3b992028ed8dcea4313c7b"
+        },
+        "first_edit": {
+          "original_revision": "c0a91dd16d5b32a254cbf6bcd268f6dbaf0fef0f",
+          "tree": "f3724a7d4a42852da4fe2b1c0f61816d69789dae",
+          "derived_revision": "94267450583f1c15e61140f1723d2064761ec5c8",
+          "commit_object": "tree f3724a7d4a42852da4fe2b1c0f61816d69789dae\nparent c0a91dd16d5b32a254cbf6bcd268f6dbaf0fef0f\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\n\nPrepare Rust 1.99 benchmark formatting\n",
+          "commit_object_sha256": "8eafc85bc7e5f5dd5c908ccbdb09a27b63517d070bb8f56fc0ef9b989b25b5ae"
+        }
+      }
+    },
+    "uv": {
+      "input_fixture": "disk-1.99.0-1-uv.json",
+      "input_fixture_sha256": "4f7b94d3c1c53d0e348dfcd91cb10987b59566a49dde64b1078c65820ae165c2",
+      "prepared_fixture": "disk-1.99.0-1-uv.json",
+      "prepared_fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+      "formatting_patch": {
+        "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+        "patch": "patches/rust-1.99-uv-cfg-select.patch",
+        "sha256": "def4e6311a8eed2a60cf13f7ccd99111754d80891ac713ce5651ccbdd1952b04",
+        "paths": [
+          "crates/uv-cache-info/src/cache_info.rs",
+          "crates/uv-cache-info/src/timestamp.rs",
+          "crates/uv-cache/src/removal.rs",
+          "crates/uv-dirs/src/lib.rs",
+          "crates/uv-fs/src/lib.rs",
+          "crates/uv-pep508/src/verbatim_url.rs",
+          "crates/uv-platform/src/host.rs",
+          "crates/uv-python/src/managed.rs",
+          "crates/uv-tool/src/tool.rs",
+          "crates/uv/src/bin/uvw.rs",
+          "crates/uv/src/bin/uvx.rs",
+          "crates/uv/src/commands/project/run.rs",
+          "crates/uv/tests/python/venv.rs",
+          "crates/uv/tests/sync/centralized_project_envs.rs",
+          "crates/uv/tests/tool/tool_install.rs"
+        ]
+      },
+      "derived": {
+        "base": {
+          "original_revision": "65ed3776f0beb32d92cd9827a7b37414f6bce409",
+          "tree": "e1e5b31e39f75f3894aa4d45f9b3daffb5a22e84",
+          "derived_revision": "e209ff09704b64d3ccd178ac658708c4b2f12e7c",
+          "commit_object": "tree e1e5b31e39f75f3894aa4d45f9b3daffb5a22e84\nparent 65ed3776f0beb32d92cd9827a7b37414f6bce409\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\n\nPrepare Rust 1.99 benchmark formatting\n",
+          "commit_object_sha256": "bb22ba17ffd323d474009989a5629c6d4af7418d062c8aa6c6332ed239d59c40"
+        },
+        "first_edit": {
+          "original_revision": "1f25765e571372c114036360763daa390211eec9",
+          "tree": "f461468300d876030083dc09d00edf34d91d9a36",
+          "derived_revision": "2130555e2efaa3c93d8b9fb37147371d95f6a608",
+          "commit_object": "tree f461468300d876030083dc09d00edf34d91d9a36\nparent 1f25765e571372c114036360763daa390211eec9\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\n\nPrepare Rust 1.99 benchmark formatting\n",
+          "commit_object_sha256": "47d10a39774dee593fb8f406b2b399ab84b317abed82fa4fa6bc5c59cfb24904"
+        }
+      }
+    }
+  },
+  "input_coordinator_revision": "fa1f9cfc38402ff468301174c332f898a3a1b5d7"
+}

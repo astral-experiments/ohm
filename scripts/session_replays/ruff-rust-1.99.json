@@ -270,5 +270,13 @@
       "program": "cargo",
       "args": ["fmt", "--all", "--", "--check"]
     }
+  ],
+  "setup_patches": [
+    {
+      "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+      "patch": "patches/rust-1.99-ruff-cfg-select.patch",
+      "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+      "paths": ["crates/ty_python_core/src/ast_node_ref.rs"]
+    }
   ]
 }
