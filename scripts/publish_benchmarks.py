@@ -38,6 +38,10 @@ def compact(report, evidence):
         provenance.pop(key, None)
     cpu = provenance.get("system_cpu", {})
     cpu.pop("commands", None)
+    cpu.pop("trace_jsonl", None)
+    cpu.pop("preflight_attempts", None)
+    for attempt in cpu.get("excluded_attempts", []):
+        attempt.pop("trace_jsonl", None)
     result["evidence"] = evidence
     return result
 
@@ -282,7 +286,7 @@ def render_tables(reports):
     )
     headlines = {
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
-        r"\d+% speed-up": f"{round(100 * (totals[0] - totals[1]) / totals[0])}% speed-up",
+        r"\d+% less time": f"{round(100 * (totals[0] - totals[1]) / totals[0])}% less time",
         r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
         r"Benchmarking Ohm \d+\.\d+\.\d+-\d+ against": f"Benchmarking Ohm {version} against",
     }

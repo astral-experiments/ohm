@@ -52,13 +52,25 @@ class PublicationTests(unittest.TestCase):
 
     def test_compaction_preserves_measurements_and_input(self):
         report = self.reports["sessions"]
-        report["provenance"]["system_cpu"]["commands"] = [{"trace": "detailed"}]
+        report["provenance"]["system_cpu"].update(
+            commands=[{"trace": "detailed"}],
+            trace_jsonl='{"violations": []}\n',
+            preflight_attempts={"attempt-1": {"passed": True}},
+            excluded_attempts=[{"passed": False, "trace_jsonl": "stopped warmup"}],
+            coverage={"intervals": 2},
+        )
         original = copy.deepcopy(report)
         compact = publish.compact(report, {"url": "archive"})
         self.assertEqual(report, original)
         self.assertEqual(compact["commands"], report["commands"])
         self.assertEqual(compact["methodology"], report["methodology"])
         self.assertNotIn("commands", compact["provenance"]["system_cpu"])
+        self.assertNotIn("trace_jsonl", compact["provenance"]["system_cpu"])
+        self.assertNotIn("preflight_attempts", compact["provenance"]["system_cpu"])
+        self.assertEqual(
+            compact["provenance"]["system_cpu"]["excluded_attempts"],
+            [{"passed": False}],
+        )
         self.assertEqual(
             compact["provenance"]["system_cpu"]["coverage"],
             report["provenance"]["system_cpu"]["coverage"],

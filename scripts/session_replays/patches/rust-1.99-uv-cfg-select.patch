@@ -1,0 +1,426 @@
+diff --git a/crates/uv-cache-info/src/cache_info.rs b/crates/uv-cache-info/src/cache_info.rs
+index ad2bd5a33..360c5055d 100644
+--- a/crates/uv-cache-info/src/cache_info.rs
++++ b/crates/uv-cache-info/src/cache_info.rs
+@@ -171,17 +171,15 @@ impl CacheInfo {
+                         cfg_select! {
+                             unix => {
+                                 use std::os::unix::fs::MetadataExt;
+-                                directories.insert(
+-                                    dir,
+-                                    Some(DirectoryTimestamp::Inode(metadata.ino())),
+-                                );
+-                            },
++                                directories
++                                    .insert(dir, Some(DirectoryTimestamp::Inode(metadata.ino())));
++                            }
+                             _ => {
+                                 warn!(
+                                     "Failed to read creation time for directory: `{}`",
+                                     path.display()
+                                 );
+-                            },
++                            }
+                         }
+                     }
+                 }
+diff --git a/crates/uv-cache-info/src/timestamp.rs b/crates/uv-cache-info/src/timestamp.rs
+index 0428281c1..5827d01f3 100644
+--- a/crates/uv-cache-info/src/timestamp.rs
++++ b/crates/uv-cache-info/src/timestamp.rs
+@@ -31,11 +31,11 @@ impl Timestamp {
+                     .expect("ctime_nsec to be representable as u32");
+                 let duration = std::time::Duration::new(ctime, ctime_nsec);
+                 Self(std::time::UNIX_EPOCH + duration)
+-            },
++            }
+             _ => {
+                 let modified = metadata.modified().expect("modified time to be available");
+                 Self(modified)
+-            },
++            }
+         }
+     }
+ 
+diff --git a/crates/uv-cache/src/removal.rs b/crates/uv-cache/src/removal.rs
+index 23a055f7b..76e974c15 100644
+--- a/crates/uv-cache/src/removal.rs
++++ b/crates/uv-cache/src/removal.rs
+@@ -134,10 +134,10 @@ impl Removal {
+                         } else {
+                             remove_file(&path)?;
+                         }
+-                    },
++                    }
+                     _ => {
+                         remove_file(&path)?;
+-                    },
++                    }
+                 }
+             } else {
+                 remove_file(&path)?;
+diff --git a/crates/uv-dirs/src/lib.rs b/crates/uv-dirs/src/lib.rs
+index 12ac1e070..ddfab90e1 100644
+--- a/crates/uv-dirs/src/lib.rs
++++ b/crates/uv-dirs/src/lib.rs
+@@ -162,11 +162,9 @@ fn locate_system_config_windows(system_drive: impl AsRef<Path>) -> Option<PathBu
+ /// On Windows, uses `%SYSTEMDRIVE%\ProgramData\uv\uv.toml`.
+ pub fn system_config_file() -> Option<PathBuf> {
+     cfg_select! {
+-        windows => {
+-            env::var(EnvVars::SYSTEMDRIVE)
+-                .ok()
+-                .and_then(|system_drive| locate_system_config_windows(format!("{system_drive}\\")))
+-        },
++        windows => env::var(EnvVars::SYSTEMDRIVE)
++            .ok()
++            .and_then(|system_drive| locate_system_config_windows(format!("{system_drive}\\"))),
+         _ => {
+             if let Some(path) =
+                 locate_system_config_xdg(env::var(EnvVars::XDG_CONFIG_DIRS).ok().as_deref())
+@@ -185,7 +183,7 @@ pub fn system_config_file() -> Option<PathBuf> {
+                     None
+                 }
+             }
+-        },
++        }
+     }
+ }
+ 
+diff --git a/crates/uv-fs/src/lib.rs b/crates/uv-fs/src/lib.rs
+index 3c6e0ed62..6e3be0eb8 100644
+--- a/crates/uv-fs/src/lib.rs
++++ b/crates/uv-fs/src/lib.rs
+@@ -355,10 +355,10 @@ pub fn symlink_or_copy_file(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std
+     cfg_select! {
+         windows => {
+             fs_err::copy(src.as_ref(), dst.as_ref())?;
+-        },
++        }
+         unix => {
+             fs_err::os::unix::fs::symlink(src.as_ref(), dst.as_ref())?;
+-        },
++        }
+     }
+ 
+     Ok(())
+diff --git a/crates/uv-pep508/src/verbatim_url.rs b/crates/uv-pep508/src/verbatim_url.rs
+index 01710bbf9..783c1e035 100644
+--- a/crates/uv-pep508/src/verbatim_url.rs
++++ b/crates/uv-pep508/src/verbatim_url.rs
+@@ -427,12 +427,10 @@ impl Pep508Url for VerbatimUrl {
+                                 .with_url_fragment(fragment)
+                                 .with_given(url)
+                                 .with_expanded(vars_expanded))
+-                        },
+-                        _ => {
+-                            Ok(Self::parse_url(expanded)?
+-                                .with_given(url)
+-                                .with_expanded(vars_expanded))
+-                        },
++                        }
++                        _ => Ok(Self::parse_url(expanded)?
++                            .with_given(url)
++                            .with_expanded(vars_expanded)),
+                     }
+                 }
+ 
+@@ -445,13 +443,12 @@ impl Pep508Url for VerbatimUrl {
+                 // Ex) `C:\Users\ferris\wheel-0.42.0.tar.gz`
+                 _ => {
+                     cfg_select! {
+-                        feature = "non-pep508-extensions" => {
+-                            Ok(
+-                                Self::from_path_with_fragment(expanded.as_ref(), working_dir)?
+-                                    .with_given(url)
+-                                    .with_expanded(vars_expanded),
+-                            )
+-                        },
++                        feature = "non-pep508-extensions" => Ok(Self::from_path_with_fragment(
++                            expanded.as_ref(),
++                            working_dir,
++                        )?
++                        .with_given(url)
++                        .with_expanded(vars_expanded)),
+                         _ => Err(Self::Err::NotAUrl(expanded.to_string())),
+                     }
+                 }
+@@ -459,13 +456,12 @@ impl Pep508Url for VerbatimUrl {
+         } else {
+             // Ex) `../editable/`
+             cfg_select! {
+-                feature = "non-pep508-extensions" => {
+-                    Ok(
+-                        Self::from_path_with_fragment(expanded.as_ref(), working_dir)?
+-                            .with_given(url)
+-                            .with_expanded(vars_expanded),
+-                    )
+-                },
++                feature = "non-pep508-extensions" => Ok(Self::from_path_with_fragment(
++                    expanded.as_ref(),
++                    working_dir,
++                )?
++                .with_given(url)
++                .with_expanded(vars_expanded)),
+                 _ => Err(Self::Err::NotAUrl(expanded.to_string())),
+             }
+         }
+diff --git a/crates/uv-platform/src/host.rs b/crates/uv-platform/src/host.rs
+index e32923eac..b776b35c4 100644
+--- a/crates/uv-platform/src/host.rs
++++ b/crates/uv-platform/src/host.rs
+@@ -25,7 +25,7 @@ impl OsType {
+                 let uname = rustix::system::uname();
+                 let os_type = uname.sysname().to_str().ok()?;
+                 Some(Self::Linux(os_type.to_string()))
+-            },
++            }
+             target_os = "macos" => Some(Self::Darwin),
+             target_os = "windows" => Some(Self::Windows),
+             _ => None,
+@@ -67,7 +67,7 @@ impl OsRelease {
+                 let uname = rustix::system::uname();
+                 let release = uname.release().to_str().ok()?;
+                 Some(Self::Unix(release.to_string()))
+-            },
++            }
+             windows => {
+                 let os_version = windows_version::OsVersion::current();
+                 Some(Self::Windows {
+@@ -76,7 +76,7 @@ impl OsRelease {
+                     build: os_version.build,
+                     revision: windows_version::revision(),
+                 })
+-            },
++            }
+             _ => None,
+         }
+     }
+@@ -120,7 +120,7 @@ impl LinuxOsRelease {
+                     .or_else(|_| fs_err::read_to_string("/usr/lib/os-release"))
+                     .ok()?;
+                 Some(content.parse().unwrap())
+-            },
++            }
+             _ => None,
+         }
+     }
+@@ -228,10 +228,16 @@ VERSION_ID=40
+         let os_type =
+             OsType::from_env().expect("OsType should be available on supported platforms");
+         cfg_select! {
+-            target_os = "linux" => { assert!(matches!(os_type, OsType::Linux(_))); },
+-            target_os = "macos" => { assert_eq!(os_type, OsType::Darwin); },
+-            target_os = "windows" => { assert_eq!(os_type, OsType::Windows); },
+-            _ => {},
++            target_os = "linux" => {
++                assert!(matches!(os_type, OsType::Linux(_)));
++            }
++            target_os = "macos" => {
++                assert_eq!(os_type, OsType::Darwin);
++            }
++            target_os = "windows" => {
++                assert_eq!(os_type, OsType::Windows);
++            }
++            _ => {}
+         }
+     }
+ 
+@@ -240,9 +246,13 @@ VERSION_ID=40
+         let os_release =
+             OsRelease::from_env().expect("OsRelease should be available on supported platforms");
+         cfg_select! {
+-            unix => { assert!(matches!(os_release, OsRelease::Unix(_))); },
+-            windows => { assert!(matches!(os_release, OsRelease::Windows { .. })); },
+-            _ => {},
++            unix => {
++                assert!(matches!(os_release, OsRelease::Unix(_)));
++            }
++            windows => {
++                assert!(matches!(os_release, OsRelease::Windows { .. }));
++            }
++            _ => {}
+         }
+     }
+ }
+diff --git a/crates/uv-python/src/managed.rs b/crates/uv-python/src/managed.rs
+index 38d2a9432..afe664f78 100644
+--- a/crates/uv-python/src/managed.rs
++++ b/crates/uv-python/src/managed.rs
+@@ -836,7 +836,7 @@ impl PythonMinorVersionLink {
+                     .symlink_metadata()
+                     .is_ok_and(|metadata| metadata.file_type().is_symlink())
+                     && points_to_target()
+-            },
++            }
+             windows => {
+                 self.symlink_directory
+                     .symlink_metadata()
+@@ -846,7 +846,7 @@ impl PythonMinorVersionLink {
+                         (metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT.0) != 0
+                     })
+                     && points_to_target()
+-            },
++            }
+         }
+     }
+ }
+diff --git a/crates/uv-tool/src/tool.rs b/crates/uv-tool/src/tool.rs
+index 951f40535..685feb5fa 100644
+--- a/crates/uv-tool/src/tool.rs
++++ b/crates/uv-tool/src/tool.rs
+@@ -129,7 +129,7 @@ impl Display for ToolEntrypoint {
+                         .to_string()
+                         .replace('/', "\\")
+                 )
+-            },
++            }
+             unix => {
+                 write!(
+                     f,
+@@ -137,7 +137,7 @@ impl Display for ToolEntrypoint {
+                     self.name,
+                     self.install_path.simplified_display()
+                 )
+-            },
++            }
+         }
+     }
+ }
+diff --git a/crates/uv/src/bin/uvw.rs b/crates/uv/src/bin/uvw.rs
+index cd36c0afe..4d8638f9a 100644
+--- a/crates/uv/src/bin/uvw.rs
++++ b/crates/uv/src/bin/uvw.rs
+@@ -11,7 +11,7 @@ fn exec_spawn(cmd: &mut Command) -> std::io::Result<Infallible> {
+             use std::os::unix::process::CommandExt;
+             let err = cmd.exec();
+             Err(err)
+-        },
++        }
+         windows => uv_windows::spawn_child(cmd, true),
+     }
+ }
+diff --git a/crates/uv/src/bin/uvx.rs b/crates/uv/src/bin/uvx.rs
+index 074817b3f..6dd6243f6 100644
+--- a/crates/uv/src/bin/uvx.rs
++++ b/crates/uv/src/bin/uvx.rs
+@@ -12,7 +12,7 @@ fn exec_spawn(cmd: &mut Command) -> std::io::Result<Infallible> {
+             use std::os::unix::process::CommandExt;
+             let err = cmd.exec();
+             Err(err)
+-        },
++        }
+         windows => uv_windows::spawn_child(cmd, false),
+     }
+ }
+diff --git a/crates/uv/src/commands/project/run.rs b/crates/uv/src/commands/project/run.rs
+index 046ddb64c..9c4a39326 100644
+--- a/crates/uv/src/commands/project/run.rs
++++ b/crates/uv/src/commands/project/run.rs
+@@ -1779,12 +1779,12 @@ impl RunCommand {
+                 cfg_select! {
+                     unix => {
+                         process.arg(OsString::from_vec(script.clone()));
+-                    },
++                    }
+                     _ => {
+                         let script =
+                             String::from_utf8(script.clone()).expect("script is valid UTF-8");
+                         process.arg(script);
+-                    },
++                    }
+                 }
+                 process.args(args);
+ 
+@@ -1810,12 +1810,12 @@ impl RunCommand {
+                 cfg_select! {
+                     unix => {
+                         process.arg(OsString::from_vec(script.clone()));
+-                    },
++                    }
+                     _ => {
+                         let script =
+                             String::from_utf8(script.clone()).expect("script is valid UTF-8");
+                         process.arg(script);
+-                    },
++                    }
+                 }
+                 process.args(args);
+ 
+diff --git a/crates/uv/tests/python/venv.rs b/crates/uv/tests/python/venv.rs
+index 37148b7c0..9b1879688 100644
+--- a/crates/uv/tests/python/venv.rs
++++ b/crates/uv/tests/python/venv.rs
+@@ -566,7 +566,7 @@ fn create_centralized_project_environment_link_failure() -> Result<()> {
+             warning: Failed to write the environment path: failed to rename file from [TEMP_DIR]/[TMP] to [VENV]/: Is a directory (os error 21)
+             Activate with: source [CACHE_DIR]/environments-v2/project-cp3.12.[X]-[HASH]/[BIN]/activate
+             "#);
+-        },
++        }
+         windows => {
+             uv_snapshot!(context.filters(), command, @r#"
+             exit_code: 0 (success)
+@@ -576,7 +576,7 @@ fn create_centralized_project_environment_link_failure() -> Result<()> {
+             warning: Failed to create link to project environment: failed to remove directory `[VENV]/`: The directory is not empty. (os error 145)
+             Activate with: source [CACHE_DIR]/environments-v2/project-cp3.12.[X]-[HASH]/[BIN]/activate
+             "#);
+-        },
++        }
+     }
+ 
+     assert!(environment.child("keep").is_file());
+@@ -1402,7 +1402,9 @@ fn non_utf8_path() {
+     let context = uv_test::test_context_with_versions!(&["3.12"]);
+     let path = PathBuf::from(cfg_select! {
+         unix => OsStr::from_bytes(b".venv-\xff"),
+-        windows => OsString::from_wide(&[0x002e, 0x0076, 0x0065, 0x006e, 0x0076, 0x002d, 0xd800]),
++        windows => {
++            OsString::from_wide(&[0x002e, 0x0076, 0x0065, 0x006e, 0x0076, 0x002d, 0xd800])
++        }
+     });
+ 
+     uv_snapshot!(context.filters(), context.venv()
+diff --git a/crates/uv/tests/sync/centralized_project_envs.rs b/crates/uv/tests/sync/centralized_project_envs.rs
+index 30890b654..a39688955 100644
+--- a/crates/uv/tests/sync/centralized_project_envs.rs
++++ b/crates/uv/tests/sync/centralized_project_envs.rs
+@@ -717,7 +717,7 @@ fn run_and_sync_link_failure_reporting() -> Result<()> {
+             Resolved 2 packages in [TIME]
+             Checked 1 package in [TIME]
+             "#);
+-        },
++        }
+         windows => {
+             uv_snapshot!(context.filters(), command, @r#"
+             exit_code: 0 (success)
+@@ -726,7 +726,7 @@ fn run_and_sync_link_failure_reporting() -> Result<()> {
+             Resolved 2 packages in [TIME]
+             Checked 1 package in [TIME]
+             "#);
+-        },
++        }
+     }
+ 
+     assert!(environment.child("keep").is_file());
+diff --git a/crates/uv/tests/tool/tool_install.rs b/crates/uv/tests/tool/tool_install.rs
+index 703fd7032..cc52aa277 100644
+--- a/crates/uv/tests/tool/tool_install.rs
++++ b/crates/uv/tests/tool/tool_install.rs
+@@ -5944,7 +5944,7 @@ fn tool_install_removed_python() {
+             fs_err::remove_file(&tool_python).unwrap();
+             fs_err::os::unix::fs::symlink(context.temp_dir.join("missing-python"), &tool_python)
+                 .unwrap();
+-        },
++        }
+         windows => {
+             let pyvenv_cfg = tool_root.child("pyvenv.cfg");
+             let broken_home = context.temp_dir.join("missing-python");
+@@ -5961,7 +5961,7 @@ fn tool_install_removed_python() {
+                 .collect::<Vec<_>>()
+                 .join("\n");
+             fs_err::write(&pyvenv_cfg, format!("{contents}\n")).unwrap();
+-        },
++        }
+     }
+ 
+     // Reinstalling should skip the broken Python install.

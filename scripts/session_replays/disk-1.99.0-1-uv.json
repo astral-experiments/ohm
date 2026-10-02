@@ -1,0 +1,266 @@
+{
+  "base_revision": "e209ff09704b64d3ccd178ac658708c4b2f12e7c",
+  "environment": {},
+  "fetch_refs": ["refs/heads/charlie/simple-api-json-parser"],
+  "project": "uv",
+  "repository": "https://github.com/astral-sh/uv.git",
+  "session": {
+    "description": "Implement a dedicated PyPI Simple API JSON parser, rerun focused parser and registry-client tests, then simplify the parser and its compatibility tests. Apply the same versioned runtime binary-path setup fix to the baseline and first-edit donor for both compilers; preserve every original parser change.",
+    "id": "uv-pypi-simple-json-parser"
+  },
+  "setup_preparation": {
+    "original_base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+    "original_first_edit_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+    "setup_patch": {
+      "label": "Resolve integration-test binary paths at runtime",
+      "patch": "patches/uv-runtime-bin-path.patch",
+      "paths": ["crates/uv-test/src/lib.rs"],
+      "sha256": "372ac74870cef2d9dd6080f4c2c5ce73c348edeaba34467dcd0690f335bc4343"
+    }
+  },
+  "source_hint": "uv",
+  "steps": [
+    {
+      "commit": "2130555e2efaa3c93d8b9fb37147371d95f6a608",
+      "kind": "edit",
+      "label": "Implement the dedicated PyPI Simple API JSON parser",
+      "parent": "e209ff09704b64d3ccd178ac658708c4b2f12e7c"
+    },
+    {
+      "args": ["test", "-p", "uv-pypi-types", "simple_json::", "--locked"],
+      "kind": "command",
+      "label": "Run focused Simple API parser tests",
+      "program": "cargo"
+    },
+    {
+      "args": ["test", "-p", "uv-pypi-types", "--locked"],
+      "kind": "command",
+      "label": "Run all PyPI types tests",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "test",
+        "-p",
+        "uv-client",
+        "project_status_pypi_json",
+        "--locked"
+      ],
+      "kind": "command",
+      "label": "Run registry project-status regression",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "clippy",
+        "-p",
+        "uv-pypi-types",
+        "-p",
+        "uv-client",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings",
+        "-A",
+        "clippy::doc_markdown",
+        "-A",
+        "clippy::double_must_use"
+      ],
+      "kind": "command",
+      "label": "Check parser and registry-client Clippy warnings",
+      "program": "cargo"
+    },
+    {
+      "args": ["fmt", "--all", "--", "--check"],
+      "kind": "command",
+      "label": "Check workspace formatting",
+      "program": "cargo"
+    },
+    {
+      "kind": "edit",
+      "label": "Simplify the direct parser and document its invariants",
+      "patch": "patches/uv-simple-parser-implementation.patch"
+    },
+    {
+      "args": ["test", "-p", "uv-pypi-types", "simple_json::", "--locked"],
+      "kind": "command",
+      "label": "Rerun focused Simple API parser tests",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "clippy",
+        "-p",
+        "uv-pypi-types",
+        "-p",
+        "uv-client",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings",
+        "-A",
+        "clippy::doc_markdown",
+        "-A",
+        "clippy::double_must_use"
+      ],
+      "kind": "command",
+      "label": "Rerun parser and registry-client Clippy",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "test",
+        "-p",
+        "uv-client",
+        "registry_client::tests::",
+        "--locked"
+      ],
+      "kind": "command",
+      "label": "Run registry-client unit tests",
+      "program": "cargo"
+    },
+    {
+      "args": ["fmt", "--all", "--", "--check"],
+      "kind": "command",
+      "label": "Recheck workspace formatting",
+      "program": "cargo"
+    },
+    {
+      "kind": "edit",
+      "label": "Simplify redundant Simple API JSON compatibility tests",
+      "patch": "patches/uv-simple-parser-tests.patch"
+    },
+    {
+      "args": ["test", "-p", "uv-pypi-types", "--locked"],
+      "kind": "command",
+      "label": "Rerun all PyPI types tests",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "clippy",
+        "-p",
+        "uv-pypi-types",
+        "-p",
+        "uv-client",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings",
+        "-A",
+        "clippy::doc_markdown",
+        "-A",
+        "clippy::double_must_use"
+      ],
+      "kind": "command",
+      "label": "Recheck parser and registry-client Clippy",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "pip_install",
+        "pip_install::registry_wheel_size_is_advisory",
+        "--locked",
+        "--",
+        "--exact"
+      ],
+      "kind": "command",
+      "label": "Run local-mock-index installation integration test",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "test",
+        "-p",
+        "uv-client",
+        "registry_client::tests::",
+        "--locked"
+      ],
+      "kind": "command",
+      "label": "Rerun registry-client unit tests",
+      "program": "cargo"
+    },
+    {
+      "args": ["fmt", "--all", "--", "--check"],
+      "kind": "command",
+      "label": "Perform final workspace formatting check",
+      "program": "cargo"
+    }
+  ],
+  "warmup": [
+    {
+      "args": ["test", "-p", "uv-pypi-types", "simple_json::", "--locked"],
+      "kind": "command",
+      "label": "Warm existing Simple API JSON tests",
+      "program": "cargo"
+    },
+    {
+      "args": ["test", "-p", "uv-pypi-types", "--locked"],
+      "kind": "command",
+      "label": "Warm the complete PyPI types test harness",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "test",
+        "-p",
+        "uv-client",
+        "registry_client::tests::",
+        "--locked"
+      ],
+      "kind": "command",
+      "label": "Warm existing registry-client unit tests",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "clippy",
+        "-p",
+        "uv-pypi-types",
+        "-p",
+        "uv-client",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings",
+        "-A",
+        "clippy::doc_markdown",
+        "-A",
+        "clippy::double_must_use"
+      ],
+      "kind": "command",
+      "label": "Warm parser and registry-client Clippy artifacts",
+      "program": "cargo"
+    },
+    {
+      "args": [
+        "test",
+        "-p",
+        "uv",
+        "--test",
+        "pip_install",
+        "pip_install::registry_wheel_size_is_advisory",
+        "--locked",
+        "--",
+        "--exact"
+      ],
+      "kind": "command",
+      "label": "Warm the existing local-mock installation integration harness",
+      "program": "cargo"
+    },
+    {
+      "args": ["fmt", "--all", "--", "--check"],
+      "kind": "command",
+      "label": "Warm workspace formatting",
+      "program": "cargo"
+    }
+  ]
+}
