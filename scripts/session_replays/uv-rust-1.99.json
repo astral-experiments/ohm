@@ -252,5 +252,29 @@
       "program": "cargo",
       "args": ["fmt", "--all", "--", "--check"]
     }
+  ],
+  "setup_patches": [
+    {
+      "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+      "patch": "patches/rust-1.99-uv-cfg-select.patch",
+      "sha256": "def4e6311a8eed2a60cf13f7ccd99111754d80891ac713ce5651ccbdd1952b04",
+      "paths": [
+        "crates/uv-cache-info/src/cache_info.rs",
+        "crates/uv-cache-info/src/timestamp.rs",
+        "crates/uv-cache/src/removal.rs",
+        "crates/uv-dirs/src/lib.rs",
+        "crates/uv-fs/src/lib.rs",
+        "crates/uv-pep508/src/verbatim_url.rs",
+        "crates/uv-platform/src/host.rs",
+        "crates/uv-python/src/managed.rs",
+        "crates/uv-tool/src/tool.rs",
+        "crates/uv/src/bin/uvw.rs",
+        "crates/uv/src/bin/uvx.rs",
+        "crates/uv/src/commands/project/run.rs",
+        "crates/uv/tests/python/venv.rs",
+        "crates/uv/tests/sync/centralized_project_envs.rs",
+        "crates/uv/tests/tool/tool_install.rs"
+      ]
+    }
   ]
 }
