@@ -211,20 +211,21 @@ class FixtureValidationTests(ReplayTestCase):
             descriptor["paths"],
         )
 
-    def test_historical_ruff_results_match_the_rust_1_98_fixture(self) -> None:
-        fixture = SCRIPTS / "session_replays" / "ruff-historical-rust-1.98.json"
-        published_fixture = SCRIPTS / "session_replays" / "ruff-historical.json"
+    def test_historical_ruff_results_match_the_rust_1_99_fixture(self) -> None:
+        fixture = SCRIPTS / "session_replays" / "ruff-historical-rust-1.99.json"
         scenario = replay.load_scenario(fixture)
         baseline = latest_reports()["historical"]
 
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
-            baseline["provenance"]["published_fixture_sha256"],
-            hashlib.sha256(published_fixture.read_bytes()).hexdigest(),
+            baseline["provenance"]["fixtures"]["ruff"]["fixture_sha256"],
+            hashlib.sha256(fixture.read_bytes()).hexdigest(),
         )
         self.assertEqual(
-            baseline["provenance"]["effective_fixture_sha256"]["ruff"],
+            baseline["provenance"]["wrapper"]["fixtures"][
+                str(fixture.relative_to(SCRIPTS.parent))
+            ],
             hashlib.sha256(fixture.read_bytes()).hexdigest(),
         )
         commands = baseline["commands"]["ruff"]
@@ -239,20 +240,21 @@ class FixtureValidationTests(ReplayTestCase):
             self.assertEqual(command["command"], [step["program"], *step["args"]])
 
     def test_current_ruff_results_match_the_fixture(self) -> None:
-        fixture = SCRIPTS / "session_replays" / "ruff-rust-1.98.json"
-        published_fixture = SCRIPTS / "session_replays" / "ruff.json"
+        fixture = SCRIPTS / "session_replays" / "ruff-rust-1.99.json"
         scenario = replay.load_scenario(fixture)
         baseline = latest_reports()["sessions"]
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(
-            baseline["provenance"]["canonical_fixture_sha256"]["ruff"],
-            hashlib.sha256(published_fixture.read_bytes()).hexdigest(),
-        )
-        self.assertEqual(
-            baseline["provenance"]["effective_fixture_sha256"]["ruff"],
+            baseline["provenance"]["fixtures"]["ruff"]["fixture_sha256"],
             hashlib.sha256(fixture.read_bytes()).hexdigest(),
         )
-        self.assertEqual(baseline["sessions"][0]["session_id"], scenario.session["id"])
+        self.assertEqual(
+            baseline["provenance"]["wrapper"]["fixtures"][
+                str(fixture.relative_to(SCRIPTS.parent))
+            ],
+            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(baseline["sessions"][0]["session"], scenario.session)
         self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
         self.assertEqual(baseline["methodology"]["external_compilations_observed"], 0)
         commands = baseline["commands"]["ruff"]

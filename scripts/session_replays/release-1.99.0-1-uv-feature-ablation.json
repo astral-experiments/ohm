@@ -1,0 +1,399 @@
+{
+  "rust_version": "1.99.0",
+  "ohm_release": "ohm-1.99.0-1",
+  "jobs": 8,
+  "host": {
+    "platform": "linux-x86_64",
+    "id": "linux-study-1",
+    "logical_cpus": 16,
+    "cpu_model": "AMD EPYC-Milan Processor"
+  },
+  "provenance": {
+    "runner_sha256": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f",
+    "wrapper": {
+      "kind": "ablation",
+      "arguments": [
+        "--upstream",
+        "1.99.0",
+        "--ohm",
+        "ohm-1.99.0-1",
+        "--jobs",
+        "8",
+        "--minimum-free-gb",
+        "60",
+        "--require-idle",
+        "--output-dir",
+        "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-1/ablation",
+        "--repetitions",
+        "2",
+        "--offline",
+        "--project",
+        "uv",
+        "--feature-matrix",
+        "--scenario",
+        "/home/dev-user/code/oss/ohm-1.99-bench/scripts/session_replays/uv-feature-ablation.json",
+        "--source-path",
+        "uv=/home/dev-user/code/oss/ohm-1.99-bench-data/sources/uv"
+      ],
+      "started_at": 1790918886.4296067,
+      "wrapper_sha256": "7079c6c86081f67c6b2d1ee455154fb8f31a9b7f208798f6452927f52ab1c05f",
+      "runner_sha256": {
+        "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+        "replay_sessions.py": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+      },
+      "path": "/home/dev-user/code/oss/ohm-1.99-bench-tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/code/oss/ohm-1.99-bench-tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/.openai/bin:/home/dev-user/.virtualenvs/openai/bin:/home/dev-user/.cargo/bin:/home/dev-user/code/openai/project/dotslash-gen/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+      "tmpdir": "/tmp/ohm99",
+      "git_maintenance": {
+        "maintenance.auto": false,
+        "gc.auto": 0,
+        "scope": "benchmark process environment only"
+      },
+      "coordinator_commit": "6efdd59ea2f58a39a7e9c9f9f6385222d3046025",
+      "manifest_sha256": "4656f7d64c511273f6cb72ddbca6417504a699bc4b70c0a71dda4ba13c2dd5c1",
+      "fixtures": {
+        "scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+      }
+    },
+    "toolchains": {
+      "1.99.0": {
+        "cargo": {
+          "version": "cargo 1.99.0 (5f94df478 2026-08-27)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+        },
+        "rustc": {
+          "version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.99 (b940084d7e 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.10.0-stable (b940084d7e 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustfmt",
+          "sha256": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3"
+        }
+      },
+      "ohm-1.99.0-1": {
+        "cargo": {
+          "version": "cargo 1.99.0-dev (018a2b934 2026-10-01) (ohm-1.99.0-1)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-1/bin/cargo",
+          "sha256": "1927ee1f8a5cec4f7d7335bc51336ac274fdaee496600d392dce9a267ff6461d"
+        },
+        "rustc": {
+          "version": "rustc 1.99.0-dev (348339dda 2026-10-01) (ohm-1.99.0-1)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-1/bin/rustc",
+          "sha256": "b6b19fee2a00fd842b7c97876afec154e2c4eac985f315b0294de9780fd10452"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.99 (f52143702f 2026-10-01)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-1/bin/clippy-driver",
+          "sha256": "df5870c93f49be5ee9ff31f87fa97a03e7ccd13c8b4b39d168c3c588f62a0647"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.10.0-dev (a21f2ab199 2026-10-01)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-1/bin/rustfmt",
+          "sha256": "c408e41fa20a89c7390ecd500f4bf8c83e876ce7ba5cd1c925f8c3cb0c343c02"
+        }
+      }
+    },
+    "helpers": {
+      "just": {
+        "url": "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz",
+        "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
+        "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
+        "version": "just 1.58.0"
+      },
+      "cargo-nextest": {
+        "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
+        "archive_sha256": "4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3",
+        "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu"
+      },
+      "uv": {
+        "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
+        "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
+        "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
+        "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)"
+      }
+    },
+    "python": {
+      "path": "/home/dev-user/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+      "version": "Python 3.12.13"
+    },
+    "system_cpu": {
+      "proof": {
+        "passed": true,
+        "violations": [],
+        "samples": 272,
+        "returncode": 0,
+        "monitor_sha256": "8c7a789ef9f84181e1e0e665279830193d0ac26fc4643594f6ed482f8dcb8210",
+        "trace_sha256": "5fecb25b8ba4d266fc55195c1285bc2856989607ed7108dfdec151c65b98b2ab"
+      },
+      "preflight_sha256": "ebc0d0b9269c21528941b7447e8594e0ee37e04a3d3ee91148e4166954d85da4",
+      "peak_external_user_cpu_fraction": 0.008686769699426207,
+      "peak_external_nonsecurity_cpu_fraction": 0.04478017782617223
+    },
+    "raw_results_sha256": "265a311e423d13c517c445666dcdffd3dde2af6679c384fefaa846189143933e",
+    "fixtures": {
+      "uv": {
+        "tree": "804dbe4e0f16cfa3f1d4bbadd3e85798b57659bd",
+        "head": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+        "diff_sha256": "200588537e40d24f556d3014122649837b13aa8a5be4e4266ad8105ff015a7f9",
+        "fixture_sha256": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+      }
+    },
+    "unmeasured_setup_recovery": {
+      "reason": "A benchmark-setup Git subprocess ran outside the timed runner process group during the first historical warmup; no historical samples completed.",
+      "completed_results_sha256": {
+        "workflow": "acf701a58fb4bc2b80c9c9363b3cb13794ffa49403210b4a52978adc6e84a9d6",
+        "sessions": "77ae8cc6874f848dc8c592a15a44ef83b996aacbbe357c63957592fda1d93a06"
+      },
+      "original_historical_results_sha256": "e12edc4504ab0003a1b2002680cece2afaf3e4f8a5c8e7e7484d61fb4a1a4595",
+      "backup_files_sha256": {
+        "historical-run.log": "d1b884ed12fae819125003bdce9d7184ae58312bd4e797c269679dc260566295",
+        "historical-preflight.json": "01b3651ebe7de816ee1c96585f73ecab1ce05aa3e8103b01b7b2fa7dd793a309",
+        "historical-resume1-preflight-attempt-1.json": "f248147ff222126e4f34ff0f88608dc7babd0c4d4ad5851bc0c81cdbc76293cd",
+        "benchmark-status.json": "391383063457c739fc110a54470d1f62ab50f01819d69f5ab943dd4ba0b50470",
+        "historical-resume1-preflight-attempt-2.json": "505f92572a622bda43827eee84865826c14db50e51d806a57fb229eb0190fd30",
+        "historical-monitor.json": "0a02045d875ad50a992a840e52e4eb115a67f7365e99049278d683315e6594b2",
+        "historical-resume1-preflight-attempt-3.json": "01b3651ebe7de816ee1c96585f73ecab1ce05aa3e8103b01b7b2fa7dd793a309",
+        "results.json": "e12edc4504ab0003a1b2002680cece2afaf3e4f8a5c8e7e7484d61fb4a1a4595",
+        "historical-monitor.jsonl": "436ce81f7fe3264584226b81c0d71dbab7aa1420a05408f4841320fc31ac9b75",
+        "historical-plan.json": "6f12bece6806d554d52656d64955c9a5ec081deda84eb8bfca1bd0b464e49568"
+      },
+      "git_activity": {
+        "pid": 2233443,
+        "parent": 2233400,
+        "name": "git",
+        "ticks": 567,
+        "start": "62164281",
+        "state": "R",
+        "group": 2233399,
+        "session": 2233399,
+        "uid": 1000,
+        "cgroup": "0::/system.slice/devbox-agent-exec-93a19d2b-0e1f-4a82-83bd-c503402671d3.service",
+        "cpu_ticks": 372
+      },
+      "git_maintenance": {
+        "maintenance.auto": false,
+        "gc.auto": 0,
+        "scope": "benchmark process environment only"
+      },
+      "runner_wrapper_sha256": "7079c6c86081f67c6b2d1ee455154fb8f31a9b7f208798f6452927f52ab1c05f",
+      "host_guard_sha256": "8c7a789ef9f84181e1e0e665279830193d0ac26fc4643594f6ed482f8dcb8210"
+    },
+    "final_exporter_sha256": "c8bc4fd00f6ba8e68bf447ea3b80bdd1d046456f427d4f6ec3493658ae499260",
+    "source_diff_audit": {
+      "format": "git diff --binary --full-index",
+      "auditor_sha256": "796dc8030873d087369889bc7fa40ba313bd7478b826788fe800d828b14664e5",
+      "matching_fields": ["head", "tree", "diff_sha256"]
+    }
+  },
+  "completed_at": "2026-10-02T05:41:28.945282+00:00",
+  "repetitions": 2,
+  "sessions": [
+    {
+      "project": "uv",
+      "session": {
+        "id": "uv-pypi-simple-json-parser-feature-ablation",
+        "description": "Replay one real, private-only PyPI Simple API parser simplification and separately measure downstream check cutoff and focused derive-heavy parser tests."
+      },
+      "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+      "commands": 2,
+      "edits": 1,
+      "warmups": 2
+    }
+  ],
+  "commands": {
+    "uv": [
+      {
+        "index": 2,
+        "label": "Recheck downstream registry-client dependencies after the private parser edit",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "uv-client", "--locked"],
+        "wall_seconds": {
+          "ohm-all": [2.145743131986819, 2.166463749948889],
+          "ohm-no-public-api-hash": [4.97972041903995, 4.8736486959969625],
+          "ohm-no-proc-macro-cache": [2.2403309360379353, 2.067174111958593],
+          "ohm-neither": [4.9491614969447255, 5.070725358906202]
+        },
+        "tests_started": {
+          "ohm-all": [0, 0],
+          "ohm-no-public-api-hash": [0, 0],
+          "ohm-no-proc-macro-cache": [0, 0],
+          "ohm-neither": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [8, 8],
+          "ohm-no-public-api-hash": [8, 8],
+          "ohm-no-proc-macro-cache": [8, 8],
+          "ohm-neither": [8, 8]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Retest the directly changed Simple API parser library",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "--lib",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "ohm-all": [1.590999989071861, 1.9178785709664226],
+          "ohm-no-public-api-hash": [1.736831107060425, 2.0802555739646778],
+          "ohm-no-proc-macro-cache": [2.170400692964904, 1.5945065279956907],
+          "ohm-neither": [2.1195822049630806, 2.006654560100287]
+        },
+        "tests_started": {
+          "ohm-all": [9, 9],
+          "ohm-no-public-api-hash": [9, 9],
+          "ohm-no-proc-macro-cache": [9, 9],
+          "ohm-neither": [9, 9]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [1, 1],
+          "ohm-no-public-api-hash": [1, 1],
+          "ohm-no-proc-macro-cache": [1, 1],
+          "ohm-neither": [1, 1]
+        }
+      }
+    ]
+  },
+  "warmups": {
+    "uv": [
+      {
+        "index": 1,
+        "label": "Warm downstream registry-client checking and its existing parser dependency",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "uv-client", "--locked"],
+        "wall_seconds": {
+          "ohm-all": [48.467448665061966, 46.34685714205261],
+          "ohm-no-public-api-hash": [48.411031797062606, 48.46217017795425],
+          "ohm-no-proc-macro-cache": [48.52498213900253, 48.58597622497473],
+          "ohm-neither": [47.068699787021615, 47.130629919003695]
+        },
+        "tests_started": {
+          "ohm-all": [0, 0],
+          "ohm-no-public-api-hash": [0, 0],
+          "ohm-no-proc-macro-cache": [0, 0],
+          "ohm-neither": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [410, 410],
+          "ohm-no-public-api-hash": [410, 410],
+          "ohm-no-proc-macro-cache": [410, 410],
+          "ohm-neither": [410, 410]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Warm focused Simple API parser library tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "--lib",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "ohm-all": [18.93698978109751, 17.5265734649729],
+          "ohm-no-public-api-hash": [18.592850802000612, 17.918340172967874],
+          "ohm-no-proc-macro-cache": [17.817802830017172, 18.604263538960367],
+          "ohm-neither": [17.592837885022163, 18.30793992395047]
+        },
+        "tests_started": {
+          "ohm-all": [9, 9],
+          "ohm-no-public-api-hash": [9, 9],
+          "ohm-no-proc-macro-cache": [9, 9],
+          "ohm-neither": [9, 9]
+        },
+        "cargo_status_message_counts": {
+          "ohm-all": [173, 173],
+          "ohm-no-public-api-hash": [173, 173],
+          "ohm-no-proc-macro-cache": [173, 173],
+          "ohm-neither": [173, 173]
+        }
+      }
+    ]
+  },
+  "timed_session_seconds": {
+    "uv": {
+      "ohm-all": [3.854455973021686, 4.194974223035388],
+      "ohm-no-public-api-hash": [6.932087779045105, 7.07058672606945],
+      "ohm-no-proc-macro-cache": [4.520578466006555, 3.7741437799995765],
+      "ohm-neither": [7.180005753994919, 7.1929233820410445]
+    }
+  },
+  "timed_command_seconds": {
+    "uv": {
+      "ohm-all": [3.73674312105868, 4.084342320915312],
+      "ohm-no-public-api-hash": [6.716551526100375, 6.95390426996164],
+      "ohm-no-proc-macro-cache": [4.410731629002839, 3.661680639954284],
+      "ohm-neither": [7.068743701907806, 7.077379919006489]
+    }
+  },
+  "timed_edit_seconds": {
+    "uv": {
+      "ohm-all": [0.01250633003655821, 0.011611792957410216],
+      "ohm-no-public-api-hash": [0.020404109032824636, 0.011289153015241027],
+      "ohm-no-proc-macro-cache": [0.011877431068569422, 0.012005559983663261],
+      "ohm-neither": [0.011842895997688174, 0.012994108954444528]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "uv": {
+      "ohm-all": [67.40443844615947, 63.87343060702551],
+      "ohm-no-public-api-hash": [67.00388259906322, 66.38051035092212],
+      "ohm-no-proc-macro-cache": [66.3427849690197, 67.1902397639351],
+      "ohm-neither": [64.66153767204378, 65.43856984295417]
+    }
+  },
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "baseline_warmups_excluded": true,
+    "session_totals_include_edits_and_runner_overhead": true,
+    "compiler_accounting": "cargo status messages; not compiler invocations",
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust_enabled": false,
+    "optional_lockfile_parse_cache_enabled": false,
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": true,
+    "test_count_semantics": "Observed test starts, including retries and nested runner output; not unique selected tests.",
+    "cargo_status_messages_prove_compiler_invocations": false
+  },
+  "order": [
+    [
+      "ohm-all",
+      "ohm-no-public-api-hash",
+      "ohm-neither",
+      "ohm-no-proc-macro-cache"
+    ],
+    [
+      "ohm-no-public-api-hash",
+      "ohm-no-proc-macro-cache",
+      "ohm-all",
+      "ohm-neither"
+    ]
+  ],
+  "evidence": {
+    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-evidence-1.99.0-1-fa7078451721/benchmark-evidence-1.99.0-1.zip",
+    "sha256": "fa70784517218f281537b88bc1a87a65c5295c3a5c94bd9b55586fcdc7bba638",
+    "path": "ablation.json",
+    "report_sha256": "51ea935d8ace4be25466a7fa9e93c182a72523188ab9dac36b25b7eb47ba277b"
+  }
+}
