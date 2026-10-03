@@ -12,9 +12,9 @@ The three changes have not been measured together.
 ## Completed measurements
 
 This draft is being assembled while the remaining measurements finish. The
-completed Ruff early-merging comparisons below have been independently checked
-against the individual samples. Final runtime guards, direct compiler-flag
-timings, uv confirmation, and the other two experiments will be added separately.
+completed comparisons below have been independently checked against the raw
+samples. Remaining runtime guards, direct compiler-flag timings, and the ThinLTO
+dependency-cache experiment will be added separately.
 
 | Early fat-LTO merging, Ruff  | Paired elapsed-time change | Pairs |
 | ---------------------------- | -------------------------: | ----: |
@@ -38,6 +38,24 @@ alternatives, rejected artifact-restoration and trace comparisons, compiler and
 source identities, cache-layout checks, and preliminary runtime checks. The
 `raw_*` and log hashes identify the original captured bytes; the compact JSON is
 formatted for this repository and is not a byte-for-byte copy of those captures.
+
+The [generic-sharing draft](https://github.com/astral-sh/ohm-cargo/pull/132) has
+completed fat-LTO builds on three uv hosts and two Ruff pairs. The two completed
+16-CPU uv cohorts, including 30 runtime pairs per workload, are captured in
+[the generic-sharing packet](generics/summary.json). Remaining host packets will
+be added when their bounded runtime and ThinLTO work finishes.
+
+| Generic sharing, uv      | Fresh build | Entrypoint rebuild | Library rebuild |
+| ------------------------ | ----------: | -----------------: | --------------: |
+| 16 CPUs, candidate first |     -19.49% |            -21.22% |         -21.01% |
+| 16 CPUs, control first   |     -18.51% |            -21.50% |         -19.52% |
+
+Each cell is one same-host, same-Cargo, same-compiler pair. Cold executables are
+about 11% smaller. Runtime outputs and diagnostics match; all four paired
+bootstrap intervals include no change. A retained 138 ms candidate outlier makes
+one trio interval wide, so these short runtime samples do not establish a speedup.
+The draft also records Ruff regressions and all three uv hosts; this evidence
+packet is still being assembled.
 
 ## Comparisons
 

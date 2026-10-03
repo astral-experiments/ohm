@@ -32,7 +32,9 @@
       },
       "confirmation_hosts": {
         "uv": ["charlie-openai-2", "charlie-openai-3"]
-      }
+      },
+      "implementation_commit": "cbec67aa6ad824fdb8550d033bfd0aee0787b1b5",
+      "pull_request": "https://github.com/astral-sh/ohm-cargo/pull/132"
     },
     "llvm": {
       "host": "charlie-oss",
@@ -42,7 +44,7 @@
         "uv": "charlie-serc-2"
       },
       "validation_host": "charlie-serc-4",
-      "validation_migration": "The original host picked up unrelated builds before the actual-flag pair started. Remaining direct-flag and Ruff runtime checks move to an idle32CPUhost with the exact compiler and executables; timings are not pooled across hosts."
+      "validation_migration": "The original host picked up unrelated builds before the actual-flag pair started. Remaining direct-flag and Ruff runtime checks move to an idle 32-CPU host with the exact compiler and executables; timings are not pooled across hosts."
     }
   },
   "acceptance": [
