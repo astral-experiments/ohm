@@ -1,0 +1,68 @@
+{
+  "coordinator": {
+    "repo": "astral-sh/ohm",
+    "commit": "a7241802952abf7c827aee2099bb672875f91ed3"
+  },
+  "compiler": {
+    "toolchain": "ohm-1.99.0-1",
+    "rust": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+    "cargo": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+    "linux_archive_sha256": "ed158e6fbd2170cfd29af0dfc38cb0f9be0a23159a61914c9c49e0cd34342f71",
+    "rust_pr_base": "charlie/generic-metadata-order",
+    "cargo_pr_base": "charlie/default-line-tables"
+  },
+  "workloads": {
+    "uv": "46b84fd0bfec23b72f29e8e2185ba68a65052f48",
+    "ruff": "1df6db3e463ffa1b587dcf47f25360d40389b0f7",
+    "cpython_runtime": "0b05ead877f909b7efe712db758012d9dbece7ce"
+  },
+  "lanes": {
+    "thinlto": {
+      "host": "charlie-openai-1",
+      "experiment": "Reuse optimized dependency modules under explicit incremental ThinLTO",
+      "previous_host": "charlie-oss-1",
+      "migration_reason": "The original host picked up unrelated compilation and test execution; preserve affected measurements as excluded and rerun on an idle host with the exact compiler."
+    },
+    "generics": {
+      "host": "charlie-serc-3",
+      "experiment": "Share generic instances with fat and thin LTO",
+      "hosts": {
+        "uv": "charlie-serc-3",
+        "ruff": "charlie-serc-1"
+      },
+      "confirmation_hosts": {
+        "uv": ["charlie-openai-2", "charlie-openai-3"]
+      }
+    },
+    "llvm": {
+      "host": "charlie-oss",
+      "experiment": "Early merged-module cleanup/deduplication under unchanged fat LTO",
+      "hosts": {
+        "ruff": "charlie-oss",
+        "uv": "charlie-serc-2"
+      },
+      "validation_host": "charlie-serc-4",
+      "validation_migration": "The original host picked up unrelated builds before the actual-flag pair started. Remaining direct-flag and Ruff runtime checks move to an idle32CPUhost with the exact compiler and executables; timings are not pooled across hosts."
+    }
+  },
+  "acceptance": [
+    "Keep compiler build configuration identical within each paired comparison",
+    "Separate cold, edit, and no-op latency",
+    "Use default machine concurrency and retain raw sample and interference data",
+    "Measure executable size and paired runtime guard workloads",
+    "Verify exact tested commits before publishing draft PRs",
+    "Do not report exploratory or instrumented attribution runs as final wall-time evidence"
+  ],
+  "kind": "Unreleased release-build optimization experiments",
+  "measurement_policy": {
+    "concurrency": "Default Cargo concurrency on each host: 32 logical CPUs for LLVM and primary generic-sharing lanes; 16 CPUs for the migrated ThinLTO lane and independent uv generic-sharing confirmations. Compare within host; do not pool raw times across hosts.",
+    "isolation": "Separate compiler/cache namespaces; cold builds use empty task-owned target and build directories. Registry downloads are prepared before measurement.",
+    "rebuilds": "Use actual source changes and confirm rustc ran. Cargo no-op or artifact restoration does not count as a compiler rebuild.",
+    "ordering": "Counterbalance candidate and control order. Preserve individual samples, failures, and explicit exclusions.",
+    "compiler": "Hold the compiler binary and bootstrap configuration constant within a pair; separate released-compiler and locally built-compiler results.",
+    "tracing": "Compiler/LLVM profiling and cache-mechanism traces are attribution or correctness evidence, not final wall-time samples.",
+    "runtime": "Measure saved executables with matching workload inputs after compilation ends; compare observable output and report binary size and peak memory.",
+    "publication": "These are draft opt-in experiments, not changes to shipped defaults or the published release benchmark tables.",
+    "independence": "Each change is measured separately; percentage improvements must not be added or multiplied as a combined speedup."
+  }
+}
