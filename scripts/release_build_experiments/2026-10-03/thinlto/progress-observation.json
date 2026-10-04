@@ -1,0 +1,10 @@
+{
+  "started_utc": "2026-10-04T00:16:46.826320+00:00",
+  "finished_utc": "2026-10-04T00:16:47.673649+00:00",
+  "purpose": "Single bounded direct SSH read of existing progress after one hour; no VM exec provisioning probe; accepted samples unchanged",
+  "exit_code": 0,
+  "stdout": "{\"repo\": \"ruff\", \"variant\": \"on\", \"phase\": \"entry-edit\", \"pair\": 1, \"elapsed_s\": 20.23284906090703, \"exit_code\": 0}\n{\"repo\": \"ruff\", \"variant\": \"on\", \"phase\": \"entry-edit\", \"pair\": 2, \"elapsed_s\": 20.443846600945108, \"exit_code\": 0}\n{\"repo\": \"ruff\", \"variant\": \"off\", \"phase\": \"entry-edit\", \"pair\": 2, \"elapsed_s\": 21.133005437091924, \"exit_code\": 0}\n{\"repo\": \"ruff\", \"variant\": \"off\", \"phase\": \"entry-edit\", \"pair\": 3, \"elapsed_s\": 21.06662996893283, \"exit_code\": 0}\n{\"repo\": \"ruff\", \"variant\": \"on\", \"phase\": \"entry-edit\", \"pair\": 3, \"elapsed_s\": 20.068047576001845, \"exit_code\": 0}\n{\"repo\": \"ruff\", \"variant\": \"on\", \"phase\": \"entry-edit\", \"pair\": 4, \"elapsed_s\": 22.175736901001073, \"exit_code\": 0}\n{\"repo\": \"ruff\", \"variant\": \"off\", \"phase\": \"entry-edit\", \"pair\": 4, \"elapsed_s\": 21.367210311931558, \"exit_code\": 0}\n{\"repo\": \"ruff\", \"variant\": \"fat\", \"phase\": \"clean-context\", \"pair\": 0, \"elapsed_s\": 355.75729010102805, \"exit_code\": 0}\n",
+  "original_record_sha256": "11cd1a2f1da118a75faec1afa2f1a237d448ce542eaf7afe08e739f07913b511",
+  "operation": "Direct SSH tail -n 8 of existing progress log; no new devbox exec or provisioning operation",
+  "sample_policy": "All observed activity retained; no acceptance decisions changed"
+}

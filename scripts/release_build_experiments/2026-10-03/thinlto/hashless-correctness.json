@@ -1,0 +1,18 @@
+[
+  {
+    "label": "Initial unguarded prototype; rejected",
+    "exit_code": 0,
+    "stdout": "7\n7\nchanged.log: INFO rustc_codegen_llvm::back::lto  - dependency.dependency.53071a5315d003b1-cgu.0.rcgu.o: re-used\ninitial.log: INFO rustc_codegen_llvm::back::lto  - dependency.dependency.53071a5315d003b1-cgu.0.rcgu.o: re-compiled\n",
+    "stderr": "",
+    "reproducer": "set -eu\nexport PATH=\"$HOME/.cargo/bin:$HOME/.local/bin:$PATH\"\nexport RUSTUP_HOME=/tmp/ohm-release-campaign/thinlto/rustup\nmkdir -p /tmp/ohm-release-campaign/thinlto/fat-dependency-correctness\ncd /tmp/ohm-release-campaign/thinlto/fat-dependency-correctness\ncat > main.rs <<'RS'\nextern crate dependency;\nfn main() { println!(\"{}\", dependency::value()); }\nRS\nprintf '%s\\n' '#[inline(never)] pub fn value() -> u32 { std::hint::black_box(7) }' > dependency.rs\nrustc +ohm dependency.rs --crate-type rlib -Copt-level=3 -Ccodegen-units=1 -Clto=fat -Cembed-bitcode=yes\nRUSTC_LOG=rustc_codegen_llvm::back::lto=info rustc +ohm main.rs --extern dependency=libdependency.rlib -Copt-level=3 -Ccodegen-units=1 -Clto=thin -Cincremental=inc -Zohm-thin-lto-dependency-cache=yes 2>initial.log\n./main\nprintf '%s\\n' '#[inline(never)] pub fn value() -> u32 { std::hint::black_box(11) }' > dependency.rs\nrustc +ohm dependency.rs --crate-type rlib -Copt-level=3 -Ccodegen-units=1 -Clto=fat -Cembed-bitcode=yes\nRUSTC_LOG=rustc_codegen_llvm::back::lto=info rustc +ohm main.rs --extern dependency=libdependency.rlib -Copt-level=3 -Ccodegen-units=1 -Clto=thin -Cincremental=inc -Zohm-thin-lto-dependency-cache=yes 2>changed.log\n./main\nrg ' - dependency.*re-' initial.log changed.log\n",
+    "record_sha256": "9015a290fa207e7d9141fd9d09317ae43f6acdacb7f7cac1d18f3a1d6cc89e16"
+  },
+  {
+    "label": "Guarded implementation before Arc refactor; final Arc implementation separately passes the run-make regression",
+    "exit_code": 0,
+    "stdout": "7\n11\nchanged.log: INFO rustc_codegen_llvm::back::lto  - dependency.dependency.53071a5315d003b1-cgu.0.rcgu.o: re-compiled\ninitial.log: INFO rustc_codegen_llvm::back::lto  - dependency.dependency.53071a5315d003b1-cgu.0.rcgu.o: re-compiled\n",
+    "stderr": "",
+    "reproducer": "set -eu\nexport PATH=\"$HOME/.cargo/bin:$HOME/.local/bin:$PATH\"\nexport RUSTUP_HOME=/tmp/ohm-release-campaign/thinlto/rustup\nmkdir -p /tmp/ohm-release-campaign/thinlto/fat-dependency-correctness-guarded\ncd /tmp/ohm-release-campaign/thinlto/fat-dependency-correctness-guarded\ncat > main.rs <<'RS'\nextern crate dependency;\nfn main() { println!(\"{}\", dependency::value()); }\nRS\nprintf '%s\\n' '#[inline(never)] pub fn value() -> u32 { std::hint::black_box(7) }' > dependency.rs\nrustc +ohm dependency.rs --crate-type rlib -Copt-level=3 -Ccodegen-units=1 -Clto=fat -Cembed-bitcode=yes\nRUSTC_LOG=rustc_codegen_llvm::back::lto=info rustc +ohm main.rs --extern dependency=libdependency.rlib -Copt-level=3 -Ccodegen-units=1 -Clto=thin -Cincremental=inc -Zohm-thin-lto-dependency-cache=yes 2>initial.log\n./main\nprintf '%s\\n' '#[inline(never)] pub fn value() -> u32 { std::hint::black_box(11) }' > dependency.rs\nrustc +ohm dependency.rs --crate-type rlib -Copt-level=3 -Ccodegen-units=1 -Clto=fat -Cembed-bitcode=yes\nRUSTC_LOG=rustc_codegen_llvm::back::lto=info rustc +ohm main.rs --extern dependency=libdependency.rlib -Copt-level=3 -Ccodegen-units=1 -Clto=thin -Cincremental=inc -Zohm-thin-lto-dependency-cache=yes 2>changed.log\n./main\nrg ' - dependency.*re-' initial.log changed.log\n",
+    "record_sha256": "78f79bb71252dba624def976545f142d6443acc91552fb63656d08cf28f351f4"
+  }
+]

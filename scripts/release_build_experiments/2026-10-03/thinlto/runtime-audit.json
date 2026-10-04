@@ -1,0 +1,2214 @@
+{
+  "audit": "Post hoc audit; measured harness and binaries unchanged",
+  "workloads": {
+    "uv-jupyter": {
+      "samples": 60,
+      "exit_code": 0,
+      "stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "normalization": "Exactly one anchored Resolved N packages duration; no other byte changes",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "stdout_compared_separately": true
+    },
+    "uv-trio": {
+      "samples": 60,
+      "exit_code": 0,
+      "stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "normalization": "Exactly one anchored Resolved N packages duration; no other byte changes",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "stdout_compared_separately": true
+    },
+    "ruff-cpython": {
+      "samples": 60,
+      "exit_code": 0,
+      "stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "normalization": "Only exact warning-line multiset order; every other stderr byte retains its position",
+      "warning_multiset": [
+        {
+          "line": "warning: Docstring at corpus/cpython-0b05ead877f909b7efe712db758012d9dbece7ce/Lib/test/test_getpath.py:390:9 contains implicit string concatenation; ignoring...\n",
+          "count": 1
+        },
+        {
+          "line": "warning: Unexpected `# ruff: noqa` directive at corpus/cpython-0b05ead877f909b7efe712db758012d9dbece7ce/Lib/test/test_with.py:177. File-level suppression comments must appear on their own line. For line-level suppression, omit the `ruff:` prefix.\n",
+          "count": 1
+        }
+      ]
+    },
+    "ruff-format": {
+      "samples": 60,
+      "exit_code": 1,
+      "stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalization": "Only Would reformat path-line order; every non-path stdout line retains its position",
+      "stderr_empty": true,
+      "normalized_path_line_count": 0,
+      "preserved_non_path_line_count": 275250,
+      "preserved_non_path_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "preserved_stdout_footer": "719 files would be reformatted, 37 files already formatted\n"
+    }
+  },
+  "captures": [
+    {
+      "stem": "uv-jupyter-1-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-1-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-1-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-10-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-10-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "9dca13ec2f789713961c0f590729f1b1b7988116e60756722ced16e4fde67716",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-10-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-11-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-11-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-11-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-12-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-12-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-12-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-13-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-13-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-13-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-14-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-14-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-14-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-15-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-15-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-15-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-16-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-16-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-16-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-17-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-17-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-17-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-18-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-18-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-18-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-19-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-19-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-19-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "66f3717a63577bc3ccf80dc88fd0c37b948f425ff7b76d30fb7c22c75ebedabb",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-2-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-2-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-2-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-20-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-20-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-20-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-3-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-3-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-3-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-4-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-4-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-4-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-5-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-5-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "9dca13ec2f789713961c0f590729f1b1b7988116e60756722ced16e4fde67716",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-5-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-6-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-6-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-6-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-7-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-7-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-7-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-8-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-8-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "f5fc6621e4af430686be1e2a0d39974e0081a5f482b8469f030fe43d497ec1fa",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-8-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "8b7c4d93da55be0525448dbe4f57a716359339272df42d23ab5facc83c82e226",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-9-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-9-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "9dca13ec2f789713961c0f590729f1b1b7988116e60756722ced16e4fde67716",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-jupyter-9-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "raw_stderr_sha256": "c1faa30356b9b90d48cef9485adb4200619524eb21670a12e901e01717b1f3cf",
+      "canonical_stdout_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01",
+      "canonical_stderr_sha256": "0ce3a8c9685390adbc8218ec1255c9b3f723ff138199217299d609468e8bfdd5",
+      "output_file_sha256": "0c6196a7cdde76652c2f9a7c542d564bb78a90c3777187286a0166b28ad3ab01"
+    },
+    {
+      "stem": "uv-trio-1-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-1-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-1-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "4ec46cd6fecffb3002448767b635e810a83fe8b1da138452dc8b1e0ad42c531a",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-10-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-10-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-10-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-11-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-11-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-11-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "4ec46cd6fecffb3002448767b635e810a83fe8b1da138452dc8b1e0ad42c531a",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-12-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-12-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-12-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-13-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-13-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-13-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-14-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-14-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-14-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-15-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-15-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-15-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-16-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-16-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-16-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-17-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-17-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-17-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-18-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-18-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-18-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-19-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-19-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-19-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-2-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-2-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-2-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-20-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-20-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-20-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "9e57a95f6d9ea3355587a0d45734b95299116237249ed59d04aa48a3a040d12f",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-3-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-3-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-3-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-4-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-4-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-4-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-5-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-5-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-5-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-6-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-6-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-6-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-7-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-7-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-7-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-8-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-8-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-8-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-9-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "e5762481dfb0bf90d63d8c646b45071c41101d6de7205806ee602232955ddb3d",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-9-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "uv-trio-9-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "raw_stderr_sha256": "8074f6b597ad487045838896353c161e2489f054d35af8ade59f78fad62ca096",
+      "canonical_stdout_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04",
+      "canonical_stderr_sha256": "874b42e2d1a85ff728c30e64c4d90ac17b0398c2ac876007d54200c975d55f79",
+      "output_file_sha256": "f7f20cd094b8a2b1b4839d359cc71a4bc8578ffe193fba09c5fe1aef7682ce04"
+    },
+    {
+      "stem": "ruff-cpython-1-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-1-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-1-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-10-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-10-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-10-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-11-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-11-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-11-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-12-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-12-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-12-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-13-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-13-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-13-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-14-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-14-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-14-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-15-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-15-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-15-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-16-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-16-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-16-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-17-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-17-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-17-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-18-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-18-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-18-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-19-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-19-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-19-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-2-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-2-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-2-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-20-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-20-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-20-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-3-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-3-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-3-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-4-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-4-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-4-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-5-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-5-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-5-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-6-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-6-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-6-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-7-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-7-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-7-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-8-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-8-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-8-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-9-fat",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-9-off",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-cpython-9-on",
+      "exit_code": 0,
+      "raw_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "raw_stderr_sha256": "5e235c77464e93c500c70367a958e68cccf5489f312463d5d0ca1e5278fcb839",
+      "canonical_stdout_sha256": "3b2f94d55fac98e8470c01919460fb47ebad6e2d66ca25ee7fdb921353812c4c",
+      "canonical_stderr_sha256": "a12235821999fb572eed3a9a9915135c48d144d03b2d30433cfd949a66ee5761",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-1-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-1-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-1-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-10-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-10-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-10-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-11-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-11-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-11-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-12-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-12-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-12-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-13-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-13-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-13-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-14-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-14-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-14-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-15-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-15-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-15-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-16-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-16-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-16-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-17-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-17-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-17-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-18-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-18-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-18-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-19-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-19-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-19-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-2-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-2-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-2-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-20-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-20-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-20-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-3-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-3-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-3-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-4-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-4-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-4-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-5-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-5-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-5-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-6-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-6-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-6-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-7-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-7-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-7-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-8-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-8-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-8-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-9-fat",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-9-off",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    },
+    {
+      "stem": "ruff-format-9-on",
+      "exit_code": 1,
+      "raw_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical_stdout_sha256": "1f532f6ea19a0415d55a222ee6d5fbe3379b4f0a13e6510b6843fb66df94eff1",
+      "canonical_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_file_sha256": null
+    }
+  ]
+}

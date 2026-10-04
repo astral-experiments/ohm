@@ -8,14 +8,14 @@ The changes have not been measured together.
 
 ## Results
 
-| Experiment                                                                 | Measured build result                                                                                         | Scope                                                                         |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [LTO generic sharing](https://github.com/astral-sh/ohm-cargo/pull/132)     | uv fresh builds 18.51–24.94% faster; entry rebuilds 21.22–21.77% faster; library rebuilds 18.52–21.01% faster | One fat-LTO pair on each of three hosts; Ruff regresses                       |
-| [Early fat-LTO merging](https://github.com/astral-sh/ohm-rust/pull/154)    | Ruff fresh builds 1.50% faster; entry rebuilds 2.37% faster                                                   | Three fresh-build and four edit pairs; uv flat/mixed                          |
-| [ThinLTO dependency reuse](https://github.com/astral-sh/ohm-rust/pull/155) | Final evidence packet pending                                                                                 | Requires incremental ThinLTO; remaining library/runtime validation is running |
+| Experiment                                                                 | Measured build result                                                                                         | Scope                                                                   |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [LTO generic sharing](https://github.com/astral-sh/ohm-cargo/pull/132)     | uv fresh builds 18.51–24.94% faster; entry rebuilds 21.22–21.77% faster; library rebuilds 18.52–21.01% faster | One fat-LTO pair on each of three hosts; Ruff regresses                 |
+| [Early fat-LTO merging](https://github.com/astral-sh/ohm-rust/pull/154)    | Ruff fresh builds 1.50% faster; entry rebuilds 2.37% faster                                                   | Three fresh-build and four edit pairs; uv flat/mixed                    |
+| [ThinLTO dependency reuse](https://github.com/astral-sh/ohm-rust/pull/155) | uv entry rebuilds 14.82% faster; Ruff 2.97% faster with mixed pairs                                           | Four pairs per CLI under incremental ThinLTO; uv library edit regresses |
 
-The generic-sharing and early-merging packets are complete. This draft is still
-being assembled while the dependency-cache lane finishes its bounded cohort.
+All three bounded measurement cohorts and final output audits are complete.
+Each implementation remains an opt-in draft for assessing its tradeoffs.
 
 ## LTO generic sharing
 
@@ -83,6 +83,46 @@ status 2 for intentional invalid-syntax fixtures; it is not a clean formatter ru
 include unsuccessful screens and rejected cache-restoration/trace comparisons.
 The core compiler test passes; profiler-specific cases were capability-skipped
 because the locally built compiler lacks the profiler runtime.
+
+## ThinLTO dependency reuse
+
+The compiler reuses validated dependency work products when LLVM's ThinLTO
+cache key matches. Local modules retain their dependency-graph checks. Reuse
+fails closed if any module in the combined index lacks a content hash; tests
+cover both a changed hashless dependency and an unchanged importer of it.
+
+Four entrypoint-edit pairs improve uv by 9.32–22.76%, with a paired geometric
+mean of 14.82%. The later three pairs improve by 12.00%; all four remain in the
+headline. Ruff's geometric mean is 2.97% faster, but one pair is 3.78% slower,
+and the later-three result is only 1.47% faster. These tiny binary-only edits
+are a favorable cache case.
+
+The single library-edit pairs go in opposite directions: uv takes 83.592 →
+89.664 seconds, while Ruff takes 23.633 → 7.510 seconds. They are directional,
+not repeated estimates. Cold/profile context also has one sample per cell.
+The cache does not apply to default fat-LTO release builds.
+
+These measurements use one optimized locally built compiler without PGO.
+Choosing incremental ThinLTO increases executable size by 15.58% for uv and
+26.28% for Ruff compared with that compiler's default fat profile. The paired
+uv runtime guards are 5.74% slower for Jupyter resolution and 5.45% slower for
+Trio with ThinLTO; both bootstrap intervals exclude no change. In contrast,
+all four runtime intervals for the cache option itself include no change.
+All 240 raw status/stdout/stderr captures pass the documented equivalence audit.
+
+An untimed mechanism check reuses all 7,221 upstream uv modules twice and
+preserves the executable hash. The focused regression and seven existing
+incremental ThinLTO tests pass. The final PR head only reformats two fixture
+strings relative to the measured commit; compiler tree and generated fixture
+bytes are identical, as recorded in [the provenance receipt](thinlto/ci-tidy-provenance.json).
+
+[Summary](thinlto/summary.json), [individual evidence](thinlto/evidence.json),
+[paired runtime analysis](thinlto/runtime-analysis.json), and
+[reproduction instructions](thinlto/README.md) retain the rejected earlier
+implementations and host cohorts, exact captured harness bytes, and launcher
+correction between the primary builds and later validation. The measured
+harness could not verify per-service CPU or memory quotas; affinity/cpuset,
+observed idle time, memory, and outside activity are recorded instead.
 
 ## Measurement boundaries
 

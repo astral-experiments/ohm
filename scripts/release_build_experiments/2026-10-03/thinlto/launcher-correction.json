@@ -1,0 +1,22 @@
+{
+  "recorded_utc": "2026-10-04T00:25:48.292607+00:00",
+  "event": "Post-build mechanism import failed because the inherited Python environment removed the script directory and applied site import hooks. Completed timed build cohorts are preserved. Only previously unrun mechanism, library edit, and runtime phases are resumed.",
+  "launcher": ["/usr/bin/python3", "-E", "-S"],
+  "removed_environment": [
+    "PYTHONPATH",
+    "PYTHONHOME",
+    "PYTHONSAFEPATH",
+    "VIRTUAL_ENV"
+  ],
+  "path_policy": "Rustup shims, user local tools, and standard system paths; virtualenv path removed",
+  "python_version": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "bench_file": "/tmp/ohm-release-campaign/thinlto/bench.py",
+  "frozen_script_sha256": {
+    "bench.py": "ae9857136f0cfe2f81d60357d9d35d4cd2ed04f59a62326277917c2ff46cb4b7",
+    "library-bench.py": "9251ded0a50abc8f08e3b81435f0b9900ea9824eff9b5b36c0f9fe020d9378c7",
+    "runtime-bench.py": "af1d8d997e98b1d8875dc34986bea61c7ef72e13254e94b1359cf3b277969b13",
+    "mechanism.py": "b9f2f6af69d36e3e84db2bc0771aa8ab8dfca7da7f7b7c462d38b2b0abca0cc8",
+    "aggregate.py": "bade39d49382e1c2a08b322ba51eebfc1a21140e4adfc76d499ef455d3e75629"
+  },
+  "private_failure_log": "benchmark-progress-newhost.log (not published because it contains unrelated environment bootstrap output)"
+}

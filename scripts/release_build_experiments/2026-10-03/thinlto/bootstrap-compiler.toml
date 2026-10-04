@@ -1,0 +1,15 @@
+profile = "compiler"
+change-id = "ignore"
+[build]
+build-dir = "/tmp/codex-cargo-targets/ohm-rust/isolated/release-thinlto/bootstrap"
+jobs = 32
+extended = false
+[llvm]
+download-ci-llvm = true
+[rust]
+download-rustc = false
+optimize = true
+debug-assertions = false
+debuginfo-level = 0
+codegen-units = 16
+channel = "dev"

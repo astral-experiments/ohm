@@ -1,0 +1,64 @@
+{
+  "main_operation": {
+    "id": "87b96e2b-893f-4d56-bdf7-7a5107e34b47",
+    "started_utc": "2026-10-03T23:15:35.859271+00:00",
+    "host": "charlie-openai-1",
+    "final_status": "All 28 main build/context samples completed; exit 1 in the subsequent pre-sample helper import"
+  },
+  "stopped_pre_sample_continuation": {
+    "id": "826bb81f-f883-4069-a0bc-472c1604202d",
+    "started_utc": "2026-10-04T00:24:31.152565+00:00",
+    "host": "charlie-openai-1",
+    "final_status": "Exit 1 at frozen hash check, before any helper measurement"
+  },
+  "successful_launcher_continuation": {
+    "id": "933a39e6-2b14-4c66-9127-43fd8cd160d1",
+    "started_utc": "2026-10-04T00:25:48.083262+00:00",
+    "host": "charlie-openai-1",
+    "final_status": "Completed with exit 0; mechanism, four library samples, 240 timed runtime samples, and aggregation complete"
+  },
+  "events": [
+    {
+      "after": "All main uv/Ruff build cohorts and profile contexts completed",
+      "failure": "Inherited Python path/site import behavior resolved the bench helper to an unrelated module; the mechanism import failed before it ran. Private environment-bootstrap output is omitted.",
+      "effect_on_samples": "No completed build sample changed or repeated; library and runtime phases had not started."
+    },
+    {
+      "after": "First corrected-launcher preflight, before any follow-up sample",
+      "failure": "Frozen hash check found the generated remote heredocs had one extra trailing newline relative to local upload inputs.",
+      "effect_on_samples": "Preflight stopped before running the helper; exact remote bytes were fetched and verified."
+    },
+    {
+      "after": "Second corrected-launcher preflight",
+      "action": "System Python -E -S, path/virtualenv variables cleared, controlled executable PATH, exact trusted bench.__file__ and remote helper hashes verified.",
+      "effect_on_samples": "Only previously unrun mechanism, directional library pairs, runtime guards, and aggregation continued. Primary entry-pair timings remain from the original launcher phase."
+    }
+  ],
+  "remote_harnesses": {
+    "bench.py": {
+      "sha256": "ae9857136f0cfe2f81d60357d9d35d4cd2ed04f59a62326277917c2ff46cb4b7",
+      "relation_to_initial_local_upload": "Exactly one additional trailing newline"
+    },
+    "library-bench.py": {
+      "sha256": "9251ded0a50abc8f08e3b81435f0b9900ea9824eff9b5b36c0f9fe020d9378c7",
+      "relation_to_initial_local_upload": "Exactly one additional trailing newline"
+    },
+    "runtime-bench.py": {
+      "sha256": "af1d8d997e98b1d8875dc34986bea61c7ef72e13254e94b1359cf3b277969b13",
+      "relation_to_initial_local_upload": "Exactly one additional trailing newline"
+    },
+    "mechanism.py": {
+      "sha256": "b9f2f6af69d36e3e84db2bc0771aa8ab8dfca7da7f7b7c462d38b2b0abca0cc8",
+      "relation_to_initial_local_upload": "Exactly one additional trailing newline"
+    },
+    "aggregate.py": {
+      "sha256": "bade39d49382e1c2a08b322ba51eebfc1a21140e4adfc76d499ef455d3e75629",
+      "relation_to_initial_local_upload": "Exactly one additional trailing newline"
+    },
+    "reproduce.py": {
+      "sha256": "1aeef74cf8a84eafb86b1dc79abb7e37d661b1c8ae3185d9e184052bc487fad4",
+      "relation_to_initial_local_upload": "Exactly one additional trailing newline"
+    }
+  },
+  "public_packet_policy": "Publish actual frozen remote script bytes. Initial local upload files were not byte-identical to the remote files. No internal bootstrap or package logs are published."
+}
