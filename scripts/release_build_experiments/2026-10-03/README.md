@@ -1,123 +1,119 @@
 # Release build experiments
 
-These experiments measure three independent, opt-in changes against the compiler
-and Cargo revisions in Ohm 1.99.0-1. They do not change release defaults or the
-published development-build benchmarks.
+Three independent opt-in experiments against Ohm 1.99.0-1, measured on Linux
+x86-64 devboxes at default Cargo concurrency. [protocol.json](protocol.json)
+records the exact compiler, Cargo, workload revisions, and implementation PRs.
+Release defaults and the published development-build benchmarks are unchanged.
+The changes have not been measured together.
 
-The compiler and workload identities are recorded in [protocol.json](protocol.json).
-Ruff and uv are measured at fixed source revisions. Within each comparison, the
-compiler binary, build configuration, workload edit, and host remain the same.
-The three changes have not been measured together.
+## Results
 
-## Completed measurements
+| Experiment                                                                 | Measured build result                                                                                         | Scope                                                                         |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [LTO generic sharing](https://github.com/astral-sh/ohm-cargo/pull/132)     | uv fresh builds 18.51–24.94% faster; entry rebuilds 21.22–21.77% faster; library rebuilds 18.52–21.01% faster | One fat-LTO pair on each of three hosts; Ruff regresses                       |
+| [Early fat-LTO merging](https://github.com/astral-sh/ohm-rust/pull/154)    | Ruff fresh builds 1.50% faster; entry rebuilds 2.37% faster                                                   | Three fresh-build and four edit pairs; uv flat/mixed                          |
+| [ThinLTO dependency reuse](https://github.com/astral-sh/ohm-rust/pull/155) | Final evidence packet pending                                                                                 | Requires incremental ThinLTO; remaining library/runtime validation is running |
 
-This draft is being assembled while the remaining measurements finish. The
-completed comparisons below have been independently checked against the raw
-samples. The remaining uv early-merging measurements, generic-sharing host
-packets, and ThinLTO dependency-cache experiment will be added separately.
+The generic-sharing and early-merging packets are complete. This draft is still
+being assembled while the dependency-cache lane finishes its bounded cohort.
 
-| Early fat-LTO merging, Ruff  | Paired elapsed-time change | Pairs |
-| ---------------------------- | -------------------------: | ----: |
-| Entrypoint rebuild           |                     -2.37% |     4 |
-| Cold compiled-artifact build |                     -1.50% |     3 |
+## LTO generic sharing
 
-These are geometric means of candidate/control ratios on one 32-CPU Linux host.
-Every pair improves: 1.67–3.09% for edits and 0.98–1.78% for cold builds. Edit-build
-peak child RSS is 4.07% lower, and the original-source executable is 0.68% smaller.
-The last edit baseline had more resident-service activity; the first three pairs
-alone improve by 2.13%. It is retained in the primary result.
+Cargo enables generic sharing only for eligible optimized final LTO units and
+dependencies used solely as LTO bitcode. Host tools, standard-library builds,
+and dependencies with mixed consumers retain their existing behavior. Every
+comparison uses the same candidate Cargo executable with the option off and on.
 
-The timings use the same PGO/BOLT release compiler with matched LLVM plugins.
-The implemented compiler flag produces a byte-identical real Ruff executable and
-an identical final fat-LTO pipeline in a separate locally built compiler. Its
-parallel prelink trace interleaves within lines and is not claimed to match.
-A separate native-flag pair with that unprofiled compiler takes 240.816 →
-233.852 seconds (2.89% faster); it is contextual and not pooled with the shipping
-compiler measurements. The [implementation draft](https://github.com/astral-sh/ohm-rust/pull/154)
-keeps the option disabled by default.
+The uv improvement repeats across 16- and 32-CPU hosts and both orders. Its
+original-source executables are about 11% smaller. Ruff goes the other way:
+two counterbalanced fat-LTO pairs give geometric-mean slowdowns of 3.52% fresh,
+5.80% for entry edits, and 1.84% for library edits, with a 1.31% larger binary.
 
-[The compact Ruff packet](llvm/ruff.json) contains all accepted pairs, screening
-alternatives, rejected artifact-restoration and trace comparisons, compiler and
-source identities, cache-layout checks, and preliminary runtime checks. [The separate validation packet](llvm/ruff-validation.json)
-contains the native-flag timing and 24 final runtime pairs per workload. Lint
-has a noisy 1.78% slowdown in the sample; format-check is effectively flat at
-0.08% faster. Outputs and diagnostics match, including the formatter's expected
-status 2 for intentional invalid-syntax fixtures. These are sampled guards,
-not a claim that every runtime workload is unaffected.
+Thirty runtime pairs per workload preserve outputs and diagnostics. Ruff's
+fat-LTO formatter is 0.71% slower in the sample (paired 95% bootstrap interval:
+0.44–0.99% slower); lint is inconclusive. Short uv resolver measurements vary
+across hosts and include a retained outlier, so they do not support a general
+runtime speedup claim.
 
-[Reproduction instructions](llvm/REPRODUCE.md) include the frozen measured
-harnesses, plugin build, compiler-flag parity, and exact workload commands. The
-`raw_*` and log hashes identify the original captured bytes; the compact JSON is
-formatted for this repository and is not a byte-for-byte copy of those captures.
+Single-pair ThinLTO screens are separate, exploratory profile comparisons.
+Generic sharing reduces uv fresh-build time by 13.09% and entry-rebuild time by
+31.81%. For Ruff it reduces fresh-build time by 3.72%, leaves entry rebuilding
+roughly unchanged, and increases binary size by 7.02%. Ruff's ThinLTO runtime
+samples are 3.06% slower for lint and 0.97% slower for formatting. These
+tradeoffs support retaining an opt-in experiment.
 
-The [generic-sharing draft](https://github.com/astral-sh/ohm-cargo/pull/132) has
-completed fat-LTO builds on three uv hosts and two Ruff pairs. The two completed
-16-CPU uv cohorts, including 30 runtime pairs per workload, are captured in
-[the generic-sharing packet](generics/summary.json). Remaining host packets will
-be added when their bounded runtime and ThinLTO work finishes.
+[All samples and provenance](generics/summary.json), [tables](generics/RESULTS.md),
+and [reproduction instructions](generics/README.md) include 51 build samples and
+720 measured runtime samples, the earlier global-flag screens, rejected
+preflights, exact frozen helpers, compiler-command scope audits, and raw archive
+receipts. The raw Ruff archive stores repeated streams by content hash while
+preserving every original path, byte length, and digest.
 
-| Generic sharing, uv      | Fresh build | Entrypoint rebuild | Library rebuild |
-| ------------------------ | ----------: | -----------------: | --------------: |
-| 16 CPUs, candidate first |     -19.49% |            -21.22% |         -21.01% |
-| 16 CPUs, control first   |     -18.51% |            -21.50% |         -19.52% |
+## Early fat-LTO merging
 
-Each cell is one same-host, same-Cargo, same-compiler pair. Cold executables are
-about 11% smaller. Runtime outputs and diagnostics match; all four paired
-bootstrap intervals include no change. A retained 138 ms candidate outlier makes
-one trio interval wide, so these short runtime samples do not establish a speedup.
-The draft also records Ruff regressions and all three uv hosts; this evidence
-packet is still being assembled.
+The compiler runs LLVM's existing function-merging pass after linking modules
+and before the main fat-LTO optimization pipeline. Optimization level and LTO
+mode stay unchanged. The implementation is disabled by default and leaves
+instrumented, custom, and incompatible pipelines unchanged.
 
-## Comparisons
+Every Ruff pair improves: 1.67–3.09% for edits and 0.98–1.78% for fresh builds.
+Edit-build peak child RSS is 4.07% lower; the executable is 0.68% smaller. The
+last edit baseline had more resident-service activity; retaining only the first
+three pairs gives a 2.13% improvement. All four remain in the primary result.
 
-- **Early fat-LTO merging** runs LLVM's existing function-merging pass once more
-  after combining the modules, before the main optimization pipeline. It keeps
-  fat LTO and the optimization level unchanged.
-- **LTO generic sharing** lets eligible optimized target crates reuse upstream
-  generic instances. Cargo scopes the flag to units used only for LTO and the
-  final LTO unit; host tools and mixed consumers keep their existing behavior.
-- **ThinLTO dependency reuse** reuses optimized dependency objects when LLVM's
-  cache key matches a validated previous work product. This requires incremental
-  ThinLTO, a different build configuration from the projects' shipped fat-LTO
-  profiles. Local modules retain their existing dependency-graph checks.
+Timings use the same PGO/BOLT release compiler with matched LLVM plugins. The
+implemented flag produces a byte-identical real Ruff executable and an identical
+complete final fat-LTO pipeline in a separately built compiler. Parallel prelink
+traces interleave within lines and are not claimed to match. A separate native
+flag pair with that unprofiled compiler takes 240.816 → 233.852 seconds (2.89%
+faster); it is contextual and is not pooled with the shipping-compiler results.
+
+The fixed uv cohort is inconclusive: entry pairs change by −2.83% and +1.99%,
+and the fresh-build pair by −0.095%. The uv executable is 1.41% smaller. All
+samples remain, including their recorded background activity.
+
+Twenty-four final runtime pairs per workload preserve outputs and diagnostics.
+Ruff lint has a noisy 1.78% slowdown and format-check is effectively flat at
+0.08% faster. uv resolver timings have large outliers on opposite variants;
+no runtime throughput claim is made. Ruff format-check returns the same expected
+status 2 for intentional invalid-syntax fixtures; it is not a clean formatter run.
+
+[Ruff measurements](llvm/ruff.json), [native-flag and final Ruff validation](llvm/ruff-validation.json),
+[uv measurements](llvm/uv.json), and [reproduction instructions](llvm/REPRODUCE.md)
+include unsuccessful screens and rejected cache-restoration/trace comparisons.
+The core compiler test passes; profiler-specific cases were capability-skipped
+because the locally built compiler lacks the profiler runtime.
 
 ## Measurement boundaries
 
-Cold builds start with empty compiled-artifact directories and warmed registry
-downloads. They are not cold-filesystem or network-download benchmarks. Cargo uses
-the host's normal concurrency: 32 logical CPUs for early merging and primary
-generic-sharing measurements, and 16 for the migrated ThinLTO measurements and
-independent uv generic-sharing confirmations. Timings from different hosts are
-not pooled.
+Fresh builds start with empty compiled-artifact directories and warmed registry
+downloads. They are not cold-filesystem or network-download benchmarks. Default
+concurrency is 32 logical CPUs for early merging and primary generic-sharing
+runs, and 16 for the cache lane and independent uv generic-sharing confirmations.
+Compare within each host; raw elapsed times from different hosts are not pooled.
 
-Edit measurements change real source and require a compiler invocation. An
-unchanged source timestamp or a restored Cargo artifact namespace does not count
-as a compiler rebuild. Entrypoint edits and library edits are reported separately.
-Counterbalanced ordering reduces order effects; individual samples remain the
-source of truth, including unsuccessful and excluded trials.
+Edit measurements change actual source and require compiler work. A restored
+Cargo artifact namespace does not count as a rebuild. Entrypoint and library
+edits remain separate. Each candidate/control pair uses the same compiler,
+configuration, source edit, and host; order is counterbalanced where repeated.
+Locally built compilers are compared with themselves, separately from the
+PGO/BOLT release compiler.
 
-Final wall-time measurements disable compiler profiling and cache diagnostic
-logging. Instrumented runs explain where time goes or verify a cache hit; their
-times are not included in the performance comparisons. Locally built compilers
-are compared with themselves with the experiment disabled. Absolute times from
-those compilers are not compared with the PGO/BOLT-optimized release compiler.
+Final wall-time samples disable compiler profiling and cache diagnostics.
+Instrumented runs explain mechanisms and are excluded from performance claims.
+Unrelated compiler overlap invalidates a complete pair. Resident services remain
+running, with measured interference retained. Peak child RSS is a per-process
+high-water measurement, not aggregate concurrent-build memory.
 
-The runners retain executable sizes and hashes, memory measurements, command and
-environment provenance, and host interference records. Unrelated compiler
-overlap invalidates a complete comparison pair. Normal resident services remain
-running and their measured activity is disclosed. No unrelated processes or
-cache directories are removed.
+Runtime checks use original-source saved executables after compilation stops.
+Ruff uses pinned CPython; uv resolves pinned inputs offline against a prepared
+public PyPI cache. Full status, output, and diagnostic checks accompany timing.
+These workloads are sampled guards, not a comprehensive runtime performance
+suite. Each packet documents its exact corpus and permitted normalization.
 
-Runtime checks use saved binaries after compilation finishes. Ruff checks and
-formats the same pinned CPython corpus. uv resolves pinned requirement inputs
-against a prepared cache with networking disabled during timing. Observable
-outputs are compared alongside the runtime samples. These workloads are guards
-against observed regressions, not a comprehensive application performance suite.
-
-## Interpretation
-
-A change to elapsed time is `candidate / control - 1`; negative values are faster.
-Comparisons apply only to their measured workload, compiler configuration, and
-host. Small effects need repeated pairs. A neutral or negative experiment is
-retained so reviewers can assess the tradeoff. Improvements from separate
-experiments must not be added or multiplied into a combined claim.
+A time change is `candidate / control - 1`; negative is faster. Repeated-pair
+headlines use geometric means of those ratios. Single pairs are directional.
+Raw-capture and log hashes identify original bytes; publication manifests identify
+formatted checked-in files. Frozen measured harnesses are preserved byte for byte.
+Neutral and negative experiments remain visible. Do not add or multiply these
+independent speedups into a combined claim.
