@@ -13,8 +13,8 @@ The three changes have not been measured together.
 
 This draft is being assembled while the remaining measurements finish. The
 completed comparisons below have been independently checked against the raw
-samples. Remaining runtime guards, direct compiler-flag timings, and the ThinLTO
-dependency-cache experiment will be added separately.
+samples. The remaining uv early-merging measurements, generic-sharing host
+packets, and ThinLTO dependency-cache experiment will be added separately.
 
 | Early fat-LTO merging, Ruff  | Paired elapsed-time change | Pairs |
 | ---------------------------- | -------------------------: | ----: |
@@ -31,11 +31,22 @@ The timings use the same PGO/BOLT release compiler with matched LLVM plugins.
 The implemented compiler flag produces a byte-identical real Ruff executable and
 an identical final fat-LTO pipeline in a separate locally built compiler. Its
 parallel prelink trace interleaves within lines and is not claimed to match.
-Direct timings of that unprofiled compiler remain a separate comparison.
+A separate native-flag pair with that unprofiled compiler takes 240.816 →
+233.852 seconds (2.89% faster); it is contextual and not pooled with the shipping
+compiler measurements. The [implementation draft](https://github.com/astral-sh/ohm-rust/pull/154)
+keeps the option disabled by default.
 
 [The compact Ruff packet](llvm/ruff.json) contains all accepted pairs, screening
 alternatives, rejected artifact-restoration and trace comparisons, compiler and
-source identities, cache-layout checks, and preliminary runtime checks. The
+source identities, cache-layout checks, and preliminary runtime checks. [The separate validation packet](llvm/ruff-validation.json)
+contains the native-flag timing and 24 final runtime pairs per workload. Lint
+has a noisy 1.78% slowdown in the sample; format-check is effectively flat at
+0.08% faster. Outputs and diagnostics match, including the formatter's expected
+status 2 for intentional invalid-syntax fixtures. These are sampled guards,
+not a claim that every runtime workload is unaffected.
+
+[Reproduction instructions](llvm/REPRODUCE.md) include the frozen measured
+harnesses, plugin build, compiler-flag parity, and exact workload commands. The
 `raw_*` and log hashes identify the original captured bytes; the compact JSON is
 formatted for this repository and is not a byte-for-byte copy of those captures.
 
