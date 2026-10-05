@@ -1,0 +1,152 @@
+   Compiling libwild v0.10.0 (/home/dev-user/code/oss/ohm-compact-study/wild/libwild)
+   Compiling compact-artifact v0.1.0 (/home/dev-user/code/oss/ohm-compact-study/wild/compact-artifact)
+    Finished `release` profile [optimized] target(s) in 25.11s
+     Running unittests src/lib.rs (/home/dev-user/code/oss/ohm-compact-study/shipping/.wild-release-build/x86_64-unknown-linux-gnu/release/deps/compact_artifact-df6ea630541b1a5a)
+
+running 15 tests
+test tests::file_backed_payload_remains_valid_after_pages_are_evicted ... ok
+test library::tests::version_two_rejects_paths_in_member_names ... ok
+test library::tests::version_one_manifests_remain_readable ... ok
+test tests::authenticated_section_size_mismatch_is_rejected ... ok
+test library::tests::partial_nearby_store_does_not_hide_complete_ancestor ... ok
+test tests::materialization_rejects_corrupt_payload_and_invalid_alignment ... ok
+test library::tests::references_are_relative_and_survive_moves_and_aliases ... ok
+test tests::authenticated_invalid_section_descriptors_are_rejected ... ok
+test tests::configured_decoded_cache_stays_within_its_budget ... ok
+test tests::materialization_rejects_inconsistent_section_count ... ok
+test tests::materialized_elf_preserves_sections_and_alignment ... ok
+test tests::every_truncation_and_index_corruption_is_rejected ... ok
+test tests::payload_is_lazy_and_pinned_once ... ok
+test tests::unused_payload_is_not_touched_and_used_corruption_is_rejected ... ok
+test tests::manifest_integrity_and_concurrent_store_publication ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (/home/dev-user/code/oss/ohm-compact-study/shipping/.wild-release-build/x86_64-unknown-linux-gnu/release/deps/libwild-5637ff27640dc5d5)
+
+running 122 tests
+test alignment::test_align_up ... ok
+test args::elf::tests::test_arguments_from_string ... ok
+test archive::tests::test_ar_consistency ... ok
+test alignment::test_align_down ... ok
+test alignment::test_align_modulo ... ok
+test args::elf::tests::test_ignored_flags ... ok
+test args::elf::tests::test_parse_file_only_options ... ok
+test args::elf::tests::test_parse_overlapping_file_and_inline_options ... ok
+test args::elf::tests::test_tdata_decimal_round_trip ... ok
+test args::elf::tests::test_ttext_hex_round_trip ... ok
+test args::elf::tests::test_tbss_decimal_round_trip ... ok
+test args::elf::tests::test_parse_recursive_file_option ... ok
+test args::elf::tests::test_ttext_decimal_round_trip ... ok
+test args::elf::tests::test_ttext_invalid_address ... ok
+test args::wasm::tests::export_is_not_treated_as_input_path ... ok
+test args::wasm::tests::parse_export_space_and_equals ... ok
+test args::elf::tests::test_tdata_hex_round_trip ... ok
+test args::macho::tests::test_parse_inline_only_options ... ok
+test args::elf::tests::test_tbss_hex_round_trip ... ok
+test args::elf::tests::test_parse_inline_only_options ... ok
+test args::tests::test_flavor ... ok
+test args::elf::tests::test_parse_mixed_file_and_inline_options ... ok
+test compression::tests::zlib_single_shard_round_trip ... ok
+test args::elf::tests::test_section_start_takes_precedence_over_ttext ... ok
+test export_list::tests::externs ... ok
+test elf_x86_64::test_relaxation ... ok
+test export_list::tests::parse_multiline_with_comments ... ok
+test expression_eval::tests::test_align ... ok
+test expression_eval::tests::test_align_zero_is_error ... ok
+test expression_eval::tests::test_alignof_evaluation ... ok
+test expression_eval::tests::test_arithmetic ... ok
+test expression_eval::tests::test_divide_by_zero ... ok
+test expression_eval::tests::test_comparisons ... ok
+test expression_eval::tests::test_evaluate_assertions_fails ... ok
+test expression_eval::tests::test_evaluate_assertions_passes ... ok
+test expression_eval::tests::test_location_counter_is_zero ... ok
+test expression_eval::tests::test_memory_functions_evaluation ... ok
+test expression_eval::tests::test_min_max ... ok
+test expression_eval::tests::test_modulo_by_zero ... ok
+test expression_eval::tests::test_number ... ok
+test expression_eval::tests::test_operator_precedence ... ok
+test expression_eval::tests::test_wrapping_arithmetic ... ok
+test gdb_index::tests::test_encode_cu_vector_entry ... ok
+test gdb_index::tests::test_gdb_hash_case_insensitive ... ok
+test gdb_index::tests::test_hash_table_slots_power_of_two ... ok
+test gdb_index::tests::test_header_size ... ok
+test gdb_index::tests::test_parse_cu_boundaries ... ok
+test layout::test_no_disallowed_overlaps ... ok
+test layout_rules::test_glob_section_character_class ... ok
+test layout_rules::test_glob_section_matching ... ok
+test layout_rules::test_glob_star_anywhere ... ok
+test layout_rules::test_section_mapping ... ok
+test linker_script::tests::test_alignof_parsing ... ok
+test linker_script::tests::test_assert_command ... ok
+test linker_script::tests::test_assert_in_sections ... ok
+test linker_script::tests::test_assert_with_complex_expression ... ok
+test linker_script::tests::test_assert_with_min_function_comma_handling ... ok
+test linker_script::tests::test_basic_linker_script ... ok
+test linker_script::tests::test_bitwise_operators ... ok
+test linker_script::tests::test_expression_operator_precedence ... ok
+test export_list::tests::parse_inline ... ok
+test linker_script::tests::test_inputs_from_script ... ok
+test linker_script::tests::test_keep_with_filename ... ok
+test linker_script::tests::test_loadaddr_parsing ... ok
+test linker_script::tests::test_logical_operators ... ok
+test linker_script::tests::test_memory_block_parsing ... ok
+test linker_script::tests::test_memory_functions_parsing ... ok
+test linker_script::tests::test_nested_sort_is_unsupported ... ok
+test linker_script::tests::test_number_suffixes ... ok
+test linker_script::tests::test_output_format_parsing ... ok
+test linker_script::tests::test_section_command ... ok
+test linker_script::tests::test_section_command_with_filename ... ok
+test linker_script::tests::test_section_command_with_glob_filename ... ok
+test linker_script::tests::test_test_inputs_from_script ... ok
+test linker_script::tests::test_unary_precedence ... ok
+test linker_script::tests::test_version_command ... ok
+test linker_script::tests::test_version_command_with_nested_braces ... ok
+test linker_script::tests::test_unary_operators ... ok
+test linker_script::tests::test_version_script_parsing_from_version_command ... ok
+test output_section_part_map::test_max_alignment ... ok
+test output_section_part_map::test_merge ... ok
+test macho_stub_library::tests::parse_library_with_reexports ... ok
+test output_section_part_map::test_merge_parts ... ok
+test output_section_part_map::test_merge_with_custom_sections ... ok
+test output_section_part_map::test_mut_with_map ... ok
+test part_id::tests::test_platform_part_id_invariants ... ok
+test linker_script::tests::test_section_command_with_start_address_expression ... ok
+test output_section_part_map::test_output_order_map_consistent ... ok
+test output_section_part_map::test_output_order_map ... ok
+test save_dir::tests::make_relative_path_works ... ok
+test linker_script::tests::test_shift_operators ... ok
+test linker_script::tests::test_sysroot_application ... ok
+test thunks::tests::test_assign_thunk_blocks_placement ... ok
+test version_script::tests::invalid_version_scripts ... ok
+test thunks::tests::test_assign_thunk_blocks_single_cluster ... ok
+test version_script::tests::single_line_version_script ... ok
+test version_script::tests::parse_rust_version_script ... ok
+test version_script::tests::test_escape_sequences ... ok
+test version_script::tests::test_negation ... ok
+test version_script::tests::test_parse_simple_version_script ... ok
+test version_script::tests::test_parse_version_script ... ok
+test version_script::tests::test_version_order ... ok
+test resolution::section_slot_is_copy ... ok
+test version_script::tests::extern_c_version_script ... ok
+test version_script::tests::extern_without_semicolon_version_script ... ok
+test wasm::tests::ensure_memory_covers_stack_and_matches_heap_end ... ok
+test wasm::tests::linker_defined_data_symbol_addresses ... ok
+test wasm::tests::parse_target_features_payload_used_and_disallowed ... ok
+test wasm::tests::stack_first_heap_base_follows_data_not_stack ... ok
+test wasm::tests::stack_high_is_sixteen_byte_aligned ... ok
+test wasm::tests::stack_pointer_init_stack_first_is_stack_size ... ok
+test wasm::tests::target_features_deduplicates_used_features_across_objects ... ok
+test wasm::tests::target_features_errors_when_used_and_disallowed_conflict ... ok
+test version_script::tests::extern_cxx_version_script ... ok
+test linker_script::tests::test_version_command_with_other_commands ... ok
+test wasm::tests::unaligned_stack_size_is_rejected ... ok
+test compression::tests::zlib_multi_shard_round_trip ... ok
+test tidy_tests::check_elf_specific_code ... ok
+test compression::tests::zstd_multi_shard_round_trip ... ok
+test tidy_tests::check_text_files ... ok
+test tidy_tests::check_toml_format ... ok
+test tidy_tests::check_sources_format ... ok
+
+test result: ok. 122 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+

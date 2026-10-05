@@ -1,7 +1,10 @@
 import hashlib
 import importlib.util
 import io
+import json
+import os
 import pathlib
+import subprocess
 import tarfile
 import tempfile
 import unittest
@@ -58,6 +61,87 @@ class PrepareWildTests(unittest.TestCase):
             self.assertIsNone(module.prepare({}, module.TARGET, "/unused"))
             self.assertIsNone(module.prepare({"bundled_tools": {"wild": {}}}, "aarch64-apple-darwin", "/unused"))
             download.assert_not_called()
+
+    def source_fixture(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = pathlib.Path(temporary.name)
+        checkout = root / "source"
+        (checkout / "compact-artifact").mkdir(parents=True)
+        (checkout / "compact-artifact/Cargo.toml").write_text("fixture")
+        for name in module.FILES[1:]:
+            (checkout / name).write_text("fixture license")
+        for args in (
+            ["init", "--quiet"], ["add", "."],
+            ["-c", "user.name=Wild fixture", "-c", "user.email=fixture@example.invalid",
+             "-c", "core.hooksPath=/dev/null", "commit", "--quiet", "-m", "Source fixture"],
+            ["remote", "add", "origin", module.SOURCE_REPOSITORY],
+        ):
+            subprocess.run(["git", "-C", str(checkout), *args], check=True)
+        revision = subprocess.check_output(
+            ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True,
+        ).strip()
+        wild = {"version": "0.10.0", "source": {
+            "repository": module.SOURCE_REPOSITORY, "revision": revision,
+            "rust_toolchain": "1.98.0",
+        }}
+        return root, checkout, wild
+
+    def test_source_build_uses_pin_and_records_binary(self):
+        root, checkout, wild = self.source_fixture()
+        tools = root / "tools"
+        tools.mkdir()
+        rustup = tools / "rustup"
+        rustup.write_text("""#!/usr/bin/env python3
+import pathlib, sys
+assert sys.argv[1:3] == ['run', '1.98.0'], sys.argv
+if sys.argv[3:5] == ['cargo', 'build']:
+    assert '--locked' in sys.argv and '--release' in sys.argv
+    output = pathlib.Path(sys.argv[sys.argv.index('--target-dir') + 1])
+    target = sys.argv[sys.argv.index('--target') + 1]
+    binary = output / target / 'release/wild'
+    binary.parent.mkdir(parents=True)
+    binary.write_text('#!/bin/sh\\necho "Wild 0.10.0 fixture"\\n')
+    binary.chmod(0o755)
+elif sys.argv[3:5] == ['cargo', '-V']:
+    print('cargo 1.98.0 fixture')
+elif sys.argv[3:5] == ['rustc', '-vV']:
+    print('rustc 1.98.0 fixture')
+else:
+    raise AssertionError(sys.argv)
+""")
+        rustup.chmod(0o755)
+        with patch.dict(os.environ, {"PATH": f"{tools}{os.pathsep}{os.environ['PATH']}"}):
+            output = module.prepare(
+                {"bundled_tools": {"wild": wild}}, module.TARGET, root / "payload", checkout,
+            )
+        self.assertEqual(set(p.name for p in output.iterdir()), {
+            *module.FILES, "provenance.json", module.COMPACT_CAPABILITY,
+        })
+        self.assertEqual((output / module.COMPACT_CAPABILITY).read_bytes(), module.COMPACT_FORMAT)
+        provenance = json.loads((output / "provenance.json").read_text())
+        self.assertEqual(provenance["binary_sha256"], hashlib.sha256((output / "wild").read_bytes()).hexdigest())
+        self.assertEqual(provenance["rustc_version"], "rustc 1.98.0 fixture")
+        self.assertEqual(module.verify_source(wild, checkout), checkout.resolve())
+
+    def test_source_rejects_wrong_revision_dirty_tree_and_wrong_repository(self):
+        root, checkout, wild = self.source_fixture()
+        with self.assertRaisesRegex(ValueError, "requires a source checkout"):
+            module.prepare({"bundled_tools": {"wild": wild}}, module.TARGET, root / "payload")
+        pinned = wild["source"]["revision"]
+        wild["source"]["revision"] = "1" * 40
+        with self.assertRaisesRegex(ValueError, "revision mismatch"):
+            module.verify_source(wild, checkout)
+        wild["source"]["revision"] = pinned
+        untracked = checkout / "injected.rs"
+        untracked.write_text("unexpected input")
+        with self.assertRaisesRegex(ValueError, "not clean"):
+            module.verify_source(wild, checkout)
+        untracked.unlink()
+        subprocess.run(["git", "-C", str(checkout), "remote", "set-url", "origin",
+                        "https://github.com/example/wild"], check=True)
+        with self.assertRaisesRegex(ValueError, "repository mismatch"):
+            module.verify_source(wild, checkout)
 
 
 if __name__ == "__main__":

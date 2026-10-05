@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 5 ]]; then
-  echo "usage: verify-release-sources.sh MANIFEST OHM_RUST_CHECKOUT OHM_CARGO_CHECKOUT OHM_CLIPPY_CHECKOUT OHM_RUSTFMT_CHECKOUT" >&2
+if [[ $# -lt 5 || $# -gt 6 ]]; then
+  echo "usage: verify-release-sources.sh MANIFEST OHM_RUST_CHECKOUT OHM_CARGO_CHECKOUT OHM_CLIPPY_CHECKOUT OHM_RUSTFMT_CHECKOUT [OHM_WILD_CHECKOUT]" >&2
   exit 2
 fi
 
@@ -14,6 +14,18 @@ rustfmt_checkout="$5"
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 "$script_dir/validate-release-manifest.sh" --require-pinned "$manifest"
+
+if jq -e '.bundled_tools.wild.source' "$manifest" >/dev/null; then
+  if [[ $# -ne 6 ]]; then
+    echo 'source-pinned Wild requires its checkout beside the Rust checkout' >&2
+    exit 1
+  fi
+  python3 "$script_dir/prepare-wild.py" "$manifest" --verify-source --source-checkout "$6"
+  if [[ "$(cd -- "$6" && pwd -P)" != "$(cd -- "$rust_checkout/.." && pwd -P)/wild" ]]; then
+    echo 'Wild source must be at ../wild relative to the Rust checkout for compact-artifact' >&2
+    exit 1
+  fi
+fi
 
 rust_revision="$(jq -er '.sources.rust.revision' "$manifest")"
 cargo_revision="$(jq -er '.sources.cargo.revision' "$manifest")"

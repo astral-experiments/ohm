@@ -1,0 +1,184 @@
+{
+  "description": "Pre-final compiler worktree check; final candidate rerun pending.",
+  "original_receipt_sha256": "199e12e291564504a5f712f2880066adf754ef186eec3b9588fa376ebd1ca5fd",
+  "script_sha256": "eb1155b597285dbdccbda9c719f01e61e46271f05d27975099f881cd86766390",
+  "case": "compact-archives-worktree-no-logger",
+  "correctness_passed": true,
+  "original_overall_passed": false,
+  "provenance": {
+    "cargo_sha256": "230b28d5eacdad73f11106d2878b52384a9c2ba61053b0939e1254df717ff013",
+    "wild_sha256": "f1bec498f7e559cfc915c5db91b86af7ad6fb6348bf1a0334a7a9186af77131d",
+    "sysroot": "/home/dev-user/code/oss/ohm-compact-study/toolchains/compact-shipping"
+  },
+  "seed": {
+    "files": 45,
+    "bytes": 792139,
+    "reflinked_files": 43
+  },
+  "commands": [
+    {
+      "label": "cargo-version",
+      "returncode": 0
+    },
+    {
+      "label": "rustc-version",
+      "returncode": 0
+    },
+    {
+      "label": "sysroot",
+      "returncode": 0
+    },
+    {
+      "label": "verify-retained-image",
+      "returncode": 0
+    },
+    {
+      "label": "verify-image-detached",
+      "returncode": 0
+    },
+    {
+      "label": "mount-owned-fixture",
+      "returncode": 0
+    },
+    {
+      "label": "git-init",
+      "returncode": 0
+    },
+    {
+      "label": "git-root",
+      "returncode": 0
+    },
+    {
+      "label": "git-local-identity",
+      "returncode": 0
+    },
+    {
+      "label": "git-identity",
+      "returncode": 0
+    },
+    {
+      "label": "lockfile",
+      "returncode": 0
+    },
+    {
+      "label": "git-add",
+      "returncode": 0
+    },
+    {
+      "label": "git-commit",
+      "returncode": 0
+    },
+    {
+      "label": "git-base",
+      "returncode": 0
+    },
+    {
+      "label": "git-upstream",
+      "returncode": 0
+    },
+    {
+      "label": "donor-build",
+      "returncode": 0
+    },
+    {
+      "label": "donor-build-runtime",
+      "returncode": 0
+    },
+    {
+      "label": "donor-noop",
+      "returncode": 0
+    },
+    {
+      "label": "donor-noop-runtime",
+      "returncode": 0
+    },
+    {
+      "label": "seed-worktree",
+      "returncode": 0
+    },
+    {
+      "label": "child-local-base-upstream",
+      "returncode": 0
+    },
+    {
+      "label": "seeded-archive-alone",
+      "returncode": 0
+    },
+    {
+      "label": "seeded-archive-alone-runtime",
+      "returncode": 0
+    },
+    {
+      "label": "child-with-donor-hidden",
+      "returncode": 0
+    },
+    {
+      "label": "child-with-donor-hidden-runtime",
+      "returncode": 0
+    },
+    {
+      "label": "first-private-child-edit",
+      "returncode": 0
+    },
+    {
+      "label": "first-private-child-edit-runtime",
+      "returncode": 0
+    },
+    {
+      "label": "second-private-child-edit",
+      "returncode": 0
+    },
+    {
+      "label": "second-private-child-edit-runtime",
+      "returncode": 0
+    },
+    {
+      "label": "child-final-noop",
+      "returncode": 0
+    },
+    {
+      "label": "child-final-noop-runtime",
+      "returncode": 0
+    },
+    {
+      "label": "unmount-owned-fixture",
+      "returncode": 32
+    }
+  ],
+  "teardown_error": "AssertionError('unmount-owned-fixture: umount: /home/dev-user/code/oss/ohm-compact-study/shipping/worktree-cow: target is busy.\\n')",
+  "teardown_recovery": {
+    "started": 1791160007.3982577,
+    "original_exec": "89e750b7-b3cd-4a94-a5e2-fa0387e7f25c",
+    "mount_record": "50 29 0:39 / /home/dev-user/code/oss/ohm-compact-study/shipping/worktree-cow rw,nosuid,nodev,relatime shared:28 - btrfs /dev/loop0 rw,discard=async,space_cache=v2,subvolid=5,subvol=/",
+    "commands": [
+      {
+        "argv": [
+          "sudo",
+          "-n",
+          "umount",
+          "/home/dev-user/code/oss/ohm-compact-study/shipping/worktree-cow"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "sudo",
+          "-n",
+          "losetup",
+          "-j",
+          "/home/dev-user/code/oss/ohm-compact-study/cow-fixture.img"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ],
+    "passed": true,
+    "unmounted": true,
+    "image_preserved": true,
+    "fixture_files_retained_inside_image": true,
+    "finished": 1791160007.4926274
+  }
+}

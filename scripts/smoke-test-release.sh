@@ -6,6 +6,7 @@ if [[ $# -ne 4 ]]; then
   exit 2
 fi
 RELEASE_DIRECTORY="$(cd -- "$1" && pwd)"
+script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 OHM_TOOLCHAIN=$2
 OHM_TARGET=$3
 CLIPPY_REVISION=$4
@@ -107,10 +108,16 @@ ohm_smoke_macros::make_answer!();
 fn main() {
     assert!(invert(false));
     assert_eq!(answer(), 42);
+    assert_eq!(ohm_smoke::library_answer(), 42);
 }
 
 fn invert(value: bool) -> bool {
     !value
+}
+EOF
+cat > "$smoke_crate/src/lib.rs" <<'EOF'
+pub fn library_answer() -> u32 {
+    42
 }
 EOF
 
@@ -205,6 +212,10 @@ if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] && \
       | grep -i "$linker" >/dev/null
   done
 fi
+
+python3 "$script_directory/smoke_test_compact.py" \
+  "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" "$OHM_TARGET" \
+  "$toolchain_root" "$smoke_crate" "$smoke_root"
 
 cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
 cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"

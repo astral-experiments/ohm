@@ -10,7 +10,11 @@ manifest_path='toolchains/1.97.1/1.json'
 manifest="$test_root/$manifest_path"
 mkdir -p -- "$(dirname -- "$manifest")"
 cp "$repository_root/$manifest_path" "$manifest"
-jq 'del(.sources.rustfmt)' "$manifest" > "$test_root/legacy.json"
+jq 'del(.sources.rustfmt) | .bundled_tools.wild = {
+  version: "0.10.0",
+  source: {repository: "https://github.com/astral-sh/ohm-wild",
+           revision: "1111111111111111111111111111111111111111", rust_toolchain: "1.98.0"}
+}' "$manifest" > "$test_root/legacy.json"
 cp "$test_root/legacy.json" "$manifest"
 
 git -C "$test_root" init --quiet
@@ -78,11 +82,44 @@ jq '.sources.rustfmt.revision = "6666666666666666666666666666666666666666"' \
 cp "$test_root/updated-rustfmt.json" "$manifest"
 check_history
 
+jq '.bundled_tools.wild.source.revision = "7777777777777777777777777777777777777777"' \
+  "$manifest" > "$test_root/updated-wild.json"
+cp "$test_root/updated-wild.json" "$manifest"
+check_history
+
 release_tag="$(git -C "$test_root" show "$base_revision:$manifest_path" | jq -er '.release.toolchain_name')"
 git -C "$test_root" tag "$release_tag"
 expect_history_failure 'a published Rustfmt source revision change'
 
 git -C "$test_root" show "$base_revision:$manifest_path" > "$manifest"
 check_history
+
+# Pinning a source-built Wild changes its zero revision, but not its repository or toolchain.
+draft_path='toolchains/1.97.1/2.json'
+draft="$test_root/$draft_path"
+jq '
+  .status = "draft" |
+  .release.ohm_revision = 2 |
+  .release.toolchain_name = "ohm-1.97.1-2" |
+  .sources[].revision = "0000000000000000000000000000000000000000" |
+  .bundled_tools.wild.source.revision = "0000000000000000000000000000000000000000"
+' "$manifest" > "$draft"
+git -C "$test_root" add "$draft_path"
+git -C "$test_root" \
+  -c user.name='Ohm manifest fixture' \
+  -c user.email='ohm-manifest-fixture@example.invalid' \
+  commit --quiet -m 'Add source-Wild draft fixture'
+base_revision="$(git -C "$test_root" rev-parse HEAD)"
+jq '
+  .status = "pinned" |
+  .sources[].revision = "1111111111111111111111111111111111111111" |
+  .bundled_tools.wild.source.revision = "2222222222222222222222222222222222222222"
+' "$draft" > "$test_root/pinned-wild.json"
+cp "$test_root/pinned-wild.json" "$draft"
+check_history
+jq '.bundled_tools.wild.source.rust_toolchain = "1.99.0"' \
+  "$draft" > "$test_root/changed-wild-toolchain.json"
+cp "$test_root/changed-wild-toolchain.json" "$draft"
+expect_history_failure 'a Wild build toolchain change while pinning a draft'
 
 echo 'manifest history tests passed'

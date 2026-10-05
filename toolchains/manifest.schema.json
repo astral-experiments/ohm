@@ -60,7 +60,7 @@
         "wild": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["version", "sha256"],
+          "required": ["version"],
           "properties": {
             "version": {
               "type": "string",
@@ -69,8 +69,39 @@
             "sha256": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            "source": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["repository", "revision", "rust_toolchain"],
+              "properties": {
+                "repository": {
+                  "const": "https://github.com/astral-sh/ohm-wild"
+                },
+                "revision": {
+                  "$ref": "#/$defs/revision"
+                },
+                "rust_toolchain": {
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                }
+              }
             }
-          }
+          },
+          "oneOf": [
+            {
+              "required": ["sha256"],
+              "not": {
+                "required": ["source"]
+              }
+            },
+            {
+              "required": ["source"],
+              "not": {
+                "required": ["sha256"]
+              }
+            }
+          ]
         }
       }
     }

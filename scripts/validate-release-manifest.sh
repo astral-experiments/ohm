@@ -78,6 +78,7 @@ rust_revision="$(jq -er '.sources.rust.revision' "$manifest")"
 cargo_revision="$(jq -er '.sources.cargo.revision' "$manifest")"
 clippy_revision="$(jq -er '.sources.clippy.revision' "$manifest")"
 rustfmt_revision="$(jq -r '.sources.rustfmt.revision // empty' "$manifest")"
+wild_revision="$(jq -r '.bundled_tools.wild.source.revision // empty' "$manifest")"
 zero_revision="0000000000000000000000000000000000000000"
 expected_toolchain_name="ohm-$rust_version-$ohm_revision"
 path_rust_version="$(basename -- "$(dirname -- "$manifest")")"
@@ -96,13 +97,15 @@ fi
 if [[ "$status" == "draft" ]]; then
   if [[ "$rust_revision" != "$zero_revision" || "$cargo_revision" != "$zero_revision" ||
     "$clippy_revision" != "$zero_revision" ||
-    ( -n "$rustfmt_revision" && "$rustfmt_revision" != "$zero_revision" ) ]]; then
+    ( -n "$rustfmt_revision" && "$rustfmt_revision" != "$zero_revision" ) ||
+    ( -n "$wild_revision" && "$wild_revision" != "$zero_revision" ) ]]; then
     echo "a draft manifest must use zero source revisions" >&2
     exit 1
   fi
 elif [[ "$rust_revision" == "$zero_revision" || "$cargo_revision" == "$zero_revision" ||
   "$clippy_revision" == "$zero_revision" ||
-  ( -n "$rustfmt_revision" && "$rustfmt_revision" == "$zero_revision" ) ]]; then
+  ( -n "$rustfmt_revision" && "$rustfmt_revision" == "$zero_revision" ) ||
+  ( -n "$wild_revision" && "$wild_revision" == "$zero_revision" ) ]]; then
   echo "a pinned manifest cannot use zero source revisions" >&2
   exit 1
 fi

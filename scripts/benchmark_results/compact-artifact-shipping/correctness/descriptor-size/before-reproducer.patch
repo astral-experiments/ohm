@@ -1,0 +1,28 @@
+diff --git a/compact-artifact/src/lib.rs b/compact-artifact/src/lib.rs
+index 71f8a029..028bf66b 100644
+--- a/compact-artifact/src/lib.rs
++++ b/compact-artifact/src/lib.rs
+@@ -1233,6 +1233,23 @@ mod tests {
+         }
+     }
+ 
++    #[test]
++    fn authenticated_section_size_mismatch_is_rejected() {
++        let mut packed = pack_elf(&sample(), Options::default()).unwrap();
++        let section = HEADER + usize_at(&packed, 32).unwrap() + SECTION_ENTRY;
++        let index_end = HEADER + usize_at(&packed, 32).unwrap() + usize_at(&packed, 56).unwrap();
++        put64(&mut packed, section + 8, 1);
++        let mut hasher = blake3::Hasher::new();
++        hasher.update(&packed[..64]);
++        hasher.update(&packed[HEADER..index_end]);
++        packed[64..HEADER].copy_from_slice(hasher.finalize().as_bytes());
++        let object = CompactObject::parse(&packed).unwrap();
++        // Before the fix, Wild copied these bytes into its ELF sh_size allocation.
++        let bytes = object.read_section(&packed, 1).unwrap();
++        let mut output = vec![0; 4096];
++        output.copy_from_slice(bytes);
++    }
++
+     #[test]
+     fn every_truncation_and_index_corruption_is_rejected() {
+         let packed = pack_elf(&sample(), Options::default()).unwrap();

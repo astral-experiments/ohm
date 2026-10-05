@@ -1,0 +1,137 @@
+{
+  "started": 1791159757.4935834,
+  "wild_source": "dfca4f88ffc49cc796aab8f76b7e2d5a731e4df5",
+  "passed": true,
+  "steps": [
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-stable-lld-prerequisite.log",
+      "argv": [
+        "sudo",
+        "-n",
+        "apt-get",
+        "install",
+        "--yes",
+        "lld"
+      ],
+      "seconds": 10.050234041060321,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-stable-padding-complete.log",
+      "argv": [
+        "rustup",
+        "run",
+        "1.97.1",
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "wild-linker",
+        "--test",
+        "integration_tests",
+        "--",
+        "elf/x86_64/compressed-debug-tls/",
+        "--test-threads=2"
+      ],
+      "seconds": 0.9456275079865009,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-stable-integration-complete.log",
+      "argv": [
+        "rustup",
+        "run",
+        "1.97.1",
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "wild-linker",
+        "--test",
+        "integration_tests",
+        "--",
+        "elf/x86_64/",
+        "--test-threads=4"
+      ],
+      "seconds": 18.0660766629735,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-stable-unit-complete.log",
+      "argv": [
+        "rustup",
+        "run",
+        "1.97.1",
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "libwild",
+        "-p",
+        "compact-artifact",
+        "--lib"
+      ],
+      "seconds": 0.6329247059766203,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-stable-pack-build-complete.log",
+      "argv": [
+        "rustup",
+        "run",
+        "1.97.1",
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "compact-artifact",
+        "--bin",
+        "wild-pack"
+      ],
+      "seconds": 6.171481346944347,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-stable-e2e.log",
+      "argv": [
+        "python3",
+        "/home/dev-user/code/oss/ohm-compact-study/harness/test_compact_wild.py"
+      ],
+      "seconds": 1.3954504259163514,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-upstream-download-complete.log",
+      "argv": [
+        "python3",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/release-tools/prepare-wild.py",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/release-tools/shipped-manifest.json",
+        "x86_64-unknown-linux-gnu",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/wild-upstream-release"
+      ],
+      "seconds": 0.4940643730806187,
+      "exit_code": 0
+    }
+  ],
+  "tools": {
+    "ld.lld": "Ubuntu LLD 18.1.3 (compatible with GNU linkers)",
+    "ld.bfd": "GNU ld (GNU Binutils for Ubuntu) 2.42\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.",
+    "clang": "Ubuntu clang version 18.1.3 (1ubuntu1)\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin",
+    "gdb": "GNU gdb (Ubuntu 15.1-1ubuntu1~24.04.1) 15.1\nCopyright (C) 2024 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.",
+    "clang-format": "Ubuntu clang-format version 18.1.3 (1ubuntu1)",
+    "taplo": "taplo 0.10.0"
+  },
+  "finished": 1791159795.6423264
+}

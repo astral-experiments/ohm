@@ -1,0 +1,97 @@
+{
+  "started": 1791160011.287832,
+  "wild_source": "8969b04ee1bcb39493126406dbe6ad21988a97c8",
+  "passed": true,
+  "steps": [
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-final-source-build.log",
+      "argv": [
+        "python3",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/release-tools/prepare-wild.py",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/release-tools/stable-source-manifest.json",
+        "x86_64-unknown-linux-gnu",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/wild-release",
+        "--source-checkout",
+        "/home/dev-user/code/oss/ohm-compact-study/wild"
+      ],
+      "seconds": 101.52571850793902,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-final-unit.log",
+      "argv": [
+        "rustup",
+        "run",
+        "1.97.1",
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "libwild",
+        "-p",
+        "compact-artifact",
+        "--lib"
+      ],
+      "seconds": 25.5426337759709,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-final-padding.log",
+      "argv": [
+        "rustup",
+        "run",
+        "1.97.1",
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "wild-linker",
+        "--test",
+        "integration_tests",
+        "--",
+        "elf/x86_64/compressed-debug-tls/",
+        "--test-threads=2"
+      ],
+      "seconds": 118.28702900896315,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-final-pack-build.log",
+      "argv": [
+        "rustup",
+        "run",
+        "1.97.1",
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "compact-artifact",
+        "--bin",
+        "wild-pack"
+      ],
+      "seconds": 2.4835653100162745,
+      "exit_code": 0
+    },
+    {
+      "log": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/wild-final-e2e.log",
+      "argv": [
+        "python3",
+        "/home/dev-user/code/oss/ohm-compact-study/harness/test_compact_wild.py"
+      ],
+      "seconds": 1.9743023209739476,
+      "exit_code": 0
+    }
+  ],
+  "previous_full_native_validation": "/home/dev-user/code/oss/ohm-compact-study/shipping/evidence/stable-wild-validation.json",
+  "wild_version": "Wild 0.10.0 non-git-build (compatible with GNU linkers)",
+  "finished": 1791160261.3282714
+}

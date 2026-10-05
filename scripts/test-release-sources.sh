@@ -121,10 +121,36 @@ if "$script_dir/verify-release-sources.sh" \
 fi
 git -C "$rust_checkout/src/tools/rustfmt" restore README.md
 
+# Source-built Wild is the same checkout rustc uses through its sibling path dependency.
+wild_checkout="$test_root/wild"
+mkdir -p "$wild_checkout/compact-artifact"
+git -C "$wild_checkout" init --quiet
+git -C "$wild_checkout" remote add origin https://github.com/astral-sh/ohm-wild
+printf 'fixture compact-artifact\n' > "$wild_checkout/compact-artifact/Cargo.toml"
+git -C "$wild_checkout" add compact-artifact/Cargo.toml
+commit_fixture "$wild_checkout" -m 'Add Wild fixture'
+wild_revision="$(git -C "$wild_checkout" rev-parse HEAD)"
+jq --arg revision "$wild_revision" '.bundled_tools.wild = {
+  version: "0.10.0",
+  source: {repository: "https://github.com/astral-sh/ohm-wild", revision: $revision,
+           rust_toolchain: "1.98.0"}
+}' "$release_manifest" > "$test_root/source-wild.json"
+cp "$test_root/source-wild.json" "$release_manifest"
+
+if "$script_dir/verify-release-sources.sh" \
+  "$release_manifest" "$rust_checkout" "$cargo_checkout" \
+  "$clippy_checkout" "$rustfmt_checkout" >/dev/null 2>&1; then
+  echo 'source verification accepted a missing Wild checkout' >&2
+  exit 1
+fi
+"$script_dir/verify-release-sources.sh" \
+  "$release_manifest" "$rust_checkout" "$cargo_checkout" \
+  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt" "$wild_checkout"
+
 printf 'unexpected Rust change\n' >> "$rust_checkout/src/version"
 if "$script_dir/verify-release-sources.sh" \
   "$release_manifest" "$rust_checkout" "$cargo_checkout" \
-  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt" \
+  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt" "$wild_checkout" \
   >/dev/null 2>&1; then
   echo 'source verification ignored a dirty Rust checkout outside tool overlays' >&2
   exit 1

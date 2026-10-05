@@ -70,4 +70,5 @@ if bash "$script_directory/smoke-test-release.sh" "$valid" "$toolchain" \
   exit 1
 fi
 grep -F 'FAILED' "$temporary_directory/smoke.log"
+python3 "$script_directory/test_smoke_compact.py"
 echo 'release packaging tests passed'

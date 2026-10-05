@@ -51,7 +51,8 @@ while IFS= read -r manifest; do
           .sources.rust.revision,
           .sources.cargo.revision,
           .sources.clippy.revision,
-          .sources.rustfmt.revision
+          .sources.rustfmt.revision,
+          .bundled_tools.wild.source.revision
         )
       '
       previous_identity="$(
@@ -78,8 +79,9 @@ while IFS= read -r manifest; do
       fi
       ;;
     draft:pinned)
-      previous_identity="$(git show "$base_revision:$manifest" | jq -S 'del(.status, .sources)')"
-      current_identity="$(jq -S 'del(.status, .sources)' "$manifest")"
+      identity_fields='del(.status, .sources, .bundled_tools.wild.source.revision)'
+      previous_identity="$(git show "$base_revision:$manifest" | jq -S "$identity_fields")"
+      current_identity="$(jq -S "$identity_fields" "$manifest")"
       if [[ "$previous_identity" != "$current_identity" ]]; then
         echo "draft-to-pinned transition changed release identity: $manifest" >&2
         exit 1

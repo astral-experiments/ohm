@@ -1,0 +1,39 @@
+[
+  {
+    "file": "wild-stable-padding-complete.log",
+    "results": [
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 1586 filtered out; finished in 0.16s"
+    ]
+  },
+  {
+    "file": "wild-stable-integration-complete.log",
+    "results": [
+      "test elf/x86_64/linker-plugin-lto/plugin-not-found                               ... ignored (A linker driver is required for LTO)",
+      "test elf/x86_64/lto-no-plugin/gcc                                                ... ignored (A linker driver is required for LTO)",
+      "test elf/x86_64/lto-no-plugin/clang                                              ... ignored (A linker driver is required for LTO)",
+      "test elf/x86_64/tlsdesc/clang-tls-desc                                           ... ignored (Failed platform test requirements. \"clang\" \"-c\" \"-x\" \"c\" \"-\" \"-o\" \"/dev/null\" \"-mtls-dialect=gnu2\": clang: error: unsupported argument 'gnu2' to option '-mtls-dialect=' for target 'x86_64-pc-linux-gnu'",
+      "test elf/x86_64/tlsdesc/clang-tls-desc-shared                                    ... ignored (Failed platform test requirements. \"clang\" \"-c\" \"-x\" \"c\" \"-\" \"-o\" \"/dev/null\" \"-mtls-dialect=gnu2\": clang: error: unsupported argument 'gnu2' to option '-mtls-dialect=' for target 'x86_64-pc-linux-gnu'",
+      "test elf/x86_64/mov-indirect-to-absolute/malfunction-no-mov-indirect-to-absolute ... ignored (Malfunction tests are allowed only in Debug profile)",
+      "test elf/x86_64/rust-integration-dynamic/lto                                     ... ignored (Can't use rust+clang with linker plugin. LLVM version mismatch? Check that clang --version matches LLVM version reported by `rustc -vV`.",
+      "test elf/x86_64/tls-local-dynamic/malfunction-no-identify-tls-gd-large           ... ignored (Malfunction tests are allowed only in Debug profile)",
+      "test elf/x86_64/rust-integration/llvm-static                                     ... ignored (Test doesn't support musl-libc)",
+      "test elf/x86_64/rust-integration/linker-plugin-lto                               ... ignored (Can't use rust+clang with linker plugin. LLVM version mismatch? Check that clang --version matches LLVM version reported by `rustc -vV`.",
+      "test elf/x86_64/linker-diff-trivial/malfunction-elf-incorrect-type               ... ignored (Malfunction tests are allowed only in Debug profile)",
+      "test elf/x86_64/gotpcrelx-jump/malfunction-no-jmp-indirect-to-relative           ... ignored (Malfunction tests are allowed only in Debug profile)",
+      "test elf/x86_64/cpp-integration/clang-crel                                       ... ignored (Failed platform test requirements. \"clang++\" \"-c\" \"-x\" \"c\" \"-\" \"-o\" \"/dev/null\" \"-Wa,--crel,--allow-experimental-crel\": clang++: error: unsupported argument '--crel' to option '-Wa,'",
+      "test result: ok. 406 passed; 0 failed; 13 ignored; 0 measured; 1169 filtered out; finished in 17.61s"
+    ]
+  },
+  {
+    "file": "wild-stable-unit-complete.log",
+    "results": [
+      "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+      "test args::elf::tests::test_ignored_flags ... ok",
+      "test result: ok. 122 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s"
+    ]
+  },
+  {
+    "file": "wild-stable-e2e.log",
+    "results": []
+  }
+]

@@ -1,0 +1,99 @@
+diff --git a/compact-artifact/src/lib.rs b/compact-artifact/src/lib.rs
+index 71f8a029..b3ec6280 100644
+--- a/compact-artifact/src/lib.rs
++++ b/compact-artifact/src/lib.rs
+@@ -501,7 +501,25 @@ impl CompactObject {
+             .count()
+     }
+ 
+-    pub fn read_section<'a>(&'a self, source: &'a [u8], index: usize) -> io::Result<&'a [u8]> {
++    /// Read a section only when its descriptor matches the size in its ELF header.
++    /// Reject mismatches before decoding a payload or passing bytes to ELF consumers.
++    pub fn read_section_with_size<'a>(
++        &'a self,
++        source: &'a [u8],
++        index: usize,
++        expected_size: u64,
++    ) -> io::Result<&'a [u8]> {
++        let section = self
++            .sections
++            .get(index)
++            .ok_or_else(|| invalid("compact section index out of bounds"))?;
++        if section.len as u64 != expected_size {
++            return Err(invalid("compact ELF section size mismatch"));
++        }
++        self.read_section(source, index)
++    }
++
++    fn read_section<'a>(&'a self, source: &'a [u8], index: usize) -> io::Result<&'a [u8]> {
+         let section = self
+             .sections
+             .get(index)
+@@ -757,10 +775,7 @@ pub fn unpack_elf(data: &[u8]) -> io::Result<Vec<u8>> {
+         if kind == 8 || usize_at(&output, header + 32)? == 0 {
+             continue;
+         }
+-        let bytes = object.read_section(data, index)?;
+-        if bytes.len() != usize_at(&output, header + 32)? {
+-            return Err(invalid("compact ELF section size mismatch"));
+-        }
++        let bytes = object.read_section_with_size(data, index, u64_at(&output, header + 32)?)?;
+         let end = offset
+             .checked_add(bytes.len())
+             .ok_or_else(|| invalid("compact ELF size overflow"))?;
+@@ -1233,6 +1248,39 @@ mod tests {
+         }
+     }
+ 
++    #[test]
++    fn authenticated_section_size_mismatch_is_rejected() {
++        let packed = pack_elf(&sample(), Options::default()).unwrap();
++        let section = HEADER + usize_at(&packed, 32).unwrap() + SECTION_ENTRY;
++        let index_end = HEADER + usize_at(&packed, 32).unwrap() + usize_at(&packed, 56).unwrap();
++        for length in [0, 1, 4097] {
++            let mut malformed = packed.clone();
++            put64(&mut malformed, section + 8, length);
++            let mut hasher = blake3::Hasher::new();
++            hasher.update(&malformed[..64]);
++            hasher.update(&malformed[HEADER..index_end]);
++            malformed[64..HEADER].copy_from_slice(hasher.finalize().as_bytes());
++            let object = CompactObject::parse(&malformed).unwrap();
++            assert_eq!(
++                object
++                    .read_section_with_size(&malformed, 1, 4096)
++                    .unwrap_err()
++                    .to_string(),
++                "compact ELF section size mismatch"
++            );
++            assert_eq!(object.decoded_blocks(), 0);
++            assert_eq!(
++                unpack_elf(&malformed).unwrap_err().to_string(),
++                "compact ELF section size mismatch"
++            );
++        }
++        let object = CompactObject::parse(&packed).unwrap();
++        assert_eq!(
++            object.read_section_with_size(&packed, 1, 4096).unwrap(),
++            vec![42; 4096]
++        );
++    }
++
+     #[test]
+     fn every_truncation_and_index_corruption_is_rejected() {
+         let packed = pack_elf(&sample(), Options::default()).unwrap();
+diff --git a/libwild/src/elf.rs b/libwild/src/elf.rs
+index dfb33eec..5691b77b 100644
+--- a/libwild/src/elf.rs
++++ b/libwild/src/elf.rs
+@@ -2991,9 +2991,10 @@ impl<'data, C: ElfClass> platform::ObjectFile<'data> for File<'data, C> {
+         if let Some(compact) = self.compact
+             && offset & compact_artifact::VIRTUAL_OFFSET != 0
+         {
+-            return Ok(compact.object.read_section(
++            return Ok(compact.object.read_section_with_size(
+                 compact.source,
+                 (offset & !compact_artifact::VIRTUAL_OFFSET) as usize,
++                section.sh_size(LittleEndian).into(),
+             )?);
+         }
+         Ok(section.data(LittleEndian, self.data)?)

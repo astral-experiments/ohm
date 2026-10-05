@@ -22,13 +22,34 @@ The version-specific installer verifies Wild's version, and release smoke tests
 build and run with both Wild and LLD. Provenance records the Wild version and
 archive checksum. Older manifests and macOS distributions omit Wild.
 
+A manifest can instead pin `bundled_tools.wild.source` with
+`repository: "https://github.com/astral-sh/ohm-wild"`, an exact `revision`, and
+a release `rust_toolchain` such as `1.98.0`. This replaces the archive `sha256`;
+`version` remains the linker's reported version. The workflow checks that source
+out at `source/wild` beside `source/rust` on both platforms, so rustc and Wild
+compile the same `compact-artifact` crate. Linux builds Wild with the pinned
+toolchain and `cargo build --locked --release`; provenance records the resulting
+binary SHA-256 and compiler versions. macOS only needs the shared crate source.
+Source verification rejects dirty trees, wrong revisions, and wrong repositories.
+The release GitHub App needs access to `ohm-wild` for these manifests, and source
+tagging includes its pinned revision.
+
+For a local candidate, pass a clean checkout at that layout to the existing
+release-source verifier as its optional sixth argument. Then prepare the Linux
+payload with `python3 scripts/prepare-wild.py MANIFEST x86_64-unknown-linux-gnu
+DESTINATION --source-checkout /path/to/wild`. Install the manifest's pinned Rust
+toolchain first. These commands accept locally committed revisions; publishing
+the source and a new release manifest is a separate step. Existing release
+manifests keep their archive pins.
+
 Starting with Ohm 1.98.0-10, `cargo +ohm test` selects upstream Wild by default
 for native Linux x86-64 GNU rustc invocations. Use `-Zohm-linker=lld` to select
 the bundled LLD, or `-Zohm-defaults=no` to disable automatic selection with the
 other Ohm defaults. Explicit linker configuration takes precedence. Rustdoc
 doctests and native compilation inside build scripts retain their existing
 configuration. This uses Wild's full linker; incremental linking is not enabled.
-The experimental ohm-wild fork and Mach-O linker are not packaged.
+The existing published manifests use upstream Wild. Source-build support alone
+does not enable compact artifacts in Cargo. The Mach-O linker is not packaged.
 
 Ohm releases are built from protected `main` using an immutable, pinned toolchain manifest.
 

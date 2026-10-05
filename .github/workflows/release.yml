@@ -31,6 +31,8 @@ jobs:
       cargo-revision: ${{ steps.manifest.outputs.cargo-revision }}
       clippy-revision: ${{ steps.manifest.outputs.clippy-revision }}
       rustfmt-revision: ${{ steps.manifest.outputs.rustfmt-revision }}
+      wild-revision: ${{ steps.manifest.outputs.wild-revision }}
+      wild-rust-toolchain: ${{ steps.manifest.outputs.wild-rust-toolchain }}
       manifest: ${{ steps.manifest.outputs.manifest }}
       toolchain: ${{ steps.manifest.outputs.toolchain }}
     steps:
@@ -67,6 +69,8 @@ jobs:
             echo "cargo-revision=$(jq -er '.sources.cargo.revision' "$MANIFEST_PATH")"
             echo "clippy-revision=$(jq -er '.sources.clippy.revision' "$MANIFEST_PATH")"
             echo "rustfmt-revision=$(jq -er '.sources.rustfmt.revision' "$MANIFEST_PATH")"
+            echo "wild-revision=$(jq -r '.bundled_tools.wild.source.revision // empty' "$MANIFEST_PATH")"
+            echo "wild-rust-toolchain=$(jq -r '.bundled_tools.wild.source.rust_toolchain // empty' "$MANIFEST_PATH")"
             echo "manifest=$MANIFEST_PATH"
             echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")"
           } >> "$GITHUB_OUTPUT"
@@ -83,6 +87,7 @@ jobs:
             ohm-cargo
             ohm-rust-clippy
             ohm-rustfmt
+            ${{ steps.manifest.outputs.wild-revision != '' && 'ohm-wild' || '' }}
           permission-contents: read
 
       - name: Check out pinned ohm-rust
@@ -121,6 +126,16 @@ jobs:
           persist-credentials: false
           path: source/rustfmt
 
+      - name: Check out pinned Wild source and shared compact-artifact crate
+        if: ${{ steps.manifest.outputs.wild-revision != '' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: astral-sh/ohm-wild
+          ref: ${{ steps.manifest.outputs.wild-revision }}
+          token: ${{ steps.source-token.outputs.token }}
+          persist-credentials: false
+          path: source/wild
+
       - name: Verify source revisions
         env:
           MANIFEST_PATH: ${{ steps.manifest.outputs.manifest }}
@@ -130,7 +145,8 @@ jobs:
             source/rust \
             source/cargo \
             source/clippy \
-            source/rustfmt
+            source/rustfmt \
+            source/wild
 
   build:
     if: inputs.build
@@ -173,6 +189,7 @@ jobs:
             ohm-cargo
             ohm-rust-clippy
             ohm-rustfmt
+            ${{ needs.plan.outputs.wild-revision != '' && 'ohm-wild' || '' }}
           permission-contents: read
 
       - name: Check out pinned ohm-rust
@@ -213,6 +230,16 @@ jobs:
           persist-credentials: false
           path: source/rust/src/tools/rustfmt
 
+      - name: Check out pinned Wild source and shared compact-artifact crate
+        if: ${{ needs.plan.outputs.wild-revision != '' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: astral-sh/ohm-wild
+          ref: ${{ needs.plan.outputs.wild-revision }}
+          token: ${{ steps.source-token.outputs.token }}
+          persist-credentials: false
+          path: source/wild
+
       - name: Verify source revisions
         env:
           MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
@@ -222,7 +249,8 @@ jobs:
             source/rust \
             source/rust/src/tools/cargo \
             source/rust/src/tools/clippy \
-            source/rust/src/tools/rustfmt
+            source/rust/src/tools/rustfmt \
+            source/wild
 
       - name: Install pinned LLVM BOLT tools
         if: matrix.target == 'x86_64-unknown-linux-gnu'
@@ -322,12 +350,19 @@ jobs:
             printf 'SDKROOT=%s\n' "$(xcrun --sdk macosx --show-sdk-path)"
           } >> "$GITHUB_ENV"
 
+      - name: Install pinned compiler for source-built Wild
+        if: matrix.target == 'x86_64-unknown-linux-gnu' && needs.plan.outputs.wild-revision != ''
+        env:
+          WILD_RUST_TOOLCHAIN: ${{ needs.plan.outputs.wild-rust-toolchain }}
+        run: rustup toolchain install "$WILD_RUST_TOOLCHAIN" --profile minimal
+
       - name: Prepare pinned Wild linker
         env:
           MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
         run: |
           wild_directory="$(python3 scripts/prepare-wild.py \
-            "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
+            "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild" \
+            --source-checkout "$GITHUB_WORKSPACE/source/wild")"
           printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
 
       - name: Build optimized extended Rust distribution
@@ -377,6 +412,10 @@ jobs:
           RUSTFMT_REVISION: ${{ needs.plan.outputs.rustfmt-revision }}
         run: |
           manifest_sha256="$(shasum -a 256 "$MANIFEST_PATH" | awk '{print $1}')"
+          wild_build='{}'
+          if [[ -n "$OHM_WILD_LINKER_DIR" && -f "$OHM_WILD_LINKER_DIR/provenance.json" ]]; then
+            wild_build="$(cat "$OHM_WILD_LINKER_DIR/provenance.json")"
+          fi
           jq -n \
             --arg toolchain "$OHM_TOOLCHAIN" \
             --arg target "$OHM_TARGET" \
@@ -388,8 +427,10 @@ jobs:
             --arg cargo_revision "$CARGO_REVISION" \
             --arg clippy_revision "$CLIPPY_REVISION" \
             --arg rustfmt_revision "$RUSTFMT_REVISION" \
-            --argjson bundled_tools "$(jq --arg target "$OHM_TARGET" \
-              'if $target == "x86_64-unknown-linux-gnu" then .bundled_tools // {} else {} end' "$MANIFEST_PATH")" \
+            --argjson bundled_tools "$(jq --arg target "$OHM_TARGET" --argjson build "$wild_build" \
+              'if $target == "x86_64-unknown-linux-gnu" then
+                 (.bundled_tools // {} | if .wild then .wild += $build else . end)
+               else {} end' "$MANIFEST_PATH")" \
             '{
               schema_version: 1,
               toolchain: $toolchain,
@@ -573,6 +614,7 @@ jobs:
             ohm-cargo
             ohm-rust-clippy
             ohm-rustfmt
+            ${{ needs.plan.outputs.wild-revision != '' && 'ohm-wild' || '' }}
           permission-contents: write
 
       - name: Tag release source revisions
@@ -583,6 +625,7 @@ jobs:
           RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
           RUSTFMT_REVISION: ${{ needs.plan.outputs.rustfmt-revision }}
           SOURCE_OWNER: ${{ github.repository_owner }}
+          WILD_REVISION: ${{ needs.plan.outputs.wild-revision }}
         run: |
           sources=(
             "ohm-rust:$RUST_REVISION"
@@ -590,6 +633,9 @@ jobs:
             "ohm-rust-clippy:$CLIPPY_REVISION"
             "ohm-rustfmt:$RUSTFMT_REVISION"
           )
+          if [[ -n "$WILD_REVISION" ]]; then
+            sources+=("ohm-wild:$WILD_REVISION")
+          fi
           missing_sources=()
 
           for source in "${sources[@]}"; do
