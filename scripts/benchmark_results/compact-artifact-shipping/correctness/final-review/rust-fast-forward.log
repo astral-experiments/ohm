@@ -1,0 +1,18 @@
+Updating e55e0485efc..d59f1c63326
+Fast-forward
+ .github/workflows/ci.yml                           |  49 ++-
+ compiler/rustc_codegen_ssa/src/back/link.rs        | 142 +--------
+ .../src/back/link/compressed_artifacts.rs          | 151 ++++++++++
+ .../src/artifact_compression.rs                    | 330 +--------------------
+ .../src/artifact_compression/tests.rs              | 327 ++++++++++++++++++++
+ .../rustc_data_structures/src/indexed_artifact.rs  |  23 +-
+ .../src/indexed_artifact/tests.rs                  |  20 ++
+ src/tools/cargo                                    |   2 +-
+ src/tools/generate-copyright/src/cargo_metadata.rs |  44 +--
+ .../generate-copyright/src/cargo_metadata/tests.rs |  41 +++
+ src/tools/tidy/src/deps.rs                         |   5 +
+ 11 files changed, 604 insertions(+), 530 deletions(-)
+ create mode 100644 compiler/rustc_codegen_ssa/src/back/link/compressed_artifacts.rs
+ create mode 100644 compiler/rustc_data_structures/src/artifact_compression/tests.rs
+ create mode 100644 compiler/rustc_data_structures/src/indexed_artifact/tests.rs
+ create mode 100644 src/tools/generate-copyright/src/cargo_metadata/tests.rs

@@ -1,0 +1,42 @@
+   Compiling compact-artifact v0.1.0 (/private/tmp/ohm-compact-stable-wild/compact-artifact)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.48s
+     Running unittests src/lib.rs (/private/tmp/codex-cargo-targets/shared-build/ohm/debug/build/workspaces/ebfbeec40da9fff3/7b9e8bcf06fe84e6/compact-artifact/23352e44e0532b8b/out/compact_artifact-23352e44e0532b8b)
+
+running 15 tests
+test tests::authenticated_invalid_section_descriptors_are_rejected ... ok
+test tests::materialization_rejects_inconsistent_section_count ... ok
+test tests::unused_payload_is_not_touched_and_used_corruption_is_rejected ... ok
+test tests::payload_is_lazy_and_pinned_once ... ok
+test tests::every_truncation_and_index_corruption_is_rejected ... ok
+test tests::configured_decoded_cache_stays_within_its_budget ... ok
+test tests::authenticated_section_size_mismatch_is_rejected ... ok
+test tests::materialization_rejects_corrupt_payload_and_invalid_alignment ... ok
+test tests::materialized_elf_preserves_sections_and_alignment ... ok
+test library::tests::version_one_manifests_remain_readable ... ok
+test tests::file_backed_payload_remains_valid_after_pages_are_evicted ... ok
+test library::tests::version_two_rejects_paths_in_member_names ... ok
+test library::tests::partial_nearby_store_does_not_hide_complete_ancestor ... ok
+test library::tests::references_are_relative_and_survive_moves_and_aliases ... ok
+test tests::manifest_integrity_and_concurrent_store_publication ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/main.rs (/private/tmp/codex-cargo-targets/shared-build/ohm/debug/build/workspaces/ebfbeec40da9fff3/7b9e8bcf06fe84e6/compact-artifact/e2537727068d016a/out/wild_pack-e2537727068d016a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/raw_metadata.rs (/private/tmp/codex-cargo-targets/shared-build/ohm/debug/build/workspaces/ebfbeec40da9fff3/7b9e8bcf06fe84e6/compact-artifact/89b954f02840b9f7/out/raw_metadata-89b954f02840b9f7)
+
+running 1 test
+test raw_metadata_length_is_checked_before_copying ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests compact_artifact
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,26 @@
+{
+  "head": "9546795cae23d424bec08487b4f3cace591efb5a",
+  "url": "https://github.com/astral-sh/ohm-rust/actions/runs/37255222028",
+  "conclusion": "failure",
+  "failed_step": "Create read-only Wild source token",
+  "error": "The 'client-id' (or deprecated 'app-id') input must be set to a non-empty string.",
+  "client_id_variable": "OHM_SOURCE_APP_CLIENT_ID",
+  "private_key_secret": "OHM_SOURCE_APP_PRIVATE_KEY",
+  "compiler_or_tidy_executed": false,
+  "later_ci_stages": "unverified; jobs stopped at missing credentials",
+  "settings_or_secrets_changed": false,
+  "jobs": [
+    {
+      "name": "Compiler and regression tests",
+      "conclusion": "failure"
+    },
+    {
+      "name": "Formatting and tidy",
+      "conclusion": "failure"
+    },
+    {
+      "name": "Compiler and regression tests (macOS)",
+      "conclusion": "failure"
+    }
+  ]
+}

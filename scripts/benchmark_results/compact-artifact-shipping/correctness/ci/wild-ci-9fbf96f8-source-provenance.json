@@ -1,0 +1,37 @@
+{
+  "repository": "astral-sh/ohm-wild",
+  "pr": "https://github.com/astral-sh/ohm-wild/pull/32",
+  "measured_head": "dba82ebe99d98adbfe6358215d456cdddb1877da",
+  "rust_ci_source_pin": "0f3f4b429c747372466213dbd1ff8eca87516170",
+  "review_head": "9fbf96f8b0ced108ea3f90c2341a289b16363ff7",
+  "shared_crate_tree": "87dad1ac8aab2b7bf757bb607cef25196f4c66fb",
+  "measured_shared_crate_tree": "214c4264333a304f35506c9456828c12a9eba066",
+  "delta_from_rust_pin": ".github/workflows/ci.yml | 2 +-\n 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "delta_from_measured": ".github/workflows/ci.yml                           | 99 +++++++++++-----------\n .github/workflows/external_tests.yml               |  5 +-\n compact-artifact/src/lib.rs                        |  3 +\n compact-artifact/src/library.rs                    |  4 +-\n deny.toml                                          |  1 +\n libwild/src/input_data.rs                          |  2 +-\n .../compressed-debug-tls/compressed-debug-tls.c    | 11 +++\n 7 files changed, 71 insertions(+), 54 deletions(-)",
+  "source_changes": [
+    "Pin exact existing GitHub Actions refs and add contents: read for private checkout",
+    "Document and locally allow the fixed 64 KiB streaming stack buffer; no allocation change",
+    "Use consuming iteration and a diagnostic-rich empty-string assertion in cfg(test) code",
+    "Allow the existing zstd dependencies BSD-3-Clause license after checking package declarations and license files",
+    "Remove one redundant reborrow of an existing &Path",
+    "Retain compression/TLS initialization/zero/data assertions and add a volatile runtime 64-byte alignment assertion; ignore only .tdata section-header alignment and DT_FLAGS_1.NOW comparison differences",
+    "Raise only the Nix matrix timeout from 10 to 20 minutes after healthy Wild and GCC-adapter checks exceeded 10 minutes; retain all jobs and commands"
+  ],
+  "binary_identity_claim": false,
+  "local_validation": {
+    "compiler": "rustc 1.99.0-dev 348339dda (ohm-1.99.0-1)",
+    "clippy": "0.1.99 f52143702f",
+    "focused_compact_clippy": "passed all-targets, -D warnings",
+    "workspace_clippy": "macOS default/no-default passed with only newer clippy::assert_is_empty allowed locally at unchanged upstream sites; Linux CI 1.94 retains -D warnings",
+    "compact_unit_tests": 15,
+    "licenses": "cargo-deny 0.20.2 check licenses passed; official archive checksum verified",
+    "format": "cargo +ohm fmt, yamlfmt 0.21 pass; actionlint 1.7.12 passes apart from ignored stale ubuntu-26.04 runner catalog entry"
+  },
+  "prior_ci": {
+    "initial": "all jobs rejected unpinned actions before checkout",
+    "0f3": "23 checks pass; Nix/wild cancelled at 10 minutes while release tests compiled",
+    "nix_intermediate": "c834 Nix adapter-llvm cache download HTTP 416; final 0f3 Nix adapters passed",
+    "b997": "23 checks pass; Nix/wild passes in 11m59s with its 20-minute allowance, adapterGcc cancelled at 10 minutes after reaching the GNU hello runtime check"
+  },
+  "final_ci_state": "24 of 24 checks passed at exact review head; see wild-32-final-summary.json"
+}

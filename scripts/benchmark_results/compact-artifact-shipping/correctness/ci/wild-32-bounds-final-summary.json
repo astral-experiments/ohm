@@ -1,0 +1,839 @@
+{
+  "repository": "astral-sh/ohm-wild",
+  "pr": "https://github.com/astral-sh/ohm-wild/pull/32",
+  "head": "9179eb988df2676342192a24dc337cf9823e9d56",
+  "collected_utc": "2026-10-05T02:34:39.168908+00:00",
+  "passed": true,
+  "checks_passed": 24,
+  "checks": [
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578899",
+      "name": "Test Linux (ci-opensuse-amd64)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590676770",
+      "name": "Nix/adapter-llvm",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590676805",
+      "name": "Nix/wild",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590676846",
+      "name": "Nix/adapterGcc",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172003/job/111590578151",
+      "name": "Run mold tests",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578578",
+      "name": "Test Mach-O (AArch64)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578786",
+      "name": "Test Linux (ci-ubuntu-arm64)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578884",
+      "name": "Test Linux (ci-opensuse-arm64)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578733",
+      "name": "Build wasip1",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578631",
+      "name": "minimal-versions",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578711",
+      "name": "Spell Check with Typos",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578746",
+      "name": "Build Linux (RISC-V)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590579058",
+      "name": "Test Linux (ci-ubuntu-cross-amd64)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578846",
+      "name": "Test Linux (ci-alpine-amd64)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578667",
+      "name": "Build Linux (LoongArch64)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578861",
+      "name": "yamlfmt",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578681",
+      "name": "Cargo deny",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578645",
+      "name": "Check formatting",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578756",
+      "name": "Clippy",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578676",
+      "name": "Build Linux (PPC64LE)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578720",
+      "name": "Find Nix checks",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578602",
+      "name": "Build Windows (x86_64)",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578416",
+      "name": "Test Wasm",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578894",
+      "name": "Test Linux (ci-arch-cross-amd64)",
+      "state": "SUCCESS"
+    }
+  ],
+  "runs": [
+    {
+      "id": 37255172023,
+      "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023",
+      "head_sha": "9179eb988df2676342192a24dc337cf9823e9d56",
+      "status": "completed",
+      "conclusion": "success",
+      "run_started_at": "2026-10-05T02:22:56Z",
+      "updated_at": "2026-10-05T02:33:50Z",
+      "jobs": [
+        {
+          "id": 111590578416,
+          "name": "Test Wasm",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:00Z",
+          "completed_at": "2026-10-05T02:24:46Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578416"
+        },
+        {
+          "id": 111590578578,
+          "name": "Test Mach-O (AArch64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:03Z",
+          "completed_at": "2026-10-05T02:24:02Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578578"
+        },
+        {
+          "id": 111590578602,
+          "name": "Build Windows (x86_64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:00Z",
+          "completed_at": "2026-10-05T02:24:22Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578602"
+        },
+        {
+          "id": 111590578631,
+          "name": "minimal-versions",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:01Z",
+          "completed_at": "2026-10-05T02:27:06Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578631"
+        },
+        {
+          "id": 111590578645,
+          "name": "Check formatting",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:00Z",
+          "completed_at": "2026-10-05T02:23:14Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578645"
+        },
+        {
+          "id": 111590578667,
+          "name": "Build Linux (LoongArch64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:01Z",
+          "completed_at": "2026-10-05T02:26:14Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578667"
+        },
+        {
+          "id": 111590578676,
+          "name": "Build Linux (PPC64LE)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:00Z",
+          "completed_at": "2026-10-05T02:27:30Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578676"
+        },
+        {
+          "id": 111590578681,
+          "name": "Cargo deny",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:01Z",
+          "completed_at": "2026-10-05T02:23:43Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578681"
+        },
+        {
+          "id": 111590578711,
+          "name": "Spell Check with Typos",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:01Z",
+          "completed_at": "2026-10-05T02:23:10Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578711"
+        },
+        {
+          "id": 111590578720,
+          "name": "Find Nix checks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:00Z",
+          "completed_at": "2026-10-05T02:23:26Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578720"
+        },
+        {
+          "id": 111590578733,
+          "name": "Build wasip1",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:02Z",
+          "completed_at": "2026-10-05T02:25:10Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578733"
+        },
+        {
+          "id": 111590578746,
+          "name": "Build Linux (RISC-V)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:01Z",
+          "completed_at": "2026-10-05T02:26:33Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578746"
+        },
+        {
+          "id": 111590578756,
+          "name": "Clippy",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:00Z",
+          "completed_at": "2026-10-05T02:23:57Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578756"
+        },
+        {
+          "id": 111590578786,
+          "name": "Test Linux (ci-ubuntu-arm64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:03Z",
+          "completed_at": "2026-10-05T02:25:37Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578786"
+        },
+        {
+          "id": 111590578846,
+          "name": "Test Linux (ci-alpine-amd64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:01Z",
+          "completed_at": "2026-10-05T02:26:42Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578846"
+        },
+        {
+          "id": 111590578861,
+          "name": "yamlfmt",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:01Z",
+          "completed_at": "2026-10-05T02:23:30Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578861"
+        },
+        {
+          "id": 111590578884,
+          "name": "Test Linux (ci-opensuse-arm64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:03Z",
+          "completed_at": "2026-10-05T02:25:26Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578884"
+        },
+        {
+          "id": 111590578894,
+          "name": "Test Linux (ci-arch-cross-amd64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:00Z",
+          "completed_at": "2026-10-05T02:27:43Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578894"
+        },
+        {
+          "id": 111590578899,
+          "name": "Test Linux (ci-opensuse-amd64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:36Z",
+          "completed_at": "2026-10-05T02:26:07Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578899"
+        },
+        {
+          "id": 111590579058,
+          "name": "Test Linux (ci-ubuntu-cross-amd64)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:01Z",
+          "completed_at": "2026-10-05T02:28:13Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590579058"
+        },
+        {
+          "id": 111590676770,
+          "name": "Nix/adapter-llvm",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:30Z",
+          "completed_at": "2026-10-05T02:33:49Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590676770"
+        },
+        {
+          "id": 111590676805,
+          "name": "Nix/wild",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:29Z",
+          "completed_at": "2026-10-05T02:31:34Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590676805"
+        },
+        {
+          "id": 111590676846,
+          "name": "Nix/adapterGcc",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:29Z",
+          "completed_at": "2026-10-05T02:31:41Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590676846"
+        }
+      ]
+    },
+    {
+      "id": 37255172003,
+      "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172003",
+      "head_sha": "9179eb988df2676342192a24dc337cf9823e9d56",
+      "status": "completed",
+      "conclusion": "success",
+      "run_started_at": "2026-10-05T02:22:56Z",
+      "updated_at": "2026-10-05T02:27:18Z",
+      "jobs": [
+        {
+          "id": 111590578151,
+          "name": "Run mold tests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T02:23:19Z",
+          "completed_at": "2026-10-05T02:27:18Z",
+          "html_url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172003/job/111590578151"
+        }
+      ]
+    }
+  ],
+  "platform_runtime_evidence": [
+    {
+      "head": "9179eb988df2676342192a24dc337cf9823e9d56",
+      "platform": "opensuse-amd64",
+      "job": 111590578899,
+      "url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578899",
+      "test_summaries": [
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "15",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "122",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "8",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "421",
+          "0",
+          "1185",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_metadata_test": [
+        "2026-10-05T02:25:18.1734426Z test raw_metadata_length_is_checked_before_copying ... ok"
+      ],
+      "compressed_tls_cases": [
+        "2026-10-05T02:25:20.8886864Z test elf/x86_64/compressed-debug-tls/zlib                                        ... ok",
+        "2026-10-05T02:25:20.9035466Z test elf/x86_64/compressed-debug-tls/zstd                                        ... ok"
+      ],
+      "raw_log_sha256": "0bf12211377c130099df21520ea71c9d0a1f8bc93993aae347d5b45bd3a42389",
+      "raw_log": "wild-ci-9179eb98-opensuse-amd64.log"
+    },
+    {
+      "head": "9179eb988df2676342192a24dc337cf9823e9d56",
+      "platform": "ubuntu-arm64",
+      "job": 111590578786,
+      "url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578786",
+      "test_summaries": [
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "15",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "122",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "8",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "356",
+          "0",
+          "1249",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_metadata_test": [
+        "2026-10-05T02:24:58.3828573Z test raw_metadata_length_is_checked_before_copying ... ok"
+      ],
+      "compressed_tls_cases": [
+        "2026-10-05T02:25:06.7651015Z test elf/aarch64/compressed-debug-tls/zlib                                       ... ok",
+        "2026-10-05T02:25:06.8434836Z test elf/aarch64/compressed-debug-tls/zstd                                       ... ok"
+      ],
+      "raw_log_sha256": "a0ed4898e8b83c4850cb77a48375306db1eb84867a5f4b9c7fdce5d6b2d36e51",
+      "raw_log": "wild-ci-9179eb98-ubuntu-arm64.log"
+    },
+    {
+      "head": "9179eb988df2676342192a24dc337cf9823e9d56",
+      "platform": "opensuse-arm64",
+      "job": 111590578884,
+      "url": "https://github.com/astral-sh/ohm-wild/actions/runs/37255172023/job/111590578884",
+      "test_summaries": [
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "15",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "122",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "8",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "358",
+          "0",
+          "1247",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "raw_metadata_test": [
+        "2026-10-05T02:24:44.0550482Z test raw_metadata_length_is_checked_before_copying ... ok"
+      ],
+      "compressed_tls_cases": [
+        "2026-10-05T02:24:52.3719406Z test elf/aarch64/compressed-debug-tls/zlib                                       ... ok",
+        "2026-10-05T02:24:53.1806065Z test elf/aarch64/compressed-debug-tls/zstd                                       ... ok"
+      ],
+      "raw_log_sha256": "a0943925e591c5cf56ccf863397a09ea0b7adfe4f67f5106e9e886eaddfbe441",
+      "raw_log": "wild-ci-9179eb98-opensuse-arm64.log"
+    }
+  ],
+  "logs": {
+    "wild-ci-9179eb98-clippy.log": {
+      "bytes": 43364,
+      "sha256": "e81a6051de54d9727afbb36a14d55d5c6bde985cf27b3fa3c5e1c7c1e67894c9"
+    },
+    "wild-ci-9179eb98-external-mold.log": {
+      "bytes": 106581,
+      "sha256": "721e90ce3ec3d0da13b111cbc3878838d15311c4f53fa626c2e688ca042069d7"
+    },
+    "wild-ci-9179eb98-licenses.log": {
+      "bytes": 38855,
+      "sha256": "b49ddf441d39feb188c1b9c0b6104a141211f537aa1505e7a18f988519d4f9db"
+    },
+    "wild-ci-9179eb98-nix-wild.log": {
+      "bytes": 641316,
+      "sha256": "25bf7a672ce1fd0c16bed21d926a380abb941f73bd32ee89cc41ed39f751aac8"
+    },
+    "wild-ci-9179eb98-opensuse-amd64.log": {
+      "bytes": 280052,
+      "sha256": "0bf12211377c130099df21520ea71c9d0a1f8bc93993aae347d5b45bd3a42389"
+    },
+    "wild-ci-9179eb98-opensuse-arm64.log": {
+      "bytes": 282400,
+      "sha256": "a0943925e591c5cf56ccf863397a09ea0b7adfe4f67f5106e9e886eaddfbe441"
+    },
+    "wild-ci-9179eb98-ubuntu-arm64.log": {
+      "bytes": 298053,
+      "sha256": "a0ed4898e8b83c4850cb77a48375306db1eb84867a5f4b9c7fdce5d6b2d36e51"
+    }
+  },
+  "scope": "Exact final-head component CI includes actual allocation-regression execution on three native Linux platform jobs; not a new performance measurement",
+  "source_provenance": "wild-ci-9179eb98-source-provenance.json",
+  "raw_metadata_guard_receipt": "../raw-metadata-length/receipt.json",
+  "prior_all_green_head": "9fbf96f8b0ced108ea3f90c2341a289b16363ff7",
+  "prior_summary": "wild-32-final-summary.json",
+  "nix_raw_metadata_execution": [
+    "2026-10-05T02:31:01.2939952Z wild> test raw_metadata_length_is_checked_before_copying ... ok(B"
+  ]
+}

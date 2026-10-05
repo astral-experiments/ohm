@@ -1,0 +1,87 @@
+diff --git a/compact-artifact/src/lib.rs b/compact-artifact/src/lib.rs
+index f25fc41b..30806d7d 100644
+--- a/compact-artifact/src/lib.rs
++++ b/compact-artifact/src/lib.rs
+@@ -333,6 +333,10 @@ fn put64(bytes: &mut [u8], offset: usize, value: u64) {
+ }
+ 
+ fn decode(bytes: &[u8], codec: u32, raw_len: usize) -> io::Result<Vec<u8>> {
++    // Raw metadata must obey its declared limit before allocating a copy.
++    if codec == 0 && bytes.len() != raw_len {
++        return Err(invalid("decoded compact artifact length mismatch"));
++    }
+     let result = match codec {
+         0 => bytes.to_vec(),
+         1 => zstd::bulk::decompress(bytes, raw_len)?,
+diff --git a/compact-artifact/tests/raw_metadata.rs b/compact-artifact/tests/raw_metadata.rs
+new file mode 100644
+index 00000000..36807238
+--- /dev/null
++++ b/compact-artifact/tests/raw_metadata.rs
+@@ -0,0 +1,66 @@
++use compact_artifact::CompactObject;
++use std::alloc::GlobalAlloc;
++use std::alloc::Layout;
++use std::alloc::System;
++use std::cell::Cell;
++
++thread_local! {
++    static LARGEST_ALLOCATION: Cell<Option<usize>> = const { Cell::new(None) };
++}
++
++struct TrackingAllocator;
++
++// SAFETY: Allocation and deallocation are forwarded unchanged to System.
++unsafe impl GlobalAlloc for TrackingAllocator {
++    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
++        let _ = LARGEST_ALLOCATION.try_with(|largest| {
++            if let Some(size) = largest.get() {
++                largest.set(Some(size.max(layout.size())));
++            }
++        });
++        // SAFETY: The caller supplies the layout required by GlobalAlloc.
++        unsafe { System.alloc(layout) }
++    }
++
++    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
++        // SAFETY: The caller supplies the allocation and its original layout.
++        unsafe { System.dealloc(ptr, layout) }
++    }
++}
++
++// Keep allocation observation in its own test binary and on the calling thread.
++#[global_allocator]
++static ALLOCATOR: TrackingAllocator = TrackingAllocator;
++
++#[test]
++fn raw_metadata_length_is_checked_before_copying() {
++    const HEADER: usize = 96;
++    const METADATA_LEN: usize = 16 * 1024;
++
++    for declared_len in [METADATA_LEN, METADATA_LEN - 1] {
++        let mut packed = vec![0; HEADER + METADATA_LEN];
++        packed[..8].copy_from_slice(compact_artifact::MAGIC);
++        packed[8..12].copy_from_slice(&1_u32.to_le_bytes());
++        packed[24..32].copy_from_slice(&(declared_len as u64).to_le_bytes());
++        packed[32..40].copy_from_slice(&(METADATA_LEN as u64).to_le_bytes());
++        packed[HEADER..HEADER + 6].copy_from_slice(b"\x7fELF\x02\x01");
++        let mut checksum = blake3::Hasher::new();
++        checksum.update(&packed[..64]);
++        checksum.update(&packed[HEADER..]);
++        packed[64..HEADER].copy_from_slice(checksum.finalize().as_bytes());
++
++        LARGEST_ALLOCATION.set(Some(0));
++        let result = CompactObject::parse(&packed);
++        let largest = LARGEST_ALLOCATION.take().unwrap();
++        if declared_len == METADATA_LEN {
++            assert_eq!(result.unwrap().metadata().len(), METADATA_LEN);
++            assert!(largest >= METADATA_LEN, "the control must observe the copy");
++        } else {
++            assert_eq!(result.unwrap_err().kind(), std::io::ErrorKind::InvalidData);
++            assert!(
++                largest < METADATA_LEN,
++                "mismatched raw metadata was copied before rejection ({largest} bytes)"
++            );
++        }
++    }
++}
