@@ -1,0 +1,6621 @@
+{
+  "passed": true,
+  "checks": 14541,
+  "matrix_sha256": "6b97f51c8f2072b70e7bf81624f9cc4f3bfbe9f3d20fb5864a59fd3223659ebf",
+  "transfer_verified_files": 1270,
+  "transfer_verified_bytes": 523408877,
+  "commands": 312,
+  "fresh_cells": 24,
+  "runtime_oracles": 312,
+  "format_cells": 24,
+  "no_op_checks": 48,
+  "edit_log_checks": 216,
+  "source_heads": {
+    "rust": "e55e0485efc397741f4aaf861f1c74a281ac902f",
+    "wild": "dba82ebe99d98adbfe6358215d456cdddb1877da",
+    "cargo": "207626090e1fb9b405abd806a86c1b42bd2db5ff"
+  },
+  "additional_baseline_raw_comparisons": [
+    {
+      "project": "uv",
+      "phase": "clean",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 3,
+      "wall_seconds": {
+        "reference_mean": 143.23011357197538,
+        "candidate_mean": 146.82079493863662,
+        "delta_mean": 3.590681366661253,
+        "ratio_of_means_percent": 2.5069318714579403,
+        "paired_percent_median": 1.8087035717020417,
+        "paired_percent_range": [
+          0.9929515800378486,
+          4.718821810901552
+        ],
+        "increased_pairs": 3
+      },
+      "allocated_bytes": {
+        "reference_mean": 3768649045.3333335,
+        "candidate_mean": 2564651690.6666665,
+        "delta_mean": -1203997354.6666667,
+        "ratio_of_means_percent": -31.947717608716054,
+        "paired_percent_median": -31.94790430355753,
+        "paired_percent_range": [
+          -31.948130710088883,
+          -31.947117814371097
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 142.56604908709414,
+            "candidate_mean": 145.1446463089669,
+            "delta_mean": 2.5785972218727693,
+            "ratio_of_means_percent": 1.8087035717020417,
+            "paired_percent_median": 1.8087035717020417,
+            "paired_percent_range": [
+              1.8087035717020417,
+              1.8087035717020417
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 143.7365363748977,
+            "candidate_mean": 145.1637705839239,
+            "delta_mean": 1.42723420902621,
+            "ratio_of_means_percent": 0.9929515800378486,
+            "paired_percent_median": 0.9929515800378486,
+            "paired_percent_range": [
+              0.9929515800378486,
+              0.9929515800378486
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 143.3877552539343,
+            "candidate_mean": 150.15396792301908,
+            "delta_mean": 6.76621266908478,
+            "ratio_of_means_percent": 4.718821810901552,
+            "paired_percent_median": 4.718821810901552,
+            "paired_percent_range": [
+              4.718821810901552,
+              4.718821810901552
+            ],
+            "increased_pairs": 1
+          }
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "direct-edit",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 9,
+      "wall_seconds": {
+        "reference_mean": 2.5619042011158957,
+        "candidate_mean": 2.7631715460059545,
+        "delta_mean": 0.20126734489005887,
+        "ratio_of_means_percent": 7.856162022076862,
+        "paired_percent_median": 11.040724740866992,
+        "paired_percent_range": [
+          -4.165182440647253,
+          17.5629166968716
+        ],
+        "increased_pairs": 7
+      },
+      "allocated_bytes": {
+        "reference_mean": 3768646314.6666665,
+        "candidate_mean": 2564653966.2222223,
+        "delta_mean": -1203992348.4444444,
+        "ratio_of_means_percent": -31.94760791849305,
+        "paired_percent_median": -31.947383465331146,
+        "paired_percent_range": [
+          -31.94947594498917,
+          -31.945928263003054
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 2.5048361643372723,
+            "candidate_mean": 2.758429412652428,
+            "delta_mean": 0.2535932483151555,
+            "ratio_of_means_percent": 10.124145120774841,
+            "paired_percent_median": 11.011208085277557,
+            "paired_percent_range": [
+              2.7005732995302845,
+              17.5629166968716
+            ],
+            "increased_pairs": 3
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 2.745970545996291,
+            "candidate_mean": 2.7963193356990814,
+            "delta_mean": 0.05034878970279048,
+            "ratio_of_means_percent": 1.8335517027376902,
+            "paired_percent_median": -3.184785325577899,
+            "paired_percent_range": [
+              -4.165182440647253,
+              14.85303646274254
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 2.434905893014123,
+            "candidate_mean": 2.734765889666354,
+            "delta_mean": 0.2998599966522306,
+            "ratio_of_means_percent": 12.31505486567448,
+            "paired_percent_median": 12.266553845098539,
+            "paired_percent_range": [
+              11.040724740866992,
+              13.643665024162566
+            ],
+            "increased_pairs": 3
+          }
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "library-edit",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 9,
+      "wall_seconds": {
+        "reference_mean": 6.87795948356183,
+        "candidate_mean": 6.665725725987512,
+        "delta_mean": -0.21223375757431817,
+        "ratio_of_means_percent": -3.085708167975576,
+        "paired_percent_median": -1.2493467258468116,
+        "paired_percent_range": [
+          -11.432132480276758,
+          1.0583149882241738
+        ],
+        "increased_pairs": 4
+      },
+      "allocated_bytes": {
+        "reference_mean": 3781964686.2222223,
+        "candidate_mean": 2578067911.111111,
+        "delta_mean": -1203896775.1111112,
+        "ratio_of_means_percent": -31.83257579048616,
+        "paired_percent_median": -31.59781086162654,
+        "paired_percent_range": [
+          -32.43549561877855,
+          -31.48118990468295
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 6.616519796662033,
+            "candidate_mean": 6.632435943970147,
+            "delta_mean": 0.015916147308113675,
+            "ratio_of_means_percent": 0.24055164644325444,
+            "paired_percent_median": 0.7969249225940889,
+            "paired_percent_range": [
+              -1.2493467258468116,
+              1.0070507255762529
+            ],
+            "increased_pairs": 2
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 6.943232307016539,
+            "candidate_mean": 6.743157930322923,
+            "delta_mean": -0.2000743766936163,
+            "ratio_of_means_percent": -2.881573996759834,
+            "paired_percent_median": 0.7822907971879012,
+            "paired_percent_range": [
+              -10.766585783043748,
+              1.0583149882241738
+            ],
+            "increased_pairs": 2
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 7.07412634700692,
+            "candidate_mean": 6.621583303669468,
+            "delta_mean": -0.45254304333745193,
+            "ratio_of_means_percent": -6.397158053713925,
+            "paired_percent_median": -4.627786704476944,
+            "paired_percent_range": [
+              -11.432132480276758,
+              -3.1243301545326063
+            ],
+            "increased_pairs": 0
+          }
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "inline-edit",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 9,
+      "wall_seconds": {
+        "reference_mean": 7.591013875906356,
+        "candidate_mean": 7.569288123360214,
+        "delta_mean": -0.021725752546141546,
+        "ratio_of_means_percent": -0.2862035678145469,
+        "paired_percent_median": -0.4260470997169419,
+        "paired_percent_range": [
+          -4.473338415275652,
+          5.380669569168939
+        ],
+        "increased_pairs": 4
+      },
+      "allocated_bytes": {
+        "reference_mean": 3753184369.7777777,
+        "candidate_mean": 2549336291.5555553,
+        "delta_mean": -1203848078.2222223,
+        "ratio_of_means_percent": -32.07537812200526,
+        "paired_percent_median": -32.074825143535634,
+        "paired_percent_range": [
+          -32.43456496933233,
+          -31.72460617469717
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 7.583761564300706,
+            "candidate_mean": 7.5233253826930495,
+            "delta_mean": -0.06043618160765618,
+            "ratio_of_means_percent": -0.7969156347444994,
+            "paired_percent_median": -0.4260470997169419,
+            "paired_percent_range": [
+              -2.4422341719189,
+              0.46720495291814323
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 7.519362562025587,
+            "candidate_mean": 7.589478590370466,
+            "delta_mean": 0.07011602834487955,
+            "ratio_of_means_percent": 0.932473035666348,
+            "paired_percent_median": 1.7315869633927061,
+            "paired_percent_range": [
+              -3.83377659322115,
+              5.380669569168939
+            ],
+            "increased_pairs": 2
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 7.669917501392774,
+            "candidate_mean": 7.595060397017126,
+            "delta_mean": -0.074857104375648,
+            "ratio_of_means_percent": -0.9759831753347381,
+            "paired_percent_median": -0.4732833312393603,
+            "paired_percent_range": [
+              -4.473338415275652,
+              2.42697972254744
+            ],
+            "increased_pairs": 1
+          }
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "noop-final",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 3,
+      "wall_seconds": {
+        "reference_mean": 0.9146926570295667,
+        "candidate_mean": 0.9125990509831657,
+        "delta_mean": -0.0020936060464009643,
+        "ratio_of_means_percent": -0.2288862854983309,
+        "paired_percent_median": -0.19620925191181637,
+        "paired_percent_range": [
+          -0.8466504263476282,
+          0.3594375188769705
+        ],
+        "increased_pairs": 1
+      },
+      "allocated_bytes": {
+        "reference_mean": 3711654570.6666665,
+        "candidate_mean": 2507811498.6666665,
+        "delta_mean": -1203843072.0,
+        "ratio_of_means_percent": -32.43413548000973,
+        "paired_percent_median": -32.43441286923626,
+        "paired_percent_range": [
+          -32.43456496933233,
+          -32.433428606111434
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 0.9117411740589887,
+            "candidate_mean": 0.9150183139136061,
+            "delta_mean": 0.003277139854617417,
+            "ratio_of_means_percent": 0.3594375188769705,
+            "paired_percent_median": 0.3594375188769705,
+            "paired_percent_range": [
+              0.3594375188769705,
+              0.3594375188769705
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 0.916722972993739,
+            "candidate_mean": 0.9089615340344608,
+            "delta_mean": -0.007761438959278166,
+            "ratio_of_means_percent": -0.8466504263476282,
+            "paired_percent_median": -0.8466504263476282,
+            "paired_percent_range": [
+              -0.8466504263476282,
+              -0.8466504263476282
+            ],
+            "increased_pairs": 0
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 0.9156138240359724,
+            "candidate_mean": 0.9138173050014302,
+            "delta_mean": -0.0017965190345421433,
+            "ratio_of_means_percent": -0.19620925191181637,
+            "paired_percent_median": -0.19620925191181637,
+            "paired_percent_range": [
+              -0.19620925191181637,
+              -0.19620925191181637
+            ],
+            "increased_pairs": 0
+          }
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "clean",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 3,
+      "wall_seconds": {
+        "reference_mean": 124.14298109298882,
+        "candidate_mean": 125.41036783368327,
+        "delta_mean": 1.2673867406944435,
+        "ratio_of_means_percent": 1.0209088983815562,
+        "paired_percent_median": 0.7794117598976857,
+        "paired_percent_range": [
+          0.6867984230975344,
+          1.5829250621103297
+        ],
+        "increased_pairs": 3
+      },
+      "allocated_bytes": {
+        "reference_mean": 2762021546.6666665,
+        "candidate_mean": 2086222506.6666667,
+        "delta_mean": -675799040.0,
+        "ratio_of_means_percent": -24.467551341718718,
+        "paired_percent_median": -24.467611816348324,
+        "paired_percent_range": [
+          -24.468059864397528,
+          -24.466982342237596
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 123.09078388905618,
+            "candidate_mean": 124.05016793403774,
+            "delta_mean": 0.9593840449815616,
+            "ratio_of_means_percent": 0.7794117598976857,
+            "paired_percent_median": 0.7794117598976857,
+            "paired_percent_range": [
+              0.7794117598976857,
+              0.7794117598976857
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 123.20357293495908,
+            "candidate_mean": 124.04973313107621,
+            "delta_mean": 0.8461601961171255,
+            "ratio_of_means_percent": 0.6867984230975344,
+            "paired_percent_median": 0.6867984230975344,
+            "paired_percent_range": [
+              0.6867984230975344,
+              0.6867984230975344
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 126.1345864549512,
+            "candidate_mean": 128.13120243593585,
+            "delta_mean": 1.996615980984643,
+            "ratio_of_means_percent": 1.5829250621103297,
+            "paired_percent_median": 1.5829250621103297,
+            "paired_percent_range": [
+              1.5829250621103297,
+              1.5829250621103297
+            ],
+            "increased_pairs": 1
+          }
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "direct-edit",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 9,
+      "wall_seconds": {
+        "reference_mean": 1.7636665738860353,
+        "candidate_mean": 2.058781204680498,
+        "delta_mean": 0.29511463079446304,
+        "ratio_of_means_percent": 16.733017179330666,
+        "paired_percent_median": 12.561931365420609,
+        "paired_percent_range": [
+          -0.6934387520991292,
+          39.3567554937134
+        ],
+        "increased_pairs": 8
+      },
+      "allocated_bytes": {
+        "reference_mean": 2762089813.3333335,
+        "candidate_mean": 2086315349.3333333,
+        "delta_mean": -675774464.0,
+        "ratio_of_means_percent": -24.466056850789542,
+        "paired_percent_median": -24.466259852152827,
+        "paired_percent_range": [
+          -24.467487168231493,
+          -24.464423674349423
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 1.6557891083260377,
+            "candidate_mean": 1.8489469933944445,
+            "delta_mean": 0.19315788506840667,
+            "ratio_of_means_percent": 11.665609110310227,
+            "paired_percent_median": 11.558909145536411,
+            "paired_percent_range": [
+              10.896072325155837,
+              12.561931365420609
+            ],
+            "increased_pairs": 3
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 1.8124962346628308,
+            "candidate_mean": 2.189801827344733,
+            "delta_mean": 0.37730559268190217,
+            "ratio_of_means_percent": 20.816903531503918,
+            "paired_percent_median": 26.4524264004671,
+            "paired_percent_range": [
+              0.45776089151721155,
+              39.3567554937134
+            ],
+            "increased_pairs": 3
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 1.822714378669237,
+            "candidate_mean": 2.1375947933023176,
+            "delta_mean": 0.31488041463308036,
+            "ratio_of_means_percent": 17.275356924707786,
+            "paired_percent_median": 25.569919960384357,
+            "paired_percent_range": [
+              -0.6934387520991292,
+              32.06772504246225
+            ],
+            "increased_pairs": 2
+          }
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "library-edit",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 9,
+      "wall_seconds": {
+        "reference_mean": 2.8144912966656395,
+        "candidate_mean": 3.1156674165718465,
+        "delta_mean": 0.3011761199062069,
+        "ratio_of_means_percent": 10.700907843027041,
+        "paired_percent_median": 11.50223893949871,
+        "paired_percent_range": [
+          -11.119140047977316,
+          37.62910226126128
+        ],
+        "increased_pairs": 7
+      },
+      "allocated_bytes": {
+        "reference_mean": 2764232021.3333335,
+        "candidate_mean": 2088590449.7777777,
+        "delta_mean": -675641571.5555556,
+        "ratio_of_means_percent": -24.442288720382386,
+        "paired_percent_median": -24.427938713589537,
+        "paired_percent_range": [
+          -24.50966552197088,
+          -24.389472127753955
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 2.6865900236880407,
+            "candidate_mean": 2.82994266335542,
+            "delta_mean": 0.14335263966737935,
+            "ratio_of_means_percent": 5.3358584079974625,
+            "paired_percent_median": 3.3994289252829546,
+            "paired_percent_range": [
+              1.3119972678381275,
+              11.50223893949871
+            ],
+            "increased_pairs": 3
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 3.1702950346516445,
+            "candidate_mean": 3.0871439676654213,
+            "delta_mean": -0.08315106698622306,
+            "ratio_of_means_percent": -2.622817942096034,
+            "paired_percent_median": -8.007476451737972,
+            "paired_percent_range": [
+              -11.119140047977316,
+              14.463981851276886
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 2.586588831657233,
+            "candidate_mean": 3.429915618694698,
+            "delta_mean": 0.8433267870374644,
+            "ratio_of_means_percent": 32.6038207818729,
+            "paired_percent_median": 35.40587278822891,
+            "paired_percent_range": [
+              24.878437653130025,
+              37.62910226126128
+            ],
+            "increased_pairs": 3
+          }
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "inline-edit",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 9,
+      "wall_seconds": {
+        "reference_mean": 2.6484955236600296,
+        "candidate_mean": 3.0621565690962598,
+        "delta_mean": 0.41366104543622995,
+        "ratio_of_means_percent": 15.618717937819282,
+        "paired_percent_median": 20.28729517538588,
+        "paired_percent_range": [
+          6.224684097461353,
+          26.245141559853113
+        ],
+        "increased_pairs": 9
+      },
+      "allocated_bytes": {
+        "reference_mean": 2760720384.0,
+        "candidate_mean": 2085157091.5555556,
+        "delta_mean": -675563292.4444444,
+        "ratio_of_means_percent": -24.470543860933237,
+        "paired_percent_median": -24.4700153850947,
+        "paired_percent_range": [
+          -24.509135219074363,
+          -24.43255046382574
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 2.593157343993274,
+            "candidate_mean": 2.757025940964619,
+            "delta_mean": 0.16386859697134545,
+            "ratio_of_means_percent": 6.3192693397848165,
+            "paired_percent_median": 6.2818345101735895,
+            "paired_percent_range": [
+              6.224684097461353,
+              6.4513315741957955
+            ],
+            "increased_pairs": 3
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 2.627406802649299,
+            "candidate_mean": 3.232889319343182,
+            "delta_mean": 0.6054825166938826,
+            "ratio_of_means_percent": 23.04487131887438,
+            "paired_percent_median": 22.275132541015918,
+            "paired_percent_range": [
+              20.54956719158607,
+              26.245141559853113
+            ],
+            "increased_pairs": 3
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 2.724922424337516,
+            "candidate_mean": 3.196554446980978,
+            "delta_mean": 0.4716320226434618,
+            "ratio_of_means_percent": 17.30808989023329,
+            "paired_percent_median": 20.28729517538588,
+            "paired_percent_range": [
+              8.236500698526704,
+              24.75823287006682
+            ],
+            "increased_pairs": 3
+          }
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "noop-final",
+      "reference": "baseline",
+      "candidate": "compact-raw",
+      "n": 3,
+      "wall_seconds": {
+        "reference_mean": 0.88437683833763,
+        "candidate_mean": 0.9516252159761885,
+        "delta_mean": 0.06724837763855855,
+        "ratio_of_means_percent": 7.6040410290443505,
+        "paired_percent_median": 0.607291872506921,
+        "paired_percent_range": [
+          -9.34300953359648,
+          34.64476016882776
+        ],
+        "increased_pairs": 2
+      },
+      "allocated_bytes": {
+        "reference_mean": 2756384085.3333335,
+        "candidate_mean": 2080833536.0,
+        "delta_mean": -675550549.3333334,
+        "ratio_of_means_percent": -24.50857821041432,
+        "paired_percent_median": -24.50854081685725,
+        "paired_percent_range": [
+          -24.509135219074363,
+          -24.508058596083494
+        ],
+        "increased_pairs": 0
+      },
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": {
+            "reference_mean": 0.8472300060093403,
+            "candidate_mean": 0.8523751649772748,
+            "delta_mean": 0.005145158967934549,
+            "ratio_of_means_percent": 0.607291872506921,
+            "paired_percent_median": 0.607291872506921,
+            "paired_percent_range": [
+              0.607291872506921,
+              0.607291872506921
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 1,
+          "wall_seconds": {
+            "reference_mean": 0.8305159209994599,
+            "candidate_mean": 1.118246169993654,
+            "delta_mean": 0.28773024899419397,
+            "ratio_of_means_percent": 34.64476016882776,
+            "paired_percent_median": 34.64476016882776,
+            "paired_percent_range": [
+              34.64476016882776,
+              34.64476016882776
+            ],
+            "increased_pairs": 1
+          }
+        },
+        {
+          "round": 2,
+          "wall_seconds": {
+            "reference_mean": 0.9753845880040899,
+            "candidate_mean": 0.884254312957637,
+            "delta_mean": -0.09113027504645288,
+            "ratio_of_means_percent": -9.34300953359648,
+            "paired_percent_median": -9.34300953359648,
+            "paired_percent_range": [
+              -9.34300953359648,
+              -9.34300953359648
+            ],
+            "increased_pairs": 0
+          }
+        }
+      ]
+    }
+  ],
+  "outside_cpu_flags": [
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "clean",
+      "direct_value": 0,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791161883.085636,
+          "cores": 7.092160291606695
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 277,
+          "samples": 278,
+          "terminal": true,
+          "processes": 3,
+          "rss": 374820864
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "direct_value": 1,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791161891.0978627,
+          "cores": 6.430320042067594
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110157824
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "direct_value": 2,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791161895.015917,
+          "cores": 6.530534043096957
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110419968
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "direct_value": 3,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791161898.8801,
+          "cores": 7.004532861488263
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 3,
+          "rss": 110288896
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "restore",
+      "direct_value": 0,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791161902.830699,
+          "cores": 5.808200800655543
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110161920
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 2,
+      "intervals": [
+        {
+          "time": 1791161943.382974,
+          "cores": 5.9726783574589035
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 14,
+          "samples": 15,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110813184
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "direct-edit",
+      "direct_value": 3,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162117.489942,
+          "cores": 6.638359777432819
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110157824
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "restore",
+      "direct_value": 0,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162121.1563993,
+          "cores": 6.528677037687624
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110284800
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "library-edit",
+      "direct_value": 0,
+      "library_value": 2,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162137.894129,
+          "cores": 5.783856385203119
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 12,
+          "samples": 13,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110678016
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 1,
+      "intervals": [
+        {
+          "time": 1791162154.4378755,
+          "cores": 5.347893975905488
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 15,
+          "samples": 16,
+          "terminal": true,
+          "processes": 2,
+          "rss": 111075328
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 2,
+      "intervals": [
+        {
+          "time": 1791162163.389132,
+          "cores": 5.680227958065045
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 15,
+          "samples": 16,
+          "terminal": true,
+          "processes": 2,
+          "rss": 111075328
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "direct_value": 1,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162328.9962344,
+          "cores": 5.44862976824558
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110678016
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "direct_value": 2,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162332.6029625,
+          "cores": 5.406179221930793
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110415872
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "direct_value": 3,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162336.1842558,
+          "cores": 5.4302181822070885
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110157824
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "restore",
+      "direct_value": 0,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162339.7824326,
+          "cores": 5.756850131379009
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 109891584
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "library-edit",
+      "direct_value": 0,
+      "library_value": 2,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162356.460118,
+          "cores": 6.546388812615198
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 12,
+          "samples": 13,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110678016
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "library-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162363.7708242,
+          "cores": 5.434287669487355
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 12,
+          "samples": 13,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110940160
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 1,
+      "intervals": [
+        {
+          "time": 1791162372.7729542,
+          "cores": 5.64110366283108
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 15,
+          "samples": 16,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110813184
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 2,
+      "intervals": [
+        {
+          "time": 1791162381.7229488,
+          "cores": 6.62604420028986
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 15,
+          "samples": 16,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110944256
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "direct-edit",
+      "direct_value": 1,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162548.717092,
+          "cores": 6.908815638741393
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110551040
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "direct-edit",
+      "direct_value": 2,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791162552.6486712,
+          "cores": 6.99052230333168
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 3,
+          "rss": 280014848
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 2,
+      "intervals": [
+        {
+          "time": 1791162601.7454407,
+          "cores": 6.009563769723288
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 14,
+          "samples": 15,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110944256
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "clean",
+      "direct_value": 0,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163074.4238446,
+          "cores": 0.5181366847873586
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 46,
+          "samples": 275,
+          "terminal": false,
+          "processes": 14,
+          "rss": 1819959296
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "direct_value": 1,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163643.299229,
+          "cores": 6.886690449669839
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 3,
+          "rss": 110161920
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "direct_value": 2,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163647.2187538,
+          "cores": 6.289802693838526
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110682112
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "direct_value": 3,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163651.0734794,
+          "cores": 5.971401103171575
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110026752
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "restore",
+      "direct_value": 0,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163654.905248,
+          "cores": 6.507119413379635
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110030848
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 1,
+      "intervals": [
+        {
+          "time": 1791163687.2586112,
+          "cores": 5.143733115786092
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 15,
+          "samples": 16,
+          "terminal": true,
+          "processes": 2,
+          "rss": 111341568
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 2,
+      "intervals": [
+        {
+          "time": 1791163695.6918201,
+          "cores": 6.9091038100343125
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 14,
+          "samples": 15,
+          "terminal": true,
+          "processes": 3,
+          "rss": 110809088
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "direct_value": 1,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163862.0320709,
+          "cores": 5.283538752692383
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110284800
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "direct_value": 2,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163865.5994084,
+          "cores": 5.488839102019919
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110415872
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "direct_value": 3,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163869.2322578,
+          "cores": 5.25302403864114
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110157824
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "restore",
+      "direct_value": 0,
+      "library_value": 0,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163872.8138134,
+          "cores": 5.521409517403096
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 5,
+          "samples": 6,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110022656
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "library-edit",
+      "direct_value": 0,
+      "library_value": 2,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163888.6760633,
+          "cores": 6.005621191352923
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 12,
+          "samples": 13,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110944256
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "library-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 0,
+      "intervals": [
+        {
+          "time": 1791163895.9439626,
+          "cores": 5.966132946264093
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 12,
+          "samples": 13,
+          "terminal": true,
+          "processes": 2,
+          "rss": 110800896
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "inline-edit",
+      "direct_value": 0,
+      "library_value": 3,
+      "inline_value": 1,
+      "intervals": [
+        {
+          "time": 1791163904.7664387,
+          "cores": 6.921467441611737
+        }
+      ],
+      "sample_positions": [
+        {
+          "index": 15,
+          "samples": 16,
+          "terminal": true,
+          "processes": 3,
+          "rss": 110813184
+        }
+      ]
+    }
+  ],
+  "relink_checks": [
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "bcf7df3e16c503db50e7992e5f37dcf64f24ba2307a71cac38c671ec0af1c787",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "3c51f94a0fb0070697d44730557098d2a35c43666a45468a3d737d04bf2af4f3",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "ee0c562bcd4bb43dfb36e2f8c929dbdd1c640ccc1c93df0985971ea2c853570b",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "329078596c714fe5317f049f8b2f5b4a7acea0c2310767628ef618bbce837e41",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "f595076a88cf35e70b9dc9d7d5dd41847f6fc70c2f0a684b8365d92a66ba2d76",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "a364b1ca25967a5a4f792be86962a551affcc80dfd3ca57fd633a3c5e13c5dd3",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "83cd4b9f7674643a449dc32465ae21b0e6f3fd6a104d2d91e18a0fb51cc195c0",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "c561ac7d4f18c1d40f1f0a3cc7b4f69b7bd31980cddfc9467c5808895a8bcfdc",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "a0f9c7bb4c7b9ba496cdccce976a4977ec2fe1cc09e55cd1398bb4f57628223b",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "a0c411d25d16f83d35fc621243a6f515b404d43bb419822a324c855f693fceaf",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "ad79a974aadddbd7e5c4e56ef2ae014ff4799d1d488dac092011ef6a9d35e5ed",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "217f4e37aba72f31dbe89f2f71ed592d54a422ac8936d872a1bb6f02b53446f6",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "cdde29a4abaf2c5c8197856264b473fc0fa4e3bb0948e384503722292ed210fa",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "e8c06c1933d2505a82c578a0aa7b8094e86fe68cbfd0c4735432eeb9d40cf02d",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "d648896791f6b51b890241b6adacc1aaf308cbcf85f1117a538fce83d9a766d3",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "3ec7ef599ac162887f8d1a144634d31f5207ac83abd47023e23f768ec9388898",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "5a74e3e61778599ad7e8f3c293cb46aa3f26607319a76ce8e8f4a59ba101aff1",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "f74ea73a624e8126e3200f9f872b0af738a2f82aad57b04084bdaaa49e1aa79c",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "1ed1792f83285ce4660c1d137d4617ef77cb5cb9b690a110a9a6d67dd6da419d",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "16e6d3395e5faab43e27f9cf4a3d5e04e336763de8e86b2c43f385ab30bcd91b",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "ed0855de0375e1fe70784c17dc7813aab96e2e0e7c09876652d546a85906d084",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "a1d9e24dd6555a9531ff15cb6f4cad0a1e2e82c0e91200818cee8454a32b400e",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "55bfced6e48f0ec2990ec325efb602f7b661f880e7b1c7ef523542fead4f9d0e",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "11157c18a47dc4e1859fdb370f009f92a5f1c6f00bcb411f833a9fa7f6b7cd92",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "866954e9ae0a8debf1b81674a78a821ed8f410a23eb7212ed7c10ce218d54bce",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "1741b70ab59aa62cffb0e8464afd3de99d5e29d2596c167e4d88b1bf2745f37b",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "badef08d687ff1e192d6228913d97db28556ecd5fb811cfd285cc135cca5082b",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "1daedf547156524e9620a3f9e86cd46af40335a57db1864694fb180c3611aa5c",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "6bc7950589131bbc5f94fbc2d2c3338a0c52abb17efa7ef9789cc9ad6157d3c5",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "d23073a6763e500b6c9c3098338d665f0e7a6a1b8f94ee744420fbdcc8f3d088",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "875b9f5ef14f56b5327ffd9d0a7feca2500449fe37f2b29e051fc93fa18f0d9d",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "cca6c2f286abb749153af913cb0045c977a070644f2e16986099193ae4612da1",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "fd69ea55fd6518e3430bd2b3ed775fc7c8aa566cd1f4cb79251feb3fe817f1d9",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "5396e3248f48ddc35da1bb9546974660fae2e328e03ec6c4b727c6401fe43adb",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "151b823515253c6ae2a9518f5cef702ebb7e28f23e3c5cc639cae261d8d80978",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "2a3ea94d538a1cca27f1a120c1277e7fe5a9fbaa44872a809707780a405b1d10",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "95b8e5729db7a244b8970a433fa5c21c39bc72a8696b04273932045960801a0d",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "1cae25a9ef3532d4f234038765b72983b9300b8e18b0d7cf0a3d7ab29ed3a6ac",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "61449ae1fc850fc6bdf899e1fa627b71d1cf36e099d8413026fad6251c5dc8d0",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "297eed88e61f196407576708f552db147077686b78d6e0a6b34d2efd1f562f2b",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "3f3a951f8e79aa5a9e7717c4b3a4e38e0cbf56b1354496d669efe97142a743d2",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "cbbf55e3805d2446bf797af75bc59ef67b9fe7ee1f3ce6a9eaf2b37e84130b14",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "1ebe75127e345ff0744f8a2fb7aadd646c86f7c3cfbdd597efdbc3194e5d07f5",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "d1e3bb85b89a102dd12e1e597942c60f96220672f2d5f0021e1b46a98d00db1f",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "23f000bd8ae4b46b3f33d6745b321f65a53f1ae84ef683916a8385961137cf8c",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "5252ab27261141f8e23c99d582446e01c71c179604f64a3a9da6fc94a5e30735",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "1d2a03757b9068615409a1e44f54d25c8777f13d2a11d4cd52eb39e0dfe82334",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "553686c83f32d21439c796a3cb0ae184fc2a17cc9e789bdecbbbba34d19c1993",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "a4ffdc1fc612beffd84471b760236ddd2273f2d70b676a3bcb82cb847965ee19",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "fc686eb5c90aeec7dc451a23800a48019f7866e9d8cc63b3c4d19f617468cdf3",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "b96804afb50829d36ab2337e21514d10ef091ef091988de20cb3df860290a8bd",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "815af5f64e05d465ed720d214f4af8961e01ec1d90febd8cd0c07d1ab5536dc5",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "40247e6cfd2053ba3e0e4cd761eba87b6ee268affce374926efcac2d8697899c",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "3eb7036966a8e1095db03420d03d246419d9dd4891212fc181862a15a0ad141a",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "17289442bd2606ebe8d476cae32139a79865e9141588d587b87a2c3865f3591a",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "049a61fdc9da715b76067fe6ce82762f09c75dee65ff96fb884a800307aa37f2",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "03279b7a761a7aa57fbd396effc40e455e746afccce18a9072e5de9fb728d0ca",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "2142319e20858b4c96780446d482a01e71a526632d1815322710d829be476655",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "b9d732213e1114b715abf2b0f867449a175b29d50a238d338f0b7cb8429a4d47",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "46a2a9094c3697045ea1c9ead7758258c0bac9c32c6b6c56479ed1db10b2e88b",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "807133c65f73ae6570ccdce9e292e1f3795c1b948b7311d7e9bcddba152594d9",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "b3de35322c4393a5809f5bc2a035e117ee1e08944b066ffff61e23c682e03aa8",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "5c6820e4a707ba341f4300beafd0d3514abeb99033fd896c962c8601da8a854d",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "ca99d2897eca7ada268c60b771aff363e5eadd9e8836348b9f0be7b6819e814c",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "5eaf31b3abf4835df67ecc5587cf8d1b492a1426b001a1750549efc5d8c5146c",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "8b6d54f1f89590db6cc97be0b35fa8be0898882baee3ce097a2cfcec6a7f9628",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "8ed16cc2a4797e860b59f86bf52c047c70d7eefdddb629bda17143da5ad604a0",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "28fd02631f1f463477905e8e2298d69985d21a9ac48ce44a77a35f3f8ed49f61",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "9fb1a52b50b5ae1d255b368d4c40371f0e2d55a3412eaccb14c646bcd810c1b8",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "8c54cfb02b78b0366383a0ea30ee8d2ff3bc1486f5b497876c6fe832ed691551",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "b6edc52ed488a5c836a504f5306740be4862e9801c4eeb3287e85be0c499f2c6",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "dae7bc45b5f34ecd1918cc827d6d9abd00df1c25f25fdc4c47ef8a69b8c74276",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "a4fc4262442dc8df601c3979d8ba7ff3def2d9f58b0dacde198bdbc7ec513726",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "89df238c59c2ef33d23c88a80dbd3f2aadd28c5f10f139530a41c84d4ef8ed1e",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "12293417d4c39c044541af4774741c28cd4799c1e9f781bb50571c330da6340a",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "db922c01ecb398215dc4fccdb2a85fda256443eedd2593eb3f574bedfb8c6aab",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "70c2fd64c7626606287f9498b74a0d48bc06782ee49caba313ed5c462461158f",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "d413921bfec552359d0caf3bedf3556c597f3d26b5ed6bcee88fa00d14e068ad",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "162a93d6cd2d53d7b6167a31f42da95726fddb7c2a3d947d42a8c7e967b3baf7",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "70fff071b8e99cb764d583936b98aeb58c9ce06dc2c75bf56b5438cfcb5872dd",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "baseline",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "1a2b98f9d061ff85b4c3deb5eb820466c152ba3ea8dbaf4aec7986c63c8010f5",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "1184580aaa76890a3fbb6b0bf6e2165a82559aa1488c8b875168e172d36cbb48",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "9df3a638c3690693c469707ec75dc2e7bbd5927d7507cf81ecee832a569782c0",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "a8e2089284e238f7e984b87944f7b7080c95dcd7bc0ca34e6c8c7a3a760c1d07",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "3724ae46dc69a9fdaf68f7405233f3cc9c084f9cb3e1556396b91f0cfa4ca48c",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "9331ddcc906c3612c04db1a39ed35c2f26d4f95e2335535df2d9f38b1f763414",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "9320d5e93d11696eb309be59e378047da8965e0240e0a4c856f62b7f86b5d4ec",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "267ae4a3278b3e40562d999a5c078b0bd74a9df34401f22585092e502ea4a8bd",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "699c72a3ea287782707634b6c243bdd3d419f02d0a5b48765bbb62c62fa586c4",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "standard",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "de6756df14b4ae8db31554a66f4035247f1220a6015f04ec9f4f3288314da9d8",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "253d002ada2aa2a245bf02501b27f1c8d14a46f975293bb9c14773b7febfec2d",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "7408064f10c63c1053b596ccf0d2eca2515a2feda09562b5f45a977e95ebba62",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "5d8f501257cfde3e9d92ca618c7b2a627c0a89e8dc66ab6347624f63b74cad54",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "4066680d34fc4395b1a4b008e1c822285597cb0fe4188a6949f44b62c1604c07",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "965cb1d3c682fa8c113603127e0986c30967a68dca8405e5db6e539329eb11a3",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "f700fd83f06f4327a01b0c04a8ea31020f6739d2db01a27159d6e24c378da482",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "71e8fa40edeeae55dc25f146fbc5c2713ff46b824a902ad915c3285289ef345a",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "12ef005b9834852343ae6bd7621f32432e9bd72142e14473cff9f2016d68f6fa",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-raw",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "98d8236bb88307a41dc6bc75d1f8211c44cde8911bc6ad532818a0fabfc65558",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "dc90e8e9e1eccca0796b45d32f3c43fdf0d57588646a263da5ddccddf3bfd400",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "b015d28f85b13bac35d7af6454ffcef83364b4514e0645df7f88034f5c41f3aa",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "73f80589ed3f715f84587d5066fa5ddc486260f8696c3d78d9017a1e7ce2d28e",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "6f1cc5fde8a86bc69de667567fb310f2908416f555eea589f6798750590d4068",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "18d0830e208d73588405be5f8cab080f3731799513417155de4f8223dbfd9fbb",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "5f9d08a3653cf615faaf65c9c48ce8a025b7773396d7f3b7fe28cd68d6c3fa57",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "79315633b6f2850a03475f0edc66e1b8a8ca78c684006916e6ff7a0584212e6e",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "7f2e56cb224a960214545bf1b21f9c6230b918d4b96b9d0dad6f61d58e31e5a6",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "uv",
+        "compact-archive",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "c64d527c830e68672564509951382df55dd2184496a2ed5e2d33ac2fc3ca195a",
+      "commands": [
+        {
+          "crate": "uv",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "uv",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "217a4e6490ba0cf6f87c9461659bd1a0b2f8d42619b68f39a4c4f83b395251f7",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "fe20875f807bc2778f25594f2ef06e5c6536d7a15b9a9fed57c5377ed810dac8",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "67403fcca4bc79a9d9eb41cca2c55c082f652fab802202e04b3620257f06655a",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "c9a44328e6f1ab0cc8f61b9b97022ff293ed44aaf765fd1c2fdac0f52856b171",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "8f85863ac2c48df0fa38cd0e1e7beb7890f94efd7e4e31ba5f9a9b335956da03",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "9fc3a864aa844ed18ae19380c5a5c8ffe606237c6c37923a066c7e22a4c5263a",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "5905ade9daeb56a7eac00b7cd197718d60be31cb91e1b97f85449ac7defe5d05",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "3859ac7c6ccd0833bef8b2bf77a1413624e7935d63bd463569f9aa56477670a0",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "9fe9ab387aa849500cb7e91e8d2c2fcadaff06f0c8b37bdbfb16dd8e7a050b48",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "60ed0a428999f2ca18246a9d6f721ec9837508e38ad0d742283fc69dfb72d8c3",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "be3c682e4e411267b7116720ba702a212fd402457371b90c529e4bd6f9a64a98",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "4bb1dd0a7270f3fd053b01b2a566c1fb0da08cf926215183f624ea0b2183d170",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "b6c0ac7953fc736c2f67112cb006b5b77a6d893852ab8726ef0e58bff81010e9",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "30ad2e5f924940e13a4b7c7cf458d63c8c384b6ffb5513a7f8dc8ffa3dab1a41",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "cb3e5572b2c4e5429e0c77b64776018b6466d57ac32e0aa9878cd0b4bad4e601",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "74d10591f743425e501b74b6207b53393abf99834f6cf881fb5afad74dc65da2",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "658f051f06cdec9f0bf49a3b6ca4310751f1eea6a1ad9c94e4f95cda7cb56139",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "5e1e8a917fd30c431f8a25b3431d4c53a2d3e649518a57eb9b82a94826fdc6ae",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "ac00d339fbcd3661b32413e8c1a2eea482f2b5e4d670c10c1cf9e249c669205b",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "fbb4a3dcaa6a4e33c882b4a88036d4f7fe317f3fa8e80f3230d0680480a22ead",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "0e6b8116276c1c4372cf3b8d64c3690191c024b915b2e42c90695dc72c3cec88",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "ddd172fa1da13aecc7cb8806ef7d019e287483e9182ffd116093a34e1c4762c2",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "df7947cd08ed4e73ffcf008f6853651e465c4072a96793e45fdef67b7c60481b",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "9e3f37071a0aa9bf04e3a8af88908f60d744afb527c3db4639367ebff3b0c7ad",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "6ab325124a848a2f78c577660bd504b79d256a40b67ccc878e205f4af4469937",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "8bcdd141fe2ecbb3f70c73d51a58fe3efd26aab846a66cd8abe43fb82e6cc874",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "f1c4d5fc82936060c750ef922615624f93cdf39c126502943cb298432cb53c3a",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "3485e0c6519f0c85b421730f9cfefe5aeb78da1f9e591cc214ba9c582cfd8628",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "4bcb3ea6ae0bf810dcb8261691ffb5a9f7ebb408276ba57fb6ba5f40980590f6",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "1720700476571023223f8c17b18306a18dad986cccc21ab81ec3ba0ccf10e14c",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "357bd1692c75ddf816f0818512492c44569f20578d7f233f98b569946151f230",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "0a5e85451246c8f5a3f0a4b4de7f6d5146796f81f9ed57fddfb72012acabe27c",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "library-edit",
+      "log_sha256": "5e5e7a63034eb876a340efb92482d76d4f392ff1bcf13da0f5b6502e616bd99f",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "6b139a02f55fdc68908f683533ece4a10e5897bc38e4488e0aa3cc830581bc33",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "5605bfaa91a4a93aecc3e9c0bbd036c56ee1dd8b9372fa9c0e08028b225b80db",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        0
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "60921d83815e7f5f635aefcbf81781e9c8632e7e83c379da23d796b9e4e4b1c8",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "a2eca3e4c4a92067adaee3b174d9040477054d7498dc6f60ffb3c0324cdde63e",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "36d8e51015d8ee31be2147ceb576700b42091568856494b0b022417c101784bc",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "690a55d24a765690da19a99bef97ff1bd3255e805d5278f7905da6eab1e05c9b",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "c996a84efce883a818fe1ca176f6b3a9b87890f049a765374a9d89196a0096dd",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "f49f1f88c432fdb19876479e8b681f914ad577092c8a51d49b254baf65789fde",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "51096c5e2fbf58969f18da0da94954d14b0736a4fb9afb925e3f58ad727c6dfa",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "b3db31a08b4cf2182de677859b423ce87a68309871bdd18deb1b19eb309acfd0",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "72475efce8a14e28d507c444e7e4aee650375c01f7dfd21601d6963d88fa50b9",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "d0013ddce35be09cba259717e24d80f7e0b35c4833468e4b588c58e7e7dcde53",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "4d40c8cf79896474c06cbb27c3f3898e3de120dd994860591d32968ac85c2407",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "f6b827a7607da66efd2faedad76daa90d821f904dc0082649846c970e184a92c",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "da1698251c29b83c3d360a62d49873cd2c85cf814427b76e31c00f27b3a4e00d",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "c859e9695ebf93dd1d3d0bb66d0781f1fba20fcbb22ced066386f11e6e769278",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "3079ddbf98ff539b3a385e2ffecb4a728f6dac3ea726d68772349b06cc426479",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "09cfe9c63ef46f5a127fb7aa29b19f1c91cf4a2449a75d2d1388b09749ba91c4",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "b5ffbe62893fc9084d996ee1c8120a5f330a3e5d474eb3f5fecbeca40df39b82",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "b4ec7054d842c28d466bf7d78dc2a31aa667fed8be5b2051601067c23b806d5b",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "64916e3e81db76f6751a4ea4978b3f22adf4dad61380fd8294998b707203045a",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "f85aa7f97c78fb123fbd34e35e3d05b133265d5f4b4a7a628182f81b0cbc3e5c",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "5a3186d1c256c45c2c7008d22dc0b0e13fbe064c0cde41b865ee83003a905827",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "ba6eacc5938e86bd1cef3e9bdbab4cf4f31ae4cd3438bf49b8ae06f10619345e",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "dae90d418842bbb7aab0231a7fe3038d4e6a00a15948886e03ac7105160d0ba3",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "0decbcfe7c4691d82fa3a79e093799eb5f9ef9d49817742d3003eec487763aae",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "a7562ab8c53dde8e6f553dd3e56f3b000978fc38908da94de20d99bcc8303785",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "f0562809514a0d1a01c1e35449dfb7baf3a5c2c73fe47e28e90b94f9b6316c6c",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "6f21011e345d24ac3384b133312dcbcb2addd88cde169c8ce0bd63b74558a8da",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "1897d72e5007cf0236ca86bad5fc810c501a874c890696a70d3c00960378aac9",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "9353fdddab4780a7f92568dbaa4c99535e67d48bd5a392e3d4f1daaf44d1fa5d",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "7620bfedca34cdfb00d76bd693314854714103ceb9cfe706aeaf7c43e188a35e",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "2aa2aa6fd9ddb43a67366b7feea28de594437ee29bbcd53938c1a1fa18af97b1",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "3994af856477aba4a985ce3902f02d82f94def6d61ec61aed52e655a4e268e98",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "22266f22e1f5d34586ffbb0aeaf137e39a476c75eb05ac805c496120bb2f3965",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "library-edit",
+      "log_sha256": "800b3153303702839f4edaeb7c067b7ebd4c029440a8648eba30e97f6933c139",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "eabe664d12746d6dcc5b529e0bbb8a0d90de99a4048ca9c02f933aeb0a37f3ac",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "7de14a9f0ac9b930905f220ba992bf29d60b72dc4f216423e4b5fb013243683e",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        1
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "c0512532784654d72aeb629fb869ae21227607fcb18c39e1012808d783ccc608",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "09ee8989ba9d2b9c3d9b85bf000b715a6938f1e9610552c747f71ad20b920e73",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "a844a64c3c5ef4aa343f0c58d78d7dbe59edc79eb1688e3074fbdccc2edbc3c0",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "4ac92289af26ae1fcd7ad120ad0962e610d560b1c5d638d2675e054f4f499880",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "22b50a25a8aaeea97c3ebf6aa6152d57daa839f467daebe2fa79d0781c48803b",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "ee5913e4ed47a3fddb55cc693c422c6a8f4923bb14bbd993f96b943db9f90e0e",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "bcb0e3c76d75fa192d25c435dc7ec624bb7c84e2906c2b0f8aec36cd089615bb",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "6d9472d20828e5a65f4be01947177d3c6a430fb7b0853c31344c28f0c922fd32",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "99789a112ce72ec968d8c295e05e450e36f43399cc58c24388a0f9c75a8522f2",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "baseline",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "58592bed3f5e5f9a24d85c825bdbeb676781aaae22f3dd3865e45eac510dd72b",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "03c506463b74d46ad556ca6ab0d089f9a592a49b9956ff86eff4850f6dfce4ad",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "ccfb4ba8c24e3cbf451b0d1799f3384a7b5c0756f6ee9f30ee5096532438bfe5",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "ca7ac851d63231c331aa07ce19aa13c440d36c20ee163baee9f57ff2740a15c3",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "64fd0d5cf58cb4b0450df312a60c2c5474b1a8b909a036d518eaaf2489c79670",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "b3228808d224b0e210666442d5c9f972cbee49f38dc7e1ca92a4b034d7462f4c",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "746dc1daa80ae2f02d6f9daf821f4d7f3a942c350b7c95a2632cf17e52fb797d",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "d9e7f257b46312b88a396897d69c5436e140311bb58ba2901698d2b6be42217f",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "7da2a4cbf08d1148143543f633ff8a1d2c965c747952c4d3a86d2b33a0c4d07d",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "standard",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "de16fae4b6aec918ebb33443189478591ab66647e977ff8eb152bdac8f865722",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "b82dd6d903fedf066658132333f9ef8e7cf9309b03c1b282a645064287dfebc5",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "8852aa8c18dbed44a4fb9955d2fa7c33e55afa8346cb6f7f7e3db64887cca3ed",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "46b3ddde0abc234ac19b1b1e7f90ec941e662cb91310c2b72c40ea410f09fe31",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "6ebc1f08139a34f1e199b2026ea78e84e5834d0ebfbee4a8aa4e731e7e24d10a",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "f922f05b50122fe349608cff02a00293c9826a3a6de046075c94b106ea9aea14",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "b74de80e8904e39dbe26729706feaf4f62b09fabc255b496420bf325881b9f6d",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "e39f5a5fa03acf2f9967f3a543a22b5d1f8813df25fc69a16c87318393912870",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "56b4b453e0752bff24519f21a83d17d589c70558b1676bfbe8a91980e7f4f895",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-raw",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "86bd90389ad8aa88e0ec5982d1c622ba9dee9ffb54a4ec42140b8ca4299c68fd",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "60c183d12241aa94fc40f72e952337c760802b9f5abc95c5b4757985d105e9d6",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "0b09733f8ff558d26b74196d3ebd468f6161986539484dca4d22478a1177aca6",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "direct-edit",
+      "log_sha256": "7a70897936007b89b6066169f314eccdf20703417d140300649b5fd63307bcb2",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "2e422fd79429530af7d738d488028858649cd7ab88093ccab064d9e101948ded",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "6653e4f7186b7e4cc31192ac0583a2bfb5d0b24811fc046d55e5f63de2abcd30",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "library-edit",
+      "log_sha256": "18153c0f293fbc3744b0eea9b31d165ac9b0fd4bfd869a0ad3bb71652b7e3b3b",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": true
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "d5d2195ae4684905e02c34e07b58b1e8810968b5790ef57ad2ce68d16109271c",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "e7af28af28408336b3b1c3fb22349674634105e78aaf86b83faf42e99154a3ce",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    },
+    {
+      "cell": [
+        "ruff",
+        "compact-archive",
+        2
+      ],
+      "phase": "inline-edit",
+      "log_sha256": "e8cc1d10d708d120886c9c1e42c6a3d85c61b2636157560bf50bcd3816154591",
+      "commands": [
+        {
+          "crate": "ruff",
+          "kind": "lib",
+          "link_only": false
+        },
+        {
+          "crate": "ruff",
+          "kind": "bin",
+          "link_only": false
+        }
+      ]
+    }
+  ],
+  "format_checks": {
+    "uv/baseline/0": {
+      "counts": {
+        "archive": 515
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-0/baseline/build/debug/build/registries/abf08d88d1f94e89-all-native-all/unicode-width/1b95644db32d9b7e/out/libunicode_width-1b95644db32d9b7e.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 9126,
+        "other": 1018
+      }
+    },
+    "uv/standard/0": {
+      "counts": {
+        "archive": 515
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-0/standard/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/e36393edf295e0c2/out/libunicode_width-e36393edf295e0c2.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 9126,
+        "other": 1018
+      }
+    },
+    "uv/compact-raw/0": {
+      "counts": {
+        "object": 8400,
+        "manifest": 509,
+        "archive": 6
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-0/compact-raw/build/debug/incremental/4999fe96062d443e/uv_scripts-36l056h4wp26o/s-hmwwe6mgmo-0rf7hle-0nsbm9q1m73elk2p8jrx786qb/37xkq001idyc5cgb5jm7fjgva.o",
+        "manifest": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-0/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/9651040381dec16a/out/libunicode_width-9651040381dec16a.rlib",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-0/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/zstd-sys/eb252ec984421081/out/libzstd.a"
+      },
+      "required": [
+        "manifest",
+        "object"
+      ],
+      "forbidden": [
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 0,
+        "other": 0
+      }
+    },
+    "uv/compact-archive/0": {
+      "counts": {
+        "object": 6756,
+        "archive": 515
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-0/compact-archive/build/debug/incremental/a84c95c94c0d5d1d/uv_scripts-36l056h4wp26o/s-hmwwhrwag6-0uhk6d0-4c3ao3zdb5b0ub3bhhidwhboh/37xkq001idyc5cgb5jm7fjgva.o",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-0/compact-archive/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/9d63b0c590c48427/out/libunicode_width-9d63b0c590c48427.rlib"
+      },
+      "required": [
+        "archive",
+        "object"
+      ],
+      "forbidden": [
+        "manifest",
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 8108,
+        "elf": 1018,
+        "other": 1018
+      }
+    },
+    "uv/compact-archive/1": {
+      "counts": {
+        "object": 6756,
+        "archive": 515
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-1/compact-archive/build/debug/incremental/51ba8488fdbc56fe/uv_scripts-36l056h4wp26o/s-hmwwlfmw1y-05zlb2r-eocubw0qvf6xuh8jo3rjpe1bv/37xkq001idyc5cgb5jm7fjgva.o",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-1/compact-archive/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/9d63b0c590c48427/out/libunicode_width-9d63b0c590c48427.rlib"
+      },
+      "required": [
+        "archive",
+        "object"
+      ],
+      "forbidden": [
+        "manifest",
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 8108,
+        "elf": 1018,
+        "other": 1018
+      }
+    },
+    "uv/compact-raw/1": {
+      "counts": {
+        "object": 8400,
+        "manifest": 509,
+        "archive": 6
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-1/compact-raw/build/debug/incremental/9cff2fef4904ac46/uv_scripts-36l056h4wp26o/s-hmwwp26a7v-10w73m5-djn8z1lywjvhen0nqvm3few8s/37xkq001idyc5cgb5jm7fjgva.o",
+        "manifest": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-1/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/49b8385a062637fe/out/libunicode_width-49b8385a062637fe.rlib",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-1/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/zstd-sys/24a0fc7ebc9c9a01/out/libzstd.a"
+      },
+      "required": [
+        "manifest",
+        "object"
+      ],
+      "forbidden": [
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 0,
+        "other": 0
+      }
+    },
+    "uv/standard/1": {
+      "counts": {
+        "archive": 515
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-1/standard/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/e36393edf295e0c2/out/libunicode_width-e36393edf295e0c2.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 9126,
+        "other": 1018
+      }
+    },
+    "uv/baseline/1": {
+      "counts": {
+        "archive": 515
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-1/baseline/build/debug/build/registries/abf08d88d1f94e89-all-native-all/unicode-width/1b95644db32d9b7e/out/libunicode_width-1b95644db32d9b7e.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 9126,
+        "other": 1018
+      }
+    },
+    "uv/baseline/2": {
+      "counts": {
+        "archive": 515
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-2/baseline/build/debug/build/registries/abf08d88d1f94e89-all-native-all/unicode-width/1b95644db32d9b7e/out/libunicode_width-1b95644db32d9b7e.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 9126,
+        "other": 1018
+      }
+    },
+    "uv/standard/2": {
+      "counts": {
+        "archive": 515
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-2/standard/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/e36393edf295e0c2/out/libunicode_width-e36393edf295e0c2.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 9126,
+        "other": 1018
+      }
+    },
+    "uv/compact-raw/2": {
+      "counts": {
+        "object": 8400,
+        "manifest": 509,
+        "archive": 6
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-2/compact-raw/build/debug/incremental/8d8bc58f5c5394cd/uv_scripts-36l056h4wp26o/s-hmwx75ae70-1nzl0tl-3c1t27173zbm501qj954e001j/37xkq001idyc5cgb5jm7fjgva.o",
+        "manifest": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-2/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/ee6c006a3d2f6252/out/libunicode_width-ee6c006a3d2f6252.rlib",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-2/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/zstd-sys/138f7f1e6e8220cd/out/libzstd.a"
+      },
+      "required": [
+        "manifest",
+        "object"
+      ],
+      "forbidden": [
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 0,
+        "other": 0
+      }
+    },
+    "uv/compact-archive/2": {
+      "counts": {
+        "object": 6756,
+        "archive": 515
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-2/compact-archive/build/debug/incremental/3d3116b3e4edde42/uv_scripts-36l056h4wp26o/s-hmwxarz203-0a4gexh-e0rruez2vy2e3fg7z104u6nq0/37xkq001idyc5cgb5jm7fjgva.o",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/uv/round-2/compact-archive/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/9d63b0c590c48427/out/libunicode_width-9d63b0c590c48427.rlib"
+      },
+      "required": [
+        "archive",
+        "object"
+      ],
+      "forbidden": [
+        "manifest",
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 510,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 8108,
+        "elf": 1018,
+        "other": 1018
+      }
+    },
+    "ruff/baseline/0": {
+      "counts": {
+        "archive": 308
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-0/baseline/build/debug/build/registries/abf08d88d1f94e89-all-native-all/unicode-width/3f9ba3390fde2429/out/libunicode_width-3f9ba3390fde2429.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 3643,
+        "other": 608
+      }
+    },
+    "ruff/standard/0": {
+      "counts": {
+        "archive": 308
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-0/standard/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/e36393edf295e0c2/out/libunicode_width-e36393edf295e0c2.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 3643,
+        "other": 608
+      }
+    },
+    "ruff/compact-raw/0": {
+      "counts": {
+        "object": 3305,
+        "manifest": 304,
+        "archive": 4
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-0/compact-raw/build/debug/incremental/ea8a4d4ef7c0ed37/ruff_memory_usage-1rzmfev98nuk4/s-hmwxiap0v6-1wl7z3j-0kp5gawlarpppun4w8oqiuq85/bhfbxjitzsjy95nhlgjxp46zo.o",
+        "manifest": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-0/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/edf16b07a818d7d7/out/libunicode_width-edf16b07a818d7d7.rlib",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-0/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/tikv-jemalloc-sys/203a82be3272806d/out/build/lib/libjemalloc_pic.a"
+      },
+      "required": [
+        "manifest",
+        "object"
+      ],
+      "forbidden": [
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 0,
+        "other": 0
+      }
+    },
+    "ruff/compact-archive/0": {
+      "counts": {
+        "object": 2445,
+        "archive": 308
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-0/compact-archive/build/debug/incremental/5eeb7621cd24d3cb/ruff_memory_usage-1rzmfev98nuk4/s-hmwxky9koa-1s63zhr-cl6d7w16o6ximff5d2himikg7/bhfbxjitzsjy95nhlgjxp46zo.o",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-0/compact-archive/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/8ca8059eb8bd6435/out/libunicode_width-8ca8059eb8bd6435.rlib"
+      },
+      "required": [
+        "archive",
+        "object"
+      ],
+      "forbidden": [
+        "manifest",
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 302,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 3035,
+        "elf": 608,
+        "other": 608
+      }
+    },
+    "ruff/compact-archive/1": {
+      "counts": {
+        "object": 2445,
+        "archive": 308
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-1/compact-archive/build/debug/incremental/0bf3d93f335aaee3/ruff_memory_usage-1rzmfev98nuk4/s-hmwxnmahot-1iagzle-0jce26luwr5yf73jqrufnr52x/bhfbxjitzsjy95nhlgjxp46zo.o",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-1/compact-archive/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/8ca8059eb8bd6435/out/libunicode_width-8ca8059eb8bd6435.rlib"
+      },
+      "required": [
+        "archive",
+        "object"
+      ],
+      "forbidden": [
+        "manifest",
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 302,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 3035,
+        "elf": 608,
+        "other": 608
+      }
+    },
+    "ruff/compact-raw/1": {
+      "counts": {
+        "object": 3305,
+        "manifest": 304,
+        "archive": 4
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-1/compact-raw/build/debug/incremental/aa191567f89e83cd/ruff_memory_usage-1rzmfev98nuk4/s-hmwxqbs3l1-0upvvvb-aamykd148tzn3sockt7rmu2qq/bhfbxjitzsjy95nhlgjxp46zo.o",
+        "manifest": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-1/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/08ab8be5257a1a0a/out/libunicode_width-08ab8be5257a1a0a.rlib",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-1/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/tikv-jemalloc-sys/7884daa8b9c2f010/out/build/lib/libjemalloc_pic.a"
+      },
+      "required": [
+        "manifest",
+        "object"
+      ],
+      "forbidden": [
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 0,
+        "other": 0
+      }
+    },
+    "ruff/standard/1": {
+      "counts": {
+        "archive": 308
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-1/standard/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/e36393edf295e0c2/out/libunicode_width-e36393edf295e0c2.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 3643,
+        "other": 608
+      }
+    },
+    "ruff/baseline/1": {
+      "counts": {
+        "archive": 308
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-1/baseline/build/debug/build/registries/abf08d88d1f94e89-all-native-all/unicode-width/3f9ba3390fde2429/out/libunicode_width-3f9ba3390fde2429.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 3643,
+        "other": 608
+      }
+    },
+    "ruff/baseline/2": {
+      "counts": {
+        "archive": 308
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-2/baseline/build/debug/build/registries/abf08d88d1f94e89-all-native-all/unicode-width/3f9ba3390fde2429/out/libunicode_width-3f9ba3390fde2429.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 3643,
+        "other": 608
+      }
+    },
+    "ruff/standard/2": {
+      "counts": {
+        "archive": 308
+      },
+      "examples": {
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-2/standard/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/e36393edf295e0c2/out/libunicode_width-e36393edf295e0c2.rlib"
+      },
+      "required": [
+        "archive"
+      ],
+      "forbidden": [
+        "wrapper",
+        "manifest",
+        "object"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 3643,
+        "other": 608
+      }
+    },
+    "ruff/compact-raw/2": {
+      "counts": {
+        "object": 3305,
+        "manifest": 304,
+        "archive": 4
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-2/compact-raw/build/debug/incremental/df45a31180205053/ruff_memory_usage-1rzmfev98nuk4/s-hmwy3qf0rf-1lq4iwp-a9chvl39mjp8ye1k627evtlvk/bhfbxjitzsjy95nhlgjxp46zo.o",
+        "manifest": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-2/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/649c6fee1d39cde2/out/libunicode_width-649c6fee1d39cde2.rlib",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-2/compact-raw/build/debug/build/registries/b17508a35d48e9f7-all-native-all/tikv-jemalloc-sys/a1ec6ab1a9113076/out/build/lib/libjemalloc_pic.a"
+      },
+      "required": [
+        "manifest",
+        "object"
+      ],
+      "forbidden": [
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 305,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 0,
+        "elf": 0,
+        "other": 0
+      }
+    },
+    "ruff/compact-archive/2": {
+      "counts": {
+        "object": 2445,
+        "archive": 308
+      },
+      "examples": {
+        "object": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-2/compact-archive/build/debug/incremental/b7a2a4237248c8de/ruff_memory_usage-1rzmfev98nuk4/s-hmwy6j61yk-1tbdg5k-blx9k471ixnexfapv36kz4n1p/bhfbxjitzsjy95nhlgjxp46zo.o",
+        "archive": "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-benchmarks/line/ruff/round-2/compact-archive/build/debug/build/registries/b17508a35d48e9f7-all-native-all/unicode-width/8ca8059eb8bd6435/out/libunicode_width-8ca8059eb8bd6435.rlib"
+      },
+      "required": [
+        "archive",
+        "object"
+      ],
+      "forbidden": [
+        "manifest",
+        "wrapper"
+      ],
+      "passed": true,
+      "metadata_formats": {
+        "raw": 302,
+        "packed": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "archive_member_formats": {
+        "compact": 3035,
+        "elf": 608,
+        "other": 608
+      }
+    }
+  },
+  "scope": "Nine sequential edit observations are grouped in three independent fresh-target rounds. Tree RSS is summed process RSS, not PSS. Allocated bytes deduplicate ext4 inodes across the entire lane, including store/build/target/scratch; they are post-command allocation, not peak disk or CoW unique extents. No retrospective exclusions or runtime/harness changes."
+}
