@@ -1,8 +1,20 @@
 # Independent shipping review
 
+## Current narrowed compiler
+
+Independent review of Rust `3b84b46e3fb38f80246f744275c69fe608dfb2f3`, followed by the Cargo-gitlink-only integration commit `54f8b75ac31207d47af50fc8c5bc9dc90f2457de`, found no remaining correctness/safety blocker within the default-off, native x86-64 Linux opt-in and binary distribution scope. Wild remains `9179eb988df2676342192a24dc337cf9823e9d56`. The [current review](correctness/readiness/review.md), [machine-readable findings](correctness/readiness/review.json), and [sealed source and execution evidence](correctness/readiness/current-cut-correctness.tar.gz) preserve the precise boundaries. Performance and adoption remain under evaluation in the [matched comparison](readiness.md).
+
+The compiler removes the unused Rust metadata-compression, indexed-metadata, and external-store paths. Thirteen reader and metadata files return byte-for-byte to the baseline. Self-contained compact objects, the complete archive scan, ordinary consumers and exports, saved replay, metadata-prefix validation, and atomic publication remain. No archive-name shortcut, metadata-schema change, or sidecar dependency was introduced. The earlier decoder-allocation and credential-scope fixes below are retained.
+
+Fresh Linux validation covers compiler/rustdoc/std builds, two forced metadata/export suites, actual compiler-component packaging and installation, ordinary/compact smoke, lifecycle/toggle/cleanup behavior, BFD/LLD/staticlib alignment, and a Btrfs worktree that remains usable without its donor. macOS validation covers an ordinary compiler build/link/run, unsupported compact-target rejection, and 21 forced metadata/incremental cases. Native proofs use Cargo `4a281305`; the published `0d39870c8` cleanup removes obsolete flag checks and passes eight enabled CI jobs. Compiler CI at `54f8b75a` stops before compilation at missing source-App credentials. Local proofs do not claim that CI ran.
+
+The [archive seal](correctness/readiness/seal.json) records a fresh-extraction inventory check, 1,271 preflight assertions, and 314 portable correctness assertions. These audit recorded source, logs, and hashes; they do not independently rerun compilers or inspect locally archived compiler binaries. A full optimized release, hostile-input fuzzing, and strict aggregate memory or disk limits remain outside this review.
+
+## Prior source review
+
 Reviewed Rust `c16f0169220bbd3a9694b08becc1f00c30f60322`, then the CI-only credential remediation `d59f1c63326e874185ed4ec5bb052f384745110f` and final shared-source pin `9546795cae23d424bec08487b4f3cace591efb5a`; Cargo `4a2813050da607ca5cfe7b5cf3a17ba7c9676be1`; Wild `b997fe077b81d3ff147e77d603f66fc5142aa3be`, then workflow-only `9fbf96f8b0ced108ea3f90c2341a289b16363ff7` and raw-metadata allocation fix `9179eb988df2676342192a24dc337cf9823e9d56`; coordinator `48c8750f4b1b22b5bb2a4178cadd456faab8c5db` (PR #140). This was a source/interface review, with the existing portable evidence checked as supporting validation. No devbox activity or additional runtime proof is implied.
 
-Result: no remaining correctness/safety blocker found within the default-off, native x86-64 Linux Cargo opt-in and binary distribution scope reviewed here. The credential-design and raw-metadata allocation findings below were fixed before this conclusion. This is separate from the [HOLD adoption recommendation](README.md), driven by the measured default-off Ruff slowdown. This is not a claim that arbitrary hostile object files cannot exhaust process resources, nor a formal verification or fuzzing result.
+Result for those revisions: no remaining correctness/safety blocker found within the default-off, native x86-64 Linux Cargo opt-in and binary distribution scope reviewed here. The credential-design and raw-metadata allocation findings below were fixed before this conclusion. The [original adoption hold](README.md) was based on the earlier synthetic inline-helper timings; it is separate from this source review and the new controlled comparison. This is not a claim that arbitrary hostile object files cannot exhaust process resources, nor a formal verification or fuzzing result.
 
 ## Findings fixed
 

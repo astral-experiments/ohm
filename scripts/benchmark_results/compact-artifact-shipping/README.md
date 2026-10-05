@@ -1,11 +1,21 @@
 # Compact artifacts: shipping candidate
 
-The self-contained format saves **19.0% of allocated build storage on uv** and
-**13.9% on Ruff**. All 312 matched build commands passed their runtime oracles,
-and the independent source review found no remaining correctness/safety blocker
-within the native Linux opt-in scope. **Keep the prototype, but hold adoption of
-this compiler/linker bundle:** its ordinary, compression-disabled path still has
-an unexplained Ruff inline-edit slowdown. Release pins and defaults are unchanged.
+The current compiler removes the unused metadata-compression and external-store
+experiments, restoring the original ordinary metadata and incremental-record
+readers. It has passed fresh Linux and macOS correctness checks, including
+package installation, ordinary consumers, lifecycle/cleanup, and donor-independent
+worktrees. A **416-command matched comparison is running**, with edits to
+existing Ruff/uv functions and a synthetic inline control. See the
+[follow-up evaluation](readiness.md) and [current correctness audit](audit-correctness.md).
+Adoption remains under evaluation. Release pins and defaults are unchanged.
+
+The **earlier 312-command study below** saved **19.0% of allocated build storage
+on uv** and **13.9% on Ruff**. All runtime oracles passed, and the scoped
+correctness/safety review found no remaining blocker. Adoption of that bundle
+was held because its ordinary, compression-disabled path was slower rebuilding
+Ruff after a synthetic inline-helper edit. Those measurements retain their
+original compiler and linker boundaries; they are not results for the narrowed
+compiler.
 
 ## Implementation
 
@@ -32,12 +42,17 @@ newer unreleased linker. The release workflow can build it from an exact source
 revision using a pinned compiler. Both compiler-build platforms obtain the
 shared format crate; only Linux packages the linker and its capability marker.
 
-## Measurement design
+## Initial measurement design
 
 The frozen matrix has 312 build commands: two projects, four modes, three fresh
 rounds, and 13 commands per cell. Each cell includes a clean build, two no-ops,
-three direct edits, a restore, three private-library edits, and three inline edits. Mode
-order reverses in the middle round. Sequential edits share cache history; the
+three direct edits, a restore, three private-library edits, and three inline edits.
+These edits change constants in benchmark-only code injected into each project:
+the binary's entry point, a non-inlined library helper, and an inlined library
+helper, respectively. The rebuilt binary must return the new value. They test
+rebuild and cache invalidation behavior, but are not edits to existing Ruff or
+uv functions; the inline result does not describe all edits in either project.
+Mode order reverses in the middle round. Sequential edits share cache history; the
 summary exposes per-round means rather than treating all nine edits as
 independent runs.
 
@@ -72,7 +87,7 @@ process-tree peak RSS accompany wall time. Every command must pass its runtime
 oracle, and each clean build must prove the requested on-disk format. An
 unrelated compiler or sustained outside user CPU invalidates the run.
 
-## Results and decision
+## Initial results and decision
 
 All **312/312 commands** were accepted across 24 cells. The independent audit
 passed **14,541 checks**, including every runtime oracle, all 24 format guards,
@@ -116,7 +131,8 @@ byte reductions were 19.2%/14.0%.
 **Decision: the storage design merits further work, but this bundle is not yet
 recommended for adoption.** Clean-build overhead is modest, and the direct-edit
 cost is about 0.22 seconds on uv and 0.17 seconds on Ruff. However, the ordinary
-candidate already regresses Ruff inline edits by **10.44%**, or **0.277 seconds**,
+candidate already regresses the synthetic Ruff inline-helper rebuild by
+**10.44%**, or **0.277 seconds**,
 with compression disabled. Eight of nine paired edits were slower in both wall
 and CPU time; CPU time rose by 0.227 seconds on average. All three round means
 were positive (+17.74%, +13.53%, +0.51%). Therefore leaving the feature off by
@@ -178,7 +194,7 @@ The compiler distribution rehearsal checks the actual tarball's Wild binary,
 capability marker, licenses, and compiler driver. It is not a production
 PGO/BOLT build or a published release.
 
-## Source revisions
+## Initial study source revisions
 
 | Component | Measurement or earlier functional boundary                                                                               | Final review revision                      |
 | --------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |

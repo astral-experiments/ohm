@@ -1,0 +1,211 @@
+{
+  "passed": true,
+  "auditor_sha256": "411fa916c4b38c91946ab20908971a83b7eb0334afa4f730a4798ca3128aa3ca",
+  "shared_auditor_sha256": "1ca96fce0f17711de6737cf87ddd1c4bb49cbe39d3dff87770952288b45d6f5d",
+  "checks": 1271,
+  "states": 26,
+  "accepted_timings": 0,
+  "transferred_files": 140,
+  "transferred_bytes": 52086629,
+  "source_states": 20,
+  "matrix_sha256": "72dedc3f13bb9a7f9ff1e818a822385b1cdea6f4fdf5aa6e64f1339407ea6246",
+  "provenance_sha256": "accc9c6c4dab0f544effa2f91ec2f63131464e1e3f0258131016317aeb79ad71",
+  "observed_real_library_cases": [
+    {
+      "project": "ruff",
+      "state": [
+        0,
+        3,
+        1
+      ],
+      "source_sha256": {
+        "crates/ruff_linter/src/rules/pyflakes/rules/unused_variable.rs": "225d367fb74ec374f53b461e9df600b6913dcc310df1f4932a31bd3505a4c6e9",
+        "crates/ruff/src/main.rs": "b29e8a37ecd5287150c6e0f0de9a4df35503c6938a3b27c26afed3027e4c5ea1",
+        "crates/ruff/src/lib.rs": "13a9ec06b939ef3e9997e00208f1796375e7b83aaaf4dc7cc7a1b112fa259507"
+      },
+      "binary_sha256": "bc5732a571bdd3a8d1772a209afbac697fe8cdc4f82c9574a2b2084d337623e4",
+      "case": {
+        "argv": [
+          "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/fixture-preflight-v2/ruff/round-0/storeless/target/debug/ruff",
+          "check",
+          "--isolated",
+          "--no-cache",
+          "--select",
+          "F841",
+          "--output-format",
+          "json",
+          "-"
+        ],
+        "input": "def f():\n    x = 1\n",
+        "code": 1,
+        "stdout": "[\n  {\n    \"cell\": null,\n    \"code\": \"F841\",\n    \"end_location\": {\n      \"column\": 6,\n      \"row\": 2\n    },\n    \"filename\": \"-\",\n    \"fix\": {\n      \"applicability\": \"unsafe\",\n      \"edits\": [\n        {\n          \"content\": \"pass\",\n          \"end_location\": {\n            \"column\": 10,\n            \"row\": 2\n          },\n          \"location\": {\n            \"column\": 5,\n            \"row\": 2\n          }\n        }\n      ],\n      \"message\": \"Remove assignment to unused variable `x`\"\n    },\n    \"location\": {\n      \"column\": 5,\n      \"row\": 2\n    },\n    \"message\": \"Local variable `x` is assigned a value but never used\",\n    \"name\": \"unused-variable\",\n    \"noqa_row\": 2,\n    \"severity\": \"error\",\n    \"url\": \"https://docs.astral.sh/ruff/rules/unused-variable\"\n  }\n]",
+        "stderr": ""
+      }
+    },
+    {
+      "project": "ruff",
+      "state": [
+        0,
+        3,
+        2
+      ],
+      "source_sha256": {
+        "crates/ruff_linter/src/rules/pyflakes/rules/unused_variable.rs": "0530f524c7c0163bf94a352016f7dd4d0ce2955fd210ea09f8241145fb6c6ea0",
+        "crates/ruff/src/main.rs": "b29e8a37ecd5287150c6e0f0de9a4df35503c6938a3b27c26afed3027e4c5ea1",
+        "crates/ruff/src/lib.rs": "13a9ec06b939ef3e9997e00208f1796375e7b83aaaf4dc7cc7a1b112fa259507"
+      },
+      "binary_sha256": "db75426b472ff38b4cdf38042ad8e87bdac733a4702348c44728e4b5079cee65",
+      "case": {
+        "argv": [
+          "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/fixture-preflight-v2/ruff/round-0/storeless/target/debug/ruff",
+          "check",
+          "--isolated",
+          "--no-cache",
+          "--select",
+          "F841",
+          "--output-format",
+          "json",
+          "-"
+        ],
+        "input": "def f():\n    x = 1\n",
+        "code": 1,
+        "stdout": "[\n  {\n    \"cell\": null,\n    \"code\": \"F841\",\n    \"end_location\": {\n      \"column\": 6,\n      \"row\": 2\n    },\n    \"filename\": \"-\",\n    \"fix\": {\n      \"applicability\": \"unsafe\",\n      \"edits\": [\n        {\n          \"content\": \"pass\",\n          \"end_location\": {\n            \"column\": 10,\n            \"row\": 2\n          },\n          \"location\": {\n            \"column\": 5,\n            \"row\": 2\n          }\n        }\n      ],\n      \"message\": \"Remove assignment to unused variable `x`\"\n    },\n    \"location\": {\n      \"column\": 5,\n      \"row\": 2\n    },\n    \"message\": \"Local variable `x` is unused after assignment\",\n    \"name\": \"unused-variable\",\n    \"noqa_row\": 2,\n    \"severity\": \"error\",\n    \"url\": \"https://docs.astral.sh/ruff/rules/unused-variable\"\n  }\n]",
+        "stderr": ""
+      }
+    },
+    {
+      "project": "ruff",
+      "state": [
+        0,
+        3,
+        3
+      ],
+      "source_sha256": {
+        "crates/ruff_linter/src/rules/pyflakes/rules/unused_variable.rs": "f0b215386902565ebf5d4522fe9def647a7055fca4e3c489f8034d0ae80ec367",
+        "crates/ruff/src/main.rs": "b29e8a37ecd5287150c6e0f0de9a4df35503c6938a3b27c26afed3027e4c5ea1",
+        "crates/ruff/src/lib.rs": "13a9ec06b939ef3e9997e00208f1796375e7b83aaaf4dc7cc7a1b112fa259507"
+      },
+      "binary_sha256": "61c671c846d907a5252b54a6406623e7fd16547ebcc3ef440ec9a63427311b67",
+      "case": {
+        "argv": [
+          "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/fixture-preflight-v2/ruff/round-0/storeless/target/debug/ruff",
+          "check",
+          "--isolated",
+          "--no-cache",
+          "--select",
+          "F841",
+          "--output-format",
+          "json",
+          "-"
+        ],
+        "input": "def f():\n    x = 1\n",
+        "code": 1,
+        "stdout": "[\n  {\n    \"cell\": null,\n    \"code\": \"F841\",\n    \"end_location\": {\n      \"column\": 6,\n      \"row\": 2\n    },\n    \"filename\": \"-\",\n    \"fix\": {\n      \"applicability\": \"unsafe\",\n      \"edits\": [\n        {\n          \"content\": \"pass\",\n          \"end_location\": {\n            \"column\": 10,\n            \"row\": 2\n          },\n          \"location\": {\n            \"column\": 5,\n            \"row\": 2\n          }\n        }\n      ],\n      \"message\": \"Remove assignment to unused variable `x`\"\n    },\n    \"location\": {\n      \"column\": 5,\n      \"row\": 2\n    },\n    \"message\": \"Local variable `x` has an assigned value that is never used\",\n    \"name\": \"unused-variable\",\n    \"noqa_row\": 2,\n    \"severity\": \"error\",\n    \"url\": \"https://docs.astral.sh/ruff/rules/unused-variable\"\n  }\n]",
+        "stderr": ""
+      }
+    },
+    {
+      "project": "uv",
+      "state": [
+        0,
+        3,
+        1
+      ],
+      "source_sha256": {
+        "crates/uv-pep508/src/lib.rs": "479d9d90bf917b37762471b9a02491385b1bc4e25d4f7fe4397bafc161b0ea3a",
+        "crates/uv/src/commands/cache_dir.rs": "1956d9bb9aa6c0db802c71b661557796dd095682dc8efde8028ca7156d7bec8e",
+        "crates/uv/src/bin/uv.rs": "89fe5890ce15244a522dbfef04d3598bdf5c57ff44e42b35bc0962a79b658b35",
+        "crates/uv/src/lib.rs": "323ffe1533b22f8a99b189cba07dc059014bdea8f7d750ef797022d3aa363a3d"
+      },
+      "binary_sha256": "95c7ac6168883df5fc9ef3eab6459e28e75069a7e7738d42ce008a9340eecf1f",
+      "case": {
+        "argv": [
+          "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/fixture-preflight-v2/uv/round-0/storeless/target/debug/uv",
+          "--no-config",
+          "--offline",
+          "--color",
+          "never",
+          "--cache-dir",
+          "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/evidence/fixture-preflight-v2/uv-storeless-0/oracle-work/cache",
+          "pip",
+          "install",
+          "--no-index",
+          "=foo"
+        ],
+        "input": null,
+        "code": 2,
+        "stdout": "",
+        "stderr": "error: Failed to parse: `=foo`\n  Caused by: Package name must start with an alphanumeric character, found `=`\n    =foo\n    ^\n"
+      }
+    },
+    {
+      "project": "uv",
+      "state": [
+        0,
+        3,
+        2
+      ],
+      "source_sha256": {
+        "crates/uv-pep508/src/lib.rs": "d28d6bee3adbda7f459378df10dd2b5a1946faa543a8cb8bc5d416443b5ab00f",
+        "crates/uv/src/commands/cache_dir.rs": "1956d9bb9aa6c0db802c71b661557796dd095682dc8efde8028ca7156d7bec8e",
+        "crates/uv/src/bin/uv.rs": "89fe5890ce15244a522dbfef04d3598bdf5c57ff44e42b35bc0962a79b658b35",
+        "crates/uv/src/lib.rs": "323ffe1533b22f8a99b189cba07dc059014bdea8f7d750ef797022d3aa363a3d"
+      },
+      "binary_sha256": "07e002bec0ff5082b80b67ac6cb1919087e41dddca0cb597d7c75eb39f70bd8d",
+      "case": {
+        "argv": [
+          "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/fixture-preflight-v2/uv/round-0/storeless/target/debug/uv",
+          "--no-config",
+          "--offline",
+          "--color",
+          "never",
+          "--cache-dir",
+          "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/evidence/fixture-preflight-v2/uv-storeless-0/oracle-work/cache",
+          "pip",
+          "install",
+          "--no-index",
+          "=foo"
+        ],
+        "input": null,
+        "code": 2,
+        "stdout": "",
+        "stderr": "error: Failed to parse: `=foo`\n  Caused by: Expected an alphanumeric first character in package name, found `=`\n    =foo\n    ^\n"
+      }
+    },
+    {
+      "project": "uv",
+      "state": [
+        0,
+        3,
+        3
+      ],
+      "source_sha256": {
+        "crates/uv-pep508/src/lib.rs": "e1c3d686d80be5c7a9cc6bd7fec15e404ee0d5e6a352ea654c5b713c60b8219b",
+        "crates/uv/src/commands/cache_dir.rs": "1956d9bb9aa6c0db802c71b661557796dd095682dc8efde8028ca7156d7bec8e",
+        "crates/uv/src/bin/uv.rs": "89fe5890ce15244a522dbfef04d3598bdf5c57ff44e42b35bc0962a79b658b35",
+        "crates/uv/src/lib.rs": "323ffe1533b22f8a99b189cba07dc059014bdea8f7d750ef797022d3aa363a3d"
+      },
+      "binary_sha256": "d663425b338ff231b18883249add25dc3e6f522d662249d127e449da2d072e77",
+      "case": {
+        "argv": [
+          "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/fixture-preflight-v2/uv/round-0/storeless/target/debug/uv",
+          "--no-config",
+          "--offline",
+          "--color",
+          "never",
+          "--cache-dir",
+          "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/evidence/fixture-preflight-v2/uv-storeless-0/oracle-work/cache",
+          "pip",
+          "install",
+          "--no-index",
+          "=foo"
+        ],
+        "input": null,
+        "code": 2,
+        "stdout": "",
+        "stderr": "error: Failed to parse: `=foo`\n  Caused by: Invalid package name starting character; expected alphanumeric, found `=`\n    =foo\n    ^\n"
+      }
+    }
+  ],
+  "scope": "All26v2source/runtime states pass independently, including everyedited UV message. This admits fixtures and functional gates, not performance results. Failed14-rowv1 remains historical, never pooled."
+}

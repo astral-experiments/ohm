@@ -1,0 +1,1872 @@
+{
+  "passed": true,
+  "source_files_compared": 373,
+  "source_bytes_compared": 90294116,
+  "files": [
+    {
+      "path": "readiness/evidence/preparation.json",
+      "bytes": 19538,
+      "sha256": "182b90d74b13d332901639c7c12c41f4195945456ad1e2997c90ada8ba2a2d38"
+    },
+    {
+      "path": "readiness/evidence/uv-compatibility.patch",
+      "bytes": 16637,
+      "sha256": "7b6d6653491a20370da275ddf82c3963b78885e986614c44ef04781da66bec1d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight.log",
+      "bytes": 3795,
+      "sha256": "e92d7a8fc2331bda11a00d36bfa7c5e9f81ee15ea22eff5f7960f0587e262912"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2.log",
+      "bytes": 2470,
+      "sha256": "34395ca014de038105228747c526437998049bb39bd2f89874320042785cdc3b"
+    },
+    {
+      "path": "readiness/evidence/preflight-v2-transfer.json",
+      "bytes": 29975,
+      "sha256": "f51edb7cc395eec36738058dcd666b7e268cbbab00e3003f1073426abd22c6ba"
+    },
+    {
+      "path": "readiness/evidence/ruff-compatibility.patch",
+      "bytes": 987,
+      "sha256": "0ccbf567ad3c95824ca79b4df0982d8d8e65bcb8b880e5f02cf9e173381d4516"
+    },
+    {
+      "path": "readiness/evidence/correctness-transfer.json",
+      "bytes": 2685,
+      "sha256": "05b8899818a51a95bed993bfa8ebb0b6712a1e658c0350001fae0e1c4c16fe13"
+    },
+    {
+      "path": "readiness/correctness/run_correctness.py",
+      "bytes": 5934,
+      "sha256": "3a86821e3aa91c019bc78aff137c41d4ffd679fb05ab0d2022d67bf3a30a586d"
+    },
+    {
+      "path": "readiness/correctness/independent-review.json",
+      "bytes": 1943,
+      "sha256": "cd6c58ee9945531d30ce9d88a816760566451fee4cc024876302666f3f8dd8f1"
+    },
+    {
+      "path": "readiness/correctness/alignment_correctness.py",
+      "bytes": 15376,
+      "sha256": "660b3b1db7a1e2dc2c1f302c1e2b1083f6aaf18c9f0a62572d5ce37223cdc1ed"
+    },
+    {
+      "path": "readiness/correctness/derivation.json",
+      "bytes": 912,
+      "sha256": "63718579c15e3ff6c4b56acc343ef107d40e91f7435db2a36a0d234239fd07f5"
+    },
+    {
+      "path": "readiness/correctness/worktree_correctness.py",
+      "bytes": 21027,
+      "sha256": "9d7a5eaaeafcee3ef5009bf964f3bf31434d2668d3bb414f0c138366a8f690cb"
+    },
+    {
+      "path": "readiness/correctness/cargo_lifecycle.py",
+      "bytes": 13754,
+      "sha256": "ea996fbce8eae2a6d7c0e0cd49644886bfce3efa643dc403f01e047ce8902408"
+    },
+    {
+      "path": "readiness/evidence/fixture-originals/manifest.json",
+      "bytes": 1304,
+      "sha256": "f21f82c94c513ed3bc05fb6ca912c56b75ad5f9f10dc6a390412267cb7678508"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/03-inline.time",
+      "bytes": 873,
+      "sha256": "2aa791d01b66e1d3c27a668ea57a6f18c6e91cf4d1496872d7940d839552a000"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/result.json",
+      "bytes": 25256,
+      "sha256": "08e0f96fe4862433e73872e2ff060acaa8a5e4277da0bd66f2ea9517ebe6083b"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/03-inline.oracle.json",
+      "bytes": 2645,
+      "sha256": "70d1e2739c42b278f5471af1fbb1830f4d34cf06d4daa70eb15fa29f4053613b"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/01-inline.bpf.jsonl",
+      "bytes": 375,
+      "sha256": "64b969689a7ddfe44da327480f36221ca64641c4287e3dbfa78d8e977c6e50c3"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/02-inline.log",
+      "bytes": 1318471,
+      "sha256": "5702d2aa1e63739bbb5d5e6684a83a4ffe6182e88b664d40529b22efcf792fb6"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/02-inline.bpf.jsonl",
+      "bytes": 375,
+      "sha256": "cb26fea88a0969e5c719d29be1329e675202a99966d089b4623b869c2b473749"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/00-prepare.monitor.json",
+      "bytes": 24609,
+      "sha256": "eac3ce7b2a9099438468eea0c2e56298f82d6cce012c439fd1a1fe93d047b410"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/00-prepare.log",
+      "bytes": 4048546,
+      "sha256": "ffa08a8057010d7a1ed5e93f770b6c538752c84974bc3ebae36d5b586d267759"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/00-prepare.time",
+      "bytes": 891,
+      "sha256": "4e74a993b73411a3f5109e5b58fc866b1084e90cdf3dafc73726c7293a855daa"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/01-inline.bpf.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/scanner.bt",
+      "bytes": 1378,
+      "sha256": "35c4eb71b47488a92ddf819165eab8164ccf4f8500e0c78194279d1b2ee70e70"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/02-inline.time",
+      "bytes": 873,
+      "sha256": "ea5427443c22775498ab88c7d82ffbada16f3aef404dceecb2b768ac5acf0563"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/01-inline.log",
+      "bytes": 1318471,
+      "sha256": "ad63472d1247e16c36f6d97a799aa4bd0490b9f9af75ba79847462db5878a976"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/03-inline.monitor.json",
+      "bytes": 676,
+      "sha256": "0c4e604466f5686da298cb8eb4e27701bc57e7e239a6e10937dd5cff3af6962a"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/01-inline.time",
+      "bytes": 876,
+      "sha256": "8e439d7640d11e13eaa13b240c069db81123dd13415c0b4ca47e466fec21f79f"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/00-prepare.oracle.json",
+      "bytes": 2645,
+      "sha256": "78b69efd7339d2f44b1d5b7de9623bfd628586903ac7cc20bd7af37e7ca95a82"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/02-inline.monitor.json",
+      "bytes": 566,
+      "sha256": "689e76eeedabf87e2bc1efdd4bccad25a7116a4aefd2ba0e7d5015aa226632d8"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/02-inline.bpf.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/01-inline.monitor.json",
+      "bytes": 565,
+      "sha256": "57454bbbcfe154814ac9ea131e3f033929ca86e2cb3bd49a5a01e9bcd83bec32"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/02-inline.oracle.json",
+      "bytes": 2645,
+      "sha256": "eb76bac1bff9b7d559c7affab6d09d1afbc46055761fc2fbafb827b92bde9fab"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/03-inline.bpf.jsonl",
+      "bytes": 376,
+      "sha256": "4669db15452d952e06572a44964e7e61a22d4e3733a511db45d85c5f1731b023"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/01-inline.oracle.json",
+      "bytes": 2645,
+      "sha256": "13951bc0721e28cbcc3fc9a610a19659f7fe4afd1af2a24846332ce7c6f40327"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/03-inline.bpf.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/scanner-profile/03-inline.log",
+      "bytes": 1318471,
+      "sha256": "0d496c5149ed0bfc86acce80b301c66d5641e1d74d2a97dce397ec5d1504dd29"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/provenance.json",
+      "bytes": 35625,
+      "sha256": "accc9c6c4dab0f544effa2f91ec2f63131464e1e3f0258131016317aeb79ad71"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/samples.jsonl",
+      "bytes": 203626,
+      "sha256": "72dedc3f13bb9a7f9ff1e818a822385b1cdea6f4fdf5aa6e64f1339407ea6246"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/status.json",
+      "bytes": 88,
+      "sha256": "3a6436f528d75552b6af5242eb6ddb0f61ccb5dc567cd202fe7508ca08bb6774"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/provenance.json",
+      "bytes": 35601,
+      "sha256": "2a75d52b5e97ccd953d7f94a1c35961fbcc14a2492dd09ed114ccd10fa47f581"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/samples.jsonl",
+      "bytes": 118578,
+      "sha256": "0dfabed122ae4f162434c437b205d67dc6c269c858c65242b3e32dce426aa0b6"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/failure.json",
+      "bytes": 14908,
+      "sha256": "66ddc035294ef13d31b92e52af5327c80e792cf58309b20d43d46e0c7cc79b50"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/initial-result.json",
+      "bytes": 5281,
+      "sha256": "829fa62da42ec67d82be69bce62e809bdd8de148f55f0fbacdf53387cedf85fa"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/result.json",
+      "bytes": 11997,
+      "sha256": "b0e4171c60ac130c0722160d0a7c995559737865b3886b2fcc5234c5a5577ca8"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/pre-linker-install-result.json",
+      "bytes": 9562,
+      "sha256": "7f2952950517bffd764a9cf2276054bcc873fd5f3d0a3ca3f4348ea4527ae8cb"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/copy-submodule-src-tools-rustc-perf.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/resume-result.json",
+      "bytes": 7432,
+      "sha256": "f76f6053e3eccf2f07c731f310e5d144dee7a21f7348f7bbae463c8eccdc6185"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/worktree.log",
+      "bytes": 3747,
+      "sha256": "8509eca8132dc7cd1706900bb591bb600068eeee1038a817756f4efe0cd86694"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/copy-bootstrap.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/copy-submodule-src-doc-reference.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/cached-loader-failure.json",
+      "bytes": 413,
+      "sha256": "4c1a3b2119b4aa7e7bc5e618d08450b0556acbefb71ce4a9cd6936b2e5471356"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/apply.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/compiler-build-initial.log",
+      "bytes": 14284,
+      "sha256": "5e3fe861658b9354762a0a43836cf5571df468b47dc0f9e3d691f79e56fae4cd"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/compiler-build-final.log",
+      "bytes": 3125,
+      "sha256": "4489ad60ac2ac6ad17df8a9d6c6d8543c1e8c283366345160cfb1382f92ba327"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/copy-submodule-library-backtrace.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/copy-submodule-src-tools-cargo.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/base-branch.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/copy-submodule-src-doc-book.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/compiler-build-resume.log",
+      "bytes": 1353,
+      "sha256": "fd0653dee20af08a9eda2e2ecc3515b7aada9bd54c81110e42fc9eae770cab15"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/upstream.log",
+      "bytes": 94,
+      "sha256": "bde0876f29355215e8245efab0124807750841c627848d80e835ae6916c44296"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/install.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/candidate-build/compiler-tests.log",
+      "bytes": 2065,
+      "sha256": "af1c61870a658dd1a01dbb462f74b17c24bbfd55f5ff0d25eb98998738a3a1b5"
+    },
+    {
+      "path": "readiness/evidence/correctness/result.json",
+      "bytes": 5582,
+      "sha256": "e72852360f624f0668be9f6236bd5b253cf492facd9e6ccbec7ce41127e79c3e"
+    },
+    {
+      "path": "readiness/evidence/correctness/lifecycle.log",
+      "bytes": 121,
+      "sha256": "5c5497415cd9a40bfe18452edb7ca3c1b454048435030eae80373ce1fb1980cc"
+    },
+    {
+      "path": "readiness/evidence/correctness/alignment.json",
+      "bytes": 29507,
+      "sha256": "a43e5864f7b23abf25766e46c91ad73cccbd6e9250ffe378a141b396db48dd28"
+    },
+    {
+      "path": "readiness/evidence/correctness/lifecycle.json",
+      "bytes": 173507,
+      "sha256": "af39b943440e33dd1125cb6640b2ed6e667f5b853adb6460aed8cea3797a78c2"
+    },
+    {
+      "path": "readiness/evidence/correctness/worktree.log",
+      "bytes": 133,
+      "sha256": "787175eb3259d22009b183d0d7da1744720b238036ca83171f1bdd47a10bdec9"
+    },
+    {
+      "path": "readiness/evidence/correctness/worktree.json",
+      "bytes": 117997,
+      "sha256": "a02bfd98171762292f7234a52ce307d2e76321a3720f3e78ce8b0d1e6175f32a"
+    },
+    {
+      "path": "readiness/evidence/correctness/alignment-build.json",
+      "bytes": 585,
+      "sha256": "e2bde72555e2d4e025d81c12e026223fc9bba988992954742b26932b10e3f2f5"
+    },
+    {
+      "path": "readiness/evidence/correctness/alignment.log",
+      "bytes": 140,
+      "sha256": "797d463150fc542def7a7eaad82509248744d32caffb85219deb9b96fc64b0fb"
+    },
+    {
+      "path": "readiness/evidence/candidate-package/source-manifest.json",
+      "bytes": 98,
+      "sha256": "5b029d613fb094aadd6c626a0bcaf46c675456906ffa287b9191871f3acd9a44"
+    },
+    {
+      "path": "readiness/evidence/candidate-package/distribution.log",
+      "bytes": 130614,
+      "sha256": "f52979e2f7e15c872ef9d753eac3470f349f29f80649f4438571d1dbb097e1d0"
+    },
+    {
+      "path": "readiness/evidence/candidate-package/defaults-build.log",
+      "bytes": 375,
+      "sha256": "93ee98937d23b7878c596e7423705ba3d10b088d5a9e60bbc74eaf72fbd86b1d"
+    },
+    {
+      "path": "readiness/evidence/candidate-package/compact-smoke.log",
+      "bytes": 424,
+      "sha256": "a308a74a0f62d825c82e6ae8dba92bb9ea94ab1eb0a00008e0be5660067d9dd8"
+    },
+    {
+      "path": "readiness/evidence/candidate-package/result.json",
+      "bytes": 5044,
+      "sha256": "1e3f7633c204a37c64bf0787118ea0794d888ae2a906fb1d2dd5e50e0349a4aa"
+    },
+    {
+      "path": "readiness/evidence/candidate-package/install-component.log",
+      "bytes": 206,
+      "sha256": "2a0abe2f7a87bc0b400436b3ceb08015d8fab483f44975499c20ca72ab35c1a8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/00-clean.patch",
+      "bytes": 17641,
+      "sha256": "fa9d024df6b41bf082f4b83b96fc7e878a6898033b0d40ccf28497a55421fdf8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/00-clean.monitor.json",
+      "bytes": 26833,
+      "sha256": "2cffc96f98eaa45c778a61977ed855472bdd26cb5c017ed0b09a335e795ada0c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/00-clean.log",
+      "bytes": 8623323,
+      "sha256": "ba8c505b823d89ff59c84bf7b2d25c65a382b5fd4b3e0fefd2425e374a4c75cf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/00-clean.time",
+      "bytes": 889,
+      "sha256": "d7962a0e611e4a8803f5108284858d615239db8bee9063d517ec5465499f0e73"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/oracle-adjustment-probe.json",
+      "bytes": 585,
+      "sha256": "95673452b8caec44f2885affde1aca1f1bd463ced61ec16187e8afe30a70547a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/00-clean.oracle.json",
+      "bytes": 2140,
+      "sha256": "a2d8460b04a187c5dc004f91cec86f6601cac7b26a203c311d522424c4b04064"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/06-real-direct.time",
+      "bytes": 869,
+      "sha256": "631af8407e4f7c8272a354dbbcd56ffe0842fd75f5c0dc7e291a2f9951c8baa4"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/02-synthetic-inline.log",
+      "bytes": 1337077,
+      "sha256": "148b1edb3db8c445eb767fc8d937d21e837c10ee7caa7a47f718608a7664c935"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/00-clean.patch",
+      "bytes": 2097,
+      "sha256": "e7bb4e79d95b528ff0475a828dc34812ca1da0470ad989d789ad08c0334293bf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/09-real-library.patch",
+      "bytes": 3398,
+      "sha256": "c797b403fb76a3c448bd8bf354cb0f757f48f3d155a3968f551e6801918e3a06"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/06-real-direct.log",
+      "bytes": 1260877,
+      "sha256": "344d9f97ea8ba92cb2c07d824aef10ef48b4d1cc6854585c5c8302ae1367fafc"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/10-real-library.oracle.json",
+      "bytes": 3329,
+      "sha256": "b3351be9b0d62e16b9988093fbd6dc03772a0fdd3ae5c8b4fc5eff106c1545c7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/04-synthetic-inline.time",
+      "bytes": 873,
+      "sha256": "b659a0e97b88bd203caecc5c07c68f201ed704083decf30dd2993b24f146bbe9"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/12-noop-final.monitor.json",
+      "bytes": 203,
+      "sha256": "e8b1433747b65d916dfc1275da2925906841c42d010e353fe5f7e7ae29a6ee83"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/07-real-direct.monitor.json",
+      "bytes": 479,
+      "sha256": "61c705b4c20e063032616d97ed7d8b2e60852c99b087ac8849837e93df50062a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/01-noop.patch",
+      "bytes": 2097,
+      "sha256": "e7bb4e79d95b528ff0475a828dc34812ca1da0470ad989d789ad08c0334293bf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/01-noop.monitor.json",
+      "bytes": 298,
+      "sha256": "edced0466308d163f1936527fbf54e8a518fb983a7fdc3c8162b9565023affde"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/01-noop.time",
+      "bytes": 869,
+      "sha256": "bd39fa9bc00ef14aec51708c9e0b9065227818a3d6aae5d6f66b647ee52b96c6"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/11-real-library.log",
+      "bytes": 1324375,
+      "sha256": "bde88ff7736cb0b84b46fc1a548f651d03972733715f960d5f528d4c5bb0896c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/08-real-direct.patch",
+      "bytes": 2717,
+      "sha256": "ac27e6b9820b28870cdec3b7d55a7081bc3df584ea2354c03a465f89d846e0c5"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/03-synthetic-inline.log",
+      "bytes": 1337077,
+      "sha256": "92a3ebf9c8442b7a432c598448f16f7519dec4c5bc045b07d11338f94476b7e7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/10-real-library.monitor.json",
+      "bytes": 3996,
+      "sha256": "50cf5d4f5e9c87eb2f506d1eb64032a06a47bab5d94bda55190cbde0fb4dd24a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/07-real-direct.time",
+      "bytes": 869,
+      "sha256": "2a1a381b31c59c2d451ddc75793cfdadbe877be1b82fd75fa4215cf610022768"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/00-clean.monitor.json",
+      "bytes": 23701,
+      "sha256": "e0e361254dba795026fe47ec1f896d6266536a7386ae00d7c39889529a15040c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/11-real-library.oracle.json",
+      "bytes": 3343,
+      "sha256": "353a4d1bf086d72279e775d3d87a0e7389e923ee31defcd15c1c2ad27e43d6d7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/07-real-direct.oracle.json",
+      "bytes": 3330,
+      "sha256": "073bfa8487612fb2715be7438940fc5af7ed5892d1db3c78b23be2dc401758ae"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/00-clean.log",
+      "bytes": 4332235,
+      "sha256": "b283dd0f8c21bf7c1d5a78ad9a0286f9b16e282fd35a8561999b26adb420c079"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/01-noop.oracle.json",
+      "bytes": 3322,
+      "sha256": "38b5910abe906f8413c757779b76be90ee0f68ec94dad81ce68b365ed4152871"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/12-noop-final.patch",
+      "bytes": 3404,
+      "sha256": "d96c532be7bb9f1fac79fef6184fd28df3bd53d2b244b6c3ae24d7f705c7832d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/11-real-library.patch",
+      "bytes": 3404,
+      "sha256": "d96c532be7bb9f1fac79fef6184fd28df3bd53d2b244b6c3ae24d7f705c7832d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/06-real-direct.monitor.json",
+      "bytes": 376,
+      "sha256": "33627a40b5d9b60df5131bac59e56af61220bcc87c3f7896eccf2e0fb512ef5d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/02-synthetic-inline.time",
+      "bytes": 875,
+      "sha256": "542eae412aa7bc5465d660d546f55d98208ed36942e4157a7ab5d9abf2e144c6"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/08-real-direct.oracle.json",
+      "bytes": 3332,
+      "sha256": "173979427709240ce1d93b1261988d79099ea85061d62d65017d1da3c2e7f69a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/08-real-direct.log",
+      "bytes": 1260877,
+      "sha256": "85977c65684b14f663dcbcd20af59d3c2ffaf4ecb24ee3db6ba71e3ddf937d0c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/03-synthetic-inline.oracle.json",
+      "bytes": 3322,
+      "sha256": "9727e03edb48d01df04ab73e26ef263ea223b8de797cdae2b8591927d44a00c1"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/08-real-direct.time",
+      "bytes": 869,
+      "sha256": "97f8ab89ceb39949e4f447c8ec72aea1cacf7f35c33aa0aa97ab6d4a2f0572f7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/05-restore.log",
+      "bytes": 1337077,
+      "sha256": "7cb68cb7127ed31d417764bf5590c41a024b92f8604d11709ccc3460a3e8d079"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/01-noop.log",
+      "bytes": 1171636,
+      "sha256": "5721658b85db86cf22c3824b916b2337eb732889f4e708412362e746751e678d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/05-restore.patch",
+      "bytes": 2097,
+      "sha256": "e7bb4e79d95b528ff0475a828dc34812ca1da0470ad989d789ad08c0334293bf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/10-real-library.log",
+      "bytes": 1324375,
+      "sha256": "33035abec1253aeac42fd681c00f78b2299603d163fc85d92e29e04acd0c9ee8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/07-real-direct.log",
+      "bytes": 1260877,
+      "sha256": "9cd5f5cadcdfcc1261415ab3696dd0aea580f5b6396f548fa5b216da70d6b937"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/02-synthetic-inline.oracle.json",
+      "bytes": 3322,
+      "sha256": "979e123d621ff0a25d325215cabbd87c4c297b7b3db891c52cadf1e8fc0098b2"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/00-clean.time",
+      "bytes": 890,
+      "sha256": "daf959cd822d9f48bc4aea3ef113fe3fb16e93565239dd3482fe7a39fe2c54bd"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/11-real-library.time",
+      "bytes": 877,
+      "sha256": "17fa2568f6e533ef05deaff6e46843811b526c91c8398aacf191dd2b38691de5"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/08-real-direct.monitor.json",
+      "bytes": 390,
+      "sha256": "2a68d52a5f1eb2ba4f0979bc9f53d48349176421173e7214437ba48a29c271d7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/05-restore.monitor.json",
+      "bytes": 581,
+      "sha256": "fb7cce855ed85e3c0c012159e3a246f4b38b3303cd3b8d76a09ceba27ef84afd"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/03-synthetic-inline.monitor.json",
+      "bytes": 599,
+      "sha256": "106e14fbcb5049bd2aeed5ca04b0efc08d8c150a50672075f7026c4e9ef4f387"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/02-synthetic-inline.patch",
+      "bytes": 2097,
+      "sha256": "109f813a8733112e19fff39034613eca7eb6179fde05817e791827960fbfbd9f"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/09-real-library.oracle.json",
+      "bytes": 3337,
+      "sha256": "a93fb000472e00377aafff700515e4b00dcfc5465dfe69ff5933bd21bfc449ee"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/09-real-library.time",
+      "bytes": 879,
+      "sha256": "3f0afddd44ee68a96ca5ee9e2d3cd9ae52a7e24ac6f93a7eb51bb2f454326203"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/12-noop-final.time",
+      "bytes": 866,
+      "sha256": "f0c67cfec8a460776428fabcd1f14a339e72993090cc06840dfc2622d1836c01"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/10-real-library.patch",
+      "bytes": 3390,
+      "sha256": "4a4cb2466b51d659ea22e0a73cfaddeefdbfbfd89ae33bb3c925edeba3ddbcc6"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/11-real-library.monitor.json",
+      "bytes": 4105,
+      "sha256": "f1be8909e6f15ed5583ba4e883bfdf863cde79acaf6b847a652de4bda956c383"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/10-real-library.time",
+      "bytes": 878,
+      "sha256": "bc19dbeaed03e1ac9ce9b4a51a4803fc7612e2446cc3db67380ef450f7227e92"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/04-synthetic-inline.monitor.json",
+      "bytes": 580,
+      "sha256": "34b0d67c714265eb577b8a5d37aaa25e1595c2d0c6c81c3f9700564c626dbf9f"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/00-clean.oracle.json",
+      "bytes": 3322,
+      "sha256": "38b5910abe906f8413c757779b76be90ee0f68ec94dad81ce68b365ed4152871"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/07-real-direct.patch",
+      "bytes": 2715,
+      "sha256": "8c919dd87bef58dca0bf18ef74b6f5e6c7839b5c94178074bb7d81ddff2c199d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/02-synthetic-inline.monitor.json",
+      "bytes": 581,
+      "sha256": "0e96b43ef6e359f95c43ef1ba8126a3255d7c026d0c5ade0773dd445647f2851"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/03-synthetic-inline.time",
+      "bytes": 873,
+      "sha256": "cfa4d66ea86ab68378d49cb2a5d11936582f0ded60b23a0487fc83988de79bfc"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/12-noop-final.log",
+      "bytes": 1171636,
+      "sha256": "7d9b569c9b5b791a52b4b659c73f28262f49ca3ca53234e43d2690134c90c6fa"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/09-real-library.log",
+      "bytes": 1324375,
+      "sha256": "f245810548b4c1cfa462686acc2bea154e649a8a562d7300dade8bb1d2235e10"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/09-real-library.monitor.json",
+      "bytes": 4010,
+      "sha256": "768853c2b4c30bae9d76c4b315844250e46f211fecc383e724b164479274c749"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/05-restore.time",
+      "bytes": 873,
+      "sha256": "0cf0b1c188592e86171e89a8196cfd3e65311a69a379183f142d6a3068143cdf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/04-synthetic-inline.oracle.json",
+      "bytes": 3322,
+      "sha256": "bdbfaa8acf301893bfeead2b2de33724f7b62506b037ea12243b7caa85e6c4d3"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/03-synthetic-inline.patch",
+      "bytes": 2097,
+      "sha256": "8ba0a57992ac6dad5488ca23b8271f7c294f2df29ef4c3e4c5d251d3ff89d78a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/04-synthetic-inline.log",
+      "bytes": 1337077,
+      "sha256": "5de87eaf3f1eb08627cf7e3a09df05297fabd7c6a0be3584d5d4009256e85bdf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/06-real-direct.patch",
+      "bytes": 2717,
+      "sha256": "dd871048d7cb2f857e3a8328d5d42456bf904f05cdc848794d5fa6c959e7d2cf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/06-real-direct.oracle.json",
+      "bytes": 3332,
+      "sha256": "a258833122679d9a533881f3a96c734a2d0379933614435d6b649c94d8c64dba"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/04-synthetic-inline.patch",
+      "bytes": 2097,
+      "sha256": "70389233470864ec38df999cfdc6cfa5f6a4b15612639cca11b3e2b5fc6e2737"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/05-restore.oracle.json",
+      "bytes": 3322,
+      "sha256": "38b5910abe906f8413c757779b76be90ee0f68ec94dad81ce68b365ed4152871"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/12-noop-final.oracle.json",
+      "bytes": 3343,
+      "sha256": "353a4d1bf086d72279e775d3d87a0e7389e923ee31defcd15c1c2ad27e43d6d7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/oracle-work/empty.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/oracle-work/invalid.toml",
+      "bytes": 2,
+      "sha256": "95d2b1934931691669cc35a87619518015336213dda0a60fe1b09f9b8e3e993d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/ruff-storeless-0/oracle-work/requirements.in",
+      "bytes": 5,
+      "sha256": "3ac0f3599aefcab6606ba938a969090b935008f364be31c4501038b975fa2a0d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/oracle-work/empty.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/oracle-work/invalid.toml",
+      "bytes": 2,
+      "sha256": "95d2b1934931691669cc35a87619518015336213dda0a60fe1b09f9b8e3e993d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight/uv-storeless-0/oracle-work/requirements.in",
+      "bytes": 5,
+      "sha256": "3ac0f3599aefcab6606ba938a969090b935008f364be31c4501038b975fa2a0d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/06-real-direct.time",
+      "bytes": 871,
+      "sha256": "8c40eaad27847dbb7ec283c612be15b714959ccfff41d457375d1538ff21003c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/02-synthetic-inline.log",
+      "bytes": 1305273,
+      "sha256": "339179c08f72649ed84563810660e558ad1951b303b3da0cd929d50a25a7d742"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/00-clean.patch",
+      "bytes": 17641,
+      "sha256": "fa9d024df6b41bf082f4b83b96fc7e878a6898033b0d40ccf28497a55421fdf8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/09-real-library.patch",
+      "bytes": 18853,
+      "sha256": "cf954aa1b267d0331037fd8db8f8ffcea8e826b09f18736e572f3db7cbd25a6b"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/06-real-direct.log",
+      "bytes": 1305328,
+      "sha256": "07e5cab39eb78d8e0a29328b0c1e7654bd44b1cc98a613ea6f202c25c80a2c17"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/10-real-library.oracle.json",
+      "bytes": 2350,
+      "sha256": "46466bf54b640598f091562ac7e25f338c30c45ac4f3c77abe452d36a030a94b"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/04-synthetic-inline.time",
+      "bytes": 870,
+      "sha256": "3f941f6926d7e49a27d08d4393499c2fb66db8ba605efa9a6401df2b9fc1f76c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/12-noop-final.monitor.json",
+      "bytes": 204,
+      "sha256": "92113353df2377894aacfdd3936b14bd12b1f0df26ad67714cea89a8766d59c7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/07-real-direct.monitor.json",
+      "bytes": 1473,
+      "sha256": "b3688db72be3f28c18733c3224710bef47401e5d040a40effa7e4643353e79b6"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/01-noop.patch",
+      "bytes": 17641,
+      "sha256": "fa9d024df6b41bf082f4b83b96fc7e878a6898033b0d40ccf28497a55421fdf8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/01-noop.monitor.json",
+      "bytes": 281,
+      "sha256": "49937342b03060ba882c2d6fe3cfb8797993e4784ed41952c8a0f975401d235a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/01-noop.time",
+      "bytes": 864,
+      "sha256": "cbea9c97cc86b60a0d3b4c93c53def4ea525a823dd318af12b63b46f11fd23e7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/11-real-library.log",
+      "bytes": 3891084,
+      "sha256": "f0b7da60fedc9a25280de02cae37470bd8020007814cedbfd1090962281e7143"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/08-real-direct.patch",
+      "bytes": 18155,
+      "sha256": "b607432c2e7f7ebd597306437890b86c433c70ea9754b3eb340f09c2623a01cd"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/03-synthetic-inline.log",
+      "bytes": 1305273,
+      "sha256": "59a353976179832dc4bf2731ca70212ecd8b84e77a9b06c2a24a768aaf669508"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/10-real-library.monitor.json",
+      "bytes": 4227,
+      "sha256": "44b2ad3780bbde2608f129d1c7f7f2ac6de92bd59088e55ec8fe772086c9aace"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/07-real-direct.time",
+      "bytes": 871,
+      "sha256": "c172e469d3ee30f35d208d62d784b4da9035d5dee2ba8a88a560995ac27c5e6f"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/00-clean.monitor.json",
+      "bytes": 26896,
+      "sha256": "1d3a1be91f5957dad374c4055a03e9fcc1a3ffc1b8a06ab0c37e9d3f58d7a878"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/11-real-library.oracle.json",
+      "bytes": 2356,
+      "sha256": "ea52dec688d4a922d4e83077c10c970a845443aed780e353e65416e082e9f0ab"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/07-real-direct.oracle.json",
+      "bytes": 2351,
+      "sha256": "c747c5464b87fe86a334ab96a2a98eaca53caf5ad54955f6ce37d5568df29ae8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/00-clean.log",
+      "bytes": 8711979,
+      "sha256": "34e38a9a1171ee2531c1840c2d4a406c8b60ee58e6969284744ddb3e834e2407"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/01-noop.oracle.json",
+      "bytes": 2339,
+      "sha256": "b94dc58dc9e9125693316f57692add1582a0d79f6d6b6b86998a12437d4a94cb"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/12-noop-final.patch",
+      "bytes": 18861,
+      "sha256": "123203a249b383d6c14be98a3553962fdfe97817f0a5e80459c88749fb81dd15"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/11-real-library.patch",
+      "bytes": 18861,
+      "sha256": "123203a249b383d6c14be98a3553962fdfe97817f0a5e80459c88749fb81dd15"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/06-real-direct.monitor.json",
+      "bytes": 1475,
+      "sha256": "e0016cb99b0a81a93dea5db470d3dda43dd4a593a399490bda70bc23f33f29ef"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/02-synthetic-inline.time",
+      "bytes": 871,
+      "sha256": "e04429b169d12cec78bebda321f528547d8d56fa8f23786a99aa25a1a4daa383"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/08-real-direct.oracle.json",
+      "bytes": 2355,
+      "sha256": "e1be3ca4e8cea6aece766a1d9b6a5c90a20006774fa3166ec1a3e17d42798b23"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/08-real-direct.log",
+      "bytes": 1305328,
+      "sha256": "2c459c4cb284a1580ee1a85834411dceaeaea8c09db5055c6252c833c52ed16c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/03-synthetic-inline.oracle.json",
+      "bytes": 2339,
+      "sha256": "d90c7e534068d06b1af32ced2d580d715f23ebf805f1e819e199c0800878198f"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/08-real-direct.time",
+      "bytes": 870,
+      "sha256": "e3619a068b4447e46d088a4fd14e8c5b33a9c5ceaa356cb9276df57ef201fc0f"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/05-restore.log",
+      "bytes": 1305273,
+      "sha256": "0009ae8ee18873257ddddee4a2ee0c1936050833e25e4c377c184887950b21bb"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/01-noop.log",
+      "bytes": 1016227,
+      "sha256": "2901b0b3beaf866981aba62fd207c24945fe8026cbec9a64130be85fd799f54c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/05-restore.patch",
+      "bytes": 17641,
+      "sha256": "fa9d024df6b41bf082f4b83b96fc7e878a6898033b0d40ccf28497a55421fdf8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/10-real-library.log",
+      "bytes": 3891084,
+      "sha256": "70ef95deb2eadec6803c6a78f99405b7fbaef85605d5bdf9d0068e6af9f1b9f5"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/07-real-direct.log",
+      "bytes": 1305328,
+      "sha256": "94032e098bc84a87dfcc00a9f52806a0b3ca40094bb999efbfffacbb9a003401"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/02-synthetic-inline.oracle.json",
+      "bytes": 2339,
+      "sha256": "12a7fc08c041c8dee3bb35cd60e333ffd215b7c5594a541ac5cd591b251df6fd"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/00-clean.time",
+      "bytes": 886,
+      "sha256": "deceff766d189cb42585dea2384f9253672f042447e36f2c4b5f21d01dd2d462"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/11-real-library.time",
+      "bytes": 878,
+      "sha256": "2e2600d27cc21fdce6c1f5b1223e0d4c5e12be884cdf343b755ce881718fe79b"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/08-real-direct.monitor.json",
+      "bytes": 1570,
+      "sha256": "7e51f8d70b3e0072cb21792881a165e15eeb20f69318873fa6e884a287c6cf40"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/05-restore.monitor.json",
+      "bytes": 1457,
+      "sha256": "24438c1a19085be5f4ffd694fffb8f5ca2f828d69acb37bafe9b5b424c265c1b"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/03-synthetic-inline.monitor.json",
+      "bytes": 1460,
+      "sha256": "97c389a99724d3507e66e546b82baeb11d29bb5fa19753b4b66183a13927ce13"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/02-synthetic-inline.patch",
+      "bytes": 17641,
+      "sha256": "e18de945669c79720668b19f69b5e795b3feca3d7eaca079232e3f79a4815589"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/09-real-library.oracle.json",
+      "bytes": 2348,
+      "sha256": "f9123826fa026f8612a3980eff42d63ca9849ca89f4df9ba9cc7abf74e3725f1"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/09-real-library.time",
+      "bytes": 877,
+      "sha256": "9e6cfab730444a8ba79c8969203f9ecb3154ac13933f95fe11d5ed0bf90a23de"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/12-noop-final.time",
+      "bytes": 863,
+      "sha256": "26888efcd3b554587b79b77f4ce95b7cf4e12aea76e8f6b9ff0de239b8782641"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/10-real-library.patch",
+      "bytes": 18855,
+      "sha256": "741c5d57660fe91e7bf5e1dca1704b6353c793bec4e97009f48732da9ece0d4e"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/11-real-library.monitor.json",
+      "bytes": 4071,
+      "sha256": "5697277a9407cf4f17e2c6c4a28628eb9c32ddbd144dc05f87a682560aca80d3"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/10-real-library.time",
+      "bytes": 878,
+      "sha256": "0210f3e0e2af1c6305f1fa169fbce59058068804e5a39f176b8235e36882b242"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/04-synthetic-inline.monitor.json",
+      "bytes": 1455,
+      "sha256": "edc2cdb055c49e8648ff1e61807febca0f8fb3b1a03da739e17bc3e139301406"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/00-clean.oracle.json",
+      "bytes": 2339,
+      "sha256": "b94dc58dc9e9125693316f57692add1582a0d79f6d6b6b86998a12437d4a94cb"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/07-real-direct.patch",
+      "bytes": 18151,
+      "sha256": "1c600630554e2e095a96523d80e7fc912ec4c76ecf3e466352b808c20d7aa40a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/02-synthetic-inline.monitor.json",
+      "bytes": 1568,
+      "sha256": "66c245759e8e553e3b89f0a64fc0f409d2f15b738b541ad69462a05f5fc9988c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/03-synthetic-inline.time",
+      "bytes": 871,
+      "sha256": "a84ed150d393540e866bcd4097fd0d948880fc60b6a4069f9eb8b6323767f79d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/12-noop-final.log",
+      "bytes": 1016227,
+      "sha256": "0db6bf02c823fc9f8e74a0314f2e7251dbf6e40d8aeedd3f418ac885bbef3f43"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/09-real-library.log",
+      "bytes": 3891084,
+      "sha256": "170fda79d11d9a89b1819400897fce4820d882301d8feefc6de5d96f51c28d7b"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/09-real-library.monitor.json",
+      "bytes": 4597,
+      "sha256": "09f19bbdccbd9a3239b24406e18738c6b8e628e8e8c6dfbcc02e80ae96a513f4"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/05-restore.time",
+      "bytes": 871,
+      "sha256": "99e9fbaecadba3fb6b5d8134199163543088c20476af9a6fecade182f922f187"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/04-synthetic-inline.oracle.json",
+      "bytes": 2339,
+      "sha256": "c2955783f72e73e3a0470450c64258657ddf07e69de417527c6490cf8f280ea3"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/03-synthetic-inline.patch",
+      "bytes": 17641,
+      "sha256": "ddffa6f4b3907400701556c8a4812b966e0fef5d8c2d2f20d073bdb40769817d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/04-synthetic-inline.log",
+      "bytes": 1305273,
+      "sha256": "d96a90af44c7246f3b40e9ba22a792c0d951b1a718281280d1253b6f131765f3"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/06-real-direct.patch",
+      "bytes": 18156,
+      "sha256": "a920e99a6c21232838d348963efdbe32c2f4006ecb7f274cf8a18125a8a76bda"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/06-real-direct.oracle.json",
+      "bytes": 2356,
+      "sha256": "4c58d68d3ea159e727458fec1e6f7e2be9de0c76132b096d7a96dcb9d7c400a1"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/04-synthetic-inline.patch",
+      "bytes": 17641,
+      "sha256": "1c0aa3d41a9dfe7f4b45d69c30003d8c0f5722b682db4b6ec332870682dc8e85"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/05-restore.oracle.json",
+      "bytes": 2339,
+      "sha256": "b94dc58dc9e9125693316f57692add1582a0d79f6d6b6b86998a12437d4a94cb"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/12-noop-final.oracle.json",
+      "bytes": 2356,
+      "sha256": "ea52dec688d4a922d4e83077c10c970a845443aed780e353e65416e082e9f0ab"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/06-real-direct.time",
+      "bytes": 869,
+      "sha256": "e984c1d6d677ee212055b398c987fd2c01bbfaa8b61da14ebf2235fda623b9f7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/02-synthetic-inline.log",
+      "bytes": 1339311,
+      "sha256": "58099bd18efeedf0097b9446d667f8e0f0c0840be441ba283b58536dcf17b5ca"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/00-clean.patch",
+      "bytes": 2097,
+      "sha256": "e7bb4e79d95b528ff0475a828dc34812ca1da0470ad989d789ad08c0334293bf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/09-real-library.patch",
+      "bytes": 3398,
+      "sha256": "c797b403fb76a3c448bd8bf354cb0f757f48f3d155a3968f551e6801918e3a06"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/06-real-direct.log",
+      "bytes": 1262072,
+      "sha256": "700952d74b3ed1b0819404db50622c6c8bcdcc244c8565f9a9171db8df5de02c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/10-real-library.oracle.json",
+      "bytes": 3353,
+      "sha256": "b1a4025106f67fdd9ecf4f70fc27cc83d556f495f1e7f81f9835c1c6a13e4a54"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/04-synthetic-inline.time",
+      "bytes": 873,
+      "sha256": "c00c41abb29bf12c7925d5f5a99f23152e152da106ca289750be06c4e049b66a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/12-noop-final.monitor.json",
+      "bytes": 290,
+      "sha256": "e189e68a1b12364754971dd9966866b54dd81caf72194055b45580c9c5dfaad8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/07-real-direct.monitor.json",
+      "bytes": 374,
+      "sha256": "9390c146ed5bf721b92b42ab77516189862598cc1702c33839808688ef46f6af"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/01-noop.patch",
+      "bytes": 2097,
+      "sha256": "e7bb4e79d95b528ff0475a828dc34812ca1da0470ad989d789ad08c0334293bf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/01-noop.monitor.json",
+      "bytes": 186,
+      "sha256": "8da570405dc36de4a6b22fa4f85d8d35cf27d615f3e2ff960fc8bcb3f741ad44"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/01-noop.time",
+      "bytes": 866,
+      "sha256": "110632a04a297159a11a1513c9f82623311a71e4e17b7f23f1bd968715bd00a1"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/11-real-library.log",
+      "bytes": 1326411,
+      "sha256": "5fd83684fa36c6ef8d05637a37dc29aefccae99c40cfd1afcd14578a393c7911"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/08-real-direct.patch",
+      "bytes": 2717,
+      "sha256": "ac27e6b9820b28870cdec3b7d55a7081bc3df584ea2354c03a465f89d846e0c5"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/03-synthetic-inline.log",
+      "bytes": 1339311,
+      "sha256": "d44699e2f536e0231202e52e59fb3db4adc730e3c35a59d9a6a5ffffdbc56124"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/10-real-library.monitor.json",
+      "bytes": 4264,
+      "sha256": "f7bf9d9fcc6329fc8c5a6f2974606d7a2e5ce9c63cc35b4c9d7aa02d6f4b5964"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/07-real-direct.time",
+      "bytes": 869,
+      "sha256": "f445660abfc74e8aa4a4653b3e468171d5029dc6dc02970126f2de1e626df496"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/00-clean.monitor.json",
+      "bytes": 23584,
+      "sha256": "132ac935b62d609f8b5cd6526717de0665bda942145a4a93c214c254d0006a94"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/11-real-library.oracle.json",
+      "bytes": 3367,
+      "sha256": "148a76cc545c3e86d58c5ab2cdf260c21de20509e22b4c50cc37b36c90cf2205"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/07-real-direct.oracle.json",
+      "bytes": 3354,
+      "sha256": "7ab69383970a7447d30c39f1d28dfb8b2dc56716a35b3b5966bbe47475ad6358"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/00-clean.log",
+      "bytes": 4366518,
+      "sha256": "fdcc292271e53491c39bff814054183fe0ebe40f0cb173126ca999a0145e48d8"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/01-noop.oracle.json",
+      "bytes": 3346,
+      "sha256": "61c9e00abfc4739ea2dac174703cb7bf476728f7a5b0d8b316264c119e0c8803"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/12-noop-final.patch",
+      "bytes": 3404,
+      "sha256": "d96c532be7bb9f1fac79fef6184fd28df3bd53d2b244b6c3ae24d7f705c7832d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/11-real-library.patch",
+      "bytes": 3404,
+      "sha256": "d96c532be7bb9f1fac79fef6184fd28df3bd53d2b244b6c3ae24d7f705c7832d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/06-real-direct.monitor.json",
+      "bytes": 378,
+      "sha256": "09e3f114743edbed5a4f2a99c35177473343dcb3ce8a03ad38e864ffbb2a442d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/02-synthetic-inline.time",
+      "bytes": 873,
+      "sha256": "e94b0cb66bc0a5920c8aaaf53f9c503f02cd796845c493da37354b7343b077fc"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/08-real-direct.oracle.json",
+      "bytes": 3356,
+      "sha256": "65f86eb40615c8032206666a893bf66b05c1f437824ccc42ec0c1b3e254690b7"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/08-real-direct.log",
+      "bytes": 1262072,
+      "sha256": "32559b04c035d9bfcc7d45ce4f0e23b332faa228b56a5a7ce143aee1e5bd0a82"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/03-synthetic-inline.oracle.json",
+      "bytes": 3346,
+      "sha256": "d6f62ec63c3a80250db0cb2ced33742b41d531618fde53ab924fcdc318b77559"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/08-real-direct.time",
+      "bytes": 869,
+      "sha256": "4cf5f989ceb00556de7aa6b74b29bb232fec680ebfa6cfaaab68f98d3fe63543"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/05-restore.log",
+      "bytes": 1339311,
+      "sha256": "ead977ec2dbc66b02b7ad4951450d3e23d218ac29983f68cae82d52b2f728142"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/01-noop.log",
+      "bytes": 1171636,
+      "sha256": "1da51899cbdc9b6cd6c5a09bd4dd6d16824fd65e1f4220fdd7dfca4d11bf064d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/05-restore.patch",
+      "bytes": 2097,
+      "sha256": "e7bb4e79d95b528ff0475a828dc34812ca1da0470ad989d789ad08c0334293bf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/10-real-library.log",
+      "bytes": 1326411,
+      "sha256": "7e09834f53bbd9edb0bd8795f92fb54eec2f6f23900dcc00b6f67bf9f2fb2125"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/07-real-direct.log",
+      "bytes": 1262072,
+      "sha256": "9ffd4269a88d87ab1f43a645f91e33519067a7bcd423abfbd5333d7ed7fddda1"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/02-synthetic-inline.oracle.json",
+      "bytes": 3346,
+      "sha256": "6cb4a34347049ae03d8738f80c5b0f4f4186a769d46b022cb2d71997391492d0"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/00-clean.time",
+      "bytes": 890,
+      "sha256": "0572be74d45d4ae98ba6acde1270676283c980f63f54593178335ffd403d57bd"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/11-real-library.time",
+      "bytes": 878,
+      "sha256": "140376b3b3a03a14505f0f1fcc9fb7316580fdf3e44bbd35370b33de0238b85c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/08-real-direct.monitor.json",
+      "bytes": 391,
+      "sha256": "9da2a691a629c63ca8cc934e312fa4feeedc4e5bd5d6a19ef1955aea74697459"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/05-restore.monitor.json",
+      "bytes": 613,
+      "sha256": "1a119c5f91a48f67ebabfddc41772356569ab1572f2189883a37a9b5b10bf67a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/03-synthetic-inline.monitor.json",
+      "bytes": 563,
+      "sha256": "181f688d4cc11ea5fb00592a84b63e8113cf333525a5870318680df99a88313e"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/02-synthetic-inline.patch",
+      "bytes": 2097,
+      "sha256": "109f813a8733112e19fff39034613eca7eb6179fde05817e791827960fbfbd9f"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/09-real-library.oracle.json",
+      "bytes": 3361,
+      "sha256": "db4e9e84cbc8d04cb868e37c77fb62dab58bc923ef703ba173da3369b56806ff"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/09-real-library.time",
+      "bytes": 879,
+      "sha256": "5343fdf0529896e6ee3259e4309f70b4b55d3ac70e0a6ce642317182d3e69b9c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/12-noop-final.time",
+      "bytes": 866,
+      "sha256": "07aa09c2649f862e8b8fbcd86c7c6f52d6a1067eb68aa347f20273cfc2b9d3cc"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/10-real-library.patch",
+      "bytes": 3390,
+      "sha256": "4a4cb2466b51d659ea22e0a73cfaddeefdbfbfd89ae33bb3c925edeba3ddbcc6"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/11-real-library.monitor.json",
+      "bytes": 4012,
+      "sha256": "fc258c7d233dfc8abdf756e55153140e548a0208b13d8d29ae49a7d80de6b55c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/10-real-library.time",
+      "bytes": 878,
+      "sha256": "af24c2c15a26e021e70beb7a4784c29e7ad6ec8776338bc9ffba7a2e77223366"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/04-synthetic-inline.monitor.json",
+      "bytes": 614,
+      "sha256": "f89a0751d9e0d3dccb4ef99a2e15950ea70464aa12d67b3e1b89c7f30532c8db"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/00-clean.oracle.json",
+      "bytes": 3346,
+      "sha256": "61c9e00abfc4739ea2dac174703cb7bf476728f7a5b0d8b316264c119e0c8803"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/07-real-direct.patch",
+      "bytes": 2715,
+      "sha256": "8c919dd87bef58dca0bf18ef74b6f5e6c7839b5c94178074bb7d81ddff2c199d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/02-synthetic-inline.monitor.json",
+      "bytes": 580,
+      "sha256": "41c19ec6c1a9a25608b5e0943386ec6326224c4acf19e96ae57043a8810001a1"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/03-synthetic-inline.time",
+      "bytes": 873,
+      "sha256": "fb25d068aca99cf4117cb77d31375b3244a842073c47ce92a2faebf7ac811a6d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/12-noop-final.log",
+      "bytes": 1171636,
+      "sha256": "50ee50e0f303daa9e642ee26a5349e976f14dd338669d6861013ecd707324bff"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/09-real-library.log",
+      "bytes": 1326411,
+      "sha256": "b15c793a54675394ec19d93099a8c0da752bc3b72d5d40ae81efceb07cae108d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/09-real-library.monitor.json",
+      "bytes": 4121,
+      "sha256": "fb14462cbf59575a9eb04422a123535cd3cbc16d9036b7247d0fbe2a33f5392c"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/05-restore.time",
+      "bytes": 873,
+      "sha256": "78106f447ccc4341f4600c906a7032d10a980066d2362cabcd617c93fd44def2"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/04-synthetic-inline.oracle.json",
+      "bytes": 3346,
+      "sha256": "f4c3202c426d383396df9c698d22babb0a345605ebb988410b8f1e9cd4484b57"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/03-synthetic-inline.patch",
+      "bytes": 2097,
+      "sha256": "8ba0a57992ac6dad5488ca23b8271f7c294f2df29ef4c3e4c5d251d3ff89d78a"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/04-synthetic-inline.log",
+      "bytes": 1339311,
+      "sha256": "1114ebcbdd7f84ee690ab9a13effc05804623fd7bd4a28a6e3b86598ee733579"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/06-real-direct.patch",
+      "bytes": 2717,
+      "sha256": "dd871048d7cb2f857e3a8328d5d42456bf904f05cdc848794d5fa6c959e7d2cf"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/06-real-direct.oracle.json",
+      "bytes": 3356,
+      "sha256": "09466fcf6310f269d56be56fd13f499013904ed77b9967a1ee5aeb46fd1f3424"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/04-synthetic-inline.patch",
+      "bytes": 2097,
+      "sha256": "70389233470864ec38df999cfdc6cfa5f6a4b15612639cca11b3e2b5fc6e2737"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/05-restore.oracle.json",
+      "bytes": 3346,
+      "sha256": "61c9e00abfc4739ea2dac174703cb7bf476728f7a5b0d8b316264c119e0c8803"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/12-noop-final.oracle.json",
+      "bytes": 3367,
+      "sha256": "148a76cc545c3e86d58c5ab2cdf260c21de20509e22b4c50cc37b36c90cf2205"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/oracle-work/empty.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/oracle-work/invalid.toml",
+      "bytes": 2,
+      "sha256": "95d2b1934931691669cc35a87619518015336213dda0a60fe1b09f9b8e3e993d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/ruff-storeless-0/oracle-work/requirements.in",
+      "bytes": 5,
+      "sha256": "3ac0f3599aefcab6606ba938a969090b935008f364be31c4501038b975fa2a0d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/oracle-work/empty.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/oracle-work/invalid.toml",
+      "bytes": 2,
+      "sha256": "95d2b1934931691669cc35a87619518015336213dda0a60fe1b09f9b8e3e993d"
+    },
+    {
+      "path": "readiness/evidence/fixture-preflight-v2/uv-storeless-0/oracle-work/requirements.in",
+      "bytes": 5,
+      "sha256": "3ac0f3599aefcab6606ba938a969090b935008f364be31c4501038b975fa2a0d"
+    },
+    {
+      "path": "readiness/evidence/fixture-originals/uv/crates/uv/src/lib.rs",
+      "bytes": 121900,
+      "sha256": "e69e50494862a70718c38e076382bf1578ee7472c6a3f67453074c768aa36acb"
+    },
+    {
+      "path": "readiness/evidence/fixture-originals/uv/crates/uv/src/bin/uv.rs",
+      "bytes": 465,
+      "sha256": "826c952b35014db0ad9c07a780471235a0da52fb7b1408975c3087cf67eb4332"
+    },
+    {
+      "path": "readiness/evidence/fixture-originals/uv/crates/uv/src/commands/cache_dir.rs",
+      "bytes": 419,
+      "sha256": "c3766709baa2fe99423f47d08755e8c4b31c57eee32ecf2bb01d4b24c80aceef"
+    },
+    {
+      "path": "readiness/evidence/fixture-originals/uv/crates/uv-pep508/src/lib.rs",
+      "bytes": 64415,
+      "sha256": "764460251afa73102029b9fc8e3083648e29af8d444bc7dc2fb0f266f6c414e4"
+    },
+    {
+      "path": "readiness/evidence/fixture-originals/ruff/crates/ruff_linter/src/rules/pyflakes/rules/unused_variable.rs",
+      "bytes": 9561,
+      "sha256": "640d0438a2254351dc3941489ce7d09bfd8aba0fa00fe5f0f0ef04a36a646d2d"
+    },
+    {
+      "path": "readiness/evidence/fixture-originals/ruff/crates/ruff/src/lib.rs",
+      "bytes": 23797,
+      "sha256": "b2cfb87cdc5137298c4a763fdd124864fc64834aa12869fdf511be3f780ef951"
+    },
+    {
+      "path": "readiness/evidence/fixture-originals/ruff/crates/ruff/src/main.rs",
+      "bytes": 2510,
+      "sha256": "0780e80f6920a1e9b3b7711bc238e26e4131a718d123a12b89838f461164b0f5"
+    },
+    {
+      "path": "storeless-cut/rust-ci-54f8-failed.log",
+      "bytes": 9303,
+      "sha256": "4eae5a1f1889e5fe44ad3eba185b195a964179e199ce931be3841d3895bfe103"
+    },
+    {
+      "path": "storeless-cut/macos-stage1-build.log",
+      "bytes": 10815,
+      "sha256": "61203f13b4fdf30d5a2776d895b315fd83a72e27cf98ef0c12ca206046ce84b3"
+    },
+    {
+      "path": "storeless-cut/independent-review.json",
+      "bytes": 5579,
+      "sha256": "c9131bcad835aeda4ebafec72ae22410166128a8926864865d3bfa43bbc56366"
+    },
+    {
+      "path": "storeless-cut/fmt.log",
+      "bytes": 241,
+      "sha256": "6fb125ab162170b3f28743e11e6b8c5dda195c6e94921b3d1519f69af06adbd1"
+    },
+    {
+      "path": "storeless-cut/macos-metadata-rmeta.log",
+      "bytes": 1211,
+      "sha256": "40c8ee9941b7f8248d1eccd84cd0b1eb596ee0426dddcbb89f22cb716dbd381f"
+    },
+    {
+      "path": "storeless-cut/candidate.patch",
+      "bytes": 148769,
+      "sha256": "8c24f6cf911c0829de90e5ec49b0ae04598f00d983168c9e1d126bef1d555275"
+    },
+    {
+      "path": "storeless-cut/macos-stage1-build.json",
+      "bytes": 6239,
+      "sha256": "fe3782bc3d96bde96bbabd7696888d4a2cdaa1720e4400580255a4ce8b96ac6e"
+    },
+    {
+      "path": "storeless-cut/macos-metadata-runmake.log",
+      "bytes": 1524,
+      "sha256": "c6d9dd33d0042da0130338ccb5dcf7b48a3134b8e4d5a61fe8aa8c051b9a3ab2"
+    },
+    {
+      "path": "storeless-cut/source-publication.json",
+      "bytes": 1215,
+      "sha256": "b1bbe41f8f3548e3087855c5d49c9361295575bb9e9c7be8bb7bac26d3024f2a"
+    },
+    {
+      "path": "storeless-cut/compiler-check.log",
+      "bytes": 7643,
+      "sha256": "4818234504ffb5d7fd5ed43a0796400b48caee97c6988feefc836674db0ab20e"
+    },
+    {
+      "path": "storeless-cut/tidy.log",
+      "bytes": 457,
+      "sha256": "f0576e9b7602a583995ef074b5bcd67574233cf1ec43da39222a3fc926e4982f"
+    },
+    {
+      "path": "storeless-cut/local-validation.json",
+      "bytes": 2382,
+      "sha256": "a431c91b3fa74cc5dd02c36cc4481baa68babc5b0b0d21a6cc5115ca23849d8d"
+    },
+    {
+      "path": "storeless-cut/macos-metadata-summary.json",
+      "bytes": 4412,
+      "sha256": "fb744388bbf020e9591f12fa9e953e42bfa0c79af99ee21fe09aa04bf0a5ff0d"
+    },
+    {
+      "path": "storeless-cut/candidate-manifest.json",
+      "bytes": 7550,
+      "sha256": "d880c0c379382e3a27cf7fd86ea9d3e48833cff9937755a42c399cbe849f15fc"
+    },
+    {
+      "path": "storeless-cut/cargo-ci-0d398-summary.json",
+      "bytes": 12582,
+      "sha256": "275447676778d9de4a897350f1bc71c47abd3544c710a129c54d6644552f2e1f"
+    },
+    {
+      "path": "storeless-cut/macos-metadata-suites.json",
+      "bytes": 3308,
+      "sha256": "bedb582ce744c4568853cef704c1131815f84fc5a28f31ca599ff2d3e50caef1"
+    },
+    {
+      "path": "storeless-cut/rust-ci-54f8-summary.json",
+      "bytes": 12935,
+      "sha256": "66900508f87414ccafbda8c62b5d51eb3955e83ec5b035ae1279a65c3f6447b6"
+    },
+    {
+      "path": "storeless-cut/compiler-check-wild9179.log",
+      "bytes": 7542,
+      "sha256": "2b8e278677c4b29b4cfccf8d82df900f11ea3a42eaa8d71ec78642086a0969c5"
+    },
+    {
+      "path": "storeless-cut/downstream-integration-audit.json",
+      "bytes": 2909,
+      "sha256": "ba2f516ffe1d7838b174bab8bc13e92d0cd7765f9e593263bc310fa4b357e865"
+    },
+    {
+      "path": "storeless-cut/compiler-check-wild9179.json",
+      "bytes": 1004,
+      "sha256": "224b61e85bf2b551cbd6683e94b9a89d4c0b913f2e8397aa5e4d285e1c019892"
+    },
+    {
+      "path": "storeless-cut/macos-metadata-suites-resume.json",
+      "bytes": 4048,
+      "sha256": "617519daeb3052b0fb1b80ba53f7f7fa462df439644eb1727d0a3f52a115a977"
+    },
+    {
+      "path": "readiness/harness/audit_readiness.py",
+      "bytes": 28544,
+      "sha256": "1ca96fce0f17711de6737cf87ddd1c4bb49cbe39d3dff87770952288b45d6f5d"
+    },
+    {
+      "path": "readiness/harness/audit_correctness.py",
+      "bytes": 15361,
+      "sha256": "8107aa5713cf6b750ad674729b9c6acb94c41b084a6edc2ded092fbc526efc26"
+    },
+    {
+      "path": "readiness/harness/audit_preflight.py",
+      "bytes": 11396,
+      "sha256": "411fa916c4b38c91946ab20908971a83b7eb0334afa4f730a4798ca3128aa3ca"
+    },
+    {
+      "path": "readiness/harness/benchmark_readiness_v2.py",
+      "bytes": 19957,
+      "sha256": "4ddd91a0cc2003347f789fce4722da9bb4b27e264abff1266d6e9c0ca0732588"
+    },
+    {
+      "path": "readiness/harness/benchmark_readiness.py",
+      "bytes": 19972,
+      "sha256": "5d9e4dc225be302ca13b3f88bf857604aac4e9984887cad5f133aa139691b0d4"
+    },
+    {
+      "path": "readiness/harness/audit_readiness_v1.py",
+      "bytes": 28277,
+      "sha256": "4f45ac80ab431c17ef97bcf8cacb32bd9642d889e91a3ccd585bf7f2eb9e6bc6"
+    },
+    {
+      "path": "readiness/harness/summarize_readiness.py",
+      "bytes": 3860,
+      "sha256": "554a327c6b9daabe387288610af742ac6a6cff88cc2e54dc6109b50473f94fb7"
+    },
+    {
+      "path": "readiness/harness/audit_readiness_preflight.py",
+      "bytes": 28404,
+      "sha256": "5336fb1b5b0785d219d7c1ef99f754ce6291b3468a9eb45ea5e6ec17e51ce31c"
+    },
+    {
+      "path": "readiness/control/scanner-summary.py",
+      "bytes": 419,
+      "sha256": "884fe1c495c208cdec5518845716eddcd42329d056e724c4303923f3199c798e"
+    },
+    {
+      "path": "readiness/control/build-candidate.py",
+      "bytes": 5225,
+      "sha256": "a5086d0b2ee4057727da457e0d508a3134de65bdfea48b3b1b72dc5c70aefc7c"
+    },
+    {
+      "path": "readiness/control/run-preflight.py",
+      "bytes": 868,
+      "sha256": "195c7d47b2e60438aaba701129cb4259b1d6f9ac7006cf517b3ad7913ea0fbd4"
+    },
+    {
+      "path": "readiness/control/correctness-progress.py",
+      "bytes": 444,
+      "sha256": "3bee4398960c66c3dfa1ce4c927ac626ee253bbf2910d0d13f266534cc06bdb1"
+    },
+    {
+      "path": "readiness/control/preservation-matrix.py",
+      "bytes": 4077,
+      "sha256": "857e5c21ae643f2d7de5d3030ab16420814773a6900a7b21a62a5169a8b47124"
+    },
+    {
+      "path": "readiness/control/build-preflight.py",
+      "bytes": 788,
+      "sha256": "760f955e2e21f0767be0f932aba25bbfbf5961265d8e925bd71cb32c8274b135"
+    },
+    {
+      "path": "readiness/control/read-instructions.py",
+      "bytes": 347,
+      "sha256": "1df7745d1bb4125ac206cb581278b29a394a7e4377e6f8c7eb1c35948a3e6fb4"
+    },
+    {
+      "path": "readiness/control/probe-uv-oracle.py",
+      "bytes": 836,
+      "sha256": "23b58232fbe6aa94dabe3e3654bf3b99aaadcbc8924dcf075c500e11707e4ecf"
+    },
+    {
+      "path": "readiness/control/preservation.py",
+      "bytes": 2553,
+      "sha256": "1ab162c880dc877c0579f5f44ca02d732f8dd0c4ef2257a76d843cdadc517be3"
+    },
+    {
+      "path": "readiness/control/probe-tools.py",
+      "bytes": 1128,
+      "sha256": "bc1d31d393f41570c919e2360724b658c058d65f8a145f2e3679085bad697633"
+    },
+    {
+      "path": "readiness/control/collect-correctness.py",
+      "bytes": 978,
+      "sha256": "04173d764d4f0186d0c854e99df740b659c489f08b8d40f74bcc70d0f3ec68f1"
+    },
+    {
+      "path": "readiness/control/inspect-rustc-cache.py",
+      "bytes": 279,
+      "sha256": "134dd5258b2916cbc54b44b8836e14e91bc563612162ce1d64219356e9ea7497"
+    },
+    {
+      "path": "readiness/control/resume-failure.py",
+      "bytes": 187,
+      "sha256": "16f77389151f797885e7253787d718f4050d8179574c87d6243d86c17e513cb8"
+    },
+    {
+      "path": "readiness/control/inspect.py",
+      "bytes": 2235,
+      "sha256": "503a74687128d69059c1d277674f040305143001be00f661f3ee6e2581fe2531"
+    },
+    {
+      "path": "readiness/control/run-correctness.py",
+      "bytes": 481,
+      "sha256": "ea4f25df0c4d0865bfb1e9a14217ac9515ecdbbc709fb94e66dd455b711abd3f"
+    },
+    {
+      "path": "readiness/control/package-candidate.py",
+      "bytes": 7079,
+      "sha256": "c20ade96b1cae9ff9e5699b5a380d0f4c4983f229434d4a49645398a13de49bc"
+    },
+    {
+      "path": "readiness/control/study-progress-v2.py",
+      "bytes": 1283,
+      "sha256": "aee04c031cedc9cbb9734bef9939c8407d15d0128196d22155e704802d49dcf3"
+    },
+    {
+      "path": "readiness/control/inspect-llvm-layout.py",
+      "bytes": 764,
+      "sha256": "bb1926d0629be5bbd48a49de64b3597980431162e5715908e2eacf4e789bff30"
+    },
+    {
+      "path": "readiness/control/snapshot-fixtures.py",
+      "bytes": 1173,
+      "sha256": "0024dbefea4201bd29b686e65419d56ff189ea3511758b1d31c10d80d67f76c0"
+    },
+    {
+      "path": "readiness/control/study-progress.py",
+      "bytes": 1280,
+      "sha256": "541f3c36a78fc6ad943d0ef81020734c89aabc825957d9b438293c9d7fbfed64"
+    },
+    {
+      "path": "readiness/control/prepare-resume.py",
+      "bytes": 3125,
+      "sha256": "c2b2b7e5ffb3b17ebc7f39663618fa8364dc14e60a26c28e28e1ec26fb18e812"
+    },
+    {
+      "path": "readiness/control/collect-preflight-v2.py",
+      "bytes": 1004,
+      "sha256": "727802ea166670a1ab416d829ebe0f339e6066f8b8d1e0e1eee7df200b268834"
+    },
+    {
+      "path": "readiness/control/resume-candidate.py",
+      "bytes": 5055,
+      "sha256": "49b6cdfaf6a87ff744248b7fd97bad2691947233a83a527d055197242db50dde"
+    },
+    {
+      "path": "readiness/control/run-preflight-v2.py",
+      "bytes": 877,
+      "sha256": "a258585defad86ce7d5a05952bba01fa06466608d2b573abf76b8ea2f856fc6b"
+    },
+    {
+      "path": "readiness/control/inspect-llvm-config.py",
+      "bytes": 563,
+      "sha256": "3aaf38617b8f56abb8342973f1b5f4b86daa0429d1a0f9be1f830ee2f6eee424"
+    },
+    {
+      "path": "readiness/control/inspect-llvm.py",
+      "bytes": 757,
+      "sha256": "990cc426073c2a2cef2c04042f574155a08e31d4c86e05483fcf737544f1d06c"
+    },
+    {
+      "path": "readiness/control/run-matrix-v2.py",
+      "bytes": 1493,
+      "sha256": "aea9bded230119afafc35f711b3b56cbf17658aeb3717bee2bcd647ea84280cc"
+    },
+    {
+      "path": "readiness/control/progress.py",
+      "bytes": 552,
+      "sha256": "427c437e6efe4f6ca2a98998602a80d167429ac707a1cac9c417180716f803d4"
+    },
+    {
+      "path": "readiness/control/monitor-matrix.py",
+      "bytes": 1468,
+      "sha256": "b19f6d1215888bb7c39a5576a48bf72bc50f6805323b7c065578002383e96f57"
+    },
+    {
+      "path": "readiness/control/run-matrix.py",
+      "bytes": 961,
+      "sha256": "c1bf436e32a054b5fe50b8b035f8ce4c98debeffc1c76847c0e6c5aba600b10f"
+    },
+    {
+      "path": "readiness/control/profile-scanner.py",
+      "bytes": 4156,
+      "sha256": "c34839e41c7cebb89f9eca55bd227630036c8b8973315639bec04f1f1792d03e"
+    },
+    {
+      "path": "readiness/control/probe-bpf.py",
+      "bytes": 460,
+      "sha256": "38ca4c77b518c1b0b52446e64c903095ef800474f15f2807c44d82436c16f63e"
+    },
+    {
+      "path": "readiness/control/resume-candidate-final.py",
+      "bytes": 4358,
+      "sha256": "a644e61eed39835ad6269c40725187e70b038909a10d08048a16f1e2d2548fa4"
+    },
+    {
+      "path": "readiness/control/collect-matrix.py",
+      "bytes": 1969,
+      "sha256": "71ceb71ffbcf24f048a543be5a7f5c425a3ac87501e8e8240ca60c816210cdf3"
+    },
+    {
+      "path": "readiness/control/prepare.py",
+      "bytes": 2959,
+      "sha256": "8488da65126b9c33574d109f2306c817946da01c4fe15a3b5790041b5da5c679"
+    },
+    {
+      "path": "readiness/control/finalize-candidate.py",
+      "bytes": 2349,
+      "sha256": "8e25a1735112b9d127b42a42a63771640af4d04c51319a3a90b60ac44edfe660"
+    },
+    {
+      "path": "readiness/scanner-summary.json",
+      "bytes": 1497,
+      "sha256": "f4fff1fc47df3d9f72f80b9c50c2c3b4a8cb71c07b3756e81200f42f8e9dbb99"
+    },
+    {
+      "path": "readiness/correctness-review.json",
+      "bytes": 10106,
+      "sha256": "652f4124c3d98f2007c1d359e272a766ee51fb67c014b7fd840802fef9ec5ffd"
+    },
+    {
+      "path": "readiness/harness-review-v2.json",
+      "bytes": 1849,
+      "sha256": "bf81156bfd792a7933c3702ba965aa221790a4a4827b9d4d94a60507672a37bd"
+    },
+    {
+      "path": "readiness/current-cut-correctness-audit.json",
+      "bytes": 2408,
+      "sha256": "e0641b49ff65eaaa9d0dfdc07959aa27ecfe01f125d6877e1a53aa4680e52885"
+    },
+    {
+      "path": "readiness/matrix-launch-plan.json",
+      "bytes": 379,
+      "sha256": "973e7470515b98f81aa83ebcb3344e77d8ff9d19255ed9f102a554740d97f099"
+    },
+    {
+      "path": "readiness/audit-validation.json",
+      "bytes": 1574,
+      "sha256": "e7eff8449d1c7f72b1acaa36bb8eeddc863bfa58a434e41e92826fd093d9f3b3"
+    },
+    {
+      "path": "readiness/audit-validation-v2.json",
+      "bytes": 832,
+      "sha256": "99242aab7121fb190f70092678bfc02c944daf0655ab40758a3013a3b6418431"
+    },
+    {
+      "path": "readiness/harness-review.json",
+      "bytes": 3665,
+      "sha256": "610144a40704577e4379bd0be5f41532c598f36e1a9daca8a984513087b9670c"
+    },
+    {
+      "path": "readiness/preflight-v1-failure-review.json",
+      "bytes": 868,
+      "sha256": "2b34a99d1c4268dacb75c7207dadbd14e8291b2bb4e60769b01029a16bf06bb5"
+    },
+    {
+      "path": "readiness/preflight-v2-independent-audit.json",
+      "bytes": 10545,
+      "sha256": "4b22772af7e98308c549393db81d9d9d32ae2a155ea0b610c1e0619b7ffe2433"
+    }
+  ]
+}

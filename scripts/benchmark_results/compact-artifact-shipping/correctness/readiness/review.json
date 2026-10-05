@@ -1,0 +1,148 @@
+{
+  "reviewed_at": 1791199634.390322,
+  "stage": "Source, native compiler/package, Mac21test suite and fresh lifecycle/alignment/worktree independently verified; controlled416 performance matrix running",
+  "result": "No additional correctness/packaging blocker found in this reviewed scope",
+  "adoption_decision": "pending independent performance matrix, not granted by correctness review",
+  "reviewed_base": "9546795cae23d424bec08487b4f3cace591efb5a",
+  "reviewed_patch_sha256": "8c24f6cf911c0829de90e5ec49b0ae04598f00d983168c9e1d126bef1d555275",
+  "published_source_commit": "3b84b46e3fb38f80246f744275c69fe608dfb2f3",
+  "published_integration_commit": "54f8b75ac31207d47af50fc8c5bc9dc90f2457de",
+  "integration_delta": "Cargo gitlink only,4a to0d398; measurements retain4a",
+  "source_paths_verified": 33,
+  "source_review_sha256": "c9131bcad835aeda4ebafec72ae22410166128a8926864865d3bfa43bbc56366",
+  "source_publication_sha256": "b1bbe41f8f3548e3087855c5d49c9361295575bb9e9c7be8bb7bac26d3024f2a",
+  "cargo_cleanup": {
+    "head": "0d39870c83ccf09a250e55d9dd13a83d606b72be",
+    "parent": "4a2813050da607ca5cfe7b5cf3a17ba7c9676be1",
+    "reviewed_file_hash_matches": true,
+    "scope": "Only removes obsolete experimental-option validation; generated compact/fast flags, capability guards, fingerprints unchanged"
+  },
+  "macos": {
+    "passed": true,
+    "receipt": "/private/tmp/ohm-compact-shipping-evidence/storeless-cut/macos-stage1-build.json",
+    "receipt_sha256": "fe3782bc3d96bde96bbabd7696888d4a2cdaa1720e4400580255a4ce8b96ac6e",
+    "log_sha256": "61203f13b4fdf30d5a2776d895b315fd83a72e27cf98ef0c12ca206046ce84b3",
+    "drivers": {
+      "librustc_driver-498c30742a24fb47.dylib": "47c9235e742c82e66d6cd6334087edce5b1e9198d757d3643bf03900923caf1f"
+    },
+    "verified_current_binary_files": [
+      "rustc",
+      "rustdoc",
+      "librustc_driver",
+      "libstd"
+    ],
+    "scope": "Non-PGO stage1 compiler/rustdoc/std build, ordinary native link/runtime42, compact rejects unsupported Darwin target; full optimized distribution unbuilt"
+  },
+  "linux": {
+    "passed": true,
+    "build_receipt_sha256": "b0e4171c60ac130c0722160d0a7c995559737865b3886b2fcc5234c5a5577ca8",
+    "package_receipt_sha256": "1e3f7633c204a37c64bf0787118ea0794d888ae2a906fb1d2dd5e50e0349a4aa",
+    "drivers": {
+      "librustc_driver-8d5d62195d3c17c1.so": "a254b72ecfd128572bc1c09e2579de84f7d88006129588b9bc8f1c8e8929ed01"
+    },
+    "wild_sha256": "37303b949ecd2f76831381583c51ec4f551ce2de89154f131832ef6c7bd94372",
+    "cargo_sha256": "dd7234f94f7d88ca799c69182646ff94b5a30f8bac1c6a72b72d5e4ffdddb47d",
+    "forced_run_make": {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0
+    },
+    "run_make_log_sha256": "af1c61870a658dd1a01dbb462f74b17c24bbfd55f5ff0d25eb98998738a3a1b5",
+    "covered_contracts": [
+      "Copied compact rlib with full metadata and deleted adjacent metadata/native archive",
+      "C-linkable ordinary staticlib, incremental repetition and symbol-hiding/renaming",
+      "No-link/link-only replay after metadata output removal",
+      "Packed native and thin archive inputs",
+      "Ordinary direct BFD consumer, rustdoc doctest and ordinary staticlib; original dependency bytes unchanged",
+      "Unsupported cross-crate LTO/plugin-LTO/packed-DWARF options rejected",
+      "Real metadata-prefix reuse/green copying, missing/corrupt optional prefix manifest, public/private invalidation and hardlinked object/metadata immutability"
+    ],
+    "package_archive": {
+      "path": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/bootstrap/dist/rustc-1.99.0-dev-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "ba21ba7d56451cefc1acfa4832de7980e70ff219bc9a70a7cd190711067dc800",
+      "bytes": 158431775
+    },
+    "package_scope": "Actual rustc component tar/install checked by reviewed validator; target std and Cargo supplied separately. Remote tar payload/installed-driver checks are receipt-backed; reviewer did not redownload158MB tar. Not full multi-component release or PGO/BOLT distribution.",
+    "installed_smoke": {
+      "default_compact_members": 0,
+      "optin_compact_members": 1,
+      "runtime": "proc macro answer42 and library answer42 assertions passed",
+      "wild_comment_checked": true,
+      "capability_marker_checked": true,
+      "wild_and_shared_crate_notices_checked": true
+    },
+    "retained_setup_failures": [
+      "Dereferenced cached LLVM alias lost SONAME filename in isolated copy",
+      "Cargo cached that original loader failure until only the isolated cache entry was moved aside",
+      "Stage1 standalone copy required creating bundled linker directory; subsequent actual distribution installed it correctly"
+    ]
+  },
+  "sealed_local_evidence": {
+    "candidate-build/initial-result.json": "829fa62da42ec67d82be69bce62e809bdd8de148f55f0fbacdf53387cedf85fa",
+    "candidate-build/result.json": "b0e4171c60ac130c0722160d0a7c995559737865b3886b2fcc5234c5a5577ca8",
+    "candidate-build/pre-linker-install-result.json": "7f2952950517bffd764a9cf2276054bcc873fd5f3d0a3ca3f4348ea4527ae8cb",
+    "candidate-build/copy-submodule-src-tools-rustc-perf.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/resume-result.json": "f76f6053e3eccf2f07c731f310e5d144dee7a21f7348f7bbae463c8eccdc6185",
+    "candidate-build/worktree.log": "8509eca8132dc7cd1706900bb591bb600068eeee1038a817756f4efe0cd86694",
+    "candidate-build/copy-bootstrap.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/copy-submodule-src-doc-reference.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/cached-loader-failure.json": "4c1a3b2119b4aa7e7bc5e618d08450b0556acbefb71ce4a9cd6936b2e5471356",
+    "candidate-build/apply.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/compiler-build-initial.log": "5e3fe861658b9354762a0a43836cf5571df468b47dc0f9e3d691f79e56fae4cd",
+    "candidate-build/compiler-build-final.log": "4489ad60ac2ac6ad17df8a9d6c6d8543c1e8c283366345160cfb1382f92ba327",
+    "candidate-build/copy-submodule-library-backtrace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/copy-submodule-src-tools-cargo.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/base-branch.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/copy-submodule-src-doc-book.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/compiler-build-resume.log": "fd0653dee20af08a9eda2e2ecc3515b7aada9bd54c81110e42fc9eae770cab15",
+    "candidate-build/upstream.log": "bde0876f29355215e8245efab0124807750841c627848d80e835ae6916c44296",
+    "candidate-build/install.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-build/compiler-tests.log": "af1c61870a658dd1a01dbb462f74b17c24bbfd55f5ff0d25eb98998738a3a1b5",
+    "candidate-package/source-manifest.json": "5b029d613fb094aadd6c626a0bcaf46c675456906ffa287b9191871f3acd9a44",
+    "candidate-package/distribution.log": "f52979e2f7e15c872ef9d753eac3470f349f29f80649f4438571d1dbb097e1d0",
+    "candidate-package/defaults-build.log": "93ee98937d23b7878c596e7423705ba3d10b088d5a9e60bbc74eaf72fbd86b1d",
+    "candidate-package/compact-smoke.log": "a308a74a0f62d825c82e6ae8dba92bb9ea94ab1eb0a00008e0be5660067d9dd8",
+    "candidate-package/result.json": "1e3f7633c204a37c64bf0787118ea0794d888ae2a906fb1d2dd5e50e0349a4aa",
+    "candidate-package/install-component.log": "2a0abe2f7a87bc0b400436b3ceb08015d8fab483f44975499c20ca72ab35c1a8"
+  },
+  "limits": [
+    "No performance attribution or adoption claim from correctness alone",
+    "Native build/package use Cargo4a; published Cargo0d398 is the reviewed option-validation cleanup with eight enabled exact-head CI jobs passing; matched native matrix deliberately retains4a",
+    "Historical wrapper/CAS flags deliberately removed; previous research compiler/artifacts remain historical evidence",
+    "Current scan and mixed-mode/doctest/staticlib/replay contracts retained without a metadata-schema shortcut",
+    "Four fresh performance rounds pending; original e55 study numerical continuity not presumed",
+    "Controlled416-command timing matrix has started; final receipt audit and shipping-worthiness decision remain pending"
+  ],
+  "publication_ci": {
+    "cargo": {
+      "head": "0d39870c83ccf09a250e55d9dd13a83d606b72be",
+      "run": 37302522379,
+      "enabled_passed": 8,
+      "optional_skipped": [
+        "Clippy APFS replay"
+      ],
+      "summary_sha256": "275447676778d9de4a897350f1bc71c47abd3544c710a129c54d6644552f2e1f",
+      "scope": "Exact-head job/step status verified; not a separate replay of test leaf logs by this reviewer"
+    },
+    "rust": {
+      "head": "54f8b75ac31207d47af50fc8c5bc9dc90f2457de",
+      "run": 37302722086,
+      "jobs_blocked": 3,
+      "exact_failure": "The 'client-id' (or deprecated 'app-id') input must be set to a non-empty string.",
+      "summary_sha256": "66900508f87414ccafbda8c62b5d51eb3955e83ec5b035ae1279a65c3f6447b6",
+      "failed_log_sha256": "4eae5a1f1889e5fe44ad3eba185b195a964179e199ce931be3841d3895bfe103",
+      "scope": "Compiler/format/tidy steps skipped; no downstream CI pass inferred. No credential settings changed or retried."
+    }
+  },
+  "expanded_correctness": {
+    "audit": "/private/tmp/ohm-compact-readiness/current-cut-correctness-audit.json",
+    "audit_sha256": "e0641b49ff65eaaa9d0dfdc07959aa27ecfe01f125d6877e1a53aa4680e52885",
+    "preflight_audit": "/private/tmp/ohm-compact-readiness/preflight-v2-independent-audit.json",
+    "preflight_audit_sha256": "4b22772af7e98308c549393db81d9d9d32ae2a155ea0b610c1e0619b7ffe2433",
+    "checks": {
+      "preflight": 1271,
+      "expanded_correctness": 200
+    },
+    "coverage": "All26v2source/runtime states; Cargo lifecycle/toggle/clean/sharing/doctest; BFD/LLD64/4096/16777216alignment; donor-independent Btrfs seed/runtime/replay; Mac12UI+9runmake21/0/0"
+  }
+}
