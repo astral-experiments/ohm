@@ -31,11 +31,12 @@ See:
 
 Ohm uses the idea behind [Headstart](https://github.com/PowderworksCode/headstart) to check
 dependent crates sooner. The compiler publishes metadata describing a library's interface before it
-finishes checking every function body; Cargo can then use that metadata to start checking dependent crates
-while the library's remaining checks run.
+finishes checking every function body; Cargo can then use that metadata to start checking dependent
+crates while the library's remaining checks run.
 
-When rechecking first-party crates while reusing pre-compiled third-party dependencies, Ruff's check time went from 22.89 to 18.17 seconds
-(20.6% faster) and rust-analyzer's went from 25.28 to 18.72 seconds (26.1% faster).
+When rechecking first-party crates while reusing pre-compiled third-party dependencies, Ruff's check
+time went from 22.89 to 18.17 seconds (20.6% faster) and rust-analyzer's went from 25.28 to 18.72
+seconds (26.1% faster).
 
 See:
 
@@ -54,8 +55,8 @@ This helps most when an edit to a dependency would otherwise force an expensive 
 binary to recompile.
 
 In a release benchmark, we changed a dependency, then rebuilt and ran a test. The median time for
-the test command fell from 26.27 to 3.79 seconds for uv (about 7×) and from 57.81 to 5.20 seconds for
-Codex (about 11×). These comparisons include public API hashing and Ohm's other changes, so they
+the test command fell from 26.27 to 3.79 seconds for uv (about 7×) and from 57.81 to 5.20 seconds
+for Codex (about 11×). These comparisons include public API hashing and Ohm's other changes, so they
 don't measure the effect of relinking alone.
 
 See:
@@ -105,9 +106,9 @@ Set `CARGO_BUILD_BUILD_DIR` to the same directory across projects or worktrees t
 their compiled registry dependencies. Cargo verifies that the package, compiler, configuration, and
 build inputs match before it reuses a dependency, and uses locks to coordinate concurrent builds.
 
-Each worktree keeps its own workspace artifacts and final outputs in its target directory.
-We also include additional "trust" settings to allow for reuse of procedural macros and native tools, but that reuse can
-be unsound.
+Each worktree keeps its own workspace artifacts and final outputs in its target directory. We also
+include additional "trust" settings to allow for reuse of procedural macros and native tools, but
+that reuse can be unsound.
 
 In the release benchmarks, building uv's `uv-normalize` in a second worktree took 9.54 seconds with
 stock Rust and 1.64 seconds with Ohm. Building Codex's `codex-utils-string` took 3.97 and 0.75
@@ -161,8 +162,8 @@ The uv benchmarks compare stock Rust's full debug information with Ohm's line ta
 default can affect the comparison. Ruff and Codex explicitly request matching debug levels. The
 release benchmarks do not measure the effect of line tables separately.
 
-(This is an existing stable Rust feature; Ohm makes it the default for development and
-test builds to speed up development out of the box.)
+(This is an existing stable Rust feature; Ohm makes it the default for development and test builds
+to speed up development out of the box.)
 
 See:
 
@@ -177,9 +178,9 @@ eligible registry and Git libraries.
 
 In an experiment that isolated the change to how Ohm stores metadata, individual metadata files
 shrank by 21–38%. The complete build directories shrank by 1.84% for syn and 2.64% for Ruff/ty,
-while the compiler executed slightly more instructions. In a macOS disk usage study, Ohm reduced
-the disk space allocated to one Ruff worktree by 40% and one uv worktree by 35%. Those figures
-include all of Ohm's reuse features and debug information defaults.
+while the compiler executed slightly more instructions. In a macOS disk usage study, Ohm reduced the
+disk space allocated to one Ruff worktree by 40% and one uv worktree by 35%. Those figures include
+all of Ohm's reuse features and debug information defaults.
 
 See:
 
@@ -188,23 +189,9 @@ See:
 - [Rust #98](https://github.com/astral-sh/ohm-rust/pull/98)
 - [Rust #123](https://github.com/astral-sh/ohm-rust/pull/123)
 
-### 11. Use Wild for Linux linking
-
-For native x86-64 Linux GNU builds, Ohm uses its bundled version of the upstream Wild linker unless
-you choose another linker explicitly. Wild performs a full link each time it runs. Cached relinking
-lets Ohm reuse the compiled code that it passes to the linker.
-
-The release benchmarks use Wild along with Ohm's other changes, so they do not measure its
-contribution separately.
-
-See:
-
-- [Cargo #114](https://github.com/astral-sh/ohm-cargo/pull/114)
-- [Ohm #109](https://github.com/astral-sh/ohm/pull/109)
-
 ## Rust compiler
 
-### 12. Cache derive macro expansions
+### 11. Cache derive macro expansions
 
 A derive macro generates Rust code from a type declaration. Ohm enables Rust's experimental cache
 for that generated code so the compiler can reuse previous macro expansions. The cache can be
@@ -217,14 +204,14 @@ parser tests. The full sequence took a median of 4.02 seconds with macro caching
 without it. The runs varied substantially, so they do not give a precise estimate of the cache's
 benefit.
 
-(This is an existing, experimental Rust compiler feature; Ohm enables it by default to speed
-up development out of the box.)
+(This is an existing, experimental Rust compiler feature; Ohm enables it by default to speed up
+development out of the box.)
 
 See:
 
 - [Cargo #54](https://github.com/astral-sh/ohm-cargo/pull/54)
 
-### 13. Reuse compiler work across incremental builds
+### 12. Reuse compiler work across incremental builds
 
 The compiler groups generated code into units that it can compile separately. Ohm keeps these groups
 stable across edits and reuses compatible decisions about where generic code belongs. This lets it
@@ -241,7 +228,7 @@ See:
 - [Rust #57](https://github.com/astral-sh/ohm-rust/pull/57)
 - [Rust #65](https://github.com/astral-sh/ohm-rust/pull/65)
 
-### 14. Reuse async code after it moves
+### 13. Reuse async code after it moves
 
 Moving async code to another line can invalidate compiled code even when its behavior stays the
 same. Ohm tracks the source locations used by debuggers separately from the layout used to generate
@@ -251,14 +238,14 @@ to restore those locations.
 
 In an earlier uv benchmark that exercised handling of Python version files, the development commands
 took a total of 140.81 seconds before this change and 123.25 seconds after it. A separate benchmark
-of uv's PyPI JSON parsing was essentially unchanged. Both benchmarks used full debug information,
-so they do not establish the benefit with Ohm's default line tables.
+of uv's PyPI JSON parsing was essentially unchanged. Both benchmarks used full debug information, so
+they do not establish the benefit with Ohm's default line tables.
 
 See:
 
 - [Rust #132](https://github.com/astral-sh/ohm-rust/pull/132)
 
-### 15. Avoid generating async bodies for metadata
+### 14. Avoid generating async bodies for metadata
 
 During `cargo check`, the compiler needs to know how an async function's state is laid out in
 memory. Ohm can compute that layout without also constructing the code that resumes or drops the
@@ -272,7 +259,7 @@ See:
 
 - [Rust #99](https://github.com/astral-sh/ohm-rust/pull/99)
 
-### 16. Run the compiler frontend in parallel
+### 15. Run the compiler frontend in parallel
 
 When Cargo invokes the compiler, Ohm enables Rust's experimental parallel frontend. The compiler can
 then use up to eight threads to parse and analyze a crate. You can choose a thread count explicitly
@@ -283,15 +270,15 @@ In an experiment on an earlier Ohm release, we changed only the frontend thread 
 development sessions for Ruff, uv, and Codex. Their combined time fell from 1,032 to 720 seconds,
 about 30%.
 
-(This is an existing, experimental Rust compiler feature; Ohm enables it by default to speed
-up development out of the box.)
+(This is an existing, experimental Rust compiler feature; Ohm enables it by default to speed up
+development out of the box.)
 
 See:
 
 - [Cargo #90](https://github.com/astral-sh/ohm-cargo/pull/90)
 - [Cargo #48](https://github.com/astral-sh/ohm-cargo/pull/48)
 
-### 17. Reduce repeated compiler work
+### 16. Reduce repeated compiler work
 
 Ohm also removes smaller sources of repeated work inside the compiler. It reuses incremental query
 results, avoids walking the same type constraints twice, and skips unnecessary work when generating
@@ -307,34 +294,9 @@ See:
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
 - [Rust #101](https://github.com/astral-sh/ohm-rust/pull/101)
 
-### 18. Optimize the compiler and its allocator
-
-Ohm builds its release compiler with profile-guided optimization (PGO). It first runs a training
-workload, then uses the resulting profile to optimize the compiler's machine code. Linux releases
-also use BOLT to optimize the compiled binary. Where supported, Ohm profiles individual toolchain
-components too.
-
-See:
-
-- [Ohm #60](https://github.com/astral-sh/ohm/pull/60)
-- [Rust #67](https://github.com/astral-sh/ohm-rust/pull/67)
-
-Ohm uses mimalloc to manage memory in `rustc` on Linux and Cargo on Apple Silicon macOS. In an
-experiment on an earlier Ohm version, changing the Linux allocator reduced the time to check Ruff by
-5.3% and two uv build times by 7.8–9.8%. Some compiler workloads used 21–25% more memory at their peak.
-
-In a macOS comparison, running a check on unchanged Ruff sources took 216 milliseconds before the
-allocator change and 199 milliseconds after it. Running a build on unchanged uv sources took 296
-and 267 milliseconds, respectively.
-
-See:
-
-- [Rust #109](https://github.com/astral-sh/ohm-rust/pull/109)
-- [Cargo #106](https://github.com/astral-sh/ohm-cargo/pull/106)
-
 ## rustfmt
 
-### 19. Format only what changed
+### 17. Format only what changed
 
 After a successful run, Ohm's `cargo fmt` remembers which workspace packages it formatted. It can
 skip those packages on the next run if their sources, configuration, and formatter have not changed.
@@ -343,8 +305,8 @@ the modules connect. Set `OHM_INCREMENTAL_FMT=0` to disable the cache.
 
 In the Codex release benchmark, checking formatting on unchanged sources took 11.91 seconds with
 stock Rust and 0.31 seconds with Ohm. After an edit, it took 12.44 and 0.50 seconds, respectively.
-Ohm's formatting cache was already warm in both cases. In a Ruff benchmark, the first formatting
-run took 7.46 seconds with stock Rust and 8.94 seconds with Ohm.
+Ohm's formatting cache was already warm in both cases. In a Ruff benchmark, the first formatting run
+took 7.46 seconds with stock Rust and 8.94 seconds with Ohm.
 
 See:
 
@@ -353,7 +315,7 @@ See:
 
 ## Clippy
 
-### 20. Reuse Clippy results for unchanged modules
+### 18. Reuse Clippy results for unchanged modules
 
 Ohm uses the compiler's incremental query system to cache the results of selected Clippy lint
 passes. After an edit, it can reuse results from unchanged modules instead of running those passes
@@ -361,9 +323,9 @@ again. If Ohm cannot safely track all the inputs to a lint pass, that pass still
 crate.
 
 In an earlier Ruff experiment, we applied three edits and compared Clippy with and without this
-cache. Average Clippy time fell from 40.55 to 38.85 seconds, about 4.2%. In a separate benchmark that
-invoked Clippy's compiler driver directly on a small crate, the time increased from 52.99 to 60.92
-milliseconds.
+cache. Average Clippy time fell from 40.55 to 38.85 seconds, about 4.2%. In a separate benchmark
+that invoked Clippy's compiler driver directly on a small crate, the time increased from 52.99 to
+60.92 milliseconds.
 
 See:
 
