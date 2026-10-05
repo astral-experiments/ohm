@@ -1,5 +1,10 @@
 # Independent shipping review
 
+This page records the earlier opt-in implementation. The
+[compatibility review](compatibility.md) covers the current automatic default,
+linker adaptation, LTO, debug-object lifetimes, and its native validation.
+The findings below remain evidence for the exact revisions they name.
+
 ## Current narrowed compiler
 
 Independent review of Rust `3b84b46e3fb38f80246f744275c69fe608dfb2f3`, followed by the Cargo-gitlink-only integration commit `54f8b75ac31207d47af50fc8c5bc9dc90f2457de`, found no remaining correctness/safety blocker within the default-off, native x86-64 Linux opt-in and binary distribution scope. Current Rust `36f01299cd71f6c090150a80fe4a7babb6245a0b` changes only that gitlink to Cargo `6333daf7`; compiler/library sources, locked dependencies, bootstrap, and workflows are identical. Wild remains `9179eb988df2676342192a24dc337cf9823e9d56`. The [current review](correctness/readiness/review.md), [machine-readable findings](correctness/readiness/review.json), and [sealed source and execution evidence](correctness/readiness/current-cut-correctness.tar.gz) preserve the precise boundaries. The [evaluation](readiness.md) reports the completed four-round results separately from the current Cargo confirmation.

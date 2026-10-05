@@ -36,13 +36,15 @@ def smoke(manifest, target, toolchain, crate, root):
     wild = manifest.get("bundled_tools", {}).get("wild")
     if target != "x86_64-unknown-linux-gnu" or wild is None:
         return
-    marker = toolchain / "lib/rustlib" / target / "bin/wild-ld/compact-artifacts-v1"
+    marker = toolchain / "lib/rustlib" / target / "bin/wild-ld/compact-artifacts-v2"
     if not marker.exists() and "source" not in wild:
         return
     if not marker.is_file() or marker.read_bytes() != b"RCOBJ001\n":
         raise ValueError("source-built Wild is missing its compact capability marker")
-    if compact_members(root / "defaults-target/debug/libohm_smoke.rlib"):
-        raise ValueError("compact objects appeared without the Cargo opt-in")
+    if not compact_members(root / "defaults-target/debug/libohm_smoke.rlib"):
+        raise ValueError("Ohm defaults produced no compact archive members")
+    if compact_members(root / "disabled-target/debug/libohm_smoke.rlib"):
+        raise ValueError("compact objects appeared with Ohm defaults disabled")
 
     environment = os.environ.copy()
     for name in ("RUSTC_WRAPPER", "RUSTC_WORKSPACE_WRAPPER", "RUSTFLAGS",
@@ -54,13 +56,24 @@ def smoke(manifest, target, toolchain, crate, root):
         CARGO_TARGET_DIR=str(root / "compact-target"),
         CARGO_BUILD_BUILD_DIR=str(root / "compact-build"),
     )
+    opt_out = environment | {
+        "CARGO_TARGET_DIR": str(root / "compact-opt-out-target"),
+        "CARGO_BUILD_BUILD_DIR": str(root / "compact-opt-out-build"),
+    }
+    subprocess.run(
+        [str(toolchain / "bin/cargo"), "-Zohm-compact-artifacts=no", "run",
+         "--manifest-path", str(crate / "Cargo.toml")],
+        env=opt_out, check=True,
+    )
+    if compact_members(root / "compact-opt-out-target/debug/libohm_smoke.rlib"):
+        raise ValueError("compact objects appeared with the explicit opt-out")
     subprocess.run(
         [str(toolchain / "bin/cargo"), "-Zohm-compact-artifacts=yes", "run",
          "--manifest-path", str(crate / "Cargo.toml")],
         env=environment, check=True,
     )
     if not compact_members(root / "compact-target/debug/libohm_smoke.rlib"):
-        raise ValueError("compact Cargo opt-in produced no compact archive members")
+        raise ValueError("explicit compact selection produced no compact archive members")
     linked = subprocess.run(
         ["readelf", "--string-dump=.comment", str(root / "compact-target/debug/ohm-smoke")],
         check=True, capture_output=True, text=True,

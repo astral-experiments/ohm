@@ -1,4 +1,9 @@
-# Compact artifacts: current compiler evaluation
+# Compact artifacts: prior compiler evaluation
+
+This document records the completed evaluation of Rust `36f01299` and Cargo
+`6333daf7`. Its opt-in recommendation predates the compatibility revision
+described in the [current overview](README.md); the measurements below are
+preserved with their original source boundaries.
 
 This follow-up evaluates a narrower compiler that retains self-contained compact
 objects and removes the unused metadata-compression and external-store

@@ -18,7 +18,7 @@ import urllib.request
 TARGET = "x86_64-unknown-linux-gnu"
 FILES = ("wild", "LICENSE-APACHE", "LICENSE-MIT")
 SOURCE_REPOSITORY = "https://github.com/astral-sh/ohm-wild"
-COMPACT_CAPABILITY = "compact-artifacts-v1"
+COMPACT_CAPABILITY = "compact-artifacts-v2"
 COMPACT_FORMAT = b"RCOBJ001\n"
 
 

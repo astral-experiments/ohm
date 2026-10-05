@@ -20,12 +20,16 @@ class CompactSmokeTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = pathlib.Path(temporary.name)
         self.toolchain = self.root / "toolchain"
-        self.marker = self.toolchain / "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/compact-artifacts-v1"
+        self.marker = self.toolchain / "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/compact-artifacts-v2"
         self.marker.parent.mkdir(parents=True)
         self.manifest = {"bundled_tools": {"wild": {"source": {"revision": "a" * 40}}}}
         self.baseline = self.root / "defaults-target/debug/libohm_smoke.rlib"
         self.baseline.parent.mkdir(parents=True)
-        self.baseline.write_bytes(archive(b"\x7fELFordinary"))
+        self.baseline.write_bytes(archive(b"RCOBJ001default"))
+        for target in ("disabled-target", "compact-opt-out-target"):
+            ordinary = self.root / target / "debug/libohm_smoke.rlib"
+            ordinary.parent.mkdir(parents=True)
+            ordinary.write_bytes(archive(b"\x7fELFordinary"))
 
     def run_smoke(self, manifest=None, target="x86_64-unknown-linux-gnu"):
         smoke.smoke(self.manifest if manifest is None else manifest, target,
@@ -63,13 +67,14 @@ class CompactSmokeTests(unittest.TestCase):
                 else:
                     with patch.dict(os.environ, {"RUSTC_WRAPPER": "/unexpected-wrapper"}):
                         self.run_smoke()
-                    command = run.call_args_list[0]
+                    self.assertEqual(run.call_args_list[0].args[0][1], "-Zohm-compact-artifacts=no")
+                    command = run.call_args_list[1]
                     self.assertEqual(command.args[0][:3], [str(self.toolchain / "bin/cargo"),
                                                           "-Zohm-compact-artifacts=yes", "run"])
                     self.assertEqual(command.kwargs["env"]["RUSTC"], str(self.toolchain / "bin/rustc"))
                     self.assertNotIn("RUSTC_WRAPPER", command.kwargs["env"])
-        self.baseline.write_bytes(archive(b"RCOBJ001unexpected"))
-        with self.assertRaisesRegex(ValueError, "without the Cargo opt-in"):
+        self.baseline.write_bytes(archive(b"\x7fELFordinary"))
+        with self.assertRaisesRegex(ValueError, "defaults produced no compact"):
             self.run_smoke()
 
 

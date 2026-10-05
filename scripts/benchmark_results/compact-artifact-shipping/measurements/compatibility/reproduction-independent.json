@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "reviewer": "rust_exports",
+  "scope": "Independent fresh extraction of sealed standalone performance archive and rerun of published evidence calculations; no benchmark execution.",
+  "package": {
+    "passed": true,
+    "scope": "Complete remote collection plus local reproducibility/verification inputs; no final767 build proof (separate correctness layer).",
+    "archive": "compatibility-performance.tar.gz",
+    "archive_sha256": "d869f91f290b08d4ee41d62a38aeef4e1b31e61ccf92ddedc99e84de57511a90",
+    "archive_bytes": 35361212,
+    "inventory_sha256": "f97afae64237a005b329768d1f390ce39b9f5098a99cd5d9969508f45403ef46",
+    "payload_files": 853,
+    "archive_regular_files": 854,
+    "payload_bytes": 316224594,
+    "collection_sha256": "358bd0e1cad8afd32f9d35ebfab34ee890b2c4896ac90cc8abe34cacab614381",
+    "summary_sha256": "7df6c03c94cdff246e890970ef1ee9ff30fd47d5841caa24e0092b216804c61d",
+    "validation_sha256": "f767ef44d2cc5dd545828d6f230f51378508d128d8295d73f5f15f4c5497ad98",
+    "pair_math_sha256": "14693bccf4db0fc8fa5008c2387e19a2a2ac6d97f0ab96105b3797fa4a933bb9",
+    "packager_sha256": "d1b31130b0d3fc687a793bd998208d4db9afef6f45b29297b6c416df296a0d85"
+  },
+  "python": "3.14.5 (main, May 10 2026, 10:21:34) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "commands": [
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/private/tmp/ohm-compact-compatibility/publication/performance-v1/verify-performance-archive.py",
+        "/private/tmp/ohm-compact-compatibility/publication/performance-v1/compatibility-performance.tar.gz",
+        "/private/tmp/ohm-compact-compatibility/publication/performance-v1/package.json",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/proof"
+      ],
+      "code": 0,
+      "seconds": 1.1936750411987305,
+      "log_sha256": "6ab4da0ed6a72e7bb04ed5018c7c80f5b2298caafde6f5469e8617ddadbf6f87"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/proof/compatibility-proof/harness/summarize_compatibility.py",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/proof/compatibility-proof",
+        "--source-snapshots",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/proof/compatibility-proof/fixtures/source-originals",
+        "--output",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/results"
+      ],
+      "code": 0,
+      "seconds": 25.263847827911377,
+      "log_sha256": "15126ba427ac1b03741219bc23b85b3ce082153d1ab76d1ecc28444d3f0d46e6"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/proof/compatibility-proof/harness/audit_pair_math.py",
+        "--samples",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/results/samples.jsonl",
+        "--summary",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/results/summary.json",
+        "--output",
+        "/private/tmp/ohm-compact-compatibility/performance-reproduction-rust-exports/pair-math.json"
+      ],
+      "code": 0,
+      "seconds": 0.06920385360717773,
+      "log_sha256": "dc98efd17beea0cfd158bba33d751e2ca85478049d6052d97882fa1f4dbf22a9"
+    }
+  ],
+  "byte_identical": {
+    "summary.json": "7df6c03c94cdff246e890970ef1ee9ff30fd47d5841caa24e0092b216804c61d",
+    "validation.json": "f767ef44d2cc5dd545828d6f230f51378508d128d8295d73f5f15f4c5497ad98",
+    "independent-pair-math.json": "14693bccf4db0fc8fa5008c2387e19a2a2ac6d97f0ab96105b3797fa4a933bb9"
+  },
+  "preserved_source_archive": true
+}

@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "reviewer": "rust_exports",
+  "scope": "Independent fresh extraction and recorded-execution verification of sealed correctness archive; not fresh compiler execution or timing equivalence.",
+  "archive_sha256": "b2bff283e734dd74cac28490674cea1bfb76a98d4eaf91221110555a11d7c4e7",
+  "manifest_sha256": "7d9b3910c686e56e222e66dae41cc0291bd3f68a80e61b2e8753c7ccd5cda739",
+  "verifier_sha256": "467bef00de35a994b6b9090028d3363cc2fac98700be79ba910ea2582d132773",
+  "python": "3.14.5 (main, May 10 2026, 10:21:34) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "/private/tmp/ohm-compact-compatibility/portable/verify_correctness.py",
+    "--archive",
+    "/private/tmp/ohm-compact-compatibility/portable/compatibility-correctness.tar.gz",
+    "--manifest",
+    "/private/tmp/ohm-compact-compatibility/portable/correctness-bundle.json",
+    "--destination",
+    "/private/tmp/ohm-compact-compatibility/correctness-reproduction-rust-exports/proof"
+  ],
+  "elapsed_seconds": 0.17182016372680664,
+  "result": {
+    "passed": true,
+    "scope": "Hash-verified recorded native execution, not fresh remote execution or a performance/adoption claim.",
+    "rust_patch": "4790daedc77c40dc4dc3a0f1789a9579d6aee773b88f4ec968e2884ef42fcc49",
+    "cargo_patch": "20b9d1fdf46667b3f65bbcba67bf7358acaeb4653b6df1fd05ed431f46172872",
+    "rust_forced_suites": 3,
+    "cargo_required_tests": 12,
+    "compiler_cases": 6,
+    "compiler_command_records": 102,
+    "cargo_policy_records": 32,
+    "additional_inherited_dylib_assertion": {
+      "code": 101,
+      "scope": "Retained separately from required routing checks; any failure must be assessed against actual base6333 fixture before interpretation."
+    },
+    "final_cargo": {
+      "head": "76793c44b8f426220ce9b86449fe405b8a85a95f",
+      "patch_sha256": "cc8871ae6b1572a771c54f8ac84e118be3354986190951b54faed4762c123d5d",
+      "required_tests": 15,
+      "native_cases": 5,
+      "standalone_cargo_sha256": "d9c404a342f4c56e0bf34c8ad9d784ed53a3fd923149200bd1e4e05d8ff8e4ec",
+      "scope": "Separate final Cargo correctness confirmation; frozen20b timings retain their own identity."
+    },
+    "archive_sha256": "b2bff283e734dd74cac28490674cea1bfb76a98d4eaf91221110555a11d7c4e7",
+    "inventory_sha256": "484ae7aa3bedd0f18eb79fc6f9e28a65fb6c128618470e8379bb98c2c0fb7d48",
+    "members": 453
+  },
+  "build_receipt_sha256": "f70724f378b08fabc8ff1dac5b24b904ed8758fa1f49176c84d89a4f2b2aef2b",
+  "native_receipt_sha256": "7619c67048060546a923843a6f57d63b4fcd1f5a2fd1fc5283eb4a8e74a0248f",
+  "final_cargo": {
+    "path": "/home/dev-user/code/oss/ohm-compact-study/shipping/compatibility/final-cargo/bin/cargo",
+    "sha256": "d9c404a342f4c56e0bf34c8ad9d784ed53a3fd923149200bd1e4e05d8ff8e4ec",
+    "version": "cargo 1.99.0 (76793c44b 2026-10-05)\nrelease: 1.99.0\ncommit-hash: 76793c44b8f426220ce9b86449fe405b8a85a95f\ncommit-date: 2026-10-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.0.13)\nos: Ubuntu 24.4.0 (noble) [64-bit]"
+  },
+  "measured_cargo": {
+    "path": "/home/dev-user/code/oss/ohm-compact-study/shipping/compatibility/toolchains/compiler-v3/bin/cargo",
+    "sha256": "8451f441757f18aaaeb59a8e0c7daf947da0a26d839fe3c0e7c6ac87f5a55db6",
+    "version": "cargo 1.99.0 (6333daf7c 2026-10-05)\nrelease: 1.99.0\ncommit-hash: 6333daf7cf99cf80125234c9419cbd36e9bff81a\ncommit-date: 2026-10-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.0.13)\nos: Ubuntu 24.4.0 (noble) [64-bit]"
+  },
+  "cases": [
+    {
+      "label": "ordinary",
+      "runtime": "42\n",
+      "compact": false,
+      "direct": false,
+      "archive": {
+        "path": "/tmp/codex-cargo-targets/ohm/isolated/compact-compatibility/final-cargo/native/ordinary/build/debug/deps/libfinal_dep-2e771270b7e80b46.rlib",
+        "sha256": "b91a1d3000f74c600cbdd9f5a15d2ab5289e19bb6a00caed74095cb0510ac095",
+        "compact_members": 0
+      }
+    },
+    {
+      "label": "default",
+      "runtime": "42\n",
+      "compact": true,
+      "direct": true,
+      "archive": {
+        "path": "/tmp/codex-cargo-targets/ohm/isolated/compact-compatibility/final-cargo/native/default/build/debug/build/workspaces/aa6f4d251d402bd7/706faa06353d084c/final-dep/49b6ea08eac62810/out/libfinal_dep-49b6ea08eac62810.rlib",
+        "sha256": "395f96e84368926a120cf19396a86ff0b5fa3418e7da01daed2ba5a2251227e1",
+        "compact_members": 1
+      }
+    },
+    {
+      "label": "optout",
+      "runtime": "42\n",
+      "compact": false,
+      "direct": false,
+      "archive": {
+        "path": "/tmp/codex-cargo-targets/ohm/isolated/compact-compatibility/final-cargo/native/optout/build/debug/build/workspaces/ff67a957f5bc7a4d/706faa06353d084c/final-dep/849dd8aeb8927150/out/libfinal_dep-849dd8aeb8927150.rlib",
+        "sha256": "7eaed3b76eaf501adfbfda08ba0d28508e0df552de5e3083a0ab81de16bc829a",
+        "compact_members": 0
+      }
+    },
+    {
+      "label": "response-fallback",
+      "runtime": "42\n",
+      "compact": false,
+      "direct": false,
+      "archive": {
+        "path": "/tmp/codex-cargo-targets/ohm/isolated/compact-compatibility/final-cargo/native/response-fallback/build/debug/build/workspaces/fd3a35ff078e8572/706faa06353d084c/final-dep/7b7353ced47a137e/out/libfinal_dep-7b7353ced47a137e.rlib",
+        "sha256": "bd59d9be19692e4bd726d652498d759218eac493b0e0ce17a2031d212af59332",
+        "compact_members": 0
+      }
+    },
+    {
+      "label": "lld-adapter",
+      "runtime": "42\n",
+      "compact": true,
+      "direct": false,
+      "archive": {
+        "path": "/tmp/codex-cargo-targets/ohm/isolated/compact-compatibility/final-cargo/native/lld-adapter/build/debug/build/workspaces/72f90781a5c70a19/706faa06353d084c/final-dep/1500b0795cf71398/out/libfinal_dep-1500b0795cf71398.rlib",
+        "sha256": "c67ff9cc8684fde729bb07994c82499eaebd40fb5716dea4e914fa99392a6efd",
+        "compact_members": 1
+      }
+    }
+  ],
+  "scope_limits": [
+    "The historical109MB compiler-v2 protected-before map is explicitly omitted with its retained hash and size; successful after-comparison remains in the archive.",
+    "Final15 focused tests and5 runtime cases prove this recorded binary separately from measured20b; no new performance claim."
+  ]
+}
