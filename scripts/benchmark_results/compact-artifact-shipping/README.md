@@ -1,7 +1,7 @@
 # Compact artifacts: shipping candidate
 
-This continues the [prototype evaluation](../compact-artifact-prototypes/README.md).
-The candidate is an opt-in native Linux format. Release source pins and automatic
+This evaluates an opt-in native Linux format with self-contained archives.
+Release source pins and automatic
 defaults are unchanged. The shipping decision awaits the complete timing matrix.
 
 ## Implementation
@@ -38,12 +38,12 @@ order reverses in the middle round. Sequential edits share cache history; the
 summary exposes per-round means rather than treating all nine edits as
 independent runs.
 
-| Mode | Compiler | Linker | Artifacts |
-| --- | --- | --- | --- |
-| baseline | Pristine Ohm source | Pinned shipped Wild 0.10.0 | Ordinary |
-| standard | Candidate source | Candidate Wild fork | Ordinary |
-| compact-raw | Candidate source | Candidate Wild fork | External-store objects, raw metadata, repaired prefix reuse |
-| compact-archive | Candidate source | Candidate Wild fork | Self-contained compact archives with full raw metadata |
+| Mode            | Compiler            | Linker                     | Artifacts                                                   |
+| --------------- | ------------------- | -------------------------- | ----------------------------------------------------------- |
+| baseline        | Pristine Ohm source | Pinned shipped Wild 0.10.0 | Ordinary                                                    |
+| standard        | Candidate source    | Candidate Wild fork        | Ordinary                                                    |
+| compact-raw     | Candidate source    | Candidate Wild fork        | External-store objects, raw metadata, repaired prefix reuse |
+| compact-archive | Candidate source    | Candidate Wild fork        | Self-contained compact archives with full raw metadata      |
 
 `standard` to `compact-archive` isolates the format and required metadata policy.
 `baseline` to `compact-archive` includes the compiler and linker changes. The
@@ -59,6 +59,8 @@ The workloads use uv at development opt-level 0 and Ruff at global development
 opt-level 1, with line-table debug information and eight build jobs. Incremental
 graph compression is disabled. These compiler builds do not use production PGO
 or BOLT; absolute timings are not installed-release performance claims.
+All arms use `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` and
+`CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all` for trusted local development.
 
 Storage is the whole lane: private target, shared build directory, incremental
 state, scratch files, and any external store. Census deduplicates hard links and
@@ -82,14 +84,21 @@ PGO/BOLT build or a published release.
 
 ## Source revisions
 
-| Component | Revision |
-| --- | --- |
-| Pristine Rust | `348339ddae4288ebb3af97d204b19479fef8f5f2` |
-| Candidate Rust | `e55e0485efc397741f4aaf861f1c74a281ac902f` |
-| Shipped Wild source base | `e9a9b0cb6fd63a23cc7b93aafc931aadd5746be6` |
-| Candidate Wild | `dba82ebe99d98adbfe6358215d456cdddb1877da` |
-| Measurement Cargo | `018a2b93409433dc5bc05c5fce838ae69e9bc396` |
-| Candidate Cargo option | `207626090e1fb9b405abd806a86c1b42bd2db5ff` |
+| Component                          | Revision                                   |
+| ---------------------------------- | ------------------------------------------ |
+| Pristine Rust                      | `348339ddae4288ebb3af97d204b19479fef8f5f2` |
+| Measured candidate Rust            | `e55e0485efc397741f4aaf861f1c74a281ac902f` |
+| Candidate Rust including CI wiring | `08354b01f0b303763fbc728f91eab5b6759d11db` |
+| Shipped Wild source base           | `e9a9b0cb6fd63a23cc7b93aafc931aadd5746be6` |
+| Candidate Wild                     | `dba82ebe99d98adbfe6358215d456cdddb1877da` |
+| Measurement Cargo                  | `018a2b93409433dc5bc05c5fce838ae69e9bc396` |
+| Candidate Cargo option             | `207626090e1fb9b405abd806a86c1b42bd2db5ff` |
 
 The harnesses are in [harness/](harness/). The original benchmark core remains
 frozen at SHA256 `ea7867f9f9a0f19ceb7d9c558aa7aa6758ae3e254878685fbc58768c65713cef`.
+
+The final Rust commits change only CI checkout and test wiring relative to the measured
+source; the devbox source and measured binaries remain unchanged. Compiler CI
+requires the release App's client ID and private key to be configured in
+`ohm-rust`, with access to the private `ohm-wild` repository. The correctness
+audit records this remaining setup requirement and the validated source boundary.
