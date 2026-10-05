@@ -176,11 +176,9 @@ retained debug object files stable, so rebuilds replace those files instead of l
 behind. Ohm stores compiler metadata more compactly and avoids storing duplicate metadata in
 eligible registry and Git libraries.
 
-In an experiment that isolated the change to how Ohm stores metadata, individual metadata files
-shrank by 21–38%. The complete build directories shrank by 1.84% for syn and 2.64% for Ruff/ty,
-while the compiler executed slightly more instructions. In a macOS disk usage study, Ohm reduced the
-disk space allocated to one Ruff worktree by 40% and one uv worktree by 35%. Those figures include
-all of Ohm's reuse features and debug information defaults.
+In a macOS benchmark, we ran the same development tasks with Ohm and stock Rust. Ohm used 40% less
+disk space for Ruff and 35% less for uv. These savings include the effects of Ohm's build reuse and
+default debug settings.
 
 See:
 
@@ -220,7 +218,7 @@ when the inputs to that metadata have not changed.
 
 In a Codex TUI experiment, we repeatedly made and reverted one edit, then rebuilt the test binary.
 Reusing the compiler's grouping decisions reduced average code generation time from 8.67 to 7.06
-seconds and average time for the whole command from 38.48 to 37.60 seconds.
+seconds.
 
 See:
 
