@@ -32,11 +32,11 @@ on the released Ohm compiler, and includes the edit and runner overhead. See
 
 ## Headstart
 
-The [Headstart](https://github.com/PowderworksCode/headstart)-inspired prototype publishes a library's
-metadata before checking all of its function bodies. Cargo can then start checking dependent crates
-while those body checks finish. Cargo holds the dependent results and diagnostics until the
-upstream crate succeeds, and discards them on failure. Private changes can still avoid rebuilding
-dependents.
+Unlike the pipelining above, the [Headstart](https://github.com/PowderworksCode/headstart)-inspired
+prototype publishes a library's metadata before checking all of its function bodies. Cargo can then
+start checking dependent crates while those body checks finish. Cargo holds the dependent results
+and diagnostics until the upstream crate succeeds, and discards them on failure. Private changes
+can still avoid rebuilding dependents.
 
 Headstart applies when checking libraries, including `cargo check --tests` and `--all-targets`. Build
 scripts and procedural macros still need executable dependencies. The feature is opt-in via
