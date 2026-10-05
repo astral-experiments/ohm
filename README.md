@@ -74,7 +74,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.99.0-1/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.99.0-2/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -97,7 +97,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.99.0-1 test` selects that specific installed revision.
+`cargo +ohm-1.99.0-2 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, parallel
 compiler frontends, and reuse of previously built registry and workspace dependencies by default.
@@ -228,6 +228,8 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Keep codegen-unit merging stable across edits so incremental builds can reuse prior output.
 - Reuse encoded metadata prefixes when private edits leave metadata dependencies unchanged.
 - Pipeline metadata when a dependency's public API changes.
+- Start dependent checks from early interface metadata while upstream function bodies are still
+  being checked (`cargo -Zheadstart=no` disables this).
 - Reuse integration-test binaries when the edited libraries aren't used by the tests.
 - Apply early cutoff to `cargo check` and `cargo clippy`, including with shared registry caches.
 - Reuse compiled registry dependencies across builds, checks, tests, and Clippy.
