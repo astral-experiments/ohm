@@ -1,8 +1,8 @@
 # How Ohm speeds up development
 
 Ohm includes the following changes to Rust, Cargo, Clippy, and rustfmt. Unless otherwise noted, they
-are included in [Ohm 1.99.0-1](../toolchains/1.99.0/1.json). Headstart is an opt-in prototype and
-has not been released.
+are included in [Ohm 1.99.0-1](../toolchains/1.99.0/1.json). Headstart is planned for the next
+release.
 
 In two warm replays of three Ruff/ty, uv, and Codex development sessions on Linux, Ohm took a
 combined median of 869 seconds versus 1,328 seconds for Rust 1.99.0, 35% less time. Those results
@@ -32,15 +32,15 @@ on the released Ohm compiler, and includes the edit and runner overhead. See
 
 ## Headstart
 
-Unlike the pipelining above, the [Headstart](https://github.com/PowderworksCode/headstart)-inspired
-prototype publishes a library's metadata before checking all of its function bodies. Cargo can then
-start checking dependent crates while those body checks finish. Cargo holds the dependent results
-and diagnostics until the upstream crate succeeds, and discards them on failure. Private changes
-can still avoid rebuilding dependents.
+Inspired by [Headstart](https://github.com/PowderworksCode/headstart), this change publishes a
+library's metadata before checking all of its function bodies. Cargo can then start checking
+dependent crates while those body checks finish. Cargo holds the dependent results and diagnostics
+until the upstream crate succeeds, and discards them on failure. Private changes can still avoid
+rebuilding dependents.
 
 Headstart applies when checking libraries, including `cargo check --tests` and `--all-targets`. Build
-scripts and procedural macros still need executable dependencies. The feature is opt-in via
-`-Zheadstart` and requires the prototype Cargo and compiler; it is not included in Ohm 1.99.0-1.
+scripts and procedural macros still need executable dependencies. The plan is to enable it by default
+in the next release. The current Cargo PR requires `-Zheadstart`.
 
 In three paired workspace rebuilds with registry and native dependencies cached, Ruff checks fell
 from 22.89 to 18.17 seconds (20.6%) and rust-analyzer checks from 25.28 to 18.72 seconds (26.1%).
