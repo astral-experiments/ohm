@@ -4,6 +4,27 @@ Ohm combines experimental Rust, Cargo, Clippy, and rustfmt changes for local dev
 Each release pins the complete set of sources in its [toolchain manifest](../toolchains/).
 Use the official Rust toolchain for production builds and final validation.
 
+## In Ohm 1.99.0-2
+
+Headstart is enabled by default for `cargo check`, including `--tests` and `--all-targets`.
+Dependent crates can start checking as soon as their dependencies publish interface metadata,
+while those dependencies finish checking function bodies. Cargo waits for every dependency to
+succeed before accepting dependent results. Unchanged interfaces still let Ohm skip downstream
+checks. Use `-Zheadstart=no` to disable early metadata without disabling the other Ohm defaults.
+[Rust #156](https://github.com/astral-sh/ohm-rust/pull/156),
+[Cargo #133](https://github.com/astral-sh/ohm-cargo/pull/133).
+
+In three paired workspace rebuilds with registry and native dependencies cached, early metadata
+reduced check time by 20.6% for Ruff and 26.1% for rust-analyzer. The tested private parser edit
+took about 1.29 seconds in both modes. These measurements isolate early metadata in the tested
+compiler revisions; they are not whole-release benchmarks or cold-build measurements.
+
+This release also restores upstream Cargo's dependency queue and removes the optional
+`-Zohm-incremental-gc` tracking and `clean incremental` prototype. Clippy, rustfmt, and bundled
+upstream Wild retain their previous pins. The standalone Clippy/codegen, resident-compiler, LTO,
+and compact-artifact/linker experiments remain excluded. See the
+[pinned manifest](../toolchains/1.99.0/2.json) for the exact sources.
+
 ## In Ohm 1.99.0-1
 
 This release updates Rust, Cargo, Clippy, and rustfmt to Rust 1.99.0 while retaining the
@@ -55,8 +76,7 @@ workspace and incremental state using filesystem clones, then revalidates source
 Matching Clippy state stays separate from reusable build and test state.
 
 The compiler reduces sparse metadata, retires superseded incremental sessions, and reuses stable
-paths for retained debug objects. Optional `-Zohm-incremental-gc` tracking allows age-based collection
-with `cargo -Zohm-incremental-gc clean incremental --max-age '30 days'`; tracking is disabled by default.
+paths for retained debug objects.
 
 See the [usage guidance](../README.md#usage) for target-directory layout, trust settings, and worktree
 commands.
@@ -77,7 +97,7 @@ See [release documentation](releases.md) for the build and packaging details.
 Generate the exact component commit inventory from any pinned manifest:
 
 ```console
-python3 scripts/list_patches.py toolchains/1.99.0/1.json
+python3 scripts/list_patches.py toolchains/1.99.0/2.json
 ```
 
 The command uses `gh-auto` to compare each pinned component with the corresponding revision in the
