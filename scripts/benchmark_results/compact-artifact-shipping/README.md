@@ -1,25 +1,67 @@
-# Compact artifacts: shipping candidate
+# Compact artifacts: ready for opt-in review
 
-The candidate stores compact object files in self-contained archives with raw
-Rust metadata. It removes the external store and its lookup/garbage-collection
-requirements, while preserving ordinary consumers, static libraries, saved
-relinking, and donor-independent worktrees.
+**Decision: ship as an opt-in for native x86-64 Linux.** The completed evidence
+supports trading modest absolute rebuild costs for substantially smaller build
+storage. Keep the option disabled by default; it is not a general speed or
+memory optimization.
 
-The completed four-round comparison saved **19.1% of allocated build storage
-on uv and 13.9% on Ruff**, after the edit sequence versus baseline. Existing application-function edits took about
-0.08 seconds longer on uv and 0.13 seconds longer on Ruff; dependency-function
-edits changed by less than 0.01 seconds and 0.27 seconds, respectively. The
-synthetic Ruff inline-helper case cost 0.42 seconds. These are results for the
-frozen Cargo `4a281305`, not a claim about all development edits. See the
-[four-round results](four-round-results.md) for means, paired distributions,
-ordinary-path costs, CPU, and memory observations.
+The implementation stores compact object files in self-contained archives with
+raw Rust metadata. It removes the compiler's external-store experiment and its
+lookup/garbage-collection requirements, while preserving ordinary consumers,
+static libraries, saved relinking, and donor-independent worktrees.
 
-The measured tradeoff supports an opt-in: the synthetic percentage reflects a
-short rebuild, while the cost is a much smaller fraction of longer commands.
-The scoped correctness/safety review found no remaining blocker. The current
-Cargo rebase changed scheduling, so the remaining validation is the separate
-current-Cargo confirmation described in the [evaluation](readiness.md).
-Release pins and defaults remain unchanged.
+## Measured tradeoff
+
+The current Cargo confirmation completed **156/156 commands** with no failures
+or exclusions; its independent audit passed **28,855 checks**. The following
+figures are means across two fresh rounds, using current Cargo `6333daf7`, Wild
+`9179eb98`, and the verified compiler sources in Rust `36f01299`. Baseline uses
+the pristine compiler with the same Cargo and Wild, rather than an installed
+release with different build optimization.
+
+Storage is settled allocation **after the edit sequence**, covering the whole
+private target, shared-build subtree, and scratch lane, with hardlinks counted
+once. It is not peak disk use or unique physical CoW allocation.
+
+| Project |  Baseline |   Compact | Disk reduction |
+| ------- | --------: | --------: | -------------: |
+| uv      | 3.432 GiB | 2.777 GiB |          19.1% |
+| Ruff    | 2.564 GiB | 2.207 GiB |          13.9% |
+
+Existing source-function edits show the following whole-command wall times.
+Each mean contains three sequential edits in each of two rounds, not six
+independent repetitions.
+
+| Project | Edit                 | Baseline |  Compact | Extra time |
+| ------- | -------------------- | -------: | -------: | ---------: |
+| uv      | Application function |  7.232 s |  7.657 s |   +0.425 s |
+| uv      | Dependency function  | 22.988 s | 22.913 s |   -0.075 s |
+| Ruff    | Application function |  1.944 s |  1.905 s |   -0.039 s |
+| Ruff    | Dependency function  | 21.234 s | 21.489 s |   +0.255 s |
+
+Clean-build means are within 0.7 seconds of baseline on both projects, whose
+builds take roughly 125–143 seconds. The ordinary candidate also has small
+measured costs with compact mode disabled: uv's application edit adds 0.282
+seconds and its clean build adds 1.912 seconds versus baseline. The option's
+additional application-edit cost over that ordinary candidate is 0.144 seconds
+on uv and 0.020 seconds on Ruff. Leaving the feature off does not promise zero
+compiler overhead.
+
+The separate **four-round, 416-command** study with frozen Cargo `4a281305`
+corroborates the storage savings. Its largest positive mean edit delta versus
+baseline is the synthetic Ruff inline case: 0.422 seconds on a 2.671-second
+rebuild. The current-Cargo confirmation measures 0.009 seconds for that same
+class; these are separate datasets, not proof that changing the scheduler
+caused the difference. The older cost is retained as a workload tradeoff, and
+its large percentage alone is not an adoption blocker. Costs are a much smaller
+fraction of the measured longer commands; these observations do not establish
+a constant overhead or the frequency of edit types in everyday development.
+
+See the [current-Cargo results](current-cargo-results.md) and
+[four-round results](four-round-results.md) for paired medians, observed ranges,
+round variation, no-ops, CPU, and memory. Some edit phases have higher sampled
+process-tree RSS; the disk savings do not establish a memory benefit. Both
+studies use development profiles and non-PGO/BOLT compiler builds on one host.
 
 ## Implementation
 

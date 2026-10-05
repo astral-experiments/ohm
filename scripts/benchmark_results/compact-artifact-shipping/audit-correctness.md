@@ -22,7 +22,7 @@ The [current Cargo integration](measurements/current-cargo/integration.json) bui
 
 Independent review found no additional correctness or packaging blocker in this scope. Formatting, full tidy, and compiler checks also passed locally. Cargo's eight enabled CI jobs pass at `6333daf7`; optional APFS replay was not selected. Rust CI at `36f01299` stops in all three jobs at the missing source-App client ID, before formatting, tidy, or compilation. Its later stages remain unverified. No credentials were changed.
 
-The new Linux driver is `a254b72ecfd128572bc1c09e2579de84f7d88006129588b9bc8f1c8e8929ed01`; the macOS driver is `47c9235e742c82e66d6cd6334087edce5b1e9198d757d3643bf03900923caf1f`. These are controlled non-PGO builds. The compiler component installation is not a full optimized release. The [evaluation](readiness.md) separates the completed four-round study from the current Cargo timing confirmation. The measured storage/time tradeoff supports the opt-in; the latter confirmation is still running.
+The new Linux driver is `a254b72ecfd128572bc1c09e2579de84f7d88006129588b9bc8f1c8e8929ed01`; the macOS driver is `47c9235e742c82e66d6cd6334087edce5b1e9198d757d3643bf03900923caf1f`. These are controlled non-PGO builds. The compiler component installation is not a full optimized release. The [evaluation](readiness.md) separates the completed four-round study from the completed current Cargo confirmation. The latter passes all 156 runtime oracles with no exclusions and an [independent 28,855-check audit](measurements/current-cargo/audit.json). The measured storage/time tradeoff supports the opt-in.
 
 ## Prior source revisions
 

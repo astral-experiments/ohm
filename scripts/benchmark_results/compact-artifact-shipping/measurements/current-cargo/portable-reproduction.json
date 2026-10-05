@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "scope": "Independent fresh local three-archive extraction, all embedded inventories and zero-overwrite verification, actual current native and timing evidence audits; no native execution, remote activity or rebuild",
+  "archives": [
+    {
+      "name": "current-cut-correctness.tar.gz",
+      "sha256": "3da176a3a30003bbd2a771f2dd31afa2544a4000097964df32be70a0a58dd986",
+      "compressed_bytes": 5991506,
+      "archive_regular_files": 391,
+      "inventory_entries": 390,
+      "inventory_sha256": "059a0ad37a126c3e39ed316166ebd61a97e3a79134488b73c3d3f015cdb3d229",
+      "payload_bytes": 90381488,
+      "archive_uncompressed_bytes": 90458673,
+      "directory_members": 0
+    },
+    {
+      "name": "readiness-matrix.tar.gz",
+      "sha256": "9832541221286816eac2055ae93c47c0b2811d0e83cc6dcd39ee7b561e3261a6",
+      "compressed_bytes": 62488912,
+      "archive_regular_files": 2391,
+      "inventory_entries": 2390,
+      "inventory_sha256": "403abcc2b760ae00a715e74ecf38752dce55f9de0c03fd3b18e310d7aec1e18a",
+      "payload_bytes": 906765188,
+      "archive_uncompressed_bytes": 907265855,
+      "directory_members": 0
+    },
+    {
+      "name": "current-cargo-evidence.tar.gz",
+      "sha256": "7a3456f006a8903d59349f28cec8c6c8555542a35b458e755c3e4db10d97355b",
+      "compressed_bytes": 31833060,
+      "archive_regular_files": 917,
+      "inventory_entries": 916,
+      "inventory_sha256": "4ee6e740c6f96f6275c32d7d3234763dbbadc99987a960dc55ee4860738a089f",
+      "payload_bytes": 360857293,
+      "archive_uncompressed_bytes": 361051102,
+      "directory_members": 0
+    }
+  ],
+  "combined_regular_files": 3699,
+  "created_directories": 159,
+  "overwrite_count": 0,
+  "verifier_sha256": "28181ded65ff1ad08ee5791b9560e06c70ad605ed2517d969ef1476dd945d05c",
+  "inventory_receipt_sha256": "43836a94ffa472c23750b3bc53073d365050812f53290622f12482de0947eedf",
+  "matrix_audit": {
+    "sha256": "557577d89bde0e2ccd247c6ecd1b9d648308304f01a8eb8c16456168186b36e0",
+    "auditor_sha256": "6a19dcdc27d98347f07ca0bd375e47de636838f815849c2b51696abf9ad018c9",
+    "checks": 28855,
+    "commands": 156,
+    "transferred_files_verified": 870,
+    "comparison_groups": 42,
+    "matches_retained_receipt_byte_for_byte": true,
+    "full_current_transfer_used": true
+  },
+  "native_audit": {
+    "sha256": "c7cee3f283cf37653cabf410f6a972bd19f7ce90ca99543c403462028f82f4c1",
+    "auditor_sha256": "5433afab2a2ca880a71d1fb32fff44858c078687e6f64b7bf6990f13f7501061",
+    "checks": 167,
+    "files_verified": 37,
+    "matches_retained_receipt_byte_for_byte": true
+  },
+  "completed": 1791215453.101266
+}

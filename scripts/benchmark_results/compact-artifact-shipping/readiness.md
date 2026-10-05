@@ -6,14 +6,17 @@ experiments. The original study's 10.44% Ruff result came from changing a
 benchmark-only inline helper. It did not describe an edit to an existing Ruff
 function or all Ruff rebuilds.
 
-The four-round comparison is complete: **416 primary commands**, with every
-runtime oracle passing, and **81,113 independent audit checks**. It saved
-19.10% of allocated build storage on uv and 13.92% on Ruff after the edit
-sequence, versus baseline. The
-[four-round results](four-round-results.md) report the rebuild costs, including
-the synthetic Ruff inline-edit slowdown. These results use the frozen Cargo
-`4a281305`; a separate confirmation with the rebased Cargo `6333daf7` is in
-progress. The studies are not pooled.
+**Recommendation: ship the native Linux option, disabled by default.** Both
+comparisons are complete. The four-round study has **416 primary commands**
+and **81,113 independent audit checks**; the actual current-Cargo confirmation
+has **156 commands**, no exclusions, and **28,855 independent audit checks**.
+All runtime oracles pass. Both studies save about 19.1% of allocated build
+storage on uv and 13.9% on Ruff after the edit sequence, versus baseline.
+The [current-Cargo results](current-cargo-results.md) and
+[four-round results](four-round-results.md) preserve their separate timing and
+resource boundaries. The storage benefit justifies the modest absolute costs
+observed here, including the older synthetic Ruff inline-edit slowdown. The
+studies are not pooled, and no universal performance or memory benefit is claimed.
 
 ## Compiler change
 
@@ -168,9 +171,14 @@ Cargo `6333daf7cf99cf80125234c9419cbd36e9bff81a` preserves the compact option,
 metadata policy, flags, profiles, fingerprints, and cache admission. Its inherited
 base changes the active dependency scheduler, however, so the old Cargo's
 timings cannot establish current integration performance. A separate actual
-Cargo build and installed default/compact smoke test precede a 156-command
-confirmation: two projects, three modes (pristine, narrowed ordinary, narrowed
-compact), two fresh rounds, and the same 13-command edit sequence.
+Cargo build and installed default/compact smoke test passed before the
+156-command confirmation: two projects, three modes (pristine, narrowed
+ordinary, narrowed compact), two fresh rounds, and the same 13-command edit
+sequence. All 156 commands passed, with no failures or exclusions. The frozen
+independent auditor verifies all 870 transferred files, all 42 paired
+comparison groups, and both rounds, for 28,855 checks. It binds the actual
+Cargo binary, installed smoke, source copies, and before/after preservation
+receipts to the measurements.
 
 The forward/reverse orders balance pair precedence; the ordinary candidate
 occupies the middle position in both rounds. These are two independent cache
@@ -179,6 +187,22 @@ rounds. All modes use the actual current Cargo and the same Wild. The original
 fixture, profile, measurement, noise guard, and runtime oracles are unchanged.
 This confirms the current integration; it does not isolate the causal effect
 of changing Cargo from `4a281305` to `6333daf7`.
+
+The [current summary](measurements/current-cargo/summary.json),
+[independent audit](measurements/current-cargo/audit.json), and
+[report](current-cargo-results.md) retain every comparison. The
+[current evidence supplement](measurements/current-cargo/current-cargo-evidence.tar.gz)
+layers onto both earlier archives without changing them. It contains 917
+regular files (916 inventory entries plus the inventory), totaling 361,051,102
+uncompressed bytes. The compressed archive is 31,833,060 bytes, SHA-256
+`7a3456f006a8903d59349f28cec8c6c8555542a35b458e755c3e4db10d97355b`.
+See its [inventory](measurements/current-cargo/inventory.json),
+[package receipt](measurements/current-cargo/package.json), and
+[portable reproduction guide](measurements/current-cargo/README.md).
+The [fresh reproduction receipt](measurements/current-cargo/portable-reproduction.json)
+verifies all 3,699 regular files across the three archives with zero overwrites.
+It reproduces the native integration and current timing audit receipts
+byte-for-byte, including all 167 and 28,855 checks, respectively.
 
 ## Correctness and integration
 

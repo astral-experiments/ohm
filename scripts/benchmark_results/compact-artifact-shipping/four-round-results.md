@@ -1,6 +1,6 @@
 # Four-round compiler comparison
 
-The compact opt-in reduced retained build storage by about 14% for Ruff and 19% for uv in this controlled four-round study. Fresh-build and real-edit timing changes were generally small; Ruff’s synthetic inline edits incurred a larger cost. These measurements use fixed Cargo `4a281305` and Wild `9179eb98`. A separate current Cargo `6333daf7` integration confirmation is pending, so this page makes no adoption claim for that rebased integration.
+The compact opt-in reduced retained build storage by about 14% for Ruff and 19% for uv in this controlled four-round study. Fresh-build and real-edit timing changes were generally small; Ruff’s synthetic inline edits incurred a larger cost. These measurements use fixed Cargo `4a281305` and Wild `9179eb98`. The completed [current Cargo confirmation](current-cargo-results.md) retains its separate two-round boundary; the [shipping recommendation](README.md) considers both datasets without pooling them.
 
 `Baseline` is Rust `348339dd` before the format changes. `Off` is the narrowed Rust `3b84b46e` compiler with ordinary artifacts. `On` is that same compiler with `-Zohm-compact-artifacts=yes`; Cargo also embeds complete raw metadata for archive portability. All arms use the same Cargo and Wild binaries. A fourth historical Rust `9546795c` arm was retained in the raw data to measure the removal of research machinery; the three arms below describe the intended opt-in comparison.
 
