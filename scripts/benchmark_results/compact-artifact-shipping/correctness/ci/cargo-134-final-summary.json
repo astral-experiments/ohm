@@ -1,0 +1,151 @@
+{
+  "observed_at": "2026-10-05T01:42:15.534668+00:00",
+  "pr": "https://github.com/astral-sh/ohm-cargo/pull/134",
+  "head": "4a2813050da607ca5cfe7b5cf3a17ba7c9676be1",
+  "measured_runtime_source": "207626090e1fb9b405abd806a86c1b42bd2db5ff",
+  "runtime_source_changed_after_measurements": false,
+  "followup_test_files": [
+    "tests/testsuite/cargo/z_help/stdout.term.svg",
+    "tests/testsuite/ohm_linker.rs"
+  ],
+  "run": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271",
+  "conclusion": "success",
+  "checks": [
+    {
+      "bucket": "pass",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581521292",
+      "name": "Clippy (depot-macos-15)",
+      "state": "SUCCESS",
+      "workflow": "CI"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581521222",
+      "name": "Cargo tests (depot-macos-15)",
+      "state": "SUCCESS",
+      "workflow": "CI"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581520997",
+      "name": "Rustfmt",
+      "state": "SUCCESS",
+      "workflow": "CI"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581521335",
+      "name": "Clippy (depot-ubuntu-24.04-8)",
+      "state": "SUCCESS",
+      "workflow": "CI"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581521304",
+      "name": "Cargo tests (depot-ubuntu-24.04-16)",
+      "state": "SUCCESS",
+      "workflow": "CI"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581521278",
+      "name": "Workspace tests",
+      "state": "SUCCESS",
+      "workflow": "CI"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581521186",
+      "name": "Resolver tests",
+      "state": "SUCCESS",
+      "workflow": "CI"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581521259",
+      "name": "Schema tests",
+      "state": "SUCCESS",
+      "workflow": "CI"
+    },
+    {
+      "bucket": "skipping",
+      "link": "https://github.com/astral-sh/ohm-cargo/actions/runs/37252050271/job/111581521900",
+      "name": "Clippy APFS replay",
+      "state": "SKIPPED",
+      "workflow": "CI"
+    }
+  ],
+  "primary_suite_results": [
+    {
+      "job": "Cargo tests (depot-macos-15)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:37:15.9716350Z test result: ok. 292 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.82s"
+    },
+    {
+      "job": "Cargo tests (depot-macos-15)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:37:15.9867860Z test result: ok. 0 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    },
+    {
+      "job": "Cargo tests (depot-macos-15)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:37:38.1892020Z test cargo::z_help::case ... ok"
+    },
+    {
+      "job": "Cargo tests (depot-macos-15)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:39:00.1114220Z test result: ok. 4277 passed; 0 failed; 420 ignored; 0 measured; 0 filtered out; finished in 104.10s"
+    },
+    {
+      "job": "Cargo tests (depot-macos-15)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:39:02.3230360Z test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.12s"
+    },
+    {
+      "job": "Cargo tests (depot-ubuntu-24.04-16)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:38:09.3310140Z test result: ok. 292 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.68s"
+    },
+    {
+      "job": "Cargo tests (depot-ubuntu-24.04-16)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:38:09.3341657Z test result: ok. 0 passed; 0 failed; 9 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    },
+    {
+      "job": "Cargo tests (depot-ubuntu-24.04-16)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:38:22.2447344Z test cargo::z_help::case ... ok"
+    },
+    {
+      "job": "Cargo tests (depot-ubuntu-24.04-16)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:39:10.1987927Z test ohm_linker::compact_artifacts_require_capability_and_track_mode_changes ... ok"
+    },
+    {
+      "job": "Cargo tests (depot-ubuntu-24.04-16)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:39:29.1762319Z test result: ok. 4287 passed; 0 failed; 422 ignored; 0 measured; 0 filtered out; finished in 79.84s"
+    },
+    {
+      "job": "Cargo tests (depot-ubuntu-24.04-16)",
+      "step": "Run Cargo unit and integration tests",
+      "output": "2026-10-05T01:39:30.7488662Z test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.45s"
+    }
+  ],
+  "resolved_failures": [
+    "Regenerated unstable-help snapshot for the new compact-artifacts option.",
+    "Log but strip automatic Ohm compiler options in the stable-compiler mock.",
+    "Disable unrelated worktree seeding for proc-macro embedded-metadata discovery; retain defaults and compact mode assertions."
+  ],
+  "local_validation": [
+    "Formatting passed.",
+    "Help snapshot passed with overwrite disabled.",
+    "macOS unsupported-host linker fixture passed.",
+    "Exact extracted mock failed before and passed after against stable 1.99.0.",
+    "Complete failing Linux proc-macro argv replay passed locally after removing seed-only flags and adapting paths."
+  ],
+  "limits": [
+    "Optional workflow-dispatch APFS replay was not selected.",
+    "No devbox activity or Rust Cargo gitlink edits were made by this CI task."
+  ]
+}
