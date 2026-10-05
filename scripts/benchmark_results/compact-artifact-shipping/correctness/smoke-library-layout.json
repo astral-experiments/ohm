@@ -1,0 +1,53 @@
+{
+  "purpose": "Validate cargo run and cargo build top-level library path used by installed-release smoke helper",
+  "scope": "Actual local macOS lib+bin builds; artifact-layout proof only, not compact-format or assembled-release execution",
+  "cargo_version": "cargo 1.99.0-dev (018a2b934 2026-10-01) (ohm-1.99.0-1)",
+  "cargo_revision": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+  "host": "aarch64-apple-darwin",
+  "fixture": "/private/tmp/ohm-compact-shipping/control/smoke-path-fixture",
+  "cases": [
+    {
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "run",
+        "--manifest-path",
+        "/private/tmp/ohm-compact-shipping/control/smoke-path-fixture/Cargo.toml"
+      ],
+      "environment": {
+        "CARGO_HOME": "/private/tmp/codex-cargo-home",
+        "CARGO_TARGET_DIR": "/private/tmp/codex-cargo-targets/ohm/isolated/compact-shipping-smoke-path/run",
+        "CARGO_BUILD_BUILD_DIR": "/private/tmp/codex-cargo-targets/ohm/isolated/compact-shipping-smoke-path/run-build"
+      },
+      "fresh_build_exit_code": 0,
+      "executable_exit_code": 0,
+      "top_level_rlib": "/private/tmp/codex-cargo-targets/ohm/isolated/compact-shipping-smoke-path/run/debug/libohm_smoke.rlib",
+      "rlib_bytes": 5368,
+      "rlib_sha256": "dd4f140cf3e099dc96652574fb7954858e8470ae41d3b3dfba275cc87779a0d7",
+      "executable": "/private/tmp/codex-cargo-targets/ohm/isolated/compact-shipping-smoke-path/run/debug/ohm-smoke",
+      "invocation": "cargo run"
+    },
+    {
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "build",
+        "--manifest-path",
+        "/private/tmp/ohm-compact-shipping/control/smoke-path-fixture/Cargo.toml"
+      ],
+      "environment": {
+        "CARGO_HOME": "/private/tmp/codex-cargo-home",
+        "CARGO_TARGET_DIR": "/private/tmp/codex-cargo-targets/ohm/isolated/compact-shipping-smoke-path/build",
+        "CARGO_BUILD_BUILD_DIR": "/private/tmp/codex-cargo-targets/ohm/isolated/compact-shipping-smoke-path/build-build"
+      },
+      "fresh_build_exit_code": 0,
+      "executable_exit_code": 0,
+      "top_level_rlib": "/private/tmp/codex-cargo-targets/ohm/isolated/compact-shipping-smoke-path/build/debug/libohm_smoke.rlib",
+      "rlib_bytes": 5368,
+      "rlib_sha256": "dd4f140cf3e099dc96652574fb7954858e8470ae41d3b3dfba275cc87779a0d7",
+      "executable": "/private/tmp/codex-cargo-targets/ohm/isolated/compact-shipping-smoke-path/build/debug/ohm-smoke",
+      "invocation": "explicit binary execution after cargo build"
+    }
+  ],
+  "source_change_required": false
+}
