@@ -1,0 +1,475 @@
+{
+  "passed": true,
+  "started": 1791211219.8488283,
+  "sources": {
+    "rust": "36f01299cd71f6c090150a80fe4a7babb6245a0b",
+    "cargo": "6333daf7cf99cf80125234c9419cbd36e9bff81a",
+    "wild": "9179eb988df2676342192a24dc337cf9823e9d56"
+  },
+  "runtime_source_commit": "3b84b46e3fb38f80246f744275c69fe608dfb2f3",
+  "timing_cargo_source": "4a2813050da607ca5cfe7b5cf3a17ba7c9676be1",
+  "scope": "Post-matrix published-Cargo functional alignment only. Existing non-PGO compiler and actual installed component are reused byte-for-byte; no compiler rebuild, timing rerun, full release or credential setup.",
+  "input_manifest_sha256": "ab614ea2c422797fb57498552ccc1c1bbb42a649e11bd7d9b9b1cc62166097b0",
+  "script_sha256": "7c70ca6bc6c00cdec1d47750bc28889ce146001550c60ea02ba9812370fe4a01",
+  "matrix_handover": {
+    "passed": true,
+    "collection_sha256": "ac4e3dc5bd9a6c0bb9ee6745d1a7e452f9c1adab93eddf79e2249836d2ee3b7c",
+    "matrix_status_sha256": "c42610b74107cf9c526d5e1ed426b1fa44bf18f7244d264d99bb5a09536a919a",
+    "matrix_samples_sha256": "08718f3409bfb4f4b547af2c14850a015df9983ae2aa7e8100f6923c34029f6a",
+    "selection_sha256": "0f959328096dae862150269249779380e326359ad60e8c0c8e07e0c24a1fd0d2",
+    "raw_runs": {
+      "initial": {
+        "namespace": "real-edit-matrix",
+        "samples_sha256": "3f85c34ea5c742b0f954dc0677ddbac512e9dd045d0a5c02b3b8deb1ebe8f684",
+        "provenance_sha256": "690c687bd45d92d2db0990697dc6fd49f8152ced02b1bfc68502349713b4eb70",
+        "failure_sha256": "4edbc7690fd1fcb8c05ee18ac582aaf3d2c9721742b2f56124cfdd7e69bfd429",
+        "status_absent": true,
+        "rows": 339,
+        "accepted": 338
+      },
+      "continuation": {
+        "namespace": "real-edit-continuation",
+        "samples_sha256": "e860a951051023b9796026663cfafa1bd29b412e2034ccc11b6f2cf2679aa754",
+        "provenance_sha256": "4de723384abf5152193b1cd698fe9ed4b4697dbf79ddeb655f9cf83509350452",
+        "status_sha256": "6755a2c68e48ce10525a8a1b8972a86240d24cdbf82af250ffb1d0c064774525",
+        "rows": 104,
+        "accepted": 104
+      }
+    },
+    "verified_files": 2669,
+    "independent_audit_sha256": "4b33d15915bee9cad2a1d2bdc58dcb67badb51421217c99a27a930363616ddbe"
+  },
+  "candidate_build_sha256": "b0e4171c60ac130c0722160d0a7c995559737865b3886b2fcc5234c5a5577ca8",
+  "candidate_package_sha256": "1e3f7633c204a37c64bf0787118ea0794d888ae2a906fb1d2dd5e50e0349a4aa",
+  "protected_files": 165822,
+  "commands": [
+    {
+      "name": "cargo-clone",
+      "argv": [
+        "git",
+        "clone",
+        "--shared",
+        "--no-checkout",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/cargo",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/source"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.05619273998308927,
+      "log_sha256": "692c66884d0b59e94e3dcf530a8e14fdd2262c09af58cb904886dab293a74bd5"
+    },
+    {
+      "name": "cargo-oss-name",
+      "argv": [
+        "git",
+        "config",
+        "--local",
+        "user.name",
+        "Charlie Marsh"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/source",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.012881197035312653,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cargo-oss-email",
+      "argv": [
+        "git",
+        "config",
+        "--local",
+        "user.email",
+        "charlie.r.marsh@gmail.com"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/source",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.010315297055058181,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cargo-bundle-verify",
+      "argv": [
+        "git",
+        "bundle",
+        "verify",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/inputs/cargo.bundle"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/source",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.08780767396092415,
+      "log_sha256": "c1484ef2817fca753e937e3266236a47f5f237e8e262a1c382e87a56edd4c036"
+    },
+    {
+      "name": "cargo-bundle-fetch",
+      "argv": [
+        "git",
+        "fetch",
+        "--no-tags",
+        "--no-recurse-submodules",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/inputs/cargo.bundle",
+        "refs/heads/charlie/current-proof",
+        "refs/heads/charlie/prior-proof"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/source",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.13849530892912298,
+      "log_sha256": "847be4372327cc9ba53b80de172bdbca755f8635a442b863a4336d06dc0238ba"
+    },
+    {
+      "name": "cargo-checkout",
+      "argv": [
+        "git",
+        "checkout",
+        "--detach",
+        "6333daf7cf99cf80125234c9419cbd36e9bff81a"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/source",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.8385824299184605,
+      "log_sha256": "8f3f26ff1f37cabb30dbdefe32607b1e8a53ba9b9c34758a573bc57b989dfabd"
+    },
+    {
+      "name": "rust-proof-clone",
+      "argv": [
+        "git",
+        "clone",
+        "--bare",
+        "--shared",
+        "/home/dev-user/code/oss/ohm-compact-study/rust",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/rust-proof.git"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 93.06386363098864,
+      "log_sha256": "ba2c815d47ae5809a965003e416aa7d77bfe101be7a6f06d753ee70886aa70da"
+    },
+    {
+      "name": "rust-proof-bundle-verify",
+      "argv": [
+        "git",
+        "bundle",
+        "verify",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/inputs/rust.bundle"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/rust-proof.git",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.6626728549599648,
+      "log_sha256": "0be05aa29c4464ac9882b845959c4f21477cf9c2f8959407941094a3a3c42539"
+    },
+    {
+      "name": "rust-proof-bundle-fetch",
+      "argv": [
+        "git",
+        "fetch",
+        "--no-tags",
+        "--no-recurse-submodules",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/inputs/rust.bundle",
+        "refs/heads/charlie/current-proof",
+        "refs/heads/charlie/prior-proof"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/rust-proof.git",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 1.0490844580344856,
+      "log_sha256": "7b06913b184bbc797583b109674f7d63b7886ecf4b0f219a186168187b97518c"
+    },
+    {
+      "name": "copy-release-cache",
+      "argv": [
+        "cp",
+        "-a",
+        "--reflink=auto",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-objects/shipping-cargo/release",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/build/release"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 5.227884341031313,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cargo-build",
+      "argv": [
+        "cargo",
+        "+ohm",
+        "-Zohm-defaults=no",
+        "build",
+        "--locked",
+        "--offline",
+        "--release",
+        "--features",
+        "ohm-defaults",
+        "--bin",
+        "cargo"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/source",
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/build"
+      },
+      "exit_code": 0,
+      "seconds": 75.21425622305833,
+      "log_sha256": "eb3b4854b40ce331e19711f31b0f396a21900cd862fd6c55794616807fc3ccdc"
+    },
+    {
+      "name": "copy-installed-prefix",
+      "argv": [
+        "cp",
+        "-aL",
+        "--reflink=auto",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/installed-smoke/toolchain",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 1.0353223189013079,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "defaults-build",
+      "argv": [
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/cargo",
+        "build",
+        "--offline",
+        "--manifest-path",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/fixture/Cargo.toml"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/fixture",
+      "environment_overrides": {
+        "RUSTC": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/rustc",
+        "RUSTDOC": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/rustdoc",
+        "CARGO_TARGET_DIR": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/defaults-target",
+        "CARGO_BUILD_BUILD_DIR": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/defaults-build"
+      },
+      "exit_code": 0,
+      "seconds": 0.7314193981001154,
+      "log_sha256": "27e302d47c27eb88833a9e7c1215a87b8f1d3858b3615c4983571d1d2f02bb1c"
+    },
+    {
+      "name": "defaults-runtime",
+      "argv": [
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/defaults-target/debug/ohm-smoke"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/fixture",
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.0032211490906774998,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compact-installed-smoke",
+      "argv": [
+        "python3",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/inputs/smoke_test_compact.py",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/evidence/source-manifest.json",
+        "x86_64-unknown-linux-gnu",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain",
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/fixture",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke"
+      ],
+      "cwd": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/fixture",
+      "environment_overrides": {
+        "RUSTC": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/rustc",
+        "RUSTDOC": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/rustdoc",
+        "CARGO_TARGET_DIR": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/defaults-target",
+        "CARGO_BUILD_BUILD_DIR": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/defaults-build"
+      },
+      "exit_code": 0,
+      "seconds": 0.7833440429531038,
+      "log_sha256": "374059b5c4f8d03c9425f0be000ecc6c2cc1dae31811fa4d70f85dcb310f7678"
+    },
+    {
+      "name": "reject-compress-artifacts",
+      "argv": [
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/rustc",
+        "-Zcompress-artifacts=yes",
+        "--crate-type=lib",
+        "--emit=metadata",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/lib.rs",
+        "-o",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/compress-artifacts.rmeta"
+      ],
+      "cwd": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options",
+      "environment_overrides": {
+        "RUSTC_BOOTSTRAP": "1"
+      },
+      "exit_code": 1,
+      "seconds": 0.02047489897813648,
+      "log_sha256": "47fd999657bab4a23593c89417c249586c5b0ad05c5f3d76753f99fa572a3b86"
+    },
+    {
+      "name": "reject-compress-incremental",
+      "argv": [
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/rustc",
+        "-Zcompress-incremental=no",
+        "--crate-type=lib",
+        "--emit=metadata",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/lib.rs",
+        "-o",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/compress-incremental.rmeta"
+      ],
+      "cwd": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options",
+      "environment_overrides": {
+        "RUSTC_BOOTSTRAP": "1"
+      },
+      "exit_code": 1,
+      "seconds": 0.019767897902056575,
+      "log_sha256": "0b6bc52c39345797322cb3404915f77417f13bb798167d66a502e318fddba481"
+    },
+    {
+      "name": "reject-compact-artifact-store",
+      "argv": [
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/rustc",
+        "-Zcompact-artifact-store=/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/unused-store",
+        "--crate-type=lib",
+        "--emit=metadata",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/lib.rs",
+        "-o",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/compact-artifact-store.rmeta"
+      ],
+      "cwd": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options",
+      "environment_overrides": {
+        "RUSTC_BOOTSTRAP": "1"
+      },
+      "exit_code": 1,
+      "seconds": 0.02034297294449061,
+      "log_sha256": "000f6b82692d8ebdf152d5430b2f7f5d7a595ba7b026d6856f5a651c8affcf4e"
+    },
+    {
+      "name": "reject-compact-artifact-raw-metadata",
+      "argv": [
+        "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/rustc",
+        "-Zcompact-artifact-raw-metadata=yes",
+        "--crate-type=lib",
+        "--emit=metadata",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/lib.rs",
+        "-o",
+        "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options/compact-artifact-raw-metadata.rmeta"
+      ],
+      "cwd": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/smoke/removed-options",
+      "environment_overrides": {
+        "RUSTC_BOOTSTRAP": "1"
+      },
+      "exit_code": 1,
+      "seconds": 0.01827252295333892,
+      "log_sha256": "6cda0795f28b9d836e41fae45bc48bdafab15904d80daaaad8110c994d2ed75b"
+    }
+  ],
+  "source_proof": {
+    "rust_cargo_gitlink": "6333daf7cf99cf80125234c9419cbd36e9bff81a",
+    "runtime_matches_frozen_patch": true,
+    "published_rust_delta": [
+      "src/tools/cargo"
+    ],
+    "cargo_delta": "benches/incremental-gc/README.md                   |  192 ----\n .../results/expiry-release-macos-aarch64.json      | 1113 --------------------\n benches/incremental-gc/results/macos-aarch64.json  |  872 ---------------\n .../results/tracking-release-macos-aarch64.json    |  841 ---------------\n benches/incremental-gc/run.py                      |  359 -------\n benches/incremental-gc/tracking_perf.py            |  297 ------\n doc/book/src/reference/unstable.md                 |   48 -\n src/bin/cargo/commands/clean.rs                    |   26 -\n src/compiler/build_runner/mod.rs                   |   13 -\n src/compiler/layout.rs                             |    2 +-\n src/compiler/mod.rs                                |    3 +-\n src/compiler/ohm_linker.rs                         |    8 +-\n src/ops/cargo_clean.rs                             |   22 -\n src/ops/cargo_worktree/mod.rs                      |    4 -\n src/util/dependency_queue.rs                       |  461 +++-----\n src/util/flock.rs                                  |    1 +\n src/workspace/features.rs                          |    2 -\n src/workspace/incremental_gc.rs                    |  617 -----------\n src/workspace/mod.rs                               |    1 -\n tests/testsuite/cargo/z_help/stdout.term.svg       |   64 +-\n tests/testsuite/incremental_gc.rs                  |  777 --------------\n tests/testsuite/incremental_gc_reuse.rs            |  283 -----\n tests/testsuite/main.rs                            |    2 -\n tests/testsuite/ohm_worktree.rs                    |   19 +\n 24 files changed, 193 insertions(+), 5834 deletions(-)",
+    "verified_runtime_paths": 33,
+    "wild_compact_tree": "356efe8fd992cb31b1d9163ae3c5dc0361a72814",
+    "cargo_tip_to_tip_paths": [
+      "benches/incremental-gc/README.md",
+      "benches/incremental-gc/results/expiry-release-macos-aarch64.json",
+      "benches/incremental-gc/results/macos-aarch64.json",
+      "benches/incremental-gc/results/tracking-release-macos-aarch64.json",
+      "benches/incremental-gc/run.py",
+      "benches/incremental-gc/tracking_perf.py",
+      "doc/book/src/reference/unstable.md",
+      "src/bin/cargo/commands/clean.rs",
+      "src/compiler/build_runner/mod.rs",
+      "src/compiler/layout.rs",
+      "src/compiler/mod.rs",
+      "src/ops/cargo_clean.rs",
+      "src/ops/cargo_worktree/mod.rs",
+      "src/util/dependency_queue.rs",
+      "src/util/flock.rs",
+      "src/workspace/features.rs",
+      "src/workspace/incremental_gc.rs",
+      "src/workspace/mod.rs",
+      "tests/testsuite/cargo/z_help/stdout.term.svg",
+      "tests/testsuite/incremental_gc.rs",
+      "tests/testsuite/incremental_gc_reuse.rs",
+      "tests/testsuite/main.rs",
+      "tests/testsuite/ohm_worktree.rs"
+    ],
+    "cargo_tree": "7a9d1c5cc34ed8fa524334bf9c90ff11323c7561",
+    "cargo_source_review_sha256": "58196d546ed552779bc1c9a36e7d629ef623cd30961f1fd44a197efa52a2bb55",
+    "rust_source_equivalence_sha256": "888df5bfe017ed5918a8a72626b95b09f97ce91fb047dc666659f2f7a17d6bad",
+    "current_cargo_has_unmeasured_inherited_scheduler_changes": true
+  },
+  "release_cache_symlinks_rejected_before_copy": true,
+  "cargo": {
+    "path": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain/bin/cargo",
+    "version": "cargo 1.99.0 (6333daf7c 2026-10-05)\nrelease: 1.99.0\ncommit-hash: 6333daf7cf99cf80125234c9419cbd36e9bff81a\ncommit-date: 2026-10-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.0.13)\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+    "sha256": "179917c3631239ea29b91aff94d833182fc5be221d1cf012c765d72212ed742f",
+    "build_target": "/tmp/codex-cargo-targets/ohm/isolated/compact-readiness/final-cargo-current/build",
+    "cache_copy_allocated_bytes": 794980352
+  },
+  "toolchain": {
+    "path": "/home/dev-user/code/oss/ohm-compact-study/shipping/readiness/final-cargo-current/toolchain",
+    "drivers": {
+      "librustc_driver-8d5d62195d3c17c1.so": "a254b72ecfd128572bc1c09e2579de84f7d88006129588b9bc8f1c8e8929ed01"
+    },
+    "rustc_sha256": "d070040503f629db4d532b1bcb6643c254aa97c2e70a01a168f4636dfb8df41d",
+    "rustdoc_sha256": "e99d96ca6ca3e26e23a9e47186c0ea699c1cd08e89b29909abb4f99b4c19f829",
+    "wild_sha256": "37303b949ecd2f76831381583c51ec4f551ce2de89154f131832ef6c7bd94372",
+    "cargo_sha256": "179917c3631239ea29b91aff94d833182fc5be221d1cf012c765d72212ed742f",
+    "runtime_source_commit": "3b84b46e3fb38f80246f744275c69fe608dfb2f3",
+    "published_rust_source": "36f01299cd71f6c090150a80fe4a7babb6245a0b",
+    "cargo_source": "6333daf7cf99cf80125234c9419cbd36e9bff81a",
+    "wild_source": "9179eb988df2676342192a24dc337cf9823e9d56"
+  },
+  "default_compact_members": 0,
+  "optin_compact_members": 1,
+  "removed_options": {
+    "compress-artifacts": {
+      "exit_code": 1,
+      "diagnostic": "unknown unstable option",
+      "no_output": true
+    },
+    "compress-incremental": {
+      "exit_code": 1,
+      "diagnostic": "unknown unstable option",
+      "no_output": true
+    },
+    "compact-artifact-store": {
+      "exit_code": 1,
+      "diagnostic": "unknown unstable option",
+      "no_output": true
+    },
+    "compact-artifact-raw-metadata": {
+      "exit_code": 1,
+      "diagnostic": "unknown unstable option",
+      "no_output": true
+    }
+  },
+  "fixture_sha256": {
+    "Cargo.toml": "170a45e301a1e1a4e8e94aeed015ef0994b6279d23c09b2580f8d066bcec0d67",
+    "macros/Cargo.toml": "d841cc5349fe08244e04aa3a1ed776c245161d8b8d8da8dbb7b1b2daa0b4918c",
+    "macros/src/lib.rs": "906a55249e39faa8a1b7e5669ed6864d97752a8db296c33f2a42233cb6165e9c",
+    "src/main.rs": "119ddba1d72f918c053a5d4eb2c0fa6e5dfc4b6913fd3b88457e2789b20ce739",
+    "src/lib.rs": "78cf80fe93909803270444e11cd48bbc95b74df19ac20045d30ea932c1fb6654"
+  },
+  "installed_compiler_matches_candidate": true,
+  "source_gitlink_consistency": true,
+  "smoke_contract": {
+    "modes": [
+      "default",
+      "compact-optin"
+    ],
+    "executable_runtime": true,
+    "library_runtime": true,
+    "proc_macro_expansion_runtime": true,
+    "compact_linked_by_wild": true
+  },
+  "timing_and_original_installed_binaries_unchanged": true,
+  "original_sources_unchanged": true,
+  "interrupted_original_status_remains_absent": true,
+  "finished": 1791211438.8031478
+}
