@@ -169,7 +169,11 @@ available under `harness/` and the referenced prototype harness path.
 See [the correctness audit](audit-correctness.md) for exact-head evidence,
 compatibility cases, failure diagnosis, and remaining platform coverage limits,
 and the [independent safety review](safety-review.md) for checked invariants and
-the fixed CI credential-authority finding.
+the fixed CI credential-authority and raw-metadata allocation findings.
+The final Linux revisions passed a compiler rebuild, both forced metadata/export
+suites, shared format tests, and compact-Wild/ordinary-BFD interoperability.
+Earlier lifecycle, worktree, alignment, and packaging receipts retain their
+separate source revisions.
 The compiler distribution rehearsal checks the actual tarball's Wild binary,
 capability marker, licenses, and compiler driver. It is not a production
 PGO/BOLT build or a published release.
@@ -178,19 +182,22 @@ PGO/BOLT build or a published release.
 
 | Component | Measurement or earlier functional boundary                                                                               | Final review revision                      |
 | --------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| Rust      | `e55e0485efc397741f4aaf861f1c74a281ac902f`                                                                               | `d59f1c63326e874185ed4ec5bb052f384745110f` |
-| Wild      | `dba82ebe99d98adbfe6358215d456cdddb1877da`                                                                               | `9fbf96f8b0ced108ea3f90c2341a289b16363ff7` |
+| Rust      | `e55e0485efc397741f4aaf861f1c74a281ac902f`                                                                               | `9546795cae23d424bec08487b4f3cace591efb5a` |
+| Wild      | `dba82ebe99d98adbfe6358215d456cdddb1877da`                                                                               | `9179eb988df2676342192a24dc337cf9823e9d56` |
 | Cargo     | Timing: `018a2b93409433dc5bc05c5fce838ae69e9bc396`; opt-in functional checks: `207626090e1fb9b405abd806a86c1b42bd2db5ff` | `4a2813050da607ca5cfe7b5cf3a17ba7c9676be1` |
 
 The pristine compiler is `348339ddae4288ebb3af97d204b19479fef8f5f2`; the
 shipped Wild source base is `e9a9b0cb6fd63a23cc7b93aafc931aadd5746be6` (0.10.0).
-Rust CI pins Wild `0f3f4b429c747372466213dbd1ff8eca87516170`; the subsequent
-Wild commits change only Nix timeouts. The later Rust changes cover CI, a
+Rust CI pins Wild `9179eb988df2676342192a24dc337cf9823e9d56`. The later Rust changes cover CI, a
 test-only Cargo pin update, dependency allowlists, and mechanically moved helper
 and test bodies. Cargo's follow-ups change only tests. Wild's later runtime
-source edits are a scoped lint annotation and removal of an unnecessary borrow;
-its other changes are tests, license policy, and workflows. The review documents
-these boundaries. Final and measured binaries are not claimed to be identical.
+source edits are a scoped lint annotation, removal of an unnecessary borrow, and
+a raw ELF metadata length check before allocation. The latter rejects malformed input
+before copying its payload and has a regression that fails before the fix and
+passes afterward. Its other changes are tests, license policy, and workflows.
+The final shared format crate tree is `356efe8fd992cb31b1d9163ae3c5dc0361a72814`;
+the measurements retain `214c4264333a304f35506c9456828c12a9eba066`. The review
+documents these boundaries. Final and measured binaries are not claimed to be identical.
 
 The harnesses are in [harness/](harness/). The original benchmark core remains
 frozen at SHA256 `ea7867f9f9a0f19ceb7d9c558aa7aa6758ae3e254878685fbc58768c65713cef`.
