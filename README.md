@@ -254,8 +254,7 @@ upstream. Multiple Ohm revisions may target the same Rust release; for example, 
 For an explanation of the major optimizations and their measured impact, see
 [_How Ohm speeds up development_](docs/optimizations.md).
 
-See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
-patches are maintained in peer repositories:
+Ohm's patches are maintained in the following repositories:
 
 - [`ohm-rust`](https://github.com/astral-sh/ohm-rust): Rust compiler and standard library.
 - [`ohm-cargo`](https://github.com/astral-sh/ohm-cargo): Cargo.

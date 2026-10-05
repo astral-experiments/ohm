@@ -1,5 +1,17 @@
 # Releases
 
+## Included patches
+
+List the commits included in a release by passing its pinned toolchain manifest:
+
+```console
+python3 scripts/list_patches.py toolchains/1.99.0/1.json
+```
+
+The command uses `gh-auto` to compare each component's pinned revision with the corresponding
+upstream Rust release. It prints commit links in source-history order, including setup and CI
+changes.
+
 ## Bundled WebAssembly target
 
 Starting with Ohm 1.98.1-5, both host distributions include the matching
