@@ -5,24 +5,24 @@
 
 An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
 
-With Ohm, incremental builds can be up to 28× faster, replayed development sessions take around
-35% less time, and `target/` disk usage decreases by around 55%.
+With Ohm, incremental builds can be up to 30× faster, replayed development sessions take around
+37% less time, and `target/` disk usage decreases by around 55%.
 
-Benchmarking Ohm 1.99.0-1 against stock Rust on replayed development sessions:
+Benchmarking Ohm 1.99.0-2 against stock Rust on replayed development sessions:
 
 <!-- benchmark:sessions -->
 
-| Scope                                      | Rust 1.99.0 | Ohm 1.99.0-1 | Time saved |
+| Scope                                      | Rust 1.99.0 | Ohm 1.99.0-2 | Time saved |
 | ------------------------------------------ | ----------- | ------------ | ---------- |
-| Ruff session                               | 526.19 s    | 362.37 s     | 31.13%     |
-| uv session                                 | 169.86 s    | 119.58 s     | 29.60%     |
-| Codex session                              | 632.05 s    | 387.20 s     | 38.74%     |
-| All sessions                               | 1,328.10 s  | 869.14 s     | 34.56%     |
-| `cargo check`                              | 169.41 s    | 62.01 s      | 63.40%     |
-| `cargo test`, `cargo nextest`, `just test` | 751.15 s    | 594.96 s     | 20.79%     |
-| `cargo clippy`                             | 386.65 s    | 195.65 s     | 49.40%     |
-| `cargo fmt`                                | 19.09 s     | 14.31 s      | 25.02%     |
-| All commands                               | 1,326.30 s  | 866.92 s     | 34.64%     |
+| Ruff session                               | 438.46 s    | 286.58 s     | 34.64%     |
+| uv session                                 | 144.04 s    | 93.94 s      | 34.78%     |
+| Codex session                              | 535.54 s    | 324.34 s     | 39.44%     |
+| All sessions                               | 1,118.04 s  | 704.86 s     | 36.96%     |
+| `cargo check`                              | 144.08 s    | 46.91 s      | 67.44%     |
+| `cargo test`, `cargo nextest`, `just test` | 627.07 s    | 496.18 s     | 20.87%     |
+| `cargo clippy`                             | 330.65 s    | 148.50 s     | 55.09%     |
+| `cargo fmt`                                | 14.27 s     | 11.20 s      | 21.51%     |
+| All commands                               | 1,116.07 s  | 702.79 s     | 37.03%     |
 
 <!-- /benchmark:sessions -->
 
@@ -30,14 +30,14 @@ And comparing disk usage (on APFS):
 
 <!-- benchmark:disk -->
 
-| Scope                 | Rust 1.99.0 | Ohm 1.99.0-1 | Space saved |
+| Scope                 | Rust 1.99.0 | Ohm 1.99.0-2 | Space saved |
 | --------------------- | ----------- | ------------ | ----------- |
-| Ruff/ty session       | 5.90 GiB    | 3.54 GiB     | 40.00%      |
-| Ruff/ty, 2 worktrees  | 10.13 GiB   | 6.06 GiB     | 40.17%      |
-| Ruff/ty, 10 worktrees | 53.01 GiB   | 26.44 GiB    | 50.11%      |
-| uv session            | 12.10 GiB   | 7.85 GiB     | 35.11%      |
-| uv, 2 worktrees       | 16.30 GiB   | 8.64 GiB     | 46.97%      |
-| uv, 10 worktrees      | 79.53 GiB   | 33.19 GiB    | 58.27%      |
+| Ruff/ty session       | 5.91 GiB    | 3.54 GiB     | 40.13%      |
+| Ruff/ty, 2 worktrees  | 10.13 GiB   | 6.00 GiB     | 40.82%      |
+| Ruff/ty, 10 worktrees | 53.04 GiB   | 26.30 GiB    | 50.42%      |
+| uv session            | 12.14 GiB   | 7.90 GiB     | 34.95%      |
+| uv, 2 worktrees       | 16.26 GiB   | 8.64 GiB     | 46.88%      |
+| uv, 10 worktrees      | 79.47 GiB   | 33.21 GiB    | 58.21%      |
 
 <!-- /benchmark:disk -->
 
@@ -74,7 +74,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.99.0-1/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.99.0-2/install.sh | sh
 ```
 
 To change the installation directory, set `OHM_INSTALL_DIR`:
@@ -97,7 +97,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`; for example,
-`cargo +ohm-1.99.0-1 test` selects that specific installed revision.
+`cargo +ohm-1.99.0-2 test` selects that specific installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, parallel
 compiler frontends, and reuse of previously built registry and workspace dependencies by default.
@@ -146,14 +146,14 @@ See the [benchmark documentation](./BENCHMARKS.md) for instructions on running t
 
 <!-- benchmark:direct -->
 
-| Project | Workflow               | Edited crate | Rust 1.99.0 | Ohm 1.99.0-1 | Speedup |
+| Project | Workflow               | Edited crate | Rust 1.99.0 | Ohm 1.99.0-2 | Speedup |
 | ------- | ---------------------- | ------------ | ----------- | ------------ | ------- |
-| uv      | `cargo check`          | `uv`         | 3.47 s      | 3.71 s       | 0.94×   |
-| uv      | `cargo clippy`         | `uv`         | 4.50 s      | 3.54 s       | 1.27×   |
-| uv      | `cargo test --test it` | `uv`         | 24.44 s     | 12.05 s      | 2.03×   |
-| Codex   | `cargo check`          | `codex-core` | 7.00 s      | 6.41 s       | 1.09×   |
-| Codex   | `just clippy`          | `codex-core` | 24.82 s     | 18.12 s      | 1.37×   |
-| Codex   | `just test`            | `codex-core` | 39.01 s     | 29.33 s      | 1.33×   |
+| uv      | `cargo check`          | `uv`         | 2.88 s      | 3.01 s       | 0.96×   |
+| uv      | `cargo clippy`         | `uv`         | 3.52 s      | 2.87 s       | 1.23×   |
+| uv      | `cargo test --test it` | `uv`         | 22.20 s     | 11.02 s      | 2.02×   |
+| Codex   | `cargo check`          | `codex-core` | 6.13 s      | 6.14 s       | 1.00×   |
+| Codex   | `just clippy`          | `codex-core` | 21.09 s     | 15.25 s      | 1.38×   |
+| Codex   | `just test`            | `codex-core` | 33.13 s     | 26.96 s      | 1.23×   |
 
 <!-- /benchmark:direct -->
 
@@ -162,14 +162,14 @@ avoid rebuilding unchanged dependents:
 
 <!-- benchmark:dependency -->
 
-| Project | Workflow               | Edited dependency    | Rust 1.99.0 | Ohm 1.99.0-1 | Speedup |
+| Project | Workflow               | Edited dependency    | Rust 1.99.0 | Ohm 1.99.0-2 | Speedup |
 | ------- | ---------------------- | -------------------- | ----------- | ------------ | ------- |
-| uv      | `cargo check`          | `uv-normalize`       | 12.97 s     | 1.09 s       | 11.87×  |
-| uv      | `cargo clippy`         | `uv-normalize`       | 16.91 s     | 0.88 s       | 19.21×  |
-| uv      | `cargo test --test it` | `uv-normalize`       | 26.27 s     | 3.79 s       | 6.94×   |
-| Codex   | `cargo check`          | `codex-utils-string` | 21.60 s     | 1.63 s       | 13.28×  |
-| Codex   | `just clippy`          | `codex-utils-string` | 49.63 s     | 1.77 s       | 28.04×  |
-| Codex   | `just test`            | `codex-utils-string` | 57.81 s     | 5.20 s       | 11.12×  |
+| uv      | `cargo check`          | `uv-normalize`       | 11.18 s     | 1.09 s       | 10.28×  |
+| uv      | `cargo clippy`         | `uv-normalize`       | 14.15 s     | 0.74 s       | 19.13×  |
+| uv      | `cargo test --test it` | `uv-normalize`       | 23.15 s     | 3.41 s       | 6.80×   |
+| Codex   | `cargo check`          | `codex-utils-string` | 19.91 s     | 1.48 s       | 13.44×  |
+| Codex   | `just clippy`          | `codex-utils-string` | 43.66 s     | 1.44 s       | 30.42×  |
+| Codex   | `just test`            | `codex-utils-string` | 52.33 s     | 4.93 s       | 10.61×  |
 
 <!-- /benchmark:dependency -->
 
@@ -177,14 +177,14 @@ avoid rebuilding unchanged dependents:
 
 <!-- benchmark:features -->
 
-| Project | Workflow                 | Package              | Rust 1.99.0 | Ohm 1.99.0-1 | Speedup |
+| Project | Workflow                 | Package              | Rust 1.99.0 | Ohm 1.99.0-2 | Speedup |
 | ------- | ------------------------ | -------------------- | ----------- | ------------ | ------- |
-| uv      | Build, then check        | `uv`                 | 70.46 s     | 23.90 s      | 2.95×   |
-| uv      | Shared-worktree build    | `uv-normalize`       | 9.54 s      | 1.64 s       | 5.82×   |
-| Codex   | Build, then check        | `codex-core`         | 125.54 s    | 63.67 s      | 1.97×   |
-| Codex   | No-op formatting         | Workspace            | 11.91 s     | 0.31 s       | 38.66×  |
-| Codex   | Formatting after an edit | `codex-core`         | 12.44 s     | 0.50 s       | 24.73×  |
-| Codex   | Shared-worktree build    | `codex-utils-string` | 3.97 s      | 0.75 s       | 5.27×   |
+| uv      | Build, then check        | `uv`                 | 66.46 s     | 18.98 s      | 3.50×   |
+| uv      | Shared-worktree build    | `uv-normalize`       | 9.01 s      | 1.01 s       | 8.95×   |
+| Codex   | Build, then check        | `codex-core`         | 111.64 s    | 44.83 s      | 2.49×   |
+| Codex   | No-op formatting         | Workspace            | 10.25 s     | 0.29 s       | 34.87×  |
+| Codex   | Formatting after an edit | `codex-core`         | 9.71 s      | 0.43 s       | 22.40×  |
+| Codex   | Shared-worktree build    | `codex-utils-string` | 3.43 s      | 0.77 s       | 4.44×   |
 
 <!-- /benchmark:features -->
 
@@ -228,6 +228,8 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Keep codegen-unit merging stable across edits so incremental builds can reuse prior output.
 - Reuse encoded metadata prefixes when private edits leave metadata dependencies unchanged.
 - Pipeline metadata when a dependency's public API changes.
+- Start dependent checks from early interface metadata while upstream function bodies are still
+  being checked (`cargo -Zheadstart=no` disables this).
 - Reuse integration-test binaries when the edited libraries aren't used by the tests.
 - Apply early cutoff to `cargo check` and `cargo clippy`, including with shared registry caches.
 - Reuse compiled registry dependencies across builds, checks, tests, and Clippy.
