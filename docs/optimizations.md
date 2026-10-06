@@ -187,9 +187,25 @@ See:
 - [Rust #98](https://github.com/astral-sh/ohm-rust/pull/98)
 - [Rust #123](https://github.com/astral-sh/ohm-rust/pull/123)
 
+### 11. Use Wild for Linux linking
+
+The linker combines compiled code into the final executable. For native x86-64 Linux GNU builds, Ohm
+uses the Wild linker by default. Explicit linker settings still take precedence.
+
+Wild performs a full link each time it runs. Cached relinking lets Ohm reuse the compiled code that
+it passes to the linker. The release benchmarks include Wild alongside Ohm's other changes, so they
+do not measure its contribution separately.
+
+(Wild is an existing linker; Ohm bundles it and enables it by default on supported Linux targets.)
+
+See:
+
+- [Cargo #114](https://github.com/astral-sh/ohm-cargo/pull/114)
+- [Ohm #112](https://github.com/astral-sh/ohm/pull/112)
+
 ## Rust compiler
 
-### 11. Cache derive macro expansions
+### 12. Cache derive macro expansions
 
 A derive macro generates Rust code from a type declaration. Ohm enables Rust's experimental cache
 for that generated code so the compiler can reuse previous macro expansions. The cache can be
@@ -209,7 +225,7 @@ See:
 
 - [Cargo #54](https://github.com/astral-sh/ohm-cargo/pull/54)
 
-### 12. Reuse compiler work across incremental builds
+### 13. Reuse compiler work across incremental builds
 
 The compiler groups generated code into units that it can compile separately. Ohm keeps these groups
 stable across edits and reuses compatible decisions about where generic code belongs. This lets it
@@ -226,7 +242,7 @@ See:
 - [Rust #57](https://github.com/astral-sh/ohm-rust/pull/57)
 - [Rust #65](https://github.com/astral-sh/ohm-rust/pull/65)
 
-### 13. Reuse async code after it moves
+### 14. Reuse async code after it moves
 
 Moving async code to another line can invalidate compiled code even when its behavior stays the
 same. Ohm tracks the source locations used by debuggers separately from the layout used to generate
@@ -243,7 +259,7 @@ See:
 
 - [Rust #132](https://github.com/astral-sh/ohm-rust/pull/132)
 
-### 14. Avoid generating async bodies for metadata
+### 15. Avoid generating async bodies for metadata
 
 During `cargo check`, the compiler needs to know how an async function's state is laid out in
 memory. Ohm can compute that layout without also constructing the code that resumes or drops the
@@ -257,7 +273,7 @@ See:
 
 - [Rust #99](https://github.com/astral-sh/ohm-rust/pull/99)
 
-### 15. Run the compiler frontend in parallel
+### 16. Run the compiler frontend in parallel
 
 When Cargo invokes the compiler, Ohm enables Rust's experimental parallel frontend. The compiler can
 then use up to eight threads to parse and analyze a crate. You can choose a thread count explicitly
@@ -276,7 +292,7 @@ See:
 - [Cargo #90](https://github.com/astral-sh/ohm-cargo/pull/90)
 - [Cargo #48](https://github.com/astral-sh/ohm-cargo/pull/48)
 
-### 16. Reduce repeated compiler work
+### 17. Reduce repeated compiler work
 
 Ohm also removes smaller sources of repeated work inside the compiler. It reuses incremental query
 results, avoids walking the same type constraints twice, and skips unnecessary work when generating
@@ -292,9 +308,44 @@ See:
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
 - [Rust #101](https://github.com/astral-sh/ohm-rust/pull/101)
 
+### 18. Optimize the compiler and its allocator
+
+Ohm builds its release compiler with profile-guided optimization (PGO). It runs a training workload,
+then uses the resulting profile to optimize the compiler's machine code. Ohm also applies PGO to
+Cargo, rustdoc, Clippy, and rustfmt. Linux releases use BOLT to further optimize the compiled
+binary.
+
+(PGO and BOLT are existing compiler optimizations; Ohm applies them when building its release
+toolchain.)
+
+See:
+
+- [Ohm #60](https://github.com/astral-sh/ohm/pull/60)
+- [Rust #67](https://github.com/astral-sh/ohm-rust/pull/67)
+
+Ohm also changes the memory allocator used by two of its tools:
+
+- On Linux, the Rust compiler (`rustc`) uses mimalloc.
+- On Apple Silicon macOS, Cargo uses mimalloc.
+
+This changes how those tools allocate and free memory while they run.
+
+In an earlier Linux benchmark, switching to mimalloc reduced a Ruff check by 5.3%, a uv rebuild by
+9.8%, and a uv edit-and-test command by 7.8%. Some compiler workloads used 21–25% more memory at
+their peak.
+
+In a macOS comparison, running a check on unchanged Ruff sources took 216 milliseconds before the
+allocator change and 199 milliseconds after it. Running a build on unchanged uv sources took 296 and
+267 milliseconds, respectively.
+
+See:
+
+- [Rust #109](https://github.com/astral-sh/ohm-rust/pull/109)
+- [Cargo #106](https://github.com/astral-sh/ohm-cargo/pull/106)
+
 ## rustfmt
 
-### 17. Format only what changed
+### 19. Format only what changed
 
 After a successful run, Ohm's `cargo fmt` remembers which workspace packages it formatted. It can
 skip those packages on the next run if their sources, configuration, and formatter have not changed.
@@ -313,7 +364,7 @@ See:
 
 ## Clippy
 
-### 18. Reuse Clippy results for unchanged modules
+### 20. Reuse Clippy results for unchanged modules
 
 Ohm uses the compiler's incremental query system to cache the results of selected Clippy lint
 passes. After an edit, it can reuse results from unchanged modules instead of running those passes
