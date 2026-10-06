@@ -1,0 +1,1011 @@
+{
+  "schema_version": 1,
+  "study": "Ohm 1.99.0-2 retained disk usage in Ruff/ty and uv development",
+  "date": "2026-10-05",
+  "metric": {
+    "name": "APFS ATTR_VOL_SPACEUSED minus each empty-volume baseline",
+    "unit": "bytes",
+    "bytes_per_gib": 1073741824,
+    "includes": [
+      "source checkouts",
+      "all target directories",
+      "shared build artifacts",
+      "runtime caches and temporary files"
+    ],
+    "excludes": [
+      "installed toolchains",
+      "Cargo source downloads and registry index",
+      "Python and Cargo extensions",
+      "common Git objects and worktree administrative files"
+    ],
+    "idle_endpoint": "At least 30 seconds inactive, then full volume flush and five stable allocation samples.",
+    "sampled_peaks": "Background allocator samples with a one-second requested interval; query overhead lengthens the period. These are lower bounds on transient maxima."
+  },
+  "host": {
+    "model": "Mac17,6",
+    "logical_cpus": 18,
+    "ram_gib": 128.0,
+    "os": "macOS 26.7.1",
+    "target": "aarch64-apple-darwin"
+  },
+  "release_manifest": {
+    "path": "toolchains/1.99.0/2.json",
+    "sha256": "d748a53709053f28eec94a2cdb3aa20747924920ba289d8789f01b9e33f74ca4"
+  },
+  "toolchains": {
+    "stock-1.99.0": {
+      "rustc": {
+        "path": "/Users/charliemarsh/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/rustc",
+        "sha256": "dd6f58440b3418aa9157ae3f05d71eecff741ca41bc4eec120e7e8f2d933b9a0",
+        "version": "rustc 1.99.0 (b940084d7 2026-09-28)"
+      },
+      "cargo": {
+        "path": "/Users/charliemarsh/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/cargo",
+        "sha256": "fc7aa5077deca8abc0651f329e8ec1d968f520e996a93b428f9935014362b382",
+        "version": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "clippy-driver": {
+        "path": "/Users/charliemarsh/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/clippy-driver",
+        "sha256": "0469c2c76677f536fb9851501ab39216a25ab4963e2878d4ad1eee94a8952889",
+        "version": "clippy 0.1.99 (b940084d7e 2026-09-28)"
+      },
+      "rustfmt": {
+        "path": "/Users/charliemarsh/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/rustfmt",
+        "sha256": "5f552ee4d89172baa898b816c56dd5448f4060436d979ba8690d6007833996dd",
+        "version": "rustfmt 1.10.0-stable (b940084d7e 2026-09-28)"
+      }
+    },
+    "ohm-1.99.0-2": {
+      "rustc": {
+        "path": "/Users/charliemarsh/.rustup/toolchains/ohm-1.99.0-2/bin/rustc",
+        "sha256": "907c745925f5f31c3d3ff01591c4565573775b2dd774994d75c824d37cba492b",
+        "version": "rustc 1.99.0-dev (08bbd755a 2026-10-05) (ohm-1.99.0-2)"
+      },
+      "cargo": {
+        "path": "/Users/charliemarsh/.rustup/toolchains/ohm-1.99.0-2/bin/cargo",
+        "sha256": "474590360c0715730bf1f14281eede8039f51fafc2e747daf82a3d7e632252d0",
+        "version": "cargo 1.99.0-dev (6246601d6 2026-10-05) (ohm-1.99.0-2)"
+      },
+      "clippy-driver": {
+        "path": "/Users/charliemarsh/.rustup/toolchains/ohm-1.99.0-2/bin/clippy-driver",
+        "sha256": "42f4ac4044c882e2c7ba635bcb1dc933c5d2caf81c207c14a2bf20276c91c630",
+        "version": "clippy 0.1.99 (f52143702f 2026-10-01)"
+      },
+      "rustfmt": {
+        "path": "/Users/charliemarsh/.rustup/toolchains/ohm-1.99.0-2/bin/rustfmt",
+        "sha256": "320c0b9896ca39131fb72178fc97b2034c8854e265bfeb670d67a9796347573a",
+        "version": "rustfmt 1.10.0-dev (a21f2ab199 2026-10-01)"
+      }
+    }
+  },
+  "configuration": {
+    "cargo_jobs": 8,
+    "cargo_offline": true,
+    "ohm_automatic_defaults": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust": "all",
+    "python": "3.12.13",
+    "separate_shared_store_per_cohort": true,
+    "private_target_per_worktree": true
+  },
+  "design": {
+    "worktrees_total": 44,
+    "cohorts": 8,
+    "single_session_repetitions": 1,
+    "fork_cohort_repetitions": 1,
+    "forks": "A frozen donor after edit 1 plus nine actual siblings, each replaying edits 2 and 3 and validation.",
+    "retention": "Every cohort retains all worktrees and artifacts through its final idle measurement. Each completed cohort is audited and its captured evidence is archived before its temporary volume is retired.",
+    "preflight": "Verify capacity; concurrent builds on other volumes are allowed. Each cohort uses an isolated APFS volume. Final endpoints wait at least 30 seconds for this workload, flush, and require stable allocation. Command timings are diagnostic only. Package-cache waits are recorded; build-directory lock contention is rejected.",
+    "interpretation": "Paired whole-configuration comparisons against stock Rust; not a controlled comparison between Ohm releases or nine independent developer histories."
+  },
+  "readme_comparisons": [
+    {
+      "project": "ruff",
+      "scenario": "One complete development session",
+      "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+      "comparison": {
+        "project": "ruff",
+        "cohort": "single",
+        "worktrees": 1,
+        "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+        "stock_retained_bytes": 6341775360,
+        "ohm_retained_bytes": 3797131264,
+        "stock_gib": 5.906238555908203,
+        "ohm_gib": 3.5363540649414062,
+        "bytes_saved": 2544644096,
+        "percent_less_disk": 40.125106165854476,
+        "valid_pair": true,
+        "mismatched_fields": [],
+        "stock_idle_seconds": 36.12075520894723,
+        "ohm_idle_seconds": 35.7280703750439
+      }
+    },
+    {
+      "project": "ruff",
+      "scenario": "Two active worktrees",
+      "measurement_timing": "immediate_worktree_completion_checkpoint",
+      "comparison": {
+        "project": "ruff",
+        "cohort": "forks",
+        "worktrees": 2,
+        "measurement_timing": "immediate_worktree_completion_checkpoint",
+        "stock_retained_bytes": 10881798144,
+        "ohm_retained_bytes": 6440067072,
+        "stock_gib": 10.134464263916016,
+        "ohm_gib": 5.997779846191406,
+        "bytes_saved": 4441731072,
+        "percent_less_disk": 40.817988104742405,
+        "valid_pair": true,
+        "mismatched_fields": []
+      }
+    },
+    {
+      "project": "ruff",
+      "scenario": "Ten active worktrees",
+      "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+      "comparison": {
+        "project": "ruff",
+        "cohort": "forks",
+        "worktrees": 10,
+        "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+        "stock_retained_bytes": 56955400192,
+        "ohm_retained_bytes": 28237750272,
+        "stock_gib": 53.04384994506836,
+        "ohm_gib": 26.29845428466797,
+        "bytes_saved": 28717649920,
+        "percent_less_disk": 50.421294246359636,
+        "valid_pair": true,
+        "mismatched_fields": [],
+        "stock_idle_seconds": 36.04514541599201,
+        "ohm_idle_seconds": 35.91273333301069
+      }
+    },
+    {
+      "project": "uv",
+      "scenario": "One complete development session",
+      "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+      "comparison": {
+        "project": "uv",
+        "cohort": "single",
+        "worktrees": 1,
+        "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+        "stock_retained_bytes": 13040242688,
+        "ohm_retained_bytes": 8482349056,
+        "stock_gib": 12.144672393798828,
+        "ohm_gib": 7.899803161621094,
+        "bytes_saved": 4557893632,
+        "percent_less_disk": 34.952521521660806,
+        "valid_pair": true,
+        "mismatched_fields": [],
+        "stock_idle_seconds": 35.72034766699653,
+        "ohm_idle_seconds": 35.85552708298201
+      }
+    },
+    {
+      "project": "uv",
+      "scenario": "Two active worktrees",
+      "measurement_timing": "immediate_worktree_completion_checkpoint",
+      "comparison": {
+        "project": "uv",
+        "cohort": "forks",
+        "worktrees": 2,
+        "measurement_timing": "immediate_worktree_completion_checkpoint",
+        "stock_retained_bytes": 17458741248,
+        "ohm_retained_bytes": 9274302464,
+        "stock_gib": 16.259719848632812,
+        "ohm_gib": 8.637367248535156,
+        "bytes_saved": 8184438784,
+        "percent_less_disk": 46.878744966436656,
+        "valid_pair": true,
+        "mismatched_fields": []
+      }
+    },
+    {
+      "project": "uv",
+      "scenario": "Ten active worktrees",
+      "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+      "comparison": {
+        "project": "uv",
+        "cohort": "forks",
+        "worktrees": 10,
+        "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+        "stock_retained_bytes": 85331750912,
+        "ohm_retained_bytes": 35656409088,
+        "stock_gib": 79.47138595581055,
+        "ohm_gib": 33.207618713378906,
+        "bytes_saved": 49675341824,
+        "percent_less_disk": 58.21437072729076,
+        "valid_pair": true,
+        "mismatched_fields": [],
+        "stock_idle_seconds": 37.58698745898437,
+        "ohm_idle_seconds": 35.903655750036705
+      }
+    }
+  ],
+  "cohorts": [
+    {
+      "cell": "ruff-ohm-forks",
+      "evidence": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/ruff-ohm-forks",
+      "results_sha256": "19086f2227e63665f84c77769cd1c98637d7fcd2a239b94e36e3f1c9f3a300a2",
+      "fixture_sha256": "01336ef5b8031ada7cdd206335b2e74a7b78a2e98a28c5fd0fbbfb3c0c170e88",
+      "private_inode_audit": {
+        "namespaces": [
+          "target/1",
+          "target/10",
+          "target/2",
+          "target/3",
+          "target/4",
+          "target/5",
+          "target/6",
+          "target/7",
+          "target/8",
+          "target/9",
+          "workspace/04773f23c64dc403",
+          "workspace/39bd7932976a3691",
+          "workspace/45a2b00731c9d26a",
+          "workspace/63e72248211b075d",
+          "workspace/77fa7958a5986209",
+          "workspace/bb80a386e2fc8b45",
+          "workspace/c869ee10e6bfad02",
+          "workspace/d568cc50fc849c0d",
+          "workspace/db822ad4b3069225",
+          "workspace/fefc711c9bbeb3b0"
+        ],
+        "files_inspected": 23208,
+        "cross_workspace_shared_inodes": []
+      },
+      "runtime_checks": [],
+      "allocation_samples_sha256": "f4422d42b90bc1137526d235d96585f2ce4d117592b61cd42975bccdca47d2b5",
+      "sampled_peak_bytes": 28857384960,
+      "allocation_samples": 1080,
+      "samples_with_concurrent_compilers": 0,
+      "idle_bytes": 28237750272,
+      "idle_seconds": 35.91273333301069,
+      "worktrees": 10,
+      "cargo_commands": 77,
+      "package_cache_wait_messages": 0
+    },
+    {
+      "cell": "ruff-ohm-single",
+      "evidence": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/ruff-ohm-single",
+      "results_sha256": "114612302d19e2c220d1113b335522db6f3bb3159fb28c4c102e49339a980d9e",
+      "fixture_sha256": "01336ef5b8031ada7cdd206335b2e74a7b78a2e98a28c5fd0fbbfb3c0c170e88",
+      "private_inode_audit": {
+        "namespaces": ["target/1", "workspace/cdf4c6caad67fe9f"],
+        "files_inspected": 2321,
+        "cross_workspace_shared_inodes": []
+      },
+      "runtime_checks": [],
+      "allocation_samples_sha256": "24b9e5bc4ce671ed5f38ce160c0cda14e2a09f11c07453614e2d9a0b43c942d0",
+      "sampled_peak_bytes": 4685697024,
+      "allocation_samples": 231,
+      "samples_with_concurrent_compilers": 15,
+      "idle_bytes": 3797131264,
+      "idle_seconds": 35.7280703750439,
+      "worktrees": 1,
+      "cargo_commands": 13,
+      "package_cache_wait_messages": 0
+    },
+    {
+      "cell": "ruff-stock-forks",
+      "evidence": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/ruff-stock-forks",
+      "results_sha256": "f9bf0fd17a3d77436db815570d8723e599e70c89084e1779e5a27aad9ee3d18e",
+      "fixture_sha256": "01336ef5b8031ada7cdd206335b2e74a7b78a2e98a28c5fd0fbbfb3c0c170e88",
+      "private_inode_audit": {
+        "namespaces": [
+          "target/1",
+          "target/10",
+          "target/2",
+          "target/3",
+          "target/4",
+          "target/5",
+          "target/6",
+          "target/7",
+          "target/8",
+          "target/9"
+        ],
+        "files_inspected": 104378,
+        "cross_workspace_shared_inodes": []
+      },
+      "runtime_checks": [],
+      "allocation_samples_sha256": "2a13c96c303ae8c417b536ed5c3962af78f302e7619c07c4d73bc3758178d1ac",
+      "sampled_peak_bytes": 56955723776,
+      "allocation_samples": 1694,
+      "samples_with_concurrent_compilers": 53,
+      "idle_bytes": 56955400192,
+      "idle_seconds": 36.04514541599201,
+      "worktrees": 10,
+      "cargo_commands": 77,
+      "package_cache_wait_messages": 0
+    },
+    {
+      "cell": "ruff-stock-single",
+      "evidence": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/ruff-stock-single",
+      "results_sha256": "3deac00f16e265a7fd6b0aeac0a0bbfc478c00314042b34b979681953bdd897e",
+      "fixture_sha256": "01336ef5b8031ada7cdd206335b2e74a7b78a2e98a28c5fd0fbbfb3c0c170e88",
+      "private_inode_audit": {
+        "namespaces": ["target/1"],
+        "files_inspected": 11832,
+        "cross_workspace_shared_inodes": []
+      },
+      "runtime_checks": [],
+      "allocation_samples_sha256": "896010b4269f1becde1c391cafefd405139282bc972b562119dd4a3148d4917e",
+      "sampled_peak_bytes": 6342144000,
+      "allocation_samples": 306,
+      "samples_with_concurrent_compilers": 18,
+      "idle_bytes": 6341775360,
+      "idle_seconds": 36.12075520894723,
+      "worktrees": 1,
+      "cargo_commands": 13,
+      "package_cache_wait_messages": 0
+    },
+    {
+      "cell": "uv-ohm-forks",
+      "evidence": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks",
+      "results_sha256": "4ba6f76c948884471361537fd669d135005132e1f83ba8fc94667f3baeaa447e",
+      "fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+      "private_inode_audit": {
+        "namespaces": [
+          "target/1",
+          "target/10",
+          "target/2",
+          "target/3",
+          "target/4",
+          "target/5",
+          "target/6",
+          "target/7",
+          "target/8",
+          "target/9",
+          "workspace/1a950af4adb5829e",
+          "workspace/2181b6abb2fbb9a4",
+          "workspace/479d699ae74038db",
+          "workspace/5beeca104ff993b2",
+          "workspace/6d3d1e90f65b3920",
+          "workspace/77f2580f2f715bb8",
+          "workspace/80b5b7e43cc200a9",
+          "workspace/e7cd6a4d59d36425",
+          "workspace/eb05e989f9a6f649",
+          "workspace/f3bc9c35f48543d7"
+        ],
+        "files_inspected": 184751,
+        "cross_workspace_shared_inodes": []
+      },
+      "runtime_checks": [
+        {
+          "worktree": 1,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/1/debug/uv",
+          "binary_sha256": "b77077973a576d2fe76fbb50470227a8bf242b48ea5a419c09a989f85edddadf",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/1/warmup-05.log",
+          "selection_log_sha256": "c07952f7f423580dcf6ae588375944da34d156d08a0a502eb34fd9327b60fc4d",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/e7cd6a4d59d36425/c8ea5f9da5b06cf6-all-native-all/uv/47082abb767950cd/out/pip_install-47082abb767950cd",
+          "test_binary_scope": "workspace/e7cd6a4d59d36425",
+          "test_binary_sha256": "7d1fff744bfdd4854a0808319451bd24d5c2551c8e1509e75733c29b942450e2",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-1.log",
+          "log_sha256": "23dcdca3fcab1ad8c7a357db2ddaf17dabed8ee7311f39cd7f482a48aa8399f1",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 2,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/2/debug/uv",
+          "binary_sha256": "f2ddad558aca37caf7c3c5d5bcb25ea70c75fa81654a820d8e65acbd0dcacb7b",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/2/15.log",
+          "selection_log_sha256": "56515f07fdb2de55d7f96e99872b365612f70c170863bac80d90d71d79603953",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/1a950af4adb5829e/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/1a950af4adb5829e",
+          "test_binary_sha256": "f2487307c8695b9cdaa40f4594da8cb3b67def670f2f107edd0442519d39af76",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-2.log",
+          "log_sha256": "9338c0f64c766eccd12c5e88f4eab5b75b22ba4f4d868eb09dd89e3f04e7a80d",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 3,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/3/debug/uv",
+          "binary_sha256": "a1b8ffaca81872604037157dc69b18ff27cae09b8414b4f25526c91b61f94687",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/3/15.log",
+          "selection_log_sha256": "180f1c68ed6e7c4220a3daeda7c67153e8accf052672fa8b8de4fce4c04c00c1",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/eb05e989f9a6f649/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/eb05e989f9a6f649",
+          "test_binary_sha256": "fe254ef6031130e24af7ed6d57db9cb7f33dcb254fbf4774188f9c702d38c5b6",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-3.log",
+          "log_sha256": "9338c0f64c766eccd12c5e88f4eab5b75b22ba4f4d868eb09dd89e3f04e7a80d",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 4,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/4/debug/uv",
+          "binary_sha256": "d14ae5b350ad41d3236e61d9c19bc5608a189b91185bb486e38f806ece93ea31",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/4/15.log",
+          "selection_log_sha256": "aa44e6ef0f06cc17ac83dcefd4c5dac031ac962ba41c02ec780f0b0aa5ec38be",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/f3bc9c35f48543d7/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/f3bc9c35f48543d7",
+          "test_binary_sha256": "375a8e3c86ba57e5dff629404f7076d52b641708fd42d97e7304b29cd94ab898",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-4.log",
+          "log_sha256": "e6d16976eb8fba1d03e3721f28d84b62b6b6a00c54a5d219b6651b24d28e253f",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 5,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/5/debug/uv",
+          "binary_sha256": "3284b611c76f2a1011de787b285940b5b8ce71417d8cb312c144ac3de2e2f3c3",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/5/15.log",
+          "selection_log_sha256": "e99afdc0e285b34d9ddd95f368d39056555d721f8e041773a220d767981375bd",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/80b5b7e43cc200a9/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/80b5b7e43cc200a9",
+          "test_binary_sha256": "d44e6aac35e304a18559e16d36faaf8e63ec835f2fe141304bf5d5882333ee44",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-5.log",
+          "log_sha256": "d6b355dad29df69306e455e7a190f150e9d0ad43ce89a097cc806bd650d4a065",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 6,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/6/debug/uv",
+          "binary_sha256": "0019ca4124abc355e18c633ad46590088c5e9f731ade5cea9dea07d4bb1ef38f",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/6/15.log",
+          "selection_log_sha256": "f731e5bf843d70d52545831cb6878a11fa6955776d4b134dd01cfd4e93ea1fc2",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/5beeca104ff993b2/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/5beeca104ff993b2",
+          "test_binary_sha256": "bcfe4d693f9d43f754180cf5be32d7648c77e7a0cf0762e8cce80325b84f9df0",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-6.log",
+          "log_sha256": "9a68c431782081a55f2a76b246755a351981092eee76bdaaac925cc7a3e110c9",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 7,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/7/debug/uv",
+          "binary_sha256": "3f8f4c39fe03282d168e2f1a9ee774ca271d099a8831cab35315ff415df65366",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/7/15.log",
+          "selection_log_sha256": "13f80375353796b7f02862b06c55b25dac791f9b0dbd6a2cfe062cb245e6d750",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/479d699ae74038db/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/479d699ae74038db",
+          "test_binary_sha256": "6e54b989adcc8ce5d0f1df2d740720201a1de8ef60317cfb279fb7290d574f2f",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-7.log",
+          "log_sha256": "6504ab4d42ac2dfa4ba8aa52f8c961b76b816fa44e3ffd15d541991111eafcf6",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 8,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/8/debug/uv",
+          "binary_sha256": "4d6da2c237de02981163743ac208abd5b550bb412dede486aaafe4325d7dc703",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/8/15.log",
+          "selection_log_sha256": "259a0bddcae8d2a962f6755b6ac41b49b3d6849502f30a4b083663f3f9272d14",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/77f2580f2f715bb8/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/77f2580f2f715bb8",
+          "test_binary_sha256": "361a47757be04a4db7a215b20d72c345e0f740b7e6f7d008c923f6d5ca2efe7c",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-8.log",
+          "log_sha256": "9338c0f64c766eccd12c5e88f4eab5b75b22ba4f4d868eb09dd89e3f04e7a80d",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 9,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/9/debug/uv",
+          "binary_sha256": "fb8ab29b34878e4e0baa47b6ca270061b29e6afc3ff20107097d120e78b3c2f0",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/9/15.log",
+          "selection_log_sha256": "f43e700fc154a1bf4f2f85e185f888ae02993d4353d776342163d0545d095e86",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/2181b6abb2fbb9a4/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/2181b6abb2fbb9a4",
+          "test_binary_sha256": "ba033e7a680e0aac42194296e1e4c60f5242d71c5858317304c4d2b3f5aa4ccf",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-9.log",
+          "log_sha256": "b5777fe212a12b6a3271815a63ce36a9ceb62da157d711f7b11d86f1e98b8458",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 10,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/targets/10/debug/uv",
+          "binary_sha256": "6ff850b65d2823cb1bd173e5a9b0ece7b8cf36ba9c7396ce9bdb19e79190124a",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/logs/uv/ohm/10/15.log",
+          "selection_log_sha256": "71787918305ecf9076de9d7cc62475730b55e8d7a6f9c48742ecef7ad6fb7472",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-forks/shared-build/debug/build/workspaces/6d3d1e90f65b3920/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/6d3d1e90f65b3920",
+          "test_binary_sha256": "a054c79c5c48c84931483a5deb3ecec4b6e6b42a41a25c849f38b284079fe223",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-forks/runtime-10.log",
+          "log_sha256": "de8f4b6d55dea37459e816bcae1f260b2485a63ef125a2c18bc50fa426df0189",
+          "returncode": 0,
+          "tests": 1
+        }
+      ],
+      "allocation_samples_sha256": "6a7004bb46bab3b2406e743495ad6490e254864dcb4fcfb520984ed09043b9cf",
+      "sampled_peak_bytes": 35686674432,
+      "allocation_samples": 600,
+      "samples_with_concurrent_compilers": 1,
+      "idle_bytes": 35656409088,
+      "idle_seconds": 35.903655750036705,
+      "worktrees": 10,
+      "cargo_commands": 92,
+      "package_cache_wait_messages": 0
+    },
+    {
+      "cell": "uv-ohm-single",
+      "evidence": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-single",
+      "results_sha256": "18e85a1acde229258d69892ce3cd112ec4b1fcc184ceb7eda4df9f4195ae4850",
+      "fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+      "private_inode_audit": {
+        "namespaces": ["target/1", "workspace/8c1e599055b9cdcd"],
+        "files_inspected": 19953,
+        "cross_workspace_shared_inodes": []
+      },
+      "runtime_checks": [
+        {
+          "worktree": 1,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-single/targets/1/debug/uv",
+          "binary_sha256": "5af0d41b5fbd2479251f3d71fb82dc25513317b3f1df5bdffdcfea03b4a11bf3",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-single/logs/uv/ohm/1/15.log",
+          "selection_log_sha256": "6bd912cc0add068d0230fb740f4a0eb8e0730bb7cab47c08ae3738c54f5aaeb7",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-ohm-single/shared-build/debug/build/workspaces/8c1e599055b9cdcd/c8ea5f9da5b06cf6-all-native-all/uv/b1a69fdbe5a3ae60/out/pip_install-b1a69fdbe5a3ae60",
+          "test_binary_scope": "workspace/8c1e599055b9cdcd",
+          "test_binary_sha256": "dee64fd90b61687c8a96f2bbc4e9caf0efd085e48b4f153d350b22cb278a1b2c",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-ohm-single/runtime-1.log",
+          "log_sha256": "4436103e914a5b74d21d3bf960800ac46b078e3c6efec534bc96097b019b2acf",
+          "returncode": 0,
+          "tests": 1
+        }
+      ],
+      "allocation_samples_sha256": "35a6c850f0b3c9465f52109cb1eff8cb68a7d0581cd0015a77692f3edba0b95a",
+      "sampled_peak_bytes": 8482590720,
+      "allocation_samples": 191,
+      "samples_with_concurrent_compilers": 15,
+      "idle_bytes": 8482349056,
+      "idle_seconds": 35.85552708298201,
+      "worktrees": 1,
+      "cargo_commands": 20,
+      "package_cache_wait_messages": 0
+    },
+    {
+      "cell": "uv-stock-forks",
+      "evidence": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks",
+      "results_sha256": "1f6950c6c1e7f7318aca9a268388dfb604210526d7bdba407db26729b74cb89b",
+      "fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+      "private_inode_audit": {
+        "namespaces": [
+          "target/1",
+          "target/10",
+          "target/2",
+          "target/3",
+          "target/4",
+          "target/5",
+          "target/6",
+          "target/7",
+          "target/8",
+          "target/9"
+        ],
+        "files_inspected": 416860,
+        "cross_workspace_shared_inodes": []
+      },
+      "runtime_checks": [
+        {
+          "worktree": 1,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/1/debug/uv",
+          "binary_sha256": "953fedcd9cb96f87d2e01bbb1afd02c8fc74ffbf78fb28a868e6bdeb8dceee12",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/1/warmup-05.log",
+          "selection_log_sha256": "a9731e5fd3d6531bfdeb7f16fdd689f0c02652acb24b9976ece51fb1ec73706c",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/1/debug/deps/pip_install-209b519b822cf1f3",
+          "test_binary_scope": "target/1",
+          "test_binary_sha256": "d222f5254018340790de7fc10b0cacbf1fee3a30a1373082c02469419822d465",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-1.log",
+          "log_sha256": "7b20bf04d389f24b73c045d1ec4017d889a27e0b5e2ea84bd127a98ef68203db",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 2,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/2/debug/uv",
+          "binary_sha256": "e02a4247d68d8dd7bb1826d96b72f1680e85e39b392c34f13a19e44ca1c4f139",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/2/15.log",
+          "selection_log_sha256": "80c97f9183f64392a054bc9b66462447537a259458e3c19a3506728e1acd498c",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/2/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/2",
+          "test_binary_sha256": "3b51bc4f0546fd798427157c90d948d66ff5ad44494c2d42fef89b1668b78d66",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-2.log",
+          "log_sha256": "b814ab59a9cd5069ab2f6f0e71568ceb2065315d91e3796de7f4d541d11e579a",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 3,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/3/debug/uv",
+          "binary_sha256": "bd71e0697e11d608ff485e477718f5d5c37ea91de9c9668e72db505dae180d91",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/3/15.log",
+          "selection_log_sha256": "39c172e6bd1a815e596635a632909fa5f304313c6cef971be140e44721a92961",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/3/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/3",
+          "test_binary_sha256": "fe7095e58f01d1ce7b654d2364c602f32b4bb572c08734c3d301017d5d6d8c07",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-3.log",
+          "log_sha256": "7aaf004821c4aed8985c2acd59c56fb55dcf3bad4ac0ae9eaf0e09bc3d96d6c7",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 4,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/4/debug/uv",
+          "binary_sha256": "4fd07198b8dae1691f21fa79cb18a3a04147a6b1f1952d11449756cc340f0211",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/4/15.log",
+          "selection_log_sha256": "0823e3b76fb4b9e33bc5a36735065e1e799dcf31156be01cb9cb27221ced198b",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/4/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/4",
+          "test_binary_sha256": "6b981be0d1bfa0c3b2486bd4069c62dead53a8da7e15b19bbb2192801ddbca63",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-4.log",
+          "log_sha256": "0395a96b830b4673b826632c26fc51479334c15495ea21de2c792ff84690ee53",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 5,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/5/debug/uv",
+          "binary_sha256": "b5369416cfc9900304bd18768a4ea66e6376f212ff2ebdf9016dec1614e01b19",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/5/15.log",
+          "selection_log_sha256": "a3950349405d3a5753e30de5ede779d5ee56daed232b6d8b6ae358c3677ab92a",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/5/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/5",
+          "test_binary_sha256": "41dc18b3dd4fafdc41a2ad93995cf3f454afd87bd4cd525980bc29f6d9dd12ee",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-5.log",
+          "log_sha256": "b814ab59a9cd5069ab2f6f0e71568ceb2065315d91e3796de7f4d541d11e579a",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 6,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/6/debug/uv",
+          "binary_sha256": "e80f3050cc9e05c811faa049a159dc413b5eee632ed2759c812ad33e739ba981",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/6/15.log",
+          "selection_log_sha256": "9d124b72a4564891a129cb4e6198f609dd4b6e25012cf54457dee1a6988e9a49",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/6/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/6",
+          "test_binary_sha256": "1973fee3874864135e35557b3dd75a7d48a0cb471d50bd292694bc3493d45294",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-6.log",
+          "log_sha256": "a16eaa29d98311ff8d69e9b0f314f6a3390d6b9bff00ee39d54f83a0eef46bfc",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 7,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/7/debug/uv",
+          "binary_sha256": "66dcc2a308f8a167a8b4fea6b1872b99950ac5edfcc05dfca179749a89a4d21b",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/7/15.log",
+          "selection_log_sha256": "caa668829a2b240c187e132390614db1e04955a1c82a950644c339f4d822cc74",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/7/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/7",
+          "test_binary_sha256": "47687db5767032c715ed5ae034a366d9c2332dd7a7fb8b1bd3658ad4bbf3a0de",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-7.log",
+          "log_sha256": "449e75aa325cae7d3b2e36b9f9bcd3cc4dbddfa650c01558c28f61fbd3bb526e",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 8,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/8/debug/uv",
+          "binary_sha256": "c45898d956acc5905dd30029318548ac4b9e3516438c3350b6aefc250519a382",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/8/15.log",
+          "selection_log_sha256": "08f80aa76c7cf9c3d76be8026c08b4ea18da21aa779965182f81260895c71926",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/8/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/8",
+          "test_binary_sha256": "a31c61293c2be8219eb219389d4f863e614e78579d43c97e16c185023b9d8365",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-8.log",
+          "log_sha256": "91209f7d68ae33ad3544f891ee87fb76792a4ee522382d64b6801b4c25881edc",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 9,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/9/debug/uv",
+          "binary_sha256": "4d23845c1bad868974ead080d8a86a45c583b9135b89d0d226c5e383dad7984f",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/9/15.log",
+          "selection_log_sha256": "bca42251e0ff683d1d9c2cb8e788972dc9f937fc6d261361d7bfafd4a66191c5",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/9/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/9",
+          "test_binary_sha256": "165cc62c08382c481cbbb7cbfb6c8e8ffd825b5ef05d1d746bb7e6c76b6ccc2a",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-9.log",
+          "log_sha256": "c8ff94ae8849abc53361cd0214def79739711f44a75c78e91fb07895c17867de",
+          "returncode": 0,
+          "tests": 1
+        },
+        {
+          "worktree": 10,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/10/debug/uv",
+          "binary_sha256": "66b2479b86201ec010493f8cf9c4f64326088bf69c3612bbd078ad29bf9c6ef5",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/logs/uv/stock/10/15.log",
+          "selection_log_sha256": "ceba1ba4f1d0873d391dad6a3be70fe4db762a06ef2432e5fde092173a2ae7df",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-forks/targets/10/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/10",
+          "test_binary_sha256": "4df2c2c7c3027a80bdb9075016276a6907440d995e7446f34f6fcfcdac10d894",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-forks/runtime-10.log",
+          "log_sha256": "f6b7d48664f9638d183b4244c89e05de5031e306eabf20b3cae977a23ec08fff",
+          "returncode": 0,
+          "tests": 1
+        }
+      ],
+      "allocation_samples_sha256": "d9ec06258df357ed84854dd6cfac22cafff3af3de0c5dea3ca520f00b17b2529",
+      "sampled_peak_bytes": 85333561344,
+      "allocation_samples": 1447,
+      "samples_with_concurrent_compilers": 37,
+      "idle_bytes": 85331750912,
+      "idle_seconds": 37.58698745898437,
+      "worktrees": 10,
+      "cargo_commands": 92,
+      "package_cache_wait_messages": 0
+    },
+    {
+      "cell": "uv-stock-single",
+      "evidence": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-single",
+      "results_sha256": "2a785d5cfcd97c095d92ae341e42df0a4fbf5d9c45e57f3a079574dc87ac54e1",
+      "fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+      "private_inode_audit": {
+        "namespaces": ["target/1"],
+        "files_inspected": 59241,
+        "cross_workspace_shared_inodes": []
+      },
+      "runtime_checks": [
+        {
+          "worktree": 1,
+          "binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-single/targets/1/debug/uv",
+          "binary_sha256": "22717dfcd8d9b8753e3e6499e9427f30df35b61d551cf632e39b0048ce74752c",
+          "selection_log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-single/logs/uv/stock/1/15.log",
+          "selection_log_sha256": "01ae3e611a6800edf625f2c8d3262d86de7a85c09a959b80e0d0fe6cfa166925",
+          "test_binary": "/private/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-2/apfs/uv-stock-single/targets/1/debug/deps/pip_install-e20be71a169a438b",
+          "test_binary_scope": "target/1",
+          "test_binary_sha256": "e2627e5d3c98fef0440c38572392ae4b344c3d8cdde65102e246e518b2eef422",
+          "log": "/private/tmp/ohm-benchmarks-1.99.0-2/apfs/disk/evidence/uv-stock-single/runtime-1.log",
+          "log_sha256": "353a136ba9f560b3e4b1ea3070a680821299a3f573e38588cbcd2a02767cee07",
+          "returncode": 0,
+          "tests": 1
+        }
+      ],
+      "allocation_samples_sha256": "8897285e61aac5e05c4a922e41f0937e5ee28250e80b4a26fe5061ed09bf45f8",
+      "sampled_peak_bytes": 13040488448,
+      "allocation_samples": 226,
+      "samples_with_concurrent_compilers": 13,
+      "idle_bytes": 13040242688,
+      "idle_seconds": 35.72034766699653,
+      "worktrees": 1,
+      "cargo_commands": 20,
+      "package_cache_wait_messages": 0
+    }
+  ],
+  "validation": {
+    "status": "pass",
+    "cargo_commands": 404,
+    "worktrees": 44,
+    "post_endpoint_runtime_checks": 22,
+    "paired_sources_explicit_settings_commands_and_test_counts_match": true,
+    "timing_comparisons": false,
+    "concurrent_compiler_activity_invalidates_allocation": false,
+    "samples_with_concurrent_compilers": 152
+  },
+  "excluded_preparation_attempts": [],
+  "provenance": {
+    "exporter_sha256": "2b451374c82b84cc5e81d80f0412e3aa0a5d632630b71ebe37fa9e44d8f9b97b",
+    "cohort_audits": {
+      "ruff-ohm-forks": "3b7e7e4f651a013a1eac2375d67f2364a26eb2eab6847c6c8f39dd4f2cb36432",
+      "ruff-ohm-single": "2dacfe12be057adf042d7f91aecd1a22acbbe803b3320e8a9ed6108659f5c699",
+      "ruff-stock-forks": "477cff13b3b08ce634ac9979a12c186215ecfe3ebf66f9a8f689c295793f87e5",
+      "ruff-stock-single": "dfed0c4f892ed5f2d71323a69fae4835e5d95c39f6d38ec4972ea0385516c913",
+      "uv-ohm-forks": "719e4fa3a7612fe5b69d64a44d7743d6e40fcf839489948ec9a06c30b7d1be5d",
+      "uv-ohm-single": "9b51acac976e1aaeabae71bebf91974bf0f946200aeb4846e052b2b7a60814d4",
+      "uv-stock-forks": "b8408176da38f41f8394b944c9b265d5ccf780a2bc62c6f03f54b33ee462c96f",
+      "uv-stock-single": "a106f989796063c14db62937334bc263cc57bb8f2f5c09bc598330144376b7da"
+    },
+    "fixture_compatibility": {
+      "formatting_compatibility": [
+        {
+          "fixture": "disk-1.99.0-1-ruff.json",
+          "fixture_sha256": "01336ef5b8031ada7cdd206335b2e74a7b78a2e98a28c5fd0fbbfb3c0c170e88",
+          "replay_edit_sha256": [
+            "b1868f3d90e07755734e1ce402f4daf8baef4eb6973b3d2fdd89bae1ca899115",
+            "470958e2db97ffac29eaccb007751cb7b571fa4fab6969edf1833c318268ca72",
+            "102cbf43936e3eb448548587ec9fbea534eb7b171b974b542b077047fe1af031"
+          ],
+          "replay_edits_commands_and_tests_unchanged": true,
+          "both_formatters_pass_prepared_endpoint": true
+        },
+        {
+          "fixture": "ruff-historical-rust-1.99.json",
+          "fixture_sha256": "ae6489113bbcb5d87fd62501503c5b7cb7fc008ef1746d7f5ac188d1003908b4",
+          "replay_edit_sha256": [
+            "97c8da1b636759067384373757844e984ce5e61db6fc96641745c480a30d6182",
+            "e23a9caddd61fe72096a2240cedfd0c0ef00b34834824858f2c69de562722121",
+            "0b61e7ed0f3790d35664d9504364cbe8bb7eb90fe28af3670bd73fa82c5aa3a4"
+          ],
+          "replay_edits_commands_and_tests_unchanged": true,
+          "both_formatters_pass_prepared_endpoint": true
+        },
+        {
+          "fixture": "disk-1.99.0-1-uv.json",
+          "fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+          "replay_edit_sha256": [
+            "40469671c8741f11edd667e128bcb0cbfe8eaf7463e352728d9af576eb5ad6e3",
+            "e89ec89bd37037b11ef51125278c5cb780455cf1f629a53d21404fab4270ae60",
+            "8f93251521da7bc006c0857ee9e191b6e5d730f96dcd76208dc18ae8c4f670a8"
+          ],
+          "replay_edits_commands_and_tests_unchanged": true,
+          "both_formatters_pass_prepared_endpoint": true
+        }
+      ],
+      "baseline_checks": {
+        "ruff": {
+          "base": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+          "tree": "dca8699f95b45b4a22321ef3b9ac12c76279488b",
+          "patch_sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+          "paths": ["crates/ty_python_core/src/ast_node_ref.rs"],
+          "stock_and_ohm_format_checks": "passed"
+        },
+        "ruff-historical": {
+          "base": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+          "tree": "ef7fb834ac3bb1284217f54e3c79750266535458",
+          "patch_sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+          "paths": ["crates/ty_python_core/src/ast_node_ref.rs"],
+          "stock_and_ohm_format_checks": "passed"
+        },
+        "uv": {
+          "base": "65ed3776f0beb32d92cd9827a7b37414f6bce409",
+          "tree": "e1e5b31e39f75f3894aa4d45f9b3daffb5a22e84",
+          "patch_sha256": "def4e6311a8eed2a60cf13f7ccd99111754d80891ac713ce5651ccbdd1952b04",
+          "paths": [
+            "crates/uv-cache-info/src/cache_info.rs",
+            "crates/uv-cache-info/src/timestamp.rs",
+            "crates/uv-cache/src/removal.rs",
+            "crates/uv-dirs/src/lib.rs",
+            "crates/uv-fs/src/lib.rs",
+            "crates/uv-pep508/src/verbatim_url.rs",
+            "crates/uv-platform/src/host.rs",
+            "crates/uv-python/src/managed.rs",
+            "crates/uv-tool/src/tool.rs",
+            "crates/uv/src/bin/uvw.rs",
+            "crates/uv/src/bin/uvx.rs",
+            "crates/uv/src/commands/project/run.rs",
+            "crates/uv/tests/python/venv.rs",
+            "crates/uv/tests/sync/centralized_project_envs.rs",
+            "crates/uv/tests/tool/tool_install.rs"
+          ],
+          "stock_and_ohm_format_checks": "passed"
+        }
+      }
+    }
+  },
+  "uv_runtime_setup": {
+    "original_fixture_sha256": "ca3e1f49ca537881e996fbe3c32069e744cc8ccce6d028dd70cc2c104d026933",
+    "prepared_fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+    "setup_patch_sha256": "372ac74870cef2d9dd6080f4c2c5ce73c348edeaba34467dcd0690f335bc4343",
+    "first_parser_edit_byte_identical": true,
+    "first_parser_edit_sha256": "30514543992b630949fc6edac36d24fe5269a4da79cb7a620849a170c75c67e0",
+    "remaining_parser_patches_unchanged": true,
+    "source_fix": "https://github.com/astral-sh/uv/pull/21432",
+    "source_fix_head": "8df39e44dcbed2e02cc8ccfc1fec963606771138",
+    "published_fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+    "setup_patch": "scripts/session_replays/patches/uv-runtime-bin-path.patch",
+    "derived_base": {
+      "applied_diff_sha256": "d377c1cde8b86a405d07272f405fd48667f33ba05d9d92457ed3cead09678348",
+      "changed_paths": ["crates/uv-test/src/lib.rs"],
+      "commit_object_sha256": "c7c3eec0fcddf9c2cd6a9cbe1bf93b6151185f11f589f1b90b28d611a84d0247",
+      "derived_parent": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+      "derived_revision": "65ed3776f0beb32d92cd9827a7b37414f6bce409",
+      "helper_sha256": "3ffcf7eb51798d2ab543f178128fe06c38981366dc9bceb08d88bcf03ba8e580",
+      "original_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+      "tree": "03edd34e93921dff539f9d48125a93cf2bdd6e47",
+      "commit_object": "tree 03edd34e93921dff539f9d48125a93cf2bdd6e47\nparent a50af60fb4162d7f94812d64c481c30a0200b6d8\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1788393600 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1788393600 +0000\n\nPrepare uv-runtime-base with runtime test binary lookup\n\nOriginal source: a50af60fb4162d7f94812d64c481c30a0200b6d8\nSetup patch: 372ac74870cef2d9dd6080f4c2c5ce73c348edeaba34467dcd0690f335bc4343\n"
+    },
+    "derived_first_edit": {
+      "applied_diff_sha256": "d377c1cde8b86a405d07272f405fd48667f33ba05d9d92457ed3cead09678348",
+      "changed_paths": ["crates/uv-test/src/lib.rs"],
+      "commit_object_sha256": "c455495f6f9c15180ad15828fe4938f93d366717159b425a474cc11851cbf2af",
+      "derived_parent": "65ed3776f0beb32d92cd9827a7b37414f6bce409",
+      "derived_revision": "1f25765e571372c114036360763daa390211eec9",
+      "helper_sha256": "3ffcf7eb51798d2ab543f178128fe06c38981366dc9bceb08d88bcf03ba8e580",
+      "original_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+      "tree": "599e025106fbe2bb5fa0765365eda00e2c1d7756",
+      "commit_object": "tree 599e025106fbe2bb5fa0765365eda00e2c1d7756\nparent 65ed3776f0beb32d92cd9827a7b37414f6bce409\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1788393600 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1788393600 +0000\n\nPrepare uv-runtime-first-edit with runtime test binary lookup\n\nOriginal source: 63251e5ce54f03363a10c088d7f9f6d6ba268302\nSetup patch: 372ac74870cef2d9dd6080f4c2c5ce73c348edeaba34467dcd0690f335bc4343\n"
+    },
+    "applied_to": "Both stock Rust and Ohm, before the first build in every uv cohort.",
+    "original_fixture": "scripts/session_replays/uv-rust-1.99.json",
+    "published_fixture": "scripts/session_replays/disk-1.99.0-1-uv.json",
+    "preparation_script_sha256": "7d5386dd944eb6cc0fbe3b4977cd1e9d02996105ef4f1582dedc57ae07337aa5"
+  },
+  "native_accounting": {
+    "authoritative": "APFS ATTR_VOL_SPACEUSED, crosschecked against diskutil volume allocation",
+    "historical_measurements_modified": false
+  },
+  "workloads": {
+    "ruff": {
+      "path": "/private/tmp/ohm-benchmarks-1.99.0-2/ohm/scripts/session_replays/disk-1.99.0-1-ruff.json",
+      "sha256": "01336ef5b8031ada7cdd206335b2e74a7b78a2e98a28c5fd0fbbfb3c0c170e88"
+    },
+    "uv": {
+      "path": "/private/tmp/ohm-benchmarks-1.99.0-2/ohm/scripts/session_replays/disk-1.99.0-1-uv.json",
+      "sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316"
+    }
+  },
+  "formatting_setup": {
+    "path": "scripts/session_replays/disk-1.99.0-1-setup.json",
+    "sha256": "4ac50c66542a57c689d5fa078ba81d4a5fdc1f8d1e6bcf6a42ac474644984c20",
+    "preparation": {
+      "reason": "Rustfmt enables upstream cfg_select formatting on the development channel. Both benchmark lanes start from the same formatting accepted by stock Rust 1.99 and Ohm 1.99.0-1.",
+      "projects": {
+        "ruff": {
+          "input_fixture": "ruff-rust-1.99.json",
+          "input_fixture_sha256": "1aca6e92472615487452d8fb78d2d2f2308614990525a5efd2de477ca903f859",
+          "prepared_fixture": "disk-1.99.0-1-ruff.json",
+          "prepared_fixture_sha256": "01336ef5b8031ada7cdd206335b2e74a7b78a2e98a28c5fd0fbbfb3c0c170e88",
+          "formatting_patch": {
+            "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+            "patch": "patches/rust-1.99-ruff-cfg-select.patch",
+            "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+            "paths": ["crates/ty_python_core/src/ast_node_ref.rs"]
+          },
+          "derived": {
+            "base": {
+              "original_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+              "tree": "dca8699f95b45b4a22321ef3b9ac12c76279488b",
+              "derived_revision": "2ad13360a9826f08a75bd80f2ca7e3e7ca075256",
+              "commit_object": "tree dca8699f95b45b4a22321ef3b9ac12c76279488b\nparent 21c9b077ab3b10dd9007710ffa471cd12f7eceab\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\n\nPrepare Rust 1.99 benchmark formatting\n",
+              "commit_object_sha256": "65f3a7f8c82e3e0325b59ef81685db049acfeccb1b3b992028ed8dcea4313c7b"
+            },
+            "first_edit": {
+              "original_revision": "c0a91dd16d5b32a254cbf6bcd268f6dbaf0fef0f",
+              "tree": "f3724a7d4a42852da4fe2b1c0f61816d69789dae",
+              "derived_revision": "94267450583f1c15e61140f1723d2064761ec5c8",
+              "commit_object": "tree f3724a7d4a42852da4fe2b1c0f61816d69789dae\nparent c0a91dd16d5b32a254cbf6bcd268f6dbaf0fef0f\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\n\nPrepare Rust 1.99 benchmark formatting\n",
+              "commit_object_sha256": "8eafc85bc7e5f5dd5c908ccbdb09a27b63517d070bb8f56fc0ef9b989b25b5ae"
+            }
+          }
+        },
+        "uv": {
+          "input_fixture": "disk-1.99.0-1-uv.json",
+          "input_fixture_sha256": "4f7b94d3c1c53d0e348dfcd91cb10987b59566a49dde64b1078c65820ae165c2",
+          "prepared_fixture": "disk-1.99.0-1-uv.json",
+          "prepared_fixture_sha256": "8044fdd7415b90c5bc214540fa308b43e82d50ba63697ddf1690621cb86ea316",
+          "formatting_patch": {
+            "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+            "patch": "patches/rust-1.99-uv-cfg-select.patch",
+            "sha256": "def4e6311a8eed2a60cf13f7ccd99111754d80891ac713ce5651ccbdd1952b04",
+            "paths": [
+              "crates/uv-cache-info/src/cache_info.rs",
+              "crates/uv-cache-info/src/timestamp.rs",
+              "crates/uv-cache/src/removal.rs",
+              "crates/uv-dirs/src/lib.rs",
+              "crates/uv-fs/src/lib.rs",
+              "crates/uv-pep508/src/verbatim_url.rs",
+              "crates/uv-platform/src/host.rs",
+              "crates/uv-python/src/managed.rs",
+              "crates/uv-tool/src/tool.rs",
+              "crates/uv/src/bin/uvw.rs",
+              "crates/uv/src/bin/uvx.rs",
+              "crates/uv/src/commands/project/run.rs",
+              "crates/uv/tests/python/venv.rs",
+              "crates/uv/tests/sync/centralized_project_envs.rs",
+              "crates/uv/tests/tool/tool_install.rs"
+            ]
+          },
+          "derived": {
+            "base": {
+              "original_revision": "65ed3776f0beb32d92cd9827a7b37414f6bce409",
+              "tree": "e1e5b31e39f75f3894aa4d45f9b3daffb5a22e84",
+              "derived_revision": "e209ff09704b64d3ccd178ac658708c4b2f12e7c",
+              "commit_object": "tree e1e5b31e39f75f3894aa4d45f9b3daffb5a22e84\nparent 65ed3776f0beb32d92cd9827a7b37414f6bce409\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\n\nPrepare Rust 1.99 benchmark formatting\n",
+              "commit_object_sha256": "bb22ba17ffd323d474009989a5629c6d4af7418d062c8aa6c6332ed239d59c40"
+            },
+            "first_edit": {
+              "original_revision": "1f25765e571372c114036360763daa390211eec9",
+              "tree": "f461468300d876030083dc09d00edf34d91d9a36",
+              "derived_revision": "2130555e2efaa3c93d8b9fb37147371d95f6a608",
+              "commit_object": "tree f461468300d876030083dc09d00edf34d91d9a36\nparent 1f25765e571372c114036360763daa390211eec9\nauthor Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\ncommitter Charlie Marsh <charlie.r.marsh@gmail.com> 1790899200 +0000\n\nPrepare Rust 1.99 benchmark formatting\n",
+              "commit_object_sha256": "47d10a39774dee593fb8f406b2b399ab84b317abed82fa4fa6bc5c59cfb24904"
+            }
+          }
+        }
+      },
+      "input_coordinator_revision": "fa1f9cfc38402ff468301174c332f898a3a1b5d7"
+    }
+  },
+  "evidence": {
+    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-evidence-1.99.0-2-960d91cc1ed4/benchmark-evidence-1.99.0-2.zip",
+    "sha256": "960d91cc1ed4949f0acd85942bb819f091ef962d672abbe72405cf5e57812673",
+    "path": "disk.json",
+    "report_sha256": "aff917435618b45d19153e284457c91a88c951e8f1d40a2d13d95fb86e105806"
+  }
+}
