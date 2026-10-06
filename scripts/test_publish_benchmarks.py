@@ -76,6 +76,34 @@ class PublicationTests(unittest.TestCase):
             report["provenance"]["system_cpu"]["coverage"],
         )
 
+    def test_compaction_preserves_recovery_segment_summaries(self):
+        report = self.reports["historical"]
+        summaries = [
+            {
+                "samples": 10,
+                "trace_sha256": "trace-hash",
+                "preflight_sha256": "preflight-hash",
+                "interval_start": start,
+                "interval_end": start + 20,
+                "accepted_cell_ids": [["ruff", "stock", repetition]],
+                "proof": {"passed": passed, "trace": "raw/monitor.jsonl"},
+                "scope": "retained" if repetition == 0 else "resumed",
+                "preflight": {"passed": True, "sample_count": 6},
+            }
+            for repetition, start, passed in [(0, 100, False), (1, 200, True)]
+        ]
+        segments = copy.deepcopy(summaries)
+        for segment in segments:
+            segment["trace_jsonl"] = '{"violations": []}\n'
+            segment["preflight"] = {"passed": True, "samples": [{}] * 6}
+        report["provenance"]["system_cpu"]["segments"] = segments
+        original = copy.deepcopy(report)
+
+        compact = publish.compact(report, {"url": "archive"})
+
+        self.assertEqual(compact["provenance"]["system_cpu"]["segments"], summaries)
+        self.assertEqual(report, original)
+
     def test_archive_round_trip_and_determinism(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

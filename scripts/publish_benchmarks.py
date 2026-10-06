@@ -40,6 +40,11 @@ def compact(report, evidence):
     cpu.pop("commands", None)
     cpu.pop("trace_jsonl", None)
     cpu.pop("preflight_attempts", None)
+    for segment in cpu.get("segments", []):
+        segment.pop("trace_jsonl", None)
+        preflight = segment.get("preflight", {})
+        if "samples" in preflight:
+            preflight["sample_count"] = len(preflight.pop("samples"))
     for attempt in cpu.get("excluded_attempts", []):
         attempt.pop("trace_jsonl", None)
     result["evidence"] = evidence
