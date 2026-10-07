@@ -339,25 +339,15 @@ See:
 - [Ohm #60](https://github.com/astral-sh/ohm/pull/60)
 - [Rust #67](https://github.com/astral-sh/ohm-rust/pull/67)
 
-Ohm also changes the memory allocator used by two of its tools:
-
-- On Linux, the Rust compiler (`rustc`) uses mimalloc.
-- On Apple Silicon macOS, Cargo uses mimalloc.
-
-This changes how those tools allocate and free memory while they run.
+On Linux, Ohm's Rust compiler (`rustc`) uses mimalloc to allocate and free memory while it runs.
 
 In an earlier Linux benchmark, switching to mimalloc reduced a Ruff check by 5.3%, a uv rebuild by
 9.8%, and a uv edit-and-test command by 7.8%. Some compiler workloads used 21–25% more memory at
 their peak.
 
-In a macOS comparison, running a check on unchanged Ruff sources took 216 milliseconds before the
-allocator change and 199 milliseconds after it. Running a build on unchanged uv sources took 296 and
-267 milliseconds, respectively.
-
 See:
 
 - [Rust #109](https://github.com/astral-sh/ohm-rust/pull/109)
-- [Cargo #106](https://github.com/astral-sh/ohm-cargo/pull/106)
 
 ### 17. Reduce repeated compiler work
 
