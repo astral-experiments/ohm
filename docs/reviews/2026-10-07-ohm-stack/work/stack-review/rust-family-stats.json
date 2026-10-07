@@ -1,0 +1,1751 @@
+[
+  {
+    "family": "CI/docs",
+    "start": "14043a7b0a1",
+    "end": "dd589c0ea32",
+    "stats": {
+      "CI/docs": [
+        94,
+        361,
+        2
+      ],
+      "production": [
+        22,
+        88,
+        2
+      ],
+      "tests": [
+        44,
+        0,
+        2
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "README.md",
+      "library/core/src/num/f32.rs",
+      "library/core/src/num/f64.rs",
+      "tests/explain.rs",
+      "tests/ui/traits/object/rerun-impossible-predicates-post-analysis.rs"
+    ]
+  },
+  {
+    "family": "Public API hashing #43",
+    "start": "d9aa2a6187b",
+    "end": "d9aa2a6187b",
+    "stats": {
+      "production": [
+        3555,
+        748,
+        52
+      ],
+      "tests": [
+        650,
+        0,
+        32
+      ]
+    },
+    "files": [
+      "Cargo.lock",
+      "compiler/rustc_attr_ir/src/data_structures.rs",
+      "compiler/rustc_attr_ir/src/encode_cross_crate.rs",
+      "compiler/rustc_attr_parsing/src/attributes/rustc_internal.rs",
+      "compiler/rustc_attr_parsing/src/context.rs",
+      "compiler/rustc_attr_parsing/src/diagnostics.rs",
+      "compiler/rustc_codegen_gcc/src/callee.rs",
+      "compiler/rustc_codegen_llvm/src/callee.rs",
+      "compiler/rustc_codegen_ssa/src/back/symbol_export.rs",
+      "compiler/rustc_errors/src/emitter.rs",
+      "compiler/rustc_errors/src/json.rs",
+      "compiler/rustc_errors/src/lib.rs",
+      "compiler/rustc_feature/src/builtin_attrs.rs",
+      "compiler/rustc_hir_analysis/src/hir_ty_lowering/mod.rs",
+      "compiler/rustc_incremental/src/persist/mod.rs",
+      "compiler/rustc_incremental/src/persist/rdr_hashes.rs",
+      "compiler/rustc_incremental/src/persist/save.rs",
+      "compiler/rustc_macros/src/serialize.rs",
+      "compiler/rustc_metadata/Cargo.toml",
+      "compiler/rustc_metadata/src/creader.rs",
+      "compiler/rustc_metadata/src/fs.rs",
+      "compiler/rustc_metadata/src/locator.rs",
+      "compiler/rustc_metadata/src/rmeta/decoder.rs",
+      "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs",
+      "compiler/rustc_metadata/src/rmeta/def_path_hash_map.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder/public_api_hasher.rs",
+      "compiler/rustc_metadata/src/rmeta/mod.rs",
+      "compiler/rustc_metadata/src/rmeta/parameterized.rs",
+      "compiler/rustc_metadata/src/rmeta/table.rs",
+      "compiler/rustc_middle/src/hir/map.rs",
+      "compiler/rustc_middle/src/ich.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/query/erase.rs",
+      "compiler/rustc_middle/src/query/keys.rs",
+      "compiler/rustc_middle/src/query/on_disk_cache.rs",
+      "compiler/rustc_middle/src/ty/codec.rs",
+      "compiler/rustc_middle/src/ty/instance.rs",
+      "compiler/rustc_middle/src/ty/mod.rs",
+      "compiler/rustc_middle/src/ty/structural_impls.rs",
+      "compiler/rustc_monomorphize/src/partitioning.rs",
+      "compiler/rustc_passes/src/check_attr.rs",
+      "compiler/rustc_passes/src/check_export.rs",
+      "compiler/rustc_resolve/src/lib.rs",
+      "compiler/rustc_session/src/options.rs",
+      "compiler/rustc_session/src/options/mitigation_coverage.rs",
+      "compiler/rustc_span/src/def_id.rs",
+      "compiler/rustc_span/src/hygiene.rs",
+      "compiler/rustc_span/src/lib.rs",
+      "compiler/rustc_span/src/symbol.rs",
+      "compiler/rustc_target/src/spec/mod.rs",
+      "compiler/rustc_target/src/spec/stable_hash.rs",
+      "tests/incremental/rdr/inline_exposes_private_callee/auxiliary/dep.rs",
+      "tests/incremental/rdr/inline_exposes_private_callee/main.rs",
+      "tests/incremental/rdr/private_module_file/auxiliary/dep.rs",
+      "tests/incremental/rdr/private_module_file/auxiliary/private.rs",
+      "tests/incremental/rdr/private_module_file/main.rs",
+      "tests/incremental/rdr/public_api_hash_attributes/auxiliary/dep.rs",
+      "tests/incremental/rdr/public_api_hash_attributes/main.rs",
+      "tests/incremental/rdr/reexported_transitive_dependencies/auxiliary/dep.rs",
+      "tests/incremental/rdr/reexported_transitive_dependencies/auxiliary/transitive_dep.rs",
+      "tests/incremental/rdr/reexported_transitive_dependencies/main.rs",
+      "tests/incremental/rdr/trait_impl_foreign_trait_reachable_type/auxiliary/dep.rs",
+      "tests/incremental/rdr/trait_impl_foreign_trait_reachable_type/main.rs",
+      "tests/incremental/rdr/trait_impl_foreign_trait_unreachable_type/auxiliary/dep.rs",
+      "tests/incremental/rdr/trait_impl_foreign_trait_unreachable_type/main.rs",
+      "tests/incremental/rdr/trait_impl_reachable_local_trait/auxiliary/dep.rs",
+      "tests/incremental/rdr/trait_impl_reachable_local_trait/main.rs",
+      "tests/incremental/rdr/trait_impl_unreachable_local_trait/auxiliary/dep.rs",
+      "tests/incremental/rdr/trait_impl_unreachable_local_trait/main.rs",
+      "tests/run-make/public-api-hash-artifact/lib.rs",
+      "tests/run-make/public-api-hash-artifact/private.rs",
+      "tests/run-make/public-api-hash-artifact/rmake.rs",
+      "tests/run-make/rdr-public-hash-body-changes/dep.rs",
+      "tests/run-make/rdr-public-hash-body-changes/rmake.rs",
+      "tests/run-make/rdr-public-hash-extra-filename/dep.rs",
+      "tests/run-make/rdr-public-hash-extra-filename/rmake.rs",
+      "tests/run-make/rdr-public-hash-private-end-of-file-change/dep.rs",
+      "tests/run-make/rdr-public-hash-private-end-of-file-change/rmake.rs",
+      "tests/run-make/rdr-public-hash-private-end-of-file-change/sub.rs",
+      "tests/run-make/rdr-public-hash-track-caller-location/dep.rs",
+      "tests/run-make/rdr-public-hash-track-caller-location/rmake.rs",
+      "tests/ui/rmeta/emit-artifact-notifications-public-api-hash.rs",
+      "tests/ui/rmeta/emit-artifact-notifications-public-api-hash.stderr"
+    ]
+  },
+  {
+    "family": "Upstream direct promotion #44",
+    "start": "7ed482387ae",
+    "end": "7ed482387ae",
+    "stats": {},
+    "files": []
+  },
+  {
+    "family": "rlink output #45",
+    "start": "0e0b7a23888",
+    "end": "0e0b7a23888",
+    "stats": {
+      "production": [
+        6,
+        2,
+        2
+      ],
+      "tests": [
+        13,
+        0,
+        2
+      ]
+    },
+    "files": [
+      "compiler/rustc_interface/src/queries.rs",
+      "compiler/rustc_interface/src/tests.rs",
+      "compiler/rustc_session/src/options.rs",
+      "tests/run-make/separate-link/rmake.rs"
+    ]
+  },
+  {
+    "family": "Skip CGU search #46",
+    "start": "8bf2b4c45c0",
+    "end": "8bf2b4c45c0",
+    "stats": {
+      "production": [
+        10,
+        1,
+        2
+      ],
+      "tests": [
+        27,
+        0,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_session/src/filesearch.rs",
+      "compiler/rustc_session/src/search_paths.rs",
+      "compiler/rustc_session/src/search_paths/tests.rs"
+    ]
+  },
+  {
+    "family": "Retain link objects #47",
+    "start": "9a9723e2ef0",
+    "end": "9a9723e2ef0",
+    "stats": {
+      "production": [
+        11,
+        4,
+        1
+      ],
+      "tests": [
+        16,
+        4,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_codegen_ssa/src/back/link.rs",
+      "tests/run-make/separate-link/rmake.rs"
+    ]
+  },
+  {
+    "family": "Crate public-hash index #48",
+    "start": "65e2324da2b",
+    "end": "65e2324da2b",
+    "stats": {
+      "production": [
+        12,
+        9,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_metadata/src/creader.rs"
+    ]
+  },
+  {
+    "family": "Upstream simplifications #49/#50/#51",
+    "start": "65af1776f56",
+    "end": "1cfd6e9f3b5",
+    "stats": {},
+    "files": []
+  },
+  {
+    "family": "Prune public-hash graph #52",
+    "start": "09214ff64dc",
+    "end": "09214ff64dc",
+    "stats": {
+      "production": [
+        18,
+        5,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_metadata/src/rmeta/encoder/public_api_hasher.rs"
+    ]
+  },
+  {
+    "family": "Generic sharing #53",
+    "start": "2d881831516",
+    "end": "2d881831516",
+    "stats": {
+      "production": [
+        27,
+        19,
+        7
+      ],
+      "tests": [
+        122,
+        0,
+        5
+      ]
+    },
+    "files": [
+      "compiler/rustc_codegen_gcc/src/callee.rs",
+      "compiler/rustc_codegen_llvm/src/callee.rs",
+      "compiler/rustc_codegen_ssa/src/back/symbol_export.rs",
+      "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder/public_api_hasher.rs",
+      "compiler/rustc_middle/src/ty/instance.rs",
+      "tests/run-make/rdr-public-hash-shared-generics/a.rs",
+      "tests/run-make/rdr-public-hash-shared-generics/b.rs",
+      "tests/run-make/rdr-public-hash-shared-generics/main.rs",
+      "tests/run-make/rdr-public-hash-shared-generics/rmake.rs",
+      "tests/run-make/rdr-public-hash-shared-generics/shared.rs"
+    ]
+  },
+  {
+    "family": "Monomorphization reuse #54/#56",
+    "start": "a107c046ea6",
+    "end": "9db7ad5ca10",
+    "stats": {
+      "CI/docs": [
+        47,
+        19,
+        2
+      ],
+      "production": [
+        419,
+        37,
+        14
+      ],
+      "tests": [
+        519,
+        2,
+        23
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_interface/src/passes.rs",
+      "compiler/rustc_metadata/src/creader.rs",
+      "compiler/rustc_middle/src/arena.rs",
+      "compiler/rustc_middle/src/dep_graph/graph.rs",
+      "compiler/rustc_middle/src/mono.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/query/erase.rs",
+      "compiler/rustc_middle/src/query/on_disk_cache.rs",
+      "compiler/rustc_monomorphize/src/collector.rs",
+      "compiler/rustc_monomorphize/src/lib.rs",
+      "compiler/rustc_monomorphize/src/partitioning.rs",
+      "compiler/rustc_query_impl/src/lib.rs",
+      "compiler/rustc_query_impl/src/query_vtables.rs",
+      "compiler/rustc_session/src/config.rs",
+      "src/doc/rustc/src/json.md",
+      "tests/incremental/mono_item_partition_body_change.rs",
+      "tests/incremental/mono_item_partition_library_body_change.rs",
+      "tests/incremental/mono_item_partition_library_distinct_edges.rs",
+      "tests/incremental/mono_item_partition_unreachable_const.rs",
+      "tests/incremental/mono_item_partition_unreachable_const_cached.rs",
+      "tests/run-make/rdr-public-hash-mono-library-runtime/closure_error.rs",
+      "tests/run-make/rdr-public-hash-mono-library-runtime/dependent.rs",
+      "tests/run-make/rdr-public-hash-mono-library-runtime/library.rs",
+      "tests/run-make/rdr-public-hash-mono-library-runtime/main.rs",
+      "tests/run-make/rdr-public-hash-mono-library-runtime/rmake.rs",
+      "tests/run-make/rdr-public-hash-shared-generics/main.rs",
+      "tests/run-make/rdr-public-hash-shared-generics/rmake.rs",
+      "tests/run-make/reset-codegen-1/partition.rs",
+      "tests/run-make/reset-codegen-1/rmake.rs",
+      "tests/run-make/unused-externs-transparent/bridge.rs",
+      "tests/run-make/unused-externs-transparent/dep.rs",
+      "tests/run-make/unused-externs-transparent/main.rs",
+      "tests/run-make/unused-externs-transparent/rmake.rs",
+      "tests/ui/unused-crate-deps/allow-cmdline-json-transparent-used.rs",
+      "tests/ui/unused-crate-deps/allow-cmdline-json-transparent-used.stderr",
+      "tests/ui/unused-crate-deps/allow-cmdline-json-transparent.rs",
+      "tests/ui/unused-crate-deps/allow-cmdline-json-transparent.stderr",
+      "tests/ui/unused-crate-deps/allow-cmdline-json.rs"
+    ]
+  },
+  {
+    "family": "Metadata prefix reuse #57",
+    "start": "3b9c3b3a2de",
+    "end": "3b9c3b3a2de",
+    "stats": {
+      "production": [
+        726,
+        25,
+        6
+      ],
+      "tests": [
+        480,
+        16,
+        6
+      ]
+    },
+    "files": [
+      "compiler/rustc_incremental/src/persist/work_product.rs",
+      "compiler/rustc_interface/src/queries.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder/metadata_prefix.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder/public_api_hasher.rs",
+      "compiler/rustc_middle/src/dep_graph/graph.rs",
+      "tests/run-make/public-api-hash-artifact/caller.rs",
+      "tests/run-make/public-api-hash-artifact/diagnostic.rs",
+      "tests/run-make/public-api-hash-artifact/macro_inspector.rs",
+      "tests/run-make/public-api-hash-artifact/macro_user.rs",
+      "tests/run-make/public-api-hash-artifact/private_macro_user.rs",
+      "tests/run-make/public-api-hash-artifact/rmake.rs"
+    ]
+  },
+  {
+    "family": "Focused harness #58",
+    "start": "1bde4dc965d",
+    "end": "1bde4dc965d",
+    "stats": {
+      "CI/docs": [
+        1,
+        0,
+        1
+      ],
+      "production": [
+        138,
+        10,
+        3
+      ],
+      "tests": [
+        329,
+        16,
+        11
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_builtin_macros/src/test_harness.rs",
+      "compiler/rustc_session/src/options.rs",
+      "library/test/src/lib.rs",
+      "src/doc/rustc/src/tests/index.md",
+      "tests/run-make/test-harness-exact-filter/README.md",
+      "tests/run-make/test-harness-exact-filter/custom-descriptor.rs",
+      "tests/run-make/test-harness-exact-filter/custom-runner.rs",
+      "tests/run-make/test-harness-exact-filter/invalid-unselected.rs",
+      "tests/run-make/test-harness-exact-filter/lint-unselected.rs",
+      "tests/run-make/test-harness-exact-filter/missing-symbol.rs",
+      "tests/run-make/test-harness-exact-filter/reexported-runner.rs",
+      "tests/run-make/test-harness-exact-filter/rmake.rs",
+      "tests/run-make/test-harness-exact-filter/single-test.rs",
+      "tests/run-make/test-harness-exact-filter/tests.rs"
+    ]
+  },
+  {
+    "family": "Caller-local CGU #59",
+    "start": "f0e9f52b36e",
+    "end": "f0e9f52b36e",
+    "stats": {
+      "CI/docs": [
+        2,
+        0,
+        1
+      ],
+      "production": [
+        38,
+        12,
+        2
+      ],
+      "tests": [
+        171,
+        0,
+        4
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_monomorphize/src/partitioning.rs",
+      "compiler/rustc_session/src/options.rs",
+      "tests/incremental/mono_item_partition_caller_local_body_change.rs",
+      "tests/run-make/caller-local-codegen/main.rs",
+      "tests/run-make/caller-local-codegen/rmake.rs",
+      "tests/run-make/caller-local-codegen/upstream.rs"
+    ]
+  },
+  {
+    "family": "Stable CGU merge #60",
+    "start": "8e70e5de484",
+    "end": "8e70e5de484",
+    "stats": {
+      "CI/docs": [
+        2,
+        0,
+        1
+      ],
+      "production": [
+        34,
+        0,
+        2
+      ],
+      "tests": [
+        228,
+        0,
+        3
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_monomorphize/src/partitioning.rs",
+      "compiler/rustc_session/src/options.rs",
+      "tests/incremental/mono_item_partition_stable_merging.rs",
+      "tests/run-make/stable-cgu-merging/main.rs",
+      "tests/run-make/stable-cgu-merging/rmake.rs"
+    ]
+  },
+  {
+    "family": "Incremental rustfmt #61",
+    "start": "a596576fe1e",
+    "end": "a596576fe1e",
+    "stats": {
+      "production": [
+        3565,
+        51,
+        10
+      ]
+    },
+    "files": [
+      "Cargo.lock",
+      "src/tools/rustfmt/Cargo.toml",
+      "src/tools/rustfmt/src/bin/main.rs",
+      "src/tools/rustfmt/src/cargo-fmt/incremental.rs",
+      "src/tools/rustfmt/src/cargo-fmt/main.rs",
+      "src/tools/rustfmt/src/cargo-fmt/test/targets.rs",
+      "src/tools/rustfmt/src/formatting.rs",
+      "src/tools/rustfmt/src/lib.rs",
+      "src/tools/rustfmt/src/modules.rs",
+      "src/tools/rustfmt/src/parse/session.rs"
+    ]
+  },
+  {
+    "family": "Recursion fix #62",
+    "start": "538113f1eb7",
+    "end": "538113f1eb7",
+    "stats": {
+      "CI/docs": [
+        1,
+        0,
+        1
+      ],
+      "production": [
+        22,
+        2,
+        2
+      ],
+      "tests": [
+        93,
+        0,
+        2
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_middle/src/ty/context.rs",
+      "compiler/rustc_query_impl/src/execution.rs",
+      "tests/run-make/parallel-query-depth-limits/recursive-macro.rs",
+      "tests/run-make/parallel-query-depth-limits/rmake.rs"
+    ]
+  },
+  {
+    "family": "Cargo pin #63",
+    "start": "72e12a4ad67",
+    "end": "72e12a4ad67",
+    "stats": {
+      "production": [
+        2,
+        2,
+        2
+      ]
+    },
+    "files": [
+      ".gitmodules",
+      "src/tools/cargo"
+    ]
+  },
+  {
+    "family": "Component PGO #67",
+    "start": "cfbef0e166e",
+    "end": "51d9f8ed694",
+    "stats": {
+      "CI/docs": [
+        26,
+        0,
+        1
+      ],
+      "production": [
+        460,
+        102,
+        12
+      ],
+      "tests": [
+        554,
+        1,
+        5
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "bootstrap.example.toml",
+      "src/bootstrap/src/core/build_steps/dist.rs",
+      "src/bootstrap/src/core/build_steps/dist/tests.rs",
+      "src/bootstrap/src/core/build_steps/tool.rs",
+      "src/bootstrap/src/core/builder/cargo.rs",
+      "src/bootstrap/src/core/builder/cargo/tests.rs",
+      "src/bootstrap/src/core/config/config.rs",
+      "src/bootstrap/src/core/config/tests.rs",
+      "src/bootstrap/src/core/config/toml/mod.rs",
+      "src/bootstrap/src/core/config/toml/pgo.rs",
+      "src/tools/opt-dist/component-pgo-v1",
+      "src/tools/opt-dist/src/environment.rs",
+      "src/tools/opt-dist/src/exec.rs",
+      "src/tools/opt-dist/src/exec/tests.rs",
+      "src/tools/opt-dist/src/main.rs",
+      "src/tools/opt-dist/src/training.rs",
+      "src/tools/opt-dist/src/training/tests.rs"
+    ]
+  },
+  {
+    "family": "Test mono reuse #65",
+    "start": "e878008d07c",
+    "end": "e878008d07c",
+    "stats": {
+      "CI/docs": [
+        27,
+        0,
+        2
+      ],
+      "production": [
+        111,
+        27,
+        8
+      ],
+      "tests": [
+        159,
+        16,
+        5
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_interface/src/passes.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_monomorphize/src/collector.rs",
+      "compiler/rustc_monomorphize/src/lib.rs",
+      "compiler/rustc_monomorphize/src/partitioning.rs",
+      "compiler/rustc_query_impl/src/lib.rs",
+      "compiler/rustc_query_impl/src/query_vtables.rs",
+      "compiler/rustc_session/src/options.rs",
+      "src/doc/unstable-book/src/compiler-flags/ohm-incremental-mono-partitions.md",
+      "tests/incremental/mono_item_partition_test_body_change.rs",
+      "tests/incremental/mono_item_partition_test_changed_edges.rs",
+      "tests/incremental/mono_item_partition_test_reordered_edges.rs",
+      "tests/incremental/mono_item_partition_test_unreachable_const.rs",
+      "tests/run-make/rdr-public-hash-mono-library-runtime/rmake.rs"
+    ]
+  },
+  {
+    "family": "Cargo pins #69/#70/#75",
+    "start": "1e4f85a2d8f",
+    "end": "1bf5b00de14",
+    "stats": {
+      "production": [
+        1,
+        1,
+        1
+      ]
+    },
+    "files": [
+      "src/tools/cargo"
+    ]
+  },
+  {
+    "family": "Driver inputs #71",
+    "start": "66dab3b340e",
+    "end": "f7fdfe8c7c5",
+    "stats": {
+      "CI/docs": [
+        6,
+        0,
+        1
+      ],
+      "production": [
+        13,
+        0,
+        5
+      ],
+      "tests": [
+        14,
+        0,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "Cargo.lock",
+      "compiler/rustc_interface/src/interface.rs",
+      "compiler/rustc_interface/src/tests.rs",
+      "compiler/rustc_session/src/config.rs",
+      "compiler/rustc_session/src/options.rs",
+      "src/tools/clippy/Cargo.toml"
+    ]
+  },
+  {
+    "family": "Source input #73",
+    "start": "4ce84317469",
+    "end": "4ce84317469",
+    "stats": {
+      "production": [
+        61,
+        3,
+        8
+      ]
+    },
+    "files": [
+      "compiler/rustc_middle/src/dep_graph/dep_node.rs",
+      "compiler/rustc_middle/src/dep_graph/dep_node_key.rs",
+      "compiler/rustc_middle/src/dep_graph/mod.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/query/erase.rs",
+      "compiler/rustc_middle/src/query/keys.rs",
+      "compiler/rustc_middle/src/ty/context.rs",
+      "compiler/rustc_span/src/lib.rs"
+    ]
+  },
+  {
+    "family": "Visibility input #74",
+    "start": "0fd9a56d7e2",
+    "end": "ad1d352d0d9",
+    "stats": {
+      "CI/docs": [
+        1,
+        0,
+        1
+      ],
+      "production": [
+        68,
+        10,
+        7
+      ],
+      "tests": [
+        73,
+        0,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_lint/src/async_fn_in_trait.rs",
+      "compiler/rustc_lint/src/context.rs",
+      "compiler/rustc_lint/src/late.rs",
+      "compiler/rustc_lint/src/lib.rs",
+      "compiler/rustc_lint/src/nonstandard_style.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_privacy/src/lib.rs",
+      "tests/run-make/incremental-lint-visibilities/rmake.rs"
+    ]
+  },
+  {
+    "family": "Stream WF #72",
+    "start": "262ce9465bd",
+    "end": "262ce9465bd",
+    "stats": {
+      "CI/docs": [
+        7,
+        0,
+        1
+      ],
+      "production": [
+        35,
+        23,
+        1
+      ],
+      "tests": [
+        227,
+        0,
+        5
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_trait_selection/src/traits/wf.rs",
+      "tests/incremental/nominal-inherited-obligations.rs",
+      "tests/ui/wf/nominal-inherited-obligations-fail.current.stderr",
+      "tests/ui/wf/nominal-inherited-obligations-fail.next.stderr",
+      "tests/ui/wf/nominal-inherited-obligations-fail.rs",
+      "tests/ui/wf/nominal-inherited-obligations.rs"
+    ]
+  },
+  {
+    "family": "Cargo pin #75",
+    "start": "70696bdfda5",
+    "end": "70696bdfda5",
+    "stats": {
+      "production": [
+        1,
+        1,
+        1
+      ]
+    },
+    "files": [
+      "src/tools/cargo"
+    ]
+  },
+  {
+    "family": "Parallel query promotion #66",
+    "start": "7d2d4ea2ee8",
+    "end": "2e78525fcca",
+    "stats": {
+      "CI/docs": [
+        13,
+        0,
+        1
+      ],
+      "production": [
+        55,
+        29,
+        3
+      ],
+      "tests": [
+        45,
+        0,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_middle/src/dep_graph/graph.rs",
+      "compiler/rustc_middle/src/query/on_disk_cache.rs",
+      "compiler/rustc_span/src/hygiene.rs",
+      "compiler/rustc_span/src/hygiene/tests.rs"
+    ]
+  },
+  {
+    "family": "Cranelift mac clone #77",
+    "start": "9d6c7fd1eb1",
+    "end": "9d6c7fd1eb1",
+    "stats": {
+      "CI/docs": [
+        6,
+        0,
+        1
+      ],
+      "production": [
+        226,
+        1,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_codegen_cranelift/build_system/utils.rs"
+    ]
+  },
+  {
+    "family": "Bootstrap mac clone #78",
+    "start": "f36811fb42b",
+    "end": "781290047ec",
+    "stats": {
+      "CI/docs": [
+        2,
+        1,
+        1
+      ],
+      "production": [
+        65,
+        12,
+        7
+      ],
+      "tests": [
+        157,
+        0,
+        2
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "src/bootstrap/src/core/build_steps/compile.rs",
+      "src/bootstrap/src/core/build_steps/dist.rs",
+      "src/bootstrap/src/core/build_steps/doc.rs",
+      "src/bootstrap/src/core/build_steps/gcc.rs",
+      "src/bootstrap/src/lib.rs",
+      "src/bootstrap/src/utils/helpers.rs",
+      "src/bootstrap/src/utils/tarball.rs",
+      "src/bootstrap/src/utils/tests/copy_link_tests.rs",
+      "src/bootstrap/src/utils/tests/mod.rs"
+    ]
+  },
+  {
+    "family": "Incremental mac clone #79",
+    "start": "3cf96de332b",
+    "end": "3cf96de332b",
+    "stats": {
+      "CI/docs": [
+        6,
+        0,
+        1
+      ],
+      "production": [
+        44,
+        6,
+        4
+      ],
+      "tests": [
+        102,
+        0,
+        2
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "Cargo.lock",
+      "compiler/rustc_fs_util/Cargo.toml",
+      "compiler/rustc_fs_util/src/lib.rs",
+      "compiler/rustc_fs_util/src/tests.rs",
+      "compiler/rustc_incremental/src/persist/fs.rs",
+      "tests/run-make/incremental-directory-copy/rmake.rs"
+    ]
+  },
+  {
+    "family": "Interning operations #81",
+    "start": "652df15f521",
+    "end": "652df15f521",
+    "stats": {
+      "production": [
+        107,
+        64,
+        5
+      ]
+    },
+    "files": [
+      "compiler/rustc_middle/src/ty/generic_args.rs",
+      "compiler/rustc_trait_selection/src/traits/query/type_op/custom.rs",
+      "compiler/rustc_trait_selection/src/traits/query/type_op/mod.rs",
+      "compiler/rustc_type_ir/src/relate.rs",
+      "compiler/rustc_type_ir/src/relate/combine.rs"
+    ]
+  },
+  {
+    "family": "Interner worker cache #83",
+    "start": "1f711c95392",
+    "end": "659a36f24fb",
+    "stats": {
+      "production": [
+        143,
+        25,
+        3
+      ],
+      "tests": [
+        108,
+        0,
+        2
+      ]
+    },
+    "files": [
+      "compiler/rustc_data_structures/src/sharded.rs",
+      "compiler/rustc_data_structures/src/sharded/tests.rs",
+      "compiler/rustc_data_structures/src/sync/worker_local.rs",
+      "compiler/rustc_data_structures/src/sync/worker_local/tests.rs",
+      "compiler/rustc_middle/src/ty/context.rs"
+    ]
+  },
+  {
+    "family": "Reuse relation/fold #84",
+    "start": "6896674faa6",
+    "end": "6896674faa6",
+    "stats": {
+      "production": [
+        91,
+        25,
+        5
+      ]
+    },
+    "files": [
+      "compiler/rustc_infer/src/infer/resolve.rs",
+      "compiler/rustc_middle/src/ty/fold.rs",
+      "compiler/rustc_middle/src/ty/generic_args.rs",
+      "compiler/rustc_middle/src/ty/predicate.rs",
+      "compiler/rustc_type_ir/src/relate.rs"
+    ]
+  },
+  {
+    "family": "SmallVec obligations #85",
+    "start": "1847fd84214",
+    "end": "1847fd84214",
+    "stats": {
+      "production": [
+        7,
+        2,
+        1
+      ],
+      "tests": [
+        53,
+        0,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_data_structures/src/obligation_forest/mod.rs",
+      "compiler/rustc_data_structures/src/obligation_forest/tests.rs"
+    ]
+  },
+  {
+    "family": "Freshening cache/inlining #88",
+    "start": "6ec1268b601",
+    "end": "6ec1268b601",
+    "stats": {
+      "production": [
+        171,
+        29,
+        6
+      ]
+    },
+    "files": [
+      "compiler/rustc_infer/src/infer/freshen.rs",
+      "compiler/rustc_middle/src/ty/context.rs",
+      "compiler/rustc_type_ir/src/binder.rs",
+      "compiler/rustc_type_ir/src/predicate_kind.rs",
+      "compiler/rustc_type_ir/src/ty_kind.rs",
+      "compiler/rustc_type_ir_macros/src/lib.rs"
+    ]
+  },
+  {
+    "family": "Relocatable output #91",
+    "start": "fc009f60233",
+    "end": "fc009f60233",
+    "stats": {
+      "production": [
+        8,
+        5,
+        2
+      ],
+      "tests": [
+        45,
+        0,
+        2
+      ]
+    },
+    "files": [
+      "compiler/rustc_codegen_llvm/src/back/write.rs",
+      "compiler/rustc_codegen_llvm/src/debuginfo/metadata.rs",
+      "tests/run-make/incremental-output-directory/lib.rs",
+      "tests/run-make/incremental-output-directory/rmake.rs"
+    ]
+  },
+  {
+    "family": "Cargo pin #95",
+    "start": "ce7f80972d0",
+    "end": "ce7f80972d0",
+    "stats": {
+      "production": [
+        1,
+        1,
+        1
+      ]
+    },
+    "files": [
+      "src/tools/cargo"
+    ]
+  },
+  {
+    "family": "Session GC #97",
+    "start": "1d9676dff7c",
+    "end": "1d9676dff7c",
+    "stats": {
+      "production": [
+        6,
+        2,
+        1
+      ],
+      "tests": [
+        3,
+        3,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_incremental/src/persist/fs.rs",
+      "tests/run-make/incremental-directory-copy/rmake.rs"
+    ]
+  },
+  {
+    "family": "Split-debug object GC #98",
+    "start": "1763538756d",
+    "end": "1763538756d",
+    "stats": {
+      "CI/docs": [
+        1,
+        0,
+        1
+      ],
+      "production": [
+        167,
+        21,
+        6
+      ],
+      "tests": [
+        118,
+        0,
+        2
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_codegen_llvm/src/back/write.rs",
+      "compiler/rustc_codegen_ssa/src/back/link.rs",
+      "compiler/rustc_codegen_ssa/src/back/write.rs",
+      "compiler/rustc_codegen_ssa/src/diagnostics.rs",
+      "compiler/rustc_interface/src/util.rs",
+      "compiler/rustc_session/src/config.rs",
+      "tests/run-make/split-debuginfo-incremental/main.rs",
+      "tests/run-make/split-debuginfo-incremental/rmake.rs"
+    ]
+  },
+  {
+    "family": "Coroutine layout split #99",
+    "start": "0a348ca223d",
+    "end": "725c77b4f26",
+    "stats": {
+      "CI/docs": [
+        12,
+        0,
+        1
+      ],
+      "production": [
+        433,
+        207,
+        12
+      ],
+      "tests": [
+        147,
+        4,
+        7
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder.rs",
+      "compiler/rustc_metadata/src/rmeta/mod.rs",
+      "compiler/rustc_metadata/src/rmeta/parameterized.rs",
+      "compiler/rustc_middle/src/arena.rs",
+      "compiler/rustc_middle/src/mir/query.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/ty/mod.rs",
+      "compiler/rustc_mir_transform/src/coroutine/layout.rs",
+      "compiler/rustc_mir_transform/src/coroutine/mod.rs",
+      "compiler/rustc_mir_transform/src/lib.rs",
+      "compiler/rustc_ty_utils/src/instance.rs",
+      "tests/incremental/coroutine-runtime-layout.rs",
+      "tests/ui/async-await/async-drop/auxiliary/async-drop-metadata-aux.rs",
+      "tests/ui/async-await/async-drop/metadata-only-layout.rs",
+      "tests/ui/coroutine/auxiliary/metadata-sufficient-for-layout.rs",
+      "tests/ui/coroutine/metadata-sufficient-for-layout.rs",
+      "tests/ui/pattern/non-structural-match-types-cycle-err.rs",
+      "tests/ui/pattern/non-structural-match-types-cycle-err.stderr"
+    ]
+  },
+  {
+    "family": "Dev codegen #101",
+    "start": "f81f332457e",
+    "end": "5466d64255f",
+    "stats": {
+      "production": [
+        193,
+        2,
+        6
+      ],
+      "tests": [
+        59,
+        0,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_codegen_ssa/src/mir/analyze.rs",
+      "compiler/rustc_codegen_ssa/src/mir/block.rs",
+      "compiler/rustc_codegen_ssa/src/mir/mod.rs",
+      "compiler/rustc_mir_transform/src/sroa.rs",
+      "compiler/rustc_monomorphize/src/mono_checks/abi_check.rs",
+      "compiler/rustc_monomorphize/src/mono_checks/move_check.rs",
+      "tests/codegen-llvm/monomorphic-noop-cleanups.rs"
+    ]
+  },
+  {
+    "family": "Fast reject #100",
+    "start": "aa32a253490",
+    "end": "aa32a253490",
+    "stats": {
+      "production": [
+        42,
+        18,
+        2
+      ]
+    },
+    "files": [
+      "compiler/rustc_middle/src/ty/generic_args.rs",
+      "compiler/rustc_type_ir/src/fast_reject.rs"
+    ]
+  },
+  {
+    "family": "Trait/region graph #103",
+    "start": "c290b2eceeb",
+    "end": "66c8da320df",
+    "stats": {
+      "production": [
+        268,
+        87,
+        8
+      ],
+      "tests": [
+        293,
+        0,
+        6
+      ]
+    },
+    "files": [
+      "compiler/rustc_borrowck/src/handle_placeholders.rs",
+      "compiler/rustc_borrowck/src/handle_placeholders/tests.rs",
+      "compiler/rustc_data_structures/src/graph/scc/mod.rs",
+      "compiler/rustc_data_structures/src/graph/scc/tests.rs",
+      "compiler/rustc_data_structures/src/obligation_forest/mod.rs",
+      "compiler/rustc_data_structures/src/obligation_forest/tests.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/ty/mod.rs",
+      "compiler/rustc_middle/src/ty/trait_def.rs",
+      "compiler/rustc_trait_selection/src/traits/fulfill.rs",
+      "compiler/rustc_trait_selection/src/traits/select/candidate_assembly.rs",
+      "tests/ui/const-generics/impl-candidate-const-index-specialization.rs",
+      "tests/ui/const-generics/impl-candidate-const-index-unevaluated.rs",
+      "tests/ui/const-generics/impl-candidate-const-index.rs"
+    ]
+  },
+  {
+    "family": "Trait/dataflow #104",
+    "start": "827d0887cd3",
+    "end": "827d0887cd3",
+    "stats": {
+      "production": [
+        116,
+        23,
+        10
+      ],
+      "tests": [
+        103,
+        0,
+        5
+      ]
+    },
+    "files": [
+      "compiler/rustc_borrowck/src/dataflow.rs",
+      "compiler/rustc_borrowck/src/dataflow/tests.rs",
+      "compiler/rustc_borrowck/src/polonius/dump.rs",
+      "compiler/rustc_middle/src/mir/terminator.rs",
+      "compiler/rustc_middle/src/ty/context.rs",
+      "compiler/rustc_middle/src/ty/trait_def.rs",
+      "compiler/rustc_mir_dataflow/src/framework/direction.rs",
+      "compiler/rustc_mir_dataflow/src/impls/initialized.rs",
+      "compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs",
+      "compiler/rustc_trait_selection/src/traits/util.rs",
+      "compiler/rustc_trait_selection/src/traits/wf.rs",
+      "tests/ui/const-generics/coherence-indexed-impls.equal.stderr",
+      "tests/ui/const-generics/coherence-indexed-impls.generic.stderr",
+      "tests/ui/const-generics/coherence-indexed-impls.named.stderr",
+      "tests/ui/const-generics/coherence-indexed-impls.rs"
+    ]
+  },
+  {
+    "family": "Promotion index #105",
+    "start": "df2d1c67b7a",
+    "end": "df2d1c67b7a",
+    "stats": {
+      "CI/docs": [
+        1,
+        0,
+        1
+      ],
+      "production": [
+        27,
+        26,
+        2
+      ],
+      "tests": [
+        22,
+        0,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_middle/src/dep_graph/graph.rs",
+      "compiler/rustc_middle/src/query/on_disk_cache.rs",
+      "tests/incremental/promote-cached-query-value.rs"
+    ]
+  },
+  {
+    "family": "Serialized query retention #106",
+    "start": "75605aa171c",
+    "end": "75605aa171c",
+    "stats": {
+      "CI/docs": [
+        7,
+        0,
+        1
+      ],
+      "production": [
+        241,
+        24,
+        5
+      ],
+      "tests": [
+        51,
+        0,
+        2
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_incremental/src/persist/save.rs",
+      "compiler/rustc_middle/src/dep_graph/graph.rs",
+      "compiler/rustc_middle/src/mir/interpret/mod.rs",
+      "compiler/rustc_middle/src/mir/interpret/tests.rs",
+      "compiler/rustc_middle/src/query/on_disk_cache.rs",
+      "compiler/rustc_query_impl/src/incremental.rs",
+      "tests/incremental/forward-cached-query-value.rs"
+    ]
+  },
+  {
+    "family": "Lookup/substitution cache #107",
+    "start": "09d4ab0254f",
+    "end": "09d4ab0254f",
+    "stats": {
+      "production": [
+        234,
+        13,
+        8
+      ],
+      "tests": [
+        29,
+        0,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_data_structures/src/obligation_forest/mod.rs",
+      "compiler/rustc_data_structures/src/obligation_forest/tests.rs",
+      "compiler/rustc_middle/src/ty/context.rs",
+      "compiler/rustc_middle/src/ty/generics.rs",
+      "compiler/rustc_middle/src/ty/predicate.rs",
+      "compiler/rustc_middle/src/ty/sty.rs",
+      "compiler/rustc_resolve/src/lib.rs",
+      "compiler/rustc_span/src/edit_distance.rs",
+      "compiler/rustc_trait_selection/src/traits/wf.rs"
+    ]
+  },
+  {
+    "family": "Literal const fastpaths #110",
+    "start": "bf16af81fee",
+    "end": "e15395df1bd",
+    "stats": {
+      "production": [
+        182,
+        2,
+        5
+      ],
+      "tests": [
+        76,
+        0,
+        4
+      ]
+    },
+    "files": [
+      "compiler/rustc_hir_typeck/src/lib.rs",
+      "compiler/rustc_mir_build/src/builder/expr/as_constant.rs",
+      "compiler/rustc_mir_build/src/builder/mod.rs",
+      "compiler/rustc_mir_build/src/check_unsafety.rs",
+      "compiler/rustc_trait_selection/src/traits/outlives_bounds.rs",
+      "tests/ui/const-generics/anon-const-requires-sized-lang-item.rs",
+      "tests/ui/const-generics/anon-const-requires-sized-lang-item.stderr",
+      "tests/ui/implied-bounds/fieldless-const-args.rs",
+      "tests/ui/implied-bounds/fieldless-const-args.stderr"
+    ]
+  },
+  {
+    "family": "LLVM premerge #108",
+    "start": "a0f04171a5f",
+    "end": "5ea69eb1cbc",
+    "stats": {
+      "CI/docs": [
+        5,
+        0,
+        1
+      ],
+      "production": [
+        25,
+        0,
+        1
+      ],
+      "tests": [
+        15,
+        0,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp",
+      "tests/codegen-llvm/merge-functions-prelink.rs"
+    ]
+  },
+  {
+    "family": "MIR-block CGU balance #115",
+    "start": "d4b28f4faaa",
+    "end": "d4b28f4faaa",
+    "stats": {
+      "production": [
+        27,
+        0,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_monomorphize/src/partitioning.rs"
+    ]
+  },
+  {
+    "family": "Cargo pin #102",
+    "start": "a57795ed70f",
+    "end": "a57795ed70f",
+    "stats": {
+      "production": [
+        1,
+        1,
+        1
+      ]
+    },
+    "files": [
+      "src/tools/cargo"
+    ]
+  },
+  {
+    "family": "Per-body analysis #112",
+    "start": "625b2473211",
+    "end": "bc78967e759",
+    "stats": {
+      "CI/docs": [
+        9,
+        0,
+        1
+      ],
+      "production": [
+        128,
+        30,
+        11
+      ],
+      "tests": [
+        37,
+        0,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_borrowck/src/dataflow.rs",
+      "compiler/rustc_borrowck/src/handle_placeholders.rs",
+      "compiler/rustc_borrowck/src/lib.rs",
+      "compiler/rustc_borrowck/src/region_infer/mod.rs",
+      "compiler/rustc_hir_typeck/src/check.rs",
+      "compiler/rustc_hir_typeck/src/fallback.rs",
+      "compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs",
+      "compiler/rustc_hir_typeck/src/gather_locals.rs",
+      "compiler/rustc_hir_typeck/src/loops.rs",
+      "compiler/rustc_hir_typeck/src/writeback.rs",
+      "compiler/rustc_privacy/src/lib.rs",
+      "tests/ui/typeck/parameter-binding-known-types.rs"
+    ]
+  },
+  {
+    "family": "Proof/dependency caches #117/#118",
+    "start": "5dd6e5b8f3c",
+    "end": "4c9469ed841",
+    "stats": {
+      "CI/docs": [
+        9,
+        0,
+        1
+      ],
+      "production": [
+        285,
+        29,
+        7
+      ],
+      "tests": [
+        508,
+        0,
+        7
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_ast/src/tokenstream.rs",
+      "compiler/rustc_hir_analysis/src/check/compare_impl_item.rs",
+      "compiler/rustc_hir_analysis/src/check/mod.rs",
+      "compiler/rustc_hir_analysis/src/check/wfcheck.rs",
+      "compiler/rustc_middle/src/dep_graph/edges.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/query/keys.rs",
+      "tests/incremental/closed-associated-type-proofs.rs",
+      "tests/ui/associated-types/closed-definition-proof-failures.current.stderr",
+      "tests/ui/associated-types/closed-definition-proof-failures.next.stderr",
+      "tests/ui/associated-types/closed-definition-proof-failures.rs",
+      "tests/ui/associated-types/closed-definition-proofs.rs",
+      "tests/ui/associated-types/concrete-impl-bound-normalization.rs",
+      "tests/ui/associated-types/concrete-impl-bound-normalization.stderr"
+    ]
+  },
+  {
+    "family": "Mimalloc #109",
+    "start": "920bd60f9cd",
+    "end": "e7fc7270de7",
+    "stats": {
+      "CI/docs": [
+        1,
+        0,
+        1
+      ],
+      "production": [
+        63,
+        4,
+        11
+      ],
+      "vendor": [
+        26588,
+        0,
+        53
+      ],
+      "tests": [
+        56,
+        0,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "Cargo.lock",
+      "bootstrap.example.toml",
+      "compiler/rustc/Cargo.toml",
+      "compiler/rustc/build.rs",
+      "compiler/rustc/mimalloc-v1",
+      "compiler/rustc/mimalloc/.gitattributes",
+      "compiler/rustc/mimalloc/CMakeLists.txt",
+      "compiler/rustc/mimalloc/LICENSE",
+      "compiler/rustc/mimalloc/README.ohm.md",
+      "compiler/rustc/mimalloc/cmake/JoinPaths.cmake",
+      "compiler/rustc/mimalloc/cmake/mimalloc-config-version.cmake",
+      "compiler/rustc/mimalloc/cmake/mimalloc-config.cmake",
+      "compiler/rustc/mimalloc/include/mimalloc-new-delete.h",
+      "compiler/rustc/mimalloc/include/mimalloc-override.h",
+      "compiler/rustc/mimalloc/include/mimalloc-stats.h",
+      "compiler/rustc/mimalloc/include/mimalloc.h",
+      "compiler/rustc/mimalloc/include/mimalloc/atomic.h",
+      "compiler/rustc/mimalloc/include/mimalloc/bits.h",
+      "compiler/rustc/mimalloc/include/mimalloc/internal.h",
+      "compiler/rustc/mimalloc/include/mimalloc/prim-tls.h",
+      "compiler/rustc/mimalloc/include/mimalloc/prim.h",
+      "compiler/rustc/mimalloc/include/mimalloc/track.h",
+      "compiler/rustc/mimalloc/include/mimalloc/types.h",
+      "compiler/rustc/mimalloc/mimalloc.pc.in",
+      "compiler/rustc/mimalloc/src/alloc-aligned.c",
+      "compiler/rustc/mimalloc/src/alloc-override.c",
+      "compiler/rustc/mimalloc/src/alloc-posix.c",
+      "compiler/rustc/mimalloc/src/alloc.c",
+      "compiler/rustc/mimalloc/src/arena.c",
+      "compiler/rustc/mimalloc/src/bitmap.c",
+      "compiler/rustc/mimalloc/src/bitmap.h",
+      "compiler/rustc/mimalloc/src/free.c",
+      "compiler/rustc/mimalloc/src/heap.c",
+      "compiler/rustc/mimalloc/src/init.c",
+      "compiler/rustc/mimalloc/src/libc.c",
+      "compiler/rustc/mimalloc/src/options.c",
+      "compiler/rustc/mimalloc/src/os.c",
+      "compiler/rustc/mimalloc/src/page-map.c",
+      "compiler/rustc/mimalloc/src/page-queue.c",
+      "compiler/rustc/mimalloc/src/page.c",
+      "compiler/rustc/mimalloc/src/prim/emscripten/prim.c",
+      "compiler/rustc/mimalloc/src/prim/osx/alloc-override-zone.c",
+      "compiler/rustc/mimalloc/src/prim/osx/prim.c",
+      "compiler/rustc/mimalloc/src/prim/prim-tls.c",
+      "compiler/rustc/mimalloc/src/prim/prim.c",
+      "compiler/rustc/mimalloc/src/prim/readme.md",
+      "compiler/rustc/mimalloc/src/prim/unix/prim.c",
+      "compiler/rustc/mimalloc/src/prim/wasi/prim.c",
+      "compiler/rustc/mimalloc/src/prim/windows/etw-mimalloc.wprp",
+      "compiler/rustc/mimalloc/src/prim/windows/etw.h",
+      "compiler/rustc/mimalloc/src/prim/windows/prim.c",
+      "compiler/rustc/mimalloc/src/prim/windows/readme.md",
+      "compiler/rustc/mimalloc/src/random.c",
+      "compiler/rustc/mimalloc/src/static.c",
+      "compiler/rustc/mimalloc/src/stats.c",
+      "compiler/rustc/mimalloc/src/subproc.c",
+      "compiler/rustc/mimalloc/src/theap.c",
+      "compiler/rustc/mimalloc/src/threadlocal.c",
+      "compiler/rustc/src/main.rs",
+      "src/bootstrap/src/core/builder/tests.rs",
+      "src/bootstrap/src/core/config/config.rs",
+      "src/bootstrap/src/core/config/toml/rust.rs",
+      "src/bootstrap/src/lib.rs",
+      "src/tools/tidy/src/deps.rs",
+      "src/tools/tidy/src/walk.rs"
+    ]
+  },
+  {
+    "family": "Cargo pin #120",
+    "start": "e19865ac2b9",
+    "end": "e19865ac2b9",
+    "stats": {
+      "production": [
+        1,
+        1,
+        1
+      ]
+    },
+    "files": [
+      "src/tools/cargo"
+    ]
+  },
+  {
+    "family": "Sparse metadata #123",
+    "start": "7a09cfaea90",
+    "end": "82a711def3f",
+    "stats": {
+      "production": [
+        185,
+        41,
+        5
+      ],
+      "tests": [
+        274,
+        0,
+        2
+      ],
+      "benchmark evidence": [
+        5868,
+        0,
+        9
+      ]
+    },
+    "files": [
+      "compiler/rustc_metadata/src/rmeta/decoder.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder.rs",
+      "compiler/rustc_metadata/src/rmeta/encoder/metadata_prefix.rs",
+      "compiler/rustc_metadata/src/rmeta/mod.rs",
+      "compiler/rustc_metadata/src/rmeta/table.rs",
+      "compiler/rustc_metadata/src/rmeta/table/tests.rs",
+      "src/tools/codspeed/results/sparse-metadata/README.md",
+      "src/tools/codspeed/results/sparse-metadata/provenance.json",
+      "src/tools/codspeed/results/sparse-metadata/results.json",
+      "src/tools/codspeed/results/sparse-metadata/samples.json",
+      "src/tools/codspeed/results/sparse-metadata/test-relocation.json",
+      "src/tools/codspeed/results/sparse-metadata/validation.json",
+      "src/tools/codspeed/sparse_metadata.md",
+      "src/tools/codspeed/sparse_metadata.py",
+      "src/tools/codspeed/test_sparse_metadata.py",
+      "tests/run-make/sparse-metadata-tables/rmake.rs"
+    ]
+  },
+  {
+    "family": "Wild/release pins #126/#130",
+    "start": "6d91ddaf049",
+    "end": "d697b1d0432",
+    "stats": {
+      "CI/docs": [
+        4,
+        2,
+        1
+      ],
+      "production": [
+        37,
+        1,
+        5
+      ],
+      "tests": [
+        15,
+        0,
+        1
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "bootstrap.example.toml",
+      "src/bootstrap/src/core/build_steps/dist.rs",
+      "src/bootstrap/src/core/config/config.rs",
+      "src/bootstrap/src/core/config/tests.rs",
+      "src/bootstrap/src/core/config/toml/target.rs",
+      "src/tools/cargo"
+    ]
+  },
+  {
+    "family": "Coroutine debug projection #132",
+    "start": "03afc32611c",
+    "end": "a30eee748ad",
+    "stats": {
+      "CI/docs": [
+        26,
+        0,
+        2
+      ],
+      "production": [
+        164,
+        29,
+        9
+      ],
+      "tests": [
+        320,
+        25,
+        8
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "compiler/rustc_codegen_llvm/src/debuginfo/metadata/enums/cpp_like.rs",
+      "compiler/rustc_codegen_llvm/src/debuginfo/metadata/enums/mod.rs",
+      "compiler/rustc_codegen_llvm/src/debuginfo/metadata/enums/native.rs",
+      "compiler/rustc_middle/src/mir/query.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/query/erase.rs",
+      "compiler/rustc_middle/src/ty/mod.rs",
+      "compiler/rustc_middle/src/ty/sty.rs",
+      "compiler/rustc_ty_utils/src/layout.rs",
+      "src/doc/unstable-book/src/compiler-flags/debug_info_type_line_numbers.md",
+      "tests/codegen-llvm/async-fn-debug-msvc.rs",
+      "tests/codegen-llvm/async-fn-debug.rs",
+      "tests/codegen-llvm/coroutine-debug-msvc.rs",
+      "tests/codegen-llvm/coroutine-debug.rs",
+      "tests/debuginfo/coroutine-objects.rs",
+      "tests/incremental/coroutine-runtime-layout.rs",
+      "tests/ui-fulldeps/coroutine-layout-projection.rs",
+      "tests/ui/pattern/non-structural-match-types-cycle-err.stderr"
+    ]
+  },
+  {
+    "family": "Cargo/package #140/#146-149",
+    "start": "e8071859620",
+    "end": "112d46a8f19",
+    "stats": {
+      "CI/docs": [
+        5,
+        0,
+        1
+      ],
+      "production": [
+        44,
+        4,
+        6
+      ],
+      "tests": [
+        125,
+        51,
+        2
+      ]
+    },
+    "files": [
+      ".github/workflows/ci.yml",
+      "src/bootstrap/src/core/build_steps/dist.rs",
+      "src/bootstrap/src/core/builder/mod.rs",
+      "src/bootstrap/src/core/builder/tests.rs",
+      "src/tools/cargo",
+      "src/tools/opt-dist/src/environment.rs",
+      "src/tools/opt-dist/src/exec.rs",
+      "src/tools/opt-dist/src/exec/tests.rs",
+      "src/tools/opt-dist/src/main.rs"
+    ]
+  },
+  {
+    "family": "Deterministic generic map #151",
+    "start": "348339ddae4",
+    "end": "348339ddae4",
+    "stats": {
+      "production": [
+        22,
+        1,
+        1
+      ]
+    },
+    "files": [
+      "compiler/rustc_middle/src/ty/generics.rs"
+    ]
+  }
+]

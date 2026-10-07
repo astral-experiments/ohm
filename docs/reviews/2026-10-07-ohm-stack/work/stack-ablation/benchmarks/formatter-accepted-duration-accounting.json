@@ -1,0 +1,53 @@
+{
+  "proof_kind": "accepted-formatter-duration-accounting-v1",
+  "campaigns": {
+    "rustfmt-no-config-snapshot": {
+      "results": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/rustfmt-no-config-snapshot-supplementary-07-accepted/campaigns/rustfmt-no-config-snapshot-supplementary-07/results.json",
+        "sha256": "92341a155770c8019929de7c0c7eb5daf3e7033dce9bc7e5297f6025767287f9"
+      },
+      "trace": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/rustfmt-no-config-snapshot-supplementary-07-accepted/campaigns/rustfmt-no-config-snapshot-supplementary-07/monitor.jsonl",
+        "sha256": "dae0168a40111894de592e8bc571a00ebb19fe74957d8c0c3d299e46902804ac"
+      },
+      "commands": 612,
+      "command_wall_seconds_sum": 1185.3096815107856,
+      "reported_command_seconds_sum": 1185.3096815107856,
+      "sample_wall_seconds_sum": 1311.8893679783214,
+      "source_receipt_seconds_sum": 125.84806747769471,
+      "edit_seconds_sum": 0.23081192187964916,
+      "warmup_seconds_sum": 0,
+      "sample_wall_minus_commands_seconds": 126.5796864675358,
+      "monitor_first_recorded_epoch": 1791225499.7808146,
+      "monitor_last_recorded_epoch": 1791227011.857446,
+      "monitor_first_to_last_seconds": 1512.076631307602,
+      "monitor_record_count": 737,
+      "monitor_span_minus_sample_wall_seconds": 200.18726332928054,
+      "scope": "Bookkeeping from already accepted raw receipts. Command sum includes GNU-time launch overhead. Sample difference primarily formatted-source receipt generation; first-to-last monitor span is not exact supervisor duration. Out-of-campaign installer/build/native/source-prefetch and failed attempts are excluded; monitor residual is not assigned to particular preparation stages without timestamps. No per-command treatment estimates recomputed."
+    },
+    "rustfmt-no-leaf-batching": {
+      "results": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/rustfmt-no-leaf-batching-supplementary-01-accepted/campaigns/rustfmt-no-leaf-batching-supplementary-01/results.json",
+        "sha256": "041d29f2f5d44947fd2460cb0d8df1987adf93862d12bb6b9eb61a4a0ad65ff7"
+      },
+      "trace": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/rustfmt-no-leaf-batching-supplementary-01-accepted/campaigns/rustfmt-no-leaf-batching-supplementary-01/monitor.jsonl",
+        "sha256": "7f98abe9026a6bb41d1e3abe73bddbaba32b365b5b89a1f446f37b831a1c7fd4"
+      },
+      "commands": 612,
+      "command_wall_seconds_sum": 1190.1286405044375,
+      "reported_command_seconds_sum": 1190.1286405044375,
+      "sample_wall_seconds_sum": 1316.0403685872443,
+      "source_receipt_seconds_sum": 125.18063959747087,
+      "edit_seconds_sum": 0.2273374644573778,
+      "warmup_seconds_sum": 0,
+      "sample_wall_minus_commands_seconds": 125.9117280828068,
+      "monitor_first_recorded_epoch": 1791239875.3262937,
+      "monitor_last_recorded_epoch": 1791241399.8928237,
+      "monitor_first_to_last_seconds": 1524.5665299892426,
+      "monitor_record_count": 743,
+      "monitor_span_minus_sample_wall_seconds": 208.52616140199825,
+      "scope": "Bookkeeping from already accepted raw receipts. Command sum includes GNU-time launch overhead. Sample difference primarily formatted-source receipt generation; first-to-last monitor span is not exact supervisor duration. Out-of-campaign installer/build/native/source-prefetch and failed attempts are excluded; monitor residual is not assigned to particular preparation stages without timestamps. No per-command treatment estimates recomputed."
+    }
+  }
+}

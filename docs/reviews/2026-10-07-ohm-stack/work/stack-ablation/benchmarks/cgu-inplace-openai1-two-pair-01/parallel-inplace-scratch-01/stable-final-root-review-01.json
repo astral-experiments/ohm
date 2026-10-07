@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "axis": "stable-cgu-merging",
+  "archive_sha256": "5f912b74a2955848acf0721dac7e826c4274403b91141df244fc38ca99d2a2ad",
+  "manifest_sha256": "625f553a3baee6b6fad9958907f28081e66c19baa04669e5824048483e5d6890",
+  "payloads_rehashed": 715,
+  "safe_regular_unique_members_original_modes_verified": 716,
+  "proofs_rehashed": 54,
+  "prior_actual_root_admission_sha256": "5d2140991ae9c12cf6a83c2113e1482f7923ee61d2f3a8885f11e33db4198a45",
+  "same_optimized_runtime_source_training_pgo_and_flags_axis_verified": true,
+  "runtime_files": 69859,
+  "command_root_review_sha256": "789ae294b9ef0bf4148a730157472002355b74aa107e118a6165be1adf1d6730",
+  "accepted_pairs": 6,
+  "timed_commands": 60,
+  "command_statistics": 15,
+  "continuous_samples": 1601,
+  "quiet_samples": 144,
+  "retained_whole_attempts": 7,
+  "current_closure_sha256": "7e0319b54ef2352343c7f1feb6546c2744ddc8559226330f6e4bed3e400998c5",
+  "all14_recorded_identities_groups_and_archive_readers_closed": true,
+  "recommendation": "Retain stable CGU merging provisionally for edited Codex library builds. Turning it off costs edits1/2 +1.474/+1.655s in both orders, while cold Ruff/uv improve -4.897/-1.984s in both orders. This tradeoff supports a bounded incremental policy, not a general speedup.",
+  "limits": [
+    "Two counterbalanced pairs per project; observed ranges are not confidence intervals.",
+    "Same optimized compiler, own source/native447, runtime loader and host-stat evidence reused exactly from prior admission. Current69k metadata bodies were host-bound assertions; not claimed retrieved locally.",
+    "Original rejected Ruff0 whole pair is preserved and excluded.",
+    "Library BUILD commands at8jobs only: no final executable linking or timed project tests.",
+    "Maximum-child RSS is not aggregate memory.",
+    "Individual caller/stable/both screens are not a factorial experiment; do not add their effects or infer interactions."
+  ]
+}

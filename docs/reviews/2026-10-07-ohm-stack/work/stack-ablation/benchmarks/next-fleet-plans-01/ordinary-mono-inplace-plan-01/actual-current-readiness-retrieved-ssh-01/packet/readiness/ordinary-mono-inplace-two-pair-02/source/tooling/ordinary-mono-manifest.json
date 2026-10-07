@@ -1,0 +1,124 @@
+{
+  "variant": "ordinary-mono",
+  "source_pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+  "source_tree": "87b2d5cbb8a79a17f09abb9282888f92130f7cf1",
+  "variant_tree": "bfb4a43d381e479504869cb77a0769bf63828f29",
+  "removed_families": [
+    54,
+    56,
+    65
+  ],
+  "reversed_production_commits": [
+    "e878008d07c8e728b65227a593f97d1d33afcd16",
+    "9db7ad5ca10217c57356df14c072663132257ef3",
+    "a107c046ea6eb5c092e9a4be7fb2d006a902ec84"
+  ],
+  "patch_file": "ordinary-mono.patch",
+  "patch_sha256": "beade1cd7b6d25757b581569840d323b7d9cab540d1d37984b918393c47eef48",
+  "snapshot": "affected files only; apply patch to complete exact-pin checkout",
+  "preserved": [
+    "caller-local upstream generic partitions (#59)",
+    "stable CGU merges (#64)",
+    "unused dependency diagnostics",
+    "collector diagnostic edge order",
+    "MIR-size estimates (#119)",
+    "worker/serialized query caches",
+    "metadata-prefix reuse",
+    "DepGraph::contains_previous_node used by retained coroutine projection test"
+  ],
+  "options": "ohm-incremental-mono-partitions remains accepted as an unused no-op so the same frozen Cargo runs both arms",
+  "native_validation_scope": "collector/codegen diagnostics; real library closure edits; test binary execution; unreachable const, changed and reordered edge histories; reuse-only assertions intentionally change",
+  "files": [
+    {
+      "path": "compiler/rustc_interface/src/passes.rs",
+      "operation": "modified",
+      "base_sha256": "137f950ae478b3800c05072020ab98c0ce4625237bb298e72bf75b5dcd95fb11",
+      "variant_sha256": "e8094f06284bb501a29ccbffb6c9273b7ed964252682fa9226b18aa92ce9109b"
+    },
+    {
+      "path": "compiler/rustc_middle/src/arena.rs",
+      "operation": "modified",
+      "base_sha256": "608d9479231296f5ab71f16fe38032534fdbd45489114d9b0129dfa5bb9eed4e",
+      "variant_sha256": "abc87d292f0f78b2d923efe695773df39c3988a2086e3c65602471e7e019b392"
+    },
+    {
+      "path": "compiler/rustc_middle/src/mono.rs",
+      "operation": "modified",
+      "base_sha256": "c5395db89c7a8f300802f55cbac97ed4e61642d429cfc673885856a793c89f8f",
+      "variant_sha256": "21c5d10e5309f898f552b83ff920dfd84ca99692ec7e7660ce3d7544e888ec04"
+    },
+    {
+      "path": "compiler/rustc_middle/src/queries.rs",
+      "operation": "modified",
+      "base_sha256": "a2ba128fd3b22a3faaa256870f5b48a51edaa9290100daade4f5405e0c445943",
+      "variant_sha256": "bbca9e154e2f176e2216c86ed60e73d9b2fa323591ef7086603de40037143f6c"
+    },
+    {
+      "path": "compiler/rustc_middle/src/query/erase.rs",
+      "operation": "modified",
+      "base_sha256": "24dec19a032d6883f28719ded10aca7e1baebc28fdba158cc6c53c53da0a06a6",
+      "variant_sha256": "191a1f0a50395d32a0cecbb2fe5dd8ea2efa7af2d1fbeb520226dc1d3b7c491a"
+    },
+    {
+      "path": "compiler/rustc_middle/src/query/on_disk_cache.rs",
+      "operation": "modified",
+      "base_sha256": "47d696218707605e0bb9192206596e0c515447f539010889eef99bf472df5931",
+      "variant_sha256": "79f8ffe7667ea9686e9e26c59669bd17e50045ef388458ca6aeb2279c68b43f0"
+    },
+    {
+      "path": "compiler/rustc_monomorphize/src/collector.rs",
+      "operation": "modified",
+      "base_sha256": "4e970c7f27ff66a5c0e725cfb8bdcbee61643065d73aa66ef2e7cdf2dbc6f49c",
+      "variant_sha256": "6d3f00c995c488743415179bcd60f19aae3784b6fb1e13b389c40f12cb6f66f5"
+    },
+    {
+      "path": "compiler/rustc_monomorphize/src/lib.rs",
+      "operation": "modified",
+      "base_sha256": "acda5002d7beae88b0e7109d579557fb5efadaa953f4738bd1a484dcd85370e8",
+      "variant_sha256": "ac701c70934761bfbbd71a4f2483d1f0edbfa7176c199cf5c1229b1ae2e40814"
+    },
+    {
+      "path": "compiler/rustc_monomorphize/src/partitioning.rs",
+      "operation": "modified",
+      "base_sha256": "1e947c04793321297b6dc2f6672764182e871b381999598b8b49343667a2574e",
+      "variant_sha256": "bf1c907ae8d528d448a5e091297e8c01bef140ab2ee4c4925dc29d9a2a7e0734"
+    },
+    {
+      "path": "compiler/rustc_query_impl/src/lib.rs",
+      "operation": "modified",
+      "base_sha256": "c0bd88bf4de1c47944f2fdb1bf3eb6259149943b061e36210b8c5a110bc69f7e",
+      "variant_sha256": "c2d4d68c6c3045af4ad7bc38fd7f1abf49cd0d01bd35d8202288034668004b51"
+    },
+    {
+      "path": "compiler/rustc_query_impl/src/query_vtables.rs",
+      "operation": "modified",
+      "base_sha256": "9dc942c469b4ef91e40f46b2693043ccda6a80a9b605cdb90e7d6dfe932a3520",
+      "variant_sha256": "12b516d0b70ebcc82eb63a5f8cc12adc9a4e976bd9d546cfd3de6eb19cd08b38"
+    }
+  ],
+  "complete_tree_manifest": "ordinary-mono/complete-tree.json",
+  "complete_tree_manifest_sha256": "af7979a8dd4978542cc03c8cff2db331c4f0c36a3a463aab1a49bcb89b7dd724",
+  "validation_status": "source export, index apply/reverse, diff check and config-aware formatting passed; compilation/native/performance pending",
+  "format_command": [
+    "rustfmt",
+    "+ohm",
+    "--check",
+    "--edition",
+    "2024",
+    "--config",
+    "skip_children=true",
+    "--config-path",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/rustfmt.toml",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_interface/src/passes.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_middle/src/arena.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_middle/src/mono.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_middle/src/queries.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_middle/src/query/erase.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_middle/src/query/on_disk_cache.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_monomorphize/src/collector.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_monomorphize/src/lib.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_monomorphize/src/partitioning.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_query_impl/src/lib.rs",
+    "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/variants/rust/ordinary-mono/compiler/rustc_query_impl/src/query_vtables.rs"
+  ]
+}

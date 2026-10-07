@@ -1,0 +1,67 @@
+diff --git a/compiler/rustc_middle/src/dep_graph/edges.rs b/compiler/rustc_middle/src/dep_graph/edges.rs
+index 4a0a9bd616b..bcd12f8ce9c 100644
+--- a/compiler/rustc_middle/src/dep_graph/edges.rs
++++ b/compiler/rustc_middle/src/dep_graph/edges.rs
+@@ -11,11 +11,8 @@
+ /// The reads recorded by one task so far, deduplicated and in first-read order.
+ #[derive(Debug)]
+ pub(crate) enum TaskReads {
+-    /// The first few reads, with a shortcut for consecutive duplicates and a filter
+-    /// that skips the exact scan when an index has not been seen before.
+-    ///
+-    /// The filter adds 8 bytes to `TaskReads` on 64-bit hosts (72 to 80 bytes).
+-    Small { len: u8, buf: [DepNodeIndex; SMALL_READS_MAX], last: DepNodeIndex, seen: u64 },
++    /// The first few reads, deduplicated by a linear scan. Most tasks never outgrow this.
++    Small { len: u8, buf: [DepNodeIndex; SMALL_READS_MAX] },
+ 
+     /// The reads of a task that outgrew the inline buffer.
+     Recorded(ReadsRecorder),
+@@ -24,12 +21,7 @@ pub(crate) enum TaskReads {
+ impl TaskReads {
+     #[inline]
+     pub(crate) fn new() -> Self {
+-        TaskReads::Small {
+-            len: 0,
+-            buf: [DepNodeIndex::ZERO; SMALL_READS_MAX],
+-            last: DepNodeIndex::ZERO,
+-            seen: 0,
+-        }
++        TaskReads::Small { len: 0, buf: [DepNodeIndex::ZERO; SMALL_READS_MAX] }
+     }
+ 
+     /// Records a read and returns whether it was new for the task. The pool provides a
+@@ -38,23 +30,13 @@ pub(crate) fn new() -> Self {
+     pub(crate) fn insert(&mut self, index: DepNodeIndex, pool: &Lock<Vec<ReadsRecorder>>) -> bool {
+         match self {
+             TaskReads::Recorded(recorder) => recorder.insert(index),
+-            TaskReads::Small { len, buf, last, seen } => {
++            TaskReads::Small { len, buf } => {
+                 let n = usize::from(*len);
+-                if n > 0 && *last == index {
+-                    return false;
+-                }
+-
+-                // A clear bit proves absence; a set bit may be a hash collision, so
+-                // those reads still need an exact lookup in the inline buffer.
+-                let bit = 1u64 << (index.as_u32() & 63);
+-                if (*seen & bit != 0) && buf[..n].contains(&index) {
+-                    *last = index;
++                if buf[..n].contains(&index) {
+                     false
+                 } else if n < SMALL_READS_MAX {
+                     buf[n] = index;
+                     *len += 1;
+-                    *last = index;
+-                    *seen |= bit;
+                     true
+                 } else {
+                     // The inline buffer is full: move the reads into a pooled recorder.
+@@ -74,7 +56,7 @@ pub(crate) fn insert(&mut self, index: DepNodeIndex, pool: &Lock<Vec<ReadsRecord
+     #[inline]
+     pub(crate) fn edges(&self) -> &[DepNodeIndex] {
+         match self {
+-            TaskReads::Small { len, buf, .. } => &buf[..usize::from(*len)],
++            TaskReads::Small { len, buf } => &buf[..usize::from(*len)],
+             TaskReads::Recorded(recorder) => &recorder.reads,
+         }
+     }

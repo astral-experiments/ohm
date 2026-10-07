@@ -1,0 +1,2600 @@
+{
+  "generated_from": "Checked-in published benchmark JSON and live fetched PR bodies; this file preserves arithmetic and raw inputs, not new timing results.",
+  "latest_workflow_source": {
+    "path": "scripts/benchmark_results/release-1.99.0-1.json",
+    "sha256": "8c6ec8ee91bc3c11a17cf37dc128a6079c06b8dde5f38352c8b587be0b49c50f"
+  },
+  "workflows": [
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "cold",
+      "stock_seconds": 71.86945615301374,
+      "ohm_seconds": 73.72838669503108,
+      "speedup": 0.9747867731094323,
+      "samples": 1,
+      "saved_seconds": -1.8589305420173332,
+      "reduction_percent": -2.5865376496791326,
+      "raw_seconds": {
+        "stock": [
+          71.86945615301374
+        ],
+        "ohm": [
+          73.72838669503108
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "noop",
+      "stock_seconds": 0.6177933329017833,
+      "ohm_seconds": 0.595884123002179,
+      "speedup": 1.036767567810368,
+      "samples": 3,
+      "saved_seconds": 0.02190920989960432,
+      "reduction_percent": 3.5463655453671694,
+      "raw_seconds": {
+        "stock": [
+          0.6177933329017833,
+          0.554012194974348,
+          1.0207706389483064
+        ],
+        "ohm": [
+          0.8480133659904823,
+          0.595884123002179,
+          0.5866567110642791
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "dependency",
+      "stock_seconds": 12.970418410026468,
+      "ohm_seconds": 1.092589890002273,
+      "speedup": 11.871259773417348,
+      "samples": 7,
+      "saved_seconds": 11.877828520024195,
+      "reduction_percent": 91.57629418371212,
+      "raw_seconds": {
+        "stock": [
+          14.629312467062846,
+          12.970418410026468,
+          11.983688674983568,
+          13.851518661016598,
+          12.8288039250765,
+          13.405217204941437,
+          12.302248610998504
+        ],
+        "ohm": [
+          1.176677150069736,
+          0.8332985910819843,
+          1.092589890002273,
+          0.7761531209107488,
+          1.1564043170074,
+          0.7276998501038179,
+          1.1884982070187107
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "check",
+      "phase": "direct",
+      "stock_seconds": 3.473841215018183,
+      "ohm_seconds": 3.713891802006401,
+      "speedup": 0.9353641409643295,
+      "samples": 5,
+      "saved_seconds": -0.24005058698821813,
+      "reduction_percent": -6.910234870564214,
+      "raw_seconds": {
+        "stock": [
+          3.473841215018183,
+          3.851492513087578,
+          3.4715866829501465,
+          3.246213898062706,
+          3.6482370890444145
+        ],
+        "ohm": [
+          3.713891802006401,
+          2.896136185969226,
+          4.410566197009757,
+          3.183073774096556,
+          3.925892021972686
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "cold",
+      "stock_seconds": 79.37173774000257,
+      "ohm_seconds": 73.71296880801674,
+      "speedup": 1.0767676166554074,
+      "samples": 1,
+      "saved_seconds": 5.658768931985833,
+      "reduction_percent": 7.129450725297493,
+      "raw_seconds": {
+        "stock": [
+          79.37173774000257
+        ],
+        "ohm": [
+          73.71296880801674
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "noop",
+      "stock_seconds": 0.7129051249939948,
+      "ohm_seconds": 0.5686269570142031,
+      "speedup": 1.2537307916905318,
+      "samples": 3,
+      "saved_seconds": 0.14427816797979176,
+      "reduction_percent": 20.238060145942573,
+      "raw_seconds": {
+        "stock": [
+          0.8861701800487936,
+          0.7129051249939948,
+          0.573975250008516
+        ],
+        "ohm": [
+          0.6049683660967276,
+          0.5686269570142031,
+          0.5212529770797119
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "stock_seconds": 16.905496918945573,
+      "ohm_seconds": 0.8798616249114275,
+      "speedup": 19.213813218240297,
+      "samples": 7,
+      "saved_seconds": 16.025635294034146,
+      "reduction_percent": 94.79541104807521,
+      "raw_seconds": {
+        "stock": [
+          17.739624422974885,
+          16.60314440098591,
+          16.957381660002284,
+          16.905496918945573,
+          16.62308750906959,
+          16.487511405022815,
+          17.069024662021548
+        ],
+        "ohm": [
+          0.9268469439120963,
+          0.868115623947233,
+          0.8961591320112348,
+          0.8737013819627464,
+          0.9004079930018634,
+          0.8595692369854078,
+          0.8798616249114275
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "clippy",
+      "phase": "direct",
+      "stock_seconds": 4.495304355979897,
+      "ohm_seconds": 3.5399604049744084,
+      "speedup": 1.269874191152823,
+      "samples": 5,
+      "saved_seconds": 0.9553439510054886,
+      "reduction_percent": 21.252041582782677,
+      "raw_seconds": {
+        "stock": [
+          4.11416638805531,
+          4.017628606990911,
+          4.641640751971863,
+          4.937940861913376,
+          4.495304355979897
+        ],
+        "ohm": [
+          3.3171505760401487,
+          3.5399604049744084,
+          3.651202511973679,
+          4.455222200020216,
+          3.4530307470122352
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "cold",
+      "stock_seconds": 144.63434488000348,
+      "ohm_seconds": 120.4138082760619,
+      "speedup": 1.201144178983305,
+      "samples": 1,
+      "saved_seconds": 24.220536603941582,
+      "reduction_percent": 16.74604785193742,
+      "raw_seconds": {
+        "stock": [
+          144.63434488000348
+        ],
+        "ohm": [
+          120.4138082760619
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "noop",
+      "stock_seconds": 1.603980585001409,
+      "ohm_seconds": 1.4112953229341656,
+      "speedup": 1.1365307876643702,
+      "samples": 3,
+      "saved_seconds": 0.19268526206724346,
+      "reduction_percent": 12.012942293006256,
+      "raw_seconds": {
+        "stock": [
+          2.242761190980673,
+          1.603980585001409,
+          1.5166133421007544
+        ],
+        "ohm": [
+          1.4112953229341656,
+          1.439127678051591,
+          1.307580552995205
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "dependency",
+      "stock_seconds": 26.266719507984817,
+      "ohm_seconds": 3.787356119020842,
+      "speedup": 6.935370924341712,
+      "samples": 7,
+      "saved_seconds": 22.479363388963975,
+      "reduction_percent": 85.5811605333147,
+      "raw_seconds": {
+        "stock": [
+          27.878853371948935,
+          28.196110718068667,
+          26.266719507984817,
+          24.84539934399072,
+          24.378884730977006,
+          27.339492869912647,
+          26.242728045093827
+        ],
+        "ohm": [
+          3.0802245549857616,
+          3.742275855038315,
+          4.212549744988792,
+          4.2157881220337,
+          3.787356119020842,
+          3.90615831699688,
+          3.526785621070303
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "test",
+      "phase": "direct",
+      "stock_seconds": 24.438554076012224,
+      "ohm_seconds": 12.045470932032913,
+      "speedup": 2.028858333053794,
+      "samples": 5,
+      "saved_seconds": 12.393083143979311,
+      "reduction_percent": 50.7111963556952,
+      "raw_seconds": {
+        "stock": [
+          25.378955626976676,
+          24.438554076012224,
+          23.226972189964727,
+          25.09837930998765,
+          22.47233431204222
+        ],
+        "ohm": [
+          12.045470932032913,
+          13.254446698003449,
+          10.789162095985375,
+          11.997327819932252,
+          12.394997948082164
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "build-check",
+      "phase": "transition",
+      "stock_seconds": 70.46437022206374,
+      "ohm_seconds": 23.896250154008158,
+      "speedup": 2.948762662255803,
+      "samples": 1,
+      "saved_seconds": 46.56812006805558,
+      "reduction_percent": 66.087470761889,
+      "raw_seconds": {
+        "stock": [
+          70.46437022206374
+        ],
+        "ohm": [
+          23.896250154008158
+        ]
+      }
+    },
+    {
+      "project": "uv",
+      "workflow": "shared-build",
+      "phase": "reuse",
+      "stock_seconds": 9.54401090706233,
+      "ohm_seconds": 1.6390124280005693,
+      "speedup": 5.823025343807225,
+      "samples": 1,
+      "saved_seconds": 7.90499847906176,
+      "reduction_percent": 82.82679636516612,
+      "raw_seconds": {
+        "stock": [
+          9.54401090706233
+        ],
+        "ohm": [
+          1.6390124280005693
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "cold",
+      "stock_seconds": 133.17400728701614,
+      "ohm_seconds": 124.51587742299307,
+      "speedup": 1.0695343440789524,
+      "samples": 1,
+      "saved_seconds": 8.658129864023067,
+      "reduction_percent": 6.5013661752800544,
+      "raw_seconds": {
+        "stock": [
+          133.17400728701614
+        ],
+        "ohm": [
+          124.51587742299307
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "noop",
+      "stock_seconds": 1.0465763839893043,
+      "ohm_seconds": 0.9391505209496245,
+      "speedup": 1.1143862039612733,
+      "samples": 3,
+      "saved_seconds": 0.10742586303967983,
+      "reduction_percent": 10.264502876531346,
+      "raw_seconds": {
+        "stock": [
+          1.044816856039688,
+          1.0465763839893043,
+          1.0730253729270771
+        ],
+        "ohm": [
+          1.232262915931642,
+          0.9300992760108784,
+          0.9391505209496245
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "dependency",
+      "stock_seconds": 21.60326502507087,
+      "ohm_seconds": 1.6270529510220513,
+      "speedup": 13.277542695522317,
+      "samples": 7,
+      "saved_seconds": 19.976212074048817,
+      "reduction_percent": 92.46848590185866,
+      "raw_seconds": {
+        "stock": [
+          20.79111342795659,
+          23.15754302404821,
+          21.0667729730485,
+          24.127797168912366,
+          21.11956392508,
+          23.662749160081148,
+          21.60326502507087
+        ],
+        "ohm": [
+          1.6877071759663522,
+          1.5176246690098196,
+          1.6879522880772129,
+          1.3730354069266468,
+          1.6270529510220513,
+          1.2947893829550594,
+          1.8058757800608873
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "check",
+      "phase": "direct",
+      "stock_seconds": 6.999244683072902,
+      "ohm_seconds": 6.408295675064437,
+      "speedup": 1.0922162518667684,
+      "samples": 5,
+      "saved_seconds": 0.5909490080084652,
+      "reduction_percent": 8.443039710236544,
+      "raw_seconds": {
+        "stock": [
+          6.837407883955166,
+          7.956720603979193,
+          6.794438334996812,
+          6.999244683072902,
+          7.10456610401161
+        ],
+        "ohm": [
+          6.404762350954115,
+          6.408295675064437,
+          7.247465117950924,
+          5.586082183988765,
+          7.397446657996625
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "cold",
+      "stock_seconds": 202.14924596599303,
+      "ohm_seconds": 157.94482619001064,
+      "speedup": 1.2798725405718807,
+      "samples": 1,
+      "saved_seconds": 44.20441977598239,
+      "reduction_percent": 21.867219719146892,
+      "raw_seconds": {
+        "stock": [
+          202.14924596599303
+        ],
+        "ohm": [
+          157.94482619001064
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "noop",
+      "stock_seconds": 1.1984105400042608,
+      "ohm_seconds": 1.0966406690422446,
+      "speedup": 1.0928014743889605,
+      "samples": 3,
+      "saved_seconds": 0.10176987096201628,
+      "reduction_percent": 8.49207075245303,
+      "raw_seconds": {
+        "stock": [
+          1.2734749580267817,
+          1.1984105400042608,
+          1.1806551279732957
+        ],
+        "ohm": [
+          1.5800403410103172,
+          1.0966406690422446,
+          1.0877324510365725
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "dependency",
+      "stock_seconds": 49.633875090046786,
+      "ohm_seconds": 1.7702117708977312,
+      "speedup": 28.038382698628116,
+      "samples": 7,
+      "saved_seconds": 47.863663319149055,
+      "reduction_percent": 96.43346047898501,
+      "raw_seconds": {
+        "stock": [
+          54.8101730881026,
+          48.95042202901095,
+          50.102596329990774,
+          49.16533075191546,
+          50.14896541205235,
+          49.263585239998065,
+          49.633875090046786
+        ],
+        "ohm": [
+          2.064134939922951,
+          1.863308829953894,
+          1.7702117708977312,
+          2.0294843930751085,
+          1.6165101130027324,
+          1.6336780930869281,
+          1.5886755919782445
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "clippy",
+      "phase": "direct",
+      "stock_seconds": 24.819420088082552,
+      "ohm_seconds": 18.12157571699936,
+      "speedup": 1.3696060693441865,
+      "samples": 5,
+      "saved_seconds": 6.6978443710831925,
+      "reduction_percent": 26.986304866564026,
+      "raw_seconds": {
+        "stock": [
+          24.314877728000283,
+          24.276671577012166,
+          24.819420088082552,
+          25.267847795970738,
+          24.917408703942783
+        ],
+        "ohm": [
+          18.12157571699936,
+          18.702265094034374,
+          19.117404149030335,
+          17.52244674100075,
+          17.666945412987843
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "cold",
+      "stock_seconds": 279.44434008596,
+      "ohm_seconds": 240.28052276803646,
+      "speedup": 1.1629920597256722,
+      "samples": 1,
+      "saved_seconds": 39.16381731792353,
+      "reduction_percent": 14.014890158761606,
+      "raw_seconds": {
+        "stock": [
+          279.44434008596
+        ],
+        "ohm": [
+          240.28052276803646
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "noop",
+      "stock_seconds": 3.011195173021406,
+      "ohm_seconds": 2.8982277950271964,
+      "speedup": 1.038978087984678,
+      "samples": 3,
+      "saved_seconds": 0.11296737799420953,
+      "reduction_percent": 3.751579406288008,
+      "raw_seconds": {
+        "stock": [
+          2.997539314092137,
+          3.0875161049189046,
+          3.011195173021406
+        ],
+        "ohm": [
+          4.004383176914416,
+          2.8982277950271964,
+          2.850844367989339
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "dependency",
+      "stock_seconds": 57.80574282002635,
+      "ohm_seconds": 5.19896275002975,
+      "speedup": 11.118706865075263,
+      "samples": 7,
+      "saved_seconds": 52.6067800699966,
+      "reduction_percent": 91.00614835758392,
+      "raw_seconds": {
+        "stock": [
+          59.181466556037776,
+          59.28161110391375,
+          57.80574282002635,
+          56.80225370195694,
+          55.67948221892584,
+          62.607783616986126,
+          57.53587478096597
+        ],
+        "ohm": [
+          6.213027097051963,
+          4.995350515004247,
+          4.983651954913512,
+          5.309938054997474,
+          4.996115311048925,
+          5.19896275002975,
+          5.475501887965947
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "test",
+      "phase": "direct",
+      "stock_seconds": 39.01197357196361,
+      "ohm_seconds": 29.33293991908431,
+      "speedup": 1.3299714818759787,
+      "samples": 5,
+      "saved_seconds": 9.679033652879298,
+      "reduction_percent": 24.81041784524135,
+      "raw_seconds": {
+        "stock": [
+          40.25904766400345,
+          40.138312467955984,
+          33.499748085974716,
+          39.01197357196361,
+          34.005443361005746
+        ],
+        "ohm": [
+          37.726036604028195,
+          29.33293991908431,
+          28.075873375986703,
+          28.046912344987504,
+          29.77796075597871
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "build-check",
+      "phase": "transition",
+      "stock_seconds": 125.53571820491925,
+      "ohm_seconds": 63.673592801904306,
+      "speedup": 1.9715507274024093,
+      "samples": 1,
+      "saved_seconds": 61.86212540301494,
+      "reduction_percent": 49.278505183707,
+      "raw_seconds": {
+        "stock": [
+          125.53571820491925
+        ],
+        "ohm": [
+          63.673592801904306
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "shared-build",
+      "phase": "reuse",
+      "stock_seconds": 3.9749602749943733,
+      "ohm_seconds": 0.7539784900145605,
+      "speedup": 5.271981001629914,
+      "samples": 1,
+      "saved_seconds": 3.220981784979813,
+      "reduction_percent": 81.03179810984079,
+      "raw_seconds": {
+        "stock": [
+          3.9749602749943733
+        ],
+        "ohm": [
+          0.7539784900145605
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "noop",
+      "stock_seconds": 11.91126353899017,
+      "ohm_seconds": 0.30810458096675575,
+      "speedup": 38.659806685170274,
+      "samples": 3,
+      "saved_seconds": 11.603158958023414,
+      "reduction_percent": 97.41333419449406,
+      "raw_seconds": {
+        "stock": [
+          12.27503586304374,
+          11.91126353899017,
+          11.901980099035427
+        ],
+        "ohm": [
+          0.3290543929906562,
+          0.30810458096675575,
+          0.30592379008885473
+        ]
+      }
+    },
+    {
+      "project": "codex-core",
+      "workflow": "fmt",
+      "phase": "direct",
+      "stock_seconds": 12.43684799107723,
+      "ohm_seconds": 0.5028089510742575,
+      "speedup": 24.734738640801343,
+      "samples": 5,
+      "saved_seconds": 11.934039040002972,
+      "reduction_percent": 95.9571030261446,
+      "raw_seconds": {
+        "stock": [
+          12.969032288063318,
+          12.43684799107723,
+          13.220759798074141,
+          12.310304568964057,
+          12.079852987080812
+        ],
+        "ohm": [
+          0.49618460901547223,
+          0.5071166380075738,
+          0.5028089510742575,
+          0.5108510210411623,
+          0.5008775240276009
+        ]
+      }
+    }
+  ],
+  "sessions": [
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.99.0-1-baseline.json",
+        "sha256": "b0fb4db3522ce2511cf9005a1d8ca68ecad011f90691cdde931fb79ac63f7032"
+      },
+      "project": "ruff",
+      "raw_seconds": {
+        "stock": [
+          522.4228896639543,
+          529.9615161359543
+        ],
+        "ohm": [
+          361.4905966699589,
+          363.2502677079756
+        ]
+      },
+      "stock_median": 526.1922028999543,
+      "ohm_median": 362.37043218896724,
+      "saved_seconds": 163.82177071098704,
+      "reduction_percent": 31.13344701957409,
+      "warmups": {
+        "stock": [
+          161.25529202702455,
+          161.0808912180364
+        ],
+        "ohm": [
+          120.79884899605531,
+          124.49668975698296
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.99.0-1-baseline.json",
+        "sha256": "b0fb4db3522ce2511cf9005a1d8ca68ecad011f90691cdde931fb79ac63f7032"
+      },
+      "project": "uv",
+      "raw_seconds": {
+        "stock": [
+          166.80287342402153,
+          172.91027929703705
+        ],
+        "ohm": [
+          119.45354363904335,
+          119.69939671293832
+        ]
+      },
+      "stock_median": 169.8565763605293,
+      "ohm_median": 119.57647017599083,
+      "saved_seconds": 50.280106184538454,
+      "reduction_percent": 29.601506907696262,
+      "warmups": {
+        "stock": [
+          239.1005802929867,
+          239.660910535953
+        ],
+        "ohm": [
+          177.68621382093988,
+          178.3048366670264
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.99.0-1-baseline.json",
+        "sha256": "b0fb4db3522ce2511cf9005a1d8ca68ecad011f90691cdde931fb79ac63f7032"
+      },
+      "project": "codex",
+      "raw_seconds": {
+        "stock": [
+          619.9753370829858,
+          644.1224570149789
+        ],
+        "ohm": [
+          374.1816001260886,
+          400.2089561170433
+        ]
+      },
+      "stock_median": 632.0488970489823,
+      "ohm_median": 387.19527812156593,
+      "saved_seconds": 244.8536189274164,
+      "reduction_percent": 38.739663983377035,
+      "warmups": {
+        "stock": [
+          340.5805274270242,
+          345.93477727402933
+        ],
+        "ohm": [
+          291.5909851200413,
+          300.655227552983
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.99.0-1-ruff-historical.json",
+        "sha256": "3586f362f5db456caeae7dd0d097ea65f0631c30fe0510382d53cb9fe30f9f20"
+      },
+      "project": "ruff",
+      "raw_seconds": {
+        "stock": [
+          502.14314426109195,
+          506.7829677630216
+        ],
+        "ohm": [
+          352.01415957999416,
+          353.99459335790016
+        ]
+      },
+      "stock_median": 504.46305601205677,
+      "ohm_median": 353.00437646894716,
+      "saved_seconds": 151.4586795431096,
+      "reduction_percent": 30.023740636319207,
+      "warmups": {
+        "stock": [
+          210.24570777011104,
+          212.40462854399811
+        ],
+        "ohm": [
+          157.52560108993202,
+          159.29013038706034
+        ]
+      }
+    }
+  ],
+  "session_command_regressions": [
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "ruff",
+      "index": 1,
+      "label": "Establish the focused cycle and attribute baseline",
+      "category": "test",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "-E",
+        "test(mdtest::cycle.md) | test(mdtest::attributes.md)",
+        "--status-level",
+        "fail"
+      ],
+      "wall_seconds": {
+        "stock": [
+          1.913532990962267,
+          2.370278347050771
+        ],
+        "ohm": [
+          2.9056606950471178,
+          2.7336993120843545
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          2,
+          2
+        ],
+        "ohm": [
+          2,
+          2
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 2.141905669006519,
+      "ohm_median": 2.819680003565736,
+      "increase_percent": 31.643519337319347
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "ruff",
+      "index": 12,
+      "label": "Run all semantic mdtests after the fixed-point rewrite",
+      "category": "test",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--failure-output",
+        "immediate-final"
+      ],
+      "wall_seconds": {
+        "stock": [
+          8.592535127070732,
+          8.669881668058224
+        ],
+        "ohm": [
+          10.436186576029286,
+          11.199750305037014
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          482,
+          482
+        ],
+        "ohm": [
+          482,
+          482
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 8.631208397564478,
+      "ohm_median": 10.81796844053315,
+      "increase_percent": 25.335502773698803
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "ruff",
+      "index": 15,
+      "label": "Verify final workspace formatting",
+      "category": "formatting",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "wall_seconds": {
+        "stock": [
+          7.17269098199904,
+          7.736632946063764
+        ],
+        "ohm": [
+          9.032837235019542,
+          8.844285403960384
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 7.454661964031402,
+      "ohm_median": 8.938561319489963,
+      "increase_percent": 19.905655851577798
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "uv",
+      "index": 3,
+      "label": "Run all PyPI types tests",
+      "category": "test",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--locked"
+      ],
+      "wall_seconds": {
+        "stock": [
+          0.47631717298645526,
+          0.4621428489917889
+        ],
+        "ohm": [
+          0.6587847440969199,
+          0.44619353802409023
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          55,
+          55
+        ],
+        "ohm": [
+          55,
+          55
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 0.4692300109891221,
+      "ohm_median": 0.5524891410605051,
+      "increase_percent": 17.743777704217024
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "uv",
+      "index": 6,
+      "label": "Check workspace formatting",
+      "category": "formatting",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "wall_seconds": {
+        "stock": [
+          3.901985910953954,
+          3.7202980519505218
+        ],
+        "ohm": [
+          4.7371291059535,
+          4.572375540970825
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 3.811141981452238,
+      "ohm_median": 4.654752323462162,
+      "increase_percent": 22.135369034151452
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "uv",
+      "index": 8,
+      "label": "Rerun focused Simple API parser tests",
+      "category": "test",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "simple_json::",
+        "--locked"
+      ],
+      "wall_seconds": {
+        "stock": [
+          1.9907667050138116,
+          3.059371904935688
+        ],
+        "ohm": [
+          2.893649716046639,
+          3.119121883995831
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          9,
+          9
+        ],
+        "ohm": [
+          9,
+          9
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          1,
+          1
+        ],
+        "ohm": [
+          1,
+          1
+        ]
+      },
+      "stock_median": 2.5250693049747497,
+      "ohm_median": 3.006385800021235,
+      "increase_percent": 19.061516216534045
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "uv",
+      "index": 10,
+      "label": "Run registry-client unit tests",
+      "category": "test",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-client",
+        "registry_client::tests::",
+        "--locked"
+      ],
+      "wall_seconds": {
+        "stock": [
+          7.8340536339674145,
+          9.924246322014369
+        ],
+        "ohm": [
+          8.942076415056363,
+          10.195094579015858
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          12,
+          12
+        ],
+        "ohm": [
+          12,
+          12
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          8,
+          8
+        ],
+        "ohm": [
+          8,
+          8
+        ]
+      },
+      "stock_median": 8.879149977990892,
+      "ohm_median": 9.56858549703611,
+      "increase_percent": 7.764656760547473
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "uv",
+      "index": 14,
+      "label": "Recheck parser and registry-client Clippy",
+      "category": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "uv-pypi-types",
+        "-p",
+        "uv-client",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings",
+        "-A",
+        "clippy::doc_markdown",
+        "-A",
+        "clippy::double_must_use"
+      ],
+      "wall_seconds": {
+        "stock": [
+          5.487030329066329,
+          6.06714314094279
+        ],
+        "ohm": [
+          8.536040581064299,
+          8.013129862956703
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          8,
+          8
+        ],
+        "ohm": [
+          8,
+          8
+        ]
+      },
+      "stock_median": 5.777086735004559,
+      "ohm_median": 8.2745852220105,
+      "increase_percent": 43.23110594606592
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "codex",
+      "index": 1,
+      "label": "Run the existing focused startup tests before editing",
+      "category": "test",
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-tui",
+        "startup"
+      ],
+      "wall_seconds": {
+        "stock": [
+          10.495947597082704,
+          9.837314739008434
+        ],
+        "ohm": [
+          11.169249144033529,
+          15.749885409954004
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          75,
+          75
+        ],
+        "ohm": [
+          75,
+          75
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 10.16663116804557,
+      "ohm_median": 13.459567276993766,
+      "increase_percent": 32.389648591739274
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "codex",
+      "index": 7,
+      "label": "Run the focused active-cell rendering tests",
+      "category": "test",
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-tui",
+        "chatwidget::rendering::tests"
+      ],
+      "wall_seconds": {
+        "stock": [
+          3.0759709359845147,
+          2.7098475539823994
+        ],
+        "ohm": [
+          4.374405523063615,
+          3.345779569935985
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          5,
+          5
+        ],
+        "ohm": [
+          5,
+          5
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 2.892909244983457,
+      "ohm_median": 3.8600925464998,
+      "increase_percent": 33.43289469566037
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "codex",
+      "index": 8,
+      "label": "Confirm animated active cells continue rendering",
+      "category": "test",
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-tui",
+        "active_cell_layout_reuses_heights_without_freezing_animation"
+      ],
+      "wall_seconds": {
+        "stock": [
+          2.6969442650442943,
+          2.674145920900628
+        ],
+        "ohm": [
+          4.494703143951483,
+          4.351219256059267
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          1,
+          1
+        ],
+        "ohm": [
+          1,
+          1
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 2.685545092972461,
+      "ohm_median": 4.422961200005375,
+      "increase_percent": 64.69510087837985
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "codex",
+      "index": 11,
+      "label": "Validate active-cell removal cache invalidation",
+      "category": "test",
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-tui",
+        "removing_active_cell_invalidates_layout_before_reusing_its_identity"
+      ],
+      "wall_seconds": {
+        "stock": [
+          2.717893421999179,
+          3.1065914650680497
+        ],
+        "ohm": [
+          3.5931297240313143,
+          3.2651823909254745
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          1,
+          1
+        ],
+        "ohm": [
+          1,
+          1
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 2.9122424435336143,
+      "ohm_median": 3.4291560574783944,
+      "increase_percent": 17.74967654539006
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-baseline.json",
+      "project": "codex",
+      "index": 12,
+      "label": "Rerun the complete focused rendering regression module",
+      "category": "test",
+      "command": [
+        "just",
+        "test",
+        "-p",
+        "codex-tui",
+        "chatwidget::rendering::tests"
+      ],
+      "wall_seconds": {
+        "stock": [
+          2.694031252991408,
+          2.6742298640310764
+        ],
+        "ohm": [
+          3.91111717291642,
+          4.1571736090118065
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          5,
+          5
+        ],
+        "ohm": [
+          5,
+          5
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 2.6841305585112423,
+      "ohm_median": 4.034145390964113,
+      "increase_percent": 50.29616864843038
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-ruff-historical.json",
+      "project": "ruff",
+      "index": 1,
+      "label": "Check the semantic crate before editing",
+      "category": "check",
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "ty_python_semantic"
+      ],
+      "wall_seconds": {
+        "stock": [
+          0.5003987399395555,
+          0.312668469035998
+        ],
+        "ohm": [
+          0.5082839570241049,
+          0.718959245015867
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 0.40653360448777676,
+      "ohm_median": 0.613621601019986,
+      "increase_percent": 50.93994549187033
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-ruff-historical.json",
+      "project": "ruff",
+      "index": 12,
+      "label": "Recheck instance-attribute regressions",
+      "category": "test",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--",
+        "mdtest::attributes.md"
+      ],
+      "wall_seconds": {
+        "stock": [
+          1.8961345549905673,
+          1.9381932370597497
+        ],
+        "ohm": [
+          2.098867365042679,
+          2.0838191020302474
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          1,
+          1
+        ],
+        "ohm": [
+          1,
+          1
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 1.9171638960251585,
+      "ohm_median": 2.0913432335364632,
+      "increase_percent": 9.085260674500994
+    },
+    {
+      "source": "scripts/session_replays/release-1.99.0-1-ruff-historical.json",
+      "project": "ruff",
+      "index": 14,
+      "label": "Verify Rust formatting across the workspace",
+      "category": "formatting",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "wall_seconds": {
+        "stock": [
+          7.876775569980964,
+          7.052101737936027
+        ],
+        "ohm": [
+          10.118134951917455,
+          9.568845728063025
+        ]
+      },
+      "tests_started": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "cargo_status_message_counts": {
+        "stock": [
+          0,
+          0
+        ],
+        "ohm": [
+          0,
+          0
+        ]
+      },
+      "stock_median": 7.464438653958496,
+      "ohm_median": 9.84349033999024,
+      "increase_percent": 31.871809741112944
+    }
+  ],
+  "historical_uv_feature_ablations": [
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.98.0-11-uv-feature-ablation.json",
+        "sha256": "35871df805783f02b5bcae7407887a2306ae17d4d7d45fa434b42a0913872ff5"
+      },
+      "release": "ohm-1.98.0-11",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-study-1",
+        "logical_cpus": 32,
+        "cpu_model": "AMD EPYC-Milan Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          3.937130474980222,
+          3.5730513820017222
+        ],
+        "ohm-no-public-api-hash": [
+          6.475713933003135,
+          7.350606429972686
+        ],
+        "ohm-no-proc-macro-cache": [
+          3.921404490014538,
+          3.8630133059923537
+        ],
+        "ohm-neither": [
+          6.806904619996203,
+          7.207747799984645
+        ]
+      },
+      "medians": {
+        "ohm-all": 3.755090928490972,
+        "ohm-no-public-api-hash": 6.9131601814879104,
+        "ohm-no-proc-macro-cache": 3.892208898003446,
+        "ohm-neither": 7.007326209990424
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 3.1365932824919582,
+        "reduction_percent": 45.064420800871986
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.11564199900749372,
+        "reduction_percent": 2.121962044467021
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": 0.1371179695124738,
+        "reduction_percent": 3.5228831007197496,
+        "same_repetition_saved_seconds": [
+          -0.015725984965683892,
+          0.2899619239906315
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.98.0-5-uv-feature-ablation.json",
+        "sha256": "c1acf1766c3d05c7104eaabbe89cf4c4bbd41758dab4d393f4907124953359fb"
+      },
+      "release": "ohm-1.98.0-5",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-1",
+        "logical_cpus": 32,
+        "cpu_model": "AMD EPYC-Milan Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          3.3885072849225253,
+          4.032819407060742
+        ],
+        "ohm-no-public-api-hash": [
+          5.956848146859556,
+          6.156426813919097
+        ],
+        "ohm-no-proc-macro-cache": [
+          3.6169915080536157,
+          3.507173630176112
+        ],
+        "ohm-neither": [
+          6.25201288308017,
+          6.343774759909138
+        ]
+      },
+      "medians": {
+        "ohm-all": 3.710663345991634,
+        "ohm-no-public-api-hash": 6.056637480389327,
+        "ohm-no-proc-macro-cache": 3.562082569114864,
+        "ohm-neither": 6.297893821494654
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 2.5408926933887415,
+        "reduction_percent": 41.13296783668795
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.046337782114278525,
+        "reduction_percent": 0.9399166951030407
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": -0.14858077687676996,
+        "reduction_percent": -4.171177225509698,
+        "same_repetition_saved_seconds": [
+          0.2284842231310904,
+          -0.5256457768846303
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.98.0-6-uv-feature-ablation.json",
+        "sha256": "b138151e1b979a4ec6e5b8c09ae028ab9083888740e8045a30c0ad21d02913c8"
+      },
+      "release": "ohm-1.98.0-6",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-1",
+        "logical_cpus": 32,
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          2.9619253911077976,
+          2.9147312585264444
+        ],
+        "ohm-no-public-api-hash": [
+          4.823293708264828,
+          4.82500503398478
+        ],
+        "ohm-no-proc-macro-cache": [
+          3.0211280724033713,
+          3.081377082504332
+        ],
+        "ohm-neither": [
+          5.064355676062405,
+          5.273215834982693
+        ]
+      },
+      "medians": {
+        "ohm-all": 2.938328324817121,
+        "ohm-no-public-api-hash": 4.824149371124804,
+        "ohm-no-proc-macro-cache": 3.0512525774538517,
+        "ohm-neither": 5.168785755522549
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 2.00167711218819,
+        "reduction_percent": 40.06184543018756
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.2287803185172379,
+        "reduction_percent": 5.566405149217805
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": 0.11292425263673067,
+        "reduction_percent": 3.7009146168738822,
+        "same_repetition_saved_seconds": [
+          0.05920268129557371,
+          0.16664582397788763
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.98.0-7-uv-feature-ablation.json",
+        "sha256": "d5c918992e5e70c3f09324bcc3ee7afdabfda1eca268d7302751de9960218186"
+      },
+      "release": "ohm-1.98.0-7",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-1",
+        "logical_cpus": 32,
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          3.1381307560950518,
+          3.37983503844589
+        ],
+        "ohm-no-public-api-hash": [
+          5.632233156822622,
+          5.366703516803682
+        ],
+        "ohm-no-proc-macro-cache": [
+          3.2766865147277713,
+          3.6369685977697372
+        ],
+        "ohm-neither": [
+          5.646487267687917,
+          5.6534044882282615
+        ]
+      },
+      "medians": {
+        "ohm-all": 3.258982897270471,
+        "ohm-no-public-api-hash": 5.499468336813152,
+        "ohm-no-proc-macro-cache": 3.4568275562487543,
+        "ohm-neither": 5.649945877958089
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 2.216801880626008,
+        "reduction_percent": 39.765351576750824
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.17416110006161034,
+        "reduction_percent": 3.8248695066339695
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": 0.1978446589782834,
+        "reduction_percent": 5.723301372689198,
+        "same_repetition_saved_seconds": [
+          0.13855575863271952,
+          0.2571335593238473
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.98.0-8-uv-feature-ablation.json",
+        "sha256": "96e1cdeb188fd9d3b5e5726f9372db1e400568032314f8b358f5d28aade4c9a2"
+      },
+      "release": "ohm-1.98.0-8",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-1",
+        "logical_cpus": 32,
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          3.4569899700582027,
+          3.378391483798623
+        ],
+        "ohm-no-public-api-hash": [
+          5.586315795779228,
+          5.9035385232418776
+        ],
+        "ohm-no-proc-macro-cache": [
+          3.4249821519479156,
+          3.2657481664791703
+        ],
+        "ohm-neither": [
+          6.027385143563151,
+          5.876216561533511
+        ]
+      },
+      "medians": {
+        "ohm-all": 3.417690726928413,
+        "ohm-no-public-api-hash": 5.744927159510553,
+        "ohm-no-proc-macro-cache": 3.345365159213543,
+        "ohm-neither": 5.951800852548331
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 2.466836062958464,
+        "reduction_percent": 42.179933745834724
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.06727406266145408,
+        "reduction_percent": 1.4471950393559811
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": -0.07232556771486998,
+        "reduction_percent": -2.1619633215727303,
+        "same_repetition_saved_seconds": [
+          -0.03200781811028719,
+          -0.11264331731945276
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.98.0-9-uv-feature-ablation.json",
+        "sha256": "545c30ccc01cb96256bd88b79f7fd891ef861b017c0b15c554e9aa84d5a99df0"
+      },
+      "release": "ohm-1.98.0-9",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-1",
+        "logical_cpus": 32,
+        "cpu_model": "AMD EPYC-Milan Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          4.5719698979992245,
+          4.604657084000792
+        ],
+        "ohm-no-public-api-hash": [
+          8.251368362001813,
+          7.50616226800048
+        ],
+        "ohm-no-proc-macro-cache": [
+          4.610191091000161,
+          4.731973875997937
+        ],
+        "ohm-neither": [
+          8.057368105000933,
+          8.479982838001888
+        ]
+      },
+      "medians": {
+        "ohm-all": 4.588313491000008,
+        "ohm-no-public-api-hash": 7.8787653150011465,
+        "ohm-no-proc-macro-cache": 4.671082483499049,
+        "ohm-neither": 8.26867547150141
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 3.44402240600175,
+        "reduction_percent": 42.65719195428869
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.23633957449965237,
+        "reduction_percent": 3.6529211028761317
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": 0.0827689924990409,
+        "reduction_percent": 1.7719445715512114,
+        "same_repetition_saved_seconds": [
+          0.03822119300093618,
+          0.12731679199714563
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.98.1-1-uv-feature-ablation.json",
+        "sha256": "1cfa565a40acd434d9474d923eadb9635cd31dbef838f82bd96a259359ba43ed"
+      },
+      "release": "ohm-1.98.1-1",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-study-1",
+        "logical_cpus": 32,
+        "cpu_model": "AMD EPYC-Milan Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          3.7352134230313823,
+          4.127803804993164
+        ],
+        "ohm-no-public-api-hash": [
+          7.449366884015035,
+          8.108816022984684
+        ],
+        "ohm-no-proc-macro-cache": [
+          4.138027464039624,
+          4.684670303016901
+        ],
+        "ohm-neither": [
+          8.341527617012616,
+          7.392371901019942
+        ]
+      },
+      "medians": {
+        "ohm-all": 3.931508614012273,
+        "ohm-no-public-api-hash": 7.779091453499859,
+        "ohm-no-proc-macro-cache": 4.411348883528262,
+        "ohm-neither": 7.866949759016279
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 3.6515918574878015,
+        "reduction_percent": 46.677518074881334
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.28384928751620464,
+        "reduction_percent": 4.623593150481963
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": 0.47984026951598935,
+        "reduction_percent": 10.877404671112886,
+        "same_repetition_saved_seconds": [
+          0.4028140410082415,
+          0.5568664980237372
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.98.1-2-uv-feature-ablation.json",
+        "sha256": "99a7eeb93857c75f376a7075771e5b18c1322edfae2c322e66dc764ce6bac596"
+      },
+      "release": "ohm-1.98.1-2",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-study-1",
+        "logical_cpus": 32,
+        "cpu_model": "AMD EPYC-Milan Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          4.051333072944544,
+          3.988637069996912
+        ],
+        "ohm-no-public-api-hash": [
+          7.341846887953579,
+          7.212331757997163
+        ],
+        "ohm-no-proc-macro-cache": [
+          4.47344296600204,
+          4.124881230993196
+        ],
+        "ohm-neither": [
+          8.672110835032072,
+          7.438694562995806
+        ]
+      },
+      "medians": {
+        "ohm-all": 4.019985071470728,
+        "ohm-no-public-api-hash": 7.277089322975371,
+        "ohm-no-proc-macro-cache": 4.299162098497618,
+        "ohm-neither": 8.05540269901394
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 3.506672426010482,
+        "reduction_percent": 45.74171531909279
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.528745201532729,
+        "reduction_percent": 8.559511568375573
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": 0.27917702702688985,
+        "reduction_percent": 6.493754378892827,
+        "same_repetition_saved_seconds": [
+          0.42210989305749536,
+          0.13624416099628434
+        ]
+      }
+    },
+    {
+      "source": {
+        "path": "scripts/session_replays/release-1.99.0-1-uv-feature-ablation.json",
+        "sha256": "c0c82a4f8dbd3714c953b6b07819b9710cdcc50fb7a9a81337911b1aa4fb15e5"
+      },
+      "release": "ohm-1.99.0-1",
+      "host": {
+        "platform": "linux-x86_64",
+        "id": "linux-study-1",
+        "logical_cpus": 16,
+        "cpu_model": "AMD EPYC-Milan Processor"
+      },
+      "samples_per_cell": 2,
+      "seconds": {
+        "ohm-all": [
+          3.854455973021686,
+          4.194974223035388
+        ],
+        "ohm-no-public-api-hash": [
+          6.932087779045105,
+          7.07058672606945
+        ],
+        "ohm-no-proc-macro-cache": [
+          4.520578466006555,
+          3.7741437799995765
+        ],
+        "ohm-neither": [
+          7.180005753994919,
+          7.1929233820410445
+        ]
+      },
+      "medians": {
+        "ohm-all": 4.024715098028537,
+        "ohm-no-public-api-hash": 7.001337252557278,
+        "ohm-no-proc-macro-cache": 4.147361123003066,
+        "ohm-neither": 7.186464568017982
+      },
+      "public_api_hash_factorial": {
+        "saved_seconds": 3.0078627997718286,
+        "reduction_percent": 42.400688109553414
+      },
+      "proc_macro_factorial": {
+        "saved_seconds": 0.15388667021761648,
+        "reduction_percent": 2.7155291498708953
+      },
+      "proc_macro_api_hash_on": {
+        "saved_seconds": 0.1226460249745287,
+        "reduction_percent": 2.9572063135346616,
+        "same_repetition_saved_seconds": [
+          0.6661224929848686,
+          -0.4208304430358112
+        ]
+      }
+    }
+  ],
+  "disk": {
+    "source": {
+      "path": "scripts/benchmark_results/disk-1.99.0-1.json",
+      "sha256": "11c6336cb151fedf2868c1526e07c356dea06857404702d1c090eff4ecd8e822"
+    },
+    "comparisons": [
+      {
+        "project": "ruff",
+        "scenario": "One complete development session",
+        "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+        "comparison": {
+          "project": "ruff",
+          "cohort": "single",
+          "worktrees": 1,
+          "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+          "stock_retained_bytes": 6334722048,
+          "ohm_retained_bytes": 3800645632,
+          "stock_gib": 5.899669647216797,
+          "ohm_gib": 3.5396270751953125,
+          "bytes_saved": 2534076416,
+          "percent_less_disk": 40.0029614053873,
+          "valid_pair": true,
+          "mismatched_fields": [],
+          "stock_idle_seconds": 35.74266245800027,
+          "ohm_idle_seconds": 35.683653250000134
+        }
+      },
+      {
+        "project": "ruff",
+        "scenario": "Two active worktrees",
+        "measurement_timing": "immediate_worktree_completion_checkpoint",
+        "comparison": {
+          "project": "ruff",
+          "cohort": "forks",
+          "worktrees": 2,
+          "measurement_timing": "immediate_worktree_completion_checkpoint",
+          "stock_retained_bytes": 10881425408,
+          "ohm_retained_bytes": 6510231552,
+          "stock_gib": 10.134117126464844,
+          "ohm_gib": 6.0631256103515625,
+          "bytes_saved": 4371193856,
+          "percent_less_disk": 40.171151224234904,
+          "valid_pair": true,
+          "mismatched_fields": []
+        }
+      },
+      {
+        "project": "ruff",
+        "scenario": "Ten active worktrees",
+        "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+        "comparison": {
+          "project": "ruff",
+          "cohort": "forks",
+          "worktrees": 10,
+          "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+          "stock_retained_bytes": 56916062208,
+          "ohm_retained_bytes": 28394971136,
+          "stock_gib": 53.0072135925293,
+          "ohm_gib": 26.44487762451172,
+          "bytes_saved": 28521091072,
+          "percent_less_disk": 50.110794678257164,
+          "valid_pair": true,
+          "mismatched_fields": [],
+          "stock_idle_seconds": 38.54215950000071,
+          "ohm_idle_seconds": 36.07087879200117
+        }
+      },
+      {
+        "project": "uv",
+        "scenario": "One complete development session",
+        "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+        "comparison": {
+          "project": "uv",
+          "cohort": "single",
+          "worktrees": 1,
+          "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+          "stock_retained_bytes": 12992696320,
+          "ohm_retained_bytes": 8430575616,
+          "stock_gib": 12.100391387939453,
+          "ohm_gib": 7.851585388183594,
+          "bytes_saved": 4562120704,
+          "percent_less_disk": 35.11296340373482,
+          "valid_pair": true,
+          "mismatched_fields": [],
+          "stock_idle_seconds": 35.84254129200053,
+          "ohm_idle_seconds": 57.259105458000704
+        }
+      },
+      {
+        "project": "uv",
+        "scenario": "Two active worktrees",
+        "measurement_timing": "immediate_worktree_completion_checkpoint",
+        "comparison": {
+          "project": "uv",
+          "cohort": "forks",
+          "worktrees": 2,
+          "measurement_timing": "immediate_worktree_completion_checkpoint",
+          "stock_retained_bytes": 17498652672,
+          "ohm_retained_bytes": 9279635456,
+          "stock_gib": 16.296890258789062,
+          "ohm_gib": 8.642333984375,
+          "bytes_saved": 8219017216,
+          "percent_less_disk": 46.969428847235996,
+          "valid_pair": true,
+          "mismatched_fields": []
+        }
+      },
+      {
+        "project": "uv",
+        "scenario": "Ten active worktrees",
+        "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+        "comparison": {
+          "project": "uv",
+          "cohort": "forks",
+          "worktrees": 10,
+          "measurement_timing": "completed_cohort_idle_at_least_30_seconds",
+          "stock_retained_bytes": 85398884352,
+          "ohm_retained_bytes": 35637858304,
+          "stock_gib": 79.53390884399414,
+          "ohm_gib": 33.19034194946289,
+          "bytes_saved": 49761026048,
+          "percent_less_disk": 58.26894159751939,
+          "valid_pair": true,
+          "mismatched_fields": [],
+          "stock_idle_seconds": 36.20266445800007,
+          "ohm_idle_seconds": 36.27164687500044
+        }
+      }
+    ]
+  },
+  "feature_claims": {
+    "ohm-rust": [
+      {
+        "number": 155,
+        "title": "Reuse dependency objects in incremental ThinLTO",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/155",
+        "head_sha": "108208fcf94e95bb716dd99b1fc4505c3c05bdfb",
+        "body": "Rebuilding an incremental ThinLTO binary currently optimizes serialized dependency modules again even when LLVM's cache keys still match. Add `-Zohm-thin-lto-dependency-cache=yes` to reuse their validated work products. Local modules retain the green dep-node requirement; dependency reuse requires a present, equal LLVM key covering the module and its ThinLTO imports, exports, and resolutions. The option is off by default.\n\nDisable the new dependency reuse if any module in the combined index lacks a content hash. Fat-LTO bitcode can omit this hash: an initial prototype kept printing `7` after a dependency changed to return `11`. The guarded version prints `11`; the regression also covers an unchanged hashed importer consuming a changed hashless dependency. Other coverage includes changed bodies, newly reachable exports, missing objects, option changes, reuse after invalidation, and executable byte identity after direct compiler cache restoration.\n\nFour counterbalanced **incremental ThinLTO entrypoint-edit** pairs on a 16-CPU AMD EPYC-Milan VM give a **14.82%** paired-geomean wall-time reduction for uv. Ruff improves **2.97%**, a small mixed result with one regressing pair. These are tiny binary-only edits and a favorable cache case.\n\n| CLI  | Reuse off, seconds             | Reuse on, seconds              | Paired geomean reduction |\n| ---- | ------------------------------ | ------------------------------ | ------------------------ |\n| uv   | 56.361, 47.794, 45.518, 46.080 | 43.531, 40.804, 41.277, 40.560 | 14.82%                   |\n| Ruff | 21.834, 21.133, 21.067, 21.367 | 20.233, 20.444, 20.068, 22.176 | 2.97%                    |\n\nAll eight complete pairs passed the predeclared acceptance rule: five seconds at least 95% idle before each build, no sampled outside compiler, and mean outside CPU no greater than 5% of machine capacity. Observed outside activity averaged 0.09\u20130.64 cores. The first rebuild has the largest gain for both tools; the later-three sensitivity is 12.00% for uv and 1.47% for Ruff. All first pairs remain in the headline. Maximum individual-child RSS ranges are 2.38\u20132.75 GiB off versus 1.95\u20132.56 GiB on for uv, and 1.51\u20131.52 GiB off versus 1.51\u20131.55 GiB on for Ruff.\n\nThe following context has **one sample per cell**, not repeated estimates. Both ThinLTO variants enable incremental compilation; the fat context uses the repositories' default release profiles with the same compiler.\n\n| CLI  | Thin clean off / on | Default fat clean / entry edit | Library edit off / on |\n| ---- | ------------------- | ------------------------------ | --------------------- |\n| uv   | 288.078 / 277.910 s | 872.002 / 685.972 s            | 83.592 / 89.664 s     |\n| Ruff | 113.368 / 111.030 s | 355.757 / 240.700 s            | 23.633 / 7.510 s      |\n\nThe library edit inserts a `black_box` call in uv's generic library entrypoint or Ruff's library entrypoint. uv regresses in this one pair; this is not a demonstrated win for all edits. The change does not affect default fat-LTO release builds.\n\nTwenty paired runtime rounds do not establish a cache-option runtime change: every paired bootstrap interval includes zero. Positive percentages below mean slower; intervals use 20,000 paired bootstrap resamples.\n\n| Runtime guard                 | Reuse on / off time change | 95% paired bootstrap interval |\n| ----------------------------- | -------------------------- | ----------------------------- |\n| uv Jupyter resolution         | \u22120.49%                     | \u22123.03% to +2.01%              |\n| uv Trio resolution            | +1.26%                     | \u22120.35% to +3.04%              |\n| Ruff CPython check            | \u22121.54%                     | \u22123.68% to +0.29%              |\n| Ruff CPython Lib format check | +0.36%                     | \u22120.66% to +1.29%              |\n\nProfile choice has a measurable cost: compared with fat LTO, ThinLTO increases uv size from 55,199,560 to 63,799,464 bytes (+15.58%) and Ruff from 29,213,440 to 36,890,352 bytes (+26.28%). uv resolution is 5.74% slower for Jupyter (95% interval +4.21% to +7.37%) and 5.45% slower for Trio (+3.65% to +7.22%) with ThinLTO. Reuse off/on uv executables are byte-identical; Ruff differs by 240 bytes. These corpus guards do not establish general runtime performance.\n\nThe strict audit passes all 240 runtime stdout/stderr/status captures, allowing only the documented resolver duration and diagnostic-order normalization. Ruff's actual rich formatter diagnostics compare byte-for-byte. The focused run-make regression and seven existing incremental ThinLTO tests pass. An untimed direct-rustc trace on uv reuses all 7,221 dependency modules twice, compiling zero dependency modules and preserving the executable hash.\n\nMeasurements use a locally built optimized stage1 compiler **without PGO**, the same compiler flag off/on, normal Cargo concurrency, isolated targets, no compiler tracing during timing, and pinned uv `46b84fd0bfec23b72f29e8e2185ba68a65052f48`, Ruff `1df6db3e463ffa1b587dcf47f25360d40389b0f7`, and released Cargo `018a2b93409433dc5bc05c5fce838ae69e9bc396`. They do not establish performance of the distributed PGO-trained Ohm compiler. Runtime uses CPython `0b05ead877f909b7efe712db758012d9dbece7ce` and offline warmed uv resolution. The [release experiment report](https://github.com/astral-sh/ohm/pull/139) contains raw timings, exact commands, acceptance decisions, runtime analysis, rejected cohorts, and reproduction scripts.\n\nThe measured compiler source is `ed3bc629d5b3ecf16a362fa61c451aa65c82b2b7` over `348339ddae4288ebb3af97d204b19479fef8f5f2`, with driver SHA-256 `1427a333ad710c07e51c36d4ef297f48024750afc49edd8b832c91898cb4e4e7`. Current head `108208fcf94e95bb716dd99b1fc4505c3c05bdfb` only wraps two test fixture literals for tidy: compiler tree/blob IDs, decoded fixture bytes, and test tokens are unchanged. Formatting/tidy and the Linux and macOS compiler regression jobs all pass at that head.\n"
+      },
+      {
+        "number": 154,
+        "title": "Add an opt-in early fat-LTO function-merging pass",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/154",
+        "head_sha": "cad61f53e225594b8a8205b809e1e3f5a2f68d58",
+        "body": "Adds `-Zearly-lto-merge-functions` to merge identical function bodies exposed by linking before fat-LTO optimization. The flag is off by default and preserves the existing release optimization level and fat-LTO setting. It respects disabled function merging and keeps PGO, coverage, sanitizer, LLVM-plugin, and `-Cno-prepopulate-passes` pipelines unchanged.\n\nOn pinned Ruff `1df6db3e`, using the shipping Ohm 1.99.0-1 PGO/BOLT compiler on a 32-CPU AMD EPYC 7763 devbox, four counterbalanced entry-edit pairs were **2.37% faster** (range 1.67\u20133.09%), and three target-cold pairs were **1.50% faster** (range 0.98\u20131.78%). These are geometric means of paired candidate/control ratios, with default concurrency and warm dependency downloads:\n\n| Workload | Pair | Baseline | Early merge |\n| --- | ---: | ---: | ---: |\n| Entry edit | 1 | 160.551 s | 156.305 s |\n| Entry edit | 2 | 159.624 s | 156.316 s |\n| Entry edit | 3 | 160.034 s | 157.361 s |\n| Entry edit | 4 | 161.273 s | 156.291 s |\n| Target cold | 1 | 195.756 s | 192.281 s |\n| Target cold | 2 | 195.033 s | 191.620 s |\n| Target cold | 3 | 194.621 s | 192.711 s |\n\nPeak child-process RSS fell 4.07% for the entry edits and 2.15% for cold builds. The original unedited executable shrank from 29,378,797 to 29,179,378 bytes (0.68%). One entry baseline had a resident-service CPU burst; retaining it gives the result above, while the first three pairs give 2.13%. A 0.289-second cached restoration was rejected because no compiler ran.\n\nThe shipping-compiler timings use paired LLVM plugins to preserve compiler build provenance. The control restores Ohm's existing prelink callback and produces the same Ruff executable as the shipping compiler. On a rebuilt compiler, this PR's actual flag and the candidate plugin produce an identical real Ruff executable and identical complete final fat-LTO pipeline. Parallel prelink trace printing interleaves, so no full-trace equality is claimed. A separate actual flag-off/on entry-edit pair on that rebuilt compiler, with its matching standard library on `charlie-serc-4`, took 240.816 / 233.852 seconds (2.89% faster). The rebuilt compiler has no PGO/BOLT; this single pair is kept separate from the shipping-compiler results.\n\nAcross 24 counterbalanced runtime pairs on `charlie-serc-4`, the saved shipping-compiler executables produced byte-identical stdout and the same exit codes. Lint's noisy point estimate was 1.78% slower (individual candidate/control ratios 0.918\u20131.229); format-check was effectively flat (0.08% faster). These sampled runtime results do not establish a universal speedup. The two known lint warnings were preserved with only their order normalized. Formatter status 2 is expected from intentional invalid-syntax fixtures in pinned CPython 3.12.7 `Lib/`; this is output equivalence, not a clean formatter run.\n\nThe bounded uv check (`46b84fd0`, `charlie-serc-2`, same shipping compiler) was inconclusive for build speed: two entry-edit pairs moved in opposite directions, and the single target-cold pair was effectively flat. The edit scope was fixed before the pairs completed.\n\n| uv workload | Pair | Baseline | Early merge |\n| --- | ---: | ---: | ---: |\n| Entry edit | 1 | 595.778 s | 578.894 s |\n| Entry edit | 2 | 575.505 s | 586.963 s |\n| Target cold | 1 | 682.189 s | 681.539 s |\n\nThe paired edit geometric mean was 0.45% lower and the cold difference 0.095% lower; neither supports a uv speedup claim. Peak child RSS fell 3.21% / 2.92%, and the executable shrank from 55,551,864 to 54,767,704 bytes (1.41%). Twenty-four offline cached-resolution pairs each for `trio.in` and `jupyter.in` preserved exact stdout and resolved requirements, with only the reported resolution duration normalized in stderr. Runtime invocations were typically 40\u201350 ms with isolated 0.45\u20130.49 s outliers on opposite variants; paired point estimates were +10.16% / \u22127.87%, so runtime throughput remains inconclusive. Every sample is retained.\n\nThe core run-make test passes, including fat/thin/off LTO, optimization level zero, disabled merging, and a custom empty pass pipeline. PGO/coverage cases are separately capability-gated and were skipped because this stage1 lacks the profiler runtime. An extra early DCE pass had only a single inconclusive screen; retaining LLVM analyses was essentially flat with roughly 34% higher peak child RSS, so neither is included.\n\n[Raw samples, compiler/source hashes, rejected samples, background CPU records, and reproducer](https://github.com/astral-sh/ohm/pull/139). The source change is based on `charlie/generic-metadata-order` at `348339ddae4288ebb3af97d204b19479fef8f5f2`.\n"
+      },
+      {
+        "number": 145,
+        "title": "Experiment with a shared incremental dependency graph",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/145",
+        "head_sha": "77f8113b45d2d83c1c1942bceced22d04d613179",
+        "body": "Fresh rustc processes decode the previous dependency graph into private allocations even when incremental inputs are warm. Add an opt-in experiment that writes an extra graph representation at successful finalization, validates it against the stock graph, and maps immutable edge bytes and value fingerprints on the next revision. Nodes and per-process lookup structures are still rebuilt; this does not retain compiler query answers or procedural-macro state.\n\nNormal builds remain on the stock path. The experiment requires `RUSTC_OHM_FLAT_DEP_GRAPH=1`, and missing, corrupt, or mismatched files fall back to stock incremental loading. On macOS, where directory cloning normally creates different file identities, the optional graph is hard-linked from the finalized generation so each reader maps the same immutable file; failure to preserve that sharing falls back.\n\nA guard exercising 11 fresh compiler processes observed the same finalized and working APFS inode on all five actual loads. Removing, corrupting, and swapping the optional file each fell back to stock; a source error never ran or changed the previous executable.\n\nKeep this as a draft experiment: it did not establish a speedup. All 28 Ruff revisions matched fresh rustc and loaded the extra file, but the candidate won only 11 of 28 matched revisions; the median paired comparison favored stock by about 3.9%, as did both individual rounds. Successful compilations took 2,014 ms median through this path versus 1,901 ms for stock. Generation and full validation currently add work to every successful revision.\n\nThe broader arbitrary-edit experiments and reproduction live in https://github.com/astral-sh/ohm/pull/127.\n"
+      },
+      {
+        "number": 141,
+        "title": "Skip redundant coroutine storage-conflict updates",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/141",
+        "head_sha": "b23acb046f70bf3b8b5f459db19d4c0161208427",
+        "body": "Skip coroutine storage-conflict updates when the current live set is a subset of the last recorded set. Every pair in that subset already conflicts, so we can skip the row unions and retain the previous snapshot until a new local appears.\n\nThis adds seven executable/struct lines plus an explanatory comment. The matrix representation and traversal stay the same. Four regressions cover shrinking and overlapping live sets, bitset-word boundaries, branches, loops, borrows, moves, resume arguments, early drops, and unwinding. All four run at optimization levels 0 and 3 with MIR validation in the Linux and macOS coroutine CI step.\n\nThe broader ablation from thread `01a08421-2b48-7703-ba8e-acb8f6d325de` favors keeping this small guard: the larger prototype did not establish an additional Codex benefit. **These are selected-crate compiler CPU measurements on the experiment's Rust revision, not measurements of this PR's current head, whole-workspace builds, or application runtime.**\n\n| Change | Production diff in experiment | Codex | Ruff | uv | ty |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| Subset guard | +7 / -0 | 2.69% | 2.84% | 5.28% | 3.28% |\n| Compact matrix + guard | +26 / -27 | 2.83% | 2.23% | 5.52% | 2.66% |\n| Full prototype | +109 / -29 | 2.33% | 1.64% | 6.14% | 1.27% |\n\nPositive percentages mean lower compiler CPU than baseline. Each project uses an equal-weight geometric mean of its selected crate ratios. The experiment used six paired rounds, seven compiler variants and an unchanged-compiler control: 480 samples containing 960 successful compiler invocations. Each invocation was a fresh nonincremental check against frozen dependencies, with one warmup per compiler/workload, shuffled/reversed compiler orders, and affinity fixed to the same eight logical CPUs on one Linux host. Compiler builds and tests did not overlap timing; the host was not exclusively reserved.\n\n| Project | Subset guard reduction, descriptive 95% interval | Full prototype reduction, descriptive 95% interval | Subset CPU relative to full |\n| --- | ---: | ---: | ---: |\n| Codex | 2.69% [1.09%, 3.92%] | 2.33% [0.13%, 4.09%] | -0.37% [-1.27%, +0.63%] |\n| Ruff | 2.84% [-0.37%, 5.66%] | 1.64% [0.08%, 2.99%] | -1.22% [-2.77%, +0.67%] |\n| uv | 5.28% [-0.52%, 7.05%] | 6.14% [4.33%, 8.24%] | +0.92% [-1.34%, +6.55%] |\n| ty | 3.28% [0.74%, 14.78%] | 1.27% [-1.42%, 11.86%] | -2.03% [-3.65%, -0.88%] |\n\nNegative values in the last column favor the guard. Intervals use 20,000 paired whole-round bootstrap resamples, without adjustment for examining multiple variants. They describe variation within this run; crossing zero does not establish equivalence or an exact fraction of the full prototype's gain retained.\n\nThe run completed with noise warnings. Unchanged-compiler controls drifted by more than 1% for the ty CLI, uv CLI, Codex TUI, and Codex app server. Three uv variant series and the Codex TUI variant without statement filtering exceeded the 3% relative median absolute deviation guard. The short ty CLI's first baseline sample used 1.47 CPU seconds, versus 0.90\u20130.95 seconds in the other five rounds; its equal weight in the project average contributes to the broad interval. No samples were removed or replaced. The inspected Ruff and ty production code is largely synchronous, so their positive estimates do not directly demonstrate savings in this coroutine pass; compiler code layout and noise may contribute.\n\n<details>\n<summary>Per-crate measurements and other ablations</summary>\n\nBaseline seconds are median summed CPU time for the captured compiler invocations. Reduction intervals are descriptive 95% intervals.\n\n| Workload | Baseline CPU | Subset guard reduction | Full prototype reduction |\n| --- | ---: | ---: | ---: |\n| codex-core | 58.1386 s | 1.93% [0.28%, 3.48%] | 2.49% [-0.25%, 5.84%] |\n| codex-tui | 30.6752 s | 3.31% [-0.49%, 6.50%] | 3.85% [0.75%, 6.29%] |\n| codex-app-server | 18.4138 s | 2.78% [-0.82%, 7.05%] | 1.68% [-2.03%, 6.56%] |\n| codex-protocol | 22.8337 s | 2.75% [0.43%, 4.38%] | 1.29% [0.99%, 2.26%] |\n| ruff | 2.0505 s | 3.02% [-0.28%, 4.28%] | 2.68% [0.30%, 3.15%] |\n| ruff_linter | 21.8193 s | 2.66% [-0.81%, 8.15%] | 0.59% [-1.88%, 5.29%] |\n| ty | 0.9256 s | 3.56% [1.09%, 25.64%] | 2.72% [0.88%, 22.51%] |\n| ty_python_semantic | 34.6004 s | 3.00% [0.02%, 7.65%] | -0.20% [-4.44%, 4.74%] |\n| uv | 14.6477 s | 7.82% [-4.09%, 10.78%] | 10.55% [7.05%, 14.72%] |\n| uv-resolver | 7.6655 s | 2.67% [-0.54%, 5.03%] | 1.51% [-1.97%, 3.80%] |\n\n| Additional variant | Codex CPU reduction | uv CPU reduction |\n| --- | ---: | ---: |\n| Compact matrix only | 1.93% | 1.92% |\n| Full without statement filtering | 1.86% | 4.44% |\n| Full without delta-row updates and symmetry pass | 1.82% | 4.35% |\n\nThe direct Codex comparison intervals for removing statement filtering or delta-row updates cross zero. On uv, removing delta-row updates increased CPU relative to full by 1.91% [0.29%, 4.98%], suggesting a possible benefit within the larger implementation. These conditional comparisons cannot be added into independent shares of the improvement.\n\n</details>\n\nOn the experiment revision, all seven compilers passed 21,934 Rust UI tests (271 ignored) and 240 focused coroutine tests, each with the same five prototype regression files. Baseline, subset-only, full, and compact-plus-subset each passed 3,814 selected Ruff/uv/ty application tests (38 ignored) and built all three debug CLIs. All 24 help/version probes succeeded, with byte-identical candidate/baseline output under identical environments. The initial uv help comparison used different `UV_CACHE_DIR` values, which appear in its output; the corrected comparison reran the unchanged, hash-verified binaries under one environment. The four regressions included in this PR also pass locally at both optimization levels with MIR validation using installed Ohm 1.98.1-2; the updated PR's CI checks the branch compiler.\n\n<details>\n<summary>Experiment provenance and application test counts</summary>\n\nThe experiment used Rust `4aa1fbcf467cf38ce58abfa8eb9213a789c5381c`, Ruff/ty `d183429e58d20ef21a2816dcab535f615d52a5b8`, uv `6b05fc325e769618964794fe4e21434e592e5d26`, and Codex `ffe14c5575697c6ab6f208d4bc3504ab34cce81f`. This PR ports the same subset guard to the Ohm 1.98.1 stack; the benchmark compiler and branch compiler differ. The existing implementation uses `last_storage_live` instead of the prototype's `last_recorded_storage_live` and preserves the branch's tracing.\n\n| Application suite | Passed per compiler | Ignored |\n| --- | ---: | ---: |\n| Ruff linter library | 2,828 | 4 |\n| Ruff parser library | 245 | 0 |\n| ty semantics library | 435 | 34 |\n| ty async mdtests | 3 | 0 |\n| ty await filter: two mdtests and two lint-doc tests | 4 | 0 |\n| uv version/marker libraries | 188 | 0 |\n| uv client async retry | 1 | 0 |\n| uv resolver library | 110 | 0 |\n\nThe retained evidence is under `/tmp/rustc-codex-ablation-20260920` on the `charlie-codex-optimize` devbox. The result, analysis, and final validation hashes were rechecked before publication, and the project point estimates were independently recomputed from all 960 invocation CPU records. The full UI and focused-test log hashes and successful counts were also rechecked for all seven variants.\n\n| Artifact | SHA-256 |\n| --- | --- |\n| `benchmarks-v2/result.json` | `1aa37d01691bc8678a01a341b3bfecc781a7f6ba6962b12a9c3a2f4ea01336d4` |\n| `analysis.json` | `2b7639adb3b0a0e240cb2bf6d029cea67ce481c3eaa3ad8e9c58c51afbd1938d` |\n| `FINAL-VALIDATION.json` | `cfc999e70db60b492efe2460cc8e88d050871a5bcbe2d9f41120c9fed9ec7cd0` |\n\n</details>\n\n<details>\n<summary>Earlier uv library replay on the Ohm fork</summary>\n\nThe earlier four-pair Linux experiment used optimized stage1 compilers without PGO/BOLT based on `41e1b477a1f2a32664705135cffc8753c8234e7c`. The mean uv library check replay fell from 3.521 s to 3.109 s (-11.7%); CPU fell 9.5%. The paired 95% interval for wall-time change was -16.2% to -7.0%, and the difference from the larger prototype was within noise.\n\n| Round | Baseline elapsed | Subset guard elapsed |\n| --- | ---: | ---: |\n| 1 | 3.566 s | 3.052 s |\n| 2 | 3.427 s | 3.145 s |\n| 3 | 3.532 s | 3.049 s |\n| 4 | 3.560 s | 3.190 s |\n\nThese counterbalanced crate-level checks used fixed warm dependencies and disabled incremental compilation. They predate stacking this PR on #140 and are a separate experiment from the broader ablation above. Instrumented checks of `ruff_linter` and `ty_python_semantic` made zero calls to this routine and showed no meaningful benefit in that earlier run.\n\n</details>\n"
+      },
+      {
+        "number": 138,
+        "title": "Avoid unnecessary codegen after unrelated source edits",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/138",
+        "head_sha": "9ddc107926d70498297c74d0112bc35e9acc780a",
+        "body": "Avoid regenerating code when an edit only moves an unchanged coroutine or changes an unrelated upstream instantiation of a generic function.\n\n- Keep coroutine diagnostic spans outside the dependency tracked by successful layout queries, while retaining the projected runtime layout dependency.\n- Store the defining item in `Generics` and load its late-bound lifetime diagnostic span through a separate query and metadata table. Moving the declaration then leaves the generic parameters unchanged.\n- Cache the upstream provider of each generic instance separately, so adding another instantiation does not invalidate an unchanged symbol name.\n\nIn the captured uv Python-version-file edit and focused test, this took **6.9% less elapsed time** and **19.0% less compiler CPU** with full debug information. All three pairs improved. With uv's current line-table defaults, elapsed time and compiler CPU were **effectively flat**.\n\n| Debug information | Elapsed time | Compiler CPU | uv library/executable codegen units regenerated |\n| --- | --- | --- | ---: |\n| Full | 6.9% less | 19.0% less | 27 \u2192 7 |\n| Line tables | Effectively flat; nominally 0.6% less | Effectively flat | 9 \u2192 6 |\n\n| Pair | Full debug: parent \u2192 candidate | Line tables: parent \u2192 candidate |\n| --- | ---: | ---: |\n| 1 | 23.933s \u2192 21.574s | 20.130s \u2192 19.449s |\n| 2 | 21.591s \u2192 20.272s | 18.787s \u2192 18.652s |\n| 3 | 21.288s \u2192 20.302s | 18.935s \u2192 19.380s |\n\nEach comparison uses three alternating pairs against #132 at [430520e951d](https://github.com/astral-sh/ohm-rust/commit/430520e951d0189be0ffcae1734f5af13901d229), with geometric means of paired ratios. The workload applies the captured `PythonVersionFile::try_from_path` edit to uv at [bdcd81a83](https://github.com/astral-sh/uv/commit/bdcd81a83ce6c3fce7c8c57a2e9d8e93b4e9620c) and runs `python_pin_with_comments_and_whitespace`. These timings cover that edit and selected test, not a whole development session. Both configurations use four Cargo jobs on an Apple M5 Max, matched optimized stage-1 compilers with jemalloc, and no compiler PGO or LTO. The metadata representation changes, so each compiler has a freshly built standard library from the same sources and configuration.\n\nAll six measurements per configuration passed the workload and interference checks, with no retries or exclusions. All 313 uv library/executable objects match byte for byte between compilers before and after the edit, including full debug data. The uv executable regenerates no codegen units; each remaining regenerated uv library object changes after the edit. Under the current defaults, the command still invokes rustc 18 times and links three times, leaving most of its cost intact.\n\nThe focused regressions pass for reuse after source movement, fresh lifetime diagnostic locations, actual coroutine layout changes, and removal of a selected upstream provider. CI now includes the three new reuse regressions, the generic-parameter diagnostic snapshot, and the existing upstream-sharing regressions on Linux and macOS.\n"
+      },
+      {
+        "number": 137,
+        "title": "Reuse worker threads for cached codegen objects",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/137",
+        "head_sha": "310959dd79b94a12388d54f7e71cee45ec52eb16",
+        "body": "Reuse idle worker threads when restoring cached codegen objects. The codegen scheduler still assigns jobserver slots, and workers are created as needed so file-copy fallbacks can run concurrently. Workers shut down when the coordinator drops the pool.\n\nA full uv Python-pin edit replay logged small improvements in its first two pairs:\n\n| Pair | Baseline | Candidate | Less time |\n| --- | ---: | ---: | ---: |\n| 1 | 156.927s | 156.071s | 0.55% |\n| 2 | 155.819s | 154.013s | 1.16% |\n\nThese are preliminary log totals, not a completed replay result. The devbox execution service lost the job during the third pair, and the benchmark's temporary directory disappeared. The detailed per-command receipts were lost, so the planned three-pair campaign could not be validated. Both compilers had passed the complete untimed verification replay before measurement. The replays used 12 Cargo jobs and matched optimized stage-1 compilers with jemalloc, without compiler LTO, PGO, or BOLT.\n\nBoth arms used GCC 13.3 and GNU BFD 2.42. The compiler build's external LLVM configuration disabled the bundled-LLD default. In the earlier completed baseline campaign with this setup, linker processes were active for 51\u201352% of elapsed command time, overlapping some compilation. The replay totals are specific to that linker setup.\n\nA fully cached 256-unit synthetic crate took **28.3% less elapsed time** and **71.7% less CPU time** by median paired ratios across five alternating pairs. Thread creation fell from **261 to 8**. These measurements use matched optimized stage-1 compilers on Linux without compiler PGO or BOLT.\n\nThe large-object copy-fallback probe produced identical object and crate-metadata payloads, and clients linked and executed successfully. Elapsed time was variable on the build VM, with a median paired ratio of 0.987 across six cross-filesystem pairs.\n"
+      },
+      {
+        "number": 136,
+        "title": "Cache resolved crate search directories",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/136",
+        "head_sha": "4721c40bd445b5f821492ca133414c18c29c261f",
+        "body": "Resolve each crate search directory once and reuse that path for ordinary files. File symlinks still receive full path resolution. We also reuse the existing crate-name/public-hash index when a newly located library is already loaded, avoiding a full metadata-root decode and linear scan.\n\nThe full uv Python-pin edit replay was **effectively flat**: 0.07% less total command time by the geometric mean of three paired ratios. Two pairs improved and one regressed.\n\n| Pair | Baseline | Candidate |\n| --- | ---: | ---: |\n| 1 | 154.66s | 153.61s |\n| 2 | 155.66s | 155.49s |\n| 3 | 155.87s | 156.77s |\n\nThese replays ran on a quiet Linux devbox with 12 Cargo jobs and matched optimized stage-1 compilers using jemalloc, without compiler LTO, PGO, or BOLT. All command-outcome and final no-op checks passed.\n\nBoth arms linked through GCC 13.3 and GNU BFD 2.42. The compiler build's external LLVM configuration disabled the bundled-LLD default. Linker processes were active for 51\u201352% of baseline elapsed command time, overlapping some compilation; these results are specific to that linker setup.\n\nIn the isolated dependency-loading probe, uv's dependencies took **11.1% less elapsed time** by median paired ratio across ten alternating pairs, roughly **0.23s \u2192 0.20s**. Canonicalization-related `readlink` calls fell from **19,116 to 9,446**, and every pair produced identical crate metadata. That probe uses retained uv artifacts with deep search paths; its gain did not produce a demonstrated full-session improvement.\n"
+      },
+      {
+        "number": 132,
+        "title": "Avoid coroutine codegen invalidation from debug locations",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/132",
+        "head_sha": "a30eee748ad471de8818dbd8dd0fb930bfe09ca0",
+        "body": "Separate coroutine codegen layout from debug names and source locations so incremental builds can reuse code after async code moves within a file. Coroutine state declaration locations are now omitted by default and restored with `-Zdebug-info-type-line-numbers=true`. State names, saved fields and instruction locations remain available.\n\nWith mimalloc for rustc, the full-debug uv Python version-file replay took **12.5% less time**: **140.81s \u2192 123.25s** median across three alternating pairs. The candidate won two pairs; the remaining pair was 0.7% slower. All correctness and freshness checks passed, with no retries.\n\nThe earlier jemalloc study measured these median command totals:\n\n| Session | Debug information | Parent | PR #132 | Result | Pairs |\n| --- | --- | ---: | ---: | --- | ---: |\n| uv Python version-file handling | Full | 139.98s | 117.03s | **16.4% less time** | 3 |\n| uv PyPI JSON parsing | Full | 145.25s | 145.31s | Effectively flat | 2 |\n| Ruff/ty | Line tables only | 356.71s | 348.09s | **2.4% less time** | 2 |\n\nThe Linux replays compare [76bd3a82](https://github.com/astral-sh/ohm-rust/commit/76bd3a8239549da4d10d081d29f2b055f5ed5849) with its [parent](https://github.com/astral-sh/ohm-rust/commit/ce7f658e083b833845336a7d9c04002135748fc9), using matched optimized stage-2 compilers without compiler PGO/BOLT. These are developer-command totals. The production diff is unchanged after rebasing. The mimalloc follow-up reused the original compiler libraries with a rebuilt rustc launcher; Clippy retained jemalloc.\n\nAn earlier experimental macOS comparison measured **13.5% less time** in one full-debug uv session (73.60s \u2192 63.65s; three pairs).\n\nIn separate [compiler-only CI measurements](https://github.com/astral-sh/ohm-rust/actions/runs/34303316952) against the [current parent](https://github.com/astral-sh/ohm-rust/actions/runs/34278894492), 19 of 22 case medians increased. Results ranged from **0.24% less time to 1.21% more time**. These unpaired runs cover 18 check cases and four debug library builds. The automated CodSpeed comparison uses the previous branch head.\n\n[Correctness CI](https://github.com/astral-sh/ohm-rust/actions/runs/34303314812) passes with coverage for incremental reuse, layout changes, async drop, diagnostics and debug metadata. Linux GDB automatic state inspection and macOS LLDB stepping and manual state inspection pass in both location modes. Windows debugger behavior remains untested.\n"
+      },
+      {
+        "number": 123,
+        "title": "Encode sparse metadata tables with bitmaps",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/123",
+        "head_sha": "82a711def3f968b10c76bf4e88379bede2848768",
+        "body": "Encode sparse metadata tables as a bitmap, a rank index, and compact payloads. Keep the dense representation whenever sparse encoding would not reduce bytes, preserving constant-time lookup in both layouts.\n\nValidate widths and arithmetic when constructing tables, and validate sparse ranks and tail bits before copying a previous metadata prefix. Emit sparse payloads directly from the bitmap and stop building a sparse index once it cannot beat dense storage. Tests cover malformed layouts, integer limits, exact size ties, all fingerprint bytes, and relocation to a different offset.\n\nMatched compiler measurements on real crates:\n\n| Workload | `.rmeta` size | Compiler instructions |\n| --- | ---: | ---: |\n| syn | -28.23% | +0.105% |\n| Ruff AST | -23.11% | +0.068% |\n| Ruff parser | -21.56% | +0.156% |\n| ty semantic | -38.32% | +0.024% |\n\nComplete incremental dev targets use **1.84% less allocated space for syn** and **2.64% less for Ruff/ty**, including dependency artifacts and incremental caches. Unique `.rlib` bytes fall 2.87% and 3.22%, respectively. These are settled ext4 allocations with hard links counted once; the larger percentages in the table apply only to individual `.rmeta` files.\n\nThe change has a small measured instruction cost (0.024\u20130.156%). Counted calls include metadata encoding and dependency decoding, with candidate-encoded dependencies and matching standard libraries. Native ABBA/BAAB runs were isolated; syn and parser timing spreads are too broad to infer a wall-time regression from their medians alone. All six ARM64 CI benchmark shards also passed: 22 matched cases with ten measured rounds each. Separate-run median elapsed changes span -1.186% to +0.575%, with ty at +0.037% and uv at +0.283%; these figures are broader coverage, not a precise speedup claim.\n\nMatched stage-1 compiler/standard-library builds, five metadata table unit tests, and four focused run-make tests passed. The sparse run-make fixture checks metadata consumers, linked execution, private edits, stable public hashes within one compiler, and incremental verification. Current-head Linux/macOS compiler tests and formatting/tidy also passed.\n\nThis wire-format change requires a new compiler version identity, as normal for a new Ohm release.\n\n[Full report and reproduction](https://github.com/astral-sh/ohm-rust/blob/0b7325f39996cae627f0b5cc6636864f33a308e7/src/tools/codspeed/results/sparse-metadata-shipping/README.md) \u00b7 [Raw evidence](https://github.com/astral-sh/ohm-rust/blob/0b7325f39996cae627f0b5cc6636864f33a308e7/src/tools/codspeed/results/sparse-metadata-shipping/raw-evidence.json.gz)\n\nMeasurements compare `d37229159e545bbdec917dd7efdf5d26da40d2bc` with compiler implementation `54d6de980917d03fd2a003b6b7f6d3d46ad3d63e`. PR head `4e23d8dabdd5e6cfd2df667ce9dc36b10cfaeea7` has identical production compiler source; later commits contain harness, documentation, and CI history fixes. The final evidence is on a separate immutable commit. The original prototype evidence remains linked from the report.\n"
+      },
+      {
+        "number": 118,
+        "title": "Reduce repeated work in compiler dependency tracking",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/118",
+        "head_sha": "4c9469ed841b9a6a43bb4c3e96a999a1abb85009",
+        "body": "Keep small dependency-read sets inline and use a bit mask to skip scans for new entries. Collisions still use exact comparisons; larger sets reuse pooled recorders. This grows `TaskReads` from 72 to 80 bytes on 64-bit hosts.\n\nWe also avoid redundant associated-type normalization, MIR move-data allocations, empty-token-stream allocations, and locking for root hygiene contexts. Associated-type `where` clauses retain full checking.\n\nARM64 [CodSpeed](https://github.com/astral-sh/ohm-rust/actions/runs/33952731280) measured a 1.76% reduction in geometric mean time across 22 cases, with bitmaps IncrFull 5.45% faster. All case means improved. This compared `058a1ff5` against [`feba5046`](https://github.com/astral-sh/ohm-rust/actions/runs/33929253092), both using mimalloc.\n"
+      },
+      {
+        "number": 117,
+        "title": "Cache bounds checks for closed associated types",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/117",
+        "head_sha": "042601664d7a739e967465862ca09fb3529e389b",
+        "body": "Reuse successful trait-bound and well-formedness checks for repeated scalar, array, and tuple associated-type definitions. We cache only proofs that are independent of the impl. An associated type's own `where Self: Bound` clause can differ between impls with the same definition, so item predicates, contextual bounds, failed proofs, and the next solver keep the existing checking path.\n\nThe incremental regression removes `Bad: Bound` while two impls still define `type Value = u8`. The original compiler misses the required error; the final PR compiler rejects that impl under both trait solvers in a [focused ARM audit](https://github.com/astral-sh/ohm-rust/actions/runs/33965084812). [CI](https://github.com/astral-sh/ohm-rust/actions/runs/33964383547) passes formatting, tidy, and compiler/regression tests on Linux and macOS.\n\nARM64 [CodSpeed measurements](https://github.com/astral-sh/ohm-rust/actions/runs/33964394072) compare `2a69a50` against its [exact base](https://github.com/astral-sh/ohm-rust/actions/runs/33963600548) `9596a372` with the same pinned suite. `bitmaps` source compilation improves by 5.43% for Full (1,338.47 \u2192 1,265.75 ms), 5.54% for IncrFull (1,803.63 \u2192 1,703.76 ms), and 4.96% for Debug Full (1,527.09 \u2192 1,451.32 ms). All 22 cases completed with at least ten rounds each; geometric mean compilation time falls by 1.06%. The largest measured slowdown is 1.40% (`bitmaps` IncrPatched).\n"
+      },
+      {
+        "number": 115,
+        "title": "Balance codegen units with MIR basic-block counts",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/115",
+        "head_sha": "d4b28f4faaa512d0005fc8ac45357b65ff113b6a",
+        "body": "Balance non-incremental codegen units using MIR basic-block counts during merging. We retain the preference for shared inline bodies, then restore statement-based estimates for the minimum-size policy and scheduling.\n\nIn an [ARM64 comparison](https://github.com/astral-sh/ohm-rust/actions/runs/33941447000) with 24 measured compilations of Codex protocol Release builds, the worst candidate block beat the best baseline block by 2.61\u20133.43% across original and edited sources, using both mean and minimum times. This compared `c219044b` with `feba5046`, both using mimalloc. Separate x86 comparisons against #107 did not consistently clear 2%.\n"
+      },
+      {
+        "number": 112,
+        "title": "Skip redundant per-body work in Rust analysis",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/112",
+        "head_sha": "bc78967e759f8bef0708a888d5e73c51ecf4b267",
+        "body": "Reuse the constraint graph from region SCC computation during borrow checking. We also assign known parameter types directly and skip type-checker fallback, writeback, loop diagnostics, and reachability work when it cannot affect the result.\n\nKeep the three borrow-checker analyses on independent worklists, so one that needs more iterations cannot force the others to repeat their work. This gives up some small gains from sharing their worklist.\n\nAcross eight rustc-perf Check/Full workloads, median compiler instruction counts fell by 0.1\u20131.8% versus the parent on x86-64 Linux (Cachegrind, two samples per compiler). This targeted screen covers the two previous regressions above 1% and six other workloads.\n"
+      },
+      {
+        "number": 110,
+        "title": "Skip redundant work for literal consts and fieldless const generics",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/110",
+        "head_sha": "e15395df1bd78d413d267007ebcd4e3c82f2d96b",
+        "body": "Skip general type checking and MIR construction for small, unsuffixed integer literals used as `usize` const arguments or associated constants. We also skip implied-outlives queries for fieldless local structs with concrete `usize` arguments and no additional bounds.\n\nAcross two local CodSpeed run orders, Full wall time fell 7.70\u20137.99% and Debug Full wall time fell 6.86\u20138.47%. These measurements use the original implementation revisions. An incremental outlier prevents a performance claim for that case.\n"
+      },
+      {
+        "number": 109,
+        "title": "Use mimalloc 3.5.1 for Linux rustc builds",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/109",
+        "head_sha": "e7fc7270de7e90555e7d0984e180c32fc97029ea",
+        "body": "Use native mimalloc 3.5.1 for Linux GNU rustc builds with `rust.mimalloc = true`. It overrides malloc in the rustc executable, including allocations made by LLVM. Mimalloc takes precedence for rustc while rustdoc and Clippy continue to honor `rust.jemalloc`. Keep the jemalloc support library in the compiler sysroot for those tools, without linking it into the mimalloc rustc executable.\n\nVendor the tested release, build its static library with upstream CMake while retaining Rust\u2019s target architecture baseline, and expose a capability marker for the release coordinator. Add a bootstrap regression test for allocator selection and keep CodSpeed configured to exercise mimalloc.\n\nMatched PGO/BOLT release experiments on x86_64 Linux reduced paired wall time by 5.3% for a Ruff/ty check rebuild, 9.8% for a uv executable rebuild, and 7.8% for an edit-and-test command. Some compiler workloads used 21\u201325% more peak process memory. These measurements used Ohm 1.98.0-8 sources and predate the later compiler changes.\n\nRelease integration: astral-sh/ohm#100.\n"
+      },
+      {
+        "number": 108,
+        "title": "Merge equivalent functions before LLVM inlining",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/108",
+        "head_sha": "5ea69eb1cbc4025cdd1dcc5c13c91e4e8a31a608",
+        "body": "Run LLVM's function-merging pass before inlining so equivalent bodies share the remaining optimization work. This applies to optimized prelink pipelines with function merging enabled and no PGO, sanitizers, coverage, or plugins.\n\nARM64 Release comparisons with prebuilt dependencies reduced compilation time by [1.35% for `codex-protocol`](https://github.com/astral-sh/ohm-rust/actions/runs/33926482373) and [0.48% for `uv-resolver`](https://github.com/astral-sh/ohm-rust/actions/runs/33923879209). These compared `66c1849` against #107 (`4627d215`), using the system allocator without PGO/BOLT. The Check and unoptimized Debug cases in CodSpeed CI do not exercise this pass.\n"
+      },
+      {
+        "number": 107,
+        "title": "Cache repeated trait lookups and substitutions",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/107",
+        "head_sha": "09d4ab0254fae9c4a3885c26d8c9a7b99d265e79",
+        "body": "Cache repeated trait lookups and type substitutions, reuse interned type lists, and clear completed obligation forests without rewriting indices. Use byte slices for ASCII edit distance.\n\nAgainst #106, repeated rustc-perf `Check`/`Full` measurements use 2.02% fewer instructions for Ruff's `ty_python_semantic` and 1.21% fewer for `uv-resolver`, with identical metadata and diagnostics. UI, unit, and all 201 incremental tests pass, along with Linux and macOS CI.\n\nFor the combined changes in #103\u2013#107, two complete [CodSpeed runs](https://github.com/astral-sh/ohm-rust/actions/runs/33842773781) reduce the 22-case suite's geometric mean compilation time by 2.37\u20132.66% against both #103 baselines, using per-case means and medians. The four-fixture `Check`/`Debug` comparison uses 4.22% fewer instructions across 64 profiles. [CodSpeed's PR report](https://github.com/astral-sh/ohm-rust/pull/107#issuecomment-5536728014) compares against #106 and labels all 22 benchmarks unchanged.\n"
+      },
+      {
+        "number": 106,
+        "title": "Retain serialized query values during cache promotion",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/106",
+        "head_sha": "75605aa171c0f0c7f880278ea9debc71d398b4c3",
+        "body": "When a green query is unused, cache promotion decodes its value only to serialize it again. Retain those bytes and their decoding context across at most three cache generations, then compact into a fresh cache. Retained and re-encoded allocations share decoding state so they keep the same identity. Values still undergo the existing fingerprint checks when loaded.\n\nAdd a seven-revision regression for delayed MIR loading, macro hygiene, allocations, and compaction, plus a unit test for shared allocation identity. All 201 incremental tests pass with parallel queries and hash verification enabled. With normal verification, an unchanged-uv reuse/compaction cycle uses 4.45% fewer instructions than PR104 across 12 profiles: the two reuse steps improve by 7.5% and 7.0%, while compaction costs 1.1% more. Metadata and diagnostics match throughout. A separate four-profile screen with full hash verification improves the first reuse step by 12.1%. A first 22-case native run is about 1.6% faster than the PR103 baselines; CodSpeed reports no significant change against PR105.\n"
+      },
+      {
+        "number": 105,
+        "title": "Skip uncached nodes during cache promotion",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/105",
+        "head_sha": "df2d1c67b7a61ddd887c4953b875745141bd042d",
+        "body": "When saving incremental state, cache promotion walks every node in the old dependency graph and recovers keys for queries whose values were never saved. Iterate the saved query-value index instead, in the old graph order, retaining the existing eligibility, loading, and fingerprint checks.\n\nAdd a three-revision test that reuses a codegen unit, then changes its caller and checks that cached MIR survives. Linux and macOS regression checks pass, including parallel cache promotion with incremental hash verification. CodSpeed reports no significant change across all 22 benchmarks.\n"
+      },
+      {
+        "number": 104,
+        "title": "Reduce trait and dataflow overhead",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/104",
+        "head_sha": "827d0887cd34362c3665ffe77bdcd62dd9a8ab6c",
+        "body": "Prune coherence checks for impls with incompatible const arguments. Skip unchanged well-formedness normalization, compare sizedness trait IDs directly, inline predicate reuse checks, and reuse borrow-checking allocations.\n\nAgainst #103, the four-crate Check/Debug suite uses 3.255% fewer instructions in ABBA and 3.259% fewer in BAAB (64 Cachegrind profiles on x86_64). All eight cases improve. The 5,937 UI tests and affected unit tests pass.\n\nRuff's `ty_python_semantic` uses 0.990% fewer instructions and `uv-resolver` uses 1.183% fewer across 16 Cachegrind profiles, with identical metadata and diagnostics. Linux and macOS regression checks pass. CodSpeed reports no significant change across all 22 benchmarks. The geometric mean of case mean times falls only 0.13\u20130.20% against two runs of #103.\n"
+      },
+      {
+        "number": 103,
+        "title": "Reduce trait selection and region graph overhead",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/103",
+        "head_sha": "66c8da320df6c05cef9b8379971264e1c2004e86",
+        "body": "Index const-generic impls and avoid temporary obligation allocations during trait selection. We also reduce copying and hashing in region-graph traversal. This builds on #101 and #100.\n\nWith matched stage-one compilers without PGO/BOLT, instruction counts fell 5.83% across a four-crate rustc-perf Check/Debug sample in both run orders, mostly from bitmaps (19.5\u201321.8%). Reductions were 0.69% for Ruff's `ty_python_semantic` and 0.63% for `uv-resolver`.\n\nAcross all 22 CodSpeed cases, the geometric mean of case mean times fell 2.20\u20132.27% in two candidate runs against the same baseline. The reductions were 0.93\u20131.13% for `ty_python_semantic` and 0.52\u20130.75% for `uv-resolver`.\n"
+      },
+      {
+        "number": 101,
+        "title": "Reduce unoptimized codegen and monomorphization overhead",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/101",
+        "head_sha": "5466d64255fb6ebf7a94c6c4ced9f8a4341de31e",
+        "body": "Skip cleanup paths that become empty after monomorphization at `opt-level=0`, while retaining paths with real destructors. We also split temporary aggregates at MIR level 1, preserve locals referenced by debug information, and avoid normalization and MIR walks for ABI and move checks that would do nothing.\n\nLocal CodSpeed measurements for `uv-resolver` development builds against #99, with dependencies already built:\n\n| Source | Before | After | Reduction |\n| --- | ---: | ---: | ---: |\n| Original | 32.450 s | 29.765 s | 8.27% |\n| Equivalent edit | 31.841 s | 28.845 s | 9.41% |\n\nThe comparison measured 24 compilations in ABBA order on one Linux CPU. Comparing the slower candidate block with the faster baseline block still gives reductions of 5.2% and 7.3%, respectively.\n"
+      },
+      {
+        "number": 100,
+        "title": "Reduce fast-rejection overhead for single generic arguments",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/100",
+        "head_sha": "aa32a253490d9f90be2944acda4b461df72744a6",
+        "body": "Special-case single generic arguments in fast rejection, return early for identical arguments, and keep recursive structural checks out of line. This reduces the setup needed for common trait-candidate comparisons.\n\nAgainst #98, compiler instruction counts fell 2.18% across a four-crate rustc-perf Check/Debug sample, mostly from bitmaps (7.6\u20138.4%). Reductions were 0.12% for Ruff's `ty_python_semantic` and 0.18% for `uv-resolver`. Wall-time results varied across runs.\n"
+      },
+      {
+        "number": 99,
+        "title": "Separate coroutine runtime layouts from executable MIR",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/99",
+        "head_sha": "725c77b4f2617ccea784c45aef2fbb64171dd409",
+        "body": "Compute coroutine runtime layouts separately from executable MIR. Metadata-only compilations can then export layout and async-drop information without constructing and serializing the resume and drop bodies. Code generation resumes the transformation when it needs those bodies.\n\nCustom or error-tainted MIR, async-drop templates, and explicit MIR instrumentation retain full lowering.\n\nA local CodSpeed comparison on `codex-core` reduced metadata size from 23.43 MB to 11.34 MB (51.59%) and mean compilation time from 29.046 s to 28.700 s (1.19%). The comparison used six measurements per compiler in ABBA order on one CPU, with matched compiler/std builds and dependencies prepared outside timing.\n\nThose measurements compare the original implementation with the then-current #88 baseline. They do not establish the experiment's 2% compilation-speed target.\n"
+      },
+      {
+        "number": 88,
+        "title": "Cache region-only freshening and inline interner lookups",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/88",
+        "head_sha": "6ec1268b6013bcd6e31668f24267f9bb911257ab",
+        "body": "Cache completed freshening results for types without type or const inference variables. These folds depend only on the type, allowing reuse across inference contexts on the same worker.\n\nWe also inline the type, predicate, and generic-argument interner hit paths, leaving shared-interner misses out of line.\n\nSixteen counterbalanced Cachegrind compilations of Ruff's `ty_python_semantic` measured at least 3.10% fewer instructions on the original source and 3.09% fewer after an edit, compared with #85. Those bounds compare the highest candidate count with the lowest baseline count, using matched stage-two compilers and eight rustc threads.\n"
+      },
+      {
+        "number": 85,
+        "title": "Store small obligation dependency lists inline",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/85",
+        "head_sha": "1847fd8421419530078a59c7d30e4957fb633527",
+        "body": "Store up to two obligation dependency indices inline with `SmallVec`. Most lists are small, so this avoids a separate allocation while preserving their order and allowing larger lists to spill to the heap.\n\nIn isolation against #81, full-check instruction counts fell 0.09% for bitmaps and 0.13% for syn. Unchanged and patched incremental checks changed little.\n\n<details>\n<summary>Instruction counts</summary>\n\nTwo runs per revision against #81 (`053ba856`), using matching inputs, a stage-one CGU16/ThinLocal compiler, and one compiler thread. Counts are means; ranges include all pairings of the two baseline and candidate runs. These measure each patch independently.\n\n| Check | Baseline Ir | Isolated PR Ir | Change | Observed range |\n| --- | ---: | ---: | ---: | ---: |\n| bitmaps / Full | 2,308,520,331.5 | 2,306,549,201.5 | -0.085% | -0.092% to -0.079% |\n| bitmaps / IncrFull | 3,545,698,112.0 | 3,543,376,933.0 | -0.065% | -0.065% to -0.065% |\n| bitmaps / IncrUnchanged | 867,792,933.0 | 867,801,585.0 | +0.001% | -0.003% to +0.005% |\n| bitmaps / IncrPatched | 1,137,245,653.0 | 1,137,385,339.0 | +0.012% | -0.004% to +0.029% |\n| syn / Full | 4,320,131,863.0 | 4,314,292,970.5 | -0.135% | -0.135% to -0.135% |\n| syn / IncrFull | 5,398,871,448.0 | 5,392,814,197.0 | -0.112% | -0.112% to -0.112% |\n| syn / IncrUnchanged | 1,671,523,037.5 | 1,671,613,295.5 | +0.005% | +0.000% to +0.011% |\n| syn / IncrPatched | 1,914,901,425.5 | 1,915,015,036.5 | +0.006% | -0.011% to +0.023% |\n\n[Baseline run 1](https://github.com/astral-sh/ohm-rust/actions/runs/33396878865), [baseline run 2](https://github.com/astral-sh/ohm-rust/actions/runs/33439531117), [PR run 1](https://github.com/astral-sh/ohm-rust/actions/runs/33439912801), [PR run 2](https://github.com/astral-sh/ohm-rust/actions/runs/33441144670).\n\n</details>\n"
+      },
+      {
+        "number": 84,
+        "title": "Reuse unchanged type relation and folding results",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/84",
+        "head_sha": "6896674faa6adae17d200614a6ca63e9fb4bc3a8",
+        "body": "Reuse existing types and argument lists when a relation or fold leaves their components unchanged. We still run the required relation callbacks and checks, but avoid rebuilding and interning the same result. Redundant zero-offset shifts and shallow-resolution folds are skipped as well.\n\nIn isolation against #81, full-check instruction counts fell 0.05% for bitmaps and 0.20% for syn. Unchanged and patched incremental checks changed little.\n\n<details>\n<summary>Instruction counts</summary>\n\nTwo runs per revision against #81 (`053ba856`), using matching inputs, a stage-one CGU16/ThinLocal compiler, and one compiler thread. Counts are means; ranges include all pairings of the two baseline and candidate runs. These measure each patch independently.\n\n| Check | Baseline Ir | Isolated PR Ir | Change | Observed range |\n| --- | ---: | ---: | ---: | ---: |\n| bitmaps / Full | 2,308,520,331.5 | 2,307,295,394.0 | -0.053% | -0.057% to -0.049% |\n| bitmaps / IncrFull | 3,545,698,112.0 | 3,544,464,310.0 | -0.035% | -0.035% to -0.035% |\n| bitmaps / IncrUnchanged | 867,792,933.0 | 867,763,657.0 | -0.003% | -0.008% to +0.001% |\n| bitmaps / IncrPatched | 1,137,245,653.0 | 1,137,261,280.0 | +0.001% | -0.014% to +0.017% |\n| syn / Full | 4,320,131,863.0 | 4,311,482,465.5 | -0.200% | -0.201% to -0.200% |\n| syn / IncrFull | 5,398,871,448.0 | 5,389,964,040.5 | -0.165% | -0.167% to -0.163% |\n| syn / IncrUnchanged | 1,671,523,037.5 | 1,671,560,263.0 | +0.002% | -0.010% to +0.014% |\n| syn / IncrPatched | 1,914,901,425.5 | 1,915,110,746.5 | +0.011% | +0.004% to +0.018% |\n\n[Baseline run 1](https://github.com/astral-sh/ohm-rust/actions/runs/33396878865), [baseline run 2](https://github.com/astral-sh/ohm-rust/actions/runs/33439531117), [PR run 1](https://github.com/astral-sh/ohm-rust/actions/runs/33439902193), [PR run 2](https://github.com/astral-sh/ohm-rust/actions/runs/33441131748).\n\n</details>\n"
+      },
+      {
+        "number": 83,
+        "title": "Cache interner results per worker",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/83",
+        "head_sha": "659a36f24fb66e6cb7a7135530c1b2b0f5b2074c",
+        "body": "Cache canonical types, predicates, and generic argument lists per compiler worker. A hit checks the full key and returns the existing value; a miss reuses its hash in the shared interner. Shared interners also avoid reserving capacity for keys that already exist.\n\nEach worker has three 16,384-entry caches, using 3 MiB of slot storage across eight workers. In the isolated bitmaps/syn comparison, full-check instruction counts fell 0.99% and 1.53%, respectively; unchanged and patched incremental checks changed little.\n\n<details>\n<summary>Instruction counts</summary>\n\nTwo runs per revision against #81 (`053ba856`), using matching inputs, a stage-one CGU16/ThinLocal compiler, and one compiler thread. Counts are means; ranges include all pairings of the two baseline and candidate runs. These measure each patch independently.\n\n| Check | Baseline Ir | PR Ir | Change | Observed range |\n| --- | ---: | ---: | ---: | ---: |\n| bitmaps / Full | 2,308,520,331.5 | 2,285,756,598.5 | -0.986% | -0.990% to -0.982% |\n| bitmaps / IncrFull | 3,545,698,112.0 | 3,523,271,503.5 | -0.633% | -0.633% to -0.632% |\n| bitmaps / IncrUnchanged | 867,792,933.0 | 867,664,116.5 | -0.015% | -0.020% to -0.009% |\n| bitmaps / IncrPatched | 1,137,245,653.0 | 1,136,861,963.0 | -0.034% | -0.059% to -0.008% |\n| syn / Full | 4,320,131,863.0 | 4,253,935,314.0 | -1.532% | -1.532% to -1.532% |\n| syn / IncrFull | 5,398,871,448.0 | 5,332,867,189.5 | -1.223% | -1.223% to -1.223% |\n| syn / IncrUnchanged | 1,671,523,037.5 | 1,671,702,320.5 | +0.011% | +0.006% to +0.015% |\n| syn / IncrPatched | 1,914,901,425.5 | 1,914,983,534.5 | +0.004% | -0.002% to +0.011% |\n\n[Baseline run 1](https://github.com/astral-sh/ohm-rust/actions/runs/33396878865), [baseline run 2](https://github.com/astral-sh/ohm-rust/actions/runs/33439531117), [PR run 1](https://github.com/astral-sh/ohm-rust/actions/runs/33439758458), [PR run 2](https://github.com/astral-sh/ohm-rust/actions/runs/33440943333).\n\n</details>\n"
+      },
+      {
+        "number": 72,
+        "title": "Stream well-formedness obligations",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/72",
+        "head_sha": "262ce9465bdc318e5026a1aed13b0811a3784238",
+        "body": "Build well-formedness obligations directly from the ancestor predicate slices. Previously, `nominal_obligations` walked the ancestors twice and allocated intermediate origin, predicate, and span vectors.\n\nThe parent-first order, substitutions, and diagnostic spans are unchanged.\n\nAn exploratory comparison on Ruff's `ty_python_semantic` check measured 4.42% lower empty-target time and 4.19% lower private-edit time across four paired comparisons in ABBA/BAAB order. The compilers shared their other inputs and used optimization level 2, 16 codegen units, and no PGO, BOLT, or LTO. These are stage-one results, not measurements of the released toolchain.\n"
+      },
+      {
+        "number": 67,
+        "title": "Profile-optimize Cargo, rustdoc, Clippy, and rustfmt",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/67",
+        "head_sha": "51d9f8ed694198164a3ea5c3f868ef5906663be7",
+        "body": "Backport component-specific PGO configuration and training for Cargo, rustdoc, Clippy, and rustfmt. Cargo shares rustc's merged profile; rustdoc, Clippy, and the two formatter binaries receive profiles from their own workloads.\n\nThe release artifacts retain each distinct profile, including profiles with identical filenames. The existing compiler, LLVM, and BOLT settings remain supported. Ohm-specific performance gains have not yet been measured.\n"
+      },
+      {
+        "number": 66,
+        "title": "Promote unchanged incremental query results in parallel",
+        "url": "https://github.com/astral-sh/ohm-rust/pull/66",
+        "head_sha": "2e78525fccad81967717b5e4cee34adc950c7611",
+        "body": "Promote unchanged disk-cached query results in parallel. Workers process separate ranges of dependency nodes and finish before the previous session's cache mapping is closed.\n\nThis also fixes concurrent expansion decoding: decoders validate expansion data, then recheck its identity under the hygiene lock so they reuse a single registered identity.\n\nThis replaces the parallel-promotion portion of #42. Its independent performance benefit on the current Rust base has not been established; the earlier bundled Rust 1.97 measurements do not validate this port.\n"
+      }
+    ],
+    "ohm-cargo": [
+      {
+        "number": 115,
+        "title": "Use indexed dependency scheduling",
+        "url": "https://github.com/astral-sh/ohm-cargo/pull/115",
+        "head_sha": "a73d8afb43b1ff7bb052c795433ed0a00187ecb0",
+        "body": "Replace repeated hash-set updates and full ready-job scans with dense job indices, per-artifact dependency counters, and a ready heap. We notify only the consumers waiting for each completed artifact and compute the existing transitive-dependent priorities with sparse bitmaps.\n\nArtifact-specific readiness and priority weights are preserved. Equal-priority jobs now use insertion indices to break ties instead of hash-map iteration order. The tests cover duplicate dependencies, forward references, cycles, randomized graphs, and disconnected components.\n\nMatched Cachegrind runs against the original revision-9 baseline (`49a7295f`, Ohm 1.98.0-9) reduce whole-Cargo instructions by 0.27% for warm `cargo check -p ruff` and 0.66% for warm `cargo check -p uv`. All artifacts stayed fresh, with no compiler invocations. Quiet native no-op/edit/revert measurements remain inconclusive and order-sensitive. Measurements use optimized builds without the release PGO/BOLT pipeline.\n"
+      },
+      {
+        "number": 108,
+        "title": "Preserve worktree snapshots after Clippy on clone-capable storage",
+        "url": "https://github.com/astral-sh/ohm-cargo/pull/108",
+        "head_sha": "7e4d49f0f6ddfb0407bc7f1efff28531970b0d39",
+        "body": "Preserve ordinary build/test snapshots when the matching bundled Clippy driver runs. Clippy outputs stay in a private namespace excluded from snapshot import. Normal Ohm defaults enable this only after a bounded clone-only probe succeeds in the actual shared snapshot storage. `-Zohm-clippy-seed-isolation=no` disables it and skips probing; explicit `yes` can opt into copying storage.\n\nKeep compiler, loader, wrapper, and procedural-macro trust checks. Verify Clippy against the unwrapped selected rustc and propagate explicit overrides through external Cargo commands. Builds and imports use a new v3 namespace; clean/GC also recognize the same workspace/target's legacy v2 namespace. Old caches can coexist until normal cleanup, so the fresh-workflow savings below do not claim an automatic upgrade purge.\n\nAll eight standard CI checks pass at `0428ec35f1c2fc6903220d1b5be7675e2ebeed72`, including five bundled-Clippy admission, lint-state, override, and trust tests actually running on both macOS and Linux. Local packaged-Ohm validation additionally covers 32 worktree tests, 17 incremental-cleanup/reuse tests, four filesystem/driver unit tests, and Cargo Clippy with warnings denied. A non-cloning HFS+ smoke confirms automatic fallback, explicit enable, retained denial markers, and no probe residue.\n\nAn eight-arm APFS replay uses the same optimized Cargo binary with automatic isolation versus explicit isolation-off, four samples each in ABBA/BAAB order. It exercises real Ruff parser tests, Clippy, a fork, a real edit, and repeated no-op commands. Every enabled arm imports 851 files with 841 reflinks; every disabled arm imports none. All 812 tests pass before the edit and 813 afterward.\n\n| Median | Off | Automatic | Change |\n| --- | ---: | ---: | ---: |\n| Final physical allocation | 984.916 MiB | 859.350 MiB | \u221212.75% |\n| Child marginal allocation | 444.387 MiB | 319.395 MiB | \u221228.13% |\n| Whole workflow elapsed | 27.044 s | 23.595 s | \u221212.75% |\n| Whole workflow waited-child CPU | 97.918 s | 83.965 s | \u221214.25% |\n| Donor-only allocation | 540.590 MiB | 539.924 MiB | \u22120.12% |\n| Donor preparation elapsed | 17.667 s | 17.700 s | +0.19% |\n| First donor Clippy | 1.287 s | 1.314 s | +27.09 ms / +2.11% |\n| Repeated donor Clippy | 89.753 ms | 104.704 ms | +14.951 ms / +16.66% |\n| Repeated child Clippy | 83.538 ms | 84.402 ms | +0.863 ms / +1.03% |\n\nThe repeated donor-Clippy cost is an explicit tradeoff: three of four pairs are slower. Wall-time ranges are 82.930\u2013109.019 ms off and 92.247\u2013105.113 ms automatic; waited-child CPU rises from 84.402 to 97.834 ms (+15.91%). A separate untimed trace confirms version-query cache hits on warm Clippy but does not establish the cause of the measured increase. The run rejects other Rust processes at command endpoints, but recorded macOS background activity can affect short timings. The measurements cover this workflow and do not establish retired-instruction savings.\n\nA stricter follow-up verified indexing was disabled and waited for low CPU activity before commands, then rejected OS activity after the first fork. That activity may have been workload-induced. All workload commands returned zero and the volume detached normally, but no complete controlled pair was accepted. \n\nPhysical allocation uses settled dedicated APFS volume growth after donor checkout, including build state and child checkout. Historical ext4 copying grew allocation by 6.64%, motivating the clone gate. Explicit macro/native-tool trust applies only to the pinned development fixture.\n\n[Full report, exact identities, ranges, paired results, procedure, raw receipts, and logs](https://github.com/astral-sh/ohm-cargo/blob/4fbbac0dd819ba33d3a1f86072856fe7e9d301b3/benches/clippy-seeding/REPORT.md). The measured source `496285f24` and final PR head have identical production code to `795cddae6`. [Final CI run](https://github.com/astral-sh/ohm-cargo/actions/runs/34032859038).\n"
+      },
+      {
+        "number": 106,
+        "title": "Use mimalloc for Apple Silicon Cargo builds",
+        "url": "https://github.com/astral-sh/ohm-cargo/pull/106",
+        "head_sha": "fcc43615da4f1fd2cc07400d941d2153295c3e0b",
+        "body": "Use mimalloc 3.5.1 for the Apple Silicon Cargo executable when built with `ohm-defaults`. Link the native allocator only into Cargo and retain macOS 11 compatibility.\n\nMatched PGO release builds on an Apple M5 Max improved metadata and unchanged-build commands by 4.6\u20138.3% versus system malloc, with the compiler held fixed. Median unchanged Ruff checks fell from 216 ms to 199 ms; unchanged uv builds fell from 296 ms to 267 ms. Linux measurements did not establish a Cargo timing win and used more memory, so the change remains macOS-only.\n\nVendor the tested native release and build it with upstream CMake; `libmimalloc-sys` 0.1.49 bundles the older 3.3.2 allocator.\n"
+      },
+      {
+        "number": 105,
+        "title": "Reuse the source checksum buffer across files",
+        "url": "https://github.com/astral-sh/ohm-cargo/pull/105",
+        "head_sha": "3b8f3390a2feb4e13a9805d33ac512568146d602",
+        "body": "Reuse a lazily allocated 64 KiB buffer across source checksums in a freshness scan. Previously, each uncached file allocated its own 16 KiB buffer. Cache hits and early stale-file exits still avoid allocation.\n\nOn an Apple M5 Max, warm-corpus benchmarks using Ruff, uv, and Codex checksum inputs reduced isolated open/read/hash time by 6.7\u20139.5%. Full Cargo check/Clippy comparisons were mixed, from 1.67% faster to 0.87% slower, so they do not establish a whole-command speedup. Those comparisons used local release builds without PGO and eight samples per variant in ABBA/BAAB order.\n"
+      },
+      {
+        "number": 104,
+        "title": "Prototype expiry of unused incremental configurations",
+        "url": "https://github.com/astral-sh/ohm-cargo/pull/104",
+        "head_sha": "7dd8c44da62a3d18cacca8de8829846220c5bd22",
+        "body": "Add an opt-in way to expire unused incremental build configurations. With `-Zohm-incremental-gc`, Cargo records configuration use even when outputs are fresh; `cargo +ohm -Zohm-incremental-gc clean incremental --max-age '30 days'` removes expired state from the calling workspace. `--dry-run` previews collection.\n\nFinished artifacts and fingerprints remain intact. Collection skips busy profiles, moves expired directories aside before deleting them, and retries interrupted deletion. Other workspaces, untracked data, and unknown ownership records are left alone. Tracking is disabled by default and currently requires the shared-build layout on Linux or macOS.\n\nIn a [controlled Ruff parser experiment](https://github.com/astral-sh/ohm-cargo/blob/a8d9dc990a4a8c3143ccc0c7db7615b06fa8291f/benches/incremental-gc/README.md), three configurations were assigned ages of 40 days and one was refreshed. Collection reclaimed 221.37 MiB of 349.42 MiB of logical incremental data (63.4%); all 97 finished artifacts remained fresh. These were simulated ages, not a long-term usage estimate or a measurement of physical APFS space.\n\nThe [next-edit comparison](https://github.com/astral-sh/ohm-cargo/blob/a8d9dc990a4a8c3143ccc0c7db7615b06fa8291f/benches/incremental-gc/results/expiry-release-macos-aarch64.json) measured parser compilation at 0.244 s with retained state and 0.903 s after expiry. A separate [tracking benchmark](https://github.com/astral-sh/ohm-cargo/blob/a8d9dc990a4a8c3143ccc0c7db7615b06fa8291f/benches/incremental-gc/results/tracking-release-macos-aarch64.json) found no clear timing difference on two no-op workloads. The tradeoff is disk space for slower edits after expiry; automatic scheduling and size budgets remain future work.\n"
+      },
+      {
+        "number": 103,
+        "title": "Allow trusted local macro snapshots in new worktrees",
+        "url": "https://github.com/astral-sh/ohm-cargo/pull/103",
+        "head_sha": "7fd68da0ba5f2c816f071f0ff49826fbec70d74a",
+        "body": "Allow worktree seeding to import snapshots containing local procedural-macro outputs when `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` is set on `cargo worktree add`. Previously, any local macro excluded the entire workspace profile.\n\nThis is potentially unsound: a macro may read untracked files or environment variables, leaving the recipient with an expansion computed for the donor. Trust is required at each import, including when an imported worktree is used as a new donor. Ordinary recipient builds need no additional opt-in, and private artifacts remain independently writable. Other compiler and path exclusions still apply.\n\nA local APFS pilot measured the additional physical allocation of each child worktree:\n\n| Workload | State | Default | With local macro trust |\n| --- | --- | ---: | ---: |\n| Ruff/ty | First build and tests | 1.506 GiB | 0.231 GiB |\n| Ruff/ty | After an edit and tests | 1.493 GiB | 0.951 GiB |\n| uv types | First build and tests | 0.237 GiB | 0.082 GiB |\n| uv types | After an edit and tests | 0.308 GiB | 0.152 GiB |\n\nBoth arms used the same donor, four jobs, separate targets, and permissive registry trust during builds. These are marginal APFS allocations with the default sibling retained, including checkouts and build state but excluding toolchains and downloaded sources. First-build workspace compiler invocations fell from 30 to 4 for Ruff and 16 to 1 for uv. Timing was inconclusive for uv; this establishes reuse and disk savings for these workloads, not a general speedup.\n\nThe uv figures cover types/library development. [uv#21432](https://github.com/astral-sh/uv/pull/21432) separately removes its integration-test binary-path blocker. Existing v5 snapshots must be rebuilt before they can be imported with the new policy.\n"
+      },
+      {
+        "number": 101,
+        "title": "Seed Git worktrees with reusable Cargo build state",
+        "url": "https://github.com/astral-sh/ohm-cargo/pull/101",
+        "head_sha": "9c8b0e5db3945ef62d491459573f62624c39837b",
+        "body": "Add `cargo +ohm worktree add <path> --target-dir <target>` to create a Git worktree with reusable build state. Normal Ohm builds prepare the donor state automatically. The new worktree gets independently writable copies of workspace artifacts and incremental state, using filesystem clones where available.\n\nSource checksums and stable compiler paths let equivalent checkouts reuse artifacts despite their new locations. Build scripts rerun, and changed sources, environment, or generated output still trigger rebuilds. Unsupported compiler inputs and untrusted macros exclude a profile from seeding.\n\nLocal Cargo builds measured the following medians, including worktree creation and the first build:\n\n| Scenario | Unseeded | Seeded |\n| --- | ---: | ---: |\n| Unchanged sources | 23.95 s | 3.59 s |\n| Small source edit before the first build | 25.08 s | 8.33 s |\n\nEach case used two samples per arm in ABBA order, a warm shared registry cache, eight jobs, permissive registry macro/native trust, and a patched macOS compiler. The measurements also include [the compiler relocation fix](https://github.com/astral-sh/ohm-rust/pull/91) and hold `CARGO_RUSTC_CURRENT_DIR` constant; they are controlled local results.\n\nBranch selection follows `git worktree add`, including `-b` and `--detach`. Use `-Zohm-worktree-seeds=no` to disable preparation while retaining other Ohm defaults. Preparing reusable state reads source contents and remaps compiler paths, which can affect debugger source lookup.\n"
+      }
+    ],
+    "ohm-rustfmt": [
+      {
+        "number": 10,
+        "title": "Avoid unnecessary formatter module topology discovery",
+        "url": "https://github.com/astral-sh/ohm-rustfmt/pull/10",
+        "head_sha": "7f1cc11953b4a13c00a7522905226b288848b627",
+        "body": "Reject nested and unrelated files before computing module topology or inspecting possible crate-root declarations. Validate each authoritative source path only once and replace quadratic dependency/probe matching with a set inclusion check, while preserving module ownership, symlink, negative-probe, and fail-closed validation rules.\n\nOn a quiet Linux devbox with matched optimized Rust 1.97.1 binaries, cold checking of Ruff's 1,877-file workspace improves from 7.70 s to 6.24 s (approximately 19%).\n"
+      },
+      {
+        "number": 9,
+        "title": "Batch independently certified formatter leaf modules",
+        "url": "https://github.com/astral-sh/ohm-rustfmt/pull/9",
+        "head_sha": "03f317d09858e4e21e0332a3ee4d8008229cad92",
+        "body": "Extend the existing single-module fast path to multiple uniquely owned, independently certified direct modules belonging to one unchanged crate root. Publish a versioned proof for every selected module, reject stale or ambiguous certificates and unsafe path separators, and capture speculative output so ordinary full-crate formatting remains authoritative whenever an edit produces errors, warnings, rewrites, or other observable diagnostics.\n\nApply batching only when a crate retains enough untouched siblings to avoid regressing small workspaces. On a generated 36-package workspace, checking after four clean module edits improves from 139.1 ms to 134.8 ms (approximately 3%)."
+      },
+      {
+        "number": 8,
+        "title": "Reuse unchanged formatter configuration snapshots",
+        "url": "https://github.com/astral-sh/ohm-rustfmt/pull/8",
+        "head_sha": "2f95b7b5a9f4adb49944c020e8da35965bf19d56",
+        "body": "Reuse previously verified configuration-content digests when the exact canonical source and native file identity are unchanged. Validate modification time, length, device, inode, and change time before reusing a digest; fail closed for in-place replacement, aliases, metadata errors, changed configuration, and incompatible persisted cache schemas.\n\nOn a generated 36-package, 648-module workspace, checking after a root edit improves from 153.2 ms to 139.4 ms (9.9%); warm unchanged checks improve from 76.9 ms to 70.4 ms."
+      },
+      {
+        "number": 7,
+        "title": "Avoid redundant formatter configuration ancestor walks",
+        "url": "https://github.com/astral-sh/ohm-rustfmt/pull/7",
+        "head_sha": "6111a9f65535eff3b9701c4a490e9b5214d275d0",
+        "body": "Stop configuration discovery as soon as a source directory reaches an ancestor already visited for the same workspace snapshot. Preserve the existing exact per-file configuration probes, nearest-configuration precedence, missing-file detection, symlink handling, and conservative invalidation; do not enumerate unrelated ancestor-directory contents.\n\nOn a generated 36-package, 648-module workspace, checking after a root edit improves from 155.2 ms to 153.5 ms (approximately 1%). This intentionally small change avoids the substantially slower directory-enumeration approach."
+      }
+    ],
+    "ohm-rust-clippy": [
+      {
+        "number": 50,
+        "title": "Cache two more Clippy passes per module",
+        "url": "https://github.com/astral-sh/ohm-rust-clippy/pull/50",
+        "head_sha": "5bd3512dc93cb5450b628f2c66cbee42aaffd974",
+        "body": "Cache `UnnecessaryWraps` and `NeedlessBorrowsForGenericArgs` through the existing module lint queries, bringing the audited set to 56 passes covering 62 lint kinds. This builds on #49 and uses the source-file input support from astral-sh/ohm-rust#73.\n\nTrack the source span actually read when constructing a suggestion, including after walking macro contexts. The borrower-analysis stack remains local to each module traversal and its nested bodies. Compilers without the source-input query retain whole-crate traversal.\n\nSix paired Ruff edits with identical preparation and unprofiled release builds averaged 36.80s on #49 and 36.39s with this change: 1.1% faster overall, winning four of six pairs. Compiler invocations, flags, and diagnostic payloads matched. This is a small preliminary gain; the no-change Cargo loop remained about 0.32s.\n\nAll 13 incremental regressions passed with the matching Ohm compiler, comparing diagnostics and metadata against uncached traversal at one and four compiler threads. The new cases cover cross-module trait changes, nested borrower state, macro suggestion text, configuration, inherited MSRV, and expectations. An untimed observer confirmed that unchanged modules skip callbacks, and a deliberately untracked source edit reproduced stale suggestions. `cargo fixit --clippy --Zdangerous-parallel-fixes` also produced the same edits and remaining warnings as #49.\n"
+      },
+      {
+        "number": 49,
+        "title": "Cache source-sensitive Clippy passes per module",
+        "url": "https://github.com/astral-sh/ohm-rust-clippy/pull/49",
+        "head_sha": "f52143702ff1f265014e87d5e6853e70a3b15728",
+        "body": "Extend module caching to `needless_pass_by_value`, `redundant_clone`, `unnecessary_wraps`, and `needless_borrows_for_generic_args`, bringing the total to 56 passes and 62 lints.\n\nThese passes read source text to construct suggestions. Their reads now use [the compiler's source-file query](https://github.com/astral-sh/ohm-rust/pull/73), so comment and whitespace edits invalidate cached suggestions even when HIR is unchanged. Borrower-analysis state remains local to each traversal. Compilers without the source-input hook keep these passes in the whole-crate traversal.\n\nThe first two passes reduced Ruff/ty edit times by 5.2% across six pairs, with a separate three-pair confirmation showing 3.8%. Adding the other two reduced times by another 1.1% in a separate six-pair comparison. These are preliminary, separate comparisons and should not be added together. Both used matched release-profile builds without PGO/BOLT and produced matching diagnostics.\n\nThis includes the additional passes previously split into #50.\n"
+      },
+      {
+        "number": 48,
+        "title": "Cache audited Clippy late passes per module",
+        "url": "https://github.com/astral-sh/ohm-rust-clippy/pull/48",
+        "head_sha": "8ccb5ec0f95dee99ed60532ac9028eb8e23caabe",
+        "body": "Run 52 audited late passes, covering 58 lints, through rustc's incremental module queries. After an edit, unchanged modules can replay their diagnostics instead of rerunning those passes over the whole crate.\n\nEach selected pass must track all its inputs, including transitive helper calls and inherited MSRV settings. Passes with untracked source reads or cross-module traversal state remain in the whole-crate traversal. The driver fingerprints its executable, configuration, arguments, and diagnostic settings using [compiler #71](https://github.com/astral-sh/ohm-rust/pull/71). Unsupported configurations retain the existing traversal.\n\nSix alternating pairs of three Ruff edits reduced average Clippy time from 40.55 s to 38.85 s (4.2%), with matching diagnostics in every pair. The comparison used matched release-profile Ohm 1.98.0-3 sources without PGO or BOLT and independent warmed build histories. A separate comparison with the earlier one-pass implementation found a further 1.3% reduction across three pairs.\n\nThere is a small-crate cost: twelve paired direct-driver edits had medians of 52.99 ms before and 60.92 ms after with default lints enabled. Disabling the selected lints removed that overhead. The measurements and native module-cache validation covered Linux workloads.\n"
+      }
+    ],
+    "ohm-wild": [
+      {
+        "number": 32,
+        "title": "Support compact Rust artifacts on Wild 0.10.0",
+        "url": "https://github.com/astral-sh/ohm-wild/pull/32",
+        "head_sha": "9179eb988df2676342192a24dc337cf9823e9d56",
+        "body": "Read compact Rust objects directly, including members of ordinary `.rlib` archives, so we can retain compressed build artifacts without expanding every object before linking. The shared `compact-artifact` crate keeps ELF and symbol metadata available eagerly and decodes independently compressed payload blocks on demand. Rustc uses the same implementation to write artifacts and reconstruct conventional ELF for other consumers.\n\nKeep the fork on released Wild 0.10.0 and retain its ordinary debug-compression codec. Fix segment padding after debug compression, validate compact section sizes against ELF headers, and preserve large section alignment when reconstructing ELF. Explicit store-manifest and bounded-cache controls remain available for experiments.\n\nMatched measurements and compiler/Cargo lifecycle evidence in [Ohm #140](https://github.com/astral-sh/ohm/pull/140) use Wild `dba82ebe`. Later commits adapt private-fork CI, document the bounded streaming buffer, update license policy, remove a redundant borrow, check raw metadata length before copying, and strengthen the TLS regression's runtime alignment check. These follow-ups are separate from the measured binary; binary identity has not been checked.\n\nAt `9179eb98`, all 24 CI checks pass, including native Linux integration tests, cross builds, macOS, Windows, Wasm, Nix, Clippy, license checks, and the external mold suite. Native Linux jobs execute the 15 compact-format unit tests and the new allocation-observing regression, which failed before the raw-metadata bound fix and now passes. Both compressed-TLS variants also execute successfully on the previously failing OpenSUSE x86-64 and Ubuntu/OpenSUSE ARM64 configurations.\n"
+      },
+      {
+        "number": 21,
+        "title": "Populate large tmpfs outputs in parallel",
+        "url": "https://github.com/astral-sh/ohm-wild/pull/21",
+        "head_sha": "9fe4a25172578d9d48fd1572efe4687a0378fb9e",
+        "body": "Prepare writable output pages in parallel before we fill large tmpfs outputs. We reuse the existing linker pool and filesystem check, limiting this to Linux tmpfs files of at least 16 MiB with at least eight workers. The 2 MiB tasks finish before output writing begins; advice failures fall back to demand paging.\n\nThe comparison below adds page population to the compact-index parent. Both builds retain full debug-string deduplication.\n\n| Representative actual link | Mean link time, change (95% interval) | CPU, change (95% interval) | Peak RSS, change (95% interval) |\n| --- | ---: | ---: | ---: |\n| Ruff mdtest | -6.21% [-7.18, -5.31] | -7.12% [-7.74, -6.49] | +0.21% [+0.11, +0.31] |\n| uv client unit tests | -6.05% [-7.46, -4.95] | -5.90% [-6.38, -5.45] | +0.09% [+0.01, +0.18] |\n| Codex TUI tests | -6.58% [-7.78, -5.21] | -6.94% [-7.31, -6.62] | +0.07% [-0.24, +0.39] |\n\nMean link time uses 15 joint randomized rounds, three warmups, eight workers on CPUs 8\u201315 and warm tmpfs output. Each output must match across the step14 baseline, compact parent and candidate; the table reports compact parent \u2192 candidate directly. The CPU/RSS columns use separate 15-pair `--no-fork` runs that include the complete linker process. These are three representative links, not full replay means. All builds use portable ThinLTO and the same sealed PGO profile and controlled dependency lock.\n\nThe saved candidate passed all 432 available native configurations. Every measured and warmup output matched across the three builds. Peak RSS rose by 1.04 MiB for Ruff and 1.21 MiB for uv; the Codex change was inconclusive (point estimate +3.43 MiB). Memory pressure and concurrent links remain unmeasured; page population brings allocation work forward. The earlier opt-out-parent replay results are retained as historical evidence, separate from this comparison.\n\n[Method and scope](https://github.com/astral-sh/ohm-wild/blob/29fa38b5e911e9e354bf7090f5f0930246707584/benchmarks/ohm/OUTPUT_PAGES.md) \u00b7 [Raw evidence and identities](https://github.com/astral-sh/ohm-wild/blob/29fa38b5e911e9e354bf7090f5f0930246707584/benchmarks/ohm/results/output-pages-compact/INDEX.json)\n\nThe [full-session comparison](https://github.com/astral-sh/ohm-wild/blob/f51b78e3fde49bbdbf5606e986db4c954419b77d/benchmarks/ohm/WHOLE_SESSIONS.md) found no clear speedup for uv and a small slowdown for Ruff; Codex remains incomplete. Those results compare the full stack with upstream using ext4, where this tmpfs-only change is inactive.\n"
+      }
+    ]
+  }
+}

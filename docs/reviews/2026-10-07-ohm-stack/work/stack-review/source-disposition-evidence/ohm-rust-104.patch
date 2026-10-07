@@ -1,0 +1,451 @@
+diff --git a/compiler/rustc_borrowck/src/dataflow.rs b/compiler/rustc_borrowck/src/dataflow.rs
+index 5bfe5ee64f0..5dcb182f70d 100644
+--- a/compiler/rustc_borrowck/src/dataflow.rs
++++ b/compiler/rustc_borrowck/src/dataflow.rs
+@@ -14,6 +14,9 @@
+ 
+ use crate::{BorrowSet, PlaceConflictBias, PlaceExt, RegionInferenceContext, places_conflict};
+ 
++#[cfg(test)]
++mod tests;
++
+ // This analysis is different to most others. Its results aren't computed with
+ // `iterate_to_fixpoint`, but are instead composed from the results of three sub-analyses that are
+ // computed individually with `iterate_to_fixpoint`.
+@@ -145,13 +148,38 @@ fn fmt_diff_with(&self, old: &Self, ctxt: &C, f: &mut fmt::Formatter<'_>) -> fmt
+ }
+ 
+ /// The transient state of the dataflow analyses used by the borrow checker.
+-#[derive(Clone, Debug, PartialEq, Eq)]
++#[derive(Debug, PartialEq, Eq)]
+ pub(crate) struct BorrowckDomain {
+     pub(crate) borrows: BorrowsDomain,
+     pub(crate) uninits: MaybeUninitializedPlacesDomain,
+     pub(crate) ever_inits: EverInitializedPlacesDomain,
+ }
+ 
++impl Clone for BorrowckDomain {
++    fn clone(&self) -> Self {
++        Self {
++            borrows: self.borrows.clone(),
++            uninits: self.uninits.clone(),
++            ever_inits: self.ever_inits.clone(),
++        }
++    }
++
++    fn clone_from(&mut self, source: &Self) {
++        // Cursor resets reuse the bitsets for the same body. MixedBitSet's
++        // clone_from requires matching domains, so replace the state otherwise.
++        if self.borrows.domain_size() == source.borrows.domain_size()
++            && self.uninits.domain_size() == source.uninits.domain_size()
++            && self.ever_inits.domain_size() == source.ever_inits.domain_size()
++        {
++            self.borrows.clone_from(&source.borrows);
++            self.uninits.clone_from(&source.uninits);
++            self.ever_inits.clone_from(&source.ever_inits);
++        } else {
++            *self = source.clone();
++        }
++    }
++}
++
+ rustc_index::newtype_index! {
+     #[orderable]
+     #[debug_format = "bw{}"]
+diff --git a/compiler/rustc_borrowck/src/dataflow/tests.rs b/compiler/rustc_borrowck/src/dataflow/tests.rs
+new file mode 100644
+index 00000000000..559b8848835
+--- /dev/null
++++ b/compiler/rustc_borrowck/src/dataflow/tests.rs
+@@ -0,0 +1,24 @@
++use rustc_index::bit_set::MixedBitSet;
++
++use super::BorrowckDomain;
++
++#[test]
++fn clone_from_replaces_bits_and_handles_domain_changes() {
++    let empty = |[borrows, uninits, ever_inits]: [usize; 3]| BorrowckDomain {
++        borrows: MixedBitSet::new_empty(borrows),
++        uninits: MixedBitSet::new_empty(uninits),
++        ever_inits: MixedBitSet::new_empty(ever_inits),
++    };
++    let mut state = empty([0, 0, 0]);
++    for sizes in [[1, 65, 4096], [4096, 1, 65], [0, 0, 0]] {
++        let mut filled = empty(sizes);
++        filled.borrows.insert_all();
++        filled.uninits.insert_all();
++        filled.ever_inits.insert_all();
++        state.clone_from(&filled);
++        assert_eq!(state, filled);
++        let cleared = empty(sizes);
++        state.clone_from(&cleared);
++        assert_eq!(state, cleared);
++    }
++}
+diff --git a/compiler/rustc_borrowck/src/polonius/dump.rs b/compiler/rustc_borrowck/src/polonius/dump.rs
+index 2b3d8b4fdac..2c144ecf230 100644
+--- a/compiler/rustc_borrowck/src/polonius/dump.rs
++++ b/compiler/rustc_borrowck/src/polonius/dump.rs
+@@ -292,7 +292,7 @@ fn emit_mermaid_cfg(body: &Body<'_>, out: &mut dyn io::Write) -> io::Result<()>
+                 }
+             }
+             TerminatorEdges::AssignOnReturn { return_, cleanup, .. } => {
+-                for to_idx in return_ {
++                for &to_idx in return_.iter() {
+                     writeln!(out, "{block_idx} --> {}", to_idx.as_usize())?;
+                 }
+ 
+diff --git a/compiler/rustc_middle/src/mir/terminator.rs b/compiler/rustc_middle/src/mir/terminator.rs
+index 2f800c38cd4..56e17be3577 100644
+--- a/compiler/rustc_middle/src/mir/terminator.rs
++++ b/compiler/rustc_middle/src/mir/terminator.rs
+@@ -1,5 +1,6 @@
+ //! Functionality for terminators and helper types that appear in terminators.
+ 
++use std::borrow::Cow;
+ use std::slice;
+ 
+ use rustc_ast::InlineAsmOptions;
+@@ -692,7 +693,7 @@ pub enum TerminatorEdges<'mir, 'tcx> {
+     Double(BasicBlock, BasicBlock),
+     /// Special action for `Yield`, `Call` and `InlineAsm` terminators.
+     AssignOnReturn {
+-        return_: SmallVec<[BasicBlock; 1]>,
++        return_: Cow<'mir, [BasicBlock]>,
+         /// The cleanup block, if it exists.
+         cleanup: Option<BasicBlock>,
+         place: CallReturnPlaces<'mir, 'tcx>,
+@@ -763,19 +764,25 @@ pub fn edges(&self) -> TerminatorEdges<'_, 'tcx> {
+ 
+             Yield { resume: target, drop, resume_arg, value: _ } => {
+                 TerminatorEdges::AssignOnReturn {
+-                    return_: [target].into_iter().chain(drop.into_iter()).collect(),
++                    return_: Cow::Owned([target].into_iter().chain(drop.into_iter()).collect()),
+                     cleanup: None,
+                     place: CallReturnPlaces::Yield(resume_arg),
+                 }
+             }
+ 
+-            Call { unwind, destination, target, func: _, args: _, fn_span: _, call_source: _ } => {
+-                TerminatorEdges::AssignOnReturn {
+-                    return_: target.into_iter().collect(),
+-                    cleanup: unwind.cleanup_block(),
+-                    place: CallReturnPlaces::Call(destination),
+-                }
+-            }
++            Call {
++                unwind,
++                destination,
++                ref target,
++                func: _,
++                args: _,
++                fn_span: _,
++                call_source: _,
++            } => TerminatorEdges::AssignOnReturn {
++                return_: Cow::Borrowed(target.as_slice()),
++                cleanup: unwind.cleanup_block(),
++                place: CallReturnPlaces::Call(destination),
++            },
+ 
+             InlineAsm {
+                 asm_macro: _,
+@@ -786,7 +793,7 @@ pub fn edges(&self) -> TerminatorEdges<'_, 'tcx> {
+                 ref targets,
+                 unwind,
+             } => TerminatorEdges::AssignOnReturn {
+-                return_: targets.iter().copied().collect(),
++                return_: Cow::Borrowed(targets),
+                 cleanup: unwind.cleanup_block(),
+                 place: CallReturnPlaces::InlineAsm(operands),
+             },
+diff --git a/compiler/rustc_middle/src/ty/context.rs b/compiler/rustc_middle/src/ty/context.rs
+index 5a92be043aa..705d72184c8 100644
+--- a/compiler/rustc_middle/src/ty/context.rs
++++ b/compiler/rustc_middle/src/ty/context.rs
+@@ -977,7 +977,8 @@ pub fn is_default_trait(self, def_id: DefId) -> bool {
+     }
+ 
+     pub fn is_sizedness_trait(self, def_id: DefId) -> bool {
+-        matches!(self.as_lang_item(def_id), Some(LangItem::Sized | LangItem::MetaSized))
++        let lang_items = self.lang_items();
++        Some(def_id) == lang_items.sized_trait() || Some(def_id) == lang_items.meta_sized_trait()
+     }
+ 
+     pub fn lift<T: Lift<TyCtxt<'tcx>>>(self, value: T) -> T::Lifted {
+@@ -2219,7 +2220,7 @@ pub fn mk_predicate(self, binder: Binder<'tcx, PredicateKind<'tcx>>) -> Predicat
+         self.interners.intern_predicate(binder)
+     }
+ 
+-    #[inline]
++    #[inline(always)]
+     pub fn reuse_or_mk_predicate(
+         self,
+         pred: Predicate<'tcx>,
+diff --git a/compiler/rustc_middle/src/ty/trait_def.rs b/compiler/rustc_middle/src/ty/trait_def.rs
+index 9983401d0d6..5e56d7787cb 100644
+--- a/compiler/rustc_middle/src/ty/trait_def.rs
++++ b/compiler/rustc_middle/src/ty/trait_def.rs
+@@ -132,6 +132,16 @@ pub struct ConstArgImpls<'tcx> {
+ }
+ 
+ impl<'tcx> ConstArgImpls<'tcx> {
++    /// Returns the concrete and fallback impls that may match this const value.
++    pub fn impls_for_value(&self, value: ty::ValTree<'tcx>) -> impl Iterator<Item = DefId> {
++        self.values
++            .get(&value)
++            .into_iter()
++            .flatten()
++            .chain(&self.fallback)
++            .map(|&(_, impl_def_id)| impl_def_id)
++    }
++
+     /// Merges a value's impls with the fallback impls in their original iteration order.
+     fn for_each(&self, value: Option<ty::ValTree<'tcx>>, mut f: impl FnMut(DefId)) {
+         let mut values =
+diff --git a/compiler/rustc_mir_dataflow/src/framework/direction.rs b/compiler/rustc_mir_dataflow/src/framework/direction.rs
+index 74962a80924..bb2df8bcb2c 100644
+--- a/compiler/rustc_mir_dataflow/src/framework/direction.rs
++++ b/compiler/rustc_mir_dataflow/src/framework/direction.rs
+@@ -214,7 +214,7 @@ fn apply_effects_in_block<'mir, 'tcx, A>(
+ 
+                 if !return_.is_empty() {
+                     analysis.apply_call_return_effect(exit_state, block, place);
+-                    for target in return_ {
++                    for &target in return_.iter() {
+                         propagate(target, exit_state);
+                     }
+                 }
+diff --git a/compiler/rustc_mir_dataflow/src/impls/initialized.rs b/compiler/rustc_mir_dataflow/src/impls/initialized.rs
+index 1b2c58c7e51..574c169622a 100644
+--- a/compiler/rustc_mir_dataflow/src/impls/initialized.rs
++++ b/compiler/rustc_mir_dataflow/src/impls/initialized.rs
+@@ -724,7 +724,7 @@ pub fn init_reaches_location(
+             else {
+                 bug!("`NonPanicPathOnly` should only be seen on terminators with return edges");
+             };
+-            queue.extend(return_.into_iter().map(BasicBlock::start_location));
++            queue.extend(return_.iter().copied().map(BasicBlock::start_location));
+         } else {
+             // This case mirrors `apply_primary_terminator_effect`.
+             queue.extend(init_block_data.terminator().successors().map(BasicBlock::start_location));
+diff --git a/compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs b/compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs
+index 8462471ba42..2ece5213434 100644
+--- a/compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs
++++ b/compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs
+@@ -77,6 +77,7 @@ fn insert(
+         &mut self,
+         tcx: TyCtxt<'tcx>,
+         impl_def_id: DefId,
++        trait_ref: ty::TraitRef<'tcx>,
+         simplified_self: Option<SimplifiedType>,
+         overlap_mode: OverlapMode,
+     ) -> Result<Inserted<'tcx>, OverlapError<'tcx>> {
+@@ -84,7 +85,7 @@ fn insert(
+         let mut replace_children = Vec::new();
+ 
+         let possible_siblings = match simplified_self {
+-            Some(st) => PotentialSiblings::Filtered(filtered_children(self, st)),
++            Some(st) => PotentialSiblings::Filtered(filtered_children(tcx, self, st, trait_ref)),
+             None => PotentialSiblings::Unfiltered(iter_children(self)),
+         };
+ 
+@@ -198,11 +199,40 @@ fn iter_children(children: &Children) -> impl Iterator<Item = DefId> {
+     children.blanket_impls.iter().chain(nonblanket).cloned()
+ }
+ 
+-fn filtered_children(children: &mut Children, st: SimplifiedType) -> impl Iterator<Item = DefId> {
+-    let nonblanket = children.non_blanket_impls.entry(st).or_default().iter();
++fn filtered_children<'a, 'tcx>(
++    tcx: TyCtxt<'tcx>,
++    children: &'a mut Children,
++    st: SimplifiedType,
++    trait_ref: ty::TraitRef<'tcx>,
++) -> impl Iterator<Item = DefId> + use<'a> {
++    let bucket = children.non_blanket_impls.entry(st).or_default();
++    let candidates = if bucket.len() >= 16 { const_arg_candidates(tcx, trait_ref) } else { None };
++    let nonblanket = bucket
++        .iter()
++        .filter(move |impl_def_id| candidates.as_ref().is_none_or(|ids| ids.contains(impl_def_id)));
+     children.blanket_impls.iter().chain(nonblanket).cloned()
+ }
+ 
++/// Prunes a large sibling scan when the const index leaves only a few candidates.
++fn const_arg_candidates<'tcx>(
++    tcx: TyCtxt<'tcx>,
++    trait_ref: ty::TraitRef<'tcx>,
++) -> Option<smallvec::SmallVec<[DefId; 8]>> {
++    let ty::Adt(adt, args) = trait_ref.self_ty().kind() else { return None };
++    let ct = args.iter().find_map(|arg| arg.as_const())?;
++    let ty::ConstKind::Value(value) = ct.kind() else { return None };
++    let index = tcx.trait_impls_by_const_arg((trait_ref.def_id, adt.did()));
++    let mut candidates = smallvec::SmallVec::<[DefId; 8]>::new();
++    for impl_def_id in index.impls_for_value(value.valtree) {
++        // Keep the membership test bounded and avoid allocating for broad buckets.
++        if candidates.len() == 8 {
++            return None;
++        }
++        candidates.push(impl_def_id);
++    }
++    Some(candidates)
++}
++
+ // A custom iterator used by Children::insert
+ enum PotentialSiblings<I, J>
+ where
+@@ -276,6 +306,7 @@ fn insert(
+             let insert_result = self.children.entry(parent).or_default().insert(
+                 tcx,
+                 impl_def_id,
++                trait_ref,
+                 simplified,
+                 overlap_mode,
+             )?;
+diff --git a/compiler/rustc_trait_selection/src/traits/util.rs b/compiler/rustc_trait_selection/src/traits/util.rs
+index e611b4fc6b6..67190b04216 100644
+--- a/compiler/rustc_trait_selection/src/traits/util.rs
++++ b/compiler/rustc_trait_selection/src/traits/util.rs
+@@ -229,10 +229,14 @@ pub fn sizedness_fast_path<'tcx>(
+         predicate.kind().skip_binder()
+         && trait_pred.polarity == ty::PredicatePolarity::Positive
+     {
+-        let sizedness = match tcx.as_lang_item(trait_pred.def_id()) {
+-            Some(LangItem::Sized) => SizedTraitKind::Sized,
+-            Some(LangItem::MetaSized) => SizedTraitKind::MetaSized,
+-            _ => return false,
++        let lang_items = tcx.lang_items();
++        let trait_def_id = Some(trait_pred.def_id());
++        let sizedness = if trait_def_id == lang_items.sized_trait() {
++            SizedTraitKind::Sized
++        } else if trait_def_id == lang_items.meta_sized_trait() {
++            SizedTraitKind::MetaSized
++        } else {
++            return false;
+         };
+ 
+         if trait_pred.self_ty().has_trivial_sizedness(tcx, sizedness) {
+diff --git a/compiler/rustc_trait_selection/src/traits/wf.rs b/compiler/rustc_trait_selection/src/traits/wf.rs
+index 36310e03a5a..ea2583c5c5a 100644
+--- a/compiler/rustc_trait_selection/src/traits/wf.rs
++++ b/compiler/rustc_trait_selection/src/traits/wf.rs
+@@ -347,6 +347,18 @@ fn normalize(self, infcx: &InferCtxt<'tcx>) -> PredicateObligations<'tcx> {
+             return self.out;
+         }
+ 
++        // Return the existing list when resolution and normalization have no work.
++        // Errors must still pass through resolve_vars_if_possible to taint the context.
++        let flags = ty::TypeFlags::HAS_ALIAS
++            | ty::TypeFlags::HAS_ERROR
++            | (ty::TypeFlags::HAS_INFER - ty::TypeFlags::HAS_RE_INFER);
++        if self.out.iter().all(|obligation| !obligation.predicate.has_type_flags(flags)) {
++            for obligation in &self.out {
++                assert!(!obligation.has_escaping_bound_vars());
++            }
++            return self.out;
++        }
++
+         let cause = self.cause(ObligationCauseCode::WellFormed(None));
+         let param_env = self.param_env;
+         let mut obligations = PredicateObligations::with_capacity(self.out.len());
+diff --git a/tests/ui/const-generics/coherence-indexed-impls.equal.stderr b/tests/ui/const-generics/coherence-indexed-impls.equal.stderr
+new file mode 100644
+index 00000000000..ebf2e28644f
+--- /dev/null
++++ b/tests/ui/const-generics/coherence-indexed-impls.equal.stderr
+@@ -0,0 +1,12 @@
++error[E0119]: conflicting implementations of trait `Trait` for type `Array<16>`
++  --> $DIR/coherence-indexed-impls.rs:27:1
++   |
++LL | impl Trait for Array<16> {}
++   | ------------------------ first implementation here
++...
++LL | impl Trait for Array<16> {}
++   | ^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `Array<16>`
++
++error: aborting due to 1 previous error
++
++For more information about this error, try `rustc --explain E0119`.
+diff --git a/tests/ui/const-generics/coherence-indexed-impls.generic.stderr b/tests/ui/const-generics/coherence-indexed-impls.generic.stderr
+new file mode 100644
+index 00000000000..f63ad56e3e8
+--- /dev/null
++++ b/tests/ui/const-generics/coherence-indexed-impls.generic.stderr
+@@ -0,0 +1,12 @@
++error[E0119]: conflicting implementations of trait `Trait` for type `Array<0>`
++  --> $DIR/coherence-indexed-impls.rs:31:1
++   |
++LL | impl Trait for Array<0> {}
++   | ----------------------- first implementation here
++...
++LL | impl<const N: usize> Trait for Array<N> {}
++   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `Array<0>`
++
++error: aborting due to 1 previous error
++
++For more information about this error, try `rustc --explain E0119`.
+diff --git a/tests/ui/const-generics/coherence-indexed-impls.named.stderr b/tests/ui/const-generics/coherence-indexed-impls.named.stderr
+new file mode 100644
+index 00000000000..30ece21f6b6
+--- /dev/null
++++ b/tests/ui/const-generics/coherence-indexed-impls.named.stderr
+@@ -0,0 +1,12 @@
++error[E0119]: conflicting implementations of trait `Trait` for type `Array<16>`
++  --> $DIR/coherence-indexed-impls.rs:37:1
++   |
++LL | impl Trait for Array<16> {}
++   | ------------------------ first implementation here
++...
++LL | impl Trait for Array<{ N }> {}
++   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `Array<16>`
++
++error: aborting due to 1 previous error
++
++For more information about this error, try `rustc --explain E0119`.
+diff --git a/tests/ui/const-generics/coherence-indexed-impls.rs b/tests/ui/const-generics/coherence-indexed-impls.rs
+new file mode 100644
+index 00000000000..10473b28ab9
+--- /dev/null
++++ b/tests/ui/const-generics/coherence-indexed-impls.rs
+@@ -0,0 +1,43 @@
++//@ revisions: pass equal generic named
++//@[pass] check-pass
++
++trait Trait {}
++struct Array<const N: usize>;
++
++impl Trait for Array<0> {}
++impl Trait for Array<1> {}
++impl Trait for Array<2> {}
++impl Trait for Array<3> {}
++impl Trait for Array<4> {}
++impl Trait for Array<5> {}
++impl Trait for Array<6> {}
++impl Trait for Array<7> {}
++impl Trait for Array<8> {}
++impl Trait for Array<9> {}
++impl Trait for Array<10> {}
++impl Trait for Array<11> {}
++impl Trait for Array<12> {}
++impl Trait for Array<13> {}
++impl Trait for Array<14> {}
++impl Trait for Array<15> {}
++impl Trait for Array<16> {}
++impl Trait for Array<17> {}
++
++#[cfg(equal)]
++impl Trait for Array<16> {}
++//[equal]~^ ERROR conflicting implementations of trait `Trait` for type `Array<16>`
++
++#[cfg(generic)]
++impl<const N: usize> Trait for Array<N> {}
++//[generic]~^ ERROR conflicting implementations of trait `Trait` for type `Array<0>`
++
++#[cfg(named)]
++const N: usize = 16;
++#[cfg(named)]
++impl Trait for Array<{ N }> {}
++//[named]~^ ERROR conflicting implementations of trait `Trait` for type `Array<16>`
++
++fn main() {
++    fn check<T: Trait>() {}
++    check::<Array<17>>();
++}

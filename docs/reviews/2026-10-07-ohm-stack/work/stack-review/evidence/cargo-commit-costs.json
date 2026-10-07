@@ -1,0 +1,832 @@
+[
+  {
+    "sha": "ced2bb5281b424681ca49d794098de4e61b49289",
+    "title": "Set up fork-owned Cargo CI (#7)",
+    "files": 5,
+    "insertions": 101,
+    "deletions": 497,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "28270cc07e218f2e2ce2fc59a48744b29e0967d3",
+    "title": "Use Namespace runners for macOS CI (#43)",
+    "files": 1,
+    "insertions": 2,
+    "deletions": 2,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "ed9e918fcf0ad49c60b576c5d88c89a96e410330",
+    "title": "Target Rust 1.98.1 in Cargo CI",
+    "files": 1,
+    "insertions": 2,
+    "deletions": 2,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "0068923c62bb0c51e2fe6b5eb45bf5fbfd453cfe",
+    "title": "Simplify the README for Ohm Cargo (#128)",
+    "files": 1,
+    "insertions": 9,
+    "deletions": 105,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "0f94df99023a16f24b48d6e479794e5c7ce7af72",
+    "title": "Target Rust 1.99.0 in Cargo CI",
+    "files": 1,
+    "insertions": 2,
+    "deletions": 2,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "21a17895f9aa6ef0ae85bc8239a1667c0206e596",
+    "title": "Match exact authentication headers in Git tests",
+    "files": 1,
+    "insertions": 1,
+    "deletions": 1,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "1aa523118aad2b32eb365589956a96587e527f92",
+    "title": "Prototype reduced dependency rebuilds with public API hashes",
+    "files": 8,
+    "insertions": 1901,
+    "deletions": 106,
+    "production_files": 7,
+    "production_insertions": 1231,
+    "production_deletions": 105
+  },
+  {
+    "sha": "30004d93bdf3b07003fb8cd7097be81d862a9f41",
+    "title": "Preserve semantic metadata and transitive link generations",
+    "files": 3,
+    "insertions": 423,
+    "deletions": 15,
+    "production_files": 2,
+    "production_insertions": 145,
+    "production_deletions": 15
+  },
+  {
+    "sha": "caac2566f0fbdf3984f519c2141a6d78e18b01b2",
+    "title": "Prototype cached relinking for dependency-only rebuilds",
+    "files": 7,
+    "insertions": 1112,
+    "deletions": 20,
+    "production_files": 4,
+    "production_insertions": 602,
+    "production_deletions": 2
+  },
+  {
+    "sha": "a43bb550de710e8b6e81c170a470dfc7f060dbb9",
+    "title": "Enable RDR early cutoff for check and Clippy",
+    "files": 3,
+    "insertions": 166,
+    "deletions": 17,
+    "production_files": 2,
+    "production_insertions": 11,
+    "production_deletions": 3
+  },
+  {
+    "sha": "d75606fa80966b4107d7625e4279c5f400307428",
+    "title": "Enable Ohm build defaults",
+    "files": 14,
+    "insertions": 547,
+    "deletions": 78,
+    "production_files": 10,
+    "production_insertions": 151,
+    "production_deletions": 25
+  },
+  {
+    "sha": "582e6bc069f9f03b3895e4f854e2c3a399a341f0",
+    "title": "Avoid cloning manifests when preparing diagnostics",
+    "files": 0,
+    "insertions": 0,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "0cf1cfc346c406cd3fc1a94cc0f21586953e9b6a",
+    "title": "Avoid cloning parsed TOML manifests",
+    "files": 0,
+    "insertions": 0,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "e42df716454ca9387245a022dabae46738084340",
+    "title": "Use FxHash collections throughout Cargo",
+    "files": 0,
+    "insertions": 0,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "ad86be59ebda9918fdffe4734190d523a52ac141",
+    "title": "Index workspace members for faster discovery",
+    "files": 0,
+    "insertions": 0,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "309b42ea09bfbc6bf44ffb8427245ecd33a4f47a",
+    "title": "Avoid parsing unchanged lockfiles",
+    "files": 0,
+    "insertions": 0,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "1aa507d75fd9e90bc0246551e5a559d225b56381",
+    "title": "Initialize Git HTTP transports only when needed",
+    "files": 0,
+    "insertions": 0,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "b8dcafd99077e0ac46d5a0fcd1b119711677677b",
+    "title": "Deserialize remote manifests without retaining TOML documents",
+    "files": 2,
+    "insertions": 80,
+    "deletions": 9,
+    "production_files": 1,
+    "production_insertions": 49,
+    "production_deletions": 9
+  },
+  {
+    "sha": "4c5b0f38185d8346339c1290c411822398ec0390",
+    "title": "Avoid cloning registry index summaries",
+    "files": 0,
+    "insertions": 0,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "4138f17c0f7f96374cd47056a1d155e89d394291",
+    "title": "Preallocate registry and target vectors",
+    "files": 0,
+    "insertions": 0,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "bf0b4b183b8d87cfdb5e6ef83c0d3598fc0243b5",
+    "title": "Initialize cached relinking in one compiler invocation",
+    "files": 2,
+    "insertions": 11,
+    "deletions": 38,
+    "production_files": 1,
+    "production_insertions": 4,
+    "production_deletions": 25
+  },
+  {
+    "sha": "6c396efb6609514fec0c85a573b72f30c9958ef6",
+    "title": "Cache workspace resolution across Cargo invocations",
+    "files": 5,
+    "insertions": 758,
+    "deletions": 11,
+    "production_files": 4,
+    "production_insertions": 279,
+    "production_deletions": 11
+  },
+  {
+    "sha": "a6ad8748ba825594ebf9a90520d249be0dc9ed29",
+    "title": "Keep cached relink objects out of dependency search paths",
+    "files": 2,
+    "insertions": 64,
+    "deletions": 34,
+    "production_files": 1,
+    "production_insertions": 20,
+    "production_deletions": 21
+  },
+  {
+    "sha": "70f5020edca159f1a1a020ea9444e1174495a669",
+    "title": "Avoid embedding crate metadata in Ohm library artifacts",
+    "files": 10,
+    "insertions": 333,
+    "deletions": 43,
+    "production_files": 6,
+    "production_insertions": 48,
+    "production_deletions": 2
+  },
+  {
+    "sha": "c20dff77e4ca22996d485280aedcc152e93f1e6c",
+    "title": "Avoid saving unnecessary temporaries for cached relinking",
+    "files": 2,
+    "insertions": 7,
+    "deletions": 1,
+    "production_files": 1,
+    "production_insertions": 0,
+    "production_deletions": 1
+  },
+  {
+    "sha": "2bf8c38621670ac3f92b4c59587d47692fde5123",
+    "title": "Skip public API hashing for terminal check targets",
+    "files": 6,
+    "insertions": 190,
+    "deletions": 33,
+    "production_files": 4,
+    "production_insertions": 77,
+    "production_deletions": 31
+  },
+  {
+    "sha": "f084eb4c326032eecf69ec05eab559063ad7ccd0",
+    "title": "Pipeline early-cutoff dependencies when public APIs change",
+    "files": 5,
+    "insertions": 675,
+    "deletions": 17,
+    "production_files": 3,
+    "production_insertions": 118,
+    "production_deletions": 8
+  },
+  {
+    "sha": "455b644b1af6b9c81786a059b2d608c46439f427",
+    "title": "Skip relinking integration tests with unused package libraries",
+    "files": 5,
+    "insertions": 841,
+    "deletions": 41,
+    "production_files": 4,
+    "production_insertions": 357,
+    "production_deletions": 35
+  },
+  {
+    "sha": "b71893bd3faab17f87358430eb45521e7702763e",
+    "title": "Reuse integration executables across unused dependency changes",
+    "files": 3,
+    "insertions": 1221,
+    "deletions": 18,
+    "production_files": 2,
+    "production_insertions": 261,
+    "production_deletions": 13
+  },
+  {
+    "sha": "cd152ebe3268f6078e68443d77d7dd982cabc0d5",
+    "title": "Add opt-in focused test compilation",
+    "files": 4,
+    "insertions": 327,
+    "deletions": 25,
+    "production_files": 2,
+    "production_insertions": 39,
+    "production_deletions": 0
+  },
+  {
+    "sha": "3dae760cf0f18b9e782c4105b937322b87dc264d",
+    "title": "Enable incremental codegen optimizations for workspace builds",
+    "files": 4,
+    "insertions": 244,
+    "deletions": 2,
+    "production_files": 3,
+    "production_insertions": 91,
+    "production_deletions": 2
+  },
+  {
+    "sha": "3fa22085f96b84d3fe66b0a1232dded101e5f821",
+    "title": "Reuse built registry dependencies during checks",
+    "files": 12,
+    "insertions": 3700,
+    "deletions": 39,
+    "production_files": 6,
+    "production_insertions": 1285,
+    "production_deletions": 13
+  },
+  {
+    "sha": "1ce6db3b5c3a9ee77ce2c068672d53ce590fcf6e",
+    "title": "Share immutable registry artifacts across worktrees",
+    "files": 13,
+    "insertions": 5833,
+    "deletions": 67,
+    "production_files": 10,
+    "production_insertions": 2267,
+    "production_deletions": 40
+  },
+  {
+    "sha": "9c68d3c0822db2b29c38017e71f1e775f2a0b8de",
+    "title": "Expand registry reuse across active dependency graphs",
+    "files": 4,
+    "insertions": 1674,
+    "deletions": 103,
+    "production_files": 3,
+    "production_insertions": 1223,
+    "production_deletions": 102
+  },
+  {
+    "sha": "9ce77b7ad2a8437f999ab90d2c7da807455f1dd4",
+    "title": "Index locked packages by dependency name",
+    "files": 2,
+    "insertions": 68,
+    "deletions": 1,
+    "production_files": 1,
+    "production_insertions": 21,
+    "production_deletions": 1
+  },
+  {
+    "sha": "c6b28e336d37bd5c89b37db76e34c876ae6bf11e",
+    "title": "Deduplicate compiler-driver validation for reused dependencies",
+    "files": 3,
+    "insertions": 87,
+    "deletions": 12,
+    "production_files": 1,
+    "production_insertions": 16,
+    "production_deletions": 12
+  },
+  {
+    "sha": "a11757ae9fb49fcfb8144ed2121f06dc018556c5",
+    "title": "Share audited procedural macros across worktrees",
+    "files": 8,
+    "insertions": 489,
+    "deletions": 91,
+    "production_files": 5,
+    "production_insertions": 318,
+    "production_deletions": 63
+  },
+  {
+    "sha": "2122c5ba5fcb22cf92d84d0811bb9f0247a85b9e",
+    "title": "Scope opaque native tools to affected registry dependencies",
+    "files": 8,
+    "insertions": 735,
+    "deletions": 104,
+    "production_files": 5,
+    "production_insertions": 321,
+    "production_deletions": 75
+  },
+  {
+    "sha": "3f423124ae59c3012230b9d6fc75ef786dd0dd01",
+    "title": "Restore early cutoff with shared registry caching",
+    "files": 10,
+    "insertions": 777,
+    "deletions": 29,
+    "production_files": 6,
+    "production_insertions": 130,
+    "production_deletions": 25
+  },
+  {
+    "sha": "f822fca9dfe3db1651854a128b9429e83e5026da",
+    "title": "Skip public API hashing for terminal test harnesses",
+    "files": 4,
+    "insertions": 200,
+    "deletions": 6,
+    "production_files": 2,
+    "production_insertions": 24,
+    "production_deletions": 4
+  },
+  {
+    "sha": "fc2bcaddf9bbfb8b0a4373eb937baee07f5f30aa",
+    "title": "Preserve compatible registry reuse across mixed test graphs",
+    "files": 4,
+    "insertions": 331,
+    "deletions": 20,
+    "production_files": 3,
+    "production_insertions": 111,
+    "production_deletions": 20
+  },
+  {
+    "sha": "c1813e8300b9bfc99b3f92c98d4e0908d0299114",
+    "title": "Scale file descriptor budgets for fine-grained build locks",
+    "files": 2,
+    "insertions": 214,
+    "deletions": 0,
+    "production_files": 1,
+    "production_insertions": 178,
+    "production_deletions": 0
+  },
+  {
+    "sha": "b0826e421995ebdd0ec83d52c2f48a808a758d4b",
+    "title": "Skip public API hashing for immutable registry libraries",
+    "files": 5,
+    "insertions": 228,
+    "deletions": 2,
+    "production_files": 3,
+    "production_insertions": 31,
+    "production_deletions": 2
+  },
+  {
+    "sha": "16060ca8caec793b4c0f85fc477c5294e4ba7149",
+    "title": "Avoid resolver cache misses for execution-only settings",
+    "files": 2,
+    "insertions": 85,
+    "deletions": 1,
+    "production_files": 1,
+    "production_insertions": 61,
+    "production_deletions": 1
+  },
+  {
+    "sha": "d9093eb664dc56719c2279cc664a4c19e2c05139",
+    "title": "Preserve established check graphs after test builds",
+    "files": 5,
+    "insertions": 759,
+    "deletions": 24,
+    "production_files": 3,
+    "production_insertions": 282,
+    "production_deletions": 24
+  },
+  {
+    "sha": "2898bc46d6939d8b51818ea67649353405644f90",
+    "title": "Enable the parallel frontend in Ohm defaults",
+    "files": 4,
+    "insertions": 212,
+    "deletions": 6,
+    "production_files": 1,
+    "production_insertions": 2,
+    "production_deletions": 1
+  },
+  {
+    "sha": "879981603da1ec2781fc0bd53a49da35f0624602",
+    "title": "Reuse built workspace dependencies during checks",
+    "files": 4,
+    "insertions": 386,
+    "deletions": 46,
+    "production_files": 3,
+    "production_insertions": 117,
+    "production_deletions": 39
+  },
+  {
+    "sha": "5b73b82b56200438a3efd3f47ed3aae001baf6ba",
+    "title": "Enable test monomorphization reuse when supported",
+    "files": 4,
+    "insertions": 196,
+    "deletions": 2,
+    "production_files": 3,
+    "production_insertions": 38,
+    "production_deletions": 0
+  },
+  {
+    "sha": "3aab206060b3321f02fce2fca3f28aed9905d7ac",
+    "title": "Invalidate unhashed outputs when monomorphization defaults change",
+    "files": 2,
+    "insertions": 99,
+    "deletions": 0,
+    "production_files": 1,
+    "production_insertions": 3,
+    "production_deletions": 0
+  },
+  {
+    "sha": "9c6e4f13e0a2fceebcd528adb9e0f3943ef4e10a",
+    "title": "Handle skipped compiler invocations in relink-only builds",
+    "files": 2,
+    "insertions": 94,
+    "deletions": 12,
+    "production_files": 1,
+    "production_insertions": 3,
+    "production_deletions": 4
+  },
+  {
+    "sha": "c4d4051043eacc2fdc39703650bbdcd800a12f13",
+    "title": "Trust authenticated crates.io packages from registry mirrors",
+    "files": 4,
+    "insertions": 315,
+    "deletions": 73,
+    "production_files": 3,
+    "production_insertions": 167,
+    "production_deletions": 63
+  },
+  {
+    "sha": "1bf75e441fed0af26ce26c6c18c7e4edc351cfbc",
+    "title": "Coalesce concurrent misses for shared registry libraries",
+    "files": 4,
+    "insertions": 340,
+    "deletions": 15,
+    "production_files": 3,
+    "production_insertions": 149,
+    "production_deletions": 13
+  },
+  {
+    "sha": "9c020eb1930bd04fb7dc44669cc224499e226451",
+    "title": "Fix shared registry cache deadlocks",
+    "files": 17,
+    "insertions": 1265,
+    "deletions": 166,
+    "production_files": 16,
+    "production_insertions": 695,
+    "production_deletions": 86
+  },
+  {
+    "sha": "4073f790da75778adf96b4ce0e18aed58db1bcc3",
+    "title": "Reserve shared-cache locks per compilation unit",
+    "files": 4,
+    "insertions": 608,
+    "deletions": 111,
+    "production_files": 3,
+    "production_insertions": 250,
+    "production_deletions": 65
+  },
+  {
+    "sha": "38dd030fa4fcff23c0c28a2011632206a5ac3542",
+    "title": "Preserve documentation and nested Cargo behavior under shared locks",
+    "files": 6,
+    "insertions": 162,
+    "deletions": 7,
+    "production_files": 5,
+    "production_insertions": 25,
+    "production_deletions": 6
+  },
+  {
+    "sha": "d555f86b7763d5f1a32e4db416b086a978653cd7",
+    "title": "Seed Git worktrees with reusable Cargo build state",
+    "files": 17,
+    "insertions": 2507,
+    "deletions": 55,
+    "production_files": 13,
+    "production_insertions": 1479,
+    "production_deletions": 30
+  },
+  {
+    "sha": "2f3e6c04ff3e9589aba55cfc6579bdd1226ae897",
+    "title": "Match Git worktree branch selection defaults",
+    "files": 4,
+    "insertions": 108,
+    "deletions": 12,
+    "production_files": 2,
+    "production_insertions": 15,
+    "production_deletions": 5
+  },
+  {
+    "sha": "91fc3a9b0f4ae888a62cb8c4bd87a073224a6837",
+    "title": "Enable worktree preparation in Ohm defaults",
+    "files": 11,
+    "insertions": 177,
+    "deletions": 23,
+    "production_files": 7,
+    "production_insertions": 28,
+    "production_deletions": 5
+  },
+  {
+    "sha": "9c8b0e5db3945ef62d491459573f62624c39837b",
+    "title": "Support worktree defaults in the stable compiler test wrapper",
+    "files": 1,
+    "insertions": 3,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "7fd68da0ba5f2c816f071f0ff49826fbec70d74a",
+    "title": "Allow trusted local macro snapshots in new worktrees",
+    "files": 9,
+    "insertions": 350,
+    "deletions": 40,
+    "production_files": 6,
+    "production_insertions": 75,
+    "production_deletions": 17
+  },
+  {
+    "sha": "3b8f3390a2feb4e13a9805d33ac512568146d602",
+    "title": "Reuse the source checksum buffer across files",
+    "files": 2,
+    "insertions": 14,
+    "deletions": 7,
+    "production_files": 2,
+    "production_insertions": 14,
+    "production_deletions": 7
+  },
+  {
+    "sha": "fcc43615da4f1fd2cc07400d941d2153295c3e0b",
+    "title": "Use mimalloc for Apple Silicon Cargo builds",
+    "files": 57,
+    "insertions": 26635,
+    "deletions": 1,
+    "production_files": 2,
+    "production_insertions": 37,
+    "production_deletions": 1
+  },
+  {
+    "sha": "5372c7aceb1b7809175eeba58f02a3889fcee782",
+    "title": "Prototype expiry of unused incremental configurations",
+    "files": 17,
+    "insertions": 2306,
+    "deletions": 33,
+    "production_files": 10,
+    "production_insertions": 480,
+    "production_deletions": 3
+  },
+  {
+    "sha": "7dd8c44da62a3d18cacca8de8829846220c5bd22",
+    "title": "Harden incremental cache expiry and reduce tracking overhead",
+    "files": 14,
+    "insertions": 3135,
+    "deletions": 147,
+    "production_files": 5,
+    "production_insertions": 310,
+    "production_deletions": 116
+  },
+  {
+    "sha": "946275f94a0880b020c1c74c929c6bcf53005054",
+    "title": "Isolate bundled Clippy state from worktree snapshots",
+    "files": 9,
+    "insertions": 367,
+    "deletions": 41,
+    "production_files": 7,
+    "production_insertions": 140,
+    "production_deletions": 40
+  },
+  {
+    "sha": "b9e3a381c9edf6911e9fc0c6e94d199bf5545929",
+    "title": "Measure Clippy snapshot storage on APFS and ext4",
+    "files": 27,
+    "insertions": 5120,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "9bc0f7b53000744d035e6aad1d62eca26d9e00ee",
+    "title": "Enable Clippy snapshot isolation when filesystem cloning is available",
+    "files": 18,
+    "insertions": 811,
+    "deletions": 229,
+    "production_files": 12,
+    "production_insertions": 395,
+    "production_deletions": 179
+  },
+  {
+    "sha": "afd4d7ab89fb09835b682fd7bacb7115356186f9",
+    "title": "Update unstable flag help snapshot",
+    "files": 1,
+    "insertions": 35,
+    "deletions": 33,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "6ae6a004302ad04c3af9999783847f2642b6194a",
+    "title": "Exercise Clippy snapshot admission with packaged Ohm in CI",
+    "files": 1,
+    "insertions": 33,
+    "deletions": 0,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "3cbb3d2487e48e88fc1e1a454a1fad082233f875",
+    "title": "Add an isolated APFS replay for Clippy snapshot admission",
+    "files": 2,
+    "insertions": 66,
+    "deletions": 2,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "d3b9ce5d71e94deee01f5f5dbac19aa7885310e3",
+    "title": "Make Clippy CI fixtures deterministic and verify replay admission",
+    "files": 2,
+    "insertions": 23,
+    "deletions": 4,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "9b56dd22803c7c673e29a21564000dec6c41a9ae",
+    "title": "Keep CI fixtures eligible and retain the replay edit revision",
+    "files": 1,
+    "insertions": 6,
+    "deletions": 3,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "3b9f35df53add8cd749fa17af03acbc216c28837",
+    "title": "Measure first and repeated Clippy costs in production replays",
+    "files": 2,
+    "insertions": 30,
+    "deletions": 1,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "7e4d49f0f6ddfb0407bc7f1efff28531970b0d39",
+    "title": "Place Cargo CI test fixtures outside the source workspace",
+    "files": 1,
+    "insertions": 3,
+    "deletions": 3,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  },
+  {
+    "sha": "47a111ab27afd9f03d1623b9174fae72e55f0680",
+    "title": "Add opt-in bundled Wild linker selection",
+    "files": 7,
+    "insertions": 336,
+    "deletions": 1,
+    "production_files": 4,
+    "production_insertions": 181,
+    "production_deletions": 1
+  },
+  {
+    "sha": "fb5d4cba1242cf3cd5c066fa55c3c2546d40c03c",
+    "title": "Enable bundled Wild by default on native Linux",
+    "files": 7,
+    "insertions": 114,
+    "deletions": 38,
+    "production_files": 3,
+    "production_insertions": 31,
+    "production_deletions": 3
+  },
+  {
+    "sha": "78a05c689e4986064ff51be145ebbca3f2e4d26c",
+    "title": "Preserve linker defaults for compiler sysroots without Wild",
+    "files": 3,
+    "insertions": 21,
+    "deletions": 3,
+    "production_files": 1,
+    "production_insertions": 9,
+    "production_deletions": 0
+  },
+  {
+    "sha": "a73d8afb43b1ff7bb052c795433ed0a00187ecb0",
+    "title": "Prototype indexed Cargo dependency scheduling",
+    "files": 1,
+    "insertions": 322,
+    "deletions": 139,
+    "production_files": 1,
+    "production_insertions": 322,
+    "production_deletions": 139
+  },
+  {
+    "sha": "38750de2f0c5fccc04d6542157ca3ff923ffaf21",
+    "title": "Preserve shared caching with bundled Wild",
+    "files": 3,
+    "insertions": 79,
+    "deletions": 4,
+    "production_files": 2,
+    "production_insertions": 70,
+    "production_deletions": 4
+  },
+  {
+    "sha": "830958e34830d0046376c6bad726427741567741",
+    "title": "Require copy-on-write cloning for worktree seeds",
+    "files": 7,
+    "insertions": 388,
+    "deletions": 164,
+    "production_files": 3,
+    "production_insertions": 228,
+    "production_deletions": 112
+  },
+  {
+    "sha": "7ce6914287133df2a7da0cdb4c80c5d787e086c4",
+    "title": "Check worktree cloning against independent filesystem support",
+    "files": 5,
+    "insertions": 65,
+    "deletions": 1,
+    "production_files": 3,
+    "production_insertions": 51,
+    "production_deletions": 1
+  },
+  {
+    "sha": "0672f2f7df4f8bd55f4bd220d214d8eee4f0739e",
+    "title": "Default to line tables for Ohm development builds",
+    "files": 3,
+    "insertions": 129,
+    "deletions": 5,
+    "production_files": 1,
+    "production_insertions": 18,
+    "production_deletions": 5
+  },
+  {
+    "sha": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+    "title": "Run Ohm debug profile tests with the Ohm compiler",
+    "files": 2,
+    "insertions": 4,
+    "deletions": 3,
+    "production_files": 0,
+    "production_insertions": 0,
+    "production_deletions": 0
+  }
+]

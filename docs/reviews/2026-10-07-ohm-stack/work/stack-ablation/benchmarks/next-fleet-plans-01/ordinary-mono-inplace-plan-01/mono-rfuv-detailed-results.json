@@ -1,0 +1,831 @@
+{
+  "proof_kind": "ordinary-mono-accepted-rfuv-detailed-results-v1",
+  "scope": "Four accepted Ruff/uv pairs on oss4 only. Codex has zero accepted pairs; no Mono six-pair completion.",
+  "recommendation": "Hold coherent ordinary Mono removal pending a valid Codex comparison; test-specific #65 remains unpriced.",
+  "pipeline_completion": {
+    "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/next-fleet-plans-01/ordinary-mono-inplace-plan-01/complete-oss4-ruff-uv-pipeline-01/complete.json",
+    "sha256": "88b03968d35af38a4b25705a3f8140db6c475f1913195c2c4841e5b89e7f9c4c",
+    "bytes": 433
+  },
+  "command_audit": {
+    "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/next-fleet-plans-01/ordinary-mono-inplace-plan-01/mono-ruff-uv-local-command-review-01/results.json",
+    "sha256": "8a85ecb14021b4652a89907ce2ff8aa90a2ce56a55399ca0fe1fccf99ada013f",
+    "bytes": 13080
+  },
+  "raw_result_bindings": [
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/next-fleet-plans-01/ordinary-mono-inplace-plan-01/complete-oss4-ruff-uv-pipeline-01/retrieved/packet/matched-pairs/b22cc345422026cc70a71e995346ffa827771c21459ffc8d0bf0e6bac499ee7a/ruff/slot-0/attempt-1/results.json",
+      "sha256": "7a3c6a10c2cb213597e515ddb427af0f3273113233adb2f921cb9b5837a5654c",
+      "bytes": 64383
+    },
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/next-fleet-plans-01/ordinary-mono-inplace-plan-01/complete-oss4-ruff-uv-pipeline-01/retrieved/packet/matched-pairs/b22cc345422026cc70a71e995346ffa827771c21459ffc8d0bf0e6bac499ee7a/ruff/slot-1/attempt-3/results.json",
+      "sha256": "7c675468c6f8c582bc729e3ebd5aa2c578c76d6fe9cbfb76e5d70a89fe4e5a18",
+      "bytes": 64383
+    },
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/next-fleet-plans-01/ordinary-mono-inplace-plan-01/complete-oss4-ruff-uv-pipeline-01/retrieved/packet/matched-pairs/b22cc345422026cc70a71e995346ffa827771c21459ffc8d0bf0e6bac499ee7a/uv/slot-0/attempt-1/results.json",
+      "sha256": "b0857bbdd07c358b9c28b5c4a231536e59f5d7f48057fcfdfd58b262bb74abe1",
+      "bytes": 94640
+    },
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/next-fleet-plans-01/ordinary-mono-inplace-plan-01/complete-oss4-ruff-uv-pipeline-01/retrieved/packet/matched-pairs/b22cc345422026cc70a71e995346ffa827771c21459ffc8d0bf0e6bac499ee7a/uv/slot-1/attempt-1/results.json",
+      "sha256": "70e8f13709dbee61d5aeaf4ff7fab5d5a96ea511a4e4ae5c4f0f5bd58c3ea2b2",
+      "bytes": 94633
+    }
+  ],
+  "timing": [
+    {
+      "project": "ruff",
+      "label": "cold-build",
+      "n": 2,
+      "full_median_seconds": 67.53004945791326,
+      "reduced_median_seconds": 66.95282689691521,
+      "paired_delta_median_seconds": -0.5772225609980524,
+      "paired_delta_min_seconds": -1.2043084846809506,
+      "paired_delta_max_seconds": 0.049863362684845924,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": -0.8350997346685651,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 66.07169678620994,
+          "reduced_seconds": 66.12156014889479,
+          "delta_seconds": 0.049863362684845924,
+          "delta_percent": 0.07546856689057968,
+          "full_max_child_rss_kib": 3442208,
+          "reduced_max_child_rss_kib": 3359804
+        },
+        {
+          "slot": 1,
+          "attempt": 3,
+          "full_seconds": 68.98840212961659,
+          "reduced_seconds": 67.78409364493564,
+          "delta_seconds": -1.2043084846809506,
+          "delta_percent": -1.74566803622771,
+          "full_max_child_rss_kib": 3415384,
+          "reduced_max_child_rss_kib": 3400368
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "warm-noop-build",
+      "n": 2,
+      "full_median_seconds": 0.44851854955777526,
+      "reduced_median_seconds": 0.445589785464108,
+      "paired_delta_median_seconds": -0.0029287640936672688,
+      "paired_delta_min_seconds": -0.02827518293634057,
+      "paired_delta_max_seconds": 0.022417654749006033,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": -0.5934427091938366,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 0.44378747697919607,
+          "reduced_seconds": 0.4662051317282021,
+          "delta_seconds": 0.022417654749006033,
+          "delta_percent": 5.051439238799649,
+          "full_max_child_rss_kib": 63108,
+          "reduced_max_child_rss_kib": 63108
+        },
+        {
+          "slot": 1,
+          "attempt": 3,
+          "full_seconds": 0.45324962213635445,
+          "reduced_seconds": 0.4249744392000139,
+          "delta_seconds": -0.02827518293634057,
+          "delta_percent": -6.238324657187322,
+          "full_max_child_rss_kib": 63108,
+          "reduced_max_child_rss_kib": 63108
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-1-build",
+      "n": 2,
+      "full_median_seconds": 25.72193133714609,
+      "reduced_median_seconds": 26.873920861631632,
+      "paired_delta_median_seconds": 1.1519895244855434,
+      "paired_delta_min_seconds": 0.93301283987239,
+      "paired_delta_max_seconds": 1.3709662090986967,
+      "slower_pairs": 2,
+      "faster_pairs": 0,
+      "paired_percent_median": 4.462462135181067,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 25.171839678194374,
+          "reduced_seconds": 26.104852518066764,
+          "delta_seconds": 0.93301283987239,
+          "delta_percent": 3.7065739008366183,
+          "full_max_child_rss_kib": 3721296,
+          "reduced_max_child_rss_kib": 3509436
+        },
+        {
+          "slot": 1,
+          "attempt": 3,
+          "full_seconds": 26.272022996097803,
+          "reduced_seconds": 27.6429892051965,
+          "delta_seconds": 1.3709662090986967,
+          "delta_percent": 5.218350369525515,
+          "full_max_child_rss_kib": 3726832,
+          "reduced_max_child_rss_kib": 3524568
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-2-build",
+      "n": 2,
+      "full_median_seconds": 35.34089983510785,
+      "reduced_median_seconds": 34.783587142592296,
+      "paired_delta_median_seconds": -0.557312692515552,
+      "paired_delta_min_seconds": -2.69812292419374,
+      "paired_delta_max_seconds": 1.5834975391626358,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": -1.3041646828960531,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 36.94817795837298,
+          "reduced_seconds": 34.25005503417924,
+          "delta_seconds": -2.69812292419374,
+          "delta_percent": -7.3024519023198735,
+          "full_max_child_rss_kib": 4443104,
+          "reduced_max_child_rss_kib": 4412720
+        },
+        {
+          "slot": 1,
+          "attempt": 3,
+          "full_seconds": 33.733621711842716,
+          "reduced_seconds": 35.31711925100535,
+          "delta_seconds": 1.5834975391626358,
+          "delta_percent": 4.694122536527767,
+          "full_max_child_rss_kib": 4491628,
+          "reduced_max_child_rss_kib": 4400488
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-3-build",
+      "n": 2,
+      "full_median_seconds": 39.71972316550091,
+      "reduced_median_seconds": 38.778107966529205,
+      "paired_delta_median_seconds": -0.9416151989717036,
+      "paired_delta_min_seconds": -3.0570184527896345,
+      "paired_delta_max_seconds": 1.1737880548462272,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": -2.1300271336299583,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 41.54792191460729,
+          "reduced_seconds": 38.49090346181765,
+          "delta_seconds": -3.0570184527896345,
+          "delta_percent": -7.357813127387381,
+          "full_max_child_rss_kib": 4542156,
+          "reduced_max_child_rss_kib": 4613192
+        },
+        {
+          "slot": 1,
+          "attempt": 3,
+          "full_seconds": 37.89152441639453,
+          "reduced_seconds": 39.06531247124076,
+          "delta_seconds": 1.1737880548462272,
+          "delta_percent": 3.097758860127464,
+          "full_max_child_rss_kib": 4562360,
+          "reduced_max_child_rss_kib": 4577004
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "cold-build",
+      "n": 2,
+      "full_median_seconds": 67.76658573490568,
+      "reduced_median_seconds": 69.14864314603619,
+      "paired_delta_median_seconds": 1.3820574111305177,
+      "paired_delta_min_seconds": -0.02328520081937313,
+      "paired_delta_max_seconds": 2.7874000230804086,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": 2.0543956714028866,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 68.25192610174417,
+          "reduced_seconds": 68.2286409009248,
+          "delta_seconds": -0.02328520081937313,
+          "delta_percent": -0.03411654754572613,
+          "full_max_child_rss_kib": 1013356,
+          "reduced_max_child_rss_kib": 1002992
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 67.28124536806718,
+          "reduced_seconds": 70.06864539114758,
+          "delta_seconds": 2.7874000230804086,
+          "delta_percent": 4.142907890351499,
+          "full_max_child_rss_kib": 998296,
+          "reduced_max_child_rss_kib": 992932
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "warm-noop-build",
+      "n": 2,
+      "full_median_seconds": 1.1638389825820923,
+      "reduced_median_seconds": 1.2073439336381853,
+      "paired_delta_median_seconds": 0.04350495105609298,
+      "paired_delta_min_seconds": 0.021002991124987602,
+      "paired_delta_max_seconds": 0.06600691098719835,
+      "slower_pairs": 2,
+      "faster_pairs": 0,
+      "paired_percent_median": 3.761242653881103,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 1.177485179156065,
+          "reduced_seconds": 1.1984881702810526,
+          "delta_seconds": 0.021002991124987602,
+          "delta_percent": 1.783715964904209,
+          "full_max_child_rss_kib": 93828,
+          "reduced_max_child_rss_kib": 93564
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 1.1501927860081196,
+          "reduced_seconds": 1.216199696995318,
+          "delta_seconds": 0.06600691098719835,
+          "delta_percent": 5.738769342857997,
+          "full_max_child_rss_kib": 93816,
+          "reduced_max_child_rss_kib": 93564
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-1-build",
+      "n": 2,
+      "full_median_seconds": 9.067705797962844,
+      "reduced_median_seconds": 9.405768503900617,
+      "paired_delta_median_seconds": 0.338062705937773,
+      "paired_delta_min_seconds": 0.31510861590504646,
+      "paired_delta_max_seconds": 0.3610167959704995,
+      "slower_pairs": 2,
+      "faster_pairs": 0,
+      "paired_percent_median": 3.730752963217232,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 9.763646905776113,
+          "reduced_seconds": 10.124663701746613,
+          "delta_seconds": 0.3610167959704995,
+          "delta_percent": 3.6975609570325974,
+          "full_max_child_rss_kib": 994972,
+          "reduced_max_child_rss_kib": 992732
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 8.371764690149575,
+          "reduced_seconds": 8.686873306054622,
+          "delta_seconds": 0.31510861590504646,
+          "delta_percent": 3.7639449694018667,
+          "full_max_child_rss_kib": 986276,
+          "reduced_max_child_rss_kib": 1006312
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-2-build",
+      "n": 2,
+      "full_median_seconds": 6.837896950542927,
+      "reduced_median_seconds": 7.2208845489658415,
+      "paired_delta_median_seconds": 0.38298759842291474,
+      "paired_delta_min_seconds": 0.14846117096021771,
+      "paired_delta_max_seconds": 0.6175140258856118,
+      "slower_pairs": 2,
+      "faster_pairs": 0,
+      "paired_percent_median": 5.73158356040504,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 6.592219386249781,
+          "reduced_seconds": 7.209733412135392,
+          "delta_seconds": 0.6175140258856118,
+          "delta_percent": 9.367316069207865,
+          "full_max_child_rss_kib": 926264,
+          "reduced_max_child_rss_kib": 928488
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 7.083574514836073,
+          "reduced_seconds": 7.232035685796291,
+          "delta_seconds": 0.14846117096021771,
+          "delta_percent": 2.0958510516022155,
+          "full_max_child_rss_kib": 930456,
+          "reduced_max_child_rss_kib": 912112
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-3-build",
+      "n": 2,
+      "full_median_seconds": 7.792984140338376,
+      "reduced_median_seconds": 8.130684617906809,
+      "paired_delta_median_seconds": 0.3377004775684327,
+      "paired_delta_min_seconds": -1.0021830764599144,
+      "paired_delta_max_seconds": 1.6775840315967798,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": 4.343259025912861,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 7.7974561783485115,
+          "reduced_seconds": 6.795273101888597,
+          "delta_seconds": -1.0021830764599144,
+          "delta_percent": -12.852692641514473,
+          "full_max_child_rss_kib": 919172,
+          "reduced_max_child_rss_kib": 919468
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 7.788512102328241,
+          "reduced_seconds": 9.46609613392502,
+          "delta_seconds": 1.6775840315967798,
+          "delta_percent": 21.539210693340195,
+          "full_max_child_rss_kib": 918640,
+          "reduced_max_child_rss_kib": 900504
+        }
+      ]
+    }
+  ],
+  "max_child_rss": [
+    {
+      "project": "ruff",
+      "label": "cold-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 3348.43359375,
+      "reduced_median_max_child_rss_mib": 3300.865234375,
+      "paired_delta_median_mib": -47.568359375,
+      "paired_delta_min_mib": -80.47265625,
+      "paired_delta_max_mib": -14.6640625,
+      "paired_raw_delta_mib": [
+        -80.47265625,
+        -14.6640625
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "ruff",
+      "label": "warm-noop-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 61.62890625,
+      "reduced_median_max_child_rss_mib": 61.62890625,
+      "paired_delta_median_mib": 0.0,
+      "paired_delta_min_mib": 0.0,
+      "paired_delta_max_mib": 0.0,
+      "paired_raw_delta_mib": [
+        0.0,
+        0.0
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-1-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 3636.78125,
+      "reduced_median_max_child_rss_mib": 3434.572265625,
+      "paired_delta_median_mib": -202.208984375,
+      "paired_delta_min_mib": -206.89453125,
+      "paired_delta_max_mib": -197.5234375,
+      "paired_raw_delta_mib": [
+        -206.89453125,
+        -197.5234375
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-2-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 4362.662109375,
+      "reduced_median_max_child_rss_mib": 4303.32421875,
+      "paired_delta_median_mib": -59.337890625,
+      "paired_delta_min_mib": -89.00390625,
+      "paired_delta_max_mib": -29.671875,
+      "paired_raw_delta_mib": [
+        -29.671875,
+        -89.00390625
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-3-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 4445.564453125,
+      "reduced_median_max_child_rss_mib": 4487.400390625,
+      "paired_delta_median_mib": 41.8359375,
+      "paired_delta_min_mib": 14.30078125,
+      "paired_delta_max_mib": 69.37109375,
+      "paired_raw_delta_mib": [
+        69.37109375,
+        14.30078125
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "uv",
+      "label": "cold-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 982.251953125,
+      "reduced_median_max_child_rss_mib": 974.572265625,
+      "paired_delta_median_mib": -7.6796875,
+      "paired_delta_min_mib": -10.12109375,
+      "paired_delta_max_mib": -5.23828125,
+      "paired_raw_delta_mib": [
+        -10.12109375,
+        -5.23828125
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "uv",
+      "label": "warm-noop-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 91.623046875,
+      "reduced_median_max_child_rss_mib": 91.37109375,
+      "paired_delta_median_mib": -0.251953125,
+      "paired_delta_min_mib": -0.2578125,
+      "paired_delta_max_mib": -0.24609375,
+      "paired_raw_delta_mib": [
+        -0.2578125,
+        -0.24609375
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-1-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 967.40625,
+      "reduced_median_max_child_rss_mib": 976.095703125,
+      "paired_delta_median_mib": 8.689453125,
+      "paired_delta_min_mib": -2.1875,
+      "paired_delta_max_mib": 19.56640625,
+      "paired_raw_delta_mib": [
+        -2.1875,
+        19.56640625
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-2-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 906.6015625,
+      "reduced_median_max_child_rss_mib": 898.73046875,
+      "paired_delta_median_mib": -7.87109375,
+      "paired_delta_min_mib": -17.9140625,
+      "paired_delta_max_mib": 2.171875,
+      "paired_raw_delta_mib": [
+        2.171875,
+        -17.9140625
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-3-build",
+      "n": 2,
+      "full_median_max_child_rss_mib": 897.369140625,
+      "reduced_median_max_child_rss_mib": 888.658203125,
+      "paired_delta_median_mib": -8.7109375,
+      "paired_delta_min_mib": -17.7109375,
+      "paired_delta_max_mib": 0.2890625,
+      "paired_raw_delta_mib": [
+        0.2890625,
+        -17.7109375
+      ],
+      "metric_scope": "maximum child RSS reported by GNU time; not aggregate memory"
+    }
+  ],
+  "endpoint_storage": [
+    {
+      "project": "ruff",
+      "n": 2,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_bytes": 1691197440,
+          "reduced_bytes": 1673326592,
+          "delta_bytes": -17870848
+        },
+        {
+          "slot": 1,
+          "attempt": 3,
+          "full_bytes": 1691176960,
+          "reduced_bytes": 1673338880,
+          "delta_bytes": -17838080
+        }
+      ],
+      "full_median_bytes": 1691187200.0,
+      "reduced_median_bytes": 1673332736.0,
+      "paired_delta_median_bytes": -17854464.0,
+      "paired_delta_min_bytes": -17870848,
+      "paired_delta_max_bytes": -17838080
+    },
+    {
+      "project": "uv",
+      "n": 2,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_bytes": 1577467904,
+          "reduced_bytes": 1571573760,
+          "delta_bytes": -5894144
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_bytes": 1577467904,
+          "reduced_bytes": 1571598336,
+          "delta_bytes": -5869568
+        }
+      ],
+      "full_median_bytes": 1577467904.0,
+      "reduced_median_bytes": 1571586048.0,
+      "paired_delta_median_bytes": -5881856.0,
+      "paired_delta_min_bytes": -5894144,
+      "paired_delta_max_bytes": -5869568
+    }
+  ],
+  "raw_endpoint_storage": [
+    {
+      "project": "ruff",
+      "slot": 0,
+      "attempt": 1,
+      "arm": "full",
+      "unique_inode_allocated_bytes": 1691197440,
+      "per_root_metrics": {
+        "targets": {
+          "logical_bytes": 222032793,
+          "allocated_bytes": 222044160,
+          "unique_inode_allocated_bytes": 222044160,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1723745747,
+          "allocated_bytes": 1733660672,
+          "unique_inode_allocated_bytes": 1469153280,
+          "files": 4048,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "metric_scope": "retained end-of-history endpoint, not continuous peak"
+    },
+    {
+      "project": "ruff",
+      "slot": 0,
+      "attempt": 1,
+      "arm": "reduced",
+      "unique_inode_allocated_bytes": 1673326592,
+      "per_root_metrics": {
+        "targets": {
+          "logical_bytes": 222348711,
+          "allocated_bytes": 222359552,
+          "unique_inode_allocated_bytes": 222359552,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1705884222,
+          "allocated_bytes": 1715789824,
+          "unique_inode_allocated_bytes": 1450967040,
+          "files": 4051,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "metric_scope": "retained end-of-history endpoint, not continuous peak"
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "attempt": 3,
+      "arm": "full",
+      "unique_inode_allocated_bytes": 1691176960,
+      "per_root_metrics": {
+        "targets": {
+          "logical_bytes": 222032705,
+          "allocated_bytes": 222044160,
+          "unique_inode_allocated_bytes": 222044160,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1723725858,
+          "allocated_bytes": 1733640192,
+          "unique_inode_allocated_bytes": 1469132800,
+          "files": 4048,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "metric_scope": "retained end-of-history endpoint, not continuous peak"
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "attempt": 3,
+      "arm": "reduced",
+      "unique_inode_allocated_bytes": 1673338880,
+      "per_root_metrics": {
+        "targets": {
+          "logical_bytes": 222348799,
+          "allocated_bytes": 222359552,
+          "unique_inode_allocated_bytes": 222359552,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1705889835,
+          "allocated_bytes": 1715802112,
+          "unique_inode_allocated_bytes": 1450979328,
+          "files": 4051,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "metric_scope": "retained end-of-history endpoint, not continuous peak"
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "attempt": 1,
+      "arm": "full",
+      "unique_inode_allocated_bytes": 1577467904,
+      "per_root_metrics": {
+        "targets": {
+          "logical_bytes": 21759172,
+          "allocated_bytes": 21766144,
+          "unique_inode_allocated_bytes": 21766144,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1582493436,
+          "allocated_bytes": 1604718592,
+          "unique_inode_allocated_bytes": 1555701760,
+          "files": 9563,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "metric_scope": "retained end-of-history endpoint, not continuous peak"
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "attempt": 1,
+      "arm": "reduced",
+      "unique_inode_allocated_bytes": 1571573760,
+      "per_root_metrics": {
+        "targets": {
+          "logical_bytes": 21799640,
+          "allocated_bytes": 21811200,
+          "unique_inode_allocated_bytes": 21811200,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1576633894,
+          "allocated_bytes": 1598820352,
+          "unique_inode_allocated_bytes": 1549762560,
+          "files": 9545,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "metric_scope": "retained end-of-history endpoint, not continuous peak"
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "attempt": 1,
+      "arm": "full",
+      "unique_inode_allocated_bytes": 1577467904,
+      "per_root_metrics": {
+        "targets": {
+          "logical_bytes": 21759172,
+          "allocated_bytes": 21766144,
+          "unique_inode_allocated_bytes": 21766144,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1582485880,
+          "allocated_bytes": 1604718592,
+          "unique_inode_allocated_bytes": 1555701760,
+          "files": 9563,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "metric_scope": "retained end-of-history endpoint, not continuous peak"
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "attempt": 1,
+      "arm": "reduced",
+      "unique_inode_allocated_bytes": 1571598336,
+      "per_root_metrics": {
+        "targets": {
+          "logical_bytes": 21799640,
+          "allocated_bytes": 21811200,
+          "unique_inode_allocated_bytes": 21811200,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1576644366,
+          "allocated_bytes": 1598844928,
+          "unique_inode_allocated_bytes": 1549787136,
+          "files": 9545,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "metric_scope": "retained end-of-history endpoint, not continuous peak"
+    }
+  ],
+  "estimator": "Median of the two within-slot reduced-minus-full deltas; range is the two observed deltas, not a confidence interval.",
+  "edit_scope": "Three sequential edits from artifact853b; Edit 3 does not mean revert.",
+  "correctness_limit": "Raw log hashes and successful statuses verified. No claim of exact warning-text equivalence.",
+  "no_new_host_access_or_timing": true
+}

@@ -1,0 +1,871 @@
+diff --git a/compiler/rustc_hir_analysis/src/check/compare_impl_item.rs b/compiler/rustc_hir_analysis/src/check/compare_impl_item.rs
+index 552a0cf12ad..2f65b443dd5 100644
+--- a/compiler/rustc_hir_analysis/src/check/compare_impl_item.rs
++++ b/compiler/rustc_hir_analysis/src/check/compare_impl_item.rs
+@@ -15,8 +15,8 @@
+ use rustc_middle::ty::error::{ExpectedFound, TypeError};
+ use rustc_middle::ty::{
+     self, BottomUpFolder, GenericArgs, GenericParamDefKind, Generics, RegionExt, Ty, TyCtxt,
+-    TypeFlags, TypeFoldable, TypeFolder, TypeSuperFoldable, TypeVisitable, TypeVisitableExt,
+-    TypeVisitor, TypingMode, Unnormalized, Upcast,
++    TypeFoldable, TypeFolder, TypeSuperFoldable, TypeVisitable, TypeVisitableExt, TypeVisitor,
++    TypingMode, Unnormalized, Upcast,
+ };
+ use rustc_middle::{bug, span_bug};
+ use rustc_span::{BytePos, DUMMY_SP, Span};
+@@ -24,7 +24,6 @@
+ use rustc_trait_selection::infer::InferCtxtExt;
+ use rustc_trait_selection::regions::InferCtxtRegionExt;
+ use rustc_trait_selection::solve::NextSolverError;
+-use rustc_trait_selection::traits::query::evaluate_obligation::InferCtxtExt as _;
+ use rustc_trait_selection::traits::{
+     self, FromSolverError, FulfillmentError, ObligationCause, ObligationCauseCode, ObligationCtxt,
+ };
+@@ -2470,21 +2469,6 @@ pub(super) fn check_type_bounds<'tcx>(
+     let param_env = tcx.param_env(impl_ty.def_id);
+     debug!(?param_env);
+ 
+-    if param_env.caller_bounds().is_empty()
+-        && matches!(impl_ty.container, ty::AssocContainer::TraitImpl(Ok(_)))
+-        && !impl_ty.is_impl_trait_in_trait()
+-        && tcx.generics_of(impl_ty.def_id).own_params.is_empty()
+-        && !tcx.is_conditionally_const(impl_ty.def_id)
+-        && !impl_trait_ref.args.has_type_flags(CLOSED_BOUND_DISALLOWED_FLAGS)
+-    {
+-        let definition = tcx.type_of(impl_ty.def_id).skip_binder();
+-        if !definition.has_type_flags(CLOSED_BOUND_DISALLOWED_FLAGS)
+-            && tcx.closed_associated_type_bounds_hold((trait_ty.def_id, definition))
+-        {
+-            return Ok(());
+-        }
+-    }
+-
+     let container_id = impl_ty.container_id(tcx);
+     let impl_ty_def_id = impl_ty.def_id.expect_local();
+     let impl_ty_args = GenericArgs::identity_for_item(tcx, impl_ty.def_id);
+@@ -2557,81 +2541,20 @@ pub(super) fn check_type_bounds<'tcx>(
+     }
+     debug!(item_bounds=?obligations);
+ 
+-    // A final, nongeneric associated type with a primitive value or array cannot be overridden.
+-    // Directly replace its projection when every bound is a trait predicate whose arguments
+-    // are only that projection. Associated-type where clauses can add obligations during
+-    // normalization, so they and other complex bounds keep the original path.
+-    let simple_value = if !obligations.is_empty()
+-        && traits::impl_item_is_final(tcx, &impl_ty)
+-        && tcx.generics_of(impl_ty.def_id).count() == 0
+-        && param_env.caller_bounds().is_empty()
+-        && tcx.clauses_of(trait_ty.def_id).clauses.is_empty()
+-        && !rebased_args.has_aliases()
+-        && !rebased_args.has_infer()
+-        && !rebased_args.references_error()
+-        && !rebased_args.has_bound_vars()
+-        && !impl_ty.is_impl_trait_in_trait()
+-        && !tcx.is_conditionally_const(impl_ty_def_id)
+-    {
+-        let value_ty = tcx.type_of(impl_ty.def_id).instantiate_identity().skip_norm_wip();
+-        let supported_value = match value_ty.kind() {
+-            ty::Bool | ty::Int(_) | ty::Uint(_) => true,
+-            ty::Array(element, length) => {
+-                matches!(element.kind(), ty::Bool | ty::Int(_) | ty::Uint(_))
+-                    && matches!(length.kind(), ty::ConstKind::Value(_))
+-            }
+-            _ => false,
+-        };
+-        if supported_value && !value_ty.references_error() {
+-            let projection =
+-                Ty::new_projection_from_args(tcx, ty::IsRigid::No, trait_ty.def_id, rebased_args);
+-            obligations
+-                .iter()
+-                .all(|obligation| {
+-                    let predicate = obligation.predicate;
+-                    predicate.kind().bound_vars().is_empty()
+-                        && !predicate.has_bound_vars()
+-                        && predicate.as_trait_clause().is_some_and(|bound| {
+-                            let trait_ref = bound.skip_binder().trait_ref;
+-                            trait_ref.self_ty() == projection
+-                                && trait_ref.args.iter().skip(1).all(|arg| arg == projection.into())
+-                        })
+-                })
+-                .then_some(value_ty)
+-        } else {
+-            None
+-        }
+-    } else {
+-        None
+-    };
+-
+-    if let Some(value_ty) = simple_value {
+-        for obligation in &mut obligations {
+-            let old = obligation.predicate.as_trait_clause().unwrap().skip_binder();
+-            let trait_ref = ty::TraitRef::new(
+-                tcx,
+-                old.trait_ref.def_id,
+-                iter::repeat_n(value_ty, old.trait_ref.args.len()),
+-            );
+-            obligation.predicate =
+-                ty::TraitPredicate { trait_ref, polarity: old.polarity }.upcast(tcx);
+-        }
+-    } else {
+-        // Normalize predicates with the assumption that the GAT may always normalize
+-        // to its definition type. This should be the param-env we use to *prove* the
+-        // predicate too, but we don't do that because of performance issues.
+-        // See <https://github.com/rust-lang/rust/pull/117542#issue-1976337685>.
+-        let normalize_param_env = param_env_with_gat_bounds(tcx, impl_ty, impl_trait_ref);
+-        for obligation in &mut obligations {
+-            match ocx.deeply_normalize(
+-                &normalize_cause,
+-                normalize_param_env,
+-                Unnormalized::new_wip(obligation.predicate),
+-            ) {
+-                Ok(pred) => obligation.predicate = pred,
+-                Err(e) => {
+-                    return Err(infcx.err_ctxt().report_fulfillment_errors(e));
+-                }
++    // Normalize predicates with the assumption that the GAT may always normalize
++    // to its definition type. This should be the param-env we use to *prove* the
++    // predicate too, but we don't do that because of performance issues.
++    // See <https://github.com/rust-lang/rust/pull/117542#issue-1976337685>.
++    let normalize_param_env = param_env_with_gat_bounds(tcx, impl_ty, impl_trait_ref);
++    for obligation in &mut obligations {
++        match ocx.deeply_normalize(
++            &normalize_cause,
++            normalize_param_env,
++            Unnormalized::new_wip(obligation.predicate),
++        ) {
++            Ok(pred) => obligation.predicate = pred,
++            Err(e) => {
++                return Err(infcx.err_ctxt().report_fulfillment_errors(e));
+             }
+         }
+     }
+@@ -2650,116 +2573,6 @@ pub(super) fn check_type_bounds<'tcx>(
+     ocx.resolve_regions_and_report_errors(impl_ty_def_id, param_env, assumed_wf_types)
+ }
+ 
+-// These bounds must be independent of an impl's inference context and require
+-// no normalization after replacing its associated type with its definition.
+-pub(super) const CLOSED_BOUND_DISALLOWED_FLAGS: TypeFlags = TypeFlags::from_bits(
+-    TypeFlags::HAS_ALIAS.bits()
+-        | TypeFlags::HAS_FREE_LOCAL_NAMES.bits()
+-        | TypeFlags::HAS_REGIONS.bits()
+-        | TypeFlags::HAS_BOUND_VARS.bits()
+-        | TypeFlags::HAS_ERROR.bits(),
+-)
+-.unwrap();
+-
+-/// Proves bounds for a structurally well-formed concrete definition.
+-/// Other bounds, failed proofs, and proofs requiring region constraints use the
+-/// caller's original checking path so that diagnostics retain the impl's context.
+-pub(super) fn closed_associated_type_bounds_hold<'tcx>(
+-    tcx: TyCtxt<'tcx>,
+-    (trait_item, definition): (DefId, Ty<'tcx>),
+-) -> bool {
+-    let item = tcx.associated_item(trait_item);
+-    // An associated type's own where clauses can depend on the impl's Self;
+-    // they are not included in `explicit_item_bounds` below.
+-    // The next solver may defer type-outlives constraints during evaluation.
+-    if tcx.next_trait_solver_globally()
+-        || tcx.assumptions_on_binders()
+-        || tcx.lang_items().sized_trait().is_none()
+-        || !matches!(item.container, ty::AssocContainer::Trait)
+-        || item.is_impl_trait_in_trait()
+-        || tcx.generics_of(trait_item).count() != 1
+-        || !tcx.clauses_of(trait_item).clauses.is_empty()
+-        || definition.has_type_flags(CLOSED_BOUND_DISALLOWED_FLAGS)
+-    {
+-        return false;
+-    }
+-
+-    // Scalars, tuples, and arrays of them are structurally well-formed when
+-    // their lengths are evaluated `usize` values. Nominal types can introduce
+-    // further WF obligations even when their arguments are entirely concrete.
+-    if !definition.walk().all(|arg| match arg.kind() {
+-        ty::GenericArgKind::Type(ty) => matches!(
+-            ty.kind(),
+-            ty::Bool
+-                | ty::Char
+-                | ty::Int(_)
+-                | ty::Uint(_)
+-                | ty::Float(_)
+-                | ty::Array(..)
+-                | ty::Tuple(_)
+-        ),
+-        ty::GenericArgKind::Const(ct) => {
+-            matches!(ct.kind(), ty::ConstKind::Value(value) if value.ty == tcx.types.usize)
+-        }
+-        ty::GenericArgKind::Lifetime(_) => false,
+-    }) {
+-        return false;
+-    }
+-
+-    let bounds = tcx.explicit_item_bounds(trait_item).skip_binder();
+-    if bounds.is_empty() {
+-        return false;
+-    }
+-    let projection = Ty::new_projection_from_args(
+-        tcx,
+-        ty::IsRigid::No,
+-        trait_item,
+-        GenericArgs::identity_for_item(tcx, trait_item),
+-    );
+-    let mut folder = BottomUpFolder {
+-        tcx,
+-        ty_op: |ty| if ty == projection { definition } else { ty },
+-        lt_op: |region| region,
+-        ct_op: |ct| ct,
+-    };
+-    let obligations: Vec<_> = util::elaborate(
+-        tcx,
+-        bounds.iter().map(|&(bound, _)| {
+-            traits::Obligation::new(
+-                tcx,
+-                ObligationCause::dummy(),
+-                ty::ParamEnv::empty(),
+-                bound.fold_with(&mut folder),
+-            )
+-        }),
+-    )
+-    .collect();
+-
+-    // A remaining parameter includes any use of `Self` outside the exact own
+-    // projection. Check all bounds before performing any speculative proofs.
+-    if obligations.iter().any(|obligation| {
+-        obligation.predicate.has_type_flags(CLOSED_BOUND_DISALLOWED_FLAGS)
+-            || !matches!(
+-                obligation.predicate.kind().skip_binder(),
+-                ty::PredicateKind::Clause(ty::ClauseKind::Trait(ty::TraitPredicate {
+-                    polarity: ty::PredicatePolarity::Positive,
+-                    ..
+-                }))
+-            )
+-    }) {
+-        return false;
+-    }
+-
+-    let infcx = tcx.infer_ctxt().build(TypingMode::non_body_analysis());
+-    obligations.iter().all(|obligation| {
+-        // The fallible evaluator returns canonical overflows without diagnosing
+-        // them. Only unconditional success, including regions, permits reuse.
+-        infcx
+-            .evaluate_obligation(obligation)
+-            .is_ok_and(|result| result.must_apply_considering_regions())
+-    })
+-}
+-
+ /// Install projection predicates that allow GATs to project to their own
+ /// definition types. This is not allowed in general in cases of default
+ /// associated types in trait definitions, or when specialization is involved,
+diff --git a/compiler/rustc_hir_analysis/src/check/mod.rs b/compiler/rustc_hir_analysis/src/check/mod.rs
+index c18983d7e22..eac3762ef9a 100644
+--- a/compiler/rustc_hir_analysis/src/check/mod.rs
++++ b/compiler/rustc_hir_analysis/src/check/mod.rs
+@@ -121,7 +121,6 @@ pub(super) fn provide(providers: &mut Providers) {
+         check_potentially_region_dependent_goals: check::check_potentially_region_dependent_goals,
+         check_type_wf: wfcheck::check_type_wf,
+         check_well_formed: wfcheck::check_well_formed,
+-        closed_associated_type_bounds_hold: compare_impl_item::closed_associated_type_bounds_hold,
+         ..*providers
+     };
+ }
+diff --git a/compiler/rustc_hir_analysis/src/check/wfcheck.rs b/compiler/rustc_hir_analysis/src/check/wfcheck.rs
+index 69d69ddddad..9a498837b1f 100644
+--- a/compiler/rustc_hir_analysis/src/check/wfcheck.rs
++++ b/compiler/rustc_hir_analysis/src/check/wfcheck.rs
+@@ -44,7 +44,6 @@
+ use tracing::{debug, instrument};
+ 
+ use super::compare_eii::{compare_eii_function_types, compare_eii_statics};
+-use super::compare_impl_item::CLOSED_BOUND_DISALLOWED_FLAGS;
+ use crate::autoderef::Autoderef;
+ use crate::constrained_generic_params::{Parameter, identify_constrained_generic_params};
+ use crate::diagnostics;
+@@ -910,28 +909,10 @@ pub(crate) fn check_associated_item(
+     tcx: TyCtxt<'_>,
+     def_id: LocalDefId,
+ ) -> Result<(), ErrorGuaranteed> {
+-    let item = tcx.associated_item(def_id);
+-    if matches!(item.kind, ty::AssocKind::Type { data: ty::AssocTypeData::Normal(_) })
+-        && let ty::AssocContainer::TraitImpl(Ok(trait_item)) = item.container
+-        && tcx.impl_polarity(item.container_id(tcx)) == ty::ImplPolarity::Positive
+-        && tcx.generics_of(def_id).count() == 0
+-        && !tcx.is_conditionally_const(def_id)
+-        && item.defaultness(tcx).has_value()
+-        && tcx.param_env(def_id).caller_bounds().is_empty()
+-        && tcx.clauses_of(def_id).clauses.is_empty()
+-    {
+-        let impl_args = tcx.impl_trait_ref(item.container_id(tcx)).skip_binder().args;
+-        let definition = tcx.type_of(def_id).skip_binder();
+-        if !(impl_args, definition).has_type_flags(CLOSED_BOUND_DISALLOWED_FLAGS) {
+-            tcx.ensure_result().coherent_trait(tcx.parent(trait_item))?;
+-            if tcx.closed_associated_type_bounds_hold((trait_item, definition)) {
+-                return Ok(());
+-            }
+-        }
+-    }
+-
+     let loc = Some(WellFormedLoc::Ty(def_id));
+     enter_wf_checking_ctxt(tcx, def_id, |wfcx| {
++        let item = tcx.associated_item(def_id);
++
+         // Avoid bogus "type annotations needed `Foo: Bar`" errors on `impl Bar for Foo` in case
+         // other `Foo` impls are incoherent.
+         tcx.ensure_result().coherent_trait(tcx.parent(item.trait_item_or_self()?))?;
+diff --git a/compiler/rustc_hir_typeck/src/lib.rs b/compiler/rustc_hir_typeck/src/lib.rs
+index 09dec4da272..7a2670f3b1b 100644
+--- a/compiler/rustc_hir_typeck/src/lib.rs
++++ b/compiler/rustc_hir_typeck/src/lib.rs
+@@ -41,7 +41,6 @@
+ 
+ pub use coercion::can_coerce;
+ use fn_ctxt::FnCtxt;
+-use rustc_ast as ast;
+ use rustc_data_structures::unord::UnordSet;
+ use rustc_errors::codes::*;
+ use rustc_errors::{Applicability, Diag, ErrorGuaranteed, struct_span_code_err};
+@@ -125,34 +124,8 @@ fn typeck_with_inspect<'tcx>(
+         span_bug!(span, "can't type-check body of {:?}", def_id);
+     });
+     let body = tcx.hir_body(body_id);
+-    let param_env = tcx.param_env(def_id);
+ 
+-    // For a small unsuffixed integer literal in a `usize` constant, typeck
+-    // records only the owner and expression types: there are no inference
+-    // variables, adjustments, or obligations to resolve.
+-    if inspector.is_none()
+-        && (matches!(
+-            node,
+-            hir::Node::ImplItem(hir::ImplItem { kind: hir::ImplItemKind::Const(..), .. })
+-        ) || (matches!(node, hir::Node::AnonConst(_))
+-            && matches!(tcx.parent_hir_node(id), hir::Node::ConstArg(_))))
+-        && node.ty().is_none_or(|ty| !ty.is_suggestable_infer_ty())
+-        && body.params.is_empty()
+-        && let hir::ExprKind::Lit(lit) = body.value.kind
+-        && let ast::LitKind::Int(value, ast::LitIntType::Unsuffixed) = lit.node
+-        && value.get() <= u16::MAX as u128
+-        && tcx.type_of(def_id).instantiate_identity().skip_norm_wip() == tcx.types.usize
+-        && tcx.hir_attrs(id).is_empty()
+-        && tcx.hir_attrs(body.value.hir_id).is_empty()
+-    {
+-        if matches!(node, hir::Node::AnonConst(_)) {
+-            tcx.require_lang_item(hir::attrs::lang_items::LangItem::Sized, body.value.span);
+-        }
+-        let mut results = ty::TypeckResults::new(id.owner);
+-        results.node_types_mut().insert(id, tcx.types.usize);
+-        results.node_types_mut().insert(body.value.hir_id, tcx.types.usize);
+-        return tcx.arena.alloc(results);
+-    }
++    let param_env = tcx.param_env(def_id);
+ 
+     let root_ctxt = TypeckRootCtxt::new(tcx, def_id);
+     if let Some(inspector) = inspector {
+diff --git a/compiler/rustc_infer/src/infer/resolve.rs b/compiler/rustc_infer/src/infer/resolve.rs
+index 71c7cdcc00c..13df23a39b9 100644
+--- a/compiler/rustc_infer/src/infer/resolve.rs
++++ b/compiler/rustc_infer/src/infer/resolve.rs
+@@ -42,21 +42,7 @@ fn fold_ty(&mut self, t: Ty<'tcx>) -> Ty<'tcx> {
+             ty
+         } else {
+             let shallow = self.infcx.shallow_resolve(t);
+-            // Shallow resolution is idempotent. Reuse the resolved type's flags and
+-            // cache entry in this frame, retaining the original debug traversal.
+-            let res = if !cfg!(debug_assertions) && shallow != t {
+-                if !shallow.has_non_region_infer() {
+-                    shallow
+-                } else if let Some(&ty) = self.cache.get(&shallow) {
+-                    ty
+-                } else {
+-                    let res = shallow.super_fold_with(self);
+-                    assert!(self.cache.insert(shallow, res));
+-                    res
+-                }
+-            } else {
+-                shallow.super_fold_with(self)
+-            };
++            let res = shallow.super_fold_with(self);
+             assert!(self.cache.insert(t, res));
+             res
+         }
+diff --git a/compiler/rustc_middle/src/queries.rs b/compiler/rustc_middle/src/queries.rs
+index 9042ee233a9..46214ba74f0 100644
+--- a/compiler/rustc_middle/src/queries.rs
++++ b/compiler/rustc_middle/src/queries.rs
+@@ -1937,11 +1937,6 @@
+         separate_provide_extern
+     }
+ 
+-    /// Whether a closed associated-type definition is well-formed and satisfies its bounds.
+-    query closed_associated_type_bounds_hold(key: (DefId, Ty<'tcx>)) -> bool {
+-        desc { "checking closed bounds on `{}` for `{}`", tcx.def_path_str(key.0), key.1 }
+-    }
+-
+     query check_well_formed(key: LocalDefId) -> Result<(), ErrorGuaranteed> {
+         desc { "checking that `{}` is well-formed", tcx.def_path_str(key) }
+     }
+diff --git a/compiler/rustc_middle/src/query/keys.rs b/compiler/rustc_middle/src/query/keys.rs
+index bedd1e8e447..47b9b94f6e7 100644
+--- a/compiler/rustc_middle/src/query/keys.rs
++++ b/compiler/rustc_middle/src/query/keys.rs
+@@ -279,12 +279,6 @@ fn default_span(&self, tcx: TyCtxt<'_>) -> Span {
+     }
+ }
+ 
+-impl<'tcx> QueryKey for (DefId, Ty<'tcx>) {
+-    fn default_span(&self, tcx: TyCtxt<'_>) -> Span {
+-        self.0.default_span(tcx)
+-    }
+-}
+-
+ impl<'tcx> QueryKey for ty::TraitRef<'tcx> {
+     fn default_span(&self, tcx: TyCtxt<'_>) -> Span {
+         tcx.def_span(self.def_id)
+diff --git a/compiler/rustc_middle/src/ty/fold.rs b/compiler/rustc_middle/src/ty/fold.rs
+index 0edf390dd95..c146e7c982d 100644
+--- a/compiler/rustc_middle/src/ty/fold.rs
++++ b/compiler/rustc_middle/src/ty/fold.rs
+@@ -290,11 +290,6 @@ pub fn shift_bound_var_indices<T>(self, bound_vars: usize, value: T) -> T
+     where
+         T: TypeFoldable<TyCtxt<'tcx>>,
+     {
+-        // Keep folding in debug builds so bound-variable validation still runs.
+-        if bound_vars == 0 && !cfg!(debug_assertions) {
+-            return value;
+-        }
+-
+         let shift_bv = |bv: ty::BoundVar| bv + bound_vars;
+         self.replace_escaping_bound_vars_uncached(
+             value,
+diff --git a/compiler/rustc_middle/src/ty/generic_args.rs b/compiler/rustc_middle/src/ty/generic_args.rs
+index 2acc2b9d981..0dc2082e507 100644
+--- a/compiler/rustc_middle/src/ty/generic_args.rs
++++ b/compiler/rustc_middle/src/ty/generic_args.rs
+@@ -445,7 +445,7 @@ pub fn for_item<F>(tcx: TyCtxt<'tcx>, def_id: DefId, mut mk_kind: F) -> GenericA
+     }
+ 
+     pub fn extend_to<F>(
+-        &'tcx self,
++        &self,
+         tcx: TyCtxt<'tcx>,
+         def_id: DefId,
+         mut mk_kind: F,
+@@ -453,14 +453,9 @@ pub fn extend_to<F>(
+     where
+         F: FnMut(&ty::GenericParamDef, &[GenericArg<'tcx>]) -> GenericArg<'tcx>,
+     {
+-        let defs = tcx.generics_of(def_id);
+-        let mut args = SmallVec::with_capacity(defs.count());
+-        Self::fill_item(&mut args, tcx, defs, &mut |param, args| {
++        Self::for_item(tcx, def_id, |param, args| {
+             self.get(param.index as usize).cloned().unwrap_or_else(|| mk_kind(param, args))
+-        });
+-        // Filling checked every parameter index, so equal lengths mean every
+-        // argument came from `self`.
+-        if args.len() == self.len() { self } else { tcx.mk_args(&args) }
++        })
+     }
+ 
+     pub fn fill_item<F>(
+diff --git a/compiler/rustc_middle/src/ty/predicate.rs b/compiler/rustc_middle/src/ty/predicate.rs
+index f112a4f1333..b650c8ca010 100644
+--- a/compiler/rustc_middle/src/ty/predicate.rs
++++ b/compiler/rustc_middle/src/ty/predicate.rs
+@@ -440,13 +440,8 @@ pub(crate) fn instantiate_supertrait_uncached(
+             .instantiate(tcx, trait_ref.skip_binder().args)
+             .skip_norm_wip();
+         // 3) ['x] + ['b] -> ['x, 'b]
+-        let bound_vars = if trait_bound_vars.is_empty() {
+-            pred_bound_vars
+-        } else if pred_bound_vars.is_empty() {
+-            trait_bound_vars
+-        } else {
+-            tcx.mk_bound_variable_kinds_from_iter(trait_bound_vars.iter().chain(pred_bound_vars))
+-        };
++        let bound_vars =
++            tcx.mk_bound_variable_kinds_from_iter(trait_bound_vars.iter().chain(pred_bound_vars));
+ 
+         // FIXME: Is it really perf sensitive to use reuse_or_mk_predicate here?
+         tcx.reuse_or_mk_predicate(
+diff --git a/compiler/rustc_mir_build/src/builder/expr/as_constant.rs b/compiler/rustc_mir_build/src/builder/expr/as_constant.rs
+index 91dab197b59..6e09c365dbf 100644
+--- a/compiler/rustc_mir_build/src/builder/expr/as_constant.rs
++++ b/compiler/rustc_mir_build/src/builder/expr/as_constant.rs
+@@ -111,10 +111,7 @@ pub(crate) fn as_constant_inner<'tcx>(
+ }
+ 
+ #[instrument(skip(tcx, lit_input))]
+-pub(crate) fn lit_to_mir_constant<'tcx>(
+-    tcx: TyCtxt<'tcx>,
+-    lit_input: LitToConstInput<'tcx>,
+-) -> Const<'tcx> {
++fn lit_to_mir_constant<'tcx>(tcx: TyCtxt<'tcx>, lit_input: LitToConstInput<'tcx>) -> Const<'tcx> {
+     let LitToConstInput { lit, ty, neg } = lit_input;
+ 
+     let ty = ty.expect("type of literal must be known at this point");
+diff --git a/compiler/rustc_mir_build/src/builder/mod.rs b/compiler/rustc_mir_build/src/builder/mod.rs
+index c51ac5e564d..5efe62c3ebc 100644
+--- a/compiler/rustc_mir_build/src/builder/mod.rs
++++ b/compiler/rustc_mir_build/src/builder/mod.rs
+@@ -24,7 +24,6 @@
+ use rustc_abi::{ExternAbi, FieldIdx};
+ use rustc_apfloat::Float;
+ use rustc_apfloat::ieee::{Double, Half, Quad, Single};
+-use rustc_ast as ast;
+ use rustc_data_structures::fx::FxHashMap;
+ use rustc_data_structures::sorted_map::SortedIndexMultiMap;
+ use rustc_errors::ErrorGuaranteed;
+@@ -67,9 +66,6 @@ pub(crate) fn closure_saved_names_of_captured_variables<'tcx>(
+ /// be called by the query `mir_built`.
+ pub(crate) fn build_mir_inner_impl<'tcx>(tcx: TyCtxt<'tcx>, def: LocalDefId) -> Body<'tcx> {
+     tcx.ensure_done().thir_abstract_const(def);
+-    if let Some(body) = build_literal_const(tcx, def) {
+-        return body;
+-    }
+     if let Err(e) = tcx.ensure_result().check_match(def) {
+         return construct_error(tcx, def, e);
+     }
+@@ -110,108 +106,6 @@ pub(crate) fn build_mir_inner_impl<'tcx>(tcx: TyCtxt<'tcx>, def: LocalDefId) ->
+     body
+ }
+ 
+-/// Data needed to build an unadjusted integer-literal const body.
+-#[derive(Clone, Copy)]
+-pub(crate) struct LiteralConst {
+-    span: Span,
+-    return_span: Span,
+-    expr_span: Span,
+-    lit: ast::LitKind,
+-}
+-
+-/// A direct literal const has no patterns, tail calls, unsafe operations, or drops.
+-pub(crate) fn literal_const_info(tcx: TyCtxt<'_>, def: LocalDefId) -> Option<LiteralConst> {
+-    if tcx.sess.instrument_coverage() || tcx.sess.opts.unstable_opts.maximal_hir_to_mir_coverage {
+-        return None;
+-    }
+-
+-    let hir_id = tcx.local_def_id_to_hir_id(def);
+-    let (span, return_span) = match tcx.hir_node(hir_id) {
+-        Node::AnonConst(ct) if matches!(tcx.parent_hir_node(hir_id), Node::ConstArg(_)) => {
+-            (ct.span, ct.span)
+-        }
+-        Node::ImplItem(hir::ImplItem {
+-            kind: hir::ImplItemKind::Const(ty, hir::ConstItemRhs::Body(_)),
+-            span,
+-            ..
+-        }) if !ty.is_suggestable_infer_ty() => (*span, ty.span),
+-        _ => return None,
+-    };
+-
+-    let hir_body = tcx.hir_body_owned_by(def);
+-    let expr = hir_body.value;
+-    let hir::ExprKind::Lit(lit) = expr.kind else { return None };
+-    let ast::LitKind::Int(value, ast::LitIntType::Unsuffixed) = lit.node else {
+-        return None;
+-    };
+-    if value.get() > u16::MAX as u128
+-        || !hir_body.params.is_empty()
+-        || tcx.parent_hir_id(expr.hir_id) != hir_id
+-        || !tcx.hir_attrs(hir_id).is_empty()
+-        || !tcx.hir_attrs(expr.hir_id).is_empty()
+-    {
+-        return None;
+-    }
+-
+-    let typeck = tcx.typeck(def);
+-    if typeck.tainted_by_errors.is_some()
+-        || typeck.node_type_opt(hir_id) != Some(tcx.types.usize)
+-        || typeck.expr_ty_opt(expr) != Some(tcx.types.usize)
+-        || !typeck.expr_adjustments(expr).is_empty()
+-    {
+-        return None;
+-    }
+-
+-    Some(LiteralConst { span, return_span, expr_span: expr.span, lit: lit.node })
+-}
+-
+-/// Build a small integer-literal const without THIR or the general MIR builder.
+-fn build_literal_const<'tcx>(tcx: TyCtxt<'tcx>, def: LocalDefId) -> Option<Body<'tcx>> {
+-    let LiteralConst { span, return_span, expr_span, lit } = literal_const_info(tcx, def)?;
+-    let constant = expr::as_constant::lit_to_mir_constant(
+-        tcx,
+-        ty::LitToConstInput { lit, ty: Some(tcx.types.usize), neg: false },
+-    );
+-    let mut cfg = CFG { basic_blocks: IndexVec::new() };
+-    assert_eq!(cfg.start_new_block(), START_BLOCK);
+-    cfg.push_assign(
+-        START_BLOCK,
+-        SourceInfo::outermost(expr_span),
+-        Place::return_place(),
+-        Rvalue::Use(
+-            Operand::Constant(Box::new(ConstOperand {
+-                span: expr_span,
+-                user_ty: None,
+-                const_: constant,
+-            })),
+-            WithRetag::Yes,
+-        ),
+-    );
+-    cfg.terminate(START_BLOCK, SourceInfo::outermost(span), TerminatorKind::Return);
+-
+-    let hir_id = tcx.local_def_id_to_hir_id(def);
+-    let source_scopes = IndexVec::from_iter([SourceScopeData {
+-        span,
+-        parent_scope: None,
+-        inlined: None,
+-        inlined_parent_scope: None,
+-        local_data: ClearCrossCrate::Set(SourceScopeLocalData { lint_root: hir_id }),
+-    }]);
+-    let local_decls = IndexVec::from_iter([LocalDecl::new(tcx.types.usize, return_span)]);
+-    Some(Body::new(
+-        MirSource::item(def.to_def_id()),
+-        cfg.basic_blocks,
+-        source_scopes,
+-        local_decls,
+-        IndexVec::new(),
+-        0,
+-        vec![],
+-        span,
+-        None,
+-        None,
+-    ))
+-}
+-
+ ///////////////////////////////////////////////////////////////////////////
+ // BuildMir -- walks a crate, looking for fn items and methods to build MIR from
+ 
+diff --git a/compiler/rustc_mir_build/src/check_unsafety.rs b/compiler/rustc_mir_build/src/check_unsafety.rs
+index b3cb37078ad..29a93e2994d 100644
+--- a/compiler/rustc_mir_build/src/check_unsafety.rs
++++ b/compiler/rustc_mir_build/src/check_unsafety.rs
+@@ -1058,15 +1058,6 @@ pub(crate) fn check_unsafety(tcx: TyCtxt<'_>, def: LocalDefId) {
+         return;
+     }
+ 
+-    // A direct literal cannot contain unsafe operations or unused unsafe blocks.
+-    // Keep building MIR here, as the regular checker does after building THIR.
+-    if !tcx.sess.opts.unstable_opts.no_steal_thir
+-        && crate::builder::literal_const_info(tcx, def).is_some()
+-    {
+-        tcx.ensure_done().mir_built(def);
+-        return;
+-    }
+-
+     let Ok((thir, expr)) = tcx.thir_body(def) else { return };
+     // Runs all other queries that depend on THIR.
+     tcx.ensure_done().mir_built(def);
+diff --git a/compiler/rustc_trait_selection/src/traits/outlives_bounds.rs b/compiler/rustc_trait_selection/src/traits/outlives_bounds.rs
+index 747ede68d6a..84cae1e7bfa 100644
+--- a/compiler/rustc_trait_selection/src/traits/outlives_bounds.rs
++++ b/compiler/rustc_trait_selection/src/traits/outlives_bounds.rs
+@@ -7,7 +7,6 @@
+ pub use rustc_middle::traits::query::OutlivesBound;
+ use rustc_middle::ty::{self, ParamEnv, Ty, TypeFolder, TypeVisitableExt};
+ use rustc_span::def_id::LocalDefId;
+-use rustc_span::sym;
+ use tracing::instrument;
+ 
+ use crate::infer::InferCtxt;
+@@ -51,40 +50,6 @@ fn implied_outlives_bounds<'a, 'tcx>(
+     // an example.
+     assert!(!ty.has_non_region_infer());
+ 
+-    // A fieldless struct with only concrete `usize` const arguments and no
+-    // other bounds cannot imply any lifetime relationships. In particular,
+-    // there is nothing to normalize or relate to the caller's environment.
+-    let tcx = infcx.tcx;
+-    if param_env.caller_bounds().is_empty()
+-        && let ty::Adt(adt, args) = ty.kind()
+-        && adt.is_struct()
+-        && adt.non_enum_variant().fields.is_empty()
+-        && adt.did().is_local()
+-        && args.iter().all(|arg| {
+-            matches!(arg.kind(), ty::GenericArgKind::Const(ct)
+-                if matches!(ct.kind(), ty::ConstKind::Value(value) if value.ty == tcx.types.usize))
+-        })
+-        && let generics = tcx.generics_of(adt.did())
+-        && generics.parent_count == 0
+-        && generics.own_params.len() == args.len()
+-        && generics.own_params.iter().all(|p| {
+-            matches!(p.kind, ty::GenericParamDefKind::Const { has_default: false })
+-        })
+-        && let clauses = tcx.clauses_of(adt.did())
+-        && clauses.parent.is_none()
+-        && clauses.clauses.len() == args.len()
+-        && clauses.clauses.iter().all(|(clause, _)| {
+-            matches!(clause.kind().no_bound_vars(),
+-                Some(ty::ClauseKind::ConstArgHasType(ct, t))
+-                    if matches!(ct.kind(), ty::ConstKind::Param(_)) && t == tcx.types.usize)
+-        })
+-        // Preserve the compatibility hack for `bevy_ecs::ParamSet`.
+-        && !(tcx.item_name(adt.did()) == sym::ParamSet
+-            && tcx.crate_name(adt.did().krate) == sym::bevy_ecs)
+-    {
+-        return vec![];
+-    }
+-
+     let mut canonical_var_values = OriginalQueryValues::default();
+     let input = ImpliedOutlivesBounds { ty };
+     let canonical = infcx.canonicalize_query(param_env.and(input), &mut canonical_var_values);
+diff --git a/compiler/rustc_type_ir/src/relate.rs b/compiler/rustc_type_ir/src/relate.rs
+index 5ed260c5e9d..45c165fddeb 100644
+--- a/compiler/rustc_type_ir/src/relate.rs
++++ b/compiler/rustc_type_ir/src/relate.rs
+@@ -205,15 +205,10 @@ fn relate<R: TypeRelation<I>>(
+                 }
+                 r => r,
+             });
+-        let inputs_and_output =
+-            RelateResult::<I, I::Ty>::collect_and_apply(inputs_and_output, |tys: &[I::Ty]| {
+-                if tys == a.inputs_and_output.as_slice() {
+-                    a.inputs_and_output
+-                } else {
+-                    cx.mk_type_list_from_iter(tys.iter().copied())
+-                }
+-            })?;
+-        Ok(ty::FnSig { inputs_and_output, fn_sig_kind: a.fn_sig_kind })
++        Ok(ty::FnSig {
++            inputs_and_output: cx.mk_type_list_from_iter(inputs_and_output)?,
++            fn_sig_kind: a.fn_sig_kind,
++        })
+     }
+ }
+ 
+@@ -407,12 +402,7 @@ pub fn structurally_relate_tys<I: Interner, R: TypeRelation<I>>(
+                 Ok(a)
+             } else {
+                 relation.relate_ty_args(a, b, a_def.def_id().into(), a_args, b_args, |args| {
+-                    // Keep the constructor's argument checks in debug builds.
+-                    if args == a_args && !cfg!(debug_assertions) {
+-                        a
+-                    } else {
+-                        Ty::new_adt(cx, a_def, args)
+-                    }
++                    Ty::new_adt(cx, a_def, args)
+                 })
+             }
+         }
+@@ -430,11 +420,7 @@ pub fn structurally_relate_tys<I: Interner, R: TypeRelation<I>>(
+             // the (anonymous) type of the same coroutine expression. So
+             // all of their regions should be equated.
+             let args = relate_args_invariantly(relation, a_args, b_args)?;
+-            Ok(if args == a_args && !cfg!(debug_assertions) {
+-                a
+-            } else {
+-                Ty::new_coroutine(cx, a_id, args)
+-            })
++            Ok(Ty::new_coroutine(cx, a_id, args))
+         }
+ 
+         (ty::CoroutineWitness(a_id, a_args), ty::CoroutineWitness(b_id, b_args))
+@@ -444,11 +430,7 @@ pub fn structurally_relate_tys<I: Interner, R: TypeRelation<I>>(
+             // the (anonymous) type of the same coroutine expression. So
+             // all of their regions should be equated.
+             let args = relate_args_invariantly(relation, a_args, b_args)?;
+-            Ok(if args == a_args && !cfg!(debug_assertions) {
+-                a
+-            } else {
+-                Ty::new_coroutine_witness(cx, a_id, args)
+-            })
++            Ok(Ty::new_coroutine_witness(cx, a_id, args))
+         }
+ 
+         (ty::Closure(a_id, a_args), ty::Closure(b_id, b_args)) if a_id == b_id => {
+@@ -456,22 +438,14 @@ pub fn structurally_relate_tys<I: Interner, R: TypeRelation<I>>(
+             // the (anonymous) type of the same closure expression. So
+             // all of their regions should be equated.
+             let args = relate_args_invariantly(relation, a_args, b_args)?;
+-            Ok(if args == a_args && !cfg!(debug_assertions) {
+-                a
+-            } else {
+-                Ty::new_closure(cx, a_id, args)
+-            })
++            Ok(Ty::new_closure(cx, a_id, args))
+         }
+ 
+         (ty::CoroutineClosure(a_id, a_args), ty::CoroutineClosure(b_id, b_args))
+             if a_id == b_id =>
+         {
+             let args = relate_args_invariantly(relation, a_args, b_args)?;
+-            Ok(if args == a_args && !cfg!(debug_assertions) {
+-                a
+-            } else {
+-                Ty::new_coroutine_closure(cx, a_id, args)
+-            })
++            Ok(Ty::new_coroutine_closure(cx, a_id, args))
+         }
+ 
+         (ty::RawPtr(a_ty, a_mutbl), ty::RawPtr(b_ty, b_mutbl)) => {
+@@ -488,7 +462,7 @@ pub fn structurally_relate_tys<I: Interner, R: TypeRelation<I>>(
+ 
+             let ty = relation.relate_with_variance(variance, info, a_ty, b_ty)?;
+ 
+-            Ok(if ty == a_ty { a } else { Ty::new_ptr(cx, ty, a_mutbl) })
++            Ok(Ty::new_ptr(cx, ty, a_mutbl))
+         }
+ 
+         (ty::Ref(a_r, a_ty, a_mutbl), ty::Ref(b_r, b_ty, b_mutbl)) => {
+@@ -506,17 +480,13 @@ pub fn structurally_relate_tys<I: Interner, R: TypeRelation<I>>(
+             let r = relation.relate(a_r, b_r)?;
+             let ty = relation.relate_with_variance(variance, info, a_ty, b_ty)?;
+ 
+-            Ok(if r == a_r && ty == a_ty { a } else { Ty::new_ref(cx, r, ty, a_mutbl) })
++            Ok(Ty::new_ref(cx, r, ty, a_mutbl))
+         }
+ 
+         (ty::Array(a_t, sz_a), ty::Array(b_t, sz_b)) => {
+             let t = relation.relate(a_t, b_t)?;
+             match relation.relate(sz_a, sz_b) {
+-                Ok(sz) => Ok(if t == a_t && sz == sz_a {
+-                    a
+-                } else {
+-                    Ty::new_array_with_const_len(cx, t, sz)
+-                }),
++                Ok(sz) => Ok(Ty::new_array_with_const_len(cx, t, sz)),
+                 Err(TypeError::ConstMismatch(_)) => {
+                     Err(TypeError::ArraySize(ExpectedFound::new(sz_a, sz_b)))
+                 }
+@@ -526,15 +496,15 @@ pub fn structurally_relate_tys<I: Interner, R: TypeRelation<I>>(
+ 
+         (ty::Slice(a_t), ty::Slice(b_t)) => {
+             let t = relation.relate(a_t, b_t)?;
+-            Ok(if t == a_t { a } else { Ty::new_slice(cx, t) })
++            Ok(Ty::new_slice(cx, t))
+         }
+ 
+         (ty::Tuple(as_), ty::Tuple(bs)) => {
+             if as_.len() == bs.len() {
+-                RelateResult::<I, I::Ty>::collect_and_apply(
++                Ok(Ty::new_tup_from_iter(
++                    cx,
+                     iter::zip(as_.iter(), bs.iter()).map(|(a, b)| relation.relate(a, b)),
+-                    |tys| if tys == as_.as_slice() { a } else { Ty::new_tup(cx, tys) },
+-                )
++                )?)
+             } else if !(as_.is_empty() || bs.is_empty()) {
+                 Err(TypeError::TupleSize(ExpectedFound::new(as_.len(), bs.len())))
+             } else {
+@@ -554,22 +524,15 @@ pub fn structurally_relate_tys<I: Interner, R: TypeRelation<I>>(
+                     a_def_id.into(),
+                     a_args.skip_binder(),
+                     b_args.skip_binder(),
+-                    |args| {
+-                        if args == a_args.skip_binder() && !cfg!(debug_assertions) {
+-                            a
+-                        } else {
+-                            Ty::new_fn_def(cx, a_def_id, a_args.rebind(args))
+-                        }
+-                    },
++                    |args| Ty::new_fn_def(cx, a_def_id, a_args.rebind(args)),
+                 );
+                 x
+             }
+         }
+ 
+         (ty::FnPtr(a_sig_tys, a_hdr), ty::FnPtr(b_sig_tys, b_hdr)) => {
+-            let a_sig = a_sig_tys.with(a_hdr);
+-            let fty = relation.relate(a_sig, b_sig_tys.with(b_hdr))?;
+-            Ok(if fty == a_sig { a } else { Ty::new_fn_ptr(cx, fty) })
++            let fty = relation.relate(a_sig_tys.with(a_hdr), b_sig_tys.with(b_hdr))?;
++            Ok(Ty::new_fn_ptr(cx, fty))
+         }
+ 
+         // Alias tend to mostly already be handled downstream due to normalization.

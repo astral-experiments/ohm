@@ -1,0 +1,81 @@
+{
+  "proof_kind": "clippy-msrv46-source-scope-v1",
+  "full_commit": "f52143702ff1f265014e87d5e6853e70a3b15728",
+  "compiler_dispatch_binding": {
+    "path": "work/stack-ablation/component-build/receipts/clippy-no-msrv-shortcut/source-contract/source-contract.json",
+    "sha256": "6ceb556b3be3e4b4fe3bb1902d5163d430db6b441eeea30de69c5f17ba13a608"
+  },
+  "full_source_manifest_sha256": "786677f8375e120dc07ab8b8f1f25483bcc58116cae81944753ec1acfc18df03",
+  "reduced_source_manifest_sha256": "0216b5edbb9df4b5e06518ea044273dff57c5e5a6b88b2c3e1050df9c339cc42",
+  "source_snapshots": {
+    "full:clippy_utils/src/msrvs.rs": {
+      "path": "work/stack-ablation/component-build/receipts/clippy-no-msrv-shortcut/source-contract/full/clippy_utils/src/msrvs.rs",
+      "sha256": "3a40e80ae0b45b5d73f70355ff772008760e3e3e9846ae7323e65a695de0b2a2",
+      "git_mode": "100644"
+    },
+    "full:clippy_utils/src/lib.rs": {
+      "path": "work/stack-ablation/component-build/receipts/clippy-no-msrv-shortcut/source-contract/full/clippy_utils/src/lib.rs",
+      "sha256": "fa0744f366c798bec90c82a7ca8965db4c4f1afeaa98bbdf4258df7037850396",
+      "git_mode": "100644"
+    },
+    "full:clippy_lints/src/attrs/mod.rs": {
+      "path": "work/stack-ablation/component-build/receipts/clippy-no-msrv-shortcut/source-contract/full/clippy_lints/src/attrs/mod.rs",
+      "sha256": "30cd32763b4a9e74f5c73332883f739a71c7d7acffe9b9a64501113ec9c36c3d",
+      "git_mode": "100644"
+    },
+    "reduced:clippy_utils/src/msrvs.rs": {
+      "path": "work/stack-ablation/component-build/receipts/clippy-no-msrv-shortcut/source-contract/reduced/clippy_utils/src/msrvs.rs",
+      "sha256": "96a598479923588d06aa006895dcfa0788c86bf1b65ce705fabe0b4938d3af4f",
+      "git_mode": "100644"
+    },
+    "reduced:clippy_utils/src/lib.rs": {
+      "path": "work/stack-ablation/component-build/receipts/clippy-no-msrv-shortcut/source-contract/full/clippy_utils/src/lib.rs",
+      "sha256": "fa0744f366c798bec90c82a7ca8965db4c4f1afeaa98bbdf4258df7037850396",
+      "git_mode": "100644"
+    },
+    "reduced:clippy_lints/src/attrs/mod.rs": {
+      "path": "work/stack-ablation/component-build/receipts/clippy-no-msrv-shortcut/source-contract/full/clippy_lints/src/attrs/mod.rs",
+      "sha256": "30cd32763b4a9e74f5c73332883f739a71c7d7acffe9b9a64501113ec9c36c3d",
+      "git_mode": "100644"
+    }
+  },
+  "existing_actual_training_coverage": {
+    "full": {
+      "coverage_path": "work/stack-ablation/component-build/receipts/clippy-full/reviewed-overlay/receipts/profile-coverage.txt",
+      "sha256": "95e05e8df7ad26a35a96d2e12f547445344820b87b33277dc2cdd749251a77f5",
+      "covered_ast_parse_attrs_symbol_rows": [
+        "clippy_utils.bd144b7043a24c5-cgu.0;_RINvNtCs10U36HCB07V_12clippy_utils5msrvs11parse_attrsNtNtCseci0sUl3W3g_9rustc_ast3ast9AttributeEB4_"
+      ]
+    },
+    "no-msrv-shortcut": {
+      "coverage_path": "work/stack-ablation/component-build/receipts/clippy-no-msrv-shortcut/reviewed-overlay/receipts/profile-coverage.txt",
+      "sha256": "95e05e8df7ad26a35a96d2e12f547445344820b87b33277dc2cdd749251a77f5",
+      "covered_ast_parse_attrs_symbol_rows": [
+        "clippy_utils.bd144b7043a24c5-cgu.0;_RINvNtCs10U36HCB07V_12clippy_utils5msrvs11parse_attrsNtNtCseci0sUl3W3g_9rustc_ast3ast9AttributeEB4_"
+      ]
+    }
+  },
+  "scope": "Only the six-line empty-attribute early return/comment is deleted. The existing empty filter iterator returnsNone. Common MsrvStack enter/exit callbacks remain; fixed compiler dispatch invokes every registered early pass even for empty attribute slices. This source/training binding does not claim a measured empty-branch count or workflow speedup.",
+  "source_lines": {
+    "full_parse_attrs_shortcut": [
+      221,
+      230
+    ],
+    "common_msrv_stack_callbacks": [
+      207,
+      218
+    ],
+    "common_extract_msrv_attr_macro": [
+      132,
+      145
+    ],
+    "representative_early_consumer": [
+      545,
+      563
+    ],
+    "common_late_inherited_attrs": [
+      119,
+      153
+    ]
+  }
+}

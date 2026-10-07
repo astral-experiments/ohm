@@ -1,0 +1,3264 @@
+diff --git a/src/bin/main.rs b/src/bin/main.rs
+index 617ef61d7b4ef0711ccbb23a6736a0033bbf61f5..52e82d528a7f926d5455df934bdca4b80eb95fd7 100644
+--- a/src/bin/main.rs
++++ b/src/bin/main.rs
+@@ -10,7 +10,7 @@ use tracing_subscriber::EnvFilter;
+ 
+ use std::collections::HashMap;
+ use std::env;
+-use std::fs::{self, File};
++use std::fs::File;
+ use std::io::{self, Read, Write, stdout};
+ use std::path::{Path, PathBuf};
+ use std::str::FromStr;
+@@ -24,8 +24,6 @@ use crate::rustfmt::{
+ 
+ const BUG_REPORT_URL: &str = "https://github.com/rust-lang/rustfmt/issues/new?labels=bug";
+ const MODULE_MANIFEST_ENVIRONMENT: &str = "OHM_RUSTFMT_MODULE_MANIFEST";
+-const CHANGED_MODULE_ENVIRONMENT: &str = "OHM_RUSTFMT_CHANGED_MODULE";
+-const MODULE_TOPOLOGY_ENVIRONMENT: &str = "OHM_RUSTFMT_MODULE_TOPOLOGY";
+ 
+ // N.B. these crates are loaded from the sysroot, so they need extern crate.
+ extern crate rustc_driver;
+@@ -349,20 +347,6 @@ fn format(
+     let mut session = Session::new(config, Some(out));
+     let module_manifest = env::var_os(MODULE_MANIFEST_ENVIRONMENT).map(PathBuf::from);
+     let expected_roots = module_manifest.as_ref().map(|_| files.clone());
+-    let changed_modules = module_manifest
+-        .as_ref()
+-        .filter(|_| files.len() == 1)
+-        .and_then(|_| {
+-            let paths = env::var_os(CHANGED_MODULE_ENVIRONMENT)?;
+-            let topologies = env::var(MODULE_TOPOLOGY_ENVIRONMENT).ok()?;
+-            let paths = env::split_paths(&paths).collect::<Vec<_>>();
+-            let topologies = topologies.split(',').map(String::from).collect::<Vec<_>>();
+-            if paths.is_empty() || paths.len() != topologies.len() {
+-                return None;
+-            }
+-            Some(paths.into_iter().zip(topologies).collect::<Vec<_>>())
+-        });
+-    let mut certified_leaves = None;
+     if module_manifest.is_some() {
+         session.enable_module_graph();
+     }
+@@ -389,11 +373,11 @@ fn format(
+                     }
+                 }
+ 
+-                certified_leaves = session.override_config(local_config, |session| {
+-                    format_targets(session, file, changed_modules.as_deref())
++                session.override_config(local_config, |sess| {
++                    format_and_emit_report(sess, Input::File(file))
+                 });
+             } else {
+-                certified_leaves = format_targets(&mut session, file, changed_modules.as_deref());
++                format_and_emit_report(&mut session, Input::File(file));
+             }
+         }
+     }
+@@ -419,91 +403,11 @@ fn format(
+         // formatting. They must never change rustfmt's diagnostics or status.
+         // Some macro rewrites intentionally fail silently without affecting
+         // rustfmt's successful public exit status.
+-        if let Some(leaves) = certified_leaves {
+-            if let Some((root, _, _)) = leaves.first() {
+-                let modules = leaves
+-                    .iter()
+-                    .map(|(_, leaf, topology)| (leaf.clone(), topology.clone()))
+-                    .collect::<Vec<_>>();
+-                let _ = session.write_leaf_certificates(&path, root, &modules);
+-            }
+-        } else {
+-            let _ = session.write_module_manifest(&path, &roots);
+-        }
++        let _ = session.write_module_manifest(&path, &roots);
+     }
+     Ok(exit_code)
+ }
+ 
+-/// Formats every certified direct child without silently authorizing an uncertified sibling.
+-fn format_targets<T: Write>(
+-    session: &mut Session<'_, T>,
+-    root: PathBuf,
+-    modules: Option<&[(PathBuf, String)]>,
+-) -> Option<Vec<(PathBuf, PathBuf, String)>> {
+-    let Some(modules) = modules else {
+-        format_target(session, root, None);
+-        return None;
+-    };
+-
+-    let mut certified = Vec::with_capacity(modules.len());
+-    for (module, topology) in modules {
+-        certified.push(format_target(
+-            session,
+-            root.clone(),
+-            Some((module, topology)),
+-        )?);
+-    }
+-    Some(certified)
+-}
+-
+-/// Falls back before modifying files whenever a requested leaf loses its root context.
+-fn format_target<T: Write>(
+-    session: &mut Session<'_, T>,
+-    root: PathBuf,
+-    changed_module: Option<(&Path, &str)>,
+-) -> Option<(PathBuf, PathBuf, String)> {
+-    let Some((leaf, topology)) = changed_module else {
+-        format_and_emit_report(session, Input::File(root));
+-        return None;
+-    };
+-    let original = fs::read(leaf).ok();
+-
+-    match session.format_module(&root, leaf, topology) {
+-        Ok(Some(report)) => {
+-            let has_warnings = report.has_warnings();
+-            let unchanged = original.is_some_and(|original| {
+-                fs::read(leaf).is_ok_and(|formatted| formatted == original)
+-            });
+-            if !has_warnings && session.has_no_visible_errors() && unchanged {
+-                return Some((root, leaf.to_owned(), String::from(topology)));
+-            }
+-            if !session.has_operational_errors()
+-                && !session.has_parsing_errors()
+-                && !session.has_check_errors()
+-                && !session.has_diff()
+-            {
+-                // A rewritten or otherwise uncertified module proves nothing about its
+-                // siblings. Let the authoritative root pass emit any warnings once.
+-                format_and_emit_report(session, Input::File(root));
+-            } else if has_warnings {
+-                session.record_visible_diagnostics();
+-                eprintln!(
+-                    "{}",
+-                    FormatReportFormatterBuilder::new(&report)
+-                        .enable_colors(should_print_with_colors(session))
+-                        .build()
+-                );
+-            }
+-        }
+-        Ok(None) => format_and_emit_report(session, Input::File(root)),
+-        Err(message) => {
+-            eprintln!("Error writing files: {message}");
+-            session.add_operational_error();
+-        }
+-    }
+-    None
+-}
+-
+ fn format_and_emit_report<T: Write>(session: &mut Session<'_, T>, input: Input) {
+     match session.format(input) {
+         Ok(report) => {
+diff --git a/src/cargo-fmt/incremental.rs b/src/cargo-fmt/incremental.rs
+index 1724612c8afbb6a762534d629730b546b6cd7544..e90ea96e1f22f42c3763aac79ba10b6af4d825b5 100644
+--- a/src/cargo-fmt/incremental.rs
++++ b/src/cargo-fmt/incremental.rs
+@@ -2,7 +2,7 @@ use std::collections::btree_map::Entry;
+ use std::collections::{BTreeMap, BTreeSet};
+ use std::env;
+ use std::fs::{self, File, OpenOptions};
+-use std::io::{self, Read};
++use std::io::{self, BufReader, Read};
+ use std::path::{Path, PathBuf};
+ use std::time::UNIX_EPOCH;
+ 
+@@ -14,20 +14,15 @@ use super::{
+     run_rustfmt_with_output, rustfmt_command,
+ };
+ 
+-const CACHE_VERSION: u32 = 10;
+-const MODULE_MANIFEST_VERSION: u32 = 3;
++const CACHE_VERSION: u32 = 11;
++const MODULE_MANIFEST_VERSION: u32 = 4;
+ const MODULE_MANIFEST_SCHEMA: &str = "ohm.rustfmt-files";
+ const MODULE_MANIFEST_ENVIRONMENT: &str = "OHM_RUSTFMT_MODULE_MANIFEST";
+-const CHANGED_MODULE_ENVIRONMENT: &str = "OHM_RUSTFMT_CHANGED_MODULE";
+-const MODULE_TOPOLOGY_ENVIRONMENT: &str = "OHM_RUSTFMT_MODULE_TOPOLOGY";
+-const LEAF_CERTIFICATE_SCHEMA: &str = "ohm.rustfmt-leaf";
+-const LEAF_CERTIFICATE_VERSION: u32 = 3;
+ const ENABLE_ENVIRONMENT: &str = "OHM_INCREMENTAL_FMT";
+ const CACHE_ENVIRONMENT: &str = "OHM_INCREMENTAL_FMT_CACHE_DIR";
+ const TRACE_ENVIRONMENT: &str = "OHM_INCREMENTAL_FMT_TRACE";
+ 
+ type ModuleGraph = BTreeMap<String, BTreeSet<String>>;
+-type LeafGraph = BTreeMap<String, BTreeMap<String, String>>;
+ type ProbeGraph = BTreeMap<String, BTreeMap<String, ProbeObservation>>;
+ 
+ /// Versioned proof that a specific invocation formatted every recorded package successfully.
+@@ -37,7 +32,6 @@ struct Snapshot {
+     version: u32,
+     invocation: String,
+     configuration: BTreeMap<String, String>,
+-    configuration_fingerprints: BTreeMap<String, ConfigurationFingerprint>,
+     packages: BTreeMap<String, PackageSnapshot>,
+ }
+ 
+@@ -46,7 +40,6 @@ struct Snapshot {
+ #[serde(deny_unknown_fields)]
+ struct PackageSnapshot {
+     targets: BTreeMap<String, BTreeMap<String, SourceFingerprint>>,
+-    leaves: LeafGraph,
+     probes: BTreeMap<String, BTreeMap<String, ProbeObservation>>,
+ }
+ 
+@@ -99,44 +92,6 @@ impl SourceFingerprint {
+     }
+ }
+ 
+-/// Reuses an existing configuration digest only while its native file identity is unchanged.
+-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+-#[serde(deny_unknown_fields)]
+-struct ConfigurationFingerprint {
+-    canonical: String,
+-    source: SourceFingerprint,
+-    length: u64,
+-    #[cfg(unix)]
+-    device: u64,
+-    #[cfg(unix)]
+-    inode: u64,
+-    #[cfg(unix)]
+-    changed_seconds: i64,
+-    #[cfg(unix)]
+-    changed_nanoseconds: i64,
+-}
+-
+-impl ConfigurationFingerprint {
+-    fn new(canonical: String, metadata: &fs::Metadata) -> io::Result<Self> {
+-        #[cfg(unix)]
+-        use std::os::unix::fs::MetadataExt;
+-
+-        Ok(Self {
+-            canonical,
+-            source: SourceFingerprint::from_metadata(metadata)?,
+-            length: metadata.len(),
+-            #[cfg(unix)]
+-            device: metadata.dev(),
+-            #[cfg(unix)]
+-            inode: metadata.ino(),
+-            #[cfg(unix)]
+-            changed_seconds: metadata.ctime(),
+-            #[cfg(unix)]
+-            changed_nanoseconds: metadata.ctime_nsec(),
+-        })
+-    }
+-}
+-
+ /// Captures existence, symlink destination, and directory-sensitive module resolution.
+ #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+ #[serde(deny_unknown_fields)]
+@@ -161,7 +116,6 @@ struct ModuleManifest {
+ struct ModuleRoot {
+     path: String,
+     files: Vec<String>,
+-    leaves: BTreeMap<String, String>,
+     dependencies: Vec<String>,
+     probes: Vec<ModuleProbe>,
+ }
+@@ -179,36 +133,10 @@ struct ModuleProbe {
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ struct Discovery {
+     modules: ModuleGraph,
+-    leaves: LeafGraph,
+     probes: ProbeGraph,
+     unchanged: bool,
+ }
+ 
+-/// Identifies a clean, context-preserving formatter run over verified direct leaves.
+-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+-#[serde(deny_unknown_fields)]
+-struct LeafCertificate {
+-    schema: String,
+-    version: u32,
+-    root: String,
+-    leaves: Vec<CertifiedLeaf>,
+-}
+-
+-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+-#[serde(deny_unknown_fields)]
+-struct CertifiedLeaf {
+-    leaf: String,
+-    topology: String,
+-}
+-
+-/// Preserves the previously verified ownership of a uniquely changed direct child.
+-#[derive(Debug, Clone, PartialEq, Eq)]
+-struct ChangedLeaf {
+-    root: String,
+-    path: String,
+-    topology: String,
+-}
+-
+ /// Couples the previous successful snapshot with the current filesystem observations.
+ struct Plan {
+     cache_path: PathBuf,
+@@ -240,11 +168,6 @@ pub(super) fn format(
+     verbosity: Verbosity,
+     manifest_path: Option<&Path>,
+ ) -> Result<i32, io::Error> {
+-    if env::var_os("RUSTFMT_LOG").is_some() {
+-        trace("formatting the complete target to preserve formatter logging");
+-        return run_rustfmt(targets, arguments, verbosity);
+-    }
+-
+     if verbosity == Verbosity::Verbose || has_observable_emit_mode(arguments) {
+         trace("falling back to complete formatting for observable output");
+         return run_rustfmt(targets, arguments, verbosity);
+@@ -306,89 +229,21 @@ pub(super) fn format(
+         trace("falling back to complete formatting for an invalid cache path");
+         return run_rustfmt(targets, arguments, verbosity);
+     };
+-    let changed_leaves = plan
+-        .changed_leaves(&changed_roots)
+-        .filter(|leaves| env::join_paths(leaves.iter().map(|leaf| Path::new(&leaf.path))).is_ok());
+-    let requested_modules = changed_leaves.as_ref().map(|leaves| {
+-        leaves
+-            .iter()
+-            .map(|leaf| (PathBuf::from(&leaf.path), leaf.topology.clone()))
+-            .collect::<Vec<_>>()
+-    });
+-    let batch = changed_leaves
+-        .as_ref()
+-        .is_some_and(|leaves| leaves.len() > 1);
+     let mut output = run_rustfmt_with_output(
+         &changed_targets,
+         arguments,
+         verbosity,
+-        if batch {
+-            RustfmtOutputMode::CaptureQuietly
+-        } else {
+-            RustfmtOutputMode::Inherit
+-        },
++        RustfmtOutputMode::Inherit,
+         Some(cache_directory),
+-        requested_modules.as_deref(),
+     )?;
+     if output.status != SUCCESS {
+-        if batch {
+-            trace("reformatting the complete target after an unsuccessful leaf batch");
+-            return run_rustfmt(&changed_targets, arguments, verbosity);
+-        }
+         trace("retaining the previous cache after unsuccessful formatting");
+         return Ok(output.status);
+     }
+ 
+-    if let Some(leaves) = changed_leaves.as_ref() {
+-        if !output.emitted_diagnostics
+-            && read_leaf_certificate(&output.module_manifests, leaves).is_ok()
+-        {
+-            let modules = plan.current.module_graph();
+-            let leaf_graph = plan.current.leaf_graph();
+-            let probes = plan.current.probe_graph();
+-            match Snapshot::capture(
+-                targets,
+-                arguments,
+-                manifest_path,
+-                &modules,
+-                &leaf_graph,
+-                &probes,
+-                None,
+-                Some(&plan.current),
+-            ) {
+-                Ok(updated) if updated == plan.current => {
+-                    trace(&format!(
+-                        "formatted {} unchanged direct leaves",
+-                        leaves.len()
+-                    ));
+-                    if let Err(error) = write_cache(&plan.cache_path, &updated) {
+-                        trace(&format!("could not update the formatting cache: {error}"));
+-                    }
+-                }
+-                Ok(_) => {
+-                    trace("reformatting the complete target after a concurrent descendant edit");
+-                    return run_rustfmt(&changed_targets, arguments, verbosity);
+-                }
+-                Err(error) => {
+-                    trace(&format!(
+-                        "reformatting the complete target after unverifiable leaf inputs: {error}"
+-                    ));
+-                    return run_rustfmt(&changed_targets, arguments, verbosity);
+-                }
+-            }
+-            return Ok(output.status);
+-        }
+-    }
+-
+     let mut discovered = match read_module_manifests(&output.module_manifests, &changed_targets) {
+         Ok(discovered) => discovered,
+         Err(error) => {
+-            if changed_leaves.is_some() {
+-                trace(&format!(
+-                    "reformatting the complete target without an authoritative leaf proof: {error}"
+-                ));
+-                return run_rustfmt(&changed_targets, arguments, verbosity);
+-            }
+             trace(&format!(
+                 "not caching without a complete authoritative module manifest: {error}"
+             ));
+@@ -415,7 +270,6 @@ pub(super) fn format(
+             verbosity,
+             RustfmtOutputMode::Inherit,
+             Some(cache_directory),
+-            None,
+         )?;
+         if output.status != SUCCESS {
+             return Ok(output.status);
+@@ -433,22 +287,11 @@ pub(super) fn format(
+ 
+     let unchanged = discovered.unchanged;
+     let mut modules = plan.current.module_graph();
+-    let mut leaves = plan.current.leaf_graph();
+     let mut probes = plan.current.probe_graph();
+     modules.extend(discovered.modules);
+-    leaves.extend(discovered.leaves);
+     probes.extend(discovered.probes);
+     let check_only = arguments.iter().any(|argument| argument == "--check");
+-    match Snapshot::capture(
+-        targets,
+-        arguments,
+-        manifest_path,
+-        &modules,
+-        &leaves,
+-        &probes,
+-        None,
+-        Some(&plan.current),
+-    ) {
++    match Snapshot::capture(targets, arguments, manifest_path, &modules, &probes, None) {
+         Ok(updated)
+             if plan.can_record(&updated, &changed_roots, check_only || unchanged)
+                 && updated.probe_graph() == probes =>
+@@ -485,31 +328,24 @@ pub(super) fn format(
+                         return Ok(output.status);
+                     }
+                 };
+-            if !discovery_matches(&verification_discovery, &modules, &leaves, &probes) {
++            if !discovery_matches(&verification_discovery, &modules, &probes) {
+                 trace("not caching a module graph changed concurrently with formatting");
+                 return Ok(output.status);
+             }
+ 
+-            let verified = match Snapshot::capture(
+-                targets,
+-                arguments,
+-                manifest_path,
+-                &modules,
+-                &leaves,
+-                &probes,
+-                None,
+-                Some(&updated),
+-            ) {
+-                Ok(verified) if verified == updated => verified,
+-                Ok(_) => {
+-                    trace("not caching files changed concurrently with formatting");
+-                    return Ok(output.status);
+-                }
+-                Err(error) => {
+-                    trace(&format!("could not verify formatted files: {error}"));
+-                    return Ok(output.status);
+-                }
+-            };
++            let verified =
++                match Snapshot::capture(targets, arguments, manifest_path, &modules, &probes, None)
++                {
++                    Ok(verified) if verified == updated => verified,
++                    Ok(_) => {
++                        trace("not caching files changed concurrently with formatting");
++                        return Ok(output.status);
++                    }
++                    Err(error) => {
++                        trace(&format!("could not verify formatted files: {error}"));
++                        return Ok(output.status);
++                    }
++                };
+ 
+             if let Err(error) = write_cache(&plan.cache_path, &verified) {
+                 trace(&format!("could not update the formatting cache: {error}"));
+@@ -522,53 +358,6 @@ pub(super) fn format(
+     Ok(output.status)
+ }
+ 
+-/// Consumes only a regular, exact-root certificate published by the trusted formatter.
+-fn read_leaf_certificate(paths: &[PathBuf], selected: &[ChangedLeaf]) -> io::Result<()> {
+-    let [path] = paths else {
+-        return Err(unsupported(
+-            "an incremental leaf needs exactly one certificate",
+-        ));
+-    };
+-    if !fs::symlink_metadata(path)?.file_type().is_file() {
+-        return Err(unsupported(
+-            "the incremental leaf certificate is not a regular file",
+-        ));
+-    }
+-    let file = File::open(path)?;
+-    let certificate: LeafCertificate = serde_json::from_reader(file).map_err(io::Error::other)?;
+-    if certificate.schema != LEAF_CERTIFICATE_SCHEMA
+-        || certificate.version != LEAF_CERTIFICATE_VERSION
+-        || selected.is_empty()
+-        || selected.iter().any(|leaf| leaf.root != certificate.root)
+-        || certificate.leaves.len() != selected.len()
+-        || certificate
+-            .leaves
+-            .iter()
+-            .zip(selected)
+-            .any(|(proof, leaf)| {
+-                proof.leaf != leaf.path
+-                    || proof.topology != leaf.topology
+-                    || !valid_topology_digest(&proof.topology)
+-                    || !canonical_module_path(&proof.leaf)
+-                        .is_ok_and(|canonical| canonical == Path::new(&proof.leaf))
+-            })
+-        || canonical_module_path(&certificate.root)? != Path::new(&certificate.root)
+-    {
+-        return Err(unsupported(
+-            "the incremental leaf certificate does not match its target",
+-        ));
+-    }
+-    fs::remove_file(path)
+-}
+-
+-/// Accepts only the exact lowercase SHA-256 domain used by the trusted producer.
+-fn valid_topology_digest(digest: &str) -> bool {
+-    digest.len() == 64
+-        && digest
+-            .bytes()
+-            .all(|byte| byte.is_ascii_digit() || matches!(byte, b'a'..=b'f'))
+-}
+-
+ /// Serializes cache discovery, formatting, verification, and publication across processes.
+ fn lock_cache(manifest_path: Option<&Path>) -> io::Result<File> {
+     let directory = cache_directory(manifest_path)?;
+@@ -596,23 +385,14 @@ fn verify_formatted_targets(
+         Verbosity::Quiet,
+         RustfmtOutputMode::CaptureQuietly,
+         Some(manifest_directory),
+-        None,
+     )
+ }
+ 
+ /// Rejects verification graphs whose parsed files or logical resolution probes changed.
+-fn discovery_matches(
+-    discovered: &Discovery,
+-    modules: &ModuleGraph,
+-    leaves: &LeafGraph,
+-    probes: &ProbeGraph,
+-) -> bool {
++fn discovery_matches(discovered: &Discovery, modules: &ModuleGraph, probes: &ProbeGraph) -> bool {
+     discovered.modules.len() == discovered.probes.len()
+-        && discovered.modules.len() == discovered.leaves.len()
+         && discovered.modules.iter().all(|(root, files)| {
+-            modules.get(root) == Some(files)
+-                && discovered.leaves.get(root) == leaves.get(root)
+-                && discovered.probes.get(root) == probes.get(root)
++            modules.get(root) == Some(files) && discovered.probes.get(root) == probes.get(root)
+         })
+ }
+ 
+@@ -664,20 +444,17 @@ impl Plan {
+         if targets.is_empty() {
+             return Err(unsupported("there are no formatter targets to cache"));
+         }
+-        if env::var_os(MODULE_MANIFEST_ENVIRONMENT).is_some()
+-            || env::var_os(CHANGED_MODULE_ENVIRONMENT).is_some()
+-            || env::var_os(MODULE_TOPOLOGY_ENVIRONMENT).is_some()
+-        {
++        if env::var_os(MODULE_MANIFEST_ENVIRONMENT).is_some() {
+             return Err(unsupported(
+-                "an external formatter handoff request cannot be cached safely",
++                "an external module manifest request cannot be cached safely",
+             ));
+         }
+ 
+         let invocation = invocation_key(targets, arguments)?;
+         let directory = cache_directory(manifest_path)?;
+         let cache_path = directory.join(format!("{invocation}.json"));
+-        let previous: Option<Snapshot> = match fs::read(&cache_path) {
+-            Ok(contents) => serde_json::from_slice(&contents).ok(),
++        let previous: Option<Snapshot> = match File::open(&cache_path) {
++            Ok(file) => serde_json::from_reader(BufReader::new(file)).ok(),
+             Err(error) if error.kind() == io::ErrorKind::NotFound => None,
+             Err(error) => return Err(error),
+         };
+@@ -692,19 +469,13 @@ impl Plan {
+             .as_ref()
+             .map(Snapshot::probe_graph)
+             .unwrap_or_default();
+-        let leaves = previous
+-            .as_ref()
+-            .map(Snapshot::leaf_graph)
+-            .unwrap_or_default();
+         let current = match Snapshot::capture(
+             targets,
+             arguments,
+             manifest_path,
+             &modules,
+-            &leaves,
+             &probes,
+             Some(&invocation),
+-            previous.as_ref(),
+         ) {
+             Ok(current) => current,
+             Err(_) if previous.is_some() => {
+@@ -715,10 +486,8 @@ impl Plan {
+                     arguments,
+                     manifest_path,
+                     &ModuleGraph::new(),
+-                    &LeafGraph::new(),
+                     &ProbeGraph::new(),
+                     Some(&invocation),
+-                    None,
+                 )?
+             }
+             Err(error) => return Err(error),
+@@ -804,64 +573,6 @@ impl Plan {
+         }
+     }
+ 
+-    /// Selects verified direct leaves with no alternate owners or source-graph changes.
+-    fn changed_leaves(&self, changed_roots: &BTreeSet<&str>) -> Option<Vec<ChangedLeaf>> {
+-        if changed_roots.len() != 1 {
+-            return None;
+-        }
+-        let previous = self.previous.as_ref()?;
+-        if previous.configuration != self.current.configuration {
+-            return None;
+-        }
+-        let root = (*changed_roots.iter().next()?).to_owned();
+-        let (package_path, current_package) = self
+-            .current
+-            .packages
+-            .iter()
+-            .find(|(_, package)| package.targets.contains_key(&root))?;
+-        let previous_package = previous.packages.get(package_path)?;
+-        let previous_sources = previous_package.targets.get(&root)?;
+-        let current_sources = current_package.targets.get(&root)?;
+-        if previous_sources.len() != current_sources.len()
+-            || previous_package.probes.get(&root) != current_package.probes.get(&root)
+-            || previous_package.leaves.get(&root) != current_package.leaves.get(&root)
+-            || previous_sources.get(&root) != current_sources.get(&root)
+-        {
+-            return None;
+-        }
+-
+-        let changes = current_sources
+-            .iter()
+-            .filter(|(path, fingerprint)| previous_sources.get(*path) != Some(*fingerprint))
+-            .map(|(path, _)| {
+-                if path == &root {
+-                    return None;
+-                }
+-                let topology = previous_package.leaves.get(&root)?.get(path)?.clone();
+-                let owners = self
+-                    .current
+-                    .packages
+-                    .values()
+-                    .flat_map(|package| package.targets.values())
+-                    .filter(|sources| sources.contains_key(path))
+-                    .count();
+-                (owners == 1).then(|| ChangedLeaf {
+-                    root: root.clone(),
+-                    path: path.clone(),
+-                    topology,
+-                })
+-            })
+-            .collect::<Option<Vec<_>>>()?;
+-        // Every selected leaf still validates its crate-root context. Avoid
+-        // batching when too few untouched siblings remain to repay that work.
+-        if changes.is_empty()
+-            || (changes.len() > 1 && current_sources.len() < changes.len().saturating_mul(3))
+-        {
+-            return None;
+-        }
+-        Some(changes)
+-    }
+-
+     /// Rejects concurrent source/configuration changes while allowing newly discovered configs.
+     fn can_record(
+         &self,
+@@ -891,9 +602,6 @@ impl Plan {
+             if package.probes.len() != updated_package.probes.len() {
+                 return false;
+             }
+-            if package.leaves.len() != updated_package.leaves.len() {
+-                return false;
+-            }
+ 
+             package.targets.iter().all(|(target_path, files)| {
+                 let Some(updated_files) = updated_package.targets.get(target_path) else {
+@@ -901,8 +609,6 @@ impl Plan {
+                 };
+                 if !changed_targets.contains(target_path.as_str()) {
+                     return files == updated_files
+-                        && package.leaves.get(target_path)
+-                            == updated_package.leaves.get(target_path)
+                         && package.probes.get(target_path)
+                             == updated_package.probes.get(target_path);
+                 }
+@@ -922,10 +628,8 @@ impl Snapshot {
+         arguments: &[String],
+         manifest_path: Option<&Path>,
+         modules: &ModuleGraph,
+-        leaves: &LeafGraph,
+         probes: &ProbeGraph,
+         invocation: Option<&str>,
+-        previous: Option<&Snapshot>,
+     ) -> io::Result<Self> {
+         let mut packages = BTreeMap::new();
+         let mut file_fingerprints = BTreeMap::new();
+@@ -944,17 +648,6 @@ impl Snapshot {
+                     "an authoritative module graph omits its target root",
+                 ));
+             }
+-            let target_leaves = leaves.get(&target_path).cloned().unwrap_or_default();
+-            if target_leaves.contains_key(&target_path)
+-                || target_leaves.keys().any(|path| !paths.contains(path))
+-                || target_leaves
+-                    .values()
+-                    .any(|digest| !valid_topology_digest(digest))
+-            {
+-                return Err(unsupported(
+-                    "an authoritative leaf graph escapes its formatter target",
+-                ));
+-            }
+ 
+             configuration_directories.insert(target.package_root.clone());
+             let mut sources = BTreeMap::new();
+@@ -963,13 +656,6 @@ impl Snapshot {
+                     Entry::Occupied(entry) => *entry.get(),
+                     Entry::Vacant(entry) => {
+                         let (_, metadata) = canonical_module_file(&path)?;
+-                        observed_probes
+-                            .entry(path.clone())
+-                            .or_insert_with(|| ProbeObservation {
+-                                canonical: Some(path.clone()),
+-                                exists: true,
+-                                is_directory: false,
+-                            });
+                         *entry.insert(SourceFingerprint::from_metadata(&metadata)?)
+                     }
+                 };
+@@ -994,46 +680,27 @@ impl Snapshot {
+                 .entry(package_path)
+                 .or_insert_with(|| PackageSnapshot {
+                     targets: BTreeMap::new(),
+-                    leaves: BTreeMap::new(),
+                     probes: BTreeMap::new(),
+                 });
+             package.targets.insert(target_path.clone(), sources);
+-            package.leaves.insert(target_path.clone(), target_leaves);
+             package.probes.insert(target_path, target_probes);
+         }
+ 
+         let current_directory = env::current_dir()?.canonicalize()?;
+         configuration_directories.insert(current_directory);
+         let mut configuration = BTreeMap::new();
+-        let mut configuration_fingerprints = BTreeMap::new();
+         let mut visited_directories = BTreeSet::new();
+         for directory in configuration_directories {
+             collect_ancestor_configuration(
+                 &directory,
+                 &mut visited_directories,
+                 &mut configuration,
+-                &mut configuration_fingerprints,
+-                previous,
+             )?;
+         }
+-        collect_global_configuration(
+-            &mut configuration,
+-            &mut configuration_fingerprints,
+-            previous,
+-        )?;
+-        collect_explicit_configuration(
+-            arguments,
+-            &mut configuration,
+-            &mut configuration_fingerprints,
+-            previous,
+-        )?;
++        collect_global_configuration(&mut configuration)?;
++        collect_explicit_configuration(arguments, &mut configuration)?;
+         if let Some(path) = manifest_path {
+-            collect_configuration_file_cached(
+-                path,
+-                &mut configuration,
+-                &mut configuration_fingerprints,
+-                previous,
+-            )?;
++            collect_configuration_file(path, &mut configuration)?;
+         }
+ 
+         Ok(Self {
+@@ -1043,7 +710,6 @@ impl Snapshot {
+                 None => invocation_key(targets, arguments)?,
+             },
+             configuration,
+-            configuration_fingerprints,
+             packages,
+         })
+     }
+@@ -1073,18 +739,6 @@ impl Snapshot {
+             })
+             .collect()
+     }
+-
+-    fn leaf_graph(&self) -> LeafGraph {
+-        self.packages
+-            .values()
+-            .flat_map(|package| {
+-                package
+-                    .leaves
+-                    .iter()
+-                    .map(|(target, leaves)| (target.clone(), leaves.clone()))
+-            })
+-            .collect()
+-    }
+ }
+ 
+ /// Fingerprints targets, effective settings, the trusted formatter, and its real compiler driver.
+@@ -1153,7 +807,6 @@ fn read_module_manifests(paths: &[PathBuf], targets: &BTreeSet<Target>) -> io::R
+         .map(|target| path_string(&target.path))
+         .collect::<io::Result<_>>()?;
+     let mut roots = ModuleGraph::new();
+-    let mut leaf_roots = LeafGraph::new();
+     let mut probe_roots = ProbeGraph::new();
+     let mut unchanged = true;
+     for path in paths {
+@@ -1177,9 +830,7 @@ fn read_module_manifests(paths: &[PathBuf], targets: &BTreeSet<Target>) -> io::R
+             canonical_module_path(&root.path)?;
+             let mut files = BTreeSet::new();
+             for path in root.files {
+-                if path != root.path {
+-                    canonical_module_path(&path)?;
+-                }
++                canonical_module_path(&path)?;
+                 if !files.insert(path) {
+                     return Err(unsupported(
+                         "the authoritative module manifest repeats a source file",
+@@ -1188,9 +839,7 @@ fn read_module_manifests(paths: &[PathBuf], targets: &BTreeSet<Target>) -> io::R
+             }
+             let mut dependencies = BTreeSet::new();
+             for path in root.dependencies {
+-                if !files.contains(&path) {
+-                    canonical_module_path(&path)?;
+-                }
++                canonical_module_path(&path)?;
+                 if !dependencies.insert(path) {
+                     return Err(unsupported(
+                         "the authoritative module manifest repeats a parsed dependency",
+@@ -1207,21 +856,8 @@ fn read_module_manifests(paths: &[PathBuf], targets: &BTreeSet<Target>) -> io::R
+                     "the authoritative module manifest omits a formatted dependency",
+                 ));
+             }
+-            let mut leaves = BTreeMap::new();
+-            for (path, topology) in root.leaves {
+-                if path == root.path
+-                    || !files.contains(&path)
+-                    || !valid_topology_digest(&topology)
+-                    || leaves.insert(path, topology).is_some()
+-                {
+-                    return Err(unsupported(
+-                        "the authoritative module manifest has an invalid leaf",
+-                    ));
+-                }
+-            }
+ 
+             let mut observations = BTreeMap::new();
+-            let mut observed_dependencies = BTreeSet::new();
+             for probe in root.probes {
+                 let expected = ProbeObservation {
+                     canonical: probe.canonical,
+@@ -1240,23 +876,23 @@ fn read_module_manifests(paths: &[PathBuf], targets: &BTreeSet<Target>) -> io::R
+                         "an authoritative source probe changed during formatting",
+                     ));
+                 }
+-                if let Some(canonical) = expected.canonical.as_ref() {
+-                    observed_dependencies.insert(canonical.clone());
+-                }
+                 if observations.insert(probe.path, expected).is_some() {
+                     return Err(unsupported(
+                         "the authoritative module manifest repeats a resolution probe",
+                     ));
+                 }
+             }
+-            if !dependencies.is_subset(&observed_dependencies) {
++            if dependencies.iter().any(|dependency| {
++                !observations.values().any(|observation| {
++                    observation.exists && observation.canonical.as_ref() == Some(dependency)
++                })
++            }) {
+                 return Err(unsupported(
+                     "the authoritative module manifest omits a loaded source probe",
+                 ));
+             }
+             files.extend(dependencies);
+             probe_roots.insert(root.path.clone(), observations);
+-            leaf_roots.insert(root.path.clone(), leaves);
+             roots.insert(root.path, files);
+         }
+     }
+@@ -1269,7 +905,6 @@ fn read_module_manifests(paths: &[PathBuf], targets: &BTreeSet<Target>) -> io::R
+ 
+     Ok(Discovery {
+         modules: roots,
+-        leaves: leaf_roots,
+         probes: probe_roots,
+         unchanged,
+     })
+@@ -1335,8 +970,6 @@ fn collect_ancestor_configuration(
+     directory: &Path,
+     visited: &mut BTreeSet<PathBuf>,
+     configuration: &mut BTreeMap<String, String>,
+-    fingerprints: &mut BTreeMap<String, ConfigurationFingerprint>,
+-    previous: Option<&Snapshot>,
+ ) -> io::Result<()> {
+     for ancestor in directory.ancestors() {
+         if visited.contains(ancestor) {
+@@ -1353,12 +986,7 @@ fn collect_ancestor_configuration(
+             ".cargo/config",
+             ".cargo/config.toml",
+         ] {
+-            collect_configuration_file_cached(
+-                &ancestor.join(name),
+-                configuration,
+-                fingerprints,
+-                previous,
+-            )?;
++            collect_configuration_file(&ancestor.join(name), configuration)?;
+         }
+     }
+ 
+@@ -1366,11 +994,7 @@ fn collect_ancestor_configuration(
+ }
+ 
+ /// Includes the home and platform-specific formatter configuration search locations.
+-fn collect_global_configuration(
+-    configuration: &mut BTreeMap<String, String>,
+-    fingerprints: &mut BTreeMap<String, ConfigurationFingerprint>,
+-    previous: Option<&Snapshot>,
+-) -> io::Result<()> {
++fn collect_global_configuration(configuration: &mut BTreeMap<String, String>) -> io::Result<()> {
+     for directory in [
+         dirs::home_dir(),
+         dirs::config_dir().map(|path| path.join("rustfmt")),
+@@ -1379,12 +1003,7 @@ fn collect_global_configuration(
+     .flatten()
+     {
+         for name in [".rustfmt.toml", "rustfmt.toml"] {
+-            collect_configuration_file_cached(
+-                &directory.join(name),
+-                configuration,
+-                fingerprints,
+-                previous,
+-            )?;
++            collect_configuration_file(&directory.join(name), configuration)?;
+         }
+     }
+ 
+@@ -1395,8 +1014,6 @@ fn collect_global_configuration(
+ fn collect_explicit_configuration(
+     arguments: &[String],
+     configuration: &mut BTreeMap<String, String>,
+-    fingerprints: &mut BTreeMap<String, ConfigurationFingerprint>,
+-    previous: Option<&Snapshot>,
+ ) -> io::Result<()> {
+     let mut arguments = arguments.iter();
+     while let Some(argument) = arguments.next() {
+@@ -1411,21 +1028,11 @@ fn collect_explicit_configuration(
+         };
+ 
+         if path.is_dir() {
+-            collect_configuration_file_cached(
+-                &path.join("rustfmt.toml"),
+-                configuration,
+-                fingerprints,
+-                previous,
+-            )?;
+-            collect_configuration_file_cached(
+-                &path.join(".rustfmt.toml"),
+-                configuration,
+-                fingerprints,
+-                previous,
+-            )?;
++            collect_configuration_file(&path.join("rustfmt.toml"), configuration)?;
++            collect_configuration_file(&path.join(".rustfmt.toml"), configuration)?;
+         } else {
+             reject_observable_formatter_configuration(&path)?;
+-            collect_configuration_file_cached(&path, configuration, fingerprints, previous)?;
++            collect_configuration_file(&path, configuration)?;
+         }
+     }
+ 
+@@ -1433,23 +1040,12 @@ fn collect_explicit_configuration(
+ }
+ 
+ /// Hashes existing settings under their logical names so symlink precedence remains visible.
+-#[cfg(test)]
+ fn collect_configuration_file(
+     path: &Path,
+     configuration: &mut BTreeMap<String, String>,
+ ) -> io::Result<()> {
+-    collect_configuration_file_cached(path, configuration, &mut BTreeMap::new(), None)
+-}
+-
+-/// Reuses authenticated configuration digests across consecutive workspace snapshots.
+-fn collect_configuration_file_cached(
+-    path: &Path,
+-    configuration: &mut BTreeMap<String, String>,
+-    fingerprints: &mut BTreeMap<String, ConfigurationFingerprint>,
+-    previous: Option<&Snapshot>,
+-) -> io::Result<()> {
+-    let metadata = match fs::metadata(path) {
+-        Ok(metadata) if metadata.is_file() => metadata,
++    match fs::metadata(path) {
++        Ok(metadata) if metadata.is_file() => {}
+         Ok(_) => return Ok(()),
+         Err(error)
+             if matches!(
+@@ -1460,7 +1056,14 @@ fn collect_configuration_file_cached(
+             return Ok(());
+         }
+         Err(error) => return Err(error),
+-    };
++    }
++
++    if matches!(
++        path.file_name().and_then(|name| name.to_str()),
++        Some("rustfmt.toml" | ".rustfmt.toml")
++    ) {
++        reject_observable_formatter_configuration(path)?;
++    }
+ 
+     // Keep the searched name as well as its canonical destination: rustfmt
+     // gives `.rustfmt.toml` precedence over `rustfmt.toml`, even when both are
+@@ -1474,28 +1077,8 @@ fn collect_configuration_file_cached(
+     if !configuration.contains_key(&key) {
+         let canonical_path = path.canonicalize()?;
+         let canonical = path_string(&canonical_path)?;
+-        let fingerprint = ConfigurationFingerprint::new(canonical.clone(), &metadata)?;
+-        if let Some((digest, _)) = previous
+-            .and_then(|snapshot| {
+-                snapshot
+-                    .configuration
+-                    .get(&key)
+-                    .zip(snapshot.configuration_fingerprints.get(&key))
+-            })
+-            .filter(|(_, previous_fingerprint)| *previous_fingerprint == &fingerprint)
+-        {
+-            configuration.insert(key.clone(), digest.clone());
+-        } else {
+-            if matches!(
+-                path.file_name().and_then(|name| name.to_str()),
+-                Some("rustfmt.toml" | ".rustfmt.toml")
+-            ) {
+-                reject_observable_formatter_configuration(path)?;
+-            }
+-            let digest = hash_configuration_file(&canonical_path)?;
+-            configuration.insert(key.clone(), format!("{canonical}:{digest}"));
+-        }
+-        fingerprints.insert(key, fingerprint);
++        let digest = hash_configuration_file(&canonical_path)?;
++        configuration.insert(key, format!("{canonical}:{digest}"));
+     }
+     Ok(())
+ }
+@@ -1820,8 +1403,7 @@ fn has_observable_emit_mode(arguments: &[String]) -> bool {
+     while let Some(argument) = arguments.next() {
+         if matches!(
+             argument.as_str(),
+-            "--backup"
+-                | "--print-config"
++            "--print-config"
+                 | "--config-help"
+                 | "--help"
+                 | "-h"
+@@ -1914,7 +1496,6 @@ mod tests {
+                 String::from("/workspace/rustfmt.toml"),
+                 String::from("original-config"),
+             )]),
+-            configuration_fingerprints: BTreeMap::new(),
+             packages: files
+                 .iter()
+                 .map(|(package, sources)| {
+@@ -1934,7 +1515,6 @@ mod tests {
+                         String::from(*package),
+                         PackageSnapshot {
+                             targets: BTreeMap::from([(root.clone(), files)]),
+-                            leaves: BTreeMap::from([(root.clone(), BTreeMap::new())]),
+                             probes: BTreeMap::from([(root, BTreeMap::new())]),
+                         },
+                     )
+@@ -1951,15 +1531,6 @@ mod tests {
+         }
+     }
+ 
+-    fn authorize_leaf(snapshot: &mut Snapshot, package: &str, path: &str) {
+-        let root = format!("{package}/src/lib.rs");
+-        if let Some(package) = snapshot.packages.get_mut(package) {
+-            if let Some(leaves) = package.leaves.get_mut(&root) {
+-                leaves.insert(String::from(path), format!("{:064x}", 1));
+-            }
+-        }
+-    }
+-
+     fn target(root: &Path, package: &Path) -> Target {
+         Target {
+             path: root.to_owned(),
+@@ -2106,159 +1677,6 @@ mod tests {
+         );
+     }
+ 
+-    #[test]
+-    fn one_authoritative_direct_leaf_uses_its_real_unchanged_root() {
+-        let package = "/workspace/first";
+-        let leaf = "/workspace/first/src/child.rs";
+-        let mut previous = snapshot(&[(
+-            package,
+-            &[("src/lib.rs", "root"), ("src/child.rs", "before")],
+-        )]);
+-        let mut current = snapshot(&[(
+-            package,
+-            &[("src/lib.rs", "root"), ("src/child.rs", "after")],
+-        )]);
+-        authorize_leaf(&mut previous, package, leaf);
+-        authorize_leaf(&mut current, package, leaf);
+-        let plan = plan(Some(previous), current);
+-
+-        assert_eq!(
+-            plan.changed_leaves(&plan.changed_targets()),
+-            Some(vec![ChangedLeaf {
+-                root: String::from("/workspace/first/src/lib.rs"),
+-                path: String::from(leaf),
+-                topology: format!("{:064x}", 1),
+-            }])
+-        );
+-    }
+-
+-    #[test]
+-    fn multiple_authoritative_direct_leaves_share_one_unchanged_root() {
+-        let package = "/workspace/first";
+-        let first = "/workspace/first/src/first.rs";
+-        let second = "/workspace/first/src/second.rs";
+-        let mut previous = snapshot(&[(
+-            package,
+-            &[
+-                ("src/lib.rs", "root"),
+-                ("src/first.rs", "before"),
+-                ("src/second.rs", "before"),
+-                ("src/unchanged_first.rs", "unchanged"),
+-                ("src/unchanged_second.rs", "unchanged"),
+-                ("src/unchanged_third.rs", "unchanged"),
+-            ],
+-        )]);
+-        let mut current = snapshot(&[(
+-            package,
+-            &[
+-                ("src/lib.rs", "root"),
+-                ("src/first.rs", "after"),
+-                ("src/second.rs", "after"),
+-                ("src/unchanged_first.rs", "unchanged"),
+-                ("src/unchanged_second.rs", "unchanged"),
+-                ("src/unchanged_third.rs", "unchanged"),
+-            ],
+-        )]);
+-        for leaf in [first, second] {
+-            authorize_leaf(&mut previous, package, leaf);
+-            authorize_leaf(&mut current, package, leaf);
+-        }
+-        let plan = plan(Some(previous), current);
+-
+-        assert_eq!(
+-            plan.changed_leaves(&plan.changed_targets()),
+-            Some(vec![
+-                ChangedLeaf {
+-                    root: String::from("/workspace/first/src/lib.rs"),
+-                    path: String::from(first),
+-                    topology: format!("{:064x}", 1),
+-                },
+-                ChangedLeaf {
+-                    root: String::from("/workspace/first/src/lib.rs"),
+-                    path: String::from(second),
+-                    topology: format!("{:064x}", 1),
+-                },
+-            ]),
+-        );
+-    }
+-
+-    #[test]
+-    fn roots_nested_modules_and_uncertified_edits_never_use_leaf_formatting() {
+-        let package = "/workspace/first";
+-        let leaf = "/workspace/first/src/child.rs";
+-        let mut previous = snapshot(&[(
+-            package,
+-            &[
+-                ("src/lib.rs", "root"),
+-                ("src/child.rs", "before"),
+-                ("src/sibling.rs", "unchanged"),
+-            ],
+-        )]);
+-        let mut current = previous.clone();
+-        if let Some(files) = current
+-            .packages
+-            .get_mut(package)
+-            .and_then(|package| package.targets.get_mut("/workspace/first/src/lib.rs"))
+-        {
+-            files.insert(String::from(leaf), fingerprint("after"));
+-        }
+-
+-        assert!(
+-            plan(Some(previous.clone()), current.clone())
+-                .changed_leaves(&BTreeSet::from(["/workspace/first/src/lib.rs"]))
+-                .is_none()
+-        );
+-
+-        authorize_leaf(&mut previous, package, leaf);
+-        authorize_leaf(&mut current, package, leaf);
+-        if let Some(files) = current
+-            .packages
+-            .get_mut(package)
+-            .and_then(|package| package.targets.get_mut("/workspace/first/src/lib.rs"))
+-        {
+-            files.insert(
+-                String::from("/workspace/first/src/sibling.rs"),
+-                fingerprint("also-changed"),
+-            );
+-        }
+-        assert!(
+-            plan(Some(previous), current)
+-                .changed_leaves(&BTreeSet::from(["/workspace/first/src/lib.rs"]))
+-                .is_none()
+-        );
+-    }
+-
+-    #[test]
+-    fn shared_leaf_ownership_and_resolution_changes_disable_leaf_formatting() {
+-        let leaf = "/workspace/shared.rs";
+-        let mut previous = snapshot(&[
+-            (
+-                "/workspace/first",
+-                &[("src/lib.rs", "root"), (leaf, "before")],
+-            ),
+-            (
+-                "/workspace/second",
+-                &[("src/lib.rs", "root"), (leaf, "before")],
+-            ),
+-        ]);
+-        let mut current = snapshot(&[
+-            (
+-                "/workspace/first",
+-                &[("src/lib.rs", "root"), (leaf, "after")],
+-            ),
+-            (
+-                "/workspace/second",
+-                &[("src/lib.rs", "root"), (leaf, "after")],
+-            ),
+-        ]);
+-        for package in ["/workspace/first", "/workspace/second"] {
+-            authorize_leaf(&mut previous, package, leaf);
+-            authorize_leaf(&mut current, package, leaf);
+-        }
+-        let plan = plan(Some(previous), current);
+-        assert!(plan.changed_leaves(&plan.changed_targets()).is_none());
+-    }
+-
+     #[test]
+     fn shared_external_modules_invalidate_every_owning_target() {
+         let previous = snapshot(&[
+@@ -2418,23 +1836,16 @@ mod tests {
+         )]);
+         let discovery = Discovery {
+             modules: modules.clone(),
+-            leaves: LeafGraph::from([(root.clone(), BTreeMap::new())]),
+             probes: probes.clone(),
+             unchanged: true,
+         };
+-        let leaves = discovery.leaves.clone();
+-        assert!(discovery_matches(&discovery, &modules, &leaves, &probes));
++        assert!(discovery_matches(&discovery, &modules, &probes));
+ 
+         let mut changed_modules = discovery.clone();
+         if let Some(files) = changed_modules.modules.get_mut(&root) {
+             files.insert(String::from("/workspace/first/src/replacement.rs"));
+         }
+-        assert!(!discovery_matches(
+-            &changed_modules,
+-            &modules,
+-            &leaves,
+-            &probes
+-        ));
++        assert!(!discovery_matches(&changed_modules, &modules, &probes));
+ 
+         let mut changed_probes = discovery;
+         if let Some(observations) = changed_probes.probes.get_mut(&root) {
+@@ -2447,12 +1858,7 @@ mod tests {
+                 },
+             );
+         }
+-        assert!(!discovery_matches(
+-            &changed_probes,
+-            &modules,
+-            &leaves,
+-            &probes
+-        ));
++        assert!(!discovery_matches(&changed_probes, &modules, &probes));
+     }
+ 
+     #[test]
+@@ -2597,26 +2003,14 @@ mod tests {
+         fs::write(&cargo, "[build]\njobs = 4\n")?;
+ 
+         let mut before = BTreeMap::new();
+-        collect_ancestor_configuration(
+-            &nested,
+-            &mut BTreeSet::new(),
+-            &mut before,
+-            &mut BTreeMap::new(),
+-            None,
+-        )?;
++        collect_ancestor_configuration(&nested, &mut BTreeSet::new(), &mut before)?;
+         assert!(before.contains_key(&path_string(&workspace)?));
+         assert!(before.contains_key(&path_string(&cargo)?));
+ 
+         let local = nested.join(".rustfmt.toml");
+         fs::write(&local, "max_width = 80\n")?;
+         let mut after = BTreeMap::new();
+-        collect_ancestor_configuration(
+-            &nested,
+-            &mut BTreeSet::new(),
+-            &mut after,
+-            &mut BTreeMap::new(),
+-            None,
+-        )?;
++        collect_ancestor_configuration(&nested, &mut BTreeSet::new(), &mut after)?;
+ 
+         assert!(after.contains_key(&path_string(&workspace)?));
+         assert!(after.contains_key(&path_string(&cargo)?));
+@@ -2624,42 +2018,6 @@ mod tests {
+         Ok(())
+     }
+ 
+-    #[test]
+-    fn configuration_digests_are_reused_only_for_unchanged_file_identity() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let configuration = directory.path().join("Cargo.lock");
+-        fs::write(&configuration, "version = 4\n")?;
+-        let key = path_string(&configuration)?;
+-
+-        let mut values = BTreeMap::new();
+-        let mut fingerprints = BTreeMap::new();
+-        collect_configuration_file_cached(&configuration, &mut values, &mut fingerprints, None)?;
+-
+-        let mut previous = snapshot(&[]);
+-        previous.configuration = BTreeMap::from([(key.clone(), String::from("cached-digest"))]);
+-        previous.configuration_fingerprints = fingerprints;
+-
+-        let mut reused = BTreeMap::new();
+-        collect_configuration_file_cached(
+-            &configuration,
+-            &mut reused,
+-            &mut BTreeMap::new(),
+-            Some(&previous),
+-        )?;
+-        assert_eq!(reused.get(&key).map(String::as_str), Some("cached-digest"));
+-
+-        fs::write(&configuration, "version = 400\n")?;
+-        let mut changed = BTreeMap::new();
+-        collect_configuration_file_cached(
+-            &configuration,
+-            &mut changed,
+-            &mut BTreeMap::new(),
+-            Some(&previous),
+-        )?;
+-        assert_ne!(changed.get(&key).map(String::as_str), Some("cached-digest"));
+-        Ok(())
+-    }
+-
+     #[cfg(unix)]
+     #[test]
+     fn configuration_aliases_preserve_precedence_when_swapped() -> io::Result<()> {
+@@ -3059,7 +2417,6 @@ mod tests {
+                 roots: vec![ModuleRoot {
+                     path: path_string(&root)?,
+                     files: vec![path_string(&root)?, path_string(&generated)?],
+-                    leaves: BTreeMap::from([(path_string(&generated)?, format!("{:064x}", 1))]),
+                     dependencies: vec![
+                         path_string(&root)?,
+                         path_string(&generated)?,
+@@ -3117,7 +2474,6 @@ mod tests {
+                 roots: vec![ModuleRoot {
+                     path: path_string(&root)?,
+                     files: vec![],
+-                    leaves: BTreeMap::new(),
+                     dependencies: vec![],
+                     probes: vec![],
+                 }],
+@@ -3142,7 +2498,7 @@ mod tests {
+     #[test]
+     fn legacy_manifests_never_claim_the_formatter_left_sources_unchanged() -> io::Result<()> {
+         let manifest: ModuleManifest =
+-            serde_json::from_str(r#"{"schema":"ohm.rustfmt-files","version":3,"roots":[]}"#)
++            serde_json::from_str(r#"{"schema":"ohm.rustfmt-files","version":4,"roots":[]}"#)
+                 .map_err(io::Error::other)?;
+ 
+         assert!(!manifest.unchanged);
+@@ -3168,7 +2524,6 @@ mod tests {
+                 roots: vec![ModuleRoot {
+                     path: root_path.clone(),
+                     files: vec![root_path.clone(), root_path.clone()],
+-                    leaves: BTreeMap::new(),
+                     dependencies: vec![root_path.clone()],
+                     probes: vec![probe(&root)?],
+                 }],
+@@ -3186,7 +2541,6 @@ mod tests {
+                 roots: vec![ModuleRoot {
+                     path: root_path.clone(),
+                     files: vec![root_path.clone()],
+-                    leaves: BTreeMap::new(),
+                     dependencies: vec![root_path.clone(), root_path.clone()],
+                     probes: vec![probe(&root)?],
+                 }],
+@@ -3198,7 +2552,6 @@ mod tests {
+         let record = ModuleRoot {
+             path: root_path.clone(),
+             files: vec![root_path.clone()],
+-            leaves: BTreeMap::new(),
+             dependencies: vec![root_path],
+             probes: vec![probe(&root)?],
+         };
+@@ -3223,7 +2576,6 @@ mod tests {
+                 roots: vec![ModuleRoot {
+                     path: path_string(&root)?,
+                     files: vec![path_string(&root)?],
+-                    leaves: BTreeMap::new(),
+                     dependencies: vec![path_string(&root)?],
+                     probes: vec![probe(&root)?, probe(&root)?],
+                 }],
+@@ -3250,7 +2602,6 @@ mod tests {
+                 roots: vec![ModuleRoot {
+                     path: path_string(&root)?,
+                     files: vec![String::from("lib.rs")],
+-                    leaves: BTreeMap::new(),
+                     dependencies: vec![path_string(&root)?],
+                     probes: vec![probe(&root)?],
+                 }],
+@@ -3279,7 +2630,6 @@ mod tests {
+                 roots: vec![ModuleRoot {
+                     path: path_string(&root)?,
+                     files: vec![path_string(&root)?, path_string(&module)?],
+-                    leaves: BTreeMap::new(),
+                     dependencies: vec![path_string(&root)?],
+                     probes: vec![probe(&root)?],
+                 }],
+@@ -3307,7 +2657,6 @@ mod tests {
+                 roots: vec![ModuleRoot {
+                     path: path_string(&root)?,
+                     files: vec![path_string(&root)?],
+-                    leaves: BTreeMap::new(),
+                     dependencies: vec![path_string(&root)?],
+                     probes: vec![],
+                 }],
+@@ -3318,62 +2667,6 @@ mod tests {
+         Ok(())
+     }
+ 
+-    #[test]
+-    fn snapshots_preserve_canonical_sources_and_distinct_resolution_probes() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let package = directory.path().canonicalize()?;
+-        let root = package.join("lib.rs");
+-        let module = package.join("module.rs");
+-        let missing = package.join("missing.rs");
+-        let nested = package.join("nested");
+-        fs::write(&root, "mod module;")?;
+-        fs::write(&module, "pub fn module() {}")?;
+-        fs::create_dir(&nested)?;
+-
+-        let root_path = path_string(&root)?;
+-        let module_path = path_string(&module)?;
+-        let mut expected = [&root, &module, &missing]
+-            .into_iter()
+-            .map(|path| {
+-                let path = path_string(path)?;
+-                Ok((path.clone(), observe_module_probe(&path)?))
+-            })
+-            .collect::<io::Result<BTreeMap<_, _>>>()?;
+-        let logical = path_string(&nested.join("..").join("module.rs"))?;
+-        expected.insert(logical.clone(), observe_module_probe(&logical)?);
+-
+-        #[cfg(unix)]
+-        {
+-            let alias = package.join("alias.rs");
+-            std::os::unix::fs::symlink(&module, &alias)?;
+-            let alias = path_string(&alias)?;
+-            expected.insert(alias.clone(), observe_module_probe(&alias)?);
+-        }
+-
+-        let snapshot = Snapshot::capture(
+-            &BTreeSet::from([target(&root, &package)]),
+-            &[],
+-            None,
+-            &ModuleGraph::from([(
+-                root_path.clone(),
+-                BTreeSet::from([root_path.clone(), module_path]),
+-            )]),
+-            &LeafGraph::new(),
+-            &ProbeGraph::from([(root_path.clone(), expected.clone())]),
+-            Some("canonical-source-probes"),
+-            None,
+-        )?;
+-
+-        assert_eq!(
+-            snapshot
+-                .packages
+-                .get(&path_string(&package)?)
+-                .and_then(|package| package.probes.get(&root_path)),
+-            Some(&expected),
+-        );
+-        Ok(())
+-    }
+-
+     #[test]
+     fn resolution_probes_track_existing_and_missing_directories() -> io::Result<()> {
+         let directory = tempfile::tempdir()?;
+@@ -3467,7 +2760,6 @@ mod tests {
+             String::from("stdout"),
+         ]));
+         assert!(has_observable_emit_mode(&[String::from("--emit=json")]));
+-        assert!(has_observable_emit_mode(&[String::from("--backup")]));
+         assert!(has_observable_emit_mode(&[String::from("-v")]));
+         assert!(has_observable_emit_mode(&[String::from("-lv")]));
+         assert!(has_observable_emit_mode(&[String::from("-lV")]));
+diff --git a/src/cargo-fmt/main.rs b/src/cargo-fmt/main.rs
+index a965ad9d0d1328be9a6fd5501c4cac4437b3fdb5..f0e044bb7dfd23b6b74f3e80c4dd4004273acebc 100644
+--- a/src/cargo-fmt/main.rs
++++ b/src/cargo-fmt/main.rs
+@@ -176,13 +176,7 @@ fn rustfmt_command() -> Command {
+     };
+ 
+     let mut command = Command::new(rustfmt);
+-    for variable in [
+-        "OHM_RUSTFMT_MODULE_MANIFEST",
+-        "OHM_RUSTFMT_CHANGED_MODULE",
+-        "OHM_RUSTFMT_MODULE_TOPOLOGY",
+-    ] {
+-        command.env_remove(variable);
+-    }
++    command.env_remove("OHM_RUSTFMT_MODULE_MANIFEST");
+     command
+ }
+ 
+@@ -539,7 +533,6 @@ fn run_rustfmt(
+         verbosity,
+         RustfmtOutputMode::Inherit,
+         None,
+-        None,
+     )?
+     .status)
+ }
+@@ -565,7 +558,6 @@ fn run_rustfmt_with_output(
+     verbosity: Verbosity,
+     output_mode: RustfmtOutputMode,
+     manifest_directory: Option<&Path>,
+-    changed_modules: Option<&[(PathBuf, String)]>,
+ ) -> Result<RustfmtOutput, io::Error> {
+     let by_edition = targets
+         .iter()
+@@ -619,17 +611,6 @@ fn run_rustfmt_with_output(
+             command.env("OHM_RUSTFMT_MODULE_MANIFEST", &manifest);
+             module_manifests.push(manifest);
+         }
+-        if let Some(modules) = changed_modules {
+-            let paths =
+-                env::join_paths(modules.iter().map(|(path, _)| path)).map_err(io::Error::other)?;
+-            let topologies = modules
+-                .iter()
+-                .map(|(_, topology)| topology.as_str())
+-                .collect::<Vec<_>>()
+-                .join(",");
+-            command.env("OHM_RUSTFMT_CHANGED_MODULE", paths);
+-            command.env("OHM_RUSTFMT_MODULE_TOPOLOGY", topologies);
+-        }
+         if output_mode != RustfmtOutputMode::Inherit {
+             command.stderr(std::process::Stdio::piped());
+         }
+diff --git a/src/formatting.rs b/src/formatting.rs
+index 32669cff73242827219088c17f4e5d99cfe4ddde..1c349bff870b4edf928aded7c85fff05e7caf169 100644
+--- a/src/formatting.rs
++++ b/src/formatting.rs
+@@ -1,8 +1,6 @@
+ // High level formatting functions.
+ 
+-use std::borrow::Cow;
+ use std::collections::HashMap;
+-use std::fs;
+ use std::io::{self, Write};
+ use std::path::Path;
+ use std::time::{Duration, Instant};
+@@ -57,187 +55,6 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+             })
+         })
+     }
+-
+-    /// Preserves root attributes and configuration while formatting one known leaf.
+-    pub(crate) fn format_leaf_input(
+-        &mut self,
+-        root: &Path,
+-        leaf: &Path,
+-        expected_topology: Option<&str>,
+-    ) -> Result<Option<(FormatReport, String, bool)>, ErrorKind> {
+-        if !self.config.version_meets_requirement() {
+-            return Err(ErrorKind::VersionMismatch);
+-        }
+-        if self.config.disable_all_formatting() {
+-            return Ok(None);
+-        }
+-
+-        rustc_span::create_session_if_not_set_then(self.config.edition().into(), |_| {
+-            let configuration = self.config.clone();
+-            let report = format_leaf_project(root, leaf, expected_topology, &configuration, self)?;
+-            if let Some((report, _, _)) = report.as_ref() {
+-                self.errors.add(&report.internal.borrow().1);
+-            }
+-            Ok(report)
+-        })
+-    }
+-}
+-
+-/// Parses the real root and selected module without traversing unrelated siblings.
+-fn format_leaf_project<T: FormatHandler>(
+-    root: &Path,
+-    leaf: &Path,
+-    expected_topology: Option<&str>,
+-    config: &Config,
+-    handler: &mut T,
+-) -> Result<Option<(FormatReport, String, bool)>, ErrorKind> {
+-    if !preflight_direct_module(root, leaf, expected_topology, config)? {
+-        return Ok(None);
+-    }
+-
+-    let psess = ParseSess::new(config, false)?;
+-    let mut report = FormatReport::new();
+-    let krate = match Parser::parse_crate(Input::File(root.to_owned()), &psess) {
+-        Ok(krate) => krate,
+-        Err(_) => {
+-            report.add_parsing_error();
+-            return Ok(Some((report, String::new(), psess.emitted_diagnostics())));
+-        }
+-    };
+-    let (attributes, items, span) =
+-        match Parser::parse_file_as_module(&psess, leaf, krate.spans.inner_span) {
+-            Ok(module) => module,
+-            Err(_) => {
+-                report.add_parsing_error();
+-                return Ok(Some((report, String::new(), psess.emitted_diagnostics())));
+-            }
+-        };
+-    let module = Module::new(
+-        span,
+-        Some(Cow::Owned(ast::ModKind::Unloaded)),
+-        Cow::Owned(items),
+-        Cow::Owned(attributes),
+-    );
+-    let Some(topology) = direct_root_module_topology(&krate, root, leaf, &module) else {
+-        return Ok(None);
+-    };
+-    if expected_topology != Some(topology.as_str()) {
+-        return Ok(None);
+-    }
+-
+-    let root_file = FileName::Real(root.to_owned());
+-    let leaf_file = FileName::Real(leaf.to_owned());
+-    let mut context = FormatContext::new(&krate, report, psess, config, handler);
+-    if should_skip_module(config, &context, false, &root_file, &leaf_file, &module) {
+-        return Ok(None);
+-    }
+-
+-    context.psess.set_silent_emitter();
+-    if !context.format_file(leaf_file, &module, false, true)? {
+-        return Ok(None);
+-    }
+-    let emitted_diagnostics = context.psess.emitted_diagnostics();
+-    Ok(Some((context.report, topology, emitted_diagnostics)))
+-}
+-
+-/// Checks speculative ownership without writing files or duplicating parser diagnostics.
+-fn preflight_direct_module(
+-    root: &Path,
+-    leaf: &Path,
+-    expected_topology: Option<&str>,
+-    config: &Config,
+-) -> Result<bool, ErrorKind> {
+-    let mut configuration = config.clone();
+-    configuration.set().show_parse_errors(false);
+-    let psess = ParseSess::new(&configuration, false)?;
+-    let Ok(krate) = Parser::parse_crate(Input::File(root.to_owned()), &psess) else {
+-        return Ok(false);
+-    };
+-    let Ok((attributes, items, span)) =
+-        Parser::parse_file_as_module(&psess, leaf, krate.spans.inner_span)
+-    else {
+-        return Ok(false);
+-    };
+-    if psess.emitted_diagnostics() {
+-        return Ok(false);
+-    }
+-
+-    let module = Module::new(
+-        span,
+-        Some(Cow::Owned(ast::ModKind::Unloaded)),
+-        Cow::Owned(items),
+-        Cow::Owned(attributes),
+-    );
+-    Ok(direct_root_module_topology(&krate, root, leaf, &module).as_deref() == expected_topology)
+-}
+-
+-/// Requires an unannotated direct declaration with ordinary, unambiguous ownership.
+-fn direct_root_module_topology(
+-    krate: &ast::Crate,
+-    root: &Path,
+-    leaf: &Path,
+-    module: &Module<'_>,
+-) -> Option<String> {
+-    let directory = root.parent()?;
+-    let parent = leaf.parent()?;
+-    let filename = leaf.file_name()?.to_str()?;
+-    let module_name = if filename == "mod.rs" {
+-        if parent.parent()? != directory {
+-            return None;
+-        }
+-        parent.file_name()?.to_str()?
+-    } else {
+-        if parent != directory {
+-            return None;
+-        }
+-        filename.strip_suffix(".rs")?
+-    };
+-    let canonical_directory = directory.canonicalize().ok()?;
+-    let canonical_leaf = leaf.canonicalize().ok()?;
+-
+-    let direct = krate.items.iter().any(|item| {
+-        if !item.attrs.is_empty() {
+-            return false;
+-        }
+-        let ast::ItemKind::Mod(_, _, kind) = &item.kind else {
+-            return false;
+-        };
+-        if !matches!(kind, ast::ModKind::Unloaded) {
+-            return false;
+-        }
+-        let Some(name) = item.kind.ident() else {
+-            return false;
+-        };
+-        if name.to_string() != module_name {
+-            return false;
+-        }
+-        let filename = format!("{name}.rs");
+-        let module_directory = name.to_string();
+-        let candidates = [
+-            (
+-                directory.join(&filename),
+-                canonical_directory.join(&filename),
+-            ),
+-            (
+-                directory.join(&module_directory).join("mod.rs"),
+-                canonical_directory.join(&module_directory).join("mod.rs"),
+-            ),
+-        ];
+-        let matches = candidates
+-            .iter()
+-            .filter_map(|(candidate, logical)| {
+-                candidate
+-                    .canonicalize()
+-                    .ok()
+-                    .map(|canonical| (logical, canonical))
+-            })
+-            .collect::<Vec<_>>();
+-        matches.len() == 1
+-            && matches.first().is_some_and(|(logical, canonical)| {
+-                logical.as_path() == canonical.as_path() && canonical == &canonical_leaf
+-            })
+-    });
+-    direct.then(|| modules::module_topology(module)).flatten()
+ }
+ 
+ /// Determine if a module should be skipped. True if the module should be skipped, false otherwise.
+@@ -334,12 +151,6 @@ fn format_project<T: FormatHandler>(
+     context.handler.record_module_graph(
+         &main_file,
+         files.iter().map(|(path, _)| path),
+-        files.iter().filter_map(|(file, module)| {
+-            let (FileName::Real(root), FileName::Real(path)) = (&main_file, file) else {
+-                return None;
+-            };
+-            direct_root_module_topology(&krate, root, path, module).map(|topology| (file, topology))
+-        }),
+         loaded_sources.iter().map(|source| match &source.name {
+             rustc_span::FileName::Real(path) => path.local_path(),
+             _ => None,
+@@ -358,7 +169,7 @@ fn format_project<T: FormatHandler>(
+             return echo_back_stdin(context.psess.snippet_provider(module.span).entire_snippet());
+         }
+         should_emit_verbose(input_is_stdin, config, || println!("Formatting {}", path));
+-        context.format_file(path, &module, is_macro_def, false)?;
++        context.format_file(path, &module, is_macro_def)?;
+     }
+     timer = timer.done_formatting();
+ 
+@@ -412,8 +223,7 @@ impl<'a, T: FormatHandler + 'a> FormatContext<'a, T> {
+         path: FileName,
+         module: &Module<'_>,
+         is_macro_def: bool,
+-        require_unchanged: bool,
+-    ) -> Result<bool, ErrorKind> {
++    ) -> Result<(), ErrorKind> {
+         let snippet_provider = self.psess.snippet_provider(module.span);
+         let mut visitor = FmtVisitor::from_psess(
+             &self.psess,
+@@ -459,32 +269,6 @@ impl<'a, T: FormatHandler + 'a> FormatContext<'a, T> {
+             snippet_provider.entire_snippet(),
+         );
+ 
+-        if require_unchanged {
+-            let errors = &self.report.internal.borrow().1;
+-            let has_visible_errors = errors.has_operational_errors
+-                || errors.has_parsing_errors
+-                || errors.has_formatting_errors
+-                || errors.has_check_errors
+-                || errors.has_diff
+-                || errors.has_unformatted_code_errors;
+-            let unchanged = if self.config.newline_style() == NewlineStyle::Auto {
+-                self.psess
+-                    .get_original_snippet(&path)
+-                    .map(|original| original.as_str() == visitor.buffer.as_str())
+-            } else {
+-                None
+-            }
+-            .unwrap_or_else(|| match &path {
+-                FileName::Real(path) => {
+-                    fs::read_to_string(path).is_ok_and(|original| original == visitor.buffer)
+-                }
+-                FileName::Stdin => false,
+-            });
+-            if has_visible_errors || self.psess.emitted_diagnostics() || !unchanged {
+-                return Ok(false);
+-            }
+-        }
+-
+         if visitor.macro_rewrite_failure {
+             self.report.add_macro_format_failure();
+         }
+@@ -496,8 +280,7 @@ impl<'a, T: FormatHandler + 'a> FormatContext<'a, T> {
+             path,
+             visitor.buffer.to_owned(),
+             &mut self.report,
+-        )?;
+-        Ok(true)
++        )
+     }
+ }
+ 
+@@ -506,15 +289,14 @@ trait FormatHandler {
+     /// Enables native filesystem recording only for callers requesting an authoritative graph.
+     fn module_graph_enabled(&self) -> bool;
+ 
+-    /// Remembers parser diagnostics that were visible during this formatter invocation.
++    /// Remembers parser diagnostics visible during this formatter invocation.
+     fn record_visible_diagnostics(&mut self);
+ 
+     /// Reports formatted files separately from all parser-loaded sources and resolver probes.
+-    fn record_module_graph<'a, 'l, 'd>(
++    fn record_module_graph<'a, 'd>(
+         &mut self,
+         root: &FileName,
+         files: impl Iterator<Item = &'a FileName>,
+-        leaves: impl Iterator<Item = (&'l FileName, String)>,
+         dependencies: impl Iterator<Item = Option<&'d Path>>,
+         probes: Option<Vec<FileProbe>>,
+     );
+@@ -537,15 +319,14 @@ impl<'b, T: Write + 'b> FormatHandler for Session<'b, T> {
+         Session::record_visible_diagnostics(self);
+     }
+ 
+-    fn record_module_graph<'a, 'l, 'd>(
++    fn record_module_graph<'a, 'd>(
+         &mut self,
+         root: &FileName,
+         files: impl Iterator<Item = &'a FileName>,
+-        leaves: impl Iterator<Item = (&'l FileName, String)>,
+         dependencies: impl Iterator<Item = Option<&'d Path>>,
+         probes: Option<Vec<FileProbe>>,
+     ) {
+-        Session::record_module_graph(self, root, files, leaves, dependencies, probes);
++        Session::record_module_graph(self, root, files, dependencies, probes);
+     }
+ 
+     // Called for each formatted file.
+diff --git a/src/lib.rs b/src/lib.rs
+index 17c7bc796cb53313904ed2bbde0475f749faf7f4..4da5f8dfeba28cdc357243042d2bc3b4f725477f 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -447,7 +447,6 @@ pub struct Session<'b, T: Write> {
+     source_file: SourceFile,
+     emitter: Box<dyn Emitter + 'b>,
+     module_graph: Option<ResolvedModuleGraph>,
+-    unchanged_leaves: BTreeSet<(PathBuf, PathBuf, String)>,
+     rewritten_sources: bool,
+     emitted_diagnostics: bool,
+ }
+@@ -462,7 +461,6 @@ struct ResolvedModuleGraph {
+ #[derive(Default)]
+ struct ResolvedRootFiles {
+     files: BTreeSet<PathBuf>,
+-    leaves: BTreeMap<PathBuf, String>,
+     dependencies: BTreeSet<PathBuf>,
+     probes: BTreeMap<PathBuf, FileProbe>,
+ }
+@@ -480,26 +478,10 @@ struct ModuleGraphManifest<'a> {
+ struct ModuleGraphRoot<'a> {
+     path: &'a Path,
+     files: Vec<&'a Path>,
+-    leaves: BTreeMap<&'a Path, &'a str>,
+     dependencies: Vec<&'a Path>,
+     probes: Vec<&'a FileProbe>,
+ }
+ 
+-/// Authorizes a no-rewrite leaf run without pretending to rediscover its siblings.
+-#[derive(serde::Serialize)]
+-struct LeafFormatCertificate<'a> {
+-    schema: &'static str,
+-    version: u32,
+-    root: &'a Path,
+-    leaves: Vec<CertifiedModule<'a>>,
+-}
+-
+-#[derive(serde::Serialize)]
+-struct CertifiedModule<'a> {
+-    leaf: &'a Path,
+-    topology: &'a str,
+-}
+-
+ /// Rejects unresolved and non-UTF-8 paths that cannot be represented in a cache manifest.
+ fn canonical_graph_path(path: &Path) -> Option<PathBuf> {
+     let canonical = path.canonicalize().ok()?;
+@@ -530,7 +512,6 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+             errors: ReportedErrors::default(),
+             source_file: SourceFile::new(),
+             module_graph: None,
+-            unchanged_leaves: BTreeSet::new(),
+             rewritten_sources: false,
+             emitted_diagnostics: false,
+         }
+@@ -539,65 +520,9 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+     /// The main entry point for Rustfmt. Formats the given input according to the
+     /// given config. `out` is only necessary if required by the configuration.
+     pub fn format(&mut self, input: Input) -> Result<FormatReport, ErrorKind> {
+-        self.unchanged_leaves.clear();
+         self.format_input_inner(input, false)
+     }
+ 
+-    /// Formats one previously resolved leaf while retaining its actual crate-root context.
+-    #[doc(hidden)]
+-    pub fn format_leaf(
+-        &mut self,
+-        root: &Path,
+-        leaf: &Path,
+-    ) -> Result<Option<FormatReport>, ErrorKind> {
+-        self.format_module(root, leaf, &modules::empty_module_topology())
+-    }
+-
+-    /// Formats one direct module only while its authoritative descendant topology matches.
+-    #[doc(hidden)]
+-    pub fn format_module(
+-        &mut self,
+-        root: &Path,
+-        module: &Path,
+-        expected_topology: &str,
+-    ) -> Result<Option<FormatReport>, ErrorKind> {
+-        match root.canonicalize().ok().zip(module.canonicalize().ok()) {
+-            Some((root, module)) => {
+-                self.unchanged_leaves
+-                    .retain(|(previous_root, previous_module, _)| {
+-                        previous_root != &root || previous_module != &module
+-                    })
+-            }
+-            None => self.unchanged_leaves.clear(),
+-        }
+-        let original = fs::read(module).ok();
+-        let report = self.format_leaf_input(root, module, Some(expected_topology))?;
+-        if report
+-            .as_ref()
+-            .is_some_and(|(_, _, emitted_diagnostics)| *emitted_diagnostics)
+-        {
+-            self.record_visible_diagnostics();
+-        }
+-        if report
+-            .as_ref()
+-            .is_some_and(|(_, _, emitted_diagnostics)| !emitted_diagnostics)
+-            && self.has_no_visible_errors()
+-            && original
+-                .is_some_and(|original| fs::read(module).is_ok_and(|result| result == original))
+-        {
+-            if let Some(unchanged) = root
+-                .canonicalize()
+-                .ok()
+-                .zip(module.canonicalize().ok())
+-                .zip(report.as_ref().map(|(_, topology, _)| topology.clone()))
+-                .map(|((root, module), topology)| (root, module, topology))
+-            {
+-                self.unchanged_leaves.insert(unchanged);
+-            }
+-        }
+-        Ok(report.map(|(report, _, _)| report))
+-    }
+-
+     /// Enables opt-in collection of the exact files selected for each input.
+     #[doc(hidden)]
+     pub fn enable_module_graph(&mut self) {
+@@ -615,11 +540,10 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+     ///
+     /// Any incomplete source, missing dependency probe, or conflicting observation disables
+     /// manifest publication for the entire formatter invocation.
+-    pub(crate) fn record_module_graph<'a, 'l, 'd>(
++    pub(crate) fn record_module_graph<'a, 'd>(
+         &mut self,
+         root: &FileName,
+         files: impl Iterator<Item = &'a FileName>,
+-        leaves: impl Iterator<Item = (&'l FileName, String)>,
+         dependencies: impl Iterator<Item = Option<&'d Path>>,
+         probes: Option<Vec<FileProbe>>,
+     ) {
+@@ -641,16 +565,6 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+             graph.complete = false;
+             return;
+         };
+-        let Some(resolved_leaves) = leaves
+-            .map(|(file, topology)| match file {
+-                FileName::Real(path) => canonical_graph_path(path).map(|path| (path, topology)),
+-                _ => None,
+-            })
+-            .collect::<Option<BTreeMap<_, _>>>()
+-        else {
+-            graph.complete = false;
+-            return;
+-        };
+         let Some(loaded_dependencies) = canonical_graph_paths(dependencies) else {
+             graph.complete = false;
+             return;
+@@ -685,9 +599,6 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+         }
+ 
+         if !resolved_files.contains(&root)
+-            || resolved_leaves
+-                .keys()
+-                .any(|path| !resolved_files.contains(path))
+             || !resolved_files.is_subset(&loaded_dependencies)
+             || !loaded_dependencies.is_subset(&observed_dependencies)
+         {
+@@ -696,7 +607,6 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+         }
+         let resolved = graph.roots.entry(root).or_default();
+         resolved.files.extend(resolved_files);
+-        resolved.leaves.extend(resolved_leaves);
+         resolved.dependencies.extend(loaded_dependencies);
+         for (path, probe) in resolved_probes {
+             if let Some(previous) = resolved.probes.insert(path, probe.clone()) {
+@@ -732,7 +642,7 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+ 
+         let manifest = ModuleGraphManifest {
+             schema: "ohm.rustfmt-files",
+-            version: 3,
++            version: 4,
+             unchanged: !self.rewritten_sources,
+             roots: graph
+                 .roots
+@@ -740,76 +650,25 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+                 .map(|(root, resolved)| ModuleGraphRoot {
+                     path: root,
+                     files: resolved.files.iter().map(PathBuf::as_path).collect(),
+-                    leaves: resolved
+-                        .leaves
+-                        .iter()
+-                        .map(|(path, topology)| (path.as_path(), topology.as_str()))
+-                        .collect(),
+                     dependencies: resolved.dependencies.iter().map(PathBuf::as_path).collect(),
+                     probes: resolved.probes.values().collect(),
+                 })
+                 .collect(),
+         };
+-        write_authoritative_manifest(path, &manifest)
+-    }
+-
+-    /// Publishes proof that a context-preserving leaf was already correctly formatted.
+-    #[doc(hidden)]
+-    pub fn write_leaf_certificate(
+-        &self,
+-        path: &Path,
+-        root: &Path,
+-        leaf: &Path,
+-        topology: &str,
+-    ) -> io::Result<()> {
+-        self.write_leaf_certificates(path, root, &[(leaf.to_owned(), String::from(topology))])
+-    }
+-
+-    /// Publishes proof only for previously certified, distinct leaves of the exact root.
+-    #[doc(hidden)]
+-    pub fn write_leaf_certificates(
+-        &self,
+-        path: &Path,
+-        root: &Path,
+-        leaves: &[(PathBuf, String)],
+-    ) -> io::Result<()> {
+-        if self.emitted_diagnostics || !self.has_no_visible_errors() {
+-            return Err(io::Error::other(
+-                "the incremental leaf format was not clean",
+-            ));
++        let temporary = path.with_extension(format!("{}.tmp", std::process::id()));
++        let mut file = OpenOptions::new()
++            .write(true)
++            .create_new(true)
++            .open(&temporary)?;
++        let result = (|| {
++            serde_json::to_writer(&mut file, &manifest).map_err(io::Error::other)?;
++            file.flush()?;
++            fs::rename(&temporary, path)
++        })();
++        if result.is_err() {
++            let _ = fs::remove_file(&temporary);
+         }
+-        let root = root.canonicalize()?;
+-        let mut canonical = Vec::with_capacity(leaves.len());
+-        let mut unique = BTreeSet::new();
+-        for (leaf, topology) in leaves {
+-            let leaf = leaf.canonicalize()?;
+-            if root == leaf
+-                || !unique.insert(leaf.clone())
+-                || !self
+-                    .unchanged_leaves
+-                    .contains(&(root.clone(), leaf.clone(), topology.clone()))
+-            {
+-                return Err(io::Error::other(
+-                    "the incremental leaf was not proven unchanged",
+-                ));
+-            }
+-            canonical.push((leaf, topology));
+-        }
+-        if canonical.is_empty() {
+-            return Err(io::Error::other("the incremental leaf batch is empty"));
+-        }
+-        write_authoritative_manifest(
+-            path,
+-            &LeafFormatCertificate {
+-                schema: "ohm.rustfmt-leaf",
+-                version: 3,
+-                root: &root,
+-                leaves: canonical
+-                    .iter()
+-                    .map(|(leaf, topology)| CertifiedModule { leaf, topology })
+-                    .collect(),
+-            },
+-        )
++        result
+     }
+ 
+     pub fn override_config<F, U>(&mut self, mut config: Config, f: F) -> U
+@@ -850,8 +709,6 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+         self.errors.has_unformatted_code_errors
+     }
+ 
+-    /// Excludes silent macro-rewrite fallbacks, matching rustfmt's public success status.
+-    #[doc(hidden)]
+     pub fn has_no_visible_errors(&self) -> bool {
+         !(self.has_operational_errors()
+             || self.has_parsing_errors()
+@@ -878,25 +735,6 @@ impl<'b, T: Write + 'b> Session<'b, T> {
+     }
+ }
+ 
+-/// Publishes private formatter handoffs through a same-directory atomic rename.
+-fn write_authoritative_manifest<T: serde::Serialize>(path: &Path, manifest: &T) -> io::Result<()> {
+-    let temporary = path.with_extension(format!("{}.tmp", std::process::id()));
+-    let mut file = OpenOptions::new()
+-        .write(true)
+-        .create_new(true)
+-        .open(&temporary)?;
+-    let result = (|| {
+-        let contents = serde_json::to_vec(&manifest).map_err(io::Error::other)?;
+-        file.write_all(&contents)?;
+-        file.flush()?;
+-        fs::rename(&temporary, path)
+-    })();
+-    if result.is_err() {
+-        let _ = fs::remove_file(&temporary);
+-    }
+-    result
+-}
+-
+ pub(crate) fn create_emitter<'a>(config: &Config) -> Box<dyn Emitter + 'a> {
+     match config.emit_mode() {
+         EmitMode::Files if config.make_backup() => {
+@@ -981,9 +819,6 @@ mod unit_tests {
+                 FileName::Real(second_root.clone()),
+             ]
+             .iter(),
+-            [FileName::Real(shared_module.clone())]
+-                .iter()
+-                .map(|path| (path, modules::empty_module_topology())),
+             [&second_root, &shared_module]
+                 .into_iter()
+                 .map(|path| Some(path.as_path())),
+@@ -1009,9 +844,6 @@ mod unit_tests {
+                 FileName::Real(first_root.clone()),
+             ]
+             .iter(),
+-            [FileName::Real(shared_module.clone())]
+-                .iter()
+-                .map(|path| (path, modules::empty_module_topology())),
+             [&first_root, &shared_module]
+                 .into_iter()
+                 .map(|path| Some(path.as_path())),
+@@ -1037,7 +869,7 @@ mod unit_tests {
+             serde_json::from_slice(&fs::read(manifest_path)?).map_err(io::Error::other)?;
+ 
+         assert_eq!(manifest["schema"], "ohm.rustfmt-files");
+-        assert_eq!(manifest["version"], 3);
++        assert_eq!(manifest["version"], 4);
+         assert_eq!(manifest["unchanged"], true);
+         assert_eq!(
+             manifest["roots"][0]["path"],
+@@ -1053,12 +885,6 @@ mod unit_tests {
+                 .map(Vec::len),
+             Some(2)
+         );
+-        assert_eq!(
+-            manifest["roots"][0]["leaves"]
+-                .as_object()
+-                .map(serde_json::Map::len),
+-            Some(1)
+-        );
+         assert_eq!(
+             manifest["roots"][0]["probes"].as_array().map(Vec::len),
+             Some(2)
+@@ -1155,461 +981,6 @@ mod unit_tests {
+         Ok(())
+     }
+ 
+-    #[test]
+-    fn direct_leaf_formatting_preserves_crate_root_skip_attributes() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let leaf = directory.path().join("child.rs");
+-        fs::write(&root, "#![rustfmt::skip::macros(example)]\nmod child;\n")?;
+-        let source = "fn child() {\n    example!( a,     b );\n}\n";
+-        fs::write(&leaf, source)?;
+-
+-        let mut configuration = Config::default();
+-        configuration.set().emit_mode(EmitMode::Files);
+-        let mut output = Vec::new();
+-        let mut session = Session::new(configuration, Some(&mut output));
+-        let report = session
+-            .format_leaf(&root, &leaf)
+-            .map_err(io::Error::other)?;
+-
+-        assert!(report.is_some());
+-        assert!(session.has_no_errors());
+-        assert_eq!(fs::read_to_string(&leaf)?, source);
+-        let certificate = directory.path().join("leaf.json");
+-        session.write_leaf_certificate(
+-            &certificate,
+-            &root,
+-            &leaf,
+-            &modules::empty_module_topology(),
+-        )?;
+-        let certificate: serde_json::Value =
+-            serde_json::from_slice(&fs::read(certificate)?).map_err(io::Error::other)?;
+-        assert_eq!(certificate["schema"], "ohm.rustfmt-leaf");
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn multiple_certified_leaves_require_independent_proofs() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let first = directory.path().join("first.rs");
+-        let second = directory.path().join("second.rs");
+-        fs::write(&root, "mod first;\nmod second;\n")?;
+-        fs::write(&first, "fn first() {}\n")?;
+-        fs::write(&second, "fn second() {}\n")?;
+-
+-        let mut output = Vec::new();
+-        let mut session = Session::new(Config::default(), Some(&mut output));
+-        for leaf in [&first, &second] {
+-            assert!(
+-                session
+-                    .format_leaf(&root, leaf)
+-                    .map_err(io::Error::other)?
+-                    .is_some()
+-            );
+-        }
+-        let topology = modules::empty_module_topology();
+-        let leaves = vec![
+-            (first.clone(), topology.clone()),
+-            (second.clone(), topology.clone()),
+-        ];
+-        let certificate_path = directory.path().join("leaves.json");
+-        session.write_leaf_certificates(&certificate_path, &root, &leaves)?;
+-        let certificate: serde_json::Value =
+-            serde_json::from_slice(&fs::read(&certificate_path)?).map_err(io::Error::other)?;
+-        assert_eq!(certificate["version"], 3);
+-        assert_eq!(certificate["leaves"].as_array().map(Vec::len), Some(2));
+-
+-        let duplicate = vec![(first.clone(), topology.clone()), (first, topology)];
+-        assert!(
+-            session
+-                .write_leaf_certificates(
+-                    &directory.path().join("duplicate.json"),
+-                    &root,
+-                    &duplicate
+-                )
+-                .is_err()
+-        );
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn rechecking_a_changed_leaf_invalidates_its_previous_certificate() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let leaf = directory.path().join("child.rs");
+-        fs::write(&root, "mod child;\n")?;
+-        fs::write(&leaf, "fn child() {}\n")?;
+-
+-        let mut output = Vec::new();
+-        let mut session = Session::new(Config::default(), Some(&mut output));
+-        assert!(
+-            session
+-                .format_leaf(&root, &leaf)
+-                .map_err(io::Error::other)?
+-                .is_some()
+-        );
+-
+-        fs::write(&leaf, "fn child( ){ }\n")?;
+-        assert!(
+-            session
+-                .format_leaf(&root, &leaf)
+-                .map_err(io::Error::other)?
+-                .is_none()
+-        );
+-        assert!(
+-            session
+-                .write_leaf_certificate(
+-                    &directory.path().join("stale.json"),
+-                    &root,
+-                    &leaf,
+-                    &modules::empty_module_topology(),
+-                )
+-                .is_err()
+-        );
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn changed_leaf_falls_back_before_rewriting_or_certifying() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let leaf = directory.path().join("child.rs");
+-        fs::write(&root, "mod child;\n")?;
+-        fs::write(&leaf, "fn child( ){ }\n")?;
+-
+-        let mut configuration = Config::default();
+-        configuration.set().emit_mode(EmitMode::Files);
+-        let mut output = Vec::new();
+-        let mut session = Session::new(configuration, Some(&mut output));
+-        assert!(
+-            session
+-                .format_leaf(&root, &leaf)
+-                .map_err(io::Error::other)?
+-                .is_none()
+-        );
+-        assert_eq!(fs::read_to_string(&leaf)?, "fn child( ){ }\n");
+-        assert!(
+-            session
+-                .write_leaf_certificate(
+-                    &directory.path().join("leaf.json"),
+-                    &root,
+-                    &leaf,
+-                    &modules::empty_module_topology(),
+-                )
+-                .is_err()
+-        );
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn direct_leaf_unchanged_detection_preserves_effective_newline_styles() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let leaf = directory.path().join("child.rs");
+-        fs::write(&root, "mod child;\n")?;
+-
+-        for (style, source, unchanged) in [
+-            (NewlineStyle::Auto, "fn child() {}\n", true),
+-            (NewlineStyle::Auto, "fn child() {}\r\n", true),
+-            (NewlineStyle::Unix, "fn child() {}\n", true),
+-            (NewlineStyle::Windows, "fn child() {}\r\n", true),
+-            (NewlineStyle::Unix, "fn child() {}\r\n", false),
+-            (NewlineStyle::Windows, "fn child() {}\n", false),
+-        ] {
+-            fs::write(&leaf, source)?;
+-            let mut configuration = Config::default();
+-            configuration.set().emit_mode(EmitMode::Files);
+-            configuration.set().newline_style(style);
+-            let mut output = Vec::new();
+-            let mut session = Session::new(configuration, Some(&mut output));
+-
+-            let formatted = session
+-                .format_leaf(&root, &leaf)
+-                .map_err(io::Error::other)?;
+-
+-            assert_eq!(formatted.is_some(), unchanged, "newline style: {style:?}");
+-            assert_eq!(fs::read_to_string(&leaf)?, source);
+-        }
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn malformed_direct_module_falls_back_without_polluting_the_session() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let leaf = directory.path().join("child.rs");
+-        fs::write(&root, "mod child;\n")?;
+-        fs::write(&leaf, "fn child( {\n")?;
+-
+-        let mut output = Vec::new();
+-        let mut session = Session::new(Config::default(), Some(&mut output));
+-        assert!(
+-            session
+-                .format_leaf(&root, &leaf)
+-                .map_err(io::Error::other)?
+-                .is_none()
+-        );
+-        assert!(session.has_no_errors());
+-
+-        let error = match session.format(Input::File(root)) {
+-            Ok(_) => {
+-                return Err(io::Error::other(
+-                    "the native resolver did not report the malformed module",
+-                ));
+-            }
+-            Err(error) => error,
+-        };
+-        assert!(error.to_string().contains("failed to resolve mod `child`"));
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn silent_tracing_macro_fallback_can_certify_an_unchanged_direct_module() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let leaf = directory.path().join("child.rs");
+-        fs::write(&root, "mod child;\n")?;
+-        let source = "fn child() {\n    tracing::trace!(%error, \"failed\");\n}\n";
+-        fs::write(&leaf, source)?;
+-
+-        let mut configuration = Config::default();
+-        configuration.set().emit_mode(EmitMode::Files);
+-        let mut output = Vec::new();
+-        let mut session = Session::new(configuration, Some(&mut output));
+-        assert!(
+-            session
+-                .format_leaf(&root, &leaf)
+-                .map_err(io::Error::other)?
+-                .is_some()
+-        );
+-        assert!(!session.has_no_errors());
+-        assert!(session.has_no_visible_errors());
+-        assert_eq!(fs::read_to_string(&leaf)?, source);
+-        session.write_leaf_certificate(
+-            &directory.path().join("leaf.json"),
+-            &root,
+-            &leaf,
+-            &modules::empty_module_topology(),
+-        )?;
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn forwarded_parser_warning_never_receives_an_incremental_certificate() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let leaf = directory.path().join("child.rs");
+-        fs::write(&root, "mod child;\n")?;
+-        fs::write(
+-            &leaf,
+-            "fn child() {\n    let _ = \"\\\n\n             \";\n}\n",
+-        )?;
+-
+-        let mut configuration = Config::default();
+-        configuration.set().emit_mode(EmitMode::Files);
+-        let mut output = Vec::new();
+-        let mut session = Session::new(configuration, Some(&mut output));
+-        assert!(
+-            session
+-                .format_leaf(&root, &leaf)
+-                .map_err(io::Error::other)?
+-                .is_none()
+-        );
+-        assert!(session.has_no_errors());
+-        assert!(
+-            session
+-                .write_leaf_certificate(
+-                    &directory.path().join("leaf.json"),
+-                    &root,
+-                    &leaf,
+-                    &modules::empty_module_topology(),
+-                )
+-                .is_err()
+-        );
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn direct_module_preserves_authoritative_cfg_and_path_child_topology() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let module = directory.path().join("child.rs");
+-        let tests = directory.path().join("child_tests.rs");
+-        fs::write(&root, "mod child;\n")?;
+-        fs::write(
+-            &module,
+-            "fn child() {}\n\n#[cfg(test)]\n#[path = \"child_tests.rs\"]\nmod tests;\n",
+-        )?;
+-        fs::write(&tests, "#[test]\nfn child_test() {}\n")?;
+-
+-        let mut configuration = Config::default();
+-        configuration.set().emit_mode(EmitMode::Files);
+-        let mut first_output = Vec::new();
+-        let mut discovery = Session::new(configuration.clone(), Some(&mut first_output));
+-        discovery.enable_module_graph();
+-        discovery
+-            .format(Input::File(root.clone()))
+-            .map_err(io::Error::other)?;
+-        let manifest = directory.path().join("modules.json");
+-        discovery.write_module_manifest(&manifest, std::slice::from_ref(&root))?;
+-        let manifest: serde_json::Value =
+-            serde_json::from_slice(&fs::read(manifest)?).map_err(io::Error::other)?;
+-        let key = module.canonicalize()?.to_string_lossy().into_owned();
+-        let topology = manifest["roots"][0]["leaves"][&key]
+-            .as_str()
+-            .ok_or_else(|| io::Error::other("direct-module topology was not recorded"))?
+-            .to_owned();
+-
+-        let mut second_output = Vec::new();
+-        let mut formatting = Session::new(configuration.clone(), Some(&mut second_output));
+-        assert!(
+-            formatting
+-                .format_module(&root, &module, &topology)
+-                .map_err(io::Error::other)?
+-                .is_some()
+-        );
+-        formatting.write_leaf_certificate(
+-            &directory.path().join("leaf.json"),
+-            &root,
+-            &module,
+-            &topology,
+-        )?;
+-
+-        fs::write(
+-            &module,
+-            "fn child() {}\n\n#[cfg(not(test))]\n#[path = \"child_tests.rs\"]\nmod tests;\n",
+-        )?;
+-        let mut third_output = Vec::new();
+-        let mut changed = Session::new(configuration, Some(&mut third_output));
+-        assert!(
+-            changed
+-                .format_module(&root, &module, &topology)
+-                .map_err(io::Error::other)?
+-                .is_none()
+-        );
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn nested_or_annotated_module_ownership_is_never_formatted_as_a_leaf() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let parent = directory.path().join("parent.rs");
+-        let nested_directory = directory.path().join("parent");
+-        fs::create_dir_all(&nested_directory)?;
+-        let nested = nested_directory.join("child.rs");
+-        fs::write(&root, "mod parent;\n")?;
+-        fs::write(&parent, "mod child;\n")?;
+-        fs::write(&nested, "fn child() {}\n")?;
+-
+-        let mut output = Vec::new();
+-        let mut session = Session::new(Config::default(), Some(&mut output));
+-        assert!(
+-            session
+-                .format_leaf(&root, &nested)
+-                .map_err(io::Error::other)?
+-                .is_none()
+-        );
+-
+-        let direct = directory.path().join("child.rs");
+-        fs::write(&direct, "fn child() {}\n")?;
+-        for declaration in [
+-            "#[cfg(test)]\nmod child;\n",
+-            "#[rustfmt::skip]\nmod child;\n",
+-            "#[path = \"child.rs\"]\nmod child;\n",
+-        ] {
+-            fs::write(&root, declaration)?;
+-            assert!(
+-                session
+-                    .format_leaf(&root, &direct)
+-                    .map_err(io::Error::other)?
+-                    .is_none()
+-            );
+-        }
+-        Ok(())
+-    }
+-
+-    #[test]
+-    fn introducing_a_child_module_invalidates_the_direct_leaf_fast_path() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let leaf = directory.path().join("child.rs");
+-        fs::write(&root, "mod child;\n")?;
+-        fs::write(&leaf, "mod nested;\n")?;
+-
+-        let mut output = Vec::new();
+-        let mut session = Session::new(Config::default(), Some(&mut output));
+-        assert!(
+-            session
+-                .format_leaf(&root, &leaf)
+-                .map_err(io::Error::other)?
+-                .is_none()
+-        );
+-        assert_eq!(fs::read_to_string(&leaf)?, "mod nested;\n");
+-        Ok(())
+-    }
+-
+-    #[cfg(unix)]
+-    #[test]
+-    fn direct_symlink_modules_retain_their_native_logical_backup_paths() -> io::Result<()> {
+-        let directory = tempfile::tempdir()?;
+-        let root = directory.path().join("lib.rs");
+-        let linked = directory.path().join("child.rs");
+-        let external_directory = directory.path().join("external");
+-        fs::create_dir(&external_directory)?;
+-        let external = external_directory.join("child.rs");
+-        fs::write(&root, "mod child;\n")?;
+-        fs::write(&external, "fn child() {}\n")?;
+-        std::os::unix::fs::symlink(&external, &linked)?;
+-
+-        let mut configuration = Config::default();
+-        configuration.set().emit_mode(EmitMode::Files);
+-        let mut discovery_output = Vec::new();
+-        let mut discovery = Session::new(configuration.clone(), Some(&mut discovery_output));
+-        discovery.enable_module_graph();
+-        discovery
+-            .format(Input::File(root.clone()))
+-            .map_err(io::Error::other)?;
+-        let manifest_path = directory.path().join("modules.json");
+-        discovery.write_module_manifest(&manifest_path, std::slice::from_ref(&root))?;
+-        let manifest: serde_json::Value =
+-            serde_json::from_slice(&fs::read(manifest_path)?).map_err(io::Error::other)?;
+-        assert!(
+-            manifest["roots"][0]["leaves"]
+-                .as_object()
+-                .is_some_and(serde_json::Map::is_empty)
+-        );
+-
+-        let source = "fn child( ){ }\n";
+-        fs::write(&external, source)?;
+-        configuration.set().make_backup(true);
+-        let mut output = Vec::new();
+-        let mut session = Session::new(configuration, Some(&mut output));
+-        assert!(
+-            session
+-                .format_leaf(&root, &external)
+-                .map_err(io::Error::other)?
+-                .is_none()
+-        );
+-        assert_eq!(fs::read_to_string(&external)?, source);
+-        assert!(fs::symlink_metadata(&linked)?.file_type().is_symlink());
+-
+-        session
+-            .format(Input::File(root))
+-            .map_err(io::Error::other)?;
+-        assert!(!fs::symlink_metadata(&linked)?.file_type().is_symlink());
+-        assert!(
+-            fs::symlink_metadata(linked.with_extension("bk"))?
+-                .file_type()
+-                .is_symlink()
+-        );
+-        assert!(!external.with_extension("bk").exists());
+-        assert_eq!(fs::read_to_string(&external)?, source);
+-        assert_eq!(fs::read_to_string(&linked)?, "fn child() {}\n");
+-        Ok(())
+-    }
+-
+     #[cfg(unix)]
+     #[test]
+     fn module_manifest_preserves_logical_symlink_probes() -> io::Result<()> {
+@@ -1714,7 +1085,6 @@ mod unit_tests {
+         session.record_module_graph(
+             &FileName::Real(root.clone()),
+             [FileName::Real(module)].iter(),
+-            std::iter::empty(),
+             [root.as_path()].into_iter().map(Some),
+             Some(vec![FileProbe {
+                 path: root.clone(),
+diff --git a/src/modules.rs b/src/modules.rs
+index abf9cbfcd7b29b6068abe2fdcd5b1a1b7946eb13..70fde024c1e8f3e6127cbe1e747e4ee27f3b146c 100644
+--- a/src/modules.rs
++++ b/src/modules.rs
+@@ -6,7 +6,6 @@ use rustc_ast::ast;
+ use rustc_ast::visit::Visitor;
+ use rustc_span::Span;
+ use rustc_span::symbol::{self, Symbol, sym};
+-use sha2::{Digest, Sha256};
+ use thin_vec::ThinVec;
+ use thiserror::Error;
+ 
+@@ -57,67 +56,6 @@ impl<'a> Module<'a> {
+     }
+ }
+ 
+-/// Fingerprints nested declarations and their exact cfg/path attributes.
+-///
+-/// Inline modules and conditional-module macros remain unsupported because their
+-/// complete ownership cannot be reconstructed without rerunning the resolver.
+-pub(crate) fn module_topology(module: &Module<'_>) -> Option<String> {
+-    struct TopologyVisitor {
+-        digest: Sha256,
+-        declarations: u64,
+-        supported: bool,
+-    }
+-
+-    impl<'ast> Visitor<'ast> for TopologyVisitor {
+-        fn visit_item(&mut self, item: &'ast ast::Item) {
+-            if is_cfg_if(item) || is_cfg_select(item) {
+-                self.supported = false;
+-                return;
+-            }
+-            if let ast::ItemKind::Mod(_, _, kind) = &item.kind {
+-                if !matches!(kind, ast::ModKind::Unloaded) {
+-                    self.supported = false;
+-                    return;
+-                }
+-                let declaration = rustc_ast_pretty::pprust::item_to_string(item);
+-                let Ok(length) = u64::try_from(declaration.len()) else {
+-                    self.supported = false;
+-                    return;
+-                };
+-                self.declarations = self.declarations.saturating_add(1);
+-                self.digest.update(length.to_le_bytes());
+-                self.digest.update(declaration.as_bytes());
+-                return;
+-            }
+-
+-            rustc_ast::visit::walk_item(self, item);
+-        }
+-    }
+-
+-    let mut visitor = TopologyVisitor {
+-        digest: Sha256::new(),
+-        declarations: 0,
+-        supported: true,
+-    };
+-    visitor.digest.update(b"ohm.rustfmt.module-topology.v1\0");
+-    for item in module.items.iter() {
+-        visitor.visit_item(item);
+-        if !visitor.supported {
+-            return None;
+-        }
+-    }
+-    visitor.digest.update(visitor.declarations.to_le_bytes());
+-    Some(format!("{:x}", visitor.digest.finalize()))
+-}
+-
+-/// Matches the canonical topology digest for a module with no nested declarations.
+-pub(crate) fn empty_module_topology() -> String {
+-    let mut digest = Sha256::new();
+-    digest.update(b"ohm.rustfmt.module-topology.v1\0");
+-    digest.update(0_u64.to_le_bytes());
+-    format!("{:x}", digest.finalize())
+-}
+-
+ /// Maps each module to the corresponding file.
+ pub(crate) struct ModResolver<'ast, 'psess> {
+     psess: &'psess ParseSess,
+diff --git a/tests/cargo-fmt/main.rs b/tests/cargo-fmt/main.rs
+index d6be5dc80d39b51acae9aaba1a46aee3d4269ad8..abd15faf0068738064b4a0c182880bc0eaeb9268 100644
+--- a/tests/cargo-fmt/main.rs
++++ b/tests/cargo-fmt/main.rs
+@@ -6,7 +6,6 @@ use std::path::Path;
+ use std::process::Command;
+ 
+ use rustfmt_config_proc_macro::rustfmt_only_ci_test;
+-use sha2::{Digest, Sha256};
+ 
+ /// Runs the paired cargo-fmt and rustfmt executables from the local target directory.
+ fn cargo_fmt_command() -> Command {
+@@ -138,132 +137,11 @@ fn cargo_fmt_emits_error_on_line_overflow_true() {
+     ))
+ }
+ 
++#[cfg(unix)]
+ #[test]
+-fn cargo_fmt_never_inherits_internal_module_handoffs() -> std::io::Result<()> {
+-    let directory = tempfile::tempdir()?;
+-    let package = directory.path().canonicalize()?;
+-    let sources = package.join("src");
+-    fs::create_dir(&sources)?;
+-    let manifest = package.join("Cargo.toml");
+-    let leaf = sources.join("child.rs");
+-    let sibling = sources.join("sibling.rs");
+-    let untrusted_manifest = package.join("untrusted-modules.json");
+-    fs::write(
+-        &manifest,
+-        "[package]\nname = \"handoff-isolation\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+-    )?;
+-    fs::write(sources.join("lib.rs"), "mod child;\nmod sibling;\n")?;
+-    fs::write(&leaf, "fn child() {}\n")?;
+-    fs::write(&sibling, "fn sibling( ){ }\n")?;
+-
+-    let mut topology = Sha256::new();
+-    topology.update(b"ohm.rustfmt.module-topology.v1\0");
+-    topology.update(0_u64.to_le_bytes());
+-    let topology = format!("{:x}", topology.finalize());
+-
+-    for enabled in ["0", "1"] {
+-        let output = cargo_fmt_command()
+-            .arg("--check")
+-            .arg("--manifest-path")
+-            .arg(&manifest)
+-            .env("OHM_INCREMENTAL_FMT", enabled)
+-            .env("OHM_INCREMENTAL_FMT_CACHE_DIR", package.join("cache"))
+-            .env("OHM_RUSTFMT_MODULE_MANIFEST", &untrusted_manifest)
+-            .env("OHM_RUSTFMT_CHANGED_MODULE", &leaf)
+-            .env("OHM_RUSTFMT_MODULE_TOPOLOGY", &topology)
+-            .output()?;
+-
+-        assert_eq!(
+-            output.status.code(),
+-            Some(1),
+-            "incremental={enabled}\nstdout:\n{}\nstderr:\n{}",
+-            String::from_utf8_lossy(&output.stdout),
+-            String::from_utf8_lossy(&output.stderr),
+-        );
+-        let stdout = String::from_utf8_lossy(&output.stdout);
+-        assert!(stdout.contains(sibling.to_string_lossy().as_ref()));
+-        assert!(!untrusted_manifest.exists());
+-    }
+-    Ok(())
+-}
+-
+-#[test]
+-fn cargo_fmt_logging_preserves_root_and_sibling_events_after_a_leaf_edit() -> std::io::Result<()> {
++fn cargo_fmt_caches_clean_checks_without_a_second_formatter_pass() -> std::io::Result<()> {
+     let directory = tempfile::tempdir()?;
+     let package = directory.path().canonicalize()?;
+-    let sources = package.join("src");
+-    fs::create_dir(&sources)?;
+-    let manifest = package.join("Cargo.toml");
+-    let leaf = sources.join("child.rs");
+-    fs::write(
+-        &manifest,
+-        "[package]\nname = \"formatter-logging\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+-    )?;
+-    fs::write(
+-        sources.join("lib.rs"),
+-        "mod child;\nmod sibling;\n\npub fn root() {\n    let _root = 1;\n}\n",
+-    )?;
+-    fs::write(&leaf, "pub fn child() {\n    let _child = 1;\n}\n")?;
+-    fs::write(
+-        sources.join("sibling.rs"),
+-        "pub fn sibling() {\n    let _sibling = 2;\n}\n",
+-    )?;
+-
+-    let run = |enabled: &str, trace: bool| {
+-        let mut command = cargo_fmt_command();
+-        command
+-            .arg("--check")
+-            .arg("--manifest-path")
+-            .arg(&manifest)
+-            .current_dir(&package)
+-            .env("OHM_INCREMENTAL_FMT", enabled)
+-            .env("OHM_INCREMENTAL_FMT_CACHE_DIR", package.join("cache"))
+-            .env("RUSTFMT_LOG", "rustfmt_nightly::visitor=debug");
+-        if trace {
+-            command.env("OHM_INCREMENTAL_FMT_TRACE", "1");
+-        } else {
+-            command.env_remove("OHM_INCREMENTAL_FMT_TRACE");
+-        }
+-        command.output()
+-    };
+-
+-    let warmed = run("1", false)?;
+-    assert!(
+-        warmed.status.success(),
+-        "stdout:\n{}\nstderr:\n{}",
+-        String::from_utf8_lossy(&warmed.stdout),
+-        String::from_utf8_lossy(&warmed.stderr),
+-    );
+-    fs::write(
+-        &leaf,
+-        "pub fn child() {\n    let _changed_child = 333;\n}\n",
+-    )?;
+-
+-    let incremental = run("1", true)?;
+-    let native = run("0", false)?;
+-
+-    assert!(incremental.status.success());
+-    assert_eq!(incremental.status.code(), native.status.code());
+-    let incremental_stdout = String::from_utf8_lossy(&incremental.stdout);
+-    let native_stdout = String::from_utf8_lossy(&native.stdout);
+-    assert!(incremental_stdout.contains("child.rs"));
+-    assert!(incremental_stdout.contains("sibling.rs"));
+-    assert!(incremental_stdout.contains("lib.rs"));
+-    assert_eq!(
+-        incremental_stdout.matches("visit_stmt:").count(),
+-        native_stdout.matches("visit_stmt:").count(),
+-    );
+-    assert!(
+-        String::from_utf8_lossy(&incremental.stderr)
+-            .contains("formatting the complete target to preserve formatter logging")
+-    );
+-    Ok(())
+-}
+-
+-#[cfg(unix)]
+-fn trusted_formatter_tools(
+-    package: &Path,
+-) -> std::io::Result<(std::path::PathBuf, std::path::PathBuf)> {
+     let tools = package.join("tools");
+     fs::create_dir(&tools)?;
+     let executable = cargo_fmt_command().get_program().to_owned();
+@@ -293,15 +171,6 @@ fn trusted_formatter_tools(
+         .ok_or_else(|| std::io::Error::other("the integration compiler has no sysroot"))?
+         .join("lib");
+     std::os::unix::fs::symlink(&compiler, tools.join("rustc"))?;
+-    Ok((tools, compiler_libraries))
+-}
+-
+-#[cfg(unix)]
+-#[test]
+-fn cargo_fmt_caches_clean_checks_without_a_second_formatter_pass() -> std::io::Result<()> {
+-    let directory = tempfile::tempdir()?;
+-    let package = directory.path().canonicalize()?;
+-    let (tools, compiler_libraries) = trusted_formatter_tools(&package)?;
+     let sources = package.join("src");
+     fs::create_dir(&sources)?;
+     let manifest = package.join("Cargo.toml");
+@@ -444,81 +313,3 @@ fn cargo_fmt_caches_clean_checks_without_a_second_formatter_pass() -> std::io::R
+     }
+     Ok(())
+ }
+-
+-#[cfg(unix)]
+-#[test]
+-fn cargo_fmt_batches_clean_leaves_without_hiding_multiple_formatting_errors() -> std::io::Result<()>
+-{
+-    let directory = tempfile::tempdir()?;
+-    let package = directory.path().canonicalize()?;
+-    let (tools, compiler_libraries) = trusted_formatter_tools(&package)?;
+-    let sources = package.join("src");
+-    fs::create_dir(&sources)?;
+-    let manifest = package.join("Cargo.toml");
+-    fs::write(
+-        &manifest,
+-        "[package]\nname = \"multiple-leaf-check\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+-    )?;
+-    fs::write(
+-        sources.join("lib.rs"),
+-        concat!(
+-            "mod first;\nmod second;\nmod unchanged_first;\n",
+-            "mod unchanged_second;\nmod unchanged_third;\n",
+-        ),
+-    )?;
+-    let first = sources.join("first.rs");
+-    let second = sources.join("second.rs");
+-    fs::write(&first, "pub fn first() {}\n")?;
+-    fs::write(&second, "pub fn second() {}\n")?;
+-    for name in ["unchanged_first", "unchanged_second", "unchanged_third"] {
+-        fs::write(
+-            sources.join(format!("{name}.rs")),
+-            format!("pub fn {name}() {{}}\n"),
+-        )?;
+-    }
+-
+-    let run = |enabled: &str| {
+-        Command::new(tools.join("cargo-fmt"))
+-            .arg("--check")
+-            .arg("--manifest-path")
+-            .arg(&manifest)
+-            .current_dir(&package)
+-            .env("OHM_INCREMENTAL_FMT", enabled)
+-            .env("OHM_INCREMENTAL_FMT_TRACE", "1")
+-            .env("OHM_INCREMENTAL_FMT_CACHE_DIR", package.join("cache"))
+-            .env("DYLD_LIBRARY_PATH", &compiler_libraries)
+-            .env("LD_LIBRARY_PATH", &compiler_libraries)
+-            .env_remove("DYLD_FALLBACK_LIBRARY_PATH")
+-            .output()
+-    };
+-
+-    assert!(run("1")?.status.success());
+-    fs::write(&first, "pub fn changed_first() {}\n")?;
+-    fs::write(&second, "pub fn changed_second() {}\n")?;
+-    let changed = std::time::UNIX_EPOCH + std::time::Duration::from_secs(2_000_000_000);
+-    for source in [&first, &second] {
+-        fs::OpenOptions::new()
+-            .write(true)
+-            .open(source)?
+-            .set_times(fs::FileTimes::new().set_modified(changed))?;
+-    }
+-    let batched = run("1")?;
+-    assert!(batched.status.success());
+-    assert!(
+-        String::from_utf8_lossy(&batched.stderr).contains("formatted 2 unchanged direct leaves"),
+-        "{}",
+-        String::from_utf8_lossy(&batched.stderr),
+-    );
+-
+-    fs::write(&first, "pub fn first( ){ }\n")?;
+-    fs::write(&second, "pub fn second( ){ }\n")?;
+-    let incremental = run("1")?;
+-    let native = run("0")?;
+-    assert_eq!(incremental.status.code(), Some(1));
+-    assert_eq!(incremental.status.code(), native.status.code());
+-    assert_eq!(incremental.stdout, native.stdout);
+-    let stdout = String::from_utf8_lossy(&incremental.stdout);
+-    assert!(stdout.contains("first.rs"));
+-    assert!(stdout.contains("second.rs"));
+-    Ok(())
+-}
+diff --git a/tests/rustfmt/main.rs b/tests/rustfmt/main.rs
+index ced1831112ab5c1431c3b1e726d83b85215481e6..4008c8d14357ca857c0fbd9dad0e9046b96e2c15 100644
+--- a/tests/rustfmt/main.rs
++++ b/tests/rustfmt/main.rs
+@@ -1,12 +1,11 @@
+ //! Integration tests for rustfmt.
+ 
+ use std::env;
+-use std::fs::{self, File, remove_file};
++use std::fs::{File, remove_file};
+ use std::path::Path;
+ use std::process::Command;
+ 
+ use rustfmt_config_proc_macro::{nightly_only_test, rustfmt_only_ci_test};
+-use sha2::{Digest, Sha256};
+ 
+ /// Run the rustfmt executable with environment vars set and return its output.
+ fn rustfmt_with_extra(
+@@ -42,36 +41,6 @@ fn rustfmt(args: &[&str]) -> (String, String) {
+     rustfmt_with_extra(args, None, &[])
+ }
+ 
+-/// Requests the same direct-module optimization used by an incremental cargo-fmt run.
+-fn rustfmt_incremental_leaf_command(root: &Path, leaf: &Path) -> Command {
+-    let mut topology = Sha256::new();
+-    topology.update(b"ohm.rustfmt.module-topology.v1\0");
+-    topology.update(0_u64.to_le_bytes());
+-
+-    let mut command = Command::new(env!("CARGO_BIN_EXE_rustfmt"));
+-    command
+-        .arg(root)
+-        .env(
+-            "OHM_RUSTFMT_MODULE_MANIFEST",
+-            root.with_extension("modules.json"),
+-        )
+-        .env("OHM_RUSTFMT_CHANGED_MODULE", leaf)
+-        .env(
+-            "OHM_RUSTFMT_MODULE_TOPOLOGY",
+-            format!("{:x}", topology.finalize()),
+-        );
+-    command
+-}
+-
+-fn rustfmt_with_incremental_leaf(
+-    root: &Path,
+-    leaf: &Path,
+-) -> std::io::Result<std::process::Output> {
+-    rustfmt_incremental_leaf_command(root, leaf)
+-        .arg("--check")
+-        .output()
+-}
+-
+ macro_rules! assert_that {
+     ($args:expr, $($check:ident $check_args:tt)&&+) => {
+         let (stdout, stderr) = rustfmt($args);
+@@ -199,177 +168,6 @@ fn mod_resolution_error_path_attribute_does_not_exist() {
+     assert!(stderr.contains("does_not_exist.rs does not exist"));
+ }
+ 
+-#[test]
+-fn incremental_malformed_module_preserves_native_resolution_diagnostics() -> std::io::Result<()> {
+-    let directory = tempfile::tempdir()?;
+-    let directory = directory.path().canonicalize()?;
+-    let root = directory.join("lib.rs");
+-    let leaf = directory.join("child.rs");
+-    fs::write(&root, "mod child;\n")?;
+-    fs::write(&leaf, "fn child( {\n")?;
+-
+-    let native = Command::new(env!("CARGO_BIN_EXE_rustfmt"))
+-        .arg(&root)
+-        .arg("--check")
+-        .output()?;
+-    let incremental = rustfmt_with_incremental_leaf(&root, &leaf)?;
+-
+-    assert!(!native.status.success());
+-    assert_eq!(incremental.status.code(), native.status.code());
+-    assert_eq!(incremental.stdout, native.stdout);
+-    assert_eq!(incremental.stderr, native.stderr);
+-    let diagnostics = String::from_utf8_lossy(&incremental.stderr);
+-    assert!(diagnostics.contains("failed to resolve mod `child`"));
+-    Ok(())
+-}
+-
+-#[test]
+-fn incremental_rewritten_module_also_formats_its_root_and_siblings() -> std::io::Result<()> {
+-    let directory = tempfile::tempdir()?;
+-    let directory = directory.path().canonicalize()?;
+-    let root = directory.join("lib.rs");
+-    let leaf = directory.join("child.rs");
+-    let sibling = directory.join("sibling.rs");
+-    fs::write(&root, "mod child;\nmod sibling;\n\nfn root( ){ }\n")?;
+-    fs::write(&leaf, "fn child( ){ }\n")?;
+-    fs::write(&sibling, "fn sibling( ){ }\n")?;
+-
+-    let output = rustfmt_incremental_leaf_command(&root, &leaf).output()?;
+-
+-    assert!(
+-        output.status.success(),
+-        "stdout:\n{}\nstderr:\n{}",
+-        String::from_utf8_lossy(&output.stdout),
+-        String::from_utf8_lossy(&output.stderr),
+-    );
+-    assert_eq!(
+-        fs::read_to_string(&root)?,
+-        "mod child;\nmod sibling;\n\nfn root() {}\n"
+-    );
+-    assert_eq!(fs::read_to_string(&leaf)?, "fn child() {}\n");
+-    assert_eq!(fs::read_to_string(&sibling)?, "fn sibling() {}\n");
+-    Ok(())
+-}
+-
+-#[test]
+-fn incremental_malformed_sibling_never_rewrites_a_changed_module() -> std::io::Result<()> {
+-    let directory = tempfile::tempdir()?;
+-    let directory = directory.path().canonicalize()?;
+-    let root = directory.join("lib.rs");
+-    let leaf = directory.join("child.rs");
+-    let sibling = directory.join("sibling.rs");
+-    let original = "fn child( ){ }\n";
+-    fs::write(&root, "mod child;\nmod sibling;\n")?;
+-    fs::write(&leaf, original)?;
+-    fs::write(&sibling, "fn sibling( {\n")?;
+-
+-    let native = Command::new(env!("CARGO_BIN_EXE_rustfmt"))
+-        .arg(&root)
+-        .output()?;
+-    assert!(!native.status.success());
+-    assert_eq!(fs::read_to_string(&leaf)?, original);
+-
+-    let incremental = rustfmt_incremental_leaf_command(&root, &leaf).output()?;
+-
+-    assert_eq!(incremental.status.code(), native.status.code());
+-    assert_eq!(incremental.stdout, native.stdout);
+-    assert_eq!(incremental.stderr, native.stderr);
+-    assert_eq!(fs::read_to_string(&leaf)?, original);
+-    assert!(
+-        String::from_utf8_lossy(&incremental.stderr).contains("failed to resolve mod `sibling`")
+-    );
+-    Ok(())
+-}
+-
+-#[test]
+-fn incremental_malformed_sibling_never_emits_a_changed_module_diff() -> std::io::Result<()> {
+-    let directory = tempfile::tempdir()?;
+-    let directory = directory.path().canonicalize()?;
+-    let root = directory.join("lib.rs");
+-    let leaf = directory.join("child.rs");
+-    let sibling = directory.join("sibling.rs");
+-    let original = "fn child( ){ }\n";
+-    fs::write(&root, "mod child;\nmod sibling;\n")?;
+-    fs::write(&leaf, original)?;
+-    fs::write(&sibling, "fn sibling( {\n")?;
+-
+-    let native = Command::new(env!("CARGO_BIN_EXE_rustfmt"))
+-        .arg(&root)
+-        .arg("--check")
+-        .output()?;
+-    let incremental = rustfmt_with_incremental_leaf(&root, &leaf)?;
+-
+-    assert!(!native.status.success());
+-    assert_eq!(incremental.status.code(), native.status.code());
+-    assert_eq!(incremental.stdout, native.stdout);
+-    assert_eq!(incremental.stderr, native.stderr);
+-    assert_eq!(fs::read_to_string(&leaf)?, original);
+-    assert!(
+-        String::from_utf8_lossy(&incremental.stderr).contains("failed to resolve mod `sibling`")
+-    );
+-    Ok(())
+-}
+-
+-#[cfg(unix)]
+-#[test]
+-fn incremental_symlinked_module_preserves_native_check_paths() -> std::io::Result<()> {
+-    let directory = tempfile::tempdir()?;
+-    let directory = directory.path().canonicalize()?;
+-    let root = directory.join("lib.rs");
+-    let linked = directory.join("child.rs");
+-    let external_directory = directory.join("external");
+-    fs::create_dir(&external_directory)?;
+-    let external = external_directory.join("child.rs");
+-    fs::write(&root, "mod child;\n")?;
+-    fs::write(&external, "fn child( ){ }\n")?;
+-    std::os::unix::fs::symlink(&external, &linked)?;
+-
+-    let native = Command::new(env!("CARGO_BIN_EXE_rustfmt"))
+-        .arg(&root)
+-        .arg("--check")
+-        .output()?;
+-    let incremental = rustfmt_with_incremental_leaf(&root, &external)?;
+-
+-    assert!(!native.status.success());
+-    assert_eq!(incremental.status.code(), native.status.code());
+-    assert_eq!(incremental.stdout, native.stdout);
+-    assert_eq!(incremental.stderr, native.stderr);
+-    let output = String::from_utf8_lossy(&incremental.stdout);
+-    assert!(output.contains(linked.to_string_lossy().as_ref()));
+-    assert!(!output.contains(external.to_string_lossy().as_ref()));
+-    Ok(())
+-}
+-
+-#[test]
+-fn incremental_topology_fallback_emits_parser_warnings_once() -> std::io::Result<()> {
+-    let directory = tempfile::tempdir()?;
+-    let directory = directory.path().canonicalize()?;
+-    let root = directory.join("lib.rs");
+-    let leaf = directory.join("child.rs");
+-    let nested = directory.join("nested.rs");
+-    fs::write(&root, "mod child;\n")?;
+-    fs::write(
+-        &leaf,
+-        concat!(
+-            "fn child() {\n    let _ = \"\\\n\n             \";\n}\n\n",
+-            "#[path = \"nested.rs\"]\nmod nested;\n",
+-        ),
+-    )?;
+-    fs::write(&nested, "fn nested() {}\n")?;
+-
+-    let native = Command::new(env!("CARGO_BIN_EXE_rustfmt"))
+-        .arg(&root)
+-        .arg("--check")
+-        .output()?;
+-    let incremental = rustfmt_with_incremental_leaf(&root, &leaf)?;
+-
+-    assert!(!native.stderr.is_empty());
+-    assert_eq!(incremental.status.code(), native.status.code());
+-    assert_eq!(incremental.stdout, native.stdout);
+-    assert_eq!(incremental.stderr, native.stderr);
+-    Ok(())
+-}
+-
+ #[test]
+ fn rustfmt_emits_error_on_line_overflow_true() {
+     // See also https://github.com/rust-lang/rustfmt/issues/3164

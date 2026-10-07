@@ -1,0 +1,312 @@
+{
+  "proof_kind": "component-pgo-resolved-release-policy-v1",
+  "component": "clippy",
+  "controlled_build_ready": true,
+  "unchanged_optimizer_inputs_equal": true,
+  "full_source_equal": true,
+  "non_pair_runtime_hashes_equal": true,
+  "all_runtime_modes_equal": true,
+  "non_pair_runtime_sizes_equal": true,
+  "non_pair_runtime_files_compared": 69857,
+  "runtime_changed_paths": [
+    "bin/cargo-clippy",
+    "bin/clippy-driver"
+  ],
+  "common_resolved_policy": {
+    "cargo_policy": [
+      {
+        "CARGO_INCREMENTAL": "0",
+        "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+        "CARGO_PROFILE_RELEASE_DEBUG": "0",
+        "CARGO_PROFILE_RELEASE_DEBUG_ASSERTIONS": "false",
+        "CARGO_PROFILE_RELEASE_LTO": "thin",
+        "CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS": "false",
+        "CARGO_PROFILE_RELEASE_STRIP": "false",
+        "RUSTC_REAL": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/stage1/bin/rustc",
+        "RUSTC_SYSROOT": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/stage1",
+        "RUSTC_TLS_MODEL_INITIAL_EXEC": "1",
+        "RUSTFLAGS": [
+          "--cfg=windows_raw_dylib",
+          "-Zannotate-moves",
+          "-Zunstable-options",
+          "--check-cfg=cfg(bootstrap)",
+          "--check-cfg=cfg(rust_analyzer)",
+          "-Zmacro-backtrace",
+          "-Csplit-debuginfo=off",
+          "-Clink-args=-Wl,-z,origin",
+          "-Clink-args=-Wl,-rpath,$ORIGIN/../lib",
+          "-Clink-arg=-Wl,--compress-debug-sections=zlib",
+          "-Alinker-messages",
+          "-Zunstable-options"
+        ]
+      },
+      {
+        "CARGO_INCREMENTAL": "0",
+        "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+        "CARGO_PROFILE_RELEASE_DEBUG": "0",
+        "CARGO_PROFILE_RELEASE_DEBUG_ASSERTIONS": "false",
+        "CARGO_PROFILE_RELEASE_LTO": "thin",
+        "CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS": "false",
+        "CARGO_PROFILE_RELEASE_STRIP": "false",
+        "RUSTC_REAL": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/stage1/bin/rustc",
+        "RUSTC_SYSROOT": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/stage1",
+        "RUSTC_TLS_MODEL_INITIAL_EXEC": "1",
+        "RUSTFLAGS": [
+          "--cfg=windows_raw_dylib",
+          "-Zannotate-moves",
+          "-Zunstable-options",
+          "--check-cfg=cfg(bootstrap)",
+          "--check-cfg=cfg(rust_analyzer)",
+          "-Zmacro-backtrace",
+          "-Csplit-debuginfo=off",
+          "-Clink-arg=-L/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/ci-llvm/lib",
+          "-Clink-args=-Wl,-z,origin",
+          "-Clink-args=-Wl,-rpath,$ORIGIN/../lib",
+          "-Clink-arg=-Wl,--compress-debug-sections=zlib",
+          "-Alinker-messages",
+          "-Zunstable-options"
+        ]
+      }
+    ],
+    "compiled_units": {
+      "clippy_lints": {
+        "codegen_options": [
+          "-C opt-level=3",
+          "-C linker-plugin-lto",
+          "-C codegen-units=1",
+          "-Zannotate-moves",
+          "-Zunstable-options",
+          "-Zmacro-backtrace",
+          "-Csplit-debuginfo=off",
+          "-Clink-arg=-L/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/ci-llvm/lib",
+          "-Clink-args=-Wl,-z,origin",
+          "-Clink-args=-Wl,-rpath,$ORIGIN/../lib",
+          "-Clink-arg=-Wl,--compress-debug-sections=zlib",
+          "-Zunstable-options",
+          "-Z binary-dep-depinfo"
+        ],
+        "cfgs": []
+      },
+      "clippy_utils": {
+        "codegen_options": [
+          "-C opt-level=3",
+          "-C linker-plugin-lto",
+          "-C codegen-units=1",
+          "-Zannotate-moves",
+          "-Zunstable-options",
+          "-Zmacro-backtrace",
+          "-Csplit-debuginfo=off",
+          "-Clink-arg=-L/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/ci-llvm/lib",
+          "-Clink-args=-Wl,-z,origin",
+          "-Clink-args=-Wl,-rpath,$ORIGIN/../lib",
+          "-Clink-arg=-Wl,--compress-debug-sections=zlib",
+          "-Zunstable-options",
+          "-Z binary-dep-depinfo"
+        ],
+        "cfgs": []
+      },
+      "clippy_driver": {
+        "codegen_options": [
+          "-C opt-level=3",
+          "-C lto=thin",
+          "-C codegen-units=1",
+          "-Zannotate-moves",
+          "-Zunstable-options",
+          "-Zmacro-backtrace",
+          "-Csplit-debuginfo=off",
+          "-Clink-arg=-L/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/ci-llvm/lib",
+          "-Clink-args=-Wl,-z,origin",
+          "-Clink-args=-Wl,-rpath,$ORIGIN/../lib",
+          "-Clink-arg=-Wl,--compress-debug-sections=zlib",
+          "-Zunstable-options",
+          "-Z binary-dep-depinfo"
+        ],
+        "cfgs": [
+          "ohm_incremental_driver_hash",
+          "ohm_source_file_hash"
+        ]
+      },
+      "cargo_clippy": {
+        "codegen_options": [
+          "-C opt-level=3",
+          "-C lto=thin",
+          "-C codegen-units=1",
+          "-Zannotate-moves",
+          "-Zunstable-options",
+          "-Zmacro-backtrace",
+          "-Csplit-debuginfo=off",
+          "-Clink-arg=-L/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/x86_64-unknown-linux-gnu/ci-llvm/lib",
+          "-Clink-args=-Wl,-z,origin",
+          "-Clink-args=-Wl,-rpath,$ORIGIN/../lib",
+          "-Clink-arg=-Wl,--compress-debug-sections=zlib",
+          "-Zunstable-options",
+          "-Z binary-dep-depinfo"
+        ],
+        "cfgs": [
+          "ohm_incremental_driver_hash",
+          "ohm_source_file_hash"
+        ]
+      }
+    },
+    "locked": true,
+    "profile": "release",
+    "build_jobs": 24
+  },
+  "arms": {
+    "full": {
+      "source": {
+        "component": "clippy",
+        "arm": "full",
+        "git_head": "f52143702ff1f265014e87d5e6853e70a3b15728",
+        "source_file_count": 4604,
+        "every_blob_and_executable_mode_verified": true,
+        "source_tree": "a3e70e644ddefcc27d304e4416b2a8cf258b90b8",
+        "source_manifest_sha256": "786677f8375e120dc07ab8b8f1f25483bcc58116cae81944753ec1acfc18df03",
+        "patch_sha256": null,
+        "release_cargo_lock_sha256": "2f82b279e4e1aa450179309a234668a22d629fef2811ea6e65ff1057a693532d",
+        "bootstrap_config_sha256": "22e45f74d74fcba5821c2f3018637bb48491fe272c93af0dee30a9e7b5180323"
+      },
+      "own_pair_sha256": {
+        "clippy-driver": "439076b65a548bf8c847e9769be1f1b5195514cad042328808fec1e29718ffd0",
+        "cargo-clippy": "59e388fc78ca775d736e216499418f2cee2ba439343c4023c4c2ba2edcc716d4"
+      },
+      "component_pgo": {
+        "component": "clippy",
+        "enabled": true
+      },
+      "training_performed": true,
+      "profile_sha256": "23a5e690301ef2306db189f5758b0eb317d9e3a93c38864ccaad54253a59fd5b",
+      "arm_proof": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/component-build/receipts/clippy-full/reviewed-overlay/receipts/arm-proof.json",
+        "sha256": "917110e59ae9203e10abc0fbe79754b993c9b1d4caa05f60ed80e1568f2fa285"
+      },
+      "build_log": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/component-build/receipts/clippy-full/reviewed-overlay/receipts/profile-use-build.log",
+        "sha256": "05d06de71490a0365aacefed0faf03d0d2d9f83d76d8798f773361972759369e"
+      },
+      "actual_commands": {
+        "cargo_commands": [
+          {
+            "raw_command_sha256": "4075cee39abfc1b1635363acd7439f42802ff390521491d830917cd80db0adc7",
+            "removed_own_pgo_flags": [
+              "-Cprofile-use=/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/components/clippy/full/pgo/clippy-pgo.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function",
+              "-Cllvm-args=-static-func-strip-dirname-prefix=8"
+            ]
+          },
+          {
+            "raw_command_sha256": "0ccab9702b19967bf887e2a0813cc2a3c501e521d4093181f19a63eebdda8f5d",
+            "removed_own_pgo_flags": [
+              "-Cprofile-use=/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/components/clippy/full/pgo/clippy-pgo.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function",
+              "-Cllvm-args=-static-func-strip-dirname-prefix=8"
+            ]
+          }
+        ],
+        "unit_commands": {
+          "clippy_lints": {
+            "raw_command_sha256": "cea0c9775ce0d2a55429b1490d63e7a0c57afa8b3797356f27bd3f990ed6c411",
+            "removed_own_pgo_flags": [
+              "-Cprofile-use=/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/components/clippy/full/pgo/clippy-pgo.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function",
+              "-Cllvm-args=-static-func-strip-dirname-prefix=8"
+            ]
+          },
+          "clippy_utils": {
+            "raw_command_sha256": "a0af6424b505cb0822cfc69bed088cb3ea1c1d9b9ac7b71695741689b12926f5",
+            "removed_own_pgo_flags": [
+              "-Cprofile-use=/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/components/clippy/full/pgo/clippy-pgo.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function",
+              "-Cllvm-args=-static-func-strip-dirname-prefix=8"
+            ]
+          },
+          "clippy_driver": {
+            "raw_command_sha256": "d3418fb826181e3699fad911f45bd4b573deb85d82114d44fa6947e98e15cb8d",
+            "removed_own_pgo_flags": [
+              "-Cprofile-use=/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/components/clippy/full/pgo/clippy-pgo.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function",
+              "-Cllvm-args=-static-func-strip-dirname-prefix=8"
+            ]
+          },
+          "cargo_clippy": {
+            "raw_command_sha256": "2674ce7142fdc11ddbadd47f286a4cc1881c238905518252f913175bae3045c1",
+            "removed_own_pgo_flags": [
+              "-Cprofile-use=/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/components/clippy/full/pgo/clippy-pgo.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function",
+              "-Cllvm-args=-static-func-strip-dirname-prefix=8"
+            ]
+          }
+        }
+      }
+    },
+    "full-pgo-off": {
+      "source": {
+        "component": "clippy",
+        "arm": "full-pgo-off",
+        "git_head": "f52143702ff1f265014e87d5e6853e70a3b15728",
+        "source_file_count": 4604,
+        "every_blob_and_executable_mode_verified": true,
+        "source_tree": "a3e70e644ddefcc27d304e4416b2a8cf258b90b8",
+        "source_manifest_sha256": "786677f8375e120dc07ab8b8f1f25483bcc58116cae81944753ec1acfc18df03",
+        "patch_sha256": null,
+        "release_cargo_lock_sha256": "2f82b279e4e1aa450179309a234668a22d629fef2811ea6e65ff1057a693532d",
+        "bootstrap_config_sha256": "22e45f74d74fcba5821c2f3018637bb48491fe272c93af0dee30a9e7b5180323"
+      },
+      "own_pair_sha256": {
+        "clippy-driver": "ad2a1f16ab566bd74766414015217fd41f0736fb470ee0c2166000945864e56d",
+        "cargo-clippy": "dbc6f48245b264899952115da0aef23f77f82c2b19b31eb9d95ae48a54cd6b68"
+      },
+      "component_pgo": {
+        "component": "clippy",
+        "enabled": false
+      },
+      "training_performed": false,
+      "profile_sha256": null,
+      "arm_proof": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/component-build/receipts/clippy-full-pgo-off/reviewed-overlay/receipts/arm-proof.json",
+        "sha256": "03bcfae7a60c048ee9c43b139462b1e8feb2871ca70b70b4a4aaf88b05e6031b"
+      },
+      "build_log": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/component-build/receipts/clippy-full-pgo-off/reviewed-overlay/receipts/profile-use-build.log",
+        "sha256": "38af25df5335c5c93c9e12d7181568e24555fa3167ddeb16c6c8d8990bf3e78d"
+      },
+      "actual_commands": {
+        "cargo_commands": [
+          {
+            "raw_command_sha256": "dcf51ed47fa56ee4a6f268ca064797c61c0192312c0075961942c59faf1f71d0",
+            "removed_own_pgo_flags": []
+          },
+          {
+            "raw_command_sha256": "6ed47086eb8b69cd5016515e61feb8f095d6f35b68061f01d75c6393a42b7d5a",
+            "removed_own_pgo_flags": []
+          }
+        ],
+        "unit_commands": {
+          "clippy_lints": {
+            "raw_command_sha256": "b3bbee0dcf80487b707595c05b8dc7b9a5801136b7f0aadbddf9a25c521a348d",
+            "removed_own_pgo_flags": []
+          },
+          "clippy_utils": {
+            "raw_command_sha256": "306b766c235015b7b27f77a6796ffa7e8bc9efd7220c8673e709016943bd4547",
+            "removed_own_pgo_flags": []
+          },
+          "clippy_driver": {
+            "raw_command_sha256": "5992b72c3de54d0eb0709a2de338f6f3175a5e031b16b49e8e95ade468594bd9",
+            "removed_own_pgo_flags": []
+          },
+          "cargo_clippy": {
+            "raw_command_sha256": "c86575efcb15f19d110abec86c54f53f1ed56d25168d8a5cdd0c87c78c75f7bc",
+            "removed_own_pgo_flags": []
+          }
+        }
+      }
+    }
+  },
+  "normalization": "Remove only the own profile-use flag and the two bootstrap PGO helper LLVM flags; omit Cargo metadata/extra-filename from policy, retain every raw command hash. All remaining codegen options, features and driver CFGs compare exactly.",
+  "full_only_training_inputs": {
+    "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/component-build/receipts/clippy-training-inputs-common.json",
+    "sha256": "5a6428923aaa4cb84639ddc1573ca9100166ab7d29055641775164b713b7ebf1"
+  },
+  "training_scope": "The accepted full source arm executed component training; the OFF arm has no instrument/train phase. Other components use the common frozen optimized runtime.",
+  "generator_sha256": "5f649e896cdd0fdac16144157db4342f0834e85d14dad7c30b3fbe2628138f13"
+}

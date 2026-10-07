@@ -1,0 +1,447 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 040bc408ce1..02d3321713f 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -148,6 +148,15 @@ jobs:
+           tests/ui/wf/nominal-inherited-obligations-fail.rs
+           tests/incremental/nominal-inherited-obligations.rs
+ 
++      - name: Run borrow checker dataflow regression tests
++        run: >-
++          python3 x.py --ci false --set build.submodules=false --set rust.debug-assertions=true
++          --set rust.lto=off test --stage 1
++          tests/ui/borrowck/borrowck-lend-flow-loop.rs
++          tests/ui/borrowck/two-phase-cannot-nest-mut-self-calls.rs
++          tests/ui/nll/maybe-initialized-drop.rs
++          tests/ui/nll/match-guards-partially-borrow.rs
++
+       - name: Run cached hygiene unit tests
+         run: >-
+           python3 x.py --ci false --set build.submodules=false --set rust.debug-assertions=true
+diff --git a/compiler/rustc_borrowck/src/dataflow.rs b/compiler/rustc_borrowck/src/dataflow.rs
+index 5dcb182f70d..e48ce293b5d 100644
+--- a/compiler/rustc_borrowck/src/dataflow.rs
++++ b/compiler/rustc_borrowck/src/dataflow.rs
+@@ -17,9 +17,8 @@
+ #[cfg(test)]
+ mod tests;
+ 
+-// This analysis is different to most others. Its results aren't computed with
+-// `iterate_to_fixpoint`, but are instead composed from the results of three sub-analyses that are
+-// computed individually with `iterate_to_fixpoint`.
++// These analyses converge independently. Combine their results for a single visit without
++// making changes in one analysis requeue work for the others.
+ pub(crate) struct Borrowck<'a, 'tcx> {
+     pub(crate) borrows: Borrows<'a, 'tcx>,
+     pub(crate) uninits: MaybeUninitializedPlaces<'a, 'tcx>,
+@@ -50,7 +49,9 @@ fn apply_early_statement_effect(
+         stmt: &mir::Statement<'tcx>,
+         loc: Location,
+     ) {
+-        self.borrows.apply_early_statement_effect(&mut state.borrows, stmt, loc);
++        if self.borrows.borrow_set.len() != 0 {
++            self.borrows.apply_early_statement_effect(&mut state.borrows, stmt, loc);
++        }
+         self.uninits.apply_early_statement_effect(&mut state.uninits, stmt, loc);
+         self.ever_inits.apply_early_statement_effect(&mut state.ever_inits, stmt, loc);
+     }
+@@ -61,7 +62,9 @@ fn apply_primary_statement_effect(
+         stmt: &mir::Statement<'tcx>,
+         loc: Location,
+     ) {
+-        self.borrows.apply_primary_statement_effect(&mut state.borrows, stmt, loc);
++        if self.borrows.borrow_set.len() != 0 {
++            self.borrows.apply_primary_statement_effect(&mut state.borrows, stmt, loc);
++        }
+         self.uninits.apply_primary_statement_effect(&mut state.uninits, stmt, loc);
+         self.ever_inits.apply_primary_statement_effect(&mut state.ever_inits, stmt, loc);
+     }
+@@ -72,7 +75,9 @@ fn apply_early_terminator_effect(
+         term: &mir::Terminator<'tcx>,
+         loc: Location,
+     ) {
+-        self.borrows.apply_early_terminator_effect(&mut state.borrows, term, loc);
++        if self.borrows.borrow_set.len() != 0 {
++            self.borrows.apply_early_terminator_effect(&mut state.borrows, term, loc);
++        }
+         self.uninits.apply_early_terminator_effect(&mut state.uninits, term, loc);
+         self.ever_inits.apply_early_terminator_effect(&mut state.ever_inits, term, loc);
+     }
+@@ -83,7 +88,9 @@ fn apply_primary_terminator_effect(
+         term: &mir::Terminator<'tcx>,
+         loc: Location,
+     ) {
+-        self.borrows.apply_primary_terminator_effect(&mut state.borrows, term, loc);
++        if self.borrows.borrow_set.len() != 0 {
++            self.borrows.apply_primary_terminator_effect(&mut state.borrows, term, loc);
++        }
+         self.uninits.apply_primary_terminator_effect(&mut state.uninits, term, loc);
+         self.ever_inits.apply_primary_terminator_effect(&mut state.ever_inits, term, loc);
+     }
+diff --git a/compiler/rustc_borrowck/src/handle_placeholders.rs b/compiler/rustc_borrowck/src/handle_placeholders.rs
+index 99f34502b46..7e8a75ab8b7 100644
+--- a/compiler/rustc_borrowck/src/handle_placeholders.rs
++++ b/compiler/rustc_borrowck/src/handle_placeholders.rs
+@@ -11,6 +11,7 @@
+ use rustc_middle::ty::{RegionVid, UniverseIndex};
+ use tracing::{debug, trace};
+ 
++use crate::constraints::graph::NormalConstraintGraph;
+ use crate::constraints::{ConstraintSccIndex, OutlivesConstraintSet};
+ use crate::consumers::OutlivesConstraint;
+ use crate::diagnostics::UniverseInfo;
+@@ -26,6 +27,7 @@
+ /// higher-kinded constraints.
+ pub(crate) struct LoweredConstraints<'tcx> {
+     pub(crate) constraint_sccs: Sccs<RegionVid, ConstraintSccIndex>,
++    pub(crate) constraint_graph: Frozen<NormalConstraintGraph>,
+     pub(crate) definitions: Frozen<IndexVec<RegionVid, RegionDefinition<'tcx>>>,
+     pub(crate) scc_annotations: IndexVec<ConstraintSccIndex, RegionTracker>,
+     pub(crate) outlives_constraints: Frozen<OutlivesConstraintSet<'tcx>>,
+@@ -303,16 +305,16 @@ pub(crate) fn compute_sccs_applying_placeholder_outlives_constraints<'tcx>(
+         debug!("No placeholder regions found; skipping rewriting logic!");
+ 
+         let mut scc_annotations = NoPlaceholderSccAnnotations(SccAnnotations::init(&definitions));
++        let constraint_graph = outlives_constraints.graph(definitions.len());
+         let constraint_sccs = ConstraintSccs::new_with_annotation(
+-            &outlives_constraints
+-                .graph(definitions.len())
+-                .region_graph(&outlives_constraints, fr_static),
++            &constraint_graph.region_graph(&outlives_constraints, fr_static),
+             &mut scc_annotations,
+         );
+ 
+         return LoweredConstraints {
+             type_tests,
+             constraint_sccs,
++            constraint_graph: Frozen::freeze(constraint_graph),
+             scc_annotations: scc_annotations.0.scc_to_annotation,
+             definitions,
+             outlives_constraints: Frozen::freeze(outlives_constraints),
+@@ -325,14 +327,17 @@ pub(crate) fn compute_sccs_applying_placeholder_outlives_constraints<'tcx>(
+     let compute_sccs =
+         |constraints: &OutlivesConstraintSet<'tcx>,
+          annotations: &mut SccAnnotations<'_, 'tcx, RegionTracker>| {
+-            ConstraintSccs::new_with_annotation(
+-                &constraints.graph(definitions.len()).region_graph(constraints, fr_static),
++            let constraint_graph = constraints.graph(definitions.len());
++            let constraint_sccs = ConstraintSccs::new_with_annotation(
++                &constraint_graph.region_graph(constraints, fr_static),
+                 annotations,
+-            )
++            );
++            (constraint_sccs, constraint_graph)
+         };
+ 
+     let mut scc_annotations = SccAnnotations::init(&definitions);
+-    let constraint_sccs = compute_sccs(&outlives_constraints, &mut scc_annotations);
++    let (constraint_sccs, constraint_graph) =
++        compute_sccs(&outlives_constraints, &mut scc_annotations);
+ 
+     debug!("Placeholders present; activating placeholder handling logic!");
+ 
+@@ -343,22 +348,25 @@ pub(crate) fn compute_sccs_applying_placeholder_outlives_constraints<'tcx>(
+         &mut outlives_constraints,
+     );
+ 
+-    let (constraint_sccs, scc_annotations) = if added_constraints {
++    let (constraint_sccs, constraint_graph, scc_annotations) = if added_constraints {
+         let mut annotations = SccAnnotations::init(&definitions);
+ 
+         // We changed the constraint set and so must recompute SCCs.
+         // Optimisation opportunity: if we can add them incrementally (and that's
+         // possible because edges to 'static always only merge SCCs into 'static),
+         // we would potentially save a lot of work here.
+-        (compute_sccs(&outlives_constraints, &mut annotations), annotations.scc_to_annotation)
++        let (constraint_sccs, constraint_graph) =
++            compute_sccs(&outlives_constraints, &mut annotations);
++        (constraint_sccs, constraint_graph, annotations.scc_to_annotation)
+     } else {
+         // If we didn't add any back-edges; no more work needs doing
+         debug!("No constraints rewritten!");
+-        (constraint_sccs, scc_annotations.scc_to_annotation)
++        (constraint_sccs, constraint_graph, scc_annotations.scc_to_annotation)
+     };
+ 
+     LoweredConstraints {
+         constraint_sccs,
++        constraint_graph: Frozen::freeze(constraint_graph),
+         definitions,
+         scc_annotations,
+         outlives_constraints: Frozen::freeze(outlives_constraints),
+diff --git a/compiler/rustc_borrowck/src/lib.rs b/compiler/rustc_borrowck/src/lib.rs
+index b1336145566..d9480452637 100644
+--- a/compiler/rustc_borrowck/src/lib.rs
++++ b/compiler/rustc_borrowck/src/lib.rs
+@@ -612,8 +612,8 @@ fn get_flow_results<'a, 'tcx>(
+     borrow_set: &'a BorrowSet<'tcx>,
+     regioncx: &RegionInferenceContext<'tcx>,
+ ) -> Results<'tcx, Borrowck<'a, 'tcx>> {
+-    // We compute these three analyses individually, but them combine them into
+-    // a single results so that `mbcx` can visit them all together.
++    // Compute these analyses independently, then combine their results so that `mbcx`
++    // can visit them together.
+     let borrows = {
+         let _timer = tcx.prof.generic_activity("borrowck_dataflow_borrows");
+         Borrows::new(tcx, body, regioncx, borrow_set).iterate_to_fixpoint(
+diff --git a/compiler/rustc_borrowck/src/region_infer/mod.rs b/compiler/rustc_borrowck/src/region_infer/mod.rs
+index d86ba5d462d..1d0e4a29be1 100644
+--- a/compiler/rustc_borrowck/src/region_infer/mod.rs
++++ b/compiler/rustc_borrowck/src/region_infer/mod.rs
+@@ -343,6 +343,7 @@ pub(crate) fn new(
+ 
+         let LoweredConstraints {
+             constraint_sccs,
++            constraint_graph,
+             definitions,
+             outlives_constraints,
+             scc_annotations,
+@@ -357,8 +358,6 @@ pub(crate) fn new(
+         debug!("placeholder_indices: {:#?}", placeholder_indices);
+         debug!("type tests: {:#?}", type_tests);
+ 
+-        let constraint_graph = Frozen::freeze(outlives_constraints.graph(definitions.len()));
+-
+         if cfg!(debug_assertions) {
+             sccs_info(infcx, &constraint_sccs);
+         }
+diff --git a/compiler/rustc_hir_typeck/src/check.rs b/compiler/rustc_hir_typeck/src/check.rs
+index 60fc0b8f9b2..bfab52c5083 100644
+--- a/compiler/rustc_hir_typeck/src/check.rs
++++ b/compiler/rustc_hir_typeck/src/check.rs
+@@ -6,7 +6,7 @@
+ use rustc_hir_analysis::check::check_function_signature;
+ use rustc_infer::infer::RegionVariableOrigin;
+ use rustc_infer::traits::WellFormedLoc;
+-use rustc_middle::ty::{self, Binder, Ty, TyCtxt};
++use rustc_middle::ty::{self, Binder, Ty, TyCtxt, TypeVisitableExt};
+ use rustc_span::def_id::LocalDefId;
+ use rustc_span::sym;
+ use rustc_trait_selection::traits::{ObligationCause, ObligationCauseCode};
+@@ -48,8 +48,17 @@ pub(super) fn check_fn<'a, 'tcx>(
+ 
+     let span = body.value.span;
+ 
+-    for param in body.params {
+-        GatherLocalsVisitor::gather_from_param(fcx, param);
++    // For ordinary functions, the normalized input types are already known.
++    // Bind simple parameters to those types without creating an inference variable
++    // and a second Sized obligation for each one.
++    let known_input_tys = (!fn_sig.c_variadic() && !tcx.is_typeck_child(fn_def_id.to_def_id()))
++        .then_some(fn_sig.inputs());
++    for (idx, param) in body.params.iter().enumerate() {
++        let known_ty = known_input_tys
++            .and_then(|inputs| inputs.get(idx))
++            .copied()
++            .filter(|ty| !ty.has_infer_types() && !ty.references_error());
++        GatherLocalsVisitor::gather_from_param(fcx, param, known_ty);
+     }
+ 
+     // C-variadic fns also have a `VaList` input that's not listed in `fn_sig`
+diff --git a/compiler/rustc_hir_typeck/src/fallback.rs b/compiler/rustc_hir_typeck/src/fallback.rs
+index 44906cb330c..1e17de52f43 100644
+--- a/compiler/rustc_hir_typeck/src/fallback.rs
++++ b/compiler/rustc_hir_typeck/src/fallback.rs
+@@ -218,6 +218,12 @@ fn calculate_diverging_fallback(&self) -> (UnordSet<ty::TyVid>, Ty<'tcx>) {
+             }
+         };
+ 
++        // Without a diverging type variable, no unresolved type can need
++        // never type fallback or its associated lints.
++        if self.diverging_type_vars.borrow().is_empty() {
++            return (UnordSet::new(), diverging_fallback_ty);
++        }
++
+         // Compute the diverging root vids D -- that is, the root vid of
+         // those type variables that (a) are the target of a coercion from
+         // a `!` type and (b) have not yet been solved.
+diff --git a/compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs b/compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs
+index 8ff4c3bf28c..4625b3adaaa 100644
+--- a/compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs
++++ b/compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs
+@@ -516,6 +516,15 @@ pub(crate) fn require_type_is_sized(
+     ) {
+         if !ty.references_error() {
+             let lang_item = self.tcx.require_lang_item(LangItem::Sized, span);
++            // Fulfillment skips this obligation for types known to be Sized.
++            if !self.infcx.disable_trait_solver_fast_paths()
++                && self.infcx.obligation_inspector.get().is_none()
++                && !ty.has_non_region_infer()
++                && !ty.has_escaping_bound_vars()
++                && ty.has_trivial_sizedness(self.tcx, SizedTraitKind::Sized)
++            {
++                return;
++            }
+             self.require_type_meets(ty, span, code, lang_item);
+         }
+     }
+@@ -681,6 +690,17 @@ pub(crate) fn register_wf_obligation(
+         span: Span,
+         code: traits::ObligationCauseCode<'tcx>,
+     ) {
++        // Fulfillment immediately discards trivially well-formed terms. Avoid
++        // putting these obligations into the forest in the first place.
++        if !self.infcx.disable_trait_solver_fast_paths()
++            && self.infcx.obligation_inspector.get().is_none()
++            && !term.has_non_region_infer()
++            && !term.has_escaping_bound_vars()
++            && term.is_trivially_wf(self.tcx)
++        {
++            return;
++        }
++
+         // WF obligations never themselves fail, so no real need to give a detailed cause:
+         let cause = self.cause(span, code);
+         self.register_predicate(traits::Obligation::new(
+diff --git a/compiler/rustc_hir_typeck/src/gather_locals.rs b/compiler/rustc_hir_typeck/src/gather_locals.rs
+index 21954203a70..4f70093f74d 100644
+--- a/compiler/rustc_hir_typeck/src/gather_locals.rs
++++ b/compiler/rustc_hir_typeck/src/gather_locals.rs
+@@ -91,12 +91,27 @@ pub(crate) fn gather_from_let_expr(
+         visitor.visit_pat(let_expr.pat);
+     }
+ 
+-    pub(crate) fn gather_from_param(fcx: &'a FnCtxt<'a, 'tcx>, param: &'tcx hir::Param<'tcx>) {
++    pub(crate) fn gather_from_param(
++        fcx: &'a FnCtxt<'a, 'tcx>,
++        param: &'tcx hir::Param<'tcx>,
++        known_ty: Option<Ty<'tcx>>,
++    ) {
+         let mut visitor = GatherLocalsVisitor {
+             fcx,
+             outermost_fn_param_pat: Some((param.ty_span, param.hir_id)),
+         };
+-        visitor.visit_pat(param.pat);
++        if let Some(known_ty) = known_ty
++            && let PatKind::Binding(hir::BindingMode(hir::ByRef::No, _), var_id, _, None) =
++                param.pat.kind
++            && var_id == param.pat.hir_id
++        {
++            // check_fn checks the parameter type is Sized. This binding has
++            // that exact type, so it needs neither a fresh type variable nor a
++            // separate Sized obligation.
++            visitor.assign(param.pat.span, param.pat.hir_id, Some(known_ty));
++        } else {
++            visitor.visit_pat(param.pat);
++        }
+     }
+ 
+     pub(crate) fn gather_from_arm(fcx: &'a FnCtxt<'a, 'tcx>, local: &'tcx hir::Arm<'tcx>) {
+diff --git a/compiler/rustc_hir_typeck/src/loops.rs b/compiler/rustc_hir_typeck/src/loops.rs
+index ea01744d5b6..993dd8457c0 100644
+--- a/compiler/rustc_hir_typeck/src/loops.rs
++++ b/compiler/rustc_hir_typeck/src/loops.rs
+@@ -84,6 +84,20 @@ struct CheckLoopVisitor<'tcx> {
+ }
+ 
+ pub(crate) fn check<'tcx>(tcx: TyCtxt<'tcx>, def_id: LocalDefId, body: &'tcx hir::Body<'tcx>) {
++    // HIR indexing visits every expression in the owner, including nested bodies.
++    // Without a `break` or `continue`, there is nothing for this visitor to check.
++    if !tcx.hir_owner_nodes(body.value.hir_id.owner).nodes.iter().any(|node| {
++        matches!(
++            node.node,
++            Node::Expr(hir::Expr {
++                kind: hir::ExprKind::Break(..) | hir::ExprKind::Continue(..),
++                ..
++            })
++        )
++    }) {
++        return;
++    }
++
+     let mut check =
+         CheckLoopVisitor { tcx, cx_stack: vec![Normal], block_breaks: Default::default() };
+     let cx = match tcx.def_kind(def_id) {
+diff --git a/compiler/rustc_hir_typeck/src/writeback.rs b/compiler/rustc_hir_typeck/src/writeback.rs
+index 7b1f38f8827..e5997f79784 100644
+--- a/compiler/rustc_hir_typeck/src/writeback.rs
++++ b/compiler/rustc_hir_typeck/src/writeback.rs
+@@ -835,6 +835,22 @@ fn resolve<T>(&mut self, value: T, span: &dyn Locatable) -> T
+     {
+         let value = self.fcx.resolve_vars_if_possible(value);
+ 
++        // With no inference variables, regions, or aliases, resolution and
++        // normalization cannot change this value. Generic const expressions
++        // may still require normalization, so keep their existing path.
++        if !self.tcx().features().generic_const_exprs()
++            && !value.has_type_flags(
++                ty::TypeFlags::HAS_INFER | ty::TypeFlags::HAS_REGIONS | ty::TypeFlags::HAS_ALIAS,
++            )
++        {
++            // Preserve writeback's error-taint update for values containing
++            // an already reported error.
++            if let Err(guar) = value.error_reported() {
++                self.typeck_results.tainted_by_errors = Some(guar);
++            }
++            return value;
++        }
++
+         let mut goals = vec![];
+         let value =
+             value.fold_with(&mut Resolver::new(self.fcx, span, self.body, true, &mut goals));
+diff --git a/compiler/rustc_privacy/src/lib.rs b/compiler/rustc_privacy/src/lib.rs
+index d87c451e193..4f6465938e0 100644
+--- a/compiler/rustc_privacy/src/lib.rs
++++ b/compiler/rustc_privacy/src/lib.rs
+@@ -1882,10 +1882,14 @@ fn effective_visibilities(tcx: TyCtxt<'_>, (): ()) -> &EffectiveVisibilities {
+     }
+     visitor.effective_visibilities.check_invariants(tcx);
+ 
+-    let check_visitor =
+-        TestReachabilityVisitor { tcx, effective_visibilities: &visitor.effective_visibilities };
+-    for id in crate_items.owners() {
+-        check_visitor.check_def_id(id);
++    if tcx.features().rustc_attrs() {
++        let check_visitor = TestReachabilityVisitor {
++            tcx,
++            effective_visibilities: &visitor.effective_visibilities,
++        };
++        for id in crate_items.owners() {
++            check_visitor.check_def_id(id);
++        }
+     }
+ 
+     tcx.arena.alloc(visitor.effective_visibilities)
+diff --git a/tests/ui/typeck/parameter-binding-known-types.rs b/tests/ui/typeck/parameter-binding-known-types.rs
+new file mode 100644
+index 00000000000..75e4371bde3
+--- /dev/null
++++ b/tests/ui/typeck/parameter-binding-known-types.rs
+@@ -0,0 +1,37 @@
++//! Type-check named function parameters directly against their known signature types.
++
++//@ check-pass
++
++#![allow(dead_code)]
++
++struct Handler<T>(T);
++
++impl<T: Clone> Handler<T> {
++    fn clone_argument(&self, item: T) -> T {
++        item.clone()
++    }
++
++    fn increment(&self, mut value: usize) -> usize {
++        value += 1;
++        value
++    }
++
++    fn destructure(&self, (first, second): (T, T)) -> (T, T) {
++        (second, first)
++    }
++
++    fn ref_binding(&self, ref item: T) -> T {
++        item.clone()
++    }
++}
++
++fn borrow<'a, T>(item: &'a T) -> &'a T {
++    item
++}
++
++fn closure_parameter() {
++    let identity = |item| item;
++    let _: u32 = identity(5_u32);
++}
++
++fn main() {}

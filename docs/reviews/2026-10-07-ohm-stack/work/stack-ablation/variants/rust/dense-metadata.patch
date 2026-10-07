@@ -1,0 +1,561 @@
+diff --git a/compiler/rustc_metadata/src/rmeta/decoder.rs b/compiler/rustc_metadata/src/rmeta/decoder.rs
+index 97cf428d0ab..782d0814ee1 100644
+--- a/compiler/rustc_metadata/src/rmeta/decoder.rs
++++ b/compiler/rustc_metadata/src/rmeta/decoder.rs
+@@ -44,7 +44,7 @@
+ 
+ use crate::creader::CStore;
+ use crate::eii::EiiMapEncodedKeyValue;
+-use crate::rmeta::table::{FixedSizeEncoding, IsDefault};
++use crate::rmeta::table::IsDefault;
+ use crate::rmeta::*;
+ 
+ mod cstore_impl;
+@@ -204,11 +204,7 @@ fn read_lazy_array<T>(&mut self, len: usize) -> LazyArray<T> {
+         self.read_lazy_offset_then(|pos| LazyArray::from_position_and_num_elems(pos, len))
+     }
+ 
+-    fn read_lazy_table<I, T: FixedSizeEncoding>(
+-        &mut self,
+-        width: usize,
+-        len: usize,
+-    ) -> LazyTable<I, T> {
++    fn read_lazy_table<I, T>(&mut self, width: usize, len: usize) -> LazyTable<I, T> {
+         self.read_lazy_offset_then(|pos| LazyTable::from_position_and_encoded_size(pos, width, len))
+     }
+ 
+@@ -713,7 +709,7 @@ fn decode(decoder: &mut D) -> Self {
+     }
+ }
+ 
+-impl<I: Idx, D: LazyDecoder, T: FixedSizeEncoding> Decodable<D> for LazyTable<I, T> {
++impl<I: Idx, D: LazyDecoder, T> Decodable<D> for LazyTable<I, T> {
+     fn decode(decoder: &mut D) -> Self {
+         let width = decoder.read_usize();
+         let len = decoder.read_usize();
+diff --git a/compiler/rustc_metadata/src/rmeta/encoder.rs b/compiler/rustc_metadata/src/rmeta/encoder.rs
+index 05c7f8747d4..3e1dd5a288f 100644
+--- a/compiler/rustc_metadata/src/rmeta/encoder.rs
++++ b/compiler/rustc_metadata/src/rmeta/encoder.rs
+@@ -3334,11 +3334,21 @@ fn try_reuse_metadata_prefix(
+         return None;
+     }
+     let previous_rdr_hashes = previous_root.rdr_hashes.take()?;
+-    let local_hashes_range = previous_rdr_hashes.local.encoded_range(&metadata)?;
+-    let expn_hashes_range = previous_rdr_hashes.expn.encoded_range(&metadata)?;
+-    if local_hashes_range.start < manifest.prefix_position
+-        || expn_hashes_range.start < manifest.prefix_position
+-    {
++    let table_in_bounds = |position: usize, width: usize, length: usize| {
++        width
++            .checked_mul(length)
++            .and_then(|length| position.checked_add(length))
++            .is_some_and(|end| position >= manifest.prefix_position && end <= metadata.len())
++    };
++    if !table_in_bounds(
++        previous_rdr_hashes.local.position.get(),
++        previous_rdr_hashes.local.width,
++        previous_rdr_hashes.local.len,
++    ) || !table_in_bounds(
++        previous_rdr_hashes.expn.position.get(),
++        previous_rdr_hashes.expn.width,
++        previous_rdr_hashes.expn.len,
++    ) {
+         return None;
+     }
+ 
+@@ -3376,18 +3386,8 @@ fn try_reuse_metadata_prefix(
+                     ecx.encode_enabled_denied_partial_mitigations(&mut hcx).value;
+             });
+             previous_root.rdr_hashes = Some(ItemPublicHashes {
+-                local: relocate_metadata_table(
+-                    ecx,
+-                    &metadata,
+-                    previous_rdr_hashes.local,
+-                    local_hashes_range,
+-                ),
+-                expn: relocate_metadata_table(
+-                    ecx,
+-                    &metadata,
+-                    previous_rdr_hashes.expn,
+-                    expn_hashes_range,
+-                ),
++                local: relocate_metadata_table(ecx, &metadata, previous_rdr_hashes.local),
++                expn: relocate_metadata_table(ecx, &metadata, previous_rdr_hashes.expn),
+                 public_global_hash: previous_rdr_hashes.public_global_hash,
+             });
+             previous_root.header.hashes.private_hash = current_private_hash;
+diff --git a/compiler/rustc_metadata/src/rmeta/encoder/metadata_prefix.rs b/compiler/rustc_metadata/src/rmeta/encoder/metadata_prefix.rs
+index fa0dfa75f1b..dbbff9da992 100644
+--- a/compiler/rustc_metadata/src/rmeta/encoder/metadata_prefix.rs
++++ b/compiler/rustc_metadata/src/rmeta/encoder/metadata_prefix.rs
+@@ -4,7 +4,6 @@
+ use std::hash::Hash;
+ use std::io::{Read, Seek, Write};
+ use std::num::NonZero;
+-use std::ops::Range;
+ use std::path::Path;
+ 
+ use rustc_data_structures::fingerprint::Fingerprint;
+@@ -21,7 +20,6 @@
+ 
+ use super::{DefPathHashDefIdEncoder, EncodeContext, EncodedMetadata};
+ use crate::rmeta::LazyTable;
+-use crate::rmeta::table::FixedSizeEncoding;
+ 
+ const METADATA_PREFIX_MAGIC: &[u8] = b"ohm-metadata-prefix-v3\0";
+ 
+@@ -57,15 +55,15 @@ pub(super) fn metadata_fingerprint(bytes: &[u8]) -> Fingerprint {
+     hasher.finish()
+ }
+ 
+-/// Copies a suffix table whose complete encoding was validated before opening the output file.
+-pub(super) fn relocate_metadata_table<'tcx, I, T: FixedSizeEncoding>(
++pub(super) fn relocate_metadata_table<'tcx, I, T>(
+     ecx: &mut EncodeContext<'_, 'tcx, DefPathHashDefIdEncoder<'tcx>>,
+     metadata: &[u8],
+     table: LazyTable<I, T>,
+-    range: Range<usize>,
+ ) -> LazyTable<I, T> {
++    let start = table.position.get();
++    let length = table.width * table.len;
+     let position = NonZero::new(ecx.position()).expect("metadata preamble is nonempty");
+-    ecx.emit_raw_bytes(&metadata[range]);
++    ecx.emit_raw_bytes(&metadata[start..start + length]);
+     LazyTable::from_position_and_encoded_size(position, table.width, table.len)
+ }
+ 
+diff --git a/compiler/rustc_metadata/src/rmeta/mod.rs b/compiler/rustc_metadata/src/rmeta/mod.rs
+index 10f7379ed80..4159d5e2e8a 100644
+--- a/compiler/rustc_metadata/src/rmeta/mod.rs
++++ b/compiler/rustc_metadata/src/rmeta/mod.rs
+@@ -137,7 +137,6 @@ struct LazyTable<I, T> {
+     position: NonZero<usize>,
+     /// The encoded size of the elements of a table is selected at runtime to drop
+     /// trailing zeroes. This is the number of bytes used for each table element.
+-    /// Bit 7 selects a sparse bitmap index followed by the nonzero elements.
+     width: usize,
+     /// How many elements are in the table.
+     len: usize,
+@@ -149,13 +148,8 @@ fn from_position_and_encoded_size(
+         position: NonZero<usize>,
+         width: usize,
+         len: usize,
+-    ) -> LazyTable<I, T>
+-    where
+-        T: table::FixedSizeEncoding,
+-    {
+-        let table = LazyTable { position, width, len, _marker: PhantomData };
+-        assert!(table.checked_layout().is_some(), "invalid metadata table layout");
+-        table
++    ) -> LazyTable<I, T> {
++        LazyTable { position, width, len, _marker: PhantomData }
+     }
+ }
+ 
+diff --git a/compiler/rustc_metadata/src/rmeta/table.rs b/compiler/rustc_metadata/src/rmeta/table.rs
+index 4c326fd8f21..94f33623c2a 100644
+--- a/compiler/rustc_metadata/src/rmeta/table.rs
++++ b/compiler/rustc_metadata/src/rmeta/table.rs
+@@ -4,7 +4,6 @@
+ use rustc_hir::def_id::LocalDefId;
+ use rustc_index::Idx;
+ use rustc_middle::ty::codec::TyEncoder;
+-use rustc_serialize::Encoder;
+ 
+ use crate::rmeta::decoder::MetaBlob;
+ use crate::rmeta::encoder::MetadataEncoder;
+@@ -13,12 +12,6 @@
+ };
+ use crate::rmeta::*;
+ 
+-// The fixed-size encodings below use at most 17 bytes. Keep dense widths unchanged so dense
+-// tables retain their existing representation, and use the next varint bit for sparse tables.
+-const SPARSE_TABLE: usize = 128;
+-const SPARSE_BUCKET_LEN: usize = 64;
+-const SPARSE_BUCKET_BYTES: usize = 12;
+-
+ pub(super) trait IsDefault: Default {
+     fn is_default(&self) -> bool;
+ }
+@@ -62,8 +55,8 @@ fn is_default(&self) -> bool {
+ /// Helper trait, for encoding to, and decoding from, a fixed number of bytes.
+ /// Used mainly for Lazy positions and lengths.
+ ///
+-/// Invariant: `[0; BYTE_LEN]` decodes to the default value. Sparse tables omit
+-/// these entries and return `Default::default()` without decoding any bytes.
++/// Invariant: `Self::default()` should encode as `[0; BYTE_LEN]`,
++/// but this has no impact on safety.
+ /// In debug builds, this invariant is checked in `[TableBuilder::set]`
+ pub(super) trait FixedSizeEncoding: IsDefault {
+     /// This should be `[u8; BYTE_LEN]`;
+@@ -631,6 +624,11 @@ pub(super) fn set(&mut self, i: I, value: T) {
+             );
+         }
+         if !value.is_default() {
++            // FIXME(eddyb) investigate more compact encodings for sparse tables.
++            // On the PR @michaelwoerister mentioned:
++            // > Space requirements could perhaps be optimized by using the HAMT `popcnt`
++            // > trick (i.e. divide things into buckets of 32 or 64 items and then
++            // > store bit-masks of which item in each bucket is actually serialized).
+             let block = self.blocks.ensure_contains_elem(i, || [0; N]);
+             value.write_to_bytes(block);
+             if self.width != N {
+@@ -647,129 +645,24 @@ pub(crate) fn encode<'tcx, M: MetadataEncoder<'tcx>>(
+         let pos = buf.position();
+ 
+         let width = self.width;
+-        let sparse_index = sparse_table_index(self.blocks.raw.as_slice(), width);
+-        if let Some(index) = &sparse_index {
+-            buf.emit_raw_bytes(index.as_slice().as_flattened());
+-            for (blocks, bucket) in self.blocks.raw.chunks(SPARSE_BUCKET_LEN).zip(index) {
+-                let mut bitmap = u64::from_le_bytes(bucket[..8].try_into().unwrap());
+-                while bitmap != 0 {
+-                    let block = blocks[bitmap.trailing_zeros() as usize];
+-                    buf.write_with(|dest| {
+-                        *dest = block;
+-                        width
+-                    });
+-                    bitmap &= bitmap - 1;
+-                }
+-            }
+-        } else {
+-            for block in &self.blocks {
+-                buf.write_with(|dest| {
+-                    *dest = *block;
+-                    width
+-                });
+-            }
++        for block in &self.blocks {
++            buf.write_with(|dest| {
++                *dest = *block;
++                width
++            });
+         }
+         GraphHashed(LazyTable::from_position_and_encoded_size(
+             NonZero::new(pos).unwrap(),
+-            width | if sparse_index.is_some() { SPARSE_TABLE } else { 0 },
++            width,
+             self.blocks.len(),
+         ))
+     }
+ }
+ 
+-/// Indexes nonzero entries in groups of 64, if that saves space over the dense table.
+-///
+-/// Each bucket stores its occupancy bitmap and the number of nonzero entries before it. A lookup
+-/// needs only one bucket and a population count; values follow the complete index in order.
+-fn sparse_table_index<const N: usize>(blocks: &[[u8; N]], width: usize) -> Option<Vec<[u8; 12]>> {
+-    const { assert!(N < SPARSE_TABLE) };
+-    if width == 0 || blocks.len() > u32::MAX as usize {
+-        return None;
+-    }
+-
+-    let index_bytes = blocks.len().div_ceil(SPARSE_BUCKET_LEN).checked_mul(SPARSE_BUCKET_BYTES)?;
+-    let dense_bytes = blocks.len().checked_mul(width)?;
+-    // A sparse width needs one extra varint byte.
+-    if index_bytes + 1 >= dense_bytes {
+-        return None;
+-    }
+-    let max_present = (dense_bytes - index_bytes - 2) / width;
+-
+-    let mut index = Vec::with_capacity(blocks.len().div_ceil(SPARSE_BUCKET_LEN));
+-    let mut present = 0u32;
+-    for bucket in blocks.chunks(SPARSE_BUCKET_LEN) {
+-        let mut bitmap = 0u64;
+-        for (i, block) in bucket.iter().enumerate() {
+-            if *block != [0; N] {
+-                bitmap |= 1 << i;
+-            }
+-        }
+-        let mut entry = [0; SPARSE_BUCKET_BYTES];
+-        entry[..8].copy_from_slice(&bitmap.to_le_bytes());
+-        entry[8..].copy_from_slice(&present.to_le_bytes());
+-        index.push(entry);
+-        present = present.checked_add(bitmap.count_ones())?;
+-        // Later entries cannot make an already oversized sparse representation profitable.
+-        if present as usize > max_present {
+-            return None;
+-        }
+-    }
+-
+-    Some(index)
+-}
+-
+ fn trailing_zeros(x: &[u8]) -> usize {
+     x.iter().rev().take_while(|b| **b == 0).count()
+ }
+ 
+-impl<I, T: FixedSizeEncoding> LazyTable<I, T> {
+-    /// Checks the width and the largest possible offset before a table is used for lookup.
+-    pub(super) fn checked_layout(&self) -> Option<(usize, usize)> {
+-        let width = self.width & !SPARSE_TABLE;
+-        if width > std::mem::size_of::<T::ByteArray>() {
+-            return None;
+-        }
+-        let index_bytes = if self.width & SPARSE_TABLE != 0 {
+-            if width == 0 || self.len == 0 || self.len > u32::MAX as usize {
+-                return None;
+-            }
+-            self.len.div_ceil(SPARSE_BUCKET_LEN).checked_mul(SPARSE_BUCKET_BYTES)?
+-        } else {
+-            0
+-        };
+-        self.position.get().checked_add(index_bytes)?.checked_add(self.len.checked_mul(width)?)?;
+-        Some((width, index_bytes))
+-    }
+-
+-    /// Locates the complete table representation, including a sparse table's index.
+-    /// Metadata-prefix reuse validates every bucket before relocating suffix tables; ordinary
+-    /// table lookups only inspect their own bucket and remain constant-time.
+-    pub(super) fn encoded_range(&self, metadata: &[u8]) -> Option<std::ops::Range<usize>> {
+-        let (width, index_bytes) = self.checked_layout()?;
+-        let data_start = self.position.get() + index_bytes;
+-        let entries = if index_bytes != 0 {
+-            let index = metadata.get(self.position.get()..data_start)?;
+-            let mut entries = 0usize;
+-            for (i, bucket) in index.chunks_exact(SPARSE_BUCKET_BYTES).enumerate() {
+-                let bitmap = u64::from_le_bytes(bucket[..8].try_into().unwrap());
+-                let preceding = u32::from_le_bytes(bucket[8..].try_into().unwrap());
+-                let valid_bits = (self.len - i * SPARSE_BUCKET_LEN).min(SPARSE_BUCKET_LEN);
+-                if preceding as usize != entries
+-                    || (valid_bits < SPARSE_BUCKET_LEN && bitmap >> valid_bits != 0)
+-                {
+-                    return None;
+-                }
+-                entries += bitmap.count_ones() as usize;
+-            }
+-            entries
+-        } else {
+-            self.len
+-        };
+-        let end = data_start + entries * width;
+-        (end <= metadata.len()).then_some(self.position.get()..end)
+-    }
+-}
+-
+ impl<I: Idx, const N: usize, T: FixedSizeEncoding<ByteArray = [u8; N]> + ParameterizedOverTcx>
+     LazyTable<I, T>
+ where
+@@ -782,30 +675,8 @@ pub(super) fn get<'a, 'tcx, M: MetaBlob<'a>>(&self, metadata: M, i: I) -> T::Val
+             return Default::default();
+         }
+ 
+-        let (start, width) = if self.width & SPARSE_TABLE != 0 {
+-            let width = self.width - SPARSE_TABLE;
+-            let bucket_start =
+-                self.position.get() + (i.index() / SPARSE_BUCKET_LEN) * SPARSE_BUCKET_BYTES;
+-            let bucket = &metadata.blob()[bucket_start..bucket_start + SPARSE_BUCKET_BYTES];
+-            let bitmap = u64::from_le_bytes(bucket[..8].try_into().unwrap());
+-            let bit = 1u64 << (i.index() % SPARSE_BUCKET_LEN);
+-            if bitmap & bit == 0 {
+-                return Default::default();
+-            }
+-            let preceding = u32::from_le_bytes(bucket[8..].try_into().unwrap());
+-            let index = (preceding as usize)
+-                .checked_add((bitmap & (bit - 1)).count_ones() as usize)
+-                .filter(|&index| index < self.len)
+-                .expect("invalid sparse metadata table index");
+-            (
+-                self.position.get()
+-                    + self.len.div_ceil(SPARSE_BUCKET_LEN) * SPARSE_BUCKET_BYTES
+-                    + width * index,
+-                width,
+-            )
+-        } else {
+-            (self.position.get() + self.width * i.index(), self.width)
+-        };
++        let width = self.width;
++        let start = self.position.get() + (width * i.index());
+         let end = start + width;
+         let bytes = &metadata.blob()[start..end];
+ 
+@@ -823,6 +694,3 @@ pub(super) fn size(&self) -> usize {
+         self.len
+     }
+ }
+-
+-#[cfg(test)]
+-mod tests;
+diff --git a/compiler/rustc_metadata/src/rmeta/table/tests.rs b/compiler/rustc_metadata/src/rmeta/table/tests.rs
+deleted file mode 100644
+index 470c5b6a5fb..00000000000
+--- a/compiler/rustc_metadata/src/rmeta/table/tests.rs
++++ /dev/null
+@@ -1,176 +0,0 @@
+-use rustc_data_structures::owned_slice::slice_owned;
+-use rustc_serialize::opaque::MAGIC_END_BYTES;
+-
+-use super::*;
+-
+-#[test]
+-fn sparse_and_dense_tables() {
+-    for width in [1, 2, 8] {
+-        for len in [0, 1, 63, 64, 65, 127, 128, 129, 257] {
+-            for sparse in [false, true] {
+-                let blocks: Vec<_> = (0..len)
+-                    .map(|i| {
+-                        let value = if !sparse || [0, 63, 64, 127, 128, 256].contains(&i) {
+-                            1u64 << ((width - 1) * 8)
+-                        } else {
+-                            0
+-                        };
+-                        value.to_le_bytes()
+-                    })
+-                    .collect();
+-                let index = sparse_table_index(&blocks, width);
+-                if !sparse {
+-                    assert!(index.is_none());
+-                } else if len == 257 {
+-                    assert!(index.is_some());
+-                }
+-                let mut encoded = vec![0];
+-                if let Some(index) = &index {
+-                    encoded.extend(index.iter().flatten());
+-                }
+-                for block in &blocks {
+-                    if index.is_none() || *block != [0; 8] {
+-                        encoded.extend_from_slice(&block[..width]);
+-                    }
+-                }
+-                let encoded_end = encoded.len();
+-                encoded.extend_from_slice(MAGIC_END_BYTES);
+-                let blob = MetadataBlob::new(slice_owned(encoded, |bytes| &bytes[..])).unwrap();
+-                let table = LazyTable::<usize, u64>::from_position_and_encoded_size(
+-                    NonZero::new(1).unwrap(),
+-                    width | if index.is_some() { SPARSE_TABLE } else { 0 },
+-                    len,
+-                );
+-                assert_eq!(table.encoded_range(&blob), Some(1..encoded_end));
+-                assert_eq!(table.encoded_range(&blob[..encoded_end - 1]), None);
+-                for (i, expected) in blocks.iter().enumerate() {
+-                    assert_eq!(table.get(&blob, i), u64::from_le_bytes(*expected));
+-                }
+-                assert_eq!(table.get(&blob, len), 0);
+-                assert_eq!(table.get(&blob, len + 100), 0);
+-
+-                // Prefix reuse copies a table's complete bytes to a different suffix position.
+-                let position = NonZero::new(37).unwrap();
+-                let mut relocated = vec![0; position.get()];
+-                relocated.extend_from_slice(&blob[table.encoded_range(&blob).unwrap()]);
+-                relocated.extend_from_slice(MAGIC_END_BYTES);
+-                let relocated =
+-                    MetadataBlob::new(slice_owned(relocated, |bytes| &bytes[..])).unwrap();
+-                let table = LazyTable::<usize, u64>::from_position_and_encoded_size(
+-                    position,
+-                    table.width,
+-                    len,
+-                );
+-                for (i, expected) in blocks.iter().enumerate() {
+-                    assert_eq!(table.get(&relocated, i), u64::from_le_bytes(*expected));
+-                }
+-            }
+-        }
+-    }
+-}
+-
+-#[test]
+-fn invalid_table_layouts() {
+-    for (position, width, len) in [
+-        (1, 9, 1),
+-        (1, SPARSE_TABLE | 9, 1),
+-        (1, SPARSE_TABLE * 2 | 1, 1),
+-        (1, SPARSE_TABLE, 1),
+-        (1, SPARSE_TABLE | 1, 0),
+-        (1, 8, usize::MAX),
+-        (usize::MAX, 1, 1),
+-        (usize::MAX, SPARSE_TABLE | 1, 1),
+-    ] {
+-        let position = NonZero::new(position).unwrap();
+-        let table = LazyTable::<usize, u64> { position, width, len, _marker: PhantomData };
+-        assert!(table.checked_layout().is_none());
+-        assert!(table.encoded_range(&[0; 64]).is_none());
+-        assert!(
+-            std::panic::catch_unwind(|| {
+-                LazyTable::<usize, u64>::from_position_and_encoded_size(position, width, len)
+-            })
+-            .is_err()
+-        );
+-    }
+-}
+-
+-#[test]
+-fn validate_every_sparse_bucket() {
+-    let blocks: Vec<_> =
+-        (0..129).map(|i| if i % SPARSE_BUCKET_LEN == 0 { [1u8] } else { [0] }).collect();
+-    let index = sparse_table_index(&blocks, 1).unwrap();
+-    let mut bytes = vec![0];
+-    bytes.extend_from_slice(index.as_slice().as_flattened());
+-    bytes.extend_from_slice(&[1; 3]);
+-    let table = LazyTable::<usize, u64>::from_position_and_encoded_size(
+-        NonZero::new(1).unwrap(),
+-        SPARSE_TABLE | 1,
+-        blocks.len(),
+-    );
+-    assert_eq!(table.encoded_range(&bytes), Some(1..bytes.len()));
+-    for end in 0..bytes.len() {
+-        assert!(table.encoded_range(&bytes[..end]).is_none());
+-    }
+-
+-    for bucket in 0..index.len() {
+-        let mut invalid = bytes.clone();
+-        let rank = 1 + bucket * SPARSE_BUCKET_BYTES + 8;
+-        invalid[rank..rank + 4].copy_from_slice(&u32::MAX.to_le_bytes());
+-        assert!(table.encoded_range(&invalid).is_none());
+-    }
+-    let mut invalid = bytes.clone();
+-    let last = 1 + (index.len() - 1) * SPARSE_BUCKET_BYTES;
+-    invalid[last..last + 8].copy_from_slice(&(1u64 << 63).to_le_bytes());
+-    assert!(table.encoded_range(&invalid).is_none());
+-
+-    // A malformed rank cannot wrap an offset and decode an unrelated value during lookup.
+-    let mut invalid = bytes;
+-    invalid[9..13].copy_from_slice(&u32::MAX.to_le_bytes());
+-    invalid.extend_from_slice(MAGIC_END_BYTES);
+-    let blob = MetadataBlob::new(slice_owned(invalid, |bytes| &bytes[..])).unwrap();
+-    assert!(
+-        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| table.get(&blob, 0))).is_err()
+-    );
+-}
+-
+-#[test]
+-fn sparse_encoding_must_be_strictly_smaller() {
+-    let mut blocks = [[0u8]; 15];
+-    blocks[0] = [1];
+-    // 12 index bytes + one value byte + the extra width varint byte.
+-    assert!(sparse_table_index(&blocks[..14], 1).is_none());
+-    assert!(sparse_table_index(&blocks, 1).is_some());
+-}
+-
+-#[test]
+-fn sparse_public_hashes() {
+-    let values: Vec<_> = (0..257)
+-        .map(|i| (i % 64 == 0).then(|| Fingerprint::from_le_bytes([i as u8 | 1; 16])))
+-        .collect();
+-    let blocks: Vec<_> = values
+-        .iter()
+-        .map(|&value| {
+-            let mut block = [0; 17];
+-            value.write_to_bytes(&mut block);
+-            block
+-        })
+-        .collect();
+-    let index = sparse_table_index(&blocks, 17).unwrap();
+-    let mut bytes = vec![0];
+-    bytes.extend_from_slice(index.as_slice().as_flattened());
+-    for block in blocks.iter().filter(|block| **block != [0; 17]) {
+-        bytes.extend_from_slice(block);
+-    }
+-    let end = bytes.len();
+-    bytes.extend_from_slice(MAGIC_END_BYTES);
+-    let blob = MetadataBlob::new(slice_owned(bytes, |bytes| &bytes[..])).unwrap();
+-    let table = LazyTable::<usize, Option<Fingerprint>>::from_position_and_encoded_size(
+-        NonZero::new(1).unwrap(),
+-        SPARSE_TABLE | 17,
+-        values.len(),
+-    );
+-    assert_eq!(table.encoded_range(&blob), Some(1..end));
+-    for (i, &value) in values.iter().enumerate() {
+-        assert_eq!(table.get(&blob, i), value);
+-    }
+-}

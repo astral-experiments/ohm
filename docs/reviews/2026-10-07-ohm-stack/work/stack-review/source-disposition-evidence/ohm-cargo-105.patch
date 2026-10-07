@@ -1,0 +1,64 @@
+diff --git a/src/compiler/fingerprint/dep_info.rs b/src/compiler/fingerprint/dep_info.rs
+index 9c5a78ece..e55cf67e6 100644
+--- a/src/compiler/fingerprint/dep_info.rs
++++ b/src/compiler/fingerprint/dep_info.rs
+@@ -648,10 +648,12 @@ impl Checksum {
+         Self { algo, value }
+     }
+ 
+-    pub fn compute(algo: ChecksumAlgo, contents: impl Read) -> Result<Self, io::Error> {
+-        // Buffer size is the recommended amount to fully leverage SIMD instructions on AVX-512 as per
+-        // blake3 documentation.
+-        let mut buf = vec![0; 16 * 1024];
++    pub fn compute(
++        algo: ChecksumAlgo,
++        contents: impl Read,
++        buf: &mut [u8],
++    ) -> Result<Self, io::Error> {
++        assert!(!buf.is_empty());
+         let mut ret = Self {
+             algo,
+             value: [0; 32],
+@@ -687,7 +689,7 @@ impl Checksum {
+                     },
+                     |mut h, out| out.copy_from_slice(&h.finish()),
+                     contents,
+-                    &mut buf,
++                    buf,
+                     value,
+                 )?;
+             }
+@@ -699,7 +701,7 @@ impl Checksum {
+                     },
+                     |h, out| out.copy_from_slice(h.finalize().as_bytes()),
+                     contents,
+-                    &mut buf,
++                    buf,
+                     value,
+                 )?;
+             }
+diff --git a/src/compiler/fingerprint/mod.rs b/src/compiler/fingerprint/mod.rs
+index 16bfefa11..50b64e062 100644
+--- a/src/compiler/fingerprint/mod.rs
++++ b/src/compiler/fingerprint/mod.rs
+@@ -3245,6 +3245,7 @@ where
+     } else {
+         None
+     };
++    let mut checksum_buffer = Vec::new();
+     for (path, prior_checksum) in paths {
+         let path = path.as_ref();
+ 
+@@ -3285,7 +3286,11 @@ where
+                             path: path.to_path_buf(),
+                         });
+                     };
+-                    let Ok(checksum) = Checksum::compute(prior_checksum.algo(), file) else {
++                    // Allocate lazily and reuse the buffer across source files.
++                    checksum_buffer.resize(64 * 1024, 0);
++                    let Ok(checksum) =
++                        Checksum::compute(prior_checksum.algo(), file, &mut checksum_buffer)
++                    else {
+                         return Some(StaleItem::UnableToReadFile {
+                             path: path.to_path_buf(),
+                         });

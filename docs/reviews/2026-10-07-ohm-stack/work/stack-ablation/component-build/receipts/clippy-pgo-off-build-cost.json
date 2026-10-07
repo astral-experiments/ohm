@@ -1,0 +1,72 @@
+{
+  "proof_kind": "component-pgo-observed-cost-v1",
+  "component": "clippy",
+  "arms": {
+    "full": {
+      "pair_bytes": {
+        "clippy-driver": 15832912,
+        "cargo-clippy": 1157728
+      },
+      "training_performed": true,
+      "own_profile_sha256": "23a5e690301ef2306db189f5758b0eb317d9e3a93c38864ccaad54253a59fd5b",
+      "phase_costs": {
+        "instrument": {
+          "elapsed_seconds": 233.29275559913367,
+          "user_seconds": 361.38263,
+          "system_seconds": 42.387058,
+          "peak_rss_kib": 2062020,
+          "exit_code": 0
+        },
+        "train": {
+          "elapsed_seconds": 102.03525956720114,
+          "user_seconds": 468.406687,
+          "system_seconds": 156.389234,
+          "peak_rss_kib": 1019272,
+          "exit_code": 0
+        },
+        "use": {
+          "elapsed_seconds": 219.2821491304785,
+          "user_seconds": 241.996099,
+          "system_seconds": 41.198169,
+          "peak_rss_kib": 2060388,
+          "exit_code": 0
+        },
+        "test": {
+          "elapsed_seconds": 67.03060490824282,
+          "user_seconds": 48.845747,
+          "system_seconds": 19.089498,
+          "peak_rss_kib": 437248,
+          "exit_code": 0
+        }
+      },
+      "arm_proof_sha256": "917110e59ae9203e10abc0fbe79754b993c9b1d4caa05f60ed80e1568f2fa285"
+    },
+    "full-pgo-off": {
+      "pair_bytes": {
+        "clippy-driver": 15990800,
+        "cargo-clippy": 1222544
+      },
+      "training_performed": false,
+      "own_profile_sha256": null,
+      "phase_costs": {
+        "use": {
+          "elapsed_seconds": 211.23611730337143,
+          "user_seconds": 229.640314,
+          "system_seconds": 39.743912,
+          "peak_rss_kib": 2052780,
+          "exit_code": 0
+        },
+        "test": {
+          "elapsed_seconds": 180.1069660168141,
+          "user_seconds": 175.951024,
+          "system_seconds": 27.592472,
+          "peak_rss_kib": 2026044,
+          "exit_code": 0
+        }
+      },
+      "arm_proof_sha256": "03bcfae7a60c048ee9c43b139462b1e8feb2871ca70b70b4a4aaf88b05e6031b"
+    }
+  },
+  "scope": "Recorded phase costs include verification and independent runtime copies; different builds are not counterbalanced build-time experiments. No runtime speed claim. OFF has no instrument/train phase.",
+  "binary_bytes_delta_off_minus_full": 222704
+}

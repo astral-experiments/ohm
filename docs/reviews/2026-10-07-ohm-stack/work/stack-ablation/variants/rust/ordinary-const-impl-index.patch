@@ -1,0 +1,243 @@
+diff --git a/compiler/rustc_middle/src/queries.rs b/compiler/rustc_middle/src/queries.rs
+index 9042ee233a9..91181d206c5 100644
+--- a/compiler/rustc_middle/src/queries.rs
++++ b/compiler/rustc_middle/src/queries.rs
+@@ -1658,11 +1658,6 @@
+         desc { "finding trait impls of `{}`", tcx.def_path_str(trait_id) }
+     }
+ 
+-    query trait_impls_by_const_arg(key: (DefId, DefId)) -> &'tcx ty::trait_def::ConstArgImpls<'tcx> {
+-        arena_cache
+-        desc { "indexing const arguments of `{}` impls for `{}`", tcx.def_path_str(key.0), tcx.def_path_str(key.1) }
+-    }
+-
+     query specialization_graph_of(trait_id: DefId) -> Result<&'tcx specialization_graph::Graph, ErrorGuaranteed> {
+         desc { "building specialization graph of trait `{}`", tcx.def_path_str(trait_id) }
+         cache_on_disk
+diff --git a/compiler/rustc_middle/src/ty/mod.rs b/compiler/rustc_middle/src/ty/mod.rs
+index 9f3d03b984b..2ed3be1f275 100644
+--- a/compiler/rustc_middle/src/ty/mod.rs
++++ b/compiler/rustc_middle/src/ty/mod.rs
+@@ -2540,7 +2540,6 @@ pub fn provide(providers: &mut Providers) {
+     super::util::bug::provide(providers);
+     *providers = Providers {
+         trait_impls_of: trait_def::trait_impls_of_provider,
+-        trait_impls_by_const_arg: trait_def::trait_impls_by_const_arg_provider,
+         incoherent_impls: trait_def::incoherent_impls_provider,
+         trait_impls_in_crate: trait_def::trait_impls_in_crate_provider,
+         traits: trait_def::traits_provider,
+diff --git a/compiler/rustc_middle/src/ty/trait_def.rs b/compiler/rustc_middle/src/ty/trait_def.rs
+index 5e56d7787cb..5309e35b107 100644
+--- a/compiler/rustc_middle/src/ty/trait_def.rs
++++ b/compiler/rustc_middle/src/ty/trait_def.rs
+@@ -121,46 +121,6 @@ pub fn non_blanket_impls(&self) -> &FxIndexMap<SimplifiedType, Vec<DefId>> {
+     }
+ }
+ 
+-/// A secondary index for large groups of ADT impls that differ in a const argument.
+-#[derive(Debug, StableHash)]
+-pub struct ConstArgImpls<'tcx> {
+-    /// The first const parameter of the ADT, including preceding type and lifetime parameters.
+-    const_arg: usize,
+-    values: FxIndexMap<ty::ValTree<'tcx>, Vec<(usize, DefId)>>,
+-    /// Generic and unevaluated consts can match any value.
+-    fallback: Vec<(usize, DefId)>,
+-}
+-
+-impl<'tcx> ConstArgImpls<'tcx> {
+-    /// Returns the concrete and fallback impls that may match this const value.
+-    pub fn impls_for_value(&self, value: ty::ValTree<'tcx>) -> impl Iterator<Item = DefId> {
+-        self.values
+-            .get(&value)
+-            .into_iter()
+-            .flatten()
+-            .chain(&self.fallback)
+-            .map(|&(_, impl_def_id)| impl_def_id)
+-    }
+-
+-    /// Merges a value's impls with the fallback impls in their original iteration order.
+-    fn for_each(&self, value: Option<ty::ValTree<'tcx>>, mut f: impl FnMut(DefId)) {
+-        let mut values =
+-            value.and_then(|value| self.values.get(&value)).map_or(&[][..], Vec::as_slice);
+-        for &(position, impl_def_id) in &self.fallback {
+-            while let Some(&(value_position, value_impl)) = values.first()
+-                && value_position < position
+-            {
+-                f(value_impl);
+-                values = &values[1..];
+-            }
+-            f(impl_def_id);
+-        }
+-        for &(_, impl_def_id) in values {
+-            f(impl_def_id);
+-        }
+-    }
+-}
+-
+ impl<'tcx> TraitDef {
+     pub fn ancestors(
+         &self,
+@@ -172,41 +132,6 @@ pub fn ancestors(
+ }
+ 
+ impl<'tcx> TyCtxt<'tcx> {
+-    /// Iterates impl candidates with the old solver's rigid-obligation/infer-impl semantics.
+-    ///
+-    /// Unlike `for_each_relevant_impl`, this can reject concrete const arguments against a
+-    /// parameter or placeholder in the obligation. Callers must not instantiate those arguments.
+-    pub fn for_each_relevant_impl_for_selection(
+-        self,
+-        trait_def_id: DefId,
+-        self_ty: Ty<'tcx>,
+-        mut f: impl FnMut(DefId),
+-    ) {
+-        if let ty::Adt(adt, args) = self_ty.kind()
+-            && let Some(ct) = args.iter().find_map(|arg| arg.as_const())
+-        {
+-            let value = match ct.kind() {
+-                ty::ConstKind::Value(value) => Some(value.valtree),
+-                ty::ConstKind::Param(_) | ty::ConstKind::Placeholder(_) => None,
+-                // These may normalize or unify with any value, so retain the original scan.
+-                _ => return self.for_each_relevant_impl(trait_def_id, self_ty, f),
+-            };
+-            let impls = self.trait_impls_of(trait_def_id);
+-            if let Some(bucket) = impls.non_blanket_impls.get(&SimplifiedType::Adt(adt.did()))
+-                && bucket.len() >= 16
+-            {
+-                let index = self.trait_impls_by_const_arg((trait_def_id, adt.did()));
+-                debug_assert_eq!(args[index.const_arg].as_const(), Some(ct));
+-                for &impl_def_id in &impls.blanket_impls {
+-                    f(impl_def_id);
+-                }
+-                index.for_each(value, f);
+-                return;
+-            }
+-        }
+-        self.for_each_relevant_impl(trait_def_id, self_ty, f);
+-    }
+-
+     /// Iterate over every impl that could possibly match the self type `self_ty`.
+     ///
+     /// `trait_def_id` MUST BE the `DefId` of a trait.
+@@ -417,36 +342,6 @@ pub(super) fn trait_impls_of_provider(tcx: TyCtxt<'_>, trait_id: DefId) -> Trait
+     impls
+ }
+ 
+-/// Indexes one ADT bucket without changing the metadata or diagnostics view of trait impls.
+-pub(super) fn trait_impls_by_const_arg_provider(
+-    tcx: TyCtxt<'_>,
+-    (trait_id, adt_id): (DefId, DefId),
+-) -> ConstArgImpls<'_> {
+-    let const_arg = tcx
+-        .generics_of(adt_id)
+-        .own_params
+-        .iter()
+-        .find(|param| matches!(param.kind, ty::GenericParamDefKind::Const { .. }))
+-        .expect("const-argument index requires an ADT with a const parameter")
+-        .index as usize;
+-    let mut index =
+-        ConstArgImpls { const_arg, values: FxIndexMap::default(), fallback: Vec::new() };
+-    let impls = tcx.trait_impls_of(trait_id);
+-    for (position, &impl_def_id) in
+-        impls.non_blanket_impls[&SimplifiedType::Adt(adt_id)].iter().enumerate()
+-    {
+-        let self_ty = tcx.type_of(impl_def_id).instantiate_identity().skip_norm_wip();
+-        if let ty::Adt(_, args) = self_ty.kind()
+-            && let ty::ConstKind::Value(value) = args.const_at(const_arg).kind()
+-        {
+-            index.values.entry(value.valtree).or_default().push((position, impl_def_id));
+-        } else {
+-            index.fallback.push((position, impl_def_id));
+-        }
+-    }
+-    index
+-}
+-
+ /// Query provider for `incoherent_impls`.
+ pub(super) fn incoherent_impls_provider(tcx: TyCtxt<'_>, simp: SimplifiedType) -> &[DefId] {
+     if let Some(def_id) = simp.def()
+diff --git a/compiler/rustc_trait_selection/src/traits/select/candidate_assembly.rs b/compiler/rustc_trait_selection/src/traits/select/candidate_assembly.rs
+index 68a6d8630a5..db863cb42f6 100644
+--- a/compiler/rustc_trait_selection/src/traits/select/candidate_assembly.rs
++++ b/compiler/rustc_trait_selection/src/traits/select/candidate_assembly.rs
+@@ -608,7 +608,7 @@ fn assemble_candidates_from_impls(
+     ) {
+         let drcx = DeepRejectCtxt::relate_rigid_infer(self.tcx());
+         let obligation_args = obligation.predicate.skip_binder().trait_ref.args;
+-        self.tcx().for_each_relevant_impl_for_selection(
++        self.tcx().for_each_relevant_impl(
+             obligation.predicate.def_id(),
+             obligation.predicate.skip_binder().trait_ref.self_ty(),
+             |impl_def_id| {
+diff --git a/compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs b/compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs
+index 2ece5213434..8462471ba42 100644
+--- a/compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs
++++ b/compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs
+@@ -77,7 +77,6 @@ fn insert(
+         &mut self,
+         tcx: TyCtxt<'tcx>,
+         impl_def_id: DefId,
+-        trait_ref: ty::TraitRef<'tcx>,
+         simplified_self: Option<SimplifiedType>,
+         overlap_mode: OverlapMode,
+     ) -> Result<Inserted<'tcx>, OverlapError<'tcx>> {
+@@ -85,7 +84,7 @@ fn insert(
+         let mut replace_children = Vec::new();
+ 
+         let possible_siblings = match simplified_self {
+-            Some(st) => PotentialSiblings::Filtered(filtered_children(tcx, self, st, trait_ref)),
++            Some(st) => PotentialSiblings::Filtered(filtered_children(self, st)),
+             None => PotentialSiblings::Unfiltered(iter_children(self)),
+         };
+ 
+@@ -199,40 +198,11 @@ fn iter_children(children: &Children) -> impl Iterator<Item = DefId> {
+     children.blanket_impls.iter().chain(nonblanket).cloned()
+ }
+ 
+-fn filtered_children<'a, 'tcx>(
+-    tcx: TyCtxt<'tcx>,
+-    children: &'a mut Children,
+-    st: SimplifiedType,
+-    trait_ref: ty::TraitRef<'tcx>,
+-) -> impl Iterator<Item = DefId> + use<'a> {
+-    let bucket = children.non_blanket_impls.entry(st).or_default();
+-    let candidates = if bucket.len() >= 16 { const_arg_candidates(tcx, trait_ref) } else { None };
+-    let nonblanket = bucket
+-        .iter()
+-        .filter(move |impl_def_id| candidates.as_ref().is_none_or(|ids| ids.contains(impl_def_id)));
++fn filtered_children(children: &mut Children, st: SimplifiedType) -> impl Iterator<Item = DefId> {
++    let nonblanket = children.non_blanket_impls.entry(st).or_default().iter();
+     children.blanket_impls.iter().chain(nonblanket).cloned()
+ }
+ 
+-/// Prunes a large sibling scan when the const index leaves only a few candidates.
+-fn const_arg_candidates<'tcx>(
+-    tcx: TyCtxt<'tcx>,
+-    trait_ref: ty::TraitRef<'tcx>,
+-) -> Option<smallvec::SmallVec<[DefId; 8]>> {
+-    let ty::Adt(adt, args) = trait_ref.self_ty().kind() else { return None };
+-    let ct = args.iter().find_map(|arg| arg.as_const())?;
+-    let ty::ConstKind::Value(value) = ct.kind() else { return None };
+-    let index = tcx.trait_impls_by_const_arg((trait_ref.def_id, adt.did()));
+-    let mut candidates = smallvec::SmallVec::<[DefId; 8]>::new();
+-    for impl_def_id in index.impls_for_value(value.valtree) {
+-        // Keep the membership test bounded and avoid allocating for broad buckets.
+-        if candidates.len() == 8 {
+-            return None;
+-        }
+-        candidates.push(impl_def_id);
+-    }
+-    Some(candidates)
+-}
+-
+ // A custom iterator used by Children::insert
+ enum PotentialSiblings<I, J>
+ where
+@@ -306,7 +276,6 @@ fn insert(
+             let insert_result = self.children.entry(parent).or_default().insert(
+                 tcx,
+                 impl_def_id,
+-                trait_ref,
+                 simplified,
+                 overlap_mode,
+             )?;

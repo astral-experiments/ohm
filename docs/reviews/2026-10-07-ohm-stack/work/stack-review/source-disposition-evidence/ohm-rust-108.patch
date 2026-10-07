@@ -1,0 +1,80 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index c5e29e2ab0c..040bc408ce1 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -119,6 +119,11 @@ jobs:
+           python3 x.py --ci false --set build.submodules=false --set rust.debug-assertions=true
+           --set rust.lto=off test --stage 1 tests/ui/rmeta
+ 
++      - name: Run LLVM prelink function-merging regression
++        run: >-
++          python3 x.py --ci false --set build.submodules=false --set rust.debug-assertions=true
++          --set rust.lto=off test --stage 1 tests/codegen-llvm/merge-functions-prelink.rs
++
+       - name: Run coroutine runtime layout regression tests
+         run: >-
+           python3 x.py --ci false --set build.submodules=false --set rust.debug-assertions=true
+diff --git a/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp b/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
+index 3ad59c53a5b..2f19b4cc544 100644
+--- a/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
++++ b/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
+@@ -40,6 +40,7 @@
+ #include "llvm/Transforms/IPO/FunctionImport.h"
+ #include "llvm/Transforms/IPO/Internalize.h"
+ #include "llvm/Transforms/IPO/LowerTypeTests.h"
++#include "llvm/Transforms/IPO/MergeFunctions.h"
+ #include "llvm/Transforms/IPO/ThinLTOBitcodeWriter.h"
+ #include "llvm/Transforms/Instrumentation/AddressSanitizer.h"
+ #include "llvm/Transforms/Instrumentation/DataFlowSanitizer.h"
+@@ -790,6 +791,30 @@ extern "C" LLVMRustResult LLVMRustOptimize(
+         });
+   }
+ 
++  bool IsPreLink = OptStage == LLVMRustOptStage::PreLinkNoLTO ||
++                   OptStage == LLVMRustOptStage::PreLinkThinLTO ||
++                   OptStage == LLVMRustOptStage::PreLinkFatLTO;
++  bool HasSanitizer =
++      SanitizerOptions &&
++      (SanitizerOptions->SanitizeAddress || SanitizerOptions->SanitizeCFI ||
++       SanitizerOptions->SanitizeDataFlow || SanitizerOptions->SanitizeKCFI ||
++       SanitizerOptions->SanitizeMemory || SanitizerOptions->SanitizerRealtime ||
++       SanitizerOptions->SanitizeThread || SanitizerOptions->SanitizeHWAddress ||
++       SanitizerOptions->SanitizeKernelAddress ||
++       SanitizerOptions->SanitizeKernelHWAddress);
++  if (MergeFunctions && IsPreLink && !NoPrepopulatePasses && !PGOOpt &&
++      !InstrumentCoverage && !HasSanitizer && LLVMPluginsLen == 0) {
++    // Merge canonicalized bodies before global cleanup and CGSCC optimization.
++    // Instrumented and plugin-defined pipelines retain their existing ordering.
++    PB.registerPipelineEarlySimplificationEPCallback(
++        [](ModulePassManager &MPM, OptimizationLevel Level,
++           ThinOrFullLTOPhase Phase) {
++          if (Level != OptimizationLevel::O0 &&
++              Phase == ThinOrFullLTOPhase::ThinLTOPreLink)
++            MPM.addPass(MergeFunctionsPass());
++        });
++  }
++
+   if (SanitizerOptions) {
+     if (SanitizerOptions->SanitizeDataFlow) {
+       std::vector<std::string> ABIListFiles(
+diff --git a/tests/codegen-llvm/merge-functions-prelink.rs b/tests/codegen-llvm/merge-functions-prelink.rs
+new file mode 100644
+index 00000000000..ba28cf6745c
+--- /dev/null
++++ b/tests/codegen-llvm/merge-functions-prelink.rs
+@@ -0,0 +1,15 @@
++//@ compile-flags: -Copt-level=3 -Clinker-plugin-lto -Ccodegen-units=1
++#![crate_type = "lib"]
++
++// Identical bodies must merge in the ThinLTO prelink pipeline.
++// CHECK: @prelink_func{{2|1}} = {{.*}}alias{{.*}}@prelink_func{{1|2}}
++
++#[no_mangle]
++pub fn prelink_func1(value: u64) -> u64 {
++    value.wrapping_add(1)
++}
++
++#[no_mangle]
++pub fn prelink_func2(value: u64) -> u64 {
++    value.wrapping_add(1)
++}

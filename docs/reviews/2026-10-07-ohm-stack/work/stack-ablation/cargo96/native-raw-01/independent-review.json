@@ -1,0 +1,156 @@
+{
+  "proof_kind": "independent-cargo96-source-native-review-v1",
+  "reviewed_utc": "2026-10-05T22:51:19.503367+00:00",
+  "reviewer": "benchmark_audit",
+  "decision": "Recommend removing Cargo96 at the frozen shipping protocol: writer reservation supersedes its intended concurrent dirty-to-fresh benefit. Native paired expectations are equivalent with retained known failures.",
+  "archive_sha256": "8e4e923ccea69118f937b27b91d3b95cb6da9bec0f5bae2e257fbfc64831efdf",
+  "archive_files_rehashed": 81,
+  "native_receipt_sha256": "8911fca5f031cd43ee342706812e428f41d62b2915937b9c5a861f92f5706ef2",
+  "concurrency_packet_sha256": "e885b89bce76690e59f884190d67a45d0a226c063c9898825ffb1e3d40d0f45c",
+  "source": {
+    "cargo_pin": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+    "all_3167_git_hashes_modes_match": true,
+    "source_before_after_unchanged": true,
+    "only_adapters": [
+      "tests/testsuite/utils/ext.rs",
+      "tests/testsuite/utils/mod.rs"
+    ],
+    "standalone_lock_sha256": "654651a325efa073219fdabe709cdb8698103d81514905f92db59f8907c3bd66",
+    "actual_shared_selectors": 69,
+    "approved_plan_text_stale_selectors": 67,
+    "extra_tests_pass_both": [
+      "concurrent_misses_preserve_forced_rebuilds",
+      "concurrent_misses_preserve_environment_inputs"
+    ],
+    "extra_tests_original_expectations": "two compiler invocations; no Fresh shortcut for forced fix or environment-dependent inputs"
+  },
+  "native": {
+    "shared_each": {
+      "passed": 66,
+      "failed": 3,
+      "ignored": 0
+    },
+    "worktree_each": {
+      "passed": 33,
+      "failed": 0,
+      "ignored": 0
+    },
+    "exact_status_maps_equal": true,
+    "known_failures_preserved": [
+      "build_dir::shared_registry_cache_keys_inherited_rustc_bootstrap",
+      "build_dir::shared_registry_cache_package_clean_only_removes_current_workspace",
+      "build_dir::shared_registry_cache_rejects_global_compiler_wrappers"
+    ],
+    "common_test_binary_sha256": "cf428d152a5189719f8f57b866db38383d1a2e5d0a0efe2cdee0e95c42e7c886"
+  },
+  "runtime": {
+    "manifest_entries_each": 69859,
+    "only_pair_delta": [
+      "bin/cargo"
+    ],
+    "same_frozen_non_cargo_runtime": true,
+    "all_seven_tool_loader_snapshots": 10,
+    "archived_before_after_rehashes_bound": true,
+    "baseline_manifest_dependency_sha256": "d3c02ba89dbcc13d284607ac8169fa01a4b16d302f8168903bf2606b0e51b921"
+  },
+  "natural_concurrency": {
+    "uv_pin": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+    "source_hashes_unchanged_across_all_runs": 1608,
+    "windows_batch_checkout_crlf": [
+      "crates/uv-virtualenv/src/activator/activate.bat",
+      "crates/uv-virtualenv/src/activator/deactivate.bat",
+      "crates/uv-virtualenv/src/activator/pydoc.bat"
+    ],
+    "lock_sha256": "ebbc60699f72542a37ab495de010929d8c443e40a0e187d6d3d39be8379a1442",
+    "chosen_leaf": "regex-syntax 0.8.11 check library, zero dependencies",
+    "paired_runs_overlap": true,
+    "observed": {
+      "full": [
+        {
+          "run": 0,
+          "initial_fingerprint": "fresh",
+          "rustc_invocations": 0,
+          "artifact_fresh": true
+        },
+        {
+          "run": 1,
+          "initial_fingerprint": "new",
+          "rustc_invocations": 1,
+          "artifact_fresh": false
+        }
+      ],
+      "reduced": [
+        {
+          "run": 0,
+          "initial_fingerprint": "new",
+          "rustc_invocations": 1,
+          "artifact_fresh": false
+        },
+        {
+          "run": 1,
+          "initial_fingerprint": "fresh",
+          "rustc_invocations": 0,
+          "artifact_fresh": true
+        }
+      ]
+    },
+    "successful_leaf_dirty_to_fresh_rechecks": 0,
+    "latency_claim": false
+  },
+  "source_reachability": {
+    "source_sha256": {
+      "src/compiler/fingerprint/mod.rs": "05758a71f6761fc092871beea6cb8da4e716dfe03e4bd4cea82aba4adbb92718",
+      "src/compiler/build_runner/mod.rs": "5707a6326618d7f141cffd805327ea610fd21277b2c64a0d0e3684159e6b7d55",
+      "src/compiler/locking.rs": "429db75d12aa1895172cc6f0c584d1f10945cba8ddcceb011c7f06ca6f36f25a",
+      "src/compiler/build_runner/compilation_files.rs": "baaf10330edc4d002db2d9cf98d66be58b1da8a744b628b3b0883c941389fb3d",
+      "src/compiler/mod.rs": "514e05acbf4793101610e45248e67d6c4f8f971b9993cb9d0fb83e83223b5f21",
+      "src/bin/cargo/main.rs": "6cf271cc91e778896d5da7b0d0ab57d730ca52c7a79ba0e21fc9c211704963b4"
+    },
+    "verified_source_lines": {
+      "src/compiler/fingerprint/mod.rs": [
+        974,
+        991,
+        1154
+      ],
+      "src/compiler/build_runner/mod.rs": [
+        726,
+        792,
+        920,
+        951,
+        1188,
+        1260
+      ],
+      "src/compiler/locking.rs": [
+        55,
+        135,
+        283,
+        313,
+        330
+      ],
+      "src/compiler/build_runner/compilation_files.rs": [
+        225,
+        970
+      ],
+      "src/compiler/mod.rs": [
+        387,
+        431
+      ],
+      "src/bin/cargo/main.rs": [
+        65
+      ]
+    },
+    "admission": "fine-grain immutable shared-registry Build/Check non-proc-macro library without dependencies",
+    "proof": "All admitted units are reservation units. Canonical whole-graph leases precede observations; dirty writers restart with exclusive leases before fingerprint invalidation. Reserved unlock/lock/downgrade keep mode. Another compliant same-physical-key Cargo writer cannot finish between dirty preparation and the queued recheck.",
+    "scope": "No intended natural concurrent other-producer dirty-to-fresh opportunity under frozen shipped reservation protocol. Callback execution itself is not declared unreachable."
+  },
+  "limitations": [
+    "All three native failures are retained and matched; this is paired expectation equivalence, not wholly green shared-cache coverage.",
+    "Approved prose says 67 shared cases; actual fixed018 harness has 69, including two original safety tests, and all expectations were unchanged.",
+    "RUST_LOG does not activate pinned Cargo CARGO_LOG debug tracing. Initial leaf fingerprints, actual rustc argv and artifact statuses independently show zero successful dirty-to-fresh leaf reuse; absent debug phrases do not establish universal recheck/provider invocation counts. Corrected logging probe is separate corroboration.",
+    "Writer-reservation reasoning assumes compliant actors respecting the same canonical unit locks. It does not cover noncooperating writers, unusual filesystem/freshness discrepancies, every configuration, or future locking changes.",
+    "Three Windows .bat checkout files use CRLF while Git blobs use LF; all Rust/config/manifest/lock bytes match and the Linux Cargo check does not use these activator scripts.",
+    "Full build/training provenance remains a separate accepted dependency. Runtime/native-test binary hashes are archived remote checks, not newly executed or rehashed remote binaries. No timing or protocol/report modifications were performed."
+  ],
+  "performance_or_host_timing_approved": false,
+  "blocking_native_parity_findings": []
+}

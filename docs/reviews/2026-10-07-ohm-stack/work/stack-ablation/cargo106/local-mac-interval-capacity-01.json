@@ -1,0 +1,22 @@
+{
+  "scope": "Read-only Mac CPU capacity screen, not a complete quiet-host admission. No build or timing started.",
+  "recorded_utc": "2026-10-06T22:54:53.128297+00:00",
+  "command": [
+    "/usr/sbin/iostat",
+    "-c",
+    "3",
+    "-w",
+    "5"
+  ],
+  "raw_output": "              disk0       cpu    load average\n    KB/t  tps  MB/s  us sy id   1m   5m   15m\n   20.56 1343 26.96  15  5 80  4.97 4.34 4.41\n    9.65  257  2.42  10  8 83  4.89 4.34 4.41\n   14.75  491  7.07   9  4 87  4.58 4.28 4.39\n",
+  "initial_since_boot_row_excluded": true,
+  "requested_interval_seconds": 5,
+  "interval_idle_percent_rounded": [
+    83,
+    87
+  ],
+  "required_idle_percent": 95,
+  "passed_cpu_capacity_screen": false,
+  "timing_admitted": false,
+  "limit": "Two observed intervals already fail the CPU criterion. Remaining quiet/ownership/free-space criteria were not evaluated; this is not a six-sample admission."
+}

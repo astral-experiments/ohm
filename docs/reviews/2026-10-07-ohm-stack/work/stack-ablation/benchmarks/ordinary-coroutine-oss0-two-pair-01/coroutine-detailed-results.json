@@ -1,0 +1,1434 @@
+{
+  "recommendation": "Remove the coherent #99/#132 coroutine layout/debug projection bundle. #138 is absent from the shipped source pin; this screen does not price it.",
+  "scope": "Original selected affected-library BUILD five phases, eight jobs, two opposite orders per project; fresh private target/shared histories per arm. Ruff/uv on oss0, Codex on Direct2; no absolute cross-host pooling.",
+  "blocks": [
+    {
+      "projects": [
+        "ruff",
+        "uv"
+      ],
+      "host": "charlie-oss-0",
+      "boot_id": "68db8bb3-5bac-4c42-8902-017b488cf59a",
+      "command_review": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/coroutine-original-four-command-root-review-01.json",
+      "command_review_sha256": "3821e7cc7a919e4ac94f40f48c433d99cfe46615cbfe89456692ecf338fa9e78",
+      "schedule_sha256": "e83de943c5ddfd76a115ad62d9cfce05da9da63b8c5cd5cda469508091841d99",
+      "packet": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/oss0-retained-four-raw-retrieved-dbox-01/packet",
+      "root_review": {
+        "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/coroutine-original-four-final-root-review-01.json",
+        "sha256": "a921568e370ff490f3121f031976e97140c4b11acfe2e755d1985ade4def2f58"
+      }
+    },
+    {
+      "projects": [
+        "codex"
+      ],
+      "host": "charlie-serc-direct-2",
+      "boot_id": "f4dcfa8c-16f9-466f-a366-dfe3a66d3d09",
+      "command_review": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-peer-completed-raw-review-01/peer-command-review-01.json",
+      "command_review_sha256": "38e833c5374d84434400db4cc60925e4f59e8be5313d05abaa6a446f320a4127",
+      "schedule_sha256": "35e8812609fa5cf3a9caf3f8c1c9c9a2d46077d1177f910a4e5b9789ca78ce6d",
+      "packet": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet"
+    }
+  ],
+  "accepted_pairs": [
+    {
+      "project": "ruff",
+      "slot": 0,
+      "attempt": 1,
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/oss0-retained-four-raw-retrieved-dbox-01/packet/matched-pairs/e83de943c5ddfd76a115ad62d9cfce05da9da63b8c5cd5cda469508091841d99/ruff/slot-0/attempt-1",
+      "host": "charlie-oss-0",
+      "results_sha256": "83df4d133554a1f83ddf91d6a20222b74efbadf144264cc5caa679d28317caa8",
+      "acceptance_sha256": "b3b6b2fa3cbb6cec00e4baf71fbbe6bbd8968dec4f2108233980389a03a3055c",
+      "release_sha256": "f0b69db4362b6ccb829e8ca77ff79f1e656c9a018a0a04570c1aed106766a4bd"
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "attempt": 1,
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/oss0-retained-four-raw-retrieved-dbox-01/packet/matched-pairs/e83de943c5ddfd76a115ad62d9cfce05da9da63b8c5cd5cda469508091841d99/ruff/slot-1/attempt-1",
+      "host": "charlie-oss-0",
+      "results_sha256": "472ac9313082ab2b2a3b30f44fdd2dcd7d088d76217aed9ecc9731fb644a8b0d",
+      "acceptance_sha256": "cc234d3b72866e55bbe04a4787f2248863fe812c02b16eddd1834a3830556b80",
+      "release_sha256": "d310a54ec59bf5312eba11ecc39134e8acc2d477231c82daefae2d827a371345"
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "attempt": 1,
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/oss0-retained-four-raw-retrieved-dbox-01/packet/matched-pairs/e83de943c5ddfd76a115ad62d9cfce05da9da63b8c5cd5cda469508091841d99/uv/slot-0/attempt-1",
+      "host": "charlie-oss-0",
+      "results_sha256": "f214bea798e64920f5a3864ba00598c6a02de28a2d3fce06c31295f67de8d9c2",
+      "acceptance_sha256": "d153a35b41792bcba19f8447ab12daad36635173c4bba9da4de1fe2fc495d216",
+      "release_sha256": "2876a70ad8c0f7541de83f654639e9d5de17e1f1d7309095f9dcf19271fb9164"
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "attempt": 1,
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/oss0-retained-four-raw-retrieved-dbox-01/packet/matched-pairs/e83de943c5ddfd76a115ad62d9cfce05da9da63b8c5cd5cda469508091841d99/uv/slot-1/attempt-1",
+      "host": "charlie-oss-0",
+      "results_sha256": "cd872396529efe08ea66b38c64c9aa8a55026aee2fb0989af2c59afefb732623",
+      "acceptance_sha256": "f9dbf7c7b6d695efc1a70ba7d619cb3ba988265847837d591f27530b35502fa6",
+      "release_sha256": "1a20e65ba6fab7ccc434bde45ba0a90f987b959f888a26e4fec797f3b6eec11c"
+    },
+    {
+      "project": "codex",
+      "slot": 0,
+      "attempt": 1,
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/matched-pairs/35e8812609fa5cf3a9caf3f8c1c9c9a2d46077d1177f910a4e5b9789ca78ce6d/codex/slot-0/attempt-1",
+      "host": "charlie-serc-direct-2",
+      "results_sha256": "337f4afb3ee2b87eeb89abe142006199683ec7d4366de0b02bb566248cb944cc",
+      "acceptance_sha256": "5cf3d8890e82bd777646459a3e13cb9c3662828dcfb198d77682fcdd13d688d7",
+      "release_sha256": "089242907e6cfd9c0dcfd82efb4e9ba99a67b2f3b8edaeed5d9bf0ff3191a916"
+    },
+    {
+      "project": "codex",
+      "slot": 1,
+      "attempt": 1,
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/matched-pairs/35e8812609fa5cf3a9caf3f8c1c9c9a2d46077d1177f910a4e5b9789ca78ce6d/codex/slot-1/attempt-1",
+      "host": "charlie-serc-direct-2",
+      "results_sha256": "b3ef53cc714738fca734a284c4a23d301b7ad61b59cb72a3bdcfb4942bc2dacd",
+      "acceptance_sha256": "9daccc93180ad06de64ebec309718c11597f6d624f0cccde851f4a05f93f5480",
+      "release_sha256": "2ad5b47a497cb9a1a58426704c6fe5dc1ad941a24e788ebae0cdbd4092371a3f"
+    }
+  ],
+  "statistics": [
+    {
+      "project": "ruff",
+      "label": "cold-build",
+      "n": 2,
+      "full_median_seconds": 51.71606957772747,
+      "reduced_median_seconds": 49.93869542423636,
+      "paired_delta_median_seconds": -1.7773741534911096,
+      "paired_delta_min_seconds": -3.0887034200131893,
+      "paired_delta_max_seconds": -0.4660448869690299,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -3.3669632672303105,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 53.196572691202164,
+          "reduced_seconds": 50.107869271188974,
+          "delta_seconds": -3.0887034200131893,
+          "delta_percent": -5.806207550141684,
+          "full_max_child_rss_kib": 3372264,
+          "reduced_max_child_rss_kib": 3364652
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 50.23556646425277,
+          "reduced_seconds": 49.76952157728374,
+          "delta_seconds": -0.4660448869690299,
+          "delta_percent": -0.9277189843189371,
+          "full_max_child_rss_kib": 3523132,
+          "reduced_max_child_rss_kib": 3361360
+        }
+      ],
+      "phase": "Cold build",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        53.196572691202164,
+        50.23556646425277
+      ],
+      "removed_seconds": [
+        50.107869271188974,
+        49.76952157728374
+      ],
+      "paired_percent": [
+        -5.806207550141684,
+        -0.9277189843189371
+      ],
+      "full_max_child_rss_mib": [
+        3293.2265625,
+        3440.55859375
+      ],
+      "removed_max_child_rss_mib": [
+        3285.79296875,
+        3282.578125
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "warm-noop-build",
+      "n": 2,
+      "full_median_seconds": 0.40220509516075253,
+      "reduced_median_seconds": 0.4420476262457669,
+      "paired_delta_median_seconds": 0.03984253108501434,
+      "paired_delta_min_seconds": -0.03639128524810076,
+      "paired_delta_max_seconds": 0.11607634741812944,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": 10.156002465645987,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 0.39693748112767935,
+          "reduced_seconds": 0.5130138285458088,
+          "delta_seconds": 0.11607634741812944,
+          "delta_percent": 29.24297979832049,
+          "full_max_child_rss_kib": 64020,
+          "reduced_max_child_rss_kib": 63080
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 0.4074727091938257,
+          "reduced_seconds": 0.37108142394572496,
+          "delta_seconds": -0.03639128524810076,
+          "delta_percent": -8.930974867028517,
+          "full_max_child_rss_kib": 64140,
+          "reduced_max_child_rss_kib": 63500
+        }
+      ],
+      "phase": "Warm no-op",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        0.39693748112767935,
+        0.4074727091938257
+      ],
+      "removed_seconds": [
+        0.5130138285458088,
+        0.37108142394572496
+      ],
+      "paired_percent": [
+        29.24297979832049,
+        -8.930974867028517
+      ],
+      "full_max_child_rss_mib": [
+        62.51953125,
+        62.63671875
+      ],
+      "removed_max_child_rss_mib": [
+        61.6015625,
+        62.01171875
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-1-build",
+      "n": 2,
+      "full_median_seconds": 18.510431458242238,
+      "reduced_median_seconds": 17.822887999471277,
+      "paired_delta_median_seconds": -0.6875434587709606,
+      "paired_delta_min_seconds": -1.654630328528583,
+      "paired_delta_max_seconds": 0.2795434109866619,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": -3.4354203022086476,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 19.53606293257326,
+          "reduced_seconds": 17.881432604044676,
+          "delta_seconds": -1.654630328528583,
+          "delta_percent": -8.469620180070937,
+          "full_max_child_rss_kib": 3643348,
+          "reduced_max_child_rss_kib": 3558716
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 17.484799983911216,
+          "reduced_seconds": 17.764343394897878,
+          "delta_seconds": 0.2795434109866619,
+          "delta_percent": 1.5987795756536416,
+          "full_max_child_rss_kib": 3663616,
+          "reduced_max_child_rss_kib": 3565100
+        }
+      ],
+      "phase": "Direct edit",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        19.53606293257326,
+        17.484799983911216
+      ],
+      "removed_seconds": [
+        17.881432604044676,
+        17.764343394897878
+      ],
+      "paired_percent": [
+        -8.469620180070937,
+        1.5987795756536416
+      ],
+      "full_max_child_rss_mib": [
+        3557.95703125,
+        3577.75
+      ],
+      "removed_max_child_rss_mib": [
+        3475.30859375,
+        3481.54296875
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-2-build",
+      "n": 2,
+      "full_median_seconds": 25.374987101648003,
+      "reduced_median_seconds": 24.558657486457378,
+      "paired_delta_median_seconds": -0.8163296151906252,
+      "paired_delta_min_seconds": -1.3961415542289615,
+      "paired_delta_max_seconds": -0.2365176761522889,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -3.1604678986577373,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 26.026644608937204,
+          "reduced_seconds": 24.630503054708242,
+          "delta_seconds": -1.3961415542289615,
+          "delta_percent": -5.364277935963924,
+          "full_max_child_rss_kib": 4449328,
+          "reduced_max_child_rss_kib": 4482132
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 24.723329594358802,
+          "reduced_seconds": 24.486811918206513,
+          "delta_seconds": -0.2365176761522889,
+          "delta_percent": -0.9566578613515508,
+          "full_max_child_rss_kib": 4535552,
+          "reduced_max_child_rss_kib": 4486620
+        }
+      ],
+      "phase": "Dependency edit",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        26.026644608937204,
+        24.723329594358802
+      ],
+      "removed_seconds": [
+        24.630503054708242,
+        24.486811918206513
+      ],
+      "paired_percent": [
+        -5.364277935963924,
+        -0.9566578613515508
+      ],
+      "full_max_child_rss_mib": [
+        4345.046875,
+        4429.25
+      ],
+      "removed_max_child_rss_mib": [
+        4377.08203125,
+        4381.46484375
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-3-build",
+      "n": 2,
+      "full_median_seconds": 28.841631622985005,
+      "reduced_median_seconds": 28.299022500868887,
+      "paired_delta_median_seconds": -0.5426091221161187,
+      "paired_delta_min_seconds": -0.7244278099387884,
+      "paired_delta_max_seconds": -0.3607904342934489,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -1.8793551623910942,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 28.933303894475102,
+          "reduced_seconds": 28.208876084536314,
+          "delta_seconds": -0.7244278099387884,
+          "delta_percent": -2.50378530077624,
+          "full_max_child_rss_kib": 4585420,
+          "reduced_max_child_rss_kib": 4504060
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 28.74995935149491,
+          "reduced_seconds": 28.38916891720146,
+          "delta_seconds": -0.3607904342934489,
+          "delta_percent": -1.2549250240059484,
+          "full_max_child_rss_kib": 4573168,
+          "reduced_max_child_rss_kib": 4495468
+        }
+      ],
+      "phase": "Revert",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        28.933303894475102,
+        28.74995935149491
+      ],
+      "removed_seconds": [
+        28.208876084536314,
+        28.38916891720146
+      ],
+      "paired_percent": [
+        -2.50378530077624,
+        -1.2549250240059484
+      ],
+      "full_max_child_rss_mib": [
+        4477.94921875,
+        4465.984375
+      ],
+      "removed_max_child_rss_mib": [
+        4398.49609375,
+        4390.10546875
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "cold-build",
+      "n": 2,
+      "full_median_seconds": 45.60107678733766,
+      "reduced_median_seconds": 44.9463084791787,
+      "paired_delta_median_seconds": -0.6547683081589639,
+      "paired_delta_min_seconds": -1.0260232919827104,
+      "paired_delta_max_seconds": -0.2835133243352175,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -1.4314161997295516,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 45.85250282008201,
+          "reduced_seconds": 44.8264795280993,
+          "delta_seconds": -1.0260232919827104,
+          "delta_percent": -2.2376603868466294,
+          "full_max_child_rss_kib": 992320,
+          "reduced_max_child_rss_kib": 1012732
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 45.34965075459331,
+          "reduced_seconds": 45.066137430258095,
+          "delta_seconds": -0.2835133243352175,
+          "delta_percent": -0.6251720126124738,
+          "full_max_child_rss_kib": 998056,
+          "reduced_max_child_rss_kib": 990200
+        }
+      ],
+      "phase": "Cold build",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        45.85250282008201,
+        45.34965075459331
+      ],
+      "removed_seconds": [
+        44.8264795280993,
+        45.066137430258095
+      ],
+      "paired_percent": [
+        -2.2376603868466294,
+        -0.6251720126124738
+      ],
+      "full_max_child_rss_mib": [
+        969.0625,
+        974.6640625
+      ],
+      "removed_max_child_rss_mib": [
+        988.99609375,
+        966.9921875
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "warm-noop-build",
+      "n": 2,
+      "full_median_seconds": 0.6518090614117682,
+      "reduced_median_seconds": 0.5814438089728355,
+      "paired_delta_median_seconds": -0.07036525243893266,
+      "paired_delta_min_seconds": -0.07723816391080618,
+      "paired_delta_max_seconds": -0.06349234096705914,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -10.825008573987038,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 0.6369637800380588,
+          "reduced_seconds": 0.5597256161272526,
+          "delta_seconds": -0.07723816391080618,
+          "delta_percent": -12.125989943445637,
+          "full_max_child_rss_kib": 94372,
+          "reduced_max_child_rss_kib": 94068
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 0.6666543427854776,
+          "reduced_seconds": 0.6031620018184185,
+          "delta_seconds": -0.06349234096705914,
+          "delta_percent": -9.52402720452844,
+          "full_max_child_rss_kib": 94312,
+          "reduced_max_child_rss_kib": 94340
+        }
+      ],
+      "phase": "Warm no-op",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        0.6369637800380588,
+        0.6666543427854776
+      ],
+      "removed_seconds": [
+        0.5597256161272526,
+        0.6031620018184185
+      ],
+      "paired_percent": [
+        -12.125989943445637,
+        -9.52402720452844
+      ],
+      "full_max_child_rss_mib": [
+        92.16015625,
+        92.1015625
+      ],
+      "removed_max_child_rss_mib": [
+        91.86328125,
+        92.12890625
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-1-build",
+      "n": 2,
+      "full_median_seconds": 5.452855806797743,
+      "reduced_median_seconds": 5.2416247157379985,
+      "paired_delta_median_seconds": -0.21123109105974436,
+      "paired_delta_min_seconds": -0.259871126152575,
+      "paired_delta_max_seconds": -0.1625910559669137,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -3.869275230609426,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 5.42475110758096,
+          "reduced_seconds": 5.262160051614046,
+          "delta_seconds": -0.1625910559669137,
+          "delta_percent": -2.997207664323931,
+          "full_max_child_rss_kib": 1008396,
+          "reduced_max_child_rss_kib": 992596
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 5.480960506014526,
+          "reduced_seconds": 5.221089379861951,
+          "delta_seconds": -0.259871126152575,
+          "delta_percent": -4.741342796894921,
+          "full_max_child_rss_kib": 1002488,
+          "reduced_max_child_rss_kib": 1022200
+        }
+      ],
+      "phase": "Direct edit",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        5.42475110758096,
+        5.480960506014526
+      ],
+      "removed_seconds": [
+        5.262160051614046,
+        5.221089379861951
+      ],
+      "paired_percent": [
+        -2.997207664323931,
+        -4.741342796894921
+      ],
+      "full_max_child_rss_mib": [
+        984.76171875,
+        978.9921875
+      ],
+      "removed_max_child_rss_mib": [
+        969.33203125,
+        998.2421875
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-2-build",
+      "n": 2,
+      "full_median_seconds": 3.88448628410697,
+      "reduced_median_seconds": 3.763978381175548,
+      "paired_delta_median_seconds": -0.120507902931422,
+      "paired_delta_min_seconds": -0.1467965617775917,
+      "paired_delta_max_seconds": -0.09421924408525229,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -3.1011732066745124,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 3.87804586160928,
+          "reduced_seconds": 3.783826617524028,
+          "delta_seconds": -0.09421924408525229,
+          "delta_percent": -2.4295546635478393,
+          "full_max_child_rss_kib": 904896,
+          "reduced_max_child_rss_kib": 936256
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 3.8909267066046596,
+          "reduced_seconds": 3.744130144827068,
+          "delta_seconds": -0.1467965617775917,
+          "delta_percent": -3.7727917498011854,
+          "full_max_child_rss_kib": 926988,
+          "reduced_max_child_rss_kib": 920628
+        }
+      ],
+      "phase": "Dependency edit",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        3.87804586160928,
+        3.8909267066046596
+      ],
+      "removed_seconds": [
+        3.783826617524028,
+        3.744130144827068
+      ],
+      "paired_percent": [
+        -2.4295546635478393,
+        -3.7727917498011854
+      ],
+      "full_max_child_rss_mib": [
+        883.6875,
+        905.26171875
+      ],
+      "removed_max_child_rss_mib": [
+        914.3125,
+        899.05078125
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-3-build",
+      "n": 2,
+      "full_median_seconds": 3.822776577901095,
+      "reduced_median_seconds": 3.820416512899101,
+      "paired_delta_median_seconds": -0.0023600650019943714,
+      "paired_delta_min_seconds": -0.01813472341746092,
+      "paired_delta_max_seconds": 0.013414593413472176,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": -0.0638959304540665,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 3.8427613247185946,
+          "reduced_seconds": 3.8561759181320667,
+          "delta_seconds": 0.013414593413472176,
+          "delta_percent": 0.3490873431868602,
+          "full_max_child_rss_kib": 923020,
+          "reduced_max_child_rss_kib": 912488
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 3.8027918310835958,
+          "reduced_seconds": 3.784657107666135,
+          "delta_seconds": -0.01813472341746092,
+          "delta_percent": -0.4768792040949932,
+          "full_max_child_rss_kib": 929164,
+          "reduced_max_child_rss_kib": 922140
+        }
+      ],
+      "phase": "Revert",
+      "host": "charlie-oss-0",
+      "full_seconds": [
+        3.8427613247185946,
+        3.8027918310835958
+      ],
+      "removed_seconds": [
+        3.8561759181320667,
+        3.784657107666135
+      ],
+      "paired_percent": [
+        0.3490873431868602,
+        -0.4768792040949932
+      ],
+      "full_max_child_rss_mib": [
+        901.38671875,
+        907.38671875
+      ],
+      "removed_max_child_rss_mib": [
+        891.1015625,
+        900.52734375
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "cold-build",
+      "n": 2,
+      "full_median_seconds": 194.33891121047782,
+      "reduced_median_seconds": 194.23183919949224,
+      "paired_delta_median_seconds": -0.10707201098557562,
+      "paired_delta_min_seconds": -0.9415929710958153,
+      "paired_delta_max_seconds": 0.7274489491246641,
+      "slower_pairs": 1,
+      "faster_pairs": 1,
+      "paired_percent_median": -0.053384613636153766,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 195.11358851206023,
+          "reduced_seconds": 194.17199554096442,
+          "delta_seconds": -0.9415929710958153,
+          "delta_percent": -0.4825870808263133,
+          "full_max_child_rss_kib": 3472312,
+          "reduced_max_child_rss_kib": 3460220
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 193.5642339088954,
+          "reduced_seconds": 194.29168285802007,
+          "delta_seconds": 0.7274489491246641,
+          "delta_percent": 0.37581785355400577,
+          "full_max_child_rss_kib": 3453372,
+          "reduced_max_child_rss_kib": 3467984
+        }
+      ],
+      "phase": "Cold build",
+      "host": "charlie-serc-direct-2",
+      "full_seconds": [
+        195.11358851206023,
+        193.5642339088954
+      ],
+      "removed_seconds": [
+        194.17199554096442,
+        194.29168285802007
+      ],
+      "paired_percent": [
+        -0.4825870808263133,
+        0.37581785355400577
+      ],
+      "full_max_child_rss_mib": [
+        3390.9296875,
+        3372.43359375
+      ],
+      "removed_max_child_rss_mib": [
+        3379.12109375,
+        3386.703125
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "warm-noop-build",
+      "n": 2,
+      "full_median_seconds": 2.1912385749747045,
+      "reduced_median_seconds": 2.3353859374765307,
+      "paired_delta_median_seconds": 0.14414736250182614,
+      "paired_delta_min_seconds": 0.05008791002910584,
+      "paired_delta_max_seconds": 0.23820681497454643,
+      "slower_pairs": 2,
+      "faster_pairs": 0,
+      "paired_percent_median": 6.72397970194133,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 2.1204777009552345,
+          "reduced_seconds": 2.358684515929781,
+          "delta_seconds": 0.23820681497454643,
+          "delta_percent": 11.233639234557335,
+          "full_max_child_rss_kib": 188476,
+          "reduced_max_child_rss_kib": 188632
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 2.2619994489941746,
+          "reduced_seconds": 2.3120873590232804,
+          "delta_seconds": 0.05008791002910584,
+          "delta_percent": 2.2143201693253234,
+          "full_max_child_rss_kib": 188852,
+          "reduced_max_child_rss_kib": 188688
+        }
+      ],
+      "phase": "Warm no-op",
+      "host": "charlie-serc-direct-2",
+      "full_seconds": [
+        2.1204777009552345,
+        2.2619994489941746
+      ],
+      "removed_seconds": [
+        2.358684515929781,
+        2.3120873590232804
+      ],
+      "paired_percent": [
+        11.233639234557335,
+        2.2143201693253234
+      ],
+      "full_max_child_rss_mib": [
+        184.05859375,
+        184.42578125
+      ],
+      "removed_max_child_rss_mib": [
+        184.2109375,
+        184.265625
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "original-edit-1-build",
+      "n": 2,
+      "full_median_seconds": 15.918049467552919,
+      "reduced_median_seconds": 16.350750331999734,
+      "paired_delta_median_seconds": 0.4327008644468151,
+      "paired_delta_min_seconds": 0.13655693491455168,
+      "paired_delta_max_seconds": 0.7288447939790785,
+      "slower_pairs": 2,
+      "faster_pairs": 0,
+      "paired_percent_median": 2.7499333510629054,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 16.18220070505049,
+          "reduced_seconds": 16.318757639965042,
+          "delta_seconds": 0.13655693491455168,
+          "delta_percent": 0.8438712224841716,
+          "full_max_child_rss_kib": 3917300,
+          "reduced_max_child_rss_kib": 3934464
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 15.653898230055347,
+          "reduced_seconds": 16.382743024034426,
+          "delta_seconds": 0.7288447939790785,
+          "delta_percent": 4.655995479641639,
+          "full_max_child_rss_kib": 3923656,
+          "reduced_max_child_rss_kib": 3944324
+        }
+      ],
+      "phase": "Direct edit",
+      "host": "charlie-serc-direct-2",
+      "full_seconds": [
+        16.18220070505049,
+        15.653898230055347
+      ],
+      "removed_seconds": [
+        16.318757639965042,
+        16.382743024034426
+      ],
+      "paired_percent": [
+        0.8438712224841716,
+        4.655995479641639
+      ],
+      "full_max_child_rss_mib": [
+        3825.48828125,
+        3831.6953125
+      ],
+      "removed_max_child_rss_mib": [
+        3842.25,
+        3851.87890625
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "original-edit-2-build",
+      "n": 2,
+      "full_median_seconds": 13.832772134046536,
+      "reduced_median_seconds": 13.50152012257604,
+      "paired_delta_median_seconds": -0.33125201147049665,
+      "paired_delta_min_seconds": -0.4281347319483757,
+      "paired_delta_max_seconds": -0.2343692909926176,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -2.379452918719982,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 14.16000781103503,
+          "reduced_seconds": 13.731873079086654,
+          "delta_seconds": -0.4281347319483757,
+          "delta_percent": -3.02354869899667,
+          "full_max_child_rss_kib": 3136036,
+          "reduced_max_child_rss_kib": 3076728
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 13.505536457058042,
+          "reduced_seconds": 13.271167166065425,
+          "delta_seconds": -0.2343692909926176,
+          "delta_percent": -1.7353571384432942,
+          "full_max_child_rss_kib": 3148600,
+          "reduced_max_child_rss_kib": 3096352
+        }
+      ],
+      "phase": "Dependency edit",
+      "host": "charlie-serc-direct-2",
+      "full_seconds": [
+        14.16000781103503,
+        13.505536457058042
+      ],
+      "removed_seconds": [
+        13.731873079086654,
+        13.271167166065425
+      ],
+      "paired_percent": [
+        -3.02354869899667,
+        -1.7353571384432942
+      ],
+      "full_max_child_rss_mib": [
+        3062.53515625,
+        3074.8046875
+      ],
+      "removed_max_child_rss_mib": [
+        3004.6171875,
+        3023.78125
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "original-edit-3-build",
+      "n": 2,
+      "full_median_seconds": 13.09951034950791,
+      "reduced_median_seconds": 11.593994402035605,
+      "paired_delta_median_seconds": -1.505515947472304,
+      "paired_delta_min_seconds": -2.6552123789442703,
+      "paired_delta_max_seconds": -0.3558195160003379,
+      "slower_pairs": 0,
+      "faster_pairs": 2,
+      "paired_percent_median": -11.343964593821642,
+      "cells": [
+        {
+          "slot": 0,
+          "attempt": 1,
+          "full_seconds": 12.872088083997369,
+          "reduced_seconds": 12.516268567997031,
+          "delta_seconds": -0.3558195160003379,
+          "delta_percent": -2.764271916711747,
+          "full_max_child_rss_kib": 2744612,
+          "reduced_max_child_rss_kib": 2688300
+        },
+        {
+          "slot": 1,
+          "attempt": 1,
+          "full_seconds": 13.32693261501845,
+          "reduced_seconds": 10.67172023607418,
+          "delta_seconds": -2.6552123789442703,
+          "delta_percent": -19.92365727093154,
+          "full_max_child_rss_kib": 2754032,
+          "reduced_max_child_rss_kib": 2677512
+        }
+      ],
+      "phase": "Revert",
+      "host": "charlie-serc-direct-2",
+      "full_seconds": [
+        12.872088083997369,
+        13.32693261501845
+      ],
+      "removed_seconds": [
+        12.516268567997031,
+        10.67172023607418
+      ],
+      "paired_percent": [
+        -2.764271916711747,
+        -19.92365727093154
+      ],
+      "full_max_child_rss_mib": [
+        2680.28515625,
+        2689.484375
+      ],
+      "removed_max_child_rss_mib": [
+        2625.29296875,
+        2614.7578125
+      ]
+    }
+  ],
+  "endpoint_storage": [
+    {
+      "project": "ruff",
+      "slot": 0,
+      "arm": "full",
+      "host": "charlie-oss-0",
+      "results_sha256": "83df4d133554a1f83ddf91d6a20222b74efbadf144264cc5caa679d28317caa8",
+      "disk": {
+        "targets": {
+          "logical_bytes": 222032793,
+          "allocated_bytes": 222044160,
+          "unique_inode_allocated_bytes": 222044160,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1723755677,
+          "allocated_bytes": 1733668864,
+          "unique_inode_allocated_bytes": 1469161472,
+          "files": 4048,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 1691205632
+    },
+    {
+      "project": "ruff",
+      "slot": 0,
+      "arm": "reduced",
+      "host": "charlie-oss-0",
+      "results_sha256": "83df4d133554a1f83ddf91d6a20222b74efbadf144264cc5caa679d28317caa8",
+      "disk": {
+        "targets": {
+          "logical_bytes": 222243173,
+          "allocated_bytes": 222253056,
+          "unique_inode_allocated_bytes": 222253056,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1724884926,
+          "allocated_bytes": 1734774784,
+          "unique_inode_allocated_bytes": 1470058496,
+          "files": 4049,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 1692311552
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "arm": "reduced",
+      "host": "charlie-oss-0",
+      "results_sha256": "472ac9313082ab2b2a3b30f44fdd2dcd7d088d76217aed9ecc9731fb644a8b0d",
+      "disk": {
+        "targets": {
+          "logical_bytes": 222243141,
+          "allocated_bytes": 222253056,
+          "unique_inode_allocated_bytes": 222253056,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1724864042,
+          "allocated_bytes": 1734746112,
+          "unique_inode_allocated_bytes": 1470029824,
+          "files": 4049,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 1692282880
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "arm": "full",
+      "host": "charlie-oss-0",
+      "results_sha256": "472ac9313082ab2b2a3b30f44fdd2dcd7d088d76217aed9ecc9731fb644a8b0d",
+      "disk": {
+        "targets": {
+          "logical_bytes": 222032793,
+          "allocated_bytes": 222044160,
+          "unique_inode_allocated_bytes": 222044160,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1723725104,
+          "allocated_bytes": 1733640192,
+          "unique_inode_allocated_bytes": 1469132800,
+          "files": 4048,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 1691176960
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "arm": "full",
+      "host": "charlie-oss-0",
+      "results_sha256": "f214bea798e64920f5a3864ba00598c6a02de28a2d3fce06c31295f67de8d9c2",
+      "disk": {
+        "targets": {
+          "logical_bytes": 21759172,
+          "allocated_bytes": 21766144,
+          "unique_inode_allocated_bytes": 21766144,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1582474135,
+          "allocated_bytes": 1604710400,
+          "unique_inode_allocated_bytes": 1555693568,
+          "files": 9563,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 1577459712
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "arm": "reduced",
+      "host": "charlie-oss-0",
+      "results_sha256": "f214bea798e64920f5a3864ba00598c6a02de28a2d3fce06c31295f67de8d9c2",
+      "disk": {
+        "targets": {
+          "logical_bytes": 21752060,
+          "allocated_bytes": 21766144,
+          "unique_inode_allocated_bytes": 21766144,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1583103528,
+          "allocated_bytes": 1605328896,
+          "unique_inode_allocated_bytes": 1556324352,
+          "files": 9542,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 1578090496
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "arm": "reduced",
+      "host": "charlie-oss-0",
+      "results_sha256": "cd872396529efe08ea66b38c64c9aa8a55026aee2fb0989af2c59afefb732623",
+      "disk": {
+        "targets": {
+          "logical_bytes": 21752060,
+          "allocated_bytes": 21766144,
+          "unique_inode_allocated_bytes": 21766144,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1583105161,
+          "allocated_bytes": 1605337088,
+          "unique_inode_allocated_bytes": 1556332544,
+          "files": 9542,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 1578098688
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "arm": "full",
+      "host": "charlie-oss-0",
+      "results_sha256": "cd872396529efe08ea66b38c64c9aa8a55026aee2fb0989af2c59afefb732623",
+      "disk": {
+        "targets": {
+          "logical_bytes": 21759172,
+          "allocated_bytes": 21766144,
+          "unique_inode_allocated_bytes": 21766144,
+          "files": 7,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 1582474833,
+          "allocated_bytes": 1604702208,
+          "unique_inode_allocated_bytes": 1555685376,
+          "files": 9563,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 1577451520
+    },
+    {
+      "project": "codex",
+      "slot": 0,
+      "arm": "full",
+      "host": "charlie-serc-direct-2",
+      "results_sha256": "337f4afb3ee2b87eeb89abe142006199683ec7d4366de0b02bb566248cb944cc",
+      "disk": {
+        "targets": {
+          "logical_bytes": 258469302,
+          "allocated_bytes": 258473984,
+          "unique_inode_allocated_bytes": 258473984,
+          "files": 5,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 10147835334,
+          "allocated_bytes": 10204889088,
+          "unique_inode_allocated_bytes": 9729187840,
+          "files": 24261,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 9987661824
+    },
+    {
+      "project": "codex",
+      "slot": 0,
+      "arm": "reduced",
+      "host": "charlie-serc-direct-2",
+      "results_sha256": "337f4afb3ee2b87eeb89abe142006199683ec7d4366de0b02bb566248cb944cc",
+      "disk": {
+        "targets": {
+          "logical_bytes": 258682780,
+          "allocated_bytes": 258691072,
+          "unique_inode_allocated_bytes": 258691072,
+          "files": 5,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 10147298840,
+          "allocated_bytes": 10204319744,
+          "unique_inode_allocated_bytes": 9728634880,
+          "files": 24316,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 9987325952
+    },
+    {
+      "project": "codex",
+      "slot": 1,
+      "arm": "reduced",
+      "host": "charlie-serc-direct-2",
+      "results_sha256": "b3ef53cc714738fca734a284c4a23d301b7ad61b59cb72a3bdcfb4942bc2dacd",
+      "disk": {
+        "targets": {
+          "logical_bytes": 258682812,
+          "allocated_bytes": 258691072,
+          "unique_inode_allocated_bytes": 258691072,
+          "files": 5,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 10147416899,
+          "allocated_bytes": 10204442624,
+          "unique_inode_allocated_bytes": 9728757760,
+          "files": 24316,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 9987448832
+    },
+    {
+      "project": "codex",
+      "slot": 1,
+      "arm": "full",
+      "host": "charlie-serc-direct-2",
+      "results_sha256": "b3ef53cc714738fca734a284c4a23d301b7ad61b59cb72a3bdcfb4942bc2dacd",
+      "disk": {
+        "targets": {
+          "logical_bytes": 258469302,
+          "allocated_bytes": 258473984,
+          "unique_inode_allocated_bytes": 258473984,
+          "files": 5,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "shared-build": {
+          "logical_bytes": 10147949605,
+          "allocated_bytes": 10204979200,
+          "unique_inode_allocated_bytes": 9729277952,
+          "files": 24261,
+          "metric": "logical/allocated sum per-file lstat sizes/blocks; unique_inode_allocated deduplicates across roots; no symlink traversal"
+        },
+        "fmt-cache": {
+          "logical_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "all_roots_unique_inode_allocated_bytes": 9987751936
+    }
+  ],
+  "source_optimizer_proofs": [
+    {
+      "kind": "source-full",
+      "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm/isolated/stack-ablation/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/source-full.json",
+      "sha256": "d534e73bfded4f126e09615cb4ad00fba1ad753ebe838b703a32f33fa88660a2",
+      "local_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/source-full.json"
+    },
+    {
+      "kind": "source-reduced",
+      "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm/isolated/stack-ablation/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/source-reduced.json",
+      "sha256": "2d34eb3724bc07b8e59f49b9cf44540585f588a5a5e3862835d5dd403a58e647",
+      "local_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/source-reduced.json"
+    },
+    {
+      "kind": "build-profile-full",
+      "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm/isolated/stack-ablation/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/baseline-runtime-manifest.json",
+      "sha256": "b134270caedf260425d5c260087d7a5d95e81647f4112987e9f3fe8267b3545c",
+      "local_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/baseline-runtime-manifest.json",
+      "optimizer_metadata": {
+        "source_commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+        "release_config_sha256": "22e45f74d74fcba5821c2f3018637bb48491fe272c93af0dee30a9e7b5180323",
+        "runtime_cargo_sha256": "b453abc37ef3824c84cf20111f9717f0df739dad755c749b480791bada64cd00",
+        "pgo": {
+          "rustc": {
+            "path": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/opt-artifacts/rustc-pgo.profdata",
+            "bytes": 60019832,
+            "sha256": "a38aee39b5692f85e3e91f557fb0105c2e76889ce862f9ef0286fe78fcc555ca"
+          },
+          "rustdoc": {
+            "path": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/opt-artifacts/rustdoc-pgo.profdata",
+            "bytes": 64345016,
+            "sha256": "7ce77e0fd2e0892826c0bd16a44323961f99e6aaad06a681901533c4e43a102e"
+          },
+          "clippy": {
+            "path": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/opt-artifacts/clippy-pgo.profdata",
+            "bytes": 66212728,
+            "sha256": "cccc828dd515e5acc9fc69a056995455ffa931f0b2f1ed27a27909cef731b25c"
+          },
+          "rustfmt": {
+            "path": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/opt-artifacts/rustfmt-pgo.profdata",
+            "bytes": 63165528,
+            "sha256": "f096820ec914865537b464b38b3ba4da80085335626bbf5d4f30a22bff38b1ac"
+          }
+        },
+        "bolt_profiles": [
+          {
+            "path": "/tmp/codex-cargo-targets/ohm-rust/isolated/stack-ablation/baseline/rust/build/opt-artifacts/rustc-bolt.profdata",
+            "bytes": 235284816,
+            "sha256": "857bcb6e4a9de5b3bb90b1f170c2d224347c5eb8d40306c2e15234a13cdbb66e"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "build-profile-reduced",
+      "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm/isolated/stack-ablation/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-installer-inputs-01/accepted-ordinary-coroutine-runtime-manifest.json",
+      "sha256": "1cfa626f5dd6a83c953b6cb99fe7297885fe180622951e1a4a634688f1e6834f",
+      "local_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-installer-inputs-01/accepted-ordinary-coroutine-runtime-manifest.json",
+      "optimizer_metadata": {
+        "source_commit": "0038a8a4a401b96a1e7a9529773494417baa503a",
+        "release_config_sha256": "22e45f74d74fcba5821c2f3018637bb48491fe272c93af0dee30a9e7b5180323",
+        "runtime_cargo_sha256": "b453abc37ef3824c84cf20111f9717f0df739dad755c749b480791bada64cd00",
+        "pgo": {
+          "rustc": {
+            "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm-rust/isolated/stack-ablation/ordinary-coroutine/rust/build/opt-artifacts/rustc-pgo.profdata",
+            "bytes": 60009440,
+            "sha256": "3977084195a06f58ae9e544fe33d33a23e907a5e3dd951dc32ea89f4b04afe92"
+          },
+          "rustdoc": {
+            "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm-rust/isolated/stack-ablation/ordinary-coroutine/rust/build/opt-artifacts/rustdoc-pgo.profdata",
+            "bytes": 64338776,
+            "sha256": "1ea3654d1b9aafac24c821796129499fd8f9c378ee92eeb6989169c1d95c6a85"
+          },
+          "clippy": {
+            "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm-rust/isolated/stack-ablation/ordinary-coroutine/rust/build/opt-artifacts/clippy-pgo.profdata",
+            "bytes": 66212632,
+            "sha256": "1aa91663228867025970e8f5c0fda955d1627c9ddc28ad0c1722c9426517dda2"
+          },
+          "rustfmt": {
+            "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm-rust/isolated/stack-ablation/ordinary-coroutine/rust/build/opt-artifacts/rustfmt-pgo.profdata",
+            "bytes": 63161616,
+            "sha256": "43fc1f3a13e83a00dd287798e2027db600dc542cbf04e5a3c152bda0df5a2fe1"
+          }
+        },
+        "bolt_profiles": [
+          {
+            "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm-rust/isolated/stack-ablation/ordinary-coroutine/rust/build/opt-artifacts/rustc-bolt.profdata",
+            "bytes": 235546435,
+            "sha256": "8e714ac0bd65ca7d09d2c7f8bc812becddd90aca865bcb88b327b2d90754f83c"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "training-inputs",
+      "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm/isolated/stack-ablation/readiness/coroutine-direct2-public-inputs-01/retained-oss0/validation/coroutine-oss0-current-preparation-03/controlled-training-inputs.json",
+      "sha256": "9c525b5478824eca1ee92c3b750c3413ed965d55704ddb115c9bc05d213a1bd0",
+      "local_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/readiness/coroutine-direct2-public-inputs-01/retained-oss0/validation/coroutine-oss0-current-preparation-03/controlled-training-inputs.json"
+    },
+    {
+      "kind": "native-validation",
+      "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm/isolated/stack-ablation/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/native-receipt.json",
+      "sha256": "66c58a5b96ef19a934ec3d2bbfd3b0dbd12f8fcfeedba7ab7733d3426bd8d053",
+      "local_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/native-receipt.json"
+    },
+    {
+      "kind": "native-root-review",
+      "path": "/mnt/devbox-scratch/dev-user/codex-cargo-targets/ohm/isolated/stack-ablation/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/native-root-review.json",
+      "sha256": "a799380825e03b026035f54a63a473c7ba3a1c7fbdc175b353072e1d3c2b9230",
+      "local_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-complete-raw-retrieved-dbox-01/human-packet/readiness/coroutine-direct2-public-inputs-01/retained-oss0/readiness/coroutine-oss0-public-inputs-01/native-root-review.json"
+    }
+  ],
+  "endpoint_storage_scope": "Per-arm retained-history endpoint after final command; lstat allocated blocks and a separate inode-deduplicated total, no symlink traversal. Not per-command or peak storage.",
+  "final_direct2_current_closure": {
+    "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/direct2-final-current-release-dbox-01/stdout.json",
+    "sha256": "8724416268056090156162cc6ed5adef4a6626238756ba5cd6ead8515f14e6a8"
+  },
+  "combined_command_counts": {
+    "accepted_pairs": 6,
+    "timed_commands": 60,
+    "states": 15,
+    "continuous_samples": 1557,
+    "quiet_samples": 144
+  },
+  "native_scope": "Accepted reduced25 compiletests+3 source units and reused baseline25+3; 4private callbacks,12debugger cases,32full-debug variable checks,44linked histories,15header checks; limitations remain in original native-root-review.",
+  "source_profile_scope": "Coherent eighteen-path source removal; original source/component/config and all11training-command plan bindings retained. Fresh source-dependent PGO/BOLT outputs differ between source arms; no claim of identical profile bytes.",
+  "final_combined_root_audit_pending": false,
+  "final_combined_root_review": {
+    "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/coroutine-final-root-review-01.json",
+    "sha256": "ec73d530ee95bb4c0fec4dc006c85b58b1aae9910adabaf16bdd83e17ee4c84b"
+  },
+  "proof_count_scope": "41 Direct2 proof bindings across40 distinct bodies; source-checks reused for2 proof kinds"
+}

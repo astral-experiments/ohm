@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "accepted": true,
+  "proof_kind": "caller-local-cgu-final-root-review-v1",
+  "scope": "Four accepted Ruff/uv pairs on their original OpenAI1 block plus two prospective Codex pairs on Serc314; no within-project host pooling and no factorial inference.",
+  "accepted_pairs": 6,
+  "timed_commands": 60,
+  "command_statistics": 15,
+  "continuous_monitor_samples": 1784,
+  "quiet_samples": 144,
+  "original_block": {
+    "raw_archive_sha256": "85e9804586846340d45e0ea3a0b425c1de6e191191f2134e3369f1b76a6dc4df",
+    "payloads": 757,
+    "original_regular_members": 758,
+    "proofs_rehashed": 54,
+    "root_command_review_sha256": "a972b9c63755d02389cecf680336aa504e9db9e14ce0ae9815b5c4a254105155",
+    "final_current_closure_sha256": "f05d3f4e8aafa182c1782ce42d9f962db210a85f6015b9952fcdf8df0c2d642e",
+    "final_current_closure_source_sha256": "7c2cf66cf6ce7d9b30f75ac11be34b999e2c026406cf1229cb94d43605f1e528",
+    "closed_identities": 18,
+    "accepted_pairs": 4,
+    "timed_commands": 40
+  },
+  "codex_block": {
+    "raw_archive_sha256": "990881adae01fb303f3e9eb6294b5d90922bfdc85033aa3c8b71ada17ba6fc80",
+    "payloads": 272,
+    "original_regular_members": 273,
+    "proofs_rehashed": 57,
+    "root_command_review_sha256": "29001ba7446a045cd649b0714ca64ecae13a16046accf5e45aafb36e19b53160",
+    "final_current_closure_sha256": "8965d465bb05a2823367dde4e2f7530907899e9ec03b4221b2b9b31270352434",
+    "closed_identities": 4,
+    "accepted_pairs": 2,
+    "timed_commands": 20
+  },
+  "same_source_runtime_profile_pgo_policy_across_blocks": true,
+  "runtime_flat_sha256": "d3c02ba89dbcc13d284607ac8169fa01a4b16d302f8168903bf2606b0e51b921",
+  "build_profile_sha256": "b134270caedf260425d5c260087d7a5d95e81647f4112987e9f3fe8267b3545c",
+  "native_root_review_reused_sha256": "447da160ff8d5ae007411e69184ccfc91c7f20fcf2d4ec0708ad92e1645911e2",
+  "runtime_default_flags_by_arm": {
+    "full": [],
+    "reduced": [
+      "-Zohm-caller-local-cgus=no"
+    ]
+  },
+  "verification": [
+    "Both independent raw archive byte/size/original-mode extractions pass; all111 readiness proof bodies rehashed.",
+    "Both root command audits cover complete histories, accepted pointers, raw result bindings, warning/source/lock/status parity and original quiet/continuous/release gates.",
+    "All eighteen old and four new final current PID/start identities equal actual archival command/supervisor identities; groups, bounded users, leases and compiler processes closed.",
+    "Full and reduced are the same source, optimized runtime, original PGO profiles and release policy; only the declared caller-local flag differs."
+  ],
+  "recommendation": "Remove the caller-local CGU policy to reduce upstream divergence, accepting repeated Ruff first/second edited-build costs around 2.84/0.93 seconds and uv first-edit cost around 0.86 seconds. The off policy improves Codex cold/direct/reverted builds by around 15.18/0.55/2.10 seconds in this screen.",
+  "limits": [
+    "Two opposite-order pairs per project; paired ranges retain both outcomes.",
+    "This validates a flag-only policy axis; source pruning and the resulting release build still need correctness validation.",
+    "Installed runtime bytes/current metadata retain the admitted host-bound assertions; omitted binaries are not newly hashed locally.",
+    "Retained whole failed attempts are excluded intact; no partial cells are stitched.",
+    "Independent Caller/Stable/Both screens do not establish factorial interactions or additive deltas."
+  ]
+}

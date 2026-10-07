@@ -1,0 +1,74 @@
+{
+  "proof_kind": "cargo96-corrected-cargo-log-independent-review-v1",
+  "status": "accepted-untimed-source-corroboration",
+  "raw_archive_sha256": "cf4cb21efedb41a577f2612c3cdd681597a77c345f180367614af35d5260ad6c",
+  "raw_packet_sha256": "bdf450bf01baaa02f7a1c579fa570ddf909dc3f84ada74d9da88adc6dacc656e",
+  "raw_member_count": 36,
+  "actual_observations": {
+    "full": [
+      {
+        "run": 0,
+        "returncode": 0,
+        "debug_lines": 1247,
+        "actual_leaf_rustc_invocations": 0,
+        "initial_fresh": [
+          "  23.547154057s DEBUG prepare_target{force=false package_id=regex-syntax v0.8.11 target=\"regex_syntax\"}: cargo::compiler::fingerprint: early_cutoff: unit UnitIndex(111) is FRESH (already up-to-date)"
+        ],
+        "initial_missing_fingerprint": [],
+        "source_exact_before_after": true,
+        "stderr_sha256": "922ed183f631c48fc6d9160bcffd1ba2535f18e103e350db2cab80104799eae9",
+        "successful_dirty_to_fresh_recheck_log_count": 0
+      },
+      {
+        "run": 1,
+        "returncode": 0,
+        "debug_lines": 643,
+        "actual_leaf_rustc_invocations": 1,
+        "initial_fresh": [],
+        "initial_missing_fingerprint": [
+          "   1.148284973s  INFO prepare_target{force=false package_id=regex-syntax v0.8.11 target=\"regex_syntax\"}: cargo::compiler::fingerprint:     err: failed to read `/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/native/cargo96-real-uv-log-02/full/shared/debug/build/registries/c437647e3ea934a4-all-native-all/regex-syntax/3f09e30b71467ec3/fingerprint/lib-regex_syntax`"
+        ],
+        "source_exact_before_after": true,
+        "stderr_sha256": "e8fbd1d7fc519c8fd0d757a56f03089884f6e45b39d08f7c4573bf376d735902",
+        "successful_dirty_to_fresh_recheck_log_count": 0
+      }
+    ],
+    "reduced": [
+      {
+        "run": 0,
+        "returncode": 0,
+        "debug_lines": 1247,
+        "actual_leaf_rustc_invocations": 0,
+        "initial_fresh": [
+          "  23.271841103s DEBUG prepare_target{force=false package_id=regex-syntax v0.8.11 target=\"regex_syntax\"}: cargo::compiler::fingerprint: early_cutoff: unit UnitIndex(111) is FRESH (already up-to-date)"
+        ],
+        "initial_missing_fingerprint": [],
+        "source_exact_before_after": true,
+        "stderr_sha256": "157d86f55c2f232684de76316781197ac61fa5b3b4b7c2723880cc4281ec7121",
+        "successful_dirty_to_fresh_recheck_log_count": 0
+      },
+      {
+        "run": 1,
+        "returncode": 0,
+        "debug_lines": 643,
+        "actual_leaf_rustc_invocations": 1,
+        "initial_fresh": [],
+        "initial_missing_fingerprint": [
+          "   0.936822573s  INFO prepare_target{force=false package_id=regex-syntax v0.8.11 target=\"regex_syntax\"}: cargo::compiler::fingerprint:     err: failed to read `/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/native/cargo96-real-uv-log-02/reduced/shared/debug/build/registries/fa3e6746962b6c0c-all-native-all/regex-syntax/ef145d9513db034d/fingerprint/lib-regex_syntax`"
+        ],
+        "source_exact_before_after": true,
+        "stderr_sha256": "f1071951e4926a963dda53b70aac814227e8c2ebb5fd80c03c0362d3e3c3c31b",
+        "successful_dirty_to_fresh_recheck_log_count": 0
+      }
+    ]
+  },
+  "scope": "Both fixed shipping arms each execute one registry regex-syntax0.8.11 Rustc total: run1 prepares it with missing fingerprint then compiles; run0 first prepares it Fresh and does not invoke its Rustc. Source inventories unchanged for all four runs. Actual CARGO_LOG debug output present. This corroborates the separately accepted writer-reservation control-flow audit; no latency or callback-count claim.",
+  "preserves_initial_attempt": "RUST_LOG original packet is untouched; this is a separate bounded corrected probe.",
+  "prior_source_review_sha256": "7a8886ddc71814998b0e716092fce4a924daaa7530d0528bf200325a7142ec84",
+  "runtime_scope": "The previous full before/after runtime and all-tool loader closure is reused explicitly; this probe records exact Cargo hashes and performs no runtime mutation.",
+  "not_claimed": [
+    "No successful dirty-to-fresh recheck is inferred from other leaves or log absence alone.",
+    "No general unreachable claim for future locking configurations or noncooperating writers.",
+    "No callback/provider count, latency advantage, or six-by-three timing campaign."
+  ]
+}

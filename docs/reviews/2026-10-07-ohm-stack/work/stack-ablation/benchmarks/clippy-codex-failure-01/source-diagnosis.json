@@ -1,0 +1,576 @@
+{
+  "proof_kind": "clippy-ordinary-codex-preserved-source-diagnosis-v1",
+  "reviewed_utc": "2026-10-06T03:29:57.102430+00:00",
+  "scope": "Read-only local raw/source review. No remote call, rebuild, native/timing rerun, source mutation, new input program or reproducer command.",
+  "status": "observed ordinary-arm functional failure; compiler cache lifetime exception identified; individual-feature attribution unproven",
+  "archive_validation": {
+    "archive_sha256": "a6381bb1b2b66081c34ae11a60df382a5741b2fbb7bde1517b67d631fb942f2f",
+    "packet_sha256": "19d915657417252b885e2e6d4295a1c8c1cf6897c6527bba85020f2b3f2682f0",
+    "regular_members": 138,
+    "payloads": 137,
+    "all_payload_bytes_sizes_extracted_and_archive_modes_verified": true
+  },
+  "bindings": [
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/validation/clippy-codex-failure-01/packet.json",
+      "sha256": "19d915657417252b885e2e6d4295a1c8c1cf6897c6527bba85020f2b3f2682f0",
+      "size": 33894,
+      "mode": "0o664"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/raw.tar.gz",
+      "sha256": "a6381bb1b2b66081c34ae11a60df382a5741b2fbb7bde1517b67d631fb942f2f",
+      "size": 17705278,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/ownership-release.json",
+      "sha256": "43551acbf694699dcad1846af314e75bfcf60266ad8ccc1ba0ad70ef7938dccb",
+      "size": 2576,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/monitor.json",
+      "sha256": "a01c40194f1be2c9bd69142aeb3666ce0fd01ed59d1920068e9a15d974a5d8d0",
+      "size": 253,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/results.json",
+      "sha256": "418ccadf4d58c8c588e83dc6e233fe0896416af7cc6e1bceae0f1e32e0010471",
+      "size": 61635,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/packet.json",
+      "sha256": "60a8e4b94a151ce5023ad69419b02d8d56d700acdfe585ecfb775cc4d9c979d8",
+      "size": 13474,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/timed-children.jsonl",
+      "sha256": "4f68e2456e67f316969052b54dd82972657c3691af64537272b6f47c97de5162",
+      "size": 1234,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/attempt-status.json",
+      "sha256": "db7648c0cd00bdd27e8b6675d966c1487b0f0f16087aaf74d8b366c2e39e5a18",
+      "size": 9323,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/worktrees/codex/reduced/0/codex-rs/rustc-ice-2026-10-06T03_10_35-164657.txt",
+      "sha256": "1b56c0d903441ec6b524f3d66ee7446cd5dfbbff6ce31d5f5823056e3b6a1d56",
+      "size": 6972,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/clippy/source-manifest.json",
+      "sha256": "3043c98526c138075d1df4e309405128c8d4765551b9d97db5eb7fc916145608",
+      "size": 2274542,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/clippy/full-source-manifest.json",
+      "sha256": "786677f8375e120dc07ab8b8f1f25483bcc58116cae81944753ec1acfc18df03",
+      "size": 752682,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/clippy/ordinary-traversal.patch",
+      "sha256": "04297862ca92ef620bcd2513feb3e9d3084bc0b385d498af7b93169f7d69186e",
+      "size": 98546,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/readiness/clippy/ordinary-root-review.json",
+      "sha256": "590f09a79ef7c8106d67a0458e119dd81d8b32c6e49507ccb280ed616f797283",
+      "size": 2019,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/readiness/clippy/native-validation-summary.json",
+      "sha256": "179fdcfa612e9966dbe4c6f16c916138afab4685d8df22fe0f01a02c5abfe9d7",
+      "size": 1432,
+      "mode": "0o664"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/readiness/clippy/diagnostic-history-receipt.json",
+      "sha256": "f0fa7f2dcde15244b6cbb65a6e8e2b602312c8f5912b230cde3e729910595938",
+      "size": 57156,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/readiness/clippy/training-policy-root-review.json",
+      "sha256": "05e888a9709d6e11261ecb068851042673198a2683824104e8434a82e23676d8",
+      "size": 1490,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/readiness/clippy/query-contract-source-receipt.json",
+      "sha256": "c54dbb7b3188ee143b702cb9579db44d08150ae21eb763cbb7499f7906bf2a0a",
+      "size": 2979,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/readiness/clippy-ordinary-supplementary.json",
+      "sha256": "9f360e28d553d46814e337cbc9e97b0c40310304aeb8fbeab1e705922c691670",
+      "size": 48899,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/logs/codex/full/0/01.log",
+      "sha256": "12d5ff6323d636fb6a5b531e452a533959ef8fad3bd03b7f54be876b6358334c",
+      "size": 97070,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/logs/codex/full/0/02.log",
+      "sha256": "6d9165600fbb472653fdb36c82afe6a032a837646b936b28693d62be320b0bb6",
+      "size": 36388,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/logs/codex/full/0/04.log",
+      "sha256": "2c44f87b2926f21fe20e37f61dde1651fbfef45c0690925f0c4213029abde8be",
+      "size": 37466,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/logs/codex/full/0/06.log",
+      "sha256": "cc28b69b49401097766ad23f509852bc774b3570b8f5782f68ecd119c540ac8b",
+      "size": 58243,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/logs/codex/reduced/0/01.log",
+      "sha256": "181781eaa5d8f35215b7b9f2fe660e53227e84040f97a802c884c1330556fccc",
+      "size": 97535,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/logs/codex/reduced/0/02.log",
+      "sha256": "fa6034c82efa476858e684f191f65509ecce9a65fb87e40039cc45e7a4e36874",
+      "size": 36469,
+      "mode": "0o600"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/clippy-codex-failure-01/packet/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/logs/codex/reduced/0/04.log",
+      "sha256": "1a95ef7e7fdca95a5342df151f5b22452ad520bad0be02a829935014bce3dbb9",
+      "size": 330927,
+      "mode": "0o600"
+    }
+  ],
+  "source_objects": [
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_incremental/src/persist/save.rs",
+      "git_mode": "100644",
+      "git_blob": "eae4650182f34b426c3f7e6af5c33366d14a68d4",
+      "sha256": "840653f2bad7fbc595e3fe89c7e455f8afb7a0b0d1e05c8d7908a07402043d20",
+      "size": 6105
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_incremental/src/persist/file_format.rs",
+      "git_mode": "100644",
+      "git_blob": "853a5c9ba7ab00cac9ec5bef4c6a6f3a600d0f1d",
+      "sha256": "8a1b82607d27b73f42880daad329cc30fea409dff241716e028b7e68cff4c60a",
+      "size": 7421
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_middle/src/query/on_disk_cache.rs",
+      "git_mode": "100644",
+      "git_blob": "7e45a8ddbc41c2899f2adc1bb6ed4d9cf9ec7fa5",
+      "sha256": "47d696218707605e0bb9192206596e0c515447f539010889eef99bf472df5931",
+      "size": 46781
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_serialize/src/opaque.rs",
+      "git_mode": "100644",
+      "git_blob": "4a644d3bb6eac98dc0d3b492601ddaabfdf08b0c",
+      "sha256": "5278a6afb931010faf6556873857a3b50247ff11fa8cf8fd6e863014970fb48a",
+      "size": 16532
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_middle/src/queries.rs",
+      "git_mode": "100644",
+      "git_blob": "9042ee233a97b15ddd4949b7655bef142d492185",
+      "sha256": "a2ba128fd3b22a3faaa256870f5b48a51edaa9290100daade4f5405e0c445943",
+      "size": 127908
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_middle/src/ty/util.rs",
+      "git_mode": "100644",
+      "git_blob": "adf153b68dae6329e1a918a5b0e4a0b708cb91ef",
+      "sha256": "8633e14af1585267351b067a87406ae030ba297304e9eef8a166c76c3059b751",
+      "size": 69942
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_middle/src/mir/interpret/mod.rs",
+      "git_mode": "100644",
+      "git_blob": "a89617d794b30f2f66756594b3de272499a00ace",
+      "sha256": "62f2628155395c4a6a9ab85fa79f3ad493ad4f26a6ed980d6dc47b79f8d7afa8",
+      "size": 26055
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_middle/src/dep_graph/graph.rs",
+      "git_mode": "100644",
+      "git_blob": "5e8dcf55dc371cde5e70c9b12873939664ea216c",
+      "sha256": "c488c59781a275ad5bddb9a5bfe5d7ba1ec40df690bb9a7c6096b295d2f6f00b",
+      "size": 61707
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_query_impl/src/dep_kind_vtables.rs",
+      "git_mode": "100644",
+      "git_blob": "495524c3f142a4b77a6ec46e1ab99a7b5496e869",
+      "sha256": "1f1d1be96ebf064433dbee29525a8aa1b9989cf483dbdf9b50d2be77c4ba1b14",
+      "size": 6666
+    },
+    {
+      "commit": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "path": "compiler/rustc_query_impl/src/incremental.rs",
+      "git_mode": "100644",
+      "git_blob": "4d4b74333f3c7e91be0f0974d4a4360a439b6b0c",
+      "sha256": "e76b7c0df0e7ca1fe02c44e4bfc76945fed7306b100831973bcbde97eee37444",
+      "size": 6669
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_incremental/src/persist/save.rs",
+      "git_mode": "100644",
+      "git_blob": "12f674fe2a859c097f67c90de1186d97471071c8",
+      "sha256": "8098ae96038e448e95721bc4473229cc5f52a7a66d5a606b02d9ccfa6c3a4618",
+      "size": 6197
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_incremental/src/persist/file_format.rs",
+      "git_mode": "100644",
+      "git_blob": "853a5c9ba7ab00cac9ec5bef4c6a6f3a600d0f1d",
+      "sha256": "8a1b82607d27b73f42880daad329cc30fea409dff241716e028b7e68cff4c60a",
+      "size": 7421
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_middle/src/query/on_disk_cache.rs",
+      "git_mode": "100644",
+      "git_blob": "1dd510da0688600a248173536541c17f58b27a0b",
+      "sha256": "1057af59ff38d53c8444c073325fb57c9b90999fb5becc53f7b94a0a2e865564",
+      "size": 38536
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_serialize/src/opaque.rs",
+      "git_mode": "100644",
+      "git_blob": "4a644d3bb6eac98dc0d3b492601ddaabfdf08b0c",
+      "sha256": "5278a6afb931010faf6556873857a3b50247ff11fa8cf8fd6e863014970fb48a",
+      "size": 16532
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_middle/src/queries.rs",
+      "git_mode": "100644",
+      "git_blob": "e44df168177c062589a6d73ad4736949773de6af",
+      "sha256": "ea9e4284f77e59b8e2e4e0c4bbc201ddce79751d145de437631b8f1236b059d0",
+      "size": 121819
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_middle/src/ty/util.rs",
+      "git_mode": "100644",
+      "git_blob": "adf153b68dae6329e1a918a5b0e4a0b708cb91ef",
+      "sha256": "8633e14af1585267351b067a87406ae030ba297304e9eef8a166c76c3059b751",
+      "size": 69942
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_middle/src/mir/interpret/mod.rs",
+      "git_mode": "100644",
+      "git_blob": "f4bd64e4ca2114d1eb25fea9728eadca6db9d7b7",
+      "sha256": "0fc1c05a9d59e8d96210b44e75352b873c8892359a3c3acb87dafe7d73c016fa",
+      "size": 24871
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_middle/src/dep_graph/graph.rs",
+      "git_mode": "100644",
+      "git_blob": "cba7c14533484987b47cdc7c8e74d1bcaf86c346",
+      "sha256": "f66eda9a9dec72aece77c0660a0672b48b30fe45dc1bdc4bca18a666a07f5495",
+      "size": 59687
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_query_impl/src/dep_kind_vtables.rs",
+      "git_mode": "100644",
+      "git_blob": "495524c3f142a4b77a6ec46e1ab99a7b5496e869",
+      "sha256": "1f1d1be96ebf064433dbee29525a8aa1b9989cf483dbdf9b50d2be77c4ba1b14",
+      "size": 6666
+    },
+    {
+      "commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "path": "compiler/rustc_query_impl/src/incremental.rs",
+      "git_mode": "100644",
+      "git_blob": "341c9f5e5068dda88489792c1dc5636687d66d9f",
+      "sha256": "7855be59b195ee2fa0902962cd6a72f8cfe5186f54f4e9d0ff27b15d2b3e0034",
+      "size": 6331
+    }
+  ],
+  "clippy_source_validation": {
+    "full_commit": "f52143702ff1f265014e87d5e6853e70a3b15728",
+    "full_files_verified": 4604,
+    "ordinary_files_verified": 4598,
+    "all_listed_source_bytes_git_modes_and_complete_merkle_trees_recomputed": true,
+    "full_tree": "a3e70e644ddefcc27d304e4416b2a8cf258b90b8",
+    "ordinary_tree": "a1b4f4739f9fe75e2bd6afe5e17d0257402c6a26",
+    "patch_sha256": "04297862ca92ef620bcd2513feb3e9d3084bc0b385d498af7b93169f7d69186e",
+    "compiler_hooks_retained": true
+  },
+  "actual_history": {
+    "project": "codex",
+    "slot": 0,
+    "attempt": 1,
+    "order": [
+      "full",
+      "reduced"
+    ],
+    "original_command": [
+      "cargo",
+      "+<arm>",
+      "clippy",
+      "--tests",
+      "-p",
+      "codex-tui",
+      "--",
+      "-D",
+      "clippy::redundant_closure_for_method_calls"
+    ],
+    "test_execution": false,
+    "full_command_exits": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "reduced_observed_command_exits": [
+      0,
+      0,
+      101
+    ],
+    "reduced_final_results_not_written": true,
+    "failed_phase": "direct edit, command step4; codex-cli library reached through selected package graph",
+    "timed_child_exit_order": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      101
+    ],
+    "monitor_samples": 310,
+    "monitor_violations": [],
+    "monitor_passed": false,
+    "owned_children_and_groups_released": true,
+    "active_users_empty": true,
+    "lease_released": true,
+    "source_parity_through_failed_phase": [
+      {
+        "phase": "session-01-before-source",
+        "files": 6143,
+        "source_map_sha256": "e491c600b43f770ec6ffdddc63142c60e53b92b4005f7cbbba531a832f9231fd",
+        "patch_sha256": "1efa22b91f62f1c43bdad182d99a44344d7f8519ef0af49122b2e98d9abdda85",
+        "both_arms_equal": true
+      },
+      {
+        "phase": "session-01-complete-source",
+        "files": 6143,
+        "source_map_sha256": "e491c600b43f770ec6ffdddc63142c60e53b92b4005f7cbbba531a832f9231fd",
+        "patch_sha256": "1efa22b91f62f1c43bdad182d99a44344d7f8519ef0af49122b2e98d9abdda85",
+        "both_arms_equal": true
+      },
+      {
+        "phase": "session-02-before-source",
+        "files": 6143,
+        "source_map_sha256": "e491c600b43f770ec6ffdddc63142c60e53b92b4005f7cbbba531a832f9231fd",
+        "patch_sha256": "1efa22b91f62f1c43bdad182d99a44344d7f8519ef0af49122b2e98d9abdda85",
+        "both_arms_equal": true
+      },
+      {
+        "phase": "session-02-complete-source",
+        "files": 6143,
+        "source_map_sha256": "e491c600b43f770ec6ffdddc63142c60e53b92b4005f7cbbba531a832f9231fd",
+        "patch_sha256": "1efa22b91f62f1c43bdad182d99a44344d7f8519ef0af49122b2e98d9abdda85",
+        "both_arms_equal": true
+      },
+      {
+        "phase": "session-04-before-source",
+        "files": 6143,
+        "source_map_sha256": "c738f50de8c58b040e58e819d3e4705afa157c54c6cbf786cb29f52b2f330628",
+        "patch_sha256": "e9b661bfac72384f323f1213177e5b4be01e53c7a3fb23ea5c7ea3dcd55ad9c2",
+        "both_arms_equal": true
+      }
+    ]
+  },
+  "failed_driver": {
+    "log_sha256": "1a95ef7e7fdca95a5342df151f5b22452ad520bad0be02a829935014bce3dbb9",
+    "exact_process_command_string_sha256": "2b0de52bb7c5d8b0205c5ba35ca254b6634837f1657e12e8705b644984866f02",
+    "argv_count": 2115,
+    "driver": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-ordinary-traversal/bin/clippy-driver",
+    "rustc_argument": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/rustup/toolchains/ohm-ablation-clippy-ordinary/bin/rustc",
+    "default_flags_prefix": [
+      "-Zpublic-api-hash",
+      "-Zcache-proc-macros",
+      "-Zthreads=8",
+      "-Zremap-cwd-prefix=/ohm-workspace/v7"
+    ],
+    "crate_name": "codex_cli",
+    "input": "cli/src/lib.rs",
+    "edition": "2024",
+    "emit": "dep-info,metadata",
+    "extern_count": 68,
+    "incremental_root": "incremental=/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/matched-pairs/50dd6407dde3a5ae241af101a97c855f60d57d79588c417c0332a2a99ab1c78d/codex/slot-0/attempt-1/shared-build/codex/reduced/0/debug/incremental/7991569c030d3250",
+    "exit": "Cargo101; compiler child signal6 SIGABRT"
+  },
+  "runtime_equivalence": {
+    "entries_per_arm": 69859,
+    "complete_manifest_keys_equal": true,
+    "only_changed_entries": [
+      "bin/cargo-clippy",
+      "bin/clippy-driver"
+    ],
+    "common_rustc_sha256": "f8ec02f37ec00ee7aaefc9144f6ba3a28b115159c90e9a32da8cfb6f7e499fe8",
+    "common_cargo_sha256": "b453abc37ef3824c84cf20111f9717f0df739dad755c749b480791bada64cd00",
+    "common_librustc_driver_sha256": "7878c47c839e344a5584712eb0d5f2939137ef060720b47fc8ce5aa41b04f14a",
+    "arm_loader_records": {
+      "full": {
+        "cargo": {
+          "binary_sha256": "b453abc37ef3824c84cf20111f9717f0df739dad755c749b480791bada64cd00",
+          "own_compiler_dependencies": []
+        },
+        "clippy-driver": {
+          "binary_sha256": "439076b65a548bf8c847e9769be1f1b5195514cad042328808fec1e29718ffd0",
+          "own_compiler_dependencies": [
+            {
+              "resolved_path": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-full/lib/librustc_driver-072bd57301277bc6.so",
+              "sha256": "7878c47c839e344a5584712eb0d5f2939137ef060720b47fc8ce5aa41b04f14a",
+              "compiler_runtime_dependency": true
+            },
+            {
+              "resolved_path": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-full/lib/libLLVM.so.23.1-rust-1.99.0-beta",
+              "sha256": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
+              "compiler_runtime_dependency": true
+            }
+          ]
+        },
+        "cargo-clippy": {
+          "binary_sha256": "59e388fc78ca775d736e216499418f2cee2ba439343c4023c4c2ba2edcc716d4",
+          "own_compiler_dependencies": [
+            {
+              "resolved_path": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-full/lib/librustc_driver-072bd57301277bc6.so",
+              "sha256": "7878c47c839e344a5584712eb0d5f2939137ef060720b47fc8ce5aa41b04f14a",
+              "compiler_runtime_dependency": true
+            },
+            {
+              "resolved_path": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-full/lib/libLLVM.so.23.1-rust-1.99.0-beta",
+              "sha256": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
+              "compiler_runtime_dependency": true
+            }
+          ]
+        }
+      },
+      "ordinary-traversal": {
+        "cargo": {
+          "binary_sha256": "b453abc37ef3824c84cf20111f9717f0df739dad755c749b480791bada64cd00",
+          "own_compiler_dependencies": []
+        },
+        "clippy-driver": {
+          "binary_sha256": "4492250b1eb7a461082582877520bf01ce0febe0ea5f8350f595a204d83cf7ad",
+          "own_compiler_dependencies": [
+            {
+              "resolved_path": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-ordinary-traversal/lib/librustc_driver-072bd57301277bc6.so",
+              "sha256": "7878c47c839e344a5584712eb0d5f2939137ef060720b47fc8ce5aa41b04f14a",
+              "compiler_runtime_dependency": true
+            },
+            {
+              "resolved_path": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-ordinary-traversal/lib/libLLVM.so.23.1-rust-1.99.0-beta",
+              "sha256": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
+              "compiler_runtime_dependency": true
+            }
+          ]
+        },
+        "cargo-clippy": {
+          "binary_sha256": "8fb7504c3b4c1d66ccc1ff3ea3082465fb5f6de1da3ea8fb92b21c98e3226e15",
+          "own_compiler_dependencies": [
+            {
+              "resolved_path": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-ordinary-traversal/lib/librustc_driver-072bd57301277bc6.so",
+              "sha256": "7878c47c839e344a5584712eb0d5f2939137ef060720b47fc8ce5aa41b04f14a",
+              "compiler_runtime_dependency": true
+            },
+            {
+              "resolved_path": "/tmp/codex-cargo-targets/ohm/isolated/stack-ablation/runtime/clippy-ordinary-traversal/lib/libLLVM.so.23.1-rust-1.99.0-beta",
+              "sha256": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
+              "compiler_runtime_dependency": true
+            }
+          ]
+        }
+      }
+    },
+    "physical_shared_target_incremental_roots_separate": true,
+    "recipe_and_managed_environment_policy_equal_except_declared_arm_paths": true
+  },
+  "reused_native_semantic_closure": {
+    "independent_root_review_sha256": "590f09a79ef7c8106d67a0458e119dd81d8b32c6e49507ccb280ed616f797283",
+    "raw_semantic_history_receipt_sha256": "f0fa7f2dcde15244b6cbb65a6e8e2b602312c8f5912b230cde3e729910595938",
+    "accepted_comparisons": 18,
+    "threads": [
+      1,
+      4
+    ],
+    "cold_positive_lint_ids": 62,
+    "scope": "Accepted diagnostic/suggestion/metadata history closure reused; no fresh suite and no cross-arm diagnostic-byte claim for this failed Codex timing attempt."
+  },
+  "source_diagnosis": [
+    {
+      "fact": "Saved first stack is codegen_fn_attrs disk load -> is_thread_local_static -> OnDiskCache::serialize -> save_dep_graph, before query-value decoding.",
+      "evidence": "original ICE frames9-15 and raw reduced04log"
+    },
+    {
+      "fact": "save_dep_graph promotes, captures retained bytes, explicitly closes all current/ancestor mappings, then calls serialize. No map is reopened on this path.",
+      "source": "save.rs74-84; on_disk_cache.rs289-295,344-431"
+    },
+    {
+      "fact": "serialize calls specialized_encode_alloc_id for loaded allocation IDs, including forwarded allocation IDs. Static allocation encoding checks TLS through codegen_fn_attrs.",
+      "source": "on_disk_cache.rs411-431; mir/interpret/mod.rs104-138; ty/util.rs718-719"
+    },
+    {
+      "fact": "with_decoder maps a closed serialized_data=None to empty bytes, then unwraps MemDecoder::new. Its only Err condition is missing rust-end-file trailer; here the saved serialize stack follows unconditional map closure.",
+      "source": "on_disk_cache.rs565-572; opaque.rs21,290-293"
+    },
+    {
+      "fact": "Rust106 introduces the early forwarding return for eligible green cache values, leaving them out of the in-memory query cache; pinned upstream promotion loads and caches them before closing. Rust105 only narrows cached-node enumeration and retains normal loading.",
+      "source": "incremental.rs128-171; Rust10675605aa171c0f0c7f880278ea9debc71d398b4c3; Rust105df2d1c67b7a61ddd887c4953b875745141bd042d"
+    },
+    {
+      "fact": "codegen_fn_attrs is cache-on-disk and feedable upstream and original. The first failure precedes decoding its value, so this packet supplies no evidence of malformed DefId/feed or missing serialized dependency. The dep_graph1497 panic is secondary during panic processing.",
+      "source": "queries.rs1569-1575; dep_graph/graph.rs1477-1497; raw reduced04log594-596"
+    }
+  ],
+  "attribution_and_limits": [
+    "Observed: ordinary traversal fails this original Codex direct-edit command; full completed this one history. The ordinary runtime cannot be considered functionally accepted for this real workload.",
+    "The exception is in the common shipping compiler cache lifecycle. Rust106 is the strongest owning delta because it changes promotion from eager in-memory loading to serialized forwarding. No isolated Rust106 removal or alternate compiler has been executed here.",
+    "The stack does not reveal the static DefId, query previous/current index, generation, or whether this particular node was already green/forwarded at promotion or became green on later demand. Consequently upstream/full immunity and individual-feature causation are not proved.",
+    "Pinned upstream has the same close-before-serialize and static/TLS-query call pattern; the differing promotion contract is established by source, not a tested upstream comparison.",
+    "Full successful per-unit compiler argv was not separately captured. Full/reduced source/recipe/environment/common-runtime equivalence is established from preserved proofs; failed actual compiler argv is retained verbatim in the original raw log.",
+    "The packet contains combined stdout/stderr as originally measured, not separately captured streams. It includes no completed reduced history or pair parity acceptance, and no final campaign or latency conclusion.",
+    "Do not discard the failure, reuse partial cells, infer security impact, or add a decoder recovery/eager-load repair based solely on this source diagnosis. Existing incremental/shared/source caches remain preserved."
+  ]
+}

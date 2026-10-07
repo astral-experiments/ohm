@@ -1,0 +1,301 @@
+{
+  "passed": true,
+  "scope": "Human BUILD Markdown corrections only. No raw, numeric JSON, source, native, timer, workload or root main/full/rust/benchmark edits.",
+  "artifact": {
+    "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/resolver-cache-native-plan/execution/packet/assets/resolver-cache-native-plan/targeted-compiler-recipe-artifact/artifact.json",
+    "sha256": "853b657c36f50aafde62fb5cce234b30b626e4483a595c691917f4f1d1858e17"
+  },
+  "helper": {
+    "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/targeted_compiler_recipes.py",
+    "sha256": "e88eec69cf65fc7033234ce35b3795b6b71eea9fd3d29f3df7561e8011512e63"
+  },
+  "historical_semantic_label_erratum": {
+    "Direct edit": "Edit 1",
+    "Dependency edit": "Edit 2",
+    "Revert": "Edit 3"
+  },
+  "mapping_scope": "Only these five-command original sequential-edit BUILD histories. Distinct Clippy four-command and rustfmt edit/revert histories are excluded.",
+  "canonical_numeric_data_preserved": {
+    "work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/caller-off-detailed-results.json": "9ed2114d14aac008ffb0e1bdb05304736627e83b403c5095461ed1d3b7a8dc4f",
+    "work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/parallel-inplace-scratch-01/stable-off-detailed-results.json": "d2c6c4affc77ea88785df66e31ee1aa8f8a61a202bd809410323dd2928f180fb",
+    "work/stack-ablation/benchmarks/cgu-both-direct2-two-pair-01/both-off-detailed-results.json": "7432f2a605ce6194005bf550b70d053c3ede6311283abc841478a974e476fb22",
+    "work/stack-ablation/benchmarks/development-debug-inplace-openai3-01/debug-complete-command-root-review-01.json": "d7442e6a5e868dbe8db4f5e51dcacf25ee2adf4445cd1dacc2974bcf8611cd39",
+    "work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/coroutine-detailed-results.json": "1b86787994d9a4df1276e69074b7d2101c89f064fcb1bddd87a1d532aaeab504"
+  },
+  "numeric_json_may_preserve_historical_labels": "Interpret original-edit-1/2/3-build according to this erratum; original metrics and canonical proof hashes remain unchanged.",
+  "actual_recipe_mappings": [
+    {
+      "project": "ruff",
+      "commands": [
+        "cold-build",
+        "warm-noop-build",
+        "original-edit-1-build",
+        "original-edit-2-build",
+        "original-edit-3-build"
+      ],
+      "edits": [
+        {
+          "human_label": "Edit 1",
+          "raw_command_label": "original-edit-1-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Simplify and document recursive attribute inference",
+            "parent": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+            "commit": "c0a91dd16d5b32a254cbf6bcd268f6dbaf0fef0f"
+          }
+        },
+        {
+          "human_label": "Edit 2",
+          "raw_command_label": "original-edit-2-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Index implicit attribute dependencies per class",
+            "parent": "c0a91dd16d5b32a254cbf6bcd268f6dbaf0fef0f",
+            "commit": "38c87bfba12aa635e3f273f248ca1f114391f504"
+          }
+        },
+        {
+          "human_label": "Edit 3",
+          "raw_command_label": "original-edit-3-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Infer recursive implicit attributes with component fixed points",
+            "parent": "38c87bfba12aa635e3f273f248ca1f114391f504",
+            "commit": "4b00c689c3d91bb17866ec08de549479d6d8dcca"
+          }
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "commands": [
+        "cold-build",
+        "warm-noop-build",
+        "original-edit-1-build",
+        "original-edit-2-build",
+        "original-edit-3-build"
+      ],
+      "edits": [
+        {
+          "human_label": "Edit 1",
+          "raw_command_label": "original-edit-1-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Implement the dedicated PyPI Simple API JSON parser",
+            "parent": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+            "commit": "63251e5ce54f03363a10c088d7f9f6d6ba268302"
+          }
+        },
+        {
+          "human_label": "Edit 2",
+          "raw_command_label": "original-edit-2-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Simplify the direct parser and document its invariants",
+            "patch": "patches/uv-simple-parser-implementation.patch"
+          }
+        },
+        {
+          "human_label": "Edit 3",
+          "raw_command_label": "original-edit-3-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Simplify redundant Simple API JSON compatibility tests",
+            "patch": "patches/uv-simple-parser-tests.patch"
+          }
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "commands": [
+        "cold-build",
+        "warm-noop-build",
+        "original-edit-1-build",
+        "original-edit-2-build",
+        "original-edit-3-build"
+      ],
+      "edits": [
+        {
+          "human_label": "Edit 1",
+          "raw_command_label": "original-edit-1-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Add active-cell transcript layout bookkeeping",
+            "parent": "74004b5397b24662a87a5264a6ae80664168c7f3",
+            "commit": "3d7bb2dd2e834b4d26cf29a7c0163dd4fb5afb70",
+            "paths": [
+              "codex-rs/tui/src/chatwidget/transcript.rs"
+            ]
+          }
+        },
+        {
+          "human_label": "Edit 2",
+          "raw_command_label": "original-edit-2-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Implement stable active-cell rendering with its regression snapshots",
+            "parent": "74004b5397b24662a87a5264a6ae80664168c7f3",
+            "commit": "3d7bb2dd2e834b4d26cf29a7c0163dd4fb5afb70",
+            "paths": [
+              "codex-rs/tui/src/chatwidget/rendering.rs",
+              "codex-rs/tui/src/chatwidget/rendering_tests.rs",
+              "codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__rendering__tests__cached_active_cell_bottom_scroll.snap"
+            ]
+          }
+        },
+        {
+          "human_label": "Edit 3",
+          "raw_command_label": "original-edit-3-build",
+          "actual_edit": {
+            "kind": "edit",
+            "label": "Invalidate cached layouts when the chat widget removes active cells",
+            "parent": "74004b5397b24662a87a5264a6ae80664168c7f3",
+            "commit": "3d7bb2dd2e834b4d26cf29a7c0163dd4fb5afb70",
+            "paths": [
+              "codex-rs/tui/src/chatwidget.rs"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/caller-off-result.md",
+      "before_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/caller.before.md",
+      "before_sha256": "f327588e68a457a84abfb06bc63b501ab1da569f07fd50db8e4f33ce57841206",
+      "after_sha256": "8630fd8270da746ed1ae7ec0a473c6d362c3002f6dff1321f837c41400acdc7f",
+      "diff_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/caller.diff",
+      "diff_sha256": "44d9b1168357b2dc38fdd777e703649fa8fb6dd0dfea79ad507f182279d66a55",
+      "state_replacements": {
+        "| Direct edit |": 6,
+        "| Dependency edit |": 6,
+        "| Revert |": 6
+      },
+      "all_table_project_and_numeric_cells_identical": true,
+      "prose_replacements": [
+        {
+          "old": "both direct-edit and revert Codex builds",
+          "new": "both Codex builds after Edits 1 and 3"
+        },
+        {
+          "old": "both Ruff direct edits",
+          "new": "both Ruff builds after Edit 1"
+        },
+        {
+          "old": "both Ruff dependency edits",
+          "new": "both Ruff builds after Edit 2"
+        },
+        {
+          "old": "both uv direct edits",
+          "new": "both uv builds after Edit 1"
+        },
+        {
+          "old": "cold build, warm no-op, direct edit, dependency edit, and revert",
+          "new": "cold build, warm no-op, and builds after original Edits 1, 2 and 3"
+        }
+      ]
+    },
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/parallel-inplace-scratch-01/stable-off-result.md",
+      "before_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/stable.before.md",
+      "before_sha256": "3aeabfb638686d8c98b9adceaca3cb98591708ea69f35c310cf61b4825a58607",
+      "after_sha256": "66d752b98397459fa79d146be72df74ec5b316d79e62abc495d2399589fd6db1",
+      "diff_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/stable.diff",
+      "diff_sha256": "493f2fb867f9ef69e2492cc5b169776d84d0c123e01518f5ac88e0c7d3e4a5ff",
+      "state_replacements": {
+        "| Direct edit |": 6,
+        "| Dependency edit |": 6,
+        "| Revert |": 6
+      },
+      "all_table_project_and_numeric_cells_identical": true,
+      "prose_replacements": [
+        {
+          "old": "the direct and dependency edited Codex library builds",
+          "new": "the Codex library builds after Edits 1 and 2"
+        },
+        {
+          "old": "cold, no-op, direct edit, dependency edit, and revert",
+          "new": "cold, no-op, and builds after original Edits 1, 2 and 3"
+        }
+      ]
+    },
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/cgu-both-direct2-two-pair-01/both-off-result.md",
+      "before_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/both.before.md",
+      "before_sha256": "4256f83682b0509e2a5de970e8aa93243e842540edeee83130cf78b200cf525a",
+      "after_sha256": "e89f3fd2d2b9187e5ff4e2df04c4a1c957720a2960c55dc0027743eee87476dc",
+      "diff_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/both.diff",
+      "diff_sha256": "c73e7b220094a1cb0f6d812b70955f1f7a564d502c21af11744c4faebb1ecba5",
+      "state_replacements": {
+        "| Direct edit |": 6,
+        "| Dependency edit |": 6,
+        "| Revert |": 6
+      },
+      "all_table_project_and_numeric_cells_identical": true,
+      "prose_replacements": []
+    },
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/development-debug-results.md",
+      "before_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/debug.before.md",
+      "before_sha256": "bfb6c3c7779478087ad8d2aeef4edef07145a8e27f7d963bf063a0e921812c4c",
+      "after_sha256": "70d70ac74c0e27cb1b1d34a4cf9c7f001ddb6978db5b3ad6d40c6f62327402ae",
+      "diff_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/debug.diff",
+      "diff_sha256": "6a20c762d0c80d4b7bbd3bd245a53bab780501b501471a32f4e88a25b9f081e8",
+      "state_replacements": {
+        "| Direct edit |": 0,
+        "| Dependency edit |": 0,
+        "| Revert |": 0
+      },
+      "all_table_project_and_numeric_cells_identical": true,
+      "prose_replacements": [
+        {
+          "old": "The Ruff and Codex edit builds also improve in both orders; uv edits improve except for its third edit, which has mixed results.",
+          "new": "Ruff edits and Codex Edits 1 and 2 improve in both orders; Codex Edit 3 is mixed. uv Edits 1 and 3 improve in both orders, while Edit 2 is slower in both."
+        }
+      ]
+    },
+    {
+      "path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/ordinary-coroutine-oss0-two-pair-01/coroutine-results.md",
+      "before_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/coroutine.before.md",
+      "before_sha256": "050b273a41c2ac877ed9fa5a49de5aabfe6830d4bd5f33cd61bda7cadfd9b24d",
+      "after_sha256": "dfe672e3003fde4c565d5525e5338b1976e4bb4a8ba443a3360e7686bc17c604",
+      "diff_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/representative-build-report-label-erratum-01/coroutine.diff",
+      "diff_sha256": "65c77883b69029315352d991d8224d78c0b5f434316a852e80466ff55b1b6f7e",
+      "state_replacements": {
+        "| Direct edit |": 6,
+        "| Dependency edit |": 6,
+        "| Revert |": 6
+      },
+      "all_table_project_and_numeric_cells_identical": true,
+      "prose_replacements": [
+        {
+          "old": "both Ruff dependency edits",
+          "new": "both Ruff builds after Edit 2"
+        },
+        {
+          "old": "both Ruff reverts",
+          "new": "both Ruff builds after Edit 3"
+        },
+        {
+          "old": "Both uv cold, direct-edit and dependency-edit builds",
+          "new": "Both uv cold builds and builds after Edits 1 and 2"
+        },
+        {
+          "old": "both Codex no-ops and direct edits",
+          "new": "both Codex no-ops and builds after Edit 1"
+        },
+        {
+          "old": "Codex dependency edits and reverts",
+          "new": "Codex builds after Edits 2 and 3"
+        },
+        {
+          "old": "cold build, warm no-op, direct edit, dependency edit and revert",
+          "new": "cold build, warm no-op, and builds after original Edits 1, 2 and 3"
+        }
+      ]
+    }
+  ],
+  "debug_prose_erratum": "uv Edit 2 loses in both orders, uv Edit 3 improves in both; Codex Edit 3 is mixed. Tables already stated the correct values and are unchanged."
+}

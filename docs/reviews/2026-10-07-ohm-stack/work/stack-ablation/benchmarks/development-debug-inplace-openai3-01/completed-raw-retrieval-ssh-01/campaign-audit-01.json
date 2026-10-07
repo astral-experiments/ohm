@@ -1,0 +1,267 @@
+{
+  "passed": true,
+  "review_kind": "subagent-whole-campaign-audit; root independent result audit remains separate",
+  "source_sha256": "f756bd62c8ad73cd12cf95ecdb413dfbdab6a313112bd2895bab9e191078aa6b",
+  "archive_sha256": "ed6ed1bea287323378d7ed40745e5b6dd369cf4169dd9156cbd710e186be47d4",
+  "payloads": 892,
+  "raw_members": 893,
+  "catalog_proofs": 35,
+  "accepted_pairs": 6,
+  "raw_commands": 60,
+  "raw_edits": 36,
+  "all_phase_source_lock_and_output_pairs_equal": true,
+  "rows": [
+    {
+      "project": "ruff",
+      "slot": 0,
+      "full_seconds": 198.52173634711653,
+      "disabled_seconds": 171.49674275517464,
+      "disabled_percent": -13.613115666431874,
+      "phases": [
+        {
+          "label": "cold-build",
+          "full_seconds": 77.78416707413271,
+          "disabled_seconds": 66.81321110203862,
+          "disabled_percent": -14.104356175258836
+        },
+        {
+          "label": "warm-noop-build",
+          "full_seconds": 0.5433672200888395,
+          "disabled_seconds": 0.5121330451220274,
+          "disabled_percent": -5.7482626503868595
+        },
+        {
+          "label": "original-edit-1-build",
+          "full_seconds": 31.552907006349415,
+          "disabled_seconds": 27.518807618878782,
+          "disabled_percent": -12.785190875309361
+        },
+        {
+          "label": "original-edit-2-build",
+          "full_seconds": 41.12920956267044,
+          "disabled_seconds": 37.08528150897473,
+          "disabled_percent": -9.832253273756187
+        },
+        {
+          "label": "original-edit-3-build",
+          "full_seconds": 47.512085483875126,
+          "disabled_seconds": 39.567309480160475,
+          "disabled_percent": -16.721589723547257
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "full_seconds": 200.17218906292692,
+      "disabled_seconds": 171.45622291509062,
+      "disabled_percent": -14.345632269030661,
+      "phases": [
+        {
+          "label": "cold-build",
+          "full_seconds": 77.97962596267462,
+          "disabled_seconds": 67.67257828265429,
+          "disabled_percent": -13.217616207794913
+        },
+        {
+          "label": "warm-noop-build",
+          "full_seconds": 0.486705063842237,
+          "disabled_seconds": 0.9712138939648867,
+          "disabled_percent": 99.54875470120459
+        },
+        {
+          "label": "original-edit-1-build",
+          "full_seconds": 32.02756764320657,
+          "disabled_seconds": 28.583505949936807,
+          "disabled_percent": -10.753428832427392
+        },
+        {
+          "label": "original-edit-2-build",
+          "full_seconds": 41.43307068524882,
+          "disabled_seconds": 35.027374788187444,
+          "disabled_percent": -15.460345543112163
+        },
+        {
+          "label": "original-edit-3-build",
+          "full_seconds": 48.245219707954675,
+          "disabled_seconds": 39.2015500003472,
+          "disabled_percent": -18.745214059241512
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "full_seconds": 99.87975982623175,
+      "disabled_seconds": 92.16561388317496,
+      "disabled_percent": -7.723432611850156,
+      "phases": [
+        {
+          "label": "cold-build",
+          "full_seconds": 75.08464810997248,
+          "disabled_seconds": 69.97842474607751,
+          "disabled_percent": -6.800622354141095
+        },
+        {
+          "label": "warm-noop-build",
+          "full_seconds": 0.7287127561867237,
+          "disabled_seconds": 0.6504082069732249,
+          "disabled_percent": -10.745598804014111
+        },
+        {
+          "label": "original-edit-1-build",
+          "full_seconds": 10.205252883024514,
+          "disabled_seconds": 8.891939009074122,
+          "disabled_percent": -12.868998828387356
+        },
+        {
+          "label": "original-edit-2-build",
+          "full_seconds": 6.378937345929444,
+          "disabled_seconds": 6.520904667209834,
+          "disabled_percent": 2.225563813869136
+        },
+        {
+          "label": "original-edit-3-build",
+          "full_seconds": 7.48220873111859,
+          "disabled_seconds": 6.123937253840268,
+          "disabled_percent": -18.15334917922372
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "full_seconds": 92.734521206934,
+      "disabled_seconds": 89.0901480554603,
+      "disabled_percent": -3.929899140085491,
+      "phases": [
+        {
+          "label": "cold-build",
+          "full_seconds": 69.56274493271485,
+          "disabled_seconds": 65.83172639319673,
+          "disabled_percent": -5.3635297789455745
+        },
+        {
+          "label": "warm-noop-build",
+          "full_seconds": 0.9341467400081456,
+          "disabled_seconds": 1.0568950730375946,
+          "disabled_percent": 13.140155370919416
+        },
+        {
+          "label": "original-edit-1-build",
+          "full_seconds": 9.22630781494081,
+          "disabled_seconds": 8.797359841875732,
+          "disabled_percent": -4.649183418425007
+        },
+        {
+          "label": "original-edit-2-build",
+          "full_seconds": 5.617429519072175,
+          "disabled_seconds": 6.519051657058299,
+          "disabled_percent": 16.05043970600708
+        },
+        {
+          "label": "original-edit-3-build",
+          "full_seconds": 7.3938922001980245,
+          "disabled_seconds": 6.885115090291947,
+          "disabled_percent": -6.88104581633543
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "slot": 0,
+      "full_seconds": 371.9952579238452,
+      "disabled_seconds": 303.8629711968824,
+      "disabled_percent": -18.315364315991044,
+      "phases": [
+        {
+          "label": "cold-build",
+          "full_seconds": 292.5168219478801,
+          "disabled_seconds": 253.41468772897497,
+          "disabled_percent": -13.367482238635919
+        },
+        {
+          "label": "warm-noop-build",
+          "full_seconds": 17.58146644383669,
+          "disabled_seconds": 2.237251410726458,
+          "disabled_percent": -87.27494422678978
+        },
+        {
+          "label": "original-edit-1-build",
+          "full_seconds": 28.13857371499762,
+          "disabled_seconds": 19.119940084870905,
+          "disabled_percent": -32.050784526153365
+        },
+        {
+          "label": "original-edit-2-build",
+          "full_seconds": 19.112804878037423,
+          "disabled_seconds": 13.830193050671369,
+          "disabled_percent": -27.639123933276366
+        },
+        {
+          "label": "original-edit-3-build",
+          "full_seconds": 14.645590939093381,
+          "disabled_seconds": 15.260898921638727,
+          "disabled_percent": 4.201318916418106
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "slot": 1,
+      "full_seconds": 350.913912626449,
+      "disabled_seconds": 306.1235360535793,
+      "disabled_percent": -12.763921566298652,
+      "phases": [
+        {
+          "label": "cold-build",
+          "full_seconds": 282.3422355763614,
+          "disabled_seconds": 248.83574519772083,
+          "disabled_percent": -11.867331966909545
+        },
+        {
+          "label": "warm-noop-build",
+          "full_seconds": 4.31498254975304,
+          "disabled_seconds": 2.6089091352187097,
+          "disabled_percent": -39.538361855761714
+        },
+        {
+          "label": "original-edit-1-build",
+          "full_seconds": 31.674774863291532,
+          "disabled_seconds": 26.7731970846653,
+          "disabled_percent": -15.474704397368145
+        },
+        {
+          "label": "original-edit-2-build",
+          "full_seconds": 14.725588160101324,
+          "disabled_seconds": 14.431983899325132,
+          "disabled_percent": -1.9938372415691075
+        },
+        {
+          "label": "original-edit-3-build",
+          "full_seconds": 17.856331476941705,
+          "disabled_seconds": 13.473700736649334,
+          "disabled_percent": -24.54384735157814
+        }
+      ]
+    }
+  ],
+  "rejected_attempts": [
+    {
+      "attempt": "matched-pairs/7eef6fdcae353ca41d6ffb29bd51467d07af0b3c28b481840b8d0e005b380706/ruff/slot-0/attempt-1",
+      "status_sha256": "0ee5a35bef49d2c84693e7d9f476074ebaa2ad58e7e0e1dbc0ab9fbe7d2dbb9a",
+      "release_sha256": "941bfa472c16c16716de8b1257de6ef7c02c79f303b4d1a2a3108b4bdb0f0533"
+    },
+    {
+      "attempt": "matched-pairs/7eef6fdcae353ca41d6ffb29bd51467d07af0b3c28b481840b8d0e005b380706/uv/slot-1/attempt-1",
+      "status_sha256": "0cd1ce4952819604eafbab343b0450130c17167079dd53a841d55d2c77c4e21f",
+      "release_sha256": "df9ea630fe85a31610cf6ddd72599fc8052558ec556ede13c4db36bd25d8d0b5"
+    },
+    {
+      "attempt": "matched-pairs/7eef6fdcae353ca41d6ffb29bd51467d07af0b3c28b481840b8d0e005b380706/codex/slot-1/attempt-1",
+      "status_sha256": "d60b575388926019b3f754ff0109d3188a3dcfd15a18b2027dff54334574b7f2",
+      "release_sha256": "0934062b24267959f000ceeb33a8a140bc2332321ee380d716b3ee3628539103"
+    }
+  ],
+  "method": "Two predeclared opposite-order BUILD pairs per project, identical compiler/Cargo bytes. Full dev debug2; reduced dev line-tables-only. Same test override accompanies treatment but no TEST-profile timings. Positive percent means line tables were slower. Rejected whole attempts excluded; all preserved."
+}

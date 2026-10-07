@@ -1,0 +1,187 @@
+{
+  "passed": true,
+  "source_command_root_receipts": [
+    {
+      "path": "work/stack-ablation/benchmarks/dense-codex-direct2-migration-01/dense-original-twelve-command-root-review-01.json",
+      "sha256": "6a93c234cce9225ca68cc8eb3bb1bc479f14ae0364b7ea1ceeaf3afc968b5f76"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/dense-codex-direct2-migration-01/dense-new-six-codex-command-root-review-01.json",
+      "sha256": "0378cda28ef83c1587b6ec972fae96acef6ebfe5cadc5c747270ef4a444d1d58"
+    }
+  ],
+  "projects_each_on_one_host": true,
+  "statistics": 15,
+  "pairs_per_project": 6,
+  "all_statistics_recomputed_from_retained_raw_cells": true,
+  "max_child_rss_scope": "GNU time maximum child; not aggregate concurrent memory",
+  "memory_statistics": [
+    {
+      "project": "ruff",
+      "label": "cold-check",
+      "latency_median_seconds": -0.8747524145292118,
+      "rss_median_mib": 34.048828125,
+      "rss_range_mib": [
+        4.61328125,
+        39.53515625
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "ruff",
+      "label": "warm-noop-check",
+      "latency_median_seconds": 0.0103429100709036,
+      "rss_median_mib": 0.0546875,
+      "rss_range_mib": [
+        -0.359375,
+        0.234375
+      ],
+      "rss_increased_pairs": 3
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-1-check",
+      "latency_median_seconds": -0.5975423984928057,
+      "rss_median_mib": 16.455078125,
+      "rss_range_mib": [
+        12.32421875,
+        23.43359375
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-2-check",
+      "latency_median_seconds": -0.33429475355660543,
+      "rss_median_mib": 40.134765625,
+      "rss_range_mib": [
+        2.921875,
+        52.6015625
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "ruff",
+      "label": "original-edit-3-check",
+      "latency_median_seconds": -0.1858968959422782,
+      "rss_median_mib": 17.154296875,
+      "rss_range_mib": [
+        -7.796875,
+        27.1953125
+      ],
+      "rss_increased_pairs": 5
+    },
+    {
+      "project": "uv",
+      "label": "cold-check",
+      "latency_median_seconds": -0.054478608013596386,
+      "rss_median_mib": 29.01171875,
+      "rss_range_mib": [
+        22.38671875,
+        41.10546875
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "uv",
+      "label": "warm-noop-check",
+      "latency_median_seconds": 0.09068731201114133,
+      "rss_median_mib": -0.064453125,
+      "rss_range_mib": [
+        -0.37109375,
+        0.25
+      ],
+      "rss_increased_pairs": 3
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-1-check",
+      "latency_median_seconds": -0.03297758649569005,
+      "rss_median_mib": 26.498046875,
+      "rss_range_mib": [
+        14.70703125,
+        42.44140625
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-2-check",
+      "latency_median_seconds": 0.02253304747864604,
+      "rss_median_mib": 16.568359375,
+      "rss_range_mib": [
+        9.40625,
+        36.2890625
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "uv",
+      "label": "original-edit-3-check",
+      "latency_median_seconds": 0.06758434406947345,
+      "rss_median_mib": 31.875,
+      "rss_range_mib": [
+        25.12890625,
+        36.05078125
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "codex",
+      "label": "cold-check",
+      "latency_median_seconds": -0.694532880501356,
+      "rss_median_mib": 59.591796875,
+      "rss_range_mib": [
+        46.890625,
+        92.640625
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "codex",
+      "label": "warm-noop-check",
+      "latency_median_seconds": 0.14813806401798502,
+      "rss_median_mib": 0.23828125,
+      "rss_range_mib": [
+        -0.5078125,
+        0.421875
+      ],
+      "rss_increased_pairs": 4
+    },
+    {
+      "project": "codex",
+      "label": "original-edit-1-check",
+      "latency_median_seconds": 0.17891277302987874,
+      "rss_median_mib": 60.546875,
+      "rss_range_mib": [
+        36.26171875,
+        86.48046875
+      ],
+      "rss_increased_pairs": 6
+    },
+    {
+      "project": "codex",
+      "label": "original-edit-2-check",
+      "latency_median_seconds": 0.07474380393978208,
+      "rss_median_mib": 31.150390625,
+      "rss_range_mib": [
+        -15.4765625,
+        68.90234375
+      ],
+      "rss_increased_pairs": 5
+    },
+    {
+      "project": "codex",
+      "label": "original-edit-3-check",
+      "latency_median_seconds": 0.03125039057340473,
+      "rss_median_mib": 9.53515625,
+      "rss_range_mib": [
+        -8.3359375,
+        43.79296875
+      ],
+      "rss_increased_pairs": 4
+    }
+  ],
+  "latency_ranges_all_cross_zero": true,
+  "root_combined_final_acceptance_pending": true
+}

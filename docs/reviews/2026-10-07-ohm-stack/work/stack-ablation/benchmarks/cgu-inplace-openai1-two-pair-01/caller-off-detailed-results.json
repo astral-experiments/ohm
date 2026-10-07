@@ -1,0 +1,417 @@
+{
+  "scope": "Independent caller-local-CGU policy screen. Same runtime within each pair; Ruff/uv OAI1 block and Codex Serc314 block reported per project without absolute cross-host pooling.",
+  "accepted_pairs": [
+    {
+      "project": "ruff",
+      "slot": 0,
+      "attempt": "attempt-3",
+      "path": "work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/original-four-raw-retrieved-ssh-01/packet/matched-pairs/3254b2162d7d698353d9df7dfb1ca2a706b9b458fef691caba2408bfbbe5a34a/ruff/slot-0/attempt-3",
+      "results_sha256": "69617bde9a0e00b7210a4f47ab3b603a9dfe98964a6a31dfd45bda0798c39312",
+      "host": "charlie-openai-1"
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "attempt": "attempt-1",
+      "path": "work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/original-four-raw-retrieved-ssh-01/packet/matched-pairs/3254b2162d7d698353d9df7dfb1ca2a706b9b458fef691caba2408bfbbe5a34a/ruff/slot-1/attempt-1",
+      "results_sha256": "1404893488d86f363178218059df752f90ac9c2b91ffcbd9ff566f2ea2d29142",
+      "host": "charlie-openai-1"
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "attempt": "attempt-1",
+      "path": "work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/original-four-raw-retrieved-ssh-01/packet/matched-pairs/3254b2162d7d698353d9df7dfb1ca2a706b9b458fef691caba2408bfbbe5a34a/uv/slot-0/attempt-1",
+      "results_sha256": "3a473129fb140a11b9079854beb0742e076abdd4875f7d64f034c2497bc9b6b3",
+      "host": "charlie-openai-1"
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "attempt": "attempt-1",
+      "path": "work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/original-four-raw-retrieved-ssh-01/packet/matched-pairs/3254b2162d7d698353d9df7dfb1ca2a706b9b458fef691caba2408bfbbe5a34a/uv/slot-1/attempt-1",
+      "results_sha256": "564bf7a6a53a07419b3c1a86d8665894603b8f3be90c9a462eef6254561c5cd2",
+      "host": "charlie-openai-1"
+    },
+    {
+      "project": "codex",
+      "slot": 0,
+      "attempt": "attempt-1",
+      "path": "work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/codex-only-resident-migration-01/complete-raw-retrieved-ssh-01/packet/matched-pairs/1cf2aeef442325e585cf36d72e185ee4a59f7d8f6a8b8f4bd22d58fc2e74076e/codex/slot-0/attempt-1",
+      "results_sha256": "2e56cb2a7c7509789ed192dd50bd80614058c23d5dceead601870ac541cd431f",
+      "host": "charlie-serc-314-o1"
+    },
+    {
+      "project": "codex",
+      "slot": 1,
+      "attempt": "attempt-1",
+      "path": "work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/codex-only-resident-migration-01/complete-raw-retrieved-ssh-01/packet/matched-pairs/1cf2aeef442325e585cf36d72e185ee4a59f7d8f6a8b8f4bd22d58fc2e74076e/codex/slot-1/attempt-1",
+      "results_sha256": "3630ab1beb53151616e4a9e4b52f7912fa02f73fdedbbe254dfbfa7ce8449c46",
+      "host": "charlie-serc-314-o1"
+    }
+  ],
+  "rows": [
+    {
+      "project": "ruff",
+      "phase": "Cold build",
+      "full": [
+        66.84936463099439,
+        65.40090658795089
+      ],
+      "caller_off": [
+        66.75224247993901,
+        65.17058254301082
+      ],
+      "paired_pct": [
+        -0.14528507726511153,
+        -0.3521725568594758
+      ],
+      "full_rss_mib": [
+        3327.35546875,
+        3421.05078125
+      ],
+      "caller_off_rss_mib": [
+        3635.3671875,
+        3638.48828125
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "Warm no-op",
+      "full": [
+        0.43790414289105684,
+        0.45576857402920723
+      ],
+      "caller_off": [
+        0.7065139120677486,
+        0.7343240219634026
+      ],
+      "paired_pct": [
+        61.33985565957922,
+        61.117739091055576
+      ],
+      "full_rss_mib": [
+        61.90625,
+        62.06640625
+      ],
+      "caller_off_rss_mib": [
+        61.78515625,
+        62.0625
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "Direct edit",
+      "full": [
+        26.659851614036597,
+        26.325122273992747
+      ],
+      "caller_off": [
+        28.765517522930168,
+        29.89612702804152
+      ],
+      "paired_pct": [
+        7.898265674460547,
+        13.56500728422696
+      ],
+      "full_rss_mib": [
+        3548.73828125,
+        3608.3203125
+      ],
+      "caller_off_rss_mib": [
+        3832.4375,
+        3896.12890625
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "Dependency edit",
+      "full": [
+        32.922774316044524,
+        34.5129852660466
+      ],
+      "caller_off": [
+        34.464994270936586,
+        34.82472731906455
+      ],
+      "paired_pct": [
+        4.684356002587786,
+        0.9032601805229579
+      ],
+      "full_rss_mib": [
+        4366.65625,
+        4366.6953125
+      ],
+      "caller_off_rss_mib": [
+        4511.98046875,
+        4534.33984375
+      ]
+    },
+    {
+      "project": "ruff",
+      "phase": "Revert",
+      "full": [
+        38.4206225000089,
+        38.596568375010975
+      ],
+      "caller_off": [
+        37.89004097296856,
+        38.784453762928024
+      ],
+      "paired_pct": [
+        -1.3809810786907906,
+        0.48679298659799475
+      ],
+      "full_rss_mib": [
+        4369.8046875,
+        4398.28515625
+      ],
+      "caller_off_rss_mib": [
+        4669.37109375,
+        4662.51953125
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "Cold build",
+      "full": [
+        67.26024421595503,
+        63.726016463013366
+      ],
+      "caller_off": [
+        63.40294446400367,
+        62.209777493961155
+      ],
+      "paired_pct": [
+        -5.734888115432025,
+        -2.3793091945928158
+      ],
+      "full_rss_mib": [
+        974.48828125,
+        987.45703125
+      ],
+      "caller_off_rss_mib": [
+        990.98828125,
+        992.56640625
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "Warm no-op",
+      "full": [
+        0.8884090799838305,
+        0.5740867370041087
+      ],
+      "caller_off": [
+        0.5515690450556576,
+        0.69506616005674
+      ],
+      "paired_pct": [
+        -37.914969862116166,
+        21.073370146812053
+      ],
+      "full_rss_mib": [
+        91.5390625,
+        91.6796875
+      ],
+      "caller_off_rss_mib": [
+        91.8046875,
+        91.91796875
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "Direct edit",
+      "full": [
+        8.298454610048793,
+        8.480690407915972
+      ],
+      "caller_off": [
+        8.714538179920055,
+        9.783862989046611
+      ],
+      "paired_pct": [
+        5.013988621055021,
+        15.366350125388873
+      ],
+      "full_rss_mib": [
+        979.27734375,
+        963.14453125
+      ],
+      "caller_off_rss_mib": [
+        970.890625,
+        970.53515625
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "Dependency edit",
+      "full": [
+        5.462314150063321,
+        5.527455305098556
+      ],
+      "caller_off": [
+        5.352392534958199,
+        5.381848528049886
+      ],
+      "paired_pct": [
+        -2.0123634797505785,
+        -2.634246122521533
+      ],
+      "full_rss_mib": [
+        911.265625,
+        907.296875
+      ],
+      "caller_off_rss_mib": [
+        896.359375,
+        893.26953125
+      ]
+    },
+    {
+      "project": "uv",
+      "phase": "Revert",
+      "full": [
+        5.540801697061397,
+        6.904126278008334
+      ],
+      "caller_off": [
+        5.5860974279930815,
+        5.305501403985545
+      ],
+      "paired_pct": [
+        0.8174941715691997,
+        -23.154629704773477
+      ],
+      "full_rss_mib": [
+        921.6484375,
+        905.0234375
+      ],
+      "caller_off_rss_mib": [
+        907.7578125,
+        907.125
+      ]
+    },
+    {
+      "project": "codex",
+      "phase": "Cold build",
+      "full": [
+        269.71717035002075,
+        244.8013642480364
+      ],
+      "caller_off": [
+        243.798042207025,
+        240.3562796249753
+      ],
+      "paired_pct": [
+        -9.609743461775032,
+        -1.8157924228548339
+      ],
+      "full_rss_mib": [
+        3371.1171875,
+        3384.875
+      ],
+      "caller_off_rss_mib": [
+        3352.6484375,
+        3340.421875
+      ]
+    },
+    {
+      "project": "codex",
+      "phase": "Warm no-op",
+      "full": [
+        6.053452573949471,
+        3.7331281900405884
+      ],
+      "caller_off": [
+        4.477251437027007,
+        3.142748533980921
+      ],
+      "paired_pct": [
+        -26.03805213087014,
+        -15.814609785828127
+      ],
+      "full_rss_mib": [
+        183.734375,
+        183.85546875
+      ],
+      "caller_off_rss_mib": [
+        184.078125,
+        184.19921875
+      ]
+    },
+    {
+      "project": "codex",
+      "phase": "Direct edit",
+      "full": [
+        19.55142735003028,
+        19.792634550016373
+      ],
+      "caller_off": [
+        18.87930879695341,
+        19.368468691012822
+      ],
+      "paired_pct": [
+        -3.4376955761024286,
+        -2.1430490111444045
+      ],
+      "full_rss_mib": [
+        3817.14453125,
+        3820.5390625
+      ],
+      "caller_off_rss_mib": [
+        3843.828125,
+        3836.65625
+      ]
+    },
+    {
+      "project": "codex",
+      "phase": "Dependency edit",
+      "full": [
+        14.533064587973058,
+        15.319099273066968
+      ],
+      "caller_off": [
+        14.61053062195424,
+        14.219181056017987
+      ],
+      "paired_pct": [
+        0.5330330262571792,
+        -7.18004497159167
+      ],
+      "full_rss_mib": [
+        3056.171875,
+        3076.1953125
+      ],
+      "caller_off_rss_mib": [
+        3008.98828125,
+        3001.15234375
+      ]
+    },
+    {
+      "project": "codex",
+      "phase": "Revert",
+      "full": [
+        15.054088075994514,
+        15.374102053930983
+      ],
+      "caller_off": [
+        13.206319318967871,
+        13.01567304506898
+      ],
+      "paired_pct": [
+        -12.274199192265412,
+        -15.340271585220677
+      ],
+      "full_rss_mib": [
+        2668.609375,
+        2676.87890625
+      ],
+      "caller_off_rss_mib": [
+        2633.27734375,
+        2638.9453125
+      ]
+    }
+  ],
+  "root_final_audit_sha256": "b179d75ffb23b414330a4f03333eee8613a6d2837f69d450a4d710e090076574",
+  "root_final_audit_path": "/Users/charliemarsh/code/oss/ohm/work/stack-ablation/benchmarks/cgu-inplace-openai1-two-pair-01/caller-final-root-review-01.json"
+}

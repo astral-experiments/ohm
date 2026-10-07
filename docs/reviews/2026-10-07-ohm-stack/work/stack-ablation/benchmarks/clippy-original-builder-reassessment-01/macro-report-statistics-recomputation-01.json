@@ -1,0 +1,604 @@
+{
+  "passed": true,
+  "scope": "Local report recomputation; archived bytes/modes, accepted readiness proofs, 48 raw command statuses/logs and every cell independently recomputed. Final guard/ownership/native/runtime acceptance is the separate root audit.",
+  "generator_sha256": "10ca343249194cc087d09415c062d406c78e0a1864241e5ce32cca02b1be9866",
+  "archive_sha256": "0a9b08c91b8bc4729d6d895066ce67643d089941c44a41ef634226849d6803b8",
+  "payloads_rehashed": 632,
+  "readiness_proofs_rehashed": 67,
+  "root_acceptance_sha256": "247d1e9b0a981853a63d45e3f033085c0ec29ddfdfbf84c54b1b919569ed0a7c",
+  "command_review_sha256": "d1d1c53c3ebd407498c2d32e69af009b7888c206df986fbb97c91a60b7647e96",
+  "statistics": [
+    {
+      "project": "ruff",
+      "label": "cold",
+      "n": 2,
+      "full_median_seconds": 31.60783896688372,
+      "reduced_median_seconds": 31.60729616973549,
+      "paired_delta_median_seconds": -0.0005427971482276917,
+      "paired_delta_min_seconds": -0.3465818837285042,
+      "paired_delta_max_seconds": 0.3454962894320488,
+      "paired_percent_median": 0.004892110015008999,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "ruff",
+          "slot": 0,
+          "label": "cold",
+          "full_seconds": 31.79865485895425,
+          "reduced_seconds": 31.452072975225747,
+          "delta_seconds": -0.3465818837285042,
+          "delta_percent": -1.089926241426875
+        },
+        {
+          "project": "ruff",
+          "slot": 1,
+          "label": "cold",
+          "full_seconds": 31.417023074813187,
+          "reduced_seconds": 31.762519364245236,
+          "delta_seconds": 0.3454962894320488,
+          "delta_percent": 1.099710461456893
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "noop",
+      "n": 2,
+      "full_median_seconds": 0.4820602140389383,
+      "reduced_median_seconds": 0.4704853347502649,
+      "paired_delta_median_seconds": -0.011574879288673401,
+      "paired_delta_min_seconds": -0.05168940778821707,
+      "paired_delta_max_seconds": 0.028539649210870266,
+      "paired_percent_median": -1.8178027407850017,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "ruff",
+          "slot": 0,
+          "label": "noop",
+          "full_seconds": 0.5163859287276864,
+          "reduced_seconds": 0.46469652093946934,
+          "delta_seconds": -0.05168940778821707,
+          "delta_percent": -10.009840491892108
+        },
+        {
+          "project": "ruff",
+          "slot": 1,
+          "label": "noop",
+          "full_seconds": 0.44773449935019016,
+          "reduced_seconds": 0.47627414856106043,
+          "delta_seconds": 0.028539649210870266,
+          "delta_percent": 6.374235010322105
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "direct",
+      "n": 2,
+      "full_median_seconds": 11.882774465717375,
+      "reduced_median_seconds": 11.957671757787466,
+      "paired_delta_median_seconds": 0.07489729207009077,
+      "paired_delta_min_seconds": 0.019656570628285408,
+      "paired_delta_max_seconds": 0.13013801351189613,
+      "paired_percent_median": 0.6296372459197119,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "ruff",
+          "slot": 0,
+          "label": "direct",
+          "full_seconds": 11.865765481255949,
+          "reduced_seconds": 11.885422051884234,
+          "delta_seconds": 0.019656570628285408,
+          "delta_percent": 0.16565783858897287
+        },
+        {
+          "project": "ruff",
+          "slot": 1,
+          "label": "direct",
+          "full_seconds": 11.899783450178802,
+          "reduced_seconds": 12.029921463690698,
+          "delta_seconds": 0.13013801351189613,
+          "delta_percent": 1.093616653250451
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "dependency",
+      "n": 2,
+      "full_median_seconds": 0.9889097111299634,
+      "reduced_median_seconds": 0.997897348832339,
+      "paired_delta_median_seconds": 0.00898763770237565,
+      "paired_delta_min_seconds": 0.006698131561279297,
+      "paired_delta_max_seconds": 0.011277143843472004,
+      "paired_percent_median": 0.9097212880263439,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "ruff",
+          "slot": 0,
+          "label": "dependency",
+          "full_seconds": 0.9852129220962524,
+          "reduced_seconds": 0.9964900659397244,
+          "delta_seconds": 0.011277143843472004,
+          "delta_percent": 1.1446402691793311
+        },
+        {
+          "project": "ruff",
+          "slot": 1,
+          "label": "dependency",
+          "full_seconds": 0.9926065001636744,
+          "reduced_seconds": 0.9993046317249537,
+          "delta_seconds": 0.006698131561279297,
+          "delta_percent": 0.6748023068733566
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "cold",
+      "n": 2,
+      "full_median_seconds": 38.49871512874961,
+      "reduced_median_seconds": 38.48203987022862,
+      "paired_delta_median_seconds": -0.01667525852099061,
+      "paired_delta_min_seconds": -0.3035968327894807,
+      "paired_delta_max_seconds": 0.27024631574749947,
+      "paired_percent_median": -0.03798354245533875,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "uv",
+          "slot": 0,
+          "label": "cold",
+          "full_seconds": 38.22326924651861,
+          "reduced_seconds": 38.49351556226611,
+          "delta_seconds": 0.27024631574749947,
+          "delta_percent": 0.7070204121069956
+        },
+        {
+          "project": "uv",
+          "slot": 1,
+          "label": "cold",
+          "full_seconds": 38.774161010980606,
+          "reduced_seconds": 38.470564178191125,
+          "delta_seconds": -0.3035968327894807,
+          "delta_percent": -0.7829874970176731
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "noop",
+      "n": 2,
+      "full_median_seconds": 0.698879802133888,
+      "reduced_median_seconds": 0.6689806552603841,
+      "paired_delta_median_seconds": -0.029899146873503923,
+      "paired_delta_min_seconds": -0.08693358581513166,
+      "paired_delta_max_seconds": 0.027135292068123817,
+      "paired_percent_median": -3.4564170387641147,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "uv",
+          "slot": 0,
+          "label": "noop",
+          "full_seconds": 0.6252195993438363,
+          "reduced_seconds": 0.6523548914119601,
+          "delta_seconds": 0.027135292068123817,
+          "delta_percent": 4.3401217902641065
+        },
+        {
+          "project": "uv",
+          "slot": 1,
+          "label": "noop",
+          "full_seconds": 0.7725400049239397,
+          "reduced_seconds": 0.685606419108808,
+          "delta_seconds": -0.08693358581513166,
+          "delta_percent": -11.252955867792336
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "direct",
+      "n": 2,
+      "full_median_seconds": 4.7370988093316555,
+      "reduced_median_seconds": 4.735245735384524,
+      "paired_delta_median_seconds": -0.0018530739471316338,
+      "paired_delta_min_seconds": -0.017127692699432373,
+      "paired_delta_max_seconds": 0.013421544805169106,
+      "paired_percent_median": -0.04104817128647298,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "uv",
+          "slot": 0,
+          "label": "direct",
+          "full_seconds": 4.708768874406815,
+          "reduced_seconds": 4.691641181707382,
+          "delta_seconds": -0.017127692699432373,
+          "delta_percent": -0.36374035668909066
+        },
+        {
+          "project": "uv",
+          "slot": 1,
+          "label": "direct",
+          "full_seconds": 4.765428744256496,
+          "reduced_seconds": 4.7788502890616655,
+          "delta_seconds": 0.013421544805169106,
+          "delta_percent": 0.2816440141161447
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "dependency",
+      "n": 2,
+      "full_median_seconds": 0.86674466682598,
+      "reduced_median_seconds": 0.8492691088467836,
+      "paired_delta_median_seconds": -0.01747555797919631,
+      "paired_delta_min_seconds": -0.022422081790864468,
+      "paired_delta_max_seconds": -0.012529034167528152,
+      "paired_percent_median": -1.9983209713312244,
+      "slower_pairs": 0,
+      "cells": [
+        {
+          "project": "uv",
+          "slot": 0,
+          "label": "dependency",
+          "full_seconds": 0.8356379056349397,
+          "reduced_seconds": 0.8231088714674115,
+          "delta_seconds": -0.012529034167528152,
+          "delta_percent": -1.499337701538117
+        },
+        {
+          "project": "uv",
+          "slot": 1,
+          "label": "dependency",
+          "full_seconds": 0.8978514280170202,
+          "reduced_seconds": 0.8754293462261558,
+          "delta_seconds": -0.022422081790864468,
+          "delta_percent": -2.497304241124332
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "cold",
+      "n": 2,
+      "full_median_seconds": 127.0053850854747,
+      "reduced_median_seconds": 127.96389597794041,
+      "paired_delta_median_seconds": 0.9585108924657106,
+      "paired_delta_min_seconds": 0.326660149730742,
+      "paired_delta_max_seconds": 1.5903616352006793,
+      "paired_percent_median": 0.7562002455508532,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "codex",
+          "slot": 0,
+          "label": "cold",
+          "full_seconds": 126.62437979597598,
+          "reduced_seconds": 128.21474143117666,
+          "delta_seconds": 1.5903616352006793,
+          "delta_percent": 1.2559679563786563
+        },
+        {
+          "project": "codex",
+          "slot": 1,
+          "label": "cold",
+          "full_seconds": 127.38639037497342,
+          "reduced_seconds": 127.71305052470416,
+          "delta_seconds": 0.326660149730742,
+          "delta_percent": 0.25643253472305005
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "noop",
+      "n": 2,
+      "full_median_seconds": 1.667060146573931,
+      "reduced_median_seconds": 1.665125957224518,
+      "paired_delta_median_seconds": -0.001934189349412918,
+      "paired_delta_min_seconds": -0.020675556734204292,
+      "paired_delta_max_seconds": 0.016807178035378456,
+      "paired_percent_median": -0.09469246992181435,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "codex",
+          "slot": 0,
+          "label": "noop",
+          "full_seconds": 1.6987425712868571,
+          "reduced_seconds": 1.6780670145526528,
+          "delta_seconds": -0.020675556734204292,
+          "delta_percent": -1.2171094716571296
+        },
+        {
+          "project": "codex",
+          "slot": 1,
+          "label": "noop",
+          "full_seconds": 1.6353777218610048,
+          "reduced_seconds": 1.6521848998963833,
+          "delta_seconds": 0.016807178035378456,
+          "delta_percent": 1.0277245318135009
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "direct",
+      "n": 2,
+      "full_median_seconds": 20.118356380145997,
+      "reduced_median_seconds": 20.309636573307216,
+      "paired_delta_median_seconds": 0.19128019316121936,
+      "paired_delta_min_seconds": 0.0862759854644537,
+      "paired_delta_max_seconds": 0.296284400857985,
+      "paired_percent_median": 0.9544577531211629,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "codex",
+          "slot": 0,
+          "label": "direct",
+          "full_seconds": 20.258546053431928,
+          "reduced_seconds": 20.344822038896382,
+          "delta_seconds": 0.0862759854644537,
+          "delta_percent": 0.4258745185212298
+        },
+        {
+          "project": "codex",
+          "slot": 1,
+          "label": "direct",
+          "full_seconds": 19.978166706860065,
+          "reduced_seconds": 20.27445110771805,
+          "delta_seconds": 0.296284400857985,
+          "delta_percent": 1.483040987721096
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "dependency",
+      "n": 2,
+      "full_median_seconds": 2.268524670507759,
+      "reduced_median_seconds": 2.305118447635323,
+      "paired_delta_median_seconds": 0.03659377712756395,
+      "paired_delta_min_seconds": 0.02568038646131754,
+      "paired_delta_max_seconds": 0.04750716779381037,
+      "paired_percent_median": 1.6091156372067594,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "codex",
+          "slot": 0,
+          "label": "dependency",
+          "full_seconds": 2.2879097322002053,
+          "reduced_seconds": 2.3354168999940157,
+          "delta_seconds": 0.04750716779381037,
+          "delta_percent": 2.0764441500987108
+        },
+        {
+          "project": "codex",
+          "slot": 1,
+          "label": "dependency",
+          "full_seconds": 2.2491396088153124,
+          "reduced_seconds": 2.27481999527663,
+          "delta_seconds": 0.02568038646131754,
+          "delta_percent": 1.141787124314808
+        }
+      ]
+    }
+  ],
+  "history_totals": [
+    {
+      "project": "ruff",
+      "slot": 0,
+      "attempt": 1,
+      "full_command_seconds": 45.16601919103414,
+      "reduced_command_seconds": 44.798681613989174,
+      "delta_seconds": -0.36733757704496384,
+      "delta_percent": -0.8133051874491648
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "attempt": 1,
+      "full_command_seconds": 44.757147524505854,
+      "reduced_command_seconds": 45.26801960822195,
+      "delta_seconds": 0.5108720837160945,
+      "delta_percent": 1.1414312841013352
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "attempt": 1,
+      "full_command_seconds": 44.3928956259042,
+      "reduced_command_seconds": 44.660620506852865,
+      "delta_seconds": 0.26772488094866276,
+      "delta_percent": 0.6030804640561493
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "attempt": 1,
+      "full_command_seconds": 45.20998118817806,
+      "reduced_command_seconds": 44.810450232587755,
+      "delta_seconds": -0.3995309555903077,
+      "delta_percent": -0.8837228972233713
+    },
+    {
+      "project": "codex",
+      "slot": 0,
+      "attempt": 1,
+      "full_command_seconds": 150.86957815289497,
+      "reduced_command_seconds": 152.5730473846197,
+      "delta_seconds": 1.703469231724739,
+      "delta_percent": 1.1291005466976367
+    },
+    {
+      "project": "codex",
+      "slot": 1,
+      "attempt": 1,
+      "full_command_seconds": 151.2490744125098,
+      "reduced_command_seconds": 151.91450652759522,
+      "delta_seconds": 0.665432115085423,
+      "delta_percent": 0.4399578097718182
+    }
+  ],
+  "commands": {
+    "ruff": [
+      "cargo",
+      "+ohm-ablation-clippy-full",
+      "clippy",
+      "-p",
+      "ty_python_semantic",
+      "-p",
+      "ty_python_core",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings",
+      "-A",
+      "clippy::format_push_string",
+      "-A",
+      "clippy::double_must_use",
+      "-A",
+      "clippy::assert_is_empty",
+      "-A",
+      "clippy::needless_borrows_for_generic_args",
+      "-A",
+      "clippy::mut_mut"
+    ],
+    "uv": [
+      "cargo",
+      "+ohm-ablation-clippy-full",
+      "clippy",
+      "-p",
+      "uv-pypi-types",
+      "-p",
+      "uv-client",
+      "--all-targets",
+      "--locked",
+      "--",
+      "-D",
+      "warnings",
+      "-A",
+      "clippy::doc_markdown",
+      "-A",
+      "clippy::double_must_use"
+    ],
+    "codex": [
+      "cargo",
+      "+ohm-ablation-clippy-full",
+      "clippy",
+      "--tests",
+      "-p",
+      "codex-tui",
+      "--",
+      "-D",
+      "clippy::redundant_closure_for_method_calls"
+    ]
+  },
+  "sessions": {
+    "ruff": {
+      "project": "ruff",
+      "session": {
+        "id": "ruff-component-fixed-points-clippy",
+        "description": "Supplementary clippy history on the exact session base"
+      },
+      "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+      "commands": 4,
+      "edits": 2,
+      "warmups": 0,
+      "setup_patches": [
+        {
+          "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+          "patch": "patches/rust-1.99-ruff-cfg-select.patch",
+          "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+          "paths": [
+            "crates/ty_python_core/src/ast_node_ref.rs"
+          ]
+        }
+      ],
+      "warmup_enabled": true
+    },
+    "uv": {
+      "project": "uv",
+      "session": {
+        "id": "uv-pypi-simple-json-parser-clippy",
+        "description": "Supplementary clippy history on the exact session base"
+      },
+      "base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+      "commands": 4,
+      "edits": 2,
+      "warmups": 0,
+      "setup_patches": [
+        {
+          "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+          "patch": "patches/rust-1.99-uv-cfg-select.patch",
+          "sha256": "def4e6311a8eed2a60cf13f7ccd99111754d80891ac713ce5651ccbdd1952b04",
+          "paths": [
+            "crates/uv-cache-info/src/cache_info.rs",
+            "crates/uv-cache-info/src/timestamp.rs",
+            "crates/uv-cache/src/removal.rs",
+            "crates/uv-dirs/src/lib.rs",
+            "crates/uv-fs/src/lib.rs",
+            "crates/uv-pep508/src/verbatim_url.rs",
+            "crates/uv-platform/src/host.rs",
+            "crates/uv-python/src/managed.rs",
+            "crates/uv-tool/src/tool.rs",
+            "crates/uv/src/bin/uvw.rs",
+            "crates/uv/src/bin/uvx.rs",
+            "crates/uv/src/commands/project/run.rs",
+            "crates/uv/tests/python/venv.rs",
+            "crates/uv/tests/sync/centralized_project_envs.rs",
+            "crates/uv/tests/tool/tool_install.rs"
+          ]
+        },
+        {
+          "label": "Resolve uv integration-test binary paths at runtime after artifact relocation",
+          "patch": "patches/uv-runtime-bin-path.patch",
+          "sha256": "372ac74870cef2d9dd6080f4c2c5ce73c348edeaba34467dcd0690f335bc4343",
+          "paths": [
+            "crates/uv-test/src/lib.rs"
+          ]
+        }
+      ],
+      "warmup_enabled": true
+    },
+    "codex": {
+      "project": "codex",
+      "session": {
+        "id": "codex-tui-active-cell-layout-clippy",
+        "description": "Supplementary clippy history on the exact session base"
+      },
+      "base_revision": "74004b5397b24662a87a5264a6ae80664168c7f3",
+      "commands": 4,
+      "edits": 2,
+      "warmups": 0,
+      "setup_patches": [
+        {
+          "label": "Bound safety-retry goal accounting by elapsed wall time",
+          "patch": "patches/codex-safety-retry-goal-accounting.patch",
+          "sha256": "af822ae0a81f239b71e5b3c0d7f947ccce96fea032571d24f809a151af98af3a",
+          "paths": [
+            "codex-rs/tui/src/app/tests/safety_buffering.rs"
+          ]
+        },
+        {
+          "label": "Match Rust 1.99 Unicode debug formatting",
+          "patch": "patches/rust-1.99-codex-debug-snapshot.patch",
+          "sha256": "1eee16737d3c0570d9edf3d095b1ff9745667397852d6df988993d15a965b0b6",
+          "paths": [
+            "codex-rs/tui/src/bottom_pane/request_user_input/snapshots/codex_tui__bottom_pane__request_user_input__render__tests__request_user_input_halfwidth_sound_marks_truncation.snap"
+          ]
+        }
+      ],
+      "warmup_enabled": true
+    }
+  }
+}

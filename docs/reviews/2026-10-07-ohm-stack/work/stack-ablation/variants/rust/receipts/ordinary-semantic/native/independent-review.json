@@ -1,0 +1,84 @@
+{
+  "proof_kind": "independent-ordinary-semantic-native-review-v1",
+  "reviewed_utc": "2026-10-05T22:26:13.708987+00:00",
+  "reviewer": "benchmark_audit",
+  "decision": "native evidence supports targeted affected compiler-operation timing subject to coordinator host/runtime gate",
+  "native_removal_regression_found": false,
+  "performance_or_adoption_approved": false,
+  "timing_host_accepted": false,
+  "bindings": {
+    "packet_sha256": "a356ee276b64d4ce906a0e05b7dfb2a3635b6c4a3e8ee092821aea38d3adc306",
+    "receipt_sha256": "a19e76aa8dde2abf0caf944fc6a6aec5d73aaff0787f7946e1b39956df9f0927",
+    "raw_archive_sha256": "f1b35acf1dc67b0a585374e842b23240c3dfc4fd207dbe9043ee8d13c303d2ff",
+    "all_178_member_sizes_and_hashes_recomputed": true,
+    "approved_six_command_plan_sha256": "caa1fbefc180d4979d26e9664d7e8e56142a2b4cf1b3a027da5f01ea1025c815",
+    "root_review_sha256": "20f38f849b7e6693c7bb1662dc9cf204f5bc022a02ce28e1dbd0403cf6e65908",
+    "review_script_sha256": "7d95badb88085b05ae4bc5277d0c9fd1a9c1c6f97d357c58357b3613b693fa4c"
+  },
+  "ui": {
+    "baseline": {
+      "passed": 3582,
+      "failed": 1,
+      "ignored": 8
+    },
+    "ordinary_semantic": {
+      "passed": 3583,
+      "failed": 0,
+      "ignored": 8
+    },
+    "same_3591_case_set": true,
+    "same_8_ignored_cases": [
+      "tests/ui/associated-type-bounds/return-type-notation/nested-rtn-error-recovery-issue-133613.rs",
+      "tests/ui/associated-type-bounds/return-type-notation/path-ambiguous-late-bound-vars.rs",
+      "tests/ui/associated-type-bounds/trait-alias-bound-vars.rs",
+      "tests/ui/const-generics/mgca/cyclic-type-const-151251.rs",
+      "tests/ui/const-generics/mgca/type-const-assoc-const-without-body.rs",
+      "tests/ui/const-generics/mgca/type-const-inherent-assoc-const-without-body.rs",
+      "tests/ui/layout/unsafe-cell-hides-niche.rs",
+      "tests/ui/traits/next-solver/object-soundness-requires-generalization.rs"
+    ],
+    "only_changed_case": "tests/ui/traits/final/overriding-rpitit.rs"
+  },
+  "stable_control_failure": {
+    "classification": "existing reproducible original-control ICE, absent after combined semantic removal",
+    "control_repeat_failures": 3,
+    "removal_repeat_passes": 3,
+    "original_fixture_git_blob": "b44b470175ce4f4f25606e040696c328b7db5ac7",
+    "original_fixture_sha256": "587666145843e74615eda5054e03c85954cc9d3ed103f0f3d7e7be0106a6852f",
+    "mode": "100644",
+    "message": "defaultness called on Item(Trait), rustc_ty_utils/src/ty.rs:97:13",
+    "preserved_raw_failed_logs": true,
+    "individual_removed_family_attribution": false
+  },
+  "other_validation": {
+    "common_incremental_each": 16,
+    "reduced_interner_hygiene_source_units": 3,
+    "baseline_source_units_explicitly_reused": 3,
+    "source_fixture_git_blobs_modes_crosschecked": 4436,
+    "history_steps": 44,
+    "histories": 4,
+    "exact_invalid_diagnostic_pairs": 2,
+    "header_checks": 15,
+    "foreign_payload_checks": 2
+  },
+  "runtime": {
+    "each_manifest_entries": 66170,
+    "own_stdlib_copy_hashes_each": 28,
+    "own_metadata_copy_hashes_each": 27,
+    "loader_snapshots_checked": 10,
+    "tools_per_snapshot": 7,
+    "native_commands_bound_to_own_runtime": true,
+    "same_frozen_baseline_cargo_both_arms": true,
+    "dry_run_execution_delta": "exactly --dry-run to --force-rerun; all other arguments/environment identical",
+    "recorded_postchecks_pass": true
+  },
+  "limitations": [
+    "Control UI suite is not wholly green: its one stable ICE and all failed repeat logs remain preserved. This is a combined #84/#110/#117 result, with no individual-family cause or timing attribution.",
+    "Existing eight UI ignores remain; selected coverage is not universal compiler compatibility.",
+    "Three interner/hygiene tests validate reduced source with debug assertions and LTO off; baseline units reuse prior accepted evidence. These do not establish relation/fold-specific unit coverage or release debug assertions.",
+    "History build-artifact JSON and invalid diagnostics were recomputed from raw files. Linked program outputs/header program outputs are recorded execution-receipt values, not separately archived subprocess stdout logs.",
+    "Full source/training and baseline metadata repair retain their independently accepted prerequisite reviews. Runtime hashes/loaders/restoration are archived remote checks; no fresh remote state, binary execution or runtime-file rehash was performed here.",
+    "No timed benchmark or simplification adoption result. Next timing should cover affected operations; full sessions only for material regressions or final combined change."
+  ],
+  "blocking_findings": []
+}

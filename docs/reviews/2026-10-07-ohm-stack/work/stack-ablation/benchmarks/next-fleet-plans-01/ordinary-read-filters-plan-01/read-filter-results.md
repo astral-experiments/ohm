@@ -1,0 +1,33 @@
+Hold a blanket removal of Rust #118’s dependency-read filters. Removing the filters made Codex’s third edited check slower in both counterbalanced pairs: +1.398 and +2.340 seconds, a +1.869-second median. Its warm no-op check also slowed in both pairs, by +0.225 and +1.235 seconds. Those losses deserve follow-up before removing the change. Ruff and uv show mixed effects, including faster removal runs; this screen does not establish a general speedup from keeping the filters.
+
+The removal restores upstream’s exact linear scan in `TaskReads::Small`, removing the recent duplicate shortcut and the 64-bit presence filter (`last` and `seen`). The original change increases the representation from 72 to 80 bytes. The removal patch changes one production file, `compiler/rustc_middle/src/dep_graph/edges.rs`, with +6/-24 lines. This is a smaller complexity burden than the broader caching bundles. Keep the simplification question open, but treat the measured Codex losses as a concrete cost rather than dismissing them as a small synthetic gain. The patch and source boundary are recorded in [the appendix scope map](../../../variants/rust/appendix-ablation-scope.md) and [the exact removal patch](../../../variants/rust/ordinary-read-filters.patch).
+
+All six pairs are finally accepted: two per Ruff, uv and Codex on the same 32-CPU oss6 boot, with opposite arm orders. Each arm starts with empty target and private shared histories, runs the original cold check, warm no-op check and three recorded source-edit checks, and uses eight jobs. These are ordinary locked/offline selected-package library checks. No project test suite was timed. Each row below is an individual command state; cold values are kept separate from warm/edit values. A positive delta means removal was slower. Percentages are the median of the two paired ratios, so they need not equal the ratio of the two displayed medians.
+
+| Project / command state | Full median (s) | Removal median (s) | Paired removal delta (s) | Paired delta range (s) | Median paired change | Removal slower |
+| --- | ---: | ---: | ---: | --- | ---: | ---: |
+| ruff / cold-check | 28.813 | 29.577 | +0.765 | +0.386 to +1.143 | +2.64% | 2/2 |
+| ruff / warm-noop-check | 0.671 | 0.509 | -0.162 | -0.232 to -0.092 | -22.96% | 0/2 |
+| ruff / original-edit-1-check | 9.350 | 8.801 | -0.549 | -1.041 to -0.057 | -6.01% | 0/2 |
+| ruff / original-edit-2-check | 9.980 | 10.380 | +0.400 | +0.300 to +0.501 | +4.02% | 2/2 |
+| ruff / original-edit-3-check | 12.505 | 12.285 | -0.221 | -0.258 to -0.183 | -1.81% | 0/2 |
+| uv / cold-check | 53.704 | 52.065 | -1.638 | -2.696 to -0.581 | -3.05% | 0/2 |
+| uv / warm-noop-check | 1.068 | 1.044 | -0.023 | -0.422 to +0.375 | +4.68% | 1/2 |
+| uv / original-edit-1-check | 5.894 | 6.406 | +0.512 | +0.471 to +0.553 | +8.82% | 2/2 |
+| uv / original-edit-2-check | 1.570 | 1.611 | +0.041 | -0.190 to +0.272 | +4.18% | 1/2 |
+| uv / original-edit-3-check | 5.258 | 5.310 | +0.053 | -0.942 to +1.047 | +1.64% | 1/2 |
+| codex / cold-check | 152.038 | 152.456 | +0.418 | -0.028 to +0.865 | +0.28% | 1/2 |
+| codex / warm-noop-check | 3.124 | 3.854 | +0.730 | +0.225 to +1.235 | +23.13% | 2/2 |
+| codex / original-edit-1-check | 10.120 | 10.142 | +0.022 | -1.085 to +1.129 | +1.21% | 1/2 |
+| codex / original-edit-2-check | 7.744 | 7.285 | -0.459 | -0.799 to -0.118 | -5.72% | 0/2 |
+| codex / original-edit-3-check | 8.124 | 9.993 | +1.869 | +1.398 to +2.340 | +23.87% | 2/2 |
+
+There are only two pairs per project. The displayed ranges are observed paired ranges, not confidence intervals, and the results do not justify a significance claim. Five command-state ranges cross zero. Codex’s third edit is the largest repeated warm/edit loss; uv’s first edit also slows in both pairs. Ruff’s first and third edits and uv’s cold check improve with removal. A decision to remove this optimization should therefore address the workload tradeoff, preferably with additional Codex warm/edit repetitions or a narrower implementation that preserves the useful case. Do not average all states into a single gain.
+
+Correctness and provenance passed independent root review. Both current 69,859-file runtime maps match their own original 66,170 shipping-file inventories plus the exact 3,689 RustSRC additions, with own size/mode/inode records, no cross-arm sharing and fourteen own tool-loading graphs. The resolved release configuration, common Cargo, source identities, eleven training-command multisets, seven non-formatter training commands in order, and each arm’s own four PGO profiles and BOLT profile are retained. The four standalone formatter batches match as a multiset; identical formatter execution order is not claimed. No compiler build, native validation or profile training was repeated for this screen.
+
+The accepted native packet covers six exact production-module tests and twenty-two reduced linked builds; the accepted baseline histories are explicitly reused. Its raw-runtime and per-unit-argv coverage limits remain as recorded in the native review. Successful timing logs establish source/lock/status and recorded parity checks; this report does not claim byte-for-byte equivalence of all warning text.
+
+Two whole timing attempts were rejected for unrelated host activity and remain excluded: Ruff slot 0 attempt 1 and Codex slot 0 attempt 1. A separate Ruff slot 1 pre-import failure created no measured attempt; its exact failed command status and traceback are preserved, and the successful transport recovery owns the original unstarted slot. The root reader explicitly binds that failed status before excluding it from launch matching. No partial timing cells were reused. The prospective method waits for complete unchanged quiet windows at initial, prepared and post-cleanup gates; failed untimed windows are recorded, and the CPU, I/O, steal, space and continuous-monitor thresholds remain unchanged.
+
+The raw packet contains all 731 payloads and 8 retained measured attempts. Root independently verified every payload and tar mode, all 40 readiness proofs, 60 timed commands, 15 paired statistics, 1,068 continuous-monitor samples and 96 required quiet samples. Final acceptance is [readfilter-complete-root-review-01.json](readfilter-complete-root-review-01.json), SHA-256 `40ec883810f3721bc41dac5dd21c4dfd846f6f25a80f7e88271e5f1bdf50c081`. [Complete paired statistics](readfilter-complete-results-self-review-01.json) include both raw cells for every row. [The raw manifest](complete-raw-retrieved-ssh-01/packet/validation/readfilter-complete-01/packet.json) binds the evidence archive, SHA-256 `ef046dbc60f41332591f0d0d4ae05c814b3df459a7e9324f8fdadcde676d34e7`.

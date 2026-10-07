@@ -1,0 +1,604 @@
+{
+  "passed": true,
+  "scope": "Local report recomputation; archived bytes/modes, accepted readiness proofs, 48 raw command statuses/logs and every cell independently recomputed. Final guard/ownership/native/runtime acceptance is the separate root audit.",
+  "generator_sha256": "10ca343249194cc087d09415c062d406c78e0a1864241e5ce32cca02b1be9866",
+  "archive_sha256": "27b137957c0eaf6e1a6870b32ab7d43a61c34a5debb413f1a8602a61e770e14e",
+  "payloads_rehashed": 643,
+  "readiness_proofs_rehashed": 69,
+  "root_acceptance_sha256": "b6da18aaf43b10b93d8a0748fd00e86a0531e3e013fe917b68721fe9ad750b27",
+  "command_review_sha256": "b7f93413dce0663bff644beea5f2f93446264600049817d477523fd49eb1d20e",
+  "statistics": [
+    {
+      "project": "ruff",
+      "label": "cold",
+      "n": 2,
+      "full_median_seconds": 31.349341776687652,
+      "reduced_median_seconds": 32.725202498957515,
+      "paired_delta_median_seconds": 1.375860722269863,
+      "paired_delta_min_seconds": 1.3270585434511304,
+      "paired_delta_max_seconds": 1.4246629010885954,
+      "paired_percent_median": 4.389396414148317,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "ruff",
+          "slot": 0,
+          "label": "cold",
+          "full_seconds": 31.240425729192793,
+          "reduced_seconds": 32.66508863028139,
+          "delta_seconds": 1.4246629010885954,
+          "delta_percent": 4.560318458647994
+        },
+        {
+          "project": "ruff",
+          "slot": 1,
+          "label": "cold",
+          "full_seconds": 31.45825782418251,
+          "reduced_seconds": 32.78531636763364,
+          "delta_seconds": 1.3270585434511304,
+          "delta_percent": 4.218474369648639
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "noop",
+      "n": 2,
+      "full_median_seconds": 0.43884683679789305,
+      "reduced_median_seconds": 0.5303443288430572,
+      "paired_delta_median_seconds": 0.09149749204516411,
+      "paired_delta_min_seconds": 0.09061747789382935,
+      "paired_delta_max_seconds": 0.09237750619649887,
+      "paired_percent_median": 20.8613546137279,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "ruff",
+          "slot": 0,
+          "label": "noop",
+          "full_seconds": 0.4516159240156412,
+          "reduced_seconds": 0.5439934302121401,
+          "delta_seconds": 0.09237750619649887,
+          "delta_percent": 20.454882408730015
+        },
+        {
+          "project": "ruff",
+          "slot": 1,
+          "label": "noop",
+          "full_seconds": 0.4260777495801449,
+          "reduced_seconds": 0.5166952274739742,
+          "delta_seconds": 0.09061747789382935,
+          "delta_percent": 21.267826818725787
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "direct",
+      "n": 2,
+      "full_median_seconds": 11.965649759862572,
+      "reduced_median_seconds": 12.756338394712657,
+      "paired_delta_median_seconds": 0.7906886348500848,
+      "paired_delta_min_seconds": 0.7654326539486647,
+      "paired_delta_max_seconds": 0.8159446157515049,
+      "paired_percent_median": 6.607473422306597,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "ruff",
+          "slot": 0,
+          "label": "direct",
+          "full_seconds": 11.997433153912425,
+          "reduced_seconds": 12.81337776966393,
+          "delta_seconds": 0.8159446157515049,
+          "delta_percent": 6.800993223166407
+        },
+        {
+          "project": "ruff",
+          "slot": 1,
+          "label": "direct",
+          "full_seconds": 11.933866365812719,
+          "reduced_seconds": 12.699299019761384,
+          "delta_seconds": 0.7654326539486647,
+          "delta_percent": 6.4139536214467885
+        }
+      ]
+    },
+    {
+      "project": "ruff",
+      "label": "dependency",
+      "n": 2,
+      "full_median_seconds": 1.0393074075691402,
+      "reduced_median_seconds": 1.1335875536315143,
+      "paired_delta_median_seconds": 0.09428014606237411,
+      "paired_delta_min_seconds": 0.07528862170875072,
+      "paired_delta_max_seconds": 0.1132716704159975,
+      "paired_percent_median": 9.107719127995406,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "ruff",
+          "slot": 0,
+          "label": "dependency",
+          "full_seconds": 1.0203895345330238,
+          "reduced_seconds": 1.1336612049490213,
+          "delta_seconds": 0.1132716704159975,
+          "delta_percent": 11.100826359203664
+        },
+        {
+          "project": "ruff",
+          "slot": 1,
+          "label": "dependency",
+          "full_seconds": 1.0582252806052566,
+          "reduced_seconds": 1.1335139023140073,
+          "delta_seconds": 0.07528862170875072,
+          "delta_percent": 7.114611896787149
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "cold",
+      "n": 2,
+      "full_median_seconds": 38.062353980727494,
+      "reduced_median_seconds": 38.35716816037893,
+      "paired_delta_median_seconds": 0.2948141796514392,
+      "paired_delta_min_seconds": -0.06594510283321142,
+      "paired_delta_max_seconds": 0.6555734621360898,
+      "paired_percent_median": 0.7799287213619999,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "uv",
+          "slot": 0,
+          "label": "cold",
+          "full_seconds": 37.84758553095162,
+          "reduced_seconds": 38.50315899308771,
+          "delta_seconds": 0.6555734621360898,
+          "delta_percent": 1.7321407771176522
+        },
+        {
+          "project": "uv",
+          "slot": 1,
+          "label": "cold",
+          "full_seconds": 38.27712243050337,
+          "reduced_seconds": 38.21117732767016,
+          "delta_seconds": -0.06594510283321142,
+          "delta_percent": -0.1722833343936525
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "noop",
+      "n": 2,
+      "full_median_seconds": 0.7001199247315526,
+      "reduced_median_seconds": 0.689570885617286,
+      "paired_delta_median_seconds": -0.010549039114266634,
+      "paired_delta_min_seconds": -0.06400262843817472,
+      "paired_delta_max_seconds": 0.04290455020964146,
+      "paired_percent_median": -1.0697633956922914,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "uv",
+          "slot": 0,
+          "label": "noop",
+          "full_seconds": 0.7405178491026163,
+          "reduced_seconds": 0.6765152206644416,
+          "delta_seconds": -0.06400262843817472,
+          "delta_percent": -8.642955536552588
+        },
+        {
+          "project": "uv",
+          "slot": 1,
+          "label": "noop",
+          "full_seconds": 0.6597220003604889,
+          "reduced_seconds": 0.7026265505701303,
+          "delta_seconds": 0.04290455020964146,
+          "delta_percent": 6.503428745168005
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "direct",
+      "n": 2,
+      "full_median_seconds": 4.781765824649483,
+      "reduced_median_seconds": 5.031625588890165,
+      "paired_delta_median_seconds": 0.24985976424068213,
+      "paired_delta_min_seconds": 0.2285534292459488,
+      "paired_delta_max_seconds": 0.27116609923541546,
+      "paired_percent_median": 5.227186459070343,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "uv",
+          "slot": 0,
+          "label": "direct",
+          "full_seconds": 4.801472136750817,
+          "reduced_seconds": 5.030025565996766,
+          "delta_seconds": 0.2285534292459488,
+          "delta_percent": 4.760069885579132
+        },
+        {
+          "project": "uv",
+          "slot": 1,
+          "label": "direct",
+          "full_seconds": 4.762059512548149,
+          "reduced_seconds": 5.033225611783564,
+          "delta_seconds": 0.27116609923541546,
+          "delta_percent": 5.694303032561554
+        }
+      ]
+    },
+    {
+      "project": "uv",
+      "label": "dependency",
+      "n": 2,
+      "full_median_seconds": 0.9189545572735369,
+      "reduced_median_seconds": 0.9020158033818007,
+      "paired_delta_median_seconds": -0.01693875389173627,
+      "paired_delta_min_seconds": -0.1012147618457675,
+      "paired_delta_max_seconds": 0.06733725406229496,
+      "paired_percent_median": -1.0225185894264364,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "uv",
+          "slot": 0,
+          "label": "dependency",
+          "full_seconds": 1.002033737488091,
+          "reduced_seconds": 0.9008189756423235,
+          "delta_seconds": -0.1012147618457675,
+          "delta_percent": -10.100933537377067
+        },
+        {
+          "project": "uv",
+          "slot": 1,
+          "label": "dependency",
+          "full_seconds": 0.8358753770589828,
+          "reduced_seconds": 0.9032126311212778,
+          "delta_seconds": 0.06733725406229496,
+          "delta_percent": 8.055896358524194
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "cold",
+      "n": 2,
+      "full_median_seconds": 128.89321790635586,
+      "reduced_median_seconds": 131.88900476600975,
+      "paired_delta_median_seconds": 2.99578685965389,
+      "paired_delta_min_seconds": 2.028138032183051,
+      "paired_delta_max_seconds": 3.963435687124729,
+      "paired_percent_median": 2.3246907235664582,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "codex",
+          "slot": 0,
+          "label": "cold",
+          "full_seconds": 128.81586175970733,
+          "reduced_seconds": 132.77929744683206,
+          "delta_seconds": 3.963435687124729,
+          "delta_percent": 3.076822708773319
+        },
+        {
+          "project": "codex",
+          "slot": 1,
+          "label": "cold",
+          "full_seconds": 128.97057405300438,
+          "reduced_seconds": 130.99871208518744,
+          "delta_seconds": 2.028138032183051,
+          "delta_percent": 1.5725587383595974
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "noop",
+      "n": 2,
+      "full_median_seconds": 1.7484403499402106,
+      "reduced_median_seconds": 1.7285877745598555,
+      "paired_delta_median_seconds": -0.01985257538035512,
+      "paired_delta_min_seconds": -0.040737963281571865,
+      "paired_delta_max_seconds": 0.0010328125208616257,
+      "paired_percent_median": -1.1328340461438102,
+      "slower_pairs": 1,
+      "cells": [
+        {
+          "project": "codex",
+          "slot": 0,
+          "label": "noop",
+          "full_seconds": 1.744610944762826,
+          "reduced_seconds": 1.7456437572836876,
+          "delta_seconds": 0.0010328125208616257,
+          "delta_percent": 0.05920016287654928
+        },
+        {
+          "project": "codex",
+          "slot": 1,
+          "label": "noop",
+          "full_seconds": 1.7522697551175952,
+          "reduced_seconds": 1.7115317918360233,
+          "delta_seconds": -0.040737963281571865,
+          "delta_percent": -2.3248682551641697
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "direct",
+      "n": 2,
+      "full_median_seconds": 20.606243988033384,
+      "reduced_median_seconds": 21.759631919208914,
+      "paired_delta_median_seconds": 1.15338793117553,
+      "paired_delta_min_seconds": 1.0815035626292229,
+      "paired_delta_max_seconds": 1.225272299721837,
+      "paired_percent_median": 5.598222211832226,
+      "slower_pairs": 2,
+      "cells": [
+        {
+          "project": "codex",
+          "slot": 0,
+          "label": "direct",
+          "full_seconds": 20.660005193203688,
+          "reduced_seconds": 21.74150875583291,
+          "delta_seconds": 1.0815035626292229,
+          "delta_percent": 5.234769074428858
+        },
+        {
+          "project": "codex",
+          "slot": 1,
+          "label": "direct",
+          "full_seconds": 20.55248278286308,
+          "reduced_seconds": 21.777755082584918,
+          "delta_seconds": 1.225272299721837,
+          "delta_percent": 5.961675349235596
+        }
+      ]
+    },
+    {
+      "project": "codex",
+      "label": "dependency",
+      "n": 2,
+      "full_median_seconds": 2.422990014310926,
+      "reduced_median_seconds": 2.350667138118297,
+      "paired_delta_median_seconds": -0.07232287619262934,
+      "paired_delta_min_seconds": -0.144272499717772,
+      "paired_delta_max_seconds": -0.00037325266748666763,
+      "paired_percent_median": -3.0174848146676423,
+      "slower_pairs": 0,
+      "cells": [
+        {
+          "project": "codex",
+          "slot": 0,
+          "label": "dependency",
+          "full_seconds": 2.396660406142473,
+          "reduced_seconds": 2.252387906424701,
+          "delta_seconds": -0.144272499717772,
+          "delta_percent": -6.019730594622907
+        },
+        {
+          "project": "codex",
+          "slot": 1,
+          "label": "dependency",
+          "full_seconds": 2.449319622479379,
+          "reduced_seconds": 2.4489463698118925,
+          "delta_seconds": -0.00037325266748666763,
+          "delta_percent": -0.015239034712377642
+        }
+      ]
+    }
+  ],
+  "history_totals": [
+    {
+      "project": "ruff",
+      "slot": 0,
+      "attempt": 1,
+      "full_command_seconds": 44.70986434165388,
+      "reduced_command_seconds": 47.15612103510648,
+      "delta_seconds": 2.4462566934525967,
+      "delta_percent": 5.471402629986377
+    },
+    {
+      "project": "ruff",
+      "slot": 1,
+      "attempt": 2,
+      "full_command_seconds": 44.87642722018063,
+      "reduced_command_seconds": 47.134824517183006,
+      "delta_seconds": 2.258397297002375,
+      "delta_percent": 5.032480161403741
+    },
+    {
+      "project": "uv",
+      "slot": 0,
+      "attempt": 1,
+      "full_command_seconds": 44.391609254293144,
+      "reduced_command_seconds": 45.11051875539124,
+      "delta_seconds": 0.7189095010980964,
+      "delta_percent": 1.6194715919846336
+    },
+    {
+      "project": "uv",
+      "slot": 1,
+      "attempt": 1,
+      "full_command_seconds": 44.53477932047099,
+      "reduced_command_seconds": 44.85024212114513,
+      "delta_seconds": 0.31546280067414045,
+      "delta_percent": 0.7083515523992556
+    },
+    {
+      "project": "codex",
+      "slot": 0,
+      "attempt": 1,
+      "full_command_seconds": 153.61713830381632,
+      "reduced_command_seconds": 158.51883786637336,
+      "delta_seconds": 4.901699562557042,
+      "delta_percent": 3.190854625128292
+    },
+    {
+      "project": "codex",
+      "slot": 1,
+      "attempt": 1,
+      "full_command_seconds": 153.72464621346444,
+      "reduced_command_seconds": 156.93694532942027,
+      "delta_seconds": 3.2122991159558296,
+      "delta_percent": 2.089644826045123
+    }
+  ],
+  "commands": {
+    "ruff": [
+      "cargo",
+      "+ohm-ablation-clippy-full",
+      "clippy",
+      "-p",
+      "ty_python_semantic",
+      "-p",
+      "ty_python_core",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings",
+      "-A",
+      "clippy::format_push_string",
+      "-A",
+      "clippy::double_must_use",
+      "-A",
+      "clippy::assert_is_empty",
+      "-A",
+      "clippy::needless_borrows_for_generic_args",
+      "-A",
+      "clippy::mut_mut"
+    ],
+    "uv": [
+      "cargo",
+      "+ohm-ablation-clippy-full",
+      "clippy",
+      "-p",
+      "uv-pypi-types",
+      "-p",
+      "uv-client",
+      "--all-targets",
+      "--locked",
+      "--",
+      "-D",
+      "warnings",
+      "-A",
+      "clippy::doc_markdown",
+      "-A",
+      "clippy::double_must_use"
+    ],
+    "codex": [
+      "cargo",
+      "+ohm-ablation-clippy-full",
+      "clippy",
+      "--tests",
+      "-p",
+      "codex-tui",
+      "--",
+      "-D",
+      "clippy::redundant_closure_for_method_calls"
+    ]
+  },
+  "sessions": {
+    "ruff": {
+      "project": "ruff",
+      "session": {
+        "id": "ruff-component-fixed-points-clippy",
+        "description": "Supplementary clippy history on the exact session base"
+      },
+      "base_revision": "21c9b077ab3b10dd9007710ffa471cd12f7eceab",
+      "commands": 4,
+      "edits": 2,
+      "warmups": 0,
+      "setup_patches": [
+        {
+          "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+          "patch": "patches/rust-1.99-ruff-cfg-select.patch",
+          "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+          "paths": [
+            "crates/ty_python_core/src/ast_node_ref.rs"
+          ]
+        }
+      ],
+      "warmup_enabled": true
+    },
+    "uv": {
+      "project": "uv",
+      "session": {
+        "id": "uv-pypi-simple-json-parser-clippy",
+        "description": "Supplementary clippy history on the exact session base"
+      },
+      "base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
+      "commands": 4,
+      "edits": 2,
+      "warmups": 0,
+      "setup_patches": [
+        {
+          "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+          "patch": "patches/rust-1.99-uv-cfg-select.patch",
+          "sha256": "def4e6311a8eed2a60cf13f7ccd99111754d80891ac713ce5651ccbdd1952b04",
+          "paths": [
+            "crates/uv-cache-info/src/cache_info.rs",
+            "crates/uv-cache-info/src/timestamp.rs",
+            "crates/uv-cache/src/removal.rs",
+            "crates/uv-dirs/src/lib.rs",
+            "crates/uv-fs/src/lib.rs",
+            "crates/uv-pep508/src/verbatim_url.rs",
+            "crates/uv-platform/src/host.rs",
+            "crates/uv-python/src/managed.rs",
+            "crates/uv-tool/src/tool.rs",
+            "crates/uv/src/bin/uvw.rs",
+            "crates/uv/src/bin/uvx.rs",
+            "crates/uv/src/commands/project/run.rs",
+            "crates/uv/tests/python/venv.rs",
+            "crates/uv/tests/sync/centralized_project_envs.rs",
+            "crates/uv/tests/tool/tool_install.rs"
+          ]
+        },
+        {
+          "label": "Resolve uv integration-test binary paths at runtime after artifact relocation",
+          "patch": "patches/uv-runtime-bin-path.patch",
+          "sha256": "372ac74870cef2d9dd6080f4c2c5ce73c348edeaba34467dcd0690f335bc4343",
+          "paths": [
+            "crates/uv-test/src/lib.rs"
+          ]
+        }
+      ],
+      "warmup_enabled": true
+    },
+    "codex": {
+      "project": "codex",
+      "session": {
+        "id": "codex-tui-active-cell-layout-clippy",
+        "description": "Supplementary clippy history on the exact session base"
+      },
+      "base_revision": "74004b5397b24662a87a5264a6ae80664168c7f3",
+      "commands": 4,
+      "edits": 2,
+      "warmups": 0,
+      "setup_patches": [
+        {
+          "label": "Bound safety-retry goal accounting by elapsed wall time",
+          "patch": "patches/codex-safety-retry-goal-accounting.patch",
+          "sha256": "af822ae0a81f239b71e5b3c0d7f947ccce96fea032571d24f809a151af98af3a",
+          "paths": [
+            "codex-rs/tui/src/app/tests/safety_buffering.rs"
+          ]
+        },
+        {
+          "label": "Match Rust 1.99 Unicode debug formatting",
+          "patch": "patches/rust-1.99-codex-debug-snapshot.patch",
+          "sha256": "1eee16737d3c0570d9edf3d095b1ff9745667397852d6df988993d15a965b0b6",
+          "paths": [
+            "codex-rs/tui/src/bottom_pane/request_user_input/snapshots/codex_tui__bottom_pane__request_user_input__render__tests__request_user_input_halfwidth_sound_marks_truncation.snap"
+          ]
+        }
+      ],
+      "warmup_enabled": true
+    }
+  }
+}

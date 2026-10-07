@@ -1,0 +1,1882 @@
+{
+  "schema": "bounded-small-source-disposition-v1",
+  "scope": "Frozen source-only recommendations; no benchmark/native/build execution, no live upstream or PR status lookup, no primary/canonical edits",
+  "pins": {
+    "ohm-rust": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+    "ohm-cargo": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+    "ohm-rust-clippy": "f52143702ff1f265014e87d5e6853e70a3b15728",
+    "ohm-rustfmt": "a21f2ab199a5f86ea88535e2a5f888d9e1c67edb"
+  },
+  "fixed_upstream": {
+    "ohm-rust": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+    "ohm-cargo": "5f94df4789f005f9a352888e8355ffc645b7ed0e"
+  },
+  "inputs": [
+    {
+      "path": "work/stack-review/source-disposition-evidence/report-inputs/rust-review.md",
+      "sha256": "abadc2a3cf88fd8eaec66c05207b0d37f1f0c7951370e52646d4c25d9e8e3dbe",
+      "bytes": 41530,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/source-disposition-evidence/report-inputs/tools-linkers-review.md",
+      "sha256": "602e9e0b8e82cf053c9f9410a2cab7b639bf902772ae864a3778120b9fbcfb46",
+      "bytes": 39965,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/source-disposition-evidence/report-inputs/full-report.md",
+      "sha256": "7e6cf1e0e2268646e0ff4fbc13e57d9488877a0428e5a00d242898aeaeb457f1",
+      "bytes": 188020,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/source-disposition-evidence/report-inputs/cargo-and-release-review.md",
+      "sha256": "d6359cfd7b1fbbbc82478d76937439172be58d9fbd6cc6ae425db8e926a61502",
+      "bytes": 27073,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/variants/rust/ordinary-semantic-manifest.json",
+      "sha256": "a820a7170f7079cce1f0d4b79a4f249825b672fd5f316b8dcea26de1b4e885fe",
+      "bytes": 9748,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/variants/rust/ordinary-const-impl-index-manifest.json",
+      "sha256": "b30bafcf10f24f9b25ec095a5fb41e0918cd43475758263723061e18f9239601",
+      "bytes": 4839,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/clippy/full-source-manifest.json",
+      "sha256": "786677f8375e120dc07ab8b8f1f25483bcc58116cae81944753ec1acfc18df03",
+      "bytes": 752682,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/rustfmt/full-source-manifest.json",
+      "sha256": "75634c54fcd51da24cf76f2159ccd57ad41e09b50570020da79313c21a48e890",
+      "bytes": 324983,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/evidence/upstream-tools-1.99.0.json",
+      "sha256": "2d29f23fcff8d13bc5c16516c7a8b1aa46394a8ca1bcd2ca30bf9a498f66d015",
+      "bytes": 45133,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-ablation/benchmarks/baseoss-package-supplementary-proposal-01/fetch-log-supplement-independent-review.json",
+      "sha256": "f012c5a45119c9a44cbae7bc73d757b8949a7bb317f771aaf4170a44844601a0",
+      "bytes": 1679,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/evidence/ohm-rust-pulls.json",
+      "sha256": "f140a60f80f9150e4b80c1227ed82f807285a80c70a79821a0ca1f812df29aca",
+      "bytes": 2885291,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/evidence/ohm-cargo-pulls.json",
+      "sha256": "380a99132abbb678ac85dc64db7abda513c17103d533d2865af241b2ed459d0b",
+      "bytes": 2486389,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/evidence/ohm-rust-clippy-pulls.json",
+      "sha256": "0df64f6066bb1245bd06ae39369bbb96b29fce6a47594c4408ab41d29f85aa90",
+      "bytes": 1000570,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/evidence/ohm-rustfmt-pulls.json",
+      "sha256": "50b9547b318affc72cdb4f915894c6f8b634a4d296a27bb7180d8c1294ba9f0a",
+      "bytes": 420006,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-pr41-files.json",
+      "sha256": "8717e3e6f792710a731abe04fcb9ef4e8534bf969b270ddf9f8270b036f620dd",
+      "bytes": 5709,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rustfmt-pr17-files.json",
+      "sha256": "fc30b4282ec96c126fce6144e4eb53b109a570895d2251caafb72cf49cdd1018",
+      "bytes": 2596,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-pr36-files.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-780c0d355ef3.json",
+      "sha256": "f1e0d5b698b96e0a9da246f5f476145904255053d9aea474d40c43ebacf75601",
+      "bytes": 3635,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-544cbb2e4a9f.json",
+      "sha256": "208ab0735aa277c1fcae3266e28cbd592f947cff79fdc59d68f8f1f092703ce4",
+      "bytes": 3696,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-pr37-files.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-acf09bc08984.json",
+      "sha256": "357e0c448af999b80f1bbd4756ce32a0e23919d432ca804f61f0b769abd0914d",
+      "bytes": 13063,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-pr39-files.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-cb3b4e13e374.json",
+      "sha256": "52acd7729ea9ab828e5d32ae047dac5b787c6f1996f8f758b399f7dfe19aa2a1",
+      "bytes": 3632,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-pr40-files.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-d76bc2752472.json",
+      "sha256": "4978c2285027824c9f6ad14ff558ec4779faabfe41019f7258e2e9f003cf28a6",
+      "bytes": 3562,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-pr42-files.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-7a06fab3512a.json",
+      "sha256": "f1d24f6fc9f3b57ba4604d31d333bb291f5c6802833612235493e20d7addfbba",
+      "bytes": 9269,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-88b173d907c1.json",
+      "sha256": "a3fa27b50c514025edca3df54cd6db0155210bfcadb5ede70817103c31510957",
+      "bytes": 3601,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-pr43-files.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-4a88eb92dfe5.json",
+      "sha256": "7ec76c1aa85972703d7d61c6fc7ba73161ee9d2d9a79cdb0ec240e078bc64af4",
+      "bytes": 3745,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-pr45-files.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-241837415257.json",
+      "sha256": "4fef06a8ddc3d3ff2a676193f58200f7a0fea4e4facd9eed35e79067c0016a1c",
+      "bytes": 5003,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-e70e5850d051.json",
+      "sha256": "46b7071322b5b1d6d7c124d0ac71a158bddc90910f085f0a5e0105b3551b5c0c",
+      "bytes": 3552,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-56c9ea6b08c1.json",
+      "sha256": "4cf93d5a471b3e0f1a1de84be7128786a2d25852c2ad0e7a51952eb25cc88325",
+      "bytes": 4396,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-a85f218a2fae.json",
+      "sha256": "0d0317c37f0245a3e8ee834a291e2d6a9374a30d5dac03895809b5984c0ef990",
+      "bytes": 5562,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-2720f6df26c4.json",
+      "sha256": "2292f6dd40b33fb44aafaa2169c7bfa7aa0cc4c94c48af1ca51cbad0c0860e30",
+      "bytes": 6395,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-5696c7367ad3.json",
+      "sha256": "26780632102f42eea88e344984019c61b9e7bff14ff3a4b5aba27628028f4c2a",
+      "bytes": 18847,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-8abefda83e32.json",
+      "sha256": "68d98b1f6380c216dd63234c55394ccbb3f8d4745a1478f87b5156c41b190565",
+      "bytes": 5538,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-55bbc0d0ef6b.json",
+      "sha256": "14b1a9ba532fa826887c0ffa9d3250bea327079f88d6ecfea2c0db5559dcd171",
+      "bytes": 5496,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-bca652421b30.json",
+      "sha256": "6f1b6b9b7ff80a9ddc4243e066aab57a6926d59e361ff262ec5fde4b08f2366b",
+      "bytes": 4907,
+      "mode": "0o644"
+    },
+    {
+      "path": "work/stack-review/raw/ohm-rust-clippy-9cf753eeed61.json",
+      "sha256": "7ce0ed7c89b5330d0c825a94144c04a64b7761da2edd3b501688592f1b8c231b",
+      "bytes": 42809,
+      "mode": "0o644"
+    }
+  ],
+  "candidate_diffs": [
+    {
+      "repo": "ohm-rust",
+      "pr": 85,
+      "title": "Store small obligation dependency lists inline",
+      "base": "6896674faa6adae17d200614a6ca63e9fb4bc3a8",
+      "head": "1847fd8421419530078a59c7d30e4957fb633527",
+      "patch": {
+        "path": "work/stack-review/source-disposition-evidence/ohm-rust-85.patch",
+        "sha256": "f0dc540ef5cf03337c5da6627cfe2936698786f88156a24607451e531d7fcfdf",
+        "bytes": 4056,
+        "mode": "0o644"
+      },
+      "stats": [
+        {
+          "path": "compiler/rustc_data_structures/src/obligation_forest/mod.rs",
+          "added": 7,
+          "removed": 2,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_data_structures/src/obligation_forest/tests.rs",
+          "added": 53,
+          "removed": 0,
+          "production": false
+        }
+      ],
+      "production_added": 7,
+      "production_removed": 2,
+      "production_files": [
+        {
+          "path": "compiler/rustc_data_structures/src/obligation_forest/mod.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "83cbc428ea57e056c02fc3511113f51b0ea64819",
+          "git_mode": "100644",
+          "sha256": "1a8152fec3860a1462755ccaa57866e9b907675b9acd04d909cefc4b6ad78a0e",
+          "bytes": 29782
+        }
+      ],
+      "historical_body": "Store up to two obligation dependency indices inline with `SmallVec`. Most lists are small, so this avoids a separate allocation while preserving their order and allowing larger lists to spill to the heap.\n\nIn isolation against #81, full-check instruction counts fell 0.09% for bitmaps and 0.13% for syn. Unchanged and patched incremental checks changed little.\n\n<details>\n<summary>Instruction counts</summary>\n\nTwo runs per revision against #81 (`053ba856`), using matching inputs, a stage-one CGU16/ThinLocal compiler, and one compiler thread. Counts are means; ranges include all pairings of the two baseline and candidate runs. These measure each patch independently.\n\n| Check | Baseline Ir | Isolated PR Ir | Change | Observed range |\n| --- | ---: | ---: | ---: | ---: |\n| bitmaps / Full | 2,308,520,331.5 | 2,306,549,201.5 | -0.085% | -0.092% to -0.079% |\n| bitmaps / IncrFull | 3,545,698,112.0 | 3,543,376,933.0 | -0.065% | -0.065% to -0.065% |\n| bitmaps / IncrUnchanged | 867,792,933.0 | 867,801,585.0 | +0.001% | -0.003% to +0.005% |\n| bitmaps / IncrPatched | 1,137,245,653.0 | 1,137,385,339.0 | +0.012% | -0.004% to +0.029% |\n| syn / Full | 4,320,131,863.0 | 4,314,292,970.5 | -0.135% | -0.135% to -0.135% |\n| syn / IncrFull | 5,398,871,448.0 | 5,392,814,197.0 | -0.112% | -0.112% to -0.112% |\n| syn / IncrUnchanged | 1,671,523,037.5 | 1,671,613,295.5 | +0.005% | +0.000% to +0.011% |\n| syn / IncrPatched | 1,914,901,425.5 | 1,915,015,036.5 | +0.006% | -0.011% to +0.023% |\n\n[Baseline run 1](https://github.com/astral-sh/ohm-rust/actions/runs/33396878865), [baseline run 2](https://github.com/astral-sh/ohm-rust/actions/runs/33439531117), [PR run 1](https://github.com/astral-sh/ohm-rust/actions/runs/33439912801), [PR run 2](https://github.com/astral-sh/ohm-rust/actions/runs/33441144670).\n\n</details>\n"
+    },
+    {
+      "repo": "ohm-rust",
+      "pr": 100,
+      "title": "Reduce fast-rejection overhead for single generic arguments",
+      "base": "5466d64255fb6ebf7a94c6c4ced9f8a4341de31e",
+      "head": "aa32a253490d9f90be2944acda4b461df72744a6",
+      "patch": {
+        "path": "work/stack-review/source-disposition-evidence/ohm-rust-100.patch",
+        "sha256": "a74fb02d43b8aca773213368260fd821782d0899371fd5e181154fdaac0a067c",
+        "bytes": 4580,
+        "mode": "0o644"
+      },
+      "stats": [
+        {
+          "path": "compiler/rustc_middle/src/ty/generic_args.rs",
+          "added": 1,
+          "removed": 0,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_type_ir/src/fast_reject.rs",
+          "added": 41,
+          "removed": 18,
+          "production": true
+        }
+      ],
+      "production_added": 42,
+      "production_removed": 18,
+      "production_files": [
+        {
+          "path": "compiler/rustc_middle/src/ty/generic_args.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "2acc2b9d981725ffa03238b5ca8edeca1392faf7",
+          "git_mode": "100644",
+          "sha256": "73341205421e39941fb9fd66b80ee799ee009ccd0c35dc8e807d76a91e86926f",
+          "bytes": 27616
+        },
+        {
+          "path": "compiler/rustc_type_ir/src/fast_reject.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "7256c44cae3a1022208e3583088abb98d01b154b",
+          "git_mode": "100644",
+          "sha256": "38b79dfc54bfb1225212c83b3ebefd2d82fcdb50f2e1c1d05a5b6d867f23aa74",
+          "bytes": 22205
+        }
+      ],
+      "historical_body": "Special-case single generic arguments in fast rejection, return early for identical arguments, and keep recursive structural checks out of line. This reduces the setup needed for common trait-candidate comparisons.\n\nAgainst #98, compiler instruction counts fell 2.18% across a four-crate rustc-perf Check/Debug sample, mostly from bitmaps (7.6\u20138.4%). Reductions were 0.12% for Ruff's `ty_python_semantic` and 0.18% for `uv-resolver`. Wall-time results varied across runs.\n"
+    },
+    {
+      "repo": "ohm-rust",
+      "pr": 104,
+      "title": "Reduce trait and dataflow overhead",
+      "base": "66c8da320df6c05cef9b8379971264e1c2004e86",
+      "head": "827d0887cd34362c3665ffe77bdcd62dd9a8ab6c",
+      "patch": {
+        "path": "work/stack-review/source-disposition-evidence/ohm-rust-104.patch",
+        "sha256": "a2f13673f24d0eb6ba17fbb4bf45c6bc89794574f22b17a4563283e88b54a3c1",
+        "bytes": 18940,
+        "mode": "0o644"
+      },
+      "stats": [
+        {
+          "path": "compiler/rustc_borrowck/src/dataflow.rs",
+          "added": 29,
+          "removed": 1,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/dataflow/tests.rs",
+          "added": 24,
+          "removed": 0,
+          "production": false
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/polonius/dump.rs",
+          "added": 1,
+          "removed": 1,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_middle/src/mir/terminator.rs",
+          "added": 17,
+          "removed": 10,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_middle/src/ty/context.rs",
+          "added": 3,
+          "removed": 2,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_middle/src/ty/trait_def.rs",
+          "added": 10,
+          "removed": 0,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_mir_dataflow/src/framework/direction.rs",
+          "added": 1,
+          "removed": 1,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_mir_dataflow/src/impls/initialized.rs",
+          "added": 1,
+          "removed": 1,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs",
+          "added": 34,
+          "removed": 3,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_trait_selection/src/traits/util.rs",
+          "added": 8,
+          "removed": 4,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_trait_selection/src/traits/wf.rs",
+          "added": 12,
+          "removed": 0,
+          "production": true
+        },
+        {
+          "path": "tests/ui/const-generics/coherence-indexed-impls.equal.stderr",
+          "added": 12,
+          "removed": 0,
+          "production": false
+        },
+        {
+          "path": "tests/ui/const-generics/coherence-indexed-impls.generic.stderr",
+          "added": 12,
+          "removed": 0,
+          "production": false
+        },
+        {
+          "path": "tests/ui/const-generics/coherence-indexed-impls.named.stderr",
+          "added": 12,
+          "removed": 0,
+          "production": false
+        },
+        {
+          "path": "tests/ui/const-generics/coherence-indexed-impls.rs",
+          "added": 43,
+          "removed": 0,
+          "production": false
+        }
+      ],
+      "production_added": 116,
+      "production_removed": 23,
+      "production_files": [
+        {
+          "path": "compiler/rustc_borrowck/src/dataflow.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "e48ce293b5d58f6c7fc90c0d0fcd8c7b4119a031",
+          "git_mode": "100644",
+          "sha256": "8141eedaee3875b931823031edf2b6dc6ec99a51aa1195e846be44c4544b0943",
+          "bytes": 24806
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/polonius/dump.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "2c144ecf230b60a808deab1c50812820d228b571",
+          "git_mode": "100644",
+          "sha256": "286fe290c629ae52c18c7a29945cd0bbb81335cf7e75cfb2536a14cc87fb47ac",
+          "bytes": 17831
+        },
+        {
+          "path": "compiler/rustc_middle/src/mir/terminator.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "56e17be3577283a7a65f02ad4263a92f7494f3fc",
+          "git_mode": "100644",
+          "sha256": "b34c5b149651a25a1d06fb72e93c5b0137f491342eea2ea726f187284819af2c",
+          "bytes": 33256
+        },
+        {
+          "path": "compiler/rustc_middle/src/ty/context.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "72f7353c488346aa046c045b4220272b9780e94a",
+          "git_mode": "100644",
+          "sha256": "2f308d07b7793e9d168a9638d24a6978ead91d35383550d201ce586373ea5128",
+          "bytes": 123433
+        },
+        {
+          "path": "compiler/rustc_middle/src/ty/trait_def.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "5e56d7787cb36946aa0590ecc018a3b9a3186321",
+          "git_mode": "100644",
+          "sha256": "039e36070930709e766d6544068fd9d0a6553534b905cdc42cb8da2264068446",
+          "bytes": 18823
+        },
+        {
+          "path": "compiler/rustc_mir_dataflow/src/framework/direction.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "bb2df8bcb2cceef92013b22aeeef9e2f00990cca",
+          "git_mode": "100644",
+          "sha256": "9d3ef611e94207ed94233371ea5595df67a8c689cdb854f156ce241da7359880",
+          "bytes": 11358
+        },
+        {
+          "path": "compiler/rustc_mir_dataflow/src/impls/initialized.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "574c169622a4b2bd67c65cbd5f8c1a3ca1c1191e",
+          "git_mode": "100644",
+          "sha256": "6727f505db4738e181468c68fd8444a7ff433dafc9fc73848c5f287cd0aa705d",
+          "bytes": 27387
+        },
+        {
+          "path": "compiler/rustc_trait_selection/src/traits/specialize/specialization_graph.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "2ece52134342dfcf9368a7b4bd41890964c72976",
+          "git_mode": "100644",
+          "sha256": "393fe8896008da23862851b03f35c641373347a337bddc7277b74c15ef263ba7",
+          "bytes": 16910
+        },
+        {
+          "path": "compiler/rustc_trait_selection/src/traits/util.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "67190b04216ca9e07926f6d2065d0b259e1a7c47",
+          "git_mode": "100644",
+          "sha256": "72eb0ef36bb6412f308fdd24299df1cce33e6ef96ea56d791cb07a5d5ebaca2a",
+          "bytes": 11420
+        },
+        {
+          "path": "compiler/rustc_trait_selection/src/traits/wf.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "0d84ccd243ef4e3a1561ecd6ef0bdc9a3aac6379",
+          "git_mode": "100644",
+          "sha256": "17a2972f8b2caa6aedda54f66a4b2194d078d79e604bff2003bf2ea4cc2da633",
+          "bytes": 54698
+        }
+      ],
+      "historical_body": "Prune coherence checks for impls with incompatible const arguments. Skip unchanged well-formedness normalization, compare sizedness trait IDs directly, inline predicate reuse checks, and reuse borrow-checking allocations.\n\nAgainst #103, the four-crate Check/Debug suite uses 3.255% fewer instructions in ABBA and 3.259% fewer in BAAB (64 Cachegrind profiles on x86_64). All eight cases improve. The 5,937 UI tests and affected unit tests pass.\n\nRuff's `ty_python_semantic` uses 0.990% fewer instructions and `uv-resolver` uses 1.183% fewer across 16 Cachegrind profiles, with identical metadata and diagnostics. Linux and macOS regression checks pass. CodSpeed reports no significant change across all 22 benchmarks. The geometric mean of case mean times falls only 0.13\u20130.20% against two runs of #103.\n"
+    },
+    {
+      "repo": "ohm-rust",
+      "pr": 108,
+      "title": "Merge equivalent functions before LLVM inlining",
+      "base": "e15395df1bd78d413d267007ebcd4e3c82f2d96b",
+      "head": "5ea69eb1cbc4025cdd1dcc5c13c91e4e8a31a608",
+      "patch": {
+        "path": "work/stack-review/source-disposition-evidence/ohm-rust-108.patch",
+        "sha256": "b9ac735d36b708cc96739e5d1c0b19c9a70d9b4ce14d7c047215ba2a704c9c2d",
+        "bytes": 3622,
+        "mode": "0o644"
+      },
+      "stats": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "added": 5,
+          "removed": 0,
+          "production": false
+        },
+        {
+          "path": "compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp",
+          "added": 25,
+          "removed": 0,
+          "production": true
+        },
+        {
+          "path": "tests/codegen-llvm/merge-functions-prelink.rs",
+          "added": 15,
+          "removed": 0,
+          "production": false
+        }
+      ],
+      "production_added": 25,
+      "production_removed": 0,
+      "production_files": [
+        {
+          "path": "compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "2f19b4cc544b4585204cc564d65c0d9982cdde38",
+          "git_mode": "100644",
+          "sha256": "1eeb33e0615669da0cfedc9d5206b6b52bd5de1ae6b616f5e5ce526c87d69886",
+          "bytes": 59682
+        }
+      ],
+      "historical_body": "Run LLVM's function-merging pass before inlining so equivalent bodies share the remaining optimization work. This applies to optimized prelink pipelines with function merging enabled and no PGO, sanitizers, coverage, or plugins.\n\nARM64 Release comparisons with prebuilt dependencies reduced compilation time by [1.35% for `codex-protocol`](https://github.com/astral-sh/ohm-rust/actions/runs/33926482373) and [0.48% for `uv-resolver`](https://github.com/astral-sh/ohm-rust/actions/runs/33923879209). These compared `66c1849` against #107 (`4627d215`), using the system allocator without PGO/BOLT. The Check and unoptimized Debug cases in CodSpeed CI do not exercise this pass.\n"
+    },
+    {
+      "repo": "ohm-rust",
+      "pr": 112,
+      "title": "Skip redundant per-body work in Rust analysis",
+      "base": "a57795ed70fc6e647bad8fee43b600f844a34e1e",
+      "head": "bc78967e759f8bef0708a888d5e73c51ecf4b267",
+      "patch": {
+        "path": "work/stack-review/source-disposition-evidence/ohm-rust-112.patch",
+        "sha256": "1111f034d0328dae2b1d5faa275a0181c70cb2d53f0e04db3fe584e201ce8d71",
+        "bytes": 20018,
+        "mode": "0o644"
+      },
+      "stats": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "added": 9,
+          "removed": 0,
+          "production": false
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/dataflow.rs",
+          "added": 14,
+          "removed": 7,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/handle_placeholders.rs",
+          "added": 18,
+          "removed": 10,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/lib.rs",
+          "added": 2,
+          "removed": 2,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/region_infer/mod.rs",
+          "added": 1,
+          "removed": 2,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/check.rs",
+          "added": 12,
+          "removed": 3,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/fallback.rs",
+          "added": 6,
+          "removed": 0,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs",
+          "added": 20,
+          "removed": 0,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/gather_locals.rs",
+          "added": 17,
+          "removed": 2,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/loops.rs",
+          "added": 14,
+          "removed": 0,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/writeback.rs",
+          "added": 16,
+          "removed": 0,
+          "production": true
+        },
+        {
+          "path": "compiler/rustc_privacy/src/lib.rs",
+          "added": 8,
+          "removed": 4,
+          "production": true
+        },
+        {
+          "path": "tests/ui/typeck/parameter-binding-known-types.rs",
+          "added": 37,
+          "removed": 0,
+          "production": false
+        }
+      ],
+      "production_added": 128,
+      "production_removed": 30,
+      "production_files": [
+        {
+          "path": "compiler/rustc_borrowck/src/dataflow.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "e48ce293b5d58f6c7fc90c0d0fcd8c7b4119a031",
+          "git_mode": "100644",
+          "sha256": "8141eedaee3875b931823031edf2b6dc6ec99a51aa1195e846be44c4544b0943",
+          "bytes": 24806
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/handle_placeholders.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "7e8a75ab8b7da88e9e587f7264e902818593828a",
+          "git_mode": "100644",
+          "sha256": "1acb0163ddaecff1b647182266eb923d5865405ed15c008cb183bd91ea07b269",
+          "bytes": 18567
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/lib.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "d9480452637de09d3006d4373d4d81a0684e3b82",
+          "git_mode": "100644",
+          "sha256": "d16e5fa88aa07d8514d954ad2ddba38e5f663d4a4e28633c390ff4e4837954c3",
+          "bytes": 113808
+        },
+        {
+          "path": "compiler/rustc_borrowck/src/region_infer/mod.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "1d0e4a29be111f5a8939c10610aaceb09b931b86",
+          "git_mode": "100644",
+          "sha256": "276fd723ba706949786956e8d5fa00b58788eaa92649e7c2985739b36197da6a",
+          "bytes": 84673
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/check.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "bfab52c5083fdbae6e86b3a757b7bd913db56dc7",
+          "git_mode": "100644",
+          "sha256": "2bc2ca616684e2c00b993a10579a8c58ae9d251f10a946ab2aaed234c484cbd7",
+          "bytes": 10199
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/fallback.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "1e17de52f436d453de4082a48032987c1cb79179",
+          "git_mode": "100644",
+          "sha256": "59d4d3ccaabd4049db236568d615ecbe43bfe1f1c745ac365c4f4c323fee8beb",
+          "bytes": 31203
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "4625b3adaaa57368e955d4dbb764f6d1a87370f3",
+          "git_mode": "100644",
+          "sha256": "eda1888f0f1f69041a0c7d8dd362f6cfeaf5aa7c803bee1a6655388ec93c9ab7",
+          "bytes": 69194
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/gather_locals.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "4f70093f74d253a60fdd6370fa40fa4df1d5a0fa",
+          "git_mode": "100644",
+          "sha256": "2152f2aadb698244ec6a569ae92cbf4e8a72ac3eff12f944fc78e23590d3df53",
+          "bytes": 9978
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/loops.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "993dd8457c0b8dd5db9c669f554ab53c8546ae0e",
+          "git_mode": "100644",
+          "sha256": "7b2d075d0eff0369a7c4f6a105ef02e964a58945710e75ac85e5950c554d9976",
+          "bytes": 18165
+        },
+        {
+          "path": "compiler/rustc_hir_typeck/src/writeback.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "e5997f797840725fe68cd22d851ff549e879b3c3",
+          "git_mode": "100644",
+          "sha256": "0b30332d478a0db923076af4d9a36da6d044714658147a925df263e0ad3d0ec5",
+          "bytes": 44505
+        },
+        {
+          "path": "compiler/rustc_privacy/src/lib.rs",
+          "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+          "git_blob": "4f6465938e0ab3c6e86192896c729eb0c13d7898",
+          "git_mode": "100644",
+          "sha256": "19f736f9da9214d0d102bda1d14b41116e8e04f077d6d496b4843e44e69dbc42",
+          "bytes": 75761
+        }
+      ],
+      "historical_body": "Reuse the constraint graph from region SCC computation during borrow checking. We also assign known parameter types directly and skip type-checker fallback, writeback, loop diagnostics, and reachability work when it cannot affect the result.\n\nKeep the three borrow-checker analyses on independent worklists, so one that needs more iterations cannot force the others to repeat their work. This gives up some small gains from sharing their worklist.\n\nAcross eight rustc-perf Check/Full workloads, median compiler instruction counts fell by 0.1\u20131.8% versus the parent on x86-64 Linux (Cachegrind, two samples per compiler). This targeted screen covers the two previous regressions above 1% and six other workloads.\n"
+    },
+    {
+      "repo": "ohm-cargo",
+      "pr": 105,
+      "title": "Reuse the source checksum buffer across files",
+      "base": "7fd68da0ba5f2c816f071f0ff49826fbec70d74a",
+      "head": "3b8f3390a2feb4e13a9805d33ac512568146d602",
+      "patch": {
+        "path": "work/stack-review/source-disposition-evidence/ohm-cargo-105.patch",
+        "sha256": "492657f1adf18cff14cf153108ff3052bf08d9eb08bcae4f5491df6e42d24e70",
+        "bytes": 2440,
+        "mode": "0o644"
+      },
+      "stats": [
+        {
+          "path": "src/compiler/fingerprint/dep_info.rs",
+          "added": 8,
+          "removed": 6,
+          "production": true
+        },
+        {
+          "path": "src/compiler/fingerprint/mod.rs",
+          "added": 6,
+          "removed": 1,
+          "production": true
+        }
+      ],
+      "production_added": 14,
+      "production_removed": 7,
+      "production_files": [
+        {
+          "path": "src/compiler/fingerprint/dep_info.rs",
+          "pin": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+          "git_blob": "e55cf67e6f5eb0c4bdf5ee9894d316c658b9a460",
+          "git_mode": "100644",
+          "sha256": "b6e10eb8f6826f20a4fb9032a17420b3573a7c694887c7b8ce9490208ea358cd",
+          "bytes": 34058
+        },
+        {
+          "path": "src/compiler/fingerprint/mod.rs",
+          "pin": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+          "git_blob": "50b64e062f2fad1f3ff2bf501f139a6af817651b",
+          "git_mode": "100644",
+          "sha256": "05758a71f6761fc092871beea6cb8da4e716dfe03e4bd4cea82aba4adbb92718",
+          "bytes": 166979
+        }
+      ],
+      "historical_body": "Reuse a lazily allocated 64 KiB buffer across source checksums in a freshness scan. Previously, each uncached file allocated its own 16 KiB buffer. Cache hits and early stale-file exits still avoid allocation.\n\nOn an Apple M5 Max, warm-corpus benchmarks using Ruff, uv, and Codex checksum inputs reduced isolated open/read/hash time by 6.7\u20139.5%. Full Cargo check/Clippy comparisons were mixed, from 1.67% faster to 0.87% slower, so they do not establish a whole-command speedup. Those comparisons used local release builds without PGO and eight samples per variant in ABBA/BAAB order.\n"
+    },
+    {
+      "repo": "ohm-rust-clippy",
+      "pr": 41,
+      "title": "Port used-underscore name prefilters",
+      "base": "d76bc275247216ab0174a7bb5048d6d35ba34202",
+      "head": "7a06fab3512a6fbed91fa101bb11195687e85ec5",
+      "patch": {
+        "path": "work/stack-review/source-disposition-evidence/ohm-rust-clippy-41.patch",
+        "sha256": "9eb5a890d9c4bd00eb13000ec3977a7ffae622ea5f06ed24d11a6177fc76e610",
+        "bytes": 4994,
+        "mode": "0o644"
+      },
+      "patch_format": "preserved GitHub complete one-file unified hunk; exact record also bound",
+      "stats": [
+        {
+          "path": "clippy_lints/src/misc.rs",
+          "added": 32,
+          "removed": 23
+        }
+      ],
+      "production_files": [
+        {
+          "path": "clippy_lints/src/misc.rs",
+          "pin": "f52143702ff1f265014e87d5e6853e70a3b15728",
+          "git_blob": "7ce0f68678957523aba152e0ef0d531c97b8fa75",
+          "git_mode": "100644",
+          "sha256": "d55510aa80407fed6fb143f2fbee0ce657b1f410a6a419ca31f9c8f778e86faa",
+          "bytes": 8641,
+          "snapshot": "/private/tmp/ohm-stack-review-tools/ohm-rust-clippy/clippy_lints/src/misc.rs",
+          "matches_accepted_full_manifest": true,
+          "pr_head_git_blob": "7ce0f68678957523aba152e0ef0d531c97b8fa75",
+          "unchanged_since_pr_head": true
+        }
+      ],
+      "historical_body": "Check for a single leading underscore before running the more expensive context checks in `used_underscore_binding` and `used_underscore_items`.\n\nOrdinary names now skip macro, desugaring, and automatically-derived checks. The existing exclusions still apply to names that can produce a diagnostic.\n"
+    },
+    {
+      "repo": "ohm-rustfmt",
+      "pr": 17,
+      "title": "Avoid redundant formatter configuration ancestor walks",
+      "base": "0e88ea9ea32f439e777241777a3ef27b26571479",
+      "head": "a29f0e3d64ef2eb466e6034617d2132c4c613915",
+      "patch": {
+        "path": "work/stack-review/source-disposition-evidence/ohm-rustfmt-17.patch",
+        "sha256": "4fb1437260004e9258b6b37d13e8fec140dbdde68088e1b0d3863aa42e17545c",
+        "bytes": 1939,
+        "mode": "0o644"
+      },
+      "patch_format": "preserved GitHub complete one-file unified hunk; exact record also bound",
+      "stats": [
+        {
+          "path": "src/cargo-fmt/incremental.rs",
+          "added": 32,
+          "removed": 2
+        }
+      ],
+      "production_files": [
+        {
+          "path": "src/cargo-fmt/incremental.rs",
+          "pin": "a21f2ab199a5f86ea88535e2a5f888d9e1c67edb",
+          "git_blob": "1724612c8afbb6a762534d629730b546b6cd7544",
+          "git_mode": "100644",
+          "sha256": "1d840911865a9c4effb8174906953c43dd7512957046eeb6407990602de05162",
+          "bytes": 131325,
+          "snapshot": "/private/tmp/ohm-stack-review-tools/ohm-rustfmt/src/cargo-fmt/incremental.rs",
+          "matches_accepted_full_manifest": true,
+          "pr_head_git_blob": "c626d09057d4958d500586cce80c1612d678ea6e",
+          "unchanged_since_pr_head": false
+        }
+      ],
+      "historical_body": "Stop walking configuration ancestors when we reach a directory already visited for the same workspace snapshot. Previously, each source directory repeated the remaining walk to the root.\n\nNearest-configuration precedence and detection of newly created configuration files are unchanged.\n"
+    }
+  ],
+  "current_source": [
+    {
+      "path": "compiler/rustc_type_ir/src/fast_reject.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "7256c44cae3a1022208e3583088abb98d01b154b",
+      "git_mode": "100644",
+      "sha256": "38b79dfc54bfb1225212c83b3ebefd2d82fcdb50f2e1c1d05a5b6d867f23aa74",
+      "bytes": 22205,
+      "selected_lines": {
+        "fn args_may_unify_inner": [
+          {
+            "line": 228,
+            "text": "    fn args_may_unify_inner("
+          }
+        ],
+        "fn args_may_unify_many": [
+          {
+            "line": 242,
+            "text": "    fn args_may_unify_many("
+          }
+        ],
+        "fn arg_may_unify": [
+          {
+            "line": 256,
+            "text": "    fn arg_may_unify(self, obl: I::GenericArg, imp: I::GenericArg, depth: usize) -> bool {"
+          }
+        ],
+        "fn types_may_unify_structurally": [
+          {
+            "line": 324,
+            "text": "    fn types_may_unify_structurally(self, lhs: I::Ty, rhs: I::Ty, depth: usize) -> bool {"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_data_structures/src/obligation_forest/mod.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "83cbc428ea57e056c02fc3511113f51b0ea64819",
+      "git_mode": "100644",
+      "sha256": "1a8152fec3860a1462755ccaa57866e9b907675b9acd04d909cefc4b6ad78a0e",
+      "bytes": 29782,
+      "selected_lines": {
+        "dependents: SmallVec": [
+          {
+            "line": 203,
+            "text": "    dependents: SmallVec<[usize; 2]>,"
+          }
+        ],
+        "dependents: if let": [
+          {
+            "line": 221,
+            "text": "            dependents: if let Some(parent_index) = parent {"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "2f19b4cc544b4585204cc564d65c0d9982cdde38",
+      "git_mode": "100644",
+      "sha256": "1eeb33e0615669da0cfedc9d5206b6b52bd5de1ae6b616f5e5ce526c87d69886",
+      "bytes": 59682,
+      "selected_lines": {
+        "if (MergeFunctions &&": [
+          {
+            "line": 805,
+            "text": "  if (MergeFunctions && IsPreLink && !NoPrepopulatePasses && !PGOOpt &&"
+          }
+        ],
+        "Phase == ThinOrFullLTOPhase::ThinLTOPreLink": [
+          {
+            "line": 813,
+            "text": "              Phase == ThinOrFullLTOPhase::ThinLTOPreLink)"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_borrowck/src/dataflow.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "e48ce293b5d58f6c7fc90c0d0fcd8c7b4119a031",
+      "git_mode": "100644",
+      "sha256": "8141eedaee3875b931823031edf2b6dc6ec99a51aa1195e846be44c4544b0943",
+      "bytes": 24806,
+      "selected_lines": {
+        "fn clone_from": [
+          {
+            "line": 174,
+            "text": "    fn clone_from(&mut self, source: &Self) {"
+          }
+        ],
+        "self.borrows.domain_size()": [
+          {
+            "line": 177,
+            "text": "        if self.borrows.domain_size() == source.borrows.domain_size()"
+          }
+        ],
+        "self.borrows.borrow_set.len() != 0": [
+          {
+            "line": 52,
+            "text": "        if self.borrows.borrow_set.len() != 0 {"
+          },
+          {
+            "line": 65,
+            "text": "        if self.borrows.borrow_set.len() != 0 {"
+          },
+          {
+            "line": 78,
+            "text": "        if self.borrows.borrow_set.len() != 0 {"
+          },
+          {
+            "line": 91,
+            "text": "        if self.borrows.borrow_set.len() != 0 {"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_middle/src/mir/terminator.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "56e17be3577283a7a65f02ad4263a92f7494f3fc",
+      "git_mode": "100644",
+      "sha256": "b34c5b149651a25a1d06fb72e93c5b0137f491342eea2ea726f187284819af2c",
+      "bytes": 33256,
+      "selected_lines": {
+        "return_: Cow<'mir": [
+          {
+            "line": 696,
+            "text": "        return_: Cow<'mir, [BasicBlock]>,"
+          }
+        ],
+        "return_: Cow::Owned": [
+          {
+            "line": 767,
+            "text": "                    return_: Cow::Owned([target].into_iter().chain(drop.into_iter()).collect()),"
+          }
+        ],
+        "return_: Cow::Borrowed": [
+          {
+            "line": 782,
+            "text": "                return_: Cow::Borrowed(target.as_slice()),"
+          },
+          {
+            "line": 796,
+            "text": "                return_: Cow::Borrowed(targets),"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_middle/src/ty/context.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "72f7353c488346aa046c045b4220272b9780e94a",
+      "git_mode": "100644",
+      "sha256": "2f308d07b7793e9d168a9638d24a6978ead91d35383550d201ce586373ea5128",
+      "bytes": 123433,
+      "selected_lines": {
+        "pub fn is_sizedness_trait": [
+          {
+            "line": 1006,
+            "text": "    pub fn is_sizedness_trait(self, def_id: DefId) -> bool {"
+          }
+        ],
+        "pub fn reuse_or_mk_predicate": [
+          {
+            "line": 2284,
+            "text": "    pub fn reuse_or_mk_predicate("
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_trait_selection/src/traits/wf.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "0d84ccd243ef4e3a1561ecd6ef0bdc9a3aac6379",
+      "git_mode": "100644",
+      "sha256": "17a2972f8b2caa6aedda54f66a4b2194d078d79e604bff2003bf2ea4cc2da633",
+      "bytes": 54698,
+      "selected_lines": {
+        "Return the existing list": [
+          {
+            "line": 350,
+            "text": "        // Return the existing list when resolution and normalization have no work."
+          }
+        ],
+        "let flags = ty::TypeFlags::HAS_ALIAS": [
+          {
+            "line": 352,
+            "text": "        let flags = ty::TypeFlags::HAS_ALIAS"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_borrowck/src/handle_placeholders.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "7e8a75ab8b7da88e9e587f7264e902818593828a",
+      "git_mode": "100644",
+      "sha256": "1acb0163ddaecff1b647182266eb923d5865405ed15c008cb183bd91ea07b269",
+      "bytes": 18567,
+      "selected_lines": {
+        "pub(crate) constraint_graph": [
+          {
+            "line": 30,
+            "text": "    pub(crate) constraint_graph: Frozen<NormalConstraintGraph>,"
+          }
+        ],
+        "We changed the constraint set": [
+          {
+            "line": 354,
+            "text": "        // We changed the constraint set and so must recompute SCCs."
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_hir_typeck/src/check.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "bfab52c5083fdbae6e86b3a757b7bd913db56dc7",
+      "git_mode": "100644",
+      "sha256": "2bc2ca616684e2c00b993a10579a8c58ae9d251f10a946ab2aaed234c484cbd7",
+      "bytes": 10199,
+      "selected_lines": {
+        "let known_input_tys": [
+          {
+            "line": 54,
+            "text": "    let known_input_tys = (!fn_sig.c_variadic() && !tcx.is_typeck_child(fn_def_id.to_def_id()))"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_hir_typeck/src/gather_locals.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "4f70093f74d253a60fdd6370fa40fa4df1d5a0fa",
+      "git_mode": "100644",
+      "sha256": "2152f2aadb698244ec6a569ae92cbf4e8a72ac3eff12f944fc78e23590d3df53",
+      "bytes": 9978,
+      "selected_lines": {
+        "if let Some(known_ty)": [
+          {
+            "line": 103,
+            "text": "        if let Some(known_ty) = known_ty"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_hir_typeck/src/fallback.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "1e17de52f436d453de4082a48032987c1cb79179",
+      "git_mode": "100644",
+      "sha256": "59d4d3ccaabd4049db236568d615ecbe43bfe1f1c745ac365c4f4c323fee8beb",
+      "bytes": 31203,
+      "selected_lines": {
+        "self.diverging_type_vars.borrow().is_empty()": [
+          {
+            "line": 223,
+            "text": "        if self.diverging_type_vars.borrow().is_empty() {"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "4625b3adaaa57368e955d4dbb764f6d1a87370f3",
+      "git_mode": "100644",
+      "sha256": "eda1888f0f1f69041a0c7d8dd362f6cfeaf5aa7c803bee1a6655388ec93c9ab7",
+      "bytes": 69194,
+      "selected_lines": {
+        "Fulfillment skips this obligation": [
+          {
+            "line": 519,
+            "text": "            // Fulfillment skips this obligation for types known to be Sized."
+          }
+        ],
+        "Fulfillment immediately discards": [
+          {
+            "line": 693,
+            "text": "        // Fulfillment immediately discards trivially well-formed terms. Avoid"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_hir_typeck/src/loops.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "993dd8457c0b8dd5db9c669f554ab53c8546ae0e",
+      "git_mode": "100644",
+      "sha256": "7b2d075d0eff0369a7c4f6a105ef02e964a58945710e75ac85e5950c554d9976",
+      "bytes": 18165,
+      "selected_lines": {
+        "if !tcx.hir_owner_nodes": [
+          {
+            "line": 89,
+            "text": "    if !tcx.hir_owner_nodes(body.value.hir_id.owner).nodes.iter().any(|node| {"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_hir_typeck/src/writeback.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "e5997f797840725fe68cd22d851ff549e879b3c3",
+      "git_mode": "100644",
+      "sha256": "0b30332d478a0db923076af4d9a36da6d044714658147a925df263e0ad3d0ec5",
+      "bytes": 44505,
+      "selected_lines": {
+        "if !self.tcx().features().generic_const_exprs()": [
+          {
+            "line": 841,
+            "text": "        if !self.tcx().features().generic_const_exprs()"
+          }
+        ]
+      }
+    },
+    {
+      "path": "compiler/rustc_privacy/src/lib.rs",
+      "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+      "git_blob": "4f6465938e0ab3c6e86192896c729eb0c13d7898",
+      "git_mode": "100644",
+      "sha256": "19f736f9da9214d0d102bda1d14b41116e8e04f077d6d496b4843e44e69dbc42",
+      "bytes": 75761,
+      "selected_lines": {
+        "if tcx.features().rustc_attrs()": [
+          {
+            "line": 1885,
+            "text": "    if tcx.features().rustc_attrs() {"
+          }
+        ]
+      }
+    },
+    {
+      "path": "src/compiler/fingerprint/dep_info.rs",
+      "pin": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+      "git_blob": "e55cf67e6f5eb0c4bdf5ee9894d316c658b9a460",
+      "git_mode": "100644",
+      "sha256": "b6e10eb8f6826f20a4fb9032a17420b3573a7c694887c7b8ce9490208ea358cd",
+      "bytes": 34058,
+      "selected_lines": {
+        "pub fn compute": [
+          {
+            "line": 651,
+            "text": "    pub fn compute("
+          }
+        ],
+        "assert!(!buf.is_empty())": [
+          {
+            "line": 656,
+            "text": "        assert!(!buf.is_empty());"
+          }
+        ]
+      }
+    },
+    {
+      "path": "src/compiler/fingerprint/mod.rs",
+      "pin": "018a2b93409433dc5bc05c5fce838ae69e9bc396",
+      "git_blob": "50b64e062f2fad1f3ff2bf501f139a6af817651b",
+      "git_mode": "100644",
+      "sha256": "05758a71f6761fc092871beea6cb8da4e716dfe03e4bd4cea82aba4adbb92718",
+      "bytes": 166979,
+      "selected_lines": {
+        "let mut checksum_buffer = Vec::new()": [
+          {
+            "line": 3248,
+            "text": "    let mut checksum_buffer = Vec::new();"
+          }
+        ],
+        "checksum_buffer.resize(64 * 1024": [
+          {
+            "line": 3290,
+            "text": "                    checksum_buffer.resize(64 * 1024, 0);"
+          }
+        ],
+        "Checksum::compute(prior_checksum": [
+          {
+            "line": 3292,
+            "text": "                        Checksum::compute(prior_checksum.algo(), file, &mut checksum_buffer)"
+          }
+        ]
+      }
+    },
+    {
+      "path": "clippy_lints/src/misc.rs",
+      "pin": "f52143702ff1f265014e87d5e6853e70a3b15728",
+      "git_blob": "7ce0f68678957523aba152e0ef0d531c97b8fa75",
+      "git_mode": "100644",
+      "sha256": "d55510aa80407fed6fb143f2fbee0ce657b1f410a6a419ca31f9c8f778e86faa",
+      "bytes": 8641,
+      "snapshot": "/private/tmp/ohm-stack-review-tools/ohm-rust-clippy/clippy_lints/src/misc.rs",
+      "matches_accepted_full_manifest": true,
+      "pr_head_git_blob": "7ce0f68678957523aba152e0ef0d531c97b8fa75",
+      "unchanged_since_pr_head": true,
+      "selected_lines": {
+        "fn in_ignored_context": [
+          {
+            "line": 136,
+            "text": "fn in_ignored_context(cx: &LateContext<'_>, expr: &Expr<'_>) -> bool {"
+          }
+        ],
+        "fn is_underscore_prefixed": [
+          {
+            "line": 142,
+            "text": "fn is_underscore_prefixed(name: Symbol) -> bool {"
+          }
+        ],
+        "fn used_underscore_items": [
+          {
+            "line": 147,
+            "text": "fn used_underscore_items<'tcx>(cx: &LateContext<'tcx>, expr: &'tcx Expr<'_>) {"
+          }
+        ],
+        "fn used_underscore_binding": [
+          {
+            "line": 200,
+            "text": "fn used_underscore_binding<'tcx>(cx: &LateContext<'tcx>, expr: &'tcx Expr<'_>) {"
+          }
+        ]
+      }
+    },
+    {
+      "path": "src/cargo-fmt/incremental.rs",
+      "pin": "a21f2ab199a5f86ea88535e2a5f888d9e1c67edb",
+      "git_blob": "1724612c8afbb6a762534d629730b546b6cd7544",
+      "git_mode": "100644",
+      "sha256": "1d840911865a9c4effb8174906953c43dd7512957046eeb6407990602de05162",
+      "bytes": 131325,
+      "snapshot": "/private/tmp/ohm-stack-review-tools/ohm-rustfmt/src/cargo-fmt/incremental.rs",
+      "matches_accepted_full_manifest": true,
+      "pr_head_git_blob": "c626d09057d4958d500586cce80c1612d678ea6e",
+      "unchanged_since_pr_head": false,
+      "selected_lines": {
+        "let mut visited_directories = BTreeSet::new()": [
+          {
+            "line": 1009,
+            "text": "        let mut visited_directories = BTreeSet::new();"
+          }
+        ],
+        "fn collect_ancestor_configuration": [
+          {
+            "line": 1334,
+            "text": "fn collect_ancestor_configuration("
+          }
+        ],
+        "if visited.contains(ancestor)": [
+          {
+            "line": 1342,
+            "text": "        if visited.contains(ancestor) {"
+          }
+        ],
+        "fn ancestor_configuration_discovers_nested_and_newly_created_files": [
+          {
+            "line": 2587,
+            "text": "    fn ancestor_configuration_discovers_nested_and_newly_created_files() -> io::Result<()> {"
+          }
+        ]
+      }
+    }
+  ],
+  "fixed_upstream_source": [
+    {
+      "path": "compiler/rustc_type_ir/src/fast_reject.rs",
+      "pin": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "git_blob": "9b50657b6b8b15738b03bb89690ca19f7ce0516b",
+      "git_mode": "100644",
+      "sha256": "a5e46e03a5bf99d26ed69280ecc14faba32a32a967818597fa3899489a9fe9fb",
+      "bytes": 21417,
+      "selected_lines": {
+        "Specialize the common `(1, 1)` case": [
+          {
+            "line": 250,
+            "text": "        // Specialize the common `(1, 1)` case to avoid iterator machinery."
+          }
+        ],
+        "if let ([obl], [imp])": [
+          {
+            "line": 251,
+            "text": "        if let ([obl], [imp]) = (obligation_args.as_slice(), impl_args.as_slice()) {"
+          }
+        ],
+        "if lhs == rhs": [
+          {
+            "line": 259,
+            "text": "        if lhs == rhs {"
+          },
+          {
+            "line": 343,
+            "text": "                matches!(rhs.kind(), ty::Placeholder(rhs) if lhs == rhs)"
+          },
+          {
+            "line": 519,
+            "text": "                matches!(rhs.kind(), ty::ConstKind::Placeholder(rhs) if lhs == rhs)"
+          }
+        ],
+        "fn arg_may_unify": [],
+        "fn types_may_unify_structurally": []
+      }
+    },
+    {
+      "path": "compiler/rustc_data_structures/src/obligation_forest/mod.rs",
+      "pin": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "git_blob": "83cfa027cc3df9b7c738109735b9f9969fbf6a73",
+      "git_mode": "100644",
+      "sha256": "ad94d4fbf7835d9ae89481706d75081801e14fe04e3cd2120249904240c57ac9",
+      "bytes": 28589,
+      "selected_lines": {
+        "dependents: Vec<usize>": [
+          {
+            "line": 193,
+            "text": "    dependents: Vec<usize>,"
+          }
+        ],
+        "dependents: SmallVec": []
+      }
+    },
+    {
+      "path": "compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp",
+      "pin": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "git_blob": "3ad59c53a5bf3343066893a6db58f3fccaff1a2c",
+      "git_mode": "100644",
+      "sha256": "7af1e74418311929571988ef9af28af5429d7012c3d6e845545b783c09916433",
+      "bytes": 58343,
+      "selected_lines": {
+        "Merge canonicalized bodies before global cleanup": [],
+        "Phase == ThinOrFullLTOPhase::ThinLTOPreLink": []
+      }
+    },
+    {
+      "path": "src/compiler/fingerprint/dep_info.rs",
+      "pin": "5f94df4789f005f9a352888e8355ffc645b7ed0e",
+      "git_blob": "3051f8f5714f7a7023ce48d4dea03cf1f2e4a67f",
+      "git_mode": "100644",
+      "sha256": "c0cec5e57d00c63d7e22fc71abc719fe0e6515d9724edd1af51fe3c07bb29466",
+      "bytes": 28090,
+      "selected_lines": {
+        "pub fn compute": [
+          {
+            "line": 570,
+            "text": "    pub fn compute(algo: ChecksumAlgo, contents: impl Read) -> Result<Self, io::Error> {"
+          }
+        ],
+        "16 * 1024": [
+          {
+            "line": 573,
+            "text": "        let mut buf = vec![0; 16 * 1024];"
+          }
+        ],
+        "assert!(!buf.is_empty())": []
+      }
+    }
+  ],
+  "empty_layers": [
+    {
+      "repo": "ohm-cargo",
+      "pr": 56,
+      "base": "d75606fa80966b4107d7625e4279c5f400307428",
+      "head": "582e6bc069f9f03b3895e4f854e2c3a399a341f0",
+      "base_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "head_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-cargo",
+      "pr": 57,
+      "base": "582e6bc069f9f03b3895e4f854e2c3a399a341f0",
+      "head": "0cf1cfc346c406cd3fc1a94cc0f21586953e9b6a",
+      "base_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "head_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-cargo",
+      "pr": 58,
+      "base": "0cf1cfc346c406cd3fc1a94cc0f21586953e9b6a",
+      "head": "e42df716454ca9387245a022dabae46738084340",
+      "base_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "head_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-cargo",
+      "pr": 59,
+      "base": "e42df716454ca9387245a022dabae46738084340",
+      "head": "ad86be59ebda9918fdffe4734190d523a52ac141",
+      "base_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "head_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-cargo",
+      "pr": 60,
+      "base": "ad86be59ebda9918fdffe4734190d523a52ac141",
+      "head": "309b42ea09bfbc6bf44ffb8427245ecd33a4f47a",
+      "base_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "head_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-cargo",
+      "pr": 62,
+      "base": "309b42ea09bfbc6bf44ffb8427245ecd33a4f47a",
+      "head": "1aa507d75fd9e90bc0246551e5a559d225b56381",
+      "base_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "head_tree": "acda62f38b3de0bb4b1cae10c972e7842e6bc676",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-cargo",
+      "pr": 63,
+      "base": "b8dcafd99077e0ac46d5a0fcd1b119711677677b",
+      "head": "4c5b0f38185d8346339c1290c411822398ec0390",
+      "base_tree": "2fcb5a5c03cb478d9f16feaac7b22cdedc94fae5",
+      "head_tree": "2fcb5a5c03cb478d9f16feaac7b22cdedc94fae5",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-cargo",
+      "pr": 64,
+      "base": "4c5b0f38185d8346339c1290c411822398ec0390",
+      "head": "4138f17c0f7f96374cd47056a1d155e89d394291",
+      "base_tree": "2fcb5a5c03cb478d9f16feaac7b22cdedc94fae5",
+      "head_tree": "2fcb5a5c03cb478d9f16feaac7b22cdedc94fae5",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust-clippy",
+      "pr": 36,
+      "base": "780c0d355ef3fb260a066b76cbf84361a966eb63",
+      "head": "544cbb2e4a9fd4b3966841f8ae864fe633178b2c",
+      "base_tree": "70e053eb4a0f9f4854738cd49b304c08667d74f8",
+      "head_tree": "70e053eb4a0f9f4854738cd49b304c08667d74f8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust-clippy",
+      "pr": 37,
+      "base": "acf09bc08984f9004cebbb233601fcf0b284a067",
+      "head": "780c0d355ef3fb260a066b76cbf84361a966eb63",
+      "base_tree": "70e053eb4a0f9f4854738cd49b304c08667d74f8",
+      "head_tree": "70e053eb4a0f9f4854738cd49b304c08667d74f8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust-clippy",
+      "pr": 39,
+      "base": "544cbb2e4a9fd4b3966841f8ae864fe633178b2c",
+      "head": "cb3b4e13e3740bdb9b4ab6acfd4b42b109966adb",
+      "base_tree": "70e053eb4a0f9f4854738cd49b304c08667d74f8",
+      "head_tree": "70e053eb4a0f9f4854738cd49b304c08667d74f8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust-clippy",
+      "pr": 40,
+      "base": "cb3b4e13e3740bdb9b4ab6acfd4b42b109966adb",
+      "head": "d76bc275247216ab0174a7bb5048d6d35ba34202",
+      "base_tree": "70e053eb4a0f9f4854738cd49b304c08667d74f8",
+      "head_tree": "70e053eb4a0f9f4854738cd49b304c08667d74f8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust-clippy",
+      "pr": 42,
+      "base": "7a06fab3512a6fbed91fa101bb11195687e85ec5",
+      "head": "88b173d907c1e6570ad3be040b4ba89be2caf974",
+      "base_tree": "426f60a415783decb80ed12e3a07160f5f8c9455",
+      "head_tree": "426f60a415783decb80ed12e3a07160f5f8c9455",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust-clippy",
+      "pr": 43,
+      "base": "88b173d907c1e6570ad3be040b4ba89be2caf974",
+      "head": "4a88eb92dfe5408888255caab322ff0c1120263f",
+      "base_tree": "426f60a415783decb80ed12e3a07160f5f8c9455",
+      "head_tree": "426f60a415783decb80ed12e3a07160f5f8c9455",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust-clippy",
+      "pr": 45,
+      "base": "24183741525754579acbbc865c71b4524a1ded31",
+      "head": "e70e5850d051fb217e1d9c27ce6516888cf3dbef",
+      "base_tree": "cdbb64963f68dc61d0c19987beaab80a14e5a94d",
+      "head_tree": "cdbb64963f68dc61d0c19987beaab80a14e5a94d",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "756df2d5bfdc7d7a55c9c52deb3b8f80c3de74b3",
+      "base": "d15cbc1e2e7fbfce49cfe180124b2d7bf2f21948",
+      "subject": "Pin Cargo with older-sysroot linker compatibility",
+      "base_tree": "6b68a9dbbd30aec5ff5c9c4f540ea2bcac644ae8",
+      "head_tree": "6b68a9dbbd30aec5ff5c9c4f540ea2bcac644ae8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "f74992b28f71a6c003e492c20e7ef537f65d306b",
+      "base": "6d91ddaf049bf07d8598557a15c8a1b188f2649d",
+      "subject": "Pin Cargo with the Linux Wild default for Ohm revision 10",
+      "base_tree": "f6bd58227d90a6b8f5a600adc94b13619cc21872",
+      "head_tree": "f6bd58227d90a6b8f5a600adc94b13619cc21872",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "6fa17f7186da9a90efcd1b0bef4c0353b0b5ef49",
+      "base": "03b9bfc37339a55b957e846d96b860e4c703626c",
+      "subject": "Add lock-free root fast paths to hygiene queries",
+      "base_tree": "d57b63755bc3d5a5b5b420019a266ae5ca2e51e8",
+      "head_tree": "d57b63755bc3d5a5b5b420019a266ae5ca2e51e8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "03b9bfc37339a55b957e846d96b860e4c703626c",
+      "base": "bb00623b60a40bd417beb9eb3a7566839c4d5a72",
+      "subject": "perf: Avoid a heap allocation per basic block in MoveData's location maps",
+      "base_tree": "d57b63755bc3d5a5b5b420019a266ae5ca2e51e8",
+      "head_tree": "d57b63755bc3d5a5b5b420019a266ae5ca2e51e8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "bb00623b60a40bd417beb9eb3a7566839c4d5a72",
+      "base": "455ceebb7f92682c696e076eb05a7ba7430aa853",
+      "subject": "perf: dep_graph: deduplicate task reads with an epoch-filtered index recorder",
+      "base_tree": "d57b63755bc3d5a5b5b420019a266ae5ca2e51e8",
+      "head_tree": "d57b63755bc3d5a5b5b420019a266ae5ca2e51e8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "455ceebb7f92682c696e076eb05a7ba7430aa853",
+      "base": "042601664d7a739e967465862ca09fb3529e389b",
+      "subject": "Rework read deduplication with pooled read recorders",
+      "base_tree": "d57b63755bc3d5a5b5b420019a266ae5ca2e51e8",
+      "head_tree": "d57b63755bc3d5a5b5b420019a266ae5ca2e51e8",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "1cfd6e9f3b5d0c0f6c94776bbaf381ebc0073d2b",
+      "base": "71157549d3364d8608c5c3bf97a3399c0be8df30",
+      "subject": "Avoid allocating when compiler strings need no escaping",
+      "base_tree": "5101712d9483e827986f8424f578dd95f0fba4eb",
+      "head_tree": "5101712d9483e827986f8424f578dd95f0fba4eb",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "71157549d3364d8608c5c3bf97a3399c0be8df30",
+      "base": "65af1776f56dbaeb7a9288b5c9c39259e70d484a",
+      "subject": "Cache successful privacy walks within each module",
+      "base_tree": "5101712d9483e827986f8424f578dd95f0fba4eb",
+      "head_tree": "5101712d9483e827986f8424f578dd95f0fba4eb",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "65af1776f56dbaeb7a9288b5c9c39259e70d484a",
+      "base": "65e2324da2b72da80f697c11c86647a03b1e5c59",
+      "subject": "Skip irrelevant foreign specialization impls",
+      "base_tree": "5101712d9483e827986f8424f578dd95f0fba4eb",
+      "head_tree": "5101712d9483e827986f8424f578dd95f0fba4eb",
+      "tree_equal": true,
+      "changed_files": 0
+    },
+    {
+      "repo": "ohm-rust",
+      "head": "7ed482387ae13ef733d0f3bdc585bc639ec343f1",
+      "base": "d9aa2a6187b9028f15ad1e7e80858b315778393a",
+      "subject": "Skip query machinery when promoting disk-cached values",
+      "base_tree": "b68615206867a119eb017c325d6ef7dd06f9ff28",
+      "head_tree": "b68615206867a119eb017c325d6ef7dd06f9ff28",
+      "tree_equal": true,
+      "changed_files": 0
+    }
+  ],
+  "nonempty_boundary": {
+    "pr": 61,
+    "base": "1aa507d75fd9e90bc0246551e5a559d225b56381",
+    "head": "b8dcafd99077e0ac46d5a0fcd1b119711677677b",
+    "numstat": [
+      "49\t9\tsrc/workspace/parser/mod.rs",
+      "31\t0\ttests/testsuite/registry.rs"
+    ]
+  },
+  "clippy_41_old_source_ancestry": {
+    "fixed_upstream_ancestor": "4f71bb82b597220d9ee619738499c9bf65616595",
+    "unchanged_path": "clippy_lints/src/misc.rs",
+    "commits": [
+      {
+        "sha": "d76bc275247216ab0174a7bb5048d6d35ba34202",
+        "changed_paths": []
+      },
+      {
+        "sha": "cb3b4e13e3740bdb9b4ab6acfd4b42b109966adb",
+        "changed_paths": []
+      },
+      {
+        "sha": "544cbb2e4a9fd4b3966841f8ae864fe633178b2c",
+        "changed_paths": []
+      },
+      {
+        "sha": "780c0d355ef3fb260a066b76cbf84361a966eb63",
+        "changed_paths": []
+      },
+      {
+        "sha": "acf09bc08984f9004cebbb233601fcf0b284a067",
+        "changed_paths": [
+          "clippy_lints/src/redundant_clone.rs",
+          "tests/ui/redundant_clone.fixed",
+          "tests/ui/redundant_clone.rs",
+          "tests/ui/redundant_clone.stderr"
+        ]
+      },
+      {
+        "sha": "56c9ea6b08c131ebdb85523cfcca8c6f7542cc42",
+        "changed_paths": [
+          ".github/workflows/ci.yml"
+        ]
+      },
+      {
+        "sha": "a85f218a2fae29efd0468e332edbf59a05000dae",
+        "changed_paths": [
+          ".github/workflows/ci.yml",
+          "clippy_utils/src/ast_utils/mod.rs"
+        ]
+      },
+      {
+        "sha": "2720f6df26c43186b2f5919b457c9540a8a5e623",
+        "changed_paths": [
+          ".github/workflows/ci.yml",
+          "rust-toolchain.toml"
+        ]
+      },
+      {
+        "sha": "5696c7367ad37df5083597bd859dea141640f851",
+        "changed_paths": [
+          "README.md",
+          "clippy_dev/src/generate.rs",
+          "clippy_dev/src/main.rs"
+        ]
+      },
+      {
+        "sha": "8abefda83e32ba0a53554b48819f2274230e9a24",
+        "changed_paths": [
+          ".github/workflows/ci.yml"
+        ]
+      },
+      {
+        "sha": "55bbc0d0ef6b960db1410600a19f6afe6fe95fc4",
+        "changed_paths": [
+          ".github/workflows/ci.yml",
+          "rust-toolchain.toml"
+        ]
+      },
+      {
+        "sha": "bca652421b306eb1a82a9bcb437af772a76e6dd1",
+        "changed_paths": [
+          ".github/workflows/ci.yml"
+        ]
+      },
+      {
+        "sha": "9cf753eeed61db7ddc30288ee93baad48982f972",
+        "changed_paths": [
+          ".github/workflows/ci.yml",
+          ".github/workflows/clippy_changelog.yml",
+          ".github/workflows/clippy_dev.yml",
+          ".github/workflows/clippy_mq.yml",
+          ".github/workflows/clippy_pr.yml",
+          ".github/workflows/deploy.yml",
+          ".github/workflows/lintcheck.yml",
+          ".github/workflows/lintcheck_summary.yml",
+          ".github/workflows/remark.yml",
+          "clippy_lints/src/mutable_debug_assertion.rs",
+          "clippy_lints/src/non_copy_const.rs",
+          "rust-toolchain.toml"
+        ]
+      }
+    ]
+  },
+  "rustfmt_package_only_scope": {
+    "source": {
+      "path": "work/stack-ablation/variants/rustfmt/src/cargo-fmt/incremental.rs",
+      "sha256": "1f6d37bb6837d4268301844b120b60d369449dcd7fb283dc83feff9fdaa749db",
+      "bytes": 105967,
+      "mode": "0o644"
+    },
+    "retains_rustfmt_17_guard": true
+  },
+  "coverage_limits": {
+    "semantic_arm": [
+      84,
+      110,
+      117
+    ],
+    "const_impl_index_arm": "#103 plus #104 trait_def/specialization_graph consumer only",
+    "not_attributed_by_these_arms": [
+      "#100",
+      "#85",
+      "#108",
+      "#104 remainder",
+      "#112"
+    ],
+    "historical_measurements_only": true
+  },
+  "empty_rust_first_parent_audit": {
+    "base": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+    "pin": "348339ddae4288ebb3af97d204b19479fef8f5f2",
+    "examined_commits": 144,
+    "empty_count": 10,
+    "scope": "Exactly frozen release first-parent source history; no live refs or source removal"
+  },
+  "clippy_ordinary_scope": {
+    "source_path": "work/stack-ablation/variants/clippy/clippy_lints/src/misc.rs",
+    "sha256": "d55510aa80407fed6fb143f2fbee0ce657b1f410a6a419ca31f9c8f778e86faa",
+    "bytes": 8641,
+    "mode": "0o644",
+    "exactly_matches_frozen_full_misc": true,
+    "retains_clippy_41": true
+  },
+  "proposed_dispositions": [
+    {
+      "candidate": "Rust100",
+      "disposition": "drop-layout/upstream-minimal-identity"
+    },
+    {
+      "candidate": "Rust85",
+      "disposition": "upstream-or-drop-container/retain-independent-test"
+    },
+    {
+      "candidate": "Rust108",
+      "disposition": "drop-custom-callback"
+    },
+    {
+      "candidate": "Rust104 remainder",
+      "disposition": "upstream-clone-and-lang-item-refactors/drop-Cow-inline-and-WF-shortcuts"
+    },
+    {
+      "candidate": "Rust112",
+      "disposition": "upstream-graph-and-test-visitor-guard/drop-other-shortcuts"
+    },
+    {
+      "candidate": "Clippy41",
+      "disposition": "upstream-or-fold-local-prefilter"
+    },
+    {
+      "candidate": "rustfmt17",
+      "disposition": "fold-if-package-cache-retained"
+    },
+    {
+      "candidate": "Cargo105",
+      "disposition": "upstream-or-fold-buffer-reuse/drop-size-tuning"
+    },
+    {
+      "candidate": "25 empty frozen commits",
+      "disposition": "drop-only-zero-delta-history-layers"
+    }
+  ]
+}
