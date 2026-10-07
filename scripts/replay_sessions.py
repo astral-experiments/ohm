@@ -596,7 +596,7 @@ class Replay:
         projects = self.options.project or list(PROJECTS)
         for project in projects:
             if project not in selected:
-                candidate = SCENARIO_DIRECTORY / f"{project}.json"
+                candidate = SCENARIO_DIRECTORY / f"{project}-rust-1.99.json"
                 if not candidate.is_file():
                     raise BenchmarkError(
                         f"no {project} session fixture; provide --scenario PATH"
@@ -1508,7 +1508,7 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         help="preserve completed results and restart interrupted cells from fresh artifacts",
     )
-    result.add_argument("--upstream", default="1.98.0")
+    result.add_argument("--upstream", default="1.99.0")
     result.add_argument("--ohm", default="ohm")
     result.add_argument(
         "--feature-matrix",

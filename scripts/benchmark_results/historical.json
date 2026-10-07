@@ -1,57 +1,81 @@
 {
   "rust_version": "1.99.0",
-  "ohm_release": "ohm-1.99.0-1",
+  "ohm_release": "ohm-1.99.0-5",
   "jobs": 8,
   "host": {
     "platform": "linux-x86_64",
-    "id": "linux-study-1",
-    "logical_cpus": 16,
-    "cpu_model": "AMD EPYC-Milan Processor"
+    "id": "charlie-ohm-session-bench",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC-Genoa Processor"
   },
   "provenance": {
-    "runner_sha256": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f",
+    "runner_sha256": "6fbe71d5cf3f9e266fca18e686c0cdbfe71e49b4b9949658f687b2af3ee51739",
     "wrapper": {
       "kind": "historical",
       "arguments": [
         "--upstream",
         "1.99.0",
         "--ohm",
-        "ohm-1.99.0-1",
+        "ohm-1.99.0-5",
         "--jobs",
         "8",
         "--minimum-free-gb",
         "60",
         "--require-idle",
         "--output-dir",
-        "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-1/historical",
+        "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-5/historical",
         "--repetitions",
         "2",
         "--offline",
         "--project",
         "ruff",
         "--scenario",
-        "/home/dev-user/code/oss/ohm-1.99-bench/scripts/session_replays/ruff-historical-rust-1.99.json",
+        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-5/scripts/session_replays/ruff-historical-rust-1.99.json",
         "--source-path",
-        "ruff=/home/dev-user/code/oss/ohm-1.99-bench-data/sources/ruff",
-        "--resume"
+        "ruff=/tmp/ohm-benchmarks-1.99.0-5/data/sources/ruff"
       ],
-      "started_at": 1790916392.4102163,
-      "wrapper_sha256": "7079c6c86081f67c6b2d1ee455154fb8f31a9b7f208798f6452927f52ab1c05f",
+      "started_at": 1792262732.855597,
+      "wrapper_sha256": "ab79b4c2c51e1d95218a00a3913ec4c66d029df820b0c0e199e57666cf1f97eb",
       "runner_sha256": {
         "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
-        "replay_sessions.py": "104334f9ca861b0af1846bf9a6d4dfe05ff8be276f6c9e6137726ba1981c011f"
+        "replay_sessions.py": "6fbe71d5cf3f9e266fca18e686c0cdbfe71e49b4b9949658f687b2af3ee51739"
       },
-      "path": "/home/dev-user/code/oss/ohm-1.99-bench-tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/code/oss/ohm-1.99-bench-tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/.openai/bin:/home/dev-user/.virtualenvs/openai/bin:/home/dev-user/.cargo/bin:/home/dev-user/code/openai/project/dotslash-gen/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
-      "tmpdir": "/tmp/ohm99",
+      "path": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-5/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+      "tmpdir": "/tmp/ohm995",
+      "sanitized_environment": {
+        "CARGO_HOME": "/tmp/codex-cargo-home",
+        "CARGO_NET_OFFLINE": "true",
+        "GIT_CONFIG_COUNT": "2",
+        "GIT_CONFIG_KEY_0": "maintenance.auto",
+        "GIT_CONFIG_KEY_1": "gc.auto",
+        "GIT_CONFIG_VALUE_0": "false",
+        "GIT_CONFIG_VALUE_1": "0",
+        "PATH": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-5/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "RUSTUP_HOME": "/home/dev-user/.rustup",
+        "TMPDIR": "/tmp/ohm995",
+        "UV_CACHE_DIR": "/tmp/codex-uv-cache",
+        "UV_PYTHON": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/python3.12",
+        "UV_PYTHON_DOWNLOADS": "never",
+        "UV_TOOL_BIN_DIR": "/tmp/ohm-benchmarks-1.99.0-5/tools/uv-bin",
+        "UV_TOOL_DIR": "/tmp/ohm-benchmarks-1.99.0-5/tools/uv-tools"
+      },
       "git_maintenance": {
         "maintenance.auto": false,
         "gc.auto": 0,
         "scope": "benchmark process environment only"
       },
-      "coordinator_commit": "6efdd59ea2f58a39a7e9c9f9f6385222d3046025",
-      "manifest_sha256": "4656f7d64c511273f6cb72ddbca6417504a699bc4b70c0a71dda4ba13c2dd5c1",
+      "coordinator_commit": "31689f052811f815de715ba575386d92a0f40c4b",
+      "manifest_sha256": "5c92ee96b63f196fac7292b7b63f1d4b406c77ec09f04489bd89d4064d5f78f1",
       "fixtures": {
         "scripts/session_replays/ruff-historical-rust-1.99.json": "ae6489113bbcb5d87fd62501503c5b7cb7fc008ef1746d7f5ac188d1003908b4"
+      },
+      "post_cell_audit": {
+        "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
+        "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
+        "process_inspector_sha256": "1ed8219cea7abdfbd63984880af72147afe05ff75053e374960f02dc86c257ac",
+        "timing_boundary": "after persisted run_session, before next cell",
+        "retirement": "exclusive per-cell target and shared-build leaves only",
+        "quiet_seconds_after_retirement": 30
       }
     },
     "toolchains": {
@@ -77,26 +101,26 @@
           "sha256": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3"
         }
       },
-      "ohm-1.99.0-1": {
+      "ohm-1.99.0-5": {
         "cargo": {
-          "version": "cargo 1.99.0-dev (018a2b934 2026-10-01) (ohm-1.99.0-1)",
-          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-1/bin/cargo",
-          "sha256": "1927ee1f8a5cec4f7d7335bc51336ac274fdaee496600d392dce9a267ff6461d"
+          "version": "cargo 1.99.0-dev (78f286eda 2026-10-17) (ohm-1.99.0-5)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-5/bin/cargo",
+          "sha256": "5aeedfb1279e35710eb4a355cc0db95b5b800c50a0b77b1321158b4f7c1abbf9"
         },
         "rustc": {
-          "version": "rustc 1.99.0-dev (348339dda 2026-10-01) (ohm-1.99.0-1)",
-          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-1/bin/rustc",
-          "sha256": "b6b19fee2a00fd842b7c97876afec154e2c4eac985f315b0294de9780fd10452"
+          "version": "rustc 1.99.0-dev (9a817f4f9 2026-10-17) (ohm-1.99.0-5)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-5/bin/rustc",
+          "sha256": "a7b0c3b2663c7725f99c9f95ad9d9eab6026c8e9c4f3b051e7539299128e0ddf"
         },
         "clippy-driver": {
-          "version": "clippy 0.1.99 (f52143702f 2026-10-01)",
-          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-1/bin/clippy-driver",
-          "sha256": "df5870c93f49be5ee9ff31f87fa97a03e7ccd13c8b4b39d168c3c588f62a0647"
+          "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-5/bin/clippy-driver",
+          "sha256": "0f05269e1c31f71e4697097dfedf2c404402abbd26245cd095220de4aa3159d4"
         },
         "rustfmt": {
-          "version": "rustfmt 1.10.0-dev (a21f2ab199 2026-10-01)",
-          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-1/bin/rustfmt",
-          "sha256": "c408e41fa20a89c7390ecd500f4bf8c83e876ce7ba5cd1c925f8c3cb0c343c02"
+          "version": "rustfmt 1.10.0-dev (29bfbe020d 2026-10-07)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-5/bin/rustfmt",
+          "sha256": "6165441ee942ca941a14ed7c6679a89099b6d666993fd941585a64828db830ae"
         }
       }
     },
@@ -105,218 +129,176 @@
         "url": "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz",
         "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
         "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
-        "version": "just 1.58.0"
+        "version": "just 1.58.0",
+        "path": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/just"
       },
       "cargo-nextest": {
         "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
         "archive_sha256": "4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3",
         "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
-        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu"
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "path": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/cargo-nextest"
       },
       "uv": {
         "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
         "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
         "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
-        "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)"
+        "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
+        "path": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/uv"
       }
     },
     "python": {
-      "path": "/home/dev-user/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
-      "version": "Python 3.12.13"
+      "version": "Python 3.12.13",
+      "path": "/tmp/ohm-benchmarks-1.99.0-3/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+      "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7"
     },
     "system_cpu": {
       "proof": {
         "passed": true,
         "violations": [],
-        "samples": 1186,
+        "samples": 1101,
         "returncode": 0,
-        "monitor_sha256": "8c7a789ef9f84181e1e0e665279830193d0ac26fc4643594f6ed482f8dcb8210",
-        "trace_sha256": "d048f6ef81d3648948fa5b591e08c23130641ea4e4d6e86c82b370e6ad94a83e"
+        "monitor_sha256": "c45541f3def3cac178f9d3e67e73dcf1f5fc1ebd392c8d6fc33d29b62dc0f636",
+        "trace_sha256": "15d60677247ba2bff8c66dcca74aadcd35405366f5d5e691a49e672a72e2eacd"
       },
-      "preflight_sha256": "6804401250e205ac782efdf5b6c9cc474893986f6d749c374a787c2280439230",
-      "peak_external_user_cpu_fraction": 0.010202729826405854,
-      "peak_external_nonsecurity_cpu_fraction": 0.04979660030603343,
-      "excluded_attempts": [
-        {
-          "phase": "initial warmup",
-          "completed_samples": 0,
-          "passed": false,
-          "proof": {
-            "passed": false,
-            "violations": [
-              {
-                "time": 1790916123.753231,
-                "interval_seconds": 2.060447517898865,
-                "idle_fraction": 0.43940795559666973,
-                "iowait_fraction": 0.009559050262102992,
-                "steal_fraction": 0.0,
-                "external_user_cpu_fraction": 0.1128395642113181,
-                "external_nonsecurity_cpu_fraction": 0.11435622502061002,
-                "external_cpu_fraction": 0.17259600009741938,
-                "external_cpu_contributors": [
-                  {
-                    "pid": 2233443,
-                    "parent": 2233400,
-                    "name": "git",
-                    "ticks": 567,
-                    "start": "62164281",
-                    "state": "R",
-                    "group": 2233399,
-                    "session": 2233399,
-                    "uid": 1000,
-                    "cgroup": "0::/system.slice/devbox-agent-exec-93a19d2b-0e1f-4a82-83bd-c503402671d3.service",
-                    "cpu_ticks": 372
-                  },
-                  {
-                    "pid": 20754,
-                    "parent": 20753,
-                    "name": "falcon-sensor-b",
-                    "ticks": 5577177,
-                    "start": "132238",
-                    "state": "S",
-                    "group": 20753,
-                    "session": 20753,
-                    "uid": 0,
-                    "cgroup": "0::/system.slice/falcon-sensor.service/sensor.falcon",
-                    "cpu_ticks": 192
-                  },
-                  {
-                    "pid": 1,
-                    "parent": 0,
-                    "name": "systemd",
-                    "ticks": 432913,
-                    "start": "265",
-                    "state": "S",
-                    "group": 1,
-                    "session": 1,
-                    "uid": 0,
-                    "cgroup": "0::/init.scope",
-                    "cpu_ticks": 1
-                  },
-                  {
-                    "pid": 387,
-                    "parent": 2,
-                    "name": "jbd2/vda1-8",
-                    "ticks": 5544,
-                    "start": "1280",
-                    "state": "S",
-                    "group": 0,
-                    "session": 0,
-                    "uid": 0,
-                    "cgroup": "0::/",
-                    "cpu_ticks": 1
-                  },
-                  {
-                    "pid": 489141,
-                    "parent": 1,
-                    "name": "devbox-agent",
-                    "ticks": 14024,
-                    "start": "58964900",
-                    "state": "S",
-                    "group": 489141,
-                    "session": 489141,
-                    "uid": 2000,
-                    "cgroup": "0::/system.slice/devbox-agent.service",
-                    "cpu_ticks": 1
-                  },
-                  {
-                    "pid": 1648840,
-                    "parent": 2,
-                    "name": "kworker/9:0-events",
-                    "ticks": 164,
-                    "start": "61680091",
-                    "state": "I",
-                    "group": 0,
-                    "session": 0,
-                    "uid": 0,
-                    "cgroup": "0::/",
-                    "cpu_ticks": 1
-                  },
-                  {
-                    "pid": 4119251,
-                    "parent": 4119241,
-                    "name": "envoy",
-                    "ticks": 32572,
-                    "start": "53246799",
-                    "state": "S",
-                    "group": 4119241,
-                    "session": 4119241,
-                    "uid": 17373,
-                    "cgroup": "0::/system.slice/openai-service-discovery-proxy.service",
-                    "cpu_ticks": 1
-                  }
-                ],
-                "competing_processes": [],
-                "free_bytes": 278034771968,
-                "runner_running": true,
-                "violations": ["unrelated same-user CPU above 5%"]
-              }
-            ],
-            "samples": 26,
-            "returncode": -15,
-            "monitor_sha256": "8c7a789ef9f84181e1e0e665279830193d0ac26fc4643594f6ed482f8dcb8210",
-            "trace_sha256": "436ce81f7fe3264584226b81c0d71dbab7aa1420a05408f4841320fc31ac9b75"
+      "preflight_sha256": "66348d0dd19fbaa2d69e031b07e7c5f40f0e3de24f33864e8c61679bc085a154",
+      "peak_external_user_cpu_fraction": 0.0027568534163873097,
+      "peak_external_nonsecurity_cpu_fraction": 0.017953560667934777,
+      "process_visibility": {
+        "captured_at": 1792249951.3105276,
+        "hostname": "charlie-ohm-session-bench",
+        "pid1_comm": "systemd",
+        "logical_cpus": 32,
+        "affinity": [
+          0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+          20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+        ],
+        "visible_process_count": 420,
+        "procfs_stat_coverage": 420,
+        "procfs_mounts": [
+          "25 29 0:23 / /proc rw,nosuid,nodev,noexec,relatime shared:12 - proc proc rw",
+          "33 24 0:28 / /sys/fs/cgroup rw,nosuid,nodev,noexec,relatime shared:9 - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot"
+        ],
+        "self_cgroup": "0::/user.slice/user-1000.slice/session-1026.scope\n",
+        "pid1_cgroup": "0::/init.scope\n",
+        "virtual_machine": {
+          "command": ["systemd-detect-virt", "--vm"],
+          "returncode": 0,
+          "output": "kvm"
+        },
+        "container": {
+          "command": ["systemd-detect-virt", "--container"],
+          "returncode": 1,
+          "output": "none"
+        },
+        "security_processes": [
+          {
+            "pid": 917,
+            "name": "falcond",
+            "uid": 0,
+            "cgroup": "0::/system.slice/falcon-sensor.service/sensor.falcon"
+          },
+          {
+            "pid": 918,
+            "name": "falcon-sensor-b",
+            "uid": 0,
+            "cgroup": "0::/system.slice/falcon-sensor.service/sensor.falcon"
           }
-        }
-      ]
+        ],
+        "proc_cpu_count": 32,
+        "monitor_sha256": "c45541f3def3cac178f9d3e67e73dcf1f5fc1ebd392c8d6fc33d29b62dc0f636",
+        "passed": true
+      },
+      "process_visibility_sha256": "5e4435de1973858f0ca74fce7577d85da1c157b37bf1601d62a24796eb0ffa86",
+      "monitoring_scope": "Full VM process visibility; original visible-process CPU thresholds with recorded root Falcon-sensor exemption. No container subtraction.",
+      "coverage": {
+        "interval_start": 1792262732.5811088,
+        "interval_end": 1792265039.6212268,
+        "maximum_gap_seconds": 2.4602671439934056,
+        "minimum_free_bytes": 1748622913536
+      }
     },
-    "raw_results_sha256": "e893e18f9e2e03d4eb48a0eb0feccf55ce19f77cc5aa41b84a7ae76853ab7734",
+    "raw_results_sha256": "9b2cb2d6b435fae905b1d52355f31936d3e1b6d4e012e35d1fc5e93a48fad94d",
     "fixtures": {
       "ruff": {
         "tree": "58e4d926cdfc56924b8c2bcc53ca681b4cd0bd20",
         "head": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
         "diff_sha256": "863e22ca9b94cef606b87a72a9e91cfc6d0dba25c1bd454e22b976f1ae4a7d7d",
-        "fixture_sha256": "ae6489113bbcb5d87fd62501503c5b7cb7fc008ef1746d7f5ac188d1003908b4"
+        "fixture_sha256": "ae6489113bbcb5d87fd62501503c5b7cb7fc008ef1746d7f5ac188d1003908b4",
+        "patches": [
+          {
+            "raw_evidence_path": "audit/fixture-edits/historical/ruff/setup-01.patch",
+            "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+            "bytes": 993
+          },
+          {
+            "raw_evidence_path": "audit/fixture-edits/historical/ruff/edit-03.patch",
+            "sha256": "97c8da1b636759067384373757844e984ce5e61db6fc96641745c480a30d6182",
+            "bytes": 52076
+          },
+          {
+            "raw_evidence_path": "audit/fixture-edits/historical/ruff/edit-07.patch",
+            "sha256": "e23a9caddd61fe72096a2240cedfd0c0ef00b34834824858f2c69de562722121",
+            "bytes": 31302
+          },
+          {
+            "raw_evidence_path": "audit/fixture-edits/historical/ruff/edit-10.patch",
+            "sha256": "0b61e7ed0f3790d35664d9504364cbe8bb7eb90fe28af3670bd73fa82c5aa3a4",
+            "bytes": 24051
+          }
+        ]
       }
     },
-    "unmeasured_setup_recovery": {
-      "reason": "A benchmark-setup Git subprocess ran outside the timed runner process group during the first historical warmup; no historical samples completed.",
-      "completed_results_sha256": {
-        "workflow": "acf701a58fb4bc2b80c9c9363b3cb13794ffa49403210b4a52978adc6e84a9d6",
-        "sessions": "77ae8cc6874f848dc8c592a15a44ef83b996aacbbe357c63957592fda1d93a06"
-      },
-      "original_historical_results_sha256": "e12edc4504ab0003a1b2002680cece2afaf3e4f8a5c8e7e7484d61fb4a1a4595",
-      "backup_files_sha256": {
-        "historical-run.log": "d1b884ed12fae819125003bdce9d7184ae58312bd4e797c269679dc260566295",
-        "historical-preflight.json": "01b3651ebe7de816ee1c96585f73ecab1ce05aa3e8103b01b7b2fa7dd793a309",
-        "historical-resume1-preflight-attempt-1.json": "f248147ff222126e4f34ff0f88608dc7babd0c4d4ad5851bc0c81cdbc76293cd",
-        "benchmark-status.json": "391383063457c739fc110a54470d1f62ab50f01819d69f5ab943dd4ba0b50470",
-        "historical-resume1-preflight-attempt-2.json": "505f92572a622bda43827eee84865826c14db50e51d806a57fb229eb0190fd30",
-        "historical-monitor.json": "0a02045d875ad50a992a840e52e4eb115a67f7365e99049278d683315e6594b2",
-        "historical-resume1-preflight-attempt-3.json": "01b3651ebe7de816ee1c96585f73ecab1ce05aa3e8103b01b7b2fa7dd793a309",
-        "results.json": "e12edc4504ab0003a1b2002680cece2afaf3e4f8a5c8e7e7484d61fb4a1a4595",
-        "historical-monitor.jsonl": "436ce81f7fe3264584226b81c0d71dbab7aa1420a05408f4841320fc31ac9b75",
-        "historical-plan.json": "6f12bece6806d554d52656d64955c9a5ec081deda84eb8bfca1bd0b464e49568"
-      },
-      "git_activity": {
-        "pid": 2233443,
-        "parent": 2233400,
-        "name": "git",
-        "ticks": 567,
-        "start": "62164281",
-        "state": "R",
-        "group": 2233399,
-        "session": 2233399,
-        "uid": 1000,
-        "cgroup": "0::/system.slice/devbox-agent-exec-93a19d2b-0e1f-4a82-83bd-c503402671d3.service",
-        "cpu_ticks": 372
-      },
-      "git_maintenance": {
-        "maintenance.auto": false,
-        "gc.auto": 0,
-        "scope": "benchmark process environment only"
-      },
-      "runner_wrapper_sha256": "7079c6c86081f67c6b2d1ee455154fb8f31a9b7f208798f6452927f52ab1c05f",
-      "host_guard_sha256": "8c7a789ef9f84181e1e0e665279830193d0ac26fc4643594f6ed482f8dcb8210"
+    "exporter_sha256": "3c2a69f8ff57f6ef035b9f08a374114d061f8ef0f9d5cb2da1b74041e1e69021",
+    "cargo_home_configuration": {
+      "checked_at": 1792249981.9841838,
+      "cargo_home": "/tmp/codex-cargo-home",
+      "config": false,
+      "config_toml": false
     },
-    "final_exporter_sha256": "c8bc4fd00f6ba8e68bf447ea3b80bdd1d046456f427d4f6ec3493658ae499260",
-    "source_diff_audit": {
-      "format": "git diff --binary --full-index",
-      "auditor_sha256": "796dc8030873d087369889bc7fa40ba313bd7478b826788fe800d828b14664e5",
-      "matching_fields": ["head", "tree", "diff_sha256"]
+    "native_tools": {
+      "created_at": 1792249982.2208252,
+      "commands": [
+        {
+          "command": ["cc", "--version"],
+          "path": "/usr/bin/cc",
+          "returncode": 0,
+          "output": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+        },
+        {
+          "command": ["c++", "--version"],
+          "path": "/usr/bin/c++",
+          "returncode": 0,
+          "output": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+        },
+        {
+          "command": ["clang", "--version"],
+          "path": "/usr/bin/clang",
+          "returncode": 0,
+          "output": "Ubuntu clang version 18.1.3 (1ubuntu1)\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin"
+        },
+        {
+          "command": ["cmake", "--version"],
+          "path": "/usr/bin/cmake",
+          "returncode": 0,
+          "output": "cmake version 3.28.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake)."
+        },
+        {
+          "command": ["make", "--version"],
+          "path": "/usr/bin/make",
+          "returncode": 0,
+          "output": "GNU Make 4.3\nBuilt for x86_64-pc-linux-gnu\nCopyright (C) 1988-2020 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."
+        },
+        {
+          "command": ["pkg-config", "--modversion", "openssl"],
+          "path": "/usr/bin/pkg-config",
+          "returncode": 0,
+          "output": "3.0.13"
+        }
+      ]
     }
   },
-  "completed_at": "2026-10-02T05:41:12.416590+00:00",
+  "completed_at": "2026-10-17T21:08:32.059470+00:00",
   "repetitions": 2,
   "sessions": [
     {
@@ -348,8 +330,8 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
-          "stock": [0.5003987399395555, 0.312668469035998],
-          "ohm": [0.5082839570241049, 0.718959245015867]
+          "stock": [0.28759605501545593, 0.25838184301392175],
+          "ohm": [0.5861157860199455, 0.557694705988979]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -374,8 +356,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [1.522402954986319, 1.3936323700472713],
-          "ohm": [1.4644751489395276, 1.3952514219563454]
+          "stock": [0.9617164850060362, 0.9170442259928677],
+          "ohm": [0.9801785190065857, 0.9506537679990288]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -400,8 +382,8 @@
           "mdtest::attributes.md"
         ],
         "wall_seconds": {
-          "stock": [142.33278118504677, 144.5506344139576],
-          "ohm": [102.73478026001249, 104.05339242797345]
+          "stock": [117.52436333399964, 117.75231857897597],
+          "ohm": [89.5502203280048, 88.86478848100523]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -426,8 +408,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [1.4468838080065325, 1.6141524490667507],
-          "ohm": [1.1940250219777226, 1.8003904500510544]
+          "stock": [0.9117933999805246, 0.95060994499363],
+          "ohm": [1.4713684769812971, 0.9909336780256126]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -451,8 +433,8 @@
           "ty_python_semantic"
         ],
         "wall_seconds": {
-          "stock": [22.82979475997854, 23.740533138043247],
-          "ohm": [11.599940468906425, 12.438919260981493]
+          "stock": [18.84780398500152, 18.693339396006195],
+          "ohm": [8.900922553992132, 9.607369347009808]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -486,8 +468,8 @@
           "mdtest::type_properties/is_subtype_of.md"
         ],
         "wall_seconds": {
-          "stock": [72.53242647903971, 72.21412782603875],
-          "ohm": [53.051976626040414, 52.649815707001835]
+          "stock": [58.61338603499462, 58.20401892598602],
+          "ohm": [46.203526431985665, 45.77486186000169]
         },
         "tests_started": {
           "stock": [3, 3],
@@ -504,8 +486,8 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
-          "stock": [21.9109703770373, 20.89979344396852],
-          "ohm": [11.047374726971611, 11.457603513961658]
+          "stock": [17.310870122979395, 17.615825941000367],
+          "ohm": [8.889271199004725, 9.090591898013372]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -530,8 +512,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [138.43003939499613, 139.93578303197864],
-          "ohm": [99.63118496292736, 101.36899500200525]
+          "stock": [115.45771310699638, 115.73174885998014],
+          "ohm": [87.94590429897653, 85.16912792198127]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -556,8 +538,8 @@
           "mdtest::attributes.md"
         ],
         "wall_seconds": {
-          "stock": [1.8961345549905673, 1.9381932370597497],
-          "ohm": [2.098867365042679, 2.0838191020302474]
+          "stock": [1.3144194089982193, 1.3398309519980103],
+          "ohm": [1.8309696190117393, 1.8135555790213402]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -595,8 +577,8 @@
           "clippy::mut_mut"
         ],
         "wall_seconds": {
-          "stock": [71.50708351295907, 73.97978514095303],
-          "ohm": [39.26298653590493, 36.79221981205046]
+          "stock": [59.313184661994455, 59.03450572901056],
+          "ohm": [24.94265747402096, 23.70069674801198]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -613,8 +595,8 @@
         "category": "formatting",
         "command": ["cargo", "fmt", "--all", "--", "--check"],
         "wall_seconds": {
-          "stock": [7.876775569980964, 7.052101737936027],
-          "ohm": [10.118134951917455, 9.568845728063025]
+          "stock": [5.3019827120006084, 5.392385519982781],
+          "ohm": [6.395370492013171, 6.771286224015057]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -644,8 +626,8 @@
           "immediate-final"
         ],
         "wall_seconds": {
-          "stock": [18.723276422941126, 18.4221005019499],
-          "ohm": [17.8939366430277, 18.20282710599713]
+          "stock": [12.258849826990627, 12.25058201799402],
+          "ohm": [11.987664143991424, 12.183828754990827]
         },
         "tests_started": {
           "stock": [867, 867],
@@ -666,8 +648,8 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
-          "stock": [37.54735575208906, 37.60370757605415],
-          "ohm": [26.377455312991515, 26.80101548600942]
+          "stock": [32.77547249398776, 32.301657185016666],
+          "ohm": [21.1786534699786, 20.89582003498799]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -692,8 +674,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [172.69835201802198, 174.80092096794397],
-          "ohm": [131.1481457769405, 132.48911490105093]
+          "stock": [141.82776329200715, 140.4640390559798],
+          "ohm": [112.95092039500014, 113.3856101630081]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -708,26 +690,26 @@
   },
   "timed_session_seconds": {
     "ruff": {
-      "stock": [502.14314426109195, 506.7829677630216],
-      "ohm": [352.01415957999416, 353.99459335790016]
+      "stock": [408.66150621601264, 408.70292040199274],
+      "ohm": [290.6252873240155, 286.2625739829964]
     }
   },
   "timed_command_seconds": {
     "ruff": {
-      "stock": [501.5089677599026, 506.0535057600355],
-      "ohm": [350.6059666686924, 352.5310387770878]
+      "stock": [408.1036791339575, 408.1405919349345],
+      "ohm": [289.684169323009, 285.4753889660642]
     }
   },
   "timed_edit_seconds": {
     "ruff": {
-      "stock": [0.07192248315550387, 0.07285826688166708],
-      "ohm": [0.4475973140215501, 0.13906378496903926]
+      "stock": [0.03645299101481214, 0.036409534979611635],
+      "ohm": [0.08471310100867413, 0.04139368800679222]
     }
   },
   "untimed_warmup_seconds": {
     "ruff": {
-      "stock": [210.24570777011104, 212.40462854399811],
-      "ohm": [157.52560108993202, 159.29013038706034]
+      "stock": [174.6032357859949, 172.76569624099648],
+      "ohm": [134.12957386497874, 134.2814301979961]
     }
   },
   "methodology": {
@@ -751,9 +733,9 @@
     ["ohm", "stock"]
   ],
   "evidence": {
-    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-evidence-1.99.0-1-fa7078451721/benchmark-evidence-1.99.0-1.zip",
-    "sha256": "fa70784517218f281537b88bc1a87a65c5295c3a5c94bd9b55586fcdc7bba638",
+    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-evidence-1.99.0-5-293a4381a080/benchmark-evidence-1.99.0-5.zip",
+    "sha256": "293a4381a08094a0e0cb862d1f184503f88c02837a1b0a6b72e8760fcd608289",
     "path": "historical.json",
-    "report_sha256": "fb5f1a3bba43efcba9156bb6555de8dc94a0384ed6ee888dda7cc82d80488009"
+    "report_sha256": "db996526a0eafac384b12e7c119e9455e3ec8701702bffa0666034576f999215"
   }
 }

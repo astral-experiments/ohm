@@ -87,7 +87,7 @@ Rust does not isolate changes between Ohm releases.
 
 ## Recorded measurements
 
-- [ty bug-fix session and worktree startup](scripts/benchmark_results/ty-worktree-1.99.0-5.md)
+- [ty bug-fix session and worktree startup](scripts/benchmark_results/ty-worktree.md)
 - [Workflow and disk-usage results](scripts/benchmark_results/)
 - [Session fixtures and replay results](scripts/session_replays/)
 
@@ -95,4 +95,6 @@ The reports record toolchain versions, sources, profiles, individual timings, an
 
 The Linux timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-5 on one 32-CPU AMD EPYC-Genoa devbox, with eight Cargo jobs. Workflow runs leave both trust opt-ins unset. Session replays set procedural-macro trust to `all`; the ty session also sets native-tool trust to `all` and records verbose compiler logs.
 
-The [APFS study](scripts/benchmark_results/disk-1.99.0-5.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. Its source, tests, artifact isolation, and allocation are checked before the volume is removed; the evidence archive retains those checks. These measurements make no claim about elapsed time on the Mac.
+The [APFS study](scripts/benchmark_results/disk.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. Its source, tests, artifact isolation, and allocation are checked before the volume is removed; the evidence archive retains those checks. These measurements make no claim about elapsed time on the Mac.
+
+Earlier reports and fixtures remain in the [benchmark history](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts). These measurements do not isolate changes between Ohm releases.

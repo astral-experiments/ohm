@@ -1,22 +1,20 @@
 # Published benchmarks
 
-[`latest.json`](latest.json) selects the five release reports used by the benchmark publisher. The [ty session and worktree report](ty-worktree-1.99.0-5.md) supplies the additional README rows.
+The current [workflow](workflow.json), [session](sessions.json), [historical-session](historical.json), [ablation](ablation.json), [disk](disk.json), and [ty session and worktree](ty-worktree.md) reports supply the README tables. They retain individual measurements, source identities, settings, and checksum-verified evidence links.
 
-JSON reports contain individual measurements and configuration. Their `evidence` fields link to detailed reports. [Raw logs and audits for Ohm 1.99.0-5](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-5-940c95bb89ba) include excluded attempts.
-
-Earlier archives are available for [Ohm 1.99.0-2](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-2-6cbbfac41159) and [releases through Ohm 1.98.1-2](https://github.com/astral-sh/ohm/releases/tag/benchmark-evidence-1.98.1-2).
+[Raw logs and audits for Ohm 1.99.0-5](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-5-940c95bb89ba) include excluded attempts. Earlier reports and fixtures remain in the [benchmark history](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts). Historical measurements are not controlled comparisons between Ohm releases.
 
 ## Publish results
 
-Prepare verified reports named `workflow.json`, `sessions.json`, `historical.json`, `ablation.json`, and `disk.json`, following the existing formats. Install formatting dependencies with `npm ci --ignore-scripts`, then run:
+Prepare audited reports named `workflow.json`, `sessions.json`, `historical.json`, `ablation.json`, and `disk.json`, following the existing formats. Archive the ty study's evidence before replacing `ty-worktree.json` and `ty-worktree.md`. Install formatting dependencies with `npm ci --ignore-scripts`, then run:
 
 ```console
 python3 scripts/publish_benchmarks.py /path/to/audited-reports
 ```
 
-The publisher checks versions, sample counts, test counts, and arithmetic. It uploads and verifies an evidence archive before writing the reports and README tables. Existing results are never overwritten. Review and commit the diff.
+The publisher checks versions, sample counts, test counts, and arithmetic. It uploads and verifies an evidence archive before replacing the five current reports and generating the README tables. It refuses to replace the current release's results. Review and commit the diff.
 
-To check the tables without publishing:
+The publisher uses `gh-auto`; source and host-contention audits must be completed separately. CI checks the reports and tables without network access:
 
 ```console
 python3 scripts/publish_benchmarks.py --check
