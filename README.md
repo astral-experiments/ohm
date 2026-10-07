@@ -253,8 +253,10 @@ available, we replay the optimizations that remain relevant and drop those that 
 upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-20` and
 `ohm-1.97.1-21`.
 
-See [_Changes from upstream_](docs/upstream-changes.md) for the complete list of included patches;
-patches are maintained in peer repositories:
+For an explanation of the major optimizations and their measured impact, see
+[_How Ohm speeds up development_](docs/optimizations.md).
+
+Ohm's patches are maintained in the following repositories:
 
 - [`ohm-rust`](https://github.com/astral-sh/ohm-rust): Rust compiler and standard library.
 - [`ohm-cargo`](https://github.com/astral-sh/ohm-cargo): Cargo.
