@@ -1,36 +1,47 @@
 # Compact build artifacts
 
-Ohm builds that include the compact-capable Wild fork support an opt-in format for
-smaller Rust build artifacts on native `x86_64-unknown-linux-gnu`:
+Ohm toolchains with the `compact-artifacts-v2` capability enable compact storage
+by default on native `x86_64-unknown-linux-gnu`. Older toolchains, other targets,
+and explicit artifact-format overrides retain ordinary storage.
 
 ```sh
-cargo +ohm -Zohm-compact-artifacts=yes build
-cargo +ohm -Zohm-compact-artifacts=yes test
+cargo +ohm build
+cargo +ohm -Zohm-compact-artifacts=no build
 ```
 
-The option is disabled by default. It selects the matching bundled Wild linker,
-including when `-Zohm-defaults=no` is set. A toolchain without that linker reports
-an error before compiling. Published toolchains predating this option do not
-support it.
+The opt-out disables storage compression independently of other Ohm defaults.
+`-Zohm-defaults=no` also disables automatic compression; explicit
+`-Zohm-compact-artifacts=yes` requires a supported target, matching capability,
+and compatible storage settings.
 
-Rust libraries remain self-contained `.rlib` archives with full, directly readable
-Rust metadata. Their object members and incremental object files are compressed.
-They follow the existing target and shared build-directory lifetimes; no separate
-object store or garbage collector is required. Switching the option on or off
-selects distinct cached artifacts. `cargo clean` retains Ohm's normal shared
-registry cache while removing the workspace's artifacts.
+Rust libraries remain self-contained `.rlib` archives with directly readable
+metadata and compressed object members. Incremental objects use the same format.
+Artifacts follow the existing target and shared-build directory lifetimes;
+`cargo clean` removes workspace artifacts and retains the shared registry cache.
+No separate object store or garbage collector is required.
 
-Final executables and shared libraries use ordinary ELF. Rust `staticlib` exports
-contain ordinary objects for native consumers. An ordinary invocation of the same
-Ohm compiler can materialize compact dependencies for a system linker, including
-doctest links. Copying an `.rlib` requires no additional object store or metadata
-sidecar; its other crate and native-library dependencies still apply.
+Bundled Wild reads compact inputs directly. Explicit linker choices retain their
+precedence: rustc supplies private ordinary inputs to other consumers without
+changing cached archives. Final executables and shared libraries use ordinary ELF;
+static-library exports contain ordinary objects. Saved relinking and doctests
+remain supported. Thin/fat LTO can extract embedded bitcode, linker-plugin LTO
+preserves raw bitcode and the selected linker, and debug packaging receives
+ordinary objects when needed. A plugin linker must support the producer's LLVM.
 
-The initial option requires the bundled Wild linker and full embedded metadata.
-Cross-compilation, cross-crate LTO, linker-plugin LTO, packed split DWARF, explicit
-linker selection, and conflicting artifact-format flags produce an error. Ordinary
-native-library and rpath arguments are supported. The default compression profile
-is `fast`; explicit compression tuning is preserved.
+## Measurements
 
-The [shipping evaluation](../scripts/benchmark_results/compact-artifact-shipping/README.md)
-records the tested revisions, storage and timing results, and adoption decision.
+In a 90-command Linux comparison, compact storage reduced settled build allocation
+by 19.3% for uv and 13.9% for Ruff. Mean application/library edit costs increased by
+0.09–0.19 seconds; clean builds increased by 0.51–1.31 seconds. The comparison used
+two fresh rounds, eight jobs, and non-PGO/BOLT compiler builds. Sequential edits
+within each round are not independent repetitions.
+
+Selecting a custom linker configuration added about 1.7 seconds per Ruff edit
+relative to direct Wild, while retaining 12.3% storage savings over ordinary
+artifacts. That cost includes cache-admission effects; it does not isolate decoding.
+Allocation covers settled target, shared-build, and scratch data, not peak storage
+or unique physical CoW extents.
+
+The [archived evaluation](https://github.com/astral-sh/ohm/tree/benchmark-evidence-2026-10-07-compact-artifacts/scripts/benchmark_results/compact-artifact-shipping)
+retains exact source and binary identities, current and earlier measurements,
+correctness checks, limitations, and the complete evidence bundles.
