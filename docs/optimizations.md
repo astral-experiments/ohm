@@ -48,9 +48,8 @@ existing compiled code. The resulting executable includes the fix even though Oh
 the linter's own code.
 
 In a release benchmark, we changed a dependency, then rebuilt and ran a test. The median time for
-the test command fell from 26.27 to 3.79 seconds for uv (about 7×) and from 57.81 to 5.20 seconds
-for Codex (about 11×). These comparisons include public API hashing and Ohm's other changes, so they
-don't measure the effect of relinking alone.
+the test command fell from 26.27 to 3.79 seconds for uv. This comparison includes public API hashing
+and Ohm's other changes, so it doesn't measure the effect of relinking alone.
 
 See:
 
