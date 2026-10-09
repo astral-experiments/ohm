@@ -6,6 +6,8 @@ Ohm includes the following changes to Rust, Cargo, Clippy, and rustfmt.
 
 ### 1. Avoid rebuilding dependents after private changes
 
+**Status:** New optimization.
+
 Cargo normally recompiles downstream crates when a dependency changes. Ohm computes a hash of the
 interface exposed by eligible libraries and avoids rebuilding dependents when that interface is
 unchanged. (The changed library is still compiled, but its dependents can be reused.) If the
@@ -28,6 +30,8 @@ See:
 - [Cargo #71](https://github.com/astral-sh/ohm-cargo/pull/71)
 
 ### 2. Relink executables without recompiling them
+
+**Status:** Rust proposal, implemented in Ohm.
 
 Ohm implements the [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790)
 approach for eligible executables and test binaries. When a dependency changes but the executable's
@@ -55,6 +59,8 @@ See:
 
 ### 3. Reuse builds during checks
 
+**Status:** New optimization.
+
 A build already produces some of the information that `cargo check` and Clippy need. Ohm can reuse
 this metadata from registry and workspace libraries after verifying that the compiler, build inputs,
 saved files, and cached diagnostics are compatible. It also keeps earlier check results when you
@@ -75,6 +81,8 @@ See:
 - [Cargo #89](https://github.com/astral-sh/ohm-cargo/pull/89)
 
 ### 4. Share compiled dependencies across worktrees
+
+**Status:** New optimization.
 
 Set `CARGO_BUILD_BUILD_DIR` to the same directory across projects or worktrees to let Ohm share
 their compiled registry dependencies. Cargo verifies that the package, compiler, configuration, and
@@ -99,6 +107,8 @@ See:
 
 ### 5. Seed new worktrees from an existing build
 
+**Status:** New optimization.
+
 `cargo +ohm worktree add` can copy compiled workspace crates and incremental compiler state into a
 new worktree. It uses copy-on-write to share storage until one copy changes.
 
@@ -118,6 +128,8 @@ See:
 - [Rust #91](https://github.com/astral-sh/ohm-rust/pull/91)
 
 ### 6. Start checking dependent crates earlier
+
+**Status:** New optimization.
 
 Ohm uses the idea behind [Headstart](https://github.com/PowderworksCode/headstart) to check
 dependent crates sooner. The compiler publishes metadata describing a library's interface before it
@@ -140,13 +152,22 @@ See:
 
 ### 7. Reuse integration tests that do not use a changed library
 
+**Status:** New optimization.
+
 Ruff has an integration test that runs `ruff config lint.select` and checks its output. Cargo builds
 two programs for this test: the `ruff` executable and a test executable that launches it. Only the
 `ruff` executable includes Ruff's library code.
 
 When you edit Ruff's library, Ohm updates the `ruff` executable and reuses the test executable. The
-test still runs and checks the updated program's output. Before reusing a test executable, Ohm
-verifies that it does not link the changed library, either directly or through another dependency.
+test still runs and checks the updated program's output. Before reusing a test executable, Ohm uses
+the compiler's record from a successful build to verify that it does not link the changed library,
+either directly or through another dependency.
+
+The library can still affect what the test observes at runtime, as Ruff's library does here. That
+does not require new code in the test executable; the test runs again against the updated program.
+Changes to the test, a used dependency, or native link inputs still prevent reuse, as does a missing
+or stale compiler record. Ohm cannot discover arbitrary inputs that a build script reads without
+declaring them; those inputs have the same tracking limits as in ordinary Cargo builds.
 
 In a Ruff experiment, the time to rebuild and run tests after an edit to the package's library fell
 from 8.26 to 5.14 seconds. After an edit to another unused workspace library, it fell from 7.20 to
@@ -159,6 +180,8 @@ See:
 
 ### 8. Reduce build artifact disk usage
 
+**Status:** New optimization.
+
 Ohm removes old incremental snapshots once newer ones replace them. It also keeps the names of
 retained debug object files stable, so rebuilds replace those files instead of leaving old copies
 behind. Ohm stores compiler metadata more compactly and avoids storing duplicate metadata in
@@ -168,6 +191,11 @@ For example, after an edit and rebuild, a new incremental snapshot can replace t
 removes that superseded snapshot, so repeated edits do not leave a growing collection of old
 snapshots for the same build.
 
+When worktrees share a `CARGO_BUILD_BUILD_DIR`, each keeps its own mutable incremental state, so
+cleanup in one cannot remove another's snapshots. Shared registry artifacts are keyed by their build
+inputs and protected by locks: incompatible builds get separate artifacts, though concurrent builds
+of the same artifact may wait.
+
 In a macOS benchmark, we ran the same development tasks with Ohm and stock Rust. Ohm used 40% less
 disk space for Ruff and 35% less for uv. These savings include the effects of Ohm's build reuse and
 default debug settings.
@@ -175,11 +203,14 @@ default debug settings.
 See:
 
 - [Cargo #68](https://github.com/astral-sh/ohm-cargo/pull/68)
+- [Cargo #77](https://github.com/astral-sh/ohm-cargo/pull/77)
 - [Rust #97](https://github.com/astral-sh/ohm-rust/pull/97)
 - [Rust #98](https://github.com/astral-sh/ohm-rust/pull/98)
 - [Rust #123](https://github.com/astral-sh/ohm-rust/pull/123)
 
 ### 9. Use line tables by default
+
+**Status:** Existing stable Rust feature, enabled by default in Ohm.
 
 For development and test builds, Ohm records file and line numbers in the debug information by
 default. These line tables let backtraces point to your source, but omit the type and variable
@@ -194,14 +225,13 @@ The uv benchmarks compare stock Rust's full debug information with Ohm's line ta
 default can affect the comparison. Ruff and Codex explicitly request matching debug levels. The
 release benchmarks do not measure the effect of line tables separately.
 
-(This is an existing stable Rust feature; Ohm makes it the default for development and test builds
-to speed up development out of the box.)
-
 See:
 
 - [Cargo #127](https://github.com/astral-sh/ohm-cargo/pull/127)
 
 ### 10. Use Wild for Linux linking
+
+**Status:** Existing linker, bundled and enabled by default in Ohm.
 
 The linker combines compiled code into the final executable. For native x86-64 Linux GNU builds, Ohm
 uses the Wild linker by default. Explicit linker settings still take precedence.
@@ -210,14 +240,14 @@ Wild performs a full link each time it runs. Cached relinking lets Ohm reuse the
 it passes to the linker. The release benchmarks include Wild alongside Ohm's other changes, so they
 do not measure its contribution separately.
 
-(Wild is an existing linker; Ohm bundles it and enables it by default on supported Linux targets.)
-
 See:
 
 - [Cargo #114](https://github.com/astral-sh/ohm-cargo/pull/114)
 - [Ohm #112](https://github.com/astral-sh/ohm/pull/112)
 
 ### 11. Reuse Cargo's dependency resolution
+
+**Status:** New optimization.
 
 Cargo resolves the workspace's dependencies before many commands. Ohm saves that result and reuses
 it when the manifests, lockfile, configuration, and toolchain have not changed. Cargo still resolves
@@ -241,6 +271,8 @@ See:
 
 ### 12. Format only what changed
 
+**Status:** New optimization.
+
 After a successful run, Ohm's `cargo fmt` remembers which workspace packages it formatted. It can
 skip those packages on the next run if their sources, configuration, and formatter have not changed.
 When a module changes, Ohm can format just that module if it can verify which crate owns it and how
@@ -260,6 +292,8 @@ See:
 
 ### 13. Run the compiler frontend in parallel
 
+**Status:** Existing experimental Rust feature, enabled by default in Ohm.
+
 When Cargo invokes the compiler, Ohm enables Rust's experimental parallel frontend. The compiler can
 then use up to eight threads to parse and analyze a crate. You can choose a thread count explicitly
 or disable Ohm's defaults with `-Zohm-defaults=no`. Invoking `rustc` directly does not enable this
@@ -273,15 +307,14 @@ In an experiment on an earlier Ohm release, we changed only the frontend thread 
 development sessions for Ruff, uv, and Codex. Their combined time fell from 1,032 to 720 seconds,
 about 30%.
 
-(This is an existing, experimental Rust compiler feature; Ohm enables it by default to speed up
-development out of the box.)
-
 See:
 
 - [Cargo #90](https://github.com/astral-sh/ohm-cargo/pull/90)
 - [Cargo #48](https://github.com/astral-sh/ohm-cargo/pull/48)
 
 ### 14. Reuse compiler work across incremental builds
+
+**Status:** New optimization.
 
 The compiler groups generated code into units that it can compile separately. Ohm keeps these groups
 stable across edits and reuses compatible decisions about where generic code belongs. This lets it
@@ -305,6 +338,8 @@ See:
 
 ### 15. Reuse async code after it moves
 
+**Status:** New optimization.
+
 Moving async code to another line can invalidate compiled code even when its behavior stays the
 same. Ohm tracks the source locations used by debuggers separately from the layout used to generate
 code, so the compiler can reuse more of its previous output. By default, debug information omits
@@ -324,32 +359,9 @@ See:
 
 - [Rust #132](https://github.com/astral-sh/ohm-rust/pull/132)
 
-### 16. Optimize the compiler and its allocator
+### 16. Reduce repeated compiler work
 
-Ohm builds its release compiler with profile-guided optimization (PGO). It runs a training workload,
-then uses the resulting profile to optimize the compiler's machine code. Ohm also applies PGO to
-Cargo, rustdoc, Clippy, and rustfmt. Linux releases use BOLT to further optimize the compiled
-binary.
-
-(PGO and BOLT are existing compiler optimizations; Ohm applies them when building its release
-toolchain.)
-
-See:
-
-- [Ohm #60](https://github.com/astral-sh/ohm/pull/60)
-- [Rust #67](https://github.com/astral-sh/ohm-rust/pull/67)
-
-On Linux, Ohm's Rust compiler (`rustc`) uses mimalloc to allocate and free memory while it runs.
-
-In an earlier Linux benchmark, switching to mimalloc reduced a Ruff check by 5.3%, a uv rebuild by
-9.8%, and a uv edit-and-test command by 7.8%. Some compiler workloads used 21–25% more memory at
-their peak.
-
-See:
-
-- [Rust #109](https://github.com/astral-sh/ohm-rust/pull/109)
-
-### 17. Reduce repeated compiler work
+**Status:** New optimization.
 
 Ohm also removes smaller sources of repeated work inside the compiler. It reuses incremental query
 results, avoids walking the same type constraints twice, and skips unnecessary work when generating
@@ -369,7 +381,9 @@ See:
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
 - [Rust #101](https://github.com/astral-sh/ohm-rust/pull/101)
 
-### 18. Avoid generating async bodies for metadata
+### 17. Avoid generating async bodies for metadata
+
+**Status:** New optimization.
 
 During `cargo check`, the compiler needs to know how an async function's state is laid out in
 memory. Ohm can compute that layout without also constructing the code that resumes or drops the
@@ -396,7 +410,9 @@ See:
 
 - [Rust #99](https://github.com/astral-sh/ohm-rust/pull/99)
 
-### 19. Cache derive macro expansions
+### 18. Cache derive macro expansions
+
+**Status:** Existing experimental Rust feature, enabled by default in Ohm.
 
 A derive macro generates Rust code from a type declaration. Ohm enables Rust's experimental cache
 for that generated code so the compiler can reuse previous macro expansions. The cache can be
@@ -413,16 +429,15 @@ parser tests. The full sequence took a median of 4.02 seconds with macro caching
 without it. The runs varied substantially, so they do not give a precise estimate of the cache's
 benefit.
 
-(This is an existing, experimental Rust compiler feature; Ohm enables it by default to speed up
-development out of the box.)
-
 See:
 
 - [Cargo #54](https://github.com/astral-sh/ohm-cargo/pull/54)
 
 ## Clippy
 
-### 20. Reuse Clippy results for unchanged modules
+### 19. Reuse Clippy results for unchanged modules
+
+**Status:** New optimization.
 
 Ohm uses the compiler's incremental query system to cache the results of selected Clippy lint
 passes. After an edit, it can reuse results from unchanged modules instead of running those passes
