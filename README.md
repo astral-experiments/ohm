@@ -107,6 +107,9 @@ Opt out with `-Zohm-defaults=no`:
 cargo +ohm -Zohm-defaults=no test
 ```
 
+The upcoming [ThinLTO backend cache](docs/thinlto-cache.md) reuses optimized native objects for
+supported builds, with automatic directory management, bounded eviction, and a separate opt-out.
+
 ### `AGENTS.md`
 
 To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS.md`:

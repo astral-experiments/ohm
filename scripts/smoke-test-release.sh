@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 if [[ $# -ne 4 ]]; then
   echo "usage: smoke-test-release.sh RELEASE_DIRECTORY TOOLCHAIN TARGET CLIPPY_REVISION" >&2
   exit 2
@@ -268,3 +270,9 @@ EOF
     exit 1
   fi
 )
+
+# Older published toolchains predate the managed ThinLTO cache.
+if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] &&
+  cargo +"$OHM_TOOLCHAIN" -Z help | grep -F 'ohm-thinlto-cache' >/dev/null; then
+  python3 "$script_directory/smoke-test-thinlto-cache.py" --toolchain "$OHM_TOOLCHAIN"
+fi
