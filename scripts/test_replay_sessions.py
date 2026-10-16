@@ -85,6 +85,49 @@ class ReplayTestCase(unittest.TestCase):
 
 
 class FixtureValidationTests(ReplayTestCase):
+    def test_ty_bugfix_fixture_preserves_red_tests_and_feature_changes(self) -> None:
+        scenario = replay.load_scenario(SCRIPTS / "session_replays" / "ty-29327.json")
+        commands = [step for step in scenario.steps if step["kind"] == "command"]
+        self.assertEqual(sum(step.get("expected_exit") == 100 for step in commands), 2)
+        self.assertEqual(scenario.environment["CARGO_PROFILE_DEV_OPT_LEVEL"], "1")
+        self.assertNotIn("CARGO_BUILD_WARNINGS", scenario.environment)
+        self.assertEqual(commands[-1]["environment"], {"CARGO_BUILD_WARNINGS": "deny"})
+        self.assertEqual(scenario.warmup[0]["args"], ["build", "--bin", "ty"])
+        self.assertEqual(
+            commands[-1]["args"],
+            ["clippy", "-p", "ty_python_semantic", "--all-targets", "--all-features"],
+        )
+        for step in commands:
+            if step["args"][:2] == ["nextest", "run"]:
+                self.assertNotIn("--all-features", step["args"])
+
+    def test_expected_failures_require_evidence_and_a_valid_status(self) -> None:
+        step = {
+            "kind": "command",
+            "label": "Red test",
+            "program": "cargo",
+            "args": ["test"],
+        }
+        for extra in (
+            {"expected_exit": 100},
+            {"expected_exit": -9, "output_contains": ["failure"]},
+            {"expected_exit": True, "output_contains": ["failure"]},
+            {"expected_exit": 100, "output_contains": [""]},
+        ):
+            with self.subTest(extra=extra), self.assertRaises(replay.BenchmarkError):
+                self.scenario(steps=[{**step, **extra}])
+
+    def test_python_helper_cannot_escape_through_a_symlink(self) -> None:
+        outside = self.directory / "outside.py"
+        outside.write_text("raise SystemExit(0)\n")
+        fixtures = self.directory / "fixtures"
+        fixtures.mkdir()
+        (fixtures / "helper.py").symlink_to(outside)
+        with self.assertRaisesRegex(replay.BenchmarkError, "symlinks"):
+            replay.Replay.command(
+                {"program": "python", "args": ["helper.py"]}, "ohm", fixtures
+            )
+
     def test_all_bundled_real_sessions_are_valid(self) -> None:
         for project in replay.PROJECTS:
             with self.subTest(project=project):
@@ -1914,6 +1957,82 @@ class SourceAndPatchSafetyTests(ReplayTestCase):
 
 
 class CommandResultTests(ReplayTestCase):
+    def test_command_environment_applies_only_to_that_command(self) -> None:
+        runner = self.runner()
+        scenario = self.scenario()
+        worktree = self.directory / "worktree"
+        worktree.mkdir()
+        build = {"program": "cargo", "args": ["build"]}
+        clippy = {
+            "program": "cargo",
+            "args": ["clippy"],
+            "environment": {"CARGO_BUILD_WARNINGS": "deny"},
+        }
+        result = subprocess.CompletedProcess([], 0, stdout="Finished\n")
+        with (
+            mock.patch.dict(replay.os.environ, {}, clear=True),
+            mock.patch.object(replay.subprocess, "run", return_value=result) as command,
+        ):
+            runner.run_command(scenario, worktree, clippy, "stock", "1.99.0", 0, 1)
+            self.assertEqual(
+                command.call_args.kwargs["env"]["CARGO_BUILD_WARNINGS"], "deny"
+            )
+            runner.run_command(scenario, worktree, build, "stock", "1.99.0", 0, 2)
+            self.assertNotIn("CARGO_BUILD_WARNINGS", command.call_args.kwargs["env"])
+
+    def test_expected_red_test_rejects_wrong_status_or_missing_diagnostic(self) -> None:
+        runner = self.runner()
+        scenario = self.scenario()
+        worktree = self.directory / "worktree"
+        worktree.mkdir()
+        step = {
+            "program": "cargo",
+            "args": ["nextest", "run"],
+            "expected_exit": 100,
+            "output_contains": ["unexpected error: [invalid-method-override]"],
+        }
+        expected = "Starting 1 test\nunexpected error: [invalid-method-override]\n"
+        for status, output, accepted in (
+            (100, expected, True),
+            (101, expected, False),
+            (0, expected, False),
+            (100, "Starting 1 test\nsegmentation fault\n", False),
+            (100, expected.replace("Starting 1 test", "Starting 0 tests"), False),
+        ):
+            with (
+                self.subTest(status=status, output=output),
+                mock.patch.object(
+                    replay.subprocess,
+                    "run",
+                    return_value=subprocess.CompletedProcess([], status, stdout=output),
+                ),
+            ):
+                if accepted:
+                    observed = runner.run_command(
+                        scenario, worktree, step, "stock", "1.99.0", 0, 1
+                    )
+                    self.assertEqual(observed["returncode"], 100)
+                else:
+                    with self.assertRaises(replay.BenchmarkError):
+                        runner.run_command(
+                            scenario, worktree, step, "stock", "1.99.0", 0, 1
+                        )
+
+    def test_python_helper_uses_the_selected_target_directory(self) -> None:
+        (self.directory / "helper.py").write_text(
+            "import os\nprint(os.environ['CARGO_TARGET_DIR'])\n"
+        )
+        runner = self.runner()
+        scenario = self.scenario()
+        worktree = self.directory / "worktree"
+        worktree.mkdir()
+        step = {"program": "python", "args": ["helper.py"]}
+        observed = runner.run_command(scenario, worktree, step, "stock", "1.99.0", 0, 1)
+        expected = runner.environment(scenario, "stock", "1.99.0", 0)[
+            "CARGO_TARGET_DIR"
+        ]
+        self.assertEqual(Path(observed["log"]).read_text().strip(), expected)
+
     def test_rejects_successful_commands_that_selected_zero_tests(self) -> None:
         runner = self.runner()
         scenario = self.scenario()

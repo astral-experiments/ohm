@@ -371,7 +371,7 @@ def load_scenario(path: Path) -> Scenario:
             for source in paths:
                 safe_relative(source, field=f"session step {index} source")
         elif kind == "command":
-            if step.get("program") not in ("cargo", "just"):
+            if step.get("program") not in ("cargo", "just", "python"):
                 raise BenchmarkError(f"session step {index} has an unsupported command")
             arguments = step.get("args")
             if (
@@ -386,8 +386,32 @@ def load_scenario(path: Path) -> Scenario:
                 raise BenchmarkError(
                     "session commands must not pin their own toolchain"
                 )
+            if step["program"] == "python":
+                setup_file(path.resolve().parent, arguments[0])
+            expected = step.get("expected_exit", 0)
+            required = step.get("output_contains", [])
+            if (
+                type(expected) is not int
+                or not 0 <= expected <= 255
+                or not isinstance(required, list)
+                or not all(isinstance(value, str) and value for value in required)
+                or (expected != 0 and not required)
+            ):
+                raise BenchmarkError(
+                    "expected failures need an exit status and output assertions"
+                )
             if "cwd" in step:
                 safe_relative(step["cwd"], field=f"session step {index} directory")
+            command_environment = step.get("environment", {})
+            if (
+                not isinstance(command_environment, dict)
+                or not all(
+                    isinstance(key, str) and isinstance(value, str)
+                    for key, value in command_environment.items()
+                )
+                or forbidden.intersection(command_environment)
+            ):
+                raise BenchmarkError("invalid command environment or managed override")
         else:
             raise BenchmarkError(f"session step {index} has unsupported kind {kind!r}")
 
@@ -471,6 +495,7 @@ class Replay:
             ("toolchains", dict(self.toolchains), None),
             ("feature_matrix", self.options.feature_matrix, False),
             ("shared_build_enabled", not self.options.no_shared_build, True),
+            ("native_tool_trust", self.options.native_tool_trust, "none"),
             ("compiler_accounting", self.options.compiler_accounting, "status"),
         )
         for key, expected, legacy_default in settings:
@@ -791,6 +816,8 @@ class Replay:
                     shared_build / str(repetition)
                 )
             environment["CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST"] = "all"
+            if self.options.native_tool_trust == "all":
+                environment["CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST"] = "all"
             if overrides := FEATURE_OVERRIDES.get(label):
                 environment["RUSTFLAGS"] = " ".join(overrides)
         if self.options.offline:
@@ -798,10 +825,19 @@ class Replay:
         return environment
 
     @staticmethod
-    def command(step: dict[str, Any], selector: str) -> list[str]:
+    def command(
+        step: dict[str, Any], selector: str, fixture_directory: Path | None = None
+    ) -> list[str]:
         arguments = list(step["args"])
         if step["program"] == "cargo":
             return ["cargo", f"+{selector}", *arguments]
+        if step["program"] == "python":
+            if fixture_directory is None:
+                raise BenchmarkError(
+                    "Python replay commands require a fixture directory"
+                )
+            script = setup_file(fixture_directory, arguments[0])
+            return [sys.executable, "-B", str(script), *arguments[1:]]
         return ["just", *arguments]
 
     def patch_bytes(
@@ -955,20 +991,22 @@ class Replay:
         *,
         phase: str = "session",
     ) -> dict[str, Any]:
-        arguments = self.command(step, selector)
+        arguments = self.command(step, selector, scenario.path.parent)
         directory = worktree / step.get("cwd", ".")
         if not directory.is_dir() or not directory.resolve().is_relative_to(
             worktree.resolve()
         ):
             raise BenchmarkError(f"session command directory is invalid: {directory}")
         self.wait_until_idle()
+        environment = self.environment(scenario, label, selector, repetition)
+        environment.update(step.get("environment", {}))
         started = time.perf_counter()
         with InterferenceMonitor(enabled=self.options.require_idle) as monitor:
             try:
                 result = subprocess.run(
                     arguments,
                     cwd=directory,
-                    env=self.environment(scenario, label, selector, repetition),
+                    env=environment,
                     text=True,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
@@ -1015,10 +1053,15 @@ class Replay:
             "external_compilation": sorted(monitor.observed),
             "log": str(log),
         }
-        if result.returncode:
+        if result.returncode != step.get("expected_exit", 0):
             raise BenchmarkError(
                 f"{scenario.project} {label} step {index} exited {result.returncode}; inspect {log}"
             )
+        for required in step.get("output_contains", []):
+            if required not in result.stdout:
+                raise BenchmarkError(
+                    f"session command did not produce expected output {required!r}; inspect {log}"
+                )
         if "blocking waiting for file lock" in result.stdout.lower():
             raise BenchmarkError(
                 f"session command encountered Cargo lock contention; inspect {log}"
@@ -1280,6 +1323,7 @@ class Replay:
             "toolchains": dict(self.toolchains),
             "feature_matrix": self.options.feature_matrix,
             "shared_build_enabled": not self.options.no_shared_build,
+            "native_tool_trust": self.options.native_tool_trust,
             "compiler_accounting": self.options.compiler_accounting,
             "sessions": [
                 {
@@ -1483,6 +1527,12 @@ def parser() -> argparse.ArgumentParser:
         ),
     )
     result.add_argument("--jobs", type=int, default=8)
+    result.add_argument(
+        "--native-tool-trust",
+        choices=("none", "all"),
+        default="none",
+        help="opt into authenticated native-tool reuse for trusted local projects",
+    )
     result.add_argument("--repetitions", type=int, default=1)
     result.add_argument("--timeout", type=int, default=1800)
     result.add_argument(

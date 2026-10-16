@@ -31,6 +31,8 @@ jobs:
           python3 scripts/test_benchmark.py
           uv run scripts/replay_sessions.py --help
           python3 scripts/test_replay_sessions.py
+          python3 scripts/benchmark_worktree_start.py --help
+          python3 scripts/test_worktree_start.py
           python3 scripts/test_publish_benchmarks.py
           python3 scripts/publish_benchmarks.py --check
           python3 scripts/test_list_patches.py

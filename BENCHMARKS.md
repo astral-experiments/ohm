@@ -1,11 +1,14 @@
 # Running benchmarks
 
-Ohm has two benchmark runners:
+Ohm has three benchmark runners:
 
 - [`scripts/benchmark.py`](scripts/benchmark.py) measures individual build, check, test, and
   formatting workflows in uv and Codex.
 - [`scripts/replay_sessions.py`](scripts/replay_sessions.py) replays recorded development sessions
   in Ruff/ty, uv, and Codex. See the [replay guide](scripts/session_replays/README.md).
+- [`scripts/benchmark_worktree_start.py`](scripts/benchmark_worktree_start.py) measures worktree
+  creation and the first focused validation after warming the parent checkout. See the
+  [worktree startup guide](scripts/session_replays/README.md#worktree-startup).
 
 The [README](README.md) summarizes the published results.
 
