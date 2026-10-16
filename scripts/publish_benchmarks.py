@@ -16,6 +16,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "scripts/benchmark_results"
 KINDS = ("workflow", "sessions", "historical", "ablation", "disk")
+TY_WORKTREE_REPORT = "ty-worktree-1.99.0-3.json"
 
 
 def load(path):
@@ -129,12 +130,27 @@ def table(headers, rows):
     )
 
 
-def render_tables(reports):
+def render_tables(reports, ty_worktree):
     release, rust = validate(reports)
     version = release.removeprefix("ohm-")
+    if ty_worktree["rust"] != rust or not re.fullmatch(
+        rf"ohm-{re.escape(rust)}-[1-9]\d*", ty_worktree["ohm"]
+    ):
+        raise ValueError("ty study and table toolchain identities differ")
+    ty_version = ty_worktree["ohm"].removeprefix("ohm-")
     sessions = reports["sessions"]
     mean = statistics.fmean
     projects = ("ruff", "uv", "codex")
+
+    def ty_total(group, lane):
+        total = ty_worktree[group][lane]["total"]
+        samples = total["samples"]
+        if not samples or not all(math.isfinite(v) and v > 0 for v in samples):
+            raise ValueError("Invalid ty study samples")
+        median = statistics.median(samples)
+        if not math.isclose(median, total["median"]):
+            raise ValueError("ty study median differs from samples")
+        return median
 
     def seconds(pair):
         stock, ohm = pair
@@ -152,7 +168,10 @@ def render_tables(reports):
         ]
         totals = [a + b for a, b in zip(totals, pair, strict=True)]
         session_rows.append([label, *seconds(pair)])
-    session_rows.append(["All sessions", *seconds(totals)])
+    session_rows.append(
+        ["ty session", *seconds([ty_total("session", lane) for lane in ("stock", "ohm")])]
+    )
+    session_rows.append(["Ruff + uv + Codex sessions", *seconds(totals)])
     for category, label in (
         ("check", "`cargo check`"),
         ("test", "`cargo test`, `cargo nextest`, `just test`"),
@@ -171,7 +190,7 @@ def render_tables(reports):
         session_rows.append([label, *seconds(pair)])
     session_rows.append(
         [
-            "All commands",
+            "Ruff + uv + Codex commands",
             *seconds(
                 [
                     sum(
@@ -217,8 +236,12 @@ def render_tables(reports):
 
     rendered = {
         "sessions": table(
-            ["Scope", f"Rust {rust}", f"Ohm {version}", "Time saved"], session_rows
-        ),
+            ["Scope", f"Rust {rust}", "Ohm", "Time saved"], session_rows
+        )
+        + f"\n\nRuff, uv, and Codex report means with Ohm {version}; "
+        f"ty reports the median of four runs with Ohm {ty_version}. "
+        "Totals and the command breakdown cover Ruff, uv, and Codex. "
+        "The ty session uses a shared build directory and both trust opt-ins.\n",
         "disk": table(
             ["Scope", f"Rust {rust}", f"Ohm {version}", "Space saved"], disk_rows
         ),
@@ -285,21 +308,45 @@ def render_tables(reports):
             ["Codex", "Shared-worktree build", "`codex-utils-string`"],
         ),
     ]
-    rendered["features"] = table(
-        ["Project", "Workflow", "Package", f"Rust {rust}", f"Ohm {version}", "Speedup"],
-        [workflow_row(key, labels) for key, labels in features],
+    feature_rows = [workflow_row(key, labels) for key, labels in features]
+    for group, filesystem in (
+        ("worktree", "ext4"),
+        ("worktree_copy_on_write", "Btrfs loopback"),
+    ):
+        stock = ty_total(group, "stock")
+        for lane, suffix in (("ohm", ""), ("ohm-trusted", ", trusted")):
+            ohm = ty_total(group, lane)
+            feature_rows.append(
+                [
+                    "ty",
+                    f"Worktree startup ({filesystem}{suffix})",
+                    "`ty_python_semantic`",
+                    f"{stock:.2f} s",
+                    f"{ohm:.2f} s",
+                    f"{stock / ohm:.2f}×",
+                ]
+            )
+    rendered["features"] = (
+        table(
+            ["Project", "Workflow", "Package", f"Rust {rust}", "Ohm", "Speedup"],
+            feature_rows,
+        )
+        + f"\n\nuv and Codex use Ohm {version}; ty uses Ohm {ty_version}. "
+        "The ty rows report medians of three runs with a shared build directory; "
+        "trusted runs also enable both trust opt-ins. Startup includes worktree "
+        "creation and first validation, with parent preparation excluded. "
+        "Only the trusted Btrfs runs seed snapshots.\n"
     )
     headlines = {
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
         r"\d+% less time": f"{round(100 * (totals[0] - totals[1]) / totals[0])}% less time",
         r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
-        r"Benchmarking Ohm \d+\.\d+\.\d+-\d+ against": f"Benchmarking Ohm {version} against",
     }
     return rendered, headlines
 
 
 def documents(reports):
-    tables, headlines = render_tables(reports)
+    tables, headlines = render_tables(reports, load(RESULTS / TY_WORKTREE_REPORT))
     result = {
         name: (ROOT / name).read_text() for name in ("README.md", "BENCHMARKS.md")
     }

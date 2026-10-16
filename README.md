@@ -8,21 +8,24 @@ An experimental fork of the Rust toolchain, designed for fast, highly parallel l
 With Ohm, incremental builds can be up to 30× faster, replayed development sessions take around
 37% less time, and `target/` disk usage decreases by around 55%.
 
-Benchmarking Ohm 1.99.0-2 against stock Rust on replayed development sessions:
+Comparing stock Rust and Ohm on replayed development sessions:
 
 <!-- benchmark:sessions -->
 
-| Scope                                      | Rust 1.99.0 | Ohm 1.99.0-2 | Time saved |
-| ------------------------------------------ | ----------- | ------------ | ---------- |
-| Ruff session                               | 438.46 s    | 286.58 s     | 34.64%     |
-| uv session                                 | 144.04 s    | 93.94 s      | 34.78%     |
-| Codex session                              | 535.54 s    | 324.34 s     | 39.44%     |
-| All sessions                               | 1,118.04 s  | 704.86 s     | 36.96%     |
-| `cargo check`                              | 144.08 s    | 46.91 s      | 67.44%     |
-| `cargo test`, `cargo nextest`, `just test` | 627.07 s    | 496.18 s     | 20.87%     |
-| `cargo clippy`                             | 330.65 s    | 148.50 s     | 55.09%     |
-| `cargo fmt`                                | 14.27 s     | 11.20 s      | 21.51%     |
-| All commands                               | 1,116.07 s  | 702.79 s     | 37.03%     |
+| Scope                                      | Rust 1.99.0 | Ohm      | Time saved |
+| ------------------------------------------ | ----------- | -------- | ---------- |
+| Ruff session                               | 438.46 s    | 286.58 s | 34.64%     |
+| uv session                                 | 144.04 s    | 93.94 s  | 34.78%     |
+| Codex session                              | 535.54 s    | 324.34 s | 39.44%     |
+| ty session                                 | 347.60 s    | 265.85 s | 23.52%     |
+| Ruff + uv + Codex sessions                 | 1,118.04 s  | 704.86 s | 36.96%     |
+| `cargo check`                              | 144.08 s    | 46.91 s  | 67.44%     |
+| `cargo test`, `cargo nextest`, `just test` | 627.07 s    | 496.18 s | 20.87%     |
+| `cargo clippy`                             | 330.65 s    | 148.50 s | 55.09%     |
+| `cargo fmt`                                | 14.27 s     | 11.20 s  | 21.51%     |
+| Ruff + uv + Codex commands                 | 1,116.07 s  | 702.79 s | 37.03%     |
+
+Ruff, uv, and Codex report means with Ohm 1.99.0-2; ty reports the median of four runs with Ohm 1.99.0-3. Totals and the command breakdown cover Ruff, uv, and Codex. The ty session uses a shared build directory and both trust opt-ins.
 
 <!-- /benchmark:sessions -->
 
@@ -173,36 +176,30 @@ avoid rebuilding unchanged dependents:
 
 <!-- /benchmark:dependency -->
 
-**Other common cases** include build-to-check reuse, formatting, and safe cross-worktree builds:
+**Other common cases** include build-to-check reuse, formatting, and worktree startup:
 
 <!-- benchmark:features -->
 
-| Project | Workflow                 | Package              | Rust 1.99.0 | Ohm 1.99.0-2 | Speedup |
-| ------- | ------------------------ | -------------------- | ----------- | ------------ | ------- |
-| uv      | Build, then check        | `uv`                 | 66.46 s     | 18.98 s      | 3.50×   |
-| uv      | Shared-worktree build    | `uv-normalize`       | 9.01 s      | 1.01 s       | 8.95×   |
-| Codex   | Build, then check        | `codex-core`         | 111.64 s    | 44.83 s      | 2.49×   |
-| Codex   | No-op formatting         | Workspace            | 10.25 s     | 0.29 s       | 34.87×  |
-| Codex   | Formatting after an edit | `codex-core`         | 9.71 s      | 0.43 s       | 22.40×  |
-| Codex   | Shared-worktree build    | `codex-utils-string` | 3.43 s      | 0.77 s       | 4.44×   |
+| Project | Workflow                                   | Package              | Rust 1.99.0 | Ohm     | Speedup |
+| ------- | ------------------------------------------ | -------------------- | ----------- | ------- | ------- |
+| uv      | Build, then check                          | `uv`                 | 66.46 s     | 18.98 s | 3.50×   |
+| uv      | Shared-worktree build                      | `uv-normalize`       | 9.01 s      | 1.01 s  | 8.95×   |
+| Codex   | Build, then check                          | `codex-core`         | 111.64 s    | 44.83 s | 2.49×   |
+| Codex   | No-op formatting                           | Workspace            | 10.25 s     | 0.29 s  | 34.87×  |
+| Codex   | Formatting after an edit                   | `codex-core`         | 9.71 s      | 0.43 s  | 22.40×  |
+| Codex   | Shared-worktree build                      | `codex-utils-string` | 3.43 s      | 0.77 s  | 4.44×   |
+| ty      | Worktree startup (ext4)                    | `ty_python_semantic` | 109.46 s    | 72.43 s | 1.51×   |
+| ty      | Worktree startup (ext4, trusted)           | `ty_python_semantic` | 109.46 s    | 66.14 s | 1.66×   |
+| ty      | Worktree startup (Btrfs loopback)          | `ty_python_semantic` | 109.31 s    | 73.34 s | 1.49×   |
+| ty      | Worktree startup (Btrfs loopback, trusted) | `ty_python_semantic` | 109.31 s    | 16.76 s | 6.52×   |
+
+uv and Codex use Ohm 1.99.0-2; ty uses Ohm 1.99.0-3. The ty rows report medians of three runs with a shared build directory; trusted runs also enable both trust opt-ins. Startup includes worktree creation and first validation, with parent preparation excluded. Only the trusted Btrfs runs seed snapshots.
 
 <!-- /benchmark:features -->
 
-### Additional workloads
-
-The ty bug-fix session and worktree startup study compare Rust 1.99.0 with Ohm 1.99.0-3:
-
-| Workload                                                       | Rust 1.99.0 | Ohm 1.99.0-3 | Time saved |
-| -------------------------------------------------------------- | ----------- | ------------ | ---------- |
-| ty session                                                     | 347.60 s    | 265.85 s     | 23.52%     |
-| Worktree startup, ext4: shared build                           | 109.46 s    | 72.43 s      | 33.83%     |
-| Worktree startup, ext4: shared build + trust opt-ins           | 109.46 s    | 66.14 s      | 39.58%     |
-| Worktree startup, Btrfs loopback: shared build                 | 109.31 s    | 73.34 s      | 32.91%     |
-| Worktree startup, Btrfs loopback: shared build + trust opt-ins | 109.31 s    | 16.76 s      | 84.67%     |
-
-These Linux measurements use eight Cargo jobs and `opt-level = 1`. The session uses both Ohm trust opt-ins. Worktree startup excludes parent preparation, which is reported separately. Snapshot seeding is verified in the trusted Btrfs runs; ext4 cannot clone the snapshots.
-
-See the [detailed report](scripts/benchmark_results/ty-worktree-1.99.0-3.md) for sample ranges, per-command timings, preparation costs, and raw evidence. These workloads are separate from the three-session aggregate above.
+The ty measurements use eight Cargo jobs and `opt-level = 1` on Linux. See the
+[detailed report](scripts/benchmark_results/ty-worktree-1.99.0-3.md) for sample ranges,
+per-command timings, preparation costs, and raw evidence.
 
 ## Philosophy
 

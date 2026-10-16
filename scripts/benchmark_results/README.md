@@ -13,8 +13,9 @@ The distinct Ohm 1.97.1-18 Ruff report remains checked in.
 
 The [ty iteration and worktree startup study](ty-worktree-1.99.0-3.md) adds two workloads
 measured with Ohm 1.99.0-3. Its [JSON report](ty-worktree-1.99.0-3.json) retains individual
-samples and links to the raw evidence. These results are separate from `latest.json`
-and the existing three-session aggregate.
+samples and links to the raw evidence. The publisher adds these results to the README's session
+and workflow tables, retaining their toolchain versions and the original three-session aggregate.
+`latest.json` selects the five release suites; the publisher pins this study separately.
 
 ## Publish a benchmark run
 

@@ -16,6 +16,12 @@ import publish_benchmarks as publish
 class PublicationTests(unittest.TestCase):
     def setUp(self):
         self.reports = publish.latest_reports()
+        self.ty_worktree = publish.load(publish.RESULTS / publish.TY_WORKTREE_REPORT)
+
+    def copy_ty_study(self, root):
+        destination = root / "scripts/benchmark_results" / publish.TY_WORKTREE_REPORT
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        publish.write_json(destination, self.ty_worktree)
 
     def test_tables_match_current_reports(self):
         for name, expected in publish.documents(self.reports).items():
@@ -23,6 +29,41 @@ class PublicationTests(unittest.TestCase):
                 publish.normalized_markdown(expected),
                 publish.normalized_markdown((publish.ROOT / name).read_text()),
             )
+
+    def test_ty_rows_keep_their_version_and_do_not_change_the_original_aggregate(self):
+        tables, headlines = publish.render_tables(self.reports, self.ty_worktree)
+        self.assertIn("| ty session | 347.60 s | 265.85 s | 23.52% |", tables["sessions"])
+        self.assertIn(
+            f"means with Ohm {self.reports['sessions']['ohm_release'].removeprefix('ohm-')}",
+            tables["sessions"],
+        )
+        self.assertIn("median of four runs with Ohm 1.99.0-3", tables["sessions"])
+        self.assertIn(
+            "| ty | Worktree startup (Btrfs loopback, trusted) | `ty_python_semantic` | 109.31 s | 16.76 s | 6.52× |",
+            tables["features"],
+        )
+        slower = copy.deepcopy(self.ty_worktree)
+        total = slower["session"]["ohm"]["total"]
+        total["samples"] = [v * 2 for v in total["samples"]]
+        total["median"] *= 2
+        changed, changed_headlines = publish.render_tables(self.reports, slower)
+        self.assertNotEqual(tables["sessions"], changed["sessions"])
+        self.assertEqual(headlines, changed_headlines)
+        for line in tables["sessions"].splitlines():
+            if line.startswith("| Ruff + uv + Codex"):
+                self.assertIn(line, changed["sessions"])
+
+    def test_rejects_mismatched_ty_version_or_median(self):
+        for change in (
+            lambda r: r.update(rust="1.98.0"),
+            lambda r: r["session"]["stock"]["total"].update(median=1),
+            lambda r: r["worktree"]["ohm"]["total"].update(samples=[float("nan")]),
+        ):
+            with self.subTest(change=change):
+                study = copy.deepcopy(self.ty_worktree)
+                change(study)
+                with self.assertRaises(ValueError):
+                    publish.render_tables(self.reports, study)
 
     def test_rejects_mismatched_or_incomplete_measurements(self):
         changes = [
@@ -124,6 +165,7 @@ class PublicationTests(unittest.TestCase):
             root = Path(directory)
             for name in ("README.md", "BENCHMARKS.md"):
                 shutil.copyfile(publish.ROOT / name, root / name)
+            self.copy_ty_study(root)
             prettier = root / "node_modules/.bin/prettier"
             prettier.parent.mkdir(parents=True)
             prettier.touch()
@@ -174,6 +216,7 @@ class PublicationTests(unittest.TestCase):
                 "inputs",
             ):
                 (root / name).mkdir(parents=True)
+            self.copy_ty_study(root)
             (root / "node_modules/.bin/prettier").touch()
             for kind, report in self.reports.items():
                 publish.write_json(root / "inputs" / f"{kind}.json", report)
