@@ -1,0 +1,109 @@
+diff --git a/crates/ty_python_semantic/src/types/overrides/attributes.rs b/crates/ty_python_semantic/src/types/overrides/attributes.rs
+--- a/crates/ty_python_semantic/src/types/overrides/attributes.rs
++++ b/crates/ty_python_semantic/src/types/overrides/attributes.rs
+@@ -9,2 +9,3 @@
+     Db, ProgramEnvironment, attribute_declarations,
++    lint::LintMetadata,
+     place::{DefinedPlace, Place, TypeOrigin},
+@@ -396,5 +397,6 @@
+ ///
+-/// Return `true` only when a diagnostic was emitted, so callers can stop after the first
+-/// reported base conflict. Property incompatibilities and ordinary mutable narrowing
+-/// have separate rules.
++/// Return the rule for an incompatibility even when its diagnostic is suppressed or
++/// disabled, so callers do not report the same conflict as a method override. Callers
++/// can still check other bases when this rule is disabled. Property incompatibilities
++/// and ordinary mutable narrowing have separate rules.
+ pub(super) fn check_override<'db>(
+@@ -407,3 +409,3 @@
+     superclass_definition: Option<Definition<'db>>,
+-) -> bool {
++) -> Option<&'static LintMetadata> {
+     let db = context.db();
+@@ -426,10 +428,5 @@
+     };
+-    let Some(source) = attribute_contract(db, env, class, receiver, name, source_kind) else {
+-        return false;
+-    };
+-    let Some(target) = attribute_contract(db, env, superclass, receiver, name, inherited_kind)
+-    else {
+-        return false;
+-    };
+-    let Some(violation) = attribute_violation(
++    let source = attribute_contract(db, env, class, receiver, name, source_kind)?;
++    let target = attribute_contract(db, env, superclass, receiver, name, inherited_kind)?;
++    let violation = attribute_violation(
+         db,
+@@ -441,5 +438,3 @@
+         &target,
+-    ) else {
+-        return false;
+-    };
++    )?;
+     // Suppress only conflicts already present with the parent's own specialization of
+@@ -475,3 +470,3 @@
+         {
+-            return false;
++            return None;
+         }
+@@ -488,3 +483,3 @@
+     else {
+-        return false;
++        return Some(rule);
+     };
+@@ -528,3 +523,3 @@
+     }
+-    true
++    Some(rule)
+ }
+@@ -622,3 +617,5 @@
+                 base_definition,
+-            ) {
++            )
++            .is_some_and(|rule| context.is_lint_enabled(rule))
++            {
+                 break;
+diff --git a/crates/ty_python_semantic/src/types/overrides.rs b/crates/ty_python_semantic/src/types/overrides.rs
+--- a/crates/ty_python_semantic/src/types/overrides.rs
++++ b/crates/ty_python_semantic/src/types/overrides.rs
+@@ -652,3 +652,3 @@
+     let mut has_typeddict_in_mro = false;
+-    let mut liskov_diagnostic_emitted = false;
++    let mut liskov_check_complete = false;
+     let mut missing_override_target: Option<MissingOverrideTarget<'db>> = None;
+@@ -848,5 +848,5 @@
+ 
+-            // Only one Liskov diagnostic should be emitted per each invalid override,
+-            // even if it overrides multiple superclasses incorrectly!
+-            if liskov_diagnostic_emitted {
++            // Stop after the first violation of an enabled rule, even if its diagnostic
++            // is suppressed or the override is incompatible with multiple superclasses.
++            if liskov_check_complete {
+                 continue;
+@@ -914,3 +914,3 @@
+                         );
+-                        liskov_diagnostic_emitted = true;
++                        liskov_check_complete = true;
+                         continue;
+@@ -920,7 +920,6 @@
+ 
+-            if configuration.check_attribute_type_violations()
+-                // Constructors may change their signature. Leave their special receiver
+-                // binding and `@override` checks to the method checker below.
+-                && !is_constructor_like_method(&member.name)
+-                && attributes::check_override(
++            // Constructors may change their signature. Leave their special receiver
++            // binding and `@override` checks to the method checker below.
++            if !is_constructor_like_method(&member.name)
++                && let Some(rule) = attributes::check_override(
+                     context,
+@@ -934,3 +933,3 @@
+             {
+-                liskov_diagnostic_emitted = true;
++                liskov_check_complete = context.is_lint_enabled(rule);
+                 continue;
+@@ -1008,3 +1007,3 @@
+ 
+-            liskov_diagnostic_emitted = true;
++            liskov_check_complete = true;
+         }

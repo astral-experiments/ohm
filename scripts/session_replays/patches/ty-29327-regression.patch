@@ -1,0 +1,56 @@
+diff --git a/crates/ty_python_semantic/resources/mdtest/liskov.md b/crates/ty_python_semantic/resources/mdtest/liskov.md
+--- a/crates/ty_python_semantic/resources/mdtest/liskov.md
++++ b/crates/ty_python_semantic/resources/mdtest/liskov.md
+@@ -3042,2 +3042,52 @@
+ 
++## Suppressing mixed override diagnostics
++
++Suppressing an incompatible attribute or property override does not expose a method override
++diagnostic for the same definition.
++
++```py
++from collections.abc import Callable
++
++class AttributeBase:
++    value: Callable[[int], int]
++
++class Incompatible(AttributeBase):
++    def value(self) -> int:  # error: [invalid-attribute-override]
++        return 0
++
++class Suppressed(AttributeBase):
++    def value(self) -> int:  # ty: ignore[invalid-attribute-override]
++        return 0
++
++class PropertyBase:
++    @property
++    def value(self) -> Callable[[int], int]:
++        return lambda x: x
++
++class SuppressedProperty(PropertyBase):
++    def value(self) -> int:  # ty: ignore[invalid-property-type-override]
++        return 0
++```
++
++## Suppressing decorated overrides
++
++A cached class method exposes attributes in addition to its call signature. Replacing it with an
++ordinary class method is an attribute override; suppressing that diagnostic also suppresses the
++incompatible call signature.
++
++```py
++from functools import cache
++
++class Base:
++    @classmethod
++    @cache
++    def value(cls) -> int:
++        return 0
++
++class Child(Base):
++    @classmethod
++    def value(cls) -> int:  # ty: ignore[invalid-attribute-override]
++        return 0
++```
++
+ ## Class variables replacing properties

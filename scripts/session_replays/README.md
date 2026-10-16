@@ -74,6 +74,36 @@ Keep existing fixtures stable so old results remain reproducible. Fixtures can d
 `setup_patches`; the runner verifies and applies them before warmup, then records file hashes and
 modes. Setup time is excluded from session and warmup totals.
 
+### ty diagnostic-suppression session
+
+[`ty-29327.json`](ty-29327.json) replays [Ruff #29327](https://github.com/astral-sh/ruff/pull/29327): failing mdtests, Markdown and Rust edits, package tests, CLI rebuilds, diagnostic checks, and Clippy. It preserves `opt-level = 1` and each command's feature selection. The initial CLI build is untimed.
+
+```sh
+python3 scripts/replay_sessions.py \
+  --project ruff --scenario scripts/session_replays/ty-29327.json \
+  --upstream 1.99.0 --ohm ohm-1.99.0-3 \
+  --source-path ruff=/path/to/ruff --output-dir /path/to/new-ty-results \
+  --jobs 8 --repetitions 4 --native-tool-trust all \
+  --compiler-accounting verbose --offline --require-idle
+```
+
+This enables both Ohm trust opt-ins. Expected failures must match the fixture's exit status and diagnostics.
+
+### Worktree startup
+
+[`benchmark_worktree_start.py`](../benchmark_worktree_start.py) builds the focused `liskov.md` test in a parent checkout, then times creating a worktree and running that test there. Parent preparation is excluded.
+
+```sh
+python3 scripts/benchmark_worktree_start.py \
+  --upstream 1.99.0 --ohm ohm-1.99.0-3 \
+  --source-path /path/to/ruff --output-dir /path/to/new-worktree-results \
+  --jobs 8 --repetitions 3 --compiler-accounting verbose --offline --require-idle
+```
+
+The runner compares stock Rust with two Ohm configurations: a shared build directory, and that directory with both trust opt-ins. Each repetition starts with fresh artifacts. Stock Rust uses `git worktree add`; Ohm uses `cargo worktree add`. Snapshot cloning requires a filesystem such as Btrfs; ext4 can still reuse shared registry builds.
+
+Use a new output directory after an interrupted startup run. See the [results](../benchmark_results/ty-worktree-1.99.0-3.md) for both benchmarks.
+
 ### Warmups and toolchain settings
 
 By default, untimed baseline warmups populate each toolchain's target directory before edits begin.

@@ -16,6 +16,8 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "scripts/benchmark_results"
 KINDS = ("workflow", "sessions", "historical", "ablation", "disk")
+TY_WORKTREE_REPORT = "ty-worktree-1.99.0-3.json"
+TY_SCENARIO = "scripts/session_replays/ty-29327.json"
 
 
 def load(path):
@@ -129,17 +131,74 @@ def table(headers, rows):
     )
 
 
-def render_tables(reports):
+def render_tables(reports, ty_worktree, ty_scenario):
     release, rust = validate(reports)
     version = release.removeprefix("ohm-")
+    if ty_worktree["rust"] != rust or not re.fullmatch(
+        rf"ohm-{re.escape(rust)}-[1-9]\d*", ty_worktree["ohm"]
+    ):
+        raise ValueError("ty study and table toolchain identities differ")
     sessions = reports["sessions"]
     mean = statistics.fmean
     projects = ("ruff", "uv", "codex")
+
+    def ty_total(group, lane):
+        total = ty_worktree[group][lane]["total"]
+        samples = total["samples"]
+        if not samples or not all(math.isfinite(v) and v > 0 for v in samples):
+            raise ValueError("Invalid ty study samples")
+        median = statistics.median(samples)
+        if not math.isclose(median, total["median"]):
+            raise ValueError("ty study median differs from samples")
+        return median
 
     def seconds(pair):
         stock, ohm = pair
         saved = 100 * (stock - ohm) / stock
         return [f"{stock:,.2f} s", f"{ohm:,.2f} s", f"{saved:.2f}%".replace("-", "−")]
+
+    lanes = ("stock", "ohm")
+    ty_commands = [step for step in ty_scenario["steps"] if step["kind"] == "command"]
+    ty_steps = ty_worktree["session_steps"]
+    if len(ty_commands) != len(ty_steps):
+        raise ValueError("ty command count differs from the fixture")
+    ty_categories = {
+        key: [0.0, 0.0]
+        for key in ("check", "test", "clippy", "formatting", "other")
+    }
+    cargo_categories = {
+        "check": "check",
+        "test": "test",
+        "nextest": "test",
+        "clippy": "clippy",
+        "fmt": "formatting",
+    }
+    samples_by_lane = {lane: [] for lane in lanes}
+    for step, command in zip(ty_steps, ty_commands, strict=True):
+        if step["label"] != command["label"]:
+            raise ValueError("ty commands differ from the fixture")
+        category = (
+            cargo_categories.get(command["args"][0], "other")
+            if command["program"] == "cargo"
+            else "other"
+        )
+        for index, lane in enumerate(lanes):
+            samples = step[lane]["seconds"]["samples"]
+            if not samples or not all(math.isfinite(v) and v > 0 for v in samples):
+                raise ValueError("Invalid ty command samples")
+            samples_by_lane[lane].append(samples)
+            ty_categories[category][index] += mean(samples)
+    for lane in lanes:
+        totals = ty_worktree["session"][lane]["commands"]["samples"]
+        if not totals or any(
+            len(samples) != len(totals) for samples in samples_by_lane[lane]
+        ):
+            raise ValueError("ty command sample counts differ")
+        if any(
+            not math.isclose(sum(samples[i] for samples in samples_by_lane[lane]), total)
+            for i, total in enumerate(totals)
+        ):
+            raise ValueError("ty command totals differ from their samples")
 
     session_rows = []
     totals = [0.0, 0.0]
@@ -152,12 +211,19 @@ def render_tables(reports):
         ]
         totals = [a + b for a, b in zip(totals, pair, strict=True)]
         session_rows.append([label, *seconds(pair)])
+    ty_pair = []
+    for lane in lanes:
+        ty_total("session", lane)
+        ty_pair.append(mean(ty_worktree["session"][lane]["total"]["samples"]))
+    session_rows.append(["ty session", *seconds(ty_pair)])
+    totals = [a + b for a, b in zip(totals, ty_pair, strict=True)]
     session_rows.append(["All sessions", *seconds(totals)])
     for category, label in (
         ("check", "`cargo check`"),
         ("test", "`cargo test`, `cargo nextest`, `just test`"),
         ("clippy", "`cargo clippy`"),
         ("formatting", "`cargo fmt`"),
+        ("other", "Other commands"),
     ):
         pair = [
             sum(
@@ -165,8 +231,10 @@ def render_tables(reports):
                 for p in projects
                 for c in sessions["commands"][p]
                 if c["category"] == category
+                or (category == "other" and c["category"] not in ty_categories)
             )
-            for lane in ("stock", "ohm")
+            + ty_categories[category][index]
+            for index, lane in enumerate(lanes)
         ]
         session_rows.append([label, *seconds(pair)])
     session_rows.append(
@@ -178,7 +246,8 @@ def render_tables(reports):
                         mean(sessions["timed_command_seconds"][p][lane])
                         for p in projects
                     )
-                    for lane in ("stock", "ohm")
+                    + mean(ty_worktree["session"][lane]["commands"]["samples"])
+                    for lane in lanes
                 ]
             ),
         ]
@@ -217,7 +286,7 @@ def render_tables(reports):
 
     rendered = {
         "sessions": table(
-            ["Scope", f"Rust {rust}", f"Ohm {version}", "Time saved"], session_rows
+            ["Scope", f"Rust {rust}", "Ohm", "Time saved"], session_rows
         ),
         "disk": table(
             ["Scope", f"Rust {rust}", f"Ohm {version}", "Space saved"], disk_rows
@@ -285,21 +354,39 @@ def render_tables(reports):
             ["Codex", "Shared-worktree build", "`codex-utils-string`"],
         ),
     ]
+    feature_rows = [workflow_row(key, labels) for key, labels in features]
+    for group, filesystem in (
+        ("worktree", "ext4"),
+        ("worktree_copy_on_write", "Btrfs"),
+    ):
+        stock = ty_total(group, "stock")
+        ohm = ty_total(group, "ohm-trusted")
+        feature_rows.append(
+            [
+                "ty",
+                f"Worktree startup ({filesystem})",
+                "`ty_python_semantic`",
+                f"{stock:.2f} s",
+                f"{ohm:.2f} s",
+                f"{stock / ohm:.2f}×",
+            ]
+        )
     rendered["features"] = table(
-        ["Project", "Workflow", "Package", f"Rust {rust}", f"Ohm {version}", "Speedup"],
-        [workflow_row(key, labels) for key, labels in features],
+        ["Project", "Workflow", "Package", f"Rust {rust}", "Ohm", "Speedup"],
+        feature_rows,
     )
     headlines = {
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
         r"\d+% less time": f"{round(100 * (totals[0] - totals[1]) / totals[0])}% less time",
         r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
-        r"Benchmarking Ohm \d+\.\d+\.\d+-\d+ against": f"Benchmarking Ohm {version} against",
     }
     return rendered, headlines
 
 
 def documents(reports):
-    tables, headlines = render_tables(reports)
+    tables, headlines = render_tables(
+        reports, load(RESULTS / TY_WORKTREE_REPORT), load(ROOT / TY_SCENARIO)
+    )
     result = {
         name: (ROOT / name).read_text() for name in ("README.md", "BENCHMARKS.md")
     }

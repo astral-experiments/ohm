@@ -1,0 +1,157 @@
+{
+  "project": "ruff",
+  "repository": "https://github.com/astral-sh/ruff.git",
+  "session": {
+    "id": "ty-override-diagnostic-suppression",
+    "public_pr": "https://github.com/astral-sh/ruff/pull/29327",
+    "final_revision": "e221f3e9b5b22b81b0ce4e7c730ac1f5c990adf0",
+    "description": "Replay the recorded #29327 bug-fix sequence, including two expected red mdtest runs, test-data-only edits, the Rust fix, executable reproducers, package tests, and all-feature Clippy. Warm only the baseline CLI build; preserve the different CLI and semantic-test feature graphs. Snapshot mutation is disabled for both toolchains."
+  },
+  "base_revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+  "fetch_refs": ["refs/pull/29327/head"],
+  "environment": {
+    "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+    "CARGO_PROFILE_DEV_LTO": "off",
+    "CARGO_PROFILE_DEV_DEBUG": "line-tables-only",
+    "INSTA_FORCE_PASS": "0",
+    "INSTA_UPDATE": "no",
+    "MDTEST_UPDATE_SNAPSHOTS": "0"
+  },
+  "warmup": [
+    {
+      "kind": "command",
+      "label": "Warm the baseline ty executable",
+      "program": "cargo",
+      "args": ["build", "--bin", "ty"]
+    }
+  ],
+  "steps": [
+    {
+      "kind": "command",
+      "label": "Build ty before reproducing the bug",
+      "program": "cargo",
+      "args": ["build", "--bin", "ty"]
+    },
+    {
+      "kind": "command",
+      "label": "Verify the original diagnostics and retain the baseline binary",
+      "program": "python",
+      "args": ["helpers/ty-29327/repro.py", "baseline"],
+      "output_contains": ["Verified both original diagnostics"]
+    },
+    {
+      "kind": "edit",
+      "label": "Add the first suppression regressions",
+      "patch": "patches/ty-29327-regression.patch"
+    },
+    {
+      "kind": "command",
+      "label": "Observe the first failing mdtest",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "--",
+        "mdtest::liskov.md"
+      ],
+      "expected_exit": 100,
+      "output_contains": [
+        "1 test run: 0 passed, 1 failed",
+        "unexpected error: [invalid-method-override]",
+        "Definition is incompatible with `AttributeBase.value`",
+        "Definition is incompatible with `PropertyBase.value`",
+        "Definition is incompatible with `Base.value`"
+      ]
+    },
+    {
+      "kind": "edit",
+      "label": "Expand the test data without changing Rust source",
+      "patch": "patches/ty-29327-expanded-regression.patch"
+    },
+    {
+      "kind": "command",
+      "label": "Repeat the failing mdtest after a test-data-only edit",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "--",
+        "mdtest::liskov.md"
+      ],
+      "expected_exit": 100,
+      "output_contains": [
+        "1 test run: 0 passed, 1 failed",
+        "unexpected error: [invalid-method-override]",
+        "Definition is incompatible with `AttributeBase.value`",
+        "Definition is incompatible with `PropertyBase.value`",
+        "Definition is incompatible with `Base.value`",
+        "Definition is incompatible with `Base.attribute`",
+        "Definition is incompatible with `Base.property`"
+      ]
+    },
+    {
+      "kind": "edit",
+      "label": "Fix override diagnostic suppression",
+      "patch": "patches/ty-29327-fix.patch"
+    },
+    {
+      "kind": "command",
+      "label": "Pass the focused regression after the Rust edit",
+      "program": "cargo",
+      "args": [
+        "nextest",
+        "run",
+        "-p",
+        "ty_python_semantic",
+        "--test",
+        "mdtest",
+        "--",
+        "mdtest::liskov.md"
+      ],
+      "output_contains": ["1 test run: 1 passed"]
+    },
+    {
+      "kind": "command",
+      "label": "Run all semantic package tests",
+      "program": "cargo",
+      "args": ["nextest", "run", "-p", "ty_python_semantic", "--no-fail-fast"],
+      "output_contains": ["tests run:"]
+    },
+    {
+      "kind": "command",
+      "label": "Rebuild the ty executable with its original feature graph",
+      "program": "cargo",
+      "args": ["build", "--bin", "ty"]
+    },
+    {
+      "kind": "command",
+      "label": "Compare 24 baseline and fixed diagnostic results",
+      "program": "python",
+      "args": ["helpers/ty-29327/repro.py", "verify"],
+      "output_contains": ["Verified 24 baseline and fixed diagnostic results."]
+    },
+    {
+      "kind": "command",
+      "label": "Run Clippy for all semantic targets and features",
+      "program": "cargo",
+      "args": [
+        "clippy",
+        "-p",
+        "ty_python_semantic",
+        "--all-targets",
+        "--all-features"
+      ],
+      "environment": {
+        "CARGO_BUILD_WARNINGS": "deny"
+      }
+    }
+  ]
+}
