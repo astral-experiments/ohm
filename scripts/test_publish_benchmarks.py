@@ -30,14 +30,9 @@ class PublicationTests(unittest.TestCase):
                 publish.normalized_markdown((publish.ROOT / name).read_text()),
             )
 
-    def test_ty_rows_keep_their_version_and_do_not_change_the_original_aggregate(self):
+    def test_ty_rows_do_not_change_the_original_aggregate(self):
         tables, headlines = publish.render_tables(self.reports, self.ty_worktree)
         self.assertIn("| ty session | 347.60 s | 265.85 s | 23.52% |", tables["sessions"])
-        self.assertIn(
-            f"other sessions use Ohm {self.reports['sessions']['ohm_release'].removeprefix('ohm-')} (means)",
-            tables["sessions"],
-        )
-        self.assertIn("ty uses Ohm 1.99.0-3 (four-run median)", tables["sessions"])
         self.assertIn(
             "| ty | Worktree startup (Btrfs) | `ty_python_semantic` | 109.31 s | 16.76 s | 6.52× |",
             tables["features"],
@@ -50,7 +45,7 @@ class PublicationTests(unittest.TestCase):
         self.assertNotEqual(tables["sessions"], changed["sessions"])
         self.assertEqual(headlines, changed_headlines)
         for line in tables["sessions"].splitlines():
-            if line.startswith("| Ruff + uv + Codex"):
+            if line.startswith(("| Ruff + uv + Codex", "| All commands")):
                 self.assertIn(line, changed["sessions"])
 
     def test_rejects_mismatched_ty_version_or_median(self):

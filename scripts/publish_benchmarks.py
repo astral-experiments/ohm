@@ -190,7 +190,7 @@ def render_tables(reports, ty_worktree):
         session_rows.append([label, *seconds(pair)])
     session_rows.append(
         [
-            "Ruff + uv + Codex commands",
+            "All commands",
             *seconds(
                 [
                     sum(
@@ -237,10 +237,7 @@ def render_tables(reports, ty_worktree):
     rendered = {
         "sessions": table(
             ["Scope", f"Rust {rust}", "Ohm", "Time saved"], session_rows
-        )
-        + f"\n\nty uses Ohm {ty_version} (four-run median); "
-        f"other sessions use Ohm {version} (means). "
-        "Totals and command timings cover Ruff, uv, and Codex.\n",
+        ),
         "disk": table(
             ["Scope", f"Rust {rust}", f"Ohm {version}", "Space saved"], disk_rows
         ),

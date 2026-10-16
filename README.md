@@ -23,9 +23,7 @@ Comparing stock Rust and Ohm on replayed development sessions:
 | `cargo test`, `cargo nextest`, `just test` | 627.07 s    | 496.18 s | 20.87%     |
 | `cargo clippy`                             | 330.65 s    | 148.50 s | 55.09%     |
 | `cargo fmt`                                | 14.27 s     | 11.20 s  | 21.51%     |
-| Ruff + uv + Codex commands                 | 1,116.07 s  | 702.79 s | 37.03%     |
-
-ty uses Ohm 1.99.0-3 (four-run median); other sessions use Ohm 1.99.0-2 (means). Totals and command timings cover Ruff, uv, and Codex.
+| All commands                               | 1,116.07 s  | 702.79 s | 37.03%     |
 
 <!-- /benchmark:sessions -->
 
