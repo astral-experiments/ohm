@@ -4,6 +4,7 @@ import copy
 import json
 from pathlib import Path
 import shutil
+import statistics
 import subprocess
 import tempfile
 import unittest
@@ -17,11 +18,15 @@ class PublicationTests(unittest.TestCase):
     def setUp(self):
         self.reports = publish.latest_reports()
         self.ty_worktree = publish.load(publish.RESULTS / publish.TY_WORKTREE_REPORT)
+        self.ty_scenario = publish.load(publish.ROOT / publish.TY_SCENARIO)
 
     def copy_ty_study(self, root):
         destination = root / "scripts/benchmark_results" / publish.TY_WORKTREE_REPORT
         destination.parent.mkdir(parents=True, exist_ok=True)
         publish.write_json(destination, self.ty_worktree)
+        fixture = root / publish.TY_SCENARIO
+        fixture.parent.mkdir(parents=True, exist_ok=True)
+        publish.write_json(fixture, self.ty_scenario)
 
     def test_tables_match_current_reports(self):
         for name, expected in publish.documents(self.reports).items():
@@ -30,23 +35,71 @@ class PublicationTests(unittest.TestCase):
                 publish.normalized_markdown((publish.ROOT / name).read_text()),
             )
 
-    def test_ty_rows_do_not_change_the_original_aggregate(self):
-        tables, headlines = publish.render_tables(self.reports, self.ty_worktree)
-        self.assertIn("| ty session | 347.60 s | 265.85 s | 23.52% |", tables["sessions"])
+    def test_ty_is_included_in_session_and_command_totals(self):
+        tables, _ = publish.render_tables(
+            self.reports, self.ty_worktree, self.ty_scenario
+        )
+        self.assertIn("| ty session | 347.80 s | 266.22 s | 23.46% |", tables["sessions"])
         self.assertIn(
             "| ty | Worktree startup (Btrfs) | `ty_python_semantic` | 109.31 s | 16.76 s | 6.52× |",
             tables["features"],
         )
-        slower = copy.deepcopy(self.ty_worktree)
-        total = slower["session"]["ohm"]["total"]
-        total["samples"] = [v * 2 for v in total["samples"]]
-        total["median"] *= 2
-        changed, changed_headlines = publish.render_tables(self.reports, slower)
-        self.assertNotEqual(tables["sessions"], changed["sessions"])
-        self.assertEqual(headlines, changed_headlines)
-        for line in tables["sessions"].splitlines():
-            if line.startswith(("| Ruff + uv + Codex", "| All commands")):
-                self.assertIn(line, changed["sessions"])
+        rows = {
+            cells[0]: cells[1:3]
+            for line in tables["sessions"].splitlines()[2:]
+            if (cells := [cell.strip() for cell in line.strip("|").split("|")])
+        }
+        for index, lane in enumerate(("stock", "ohm")):
+            session_sum = sum(
+                float(rows[label][index].removesuffix(" s").replace(",", ""))
+                for label in ("Ruff session", "uv session", "Codex session", "ty session")
+            )
+            shown_total = float(
+                rows["All sessions"][index].removesuffix(" s").replace(",", "")
+            )
+            self.assertAlmostEqual(session_sum, shown_total, delta=0.02)
+            command_sum = sum(
+                float(rows[label][index].removesuffix(" s").replace(",", ""))
+                for label in (
+                    "`cargo check`",
+                    "`cargo test`, `cargo nextest`, `just test`",
+                    "`cargo clippy`",
+                    "`cargo fmt`",
+                    "Other commands",
+                )
+            )
+            all_commands = float(
+                rows["All commands"][index].removesuffix(" s").replace(",", "")
+            )
+            self.assertAlmostEqual(command_sum, all_commands, delta=0.03)
+            expected_ty = statistics.fmean(
+                self.ty_worktree["session"][lane]["commands"]["samples"]
+            )
+            old_commands = sum(
+                statistics.fmean(
+                    self.reports["sessions"]["timed_command_seconds"][p][lane]
+                )
+                for p in ("ruff", "uv", "codex")
+            )
+            self.assertAlmostEqual(all_commands, old_commands + expected_ty, delta=0.01)
+            for category, label, indices in (
+                ("test", "`cargo test`, `cargo nextest`, `just test`", (2, 3, 4, 5)),
+                ("clippy", "`cargo clippy`", (8,)),
+            ):
+                old = sum(
+                    statistics.fmean(command["wall_seconds"][lane])
+                    for project in ("ruff", "uv", "codex")
+                    for command in self.reports["sessions"]["commands"][project]
+                    if command["category"] == category
+                )
+                ty = sum(
+                    statistics.fmean(
+                        self.ty_worktree["session_steps"][i][lane]["seconds"]["samples"]
+                    )
+                    for i in indices
+                )
+                observed = float(rows[label][index].removesuffix(" s").replace(",", ""))
+                self.assertAlmostEqual(observed, old + ty, delta=0.01)
 
     def test_rejects_mismatched_ty_version_or_median(self):
         for change in (
@@ -58,7 +111,7 @@ class PublicationTests(unittest.TestCase):
                 study = copy.deepcopy(self.ty_worktree)
                 change(study)
                 with self.assertRaises(ValueError):
-                    publish.render_tables(self.reports, study)
+                    publish.render_tables(self.reports, study, self.ty_scenario)
 
     def test_rejects_mismatched_or_incomplete_measurements(self):
         changes = [
@@ -246,7 +299,7 @@ class PublicationTests(unittest.TestCase):
                 for name, expected in publish.documents(actual).items():
                     self.assertEqual((root / name).read_text(), expected)
             self.assertEqual(
-                len(list((root / "scripts/session_replays").glob("*.json"))), 3
+                len(list((root / "scripts/session_replays").glob("release-*.json"))), 3
             )
 
 

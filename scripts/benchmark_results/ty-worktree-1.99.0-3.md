@@ -4,11 +4,11 @@ We compare stock Rust 1.99.0 with Ohm 1.99.0-3 on Linux. The session replays [Ru
 
 | Workload                 | Rust 1.99.0 | Ohm 1.99.0-3 | Time saved |
 | ------------------------ | ----------- | ------------ | ---------- |
-| ty session               | 347.60 s    | 265.85 s     | 23.52%     |
+| ty session               | 347.80 s    | 266.22 s     | 23.46%     |
 | Worktree startup (ext4)  | 109.46 s    | 66.14 s      | 39.58%     |
 | Worktree startup (Btrfs) | 109.31 s    | 16.76 s      | 84.67%     |
 
-These are medians of four session replays and three startup runs per configuration. Ohm uses a shared build directory and both trust opt-ins. Btrfs runs on a loopback filesystem backed by ext4.
+The session result is the mean of four replays; startup results are medians of three runs per configuration. Ohm uses a shared build directory and both trust opt-ins. Btrfs runs on a loopback filesystem backed by ext4.
 
 ## Session
 
@@ -30,7 +30,7 @@ Ohm saves the most time on the first test build, package tests, and Clippy. The 
 
 For the package tests, Cargo's reported build time falls from 80.50 s to 48.98 s, while Nextest's test execution rises from 16.47 s to 18.65 s. Compiler counts describe driver launches, not the work each driver performs.
 
-Complete-session ranges are 341.81–354.21 s for Rust and 263.09–270.10 s for Ohm. Initial CLI build medians are 131.95 s and 116.76 s. Per-command medians need not sum to the session median.
+Complete-session ranges are 341.81–354.21 s for Rust and 263.09–270.10 s for Ohm. Initial CLI build medians are 131.95 s and 116.76 s. Command timings are medians.
 
 ## Worktree startup
 

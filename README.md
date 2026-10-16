@@ -6,7 +6,7 @@
 An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
 
 With Ohm, incremental builds can be up to 30× faster, replayed development sessions take around
-37% less time, and `target/` disk usage decreases by around 55%.
+34% less time, and `target/` disk usage decreases by around 55%.
 
 Comparing stock Rust and Ohm on replayed development sessions:
 
@@ -17,13 +17,14 @@ Comparing stock Rust and Ohm on replayed development sessions:
 | Ruff session                               | 438.46 s    | 286.58 s | 34.64%     |
 | uv session                                 | 144.04 s    | 93.94 s  | 34.78%     |
 | Codex session                              | 535.54 s    | 324.34 s | 39.44%     |
-| ty session                                 | 347.60 s    | 265.85 s | 23.52%     |
-| Ruff + uv + Codex sessions                 | 1,118.04 s  | 704.86 s | 36.96%     |
+| ty session                                 | 347.80 s    | 266.22 s | 23.46%     |
+| All sessions                               | 1,465.84 s  | 971.08 s | 33.75%     |
 | `cargo check`                              | 144.08 s    | 46.91 s  | 67.44%     |
-| `cargo test`, `cargo nextest`, `just test` | 627.07 s    | 496.18 s | 20.87%     |
-| `cargo clippy`                             | 330.65 s    | 148.50 s | 55.09%     |
+| `cargo test`, `cargo nextest`, `just test` | 853.66 s    | 673.29 s | 21.13%     |
+| `cargo clippy`                             | 416.85 s    | 196.49 s | 52.86%     |
 | `cargo fmt`                                | 14.27 s     | 11.20 s  | 21.51%     |
-| All commands                               | 1,116.07 s  | 702.79 s | 37.03%     |
+| Other commands                             | 34.31 s     | 39.43 s  | −14.93%    |
+| All commands                               | 1,463.17 s  | 967.32 s | 33.89%     |
 
 <!-- /benchmark:sessions -->
 
@@ -189,12 +190,7 @@ avoid rebuilding unchanged dependents:
 | ty      | Worktree startup (ext4)  | `ty_python_semantic` | 109.46 s    | 66.14 s | 1.66×   |
 | ty      | Worktree startup (Btrfs) | `ty_python_semantic` | 109.31 s    | 16.76 s | 6.52×   |
 
-ty uses Ohm 1.99.0-3, a shared build directory, and both trust opt-ins; other rows use Ohm 1.99.0-2. Worktree startup includes creation and the first test (median of three runs), excluding parent preparation. Btrfs uses a loopback filesystem.
-
 <!-- /benchmark:features -->
-
-See the [ty benchmark report](scripts/benchmark_results/ty-worktree-1.99.0-3.md) for
-configuration, individual runs, and results without the trust opt-ins.
 
 ## Philosophy
 

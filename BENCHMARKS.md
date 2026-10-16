@@ -93,4 +93,6 @@ Rust does not isolate changes between Ohm releases.
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
 
+Ruff, uv, and Codex were measured with Ohm 1.99.0-2 on one Linux host; the ty session used Ohm 1.99.0-3 on another, with native-tool trust and verbose compiler logging enabled.
+
 The [APFS study](scripts/benchmark_results/disk-1.99.0-2.json) measures physical disk allocation. `benchmark.py` measures elapsed time; the two require different measurement procedures.
