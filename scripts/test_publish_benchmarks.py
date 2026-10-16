@@ -34,12 +34,12 @@ class PublicationTests(unittest.TestCase):
         tables, headlines = publish.render_tables(self.reports, self.ty_worktree)
         self.assertIn("| ty session | 347.60 s | 265.85 s | 23.52% |", tables["sessions"])
         self.assertIn(
-            f"means with Ohm {self.reports['sessions']['ohm_release'].removeprefix('ohm-')}",
+            f"other sessions use Ohm {self.reports['sessions']['ohm_release'].removeprefix('ohm-')} (means)",
             tables["sessions"],
         )
-        self.assertIn("median of four runs with Ohm 1.99.0-3", tables["sessions"])
+        self.assertIn("ty uses Ohm 1.99.0-3 (four-run median)", tables["sessions"])
         self.assertIn(
-            "| ty | Worktree startup (Btrfs loopback, trusted) | `ty_python_semantic` | 109.31 s | 16.76 s | 6.52× |",
+            "| ty | Worktree startup (Btrfs) | `ty_python_semantic` | 109.31 s | 16.76 s | 6.52× |",
             tables["features"],
         )
         slower = copy.deepcopy(self.ty_worktree)
@@ -57,7 +57,7 @@ class PublicationTests(unittest.TestCase):
         for change in (
             lambda r: r.update(rust="1.98.0"),
             lambda r: r["session"]["stock"]["total"].update(median=1),
-            lambda r: r["worktree"]["ohm"]["total"].update(samples=[float("nan")]),
+            lambda r: r["worktree"]["ohm-trusted"]["total"].update(samples=[float("nan")]),
         ):
             with self.subTest(change=change):
                 study = copy.deepcopy(self.ty_worktree)

@@ -25,7 +25,7 @@ Comparing stock Rust and Ohm on replayed development sessions:
 | `cargo fmt`                                | 14.27 s     | 11.20 s  | 21.51%     |
 | Ruff + uv + Codex commands                 | 1,116.07 s  | 702.79 s | 37.03%     |
 
-Ruff, uv, and Codex report means with Ohm 1.99.0-2; ty reports the median of four runs with Ohm 1.99.0-3. Totals and the command breakdown cover Ruff, uv, and Codex. The ty session uses a shared build directory and both trust opt-ins.
+ty uses Ohm 1.99.0-3 (four-run median); other sessions use Ohm 1.99.0-2 (means). Totals and command timings cover Ruff, uv, and Codex.
 
 <!-- /benchmark:sessions -->
 
@@ -180,26 +180,23 @@ avoid rebuilding unchanged dependents:
 
 <!-- benchmark:features -->
 
-| Project | Workflow                                   | Package              | Rust 1.99.0 | Ohm     | Speedup |
-| ------- | ------------------------------------------ | -------------------- | ----------- | ------- | ------- |
-| uv      | Build, then check                          | `uv`                 | 66.46 s     | 18.98 s | 3.50×   |
-| uv      | Shared-worktree build                      | `uv-normalize`       | 9.01 s      | 1.01 s  | 8.95×   |
-| Codex   | Build, then check                          | `codex-core`         | 111.64 s    | 44.83 s | 2.49×   |
-| Codex   | No-op formatting                           | Workspace            | 10.25 s     | 0.29 s  | 34.87×  |
-| Codex   | Formatting after an edit                   | `codex-core`         | 9.71 s      | 0.43 s  | 22.40×  |
-| Codex   | Shared-worktree build                      | `codex-utils-string` | 3.43 s      | 0.77 s  | 4.44×   |
-| ty      | Worktree startup (ext4)                    | `ty_python_semantic` | 109.46 s    | 72.43 s | 1.51×   |
-| ty      | Worktree startup (ext4, trusted)           | `ty_python_semantic` | 109.46 s    | 66.14 s | 1.66×   |
-| ty      | Worktree startup (Btrfs loopback)          | `ty_python_semantic` | 109.31 s    | 73.34 s | 1.49×   |
-| ty      | Worktree startup (Btrfs loopback, trusted) | `ty_python_semantic` | 109.31 s    | 16.76 s | 6.52×   |
+| Project | Workflow                 | Package              | Rust 1.99.0 | Ohm     | Speedup |
+| ------- | ------------------------ | -------------------- | ----------- | ------- | ------- |
+| uv      | Build, then check        | `uv`                 | 66.46 s     | 18.98 s | 3.50×   |
+| uv      | Shared-worktree build    | `uv-normalize`       | 9.01 s      | 1.01 s  | 8.95×   |
+| Codex   | Build, then check        | `codex-core`         | 111.64 s    | 44.83 s | 2.49×   |
+| Codex   | No-op formatting         | Workspace            | 10.25 s     | 0.29 s  | 34.87×  |
+| Codex   | Formatting after an edit | `codex-core`         | 9.71 s      | 0.43 s  | 22.40×  |
+| Codex   | Shared-worktree build    | `codex-utils-string` | 3.43 s      | 0.77 s  | 4.44×   |
+| ty      | Worktree startup (ext4)  | `ty_python_semantic` | 109.46 s    | 66.14 s | 1.66×   |
+| ty      | Worktree startup (Btrfs) | `ty_python_semantic` | 109.31 s    | 16.76 s | 6.52×   |
 
-uv and Codex use Ohm 1.99.0-2; ty uses Ohm 1.99.0-3. The ty rows report medians of three runs with a shared build directory; trusted runs also enable both trust opt-ins. Startup includes worktree creation and first validation, with parent preparation excluded. Only the trusted Btrfs runs seed snapshots.
+ty uses Ohm 1.99.0-3, a shared build directory, and both trust opt-ins; other rows use Ohm 1.99.0-2. Worktree startup includes creation and the first test (median of three runs), excluding parent preparation. Btrfs uses a loopback filesystem.
 
 <!-- /benchmark:features -->
 
-The ty measurements use eight Cargo jobs and `opt-level = 1` on Linux. See the
-[detailed report](scripts/benchmark_results/ty-worktree-1.99.0-3.md) for sample ranges,
-per-command timings, preparation costs, and raw evidence.
+See the [ty benchmark report](scripts/benchmark_results/ty-worktree-1.99.0-3.md) for
+configuration, individual runs, and results without the trust opt-ins.
 
 ## Philosophy
 

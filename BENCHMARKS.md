@@ -7,7 +7,7 @@ Ohm has three benchmark runners:
 - [`scripts/replay_sessions.py`](scripts/replay_sessions.py) replays recorded development sessions
   in Ruff/ty, uv, and Codex. See the [replay guide](scripts/session_replays/README.md).
 - [`scripts/benchmark_worktree_start.py`](scripts/benchmark_worktree_start.py) measures worktree
-  creation and the first focused validation after warming the parent checkout. See the
+  creation and its first test run, starting from a parent that has built the test. See the
   [worktree startup guide](scripts/session_replays/README.md#worktree-startup).
 
 The [README](README.md) summarizes the published results.
@@ -91,22 +91,6 @@ Rust does not isolate changes between Ohm releases.
 - [Workflow and disk-usage results](scripts/benchmark_results/)
 - [Session fixtures and replay results](scripts/session_replays/)
 
-The result files record the measured versions, source revisions, configuration, and methodology. The
-macOS/APFS disk studies use a separate volume-allocation meter and worktree schedule;
-`benchmark.py` measures elapsed time and does not reproduce those studies.
+The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
 
-Ohm 1.99.0-2 results cover [216 workflow samples](scripts/benchmark_results/release-1.99.0-2.json), [12 current-session replays](scripts/session_replays/release-1.99.0-2-baseline.json), [four historical Ruff replays](scripts/session_replays/release-1.99.0-2-ruff-historical.json), and [eight uv ablation replays](scripts/session_replays/release-1.99.0-2-uv-feature-ablation.json). Linux timings compare stock Rust 1.99.0 with Ohm using eight jobs on a 32-CPU AMD EPYC-Genoa Processor managed devbox, with Falcon and other infrastructure services enabled.
-
-Each suite passed six five-second preflight checks requiring at least 95% idle, at most 0.5% I/O wait and 0.1% steal, and no unrelated compilers. Continuous monitoring rejects unrelated compilers, intervals with more than 5% host CPU used by other processes belonging to the benchmark user, and three consecutive two-second intervals with more than 5% outside CPU across all users excluding the recorded Falcon service. All service overhead remains in the timings. The runs retain at least 60 GiB of free space. The CPU audit retains telemetry covering all 428 timed commands and their warmups. All four Linux suites disable automatic Git maintenance during benchmark commands. After each replay, the campaign records source and command checks, plus nextest selection inventories for Ruff and Codex, before discarding its build artifacts. It then requires a fresh 30-second quiet check.
-
-The [detailed reports](scripts/benchmark_results/README.md) and [raw evidence archive](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-2-6cbbfac41159) retain excluded attempts, retries, and audit evidence. One historical replay cell was rejected by the compiler-contention guard and rerun from fresh source and build artifacts; the three completed cells were preserved unchanged. Both compilers receive the same formatting and snapshot compatibility patches for Rust 1.99. All Codex replay cells use the same short, private temporary-directory path configured before warmup.
-
-The uv fixtures leave dev/test debug information unspecified: stock Rust uses full debug information, while Ohm defaults to line tables. Ruff's fixtures explicitly request line tables, and Codex's pinned source explicitly requests limited debug information. The explicit settings are the same across toolchains; the uv comparison includes the released default change. All feature-ablation cells use the same Ohm debug default.
-
-The [APFS study](scripts/benchmark_results/disk-1.99.0-2.json) measures physical allocation across eight cohorts and 44 worktrees. Its [uv fixture](scripts/session_replays/disk-1.99.0-1-uv.json) applies the same test patch to both toolchains. All 404 Cargo commands passed; their logs record 53,664 test starts. Another 22 runtime checks passed after measurement.
-
-The meter reads native APFS volume allocation and cross-checks it against container allocation. The one- and ten-worktree comparisons wait at least 30 seconds after the workload finishes, flush the volume, and require five stable allocation readings. The two-worktree comparisons use the checkpoint immediately after the continuation completes. Concurrent builds on other volumes are allowed; the local study reports physical allocation only.
-
-Allocation-measurement retries and capacity preflights are recorded in the run evidence. The study retained the same workload inputs and 60 GiB runtime reserve throughout. Its paired comparison audit accounts for uv's released debug-default difference.
-
-Replays set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all`; the APFS study also sets `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all`. These comparisons use each runner's documented configuration against stock Rust and do not isolate individual optimizations or changes between Ohm releases.
+The [APFS study](scripts/benchmark_results/disk-1.99.0-2.json) measures physical disk allocation. `benchmark.py` measures elapsed time; the two require different measurement procedures.

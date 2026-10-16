@@ -238,10 +238,9 @@ def render_tables(reports, ty_worktree):
         "sessions": table(
             ["Scope", f"Rust {rust}", "Ohm", "Time saved"], session_rows
         )
-        + f"\n\nRuff, uv, and Codex report means with Ohm {version}; "
-        f"ty reports the median of four runs with Ohm {ty_version}. "
-        "Totals and the command breakdown cover Ruff, uv, and Codex. "
-        "The ty session uses a shared build directory and both trust opt-ins.\n",
+        + f"\n\nty uses Ohm {ty_version} (four-run median); "
+        f"other sessions use Ohm {version} (means). "
+        "Totals and command timings cover Ruff, uv, and Codex.\n",
         "disk": table(
             ["Scope", f"Rust {rust}", f"Ohm {version}", "Space saved"], disk_rows
         ),
@@ -311,31 +310,29 @@ def render_tables(reports, ty_worktree):
     feature_rows = [workflow_row(key, labels) for key, labels in features]
     for group, filesystem in (
         ("worktree", "ext4"),
-        ("worktree_copy_on_write", "Btrfs loopback"),
+        ("worktree_copy_on_write", "Btrfs"),
     ):
         stock = ty_total(group, "stock")
-        for lane, suffix in (("ohm", ""), ("ohm-trusted", ", trusted")):
-            ohm = ty_total(group, lane)
-            feature_rows.append(
-                [
-                    "ty",
-                    f"Worktree startup ({filesystem}{suffix})",
-                    "`ty_python_semantic`",
-                    f"{stock:.2f} s",
-                    f"{ohm:.2f} s",
-                    f"{stock / ohm:.2f}×",
-                ]
-            )
+        ohm = ty_total(group, "ohm-trusted")
+        feature_rows.append(
+            [
+                "ty",
+                f"Worktree startup ({filesystem})",
+                "`ty_python_semantic`",
+                f"{stock:.2f} s",
+                f"{ohm:.2f} s",
+                f"{stock / ohm:.2f}×",
+            ]
+        )
     rendered["features"] = (
         table(
             ["Project", "Workflow", "Package", f"Rust {rust}", "Ohm", "Speedup"],
             feature_rows,
         )
-        + f"\n\nuv and Codex use Ohm {version}; ty uses Ohm {ty_version}. "
-        "The ty rows report medians of three runs with a shared build directory; "
-        "trusted runs also enable both trust opt-ins. Startup includes worktree "
-        "creation and first validation, with parent preparation excluded. "
-        "Only the trusted Btrfs runs seed snapshots.\n"
+        + f"\n\nty uses Ohm {ty_version}, a shared build directory, and both trust "
+        f"opt-ins; other rows use Ohm {version}. Worktree startup includes creation "
+        "and the first test (median of three runs), excluding parent preparation. "
+        "Btrfs uses a loopback filesystem.\n"
     )
     headlines = {
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",

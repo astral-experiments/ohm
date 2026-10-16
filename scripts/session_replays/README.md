@@ -76,56 +76,33 @@ modes. Setup time is excluded from session and warmup totals.
 
 ### ty diagnostic-suppression session
 
-[`ty-29327.json`](ty-29327.json) replays [Ruff #29327](https://github.com/astral-sh/ruff/pull/29327).
-It builds the ty executable, checks two Python reproducers, adds and expands Markdown regressions,
-runs two expected failing mdtests, applies the Rust fix, runs focused and package tests, rebuilds ty,
-checks 24 baseline/fixed diagnostic results, and runs Clippy with all targets and features.
-The three edit patches reproduce the public PR exactly.
-
-The baseline CLI build is warmed before timing. The replay preserves `opt-level = 1` and the
-different feature selections of the CLI, semantic tests, and Clippy. It disables snapshot mutation
-for both toolchains. The Python helper replaces machine-specific paths and the original `uv run`
-launcher; its baseline step includes copying the saved executable. Expected failures require both
-the recorded exit status and diagnostic assertions, so a compiler failure cannot count as a red test.
+[`ty-29327.json`](ty-29327.json) replays [Ruff #29327](https://github.com/astral-sh/ruff/pull/29327): failing mdtests, Markdown and Rust edits, package tests, CLI rebuilds, diagnostic checks, and Clippy. It preserves `opt-level = 1` and each command's feature selection. The initial CLI build is untimed.
 
 ```sh
 python3 scripts/replay_sessions.py \
   --project ruff --scenario scripts/session_replays/ty-29327.json \
   --upstream 1.99.0 --ohm ohm-1.99.0-3 \
   --source-path ruff=/path/to/ruff --output-dir /path/to/new-ty-results \
-  --jobs 8 --repetitions 4 --native-tool-trust all --require-idle
+  --jobs 8 --repetitions 4 --native-tool-trust all \
+  --compiler-accounting verbose --offline --require-idle
 ```
 
-`--native-tool-trust all` adds authenticated native-tool reuse to the runner's existing
-procedural-macro trust opt-in. This matches the local development configuration used for the
-recorded session; it is additional to packaged defaults. Existing fixtures and results remain unchanged.
-
-See the [Ohm 1.99.0-3 measurements](../benchmark_results/ty-worktree-1.99.0-3.md) for timings,
-compiler counts, and source and test checks.
+This enables both Ohm trust opt-ins. Expected failures must match the fixture's exit status and diagnostics.
 
 ### Worktree startup
 
-[`benchmark_worktree_start.py`](../benchmark_worktree_start.py) measures a separate transition:
-warm the unmodified parent checkout with the focused `liskov.md` mdtest, create a worktree at the
-same revision, then run that validation for the first time in its private target directory.
-The parent warmup is reported separately. Creation and first-validation times are reported
-individually and summed; source checks between them are excluded.
+[`benchmark_worktree_start.py`](../benchmark_worktree_start.py) builds the focused `liskov.md` test in a parent checkout, then times creating a worktree and running that test there. Parent preparation is excluded.
 
 ```sh
 python3 scripts/benchmark_worktree_start.py \
   --upstream 1.99.0 --ohm ohm-1.99.0-3 \
   --source-path /path/to/ruff --output-dir /path/to/new-worktree-results \
-  --jobs 8 --repetitions 3 --require-idle
+  --jobs 8 --repetitions 3 --compiler-accounting verbose --offline --require-idle
 ```
 
-Stock Rust uses `git worktree add`; Ohm uses `cargo worktree add` to seed compatible state from
-the parent. Both keep workspace outputs private. The runner measures Ohm with a separate shared
-build directory, then with both local trust opt-ins set to `all`. Each configuration and repetition
-starts with fresh parent, child, and shared build directories. The order rotates between repetitions.
-Snapshot seeding requires copy-on-write file cloning. Cargo reports skipped profiles when the
-filesystem cannot clone them; shared registry artifacts can still reduce the first build's work.
-The result measures first-validation latency on the host filesystem, not APFS disk savings or a
-warm edit/retest loop. Interrupted attempts need a new output directory.
+The runner compares stock Rust with two Ohm configurations: a shared build directory, and that directory with both trust opt-ins. Each repetition starts with fresh artifacts. Stock Rust uses `git worktree add`; Ohm uses `cargo worktree add`. Snapshot cloning requires a filesystem such as Btrfs; ext4 can still reuse shared registry builds.
+
+Use a new output directory after an interrupted startup run. See the [results](../benchmark_results/ty-worktree-1.99.0-3.md) for both benchmarks.
 
 ### Warmups and toolchain settings
 
