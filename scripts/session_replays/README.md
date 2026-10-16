@@ -100,6 +100,9 @@ python3 scripts/replay_sessions.py \
 procedural-macro trust opt-in. This matches the local development configuration used for the
 recorded session; it is additional to packaged defaults. Existing fixtures and results remain unchanged.
 
+See the [Ohm 1.99.0-3 measurements](../benchmark_results/ty-worktree-1.99.0-3.md) for timings,
+compiler counts, and source and test checks.
+
 ### Worktree startup
 
 [`benchmark_worktree_start.py`](../benchmark_worktree_start.py) measures a separate transition:
@@ -119,6 +122,8 @@ Stock Rust uses `git worktree add`; Ohm uses `cargo worktree add` to seed compat
 the parent. Both keep workspace outputs private. The runner measures Ohm with a separate shared
 build directory, then with both local trust opt-ins set to `all`. Each configuration and repetition
 starts with fresh parent, child, and shared build directories. The order rotates between repetitions.
+Snapshot seeding requires copy-on-write file cloning. Cargo reports skipped profiles when the
+filesystem cannot clone them; shared registry artifacts can still reduce the first build's work.
 The result measures first-validation latency on the host filesystem, not APFS disk savings or a
 warm edit/retest loop. Interrupted attempts need a new output directory.
 

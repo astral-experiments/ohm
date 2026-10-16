@@ -188,6 +188,22 @@ avoid rebuilding unchanged dependents:
 
 <!-- /benchmark:features -->
 
+### Additional workloads
+
+The ty bug-fix session and worktree startup study compare Rust 1.99.0 with Ohm 1.99.0-3:
+
+| Workload                                                       | Rust 1.99.0 | Ohm 1.99.0-3 | Time saved |
+| -------------------------------------------------------------- | ----------- | ------------ | ---------- |
+| ty session                                                     | 347.60 s    | 265.85 s     | 23.52%     |
+| Worktree startup, ext4: shared build                           | 109.46 s    | 72.43 s      | 33.83%     |
+| Worktree startup, ext4: shared build + trust opt-ins           | 109.46 s    | 66.14 s      | 39.58%     |
+| Worktree startup, Btrfs loopback: shared build                 | 109.31 s    | 73.34 s      | 32.91%     |
+| Worktree startup, Btrfs loopback: shared build + trust opt-ins | 109.31 s    | 16.76 s      | 84.67%     |
+
+These Linux measurements use eight Cargo jobs and `opt-level = 1`. The session uses both Ohm trust opt-ins. Worktree startup excludes parent preparation, which is reported separately. Snapshot seeding is verified in the trusted Btrfs runs; ext4 cannot clone the snapshots.
+
+See the [detailed report](scripts/benchmark_results/ty-worktree-1.99.0-3.md) for sample ranges, per-command timings, preparation costs, and raw evidence. These workloads are separate from the three-session aggregate above.
+
 ## Philosophy
 
 Rust's compile times and disk usage are increasingly viewed as bottlenecks in day-to-day

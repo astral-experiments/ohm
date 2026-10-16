@@ -11,6 +11,11 @@ the migration. Its manifest hashes every original file, including the removed Ru
 projections whose measurements are already in their corresponding baseline reports.
 The distinct Ohm 1.97.1-18 Ruff report remains checked in.
 
+The [ty iteration and worktree startup study](ty-worktree-1.99.0-3.md) adds two workloads
+measured with Ohm 1.99.0-3. Its [JSON report](ty-worktree-1.99.0-3.json) retains individual
+samples and links to the raw evidence. These results are separate from `latest.json`
+and the existing three-session aggregate.
+
 ## Publish a benchmark run
 
 Finish the measurements and their independent audits first. Prepare a directory of

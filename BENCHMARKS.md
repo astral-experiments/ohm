@@ -15,11 +15,13 @@ The [README](README.md) summarizes the published results.
 ## Prerequisites
 
 Install [uv](https://docs.astral.sh/uv/), Git, and the stock Rust and Ohm toolchains you want to
-compare. Codex also needs [`just`](https://github.com/casey/just) and `cargo-nextest`.
+compare. Ruff/ty and Codex sessions need `cargo-nextest`; Codex also needs
+[`just`](https://github.com/casey/just).
 
 Run from the Ohm repository on a quiet machine with enough disk space for separate builds. The
-runner may need network access to clone source repositories. Cargo commands run with
-`--locked --offline`, so cache their dependencies before starting.
+runners may need network access to clone source repositories. Workflow benchmarks invoke Cargo with
+`--locked --offline`. Session and worktree replays support `--offline`; cache their dependencies
+before enabling it.
 
 ## Run the workflow benchmarks
 
@@ -85,6 +87,7 @@ Rust does not isolate changes between Ohm releases.
 
 ## Recorded measurements
 
+- [ty bug-fix session and worktree startup](scripts/benchmark_results/ty-worktree-1.99.0-3.md)
 - [Workflow and disk-usage results](scripts/benchmark_results/)
 - [Session fixtures and replay results](scripts/session_replays/)
 
