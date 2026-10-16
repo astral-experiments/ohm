@@ -23,14 +23,14 @@ runner may need network access to clone source repositories. Cargo commands run 
 Preview the plan without cloning or building:
 
 ```console
-uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-2 --dry-run
+uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-3 --dry-run
 ```
 
 Run both projects:
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-2 --jobs 8 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-3 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -89,15 +89,15 @@ The result files record the measured versions, source revisions, configuration, 
 macOS/APFS disk studies use a separate volume-allocation meter and worktree schedule;
 `benchmark.py` measures elapsed time and does not reproduce those studies.
 
-Ohm 1.99.0-2 results cover [216 workflow samples](scripts/benchmark_results/release-1.99.0-2.json), [12 current-session replays](scripts/session_replays/release-1.99.0-2-baseline.json), [four historical Ruff replays](scripts/session_replays/release-1.99.0-2-ruff-historical.json), and [eight uv ablation replays](scripts/session_replays/release-1.99.0-2-uv-feature-ablation.json). Linux timings compare stock Rust 1.99.0 with Ohm using eight jobs on a 32-CPU AMD EPYC-Genoa Processor managed devbox, with Falcon and other infrastructure services enabled.
+Ohm 1.99.0-3 results cover [216 workflow samples](scripts/benchmark_results/release-1.99.0-3.json), [12 current-session replays](scripts/session_replays/release-1.99.0-3-baseline.json), [four historical Ruff replays](scripts/session_replays/release-1.99.0-3-ruff-historical.json), and [eight uv ablation replays](scripts/session_replays/release-1.99.0-3-uv-feature-ablation.json). Linux timings compare stock Rust 1.99.0 with Ohm using eight jobs on a 32-CPU AMD EPYC-Genoa Processor managed devbox, with Falcon and other infrastructure services enabled.
 
 Each suite passed six five-second preflight checks requiring at least 95% idle, at most 0.5% I/O wait and 0.1% steal, and no unrelated compilers. Continuous monitoring rejects unrelated compilers, intervals with more than 5% host CPU used by other processes belonging to the benchmark user, and three consecutive two-second intervals with more than 5% outside CPU across all users excluding the recorded Falcon service. All service overhead remains in the timings. The runs retain at least 60 GiB of free space. The CPU audit retains telemetry covering all 428 timed commands and their warmups. All four Linux suites disable automatic Git maintenance during benchmark commands. After each replay, the campaign records source and command checks, plus nextest selection inventories for Ruff and Codex, before discarding its build artifacts. It then requires a fresh 30-second quiet check.
 
-The [detailed reports](scripts/benchmark_results/README.md) and [raw evidence archive](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-2-6cbbfac41159) retain excluded attempts, retries, and audit evidence. One historical replay cell was rejected by the compiler-contention guard and rerun from fresh source and build artifacts; the three completed cells were preserved unchanged. Both compilers receive the same formatting and snapshot compatibility patches for Rust 1.99. All Codex replay cells use the same short, private temporary-directory path configured before warmup.
+The [detailed reports](scripts/benchmark_results/README.md) and [raw evidence archive](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-3-7635ae561bcd) retain excluded attempts, retries, and audit evidence. The compiler-contention guard rejected one uv Clippy workflow attempt and the first warmup of an Ohm Codex replay. The workflow restarted from empty build directories. The replay resumed after preserving its ten completed cells unchanged and archiving all artifacts from the incomplete cell; the entire interrupted cell then ran with fresh artifacts and warmups. No timing from either rejected attempt contributes to the published results. The evidence retains both monitored replay segments and the untimed recovery gap. Both compilers receive the same formatting and snapshot compatibility patches for Rust 1.99. All Codex replay cells use the same short, private temporary-directory path configured before warmup.
 
 The uv fixtures leave dev/test debug information unspecified: stock Rust uses full debug information, while Ohm defaults to line tables. Ruff's fixtures explicitly request line tables, and Codex's pinned source explicitly requests limited debug information. The explicit settings are the same across toolchains; the uv comparison includes the released default change. All feature-ablation cells use the same Ohm debug default.
 
-The [APFS study](scripts/benchmark_results/disk-1.99.0-2.json) measures physical allocation across eight cohorts and 44 worktrees. Its [uv fixture](scripts/session_replays/disk-1.99.0-1-uv.json) applies the same test patch to both toolchains. All 404 Cargo commands passed; their logs record 53,664 test starts. Another 22 runtime checks passed after measurement.
+The [APFS study](scripts/benchmark_results/disk-1.99.0-3.json) measures physical allocation across eight cohorts and 44 worktrees. Its [uv fixture](scripts/session_replays/disk-1.99.0-1-uv.json) applies the same test patch to both toolchains. All 404 Cargo commands passed; their logs record 53,664 test starts. Another 22 runtime checks passed after measurement.
 
 The meter reads native APFS volume allocation and cross-checks it against container allocation. The one- and ten-worktree comparisons wait at least 30 seconds after the workload finishes, flush the volume, and require five stable allocation readings. The two-worktree comparisons use the checkpoint immediately after the continuation completes. Concurrent builds on other volumes are allowed; the local study reports physical allocation only.
 
