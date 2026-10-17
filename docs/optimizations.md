@@ -262,8 +262,13 @@ still unused. Missing or inconsistent evidence causes one retry with the complet
 For example, `cargo +ohm test -p parser --lib` can rebuild the parser's unit tests without rebuilding
 an unused test helper. Dependencies still needed by another retained edge continue to build. The
 optimization preserves dependency resolution, features, compiler arguments, and optimization settings.
-Initial builds, unsupported targets, and dependencies with build scripts or other opaque effects
-keep ordinary scheduling.
+Initial builds and unsupported targets use ordinary scheduling. Dependencies with build scripts or
+other opaque effects cannot be skipped.
+
+On Linux, retained dependencies may supply ordinary static archives and ELF objects from their
+build scripts' own output directories. Those dependencies still build normally, and Cargo checks
+their current outputs before compiling the test. Root-package native inputs, external search paths,
+opaque linker arguments, file aliases, and unsupported files require the complete graph.
 
 A successful targeted test no longer establishes that every declared dev dependency compiles:
 errors and warnings in skipped dependencies are omitted. Use `-Zohm-defer-dev-deps=no` to validate
