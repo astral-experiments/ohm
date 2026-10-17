@@ -336,10 +336,12 @@ exits; programs launched by older Cargo versions may not have that protection. U
 unfamiliar or malformed state do not establish that an artifact is disposable. Reclaimed artifacts
 rebuild on demand.
 
-Usage tracking adds some work to warm builds. Focused comparisons with the earlier file-based
-tracker measured about 2.9% overhead for an 11-entry workload and 1.0% for a 405-entry Cargo build.
-These measurements compare tracking implementations. A machine crash can lose recent usage
-timestamps, allowing a later explicit GC command to reclaim artifacts that could have been reused.
+Usage tracking reads the selected dependencies' records on warm builds. It updates timestamps at
+five-minute intervals and rounds them upward, so cleanup always allows a full hour without use and
+may retain artifacts for up to five additional minutes. Repeated builds within an interval skip
+the write transaction; short builds also skip the completion query. A machine crash can lose recent
+usage timestamps, allowing a later explicit GC command to reclaim artifacts that could have been
+reused.
 
 In a macOS benchmark, we ran the same development tasks with Ohm and stock Rust. Ohm used 40% less
 disk space for Ruff and 35% less for uv. These savings include the effects of Ohm's build reuse and
