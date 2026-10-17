@@ -2,7 +2,7 @@
 
 Ohm includes the following changes to Rust, Cargo, Clippy, and rustfmt.
 
-This guide covers Ohm 1.99.0-4. The measurements come from release benchmarks and individual
+This guide covers Ohm 1.99.0-5. The measurements come from release benchmarks and individual
 experiments, including earlier prototypes. They do not predict the benefit for every project.
 
 ## Cargo and builds
@@ -114,6 +114,9 @@ from that check. Release builds, test targets, procedural macros, build scripts,
 compiler configurations retain ordinary behavior. The extra checkpoints consume disk space. Use
 `-Zohm-shared-stages=no` on both commands to opt out.
 
+Ohm 1.99.0-5 fixes a compiler panic after const-generic type edits by rerunning queries whose side
+effects cannot be restored from the saved check.
+
 An earlier prototype reduced a first build after a check from 104.44 to 80.66 seconds. A later uv
 warm-cycle pair was slightly slower with sharing, at 5.80 versus 5.72 seconds. These measurements
 do not establish a general speedup for the released implementation.
@@ -122,6 +125,7 @@ See:
 
 - [Cargo #145](https://github.com/astral-sh/ohm-cargo/pull/145)
 - [Rust #177](https://github.com/astral-sh/ohm-rust/pull/177)
+- [Rust #187](https://github.com/astral-sh/ohm-rust/pull/187)
 
 ### 5. Share compiled dependencies across worktrees
 
@@ -435,10 +439,18 @@ can reuse the finished object for an unchanged unit, avoiding repeated LLVM opti
 generation. Cache keys cover the compiler, target, options, bitcode, and the cross-unit information
 that affects optimization. This preserves the build's selected optimization settings.
 
-Cargo manages the cache in `<build-dir>/.ohm-thinlto-cache`. After a build, it removes entries unused
-for 30 days and prunes the least recently used objects to limits of 2 GiB or 100,000 objects.
-Concurrent writers or contended locks can temporarily leave the cache above those limits. Explicit
-compiler cache directories retain their own policy.
+With a shared build directory, Cargo stores these objects under
+`<build-dir>/.ohm-thinlto-cache/<compiler-context>`. Starting with Ohm 1.99.0-5, `cargo +ohm gc`
+collects individual objects after one hour without compiler use, and obsolete compiler contexts
+immediately. Shared caches no longer scan or prune at build completion. Cleanup remains manual and
+respects active consumers. Rustc refreshes an object's modification time when it reuses the object;
+Cargo does not add per-object database records or timestamp updates to warm builds.
+
+If Cargo cannot record the shared cache's provenance, it keeps new objects private. Private caches
+retain the existing policy: after a build, remove entries unused for 30 days and prune the least
+recently used objects to limits of 2 GiB or 100,000 objects. Concurrent writers or contended locks can
+temporarily leave those caches above their limits. Explicit compiler cache directories retain their
+own policy.
 
 Unsupported compiler configurations, instrumentation, and wrappers keep ordinary compilation, as do
 cache misses or failures. Use `-Zohm-thinlto-cache=no` to disable this default, or `-Zohm-defaults=no`
@@ -448,6 +460,7 @@ byte-identical executables; it does not establish a whole-build speedup.
 See:
 
 - [Cargo #142](https://github.com/astral-sh/ohm-cargo/pull/142)
+- [Cargo #164](https://github.com/astral-sh/ohm-cargo/pull/164)
 - [Rust #164](https://github.com/astral-sh/ohm-rust/pull/164)
 
 ## rustfmt
