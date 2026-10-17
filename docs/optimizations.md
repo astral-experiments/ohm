@@ -319,10 +319,10 @@ inputs and protected by locks: incompatible builds get separate artifacts, thoug
 of the same artifact may wait.
 
 Ohm 1.99.0-4 moves private build state from the global build directory into each worktree's target.
-The first build after this layout change rebuilds private intermediates; existing global registry
-artifacts remain reusable. `cargo clean` removes the selected project's private state, and removing
-a worktree removes its default target. Explicit target directories outside the checkout need
-separate cleanup.
+The first build after this layout change rebuilds private intermediates. Shared registry artifacts
+stay in place; reuse still requires compatible build inputs. `cargo clean` removes the selected
+project's private state, and removing a worktree removes its default target. Explicit target
+directories outside the checkout need separate cleanup.
 
 On Linux and macOS, `cargo +ohm gc --dry-run` previews cleanup of shared build caches, and
 `cargo +ohm gc` performs it. Current-release compiler contexts and individual dependency builds
