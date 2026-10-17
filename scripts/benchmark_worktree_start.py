@@ -252,7 +252,7 @@ def parser():
     result.add_argument("--source-path", type=Path)
     result.add_argument("--output-dir", type=Path, required=True)
     result.add_argument("--upstream", default="1.99.0")
-    result.add_argument("--ohm", default="ohm-1.99.0-3")
+    result.add_argument("--ohm", default="ohm-1.99.0-5")
     result.add_argument("--jobs", type=int, default=8)
     result.add_argument("--repetitions", type=int, default=3)
     result.add_argument("--timeout", type=int, default=1800)

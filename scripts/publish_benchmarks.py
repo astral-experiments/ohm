@@ -16,7 +16,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "scripts/benchmark_results"
 KINDS = ("workflow", "sessions", "historical", "ablation", "disk")
-TY_WORKTREE_REPORT = "ty-worktree-1.99.0-3.json"
+TY_WORKTREE_REPORT = "ty-worktree-1.99.0-5.json"
 TY_SCENARIO = "scripts/session_replays/ty-29327.json"
 
 

@@ -22,10 +22,11 @@ ulimit -n 65536
 install -d -m 700 /tmp/ohm-replay-1
 export TMPDIR=/tmp/ohm-replay-1
 python3 scripts/replay_sessions.py \
-  --upstream 1.98.1 \
-  --ohm ohm-1.98.1-2 \
-  --scenario scripts/session_replays/ruff-rust-1.98.json \
-  --scenario scripts/session_replays/codex-stable-goal-accounting.json \
+  --upstream 1.99.0 \
+  --ohm ohm-1.99.0-5 \
+  --scenario scripts/session_replays/ruff-rust-1.99.json \
+  --scenario scripts/session_replays/uv-rust-1.99.json \
+  --scenario scripts/session_replays/codex-rust-1.99.json \
   --source-path ruff=/path/to/ruff \
   --source-path uv=/path/to/uv \
   --source-path codex=/path/to/codex \
@@ -53,16 +54,13 @@ If your shell sets `PYTHONSAFEPATH=1`, invoke the trusted script with
 Use `--project ruff`, `--project uv`, or `--project codex` to run one project. Override its fixture
 with `--scenario PATH`.
 
-| Project | Fixture                                                                | Workload                                                                                               |
-| ------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Ruff/ty | [ruff-rust-1.98.json](ruff-rust-1.98.json)                             | Recursive attribute inference, focused mdtests, package tests, Clippy, and formatting.                 |
-| uv      | [uv.json](uv.json)                                                     | PyPI Simple API JSON parsing, parser and registry-client tests, Clippy, and a local installation test. |
-| Codex   | [codex-stable-goal-accounting.json](codex-stable-goal-accounting.json) | Public TUI rendering changes, focused nextest runs, package tests, and Clippy.                         |
+| Project | Fixture                                      | Workload                                                                                               |
+| ------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Ruff/ty | [ruff-rust-1.99.json](ruff-rust-1.99.json)   | Recursive attribute inference, focused mdtests, package tests, Clippy, and formatting.                 |
+| uv      | [uv-rust-1.99.json](uv-rust-1.99.json)       | PyPI Simple API JSON parsing, parser and registry-client tests, Clippy, and a local installation test. |
+| Codex   | [codex-rust-1.99.json](codex-rust-1.99.json) | Public TUI rendering changes, focused nextest runs, package tests, and Clippy.                         |
 
-The Ruff fixture allows `clippy::format_push_string`, which Rust 1.98 introduced after the recorded
-source revision. Both toolchains use the same allowance, profile, and test selection. The older
-[ruff-historical-rust-1.98.json](ruff-historical-rust-1.98.json) fixture covers a different session,
-including check-to-test-to-check transitions.
+The Rust 1.99 fixtures apply the same formatting compatibility patches and Clippy allowances to both toolchains. Profiles and test selections also match. The [historical Ruff fixture](ruff-historical-rust-1.99.json) covers a different session, including check-to-test-to-check transitions.
 
 The Codex fixture includes a
 [test-only setup patch](patches/codex-safety-retry-goal-accounting.patch) that bounds a timing
@@ -81,7 +79,7 @@ modes. Setup time is excluded from session and warmup totals.
 ```sh
 python3 scripts/replay_sessions.py \
   --project ruff --scenario scripts/session_replays/ty-29327.json \
-  --upstream 1.99.0 --ohm ohm-1.99.0-3 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-5 \
   --source-path ruff=/path/to/ruff --output-dir /path/to/new-ty-results \
   --jobs 8 --repetitions 4 --native-tool-trust all \
   --compiler-accounting verbose --offline --require-idle
@@ -95,14 +93,14 @@ This enables both Ohm trust opt-ins. Expected failures must match the fixture's 
 
 ```sh
 python3 scripts/benchmark_worktree_start.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-3 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-5 \
   --source-path /path/to/ruff --output-dir /path/to/new-worktree-results \
   --jobs 8 --repetitions 3 --compiler-accounting verbose --offline --require-idle
 ```
 
 The runner compares stock Rust with two Ohm configurations: a shared build directory, and that directory with both trust opt-ins. Each repetition starts with fresh artifacts. Stock Rust uses `git worktree add`; Ohm uses `cargo worktree add`. Snapshot cloning requires a filesystem such as Btrfs; ext4 can still reuse shared registry builds.
 
-Use a new output directory after an interrupted startup run. See the [results](../benchmark_results/ty-worktree-1.99.0-3.md) for both benchmarks.
+Use a new output directory after an interrupted startup run. See the [results](../benchmark_results/ty-worktree-1.99.0-5.md) for both benchmarks.
 
 ### Warmups and toolchain settings
 
@@ -140,8 +138,8 @@ python3 scripts/replay_sessions.py \
   --project uv \
   --scenario scripts/session_replays/uv-feature-ablation.json \
   --source-path uv=/path/to/uv \
-  --upstream 1.98.1 \
-  --ohm ohm-1.98.1-2 \
+  --upstream 1.99.0 \
+  --ohm ohm-1.99.0-5 \
   --output-dir /path/to/new-empty-ablation-results \
   --feature-matrix \
   --jobs 8 \

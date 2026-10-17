@@ -1,0 +1,1024 @@
+{
+  "rust_version": "1.99.0",
+  "ohm_release": "ohm-1.99.0-5",
+  "jobs": 8,
+  "host": {
+    "platform": "linux-x86_64",
+    "id": "charlie-ohm-session-bench",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC-Genoa Processor"
+  },
+  "provenance": {
+    "runner_sha256": "6fbe71d5cf3f9e266fca18e686c0cdbfe71e49b4b9949658f687b2af3ee51739",
+    "wrapper": {
+      "kind": "historical",
+      "arguments": [
+        "--upstream",
+        "1.99.0",
+        "--ohm",
+        "ohm-1.99.0-5",
+        "--jobs",
+        "8",
+        "--minimum-free-gb",
+        "60",
+        "--require-idle",
+        "--output-dir",
+        "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-5/historical",
+        "--repetitions",
+        "2",
+        "--offline",
+        "--project",
+        "ruff",
+        "--scenario",
+        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-5/scripts/session_replays/ruff-historical-rust-1.99.json",
+        "--source-path",
+        "ruff=/tmp/ohm-benchmarks-1.99.0-5/data/sources/ruff"
+      ],
+      "started_at": 1792262732.855597,
+      "wrapper_sha256": "ab79b4c2c51e1d95218a00a3913ec4c66d029df820b0c0e199e57666cf1f97eb",
+      "runner_sha256": {
+        "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
+        "replay_sessions.py": "6fbe71d5cf3f9e266fca18e686c0cdbfe71e49b4b9949658f687b2af3ee51739"
+      },
+      "path": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-5/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+      "tmpdir": "/tmp/ohm995",
+      "sanitized_environment": {
+        "CARGO_HOME": "/tmp/codex-cargo-home",
+        "CARGO_NET_OFFLINE": "true",
+        "GIT_CONFIG_COUNT": "2",
+        "GIT_CONFIG_KEY_0": "maintenance.auto",
+        "GIT_CONFIG_KEY_1": "gc.auto",
+        "GIT_CONFIG_VALUE_0": "false",
+        "GIT_CONFIG_VALUE_1": "0",
+        "PATH": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-5/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "RUSTUP_HOME": "/home/dev-user/.rustup",
+        "TMPDIR": "/tmp/ohm995",
+        "UV_CACHE_DIR": "/tmp/codex-uv-cache",
+        "UV_PYTHON": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/python3.12",
+        "UV_PYTHON_DOWNLOADS": "never",
+        "UV_TOOL_BIN_DIR": "/tmp/ohm-benchmarks-1.99.0-5/tools/uv-bin",
+        "UV_TOOL_DIR": "/tmp/ohm-benchmarks-1.99.0-5/tools/uv-tools"
+      },
+      "git_maintenance": {
+        "maintenance.auto": false,
+        "gc.auto": 0,
+        "scope": "benchmark process environment only"
+      },
+      "coordinator_commit": "31689f052811f815de715ba575386d92a0f40c4b",
+      "manifest_sha256": "5c92ee96b63f196fac7292b7b63f1d4b406c77ec09f04489bd89d4064d5f78f1",
+      "fixtures": {
+        "scripts/session_replays/ruff-historical-rust-1.99.json": "ae6489113bbcb5d87fd62501503c5b7cb7fc008ef1746d7f5ac188d1003908b4"
+      },
+      "post_cell_audit": {
+        "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
+        "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
+        "process_inspector_sha256": "1ed8219cea7abdfbd63984880af72147afe05ff75053e374960f02dc86c257ac",
+        "timing_boundary": "after persisted run_session, before next cell",
+        "retirement": "exclusive per-cell target and shared-build leaves only",
+        "quiet_seconds_after_retirement": 30
+      }
+    },
+    "toolchains": {
+      "1.99.0": {
+        "cargo": {
+          "version": "cargo 1.99.0 (5f94df478 2026-08-27)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+        },
+        "rustc": {
+          "version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.99 (b940084d7e 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.10.0-stable (b940084d7e 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustfmt",
+          "sha256": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3"
+        }
+      },
+      "ohm-1.99.0-5": {
+        "cargo": {
+          "version": "cargo 1.99.0-dev (78f286eda 2026-10-17) (ohm-1.99.0-5)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-5/bin/cargo",
+          "sha256": "5aeedfb1279e35710eb4a355cc0db95b5b800c50a0b77b1321158b4f7c1abbf9"
+        },
+        "rustc": {
+          "version": "rustc 1.99.0-dev (9a817f4f9 2026-10-17) (ohm-1.99.0-5)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-5/bin/rustc",
+          "sha256": "a7b0c3b2663c7725f99c9f95ad9d9eab6026c8e9c4f3b051e7539299128e0ddf"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-5/bin/clippy-driver",
+          "sha256": "0f05269e1c31f71e4697097dfedf2c404402abbd26245cd095220de4aa3159d4"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.10.0-dev (29bfbe020d 2026-10-07)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-5/bin/rustfmt",
+          "sha256": "6165441ee942ca941a14ed7c6679a89099b6d666993fd941585a64828db830ae"
+        }
+      }
+    },
+    "helpers": {
+      "just": {
+        "url": "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz",
+        "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
+        "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
+        "version": "just 1.58.0",
+        "path": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/just"
+      },
+      "cargo-nextest": {
+        "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
+        "archive_sha256": "4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3",
+        "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "path": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/cargo-nextest"
+      },
+      "uv": {
+        "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
+        "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
+        "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
+        "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
+        "path": "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/uv"
+      }
+    },
+    "python": {
+      "version": "Python 3.12.13",
+      "path": "/tmp/ohm-benchmarks-1.99.0-3/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+      "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7"
+    },
+    "system_cpu": {
+      "proof": {
+        "passed": true,
+        "violations": [],
+        "samples": 1101,
+        "returncode": 0,
+        "monitor_sha256": "c45541f3def3cac178f9d3e67e73dcf1f5fc1ebd392c8d6fc33d29b62dc0f636",
+        "trace_sha256": "15d60677247ba2bff8c66dcca74aadcd35405366f5d5e691a49e672a72e2eacd"
+      },
+      "preflight_sha256": "66348d0dd19fbaa2d69e031b07e7c5f40f0e3de24f33864e8c61679bc085a154",
+      "peak_external_user_cpu_fraction": 0.0027568534163873097,
+      "peak_external_nonsecurity_cpu_fraction": 0.017953560667934777,
+      "process_visibility": {
+        "captured_at": 1792249951.3105276,
+        "hostname": "charlie-ohm-session-bench",
+        "pid1_comm": "systemd",
+        "logical_cpus": 32,
+        "affinity": [
+          0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+          20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+        ],
+        "visible_process_count": 420,
+        "procfs_stat_coverage": 420,
+        "procfs_mounts": [
+          "25 29 0:23 / /proc rw,nosuid,nodev,noexec,relatime shared:12 - proc proc rw",
+          "33 24 0:28 / /sys/fs/cgroup rw,nosuid,nodev,noexec,relatime shared:9 - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot"
+        ],
+        "self_cgroup": "0::/user.slice/user-1000.slice/session-1026.scope\n",
+        "pid1_cgroup": "0::/init.scope\n",
+        "virtual_machine": {
+          "command": ["systemd-detect-virt", "--vm"],
+          "returncode": 0,
+          "output": "kvm"
+        },
+        "container": {
+          "command": ["systemd-detect-virt", "--container"],
+          "returncode": 1,
+          "output": "none"
+        },
+        "security_processes": [
+          {
+            "pid": 917,
+            "name": "falcond",
+            "uid": 0,
+            "cgroup": "0::/system.slice/falcon-sensor.service/sensor.falcon"
+          },
+          {
+            "pid": 918,
+            "name": "falcon-sensor-b",
+            "uid": 0,
+            "cgroup": "0::/system.slice/falcon-sensor.service/sensor.falcon"
+          }
+        ],
+        "proc_cpu_count": 32,
+        "monitor_sha256": "c45541f3def3cac178f9d3e67e73dcf1f5fc1ebd392c8d6fc33d29b62dc0f636",
+        "passed": true
+      },
+      "process_visibility_sha256": "5e4435de1973858f0ca74fce7577d85da1c157b37bf1601d62a24796eb0ffa86",
+      "monitoring_scope": "Full VM process visibility; original visible-process CPU thresholds with recorded root Falcon-sensor exemption. No container subtraction.",
+      "coverage": {
+        "interval_start": 1792262732.5811088,
+        "interval_end": 1792265039.6212268,
+        "maximum_gap_seconds": 2.4602671439934056,
+        "minimum_free_bytes": 1748622913536
+      }
+    },
+    "raw_results_sha256": "9b2cb2d6b435fae905b1d52355f31936d3e1b6d4e012e35d1fc5e93a48fad94d",
+    "fixtures": {
+      "ruff": {
+        "tree": "58e4d926cdfc56924b8c2bcc53ca681b4cd0bd20",
+        "head": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+        "diff_sha256": "863e22ca9b94cef606b87a72a9e91cfc6d0dba25c1bd454e22b976f1ae4a7d7d",
+        "fixture_sha256": "ae6489113bbcb5d87fd62501503c5b7cb7fc008ef1746d7f5ac188d1003908b4",
+        "patches": [
+          {
+            "raw_evidence_path": "audit/fixture-edits/historical/ruff/setup-01.patch",
+            "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+            "bytes": 993
+          },
+          {
+            "raw_evidence_path": "audit/fixture-edits/historical/ruff/edit-03.patch",
+            "sha256": "97c8da1b636759067384373757844e984ce5e61db6fc96641745c480a30d6182",
+            "bytes": 52076
+          },
+          {
+            "raw_evidence_path": "audit/fixture-edits/historical/ruff/edit-07.patch",
+            "sha256": "e23a9caddd61fe72096a2240cedfd0c0ef00b34834824858f2c69de562722121",
+            "bytes": 31302
+          },
+          {
+            "raw_evidence_path": "audit/fixture-edits/historical/ruff/edit-10.patch",
+            "sha256": "0b61e7ed0f3790d35664d9504364cbe8bb7eb90fe28af3670bd73fa82c5aa3a4",
+            "bytes": 24051
+          }
+        ]
+      }
+    },
+    "endpoint_test_inventories": {
+      "scope": "Largest nextest selection at each final replay source, captured after that cell timing was persisted and before exclusive build artifacts were retired; each cell retirement followed by a fresh 30-second quiet gate.",
+      "proof_sha256": "8144a3f167eb001c6eff9578de696953a619bfe770152dfdb747e56684745793",
+      "inventories": [
+        {
+          "suite": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 0,
+          "command_index": 15,
+          "measured_command": [
+            "cargo",
+            "+1.99.0",
+            "nextest",
+            "run",
+            "-p",
+            "ty_python_core",
+            "-p",
+            "ty_python_semantic",
+            "--no-fail-fast",
+            "--status-level",
+            "fail",
+            "--failure-output",
+            "immediate-final"
+          ],
+          "inventory_command": [
+            "cargo",
+            "+1.99.0",
+            "nextest",
+            "list",
+            "--message-format",
+            "json",
+            "-p",
+            "ty_python_core",
+            "-p",
+            "ty_python_semantic"
+          ],
+          "cwd": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-5/historical/worktrees/ruff/stock/0",
+          "count": 867,
+          "json_sha256": "0c73a9623b90b8fe3dfe3a0161cf8104c404c02894f175183eddcf9cd9549c4f",
+          "log_sha256": "3cf667881a6f2038943e6e0c3bff9d36f589698a08568f760e9f0b3502101e85",
+          "selected_sha256": "d37b89bcfd9a9fb1833dcf12b573b3eae04b26975da184f4c56d63dcdf0755eb",
+          "selection_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
+          "scope": "Largest nextest selection at final source, after this cell timing was persisted and before its artifacts were retired."
+        },
+        {
+          "suite": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 0,
+          "command_index": 15,
+          "measured_command": [
+            "cargo",
+            "+ohm-1.99.0-5",
+            "nextest",
+            "run",
+            "-p",
+            "ty_python_core",
+            "-p",
+            "ty_python_semantic",
+            "--no-fail-fast",
+            "--status-level",
+            "fail",
+            "--failure-output",
+            "immediate-final"
+          ],
+          "inventory_command": [
+            "cargo",
+            "+ohm-1.99.0-5",
+            "nextest",
+            "list",
+            "--message-format",
+            "json",
+            "-p",
+            "ty_python_core",
+            "-p",
+            "ty_python_semantic"
+          ],
+          "cwd": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-5/historical/worktrees/ruff/ohm/0",
+          "count": 867,
+          "json_sha256": "e5cece04afbfb8760601c3b1580e5194d8f06a10149b61805d8e9f50fa88b269",
+          "log_sha256": "16828c18e3535eb50fa7a6e6022c2117bbbe22e63869a127b20839c71881028b",
+          "selected_sha256": "d37b89bcfd9a9fb1833dcf12b573b3eae04b26975da184f4c56d63dcdf0755eb",
+          "selection_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
+          "scope": "Largest nextest selection at final source, after this cell timing was persisted and before its artifacts were retired."
+        },
+        {
+          "suite": "historical",
+          "project": "ruff",
+          "toolchain": "ohm",
+          "repetition": 1,
+          "command_index": 15,
+          "measured_command": [
+            "cargo",
+            "+ohm-1.99.0-5",
+            "nextest",
+            "run",
+            "-p",
+            "ty_python_core",
+            "-p",
+            "ty_python_semantic",
+            "--no-fail-fast",
+            "--status-level",
+            "fail",
+            "--failure-output",
+            "immediate-final"
+          ],
+          "inventory_command": [
+            "cargo",
+            "+ohm-1.99.0-5",
+            "nextest",
+            "list",
+            "--message-format",
+            "json",
+            "-p",
+            "ty_python_core",
+            "-p",
+            "ty_python_semantic"
+          ],
+          "cwd": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-5/historical/worktrees/ruff/ohm/1",
+          "count": 867,
+          "json_sha256": "82d52ee72e5ce42b92b8e3431ed4d57611a9b626011ae4c1fcea90fb5c3d3f0a",
+          "log_sha256": "16828c18e3535eb50fa7a6e6022c2117bbbe22e63869a127b20839c71881028b",
+          "selected_sha256": "d37b89bcfd9a9fb1833dcf12b573b3eae04b26975da184f4c56d63dcdf0755eb",
+          "selection_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
+          "scope": "Largest nextest selection at final source, after this cell timing was persisted and before its artifacts were retired."
+        },
+        {
+          "suite": "historical",
+          "project": "ruff",
+          "toolchain": "stock",
+          "repetition": 1,
+          "command_index": 15,
+          "measured_command": [
+            "cargo",
+            "+1.99.0",
+            "nextest",
+            "run",
+            "-p",
+            "ty_python_core",
+            "-p",
+            "ty_python_semantic",
+            "--no-fail-fast",
+            "--status-level",
+            "fail",
+            "--failure-output",
+            "immediate-final"
+          ],
+          "inventory_command": [
+            "cargo",
+            "+1.99.0",
+            "nextest",
+            "list",
+            "--message-format",
+            "json",
+            "-p",
+            "ty_python_core",
+            "-p",
+            "ty_python_semantic"
+          ],
+          "cwd": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-5/historical/worktrees/ruff/stock/1",
+          "count": 867,
+          "json_sha256": "0f5738e4200935e928d06d55c926b3a01de30da97a6487740875c3fb56946809",
+          "log_sha256": "3cf667881a6f2038943e6e0c3bff9d36f589698a08568f760e9f0b3502101e85",
+          "selected_sha256": "d37b89bcfd9a9fb1833dcf12b573b3eae04b26975da184f4c56d63dcdf0755eb",
+          "selection_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
+          "scope": "Largest nextest selection at final source, after this cell timing was persisted and before its artifacts were retired."
+        }
+      ]
+    },
+    "exporter_sha256": "3c2a69f8ff57f6ef035b9f08a374114d061f8ef0f9d5cb2da1b74041e1e69021",
+    "host_selection": {
+      "benchmark_host_id": "charlie-ohm-session-bench",
+      "hostname": "charlie-ohm-session-bench",
+      "logical_cpus": 32,
+      "cpu_model": "AMD EPYC-Genoa Processor",
+      "visibility_mode": "full-vm",
+      "host_visibility_sha256": "5e4435de1973858f0ca74fce7577d85da1c157b37bf1601d62a24796eb0ffa86",
+      "selection_preflight_sha256": "e7300cd7ef7f2c51bf70f4dd3319788febe798bc3929fc058f74c5a8928f5956",
+      "selected_at": 1792249981.882669,
+      "free_bytes": 1764708913152,
+      "history": [
+        {
+          "host": "charlie-oss-2",
+          "accepted_samples": 0,
+          "outcome": "Background Python and provisioning work observed; left untouched."
+        },
+        {
+          "host": "charlie-oss-3",
+          "accepted_samples": 0,
+          "outcome": "Unrelated Rust compiler active; left untouched."
+        }
+      ],
+      "capacity_policy": "Keep at least 60 GiB free; audit each persisted replay cell, retire only its unique target/shared artifact leaves, then pass a new 30-second quiet gate."
+    },
+    "host_selection_sha256": "2792613a41d7f434584286957719e242f8cad953905095b945f06a9109b4cad0",
+    "cargo_home_configuration": {
+      "checked_at": 1792249981.9841838,
+      "cargo_home": "/tmp/codex-cargo-home",
+      "config": false,
+      "config_toml": false
+    },
+    "cargo_home_configuration_sha256": "fffc984bcec615caff0c96d9594da9a60b993896e9d4df316c73d6a24c87aaa8",
+    "controller_entrypoint": {
+      "created_at": 1792249982.5281935,
+      "command": [
+        "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/python3.12",
+        "-B",
+        "/tmp/ohm-benchmarks-1.99.0-5/data/controller/launch-linux.py"
+      ],
+      "environment": {
+        "HOME": "/home/dev-user",
+        "USER": "charliemarsh",
+        "LOGNAME": "charliemarsh",
+        "PATH": "/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8"
+      },
+      "cwd": "/tmp/ohm-benchmarks-1.99.0-5/data",
+      "start_new_session": true,
+      "stdin": "DEVNULL",
+      "entrypoint_sha256": "2a02c0c761c91ba134a135868871b2e7f7359b7d4e9512641326c852a8c3b1be",
+      "launcher_sha256": "73dbe7ecc3a076a076f511c4a5b5b9babd90cde555c85e140f9b9384efe03a6d",
+      "pid": 3889298
+    },
+    "controller_entrypoint_sha256": "2b4c802c3a05a65e153b76818680bcac8fba4574cb569701b4611a83d7e16c91",
+    "controller_resume_entrypoint": {
+      "created_at": 1792259231.7200136,
+      "command": [
+        "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/python3.12",
+        "-B",
+        "/tmp/ohm-benchmarks-1.99.0-5/data/controller/resume-sessions.py"
+      ],
+      "environment": {
+        "HOME": "/home/dev-user",
+        "USER": "charliemarsh",
+        "LOGNAME": "charliemarsh",
+        "PATH": "/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8"
+      },
+      "cwd": "/tmp/ohm-benchmarks-1.99.0-5/data",
+      "start_new_session": true,
+      "stdin": "DEVNULL",
+      "entrypoint_sha256": "8517d909d820dae6abae95c6e0fcd4ca9b7a31c7b86c92bf67b8843869d82819",
+      "launcher_sha256": "51696b2e46791eb61668cb06bed0d6c781d2df65108d44b121dd5a96efed2e35",
+      "pid": 766931
+    },
+    "controller_resume_entrypoint_sha256": "d46b3b695b60ab7834f47f701228a1e2d3ab835cb484dad3ab750de0dd190b28",
+    "native_tools": {
+      "created_at": 1792249982.2208252,
+      "commands": [
+        {
+          "command": ["cc", "--version"],
+          "path": "/usr/bin/cc",
+          "returncode": 0,
+          "output": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+        },
+        {
+          "command": ["c++", "--version"],
+          "path": "/usr/bin/c++",
+          "returncode": 0,
+          "output": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+        },
+        {
+          "command": ["clang", "--version"],
+          "path": "/usr/bin/clang",
+          "returncode": 0,
+          "output": "Ubuntu clang version 18.1.3 (1ubuntu1)\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin"
+        },
+        {
+          "command": ["cmake", "--version"],
+          "path": "/usr/bin/cmake",
+          "returncode": 0,
+          "output": "cmake version 3.28.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake)."
+        },
+        {
+          "command": ["make", "--version"],
+          "path": "/usr/bin/make",
+          "returncode": 0,
+          "output": "GNU Make 4.3\nBuilt for x86_64-pc-linux-gnu\nCopyright (C) 1988-2020 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."
+        },
+        {
+          "command": ["pkg-config", "--modversion", "openssl"],
+          "path": "/usr/bin/pkg-config",
+          "returncode": 0,
+          "output": "3.0.13"
+        }
+      ]
+    },
+    "native_tools_sha256": "23dbafcc0cb86e51601475deba83c208ad1d965d4526c39c51dfd02c29959c65",
+    "rejected_host_evidence": {
+      "screened_hosts": [
+        {
+          "host": "charlie-oss-2",
+          "accepted_samples": 0,
+          "outcome": "Background Python and provisioning work observed; left untouched."
+        },
+        {
+          "host": "charlie-oss-3",
+          "accepted_samples": 0,
+          "outcome": "Unrelated Rust compiler active; left untouched."
+        }
+      ],
+      "measured_attempts": []
+    },
+    "controls_review": {
+      "passed": true,
+      "checked_at": 1792249982.4873714,
+      "scope": "Fresh VM visibility, recomputed CPU preflight arithmetic, source fixtures, native dependencies and execution controls; the exporter independently rechecks the recorded measurements after the campaign.",
+      "host_selection_sha256": "2792613a41d7f434584286957719e242f8cad953905095b945f06a9109b4cad0",
+      "host_visibility_sha256": "5e4435de1973858f0ca74fce7577d85da1c157b37bf1601d62a24796eb0ffa86",
+      "controller_sha256": {
+        "select-vm-host.py": "cac306f2c4f7e0cf66446b24198dde2b92ff22b3c41105a2c50dec99b3084cea",
+        "host_guard.py": "c45541f3def3cac178f9d3e67e73dcf1f5fc1ebd392c8d6fc33d29b62dc0f636",
+        "launch-linux.py": "73dbe7ecc3a076a076f511c4a5b5b9babd90cde555c85e140f9b9384efe03a6d",
+        "prefetch.py": "07b5968d3ddb2333143d3382b4d58d386d37aff75cbb465b6744498afe7c7ef7",
+        "review-controls.py": "e6185d0d109aefd696fdb1b4e91539b3b51749eb1632108659385a31374129d9",
+        "run-suite.py": "ab79b4c2c51e1d95218a00a3913ec4c66d029df820b0c0e199e57666cf1f97eb",
+        "start-controller.py": "2a02c0c761c91ba134a135868871b2e7f7359b7d4e9512641326c852a8c3b1be",
+        "status.py": "c66c87f0fad6e666701c44e2f379303b8d2e77b234146433ba32a4e220b71d6e",
+        "prepare-sources.py": "3a72f271f33d702245e4dd3a989b7a3fb046f99ca34d72aca17da2cd4dc23a86",
+        "test_host_guard.py": "c6846baaed05ded7ceca3b1ff15b7d992c159e38fccb6ab61d578478a32b9310"
+      },
+      "preparation_sha256": "448a3e04f3efe5c8dc95b2a964676b6f46a0a6401a8ef7198845bef875ecd941"
+    },
+    "controls_review_sha256": "e42d8105915068b2126ee2f106da5a7a5f26cdc247698f565ff74af371db828e",
+    "source_diff_audit": {
+      "format": "git diff --binary --full-index",
+      "matching_fields": ["head", "tree", "diff_sha256"]
+    }
+  },
+  "completed_at": "2026-10-17T21:08:32.059470+00:00",
+  "repetitions": 2,
+  "sessions": [
+    {
+      "project": "ruff",
+      "session": {
+        "id": "ruff-inherited-attribute-inference",
+        "description": "Replay three consecutive, real ty inherited-attribute inference changes from Ruff PR #27736, interleaved with the focused mdtests, cargo checks, formatting, Clippy, and package-wide validation used in the original session."
+      },
+      "base_revision": "6b684f7e7c3885b39a839d235ea9be1e323a94f0",
+      "commands": 12,
+      "edits": 3,
+      "warmups": 2,
+      "setup_patches": [
+        {
+          "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
+          "patch": "patches/rust-1.99-ruff-cfg-select.patch",
+          "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
+          "paths": ["crates/ty_python_core/src/ast_node_ref.rs"]
+        }
+      ],
+      "warmup_enabled": true
+    }
+  ],
+  "commands": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Check the semantic crate before editing",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [0.28759605501545593, 0.25838184301392175],
+          "ohm": [0.5861157860199455, 0.557694705988979]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Establish the focused attribute-cycle baseline",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [0.9617164850060362, 0.9170442259928677],
+          "ohm": [0.9801785190065857, 0.9506537679990288]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 4,
+        "label": "Run focused instance-attribute mdtests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::attributes.md"
+        ],
+        "wall_seconds": {
+          "stock": [117.52436333399964, 117.75231857897597],
+          "ohm": [89.5502203280048, 88.86478848100523]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [3, 3],
+          "ohm": [3, 3]
+        }
+      },
+      {
+        "index": 5,
+        "label": "Recheck focused inference-cycle mdtests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [0.9117933999805246, 0.95060994499363],
+          "ohm": [1.4713684769812971, 0.9909336780256126]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 6,
+        "label": "Check core and semantic crates after the core dependency edit",
+        "category": "check",
+        "command": [
+          "cargo",
+          "check",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic"
+        ],
+        "wall_seconds": {
+          "stock": [18.84780398500152, 18.693339396006195],
+          "ohm": [8.900922553992132, 9.607369347009808]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 8,
+        "label": "Run the original cycle, hasattr, and subtype regression slice",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final",
+          "--",
+          "mdtest::cycle.md",
+          "mdtest::narrow/hasattr.md",
+          "mdtest::type_properties/is_subtype_of.md"
+        ],
+        "wall_seconds": {
+          "stock": [58.61338603499462, 58.20401892598602],
+          "ohm": [46.203526431985665, 45.77486186000169]
+        },
+        "tests_started": {
+          "stock": [3, 3],
+          "ohm": [3, 3]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 9,
+        "label": "Recheck semantic analysis after the recursive-inference edit",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [17.310870122979395, 17.615825941000367],
+          "ohm": [8.889271199004725, 9.090591898013372]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      },
+      {
+        "index": 11,
+        "label": "Run the expanded inference-cycle regression file",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [115.45771310699638, 115.73174885998014],
+          "ohm": [87.94590429897653, 85.16912792198127]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [2, 2],
+          "ohm": [2, 2]
+        }
+      },
+      {
+        "index": 12,
+        "label": "Recheck instance-attribute regressions",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::attributes.md"
+        ],
+        "wall_seconds": {
+          "stock": [1.3144194089982193, 1.3398309519980103],
+          "ohm": [1.8309696190117393, 1.8135555790213402]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 13,
+        "label": "Run strict Clippy for the changed core and semantic crates",
+        "category": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings",
+          "-A",
+          "clippy::format_push_string",
+          "-A",
+          "clippy::double_must_use",
+          "-A",
+          "clippy::assert_is_empty",
+          "-A",
+          "clippy::needless_borrows_for_generic_args",
+          "-A",
+          "clippy::mut_mut"
+        ],
+        "wall_seconds": {
+          "stock": [59.313184661994455, 59.03450572901056],
+          "ohm": [24.94265747402096, 23.70069674801198]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [92, 92],
+          "ohm": [25, 25]
+        }
+      },
+      {
+        "index": 14,
+        "label": "Verify Rust formatting across the workspace",
+        "category": "formatting",
+        "command": ["cargo", "fmt", "--all", "--", "--check"],
+        "wall_seconds": {
+          "stock": [5.3019827120006084, 5.392385519982781],
+          "ohm": [6.395370492013171, 6.771286224015057]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        }
+      },
+      {
+        "index": 15,
+        "label": "Validate all core and semantic package tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_core",
+          "-p",
+          "ty_python_semantic",
+          "--no-fail-fast",
+          "--status-level",
+          "fail",
+          "--failure-output",
+          "immediate-final"
+        ],
+        "wall_seconds": {
+          "stock": [12.258849826990627, 12.25058201799402],
+          "ohm": [11.987664143991424, 12.183828754990827]
+        },
+        "tests_started": {
+          "stock": [867, 867],
+          "ohm": [867, 867]
+        },
+        "cargo_status_message_counts": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        }
+      }
+    ]
+  },
+  "warmups": {
+    "ruff": [
+      {
+        "index": 1,
+        "label": "Warm the semantic crate at the unmodified session baseline",
+        "category": "check",
+        "command": ["cargo", "check", "-p", "ty_python_semantic"],
+        "wall_seconds": {
+          "stock": [32.77547249398776, 32.301657185016666],
+          "ohm": [21.1786534699786, 20.89582003498799]
+        },
+        "tests_started": {
+          "stock": [0, 0],
+          "ohm": [0, 0]
+        },
+        "cargo_status_message_counts": {
+          "stock": [179, 179],
+          "ohm": [179, 179]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Warm the baseline inference-cycle mdtest harness",
+        "category": "test",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--",
+          "mdtest::cycle.md"
+        ],
+        "wall_seconds": {
+          "stock": [141.82776329200715, 140.4640390559798],
+          "ohm": [112.95092039500014, 113.3856101630081]
+        },
+        "tests_started": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
+        },
+        "cargo_status_message_counts": {
+          "stock": [193, 193],
+          "ohm": [193, 193]
+        }
+      }
+    ]
+  },
+  "timed_session_seconds": {
+    "ruff": {
+      "stock": [408.66150621601264, 408.70292040199274],
+      "ohm": [290.6252873240155, 286.2625739829964]
+    }
+  },
+  "timed_command_seconds": {
+    "ruff": {
+      "stock": [408.1036791339575, 408.1405919349345],
+      "ohm": [289.684169323009, 285.4753889660642]
+    }
+  },
+  "timed_edit_seconds": {
+    "ruff": {
+      "stock": [0.03645299101481214, 0.036409534979611635],
+      "ohm": [0.08471310100867413, 0.04139368800679222]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "ruff": {
+      "stock": [174.6032357859949, 172.76569624099648],
+      "ohm": [134.12957386497874, 134.2814301979961]
+    }
+  },
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "baseline_warmups_excluded": true,
+    "session_totals_include_edits_and_runner_overhead": true,
+    "compiler_accounting": "cargo status messages; not compiler invocations",
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust_enabled": false,
+    "optional_lockfile_parse_cache_enabled": false,
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": true,
+    "test_count_semantics": "Observed test starts, including retries and nested runner output; not unique selected tests.",
+    "cargo_status_messages_prove_compiler_invocations": false
+  },
+  "order": [
+    ["stock", "ohm"],
+    ["ohm", "stock"]
+  ],
+  "evidence": {
+    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-evidence-1.99.0-5-293a4381a080/benchmark-evidence-1.99.0-5.zip",
+    "sha256": "293a4381a08094a0e0cb862d1f184503f88c02837a1b0a6b72e8760fcd608289",
+    "path": "historical.json",
+    "report_sha256": "db996526a0eafac384b12e7c119e9455e3ec8701702bffa0666034576f999215"
+  }
+}
