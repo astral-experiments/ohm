@@ -28,14 +28,14 @@ before enabling it.
 Preview the plan without cloning or building:
 
 ```console
-uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-2 --dry-run
+uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-5 --dry-run
 ```
 
 Run both projects:
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-2 --jobs 8 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-5 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -87,12 +87,12 @@ Rust does not isolate changes between Ohm releases.
 
 ## Recorded measurements
 
-- [ty bug-fix session and worktree startup](scripts/benchmark_results/ty-worktree-1.99.0-3.md)
+- [ty bug-fix session and worktree startup](scripts/benchmark_results/ty-worktree-1.99.0-5.md)
 - [Workflow and disk-usage results](scripts/benchmark_results/)
 - [Session fixtures and replay results](scripts/session_replays/)
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
 
-Ruff, uv, and Codex were measured with Ohm 1.99.0-2 on one Linux host; the ty session used Ohm 1.99.0-3 on another, with native-tool trust and verbose compiler logging enabled.
+The Linux timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-5 on one 32-CPU AMD EPYC-Genoa devbox, with eight Cargo jobs. Workflow runs leave both trust opt-ins unset. Session replays set procedural-macro trust to `all`; the ty session also sets native-tool trust to `all` and records verbose compiler logs.
 
-The [APFS study](scripts/benchmark_results/disk-1.99.0-2.json) measures physical disk allocation. `benchmark.py` measures elapsed time; the two require different measurement procedures.
+The [APFS study](scripts/benchmark_results/disk-1.99.0-5.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. Its source, tests, artifact isolation, and allocation are checked before the volume is removed; the evidence archive retains those checks. These measurements make no claim about elapsed time on the Mac.

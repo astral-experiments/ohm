@@ -39,9 +39,9 @@ class PublicationTests(unittest.TestCase):
         tables, _ = publish.render_tables(
             self.reports, self.ty_worktree, self.ty_scenario
         )
-        self.assertIn("| ty session | 347.80 s | 266.22 s | 23.46% |", tables["sessions"])
+        self.assertIn("| ty session | 287.99 s | 189.85 s | 34.08% |", tables["sessions"])
         self.assertIn(
-            "| ty | Worktree startup (Btrfs) | `ty_python_semantic` | 109.31 s | 16.76 s | 6.52× |",
+            "| ty | Worktree startup (Btrfs) | `ty_python_semantic` | 93.42 s | 13.41 s | 6.97× |",
             tables["features"],
         )
         rows = {

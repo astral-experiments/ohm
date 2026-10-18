@@ -1,8 +1,10 @@
 # Published benchmarks
 
-[`latest.json`](latest.json) selects the five release reports used by the benchmark publisher. The [ty session and worktree report](ty-worktree-1.99.0-3.md) supplies the additional README rows.
+[`latest.json`](latest.json) selects the five release reports used by the benchmark publisher. The [ty session and worktree report](ty-worktree-1.99.0-5.md) supplies the additional README rows.
 
-JSON reports contain individual measurements and configuration. Their `evidence` fields link to detailed reports. [Raw logs for Ohm 1.99.0-2](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-2-6cbbfac41159) and the [archive through Ohm 1.98.1-2](https://github.com/astral-sh/ohm/releases/tag/benchmark-evidence-1.98.1-2) are also available.
+JSON reports contain individual measurements and configuration. Their `evidence` fields link to detailed reports. [Raw logs and audits for Ohm 1.99.0-5](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-5-940c95bb89ba) include excluded attempts.
+
+Earlier archives are available for [Ohm 1.99.0-2](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-2-6cbbfac41159) and [releases through Ohm 1.98.1-2](https://github.com/astral-sh/ohm/releases/tag/benchmark-evidence-1.98.1-2).
 
 ## Publish results
 
