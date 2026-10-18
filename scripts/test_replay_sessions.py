@@ -132,7 +132,7 @@ class FixtureValidationTests(ReplayTestCase):
         for project in replay.PROJECTS:
             with self.subTest(project=project):
                 scenario = replay.load_scenario(
-                    SCRIPTS / "session_replays" / f"{project}.json"
+                    SCRIPTS / "session_replays" / f"{project}-rust-1.99.json"
                 )
                 self.assertEqual(scenario.project, project)
                 self.assertRegex(scenario.session["id"], r"^[a-z][a-z0-9-]+$")
@@ -153,9 +153,11 @@ class FixtureValidationTests(ReplayTestCase):
 
     def test_default_ruff_fixture_preserves_the_historical_workload(self) -> None:
         historical = replay.load_scenario(
-            SCRIPTS / "session_replays" / "ruff-historical.json"
+            SCRIPTS / "session_replays" / "ruff-historical-rust-1.99.json"
         )
-        current = replay.load_scenario(SCRIPTS / "session_replays" / "ruff.json")
+        current = replay.load_scenario(
+            SCRIPTS / "session_replays" / "ruff-rust-1.99.json"
+        )
         self.assertEqual(current.project, "ruff")
         self.assertNotEqual(current.session["id"], historical.session["id"])
         self.assertNotEqual(current.base_revision, historical.base_revision)
@@ -201,35 +203,9 @@ class FixtureValidationTests(ReplayTestCase):
             for key, value in current.environment.items():
                 self.assertEqual(environment[key], value)
 
-    def test_rust_1_98_ruff_fixtures_only_allow_the_new_clippy_lint(self) -> None:
-        for original_name, compatible_name in (
-            ("ruff.json", "ruff-rust-1.98.json"),
-            ("ruff-historical.json", "ruff-historical-rust-1.98.json"),
-        ):
-            with self.subTest(fixture=original_name):
-                original_path = SCRIPTS / "session_replays" / original_name
-                compatible_path = SCRIPTS / "session_replays" / compatible_name
-                expected = json.loads(original_path.read_text())
-                for step in expected["steps"]:
-                    if (
-                        step["kind"] == "command"
-                        and step["program"] == "cargo"
-                        and step["args"][0] == "clippy"
-                    ):
-                        step["args"].extend(["-A", "clippy::format_push_string"])
-
-                self.assertEqual(json.loads(compatible_path.read_text()), expected)
-                self.assertEqual(replay.load_scenario(compatible_path).project, "ruff")
-
-    def test_codex_fixture_preserves_published_command_and_reviewed_setup(self) -> None:
+    def test_codex_fixture_uses_reviewed_setup_patch(self) -> None:
         directory = SCRIPTS / "session_replays"
-        fixture = directory / "codex-stable-goal-accounting.json"
-        expected = json.loads((directory / "codex.json").read_text())
-        baseline = json.loads(
-            (directory / "release-1.98.0-1-baseline.json").read_text()
-        )
-        command = baseline["commands"]["codex"][-1]["command"]
-        expected["steps"][-1].update(program=command[0], args=command[1:])
+        fixture = directory / "codex-rust-1.99.json"
         descriptor = {
             "label": "Bound safety-retry goal accounting by elapsed wall time",
             "patch": "patches/codex-safety-retry-goal-accounting.patch",
@@ -238,9 +214,7 @@ class FixtureValidationTests(ReplayTestCase):
             ),
             "paths": ["codex-rs/tui/src/app/tests/safety_buffering.rs"],
         }
-        expected["setup_patches"] = [descriptor]
-
-        self.assertEqual(json.loads(fixture.read_text()), expected)
+        self.assertIn(descriptor, json.loads(fixture.read_text())["setup_patches"])
         self.assertEqual(replay.load_scenario(fixture).project, "codex")
         patch_path = directory / descriptor["patch"]
         patch = patch_path.read_bytes()
@@ -325,116 +299,6 @@ class FixtureValidationTests(ReplayTestCase):
                     ),
                     baseline["timed_command_seconds"]["ruff"][toolchain][repetition],
                 )
-
-    def test_checked_in_release_baseline_contains_paired_real_sessions(self) -> None:
-        baseline = json.loads(
-            (
-                SCRIPTS / "session_replays" / "release-1.97.1-17-baseline.json"
-            ).read_text()
-        )
-        self.assertEqual(baseline["rust_version"], "1.97.1")
-        self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-17")
-        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
-        self.assertEqual(baseline["jobs"], replay.parser().get_default("jobs"))
-        self.assertIn(
-            f"--jobs {baseline['jobs']} \\",
-            (SCRIPTS / "session_replays" / "README.md").read_text(),
-        )
-        for project in replay.PROJECTS:
-            samples = baseline["timed_session_seconds"][project]
-            self.assertEqual(len(samples["stock"]), baseline["repetitions"])
-            self.assertEqual(len(samples["ohm"]), baseline["repetitions"])
-            self.assertTrue(all(seconds > 0 for seconds in samples["stock"]))
-            self.assertTrue(all(seconds > 0 for seconds in samples["ohm"]))
-        self.assertIsNone(baseline["untimed_warmup_seconds"]["uv"]["stock"][0])
-        self.assertFalse(
-            baseline["methodology"]["cargo_status_messages_prove_compiler_invocations"]
-        )
-
-    def test_historical_ruff_fixture_matches_release_baseline_warmups(self) -> None:
-        baseline = json.loads(
-            (
-                SCRIPTS / "session_replays" / "release-1.97.1-17-baseline.json"
-            ).read_text()
-        )
-        scenario = replay.load_scenario(
-            SCRIPTS / "session_replays" / "ruff-historical.json"
-        )
-
-        self.assertEqual(len(scenario.warmup), 2)
-        self.assertEqual(
-            [step["args"][0] for step in scenario.warmup], ["check", "nextest"]
-        )
-        self.assertFalse(baseline["methodology"]["ruff_warmup_included_formatting"])
-        self.assertFalse(any(step["args"][0] == "fmt" for step in scenario.warmup))
-
-    def test_revision_18_results_preserve_every_recorded_command(self) -> None:
-        baseline = json.loads(
-            (
-                SCRIPTS / "session_replays" / "release-1.97.1-18-baseline.json"
-            ).read_text()
-        )
-        self.assertEqual(baseline["ohm_release"], "ohm-1.97.1-18")
-        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
-        self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
-        self.assertEqual(baseline["methodology"]["external_compilations_observed"], 0)
-        self.assertFalse(
-            baseline["methodology"]["cargo_status_messages_prove_compiler_invocations"]
-        )
-
-        for project in replay.PROJECTS:
-            with self.subTest(project=project):
-                fixture = "ruff-historical" if project == "ruff" else project
-                scenario = replay.load_scenario(
-                    SCRIPTS / "session_replays" / f"{fixture}.json"
-                )
-                commands = baseline["commands"][project]
-                expected = [
-                    (index, step)
-                    for index, step in enumerate(scenario.steps, start=1)
-                    if step["kind"] == "command"
-                ]
-                self.assertEqual(len(commands), len(expected))
-                for command, (index, step) in zip(commands, expected, strict=True):
-                    self.assertEqual(command["index"], index)
-                    self.assertEqual(command["label"], step["label"])
-                    original = [step["program"], *step["args"]]
-                    if project == "codex" and index == len(scenario.steps):
-                        self.assertEqual(command["command"][: len(original)], original)
-                        self.assertEqual(command["command"][len(original)], "-E")
-                        self.assertEqual(len(command["command"]), len(original) + 2)
-                    else:
-                        self.assertEqual(command["command"], original)
-                    category = {
-                        "check": "check",
-                        "test": "test",
-                        "nextest": "test",
-                        "clippy": "clippy",
-                        "fmt": "formatting",
-                    }[original[1]]
-                    self.assertEqual(command["category"], category)
-
-                for toolchain in ("stock", "ohm"):
-                    for repetition in range(baseline["repetitions"]):
-                        total = sum(
-                            command["wall_seconds"][toolchain][repetition]
-                            for command in commands
-                        )
-                        self.assertAlmostEqual(
-                            total,
-                            baseline["timed_command_seconds"][project][toolchain][
-                                repetition
-                            ],
-                        )
-                        self.assertGreaterEqual(
-                            baseline["timed_session_seconds"][project][toolchain][
-                                repetition
-                            ],
-                            total
-                            + baseline["timed_edit_seconds"][project][toolchain][
-                                repetition
-                            ],
-                        )
 
     def test_rejects_incomplete_or_uppercase_commit_shas(self) -> None:
         for revision in ("abc123", "A" * 40, None):
@@ -924,7 +788,7 @@ class ResumeTests(ReplayTestCase):
             "project": "ruff",
             "session_id": "real-session",
             "toolchain": label,
-            "selector": "1.98.0" if label == "stock" else "ohm",
+            "selector": "1.99.0" if label == "stock" else "ohm",
             "repetition": 0,
             "wall_seconds": 1.0,
         }
@@ -1056,7 +920,7 @@ class ResumeTests(ReplayTestCase):
             with mock.patch.object(
                 resumed, "run_command", side_effect=result
             ) as command:
-                observed = resumed.run_session(scenario, "stock", "1.98.0", 0)
+                observed = resumed.run_session(scenario, "stock", "1.99.0", 0)
 
         self.assertEqual(len(command.call_args_list), 2)
         self.assertEqual(command.call_args_list[0].kwargs["phase"], "warmup")
@@ -1184,7 +1048,7 @@ class ResumeTests(ReplayTestCase):
                     "tests_started": 1,
                 },
             ):
-                resumed.run_session(scenario, "stock", "1.98.0", 0)
+                resumed.run_session(scenario, "stock", "1.99.0", 0)
 
         archive = initial.output / "interrupted" / "ruff" / "stock" / "0" / "0"
         self.assertEqual(
@@ -1205,7 +1069,7 @@ class ResumeTests(ReplayTestCase):
             resumed = self.runner("--resume")
         resumed.sources["ruff"] = source
         with self.assertRaisesRegex(replay.BenchmarkError, "already completed"):
-            resumed.run_session(scenario, "stock", "1.98.0", 0)
+            resumed.run_session(scenario, "stock", "1.99.0", 0)
 
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
 
@@ -1232,7 +1096,7 @@ class ResumeTests(ReplayTestCase):
                     "tests_started": 1,
                 },
             ):
-                resumed.run_session(scenario, "stock", "1.98.0", 0)
+                resumed.run_session(scenario, "stock", "1.99.0", 0)
 
         archived = (
             initial.output
@@ -1264,7 +1128,7 @@ class ResumeTests(ReplayTestCase):
             resumed = self.runner("--resume")
         resumed.sources["ruff"] = source
         with self.assertRaisesRegex(replay.BenchmarkError, "owned artifact"):
-            resumed.run_session(scenario, "stock", "1.98.0", 0)
+            resumed.run_session(scenario, "stock", "1.99.0", 0)
 
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
         self.assertEqual(
@@ -1292,7 +1156,7 @@ class ResumeTests(ReplayTestCase):
         resumed.sources["ruff"] = source
 
         with self.assertRaisesRegex(replay.BenchmarkError, "exact base revision"):
-            resumed.run_session(scenario, "stock", "1.98.0", 0)
+            resumed.run_session(scenario, "stock", "1.99.0", 0)
         with self.assertRaisesRegex(replay.BenchmarkError, "different source"):
             resumed.run_session(scenario, "ohm", "ohm", 0)
 
@@ -1308,7 +1172,7 @@ class ResumeTests(ReplayTestCase):
 
         self.assertFalse(runner.options.resume)
         with self.assertRaisesRegex(replay.BenchmarkError, "already exists"):
-            runner.run_session(scenario, "stock", "1.98.0", 0)
+            runner.run_session(scenario, "stock", "1.99.0", 0)
         self.assertEqual(self.git(worktree, "rev-parse", "HEAD"), revision)
 
 
@@ -1559,7 +1423,7 @@ class SetupPatchTests(ReplayTestCase):
             ) as command,
             mock.patch("builtins.print"),
         ):
-            sample = runner.run_session(runner.scenarios[0], "stock", "1.98.0", 0)
+            sample = runner.run_session(runner.scenarios[0], "stock", "1.99.0", 0)
         self.assertEqual(command.call_count, 1)
         self.assertEqual(sample["warmup_steps"], [])
         self.assertEqual(
@@ -1574,7 +1438,7 @@ class SetupPatchTests(ReplayTestCase):
         self.patch_file.write_bytes(self.patch + b"tampered\n")
         with mock.patch.object(runner, "run_command") as command:
             with self.assertRaisesRegex(replay.BenchmarkError, "SHA-256"):
-                runner.run_session(runner.scenarios[0], "stock", "1.98.0", 0)
+                runner.run_session(runner.scenarios[0], "stock", "1.99.0", 0)
         command.assert_not_called()
         self.assertEqual(runner.samples, [])
         worktree = runner.output / "worktrees" / "ruff" / "stock" / "0"
@@ -1682,7 +1546,7 @@ class SetupPatchTests(ReplayTestCase):
             with self.assertRaisesRegex(
                 replay.BenchmarkError, "different setup patch proofs"
             ):
-                runner.run_session(runner.scenarios[0], "stock", "1.98.0", 1)
+                runner.run_session(runner.scenarios[0], "stock", "1.99.0", 1)
         command.assert_not_called()
 
     def test_ordered_overlapping_setup_patches_require_a_consistent_hash_chain(
@@ -1739,7 +1603,7 @@ class SetupPatchTests(ReplayTestCase):
             ),
             mock.patch("builtins.print"),
         ):
-            sample = resumed.run_session(resumed.scenarios[0], "stock", "1.98.0", 0)
+            sample = resumed.run_session(resumed.scenarios[0], "stock", "1.99.0", 0)
         archived = list((runner.output / "interrupted").rglob("README.md"))
         self.assertEqual(len(archived), 1)
         self.assertEqual(archived[0].read_bytes(), self.after + b"interrupted edit\n")

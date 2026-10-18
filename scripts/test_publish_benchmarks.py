@@ -141,6 +141,8 @@ class PublicationTests(unittest.TestCase):
 
     def test_compaction_preserves_measurements_and_input(self):
         report = self.reports["sessions"]
+        report["provenance"]["rejected_host_evidence"] = {"log": "old attempt"}
+        report["provenance"]["independent_controls_review"] = {"passed": True}
         report["provenance"]["system_cpu"].update(
             commands=[{"trace": "detailed"}],
             trace_jsonl='{"violations": []}\n',
@@ -153,6 +155,8 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(report, original)
         self.assertEqual(compact["commands"], report["commands"])
         self.assertEqual(compact["methodology"], report["methodology"])
+        self.assertNotIn("rejected_host_evidence", compact["provenance"])
+        self.assertNotIn("independent_controls_review", compact["provenance"])
         self.assertNotIn("commands", compact["provenance"]["system_cpu"])
         self.assertNotIn("trace_jsonl", compact["provenance"]["system_cpu"])
         self.assertNotIn("preflight_attempts", compact["provenance"]["system_cpu"])
@@ -221,6 +225,12 @@ class PublicationTests(unittest.TestCase):
             inputs.mkdir()
             for kind, report in self.reports.items():
                 publish.write_json(inputs / f"{kind}.json", report)
+            results = root / "scripts/benchmark_results"
+            results.mkdir(parents=True, exist_ok=True)
+            for kind in publish.KINDS:
+                publish.write_json(
+                    results / f"{kind}.json", {"ohm_release": "ohm-0.0.0-1"}
+                )
             before = {
                 p.relative_to(root): p.read_bytes()
                 for p in root.rglob("*")
@@ -252,14 +262,13 @@ class PublicationTests(unittest.TestCase):
             }
             self.assertEqual(before, after)
 
-    def test_verified_archive_publishes_a_single_canonical_session_report(self):
+    def test_verified_archive_replaces_current_reports(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for name in ("README.md", "BENCHMARKS.md"):
                 shutil.copyfile(publish.ROOT / name, root / name)
             for name in (
                 "scripts/benchmark_results",
-                "scripts/session_replays",
                 "node_modules/.bin",
                 "inputs",
             ):
@@ -268,6 +277,10 @@ class PublicationTests(unittest.TestCase):
             (root / "node_modules/.bin/prettier").touch()
             for kind, report in self.reports.items():
                 publish.write_json(root / "inputs" / f"{kind}.json", report)
+                publish.write_json(
+                    root / "scripts/benchmark_results" / f"{kind}.json",
+                    {"ohm_release": "ohm-0.0.0-1"},
+                )
 
             def run(arguments, **kwargs):
                 if arguments[:3] == ["gh-auto", "release", "download"]:
@@ -298,8 +311,14 @@ class PublicationTests(unittest.TestCase):
                     self.assertEqual(report["evidence"]["path"], f"{kind}.json")
                 for name, expected in publish.documents(actual).items():
                     self.assertEqual((root / name).read_text(), expected)
+                with self.assertRaisesRegex(ValueError, "Results already exist"):
+                    publish.publish(root / "inputs")
             self.assertEqual(
-                len(list((root / "scripts/session_replays").glob("release-*.json"))), 3
+                {
+                    path.stem
+                    for path in (root / "scripts/benchmark_results").glob("*.json")
+                },
+                set(publish.KINDS) | {Path(publish.TY_WORKTREE_REPORT).stem},
             )
 
 

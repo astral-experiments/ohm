@@ -16,7 +16,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "scripts/benchmark_results"
 KINDS = ("workflow", "sessions", "historical", "ablation", "disk")
-TY_WORKTREE_REPORT = "ty-worktree-1.99.0-5.json"
+TY_WORKTREE_REPORT = "ty-worktree.json"
 TY_SCENARIO = "scripts/session_replays/ty-29327.json"
 
 
@@ -35,9 +35,23 @@ def write_json(path, value):
 def compact(report, evidence):
     """Keep measurements and audit summaries; the archive retains full provenance."""
     result = copy.deepcopy(report)
-    provenance = result.get("provenance", {})
-    for key in ("input_receipt_sha256", "replay_source_audit"):
-        provenance.pop(key, None)
+    provenance = result["provenance"] = {
+        key: value
+        for key, value in result.get("provenance", {}).items()
+        if key in {
+            "runner_sha256",
+            "wrapper",
+            "toolchains",
+            "helpers",
+            "python",
+            "system_cpu",
+            "raw_results_sha256",
+            "fixtures",
+            "exporter_sha256",
+            "cargo_home_configuration",
+            "native_tools",
+        }
+    }
     cpu = provenance.get("system_cpu", {})
     cpu.pop("commands", None)
     cpu.pop("trace_jsonl", None)
@@ -54,8 +68,7 @@ def compact(report, evidence):
 
 
 def latest_reports():
-    index = load(RESULTS / "latest.json")
-    return {kind: load(RESULTS / index[kind]) for kind in KINDS}
+    return {kind: load(RESULTS / f"{kind}.json") for kind in KINDS}
 
 
 def validate(reports):
@@ -440,14 +453,9 @@ def publish(directory):
     if not prettier.is_file():
         raise ValueError("Run npm ci --ignore-scripts before publishing benchmarks")
     version = release.removeprefix("ohm-")
-    paths = {
-        "workflow": f"scripts/benchmark_results/release-{version}.json",
-        "sessions": f"scripts/session_replays/release-{version}-baseline.json",
-        "historical": f"scripts/session_replays/release-{version}-ruff-historical.json",
-        "ablation": f"scripts/session_replays/release-{version}-uv-feature-ablation.json",
-        "disk": f"scripts/benchmark_results/disk-{version}.json",
-    }
-    if any((ROOT / path).exists() for path in paths.values()):
+    paths = {kind: f"scripts/benchmark_results/{kind}.json" for kind in KINDS}
+    current = RESULTS / "sessions.json"
+    if current.exists() and load(current)["ohm_release"] == release:
         raise ValueError(
             "Results already exist for this release; refusing to replace them"
         )
@@ -522,13 +530,6 @@ def publish(directory):
                     },
                 ),
             )
-    write_json(
-        RESULTS / "latest.json",
-        {
-            kind: str(Path("..") / Path(path).relative_to("scripts"))
-            for kind, path in paths.items()
-        },
-    )
     for name, text in updated.items():
         (ROOT / name).write_text(text)
     subprocess.run(
@@ -536,7 +537,6 @@ def publish(directory):
             str(prettier),
             "--write",
             *paths.values(),
-            "scripts/benchmark_results/latest.json",
             *updated,
         ],
         cwd=ROOT,

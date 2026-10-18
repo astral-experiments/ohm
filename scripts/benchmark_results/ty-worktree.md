@@ -60,7 +60,7 @@ The trusted Btrfs runs seed 2733 files, including 2695 reflinked files. The ext4
 - The session and trusted startup runs set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` and `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all`.
 - Each repetition starts with fresh artifacts. Toolchain order alternates for sessions and rotates for startup runs.
 
-Runs wait for an idle host and restart if CPU monitoring detects interference. The [JSON report](ty-worktree-1.99.0-5.json) records the thresholds, samples, source checks, and rejected attempts. These measurements compare complete toolchains; they do not isolate individual optimizations or changes between Ohm releases.
+Runs wait for an idle host and restart if CPU monitoring detects interference. The [JSON report](ty-worktree.json) records the thresholds, samples, source checks, and rejected attempts. These measurements compare complete toolchains; they do not isolate individual optimizations or changes between Ohm releases.
 
 ## Reproduce
 

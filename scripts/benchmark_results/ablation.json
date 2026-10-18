@@ -236,84 +236,12 @@
       }
     },
     "exporter_sha256": "3c2a69f8ff57f6ef035b9f08a374114d061f8ef0f9d5cb2da1b74041e1e69021",
-    "host_selection": {
-      "benchmark_host_id": "charlie-ohm-session-bench",
-      "hostname": "charlie-ohm-session-bench",
-      "logical_cpus": 32,
-      "cpu_model": "AMD EPYC-Genoa Processor",
-      "visibility_mode": "full-vm",
-      "host_visibility_sha256": "5e4435de1973858f0ca74fce7577d85da1c157b37bf1601d62a24796eb0ffa86",
-      "selection_preflight_sha256": "e7300cd7ef7f2c51bf70f4dd3319788febe798bc3929fc058f74c5a8928f5956",
-      "selected_at": 1792249981.882669,
-      "free_bytes": 1764708913152,
-      "history": [
-        {
-          "host": "charlie-oss-2",
-          "accepted_samples": 0,
-          "outcome": "Background Python and provisioning work observed; left untouched."
-        },
-        {
-          "host": "charlie-oss-3",
-          "accepted_samples": 0,
-          "outcome": "Unrelated Rust compiler active; left untouched."
-        }
-      ],
-      "capacity_policy": "Keep at least 60 GiB free; audit each persisted replay cell, retire only its unique target/shared artifact leaves, then pass a new 30-second quiet gate."
-    },
-    "host_selection_sha256": "2792613a41d7f434584286957719e242f8cad953905095b945f06a9109b4cad0",
     "cargo_home_configuration": {
       "checked_at": 1792249981.9841838,
       "cargo_home": "/tmp/codex-cargo-home",
       "config": false,
       "config_toml": false
     },
-    "cargo_home_configuration_sha256": "fffc984bcec615caff0c96d9594da9a60b993896e9d4df316c73d6a24c87aaa8",
-    "controller_entrypoint": {
-      "created_at": 1792249982.5281935,
-      "command": [
-        "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/python3.12",
-        "-B",
-        "/tmp/ohm-benchmarks-1.99.0-5/data/controller/launch-linux.py"
-      ],
-      "environment": {
-        "HOME": "/home/dev-user",
-        "USER": "charliemarsh",
-        "LOGNAME": "charliemarsh",
-        "PATH": "/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-        "LANG": "C.UTF-8",
-        "LC_ALL": "C.UTF-8"
-      },
-      "cwd": "/tmp/ohm-benchmarks-1.99.0-5/data",
-      "start_new_session": true,
-      "stdin": "DEVNULL",
-      "entrypoint_sha256": "2a02c0c761c91ba134a135868871b2e7f7359b7d4e9512641326c852a8c3b1be",
-      "launcher_sha256": "73dbe7ecc3a076a076f511c4a5b5b9babd90cde555c85e140f9b9384efe03a6d",
-      "pid": 3889298
-    },
-    "controller_entrypoint_sha256": "2b4c802c3a05a65e153b76818680bcac8fba4574cb569701b4611a83d7e16c91",
-    "controller_resume_entrypoint": {
-      "created_at": 1792259231.7200136,
-      "command": [
-        "/tmp/ohm-benchmarks-1.99.0-5/tools/bin/python3.12",
-        "-B",
-        "/tmp/ohm-benchmarks-1.99.0-5/data/controller/resume-sessions.py"
-      ],
-      "environment": {
-        "HOME": "/home/dev-user",
-        "USER": "charliemarsh",
-        "LOGNAME": "charliemarsh",
-        "PATH": "/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-        "LANG": "C.UTF-8",
-        "LC_ALL": "C.UTF-8"
-      },
-      "cwd": "/tmp/ohm-benchmarks-1.99.0-5/data",
-      "start_new_session": true,
-      "stdin": "DEVNULL",
-      "entrypoint_sha256": "8517d909d820dae6abae95c6e0fcd4ca9b7a31c7b86c92bf67b8843869d82819",
-      "launcher_sha256": "51696b2e46791eb61668cb06bed0d6c781d2df65108d44b121dd5a96efed2e35",
-      "pid": 766931
-    },
-    "controller_resume_entrypoint_sha256": "d46b3b695b60ab7834f47f701228a1e2d3ab835cb484dad3ab750de0dd190b28",
     "native_tools": {
       "created_at": 1792249982.2208252,
       "commands": [
@@ -354,47 +282,6 @@
           "output": "3.0.13"
         }
       ]
-    },
-    "native_tools_sha256": "23dbafcc0cb86e51601475deba83c208ad1d965d4526c39c51dfd02c29959c65",
-    "rejected_host_evidence": {
-      "screened_hosts": [
-        {
-          "host": "charlie-oss-2",
-          "accepted_samples": 0,
-          "outcome": "Background Python and provisioning work observed; left untouched."
-        },
-        {
-          "host": "charlie-oss-3",
-          "accepted_samples": 0,
-          "outcome": "Unrelated Rust compiler active; left untouched."
-        }
-      ],
-      "measured_attempts": []
-    },
-    "controls_review": {
-      "passed": true,
-      "checked_at": 1792249982.4873714,
-      "scope": "Fresh VM visibility, recomputed CPU preflight arithmetic, source fixtures, native dependencies and execution controls; the exporter independently rechecks the recorded measurements after the campaign.",
-      "host_selection_sha256": "2792613a41d7f434584286957719e242f8cad953905095b945f06a9109b4cad0",
-      "host_visibility_sha256": "5e4435de1973858f0ca74fce7577d85da1c157b37bf1601d62a24796eb0ffa86",
-      "controller_sha256": {
-        "select-vm-host.py": "cac306f2c4f7e0cf66446b24198dde2b92ff22b3c41105a2c50dec99b3084cea",
-        "host_guard.py": "c45541f3def3cac178f9d3e67e73dcf1f5fc1ebd392c8d6fc33d29b62dc0f636",
-        "launch-linux.py": "73dbe7ecc3a076a076f511c4a5b5b9babd90cde555c85e140f9b9384efe03a6d",
-        "prefetch.py": "07b5968d3ddb2333143d3382b4d58d386d37aff75cbb465b6744498afe7c7ef7",
-        "review-controls.py": "e6185d0d109aefd696fdb1b4e91539b3b51749eb1632108659385a31374129d9",
-        "run-suite.py": "ab79b4c2c51e1d95218a00a3913ec4c66d029df820b0c0e199e57666cf1f97eb",
-        "start-controller.py": "2a02c0c761c91ba134a135868871b2e7f7359b7d4e9512641326c852a8c3b1be",
-        "status.py": "c66c87f0fad6e666701c44e2f379303b8d2e77b234146433ba32a4e220b71d6e",
-        "prepare-sources.py": "3a72f271f33d702245e4dd3a989b7a3fb046f99ca34d72aca17da2cd4dc23a86",
-        "test_host_guard.py": "c6846baaed05ded7ceca3b1ff15b7d992c159e38fccb6ab61d578478a32b9310"
-      },
-      "preparation_sha256": "448a3e04f3efe5c8dc95b2a964676b6f46a0a6401a8ef7198845bef875ecd941"
-    },
-    "controls_review_sha256": "e42d8105915068b2126ee2f106da5a7a5f26cdc247698f565ff74af371db828e",
-    "source_diff_audit": {
-      "format": "git diff --binary --full-index",
-      "matching_fields": ["head", "tree", "diff_sha256"]
     }
   },
   "completed_at": "2026-10-17T21:08:37.091596+00:00",
