@@ -66,8 +66,8 @@ must be built from source and registered with `rustup toolchain link` before run
 above; the regular installer does not provide it. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the pinned component
 sources, PGO/BOLT configuration, build inputs, and binary identities. Use `--ohm` to select another
-installed toolchain when measuring a different version. The archived build recipe and optimization
-profiles are linked from the [results index](scripts/benchmark_results/README.md).
+installed toolchain when measuring a different version. See the
+[results index](scripts/benchmark_results/README.md) for the available evidence.
 
 | Workflow                          | Untimed baseline warmup  | Measured sequence                     |
 | --------------------------------- | ------------------------ | ------------------------------------- |
@@ -124,8 +124,8 @@ python3 scripts/workflow_results.py /path/to/ruff/results.json /path/to/uv/resul
 The report retains each sequence and command timing, warmups, source identities, compiler revisions,
 executable and compiler-library hashes, failed executions, and rejected attempts. If any repetition
 fails, the table shows a failure count
-for that toolchain and omits its timing and the row's speedup. After archiving the raw evidence,
-save the report and its evidence link as `scripts/benchmark_results/developer-workflows.json`, then
+for that toolchain and omits its timing and the row's speedup. Archive the raw evidence and
+save the validated report as `scripts/benchmark_results/developer-workflows.json`, then
 refresh the README table:
 
 ```console
