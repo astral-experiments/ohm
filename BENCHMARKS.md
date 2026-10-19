@@ -1,7 +1,9 @@
 # Running benchmarks
 
-Ohm has three benchmark runners:
+Ohm has four benchmark runners:
 
+- [`scripts/benchmark_workflows.py`](scripts/benchmark_workflows.py) measures complete edit, check,
+  build, formatting, lint, and test sequences in Ruff/ty, uv, and Codex.
 - [`scripts/benchmark.py`](scripts/benchmark.py) measures individual build, check, test, and
   formatting workflows in uv and Codex.
 - [`scripts/replay_sessions.py`](scripts/replay_sessions.py) replays recorded development sessions
@@ -15,15 +17,122 @@ The [README](README.md) summarizes the published results.
 ## Prerequisites
 
 Install [uv](https://docs.astral.sh/uv/), Git, and the stock Rust and Ohm toolchains you want to
-compare. Ruff/ty and Codex sessions need `cargo-nextest`; Codex also needs
-[`just`](https://github.com/casey/just).
+compare. Ruff/ty and Codex workflows and sessions need `cargo-nextest`; Codex session replays also
+need [`just`](https://github.com/casey/just).
 
 Run from the Ohm repository on a quiet machine with enough disk space for separate builds. The
 runners may need network access to clone source repositories. Workflow benchmarks invoke Cargo with
 `--locked --offline`. Session and worktree replays support `--offline`; cache their dependencies
 before enabling it.
 
-## Run the workflow benchmarks
+## Run the developer workflows
+
+These Linux benchmarks measure five short workflows in the representative projects. The runner
+pins each source revision, edit, package, and test selection; `--dry-run` prints the full plan without
+cloning or building:
+
+```console
+python3 scripts/benchmark_workflows.py --output-dir /path/to/results --dry-run
+```
+
+Fetch dependencies before measuring, using the same Cargo home for both commands:
+
+```console
+python3 scripts/benchmark_workflows.py \
+  --project uv --source-path uv=/path/to/uv \
+  --upstream 1.99.0 --ohm ohm-1.99.0-5-workflow-cache-fix-92ad10889020 \
+  --output-dir /path/to/preparation --prepare-only
+
+python3 scripts/benchmark_workflows.py \
+  --project uv --source-path uv=/path/to/preparation/sources/uv \
+  --upstream 1.99.0 --ohm ohm-1.99.0-5-workflow-cache-fix-92ad10889020 \
+  --jobs 8 --repetitions 4 --contention-retries 8 \
+  --require-idle --discard-targets --output-dir /path/to/new-empty-results
+```
+
+Use `--project ruff` or `--project codex` to run the other projects. Omit `--project` to run all three
+sequentially, or assign one project to each devbox. Stock and Ohm always run sequentially on the same
+host for a given project. `--workflow` selects a subset for diagnosis. `--resume` retains completed
+samples and rejects changed runner code, source definitions, sampling settings, or toolchains. If your shell
+sets `PYTHONSAFEPATH=1`, prefix the commands with `env -u PYTHONSAFEPATH`.
+
+The published measurements use eight Cargo jobs on three 32-vCPU Linux devboxes. Each result
+records its host metadata, command logs, and CPU traces.
+
+The table uses an unreleased compiler build from
+[`92ad10889020`](https://github.com/astral-sh/ohm-rust/commit/92ad108890201c1fb596b4ec51fb493cb7280b65),
+which fixes a retained-query cache crash found in the Codex edit-and-test workflow. This toolchain
+must be built from source and registered with `rustup toolchain link` before running the command
+above; the regular installer does not provide it. The
+[build provenance](scripts/benchmark_results/workflow-build.json) records the pinned component
+sources, PGO/BOLT configuration, build inputs, and binary identities. Use `--ohm` to select another
+installed toolchain when measuring a different version. The archived build recipe and optimization
+profiles are linked from the [results index](scripts/benchmark_results/README.md).
+
+| Workflow                          | Untimed baseline warmup  | Measured sequence                     |
+| --------------------------------- | ------------------------ | ------------------------------------- |
+| Edit → focused test               | Test                     | Direct edit, test                     |
+| Edit dependency → downstream test | Test                     | Dependency implementation edit, test  |
+| Edit → check → test → check       | Check, test, check       | Direct edit, check, test, check       |
+| Check → build → check             | Check only               | Check, build, check                   |
+| Edit → fmt → clippy → test        | Formatting, Clippy, test | Direct edit, formatting, Clippy, test |
+
+The timer covers the entire measured sequence, including applying the edit and runner overhead.
+Warmups and source preparation are excluded. Every sample gets fresh target and shared-build
+directories, which remain continuous throughout that sample. The runner alternates stock/Ohm order
+by repetition and workflow. Medians are calculated from complete sequences; adding independently
+measured command medians would lose the effects of switching commands.
+
+| Project | Target package       | Edited dependency    | Focused test                                                                 |
+| ------- | -------------------- | -------------------- | ---------------------------------------------------------------------------- |
+| Ruff/ty | `ty_python_semantic` | `ty_python_core`     | `mdtest::liskov.md`, using nextest                                           |
+| uv      | `uv`                 | `uv-normalize`       | `help::help` in the `it` integration target                                  |
+| Codex   | `codex-core`         | `codex-utils-string` | `preparation_canonicalizes_data_urls_and_rejects_remote_urls`, using nextest |
+
+Check, build, and Clippy target the package's library; formatting applies fixes to the target package. Tests
+include compiling and running one existing test. The dependency edits preserve the public API.
+Source formatting is normalized with Ohm rustfmt before warmup, identically for each pair. Both
+formatters accept this shared baseline and produce identical formatted edits in the three projects.
+Clippy and tests run on the formatted edit in the formatting workflow. Both Ohm trust opt-ins are `all` and its
+shared build directory is separate from the target directory. The uv default-debug-information
+difference remains part of the stock/Ohm comparison; explicit project profiles are preserved.
+
+With `--require-idle`, each sample waits after its baseline warmup for 30 seconds with at least 95%
+host CPU idle, at most 0.5% I/O wait and 0.1% steal, and no unrelated compilers. During measurement,
+the runner rejects unrelated compilers, steal above 0.1%, or three consecutive two-second samples
+with more than 5% host CPU used by other processes. It also rejects unrelated compilation during
+warmup. Host CPU counters include competing processes that finish between samples. Background
+monitoring services remain enabled and their overhead remains in the timings.
+Contaminated attempts retain logs and build state and are retried from fresh artifacts. If a run
+exhausts its attempts, resume it with a larger `--contention-retries` value; existing attempts are
+skipped and their evidence is preserved.
+
+A command with an unexpected exit status is retained as a failed execution, and the runner continues
+with the remaining workflows. It keeps the failed build state and copies compiler crash reports into
+the logs. The process exits unsuccessfully after completing the study if any executions failed.
+Missing tools and other setup errors still stop the run. `--resume` skips both successful and failed
+executions; a failed execution is never retried to obtain a better timing.
+
+The result directory contains `results.json` and per-command logs and CPU traces. To validate and
+combine the three completed runs:
+
+```console
+python3 scripts/workflow_results.py /path/to/ruff/results.json /path/to/uv/results.json \
+  /path/to/codex/results.json --output /path/to/developer-workflows.json
+```
+
+The report retains each sequence and command timing, warmups, source identities, compiler revisions,
+executable and compiler-library hashes, failed executions, and rejected attempts. If any repetition
+fails, the table shows a failure count
+for that toolchain and omits its timing and the row's speedup. After archiving the raw evidence,
+save the report and its evidence link as `scripts/benchmark_results/developer-workflows.json`, then
+refresh the README table:
+
+```console
+python3 scripts/publish_benchmarks.py --render
+```
+
+## Run the individual-command benchmarks
 
 Preview the plan without cloning or building:
 
@@ -93,7 +202,7 @@ Rust does not isolate changes between Ohm releases.
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
 
-The Linux timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-5 on one 32-CPU AMD EPYC-Genoa devbox, with eight Cargo jobs. Workflow runs leave both trust opt-ins unset. Session replays set procedural-macro trust to `all`; the ty session also sets native-tool trust to `all` and records verbose compiler logs.
+The individual-command and session timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-5 on one 32-CPU AMD EPYC-Genoa devbox, with eight Cargo jobs. Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust to `all`; the ty session also sets native-tool trust to `all` and records verbose compiler logs. The developer-workflow report records its separate host for each project; compare stock and Ohm within each project.
 
 The [APFS study](scripts/benchmark_results/disk.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. Its source, tests, artifact isolation, and allocation are checked before the volume is removed; the evidence archive retains those checks. These measurements make no claim about elapsed time on the Mac.
 

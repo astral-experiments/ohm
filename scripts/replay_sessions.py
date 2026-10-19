@@ -1054,9 +1054,11 @@ class Replay:
             "log": str(log),
         }
         if result.returncode != step.get("expected_exit", 0):
-            raise BenchmarkError(
+            error = BenchmarkError(
                 f"{scenario.project} {label} step {index} exited {result.returncode}; inspect {log}"
             )
+            error.command_sample = sample
+            raise error
         for required in step.get("output_contains", []):
             if required not in result.stdout:
                 raise BenchmarkError(

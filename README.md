@@ -142,7 +142,40 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 
 ## Benchmarks
 
-See the [benchmark documentation](./BENCHMARKS.md) for instructions on running these benchmarks.
+**Developer workflows** measure complete command sequences after an untimed baseline warmup. Each
+sequence preserves its build artifacts between commands; each repetition starts from fresh artifacts.
+
+<!-- benchmark:developer-workflows -->
+
+| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-5 + fix | Time saved |
+| ------- | --------------------------------- | ----------- | ------------------ | ---------- |
+| Ruff/ty | Edit → focused test               | 16.46 s     | 18.91 s            | −14.89%    |
+| Ruff/ty | Edit dependency → downstream test | 16.99 s     | 6.18 s             | 63.63%     |
+| Ruff/ty | Edit → check → test → check       | 25.14 s     | 29.03 s            | −15.48%    |
+| Ruff/ty | Check → build → check             | 94.13 s     | 74.39 s            | 20.97%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 32.22 s     | 29.95 s            | 7.05%      |
+| uv      | Edit → focused test               | 23.41 s     | 12.51 s            | 46.58%     |
+| uv      | Edit dependency → downstream test | 27.80 s     | 4.92 s             | 82.30%     |
+| uv      | Edit → check → test → check       | 27.38 s     | 18.47 s            | 32.54%     |
+| uv      | Check → build → check             | 139.72 s    | 82.70 s            | 40.81%     |
+| uv      | Edit → fmt → clippy → test        | 29.22 s     | 19.91 s            | 31.86%     |
+| Codex   | Edit → focused test               | 28.16 s     | 25.86 s            | 8.15%      |
+| Codex   | Edit dependency → downstream test | 53.16 s     | 6.31 s             | 88.14%     |
+| Codex   | Edit → check → test → check       | 34.98 s     | 37.66 s            | −7.66%     |
+| Codex   | Check → build → check             | 158.89 s    | 122.41 s           | 22.96%     |
+| Codex   | Edit → fmt → clippy → test        | 39.83 s     | 34.95 s            | 12.26%     |
+
+<!-- /benchmark:developer-workflows -->
+
+The Ohm column uses an optimized, unreleased build of 1.99.0-5 with the
+[retained-query cache fix](https://github.com/astral-sh/ohm-rust/pull/190). Its exact sources and build
+settings are recorded in the [build provenance](scripts/benchmark_results/workflow-build.json).
+
+Times are medians of four runs on each project's devbox, including compilation and one focused test
+where shown. A failure count replaces the timing if any repetition fails; that row has no speedup.
+Edits change the target crate unless labeled as a dependency edit. See the
+[workflow definitions and starting states](BENCHMARKS.md#run-the-developer-workflows) and
+[individual measurements](scripts/benchmark_results/developer-workflows.json).
 
 **Direct edits** modify the crate being checked, linted, or tested:
 
@@ -181,9 +214,9 @@ avoid rebuilding unchanged dependents:
 
 | Project | Workflow                 | Package              | Rust 1.99.0 | Ohm     | Speedup |
 | ------- | ------------------------ | -------------------- | ----------- | ------- | ------- |
-| uv      | Build, then check        | `uv`                 | 61.71 s     | 14.51 s | 4.25×   |
+| uv      | Check after build        | `uv`                 | 61.71 s     | 14.51 s | 4.25×   |
 | uv      | Shared-worktree build    | `uv-normalize`       | 8.88 s      | 1.37 s  | 6.48×   |
-| Codex   | Build, then check        | `codex-core`         | 107.66 s    | 29.85 s | 3.61×   |
+| Codex   | Check after build        | `codex-core`         | 107.66 s    | 29.85 s | 3.61×   |
 | Codex   | No-op formatting         | Workspace            | 10.34 s     | 0.30 s  | 34.46×  |
 | Codex   | Formatting after an edit | `codex-core`         | 10.25 s     | 0.48 s  | 21.35×  |
 | Codex   | Shared-worktree build    | `codex-utils-string` | 3.66 s      | 1.79 s  | 2.05×   |

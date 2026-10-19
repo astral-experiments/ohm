@@ -1877,9 +1877,17 @@ class CommandResultTests(ReplayTestCase):
                     )
                     self.assertEqual(observed["returncode"], 100)
                 else:
-                    with self.assertRaises(replay.BenchmarkError):
+                    with self.assertRaises(replay.BenchmarkError) as failure:
                         runner.run_command(
                             scenario, worktree, step, "stock", "1.99.0", 0, 1
+                        )
+                    if status != step["expected_exit"]:
+                        self.assertEqual(
+                            failure.exception.command_sample["returncode"], status
+                        )
+                        self.assertEqual(
+                            Path(failure.exception.command_sample["log"]).read_text(),
+                            output,
                         )
 
     def test_python_helper_uses_the_selected_target_directory(self) -> None:
