@@ -341,7 +341,7 @@ def comparisons(report):
 def validate(report):
     identity = re.fullmatch(
         rf"ohm-{re.escape(report['rust_version'])}-[1-9]\d*"
-        r"(?:-workflow-cache-fix-([0-9a-f]{12}))?",
+        r"(?:-workflow-(?:cache-fix|overhead)-([0-9a-f]{12}))?",
         report["ohm_release"],
     )
     if not re.fullmatch(r"\d+\.\d+\.\d+", report["rust_version"]) or not identity:
@@ -393,10 +393,12 @@ def build_report(runs):
 
 
 def toolchain_label(report):
-    version, separator, _ = (
-        report["ohm_release"].removeprefix("ohm-").partition("-workflow-cache-fix-")
+    version, separator, build = (
+        report["ohm_release"].removeprefix("ohm-").partition("-workflow-")
     )
-    return version + (" + fix" if separator else "")
+    if not separator:
+        return version
+    return version + (" + fixes" if build.startswith("overhead-") else " + fix")
 
 
 def table_rows(report):

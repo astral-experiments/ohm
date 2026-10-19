@@ -170,26 +170,30 @@ class WorkflowReportTests(unittest.TestCase):
                     workflow_results.validate(report)
 
     def test_unreleased_build_must_match_its_source_revision(self):
-        runs = synthetic_runs()
-        revision = "1" * 40
-        selector = f"ohm-1.99.0-5-workflow-cache-fix-{revision[:12]}"
-        for run in runs:
-            run["configuration"]["toolchains"]["ohm"] = selector
-            run["metadata"]["toolchains"]["ohm"]["rustc"]["version"] = (
-                f"rustc ({selector})\ncommit-hash: {revision}"
-            )
-            for sample in run["samples"]:
-                sample["normalization"]["command"][1] = f"+{selector}"
-                if sample["toolchain"] == "ohm":
-                    sample["selector"] = selector
-                    for command in [*sample["commands"], *sample["warmups"]]:
-                        command["command"][1] = f"+{selector}"
-        report = workflow_results.build_report(runs)
-        self.assertEqual(report["ohm_source_revision"], revision)
-        self.assertEqual(workflow_results.toolchain_label(report), "1.99.0-5 + fix")
-        report["ohm_source_revision"] = "2" * 40
-        with self.assertRaises(ValueError):
-            workflow_results.validate(report)
+        for build, label in (("cache-fix", "fix"), ("overhead", "fixes")):
+            with self.subTest(build=build):
+                runs = synthetic_runs()
+                revision = "1" * 40
+                selector = f"ohm-1.99.0-5-workflow-{build}-{revision[:12]}"
+                for run in runs:
+                    run["configuration"]["toolchains"]["ohm"] = selector
+                    run["metadata"]["toolchains"]["ohm"]["rustc"]["version"] = (
+                        f"rustc ({selector})\ncommit-hash: {revision}"
+                    )
+                    for sample in run["samples"]:
+                        sample["normalization"]["command"][1] = f"+{selector}"
+                        if sample["toolchain"] == "ohm":
+                            sample["selector"] = selector
+                            for command in [*sample["commands"], *sample["warmups"]]:
+                                command["command"][1] = f"+{selector}"
+                report = workflow_results.build_report(runs)
+                self.assertEqual(report["ohm_source_revision"], revision)
+                self.assertEqual(
+                    workflow_results.toolchain_label(report), f"1.99.0-5 + {label}"
+                )
+                report["ohm_source_revision"] = "2" * 40
+                with self.assertRaises(ValueError):
+                    workflow_results.validate(report)
 
     def test_failed_execution_prevents_a_success_only_speedup(self):
         runs = synthetic_runs()
