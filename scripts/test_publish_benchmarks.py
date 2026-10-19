@@ -1,7 +1,6 @@
 """Check report arithmetic, evidence preservation, and publication ordering."""
 
 import copy
-import json
 from pathlib import Path
 import shutil
 import statistics
@@ -20,13 +19,17 @@ class PublicationTests(unittest.TestCase):
         self.ty_worktree = publish.load(publish.RESULTS / publish.TY_WORKTREE_REPORT)
         self.ty_scenario = publish.load(publish.ROOT / publish.TY_SCENARIO)
 
-    def copy_ty_study(self, root):
+    def copy_supplemental_reports(self, root):
         destination = root / "scripts/benchmark_results" / publish.TY_WORKTREE_REPORT
         destination.parent.mkdir(parents=True, exist_ok=True)
         publish.write_json(destination, self.ty_worktree)
         fixture = root / publish.TY_SCENARIO
         fixture.parent.mkdir(parents=True, exist_ok=True)
         publish.write_json(fixture, self.ty_scenario)
+        shutil.copyfile(
+            publish.RESULTS / publish.DEVELOPER_WORKFLOW_REPORT,
+            root / "scripts/benchmark_results" / publish.DEVELOPER_WORKFLOW_REPORT,
+        )
 
     def test_tables_match_current_reports(self):
         for name, expected in publish.documents(self.reports).items():
@@ -217,7 +220,7 @@ class PublicationTests(unittest.TestCase):
             root = Path(directory)
             for name in ("README.md", "BENCHMARKS.md"):
                 shutil.copyfile(publish.ROOT / name, root / name)
-            self.copy_ty_study(root)
+            self.copy_supplemental_reports(root)
             prettier = root / "node_modules/.bin/prettier"
             prettier.parent.mkdir(parents=True)
             prettier.touch()
@@ -273,7 +276,7 @@ class PublicationTests(unittest.TestCase):
                 "inputs",
             ):
                 (root / name).mkdir(parents=True)
-            self.copy_ty_study(root)
+            self.copy_supplemental_reports(root)
             (root / "node_modules/.bin/prettier").touch()
             for kind, report in self.reports.items():
                 publish.write_json(root / "inputs" / f"{kind}.json", report)
@@ -318,7 +321,11 @@ class PublicationTests(unittest.TestCase):
                     path.stem
                     for path in (root / "scripts/benchmark_results").glob("*.json")
                 },
-                set(publish.KINDS) | {Path(publish.TY_WORKTREE_REPORT).stem},
+                set(publish.KINDS)
+                | {
+                    Path(publish.TY_WORKTREE_REPORT).stem,
+                    Path(publish.DEVELOPER_WORKFLOW_REPORT).stem,
+                },
             )
 
 

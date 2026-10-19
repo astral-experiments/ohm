@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "toolchain": "ohm-1.99.0-5-workflow-cache-fix-92ad10889020",
+  "released": false,
+  "base_release": "ohm-1.99.0-5",
+  "compiler_fix": "https://github.com/astral-sh/ohm-rust/pull/190",
+  "sources": {
+    "rust": "92ad108890201c1fb596b4ec51fb493cb7280b65",
+    "cargo": "78f286eda8d974a999aeb5ac9d1bbcbdd831318b",
+    "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
+    "rustfmt": "29bfbe020d7d8ddc639963680d50943989990c62",
+    "rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
+    "llvm": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145"
+  },
+  "rustc_version": "rustc 1.99.0-dev (92ad10889 2026-10-19) (ohm-1.99.0-5-workflow-cache-fix-92ad10889020)\nbinary: rustc\ncommit-hash: 92ad108890201c1fb596b4ec51fb493cb7280b65\ncommit-date: 2026-10-19\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1",
+  "host": "charlie-oss-5",
+  "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "logical_cpus": 32,
+  "cpu_model": "AMD EPYC-Milan Processor",
+  "started_at": "2026-10-19T03:00:14Z",
+  "finished_at": "2026-10-19T04:31:43Z",
+  "optimization": {
+    "component_pgo": true,
+    "executed_profile_coverage_verified": true,
+    "bolt": true,
+    "bolt_packages": [
+      {
+        "Package": "bolt-23",
+        "Version": "1:23.1.4~++20261018124056+71c76755a8ff-1~exp1~20261018124211.83",
+        "Filename": "pool/main/l/llvm-toolchain-23/bolt-23_23.1.4~++20261018124056+71c76755a8ff-1~exp1~20261018124211.83_amd64.deb",
+        "SHA256": "41eceaf2d68a0fc490e276fbe22f4a8409fc1a7ecff9be0caf0588a87daf6629",
+        "Size": "42173978"
+      },
+      {
+        "Package": "libbolt-23-dev",
+        "Version": "1:23.1.4~++20261018124056+71c76755a8ff-1~exp1~20261018124211.83",
+        "Filename": "pool/main/l/llvm-toolchain-23/libbolt-23-dev_23.1.4~++20261018124056+71c76755a8ff-1~exp1~20261018124211.83_amd64.deb",
+        "SHA256": "15f5522dcd9f9d37c271764e4845664cd15e75149fe8019f5f34f195ca94f4e9",
+        "Size": "72748"
+      }
+    ],
+    "profiles": {
+      "rustc": {
+        "sha256": "949a2abc8386b07de89c5293d685f96b50ded831e781e95d7e8a9ea432b6ee91",
+        "bytes": 59842168
+      },
+      "rustdoc": {
+        "sha256": "67c0437f69e7a45a0a3c9c25a9ca6b6cd45b70ed726687b82c50d27c581394b1",
+        "bytes": 64156408
+      },
+      "clippy": {
+        "sha256": "032141f3089213a72d63c346867c130e3c7268655960b7321f914878ef27ed31",
+        "bytes": 66012208
+      },
+      "rustfmt": {
+        "sha256": "d0726ab60a98493f65cd8535da5651f5e7cf1da8106cf8a16fe955d7687fcec4",
+        "bytes": 62979504
+      },
+      "rustc_bolt": {
+        "sha256": "ea662ce25d7b220b25f3ba995a3a720816d44c5582972070c60d7d2d7c38bdcb",
+        "bytes": 229735711
+      }
+    }
+  },
+  "bootstrap": {
+    "profile": "dist",
+    "change-id": "ignore",
+    "build": {
+      "jobs": 16,
+      "submodules": false,
+      "description": "ohm-1.99.0-5-workflow-cache-fix-92ad10889020",
+      "locked-deps": true,
+      "metrics": true,
+      "profiler": true,
+      "cargo-native-static": true,
+      "tools": [
+        "analysis",
+        "cargo",
+        "clippy",
+        "rust-analyzer-proc-macro-srv",
+        "rustdoc",
+        "rustfmt"
+      ],
+      "tool": {
+        "cargo": {
+          "features": ["ohm-defaults"]
+        }
+      }
+    },
+    "rust": {
+      "mimalloc": true,
+      "debug-assertions": false,
+      "debug-logging": false,
+      "llvm-tools": false,
+      "llvm-bitcode-linker": false,
+      "lld": true,
+      "channel": "dev",
+      "omit-git-hash": false,
+      "codegen-units": 1,
+      "codegen-units-std": 1,
+      "jemalloc": true,
+      "lto": "thin"
+    },
+    "llvm": {
+      "download-ci-llvm": false,
+      "link-shared": true
+    },
+    "target": {
+      "wasm32-unknown-unknown": {
+        "profiler": false
+      },
+      "x86_64-unknown-linux-gnu": {
+        "llvm-has-rust-patches": true,
+        "llvm-config": "/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/llvm-sdk/bin/llvm-config"
+      }
+    },
+    "dist": {
+      "compression-formats": ["gz"],
+      "compression-profile": "balanced"
+    }
+  },
+  "distribution_overrides": {
+    "build.description": "ohm-1.99.0-5-workflow-cache-fix-92ad10889020",
+    "target.x86_64-unknown-linux-gnu.ohm-wild-linker": "/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/tools/wild",
+    "targets": ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
+  },
+  "build_adjustments": [
+    "Accept the explicitly unreleased toolchain name in the distribution helper.",
+    "Reuse the exact released LLVM library and LLD through an audited external LLVM SDK.",
+    "Allow bootstrap to package the verified LLD beside external llvm-config.",
+    "Keep LLVM library search paths in the distribution helper environment.",
+    "Omit optional llvm-tools and llvm-bitcode-linker components."
+  ],
+  "build_inputs_sha256": {
+    "inputs/benchmark-bootstrap.toml": "23668a8c3ddb1edc1c34db7c194b658d49cd05fefda709188867a375e37d3b1c",
+    "inputs/bootstrap.toml": "5822d2ae682a27193ef413f013281b0849797c88c78545607ab563ea48f87684",
+    "inputs/build-optimized-dist.sh": "539af448246e4b4debe7248384e7e5b334d0ff9b62507fef224485dff26664e3",
+    "inputs/build-workflow-dist.sh": "8064185a31de8c9a17d6a95cb3ea9d836ef222fb4429afe4861f1a5bd8e5cf06",
+    "inputs/external-lld-bootstrap.patch": "c161c372a45f590f592fadb63bc2b93c69924cfd6528181b25e9929bf7432206",
+    "inputs/prepare-wild.py": "dd09d3413a0a2d34c6d39b2c79f63cf058de523c8c9224e0b3b657dbf4c4233e",
+    "inputs/release5.json": "5c92ee96b63f196fac7292b7b63f1d4b406c77ec09f04489bd89d4064d5f78f1",
+    "optimized-build.sh": "8e5df0231f9fae2efbbf45bac2629f1173924790f4f7a1d4ae654e7cb5e5d8f4",
+    "allow-external-lld.py": "60e4e84650e3ca16ce09327c2211417c6d153db9f04949c1251c8e6ad89bb0a2",
+    "package-build.py": "9967568c1f1fd159092fc8d8d027bc028233f8dbd54c4138d5df5f3e45a7c1c3",
+    "resume-final-dist.py": "0c050f303a2672c847312153c9afedcdbb83227f830f13d5c5fb95dd79435a5f",
+    "verify-profile-coverage.sh": "f6bf7561273de1ddcac7e853f8b783aca6fe4caff33a527bbdbc3aef6c8e4f6e",
+    "source/build/ohm-release-bootstrap.toml": "9c998367b701fd3ea1efceff61697eaeab32bb1a8433440bd402c6c287ddd761"
+  },
+  "build_log_sha256": "b4c3f21b356db961799f8b789c3c4435771fe00bfa3140159e3510c5d6506eec",
+  "packaging_resume": {
+    "reason": "Documentation submodules were missing during final distribution assembly.",
+    "command": [
+      "python3",
+      "/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/x.py",
+      "dist",
+      "--ci",
+      "false",
+      "--config",
+      "/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/ohm-release-bootstrap.toml",
+      "--build-dir",
+      "/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build",
+      "--host",
+      "x86_64-unknown-linux-gnu",
+      "--target",
+      "x86_64-unknown-linux-gnu,wasm32-unknown-unknown",
+      "--set",
+      "build.description=ohm-1.99.0-5-workflow-cache-fix-92ad10889020",
+      "--set",
+      "target.x86_64-unknown-linux-gnu.ohm-wild-linker=/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/tools/wild",
+      "extended",
+      "--set",
+      "pgo.rustc.use=/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/opt-artifacts/rustc-pgo.profdata",
+      "--set",
+      "pgo.cargo.use=/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/opt-artifacts/rustc-pgo.profdata",
+      "--set",
+      "pgo.rustdoc.use=/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/opt-artifacts/rustdoc-pgo.profdata",
+      "--set",
+      "pgo.clippy.use=/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/opt-artifacts/clippy-pgo.profdata",
+      "--set",
+      "pgo.rustfmt.use=/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/opt-artifacts/rustfmt-pgo.profdata",
+      "--keep-stage",
+      "0",
+      "--keep-stage",
+      "1",
+      "--reproducible-artifact",
+      "/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/opt-artifacts/rustc-bolt.profdata"
+    ],
+    "compiler_sha256_before": "12e021d45c5a31544e9f2ed9f671ba85e3f5806b391d046d9ea8eb7714dc6352",
+    "compiler_sha256_after": "12e021d45c5a31544e9f2ed9f671ba85e3f5806b391d046d9ea8eb7714dc6352",
+    "bolt_metadata_present": true,
+    "submodules": {
+      "src/doc/book": "917544888a55e4da7109bdba8c88c893c0da70f4",
+      "src/doc/reference": "82da570bafd9efed421bdbae0f8603ede8dd308b",
+      "src/doc/edition-guide": "5a14f7276ebc0bd100974f02b918f30472c782fc",
+      "src/doc/embedded-book": "0789b0f29e73ecb91213cac10ad0eec1b9333770",
+      "src/doc/nomicon": "5012a37c682b26c4e19433888ed2ca9b129696ca",
+      "src/doc/rust-by-example": "15308f3e951814ef3475d2b58f48276e6b17b9af"
+    },
+    "status": "passed"
+  },
+  "distribution_sha256": "99695156e0c99a01bcef70351f469d1a5d8807b7efc63cf824bb523624bf34e1",
+  "binaries_sha256": {
+    "bin/cargo": "7e64d924d2c1f2a578723440faec34689573125120b9c63c32278ce688a10f50",
+    "bin/cargo-clippy": "35f7e588f2d7830e80e77ba83c24b87515b2754d71e54d26cacb6edf63a5f3a0",
+    "bin/cargo-fmt": "aafe654a25913badb9c214af9d2b47407f0e36005c8e3f2c087802cd8f24ecbb",
+    "bin/clippy-driver": "f8313b04cd12e7c13d1feed69710b8b2496e3758eea7cf908d10aa1c9ceab29d",
+    "bin/rust-gdb": "7054a508ece38b5bb81860e8ddbcd62021fab6432026789970ebbba8b84f6163",
+    "bin/rust-gdbgui": "bc60613775a098e59b49fa4584cea73631697fe1456c44284c337d6700340315",
+    "bin/rust-lldb": "a82c91ccb285aa4a1dbcf08cda68ba4e8c36082af0adfefdee514673113815da",
+    "bin/rustc": "6cf8d7db685da05a11fa33330f5cf07f00294f65fc61beebf39654a34b92582a",
+    "bin/rustdoc": "7e14f00e3095ecdd02919843cd28bc0fd4bcb8124be9f02263e6669c45972611",
+    "bin/rustfmt": "314900b1ee5a05c1e975cd5767f35a4fa2997b84dfab25cc02cddbb76676b7d5",
+    "lib/libLLVM-23-rust-1.99.0-beta.so": "7b53841c7a8ffde8c6ebd9fc222bffdb99ee99cb818bfc40693f61af73b8a61d",
+    "lib/libLLVM.so.23.1-rust-1.99.0-beta": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
+    "lib/librustc_driver-160d3f1cceded3e8.so": "12e021d45c5a31544e9f2ed9f671ba85e3f5806b391d046d9ea8eb7714dc6352"
+  }
+}
