@@ -35,6 +35,23 @@ class ContaminatedBenchmarkError(BenchmarkError):
     """Compiler activity or cache contention invalidated a measurement."""
 
 
+def toolchain_order(
+    toolchains: tuple[tuple[str, str], ...], index: int
+) -> tuple[tuple[str, str], ...]:
+    """Balance each toolchain's position and the order of each pair."""
+    if len(toolchains) == 2:
+        return toolchains if index % 2 == 0 else toolchains[::-1]
+    offset = index % len(toolchains)
+    order = toolchains[offset:] + toolchains[:offset]
+    return order if index // len(toolchains) % 2 == 0 else order[::-1]
+
+
+def configure_ready_tests(environment: dict[str, str], label: str) -> None:
+    environment.pop("CARGO_UNSTABLE_OHM_READY_TESTS", None)
+    if label == "ohm-ready-tests":
+        environment["CARGO_UNSTABLE_OHM_READY_TESTS"] = "true"
+
+
 @dataclasses.dataclass(frozen=True)
 class Edit:
     path: str
@@ -285,6 +302,11 @@ def parser() -> argparse.ArgumentParser:
     argument_parser.add_argument("--upstream", default="1.98.0")
     argument_parser.add_argument("--ohm", default="ohm")
     argument_parser.add_argument(
+        "--compare-ready-tests",
+        action="store_true",
+        help="also measure the same Ohm toolchain with test/build overlap enabled",
+    )
+    argument_parser.add_argument(
         "--project",
         action="append",
         choices=WORKLOADS,
@@ -327,6 +349,8 @@ class Study:
             raise BenchmarkError("benchmark projects must not be repeated")
         self.workloads = [WORKLOADS[name] for name in selected]
         self.toolchains = (("stock", options.upstream), ("ohm", options.ohm))
+        if options.compare_ready_tests:
+            self.toolchains += (("ohm-ready-tests", options.ohm),)
         self.output = options.output_dir.expanduser().resolve()
         self.sources: dict[str, Path] = {}
         self.revisions: dict[str, str] = {}
@@ -616,7 +640,7 @@ class Study:
         shutil.rmtree(target)
 
     def ordered_toolchains(self, index: int) -> tuple[tuple[str, str], ...]:
-        return self.toolchains if index % 2 == 0 else self.toolchains[::-1]
+        return toolchain_order(self.toolchains, index)
 
     def wait_until_idle(self, *, quiet_seconds: int = 0) -> None:
         active = competing_processes()
@@ -688,6 +712,7 @@ class Study:
         )
         if extra_environment is not None:
             environment.update(extra_environment)
+        configure_ready_tests(environment, label)
         identifier = (
             f"{len(self.samples) + 1:04d}-{workload.name}-{workflow}-{phase}-{label}"
         )
@@ -801,7 +826,7 @@ class Study:
                 sample["package"] = workload.package
                 sample["worktree"] = str(worktree)
                 sample["shared_build_directory"] = environment["CARGO_BUILD_BUILD_DIR"]
-            elif workflow == "build-check" and label == "ohm":
+            elif workflow == "build-check" and label.startswith("ohm"):
                 sample["registry_build_ready"] = (
                     directory / ".ohm-built-registry-ready"
                 ).is_file()
@@ -885,7 +910,7 @@ class Study:
                 record=False,
                 extra_environment=environments[label],
             )
-            if label == "ohm":
+            if label.startswith("ohm"):
                 cache = Path(environments[label]["OHM_INCREMENTAL_FMT_CACHE_DIR"])
                 if not any(path.is_file() for path in cache.glob("*.json")):
                     raise BenchmarkError(
@@ -949,7 +974,7 @@ class Study:
                 # Stock Cargo cannot safely share workspace artifacts between
                 # worktrees, so match Ohm's correctness with private roots.
                 build_directory = root / (
-                    "shared-build" if label == "ohm" else "primary-build"
+                    "shared-build" if label.startswith("ohm") else "primary-build"
                 )
                 self.execute(
                     workload,
@@ -966,7 +991,7 @@ class Study:
                         "PATH": executable_path,
                     },
                 )
-                if label == "ohm":
+                if label.startswith("ohm"):
                     marker = build_directory / ".ohm-shared-registry-cache-v1"
                     registries = build_directory / "debug" / "build" / "registries"
                     if not marker.is_file() or not registries.is_dir():
@@ -983,7 +1008,7 @@ class Study:
                 for label, selector in self.ordered_toolchains(index):
                     root = self.target(workload, workflow, label)
                     build_directory = root / (
-                        "shared-build" if label == "ohm" else "secondary-build"
+                        "shared-build" if label.startswith("ohm") else "secondary-build"
                     )
                     self.execute(
                         workload,
@@ -1155,6 +1180,7 @@ class Study:
             "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "jobs": self.options.jobs,
             "discard_targets": self.options.discard_targets,
+            "compare_ready_tests": self.options.compare_ready_tests,
             "toolchains": {
                 label: {
                     "selector": selector,
