@@ -488,10 +488,13 @@ class Study:
             + self.options.dependency_runs
             + self.options.direct_runs
         )
-        core_samples = len(self.workloads) * len(WORKFLOWS) * 2 * repetitions
-        feature_samples = len(self.workloads) * 4
+        configurations = len(self.toolchains)
+        core_samples = (
+            len(self.workloads) * len(WORKFLOWS) * configurations * repetitions
+        )
+        feature_samples = len(self.workloads) * 2 * configurations
         feature_samples += sum(
-            2 * (self.options.noop_runs + self.options.direct_runs)
+            configurations * (self.options.noop_runs + self.options.direct_runs)
             for workload in self.workloads
             if workload.repository == "codex"
         )
