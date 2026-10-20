@@ -147,28 +147,30 @@ sequence preserves its build artifacts between commands; each repetition starts 
 
 <!-- benchmark:developer-workflows -->
 
-| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-5 + fix | Time saved |
-| ------- | --------------------------------- | ----------- | ------------------ | ---------- |
-| Ruff/ty | Edit → focused test               | 16.46 s     | 18.91 s            | −14.89%    |
-| Ruff/ty | Edit dependency → downstream test | 16.99 s     | 6.18 s             | 63.63%     |
-| Ruff/ty | Edit → check → test → check       | 25.14 s     | 29.03 s            | −15.48%    |
-| Ruff/ty | Check → build → check             | 94.13 s     | 74.39 s            | 20.97%     |
-| Ruff/ty | Edit → fmt → clippy → test        | 32.22 s     | 29.95 s            | 7.05%      |
-| uv      | Edit → focused test               | 23.41 s     | 12.51 s            | 46.58%     |
-| uv      | Edit dependency → downstream test | 27.80 s     | 4.92 s             | 82.30%     |
-| uv      | Edit → check → test → check       | 27.38 s     | 18.47 s            | 32.54%     |
-| uv      | Check → build → check             | 139.72 s    | 82.70 s            | 40.81%     |
-| uv      | Edit → fmt → clippy → test        | 29.22 s     | 19.91 s            | 31.86%     |
-| Codex   | Edit → focused test               | 28.16 s     | 25.86 s            | 8.15%      |
-| Codex   | Edit dependency → downstream test | 53.16 s     | 6.31 s             | 88.14%     |
-| Codex   | Edit → check → test → check       | 34.98 s     | 37.66 s            | −7.66%     |
-| Codex   | Check → build → check             | 158.89 s    | 122.41 s           | 22.96%     |
-| Codex   | Edit → fmt → clippy → test        | 39.83 s     | 34.95 s            | 12.26%     |
+| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-5 + fixes | Time saved |
+| ------- | --------------------------------- | ----------- | -------------------- | ---------- |
+| Ruff/ty | Edit → focused test               | 16.68 s     | 15.94 s              | 4.46%      |
+| Ruff/ty | Edit dependency → downstream test | 15.95 s     | 4.75 s               | 70.22%     |
+| Ruff/ty | Edit → check → test → check       | 24.08 s     | 23.77 s              | 1.28%      |
+| Ruff/ty | Check → build → check             | 94.31 s     | 74.73 s              | 20.76%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 32.56 s     | 24.39 s              | 25.11%     |
+| uv      | Edit → focused test               | 17.54 s     | 10.21 s              | 41.77%     |
+| uv      | Edit dependency → downstream test | 19.79 s     | 2.78 s               | 85.97%     |
+| uv      | Edit → check → test → check       | 20.80 s     | 13.25 s              | 36.30%     |
+| uv      | Check → build → check             | 111.44 s    | 62.50 s              | 43.92%     |
+| uv      | Edit → fmt → clippy → test        | 21.96 s     | 15.67 s              | 28.66%     |
+| Codex   | Edit → focused test               | 27.47 s     | 24.36 s              | 11.32%     |
+| Codex   | Edit dependency → downstream test | 52.30 s     | 4.68 s               | 91.05%     |
+| Codex   | Edit → check → test → check       | 35.09 s     | 33.57 s              | 4.31%      |
+| Codex   | Check → build → check             | 154.96 s    | 122.26 s             | 21.11%     |
+| Codex   | Edit → fmt → clippy → test        | 37.14 s     | 33.26 s              | 10.45%     |
 
 <!-- /benchmark:developer-workflows -->
 
 The Ohm column uses an optimized, unreleased build of 1.99.0-5 with the
-[retained-query cache fix](https://github.com/astral-sh/ohm-rust/pull/190). Its exact sources and build
+[retained-query cache fix](https://github.com/astral-sh/ohm-rust/pull/190),
+[huge-page default fix](https://github.com/astral-sh/ohm-rust/pull/191), and
+[Cargo validation optimization](https://github.com/astral-sh/ohm-cargo/pull/167). Its exact sources and build
 settings are recorded in the [build provenance](scripts/benchmark_results/workflow-build.json).
 
 Times are medians of four runs on each project's devbox, including compilation and one focused test

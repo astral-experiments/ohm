@@ -21,8 +21,8 @@ compare. Ruff/ty and Codex workflows and sessions need `cargo-nextest`; Codex se
 need [`just`](https://github.com/casey/just).
 
 Run from the Ohm repository on a quiet machine with enough disk space for separate builds. The
-runners may need network access to clone source repositories. Workflow benchmarks invoke Cargo with
-`--locked --offline`. Session and worktree replays support `--offline`; cache their dependencies
+runners may need network access to clone source repositories. Workflow benchmarks lock dependencies
+and run Cargo offline. Session and worktree replays support `--offline`; cache their dependencies
 before enabling it.
 
 ## Run the developer workflows
@@ -40,12 +40,12 @@ Fetch dependencies before measuring, using the same Cargo home for both commands
 ```console
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
-  --upstream 1.99.0 --ohm ohm-1.99.0-5-workflow-cache-fix-92ad10889020 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
-  --upstream 1.99.0 --ohm ohm-1.99.0-5-workflow-cache-fix-92ad10889020 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -60,8 +60,11 @@ The published measurements use eight Cargo jobs on three 32-vCPU Linux devboxes.
 records its host metadata, command logs, and CPU traces.
 
 The table uses an unreleased compiler build from
-[`92ad10889020`](https://github.com/astral-sh/ohm-rust/commit/92ad108890201c1fb596b4ec51fb493cb7280b65),
-which fixes a retained-query cache crash found in the Codex edit-and-test workflow. This toolchain
+[`6f05b55ce6dc`](https://github.com/astral-sh/ohm-rust/commit/6f05b55ce6dcc10e65e618a136c2b188c409330e)
+with Cargo at
+[`3deaf286063a`](https://github.com/astral-sh/ohm-cargo/commit/3deaf286063ac0a0a47d4605d757d11373338452).
+It fixes a retained-query cache crash found in the Codex edit-and-test workflow, disables transparent
+huge pages in mimalloc by default, and reduces repeated Cargo build-directory validation. This toolchain
 must be built from source and registered with `rustup toolchain link` before running the command
 above; the regular installer does not provide it. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the pinned component
