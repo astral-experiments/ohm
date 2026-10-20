@@ -149,30 +149,31 @@ sequence preserves its build artifacts between commands; each repetition starts 
 
 | Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-5 + fixes | Time saved |
 | ------- | --------------------------------- | ----------- | -------------------- | ---------- |
-| Ruff/ty | Edit → focused test               | 16.50 s     | 15.31 s              | 7.24%      |
-| Ruff/ty | Edit dependency → downstream test | 16.47 s     | 4.90 s               | 70.28%     |
-| Ruff/ty | Edit → check → test → check       | 24.52 s     | 24.81 s              | −1.18%     |
-| Ruff/ty | Check → build → check             | 94.05 s     | 64.47 s              | 31.45%     |
-| Ruff/ty | Edit → fmt → clippy → test        | 32.04 s     | 25.00 s              | 21.95%     |
-| uv      | Edit → focused test               | 25.84 s     | 12.69 s              | 50.90%     |
-| uv      | Edit dependency → downstream test | 29.08 s     | 3.69 s               | 87.32%     |
-| uv      | Edit → check → test → check       | 29.04 s     | 18.96 s              | 34.70%     |
-| uv      | Check → build → check             | 160.25 s    | 77.99 s              | 51.34%     |
-| uv      | Edit → fmt → clippy → test        | 29.37 s     | 18.82 s              | 35.93%     |
-| Codex   | Edit → focused test               | 33.33 s     | 28.31 s              | 15.05%     |
-| Codex   | Edit dependency → downstream test | 61.40 s     | 5.39 s               | 91.22%     |
-| Codex   | Edit → check → test → check       | 43.26 s     | 39.63 s              | 8.38%      |
-| Codex   | Check → build → check             | 205.43 s    | 141.34 s             | 31.20%     |
-| Codex   | Edit → fmt → clippy → test        | 49.75 s     | 39.71 s              | 20.18%     |
+| Ruff/ty | Edit → focused test               | 15.97 s     | 13.18 s              | 17.48%     |
+| Ruff/ty | Edit dependency → downstream test | 15.55 s     | 3.62 s               | 76.70%     |
+| Ruff/ty | Edit → check → test → check       | 23.85 s     | 21.87 s              | 8.30%      |
+| Ruff/ty | Check → build → check             | 94.06 s     | 61.93 s              | 34.17%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 32.33 s     | 23.46 s              | 27.45%     |
+| uv      | Edit → focused test               | 22.31 s     | 11.52 s              | 48.36%     |
+| uv      | Edit dependency → downstream test | 25.21 s     | 3.32 s               | 86.81%     |
+| uv      | Edit → check → test → check       | 26.23 s     | 15.11 s              | 42.42%     |
+| uv      | Check → build → check             | 141.40 s    | 72.80 s              | 48.51%     |
+| uv      | Edit → fmt → clippy → test        | 28.17 s     | 17.33 s              | 38.48%     |
+| Codex   | Edit → focused test               | 35.69 s     | 27.70 s              | 22.39%     |
+| Codex   | Edit dependency → downstream test | 65.65 s     | 5.06 s               | 92.30%     |
+| Codex   | Edit → check → test → check       | 45.18 s     | 38.31 s              | 15.21%     |
+| Codex   | Check → build → check             | 204.54 s    | 140.06 s             | 31.53%     |
+| Codex   | Edit → fmt → clippy → test        | 49.75 s     | 40.76 s              | 18.06%     |
 
 <!-- /benchmark:developer-workflows -->
 
 The Ohm column uses an optimized, unreleased build of 1.99.0-5 with the
 [retained-query cache fix](https://github.com/astral-sh/ohm-rust/pull/190),
 [huge-page default fix](https://github.com/astral-sh/ohm-rust/pull/191),
-[Cargo validation optimization](https://github.com/astral-sh/ohm-cargo/pull/167), and
-[check-after-build fix](https://github.com/astral-sh/ohm-cargo/pull/169). Its exact sources and build
-settings are recorded in the [build provenance](scripts/benchmark_results/workflow-build.json).
+[Cargo validation optimization](https://github.com/astral-sh/ohm-cargo/pull/167),
+[check-after-build fix](https://github.com/astral-sh/ohm-cargo/pull/169), and
+[check-graph selection optimization](https://github.com/astral-sh/ohm-cargo/pull/170). Its exact sources
+and build settings are recorded in the [build provenance](scripts/benchmark_results/workflow-build.json).
 
 Times are medians of four runs on each project's devbox, including compilation and one focused test
 where shown. A failure count replaces the timing if any repetition fails; that row has no speedup.
