@@ -107,6 +107,8 @@ class ReadyTestComparisonTests(unittest.TestCase):
             benchmark.toolchain_order(configurations, index) for index in range(6)
         ]
         self.assertEqual(len(set(orders)), 6)
+        for index in range(0, 6, 2):
+            self.assertEqual(orders[index], orders[index + 1][::-1])
         for first in configurations:
             for position in range(3):
                 self.assertEqual(sum(order[position] == first for order in orders), 2)
