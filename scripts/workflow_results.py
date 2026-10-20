@@ -106,7 +106,8 @@ def comparisons(report):
                 for tool in tools.values()
             ):
                 raise ValueError("Workflow compiler hashes are incomplete")
-            if lane == "ohm" and report["ohm_release"] not in tools["rustc"]["version"]:
+            compiler_release = report["ohm_release"].partition("-cargo-")[0]
+            if lane == "ohm" and compiler_release not in tools["rustc"]["version"]:
                 raise ValueError("Ohm compiler does not identify the measured release")
             libraries = tools["rustc"].get("libraries", {})
             if (
@@ -121,6 +122,9 @@ def comparisons(report):
             if lane == "ohm" and (revision := report.get("ohm_source_revision")):
                 if f"commit-hash: {revision}" not in tools["rustc"]["version"]:
                     raise ValueError("Ohm compiler source revision differs")
+            if lane == "ohm" and (revision := report.get("ohm_cargo_source_revision")):
+                if f"commit-hash: {revision}" not in tools["cargo"]["version"]:
+                    raise ValueError("Ohm Cargo source revision differs")
         if compiler_identities is not None and identities != compiler_identities:
             raise ValueError("Workflow hosts used different toolchain binaries")
         compiler_identities = identities
@@ -341,7 +345,8 @@ def comparisons(report):
 def validate(report):
     identity = re.fullmatch(
         rf"ohm-{re.escape(report['rust_version'])}-[1-9]\d*"
-        r"(?:-workflow-(?:cache-fix|overhead)-([0-9a-f]{12}))?",
+        r"(?:-workflow-(?:cache-fix|overhead)-([0-9a-f]{12})"
+        r"(?:-cargo-([0-9a-f]{12}))?)?",
         report["ohm_release"],
     )
     if not re.fullmatch(r"\d+\.\d+\.\d+", report["rust_version"]) or not identity:
@@ -351,6 +356,11 @@ def validate(report):
         or not report["ohm_source_revision"].startswith(identity[1])
     ):
         raise ValueError("Unreleased compiler must identify its exact source revision")
+    if identity[2] and (
+        not re.fullmatch(r"[0-9a-f]{40}", report.get("ohm_cargo_source_revision", ""))
+        or not report["ohm_cargo_source_revision"].startswith(identity[2])
+    ):
+        raise ValueError("Unreleased Cargo must identify its exact source revision")
     if report["repetitions"] < 2 or report["jobs"] < 1:
         raise ValueError("Invalid workflow sampling settings")
     if report["comparisons"] != comparisons(report):
@@ -382,11 +392,15 @@ def build_report(runs):
         },
         "runs": [compact_run(run) for run in runs],
     }
-    if revision := re.search(
-        r"(?m)^commit-hash: ([0-9a-f]{40})$",
-        runs[0]["metadata"]["toolchains"]["ohm"]["rustc"]["version"],
+    for tool, field in (
+        ("rustc", "ohm_source_revision"),
+        ("cargo", "ohm_cargo_source_revision"),
     ):
-        report["ohm_source_revision"] = revision[1]
+        if revision := re.search(
+            r"(?m)^commit-hash: ([0-9a-f]{40})$",
+            runs[0]["metadata"]["toolchains"]["ohm"][tool]["version"],
+        ):
+            report[field] = revision[1]
     report["comparisons"] = comparisons(report)
     validate(report)
     return report

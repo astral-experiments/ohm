@@ -149,28 +149,29 @@ sequence preserves its build artifacts between commands; each repetition starts 
 
 | Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-5 + fixes | Time saved |
 | ------- | --------------------------------- | ----------- | -------------------- | ---------- |
-| Ruff/ty | Edit → focused test               | 16.68 s     | 15.94 s              | 4.46%      |
-| Ruff/ty | Edit dependency → downstream test | 15.95 s     | 4.75 s               | 70.22%     |
-| Ruff/ty | Edit → check → test → check       | 24.08 s     | 23.77 s              | 1.28%      |
-| Ruff/ty | Check → build → check             | 94.31 s     | 74.73 s              | 20.76%     |
-| Ruff/ty | Edit → fmt → clippy → test        | 32.56 s     | 24.39 s              | 25.11%     |
-| uv      | Edit → focused test               | 17.54 s     | 10.21 s              | 41.77%     |
-| uv      | Edit dependency → downstream test | 19.79 s     | 2.78 s               | 85.97%     |
-| uv      | Edit → check → test → check       | 20.80 s     | 13.25 s              | 36.30%     |
-| uv      | Check → build → check             | 111.44 s    | 62.50 s              | 43.92%     |
-| uv      | Edit → fmt → clippy → test        | 21.96 s     | 15.67 s              | 28.66%     |
-| Codex   | Edit → focused test               | 27.47 s     | 24.36 s              | 11.32%     |
-| Codex   | Edit dependency → downstream test | 52.30 s     | 4.68 s               | 91.05%     |
-| Codex   | Edit → check → test → check       | 35.09 s     | 33.57 s              | 4.31%      |
-| Codex   | Check → build → check             | 154.96 s    | 122.26 s             | 21.11%     |
-| Codex   | Edit → fmt → clippy → test        | 37.14 s     | 33.26 s              | 10.45%     |
+| Ruff/ty | Edit → focused test               | 16.50 s     | 15.31 s              | 7.24%      |
+| Ruff/ty | Edit dependency → downstream test | 16.47 s     | 4.90 s               | 70.28%     |
+| Ruff/ty | Edit → check → test → check       | 24.52 s     | 24.81 s              | −1.18%     |
+| Ruff/ty | Check → build → check             | 94.05 s     | 64.47 s              | 31.45%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 32.04 s     | 25.00 s              | 21.95%     |
+| uv      | Edit → focused test               | 25.84 s     | 12.69 s              | 50.90%     |
+| uv      | Edit dependency → downstream test | 29.08 s     | 3.69 s               | 87.32%     |
+| uv      | Edit → check → test → check       | 29.04 s     | 18.96 s              | 34.70%     |
+| uv      | Check → build → check             | 160.25 s    | 77.99 s              | 51.34%     |
+| uv      | Edit → fmt → clippy → test        | 29.37 s     | 18.82 s              | 35.93%     |
+| Codex   | Edit → focused test               | 33.33 s     | 28.31 s              | 15.05%     |
+| Codex   | Edit dependency → downstream test | 61.40 s     | 5.39 s               | 91.22%     |
+| Codex   | Edit → check → test → check       | 43.26 s     | 39.63 s              | 8.38%      |
+| Codex   | Check → build → check             | 205.43 s    | 141.34 s             | 31.20%     |
+| Codex   | Edit → fmt → clippy → test        | 49.75 s     | 39.71 s              | 20.18%     |
 
 <!-- /benchmark:developer-workflows -->
 
 The Ohm column uses an optimized, unreleased build of 1.99.0-5 with the
 [retained-query cache fix](https://github.com/astral-sh/ohm-rust/pull/190),
-[huge-page default fix](https://github.com/astral-sh/ohm-rust/pull/191), and
-[Cargo validation optimization](https://github.com/astral-sh/ohm-cargo/pull/167). Its exact sources and build
+[huge-page default fix](https://github.com/astral-sh/ohm-rust/pull/191),
+[Cargo validation optimization](https://github.com/astral-sh/ohm-cargo/pull/167), and
+[check-after-build fix](https://github.com/astral-sh/ohm-cargo/pull/169). Its exact sources and build
 settings are recorded in the [build provenance](scripts/benchmark_results/workflow-build.json).
 
 Times are medians of four runs on each project's devbox, including compilation and one focused test

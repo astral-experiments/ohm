@@ -40,12 +40,14 @@ Fetch dependencies before measuring, using the same Cargo home for both commands
 ```console
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
-  --upstream 1.99.0 --ohm ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc \
+  --upstream 1.99.0 \
+  --ohm ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc-cargo-e8766043df7a \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
-  --upstream 1.99.0 --ohm ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc \
+  --upstream 1.99.0 \
+  --ohm ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc-cargo-e8766043df7a \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -62,11 +64,12 @@ records its host metadata, command logs, and CPU traces.
 The table uses an unreleased compiler build from
 [`6f05b55ce6dc`](https://github.com/astral-sh/ohm-rust/commit/6f05b55ce6dcc10e65e618a136c2b188c409330e)
 with Cargo at
-[`3deaf286063a`](https://github.com/astral-sh/ohm-cargo/commit/3deaf286063ac0a0a47d4605d757d11373338452).
+[`e8766043df7a`](https://github.com/astral-sh/ohm-cargo/commit/e8766043df7a6232e95e5c092332115833f0b2c2).
 It fixes a retained-query cache crash found in the Codex edit-and-test workflow, disables transparent
-huge pages in mimalloc by default, and reduces repeated Cargo build-directory validation. This toolchain
-must be built from source and registered with `rustup toolchain link` before running the command
-above; the regular installer does not provide it. The
+huge pages in mimalloc by default, reduces repeated Cargo build-directory validation, and preserves
+warm checks after builds. This rerun rebuilds Cargo using the previous compiler binaries and PGO
+profiles. Build this toolchain from source and register it with `rustup toolchain link` before running
+the command above; the regular installer does not provide it. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the pinned component
 sources, PGO/BOLT configuration, build inputs, and binary identities. Use `--ohm` to select another
 installed toolchain when measuring a different version. See the

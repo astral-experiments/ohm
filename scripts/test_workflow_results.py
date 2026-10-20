@@ -170,16 +170,27 @@ class WorkflowReportTests(unittest.TestCase):
                     workflow_results.validate(report)
 
     def test_unreleased_build_must_match_its_source_revision(self):
-        for build, label in (("cache-fix", "fix"), ("overhead", "fixes")):
-            with self.subTest(build=build):
+        for build, label, cargo_revision in (
+            ("cache-fix", "fix", None),
+            ("overhead", "fixes", None),
+            ("overhead", "fixes", "3" * 40),
+        ):
+            with self.subTest(build=build, cargo_revision=cargo_revision):
                 runs = synthetic_runs()
                 revision = "1" * 40
-                selector = f"ohm-1.99.0-5-workflow-{build}-{revision[:12]}"
+                compiler_release = f"ohm-1.99.0-5-workflow-{build}-{revision[:12]}"
+                selector = compiler_release
+                if cargo_revision:
+                    selector += f"-cargo-{cargo_revision[:12]}"
                 for run in runs:
                     run["configuration"]["toolchains"]["ohm"] = selector
                     run["metadata"]["toolchains"]["ohm"]["rustc"]["version"] = (
-                        f"rustc ({selector})\ncommit-hash: {revision}"
+                        f"rustc ({compiler_release})\ncommit-hash: {revision}"
                     )
+                    if cargo_revision:
+                        run["metadata"]["toolchains"]["ohm"]["cargo"]["version"] = (
+                            f"cargo\ncommit-hash: {cargo_revision}"
+                        )
                     for sample in run["samples"]:
                         sample["normalization"]["command"][1] = f"+{selector}"
                         if sample["toolchain"] == "ohm":
@@ -191,6 +202,18 @@ class WorkflowReportTests(unittest.TestCase):
                 self.assertEqual(
                     workflow_results.toolchain_label(report), f"1.99.0-5 + {label}"
                 )
+                if cargo_revision:
+                    self.assertEqual(report["ohm_cargo_source_revision"], cargo_revision)
+                    changed = copy.deepcopy(report)
+                    changed["ohm_cargo_source_revision"] = "4" * 40
+                    with self.assertRaises(ValueError):
+                        workflow_results.validate(changed)
+                    changed = copy.deepcopy(report)
+                    changed["runs"][0]["metadata"]["toolchains"]["ohm"]["cargo"][
+                        "version"
+                    ] = "cargo\ncommit-hash: " + "4" * 40
+                    with self.assertRaises(ValueError):
+                        workflow_results.validate(changed)
                 report["ohm_source_revision"] = "2" * 40
                 with self.assertRaises(ValueError):
                     workflow_results.validate(report)

@@ -718,7 +718,7 @@ class WorkflowStudy(replay.Replay):
                 )
                 versions[label][tool] = {
                     "version": replay.command_output(
-                        [str(path), "-vV" if tool == "rustc" else "--version"]
+                        [str(path), "-vV" if tool in {"cargo", "rustc"} else "--version"]
                     ),
                     "sha256": sha256(path.read_bytes()),
                 }

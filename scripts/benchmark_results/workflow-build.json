@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "toolchain": "ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc",
+  "toolchain": "ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc-cargo-e8766043df7a",
   "released": false,
   "base_release": "ohm-1.99.0-5",
   "compiler_fix": "https://github.com/astral-sh/ohm-rust/pull/190",
@@ -10,13 +10,14 @@
       "pull_request": "https://github.com/astral-sh/ohm-rust/pull/191"
     },
     "cargo": {
-      "revision": "3deaf286063ac0a0a47d4605d757d11373338452",
-      "pull_request": "https://github.com/astral-sh/ohm-cargo/pull/167"
+      "revision": "e8766043df7a6232e95e5c092332115833f0b2c2",
+      "pull_request": "https://github.com/astral-sh/ohm-cargo/pull/169",
+      "includes_validation_fix": "https://github.com/astral-sh/ohm-cargo/pull/167"
     }
   },
   "sources": {
     "rust": "6f05b55ce6dcc10e65e618a136c2b188c409330e",
-    "cargo": "3deaf286063ac0a0a47d4605d757d11373338452",
+    "cargo": "e8766043df7a6232e95e5c092332115833f0b2c2",
     "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
     "rustfmt": "29bfbe020d7d8ddc639963680d50943989990c62",
     "rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
@@ -27,8 +28,8 @@
   "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
   "logical_cpus": 32,
   "cpu_model": "AMD EPYC-Milan Processor",
-  "started_at": "2026-10-19T17:13:19Z",
-  "finished_at": "2026-10-19T18:54:43.999148+00:00",
+  "started_at": "2026-10-20T01:47:19Z",
+  "finished_at": "2026-10-20T01:51:37Z",
   "optimization": {
     "component_pgo": true,
     "executed_profile_coverage_verified": true,
@@ -69,6 +70,11 @@
       "rustc_bolt": {
         "sha256": "504687342ca1ffaf47fd2e8fd7ac7c24571c9014794c3fb9d6e86b3358ffa4da",
         "bytes": 230308051
+      },
+      "cargo": {
+        "sha256": "80ec8ea4dfa1a4f04213cca30bae9ac6f2a35fcf11a9cb75dc650bb000fbdcc2",
+        "bytes": 59853912,
+        "reused_from": "rustc"
       }
     }
   },
@@ -140,7 +146,8 @@
     "Allow bootstrap to package the verified LLD beside external llvm-config.",
     "Keep LLVM library search paths in the distribution helper environment.",
     "Omit optional llvm-tools and llvm-bitcode-linker components.",
-    "Rebuild stale standard-library artifacts after the compiler revision changes, then resume the final distribution with the completed PGO/BOLT compiler unchanged."
+    "Rebuild stale standard-library artifacts after the compiler revision changes, then resume the final distribution with the completed PGO/BOLT compiler unchanged.",
+    "Rebuild only Cargo at the check-after-build fix, retaining the compiler, other tools, static native dependencies, release settings, and PGO profile."
   ],
   "build_inputs_sha256": {
     "performance-fix/inputs/benchmark-bootstrap.toml": "23668a8c3ddb1edc1c34db7c194b658d49cd05fefda709188867a375e37d3b1c",
@@ -163,9 +170,8 @@
     "initial_failure_log_sha256": "5420dce4125a2e451eca34112b7f477b6b23ddd9f0148e6308c6c37f86cefc2f"
   },
   "cargo_import_correction": "2026-10-19T17:16:27Z",
-  "distribution_sha256": "a1bc44e9c8b5db1b06e29aeb74a903176acd0b2fd31052a0bd483433d947e6a5",
   "binaries_sha256": {
-    "bin/cargo": "278ffc2767d0b79f01f539bd9b7010b66d92038a2c09386c36af8a25c2814f59",
+    "bin/cargo": "705d9afc99e3001a82645db244d234e54edae77564c183153c508c1f31aefbbd",
     "bin/cargo-clippy": "b86aedde780d15c65204e6da312aecfa328f5722fe30f88dc956767582d1357b",
     "bin/cargo-fmt": "d0f0a86ceb6afcad78cdd07c4dc5f7e6a61e7ff889f586f30168c7712bcc7148",
     "bin/clippy-driver": "039f3d28b8d5e5012975f59db85c33068bf59a015e00c91e6b99011d1e6317c8",
@@ -179,6 +185,46 @@
     "lib/libLLVM.so.23.1-rust-1.99.0-beta": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
     "lib/librustc_driver-160d3f1cceded3e8.so": "cbd05647096b340aa38b886216957043eae25365647ff42aecfd3b6106f4bf4d"
   },
-  "cargo_version": "cargo 1.99.0-dev (3deaf2860 2026-10-19) (ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc)\nrelease: 1.99.0-dev\ncommit-hash: 3deaf286063ac0a0a47d4605d757d11373338452\ncommit-date: 2026-10-19\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
-  "mimalloc_allow_thp_default": 0
+  "cargo_version": "cargo 1.99.0-dev (e8766043d 2026-10-20) (ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc)\nrelease: 1.99.0-dev\ncommit-hash: e8766043df7a6232e95e5c092332115833f0b2c2\ncommit-date: 2026-10-20\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+  "mimalloc_allow_thp_default": 0,
+  "parent_toolchain": {
+    "toolchain": "ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc",
+    "distribution_sha256": "a1bc44e9c8b5db1b06e29aeb74a903176acd0b2fd31052a0bd483433d947e6a5",
+    "compiler_build_started_at": "2026-10-19T17:13:19Z",
+    "compiler_build_finished_at": "2026-10-19T18:54:43.999148+00:00",
+    "cargo_revision": "3deaf286063ac0a0a47d4605d757d11373338452"
+  },
+  "cargo_component_rebuild": {
+    "host": "charlie-oss-5",
+    "source_base": "c78cc817ff541ba446688bead326ef45572e6f86",
+    "source_revision": "e8766043df7a6232e95e5c092332115833f0b2c2",
+    "compiler_and_other_tools_unchanged": true,
+    "baseline_binary_sha256": "7a00346c5a4d349971eeae701302a6b00a1b26dcc0615b39648217274d322d52",
+    "fixed_binary_sha256": "705d9afc99e3001a82645db244d234e54edae77564c183153c508c1f31aefbbd",
+    "build_script_sha256": "0ac2ad5e6282a654384167856a41e44ef9949eeb51e9fb5effd9beb2fcbd07e1",
+    "baseline_build_log_sha256": "dd68f4ba04bc7b5f4be30656f57c60acad61d09f2b696690eee9c9cb1327a39f",
+    "fixed_build_log_sha256": "d692d8e97f7b4984737901fb8249882dd6b7bfe3d4fbb9e5b8d17be0073c21c8",
+    "profile_policy": "Reuse the same PGO profile for both Cargo builds. LLVM discarded mismatched control-flow counts in changed functions.",
+    "build_command": [
+      "build/bootstrap/debug/bootstrap",
+      "build",
+      "--config",
+      "build/ohm-release-bootstrap.toml",
+      "--stage",
+      "2",
+      "--keep-stage",
+      "0",
+      "--keep-stage",
+      "1",
+      "--keep-stage",
+      "2",
+      "--set",
+      "pgo.rustc.use=\"/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/opt-artifacts/rustc-pgo.profdata\"",
+      "--set",
+      "pgo.cargo.use=\"/home/dev-user/code/oss/ohm-workflow-benchmarks-20261019/optimized-build/source/build/opt-artifacts/rustc-pgo.profdata\"",
+      "--set",
+      "build.jobs=8",
+      "src/tools/cargo"
+    ]
+  }
 }
