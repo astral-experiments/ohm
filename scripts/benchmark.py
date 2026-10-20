@@ -41,9 +41,9 @@ def toolchain_order(
     """Balance each toolchain's position and the order of each pair."""
     if len(toolchains) == 2:
         return toolchains if index % 2 == 0 else toolchains[::-1]
-    offset = index % len(toolchains)
+    offset = index // 2 % len(toolchains)
     order = toolchains[offset:] + toolchains[:offset]
-    return order if index // len(toolchains) % 2 == 0 else order[::-1]
+    return order if index % 2 == 0 else order[::-1]
 
 
 def configure_ready_tests(environment: dict[str, str], label: str) -> None:
