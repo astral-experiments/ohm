@@ -107,8 +107,47 @@ def comparisons(report):
             ):
                 raise ValueError("Workflow compiler hashes are incomplete")
             compiler_release = report["ohm_release"].partition("-cargo-")[0]
-            if lane == "ohm" and compiler_release not in tools["rustc"]["version"]:
-                raise ValueError("Ohm compiler does not identify the measured release")
+            if lane == "ohm":
+                provenance = tools["rustc"].get("build_provenance")
+                if provenance is not None:
+                    # A package can reuse a compiler from an earlier build.
+                    if (
+                        provenance.get("toolchain") != report["ohm_release"]
+                        or any(
+                            provenance.get(f"{tool}_version") != tools[tool]["version"]
+                            for tool in ("rustc", "cargo")
+                        )
+                        or any(
+                            provenance.get("sources", {}).get(source)
+                            != report.get(field)
+                            for source, field in (
+                                ("rust", "ohm_source_revision"),
+                                ("cargo", "ohm_cargo_source_revision"),
+                            )
+                        )
+                    ):
+                        raise ValueError(
+                            "Ohm build provenance identifies different tools"
+                        )
+                    hashes = {
+                        "bin/" + tool: identity["sha256"]
+                        for tool, identity in tools.items()
+                    }
+                    hashes.update(
+                        ("lib/" + name, digest)
+                        for name, digest in tools["rustc"].get("libraries", {}).items()
+                    )
+                    if any(
+                        provenance.get("binaries_sha256", {}).get(name) != digest
+                        for name, digest in hashes.items()
+                    ):
+                        raise ValueError(
+                            "Ohm build provenance has different binary hashes"
+                        )
+                elif compiler_release not in tools["rustc"]["version"]:
+                    raise ValueError(
+                        "Ohm compiler does not identify the measured release"
+                    )
             libraries = tools["rustc"].get("libraries", {})
             if (
                 not any("rustc_driver" in name for name in libraries)

@@ -1,0 +1,446 @@
+{
+  "schema_version": 1,
+  "project": "uv",
+  "project_revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+  "command": ["cargo", "+TOOLCHAIN", "fmt", "-p", "uv", "--"],
+  "edit": {
+    "path": "crates/uv/src/install_source.rs",
+    "before": "component == cellar && next == formula",
+    "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+    "crate": "uv"
+  },
+  "control_sources": {
+    "rust": "72096bc6b3fc4443647fe05deb4ae473b49043f3",
+    "cargo": "5a16c750eba7f6b7bcfd7a220a377685c62b3512",
+    "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
+    "rustfmt": "5af2f950cd8bae79cec9ea032885db10e7dfe318",
+    "rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
+    "llvm": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145"
+  },
+  "candidate_sources": {
+    "rust": "72096bc6b3fc4443647fe05deb4ae473b49043f3",
+    "cargo": "5a16c750eba7f6b7bcfd7a220a377685c62b3512",
+    "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
+    "rustfmt": "ff92f3fe9ca8ca99f967842885c61c0c99b465bd",
+    "rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
+    "llvm": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145"
+  },
+  "toolchains": {
+    "control": {
+      "selector": "ohm-1.99.0-5-fmt-comment-scan-control-72096bc6b3fc-cargo-5a16c750eba7",
+      "binaries_sha256": {
+        "bin/rustfmt": "472fb98ef7b5a680e3cb71c5a6426358269fe0ce101984228128a3bb7f277a60",
+        "bin/cargo-fmt": "23e01b3f02357dea1b6da85c32de16c246642423a2bde61d3d8eb85d3ccfaef9",
+        "bin/cargo-clippy": "7652ccc41292fed6d40ef444e00062c86cbfbb38480def0a9f29b8e931bed2d8",
+        "bin/rustdoc": "d0956f5592ebed42c3939572406bd29314651a9160b2a4eb446ee76bfc7900d0",
+        "bin/cargo": "9d46b9750d2daf67019fd71dc0a8a8413044908bfe5f8e6098e79d8ca7c5240d",
+        "bin/clippy-driver": "bb2b25f427e69e7ce56845bd089b950d8624a4d698a4424de9bdd849c3fe204d",
+        "bin/rustc": "03ae7660096b13026e5d5c97f496b79f74144e71874ef2345b5cd0d1f1a98408",
+        "lib/librustc_driver-160d3f1cceded3e8.so": "51f2e1fdc1cf0fffa798ae57d7d00bdf7760086295ac9c190e69345f883671f9",
+        "lib/libLLVM-23-rust-1.99.0-beta.so": "7b53841c7a8ffde8c6ebd9fc222bffdb99ee99cb818bfc40693f61af73b8a61d",
+        "lib/libLLVM.so.23.1-rust-1.99.0-beta": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+      }
+    },
+    "candidate": {
+      "selector": "ohm-1.99.0-5-fmt-comment-scan-candidate-72096bc6b3fc-cargo-5a16c750eba7",
+      "binaries_sha256": {
+        "bin/rustfmt": "d779db3d7aba132eaee94c1711599c83c87163fc167e3899a63a5296131fe099",
+        "bin/cargo-fmt": "23e01b3f02357dea1b6da85c32de16c246642423a2bde61d3d8eb85d3ccfaef9",
+        "bin/cargo-clippy": "7652ccc41292fed6d40ef444e00062c86cbfbb38480def0a9f29b8e931bed2d8",
+        "bin/rustdoc": "d0956f5592ebed42c3939572406bd29314651a9160b2a4eb446ee76bfc7900d0",
+        "bin/cargo": "9d46b9750d2daf67019fd71dc0a8a8413044908bfe5f8e6098e79d8ca7c5240d",
+        "bin/clippy-driver": "bb2b25f427e69e7ce56845bd089b950d8624a4d698a4424de9bdd849c3fe204d",
+        "bin/rustc": "03ae7660096b13026e5d5c97f496b79f74144e71874ef2345b5cd0d1f1a98408",
+        "lib/librustc_driver-160d3f1cceded3e8.so": "51f2e1fdc1cf0fffa798ae57d7d00bdf7760086295ac9c190e69345f883671f9",
+        "lib/libLLVM-23-rust-1.99.0-beta.so": "7b53841c7a8ffde8c6ebd9fc222bffdb99ee99cb818bfc40693f61af73b8a61d",
+        "lib/libLLVM.so.23.1-rust-1.99.0-beta": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+      }
+    }
+  },
+  "candidate_commit": "ff92f3fe9ca8ca99f967842885c61c0c99b465bd",
+  "protocol": {
+    "written_at": "2026-10-21T16:55:49.234336+00:00",
+    "status": "planned_before_candidate_timings",
+    "primary_question": "Does skipping comment scans for snippets without slashes reduce edited uv formatting time compared with rustfmt #27, with Cargo #176 and the compiler held constant?",
+    "pairs": 40,
+    "batches": 2,
+    "pairs_per_batch": 20,
+    "order": "Seeded, balanced randomized order within each batch; seeds 2026102121 and 2026102122.",
+    "command": ["cargo", "+SELECTOR", "fmt", "-p", "uv", "--"],
+    "source": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+    "edit": "Exactly the frozen developer-workflow direct edit in crates/uv/src/install_source.rs.",
+    "control": "Rebuilt rustfmt 5af2f950cd8bae79cec9ea032885db10e7dfe318 (#27), with identical compiler, Cargo #176, PGO inputs, and all other components.",
+    "treatment": "rustfmt ff92f3fe9ca8ca99f967842885c61c0c99b465bd, adding conservative slash-presence checks before comment scanning.",
+    "cache": "Stable separate private formatter caches for each lane. Restore baseline and warm each lane before each measured edit. No binary replacement during the run.",
+    "admission": "30 seconds >=95% idle, <=0.5% iowait, <=0.1% steal, no unrelated compiler.",
+    "contention": "Record CPU at 0.25-second intervals; reject a pair if external CPU exceeds 5% in three consecutive intervals or steal exceeds 0.1%. Retain every rejected pair and retry up to 8 times.",
+    "failure_policy": "Execution failure is retained and ends confirmation; never retry failures into success.",
+    "primary_statistic": "Paired geometric mean time reduction, with a two-sided 99% percentile bootstrap interval over pairs (20000 resamples; fixed seed 2026102123).",
+    "secondary": "Median paired reduction, lane medians, pair win count; no substitution for primary metric.",
+    "stopping": "Complete all 40 accepted pairs, or report a failed/inconclusive campaign. Do not stop early for significance or add pairs based on observed effects.",
+    "exclusions": "Only the predeclared contention guard; no timing outlier removal.",
+    "scope_note": "Exploratory profiling is separate and never pooled with confirmation.",
+    "implementation_hypothesis": "Rust comments require an ASCII slash. Skip contains_comment lexical scans for text without slashes, and skip comment-payload comparison when neither old nor new text contains a slash. Preserve the existing lexer and formatter verification otherwise.",
+    "cargo_revision": "5a16c750eba7f6b7bcfd7a220a377685c62b3512",
+    "logical_cpus": 32,
+    "cargo_jobs": 8,
+    "adoption": "Require unchanged formatting behavior and a positive lower bound on the preregistered 99% interval. Do not extend the sample or substitute a different primary statistic if inconclusive."
+  },
+  "plan_sha256": "8c574a5f1f0be46f012bb3e66d1e6e41cbf6b5883e26ecd57d570e7dabe79c28",
+  "runner_sha256": "88407c9908f887e1fcde4a3d20f6ff6b24536f9592b72257a286c322b4ed5006",
+  "accepted_pairs": 40,
+  "discarded_pairs": 2,
+  "execution_failures": 0,
+  "geometric_mean_time_reduction": 0.1487505543165113,
+  "bootstrap_99_percent_interval": [0.13293073577874567, 0.16148350315808335],
+  "median_paired_time_reduction": 0.15268140267937735,
+  "control_median_seconds": 1.5369558059610426,
+  "candidate_median_seconds": 1.3040577584761195,
+  "candidate_wins": 39,
+  "conclusion": "reduction_confirmed",
+  "samples": [
+    {
+      "batch": 0,
+      "pair": 0,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5397936740191653,
+      "candidate_seconds": 1.308757352991961,
+      "time_reduction": 0.15004368762222153
+    },
+    {
+      "batch": 0,
+      "pair": 1,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5247637759894133,
+      "candidate_seconds": 1.3019787149969488,
+      "time_reduction": 0.14611119735442302
+    },
+    {
+      "batch": 0,
+      "pair": 2,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5606040039565414,
+      "candidate_seconds": 1.3409109018975869,
+      "time_reduction": 0.14077440625679205
+    },
+    {
+      "batch": 0,
+      "pair": 3,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6440952620469034,
+      "candidate_seconds": 1.563247810001485,
+      "time_reduction": 0.049174432839592885
+    },
+    {
+      "batch": 0,
+      "pair": 4,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.530090334941633,
+      "candidate_seconds": 1.303519109962508,
+      "time_reduction": 0.14807702513052456
+    },
+    {
+      "batch": 0,
+      "pair": 5,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5468899930128828,
+      "candidate_seconds": 1.310741301975213,
+      "time_reduction": 0.15266030041200418
+    },
+    {
+      "batch": 0,
+      "pair": 6,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5445808870717883,
+      "candidate_seconds": 1.29523051797878,
+      "time_reduction": 0.16143561737690926
+    },
+    {
+      "batch": 0,
+      "pair": 7,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5448500900529325,
+      "candidate_seconds": 1.3039009859785438,
+      "time_reduction": 0.155969246223841
+    },
+    {
+      "batch": 0,
+      "pair": 8,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5677995680598542,
+      "candidate_seconds": 1.3091426190221682,
+      "time_reduction": 0.16498087785403137
+    },
+    {
+      "batch": 0,
+      "pair": 9,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5312474730890244,
+      "candidate_seconds": 1.2966599120991305,
+      "time_reduction": 0.1532002926454824
+    },
+    {
+      "batch": 0,
+      "pair": 10,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5232444619759917,
+      "candidate_seconds": 1.2978220989461988,
+      "time_reduction": 0.1479883030313921
+    },
+    {
+      "batch": 0,
+      "pair": 11,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5372830600244924,
+      "candidate_seconds": 1.311456977040507,
+      "time_reduction": 0.1468994805552516
+    },
+    {
+      "batch": 0,
+      "pair": 12,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.933985106064938,
+      "candidate_seconds": 1.474322755006142,
+      "time_reduction": 0.23767626214767856
+    },
+    {
+      "batch": 0,
+      "pair": 13,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5675732400268316,
+      "candidate_seconds": 1.2967547120060772,
+      "time_reduction": 0.17276291857094916
+    },
+    {
+      "batch": 0,
+      "pair": 14,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5335091899614781,
+      "candidate_seconds": 1.3855606010183692,
+      "time_reduction": 0.0964771453028106
+    },
+    {
+      "batch": 0,
+      "pair": 15,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5290122590959072,
+      "candidate_seconds": 1.3013707019854337,
+      "time_reduction": 0.14888144667007197
+    },
+    {
+      "batch": 0,
+      "pair": 16,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.524863620987162,
+      "candidate_seconds": 1.298843992059119,
+      "time_reduction": 0.1482228481401655
+    },
+    {
+      "batch": 0,
+      "pair": 17,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5317786950618029,
+      "candidate_seconds": 1.3333678030176088,
+      "time_reduction": 0.12952973734641793
+    },
+    {
+      "batch": 0,
+      "pair": 18,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5366285518975928,
+      "candidate_seconds": 1.2929383459268138,
+      "time_reduction": 0.15858758167017295
+    },
+    {
+      "batch": 0,
+      "pair": 19,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.568140601972118,
+      "candidate_seconds": 1.295286706998013,
+      "time_reduction": 0.17399836126362633
+    },
+    {
+      "batch": 1,
+      "pair": 0,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5303340899990872,
+      "candidate_seconds": 1.2945233990903944,
+      "time_reduction": 0.1540909873535088
+    },
+    {
+      "batch": 1,
+      "pair": 1,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.563556664972566,
+      "candidate_seconds": 1.3052931280108169,
+      "time_reduction": 0.16517696016234928
+    },
+    {
+      "batch": 1,
+      "pair": 2,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5674199759960175,
+      "candidate_seconds": 1.3211151689756662,
+      "time_reduction": 0.15714027560726784
+    },
+    {
+      "batch": 1,
+      "pair": 3,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5517312239389867,
+      "candidate_seconds": 1.2920117320027202,
+      "time_reduction": 0.1673740193723643
+    },
+    {
+      "batch": 1,
+      "pair": 4,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5527752179186791,
+      "candidate_seconds": 1.3154400549829006,
+      "time_reduction": 0.1528457951910771
+    },
+    {
+      "batch": 1,
+      "pair": 5,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.52511374396272,
+      "candidate_seconds": 1.2922250549308956,
+      "time_reduction": 0.15270250494675053
+    },
+    {
+      "batch": 1,
+      "pair": 6,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5340924760093912,
+      "candidate_seconds": 1.286489856080152,
+      "time_reduction": 0.1614000614704295
+    },
+    {
+      "batch": 1,
+      "pair": 7,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.525202251970768,
+      "candidate_seconds": 1.2926505240611732,
+      "time_reduction": 0.15247271475576862
+    },
+    {
+      "batch": 1,
+      "pair": 8,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.530737751047127,
+      "candidate_seconds": 1.3001397469779477,
+      "time_reduction": 0.1506450101667871
+    },
+    {
+      "batch": 1,
+      "pair": 9,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5384128029691055,
+      "candidate_seconds": 1.3000864830100909,
+      "time_reduction": 0.15491701544543157
+    },
+    {
+      "batch": 1,
+      "pair": 10,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.533669958007522,
+      "candidate_seconds": 1.3126079640351236,
+      "time_reduction": 0.1441392216220969
+    },
+    {
+      "batch": 1,
+      "pair": 11,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.531469703069888,
+      "candidate_seconds": 1.2970379289472476,
+      "time_reduction": 0.15307633814283972
+    },
+    {
+      "batch": 1,
+      "pair": 12,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5294297720538452,
+      "candidate_seconds": 1.3072270069969818,
+      "time_reduction": 0.14528471271908816
+    },
+    {
+      "batch": 1,
+      "pair": 13,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5329550149617717,
+      "candidate_seconds": 1.3264873930020258,
+      "time_reduction": 0.13468602792945927
+    },
+    {
+      "batch": 1,
+      "pair": 14,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5277157879900187,
+      "candidate_seconds": 1.298839740920812,
+      "time_reduction": 0.14981585506184625
+    },
+    {
+      "batch": 1,
+      "pair": 15,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5287513980874792,
+      "candidate_seconds": 1.3042145309736952,
+      "time_reduction": 0.14687598480347253
+    },
+    {
+      "batch": 1,
+      "pair": 16,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5959844269091263,
+      "candidate_seconds": 1.3187879000324756,
+      "time_reduction": 0.17368372911600727
+    },
+    {
+      "batch": 1,
+      "pair": 17,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.585783232934773,
+      "candidate_seconds": 1.3077951000304893,
+      "time_reduction": 0.17530020946798475
+    },
+    {
+      "batch": 1,
+      "pair": 18,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5584249689709395,
+      "candidate_seconds": 1.306640480994247,
+      "time_reduction": 0.16156343294663145
+    },
+    {
+      "batch": 1,
+      "pair": 19,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.681603359989822,
+      "candidate_seconds": 1.7078449389664456,
+      "time_reduction": -0.015605094281437859
+    }
+  ],
+  "started_at": "2026-10-21T19:04:17.617330+00:00",
+  "finished_at": "2026-10-21T19:31:26.571053+00:00",
+  "audit": {
+    "status": "passed",
+    "command_logs_verified": 168,
+    "cpu_intervals_verified": 463,
+    "formatted_output_identical": true,
+    "result_sha256": "ad93937e2d7591aa10dd2bd492ad421c3dc42a6e419d4c852742cb4bca1fc83f",
+    "frozen_inputs_verified": true,
+    "evidence_files_verified": 445,
+    "full_formatter_tests_passed": true,
+    "packaged_toolchains_verified": true,
+    "final_toolchains_verified": true,
+    "subsequent_format_and_check_cache_hits": true,
+    "formatted_workspace_identical": true
+  },
+  "evidence": {
+    "archive_name": "fmt-followup-evidence.tar.gz",
+    "bytes": 9218166,
+    "sha256": "719a53240f3ebd6472ccf178903da4de8529c749284648cd2ff94be46a15d66a",
+    "files": 445,
+    "publication": "unpublished"
+  }
+}

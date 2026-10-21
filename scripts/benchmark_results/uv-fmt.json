@@ -1,0 +1,458 @@
+{
+  "schema_version": 1,
+  "project": "uv",
+  "project_revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+  "command": ["cargo", "+TOOLCHAIN", "fmt", "-p", "uv", "--"],
+  "edit": {
+    "path": "crates/uv/src/install_source.rs",
+    "before": "component == cellar && next == formula",
+    "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+    "crate": "uv"
+  },
+  "control_sources": {
+    "rust": "72096bc6b3fc4443647fe05deb4ae473b49043f3",
+    "cargo": "5a16c750eba7f6b7bcfd7a220a377685c62b3512",
+    "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
+    "rustfmt": "29bfbe020d7d8ddc639963680d50943989990c62",
+    "rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
+    "llvm": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145"
+  },
+  "candidate_sources": {
+    "rust": "72096bc6b3fc4443647fe05deb4ae473b49043f3",
+    "cargo": "5a16c750eba7f6b7bcfd7a220a377685c62b3512",
+    "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
+    "rustfmt": "5af2f950cd8bae79cec9ea032885db10e7dfe318",
+    "rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
+    "llvm": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145"
+  },
+  "toolchains": {
+    "control": {
+      "selector": "ohm-1.99.0-5-uv-fmt-control-72096bc6b3fc-cargo-5a16c750eba7",
+      "binaries_sha256": {
+        "bin/rustfmt": "1c5d29063db5c51447cfab5cc113f20b13927dd7c3815a73c00f4bebc89bc6c7",
+        "bin/cargo-fmt": "77d0a67b5f5b2caa76e1e849c1d2a45563336f763b6082d497e6c5d02bfd63fc",
+        "bin/cargo-clippy": "7652ccc41292fed6d40ef444e00062c86cbfbb38480def0a9f29b8e931bed2d8",
+        "bin/rustdoc": "d0956f5592ebed42c3939572406bd29314651a9160b2a4eb446ee76bfc7900d0",
+        "bin/cargo": "9d46b9750d2daf67019fd71dc0a8a8413044908bfe5f8e6098e79d8ca7c5240d",
+        "bin/clippy-driver": "bb2b25f427e69e7ce56845bd089b950d8624a4d698a4424de9bdd849c3fe204d",
+        "bin/rustc": "03ae7660096b13026e5d5c97f496b79f74144e71874ef2345b5cd0d1f1a98408",
+        "lib/librustc_driver-160d3f1cceded3e8.so": "51f2e1fdc1cf0fffa798ae57d7d00bdf7760086295ac9c190e69345f883671f9",
+        "lib/libLLVM-23-rust-1.99.0-beta.so": "7b53841c7a8ffde8c6ebd9fc222bffdb99ee99cb818bfc40693f61af73b8a61d",
+        "lib/libLLVM.so.23.1-rust-1.99.0-beta": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+      }
+    },
+    "candidate": {
+      "selector": "ohm-1.99.0-5-uv-fmt-72096bc6b3fc-cargo-5a16c750eba7",
+      "binaries_sha256": {
+        "bin/rustfmt": "472fb98ef7b5a680e3cb71c5a6426358269fe0ce101984228128a3bb7f277a60",
+        "bin/cargo-fmt": "23e01b3f02357dea1b6da85c32de16c246642423a2bde61d3d8eb85d3ccfaef9",
+        "bin/cargo-clippy": "7652ccc41292fed6d40ef444e00062c86cbfbb38480def0a9f29b8e931bed2d8",
+        "bin/rustdoc": "d0956f5592ebed42c3939572406bd29314651a9160b2a4eb446ee76bfc7900d0",
+        "bin/cargo": "9d46b9750d2daf67019fd71dc0a8a8413044908bfe5f8e6098e79d8ca7c5240d",
+        "bin/clippy-driver": "bb2b25f427e69e7ce56845bd089b950d8624a4d698a4424de9bdd849c3fe204d",
+        "bin/rustc": "03ae7660096b13026e5d5c97f496b79f74144e71874ef2345b5cd0d1f1a98408",
+        "lib/librustc_driver-160d3f1cceded3e8.so": "51f2e1fdc1cf0fffa798ae57d7d00bdf7760086295ac9c190e69345f883671f9",
+        "lib/libLLVM-23-rust-1.99.0-beta.so": "7b53841c7a8ffde8c6ebd9fc222bffdb99ee99cb818bfc40693f61af73b8a61d",
+        "lib/libLLVM.so.23.1-rust-1.99.0-beta": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+      }
+    }
+  },
+  "pull_request": "https://github.com/astral-sh/ohm-rustfmt/pull/27",
+  "protocol": {
+    "written_at": "2026-10-21T11:28:00.224859+00:00",
+    "status": "planned_before_candidate_timings",
+    "primary_question": "Does the selected formatter bookkeeping fix reduce uv edited cargo fmt time with Cargo #176 held constant?",
+    "pairs": 40,
+    "batches": 2,
+    "pairs_per_batch": 20,
+    "order": "Seeded, balanced randomized order within each batch; seeds 2026102101 and 2026102102.",
+    "command": ["cargo", "+SELECTOR", "fmt", "-p", "uv", "--"],
+    "source": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+    "edit": "Exactly the frozen developer-workflow direct edit in crates/uv/src/install_source.rs.",
+    "control": "Rebuilt original formatter sources; optimized compiler, Cargo #176, PGO inputs and all other components identical to treatment.",
+    "treatment": "Final reviewed formatter bookkeeping change in astral-sh/ohm-rustfmt, based on native/syscall evidence; freeze source diff and artifact hashes before running.",
+    "cache": "Stable separate private formatter caches for each lane. Restore baseline and warm each lane before each measured edit. No binary replacement during the run.",
+    "admission": "30 seconds >=95% idle, <=0.5% iowait, <=0.1% steal, no unrelated compiler.",
+    "contention": "Record CPU at 0.25-second intervals; reject a pair if external CPU exceeds 5% in three consecutive intervals or steal exceeds 0.1%. Retain every rejected pair and retry up to 8 times.",
+    "failure_policy": "Execution failure is retained and ends confirmation; never retry failures into success.",
+    "primary_statistic": "Paired geometric mean time reduction, with a two-sided 99% percentile bootstrap interval over pairs (20000 resamples; fixed seed 2026102103).",
+    "secondary": "Median paired reduction, lane medians, pair win count; no substitution for primary metric.",
+    "stopping": "Complete all 40 accepted pairs, or report a failed/inconclusive campaign. Do not stop early for significance or add pairs based on observed effects.",
+    "exclusions": "Only the predeclared contention guard; no timing outlier removal.",
+    "scope_note": "Exploratory profiling is separate and never pooled with confirmation.",
+    "hypothesis_revision_at": "2026-10-21T11:47:20.907975+00:00",
+    "implementation_hypothesis": "Use Linux openat2 with RESOLVE_NO_SYMLINKS and O_PATH to prove already-canonical absolute paths in one kernel lookup. Fall back to standard canonicalization for symlinks, parent components, relative paths and syscall errors. No observation reuse across calls and no change to formatter verification.",
+    "cargo_revision": "5a16c750eba7f6b7bcfd7a220a377685c62b3512",
+    "logical_cpus": 32,
+    "cargo_jobs": 8
+  },
+  "plan_sha256": "5e9b43c3da65f59ef164dc32b49c3b349b6645eeaca5e729cb7044b740809e5f",
+  "runner_sha256": "b8dc3b3f46f4726ad33ba86c8685db1732cac099f2e9e0b15673db2ad77a9300",
+  "accepted_pairs": 40,
+  "discarded_pairs": 2,
+  "execution_failures": 0,
+  "geometric_mean_time_reduction": 0.05795088989676367,
+  "bootstrap_99_percent_interval": [0.0431334954035397, 0.07209763039541803],
+  "median_paired_time_reduction": 0.06419364654587223,
+  "control_median_seconds": 1.630748292500357,
+  "candidate_median_seconds": 1.5253888229999575,
+  "candidate_wins": 36,
+  "conclusion": "reduction_confirmed",
+  "samples": [
+    {
+      "batch": 0,
+      "pair": 0,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5941848239999672,
+      "candidate_seconds": 1.5213801709996915,
+      "time_reduction": 0.045668891024568725
+    },
+    {
+      "batch": 0,
+      "pair": 1,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.6617861459999403,
+      "candidate_seconds": 1.470700584000042,
+      "time_reduction": 0.11498805815649471
+    },
+    {
+      "batch": 0,
+      "pair": 2,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.664303538999775,
+      "candidate_seconds": 1.4906188509999083,
+      "time_reduction": 0.10435878067305493
+    },
+    {
+      "batch": 0,
+      "pair": 3,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.6550124959999266,
+      "candidate_seconds": 1.5125703549997525,
+      "time_reduction": 0.08606710906681903
+    },
+    {
+      "batch": 0,
+      "pair": 4,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5679614360001324,
+      "candidate_seconds": 1.5762375969998175,
+      "time_reduction": -0.005278293719262361
+    },
+    {
+      "batch": 0,
+      "pair": 5,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5739750140000979,
+      "candidate_seconds": 1.5295233209999424,
+      "time_reduction": 0.028241676395603044
+    },
+    {
+      "batch": 0,
+      "pair": 6,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6490964820000045,
+      "candidate_seconds": 1.5740279360002205,
+      "time_reduction": 0.0455210151856863
+    },
+    {
+      "batch": 0,
+      "pair": 7,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.644977731000381,
+      "candidate_seconds": 1.4695838819998244,
+      "time_reduction": 0.10662384401635161
+    },
+    {
+      "batch": 0,
+      "pair": 8,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6102695620002123,
+      "candidate_seconds": 1.5074186349997944,
+      "time_reduction": 0.06387186929911326
+    },
+    {
+      "batch": 0,
+      "pair": 9,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5677814390001004,
+      "candidate_seconds": 1.5764216620000298,
+      "time_reduction": -0.005511114486366209
+    },
+    {
+      "batch": 0,
+      "pair": 10,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.663232531000176,
+      "candidate_seconds": 1.4929353910001737,
+      "time_reduction": 0.102389255155799
+    },
+    {
+      "batch": 0,
+      "pair": 11,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6585191999997733,
+      "candidate_seconds": 1.5989494830000694,
+      "time_reduction": 0.03591741174881302
+    },
+    {
+      "batch": 0,
+      "pair": 12,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.6326797720003015,
+      "candidate_seconds": 1.4899373500002184,
+      "time_reduction": 0.0874283031173958
+    },
+    {
+      "batch": 0,
+      "pair": 13,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.6035987999998724,
+      "candidate_seconds": 1.5526951970000482,
+      "time_reduction": 0.031743353137847374
+    },
+    {
+      "batch": 0,
+      "pair": 14,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.6524524550000024,
+      "candidate_seconds": 1.5123961549998057,
+      "time_reduction": 0.08475662920068494
+    },
+    {
+      "batch": 0,
+      "pair": 15,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.551435269000649,
+      "candidate_seconds": 1.5657275550001941,
+      "time_reduction": -0.009212299272241875
+    },
+    {
+      "batch": 0,
+      "pair": 16,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.6098045629996705,
+      "candidate_seconds": 1.486768120999841,
+      "time_reduction": 0.07642942803601349
+    },
+    {
+      "batch": 0,
+      "pair": 17,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6020015519998196,
+      "candidate_seconds": 1.506296745000327,
+      "time_reduction": 0.059740770463063364
+    },
+    {
+      "batch": 0,
+      "pair": 18,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.5621012479996352,
+      "candidate_seconds": 1.5417669449998357,
+      "time_reduction": 0.013017275945358064
+    },
+    {
+      "batch": 0,
+      "pair": 19,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5618841340001381,
+      "candidate_seconds": 1.5125225560004765,
+      "time_reduction": 0.03160386671784787
+    },
+    {
+      "batch": 1,
+      "pair": 0,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6639826869995886,
+      "candidate_seconds": 1.530619875999946,
+      "time_reduction": 0.08014675395458337
+    },
+    {
+      "batch": 1,
+      "pair": 1,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6805459629995312,
+      "candidate_seconds": 1.5159288750000997,
+      "time_reduction": 0.09795452883990974
+    },
+    {
+      "batch": 1,
+      "pair": 2,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.649490063000485,
+      "candidate_seconds": 1.5294430529993406,
+      "time_reduction": 0.072778255955525
+    },
+    {
+      "batch": 1,
+      "pair": 3,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5756917599992448,
+      "candidate_seconds": 1.5939441600003192,
+      "time_reduction": -0.01158373767283205
+    },
+    {
+      "batch": 1,
+      "pair": 4,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6205247600000803,
+      "candidate_seconds": 1.5032096879995152,
+      "time_reduction": 0.07239326105733757
+    },
+    {
+      "batch": 1,
+      "pair": 5,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.659769086999404,
+      "candidate_seconds": 1.5073134510003001,
+      "time_reduction": 0.09185352179002149
+    },
+    {
+      "batch": 1,
+      "pair": 6,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6412963390002915,
+      "candidate_seconds": 1.5598351099997672,
+      "time_reduction": 0.0496322492561837
+    },
+    {
+      "batch": 1,
+      "pair": 7,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5904139799995392,
+      "candidate_seconds": 1.545116248999875,
+      "time_reduction": 0.02848172335587562
+    },
+    {
+      "batch": 1,
+      "pair": 8,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6410041110002567,
+      "candidate_seconds": 1.5158578680002393,
+      "time_reduction": 0.0762619923747393
+    },
+    {
+      "batch": 1,
+      "pair": 9,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6556387579994407,
+      "candidate_seconds": 1.4860970590007128,
+      "time_reduction": 0.10240259125341478
+    },
+    {
+      "batch": 1,
+      "pair": 10,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6195122549997905,
+      "candidate_seconds": 1.5051561319996836,
+      "time_reduction": 0.07061145888032916
+    },
+    {
+      "batch": 1,
+      "pair": 11,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5560285480005405,
+      "candidate_seconds": 1.548078820000228,
+      "time_reduction": 0.0051089859569271034
+    },
+    {
+      "batch": 1,
+      "pair": 12,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.6554899459997614,
+      "candidate_seconds": 1.486517977999938,
+      "time_reduction": 0.10206764976623284
+    },
+    {
+      "batch": 1,
+      "pair": 13,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.5782072450001579,
+      "candidate_seconds": 1.5323204230007832,
+      "time_reduction": 0.02907528282153471
+    },
+    {
+      "batch": 1,
+      "pair": 14,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.653484534999734,
+      "candidate_seconds": 1.5790518060002796,
+      "time_reduction": 0.0450156789639804
+    },
+    {
+      "batch": 1,
+      "pair": 15,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.577853808999862,
+      "candidate_seconds": 1.5639161230001264,
+      "time_reduction": 0.00883331898065387
+    },
+    {
+      "batch": 1,
+      "pair": 16,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.7346061669995834,
+      "candidate_seconds": 1.5631320270003926,
+      "time_reduction": 0.09885479670339026
+    },
+    {
+      "batch": 1,
+      "pair": 17,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.593968139000026,
+      "candidate_seconds": 1.4911326090004877,
+      "time_reduction": 0.0645154237926312
+    },
+    {
+      "batch": 1,
+      "pair": 18,
+      "order": ["candidate", "control"],
+      "control_seconds": 1.6288168130004124,
+      "candidate_seconds": 1.57559152200065,
+      "time_reduction": 0.03267727259133402
+    },
+    {
+      "batch": 1,
+      "pair": 19,
+      "order": ["control", "candidate"],
+      "control_seconds": 1.6530077489996984,
+      "candidate_seconds": 1.5293974750002235,
+      "time_reduction": 0.0747790045595832
+    }
+  ],
+  "started_at": "2026-10-21T12:16:22.907586+00:00",
+  "finished_at": "2026-10-21T12:45:46.502948+00:00",
+  "audit": {
+    "status": "passed",
+    "command_logs_verified": 168,
+    "cpu_intervals_verified": 504,
+    "formatted_output_identical": true,
+    "result_sha256": "dafb2d8d9b6f3e10b806291483a2db59a030b75703f03d53c0a0b16bf9dc1908",
+    "frozen_inputs_verified": true,
+    "evidence_files_verified": 291
+  },
+  "syscall_diagnostic": {
+    "purpose": "Attribution and correctness only; traced durations are excluded from latency claims.",
+    "calls": {
+      "control": {
+        "readlink": 20314,
+        "openat2": 0,
+        "statx": 4110
+      },
+      "candidate": {
+        "readlink": 1117,
+        "openat2": 1541,
+        "statx": 4110
+      }
+    },
+    "formatted_output_identical": true,
+    "subsequent_format_and_check_cache_hits": true
+  },
+  "evidence": {
+    "archive_name": "fmt-confirmation-evidence.tar.gz",
+    "bytes": 186029,
+    "sha256": "43b296bc63f336a42d87e45ec0887b896405dcb336706933fef0fef75d127e4f",
+    "files": 291,
+    "publication": "unpublished"
+  }
+}

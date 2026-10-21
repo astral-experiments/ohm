@@ -176,6 +176,7 @@ class WorkflowReportTests(unittest.TestCase):
             ("workflow-overhead", "fixes", "3" * 40),
             ("edited-check-compact2", "fixes", "3" * 40),
             ("edited-check-sso", "fixes", "3" * 40),
+            ("uv-fmt", "fixes", "3" * 40),
         ):
             with self.subTest(build=build, cargo_revision=cargo_revision):
                 runs = synthetic_runs()
@@ -184,15 +185,38 @@ class WorkflowReportTests(unittest.TestCase):
                 selector = compiler_release
                 if cargo_revision:
                     selector += f"-cargo-{cargo_revision[:12]}"
+                measured_release = compiler_release.replace(
+                    "uv-fmt", "edited-check-sso"
+                )
                 for run in runs:
                     run["configuration"]["toolchains"]["ohm"] = selector
                     run["metadata"]["toolchains"]["ohm"]["rustc"]["version"] = (
-                        f"rustc ({compiler_release})\ncommit-hash: {revision}"
+                        f"rustc ({measured_release})\ncommit-hash: {revision}"
                     )
                     if cargo_revision:
                         run["metadata"]["toolchains"]["ohm"]["cargo"]["version"] = (
                             f"cargo\ncommit-hash: {cargo_revision}"
                         )
+                    if measured_release != compiler_release:
+                        tools = run["metadata"]["toolchains"]["ohm"]
+                        tools["rustc"]["build_provenance"] = {
+                            "toolchain": selector,
+                            "rustc_version": tools["rustc"]["version"],
+                            "cargo_version": tools["cargo"]["version"],
+                            "sources": {"rust": revision, "cargo": cargo_revision},
+                            "binaries_sha256": {
+                                **{
+                                    "bin/" + name: tool["sha256"]
+                                    for name, tool in tools.items()
+                                },
+                                **{
+                                    "lib/" + name: digest
+                                    for name, digest in tools["rustc"][
+                                        "libraries"
+                                    ].items()
+                                },
+                            },
+                        }
                     for sample in run["samples"]:
                         sample["normalization"]["command"][1] = f"+{selector}"
                         if sample["toolchain"] == "ohm":
@@ -204,8 +228,25 @@ class WorkflowReportTests(unittest.TestCase):
                 self.assertEqual(
                     workflow_results.toolchain_label(report), f"1.99.0-5 + {label}"
                 )
+                if measured_release != compiler_release:
+                    for field, value in (
+                        ("toolchain", "ohm-1.99.0-5"),
+                        ("rustc_version", "different compiler"),
+                        ("cargo_version", "different Cargo"),
+                        ("sources", {}),
+                        ("binaries_sha256", {}),
+                    ):
+                        changed = copy.deepcopy(report)
+                        for run in changed["runs"]:
+                            run["metadata"]["toolchains"]["ohm"]["rustc"][
+                                "build_provenance"
+                            ][field] = value
+                        with self.assertRaises(ValueError):
+                            workflow_results.validate(changed)
                 if cargo_revision:
-                    self.assertEqual(report["ohm_cargo_source_revision"], cargo_revision)
+                    self.assertEqual(
+                        report["ohm_cargo_source_revision"], cargo_revision
+                    )
                     changed = copy.deepcopy(report)
                     changed["ohm_cargo_source_revision"] = "4" * 40
                     with self.assertRaises(ValueError):

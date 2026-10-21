@@ -2,7 +2,13 @@
 
 The current [developer-workflow](developer-workflows.json), [individual-command](workflow.json), [session](sessions.json), [historical-session](historical.json), [ablation](ablation.json), [disk](disk.json), and [ty session and worktree](ty-worktree.md) reports supply the README tables. They retain individual measurements, source identities, settings, and available evidence links.
 
-The release benchmark reports use the published Ohm 1.99.0-6 binaries. The
+The developer-workflow report uses an optimized experimental build with Cargo #175 and #176 and
+[rustfmt #27](https://github.com/astral-sh/ohm-rustfmt/pull/27). Its
+[build provenance](developer-workflow-build.json) records exact component sources, optimization inputs,
+and binary hashes. The report retains all accepted measurements and references a checksum-verified
+private archive of command logs, CPU traces, and excluded attempts.
+
+The other benchmark reports use the published Ohm 1.99.0-6 binaries. The
 [build provenance](workflow-build.json) records the release archives, source pins, and binary hashes
 verified on the Mac and Linux hosts. The reports retain accepted measurements and link to raw logs,
 CPU traces, source audits, and excluded attempts.
@@ -20,9 +26,19 @@ preserve earlier studies. Different releases may use different machines or workl
 measurements are not controlled comparisons between Ohm releases.
 
 The separate [Ruff edited-check study](ruff-edited-check.json) retains 64 matched pairs for the
-unreleased [public API graph optimization](https://github.com/astral-sh/ohm-rust/pull/194). Its
+[public API graph optimization](https://github.com/astral-sh/ohm-rust/pull/194). Its
 [build record](ruff-edited-check-build.json) describes that experimental compiler. These results are
 excluded from the release tables; that study's raw archive remains unpublished.
+
+The separate [uv formatter study](uv-fmt.json) retains 40 matched pairs comparing rustfmt #27 with its
+parent, holding Cargo #176 and the compiler constant. It measured 5.8% less time for edited formatting
+(99% bootstrap interval: 4.3–7.2%). Its raw profiling and confirmation evidence remains unpublished.
+
+The [uv comment-scan study](uv-fmt-comment-scan.json) retains a further 40 matched pairs comparing
+[rustfmt #33](https://github.com/astral-sh/ohm-rustfmt/pull/33) with #27. Only the formatter binary
+differs between its toolchains. It measured a further 14.9% reduction in edited formatting time
+(99% bootstrap interval: 13.3–16.1%), with identical output. This follow-up is excluded from the
+developer-workflow table; its raw evidence remains unpublished.
 
 ## Publish results
 

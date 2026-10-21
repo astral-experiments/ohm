@@ -147,29 +147,42 @@ sequence preserves its build artifacts between commands; each repetition starts 
 
 <!-- benchmark:developer-workflows -->
 
-| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-6 | Time saved |
-| ------- | --------------------------------- | ----------- | ------------ | ---------- |
-| Ruff/ty | Edit → focused test               | 14.06 s     | 12.76 s      | 9.28%      |
-| Ruff/ty | Edit dependency → downstream test | 13.55 s     | 3.03 s       | 77.67%     |
-| Ruff/ty | Edit → check → test → check       | 21.05 s     | 19.26 s      | 8.49%      |
-| Ruff/ty | Check → build → check             | 75.14 s     | 52.73 s      | 29.82%     |
-| Ruff/ty | Edit → fmt → clippy → test        | 26.47 s     | 21.12 s      | 20.21%     |
-| uv      | Edit → focused test               | 22.31 s     | 9.49 s       | 57.46%     |
-| uv      | Edit dependency → downstream test | 28.52 s     | 3.34 s       | 88.30%     |
-| uv      | Edit → check → test → check       | 28.24 s     | 12.75 s      | 54.84%     |
-| uv      | Check → build → check             | 142.10 s    | 76.70 s      | 46.02%     |
-| uv      | Edit → fmt → clippy → test        | 29.96 s     | 15.38 s      | 48.67%     |
-| Codex   | Edit → focused test               | 31.89 s     | 27.81 s      | 12.79%     |
-| Codex   | Edit dependency → downstream test | 59.31 s     | 5.57 s       | 90.61%     |
-| Codex   | Edit → check → test → check       | 38.44 s     | 36.75 s      | 4.40%      |
-| Codex   | Check → build → check             | 186.73 s    | 132.44 s     | 29.07%     |
-| Codex   | Edit → fmt → clippy → test        | 44.40 s     | 34.91 s      | 21.38%     |
+| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-5 + fixes | Time saved |
+| ------- | --------------------------------- | ----------- | -------------------- | ---------- |
+| Ruff/ty | Edit → focused test               | 19.37 s     | 16.13 s              | 16.72%     |
+| Ruff/ty | Edit dependency → downstream test | 19.20 s     | 4.30 s               | 77.63%     |
+| Ruff/ty | Edit → check → test → check       | 26.91 s     | 25.65 s              | 4.66%      |
+| Ruff/ty | Check → build → check             | 105.19 s    | 69.11 s              | 34.30%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 33.35 s     | 27.44 s              | 17.70%     |
+| uv      | Edit → focused test               | 23.07 s     | 10.45 s              | 54.68%     |
+| uv      | Edit dependency → downstream test | 26.91 s     | 3.35 s               | 87.56%     |
+| uv      | Edit → check → test → check       | 28.03 s     | 14.77 s              | 47.31%     |
+| uv      | Check → build → check             | 146.86 s    | 76.67 s              | 47.80%     |
+| uv      | Edit → fmt → clippy → test        | 30.92 s     | 17.42 s              | 43.67%     |
+| Codex   | Edit → focused test               | 37.35 s     | 30.48 s              | 18.41%     |
+| Codex   | Edit dependency → downstream test | 66.84 s     | 5.50 s               | 91.77%     |
+| Codex   | Edit → check → test → check       | 47.43 s     | 38.04 s              | 19.79%     |
+| Codex   | Check → build → check             | 209.57 s    | 139.04 s             | 33.65%     |
+| Codex   | Edit → fmt → clippy → test        | 53.04 s     | 38.76 s              | 26.93%     |
 
 <!-- /benchmark:developer-workflows -->
 
-These measurements use the published Ohm 1.99.0-6 binaries. The
-[build provenance](scripts/benchmark_results/workflow-build.json) records the release, component
-sources, and binary hashes.
+The Ohm column uses an optimized experimental build with
+[Cargo #175](https://github.com/astral-sh/ohm-cargo/pull/175),
+[Cargo #176](https://github.com/astral-sh/ohm-cargo/pull/176), and the
+[Linux formatter path-resolution fix](https://github.com/astral-sh/ohm-rustfmt/pull/27).
+It also includes the [public API graph optimization](https://github.com/astral-sh/ohm-rust/pull/194).
+The [build provenance](scripts/benchmark_results/developer-workflow-build.json) records the exact
+component sources, optimization settings, and binary hashes.
+
+In a separate [40-pair uv study](scripts/benchmark_results/uv-fmt.json), the formatter fix reduced
+edited `cargo fmt -p uv` time by 5.8% (99% bootstrap interval: 4.3–7.2%), holding Cargo and the
+compiler constant.
+
+A follow-up [40-pair study](scripts/benchmark_results/uv-fmt-comment-scan.json) measured a further
+14.9% reduction (99% interval: 13.3–16.1%) from
+[skipping unnecessary comment scans](https://github.com/astral-sh/ohm-rustfmt/pull/33). That change is
+measured separately and is not included in the workflow table above.
 
 Each study's cache trust settings are documented in the [benchmark guide](BENCHMARKS.md).
 

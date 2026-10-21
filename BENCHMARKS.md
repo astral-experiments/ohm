@@ -41,13 +41,13 @@ Fetch dependencies before measuring, using the same Cargo home for both commands
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-6 \
+  --ohm ohm-1.99.0-5-uv-fmt-72096bc6b3fc-cargo-5a16c750eba7 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-6 \
+  --ohm ohm-1.99.0-5-uv-fmt-72096bc6b3fc-cargo-5a16c750eba7 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -61,19 +61,41 @@ sets `PYTHONSAFEPATH=1`, prefix the commands with `env -u PYTHONSAFEPATH`.
 The published measurements use eight Cargo jobs on three 32-vCPU Linux devboxes. Each result
 records its host metadata, command logs, and CPU traces.
 
-The published results use the official Ohm 1.99.0-6 release. The
-[build provenance](scripts/benchmark_results/workflow-build.json) records the release archives,
-component sources, and binary hashes verified on each machine. Use `--ohm` to select another
-installed toolchain when measuring a different version. See the
-[results index](scripts/benchmark_results/README.md) for the evidence.
+The developer workflows use an optimized experimental build with Rust at
+[`72096bc6b3fc`](https://github.com/astral-sh/ohm-rust/commit/72096bc6b3fc4443647fe05deb4ae473b49043f3),
+Cargo at [`5a16c750eba7`](https://github.com/astral-sh/ohm-cargo/commit/5a16c750eba7f6b7bcfd7a220a377685c62b3512)
+(#176, including #175), and rustfmt at
+[`5af2f950cd8b`](https://github.com/astral-sh/ohm-rustfmt/commit/5af2f950cd8bae79cec9ea032885db10e7dfe318).
+The [build provenance](scripts/benchmark_results/developer-workflow-build.json) records the component
+sources, retained PGO/BOLT inputs, build settings, and binary hashes verified on each machine.
+Build these sources and register the toolchain with `rustup toolchain link` before running the commands
+above; the regular installer does not provide this experimental build. Use `--ohm` to select another
+installed toolchain. See the [results index](scripts/benchmark_results/README.md) for the evidence.
+
+The separate [uv formatter study](scripts/benchmark_results/uv-fmt.json) holds Cargo #176, the compiler,
+and optimization inputs constant while comparing rustfmt #27 with its parent. Forty pairs in two
+batches, with balanced randomized order, measured a 5.8% paired geometric mean time reduction
+(99% bootstrap interval: 4.3–7.2%) for the same edited `cargo fmt -p uv` command. The sample count,
+contention rules, and analysis were fixed before candidate timings. Two contention exclusions and
+zero execution failures were retained. These pairs are separate from the four-repetition workflow
+medians; comparisons with earlier campaigns do not isolate an individual change.
+
+A separate [comment-scan study](scripts/benchmark_results/uv-fmt-comment-scan.json) compares
+[rustfmt #33](https://github.com/astral-sh/ohm-rustfmt/pull/33) with #27 on another quiet 32-vCPU devbox.
+The rebuilt control formatter is byte-identical to the preceding study's candidate, and only the
+rustfmt binary differs between the two new toolchains. The same edited uv command, fixed 40-pair
+sample, balanced randomized order, and 99% bootstrap analysis measured a further 14.9% time reduction
+(interval: 13.3–16.1%). Two pairs were excluded for contention; no executions failed. Formatted workspace
+output was identical, and all 385 formatter tests passed, with one ignored doc test. This follow-up
+is separate from the 120 workflow measurements above, which use #27.
 
 The separate [Ruff edited-check study](scripts/benchmark_results/ruff-edited-check.json) compares an
 unreleased compiler with its baseline, holding the Cargo binary and PGO/BOLT inputs constant. On a
 16-vCPU host with eight jobs, 64 alternating pairs measured a 3.0% median paired time reduction
 (95% bootstrap interval: 1.9–4.1%). Its [build record](scripts/benchmark_results/ruff-edited-check-build.json)
 identifies the experimental metadata optimizations from
-[Rust #194](https://github.com/astral-sh/ohm-rust/pull/194), which are excluded from Ohm 1.99.0-6
-and the release benchmarks.
+[Rust #194](https://github.com/astral-sh/ohm-rust/pull/194), which are included in the experimental
+developer-workflow build and excluded from the Ohm 1.99.0-6 release benchmarks.
 
 | Workflow                          | Untimed baseline warmup  | Measured sequence                     |
 | --------------------------------- | ------------------------ | ------------------------------------- |
@@ -208,11 +230,12 @@ Rust does not isolate changes between Ohm releases.
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
 
-The timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-6, using eight Cargo jobs on
+The release timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-6, using eight Cargo jobs on
 32-CPU Linux devboxes. uv and Codex each use a dedicated host. Ruff's main replay uses a third
-host; its historical replay and developer workflows use the host that completed the ty study.
-Every comparison keeps all configurations and repetitions on one host. Host and CPU identities
-are recorded in each report; these measurements do not isolate changes from earlier Ohm releases.
+host; its historical replay uses the host that completed the ty study. The experimental developer
+workflows use three separate 32-CPU hosts, one per project, with eight jobs. Every comparison keeps
+all configurations and repetitions on one host. Host and CPU identities are recorded in each report;
+these measurements do not isolate changes from earlier Ohm releases.
 
 Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust
 to `all`; the ty session and developer workflows also set native-tool trust to `all`.
