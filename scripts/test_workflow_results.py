@@ -171,14 +171,16 @@ class WorkflowReportTests(unittest.TestCase):
 
     def test_unreleased_build_must_match_its_source_revision(self):
         for build, label, cargo_revision in (
-            ("cache-fix", "fix", None),
-            ("overhead", "fixes", None),
-            ("overhead", "fixes", "3" * 40),
+            ("workflow-cache-fix", "fix", None),
+            ("workflow-overhead", "fixes", None),
+            ("workflow-overhead", "fixes", "3" * 40),
+            ("edited-check-compact2", "fixes", "3" * 40),
+            ("edited-check-sso", "fixes", "3" * 40),
         ):
             with self.subTest(build=build, cargo_revision=cargo_revision):
                 runs = synthetic_runs()
-                revision = "1" * 40
-                compiler_release = f"ohm-1.99.0-5-workflow-{build}-{revision[:12]}"
+                revision = "a" * 40
+                compiler_release = f"ohm-1.99.0-5-{build}-{revision[:12]}"
                 selector = compiler_release
                 if cargo_revision:
                     selector += f"-cargo-{cargo_revision[:12]}"

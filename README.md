@@ -149,31 +149,29 @@ sequence preserves its build artifacts between commands; each repetition starts 
 
 | Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-5 + fixes | Time saved |
 | ------- | --------------------------------- | ----------- | -------------------- | ---------- |
-| Ruff/ty | Edit → focused test               | 15.97 s     | 13.18 s              | 17.48%     |
-| Ruff/ty | Edit dependency → downstream test | 15.55 s     | 3.62 s               | 76.70%     |
-| Ruff/ty | Edit → check → test → check       | 23.85 s     | 21.87 s              | 8.30%      |
-| Ruff/ty | Check → build → check             | 94.06 s     | 61.93 s              | 34.17%     |
-| Ruff/ty | Edit → fmt → clippy → test        | 32.33 s     | 23.46 s              | 27.45%     |
-| uv      | Edit → focused test               | 22.31 s     | 11.52 s              | 48.36%     |
-| uv      | Edit dependency → downstream test | 25.21 s     | 3.32 s               | 86.81%     |
-| uv      | Edit → check → test → check       | 26.23 s     | 15.11 s              | 42.42%     |
-| uv      | Check → build → check             | 141.40 s    | 72.80 s              | 48.51%     |
-| uv      | Edit → fmt → clippy → test        | 28.17 s     | 17.33 s              | 38.48%     |
-| Codex   | Edit → focused test               | 35.69 s     | 27.70 s              | 22.39%     |
-| Codex   | Edit dependency → downstream test | 65.65 s     | 5.06 s               | 92.30%     |
-| Codex   | Edit → check → test → check       | 45.18 s     | 38.31 s              | 15.21%     |
-| Codex   | Check → build → check             | 204.54 s    | 140.06 s             | 31.53%     |
-| Codex   | Edit → fmt → clippy → test        | 49.75 s     | 40.76 s              | 18.06%     |
+| Ruff/ty | Edit → focused test               | 16.12 s     | 13.86 s              | 14.04%     |
+| Ruff/ty | Edit dependency → downstream test | 16.27 s     | 3.60 s               | 77.85%     |
+| Ruff/ty | Edit → check → test → check       | 24.33 s     | 21.83 s              | 10.27%     |
+| Ruff/ty | Check → build → check             | 93.39 s     | 62.65 s              | 32.91%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 31.87 s     | 23.58 s              | 26.00%     |
+| uv      | Edit → focused test               | 21.81 s     | 9.58 s               | 56.06%     |
+| uv      | Edit dependency → downstream test | 24.94 s     | 3.22 s               | 87.09%     |
+| uv      | Edit → check → test → check       | 25.70 s     | 12.99 s              | 49.45%     |
+| uv      | Check → build → check             | 140.05 s    | 73.20 s              | 47.73%     |
+| uv      | Edit → fmt → clippy → test        | 27.24 s     | 14.42 s              | 47.04%     |
+| Codex   | Edit → focused test               | 31.16 s     | 26.05 s              | 16.41%     |
+| Codex   | Edit dependency → downstream test | 57.55 s     | 4.85 s               | 91.58%     |
+| Codex   | Edit → check → test → check       | 41.12 s     | 32.69 s              | 20.51%     |
+| Codex   | Check → build → check             | 190.75 s    | 132.59 s             | 30.49%     |
+| Codex   | Edit → fmt → clippy → test        | 44.71 s     | 34.41 s              | 23.03%     |
 
 <!-- /benchmark:developer-workflows -->
 
-The Ohm column uses an optimized, unreleased build of 1.99.0-5 with the
-[retained-query cache fix](https://github.com/astral-sh/ohm-rust/pull/190),
-[huge-page default fix](https://github.com/astral-sh/ohm-rust/pull/191),
-[Cargo validation optimization](https://github.com/astral-sh/ohm-cargo/pull/167),
-[check-after-build fix](https://github.com/astral-sh/ohm-cargo/pull/169), and
-[check-graph selection optimization](https://github.com/astral-sh/ohm-cargo/pull/170). Its exact sources
-and build settings are recorded in the [build provenance](scripts/benchmark_results/workflow-build.json).
+The Ohm column uses an optimized, unreleased build of 1.99.0-5 with the compiler and Cargo fixes found
+during these measurements, including [check-after-build reuse](https://github.com/astral-sh/ohm-cargo/pull/169),
+[compiler-info caching](https://github.com/astral-sh/ohm-cargo/pull/168), and
+[compact public API graph nodes](https://github.com/astral-sh/ohm-rust/pull/194). Its exact sources and
+build settings are recorded in the [build provenance](scripts/benchmark_results/workflow-build.json).
 
 Times are medians of four runs on each project's devbox, including compilation and one focused test
 where shown. A failure count replaces the timing if any repetition fails; that row has no speedup.

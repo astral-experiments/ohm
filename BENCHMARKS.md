@@ -41,13 +41,13 @@ Fetch dependencies before measuring, using the same Cargo home for both commands
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc-cargo-a7a77d3be394 \
+  --ohm ohm-1.99.0-5-edited-check-sso-72096bc6b3fc-cargo-3d9852572bda \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-5-workflow-overhead-6f05b55ce6dc-cargo-a7a77d3be394 \
+  --ohm ohm-1.99.0-5-edited-check-sso-72096bc6b3fc-cargo-3d9852572bda \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -62,19 +62,26 @@ The published measurements use eight Cargo jobs on three 32-vCPU Linux devboxes.
 records its host metadata, command logs, and CPU traces.
 
 The table uses an unreleased compiler build from
-[`6f05b55ce6dc`](https://github.com/astral-sh/ohm-rust/commit/6f05b55ce6dcc10e65e618a136c2b188c409330e)
+[`72096bc6b3fc`](https://github.com/astral-sh/ohm-rust/commit/72096bc6b3fc4443647fe05deb4ae473b49043f3)
 with Cargo at
-[`a7a77d3be394`](https://github.com/astral-sh/ohm-cargo/commit/a7a77d3be394084932517434cf17a8be3f504ca2).
+[`3d9852572bda`](https://github.com/astral-sh/ohm-cargo/commit/3d9852572bdaa8e7c627356a0c52533717888988).
 It fixes a retained-query cache crash found in the Codex edit-and-test workflow, disables transparent
 huge pages in mimalloc by default, reduces repeated Cargo build-directory validation, preserves
-warm checks after builds, and avoids preparing a second graph for established checks.
-This rerun rebuilds Cargo using the previous compiler binaries and PGO
-profiles. Build this toolchain from source and register it with `rustup toolchain link` before running
+warm checks after builds, and avoids preparing a second graph for established checks. It also reuses
+fresh native outputs during checks, caches compiler information, and stores public API graph nodes
+as compact indices with small edge sets kept inline.
+This build uses retained PGO profiles for the compiler and companion tools, plus the compiler's BOLT
+profile. Build this toolchain from source and register it with `rustup toolchain link` before running
 the command above; the regular installer does not provide it. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the pinned component
 sources, PGO/BOLT configuration, build inputs, and binary identities. Use `--ohm` to select another
 installed toolchain when measuring a different version. See the
 [results index](scripts/benchmark_results/README.md) for the available evidence.
+
+The [matched Ruff edited-check study](scripts/benchmark_results/ruff-edited-check.json) compares this
+compiler with the baseline compiler using the same Cargo binary and PGO/BOLT inputs. On a separate 16-vCPU host
+with eight jobs, 64 alternating pairs measured a 3.0% median paired time reduction (95% bootstrap
+interval: 1.9–4.1%).
 
 | Workflow                          | Untimed baseline warmup  | Measured sequence                     |
 | --------------------------------- | ------------------------ | ------------------------------------- |
