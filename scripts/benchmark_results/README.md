@@ -40,6 +40,15 @@ differs between its toolchains. It measured a further 14.9% reduction in edited 
 (99% bootstrap interval: 13.3–16.1%), with identical output. This follow-up is excluded from the
 developer-workflow table; its raw evidence remains unpublished.
 
+The [uv memchr study](uv-fmt-memchr.json) retains 80 matched pairs on two devboxes comparing
+`memchr` slash searches with #33. It measured 0.86% less edited formatting time (99% interval:
+0.33–1.48%), with positive estimates on both hosts and identical output. The report records the
+measured revisions, the identical patch published in
+[rustfmt #34](https://github.com/astral-sh/ohm-rustfmt/pull/34), and an audit correction for a
+30-second idle window with fewer, longer samples in one already-excluded attempt. Measurements,
+exclusions, and the estimator were unchanged. This study is excluded from the developer-workflow
+table; both raw evidence archives remain unpublished.
+
 ## Publish results
 
 Prepare audited reports named `workflow.json`, `sessions.json`, `historical.json`, `ablation.json`, and `disk.json`, following the existing formats. Archive the ty study's evidence before replacing `ty-worktree.json` and `ty-worktree.md`. The developer workflows are measured separately: combine their three completed runs with `scripts/workflow_results.py`, archive their logs and CPU traces, and replace `developer-workflows.json` with the validated report and evidence metadata. Install formatting dependencies with `npm ci --ignore-scripts`, then run:

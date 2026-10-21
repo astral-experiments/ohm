@@ -184,6 +184,11 @@ A follow-up [40-pair study](scripts/benchmark_results/uv-fmt-comment-scan.json) 
 [skipping unnecessary comment scans](https://github.com/astral-sh/ohm-rustfmt/pull/33). That change is
 measured separately and is not included in the workflow table above.
 
+A separate [80-pair study](scripts/benchmark_results/uv-fmt-memchr.json) on two devboxes measured
+0.86% less edited formatting time (99% interval: 0.33–1.48%) from
+[using `memchr` for those slash searches](https://github.com/astral-sh/ohm-rustfmt/pull/34), compared
+with #33. Both hosts improved. This change is also excluded from the workflow table above.
+
 Each study's cache trust settings are documented in the [benchmark guide](BENCHMARKS.md).
 
 Times are medians of four runs on each project's devbox, including compilation and one focused test

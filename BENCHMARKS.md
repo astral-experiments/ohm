@@ -89,6 +89,17 @@ sample, balanced randomized order, and 99% bootstrap analysis measured a further
 output was identical, and all 385 formatter tests passed, with one ignored doc test. This follow-up
 is separate from the 120 workflow measurements above, which use #27.
 
+The [memchr study](scripts/benchmark_results/uv-fmt-memchr.json) compares the slash searches in #33
+with `memchr` across 80 matched pairs, 40 on each of two 32-vCPU devboxes. The fixed sample, balanced
+randomized order, and bootstrap stratified by host measured a 0.86% paired geometric mean time
+reduction (99% interval: 0.33–1.48%). The host estimates were 0.80% and 0.92%; 13 pairs were excluded
+for contention, and no executions failed. Both formatter executables were rebuilt; the compiler,
+Cargo #176, sysroot, and optimization inputs were held constant. Formatted workspace output was
+identical, subsequent formatting and check commands hit the cache, and all 385 formatter tests
+passed, with one ignored doc test. The same patch is published as
+[rustfmt #34](https://github.com/astral-sh/ohm-rustfmt/pull/34) above #32; the intervening formatter
+changes were not part of this comparison. This study is also separate from the workflow table.
+
 The separate [Ruff edited-check study](scripts/benchmark_results/ruff-edited-check.json) compares an
 unreleased compiler with its baseline, holding the Cargo binary and PGO/BOLT inputs constant. On a
 16-vCPU host with eight jobs, 64 alternating pairs measured a 3.0% median paired time reduction
