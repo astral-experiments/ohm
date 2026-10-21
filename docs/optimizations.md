@@ -2,7 +2,7 @@
 
 Ohm includes the following changes to Rust, Cargo, Clippy, and rustfmt.
 
-This guide covers Ohm 1.99.0-6. The measurements come from release benchmarks and individual
+This guide covers Ohm 1.99.0-7. The measurements come from release benchmarks and individual
 experiments, including earlier prototypes. They do not predict the benefit for every project.
 
 ## Cargo and builds
@@ -25,8 +25,13 @@ In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-type
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
 seconds with it.
 
+Ohm 1.99.0-7 represents the metadata graph with compact node IDs and keeps small sets of edges inline. It resolves each edge's source once per encoding scope, reducing repeated hashing, copying, and allocation. The hash inputs and stable ordering stay the same.
+
+In 64 paired Ruff edited-check measurements, this change reduced median paired wall time by 3.0% (95% interval: 1.9–4.1%). Both variants used identical Cargo binaries and PGO/BOLT inputs. These measurements preceded the final rebase and do not establish the effect on other workloads.
+
 See:
 
+- [Rust #194](https://github.com/astral-sh/ohm-rust/pull/194)
 - [Rust #43](https://github.com/astral-sh/ohm-rust/pull/43)
 - [Cargo #53](https://github.com/astral-sh/ohm-cargo/pull/53)
 - [Cargo #55](https://github.com/astral-sh/ohm-cargo/pull/55)
@@ -99,6 +104,10 @@ Libraries that use local procedural macros become eligible only with
 read untracked inputs; otherwise, reuse can preserve stale generated code. It does not enable reuse
 through build scripts in a procedural macro's dependency chain.
 
+Starting with Ohm 1.99.0-7, Cargo preserves an unset dynamic-library search path when it has no directories to add. Previously, it inserted an empty entry that the reuse checks treated as a relative search directory, rejecting otherwise reusable native dependencies. Explicit empty values and actual plugin search paths retain their meaning.
+
+In 12 paired Linux measurements, the first uv check after `cargo test --no-run` took 38.5% less wall time with this fix (99% interval: 36.3–40.7%). Median time fell from 36.1 to 22.2 seconds, and crate compiler invocations fell from 500 to 174. These measurements preceded the final stack and do not establish the effect on published session replays.
+
 See:
 
 - [Cargo #75](https://github.com/astral-sh/ohm-cargo/pull/75)
@@ -111,6 +120,7 @@ See:
 - [Cargo #169](https://github.com/astral-sh/ohm-cargo/pull/169)
 - [Cargo #170](https://github.com/astral-sh/ohm-cargo/pull/170)
 - [Cargo #171](https://github.com/astral-sh/ohm-cargo/pull/171)
+- [Cargo #178](https://github.com/astral-sh/ohm-cargo/pull/178)
 
 ### 4. Reuse checks during builds
 
@@ -357,11 +367,9 @@ become eligible after one hour without use. Contexts from older Ohm releases, re
 and recognized legacy layouts are eligible immediately. Builds, tests, worktree commands, and
 upgrades do not invoke this cleanup automatically.
 
-GC preserves local targets and skips shared roots with active consumers. Builds and programs
-launched by this Cargo version hold leases that protect their artifacts, including after Cargo
-exits; programs launched by older Cargo versions may not have that protection. Unknown usage and
-unfamiliar or malformed state do not establish that an artifact is disposable. Reclaimed artifacts
-rebuild on demand.
+GC preserves local targets. Starting with Ohm 1.99.0-7, it skips active compiler contexts while reclaiming unused contexts in the same shared directory. For example, a running program built with the current compiler no longer prevents cleanup of an obsolete compiler's cache. Dependencies and ThinLTO objects inside the active context remain protected, including after Cargo exits.
+
+New shared artifacts use a namespace that older collectors preserve. Moving to it requires a one-time rebuild. Older Cargo builds can still postpone cleanup of legacy caches, and programs they launch may lack the newer lease protection. Unknown usage and unfamiliar or malformed state do not establish that an artifact is disposable. Reclaimed artifacts rebuild on demand.
 
 Usage tracking reads the selected dependencies' records on warm builds. It updates timestamps at
 five-minute intervals and rounds them upward, so cleanup always allows a full hour without use and
@@ -369,6 +377,8 @@ may retain artifacts for up to five additional minutes. Repeated builds within a
 the write transaction; short builds also skip the completion query. A machine crash can lose recent
 usage timestamps, allowing a later explicit GC command to reclaim artifacts that could have been
 reused.
+
+A small warm-build experiment for the context-lock change increased from roughly 52 to 53 milliseconds. Its broader runtime cost has not been established.
 
 In a macOS benchmark, we ran the same development tasks with Ohm and stock Rust. Ohm used 40% less
 disk space for Ruff and 35% less for uv. These savings include the effects of Ohm's build reuse and
@@ -380,6 +390,7 @@ See:
 - [Cargo #157](https://github.com/astral-sh/ohm-cargo/pull/157)
 - [Cargo #158](https://github.com/astral-sh/ohm-cargo/pull/158)
 - [Cargo #160](https://github.com/astral-sh/ohm-cargo/pull/160)
+- [Cargo #174](https://github.com/astral-sh/ohm-cargo/pull/174)
 - [Cargo #77](https://github.com/astral-sh/ohm-cargo/pull/77)
 - [Rust #97](https://github.com/astral-sh/ohm-rust/pull/97)
 - [Rust #98](https://github.com/astral-sh/ohm-rust/pull/98)
@@ -427,7 +438,7 @@ See:
 - [Cargo #139](https://github.com/astral-sh/ohm-cargo/pull/139)
 - [Ohm #112](https://github.com/astral-sh/ohm/pull/112)
 
-### 15. Reuse Cargo's dependency resolution
+### 15. Avoid repeated Cargo preparation work
 
 **Status:** New optimization.
 
@@ -457,6 +468,23 @@ full canonicalization path, and a new reservation revalidates the directories. I
 per variant against Ohm 1.99.0-5, median times fell by 3.3% for Ruff and 4.0% for Codex. See
 [Cargo #143](https://github.com/astral-sh/ohm-cargo/pull/143) and
 [Cargo #167](https://github.com/astral-sh/ohm-cargo/pull/167).
+
+Ohm 1.99.0-7 skips dependency-file generation when a target has no eligible `.d` output. With human-readable output, it also skips artifact setup when there are no destinations to link. After compilation finishes, Cargo reuses parsed dependency files across root targets instead of reading them repeatedly. It caches each unit's formatted hash and output path during build preparation, clearing cached paths if shared-cache validation falls back to private outputs.
+
+Cargo also skips rewriting `OUT_DIR` values in cached build-script output when the directory has not moved. Commands that do not access Git avoid initializing libgit2 and its TLS context; certificate probing still runs at startup. These changes apply automatically.
+
+In focused warm Ruff measurements, skipping unused dependency-file generation reduced unchanged workspace checks by 18.2% and test builds by 20.2%. Reducing artifact setup and repeated dependency-file parsing then reduced unchanged workspace builds by 13.8% against that change. The other command comparisons were inconclusive. These paired Linux measurements preceded the final stack, used different baselines, and do not establish the improvement for edited builds or whole development sessions.
+
+A separate comparison of the `OUT_DIR`, loader-path, Git initialization, and path-cache changes together measured 9.36% fewer Cargo instructions for warm uv checks and 8.21% fewer for warm test builds. The profiler excluded compiler subprocesses, and tests did not run. Wall-time measurements were inconclusive; fewer Cargo instructions do not establish a faster command.
+
+See:
+
+- [Cargo #175](https://github.com/astral-sh/ohm-cargo/pull/175)
+- [Cargo #176](https://github.com/astral-sh/ohm-cargo/pull/176)
+- [Cargo #177](https://github.com/astral-sh/ohm-cargo/pull/177)
+- [Cargo #178](https://github.com/astral-sh/ohm-cargo/pull/178)
+- [Cargo #179](https://github.com/astral-sh/ohm-cargo/pull/179)
+- [Cargo #180](https://github.com/astral-sh/ohm-cargo/pull/180)
 
 ### 16. Cache unchanged ThinLTO objects
 
@@ -511,10 +539,15 @@ stock Rust and 0.31 seconds with Ohm. After an edit, it took 12.44 and 0.50 seco
 Ohm's formatting cache was already warm in both cases. In a Ruff benchmark, the first formatting run
 took 7.46 seconds with stock Rust and 8.94 seconds with Ohm.
 
+On Linux, Ohm 1.99.0-7 also resolves absolute paths without symlinks in one filesystem lookup using `openat2`. The formatter checks the current filesystem on every call; symlinks, parent components, relative paths, and unsupported kernels use standard canonicalization. Formatting and cache verification still run normally.
+
+Across 40 matched pairs, edited `cargo fmt -p uv` took 5.8% less time (99% interval: 4.3–7.2%), with identical formatting and subsequent cache hits. Both variants used the same compiler, Cargo, and PGO inputs. This isolates the formatter change in one workflow; it does not measure a full development session.
+
 See:
 
 - [rustfmt #13](https://github.com/astral-sh/ohm-rustfmt/pull/13)
 - [rustfmt #14](https://github.com/astral-sh/ohm-rustfmt/pull/14)
+- [rustfmt #27](https://github.com/astral-sh/ohm-rustfmt/pull/27)
 
 ## Rust compiler
 
