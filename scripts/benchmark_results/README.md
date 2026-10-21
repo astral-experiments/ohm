@@ -2,9 +2,31 @@
 
 The current [developer-workflow](developer-workflows.json), [individual-command](workflow.json), [session](sessions.json), [historical-session](historical.json), [ablation](ablation.json), [disk](disk.json), and [ty session and worktree](ty-worktree.md) reports supply the README tables. They retain individual measurements, source identities, settings, and available evidence links.
 
-The developer workflows use an optimized, unreleased build of Ohm 1.99.0-5. The checked-in report retains every accepted measurement; [build provenance](workflow-build.json) records the sources, settings, and binary hashes. The separate [Ruff edited-check study](ruff-edited-check.json) records the 64 matched pairs used to verify the [public API graph optimization](https://github.com/astral-sh/ohm-rust/pull/194). Raw workflow logs, rejected attempts, compiler build recipes, and PGO/BOLT profiles are archived separately and have not been published.
+The release benchmark reports use the published Ohm 1.99.0-6 binaries. The
+[build provenance](workflow-build.json) records the release archives, source pins, and binary hashes
+verified on the Mac and Linux hosts. The reports retain accepted measurements and link to raw logs,
+CPU traces, source audits, and excluded attempts.
 
-[Raw logs and audits for Ohm 1.99.0-5](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-5-940c95bb89ba) include excluded attempts. Earlier reports and fixtures remain in the [benchmark history](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts). Historical measurements are not controlled comparisons between Ohm releases.
+The [test/build overlap report](ready-tests.md) compares default Ohm with the same binaries and
+`CARGO_UNSTABLE_OHM_READY_TESTS=true`. It includes command timings, full sessions, developer
+workflows, workspace-test and parser-edit comparisons, and APFS allocation. Nextest workloads are controls because
+Cargo disables this option for the build-only invocation that Nextest uses.
+
+The [raw evidence](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-6-4c43f2319969)
+contains command logs, source audits, CPU traces, and excluded attempts. The
+[comparison inputs and generators](https://github.com/astral-sh/ohm/releases/tag/benchmark-comparison-evidence-1.99.0-6-218caca3c1ea)
+reproduce the overlap JSON and Markdown and the ty Markdown byte for byte. Their manifests record
+the file hashes; checked-in reports may omit detailed traces and use different whitespace.
+
+[Raw evidence for Ohm 1.99.0-5](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-5-940c95bb89ba)
+and the [benchmark history](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts)
+preserve earlier studies. Different releases may use different machines or workloads; historical
+measurements are not controlled comparisons between Ohm releases.
+
+The separate [Ruff edited-check study](ruff-edited-check.json) retains 64 matched pairs for the
+unreleased [public API graph optimization](https://github.com/astral-sh/ohm-rust/pull/194). Its
+[build record](ruff-edited-check-build.json) describes that experimental compiler. These results are
+excluded from the release tables; that study's raw archive remains unpublished.
 
 ## Publish results
 

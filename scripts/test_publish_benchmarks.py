@@ -42,9 +42,8 @@ class PublicationTests(unittest.TestCase):
         tables, _ = publish.render_tables(
             self.reports, self.ty_worktree, self.ty_scenario
         )
-        self.assertIn("| ty session | 287.99 s | 189.85 s | 34.08% |", tables["sessions"])
         self.assertIn(
-            "| ty | Worktree startup (Btrfs) | `ty_python_semantic` | 93.42 s | 13.41 s | 6.97× |",
+            "| ty | Worktree startup (Btrfs) | `ty_python_semantic` |",
             tables["features"],
         )
         rows = {
@@ -53,6 +52,11 @@ class PublicationTests(unittest.TestCase):
             if (cells := [cell.strip() for cell in line.strip("|").split("|")])
         }
         for index, lane in enumerate(("stock", "ohm")):
+            self.assertAlmostEqual(
+                float(rows["ty session"][index].removesuffix(" s")),
+                statistics.fmean(self.ty_worktree["session"][lane]["total"]["samples"]),
+                delta=0.01,
+            )
             session_sum = sum(
                 float(rows[label][index].removesuffix(" s").replace(",", ""))
                 for label in ("Ruff session", "uv session", "Codex session", "ty session")

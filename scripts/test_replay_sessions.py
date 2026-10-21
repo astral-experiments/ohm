@@ -233,17 +233,17 @@ class FixtureValidationTests(ReplayTestCase):
         scenario = replay.load_scenario(fixture)
         baseline = latest_reports()["historical"]
 
-        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
+        self.assertEqual(
+            baseline["order"],
+            [["stock", "ohm", "ohm-ready-tests"], ["ohm-ready-tests", "ohm", "stock"]],
+        )
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
-            baseline["provenance"]["fixtures"]["ruff"]["fixture_sha256"],
-            hashlib.sha256(fixture.read_bytes()).hexdigest(),
-        )
-        self.assertEqual(
-            baseline["provenance"]["wrapper"]["fixtures"][
-                str(fixture.relative_to(SCRIPTS.parent))
-            ],
-            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+            {
+                Path(name).name: digest
+                for name, digest in baseline["provenance"]["wrapper"]["fixtures"].items()
+            },
+            {fixture.name: hashlib.sha256(fixture.read_bytes()).hexdigest()},
         )
         commands = baseline["commands"]["ruff"]
         expected = [
@@ -260,18 +260,17 @@ class FixtureValidationTests(ReplayTestCase):
         fixture = SCRIPTS / "session_replays" / "ruff-rust-1.99.json"
         scenario = replay.load_scenario(fixture)
         baseline = latest_reports()["sessions"]
-        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(
-            baseline["provenance"]["fixtures"]["ruff"]["fixture_sha256"],
-            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+            baseline["order_by_project"]["ruff"],
+            [["stock", "ohm", "ohm-ready-tests"], ["ohm-ready-tests", "ohm", "stock"]],
         )
+        wrapper = baseline["provenance"]["wrapper"]["by_project"]["ruff"]
         self.assertEqual(
-            baseline["provenance"]["wrapper"]["fixtures"][
-                str(fixture.relative_to(SCRIPTS.parent))
-            ],
-            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+            {Path(name).name: digest for name, digest in wrapper["fixtures"].items()},
+            {fixture.name: hashlib.sha256(fixture.read_bytes()).hexdigest()},
         )
-        self.assertEqual(baseline["sessions"][0]["session"], scenario.session)
+        session = next(s for s in baseline["sessions"] if s["project"] == "ruff")
+        self.assertEqual(session["session"], scenario.session)
         self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
         self.assertEqual(baseline["methodology"]["external_compilations_observed"], 0)
         commands = baseline["commands"]["ruff"]
@@ -284,14 +283,16 @@ class FixtureValidationTests(ReplayTestCase):
         for command, (index, step) in zip(commands, expected, strict=True):
             self.assertEqual(command["index"], index)
             self.assertEqual(command["command"], [step["program"], *step["args"]])
+            for toolchain in ("ohm", "ohm-ready-tests"):
+                self.assertEqual(
+                    command["tests_started"]["stock"], command["tests_started"][toolchain]
+                )
+        for toolchain in ("stock", "ohm", "ohm-ready-tests"):
             self.assertEqual(
-                command["tests_started"]["stock"], command["tests_started"]["ohm"]
+                len(baseline["timed_session_seconds"]["ruff"][toolchain]),
+                baseline["repetitions"],
             )
-        for toolchain in ("stock", "ohm"):
-            self.assertEqual(
-                len(baseline["timed_session_seconds"]["ruff"][toolchain]), 2
-            )
-            for repetition in range(2):
+            for repetition in range(baseline["repetitions"]):
                 self.assertAlmostEqual(
                     sum(
                         command["wall_seconds"][toolchain][repetition]
@@ -1943,6 +1944,32 @@ class CommandResultTests(ReplayTestCase):
         self.assertEqual(sample["cargo_reported_crates"], ["package"])
         self.assertIsNone(sample["actual_compiler_invocations"])
         self.assertIsNone(sample["cargo_status_without_compiler_invocation"])
+
+    def test_status_messages_can_interrupt_test_output(self) -> None:
+        runner = self.runner("--compare-ready-tests")
+        scenario = self.scenario()
+        worktree = self.directory / "worktree"
+        worktree.mkdir()
+        step = {"program": "cargo", "args": ["test", "-p", "package", "--lib"]}
+        result = subprocess.CompletedProcess(
+            [],
+            0,
+            stdout=(
+                "   Compiling package v1.0.0\n"
+                "running 1 test\n"
+                "test tests::example ...    Compiling downstream v1.0.0\n"
+                "ok\n"
+                "test result: ok. 1 passed; 0 failed\n"
+            ),
+        )
+
+        with mock.patch.object(replay.subprocess, "run", return_value=result):
+            sample = runner.run_command(
+                scenario, worktree, step, "ohm-ready-tests", "ohm", 0, 1
+            )
+
+        self.assertEqual(sample["cargo_reported_crates"], ["package", "downstream"])
+        self.assertEqual(sample["tests_started"], 1)
 
     def test_verbose_accounting_distinguishes_status_only_early_cutoff(self) -> None:
         runner = self.runner("--compiler-accounting", "verbose")

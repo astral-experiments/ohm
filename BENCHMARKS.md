@@ -41,47 +41,39 @@ Fetch dependencies before measuring, using the same Cargo home for both commands
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-5-edited-check-sso-72096bc6b3fc-cargo-3d9852572bda \
+  --ohm ohm-1.99.0-6 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-5-edited-check-sso-72096bc6b3fc-cargo-3d9852572bda \
+  --ohm ohm-1.99.0-6 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
 
 Use `--project ruff` or `--project codex` to run the other projects. Omit `--project` to run all three
-sequentially, or assign one project to each devbox. Stock and Ohm always run sequentially on the same
-host for a given project. `--workflow` selects a subset for diagnosis. `--resume` retains completed
+sequentially, or assign one project to each devbox. Each project's configurations run sequentially on the same
+host. `--workflow` selects a subset for diagnosis. `--resume` retains completed
 samples and rejects changed runner code, source definitions, sampling settings, or toolchains. If your shell
 sets `PYTHONSAFEPATH=1`, prefix the commands with `env -u PYTHONSAFEPATH`.
 
 The published measurements use eight Cargo jobs on three 32-vCPU Linux devboxes. Each result
 records its host metadata, command logs, and CPU traces.
 
-The table uses an unreleased compiler build from
-[`72096bc6b3fc`](https://github.com/astral-sh/ohm-rust/commit/72096bc6b3fc4443647fe05deb4ae473b49043f3)
-with Cargo at
-[`3d9852572bda`](https://github.com/astral-sh/ohm-cargo/commit/3d9852572bdaa8e7c627356a0c52533717888988).
-It fixes a retained-query cache crash found in the Codex edit-and-test workflow, disables transparent
-huge pages in mimalloc by default, reduces repeated Cargo build-directory validation, preserves
-warm checks after builds, and avoids preparing a second graph for established checks. It also reuses
-fresh native outputs during checks, caches compiler information, and stores public API graph nodes
-as compact indices with small edge sets kept inline.
-This build uses retained PGO profiles for the compiler and companion tools, plus the compiler's BOLT
-profile. Build this toolchain from source and register it with `rustup toolchain link` before running
-the command above; the regular installer does not provide it. The
-[build provenance](scripts/benchmark_results/workflow-build.json) records the pinned component
-sources, PGO/BOLT configuration, build inputs, and binary identities. Use `--ohm` to select another
+The published results use the official Ohm 1.99.0-6 release. The
+[build provenance](scripts/benchmark_results/workflow-build.json) records the release archives,
+component sources, and binary hashes verified on each machine. Use `--ohm` to select another
 installed toolchain when measuring a different version. See the
-[results index](scripts/benchmark_results/README.md) for the available evidence.
+[results index](scripts/benchmark_results/README.md) for the evidence.
 
-The [matched Ruff edited-check study](scripts/benchmark_results/ruff-edited-check.json) compares this
-compiler with the baseline compiler using the same Cargo binary and PGO/BOLT inputs. On a separate 16-vCPU host
-with eight jobs, 64 alternating pairs measured a 3.0% median paired time reduction (95% bootstrap
-interval: 1.9–4.1%).
+The separate [Ruff edited-check study](scripts/benchmark_results/ruff-edited-check.json) compares an
+unreleased compiler with its baseline, holding the Cargo binary and PGO/BOLT inputs constant. On a
+16-vCPU host with eight jobs, 64 alternating pairs measured a 3.0% median paired time reduction
+(95% bootstrap interval: 1.9–4.1%). Its [build record](scripts/benchmark_results/ruff-edited-check-build.json)
+identifies the experimental metadata optimizations from
+[Rust #194](https://github.com/astral-sh/ohm-rust/pull/194), which are excluded from Ohm 1.99.0-6
+and the release benchmarks.
 
 | Workflow                          | Untimed baseline warmup  | Measured sequence                     |
 | --------------------------------- | ------------------------ | ------------------------------------- |
@@ -93,7 +85,7 @@ interval: 1.9–4.1%).
 
 The timer covers the entire measured sequence, including applying the edit and runner overhead.
 Warmups and source preparation are excluded. Every sample gets fresh target and shared-build
-directories, which remain continuous throughout that sample. The runner alternates stock/Ohm order
+directories, which remain continuous throughout that sample. The runner rotates and reverses configuration order
 by repetition and workflow. Medians are calculated from complete sequences; adding independently
 measured command medians would lose the effects of switching commands.
 
@@ -105,7 +97,7 @@ measured command medians would lose the effects of switching commands.
 
 Check, build, and Clippy target the package's library; formatting applies fixes to the target package. Tests
 include compiling and running one existing test. The dependency edits preserve the public API.
-Source formatting is normalized with Ohm rustfmt before warmup, identically for each pair. Both
+Source formatting is normalized with Ohm rustfmt before warmup, identically for each configuration. Both
 formatters accept this shared baseline and produce identical formatted edits in the three projects.
 Clippy and tests run on the formatted edit in the formatting workflow. Both Ohm trust opt-ins are `all` and its
 shared build directory is separate from the target directory. The uv default-debug-information
@@ -117,7 +109,7 @@ the runner rejects unrelated compilers, steal above 0.1%, or three consecutive t
 with more than 5% host CPU used by other processes. It also rejects unrelated compilation during
 warmup. Host CPU counters include competing processes that finish between samples. Background
 monitoring services remain enabled and their overhead remains in the timings.
-Contaminated attempts retain logs and build state and are retried from fresh artifacts. If a run
+Attempts rejected by the activity checks retain logs and build state and are retried from fresh artifacts. If a run
 exhausts its attempts, resume it with a larger `--contention-retries` value; existing attempts are
 skipped and their evidence is preserved.
 
@@ -146,19 +138,38 @@ refresh the README table:
 python3 scripts/publish_benchmarks.py --render
 ```
 
+## Compare test/build overlap
+
+Add `--compare-ready-tests` to the developer-workflow, individual-command, or session runner to
+measure a third configuration. It uses the same Ohm binaries with
+`CARGO_UNSTABLE_OHM_READY_TESTS=true`; the runner clears that setting for the other configurations.
+The published 1.99.0-6 runs include all three configurations, and the
+[overlap report](scripts/benchmark_results/ready-tests.md) compares the two Ohm variants.
+
+This option lets Cargo start an eligible test executable while other targets are still building.
+It does not apply to `cargo nextest`, which builds tests with `--no-run` before running them itself.
+Nextest workflows therefore serve as controls for timing variation. The report also includes a
+constructed uv workspace test workload and a parser-edit comparison, labeled separately from the
+recorded development sessions.
+
+The constructed workspace workload sets `RUST_TEST_THREADS=1` for every configuration because
+uv-client's parallel tests race over process-global certificate environment variables. This keeps
+tests serial within each executable; Cargo can still overlap test executables with compilation.
+The original parallel-test attempt is excluded in full and retained in the raw evidence.
+
 ## Run the individual-command benchmarks
 
 Preview the plan without cloning or building:
 
 ```console
-uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-5 --dry-run
+uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-6 --dry-run
 ```
 
 Run both projects:
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-5 --jobs 8 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-6 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -168,7 +179,7 @@ you need to reproduce a result, and match its base Rust version with `--upstream
 
 The runner creates temporary worktrees at pinned source revisions and gives each workflow and
 toolchain its own target directory. It applies reversible edits without changing the source
-checkouts. Both toolchains use the same edits, explicit profile settings, job count, and test selection.
+checkouts. All configurations use the same edits, explicit profile settings, job count, and test selection.
 
 ### Workloads
 
@@ -212,11 +223,21 @@ Rust does not isolate changes between Ohm releases.
 
 - [ty bug-fix session and worktree startup](scripts/benchmark_results/ty-worktree.md)
 - [Workflow and disk-usage results](scripts/benchmark_results/)
+- [Opt-in test/build overlap](scripts/benchmark_results/ready-tests.md)
 - [Session fixtures and replay results](scripts/session_replays/)
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
 
-The individual-command and session timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-5 on one 32-CPU AMD EPYC-Genoa devbox, with eight Cargo jobs. Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust to `all`; the ty session also sets native-tool trust to `all` and records verbose compiler logs. The developer-workflow report records its separate host for each project; compare stock and Ohm within each project.
+The timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-6, using eight Cargo jobs on
+32-CPU Linux devboxes. uv and Codex each use a dedicated host. Ruff's main replay uses a third
+host; its historical replay and developer workflows use the host that completed the ty study.
+Every comparison keeps all configurations and repetitions on one host. Host and CPU identities
+are recorded in each report; these measurements do not isolate changes from earlier Ohm releases.
+
+Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust
+to `all`; the ty session and developer workflows also set native-tool trust to `all`. The option
+comparison keeps those settings fixed and changes only `CARGO_UNSTABLE_OHM_READY_TESTS`.
+Linux runs retain full-VM CPU and process traces and require at least 60 GiB free during measurement.
 
 The [APFS study](scripts/benchmark_results/disk.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. Its source, tests, artifact isolation, and allocation are checked before the volume is removed; the evidence archive retains those checks. These measurements make no claim about elapsed time on the Mac.
 

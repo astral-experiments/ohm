@@ -36,8 +36,10 @@ from benchmark import (
 
 SCENARIO_DIRECTORY = Path(__file__).with_name("session_replays")
 PROJECTS = ("ruff", "uv", "codex")
+# Cargo stderr can interrupt an unfinished libtest stdout line.
 CARGO_STATUS = re.compile(
-    r"^\s*(?P<action>Compiling|Checking)\s+(?P<crate>[^\s]+)", re.MULTILINE
+    r"(?:^\s*|(?<=\S)[ \t]{3,})(?P<action>Compiling|Checking)\s+(?P<crate>[^\s]+)",
+    re.MULTILINE,
 )
 VERBOSE_COMMAND = re.compile(r"^\s*Running\s+`(?P<command>.+)`\s*$", re.MULTILINE)
 TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")

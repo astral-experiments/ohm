@@ -921,7 +921,7 @@ def parser():
     result.add_argument("--source-path", action="append", default=[])
     result.add_argument("--output-dir", type=Path, required=True)
     result.add_argument("--upstream", default="1.99.0")
-    result.add_argument("--ohm", default="ohm-1.99.0-5")
+    result.add_argument("--ohm", default="ohm-1.99.0-6")
     result.add_argument(
         "--compare-ready-tests",
         action="store_true",
