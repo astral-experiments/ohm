@@ -2,7 +2,7 @@
 
 Ohm includes the following changes to Rust, Cargo, Clippy, and rustfmt.
 
-This guide covers Ohm 1.99.0-7. The measurements come from release benchmarks and individual
+This guide covers Ohm 1.99.0-8. The measurements come from release benchmarks and individual
 experiments, including earlier prototypes. They do not predict the benefit for every project.
 
 ## Cargo and builds
@@ -543,11 +543,34 @@ On Linux, Ohm 1.99.0-7 also resolves absolute paths without symlinks in one file
 
 Across 40 matched pairs, edited `cargo fmt -p uv` took 5.8% less time (99% interval: 4.3–7.2%), with identical formatting and subsequent cache hits. Both variants used the same compiler, Cargo, and PGO inputs. This isolates the formatter change in one workflow; it does not measure a full development session.
 
+Ohm 1.99.0-8 can format a single verified direct module that needs a rewrite without formatting its whole crate. After a rewrite, it can also verify eligible modules individually. These paths require fresh checks of module ownership, configuration, and resolution; ineligible changes fall back to ordinary crate formatting. The final workspace snapshot must still match before Ohm caches the result.
+
+Snapshot preparation now borrows cached module graphs instead of copying them, reuses parsed input when formatting a direct module, and reuses Linux file handles for metadata checks. Leaf-certificate JSON reads are buffered.
+
+A focused Ruff comparison measured the cumulative effect of these changes on warm `cargo fmt`:
+
+| Edit                                   | Median before → after | Paired time reduction (99% interval) |
+| -------------------------------------- | --------------------: | -----------------------------------: |
+| None                                   |    164.79 → 160.94 ms |                   2.43% (2.00–2.86%) |
+| Already-formatted comment              |    276.42 → 268.49 ms |                   3.14% (2.61–3.80%) |
+| Rewrite `ruff_linter/src/doc_lines.rs` |  4,616.08 → 368.44 ms |                92.01% (91.98–92.05%) |
+
+The first two comparisons used 60 matched pairs; the rewrite comparison used 24. These were full Linux builds without PGO, before the changes were combined with the comment-scanning optimization below. The large rewrite improvement depends on avoiding whole-crate work and does not describe every edit or a complete development session.
+
+The formatter also skips comment lexing when text has no `/`, using `memchr` to search for that byte. Separate edited uv formatting comparisons measured 14.9% less time from skipping the lexer across 40 pairs (99% interval: 13.3–16.1%), followed by 0.86% less time from `memchr` across 80 pairs on two hosts (0.33–1.48%). Formatted output was identical. Those builds used the same compiler, Cargo, and PGO inputs within each comparison, and preceded the final stack; the percentages are not additive.
+
 See:
 
 - [rustfmt #13](https://github.com/astral-sh/ohm-rustfmt/pull/13)
 - [rustfmt #14](https://github.com/astral-sh/ohm-rustfmt/pull/14)
 - [rustfmt #27](https://github.com/astral-sh/ohm-rustfmt/pull/27)
+- [rustfmt #28](https://github.com/astral-sh/ohm-rustfmt/pull/28)
+- [rustfmt #29](https://github.com/astral-sh/ohm-rustfmt/pull/29)
+- [rustfmt #30](https://github.com/astral-sh/ohm-rustfmt/pull/30)
+- [rustfmt #31](https://github.com/astral-sh/ohm-rustfmt/pull/31)
+- [rustfmt #32](https://github.com/astral-sh/ohm-rustfmt/pull/32)
+- [rustfmt #33](https://github.com/astral-sh/ohm-rustfmt/pull/33)
+- [rustfmt #34](https://github.com/astral-sh/ohm-rustfmt/pull/34)
 
 ## Rust compiler
 
