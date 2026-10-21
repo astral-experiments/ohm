@@ -236,14 +236,11 @@ class FixtureValidationTests(ReplayTestCase):
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
-            baseline["provenance"]["fixtures"]["ruff"]["fixture_sha256"],
-            hashlib.sha256(fixture.read_bytes()).hexdigest(),
-        )
-        self.assertEqual(
-            baseline["provenance"]["wrapper"]["fixtures"][
-                str(fixture.relative_to(SCRIPTS.parent))
-            ],
-            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+            {
+                Path(name).name: digest
+                for name, digest in baseline["provenance"]["wrapper"]["fixtures"].items()
+            },
+            {fixture.name: hashlib.sha256(fixture.read_bytes()).hexdigest()},
         )
         commands = baseline["commands"]["ruff"]
         expected = [
@@ -260,18 +257,17 @@ class FixtureValidationTests(ReplayTestCase):
         fixture = SCRIPTS / "session_replays" / "ruff-rust-1.99.json"
         scenario = replay.load_scenario(fixture)
         baseline = latest_reports()["sessions"]
-        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertEqual(
-            baseline["provenance"]["fixtures"]["ruff"]["fixture_sha256"],
-            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+            baseline["order_by_project"]["ruff"],
+            [["stock", "ohm"], ["ohm", "stock"]],
         )
+        wrapper = baseline["provenance"]["wrapper"]["by_project"]["ruff"]
         self.assertEqual(
-            baseline["provenance"]["wrapper"]["fixtures"][
-                str(fixture.relative_to(SCRIPTS.parent))
-            ],
-            hashlib.sha256(fixture.read_bytes()).hexdigest(),
+            {Path(name).name: digest for name, digest in wrapper["fixtures"].items()},
+            {fixture.name: hashlib.sha256(fixture.read_bytes()).hexdigest()},
         )
-        self.assertEqual(baseline["sessions"][0]["session"], scenario.session)
+        session = next(s for s in baseline["sessions"] if s["project"] == "ruff")
+        self.assertEqual(session["session"], scenario.session)
         self.assertTrue(baseline["methodology"]["all_commands_succeeded"])
         self.assertEqual(baseline["methodology"]["external_compilations_observed"], 0)
         commands = baseline["commands"]["ruff"]
@@ -289,9 +285,10 @@ class FixtureValidationTests(ReplayTestCase):
             )
         for toolchain in ("stock", "ohm"):
             self.assertEqual(
-                len(baseline["timed_session_seconds"]["ruff"][toolchain]), 2
+                len(baseline["timed_session_seconds"]["ruff"][toolchain]),
+                baseline["repetitions"],
             )
-            for repetition in range(2):
+            for repetition in range(baseline["repetitions"]):
                 self.assertAlmostEqual(
                     sum(
                         command["wall_seconds"][toolchain][repetition]
@@ -1877,9 +1874,17 @@ class CommandResultTests(ReplayTestCase):
                     )
                     self.assertEqual(observed["returncode"], 100)
                 else:
-                    with self.assertRaises(replay.BenchmarkError):
+                    with self.assertRaises(replay.BenchmarkError) as failure:
                         runner.run_command(
                             scenario, worktree, step, "stock", "1.99.0", 0, 1
+                        )
+                    if status != step["expected_exit"]:
+                        self.assertEqual(
+                            failure.exception.command_sample["returncode"], status
+                        )
+                        self.assertEqual(
+                            Path(failure.exception.command_sample["log"]).read_text(),
+                            output,
                         )
 
     def test_python_helper_uses_the_selected_target_directory(self) -> None:

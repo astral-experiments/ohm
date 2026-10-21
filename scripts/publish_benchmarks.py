@@ -13,11 +13,14 @@ import subprocess
 import tempfile
 import zipfile
 
+import workflow_results
+
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "scripts/benchmark_results"
 KINDS = ("workflow", "sessions", "historical", "ablation", "disk")
 TY_WORKTREE_REPORT = "ty-worktree.json"
 TY_SCENARIO = "scripts/session_replays/ty-29327.json"
+DEVELOPER_WORKFLOW_REPORT = "developer-workflows.json"
 
 
 def load(path):
@@ -348,14 +351,14 @@ def render_tables(reports, ty_worktree, ty_scenario):
             rows,
         )
     features = [
-        (("uv", "build-check", "transition"), ["uv", "Build, then check", "`uv`"]),
+        (("uv", "build-check", "transition"), ["uv", "Check after build", "`uv`"]),
         (
             ("uv", "shared-build", "reuse"),
             ["uv", "Shared-worktree build", "`uv-normalize`"],
         ),
         (
             ("codex-core", "build-check", "transition"),
-            ["Codex", "Build, then check", "`codex-core`"],
+            ["Codex", "Check after build", "`codex-core`"],
         ),
         (("codex-core", "fmt", "noop"), ["Codex", "No-op formatting", "Workspace"]),
         (
@@ -399,6 +402,17 @@ def render_tables(reports, ty_worktree, ty_scenario):
 def documents(reports):
     tables, headlines = render_tables(
         reports, load(RESULTS / TY_WORKTREE_REPORT), load(ROOT / TY_SCENARIO)
+    )
+    workflows = load(RESULTS / DEVELOPER_WORKFLOW_REPORT)
+    tables["developer-workflows"] = table(
+        [
+            "Project",
+            "Workflow",
+            f"Rust {workflows['rust_version']}",
+            f"Ohm {workflow_results.toolchain_label(workflows)}",
+            "Time saved",
+        ],
+        workflow_results.table_rows(workflows),
     )
     result = {
         name: (ROOT / name).read_text() for name in ("README.md", "BENCHMARKS.md")
@@ -552,14 +566,20 @@ def main():
         nargs="?",
         help="directory of audited workflow, sessions, historical, ablation, and disk JSON reports",
     )
-    parser.add_argument(
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument(
         "--check",
         action="store_true",
         help="verify the latest checked-in reports and generated tables without publishing",
     )
+    modes.add_argument(
+        "--render",
+        action="store_true",
+        help="regenerate the Markdown tables from the checked-in reports",
+    )
     args = parser.parse_args()
-    if args.check == (args.reports is not None):
-        parser.error("select a reports directory or --check")
+    if (args.check or args.render) == (args.reports is not None):
+        parser.error("select a reports directory, --check, or --render")
     if args.check:
         for name, expected in documents(latest_reports()).items():
             if normalized_markdown((ROOT / name).read_text()) != normalized_markdown(
@@ -567,6 +587,15 @@ def main():
             ):
                 raise ValueError(f"{name}: benchmark tables are stale")
         print("Benchmark reports and tables match")
+    elif args.render:
+        prettier = ROOT / "node_modules/.bin/prettier"
+        if not prettier.is_file():
+            raise ValueError("Run npm ci --ignore-scripts before rendering benchmarks")
+        updated = documents(latest_reports())
+        for name, text in updated.items():
+            (ROOT / name).write_text(text)
+        subprocess.run([str(prettier), "--write", *updated], cwd=ROOT, check=True)
+        print("Benchmark tables refreshed")
     else:
         publish(args.reports)
 

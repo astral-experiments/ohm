@@ -1,0 +1,552 @@
+{
+  "schema_version": 1,
+  "purpose": "Isolate the Ruff edited-check effect of compact public-API graph nodes and inline small edge sets against the compiler before these changes.",
+  "project": {
+    "name": "Ruff/ty",
+    "revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+    "package": "ty_python_semantic",
+    "edit": {
+      "path": "crates/ty_python_semantic/src/types.rs",
+      "before": "DynamicType::Unknown\n                    | DynamicType::UnknownGeneric(_)",
+      "after": "DynamicType::UnknownGeneric(_)\n                    | DynamicType::Unknown",
+      "crate": "ty_python_semantic"
+    }
+  },
+  "toolchains": {
+    "parent": {
+      "selector": "ohm-1.99.0-5-edited-check-parent-ce4ad82a378c",
+      "rust_revision": "ce4ad82a378c677ae07220c882a690d48fcf523c",
+      "cargo_revision": "3d9852572bdaa8e7c627356a0c52533717888988",
+      "binaries_sha256": {
+        "bin/rustc": "03ae7660096b13026e5d5c97f496b79f74144e71874ef2345b5cd0d1f1a98408",
+        "bin/cargo": "7346b8ea8b6bc0601140a25fd740b3e9a822ec77ac05c668b3e50571a290fb81",
+        "lib/librustc_driver-160d3f1cceded3e8.so": "b3c169974cfe72fe7cc58aa6432f3bf18a0dfaf22843fe002e53b1f4312ea2b0"
+      }
+    },
+    "candidate": {
+      "selector": "ohm-1.99.0-5-edited-check-sso-72096bc6b3fc",
+      "rust_revision": "72096bc6b3fc4443647fe05deb4ae473b49043f3",
+      "cargo_revision": "3d9852572bdaa8e7c627356a0c52533717888988",
+      "binaries_sha256": {
+        "bin/rustc": "03ae7660096b13026e5d5c97f496b79f74144e71874ef2345b5cd0d1f1a98408",
+        "bin/cargo": "7346b8ea8b6bc0601140a25fd740b3e9a822ec77ac05c668b3e50571a290fb81",
+        "lib/librustc_driver-160d3f1cceded3e8.so": "51f2e1fdc1cf0fffa798ae57d7d00bdf7760086295ac9c190e69345f883671f9"
+      }
+    }
+  },
+  "protocol": {
+    "pairs": 64,
+    "sample_size_policy": "Fixed before inspecting any timings from this candidate; independent of the eight-pair screening run.",
+    "logical_cpus": 16,
+    "cargo_jobs": 8,
+    "command": [
+      "cargo",
+      "+<lane>",
+      "check",
+      "-p",
+      "ty_python_semantic",
+      "--lib",
+      "--locked"
+    ],
+    "source_path": "Same checkout for both lanes; separate stable target and shared-build directories.",
+    "warmup": "Untimed actual edit and restore in both lanes before measuring; every measured edit and subsequent restore recompiles exactly one crate.",
+    "order": "Alternating parent/candidate order by pair.",
+    "instrumentation": "None; normal Cargo jobserver inheritance.",
+    "noise_guard": "30-second idle admission (at least 95% idle, at most 0.5% I/O wait and 0.1% steal); reject unrelated compilers, steal above 0.1%, or three consecutive two-second intervals above 5% external CPU.",
+    "compiler_build": "Same Cargo binary, stage1 compiler, LLVM SDK, optimization settings, and retained PGO/BOLT profiles in both lanes.",
+    "environment": {
+      "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+      "CARGO_PROFILE_DEV_LTO": "off",
+      "CARGO_PROFILE_DEV_DEBUG": "line-tables-only",
+      "CARGO_BUILD_JOBS": "8",
+      "CARGO_INCREMENTAL": "1",
+      "CARGO_TERM_COLOR": "never",
+      "CARGO_NET_OFFLINE": "true",
+      "CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST": "all",
+      "CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST": "all"
+    }
+  },
+  "started_at": "2026-10-20T22:15:44.956482+00:00",
+  "finished_at": "2026-10-20T23:48:20.632113+00:00",
+  "summary": {
+    "samples_per_lane": 64,
+    "median_seconds": {
+      "parent": 8.950535816499723,
+      "candidate": 8.5942749095002
+    },
+    "reduction_in_medians_percent": 3.9803304997984568,
+    "candidate_faster_pairs": 53,
+    "paired_median_reduction_percent": 2.9979712849705296,
+    "paired_median_bootstrap_95_percent_interval": [
+      1.8907808009769766, 4.090042188061233
+    ],
+    "discarded": 7,
+    "failures": 0
+  },
+  "uncertainty_method": {
+    "statistic": "Median of the per-pair percentage time reductions.",
+    "method": "Percentile bootstrap over pairs.",
+    "resamples": 20000,
+    "seed": 20261020,
+    "sorted_interval_indices_zero_based": [500, 19499],
+    "scope": "Uncertainty within this fixed project, host, edit, and toolchain comparison."
+  },
+  "measurements": [
+    {
+      "pair": 1,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.948549232000005,
+      "candidate_seconds": 9.180480512999566,
+      "reduction_percent": -2.591831088889518
+    },
+    {
+      "pair": 2,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.679979920001642,
+      "candidate_seconds": 8.999818343998413,
+      "reduction_percent": -3.684782994252722
+    },
+    {
+      "pair": 3,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.819140298999628,
+      "candidate_seconds": 8.520339675000287,
+      "reduction_percent": 3.3880924202241647
+    },
+    {
+      "pair": 4,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.049166513999808,
+      "candidate_seconds": 8.915436688001137,
+      "reduction_percent": 1.4778137388872237
+    },
+    {
+      "pair": 5,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.99112469099964,
+      "candidate_seconds": 8.7807968420002,
+      "reduction_percent": 2.339282973241208
+    },
+    {
+      "pair": 6,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.665858844000468,
+      "candidate_seconds": 10.060173902000315,
+      "reduction_percent": -16.089750399813596
+    },
+    {
+      "pair": 7,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.917957055999068,
+      "candidate_seconds": 8.468182734999573,
+      "reduction_percent": 5.0434681191577795
+    },
+    {
+      "pair": 8,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.712687526998707,
+      "candidate_seconds": 8.786181146000672,
+      "reduction_percent": -0.8435240994724591
+    },
+    {
+      "pair": 9,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.650244422000469,
+      "candidate_seconds": 9.127435088999846,
+      "reduction_percent": -5.516499230769956
+    },
+    {
+      "pair": 10,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.645908902999508,
+      "candidate_seconds": 8.472775158999866,
+      "reduction_percent": 2.002493271003325
+    },
+    {
+      "pair": 11,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.980609493000884,
+      "candidate_seconds": 8.478313649000484,
+      "reduction_percent": 5.593115304611218
+    },
+    {
+      "pair": 12,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.020643223000661,
+      "candidate_seconds": 9.04469711999991,
+      "reduction_percent": -0.2666539004437807
+    },
+    {
+      "pair": 13,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.832741334001184,
+      "candidate_seconds": 8.321024674998625,
+      "reduction_percent": 5.793407048304832
+    },
+    {
+      "pair": 14,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.790790333001496,
+      "candidate_seconds": 8.54132087400103,
+      "reduction_percent": 2.837850176723389
+    },
+    {
+      "pair": 15,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.999700600999859,
+      "candidate_seconds": 8.534384972001135,
+      "reduction_percent": 5.170345655132436
+    },
+    {
+      "pair": 16,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.97132175600018,
+      "candidate_seconds": 8.701047481999922,
+      "reduction_percent": 3.0126472035126084
+    },
+    {
+      "pair": 17,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.003704216000187,
+      "candidate_seconds": 8.490847881999798,
+      "reduction_percent": 5.696059329548042
+    },
+    {
+      "pair": 18,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.704306620000352,
+      "candidate_seconds": 8.56980065300013,
+      "reduction_percent": 1.5452806624615123
+    },
+    {
+      "pair": 19,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.711142132000532,
+      "candidate_seconds": 9.06021871899975,
+      "reduction_percent": -4.007242468434513
+    },
+    {
+      "pair": 20,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.116858138999305,
+      "candidate_seconds": 8.818663005000417,
+      "reduction_percent": 3.270810288506021
+    },
+    {
+      "pair": 21,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.106835196998873,
+      "candidate_seconds": 8.278125120999903,
+      "reduction_percent": 9.09986903322977
+    },
+    {
+      "pair": 22,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.101939094000045,
+      "candidate_seconds": 8.828401400000075,
+      "reduction_percent": 3.005268340899847
+    },
+    {
+      "pair": 23,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.356528886000888,
+      "candidate_seconds": 8.590956797001127,
+      "reduction_percent": 8.182223325844696
+    },
+    {
+      "pair": 24,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.753698374001033,
+      "candidate_seconds": 8.343653490999714,
+      "reduction_percent": 4.684247337321734
+    },
+    {
+      "pair": 25,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.112295963001088,
+      "candidate_seconds": 8.381180459999086,
+      "reduction_percent": 8.02339504742351
+    },
+    {
+      "pair": 26,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.997190583000702,
+      "candidate_seconds": 8.402101276000394,
+      "reduction_percent": 6.614168072916781
+    },
+    {
+      "pair": 27,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.959004188000108,
+      "candidate_seconds": 8.405965441001172,
+      "reduction_percent": 6.172993509029601
+    },
+    {
+      "pair": 28,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.661474583001109,
+      "candidate_seconds": 8.576665678001518,
+      "reduction_percent": 0.9791508846084374
+    },
+    {
+      "pair": 29,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.883742886000618,
+      "candidate_seconds": 8.851999606999016,
+      "reduction_percent": 0.35731874964126664
+    },
+    {
+      "pair": 30,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.904353351999816,
+      "candidate_seconds": 8.67284849600037,
+      "reduction_percent": 2.599906437309718
+    },
+    {
+      "pair": 31,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.930888808999953,
+      "candidate_seconds": 8.482182272999125,
+      "reduction_percent": 5.024209186756989
+    },
+    {
+      "pair": 32,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.982818823998969,
+      "candidate_seconds": 8.876879960000224,
+      "reduction_percent": 1.1793498908796107
+    },
+    {
+      "pair": 33,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.49992586299959,
+      "candidate_seconds": 8.235576806999234,
+      "reduction_percent": 13.30904129394057
+    },
+    {
+      "pair": 34,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.57088133599973,
+      "candidate_seconds": 8.68120849800107,
+      "reduction_percent": -1.287232405586347
+    },
+    {
+      "pair": 35,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.407182822998948,
+      "candidate_seconds": 8.42766841500088,
+      "reduction_percent": 10.412409606873197
+    },
+    {
+      "pair": 36,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.501968091999515,
+      "candidate_seconds": 8.470367557998543,
+      "reduction_percent": 0.37168492823101973
+    },
+    {
+      "pair": 37,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.152841803001138,
+      "candidate_seconds": 8.373223583001163,
+      "reduction_percent": 8.517772258932133
+    },
+    {
+      "pair": 38,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.825013652000052,
+      "candidate_seconds": 8.561086243000318,
+      "reduction_percent": 2.9906742290412125
+    },
+    {
+      "pair": 39,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.051732890000494,
+      "candidate_seconds": 8.264155673999994,
+      "reduction_percent": 8.700844640152184
+    },
+    {
+      "pair": 40,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.899648876000356,
+      "candidate_seconds": 8.939206168000965,
+      "reduction_percent": -0.44448149080671406
+    },
+    {
+      "pair": 41,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.74269361000006,
+      "candidate_seconds": 8.516241145000095,
+      "reduction_percent": 2.590191022374899
+    },
+    {
+      "pair": 42,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.192188962000728,
+      "candidate_seconds": 8.688994905000072,
+      "reduction_percent": 5.474148313103566
+    },
+    {
+      "pair": 43,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.73826567300057,
+      "candidate_seconds": 8.734140483999,
+      "reduction_percent": 0.04720832663986929
+    },
+    {
+      "pair": 44,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.952522400999442,
+      "candidate_seconds": 8.639556806998371,
+      "reduction_percent": 3.495837038800731
+    },
+    {
+      "pair": 45,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.8401277640005,
+      "candidate_seconds": 8.52491595399988,
+      "reduction_percent": 3.5656929222703138
+    },
+    {
+      "pair": 46,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.678702388000602,
+      "candidate_seconds": 8.673250132998874,
+      "reduction_percent": 0.06282338946507204
+    },
+    {
+      "pair": 47,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.002751555000941,
+      "candidate_seconds": 8.329136405998725,
+      "reduction_percent": 7.482325207875251
+    },
+    {
+      "pair": 48,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.140301403000194,
+      "candidate_seconds": 8.597593021999273,
+      "reduction_percent": 5.937532659730271
+    },
+    {
+      "pair": 49,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.034428758999638,
+      "candidate_seconds": 8.453389057000095,
+      "reduction_percent": 6.431393920957551
+    },
+    {
+      "pair": 50,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.71101037599874,
+      "candidate_seconds": 8.796929056999943,
+      "reduction_percent": -0.9863227948612385
+    },
+    {
+      "pair": 51,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.772150492000947,
+      "candidate_seconds": 8.768700523000007,
+      "reduction_percent": 0.03932865725554402
+    },
+    {
+      "pair": 52,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.795569523001177,
+      "candidate_seconds": 8.844459369000106,
+      "reduction_percent": -0.5558462800058228
+    },
+    {
+      "pair": 53,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.79216817500128,
+      "candidate_seconds": 8.53675768299945,
+      "reduction_percent": 2.904977326617064
+    },
+    {
+      "pair": 54,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.33188344500013,
+      "candidate_seconds": 8.42246688600062,
+      "reduction_percent": 9.745262726001581
+    },
+    {
+      "pair": 55,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.169286450000072,
+      "candidate_seconds": 8.38553686999876,
+      "reduction_percent": 8.54755257429336
+    },
+    {
+      "pair": 56,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.80708232500183,
+      "candidate_seconds": 8.68509908300257,
+      "reduction_percent": 1.3850584960807044
+    },
+    {
+      "pair": 57,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.976891591999447,
+      "candidate_seconds": 8.627534897997975,
+      "reduction_percent": 3.891733462759339
+    },
+    {
+      "pair": 58,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.943666631999804,
+      "candidate_seconds": 8.854947536998225,
+      "reduction_percent": 0.9919767658171486
+    },
+    {
+      "pair": 59,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.064308577002521,
+      "candidate_seconds": 8.861605171998235,
+      "reduction_percent": 2.236280939492441
+    },
+    {
+      "pair": 60,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.161039866001374,
+      "candidate_seconds": 9.14060898399839,
+      "reduction_percent": 0.2230192456514346
+    },
+    {
+      "pair": 61,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 9.101724473999639,
+      "candidate_seconds": 8.456753097001638,
+      "reduction_percent": 7.086254685476945
+    },
+    {
+      "pair": 62,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 8.87976739700025,
+      "candidate_seconds": 8.845393402003538,
+      "reduction_percent": 0.3871046780834053
+    },
+    {
+      "pair": 63,
+      "order": ["parent", "candidate"],
+      "parent_seconds": 8.971670236001955,
+      "candidate_seconds": 8.456004108000343,
+      "reduction_percent": 5.747716026524497
+    },
+    {
+      "pair": 64,
+      "order": ["candidate", "parent"],
+      "parent_seconds": 9.075730566997663,
+      "candidate_seconds": 8.79424301200197,
+      "reduction_percent": 3.1015415554453973
+    }
+  ],
+  "evidence": {
+    "archive_name": "ruff-sso-confirmation-evidence.tar.gz",
+    "publication": "unpublished",
+    "sha256": "9ec8e5651996561d37f78df52bb99e064d8db107f2c444c7a40ff8c473aa8ad2",
+    "bytes": 253947,
+    "verified_files": 369
+  },
+  "build_provenance": "ruff-edited-check-build.json"
+}
