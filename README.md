@@ -171,10 +171,7 @@ These measurements use the published Ohm 1.99.0-6 binaries. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the release, component
 sources, and binary hashes.
 
-The tables leave test/build overlap disabled. A
-[separate comparison](scripts/benchmark_results/ready-tests.md) uses the same binaries with
-`CARGO_UNSTABLE_OHM_READY_TESTS=true`. Each study's cache trust settings are documented in the
-[benchmark guide](BENCHMARKS.md).
+Each study's cache trust settings are documented in the [benchmark guide](BENCHMARKS.md).
 
 Times are medians of four runs on each project's devbox, including compilation and one focused test
 where shown. A failure count replaces the timing if any repetition fails; that row has no speedup.

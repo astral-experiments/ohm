@@ -85,8 +85,8 @@ and the release benchmarks.
 
 The timer covers the entire measured sequence, including applying the edit and runner overhead.
 Warmups and source preparation are excluded. Every sample gets fresh target and shared-build
-directories, which remain continuous throughout that sample. The runner rotates and reverses configuration order
-by repetition and workflow. Medians are calculated from complete sequences; adding independently
+directories, which remain continuous throughout that sample. The runner reverses toolchain order
+between repetitions and workflows. Medians are calculated from complete sequences; adding independently
 measured command medians would lose the effects of switching commands.
 
 | Project | Target package       | Edited dependency    | Focused test                                                                 |
@@ -137,25 +137,6 @@ refresh the README table:
 ```console
 python3 scripts/publish_benchmarks.py --render
 ```
-
-## Compare test/build overlap
-
-Add `--compare-ready-tests` to the developer-workflow, individual-command, or session runner to
-measure a third configuration. It uses the same Ohm binaries with
-`CARGO_UNSTABLE_OHM_READY_TESTS=true`; the runner clears that setting for the other configurations.
-The published 1.99.0-6 runs include all three configurations, and the
-[overlap report](scripts/benchmark_results/ready-tests.md) compares the two Ohm variants.
-
-This option lets Cargo start an eligible test executable while other targets are still building.
-It does not apply to `cargo nextest`, which builds tests with `--no-run` before running them itself.
-Nextest workflows therefore serve as controls for timing variation. The report also includes a
-constructed uv workspace test workload and a parser-edit comparison, labeled separately from the
-recorded development sessions.
-
-The constructed workspace workload sets `RUST_TEST_THREADS=1` for every configuration because
-uv-client's parallel tests race over process-global certificate environment variables. This keeps
-tests serial within each executable; Cargo can still overlap test executables with compilation.
-The original parallel-test attempt is excluded in full and retained in the raw evidence.
 
 ## Run the individual-command benchmarks
 
@@ -223,7 +204,6 @@ Rust does not isolate changes between Ohm releases.
 
 - [ty bug-fix session and worktree startup](scripts/benchmark_results/ty-worktree.md)
 - [Workflow and disk-usage results](scripts/benchmark_results/)
-- [Opt-in test/build overlap](scripts/benchmark_results/ready-tests.md)
 - [Session fixtures and replay results](scripts/session_replays/)
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
@@ -235,8 +215,7 @@ Every comparison keeps all configurations and repetitions on one host. Host and 
 are recorded in each report; these measurements do not isolate changes from earlier Ohm releases.
 
 Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust
-to `all`; the ty session and developer workflows also set native-tool trust to `all`. The option
-comparison keeps those settings fixed and changes only `CARGO_UNSTABLE_OHM_READY_TESTS`.
+to `all`; the ty session and developer workflows also set native-tool trust to `all`.
 Linux runs retain full-VM CPU and process traces and require at least 60 GiB free during measurement.
 
 The [APFS study](scripts/benchmark_results/disk.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. Its source, tests, artifact isolation, and allocation are checked before the volume is removed; the evidence archive retains those checks. These measurements make no claim about elapsed time on the Mac.

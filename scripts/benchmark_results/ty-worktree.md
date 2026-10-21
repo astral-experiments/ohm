@@ -10,8 +10,6 @@ We compare stock Rust 1.99.0 with Ohm 1.99.0-6 on Linux. The session replays [Ru
 
 The session result is the mean of four replays; startup results are medians of three runs per configuration. Ohm uses a shared build directory and both trust opt-ins. Btrfs runs on a loopback filesystem backed by ext4.
 
-These tables leave test/build overlap disabled. The [separate option comparison](ready-tests.md) includes four additional ty replays with the same binaries and the option enabled. This session uses Nextest, whose build-only Cargo invocation disables early test execution.
-
 ## Session
 
 The replay adds a failing Markdown test, expands it, applies the Rust fix, runs focused and package tests, rebuilds ty, checks its diagnostics, and runs Clippy. It keeps the original `opt-level = 1` and the different features used by the CLI, tests, and Clippy. The initial CLI build is excluded from the session total.
@@ -62,7 +60,7 @@ After timing, we change only each child’s Markdown regression and run its orig
 - `opt-level = 1`, line-table debug information, LTO off, and the source's dependency profile overrides.
 - Cargo runs offline with verbose logging on both toolchains.
 - The session and trusted startup runs set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` and `CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST=all`.
-- Each repetition starts with fresh artifacts. Session runs rotate and reverse the three configurations; worktree configurations rotate.
+- Each repetition starts with fresh artifacts. Session configurations run in varied order; worktree configurations rotate.
 
 Runs wait for an idle host and restart if CPU monitoring detects interference. The [JSON report](ty-worktree.json) records the thresholds, samples, source checks, and rejected attempts. These measurements compare complete toolchains; they do not isolate individual optimizations or changes between Ohm releases.
 

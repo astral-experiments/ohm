@@ -29,7 +29,6 @@ jobs:
         run: |
           uv run scripts/benchmark.py --help
           python3 scripts/test_benchmark.py
-          python3 scripts/test_ready_test_benchmarks.py
           python3 scripts/benchmark_workflows.py --help
           python3 scripts/test_workflow_benchmarks.py
           python3 scripts/test_workflow_results.py

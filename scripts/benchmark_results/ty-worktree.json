@@ -34,11 +34,6 @@
       "shared_build_directory": true,
       "proc_macro_trust": "all",
       "native_tool_trust": "all"
-    },
-    "session_ready_tests_settings": {
-      "configuration": "ohm-ready-tests",
-      "CARGO_UNSTABLE_OHM_READY_TESTS": "true",
-      "activation": "The Nextest commands in this replay do not activate test-build overlap."
     }
   },
   "toolchains": {
@@ -77,7 +72,7 @@
     "session_repetitions": 4,
     "worktree_repetitions_per_filesystem": 3,
     "worktree_filesystems": ["ext4", "Btrfs loopback"],
-    "ordering": "Session runs rotate and reverse the three configurations; worktree configurations rotate.",
+    "ordering": "Session configurations run in varied order; worktree configurations rotate.",
     "session_total": "Nine commands, three edits, and runner overhead; baseline CLI warmup excluded.",
     "worktree_total": "Creation plus first focused validation; parent warmup and intermediate source checks excluded.",
     "aggregation": "Session totals use means; worktree and per-step timings use medians. Per-step medians need not sum to the session mean.",
@@ -148,36 +143,6 @@
         "maximum": 103.25840787700145
       },
       "compiler_invocations": [168, 168, 168, 168]
-    },
-    "ohm-ready-tests": {
-      "total": {
-        "samples": [
-          186.69192415097496, 184.12361748702824, 183.92604541301262,
-          178.5953414690448
-        ],
-        "median": 184.02483145002043,
-        "minimum": 178.5953414690448,
-        "maximum": 186.69192415097496
-      },
-      "commands": {
-        "samples": [
-          185.3157149919425, 182.7709459909238, 182.60433760500746,
-          177.27390562201617
-        ],
-        "median": 182.68764179796563,
-        "minimum": 177.27390562201617,
-        "maximum": 185.3157149919425
-      },
-      "warmup": {
-        "samples": [
-          97.00832292699488, 94.97953905700706, 94.38577110902406,
-          94.68150150496513
-        ],
-        "median": 94.8305202809861,
-        "minimum": 94.38577110902406,
-        "maximum": 97.00832292699488
-      },
-      "compiler_invocations": [168, 168, 168, 168]
     }
   },
   "session_steps": [
@@ -218,24 +183,6 @@
           "minimum": 0.38,
           "maximum": 0.44
         }
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            0.47687866300111637, 0.4856901419698261, 0.4525588289834559,
-            0.4784795949817635
-          ],
-          "median": 0.47767912899143994,
-          "minimum": 0.4525588289834559,
-          "maximum": 0.4856901419698261
-        },
-        "compiler_invocations": [0, 0, 0, 0],
-        "cargo_reported_build_seconds": {
-          "samples": [0.43, 0.43, 0.4, 0.42],
-          "median": 0.425,
-          "minimum": 0.4,
-          "maximum": 0.43
-        }
       }
     },
     {
@@ -261,18 +208,6 @@
           "median": 0.38726438098819926,
           "minimum": 0.3864369069924578,
           "maximum": 0.988349589984864
-        },
-        "compiler_invocations": [0, 0, 0, 0]
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            0.38606925698695704, 0.38648019602987915, 0.38604314101394266,
-            0.3863294670009054
-          ],
-          "median": 0.38619936199393123,
-          "minimum": 0.38604314101394266,
-          "maximum": 0.38648019602987915
         },
         "compiler_invocations": [0, 0, 0, 0]
       }
@@ -326,30 +261,6 @@
           "minimum": 0.596,
           "maximum": 0.623
         }
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            59.4666012749658, 60.585842813015915, 59.36641508399043,
-            59.049697908980306
-          ],
-          "median": 59.416508179478114,
-          "minimum": 59.049697908980306,
-          "maximum": 60.585842813015915
-        },
-        "compiler_invocations": [116, 116, 116, 116],
-        "cargo_reported_build_seconds": {
-          "samples": [58.37, 59.44, 58.25, 57.95],
-          "median": 58.31,
-          "minimum": 57.95,
-          "maximum": 59.44
-        },
-        "nextest_reported_test_seconds": {
-          "samples": [0.605, 0.606, 0.633, 0.611],
-          "median": 0.6085,
-          "minimum": 0.605,
-          "maximum": 0.633
-        }
       }
     },
     {
@@ -400,30 +311,6 @@
           "median": 0.62,
           "minimum": 0.611,
           "maximum": 0.968
-        }
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            1.9419617600506172, 1.6879958299687132, 1.381465393002145,
-            1.3483519119909033
-          ],
-          "median": 1.534730611485429,
-          "minimum": 1.3483519119909033,
-          "maximum": 1.9419617600506172
-        },
-        "compiler_invocations": [0, 0, 0, 0],
-        "cargo_reported_build_seconds": {
-          "samples": [0.51, 0.29, 0.29, 0.29],
-          "median": 0.29,
-          "minimum": 0.29,
-          "maximum": 0.51
-        },
-        "nextest_reported_test_seconds": {
-          "samples": [0.665, 0.871, 0.623, 0.622],
-          "median": 0.644,
-          "minimum": 0.622,
-          "maximum": 0.871
         }
       }
     },
@@ -476,30 +363,6 @@
           "minimum": 0.602,
           "maximum": 0.664
         }
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            17.946762165986, 17.387270241975784, 16.220946798974182,
-            14.756587603013031
-          ],
-          "median": 16.804108520474983,
-          "minimum": 14.756587603013031,
-          "maximum": 17.946762165986
-        },
-        "compiler_invocations": [3, 3, 3, 3],
-        "cargo_reported_build_seconds": {
-          "samples": [16.79, 15.98, 15.16, 13.71],
-          "median": 15.57,
-          "minimum": 13.71,
-          "maximum": 16.79
-        },
-        "nextest_reported_test_seconds": {
-          "samples": [0.618, 0.606, 0.619, 0.611],
-          "median": 0.6145,
-          "minimum": 0.606,
-          "maximum": 0.619
-        }
       }
     },
     {
@@ -551,30 +414,6 @@
           "minimum": 7.323,
           "maximum": 7.702
         }
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            51.44405831099721, 50.203603977977764, 50.99777415103745,
-            48.79381859797286
-          ],
-          "median": 50.600689064507606,
-          "minimum": 48.79381859797286,
-          "maximum": 51.44405831099721
-        },
-        "compiler_invocations": [2, 2, 2, 2],
-        "cargo_reported_build_seconds": {
-          "samples": [42.87, 42.09, 42.56, 40.92],
-          "median": 42.325,
-          "minimum": 40.92,
-          "maximum": 42.87
-        },
-        "nextest_reported_test_seconds": {
-          "samples": [8.056, 7.574, 7.819, 7.406],
-          "median": 7.6965,
-          "minimum": 7.406,
-          "maximum": 8.056
-        }
       }
     },
     {
@@ -614,24 +453,6 @@
           "minimum": 23.83,
           "maximum": 24.96
         }
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            24.261905987979844, 23.549897428019904, 25.526776878978126,
-            23.937470982025843
-          ],
-          "median": 24.099688485002844,
-          "minimum": 23.549897428019904,
-          "maximum": 25.526776878978126
-        },
-        "compiler_invocations": [6, 6, 6, 6],
-        "cargo_reported_build_seconds": {
-          "samples": [24.17, 23.47, 25.42, 23.86],
-          "median": 24.015,
-          "minimum": 23.47,
-          "maximum": 25.42
-        }
       }
     },
     {
@@ -657,18 +478,6 @@
           "median": 2.37701044647838,
           "minimum": 2.361474660981912,
           "maximum": 2.57827694498701
-        },
-        "compiler_invocations": [0, 0, 0, 0]
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            2.3247801740071736, 2.341818119981326, 2.3678406230174005,
-            2.362692352035083
-          ],
-          "median": 2.3522552360082045,
-          "minimum": 2.3247801740071736,
-          "maximum": 2.3678406230174005
         },
         "compiler_invocations": [0, 0, 0, 0]
       }
@@ -709,24 +518,6 @@
           "median": 26.105,
           "minimum": 25.8,
           "maximum": 27.13
-        }
-      },
-      "ohm-ready-tests": {
-        "seconds": {
-          "samples": [
-            27.0666973979678, 26.14234724198468, 25.904516706010327,
-            26.16047720401548
-          ],
-          "median": 26.15141222300008,
-          "minimum": 25.904516706010327,
-          "maximum": 27.0666973979678
-        },
-        "compiler_invocations": [41, 41, 41, 41],
-        "cargo_reported_build_seconds": {
-          "samples": [26.94, 26.01, 25.75, 26.02],
-          "median": 26.015,
-          "minimum": 25.75,
-          "maximum": 26.94
         }
       }
     }
@@ -1010,7 +801,8 @@
         4.91202217427153e-5, 4.279807211145935e-5, 8.466504391999153e-5
       ],
       "minimum_free_gib": 219.09242630004883
-    }
+    },
+    "scope": "Audit of the full archived campaign, including measurements omitted from this report."
   },
   "excluded_attempts": {
     "ext4": {
@@ -1037,5 +829,6 @@
     "sha256": "777b898880f27fba5dd5fe5638f780f970f52963b8bc028e5cd4ffcc9e76ad73",
     "bytes": 11819152,
     "files": 553
-  }
+  },
+  "publication_scope": "The checked-in measurements are a subset of the archived campaign. Original run settings and omitted measurements remain in the linked evidence."
 }

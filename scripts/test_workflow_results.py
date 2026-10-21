@@ -127,71 +127,9 @@ def synthetic_runs():
     return runs
 
 
-def synthetic_ready_runs():
-    runs = synthetic_runs()
-    for run in runs:
-        run["configuration"]["compare_ready_tests"] = True
-        run["configuration"]["toolchains"]["ohm-ready-tests"] = "ohm-1.99.0-5"
-        run["metadata"]["toolchains"]["ohm-ready-tests"] = copy.deepcopy(
-            run["metadata"]["toolchains"]["ohm"]
-        )
-        for sample in list(run["samples"]):
-            for command in [
-                sample["normalization"],
-                *sample["warmups"],
-                *sample["commands"],
-            ]:
-                command["benchmark_environment"] = {}
-            if sample["toolchain"] != "ohm":
-                continue
-            overlap = copy.deepcopy(sample)
-            overlap["toolchain"] = "ohm-ready-tests"
-            overlap["target_directory"] = sample["target_directory"].replace(
-                "/ohm/", "/ohm-ready-tests/"
-            )
-            for command in [
-                overlap["normalization"],
-                *overlap["warmups"],
-                *overlap["commands"],
-            ]:
-                command["benchmark_environment"]["CARGO_UNSTABLE_OHM_READY_TESTS"] = (
-                    "true"
-                )
-            run["samples"].append(overlap)
-    return runs
-
-
 class WorkflowReportTests(unittest.TestCase):
     def setUp(self):
         self.report = workflow_results.build_report(synthetic_runs())
-
-    def test_overlap_preserves_the_default_comparison(self):
-        report = workflow_results.build_report(synthetic_ready_runs())
-        for baseline, row in zip(
-            self.report["comparisons"], report["comparisons"], strict=True
-        ):
-            self.assertEqual({key: row[key] for key in baseline}, baseline)
-            self.assertEqual(row["ready_tests_seconds"], row["ohm_seconds"])
-            self.assertEqual(row["ready_tests_percent_saved"], 0)
-
-    def test_overlap_rejects_different_binaries_settings_or_source(self):
-        report = workflow_results.build_report(synthetic_ready_runs())
-        for field in ("binary", "setting", "source"):
-            changed = copy.deepcopy(report)
-            run = changed["runs"][0]
-            sample = next(
-                s for s in run["samples"] if s["toolchain"] == "ohm-ready-tests"
-            )
-            if field == "binary":
-                run["metadata"]["toolchains"]["ohm-ready-tests"]["cargo"]["sha256"] = (
-                    "f" * 64
-                )
-            elif field == "setting":
-                sample["commands"][0]["benchmark_environment"].clear()
-            else:
-                sample["edited_diff_sha256"] = "e" * 64
-            with self.subTest(field=field), self.assertRaises(ValueError):
-                workflow_results.validate(changed)
 
     def test_uses_median_of_complete_sequences(self):
         row = next(
@@ -267,9 +205,7 @@ class WorkflowReportTests(unittest.TestCase):
                     workflow_results.toolchain_label(report), f"1.99.0-5 + {label}"
                 )
                 if cargo_revision:
-                    self.assertEqual(
-                        report["ohm_cargo_source_revision"], cargo_revision
-                    )
+                    self.assertEqual(report["ohm_cargo_source_revision"], cargo_revision)
                     changed = copy.deepcopy(report)
                     changed["ohm_cargo_source_revision"] = "4" * 40
                     with self.assertRaises(ValueError):

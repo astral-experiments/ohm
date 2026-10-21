@@ -71,9 +71,6 @@ def comparisons(report):
         configuration = run["configuration"]
         metadata = run["metadata"]
         selectors = {"stock": report["rust_version"], "ohm": report["ohm_release"]}
-        ready_tests = configuration.get("compare_ready_tests", False)
-        if ready_tests:
-            selectors["ohm-ready-tests"] = report["ohm_release"]
         if configuration["toolchains"] != selectors:
             raise ValueError("Workflow toolchain versions differ")
         if (
@@ -103,8 +100,6 @@ def comparisons(report):
         identities = metadata["toolchains"]
         if set(identities) != set(selectors):
             raise ValueError("Workflow compiler identities are incomplete")
-        if ready_tests and identities["ohm-ready-tests"] != identities["ohm"]:
-            raise ValueError("The overlap comparison must use the same Ohm binaries")
         for lane, tools in identities.items():
             if set(tools) != {"cargo", "rustc", "rustfmt", "clippy-driver"} or any(
                 not re.fullmatch(r"[0-9a-f]{64}", tool["sha256"])
@@ -112,10 +107,7 @@ def comparisons(report):
             ):
                 raise ValueError("Workflow compiler hashes are incomplete")
             compiler_release = report["ohm_release"].partition("-cargo-")[0]
-            if (
-                lane.startswith("ohm")
-                and compiler_release not in tools["rustc"]["version"]
-            ):
+            if lane == "ohm" and compiler_release not in tools["rustc"]["version"]:
                 raise ValueError("Ohm compiler does not identify the measured release")
             libraries = tools["rustc"].get("libraries", {})
             if (
@@ -127,14 +119,10 @@ def comparisons(report):
                 )
             ):
                 raise ValueError("Workflow compiler library hashes are incomplete")
-            if lane.startswith("ohm") and (
-                revision := report.get("ohm_source_revision")
-            ):
+            if lane == "ohm" and (revision := report.get("ohm_source_revision")):
                 if f"commit-hash: {revision}" not in tools["rustc"]["version"]:
                     raise ValueError("Ohm compiler source revision differs")
-            if lane.startswith("ohm") and (
-                revision := report.get("ohm_cargo_source_revision")
-            ):
+            if lane == "ohm" and (revision := report.get("ohm_cargo_source_revision")):
                 if f"commit-hash: {revision}" not in tools["cargo"]["version"]:
                     raise ValueError("Ohm Cargo source revision differs")
         if compiler_identities is not None and identities != compiler_identities:
@@ -217,14 +205,6 @@ def comparisons(report):
                     raise ValueError("Invalid or contaminated workflow command")
                 if not re.fullmatch(r"[0-9a-f]{64}", command["log_sha256"]):
                     raise ValueError("Workflow log has no content identity")
-                if ready_tests:
-                    environment = command.get("benchmark_environment")
-                    expected = "true" if lane == "ohm-ready-tests" else None
-                    if (
-                        not isinstance(environment, dict)
-                        or environment.get("CARGO_UNSTABLE_OHM_READY_TESTS") != expected
-                    ):
-                        raise ValueError("The recorded test-overlap setting differs")
             for command in [*sample["warmups"], *sample["commands"]]:
                 expected = [
                     "cargo",
@@ -328,15 +308,14 @@ def comparisons(report):
                         for sample in pair
                     ):
                         for field in ("baseline_diff_sha256", "edited_diff_sha256"):
-                            if len({sample[field] for sample in pair}) != 1:
+                            if pair[0][field] != pair[1][field]:
                                 raise ValueError(
                                     "Paired workflow source contents differ"
                                 )
-                medians = {
-                    lane: None if failures[lane] else statistics.median(durations[lane])
+                stock, ohm = (
+                    None if failures[lane] else statistics.median(durations[lane])
                     for lane in selectors
-                }
-                stock, ohm = medians["stock"], medians["ohm"]
+                )
                 rows.append(
                     {
                         "project": project,
@@ -352,17 +331,6 @@ def comparisons(report):
                         ),
                     }
                 )
-                if ready_tests:
-                    overlap = medians["ohm-ready-tests"]
-                    rows[-1].update(
-                        ready_tests_seconds=overlap,
-                        ready_tests_failures=failures["ohm-ready-tests"],
-                        ready_tests_percent_saved=(
-                            100 * (ohm - overlap) / ohm
-                            if ohm is not None and overlap is not None
-                            else None
-                        ),
-                    )
     if seen_projects != {"ruff", "uv", "codex"}:
         raise ValueError("Workflow report must cover Ruff/ty, uv, and Codex")
     return sorted(
@@ -424,13 +392,6 @@ def build_report(runs):
         },
         "runs": [compact_run(run) for run in runs],
     }
-    if first.get("compare_ready_tests"):
-        report["methodology"]["order"] = (
-            "reverse adjacent repetitions; rotate the first configuration after each pair"
-        )
-        report["methodology"]["ready_tests_opt_in"] = (
-            "CARGO_UNSTABLE_OHM_READY_TESTS=true; default and opt-in use identical Ohm binaries"
-        )
     for tool, field in (
         ("rustc", "ohm_source_revision"),
         ("cargo", "ohm_cargo_source_revision"),

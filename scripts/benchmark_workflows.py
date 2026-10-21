@@ -16,14 +16,7 @@ import threading
 import time
 
 import replay_sessions as replay
-from benchmark import (
-    BenchmarkError,
-    Edit,
-    REPOSITORIES,
-    WORKLOADS,
-    edit_contents,
-    toolchain_order,
-)
+from benchmark import BenchmarkError, Edit, REPOSITORIES, WORKLOADS, edit_contents
 
 
 @dataclasses.dataclass(frozen=True)
@@ -365,7 +358,6 @@ class WorkflowStudy(replay.Replay):
     def configuration(self):
         return {
             "toolchains": dict(self.toolchains),
-            "compare_ready_tests": self.options.compare_ready_tests,
             "jobs": self.options.jobs,
             "repetitions": self.options.repetitions,
             "require_idle": self.options.require_idle,
@@ -726,10 +718,7 @@ class WorkflowStudy(replay.Replay):
                 )
                 versions[label][tool] = {
                     "version": replay.command_output(
-                        [
-                            str(path),
-                            "-vV" if tool in {"cargo", "rustc"} else "--version",
-                        ]
+                        [str(path), "-vV" if tool in {"cargo", "rustc"} else "--version"]
                     ),
                     "sha256": sha256(path.read_bytes()),
                 }
@@ -840,8 +829,10 @@ class WorkflowStudy(replay.Replay):
         for repetition in range(self.options.repetitions):
             for scenario in self.scenarios:
                 for workflow_index, workflow_id in enumerate(self.workflows):
-                    order = toolchain_order(
-                        self.toolchains, repetition + workflow_index
+                    order = (
+                        self.toolchains
+                        if (repetition + workflow_index) % 2 == 0
+                        else self.toolchains[::-1]
                     )
                     for label, selector in order:
                         if any(
@@ -922,11 +913,6 @@ def parser():
     result.add_argument("--output-dir", type=Path, required=True)
     result.add_argument("--upstream", default="1.99.0")
     result.add_argument("--ohm", default="ohm-1.99.0-6")
-    result.add_argument(
-        "--compare-ready-tests",
-        action="store_true",
-        help="also measure the same Ohm toolchain with test/build overlap enabled",
-    )
     result.add_argument("--jobs", type=int, default=8)
     result.add_argument("--repetitions", type=int, default=4)
     result.add_argument("--timeout", type=int, default=3600)

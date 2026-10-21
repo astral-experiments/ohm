@@ -233,10 +233,7 @@ class FixtureValidationTests(ReplayTestCase):
         scenario = replay.load_scenario(fixture)
         baseline = latest_reports()["historical"]
 
-        self.assertEqual(
-            baseline["order"],
-            [["stock", "ohm", "ohm-ready-tests"], ["ohm-ready-tests", "ohm", "stock"]],
-        )
+        self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
             {
@@ -262,7 +259,7 @@ class FixtureValidationTests(ReplayTestCase):
         baseline = latest_reports()["sessions"]
         self.assertEqual(
             baseline["order_by_project"]["ruff"],
-            [["stock", "ohm", "ohm-ready-tests"], ["ohm-ready-tests", "ohm", "stock"]],
+            [["stock", "ohm"], ["ohm", "stock"]],
         )
         wrapper = baseline["provenance"]["wrapper"]["by_project"]["ruff"]
         self.assertEqual(
@@ -283,11 +280,10 @@ class FixtureValidationTests(ReplayTestCase):
         for command, (index, step) in zip(commands, expected, strict=True):
             self.assertEqual(command["index"], index)
             self.assertEqual(command["command"], [step["program"], *step["args"]])
-            for toolchain in ("ohm", "ohm-ready-tests"):
-                self.assertEqual(
-                    command["tests_started"]["stock"], command["tests_started"][toolchain]
-                )
-        for toolchain in ("stock", "ohm", "ohm-ready-tests"):
+            self.assertEqual(
+                command["tests_started"]["stock"], command["tests_started"]["ohm"]
+            )
+        for toolchain in ("stock", "ohm"):
             self.assertEqual(
                 len(baseline["timed_session_seconds"]["ruff"][toolchain]),
                 baseline["repetitions"],
@@ -1944,32 +1940,6 @@ class CommandResultTests(ReplayTestCase):
         self.assertEqual(sample["cargo_reported_crates"], ["package"])
         self.assertIsNone(sample["actual_compiler_invocations"])
         self.assertIsNone(sample["cargo_status_without_compiler_invocation"])
-
-    def test_status_messages_can_interrupt_test_output(self) -> None:
-        runner = self.runner("--compare-ready-tests")
-        scenario = self.scenario()
-        worktree = self.directory / "worktree"
-        worktree.mkdir()
-        step = {"program": "cargo", "args": ["test", "-p", "package", "--lib"]}
-        result = subprocess.CompletedProcess(
-            [],
-            0,
-            stdout=(
-                "   Compiling package v1.0.0\n"
-                "running 1 test\n"
-                "test tests::example ...    Compiling downstream v1.0.0\n"
-                "ok\n"
-                "test result: ok. 1 passed; 0 failed\n"
-            ),
-        )
-
-        with mock.patch.object(replay.subprocess, "run", return_value=result):
-            sample = runner.run_command(
-                scenario, worktree, step, "ohm-ready-tests", "ohm", 0, 1
-            )
-
-        self.assertEqual(sample["cargo_reported_crates"], ["package", "downstream"])
-        self.assertEqual(sample["tests_started"], 1)
 
     def test_verbose_accounting_distinguishes_status_only_early_cutoff(self) -> None:
         runner = self.runner("--compiler-accounting", "verbose")

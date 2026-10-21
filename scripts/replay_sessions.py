@@ -27,19 +27,12 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from benchmark import (
-    COMPILER_PROCESSES,
-    BenchmarkError,
-    configure_ready_tests,
-    toolchain_order,
-)
+from benchmark import COMPILER_PROCESSES, BenchmarkError
 
 SCENARIO_DIRECTORY = Path(__file__).with_name("session_replays")
 PROJECTS = ("ruff", "uv", "codex")
-# Cargo stderr can interrupt an unfinished libtest stdout line.
 CARGO_STATUS = re.compile(
-    r"(?:^\s*|(?<=\S)[ \t]{3,})(?P<action>Compiling|Checking)\s+(?P<crate>[^\s]+)",
-    re.MULTILINE,
+    r"^\s*(?P<action>Compiling|Checking)\s+(?P<crate>[^\s]+)", re.MULTILINE
 )
 VERBOSE_COMMAND = re.compile(r"^\s*Running\s+`(?P<command>.+)`\s*$", re.MULTILINE)
 TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")
@@ -468,16 +461,10 @@ class Replay:
     def __init__(self, options: argparse.Namespace) -> None:
         self.options = options
         self.output = options.output_dir.expanduser().resolve()
-        if options.feature_matrix and options.compare_ready_tests:
-            raise BenchmarkError(
-                "measure ready tests separately from the compiler feature matrix"
-            )
         if options.feature_matrix:
             self.toolchains = tuple((label, options.ohm) for label, _ in FEATURE_MATRIX)
         else:
             self.toolchains = (("stock", options.upstream), ("ohm", options.ohm))
-            if options.compare_ready_tests:
-                self.toolchains += (("ohm-ready-tests", options.ohm),)
         self.samples: list[dict[str, Any]] = []
         self.scenarios = self.select_scenarios()
         self.sources: dict[str, Path] = {}
@@ -507,7 +494,6 @@ class Replay:
             ("jobs", self.options.jobs, None),
             ("toolchains", dict(self.toolchains), None),
             ("feature_matrix", self.options.feature_matrix, False),
-            ("compare_ready_tests", self.options.compare_ready_tests, False),
             ("shared_build_enabled", not self.options.no_shared_build, True),
             ("native_tool_trust", self.options.native_tool_trust, "none"),
             ("compiler_accounting", self.options.compiler_accounting, "status"),
@@ -821,10 +807,10 @@ class Replay:
             environment.pop(key, None)
         if self.options.compiler_accounting == "verbose":
             environment["CARGO_TERM_VERBOSE"] = "true"
-        if label.startswith("ohm"):
+        if label == "ohm" or label in FEATURE_OVERRIDES:
             if not self.options.no_shared_build:
                 shared_build = self.output / "shared-build" / scenario.project
-                if self.options.feature_matrix or self.options.compare_ready_tests:
+                if self.options.feature_matrix:
                     shared_build /= label
                 environment["CARGO_BUILD_BUILD_DIR"] = str(
                     shared_build / str(repetition)
@@ -836,7 +822,6 @@ class Replay:
                 environment["RUSTFLAGS"] = " ".join(overrides)
         if self.options.offline:
             environment["CARGO_NET_OFFLINE"] = "true"
-        configure_ready_tests(environment, label)
         return environment
 
     @staticmethod
@@ -1339,7 +1324,6 @@ class Replay:
             "repetitions": self.options.repetitions,
             "toolchains": dict(self.toolchains),
             "feature_matrix": self.options.feature_matrix,
-            "compare_ready_tests": self.options.compare_ready_tests,
             "shared_build_enabled": not self.options.no_shared_build,
             "native_tool_trust": self.options.native_tool_trust,
             "compiler_accounting": self.options.compiler_accounting,
@@ -1493,7 +1477,11 @@ class Replay:
                         for index in (0, 1, 3, 2)
                     )
                 else:
-                    order = toolchain_order(self.toolchains, repetition)
+                    order = (
+                        self.toolchains
+                        if repetition % 2 == 0
+                        else self.toolchains[::-1]
+                    )
                 for label, selector in order:
                     if any(
                         sample["project"] == scenario.project
@@ -1524,11 +1512,6 @@ def parser() -> argparse.ArgumentParser:
     )
     result.add_argument("--upstream", default="1.99.0")
     result.add_argument("--ohm", default="ohm")
-    result.add_argument(
-        "--compare-ready-tests",
-        action="store_true",
-        help="also measure the same Ohm toolchain with test/build overlap enabled",
-    )
     result.add_argument(
         "--feature-matrix",
         action="store_true",

@@ -7,16 +7,12 @@ The release benchmark reports use the published Ohm 1.99.0-6 binaries. The
 verified on the Mac and Linux hosts. The reports retain accepted measurements and link to raw logs,
 CPU traces, source audits, and excluded attempts.
 
-The [test/build overlap report](ready-tests.md) compares default Ohm with the same binaries and
-`CARGO_UNSTABLE_OHM_READY_TESTS=true`. It includes command timings, full sessions, developer
-workflows, workspace-test and parser-edit comparisons, and APFS allocation. Nextest workloads are controls because
-Cargo disables this option for the build-only invocation that Nextest uses.
-
 The [raw evidence](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-6-4c43f2319969)
 contains command logs, source audits, CPU traces, and excluded attempts. The
-[comparison inputs and generators](https://github.com/astral-sh/ohm/releases/tag/benchmark-comparison-evidence-1.99.0-6-218caca3c1ea)
-reproduce the overlap JSON and Markdown and the ty Markdown byte for byte. Their manifests record
-the file hashes; checked-in reports may omit detailed traces and use different whitespace.
+[archived reports and generators](https://github.com/astral-sh/ohm/releases/tag/benchmark-comparison-evidence-1.99.0-6-218caca3c1ea)
+retain the full campaign inputs and their file hashes. The checked-in reports select the stock and
+default Ohm measurements and omit detailed traces. Original run settings and omitted measurements
+remain in the archives.
 
 [Raw evidence for Ohm 1.99.0-5](https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-5-940c95bb89ba)
 and the [benchmark history](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts)

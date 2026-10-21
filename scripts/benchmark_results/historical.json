@@ -15,29 +15,6 @@
     },
     "wrapper": {
       "kind": "historical",
-      "arguments": [
-        "--upstream",
-        "1.99.0",
-        "--ohm",
-        "ohm-1.99.0-6",
-        "--jobs",
-        "8",
-        "--minimum-free-gb",
-        "60",
-        "--require-idle",
-        "--output-dir",
-        "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical",
-        "--project",
-        "ruff",
-        "--repetitions",
-        "2",
-        "--offline",
-        "--compare-ready-tests",
-        "--scenario",
-        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-6/scripts/session_replays/ruff-historical-rust-1.99.json",
-        "--source-path",
-        "ruff=/tmp/ohm-benchmarks-1.99.0-6/data/sources/ruff"
-      ],
       "started_at": 1792552245.2163663,
       "wrapper_sha256": "bafea82ac2e486c496549e15e809550c6d49f8523625e5ad153021d6bff9198d",
       "runner_sha256": {
@@ -48,8 +25,7 @@
       "tmpdir": "/tmp/ohm996",
       "toolchains": [
         ["stock", "1.99.0"],
-        ["ohm", "ohm-1.99.0-6"],
-        ["ohm-ready-tests", "ohm-1.99.0-6"]
+        ["ohm", "ohm-1.99.0-6"]
       ],
       "sanitized_environment": {
         "CARGO_HOME": "/tmp/codex-cargo-home",
@@ -236,18 +212,15 @@
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
           "stock": [0.2996017839759588, 0.3236435049911961],
-          "ohm": [0.3938281500013545, 0.33728824299760163],
-          "ohm-ready-tests": [0.3194767989916727, 0.32490501896245405]
+          "ohm": [0.3938281500013545, 0.33728824299760163]
         },
         "tests_started": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         },
         "cargo_status_message_counts": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         }
       },
       {
@@ -265,18 +238,15 @@
         ],
         "wall_seconds": {
           "stock": [0.9738132799975574, 0.9450164830195718],
-          "ohm": [0.9629087300272658, 0.9372657820349559],
-          "ohm-ready-tests": [0.9427710769814439, 0.9501297529786825]
+          "ohm": [0.9629087300272658, 0.9372657820349559]
         },
         "tests_started": {
           "stock": [1, 1],
-          "ohm": [1, 1],
-          "ohm-ready-tests": [1, 1]
+          "ohm": [1, 1]
         },
         "cargo_status_message_counts": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         }
       },
       {
@@ -294,18 +264,15 @@
         ],
         "wall_seconds": {
           "stock": [116.85949846502626, 115.20919694000622],
-          "ohm": [89.89047144597862, 85.9580632019788],
-          "ohm-ready-tests": [86.36892636999255, 83.96891689801123]
+          "ohm": [89.89047144597862, 85.9580632019788]
         },
         "tests_started": {
           "stock": [1, 1],
-          "ohm": [1, 1],
-          "ohm-ready-tests": [1, 1]
+          "ohm": [1, 1]
         },
         "cargo_status_message_counts": {
           "stock": [3, 3],
-          "ohm": [3, 3],
-          "ohm-ready-tests": [3, 3]
+          "ohm": [3, 3]
         }
       },
       {
@@ -323,18 +290,15 @@
         ],
         "wall_seconds": {
           "stock": [0.9217221500002779, 1.0495629149954766],
-          "ohm": [1.680426619015634, 1.1640929540153593],
-          "ohm-ready-tests": [1.1084917939733714, 1.3260227849823423]
+          "ohm": [1.680426619015634, 1.1640929540153593]
         },
         "tests_started": {
           "stock": [1, 1],
-          "ohm": [1, 1],
-          "ohm-ready-tests": [1, 1]
+          "ohm": [1, 1]
         },
         "cargo_status_message_counts": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         }
       },
       {
@@ -351,18 +315,15 @@
         ],
         "wall_seconds": {
           "stock": [18.99351249000756, 18.222157690033782],
-          "ohm": [9.704176365979947, 10.44259241601685],
-          "ohm-ready-tests": [9.98381204897305, 9.635915021004621]
+          "ohm": [9.704176365979947, 10.44259241601685]
         },
         "tests_started": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         },
         "cargo_status_message_counts": {
           "stock": [2, 2],
-          "ohm": [2, 2],
-          "ohm-ready-tests": [2, 2]
+          "ohm": [2, 2]
         }
       },
       {
@@ -389,18 +350,15 @@
         ],
         "wall_seconds": {
           "stock": [59.43112684099469, 57.15346941299504],
-          "ohm": [43.61421137396246, 43.84945072204573],
-          "ohm-ready-tests": [43.0975725070457, 43.157807631010655]
+          "ohm": [43.61421137396246, 43.84945072204573]
         },
         "tests_started": {
           "stock": [3, 3],
-          "ohm": [3, 3],
-          "ohm-ready-tests": [3, 3]
+          "ohm": [3, 3]
         },
         "cargo_status_message_counts": {
           "stock": [2, 2],
-          "ohm": [2, 2],
-          "ohm-ready-tests": [2, 2]
+          "ohm": [2, 2]
         }
       },
       {
@@ -410,18 +368,15 @@
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
           "stock": [18.809585703013, 17.04047465499025],
-          "ohm": [9.580323826987296, 9.361055170011241],
-          "ohm-ready-tests": [9.189672929991502, 8.7255858379649]
+          "ohm": [9.580323826987296, 9.361055170011241]
         },
         "tests_started": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         },
         "cargo_status_message_counts": {
           "stock": [1, 1],
-          "ohm": [1, 1],
-          "ohm-ready-tests": [1, 1]
+          "ohm": [1, 1]
         }
       },
       {
@@ -439,18 +394,15 @@
         ],
         "wall_seconds": {
           "stock": [117.91966476698872, 113.57454416598193],
-          "ohm": [85.67907365399878, 83.45931930001825],
-          "ohm-ready-tests": [82.38283443899127, 83.53533105796669]
+          "ohm": [85.67907365399878, 83.45931930001825]
         },
         "tests_started": {
           "stock": [1, 1],
-          "ohm": [1, 1],
-          "ohm-ready-tests": [1, 1]
+          "ohm": [1, 1]
         },
         "cargo_status_message_counts": {
           "stock": [2, 2],
-          "ohm": [2, 2],
-          "ohm-ready-tests": [2, 2]
+          "ohm": [2, 2]
         }
       },
       {
@@ -468,18 +420,15 @@
         ],
         "wall_seconds": {
           "stock": [1.3328510940191336, 1.4589992450200953],
-          "ohm": [1.7630261849844828, 1.8506557900109328],
-          "ohm-ready-tests": [1.5910633980529383, 1.7185345130274072]
+          "ohm": [1.7630261849844828, 1.8506557900109328]
         },
         "tests_started": {
           "stock": [1, 1],
-          "ohm": [1, 1],
-          "ohm-ready-tests": [1, 1]
+          "ohm": [1, 1]
         },
         "cargo_status_message_counts": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         }
       },
       {
@@ -510,18 +459,15 @@
         ],
         "wall_seconds": {
           "stock": [59.474513061053585, 58.19894540699897],
-          "ohm": [20.552590379025787, 20.918078759976197],
-          "ohm-ready-tests": [20.958007175999228, 20.648728061991278]
+          "ohm": [20.552590379025787, 20.918078759976197]
         },
         "tests_started": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         },
         "cargo_status_message_counts": {
           "stock": [92, 92],
-          "ohm": [25, 25],
-          "ohm-ready-tests": [25, 25]
+          "ohm": [25, 25]
         }
       },
       {
@@ -531,18 +477,15 @@
         "command": ["cargo", "fmt", "--all", "--", "--check"],
         "wall_seconds": {
           "stock": [5.3188906400464475, 5.621060257020872],
-          "ohm": [6.451276364037767, 6.3894322700216435],
-          "ohm-ready-tests": [6.480007740959991, 6.316640670993365]
+          "ohm": [6.451276364037767, 6.3894322700216435]
         },
         "tests_started": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         },
         "cargo_status_message_counts": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         }
       },
       {
@@ -565,18 +508,15 @@
         ],
         "wall_seconds": {
           "stock": [12.317758484976366, 13.19466833799379],
-          "ohm": [10.434481834003236, 10.251728628005367],
-          "ohm-ready-tests": [10.075649478996638, 10.20400167297339]
+          "ohm": [10.434481834003236, 10.251728628005367]
         },
         "tests_started": {
           "stock": [867, 867],
-          "ohm": [867, 867],
-          "ohm-ready-tests": [867, 867]
+          "ohm": [867, 867]
         },
         "cargo_status_message_counts": {
           "stock": [1, 1],
-          "ohm": [1, 1],
-          "ohm-ready-tests": [1, 1]
+          "ohm": [1, 1]
         }
       }
     ]
@@ -590,18 +530,15 @@
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
           "stock": [31.197812510014046, 31.8947878999752],
-          "ohm": [23.260917200008407, 21.53194060502574],
-          "ohm-ready-tests": [22.01345097698504, 21.183597547002137]
+          "ohm": [23.260917200008407, 21.53194060502574]
         },
         "tests_started": {
           "stock": [0, 0],
-          "ohm": [0, 0],
-          "ohm-ready-tests": [0, 0]
+          "ohm": [0, 0]
         },
         "cargo_status_message_counts": {
           "stock": [179, 179],
-          "ohm": [179, 179],
-          "ohm-ready-tests": [179, 179]
+          "ohm": [179, 179]
         }
       },
       {
@@ -619,18 +556,15 @@
         ],
         "wall_seconds": {
           "stock": [141.95627088297624, 142.5578188149957],
-          "ohm": [113.68353110499447, 113.33652006101329],
-          "ohm-ready-tests": [112.98949829197954, 113.40214132401161]
+          "ohm": [113.68353110499447, 113.33652006101329]
         },
         "tests_started": {
           "stock": [1, 1],
-          "ohm": [1, 1],
-          "ohm-ready-tests": [1, 1]
+          "ohm": [1, 1]
         },
         "cargo_status_message_counts": {
           "stock": [193, 193],
-          "ohm": [193, 193],
-          "ohm-ready-tests": [193, 193]
+          "ohm": [193, 193]
         }
       }
     ]
@@ -638,2097 +572,27 @@
   "timed_session_seconds": {
     "ruff": {
       "stock": [413.2425044599804, 402.6047914319788],
-      "ohm": [281.334611917031, 275.55546277796384],
-      "ohm-ready-tests": [273.26459226896986, 271.1269476689631]
+      "ohm": [281.334611917031, 275.55546277796384]
     }
   },
   "timed_command_seconds": {
     "ruff": {
       "stock": [412.65253876009956, 401.9917390140472],
-      "ohm": [280.70679492800264, 274.91902323713293],
-      "ohm-ready-tests": [272.49828575894935, 270.512518921867]
+      "ohm": [280.70679492800264, 274.91902323713293]
     }
   },
   "timed_edit_seconds": {
     "ruff": {
       "stock": [0.03857789997709915, 0.03814865002641454],
-      "ohm": [0.03925594995962456, 0.039112663944251835],
-      "ohm-ready-tests": [0.03713984496425837, 0.03680311294738203]
+      "ohm": [0.03925594995962456, 0.039112663944251835]
     }
   },
   "untimed_warmup_seconds": {
     "ruff": {
       "stock": [173.1540833929903, 174.4526067149709],
-      "ohm": [136.94444830500288, 134.86846066603903],
-      "ohm-ready-tests": [135.00294926896458, 134.58573887101375]
+      "ohm": [136.94444830500288, 134.86846066603903]
     }
   },
-  "overlap_observations": [
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/01.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 1,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/02.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/04.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/05.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "check",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/06.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--test",
-        "mdtest",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final",
-        "--",
-        "mdtest::cycle.md",
-        "mdtest::narrow/hasattr.md",
-        "mdtest::type_properties/is_subtype_of.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/08.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/09.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/11.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/12.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 12,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--all-targets",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::format_push_string",
-        "-A",
-        "clippy::double_must_use",
-        "-A",
-        "clippy::assert_is_empty",
-        "-A",
-        "clippy::needless_borrows_for_generic_args",
-        "-A",
-        "clippy::mut_mut"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/13.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/14.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/15.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/warmup-01.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/0/warmup-02.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/01.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 1,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/02.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/04.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/05.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "check",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/06.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--test",
-        "mdtest",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final",
-        "--",
-        "mdtest::cycle.md",
-        "mdtest::narrow/hasattr.md",
-        "mdtest::type_properties/is_subtype_of.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/08.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/09.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/11.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/12.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 12,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--all-targets",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::format_push_string",
-        "-A",
-        "clippy::double_must_use",
-        "-A",
-        "clippy::assert_is_empty",
-        "-A",
-        "clippy::needless_borrows_for_generic_args",
-        "-A",
-        "clippy::mut_mut"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/13.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/14.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/15.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/warmup-01.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/0/warmup-02.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/01.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 1,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/02.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/04.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/05.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "check",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/06.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--test",
-        "mdtest",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final",
-        "--",
-        "mdtest::cycle.md",
-        "mdtest::narrow/hasattr.md",
-        "mdtest::type_properties/is_subtype_of.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/08.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/09.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/11.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/12.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 12,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--all-targets",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::format_push_string",
-        "-A",
-        "clippy::double_must_use",
-        "-A",
-        "clippy::assert_is_empty",
-        "-A",
-        "clippy::needless_borrows_for_generic_args",
-        "-A",
-        "clippy::mut_mut"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/13.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/14.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/15.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/warmup-01.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/0/warmup-02.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 0,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/01.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 1,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/02.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/04.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/05.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "check",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/06.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--test",
-        "mdtest",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final",
-        "--",
-        "mdtest::cycle.md",
-        "mdtest::narrow/hasattr.md",
-        "mdtest::type_properties/is_subtype_of.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/08.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/09.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/11.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/12.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 12,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--all-targets",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::format_push_string",
-        "-A",
-        "clippy::double_must_use",
-        "-A",
-        "clippy::assert_is_empty",
-        "-A",
-        "clippy::needless_borrows_for_generic_args",
-        "-A",
-        "clippy::mut_mut"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/13.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/14.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/15.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/warmup-01.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm-ready-tests/1/warmup-02.log",
-      "toolchain": "ohm-ready-tests",
-      "ready_tests": "true",
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/01.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 1,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/02.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/04.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/05.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "check",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/06.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--test",
-        "mdtest",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final",
-        "--",
-        "mdtest::cycle.md",
-        "mdtest::narrow/hasattr.md",
-        "mdtest::type_properties/is_subtype_of.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/08.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/09.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/11.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/12.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 12,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--all-targets",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::format_push_string",
-        "-A",
-        "clippy::double_must_use",
-        "-A",
-        "clippy::assert_is_empty",
-        "-A",
-        "clippy::needless_borrows_for_generic_args",
-        "-A",
-        "clippy::mut_mut"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/13.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/14.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/15.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/warmup-01.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/ohm/1/warmup-02.log",
-      "toolchain": "ohm",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/01.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 1,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/02.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/04.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/05.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "check",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/06.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--test",
-        "mdtest",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final",
-        "--",
-        "mdtest::cycle.md",
-        "mdtest::narrow/hasattr.md",
-        "mdtest::type_properties/is_subtype_of.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/08.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/09.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/11.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::attributes.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/12.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 12,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--all-targets",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::format_push_string",
-        "-A",
-        "clippy::double_must_use",
-        "-A",
-        "clippy::assert_is_empty",
-        "-A",
-        "clippy::needless_borrows_for_generic_args",
-        "-A",
-        "clippy::mut_mut"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/13.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/14.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_core",
-        "-p",
-        "ty_python_semantic",
-        "--no-fail-fast",
-        "--status-level",
-        "fail",
-        "--failure-output",
-        "immediate-final"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/15.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/warmup-01.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "nextest",
-        "run",
-        "-p",
-        "ty_python_semantic",
-        "--",
-        "mdtest::cycle.md"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/historical/logs/ruff/stock/1/warmup-02.log",
-      "toolchain": "stock",
-      "ready_tests": null,
-      "matched_process_observations": [],
-      "logged_test_launches": [],
-      "uncovered_test_executables": [],
-      "process_observer": "deps-directory-only",
-      "test_result_before_build_finished": false,
-      "running_before_build_finished": false,
-      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
-      "project": "ruff",
-      "repetition": 1,
-      "index": 2,
-      "measured": false
-    }
-  ],
   "methodology": {
     "all_commands_succeeded": true,
     "external_compilations_observed": 0,
@@ -2741,13 +605,11 @@
     "ohm_native_tool_trust": "none",
     "dependencies_prefetched_locked": true,
     "timed_commands_offline": true,
-    "constructed_workload": false,
-    "ready_tests_opt_in": "CARGO_UNSTABLE_OHM_READY_TESTS=true only for ohm-ready-tests",
-    "default_and_opt_in_use_identical_binaries": true
+    "constructed_workload": false
   },
   "order": [
-    ["stock", "ohm", "ohm-ready-tests"],
-    ["ohm-ready-tests", "ohm", "stock"]
+    ["stock", "ohm"],
+    ["ohm", "stock"]
   ],
   "raw_evidence": {
     "release": "https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-6-4c43f2319969",
@@ -2767,5 +629,6 @@
     "sha256": "f9b96085a0d84cb4e969836ce774e0edba663d389beee048917b9be5ead03ca1",
     "path": "historical.json",
     "report_sha256": "262ef08f0eff796d4aec17c9bcfca8cfcae4cd1d775a098d074ba283d99ef110"
-  }
+  },
+  "publication_scope": "The checked-in measurements are a subset of the archived campaign. Original run settings and omitted measurements remain in the linked evidence."
 }
