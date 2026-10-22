@@ -144,6 +144,8 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 
 **Developer workflows** measure complete command sequences after an untimed baseline warmup. Each
 sequence preserves its build artifacts between commands; each repetition starts from fresh artifacts.
+Times are medians of four runs, with each toolchain pair measured on the same host. See the
+[benchmark guide](BENCHMARKS.md) for details.
 
 <!-- benchmark:developer-workflows -->
 
@@ -166,18 +168,6 @@ sequence preserves its build artifacts between commands; each repetition starts 
 | Codex   | Edit → fmt → clippy → test        | 44.04 s     | 32.30 s      | 26.67%     |
 
 <!-- /benchmark:developer-workflows -->
-
-These measurements use the published Ohm 1.99.0-7 binaries and were collected on October 21–22, 2026 (UTC). The
-[build provenance](scripts/benchmark_results/workflow-build.json) records the release, component
-sources, and verified binary hashes.
-
-Each study's cache trust settings are documented in the [benchmark guide](BENCHMARKS.md).
-
-Developer-workflow times are medians of four runs, with both toolchains measured on the same host.
-They include compilation and one focused test where shown. A failure count replaces the timing if any repetition fails; that row has no speedup.
-Edits change the target crate unless labeled as a dependency edit. See the
-[workflow definitions and starting states](BENCHMARKS.md#run-the-developer-workflows) and
-[individual measurements](scripts/benchmark_results/developer-workflows.json).
 
 **Direct edits** modify the crate being checked, linted, or tested:
 
