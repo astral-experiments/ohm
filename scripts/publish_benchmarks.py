@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-"""Archive audited reports, publish compact results, and refresh benchmark tables."""
+"""Publish benchmark measurements and refresh the tables from the checked-in reports."""
 
 import argparse
 import copy
-import hashlib
 import json
 import math
 from pathlib import Path
 import re
 import statistics
 import subprocess
-import tempfile
-import zipfile
 
 import workflow_results
 
@@ -27,16 +24,12 @@ def load(path):
     return json.loads(path.read_text())
 
 
-def digest(data):
-    return hashlib.sha256(data).hexdigest()
-
-
 def write_json(path, value):
     path.write_text(json.dumps(value, indent=2) + "\n")
 
 
-def compact(report, evidence):
-    """Keep measurements and audit summaries; the archive retains full provenance."""
+def compact(report):
+    """Keep the measurements and audit summaries used to interpret a run."""
     result = copy.deepcopy(report)
     provenance = result["provenance"] = {
         key: value
@@ -66,7 +59,8 @@ def compact(report, evidence):
             preflight["sample_count"] = len(preflight.pop("samples"))
     for attempt in cpu.get("excluded_attempts", []):
         attempt.pop("trace_jsonl", None)
-    result["evidence"] = evidence
+    for key in ("raw_evidence", "evidence", "full_report"):
+        result.pop(key, None)
     return result
 
 
@@ -440,25 +434,6 @@ def normalized_markdown(text):
     return re.sub(r"\s+", " ", text).strip()
 
 
-def archive_reports(directory, output):
-    files = {
-        f"{kind}.json": (directory / f"{kind}.json").read_bytes() for kind in KINDS
-    }
-    manifest = {name: digest(data) for name, data in files.items()}
-    with zipfile.ZipFile(output, "x", compression=zipfile.ZIP_DEFLATED) as bundle:
-        for name, data in files.items():
-            bundle.writestr(
-                zipfile.ZipInfo(name, (1980, 1, 1, 0, 0, 0)),
-                data,
-                compress_type=zipfile.ZIP_DEFLATED,
-            )
-        bundle.writestr(
-            zipfile.ZipInfo("manifest.json", (1980, 1, 1, 0, 0, 0)),
-            json.dumps(manifest, indent=2) + "\n",
-        )
-    return manifest
-
-
 def publish(directory):
     reports = {kind: load(directory / f"{kind}.json") for kind in KINDS}
     release, _ = validate(reports)
@@ -466,84 +441,14 @@ def publish(directory):
     prettier = ROOT / "node_modules/.bin/prettier"
     if not prettier.is_file():
         raise ValueError("Run npm ci --ignore-scripts before publishing benchmarks")
-    version = release.removeprefix("ohm-")
     paths = {kind: f"scripts/benchmark_results/{kind}.json" for kind in KINDS}
     current = RESULTS / "sessions.json"
     if current.exists() and load(current)["ohm_release"] == release:
         raise ValueError(
             "Results already exist for this release; refusing to replace them"
         )
-    with tempfile.TemporaryDirectory(prefix="ohm-benchmark-publication-") as temporary:
-        temporary = Path(temporary)
-        archive = temporary / f"benchmark-evidence-{version}.zip"
-        manifest = archive_reports(directory, archive)
-        with zipfile.ZipFile(archive) as bundle:
-            if any(
-                json.loads(bundle.read(f"{kind}.json")) != report
-                for kind, report in reports.items()
-            ):
-                raise ValueError("Input reports changed during publication")
-        checksum = digest(archive.read_bytes())
-        tag = f"benchmark-evidence-{version}-{checksum[:12]}"
-        url = f"https://github.com/astral-sh/ohm/releases/download/{tag}/{archive.name}"
-        exists = subprocess.run(
-            ["gh-auto", "release", "view", tag, "--json", "tagName"],
-            cwd=ROOT,
-            capture_output=True,
-        )
-        if exists.returncode:
-            subprocess.run(
-                [
-                    "gh-auto",
-                    "release",
-                    "create",
-                    tag,
-                    str(archive),
-                    "--latest=false",
-                    "--target",
-                    subprocess.check_output(
-                        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
-                    ).strip(),
-                    "--title",
-                    f"Benchmark evidence for {release}",
-                    "--notes",
-                    "Detailed audited benchmark reports. The ZIP manifest records each input file's SHA-256. This release contains benchmark evidence only.",
-                ],
-                cwd=ROOT,
-                check=True,
-            )
-        download = temporary / "download"
-        subprocess.run(
-            [
-                "gh-auto",
-                "release",
-                "download",
-                tag,
-                "--pattern",
-                archive.name,
-                "--dir",
-                str(download),
-            ],
-            cwd=ROOT,
-            check=True,
-        )
-        if digest((download / archive.name).read_bytes()) != checksum:
-            raise ValueError(
-                "Downloaded evidence differs; local reports were not changed"
-            )
-        for kind, path in paths.items():
-            write_json(
-                ROOT / path,
-                compact(
-                    reports[kind],
-                    {
-                        "url": url,
-                        "sha256": checksum,
-                        "path": f"{kind}.json",
-                        "report_sha256": manifest[f"{kind}.json"],
-                    },
-                ),
-            )
+    for kind, path in paths.items():
+        write_json(ROOT / path, compact(reports[kind]))
     for name, text in updated.items():
         (ROOT / name).write_text(text)
     subprocess.run(

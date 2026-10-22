@@ -65,7 +65,7 @@ The published results use the official Ohm 1.99.0-7 release. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the release archives,
 component sources, and binary hashes verified on each machine. Use `--ohm` to select another
 installed toolchain when measuring a different version. See the
-[results index](scripts/benchmark_results/README.md) for the evidence.
+[results index](scripts/benchmark_results/README.md) for the measurements.
 
 The separate [Ruff edited-check study](scripts/benchmark_results/ruff-edited-check.json) measured the
 public-API metadata optimization in [Rust #194](https://github.com/astral-sh/ohm-rust/pull/194)
@@ -130,8 +130,7 @@ python3 scripts/workflow_results.py /path/to/ruff/results.json /path/to/uv/resul
 The report retains each sequence and command timing, warmups, source identities, compiler revisions,
 executable and compiler-library hashes, failed executions, and rejected attempts. If any repetition
 fails, the table shows a failure count
-for that toolchain and omits its timing and the row's speedup. Archive the raw evidence and
-save the validated report as `scripts/benchmark_results/developer-workflows.json`, then
+for that toolchain and omits its timing and the row's speedup. Save the validated report as `scripts/benchmark_results/developer-workflows.json`, then
 refresh the README table:
 
 ```console
@@ -206,7 +205,7 @@ Rust does not isolate changes between Ohm releases.
 - [Workflow and disk-usage results](scripts/benchmark_results/)
 - [Session fixtures and replay results](scripts/session_replays/)
 
-The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
+The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. They also record which attempts were excluded and why.
 
 The October 21–22, 2026 (UTC) timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-7,
 using eight Cargo jobs on 32-vCPU Linux devboxes. uv runs on `charlie-serc-1`, and Codex runs on
@@ -217,8 +216,8 @@ campaign, so these measurements do not isolate the effect of changes between Ohm
 
 Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust
 to `all`; the ty session and developer workflows also set native-tool trust to `all`.
-Linux runs retain full-VM CPU and process traces and require at least 60 GiB free during measurement.
+Linux runs collect full-VM CPU and process traces and require at least 60 GiB free during measurement.
 
-The [APFS study](scripts/benchmark_results/disk.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. Its source, tests, artifact isolation, and allocation are checked before the volume is removed; the evidence archive retains those checks. These measurements make no claim about elapsed time on the Mac.
+The [APFS study](scripts/benchmark_results/disk.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. We check each cohort’s sources, tests, artifact isolation, and allocation before removing its volume. These measurements make no claim about elapsed time on the Mac.
 
 Earlier reports and fixtures remain in the [benchmark history](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts).
