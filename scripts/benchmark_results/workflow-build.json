@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "toolchain": "ohm-1.99.0-6",
+  "toolchain": "ohm-1.99.0-7",
   "released": true,
-  "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-6",
-  "published_at": "2026-10-21T00:14:42Z",
-  "release_workflow": "https://github.com/astral-sh/ohm/actions/runs/39508026570",
-  "coordinator_revision": "12c716e7f4620a6e3ad53d18c475a1c50150e335",
+  "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-7",
+  "published_at": "2026-10-21T17:04:35Z",
+  "release_workflow": "https://github.com/astral-sh/ohm/actions/runs/39622392946",
+  "coordinator_revision": "93b26605a86232e574a8f744b86d467c829efefa",
   "manifest": {
-    "path": "toolchains/1.99.0/6.json",
-    "sha256": "7d1e59b58419ede0089c9c50d4160e86358115679aca33842b1887f34f90864c"
+    "path": "toolchains/1.99.0/7.json",
+    "sha256": "a7560ea9dd7b28a843e382487ed87809a1c6597bc017a3ba5c47521671e803ff"
   },
   "sources": {
-    "rust": "6d4a7ee3200c5311112d433cb9d1da4a2630a66f",
-    "cargo": "5e5d271d763d7beb38b48755e22bd59e93f02b97",
+    "rust": "a912f1842d3cfe15d90df36f89af73a5ef90a9d1",
+    "cargo": "c40676e264501bc8a93095d3a273a1c300b80875",
     "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
-    "rustfmt": "29bfbe020d7d8ddc639963680d50943989990c62"
+    "rustfmt": "5af2f950cd8bae79cec9ea032885db10e7dfe318"
   },
   "targets": {
     "x86_64-unknown-linux-gnu": {
       "archive": {
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-6/ohm-1.99.0-6-x86_64-unknown-linux-gnu.tar.gz",
-        "sha256": "98a4f4f99ea1ff36e10209258724426496afbbcab14d746294fe53a2fedad37c",
-        "size": 358326651
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-7/ohm-1.99.0-7-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "40f3bfb17dbd906381a8f5bfdd1f2da22f154e5a4fc0147dd2473a5e16171a1e",
+        "size": 358373975
       },
       "published_provenance": {
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-6/ohm-1.99.0-6-x86_64-unknown-linux-gnu-provenance.json",
-        "sha256": "a28e49279024b1ddb7819002a0f87cc27589130fb53a314346fe564a93b5c0c5",
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-7/ohm-1.99.0-7-x86_64-unknown-linux-gnu-provenance.json",
+        "sha256": "1ab0ca41ae0bdea4727e6b121d4e5054544d1e0c15fe4d69aca095d23214d0e1",
         "size": 866
       },
       "bundled_tools": {
@@ -36,82 +36,404 @@
       },
       "components": {
         "rustc": {
-          "version": "rustc 1.99.0-dev (6d4a7ee32 2026-10-20) (ohm-1.99.0-6)",
-          "sha256": "6109cff145371a50c4f62b61908d2ffbf6d259b180c8effde07baa426aab682a"
+          "version": "rustc 1.99.0-dev (a912f1842 2026-10-21) (ohm-1.99.0-7)",
+          "sha256": "a841949df03d859781f6bf7451564605c927699e76530ab4d798cca8ca0746c3"
         },
         "cargo": {
-          "version": "cargo 1.99.0-dev (5e5d271d7 2026-10-20) (ohm-1.99.0-6)",
-          "sha256": "ba03ac96ba5ebfff69a37d8a898e4bba90e29c1a62141cef8a759b91232b7b7e"
+          "version": "cargo 1.99.0-dev (c40676e26 2026-10-21) (ohm-1.99.0-7)",
+          "sha256": "c17e3b17956207dac4dd6030942461ab9017c816ec10e5ebef9eb6ea6899d856"
         },
         "clippy-driver": {
           "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)",
-          "sha256": "3fa956c143c25693185d41f045a4def1bb2f3969136de0e9e47127458032b31c"
+          "sha256": "00487c3e3aa540c673cc03618527358baf684d4e650ebc3953f73bf3f739d657"
         },
         "rustfmt": {
-          "version": "rustfmt 1.10.0-dev (29bfbe020d 2026-10-07)",
-          "sha256": "ac77dd845569e094a5488cd41f36f2030c1111b66e3969f9f11cf54e3fe98907"
+          "version": "rustfmt 1.10.0-dev (5af2f950cd 2026-10-21)",
+          "sha256": "7ae5857e6a2f43e1b8ed96bcd4225b0f598e9d2dcd74f1a2ca01486fd1c55cea"
         }
       }
     },
     "aarch64-apple-darwin": {
       "archive": {
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-6/ohm-1.99.0-6-aarch64-apple-darwin.tar.gz",
-        "sha256": "1d890872a40c2d55faba62dee205511552f89665c6c286c3332a86a597b94785",
-        "size": 294457269
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-7/ohm-1.99.0-7-aarch64-apple-darwin.tar.gz",
+        "sha256": "672adf445dac2ade37ffcfcb7d33810493ae522c85a3f24e002d91568f6eb1de",
+        "size": 294596893
       },
       "published_provenance": {
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-6/ohm-1.99.0-6-aarch64-apple-darwin-provenance.json",
-        "sha256": "26a968485f7dab930c1329ad95222be0b831094a914838abac8691c4fe81ebf6",
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-7/ohm-1.99.0-7-aarch64-apple-darwin-provenance.json",
+        "sha256": "020f016304f2e162434861cf5d5f7fc876bb1beb0a84d10620b6f2df26f1a2cc",
         "size": 729
       },
       "bundled_tools": {},
       "components": {
         "rustc": {
-          "version": "rustc 1.99.0-dev (6d4a7ee32 2026-10-20) (ohm-1.99.0-6)",
-          "sha256": "1c72dacc854cacb9cbdc2b15fbd668369542d05fca1492024c4bf9e47f13316e"
+          "version": "rustc 1.99.0-dev (a912f1842 2026-10-21) (ohm-1.99.0-7)",
+          "sha256": "15b3747a5fdf1cf2cc8876442d6fa0f99783944c24d35efd0c15c507b6c4df41"
         },
         "cargo": {
-          "version": "cargo 1.99.0-dev (5e5d271d7 2026-10-20) (ohm-1.99.0-6)",
-          "sha256": "4357e9dd970f0415d100959260232a721f96e207c6d7ae5956326b3147ea4369"
+          "version": "cargo 1.99.0-dev (c40676e26 2026-10-21) (ohm-1.99.0-7)",
+          "sha256": "0b9c6fffa1657057632ab54b5aa28ea52ed8cad127ddfeca15d933b3aecec5b7"
         },
         "clippy-driver": {
           "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)",
-          "sha256": "907d214ddaa379149bf8c0c42c0d05e529a4c23548109a0637903a470821c27e"
+          "sha256": "e80fd7319dff4b7c4c687603e23b3fd9f88c6b7b483b71a991fd0b6af9fc6fdc"
         },
         "rustfmt": {
-          "version": "rustfmt 1.10.0-dev (29bfbe020d 2026-10-07)",
-          "sha256": "f71cbe6e68eb91156432f6b8c4bda0c4c835ec01d9789ec9e3bb86d870e6a212"
+          "version": "rustfmt 1.10.0-dev (5af2f950cd 2026-10-21)",
+          "sha256": "8f5cf21ee1e27e52918860006a605f48d443f5ab5406c529cbb4e927aef4790f"
         }
       }
     }
   },
   "measurement": {
-    "runner_revision": "d6c0dad5a710ae54b780893f8ee502f02e6fed5f",
+    "runner_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
     "linux_hosts": [
-      "charlie-oss-2",
+      "charlie-ohm-session-bench",
       "charlie-oss-3",
-      "charlie-oss-8",
-      "charlie-ohm-session-bench"
+      "charlie-serc-1",
+      "charlie-serc-4"
     ],
-    "other_settings": "Each report records its trust and shared-build settings.",
+    "settings": "Each report records its procedural-macro/native-tool trust and shared-build settings.",
     "study_hosts": {
       "individual_commands": {
-        "uv": "charlie-oss-2",
+        "uv": "charlie-serc-1",
         "codex": "charlie-oss-3"
       },
       "main_sessions": {
-        "uv": "charlie-oss-2",
-        "codex": "charlie-oss-3",
-        "ruff": "charlie-oss-8"
+        "uv": "charlie-serc-1",
+        "ruff": "charlie-serc-4",
+        "codex": "charlie-oss-3"
       },
-      "historical_ruff": "charlie-ohm-session-bench",
+      "historical_ruff": "charlie-serc-4",
       "developer_workflows": {
-        "uv": "charlie-oss-2",
-        "codex": "charlie-oss-3",
-        "ruff": "charlie-ohm-session-bench"
+        "uv": "charlie-serc-1",
+        "ruff": "charlie-ohm-session-bench",
+        "codex": "charlie-oss-3"
       },
       "ty_session_and_worktrees": "charlie-ohm-session-bench",
-      "constructed_uv_comparisons": "charlie-oss-2"
+      "feature_ablation": "charlie-serc-1",
+      "apfs_disk": {
+        "model": "Mac17,6",
+        "logical_cpus": 18,
+        "ram_gib": 128.0,
+        "os": "macOS 26.7.1",
+        "target": "aarch64-apple-darwin"
+      }
+    },
+    "same_linux_release_components_on_all_hosts": true,
+    "ruff_split_evidence": {
+      "sessions": {
+        "host": "charlie-serc-4",
+        "studies": ["sessions", "historical"],
+        "archive": "linux-ruff-sessions-1.99.0-7-raw.zip",
+        "archive_sha256": "c501ffb0f05a89d82038a76691d31fd4dbffc732cbfc3467bf006ccd1610681a",
+        "extraction_receipt": "retrieved/linux/ruff-sessions.receipt.json",
+        "extraction_receipt_sha256": "8713d2094aad10d6e24e5f55150e8fb9c36f688dc6a93a0b011d20e6c446d25d",
+        "report_sha256": {
+          "sessions.json": "3e6e5387c547d7e14026e1be58682350fb25fa98e532681eba136280fcf015fe",
+          "historical.json": "0418efb621bcb720c7afe8207f39eab50f45148a5e3b09f8de3b536590c880c3"
+        }
+      },
+      "developer": {
+        "host": "charlie-ohm-session-bench",
+        "studies": ["developer"],
+        "archive": "linux-ruff-developer-1.99.0-7-raw.zip",
+        "archive_sha256": "4e77d0109e3d8fd9579c56cca249c6f063d8b26464402ea6c23439b77d638b45",
+        "extraction_receipt": "retrieved/linux/ruff-developer.receipt.json",
+        "extraction_receipt_sha256": "1bcc833ee71ce092b76bb868dce802c5da024282a4494a7c9175924880038fbe",
+        "report_sha256": {
+          "developer.json": "f08b537c5360faecc1437557cfc334d8f8562255b2d3368974452bacde7b1561"
+        }
+      }
     }
+  },
+  "provenance_inputs": {
+    "release-install/expected.json": {
+      "sha256": "450449303812456c4c97fe81c29940b6e295ccbddf18a725d58e5945a6bbe702",
+      "bytes": 1903
+    },
+    "release-install/manifest.json": {
+      "sha256": "a7560ea9dd7b28a843e382487ed87809a1c6597bc017a3ba5c47521671e803ff",
+      "bytes": 971
+    },
+    "frozen-source.json": {
+      "sha256": "6d29eb769503a01b254041b080e81753ffeff1ed8dc4f1a18ef0fef790f4649a",
+      "bytes": 531
+    },
+    "audit/migration-completed.json": {
+      "sha256": "8c0db8c7de0f2c826d05b96e18ee768218e3e23f92cb548e8b500a666fb2f506",
+      "bytes": 1401
+    },
+    "audit/migration-install-exec-charlie-serc-1.json": {
+      "sha256": "52d74bbc8a40357b1ff1fca00ec8ab5ae9f20440901425019c02d68784d74197",
+      "bytes": 1903
+    },
+    "audit/migration-gate-2-exec-charlie-serc-1.json": {
+      "sha256": "899547404b59bbdaad853e8330d68331b93a87de65bfb9c0cb45f538109e6450",
+      "bytes": 1183
+    },
+    "audit/migration-install-exec-charlie-serc-4.json": {
+      "sha256": "984c6346f4365e73b4c34efa424c7e7c9eaca5bb642bc279eae80fe7066cb600",
+      "bytes": 1903
+    },
+    "audit/migration-gate-exec-charlie-serc-4.json": {
+      "sha256": "81400e5a7a3ccdf97515294762eeb33a84c33cbc08b463edf4a3fe814041ab4d",
+      "bytes": 1183
+    },
+    "audit/host-selection-charlie-oss-3.json": {
+      "sha256": "fdf27433e08cd3be3d6c7cf7945ccc48fc5c7a8a97fdb982b69ddc71bc1efb68",
+      "bytes": 628
+    },
+    "audit/verified-install-charlie-oss-3.json": {
+      "sha256": "f5286458ea62c32251815b53292418dcf24aed7eb0da913b3cee0e013dc05f16",
+      "bytes": 1451
+    },
+    "publication/ty/reports/ty-worktree.json": {
+      "sha256": "a663f1a21d89416ba881d209ed4d6edb85713e4ef581e1c69bf22860fef2a6f8",
+      "bytes": 33308
+    },
+    "audit/ty-publication-preparation.json": {
+      "sha256": "c6094f55ac237f9ae35dde8a2a5798de642afbffaeff591a3272b43dc2a344d2",
+      "bytes": 1138
+    },
+    "audit/verified-install-charlie-ohm-session-bench.json": {
+      "sha256": "80c4c240a77a61b5bb3b1f898e4254db58dfac8f459a4caa4e30a71338095a87",
+      "bytes": 1450
+    },
+    "release-install/verified-install.json": {
+      "sha256": "76ed28b21f243cc07f42c83fb4f7f4dc544cadb76d8968b3d4af03d9fdcc594d",
+      "bytes": 1466
+    },
+    "apfs/disk/reports/disk.json": {
+      "sha256": "87d1fe0479ccc01ff6eaae2a70df6e5313fbdd09e1303db1f9e9f397b929c41f",
+      "bytes": 422496
+    },
+    "audit/apfs-complete-independent-review.json": {
+      "sha256": "48616be3ce7b6ac67c8366d77d3b32478aac736550088c12007b48aab8399d16",
+      "bytes": 1286
+    },
+    "release-install/github/ohm-1.99.0-7-x86_64-unknown-linux-gnu-provenance.json": {
+      "sha256": "1ab0ca41ae0bdea4727e6b121d4e5054544d1e0c15fe4d69aca095d23214d0e1",
+      "bytes": 866
+    },
+    "release-install/github/ohm-1.99.0-7-aarch64-apple-darwin-provenance.json": {
+      "sha256": "020f016304f2e162434861cf5d5f7fc876bb1beb0a84d10620b6f2df26f1a2cc",
+      "bytes": 729
+    },
+    "write-split-build-provenance.py": {
+      "sha256": "d24ffeb86270416cb496424dec2984293349b2bc39113fb615d16985f05cd802",
+      "bytes": 5191
+    },
+    "retrieved/linux/ruff-sessions.receipt.json": {
+      "sha256": "8713d2094aad10d6e24e5f55150e8fb9c36f688dc6a93a0b011d20e6c446d25d",
+      "bytes": 1052
+    },
+    "retrieved/linux/ruff-developer.receipt.json": {
+      "sha256": "1bcc833ee71ce092b76bb868dce802c5da024282a4494a7c9175924880038fbe",
+      "bytes": 1025
+    }
+  },
+  "raw_evidence": {
+    "release": "https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d",
+    "manifest": {
+      "bytes": 3104,
+      "sha256": "2be7fb68ff9d4741e3917b4686440f7e26622a4a0876d92d8135ef8503c18f10",
+      "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/manifest.json"
+    },
+    "by_suite": {
+      "workflow": {
+        "uv": {
+          "host": "charlie-serc-1",
+          "archive": {
+            "bytes": 7764009,
+            "sha256": "365c4c0a28d33aec8be0a04a2b9da914e78e3bf2c0fd1ca8db7946479b519fe8",
+            "host": "charlie-serc-1",
+            "manifest_files": 783,
+            "studies": ["workflow", "sessions", "ablation", "developer"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-uv-1.99.0-7-raw.zip"
+          }
+        },
+        "codex": {
+          "host": "charlie-oss-3",
+          "archive": {
+            "bytes": 11894450,
+            "sha256": "f71c8dedb573e29ee8a5d3585294f9701d06816d52e4e8abbfbb2ceabc48b4ad",
+            "host": "charlie-oss-3",
+            "manifest_files": 644,
+            "studies": ["workflow", "sessions", "developer"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-codex-1.99.0-7-raw.zip"
+          }
+        }
+      },
+      "sessions": {
+        "uv": {
+          "host": "charlie-serc-1",
+          "archive": {
+            "bytes": 7764009,
+            "sha256": "365c4c0a28d33aec8be0a04a2b9da914e78e3bf2c0fd1ca8db7946479b519fe8",
+            "host": "charlie-serc-1",
+            "manifest_files": 783,
+            "studies": ["workflow", "sessions", "ablation", "developer"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-uv-1.99.0-7-raw.zip"
+          }
+        },
+        "codex": {
+          "host": "charlie-oss-3",
+          "archive": {
+            "bytes": 11894450,
+            "sha256": "f71c8dedb573e29ee8a5d3585294f9701d06816d52e4e8abbfbb2ceabc48b4ad",
+            "host": "charlie-oss-3",
+            "manifest_files": 644,
+            "studies": ["workflow", "sessions", "developer"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-codex-1.99.0-7-raw.zip"
+          }
+        },
+        "ruff": {
+          "host": "charlie-serc-4",
+          "archive": {
+            "bytes": 148021859,
+            "sha256": "c501ffb0f05a89d82038a76691d31fd4dbffc732cbfc3467bf006ccd1610681a",
+            "host": "charlie-serc-4",
+            "manifest_files": 583,
+            "studies": ["sessions", "historical"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-ruff-sessions-1.99.0-7-raw.zip"
+          }
+        }
+      },
+      "historical": {
+        "ruff": {
+          "host": "charlie-serc-4",
+          "archive": {
+            "bytes": 148021859,
+            "sha256": "c501ffb0f05a89d82038a76691d31fd4dbffc732cbfc3467bf006ccd1610681a",
+            "host": "charlie-serc-4",
+            "manifest_files": 583,
+            "studies": ["sessions", "historical"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-ruff-sessions-1.99.0-7-raw.zip"
+          }
+        }
+      },
+      "ablation": {
+        "uv": {
+          "host": "charlie-serc-1",
+          "archive": {
+            "bytes": 7764009,
+            "sha256": "365c4c0a28d33aec8be0a04a2b9da914e78e3bf2c0fd1ca8db7946479b519fe8",
+            "host": "charlie-serc-1",
+            "manifest_files": 783,
+            "studies": ["workflow", "sessions", "ablation", "developer"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-uv-1.99.0-7-raw.zip"
+          }
+        }
+      },
+      "developer": {
+        "uv": {
+          "host": "charlie-serc-1",
+          "archive": {
+            "bytes": 7764009,
+            "sha256": "365c4c0a28d33aec8be0a04a2b9da914e78e3bf2c0fd1ca8db7946479b519fe8",
+            "host": "charlie-serc-1",
+            "manifest_files": 783,
+            "studies": ["workflow", "sessions", "ablation", "developer"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-uv-1.99.0-7-raw.zip"
+          }
+        },
+        "codex": {
+          "host": "charlie-oss-3",
+          "archive": {
+            "bytes": 11894450,
+            "sha256": "f71c8dedb573e29ee8a5d3585294f9701d06816d52e4e8abbfbb2ceabc48b4ad",
+            "host": "charlie-oss-3",
+            "manifest_files": 644,
+            "studies": ["workflow", "sessions", "developer"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-codex-1.99.0-7-raw.zip"
+          }
+        },
+        "ruff": {
+          "host": "charlie-ohm-session-bench",
+          "archive": {
+            "bytes": 2173607,
+            "sha256": "4e77d0109e3d8fd9579c56cca249c6f063d8b26464402ea6c23439b77d638b45",
+            "host": "charlie-ohm-session-bench",
+            "manifest_files": 358,
+            "studies": ["developer"],
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-ruff-developer-1.99.0-7-raw.zip"
+          }
+        }
+      },
+      "disk": {
+        "disk": {
+          "host": "macOS APFS",
+          "archive": {
+            "bytes": 29394058,
+            "sha256": "7ff2148af0cf04c6648edae2e10b1374e76d43e41628f91f4f100dd4062951f2",
+            "host": "macOS APFS",
+            "manifest_files": 653,
+            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/apfs-1.99.0-7-raw.zip"
+          }
+        }
+      }
+    },
+    "excluded_attempts": {
+      "uv": {
+        "bytes": 524869,
+        "sha256": "bfce37511b388068c534d7b1ed6b8438f46b772f20f6ccbdc9507b77217d65ed",
+        "host": "charlie-oss-1",
+        "manifest_files": 277,
+        "studies": [],
+        "accepted_samples": 0,
+        "scope": "Excluded attempt; no sample contributes to published timings.",
+        "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-uv-excluded-charlie-oss-1-1.99.0-7-raw.zip"
+      },
+      "ruff": {
+        "bytes": 290239,
+        "sha256": "e39a201d72c27ef205cf8741d6a1b3cc2fde6c55b2a76901ea6ebc585d932a2c",
+        "host": "charlie-oss-7",
+        "manifest_files": 108,
+        "studies": [],
+        "accepted_samples": 0,
+        "scope": "Excluded attempt; no sample contributes to published timings.",
+        "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-ruff-excluded-charlie-oss-7-1.99.0-7-raw.zip"
+      },
+      "ruff_serc4_developer": {
+        "archive": {
+          "bytes": 148021859,
+          "sha256": "c501ffb0f05a89d82038a76691d31fd4dbffc732cbfc3467bf006ccd1610681a",
+          "host": "charlie-serc-4",
+          "manifest_files": 583,
+          "studies": ["sessions", "historical"],
+          "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-ruff-sessions-1.99.0-7-raw.zip"
+        },
+        "scope_path": "selected-suites.json",
+        "accepted_samples": 0,
+        "attempts": [
+          {
+            "path": "rejected/ruff-developer-serc4-attempt-1",
+            "retained_samples": 15,
+            "accepted_samples": 0
+          },
+          {
+            "path": "rejected/ruff-developer-serc4-attempt-2",
+            "retained_samples": 5,
+            "accepted_samples": 0
+          }
+        ]
+      }
+    },
+    "ty": {
+      "host": "charlie-ohm-session-bench",
+      "archive": {
+        "bytes": 8073471,
+        "sha256": "e2a2b69a25e740b5a7728a410f5c1e21dacbfc5b5808d63b00d64eb459bd73e1",
+        "files": 469,
+        "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-evidence-ty-29327-1.99.0-7-e2a2b69a25e7/ty-29327-evidence.zip"
+      }
+    }
+  },
+  "full_report": {
+    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-report-inputs-1.99.0-7-f5f433e73751/benchmark-report-inputs-1.99.0-7.zip",
+    "sha256": "dff13ad2ee6158296bd6f0accd1233c63424200f63d1d02ad0815c5d3e14d16c",
+    "path": "reports/workflow-build.json",
+    "report_sha256": "e3fc7e7151ac047cb9bdd28dbb222119c52bc905990392e45ac551bf93d57b21"
   }
 }
