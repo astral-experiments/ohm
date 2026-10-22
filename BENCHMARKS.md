@@ -41,13 +41,13 @@ Fetch dependencies before measuring, using the same Cargo home for both commands
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-6 \
+  --ohm ohm-1.99.0-7 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-6 \
+  --ohm ohm-1.99.0-7 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -58,22 +58,22 @@ host. `--workflow` selects a subset for diagnosis. `--resume` retains completed
 samples and rejects changed runner code, source definitions, sampling settings, or toolchains. If your shell
 sets `PYTHONSAFEPATH=1`, prefix the commands with `env -u PYTHONSAFEPATH`.
 
-The published measurements use eight Cargo jobs on three 32-vCPU Linux devboxes. Each result
+The published developer-workflow measurements use eight Cargo jobs on three 32-vCPU Linux devboxes. Each result
 records its host metadata, command logs, and CPU traces.
 
-The published results use the official Ohm 1.99.0-6 release. The
+The published results use the official Ohm 1.99.0-7 release. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the release archives,
 component sources, and binary hashes verified on each machine. Use `--ohm` to select another
 installed toolchain when measuring a different version. See the
 [results index](scripts/benchmark_results/README.md) for the evidence.
 
-The separate [Ruff edited-check study](scripts/benchmark_results/ruff-edited-check.json) compares an
-unreleased compiler with its baseline, holding the Cargo binary and PGO/BOLT inputs constant. On a
-16-vCPU host with eight jobs, 64 alternating pairs measured a 3.0% median paired time reduction
+The separate [Ruff edited-check study](scripts/benchmark_results/ruff-edited-check.json) measured the
+public-API metadata optimization in [Rust #194](https://github.com/astral-sh/ohm-rust/pull/194)
+using an experimental compiler and its baseline, holding the Cargo binary and PGO/BOLT inputs constant.
+On a 16-vCPU host with eight jobs, 64 alternating pairs measured a 3.0% median paired time reduction
 (95% bootstrap interval: 1.9–4.1%). Its [build record](scripts/benchmark_results/ruff-edited-check-build.json)
-identifies the experimental metadata optimizations from
-[Rust #194](https://github.com/astral-sh/ohm-rust/pull/194), which are excluded from Ohm 1.99.0-6
-and the release benchmarks.
+identifies those binaries. Rust #194 is included in Ohm 1.99.0-7; these earlier paired measurements
+remain separate from the release tables.
 
 | Workflow                          | Untimed baseline warmup  | Measured sequence                     |
 | --------------------------------- | ------------------------ | ------------------------------------- |
@@ -143,14 +143,14 @@ python3 scripts/publish_benchmarks.py --render
 Preview the plan without cloning or building:
 
 ```console
-uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-6 --dry-run
+uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-7 --dry-run
 ```
 
 Run both projects:
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-6 --jobs 8 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-7 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -208,11 +208,12 @@ Rust does not isolate changes between Ohm releases.
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
 
-The timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-6, using eight Cargo jobs on
-32-CPU Linux devboxes. uv and Codex each use a dedicated host. Ruff's main replay uses a third
-host; its historical replay and developer workflows use the host that completed the ty study.
-Every comparison keeps all configurations and repetitions on one host. Host and CPU identities
-are recorded in each report; these measurements do not isolate changes from earlier Ohm releases.
+The October 21–22, 2026 (UTC) timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-7,
+using eight Cargo jobs on 32-vCPU Linux devboxes. uv runs on `charlie-serc-1`, and Codex runs on
+`charlie-oss-3`. Ruff's main and historical replays run on `charlie-serc-4`; its developer workflows
+and the ty session and worktree studies run on `charlie-ohm-session-bench`. Each comparison keeps
+all configurations and repetitions on the same host. Host assignments differ from the previous
+campaign, so these measurements do not isolate the effect of changes between Ohm releases.
 
 Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust
 to `all`; the ty session and developer workflows also set native-tool trust to `all`.
@@ -220,4 +221,4 @@ Linux runs retain full-VM CPU and process traces and require at least 60 GiB fre
 
 The [APFS study](scripts/benchmark_results/disk.json) measures physical disk allocation on macOS, with both Ohm trust opt-ins set to `all`. Each cohort uses an isolated volume. Its source, tests, artifact isolation, and allocation are checked before the volume is removed; the evidence archive retains those checks. These measurements make no claim about elapsed time on the Mac.
 
-Earlier reports and fixtures remain in the [benchmark history](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts). These measurements do not isolate changes between Ohm releases.
+Earlier reports and fixtures remain in the [benchmark history](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts).
