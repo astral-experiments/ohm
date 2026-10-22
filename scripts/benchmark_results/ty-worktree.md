@@ -68,4 +68,4 @@ Runs wait for an idle host and restart if CPU monitoring detects interference. T
 
 See the [session](../session_replays/README.md#ty-diagnostic-suppression-session) and [worktree startup](../session_replays/README.md#worktree-startup) commands. The fixture starts at [4d6a7db78713](https://github.com/astral-sh/ruff/commit/4d6a7db787130c5a4a95bd835369babd78e4a1f6) and reproduces [e221f3e9b5b2](https://github.com/astral-sh/ruff/commit/e221f3e9b5b22b81b0ce4e7c730ac1f5c990adf0). The measured harness is Ohm commit `04c83d53483607aec4f93fd2bb55b412f101d677`.
 
-The [evidence archive](https://github.com/astral-sh/ohm/releases/tag/benchmark-evidence-ty-29327-1.99.0-8-3dd5a5d42175) contains command logs, CPU traces, source and test checks, and excluded attempts. Its SHA-256 is `3dd5a5d42175e66273b7f81d4ffb3049e933b275531b48a4b0ab8c78d39efeb6`.
+The [study data](ty-worktree.json) records individual measurements, source and test checks, and excluded attempts.

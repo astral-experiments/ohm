@@ -14,3 +14,5 @@ We ran Ohm 1.99.0-7 and 1.99.0-8 on the same Linux host with warmed, private for
 The median columns summarize each release separately. For the last column, we divided the -8 time by the -7 time within each pair and took the geometric mean of the 40 ratios. Ratios below 1 favor -8. The 99% confidence intervals use 20,000 bootstrap resamples of the pairs.
 
 Both releases ran `cargo +<release> fmt -p <package>` with their published defaults. We edited `doc_lines.rs` in `ruff_linter` at Ruff revision `4d6a7db787130c5a4a95bd835369babd78e4a1f6` and `install_source.rs` in `uv` at revision `c22e6b71933443e9cd299d4b6ac8de035ed4825b`.
+
+The [paired timings](formatting-comparison.json) include the execution order for each pair. The [measurement protocol and runner](https://github.com/astral-sh/ohm/tree/444cf954135e74a52b4c9f3f6990d0bc6aff1a5a/benchmark-inputs/1.99.0-8/formatter) define the exact edits, warmups, and randomization.
