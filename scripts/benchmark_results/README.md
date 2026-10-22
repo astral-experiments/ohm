@@ -1,12 +1,12 @@
 # Published benchmarks
 
-The [developer-workflow](developer-workflows.json), [individual-command](workflow.json), [session](sessions.json), [historical-session](historical.json), [ablation](ablation.json), [disk](disk.json), and [ty session and worktree](ty-worktree.md) reports record the October 21–22, 2026 (UTC) measurements. They retain individual measurements, source identities, and settings. The ty study also has a [JSON report](ty-worktree.json).
+On October 22, 2026, we measured published Ohm 1.99.0-8 against stock Rust 1.99.0. The reports include individual timings, source revisions, toolchain settings, and exclusion summaries. [Developer workflows](developer-workflows.json) · [Individual commands](workflow.json) · [Sessions](sessions.json) · [Historical replays](historical.json) · [Ablations](ablation.json) · [Disk usage](disk.json) · [ty session and worktree startup](ty-worktree.md)
 
-The release benchmark reports use the published Ohm 1.99.0-7 binaries. The [build provenance](workflow-build.json) records the release archives, source pins, host assignments, and binary hashes verified on the Mac and Linux hosts.
+The ty study includes the per-run measurements for ext4 and Btrfs. The build record identifies the release archives, component pins, host assignments and installed binary hashes. [ty data](ty-worktree.json) · [Build provenance](workflow-build.json) · [Trust settings](../../BENCHMARKS.md#recorded-measurements)
 
-The uv run on `charlie-oss-1` and the Ruff run on `charlie-oss-7` exceeded the host CPU limit. The two Ruff developer-workflow attempts on `charlie-serc-4` contributed no samples. The replacement runs supply the published developer timings.
+The formatter study compares published Ohm 1.99.0-7 and 1.99.0-8 on Ruff and uv. Each case has 40 matched pairs with warmed, persistent per-release formatter caches. [Formatter results](formatting-comparison.md) · [Formatter data](formatting-comparison.json)
 
-The comparisons use stock Rust and Ohm with the [documented trust settings](../../BENCHMARKS.md#recorded-measurements). The ablation report records its feature overrides.
+The Codex developer run exhausted its retries under CPU contention, including an overlapping compiler. The report uses 40 accepted samples from its replacement run.
 
 The [historical reports and fixtures](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts) and [study-specific reproduction inputs](https://github.com/astral-sh/ohm/tree/444cf954135e74a52b4c9f3f6990d0bc6aff1a5a/benchmark-inputs) preserve the earlier workloads and methods. Host assignments and workloads can differ between releases.
 
