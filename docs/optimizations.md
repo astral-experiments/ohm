@@ -12,7 +12,8 @@ Cargo normally recompiles downstream crates when a dependency changes. Ohm compu
 interface exposed by eligible libraries and avoids rebuilding dependents when that interface is
 unchanged. (The changed library is still compiled, but its dependents can be reused.) If the
 interface changes, Cargo starts downstream compilation once the new metadata is ready, without
-waiting for the rest of the dependency's build.
+waiting for the rest of the dependency's build. Ohm also uses a compact metadata graph to reduce the
+work needed to compute the interface hash.
 
 For example, assume that `linter` depends on `parser`. If you fix a bug in a private parser helper
 without changing the exposed interface, Ohm recompiles `parser` but can reuse `linter`. An
@@ -22,8 +23,12 @@ In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-type
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
 seconds with it.
 
+In a separate experiment, the compact metadata graph reduced the time to check Ruff after an edit by
+3.0%.
+
 See:
 
+- [Rust #194](https://github.com/astral-sh/ohm-rust/pull/194)
 - [Rust #43](https://github.com/astral-sh/ohm-rust/pull/43)
 - [Cargo #53](https://github.com/astral-sh/ohm-cargo/pull/53)
 - [Cargo #55](https://github.com/astral-sh/ohm-cargo/pull/55)
@@ -47,9 +52,8 @@ In the `linter` and `parser` example above, the linker combines their compiled c
 existing compiled code. The resulting executable includes the fix even though Ohm did not recompile
 the linter's own code.
 
-In a release benchmark, we changed a dependency, then rebuilt and ran a test. The median time for
-the test command fell from 26.27 to 3.79 seconds for uv. This comparison includes public API hashing
-and Ohm's other changes, so it doesn't measure the effect of relinking alone.
+In a release benchmark, we changed a dependency, then rebuilt and ran a uv test. The median time for
+the command fell from 26.27 to 3.79 seconds.
 
 See:
 
@@ -61,25 +65,62 @@ See:
 **Status:** New optimization.
 
 A build already produces some of the information that `cargo check` and Clippy need. Ohm can reuse
-this metadata from registry and workspace libraries after verifying that the compiler, build inputs,
-saved files, and cached diagnostics are compatible. It also keeps earlier check results when you
-build tests, so switching between testing and checking can reuse work from both.
+results from compatible builds of libraries, binaries, and tests after checking that the compiler,
+build inputs, and saved files are compatible. Ohm also replays cached warnings and keeps earlier
+check results when you build tests, so switching between testing and checking can reuse work from
+both.
 
 For example, suppose you run `cargo +ohm build`, then `cargo +ohm check` in the same workspace. The
 build has already checked and compiled a dependency such as `memchr`. If its inputs still match, Ohm
-can use the metadata from that build instead of checking `memchr` again.
+can use the metadata from that build instead of checking `memchr` again. Similarly, after
+`cargo +ohm build --bin parser`, a subsequent `cargo +ohm check --bin parser` can reuse the build
+results if the inputs still match. If you check, build, and then check again, Ohm can also reuse
+the first check's results.
 
 In the release benchmarks, we built each project and then timed a check. The uv check took 70.46
 seconds with stock Rust and 23.90 seconds with Ohm; the Codex check took 125.54 and 63.67 seconds,
 respectively.
+
+In a Linux uv experiment, reusing native dependencies reduced the median time for the first check
+after `cargo test --no-run` from 36.1 to 22.2 seconds.
 
 See:
 
 - [Cargo #75](https://github.com/astral-sh/ohm-cargo/pull/75)
 - [Cargo #91](https://github.com/astral-sh/ohm-cargo/pull/91)
 - [Cargo #89](https://github.com/astral-sh/ohm-cargo/pull/89)
+- [Cargo #149](https://github.com/astral-sh/ohm-cargo/pull/149)
+- [Cargo #150](https://github.com/astral-sh/ohm-cargo/pull/150)
+- [Cargo #152](https://github.com/astral-sh/ohm-cargo/pull/152)
+- [Cargo #154](https://github.com/astral-sh/ohm-cargo/pull/154)
+- [Cargo #169](https://github.com/astral-sh/ohm-cargo/pull/169)
+- [Cargo #170](https://github.com/astral-sh/ohm-cargo/pull/170)
+- [Cargo #171](https://github.com/astral-sh/ohm-cargo/pull/171)
+- [Cargo #178](https://github.com/astral-sh/ohm-cargo/pull/178)
 
-### 4. Share compiled dependencies across worktrees
+### 4. Reuse checks during builds
+
+**Status:** New optimization, enabled by default for eligible debug builds.
+
+A native build repeats type checking and borrow checking that a preceding `cargo check` may have
+already done. Ohm saves the results of a check and reuses them in compatible builds. It also keeps
+the build's generated objects for later incremental builds.
+
+For example, after checking a parser change, you can build the parser and reuse some of the work
+from that check. Release builds, test targets, procedural macros, build scripts, and unsupported
+compiler configurations retain ordinary behavior. The extra checkpoints consume disk space. Use
+`-Zohm-shared-stages=no` on both commands to opt out.
+
+In a prototype, a first build after a check fell from 104.44 to 80.66 seconds. A separate uv
+warm-cycle comparison was slightly slower with sharing, at 5.80 versus 5.72 seconds.
+
+See:
+
+- [Cargo #145](https://github.com/astral-sh/ohm-cargo/pull/145)
+- [Rust #177](https://github.com/astral-sh/ohm-rust/pull/177)
+- [Rust #187](https://github.com/astral-sh/ohm-rust/pull/187)
+
+### 5. Share compiled dependencies across worktrees
 
 **Status:** New optimization.
 
@@ -87,9 +128,10 @@ Set `CARGO_BUILD_BUILD_DIR` to the same directory across projects or worktrees t
 their compiled registry dependencies. Cargo verifies that the package, compiler, configuration, and
 build inputs match before it reuses a dependency, and uses locks to coordinate concurrent builds.
 
-Each worktree keeps its own workspace artifacts and final outputs in its target directory. We also
-include additional "trust" settings to allow for reuse of procedural macros and native tools, but
-that reuse can be unsound.
+Each worktree keeps its own private intermediates, incremental compiler state, documentation,
+scratch files, and final outputs in its target directory. The shared build directory retains
+eligible registry artifacts and reusable ThinLTO objects. We also include additional "trust"
+settings to allow for reuse of procedural macros and native tools, but that reuse can be unsound.
 
 For example, suppose you build your project on `main`, then build a fix in a second worktree. Both
 worktrees use the same version of `memchr` with the same features and build settings. If they share
@@ -103,8 +145,9 @@ See:
 
 - [Cargo #77](https://github.com/astral-sh/ohm-cargo/pull/77)
 - [Cargo #78](https://github.com/astral-sh/ohm-cargo/pull/78)
+- [Cargo #158](https://github.com/astral-sh/ohm-cargo/pull/158)
 
-### 5. Seed new worktrees from an existing build
+### 6. Seed new worktrees from an existing build
 
 **Status:** New optimization.
 
@@ -126,7 +169,7 @@ See:
 - [Cargo #126](https://github.com/astral-sh/ohm-cargo/pull/126)
 - [Rust #91](https://github.com/astral-sh/ohm-rust/pull/91)
 
-### 6. Start checking dependent crates earlier
+### 7. Start checking dependent crates earlier
 
 **Status:** New optimization.
 
@@ -149,7 +192,7 @@ See:
 - [Rust #156](https://github.com/astral-sh/ohm-rust/pull/156)
 - [Cargo #133](https://github.com/astral-sh/ohm-cargo/pull/133)
 
-### 7. Reuse integration tests that do not use a changed library
+### 8. Reuse integration tests that do not use a changed library
 
 **Status:** New optimization.
 
@@ -177,7 +220,74 @@ See:
 - [Cargo #72](https://github.com/astral-sh/ohm-cargo/pull/72)
 - [Cargo #73](https://github.com/astral-sh/ohm-cargo/pull/73)
 
-### 8. Reduce build artifact disk usage
+### 9. Start compiling integration tests earlier
+
+**Status:** New optimization, enabled by default for eligible native tests.
+
+An integration test that launches a package's executable may not use the package's library itself.
+Ohm can compile such a test while the library compiles, including on the first native build. It
+accepts the early result only when the compiler confirms that the test does not use the library and
+the library builds successfully. Otherwise, Cargo retries after the library finishes successfully.
+
+After a test has built without using the library, Ohm can also compile it early on later edits. The
+optimization requires Headstart and at least two build jobs; `-Zohm-early-tests=no` disables it.
+Tests still wait until all requested libraries and executables are built. The option below can start
+tests sooner.
+
+See:
+
+- [Cargo #146](https://github.com/astral-sh/ohm-cargo/pull/146)
+- [Cargo #147](https://github.com/astral-sh/ohm-cargo/pull/147)
+
+### 10. Skip unused dev-dependency rebuilds in targeted tests
+
+**Status:** New optimization, enabled by default for eligible native library-test rebuilds.
+
+A library's test target can declare a workspace dev dependency without using it. After an edit,
+ordinary Cargo may rebuild that dependency and the normal library it depends on before compiling
+the tests. Ohm can skip those rebuilds when the previous test executable recorded the dependency
+as unused. If the compiler can't confirm that the dependency is still unused, Cargo rebuilds the
+test with all its dependencies.
+
+For example, `cargo +ohm test -p parser --lib` can rebuild the parser's unit tests without
+rebuilding an unused test helper. Cargo still builds dependencies used elsewhere or with build
+scripts, and falls back to the full dependency graph for unsupported native inputs. Initial builds
+and unsupported targets follow Cargo's usual behavior.
+
+Skipped dependencies are not compiled, so their errors and warnings won't appear. Use
+`-Zohm-defer-dev-deps=no` to build all declared dev dependencies.
+
+In a warm build, rebuilding ty's unit tests took 37.72 seconds with this optimization and 72.22
+seconds without it; uv's took 26.22 and 30.97 seconds, respectively.
+
+See:
+
+- [Cargo #161](https://github.com/astral-sh/ohm-cargo/pull/161)
+
+### 11. Run ready test binaries while compilation continues
+
+**Status:** New experiment, opt-in.
+
+Run `cargo +ohm -Zohm-ready-tests test` to start tests while Cargo is still compiling. Test binaries
+run one at a time, with their ordinary arguments and environment. Build scripts, application
+executables, and dynamic libraries must finish before tests start. Unsupported platforms, custom
+runners, and incompatible terminal configurations retain ordinary execution.
+
+Running tests alongside compilation can shorten the command, but it can also slow it down if they
+compete for CPU, memory, or disk bandwidth. Tests may run in a different order and can make changes
+before a later compilation failure.
+
+You can also opt in with `CARGO_UNSTABLE_OHM_READY_TESTS=true`, or pass `-Zohm-ready-tests=no` to
+disable it.
+
+In a prototype ty comparison, the full command fell from 43.19 to 34.05 seconds while running the
+same 868 tests.
+
+See:
+
+- [Cargo #153](https://github.com/astral-sh/ohm-cargo/pull/153)
+
+### 12. Reduce build artifact disk usage
 
 **Status:** New optimization.
 
@@ -195,19 +305,31 @@ cleanup in one cannot remove another's snapshots. Shared registry artifacts are 
 inputs and protected by locks: incompatible builds get separate artifacts, though concurrent builds
 of the same artifact may wait.
 
+`cargo clean` removes the selected project's private state, and removing a worktree removes its
+default target directory. An explicitly configured target directory outside the checkout needs
+separate cleanup.
+
+On Linux and macOS, `cargo +ohm gc --dry-run` previews cleanup of shared build caches, and
+`cargo +ohm gc` performs it. It can remove unused shared artifacts after at least an hour and
+artifacts for obsolete compilers immediately. It leaves local targets and active compiler caches
+alone; removed artifacts are rebuilt when needed.
+
 In a macOS benchmark, we ran the same development tasks with Ohm and stock Rust. Ohm used 40% less
-disk space for Ruff and 35% less for uv. These savings include the effects of Ohm's build reuse and
-default debug settings.
+disk space for Ruff and 35% less for uv.
 
 See:
 
 - [Cargo #68](https://github.com/astral-sh/ohm-cargo/pull/68)
+- [Cargo #157](https://github.com/astral-sh/ohm-cargo/pull/157)
+- [Cargo #158](https://github.com/astral-sh/ohm-cargo/pull/158)
+- [Cargo #160](https://github.com/astral-sh/ohm-cargo/pull/160)
+- [Cargo #174](https://github.com/astral-sh/ohm-cargo/pull/174)
 - [Cargo #77](https://github.com/astral-sh/ohm-cargo/pull/77)
 - [Rust #97](https://github.com/astral-sh/ohm-rust/pull/97)
 - [Rust #98](https://github.com/astral-sh/ohm-rust/pull/98)
 - [Rust #123](https://github.com/astral-sh/ohm-rust/pull/123)
 
-### 9. Use line tables by default
+### 13. Use line tables by default
 
 **Status:** Existing stable Rust feature, enabled by default in Ohm.
 
@@ -220,15 +342,11 @@ settings take precedence over Ohm's default.
 For example, a panic backtrace can still point to `parser.rs:42`. If you stop there in a debugger
 and want to inspect a local variable such as `tokens`, rebuild with full debug information.
 
-The uv benchmarks compare stock Rust's full debug information with Ohm's line tables, so this
-default can affect the comparison. Ruff and Codex explicitly request matching debug levels. The
-release benchmarks do not measure the effect of line tables separately.
-
 See:
 
 - [Cargo #127](https://github.com/astral-sh/ohm-cargo/pull/127)
 
-### 10. Use Wild for Linux linking
+### 14. Use Wild for Linux linking
 
 **Status:** Existing linker, bundled and enabled by default in Ohm.
 
@@ -236,21 +354,23 @@ The linker combines compiled code into the final executable. For native x86-64 L
 uses the Wild linker by default. Explicit linker settings still take precedence.
 
 Wild performs a full link each time it runs. Cached relinking lets Ohm reuse the compiled code that
-it passes to the linker. The release benchmarks include Wild alongside Ohm's other changes, so they
-do not measure its contribution separately.
+it passes to the linker, and Ohm can reuse eligible integration tests when it adds flags for Wild.
 
 See:
 
 - [Cargo #114](https://github.com/astral-sh/ohm-cargo/pull/114)
+- [Cargo #139](https://github.com/astral-sh/ohm-cargo/pull/139)
 - [Ohm #112](https://github.com/astral-sh/ohm/pull/112)
 
-### 11. Reuse Cargo's dependency resolution
+### 15. Avoid repeated Cargo preparation work
 
 **Status:** New optimization.
 
 Cargo resolves the workspace's dependencies before many commands. Ohm saves that result and reuses
 it when the manifests, lockfile, configuration, and toolchain have not changed. Cargo still resolves
-the packages and features needed by the current command.
+the packages and features needed by the current command. Ohm also avoids repeated filesystem checks
+and unnecessary work preparing and reading build outputs. Commands that do not access Git skip
+initializing its library.
 
 For example, fixing a bug in `parse_number` leaves the workspace's dependency versions unchanged.
 The next check can reuse the saved resolution. Adding a dependency to `Cargo.toml` invalidates it,
@@ -260,36 +380,88 @@ In an earlier experiment on a Codex workspace that had already been built, reusi
 resolution reduced `cargo metadata` time from 413 to 358 milliseconds and Nextest time from 961 to
 824 milliseconds.
 
+In a warm Ruff experiment, skipping unnecessary dependency-file generation reduced unchanged
+workspace checks by 18.2% and test builds by 20.2%. A separate change to output preparation and
+dependency-file parsing reduced unchanged workspace builds by 13.8%.
+
 See:
 
 - [Cargo #66](https://github.com/astral-sh/ohm-cargo/pull/66)
 - [Cargo #88](https://github.com/astral-sh/ohm-cargo/pull/88)
 - [Cargo #16](https://github.com/astral-sh/ohm-cargo/pull/16)
+- [Cargo #143](https://github.com/astral-sh/ohm-cargo/pull/143)
+- [Cargo #167](https://github.com/astral-sh/ohm-cargo/pull/167)
+- [Cargo #175](https://github.com/astral-sh/ohm-cargo/pull/175)
+- [Cargo #176](https://github.com/astral-sh/ohm-cargo/pull/176)
+- [Cargo #177](https://github.com/astral-sh/ohm-cargo/pull/177)
+- [Cargo #178](https://github.com/astral-sh/ohm-cargo/pull/178)
+- [Cargo #179](https://github.com/astral-sh/ohm-cargo/pull/179)
+- [Cargo #180](https://github.com/astral-sh/ohm-cargo/pull/180)
+
+### 16. Cache unchanged ThinLTO objects
+
+**Status:** New optimization, enabled by default for eligible Linux builds.
+
+ThinLTO optimizes code across compilation units. In supported non-incremental native builds, Ohm
+can reuse the finished object for an unchanged unit, avoiding repeated LLVM optimization and code
+generation. Cache keys cover the compiler, target, options, bitcode, and the cross-unit information
+that affects optimization. This preserves the build's selected optimization settings.
+
+With a shared build directory, Cargo shares these objects between compatible builds and cleans them
+with `cargo +ohm gc`. If Cargo can't track where the cached objects came from, it keeps new objects
+private. Private caches are pruned after builds; explicitly configured compiler cache directories
+retain their own cleanup policy.
+
+Unsupported compiler configurations, instrumentation, and wrappers keep ordinary compilation, as do
+cache misses or failures. Use `-Zohm-thinlto-cache=no` to disable this default, or
+`-Zohm-defaults=no` to disable it with Ohm's other defaults.
+
+See:
+
+- [Cargo #142](https://github.com/astral-sh/ohm-cargo/pull/142)
+- [Cargo #164](https://github.com/astral-sh/ohm-cargo/pull/164)
+- [Rust #164](https://github.com/astral-sh/ohm-rust/pull/164)
 
 ## rustfmt
 
-### 12. Format only what changed
+### 17. Format only what changed
 
 **Status:** New optimization.
 
 After a successful run, Ohm's `cargo fmt` remembers which workspace packages it formatted. It can
 skip those packages on the next run if their sources, configuration, and formatter have not changed.
-When a module changes, Ohm can format just that module if it can verify which crate owns it and how
-the modules connect. Set `OHM_INCREMENTAL_FMT=0` to disable the cache.
+When a module changes, Ohm can format or verify just that module if it can determine which crate
+owns it and how the modules connect. Otherwise, it formats the whole crate. Set `OHM_INCREMENTAL_FMT=0`
+to disable the cache.
+
+Ohm also reduces filesystem and parsing work during formatting. For example, on Linux it can resolve
+eligible paths with a single filesystem lookup, and it can skip scanning for comments when the text
+contains no `/` character.
 
 In the Codex release benchmark, checking formatting on unchanged sources took 11.91 seconds with
 stock Rust and 0.31 seconds with Ohm. After an edit, it took 12.44 and 0.50 seconds, respectively.
 Ohm's formatting cache was already warm in both cases. In a Ruff benchmark, the first formatting run
 took 7.46 seconds with stock Rust and 8.94 seconds with Ohm.
 
+In a separate Linux experiment on a warm Ruff workspace, formatting one edit that required a rewrite
+fell from 4.62 to 0.37 seconds.
+
 See:
 
 - [rustfmt #13](https://github.com/astral-sh/ohm-rustfmt/pull/13)
 - [rustfmt #14](https://github.com/astral-sh/ohm-rustfmt/pull/14)
+- [rustfmt #27](https://github.com/astral-sh/ohm-rustfmt/pull/27)
+- [rustfmt #28](https://github.com/astral-sh/ohm-rustfmt/pull/28)
+- [rustfmt #29](https://github.com/astral-sh/ohm-rustfmt/pull/29)
+- [rustfmt #30](https://github.com/astral-sh/ohm-rustfmt/pull/30)
+- [rustfmt #31](https://github.com/astral-sh/ohm-rustfmt/pull/31)
+- [rustfmt #32](https://github.com/astral-sh/ohm-rustfmt/pull/32)
+- [rustfmt #33](https://github.com/astral-sh/ohm-rustfmt/pull/33)
+- [rustfmt #34](https://github.com/astral-sh/ohm-rustfmt/pull/34)
 
 ## Rust compiler
 
-### 13. Run the compiler frontend in parallel
+### 18. Run the compiler frontend in parallel
 
 **Status:** Existing experimental Rust feature, enabled by default in Ohm.
 
@@ -302,23 +474,48 @@ For example, a build may reach a large parser crate after all its dependencies h
 if Cargo has no other crates ready to compile, the compiler can check independent function bodies in
 the parser on several threads.
 
-In an experiment on an earlier Ohm release, we changed only the frontend thread setting and ran
-development sessions for Ruff, uv, and Codex. Their combined time fell from 1,032 to 720 seconds,
-about 30%.
+In an experiment, we changed only the frontend thread setting and ran development sessions for Ruff,
+uv, and Codex. Their combined time fell from 1,032 to 720 seconds, about 30%.
 
 See:
 
 - [Cargo #90](https://github.com/astral-sh/ohm-cargo/pull/90)
 - [Cargo #48](https://github.com/astral-sh/ohm-cargo/pull/48)
 
-### 14. Reuse compiler work across incremental builds
+### 19. Compile codegen units in batches
 
 **Status:** New optimization.
 
-The compiler groups generated code into units that it can compile separately. Ohm keeps these groups
-stable across edits and reuses compatible decisions about where generic code belongs. This lets it
-reuse more work from the previous build. Ohm also reuses part of the metadata it has already encoded
-when the inputs to that metadata have not changed.
+The compiler divides generated code into units that LLVM can compile separately. Ohm compiles later
+units in batches of up to two, rather than processing them one at a time. This bounds the amount of
+intermediate code waiting for LLVM while allowing more work to proceed in parallel.
+
+In a benchmark that replayed development commits, the batches made ty 7.6% faster and ripgrep 2.0%
+faster, but uv 0.9% slower. CPU use rose in all three, and ty's peak memory use rose 6.2%.
+
+See:
+
+- [Rust #178](https://github.com/astral-sh/ohm-rust/pull/178)
+
+### 20. Reuse compiler work across incremental builds
+
+**Status:** New optimization.
+
+The compiler groups generated code into units that it can compile separately. Ohm keeps these
+groups stable across edits and reuses compatible decisions about where generic code belongs. It also
+retains cached query results from those decisions so they can be reused after a later edit. This can
+increase the size of the query cache; set `OHM_RETAIN_MONO_QUERY_VALUES=0` to disable the retention.
+
+For incremental builds at optimization levels 0 and 1, Ohm can split large codegen units into
+smaller stable groups. A later edit may then need to recompile only one group. Splitting can
+increase stored object size and affect runtime performance. Use `-Zohm-cgu-split-limit` to change
+the maximum number of groups, or `-Zohm-split-large-cgus=no` to disable splitting.
+
+Ohm also reuses part of the metadata it has already encoded when its inputs have not changed. This
+includes source-written exported macros when their text and source locations match. Generated macros
+or changed locations require fresh encoding; `-Zohm-metadata-macro-reuse=no` disables this metadata
+reuse for macros. If an incremental query cache cannot be loaded, Ohm discards the matching
+dependency graph and recomputes it.
 
 For example, suppose a test binary calls `parse::<u32>` and `parse::<u64>`. Changing an error
 message in one test may leave both generated versions of `parse` and their dependencies unchanged.
@@ -329,13 +526,27 @@ In a Codex TUI experiment, we repeatedly made and reverted one edit, then rebuil
 Reusing the compiler's grouping decisions reduced average code generation time from 8.67 to 7.06
 seconds.
 
+In one uv comparison from the same starting state, retaining query results reduced an edited test
+from 18.96 to 15.49 seconds. Including the preceding compiler refresh, the cycle fell from 24.53 to
+20.80 seconds.
+
+In an edit-and-rebuild experiment at optimization level 1, splitting reduced times by 32.8% for ty
+and 45.8% for uv. Splitting also made ty's tests about 3–4% slower and increased uv's cold-build
+time by 5.7% in separate comparisons.
+
 See:
 
 - [Rust #54](https://github.com/astral-sh/ohm-rust/pull/54)
 - [Rust #57](https://github.com/astral-sh/ohm-rust/pull/57)
 - [Rust #65](https://github.com/astral-sh/ohm-rust/pull/65)
+- [Rust #179](https://github.com/astral-sh/ohm-rust/pull/179)
+- [Rust #183](https://github.com/astral-sh/ohm-rust/pull/183)
+- [Rust #180](https://github.com/astral-sh/ohm-rust/pull/180)
+- [Rust #190](https://github.com/astral-sh/ohm-rust/pull/190)
+- [Rust #192](https://github.com/astral-sh/ohm-rust/pull/192)
+- [Rust #193](https://github.com/astral-sh/ohm-rust/pull/193)
 
-### 15. Reuse async code after it moves
+### 21. Reuse async code after it moves
 
 **Status:** New optimization.
 
@@ -349,23 +560,29 @@ For example, adding a comment above an unchanged async function shifts its line 
 those source locations separate from the layout of the function's saved state, so the line shift
 alone need not invalidate compiler work that depends only on that layout.
 
-In an earlier uv benchmark that exercised handling of Python version files, the development commands
-took a total of 140.81 seconds before this change and 123.25 seconds after it. A separate benchmark
-of uv's PyPI JSON parsing was essentially unchanged. Both benchmarks used full debug information, so
-they do not establish the benefit with Ohm's default line tables.
+In an earlier uv benchmark with full debug information, development commands that exercised Python
+version files took a total of 140.81 seconds before this change and 123.25 seconds after it. A
+separate benchmark of uv's PyPI JSON parsing was essentially unchanged.
 
 See:
 
 - [Rust #132](https://github.com/astral-sh/ohm-rust/pull/132)
 
-### 16. Reduce repeated compiler work
+### 22. Reduce repeated compiler work
 
 **Status:** New optimization.
 
 Ohm also removes smaller sources of repeated work inside the compiler. It reuses incremental query
 results, avoids walking the same type constraints twice, and skips unnecessary work when generating
 code for development builds. For example, it can omit cleanup paths that have become empty and avoid
-constructing intermediate lists while checking type constraints.
+constructing intermediate lists while checking type constraints. Other changes avoid repeated
+lookups, reuse LLVM target machines, and reduce the size of compiler data structures.
+
+When laying out async state, Ohm skips redundant work when tracking which values are live at the
+same time. This backports a change from
+[rust-lang/rust #163126](https://github.com/rust-lang/rust/pull/163126). On Unix, Ohm also reduces
+peak memory use by keeping a read-only mapping of an incremental query cache while rewriting it,
+instead of copying the retained data into memory.
 
 For example, a generic type `Container<T>` might require `T: Clone`. When checking a use of that
 type, the compiler gathers the bounds that apply to it. Ohm gathers those bounds in one walk through
@@ -375,12 +592,29 @@ In an experiment, the simpler checks of type constraints reduced the time to che
 `ty_python_semantic` crate by about 4%. In a separate experiment, the changes to code generation in
 development builds reduced `uv-resolver` compilation time by about 8–9%.
 
+In another experiment, the lookup and data-structure changes, together with Cargo's filesystem
+caches, reduced total rebuild time across 13 uv development commits from 478.19 to 446.97 seconds,
+or 6.5%. Focused Ruff measurements of the query-cache change saved about 36 MiB during a check and
+114 MiB during a build, with no consistent wall-time improvement.
+
 See:
 
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
 - [Rust #101](https://github.com/astral-sh/ohm-rust/pull/101)
+- [Rust #141](https://github.com/astral-sh/ohm-rust/pull/141)
+- [Rust #173](https://github.com/astral-sh/ohm-rust/pull/173)
+- [Rust #181](https://github.com/astral-sh/ohm-rust/pull/181)
 
-### 17. Avoid generating async bodies for metadata
+### 23. Reduce allocator page-clearing work
+
+**Status:** Default allocator setting on Linux.
+
+Ohm disables transparent huge pages in rustc's mimalloc allocator by default. A Ruff edited-check
+profile found that clearing huge pages accounted for roughly 40% of sampled CPU time. Disabling them
+reduced the median check from 10.78 to 8.60 seconds across four trials. The `MIMALLOC_ALLOW_THP`
+environment override remains available. See [Rust #191](https://github.com/astral-sh/ohm-rust/pull/191).
+
+### 24. Avoid generating async bodies for metadata
 
 **Status:** New optimization.
 
@@ -409,7 +643,7 @@ See:
 
 - [Rust #99](https://github.com/astral-sh/ohm-rust/pull/99)
 
-### 18. Cache derive macro expansions
+### 25. Cache derive macro expansions
 
 **Status:** Existing experimental Rust feature, enabled by default in Ohm.
 
@@ -425,8 +659,7 @@ inputs, Ohm can reuse that generated code while checking the edited function.
 
 In the uv benchmark, we applied a private parser edit, checked the dependent crate, and ran the
 parser tests. The full sequence took a median of 4.02 seconds with macro caching and 4.15 seconds
-without it. The runs varied substantially, so they do not give a precise estimate of the cache's
-benefit.
+without it.
 
 See:
 
@@ -434,7 +667,7 @@ See:
 
 ## Clippy
 
-### 19. Reuse Clippy results for unchanged modules
+### 26. Reuse Clippy results for unchanged modules
 
 **Status:** New optimization.
 
@@ -466,3 +699,23 @@ with a version that already skipped some unnecessary analysis.
 See:
 
 - [Clippy #7](https://github.com/astral-sh/ohm-rust-clippy/pull/7)
+
+### 27. Preserve dependency reuse during Clippy
+
+**Status:** New optimization.
+
+Clippy runs workspace crates through its compiler wrapper, while ordinary dependencies still use
+rustc. Ohm lets dependencies reuse compatible check and build results while running Clippy on the
+workspace crates. It also caches compiler capability checks when switching between rustc and Clippy.
+
+For example, after checking a workspace, running Clippy can reuse unchanged registry dependencies
+instead of checking them again. Workspace crates still run through Clippy, including after an edit
+that introduces a lint.
+
+In one Codex session replay, using a Cargo build with this reuse reduced Clippy time from 124.56 to
+56.99 seconds and total session time from 322.72 to 250.58 seconds.
+
+See:
+
+- [Cargo #156](https://github.com/astral-sh/ohm-cargo/pull/156)
+- [Cargo #168](https://github.com/astral-sh/ohm-cargo/pull/168)
