@@ -79,31 +79,31 @@
         },
         "workflows": {
           "edit-test": {
-            "label": "Edit \u2192 focused test",
+            "label": "Edit → focused test",
             "edit": "direct",
             "warmup": ["test"],
             "commands": ["test"]
           },
           "dependency-test": {
-            "label": "Edit dependency \u2192 downstream test",
+            "label": "Edit dependency → downstream test",
             "edit": "dependency",
             "warmup": ["test"],
             "commands": ["test"]
           },
           "edit-check-test-check": {
-            "label": "Edit \u2192 check \u2192 test \u2192 check",
+            "label": "Edit → check → test → check",
             "edit": "direct",
             "warmup": ["check", "test", "check"],
             "commands": ["check", "test", "check"]
           },
           "check-build-check": {
-            "label": "Check \u2192 build \u2192 check",
+            "label": "Check → build → check",
             "edit": null,
             "warmup": ["check"],
             "commands": ["check", "build", "check"]
           },
           "edit-fmt-clippy-test": {
-            "label": "Edit \u2192 fmt \u2192 clippy \u2192 test",
+            "label": "Edit → fmt → clippy → test",
             "edit": "direct",
             "warmup": ["fmt", "clippy", "test"],
             "commands": ["fmt", "clippy", "test"]
@@ -7237,31 +7237,31 @@
         },
         "workflows": {
           "edit-test": {
-            "label": "Edit \u2192 focused test",
+            "label": "Edit → focused test",
             "edit": "direct",
             "warmup": ["test"],
             "commands": ["test"]
           },
           "dependency-test": {
-            "label": "Edit dependency \u2192 downstream test",
+            "label": "Edit dependency → downstream test",
             "edit": "dependency",
             "warmup": ["test"],
             "commands": ["test"]
           },
           "edit-check-test-check": {
-            "label": "Edit \u2192 check \u2192 test \u2192 check",
+            "label": "Edit → check → test → check",
             "edit": "direct",
             "warmup": ["check", "test", "check"],
             "commands": ["check", "test", "check"]
           },
           "check-build-check": {
-            "label": "Check \u2192 build \u2192 check",
+            "label": "Check → build → check",
             "edit": null,
             "warmup": ["check"],
             "commands": ["check", "build", "check"]
           },
           "edit-fmt-clippy-test": {
-            "label": "Edit \u2192 fmt \u2192 clippy \u2192 test",
+            "label": "Edit → fmt → clippy → test",
             "edit": "direct",
             "warmup": ["fmt", "clippy", "test"],
             "commands": ["fmt", "clippy", "test"]
@@ -14859,31 +14859,31 @@
         },
         "workflows": {
           "edit-test": {
-            "label": "Edit \u2192 focused test",
+            "label": "Edit → focused test",
             "edit": "direct",
             "warmup": ["test"],
             "commands": ["test"]
           },
           "dependency-test": {
-            "label": "Edit dependency \u2192 downstream test",
+            "label": "Edit dependency → downstream test",
             "edit": "dependency",
             "warmup": ["test"],
             "commands": ["test"]
           },
           "edit-check-test-check": {
-            "label": "Edit \u2192 check \u2192 test \u2192 check",
+            "label": "Edit → check → test → check",
             "edit": "direct",
             "warmup": ["check", "test", "check"],
             "commands": ["check", "test", "check"]
           },
           "check-build-check": {
-            "label": "Check \u2192 build \u2192 check",
+            "label": "Check → build → check",
             "edit": null,
             "warmup": ["check"],
             "commands": ["check", "build", "check"]
           },
           "edit-fmt-clippy-test": {
-            "label": "Edit \u2192 fmt \u2192 clippy \u2192 test",
+            "label": "Edit → fmt → clippy → test",
             "edit": "direct",
             "warmup": ["fmt", "clippy", "test"],
             "commands": ["fmt", "clippy", "test"]
@@ -31541,116 +31541,5 @@
       "repetition": 3,
       "measured": true
     }
-  ],
-  "evidence": {
-    "publication": "https://github.com/astral-sh/ohm/releases/tag/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d",
-    "host_reports": {
-      "uv": {
-        "path": "developer.json",
-        "sha256": "905e8093761e965e9c2a7aed430fa8be15b623e6f1d58e9d980e54e38ad37423"
-      },
-      "codex": {
-        "path": "developer.json",
-        "sha256": "cce6a2098db85f9173563a0f73a3c00ca4f826231085711568de4873901fbe3e"
-      },
-      "ruff": {
-        "path": "developer.json",
-        "sha256": "f08b537c5360faecc1437557cfc334d8f8562255b2d3368974452bacde7b1561"
-      }
-    },
-    "manifest": {
-      "bytes": 3104,
-      "sha256": "2be7fb68ff9d4741e3917b4686440f7e26622a4a0876d92d8135ef8503c18f10",
-      "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/manifest.json"
-    },
-    "by_suite": {
-      "developer": {
-        "uv": {
-          "host": "charlie-serc-1",
-          "archive": {
-            "bytes": 7764009,
-            "sha256": "365c4c0a28d33aec8be0a04a2b9da914e78e3bf2c0fd1ca8db7946479b519fe8",
-            "host": "charlie-serc-1",
-            "manifest_files": 783,
-            "studies": ["workflow", "sessions", "ablation", "developer"],
-            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-uv-1.99.0-7-raw.zip"
-          }
-        },
-        "codex": {
-          "host": "charlie-oss-3",
-          "archive": {
-            "bytes": 11894450,
-            "sha256": "f71c8dedb573e29ee8a5d3585294f9701d06816d52e4e8abbfbb2ceabc48b4ad",
-            "host": "charlie-oss-3",
-            "manifest_files": 644,
-            "studies": ["workflow", "sessions", "developer"],
-            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-codex-1.99.0-7-raw.zip"
-          }
-        },
-        "ruff": {
-          "host": "charlie-ohm-session-bench",
-          "archive": {
-            "bytes": 2173607,
-            "sha256": "4e77d0109e3d8fd9579c56cca249c6f063d8b26464402ea6c23439b77d638b45",
-            "host": "charlie-ohm-session-bench",
-            "manifest_files": 358,
-            "studies": ["developer"],
-            "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-ruff-developer-1.99.0-7-raw.zip"
-          }
-        }
-      }
-    },
-    "excluded_attempts": {
-      "uv": {
-        "bytes": 524869,
-        "sha256": "bfce37511b388068c534d7b1ed6b8438f46b772f20f6ccbdc9507b77217d65ed",
-        "host": "charlie-oss-1",
-        "manifest_files": 277,
-        "studies": [],
-        "accepted_samples": 0,
-        "scope": "Excluded attempt; no sample contributes to published timings.",
-        "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-uv-excluded-charlie-oss-1-1.99.0-7-raw.zip"
-      },
-      "ruff": {
-        "bytes": 290239,
-        "sha256": "e39a201d72c27ef205cf8741d6a1b3cc2fde6c55b2a76901ea6ebc585d932a2c",
-        "host": "charlie-oss-7",
-        "manifest_files": 108,
-        "studies": [],
-        "accepted_samples": 0,
-        "scope": "Excluded attempt; no sample contributes to published timings.",
-        "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-ruff-excluded-charlie-oss-7-1.99.0-7-raw.zip"
-      },
-      "ruff_serc4_developer": {
-        "archive": {
-          "bytes": 148021859,
-          "sha256": "c501ffb0f05a89d82038a76691d31fd4dbffc732cbfc3467bf006ccd1610681a",
-          "host": "charlie-serc-4",
-          "manifest_files": 583,
-          "studies": ["sessions", "historical"],
-          "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-raw-evidence-1.99.0-7-2be7fb68ff9d/linux-ruff-sessions-1.99.0-7-raw.zip"
-        },
-        "scope_path": "selected-suites.json",
-        "accepted_samples": 0,
-        "attempts": [
-          {
-            "path": "rejected/ruff-developer-serc4-attempt-1",
-            "retained_samples": 15,
-            "accepted_samples": 0
-          },
-          {
-            "path": "rejected/ruff-developer-serc4-attempt-2",
-            "retained_samples": 5,
-            "accepted_samples": 0
-          }
-        ]
-      }
-    }
-  },
-  "full_report": {
-    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-report-inputs-1.99.0-7-f5f433e73751/benchmark-report-inputs-1.99.0-7.zip",
-    "sha256": "dff13ad2ee6158296bd6f0accd1233c63424200f63d1d02ad0815c5d3e14d16c",
-    "path": "reports/developer-workflows.json",
-    "report_sha256": "2ac29669e51d7e2a4b92a6fb8daac33270a6424ab533ef8bdb1acba2e20a2fa2"
-  }
+  ]
 }
