@@ -310,13 +310,18 @@ inputs and protected by locks: incompatible builds get separate artifacts, thoug
 of the same artifact may wait.
 
 `cargo clean` removes the selected project's private state, and removing a worktree removes its
-default target directory. An explicitly configured target directory outside the checkout needs
-separate cleanup.
+default target directory. An external target can outlive its checkout.
 
-On Linux and macOS, `cargo +ohm gc --dry-run` previews cleanup of shared build caches, and
-`cargo +ohm gc` performs it. It can remove unused shared artifacts after at least an hour and
-artifacts for obsolete compilers immediately. It leaves local targets and active compiler caches
-alone; removed artifacts are rebuilt when needed.
+On Linux and macOS, Ohm records when a build, check, or worktree seed uses a target. After an hour
+of inactivity, `cargo +ohm gc` can reclaim that target’s binaries, documentation, incremental state,
+and private compiler output. Cargo rounds the last-use time up to the next five-minute boundary.
+An active build holds a lock that postpones cleanup.
+
+`cargo +ohm gc --max-age 2d --dry-run` previews cleanup after two days of inactivity.
+The same cutoff applies to shared compiler caches, individual dependency builds, and
+ThinLTO objects. After an Ohm upgrade, GC can immediately reclaim marked intermediates from the old
+compiler, even in a recently used checkout. It preserves directories that back external artifact
+exports.
 
 Manual cleanup continues in bounded batches until it finishes the available work. It scans idle
 dependencies once per invocation, then rechecks their use under a lock before removal. A progress
@@ -341,6 +346,8 @@ See:
 - [Cargo #187](https://github.com/astral-sh/ohm-cargo/pull/187)
 - [Cargo #188](https://github.com/astral-sh/ohm-cargo/pull/188)
 - [Cargo #189](https://github.com/astral-sh/ohm-cargo/pull/189)
+- [Cargo #190](https://github.com/astral-sh/ohm-cargo/pull/190)
+- [Cargo #191](https://github.com/astral-sh/ohm-cargo/pull/191)
 - [Cargo #77](https://github.com/astral-sh/ohm-cargo/pull/77)
 - [Rust #97](https://github.com/astral-sh/ohm-rust/pull/97)
 - [Rust #98](https://github.com/astral-sh/ohm-rust/pull/98)
@@ -571,6 +578,16 @@ In an edit-and-rebuild experiment at optimization level 1, splitting reduced tim
 and 45.8% for uv. Splitting also made ty's tests about 3–4% slower and increased uv's cold-build
 time by 5.7% in separate comparisons.
 
+When rustc loads an unchanged query result from disk, it can reuse the encoded bytes when saving
+the next incremental cache, until the cache needs compaction. Inside its private session directory,
+rustc unlinks the old query cache and dependency graph before replacing them. On ext4, this can
+avoid waiting for pending writes.
+
+On ext4, we used the same compiler binary to compare this change with the behavior at Rust #194.
+Across two rounds of paired runs, a `check → build → check` sequence after an edit took 4.05% less
+time on uv and 2.24% less on Ruff. Timing ended when the final check returned, so some filesystem
+writes could finish after the measured sequence.
+
 See:
 
 - [Rust #54](https://github.com/astral-sh/ohm-rust/pull/54)
@@ -582,6 +599,7 @@ See:
 - [Rust #190](https://github.com/astral-sh/ohm-rust/pull/190)
 - [Rust #192](https://github.com/astral-sh/ohm-rust/pull/192)
 - [Rust #193](https://github.com/astral-sh/ohm-rust/pull/193)
+- [Rust #203](https://github.com/astral-sh/ohm-rust/pull/203)
 
 ### 21. Reuse async code after it moves
 
