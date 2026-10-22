@@ -41,13 +41,13 @@ Fetch dependencies before measuring, using the same Cargo home for both commands
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-7 \
+  --ohm ohm-1.99.0-8 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-7 \
+  --ohm ohm-1.99.0-8 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -61,7 +61,7 @@ sets `PYTHONSAFEPATH=1`, prefix the commands with `env -u PYTHONSAFEPATH`.
 The published developer-workflow measurements use eight Cargo jobs on three 32-vCPU Linux devboxes. Each result
 records its host metadata, command logs, and CPU traces.
 
-The published results use the official Ohm 1.99.0-7 release. The
+The published results use the official Ohm 1.99.0-8 release. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the release archives,
 component sources, and binary hashes verified on each machine. Use `--ohm` to select another
 installed toolchain when measuring a different version. See the
@@ -143,14 +143,14 @@ python3 scripts/publish_benchmarks.py --render
 Preview the plan without cloning or building:
 
 ```console
-uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-7 --dry-run
+uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-8 --dry-run
 ```
 
 Run both projects:
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-7 --jobs 8 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-8 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -208,12 +208,13 @@ Rust does not isolate changes between Ohm releases.
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. Their evidence links contain logs, CPU traces, and excluded attempts.
 
-The October 21–22, 2026 (UTC) timing studies compare stock Rust 1.99.0 with Ohm 1.99.0-7,
-using eight Cargo jobs on 32-vCPU Linux devboxes. uv runs on `charlie-serc-1`, and Codex runs on
-`charlie-oss-3`. Ruff's main and historical replays run on `charlie-serc-4`; its developer workflows
-and the ty session and worktree studies run on `charlie-ohm-session-bench`. Each comparison keeps
-all configurations and repetitions on the same host. Host assignments differ from the previous
-campaign, so these measurements do not isolate the effect of changes between Ohm releases.
+On October 22, 2026 (UTC), we compared stock Rust 1.99.0 and published Ohm 1.99.0-8 with eight
+Cargo jobs on 32-vCPU Linux devboxes. uv ran on `charlie-serc-1`, Codex on `charlie-oss-3`,
+and Ruff and ty on `charlie-ohm-session-bench`. Each project used the same host for both toolchains.
+
+The formatter study paired published Ohm 1.99.0-7 and 1.99.0-8 on `charlie-serc-1`. Each release
+formatted the same inputs after an untimed warmup and kept its private formatter cache across pairs.
+The report gives 99% confidence intervals for all six cases. [Paired formatter results](scripts/benchmark_results/formatting-comparison.md)
 
 Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust
 to `all`; the ty session and developer workflows also set native-tool trust to `all`.

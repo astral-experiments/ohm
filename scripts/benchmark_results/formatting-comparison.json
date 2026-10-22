@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "release": "ohm-1.99.0-8",
+  "baseline": "ohm-1.99.0-7",
+  "accepted_pairs": 240,
+  "protocol_sha256": "4827f16f7ac599d586a60615d841be531a5247d9e77203d7ad2eafe7083e778f",
+  "results": [
+    {
+      "project": "ruff",
+      "scenario": "unchanged",
+      "source_revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "command": ["cargo", "+<release>", "fmt", "-p", "ruff_linter"],
+      "accepted_pairs": 40,
+      "control_median_seconds": 0.10917681700000001,
+      "candidate_median_seconds": 0.107113736,
+      "candidate_over_control_geometric_ratio": 0.9965519039206315,
+      "paired_time_reduction": 0.003448096079368468,
+      "bootstrap_99_percent_ratio_interval": [
+        0.981482103188464, 1.015348813448689
+      ],
+      "bootstrap_99_percent_reduction_interval": [
+        -0.015348813448688992, 0.01851789681153604
+      ],
+      "bootstrap_resamples": 20000,
+      "bootstrap_seed": 2026102209,
+      "candidate_wins": 30,
+      "conclusion": "inconclusive",
+      "host": "charlie-serc-1"
+    },
+    {
+      "project": "ruff",
+      "scenario": "formatted-comment",
+      "source_revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "command": ["cargo", "+<release>", "fmt", "-p", "ruff_linter"],
+      "accepted_pairs": 40,
+      "control_median_seconds": 0.174959602,
+      "candidate_median_seconds": 0.170758866,
+      "candidate_over_control_geometric_ratio": 0.9743212818798539,
+      "paired_time_reduction": 0.025678718120146105,
+      "bootstrap_99_percent_ratio_interval": [
+        0.9651589038820861, 0.9838359116975098
+      ],
+      "bootstrap_99_percent_reduction_interval": [
+        0.016164088302490165, 0.03484109611791386
+      ],
+      "bootstrap_resamples": 20000,
+      "bootstrap_seed": 2026102210,
+      "candidate_wins": 35,
+      "conclusion": "faster",
+      "host": "charlie-serc-1"
+    },
+    {
+      "project": "ruff",
+      "scenario": "leaf-rewrite",
+      "source_revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "command": ["cargo", "+<release>", "fmt", "-p", "ruff_linter"],
+      "accepted_pairs": 40,
+      "control_median_seconds": 4.52885587,
+      "candidate_median_seconds": 0.23125098849999998,
+      "candidate_over_control_geometric_ratio": 0.051035095547920344,
+      "paired_time_reduction": 0.9489649044520797,
+      "bootstrap_99_percent_ratio_interval": [
+        0.05070011225170104, 0.05139819473994658
+      ],
+      "bootstrap_99_percent_reduction_interval": [
+        0.9486018052600534, 0.949299887748299
+      ],
+      "bootstrap_resamples": 20000,
+      "bootstrap_seed": 2026102211,
+      "candidate_wins": 40,
+      "conclusion": "faster",
+      "host": "charlie-serc-1"
+    },
+    {
+      "project": "uv",
+      "scenario": "unchanged",
+      "source_revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "command": ["cargo", "+<release>", "fmt", "-p", "uv"],
+      "accepted_pairs": 40,
+      "control_median_seconds": 0.0823085635,
+      "candidate_median_seconds": 0.08146035300000001,
+      "candidate_over_control_geometric_ratio": 0.9935562989462596,
+      "paired_time_reduction": 0.006443701053740369,
+      "bootstrap_99_percent_ratio_interval": [
+        0.9815269581731202, 1.0060743919641397
+      ],
+      "bootstrap_99_percent_reduction_interval": [
+        -0.006074391964139725, 0.01847304182687981
+      ],
+      "bootstrap_resamples": 20000,
+      "bootstrap_seed": 2026102219,
+      "candidate_wins": 26,
+      "conclusion": "inconclusive",
+      "host": "charlie-serc-1"
+    },
+    {
+      "project": "uv",
+      "scenario": "formatted-comment",
+      "source_revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "command": ["cargo", "+<release>", "fmt", "-p", "uv"],
+      "accepted_pairs": 40,
+      "control_median_seconds": 0.8301501904999999,
+      "candidate_median_seconds": 0.715378914,
+      "candidate_over_control_geometric_ratio": 0.8569733043814736,
+      "paired_time_reduction": 0.14302669561852643,
+      "bootstrap_99_percent_ratio_interval": [
+        0.8490166719071851, 0.8638632447838885
+      ],
+      "bootstrap_99_percent_reduction_interval": [
+        0.13613675521611146, 0.1509833280928149
+      ],
+      "bootstrap_resamples": 20000,
+      "bootstrap_seed": 2026102220,
+      "candidate_wins": 40,
+      "conclusion": "faster",
+      "host": "charlie-serc-1"
+    },
+    {
+      "project": "uv",
+      "scenario": "leaf-rewrite",
+      "source_revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "command": ["cargo", "+<release>", "fmt", "-p", "uv"],
+      "accepted_pairs": 40,
+      "control_median_seconds": 1.5836204975000001,
+      "candidate_median_seconds": 1.3473400130000002,
+      "candidate_over_control_geometric_ratio": 0.8509467604534926,
+      "paired_time_reduction": 0.1490532395465074,
+      "bootstrap_99_percent_ratio_interval": [
+        0.8477890511764495, 0.8542015355310667
+      ],
+      "bootstrap_99_percent_reduction_interval": [
+        0.1457984644689333, 0.15221094882355046
+      ],
+      "bootstrap_resamples": 20000,
+      "bootstrap_seed": 2026102221,
+      "candidate_wins": 40,
+      "conclusion": "faster",
+      "host": "charlie-serc-1"
+    }
+  ],
+  "limits": [
+    "Measures formatting, not check/build/test end-to-end performance.",
+    "Compares the complete published releases, including their build inputs; does not assign a separate causal percentage to each source PR."
+  ],
+  "all_output_parity_checks_passed": true,
+  "raw_evidence": {
+    "release": "https://github.com/astral-sh/ohm/releases/tag/benchmark-formatting-evidence-1.99.0-8-78e3cce2d2a5",
+    "manifest": {
+      "bytes": 2910,
+      "sha256": "78e3cce2d2a5ed09646b39c7477ddd14f78a3a43ffce8495d6a990c54194fafd",
+      "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-formatting-evidence-1.99.0-8-78e3cce2d2a5/manifest.json"
+    },
+    "archive": {
+      "bytes": 2089480,
+      "sha256": "afa719439f5e29fd1b5ce8f3df3cc85db2bc4a9cc1c7aadf69c713807622b7e4",
+      "files": 1884,
+      "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-formatting-evidence-1.99.0-8-78e3cce2d2a5/formatting-comparison-1.99.0-8-raw.zip"
+    }
+  },
+  "full_report": {
+    "url": "https://github.com/astral-sh/ohm/releases/download/benchmark-report-inputs-1.99.0-8-23d213697c44/benchmark-report-inputs-1.99.0-8.zip",
+    "sha256": "04e1eb91ed39ddc5a97b899e05d6c1d4deff2497f5abdc4d58a557480951cf9c",
+    "path": "reports/formatting-comparison.json",
+    "report_sha256": "d2222ae465529aa28fa0387ca9d649f8a69973bbcb39e4ddb7e2108cbfd8fe98"
+  }
+}
