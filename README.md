@@ -28,6 +28,9 @@ Comparing stock Rust and Ohm on replayed development sessions:
 
 <!-- /benchmark:sessions -->
 
+All four Ohm session replays enabled procedural-macro trust. The ty replay also enabled native-tool
+trust. [Benchmark settings](BENCHMARKS.md#recorded-measurements)
+
 And comparing disk usage (on APFS):
 
 <!-- benchmark:disk -->
@@ -72,7 +75,7 @@ Ohm's installer verifies its embedded archive checksum, installs the complete Ru
 registers an exact version and a moving `ohm` alias with rustup, enabling `cargo +ohm` invocations
 (e.g., `cargo +ohm check`).
 
-To install the release used in the benchmarks below, run
+This command installs Ohm 1.99.0-8, the version used in these benchmarks.
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
