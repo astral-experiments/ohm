@@ -1,0 +1,57 @@
+{
+  "release": "ohm-1.99.0-8",
+  "baseline": "ohm-1.99.0-7",
+  "purpose": "Measure published formatter behavior directly, including a leaf edit that requires rewriting",
+  "host": "charlie-serc-1",
+  "same_host": true,
+  "cases": [
+    {
+      "project": "ruff",
+      "package": "ruff_linter",
+      "path": "crates/ruff_linter/src/doc_lines.rs",
+      "revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "rewrite_before": "pub(crate) fn doc_lines_from_ast(python_ast: &Suite, locator: &Locator) -> Vec<TextSize> {",
+      "rewrite_after": "pub(crate)fn doc_lines_from_ast(python_ast:&Suite,locator:&Locator)->Vec<TextSize>{"
+    },
+    {
+      "project": "uv",
+      "package": "uv",
+      "path": "crates/uv/src/install_source.rs",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "rewrite_before": "component == cellar && next == formula",
+      "rewrite_after": "component==cellar&&next==formula"
+    }
+  ],
+  "scenarios": [
+    "unchanged",
+    "formatted-comment",
+    "leaf-rewrite"
+  ],
+  "pairs_per_case_and_scenario": 40,
+  "warmup_pairs": 2,
+  "order": "balanced AB/BA, deterministically shuffled before measurement",
+  "seed": 2026102208,
+  "edits": "Nonempty cases append a unique already-formatted comment. The rewrite case also removes whitespace from the recorded existing expression or function signature. Both lanes receive identical bytes; the source topology and configuration stay unchanged.",
+  "lanes": "Independent source worktrees, target directories and formatter caches; versioned published toolchains. Same source and edit in both lanes.",
+  "command": [
+    "cargo",
+    "+<version>",
+    "fmt",
+    "-p",
+    "<package>"
+  ],
+  "correctness": "The published -7 formatter establishes canonical baseline bytes before timing. For every nonempty case, expected output is that baseline plus its unique comment. Require exactly that target content, unchanged other tracked files, and byte-identical output patches across releases. Retain input/output hashes and baseline patches.",
+  "timing": "Only cargo fmt subprocess elapsed wall time; source preparation, cache warmup, parity checks and hashing are outside timing. Retain all successful pairs; no latency-based outlier removal.",
+  "host_policy": "Use the frozen complete-host quiet gate and outer process/CPU monitor. Retain and exclude any entire attempt rejected by that monitor. Do not modify thresholds or run concurrently with other measurements.",
+  "statistics": "Report lane medians, geometric mean paired elapsed-time ratio, and deterministic 99 percent paired-bootstrap confidence intervals. A ratio interval crossing one is inconclusive.",
+  "limits": [
+    "Measures formatting, not check/build/test end-to-end performance.",
+    "Compares the complete published releases, including their build inputs; does not assign a separate causal percentage to each source PR."
+  ],
+  "frozen_before_measurement": true,
+  "measurements_started": false,
+  "schema_version": 4,
+  "source_inspection_note": "Before any formatter measurements, replaced the proposed synthetic function with whitespace changes in existing source so the rewrite cases exercise ordinary edits. Canonicalize with the comparison baseline (-7), avoiding unrelated stable/nightly formatter configuration differences.",
+  "bootstrap_resamples": 20000,
+  "bootstrap_seed": 2026102209
+}

@@ -1,0 +1,1104 @@
+{
+  "rust_version": "1.99.0",
+  "ohm_release": "ohm-1.99.0-6",
+  "jobs": 8,
+  "host": {
+    "platform": "linux-x86_64",
+    "id": "charlie-oss-2",
+    "logical_cpus": 32,
+    "cpu_model": "AMD EPYC-Milan Processor"
+  },
+  "provenance": {
+    "runner_sha256": {
+      "benchmark.py": "c84ae1e2e7994e735abb9601fe1359319e3a48d61d0a3ac557e25e23faf9b614",
+      "replay_sessions.py": "9d55791d565019e9fdc9ba91a9adb8ae91bd3afb0b316c17f36d7ff0e01ff389"
+    },
+    "wrapper": {
+      "kind": "ablation-overlap",
+      "arguments": [
+        "--upstream",
+        "1.99.0",
+        "--ohm",
+        "ohm-1.99.0-6",
+        "--jobs",
+        "8",
+        "--minimum-free-gb",
+        "60",
+        "--require-idle",
+        "--output-dir",
+        "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-6/ablation-overlap",
+        "--project",
+        "uv",
+        "--repetitions",
+        "2",
+        "--offline",
+        "--compare-ready-tests",
+        "--scenario",
+        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-6/scripts/session_replays/uv-feature-ablation.json",
+        "--source-path",
+        "uv=/tmp/ohm-benchmarks-1.99.0-6/data/sources/uv"
+      ],
+      "started_at": 1792573533.8410578,
+      "wrapper_sha256": "9d5c29b549cee2d54a7b4783efe798fff8c3ceac6eb4e00be18a1c05292523a5",
+      "runner_sha256": {
+        "benchmark.py": "c84ae1e2e7994e735abb9601fe1359319e3a48d61d0a3ac557e25e23faf9b614",
+        "replay_sessions.py": "9d55791d565019e9fdc9ba91a9adb8ae91bd3afb0b316c17f36d7ff0e01ff389"
+      },
+      "path": "/tmp/ohm-benchmarks-1.99.0-6/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-6/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+      "tmpdir": "/tmp/ohm996",
+      "toolchains": [
+        [
+          "stock",
+          "1.99.0"
+        ],
+        [
+          "ohm",
+          "ohm-1.99.0-6"
+        ],
+        [
+          "ohm-ready-tests",
+          "ohm-1.99.0-6"
+        ]
+      ],
+      "sanitized_environment": {
+        "CARGO_HOME": "/tmp/codex-cargo-home",
+        "CARGO_NET_OFFLINE": "true",
+        "GIT_CONFIG_COUNT": "2",
+        "GIT_CONFIG_KEY_0": "maintenance.auto",
+        "GIT_CONFIG_KEY_1": "gc.auto",
+        "GIT_CONFIG_VALUE_0": "false",
+        "GIT_CONFIG_VALUE_1": "0",
+        "PATH": "/tmp/ohm-benchmarks-1.99.0-6/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-6/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "RUSTUP_HOME": "/home/dev-user/.rustup",
+        "TMPDIR": "/tmp/ohm996",
+        "UV_CACHE_DIR": "/tmp/codex-uv-cache",
+        "UV_PYTHON": "/tmp/ohm-benchmarks-1.99.0-6/tools/bin/python3.12",
+        "UV_PYTHON_DOWNLOADS": "never",
+        "UV_TOOL_BIN_DIR": "/tmp/ohm-benchmarks-1.99.0-6/tools/uv-bin",
+        "UV_TOOL_DIR": "/tmp/ohm-benchmarks-1.99.0-6/tools/uv-tools"
+      },
+      "terminal": {
+        "controlling_tty": false,
+        "stdin_isatty": false,
+        "stdout_isatty": false,
+        "stderr_isatty": false
+      },
+      "git_maintenance": {
+        "maintenance.auto": false,
+        "gc.auto": 0,
+        "scope": "benchmark process environment only"
+      },
+      "coordinator_commit": "d6c0dad5a710ae54b780893f8ee502f02e6fed5f",
+      "manifest_sha256": "7d1e59b58419ede0089c9c50d4160e86358115679aca33842b1887f34f90864c",
+      "fixtures": {
+        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-6/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+      },
+      "post_cell_audit": {
+        "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
+        "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
+        "process_inspector_sha256": "8532849791c0ce299052f6fc0e49cfe5cca887d81e5d8a6ec52de5e69759816d",
+        "timing_boundary": "after persisted run_session, before next cell",
+        "retirement": "exclusive per-cell target and shared-build leaves only",
+        "quiet_seconds_after_retirement": 30
+      }
+    },
+    "toolchains": {
+      "1.99.0": {
+        "cargo": {
+          "version": "cargo 1.99.0 (5f94df478 2026-08-27)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+        },
+        "rustc": {
+          "version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.99 (b940084d7e 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.10.0-stable (b940084d7e 2026-09-28)",
+          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustfmt",
+          "sha256": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3"
+        }
+      },
+      "ohm-1.99.0-6": {
+        "cargo": {
+          "version": "cargo 1.99.0-dev (5e5d271d7 2026-10-20) (ohm-1.99.0-6)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-6/bin/cargo",
+          "sha256": "ba03ac96ba5ebfff69a37d8a898e4bba90e29c1a62141cef8a759b91232b7b7e"
+        },
+        "rustc": {
+          "version": "rustc 1.99.0-dev (6d4a7ee32 2026-10-20) (ohm-1.99.0-6)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-6/bin/rustc",
+          "sha256": "6109cff145371a50c4f62b61908d2ffbf6d259b180c8effde07baa426aab682a"
+        },
+        "clippy-driver": {
+          "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-6/bin/clippy-driver",
+          "sha256": "3fa956c143c25693185d41f045a4def1bb2f3969136de0e9e47127458032b31c"
+        },
+        "rustfmt": {
+          "version": "rustfmt 1.10.0-dev (29bfbe020d 2026-10-07)",
+          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-6/bin/rustfmt",
+          "sha256": "ac77dd845569e094a5488cd41f36f2030c1111b66e3969f9f11cf54e3fe98907"
+        }
+      }
+    },
+    "helpers": {
+      "just": {
+        "url": "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz",
+        "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
+        "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
+        "version": "just 1.58.0",
+        "path": "/tmp/ohm-benchmarks-1.99.0-6/tools/bin/just"
+      },
+      "cargo-nextest": {
+        "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
+        "archive_sha256": "4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3",
+        "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
+        "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
+        "path": "/tmp/ohm-benchmarks-1.99.0-6/tools/bin/cargo-nextest"
+      },
+      "uv": {
+        "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
+        "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
+        "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
+        "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
+        "path": "/tmp/ohm-benchmarks-1.99.0-6/tools/bin/uv"
+      },
+      "python3.12": {
+        "path": "/tmp/ohm-benchmarks-1.99.0-6/tools/bin/python3.12",
+        "resolved_path": "/home/dev-user/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+        "sha256": "7d43f6e86a6c6dd12005ec77eb2055f1be3f1bb3adedf8afe0a87973fa7371ce",
+        "version": "Python 3.12.13"
+      }
+    },
+    "python": {
+      "path": "/tmp/ohm-benchmarks-1.99.0-6/tools/bin/python3.12",
+      "resolved_path": "/home/dev-user/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+      "sha256": "7d43f6e86a6c6dd12005ec77eb2055f1be3f1bb3adedf8afe0a87973fa7371ce",
+      "version": "Python 3.12.13",
+      "verified_at": 1792547501.3191757,
+      "provenance": "Copied from the existing pre-measurement helpers.json fingerprint after verifying the installed interpreter again.",
+      "helpers_sha256": "d0666c4586643203968e5848fce58ba9ac7b9fbebbd5f57a63e547606f915644"
+    },
+    "system_cpu": {
+      "proof": {
+        "passed": true,
+        "violations": [],
+        "samples": 393,
+        "returncode": 0,
+        "monitor_sha256": "cfdb2cd75f1bf956faad31a33e3bbe21440b71d553ce70eb81c358d9ac641802",
+        "trace_sha256": "53e1b549faa35000b5eb14bcf029c46a929fd224d390aff5fa9738d6e5548408"
+      },
+      "preflight_sha256": "4841fbb712edb2bb62669b987e88e236afb875bc0414b19ba0dfbb48b2de3799",
+      "accepted_prefix_only": false,
+      "accepted_samples": 393,
+      "interval_start": 1792573533.7492957,
+      "interval_end": 1792574353.904736,
+      "maximum_gap_seconds": 2.265948684012983,
+      "minimum_free_bytes": 941853908992,
+      "weighted_steal_fraction": 2.6027791557196837e-05,
+      "peak_steal_fraction": 0.00045317220543806646,
+      "peak_external_user_cpu_fraction": 0.031826432683600574
+    },
+    "raw_results_sha256": "8e91be4dab03cac77885b0210344e3ded1f2fd3d6c2359c9b0da1812728f7701",
+    "exporter_sha256": "1fef388c82a3ab73b90d874c7582dc29e34a524adaa4b09acb5ab64df03b646c",
+    "fixtures": {
+      "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-6/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+    }
+  },
+  "completed_at": "2026-10-21T09:19:40.115405+00:00",
+  "repetitions": 2,
+  "sessions": [
+    {
+      "project": "uv",
+      "session": {
+        "id": "uv-pypi-simple-json-parser-feature-ablation",
+        "description": "Replay one real, private-only PyPI Simple API parser simplification and separately measure downstream check cutoff and focused derive-heavy parser tests."
+      },
+      "base_revision": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+      "commands": 2,
+      "edits": 1,
+      "warmups": 2
+    }
+  ],
+  "commands": {
+    "uv": [
+      {
+        "index": 2,
+        "label": "Recheck downstream registry-client dependencies after the private parser edit",
+        "category": "check",
+        "command": [
+          "cargo",
+          "check",
+          "-p",
+          "uv-client",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [
+            3.4555008549941704,
+            3.4681849970365874
+          ],
+          "ohm": [
+            1.134551523020491,
+            1.0917063160450198
+          ],
+          "ohm-ready-tests": [
+            1.185610195971094,
+            1.12428207998164
+          ]
+        },
+        "tests_started": {
+          "stock": [
+            0,
+            0
+          ],
+          "ohm": [
+            0,
+            0
+          ],
+          "ohm-ready-tests": [
+            0,
+            0
+          ]
+        },
+        "cargo_status_message_counts": {
+          "stock": [
+            8,
+            8
+          ],
+          "ohm": [
+            8,
+            8
+          ],
+          "ohm-ready-tests": [
+            8,
+            8
+          ]
+        }
+      },
+      {
+        "index": 3,
+        "label": "Retest the directly changed Simple API parser library",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "--lib",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [
+            1.7991348769864999,
+            1.7609771100105718
+          ],
+          "ohm": [
+            1.3629965380532667,
+            1.3271478899987414
+          ],
+          "ohm-ready-tests": [
+            1.327676896005869,
+            1.3003807899658568
+          ]
+        },
+        "tests_started": {
+          "stock": [
+            9,
+            9
+          ],
+          "ohm": [
+            9,
+            9
+          ],
+          "ohm-ready-tests": [
+            9,
+            9
+          ]
+        },
+        "cargo_status_message_counts": {
+          "stock": [
+            1,
+            1
+          ],
+          "ohm": [
+            1,
+            1
+          ],
+          "ohm-ready-tests": [
+            1,
+            1
+          ]
+        }
+      }
+    ]
+  },
+  "warmups": {
+    "uv": [
+      {
+        "index": 1,
+        "label": "Warm downstream registry-client checking and its existing parser dependency",
+        "category": "check",
+        "command": [
+          "cargo",
+          "check",
+          "-p",
+          "uv-client",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [
+            42.31810759200016,
+            43.08575670898426
+          ],
+          "ohm": [
+            46.35382211999968,
+            44.2847996460041
+          ],
+          "ohm-ready-tests": [
+            45.56843972398201,
+            45.38113827898633
+          ]
+        },
+        "tests_started": {
+          "stock": [
+            0,
+            0
+          ],
+          "ohm": [
+            0,
+            0
+          ],
+          "ohm-ready-tests": [
+            0,
+            0
+          ]
+        },
+        "cargo_status_message_counts": {
+          "stock": [
+            410,
+            410
+          ],
+          "ohm": [
+            410,
+            410
+          ],
+          "ohm-ready-tests": [
+            410,
+            410
+          ]
+        }
+      },
+      {
+        "index": 2,
+        "label": "Warm focused Simple API parser library tests",
+        "category": "test",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "uv-pypi-types",
+          "--lib",
+          "simple_json::",
+          "--locked"
+        ],
+        "wall_seconds": {
+          "stock": [
+            17.362217066984158,
+            17.895507131994236
+          ],
+          "ohm": [
+            18.032594899006654,
+            17.799915358016733
+          ],
+          "ohm-ready-tests": [
+            17.94789649901213,
+            17.854809547017794
+          ]
+        },
+        "tests_started": {
+          "stock": [
+            9,
+            9
+          ],
+          "ohm": [
+            9,
+            9
+          ],
+          "ohm-ready-tests": [
+            9,
+            9
+          ]
+        },
+        "cargo_status_message_counts": {
+          "stock": [
+            173,
+            173
+          ],
+          "ohm": [
+            166,
+            166
+          ],
+          "ohm-ready-tests": [
+            166,
+            166
+          ]
+        }
+      }
+    ]
+  },
+  "timed_session_seconds": {
+    "uv": {
+      "stock": [
+        5.357540113967843,
+        5.3304927090066485
+      ],
+      "ohm": [
+        2.59963323303964,
+        2.5188048720010556
+      ],
+      "ohm-ready-tests": [
+        2.616346642957069,
+        2.5294474529800937
+      ]
+    }
+  },
+  "timed_command_seconds": {
+    "uv": {
+      "stock": [
+        5.25463573198067,
+        5.229162107047159
+      ],
+      "ohm": [
+        2.4975480610737577,
+        2.4188542060437612
+      ],
+      "ohm-ready-tests": [
+        2.513287091976963,
+        2.424662869947497
+      ]
+    }
+  },
+  "timed_edit_seconds": {
+    "uv": {
+      "stock": [
+        0.005031011009123176,
+        0.004799314949195832
+      ],
+      "ohm": [
+        0.004140842997003347,
+        0.004779789014719427
+      ],
+      "ohm-ready-tests": [
+        0.004858857952058315,
+        0.005826998967677355
+      ]
+    }
+  },
+  "untimed_warmup_seconds": {
+    "uv": {
+      "stock": [
+        59.68032465898432,
+        60.9812638409785
+      ],
+      "ohm": [
+        64.38641701900633,
+        62.084715004020836
+      ],
+      "ohm-ready-tests": [
+        63.51633622299414,
+        63.23594782600412
+      ]
+    }
+  },
+  "overlap_observations": [
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "stock",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 2,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "stock",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 3,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "stock",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 1,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "stock",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 2,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "ohm",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 2,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "ohm",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 3,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "ohm",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 1,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "ohm",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 2,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "ohm-ready-tests",
+      "ready_tests": "true",
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 2,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "ohm-ready-tests",
+      "ready_tests": "true",
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": true,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 3,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "ohm-ready-tests",
+      "ready_tests": "true",
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 1,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "ohm-ready-tests",
+      "ready_tests": "true",
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": true,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 0,
+      "index": 2,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "ohm-ready-tests",
+      "ready_tests": "true",
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 2,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "ohm-ready-tests",
+      "ready_tests": "true",
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": true,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 3,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "ohm-ready-tests",
+      "ready_tests": "true",
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 1,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "ohm-ready-tests",
+      "ready_tests": "true",
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": true,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 2,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "ohm",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 2,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "ohm",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 3,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "ohm",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 1,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "ohm",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 2,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "stock",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 2,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "stock",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 3,
+      "measured": true,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "uv-client",
+        "--locked"
+      ],
+      "toolchain": "stock",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 1,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 0,
+      "uncovered_test_executables_count": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "uv-pypi-types",
+        "--lib",
+        "simple_json::",
+        "--locked"
+      ],
+      "toolchain": "stock",
+      "ready_tests": null,
+      "process_observer": "all-owned-executables",
+      "test_result_before_build_finished": false,
+      "running_before_build_finished": false,
+      "sampling_caveat": "Two-second samples can miss short overlap. The original monitor also omits Ohm executables outside deps; omitted paths are listed explicitly.",
+      "project": "uv",
+      "repetition": 1,
+      "index": 2,
+      "measured": false,
+      "matched_process_observations_count": 0,
+      "logged_test_launches_count": 1,
+      "uncovered_test_executables_count": 0
+    }
+  ],
+  "methodology": {
+    "all_commands_succeeded": true,
+    "external_compilations_observed": 0,
+    "matching_test_counts_within_pairs": true,
+    "baseline_warmups_excluded": true,
+    "session_totals_include_edits_and_runner_overhead": true,
+    "compiler_accounting": "cargo status messages, not compiler invocations",
+    "shared_build_enabled": true,
+    "ohm_proc_macro_trust": "all",
+    "ohm_native_tool_trust": "none",
+    "dependencies_prefetched_locked": true,
+    "timed_commands_offline": true,
+    "constructed_workload": false,
+    "ready_tests_opt_in": "CARGO_UNSTABLE_OHM_READY_TESTS=true only for ohm-ready-tests",
+    "default_and_opt_in_use_identical_binaries": true
+  },
+  "order": [
+    [
+      "stock",
+      "ohm",
+      "ohm-ready-tests"
+    ],
+    [
+      "ohm-ready-tests",
+      "ohm",
+      "stock"
+    ]
+  ]
+}

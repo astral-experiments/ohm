@@ -1,0 +1,88 @@
+{
+  "release": "ohm-1.99.0-6",
+  "comparisons": [
+    {
+      "project": "ruff",
+      "cohort": "single",
+      "worktrees": 1,
+      "default_bytes": 3857141760,
+      "ready_tests_bytes": 3856666624,
+      "ready_tests_percent_saved": 0.012318344244625325,
+      "source_trees_match": true,
+      "commands_and_test_counts_match": true,
+      "default_audit_sha256": "eccfcfd0003f888ee0c61d6b19d5501100d74b579f3b49e235b882afb99b8eb1",
+      "ready_tests_audit_sha256": "6dcdcfe3660888c3bed6f9e7e2b8f3a33c5ce710d5142a4a0c0363fc5d3e8988",
+      "default_results_sha256": "2b6739dce2a4a310c622d31f1c59ba42cd2d252b16deb579409437997e4c236e",
+      "ready_tests_results_sha256": "0367069124ae3e772e4180cce21a600e923dcf312fc87abbd42a9f60dcaaefa2"
+    },
+    {
+      "project": "ruff",
+      "cohort": "forks",
+      "worktrees": 10,
+      "default_bytes": 28987703296,
+      "ready_tests_bytes": 28987506688,
+      "ready_tests_percent_saved": 0.0006782462135492116,
+      "source_trees_match": true,
+      "commands_and_test_counts_match": true,
+      "default_audit_sha256": "fbf57009d917a5f5b82c2945d2a112f440885a63e45c07bfb46d3bff9b58ccf0",
+      "ready_tests_audit_sha256": "48e1e9aa71dffc7a7eee442c6188eb1d145d8e55b8f91d74c59ea4e94ad85040",
+      "default_results_sha256": "eb93eca694bf3efd706320cda84840e3e05318a0968212dc2071538d6dac3dfc",
+      "ready_tests_results_sha256": "98fab37e0a382e95e7df11832085863dcacfe4cd19347d1e09ea17fc7450ea4b"
+    },
+    {
+      "project": "uv",
+      "cohort": "single",
+      "worktrees": 1,
+      "default_bytes": 8505798656,
+      "ready_tests_bytes": 8489644032,
+      "ready_tests_percent_saved": 0.18992483426120732,
+      "source_trees_match": true,
+      "commands_and_test_counts_match": true,
+      "default_audit_sha256": "76d931aaf4a921c1e96da2af33468eec9f1249161892464197eb5ebbd1cc8b00",
+      "ready_tests_audit_sha256": "32c0b4818516cef2c2c9fa8da6de19580aebcd0f4406b4bb8fe7f16b281e495c",
+      "default_results_sha256": "73b5c2ec5ced04f01f9952da4bc49a6fe433b38015537f1473c1af8a244d16f2",
+      "ready_tests_results_sha256": "64a8d63e7c95532917e2979781411f0f438dbf73edbf392945844202b96004d5"
+    },
+    {
+      "project": "uv",
+      "cohort": "forks",
+      "worktrees": 10,
+      "default_bytes": 35644567552,
+      "ready_tests_bytes": 35670523904,
+      "ready_tests_percent_saved": -0.07281993802318862,
+      "source_trees_match": true,
+      "commands_and_test_counts_match": true,
+      "default_audit_sha256": "e4ac4ed6bee7d95aa7046adc4f284d559e629ee4b825d6ba5d0f1f148767b59e",
+      "ready_tests_audit_sha256": "b37c1e507cacc174a9a400e135e43a3280e82b3d9a3c56f6b8c70bff68db2097",
+      "default_results_sha256": "7919a5c040c9de4e0b976e39ed61f8ac8cedad94f9464f737dcc8a15b50980d7",
+      "ready_tests_results_sha256": "785b757ec433e130e32ed62e22d2fe4b9a9392bc367f5d21aa322fc82237f0c5"
+    }
+  ],
+  "methodology": {
+    "metric": "retained bytes after completed cohort and at least 30 seconds idle",
+    "elapsed_times_are_performance_measurements": false,
+    "ready_tests_setting": "CARGO_UNSTABLE_OHM_READY_TESTS=true",
+    "identical_binaries_sources_commands_and_other_explicit_settings": true,
+    "sample_count": 1,
+    "filesystem": "APFS"
+  },
+  "helpers": {
+    "just": {
+      "version": "just 1.58.0",
+      "sha256": "0070dcf46e51756f7b0dd8d2a105c4345231b4201f438f56076a2436b3881107"
+    },
+    "cargo-nextest": {
+      "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: aarch64-apple-darwin",
+      "sha256": "3df7fe2bf35448c91f4c687eb8878bc86497151726581f245162520e06c98f22"
+    },
+    "uv": {
+      "version": "uv 0.12.8 (68209e5c6 2026-08-31 aarch64-apple-darwin)",
+      "sha256": "e053a85d61ffa0790b564afe56bb7314d69334ff33b77175df03f9de2f11dd46"
+    },
+    "python3.12": {
+      "version": "Python 3.12.13",
+      "sha256": "71720f1fc66989ebd691e81c96111b47ae6ff3f1a478666084d1cacbf0fccbf2"
+    }
+  },
+  "exporter_sha256": "3c6732ec78bdfc0b7f95770ff97edad4baecce906333e62400576be39d48c809"
+}
