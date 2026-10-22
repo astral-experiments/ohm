@@ -217,13 +217,6 @@ avoid rebuilding unchanged dependents:
 
 <!-- /benchmark:features -->
 
-The two ty worktree rows use both Ohm trust opt-ins. With a shared build directory and default
-trust settings, median startup took 56.95 s on ext4 and 56.93 s on Btrfs. [Worktree study](scripts/benchmark_results/ty-worktree.md)
-
-On warmed package formatting runs, the median time to rewrite a whitespace edit in Ruff fell from
-4.53 s in Ohm 1.99.0-7 to 0.23 s in 1.99.0-8. Each release kept its own formatter cache across
-40 paired runs per case. [Formatter comparison](scripts/benchmark_results/formatting-comparison.md)
-
 ## Philosophy
 
 Rust's compile times and disk usage are increasingly viewed as bottlenecks in day-to-day
