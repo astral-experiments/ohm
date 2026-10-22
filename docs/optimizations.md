@@ -19,6 +19,9 @@ For example, assume that `linter` depends on `parser`. If you fix a bug in a pri
 without changing the exposed interface, Ohm recompiles `parser` but can reuse `linter`. An
 executable using them still needs to be relinked to pick up the change.
 
+Static libraries also track changes to dependency implementations, because the archive contains
+their code. This applies when a crate emits both an `rlib` and a static library.
+
 In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-types`, then checked the
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
 seconds with it.
@@ -29,6 +32,7 @@ In a separate experiment, the compact metadata graph reduced the time to check R
 See:
 
 - [Rust #194](https://github.com/astral-sh/ohm-rust/pull/194)
+- [Rust #201](https://github.com/astral-sh/ohm-rust/pull/201)
 - [Rust #43](https://github.com/astral-sh/ohm-rust/pull/43)
 - [Cargo #53](https://github.com/astral-sh/ohm-cargo/pull/53)
 - [Cargo #55](https://github.com/astral-sh/ohm-cargo/pull/55)
@@ -314,6 +318,16 @@ On Linux and macOS, `cargo +ohm gc --dry-run` previews cleanup of shared build c
 artifacts for obsolete compilers immediately. It leaves local targets and active compiler caches
 alone; removed artifacts are rebuilt when needed.
 
+Manual cleanup continues in bounded batches until it finishes the available work. It scans idle
+dependencies once per invocation, then rechecks their use under a lock before removal. A progress
+bar reports eligible files and bytes during a dry run, or reclaimed files and bytes during cleanup.
+If a cache is locked or inaccessible, Cargo continues independent cleanup and reports the problem;
+`-v` identifies blocking locks.
+
+On a Linux fixture with 2,048 expired dependency variants and 16 fresh ones, scanning candidates
+once reduced median cleanup time from 30.1 to 4.9 seconds across four paired runs. Both versions
+removed the same 18,432 files.
+
 In a macOS benchmark, we ran the same development tasks with Ohm and stock Rust. Ohm used 40% less
 disk space for Ruff and 35% less for uv.
 
@@ -324,6 +338,9 @@ See:
 - [Cargo #158](https://github.com/astral-sh/ohm-cargo/pull/158)
 - [Cargo #160](https://github.com/astral-sh/ohm-cargo/pull/160)
 - [Cargo #174](https://github.com/astral-sh/ohm-cargo/pull/174)
+- [Cargo #187](https://github.com/astral-sh/ohm-cargo/pull/187)
+- [Cargo #188](https://github.com/astral-sh/ohm-cargo/pull/188)
+- [Cargo #189](https://github.com/astral-sh/ohm-cargo/pull/189)
 - [Cargo #77](https://github.com/astral-sh/ohm-cargo/pull/77)
 - [Rust #97](https://github.com/astral-sh/ohm-rust/pull/97)
 - [Rust #98](https://github.com/astral-sh/ohm-rust/pull/98)
@@ -372,6 +389,16 @@ the packages and features needed by the current command. Ohm also avoids repeate
 and unnecessary work preparing and reading build outputs. Commands that do not access Git skip
 initializing its library.
 
+When loading manifests, Ohm shares inherited workspace dependency maps between members and avoids
+redundant allocations. It skips building a software bill of materials unless an output requests one.
+It also reduces the work needed to prioritize build jobs and compare package identifiers. Separate
+experiments on uv measured fewer instructions in Cargo for these changes; their wall-time effects
+remain unresolved.
+
+On Unix, freshness checks hash source files in parallel when at least 128 checksums are uncached.
+Cargo uses up to four workers within its job budget, preserves file order when reporting the first
+stale input, and releases those slots before running compilers or build scripts.
+
 For example, fixing a bug in `parse_number` leaves the workspace's dependency versions unchanged.
 The next check can reuse the saved resolution. Adding a dependency to `Cargo.toml` invalidates it,
 so Cargo resolves the dependencies again.
@@ -383,6 +410,10 @@ resolution reduced `cargo metadata` time from 413 to 358 milliseconds and Nextes
 In a warm Ruff experiment, skipping unnecessary dependency-file generation reduced unchanged
 workspace checks by 18.2% and test builds by 20.2%. A separate change to output preparation and
 dependency-file parsing reduced unchanged workspace builds by 13.8%.
+
+In a separate warm Ruff comparison with eight jobs, parallel checksum checks reduced unchanged
+`cargo test --workspace --no-run` wall time by 5.63% across 480 pairs (99% confidence interval:
+2.92–8.27%). The `check` and `build` comparisons were inconclusive.
 
 See:
 
@@ -397,6 +428,12 @@ See:
 - [Cargo #178](https://github.com/astral-sh/ohm-cargo/pull/178)
 - [Cargo #179](https://github.com/astral-sh/ohm-cargo/pull/179)
 - [Cargo #180](https://github.com/astral-sh/ohm-cargo/pull/180)
+- [Cargo #181](https://github.com/astral-sh/ohm-cargo/pull/181)
+- [Cargo #182](https://github.com/astral-sh/ohm-cargo/pull/182)
+- [Cargo #183](https://github.com/astral-sh/ohm-cargo/pull/183)
+- [Cargo #184](https://github.com/astral-sh/ohm-cargo/pull/184)
+- [Cargo #185](https://github.com/astral-sh/ohm-cargo/pull/185)
+- [Cargo #186](https://github.com/astral-sh/ohm-cargo/pull/186)
 
 ### 16. Cache unchanged ThinLTO objects
 
