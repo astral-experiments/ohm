@@ -15,7 +15,9 @@ We ran five workflows in Ruff/ty and uv with stock Rust 1.99.0 and Ohm 1.99.0-9.
 | uv      | Check → build → check             |    139.39 s |      72.33 s |     48.11% |
 | uv      | Edit → fmt → clippy → test        |     28.90 s |      14.61 s |     49.45% |
 
-Ruff/ty and uv contributed 40 accepted measurements each. The host-activity checks discarded nine attempts on Ruff/ty and four on uv. [Ruff/ty timings](developer-ruff.json) · [uv timings](developer-uv.json)
+Ruff/ty and uv contributed 40 accepted measurements each. The host-activity checks discarded nine attempts on Ruff/ty and four on uv. Each row in the CSV identifies the repetition and attempt, starting at zero. Accepted rows give the total elapsed time, command time, and edit time in seconds. Discarded rows record whether the host exceeded its CPU limit or another compiler ran during a command. [Individual timings and exclusions](developer-workflows.csv)
+
+The runner fixes each project's edit, warmup, and command sequence. The build record identifies the hosts, binaries, and original reports by checksum. [Workflow fixtures](https://github.com/astral-sh/ohm/blob/04c83d53483607aec4f93fd2bb55b412f101d677/scripts/benchmark_workflows.py) · [Ruff source](https://github.com/astral-sh/ruff/tree/4d6a7db787130c5a4a95bd835369babd78e4a1f6) · [uv source](https://github.com/astral-sh/uv/tree/c22e6b71933443e9cd299d4b6ac8de035ed4825b) · [Build record](../workflow-build.json)
 
 ## Codex
 
