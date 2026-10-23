@@ -521,10 +521,19 @@ the parser on several threads.
 In an experiment, we changed only the frontend thread setting and ran development sessions for Ruff,
 uv, and Codex. Their combined time fell from 1,032 to 720 seconds, about 30%.
 
+In native builds with multiple frontend workers, rustc starts encoding crate metadata as soon as the
+function bodies it needs are ready. Another worker identifies exported symbols. Encoding waits for
+that worker only when it needs the symbol list.
+
+In two rounds with the same optimized compiler on the Rust #203 base, this change reduced the time
+for an edited `check → build → check` by 3.6–5.4% on uv and 2.5–4.8% on Ruff. Timing ended when
+Cargo returned, so pending filesystem writes could finish later.
+
 See:
 
 - [Cargo #90](https://github.com/astral-sh/ohm-cargo/pull/90)
 - [Cargo #48](https://github.com/astral-sh/ohm-cargo/pull/48)
+- [Rust #206](https://github.com/astral-sh/ohm-rust/pull/206)
 
 ### 19. Compile codegen units in batches
 
@@ -578,12 +587,15 @@ In an edit-and-rebuild experiment at optimization level 1, splitting reduced tim
 and 45.8% for uv. Splitting also made ty's tests about 3–4% slower and increased uv's cold-build
 time by 5.7% in separate comparisons.
 
-When rustc loads an unchanged query result from disk, it can reuse the encoded bytes when saving
-the next incremental cache, until the cache needs compaction. Inside its private session directory,
-rustc unlinks the old query cache and dependency graph before replacing them. On ext4, this can
-avoid waiting for pending writes.
+When rustc loads a query result from disk, it can reuse the same bytes in the next incremental cache
+until the cache needs compaction. If rustc recomputes a result, it writes the new value even when
+its fingerprint stays the same. A source edit can move a diagnostic span without changing that
+fingerprint. On uv, reusing the old span made a later incremental build crash.
 
-On ext4, we used the same compiler binary to compare this change with the behavior at Rust #194.
+Inside its private session directory, rustc unlinks the old query cache and dependency graph before
+replacing them. On ext4, this can avoid waiting for pending writes.
+
+On ext4, we used the same compiler binary to compare Rust #203 with the behavior at Rust #194.
 Across two rounds of paired runs, a `check → build → check` sequence after an edit took 4.05% less
 time on uv and 2.24% less on Ruff. Timing ended when the final check returned, so some filesystem
 writes could finish after the measured sequence.
@@ -600,6 +612,7 @@ See:
 - [Rust #192](https://github.com/astral-sh/ohm-rust/pull/192)
 - [Rust #193](https://github.com/astral-sh/ohm-rust/pull/193)
 - [Rust #203](https://github.com/astral-sh/ohm-rust/pull/203)
+- [Rust #207](https://github.com/astral-sh/ohm-rust/pull/207)
 
 ### 21. Reuse async code after it moves
 
@@ -633,6 +646,10 @@ code for development builds. For example, it can omit cleanup paths that have be
 constructing intermediate lists while checking type constraints. Other changes avoid repeated
 lookups, reuse LLVM target machines, and reduce the size of compiler data structures.
 
+Within one compilation, rustc remembers which crate each direct `--extern` name or alias resolved
+to. Generated tests and macros can then reuse that lookup. For transitive dependencies, rustc uses
+the metadata hash to distinguish versions of the same crate.
+
 When laying out async state, Ohm skips redundant work when tracking which values are live at the
 same time. This backports a change from
 [rust-lang/rust #163126](https://github.com/rust-lang/rust/pull/163126). On Unix, Ohm also reduces
@@ -652,6 +669,9 @@ caches, reduced total rebuild time across 13 uv development commits from 478.19 
 or 6.5%. Focused Ruff measurements of the query-cache change saved about 36 MiB during a check and
 114 MiB during a build, with no consistent wall-time improvement.
 
+In 12 paired runs on Ruff, caching these lookups reduced an edited `cargo test --lib --no-run` from
+12.50 to 11.83 seconds. The experiment used stage2 compilers built without release PGO or BOLT.
+
 See:
 
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
@@ -659,6 +679,7 @@ See:
 - [Rust #141](https://github.com/astral-sh/ohm-rust/pull/141)
 - [Rust #173](https://github.com/astral-sh/ohm-rust/pull/173)
 - [Rust #181](https://github.com/astral-sh/ohm-rust/pull/181)
+- [Rust #205](https://github.com/astral-sh/ohm-rust/pull/205)
 
 ### 23. Reduce allocator page-clearing work
 
