@@ -143,12 +143,9 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 ## Benchmarks
 
 **Developer workflows** measure complete command sequences after an untimed baseline warmup. Each
-repetition starts with fresh artifacts and reuses them between commands. Times are medians of four
-runs per toolchain on the same host. [Benchmark guide](BENCHMARKS.md)
-
-Ohm 1.99.0-9 has results for Ruff/ty and uv. The Codex run exhausted its CPU-contention retries,
-so the last complete three-project comparison, shown below, is for Ohm 1.99.0-8.
-[Ohm 1.99.0-9 developer results](scripts/benchmark_results/1.99.0-9/developer-workflows.md)
+sequence preserves its build artifacts between commands; each repetition starts from fresh artifacts.
+Times are medians of four runs, with each toolchain pair measured on the same host. See the
+[benchmark guide](BENCHMARKS.md) for details.
 
 <!-- benchmark:developer-workflows -->
 

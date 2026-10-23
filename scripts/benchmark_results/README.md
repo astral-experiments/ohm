@@ -4,13 +4,30 @@ On October 22–23, 2026 (UTC), we measured Ohm 1.99.0-9 against stock Rust 1.99
 
 The ty study includes the per-run measurements for ext4 and Btrfs. The build record identifies the release archives, component pins, host assignments and installed binary hashes. [ty data](ty-worktree.json) · [Build provenance](workflow-build.json) · [Trust settings](../../BENCHMARKS.md#recorded-measurements)
 
-The formatter study compares Ohm 1.99.0-8 and 1.99.0-9 across six cases on Ruff and uv. Each case has 40 matched pairs. Comparing times within each pair, -9 took 15.0% longer than -8 after adding an already-formatted comment in Ruff and 9.5% longer in uv. The uv whitespace rewrite took 5.6% longer. The other three 99% confidence intervals include equal time. [Formatter results](formatting-comparison.md) · [Paired timings and reproduction inputs](formatting-comparison.json)
-
 Four Codex developer runs stopped when one check-build-check repetition exhausted its CPU-contention retries. We excluded all 74 partial measurements. The final run rejected all nine attempts on stock Rust. The three-project developer table in the main README comes from the last completed run on Ohm 1.99.0-8. [Ohm 1.99.0-8 developer timings](developer-workflows.json)
 
 The [historical reports and fixtures](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts) and [study-specific reproduction inputs](https://github.com/astral-sh/ohm/tree/444cf954135e74a52b4c9f3f6990d0bc6aff1a5a/benchmark-inputs) preserve the earlier workloads and methods. Host assignments and workloads can differ between releases.
 
 The separate [Ruff edited-check study](ruff-edited-check.json) retains 64 matched pairs for an earlier experimental version of the [public-API metadata optimization](https://github.com/astral-sh/ohm-rust/pull/194), which is included in Ohm 1.99.0-7. Its [build record](ruff-edited-check-build.json) identifies that experimental compiler. The release tables exclude this earlier study.
+
+## Formatter comparison
+
+We timed `cargo fmt -p <package>` with Ohm 1.99.0-8 and 1.99.0-9 on the same Linux host.
+Each case ran 40 pairs with identical input, identical output, and a warm cache for each release.
+We shuffled the order so each release ran first in 20 pairs.
+
+| Project | Formatting case                |  -8 median |  -9 median |  -9 / -8 time (99% CI) |
+| ------- | ------------------------------ | ---------: | ---------: | ---------------------: |
+| ruff    | Unchanged file                 |  120.15 ms |  119.92 ms | 0.9700 (0.8559–1.1100) |
+| ruff    | Already formatted comment      |  170.47 ms |  178.54 ms | 1.1498 (1.0193–1.3312) |
+| ruff    | Whitespace requiring a rewrite |  240.03 ms |  242.70 ms | 1.0794 (0.9677–1.2082) |
+| uv      | Unchanged file                 |   97.66 ms |  154.72 ms | 1.2168 (0.9809–1.4967) |
+| uv      | Already formatted comment      |  846.54 ms |  920.12 ms | 1.0952 (1.0455–1.1466) |
+| uv      | Whitespace requiring a rewrite | 1499.03 ms | 1559.53 ms | 1.0563 (1.0221–1.0906) |
+
+The last column gives the geometric mean of the 40 within-pair time ratios. A value above 1
+means -9 took longer. The 99% confidence intervals use 20,000 bootstrap resamples of the pairs.
+[Paired timings, fixtures, and reproduction instructions](formatting-comparison.json)
 
 ## Publish results
 
