@@ -41,13 +41,13 @@ Fetch dependencies before measuring, using the same Cargo home for both commands
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-8 \
+  --ohm ohm-1.99.0-9 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-8 \
+  --ohm ohm-1.99.0-9 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -58,10 +58,11 @@ host. `--workflow` selects a subset for diagnosis. `--resume` retains completed
 samples and rejects changed runner code, source definitions, sampling settings, or toolchains. If your shell
 sets `PYTHONSAFEPATH=1`, prefix the commands with `env -u PYTHONSAFEPATH`.
 
-The published developer-workflow measurements use eight Cargo jobs on three 32-vCPU Linux devboxes. Each result
+The published developer-workflow measurements use eight Cargo jobs on 32-vCPU Linux devboxes. Each result
 records its host metadata, command logs, and CPU traces.
 
-The published results use the official Ohm 1.99.0-8 release. The
+The new measurements use Ohm 1.99.0-9. Ruff and uv completed all five developer workflows.
+The README also shows the last complete three-project developer comparison, measured on 1.99.0-8. The
 [build provenance](scripts/benchmark_results/workflow-build.json) records the release archives,
 component sources, and binary hashes verified on each machine. Use `--ohm` to select another
 installed toolchain when measuring a different version. See the
@@ -142,14 +143,14 @@ python3 scripts/publish_benchmarks.py --render
 Preview the plan without cloning or building:
 
 ```console
-uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-8 --dry-run
+uv run scripts/benchmark.py --upstream 1.99.0 --ohm ohm-1.99.0-9 --dry-run
 ```
 
 Run both projects:
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-8 --jobs 8 \
+  --upstream 1.99.0 --ohm ohm-1.99.0-9 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -201,19 +202,24 @@ Rust does not isolate changes between Ohm releases.
 
 ## Recorded measurements
 
+- [Ohm 1.99.0-9 developer workflows for Ruff/ty and uv](scripts/benchmark_results/1.99.0-9/developer-workflows.md)
 - [ty bug-fix session and worktree startup](scripts/benchmark_results/ty-worktree.md)
 - [Workflow and disk-usage results](scripts/benchmark_results/)
 - [Session fixtures and replay results](scripts/session_replays/)
 
 The reports record toolchain versions, sources, profiles, individual timings, and measurement conditions. They also record which attempts were excluded and why.
 
-On October 22, 2026 (UTC), we compared stock Rust 1.99.0 and published Ohm 1.99.0-8 with eight
-Cargo jobs on 32-vCPU Linux devboxes. uv ran on `charlie-serc-1`, Codex on `charlie-oss-3`,
-and Ruff and ty on `charlie-ohm-session-bench`. Each project used the same host for both toolchains.
+On October 22–23, 2026 (UTC), we compared stock Rust 1.99.0 and Ohm 1.99.0-9 with eight Cargo
+jobs on 32-vCPU Linux devboxes. Each comparison ran both toolchains on the same host.
+uv used `charlie-ohm-9-uv`, Ruff used `charlie-ohm-9-ruff`, and ty used `charlie-ohm-9-ty`.
+The Codex individual commands and session replays ran on `charlie-ohm-9-codex`. Its developer
+suite exhausted the host-activity retry budget in four runs across three machines. The last run
+on `charlie-oss-3` rejected all nine attempts at one stock Rust check-build-check repetition.
 
-The formatter study paired published Ohm 1.99.0-7 and 1.99.0-8 on `charlie-serc-1`. Each release
-formatted the same inputs after an untimed warmup and kept its private formatter cache across pairs.
-The report gives 99% confidence intervals for all six cases. [Paired formatter results](scripts/benchmark_results/formatting-comparison.md)
+The formatter study compared published Ohm 1.99.0-8 and 1.99.0-9 on `charlie-ohm-9-ty`.
+Each of the six cases had 40 pairs. Both releases formatted identical input within each pair,
+and each ran first in 20 pairs. Each release kept its own warmed cache. The report gives a 99%
+confidence interval for each paired time ratio. [Paired formatter results](scripts/benchmark_results/formatting-comparison.md)
 
 Individual-command runs leave both trust opt-ins unset. Session replays set procedural-macro trust
 to `all`; the ty session and developer workflows also set native-tool trust to `all`.

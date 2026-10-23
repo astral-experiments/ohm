@@ -1,12 +1,12 @@
 # Published benchmarks
 
-On October 22, 2026, we measured published Ohm 1.99.0-8 against stock Rust 1.99.0. The reports include individual timings, source revisions, toolchain settings, and exclusion summaries. [Developer workflows](developer-workflows.json) · [Individual commands](workflow.json) · [Sessions](sessions.json) · [Historical replays](historical.json) · [Ablations](ablation.json) · [Disk usage](disk.json) · [ty session and worktree startup](ty-worktree.md)
+On October 22–23, 2026 (UTC), we measured Ohm 1.99.0-9 against stock Rust 1.99.0. The reports include individual timings, source revisions, toolchain settings, and excluded attempts. [Ruff/ty and uv developer workflows](1.99.0-9/developer-workflows.md) · [Individual commands](workflow.json) · [Sessions](sessions.json) · [Historical replays](historical.json) · [Ablations](ablation.json) · [Disk usage](disk.json) · [ty session and worktree startup](ty-worktree.md)
 
 The ty study includes the per-run measurements for ext4 and Btrfs. The build record identifies the release archives, component pins, host assignments and installed binary hashes. [ty data](ty-worktree.json) · [Build provenance](workflow-build.json) · [Trust settings](../../BENCHMARKS.md#recorded-measurements)
 
-The formatter study compares published Ohm 1.99.0-7 and 1.99.0-8 on Ruff and uv. Each case has 40 matched pairs with warmed, persistent per-release formatter caches. [Formatter results](formatting-comparison.md) · [Formatter data](formatting-comparison.json)
+The formatter study compares Ohm 1.99.0-8 and 1.99.0-9 across six cases on Ruff and uv. Each case has 40 matched pairs. Comparing times within each pair, -9 took 15.0% longer than -8 after adding an already-formatted comment in Ruff and 9.5% longer in uv. The uv whitespace rewrite took 5.6% longer. The other three 99% confidence intervals include equal time. [Formatter results](formatting-comparison.md) · [Paired timings and reproduction inputs](formatting-comparison.json)
 
-The Codex developer run exhausted its retries under CPU contention, including an overlapping compiler. The report uses 40 accepted samples from its replacement run.
+Four Codex developer runs stopped when one check-build-check repetition exhausted its CPU-contention retries. We excluded all 74 partial measurements. The final run rejected all nine attempts on stock Rust. The three-project developer table in the main README comes from the last completed run on Ohm 1.99.0-8. [Ohm 1.99.0-8 developer timings](developer-workflows.json)
 
 The [historical reports and fixtures](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts) and [study-specific reproduction inputs](https://github.com/astral-sh/ohm/tree/444cf954135e74a52b4c9f3f6990d0bc6aff1a5a/benchmark-inputs) preserve the earlier workloads and methods. Host assignments and workloads can differ between releases.
 
