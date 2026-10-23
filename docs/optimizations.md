@@ -46,7 +46,8 @@ Ohm implements the [Relink, don't rebuild](https://github.com/rust-lang/compiler
 approach for eligible executables and test binaries. When a dependency changes but the executable's
 compiled code is still valid, Ohm reuses that code and reruns the linker to include the updated
 dependency. Changes involving procedural macros, build scripts, or native libraries may still
-require recompilation.
+require recompilation. Cargo checks the saved object bytes and the complete relink manifest before
+reusing them. If either check fails, it recompiles the target.
 
 This helps most when an edit to a dependency would otherwise force an expensive executable or test
 binary to recompile.
@@ -63,6 +64,8 @@ See:
 
 - [Cargo #51](https://github.com/astral-sh/ohm-cargo/pull/51)
 - [Cargo #52](https://github.com/astral-sh/ohm-cargo/pull/52)
+- [Cargo #197](https://github.com/astral-sh/ohm-cargo/pull/197)
+- [Cargo #198](https://github.com/astral-sh/ohm-cargo/pull/198)
 
 ### 3. Reuse builds during checks
 
@@ -137,6 +140,10 @@ scratch files, and final outputs in its target directory. The shared build direc
 eligible registry artifacts and reusable ThinLTO objects. We also include additional "trust"
 settings to allow for reuse of procedural macros and native tools, but that reuse can be unsound.
 
+With Ohm defaults disabled, two workspaces with separate target directories can still share one
+external build directory. Cargo gives each workspace its own intermediates, including build-script
+outputs. Running `cargo clean` in one workspace preserves the other workspace’s files.
+
 For example, suppose you build your project on `main`, then build a fix in a second worktree. Both
 worktrees use the same version of `memchr` with the same features and build settings. If they share
 a build directory, Ohm can reuse the compiled `memchr` from the first worktree in the second.
@@ -150,6 +157,8 @@ See:
 - [Cargo #77](https://github.com/astral-sh/ohm-cargo/pull/77)
 - [Cargo #78](https://github.com/astral-sh/ohm-cargo/pull/78)
 - [Cargo #158](https://github.com/astral-sh/ohm-cargo/pull/158)
+- [Cargo #211](https://github.com/astral-sh/ohm-cargo/pull/211)
+- [Cargo #213](https://github.com/astral-sh/ohm-cargo/pull/213)
 
 ### 6. Seed new worktrees from an existing build
 
@@ -719,7 +728,7 @@ See:
 
 - [Rust #99](https://github.com/astral-sh/ohm-rust/pull/99)
 
-### 25. Cache derive macro expansions
+### 25. Cache derive and attribute macro expansions
 
 **Status:** Existing experimental Rust feature, enabled by default in Ohm.
 
@@ -733,6 +742,12 @@ For example, `#[derive(serde::Serialize)]` on a `Config` struct generates code t
 fields. If you edit a separate `connect` function without changing the struct or the macro's other
 inputs, Ohm can reuse that generated code while checking the edited function.
 
+Ohm 1.99.0-12 also caches attribute macro expansions. Editing the annotated item, its attribute,
+or the macro crate invalidates the entry. A macro that reads a tracked file or environment value,
+inspects source locations or text, or requests nested expression expansion runs again. In the
+original compiler comparison, this saved 0.66 seconds (9.1%) on an incremental Ruff check after an
+unrelated edit.
+
 In the uv benchmark, we applied a private parser edit, checked the dependent crate, and ran the
 parser tests. The full sequence took a median of 4.02 seconds with macro caching and 4.15 seconds
 without it.
@@ -740,6 +755,7 @@ without it.
 See:
 
 - [Cargo #54](https://github.com/astral-sh/ohm-cargo/pull/54)
+- [Rust #208](https://github.com/astral-sh/ohm-rust/pull/208)
 
 ## Clippy
 
