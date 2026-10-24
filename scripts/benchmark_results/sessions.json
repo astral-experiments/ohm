@@ -1,6 +1,6 @@
 {
   "rust_version": "1.99.0",
-  "ohm_release": "ohm-1.99.0-9",
+  "ohm_release": "ohm-1.99.0-10",
   "jobs": 8,
   "repetitions": 2,
   "methodology": {
@@ -14,20 +14,17 @@
     "ohm_proc_macro_trust": "all",
     "ohm_native_tool_trust": "none",
     "dependencies_prefetched_locked": true,
-    "timed_commands_offline": true
+    "timed_commands_offline": true,
+    "test_count_comparison_by_project": {
+      "codex": "Unique successful nextest selections; raw tests_started includes verified captured retry banners and remains unchanged."
+    }
   },
   "host": {
     "platform": "linux-x86_64",
     "by_project": {
-      "uv": {
-        "platform": "linux-x86_64",
-        "id": "charlie-ohm-9-uv",
-        "logical_cpus": 32,
-        "cpu_model": "AMD EPYC-Milan Processor"
-      },
       "codex": {
         "platform": "linux-x86_64",
-        "id": "charlie-ohm-9-codex",
+        "id": "charlie-ohm-10-replay",
         "logical_cpus": 32,
         "cpu_model": "AMD EPYC-Milan Processor"
       },
@@ -39,7 +36,7 @@
       }
     }
   },
-  "completed_at": "2026-10-23T01:45:53.364268+00:00",
+  "completed_at": "2026-10-23T23:27:10.074495+00:00",
   "provenance": {
     "runner_sha256": {
       "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
@@ -49,169 +46,113 @@
     },
     "toolchains": {
       "1.99.0": {
-        "cargo": {
-          "version": "cargo 1.99.0 (5f94df478 2026-08-27)",
-          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
-          "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
-        },
         "rustc": {
+          "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f",
           "version": "rustc 1.99.0 (b940084d7 2026-09-28)",
-          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
-          "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+          "paths_by_project": {
+            "codex": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "ruff": "/tmp/ohm-benchmarks-1.99.0-10/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc"
+          }
+        },
+        "cargo": {
+          "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14",
+          "version": "cargo 1.99.0 (5f94df478 2026-08-27)",
+          "paths_by_project": {
+            "codex": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "ruff": "/tmp/ohm-benchmarks-1.99.0-10/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo"
+          }
         },
         "clippy-driver": {
+          "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6",
           "version": "clippy 0.1.99 (b940084d7e 2026-09-28)",
-          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
-          "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+          "paths_by_project": {
+            "codex": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+            "ruff": "/tmp/ohm-benchmarks-1.99.0-10/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver"
+          }
         },
         "rustfmt": {
+          "sha256": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3",
           "version": "rustfmt 1.10.0-stable (b940084d7e 2026-09-28)",
-          "path": "/home/dev-user/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustfmt",
-          "sha256": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3"
+          "paths_by_project": {
+            "codex": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustfmt",
+            "ruff": "/tmp/ohm-benchmarks-1.99.0-10/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustfmt"
+          }
         }
       },
-      "ohm-1.99.0-9": {
-        "cargo": {
-          "version": "cargo 1.99.0-dev (581da65e4 2026-10-22) (ohm-1.99.0-9)",
-          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-9/bin/cargo",
-          "sha256": "dcca834671e0052c0173eec96670e7abb0a7ae664ed40dc8752e82069ea5c80e"
-        },
+      "ohm-1.99.0-10": {
         "rustc": {
-          "version": "rustc 1.99.0-dev (e4464fdbc 2026-10-22) (ohm-1.99.0-9)",
-          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-9/bin/rustc",
-          "sha256": "ac5fb6fca6c443a2062d491a1793b96a384c302ba52118eeef3658b57f546a95"
+          "sha256": "28982a3b7bc36792f70f7ef3020127ae69a9f51e44fad45cbb8015067befff76",
+          "version": "rustc 1.99.0-dev (98db6c4fb 2026-10-22) (ohm-1.99.0-10)",
+          "paths_by_project": {
+            "codex": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup/toolchains/ohm-1.99.0-10/bin/rustc",
+            "ruff": "/tmp/ohm-benchmarks-1.99.0-10/rustup/toolchains/ohm-1.99.0-10/bin/rustc"
+          }
+        },
+        "cargo": {
+          "sha256": "ec63b80b17e84847860107eb600d8e21b1c02c2d7eee3b432b4865efc8e54d46",
+          "version": "cargo 1.99.0-dev (bbe8182f6 2026-10-22) (ohm-1.99.0-10)",
+          "paths_by_project": {
+            "codex": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup/toolchains/ohm-1.99.0-10/bin/cargo",
+            "ruff": "/tmp/ohm-benchmarks-1.99.0-10/rustup/toolchains/ohm-1.99.0-10/bin/cargo"
+          }
         },
         "clippy-driver": {
+          "sha256": "8ef385b7b907d6b86e644052f705cd667f926873f5299bd3019bd18e04dddf76",
           "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)",
-          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-9/bin/clippy-driver",
-          "sha256": "a4519daf542e862b9bf1eb29de82e707dca822e8a8c4eef50f4b4e61429682bd"
+          "paths_by_project": {
+            "codex": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup/toolchains/ohm-1.99.0-10/bin/clippy-driver",
+            "ruff": "/tmp/ohm-benchmarks-1.99.0-10/rustup/toolchains/ohm-1.99.0-10/bin/clippy-driver"
+          }
         },
         "rustfmt": {
+          "sha256": "3444223641f493e03a9af693f172a0801958463f7f15b2a9496bad1c05888964",
           "version": "rustfmt 1.10.0-dev (3c9620c92b 2026-10-21)",
-          "path": "/home/dev-user/.rustup/toolchains/ohm-1.99.0-9/bin/rustfmt",
-          "sha256": "9545648bcda26b48d6d6e8698f0f57b5cffd6af02d2923d675b48886a483634b"
+          "paths_by_project": {
+            "codex": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup/toolchains/ohm-1.99.0-10/bin/rustfmt",
+            "ruff": "/tmp/ohm-benchmarks-1.99.0-10/rustup/toolchains/ohm-1.99.0-10/bin/rustfmt"
+          }
         }
       }
     },
     "wrapper": {
       "by_project": {
-        "uv": {
-          "kind": "sessions",
-          "arguments": [
-            "--upstream",
-            "1.99.0",
-            "--ohm",
-            "ohm-1.99.0-9",
-            "--jobs",
-            "8",
-            "--minimum-free-gb",
-            "60",
-            "--require-idle",
-            "--output-dir",
-            "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions",
-            "--project",
-            "uv",
-            "--repetitions",
-            "2",
-            "--offline",
-            "--scenario",
-            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-9/scripts/session_replays/uv-rust-1.99.json",
-            "--source-path",
-            "uv=/tmp/ohm-benchmarks-1.99.0-9/data/sources/uv"
-          ],
-          "started_at": 1792689014.5947776,
-          "wrapper_sha256": "c868f2de0f51785cf63da5003d7f0a0f488e6cee8660b3b0b6f2f97869336f73",
-          "runner_sha256": {
-            "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
-            "replay_sessions.py": "015d02607858da8acf93768e714f28603a920a4ad61b5976b862548328f168a8",
-            "benchmark_workflows.py": "a31ecbb300c3f83fbb38c41fea8678d097c2e45c93887d7b03de20e8c0a22a84",
-            "workflow_results.py": "fabc3ce1ea82ee0dc517c2381e4c82490a3529b4ea9a75814c5f988492fe6e58"
-          },
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-          "tmpdir": "/tmp/ohm999",
-          "toolchains": [
-            ["stock", "1.99.0"],
-            ["ohm", "ohm-1.99.0-9"]
-          ],
-          "sanitized_environment": {
-            "CARGO_HOME": "/tmp/codex-cargo-home",
-            "CARGO_NET_OFFLINE": "true",
-            "GIT_CONFIG_COUNT": "2",
-            "GIT_CONFIG_KEY_0": "maintenance.auto",
-            "GIT_CONFIG_KEY_1": "gc.auto",
-            "GIT_CONFIG_VALUE_0": "false",
-            "GIT_CONFIG_VALUE_1": "0",
-            "PATH": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-            "RUSTUP_HOME": "/home/dev-user/.rustup",
-            "TMPDIR": "/tmp/ohm999",
-            "UV_CACHE_DIR": "/tmp/codex-uv-cache",
-            "UV_PYTHON": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
-            "UV_PYTHON_DOWNLOADS": "never",
-            "UV_TOOL_BIN_DIR": "/tmp/ohm-benchmarks-1.99.0-9/tools/uv-bin",
-            "UV_TOOL_DIR": "/tmp/ohm-benchmarks-1.99.0-9/tools/uv-tools"
-          },
-          "terminal": {
-            "controlling_tty": false,
-            "stdin_isatty": false,
-            "stdout_isatty": false,
-            "stderr_isatty": false
-          },
-          "git_maintenance": {
-            "maintenance.auto": false,
-            "gc.auto": 0,
-            "scope": "benchmark process environment only"
-          },
-          "coordinator_commit": "04c83d53483607aec4f93fd2bb55b412f101d677",
-          "manifest_sha256": "64f2410a1fb68da6ea642f4e68153def536f61eddddf074573cce39b066351cb",
-          "fixtures": {
-            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-9/scripts/session_replays/uv-rust-1.99.json": "ca3e1f49ca537881e996fbe3c32069e744cc8ccce6d028dd70cc2c104d026933"
-          },
-          "post_cell_audit": {
-            "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
-            "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
-            "process_inspector_sha256": "0d801435e5c7a4ed7b74a6233431afa45f35a384402ef47f60efa9050507a802",
-            "timing_boundary": "after persisted run_session, before next cell",
-            "retirement": "exclusive per-cell target and shared-build leaves only",
-            "quiet_seconds_after_retirement": 30
-          }
-        },
         "codex": {
           "kind": "sessions",
           "arguments": [
             "--upstream",
             "1.99.0",
             "--ohm",
-            "ohm-1.99.0-9",
+            "ohm-1.99.0-10",
             "--jobs",
             "8",
             "--minimum-free-gb",
             "60",
             "--require-idle",
             "--output-dir",
-            "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions",
+            "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions",
             "--project",
             "codex",
             "--repetitions",
             "2",
             "--offline",
             "--scenario",
-            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-9/scripts/session_replays/codex-rust-1.99.json",
+            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-10-codex-replay/scripts/session_replays/codex-rust-1.99.json",
             "--source-path",
-            "codex=/tmp/ohm-benchmarks-1.99.0-9/data/sources/codex"
+            "codex=/tmp/ohm-benchmarks-1.99.0-10-codex-replay-sessions/data/sources/codex"
           ],
-          "started_at": 1792693188.9396262,
-          "wrapper_sha256": "c868f2de0f51785cf63da5003d7f0a0f488e6cee8660b3b0b6f2f97869336f73",
+          "started_at": 1792791431.112441,
+          "wrapper_sha256": "eaff9dda08dd9c8b51525207ba02138d8381def87895f437345e1a155f952c89",
           "runner_sha256": {
             "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
             "replay_sessions.py": "015d02607858da8acf93768e714f28603a920a4ad61b5976b862548328f168a8",
             "benchmark_workflows.py": "a31ecbb300c3f83fbb38c41fea8678d097c2e45c93887d7b03de20e8c0a22a84",
             "workflow_results.py": "fabc3ce1ea82ee0dc517c2381e4c82490a3529b4ea9a75814c5f988492fe6e58"
           },
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-          "tmpdir": "/tmp/ohm999",
+          "path": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+          "tmpdir": "/tmp/ohm10x",
           "toolchains": [
             ["stock", "1.99.0"],
-            ["ohm", "ohm-1.99.0-9"]
+            ["ohm", "ohm-1.99.0-10"]
           ],
           "sanitized_environment": {
             "CARGO_HOME": "/tmp/codex-cargo-home",
@@ -221,14 +162,14 @@
             "GIT_CONFIG_KEY_1": "gc.auto",
             "GIT_CONFIG_VALUE_0": "false",
             "GIT_CONFIG_VALUE_1": "0",
-            "PATH": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-            "RUSTUP_HOME": "/home/dev-user/.rustup",
-            "TMPDIR": "/tmp/ohm999",
+            "PATH": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+            "RUSTUP_HOME": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/rustup",
+            "TMPDIR": "/tmp/ohm10x",
             "UV_CACHE_DIR": "/tmp/codex-uv-cache",
-            "UV_PYTHON": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
+            "UV_PYTHON": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin/python3.12",
             "UV_PYTHON_DOWNLOADS": "never",
-            "UV_TOOL_BIN_DIR": "/tmp/ohm-benchmarks-1.99.0-9/tools/uv-bin",
-            "UV_TOOL_DIR": "/tmp/ohm-benchmarks-1.99.0-9/tools/uv-tools"
+            "UV_TOOL_BIN_DIR": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/uv-bin",
+            "UV_TOOL_DIR": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/uv-tools"
           },
           "terminal": {
             "controlling_tty": false,
@@ -242,14 +183,14 @@
             "scope": "benchmark process environment only"
           },
           "coordinator_commit": "04c83d53483607aec4f93fd2bb55b412f101d677",
-          "manifest_sha256": "64f2410a1fb68da6ea642f4e68153def536f61eddddf074573cce39b066351cb",
+          "manifest_sha256": "c6ffe53088925ce7b8df60359a8b76f776e023256b4398d812c92312f478f3b2",
           "fixtures": {
-            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-9/scripts/session_replays/codex-rust-1.99.json": "b9fdc1e06044c7f1b59a87b436f341b8c90ef90b5b90f3986f541ef63401b7bf"
+            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-10-codex-replay/scripts/session_replays/codex-rust-1.99.json": "b9fdc1e06044c7f1b59a87b436f341b8c90ef90b5b90f3986f541ef63401b7bf"
           },
           "post_cell_audit": {
-            "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
+            "helper_sha256": "f1fe97d4a09ee6b89765d98c5a9ae954e7452c65e53a89231a180fd983857ad0",
             "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
-            "process_inspector_sha256": "0d801435e5c7a4ed7b74a6233431afa45f35a384402ef47f60efa9050507a802",
+            "process_inspector_sha256": "ccf2d7610f61aaa787e36da921232c188282d811374b0aefb3abe7136c49e618",
             "timing_boundary": "after persisted run_session, before next cell",
             "retirement": "exclusive per-cell target and shared-build leaves only",
             "quiet_seconds_after_retirement": 30
@@ -261,37 +202,37 @@
             "--upstream",
             "1.99.0",
             "--ohm",
-            "ohm-1.99.0-9",
+            "ohm-1.99.0-10",
             "--jobs",
             "8",
             "--minimum-free-gb",
             "60",
             "--require-idle",
             "--output-dir",
-            "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions",
+            "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions",
             "--project",
             "ruff",
             "--repetitions",
             "2",
             "--offline",
             "--scenario",
-            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-9/scripts/session_replays/ruff-rust-1.99.json",
+            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-10/scripts/session_replays/ruff-rust-1.99.json",
             "--source-path",
-            "ruff=/tmp/ohm-benchmarks-1.99.0-9/data/sources/ruff"
+            "ruff=/tmp/ohm-benchmarks-1.99.0-10/data/sources/ruff"
           ],
-          "started_at": 1792686117.3714678,
-          "wrapper_sha256": "c868f2de0f51785cf63da5003d7f0a0f488e6cee8660b3b0b6f2f97869336f73",
+          "started_at": 1792751304.8388174,
+          "wrapper_sha256": "499c8279286bd3441efe178f5af7f05161c55b3067deab011ba64e64465b8f6f",
           "runner_sha256": {
             "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
             "replay_sessions.py": "015d02607858da8acf93768e714f28603a920a4ad61b5976b862548328f168a8",
             "benchmark_workflows.py": "a31ecbb300c3f83fbb38c41fea8678d097c2e45c93887d7b03de20e8c0a22a84",
             "workflow_results.py": "fabc3ce1ea82ee0dc517c2381e4c82490a3529b4ea9a75814c5f988492fe6e58"
           },
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-          "tmpdir": "/tmp/ohm999",
+          "path": "/tmp/ohm-benchmarks-1.99.0-10/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-10/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-10/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+          "tmpdir": "/tmp/ohm9910",
           "toolchains": [
             ["stock", "1.99.0"],
-            ["ohm", "ohm-1.99.0-9"]
+            ["ohm", "ohm-1.99.0-10"]
           ],
           "sanitized_environment": {
             "CARGO_HOME": "/tmp/codex-cargo-home",
@@ -301,14 +242,14 @@
             "GIT_CONFIG_KEY_1": "gc.auto",
             "GIT_CONFIG_VALUE_0": "false",
             "GIT_CONFIG_VALUE_1": "0",
-            "PATH": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-9/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-            "RUSTUP_HOME": "/home/dev-user/.rustup",
-            "TMPDIR": "/tmp/ohm999",
+            "PATH": "/tmp/ohm-benchmarks-1.99.0-10/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-10/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/tmp/ohm-benchmarks-1.99.0-10/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+            "RUSTUP_HOME": "/tmp/ohm-benchmarks-1.99.0-10/rustup",
+            "TMPDIR": "/tmp/ohm9910",
             "UV_CACHE_DIR": "/tmp/codex-uv-cache",
-            "UV_PYTHON": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
+            "UV_PYTHON": "/tmp/ohm-benchmarks-1.99.0-10/tools/bin/python3.12",
             "UV_PYTHON_DOWNLOADS": "never",
-            "UV_TOOL_BIN_DIR": "/tmp/ohm-benchmarks-1.99.0-9/tools/uv-bin",
-            "UV_TOOL_DIR": "/tmp/ohm-benchmarks-1.99.0-9/tools/uv-tools"
+            "UV_TOOL_BIN_DIR": "/tmp/ohm-benchmarks-1.99.0-10/tools/uv-bin",
+            "UV_TOOL_DIR": "/tmp/ohm-benchmarks-1.99.0-10/tools/uv-tools"
           },
           "terminal": {
             "controlling_tty": false,
@@ -322,14 +263,14 @@
             "scope": "benchmark process environment only"
           },
           "coordinator_commit": "04c83d53483607aec4f93fd2bb55b412f101d677",
-          "manifest_sha256": "64f2410a1fb68da6ea642f4e68153def536f61eddddf074573cce39b066351cb",
+          "manifest_sha256": "c6ffe53088925ce7b8df60359a8b76f776e023256b4398d812c92312f478f3b2",
           "fixtures": {
-            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-9/scripts/session_replays/ruff-rust-1.99.json": "e09ce27d30970c5181c9c48a3c5f90647fd73126d065dbe1aa743f77f4176796"
+            "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-10/scripts/session_replays/ruff-rust-1.99.json": "e09ce27d30970c5181c9c48a3c5f90647fd73126d065dbe1aa743f77f4176796"
           },
           "post_cell_audit": {
             "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
             "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
-            "process_inspector_sha256": "0d801435e5c7a4ed7b74a6233431afa45f35a384402ef47f60efa9050507a802",
+            "process_inspector_sha256": "4c677c15c0e9af4566c213f94f6632dd52eee08bb5e11608e900085b9a70f47e",
             "timing_boundary": "after persisted run_session, before next cell",
             "retirement": "exclusive per-cell target and shared-build leaves only",
             "quiet_seconds_after_retirement": 30
@@ -339,128 +280,78 @@
     },
     "system_cpu": {
       "by_project": {
-        "uv": {
-          "proof": {
-            "passed": true,
-            "violations": [],
-            "samples": 913,
-            "returncode": 0,
-            "monitor_sha256": "12e8ba6fd2c8bbb8739eae03021d8ed65a21f36f7193cc7f25e590db424281c1",
-            "trace_sha256": "b49fdfe45801d21fd8a979e6e635a980a4cafdd0b10f4071cd5c517e26f43e19"
-          },
-          "preflight_sha256": "c52bf2e94502530901d7488a2108d015e4ac22b8c589381ee6ea32b0d009dcf2",
-          "accepted_prefix_only": false,
-          "accepted_samples": 913,
-          "interval_start": 1792689014.2196393,
-          "interval_end": 1792690960.0022087,
-          "maximum_gap_seconds": 2.5188424719999603,
-          "minimum_free_bytes": 511732621312,
-          "weighted_steal_fraction": 3.4761609730922505e-5,
-          "peak_steal_fraction": 0.0010515247108307045,
-          "peak_external_user_cpu_fraction": 0.0039673775142860055
-        },
         "codex": {
           "proof": {
             "passed": true,
             "violations": [],
-            "samples": 1895,
+            "samples": 2943,
             "returncode": 0,
-            "monitor_sha256": "12e8ba6fd2c8bbb8739eae03021d8ed65a21f36f7193cc7f25e590db424281c1",
-            "trace_sha256": "843579b2e2ec23cc09112c523f9b9c5d33f3f78fb3d5ec592c4458cd29e883b1"
+            "monitor_sha256": "63c7d590e1c0631e2c0f3b31b9d8d1955cbe1964619943b714f3222f097fc481",
+            "trace_sha256": "05425cdc6ae20512fee6482baed0aae1bf7407956d8ccf936dbb67514f47716b"
           },
-          "preflight_sha256": "04949cf086bca2a86652d2edc2c3dce665c9fc7ce6115e32acb8f2564cba990d",
+          "preflight_sha256": "a0684a5cc5868753b5b5d8d6160e77d3563c540ec3770a16d0e5985891560bbc",
           "accepted_prefix_only": false,
-          "accepted_samples": 1895,
-          "interval_start": 1792693188.562711,
-          "interval_end": 1792697196.457778,
-          "maximum_gap_seconds": 3.096732639000038,
-          "minimum_free_bytes": 502774263808,
-          "weighted_steal_fraction": 2.6810281978316597e-5,
-          "peak_steal_fraction": 0.0008573878250928837,
-          "peak_external_user_cpu_fraction": 0.008189421742779363
+          "accepted_samples": 2943,
+          "interval_start": 1792791430.535204,
+          "interval_end": 1792797820.3286812,
+          "maximum_gap_seconds": 2.622393022000324,
+          "minimum_free_bytes": 463451877376,
+          "weighted_steal_fraction": 3.228146762771614e-5,
+          "peak_steal_fraction": 0.004032258064516129,
+          "peak_external_user_cpu_fraction": 0.009292128062949299
         },
         "ruff": {
           "proof": {
             "passed": true,
             "violations": [],
-            "samples": 1452,
+            "samples": 1225,
             "returncode": 0,
-            "monitor_sha256": "12e8ba6fd2c8bbb8739eae03021d8ed65a21f36f7193cc7f25e590db424281c1",
-            "trace_sha256": "7252c5e04f2c3a9a1f18052fadaa2b4ffd13da5ba12f023a97921a3a8e14f0f2"
+            "monitor_sha256": "2a22a351aacea00a3ecf8d3bcd15eb40b0b4f656b7d44e04b1cca78b9bbbf384",
+            "trace_sha256": "c07244715f3077459651ac4e2019c9b8a10aa2713539f2c865e9b038af5fbaf1"
           },
-          "preflight_sha256": "88f68e9d1a7a66b4af10605f9f616944244a6921bff241c2ce651eb68a9a29c8",
+          "preflight_sha256": "f47595dbcb5e206dc7d5381a518ed794ebecf88abe3a2c1573701f076c389c8f",
           "accepted_prefix_only": false,
-          "accepted_samples": 1452,
-          "interval_start": 1792686116.9610753,
-          "interval_end": 1792689257.2424326,
-          "maximum_gap_seconds": 2.4007898489999207,
-          "minimum_free_bytes": 490346328064,
-          "weighted_steal_fraction": 1.3296572143701354e-5,
-          "peak_steal_fraction": 0.0004092769440654843,
-          "peak_external_user_cpu_fraction": 0.0033808793296330863
+          "accepted_samples": 1225,
+          "interval_start": 1792751304.4823384,
+          "interval_end": 1792753902.0484016,
+          "maximum_gap_seconds": 2.2900980570002503,
+          "minimum_free_bytes": 485513744384,
+          "weighted_steal_fraction": 2.1141610737038833e-5,
+          "peak_steal_fraction": 0.0005867683731846853,
+          "peak_external_user_cpu_fraction": 0.0020773448457165
         }
       }
     },
     "raw_results_sha256": {
-      "uv": "911cd6d787d64f9d64c0f0fe305b506c1222d9a0f24a7394e9cf5d709f8c7f63",
-      "codex": "19b9aed233d5c98a00e8951552ad2e4e1c3a85ea7e6c53359086cbaed457cd82",
-      "ruff": "09d4cfbaeb5104dfb5f42023a85d53e1ce6c245dda7b10b91c8592fa6130c1c6"
+      "codex": "865be33c0475b24a9a6ad6196d60ae4d6757c8849b12f3cf059c2d009f08c8ed",
+      "ruff": "30d3d136daccd67b06d1eb06f1afb7f454e349948e421d0ed10a6b9b6abfa1a3"
     },
     "helpers": {
-      "uv": {
-        "just": {
-          "url": "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz",
-          "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
-          "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
-          "version": "just 1.58.0",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/just"
-        },
-        "cargo-nextest": {
-          "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
-          "archive_sha256": "4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3",
-          "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
-          "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/cargo-nextest"
-        },
-        "uv": {
-          "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
-          "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
-          "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
-          "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/uv"
-        },
-        "python3.12": {
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
-          "resolved_path": "/tmp/ohm-benchmarks-1.99.0-9/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
-          "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
-          "version": "Python 3.12.13"
-        }
-      },
       "codex": {
         "just": {
           "url": "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz",
           "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
           "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
           "version": "just 1.58.0",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/just"
+          "path": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin/just"
         },
         "cargo-nextest": {
           "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
           "archive_sha256": "4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3",
           "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
           "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/cargo-nextest"
+          "path": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin/cargo-nextest"
         },
         "uv": {
           "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
           "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
           "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
           "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/uv"
+          "path": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin/uv"
         },
         "python3.12": {
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
-          "resolved_path": "/tmp/ohm-benchmarks-1.99.0-9/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+          "path": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin/python3.12",
+          "resolved_path": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
           "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
           "version": "Python 3.12.13"
         }
@@ -471,1316 +362,50 @@
           "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
           "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
           "version": "just 1.58.0",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/just"
+          "path": "/tmp/ohm-benchmarks-1.99.0-10/tools/bin/just"
         },
         "cargo-nextest": {
           "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
           "archive_sha256": "4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3",
           "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
           "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/cargo-nextest"
+          "path": "/tmp/ohm-benchmarks-1.99.0-10/tools/bin/cargo-nextest"
         },
         "uv": {
           "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
           "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
           "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
           "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/uv"
+          "path": "/tmp/ohm-benchmarks-1.99.0-10/tools/bin/uv"
         },
         "python3.12": {
-          "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
-          "resolved_path": "/tmp/ohm-benchmarks-1.99.0-9/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+          "path": "/tmp/ohm-benchmarks-1.99.0-10/tools/bin/python3.12",
+          "resolved_path": "/tmp/ohm-benchmarks-1.99.0-10/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
           "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
           "version": "Python 3.12.13"
         }
       }
     },
     "python": {
-      "uv": {
-        "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
-        "resolved_path": "/tmp/ohm-benchmarks-1.99.0-9/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
-        "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
-        "version": "Python 3.12.13"
-      },
       "codex": {
-        "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
-        "resolved_path": "/tmp/ohm-benchmarks-1.99.0-9/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+        "path": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/bin/python3.12",
+        "resolved_path": "/tmp/ohm-benchmarks-1.99.0-10-codex-replay/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
         "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
         "version": "Python 3.12.13"
       },
       "ruff": {
-        "path": "/tmp/ohm-benchmarks-1.99.0-9/tools/bin/python3.12",
-        "resolved_path": "/tmp/ohm-benchmarks-1.99.0-9/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+        "path": "/tmp/ohm-benchmarks-1.99.0-10/tools/bin/python3.12",
+        "resolved_path": "/tmp/ohm-benchmarks-1.99.0-10/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
         "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
         "version": "Python 3.12.13"
       }
     },
-    "exporter_sha256": "1bac11af86a09da203d8d6251ddc08d4297330aadc2199cdda2a709b63e7546f"
+    "exporter_sha256": "72768c45a862b72ee1a69ee47eed36f9a66a974bde5b1d7d14819ac8bbe4dbcb"
   },
   "command_audits": [
     {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/02.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/03.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 3,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "project_status_pypi_json",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/04.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/05.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/06.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/08.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/09.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/10.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 10,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/11.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/13.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/14.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv",
-        "--test",
-        "pip_install",
-        "pip_install::registry_wheel_size_is_advisory",
-        "--locked",
-        "--",
-        "--exact"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/15.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/16.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 16,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/17.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 17,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/warmup-01.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/warmup-02.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/warmup-03.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 3,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/warmup-04.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 4,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv",
-        "--test",
-        "pip_install",
-        "pip_install::registry_wheel_size_is_advisory",
-        "--locked",
-        "--",
-        "--exact"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/warmup-05.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 5,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/0/warmup-06.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 0,
-      "index": 6,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/02.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/03.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 3,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "project_status_pypi_json",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/04.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/05.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/06.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/08.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/09.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/10.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 10,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/11.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/13.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/14.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv",
-        "--test",
-        "pip_install",
-        "pip_install::registry_wheel_size_is_advisory",
-        "--locked",
-        "--",
-        "--exact"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/15.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/16.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 16,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/17.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 17,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/warmup-01.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/warmup-02.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/warmup-03.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 3,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/warmup-04.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 4,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv",
-        "--test",
-        "pip_install",
-        "pip_install::registry_wheel_size_is_advisory",
-        "--locked",
-        "--",
-        "--exact"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/warmup-05.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 5,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/0/warmup-06.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 0,
-      "index": 6,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/02.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/03.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 3,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "project_status_pypi_json",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/04.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/05.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/06.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/08.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/09.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/10.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 10,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/11.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/13.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/14.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv",
-        "--test",
-        "pip_install",
-        "pip_install::registry_wheel_size_is_advisory",
-        "--locked",
-        "--",
-        "--exact"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/15.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/16.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 16,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/17.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 17,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/warmup-01.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/warmup-02.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/warmup-03.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 3,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/warmup-04.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 4,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv",
-        "--test",
-        "pip_install",
-        "pip_install::registry_wheel_size_is_advisory",
-        "--locked",
-        "--",
-        "--exact"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/warmup-05.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 5,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/ohm/1/warmup-06.log",
-      "toolchain": "ohm",
-      "project": "uv",
-      "repetition": 1,
-      "index": 6,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/02.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 2,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/03.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 3,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "project_status_pypi_json",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/04.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 4,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/05.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 5,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/06.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 6,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/08.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 8,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/09.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 9,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/10.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 10,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/11.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 11,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/13.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 13,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/14.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 14,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv",
-        "--test",
-        "pip_install",
-        "pip_install::registry_wheel_size_is_advisory",
-        "--locked",
-        "--",
-        "--exact"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/15.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 15,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/16.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 16,
-      "measured": true
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/17.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 17,
-      "measured": true
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-pypi-types",
-        "simple_json::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/warmup-01.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 1,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/warmup-02.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 2,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv-client",
-        "registry_client::tests::",
-        "--locked"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/warmup-03.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 3,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "clippy",
-        "-p",
-        "uv-pypi-types",
-        "-p",
-        "uv-client",
-        "--all-targets",
-        "--locked",
-        "--",
-        "-D",
-        "warnings",
-        "-A",
-        "clippy::doc_markdown",
-        "-A",
-        "clippy::double_must_use"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/warmup-04.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 4,
-      "measured": false
-    },
-    {
-      "command": [
-        "cargo",
-        "test",
-        "-p",
-        "uv",
-        "--test",
-        "pip_install",
-        "pip_install::registry_wheel_size_is_advisory",
-        "--locked",
-        "--",
-        "--exact"
-      ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/warmup-05.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 5,
-      "measured": false
-    },
-    {
-      "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/uv/stock/1/warmup-06.log",
-      "toolchain": "stock",
-      "project": "uv",
-      "repetition": 1,
-      "index": 6,
-      "measured": false
-    },
-    {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/01.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1789,7 +414,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/03.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/03.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1798,7 +423,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "codex-tui"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/04.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/04.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1813,7 +438,7 @@
         "codex-tui",
         "active_cell_layout_preserves_custom_height_and_bottom_scroll"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/06.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/06.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1828,7 +453,7 @@
         "codex-tui",
         "chatwidget::rendering::tests"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/07.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/07.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1843,7 +468,7 @@
         "codex-tui",
         "active_cell_layout_reuses_heights_without_freezing_animation"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/08.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/08.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1858,7 +483,7 @@
         "codex-tui",
         "active_cell_layout_preserves_custom_height_and_bottom_scroll"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/10.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/10.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1873,7 +498,7 @@
         "codex-tui",
         "removing_active_cell_invalidates_layout_before_reusing_its_identity"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/11.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/11.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1888,7 +513,7 @@
         "codex-tui",
         "chatwidget::rendering::tests"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/12.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/12.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1906,7 +531,7 @@
         "-D",
         "clippy::redundant_closure_for_method_calls"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/13.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/13.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1922,7 +547,7 @@
         "-E",
         "not (test(=chatwidget::tests::status_surface_previews::missing_project_root_uses_different_status_and_title_preview_sources) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::terminal_title_setup_popup_mixed_snapshot) | test(=chatwidget::tests::terminal_title::terminal_title_activity_indicators_do_not_animate_when_animations_are_disabled) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_blinks_when_animations_are_enabled) | test(=chatwidget::tests::terminal_title::terminal_title_shows_action_required_while_exec_approval_is_pending) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_respects_spinner_setting) | test(=app::tests::safety_buffering::safety_retry_preserves_a_committed_steer_from_the_interrupted_turn))"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/14.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/14.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1931,7 +556,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/0/warmup-01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/0/warmup-01.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 0,
@@ -1940,7 +565,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/01.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -1949,7 +574,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/03.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/03.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -1958,7 +583,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "codex-tui"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/04.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/04.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -1973,7 +598,7 @@
         "codex-tui",
         "active_cell_layout_preserves_custom_height_and_bottom_scroll"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/06.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/06.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -1988,7 +613,7 @@
         "codex-tui",
         "chatwidget::rendering::tests"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/07.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/07.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -2003,7 +628,7 @@
         "codex-tui",
         "active_cell_layout_reuses_heights_without_freezing_animation"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/08.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/08.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -2018,7 +643,7 @@
         "codex-tui",
         "active_cell_layout_preserves_custom_height_and_bottom_scroll"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/10.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/10.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -2033,7 +658,7 @@
         "codex-tui",
         "removing_active_cell_invalidates_layout_before_reusing_its_identity"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/11.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/11.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -2048,7 +673,7 @@
         "codex-tui",
         "chatwidget::rendering::tests"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/12.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/12.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -2066,7 +691,7 @@
         "-D",
         "clippy::redundant_closure_for_method_calls"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/13.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/13.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -2082,7 +707,7 @@
         "-E",
         "not (test(=chatwidget::tests::status_surface_previews::missing_project_root_uses_different_status_and_title_preview_sources) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::terminal_title_setup_popup_mixed_snapshot) | test(=chatwidget::tests::terminal_title::terminal_title_activity_indicators_do_not_animate_when_animations_are_disabled) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_blinks_when_animations_are_enabled) | test(=chatwidget::tests::terminal_title::terminal_title_shows_action_required_while_exec_approval_is_pending) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_respects_spinner_setting) | test(=app::tests::safety_buffering::safety_retry_preserves_a_committed_steer_from_the_interrupted_turn))"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/14.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/14.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -2091,7 +716,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/0/warmup-01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/0/warmup-01.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 0,
@@ -2100,7 +725,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/01.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2109,7 +734,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/03.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/03.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2118,7 +743,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "codex-tui"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/04.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/04.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2133,7 +758,7 @@
         "codex-tui",
         "active_cell_layout_preserves_custom_height_and_bottom_scroll"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/06.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/06.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2148,7 +773,7 @@
         "codex-tui",
         "chatwidget::rendering::tests"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/07.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/07.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2163,7 +788,7 @@
         "codex-tui",
         "active_cell_layout_reuses_heights_without_freezing_animation"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/08.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/08.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2178,7 +803,7 @@
         "codex-tui",
         "active_cell_layout_preserves_custom_height_and_bottom_scroll"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/10.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/10.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2193,7 +818,7 @@
         "codex-tui",
         "removing_active_cell_invalidates_layout_before_reusing_its_identity"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/11.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/11.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2208,7 +833,7 @@
         "codex-tui",
         "chatwidget::rendering::tests"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/12.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/12.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2226,7 +851,7 @@
         "-D",
         "clippy::redundant_closure_for_method_calls"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/13.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/13.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2242,7 +867,7 @@
         "-E",
         "not (test(=chatwidget::tests::status_surface_previews::missing_project_root_uses_different_status_and_title_preview_sources) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::terminal_title_setup_popup_mixed_snapshot) | test(=chatwidget::tests::terminal_title::terminal_title_activity_indicators_do_not_animate_when_animations_are_disabled) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_blinks_when_animations_are_enabled) | test(=chatwidget::tests::terminal_title::terminal_title_shows_action_required_while_exec_approval_is_pending) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_respects_spinner_setting) | test(=app::tests::safety_buffering::safety_retry_preserves_a_committed_steer_from_the_interrupted_turn))"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/14.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/14.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2251,7 +876,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/ohm/1/warmup-01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/ohm/1/warmup-01.log",
       "toolchain": "ohm",
       "project": "codex",
       "repetition": 1,
@@ -2260,7 +885,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/01.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2269,7 +894,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/03.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/03.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2278,7 +903,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "codex-tui"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/04.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/04.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2293,7 +918,7 @@
         "codex-tui",
         "active_cell_layout_preserves_custom_height_and_bottom_scroll"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/06.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/06.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2308,7 +933,7 @@
         "codex-tui",
         "chatwidget::rendering::tests"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/07.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/07.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2323,7 +948,7 @@
         "codex-tui",
         "active_cell_layout_reuses_heights_without_freezing_animation"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/08.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/08.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2338,7 +963,7 @@
         "codex-tui",
         "active_cell_layout_preserves_custom_height_and_bottom_scroll"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/10.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/10.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2353,7 +978,7 @@
         "codex-tui",
         "removing_active_cell_invalidates_layout_before_reusing_its_identity"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/11.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/11.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2368,7 +993,7 @@
         "codex-tui",
         "chatwidget::rendering::tests"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/12.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/12.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2386,7 +1011,7 @@
         "-D",
         "clippy::redundant_closure_for_method_calls"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/13.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/13.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2402,7 +1027,7 @@
         "-E",
         "not (test(=chatwidget::tests::status_surface_previews::missing_project_root_uses_different_status_and_title_preview_sources) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::terminal_title_setup_popup_mixed_snapshot) | test(=chatwidget::tests::terminal_title::terminal_title_activity_indicators_do_not_animate_when_animations_are_disabled) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_blinks_when_animations_are_enabled) | test(=chatwidget::tests::terminal_title::terminal_title_shows_action_required_while_exec_approval_is_pending) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_respects_spinner_setting) | test(=app::tests::safety_buffering::safety_retry_preserves_a_committed_steer_from_the_interrupted_turn))"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/14.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/14.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2411,7 +1036,7 @@
     },
     {
       "command": ["just", "test", "-p", "codex-tui", "startup"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/codex/stock/1/warmup-01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10-codex-replay-sessions/sessions/logs/codex/stock/1/warmup-01.log",
       "toolchain": "stock",
       "project": "codex",
       "repetition": 1,
@@ -2432,7 +1057,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/01.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2453,7 +1078,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/03.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/03.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2472,7 +1097,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/04.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/04.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2502,7 +1127,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/05.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/05.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2523,7 +1148,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/07.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/07.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2542,7 +1167,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/08.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/08.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2572,7 +1197,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/09.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/09.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2593,7 +1218,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/11.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/11.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2615,7 +1240,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/12.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/12.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2637,7 +1262,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/13.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/13.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2667,7 +1292,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/14.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/14.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2676,7 +1301,7 @@
     },
     {
       "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/15.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/15.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2695,7 +1320,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/0/warmup-01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/0/warmup-01.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -2716,7 +1341,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/01.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2737,7 +1362,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/03.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/03.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2756,7 +1381,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/04.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/04.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2786,7 +1411,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/05.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/05.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2807,7 +1432,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/07.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/07.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2826,7 +1451,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/08.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/08.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2856,7 +1481,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/09.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/09.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2877,7 +1502,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/11.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/11.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2899,7 +1524,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/12.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/12.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2921,7 +1546,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/13.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/13.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2951,7 +1576,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/14.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/14.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2960,7 +1585,7 @@
     },
     {
       "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/15.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/15.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -2979,7 +1604,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/0/warmup-01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/0/warmup-01.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -3000,7 +1625,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/01.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3021,7 +1646,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/03.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/03.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3040,7 +1665,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/04.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/04.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3070,7 +1695,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/05.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/05.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3091,7 +1716,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/07.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/07.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3110,7 +1735,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/08.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/08.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3140,7 +1765,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/09.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/09.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3161,7 +1786,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/11.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/11.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3183,7 +1808,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/12.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/12.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3205,7 +1830,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/13.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/13.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3235,7 +1860,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/14.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/14.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3244,7 +1869,7 @@
     },
     {
       "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/15.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/15.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3263,7 +1888,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/ohm/1/warmup-01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/ohm/1/warmup-01.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -3284,7 +1909,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/01.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3305,7 +1930,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/03.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/03.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3324,7 +1949,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/04.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/04.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3354,7 +1979,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/05.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/05.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3375,7 +2000,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/07.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/07.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3394,7 +2019,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/08.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/08.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3424,7 +2049,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/09.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/09.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3445,7 +2070,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/11.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/11.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3467,7 +2092,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/12.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/12.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3489,7 +2114,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/13.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/13.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3519,7 +2144,7 @@
         "-A",
         "clippy::mut_mut"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/14.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/14.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3528,7 +2153,7 @@
     },
     {
       "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/15.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/15.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3547,7 +2172,7 @@
         "--status-level",
         "fail"
       ],
-      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-9/sessions/logs/ruff/stock/1/warmup-01.log",
+      "log": "/tmp/codex-cargo-targets/ohm/isolated/release-1.99.0-10/sessions/logs/ruff/stock/1/warmup-01.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -3556,42 +2181,6 @@
     }
   ],
   "sessions": [
-    {
-      "project": "uv",
-      "session": {
-        "id": "uv-pypi-simple-json-parser",
-        "description": "Implement a dedicated PyPI Simple API JSON parser, rerun focused parser and registry-client tests, then simplify the parser and its compatibility tests."
-      },
-      "base_revision": "a50af60fb4162d7f94812d64c481c30a0200b6d8",
-      "commands": 14,
-      "edits": 3,
-      "warmups": 6,
-      "setup_patches": [
-        {
-          "label": "Use cfg_select formatting accepted by stable and development-channel rustfmt",
-          "patch": "patches/rust-1.99-uv-cfg-select.patch",
-          "sha256": "def4e6311a8eed2a60cf13f7ccd99111754d80891ac713ce5651ccbdd1952b04",
-          "paths": [
-            "crates/uv-cache-info/src/cache_info.rs",
-            "crates/uv-cache-info/src/timestamp.rs",
-            "crates/uv-cache/src/removal.rs",
-            "crates/uv-dirs/src/lib.rs",
-            "crates/uv-fs/src/lib.rs",
-            "crates/uv-pep508/src/verbatim_url.rs",
-            "crates/uv-platform/src/host.rs",
-            "crates/uv-python/src/managed.rs",
-            "crates/uv-tool/src/tool.rs",
-            "crates/uv/src/bin/uvw.rs",
-            "crates/uv/src/bin/uvx.rs",
-            "crates/uv/src/commands/project/run.rs",
-            "crates/uv/tests/python/venv.rs",
-            "crates/uv/tests/sync/centralized_project_envs.rs",
-            "crates/uv/tests/tool/tool_install.rs"
-          ]
-        }
-      ],
-      "warmup_enabled": true
-    },
     {
       "project": "codex",
       "session": {
@@ -3642,354 +2231,6 @@
     }
   ],
   "commands": {
-    "uv": [
-      {
-        "index": 2,
-        "label": "Run focused Simple API parser tests",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv-pypi-types",
-          "simple_json::",
-          "--locked"
-        ],
-        "wall_seconds": {
-          "stock": [4.613979890999872, 4.99825082300049],
-          "ohm": [3.628087136999966, 3.150341651999952]
-        },
-        "tests_started": {
-          "stock": [9, 9],
-          "ohm": [9, 9]
-        },
-        "cargo_status_message_counts": {
-          "stock": [1, 1],
-          "ohm": [1, 1]
-        }
-      },
-      {
-        "index": 3,
-        "label": "Run all PyPI types tests",
-        "category": "test",
-        "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-        "wall_seconds": {
-          "stock": [0.5536180019998937, 0.6830379980001453],
-          "ohm": [0.4883360889998585, 0.4945554969999648]
-        },
-        "tests_started": {
-          "stock": [55, 55],
-          "ohm": [55, 55]
-        },
-        "cargo_status_message_counts": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        }
-      },
-      {
-        "index": 4,
-        "label": "Run registry project-status regression",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv-client",
-          "project_status_pypi_json",
-          "--locked"
-        ],
-        "wall_seconds": {
-          "stock": [22.54440346299998, 21.87697196499994],
-          "ohm": [12.386051648999455, 12.552139774999887]
-        },
-        "tests_started": {
-          "stock": [1, 1],
-          "ohm": [1, 1]
-        },
-        "cargo_status_message_counts": {
-          "stock": [8, 8],
-          "ohm": [8, 8]
-        }
-      },
-      {
-        "index": 5,
-        "label": "Check parser and registry-client Clippy warnings",
-        "category": "clippy",
-        "command": [
-          "cargo",
-          "clippy",
-          "-p",
-          "uv-pypi-types",
-          "-p",
-          "uv-client",
-          "--all-targets",
-          "--locked",
-          "--",
-          "-D",
-          "warnings",
-          "-A",
-          "clippy::doc_markdown",
-          "-A",
-          "clippy::double_must_use"
-        ],
-        "wall_seconds": {
-          "stock": [11.095324969000103, 9.629218781000418],
-          "ohm": [5.969423686000482, 5.682447364999462]
-        },
-        "tests_started": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        },
-        "cargo_status_message_counts": {
-          "stock": [8, 8],
-          "ohm": [8, 8]
-        }
-      },
-      {
-        "index": 6,
-        "label": "Check workspace formatting",
-        "category": "formatting",
-        "command": ["cargo", "fmt", "--all", "--", "--check"],
-        "wall_seconds": {
-          "stock": [3.9847837440001967, 4.0723973700005445],
-          "ohm": [4.00530130199968, 4.165484572999958]
-        },
-        "tests_started": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        },
-        "cargo_status_message_counts": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        }
-      },
-      {
-        "index": 8,
-        "label": "Rerun focused Simple API parser tests",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv-pypi-types",
-          "simple_json::",
-          "--locked"
-        ],
-        "wall_seconds": {
-          "stock": [2.0893254499997056, 2.081459031999657],
-          "ohm": [2.8062217490005423, 2.9510908729998846]
-        },
-        "tests_started": {
-          "stock": [9, 9],
-          "ohm": [9, 9]
-        },
-        "cargo_status_message_counts": {
-          "stock": [1, 1],
-          "ohm": [1, 1]
-        }
-      },
-      {
-        "index": 9,
-        "label": "Rerun parser and registry-client Clippy",
-        "category": "clippy",
-        "command": [
-          "cargo",
-          "clippy",
-          "-p",
-          "uv-pypi-types",
-          "-p",
-          "uv-client",
-          "--all-targets",
-          "--locked",
-          "--",
-          "-D",
-          "warnings",
-          "-A",
-          "clippy::doc_markdown",
-          "-A",
-          "clippy::double_must_use"
-        ],
-        "wall_seconds": {
-          "stock": [7.077864087999842, 5.229809968000154],
-          "ohm": [1.7935585349996472, 1.4340315970002848]
-        },
-        "tests_started": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        },
-        "cargo_status_message_counts": {
-          "stock": [8, 8],
-          "ohm": [8, 8]
-        }
-      },
-      {
-        "index": 10,
-        "label": "Run registry-client unit tests",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv-client",
-          "registry_client::tests::",
-          "--locked"
-        ],
-        "wall_seconds": {
-          "stock": [9.25937680700008, 9.004294638999454],
-          "ohm": [8.22805002899986, 8.037254715999552]
-        },
-        "tests_started": {
-          "stock": [12, 12],
-          "ohm": [12, 12]
-        },
-        "cargo_status_message_counts": {
-          "stock": [8, 8],
-          "ohm": [8, 8]
-        }
-      },
-      {
-        "index": 11,
-        "label": "Recheck workspace formatting",
-        "category": "formatting",
-        "command": ["cargo", "fmt", "--all", "--", "--check"],
-        "wall_seconds": {
-          "stock": [4.205619501000001, 4.129557665999528],
-          "ohm": [0.2392596110003069, 0.21315902300011658]
-        },
-        "tests_started": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        },
-        "cargo_status_message_counts": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        }
-      },
-      {
-        "index": 13,
-        "label": "Rerun all PyPI types tests",
-        "category": "test",
-        "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-        "wall_seconds": {
-          "stock": [2.9251986019999094, 3.0403816520001783],
-          "ohm": [2.0445380130004196, 2.05709589900016]
-        },
-        "tests_started": {
-          "stock": [55, 55],
-          "ohm": [55, 55]
-        },
-        "cargo_status_message_counts": {
-          "stock": [1, 1],
-          "ohm": [1, 1]
-        }
-      },
-      {
-        "index": 14,
-        "label": "Recheck parser and registry-client Clippy",
-        "category": "clippy",
-        "command": [
-          "cargo",
-          "clippy",
-          "-p",
-          "uv-pypi-types",
-          "-p",
-          "uv-client",
-          "--all-targets",
-          "--locked",
-          "--",
-          "-D",
-          "warnings",
-          "-A",
-          "clippy::doc_markdown",
-          "-A",
-          "clippy::double_must_use"
-        ],
-        "wall_seconds": {
-          "stock": [7.030662582999867, 6.271119464999174],
-          "ohm": [5.23613212500004, 4.885196399000051]
-        },
-        "tests_started": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        },
-        "cargo_status_message_counts": {
-          "stock": [8, 8],
-          "ohm": [8, 8]
-        }
-      },
-      {
-        "index": 15,
-        "label": "Run local-mock-index installation integration test",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv",
-          "--test",
-          "pip_install",
-          "pip_install::registry_wheel_size_is_advisory",
-          "--locked",
-          "--",
-          "--exact"
-        ],
-        "wall_seconds": {
-          "stock": [109.82241868799974, 102.58822162199976],
-          "ohm": [50.37351855799989, 49.471615894000024]
-        },
-        "tests_started": {
-          "stock": [1, 1],
-          "ohm": [1, 1]
-        },
-        "cargo_status_message_counts": {
-          "stock": [30, 30],
-          "ohm": [30, 30]
-        }
-      },
-      {
-        "index": 16,
-        "label": "Rerun registry-client unit tests",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv-client",
-          "registry_client::tests::",
-          "--locked"
-        ],
-        "wall_seconds": {
-          "stock": [11.001220211000145, 10.617642489999525],
-          "ohm": [7.986567861999902, 8.860998776000088]
-        },
-        "tests_started": {
-          "stock": [12, 12],
-          "ohm": [12, 12]
-        },
-        "cargo_status_message_counts": {
-          "stock": [8, 8],
-          "ohm": [8, 8]
-        }
-      },
-      {
-        "index": 17,
-        "label": "Perform final workspace formatting check",
-        "category": "formatting",
-        "command": ["cargo", "fmt", "--all", "--", "--check"],
-        "wall_seconds": {
-          "stock": [4.314976794999893, 4.1181661219998205],
-          "ohm": [0.3388921149999078, 0.22906840599989664]
-        },
-        "tests_started": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        },
-        "cargo_status_message_counts": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        }
-      }
-    ],
     "codex": [
       {
         "index": 1,
@@ -3997,8 +2238,8 @@
         "category": "test",
         "command": ["just", "test", "-p", "codex-tui", "startup"],
         "wall_seconds": {
-          "stock": [9.099760668999807, 8.877076458999],
-          "ohm": [9.369296794000547, 8.681073489999108]
+          "stock": [21.280141524999635, 10.533492149001177],
+          "ohm": [10.789294898999287, 10.740150218000053]
         },
         "tests_started": {
           "stock": [75, 75],
@@ -4007,6 +2248,10 @@
         "cargo_status_message_counts": {
           "stock": [0, 0],
           "ohm": [0, 0]
+        },
+        "selected_tests_completed": {
+          "stock": [75, 75],
+          "ohm": [75, 75]
         }
       },
       {
@@ -4015,8 +2260,8 @@
         "category": "test",
         "command": ["just", "test", "-p", "codex-tui", "startup"],
         "wall_seconds": {
-          "stock": [119.89983958500125, 104.95132136600114],
-          "ohm": [71.14275600200017, 71.13130604199978]
+          "stock": [414.81176131100074, 123.48582118899867],
+          "ohm": [80.23954959000002, 72.95489489399915]
         },
         "tests_started": {
           "stock": [75, 75],
@@ -4025,6 +2270,10 @@
         "cargo_status_message_counts": {
           "stock": [3, 3],
           "ohm": [3, 3]
+        },
+        "selected_tests_completed": {
+          "stock": [75, 75],
+          "ohm": [75, 75]
         }
       },
       {
@@ -4033,8 +2282,8 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "codex-tui"],
         "wall_seconds": {
-          "stock": [195.47039532599956, 179.90068058100042],
-          "ohm": [56.07002385399937, 55.94945525499861]
+          "stock": [472.5845327900006, 204.64865743700102],
+          "ohm": [67.26727684800062, 68.25611444900096]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -4057,8 +2306,8 @@
           "active_cell_layout_preserves_custom_height_and_bottom_scroll"
         ],
         "wall_seconds": {
-          "stock": [78.69002712200017, 70.46498269400035],
-          "ohm": [41.47775751100016, 43.931299395999304]
+          "stock": [287.5410460229996, 81.648565427],
+          "ohm": [49.097105710001415, 50.76831929099899]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -4067,6 +2316,10 @@
         "cargo_status_message_counts": {
           "stock": [3, 3],
           "ohm": [3, 3]
+        },
+        "selected_tests_completed": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
         }
       },
       {
@@ -4081,8 +2334,8 @@
           "chatwidget::rendering::tests"
         ],
         "wall_seconds": {
-          "stock": [3.2642258549985854, 3.23832315600157],
-          "ohm": [2.783041991000573, 2.461101110000527]
+          "stock": [7.162624627999321, 3.958331525000176],
+          "ohm": [5.023003955000604, 4.0560601090001]
         },
         "tests_started": {
           "stock": [5, 5],
@@ -4091,6 +2344,10 @@
         "cargo_status_message_counts": {
           "stock": [0, 0],
           "ohm": [0, 0]
+        },
+        "selected_tests_completed": {
+          "stock": [5, 5],
+          "ohm": [5, 5]
         }
       },
       {
@@ -4105,8 +2362,8 @@
           "active_cell_layout_reuses_heights_without_freezing_animation"
         ],
         "wall_seconds": {
-          "stock": [3.435714769000697, 3.0364061090003815],
-          "ohm": [2.777044489999753, 2.8188711629991303]
+          "stock": [10.49621819099957, 3.428827502999411],
+          "ohm": [5.767259502001252, 6.263196088999393]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -4115,6 +2372,10 @@
         "cargo_status_message_counts": {
           "stock": [0, 0],
           "ohm": [0, 0]
+        },
+        "selected_tests_completed": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
         }
       },
       {
@@ -4129,8 +2390,8 @@
           "active_cell_layout_preserves_custom_height_and_bottom_scroll"
         ],
         "wall_seconds": {
-          "stock": [47.094090692000464, 43.03349942400018],
-          "ohm": [37.708423979000145, 38.12576044799971]
+          "stock": [173.29159812500075, 51.30572800400114],
+          "ohm": [47.80295601399848, 43.09789471099975]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -4139,6 +2400,10 @@
         "cargo_status_message_counts": {
           "stock": [3, 3],
           "ohm": [3, 3]
+        },
+        "selected_tests_completed": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
         }
       },
       {
@@ -4153,8 +2418,8 @@
           "removing_active_cell_invalidates_layout_before_reusing_its_identity"
         ],
         "wall_seconds": {
-          "stock": [3.346871503999864, 3.0453028140000242],
-          "ohm": [2.8163275780007098, 2.7640311170016503]
+          "stock": [7.910116746999847, 3.7789956889992027],
+          "ohm": [5.09399619100077, 4.204762364999624]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -4163,6 +2428,10 @@
         "cargo_status_message_counts": {
           "stock": [0, 0],
           "ohm": [0, 0]
+        },
+        "selected_tests_completed": {
+          "stock": [1, 1],
+          "ohm": [1, 1]
         }
       },
       {
@@ -4177,8 +2446,8 @@
           "chatwidget::rendering::tests"
         ],
         "wall_seconds": {
-          "stock": [3.471094329999687, 2.882893490001152],
-          "ohm": [2.764949861999412, 2.7419862400001875]
+          "stock": [10.204537564999555, 4.2304043829990405],
+          "ohm": [5.1303612449992215, 2.9052533769990987]
         },
         "tests_started": {
           "stock": [5, 5],
@@ -4187,6 +2456,10 @@
         "cargo_status_message_counts": {
           "stock": [0, 0],
           "ohm": [0, 0]
+        },
+        "selected_tests_completed": {
+          "stock": [5, 5],
+          "ohm": [5, 5]
         }
       },
       {
@@ -4204,8 +2477,8 @@
           "clippy::redundant_closure_for_method_calls"
         ],
         "wall_seconds": {
-          "stock": [228.71266885499972, 202.88440779899975],
-          "ohm": [80.1514599509992, 82.14347047699994]
+          "stock": [705.9182763040008, 237.0530350070003],
+          "ohm": [99.38040414900024, 96.00584004699886]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -4229,16 +2502,20 @@
           "not (test(=chatwidget::tests::status_surface_previews::missing_project_root_uses_different_status_and_title_preview_sources) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_mixed_snapshot) | test(=chatwidget::tests::status_surface_previews::status_surface_preview_lines_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::status_line_setup_popup_hardcoded_only_snapshot) | test(=chatwidget::tests::status_surface_previews::terminal_title_setup_popup_mixed_snapshot) | test(=chatwidget::tests::terminal_title::terminal_title_activity_indicators_do_not_animate_when_animations_are_disabled) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_blinks_when_animations_are_enabled) | test(=chatwidget::tests::terminal_title::terminal_title_shows_action_required_while_exec_approval_is_pending) | test(=chatwidget::tests::terminal_title::terminal_title_action_required_respects_spinner_setting) | test(=app::tests::safety_buffering::safety_retry_preserves_a_committed_steer_from_the_interrupted_turn))"
         ],
         "wall_seconds": {
-          "stock": [34.808131988998866, 36.24885687400092],
-          "ohm": [33.5149210769996, 31.56734733799931]
+          "stock": [45.27931030000036, 70.95391938800094],
+          "ohm": [49.28041822300111, 32.566558459999214]
         },
         "tests_started": {
-          "stock": [3439, 3439],
+          "stock": [3439, 3440],
           "ohm": [3439, 3439]
         },
         "cargo_status_message_counts": {
           "stock": [0, 0],
           "ohm": [0, 0]
+        },
+        "selected_tests_completed": {
+          "stock": [3439, 3439],
+          "ohm": [3439, 3439]
         }
       }
     ],
@@ -4261,8 +2538,8 @@
           "fail"
         ],
         "wall_seconds": {
-          "stock": [2.151226815999962, 2.575830435000171],
-          "ohm": [2.6085506149997855, 2.6845005310001397]
+          "stock": [2.1092206230000556, 2.067579418999685],
+          "ohm": [2.0691679970000223, 1.9180686960003186]
         },
         "tests_started": {
           "stock": [2, 2],
@@ -4291,8 +2568,8 @@
           "fail"
         ],
         "wall_seconds": {
-          "stock": [36.891464994000216, 38.781624436999664],
-          "ohm": [30.91839429699985, 31.804018667000037]
+          "stock": [35.77302438699985, 32.03715293900041],
+          "ohm": [24.811076902999957, 22.998870395000267]
         },
         "tests_started": {
           "stock": [2, 2],
@@ -4319,8 +2596,8 @@
           "fail"
         ],
         "wall_seconds": {
-          "stock": [44.46592483400036, 46.286045029999514],
-          "ohm": [38.6266937270002, 39.5376979939997]
+          "stock": [43.217015160000074, 38.013851498999884],
+          "ohm": [32.51308777600025, 30.90416404000007]
         },
         "tests_started": {
           "stock": [868, 868],
@@ -4358,8 +2635,8 @@
           "clippy::mut_mut"
         ],
         "wall_seconds": {
-          "stock": [91.1492187089998, 101.29974774499988],
-          "ohm": [28.913375996000013, 29.341379959999813]
+          "stock": [82.46613676300012, 78.46279052],
+          "ohm": [26.386098435999884, 23.682815209999717]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -4388,8 +2665,8 @@
           "fail"
         ],
         "wall_seconds": {
-          "stock": [67.21624643600035, 66.1795897890006],
-          "ohm": [44.00461317700001, 43.39873816599993]
+          "stock": [59.864332617999935, 53.6906605170002],
+          "ohm": [35.69570758300006, 33.40945329900023]
         },
         "tests_started": {
           "stock": [2, 2],
@@ -4416,8 +2693,8 @@
           "fail"
         ],
         "wall_seconds": {
-          "stock": [82.2012981480002, 78.65204249399994],
-          "ohm": [53.056010646999766, 52.22370288499951]
+          "stock": [67.90034661400023, 61.42482373299981],
+          "ohm": [43.97403797800007, 41.36418352999999]
         },
         "tests_started": {
           "stock": [868, 868],
@@ -4455,8 +2732,8 @@
           "clippy::mut_mut"
         ],
         "wall_seconds": {
-          "stock": [76.51001529899986, 85.84749408599964],
-          "ohm": [25.687050392999936, 24.455563421999614]
+          "stock": [63.384372790999805, 55.691599847999896],
+          "ohm": [19.7401741460003, 18.363606768999944]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -4485,8 +2762,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [89.21610163100013, 86.29996171399944],
-          "ohm": [51.17011493100017, 49.07658451899988]
+          "stock": [69.7097034049998, 62.93063086000029],
+          "ohm": [42.98804119500028, 41.09210267000026]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -4516,8 +2793,8 @@
           "immediate-final"
         ],
         "wall_seconds": {
-          "stock": [7.181910355999662, 7.3649491070000295],
-          "ohm": [7.206813671999953, 7.063529160999678]
+          "stock": [6.371836677999909, 6.294567934999577],
+          "ohm": [6.422117525999965, 6.128394448999643]
         },
         "tests_started": {
           "stock": [482, 482],
@@ -4547,8 +2824,8 @@
           "immediate-final"
         ],
         "wall_seconds": {
-          "stock": [98.99780467200026, 99.3337049010006],
-          "ohm": [59.7104635820001, 59.10148070899959]
+          "stock": [82.11238307600024, 71.20637173799969],
+          "ohm": [52.45623800700014, 48.99394647700001]
         },
         "tests_started": {
           "stock": [868, 868],
@@ -4586,8 +2863,8 @@
           "clippy::mut_mut"
         ],
         "wall_seconds": {
-          "stock": [92.88579654499972, 103.45020627800022],
-          "ohm": [30.623543597000207, 26.449943624000298]
+          "stock": [74.12102312900015, 61.8641571219996],
+          "ohm": [22.44164458499972, 20.445099699000366]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -4604,8 +2881,8 @@
         "category": "formatting",
         "command": ["cargo", "fmt", "--all", "--", "--check"],
         "wall_seconds": {
-          "stock": [10.909073613000146, 11.004040155000439],
-          "ohm": [11.705988592999802, 10.920360349000475]
+          "stock": [8.368574816000091, 7.389469261000158],
+          "ohm": [8.235165617999883, 7.5654189830002]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -4619,157 +2896,6 @@
     ]
   },
   "warmups": {
-    "uv": [
-      {
-        "index": 1,
-        "label": "Warm existing Simple API JSON tests",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv-pypi-types",
-          "simple_json::",
-          "--locked"
-        ],
-        "wall_seconds": {
-          "stock": [20.263685762000023, 20.123290370000177],
-          "ohm": [21.88791758699972, 20.22263299699989]
-        },
-        "tests_started": {
-          "stock": [1, 1],
-          "ohm": [1, 1]
-        },
-        "cargo_status_message_counts": {
-          "stock": [176, 176],
-          "ohm": [176, 176]
-        }
-      },
-      {
-        "index": 2,
-        "label": "Warm the complete PyPI types test harness",
-        "category": "test",
-        "command": ["cargo", "test", "-p", "uv-pypi-types", "--locked"],
-        "wall_seconds": {
-          "stock": [0.7245926409996173, 0.46465004200035764],
-          "ohm": [0.49939195300066785, 0.5433659390000685]
-        },
-        "tests_started": {
-          "stock": [47, 47],
-          "ohm": [47, 47]
-        },
-        "cargo_status_message_counts": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        }
-      },
-      {
-        "index": 3,
-        "label": "Warm existing registry-client unit tests",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv-client",
-          "registry_client::tests::",
-          "--locked"
-        ],
-        "wall_seconds": {
-          "stock": [71.26355425300062, 70.80747695599985],
-          "ohm": [67.13050578300044, 63.705691566000496]
-        },
-        "tests_started": {
-          "stock": [12, 12],
-          "ohm": [12, 12]
-        },
-        "cargo_status_message_counts": {
-          "stock": [355, 355],
-          "ohm": [355, 355]
-        }
-      },
-      {
-        "index": 4,
-        "label": "Warm parser and registry-client Clippy artifacts",
-        "category": "clippy",
-        "command": [
-          "cargo",
-          "clippy",
-          "-p",
-          "uv-pypi-types",
-          "-p",
-          "uv-client",
-          "--all-targets",
-          "--locked",
-          "--",
-          "-D",
-          "warnings",
-          "-A",
-          "clippy::doc_markdown",
-          "-A",
-          "clippy::double_must_use"
-        ],
-        "wall_seconds": {
-          "stock": [48.98120882200055, 47.975828003999595],
-          "ohm": [8.359995099000116, 7.543664198999977]
-        },
-        "tests_started": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        },
-        "cargo_status_message_counts": {
-          "stock": [420, 420],
-          "ohm": [37, 37]
-        }
-      },
-      {
-        "index": 5,
-        "label": "Warm the existing local-mock installation integration harness",
-        "category": "test",
-        "command": [
-          "cargo",
-          "test",
-          "-p",
-          "uv",
-          "--test",
-          "pip_install",
-          "pip_install::registry_wheel_size_is_advisory",
-          "--locked",
-          "--",
-          "--exact"
-        ],
-        "wall_seconds": {
-          "stock": [114.85902384900055, 115.53834154099968],
-          "ohm": [82.85018359800051, 82.28088171800027]
-        },
-        "tests_started": {
-          "stock": [1, 1],
-          "ohm": [1, 1]
-        },
-        "cargo_status_message_counts": {
-          "stock": [197, 197],
-          "ohm": [197, 197]
-        }
-      },
-      {
-        "index": 6,
-        "label": "Warm workspace formatting",
-        "category": "formatting",
-        "command": ["cargo", "fmt", "--all", "--", "--check"],
-        "wall_seconds": {
-          "stock": [4.142814425999859, 3.865942417000042],
-          "ohm": [3.9074617500000386, 3.94465506799952]
-        },
-        "tests_started": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        },
-        "cargo_status_message_counts": {
-          "stock": [0, 0],
-          "ohm": [0, 0]
-        }
-      }
-    ],
     "codex": [
       {
         "index": 1,
@@ -4777,8 +2903,8 @@
         "category": "test",
         "command": ["just", "test", "-p", "codex-tui", "startup"],
         "wall_seconds": {
-          "stock": [381.5096770889995, 353.21057504000055],
-          "ohm": [300.5434953019994, 295.96096471799865]
+          "stock": [862.6243895830003, 409.5137208719989],
+          "ohm": [336.0576630380001, 334.103741207]
         },
         "tests_started": {
           "stock": [75, 75],
@@ -4787,6 +2913,10 @@
         "cargo_status_message_counts": {
           "stock": [1029, 1029],
           "ohm": [1029, 1029]
+        },
+        "selected_tests_completed": {
+          "stock": [75, 75],
+          "ohm": [75, 75]
         }
       }
     ],
@@ -4807,8 +2937,8 @@
           "fail"
         ],
         "wall_seconds": {
-          "stock": [179.062438982, 185.56694678299937],
-          "ohm": [136.43642334200013, 138.9798354530003]
+          "stock": [178.00401918800003, 159.47702263100018],
+          "ohm": [129.63693994699997, 127.10796411299998]
         },
         "tests_started": {
           "stock": [868, 868],
@@ -4822,66 +2952,46 @@
     ]
   },
   "timed_session_seconds": {
-    "uv": {
-      "stock": [201.13021575099992, 189.0937268329999],
-      "ohm": [106.2815346970001, 104.78097191600045]
-    },
     "codex": {
-      "stock": [727.8732139799995, 659.1893639730006],
-      "ohm": [341.1019055659999, 342.9210244599999]
+      "stock": [2157.163823892999, 795.6565421329997],
+      "ohm": [425.50834104500063, 392.50499719599975]
     },
     "ruff": {
-      "stock": [700.5837239400003, 728.184254793],
-      "ohm": [385.24323909999976, 376.9061330780005]
+      "stock": [596.2212759619999, 531.7409715000003],
+      "ohm": [318.4569121700001, 297.531741581]
     }
   },
   "timed_command_seconds": {
-    "uv": {
-      "stock": [200.51877279399923, 188.3405295929988],
-      "ohm": [105.52393845999995, 104.18448044499928]
-    },
     "codex": {
-      "stock": [727.2928206959987, 658.5637507660049],
-      "ohm": [340.57600308899964, 342.31570207599725]
+      "stock": [2156.4801635090007, 795.0257777010011],
+      "ohm": [424.871626326003, 391.8190440099952]
     },
     "ruff": {
-      "stock": [699.7760820530007, 727.0752361710001],
-      "ohm": [384.2316132269998, 376.05749998699866]
+      "stock": [595.3979700600003, 531.0736553909992],
+      "ohm": [317.7325577500005, 296.866124217001]
     }
   },
   "timed_edit_seconds": {
-    "uv": {
-      "stock": [0.018525974999647588, 0.02117191700017429],
-      "ohm": [0.02713932299957378, 0.016565355000238924]
-    },
     "codex": {
-      "stock": [0.014990579000368598, 0.013105260999509483],
-      "ohm": [0.014299022999693989, 0.014861384001051192]
+      "stock": [0.025146327998299967, 0.014251764998334693],
+      "ohm": [0.015542553001068882, 0.01803420800024469]
     },
     "ruff": {
-      "stock": [0.05875240199975451, 0.06329654500041215],
-      "ohm": [0.057924134000131744, 0.059238321999600885]
+      "stock": [0.05612367299931975, 0.05329927399998269],
+      "ohm": [0.05270528899973215, 0.05211414599989439]
     }
   },
   "untimed_warmup_seconds": {
-    "uv": {
-      "stock": [260.2348797530012, 258.7755293299997],
-      "ohm": [184.6354557700015, 178.24089148700023]
-    },
     "codex": {
-      "stock": [381.5096770889995, 353.21057504000055],
-      "ohm": [300.5434953019994, 295.96096471799865]
+      "stock": [862.6243895830003, 409.5137208719989],
+      "ohm": [336.0576630380001, 334.103741207]
     },
     "ruff": {
-      "stock": [179.062438982, 185.56694678299937],
-      "ohm": [136.43642334200013, 138.9798354530003]
+      "stock": [178.00401918800003, 159.47702263100018],
+      "ohm": [129.63693994699997, 127.10796411299998]
     }
   },
   "order_by_project": {
-    "uv": [
-      ["stock", "ohm"],
-      ["ohm", "stock"]
-    ],
     "codex": [
       ["stock", "ohm"],
       ["ohm", "stock"]
@@ -4890,5 +3000,8 @@
       ["stock", "ohm"],
       ["ohm", "stock"]
     ]
+  },
+  "excluded_projects": {
+    "uv": "rustc panicked while compiling uv-pypi-types: invalid cached local expansion data."
   }
 }

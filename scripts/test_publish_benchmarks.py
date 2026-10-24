@@ -2,6 +2,7 @@
 
 import copy
 from pathlib import Path
+import re
 import shutil
 import statistics
 import tempfile
@@ -29,6 +30,94 @@ class PublicationTests(unittest.TestCase):
             root / "scripts/benchmark_results" / publish.DEVELOPER_WORKFLOW_REPORT,
         )
 
+    def partial_disk(self, *, forks=True):
+        disk = copy.deepcopy(self.reports["disk"])
+        release, rust = (
+            self.reports["sessions"]["ohm_release"],
+            self.reports["sessions"]["rust_version"],
+        )
+        disk["release"] = release
+        if "stock-" + rust in disk["toolchains"]:
+            disk["toolchains"][rust] = disk["toolchains"].pop("stock-" + rust)
+        disk["validation"].update(status="partial", full_campaign_passed=False)
+        disk["campaign"] = {
+            "fork_continuation": {
+                "release": release,
+                "state": "finished_with_failed_original_cohort",
+                "finished_at": 2,
+            }
+        }
+        disk["cohort_inventory"] = [
+            dict(
+                row,
+                accepted=row["cell"].startswith("ruff-")
+                and (forks or row["cell"].endswith("-single")),
+                retained_bytes=row.get("idle_bytes", row.get("retained_bytes")),
+            )
+            for row in disk.get("cohort_inventory", disk["cohorts"])
+        ]
+        for row in disk["cohort_inventory"]:
+            row["state"] = "audited_complete" if row["accepted"] else "failed"
+        disk["cohorts"] = [r for r in disk["cohort_inventory"] if r["accepted"]]
+        accepted = {r["cell"] for r in disk["cohorts"]}
+        disk["readme_comparisons"] = [
+            r
+            for r in disk["readme_comparisons"]
+            if r["project"] == "ruff" and (forks or r["comparison"]["worktrees"] == 1)
+        ]
+        disk["omitted_comparisons"] = []
+        for project in ("ruff", "uv"):
+            for mode in ("single", "forks"):
+                missing = {
+                    f"{project}-{label}-{mode}" for label in ("stock", "ohm")
+                } - accepted
+                if missing:
+                    disk["omitted_comparisons"].append(
+                        {
+                            "project": project,
+                            "cohort": mode,
+                            "missing_audited_cohorts": sorted(missing),
+                            "ratio": None,
+                        }
+                    )
+        return disk
+
+    def test_partial_disk_compaction_and_pair_eligibility(self):
+        reports = copy.deepcopy(self.reports)
+        reports["disk"] = publish.compact(self.partial_disk())
+        publish.validate(reports)
+        missing = copy.deepcopy(reports["disk"]["readme_comparisons"][0])
+        missing["project"] = missing["comparison"]["project"] = "uv"
+        reports["disk"]["readme_comparisons"].append(missing)
+        with self.assertRaises(ValueError):
+            publish.validate(reports)
+
+    def test_partial_disk_requires_terminal_identity_and_correct_arithmetic(self):
+        for change in (
+            lambda d: d["cohort_inventory"][0].update(state="running"),
+            lambda d: d["campaign"]["fork_continuation"].pop("finished_at"),
+            lambda d: d["readme_comparisons"][0]["comparison"].update(bytes_saved=1),
+        ):
+            with self.subTest(change=change):
+                reports = copy.deepcopy(self.reports)
+                reports["disk"] = self.partial_disk()
+                change(reports["disk"])
+                with self.assertRaises(ValueError):
+                    publish.validate(reports)
+
+    def test_partial_disk_without_ten_worktree_pair_has_no_numeric_headline(self):
+        reports = copy.deepcopy(self.reports)
+        reports["disk"] = self.partial_disk(forks=False)
+        _, headlines = publish.render_tables(
+            reports, self.ty_worktree, self.ty_scenario
+        )
+        headline = headlines[publish.DISK_HEADLINE]
+        self.assertEqual(headline, "disk usage comparisons are incomplete")
+        first = re.sub(
+            publish.DISK_HEADLINE, headline, "disk usage decreases by around 55%"
+        )
+        self.assertEqual(re.sub(publish.DISK_HEADLINE, headline, first), first)
+
     def test_tables_match_current_reports(self):
         for name, expected in publish.documents(self.reports).items():
             self.assertEqual(
@@ -49,6 +138,13 @@ class PublicationTests(unittest.TestCase):
             for line in tables["sessions"].splitlines()[2:]
             if (cells := [cell.strip() for cell in line.strip("|").split("|")])
         }
+        projects = self.reports["sessions"]["commands"]
+        excluded = self.reports["sessions"].get("excluded_projects", {})
+        session_total = "Completed sessions" if excluded else "All sessions"
+        command_total = "Commands in completed sessions" if excluded else "All commands"
+        for project in excluded:
+            self.assertEqual(rows[f"{publish.SESSION_LABELS[project]} (incomplete)"], ["—", "—"])
+        labels = [publish.SESSION_LABELS[project] for project in projects] + ["ty session"]
         for index, lane in enumerate(("stock", "ohm")):
             self.assertAlmostEqual(
                 float(rows["ty session"][index].removesuffix(" s")),
@@ -57,10 +153,10 @@ class PublicationTests(unittest.TestCase):
             )
             session_sum = sum(
                 float(rows[label][index].removesuffix(" s").replace(",", ""))
-                for label in ("Ruff session", "uv session", "Codex session", "ty session")
+                for label in labels
             )
             shown_total = float(
-                rows["All sessions"][index].removesuffix(" s").replace(",", "")
+                rows[session_total][index].removesuffix(" s").replace(",", "")
             )
             self.assertAlmostEqual(session_sum, shown_total, delta=0.02)
             command_sum = sum(
@@ -74,7 +170,7 @@ class PublicationTests(unittest.TestCase):
                 )
             )
             all_commands = float(
-                rows["All commands"][index].removesuffix(" s").replace(",", "")
+                rows[command_total][index].removesuffix(" s").replace(",", "")
             )
             self.assertAlmostEqual(command_sum, all_commands, delta=0.03)
             expected_ty = statistics.fmean(
@@ -84,7 +180,7 @@ class PublicationTests(unittest.TestCase):
                 statistics.fmean(
                     self.reports["sessions"]["timed_command_seconds"][p][lane]
                 )
-                for p in ("ruff", "uv", "codex")
+                for p in projects
             )
             self.assertAlmostEqual(all_commands, old_commands + expected_ty, delta=0.01)
             for category, label, indices in (
@@ -93,7 +189,7 @@ class PublicationTests(unittest.TestCase):
             ):
                 old = sum(
                     statistics.fmean(command["wall_seconds"][lane])
-                    for project in ("ruff", "uv", "codex")
+                    for project in projects
                     for command in self.reports["sessions"]["commands"][project]
                     if command["category"] == category
                 )
@@ -106,6 +202,32 @@ class PublicationTests(unittest.TestCase):
                 observed = float(rows[label][index].removesuffix(" s").replace(",", ""))
                 self.assertAlmostEqual(observed, old + ty, delta=0.01)
 
+    def test_session_exclusions_require_a_complete_pair(self):
+        sessions = self.reports["sessions"]
+        project = next(iter(sessions["commands"]))
+        excluded = sessions.setdefault("excluded_projects", {})
+        excluded[project] = "The replay failed."
+        with self.assertRaisesRegex(ValueError, "coverage"):
+            publish.validate(self.reports)
+        for key in ("commands", "timed_session_seconds", "timed_command_seconds"):
+            del sessions[key][project]
+        tables, _ = publish.render_tables(self.reports, self.ty_worktree, self.ty_scenario)
+        self.assertIn(f"| {publish.SESSION_LABELS[project]} (incomplete) | — | — | — |", tables["sessions"])
+        self.assertIn("| Completed sessions |", tables["sessions"])
+        del excluded[project]
+        with self.assertRaisesRegex(ValueError, "coverage"):
+            publish.validate(self.reports)
+
+    def test_failed_replay_cannot_include_timings(self):
+        report = self.reports["historical"]
+        failure = {key: report[key] for key in ("ohm_release", "rust_version")}
+        failure["failure"] = {"project": "ruff", "reason": "The replay failed.", "log_sha256": "a" * 64}
+        self.reports["historical"] = failure
+        publish.validate(self.reports)
+        failure["timed_session_seconds"] = {"ruff": {"stock": [1]}}
+        with self.assertRaisesRegex(ValueError, "failed replay"):
+            publish.validate(self.reports)
+
     def test_rejects_mismatched_ty_version_or_median(self):
         for change in (
             lambda r: r.update(rust="1.98.0"),
@@ -117,6 +239,29 @@ class PublicationTests(unittest.TestCase):
                 change(study)
                 with self.assertRaises(ValueError):
                     publish.render_tables(self.reports, study, self.ty_scenario)
+
+    def test_codex_replay_compares_completed_selections(self):
+        sessions = self.reports["sessions"]
+        methods = sessions["methodology"].setdefault("test_count_comparison_by_project", {})
+        methods["codex"] = publish.CODEX_TEST_COUNT_COMPARISON
+        tests = [c for c in sessions["commands"]["codex"] if c["category"] == "test"]
+        for command in tests:
+            command.setdefault("selected_tests_completed", copy.deepcopy(command["tests_started"]))
+        command = tests[-1]
+        command["tests_started"] = {"stock": [3439, 3440], "ohm": [3439, 3439]}
+        command["selected_tests_completed"] = {"stock": [3439, 3439], "ohm": [3439, 3439]}
+        publish.validate(self.reports)
+        self.assertEqual(command["tests_started"]["stock"], [3439, 3440])
+
+        command["selected_tests_completed"]["stock"][1] = 3440
+        with self.assertRaisesRegex(ValueError, "mismatched command test counts"):
+            publish.validate(self.reports)
+        command["selected_tests_completed"]["stock"][1] = 3441
+        with self.assertRaisesRegex(ValueError, "Invalid selected test counts"):
+            publish.validate(self.reports)
+        del methods["codex"]
+        with self.assertRaisesRegex(ValueError, "Unexpected selected test counts"):
+            publish.validate(self.reports)
 
     def test_rejects_mismatched_or_incomplete_measurements(self):
         changes = [
@@ -175,7 +320,7 @@ class PublicationTests(unittest.TestCase):
         )
 
     def test_compaction_preserves_recovery_segment_summaries(self):
-        report = self.reports["historical"]
+        report = {"provenance": {"system_cpu": {}}}
         summaries = [
             {
                 "samples": 10,
@@ -236,6 +381,9 @@ class PublicationTests(unittest.TestCase):
                 )
                 actual = publish.latest_reports()
                 for kind, report in actual.items():
+                    if "failure" in report:
+                        self.assertEqual(report["failure"], self.reports[kind]["failure"])
+                        continue
                     field = (
                         "readme_comparisons"
                         if kind == "disk"

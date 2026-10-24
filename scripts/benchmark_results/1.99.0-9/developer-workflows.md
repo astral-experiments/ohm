@@ -17,7 +17,7 @@ We ran five workflows in Ruff/ty and uv with stock Rust 1.99.0 and Ohm 1.99.0-9.
 
 Ruff/ty and uv contributed 40 accepted measurements each. The host-activity checks discarded nine attempts on Ruff/ty and four on uv. Each row in the CSV identifies the repetition and attempt, starting at zero. Accepted rows give the total elapsed time, command time, and edit time in seconds. Discarded rows record whether the host exceeded its CPU limit or another compiler ran during a command. [Individual timings and exclusions](developer-workflows.csv)
 
-The runner fixes each project's edit, warmup, and command sequence. The build record identifies the hosts, binaries, and original reports by checksum. [Workflow fixtures](https://github.com/astral-sh/ohm/blob/04c83d53483607aec4f93fd2bb55b412f101d677/scripts/benchmark_workflows.py) · [Ruff source](https://github.com/astral-sh/ruff/tree/4d6a7db787130c5a4a95bd835369babd78e4a1f6) · [uv source](https://github.com/astral-sh/uv/tree/c22e6b71933443e9cd299d4b6ac8de035ed4825b) · [Build record](../workflow-build.json)
+The runner fixes each project's edit, warmup, and command sequence. The build record identifies the hosts, binaries, and original reports by checksum. [Workflow fixtures](https://github.com/astral-sh/ohm/blob/04c83d53483607aec4f93fd2bb55b412f101d677/scripts/benchmark_workflows.py) · [Ruff source](https://github.com/astral-sh/ruff/tree/4d6a7db787130c5a4a95bd835369babd78e4a1f6) · [uv source](https://github.com/astral-sh/uv/tree/c22e6b71933443e9cd299d4b6ac8de035ed4825b) · [Build record](https://github.com/astral-sh/ohm/blob/f4809acf55a81876e1251dc2dfa15c7062d73425/scripts/benchmark_results/workflow-build.json)
 
 ## Codex
 
@@ -30,4 +30,4 @@ Four Codex runs on three machines stopped during check → build → check. In t
 | `charlie-oss-3`, first run                    |                       16 |                  4 |
 | `charlie-oss-3`, eight retries per repetition |                       16 |                 12 |
 
-Codex completed its individual-command benchmarks and its recorded session on 1.99.0-9. The last complete developer-workflow comparison for all three projects used 1.99.0-8. [Individual commands](../workflow.json) · [Recorded sessions](../sessions.json) · [1.99.0-8 developer workflows](../developer-workflows.json)
+Codex completed its individual-command benchmarks and its recorded session on 1.99.0-9. The preceding complete developer-workflow comparison covered all three projects on Ohm 1.99.0-8. [Individual commands](https://github.com/astral-sh/ohm/blob/f4809acf55a81876e1251dc2dfa15c7062d73425/scripts/benchmark_results/workflow.json) · [Recorded sessions](https://github.com/astral-sh/ohm/blob/f4809acf55a81876e1251dc2dfa15c7062d73425/scripts/benchmark_results/sessions.json) · [1.99.0-8 developer workflows](https://github.com/astral-sh/ohm/blob/d81ebd7bbccc7475294f234b13f7d6b0a40f9a32/scripts/benchmark_results/developer-workflows.json)

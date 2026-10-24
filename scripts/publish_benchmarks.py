@@ -18,6 +18,7 @@ KINDS = ("workflow", "sessions", "historical", "ablation", "disk")
 TY_WORKTREE_REPORT = "ty-worktree.json"
 TY_SCENARIO = "scripts/session_replays/ty-29327.json"
 DEVELOPER_WORKFLOW_REPORT = "developer-workflows.json"
+DISK_HEADLINE = r"disk usage (?:decreases by around \d+%(?: in completed ten-worktree comparisons)?|comparisons are incomplete)"
 
 
 def load(path):
@@ -68,10 +69,163 @@ def latest_reports():
     return {kind: load(RESULTS / f"{kind}.json") for kind in KINDS}
 
 
+SESSION_LABELS = {"ruff": "Ruff session", "uv": "uv session", "codex": "Codex session"}
+
+
+def validate_session_coverage(report):
+    excluded = report.get("excluded_projects", {})
+    if not isinstance(excluded, dict) or not excluded.keys() <= SESSION_LABELS.keys() or not all(
+        isinstance(reason, str) and reason.strip() for reason in excluded.values()
+    ):
+        raise ValueError("Invalid session exclusions")
+    if report["repetitions"] < 1:
+        raise ValueError("A session comparison needs at least one repetition")
+    complete = SESSION_LABELS.keys() - excluded.keys()
+    for key in ("commands", "timed_command_seconds", "timed_session_seconds"):
+        if set(report[key]) != complete:
+            raise ValueError(f"Session coverage differs for {key}")
+    for project in complete:
+        for key in ("timed_command_seconds", "timed_session_seconds"):
+            lanes = report[key][project]
+            if set(lanes) != {"stock", "ohm"} or any(
+                len(values) != report["repetitions"]
+                or not all(math.isfinite(v) and v > 0 for v in values)
+                for values in lanes.values()
+            ):
+                raise ValueError(f"Incomplete session comparison for {project}")
+
+
+def validate_partial_disk(disk, release):
+    """Validate the terminal inventory and the pairs selected for publication."""
+
+    def require(condition):
+        if not condition:
+            raise ValueError("Incomplete or inconsistent partial disk report")
+
+    try:
+        validation = disk["validation"]
+        terminal = disk["campaign"]["fork_continuation"]
+        require(disk["release"] == terminal["release"] == release)
+        require(
+            terminal["state"] == "finished_with_failed_original_cohort"
+            and math.isfinite(terminal["finished_at"])
+        )
+        require(
+            validation["full_campaign_passed"] is False
+            and validation[
+                "paired_sources_explicit_settings_commands_and_test_counts_match"
+            ]
+            is True
+        )
+        rows = disk["cohort_inventory"]
+        inventory = {row["cell"]: row for row in rows}
+        expected = {
+            f"{p}-{label}-{mode}"
+            for p in ("ruff", "uv")
+            for label in ("stock", "ohm")
+            for mode in ("single", "forks")
+        }
+        require(len(rows) == 8 and set(inventory) == expected)
+        require(
+            all(
+                r["state"] in {"audited_complete", "failed"}
+                and r["accepted"] is (r["state"] == "audited_complete")
+                for r in rows
+            )
+        )
+        accepted = {cell for cell, row in inventory.items() if row["accepted"]}
+        require(accepted < expected and validation["timing_comparisons"] is False)
+        require({r["cell"] for r in disk["cohorts"]} == accepted)
+        eligible, missing = set(), {}
+        for project in ("ruff", "uv"):
+            for mode in ("single", "forks"):
+                pair = {f"{project}-{label}-{mode}" for label in ("stock", "ohm")}
+                if pair <= accepted:
+                    eligible.update(
+                        (project, mode, n)
+                        for n in ([1] if mode == "single" else [2, 10])
+                    )
+                else:
+                    missing[project, mode] = pair - accepted
+        observed = set()
+        for item in disk["readme_comparisons"]:
+            row = item["comparison"]
+            key = row["project"], row["cohort"], row["worktrees"]
+            require(
+                key in eligible
+                and key not in observed
+                and item["project"] == row["project"]
+            )
+            require(row["valid_pair"] is True and row["mismatched_fields"] == [])
+            if row["worktrees"] != 2:
+                require(
+                    all(
+                        row[label + "_retained_bytes"]
+                        == inventory[f"{row['project']}-{label}-{row['cohort']}"][
+                            "retained_bytes"
+                        ]
+                        for label in ("stock", "ohm")
+                    )
+                )
+            observed.add(key)
+        require(observed == eligible)
+        omitted = disk["omitted_comparisons"]
+        require(
+            len(omitted) == len(missing)
+            and {(r["project"], r["cohort"]) for r in omitted} == set(missing)
+        )
+        require(
+            all(
+                set(r["missing_audited_cohorts"]) == missing[r["project"], r["cohort"]]
+                and r["ratio"] is None
+                for r in omitted
+            )
+        )
+    except (KeyError, TypeError, AttributeError) as error:
+        raise ValueError("Missing partial disk report identities") from error
+
+
+CODEX_TEST_COUNT_COMPARISON = (
+    "Unique successful nextest selections; raw tests_started includes "
+    "verified captured retry banners and remains unchanged."
+)
+
+
+def replay_test_counts(report, kind, project, command):
+    started = command["tests_started"]
+    method = report["methodology"].get("test_count_comparison_by_project", {}).get(project)
+    if not (
+        kind == "sessions"
+        and project == "codex"
+        and command["category"] == "test"
+        and method == CODEX_TEST_COUNT_COMPARISON
+    ):
+        if "selected_tests_completed" in command:
+            raise ValueError("Unexpected selected test counts")
+        return started
+
+    # Retry output can contain extra libtest banners for the same selected tests.
+    selected = command.get("selected_tests_completed")
+    if not isinstance(selected, dict) or set(selected) != {"stock", "ohm"} or set(started) != set(selected):
+        raise ValueError("Missing selected test counts")
+    for lane, counts in selected.items():
+        banners = started[lane]
+        if (
+            not isinstance(counts, list)
+            or not isinstance(banners, list)
+            or len(counts) != report["repetitions"]
+            or len(banners) != len(counts)
+            or any(type(n) is not int or type(b) is not int or not 0 < n <= b for n, b in zip(counts, banners))
+        ):
+            raise ValueError("Invalid selected test counts")
+    return selected
+
+
 def validate(reports):
     release = reports["sessions"]["ohm_release"]
     if not re.fullmatch(r"ohm-\d+\.\d+\.\d+-[1-9]\d*", release):
         raise ValueError("Invalid Ohm release identity")
+    validate_session_coverage(reports["sessions"])
     rust = reports["sessions"]["rust_version"]
     if not release.startswith(f"ohm-{rust}-"):
         raise ValueError("Ohm and stock Rust versions differ")
@@ -79,6 +233,19 @@ def validate(reports):
         report = reports[kind]
         if (report["ohm_release"], report["rust_version"]) != (release, rust):
             raise ValueError(f"{kind}: mismatched toolchain identity")
+        if "failure" in report:
+            failure = report["failure"]
+            if (
+                kind not in {"historical", "ablation"}
+                or set(report) - {"rust_version", "ohm_release", "failure", "host", "provenance"}
+                or not isinstance(failure, dict)
+                or failure.get("project") != {"historical": "ruff", "ablation": "uv"}[kind]
+                or not isinstance(failure.get("reason"), str)
+                or not failure["reason"].strip()
+                or not re.fullmatch(r"[0-9a-f]{64}", failure.get("log_sha256", ""))
+            ):
+                raise ValueError(f"{kind}: invalid failed replay report")
+            continue
         methodology = report["methodology"]
         if not methodology["all_commands_succeeded"]:
             raise ValueError(f"{kind}: unsuccessful measurements")
@@ -89,7 +256,7 @@ def validate(reports):
                 raise ValueError(f"{kind}: mismatched test counts")
             for project, commands in report["commands"].items():
                 for command in commands:
-                    counts = list(command["tests_started"].values())
+                    counts = list(replay_test_counts(report, kind, project, command).values())
                     if any(value != counts[0] for value in counts):
                         raise ValueError(f"{kind}: mismatched command test counts")
                 for lane, totals in report["timed_command_seconds"][project].items():
@@ -116,16 +283,25 @@ def validate(reports):
         ) or not math.isclose(stock / ohm, row["speedup"]):
             raise ValueError("Invalid workflow comparison")
     disk = reports["disk"]
-    if disk["validation"]["status"] != "pass" or set(disk["toolchains"]) != {
+    status = disk["validation"]["status"]
+    if status not in {"pass", "partial"} or set(disk["toolchains"]) != {
         release,
-        "stock-" + rust,
+        rust if status == "partial" else "stock-" + rust,
     }:
         raise ValueError("Disk audit or toolchain identity differs")
+    if status == "partial":
+        validate_partial_disk(disk, release)
     for item in disk["readme_comparisons"]:
         row = item["comparison"]
         stock, ohm = row["stock_retained_bytes"], row["ohm_retained_bytes"]
-        if min(stock, ohm) <= 0 or not math.isclose(
-            100 * (stock - ohm) / stock, row["percent_less_disk"]
+        if not all(math.isfinite(v) and v > 0 for v in (stock, ohm)) or not all(
+            math.isclose(expected, row[key])
+            for key, expected in {
+                "percent_less_disk": 100 * (stock - ohm) / stock,
+                "bytes_saved": stock - ohm,
+                "stock_gib": stock / 2**30,
+                "ohm_gib": ohm / 2**30,
+            }.items()
         ):
             raise ValueError("Invalid disk comparison")
     return release, rust
@@ -150,7 +326,8 @@ def render_tables(reports, ty_worktree, ty_scenario):
         raise ValueError("ty study and table toolchain identities differ")
     sessions = reports["sessions"]
     mean = statistics.fmean
-    projects = ("ruff", "uv", "codex")
+    projects = tuple(p for p in SESSION_LABELS if p in sessions["commands"])
+    incomplete = bool(sessions.get("excluded_projects"))
 
     def ty_total(group, lane):
         total = ty_worktree[group][lane]["total"]
@@ -164,8 +341,8 @@ def render_tables(reports, ty_worktree, ty_scenario):
 
     def seconds(pair):
         stock, ohm = pair
-        saved = 100 * (stock - ohm) / stock
-        return [f"{stock:,.2f} s", f"{ohm:,.2f} s", f"{saved:.2f}%".replace("-", "−")]
+        saved = f"{100 * (stock - ohm) / stock:.2f}%".replace("-", "−") if stock else "—"
+        return [f"{stock:,.2f} s", f"{ohm:,.2f} s", saved]
 
     lanes = ("stock", "ohm")
     ty_commands = [step for step in ty_scenario["steps"] if step["kind"] == "command"]
@@ -212,9 +389,10 @@ def render_tables(reports, ty_worktree, ty_scenario):
 
     session_rows = []
     totals = [0.0, 0.0]
-    for project, label in zip(
-        projects, ("Ruff session", "uv session", "Codex session"), strict=True
-    ):
+    for project, label in SESSION_LABELS.items():
+        if project not in projects:
+            session_rows.append([f"{label} (incomplete)", "—", "—", "—"])
+            continue
         pair = [
             mean(sessions["timed_session_seconds"][project][lane])
             for lane in ("stock", "ohm")
@@ -227,7 +405,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
         ty_pair.append(mean(ty_worktree["session"][lane]["total"]["samples"]))
     session_rows.append(["ty session", *seconds(ty_pair)])
     totals = [a + b for a, b in zip(totals, ty_pair, strict=True)]
-    session_rows.append(["All sessions", *seconds(totals)])
+    session_rows.append(["Completed sessions" if incomplete else "All sessions", *seconds(totals)])
     for category, label in (
         ("check", "`cargo check`"),
         ("test", "`cargo test`, `cargo nextest`, `just test`"),
@@ -249,7 +427,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
         session_rows.append([label, *seconds(pair)])
     session_rows.append(
         [
-            "All commands",
+            "Commands in completed sessions" if incomplete else "All commands",
             *seconds(
                 [
                     sum(
@@ -388,7 +566,16 @@ def render_tables(reports, ty_worktree, ty_scenario):
     headlines = {
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
         r"\d+% less time": f"{round(100 * (totals[0] - totals[1]) / totals[0])}% less time",
-        r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
+        DISK_HEADLINE: (
+            f"disk usage decreases by around {5 * round(mean(savings) / 5)}%"
+            + (
+                " in completed ten-worktree comparisons"
+                if reports["disk"]["validation"]["status"] == "partial"
+                else ""
+            )
+            if savings
+            else "disk usage comparisons are incomplete"
+        ),
     }
     return rendered, headlines
 
