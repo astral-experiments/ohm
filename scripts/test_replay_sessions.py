@@ -233,6 +233,24 @@ class FixtureValidationTests(ReplayTestCase):
         scenario = replay.load_scenario(fixture)
         baseline = latest_reports()["historical"]
 
+        fixture_sha256 = hashlib.sha256(fixture.read_bytes()).hexdigest()
+        if "failure" in baseline:
+            failure = baseline["failure"]
+            self.assertEqual(failure["project"], scenario.project)
+            self.assertEqual(failure["source_revision"], scenario.base_revision)
+            self.assertEqual(failure["accepted_comparisons"], 0)
+            self.assertEqual(
+                failure["fixture"], fixture.relative_to(SCRIPTS.parent).as_posix()
+            )
+            self.assertEqual(
+                baseline["provenance"]["fixtures"], {failure["fixture"]: fixture_sha256}
+            )
+            self.assertIn(failure["step"], range(1, len(scenario.steps) + 1))
+            step = scenario.steps[failure["step"] - 1]
+            self.assertEqual(step["kind"], "command")
+            self.assertEqual(failure["command"], [step["program"], *step["args"]])
+            return
+
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
         self.assertEqual(
@@ -240,7 +258,7 @@ class FixtureValidationTests(ReplayTestCase):
                 Path(name).name: digest
                 for name, digest in baseline["provenance"]["wrapper"]["fixtures"].items()
             },
-            {fixture.name: hashlib.sha256(fixture.read_bytes()).hexdigest()},
+            {fixture.name: fixture_sha256},
         )
         commands = baseline["commands"]["ruff"]
         expected = [
