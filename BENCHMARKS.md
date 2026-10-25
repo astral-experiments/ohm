@@ -9,6 +9,15 @@ Install [uv](https://docs.astral.sh/uv/), Git, and both Rust toolchains. Ruff/ty
 workflows need `cargo-nextest`. Codex session replays also need `just`. Run the commands from
 the Ohm repository with enough space for separate builds. Cache dependencies before an offline run.
 
+On x86_64 Linux, compare stock Rust 1.99.0 with Ohm 1.99.0-13, which bundles Wild 0.10.0.
+The versioned installer checks the archive's SHA-256 against
+`a71a27c39a26a9d38ea0717bdef41c41af9b04052cdabebb20b4fce672fbd92b`.
+[Ohm installer](https://labs.astral.sh/ohm/releases/ohm-1.99.0-13/install.sh) · [Release manifest](toolchains/1.99.0/13.json)
+
+Run the examples below from Ohm commit `04c83d53483607aec4f93fd2bb55b412f101d677` to use the
+same benchmark drivers, workload revisions and replay fixtures as the campaign.
+[Benchmark drivers and fixtures](https://github.com/astral-sh/ohm/tree/04c83d53483607aec4f93fd2bb55b412f101d677/scripts)
+
 ## Run the developer workflows
 
 The Linux runner measures five command sequences. Each repetition starts with fresh build
@@ -29,13 +38,13 @@ Prepare the sources and dependencies, then measure with the same Cargo home in b
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-9 \
+  --ohm ohm-1.99.0-13 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-9 \
+  --ohm ohm-1.99.0-13 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -44,11 +53,15 @@ Choose `--project ruff`, `uv`, or `codex`, or omit the option to run all three. 
 `--workflow` to select one sequence. If your shell sets `PYTHONSAFEPATH=1`, prefix the commands
 with `env -u PYTHONSAFEPATH`.
 
-| Project | Target package       | Edited dependency    | Focused test                                                                 |
-| ------- | -------------------- | -------------------- | ---------------------------------------------------------------------------- |
-| Ruff/ty | `ty_python_semantic` | `ty_python_core`     | `mdtest::liskov.md`, using nextest                                           |
-| uv      | `uv`                 | `uv-normalize`       | `help::help` in the `it` integration target                                  |
-| Codex   | `codex-core`         | `codex-utils-string` | `preparation_canonicalizes_data_urls_and_rejects_remote_urls`, using nextest |
+| Project                           | Target package       | Edited dependency    | Focused test                                                                 |
+| --------------------------------- | -------------------- | -------------------- | ---------------------------------------------------------------------------- |
+| [Ruff/ty at 4d6a7db][ruff-source] | `ty_python_semantic` | `ty_python_core`     | `mdtest::liskov.md`, using nextest                                           |
+| [uv at c22e6b7][uv-source]        | `uv`                 | `uv-normalize`       | `help::help` in the `it` integration target                                  |
+| [Codex at 5157493][codex-source]  | `codex-core`         | `codex-utils-string` | `preparation_canonicalizes_data_urls_and_rejects_remote_urls`, using nextest |
+
+[ruff-source]: https://github.com/astral-sh/ruff/commit/4d6a7db787130c5a4a95bd835369babd78e4a1f6
+[uv-source]: https://github.com/astral-sh/uv/commit/c22e6b71933443e9cd299d4b6ac8de035ed4825b
+[codex-source]: https://github.com/openai/codex/commit/5157493c23713ac12034cf250ffb0a8ce0670277
 
 The direct edit changes the target package. The dependency edit preserves its public API.
 The formatting workflow starts both toolchains from the same normalized source, then runs
@@ -73,15 +86,16 @@ python3 scripts/workflow_results.py /path/to/ruff/results.json /path/to/uv/resul
 
 ## Run the individual-command benchmarks
 
-This runner measures uv and Codex. Use `--dry-run` to inspect the plan. To measure a single
-project, use `--project uv` or `--project codex-core`. Both toolchains apply the same edits in
+Run uv and Codex on separate quiet hosts. Select `--project uv` or `--project codex-core`.
+Use `--dry-run` to inspect the plan. Both toolchains apply the same edits in
 temporary worktrees and use separate target directories.
 
 ```console
 uv run scripts/benchmark.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-9 --jobs 8 \
+  --project uv --upstream 1.99.0 --ohm ohm-1.99.0-13 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
-  --require-idle --discard-targets --output-dir /path/to/new-empty-results
+  --minimum-free-gb 60 --quiet-seconds 30 --require-idle \
+  --discard-targets --output-dir /path/to/new-empty-results
 ```
 
 ### Workloads
