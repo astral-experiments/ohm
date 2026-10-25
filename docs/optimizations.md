@@ -49,6 +49,12 @@ dependency. Changes involving procedural macros, build scripts, or native librar
 require recompilation. Cargo checks the saved object bytes and the complete relink manifest before
 reusing them. If either check fails, it recompiles the target.
 
+Ohm 1.99.0-13 reads relink manifests up to 1 MiB into a buffer and decodes the fields Cargo
+writes directly. Larger manifests still use the streaming reader. Checking the manifest and
+object checksums remains part of every reuse decision. In a uv test build after a library edit,
+buffering alone cut Cargo's instruction count by 10.19% and 10.05% on two Linux hosts. These
+counts exclude rustc and the linker.
+
 This helps most when an edit to a dependency would otherwise force an expensive executable or test
 binary to recompile.
 
@@ -66,6 +72,8 @@ See:
 - [Cargo #52](https://github.com/astral-sh/ohm-cargo/pull/52)
 - [Cargo #197](https://github.com/astral-sh/ohm-cargo/pull/197)
 - [Cargo #198](https://github.com/astral-sh/ohm-cargo/pull/198)
+- [Cargo #234](https://github.com/astral-sh/ohm-cargo/pull/234)
+- [Cargo #236](https://github.com/astral-sh/ohm-cargo/pull/236)
 
 ### 3. Reuse builds during checks
 
@@ -411,6 +419,18 @@ It also reduces the work needed to prioritize build jobs and compare package ide
 experiments on uv measured fewer instructions in Cargo for these changes; their wall-time effects
 remain unresolved.
 
+On Unix, Ohm 1.99.0-13 caches parsed registry manifests between Cargo invocations. For example,
+two projects that use the same published crate can reuse its manifest through Cargo home. Cargo
+checks the manifest contents and parser version before accepting a record; a miss parses the
+original TOML and keeps its diagnostics. Each record has two possible slots in a bounded cache.
+In the first version of the cache, an edited uv check used about 5% fewer Cargo instructions
+with warm entries but about 18% more when populating them. Parsing each miss once reduced the
+instruction count on that first run by about 7% relative to the initial implementation. These
+experiments counted Cargo instructions; elapsed time was inconclusive.
+
+Cargo can also order most package names by comparing their first eight bytes. When it changes
+the source of a dependency, it can keep sharing the dependency's version and feature data.
+
 On Unix, freshness checks hash source files in parallel when at least 128 checksums are uncached.
 Cargo uses up to four workers within its job budget, preserves file order when reporting the first
 stale input, and releases those slots before running compilers or build scripts.
@@ -450,6 +470,11 @@ See:
 - [Cargo #184](https://github.com/astral-sh/ohm-cargo/pull/184)
 - [Cargo #185](https://github.com/astral-sh/ohm-cargo/pull/185)
 - [Cargo #186](https://github.com/astral-sh/ohm-cargo/pull/186)
+- [Cargo #235](https://github.com/astral-sh/ohm-cargo/pull/235)
+- [Cargo #237](https://github.com/astral-sh/ohm-cargo/pull/237)
+- [Cargo #238](https://github.com/astral-sh/ohm-cargo/pull/238)
+- [Cargo #239](https://github.com/astral-sh/ohm-cargo/pull/239)
+- [Cargo #240](https://github.com/astral-sh/ohm-cargo/pull/240)
 
 ### 16. Cache unchanged ThinLTO objects
 
@@ -659,6 +684,18 @@ Within one compilation, rustc remembers which crate each direct `--extern` name 
 to. Generated tests and macros can then reuse that lookup. For transitive dependencies, rustc uses
 the metadata hash to distinguish versions of the same crate.
 
+Ohm 1.99.0-13 allocates three compiler worker caches only when a worker first uses them. It also
+skips an extern lookup when crate metadata already identifies a dependency as public. When
+collecting implementations of a trait, rustc skips crates whose metadata lists none for that trait.
+
+When checking an opaque type such as `impl Iterator`, rustc can reuse the bounds from the
+type's signature for each pair of lifetimes it compares. Each comparison gets its own inference
+state. This change cut compiler instructions for uv's library by 2.44% and 2.29% on two Linux
+hosts after a version-matching edit. The same edit exercises incremental queries in `uv-client`:
+letting nested queries reuse up to eight dependency recorders instead of four cut compiler
+instructions for that crate by 2.47% and 1.37%. The larger pool can retain more memory. Both
+experiments used compilers without release PGO or BOLT and measured instructions for one crate.
+
 When laying out async state, Ohm skips redundant work when tracking which values are live at the
 same time. This backports a change from
 [rust-lang/rust #163126](https://github.com/rust-lang/rust/pull/163126). On Unix, Ohm also reduces
@@ -689,6 +726,11 @@ See:
 - [Rust #173](https://github.com/astral-sh/ohm-rust/pull/173)
 - [Rust #181](https://github.com/astral-sh/ohm-rust/pull/181)
 - [Rust #205](https://github.com/astral-sh/ohm-rust/pull/205)
+- [Rust #218](https://github.com/astral-sh/ohm-rust/pull/218)
+- [Rust #219](https://github.com/astral-sh/ohm-rust/pull/219)
+- [Rust #222](https://github.com/astral-sh/ohm-rust/pull/222)
+- [Rust #226](https://github.com/astral-sh/ohm-rust/pull/226)
+- [Rust #227](https://github.com/astral-sh/ohm-rust/pull/227)
 
 ### 23. Reduce allocator page-clearing work
 
