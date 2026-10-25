@@ -397,11 +397,22 @@ uses the Wild linker by default. Explicit linker settings still take precedence.
 Wild performs a full link each time it runs. Cached relinking lets Ohm reuse the compiled code that
 it passes to the linker, and Ohm can reuse eligible integration tests when it adds flags for Wild.
 
+Ohm 1.99.0-14 bundles Wild 0.11.0. Wild reads archive members in parallel and now uses at most
+32 threads by default to reduce contention when writing the output file. If the output has hard
+links, Wild replaces the file at the output path so the other links keep the previous executable.
+
+In Wild's Zed debug benchmark on ext4, the link took about 19% less time with 0.11.0 than with
+0.10.0 when the linker created a new output file. With an existing output file, the link took about
+5% longer. Wild measured the time spent in the linker on a Ryzen 9 9955HX.
+
 See:
 
 - [Cargo #114](https://github.com/astral-sh/ohm-cargo/pull/114)
 - [Cargo #139](https://github.com/astral-sh/ohm-cargo/pull/139)
 - [Ohm #112](https://github.com/astral-sh/ohm/pull/112)
+- [Ohm #181](https://github.com/astral-sh/ohm/pull/181)
+- [Wild 0.11.0 release notes](https://github.com/wild-linker/wild/releases/tag/0.11.0)
+- [Wild linker benchmarks](https://github.com/wild-linker/wild/blob/0.11.0/benchmarks/ryzen-9955hx.md#filesystem-performance)
 
 ### 15. Avoid repeated Cargo preparation work
 
