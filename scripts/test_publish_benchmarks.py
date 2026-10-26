@@ -136,6 +136,7 @@ class PublicationTests(unittest.TestCase):
                 "stock"
             ].__setitem__(0, 999999),
             lambda r: r["disk"]["validation"].update(status="fail"),
+            lambda r: r["disk"]["release_manifest"].update(path="toolchains/0.0.0/1.json"),
         ]
         for change in changes:
             with self.subTest(change=change):
@@ -202,20 +203,24 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(compact["provenance"]["system_cpu"]["segments"], summaries)
         self.assertEqual(report, original)
 
+    def prepare_publication(self, root):
+        for name in ("README.md", "BENCHMARKS.md"):
+            shutil.copyfile(publish.ROOT / name, root / name)
+        (root / "inputs").mkdir()
+        (root / "node_modules/.bin").mkdir(parents=True)
+        (root / "node_modules/.bin/prettier").touch()
+        self.copy_supplemental_reports(root)
+
     def test_publish_replaces_current_reports(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for name in ("README.md", "BENCHMARKS.md"):
-                shutil.copyfile(publish.ROOT / name, root / name)
-            for name in (
-                "scripts/benchmark_results",
-                "node_modules/.bin",
-                "inputs",
-            ):
-                (root / name).mkdir(parents=True)
-            self.copy_supplemental_reports(root)
-            (root / "node_modules/.bin/prettier").touch()
+            self.prepare_publication(root)
+            disk_rust, disk_version = publish.disk_versions(self.reports["disk"])
             for kind, report in self.reports.items():
+                if kind in publish.TIMING_KINDS:
+                    report = dict(
+                        report, ohm_release=f"ohm-{disk_version}", rust_version=disk_rust
+                    )
                 publish.write_json(root / "inputs" / f"{kind}.json", report)
                 publish.write_json(
                     root / "scripts/benchmark_results" / f"{kind}.json",
@@ -259,6 +264,47 @@ class PublicationTests(unittest.TestCase):
                     Path(publish.DEVELOPER_WORKFLOW_REPORT).stem,
                 },
             )
+
+    def test_publish_timing_release_preserves_disk_measurements_and_labels(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.prepare_publication(root)
+            results = root / "scripts/benchmark_results"
+            disk = results / "disk.json"
+            disk_bytes = (publish.RESULTS / disk.name).read_bytes()
+            disk.write_bytes(disk_bytes)
+            disk_rust, disk_version = publish.disk_versions(self.reports["disk"])
+            current = self.reports["sessions"]["ohm_release"].removeprefix("ohm-")
+            rust, revision = current.rsplit("-", 1)
+            version = f"{rust}-{int(revision) + 1}"
+            for kind in publish.TIMING_KINDS:
+                report = dict(self.reports[kind], ohm_release=f"ohm-{version}")
+                publish.write_json(root / "inputs" / f"{kind}.json", report)
+
+            with (
+                mock.patch.object(publish, "ROOT", root),
+                mock.patch.object(publish, "RESULTS", results),
+                mock.patch.object(publish.subprocess, "run") as run,
+            ):
+                incoming_disk = root / "inputs" / disk.name
+                incoming_disk.write_bytes(disk_bytes)
+                with self.assertRaisesRegex(ValueError, "New disk measurements"):
+                    publish.publish(root / "inputs")
+                incoming_disk.unlink()
+                publish.publish(root / "inputs")
+
+            self.assertEqual(disk.read_bytes(), disk_bytes)
+            self.assertNotIn(
+                "scripts/benchmark_results/disk.json", run.call_args.args[0]
+            )
+            readme = (root / "README.md").read_text()
+            self.assertIn(
+                f"| Scope | Rust {disk_rust} | Ohm {disk_version} | Space saved |", readme
+            )
+            self.assertRegex(
+                readme, r"and `target/` disk usage decreases by around \d+%\."
+            )
+            self.assertIn(f"| Rust {rust} | Ohm {version} | Speedup |", readme)
 
 
 if __name__ == "__main__":

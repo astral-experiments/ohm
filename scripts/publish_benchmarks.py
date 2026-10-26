@@ -14,7 +14,8 @@ import workflow_results
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "scripts/benchmark_results"
-KINDS = ("workflow", "sessions", "historical", "ablation", "disk")
+TIMING_KINDS = ("workflow", "sessions", "historical", "ablation")
+KINDS = (*TIMING_KINDS, "disk")
 TY_WORKTREE_REPORT = "ty-worktree.json"
 TY_SCENARIO = "scripts/session_replays/ty-29327.json"
 DEVELOPER_WORKFLOW_REPORT = "developer-workflows.json"
@@ -68,6 +69,17 @@ def latest_reports():
     return {kind: load(RESULTS / f"{kind}.json") for kind in KINDS}
 
 
+def disk_versions(report):
+    manifest = re.fullmatch(
+        r"toolchains/(\d+\.\d+\.\d+)/([1-9]\d*)\.json",
+        report["release_manifest"]["path"],
+    )
+    if not manifest:
+        raise ValueError("Invalid disk release manifest")
+    rust, revision = manifest.groups()
+    return rust, f"{rust}-{revision}"
+
+
 def validate(reports):
     release = reports["sessions"]["ohm_release"]
     if not re.fullmatch(r"ohm-\d+\.\d+\.\d+-[1-9]\d*", release):
@@ -75,7 +87,7 @@ def validate(reports):
     rust = reports["sessions"]["rust_version"]
     if not release.startswith(f"ohm-{rust}-"):
         raise ValueError("Ohm and stock Rust versions differ")
-    for kind in KINDS[:-1]:
+    for kind in TIMING_KINDS:
         report = reports[kind]
         if (report["ohm_release"], report["rust_version"]) != (release, rust):
             raise ValueError(f"{kind}: mismatched toolchain identity")
@@ -116,9 +128,10 @@ def validate(reports):
         ) or not math.isclose(stock / ohm, row["speedup"]):
             raise ValueError("Invalid workflow comparison")
     disk = reports["disk"]
+    disk_rust, disk_version = disk_versions(disk)
     if disk["validation"]["status"] != "pass" or set(disk["toolchains"]) != {
-        release,
-        "stock-" + rust,
+        f"ohm-{disk_version}",
+        f"stock-{disk_rust}",
     }:
         raise ValueError("Disk audit or toolchain identity differs")
     for item in disk["readme_comparisons"]:
@@ -265,6 +278,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
 
     disk_rows = []
     savings = []
+    disk_rust, disk_version = disk_versions(reports["disk"])
     for item in reports["disk"]["readme_comparisons"]:
         row = item["comparison"]
         project = "Ruff/ty" if item["project"] == "ruff" else "uv"
@@ -299,7 +313,8 @@ def render_tables(reports, ty_worktree, ty_scenario):
             ["Scope", f"Rust {rust}", "Ohm", "Time saved"], session_rows
         ),
         "disk": table(
-            ["Scope", f"Rust {rust}", f"Ohm {version}", "Space saved"], disk_rows
+            ["Scope", f"Rust {disk_rust}", f"Ohm {disk_version}", "Space saved"],
+            disk_rows,
         ),
     }
     for phase in ("direct", "dependency"):
@@ -435,13 +450,18 @@ def normalized_markdown(text):
 
 
 def publish(directory):
-    reports = {kind: load(directory / f"{kind}.json") for kind in KINDS}
+    kinds = KINDS if (directory / "disk.json").exists() else TIMING_KINDS
+    reports = {kind: load(directory / f"{kind}.json") for kind in kinds}
+    if "disk" not in reports:
+        reports["disk"] = load(RESULTS / "disk.json")
     release, _ = validate(reports)
+    if "disk" in kinds and release not in reports["disk"]["toolchains"]:
+        raise ValueError("New disk measurements must match the timing release")
     updated = documents(reports)
     prettier = ROOT / "node_modules/.bin/prettier"
     if not prettier.is_file():
         raise ValueError("Run npm ci --ignore-scripts before publishing benchmarks")
-    paths = {kind: f"scripts/benchmark_results/{kind}.json" for kind in KINDS}
+    paths = {kind: f"scripts/benchmark_results/{kind}.json" for kind in kinds}
     current = RESULTS / "sessions.json"
     if current.exists() and load(current)["ohm_release"] == release:
         raise ValueError(
@@ -469,7 +489,7 @@ def main():
         "reports",
         type=Path,
         nargs="?",
-        help="directory of audited workflow, sessions, historical, ablation, and disk JSON reports",
+        help="directory of audited timing reports and an optional disk.json",
     )
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument(

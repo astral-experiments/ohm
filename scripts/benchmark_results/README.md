@@ -1,8 +1,12 @@
 # Published benchmarks
 
-We compared published Ohm 1.99.0-11 with stock Rust 1.99.0. Each workload ran both toolchains on the same machine. [Developer workflows](developer-workflows.json) · [Individual commands](workflow.json) · [Recorded sessions](sessions.json) · [Historical replays](historical.json) · [Ablations](ablation.json)
+We compared published Ohm 1.99.0-14 with stock Rust 1.99.0 on x86_64 Linux. Each project ran both toolchains on the same machine. The four recorded session means totaled 999.61 s with Ohm and 1,882.94 s with stock Rust, a 46.91% reduction. Some steps took longer with Ohm. The full Codex TUI package test averaged 38.92 s with Ohm and 37.04 s with stock Rust. The uv workspace formatting check averaged 4.21 s and 3.91 s, respectively. [Recorded sessions](sessions.json) · [ty session and worktree startup](ty-worktree.md)
 
-The published -11 compiler completed the uv recorded session, the historical Ruff replay, and both uv disk scenarios that crashed on -10. All eight APFS cohorts completed. [Disk measurements](disk.json) · [ty session and worktree startup](ty-worktree.md)
+All 15 developer workflows had a lower median with Ohm. For example, after an implementation edit in a Codex dependency, the downstream test took 5.72 s with Ohm and 73.28 s with stock Rust. The individual-command study includes 216 accepted samples across uv and Codex. [Developer workflows](developer-workflows.json) · [Individual commands](workflow.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
+
+An unrelated process used enough CPU to invalidate the first uv individual-command trial. We excluded its one recorded sample and used the 100 accepted samples from the replacement trial. A separate uv ablation attempt stopped during warmup when another compiler ran. We kept the completed individual-command and session results and used only the eight ablation samples from the retry. The developer-workflow runner also discarded 14 uv, 18 Codex, and eight Ruff attempts for host contention or overlapping compilation. Each accepted replacement started with fresh artifacts. The ty report records its preflight and worktree exclusions separately. [Developer workflow samples](developer-workflows.json) · [ty audit](ty-worktree.json)
+
+The APFS disk study compares Ohm 1.99.0-11 with stock Rust 1.99.0. All eight cohorts completed in that release. The formatter comparison below measures -10 against -11. [Disk measurements](disk.json) · [Formatter measurements](formatting-comparison.json)
 
 The build record identifies each suite’s host, release archive, installed binaries and workload revisions. The ty report includes individual ext4 and Btrfs measurements. [Build provenance](workflow-build.json) · [ty data](ty-worktree.json) · [Trust settings](../../BENCHMARKS.md#recorded-measurements) · [Earlier developer workflows](1.99.0-9/developer-workflows.md)
 
@@ -29,7 +33,9 @@ The last column gives the geometric mean of the within-pair time ratios. Values 
 
 Commit the individual measurements, toolchain and source revisions, workload fixtures, and reasons for excluding runs. Keep command logs and CPU traces through review. Include a trace in Git when a published conclusion depends on it.
 
-Prepare audited reports named `workflow.json`, `sessions.json`, `historical.json`, `ablation.json`, and `disk.json`. Record the ty measurements in `ty-worktree.json` and `ty-worktree.md`. Combine the three developer-workflow runs with `scripts/workflow_results.py` and save the validated `developer-workflows.json`.
+Prepare audited reports named `workflow.json`, `sessions.json`, `historical.json`, and `ablation.json`. Supply `disk.json` when the release has new disk measurements. Otherwise, the publisher keeps the checked-in disk report and labels the disk comparison with the toolchains used in that study.
+
+Record the ty measurements in `ty-worktree.json` and `ty-worktree.md`. Combine the three developer-workflow runs with `scripts/workflow_results.py` and save the validated `developer-workflows.json`.
 
 Install formatting dependencies with `npm ci --ignore-scripts` and run the publisher locally.
 

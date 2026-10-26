@@ -1,664 +1,127 @@
 {
-  "schema_version": 1,
-  "toolchain": "ohm-1.99.0-11",
-  "released": true,
-  "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-11",
-  "published_at": "2026-10-23T12:53:18Z",
-  "release_workflow": "https://github.com/astral-sh/ohm/actions/runs/39944231899",
-  "coordinator_revision": "6e8536aa3707f4193b59f0a8fd8a85a80b2133da",
+  "coordinator_revision": "205f23a47af3d61b57900f2313148f7dd5254b95",
   "manifest": {
-    "path": "toolchains/1.99.0/11.json",
-    "sha256": "f7304cb4aa77b56b469385d726f7ec8838fa79af845d98dfe8dc0c072fe4ec9d"
+    "path": "toolchains/1.99.0/14.json",
+    "sha256": "0102697b3de56d1008996bb3543e194019931453285a3080a9e8c32bff8e304b"
   },
+  "measurement": {
+    "linux_hosts": [
+      "charlie-ohm-14-codex",
+      "charlie-ohm-14-ruff",
+      "charlie-ohm-14-ty",
+      "charlie-ohm-14-uv"
+    ],
+    "runner_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
+    "same_linux_release_components_on_all_hosts": true,
+    "settings": "Each suite records its shared-build and procedural-macro and native-tool trust settings.",
+    "stock_components": {
+      "cargo": {
+        "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14",
+        "version": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "clippy-driver": {
+        "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6",
+        "version": "clippy 0.1.99 (b940084d7e 2026-09-28)"
+      },
+      "rustc": {
+        "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f",
+        "version": "rustc 1.99.0 (b940084d7 2026-09-28)"
+      },
+      "rustfmt": {
+        "sha256": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3",
+        "version": "rustfmt 1.10.0-stable (b940084d7e 2026-09-28)"
+      }
+    },
+    "study_hosts": {
+      "developer_workflows": {
+        "codex": "charlie-ohm-14-codex",
+        "ruff": "charlie-ohm-14-ruff",
+        "uv": "charlie-ohm-14-uv"
+      },
+      "feature_ablation": "charlie-ohm-14-uv",
+      "historical_ruff": "charlie-ohm-14-ruff",
+      "individual_commands": {
+        "codex": "charlie-ohm-14-codex",
+        "uv": "charlie-ohm-14-uv"
+      },
+      "main_sessions": {
+        "codex": "charlie-ohm-14-codex",
+        "ruff": "charlie-ohm-14-ruff",
+        "uv": "charlie-ohm-14-uv"
+      },
+      "ty_session_and_worktrees": "charlie-ohm-14-ty"
+    }
+  },
+  "provenance_inputs": {
+    "project_verification_sha256": {
+      "codex": "c5ee65cefb656751fb365fe72eb2b9aa608439374894337e4bba58e7b63c9920",
+      "ruff": "23b5b7ab40052fc1bc05f2ec0d795528a70b0b60eea2936653fb84298e48cd21",
+      "ty": "77ea30faa4c6fd998d4a4539a73097af8672d93dbc3980c6ac9d6f13908454be",
+      "uv": "31df18dc6537bbf646aad050c3f39771d35e1a4f4debf73855194323e7e0107a"
+    },
+    "published_verification_sha256": "a627da5afe6c386e66cef913eee99bd0d68adf199e00356fde53077ff16c57ad"
+  },
+  "published_at": "2026-10-25T20:30:58Z",
+  "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-14",
+  "release_workflow": "https://github.com/astral-sh/ohm/actions/runs/40223755459",
+  "released": true,
+  "schema_version": 1,
   "sources": {
-    "rust": "6802bee627afb2c0e086c72b7702a17d855d0738",
-    "cargo": "bbe8182f6f4f92dce7e1e175627fa26dd6df683a",
+    "cargo": "461a3d1007ecc997a6d86c7d75e8b518575c8d90",
     "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
+    "rust": "f1a7cf9d20b2cae39e991b178b56ba06b43dc8fa",
     "rustfmt": "3c9620c92b01e6c393324729c4861823cc3676e2"
   },
   "targets": {
+    "aarch64-apple-darwin": {
+      "archive": {
+        "sha256": "80c0991697cdfd3b95a7d5ffc2d58ecf98588a26082e7f462cbcca12344a2e31",
+        "size": 295006376,
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-14/ohm-1.99.0-14-aarch64-apple-darwin.tar.gz"
+      },
+      "bundled_tools": {},
+      "published_provenance": {
+        "sha256": "99d20f566f238ce2ee887f01c6abff93cd7e4d7eb587bc399e56ada2b67bfeaa",
+        "size": 731,
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-14/ohm-1.99.0-14-aarch64-apple-darwin-provenance.json"
+      }
+    },
     "x86_64-unknown-linux-gnu": {
       "archive": {
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-11/ohm-1.99.0-11-x86_64-unknown-linux-gnu.tar.gz",
-        "sha256": "881a5b19bc04d7f35a5490424b9c9e3c6283daef548bcda1a40f250e42e07550",
-        "size": 358488553
-      },
-      "published_provenance": {
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-11/ohm-1.99.0-11-x86_64-unknown-linux-gnu-provenance.json",
-        "sha256": "9e63c45b3667183acde81182b299cffa30caa0277bd9e0850f686ad9a7a35dc3",
-        "size": 868
+        "sha256": "a1a80d3275d163886886d3330e57b6f94023770fb378e0a8f35503ff36d688ef",
+        "size": 359655088,
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-14/ohm-1.99.0-14-x86_64-unknown-linux-gnu.tar.gz"
       },
       "bundled_tools": {
         "wild": {
-          "version": "0.10.0",
-          "sha256": "641265506a7c06cfb03181b8916ab663ec8407855db6d4db7f8450667d105283"
+          "sha256": "25012a78de164686f552b7703b5d0223adab4829c79cd1fb351108221d61c7d8",
+          "version": "0.11.0"
         }
       },
       "components": {
-        "rustc": {
-          "version": "rustc 1.99.0-dev (6802bee62 2026-10-23) (ohm-1.99.0-11)",
-          "sha256": "1b2ee94fea26c2264a207cdbb1632e5e0ceaf7576edb28d16794f0f7e5c58596"
-        },
         "cargo": {
-          "version": "cargo 1.99.0-dev (bbe8182f6 2026-10-22) (ohm-1.99.0-11)",
-          "sha256": "cf4c56ce9e0e93ba432a2b6d3333a0e5f477d2931bd118bc4ae149a53173a88d"
+          "sha256": "9be48c4b02669047975662348a3f134d0abcd247d70d13c55ab024f806320590",
+          "version": "cargo 1.99.0-dev (461a3d100 2026-10-25) (ohm-1.99.0-14)"
         },
         "clippy-driver": {
-          "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)",
-          "sha256": "3caf650ecf8436e8d8216f51050319f8b80060c0cc0fb37f533886e68cb5bb58"
+          "sha256": "efa25229013d4b41fafb5fe291b41ebdb51a95b12f8f020b32cd461dfa588bf1",
+          "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)"
+        },
+        "rustc": {
+          "sha256": "a63a2a6506be83dfd6cd853e9807897b120660c056a8774011d82396ef549b13",
+          "version": "rustc 1.99.0-dev (f1a7cf9d2 2026-10-25) (ohm-1.99.0-14)"
         },
         "rustfmt": {
-          "version": "rustfmt 1.10.0-dev (3c9620c92b 2026-10-21)",
-          "sha256": "96845bc2194c18e6a44c3fe14a44238f1efe5246ee3053f79be3d785df846254"
+          "sha256": "302e4caff8be8f43d81d64a392e48e40a6db26a43d3578c7decb73cf6ee33ccb",
+          "version": "rustfmt 1.10.0-dev (3c9620c92b 2026-10-21)"
         }
-      }
-    },
-    "aarch64-apple-darwin": {
-      "archive": {
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-11/ohm-1.99.0-11-aarch64-apple-darwin.tar.gz",
-        "sha256": "0a6ab779dd568dd402c9d72c682e9fef3c524245eb6bd2e2fc33788b3883d60f",
-        "size": 294679103
       },
       "published_provenance": {
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-11/ohm-1.99.0-11-aarch64-apple-darwin-provenance.json",
-        "sha256": "4cd8853cbb63451094545401d4c0dee4f9804aad113a4c165601f46db4d27aac",
-        "size": 731
-      },
-      "bundled_tools": {},
-      "components": {
-        "rustc": {
-          "version": "rustc 1.99.0-dev (6802bee62 2026-10-23) (ohm-1.99.0-11)",
-          "sha256": "a59fc814b3a9fe67cede2e1bcfbe24aadae53da96a7e4ace419aded712502347"
-        },
-        "cargo": {
-          "version": "cargo 1.99.0-dev (bbe8182f6 2026-10-22) (ohm-1.99.0-11)",
-          "sha256": "0f3782e1b8aa1a9ea1556131da1038eab297bac368fbcfc14183361c12b0f5d1"
-        },
-        "clippy-driver": {
-          "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)",
-          "sha256": "85af591276587c6226907c3bb7346059b2635c3ba03abc8079092236e86e795b"
-        },
-        "rustfmt": {
-          "version": "rustfmt 1.10.0-dev (3c9620c92b 2026-10-21)",
-          "sha256": "fc8efb3023febb64be82181508cf7d300bf55d9f0702da22e5d0401d0dbbbef2"
-        }
+        "sha256": "f14f2fb1a5a88f1cbb317c0614d2acb26a3c24ded8a80283747d51a466ca54dc",
+        "size": 868,
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-14/ohm-1.99.0-14-x86_64-unknown-linux-gnu-provenance.json"
       }
     }
   },
-  "measurement": {
-    "runner_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
-    "linux_hosts": [
-      "charlie-ohm-11-codex",
-      "charlie-ohm-11-ruff",
-      "charlie-ohm-11-ty",
-      "charlie-ohm-11-uv"
-    ],
-    "settings": "Each report records its procedural-macro/native-tool trust and shared-build settings.",
-    "study_hosts": {
-      "individual_commands": {
-        "uv": "charlie-ohm-11-uv",
-        "codex": "charlie-ohm-11-codex"
-      },
-      "main_sessions": {
-        "uv": "charlie-ohm-11-uv",
-        "codex": "charlie-ohm-11-codex",
-        "ruff": "charlie-ohm-11-ruff"
-      },
-      "historical_ruff": "charlie-ohm-11-ruff",
-      "developer_workflows": {
-        "uv": "charlie-ohm-11-uv",
-        "codex": "charlie-ohm-11-ruff",
-        "ruff": "charlie-ohm-11-ruff"
-      },
-      "ty_session_and_worktrees": "charlie-ohm-11-ty",
-      "feature_ablation": "charlie-ohm-11-uv",
-      "apfs_disk": {
-        "model": "Mac17,6",
-        "logical_cpus": 18,
-        "ram_gib": 128.0,
-        "os": "macOS 26.7.1",
-        "target": "aarch64-apple-darwin"
-      },
-      "formatter_comparison": "charlie-ohm-11-ty"
-    },
-    "same_linux_release_components_on_all_hosts": true
-  },
-  "provenance_inputs": {
-    "release-verification/audit/publication-verification-complete.json": {
-      "sha256": "0886b048ebc6a155ed19e45b5525aeb5788e60f53a36a9bd9d416bb8207b102c",
-      "bytes": 2206
-    },
-    "release-verification/audit/published-release-independent-verification.json": {
-      "sha256": "9a6a368900647c6d38e6f71f598f36159c1fc140253f2021ba89aba9fea53978",
-      "bytes": 12851
-    },
-    "release-install/expected.json": {
-      "sha256": "bf0fb0893e73eca81dcd42aafe16250dd60039ed54248dd9394d3b9965e29846",
-      "bytes": 34564
-    },
-    "release-install/manifest.json": {
-      "sha256": "f7304cb4aa77b56b469385d726f7ec8838fa79af845d98dfe8dc0c072fe4ec9d",
-      "bytes": 973
-    },
-    "frozen-source.json": {
-      "sha256": "7aaf69b86b5413df17eb658cd1566116aa611577a895bfc7d49925a5784592fc",
-      "bytes": 468
-    },
-    "release-install/install.sh": {
-      "sha256": "2548b7721d0bed3ef1fb824f647d0756867768821b653f4aace23f4685cb1e46",
-      "bytes": 15288
-    },
-    "uv-codex/assignments.json": {
-      "sha256": "b7db4743f25f710d2edd4f63e296afe1eaab0b6a565c789a572620d8f65f3441",
-      "bytes": 3203
-    },
-    "integration/original-launch-bindings.json": {
-      "sha256": "60469d693a524033fb66a959938cf51bbfd6da0b31287861954aee30efb7d696",
-      "bytes": 2447
-    },
-    "integration/dedicated-host-bindings.json": {
-      "sha256": "00182ee64078dd535c0e37721eebc2ec02d8b3dd258ac2cc11a7508452c89c4b",
-      "bytes": 1690
-    },
-    "audit/all-measurement-controllers-launched.json": {
-      "sha256": "6ac88a006dceafa9277e259252d67ee3f780fe5df0d8bb44148aa1bf054c6561",
-      "bytes": 16183
-    },
-    "audit/campaign-installations.json": {
-      "sha256": "eabb5990e25a29c567de4558049f8ecc8ad8651f4c831c35ed1e3f559ba695c8",
-      "bytes": 7138
-    },
-    "audit/provisioning/all-guests-verified.json": {
-      "sha256": "19074f6b957e7d4788dca69561d880f2720bd2b51b8c6b41dff7b1250c40e891",
-      "bytes": 3081
-    },
-    "uv-codex/audit/uv-inventory.json": {
-      "sha256": "8f3f60968706852970ae2331ccf46fe7986820f14661bb2304655f3d7318e30d",
-      "bytes": 3986
-    },
-    "uv-codex/jobs/uv/install.job.json": {
-      "sha256": "2a9d40ab540a22bb588b43471179dffcd7d013711b7277d4b356847fa905694f",
-      "bytes": 583
-    },
-    "uv-codex/jobs/uv/install.result.json": {
-      "sha256": "2d9cb137fc35c25aa19a5646c5c2180100001da5727be989ace16446b1537379",
-      "bytes": 1514
-    },
-    "uv-codex/jobs/uv/gate.job.json": {
-      "sha256": "edf87e8f00b8e476677a19b4d41c0599b52db12397cf1fa09ff680cfec46541a",
-      "bytes": 580
-    },
-    "uv-codex/jobs/uv/gate.result.json": {
-      "sha256": "82cada63a9a7dc6b72275d5908cfdb2d8ba07012321fe491816029a275002fee",
-      "bytes": 1599
-    },
-    "uv-codex/jobs/uv/start.job.json": {
-      "sha256": "bdc4a86f0a51bdb437a7e239b461eab7bd986011a0f0738706aa408d349a6235",
-      "bytes": 581
-    },
-    "uv-codex/jobs/uv/start.result.json": {
-      "sha256": "3ffbd3da120db0292e36052ee5f772dda6a7ae1f95a1ced5d53ce9db2918a3b7",
-      "bytes": 1363
-    },
-    "uv-codex/audit/codex-inventory.json": {
-      "sha256": "6a27cd33263b764588ab27c72b643ce7fb1fa12d3a84757feecc3cea6ffb43a1",
-      "bytes": 4001
-    },
-    "uv-codex/jobs/codex/install.job.json": {
-      "sha256": "2e0a668004b8836c5e859063907da8a1ea080d522b0f0537696e8f3dc027daae",
-      "bytes": 589
-    },
-    "uv-codex/jobs/codex/install.result.json": {
-      "sha256": "35c15c529841498c2d73e94967f4178431b549dd91b280b1089207a7148e119c",
-      "bytes": 1528
-    },
-    "uv-codex/jobs/codex/gate.job.json": {
-      "sha256": "f0457566b76f95f6a160344be15d8b991df0423335f4445b1a921b2a1f2ef192",
-      "bytes": 586
-    },
-    "uv-codex/jobs/codex/gate.result.json": {
-      "sha256": "a489159e46128d017ad75b8d11d612584e669d7485645d9b9e8d714c9816f589",
-      "bytes": 1616
-    },
-    "uv-codex/jobs/codex/start.job.json": {
-      "sha256": "b383136a66560098fd187146a17fb7b9ef1c6f5f3e095ea6a3add85d3798387a",
-      "bytes": 588
-    },
-    "uv-codex/jobs/codex/start.result.json": {
-      "sha256": "226ee2d5d9c3055d245dbbee2e772476237c29b120315f28b700bc6a8d845418",
-      "bytes": 1381
-    },
-    "uv-codex/audit/ruff-inventory.json": {
-      "sha256": "0443d1473e6bbc819d2c922b988ef0f83eea27a1b0fbacda7cd99aeb7a887a3b",
-      "bytes": 3996
-    },
-    "uv-codex/jobs/ruff/install.job.json": {
-      "sha256": "c3612f3d1d8593abce819fb395a570b21b7914faad827b3d266642aba4ee7743",
-      "bytes": 588
-    },
-    "uv-codex/jobs/ruff/install.result.json": {
-      "sha256": "ce743dc8db55df53ee68e8b1f69fc3e146cb499aa26e36e9f5e61685e868680f",
-      "bytes": 1712
-    },
-    "uv-codex/jobs/ruff/gate.job.json": {
-      "sha256": "8bc99b650d54928df2a15beb415c2d4d42b7e5a28eecefc7e2c91ac045df0bff",
-      "bytes": 584
-    },
-    "uv-codex/jobs/ruff/gate.result.json": {
-      "sha256": "ed8a536e6f53e413ee8609aff1d8c1b86b8d38a54fdf4469cbcf9e7a9c7022b0",
-      "bytes": 1797
-    },
-    "uv-codex/jobs/ruff/start.job.json": {
-      "sha256": "e95a3ad79f5c0d41866bf8c6c0f983306916b2939d035a699716f01fc3d8cfd4",
-      "bytes": 586
-    },
-    "uv-codex/jobs/ruff/start.result.json": {
-      "sha256": "59252ef557bbd813b68ce062ec554c9643bdcf4680eb6aa3ecbdc9ec22acc5fe",
-      "bytes": 1563
-    },
-    "uv-codex/audit/ty-inventory.json": {
-      "sha256": "2510facdebc47400387a24e79df2e68af0c1cdc8cdd80ce88c1fe9bf06e3bdd9",
-      "bytes": 3986
-    },
-    "uv-codex/jobs/ty/install.job.json": {
-      "sha256": "3be7e5414d6d10cf02a68c55e1856f9d9f06b123bbe5cfbf055f1ca26bae27ce",
-      "bytes": 583
-    },
-    "uv-codex/jobs/ty/install.result.json": {
-      "sha256": "bcacc4173f6398150fd47e85185f7940b3aa7c71f03a7807bf5f95487451eb6f",
-      "bytes": 1702
-    },
-    "uv-codex/jobs/ty/gate.job.json": {
-      "sha256": "792522c23af95f96e06cf7c9935546cd6b5efa1f51ba5b2cff144ca0047e33c1",
-      "bytes": 580
-    },
-    "uv-codex/jobs/ty/gate.result.json": {
-      "sha256": "0a81fc8bf6a3f09573776993587a14abfe19309691c9f999e44f0c423426d153",
-      "bytes": 1787
-    },
-    "uv-codex/jobs/ty/start.job.json": {
-      "sha256": "d037f6b95e1cac60a148f495c0cc94752af9b1784b7deaab9cb2e58f8bd8e18c",
-      "bytes": 581
-    },
-    "uv-codex/jobs/ty/start.result.json": {
-      "sha256": "5110eb74431cc0f50ceccd902c3b8a0cc82634eb185d50bb81e5b0940feaafd2",
-      "bytes": 1733
-    },
-    "ruff-ty/audit/ty-report-complete.json": {
-      "sha256": "9b712599fc40e7caf17f23009480ed9b40d1b1fc96d106d4c1905d46e9081632",
-      "bytes": 33069
-    },
-    "uv-codex/audit/ty-final-independent-review.json": {
-      "sha256": "e51f8e977f691dfffb175c1a40f1f66f52216de22aac6ba1b2a74d148dd5c9bb",
-      "bytes": 8266
-    },
-    "ruff-ty/retrieved/ty/preparation/data/host-selection.json": {
-      "sha256": "a3e9726ba6acc18815e1733e105bc10dee3f791fc5cb7aaa40ea9dce7a2dfefd",
-      "bytes": 636
-    },
-    "ruff-ty/retrieved/ty/preparation/data/guest-identity.json": {
-      "sha256": "a835bfc01326164be79a7f4c59cdd8b2763cf43b204f2984ff89a04ddb8aeab8",
-      "bytes": 467
-    },
-    "ruff-ty/retrieved/ty/preparation/data/preparation-ruff-ty/start.json": {
-      "sha256": "88d661616f82c7e25049b18dbca2894676461c645462597d6e475b2eacb3064a",
-      "bytes": 1096
-    },
-    "ruff-ty/retrieved/ty/preparation/release-install/verified-install.json": {
-      "sha256": "5046e882295b3d2d0f8186e902af9deee3f3e6d44bb78e8420ffdd2192b0559c",
-      "bytes": 1513
-    },
-    "uv-codex/audit/uv-primary-audit.json": {
-      "sha256": "94d068d77bcfbce62fb1eae1c773db8da7ddbd602fcff1be6d673222b7f05e18",
-      "bytes": 166160
-    },
-    "ruff-ty/audit/uv-final-independent-review.json": {
-      "sha256": "fb0d8d13cc9a63334880d761bc05955247e5d8bd035650253ebd8bad2e30bf52",
-      "bytes": 13241
-    },
-    "retrieved/linux/uv/campaign/host-selection.json": {
-      "sha256": "7bb6d262f1cb47ffa673f879c40b803de7210eaadd8c3e8ff1f0d5813bb5d5b9",
-      "bytes": 635
-    },
-    "retrieved/linux/uv/campaign/guest-identity.json": {
-      "sha256": "54526fe7c429455100ba8cbaf2c2a32876684096b5f055c980e5f2d3bd767a56",
-      "bytes": 346
-    },
-    "retrieved/linux/uv/campaign/preparation-uv-codex/start.json": {
-      "sha256": "35f62da8afc40e0b0944ab49db3a91e040ccc45ac3013d47f9969b4758e6551b",
-      "bytes": 707
-    },
-    "retrieved/linux/uv/campaign/uv-codex-stage.json": {
-      "sha256": "e8416d28c65286d19c63248614a951efe7f206dcddd113d889766c06d6c60dda",
-      "bytes": 362
-    },
-    "retrieved/linux/uv/release-install/verified-install.json": {
-      "sha256": "865a90f5fd3879c6c8ecb59838bab2ae7dd427f12279d05fb3f2ad7a83c2e2b6",
-      "bytes": 1513
-    },
-    "uv-codex/audit/ruff-primary-audit.json": {
-      "sha256": "dced73d9f872115bb7f119220986bd19440d526931808db6c8805d2ffdc0e9dc",
-      "bytes": 183993
-    },
-    "ruff-ty/audit/ruff-final-independent-review.json": {
-      "sha256": "b9f60a098b783d97d409c7e87137c354f42f4e7155bad0d8552770245756b72d",
-      "bytes": 10363
-    },
-    "retrieved/linux/ruff/campaign/host-selection.json": {
-      "sha256": "249fdec481e4156dd0a06c7e82a686e06ed661df7805756a5b74a50a0fa536a1",
-      "bytes": 639
-    },
-    "retrieved/linux/ruff/campaign/guest-identity.json": {
-      "sha256": "d4ea0a0825a2ce205c21bf18f66e47715cdfcde8c28e721886749a97b4b2e0b4",
-      "bytes": 471
-    },
-    "retrieved/linux/ruff/campaign/preparation-ruff-ty/start.json": {
-      "sha256": "f94578fb3bc190a6f873cb923f40fe0e757c792897119efab4d7155379237527",
-      "bytes": 898
-    },
-    "retrieved/linux/ruff/release-install/verified-install.json": {
-      "sha256": "01730cc954141f73987d201a8c9cbd2890eee40543c7a1911a18f73a2900886c",
-      "bytes": 1514
-    },
-    "uv-codex/scoped-continuation/audit/codex-primary-audit.json": {
-      "sha256": "11bbf53221b78fd12699cde2431a4d0e38cdfee3f802127f1687c65691b77a1a",
-      "bytes": 113108
-    },
-    "uv-codex/codex-continuation/audit/failed-developer-actual-independent-review.json": {
-      "sha256": "cabbe5e3dde16ed1e86114cc8c50956a19660801d330bb3b1ce0c3750eeea8e9",
-      "bytes": 19577
-    },
-    "retrieved/linux/codex-scoped/campaign/host-selection.json": {
-      "sha256": "b5d2f415bf976ec45d4c7197f9e2e2018cdad8c9690bd64aade6a4830e10bfaa",
-      "bytes": 642
-    },
-    "retrieved/linux/codex-scoped/campaign/guest-identity.json": {
-      "sha256": "78799f3cdd0b0d97142f36e4f661a8c7b0a0a401e043edf3d6cff3a5f05aee16",
-      "bytes": 352
-    },
-    "retrieved/linux/codex-scoped/campaign/preparation-uv-codex/start.json": {
-      "sha256": "9f577b9e73666d3239215eab324d7ef8351f91789bb8394880d8550c60ca1f04",
-      "bytes": 716
-    },
-    "retrieved/linux/codex-scoped/campaign/uv-codex-stage.json": {
-      "sha256": "25d5f69bbf7281414da184d9ed9c8e254593d107cea16fafc1049012f67c1bfc",
-      "bytes": 368
-    },
-    "retrieved/linux/codex-scoped/release-install/verified-install.json": {
-      "sha256": "4f3520b99809ad828bb301ee05ca29bb1d67c08f7c199980e69bd269b2d4cb21",
-      "bytes": 1514
-    },
-    "audit/mac-install-complete.json": {
-      "sha256": "eb74b270758b2a702d6adc9e074417300b5bc2feccc72335178fcf7d9b35aecf",
-      "bytes": 1462
-    },
-    "release-install/verified-install.json": {
-      "sha256": "81a99d04066c99e60ec7aa1cda782bf3f581f9154d56448c1c5fb0baf294e146",
-      "bytes": 1659
-    },
-    "retrieved/linux/uv/reports/developer.json": {
-      "sha256": "7d13f137e01959ef9e1c1d31f654d8ae895fbcdd682c9a255ec756b340f0c1c6",
-      "bytes": 20326130
-    },
-    "retrieved/linux/uv/reports/ablation.json": {
-      "sha256": "ca6b4d871a47b5526dfdf2fcee7ee9601237a341de8b42de56a8a8cd83ed5f76",
-      "bytes": 1488557
-    },
-    "retrieved/linux/uv/reports/workflow.json": {
-      "sha256": "175119b098e72e72263e98b91d0245ef509b73bf51cb08572c1c46041b61a125",
-      "bytes": 2551111
-    },
-    "retrieved/linux/uv/reports/sessions.json": {
-      "sha256": "2c3900272c103876a6ddeebc1deb0767bf4cb6fa2bf7b76064b597b2a6ebc74d",
-      "bytes": 2667144
-    },
-    "uv-codex/codex-session-recovery-v2/publication/audit/codex-sessions-primary-audit.json": {
-      "sha256": "cdef26726cfeece22d16a96cfb72c511319c9330b051080512565e543c18ce64",
-      "bytes": 718835
-    },
-    "ruff-ty/audit/codex-session-retry2-final-independent-review.json": {
-      "sha256": "67bafc3b6b4a13f402463106fd4c92e19649a1917164f9081bdc3b10ec11f986",
-      "bytes": 211145
-    },
-    "uv-codex/codex-developer-recovery/publication/audit/codex-developer-primary-audit.json": {
-      "sha256": "af71bc5934c33e571501526f259dd8cb35089714612a655496db598f5170b131",
-      "bytes": 196422
-    },
-    "ruff-ty/audit/codex-recovery-developer-final-independent-review.json": {
-      "sha256": "d6d0a9a4c3fada93444680e04d211011d0eaded82063fe07b5653e13cd27d7c8",
-      "bytes": 24053
-    },
-    "retrieved/recovery/codex-developer/reports/developer.json": {
-      "sha256": "1834202a23e525a36d03b815424bc0f0f802f17cfaaeb1abecac37f8a8f8a397",
-      "bytes": 44719723
-    },
-    "integration/codex-developer-recovered-origin.json": {
-      "sha256": "b33da6712d4b79ecfd3f46420474813890c3ac833ed45c328006beeff819f4d4",
-      "bytes": 4691
-    },
-    "uv-codex/codex-developer-recovery/package-index.json": {
-      "sha256": "b2e4bc472b889cb050d68f093e008792a4e68847f45c8ff877cb79a8bd2eb436",
-      "bytes": 1083
-    },
-    "uv-codex/codex-developer-recovery/package/audit/developer-recovery.py": {
-      "sha256": "416f0b05a2c221fb3ca1934d8f960fa73c1582494e449fc8f40a5f3f2ade6ea6",
-      "bytes": 18584
-    },
-    "retrieved/recovery/codex-developer/campaign/host-visibility.json": {
-      "sha256": "186796e16fe35752c286073a51b4cc90844dca1bcef05a3244fe3cbc38429270",
-      "bytes": 1560
-    },
-    "retrieved/recovery/codex-developer/campaign/prepared-plan.json": {
-      "sha256": "04d96ca073a8a5c36bfebe143172bfdbc74b363a9763ccce832e09b2b7a07625",
-      "bytes": 2887
-    },
-    "uv-codex/codex-developer-recovery/start.json": {
-      "sha256": "55a43de757ee7c3d4d364b7a53491c4550858917787e658a72e059dabbb29de7",
-      "bytes": 2638
-    },
-    "uv-codex/codex-developer-recovery/audit/source-independent-review.json": {
-      "sha256": "a19bd60d7132c08902661cbb082416026f5302f8568ff65da52c42699b4e3d72",
-      "bytes": 8708
-    },
-    "uv-codex/codex-developer-recovery/package/audit/expected.json": {
-      "sha256": "047309a40c5213b9ec514367ba1e8e2ceabc2475c7d3260d0547b6e3607863a0",
-      "bytes": 300905
-    },
-    "uv-codex/codex-developer-recovery/audit/implementation-independent-review.json": {
-      "sha256": "1a658d54eb3e0063c4ce3b3e9d108cfbcb020ac16d9cd942f50f9d91997c99d8",
-      "bytes": 3734
-    },
-    "retrieved/recovery/codex-developer/campaign/developer-plan.json": {
-      "sha256": "f06841f64fc3e05f7321f3eab95fa4db49627048e877958c395b11174963e638",
-      "bytes": 2887
-    },
-    "retrieved/recovery/codex-developer/raw/developer/results.json": {
-      "sha256": "891a86bbc5eb0c19d746a26e1ead0f30122367efdaf321604393e6d7148a5a98",
-      "bytes": 2548497
-    },
-    "retrieved/recovery/codex-developer/campaign/host-selection.json": {
-      "sha256": "d113bbed5aa7860e12c25f24185d427139419e9563859705efa5a80ddf9d4e35",
-      "bytes": 640
-    },
-    "retrieved/recovery/codex-developer/campaign/benchmark-status.json": {
-      "sha256": "df0d0a3d69bac90adea192c60cde1ab8c17fcb3f6ee95b9f8532018babfb108d",
-      "bytes": 625
-    },
-    "retrieved/recovery/codex-developer/campaign/retained-original.json": {
-      "sha256": "c299aaad6926c865d69dc95f14f2d5a417295b59475fcb3489f7598d4ecad11f",
-      "bytes": 290676
-    },
-    "uv-codex/codex-developer-recovery/stage.json": {
-      "sha256": "0e0167335690e66675d06227a861083c25a39769304f58ec45df1e3cf2658f39",
-      "bytes": 1884
-    },
-    "uv-codex/codex-developer-recovery/prepare.json": {
-      "sha256": "226747872435993834fd71987fe477c9fd401f40949fdc50a27706bc130e48ad",
-      "bytes": 4649
-    },
-    "retrieved/recovery/codex-developer/campaign/prepare-status.json": {
-      "sha256": "94ae30166e8b8b28731a5d4fe7cc23a5bd59ef6b73435a8629515129c845530c",
-      "bytes": 3869
-    },
-    "retrieved/recovery/codex-sessions-retry2/reports/sessions.json": {
-      "sha256": "e22081f31f6b63666586282c42385112622e299c35b9e6a5ae9e509673ad7ac0",
-      "bytes": 9182817
-    },
-    "integration/codex-session-recovered-origin.json": {
-      "sha256": "b85e2a6d884eb081253ed50d850f30aa027f1352b6844df3bde104138ff9feab",
-      "bytes": 5659
-    },
-    "uv-codex/codex-session-recovery-v2/package-index.json": {
-      "sha256": "8971eb90afd5e5747439ed16e903c43acc12b6f711e1b5e0aff844fef863d343",
-      "bytes": 1344
-    },
-    "uv-codex/codex-session-recovery-v2/package/audit/session-recovery.py": {
-      "sha256": "11188ad0e73e5726a207300c91fd27ecfffb8042383f998668d657ab68aac4d6",
-      "bytes": 24509
-    },
-    "retrieved/recovery/codex-sessions-retry2/campaign/host-visibility.json": {
-      "sha256": "9f3fd805bb87fb639a2cd5b0139788b98195228aab13e962f526b03fce4907a2",
-      "bytes": 1559
-    },
-    "retrieved/recovery/codex-sessions-retry2/campaign/prepared-plan.json": {
-      "sha256": "bfea53421b2bfe16875e9b03004b7fa69c8c0cfdc16151b781f654494bed411f",
-      "bytes": 3619
-    },
-    "uv-codex/codex-session-recovery-v2/source/audit/session-recovery.py": {
-      "sha256": "269fda58b4a05d6dd19b5b38a1f6e206431ab83c5bcaacf38176d5ac9df8bad7",
-      "bytes": 23726
-    },
-    "uv-codex/codex-session-recovery-v2/start.json": {
-      "sha256": "e6f38ce79675f35687eed96b817e685c9b10971582c88945cba7a27119f52763",
-      "bytes": 2640
-    },
-    "uv-codex/codex-session-recovery-v2/audit/source-independent-review.json": {
-      "sha256": "ee6c8a951bd53b375eee712599dab8d2ec8f8654a6cbaefad745fab0f075e8eb",
-      "bytes": 5306
-    },
-    "uv-codex/codex-session-recovery-v2/package/audit/expected.json": {
-      "sha256": "5f430810f2d000b263042f08dd41a49255958a39d9db4fa968c10eb078c10846",
-      "bytes": 140563
-    },
-    "uv-codex/codex-session-recovery-v2/audit/final-package-independent-review.json": {
-      "sha256": "98d74a8e3cde3354557878f2ed69ddbd3583e665395869a76e6901f4125213b0",
-      "bytes": 6527
-    },
-    "retrieved/recovery/codex-sessions-retry2/campaign/sessions-plan.json": {
-      "sha256": "b89328c101afb3770c9bdc524ea0ab419bdca57d34ba0b8f50c233f0d3b9fe2d",
-      "bytes": 3619
-    },
-    "retrieved/recovery/codex-sessions-retry2/raw/sessions/results.json": {
-      "sha256": "cbe94d003ed3fc3e2384baeb5d17f3e4b99002f505c38b5a06e75fffbc18f51b",
-      "bytes": 266495
-    },
-    "retrieved/recovery/codex-sessions-retry2/campaign/host-selection.json": {
-      "sha256": "d007c51fcebe32ed35da86bfc10a84413a0c1d37782fa50a92f572452dba1524",
-      "bytes": 642
-    },
-    "retrieved/recovery/codex-sessions-retry2/campaign/benchmark-status.json": {
-      "sha256": "d7540b2d92b9e119eb5b2e7f126bf4a87fdcc4001e49b969b406e3a46d187bcc",
-      "bytes": 615
-    },
-    "retrieved/recovery/codex-sessions-retry2/campaign/retained-original.json": {
-      "sha256": "15b1a46d619368d4bb296f8cb325495a44af3488dc2346ad2b0f8b23d506ec1d",
-      "bytes": 133804
-    },
-    "integration/codex-session-gap-failed-inputs.json": {
-      "sha256": "55c6d89a9ca1d3be0ffbc3acbe9750d2f9f7ffc43342315028b571af74768955",
-      "bytes": 4284
-    },
-    "uv-codex/codex-session-recovery-v2/stage.json": {
-      "sha256": "18088493d814d811f4be4e324a9316f32f965bf1eab171260a4578d99f110bf6",
-      "bytes": 2829
-    },
-    "uv-codex/codex-session-recovery-v2/prepare.json": {
-      "sha256": "153511b24425ffe03d98e876d10684e2e13f0af325c7cea990db46dd4417df3f",
-      "bytes": 4651
-    },
-    "uv-codex/codex-session-recovery-v2/audit/capacity-bound.py": {
-      "sha256": "2336b3e9188355f648d2974a8b3e738a6358fa1f37f2133abe4600084618d9e7",
-      "bytes": 653
-    },
-    "retrieved/recovery/codex-sessions-retry2/campaign/sources-prepared.json": {
-      "sha256": "25cbc314d1a548e3a3725d161ee9496dbb59d9e186a88657681926f0a46e5841",
-      "bytes": 6370
-    },
-    "retrieved/recovery/codex-sessions-retry2/campaign/prepare-status.json": {
-      "sha256": "132d4eb8d01697daab8b97beb3cc7c3cee7609564e696d5b5e5e3bb8a7f7c96a",
-      "bytes": 3869
-    },
-    "integration/codex-session-retry2-capacity.json": {
-      "sha256": "b232b3e5769ade85e691211c674b005053f33f7d0f14f6012f457ad7264030bb",
-      "bytes": 2512
-    },
-    "retrieved/linux/codex-scoped/reports/workflow.json": {
-      "sha256": "a3e7e48bec0a1cb66a23ed3c3eb399666b1cfd4de37ead769fa16eee9fe81eae",
-      "bytes": 6326678
-    },
-    "retrieved/linux/ruff/reports/developer.json": {
-      "sha256": "fcfa2699e96e504b555b8172102a17b8efae32247b185d3d9fbfc9237c961d52",
-      "bytes": 13624064
-    },
-    "retrieved/linux/ruff/reports/sessions.json": {
-      "sha256": "13962ca288d5a355f89f2b0a0bdd5281f220e57973197abee5f1f7698a4ae149",
-      "bytes": 3729644
-    },
-    "retrieved/linux/ruff/reports/historical.json": {
-      "sha256": "b7e561d021c2c743321034e1c61b26fec9c6f9ad08554290c0a718c8774fadfd",
-      "bytes": 4090739
-    },
-    "ruff-ty/reports/ty-worktree.json": {
-      "sha256": "f39a623ef63adbbd547624bf0e6b8f613bd13a99c181e92b8fbe47e840fa987a",
-      "bytes": 32818
-    },
-    "ruff-ty/retrieved/ty/ext4/metadata.json": {
-      "sha256": "5cc0e62a17f883c76511d1d77a1775a64a3476aa83d25726625ad148a2461c07",
-      "bytes": 10785
-    },
-    "ruff-ty/retrieved/ty/ext4/final-toolchain-proof.json": {
-      "sha256": "c53d99082f7e631cc52565a2cab773a8d6dfc57911f2bb00055c713bd86d0fe6",
-      "bytes": 3258
-    },
-    "ruff-ty/retrieved/ty/copy-on-write/metadata.json": {
-      "sha256": "1ce2617e05f8914baf507a5c47f6c0fc65988a344c1528c760eeeeb724bbd4e8",
-      "bytes": 11278
-    },
-    "ruff-ty/retrieved/ty/copy-on-write/final-toolchain-proof.json": {
-      "sha256": "c53d99082f7e631cc52565a2cab773a8d6dfc57911f2bb00055c713bd86d0fe6",
-      "bytes": 3258
-    },
-    "audit/apfs-clock-recovery-local-reconciliation.json": {
-      "sha256": "57f1fe732aa348eaafd9547ce2fdd7c729318dbda090620d486f293c2df5bf6b",
-      "bytes": 3039
-    },
-    "audit/apfs-final-independent-review.json": {
-      "sha256": "f70bd6b937887193364e260080df0453f6d6e17609f66341bc7889e5364036fa",
-      "bytes": 2244
-    },
-    "apfs/disk/reports/disk.json": {
-      "sha256": "41f493e4dfc528e237646df7cbaa770847638b0f742a059595edf0bb90ce1947",
-      "bytes": 426493
-    },
-    "formatting/audit/primary-complete.json": {
-      "sha256": "d948670a913a3de72c9301b18894c286a3c257fa58e4c916e5947b197ee2fb7e",
-      "bytes": 8155
-    },
-    "formatting/audit/final-independent-review.json": {
-      "sha256": "df5465c1d24a5719dd2c31ab79e7b60719a753aa8915c55229e8d0b2f1ce6057",
-      "bytes": 6093
-    },
-    "reports/formatting-comparison.json": {
-      "sha256": "5ce694649f3cd0174a939a8faaa23652cb1df8ad828b60251b651631e24ad033",
-      "bytes": 15593
-    },
-    "release-install/github/ohm-1.99.0-11-x86_64-unknown-linux-gnu-provenance.json": {
-      "sha256": "9e63c45b3667183acde81182b299cffa30caa0277bd9e0850f686ad9a7a35dc3",
-      "bytes": 868
-    },
-    "release-install/github/ohm-1.99.0-11-aarch64-apple-darwin-provenance.json": {
-      "sha256": "4cd8853cbb63451094545401d4c0dee4f9804aad113a4c165601f46db4d27aac",
-      "bytes": 731
-    }
-  }
+  "toolchain": "ohm-1.99.0-14"
 }
