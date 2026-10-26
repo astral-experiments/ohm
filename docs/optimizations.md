@@ -422,8 +422,7 @@ workspace checks by 18.2% and test builds by 20.2%. A separate change to output 
 dependency-file parsing reduced unchanged workspace builds by 13.8%.
 
 In a warm Ruff workspace with eight jobs, parallel hashing reduced the time for an unchanged
-`cargo test --workspace --no-run` by 5.6%. The same experiment found no clear improvement for
-`cargo check` or `cargo build`.
+`cargo test --workspace --no-run` by 5.6%.
 
 See:
 
