@@ -301,7 +301,9 @@ class PublicationTests(unittest.TestCase):
             self.assertIn(
                 f"| Scope | Rust {disk_rust} | Ohm {disk_version} | Space saved |", readme
             )
-            self.assertIn(f"less disk space with Ohm {disk_version}.", readme)
+            self.assertRegex(
+                readme, r"and `target/` disk usage decreases by around \d+%\."
+            )
             self.assertIn(f"| Rust {rust} | Ohm {version} | Speedup |", readme)
 
 

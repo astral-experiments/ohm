@@ -403,7 +403,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
     headlines = {
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
         r"\d+% less time": f"{round(100 * (totals[0] - totals[1]) / totals[0])}% less time",
-        r"about \d+% less disk space with Ohm \d+\.\d+\.\d+-\d+": f"about {5 * round(mean(savings) / 5)}% less disk space with Ohm {disk_version}",
+        r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
     }
     return rendered, headlines
 

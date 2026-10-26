@@ -5,11 +5,10 @@
 
 An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
 
-With Ohm, incremental builds can be up to 27× faster and replayed development sessions take around
-47% less time. On average, the two ten-worktree workloads on APFS used
-about 55% less disk space with Ohm 1.99.0-11.
+With Ohm, incremental builds can be up to 27× faster, replayed development sessions take around
+47% less time, and `target/` disk usage decreases by around 55%.
 
-We replayed four development sessions on Linux with stock Rust 1.99.0 and Ohm 1.99.0-14.
+Comparing stock Rust and Ohm on replayed development sessions:
 
 <!-- benchmark:sessions -->
 
