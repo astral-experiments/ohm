@@ -15,6 +15,10 @@ Both ThinLTO comparisons have two-sided p = 0.000488 (build) and 0.000488 (test 
 
 The additional debug-relocation change changed full-command instructions by +0.20% for build and +0.10% for the test build compared with ThinLTO alone. The packaging draft selects pristine upstream code. [Individual process counts, order, source digests and output digests](shipping.csv)
 
+Eight additional native builds exercised Ohm's default GCC linker driver with both packages and both source edits. Each rebuilt exactly the expected target. Every executable matched across linker packages, and the execution trace reached the private Wild binary through GCC and collect2. [Native output digests](default-native.csv) · [Successful linker-driver executions](default-native-traces.csv)
+
+A separate paired experiment combined the four release-PGO Cargo changes with the ThinLTO Wild linker. [Combined measurements and Cargo revisions](combined.md)
+
 ## Measure the package
 
 Use Python 3.11+, Valgrind Cachegrind, Clang and an installed x86-64 Linux Ohm 1.99.0-14 toolchain. Create a private rustup home and two disposable Ruff worktrees at `93526150df078af7dd8fc4226cdcc469539d2001`. A clean target and roughly 6 GiB for build or 18 GiB for test worked on this host. The source checkouts must remain at the same paths during a run. Set `EVIDENCE` to this directory and `COORDINATOR` to the coordinator checkout with the ThinLTO change.
