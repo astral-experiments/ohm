@@ -1,14 +1,12 @@
-"""Check report arithmetic, evidence preservation, and publication ordering."""
+"""Check report arithmetic, compaction, and publication."""
 
 import copy
 from pathlib import Path
 import shutil
 import statistics
-import subprocess
 import tempfile
 import unittest
 from unittest import mock
-import zipfile
 
 import publish_benchmarks as publish
 
@@ -158,7 +156,7 @@ class PublicationTests(unittest.TestCase):
             coverage={"intervals": 2},
         )
         original = copy.deepcopy(report)
-        compact = publish.compact(report, {"url": "archive"})
+        compact = publish.compact(report)
         self.assertEqual(report, original)
         self.assertEqual(compact["commands"], report["commands"])
         self.assertEqual(compact["methodology"], report["methodology"])
@@ -199,77 +197,12 @@ class PublicationTests(unittest.TestCase):
         report["provenance"]["system_cpu"]["segments"] = segments
         original = copy.deepcopy(report)
 
-        compact = publish.compact(report, {"url": "archive"})
+        compact = publish.compact(report)
 
         self.assertEqual(compact["provenance"]["system_cpu"]["segments"], summaries)
         self.assertEqual(report, original)
 
-    def test_archive_round_trip_and_determinism(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            for kind, report in self.reports.items():
-                publish.write_json(root / f"{kind}.json", report)
-            first, second = root / "one.zip", root / "two.zip"
-            manifest = publish.archive_reports(root, first)
-            publish.archive_reports(root, second)
-            self.assertEqual(first.read_bytes(), second.read_bytes())
-            with zipfile.ZipFile(first) as archive:
-                for name, checksum in manifest.items():
-                    data = archive.read(name)
-                    self.assertEqual(data, (root / name).read_bytes())
-                    self.assertEqual(publish.digest(data), checksum)
-
-    def test_failed_download_verification_leaves_checkout_unchanged(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            for name in ("README.md", "BENCHMARKS.md"):
-                shutil.copyfile(publish.ROOT / name, root / name)
-            self.copy_supplemental_reports(root)
-            prettier = root / "node_modules/.bin/prettier"
-            prettier.parent.mkdir(parents=True)
-            prettier.touch()
-            inputs = root / "inputs"
-            inputs.mkdir()
-            for kind, report in self.reports.items():
-                publish.write_json(inputs / f"{kind}.json", report)
-            results = root / "scripts/benchmark_results"
-            results.mkdir(parents=True, exist_ok=True)
-            for kind in publish.KINDS:
-                publish.write_json(
-                    results / f"{kind}.json", {"ohm_release": "ohm-0.0.0-1"}
-                )
-            before = {
-                p.relative_to(root): p.read_bytes()
-                for p in root.rglob("*")
-                if p.is_file()
-            }
-
-            def run(arguments, **kwargs):
-                if arguments[:3] == ["gh-auto", "release", "download"]:
-                    destination = Path(arguments[-1])
-                    destination.mkdir()
-                    (
-                        destination / arguments[arguments.index("--pattern") + 1]
-                    ).write_bytes(b"wrong archive")
-                return subprocess.CompletedProcess(arguments, 0)
-
-            with (
-                mock.patch.object(publish, "ROOT", root),
-                mock.patch.object(
-                    publish, "RESULTS", root / "scripts/benchmark_results"
-                ),
-                mock.patch.object(publish.subprocess, "run", side_effect=run),
-            ):
-                with self.assertRaisesRegex(ValueError, "Downloaded evidence differs"):
-                    publish.publish(inputs)
-            after = {
-                p.relative_to(root): p.read_bytes()
-                for p in root.rglob("*")
-                if p.is_file()
-            }
-            self.assertEqual(before, after)
-
-    def test_verified_archive_replaces_current_reports(self):
+    def test_publish_replaces_current_reports(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for name in ("README.md", "BENCHMARKS.md"):
@@ -289,22 +222,18 @@ class PublicationTests(unittest.TestCase):
                     {"ohm_release": "ohm-0.0.0-1"},
                 )
 
-            def run(arguments, **kwargs):
-                if arguments[:3] == ["gh-auto", "release", "download"]:
-                    destination = Path(arguments[-1])
-                    destination.mkdir()
-                    name = arguments[arguments.index("--pattern") + 1]
-                    shutil.copyfile(destination.parent / name, destination / name)
-                return subprocess.CompletedProcess(arguments, 0)
-
             with (
                 mock.patch.object(publish, "ROOT", root),
                 mock.patch.object(
                     publish, "RESULTS", root / "scripts/benchmark_results"
                 ),
-                mock.patch.object(publish.subprocess, "run", side_effect=run),
+                mock.patch.object(publish.subprocess, "run") as run,
             ):
                 publish.publish(root / "inputs")
+                run.assert_called_once()
+                self.assertEqual(
+                    run.call_args.args[0][0], str(root / "node_modules/.bin/prettier")
+                )
                 actual = publish.latest_reports()
                 for kind, report in actual.items():
                     field = (
@@ -315,7 +244,6 @@ class PublicationTests(unittest.TestCase):
                         else "commands"
                     )
                     self.assertEqual(report[field], self.reports[kind][field])
-                    self.assertEqual(report["evidence"]["path"], f"{kind}.json")
                 for name, expected in publish.documents(actual).items():
                     self.assertEqual((root / name).read_text(), expected)
                 with self.assertRaisesRegex(ValueError, "Results already exist"):
