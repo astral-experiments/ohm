@@ -17,10 +17,9 @@ work needed to compute the interface hash.
 
 For example, assume that `linter` depends on `parser`. If you fix a bug in a private parser helper
 without changing the exposed interface, Ohm recompiles `parser` but can reuse `linter`. An
-executable using them still needs to be relinked to pick up the change.
-
-Static libraries also track changes to dependency implementations, because the archive contains
-their code. This applies when a crate emits both an `rlib` and a static library.
+executable using them still needs to be relinked to pick up the change. If `linter` produces a
+static library, Cargo rebuilds the archive because it contains the parser's code. This also applies
+when `linter` produces both a static library and an `rlib`.
 
 In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-types`, then checked the
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
@@ -45,15 +44,10 @@ See:
 Ohm implements the [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790)
 approach for eligible executables and test binaries. When a dependency changes but the executable's
 compiled code is still valid, Ohm reuses that code and reruns the linker to include the updated
-dependency. Changes involving procedural macros, build scripts, or native libraries may still
-require recompilation. Cargo checks the saved object bytes and the complete relink manifest before
-reusing them. If either check fails, it recompiles the target.
-
-Ohm 1.99.0-13 reads relink manifests up to 1 MiB into a buffer and decodes the fields Cargo
-writes directly. Larger manifests still use the streaming reader. Checking the manifest and
-object checksums remains part of every reuse decision. In a uv test build after a library edit,
-buffering alone cut Cargo's instruction count by 10.19% and 10.05% on two Linux hosts. These
-counts exclude rustc and the linker.
+dependency. Before relinking, Cargo verifies the list of link inputs and the contents of each
+saved object file. If an input is missing or a checksum fails, Cargo recompiles the target.
+Changes involving procedural macros, build scripts, or native libraries may also require
+recompilation.
 
 This helps most when an edit to a dependency would otherwise force an expensive executable or test
 binary to recompile.
@@ -143,18 +137,19 @@ Set `CARGO_BUILD_BUILD_DIR` to the same directory across projects or worktrees t
 their compiled registry dependencies. Cargo verifies that the package, compiler, configuration, and
 build inputs match before it reuses a dependency, and uses locks to coordinate concurrent builds.
 
-Each worktree keeps its own private intermediates, incremental compiler state, documentation,
-scratch files, and final outputs in its target directory. The shared build directory retains
-eligible registry artifacts and reusable ThinLTO objects. We also include additional "trust"
-settings to allow for reuse of procedural macros and native tools, but that reuse can be unsound.
-
-With Ohm defaults disabled, two workspaces with separate target directories can still share one
-external build directory. Cargo gives each workspace its own intermediates, including build-script
-outputs. Running `cargo clean` in one workspace preserves the other workspace’s files.
+Each worktree keeps its incremental compiler state, documentation, scratch files, and final
+outputs in its own target directory. The shared build directory holds eligible registry artifacts
+and reusable ThinLTO objects. Additional trust settings allow reuse of procedural macros and
+native tools, but that reuse can be unsound.
 
 For example, suppose you build your project on `main`, then build a fix in a second worktree. Both
 worktrees use the same version of `memchr` with the same features and build settings. If they share
 a build directory, Ohm can reuse the compiled `memchr` from the first worktree in the second.
+
+If you turn off Ohm's defaults, both worktrees can still point to the same external build directory.
+As long as each has its own target directory, Cargo keeps their intermediate files separate. Each
+worktree's build scripts get their own `OUT_DIR`, and running `cargo clean` in one worktree
+preserves the other's files.
 
 In the release benchmarks, building uv's `uv-normalize` in a second worktree took 9.54 seconds with
 stock Rust and 1.64 seconds with Ohm. Building Codex's `codex-utils-string` took 3.97 and 0.75
@@ -326,29 +321,18 @@ cleanup in one cannot remove another's snapshots. Shared registry artifacts are 
 inputs and protected by locks: incompatible builds get separate artifacts, though concurrent builds
 of the same artifact may wait.
 
-`cargo clean` removes the selected project's private state, and removing a worktree removes its
-default target directory. An external target can outlive its checkout.
+`cargo clean` removes the selected project's private state. Removing a worktree also removes its
+default target directory, but a target directory outside the checkout can remain on disk.
 
-On Linux and macOS, Ohm records when a build, check, or worktree seed uses a target. After an hour
-of inactivity, `cargo +ohm gc` can reclaim that target’s binaries, documentation, incremental state,
-and private compiler output. Cargo rounds the last-use time up to the next five-minute boundary.
-An active build holds a lock that postpones cleanup.
+On Linux and macOS, `cargo +ohm gc` can reclaim build outputs in idle target directories as well
+as unused shared dependencies, compiler caches, and ThinLTO objects. By default, Cargo waits at
+least an hour after a target's last use. Builds, checks, and `cargo +ohm worktree add` all count
+as uses. After an upgrade, Cargo can remove obsolete compiler intermediates immediately.
 
-`cargo +ohm gc --max-age 2d --dry-run` previews cleanup after two days of inactivity.
-The same cutoff applies to shared compiler caches, individual dependency builds, and
-ThinLTO objects. After an Ohm upgrade, GC can immediately reclaim marked intermediates from the old
-compiler, even in a recently used checkout. It preserves directories that back external artifact
-exports.
-
-Manual cleanup continues in bounded batches until it finishes the available work. It scans idle
-dependencies once per invocation, then rechecks their use under a lock before removal. A progress
-bar reports eligible files and bytes during a dry run, or reclaimed files and bytes during cleanup.
-If a cache is locked or inaccessible, Cargo continues independent cleanup and reports the problem;
-`-v` identifies blocking locks.
-
-On a Linux fixture with 2,048 expired dependency variants and 16 fresh ones, scanning candidates
-once reduced median cleanup time from 30.1 to 4.9 seconds across four paired runs. Both versions
-removed the same 18,432 files.
+For example, run `cargo +ohm gc --max-age 2d --dry-run` to see how much space you could reclaim
+from builds last used at least two days ago. Omit `--dry-run` to remove the eligible files. If an
+active build holds a lock, Cargo skips that part of the cleanup and continues elsewhere. Use `-v`
+to see which lock it encountered.
 
 In a macOS benchmark, we ran the same development tasks with Ohm and stock Rust. Ohm used 40% less
 disk space for Ruff and 35% less for uv.
@@ -391,19 +375,14 @@ See:
 
 **Status:** Existing linker, bundled and enabled by default in Ohm.
 
-The linker combines compiled code into the final executable. For native x86-64 Linux GNU builds, Ohm
-uses the Wild linker by default. Explicit linker settings still take precedence.
+The linker combines compiled code into the final executable. On native x86-64 Linux GNU builds,
+Ohm uses Wild unless you choose a different linker. Wild reads archive members in parallel and
+uses up to 32 threads by default.
 
-Wild performs a full link each time it runs. Cached relinking lets Ohm reuse the compiled code that
-it passes to the linker, and Ohm can reuse eligible integration tests when it adds flags for Wild.
-
-Ohm 1.99.0-14 bundles Wild 0.11.0. Wild reads archive members in parallel and now uses at most
-32 threads by default to reduce contention when writing the output file. If the output has hard
-links, Wild replaces the file at the output path so the other links keep the previous executable.
-
-In Wild's Zed debug benchmark on ext4, the link took about 19% less time with 0.11.0 than with
-0.10.0 when the linker created a new output file. With an existing output file, the link took about
-5% longer. Wild measured the time spent in the linker on a Ryzen 9 9955HX.
+Wild performs a full link each time it runs. After a dependency changes, Ohm can pass saved
+object files to Wild. It can also reuse an integration test executable if the test does not
+link the changed dependency. If the output file has another hard link, Wild replaces the file
+at the output path so the other link still opens the previous executable.
 
 See:
 
@@ -411,8 +390,6 @@ See:
 - [Cargo #139](https://github.com/astral-sh/ohm-cargo/pull/139)
 - [Ohm #112](https://github.com/astral-sh/ohm/pull/112)
 - [Ohm #181](https://github.com/astral-sh/ohm/pull/181)
-- [Wild 0.11.0 release notes](https://github.com/wild-linker/wild/releases/tag/0.11.0)
-- [Wild linker benchmarks](https://github.com/wild-linker/wild/blob/0.11.0/benchmarks/ryzen-9955hx.md#filesystem-performance)
 
 ### 15. Avoid repeated Cargo preparation work
 
@@ -420,35 +397,21 @@ See:
 
 Cargo resolves the workspace's dependencies before many commands. Ohm saves that result and reuses
 it when the manifests, lockfile, configuration, and toolchain have not changed. Cargo still resolves
-the packages and features needed by the current command. Ohm also avoids repeated filesystem checks
-and unnecessary work preparing and reading build outputs. Commands that do not access Git skip
-initializing its library.
-
-When loading manifests, Ohm shares inherited workspace dependency maps between members and avoids
-redundant allocations. It skips building a software bill of materials unless an output requests one.
-It also reduces the work needed to prioritize build jobs and compare package identifiers. Separate
-experiments on uv measured fewer instructions in Cargo for these changes; their wall-time effects
-remain unresolved.
-
-On Unix, Ohm 1.99.0-13 caches parsed registry manifests between Cargo invocations. For example,
-two projects that use the same published crate can reuse its manifest through Cargo home. Cargo
-checks the manifest contents and parser version before accepting a record; a miss parses the
-original TOML and keeps its diagnostics. Each record has two possible slots in a bounded cache.
-In the first version of the cache, an edited uv check used about 5% fewer Cargo instructions
-with warm entries but about 18% more when populating them. Parsing each miss once reduced the
-instruction count on that first run by about 7% relative to the initial implementation. These
-experiments counted Cargo instructions; elapsed time was inconclusive.
-
-Cargo can also order most package names by comparing their first eight bytes. When it changes
-the source of a dependency, it can keep sharing the dependency's version and feature data.
-
-On Unix, freshness checks hash source files in parallel when at least 128 checksums are uncached.
-Cargo uses up to four workers within its job budget, preserves file order when reporting the first
-stale input, and releases those slots before running compilers or build scripts.
+the packages and features needed by the current command.
 
 For example, fixing a bug in `parse_number` leaves the workspace's dependency versions unchanged.
 The next check can reuse the saved resolution. Adding a dependency to `Cargo.toml` invalidates it,
 so Cargo resolves the dependencies again.
+
+Cargo shares inherited dependency declarations across workspace members. On Unix, it also caches
+parsed registry manifests in Cargo home. If two projects use the same published crate, the second
+can reuse the manifest parsed by the first. Cargo checks that the contents and parser version
+match. On a cache miss, it parses the TOML and reports errors against the original file.
+
+Ohm avoids repeated filesystem checks and skips work the command doesn't need, such as initializing
+Git or generating a software bill of materials. On Unix, when Cargo needs at least 128 uncached
+checksums to tell whether a build is up to date, it can hash the source files in parallel. It uses
+up to four of the build's job slots and releases them before running compilers or build scripts.
 
 In an earlier experiment on a Codex workspace that had already been built, reusing the dependency
 resolution reduced `cargo metadata` time from 413 to 358 milliseconds and Nextest time from 961 to
@@ -458,9 +421,9 @@ In a warm Ruff experiment, skipping unnecessary dependency-file generation reduc
 workspace checks by 18.2% and test builds by 20.2%. A separate change to output preparation and
 dependency-file parsing reduced unchanged workspace builds by 13.8%.
 
-In a separate warm Ruff comparison with eight jobs, parallel checksum checks reduced unchanged
-`cargo test --workspace --no-run` wall time by 5.63% across 480 pairs (99% confidence interval:
-2.92–8.27%). The `check` and `build` comparisons were inconclusive.
+In a warm Ruff workspace with eight jobs, parallel hashing reduced the time for an unchanged
+`cargo test --workspace --no-run` by 5.6%. The same experiment found no clear improvement for
+`cargo check` or `cargo build`.
 
 See:
 
@@ -561,18 +524,11 @@ default. More threads can also increase memory use.
 
 For example, a build may reach a large parser crate after all its dependencies have finished. Even
 if Cargo has no other crates ready to compile, the compiler can check independent function bodies in
-the parser on several threads.
+the parser on several threads. In a native build, one thread can also start encoding the parser's
+metadata while another works out which symbols it exports.
 
 In an experiment, we changed only the frontend thread setting and ran development sessions for Ruff,
 uv, and Codex. Their combined time fell from 1,032 to 720 seconds, about 30%.
-
-In native builds with multiple frontend workers, rustc starts encoding crate metadata as soon as the
-function bodies it needs are ready. Another worker identifies exported symbols. Encoding waits for
-that worker only when it needs the symbol list.
-
-In two rounds with the same optimized compiler on the Rust #203 base, this change reduced the time
-for an edited `check → build → check` by 3.6–5.4% on uv and 2.5–4.8% on Ruff. Timing ended when
-Cargo returned, so pending filesystem writes could finish later.
 
 See:
 
@@ -620,6 +576,12 @@ message in one test may leave both generated versions of `parse` and their depen
 Ohm can reuse its previous decisions about which compilation group contains each version, while
 still compiling the edited test.
 
+When rustc loads an unchanged query result from disk, it can keep the encoded bytes for the next
+build. If it recomputes the result, it saves the new value even when its fingerprint matches the
+old one. That matters when an edit moves the line an error points to without changing anything
+else about the result. When replacing its private query cache and dependency graph, rustc unlinks
+the old files first. On ext4 this can avoid waiting for writes to files it is about to discard.
+
 In a Codex TUI experiment, we repeatedly made and reverted one edit, then rebuilt the test binary.
 Reusing the compiler's grouping decisions reduced average code generation time from 8.67 to 7.06
 seconds.
@@ -631,19 +593,6 @@ from 18.96 to 15.49 seconds. Including the preceding compiler refresh, the cycle
 In an edit-and-rebuild experiment at optimization level 1, splitting reduced times by 32.8% for ty
 and 45.8% for uv. Splitting also made ty's tests about 3–4% slower and increased uv's cold-build
 time by 5.7% in separate comparisons.
-
-When rustc loads a query result from disk, it can reuse the same bytes in the next incremental cache
-until the cache needs compaction. If rustc recomputes a result, it writes the new value even when
-its fingerprint stays the same. A source edit can move a diagnostic span without changing that
-fingerprint. On uv, reusing the old span made a later incremental build crash.
-
-Inside its private session directory, rustc unlinks the old query cache and dependency graph before
-replacing them. On ext4, this can avoid waiting for pending writes.
-
-On ext4, we used the same compiler binary to compare Rust #203 with the behavior at Rust #194.
-Across two rounds of paired runs, a `check → build → check` sequence after an edit took 4.05% less
-time on uv and 2.24% less on Ruff. Timing ended when the final check returned, so some filesystem
-writes could finish after the measured sequence.
 
 See:
 
@@ -691,22 +640,6 @@ code for development builds. For example, it can omit cleanup paths that have be
 constructing intermediate lists while checking type constraints. Other changes avoid repeated
 lookups, reuse LLVM target machines, and reduce the size of compiler data structures.
 
-Within one compilation, rustc remembers which crate each direct `--extern` name or alias resolved
-to. Generated tests and macros can then reuse that lookup. For transitive dependencies, rustc uses
-the metadata hash to distinguish versions of the same crate.
-
-Ohm 1.99.0-13 allocates three compiler worker caches only when a worker first uses them. It also
-skips an extern lookup when crate metadata already identifies a dependency as public. When
-collecting implementations of a trait, rustc skips crates whose metadata lists none for that trait.
-
-When checking an opaque type such as `impl Iterator`, rustc can reuse the bounds from the
-type's signature for each pair of lifetimes it compares. Each comparison gets its own inference
-state. This change cut compiler instructions for uv's library by 2.44% and 2.29% on two Linux
-hosts after a version-matching edit. The same edit exercises incremental queries in `uv-client`:
-letting nested queries reuse up to eight dependency recorders instead of four cut compiler
-instructions for that crate by 2.47% and 1.37%. The larger pool can retain more memory. Both
-experiments used compilers without release PGO or BOLT and measured instructions for one crate.
-
 When laying out async state, Ohm skips redundant work when tracking which values are live at the
 same time. This backports a change from
 [rust-lang/rust #163126](https://github.com/rust-lang/rust/pull/163126). On Unix, Ohm also reduces
@@ -717,6 +650,17 @@ For example, a generic type `Container<T>` might require `T: Clone`. When checki
 type, the compiler gathers the bounds that apply to it. Ohm gathers those bounds in one walk through
 their declarations, avoiding a second walk and temporary lists.
 
+Similarly, when checking an opaque return type such as `impl Iterator`, rustc can reuse its
+declared bounds each time it compares two lifetimes. When looking for implementations of a trait,
+it skips crates whose metadata lists none for that trait.
+
+Every generated Rust test imports the `test` crate. Once rustc has resolved that name, it can
+reuse the result for the remaining tests in the same compilation.
+
+Compiler workers allocate caches for trait bounds and function signatures on first use. A query
+can also reuse the buffer that an earlier query used to record its dependencies. Keeping those
+buffers available saves allocations but can increase memory use.
+
 In an experiment, the simpler checks of type constraints reduced the time to check Ruff's
 `ty_python_semantic` crate by about 4%. In a separate experiment, the changes to code generation in
 development builds reduced `uv-resolver` compilation time by about 8–9%.
@@ -725,9 +669,6 @@ In another experiment, the lookup and data-structure changes, together with Carg
 caches, reduced total rebuild time across 13 uv development commits from 478.19 to 446.97 seconds,
 or 6.5%. Focused Ruff measurements of the query-cache change saved about 36 MiB during a check and
 114 MiB during a build, with no consistent wall-time improvement.
-
-In 12 paired runs on Ruff, caching these lookups reduced an edited `cargo test --lib --no-run` from
-12.50 to 11.83 seconds. The experiment used stage2 compilers built without release PGO or BOLT.
 
 See:
 
@@ -783,23 +724,20 @@ See:
 
 ### 25. Cache derive and attribute macro expansions
 
-**Status:** Existing experimental Rust feature, enabled by default in Ohm.
+**Status:** Experimental macro caching, enabled by default in Ohm.
 
-A derive macro generates Rust code from a type declaration. Ohm enables Rust's experimental cache
-for that generated code so the compiler can reuse previous macro expansions. The cache can be
-unsound if a macro depends on an input that the cache does not track: it may reuse code that no
-longer matches the input. Cargo also has trust settings for reusing compiled macros and worktree
-snapshots; those settings control separate caches and carry their own soundness risks.
+Ohm caches the code that derive and attribute macros generate. For example,
+`#[derive(serde::Serialize)]` on a `Config` struct generates code to serialize its fields. If you
+edit a separate `connect` function, Ohm can reuse that code as long as the macro's inputs are
+unchanged.
 
-For example, `#[derive(serde::Serialize)]` on a `Config` struct generates code to serialize its
-fields. If you edit a separate `connect` function without changing the struct or the macro's other
-inputs, Ohm can reuse that generated code while checking the edited function.
+Editing an attribute, the item it annotates, or the macro crate makes rustc expand the attribute
+macro again. It also reruns an attribute macro if the macro reads a tracked file or environment
+variable, inspects source locations or text, or asks rustc to expand a nested expression.
 
-Ohm 1.99.0-12 also caches attribute macro expansions. Editing the annotated item, its attribute,
-or the macro crate invalidates the entry. A macro that reads a tracked file or environment value,
-inspects source locations or text, or requests nested expression expansion runs again. In the
-original compiler comparison, this saved 0.66 seconds (9.1%) on an incremental Ruff check after an
-unrelated edit.
+An untracked input can make the cache unsound. If a macro reads a file without telling rustc and
+the file changes, rustc may reuse code generated from its old contents. Cargo's trust settings for
+compiled macros and worktree snapshots control separate caches.
 
 In the uv benchmark, we applied a private parser edit, checked the dependent crate, and ran the
 parser tests. The full sequence took a median of 4.02 seconds with macro caching and 4.15 seconds
