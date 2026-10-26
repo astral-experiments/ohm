@@ -12,7 +12,7 @@ The linker has three arms. `control` is the ThinLTO upstream Wild build proposed
 
 The locked schedules use 12 blocks for each command. Each direction of the complete historical patch appears six times. The three arms run once per block, and the six possible orders appear twice each. Each scored command starts after Cargo has produced the opposite fixture state. The comparison checks the dirty units, the entire Cargo graph and the raw ELF bytes of every executable against a native build in the same context. Independent native traces establish the complete roster of successful application execs, including concurrent execs split by `strace`.
 
-Cargo runs under DynamoRIO with child tracing disabled. Cachegrind records every rustc process and its Clang and Wild descendants using separate PID output files. The collectors have different instruction-count conventions, so the per-process data keeps both counts identifiable. The bootstrap rustup program, the shell that forwards to Clang, and the profilers are outside the application counts. `ir-0` is the sole instruction cohort. The independent elapsed-time schedules apply only when reporting an elapsed comparison. [Counter source and calibration](../integrated.md)
+Cargo runs under DynamoRIO with child tracing disabled. Cachegrind records every rustc process and its Clang and Wild descendants using separate PID output files. The collectors have different instruction-count conventions, so the per-process data keeps both counts identifiable. The bootstrap rustup program, the shell that forwards to Clang, and the profilers are outside the application counts. `ir-0` is the primary instruction cohort. The test build also repeats that measurement using the independently frozen second schedule. Both use the same verified native product and process gates. [Counter source and calibration](../integrated.md)
 
 ## Reproduce
 
@@ -30,10 +30,11 @@ for action in native count-audit measure; do
     --fixture formatter-holdout --control "$thin" --middle "$individual" --candidate "$paired"
 done
 python3 export.py build "$study/results" "$raw"
-python3 ../analyze.py "$raw/build.csv" middle candidate
-python3 ../analyze.py "$raw/build.csv" control candidate
+python3 analyze.py "$raw/build.csv"
 ```
 
 Repeat with mode `test`, a new state, CPU set 12–15 and fixture `test-target-discovery`. Run `check-edge-cases.py "$individual" "$paired" "$edges"` to reproduce the 25 small ELF comparisons covering loaded and discarded sections, fallback cases, compression, relocatable output and an invalid relocation offset.
+
+The analysis reports paired geometric reductions and 95% bootstrap intervals stratified by source direction. The exact two-sided randomization test conditions on the third arm’s position within each block. Each of the three groups then has four blocks with two baseline-first assignments, giving 216 allowable label permutations.
 
 `native-oracles.json` records independent native traces and each raw executable digest for the six arm/direction combinations in each workload. The normalized labels in that file remove the local checkout prefix from the Cargo package identifier. The measurement itself compares every unmodified executable against the native reference at its real path. `source-oracles.json` records every affected file in both directions. `relocation-census.json` records Wild's selected input archives and their hashes from a real CLI link. Of 4,551,713 debug relocations in that executable, 4,549,295 come from selected archive members. All 1,438,170 `.debug_ranges` entries and 337,592 of 340,095 `.debug_loc` entries have the eligible adjacent local-section representation.

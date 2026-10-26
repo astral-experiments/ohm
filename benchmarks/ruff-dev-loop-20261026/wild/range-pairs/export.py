@@ -31,11 +31,16 @@ def main():
     parser.add_argument("mode", choices=["build", "test"])
     parser.add_argument("results", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--replicate", type=int, choices=[0, 1], default=0)
     args = parser.parse_args()
-    plan = json.loads((HERE / (args.mode + "-plan.json")).read_bytes())
+    prefix = args.mode + ("-replication" if args.replicate else "")
+    plan_name = args.mode + (
+        "-elapsed-replication-plan.json" if args.replicate else "-plan.json"
+    )
+    plan = json.loads((HERE / plan_name).read_bytes())
     sources = json.loads((HERE / "source-oracles.json").read_bytes())[args.mode]
     native = json.loads((HERE / "native-oracles.json").read_bytes())[args.mode]
-    directory = args.results / "ir-0"
+    directory = args.results / f"ir-{args.replicate}"
     rows = [
         json.loads(line)
         for line in (directory / "observations.jsonl").read_text().splitlines()
@@ -43,10 +48,10 @@ def main():
     assert len(rows) == 3 * len(plan["blocks"]) == 36
     args.output.mkdir(exist_ok=True, parents=True)
     with (
-        (args.output / (args.mode + ".csv")).open("w", newline="") as raw,
-        (args.output / (args.mode + "-processes.jsonl")).open("w") as processes,
+        (args.output / (prefix + ".csv")).open("w", newline="") as raw,
+        (args.output / (prefix + "-processes.jsonl")).open("w") as processes,
     ):
-        writer = csv.DictWriter(raw, fieldnames=COLUMNS)
+        writer = csv.DictWriter(raw, fieldnames=COLUMNS, lineterminator="\n")
         writer.writeheader()
         for i, r in enumerate(rows):
             block, pos = divmod(i, 3)
