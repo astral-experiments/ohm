@@ -1,0 +1,40 @@
+diff --git a/libwild/src/elf_writer.rs b/libwild/src/elf_writer.rs
+index a377d9f8..3a44504a 100644
+--- a/libwild/src/elf_writer.rs
++++ b/libwild/src/elf_writer.rs
+@@ -4515,0 +4516,35 @@ fn apply_debug_relocation<
++    // DWARF stores offsets into its own output sections as absolute 32-bit relocations.
++    if A::arch_identifier() == object::elf::EM_X86_64
++        && r_type == object::elf::R_X86_64_32
++        && !layout.args().should_output_partial_object()
++        && sym.st_bind() == object::elf::STB_LOCAL
++        && sym.st_type() == object::elf::STT_SECTION
++        && !crate::platform::Symbol::has_name(sym)
++        && crate::platform::Symbol::value(sym) == 0
++        && let Some(index) = section_index
++    {
++        let offset = match object_layout.sections.get(index.0) {
++            Some(SectionSlot::LoadedDebugInfo(_)) => object_layout.section_resolutions[index.0]
++                .address()
++                .map(|address| address.wrapping_add(addend as u64)),
++            Some(SectionSlot::MergeStrings(_)) => get_merged_string_output_address::<elf::Elf<C>>(
++                symbol_index,
++                addend,
++                object_layout.object,
++                &object_layout.sections,
++                &layout.symbol_db.section_part_ids,
++                object_layout.section_id_range,
++                &layout.merged_strings,
++                &layout.merged_string_start_addresses,
++                false,
++            )?,
++            _ => None,
++        };
++        if let Some(offset) = offset {
++            const ABSOLUTE_32: RelocationKindInfo =
++                linker_utils::x86_64::relocation_from_raw(object::elf::R_X86_64_32).unwrap();
++            ABSOLUTE_32.write_to_buffer(offset, &mut out[offset_in_section as usize..])?;
++            return Ok(());
++        }
++    }
++
