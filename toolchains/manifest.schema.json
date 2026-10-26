@@ -76,6 +76,10 @@
               "required": ["revision", "binary_sha256", "builder_sha256"],
               "properties": {
                 "revision": { "$ref": "#/$defs/revision" },
+                "patch_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
                 "binary_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$"

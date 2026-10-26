@@ -16,6 +16,7 @@ import urllib.request
 
 TARGET = "x86_64-unknown-linux-gnu"
 FILES = ("wild", "LICENSE-APACHE", "LICENSE-MIT")
+PATCH_DIRECTORY = pathlib.Path(__file__).resolve().parents[1] / "release" / "wild-patches"
 
 
 def fetch_archive(url, checksum):
@@ -30,10 +31,13 @@ def build_source(source, version, checksum, destination):
     revision = source["revision"]
     builder = source["builder_sha256"]
     binary = source["binary_sha256"]
+    patch = source.get("patch_sha256")
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("invalid Wild source revision")
     if not all(re.fullmatch(r"[0-9a-f]{64}", value) for value in (builder, binary)):
         raise ValueError("invalid Wild build digest")
+    if patch is not None and not re.fullmatch(r"[0-9a-f]{64}", patch):
+        raise ValueError("invalid Wild patch digest")
 
     payload = fetch_archive(f"https://codeload.github.com/wild-linker/wild/tar.gz/{revision}", checksum)
     destination = pathlib.Path(destination).resolve()
@@ -41,6 +45,11 @@ def build_source(source, version, checksum, destination):
     with tempfile.TemporaryDirectory(dir=destination.parent) as temporary:
         work = pathlib.Path(temporary)
         (work / "source.tar.gz").write_bytes(payload)
+        if patch is not None:
+            contents = (PATCH_DIRECTORY / f"{patch}.patch").read_bytes()
+            if hashlib.sha256(contents).hexdigest() != patch:
+                raise ValueError("Wild patch checksum mismatch")
+            (work / "source.patch").write_bytes(contents)
         shutil.copyfile(pathlib.Path(__file__).with_name("build-wild.sh"), work / "build-wild.sh")
         subprocess.run([
             "docker", "run", "--rm", "--platform=linux/amd64", "--user", f"{os.getuid()}:{os.getgid()}",

@@ -1,0 +1,175 @@
+Ohm Wild source from https://github.com/astral-sh/ohm-wild/commit/c729f2d0cc44ced0ba4e3d187109fed28b8cf5c7
+Includes the x86-64 local debug relocation changes through 79a4556e767c3cdc6573f4ed086912ebfd62180c.
+Generated with git -c diff.suppressBlankEmpty=true diff --full-index e856d81f6683cad80b9fe0ebf1a0c3c403c6fe11 c729f2d0cc44ced0ba4e3d187109fed28b8cf5c7.
+
+diff --git a/libwild/src/elf_writer.rs b/libwild/src/elf_writer.rs
+index a377d9f80383f6e11eae7f36b2992ab97d905025..9e57a65291cbc52d0f63a44ee41a5a5d78412936 100644
+--- a/libwild/src/elf_writer.rs
++++ b/libwild/src/elf_writer.rs
+@@ -2996,6 +2996,18 @@ fn apply_debug_rela_relocations<'data, C: ElfClass, A: Arch<Platform = elf::Elf<
+     layout: &ElfLayout<'data, C>,
+ ) -> Result {
+     if relocations.len() < PARALLEL_DEBUG_RELOCATION_MIN {
++        if A::arch_identifier() == object::elf::EM_X86_64
++            && !layout.args().should_output_partial_object()
++            && relocations.len() >= 2
++            && matches!(
++                object.object.section_name(section_index)?,
++                DEBUG_RANGES_SECTION_NAME | DEBUG_LOC_SECTION_NAME
++            )
++            && write_x86_64_debug_ranges::<C>(object, out, relocations).is_some()
++        {
++            record_debug_relocations(object, section_index, layout, relocations.len());
++            return Ok(());
++        }
+         return apply_debug_relocations::<C, A, elf::ElfRela<C>, _>(
+             object,
+             out,
+@@ -3074,6 +3086,84 @@ fn apply_debug_rela_relocations<'data, C: ElfClass, A: Arch<Platform = elf::Elf<
+     Ok(())
+ }
+
++#[derive(Clone, Copy)]
++enum LocalDebugAddress {
++    Section(u64),
++    Discarded,
++}
++
++impl LocalDebugAddress {
++    /// An unnamed local section symbol at offset zero resolves within its own object.
++    fn for_symbol<C: ElfClass>(
++        object: &ObjectLayout<elf::Elf<C>>,
++        sym: &elf::SymtabEntry<C>,
++        section: Option<object::SectionIndex>,
++    ) -> Option<Self> {
++        if sym.st_bind() != object::elf::STB_LOCAL
++            || sym.st_type() != object::elf::STT_SECTION
++            || crate::platform::Symbol::has_name(sym)
++            || crate::platform::Symbol::value(sym) != 0
++        {
++            return None;
++        }
++        let index = section?.0;
++        match object.sections.get(index)? {
++            SectionSlot::Loaded(_) => object
++                .section_resolutions
++                .get(index)?
++                .address()
++                .filter(|&address| address != 0)
++                .map(Self::Section),
++            SectionSlot::Discard | SectionSlot::Unloaded(_) => Some(Self::Discarded),
++            _ => None,
++        }
++    }
++
++    fn with_addend(self, addend: i64, tombstone: u64) -> u64 {
++        match self {
++            Self::Section(base) => base.wrapping_add(addend as u64),
++            Self::Discarded => tombstone,
++        }
++    }
++}
++
++/// DWARF4 uses pairs of addresses for each range in a range or location list.
++/// If a pair has a different representation, the caller replays the ordinary
++/// relocations. Every write this function made before that point was absolute.
++fn write_x86_64_debug_ranges<C: ElfClass>(
++    object: &ObjectLayout<elf::Elf<C>>,
++    out: &mut [u8],
++    relocations: &[elf::Rela<C>],
++) -> Option<()> {
++    let (pairs, tail) = relocations.as_chunks::<2>();
++    if !tail.is_empty() {
++        return None;
++    }
++    for &[start, end] in pairs {
++        let start = elf::ElfRela::<C>::new(start);
++        let end = elf::ElfRela::<C>::new(end);
++        let symbol = start.symbol()?;
++        if start.raw_type() != object::elf::R_X86_64_64
++            || end.raw_type() != object::elf::R_X86_64_64
++            || end.symbol() != Some(symbol)
++            || end.offset() != start.offset().checked_add(8)?
++        {
++            return None;
++        }
++        let sym = object.object.symbol(symbol).ok()?;
++        let section = object.object.symbol_section(sym, symbol).ok()?;
++        let base = LocalDebugAddress::for_symbol::<C>(object, sym, section)?;
++        let low = base.with_addend(start.addend(), 1);
++        let high = base.with_addend(end.addend(), 1);
++        let pair = out
++            .get_mut(usize::try_from(start.offset()).ok()?..)?
++            .first_chunk_mut::<16>()?;
++        pair[..8].copy_from_slice(&low.to_le_bytes());
++        pair[8..].copy_from_slice(&high.to_le_bytes());
++    }
++    Some(())
++}
++
+ #[inline(always)]
+ pub(crate) fn apply_debug_relocations<
+     'data,
+@@ -3160,7 +3250,13 @@ fn apply_debug_relocations_impl<
+                 display_relocation::<C, A, R>(object, &rel, layout)
+             )
+         })?;
+-        relocation_cache.previous = Some(rel);
++        // Only paired ULEB128 debug relocations use the previous entry.
++        if matches!(
++            A::arch_identifier(),
++            object::elf::EM_RISCV | object::elf::EM_LOONGARCH
++        ) {
++            relocation_cache.previous = Some(rel);
++        }
+     }
+     Ok(relocation_count)
+ }
+@@ -4513,6 +4609,20 @@ fn apply_debug_relocation<
+     let sym = object_layout.object.symbol(symbol_index)?;
+     let section_index = object_layout.object.symbol_section(sym, symbol_index)?;
+
++    if A::arch_identifier() == object::elf::EM_X86_64
++        && r_type == object::elf::R_X86_64_64
++        && !layout.args().should_output_partial_object()
++        && let Some(base) = LocalDebugAddress::for_symbol::<C>(object_layout, sym, section_index)
++    {
++        const ABSOLUTE_64: RelocationKindInfo =
++            linker_utils::x86_64::relocation_from_raw(object::elf::R_X86_64_64).unwrap();
++        ABSOLUTE_64.write_to_buffer(
++            base.with_addend(addend, section_tombstone_value),
++            &mut out[offset_in_section as usize..],
++        )?;
++        return Ok(());
++    }
++
+     let resolution = layout
+         .merged_symbol_resolution(object_layout.symbol_id_range.input_to_id(symbol_index))
+         .or_else(|| {
+diff --git a/wild/tests/sources/elf/comdat-debug-gc/comdat-debug-gc.s b/wild/tests/sources/elf/comdat-debug-gc/comdat-debug-gc.s
+index 79eb137f4fa97af69d6d8c257e6bbd379173ea7e..1ca5b7d728c1c1b0f1a61a041f4cfd219fcb562c 100644
+--- a/wild/tests/sources/elf/comdat-debug-gc/comdat-debug-gc.s
++++ b/wild/tests/sources/elf/comdat-debug-gc/comdat-debug-gc.s
+@@ -17,7 +17,9 @@
+ # BFD retains the group when another debug section refers to its debug member.
+ //#ReferenceLinkers:lld
+ //#CompArgs:-Wa,--defsym,DEBUG_REFERENCE=1
+-//#ExpectSectionBytes:.debug_reference=0x0000000000000000
++//#ExpectSectionBytes:.debug_reference=0x00000000000000000000000000000000
++//#ExpectSectionBytes:.debug_ranges=0x01000000000000000100000000000000
++//#ExpectSectionBytes:.debug_loc=0x01000000000000000100000000000000
+
+ //#Config:no-gc:base
+ //#LinkArgs:--no-gc-sections
+@@ -60,6 +62,11 @@ live_companion:
+ .ifdef DEBUG_REFERENCE
+ .section .debug_reference,"",@progbits
+ .quad dead_debug
++.quad .text.dead + 9
++.section .debug_ranges,"",@progbits
++.quad .text.dead + 9, .text.dead + 17
++.section .debug_loc,"",@progbits
++.quad .text.dead + 3, .text.dead + 7
+ .endif
+
+ .section .note.GNU-stack,"",@progbits

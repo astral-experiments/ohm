@@ -69,6 +69,8 @@ class PrepareWildTests(unittest.TestCase):
             mount = command[command.index("--mount") + 1]
             work = pathlib.Path(mount.removeprefix("type=bind,src=").removesuffix(",dst=/work"))
             self.assertEqual((work / "source.tar.gz").read_bytes(), payload)
+            if "patch_sha256" in source:
+                self.assertEqual((work / "source.patch").read_bytes(), b"patch fixture")
             staged = work / "wild"
             staged.mkdir()
             (staged / "wild").write_bytes(executable)
@@ -76,6 +78,7 @@ class PrepareWildTests(unittest.TestCase):
 
         with (
             tempfile.TemporaryDirectory() as temporary,
+            patch.object(module, "PATCH_DIRECTORY", pathlib.Path(temporary)),
             patch.object(module.urllib.request, "urlopen") as download,
             patch.object(module.subprocess, "run", side_effect=build) as docker,
             patch.object(module.subprocess, "check_output", return_value="Wild 0.11.0 non-git-build"),
@@ -86,6 +89,18 @@ class PrepareWildTests(unittest.TestCase):
             download.assert_called_once_with(
                 "https://codeload.github.com/wild-linker/wild/tar.gz/" + "a" * 40, timeout=120
             )
+            digest = hashlib.sha256(b"patch fixture").hexdigest()
+            source["patch_sha256"] = digest
+            patch_file = pathlib.Path(temporary) / f"{digest}.patch"
+            patch_file.write_bytes(b"patch fixture")
+            download.return_value = io.BytesIO(payload)
+            patched = pathlib.Path(temporary) / "patched"
+            self.assertEqual(module.prepare(manifest, module.TARGET, patched), patched)
+            patch_file.write_bytes(b"corrupt patch")
+            download.return_value = io.BytesIO(payload)
+            with self.assertRaisesRegex(ValueError, "patch checksum"):
+                module.prepare(manifest, module.TARGET, patched)
+            del source["patch_sha256"]
             source["binary_sha256"] = "0" * 64
             download.return_value = io.BytesIO(payload)
             with self.assertRaisesRegex(ValueError, "binary checksum"):
@@ -93,7 +108,7 @@ class PrepareWildTests(unittest.TestCase):
             download.return_value = io.BytesIO(b"other source")
             with self.assertRaisesRegex(ValueError, "archive checksum"):
                 module.prepare(manifest, module.TARGET, destination)
-            self.assertEqual(docker.call_count, 2)
+            self.assertEqual(docker.call_count, 3)
 
     def test_old_manifests_and_other_platforms_do_not_download(self):
         with patch.object(module.urllib.request, "urlopen") as download:
