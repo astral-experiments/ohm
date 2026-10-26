@@ -15,7 +15,7 @@ def reduction(log_ratios):
     return -100 * math.expm1(-statistics.mean(log_ratios))
 
 
-def compare(blocks, baseline, candidate):
+def compare(blocks, baseline, candidate, metric="total"):
     ratios = []
     linker_ratios = []
     source = collections.defaultdict(list)
@@ -29,14 +29,15 @@ def compare(blocks, baseline, candidate):
         ]
         for key in ["edit", "units", "executables", "source_sha256", "outputs_sha256"]:
             assert a[key] == b[key] == third[key]
-        log_ratio = math.log(int(a["total"]) / int(b["total"]))
+        log_ratio = math.log(int(a[metric]) / int(b[metric]))
         ratios.append(log_ratio)
         source[a["edit"]].append(log_ratio)
-        linker_ratios.append(math.log(int(a["wild"]) / int(b["wild"])))
+        if metric == "total":
+            linker_ratios.append(math.log(int(a["wild"]) / int(b["wild"])))
         sign = 1 if int(a["position"]) < int(b["position"]) else -1
         by_third_position[int(third["position"])].append((sign, sign * log_ratio))
         for arm, row in block.items():
-            counts_by_arm[arm].append(int(row["total"]))
+            counts_by_arm[arm].append(int(row[metric]))
 
     # Conditioning on the third arm's position leaves four blocks in each stratum.
     # Each contains exactly two baseline-first and two candidate-first assignments.
@@ -75,10 +76,14 @@ def compare(blocks, baseline, candidate):
             "tail": tail,
             "assignments": len(permuted),
         },
-        "linker_reduction_percent": reduction(linker_ratios),
+        **(
+            {"linker_reduction_percent": reduction(linker_ratios)}
+            if linker_ratios
+            else {}
+        ),
         "half_reductions_percent": [reduction(ratios[:6]), reduction(ratios[6:])],
         "source_direction_percent": {s: reduction(xs) for s, xs in source.items()},
-        "median_instructions": {
+        ("median_instructions" if metric == "total" else "median_elapsed_ns"): {
             arm: statistics.median(xs) for arm, xs in counts_by_arm.items()
         },
     }
@@ -87,13 +92,17 @@ def compare(blocks, baseline, candidate):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("csv", type=Path)
+    parser.add_argument("--elapsed", action="store_true")
     args = parser.parse_args()
     blocks = collections.defaultdict(dict)
     with args.csv.open() as f:
         for row in csv.DictReader(f):
-            assert int(row["total"]) == sum(
-                int(row[role]) for role in ["cargo", "rustc", "clang", "wild"]
-            )
+            if args.elapsed:
+                assert int(row["elapsed_ns"]) > 0
+            else:
+                assert int(row["total"]) == sum(
+                    int(row[role]) for role in ["cargo", "rustc", "clang", "wild"]
+                )
             block = blocks[int(row["block"])]
             assert row["arm"] not in block
             block[row["arm"]] = row
@@ -101,7 +110,15 @@ def main():
     ordered = [blocks[i] for i in range(12)]
     print(
         json.dumps(
-            [compare(ordered, base, "candidate") for base in ["middle", "control"]],
+            [
+                compare(
+                    ordered,
+                    base,
+                    "candidate",
+                    "elapsed_ns" if args.elapsed else "total",
+                )
+                for base in ["middle", "control"]
+            ],
             indent=2,
         )
     )

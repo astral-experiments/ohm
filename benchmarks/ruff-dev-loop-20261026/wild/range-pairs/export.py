@@ -2,28 +2,13 @@
 
 import argparse
 import collections
+import contextlib
 import csv
 import hashlib
 import json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-COLUMNS = [
-    "mode",
-    "block",
-    "position",
-    "edit",
-    "arm",
-    "units",
-    "executables",
-    "cargo",
-    "rustc",
-    "clang",
-    "wild",
-    "total",
-    "source_sha256",
-    "outputs_sha256",
-]
 
 
 def main():
@@ -32,26 +17,54 @@ def main():
     parser.add_argument("results", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--replicate", type=int, choices=[0, 1], default=0)
+    parser.add_argument("--elapsed", action="store_true")
     args = parser.parse_args()
-    prefix = args.mode + ("-replication" if args.replicate else "")
+    prefix = (
+        args.mode
+        + ("-native" if args.elapsed else "")
+        + ("-replication" if args.replicate else "")
+    )
     plan_name = args.mode + (
         "-elapsed-replication-plan.json" if args.replicate else "-plan.json"
     )
     plan = json.loads((HERE / plan_name).read_bytes())
     sources = json.loads((HERE / "source-oracles.json").read_bytes())[args.mode]
     native = json.loads((HERE / "native-oracles.json").read_bytes())[args.mode]
-    directory = args.results / f"ir-{args.replicate}"
+    directory = args.results / (
+        ("wall-" if args.elapsed else "ir-") + str(args.replicate)
+    )
     rows = [
         json.loads(line)
         for line in (directory / "observations.jsonl").read_text().splitlines()
     ]
     assert len(rows) == 3 * len(plan["blocks"]) == 36
     args.output.mkdir(exist_ok=True, parents=True)
+    measurements = (
+        ["elapsed_ns", "child_cpu_seconds"]
+        if args.elapsed
+        else ["cargo", "rustc", "clang", "wild", "total"]
+    )
+    fields = [
+        "mode",
+        "block",
+        "position",
+        "edit",
+        "arm",
+        "units",
+        "executables",
+        *measurements,
+        "source_sha256",
+        "outputs_sha256",
+    ]
     with (
         (args.output / (prefix + ".csv")).open("w", newline="") as raw,
-        (args.output / (prefix + "-processes.jsonl")).open("w") as processes,
+        (
+            contextlib.nullcontext()
+            if args.elapsed
+            else (args.output / (prefix + "-processes.jsonl")).open("w")
+        ) as processes,
     ):
-        writer = csv.DictWriter(raw, fieldnames=COLUMNS, lineterminator="\n")
+        writer = csv.DictWriter(raw, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for i, r in enumerate(rows):
             block, pos = divmod(i, 3)
@@ -64,8 +77,6 @@ def main():
             source = sources[r["edit"]]
             reference = native[r["edit"]]
             tag = directory / f"{block:02d}-{pos}"
-            details = json.loads((tag / "processes.json").read_bytes())
-            assert details["counts"] == r["counts"] and details["total"] == r["total"]
             assert (
                 r["dirty"] == reference["dirty_names"]
                 and r["units"] == reference["units"]
@@ -90,6 +101,26 @@ def main():
                     ).encode()
                 ).hexdigest()
             )
+            if args.elapsed:
+                timing = json.loads((tag / "time.json").read_bytes())
+                assert (
+                    timing == {key: r[key] for key in measurements}
+                    and timing["elapsed_ns"] > 0
+                )
+                writer.writerow(
+                    {
+                        "mode": args.mode,
+                        "source_sha256": source["sha256"],
+                        **{
+                            k: r[k]
+                            for k in fields
+                            if k not in {"mode", "source_sha256"}
+                        },
+                    }
+                )
+                continue
+            details = json.loads((tag / "processes.json").read_bytes())
+            assert details["counts"] == r["counts"] and details["total"] == r["total"]
             counts = collections.Counter()
             guest_counts = collections.Counter()
             for p in details["processes"]:
