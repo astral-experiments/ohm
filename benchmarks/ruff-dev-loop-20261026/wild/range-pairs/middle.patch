@@ -1,0 +1,55 @@
+diff --git a/libwild/src/elf_writer.rs b/libwild/src/elf_writer.rs
+index a377d9f80383f6e11eae7f36b2992ab97d905025..a9f41f8b5436a5e07975424e7443f2836140e53b 100644
+--- a/libwild/src/elf_writer.rs
++++ b/libwild/src/elf_writer.rs
+@@ -3160,7 +3160,13 @@ fn apply_debug_relocations_impl<
+                 display_relocation::<C, A, R>(object, &rel, layout)
+             )
+         })?;
+-        relocation_cache.previous = Some(rel);
++        // Only paired ULEB128 debug relocations use the previous entry.
++        if matches!(
++            A::arch_identifier(),
++            object::elf::EM_RISCV | object::elf::EM_LOONGARCH
++        ) {
++            relocation_cache.previous = Some(rel);
++        }
+     }
+     Ok(relocation_count)
+ }
+@@ -4513,6 +4519,35 @@ fn apply_debug_relocation<
+     let sym = object_layout.object.symbol(symbol_index)?;
+     let section_index = object_layout.object.symbol_section(sym, symbol_index)?;
+
++    // Defined local section symbols resolve only within this object. At offset zero,
++    // a loaded section uses its start and a discarded section uses the DWARF tombstone.
++    if A::arch_identifier() == object::elf::EM_X86_64
++        && r_type == object::elf::R_X86_64_64
++        && !layout.args().should_output_partial_object()
++        && sym.st_bind() == object::elf::STB_LOCAL
++        && sym.st_type() == object::elf::STT_SECTION
++        && !crate::platform::Symbol::has_name(sym)
++        && crate::platform::Symbol::value(sym) == 0
++        && let Some(index) = section_index
++    {
++        let value = match object_layout.sections.get(index.0) {
++            Some(SectionSlot::Loaded(_)) => object_layout
++                .section_resolutions
++                .get(index.0)
++                .and_then(|r| r.address())
++                .filter(|&address| address != 0)
++                .map(|address| address.wrapping_add(addend as u64)),
++            Some(SectionSlot::Discard | SectionSlot::Unloaded(_)) => Some(section_tombstone_value),
++            _ => None,
++        };
++        if let Some(value) = value {
++            const ABSOLUTE_64: RelocationKindInfo =
++                linker_utils::x86_64::relocation_from_raw(object::elf::R_X86_64_64).unwrap();
++            ABSOLUTE_64.write_to_buffer(value, &mut out[offset_in_section as usize..])?;
++            return Ok(());
++        }
++    }
++
+     let resolution = layout
+         .merged_symbol_resolution(object_layout.symbol_id_range.input_to_id(symbol_index))
+         .or_else(|| {

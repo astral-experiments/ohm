@@ -1,0 +1,41 @@
+{
+  "direction": "reverse",
+  "fixtures": [
+    {
+      "commit": "b3fb43af25f3d07758f953ce20ec900fc8812da2",
+      "label": "formatter-holdout",
+      "patch_sha256": "d6030e06cd87b11edf5d06321518805c69baf906b344db83444a82b544aff1f2",
+      "paths": [
+        "crates/ruff_python_formatter/resources/test/fixtures/ruff/expression/nested_string_quote_style.py",
+        "crates/ruff_python_formatter/src/context.rs",
+        "crates/ruff_python_formatter/src/other/f_string.rs",
+        "crates/ruff_python_formatter/src/other/interpolated_string_element.rs",
+        "crates/ruff_python_formatter/src/other/t_string.rs",
+        "crates/ruff_python_formatter/src/string/implicit.rs",
+        "crates/ruff_python_formatter/tests/snapshots/format@expression__fstring.py.snap",
+        "crates/ruff_python_formatter/tests/snapshots/format@expression__nested_string_quote_style.py.snap"
+      ],
+      "rank": "df9ca6e092726660b5e097f96455f577cdbbc4765f2269de3b481d3812fdd82a",
+      "rust_delta_lines": 81,
+      "split": "holdout",
+      "stratum": "formatter",
+      "title": "Alternate nested quotes inside format spec interpolations (#28259)"
+    },
+    {
+      "commit": "2fb7c8ddd806aec98f8bba8f4c78d4a7c22f9d56",
+      "label": "test-target-discovery",
+      "patch_sha256": "778a9988053c6b1cd9a68c2092c3b9fe1c8768fb074aee1363e5c60e746edd09",
+      "paths": [
+        "crates/ruff_python_formatter/tests/fixtures.rs",
+        "crates/ruff_python_formatter/tests/snapshots/format@expression__nested_string_quote_style.py.snap"
+      ],
+      "rank": "4b3e73778a1185f9d6943182485a6c3dc222db700b381f4db3cbd334d00b7534",
+      "rust_delta_lines": 9,
+      "split": "discovery",
+      "stratum": "test-target",
+      "title": "Sort formatter diagnostics in snapshots (#24375)"
+    }
+  ],
+  "ruff": "93526150df078af7dd8fc4226cdcc469539d2001",
+  "seed": "ohm-ruff-entropy-20261026-stage2"
+}

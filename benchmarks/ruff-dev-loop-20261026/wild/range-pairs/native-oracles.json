@@ -1,0 +1,1082 @@
+{
+  "build": {
+    "changed": {
+      "arm_receipts": [
+        {
+          "arm": "control",
+          "native_result_sha256": "c8ded561feb8a10a10bc34ba385b204e77e32a2d46160331292b608f94a25d23",
+          "native_trace_sha256": "c21428fc884f43c36996fce43c25f3821f4a3abd6eeb63b2eae2c77f5b9aa1f4"
+        },
+        {
+          "arm": "middle",
+          "native_result_sha256": "10bf0781e08425fd30c969c60fbc97096d0edceac52534d5cea6dc0659b2d007",
+          "native_trace_sha256": "4be4cbaaaa75ee3c466edd68d63a7051c11c15b0d76f6949c18cf1542a4f6130"
+        },
+        {
+          "arm": "candidate",
+          "native_result_sha256": "59c23b00ebd6642b08eac355b04cabfbe8f9aa3609f76144eb8103e35df3a1ce",
+          "native_trace_sha256": "d1bb27d067e67da1fee62126733c3cdd632ffe885d82a6f5362598ed50a43cdd"
+        }
+      ],
+      "dirty_names": [
+        "ruff",
+        "ruff",
+        "ruff_benchmark",
+        "ruff_dev",
+        "ruff_markdown",
+        "ruff_mdtest",
+        "ruff_python_formatter",
+        "ruff_python_formatter",
+        "ruff_server",
+        "ruff_wasm",
+        "ruff_workspace",
+        "ty",
+        "ty",
+        "ty_completion_bench",
+        "ty_completion_eval",
+        "ty_ide",
+        "ty_project",
+        "ty_server",
+        "ty_wasm"
+      ],
+      "executables": {
+        "[\"crates/ruff#0.17.0\",\"ruff\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 160186328,
+          "sha256": "6d45174e44aabbbe3d7ee33d24de7970bdefa51986b06f5f415423e39c15c032"
+        },
+        "[\"crates/ruff_dev#0.0.0\",\"ruff_dev\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 293960592,
+          "sha256": "0635aecd2671e51c0a7c39e66373a264227fed8191d46ded91b7332ef0b21709"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"ruff_python_formatter\",[\"bin\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 48107920,
+          "sha256": "bd1a35ba9cf90e2c19687d8c46e7a726a538a1d1624958770cdf00a3472ca33d"
+        },
+        "[\"crates/ty#0.0.0\",\"ty\",[\"bin\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 226316248,
+          "sha256": "2341b9454372e3551de02781d28bf1d53f7e398641885820cf7300fb6aaa7785"
+        },
+        "[\"crates/ty_completion_bench#0.0.0\",\"ty_completion_bench\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 191968880,
+          "sha256": "2cee2c199c23e1313c59941aff24fb6f7207ced13a22d1b2c22512ce719bb263"
+        },
+        "[\"crates/ty_completion_eval#0.0.0\",\"ty_completion_eval\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 192794664,
+          "sha256": "f8a6a2c081aaa6706be67733f1a4dca3878aaa8638031d0bb655f1931dc1b3d3"
+        }
+      },
+      "processes": {
+        "cargo": 1,
+        "clang": 8,
+        "rustc": 19,
+        "wild": 8
+      },
+      "rustc_crates": [
+        "ruff",
+        "ruff",
+        "ruff_benchmark",
+        "ruff_dev",
+        "ruff_markdown",
+        "ruff_mdtest",
+        "ruff_python_formatter",
+        "ruff_python_formatter",
+        "ruff_server",
+        "ruff_wasm",
+        "ruff_workspace",
+        "ty",
+        "ty",
+        "ty_completion_bench",
+        "ty_completion_eval",
+        "ty_ide",
+        "ty_project",
+        "ty_server",
+        "ty_wasm"
+      ],
+      "unit_graph_sha256": "0a626a06a3fed7232b4ac2a70e240aebde4ceac7ba486beb31d8b6a75c697faf",
+      "units": 501
+    },
+    "original": {
+      "arm_receipts": [
+        {
+          "arm": "control",
+          "native_result_sha256": "5ee0a63f3aabb6f04baa6ede33df72873003700ed00c20d7dfa2b6c184a72719",
+          "native_trace_sha256": "fc5c9de2022be4470946e838072f70d85253f53bf01f1b92c9726e2980c5047a"
+        },
+        {
+          "arm": "middle",
+          "native_result_sha256": "347287ff13a62fc97d23a1d70d9ccd5f7a5a2a67810d2674e2d74f4cd76eedfd",
+          "native_trace_sha256": "0292d3d69633ccdc1362803e867de9f44c20071b9c623b5107c71a701c6cf8a4"
+        },
+        {
+          "arm": "candidate",
+          "native_result_sha256": "4d6d41628481856ee9801c2067566118dba02b0bacf432d1b36c285bb300dcbb",
+          "native_trace_sha256": "8b7fb6e35824f888c3f155f7b07612c252c23c7a8615f1d7bfa3fd4d437aed02"
+        }
+      ],
+      "dirty_names": [
+        "ruff",
+        "ruff",
+        "ruff_benchmark",
+        "ruff_dev",
+        "ruff_markdown",
+        "ruff_mdtest",
+        "ruff_python_formatter",
+        "ruff_python_formatter",
+        "ruff_server",
+        "ruff_wasm",
+        "ruff_workspace",
+        "ty",
+        "ty",
+        "ty_completion_bench",
+        "ty_completion_eval",
+        "ty_ide",
+        "ty_project",
+        "ty_server",
+        "ty_wasm"
+      ],
+      "executables": {
+        "[\"crates/ruff#0.17.0\",\"ruff\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 160187560,
+          "sha256": "4913b2e255dceb42d9d922fb5c6f804dc3379ffe3afda5c1fceb66ff089541dd"
+        },
+        "[\"crates/ruff_dev#0.0.0\",\"ruff_dev\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 293961792,
+          "sha256": "164300d337fbd63d952a921a89309cad164baaccf4d9dde7dceaa53058db0db9"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"ruff_python_formatter\",[\"bin\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 48109216,
+          "sha256": "3dc19161ad9aacd4886a0f0eb62590c619ad2749c9c76887b285f6ac01d89fd2"
+        },
+        "[\"crates/ty#0.0.0\",\"ty\",[\"bin\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 226316632,
+          "sha256": "0cee94b2aa92b6d2c3760b3a4e4c499154d756740c97fd7f4c0001a3809c6467"
+        },
+        "[\"crates/ty_completion_bench#0.0.0\",\"ty_completion_bench\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 191969256,
+          "sha256": "d0f8291dc3d27d66c37feb4926d159c80a233c0601963488218c191153768a7e"
+        },
+        "[\"crates/ty_completion_eval#0.0.0\",\"ty_completion_eval\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 192795040,
+          "sha256": "0751a2a1c61825d0a27fb22691bdab51df0c3a7403b14b7f97f5630bde6fe5f5"
+        }
+      },
+      "processes": {
+        "cargo": 1,
+        "clang": 8,
+        "rustc": 19,
+        "wild": 8
+      },
+      "rustc_crates": [
+        "ruff",
+        "ruff",
+        "ruff_benchmark",
+        "ruff_dev",
+        "ruff_markdown",
+        "ruff_mdtest",
+        "ruff_python_formatter",
+        "ruff_python_formatter",
+        "ruff_server",
+        "ruff_wasm",
+        "ruff_workspace",
+        "ty",
+        "ty",
+        "ty_completion_bench",
+        "ty_completion_eval",
+        "ty_ide",
+        "ty_project",
+        "ty_server",
+        "ty_wasm"
+      ],
+      "unit_graph_sha256": "0a626a06a3fed7232b4ac2a70e240aebde4ceac7ba486beb31d8b6a75c697faf",
+      "units": 501
+    }
+  },
+  "test": {
+    "changed": {
+      "arm_receipts": [
+        {
+          "arm": "control",
+          "native_result_sha256": "ffccadcccef22c4a0da1fea0af9283542e160c566b63d870260eb258bbcd8eb7",
+          "native_trace_sha256": "765b80d47c9351749342774dcdbeb3a703e4e28f667847d7f57e3dc40e4df180"
+        },
+        {
+          "arm": "middle",
+          "native_result_sha256": "ffccadcccef22c4a0da1fea0af9283542e160c566b63d870260eb258bbcd8eb7",
+          "native_trace_sha256": "dfdf0052a79844882ad56489b3da12bb42fe872e55098596c189c63f5e82df77"
+        },
+        {
+          "arm": "candidate",
+          "native_result_sha256": "ffccadcccef22c4a0da1fea0af9283542e160c566b63d870260eb258bbcd8eb7",
+          "native_trace_sha256": "553f6a3008f9e961df0d65045e042f4f2afd12af2c3489299bc29600b37c72f4"
+        }
+      ],
+      "dirty_names": [
+        "fixtures"
+      ],
+      "executables": {
+        "[\"crates/mdtest#0.0.0\",\"mdtest\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 49534480,
+          "sha256": "7b890b83af7fc33f15c7608d4b87c0f33879f407075b22b69bced1db7cb76147"
+        },
+        "[\"crates/ruff#0.17.0\",\"analyze_graph\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 18651360,
+          "sha256": "b5f5e44bd2846fd95f516cecc9b6ac0d13cf0c51c2d832400f6de9796d01e9f1"
+        },
+        "[\"crates/ruff#0.17.0\",\"cli\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 88453648,
+          "sha256": "09df63cf19e609784a54c057b49ec1a9a2b29de316a6c6e9ceaa503cf34beb32"
+        },
+        "[\"crates/ruff#0.17.0\",\"config\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 12727952,
+          "sha256": "c1bf1f66f570687445789e4270af87799e7ea72c3369e3da2bac6109bdf12ddc"
+        },
+        "[\"crates/ruff#0.17.0\",\"direxist_guard\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 12725952,
+          "sha256": "a286599895827424c4ebe139b79b46c1710cffde8c36dc7e6b4c70c29510dfc6"
+        },
+        "[\"crates/ruff#0.17.0\",\"integration_test\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 161482952,
+          "sha256": "c1e624400a2a21fc845a06c94a724088992395daeb8e0f27745d02693761e2f3"
+        },
+        "[\"crates/ruff#0.17.0\",\"resolve_files\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15589368,
+          "sha256": "1831ace4ca49322c995f9d70b6f1ff5a584561c6d0424a8780f010ab9628fab7"
+        },
+        "[\"crates/ruff#0.17.0\",\"ruff\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 160470504,
+          "sha256": "5af8937e1154e5737fbbd85e61f110af02d3458d98351843c785adf2f403fe3a"
+        },
+        "[\"crates/ruff#0.17.0\",\"ruff\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 46513728,
+          "sha256": "cc3493a4ea199b4e4c1532a06490eaf3d5c7e781e0a161d4f854620c46c18c35"
+        },
+        "[\"crates/ruff#0.17.0\",\"ruff\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 141874504,
+          "sha256": "e73c390999c50ed8555e88fc1c3d0f9501cee3a559d4e7732305e2b7575479e1"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"color\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 6434248,
+          "sha256": "e3962728e0c24698f3398a662dd15a72c8dc782a6df3f14df70150bda66d3028"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"custom_error\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1817992,
+          "sha256": "e85e5edd71a9cb8c7489bd49f4d55d83d9670594d77f7f9c6f023e7b16f168b9"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"custom_level\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1824360,
+          "sha256": "bddc468612f19ebae4d7d39f85e8235f4f530a61155aa46bbc1e2aaa32b90470"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"elide_header\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1815840,
+          "sha256": "547635c16f368a502f1b03c104f577ad9fc0322046800b7e49f08d6acbb52e8a"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"examples\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 5883496,
+          "sha256": "11a610bce1d33290db08070bb87c9f094c97f9ec036c9dfb9b8072d8d97af975"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"expected_type\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1816168,
+          "sha256": "a890a45381c7681880619f920dd6baaf0b96a881ed38c90c930c234b1d8740db"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"footer\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1818160,
+          "sha256": "702788e8b36f45ba7e9ebff9208b7ebeeb109f5520807f1b25efe48e63ac3b26"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"format\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1818192,
+          "sha256": "fac4f4e53d076835bd6536e48533b967b3b3a5d837a21bdeaebfd98a8a4038fd"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"formatter\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 7029424,
+          "sha256": "cd319b9ca8675c79622673def0c1cb89bc9798776b87018eb7c4c5d8e4458892"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"highlight_message\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1822952,
+          "sha256": "d8e5ec6a11b9a17f34230c8d2b33f7b6cda10cdd7bf348a424236fb03df70a7d"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"highlight_source\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1819272,
+          "sha256": "d8c56dc68ea425cc02322dbd87727980a68b0099e45fbf1e6e3c54452856a485"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"id_hyperlink\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1818536,
+          "sha256": "f8f7710ecbd4c0b38e6a8f64f8da39ff566fadf6f4b5c780837555a198e1c5fc"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"multi_suggestion\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1825424,
+          "sha256": "b4fe3ddf32f46f1abc68965490470b5a2ecd38119b7e709bc8729888253f8139"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"multislice\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1814560,
+          "sha256": "622ce3dedf755a40e17db6c7e636c06d9595658867db1adac95d0a80b786a64b"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"ruff\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 6167968,
+          "sha256": "a9db0de09de6cbc49fa948e36e1068c241d0de5413ea6fe313499aac9dbd3ff8"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"rustc_tests\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 6794752,
+          "sha256": "1b7fee9729785ae3a4e393928e9888f52994aae50988ad25007a6d7b20cc9ac7"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"struct_name_as_context\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1817048,
+          "sha256": "9eca8aa70279960cd99e7fe6f9c6e3ae52426eb559e88358cfee0e9c469ead50"
+        },
+        "[\"crates/ruff_cache#0.0.17\",\"cache_key\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1137960,
+          "sha256": "2476fe8caa04a3820898b8e19c21026fc39ecd7ca7a1a866fc159d03b8f1a2c3"
+        },
+        "[\"crates/ruff_command_line#0.0.17\",\"ruff_command_line\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1066928,
+          "sha256": "c2c42935224ad18b2d2afc0603f81003d4f157186557ca7d36fa392342e06397"
+        },
+        "[\"crates/ruff_db#0.0.17\",\"ruff_db\",[\"lib\"],[\"cache\",\"ignore\",\"junit\",\"os\",\"ruff_cache\",\"schemars\",\"serde\",\"testing\",\"tracing-subscriber\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 50746320,
+          "sha256": "5cdf6cce6d78695208a7a343710cc8096b6f51fd5753630b927ee58080369b4d"
+        },
+        "[\"crates/ruff_dev#0.0.0\",\"ruff_dev\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 259897848,
+          "sha256": "799db4738d5a70488b42b3b6963177e64369408c924ab1b0f818494f5dfc461e"
+        },
+        "[\"crates/ruff_formatter#0.0.17\",\"ruff_formatter\",[\"lib\"],[\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 8588320,
+          "sha256": "c0d41426a91a861908f329e44eb508312e51c0da7d85d3fd1f33780c2705fdfe"
+        },
+        "[\"crates/ruff_index#0.0.17\",\"ruff_index\",[\"lib\"],[\"salsa\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1226296,
+          "sha256": "37051115761888543e7184b78c366b1953fd76c65f0223235481b997531693c8"
+        },
+        "[\"crates/ruff_linter#0.17.0\",\"ruff_linter\",[\"lib\"],[\"clap\",\"default\",\"schemars\",\"test-rules\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 115571816,
+          "sha256": "263f0ad1ae997472ed9f884232019837559b53f5469a1753670756b27df32d8e"
+        },
+        "[\"crates/ruff_markdown#0.0.17\",\"ruff_markdown\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 101981240,
+          "sha256": "bb1c59078393a2ed011e841ab4dea49eacb3db6de267d17eaa7cfa52bf890dcc"
+        },
+        "[\"crates/ruff_mdtest#0.0.0\",\"mdtest\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 132335920,
+          "sha256": "cad3a2569da419609ca54bf4548d9f15c82584297fa08edcaa0d740f9a5c885d"
+        },
+        "[\"crates/ruff_notebook#0.0.17\",\"ruff_notebook\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 4602360,
+          "sha256": "2187b6ad5e106e6c2b0e251f347fee0b1b6a0578b22d5edd16b6eda1b70c7b9e"
+        },
+        "[\"crates/ruff_python_ast#0.0.17\",\"ruff_python_ast\",[\"lib\"],[\"cache\",\"get-size\",\"salsa\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 9406952,
+          "sha256": "a5728fb665115eacdd28fa0b9999afa1776113b813a1712d54b30ef39c962cee"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"comparable\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15284056,
+          "sha256": "3c20ee55cd747e83fe6bdf05f354aab785ff257c2f898112c1a11df98d581161"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"identifier\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15027584,
+          "sha256": "e17ea54fc58c0ff1097ee6bb7f894fbb622ed3b0e2dc2e02d9fe35798635ef5b"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"match_pattern\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15003584,
+          "sha256": "a6569cb554132be87e2b955de2378ab8d4092bf097ded90ed420498f231a96a9"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"parentheses\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15235712,
+          "sha256": "93e1e1bc5de417fe0c2ac593569d5342c1c65aacf1bff626ef024412bb9db958"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"parenthesize\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15125592,
+          "sha256": "ff2ca84f0f0563c73c3cf27883fdf99ca43e2752fd813ed7aaad68bb96405347"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"source_order\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 20782880,
+          "sha256": "e8aa17aa280d393e378b2aa53502b46a9d8eb2fb3fc4927e16645ab7f1a2a38d"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"stmt_if\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15022656,
+          "sha256": "744dadc2c7c8acb614cbb289fa549d8b4acf571344aa00b2c4ee0d9e721a456e"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"visitor\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 20764976,
+          "sha256": "6f176ed53e11a9d72d05e9201d47bc53866909b090ee58a9ee30810183b521a9"
+        },
+        "[\"crates/ruff_python_codegen#0.0.17\",\"ruff_python_codegen\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 16497416,
+          "sha256": "b5bbe6e029a4522d03d3d928c73fd7504e528c884e1a2f25283653d64a5ec9b1"
+        },
+        "[\"crates/ruff_python_edits#0.0.17\",\"ruff_python_edits\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15313544,
+          "sha256": "d60494900aa85eaccff28c10b33cd1f897fc8d2869b73dab7a59b644e4a9cbe6"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"fixtures\",[\"test\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 58659760,
+          "sha256": "a3c9f8c8731994afe0a28e489719a47bfe871ceac2a26bc82f2a949166c63018"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"normalizer\",[\"test\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 6446512,
+          "sha256": "5a7cca7c195114340fb81a5ad1605e61561063841d35c333642512fb3cec8d47"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"ruff_python_formatter\",[\"bin\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 48138176,
+          "sha256": "bbb42dfefb8e3cd39b0cab224fab1acf7e82cb861732b9b42288094d980c110b"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"ruff_python_formatter\",[\"bin\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 36462784,
+          "sha256": "a71cc33bd7e2ab80e9ee6283cc8cd523633112f4ef09a42c2dbed93e17631b72"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"ruff_python_formatter\",[\"lib\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 52580496,
+          "sha256": "4c2d645905840007cfc25b47125b6ef73ad546950e9b9e154c6e3b95c84a2722"
+        },
+        "[\"crates/ruff_python_importer#0.0.17\",\"ruff_python_importer\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 21704904,
+          "sha256": "68ee6179adecd88ce85d8a6e0b56b61fafaafba7937779cef7930f7684f8c17b"
+        },
+        "[\"crates/ruff_python_index#0.0.17\",\"ruff_python_index\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15229488,
+          "sha256": "1059be75f936dd891a44a0859e9fe4a40cbedb492424649a0f98a2ba490d33a1"
+        },
+        "[\"crates/ruff_python_literal#0.0.17\",\"ruff_python_literal\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 12014304,
+          "sha256": "f1ad1ec6287c0e4b6c6afabb1daada434ad5ce6f0fd65d26b6f840e7988afde6"
+        },
+        "[\"crates/ruff_python_parser#0.0.17\",\"fixtures\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 31050456,
+          "sha256": "fd2737bee7d4449ad0d26bb473ec27294098498ad43e935601c95b62ff9c472e"
+        },
+        "[\"crates/ruff_python_parser#0.0.17\",\"generate_inline_tests\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1871976,
+          "sha256": "ea2c9135af82f173b12ab5721948b2b6b3cd819797249212b69b26ea58930a02"
+        },
+        "[\"crates/ruff_python_parser#0.0.17\",\"ruff_python_parser\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 21799592,
+          "sha256": "15e521d91552dbfb2d3b26e1a80fba3f05197aaaf787f5cc91f3a40671d203b9"
+        },
+        "[\"crates/ruff_python_semantic#0.0.17\",\"ruff_python_semantic\",[\"lib\"],[\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 21058720,
+          "sha256": "2811bdd9859200e925221d7c48f96d2df444a9c0c2f89a3b46556010cad078ed"
+        },
+        "[\"crates/ruff_python_stdlib#0.0.17\",\"ruff_python_stdlib\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1208392,
+          "sha256": "24da7b76761ec3b3e230da81f0eb26648baa87b3cfde9da4c720ba8d3259d419"
+        },
+        "[\"crates/ruff_python_trivia#0.0.17\",\"ruff_python_trivia\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 3083112,
+          "sha256": "06500200bba5a9880142ff648128c4c637438e90b514fadc7c24d7ede2ee0827"
+        },
+        "[\"crates/ruff_python_trivia_integration_tests#0.0.0\",\"block_comments\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15057976,
+          "sha256": "be50390e19b30c1aaada28e91c3f9a8244c479cb2124c32b76225ebd1b0c9a14"
+        },
+        "[\"crates/ruff_python_trivia_integration_tests#0.0.0\",\"simple_tokenizer\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 20846936,
+          "sha256": "a433335a82a77250e1e68d3c153b03b4fe9969c8f055b6fb43487acb759b82c7"
+        },
+        "[\"crates/ruff_python_trivia_integration_tests#0.0.0\",\"whitespace\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15016344,
+          "sha256": "c28e043276855370cdbc88b1958086b84a844e2f63de1f41b7c0524d7177b7ca"
+        },
+        "[\"crates/ruff_server#0.0.17\",\"document\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 103670256,
+          "sha256": "0e026a1f2f817b4e32f2ab1501ad7be7badb39d0fae16071aa6c75cdd5b4d4cb"
+        },
+        "[\"crates/ruff_server#0.0.17\",\"e2e\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 145333480,
+          "sha256": "f880f9835298ebe354adde5f7fc44c74e99d56047097ca88072b9b9d2936fcb0"
+        },
+        "[\"crates/ruff_server#0.0.17\",\"ruff_server\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 114529944,
+          "sha256": "330f83990a941a8052e420a25c3d4202af370845544d7a2ffc665dafa1b56ab6"
+        },
+        "[\"crates/ruff_source_file#0.0.17\",\"ruff_source_file\",[\"lib\"],[\"get-size\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2696840,
+          "sha256": "78792ab227dd7fde045643fd6d0e6ba9f36bd05f8d677bed6f2ce8ddc00d62cd"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"auto_traits\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1066920,
+          "sha256": "bea3a01770bbbf8dd6733649b77c5dafcfd3654cb32db222cf5cbdbc448814f2"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"constructors\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2557120,
+          "sha256": "118487ed6a49bf051470ff06234bd2824cb3f5e376c9cac8deb6b83e02ad5a8c"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"indexing\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2549096,
+          "sha256": "4db53a949cd2432cf853fd7dc2acc3e6962390f764cc17aca7a270bfb9a91529"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"main\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2590056,
+          "sha256": "7c1b155cfa9cf58a6045e8f79519336e0bb7244b4378decf9ade1222646d0390"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"serde\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2717832,
+          "sha256": "19a05c040c166e26157e7497e54a886d43df5e1774b487d89a6fde7d8bd841b8"
+        },
+        "[\"crates/ruff_unicode_names2#0.0.17\",\"character\",[\"example\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1356088,
+          "sha256": "23be34efbe51be8245ea7c7e1dbc1ad493e863a1ac32a44912226c5285e7fb28"
+        },
+        "[\"crates/ruff_unicode_names2#0.0.17\",\"count\",[\"example\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 678976,
+          "sha256": "a4dc082b05804dbbfe3d2162487d424831623c11a0ba93615e6aa03d560a6b08"
+        },
+        "[\"crates/ruff_unicode_names2#0.0.17\",\"name\",[\"example\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1106632,
+          "sha256": "c4d71ce1ace43e36b96c17236f5bccec7318cb644e6cf56d9713b7bd7e0bce61"
+        },
+        "[\"crates/ruff_unicode_names2_generator#0.0.17\",\"unicode_names2_generator\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1088784,
+          "sha256": "5328d68a1e2503c87bbea4112c67a1c2226f24a669fdd1ecbcdfc40098d0ffb2"
+        },
+        "[\"crates/ruff_wasm#0.17.0\",\"api\",[\"test\"],[\"console_error_panic_hook\",\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1066832,
+          "sha256": "db370756c6fadef846dde0243effcea758fc478db06c3a17dffe9a4028f29a31"
+        },
+        "[\"crates/ruff_workspace#0.0.17\",\"ruff_workspace\",[\"lib\"],[\"default\",\"schemars\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 101289984,
+          "sha256": "856ca1bf8549f30e134c2916c2985c5636a576a0135186ce70c7e13e246b7d9b"
+        },
+        "[\"crates/ty#0.0.0\",\"cli\",[\"test\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 21982336,
+          "sha256": "d69f27831aa990ac7864c00e7dacc3da574e04f80dce1540a4d2b82ab9321b36"
+        },
+        "[\"crates/ty#0.0.0\",\"file_watching\",[\"test\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 194658808,
+          "sha256": "14cbc3464512032374b5a943c48e1518bdd907524c3a950d50c20904de406719"
+        },
+        "[\"crates/ty#0.0.0\",\"self_environment\",[\"test\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 16920936,
+          "sha256": "e7f03a022646a0ec61687c2bfdc951885fe4e77f551f1cd0f3464eed3cba760a"
+        },
+        "[\"crates/ty#0.0.0\",\"ty\",[\"bin\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 226931000,
+          "sha256": "01e8b66c4459a74736a0f06327ca07100badc2e0c2c6585ad7516005a50cd92e"
+        },
+        "[\"crates/ty#0.0.0\",\"ty\",[\"bin\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 191136792,
+          "sha256": "cfab716d2ca96f378a13f30dea93f7b2a55a351ad07e3b16faf395807d6ef3f1"
+        },
+        "[\"crates/ty#0.0.0\",\"ty\",[\"lib\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 191091048,
+          "sha256": "c0c2898b581f83fd2702874df59575ccdac158ee0952884789528af493d01f58"
+        },
+        "[\"crates/ty_combine#0.0.17\",\"ty_combine\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 36707240,
+          "sha256": "6ad41186b9aca42580b7e0120679666df90333797a764465d2e3520be5a14917"
+        },
+        "[\"crates/ty_completion_bench#0.0.0\",\"ty_completion_bench\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 185853008,
+          "sha256": "1227ba5a1d09b304d71c4ad8cf22fdd731ef2e0f568d6d9f6881af2910b3a051"
+        },
+        "[\"crates/ty_completion_eval#0.0.0\",\"ty_completion_eval\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 185854800,
+          "sha256": "f5070b92f6b374b50c0000207e16d13a8dccf635f6e93b9c3ca7eb1998602ea0"
+        },
+        "[\"crates/ty_ide#0.0.0\",\"ty_ide\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 208433656,
+          "sha256": "4ede5249980014484dbe9e308a4223467cdba2076b7ca333373decc20a05bf73"
+        },
+        "[\"crates/ty_module_resolver#0.0.17\",\"ty_module_resolver\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 54476120,
+          "sha256": "039b09dc1dfe6a629a7058ac731fbf3f9ba6bb854909c945a791b4800add3aba"
+        },
+        "[\"crates/ty_project#0.0.0\",\"ty_project\",[\"lib\"],[\"default\",\"deflate\",\"format\",\"junit\",\"ruff_python_formatter\",\"schemars\",\"testing\",\"zstd\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 192318296,
+          "sha256": "9fa9e45f39b63391fc27200e71a9e3b4f67cda908e1298038663555cf1a4f038"
+        },
+        "[\"crates/ty_python_core#0.0.17\",\"ty_python_core\",[\"lib\"],[\"schemars\",\"serde\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 55270272,
+          "sha256": "4ef08922081485d23e711663cc097aa4317db3f1dd065007dca2f22c584d6dc6"
+        },
+        "[\"crates/ty_python_semantic#0.0.17\",\"corpus\",[\"test\"],[\"schemars\",\"serde\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 165076192,
+          "sha256": "6cdc995daa346788188b3e11ba5819ffffb81622a33ad37bd8c7b653d026aef4"
+        },
+        "[\"crates/ty_python_semantic#0.0.17\",\"mdtest\",[\"test\"],[\"schemars\",\"serde\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 184174344,
+          "sha256": "f341bc8bd92d4b162eb2d0d6d4ae2157faa0de4c19a695975e37d7e0080853b4"
+        },
+        "[\"crates/ty_python_semantic#0.0.17\",\"ty_python_semantic\",[\"lib\"],[\"schemars\",\"serde\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 179028528,
+          "sha256": "f661575d6bf59c1c7799d7585d89c76b83e5f87cf25207217bab14a9ab7f7167"
+        },
+        "[\"crates/ty_server#0.0.0\",\"e2e\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 225655240,
+          "sha256": "8f2754c7668a6ce184a8f9c5b9783cf0ffb1e17cfd4f4404999b9673c620f04c"
+        },
+        "[\"crates/ty_server#0.0.0\",\"ty_server\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 191815304,
+          "sha256": "540aaa64abb6c45c42f480e170c1b32a19136dbafee3959535507407e2f07ace"
+        },
+        "[\"crates/ty_site_packages#0.0.17\",\"ty_site_packages\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 42292616,
+          "sha256": "76d254d7a6141912020f08e0d04cf8eba9ca05c3c589abadb46a011a5a8767ba"
+        },
+        "[\"crates/ty_test#0.0.0\",\"ty_test\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 165959752,
+          "sha256": "7e7140d4713d00e2e73c7a80c11ab431faee4f94848c668ef8b7d4856db5b6ec"
+        },
+        "[\"crates/ty_vendored#0.0.17\",\"ty_vendored\",[\"lib\"],[\"deflate\",\"zstd\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 38504200,
+          "sha256": "61075d5aabe9c59841fcd976b87a767cff247776c5aae32e871eb77cc85f97c1"
+        },
+        "[\"crates/ty_wasm#0.0.0\",\"api\",[\"test\"],[\"console_error_panic_hook\",\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1066824,
+          "sha256": "ea28d17cfe4db48db05aaf3f7df2ab45486d430650bd7f539ef43db540aa080a"
+        }
+      },
+      "processes": {
+        "cargo": 1,
+        "clang": 1,
+        "rustc": 1,
+        "wild": 1
+      },
+      "rustc_crates": [
+        "fixtures"
+      ],
+      "unit_graph_sha256": "962cf55eb72ff9e663acff00226488b24e77eddcbbf4a8ac9deb831dce0a2a92",
+      "units": 619
+    },
+    "original": {
+      "arm_receipts": [
+        {
+          "arm": "control",
+          "native_result_sha256": "64ee6ffb9ac859756c038a7b6b178fd21713a3f49d40d429d97dbafead26b32a",
+          "native_trace_sha256": "9eab62813a1e0cdfff5afd5a3ebf520407e9e9c258c2b6de96d6ed4240264586"
+        },
+        {
+          "arm": "middle",
+          "native_result_sha256": "64ee6ffb9ac859756c038a7b6b178fd21713a3f49d40d429d97dbafead26b32a",
+          "native_trace_sha256": "0f349b6d15e3ecb5e4c022404adcf15b29950621fe7f6356f3c78873b44d74ab"
+        },
+        {
+          "arm": "candidate",
+          "native_result_sha256": "64ee6ffb9ac859756c038a7b6b178fd21713a3f49d40d429d97dbafead26b32a",
+          "native_trace_sha256": "f3c869954a038e4192814b73fabf66b55c77d4ecb428fa3e5429c67a1d02115d"
+        }
+      ],
+      "dirty_names": [
+        "fixtures"
+      ],
+      "executables": {
+        "[\"crates/mdtest#0.0.0\",\"mdtest\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 49534480,
+          "sha256": "7b890b83af7fc33f15c7608d4b87c0f33879f407075b22b69bced1db7cb76147"
+        },
+        "[\"crates/ruff#0.17.0\",\"analyze_graph\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 18651360,
+          "sha256": "b5f5e44bd2846fd95f516cecc9b6ac0d13cf0c51c2d832400f6de9796d01e9f1"
+        },
+        "[\"crates/ruff#0.17.0\",\"cli\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 88453648,
+          "sha256": "09df63cf19e609784a54c057b49ec1a9a2b29de316a6c6e9ceaa503cf34beb32"
+        },
+        "[\"crates/ruff#0.17.0\",\"config\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 12727952,
+          "sha256": "c1bf1f66f570687445789e4270af87799e7ea72c3369e3da2bac6109bdf12ddc"
+        },
+        "[\"crates/ruff#0.17.0\",\"direxist_guard\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 12725952,
+          "sha256": "a286599895827424c4ebe139b79b46c1710cffde8c36dc7e6b4c70c29510dfc6"
+        },
+        "[\"crates/ruff#0.17.0\",\"integration_test\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 161482952,
+          "sha256": "c1e624400a2a21fc845a06c94a724088992395daeb8e0f27745d02693761e2f3"
+        },
+        "[\"crates/ruff#0.17.0\",\"resolve_files\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15589368,
+          "sha256": "1831ace4ca49322c995f9d70b6f1ff5a584561c6d0424a8780f010ab9628fab7"
+        },
+        "[\"crates/ruff#0.17.0\",\"ruff\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 160470504,
+          "sha256": "5af8937e1154e5737fbbd85e61f110af02d3458d98351843c785adf2f403fe3a"
+        },
+        "[\"crates/ruff#0.17.0\",\"ruff\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 46513728,
+          "sha256": "cc3493a4ea199b4e4c1532a06490eaf3d5c7e781e0a161d4f854620c46c18c35"
+        },
+        "[\"crates/ruff#0.17.0\",\"ruff\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 141874504,
+          "sha256": "e73c390999c50ed8555e88fc1c3d0f9501cee3a559d4e7732305e2b7575479e1"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"color\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 6434248,
+          "sha256": "e3962728e0c24698f3398a662dd15a72c8dc782a6df3f14df70150bda66d3028"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"custom_error\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1817992,
+          "sha256": "e85e5edd71a9cb8c7489bd49f4d55d83d9670594d77f7f9c6f023e7b16f168b9"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"custom_level\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1824360,
+          "sha256": "bddc468612f19ebae4d7d39f85e8235f4f530a61155aa46bbc1e2aaa32b90470"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"elide_header\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1815840,
+          "sha256": "547635c16f368a502f1b03c104f577ad9fc0322046800b7e49f08d6acbb52e8a"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"examples\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 5883496,
+          "sha256": "11a610bce1d33290db08070bb87c9f094c97f9ec036c9dfb9b8072d8d97af975"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"expected_type\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1816168,
+          "sha256": "a890a45381c7681880619f920dd6baaf0b96a881ed38c90c930c234b1d8740db"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"footer\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1818160,
+          "sha256": "702788e8b36f45ba7e9ebff9208b7ebeeb109f5520807f1b25efe48e63ac3b26"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"format\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1818192,
+          "sha256": "fac4f4e53d076835bd6536e48533b967b3b3a5d837a21bdeaebfd98a8a4038fd"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"formatter\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 7029424,
+          "sha256": "cd319b9ca8675c79622673def0c1cb89bc9798776b87018eb7c4c5d8e4458892"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"highlight_message\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1822952,
+          "sha256": "d8e5ec6a11b9a17f34230c8d2b33f7b6cda10cdd7bf348a424236fb03df70a7d"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"highlight_source\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1819272,
+          "sha256": "d8c56dc68ea425cc02322dbd87727980a68b0099e45fbf1e6e3c54452856a485"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"id_hyperlink\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1818536,
+          "sha256": "f8f7710ecbd4c0b38e6a8f64f8da39ff566fadf6f4b5c780837555a198e1c5fc"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"multi_suggestion\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1825424,
+          "sha256": "b4fe3ddf32f46f1abc68965490470b5a2ecd38119b7e709bc8729888253f8139"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"multislice\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1814560,
+          "sha256": "622ce3dedf755a40e17db6c7e636c06d9595658867db1adac95d0a80b786a64b"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"ruff\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 6167968,
+          "sha256": "a9db0de09de6cbc49fa948e36e1068c241d0de5413ea6fe313499aac9dbd3ff8"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"rustc_tests\",[\"test\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 6794752,
+          "sha256": "1b7fee9729785ae3a4e393928e9888f52994aae50988ad25007a6d7b20cc9ac7"
+        },
+        "[\"crates/ruff_annotate_snippets#0.0.17\",\"struct_name_as_context\",[\"example\"],[\"default\",\"simd\",\"std\",\"testing-colors\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1817048,
+          "sha256": "9eca8aa70279960cd99e7fe6f9c6e3ae52426eb559e88358cfee0e9c469ead50"
+        },
+        "[\"crates/ruff_cache#0.0.17\",\"cache_key\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1137960,
+          "sha256": "2476fe8caa04a3820898b8e19c21026fc39ecd7ca7a1a866fc159d03b8f1a2c3"
+        },
+        "[\"crates/ruff_command_line#0.0.17\",\"ruff_command_line\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1066928,
+          "sha256": "c2c42935224ad18b2d2afc0603f81003d4f157186557ca7d36fa392342e06397"
+        },
+        "[\"crates/ruff_db#0.0.17\",\"ruff_db\",[\"lib\"],[\"cache\",\"ignore\",\"junit\",\"os\",\"ruff_cache\",\"schemars\",\"serde\",\"testing\",\"tracing-subscriber\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 50746320,
+          "sha256": "5cdf6cce6d78695208a7a343710cc8096b6f51fd5753630b927ee58080369b4d"
+        },
+        "[\"crates/ruff_dev#0.0.0\",\"ruff_dev\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 259897848,
+          "sha256": "799db4738d5a70488b42b3b6963177e64369408c924ab1b0f818494f5dfc461e"
+        },
+        "[\"crates/ruff_formatter#0.0.17\",\"ruff_formatter\",[\"lib\"],[\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 8588320,
+          "sha256": "c0d41426a91a861908f329e44eb508312e51c0da7d85d3fd1f33780c2705fdfe"
+        },
+        "[\"crates/ruff_index#0.0.17\",\"ruff_index\",[\"lib\"],[\"salsa\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1226296,
+          "sha256": "37051115761888543e7184b78c366b1953fd76c65f0223235481b997531693c8"
+        },
+        "[\"crates/ruff_linter#0.17.0\",\"ruff_linter\",[\"lib\"],[\"clap\",\"default\",\"schemars\",\"test-rules\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 115571816,
+          "sha256": "263f0ad1ae997472ed9f884232019837559b53f5469a1753670756b27df32d8e"
+        },
+        "[\"crates/ruff_markdown#0.0.17\",\"ruff_markdown\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 101981240,
+          "sha256": "bb1c59078393a2ed011e841ab4dea49eacb3db6de267d17eaa7cfa52bf890dcc"
+        },
+        "[\"crates/ruff_mdtest#0.0.0\",\"mdtest\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 132335920,
+          "sha256": "cad3a2569da419609ca54bf4548d9f15c82584297fa08edcaa0d740f9a5c885d"
+        },
+        "[\"crates/ruff_notebook#0.0.17\",\"ruff_notebook\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 4602360,
+          "sha256": "2187b6ad5e106e6c2b0e251f347fee0b1b6a0578b22d5edd16b6eda1b70c7b9e"
+        },
+        "[\"crates/ruff_python_ast#0.0.17\",\"ruff_python_ast\",[\"lib\"],[\"cache\",\"get-size\",\"salsa\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 9406952,
+          "sha256": "a5728fb665115eacdd28fa0b9999afa1776113b813a1712d54b30ef39c962cee"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"comparable\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15284056,
+          "sha256": "3c20ee55cd747e83fe6bdf05f354aab785ff257c2f898112c1a11df98d581161"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"identifier\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15027584,
+          "sha256": "e17ea54fc58c0ff1097ee6bb7f894fbb622ed3b0e2dc2e02d9fe35798635ef5b"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"match_pattern\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15003584,
+          "sha256": "a6569cb554132be87e2b955de2378ab8d4092bf097ded90ed420498f231a96a9"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"parentheses\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15235712,
+          "sha256": "93e1e1bc5de417fe0c2ac593569d5342c1c65aacf1bff626ef024412bb9db958"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"parenthesize\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15125592,
+          "sha256": "ff2ca84f0f0563c73c3cf27883fdf99ca43e2752fd813ed7aaad68bb96405347"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"source_order\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 20782880,
+          "sha256": "e8aa17aa280d393e378b2aa53502b46a9d8eb2fb3fc4927e16645ab7f1a2a38d"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"stmt_if\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15022656,
+          "sha256": "744dadc2c7c8acb614cbb289fa549d8b4acf571344aa00b2c4ee0d9e721a456e"
+        },
+        "[\"crates/ruff_python_ast_integration_tests#0.0.0\",\"visitor\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 20764976,
+          "sha256": "6f176ed53e11a9d72d05e9201d47bc53866909b090ee58a9ee30810183b521a9"
+        },
+        "[\"crates/ruff_python_codegen#0.0.17\",\"ruff_python_codegen\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 16497416,
+          "sha256": "b5bbe6e029a4522d03d3d928c73fd7504e528c884e1a2f25283653d64a5ec9b1"
+        },
+        "[\"crates/ruff_python_edits#0.0.17\",\"ruff_python_edits\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15313544,
+          "sha256": "d60494900aa85eaccff28c10b33cd1f897fc8d2869b73dab7a59b644e4a9cbe6"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"fixtures\",[\"test\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 58720248,
+          "sha256": "33dd9e28a7c9c8bcb062bda4f52f26d8d3240a4a1f6c529bd7c6a99d41677d92"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"normalizer\",[\"test\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 6446512,
+          "sha256": "5a7cca7c195114340fb81a5ad1605e61561063841d35c333642512fb3cec8d47"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"ruff_python_formatter\",[\"bin\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 48138176,
+          "sha256": "bbb42dfefb8e3cd39b0cab224fab1acf7e82cb861732b9b42288094d980c110b"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"ruff_python_formatter\",[\"bin\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 36462784,
+          "sha256": "a71cc33bd7e2ab80e9ee6283cc8cd523633112f4ef09a42c2dbed93e17631b72"
+        },
+        "[\"crates/ruff_python_formatter#0.0.17\",\"ruff_python_formatter\",[\"lib\"],[\"default\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 52580496,
+          "sha256": "4c2d645905840007cfc25b47125b6ef73ad546950e9b9e154c6e3b95c84a2722"
+        },
+        "[\"crates/ruff_python_importer#0.0.17\",\"ruff_python_importer\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 21704904,
+          "sha256": "68ee6179adecd88ce85d8a6e0b56b61fafaafba7937779cef7930f7684f8c17b"
+        },
+        "[\"crates/ruff_python_index#0.0.17\",\"ruff_python_index\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15229488,
+          "sha256": "1059be75f936dd891a44a0859e9fe4a40cbedb492424649a0f98a2ba490d33a1"
+        },
+        "[\"crates/ruff_python_literal#0.0.17\",\"ruff_python_literal\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 12014304,
+          "sha256": "f1ad1ec6287c0e4b6c6afabb1daada434ad5ce6f0fd65d26b6f840e7988afde6"
+        },
+        "[\"crates/ruff_python_parser#0.0.17\",\"fixtures\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 31050456,
+          "sha256": "fd2737bee7d4449ad0d26bb473ec27294098498ad43e935601c95b62ff9c472e"
+        },
+        "[\"crates/ruff_python_parser#0.0.17\",\"generate_inline_tests\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1871976,
+          "sha256": "ea2c9135af82f173b12ab5721948b2b6b3cd819797249212b69b26ea58930a02"
+        },
+        "[\"crates/ruff_python_parser#0.0.17\",\"ruff_python_parser\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 21799592,
+          "sha256": "15e521d91552dbfb2d3b26e1a80fba3f05197aaaf787f5cc91f3a40671d203b9"
+        },
+        "[\"crates/ruff_python_semantic#0.0.17\",\"ruff_python_semantic\",[\"lib\"],[\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 21058720,
+          "sha256": "2811bdd9859200e925221d7c48f96d2df444a9c0c2f89a3b46556010cad078ed"
+        },
+        "[\"crates/ruff_python_stdlib#0.0.17\",\"ruff_python_stdlib\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1208392,
+          "sha256": "24da7b76761ec3b3e230da81f0eb26648baa87b3cfde9da4c720ba8d3259d419"
+        },
+        "[\"crates/ruff_python_trivia#0.0.17\",\"ruff_python_trivia\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 3083112,
+          "sha256": "06500200bba5a9880142ff648128c4c637438e90b514fadc7c24d7ede2ee0827"
+        },
+        "[\"crates/ruff_python_trivia_integration_tests#0.0.0\",\"block_comments\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15057976,
+          "sha256": "be50390e19b30c1aaada28e91c3f9a8244c479cb2124c32b76225ebd1b0c9a14"
+        },
+        "[\"crates/ruff_python_trivia_integration_tests#0.0.0\",\"simple_tokenizer\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 20846936,
+          "sha256": "a433335a82a77250e1e68d3c153b03b4fe9969c8f055b6fb43487acb759b82c7"
+        },
+        "[\"crates/ruff_python_trivia_integration_tests#0.0.0\",\"whitespace\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 15016344,
+          "sha256": "c28e043276855370cdbc88b1958086b84a844e2f63de1f41b7c0524d7177b7ca"
+        },
+        "[\"crates/ruff_server#0.0.17\",\"document\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 103670256,
+          "sha256": "0e026a1f2f817b4e32f2ab1501ad7be7badb39d0fae16071aa6c75cdd5b4d4cb"
+        },
+        "[\"crates/ruff_server#0.0.17\",\"e2e\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 145333480,
+          "sha256": "f880f9835298ebe354adde5f7fc44c74e99d56047097ca88072b9b9d2936fcb0"
+        },
+        "[\"crates/ruff_server#0.0.17\",\"ruff_server\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 114529944,
+          "sha256": "330f83990a941a8052e420a25c3d4202af370845544d7a2ffc665dafa1b56ab6"
+        },
+        "[\"crates/ruff_source_file#0.0.17\",\"ruff_source_file\",[\"lib\"],[\"get-size\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2696840,
+          "sha256": "78792ab227dd7fde045643fd6d0e6ba9f36bd05f8d677bed6f2ce8ddc00d62cd"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"auto_traits\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1066920,
+          "sha256": "bea3a01770bbbf8dd6733649b77c5dafcfd3654cb32db222cf5cbdbc448814f2"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"constructors\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2557120,
+          "sha256": "118487ed6a49bf051470ff06234bd2824cb3f5e376c9cac8deb6b83e02ad5a8c"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"indexing\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2549096,
+          "sha256": "4db53a949cd2432cf853fd7dc2acc3e6962390f764cc17aca7a270bfb9a91529"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"main\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2590056,
+          "sha256": "7c1b155cfa9cf58a6045e8f79519336e0bb7244b4378decf9ade1222646d0390"
+        },
+        "[\"crates/ruff_text_size#0.0.17\",\"serde\",[\"test\"],[\"get-size\",\"schemars\",\"serde\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 2717832,
+          "sha256": "19a05c040c166e26157e7497e54a886d43df5e1774b487d89a6fde7d8bd841b8"
+        },
+        "[\"crates/ruff_unicode_names2#0.0.17\",\"character\",[\"example\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1356088,
+          "sha256": "23be34efbe51be8245ea7c7e1dbc1ad493e863a1ac32a44912226c5285e7fb28"
+        },
+        "[\"crates/ruff_unicode_names2#0.0.17\",\"count\",[\"example\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 678976,
+          "sha256": "a4dc082b05804dbbfe3d2162487d424831623c11a0ba93615e6aa03d560a6b08"
+        },
+        "[\"crates/ruff_unicode_names2#0.0.17\",\"name\",[\"example\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 1106632,
+          "sha256": "c4d71ce1ace43e36b96c17236f5bccec7318cb644e6cf56d9713b7bd7e0bce61"
+        },
+        "[\"crates/ruff_unicode_names2_generator#0.0.17\",\"unicode_names2_generator\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1088784,
+          "sha256": "5328d68a1e2503c87bbea4112c67a1c2226f24a669fdd1ecbcdfc40098d0ffb2"
+        },
+        "[\"crates/ruff_wasm#0.17.0\",\"api\",[\"test\"],[\"console_error_panic_hook\",\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1066832,
+          "sha256": "db370756c6fadef846dde0243effcea758fc478db06c3a17dffe9a4028f29a31"
+        },
+        "[\"crates/ruff_workspace#0.0.17\",\"ruff_workspace\",[\"lib\"],[\"default\",\"schemars\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 101289984,
+          "sha256": "856ca1bf8549f30e134c2916c2985c5636a576a0135186ce70c7e13e246b7d9b"
+        },
+        "[\"crates/ty#0.0.0\",\"cli\",[\"test\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 21982336,
+          "sha256": "d69f27831aa990ac7864c00e7dacc3da574e04f80dce1540a4d2b82ab9321b36"
+        },
+        "[\"crates/ty#0.0.0\",\"file_watching\",[\"test\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 194658808,
+          "sha256": "14cbc3464512032374b5a943c48e1518bdd907524c3a950d50c20904de406719"
+        },
+        "[\"crates/ty#0.0.0\",\"self_environment\",[\"test\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 16920936,
+          "sha256": "e7f03a022646a0ec61687c2bfdc951885fe4e77f551f1cd0f3464eed3cba760a"
+        },
+        "[\"crates/ty#0.0.0\",\"ty\",[\"bin\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":false}]": {
+          "bytes": 226931000,
+          "sha256": "01e8b66c4459a74736a0f06327ca07100badc2e0c2c6585ad7516005a50cd92e"
+        },
+        "[\"crates/ty#0.0.0\",\"ty\",[\"bin\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 191136792,
+          "sha256": "cfab716d2ca96f378a13f30dea93f7b2a55a351ad07e3b16faf395807d6ef3f1"
+        },
+        "[\"crates/ty#0.0.0\",\"ty\",[\"lib\"],[\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 191091048,
+          "sha256": "c0c2898b581f83fd2702874df59575ccdac158ee0952884789528af493d01f58"
+        },
+        "[\"crates/ty_combine#0.0.17\",\"ty_combine\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 36707240,
+          "sha256": "6ad41186b9aca42580b7e0120679666df90333797a764465d2e3520be5a14917"
+        },
+        "[\"crates/ty_completion_bench#0.0.0\",\"ty_completion_bench\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 185853008,
+          "sha256": "1227ba5a1d09b304d71c4ad8cf22fdd731ef2e0f568d6d9f6881af2910b3a051"
+        },
+        "[\"crates/ty_completion_eval#0.0.0\",\"ty_completion_eval\",[\"bin\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 185854800,
+          "sha256": "f5070b92f6b374b50c0000207e16d13a8dccf635f6e93b9c3ca7eb1998602ea0"
+        },
+        "[\"crates/ty_ide#0.0.0\",\"ty_ide\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 208433656,
+          "sha256": "4ede5249980014484dbe9e308a4223467cdba2076b7ca333373decc20a05bf73"
+        },
+        "[\"crates/ty_module_resolver#0.0.17\",\"ty_module_resolver\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 54476120,
+          "sha256": "039b09dc1dfe6a629a7058ac731fbf3f9ba6bb854909c945a791b4800add3aba"
+        },
+        "[\"crates/ty_project#0.0.0\",\"ty_project\",[\"lib\"],[\"default\",\"deflate\",\"format\",\"junit\",\"ruff_python_formatter\",\"schemars\",\"testing\",\"zstd\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 192318296,
+          "sha256": "9fa9e45f39b63391fc27200e71a9e3b4f67cda908e1298038663555cf1a4f038"
+        },
+        "[\"crates/ty_python_core#0.0.17\",\"ty_python_core\",[\"lib\"],[\"schemars\",\"serde\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 55270272,
+          "sha256": "4ef08922081485d23e711663cc097aa4317db3f1dd065007dca2f22c584d6dc6"
+        },
+        "[\"crates/ty_python_semantic#0.0.17\",\"corpus\",[\"test\"],[\"schemars\",\"serde\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 165076192,
+          "sha256": "6cdc995daa346788188b3e11ba5819ffffb81622a33ad37bd8c7b653d026aef4"
+        },
+        "[\"crates/ty_python_semantic#0.0.17\",\"mdtest\",[\"test\"],[\"schemars\",\"serde\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 184174344,
+          "sha256": "f341bc8bd92d4b162eb2d0d6d4ae2157faa0de4c19a695975e37d7e0080853b4"
+        },
+        "[\"crates/ty_python_semantic#0.0.17\",\"ty_python_semantic\",[\"lib\"],[\"schemars\",\"serde\",\"testing\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 179028528,
+          "sha256": "f661575d6bf59c1c7799d7585d89c76b83e5f87cf25207217bab14a9ab7f7167"
+        },
+        "[\"crates/ty_server#0.0.0\",\"e2e\",[\"test\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 225655240,
+          "sha256": "8f2754c7668a6ce184a8f9c5b9783cf0ffb1e17cfd4f4404999b9673c620f04c"
+        },
+        "[\"crates/ty_server#0.0.0\",\"ty_server\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 191815304,
+          "sha256": "540aaa64abb6c45c42f480e170c1b32a19136dbafee3959535507407e2f07ace"
+        },
+        "[\"crates/ty_site_packages#0.0.17\",\"ty_site_packages\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 42292616,
+          "sha256": "76d254d7a6141912020f08e0d04cf8eba9ca05c3c589abadb46a011a5a8767ba"
+        },
+        "[\"crates/ty_test#0.0.0\",\"ty_test\",[\"lib\"],[],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 165959752,
+          "sha256": "7e7140d4713d00e2e73c7a80c11ab431faee4f94848c668ef8b7d4856db5b6ec"
+        },
+        "[\"crates/ty_vendored#0.0.17\",\"ty_vendored\",[\"lib\"],[\"deflate\",\"zstd\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 38504200,
+          "sha256": "61075d5aabe9c59841fcd976b87a767cff247776c5aae32e871eb77cc85f97c1"
+        },
+        "[\"crates/ty_wasm#0.0.0\",\"api\",[\"test\"],[\"console_error_panic_hook\",\"default\"],{\"debug_assertions\":true,\"debuginfo\":\"line-tables-only\",\"opt_level\":\"1\",\"overflow_checks\":true,\"test\":true}]": {
+          "bytes": 1066824,
+          "sha256": "ea28d17cfe4db48db05aaf3f7df2ab45486d430650bd7f539ef43db540aa080a"
+        }
+      },
+      "processes": {
+        "cargo": 1,
+        "clang": 1,
+        "rustc": 1,
+        "wild": 1
+      },
+      "rustc_crates": [
+        "fixtures"
+      ],
+      "unit_graph_sha256": "962cf55eb72ff9e663acff00226488b24e77eddcbbf4a8ac9deb831dce0a2a92",
+      "units": 619
+    }
+  }
+}

@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+case "$1 $2" in 'cargo +ohm') shift 2;; *) exit 90;; esac
+real="$RUSTUP_HOME/toolchains/ohm/bin/cargo"
+[ -x "$real" ] && [ -n "$OHM_HIST_IR" ]
+printf '%s\0' "$real" "$@" > "$OHM_HIST_IR/cargo.$$.argv"
+exec rustup run ohm "$OHM_DRRUN" -no_follow_children -c "$OHM_PIDCOUNTER" "$OHM_HIST_IR/cargo.$$.ir" -- "$real" "$@"

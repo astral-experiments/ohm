@@ -1,0 +1,10 @@
+#!/bin/sh
+if [ -n "${OHM_HIST_NATIVE:-}" ]; then
+ printf '%s\0' "$@" > "$OHM_HIST_NATIVE/rustc.$$.argv"
+fi
+if [ -n "${OHM_HIST_IR:-}" ]; then
+ printf '%s\0' "$@" > "$OHM_HIST_IR/rustc.$$.argv"
+ exec valgrind --tool=cachegrind --cache-sim=no --branch-sim=no --trace-children=yes --vgdb=no --verbose \
+  "--cachegrind-out-file=$OHM_HIST_IR/guest.%p" "--log-file=$OHM_HIST_IR/vg.%p" "$@"
+fi
+exec "$@"
