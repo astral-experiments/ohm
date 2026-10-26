@@ -23,7 +23,7 @@ def main():
         "output", type=Path, help="new directory for the linker and licenses"
     )
     args = parser.parse_args()
-    info = json.loads((args.coordinator / "toolchains/1.99.0/15.json").read_bytes())[
+    info = json.loads((args.coordinator / "toolchains/1.99.0/16.json").read_bytes())[
         "bundled_tools"
     ]["wild"]
     revision = info["source"]["revision"]
