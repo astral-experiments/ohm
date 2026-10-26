@@ -4,9 +4,11 @@
 import hashlib
 import io
 import json
+import os
 import pathlib
 import re
 import shutil
+import subprocess
 import sys
 import tarfile
 import tempfile
@@ -14,6 +16,46 @@ import urllib.request
 
 TARGET = "x86_64-unknown-linux-gnu"
 FILES = ("wild", "LICENSE-APACHE", "LICENSE-MIT")
+
+
+def fetch_archive(url, checksum):
+    with urllib.request.urlopen(url, timeout=120) as response:
+        payload = response.read()
+    if hashlib.sha256(payload).hexdigest() != checksum:
+        raise ValueError("Wild archive checksum mismatch")
+    return payload
+
+
+def build_source(source, version, checksum, destination):
+    revision = source["revision"]
+    builder = source["builder_sha256"]
+    binary = source["binary_sha256"]
+    if not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("invalid Wild source revision")
+    if not all(re.fullmatch(r"[0-9a-f]{64}", value) for value in (builder, binary)):
+        raise ValueError("invalid Wild build digest")
+
+    payload = fetch_archive(f"https://codeload.github.com/wild-linker/wild/tar.gz/{revision}", checksum)
+    destination = pathlib.Path(destination).resolve()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=destination.parent) as temporary:
+        work = pathlib.Path(temporary)
+        (work / "source.tar.gz").write_bytes(payload)
+        shutil.copyfile(pathlib.Path(__file__).with_name("build-wild.sh"), work / "build-wild.sh")
+        subprocess.run([
+            "docker", "run", "--rm", "--platform=linux/amd64", "--user", f"{os.getuid()}:{os.getgid()}",
+            "--mount", f"type=bind,src={work},dst=/work", "--workdir=/work", "--env", "CARGO_HOME=/work/cargo",
+            f"docker.io/library/rust@sha256:{builder}", "sh", "build-wild.sh",
+        ], check=True, stdout=sys.stderr)
+        staged = work / "wild"
+        executable = staged / "wild"
+        if hashlib.sha256(executable.read_bytes()).hexdigest() != binary:
+            raise ValueError("Wild binary checksum mismatch")
+        actual = subprocess.check_output([executable, "--version"], text=True)
+        if not actual.startswith(f"Wild {version} "):
+            raise ValueError(f"unexpected Wild version: {actual.strip()}")
+        staged.rename(destination)
+    return destination
 
 
 def prepare(manifest, target, destination):
@@ -26,12 +68,11 @@ def prepare(manifest, target, destination):
         raise ValueError("invalid Wild version")
     if not re.fullmatch(r"[0-9a-f]{64}", checksum):
         raise ValueError("invalid Wild SHA-256")
+    if "source" in wild:
+        return build_source(wild["source"], version, checksum, destination)
     name = f"wild-linker-{version}-{TARGET}"
     url = f"https://github.com/wild-linker/wild/releases/download/{version}/{name}.tar.gz"
-    with urllib.request.urlopen(url, timeout=120) as response:
-        payload = response.read()
-    if hashlib.sha256(payload).hexdigest() != checksum:
-        raise ValueError("Wild archive checksum mismatch")
+    payload = fetch_archive(url, checksum)
 
     destination = pathlib.Path(destination).resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)

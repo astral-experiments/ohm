@@ -30,6 +30,10 @@ and Apache licenses. Bootstrap installs the linker as
 both GCC and Clang find Wild with `-B` and `-fuse-ld=bfd`. The system C compiler
 driver still supplies startup objects and system libraries.
 
+A `source` entry selects a source build. Its `revision` names the upstream Wild commit and `sha256` in the
+parent object checks the source archive. The entry pins the amd64 Rust builder image and the resulting
+executable by SHA-256. Cargo builds the upstream `dist` profile with ThinLTO and `--locked`.
+
 The version-specific installer verifies Wild's version, and release smoke tests
 build and run with both Wild and LLD. Provenance records the Wild version and
 archive checksum. Older manifests and macOS distributions omit Wild.
