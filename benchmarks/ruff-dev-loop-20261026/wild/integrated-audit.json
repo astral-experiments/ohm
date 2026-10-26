@@ -1,0 +1,2115 @@
+{
+  "cohort": "shared prebuilt baseline dependencies",
+  "audits": {
+    "build": {
+      "snapshot": {
+        "entries": 14695,
+        "sha256": "52d1acc3bd811d8e7810a4762e42f2e361a4e2b2fc1f650cca74dcece1605997",
+        "unique_file_bytes": 6018296520
+      },
+      "native_exec": {
+        "parent": [
+          [
+            "3282168",
+            "/home/dev-user/.cargo/bin/rustup"
+          ],
+          [
+            "3282168",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/dr-dispatch/bin/cargo"
+          ],
+          [
+            "3282168",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo"
+          ],
+          [
+            "3282851",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/compiler-wrapper"
+          ],
+          [
+            "3282851",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/audited-compiler-wrapper"
+          ],
+          [
+            "3282851",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc"
+          ],
+          [
+            "3283257",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/clang"
+          ],
+          [
+            "3283257",
+            "/usr/lib/llvm-18/bin/clang"
+          ],
+          [
+            "3283285",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/wild-dispatch"
+          ],
+          [
+            "3283285",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd"
+          ]
+        ],
+        "stack": [
+          [
+            "3289044",
+            "/home/dev-user/.cargo/bin/rustup"
+          ],
+          [
+            "3289044",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/dr-dispatch/bin/cargo"
+          ],
+          [
+            "3289044",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo"
+          ],
+          [
+            "3289604",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/compiler-wrapper"
+          ],
+          [
+            "3289604",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/audited-compiler-wrapper"
+          ],
+          [
+            "3289604",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc"
+          ],
+          [
+            "3289855",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/clang"
+          ],
+          [
+            "3289855",
+            "/usr/lib/llvm-18/bin/clang"
+          ],
+          [
+            "3289859",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/wild-dispatch"
+          ],
+          [
+            "3289859",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd"
+          ]
+        ]
+      },
+      "compiler_state": {
+        "parent": {
+          "default_driver": [
+            64800,
+            14978485,
+            1793042448707452324,
+            162571424
+          ],
+          "frontend": [
+            64800,
+            14978489,
+            1793042446558438645,
+            171720
+          ],
+          "selected_driver": [
+            64800,
+            14978590,
+            1793042447984447723,
+            162571424
+          ]
+        },
+        "stack": {
+          "default_driver": [
+            64800,
+            14978485,
+            1793042448707452324,
+            162571424
+          ],
+          "frontend": [
+            64800,
+            14978489,
+            1793042446558438645,
+            171720
+          ],
+          "selected_driver": [
+            64800,
+            14978592,
+            1793042448292449683,
+            162544992
+          ]
+        }
+      },
+      "tools": {
+        "audited_compiler_wrapper": "b64346aae62ba44938e62e25c7dbb5641bc638c5c21afcfe44017da0b8e90e1f",
+        "cachegrind": "valgrind-3.22.0",
+        "drrun": "f92d796060b53c1ec14ac97e089edfb29a3ce8bd17c2c011fd763054d10f4b55",
+        "outer_compiler_wrapper": "aaa4e438cf7181070c076c314be52b89304413d5e3561a012abfee4f73c8c02a",
+        "pidcounter": "79f0c15d45b8d6b58a657b1816d4c2db2f798a9dbba4a1d02b3f2f3a1bda8204"
+      },
+      "probes": {
+        "parent": {
+          "counts": {
+            "cargo": 1600588769,
+            "clang": 88469865,
+            "ld.bfd": 3344590791,
+            "rustc": 486012746
+          },
+          "engines": {
+            "cargo": "DynamoRIO",
+            "clang": "Cachegrind",
+            "ld.bfd": "Cachegrind",
+            "rustc": "Cachegrind"
+          },
+          "images": {
+            "cargo": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+              "pid": 3283466,
+              "threads": 13
+            },
+            "clang": {
+              "image": "/usr/lib/llvm-18/bin/clang",
+              "pid": 3287609
+            },
+            "ld.bfd": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+              "pid": 3287722
+            },
+            "rustc": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+              "pid": 3283999
+            }
+          },
+          "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+          "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+        },
+        "stack": {
+          "counts": {
+            "cargo": 1578469893,
+            "clang": 88469873,
+            "ld.bfd": 3229296702,
+            "rustc": 485620115
+          },
+          "engines": {
+            "cargo": "DynamoRIO",
+            "clang": "Cachegrind",
+            "ld.bfd": "Cachegrind",
+            "rustc": "Cachegrind"
+          },
+          "images": {
+            "cargo": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+              "pid": 3290115,
+              "threads": 13
+            },
+            "clang": {
+              "image": "/usr/lib/llvm-18/bin/clang",
+              "pid": 3293629
+            },
+            "ld.bfd": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+              "pid": 3294494
+            },
+            "rustc": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+              "pid": 3290666
+            }
+          },
+          "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+          "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+        }
+      }
+    },
+    "test": {
+      "snapshot": {
+        "entries": 24408,
+        "sha256": "150f7bf918f454969035bf287dd121057ad0306c93fd13374cd9f63b3d3b88f5",
+        "unique_file_bytes": 13650807361
+      },
+      "native_exec": {
+        "parent": [
+          [
+            "3284072",
+            "/home/dev-user/.cargo/bin/rustup"
+          ],
+          [
+            "3284072",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/dr-dispatch/bin/cargo"
+          ],
+          [
+            "3284072",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo"
+          ],
+          [
+            "3284367",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/compiler-wrapper"
+          ],
+          [
+            "3284367",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/audited-compiler-wrapper"
+          ],
+          [
+            "3284367",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc"
+          ],
+          [
+            "3284572",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/clang"
+          ],
+          [
+            "3284572",
+            "/usr/lib/llvm-18/bin/clang"
+          ],
+          [
+            "3284579",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/wild-dispatch"
+          ],
+          [
+            "3284579",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd"
+          ]
+        ],
+        "stack": [
+          [
+            "3292689",
+            "/home/dev-user/.cargo/bin/rustup"
+          ],
+          [
+            "3292689",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/dr-dispatch/bin/cargo"
+          ],
+          [
+            "3292689",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo"
+          ],
+          [
+            "3293271",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/compiler-wrapper"
+          ],
+          [
+            "3293271",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/audited-compiler-wrapper"
+          ],
+          [
+            "3293271",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc"
+          ],
+          [
+            "3293453",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/clang"
+          ],
+          [
+            "3293453",
+            "/usr/lib/llvm-18/bin/clang"
+          ],
+          [
+            "3293468",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/wild-dispatch"
+          ],
+          [
+            "3293468",
+            "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd"
+          ]
+        ]
+      },
+      "compiler_state": {
+        "parent": {
+          "default_driver": [
+            64800,
+            15362308,
+            1793042459980524006,
+            162571424
+          ],
+          "frontend": [
+            64800,
+            15362312,
+            1793042458322513471,
+            171720
+          ],
+          "selected_driver": [
+            64800,
+            15362422,
+            1793042459233519260,
+            162571424
+          ]
+        },
+        "stack": {
+          "default_driver": [
+            64800,
+            15362308,
+            1793042459980524006,
+            162571424
+          ],
+          "frontend": [
+            64800,
+            15362312,
+            1793042458322513471,
+            171720
+          ],
+          "selected_driver": [
+            64800,
+            15362418,
+            1793042459537521191,
+            162544992
+          ]
+        }
+      },
+      "tools": {
+        "audited_compiler_wrapper": "b64346aae62ba44938e62e25c7dbb5641bc638c5c21afcfe44017da0b8e90e1f",
+        "cachegrind": "valgrind-3.22.0",
+        "drrun": "f92d796060b53c1ec14ac97e089edfb29a3ce8bd17c2c011fd763054d10f4b55",
+        "outer_compiler_wrapper": "c8c0bc40c6d3cc7f4a320a541768c732a5b2d45d9d49743585a08fd5afc1076f",
+        "pidcounter": "79f0c15d45b8d6b58a657b1816d4c2db2f798a9dbba4a1d02b3f2f3a1bda8204"
+      },
+      "probes": {
+        "parent": {
+          "counts": {
+            "cargo": 1230973107,
+            "clang": 70067940,
+            "ld.bfd": 1212983960,
+            "rustc": 2101990793
+          },
+          "engines": {
+            "cargo": "DynamoRIO",
+            "clang": "Cachegrind",
+            "ld.bfd": "Cachegrind",
+            "rustc": "Cachegrind"
+          },
+          "images": {
+            "cargo": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+              "pid": 3285146,
+              "threads": 13
+            },
+            "clang": {
+              "image": "/usr/lib/llvm-18/bin/clang",
+              "pid": 3290785
+            },
+            "ld.bfd": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+              "pid": 3290932
+            },
+            "rustc": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+              "pid": 3285524
+            }
+          },
+          "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+          "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+        },
+        "stack": {
+          "counts": {
+            "cargo": 1194620193,
+            "clang": 70067953,
+            "ld.bfd": 1171054636,
+            "rustc": 2109512894
+          },
+          "engines": {
+            "cargo": "DynamoRIO",
+            "clang": "Cachegrind",
+            "ld.bfd": "Cachegrind",
+            "rustc": "Cachegrind"
+          },
+          "images": {
+            "cargo": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+              "pid": 3294578,
+              "threads": 13
+            },
+            "clang": {
+              "image": "/usr/lib/llvm-18/bin/clang",
+              "pid": 3303817
+            },
+            "ld.bfd": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+              "pid": 3303916
+            },
+            "rustc": {
+              "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+              "pid": 3294939
+            }
+          },
+          "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+          "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+        }
+      }
+    }
+  },
+  "scored_processes": {
+    "build-0-0": {
+      "counts": {
+        "cargo": 1600583456,
+        "clang": 88460132,
+        "ld.bfd": 3346300554,
+        "rustc": 485281786
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3332257,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3335238
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3335548
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3332392
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-0-1": {
+      "counts": {
+        "cargo": 1578380960,
+        "clang": 88460109,
+        "ld.bfd": 3230639909,
+        "rustc": 483666304
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3336296,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3345271
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3345870
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3336952
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-1-0": {
+      "counts": {
+        "cargo": 1600448686,
+        "clang": 88460132,
+        "ld.bfd": 3344692482,
+        "rustc": 485145703
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3348232,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3357866
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3358812
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3349618
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-1-1": {
+      "counts": {
+        "cargo": 1578457921,
+        "clang": 88460109,
+        "ld.bfd": 3230877992,
+        "rustc": 484545484
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3360687,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3361870
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3361935
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3360855
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-2-0": {
+      "counts": {
+        "cargo": 1600406649,
+        "clang": 88460132,
+        "ld.bfd": 3345140597,
+        "rustc": 484776818
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3363555,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3366561
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3367015
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3364006
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-2-1": {
+      "counts": {
+        "cargo": 1578489990,
+        "clang": 88460109,
+        "ld.bfd": 3228873209,
+        "rustc": 484072971
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3369095,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3371087
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3371447
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3369413
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-3-0": {
+      "counts": {
+        "cargo": 1600795768,
+        "clang": 88460132,
+        "ld.bfd": 3344281845,
+        "rustc": 485839276
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3372635,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3378726
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3379131
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3372875
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-3-1": {
+      "counts": {
+        "cargo": 1578395022,
+        "clang": 88460109,
+        "ld.bfd": 3231052567,
+        "rustc": 485161449
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3381317,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3384563
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3385811
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3381533
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-4-0": {
+      "counts": {
+        "cargo": 1600591652,
+        "clang": 88460132,
+        "ld.bfd": 3345467844,
+        "rustc": 484784651
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3388048,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3391213
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3391320
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3389643
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-4-1": {
+      "counts": {
+        "cargo": 1578480398,
+        "clang": 88460109,
+        "ld.bfd": 3232219994,
+        "rustc": 484391941
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3391759,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3395763
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3396378
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3391923
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-5-0": {
+      "counts": {
+        "cargo": 1600266808,
+        "clang": 88460132,
+        "ld.bfd": 3343577236,
+        "rustc": 485685141
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3398473,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3401963
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3402187
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3399489
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-5-1": {
+      "counts": {
+        "cargo": 1578522885,
+        "clang": 88460109,
+        "ld.bfd": 3230465332,
+        "rustc": 485064728
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3404151,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3407370
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3407529
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3404304
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-6-0": {
+      "counts": {
+        "cargo": 1600626578,
+        "clang": 88460132,
+        "ld.bfd": 3345738740,
+        "rustc": 484735451
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3408628,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3410610
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3410976
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3409282
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-6-1": {
+      "counts": {
+        "cargo": 1578285240,
+        "clang": 88460109,
+        "ld.bfd": 3230794960,
+        "rustc": 484252414
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3411275,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3415666
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3415900
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3411506
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-7-0": {
+      "counts": {
+        "cargo": 1578320633,
+        "clang": 88460109,
+        "ld.bfd": 3230614730,
+        "rustc": 484688081
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3416855,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3421082
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3421290
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3417503
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-7-1": {
+      "counts": {
+        "cargo": 1600694441,
+        "clang": 88460132,
+        "ld.bfd": 3343385537,
+        "rustc": 485729277
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3422617,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3426880
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3427633
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3423178
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-8-0": {
+      "counts": {
+        "cargo": 1578568158,
+        "clang": 88460109,
+        "ld.bfd": 3231692637,
+        "rustc": 484056197
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3431983,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3437654
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3438255
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3432825
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-8-1": {
+      "counts": {
+        "cargo": 1600879669,
+        "clang": 88460132,
+        "ld.bfd": 3346039919,
+        "rustc": 484436001
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3441928,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3447238
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3447502
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3443529
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-9-0": {
+      "counts": {
+        "cargo": 1600839423,
+        "clang": 88460132,
+        "ld.bfd": 3345276870,
+        "rustc": 484616766
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3449140,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3452291
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3452764
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3449559
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-9-1": {
+      "counts": {
+        "cargo": 1578212097,
+        "clang": 88460109,
+        "ld.bfd": 3229152876,
+        "rustc": 485268503
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3453475,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3459001
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3459837
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3453711
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-10-0": {
+      "counts": {
+        "cargo": 1578158985,
+        "clang": 88460109,
+        "ld.bfd": 3227863493,
+        "rustc": 485093304
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3461936,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3466506
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3466818
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3462477
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "build-10-1": {
+      "counts": {
+        "cargo": 1600920204,
+        "clang": 88460132,
+        "ld.bfd": 3344107754,
+        "rustc": 485156073
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3468634,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3473152
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3473624
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3469297
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-11-0": {
+      "counts": {
+        "cargo": 1600636349,
+        "clang": 88460132,
+        "ld.bfd": 3344231153,
+        "rustc": 484547830
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3475132,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3480413
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3480712
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3475749
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "build-11-1": {
+      "counts": {
+        "cargo": 1578305952,
+        "clang": 88460109,
+        "ld.bfd": 3228983601,
+        "rustc": 484731281
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/cargo",
+          "pid": 3483134,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3488512
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/ld.bfd",
+          "pid": 3489067
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/runtime/bin/rustc",
+          "pid": 3484233
+        }
+      },
+      "one_rustc_argv_sha256": "f2a02561f8f3ecfe1f34fa8fd9f79ad6d70502cf351837a764c23f05d96ad76e",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-build/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-0-0": {
+      "counts": {
+        "cargo": 1195079912,
+        "clang": 70074224,
+        "ld.bfd": 1171530718,
+        "rustc": 2098402759
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3332352,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3336948
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3337333
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3332563
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-0-1": {
+      "counts": {
+        "cargo": 1230864005,
+        "clang": 70074247,
+        "ld.bfd": 1213655822,
+        "rustc": 2101776790
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3341826,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3355337
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3356272
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3343104
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-1-0": {
+      "counts": {
+        "cargo": 1231465301,
+        "clang": 70074247,
+        "ld.bfd": 1212914535,
+        "rustc": 2102400077
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3359394,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3362044
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3362485
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3360035
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-1-1": {
+      "counts": {
+        "cargo": 1194918371,
+        "clang": 70074224,
+        "ld.bfd": 1171435818,
+        "rustc": 2110272504
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3364152,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3369649
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3369735
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3364597
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-2-0": {
+      "counts": {
+        "cargo": 1194420885,
+        "clang": 70074224,
+        "ld.bfd": 1171263806,
+        "rustc": 2098282706
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3370993,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3378116
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3378703
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3371144
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-2-1": {
+      "counts": {
+        "cargo": 1231788937,
+        "clang": 70074247,
+        "ld.bfd": 1213085817,
+        "rustc": 2102127586
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3381311,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3388295
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3389280
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3381535
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-3-0": {
+      "counts": {
+        "cargo": 1230977468,
+        "clang": 70074247,
+        "ld.bfd": 1213214037,
+        "rustc": 2113779428
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3390783,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3395030
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3395041
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3391047
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-3-1": {
+      "counts": {
+        "cargo": 1194807606,
+        "clang": 70074224,
+        "ld.bfd": 1170713974,
+        "rustc": 2097327470
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3396709,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3403070
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3403611
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3397544
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-4-0": {
+      "counts": {
+        "cargo": 1194562798,
+        "clang": 70074224,
+        "ld.bfd": 1171372930,
+        "rustc": 2099355432
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3404533,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3409411
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3409465
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3405218
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-4-1": {
+      "counts": {
+        "cargo": 1230856447,
+        "clang": 70074247,
+        "ld.bfd": 1213625296,
+        "rustc": 2103577476
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3410029,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3414679
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3415094
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3410127
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-5-0": {
+      "counts": {
+        "cargo": 1231394808,
+        "clang": 70074247,
+        "ld.bfd": 1213458989,
+        "rustc": 2112786945
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3416420,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3422122
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3422993
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3416945
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-5-1": {
+      "counts": {
+        "cargo": 1194740092,
+        "clang": 70074224,
+        "ld.bfd": 1171291528,
+        "rustc": 2099365480
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3423820,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3434593
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3435171
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3424126
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-6-0": {
+      "counts": {
+        "cargo": 1195234397,
+        "clang": 70074224,
+        "ld.bfd": 1170884773,
+        "rustc": 2109924270
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3438004,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3447433
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3447729
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3439075
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-6-1": {
+      "counts": {
+        "cargo": 1231585018,
+        "clang": 70074247,
+        "ld.bfd": 1213096817,
+        "rustc": 2104287715
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3449619,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3453736
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3454117
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3449896
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-7-0": {
+      "counts": {
+        "cargo": 1194875849,
+        "clang": 70074224,
+        "ld.bfd": 1171625616,
+        "rustc": 2097453602
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3455893,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3464327
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3464814
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3456643
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-7-1": {
+      "counts": {
+        "cargo": 1231807516,
+        "clang": 70074247,
+        "ld.bfd": 1213698468,
+        "rustc": 2115290035
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3466711,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3473441
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3473890
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3467024
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-8-0": {
+      "counts": {
+        "cargo": 1231652435,
+        "clang": 70074247,
+        "ld.bfd": 1212882116,
+        "rustc": 2101841694
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3475705,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3483949
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3484535
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3476016
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-8-1": {
+      "counts": {
+        "cargo": 1194155414,
+        "clang": 70074224,
+        "ld.bfd": 1170667413,
+        "rustc": 2108224845
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3486318,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3493409
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3493768
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3487170
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-9-0": {
+      "counts": {
+        "cargo": 1194581373,
+        "clang": 70074224,
+        "ld.bfd": 1171253269,
+        "rustc": 2097852916
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3495988,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3500292
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3500855
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3496091
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-9-1": {
+      "counts": {
+        "cargo": 1231733593,
+        "clang": 70074247,
+        "ld.bfd": 1213527519,
+        "rustc": 2113600456
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3501957,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3505063
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3505229
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3501997
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-10-0": {
+      "counts": {
+        "cargo": 1195139379,
+        "clang": 70074224,
+        "ld.bfd": 1171562698,
+        "rustc": 2109420428
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3506277,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3518967
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3520403
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3506935
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    },
+    "test-10-1": {
+      "counts": {
+        "cargo": 1231586655,
+        "clang": 70074247,
+        "ld.bfd": 1212849029,
+        "rustc": 2100544340
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3526486,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3541395
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3542498
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3527937
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-11-0": {
+      "counts": {
+        "cargo": 1231456201,
+        "clang": 70074247,
+        "ld.bfd": 1213031882,
+        "rustc": 2113246785
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3548160,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3570373
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3571222
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3549084
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/parent/librustc_driver-774a793a844d5500.so"
+    },
+    "test-11-1": {
+      "counts": {
+        "cargo": 1195000522,
+        "clang": 70074224,
+        "ld.bfd": 1171251132,
+        "rustc": 2098200974
+      },
+      "engines": {
+        "cargo": "DynamoRIO",
+        "clang": "Cachegrind",
+        "ld.bfd": "Cachegrind",
+        "rustc": "Cachegrind"
+      },
+      "images": {
+        "cargo": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/cargo",
+          "pid": 3576429,
+          "threads": 13
+        },
+        "clang": {
+          "image": "/usr/lib/llvm-18/bin/clang",
+          "pid": 3591991
+        },
+        "ld.bfd": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/ld.bfd",
+          "pid": 3592544
+        },
+        "rustc": {
+          "image": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/runtime/bin/rustc",
+          "pid": 3577562
+        }
+      },
+      "one_rustc_argv_sha256": "c2fff941d7ab788c248f66b9c11c46427ee28b1ec9d943185e2d053bbb85b9de",
+      "selected_driver": "/mnt/devbox-scratch/dev-user/ohm-ruff-loop-20261026/wild-full/prebuilt-test/drivers/stack/librustc_driver-774a793a844d5500.so"
+    }
+  }
+}

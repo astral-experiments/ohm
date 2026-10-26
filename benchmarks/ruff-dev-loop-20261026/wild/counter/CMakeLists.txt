@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.14)
+project(pidcounter C CXX)
+find_package(DynamoRIO CONFIG REQUIRED)
+add_library(pidcounter SHARED counter.c)
+configure_DynamoRIO_client(pidcounter)
+use_DynamoRIO_extension(pidcounter drmgr)
+use_DynamoRIO_extension(pidcounter drreg)
