@@ -1,0 +1,44 @@
+{
+  "coordinator_commit": "76474a0e3ae24206f38562344be8a553467ba05c",
+  "wild_source_commit": "c729f2d0cc44ced0ba4e3d187109fed28b8cf5c7",
+  "wild_upstream_commit": "e856d81f6683cad80b9fe0ebf1a0c3c403c6fe11",
+  "upstream_archive_sha256": "490a7660a6f94b333446c5243a211b94078900b5b1421e59205d1aa8f365eb81",
+  "patch_sha256": "e0b56de772ee2c94f3b1977e1557242e3c2dd1e0055ed8707f8a258b49d79a80",
+  "linux_amd64_rust_image_sha256": "8bf7188ae46ad73b801c8d405eedc13ce63a7852b562885743a56890723549a8",
+  "verified_source_files": {
+    "libwild/src/elf_writer.rs": "fdc48be649c86c3d45ddae77c44083332360f7d6eedbec7782d08d5b48cd82c4",
+    "wild/tests/sources/elf/comdat-debug-gc/comdat-debug-gc.s": "90df7dc12a562c4bb56c4544d868ff668fab4ab76aede3a79e2180802f6e0cd7"
+  },
+  "measured_package": {
+    "wild": {
+      "bytes": 10476336,
+      "sha256": "97cd2b7445d07159a210194340a0f8bdbfc08344fa4ea3afbd547f3309cd0cb4"
+    },
+    "LICENSE-APACHE": {
+      "bytes": 9723,
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    "LICENSE-MIT": {
+      "bytes": 1023,
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    }
+  },
+  "clean_rebuilds": {
+    "clean-build": {
+      "outputs_sha256": {
+        "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+        "wild": "97cd2b7445d07159a210194340a0f8bdbfc08344fa4ea3afbd547f3309cd0cb4"
+      },
+      "build_log_sha256": "cfe2b8ddbadd1cac85a67532071be456cec990c09919f6b1340cd5467c120e0f"
+    },
+    "pinned-commit-rebuild": {
+      "outputs_sha256": {
+        "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+        "wild": "97cd2b7445d07159a210194340a0f8bdbfc08344fa4ea3afbd547f3309cd0cb4"
+      },
+      "build_log_sha256": "4c3bf0f4da484cd965aa60bb5a247f21caa9cc75ed2ec009cbc66626bc7c69d2"
+    }
+  }
+}
