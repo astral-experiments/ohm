@@ -19,3 +19,5 @@ The complete historical patch and edit direction were identical across the three
 The second test-build measurement was added before the primary test cohort finished. It reused the independent schedule already frozen for an elapsed-time replication, the same warm target and the same native checks. Its sample is separate from the primary twelve blocks.
 
 The full formatter-build cohort is still in progress.
+
+Both separately registered native elapsed-time cohorts are reported alongside their raw durations. [Native command timing](native-latency.md)
