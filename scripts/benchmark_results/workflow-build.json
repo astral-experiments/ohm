@@ -1,16 +1,17 @@
 {
-  "coordinator_revision": "205f23a47af3d61b57900f2313148f7dd5254b95",
+  "coordinator_revision": "82d54e6d111291c85ff43c6cf1f1bb9fb21e1c81",
   "manifest": {
-    "path": "toolchains/1.99.0/14.json",
-    "sha256": "0102697b3de56d1008996bb3543e194019931453285a3080a9e8c32bff8e304b"
+    "path": "toolchains/1.99.0/15.json",
+    "sha256": "46be84e15e3f8717b63a1742e0e95460f8b447f43c5c5951c41cb00695753eef"
   },
   "measurement": {
     "linux_hosts": [
-      "charlie-ohm-14-codex",
-      "charlie-ohm-14-ruff",
-      "charlie-ohm-14-ty",
-      "charlie-ohm-14-uv"
+      "charlie-ohm-15-codex",
+      "charlie-ohm-15-ruff",
+      "charlie-ohm-15-ty",
+      "charlie-ohm-15-uv"
     ],
+    "pending_developer_workflows": ["uv"],
     "runner_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
     "same_linux_release_components_on_all_hosts": true,
     "settings": "Each suite records its shared-build and procedural-macro and native-tool trust settings.",
@@ -34,63 +35,62 @@
     },
     "study_hosts": {
       "developer_workflows": {
-        "codex": "charlie-ohm-14-codex",
-        "ruff": "charlie-ohm-14-ruff",
-        "uv": "charlie-ohm-14-uv"
+        "codex": "charlie-ohm-15-codex",
+        "ruff": "charlie-ohm-15-ruff"
       },
-      "feature_ablation": "charlie-ohm-14-uv",
-      "historical_ruff": "charlie-ohm-14-ruff",
+      "feature_ablation": "charlie-ohm-15-uv",
+      "historical_ruff": "charlie-ohm-15-ruff",
       "individual_commands": {
-        "codex": "charlie-ohm-14-codex",
-        "uv": "charlie-ohm-14-uv"
+        "codex": "charlie-ohm-15-codex",
+        "uv": "charlie-ohm-15-uv"
       },
       "main_sessions": {
-        "codex": "charlie-ohm-14-codex",
-        "ruff": "charlie-ohm-14-ruff",
-        "uv": "charlie-ohm-14-uv"
+        "codex": "charlie-ohm-15-codex",
+        "ruff": "charlie-ohm-15-ruff",
+        "uv": "charlie-ohm-15-uv"
       },
-      "ty_session_and_worktrees": "charlie-ohm-14-ty"
+      "ty_session_and_worktrees": "charlie-ohm-15-ty"
     }
   },
   "provenance_inputs": {
     "project_verification_sha256": {
-      "codex": "c5ee65cefb656751fb365fe72eb2b9aa608439374894337e4bba58e7b63c9920",
-      "ruff": "23b5b7ab40052fc1bc05f2ec0d795528a70b0b60eea2936653fb84298e48cd21",
-      "ty": "77ea30faa4c6fd998d4a4539a73097af8672d93dbc3980c6ac9d6f13908454be",
-      "uv": "31df18dc6537bbf646aad050c3f39771d35e1a4f4debf73855194323e7e0107a"
+      "codex": "584ab9d498bdd9e6f2619b1d18ec1779665c633efb8189d3f403ffc2aebbeec4",
+      "ruff": "2f2a6459a33b79dd34af303e14984bf9946c9a6aa26af88467009ec6002348cb",
+      "ty": "9c72c62f6dafdf0cfd9effaab6155a82cf7060a7a6a7f54b86143cf2ef504bcb",
+      "uv": "8c8563ad68f51d2f18c8312863a27c5b8a50dcd5fff828ed8f160e493ceb66fa"
     },
-    "published_verification_sha256": "a627da5afe6c386e66cef913eee99bd0d68adf199e00356fde53077ff16c57ad"
+    "published_verification_sha256": "f23b90c8e9f9071452e6ec127ed1e59c0842daa3c449360d5a54d5ad1d6df86a"
   },
-  "published_at": "2026-10-25T20:30:58Z",
-  "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-14",
-  "release_workflow": "https://github.com/astral-sh/ohm/actions/runs/40223755459",
+  "published_at": "2026-10-27T07:09:12Z",
+  "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-15",
+  "release_workflow": "https://github.com/astral-sh/ohm/actions/runs/40456369013",
   "released": true,
   "schema_version": 1,
   "sources": {
-    "cargo": "461a3d1007ecc997a6d86c7d75e8b518575c8d90",
+    "cargo": "701d02b53c3530c833a26aac013f9a22dfd6386d",
     "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
-    "rust": "f1a7cf9d20b2cae39e991b178b56ba06b43dc8fa",
+    "rust": "2169ab9678eb7c748acc1a9b89e7df21548dbd73",
     "rustfmt": "3c9620c92b01e6c393324729c4861823cc3676e2"
   },
   "targets": {
     "aarch64-apple-darwin": {
       "archive": {
-        "sha256": "80c0991697cdfd3b95a7d5ffc2d58ecf98588a26082e7f462cbcca12344a2e31",
-        "size": 295006376,
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-14/ohm-1.99.0-14-aarch64-apple-darwin.tar.gz"
+        "sha256": "778fe59b32f0c3ab421b08be4f3128fbc1f05649a114be6c31df361ab5d8f6db",
+        "size": 294860827,
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-15/ohm-1.99.0-15-aarch64-apple-darwin.tar.gz"
       },
       "bundled_tools": {},
       "published_provenance": {
-        "sha256": "99d20f566f238ce2ee887f01c6abff93cd7e4d7eb587bc399e56ada2b67bfeaa",
+        "sha256": "c1a15d8e8d9dd8662403a35f2a29a45ab9be8747292022d507e2b213b4614f2f",
         "size": 731,
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-14/ohm-1.99.0-14-aarch64-apple-darwin-provenance.json"
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-15/ohm-1.99.0-15-aarch64-apple-darwin-provenance.json"
       }
     },
     "x86_64-unknown-linux-gnu": {
       "archive": {
-        "sha256": "a1a80d3275d163886886d3330e57b6f94023770fb378e0a8f35503ff36d688ef",
-        "size": 359655088,
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-14/ohm-1.99.0-14-x86_64-unknown-linux-gnu.tar.gz"
+        "sha256": "bd17067e6ca3343050bf4c3c64bb1959b996479a82868d01fbec29c4c4f79bf4",
+        "size": 359640412,
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-15/ohm-1.99.0-15-x86_64-unknown-linux-gnu.tar.gz"
       },
       "bundled_tools": {
         "wild": {
@@ -100,28 +100,28 @@
       },
       "components": {
         "cargo": {
-          "sha256": "9be48c4b02669047975662348a3f134d0abcd247d70d13c55ab024f806320590",
-          "version": "cargo 1.99.0-dev (461a3d100 2026-10-25) (ohm-1.99.0-14)"
+          "sha256": "9f8d4f1d2fd95c42bb82d251d5aad35b651cf7f851e0fe89ba43231b3a2c55e1",
+          "version": "cargo 1.99.0-dev (701d02b53 2026-10-26) (ohm-1.99.0-15)"
         },
         "clippy-driver": {
-          "sha256": "efa25229013d4b41fafb5fe291b41ebdb51a95b12f8f020b32cd461dfa588bf1",
+          "sha256": "9f08a6437ad243a4818ca30fc1cc3eb9059a06f4c933eb770b94b462e82ef168",
           "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)"
         },
         "rustc": {
-          "sha256": "a63a2a6506be83dfd6cd853e9807897b120660c056a8774011d82396ef549b13",
-          "version": "rustc 1.99.0-dev (f1a7cf9d2 2026-10-25) (ohm-1.99.0-14)"
+          "sha256": "0d87a2ac6d91f20b30441a1f158347842796ec6b43668e9d3506e81c139bc112",
+          "version": "rustc 1.99.0-dev (2169ab967 2026-10-27) (ohm-1.99.0-15)"
         },
         "rustfmt": {
-          "sha256": "302e4caff8be8f43d81d64a392e48e40a6db26a43d3578c7decb73cf6ee33ccb",
+          "sha256": "cfdcc31219429e8c3f7a3e0b398b0cdb0fcbb66a22cd2075da411f6e0243b49b",
           "version": "rustfmt 1.10.0-dev (3c9620c92b 2026-10-21)"
         }
       },
       "published_provenance": {
-        "sha256": "f14f2fb1a5a88f1cbb317c0614d2acb26a3c24ded8a80283747d51a466ca54dc",
+        "sha256": "0a5bfbcc5fa2056e8e1519c41e087d2ff3f446ff04baa38235a2d167bd68d50a",
         "size": 868,
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-14/ohm-1.99.0-14-x86_64-unknown-linux-gnu-provenance.json"
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-15/ohm-1.99.0-15-x86_64-unknown-linux-gnu-provenance.json"
       }
     }
   },
-  "toolchain": "ohm-1.99.0-14"
+  "toolchain": "ohm-1.99.0-15"
 }
