@@ -27,6 +27,12 @@ but can omit private implementation details from the interface hash. Two edits t
 then required checking just the parser, down from 35 and 22 compiler invocations. An edit to
 its public lexer still required all 35.
 
+Incremental native builds can reuse downstream crates after the same kind of private edit. A
+re-export can expose a source location or a macro expansion to another crate. Ohm tracks those
+locations and looks up each expansion by its stable identity, so an unrelated edit can renumber
+expansions without forcing a rebuild. Moving a source location that a caller uses still invalidates
+the cached metadata. The first build after upgrading rebuilds old workspace metadata once.
+
 In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-types`, then checked the
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
 seconds with it.
@@ -39,6 +45,7 @@ See:
 - [Rust #194](https://github.com/astral-sh/ohm-rust/pull/194)
 - [Rust #201](https://github.com/astral-sh/ohm-rust/pull/201)
 - [Rust #232](https://github.com/astral-sh/ohm-rust/pull/232)
+- [Rust #233](https://github.com/astral-sh/ohm-rust/pull/233)
 - [Rust #43](https://github.com/astral-sh/ohm-rust/pull/43)
 - [Cargo #53](https://github.com/astral-sh/ohm-cargo/pull/53)
 - [Cargo #55](https://github.com/astral-sh/ohm-cargo/pull/55)
