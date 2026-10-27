@@ -33,6 +33,12 @@ locations and looks up each expansion by its stable identity, so an unrelated ed
 expansions without forcing a rebuild. Moving a source location that a caller uses still invalidates
 the cached metadata. The first build after upgrading rebuilds old workspace metadata once.
 
+We changed the diagnostic for a mixed literal in Ruff's parser and compared the Ohm compiler
+before and after the native optimization on Linux. Across 12 paired runs per command, the median
+workspace build fell from 19.21 to 5.60 seconds and `cargo test --no-run` fell from 25.58 to 8.24
+seconds. Full compiler invocations fell from 35 to 3 for the build and from 93 to 6 for the test
+binaries. Both compilers invoked the linker eight times for the build and 67 times for the tests.
+
 In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-types`, then checked the
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
 seconds with it.
@@ -46,6 +52,7 @@ See:
 - [Rust #201](https://github.com/astral-sh/ohm-rust/pull/201)
 - [Rust #232](https://github.com/astral-sh/ohm-rust/pull/232)
 - [Rust #233](https://github.com/astral-sh/ohm-rust/pull/233)
+- [Ruff native build measurements](https://github.com/astral-sh/ohm-cargo/tree/837a3a07a7368c1a3706ab2779b8ab3450814f7d/benchmarks/ruff-dev-loop-20261027/corrected-workspace-parser)
 - [Rust #43](https://github.com/astral-sh/ohm-rust/pull/43)
 - [Cargo #53](https://github.com/astral-sh/ohm-cargo/pull/53)
 - [Cargo #55](https://github.com/astral-sh/ohm-cargo/pull/55)
