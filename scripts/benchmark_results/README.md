@@ -14,6 +14,16 @@ The [historical reports and fixtures](https://github.com/astral-sh/ohm/tree/9cbe
 
 The separate [Ruff edited-check study](ruff-edited-check.json) retains 64 matched pairs for an earlier experimental version of the [public-API metadata optimization](https://github.com/astral-sh/ohm-rust/pull/194), which is included in Ohm 1.99.0-7. Its [build record](ruff-edited-check-build.json) identifies that experimental compiler. The release tables exclude this earlier study.
 
+## Linux session replays with 1.99.0-15
+
+Each entry gives the wall time in seconds for a complete session replay. The last column compares the mean time for each toolchain on the same host.
+
+| Session         |          Stock Rust 1.99.0 (s) |              Ohm 1.99.0-15 (s) | Time saved |
+| --------------- | -----------------------------: | -----------------------------: | ---------: |
+| Ruff            |                 529.11, 505.25 |                 282.47, 280.71 |     45.55% |
+| Ruff historical |                 484.48, 494.34 |                 321.58, 326.49 |     33.79% |
+| ty              | 660.37, 601.37, 635.72, 534.12 | 332.38, 327.47, 312.86, 308.63 |     47.30% |
+
 ## Ruff compiler and Cargo changes in 1.99.0-15
 
 We changed a diagnostic in Ruff’s parser and timed a rebuild of the workspace on x86_64 Linux. Both compilers used the same Ohm Cargo and linker. The new compiler could reuse downstream crates after the edit. It finished first in all 12 pairs for each command. [Compiler change](https://github.com/astral-sh/ohm-rust/pull/233) · [Paired timings and compiler traces](https://github.com/astral-sh/ohm-cargo/tree/837a3a07a7368c1a3706ab2779b8ab3450814f7d/benchmarks/ruff-dev-loop-20261027/corrected-workspace-parser)
