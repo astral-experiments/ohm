@@ -4,6 +4,8 @@ Each comparison uses twelve matched blocks of the full default workspace command
 
 | Historical edit | Baseline | Median baseline instructions | Median candidate instructions | Whole-command reduction (95% CI) | Favorable pairs | Exact two-sided p | Wild reduction |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Full build, formatter change | Wild #42 | 55.7318B | 56.1745B | -0.017% (-1.192% to 1.309%) | 6/12 | 0.90741 | 2.283% |
+| Full build, formatter change | Ohm #185 | 57.8983B | 56.1745B | 3.695% (2.653% to 4.693%) | 12/12 | 0.00926 | 10.838% |
 | Full test build, formatter fixture | Wild #42 | 5.8126B | 5.7858B | 0.471% (0.370% to 0.564%) | 12/12 | 0.00926 | 2.447% |
 | Full test build, formatter fixture | Ohm #185 | 5.9276B | 5.7858B | 2.397% (2.295% to 2.491%) | 12/12 | 0.00926 | 11.967% |
 | Independent test-build replication | Wild #42 | 5.8145B | 5.7836B | 0.505% (0.424% to 0.585%) | 12/12 | 0.00926 | 2.448% |
@@ -13,11 +15,12 @@ The complete historical patch and edit direction were identical across the three
 
 ## Raw observations
 
+- Full build, formatter change. [Command counts](build.csv), [per-process records](build-processes.jsonl), [intervals and direction splits](build-summary.json)
 - Full test build, formatter fixture. [Command counts](test.csv), [per-process records](test-processes.jsonl), [intervals and direction splits](test-summary.json)
 - Independent test-build replication. [Command counts](test-replication.csv), [per-process records](test-replication-processes.jsonl), [intervals and direction splits](test-replication-summary.json)
 
 The second test-build measurement was added before the primary test cohort finished. It reused the independent schedule already frozen for an elapsed-time replication, the same warm target and the same native checks. Its sample is separate from the primary twelve blocks.
 
-The full formatter-build cohort is still in progress.
+The held-out formatter change starts 19 compiler processes and eight links per command. [Instruction differences by process](build-processes.md)
 
 Both separately registered native elapsed-time cohorts are reported alongside their raw durations. [Native command timing](native-latency.md)
