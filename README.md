@@ -149,23 +149,23 @@ Times are medians of four runs, with each toolchain pair measured on the same ho
 
 <!-- benchmark:developer-workflows -->
 
-| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-14 | Time saved |
+| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-15 | Time saved |
 | ------- | --------------------------------- | ----------- | ------------- | ---------- |
-| Ruff/ty | Edit → focused test               | 17.01 s     | 14.59 s       | 14.21%     |
-| Ruff/ty | Edit dependency → downstream test | 17.30 s     | 3.91 s        | 77.42%     |
-| Ruff/ty | Edit → check → test → check       | 25.11 s     | 23.11 s       | 7.95%      |
-| Ruff/ty | Check → build → check             | 95.33 s     | 60.97 s       | 36.05%     |
-| Ruff/ty | Edit → fmt → clippy → test        | 33.71 s     | 24.22 s       | 28.17%     |
-| uv      | Edit → focused test               | 27.03 s     | 11.46 s       | 57.62%     |
-| uv      | Edit dependency → downstream test | 30.17 s     | 3.88 s        | 87.14%     |
-| uv      | Edit → check → test → check       | 30.47 s     | 15.34 s       | 49.67%     |
-| uv      | Check → build → check             | 161.68 s    | 84.99 s       | 47.43%     |
-| uv      | Edit → fmt → clippy → test        | 34.05 s     | 17.90 s       | 47.44%     |
-| Codex   | Edit → focused test               | 40.77 s     | 31.53 s       | 22.66%     |
-| Codex   | Edit dependency → downstream test | 73.28 s     | 5.72 s        | 92.19%     |
-| Codex   | Edit → check → test → check       | 52.41 s     | 35.95 s       | 31.40%     |
-| Codex   | Check → build → check             | 233.43 s    | 143.12 s      | 38.69%     |
-| Codex   | Edit → fmt → clippy → test        | 54.66 s     | 36.32 s       | 33.55%     |
+| Ruff/ty | Edit → focused test               | 16.20 s     | 14.56 s       | 10.09%     |
+| Ruff/ty | Edit dependency → downstream test | 16.46 s     | 12.47 s       | 24.24%     |
+| Ruff/ty | Edit → check → test → check       | 24.19 s     | 22.41 s       | 7.37%      |
+| Ruff/ty | Check → build → check             | 92.34 s     | 58.94 s       | 36.17%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 31.88 s     | 23.96 s       | 24.84%     |
+| uv      | Edit → focused test               | 24.64 s     | 9.09 s        | 63.10%     |
+| uv      | Edit dependency → downstream test | 27.88 s     | 3.23 s        | 88.42%     |
+| uv      | Edit → check → test → check       | 29.36 s     | 13.01 s       | 55.68%     |
+| uv      | Check → build → check             | 159.97 s    | 81.70 s       | 48.93%     |
+| uv      | Edit → fmt → clippy → test        | 32.07 s     | 15.82 s       | 50.67%     |
+| Codex   | Edit → focused test               | 31.51 s     | 23.57 s       | 25.21%     |
+| Codex   | Edit dependency → downstream test | 58.50 s     | 4.58 s        | 92.17%     |
+| Codex   | Edit → check → test → check       | 39.79 s     | 29.27 s       | 26.43%     |
+| Codex   | Check → build → check             | 206.23 s    | 130.69 s      | 36.63%     |
+| Codex   | Edit → fmt → clippy → test        | 48.69 s     | 32.48 s       | 33.30%     |
 
 <!-- /benchmark:developer-workflows -->
 

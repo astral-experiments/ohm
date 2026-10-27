@@ -2,9 +2,9 @@
 
 We compared published Ohm 1.99.0-15 with stock Rust 1.99.0 on x86_64 Linux. Each project ran both toolchains on the same machine. The four recorded session means totaled 1,029.18 s with Ohm and 1,941.52 s with stock Rust, a 46.99% reduction. Some steps took longer with Ohm. The uv registry-client unit tests averaged 7.84 s with Ohm and 7.06 s with stock Rust. The uv workspace formatting check averaged 3.64 s and 3.59 s, respectively. [Recorded sessions](sessions.json) · [ty session and worktree startup](ty-worktree.md)
 
-The individual-command study includes 216 accepted samples across uv and Codex. The largest difference was a Codex Clippy run after an edit to `codex-utils-string`. Its median fell from 50.05 s to 1.39 s. The ten completed developer workflows for Ruff and Codex appear below. The README’s developer-workflow table still shows 1.99.0-14 while the five uv comparisons for 1.99.0-15 are in progress. [Individual commands](workflow.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
+The individual-command study includes 216 accepted samples across uv and Codex. The largest difference was a Codex Clippy run after an edit to `codex-utils-string`. Its median fell from 50.05 s to 1.39 s. The developer-workflow study covers five edit-and-build workflows each for Ruff, uv, and Codex. After a uv dependency edit, the median time to run the downstream test fell from 27.88 s to 3.23 s. [Individual commands](workflow.json) · [Developer workflows](developer-workflows.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
 
-Host activity invalidated 32 samples in the first uv individual-command trial. The replacement supplied all 100 accepted uv samples. Two uv developer-workflow trials stopped after 17 and 29 samples. We excluded both trials and resumed the missing cells on a separate host. The Codex and Ruff developer runs discarded 14 and five attempts, respectively. The ty report records its exclusions separately. [ty audit](ty-worktree.json)
+Host activity invalidated 32 samples in the first uv individual-command trial. The replacement supplied all 100 accepted uv samples. Two uv developer-workflow trials stopped after 17 and 29 samples. We excluded both trials. On the replacement uv host, 16 cells passed in the first run and the remaining 24 passed after resuming. The uv, Codex, and Ruff developer runs discarded 22, 14, and five attempts, respectively. The ty report records its exclusions separately. [ty audit](ty-worktree.json)
 
 The APFS disk study compares Ohm 1.99.0-11 with stock Rust 1.99.0. All eight cohorts completed in that release. The formatter comparison below measures -10 against -11. [Disk measurements](disk.json) · [Formatter measurements](formatting-comparison.json)
 
@@ -25,23 +25,6 @@ Each entry gives the wall time in seconds for a complete session replay. The las
 | Ruff historical |                 484.48, 494.34 |                 321.58, 326.49 |     33.79% |
 | uv              |                 156.32, 159.12 |                   91.71, 90.05 |     42.38% |
 | ty              | 660.37, 601.37, 635.72, 534.12 | 332.38, 327.47, 312.86, 308.63 |     47.30% |
-
-### Completed developer workflows
-
-Each median covers four complete workflows per toolchain.
-
-| Project | Workflow                          | Stock Rust 1.99.0 | Ohm 1.99.0-15 | Time saved |
-| ------- | --------------------------------- | ----------------: | ------------: | ---------: |
-| Ruff/ty | Edit → focused test               |           16.20 s |       14.56 s |     10.09% |
-| Ruff/ty | Edit dependency → downstream test |           16.46 s |       12.47 s |     24.24% |
-| Ruff/ty | Edit → check → test → check       |           24.19 s |       22.41 s |      7.37% |
-| Ruff/ty | Check → build → check             |           92.34 s |       58.94 s |     36.17% |
-| Ruff/ty | Edit → fmt → clippy → test        |           31.88 s |       23.96 s |     24.84% |
-| Codex   | Edit → focused test               |           31.51 s |       23.57 s |     25.21% |
-| Codex   | Edit dependency → downstream test |           58.50 s |        4.58 s |     92.17% |
-| Codex   | Edit → check → test → check       |           39.79 s |       29.27 s |     26.43% |
-| Codex   | Check → build → check             |          206.23 s |      130.69 s |     36.63% |
-| Codex   | Edit → fmt → clippy → test        |           48.69 s |       32.48 s |     33.30% |
 
 ## Ruff compiler and Cargo changes in 1.99.0-15
 

@@ -9,9 +9,9 @@
       "charlie-ohm-15-codex",
       "charlie-ohm-15-ruff",
       "charlie-ohm-15-ty",
-      "charlie-ohm-15-uv"
+      "charlie-ohm-15-uv",
+      "charlie-ohmdev-15-uv"
     ],
-    "pending_developer_workflows": ["uv"],
     "runner_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
     "same_linux_release_components_on_all_hosts": true,
     "settings": "Each suite records its shared-build and procedural-macro and native-tool trust settings.",
@@ -36,7 +36,8 @@
     "study_hosts": {
       "developer_workflows": {
         "codex": "charlie-ohm-15-codex",
-        "ruff": "charlie-ohm-15-ruff"
+        "ruff": "charlie-ohm-15-ruff",
+        "uv": "charlie-ohmdev-15-uv"
       },
       "feature_ablation": "charlie-ohm-15-uv",
       "historical_ruff": "charlie-ohm-15-ruff",
@@ -57,9 +58,13 @@
       "codex": "584ab9d498bdd9e6f2619b1d18ec1779665c633efb8189d3f403ffc2aebbeec4",
       "ruff": "2f2a6459a33b79dd34af303e14984bf9946c9a6aa26af88467009ec6002348cb",
       "ty": "9c72c62f6dafdf0cfd9effaab6155a82cf7060a7a6a7f54b86143cf2ef504bcb",
-      "uv": "8c8563ad68f51d2f18c8312863a27c5b8a50dcd5fff828ed8f160e493ceb66fa"
+      "uv": "d06c7cceb45620879eb3c00c56f4b3649f6cd2be420932e193bd4c552570bc9b"
     },
-    "published_verification_sha256": "f23b90c8e9f9071452e6ec127ed1e59c0842daa3c449360d5a54d5ad1d6df86a"
+    "published_verification_sha256": "f23b90c8e9f9071452e6ec127ed1e59c0842daa3c449360d5a54d5ad1d6df86a",
+    "uv_suite_verification_sha256": {
+      "charlie-ohm-15-uv": "8c8563ad68f51d2f18c8312863a27c5b8a50dcd5fff828ed8f160e493ceb66fa",
+      "charlie-ohmdev-15-uv": "28f8cc0ed1400c4f6edd28a842d4cca95475ae08b8aeeaaaed11e6651e9cc20c"
+    }
   },
   "published_at": "2026-10-27T07:09:12Z",
   "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-15",
