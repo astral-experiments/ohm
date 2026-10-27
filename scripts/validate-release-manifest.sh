@@ -7,7 +7,7 @@ if [[ "${1:-}" == "--require-pinned" ]]; then
   shift
 fi
 
-manifest="${1:-toolchains/1.99.0/15.json}"
+manifest="${1:-toolchains/1.99.0/16.json}"
 if [[ $# -gt 1 ]]; then
   echo "usage: validate-release-manifest.sh [--require-pinned] [MANIFEST]" >&2
   exit 2
