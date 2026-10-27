@@ -134,6 +134,13 @@ procedural macros can still reuse their native artifacts. On Ruff, `cargo check 
 to fail after a workspace build because rustc saw two copies of `pep440_rs`. With this change,
 the check succeeds and all 520 units are fresh on the next check.
 
+After a build script changes, Cargo uses the timestamp of its validated result when restoring
+unchanged compiler metadata. Using the older timestamp on the script's stdout made the next
+`cargo check` recompile `ruff`, `ty`, and `ty_wasm` even though none of their inputs had changed.
+With the fix, all 520 units were fresh and the median for that unchanged check fell from 1.00 s to
+0.62 s. Across 24 paired trials, the edited check and the following unchanged check together took
+16.8% less time. The edited check alone had no clear timing difference.
+
 In the release benchmarks, we built each project and then timed a check. The uv check took 70.46
 seconds with stock Rust and 23.90 seconds with Ohm; the Codex check took 125.54 and 63.67 seconds,
 respectively.
@@ -155,6 +162,7 @@ See:
 - [Cargo #171](https://github.com/astral-sh/ohm-cargo/pull/171)
 - [Cargo #178](https://github.com/astral-sh/ohm-cargo/pull/178)
 - [Cargo #253](https://github.com/astral-sh/ohm-cargo/pull/253)
+- [Cargo #256 and the build-script timestamp measurements](https://github.com/astral-sh/ohm-cargo/pull/256)
 - [Ruff build followed by check](https://github.com/astral-sh/ohm-cargo/tree/0abc9677ba9cfa1a0525cbab6597e329a42eaa9e/benchmarks/ruff-dev-loop-20261027/consistent-native-check)
 
 ### 4. Reuse checks during builds
@@ -815,6 +823,12 @@ Editing an attribute, the item it annotates, or the macro crate makes rustc expa
 macro again. It also reruns an attribute macro if the macro reads a tracked file or environment
 variable, inspects source locations or text, or asks rustc to expand a nested expression.
 
+Reusing an expansion also has to leave rustc's source map and syntax contexts in the same state as
+running the macro. Parsing a string inside a macro creates a virtual source file, which affects the
+positions of tokens parsed later. Ohm now recreates those files in their original order and restores
+the macro's syntax contexts before decoding cached tokens. On 1.99.0-16, six of 28 downstream
+builds in a reproducer failed with `E0460` when they mixed artifacts from different cache histories.
+
 An untracked input can make the cache unsound. If a macro reads a file without telling rustc and
 the file changes, rustc may reuse code generated from its old contents. Cargo's trust settings for
 compiled macros and worktree snapshots control separate caches.
@@ -827,6 +841,8 @@ See:
 
 - [Cargo #54](https://github.com/astral-sh/ohm-cargo/pull/54)
 - [Rust #208](https://github.com/astral-sh/ohm-rust/pull/208)
+- [Rust #238](https://github.com/astral-sh/ohm-rust/pull/238)
+- [Downstream build reproducer on 1.99.0-16](https://github.com/astral-sh/ohm-cargo/tree/db71638cbb6dda4752d51ca6373e234811dff18f/benchmarks/ruff-dev-loop-20261027/shipping-16-macro-results)
 
 ## Clippy
 
