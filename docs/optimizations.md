@@ -21,6 +21,12 @@ executable using them still needs to be relinked to pick up the change. If `lint
 static library, Cargo rebuilds the archive because it contains the parser's code. This also applies
 when `linter` produces both a static library and an `rlib`.
 
+During `cargo check`, moving a private method can also move the source spans in a private type's
+trait implementations. Ohm keeps the trait headers that downstream code needs for type inference,
+but can omit private implementation details from the interface hash. Two edits to Ruff's parser
+then required checking just the parser, down from 35 and 22 compiler invocations. An edit to
+its public lexer still required all 35.
+
 In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-types`, then checked the
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
 seconds with it.
@@ -32,6 +38,7 @@ See:
 
 - [Rust #194](https://github.com/astral-sh/ohm-rust/pull/194)
 - [Rust #201](https://github.com/astral-sh/ohm-rust/pull/201)
+- [Rust #232](https://github.com/astral-sh/ohm-rust/pull/232)
 - [Rust #43](https://github.com/astral-sh/ohm-rust/pull/43)
 - [Cargo #53](https://github.com/astral-sh/ohm-cargo/pull/53)
 - [Cargo #55](https://github.com/astral-sh/ohm-cargo/pull/55)
@@ -413,6 +420,15 @@ Git or generating a software bill of materials. On Unix, when Cargo needs at lea
 checksums to tell whether a build is up to date, it can hash the source files in parallel. It uses
 up to four of the build's job slots and releases them before running compilers or build scripts.
 
+Cargo avoids parsing the same registry URL for every package in a lockfile and copying workspace
+lint tables that a member does not inherit. It also caches registry manifest warnings alongside
+the parsed manifest. When a build script needs a list of package files, Cargo can recognize a Git
+index it has already verified. It still walks the working tree, so new untracked files are visible.
+
+On a Ruff workspace with all 520 artifacts up to date, the ten Cargo changes together reduced
+Cargo's instructions for `cargo check` by 10.51%.
+[Paired measurements](https://github.com/astral-sh/ohm-cargo/tree/60f815537745e8dd8867c3062aea061c6865be34/benchmarks/ruff-dev-loop-20261026/ten-cargo-fresh)
+
 In an earlier experiment on a Codex workspace that had already been built, reusing the dependency
 resolution reduced `cargo metadata` time from 413 to 358 milliseconds and Nextest time from 961 to
 824 milliseconds.
@@ -448,6 +464,15 @@ See:
 - [Cargo #238](https://github.com/astral-sh/ohm-cargo/pull/238)
 - [Cargo #239](https://github.com/astral-sh/ohm-cargo/pull/239)
 - [Cargo #240](https://github.com/astral-sh/ohm-cargo/pull/240)
+- [Cargo #242](https://github.com/astral-sh/ohm-cargo/pull/242)
+- [Cargo #243](https://github.com/astral-sh/ohm-cargo/pull/243)
+- [Cargo #244](https://github.com/astral-sh/ohm-cargo/pull/244)
+- [Cargo #245](https://github.com/astral-sh/ohm-cargo/pull/245)
+- [Cargo #246](https://github.com/astral-sh/ohm-cargo/pull/246)
+- [Cargo #247](https://github.com/astral-sh/ohm-cargo/pull/247)
+- [Cargo #248](https://github.com/astral-sh/ohm-cargo/pull/248)
+- [Cargo #249](https://github.com/astral-sh/ohm-cargo/pull/249)
+- [Cargo #250](https://github.com/astral-sh/ohm-cargo/pull/250)
 
 ### 16. Cache unchanged ThinLTO objects
 
@@ -521,6 +546,11 @@ then use up to eight threads to parse and analyze a crate. You can choose a thre
 or disable Ohm's defaults with `-Zohm-defaults=no`. Invoking `rustc` directly does not enable this
 default. More threads can also increase memory use.
 
+For incremental debug checks on x86-64 Linux, Cargo uses one frontend thread for small workspace
+crates. It uses the previous successful check's dependency file to identify them. The first check
+keeps the usual thread count, as do larger crates. Explicit compiler flags take precedence. After
+a small edit to Ruff's lexer, this reduced the time for the full workspace check by 3.20%.
+
 For example, a build may reach a large parser crate after all its dependencies have finished. Even
 if Cargo has no other crates ready to compile, the compiler can check independent function bodies in
 the parser on several threads. In a native build, one thread can also start encoding the parser's
@@ -532,6 +562,7 @@ uv, and Codex. Their combined time fell from 1,032 to 720 seconds, about 30%.
 See:
 
 - [Cargo #90](https://github.com/astral-sh/ohm-cargo/pull/90)
+- [Cargo #251](https://github.com/astral-sh/ohm-cargo/pull/251)
 - [Cargo #48](https://github.com/astral-sh/ohm-cargo/pull/48)
 - [Rust #206](https://github.com/astral-sh/ohm-rust/pull/206)
 
@@ -653,6 +684,11 @@ Similarly, when checking an opaque return type such as `impl Iterator`, rustc ca
 declared bounds each time it compares two lifetimes. When looking for implementations of a trait,
 it skips crates whose metadata lists none for that trait.
 
+When a node has no attributes, the early lint visitor can keep using the enclosing lint settings.
+Rustc also walks the packed dependency indexes from the previous build without updating a separate
+count at every edge. In separate experiments on an edit to Ruff's parser, these changes reduced
+instructions across Cargo and rustc by 0.45% and 0.50%, respectively.
+
 Every generated Rust test imports the `test` crate. Once rustc has resolved that name, it can
 reuse the result for the remaining tests in the same compilation.
 
@@ -682,6 +718,8 @@ See:
 - [Rust #222](https://github.com/astral-sh/ohm-rust/pull/222)
 - [Rust #226](https://github.com/astral-sh/ohm-rust/pull/226)
 - [Rust #227](https://github.com/astral-sh/ohm-rust/pull/227)
+- [Rust #230](https://github.com/astral-sh/ohm-rust/pull/230)
+- [Rust #231](https://github.com/astral-sh/ohm-rust/pull/231)
 
 ### 23. Reduce allocator page-clearing work
 
