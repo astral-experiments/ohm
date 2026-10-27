@@ -39,6 +39,23 @@ workspace build fell from 19.21 to 5.60 seconds and `cargo test --no-run` fell f
 seconds. Full compiler invocations fell from 35 to 3 for the build and from 93 to 6 for the test
 binaries. Both compilers invoked the linker eight times for the build and 67 times for the tests.
 
+A crate can export a macro and still keep a private enum's derived implementations out of its
+public interface. Ohm tracks which types a caller can reach and keeps the trait headers that
+downstream selection needs. With the compiler change, correcting a private doc comment in Ruff's
+linter reduced full compiler invocations from 11 to 2 for a workspace build and from 26 to 4 when
+building the tests.
+
+A procedural macro can read the position or text of a token from another crate. When that happens,
+rustc records the observation. On the next build, Cargo asks rustc to record the reader's source
+and binary inputs. Cargo checks their digests before reusing the reader and checks them again if
+an upstream job could have replaced the metadata. A missing or changed input forces compilation.
+
+In a paired Linux comparison on Ruff, the Cargo change reduced the median for an unchanged
+`cargo test --no-run` from 6.09 to 0.96 seconds. All 619 units were fresh, eliminating 50 native
+links. The ordinary workspace build was already fresh with either Cargo. Checking the inputs has a
+cost when a macro observes a real change. In a seven-package fixture, moving the observed token
+increased the median build from 346 to 485 milliseconds.
+
 In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-types`, then checked the
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
 seconds with it.
@@ -52,6 +69,10 @@ See:
 - [Rust #201](https://github.com/astral-sh/ohm-rust/pull/201)
 - [Rust #232](https://github.com/astral-sh/ohm-rust/pull/232)
 - [Rust #233](https://github.com/astral-sh/ohm-rust/pull/233)
+- [Cargo #254](https://github.com/astral-sh/ohm-cargo/pull/254)
+- [Ruff private doc edit](https://github.com/astral-sh/ohm-cargo/tree/2f07518331735487c84aaeadab58ce98d7c5a71b/benchmarks/ruff-dev-loop-20261027/native-qualified-results)
+- [Ruff test builds](https://github.com/astral-sh/ohm-cargo/tree/d2fae69374cda17ef47ef198a75fdd24d690b34f/benchmarks/ruff-dev-loop-20261027/whole-ruff-cargo-observer-fifo)
+- [Observed-token edit](https://github.com/astral-sh/ohm-cargo/tree/0c7fdaea22df8b42e67c1ccb6e12b92886c6cb2f/benchmarks/ruff-dev-loop-20261027/observer-fifo-seven-package-results)
 - [Ruff native build measurements](https://github.com/astral-sh/ohm-cargo/tree/837a3a07a7368c1a3706ab2779b8ab3450814f7d/benchmarks/ruff-dev-loop-20261027/corrected-workspace-parser)
 - [Rust #43](https://github.com/astral-sh/ohm-rust/pull/43)
 - [Cargo #53](https://github.com/astral-sh/ohm-cargo/pull/53)
@@ -107,6 +128,12 @@ can use the metadata from that build instead of checking `memchr` again. Similar
 results if the inputs still match. If you check, build, and then check again, Ohm can also reuse
 the first check's results.
 
+If a single compiler invocation would see both a native and a checked copy of the same library,
+Cargo checks the dependencies that would introduce the conflicting copy. Other roots and host
+procedural macros can still reuse their native artifacts. On Ruff, `cargo check --workspace` used
+to fail after a workspace build because rustc saw two copies of `pep440_rs`. With this change,
+the check succeeds and all 520 units are fresh on the next check.
+
 In the release benchmarks, we built each project and then timed a check. The uv check took 70.46
 seconds with stock Rust and 23.90 seconds with Ohm; the Codex check took 125.54 and 63.67 seconds,
 respectively.
@@ -127,6 +154,8 @@ See:
 - [Cargo #170](https://github.com/astral-sh/ohm-cargo/pull/170)
 - [Cargo #171](https://github.com/astral-sh/ohm-cargo/pull/171)
 - [Cargo #178](https://github.com/astral-sh/ohm-cargo/pull/178)
+- [Cargo #253](https://github.com/astral-sh/ohm-cargo/pull/253)
+- [Ruff build followed by check](https://github.com/astral-sh/ohm-cargo/tree/0abc9677ba9cfa1a0525cbab6597e329a42eaa9e/benchmarks/ruff-dev-loop-20261027/consistent-native-check)
 
 ### 4. Reuse checks during builds
 
