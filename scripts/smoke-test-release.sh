@@ -212,6 +212,15 @@ if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] && \
     readelf --string-dump=.comment "$smoke_root/linker-target/debug/ohm-smoke" \
       | grep -i "$linker" >/dev/null
   done
+  if jq -e '.bundled_tools.wild.source' "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+    raw_tmpdir="$smoke_root/"$'tmp-\xff'
+    mkdir "$raw_tmpdir"
+    TMPDIR="$raw_tmpdir" CARGO_TARGET_DIR="$smoke_root/byte-path-target" \
+      CARGO_BUILD_BUILD_DIR="$smoke_root/byte-path-build" \
+      cargo +"$OHM_TOOLCHAIN" run --offline --manifest-path "$smoke_crate/Cargo.toml"
+    readelf --string-dump=.comment "$smoke_root/byte-path-target/debug/ohm-smoke" \
+      | grep -i 'Wild' >/dev/null
+  fi
 fi
 
 cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings

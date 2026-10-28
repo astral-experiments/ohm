@@ -53,6 +53,58 @@ class PrepareWildTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unsafe"):
             self.prepare(self.archive(unsafe=True))
 
+    def test_build_checked_source_in_pinned_image(self):
+        payload = b"source archive"
+        executable = b"#!/bin/sh\necho 'Wild 0.11.0 non-git-build'\n"
+        source = {
+            "revision": "a" * 40,
+            "builder_sha256": "b" * 64,
+            "binary_sha256": hashlib.sha256(executable).hexdigest(),
+            "patch_sha256": hashlib.sha256(b"patch fixture").hexdigest(),
+        }
+        wild = {"version": "0.11.0", "sha256": hashlib.sha256(payload).hexdigest(), "source": source}
+        manifest = {"bundled_tools": {"wild": wild}}
+
+        def build(command, **kwargs):
+            self.assertIn("docker.io/library/rust@sha256:" + "b" * 64, command)
+            mount = command[command.index("--mount") + 1]
+            work = pathlib.Path(mount.removeprefix("type=bind,src=").removesuffix(",dst=/work"))
+            self.assertEqual((work / "source.tar.gz").read_bytes(), payload)
+            self.assertEqual((work / "source.patch").read_bytes(), b"patch fixture")
+            staged = work / "wild"
+            staged.mkdir()
+            (staged / "wild").write_bytes(executable)
+            (staged / "wild").chmod(0o755)
+
+        with (
+            tempfile.TemporaryDirectory() as temporary,
+            patch.object(module, "PATCH_DIRECTORY", pathlib.Path(temporary)),
+            patch.object(module.urllib.request, "urlopen") as download,
+            patch.object(module.subprocess, "run", side_effect=build) as docker,
+            patch.object(module.subprocess, "check_output", return_value="Wild 0.11.0 non-git-build"),
+        ):
+            destination = pathlib.Path(temporary) / "staged"
+            patch_file = pathlib.Path(temporary) / f'{source["patch_sha256"]}.patch'
+            patch_file.write_bytes(b"patch fixture")
+            download.return_value = io.BytesIO(payload)
+            self.assertEqual(module.prepare(manifest, module.TARGET, destination), destination)
+            download.assert_called_once_with(
+                "https://codeload.github.com/wild-linker/wild/tar.gz/" + "a" * 40, timeout=120
+            )
+            patch_file.write_bytes(b"corrupt patch")
+            download.return_value = io.BytesIO(payload)
+            with self.assertRaisesRegex(ValueError, "patch checksum"):
+                module.prepare(manifest, module.TARGET, destination)
+            patch_file.write_bytes(b"patch fixture")
+            source["binary_sha256"] = "0" * 64
+            download.return_value = io.BytesIO(payload)
+            with self.assertRaisesRegex(ValueError, "binary checksum"):
+                module.prepare(manifest, module.TARGET, destination)
+            download.return_value = io.BytesIO(b"other source")
+            with self.assertRaisesRegex(ValueError, "archive checksum"):
+                module.prepare(manifest, module.TARGET, destination)
+            self.assertEqual(docker.call_count, 2)
+
     def test_old_manifests_and_other_platforms_do_not_download(self):
         with patch.object(module.urllib.request, "urlopen") as download:
             self.assertIsNone(module.prepare({}, module.TARGET, "/unused"))
