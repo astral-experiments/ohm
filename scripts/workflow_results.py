@@ -331,7 +331,16 @@ def comparisons(report):
                         ),
                     }
                 )
-    if seen_projects != {"ruff", "uv", "codex"}:
+    omitted = report.get("omitted_projects", {})
+    if (
+        not isinstance(omitted, dict)
+        or any(
+            not isinstance(reason, str) or not reason.strip()
+            for reason in omitted.values()
+        )
+        or seen_projects.intersection(omitted)
+        or seen_projects.union(omitted) != {"ruff", "uv", "codex"}
+    ):
         raise ValueError("Workflow report must cover Ruff/ty, uv, and Codex")
     return sorted(
         rows,
@@ -367,7 +376,7 @@ def validate(report):
         raise ValueError("Workflow table differs from its measurements")
 
 
-def build_report(runs):
+def build_report(runs, *, omitted_projects=None):
     first = runs[0]["configuration"]
     report = {
         "schema_version": 1,
@@ -392,6 +401,8 @@ def build_report(runs):
         },
         "runs": [compact_run(run) for run in runs],
     }
+    if omitted_projects:
+        report["omitted_projects"] = omitted_projects
     for tool, field in (
         ("rustc", "ohm_source_revision"),
         ("cargo", "ohm_cargo_source_revision"),
