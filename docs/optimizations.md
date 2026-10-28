@@ -471,6 +471,13 @@ Git or generating a software bill of materials. On Unix, when Cargo needs at lea
 checksums to tell whether a build is up to date, it can hash the source files in parallel. It uses
 up to four of the build's job slots and releases them before running compilers or build scripts.
 
+Rustc hashes each input using its original filename. It escapes spaces when it writes the
+dependency file. On Ohm 1.99.0-16, if both `input space` and `input\ space` existed, rustc could
+compile the first file but hash the second. Cargo could then reuse an executable after its input
+had changed. If two Unix filenames have the same spelling in the dependency file, rustc now omits
+the ambiguous checksum. On upgrade, Cargo rebuilds units whose old records could have lost the
+original filename. Later builds can reuse the corrected records.
+
 Cargo avoids parsing the same registry URL for every package in a lockfile and copying workspace
 lint tables that a member does not inherit. It also caches registry manifest warnings alongside
 the parsed manifest. When a build script needs a list of package files, Cargo can recognize a Git
@@ -524,6 +531,8 @@ See:
 - [Cargo #248](https://github.com/astral-sh/ohm-cargo/pull/248)
 - [Cargo #249](https://github.com/astral-sh/ohm-cargo/pull/249)
 - [Cargo #250](https://github.com/astral-sh/ohm-cargo/pull/250)
+- [Cargo #258](https://github.com/astral-sh/ohm-cargo/pull/258)
+- [Rust #241](https://github.com/astral-sh/ohm-rust/pull/241)
 
 ### 16. Cache unchanged ThinLTO objects
 
