@@ -119,18 +119,6 @@ jobs:
           for manifest in "${manifests[@]}"; do
             ./scripts/validate-release-manifest.sh "$manifest"
           done
-      - name: Reproduce the Linux linker when its inputs change
-        if: github.event_name == 'pull_request'
-        env:
-          BASE_REVISION: ${{ github.event.pull_request.base.sha }}
-        run: |
-          if git diff --quiet "$BASE_REVISION"...HEAD -- toolchains release/wild-patches scripts/prepare-wild.py scripts/build-wild.sh; then
-            exit 0
-          fi
-          manifest="$(git ls-files 'toolchains/*/*.json' | sort -V | tail -n 1)"
-          if jq -e '.bundled_tools.wild.source' "$manifest" >/dev/null; then
-            python3 scripts/prepare-wild.py "$manifest" x86_64-unknown-linux-gnu "$RUNNER_TEMP/ohm-wild"
-          fi
       - name: Protect existing toolchain manifests
         env:
           BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}

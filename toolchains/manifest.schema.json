@@ -69,31 +69,6 @@
             "sha256": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
-            },
-            "source": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "revision",
-                "patch_sha256",
-                "binary_sha256",
-                "builder_sha256"
-              ],
-              "properties": {
-                "revision": { "$ref": "#/$defs/revision" },
-                "patch_sha256": {
-                  "type": "string",
-                  "pattern": "^[0-9a-f]{64}$"
-                },
-                "binary_sha256": {
-                  "type": "string",
-                  "pattern": "^[0-9a-f]{64}$"
-                },
-                "builder_sha256": {
-                  "type": "string",
-                  "pattern": "^[0-9a-f]{64}$"
-                }
-              }
             }
           }
         }

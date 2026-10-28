@@ -25,25 +25,22 @@ Release smoke tests compile and link a Wasm executable using the installed packa
 Release manifests can pin `bundled_tools.wild` with a version and the SHA-256
 of the upstream `wild-linker-VERSION-x86_64-unknown-linux-gnu.tar.gz` archive.
 Linux builds verify that archive before extracting the executable and its MIT
-and Apache licenses. If the manifest specifies `wild.source`, the archive checksum
-covers the upstream source at the pinned revision. The build applies the checked-in
-patch in a pinned Rust container and verifies the SHA-256 of the resulting executable.
-Bootstrap installs the linker as
+and Apache licenses. Bootstrap installs the linker as
 `lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd`; the private name lets
 both GCC and Clang find Wild with `-B` and `-fuse-ld=bfd`. The system C compiler
 driver still supplies startup objects and system libraries.
 
 The version-specific installer verifies Wild's version, and release smoke tests
-build and run with both Wild and LLD. The release provenance records the Wild
-pins from the manifest. Older manifests and macOS distributions omit Wild.
+build and run with both Wild and LLD. Provenance records the Wild version and
+archive checksum. Older manifests and macOS distributions omit Wild.
 
-Starting with Ohm 1.98.0-10, `cargo +ohm test` selects Wild by default
+Starting with Ohm 1.98.0-10, `cargo +ohm test` selects upstream Wild by default
 for native Linux x86-64 GNU rustc invocations. Use `-Zohm-linker=lld` to select
 the bundled LLD, or `-Zohm-defaults=no` to disable automatic selection with the
 other Ohm defaults. Explicit linker configuration takes precedence. Rustdoc
 doctests and native compilation inside build scripts retain their existing
-configuration. Ohm 1.99.0-18 packages the full ELF linker with a patch for
-non-UTF-8 filenames in native Linux builds.
+configuration. This uses Wild's full linker; incremental linking is not enabled.
+The experimental ohm-wild fork and Mach-O linker are not packaged.
 
 Ohm releases are built from protected `main` using an immutable, pinned toolchain manifest.
 
