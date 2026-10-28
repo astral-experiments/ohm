@@ -45,12 +45,17 @@ downstream selection needs. With the compiler change, correcting a private doc c
 linter reduced full compiler invocations from 11 to 2 for a workspace build and from 26 to 4 when
 building the tests.
 
-A procedural macro can read the position or text of a token from another crate. When that happens,
-rustc records the observation. On the next build, Cargo asks rustc to record the reader's source
-and binary inputs. Cargo checks their digests before reusing the reader and checks them again if
-an upstream job could have replaced the metadata. A missing or changed input forces compilation.
+A procedural macro can read the position or text of a token from another crate. In 1.99.0-18, Cargo
+reruns rustc for a unit that observed such a span. An input can change after rustc reads it but
+before Cargo records its checksum. The next warm build must pick up that edit even if the file still
+has its original timestamp.
 
-In a paired Linux comparison on Ruff, the Cargo change reduced the median for an unchanged
+Rustc also tracks both ends of exported source spans. Moving a public `#[track_caller]` function
+from column 1 to column 257 used to leave an incremental caller reporting column 1. The caller now
+reports 257, as it does after a clean build. Moving a public identifier in a crate that emits both
+Rust metadata and a native library also invalidates the downstream reader.
+
+In a paired Linux comparison on Ruff before 1.99.0-18, the earlier reuse policy reduced the median for an unchanged
 `cargo test --no-run` from 6.09 to 0.96 seconds. All 619 units were fresh, eliminating 50 native
 links. The ordinary workspace build was already fresh with either Cargo. Checking the inputs has a
 cost when a macro observes a real change. In a seven-package fixture, moving the observed token
@@ -70,6 +75,9 @@ See:
 - [Rust #232](https://github.com/astral-sh/ohm-rust/pull/232)
 - [Rust #233](https://github.com/astral-sh/ohm-rust/pull/233)
 - [Cargo #254](https://github.com/astral-sh/ohm-cargo/pull/254)
+- [Cargo #261](https://github.com/astral-sh/ohm-cargo/pull/261)
+- [Rust #243](https://github.com/astral-sh/ohm-rust/pull/243)
+- [Rust #245](https://github.com/astral-sh/ohm-rust/pull/245)
 - [Ruff private doc edit](https://github.com/astral-sh/ohm-cargo/tree/2f07518331735487c84aaeadab58ce98d7c5a71b/benchmarks/ruff-dev-loop-20261027/native-qualified-results)
 - [Ruff test builds](https://github.com/astral-sh/ohm-cargo/tree/d2fae69374cda17ef47ef198a75fdd24d690b34f/benchmarks/ruff-dev-loop-20261027/whole-ruff-cargo-observer-fifo)
 - [Observed-token edit](https://github.com/astral-sh/ohm-cargo/tree/0c7fdaea22df8b42e67c1ccb6e12b92886c6cb2f/benchmarks/ruff-dev-loop-20261027/observer-fifo-seven-package-results)
@@ -308,10 +316,16 @@ optimization requires Headstart and at least two build jobs; `-Zohm-early-tests=
 Tests still wait until all requested libraries and executables are built. The option below can start
 tests sooner.
 
+If the library has already finished, Cargo compiles the integration test against it immediately. An
+earlier version could compile and link the same test twice. In a paired comparison on Ruff, removing
+that duplicate invocation cut the median first workspace test build after a test-source edit from
+12.60 to 11.16 seconds.
+
 See:
 
 - [Cargo #146](https://github.com/astral-sh/ohm-cargo/pull/146)
 - [Cargo #147](https://github.com/astral-sh/ohm-cargo/pull/147)
+- [Cargo #260](https://github.com/astral-sh/ohm-cargo/pull/260)
 
 ### 10. Skip unused dev-dependency rebuilds in targeted tests
 
@@ -483,6 +497,14 @@ lint tables that a member does not inherit. It also caches registry manifest war
 the parsed manifest. When a build script needs a list of package files, Cargo can recognize a Git
 index it has already verified. It still walks the working tree, so new untracked files are visible.
 
+Cargo checks explicit workspace members only when they can override an exclusion. Codex lists 165
+workspace members and no exclusions. Skipping that scan reduced Cargo’s instruction count by 7.38%
+on a warm workspace check and 16.80% on a check of `codex-utils-string`. These measurements count
+instructions in Cargo itself.
+
+When it writes a Make dependency file, Cargo collects the input paths directly. It sorts them once
+and removes duplicates, preserving the first spelling of equivalent paths.
+
 On a Ruff workspace with all 520 artifacts up to date, the ten Cargo changes together reduced
 Cargo's instructions for `cargo check` by 10.51%.
 [Paired measurements](https://github.com/astral-sh/ohm-cargo/tree/60f815537745e8dd8867c3062aea061c6865be34/benchmarks/ruff-dev-loop-20261026/ten-cargo-fresh)
@@ -525,6 +547,8 @@ See:
 - [Cargo #242](https://github.com/astral-sh/ohm-cargo/pull/242)
 - [Cargo #243](https://github.com/astral-sh/ohm-cargo/pull/243)
 - [Cargo #244](https://github.com/astral-sh/ohm-cargo/pull/244)
+- [Cargo #262](https://github.com/astral-sh/ohm-cargo/pull/262)
+- [Cargo #263](https://github.com/astral-sh/ohm-cargo/pull/263)
 - [Cargo #245](https://github.com/astral-sh/ohm-cargo/pull/245)
 - [Cargo #246](https://github.com/astral-sh/ohm-cargo/pull/246)
 - [Cargo #247](https://github.com/astral-sh/ohm-cargo/pull/247)
@@ -821,36 +845,28 @@ See:
 
 ### 25. Cache derive and attribute macro expansions
 
-**Status:** Experimental macro caching, enabled by default in Ohm.
+Starting in 1.99.0-18, rustc runs native derive and attribute macros on every compilation. A derive
+macro can call a C helper. In one reproducer, changing the helper’s return value from `17` to `29`
+rebuilt the macro and its consumer, but the warm executable still printed `17`. The first warm build
+with -18 prints `29`. Rustc still accepts `-Zcache-proc-macros` for compatibility and keeps
+expansion caching off.
 
-Ohm caches the code that derive and attribute macros generate. For example,
-`#[derive(serde::Serialize)]` on a `Config` struct generates code to serialize its fields. If you
-edit a separate `connect` function, Ohm can reuse that code as long as the macro's inputs are
-unchanged.
+Earlier releases cached the code generated by macros such as `#[derive(serde::Serialize)]`. To reuse
+an expansion, rustc had to restore generated source files and syntax contexts in the same order as a
+fresh expansion. In 1.99.0-16, mixing artifacts from different cache histories caused six of 28
+downstream builds in one reproducer to fail with `E0460`.
 
-Editing an attribute, the item it annotates, or the macro crate makes rustc expand the attribute
-macro again. It also reruns an attribute macro if the macro reads a tracked file or environment
-variable, inspects source locations or text, or asks rustc to expand a nested expression.
-
-Reusing an expansion also has to leave rustc's source map and syntax contexts in the same state as
-running the macro. Parsing a string inside a macro creates a virtual source file, which affects the
-positions of tokens parsed later. Ohm now recreates those files in their original order and restores
-the macro's syntax contexts before decoding cached tokens. On 1.99.0-16, six of 28 downstream
-builds in a reproducer failed with `E0460` when they mixed artifacts from different cache histories.
-
-An untracked input can make the cache unsound. If a macro reads a file without telling rustc and
-the file changes, rustc may reuse code generated from its old contents. Cargo's trust settings for
-compiled macros and worktree snapshots control separate caches.
-
-In the uv benchmark, we applied a private parser edit, checked the dependent crate, and ran the
-parser tests. The full sequence took a median of 4.02 seconds with macro caching and 4.15 seconds
-without it.
+In an earlier uv benchmark, editing a private parser, checking its dependent crate and running the
+parser tests took a median of 4.02 seconds with expansion caching and 4.15 seconds without it.
+Cargo’s trust settings for reusing compiled macros across worktrees control a separate cache.
 
 See:
 
 - [Cargo #54](https://github.com/astral-sh/ohm-cargo/pull/54)
 - [Rust #208](https://github.com/astral-sh/ohm-rust/pull/208)
 - [Rust #238](https://github.com/astral-sh/ohm-rust/pull/238)
+- [Rust #244](https://github.com/astral-sh/ohm-rust/pull/244)
+- [Cargo #261](https://github.com/astral-sh/ohm-cargo/pull/261)
 - [Downstream build reproducer on 1.99.0-16](https://github.com/astral-sh/ohm-cargo/tree/db71638cbb6dda4752d51ca6373e234811dff18f/benchmarks/ruff-dev-loop-20261027/shipping-16-macro-results)
 
 ## Clippy
