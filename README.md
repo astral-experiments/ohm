@@ -119,9 +119,8 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 - Use `cargo +ohm <command>` for all local Cargo commands, including `check`, `test`, `clippy`,
   `fmt`, `metadata`, and external subcommands. Use `rustc +ohm` for direct compiler calls and
   `RUSTUP_TOOLCHAIN=ohm just <recipe>` for task runners.
-- Ohm automatically enables `-Zrelink-only`, `-Zpublic-api-hash`, `-Zcache-proc-macros`, and
-  `-Zthreads=8` when compiling. Do not inject these flags manually or through `RUSTFLAGS`; direct
-  `rustc +ohm` does not receive Cargo's defaults.
+- Ohm automatically enables `-Zrelink-only`, `-Zpublic-api-hash`, and `-Zthreads=8` when compiling.
+  Cargo supplies these flags for you. Direct `rustc +ohm` uses its own defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
   separate shared path for all trusted local projects and worktrees using the same Ohm toolchain.
   Keep the shared build directory separate from every worktree target directory, and do not delete
@@ -268,7 +267,6 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Avoid duplicate builds when concurrent Cargo invocations need the same registry library with no
   dependencies.
 - Format individual changed modules when rustfmt can verify the module graph.
-- Cache procedural-macro expansions (`rustc -Zcache-proc-macros`).
 - Combine Clippy lint passes and backport faster redundant-clone checks.
 
 Ohm is exclusively intended for local development: never use it for production builds or releases,

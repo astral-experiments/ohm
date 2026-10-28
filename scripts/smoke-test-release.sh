@@ -129,7 +129,7 @@ for argument in "$@"; do
   fi
   case "$argument" in
     -Zpublic-api-hash) has_public_api_hash=true ;;
-    -Zcache-proc-macros) has_proc_macro_cache=true ;;
+    -Zcache-proc-macros|-Zcache-proc-macros=yes) has_proc_macro_cache=true ;;
   esac
   previous_argument="$argument"
 done
@@ -137,8 +137,12 @@ done
 if [[ "$crate_name" == "ohm_smoke" ]]; then
   case "${OHM_EXPECT_DEFAULTS:?}" in
     enabled)
-      if [[ "$has_public_api_hash" != true || "$has_proc_macro_cache" != true ]]; then
+      if [[ "$has_public_api_hash" != true ]]; then
         echo "Ohm defaults missing from ohm_smoke rustc invocation" >&2
+        exit 1
+      fi
+      if [[ "$has_proc_macro_cache" != "${OHM_EXPECT_PROC_MACRO_CACHE:?}" ]]; then
+        echo "unexpected proc-macro cache setting in ohm_smoke rustc invocation" >&2
         exit 1
       fi
       ;;
@@ -162,7 +166,11 @@ chmod +x "$rustc_wrapper"
 
 unset CARGO_BUILD_RUSTFLAGS CARGO_ENCODED_RUSTFLAGS RUSTFLAGS RUSTC_WORKSPACE_WRAPPER
 defaults_log="$smoke_root/defaults-rustc-args"
+expect_proc_macro_cache="$(jq -r '
+  .release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) < [1, 99, 0, 18]
+' "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json")"
 OHM_EXPECT_DEFAULTS=enabled \
+  OHM_EXPECT_PROC_MACRO_CACHE="$expect_proc_macro_cache" \
   OHM_RUSTC_LOG="$defaults_log" \
   RUSTC_WRAPPER="$rustc_wrapper" \
   CARGO_TARGET_DIR="$smoke_root/defaults-target" \
