@@ -240,6 +240,13 @@ if [[ "$use_bolt" == true ]]; then
   opt_dist_arguments+=(--use-bolt)
 fi
 
+# This compiler rechecks dependencies with native inputs. rustc-perf expects
+# the selected crate to be the only one compiled during each training run.
+if [[ "$toolchain" == ohm-1.99.0-20 && \
+  "$(git -C "$rust_checkout" rev-parse --verify HEAD)" == ad005f99d0b51fd62b5c237bc13b31b371a1686e ]]; then
+  opt_dist_arguments+=(--benchmark-cargo-config unstable.ohm-defaults=false)
+fi
+
 dist_arguments=(--set "build.description=$toolchain")
 if [[ -n "${OHM_WILD_LINKER_DIR:-}" ]]; then
   if [[ "$target" != x86_64-unknown-linux-gnu || ! -x "$OHM_WILD_LINKER_DIR/wild" ]]; then
