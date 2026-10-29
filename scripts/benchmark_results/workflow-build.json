@@ -1,28 +1,16 @@
 {
-  "coordinator_revision": "fdf90406638cacb725178ee17e67957f7bd662ca",
+  "coordinator_revision": "885faf0af725074adc31080a1c732c60965d8bbe",
   "manifest": {
-    "path": "toolchains/1.99.0/17.json",
-    "sha256": "77b227400d7246114e14f92c3238a92284a80d900505b2e32598b67a9c2d3de3"
+    "path": "toolchains/1.99.0/18.json",
+    "sha256": "0a87f72c20bce32b898be3752a9f00c2e2e95ef1d10850de4f3dded1d8d624f3"
   },
   "measurement": {
     "linux_hosts": [
-      "charlie-ohm-17-codex",
-      "charlie-ohm-17-ruff",
-      "charlie-ohm-17-ty",
-      "charlie-ohm-17-uv"
+      "charlie-ohm-18-codex",
+      "charlie-ohm-18-ruff",
+      "charlie-ohm-18-ty",
+      "charlie-ohm-18-uv"
     ],
-    "publication_scope": {
-      "complete_suites": [
-        "individual_commands",
-        "sessions",
-        "historical_ruff",
-        "uv_ablation",
-        "ty_worktrees"
-      ],
-      "developer_projects": ["uv", "ruff"],
-      "omitted_developer_projects": ["codex"],
-      "reason": "The separate Codex developer suite was stopped by its unchanged host-activity guard; its partial samples are excluded."
-    },
     "runner_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
     "same_linux_release_components_on_all_hosts": true,
     "settings": "Each suite records its shared-build and procedural-macro and native-tool trust settings.",
@@ -46,62 +34,63 @@
     },
     "study_hosts": {
       "developer_workflows": {
-        "ruff": "charlie-ohm-17-ruff",
-        "uv": "charlie-ohm-17-uv"
+        "codex": "charlie-ohm-18-codex",
+        "ruff": "charlie-ohm-18-ruff",
+        "uv": "charlie-ohm-18-uv"
       },
-      "feature_ablation": "charlie-ohm-17-uv",
-      "historical_ruff": "charlie-ohm-17-ruff",
+      "feature_ablation": "charlie-ohm-18-uv",
+      "historical_ruff": "charlie-ohm-18-ruff",
       "individual_commands": {
-        "codex": "charlie-ohm-17-codex",
-        "uv": "charlie-ohm-17-uv"
+        "codex": "charlie-ohm-18-codex",
+        "uv": "charlie-ohm-18-uv"
       },
       "main_sessions": {
-        "codex": "charlie-ohm-17-codex",
-        "ruff": "charlie-ohm-17-ruff",
-        "uv": "charlie-ohm-17-uv"
+        "codex": "charlie-ohm-18-codex",
+        "ruff": "charlie-ohm-18-ruff",
+        "uv": "charlie-ohm-18-uv"
       },
-      "ty_session_and_worktrees": "charlie-ohm-17-ty"
+      "ty_session_and_worktrees": "charlie-ohm-18-ty"
     }
   },
   "provenance_inputs": {
     "project_verification_sha256": {
-      "codex": "5a6d1f3973c6acfbf78d311eb0131fd28aa0758a2acb7f6a56fbddc8bdbce706",
-      "ruff": "5145d7389e7faf6d6803b05379c687c1cb3f62c5d16d4f2803da81e57ea6c797",
-      "ty": "eddd7081869be19f7ea712879380a798248a0097cac09eccdd12b4b3b5ff6b21",
-      "uv": "99ab7b4ac927c6cf538c66c2cc1f32af2f9e1937ea939f07dc12ecdace0a507e"
+      "codex": "aa111e45512af5370bb63d663780d0f4f6d6ea2cd165f92c7ff218666f10b797",
+      "ruff": "43e89dff7cf64e30debf25eec8475898fa3d536a1066bdd0de58a47c99b8024a",
+      "ty": "e6fe7e859249152b0d00a7d9657f7bc878a62b3f021983796e25bc4a99ec6368",
+      "uv": "ee0f301fae3c1056303283c02fd69cddf2b7fa71f95f0037e38c1599fb72a3a9"
     },
-    "published_verification_sha256": "c590c315b57e0c74b98b3431d54a2d02d3127b5ffe3ee63bfb1e28afb4501ad3"
+    "published_verification_sha256": "82dbebdbdfb7502b8f7befd1f1765c4c3aecfd3315e0668bac2ba792a4105623"
   },
-  "published_at": "2026-10-28T02:16:30Z",
-  "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-17",
-  "release_workflow": "https://github.com/astral-sh/ohm/actions/runs/40609224340",
+  "published_at": "2026-10-28T19:57:10Z",
+  "release": "https://github.com/astral-sh/ohm/releases/tag/ohm-1.99.0-18",
+  "release_workflow": "https://github.com/astral-sh/ohm/actions/runs/40741806145",
   "released": true,
   "schema_version": 1,
   "sources": {
-    "cargo": "a0c7d08c898d3fdff992f2f431dec57d2486add2",
+    "cargo": "7caf39914da1e28a67744ecbc963a5f26361474d",
     "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
-    "rust": "bfa236f639034f61ec884c15bd1f4e0b75e508ac",
+    "rust": "a4fa11bcd38280639cb94daacc125472657db6c3",
     "rustfmt": "3c9620c92b01e6c393324729c4861823cc3676e2"
   },
   "targets": {
     "aarch64-apple-darwin": {
       "archive": {
-        "sha256": "e58f5ce47b9dd2dbee8c47a7850fb3aec53066c1c781daa3f955ae201f3cb92b",
-        "size": 294967609,
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-17/ohm-1.99.0-17-aarch64-apple-darwin.tar.gz"
+        "sha256": "068be3dd481c11a6e007f963eef60c57b32c50fece04d6628427984a0cc28b32",
+        "size": 294859399,
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-18/ohm-1.99.0-18-aarch64-apple-darwin.tar.gz"
       },
       "bundled_tools": {},
       "published_provenance": {
-        "sha256": "e61f200d09fcd9b84f215032916b55673fa7de33c3ea4f8dbee1070819505fbf",
+        "sha256": "5c8549560c41784372e750072f7ccb1480c252d4a080863a9176c0bebccbc8b6",
         "size": 731,
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-17/ohm-1.99.0-17-aarch64-apple-darwin-provenance.json"
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-18/ohm-1.99.0-18-aarch64-apple-darwin-provenance.json"
       }
     },
     "x86_64-unknown-linux-gnu": {
       "archive": {
-        "sha256": "163267d26889b1bd2c467d7db97efee42cd2ac9dc9af2abc3a56ade8da9a9572",
-        "size": 359683716,
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-17/ohm-1.99.0-17-x86_64-unknown-linux-gnu.tar.gz"
+        "sha256": "629abab6a87c84bb4d910549ca96a31e437e3dc9de3039fedcbb7b50d198a5e8",
+        "size": 359656945,
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-18/ohm-1.99.0-18-x86_64-unknown-linux-gnu.tar.gz"
       },
       "bundled_tools": {
         "wild": {
@@ -111,28 +100,28 @@
       },
       "components": {
         "cargo": {
-          "sha256": "4e4065390403afbf4fb77b2f41fbc21c59afe3dda2337a5bbe29fda29a47dbb3",
-          "version": "cargo 1.99.0-dev (a0c7d08c8 2026-10-27) (ohm-1.99.0-17)"
+          "sha256": "02a86ebd2d9e4f237b33f212102b81ed145eb77fae090d67e379cb6f1d70a573",
+          "version": "cargo 1.99.0-dev (7caf39914 2026-10-28) (ohm-1.99.0-18)"
         },
         "clippy-driver": {
-          "sha256": "c85df32a9f4ccea7c5b9f801d820b507037fb5ff23de682daa8b53d9b98351d6",
+          "sha256": "9084aaba497ad1677ea3f98b89479a84f34995be8101bfa161fb6c4d0e32623d",
           "version": "clippy 0.1.99 (0d76dc1f4f 2026-10-15)"
         },
         "rustc": {
-          "sha256": "7ec5263869aed2fc9272ea7212aabbe7b272a4685f1b79af75c123daff09c02c",
-          "version": "rustc 1.99.0-dev (bfa236f63 2026-10-27) (ohm-1.99.0-17)"
+          "sha256": "c6ab483d6698f68eebb49d74b27361f3e02ede55452dc0416c3fdec9a45b7f60",
+          "version": "rustc 1.99.0-dev (a4fa11bcd 2026-10-28) (ohm-1.99.0-18)"
         },
         "rustfmt": {
-          "sha256": "487548e70a48e86500b5ba9fcc7eab1784291d49721f82dd6c63610b3791ef3b",
+          "sha256": "2ce6c4e91ca60f5a27808292d2ab6456bdf6f4a5655e7d63e56307112faa2eef",
           "version": "rustfmt 1.10.0-dev (3c9620c92b 2026-10-21)"
         }
       },
       "published_provenance": {
-        "sha256": "15d0f77b5d8c4157bcfbc503d3dd9308bc5ff1708c3f0cec092939bd2543e1a2",
+        "sha256": "45e1b4b87010db376a1cb8b4234beaec1505cbca4836d6992a7496a380641c40",
         "size": 868,
-        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-17/ohm-1.99.0-17-x86_64-unknown-linux-gnu-provenance.json"
+        "url": "https://github.com/astral-sh/ohm/releases/download/ohm-1.99.0-18/ohm-1.99.0-18-x86_64-unknown-linux-gnu-provenance.json"
       }
     }
   },
-  "toolchain": "ohm-1.99.0-17"
+  "toolchain": "ohm-1.99.0-18"
 }
