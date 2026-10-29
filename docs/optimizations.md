@@ -110,6 +110,12 @@ the linter's own code.
 In a release benchmark, we changed a dependency, then rebuilt and ran a uv test. The median time for
 the command fell from 26.27 to 3.79 seconds.
 
+A cached relink already has a list of its Rust crate inputs. In 1.99.0-19, rustc waits until it
+needs to look up a crate before it opens the library search directories. In an earlier uv
+test-harness relink, this avoided 519 directory opens and produced a byte-for-byte identical
+executable. Rustc used about 5% fewer instructions on two machines. The count covers rustc’s own
+work before and after the native linker runs.
+
 See:
 
 - [Cargo #51](https://github.com/astral-sh/ohm-cargo/pull/51)
@@ -118,6 +124,7 @@ See:
 - [Cargo #198](https://github.com/astral-sh/ohm-cargo/pull/198)
 - [Cargo #234](https://github.com/astral-sh/ohm-cargo/pull/234)
 - [Cargo #236](https://github.com/astral-sh/ohm-cargo/pull/236)
+- [Rust #252](https://github.com/astral-sh/ohm-rust/pull/252)
 
 ### 3. Reuse builds during checks
 
@@ -245,11 +252,17 @@ In a macOS experiment, creating a worktree and completing its first build took 2
 copied build state and 3.59 seconds with it. When we made a small edit before building, the times
 were 25.08 and 8.33 seconds.
 
+Cargo records which worktrees it has seeded in a generated marker file. In 1.99.0-18, if that marker
+was a symlink, even a fully fresh build could write through it to an unrelated file. Starting in
+1.99.0-19, Cargo replaces the marker at its own path. The file the symlink pointed to keeps its
+original contents.
+
 See:
 
 - [Cargo #101](https://github.com/astral-sh/ohm-cargo/pull/101)
 - [Cargo #126](https://github.com/astral-sh/ohm-cargo/pull/126)
 - [Rust #91](https://github.com/astral-sh/ohm-rust/pull/91)
+- [Cargo #274](https://github.com/astral-sh/ohm-cargo/pull/274)
 
 ### 7. Start checking dependent crates earlier
 
@@ -789,6 +802,18 @@ caches, reduced total rebuild time across 13 uv development commits from 478.19 
 or 6.5%. Focused Ruff measurements of the query-cache change saved about 36 MiB during a check and
 114 MiB during a build, with no consistent wall-time improvement.
 
+Rustc checks command-line tool lints in each module. A workspace can enable Clippy lints even when
+Clippy is absent. To decide which diagnostic to issue, rustc used to scan every registered lint
+name. In 1.99.0-19, it records the tool prefixes when it registers those names and can answer with
+one lookup. With an earlier stage-1 compiler, editing Ruff and running `cargo check -p ruff` took
+2.16% less wall time across 64 pairs.
+
+A test binary can also depend on hundreds of crates whose generic symbols the linker does not need
+to retain. Rustc now records one bit in each crate’s metadata indicating whether any of its symbols
+needs special treatment in a C-level link. A test-harness compile for uv decoded one local list and
+read 479 summary bits. On the earlier compiler, rustc executed about half as many instructions in
+that compile. The whole-command timing was inconclusive.
+
 See:
 
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
@@ -804,6 +829,8 @@ See:
 - [Rust #227](https://github.com/astral-sh/ohm-rust/pull/227)
 - [Rust #230](https://github.com/astral-sh/ohm-rust/pull/230)
 - [Rust #231](https://github.com/astral-sh/ohm-rust/pull/231)
+- [Rust #250](https://github.com/astral-sh/ohm-rust/pull/250)
+- [Rust #251](https://github.com/astral-sh/ohm-rust/pull/251)
 
 ### 23. Reduce allocator page-clearing work
 
