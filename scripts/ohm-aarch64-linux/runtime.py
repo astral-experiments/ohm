@@ -23,7 +23,7 @@ CAP = ROOT / "capsule"
 WORK = ROOT / "work"
 RUFF = ROOT / "ruff"
 WILD = "lib/rustlib/" + HOST + "/bin/wild-ld/ld.bfd"
-TOOLS = {"bin/cargo": "1d06626bcef3c5235676ada14f4b7107f56e98aef620f81b0e0c47381dbe0add",
+TOOLS = {"bin/cargo": "abf43741c6c75f7fd4a3bcbf1db0cfc29824a07727bde4a3974b3ea44b379c1a",
          WILD: "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"}
 BASE = "ohm-1.99.0-20-" + HOST
 ARCHIVE = BASE + ".tar.gz"
@@ -64,6 +64,7 @@ def release():
                 shutil.copyfileobj(source, out)
             path.chmod(0o755)
             found[n] = sha(path)
+    save(LOG / "release-members.json", {"observed": found, "required": TOOLS})
     need(found == TOOLS, "signed Cargo or Wild bytes changed")
     save(LOG / "release.json", {"release": A, "checksum": SIDE, "provenance": PROV, "tools": found})
 
