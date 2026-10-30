@@ -243,7 +243,7 @@ fi
 # This compiler rechecks dependencies with native inputs. rustc-perf expects
 # the selected crate to be the only one compiled during each training run.
 if [[ "$toolchain" == ohm-1.99.0-20 && \
-  "$(git -C "$rust_checkout" rev-parse --verify HEAD)" == ad005f99d0b51fd62b5c237bc13b31b371a1686e ]]; then
+  "$(git -C "$rust_checkout" rev-parse --verify HEAD)" == 05efba7a06f5bb71d1efb4b86805800f8b810779 ]]; then
   opt_dist_arguments+=(--benchmark-cargo-config unstable.ohm-defaults=false)
 fi
 
