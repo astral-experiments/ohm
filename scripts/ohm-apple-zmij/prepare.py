@@ -1,6 +1,7 @@
 """Prepare private, source-enrolled inputs on an ephemeral arm64 Actions worker."""
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
@@ -26,6 +27,7 @@ from study import (
     ZMIJ,
     ZMIJ_LIB,
     check_host,
+    digest,
     env_for,
     git,
     need,
@@ -150,6 +152,56 @@ def role_files(prefix):
     return {str(p.relative_to(prefix)): sha(p) for p in sorted(prefix.rglob("*")) if p.is_file()}
 
 
+def identity_digest(prefix, members):
+    rows = []
+    for name in sorted(members):
+        st = (prefix / name).stat()
+        rows.append((name, st.st_dev, st.st_ino, st.st_mode, st.st_size, st.st_mtime_ns))
+    return digest(json.dumps(rows).encode())
+
+
+def freeze_stage(stage, frozen, source, library):
+    """Snapshot runtime files without following bootstrap's two source-checkout symlinks."""
+    stage = stage.resolve(strict=True)
+    backrefs = {Path("lib/rustlib") / component / "rust" for component in ("src", "rustc-src")}
+    for ref in backrefs:
+        link = stage / ref
+        need(link.is_symlink() and link.samefile(source), f"unexpected bootstrap source alias {link}")
+    aliases = {}
+
+    def exclude(directory, names):
+        skip = []
+        for name in names:
+            path = Path(directory) / name
+            rel = path.relative_to(stage)
+            if rel in backrefs:
+                skip.append(name)
+            elif path.is_symlink() and path.is_dir():
+                target = path.resolve(strict=True)
+                need(
+                    target.is_relative_to(stage) and target not in path.parents,
+                    f"external or cyclic SDK alias {path}",
+                )
+                aliases[rel] = target.relative_to(stage)
+                skip.append(name)
+        return skip
+
+    # Copy file aliases as ordinary files, including LLVM, driver and host std
+    # objects linked out of the mutable build. Keep internal directory aliases local.
+    shutil.copytree(stage, frozen, symlinks=False, ignore=exclude)
+    for relative, target in aliases.items():
+        link = frozen / relative
+        need((frozen / target).is_dir(), f"missing SDK directory {target}")
+        link.symlink_to(os.path.relpath(frozen / target, link.parent), target_is_directory=True)
+    # This consumer uses the ordinary rust-src library, not rustc-dev sources.
+    # Its clean checkout has the same library tree and backtrace gitlink in both arms.
+    std = frozen / "lib/rustlib/src/rust/library"
+    shutil.copytree(library, std, symlinks=True, ignore=shutil.ignore_patterns(".git"))
+    need(not any(p.is_symlink() for p in std.rglob("*")), "unexpected symlink in enrolled standard-library source")
+    need((std / "std/src/lib.rs").is_file(), "missing frozen standard-library source")
+    return {str(k): str(v) for k, v in sorted(aliases.items())}
+
+
 def build_pair(root, checkout):
     check_host(root, 32)
     src = root / "compiler-source"
@@ -169,6 +221,13 @@ def build_pair(root, checkout):
             "tests/run-make/ohm-checked-dep-info/rmake.rs",
         },
         "unexpected product change",
+    )
+    library = checkout / "library"
+    lib_tree = text_git(checkout, "rev-parse", CHILD + ":library")
+    need(text_git(checkout, "rev-parse", PARENT + ":library") == lib_tree, "standard-library source changed")
+    need(
+        not text_git(checkout, "status", "--porcelain", "--ignore-submodules=none", "--", "library"),
+        "dirty library source",
     )
     # Pin the ordinary full-history LLVM merge base; never use a hosted ephemeral SHA as a compiler version.
     # The reconstructed bundle deliberately has no private remote. Bootstrap only
@@ -211,16 +270,19 @@ def build_pair(root, checkout):
         stage = src / "build" / TRIPLE
         stage1 = stage / "stage1"
         frozen = root / ("stage-" + name)
-        # Materialize symlinks, including any bootstrap paths into mutable build outputs.
-        shutil.copytree(stage1, frozen, symlinks=False)
+        aliases = freeze_stage(stage1, frozen, src, library)
         cargo = frozen / "bin/cargo"
         if cargo.exists():
             cargo.unlink()
         os.link(root / "signed/bin/cargo", cargo)
+        runtime_files = role_files(frozen)
         products[name] = {
             "source": rev,
             "tree": text_git(src, "rev-parse", "HEAD^{tree}"),
-            "runtime": role_files(frozen),
+            "runtime": runtime_files,
+            "physical_inventory": identity_digest(frozen, runtime_files),
+            "library_tree": lib_tree,
+            "directory_aliases": aliases,
             "stage0_cargo": physical(stage / "stage0/bin/cargo"),
             "stage0_rustc": physical(stage / "stage0/bin/rustc"),
             "source_stamp_input": sha(src / "src/stage0"),
@@ -228,7 +290,14 @@ def build_pair(root, checkout):
             "rustc": run([str(frozen / "bin/rustc"), "-vV"]).decode(),
             "build_flags": base[1:],
         }
+        save(root / "receipts" / f"bootstrap-{name}-product.json", products[name])
     p, c = (products[k] for k in "PC")
+    need(
+        identity_digest(root / "stage-P", p["runtime"]) == p["physical_inventory"]
+        and role_files(root / "stage-P") == p["runtime"],
+        "parent SDK changed during child bootstrap",
+    )
+    need(p["directory_aliases"] == c["directory_aliases"], "SDK directory aliases changed")
     need(
         p["stage0_rustc"] == c["stage0_rustc"]
         and p["stage0_cargo"] == c["stage0_cargo"]
@@ -258,7 +327,7 @@ def build_pair(root, checkout):
         },
     )
     runtime = root / "native"
-    shutil.copytree(root / "stage-P", runtime, symlinks=False, copy_function=os.link)
+    shutil.copytree(root / "stage-P", runtime, symlinks=True, copy_function=os.link)
     # Run the exact checked-in NEON-positive, :q and .incbin-negative test using this child and backend.
     rm = root / "receipts/run-make.log"
     with rm.open("xb") as stream:

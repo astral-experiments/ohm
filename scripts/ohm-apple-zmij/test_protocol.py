@@ -17,6 +17,7 @@ from cohort import summarize
 from measure import typed
 from objects import archive_evidence, bag
 from pilot import has_output
+from prepare import freeze_stage, identity_digest, role_files
 from wrapper import WrapperTrace, compiler_selector
 
 
@@ -196,6 +197,48 @@ class Protocol(unittest.TestCase):
             self.assertEqual(child.call_args.args[0], argv)
             self.assertEqual(child.call_args.kwargs["env"]["RUSTC"], str(compiler.resolve()))
             self.assertEqual(rows[0]["selected_rustc"], str(compiler.resolve()))
+
+    def test_stage_freezes_runtime_without_following_source_backlinks(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            repo = root / "checkout"
+            stage = repo / "build/host/stage1"
+            rl = stage / "lib/rustlib"
+            library = repo / "library"
+            std = library / "std/src/lib.rs"
+            std.parent.mkdir(parents=True)
+            std.write_text("real standard library source")
+            (library / ".git").write_text("private checkout control")
+            for component in ("src", "rustc-src"):
+                (rl / component).mkdir(parents=True)
+                (rl / component / "rust").symlink_to(repo)
+            dep = repo / "build/external.o"
+            dep.write_bytes(b"P")
+            host = rl / "native/lib"
+            host.mkdir(parents=True)
+            (host / "libstd.rlib").symlink_to(dep)
+            (rl / "host").symlink_to("native")
+            (stage / "lib/driver").symlink_to(dep)
+            frozen = root / "P"
+            links = freeze_stage(stage, frozen, repo, library)
+            self.assertEqual(links, {"lib/rustlib/host": "lib/rustlib/native"})
+            before = role_files(frozen)
+            physical = identity_digest(frozen, before)
+            dep.write_bytes(b"C")
+            child = root / "C"
+            freeze_stage(stage, child, repo, library)
+            for path in ("lib/driver", "lib/rustlib/host/lib/libstd.rlib"):
+                self.assertEqual((frozen / path).read_bytes(), b"P")
+                self.assertEqual((child / path).read_bytes(), b"C")
+            self.assertEqual(role_files(frozen), before)
+            self.assertEqual(identity_digest(frozen, before), physical)
+            self.assertTrue((frozen / "lib/rustlib/host").resolve().is_relative_to(frozen))
+            self.assertFalse((frozen / "lib/rustlib/rustc-src/rust").exists())
+            self.assertFalse((frozen / "lib/rustlib/src/rust/library/.git").exists())
+            self.assertEqual((frozen / "lib/rustlib/src/rust/library/std/src/lib.rs").read_bytes(), std.read_bytes())
+            (stage / "lib/unexpected").symlink_to(repo)
+            with self.assertRaisesRegex(RuntimeError, "external or cyclic SDK alias"):
+                freeze_stage(stage, root / "bad", repo, library)
 
     def test_whole_single_branch_transition(self):
         with tempfile.TemporaryDirectory() as t:
