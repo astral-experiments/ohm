@@ -101,6 +101,11 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
             need(e2e is None,"ambiguous ty_server e2e")
             e2e=actual_tests(path,repo,env,state,dest)
             e2e_links=links[str(path)]
+            if label=="clean" and "ty-comparison" in dest.parts:
+                archive=root/"receipts/clean-ty-executables"/(e2e["raw"]+".macho.gz")
+                if not archive.exists():
+                    archive.parent.mkdir(exist_ok=True)
+                    compress_bytes(archive,path.read_bytes())
     if ok:
         need(e2e is not None, "missing qualified ty_server e2e")
         if label in ("edit","repair"):
@@ -119,13 +124,13 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
     return e2e
 
 
-def run_focus(root, trace):
+def run_focus(root, trace, role="S"):
     repo=root/"ruff"
     work=root/"ty-focus-work"
-    work.mkdir()
-    sdk=select(root,"S")
+    work.mkdir(exist_ok=True)
+    sdk=select(root,role)
     env=env_for(work,sdk)
-    prefix=root/"receipts/ty-focus"
+    prefix=(root/"receipts/ty-focus" if role=="S" else root/"receipts/ty-comparison"/role/"focus")
     def visit(where, plan):
         check_host(root,24)
         fresh(work,root/"seed")
@@ -152,8 +157,9 @@ def run_focus(root, trace):
         if state=="bad":
             continue
         comparisons[key]={k:rows[key][k]==v for k,v in references[state].items()}
-        need(comparisons[key]["inventory"], "focused test behavior differs from clean")
+        need(all(comparisons[key].values()), "focused test executable differs from clean")
     save(prefix/"result.json",{"source":[A,B],"clean":references,"comparisons":comparisons,"scores":0})
+    return references
 
 
 def workspace(root,trace):
