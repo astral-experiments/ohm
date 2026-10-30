@@ -82,7 +82,7 @@ def read_files(dest, roots, crate):
     for root in roots:
         for p in root.rglob('*'):
             normalized=crate.replace('-','_')
-            is_raw=p.name.startswith(normalized+'-') and p.suffix=='.d'
+            is_raw=(p.name.startswith(normalized+'-') or p.name==normalized+'.d') and p.suffix=='.d'
             encoded=p.name in ('dep-lib-'+normalized,'dep-bin-'+normalized,'dep-bin-'+crate)
             if not (is_raw or encoded) or not p.is_file(): continue
             st=p.stat();ident=(st.st_dev,st.st_ino);raw=p.read_bytes()
@@ -94,6 +94,11 @@ def read_files(dest, roots, crate):
                 rules=[x for x in raw.decode().splitlines() if ': ' in x]
                 first=rules[0].split(': ',1)[1].split();own=[x for x in rules if x.split(': ',1)[0]==str(p)]
                 if not own:own=[x for x in rules if x.split(': ',1)[0].endswith('/'+p.name)]
+                if not own:
+                    assert len(rules)==1 and not any(line.endswith(b':') for line in raw.splitlines()),(p,rules)
+                    info.update(kind='cargo-exported-depfile',first=[v for v in first if '/dev/null/ohm-' in v])
+                    result[str(p)]=info
+                    continue
                 assert len(own)==1,(p,rules)
                 ordinary=own[0].split(': ',1)[1].split()
                 markers=lambda x:[f for f in x if '/dev/null/ohm-' in f]

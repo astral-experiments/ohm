@@ -9,11 +9,13 @@ ORIG=HERE.parent/'ohm-aarch64-confirm'
 s=runpy.run_path(str(ORIG/'reopen.py'))
 H=lambda b:sha256(b).hexdigest()
 key=lambda v:H(json.dumps(v,sort_keys=True,separators=(',',':')).encode())
-def verify(path):
+def verify(path, expected_sources=None, expected_drivers=None, cargo_sha='869a24e83ff84cca6e9d6cb35eb62f149aa48555cf8bb7ee9b94d44ad90d2914'):
+ expected_sources=s['source'] if expected_sources is None else expected_sources
+ expected_drivers=s['drivers'] if expected_drivers is None else expected_drivers
  a=s['Study'](path)
  try:
   phases=s['subject']['lib']['PHASES'];env=a.J('ruff-native-eligibility.json');select=runpy.run_path(str(ORIG/'verify_transitions.py'))['verify'](a.z)
-  assert env['sources']==s['source'] and env['drivers']==s['drivers'] and a.J('cargo-substitution.json')['to'][0]==env['cargo']=='869a24e83ff84cca6e9d6cb35eb62f149aa48555cf8bb7ee9b94d44ad90d2914'
+  assert env['sources']==expected_sources and env['drivers']==expected_drivers and a.J('cargo-substitution.json')['to'][0]==env['cargo']==cargo_sha
   assert not any('/profiles/cg.' in p or p.endswith('/counter-unavailable.json') for p in a.all)
   assert set(env['roles'])==set('ANM') and env['all_nine']==H(a.get('all-nine-actual-transitions.json'))
   reference=env['roles']['A'];globals_=a.native.__globals__
@@ -54,7 +56,7 @@ def verify(path):
       'ordinary_ast_env_verified':True}
   assert set(a.native_refs)=={'old','edited'} and len(a.native_refs['old'])==len(a.native_refs['edited'])==95 and len(a.elf)==2
   assert key(a.native_refs['old'])==reference['old_objects'] and key(a.native_refs['edited'])==reference['new_objects']
-  return {'roles':details,'cargo':env['cargo'],'sources':s['source'],'drivers':s['drivers'],'status':'complete native eligibility, zero counts','reference':{k:reference[k] for k in ('old','new','units','old_objects','new_objects','old_value','new_value')},
+  return {'roles':details,'cargo':env['cargo'],'sources':expected_sources,'drivers':expected_drivers,'status':'complete native eligibility, zero counts','reference':{k:reference[k] for k in ('old','new','units','old_objects','new_objects','old_value','new_value')},
     'argv_count':env['argv_count'],'namespace_positions':env['namespace_positions'],'actual_ast':actual,'terminal':H(a.get('ruff-native-eligibility.json'))}
  finally:a.z.close()
 if __name__=='__main__':

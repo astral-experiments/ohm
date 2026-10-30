@@ -30,6 +30,9 @@ def verify_native(root,placement,spelling,keys):
         if row['markers']:
             for n,(_,__,digest) in row['markers'].items():
                 data=(root/'raw-depfiles'/digest).read_bytes()
+                if not any(line.endswith(b':') for line in data.splitlines()):
+                    assert len(data.splitlines())==1 and spelling.encode() in data.splitlines()[0].split(),(phase,n)
+                    continue
                 assert any(line==spelling.encode()+b':' for line in data.splitlines()) and not any(line==HARD.encode()+b':' for line in data.splitlines()),(phase,n)
                 assert not any(line==(NEW if spelling==OLD else OLD).encode()+b':' for line in data.splitlines())
         if row['exit']==0:assert row['selected'] and row['elf'] and row['answer']

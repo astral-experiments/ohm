@@ -5,7 +5,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: gnu-versioned-native-four-way-20261030
+  group: gnu-versioned-native-and-ruff-20261030-v2
   cancel-in-progress: false
 jobs:
   block:
@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        block: ["direct","signed","classic","aware","migrate-signed","migrate-classic","named","legacy-writer"]
+        block: ["signed","classic","aware","migrate-signed","migrate-classic","legacy-writer","ruff"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -29,6 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           export QA_ROOT="$RUNNER_TEMP/versioned-gnu-native"
+          if [[ "${{ matrix.block }}" == ruff ]]; then QA_ROOT="$RUNNER_TEMP/gnu-aarch64-ruff-screen"; fi
           mkdir -p "$QA_ROOT/inputs" "$QA_ROOT/receipts"
           printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
           for family in ohm-aarch64-registers ohm-aarch64-compact ohm-aarch64-confirm ohm-aarch64-fallback ohm-aarch64-versioned; do
@@ -48,21 +49,23 @@ jobs:
           set -euo pipefail
           python3 -IB scripts/ohm-aarch64-versioned/acquire_builds.py
           python3 -IB scripts/ohm-aarch64-fallback/acquire.py
+          if [[ "${{ matrix.block }}" == ruff ]]; then
+            bash scripts/ohm-aarch64-confirm/ancestor.sh "$RUNNER_TEMP/gnu-compact-public-ancestor"
+          fi
       - name: Apply actual GNU marker and provider gates
         env:
           MODE: ${{ matrix.block }}
         run: |
           set -euo pipefail
           case "$MODE" in
-            direct) python3 -IB scripts/ohm-aarch64-versioned/direct_restored.py ;;
-            named) python3 -IB scripts/ohm-aarch64-versioned/named.py "$QA_ROOT/inputs" ;;
+            ruff) python3 -IB scripts/ohm-aarch64-versioned/ruff_admission.py "$RUNNER_TEMP/gnu-compact-public-ancestor" "$QA_ROOT/inputs" ;;
             *) python3 -IB scripts/ohm-aarch64-versioned/safety.py "$MODE" "$QA_ROOT/inputs" ;;
           esac
       - name: Retain all native terminals, products and profiles even if incomplete
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-versioned-native-${{ matrix.block }}
-          path: ${{ runner.temp }}/versioned-gnu-native/receipts
+          name: gnu-versioned-rerun-${{ matrix.block }}
+          path: ${{ env.QA_ROOT }}/receipts
           retention-days: 7
           if-no-files-found: error

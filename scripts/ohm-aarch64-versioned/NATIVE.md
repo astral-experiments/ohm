@@ -40,3 +40,24 @@ The native groups and their independent readback must pass before final
 Ruff instruction samples. Incidental process counts and any failure remain
 in the raw evidence. Elapsed time from any source build or fixture is outside
 the study.
+
+## Preserved first qualification
+
+The 29 direct cases on each actual compiler and all four ordinary named-path
+histories passed. Every named-path group includes three real Cargo commands
+and fresh complete consumer output. Each of the six provider/migration
+groups emitted a successful first native ELF, then its diagnostic file
+inventory rejected the unhashed final binary name. Retain all eight original
+raw artifacts from 41083038179. The revised observer distinguishes Cargo's
+single-line exported .d from rustc's own output and prerequisite rules, and
+links each to the real encoded fingerprint. It was locally replayed against
+all six original emitted depfiles and all twelve named-path commands before
+obtaining any new result. The new six provider groups start from fresh roots.
+
+A seventh independent unscored worker enrolls A, N and the physical versioned
+compiler with the same new Cargo on the 74-file historical Ruff change.
+The unchanged protocol requires its real ordinary rosters, 39 typed units,
+95 generated objects, independent empty/invalid/contrary/repair, three fixed
+SDK namespaces, all nine same/cross transitions, actual process environments
+and exact marker spellings. The previous scored work contributes zero
+observations to this separate versioned pair.
