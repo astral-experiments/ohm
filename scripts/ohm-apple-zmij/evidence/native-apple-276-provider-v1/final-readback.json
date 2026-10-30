@@ -1,0 +1,715 @@
+{
+  "actual_build_scripts": 232,
+  "actual_cached_rustcs": 0,
+  "actual_full_rustcs": 874,
+  "actual_provider_ld": 310,
+  "actual_stock_ld": 502,
+  "cases": 16,
+  "commands": 352,
+  "compared": 176,
+  "complete_image_comparisons": {
+    "both_error": 52,
+    "different_matching_verdict_and_different_text": 0,
+    "different_matching_verdict_and_text": 0,
+    "different_verdict_two_images": 6,
+    "only_empty_image": 0,
+    "only_warm_image": 12,
+    "raw_match": 106
+  },
+  "declared_evaluated": 64,
+  "declared_failed": [],
+  "differential": [
+    [
+      "direct",
+      "unwatched",
+      "default",
+      "higher-no-rust",
+      [
+        0,
+        [
+          29,
+          7
+        ]
+      ],
+      [
+        0,
+        [
+          17,
+          7
+        ]
+      ]
+    ],
+    [
+      "direct",
+      "unwatched",
+      "default",
+      "malformed-no-rust",
+      [
+        101,
+        null
+      ],
+      [
+        0,
+        [
+          29,
+          11
+        ]
+      ]
+    ],
+    [
+      "direct",
+      "unwatched",
+      "default",
+      "missing-no-rust",
+      [
+        101,
+        null
+      ],
+      [
+        0,
+        [
+          29,
+          13
+        ]
+      ]
+    ],
+    [
+      "library",
+      "unwatched",
+      "default",
+      "higher-no-rust",
+      [
+        0,
+        [
+          29,
+          7
+        ]
+      ],
+      [
+        0,
+        [
+          17,
+          7
+        ]
+      ]
+    ],
+    [
+      "library",
+      "unwatched",
+      "default",
+      "malformed-no-rust",
+      [
+        101,
+        null
+      ],
+      [
+        0,
+        [
+          29,
+          11
+        ]
+      ]
+    ],
+    [
+      "library",
+      "unwatched",
+      "default",
+      "missing-no-rust",
+      [
+        101,
+        null
+      ],
+      [
+        0,
+        [
+          29,
+          13
+        ]
+      ]
+    ]
+  ],
+  "higher_no_rust_native": {
+    "C-direct-declared-default": {
+      "cached": [],
+      "full": [
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "C-direct-declared-off": {
+      "cached": [],
+      "full": [
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "C-direct-unwatched-default": {
+      "cached": [],
+      "full": [],
+      "linker": 0,
+      "status": 0,
+      "value": [
+        17,
+        7
+      ]
+    },
+    "C-direct-unwatched-off": {
+      "cached": [],
+      "full": [],
+      "linker": 0,
+      "status": 0,
+      "value": [
+        17,
+        7
+      ]
+    },
+    "C-library-declared-default": {
+      "cached": [],
+      "full": [
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "C-library-declared-off": {
+      "cached": [],
+      "full": [
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "C-library-unwatched-default": {
+      "cached": [],
+      "full": [],
+      "linker": 0,
+      "status": 0,
+      "value": [
+        17,
+        7
+      ]
+    },
+    "C-library-unwatched-off": {
+      "cached": [],
+      "full": [],
+      "linker": 0,
+      "status": 0,
+      "value": [
+        17,
+        7
+      ]
+    },
+    "P-direct-declared-default": {
+      "cached": [],
+      "full": [
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "P-direct-declared-off": {
+      "cached": [],
+      "full": [
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "P-direct-unwatched-default": {
+      "cached": [],
+      "full": [
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "P-direct-unwatched-off": {
+      "cached": [],
+      "full": [],
+      "linker": 0,
+      "status": 0,
+      "value": [
+        17,
+        7
+      ]
+    },
+    "P-library-declared-default": {
+      "cached": [],
+      "full": [
+        "barrier",
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "P-library-declared-off": {
+      "cached": [],
+      "full": [
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "P-library-unwatched-default": {
+      "cached": [],
+      "full": [
+        "barrier",
+        "qa_owned_test"
+      ],
+      "linker": 1,
+      "status": 0,
+      "value": [
+        29,
+        7
+      ]
+    },
+    "P-library-unwatched-off": {
+      "cached": [],
+      "full": [],
+      "linker": 0,
+      "status": 0,
+      "value": [
+        17,
+        7
+      ]
+    }
+  },
+  "lower_markers": {
+    "C-direct-declared-default": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "C-direct-declared-off": [
+      [
+        false,
+        false
+      ]
+    ],
+    "C-direct-unwatched-default": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "C-direct-unwatched-off": [
+      [
+        false,
+        false
+      ]
+    ],
+    "C-library-declared-default": [
+      [
+        false,
+        true
+      ]
+    ],
+    "C-library-declared-off": [
+      [
+        false,
+        false
+      ]
+    ],
+    "C-library-unwatched-default": [
+      [
+        false,
+        true
+      ]
+    ],
+    "C-library-unwatched-off": [
+      [
+        false,
+        false
+      ]
+    ],
+    "P-direct-declared-default": [
+      [
+        true,
+        false
+      ]
+    ],
+    "P-direct-declared-off": [
+      [
+        false,
+        false
+      ]
+    ],
+    "P-direct-unwatched-default": [
+      [
+        true,
+        false
+      ]
+    ],
+    "P-direct-unwatched-off": [
+      [
+        false,
+        false
+      ]
+    ],
+    "P-library-declared-default": [
+      [
+        true,
+        false
+      ]
+    ],
+    "P-library-declared-off": [
+      [
+        false,
+        false
+      ]
+    ],
+    "P-library-unwatched-default": [
+      [
+        true,
+        false
+      ]
+    ],
+    "P-library-unwatched-off": [
+      [
+        false,
+        false
+      ]
+    ]
+  },
+  "native_programs": 236,
+  "true_cargo_101": 116,
+  "unexpected": [],
+  "unique_complete_machos": 50,
+  "unwatched_mismatches": [
+    [
+      "C-direct-unwatched-default",
+      "higher-no-rust",
+      [
+        0,
+        [
+          17,
+          7
+        ]
+      ],
+      [
+        0,
+        [
+          29,
+          7
+        ]
+      ]
+    ],
+    [
+      "C-direct-unwatched-default",
+      "malformed-no-rust",
+      [
+        0,
+        [
+          29,
+          11
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "C-direct-unwatched-default",
+      "missing-no-rust",
+      [
+        0,
+        [
+          29,
+          13
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "P-direct-unwatched-off",
+      "higher-no-rust",
+      [
+        0,
+        [
+          17,
+          7
+        ]
+      ],
+      [
+        0,
+        [
+          29,
+          7
+        ]
+      ]
+    ],
+    [
+      "P-direct-unwatched-off",
+      "malformed-no-rust",
+      [
+        0,
+        [
+          29,
+          11
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "P-direct-unwatched-off",
+      "missing-no-rust",
+      [
+        0,
+        [
+          29,
+          13
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "C-direct-unwatched-off",
+      "higher-no-rust",
+      [
+        0,
+        [
+          17,
+          7
+        ]
+      ],
+      [
+        0,
+        [
+          29,
+          7
+        ]
+      ]
+    ],
+    [
+      "C-direct-unwatched-off",
+      "malformed-no-rust",
+      [
+        0,
+        [
+          29,
+          11
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "C-direct-unwatched-off",
+      "missing-no-rust",
+      [
+        0,
+        [
+          29,
+          13
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "C-library-unwatched-default",
+      "higher-no-rust",
+      [
+        0,
+        [
+          17,
+          7
+        ]
+      ],
+      [
+        0,
+        [
+          29,
+          7
+        ]
+      ]
+    ],
+    [
+      "C-library-unwatched-default",
+      "malformed-no-rust",
+      [
+        0,
+        [
+          29,
+          11
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "C-library-unwatched-default",
+      "missing-no-rust",
+      [
+        0,
+        [
+          29,
+          13
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "P-library-unwatched-off",
+      "higher-no-rust",
+      [
+        0,
+        [
+          17,
+          7
+        ]
+      ],
+      [
+        0,
+        [
+          29,
+          7
+        ]
+      ]
+    ],
+    [
+      "P-library-unwatched-off",
+      "malformed-no-rust",
+      [
+        0,
+        [
+          29,
+          11
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "P-library-unwatched-off",
+      "missing-no-rust",
+      [
+        0,
+        [
+          29,
+          13
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "C-library-unwatched-off",
+      "higher-no-rust",
+      [
+        0,
+        [
+          17,
+          7
+        ]
+      ],
+      [
+        0,
+        [
+          29,
+          7
+        ]
+      ]
+    ],
+    [
+      "C-library-unwatched-off",
+      "malformed-no-rust",
+      [
+        0,
+        [
+          29,
+          11
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ],
+    [
+      "C-library-unwatched-off",
+      "missing-no-rust",
+      [
+        0,
+        [
+          29,
+          13
+        ]
+      ],
+      [
+        101,
+        null
+      ]
+    ]
+  ]
+}

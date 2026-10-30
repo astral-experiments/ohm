@@ -67,31 +67,33 @@ def linked(row):
     return {k for k,info in row["test_executables"].items() if info["physical_links"]}
 
 
-def workspace(signed, paired=None):
+def workspace(signed, paired):
     cold = signed["cold"]
     assert len(cold["test_executables"])==83
     for pre in ("repeat-1","repeat-2"):
         row=signed[pre]
         assert identity(row)==identity(cold) and len(row["full"])==106 and row["all_linkers"]==99 and len(linked(row))==81
     assert linked(signed["repeat-1"])==linked(signed["repeat-2"])
-    if paired is None:
-        return
-    base="ty-comparison/workspace/"
-    refs = {r:paired[base+r+"/empty-new/clean"] for r in ("P","C")}
+    refs = {r:paired[r+"/empty-new/clean"] for r in ("P","C")}
     assert set(refs["P"]["test_executables"])==set(refs["C"]["test_executables"])==set(cold["test_executables"])
     for role,ref in refs.items():
         for phase in ("edit","repeat-1","repeat-2"):
-            v=paired[base+role+"/visit/"+phase]
-            assert identity(v)==identity(ref) and v["e2e"]["tests"]==195
+            v=paired[role+"/visit/"+phase]
+            assert identity(v)==identity(ref) and v["e2e"]["tests"]==195 and v["e2e"]["links"]==1
             if phase=="edit":
                 assert v["e2e"]["links"]==1 and v["full"].count("ty_server")>=1
-    for phase in ("repeat-1","repeat-2"):
-        p,c=[paired[base+r+"/visit/"+phase] for r in ("P","C")]
-        skipped=sorted(linked(p)-linked(c))
-        extra=sorted(linked(c)-linked(p))
-        print(phase,"of 83 native test executables; prior, candidate, skipped, newly linked:",len(linked(p)),len(linked(c)),len(skipped),len(extra))
-        print("  all rustc + linker processes:",len(p["full"]),p["all_linkers"],"->",len(c["full"]),c["all_linkers"])
-        print("  ron compiles:",p["full"].count("ron"),"->",c["full"].count("ron"))
+    reference_sets = tuple(linked(paired[r+"/visit/edit"]) for r in ("P","C"))
+    for phase in ("edit","repeat-1","repeat-2"):
+        p,c=[paired[r+"/visit/"+phase] for r in ("P","C")]
+        before,after=linked(p),linked(c)
+        assert (before,after)==reference_sets and len(before)==81 and len(after)==60
+        assert after<=before and len(before-after)==21
+        assert (p["all_linkers"],c["all_linkers"])==(99,66) and p["link_only"]==c["link_only"]==[]
+        assert (len(p["full"]),len(c["full"]))==((108,74) if phase=="edit" else (106,72))
+        assert p["full"].count("ron")==c["full"].count("ron")==1
+        assert (p["full"].count("zmij"),c["full"].count("zmij"))==(1,0)
+        print(phase, "test executables linked:",len(before),"->",len(after),"/ 83",
+              "all rustc:",len(p["full"]),"->",len(c["full"]),"all linkers:",p["all_linkers"],"->",c["all_linkers"])
 
 
 def native_refs(original, stored):
@@ -125,7 +127,7 @@ if __name__=="__main__":
             eq=json.loads(portable.read("ty-comparison/clean-equivalence-"+state+".json"))
             assert eq[r]["raw"]==ref["e2e"]["sha256"] and eq[r]["code_pages"]>0 and eq[r]["paths"]
     signed,_=read("signed-workspace")
-    paired=read("paired-workspace")[0] if "paired-workspace" in PLANS else None
+    paired,_=read("paired-workspace")
     workspace(signed,paired)
     if args.native_binaries:
         native_refs(args.native_binaries,portable)

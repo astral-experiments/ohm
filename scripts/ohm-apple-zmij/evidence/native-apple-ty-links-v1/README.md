@@ -14,6 +14,18 @@ The test-build used the normal Cargo defaults, the signed `-20` Cargo and the sa
 
 The four independently clean e2e executables have the same machine instructions for the same Ruff revision across compilers. Their complete bytes differ in the native debugger’s object paths and corresponding code-signature page hashes. The optional whole-program replay below checks each original signed page, binds each rewritten field to one of the real Apple `ld` inputs, and compares every resulting byte. It checks 19,212 signed pages per executable on the edited revision.
 
+## Workspace test build
+
+On the same Ruff edit, `cargo test --workspace --no-run` returned 83 test executables. The parent called Apple's linker for 81 of them after the edit and on each of the next two unchanged builds. With #276, it called the linker for 60. The same 21 executables avoided a link on all three commands. All 83 executables matched the length and SHA-256 of the corresponding compiler’s independently empty build after the edit and on both repeats. The edited e2e binary contained and passed the new regression. [Paired workspace run](https://github.com/astral-experiments/ohm/actions/runs/41056076188)
+
+| Workspace command | Parent rustc / ld | #276 rustc / ld | Parent / #276 test programs linked |
+| --- | ---: | ---: | ---: |
+| Build after the diagnostics edit | 108 / 99 | 74 / 66 | 81 / 60 |
+| First unchanged test-build | 106 / 99 | 72 / 66 | 81 / 60 |
+| Second unchanged test-build | 106 / 99 | 72 / 66 | 81 / 60 |
+
+The workspace still recompiles `ron` once and the two `zlib-rs` units on each repeat. The workspace e2e executable still relinks once. Its actual linker command consumes both `ron` and `zlib-rs` archives. The focused e2e command above can already skip its link.
+
 ## Replay
 
 Run from this directory with Python 3.11 or later.
