@@ -56,11 +56,8 @@ jobs:
           cargo +ohm -Vv > "$QA_ROOT/receipts/cargo-Vv"
           rustc +ohm --target=aarch64-unknown-linux-gnu --print cfg > "$QA_ROOT/receipts/cfg"
           sha256sum "$QA_ROOT"/rustup/toolchains/ohm/lib/librustc_driver-*.so > "$QA_ROOT/receipts/driver"
-      - name: Verify GNU assembly and run independently empty native-provider controls
-        run: python3 -IB scripts/ohm-aarch64-registers/native.py
-      - name: Build genuine Ruff and identify all active assembly classifications
-        if: always() && steps.sdk.outcome == 'success'
-        run: python3 -IB scripts/ohm-aarch64-registers/roster.py
+      - name: Collect each failing positive and each passing conservative control on the original
+        run: python3 -IB scripts/ohm-aarch64-registers/classifier.py before
       - name: Preserve native receipts, including failures
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
