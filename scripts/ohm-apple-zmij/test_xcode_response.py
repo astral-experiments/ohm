@@ -13,7 +13,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from execs import ExecTrace
 from study import compress_bytes, digest, need, save
-from xcode_response import ResponseRows, resolved, words
+from xcode_response import ResponseRows, darwin_user_temp, resolved, words
 
 
 def synthetic(root):
@@ -94,10 +94,14 @@ def native(root):
             options.append("-L"+str(d))
         images = {}
         for role, arguments in (("direct", base), ("response", [*base, *options])):
-            with (log/(role+".out")).open("wb") as out, (log/(role+".err")).open("wb") as err:
-                status, events = trace.command(arguments, cwd=work, env=os.environ.copy(), out=out, err=err,
-                                               observed_rows=ResponseRows(tempfile.gettempdir()))
-            compress_bytes(log/(role+"-exec.json.gz"), json.dumps(events).encode())
+            rows = ResponseRows(tempfile.gettempdir(), darwin_user_temp())
+            save(log/(role+"-roots.json"), sorted(map(str, rows.temporary)))
+            try:
+                with (log/(role+".out")).open("wb") as out, (log/(role+".err")).open("wb") as err:
+                    status, events = trace.command(arguments, cwd=work, env=os.environ.copy(), out=out, err=err,
+                                                   observed_rows=rows)
+            finally:
+                compress_bytes(log/(role+"-exec.json.gz"), json.dumps(rows).encode())
             need(status == 0, f"native {role} calibration failed")
             expanded = list(resolved(events))
             original, = [e for e in events if Path(e["path"]).name in ("ld", "ld64", "ld-prime", "ld-classic")]

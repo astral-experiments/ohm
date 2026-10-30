@@ -1,12 +1,14 @@
 """Bind an observed Xcode ld @file to the file LLVM wrote and the actual parent clang."""
 import base64
 from collections import Counter
+from functools import cache
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
 import stat
+import subprocess
 
 from study import need
 
@@ -52,17 +54,29 @@ def file_name(raw):
     return path
 
 
+@cache
+def darwin_user_temp():
+    run = subprocess.run(["/usr/bin/getconf", "DARWIN_USER_TEMP_DIR"], check=True, capture_output=True, text=True)
+    result = Path(run.stdout.rstrip("\n"))
+    need(not run.stderr and result.is_absolute() and result.is_dir() and result.stat().st_uid == os.getuid(),
+         "invalid per-user Darwin temporary root")
+    return result.resolve(strict=True)
+
+
 class ResponseRows(list):
-    def __init__(self, temporary):
+    def __init__(self, temporary, system=None):
         super().__init__()
-        self.temporary = Path(temporary).resolve(strict=True)
+        self.temporary = {Path(temporary).resolve(strict=True)}
+        if system is not None:
+            self.temporary.add(Path(system).resolve(strict=True))
 
     def append(self, event):
         raw = event["argv"]
         if Path(event["path"]).name in LD and any(a.startswith("@") for a in raw[1:]):
             path = file_name(raw)
             try:
-                need(path.parent.resolve(strict=True) == self.temporary, "linker response outside enrolled temporary directory")
+                parent = path.parent.resolve(strict=True)
+                need(parent in self.temporary, f"unmatched linker temp {parent} against {sorted(map(str, self.temporary))}")
                 fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK)
                 with os.fdopen(fd, "rb") as src:
                     st = os.fstat(fd)
@@ -72,12 +86,14 @@ class ResponseRows(list):
                     data = src.read(LIMIT + 1)
                     need(identity == stamp(os.fstat(fd)) == stamp(os.stat(path, follow_symlinks=False)) and
                          len(data) == st.st_size, "linker response changed during capture")
-            except OSError as e:
-                raise RuntimeError(f"could not witness live Xcode response {path.name}: {e}") from e
-            words(data)
-            event = {**event, "xcode_response": {"path": str(path), "temporary": str(self.temporary), "identity": identity,
+            except (OSError, RuntimeError) as e:
+                super().append({**event, "response_observer_error": str(e), "expected_roots": sorted(map(str, self.temporary))})
+                raise RuntimeError(f"could not witness live Xcode response {path}: {e}") from e
+            event = {**event, "xcode_response": {"path": str(path), "temporary": str(parent), "identity": identity,
                       "sha256": digest(data), "bytes": base64.b64encode(data).decode(), "raw_argv": digest(packed(raw))}}
         super().append(event)
+        if "xcode_response" in event:
+            words(data)
 
 
 def outputs(argv):

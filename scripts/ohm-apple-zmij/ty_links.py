@@ -14,7 +14,7 @@ from measure import capture, fresh, native_rows, retire, select
 from prepare import prepare_ruff
 from study import load, ZMIJ_LIB, check_host, compress_bytes, digest, env_for, git, need, save, sdk_id, sha, text_git
 from verbs import macho_text
-from xcode_response import ResponseRows, resolved
+from xcode_response import ResponseRows, darwin_user_temp, resolved
 
 A = "2d253467b5153f82d26c51d49eb8d4156f1768bf"
 B = "aa9a1ff88aa83b3f01360ef5b3cb04b2be187206"
@@ -29,7 +29,7 @@ ERROR = "ohm_ty_28988_missing_name"
 
 class CensusTrace(ExecTrace):
     def command(self, argv, **kwargs):
-        return super().command(argv, timeout=2100, observed_rows=ResponseRows(kwargs["env"].get("TMPDIR") or tempfile.gettempdir()), **kwargs)
+        return super().command(argv, timeout=2100, observed_rows=ResponseRows(kwargs["env"].get("TMPDIR") or tempfile.gettempdir(), darwin_user_temp()), **kwargs)
 
 
 def enrolled(repo):
