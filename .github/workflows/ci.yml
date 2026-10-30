@@ -1,14 +1,14 @@
-name: Private native Apple provider qualification
+name: Native Apple Cargo 293 or signed provider evidence
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: apple-276-external-providers-${{ github.ref }}
+  group: apple-293-native-receipts-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  apple-provider-edges:
+  native-apple-293:
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 105
+    timeout-minutes: 135
     env:
       PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -21,7 +21,7 @@ jobs:
           python-version: '3.13'
       - name: Verify the protocol, Apple exec observer and native linker
         run: |
-          root="$RUNNER_TEMP/ohm-276-apple-provider"
+          root="$RUNNER_TEMP/ohm-293-apple-provider"
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
@@ -29,36 +29,46 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          root="$RUNNER_TEMP/ohm-276-apple-provider"
+          root="$RUNNER_TEMP/ohm-293-apple-provider"
           mkdir "$root/assets"
           gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
           python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
       - name: Build exact Rust parent and child and reopen both complete SDKs
         run: |
-          root="$RUNNER_TEMP/ohm-276-apple-provider"
+          root="$RUNNER_TEMP/ohm-293-apple-provider"
           python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
           if ! command -v ninja >/dev/null; then brew install ninja; fi
           (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
           python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Reopen first direct no-watch parent and candidate
-        run: python3 -IB scripts/ohm-apple-zmij/provider_edges.py "$RUNNER_TEMP/ohm-276-apple-provider" first
+      - name: Build and physically verify unmodified Cargo 735e1528 on local APFS
+        run: python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$RUNNER_TEMP/ohm-293-apple-provider"
+      - name: Direct unwatched provider with signed Cargo and the receipt candidate
+        run: python3 -IB scripts/ohm-apple-zmij/cargo_receipt_qualification.py "$RUNNER_TEMP/ohm-293-apple-provider" first
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: apple-276-direct-unwatched-first
+          name: cargo293-direct-first
           path: |
-            ${{ runner.temp }}/ohm-276-apple-provider/receipts/provider-matrix
-            ${{ runner.temp }}/ohm-276-apple-provider/receipts/edge-markers
-            ${{ runner.temp }}/ohm-276-apple-provider/receipts/edge-images
+            ${{ runner.temp }}/ohm-293-apple-provider/receipts/cargo293
+            ${{ runner.temp }}/ohm-293-apple-provider/receipts/provider-matrix
           retention-days: 14
           if-no-files-found: warn
-      - name: Complete both native placements and Cargo modes with watched and unwatched providers
-        run: python3 -IB scripts/ohm-apple-zmij/provider_edges.py "$RUNNER_TEMP/ohm-276-apple-provider" rest
+      - name: Finish native direct and downstream cases with matched empty products
+        run: python3 -IB scripts/ohm-apple-zmij/cargo_receipt_qualification.py "$RUNNER_TEMP/ohm-293-apple-provider" rest
+      - name: Genuine Ruff test generation, two repeats, invalid, repair and fresh references
+        run: python3 -IB scripts/ohm-apple-zmij/cargo_receipt_qualification.py "$RUNNER_TEMP/ohm-293-apple-provider" ruff
+      - name: Independently test static native bytes embedded in a genuine registry rlib
+        if: success() || (failure() && hashFiles('scripts/ohm-apple-zmij/cargo293/source.pack') != '')
+        run: |
+          root="$RUNNER_TEMP/ohm-293-apple-provider"
+          if test -s "$root/receipts/provider-matrix/terminal.json"; then
+            python3 -IB scripts/ohm-apple-zmij/cargo_receipt_qualification.py "$root" bundle
+          fi
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: apple-276-external-provider-receipts
-          path: ${{ runner.temp }}/ohm-276-apple-provider/receipts
+          name: cargo293-native-provider-and-ruff
+          path: ${{ runner.temp }}/ohm-293-apple-provider/receipts
           retention-days: 14
           if-no-files-found: warn

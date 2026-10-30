@@ -93,7 +93,11 @@ def native_rows(rows, sdk):
     if partial:
         rows = rows[1:]
     rustc, cargo = (sdk / "bin" / n for n in ("rustc", "cargo"))
-    real_cargo = [r for r in rows if Path(r["path"]).exists() and Path(r["path"]).samefile(cargo)]
+    cargo_events = [r for r in rows if Path(r["path"]).exists() and Path(r["path"]).samefile(cargo)]
+    # #293 executes this very Cargo binary a second time through a per-unit linker alias.
+    drivers = [r for r in cargo_events if r["argv"] and Path(r["argv"][0]).name == "ohm-link-cc"
+               and Path(r["argv"][0]).parent.name.endswith(".rlink-objects")]
+    real_cargo = [r for r in cargo_events if r not in drivers]
     full = []
     relink = []
     linkers = []
@@ -124,6 +128,8 @@ def native_rows(rows, sdk):
     return {
         "scope": "compiler-wrapper-unscored" if partial else "kernel-exec",
         "cargo": None if partial else len(real_cargo),
+        "cargo_link_driver": [{"pid": r["pid"], "ppid": r["ppid"], "alias": r["argv"][0],
+                              "path": r["path"], "cdhash": r["cdhash"]} for r in drivers],
         "full": sorted(full),
         "link_only": sorted(relink),
         "linkers": None if partial else linkers,

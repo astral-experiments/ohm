@@ -157,8 +157,9 @@ def capture_visit(root, src, work, sdk, env, trace, out, defaults, placement):
     final=[]
     for link in native["linkers"]:
         a=link["argv"]
-        if "-lqa_owned_external" not in a:continue
+        if placement != "registrybundle" and "-lqa_owned_external" not in a:continue
         path,=[a[n+1] for n,s in enumerate(a) if s=="-o"]
+        if placement == "registrybundle" and not Path(path).name.startswith("qa_owned_test"):continue
         search=[s[2:] if s.startswith("-L") and s!="-L" else a[n+1] for n,s in enumerate(a) if s.startswith("-L")]
         need(str(src/"early") in search and str(src/"late") in search and search.index(str(src/"early"))<search.index(str(src/"late")),"wrong native archive search order")
         ee,=[e for e in events if e["argv"]==a and Path(e["path"]).name in ("ld","ld-classic","ld-prime","ld64")]
@@ -216,27 +217,34 @@ def with_empty(work, task):
         parked.rmdir()
 
 
-def run_case(root, trace, role, placement, watch, defaults, bodies):
-    name="-".join((role,placement,watch,"default" if defaults else "off"))
+def run_case(root, trace, role, placement, watch, defaults, bodies, *, label=None,
+             environment=None, visits=STEPS, change=configure, evidence=None, fixture=form):
+    name="-".join((label or role,placement,watch,"default" if defaults else "off"))
     out=root/"receipts/provider-matrix"/name;out.mkdir()
     work=root/"provider-build";src=root/"provider-source";work.mkdir();src.mkdir()
     for n in ("target","shared","cargo-home"):(work/n).mkdir()
     sdk=select(root,role);env=env_for(work,sdk)
+    if environment:env=environment(env)
     driver,=(sdk/"lib").glob("librustc_driver*.dylib")
     ident={**physical(driver),"ctime_ns":driver.stat().st_ctime_ns}
     need(ident["sha256"]==load(root/"receipts/pair.json")["products"][role]["runtime"]["lib/"+driver.name],"wrong driver")
-    trigger=form(src,placement,watch=="declared")
+    trigger=fixture(src,placement,watch=="declared")
     trigger.write_text("#[inline(never)] pub fn value()->i32 {7}\n")
     run(["cargo","+ohm","generate-lockfile","--offline"],cwd=src,env=env)
     sources={str(p.relative_to(src)):p.read_text() for p in sorted(src.rglob("*")) if p.is_file()}
-    save(out/"inputs.json",{"role":role,"placement":placement,"watch":watch,"defaults":defaults,"driver":ident,"source":sources,"steps":STEPS})
+    save(out/"inputs.json",{"role":role,"placement":placement,"watch":watch,"defaults":defaults,"driver":ident,"source":sources,"steps":visits})
     rows={};last_rust=7
-    for name,state,rust in STEPS:
+    for name,state,rust in visits:
         check_host(root,7)
         if rust!=last_rust:trigger.write_text(f"#[inline(never)] pub fn value()->i32 {{{rust}}}\n");last_rust=rust
-        snapshots=configure(src,state,bodies)
-        a=capture_visit(root,src,work,sdk,env,trace,out/name/"warm",defaults,placement)
-        b=with_empty(work,lambda:capture_visit(root,src,work,sdk,env,trace,out/name/"empty",defaults,placement))
+        snapshots=change(src,state,bodies)
+        def capture_one(kind):
+            dest=out/name/kind
+            row=capture_visit(root,src,work,sdk,env,trace,dest,defaults,placement)
+            if evidence:evidence(work,dest,row)
+            return row
+        a=capture_one("warm")
+        b=with_empty(work,lambda:capture_one("empty"))
         need(ident=={**physical(driver),"ctime_ns":driver.stat().st_ctime_ns},"driver changed between warm and clean")
         item={"provider":state,"rust":rust,"trigger_sha256":sha(trigger),"archives":snapshots,
               "warm":[a["status"],a["answer"],a["image"]["raw"] if a["image"] else None],

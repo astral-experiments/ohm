@@ -156,7 +156,7 @@ def env_for(root, sdk):
     return environment
 
 
-def sdk_id(sdk, env):
+def sdk_id(sdk, env, cargo_source=CARGO_SOURCE):
     compiler = run(["rustc", "+ohm", "-vV"], env=env).decode()
     cargo = run(["cargo", "+ohm", "-Vv"], env=env).decode()
     need(
@@ -165,7 +165,7 @@ def sdk_id(sdk, env):
         "incorrect sysroot",
     )
     need(
-        f"host: {TRIPLE}" in compiler and f"commit-hash: {CARGO_SOURCE}" in cargo,
+        f"host: {TRIPLE}" in compiler and f"commit-hash: {cargo_source}" in cargo,
         "foreign compiler host or Cargo source",
     )
     libs = sorted((sdk / "lib").glob("librustc_driver*.dylib"))

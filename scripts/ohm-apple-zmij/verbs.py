@@ -165,7 +165,8 @@ def hold(verb, work, label, result):
     return dest, marker_bytes(Path((work / "zmij-dep-location").read_text()).read_bytes())
 
 
-def phase(verb, root, work, sdk, env, role, state, label, trace, dest, *, captured=None, held=None):
+def phase(verb, root, work, sdk, env, role, state, label, trace, dest, *, captured=None, held=None,
+          require_typed_zmij_match=True):
     ok = state != "invalid"
     status, stdout, stderr, events, stats = captured or capture(ARGS[verb], root / "ruff", env, dest, trace)
     need(status == (0 if ok else 101), f"{verb} {label} exit {status} {stderr[-1024:]!r}")
@@ -174,7 +175,9 @@ def phase(verb, root, work, sdk, env, role, state, label, trace, dest, *, captur
     need(len(units) == 1 and sha(units[0]["target"]["src_path"]) == ZMIJ_LIB, "wrong locked zmij")
     native = native_rows(events, sdk) if events is not None else None
     if native is not None:
-        need(native["cargo"] == 1 and native["full"].count("zmij") == int(not units[0]["fresh"]), "typed/physical count mismatch")
+        need(native["cargo"] == 1, "wrong physical Cargo root")
+        if require_typed_zmij_match:
+            need(native["full"].count("zmij") == int(not units[0]["fresh"]), "typed/physical count mismatch")
         need(all(link["stock"] for link in native["linkers"]), "unexpected native linker")
     marker, body = held[1] if held else marked(work)
     compress_bytes(dest / "zmij.dep.gz", body)
