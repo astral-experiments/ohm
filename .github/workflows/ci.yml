@@ -6,7 +6,7 @@ on:
         description: Bootstrap source or reopen the registered immutable compiler
         type: choice
         default: qualification
-        options: [qualification, bootstrap]
+        options: [qualification, bootstrap, pilots, holdout]
 permissions:
   contents: read
   actions: read
@@ -164,3 +164,111 @@ jobs:
           path: |
             ${{ runner.temp }}/qualified-syscall/receipts
             ${{ runner.temp }}/observed-ruff/receipts
+
+  pilots:
+    if: inputs.phase == 'pilots' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - {position: 1, order: PC}
+          - {position: 2, order: CP}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify the original parent SDK, version-aware Cargo and unchanged Wild
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/ohm-gnu-syscall/ingress.sh
+      - name: Restore exactly the original compiler driver from run 41099028701
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
+          mkdir -p "$QA_ROOT/receipts"
+          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
+          {
+            echo "QA_ROOT=$QA_ROOT"
+            echo "CENSUS_PARENT=$CENSUS_PARENT"
+            echo "CENSUS_ROOT=$RUNNER_TEMP/observed-ruff"
+            echo "CENSUS_SDK=$QA_ROOT/candidate-sdk"
+            echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
+          } >> "$GITHUB_ENV"
+      - name: Count both ordinary Cargo commands and compare to a same-path clean Ruff CLI
+        env:
+          ROLE_ORDER: ${{ matrix.order }}
+        run: python3 -IB scripts/ohm-gnu-syscall/paired.py "$ROLE_ORDER"
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-svc-pilots-${{ matrix.position }}
+          retention-days: 14
+          path: ${{ runner.temp }}/qualified-syscall/receipts
+
+  holdout:
+    if: inputs.phase == 'holdout' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - {position: 1, order: PC}
+          - {position: 2, order: CP}
+          - {position: 3, order: CP}
+          - {position: 4, order: CP}
+          - {position: 5, order: PC}
+          - {position: 6, order: CP}
+          - {position: 7, order: CP}
+          - {position: 8, order: PC}
+          - {position: 9, order: PC}
+          - {position: 10, order: PC}
+          - {position: 11, order: PC}
+          - {position: 12, order: CP}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify the original parent SDK, version-aware Cargo and unchanged Wild
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/ohm-gnu-syscall/ingress.sh
+      - name: Restore exactly the original compiler driver from run 41099028701
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
+          mkdir -p "$QA_ROOT/receipts"
+          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
+          {
+            echo "QA_ROOT=$QA_ROOT"
+            echo "CENSUS_PARENT=$CENSUS_PARENT"
+            echo "CENSUS_ROOT=$RUNNER_TEMP/observed-ruff"
+            echo "CENSUS_SDK=$QA_ROOT/candidate-sdk"
+            echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
+          } >> "$GITHUB_ENV"
+      - name: Count both ordinary Cargo commands and compare to a same-path clean Ruff CLI
+        env:
+          ROLE_ORDER: ${{ matrix.order }}
+        run: python3 -IB scripts/ohm-gnu-syscall/paired.py "$ROLE_ORDER"
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-svc-holdout-${{ matrix.position }}
+          retention-days: 14
+          path: ${{ runner.temp }}/qualified-syscall/receipts
