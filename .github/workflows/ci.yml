@@ -1,16 +1,24 @@
 name: Remaining GNU inputs in Ruff ty_project tests
 on:
   workflow_dispatch:
+    inputs:
+      workload:
+        description: Which real Ruff edit to observe
+        type: choice
+        default: ty-project
+        options:
+          - ty-project
+          - ruff-cli
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: gnu-ty-project-hard-cgu-20261030
+  group: gnu-hard-census-${{ inputs.workload || 'ty-project' }}
   cancel-in-progress: false
 jobs:
   native:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ty-hard-inputs'
-    name: Census ordinary AArch64 ty_project builds on the versioned register rules
+    name: Census ordinary AArch64 ${{ inputs.workload || 'ty-project' }} builds
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 220
     steps:
@@ -53,6 +61,7 @@ jobs:
           PY
 
       - name: Trace the real root-change fix and run the returned target tests
+        if: inputs.workload != 'ruff-cli'
         run: |
           set -euo pipefail
           export CENSUS_ROOT="$RUNNER_TEMP/gnu-ty-marker-census"
@@ -60,15 +69,22 @@ jobs:
           python3 -IB scripts/ohm-gnu-ty-input-census/census.py --self-test
           python3 -IB scripts/ohm-gnu-ty-input-census/census.py
       - name: Inspect the remaining three registry code generators and one unchanged instruction profile
+        if: inputs.workload != 'ruff-cli'
         run: |
           export CENSUS_ROOT="$RUNNER_TEMP/gnu-ty-marker-census"
           export CENSUS_SDK="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
           python3 -IB scripts/ohm-gnu-ty-input-census/assembly.py
+      - name: Trace the real starred-operand rule edit and run both returned Ruff CLIs
+        if: inputs.workload == 'ruff-cli'
+        run: |
+          export CENSUS_ROOT="$RUNNER_TEMP/gnu-ty-marker-census"
+          export CENSUS_SDK="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          python3 -IB scripts/ohm-gnu-ty-input-census/cli.py
       - name: Retain original process streams, depfiles and test verdicts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-ty-project-hard-input-census
+          name: gnu-${{ inputs.workload || 'ty-project' }}-hard-input-census
           retention-days: 14
           if-no-files-found: warn
           path: |

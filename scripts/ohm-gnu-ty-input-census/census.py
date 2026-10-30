@@ -127,7 +127,7 @@ def native_tests(exe, label, revision, root, store, env, previous):
     return {'sha256':raw,'bytes':exe.stat().st_size,'tests':sorted(names),'control':control,'source':revision,'phase':label}
 
 
-def census():
+def acquire(old,new,trees,lock,changed,cli):
     work=Path(os.environ['CENSUS_ROOT']).resolve();sdk=Path(os.environ['CENSUS_SDK']).resolve(strict=True)
     assert not work.exists();work.mkdir()
     out=work/'receipts';out.mkdir();src=work/'ruff'
@@ -147,41 +147,53 @@ def census():
          'AR_aarch64_unknown_linux_gnu':'/usr/bin/aarch64-linux-gnu-ar','CARGO_TERM_COLOR':'never','LC_ALL':'C','TZ':'UTC',
          'CARGO_CACHE_AUTO_CLEAN_FREQUENCY':'never','GIT_CONFIG_GLOBAL':os.devnull,'GIT_CONFIG_NOSYSTEM':'1'}
     command(['git','init','-q',src],work,env)
-    command(['git','fetch','--depth=2','--no-tags','https://github.com/astral-sh/ruff',B],src,env)
-    command(['git','checkout','-q','--detach',A],src,env)
-    assert command(['git','rev-parse',B+'^'],src,env)==A
-    assert all(command(['git','rev-parse',rev+'^{tree}'],src,env)==tree for rev,tree in TREES.items())
-    assert sha(src/'Cargo.lock')==LOCK
-    patch=command(['git','diff','--name-only',A,B],src,env).splitlines()
-    assert patch==['crates/ty_project/src/glob/exclude.rs','crates/ty_project/src/glob/include.rs','crates/ty_server/tests/e2e/main.rs','crates/ty_server/tests/e2e/snapshots/e2e__commands__debug_command.snap']
+    command(['git','fetch','--depth=2','--no-tags','https://github.com/astral-sh/ruff',new],src,env)
+    command(['git','checkout','-q','--detach',old],src,env)
+    assert command(['git','rev-parse',new+'^'],src,env)==old
+    assert all(command(['git','rev-parse',rev+'^{tree}'],src,env)==tree for rev,tree in trees.items())
+    assert sha(src/'Cargo.lock')==lock
+    patch=command(['git','diff','--name-only',old,new],src,env).splitlines()
+    assert patch==changed
     # The target tests also compile host build scripts and procedural macros.
     command(['cargo','+ohm','fetch','--locked'],src,env)
     env['CARGO_NET_OFFLINE']='true'
     assert Path(command(['rustup','which','--toolchain','ohm','rustc'],src,env)).samefile(sdk/'bin/rustc')
     assert Path(command(['rustup','which','--toolchain','ohm','cargo'],src,env)).samefile(sdk/'bin/cargo')
     save(out/'enrolled.json',{'compiler':v,'cargo_sha':sha(sdk/'bin/cargo'),'rustc':command(['rustc','+ohm','-vV'],src,env),
-         'cargo':command(['cargo','+ohm','-Vv'],src,env),'env':env,'trees':TREES,'changed':patch,'lock_sha256':LOCK,'cli':CLI})
+         'cargo':command(['cargo','+ohm','-Vv'],src,env),'env':env,'trees':trees,'changed':patch,'lock_sha256':lock,'cli':cli})
     qualify.rt.SDK=sdk
+    return work,out,src,env
+
+
+def trace_build(label,work,out,src,env,cli,expected=0):
+    dest=out/label;dest.mkdir();trace=work/(label+'-raw-execs');trace.mkdir()
+    cmd=['strace','-ff','-q','-s','262144','-e','trace=execve,execveat','-o',str(trace/'proc'),*cli]
+    build=subprocess.run(cmd,cwd=src,env=env,capture_output=True,timeout=6600)
+    blob(dest/'stdout.gz',build.stdout);blob(dest/'stderr.gz',build.stderr)
+    with tarfile.open(dest/'execs.tar.gz','w:gz',compresslevel=1) as archive:
+        for f in sorted(trace.iterdir()):archive.add(f,arcname=f.name,recursive=False)
+    save(dest/'command.json',{'argv':cmd,'exit':build.returncode,'stdout':digest(build.stdout),'stderr':digest(build.stderr)})
+    if build.returncode!=expected:
+        print(build.stderr.decode(errors='replace')[-3500:],flush=True)
+        print(build.stdout.decode(errors='replace')[-2500:],flush=True)
+    assert build.returncode==expected
+    messages=[json.loads(l) for l in build.stdout.splitlines()]
+    assert messages[-1]=={'reason':'build-finished','success':expected==0}
+    kernel=qualify.native(trace,src)
+    assert kernel['cargo'][0]['terminal']==[expected]
+    save(dest/'kernel.json',kernel)
+    return dest,messages,kernel
+
+
+def census():
+    changed=['crates/ty_project/src/glob/exclude.rs','crates/ty_project/src/glob/include.rs','crates/ty_server/tests/e2e/main.rs','crates/ty_server/tests/e2e/snapshots/e2e__commands__debug_command.snap']
+    work,out,src,env=acquire(A,B,TREES,LOCK,changed,CLI)
     current={};prior=None;phase_rows={}
     for label,rev in [('cold',A),('edit',B),('repeat',B)]:
         if label=='edit':command(['git','restore','--source',B,'--staged','--worktree','--','.'],src,env)
         assert command(['git','write-tree'],src,env)==TREES[rev] and not command(['git','diff','--name-only'],src,env)
-        dest=out/label;dest.mkdir();trace=work/(label+'-raw-execs');trace.mkdir()
-        cmd=['strace','-ff','-q','-s','262144','-e','trace=execve,execveat','-o',str(trace/'proc'),*CLI]
-        build=subprocess.run(cmd,cwd=src,env=env,capture_output=True,timeout=6600)
-        blob(dest/'stdout.gz',build.stdout);blob(dest/'stderr.gz',build.stderr)
-        with tarfile.open(dest/'execs.tar.gz','w:gz',compresslevel=1) as archive:
-            for f in sorted(trace.iterdir()):archive.add(f,arcname=f.name,recursive=False)
-        save(dest/'command.json',{'argv':cmd,'exit':build.returncode,'stdout':digest(build.stdout),'stderr':digest(build.stderr)})
-        if build.returncode:
-            print(build.stderr.decode(errors='replace')[-3500:],flush=True)
-            print(build.stdout.decode(errors='replace')[-2500:],flush=True)
-        assert build.returncode==0
-        messages=[json.loads(l) for l in build.stdout.splitlines()]
-        assert messages[-1]=={'reason':'build-finished','success':True}
-        kernel=qualify.native(trace,src)
-        assert kernel['cargo'][0]['terminal']==[0]
-        save(dest/'kernel.json',kernel);units=[]
+        dest,messages,kernel=trace_build(label,work,out,src,env,CLI)
+        units=[]
         owners={}
         for m in messages:
             if m['reason']=='compiler-artifact':
