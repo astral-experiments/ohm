@@ -157,6 +157,12 @@ def env_for(root, sdk):
 
 
 def sdk_id(sdk, env):
+    expected_cargo = CARGO_SOURCE
+    if sdk.name == "native" and (sdk.parent / "receipts/fixed-cargo-293.json").is_file():
+        pinned = load(sdk.parent / "receipts/fixed-cargo-293.json")
+        expected_cargo = "735e1528ed741015c57676dccf05dbdc0ff7bed1"
+        need(pinned["commit"] == expected_cargo and physical(sdk/"bin/cargo") == pinned["binary"]
+             and (sdk/"bin/cargo").samefile(sdk.parent/"cargo-293"), "measured Cargo identity changed")
     compiler = run(["rustc", "+ohm", "-vV"], env=env).decode()
     cargo = run(["cargo", "+ohm", "-Vv"], env=env).decode()
     need(
@@ -165,7 +171,7 @@ def sdk_id(sdk, env):
         "incorrect sysroot",
     )
     need(
-        f"host: {TRIPLE}" in compiler and f"commit-hash: {CARGO_SOURCE}" in cargo,
+        f"host: {TRIPLE}" in compiler and f"commit-hash: {expected_cargo}" in cargo,
         "foreign compiler host or Cargo source",
     )
     libs = sorted((sdk / "lib").glob("librustc_driver*.dylib"))

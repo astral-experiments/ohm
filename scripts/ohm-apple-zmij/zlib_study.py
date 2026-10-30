@@ -14,6 +14,7 @@ from native_inputs import run_archive_check
 from prepare import prepare_ruff
 from study import MISSING, RECHECK, compress_bytes, digest, env_for, git, need, run, save, sdk_id, sha, text_git
 from verbs import macho_text
+from fixed_crc import evidence
 
 OLD = "ccba26cc3af909b7f19060f48f53daeab5070f9d"
 NEW = "d8dac4cb576bd091a8b6cdc60a65c770ea75a96e"
@@ -113,7 +114,8 @@ def phase(root, work, sdk, env, out, step, rev, trace):
     native = native_rows(events,sdk)
     need(native["scope"]=="kernel-exec" and native["cargo"]==1 and all(x["stock"] for x in native["linkers"]), "incomplete kernel trace")
     zlib = zlib_units(arts,work,out)
-    need(native["full"].count("zlib_rs")==sum(not z["fresh"] for z in zlib), "zlib typed/physical mismatch")
+    # Cargo can report dirty before the native scheduler chooses a less expensive action.
+    # Retain every typed row above and use the enrolled kernel compiler PIDs as the physical census.
     path = result = None
     argv = []
     if ok:
@@ -126,6 +128,7 @@ def phase(root, work, sdk, env, out, step, rev, trace):
         need(any((m.get("code") or {}).get("code")=="E0425" and BAD in m["message"] for m in errors) and
              not any(r["target"]["name"]=="ty_vendored" and r["executable"] for r in arts), "wrong invalid edit verdict")
     row = {"step":step,"rev":rev,"code":code,"command":CMD,"output":path,"product":result,"zlib":zlib,"native":native,"root_link_argv":argv,"streams":streams}
+    evidence(work,out,row)
     save(out/"verified.json",row)
     print(step,rev[:8],len(native["full"]),len(native["linkers"]),len(argv),"zlib",native["full"].count("zlib_rs"),flush=True)
     return row

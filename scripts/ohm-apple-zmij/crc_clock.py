@@ -14,12 +14,12 @@ from execs import ExecTrace
 from macho_paths import compare
 from measure import capture, fresh, retire, select
 from native_inputs import run_archive_check
-from study import CHILD, MISSING, PARENT, RECHECK, compress_bytes, digest, env_for, load, need, save, sdk_id, sha
+from study import CHILD, MISSING, PARENT, RECHECK, check_host, compress_bytes, digest, env_for, load, need, save, sdk_id, sha
 from ty_disk import snapshot
 from zlib_study import CMD, NEW, OLD, checkout, installation, product
 
 ENDPOINTS=("edit","repeat-1","repeat-2")
-ALLOCATION=int(digest(("crc typeshed n12 v1 / "+PARENT+CHILD+OLD+NEW).encode()),16)%924
+ALLOCATION=int(digest(("crc typeshed on exact 735e1528, independent 12 v1 / "+PARENT+CHILD+OLD+NEW).encode()),16)%924
 FIRST=set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS={"screen":["PC","CP"],"confirmation":["PC" if i in FIRST else "CP" for i in range(12)]}
 
@@ -95,7 +95,7 @@ def depfiles(work, arts):
 
 
 def anchored(root,role,phase):
-    start=root/"receipts/crc-clock-before"/role
+    start=root/"receipts/crc-clock-before/PC"/role
     code=load(start/("clean-old" if phase=="cold" else "clean-new")/"clean/verified.json")
     with gzip.open(start/"visits"/phase/"stdout.gz","rb") as f:
         _,_,sig=typed(f.read())
@@ -104,7 +104,7 @@ def anchored(root,role,phase):
 
 def timed(root, out, role):
     work=root/"crc-work";repo=root/"ruff";sdk=select(root,role);env=env_for(work,sdk)
-    fresh(work,root/"seed"); before=sdk_id(sdk,env)
+    check_host(root,8);fresh(work,root/"seed"); before=sdk_id(sdk,env)
     saved=work/"clock-hold";need(not saved.exists(),"stale timed program")
     pending=[]
     deps=None
@@ -144,26 +144,43 @@ def timed(root, out, role):
 
 
 def initial(root):
-    top=root/"receipts/crc-clock-before"
-    trace=ExecTrace()
+    from receipt_cargo import CANDIDATE
+    native=load(root/'receipts/provider-matrix/terminal.json')
+    need(native['passed'] and native['commands']==392, 'CRC provider safety rejected the stack')
+    out=root/'receipts/crc-clock-before'; trace=ExecTrace();trace.ready();eligible=True
     try:
-        trace.ready()
-        refs={}
-        for role in "PC":
-            refs[role],rows=installation(root,role,top/role,trace)
-            for step in ("repeat-1","repeat-2"):
-                native=rows[step]["native"]
-                need((native["full"].count("zlib_rs")>0)==(role=="P") and len(rows[step]["root_link_argv"])==int(role=="P"),"physical effect did not reproduce")
-            run_archive_check(root,role,trace)
-        for rev in (OLD,NEW):
-            arms={}
-            for role in "PC":
-                row=refs[role][rev]
-                image=gzip.decompress((root/"receipts/crc-programs"/(row["product"]["raw"]+".gz")).read_bytes())
-                arms[role]=image,row["output"],row["root_link_argv"][0]
-            save(top/(rev+"-cross.json"),compare(arms))
-    finally:
-        trace.close()
+        for order in ('PC','CP'):
+            refs={};baseline={}
+            for role in order:
+                check_host(root,8)
+                refs[role],baseline[role]=installation(root,role,out/order/role,trace)
+            per={}
+            for step in ('repeat-1','repeat-2'):
+                phases={}
+                for r in 'PC':
+                    row=baseline[r][step];n=row['native'];cert=load(out/order/r/'visits'/step/'native-link-receipt.json')
+                    seals=[x['records'] for x in cert['aliases'].values() if {'seal','product'}<=x['records'].keys()]
+                    protected=any(x['product']['sha256']==row['product']['raw'] for x in seals)
+                    p={'zlib_full':n['full'].count('zlib_rs'),'full':n['full'],'link_only':n['link_only'],'ld':len(n['linkers']),
+                       'root_ld':len(row['root_link_argv']),'driver':len(n['cargo_link_driver']),'sealed_output':protected,
+                       'hard':[x['hard'] for x in row['zlib']],'recheck':[x['recheck'] for x in row['zlib']]}
+                    phases[r]=p
+                p,c=phases['P'],phases['C']
+                passed=bool(p['zlib_full'] and c['zlib_full']==0 and len(p['full'])>len(c['full']) and all(p['hard']) and
+                            not any(c['hard']) and all(c['recheck']) and c['root_ld']<=p['root_ld'] and c['root_ld']==0 and
+                            c['ld']<=p['ld'] and ('ty_vendored' not in c['link_only'] or (c['driver']>0 and c['sealed_output'])))
+                eligible=eligible and passed;per[step]={'passed':passed,'roles':phases}
+            for rev in (OLD,NEW):
+                arms={}
+                for role in 'PC':
+                    row=refs[role][rev];image=gzip.decompress((root/'receipts/crc-programs'/(row['product']['raw']+'.gz')).read_bytes())
+                    arms[role]=image,row['output'],row['root_link_argv'][0]
+                save(out/order/(rev+'-cross.json'),compare(arms))
+            save(out/order/'verdict.json',per)
+        for role in 'PC':run_archive_check(root,role,trace)
+    finally:trace.close()
+    gate={'cargo':CANDIDATE,'rust':[PARENT,CHILD],'ruff':[OLD,NEW],'structural':eligible,'provider':sha(root/'receipts/provider-matrix/terminal.json'),'harness':fingerprint_sources()}
+    save(root/'receipts/declared-crc-subject.json',gate);print('structural',eligible,flush=True)
 
 
 def stage(root, mode):
@@ -176,7 +193,7 @@ def stage(root, mode):
     save(out/"registered.json",dict(eligible=gate,order=ORDERS[mode],assignment=ALLOCATION,harness=harness,argv=CMD,
                                      primary="first unchanged test build after historical typeshed revision",
                                      secondary=["edit","second unchanged test build"],independent_clean="complete native Mach-O, embedded ZIP and both real tests on every visit"))
-    if mode=="screen":initial(root)
+    need(gate["structural"] and gate["harness"]==harness, "structural native gate rejected")
     pairs=[]
     for i,order in enumerate(ORDERS[mode],1):
         pairs.append({r:timed(root,out/f"pair-{i:02}"/r,r) for r in order})
@@ -200,9 +217,10 @@ def stage(root, mode):
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("mode",choices=("enroll","screen","confirmation"))
+    parser.add_argument("mode",choices=("enroll","structural","screen","confirmation"))
     parser.add_argument("root",type=Path)
     parser.add_argument("--sha256")
     a=parser.parse_args();root=a.root.resolve(strict=True)
     if a.mode=="enroll":save(root/"receipts/declared-crc-subject.json",enroll(root/"prior-typeshed.zip",a.sha256))
+    elif a.mode=="structural":initial(root)
     else:stage(root,a.mode)
