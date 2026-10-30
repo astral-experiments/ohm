@@ -1,0 +1,178 @@
+{
+  "Cargo_kernel_cdhashes": {
+    "R": [
+      "DB8A970E0004A96F0C98F5E8D80C15617E4FDB9F"
+    ],
+    "S": [
+      "3ED337A17990C6499106840D4C73EE3CAB8E0EA0"
+    ]
+  },
+  "commands": 524,
+  "distinct_native_images": 66,
+  "fully_reopened_images": true,
+  "host": {
+    "minimal": [],
+    "ordinary": []
+  },
+  "provider_cases": 26,
+  "providers": {
+    "17": {
+      "archive": "fa128d58b233012bd853595ac79542710c08b0805a7bb4018029603ef7ff548d",
+      "archive_bytes": 712,
+      "object": "2198a32afde04a930e3153e4e721cf79dff5a4ded86d64649f23113fc998faf3",
+      "object_text": "20028052c0035fd6"
+    },
+    "29": {
+      "archive": "fe3e1aaa7c97f295ad69d5e82fe364bf1dd12eece4672eb069596f9f26e5a0b9",
+      "archive_bytes": 712,
+      "object": "d2d8c174aa8b047f2cd38d839fdf185ba24d9ac79114ec294de7dc1721dabf3f",
+      "object_text": "a0038052c0035fd6"
+    }
+  },
+  "ruff_clean_comparisons": {
+    "R/minimal-shell": {
+      "cold": {
+        "inventory": true,
+        "raw": false,
+        "tests": true,
+        "text": true
+      },
+      "edit": {
+        "inventory": true,
+        "raw": false,
+        "tests": true,
+        "text": true
+      },
+      "invalid": "E0425",
+      "repair": {
+        "inventory": true,
+        "raw": false,
+        "tests": true,
+        "text": true
+      },
+      "repeat-1": {
+        "inventory": true,
+        "raw": false,
+        "tests": true,
+        "text": true
+      },
+      "repeat-2": {
+        "inventory": true,
+        "raw": false,
+        "tests": true,
+        "text": true
+      }
+    },
+    "R/ordinary": {
+      "cold": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      },
+      "edit": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      },
+      "invalid": "E0425",
+      "repair": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      },
+      "repeat-1": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      },
+      "repeat-2": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      }
+    },
+    "S/ordinary": {
+      "cold": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      },
+      "edit": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      },
+      "invalid": "E0425",
+      "repair": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      },
+      "repeat-1": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      },
+      "repeat-2": {
+        "inventory": true,
+        "raw": true,
+        "tests": true,
+        "text": true
+      }
+    }
+  },
+  "ruff_commands": 24,
+  "source_build": {
+    "actual_rust_driver": "a90448893ade26a4ce429fbcbf9301e3f8dd5979eca0b1576a4dad7aba764663",
+    "features": [
+      "all-static",
+      "default",
+      "http-transport-curl",
+      "ohm-defaults",
+      "openssl",
+      "vendored-libgit2",
+      "vendored-openssl"
+    ],
+    "inputs": {
+      "commit": "735e1528ed741015c57676dccf05dbdc0ff7bed1",
+      "entries": 3114,
+      "lock": "876cfe61b54e261f7bd07c65c9226de7001a1b02178476a8c6330b792fff3f43",
+      "parent": "98d431a99779ccfbcfe42dfa74dd541de3a92d05",
+      "product_sources": {
+        "src/compiler/native_link/apple.rs": "7c6a241539592ffcf128eee65146c4405ef8b903da77a8aa0bf523bae9b1c72f",
+        "src/compiler/native_link/generation.rs": "33183eed88b2bbc4e465a2c832f9ce7f7616df79e05a139fd8e6d4214cb35c36",
+        "src/compiler/native_link/mod.rs": "6d68d8bdc06c9bc84390eaa9e06d18a865bbe97d8f68875cbf31313e98ab8f52",
+        "src/compiler/native_link/namespace.rs": "abadc486632371866a1cadb08c1f153e2b58aace3ee3d3e4be8642b5a3697452",
+        "src/compiler/native_link/relay.rs": "78bebb62c225ffa960d9b1295ae911f89afceeba92f2696f5c37b84156bd87e8"
+      },
+      "source_pack": "775494565d10143c9f34679ad21d90020ed9c82518f774fde923f4d5ef90ea4b",
+      "tree": "9cb7035b7adc52ecac48495666b95ba857ed3cdd"
+    },
+    "physical_cargo": "3b3f0d9c7fe2629a5e8529b296ab2a4d98577dba005d5036f137a3046d2c5579",
+    "runtime_others": 2465,
+    "signed_apple_archive": "7cd292583785c25a315f67bf85c8f028a15ccb0be5461ac39ce6e46720807bb8",
+    "signed_cargo": "505008003127f597cf2bdbd967d2bac9158d706b55a18f8bf17790e9ea3bbac9",
+    "signed_linux": false
+  },
+  "stock_linkers": [
+    [
+      "3065220D3CF77318B8575B0059DF4D34597EA84B",
+      "2b48a59af70235283aa94c43eb0dd2ef80182c106db43279db936cc87426b443"
+    ]
+  ],
+  "subjects": {
+    "R": "735e1528ed741015c57676dccf05dbdc0ff7bed1",
+    "Rust": "444c0273a2e2bc0b161e988d43c882349bc2d7a6",
+    "S": "2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c"
+  },
+  "zip_sha256": "60fe0f0d2c85ffb2df304c27cb5823d50a266d4746619828db5388e298559668"
+}
