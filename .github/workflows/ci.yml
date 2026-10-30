@@ -5,7 +5,7 @@ on:
       phase:
         type: choice
         default: baseline
-        options: [baseline, compile, pilot]
+        options: [baseline, compile, pilot, guards]
 permissions:
   contents: read
   actions: read
@@ -129,6 +129,51 @@ jobs:
           path: |
             ${{ runner.temp }}/qualified-syscall/receipts/candidate.json
             ${{ runner.temp }}/observed-ruff-db/receipts
+            ${{ runner.temp }}/atomic-subjects/*-sdk.json
+            ${{ runner.temp }}/atomic-subjects/origin.json
+            ${{ runner.temp }}/atomic-subjects/atomic-candidate.json
+          if-no-files-found: error
+          retention-days: 7
+
+  guards:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-atomic-ruff-db' && inputs.phase == 'guards'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify the GNU AArch64 SDK and the exact strict Cargo reader
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          bash scripts/ohm-gnu-syscall/ingress.sh
+          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
+          mkdir -p "$QA_ROOT/receipts"
+          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
+          {
+            echo "CENSUS_ROOT=$RUNNER_TEMP/observed-ruff-db"
+            echo "CENSUS_SDK=$QA_ROOT/candidate-sdk"
+            echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
+          } >> "$GITHUB_ENV"
+      - name: Verify the registered compiler transfer and both complete SDK inventories
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/ohm-gnu-atomic-db/sdk.py
+      - name: Exercise accepted atomic loops, hostile assembly, bundled archives and live file inputs
+        run: python3 -IB scripts/ohm-gnu-atomic-db/guards.py
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-atomic-source-and-file-guards
+          path: |
+            ${{ runner.temp }}/atomic-file-guards/*/receipts
+            ${{ runner.temp }}/atomic-file-guards/terminal.json
             ${{ runner.temp }}/atomic-subjects/*-sdk.json
             ${{ runner.temp }}/atomic-subjects/origin.json
             ${{ runner.temp }}/atomic-subjects/atomic-candidate.json

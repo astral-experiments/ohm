@@ -12,7 +12,7 @@ import sys
 import tarfile
 
 SCRIPTS = Path(__file__).resolve().parents[1]
-sys.path[:0] = [str(SCRIPTS / 'ohm-gnu-ty-input-census'), str(SCRIPTS / 'ohm-aarch64-registers')]
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(SCRIPTS / 'ohm-gnu-ty-input-census'), str(SCRIPTS / 'ohm-aarch64-registers')]
 import census
 import tree_ir
 
