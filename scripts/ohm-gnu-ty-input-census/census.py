@@ -154,7 +154,8 @@ def census():
     assert sha(src/'Cargo.lock')==LOCK
     patch=command(['git','diff','--name-only',A,B],src,env).splitlines()
     assert patch==['crates/ty_project/src/glob/exclude.rs','crates/ty_project/src/glob/include.rs','crates/ty_server/tests/e2e/main.rs','crates/ty_server/tests/e2e/snapshots/e2e__commands__debug_command.snap']
-    command(['cargo','+ohm','fetch','--locked','--target',TARGET],src,env)
+    # The target tests also compile host build scripts and procedural macros.
+    command(['cargo','+ohm','fetch','--locked'],src,env)
     env['CARGO_NET_OFFLINE']='true'
     assert Path(command(['rustup','which','--toolchain','ohm','rustc'],src,env)).samefile(sdk/'bin/rustc')
     assert Path(command(['rustup','which','--toolchain','ohm','cargo'],src,env)).samefile(sdk/'bin/cargo')
