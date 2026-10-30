@@ -103,6 +103,8 @@ def native(root):
     src.write_text('extern int puts(const char *);\nvolatile const unsigned char fixture[64*1024*1024]={29};\nint main(void){return fixture[0]==29 ? (puts("29"),0) : 1;}\n')
     cc=subprocess.check_output(['/usr/bin/xcrun','--find','clang'],text=True).strip();sdk=subprocess.check_output(['/usr/bin/xcrun','--sdk','macosx','--show-sdk-path'],text=True).strip()
     subprocess.run([cc,'-isysroot',sdk,'-c',src,'-o',obj],check=True)
+    object_sha=digest(obj.read_bytes());compress_bytes(out/(object_sha+'.o.gz'),obj.read_bytes())
+    save(out/'fixture.json',{'source':src.read_text(),'source_sha256':digest(src.read_bytes()),'compiler':cc,'sdk':sdk,'object':str(obj),'object_sha256':object_sha})
     base=[cc,'-isysroot',sdk,str(obj),'-o',str(exe)];opts=[]
     for i in range(825):
         d=work/(f'{i:04}-'+'a'*96);d.mkdir();opts.append('-L'+str(d))
@@ -120,8 +122,11 @@ def native(root):
             ld,=[v for v in raw if Path(v['path']).name in ('ld','ld64','ld-classic','ld-prime')]
             actual,=[v for v in eargv if v['pid']==ld['pid'] and v['seq']==ld['seq']]
             need(bool(ld.get('xcode_response'))==(name!='direct') and str(obj) in actual['argv'] and str(exe) in actual['argv'],'failed expected real Xcode response shape')
-            b=exe.read_bytes();value=subprocess.check_output([str(exe)]);need(value==b'29\n','wrong real native program')
-            entry={'whole_macho':digest(b),'bytes':len(b),'stdout':value.decode(),'source_object':digest(obj.read_bytes()),'real_output':str(exe),'signed_linker_pid':ld['pid'],'exact_raw_args':ld['argv']}
+            b=exe.read_bytes();run=subprocess.run([str(exe)],capture_output=True);value=run.stdout;need(run.returncode==0 and value==b'29\n' and not run.stderr,'wrong real native program')
+            held=out/(digest(b)+'.macho.gz')
+            if not held.exists():compress_bytes(held,b)
+            compress_bytes(out/(name+'-program.out.gz'),value);compress_bytes(out/(name+'-program.err.gz'),run.stderr)
+            entry={'whole_macho':digest(b),'bytes':len(b),'stdout':value.decode(),'source_object':object_sha,'program_exit':run.returncode,'real_output':str(exe),'signed_linker_pid':ld['pid'],'exact_raw_args':ld['argv']}
             if name!='direct':
                 p=ld['xcode_response'];entry.update(sha256=p['sha256'],held_inode=p['identity'][:2],actual_parent=ld['ppid'],real_adversarial_refusals=negatives(raw))
             result[name]=entry;exe.unlink()
