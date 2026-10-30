@@ -400,9 +400,11 @@ def render_tables(reports, ty_worktree, ty_scenario):
         ["Project", "Workflow", "Package", f"Rust {rust}", "Ohm", "Speedup"],
         feature_rows,
     )
+    session_percent = round(100 * (totals[0] - totals[1]) / totals[0])
+    session_direction = "less" if session_percent >= 0 else "more"
     headlines = {
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
-        r"\d+% less time": f"{round(100 * (totals[0] - totals[1]) / totals[0])}% less time",
+        r"\d+% (?:less|more) time": f"{abs(session_percent)}% {session_direction} time",
         r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
     }
     return rendered, headlines
