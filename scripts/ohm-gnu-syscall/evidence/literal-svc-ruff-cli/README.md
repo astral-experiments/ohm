@@ -51,6 +51,13 @@ python3 -IB verify.py --records repetition-41123332513 \
 
 ## Rerun the benchmark
 
+To run the registered instruction measurements on fresh compiler builds, dispatch the source workflow. It rebuilds Cargo, both compilers and the two targets' standard libraries from pinned sources, verifies their bytes, and enrolls 12 workers. Its independent qualification matched all 119 files in each toolchain and reproduced the 19-to-four and 19-to-three full compilation counts. The source workflow uses the published `-20` distribution and Rust bootstrap downloads. [Verified source rebuild, result collector and rerun instructions](https://github.com/astral-experiments/ohm/tree/85c467e1190d80fa8607fb0f9ef0824b4271266a/scripts/ohm-gnu-syscall/source-rebuild)
+
+```sh
+gh-auto workflow run ci.yml --repo astral-experiments/ohm \
+  --ref charlie/qa-gnu-svc-source-rebuild -f phase=holdout
+```
+
 To recompute all paired results from the retained original clocks, Cargo rosters, storage censuses and native-build observations, run the following here with Python 3.11 or newer and zstd.
 
 ```sh
