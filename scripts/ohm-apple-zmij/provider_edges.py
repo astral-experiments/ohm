@@ -19,7 +19,9 @@ from study import CHILD, MISSING, PARENT, RECHECK, check_host, compress_bytes, d
 
 BARRIER = '''#[inline(never)]
 pub fn barrier(value: i32) -> i32 {
-    unsafe { core::arch::asm!("mov fp, fp", options(nomem, nostack, preserves_flags)); }
+    let mut x = value as f64;
+    unsafe { core::arch::asm!("fsqrt {x:d}, {x:d}", x = inout(vreg) x, options(pure, nomem, nostack)); }
+    assert_eq!(x, (value as f64).sqrt());
     value
 }
 '''

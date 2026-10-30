@@ -1,0 +1,5 @@
+# Register-only native math in Ruff workspace tests
+
+Use Cargo 735e1528 with the baseline Rust 82911b51 and the scalar libm candidate 3dd3afd3 in both native Apple roles. First exercise direct and transitive native archives with both watched and unwatched provider directories, changing provider order and contents, missing/malformed archives, same-stamp writes, genuine Rust edits, and independent empty builds. Require the scalar assembly marker to change on the expected public code path.
+
+Use the whole historical Ruff deleted-file diagnostic fix. Record every full and link-only rustc, real linker driver recheck and Xcode ld, and map each ld output to all 83 Cargo-returned test programs. After the edit, both repetitions and repair, compare every returned program with the same compiler's independently empty build. Run the selected genuine language-server regressions, reject the additional invalid source with E0425, and independently execute the locked scalar math archive for six f32/f64 results. Record any saved and added links without requiring a particular number. This experiment does not measure time.
