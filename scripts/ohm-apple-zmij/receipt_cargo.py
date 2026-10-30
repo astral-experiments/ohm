@@ -51,17 +51,20 @@ def build(root, aware=False):
          os.stat(filesystem["MountPoint"]).st_dev == root.stat().st_dev, "provider qualification requires APFS")
     save(receipts / "filesystem.json", filesystem)
     src = root / ("aware-cargo-source" if aware else "receipt-cargo-source")
-    source = materialize(src)
-    selected = CANDIDATE
     if aware:
-        sys.path.insert(0, str(Path(__file__).resolve().parent / "source-transport/versioned"))
-        from prepare_versioned import materialize as apply_version
-        from versioned_select import AWARE
-        ancestry = apply_version(src, "cargo")
-        selected = AWARE
-        assert ancestry[-1]["source"] == selected
-        source = {"commit": selected, "tree": ancestry[-1]["tree"], "base": source, "steps": ancestry,
-                  "lock": sha(src / "Cargo.lock")}
+        directory = Path(__file__).resolve().parents[1] / "ohm-gnu-syscall/release-reader"
+        sys.path.insert(0, str(directory))
+        from build import materialize as release_tree, REGISTERED
+        release_tree(src)
+        registered = REGISTERED["integrated"]
+        selected = registered["commit"]
+        source = {"commit": selected, "tree": registered["tree"], "parents": registered["parents"],
+                  "entries": len(run(["git","ls-tree","-r","HEAD"],cwd=src).splitlines()),
+                  "lock": sha(src/"Cargo.lock"), "transport": {p.name: sha(p) for p in directory.iterdir() if p.is_file()}}
+        need(source["entries"] == 3114, "incomplete release Cargo tree")
+    else:
+        source = materialize(src)
+        selected = CANDIDATE
     save(receipts / "source.json", source)
     work = root / ("aware-cargo-build" if aware else "receipt-cargo-build")
     work.mkdir()

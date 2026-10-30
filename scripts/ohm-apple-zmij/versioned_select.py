@@ -5,7 +5,7 @@ import os
 from study import CARGO_SOURCE, need, physical, run, sha, save
 
 CLASSIC = "735e1528ed741015c57676dccf05dbdc0ff7bed1"
-AWARE = "9a102b4519b40f9034aa40533d92c83583dcb289"
+AWARE = "fd55a13d0220748794ba3c7c9556ef8ceed8591f"
 CARGOS = {"signed": (CARGO_SOURCE,"signed/bin/cargo"), "classic": (CLASSIC,"cargo-293"), "aware": (AWARE,"cargo-aware")}
 def current(root):
     selection=json.loads((root/"receipts/versioned-current.json").read_bytes())
