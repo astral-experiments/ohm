@@ -19,6 +19,7 @@ import study as kit
 import disk
 import native
 import outputs
+import stable_sdk
 from omission import publish,require,sha
 
 ROOT,OUT,WORK,TREE=kit.ROOT,kit.OUT,kit.WORK,kit.TREE
@@ -85,6 +86,7 @@ def run_visit(arm, phase, branch, env, where, *, reference=False, trace=False):
     res=native.run([*prefix,*CARGO],env,TREE,where/'cargo',101 if phase=='invalid' else 0);msg=list(map(json.loads,res.stdout.splitlines()));require(msg[-1]=={'reason':'build-finished','success':phase!='invalid'},'missing final Cargo success or expected rejection')
     if phase=='invalid':
         diagnostics=[m['message'] for m in msg if m.get('reason')=='compiler-message'];require(any(m.get('code') and m['code']['code']=='E0308' and any('ohm_branch_switch_invalid' in t['text'] for s in m['spans'] for t in s['text']) for m in diagnostics),'wrong invalid-body failure');publish(where/'invalid.json',{'error':'E0308','exit':101});return {'invalid':True}
+    native_path=stable_sdk.output_directory(msg,'tikv-jemalloc-sys')
     actual=trace_read(where/'exec.raw',arm,phase,where) if trace else None
     rows,dirty=roster(msg);publish(where/'roster.json.gz',{'members':rows,'dirty':dirty})
     if reference or phase=='empty-A':require(len(dirty)==375,'cold build reused existing Cargo output')
@@ -98,20 +100,21 @@ def run_visit(arm, phase, branch, env, where, *, reference=False, trace=False):
     ref=CLEAN/f'{arm}-{branch}.json.gz'
     if reference:
         for name,path in paths.items():native.preserve(path,obs[name],BODIES,BUNDLE)
-        publish(ref,{'native':obs,'graph':commit(rows),'graph_rows':rows})
+        publish(ref,{'native':obs,'graph':commit(rows),'graph_rows':rows,'jemalloc_out_dir':native_path})
     expected=load(ref);require(commit(rows)==expected['graph'] and rows==expected['graph_rows'],'typed graph differs from own fresh reference')
+    require(expected['jemalloc_out_dir']==native_path,'actual native output directory differs from own clean')
     reference_data=expected['native']
     for name,path in paths.items():native.same_file(path,obs[name],reference_data[name],BODIES,where)
     require({k:v for k,v in obs.items() if k not in paths}=={k:v for k,v in reference_data.items() if k not in paths},'native behavior differs from own empty reference')
-    result={'arm':arm,'phase':phase,'branch':branch,'source':kit.REVS[branch],'artifact_count':len(rows),'graph':commit(rows),'dirty':len(dirty),'dirty_digest':commit(dirty),'actual_execs':actual,'allocation':storage['allocated'],'roots':storage['roots'],'cross_root_alias_bytes':storage['bytes_aliased_between_roots'],'older_exclusive_bytes':storage['older_exclusive_bytes'],'packed_count':storage['packed_files'],'packed_bytes':storage['packed_bytes'],'cli':obs['cli']['whole'],'reader':obs['reader']['whole'],'behavior':commit({k:v for k,v in obs.items() if k not in paths})}
+    result={'arm':arm,'phase':phase,'branch':branch,'source':kit.REVS[branch],'artifact_count':len(rows),'jemalloc_out_dir':native_path,'graph':commit(rows),'dirty':len(dirty),'dirty_digest':commit(dirty),'actual_execs':actual,'allocation':storage['allocated'],'roots':storage['roots'],'cross_root_alias_bytes':storage['bytes_aliased_between_roots'],'older_exclusive_bytes':storage['older_exclusive_bytes'],'packed_count':storage['packed_files'],'packed_bytes':storage['packed_bytes'],'cli':obs['cli']['whole'],'reader':obs['reader']['whole'],'behavior':commit({k:v for k,v in obs.items() if k not in paths})}
     publish(where/'visit.json',result);return result
 
 
 def qualify():
-    require(kit.git('rev-parse',kit.REVS['B']+'^')==kit.REVS['A'] and len(kit.git('diff','--name-status',kit.REVS['A'],kit.REVS['B']).splitlines())==169,'not the historic 169-path edit');calibration();CLEAN.mkdir();BODIES.mkdir()
+    require(kit.git('rev-parse',kit.REVS['B']+'^')==kit.REVS['A'] and len(kit.git('diff','--name-status',kit.REVS['A'],kit.REVS['B']).splitlines())==169,'not the historic 169-path edit');calibration();stable_sdk.prepare();stable_sdk.check_namespaces();CLEAN.mkdir();BODIES.mkdir()
     for arm in kit.ARMS:
         for branch in ('A','B'):
-            env=kit.setup_arm(arm);run_visit(arm,'cold-'+branch,branch,env,CLEAN/f'{arm}-{branch}',reference=True,trace=branch=='A')
+            env=stable_sdk.select(arm,'clean-'+arm+'-'+branch);run_visit(arm,'cold-'+branch,branch,env,CLEAN/f'{arm}-{branch}',reference=True,trace=branch=='A')
     comparison={}
     for branch in ('A','B'):
         controls={arm:load(CLEAN/f'{arm}-{branch}.json.gz') for arm in kit.ARMS};base=controls['Off'];result={}
@@ -120,13 +123,15 @@ def qualify():
             require(a['cli']['executable']==b['cli']['executable'] and a['cli']['loads']==b['cli']['loads'],'executable or executable-load bytes differ across options')
             result[arm]={'raw':b['cli']['whole'],'differing_sections':sorted(name for name in a['cli']['sections'].keys()|b['cli']['sections'].keys() if a['cli']['sections'].get(name)!=b['cli']['sections'].get(name))}
         comparison[branch]=result
+    full_names={arm:load(CLEAN/f'{arm}-A.json.gz')['jemalloc_out_dir'] for arm in kit.ARMS}
+    for arm in kit.ARMS:require(full_names[arm]==load(CLEAN/f'{arm}-B.json.gz')['jemalloc_out_dir'],('full CLI chose different native namespace on the two cold branches',arm))
     from provider import native_controls
-    for arm in kit.ARMS:native_controls(arm,kit.setup_arm(arm),ROOT,OUT)
-    publish(OUT/'full-cli-controls.json',{'branches':comparison,'input_root':str(TREE),'sdk_path':str(kit.SDK),'scored_clock':False,'raw_products':'full-cli-binaries','provider_arms':list(kit.ARMS)})
+    for arm in kit.ARMS:native_controls(arm,stable_sdk.select(arm,'provider-'+arm),ROOT,OUT)
+    publish(OUT/'full-cli-controls.json',{'branches':comparison,'input_root':str(TREE),'full_native_paths':full_names,'sdk_path':str(kit.SDK),'scored_clock':False,'raw_products':'full-cli-binaries','provider_arms':list(kit.ARMS)})
 
 
 def install(arm,path):
-    path.mkdir();env=kit.setup_arm(arm);result={}
+    path.mkdir();label=path.parent.name+'-'+path.name;env=stable_sdk.select(arm,label);publish(path/'sdk.json',load(stable_sdk.USES/(label+'.json')));result={}
     for phase,branch in VISITS:
         result[phase]=run_visit(arm,phase,branch,env,path/phase,trace=phase in ('return-A','return-B','unchanged-B'))
     require(result['return-A']['cli']!=result['return-B']['cli'],'wrong executable after returning to the other branch');publish(path/'complete.json',result);return result

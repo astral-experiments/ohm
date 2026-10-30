@@ -39,12 +39,19 @@ def verify_disk(where):
 def verify(logs,stage):
     mode=read(logs/'full-cli-controls.json'); assert mode['scored_clock'] is False
     calibr=logs/'full-cli-calibration'; f=verify_disk(calibr/'aliases'); s=verify_disk(calibr/'removed');assert f['shared_inodes']==1 and s['shared_inodes']==0
+    physical=read(logs/'full-cli-sdk-identities.json');namespaces=read(logs/'full-cli-stable-cargo.json');seen={}
+    for observation in namespaces['checks']:
+        arm=observation['arm'];assert seen.setdefault(arm,observation['selected'])==observation['selected']==namespaces['expected'][arm]
+    assert len(namespaces['checks'])==6 and set(seen)==set(schema.kit.ARMS)
+    for use in (logs/'full-cli-sdk-uses').glob('*.json'):
+        item=read(use);assert item['files']==physical[item['role']]
     clean=logs/'full-cli-clean';references={};binaries=set()
     for role in schema.kit.ARMS:
         native_test=read(logs/('provider-'+role)/'result.json');assert [native_test[k]['output'] for k in ('cold-A','first-B','returned-A','repair','empty-repair')]==['17 1','29 2','29 1','29 1','29 1']
         assert native_test['invalid']['exit']==101 and native_test['returned-A']['binary']==native_test['repair']['binary']==native_test['empty-repair']['binary']!=native_test['cold-A']['binary']
         for branch in ('A','B'):
             r=read(clean/f'{role}-{branch}.json.gz');references[role,branch]=r
+            use=read(logs/'full-cli-sdk-uses'/f'clean-{role}-{branch}.json');assert use['files']==physical[use['role']] and r['jemalloc_out_dir']==mode['full_native_paths'][role]
             assert len(r['graph_rows'])==375 and r['graph']==schema.commit(r['graph_rows'])
             for label in ('cli','reader'):binaries.add(r['native'][label]['whole'])
     for digest in binaries:assert complete_digest(logs/'full-cli-binaries'/(digest+'.zst'))==digest
@@ -57,7 +64,7 @@ def verify(logs,stage):
     for i,order in enumerate(orders,1):
         group={}
         for arm in order:
-            slot=folder/f'triplet-{i:02}-{arm}';rows=read(slot/'complete.json');assert set(rows)=={p for p,_ in schema.VISITS};group[arm]={}
+            slot=folder/f'triplet-{i:02}-{arm}';use=read(slot/'sdk.json');assert use['arm']==arm and use['files']==physical[use['role']];rows=read(slot/'complete.json');assert set(rows)=={p for p,_ in schema.VISITS};group[arm]={}
             for phase,branch in schema.VISITS:
                 where=slot/phase;events=list(map(json.loads,gzip.decompress((where/'cargo.stdout.gz').read_bytes()).splitlines()));process=read(where/'cargo.json.gz')
                 assert events[-1]=={'reason':'build-finished','success':phase!='invalid'} and process['exit']==(101 if phase=='invalid' else 0)
@@ -67,6 +74,7 @@ def verify(logs,stage):
                 v=read(where/'visit.json');assert v==rows[phase];r=references[arm,branch];assert v['source']==schema.kit.REVS[branch] and v['phase']==phase
                 units,dirty=schema.roster(events,Path(mode['input_root']));roster=read(where/'roster.json.gz');assert roster=={'members':units,'dirty':dirty} and units==r['graph_rows'] and v['dirty_digest']==schema.commit(dirty)
                 disk=verify_disk(where);assert disk['allocated']==v['allocation'] and disk['packed_bytes']==v['packed_bytes']
+                assert schema.stable_sdk.output_directory(events,'tikv-jemalloc-sys')==v['jemalloc_out_dir']==r['jemalloc_out_dir']==mode['full_native_paths'][arm]
                 obs=read(where/'native.json.gz');assert obs==r['native'] and obs['cli']['whole']==v['cli'] and obs['reader']['whole']==v['reader']
                 assert gzip.decompress((where/'reader-run.stdout.gz').read_bytes()).decode().strip()==obs['typed']
                 for name,rec in obs['cli_cases'].items():
