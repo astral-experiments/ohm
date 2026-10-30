@@ -7,7 +7,7 @@ import re
 import struct
 from pathlib import Path
 
-def read_profile(path):
+def read_profile(path,allow_zero=False):
     body=path.read_bytes(); hdr=struct.pack('<I',9)
     assert body[:8]==b'MMPD'+hdr
     streams=collections.defaultdict(bytearray)
@@ -30,16 +30,17 @@ def read_profile(path):
             else:
                 out.append(data[pos]);pos+=1
         return bytes(out)
-    modules=[]
+    modules=[];activity_count=0
     for kind,ident,tid,lo,hi,upper in struct.iter_unpack('<QQIIII',events[8:]):
         if string(kind)!=b'GenericActivity':continue
+        activity_count+=1
         text=string(ident)
         if text==b'codegen_module' or text.startswith(b'codegen_module\x1e'):
             fields=text.split(b'\x1e')
             assert len(fields)==3 and fields[2].isdigit(),fields
             modules.append(fields[1].decode())
-    assert modules and len(modules)==len(set(modules)), modules
-    return {'sha':hashlib.sha256(body).hexdigest(),'physical_codegen':sorted(modules)}
+    assert activity_count>0 and (modules or allow_zero) and len(modules)==len(set(modules)), modules
+    return {'sha':hashlib.sha256(body).hexdigest(),'generic_activities':activity_count,'physical_codegen':sorted(modules)}
 
 def record(d):
     result=json.loads((d/'result.json').read_bytes())

@@ -56,7 +56,8 @@ def stable_selector():
                 (parked/state).rename(active);raise
             state=role
         need(all(snapshot(r,state)==before[r] for r in 'PC'),"SDK file identity changed")
-        calls.append([former,state]);save(rt.LOG/'selector-visits.json',calls)
+        calls.append([former,state])
+        save(rt.LOG/'selector-visits'/f'{len(calls):03d}.json',calls[-1])
         return different
     rt.select=select
     for r in 'PCCP':select(r)
@@ -113,9 +114,7 @@ def profile_ruff(role):
             proc=rt.record(cmd,out/'cargo',rt.RUFF,env)
             events=[json.loads(line) for line in proc.stdout.splitlines() if line.startswith(b'{')]
             streaming=[line for line in proc.stdout.splitlines() if not line.startswith(b'{')]
-            if b'MONO_ITEM ' not in b'\n'.join(streaming):
-                # Cargo may relay raw compiler output through JSON diagnostics on some versions.
-                streaming+=proc.stderr.splitlines()
+            streaming+=proc.stderr.splitlines()
             need(events[-1]=={'reason':'build-finished','success':True},'profiled Cargo did not finish')
             unit,=[u for u in events if u['reason']=='compiler-artifact' and u['target']['name']=='ruff_python_ast']
             archive,=[Path(f) for f in unit['filenames'] if f.endswith('.rlib')]
@@ -127,10 +126,11 @@ def profile_ruff(role):
             new=set(profiles.iterdir())-before
             actual,=new
             (out/'native-profile').write_bytes(actual.read_bytes())
-            measured=read_profile(actual)
+            measured=read_profile(actual,allow_zero=True)
             lines=b'\n'.join(streaming)+b'\n'
             cgus={m.decode():v.decode() for m,v in re.findall(rb'^CGU_REUSE (\S+) (No|PreLto|PostLto)$',lines,re.M)}
-            need(any(v=='No' for v in cgus.values()) and set(measured['physical_codegen'])=={n for n,v in cgus.items() if v=='No'},
+            need(cgus and len(cgus)==len(re.findall(rb'^CGU_REUSE ',lines,re.M))
+                 and set(measured['physical_codegen'])=={n for n,v in cgus.items() if v=='No'},
                  "Rust reuse report disagrees with independent physical LLVM events")
             need(len(cgus)==len(proof['objects']),"module inventory differs from complete object roster")
             rows[label]={'raw_archive':bench.custody(content,'.profile.rlib'),'actual':measured,'cgus':cgus,

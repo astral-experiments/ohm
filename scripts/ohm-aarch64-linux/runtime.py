@@ -212,14 +212,16 @@ def probe(role):
          "cross-compiled program failed")
     asm_path = "tests/run-make/ohm-checked-dep-info/inline.rs"
     source = ROOT / "rust"
-    need(text_git(source, "rev-parse", CHILD + ":" + asm_path) == "6a36b0f4ef7febb78a53dea5528b011fa74b3695", "wrong checked-in asm source")
+    need(all(text_git(source, "rev-parse", rev + ":" + asm_path) == "89ce772800e304c3af6c2cd7071e423ad798a03f"
+             for rev in (PARENT, CHILD)), "wrong checked-in asm source")
     (folder / "inline.rs").write_bytes(git(source, "show", CHILD + ":" + asm_path))
     payload = folder / "payload.bin"
     payload.write_bytes(b"\xa5")
-    for fixture, expected in (("ordinary", role == "P"), ("vector_modifier", True), ("vector_directive", True)):
+    # Both subjects keep the crate-level assembly guard on GNU AArch64.
+    for fixture in ("ordinary", "vector_modifier", "vector_directive"):
         flags = [*r, "inline.rs", "--target", TARGET, "--crate-type=rlib", "-Zohm-check-relink-inputs", "--cfg", fixture, "--emit=link,dep-info=-"]
         rules = record(flags, out / ("asm-" + fixture), folder, env).stdout
-        need((MISSING in rules) == expected and (RECHECK in rules) == (not expected), "incorrect Linux AArch64 " + fixture + " dependencies")
+        need(MISSING in rules and RECHECK not in rules, "incorrect Linux AArch64 " + fixture + " dependencies")
     payload.unlink()
     archive = folder / "libinline.rlib"
     need(archive.is_file(), "missing successful inline assembly archive")
