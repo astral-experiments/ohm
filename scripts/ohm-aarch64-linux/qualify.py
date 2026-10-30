@@ -413,6 +413,14 @@ def screen():
 
 
 def selftest():
+    cfg = b'target_arch="aarch64"\ntarget_os="linux"\ntarget_env="gnu"\ntarget_feature="neon"\n'
+    need(rt.target_cfg(cfg) == sorted(cfg.decode().splitlines()), "cfg receipt differs from compiler output")
+    for invalid in (cfg + b"miri\n", cfg.replace(b"neon", b"no_neon")):
+        try:
+            rt.target_cfg(invalid)
+        except RuntimeError:
+            continue
+        raise RuntimeError("unexpected Linux AArch64 cfg accepted")
     good = bytearray(64)
     good[:6] = b"\x7fELF\x02\x01"
     good[16:20] = b"\x01\0\xb7\0"

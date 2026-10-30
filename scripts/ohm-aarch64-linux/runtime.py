@@ -170,6 +170,13 @@ def record(argv, folder, cwd, env, code=0):
     return proc
 
 
+def target_cfg(lines):
+    values = set(lines.splitlines())
+    need({b'target_arch="aarch64"', b'target_os="linux"', b'target_env="gnu"', b'target_feature="neon"'} <= values
+         and b"miri" not in values, "not the actual zmij cfg")
+    return sorted(x.decode() for x in values)
+
+
 def probe(role):
     env = environment()
     env.update(CARGO_HOME=str(ROOT / "diagnostic-cargo-home"), CARGO_TARGET_DIR=str(ROOT / "diagnostic-target"),
@@ -184,10 +191,8 @@ def probe(role):
         ids[exe] = physical(p)
     cv = record(["cargo", "+ohm", "-Vv"], out / "cargo", ROOT, env).stdout
     rv = record(r + ["-vV"], out / "rustc", ROOT, env).stdout
-    cfg = record(r + ["--print", "cfg", "--target", TARGET], out / "cfg", ROOT, env).stdout.splitlines()
+    cfg = target_cfg(record(r + ["--print", "cfg", "--target", TARGET], out / "cfg", ROOT, env).stdout)
     need(CARGO_SOURCE.encode() in cv and HOST.encode() in rv, "wrong Cargo or compiler host")
-    need({b'target_arch="aarch64"', b'target_os="linux"', b'target_env="gnu"', b'target_feature="neon"'} <= set(cfg)
-         and b"miri" not in cfg, "not the actual zmij cfg")
     folder = ROOT / ("smoke-" + role)
     folder.mkdir()
     (folder / "mac.rs").write_text('extern crate proc_macro; use proc_macro::TokenStream;\n#[proc_macro] pub fn answer(_:TokenStream)->TokenStream {"29u32".parse().unwrap()}\n')
@@ -211,17 +216,17 @@ def probe(role):
     (folder / "inline.rs").write_bytes(git(source, "show", CHILD + ":" + asm_path))
     payload = folder / "payload.bin"
     payload.write_bytes(b"\xa5")
-    for cfg, expected in (("ordinary", role == "P"), ("vector_modifier", True), ("vector_directive", True)):
-        flags = [*r, "inline.rs", "--target", TARGET, "--crate-type=rlib", "-Zohm-check-relink-inputs", "--cfg", cfg, "--emit=link,dep-info=-"]
-        rules = record(flags, out / ("asm-" + cfg), folder, env).stdout
-        need((MISSING in rules) == expected and (RECHECK in rules) == (not expected), "incorrect Linux AArch64 " + cfg + " dependencies")
+    for fixture, expected in (("ordinary", role == "P"), ("vector_modifier", True), ("vector_directive", True)):
+        flags = [*r, "inline.rs", "--target", TARGET, "--crate-type=rlib", "-Zohm-check-relink-inputs", "--cfg", fixture, "--emit=link,dep-info=-"]
+        rules = record(flags, out / ("asm-" + fixture), folder, env).stdout
+        need((MISSING in rules) == expected and (RECHECK in rules) == (not expected), "incorrect Linux AArch64 " + fixture + " dependencies")
     payload.unlink()
     archive = folder / "libinline.rlib"
     need(archive.is_file(), "missing successful inline assembly archive")
     archive.unlink()
     missing = record(flags, out / "asm-missing-file", folder, env, 1)
     need(b"payload.bin" in missing.stderr and not archive.exists(), "missing real inline assembler input accepted or misdiagnosed")
-    save(out / "verified.json", {"rustc": ids, "driver": physical(driver), "rustc_version": digest(rv), "cfg": sorted(x.decode() for x in cfg)})
+    save(out / "verified.json", {"rustc": ids, "driver": physical(driver), "rustc_version": digest(rv), "cfg": cfg})
 
 
 def elf(data, kinds):

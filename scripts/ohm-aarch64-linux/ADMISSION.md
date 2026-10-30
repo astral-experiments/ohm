@@ -15,3 +15,9 @@ A separate private three-day SDK archive allows a later test-build invocation to
 ```sh
 python3 -IB scripts/ohm-aarch64-linux/capsule.py linux-aarch64-sdk-pair.tar.zst "$SDK_SHA256" P "$NEW_SDK"
 ```
+
+## Reopening the native probe and capsule program
+
+At fa1c86209ccd69396ed09256c78cb2bae8b46a04, both real 117-file, two-architecture compiler kits passed their matched input gates. Their only differing file was the physical compiler driver. The parent host and AArch64 QEMU consumer produced 29, its three assembler rules matched, and its missing real assembly input failed. The child independently passed both checked-in Linux host run-make tests. The probe's final report accidentally reused its `cfg` binding for a fixture name. Separately, an isolated Python process could not import the private archive program's sibling runtime module. Neither failure admitted a Ruff command. Its 63-entry raw archive has SHA-256 12f35e766f6abf55a4979f9fee8b0fb4fc39901868cc4a309f1787973220af42. [Third zero-sample run](https://github.com/astral-experiments/ohm/actions/runs/41053510446)
+
+The next run uses a typed target-cfg list, another name for its fixture, and an explicit sibling import under isolated Python. Across both previously returned file tables, the bootstrap installed LLVM under the driver directory and under native `rustlib`. The archive allowlist accepts both exact locations, including LLVM's short linker script. The separately reopened tables contain 115 unique objects totalling 763,421,182 bytes including the signed release tools. All benchmark and native gates retain their original definition.

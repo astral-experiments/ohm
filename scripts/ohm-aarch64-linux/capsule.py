@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tarfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import runtime as rt
 from study import need, save, sha
 
@@ -24,7 +25,7 @@ def sdk_path(name):
         return False
     if name in rt.TOOLS or name == "bin/rustc":
         return True
-    if path.parent == Path("lib") and re.fullmatch(r"lib[0-9A-Za-z_.+-]+\.so(?:\.[0-9A-Za-z.+-]+)?", path.name):
+    if path.parent in (Path("lib"), Path("lib/rustlib") / rt.HOST / "lib") and re.fullmatch(r"lib[0-9A-Za-z_.+-]+\.so(?:\.[0-9A-Za-z.+-]+)?", path.name):
         return True
     for triple in (rt.HOST, rt.TARGET):
         base = Path("lib/rustlib") / triple
@@ -62,7 +63,7 @@ def binary_payload(path, names):
         magic = stream.read(192)
     if magic.startswith((b"\x7fELF", b"!<arch>\n", b"rust\0")):
         return True
-    return (all(n.startswith("lib/libLLVM") for n in names) and path.stat().st_size < 192
+    return (all(Path(n).name.startswith("libLLVM") for n in names) and path.stat().st_size < 192
             and re.fullmatch(rb"INPUT\(libLLVM\.so\.[0-9A-Za-z.+-]+\)\s*", magic) is not None)
 
 
@@ -165,6 +166,8 @@ def build():
 if __name__ == "__main__":
     if sys.argv[1:] == ["build"]:
         build()
+    elif sys.argv[1:] == ["--help"]:
+        print("capsule.py build | ARCHIVE SHA256 P|C NEW_SDK")
     else:
         archive, expected, role, dst = sys.argv[1:]
         archive = Path(archive)
