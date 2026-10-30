@@ -25,7 +25,7 @@ jobs:
         run: |
           root="$RUNNER_TEMP/packaged-linux-50"
           mkdir -p "$root/receipts/shared"
-          df -BT1 "$root" > "$root/receipts/shared/initial-disk.txt"
+          df -T -B1 "$root" > "$root/receipts/shared/initial-disk.txt"
           findmnt --target "$root" > "$root/receipts/shared/filesystem.txt"
           python3 -IB -c 'import shutil,sys; v=shutil.disk_usage(sys.argv[1]).free; print(v); assert v>=65*2**30,"original 65 GiB scratch preflight"' "$root"
           sudo apt-get update -qq
