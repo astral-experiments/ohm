@@ -10,17 +10,13 @@ jobs:
   probe:
     name: ${{ matrix.runner }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 5
+    permissions:
+      contents: read
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         include:
-          - runner: github-ubuntu-24.04-x86_64-8
-            target: x86_64-unknown-linux-gnu
-          - runner: namespace-profile-ubuntu-24-04-16
-            target: x86_64-unknown-linux-gnu
-          - runner: depot-macos-15
-            target: aarch64-apple-darwin
           - runner: macos-15
             target: aarch64-apple-darwin
     env:
@@ -42,6 +38,11 @@ jobs:
             test "$ID" = ubuntu && test "$VERSION_ID" = 24.04
             test "$(uname -m)" = x86_64
           fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Free space on the disposable runner and verify the selected SDK
+        run: ./scripts/prepare-hosted-macos-release.sh
       - name: Run a profile-instrumented Rust executable on Apple Silicon
         if: runner.os == 'macOS'
         shell: bash
