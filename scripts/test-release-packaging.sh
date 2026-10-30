@@ -40,12 +40,20 @@ for target in aarch64-apple-darwin x86_64-unknown-linux-gnu; do
 done
 cmp "$manifest" "$valid/$toolchain.json"
 
-for failure in checksum symlink identity; do
+for failure in checksum wrong-archive wrong-provenance symlink identity; do
   broken="$temporary_directory/$failure"
   cp -R "$inputs" "$broken"
   selected_toolchain=$toolchain
   case "$failure" in
     checksum) printf 'corrupt\n' >> "$broken/$toolchain-aarch64-apple-darwin.tar.gz" ;;
+    wrong-archive)
+      cp "$broken/$toolchain-aarch64-apple-darwin.tar.gz.sha256" \
+        "$broken/$toolchain-x86_64-unknown-linux-gnu.tar.gz.sha256"
+      ;;
+    wrong-provenance)
+      cp "$broken/$toolchain-aarch64-apple-darwin-provenance.json.sha256" \
+        "$broken/$toolchain-x86_64-unknown-linux-gnu-provenance.json.sha256"
+      ;;
     symlink)
       rm "$broken/$toolchain-aarch64-apple-darwin-provenance.json"
       ln -s "$inputs/$toolchain-aarch64-apple-darwin-provenance.json" \
