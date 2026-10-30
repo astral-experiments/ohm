@@ -31,7 +31,12 @@ for target in "${targets[@]}"; do
     fi
   done
 
-  sha256sum --check --strict "$archive_name.sha256" "$provenance_name.sha256"
+  for asset in "$archive_name" "$provenance_name"; do
+    if ! sha256sum "$asset" | cmp -s - "$asset.sha256"; then
+      echo "checksum file does not match $asset: $asset.sha256" >&2
+      exit 1
+    fi
+  done
 done
 
 macos_archive="$OHM_TOOLCHAIN-aarch64-apple-darwin.tar.gz"
