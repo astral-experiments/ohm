@@ -33,7 +33,7 @@ BUILD='''fn main(){
 '''
 def write(p,s):
     p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s)
-def run(root, role, placement, defaults, stock_source=None, native_only=False):
+def run(root, role, placement, defaults, stock_source=None, native_only=False, history=None, rust_source=None):
     cwd=rt.ROOT/'edges';cwd.mkdir(); env=rt.environment();work=rt.ROOT/'edges-work';work.mkdir()
     env.update(CARGO_HOME=str(work/'cargo-home'),CARGO_TARGET_DIR=str(work/'target'),CARGO_BUILD_BUILD_DIR=str(work/'shared'),
                CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=q.CROSS)
@@ -113,7 +113,9 @@ def run(root, role, placement, defaults, stock_source=None, native_only=False):
                 p.rename(saved/('empty-'+p.name));(saved/p.name).rename(p)
         return result
     visit('cold-lower')
-    if native_only:
+    if history is not None:
+        history(root,cwd,early,late,initial,ar,version,visit)
+    elif native_only:
         early.write_bytes(b'!<arch>\n'+b'\0'*60);late.unlink()
         visit('malformed-no-Rust-edit');visit('empty-malformed',True)
         early.unlink();late.write_bytes(initial)
@@ -129,7 +131,7 @@ def run(root, role, placement, defaults, stock_source=None, native_only=False):
         visit('malformed-real-Rust-edit');visit('empty-malformed',True)
         early.unlink();version(15);visit('missing-real-Rust-edit');visit('empty-missing',True)
         late.write_bytes(initial);version(19);visit('restored-real-Rust-edit');visit('empty-restored',True);visit('restored-unchanged')
-    save(root/'completed.json',{'source':stock_source or {'P':subject.BASE,'C':subject.TREATMENT}[role],'placement':placement,'defaults':defaults,'cases':arms,'source_shape':sha(cwd/'src/main.rs'),'build_rs':sha(cwd/'build.rs')})
+    save(root/'completed.json',{'source':rust_source or stock_source or {'P':subject.BASE,'C':subject.TREATMENT}[role],'placement':placement,'defaults':defaults,'cases':arms,'source_shape':sha(cwd/'src/main.rs'),'build_rs':sha(cwd/'build.rs')})
     parked=rt.ROOT/('closed-'+root.name);parked.mkdir()
     cwd.rename(parked/'source');work.rename(parked/'work')
 

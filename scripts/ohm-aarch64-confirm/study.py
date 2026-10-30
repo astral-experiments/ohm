@@ -34,7 +34,7 @@ def old(base):
     select, _, _=compare.installable(base/"sdk.tar.zst",ORIGINAL,base/"native")
     select("P")
 
-def setup(ancestor, inputs):
+def setup(ancestor, inputs, alternate=None):
     kit.bind()
     _, pair, _ = compare.installable(inputs/"sdk.tar.zst",CURRENT,inputs/"native",expected_tree=kit.TREE)
     oldA, oldN = (load(ancestor/"receipts"/(k+"-sdk.json")) for k in "PC")
@@ -43,13 +43,25 @@ def setup(ancestor, inputs):
     need({k:v["source"] for k,v in roles.items()}==SOURCE,"wrong three source revisions")
     name, = (n for n in oldA["files"] if n.startswith("lib/librustc_driver"))
     ref = dict(oldA["files"]); del ref[name]
+    overrides={}
+    if alternate is not None:
+        alternate_path,product=alternate
+        need(sha(alternate_path)==product["cargo_sha256"] and product["git"]=="735e1528ed741015c57676dccf05dbdc0ff7bed1","unregistered replacement Cargo")
+        original=roles["A"]["files"]["bin/cargo"]
+        need(original[0]==rt.TOOLS["bin/cargo"] and product["mode"]==original[2],"incorrect signed Cargo predecessor or executable mode")
+        for k,v in roles.items():
+            need(v["files"]["bin/cargo"]==original,"asymmetrical signed Cargo source")
+            v["files"]["bin/cargo"]=[product["cargo_sha256"],product["raw_bytes"],product["mode"]]
+        ref["bin/cargo"]=roles["A"]["files"]["bin/cargo"]
+        overrides={"bin/cargo":alternate_path}
+        save(rt.LOG/"cargo-substitution.json",{"immutable_source":product["git"],"from":original,"to":ref["bin/cargo"],"version":product["version"],"product":sha(alternate_path.parent/"product.json")})
     for k,v in roles.items():
         files = dict(v["files"])
         need(files.pop(name)[0]==DRIVER[k] and len(files)==118 and files==ref,"more than the one physical driver changed")
         save(rt.LOG/("subject-"+k+".json"),v)
     origins={"A":ancestor/"donor-P","N":rt.ROOT/"donor-P","M":rt.ROOT/"donor-C"}
     cls=runpy.run_path(str(HERE/"parked.py"))["Parked"]
-    storage=cls(rt.ROOT/"fixed-role-parking",rt.SDK,{k:v["files"] for k,v in roles.items()},origins,name)
+    storage=cls(rt.ROOT/"fixed-role-parking",rt.SDK,{k:v["files"] for k,v in roles.items()},origins,name,overrides=overrides)
     save(rt.LOG/"all-named-start-identities.json",storage.initial)
     history=[]
     def select(k):

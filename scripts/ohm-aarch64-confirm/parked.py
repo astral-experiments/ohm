@@ -30,7 +30,7 @@ def fingerprint(tree,names):
     return {n:identity(tree/n) for n in sorted(names)}
 
 class Parked:
-    def __init__(self,store,visible,files,origins,driver):
+    def __init__(self,store,visible,files,origins,driver,overrides=None):
         assert not store.exists() and not visible.exists() and set(files)==set(origins)==set('ANM')
         self.store,self.visible,self.names,self.driver=store,visible,set(files['A']),driver
         store.mkdir();visible.parent.mkdir(parents=True,exist_ok=True)
@@ -39,7 +39,7 @@ class Parked:
             folder=store/role;folder.mkdir()
             assert set(files[role])==self.names
             for name,(h,size,mode) in sorted(files[role].items()):
-                src=origins[role]/name;dst=folder/name;dst.parent.mkdir(parents=True,exist_ok=True)
+                src=(overrides or {}).get(name,origins[role]/name);dst=folder/name;dst.parent.mkdir(parents=True,exist_ok=True)
                 source=identity(src)
                 assert [source['sha256'],source['size'],source['mode']]==[h,size,mode]
                 if role=='A' or name==driver:
