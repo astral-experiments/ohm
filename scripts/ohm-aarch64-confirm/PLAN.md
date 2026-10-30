@@ -1,6 +1,6 @@
-# Held-out GNU AArch64 Ruff build
+# Held-out GNU AArch64 Ruff build with fixed physical compiler runtimes
 
-This registration covers twelve new matched blocks. Earlier native and instruction acquisitions are eligibility controls and contribute zero observations. The workloads are the first real edit, its immediate unchanged successor, and a separately trained, already-settled build. CPU time and wall time are outside this experiment.
+This registration covers twelve new matched blocks. Earlier native and instruction acquisitions are eligibility controls and contribute zero observations. The rejected first schedule at 289cb599 contributes zero blocks. The public eligibility-only native Actions run 41071713576 has passed all six cross-role and three same-role transitions. Its full archive is pinned in gates.py and its physical procedure is documented in PARKED.md. Each independent block repeats those same ten true Cargo builds before starting fresh target and build stores. The workloads are the first real edit, its immediate unchanged successor, and a separately trained, already-settled build. CPU time and wall time are outside this experiment.
 
 ## Subjects and inputs
 
@@ -8,7 +8,7 @@ The public baseline A is the exact Rust #276 head 444c0273a2e2bc0b161e988d43c882
 
 Reopen both original content-addressed compiler capsules and every mode, length and digest of their 119 runtime files. Require the same N table in each capsule. Across A/N/M, only the source-built compiler driver can differ. Keep exact signed -20 Cargo, Rustup, LLVM, target/host standard libraries and physical native tools. Select all at the same canonical paths. Retain each driver's real Cargo-generated toolchain namespace and require that the 171-element actual first-edit AST argv is otherwise identical. Distinct path elements are permitted only directly following --out-dir, -L or --extern, with exactly one known per-role v2 shard; pass the complete original argv without rewriting any token. Each counted command must match its own real ordinary argv literally.
 
-Use separate new Ubuntu x86_64 runner jobs, at most three at once. Each runs all three arms serially and independently empty. Save its CPU and boot identifier digest. Record the number of distinct guests. The schedule assigns each permutation twice and each arm four times in each position. Its order was derived by sorting each set of six permutations with SHA-256 using a fixed public seed; schedule.json is authoritative. Keep every started block, including failed native/trace/output verifications. No replacement, imputation or dropping a slow block.
+Use separate new Ubuntu x86_64 runner jobs, at most three at once. Each runs all three arms serially and independently empty. Save its CPU and boot identifier digest. Record the number of distinct guests. The schedule assigns each permutation twice and each arm four times in each position. Its order was derived by sorting each set of six permutations with SHA-256 using the independently frozen seed GNU-compact-heldout-parked-v2. The file schedule.json is authoritative. Keep every started block, including failed native/trace/output verifications. No replacement, imputation or dropping a slow block.
 
 ## Workload and gates
 

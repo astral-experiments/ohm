@@ -58,6 +58,7 @@ def reopen(path, number, git, remote_digest):
     assert file_sha(path)==remote_digest
     a=Study(path)
     try:
+        transitions=runpy.run_path(str(HERE/"verify_transitions.py"))["verify"](a.z)
         calibration=calibrate(a)
         configuration=a.J('heldout-registration.json');terminal=a.J('terminal.json')
         assert a.get('qa-head').decode().strip()==configuration["QA"]==git
@@ -100,11 +101,25 @@ def reopen(path, number, git, remote_digest):
             assert all(sum(samples[k].values())==complete[k] for k in samples)
             counts[role]=samples
             reports[role]={k:H(a.get(p)) for k,p in [('ordinary',prefix+'/complete.json'),('cycle',cycle+'/complete.json')]}
+        assert shards==transitions['namespaces']
+        initial=a.J('all-named-start-identities.json')
+        selects=a.J('physical-selections.json')
+        assert H(a.get('physical-selections.json'))==terminal['all_selections']
+        order='A'+transitions['order']+''.join(k*2 for k in schedule[number])
+        assert ''.join(v['to'] for v in selects)==order
+        snapshots=[]
+        for i,v in enumerate(selects):
+            role=order[i];name=f'physical-selections/{i:02d}-{role}.json'
+            assert v['snapshot']==name and v['sha256']==H(a.get(name))
+            stream=a.J(name)
+            assert stream['files']==initial[role] and {k:d for k,d in stream.items() if k!='files'}=={k:d for k,d in v.items() if k not in ('snapshot','sha256')}
+            assert stream['from']==(None if i==0 else order[i-1])
+            snapshots.append({'role':role,'from':stream['from'],'snapshot_sha256':H(a.get(name))})
         assert len(set(shards.values()))==3 and sdk['A']==sdk['N']==sdk['M']
         assert len(a.elf)==2 and all(len(s)==95 for s in a.native_refs.values()) and set(a.native_refs)=={'old','edited'}
         return {'block':number,'order':schedule[number],'git':git,'source':source,'drivers':drivers,'boot':configuration['boot_digest'],'cpu':configuration['cpu'],
                 'calibrated_controls':calibration,'physical_args':{'namespace_by_role':shards,'namespace_only_fields':len(reference_argv[1]),'total_argv':len(reference_argv[0])},
-                'native':rosters,'whole_guest_Ir_by_process':counts,'same_source_complete_reader':a.elf,
+                'native':rosters,'all_real_selector_transitions':transitions,'all_native_and_counted_role_selections':snapshots,'whole_guest_Ir_by_process':counts,'same_source_complete_reader':a.elf,
                 'ordered_objects_sha256':{k:H(json.dumps(v,separators=(',',':')).encode()) for k,v in a.native_refs.items()},
                 'raw_archive':remote_digest,'original_terminal':H(a.get('terminal.json')),'source_specific_completions':reports}
     finally:a.z.close()

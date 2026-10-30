@@ -105,7 +105,8 @@ def block(number, ancestor, inputs):
         now=load(prior/"counter/verified.json")
         summary[role]={"first-real-edit":cycle["first-real-edit"],"immediate-repeat":cycle["immediate-repeat"],"settled":now["Ir"],
                        "native_terminal":sha(prior/"complete.json"),"cycle_terminal":sha(rt.LOG/(name+"-edit-cycle")/"complete.json")}
-    save(rt.LOG/"terminal.json",{"block":number,"order":order,"values":summary,"sources":SOURCE,
+    selections=save(rt.LOG/"physical-selections.json",history)
+    save(rt.LOG/"terminal.json",{"all_selections":selections,"block":number,"order":order,"values":summary,"sources":SOURCE,
                                 "first_edit_gate":"one real edit, same unmodified Cargo configuration, complete userspace Cargo and compiler guests","heldout":True})
 
 if __name__=="__main__":
