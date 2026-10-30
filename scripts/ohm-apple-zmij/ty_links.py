@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import tempfile
 
 from cgu_inputs import agrees, same_product, stash, witness
 from execs import ExecTrace
@@ -13,6 +14,7 @@ from measure import capture, fresh, native_rows, retire, select
 from prepare import prepare_ruff
 from study import load, ZMIJ_LIB, check_host, compress_bytes, digest, env_for, git, need, save, sdk_id, sha, text_git
 from verbs import macho_text
+from xcode_response import ResponseRows, resolved
 
 A = "2d253467b5153f82d26c51d49eb8d4156f1768bf"
 B = "aa9a1ff88aa83b3f01360ef5b3cb04b2be187206"
@@ -27,7 +29,7 @@ ERROR = "ohm_ty_28988_missing_name"
 
 class CensusTrace(ExecTrace):
     def command(self, argv, **kwargs):
-        return super().command(argv, timeout=2100, **kwargs)
+        return super().command(argv, timeout=2100, observed_rows=ResponseRows(kwargs["env"].get("TMPDIR") or tempfile.gettempdir()), **kwargs)
 
 
 def enrolled(repo):
@@ -87,7 +89,7 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label, provenance=N
     need(zmij and all(sha(z["target"]["src_path"])==ZMIJ_LIB for z in zmij),"wrong locked zmij")
     if ok and label in ("cold","edit","clean"):
         observe(events, work, sdk, {"e2e","ty_server"}, dest)
-    native=native_rows(events,sdk)
+    native=native_rows(list(resolved(events)),sdk)
     need(native["cargo"]>=1 and all(l["stock"] for l in native["linkers"]), "foreign Cargo or linker")
     need(native["full"].count("zmij")==sum(not z["fresh"] for z in zmij), "typed/physical zmij mismatch")
     links=collections.Counter(output_name(l) for l in native["linkers"])
