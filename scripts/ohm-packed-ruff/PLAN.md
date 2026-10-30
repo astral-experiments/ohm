@@ -41,6 +41,12 @@ peak. The scored ordinary Cargo and instruction runs have no disk-walking
 observer. Neither host-wide free space nor a failed du sample is a peak for
 this workload. The primary endpoints and admission criteria above are unchanged.
 
+The first clean Off build passed on the hosted overlay. The original immediate
+stat walk and du then disagreed before any scored run. Flush only each private
+installation's files and directories after timing; compare separate Python
+lstat, GNU find and GNU du totals for the same complete pair of roots.
+All three must agree exactly. Preserve per-path input on a discrepancy.
+
 Run two mirrored triplets Off/Full/Packed and Packed/Full/Off. Require all four
 Off/Packed return ratios above two, smaller complete allocations for Packed
 than Full at each of the three switch endpoints in both triplets, real packed

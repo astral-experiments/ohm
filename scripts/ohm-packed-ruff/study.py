@@ -239,7 +239,7 @@ def measure(directory, phase, branch, arm, env, reference, *, create=False, trac
         for file in (directory / "callgrind").glob("rustc.*.argv"):
             args = file.read_bytes().split(b"\0")
             require(b"-Zohm-check-relink-inputs" in args and (b"-Zohm-branch-cache=yes" in args) == (arm != "Off"), file)
-    footprint = count.census(WORK / "target", WORK / "build")
+    footprint = count.census(WORK / "target", WORK / "build", directory)
     companions = [p for name in ("target", "build") for p in (WORK / name).rglob("ohm-packed-object-*")]
     if phase in SWITCHES or phase == "unchanged-B":
         require(bool(companions) == (arm == "Packed"), (arm, phase, len(companions)))

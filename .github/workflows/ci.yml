@@ -50,6 +50,7 @@ jobs:
           cp scripts/ohm-packed-ruff/PLAN.md "$root/logs/PLAN.md"
           git rev-parse HEAD > "$root/logs/hosted-study-head.txt"
           (cd scripts/ohm-packed-ruff && sha256sum -c SHA256SUMS)
+          python3 -IB scripts/ohm-packed-ruff/harness/check_allocation.py "$root/work" "$root/logs/storage-fixture"
       - name: Obtain the immutable signed native Cargo and Wild
         env:
           GH_TOKEN: ${{ github.token }}
