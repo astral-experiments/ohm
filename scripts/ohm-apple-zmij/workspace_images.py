@@ -8,6 +8,7 @@ import shutil
 from cgu_inputs import witness
 from study import digest,load,need,save
 from verbs import macho_text
+from response_custody import resolved
 
 CHUNK=256*1024
 MIN=8*2**30
@@ -41,7 +42,9 @@ def store(root, path):
 def outputs(native, events):
     certs=collections.defaultdict(list)
     by_argv=collections.defaultdict(list)
-    for event in events:
+    direct={(e['pid'],e['seq']):e for e in events}
+    need(len(direct)==len(events),'duplicate original kernel execution')
+    for event in resolved(events):
         if Path(event['path']).name in ('ld','ld-prime','ld64','ld-classic'):
             a=event['argv'];by_argv[digest(json.dumps(a,separators=(',',':')).encode())].append(event)
     for row in native['linkers']:
@@ -49,9 +52,12 @@ def outputs(native, events):
         a=row['argv'];h=digest(json.dumps(a,separators=(',',':')).encode())
         need(by_argv[h],'missing kernel linker execution')
         event=by_argv[h].pop(0)
+        raw=direct[event['pid'],event['seq']]
+        raw_sha=digest(json.dumps(raw['argv'],separators=(',',':')).encode())
         [p]=[v for k,v in zip(a,a[1:]) if k=='-o']
         certs[str(Path(p).resolve())].append({'output':p,'pid':event['pid'],'seq':event['seq'],
-            'path':event['path'],'cdhash':event['cdhash'],'tool_sha256':row['sha'],'argv_sha256':h,'args':a})
+            'path':event['path'],'cdhash':event['cdhash'],'tool_sha256':row['sha'],'argv_sha256':h,'raw_argv_sha256':raw_sha,
+            'response_sha256':raw.get('xcode_response',{}).get('sha256'),'args':a})
     return certs
 
 

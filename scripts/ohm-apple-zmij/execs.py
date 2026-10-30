@@ -66,6 +66,7 @@ class ExecTrace:
                             "argv": a,
                             "seq": seq,
                             "cdhash": t.get("cdhash"),
+                            **(slot.extra_event_fields(record,t) if hasattr(slot,"extra_event_fields") else {}),
                         }
                     )
             except (KeyError, TypeError, ValueError, RuntimeError) as e:

@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+from response_custody import command as held_command, resolved
 
 from execs import ExecTrace
 from local_dev import observe
@@ -29,7 +30,7 @@ ERROR = "ohm_ty_28988_missing_name"
 
 class CensusTrace(ExecTrace):
     def command(self, argv, **kwargs):
-        return super().command(argv, timeout=2100, **kwargs)
+        return held_command(super().command, argv, timeout=2100, **kwargs)
 
 
 def enrolled(repo):
@@ -89,7 +90,7 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
     need((zmij or not ok) and all(sha(z["target"]["src_path"])==ZMIJ_LIB for z in zmij),"wrong locked zmij")
     if ok and label in ("cold","edit","clean"):
         observe(events, work, sdk, {"e2e","ty_server"}, dest)
-    native=native_rows(events,sdk)
+    native=native_rows(list(resolved(events)),sdk)
     need(native["scope"]=="kernel-exec" and native["cargo"]==1 and all(l["stock"] for l in native["linkers"]), "foreign Cargo or linker")
     need(native["full"].count("zmij")==sum(not z["fresh"] for z in zmij), "typed/physical zmij mismatch")
     crc = zlib_units(units,work,dest) if scope=="workspace" and ok else []

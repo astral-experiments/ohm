@@ -12,6 +12,7 @@ from zipfile import ZipFile
 from cgu_inputs import modules
 from macho_paths import canonical
 from study import digest, need
+from response_custody import resolved
 
 
 def json_body(z, name):
@@ -29,7 +30,7 @@ def link_output(argv):
 
 
 def observed_ld(z, phase, *, argv_sha=None, output=None, pid=None):
-    events = json.loads(packed(z, phase + "/exec.json.gz"))
+    events = resolved(json.loads(packed(z, phase + "/exec.json.gz")))
     result = []
     for event in events:
         if Path(event["path"]).name not in {"ld", "ld-classic", "ld-prime", "ld64"}:

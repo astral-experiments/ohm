@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   libm-on-293:
-    if: github.ref == 'refs/heads/charlie/qa-apple-libm-workspace-objects'
+    if: github.ref == 'refs/heads/charlie/qa-apple-libm-response-workspace'
     runs-on: namespace-profile-macos-15
     timeout-minutes: 355
     env:
@@ -28,7 +28,13 @@ jobs:
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/libm-full-objects-plan.md "$root/receipts/registration.md"
+          python3 -IB scripts/ohm-apple-zmij/response_fs_schema.py "$root/receipts/response-calibration/schema"
+          python3 -IB scripts/ohm-apple-zmij/test_xcode_response.py -q
+          python3 -IB scripts/ohm-apple-zmij/test_held_response.py -q
+          python3 -IB scripts/ohm-apple-zmij/test_held_response.py native "$root/response-control"
+          cp -R "$root/response-control/receipts" "$root/receipts/response-calibration/native"
+          python3 -IB scripts/ohm-apple-zmij/reopen_response_native.py "$root/receipts/response-calibration/native"
+          cp scripts/ohm-apple-zmij/libm-response-workspace-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}
@@ -62,7 +68,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: libm-workspace-physical-objects-provider
+          name: libm-workspace-verified-response-provider
           path: ${{ runner.temp }}/apple-libm-on-293/receipts
           retention-days: 14
           if-no-files-found: warn
@@ -79,7 +85,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: libm-workspace-physical-objects-final
+          name: libm-workspace-verified-response-final
           path: ${{ runner.temp }}/apple-libm-on-293/receipts
           retention-days: 14
           if-no-files-found: warn

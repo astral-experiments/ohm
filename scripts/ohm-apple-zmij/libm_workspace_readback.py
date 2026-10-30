@@ -14,6 +14,7 @@ from study import digest, need, save
 from ty_links import A, B, ERROR, EXISTING, NEW
 from verbs import macho_text
 from workspace_images import CHUNK, Image, compare
+from response_custody import resolved
 
 ROOT = "ty-comparison/workspace"
 EXPECTED_MATH = b"3ff6a09e667f3bcd 3fb504f3 4000000000000000 40800000 401a000000000000 40d00000\n"
@@ -101,7 +102,8 @@ def compare_phase(c, phase, state, role, history, bodies, proofs):
     rows=[json.loads(l) for l in raw["stdout"].splitlines()]
     valid=state!="bad"
     need(rows[-1]=={"reason":"build-finished","success":valid} and q["exit"]==(0 if valid else 101),"wrong Cargo result")
-    events=json.loads(raw["native_events"])
+    original=json.loads(raw["native_events"]);events=list(resolved(original))
+    raw_by_id={(e["pid"],e["seq"]):e for e in original};need(len(raw_by_id)==len(original),"duplicate kernel event")
     typed=[r for r in rows if r["reason"]=="compiler-artifact"]
     if not valid:
         need(q["e2e"] is None and any((r.get("message",{}).get("code") or {}).get("code")=="E0425" for r in rows) and ERROR.encode() in raw["stdout"],"invalid source did not fail correctly")
@@ -123,6 +125,8 @@ def compare_phase(c, phase, state, role, history, bodies, proofs):
         if links[path]:
             need(len(links[path])==1 and p["current_link"] and p["link_origin"]==here,"unwitnessed or ambiguous fresh test program")
             event,=links[path];link=c.json(here+"/link.json");argv=event["argv"]
+            original=raw_by_id[(event["pid"],event["seq"])]
+            need(link["raw_argv_sha256"]==digest(json.dumps(original["argv"],separators=(",",":")).encode()) and original.get("xcode_response",{}).get("sha256")==link["response_sha256"],"physical raw linker argv or live clang response changed")
             need(event["pid"]==link["pid"] and event["seq"]==link["seq"] and event["cdhash"]==link["cdhash"] and
                  event["path"]==link["path"] and link["output"]==reopen_cgu.link_output(argv) and link["argv_sha256"]==digest(json.dumps(argv,separators=(",",":")).encode()) and link==p["physical"],"kernel Xcode linker did not emit this program")
             if p.get("error"):
