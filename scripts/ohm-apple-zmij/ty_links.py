@@ -6,11 +6,12 @@ import os
 from pathlib import Path
 import subprocess
 
+from cgu_inputs import agrees, same_product, stash, witness
 from execs import ExecTrace
 from local_dev import observe
 from measure import capture, fresh, native_rows, retire, select
 from prepare import prepare_ruff
-from study import ZMIJ_LIB, check_host, compress_bytes, digest, env_for, git, need, save, sdk_id, sha, text_git
+from study import load, ZMIJ_LIB, check_host, compress_bytes, digest, env_for, git, need, save, sdk_id, sha, text_git
 from verbs import macho_text
 
 A = "2d253467b5153f82d26c51d49eb8d4156f1768bf"
@@ -72,7 +73,7 @@ def output_name(link):
     return str(Path(outs[0]).resolve())
 
 
-def collect(root, scope, work, sdk, env, trace, dest, state, label):
+def collect(root, scope, work, sdk, env, trace, dest, state, label, provenance=None):
     repo=root/"ruff"
     argv=["cargo","+ohm","test",*(["-p","ty_server","--test","e2e"] if scope=="focus" else ["--workspace"]),
           "--no-run","--locked","--offline","-j4","--message-format=json"]
@@ -104,6 +105,22 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
             need(e2e is None,"ambiguous ty_server e2e")
             e2e=actual_tests(path,repo,env,state,dest)
             e2e_links=links[str(path)]
+            if provenance is not None:
+                body = path.read_bytes()
+                need(digest(body) == e2e["raw"], "returned test executable changed after its observed run")
+                chunks = [stash(root,"ty-image-chunks",body[i:i+2**20]) for i in range(0,len(body),2**20)]
+                save(dest/"image.json", {"sha256":e2e["raw"],"size":len(body),"ordered_MiB_chunks":chunks})
+                if e2e_links:
+                    linker, = [l for l in native["linkers"] if output_name(l) == str(path)]
+                    need(linker["stock"], "test did not use the enrolled Xcode linker")
+                    owned = witness(root, dest, body, str(path), linker=linker["argv"])
+                    provenance[e2e["raw"]] = owned
+                else:
+                    previous = provenance.get(e2e["raw"])
+                    need(previous is not None, "returned program has no physical linker in this fresh installation")
+                    owned = witness(root, dest, body, str(path))
+                    need(agrees(owned, previous), "current compiler recipe or module payload changed after its link")
+                    save(dest/"previous-link.json", {"raw":e2e["raw"],"argv":previous["linker_argv"],"recipe":previous["recipe"]})
             if label in ("cold","edit","clean","repair") and "ty-comparison" in dest.parts:
                 archive=root/"receipts/clean-ty-executables"/(e2e["raw"]+".macho.gz")
                 if not archive.exists():
@@ -143,10 +160,11 @@ def run_focus(root, trace, role="S"):
         ident=sdk_id(sdk,env)
         rows={}
         prev=None
+        provenance={}
         for label,state in plan:
             if state!=prev:
                 checkout(repo,state)
-            rows[label]=collect(root,"focus",work,sdk,env,trace,where/label,state,label)
+            rows[label]=collect(root,"focus",work,sdk,env,trace,where/label,state,label,provenance)
             prev=state
         need(ident==sdk_id(sdk,env),"SDK drift")
         retire(work)
@@ -163,7 +181,10 @@ def run_focus(root, trace, role="S"):
         if state=="bad":
             continue
         comparisons[key]={k:rows[key][k]==v for k,v in references[state].items()}
-        need(all(comparisons[key].values()), "focused test executable differs from clean")
+        proof = load(prefix/"visit"/key/"cgu-proof.json")
+        reference = load(prefix/("empty-"+state)/"clean/cgu-proof.json")
+        comparisons[key]["verified_native_image"] = same_product(rows[key], references[state], proof, reference)
+        need(comparisons[key]["verified_native_image"], "test program, native CGU or test inventory differs from clean")
     save(prefix/"result.json",{"source":[A,B],"clean":references,"comparisons":comparisons,"scores":0})
     return references
 

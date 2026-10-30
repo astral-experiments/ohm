@@ -8,7 +8,7 @@ concurrency:
 jobs:
   ty-e2e-on-293:
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 300
+    timeout-minutes: 360
     env:
       PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -22,6 +22,8 @@ jobs:
       - name: Freeze and verify subjects, provider design and native execution observer
         run: |
           root="$RUNNER_TEMP/apple-dev-ty293"
+          PYTHONPATH=scripts/ohm-apple-zmij python3 -B scripts/ohm-apple-zmij/test_cgu.py scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
+          python3 -IB scripts/ohm-apple-zmij/test_two_commands.py -v
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"

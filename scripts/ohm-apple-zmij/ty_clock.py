@@ -1,14 +1,13 @@
 """Observe real ty_server builds separately from the counters and the paired whole-Cargo clocks."""
 import argparse
-import ctypes
 import gzip
 import itertools
 import json
 import os
 from pathlib import Path
-import shutil
 
 from cohort import fingerprint_sources, summarize
+from cgu_inputs import same_product, witness
 from measure import capture, fresh, retire, select
 from study import CHILD, PARENT, ZMIJ_LIB, check_host, compress_bytes, digest, env_for, load, need, save, sdk_id, sha
 from dyld import check as check_dyld
@@ -17,7 +16,7 @@ from receipt_cargo import CANDIDATE
 from ty_disk import snapshot
 from ty_links import A, B, E2E, CensusTrace, actual_tests, checkout, run_focus
 
-DESIGN="ty_server e2e real developer incremental on physical Cargo 293 / 2+12 v1"
+DESIGN="ty_server e2e ordinary developer / Cargo 293 / independent private endpoints admission v2"
 CMD=["cargo","+ohm","test","-p","ty_server","--test","e2e","--no-run","--locked","--offline","-j4","--message-format=json"]
 PHASES=("edit","repeat-1","repeat-2")
 SUBJECTS={"e2e","ty_server","zmij"}
@@ -29,7 +28,7 @@ ORDERS={"screen":["PC","CP"],"confirmation":["PC" if x in P_FIRST else "CP" for 
 def subjects(root):
     provider = root/"receipts/provider-matrix/terminal.json"
     gate = load(provider)
-    need(gate["passed"] and gate["commands"]==392 and not any(gate["wrong_or_raw_mismatch"].values()),
+    need(gate["passed"] and gate["commands"]==392 and not any(gate["wrong_or_image_mismatch"].values()),
          "native provider safety gate failed")
     need(load(root/"receipts/fixed-cargo-293.json")["commit"]==CANDIDATE,"different Cargo")
     return {"cargo":CANDIDATE,"rust":[PARENT,CHILD],"ruff":[A,B],"native_controls":sha(provider)}
@@ -54,7 +53,14 @@ def structural(root):
         for state in ("old","new"):
             need(all(refs["P"][state][key] == refs["C"][state][key] for key in ("text","inventory")),
                  "independent clean compiler roles disagree on instructions or tests")
-        save(top/"development-structure.json",{"subjects":enrolled,"counts":counts})
+        cross = {}
+        for state in ("old","new"):
+            products = {role:load(top/role/"focus"/("empty-"+state)/"clean/cgu-proof.json") for role in "PC"}
+            need(all("linker_argv" in v for v in products.values()), "clean input lacks kernel linker evidence")
+            cross[state] = {kind: products["P"][kind]==products["C"][kind] for kind in ("cross_path_image","modules","debug_paths")}
+            save(top/("clean-cross-"+state+".json"),cross[state])
+            need(all(cross[state].values()), "independent compiler roles disagree after authenticated canonicalization")
+        save(top/"development-structure.json",{"subjects":enrolled,"counts":counts,"cross":cross})
     finally:
         trace.close()
 
@@ -70,13 +76,6 @@ def parse(stream, repo):
     return Path(e2e["executable"]),{"units":digest(json.dumps(roster).encode()),"dirty": sorted(a["target"]["name"] for a in arts if not a["fresh"])}
 
 
-def hold(source, dest):
-    dest.parent.mkdir(parents=True)
-    clone=ctypes.CDLL(None,use_errno=True).clonefile
-    clone.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_uint32]
-    need(clone(os.fsencode(source),os.fsencode(dest),0)==0,"APFS snapshot failed")
-
-
 def anchored(root, role, step):
     base=root/"receipts/ty-comparison"/role/"focus"
     phase="old" if step=="cold" else "new"
@@ -88,51 +87,67 @@ def anchored(root, role, step):
 
 
 def timed(root, out, role):
-    check_host(root, 24)
-    repo=root/"ruff"
-    work=root/"ty-focus-work"
-    sdk=select(root,role)
-    env=env_for(work,sdk)
-    fresh(work,root/"seed")
-    identity=sdk_id(sdk,env)
-    held=work/"held"
-    need(not held.exists(), "stale endpoint snapshots")
-    snapshot_rows={}
-    phases=("cold",*PHASES)
-    for step in phases:
-        if step in ("cold","edit"):
-            checkout(repo, "old" if step=="cold" else "new")
-        target=out/step
-        code,data,stderr,events,clock=capture(CMD,repo,env,target,clock=step!="cold")
-        need(code==0 and events is None, f"timed Cargo failed: {stderr[-500:]!r}")
-        exe,sig=parse(data,repo)
-        copy=held/step/exe.name
-        hold(exe,copy)
-        snapshot_rows[step]=(copy,sig,clock)
-    # Heavy result readers, linked tests and filesystem walks all follow the last clock.
-    rows={}
-    for step,(copy,sig,clock) in snapshot_rows.items():
-        expected, baseline=anchored(root,role,step)
-        observed=actual_tests(copy,repo,env,"old" if step=="cold" else "new",out/step)
-        subject=lambda signature: [name for name in signature["dirty"] if name in SUBJECTS]
-        check={"expected":expected,"observed":observed,"reference_signature":baseline,"actual_signature":sig,
-               "whole_image_equal":observed==expected,"roster_equal":sig["units"]==baseline["units"],
-               "subject_equal":subject(sig)==subject(baseline)}
-        save(out/step/"validation.json",check)
-        if not check["whole_image_equal"]:
-            compress_bytes(out/step/"unexpected-program.macho.gz",copy.read_bytes())
-        need(check["whole_image_equal"],"native program differs from independent clean, raw failing Mach-O retained")
-        need(check["roster_equal"] and check["subject_equal"],"resolved graph or focused compiler work changed")
-        row={"endpoint":step,"signature":sig,"product":observed,"cargo":clock}
-        save(out/step/"result.json",row)
-        rows[step]=row
-    shutil.rmtree(held)
-    proof=load(root/"receipts/ty-comparison"/role/"focus/visit/edit/development-emitters.json")
-    verify_saved(work,proof,out)
-    disk=snapshot(work,out/"steady-disk")
-    need(identity==sdk_id(sdk,env),"subject compiler changed")
-    retire(work)
-    print("verified",role,out.parent.name,"first unchanged ns",rows["repeat-1"]["cargo"]["ns"],"bytes",disk["all"]["allocated_bytes"],flush=True)
+    from cgu_inputs import stash
+    from two_commands import combined
+
+    repo = root/"ruff"
+    work = root/"ty-focus-work"
+    sdk = select(root, role)
+    env = env_for(work, sdk)
+    need(all(k not in env for k in ("CI","TF_BUILD","RUSTFLAGS","CARGO_ENCODED_RUSTFLAGS","CARGO_INCREMENTAL")),
+         "a CI or compiler override is present")
+    before = sdk_id(sdk, env)
+    prior = root/"receipts/ty-comparison"/role/"focus"
+    ref = load(prior/"empty-new/clean/cgu-proof.json")
+    emitters = load(prior/"visit/edit/development-emitters.json")
+    rows = {}
+    # Each endpoint owns its installation, including the two consecutive Cargos.
+    for point in ("repeat-1", "edit", "repeat-2", "edit+repeat-1"):
+        check_host(root,24)
+        fresh(work,root/"seed")
+        target = out/point
+        def validate(label, sample):
+            code, data, stderr, events, metric = sample
+            need(code == 0 and events is None, f"{label}: Cargo failed: {stderr[-500:]!r}")
+            exe, signature = parse(data,repo)
+            expected, reference = anchored(root,role,label)
+            focus=lambda sig:[name for name in sig["dirty"] if name in SUBJECTS]
+            need(signature["units"] == reference["units"] and focus(signature) == focus(reference),
+                 "resolved graph or focused dirtiness changed")
+            save(target/label/"signature.json", {"observed":signature,"reference":reference})
+            return exe, signature, expected
+        checkout(repo,"old")
+        validate("cold", capture(CMD,repo,env,target/"cold"))
+        checkout(repo,"new")
+        if point == "edit+repeat-1":
+            stream, clock = combined(CMD,repo,env,target)
+            validate("edit",stream[0])
+            step = "repeat-1"
+            exe, sig, expected = validate(step, stream[1])
+        else:
+            for step in PHASES:
+                measured = step == point
+                sample = capture(CMD,repo,env,target/step,clock=measured)
+                exe, sig, expected = validate(step, sample)
+                if measured:
+                    clock = sample[4]
+                    break
+        actual = actual_tests(exe,repo,env,"new",target/step)
+        original = exe.read_bytes()
+        physical = Path(ref["output"])
+        need(physical.is_file() and (physical.samefile(exe) or sha(physical)==digest(original)),
+             "promoted executable does not match the enrolled linker output")
+        owned = witness(root,target/step,original,str(physical))
+        chunks = [stash(root,"ty-image-chunks",original[i:i+2**20]) for i in range(0,len(original),2**20)]
+        save(target/"image.json", {"sha256":digest(original),"size":len(original),"ordered_MiB_chunks":chunks})
+        need(same_product(actual,expected,owned,ref), "returned e2e program or physical modules differ from independent clean")
+        verify_saved(work,emitters,target)
+        disk = snapshot(work,target/"steady-disk")
+        need(before==sdk_id(sdk,env), "compiler or Cargo identity changed")
+        rows[point]={"phase":step,"cargo":clock,"product":actual,"canonical":owned["same_path_image"],
+                     "expected":expected,"raw_matches":actual==expected,"disk":disk["all"]["allocated_bytes"]}
+        save(target/"point.json",rows[point])
+        retire(work)
     return rows
 
 
@@ -149,15 +164,12 @@ def run_stage(root, mode):
              "independent pilot validation missing")
     save(top/"registration.json",{"order":order,"assignment":ALLOCATION,"harness":harness,
          "primary":"repeat-1","secondary":["edit","repeat-2","edit+repeat-1"],
-         "correctness":"clean whole Mach-O, full inventory, old/new e2e, real native providers",
+         "correctness":"same complete signed Mach-O after Xcode- and recipe-bound exclusive N_OSO salts, exact CGUs, full test inventory and original/repaired native inputs",
          "work_eligibility":"compare complete unit roster and all e2e, ty_server, zmij dirty states; include incidental work",
          "argv":CMD,"subjects":enrolled,"design":DESIGN})
     pairs=[]
     for pos,roles in enumerate(order,1):
         pair={role:timed(root,top/f"pair-{pos:02}"/role,role) for role in roles}
-        for role,arm in pair.items():
-            visits=[arm[phase]["cargo"] for phase in ("edit","repeat-1")]
-            arm["edit+repeat-1"]={"cargo":{k:sum(v[k] for v in visits) for k in ("ns","user","system","instructions") if all(k in v for v in visits)}}
         pairs.append(pair)
     endpoints=(*PHASES,"edit+repeat-1")
     result=summarize(pairs,order,endpoints=endpoints)
@@ -184,8 +196,11 @@ def run_stage(root, mode):
             for role in "CP":
                 sdk=select(root,role); env=env_for(work,sdk)
                 fresh(work,root/"seed"); checkout(root/"ruff","new")
-                product=collect(root,"focus",work,sdk,env,trace,top/"terminal-clean"/role,"new","clean")
-                need(product==anchored(root,role,"edit")[0], "terminal independent clean executable drift")
+                where=top/"terminal-clean"/role
+                product=collect(root,"focus",work,sdk,env,trace,where,"new","clean",{})
+                ref=root/"receipts/ty-comparison"/role/"focus/empty-new/clean/cgu-proof.json"
+                need(same_product(product,anchored(root,role,"edit")[0],load(where/"cgu-proof.json"),load(ref)),
+                     "terminal independent clean executable or CGU drift")
                 retire(work)
         finally:
             trace.close()
