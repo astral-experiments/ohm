@@ -1,24 +1,16 @@
-name: Compare packaged -20 and -21 native inputs
+name: Observe Ruff examples on the packaged -20 and -21 Apple SDKs
 on: workflow_dispatch
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: packaged-native-inputs-v2-${{ github.sha }}
+  group: packaged-ruff-examples-${{ github.sha }}
   cancel-in-progress: false
 jobs:
-  packaged:
-    if: github.ref == 'refs/heads/charlie/qa-packaged-release21-native-inputs'
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - host: namespace-profile-macos-15
-            target: aarch64-apple-darwin
-          - host: ubuntu-24.04
-            target: x86_64-unknown-linux-gnu
-    runs-on: ${{ matrix.host }}
-    timeout-minutes: 145
+  examples:
+    if: github.ref == 'refs/heads/charlie/qa-release21-ruff-examples'
+    runs-on: namespace-profile-macos-15
+    timeout-minutes: 50
     env:
       PYTHONDONTWRITEBYTECODE: '1'
       PYTHONNOUSERSITE: '1'
@@ -29,40 +21,22 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify frozen native evidence reader and independent mutation controls
-        run: python3 -IB scripts/packaged-native-21/readback.py --controls
-      - name: Authenticate and install original -20 platform archive
-        id: baseline_install
+      - name: Exercise true native kernel custody and admitted source
+        run: python3 -IB scripts/packaged-native-21/examples_controls.py
+      - name: Authenticate original signed -20 and original private release-run -21 distributions
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/packaged-native-21/packages.py 20 "$RUNNER_TEMP/packaged-native"
-      - name: Run and reopen -20 direct and transitive native programs
         run: |
-          python3 -IB scripts/packaged-native-21/probe.py 20 "$RUNNER_TEMP/packaged-native"
-          python3 -IB scripts/packaged-native-21/readback.py "$RUNNER_TEMP/packaged-native/receipts" 20
+          python3 -IB scripts/packaged-native-21/packages.py 20 "$RUNNER_TEMP/packaged-examples"
+          python3 -IB scripts/packaged-native-21/packages.py 21 "$RUNNER_TEMP/packaged-examples"
+      - name: Build, run, edit, break and repair twelve public Ruff examples
+        run: python3 -IB scripts/packaged-native-21/examples.py "$RUNNER_TEMP/packaged-examples"
+      - name: Reopen fresh developer compiles, genuine Xcode link outputs and native program returns
+        run: python3 -IB scripts/packaged-native-21/examples.py read "$RUNNER_TEMP/packaged-examples/receipts"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: signed-20-native-${{ matrix.target }}
-          path: ${{ runner.temp }}/packaged-native/receipts
-          retention-days: 14
-          if-no-files-found: warn
-      - name: Wait for and authenticate this platform dist from exact -21 run 41088174292
-        id: candidate_install
-        if: always() && steps.baseline_install.outcome == 'success'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/packaged-native-21/packages.py 21 "$RUNNER_TEMP/packaged-native"
-      - name: Run, reopen and compare both shipped compilers on the same source states
-        if: always() && steps.candidate_install.outcome == 'success'
-        run: |
-          python3 -IB scripts/packaged-native-21/probe.py 21 "$RUNNER_TEMP/packaged-native"
-          python3 -IB scripts/packaged-native-21/readback.py "$RUNNER_TEMP/packaged-native/receipts" 21
-          python3 -IB scripts/packaged-native-21/readback.py "$RUNNER_TEMP/packaged-native/receipts" both
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: compared-20-21-native-${{ matrix.target }}
-          path: ${{ runner.temp }}/packaged-native/receipts
+          name: packaged-20-21-ruff-examples-apple
+          path: ${{ runner.temp }}/packaged-examples/receipts
           retention-days: 14
           if-no-files-found: warn
