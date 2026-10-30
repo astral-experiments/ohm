@@ -103,6 +103,22 @@ def phase(repo,env,tools,label,state,explain):
                 if q.is_file():present.append([n,v,stat(q),sha(q)])
         inputs[str(pid)]=[name,present]
     gz(where/'externs.json.gz',json.dumps(inputs,separators=(',',':')).encode())
+    # Preserve actual products, including Ron, regardless of whether an intermediate
+    # consumer physically compiled this visit. Also authenticate its native object roster.
+    products={}
+    for art in arts:
+        if art['target']['name'] not in K:continue
+        for lit in art['filenames']:
+            p=Path(lit)
+            if p.suffix not in {'.rlib','.rmeta','.so'} or not p.is_file():continue
+            r=[stat(p),sha(p)]
+            if art['target']['name'] in ('ron','insta') and p.suffix=='.rlib':
+                members=subprocess.check_output(['ar','t',p],text=True).splitlines();md={}
+                for name in members:
+                    md[name]=digest(subprocess.check_output(['ar','p',p,name]))
+                r.append(md)
+            products[lit]=r
+    gz(where/'selected-products.json.gz',json.dumps(products,separators=(',',':')).encode())
     print(label,len(arts),dict(perctl),detail['e2e_sha256'],flush=True)
 def main():
     assert not root.exists() and orig.name=='original-qa';root.mkdir();out.mkdir();w.room(root,65)
