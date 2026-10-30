@@ -14,7 +14,7 @@ m=q.m
 
 def main():
     out=m.R/'test-packet';out.mkdir()
-    spec=json.loads((HERE/'spec.json').read_bytes());assert m.read(m.O/'fix-terminal.json')['product']==spec
+    spec=json.loads((HERE/'spec.json').read_bytes())
     C=m.read(m.O/'buildkit/C/built.json'); P=m.read(m.O/'buildkit/P/built.json')
     original=m.read(m.O/'subjects.json')['environment']
     build=q.build_env(original);source=Path(C['source_directory'])
@@ -91,6 +91,17 @@ def main():
                 invoke(name,fn,want,[str(discovery),subject['cargo']['sha256']])
                 records.append([name,fn,want])
     finally:os.replace(backup,discovery)
-    m.save(out/'terminal.json',{'test_results':records,'matched_suite':q.item_stat(exe),'restored':q.item_stat(discovery)})
+    # Find the unit test's fully qualified name from this authenticated native binary.
+    libcmd=['cargo','+ohm','-Zohm-defaults=no','test','--lib','--release','-p','cargo','--locked','--offline','--features','ohm-defaults,all-static','--no-run','-j12','--message-format=json']
+    built=q.builder(source,libcmd,build,out/'lib-compile');objs=[json.loads(l) for l in built.stdout.splitlines()]
+    lib,=[o for o in objs if o['reason']=='compiler-artifact' and o['target']['kind']==['lib'] and o['target']['name']=='cargo' and o['profile']['test'] and o.get('executable')]
+    unitexe=Path(lib['executable']);assert unitexe.resolve().is_relative_to(m.R/'buildkit')
+    listing=m.get([unitexe,'--list','--format','terse'],cwd=source,env=env);q.out(out/'unit-list.gz',listing)
+    fullname,=[line.decode().removesuffix(': test') for line in listing.splitlines() if line.decode().endswith('::'+spec['torn_test']+': test')]
+    r=subprocess.run([unitexe,fullname,'--exact','--nocapture','--test-threads=1'],cwd=source,env=env,capture_output=True,timeout=100)
+    q.out(out/'unit-stdout.gz',r.stdout);q.out(out/'unit-stderr.gz',r.stderr)
+    assert r.returncode==0 and fullname.encode() in r.stdout and b'1 passed; 0 failed' in r.stdout
+    m.save(out/'terminal.json',{'test_results':records,'matched_suite':q.item_stat(exe),'restored':q.item_stat(discovery),
+        'torn_unit':{'fully_qualified':fullname,'exe':q.item_stat(unitexe),'exit':r.returncode}})
     print('All eight matched-source test outcomes met their expected clean/red verdicts',flush=True)
 if __name__=='__main__':main()

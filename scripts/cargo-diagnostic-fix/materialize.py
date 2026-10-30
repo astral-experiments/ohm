@@ -49,7 +49,12 @@ def tree(dest,pack,fixed=None):
         git(dest,'update-ref','HEAD',head)
         assert git(dest,'status','--porcelain=v1')==b'' and git(dest,'rev-parse','HEAD').decode().strip()==head
     visit('parent',BASE,BASE_PARENT,BASE_TREE,True)
-    if fixed:visit('fixed',fixed['head'],BASE,fixed['tree'],False)
+    parent=BASE
+    if fixed:
+        for element in fixed['commits']:
+            visit(element['key'],element['head'],parent,element['tree'],False)
+            parent=element['head']
+        assert parent==fixed['head']
     head=fixed['head'] if fixed else BASE
     git(dest,'fsck','--no-progress','--full','--strict')
     return {'commit':head,'tree':git(dest,'rev-parse','HEAD^{tree}').decode().strip(),'source_pack':PACK,

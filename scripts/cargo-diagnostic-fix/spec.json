@@ -2,10 +2,28 @@
   "changed": [
     "src/compiler/fingerprint/dirty_reason.rs",
     "src/compiler/fingerprint/mod.rs",
+    "src/ops/cargo_report/rebuilds.rs",
     "tests/testsuite/freshness.rs"
   ],
-  "head": "8c68d93dd97c142750714de6e27b832faaa1dd0d",
-  "inventory": "ca9ebc5a06142170c5cae9cb5c0089eda216f193a16d8730c36d52bbfd64537f",
+  "commits": [
+    {
+      "head": "8c68d93dd97c142750714de6e27b832faaa1dd0d",
+      "key": "fixed",
+      "tree": "fb81257e2404ba4db5779deeb956ef545464ef9b"
+    },
+    {
+      "head": "cd65eec21f04b024ee710426fbe7aafac4f529a0",
+      "key": "migration",
+      "tree": "b1aebc0c8d3bef82cfc3ff46bf3f96d7e06f8cd7"
+    },
+    {
+      "head": "58f94004f2cf0790be76db99a49f725a3611e5a6",
+      "key": "report",
+      "tree": "3106ac10ed46f940efe34c0a6b749a2a637ba2f2"
+    }
+  ],
+  "head": "58f94004f2cf0790be76db99a49f725a3611e5a6",
+  "inventory": "a1385ee174af0be89d8156dcd78ed1361bda5e942170ef5731ce4954c44d5700",
   "parent": "2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c",
   "tests": [
     "freshness::early_cutoff_rechecks_a_repaired_test_after_failure",
@@ -13,5 +31,6 @@
     "freshness::early_cutoff_skips_check_test_dependents",
     "freshness::ohm_defaults_enable_check_early_cutoff"
   ],
-  "tree": "fb81257e2404ba4db5779deeb956ef545464ef9b"
+  "torn_test": "a_short_fingerprint_from_another_build_cannot_authorize_early_cutoff",
+  "tree": "3106ac10ed46f940efe34c0a6b749a2a637ba2f2"
 }
