@@ -18,6 +18,27 @@ BOOT_HEAD='f251bcb417be911fc3ed9c4814b17ffa7b360c28'
 REPO='astral-experiments/ohm'
 SOURCE=json.loads((DIR/'source/source.json').read_text())['roles']
 DRIVER=MEMBERS['driver_path']
+ATOMIC_DRIVER='45d8737f938d6ed97be5903342718f087d0af6ea710dd3c2416babc8c570d4b7'
+
+def install(root,parent,transfer,origin):
+    candidate=root/'candidate-sdk';shutil.copytree(parent,candidate,copy_function=os.link)
+    rec=json.loads((transfer/'atomic-candidate.json').read_text())
+    assert rec['source']==SOURCE['candidate']['source'] and rec['tree']==SOURCE['candidate']['tree']
+    assert rec['reviewed_source']==SOURCE['candidate']['reviewed'] and rec['parent']==SOURCE['parent']['source']
+    assert rec['driver_path']==DRIVER and rec['unchanged_members']==118 and rec['parent_driver']==patched_record()['driver']
+    assert rec['driver'][0]==ATOMIC_DRIVER and rec['driver']!=rec['parent_driver'] and census.sha(transfer/'driver.zst')==rec['compression']
+    driver=candidate/DRIVER;tmp=driver.with_name('atomic-driver.installing')
+    subprocess.run(['zstd','-qd',transfer/'driver.zst','-o',tmp],check=True)
+    tmp.chmod(rec['driver'][2]);tmp.replace(driver)
+    for role,kit,seal in [('P',parent,rec['parent_driver']),('C',candidate,rec['driver'])]:
+        roster=MEMBERS['common']|{DRIVER:seal}
+        found={f.relative_to(kit).as_posix():[census.sha(f),f.stat().st_size,f.stat().st_mode&0o777]
+               for f in kit.rglob('*') if f.is_file()}
+        assert found==roster and len(found)==119,role
+        census.save(root/(role+'-sdk.json'),found)
+    census.save(root/'atomic-candidate.json',rec)
+    census.save(root/'origin.json',origin|{'parent':str(parent),'candidate':str(candidate)})
+    return root
 
 def restore():
     gh=lambda endpoint: json.loads(subprocess.check_output(['gh','api','repos/'+REPO+'/actions/'+endpoint]))
@@ -28,7 +49,6 @@ def restore():
     assert not product['expired'] and product['workflow_run']['id']==BOOT and product['workflow_run']['head_sha']==BOOT_HEAD
     root=Path(os.environ['RUNNER_TEMP'])/'atomic-subjects';root.mkdir()
     parent=Path(os.environ['CENSUS_SDK']).resolve(strict=True)
-    candidate=root/'candidate-sdk';shutil.copytree(parent,candidate,copy_function=os.link)
     with tempfile.TemporaryDirectory(dir=root) as scratch:
         zip_path=Path(scratch)/'transfer.zip'
         with zip_path.open('xb') as f:
@@ -37,24 +57,7 @@ def restore():
         with zipfile.ZipFile(zip_path) as z:
             assert sorted(z.namelist())==['atomic-candidate.json','driver.zst']
             z.extractall(scratch)
-        rec=json.loads((Path(scratch)/'atomic-candidate.json').read_text())
-        assert rec['source']==SOURCE['candidate']['source'] and rec['tree']==SOURCE['candidate']['tree']
-        assert rec['reviewed_source']==SOURCE['candidate']['reviewed'] and rec['parent']==SOURCE['parent']['source']
-        assert rec['driver_path']==DRIVER and rec['unchanged_members']==118 and rec['parent_driver']==patched_record()['driver']
-        assert rec['driver']!=rec['parent_driver'] and census.sha(Path(scratch)/'driver.zst')==rec['compression']
-        driver=candidate/DRIVER;tmp=driver.with_name('atomic-driver.installing')
-        subprocess.run(['zstd','-qd',Path(scratch)/'driver.zst','-o',tmp],check=True)
-        tmp.chmod(rec['driver'][2]);tmp.replace(driver)
-    for role,kit,seal in [('P',parent,rec['parent_driver']),('C',candidate,rec['driver'])]:
-        roster=MEMBERS['common']|{DRIVER:seal}
-        found={f.relative_to(kit).as_posix():[census.sha(f),f.stat().st_size,f.stat().st_mode&0o777]
-               for f in kit.rglob('*') if f.is_file()}
-        assert found==roster and len(found)==119,role
-        census.save(root/(role+'-sdk.json'),found)
-    census.save(root/'atomic-candidate.json',rec)
-    census.save(root/'origin.json',{'head':BOOT_HEAD,'run':BOOT,'artifact':product['id'],'digest':product['digest'],
-                                    'parent':str(parent),'candidate':str(candidate)})
-    return root
+        return install(root,parent,Path(scratch),{'head':BOOT_HEAD,'run':BOOT,'artifact':product['id'],'digest':product['digest']})
 
 def preparation():
     root=Path(os.environ['RUNNER_TEMP'])/'atomic-subjects'

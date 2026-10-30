@@ -5,7 +5,11 @@ on:
       phase:
         type: choice
         default: baseline
-        options: [baseline, compile, pilot, library, guards, holdout]
+        options: [baseline, compile, pilot, library, guards, holdout, source]
+      source_run:
+        description: Completed same-revision source qualification for a fresh holdout
+        type: string
+        default: ''
 permissions:
   contents: read
   actions: read
@@ -69,6 +73,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Verify both registered compiler SDKs and the unchanged strict Cargo
+        if: inputs.source_run == ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -85,6 +90,16 @@ jobs:
             echo "CENSUS_SDK=$CENSUS_SDK"
             echo "CENSUS_CANDIDATE_RECORD=$CENSUS_CANDIDATE_RECORD"
           } >> "$GITHUB_ENV"
+      - name: Verify the two kits rebuilt by the selected source qualification
+        if: inputs.source_run != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ inputs.source_run }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd
+          python3 -IB scripts/ohm-gnu-atomic-db/source_sdk.py pull "$SOURCE_RUN"
       - name: Count the registered edit and its first unchanged library build
         env:
           POSITION: ${{ matrix.position }}
@@ -104,7 +119,7 @@ jobs:
           retention-days: 7
 
   compile:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-atomic-ruff-db' && inputs.phase == 'compile'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-atomic-ruff-db' && (inputs.phase == 'compile' || inputs.phase == 'source')
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 240
     steps:
@@ -135,6 +150,137 @@ jobs:
           path: ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
           if-no-files-found: error
           retention-days: 14
+
+  source-cargo:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-atomic-ruff-db' && inputs.phase == 'source'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Fetch the checksummed release and upstream bootstrap prerequisites
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/ohm-gnu-syscall/source-rebuild/prepare.sh
+      - name: Rebuild the 119-file Cargo-builder SDK
+        run: python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py rustc builder
+      - name: Rebuild Cargo 301 at its recorded source and physical paths, then verify every ELF byte
+        run: |
+          set -euo pipefail
+          builder="$QA_ROOT"
+          export QA_ROOT="$RUNNER_TEMP/gnu-cargo293-build"
+          mkdir -p "$QA_ROOT/receipts"
+          python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py cargo "$builder"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-atomic-source-cargo
+          path: |
+            ${{ runner.temp }}/gnu-cargo293-build/product/cargo.zst
+            ${{ runner.temp }}/gnu-cargo293-build/product/product.json
+          retention-days: 4
+          compression-level: 0
+          if-no-files-found: error
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-atomic-source-builder-records
+          path: |
+            ${{ runner.temp }}/gnu-cargo293-build/receipts
+            ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
+          retention-days: 14
+          if-no-files-found: error
+
+  source-parent:
+    needs: source-cargo
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Fetch the checksummed release and upstream bootstrap prerequisites
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/ohm-gnu-syscall/source-rebuild/prepare.sh
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: gnu-atomic-source-cargo
+          path: ${{ runner.temp }}/just-built-cargo
+      - name: Bootstrap the exact comparison parent, both target libraries and the new Cargo
+        run: |
+          set -euo pipefail
+          python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py rustc patched --cargo-transfer "$RUNNER_TEMP/just-built-cargo"
+          python3 -IB scripts/ohm-gnu-atomic-db/source_sdk.py pack
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-atomic-source-parent-sdk
+          path: ${{ runner.temp }}/atomic-source-parent
+          retention-days: 4
+          if-no-files-found: error
+          compression-level: 0
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-atomic-source-parent-records
+          path: ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
+          retention-days: 14
+          if-no-files-found: error
+
+  source-qualification:
+    needs: [source-parent, compile]
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [P, C]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: gnu-atomic-source-parent-sdk
+          path: ${{ runner.temp }}/new-source-parent
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: gnu-atomic-registered-compiler
+          path: ${{ runner.temp }}/new-source-candidate
+      - name: Validate both source-built 119-file SDKs
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd
+          python3 -IB scripts/ohm-gnu-atomic-db/source_sdk.py restore
+      - name: Exercise the actual Ruff edit, unchanged commands, bad edit, repair and independent downstream caller
+        env:
+          ROLE: ${{ matrix.role }}
+        run: |
+          set -euo pipefail
+          python3 -IB scripts/ohm-gnu-atomic-db/screen.py build "$ROLE"
+          python3 -IB scripts/ohm-gnu-atomic-db/source_sdk.py retain
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-atomic-source-library-${{ matrix.role }}
+          path: |
+            ${{ runner.temp }}/observed-ruff-db/receipts
+            ${{ runner.temp }}/atomic-code-witness
+            ${{ runner.temp }}/atomic-subjects/*-sdk.json
+            ${{ runner.temp }}/atomic-subjects/origin.json
+            ${{ runner.temp }}/atomic-subjects/atomic-candidate.json
+          retention-days: 14
+          if-no-files-found: error
 
   pilot:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-atomic-ruff-db' && (inputs.phase == 'pilot' || inputs.phase == 'library')

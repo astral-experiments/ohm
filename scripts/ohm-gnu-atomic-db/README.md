@@ -46,3 +46,30 @@ python3 -IB scripts/ohm-gnu-atomic-db/collect.py
 gh-auto workflow run ci.yml --repo astral-experiments/ohm --ref charlie/qa-gnu-atomic-ruff-db -f phase=pilot
 gh-auto workflow run ci.yml --repo astral-experiments/ohm --ref charlie/qa-gnu-atomic-ruff-db -f phase=guards
 ```
+
+## Repeat the instruction study from source
+
+Use a checkout authorized for the Ohm repository. The source phase builds Cargo #301, the #283 compiler and the candidate compiler from their registered Git trees. It installs both standard libraries for each compiler. All 119 SDK entries must reproduce their original checksums, sizes and modes. Each resulting SDK runs the real Ruff edit, invalid edit, repair and independent empty build. Two complete downstream QEMU executables, old and new, are retained once per worker for byte-level review. The bootstrap uses published compiler/CI LLVM components and the checksummed Ohm `-20` distribution. The compiled products cross only between jobs in the new dispatch. [Bootstrap and embedded source identities](source/source.json) · [Common compiler and Cargo reconstruction](../ohm-gnu-syscall/source-rebuild/) · [Checked assembly forms](evidence/portable-atomic-1.13.1/forms.json)
+
+```sh
+repo=astral-experiments/ohm
+ref=charlie/qa-gnu-atomic-ruff-db
+qa_commit=$(gh-auto api "repos/$repo/git/ref/heads/$ref" --jq .object.sha)
+gh-auto workflow run ci.yml --repo "$repo" --ref "$ref" -f phase=source
+```
+
+Set `source_run` to the numeric ID printed above. After the source qualification succeeds, start the registered twelve-position holdout within four days, while that new run’s temporary parent SDK and candidate driver remain available. The two commands must select the same QA commit. A reviewer can start another source qualification at any time to regenerate the transfers. The holdout independently checks their run, QA commit, compressed digests and every uncompressed SDK member before measuring.
+
+```sh
+gh-auto run watch "$source_run" --repo "$repo" --exit-status
+test "$qa_commit" = "$(gh-auto api "repos/$repo/git/ref/heads/$ref" --jq .object.sha)"
+gh-auto workflow run ci.yml --repo "$repo" --ref "$ref" -f phase=holdout -f source_run="$source_run"
+```
+
+Set `holdout_run` to that second run ID, then collect the pairs while its seven-day job artifacts remain available. The retained text data includes the original hardware clocks and calibration, Cargo unit streams, external consumer hashes and verdicts, unchanged physical process traces and the target/build inode inventories. The offline command independently recomputes the twelve ratios, their order-statistic interval and the exact randomization test. Use `gh` in place of `gh-auto` on a machine where that is the authenticated GitHub CLI.
+
+```sh
+gh-auto run watch "$holdout_run" --repo "$repo" --exit-status
+python3 -IB scripts/ohm-gnu-atomic-db/pairs.py collect "atomic-counts-$holdout_run" --run "$holdout_run" --head "$qa_commit"
+python3 -IB scripts/ohm-gnu-atomic-db/pairs.py verify "atomic-counts-$holdout_run"
+```
