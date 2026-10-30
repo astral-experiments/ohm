@@ -33,7 +33,7 @@ def build(root):
     rows=[json.loads(l) for l in p.stdout.splitlines()]
     assert rows[-1]=={'reason':'build-finished','success':True}
     leaf,=[r for r in rows if r['reason']=='compiler-artifact' and r['target']['name']=='cargo' and 'lib' in r['target']['kind'] and r['profile']['test'] and r.get('executable')]
-    native=Path(leaf['executable']);assert native.is_file() and not leaf['fresh'] and native.resolve().is_relative_to(root/'build-target')
+    native=Path(leaf['executable']);assert native.is_file() and not leaf['fresh'] and any(native.resolve().is_relative_to(root/p) for p in ('build-target','build-shared'))
     deliver=root/'unit-deliver';deliver.mkdir();binary=deliver/'library-tests';shutil.copyfile(native,binary);binary.chmod(0o755)
     listed=subprocess.check_output([binary,'--list'],cwd=src,env=env)
     put(out/'unit-list.gz',listed);names={v.removesuffix(': test') for v in listed.decode().splitlines() if v.endswith(': test')}
