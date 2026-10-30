@@ -53,6 +53,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB scripts/ohm-apple-zmij/run.py test_build_study admit "$RUNNER_TEMP/apple-zmij"
+      - name: Reopen all four prior clean executables and reject damaged comparison controls
+        if: inputs.apple_zmij == 'qualified'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          root="$RUNNER_TEMP/apple-zmij"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12975434252/zip" > "$root/earlier-clean.zip"
+          python3 -IB scripts/ohm-apple-zmij/reopen_test_programs.py "$root/earlier-clean.zip" "$root/receipts/reopened-native-programs.json"
       - name: Verify release, source and complete locked offline registry inputs
         run: |
           root="$RUNNER_TEMP/apple-zmij"

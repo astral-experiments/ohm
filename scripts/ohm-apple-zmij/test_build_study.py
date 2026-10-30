@@ -2,6 +2,7 @@
 
 import argparse
 import collections
+import gzip
 import hashlib
 import io
 import json
@@ -13,6 +14,7 @@ from cohort import ENDPOINTS, fingerprint_sources, summarize
 from dyld import check as check_dyld
 from execs import ExecTrace
 from measure import select
+from macho_paths import compare as compare_macho
 from native_inputs import run_archive_check
 from study import ARCHIVE_SHA, CHILD, ORDERS, PARENT, check_host, load, need, run, save, sha
 from verbs import A, ARGS, B, NEW_TEST, installed
@@ -58,6 +60,29 @@ def assert_product(row, clean):
     need(row["product"] == clean[row["state"]], "actual test executable, code, inventory or suite differs from independent clean")
 
 
+def compare_clean(root, out, refs, state):
+    arms = {}
+    for role in "PC":
+        prefix = out / role / ("empty-" + state) / "clean"
+        record = load(prefix / "verified.json")
+        with gzip.open(prefix / "stdout.gz","rb") as f:
+            artifacts = [json.loads(line) for line in f]
+        executables = [r["executable"] for r in artifacts if r.get("executable") and
+                       r["target"]["name"] == "ruff_python_ast" and r["profile"]["test"]]
+        need(len(executables) == 1, "ambiguous actual test executable")
+        path = executables[0]
+        links = [link["argv"] for link in record["native"]["linkers"]
+                 if [v for k,v in zip(link["argv"],link["argv"][1:]) if k == "-o"] == [path]]
+        need(len(links) == 1, "ambiguous actual test linker")
+        original = refs[role][state]["raw"]
+        data = gzip.decompress((root / "receipts/test-executables" / (original + ".macho.gz")).read_bytes())
+        need(hashlib.sha256(data).hexdigest()==original, "clean native file changed")
+        arms[role] = data,path,links[0]
+    same_fields = ("text","tests","verdicts")
+    need(all(refs["P"][state][key] == refs["C"][state][key] for key in same_fields), "different executable code or test behavior")
+    return compare_macho(arms)
+
+
 def verify_trace(root, out, *, negative=True):
     trace = ExecTrace()
     baselines, clean = {}, {}
@@ -84,7 +109,7 @@ def verify_trace(root, out, *, negative=True):
                 run_archive_check(root, role, trace, label=out.parent.name + "-test-" + role)
     finally:
         trace.close()
-    need(clean["P"] == clean["C"], "compiler arms emitted different test programs")
+    cross = {state:compare_clean(root,out,clean,state) for state in ("old","new")}
     for phase in ENDPOINTS:
         parent = signature(baselines["P"][phase])
         child = signature(baselines["C"][phase])
@@ -94,7 +119,8 @@ def verify_trace(root, out, *, negative=True):
              and len(child["links"]) <= 1 and not child["link_only"], "unexpected candidate compiler or linker")
         if phase == "edit":
             need(child["full"] == ["ruff_python_ast"] and len(child["links"]) == 1, "real edit failed to rebuild and relink")
-    save(out/"verified.json",{"clean":clean,"physical":{r:{p:signature(row) for p,row in rows.items()} for r,rows in baselines.items()}})
+    save(out/"verified.json",{"clean":clean,"cross_compiler":cross,
+         "physical":{r:{p:signature(row) for p,row in rows.items()} for r,rows in baselines.items()}})
     return baselines, clean
 
 
@@ -109,7 +135,7 @@ def execute(root, mode):
            "old": A, "new": B, "compilers": [PARENT, CHILD], "order": ORDERS[mode], "pilot_sha": SIGNED_SHA,
            "paired": "independent private Cargo/target/build for each installation",
            "admission": "both pilot ratios above two; separate balanced n=12 lower median bound above two and p<=.05",
-           "correctness": "identical complete Mach-O, 53/54 inventories and full suite and layout verdicts; actual edit must link",
+           "correctness": "same-compiler complete Mach-O must equal clean; cross-compiler files must match after replacing only verified linker N_OSO Cargo namespaces and recomputing independently validated ad-hoc page hashes; identical 53/54 complete suite records; actual edit must link",
            "harness": fingerprint_sources()}
     if mode == "confirm":
         prior = load(root / "receipts/test-screen/result.json")
