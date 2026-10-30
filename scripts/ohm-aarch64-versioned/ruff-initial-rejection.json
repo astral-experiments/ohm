@@ -1,0 +1,56 @@
+{
+  "QA": "17cb902d39dca47550a9f51b6a983f7c6c1fa645",
+  "artifact": [
+    12989854985,
+    9847145,
+    "5aa7b97126a93d8f3a366e476248d975794ac14c1df6670c380a2e8e569728cd"
+  ],
+  "partial": {
+    "edit": {
+      "Cargo": {
+        "actual_path": "/home/runner/work/_temp/gnu-aarch64-ruff-screen/rustup/toolchains/ohm/bin/cargo",
+        "argc": 10,
+        "argv_sha256": "6fd2476202a6179dd09435501302782062e4cf65c2703e57b176cd8c921de9f4",
+        "exit": [
+          0
+        ],
+        "pid": 2720
+      },
+      "native": "652237a0bda14d5a3c45cce8bf55191475727a622953d1d722e6d492ed9ec5db",
+      "raw_exec": "c8c7222d0428e46a814cc67146e067b6b94988b2b348deb0157061fcce7c8bc2",
+      "reader": "7d4d2fd48f2ef717f19b11cf5e4f21bcea69d16d55e631301b8266d74cf8abd8",
+      "root_counts": {
+        "cargo": 1,
+        "rustcs": 3,
+        "rustup-dispatch": 1
+      },
+      "rustc": {
+        "actual_path": "/home/runner/work/_temp/gnu-aarch64-ruff-screen/rustup/toolchains/ohm/bin/rustc",
+        "argc": 171,
+        "argv_sha256": "a73d1020d0b588b984cd3a660f96588d8cc273041c74a55c96f7552a75786633",
+        "exit": [
+          0
+        ],
+        "pid": 2761
+      },
+      "value": "3.15 3.15 3.11"
+    },
+    "old-empty": {
+      "native": "62ce51af1d53d5ba571f4c1698ad7a0440d7734558247144dba6ff84497e7616",
+      "raw_exec": "ec686079a0d71a31f4a5f91199ae019626d903633b4d76d679a7da05d0345d36",
+      "reader": "1a8df04825085b4b606db458fecf9ec24f2b651414eea444670226a5dfbf72f9",
+      "root_counts": {
+        "Cargo build script": 5,
+        "cargo": 1,
+        "compiler_probes": 15,
+        "link_tools": 24,
+        "rustcs": 39,
+        "rustup-dispatch": 1
+      },
+      "value": "3.14 3.14 3.10"
+    }
+  },
+  "rejected": "First live process sample disagreed with the traced cargo or rustc argv / role. Both processes exited 0; the prior sampler discarded its rejected observation and cannot distinguish the actual mismatching field.",
+  "run": 41083924872,
+  "scored": 0
+}

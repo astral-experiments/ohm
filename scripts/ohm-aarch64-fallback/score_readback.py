@@ -73,21 +73,21 @@ def pilot(rows,order):
    data[f'{parent}/M:{phase}']=ordered
  return {'stage':'pilot','all_twelve_pilot_ratios_strictly_above_two':all(x[-1]>2 for r in data.values() for x in r),
          'sources':rows[0]['source'],'fixed_cargo':rows[0]['fixed_cargo'],'native':rows[0]['fixed_native'],'schedule':order,'distinct_boot_ids':len({r['boot'] for r in rows}),'paired_ratios':data}
-def remote(stage):
+def remote(stage,artifact_prefix='gnu-735e1528-',job_prefix='Fixed Cargo '):
  get=lambda n:json.loads(subprocess.check_output(['gh','api','repos/astral-experiments/ohm/'+n]))
  run=os.environ['GITHUB_RUN_ID'];git=os.environ['GITHUB_SHA'];assert get('actions/runs/'+run)['head_sha']==git
  order=fixed.options(stage)
- directory=Path(os.environ['RUNNER_TEMP'])/'gnu-735e1528-raw-reader';directory.mkdir();out=directory/'verified';out.mkdir()
+ directory=Path(os.environ['RUNNER_TEMP'])/(artifact_prefix+'raw-reader');directory.mkdir();out=directory/'verified';out.mkdir()
  order_file=directory/'schedule.json';dump(order_file,order)
  arts={a['name']:a for a in get('actions/runs/'+run+'/artifacts?per_page=100')['artifacts']}
- assert set(arts)=={'gnu-735e1528-'+stage+'-'+n for n in order} and len(arts)==len(order)
+ assert set(arts)=={artifact_prefix+stage+'-'+n for n in order} and len(arts)==len(order)
  jobs=get('actions/runs/'+run+'/jobs?per_page=100')['jobs']
- qualified=[j for j in jobs if j['name'].startswith('Fixed Cargo '+stage+' Ruff block ')]
+ qualified=[j for j in jobs if j['name'].startswith(job_prefix+stage+' Ruff block ')]
  assert len(qualified)==len({j['id'] for j in qualified})==len(order) and {j['name'].rsplit(' ',1)[-1] for j in qualified}==set(order)
  assert all(j['status']=='completed' and j['conclusion']=='success' for j in qualified)
  rows=[]
  for n in sorted(order):
-  item=arts['gnu-735e1528-'+stage+'-'+n];assert item['workflow_run']['head_sha']==git and item['workflow_run']['id']==int(run) and not item['expired']
+  item=arts[artifact_prefix+stage+'-'+n];assert item['workflow_run']['head_sha']==git and item['workflow_run']['id']==int(run) and not item['expired']
   length=item['size_in_bytes'];assert 0<length<768*2**20 and shutil.disk_usage(directory).free>length+16*2**30
   p=directory/(n+'.zip')
   with p.open('xb') as f:subprocess.run(['gh','api','repos/astral-experiments/ohm/actions/artifacts/'+str(item['id'])+'/zip'],stdout=f,check=True)

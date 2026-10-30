@@ -29,8 +29,13 @@ def inspect(z, phase, rows):
                 if not line.startswith((b'execve(', b'execveat(')) or not line.rstrip().endswith(b'= 0'):
                     continue
                 match = EXEC.fullmatch(line)
-                assert match, line[:240]
-                path, argv = (ast.literal_eval(p.decode()) for p in match.groups())
+                if match:
+                    path, argv = (ast.literal_eval(p.decode()) for p in match.groups())
+                else:
+                    assert line.startswith(b'execve('), line[:240]
+                    expr = re.sub(rb'\)\s+= 0$', b')', line.removeprefix(b'execve'))
+                    path, argv, env = ast.literal_eval(expr.decode())
+                    assert isinstance(argv,list) and isinstance(env,list) and all('=' in v for v in env)
                 name = Path(path).name
                 if path.endswith('/rustup/toolchains/ohm/bin/rustc'):
                     kind = 'rustcs' if '--crate-name' in argv and any(x == '--emit' or x.startswith('--emit=') for x in argv) else 'compiler_probes'

@@ -5,19 +5,19 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: gnu-versioned-native-and-ruff-20261030-v2
+  group: gnu-versioned-ruff-kernel-environment-v1
   cancel-in-progress: false
 jobs:
   block:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    name: Source-bound GNU marker, native provider and migration ${{ matrix.block }}
+    name: Physical GNU compiler and versioned Cargo Ruff source gate ${{ matrix.block }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: 3
       matrix:
-        block: ["signed","classic","aware","migrate-signed","migrate-classic","legacy-writer","ruff"]
+        block: ["ruff"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -42,6 +42,7 @@ jobs:
           dpkg-query -W gcc-aarch64-linux-gnu libc6-dev-arm64-cross binutils-aarch64-linux-gnu qemu-user strace valgrind > "$QA_ROOT/receipts/packages"
           echo 'def5fdcf6ae64a4d3e6af3786b622978d8313e0734ecf3f6cbe71d8be9e274c8  /usr/bin/valgrind.bin' | sha256sum -c -
           python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
+          python3 -IB scripts/ohm-aarch64-versioned/kernel_env_test.py
       - name: Read back matched compiler and Cargo source products
         env:
           GH_TOKEN: ${{ github.token }}
@@ -65,7 +66,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-versioned-rerun-${{ matrix.block }}
+          name: gnu-versioned-kernel-${{ matrix.block }}
           path: ${{ env.QA_ROOT }}/receipts
           retention-days: 7
           if-no-files-found: error

@@ -6,8 +6,10 @@ from ruff_subjects import DEFAULT_SOURCE,DEFAULT_DRIVERS,REG,enroll,marker_rules
 from study import save,sha,load
 sys.path.insert(0,str(HERE.parent/'ohm-aarch64-fallback'))
 import ruff_native as original
+from kernel_env import install
 
 def main(ancestor,inputs):
+    install()
     enroll(original.HOLD)
     original.HIN['PRODUCT']=REG['cargo_elf']
     original.main(ancestor,inputs,inputs/'versioned/cargo')

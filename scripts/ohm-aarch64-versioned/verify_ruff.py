@@ -4,6 +4,7 @@ from pathlib import Path
 import json,sys,zipfile
 HERE=Path(__file__).resolve().parent;sys.path.insert(0,str(HERE))
 from ruff_subjects import DEFAULT_SOURCE,DEFAULT_DRIVERS,REG
+from kernel_env import verify as verify_kernel
 sys.path.insert(0,str(HERE.parent/'ohm-aarch64-fallback'))
 import verify_ruff_native
 H=lambda b:sha256(b).hexdigest()
@@ -15,6 +16,7 @@ def verify(p):
         assert extra['native']==H(z.read('ruff-native-eligibility.json'))==r['terminal']
         assert extra['new_cargo']==r['cargo'] and extra['source_alias_M']==DEFAULT_SOURCE['M']
         for role in 'ANM':
+            verify_kernel(z,'ruff-native-'+role+'/edit')
             for phase in ('old-empty','edit','unchanged-1','unchanged-2','empty-edited'):
                 for name,row in extra['roles'][role][phase].items():
                     raw=z.read('ruff-native-'+role+'/'+phase+'/'+name+'.d')

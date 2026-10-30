@@ -26,12 +26,13 @@ def options(stage):
  schedules=load(HERE/'fixed-schedules.json')
  assert stage in ('pilot','confirmation') and set(schedules)=={'pilot','confirmation'}
  return schedules[stage]
-def main(number,stage,ancestor,inputs):
+def main(number,stage,ancestor,inputs,cargo_dir=None,actual_cargo='869a24e83ff84cca6e9d6cb35eb62f149aa48555cf8bb7ee9b94d44ad90d2914'):
  protocol=load(HERE/'admissible-native.json')
- assert protocol['cargo_elf']=='869a24e83ff84cca6e9d6cb35eb62f149aa48555cf8bb7ee9b94d44ad90d2914'
+ assert protocol['cargo_elf']==actual_cargo
  safe=load(rt.LOG/'independent-admissions.json')
  assert safe['sources']==HOLD['SOURCE'] and safe['admitted']==protocol and safe['cargo']==protocol['cargo_elf']
- p=load(inputs/'fixed/product.json');assert p['cargo_sha256']==protocol['cargo_elf']==sha(inputs/'fixed/cargo')
+ cargo_dir=cargo_dir or inputs/'fixed'
+ p=load(cargo_dir/'product.json');assert p['cargo_sha256']==protocol['cargo_elf']==sha(cargo_dir/'cargo')
  if stage=='confirmation':
   assert load(rt.LOG/'independent-pilot.json')['all_twelve_pilot_ratios_strictly_above_two']
  else:assert not (rt.LOG/'independent-pilot.json').exists()
@@ -53,7 +54,7 @@ def main(number,stage,ancestor,inputs):
   return row
  q.visit=capture
  try:
-  HOLD['block'](number,ancestor,inputs,{'order_map':schedule,'cargo':(inputs/'fixed/cargo',p),'registration':sha(rt.LOG/'fixed-cargo-registration.json')})
+  HOLD['block'](number,ancestor,inputs,{'order_map':schedule,'cargo':(cargo_dir/'cargo',p),'registration':sha(rt.LOG/'fixed-cargo-registration.json')})
  finally:q.visit=orig
  terminal=load(rt.LOG/'terminal.json');assert set(terminal['values'])==set('ANM') and terminal['order']==schedule[number]
  for role in 'ANM':

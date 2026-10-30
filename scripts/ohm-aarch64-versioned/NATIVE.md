@@ -61,3 +61,26 @@ The unchanged protocol requires its real ordinary rosters, 39 typed units,
 SDK namespaces, all nine same/cross transitions, actual process environments
 and exact marker spellings. The previous scored work contributes zero
 observations to this separate versioned pair.
+
+## Readback of the second qualification
+
+The six source-matched provider histories ended successfully, including the
+actual two-way migrations. The independent reader reopened 444 Cargo runs,
+their GNU linker searches, full AArch64 ELF images, QEMU outputs, malformed
+native errors, physical file updates, and authenticated translated depfiles.
+Those six groups remain enrolled.
+
+The separate Ruff worker stopped on the A edit's live process assertion.
+Both real applications exited zero, and both old/new readers matched the
+original reference, but the sampler kept only the first tuple per PID and
+did not write a rejected tuple. The raw record includes the Cargo and
+171-element rustc argv. It cannot identify the differing live field.
+Keep the stopped trial and zero observations. Re-enroll only the Ruff
+native control with fresh physical outputs and the identical pinnings.
+Its ordinary edit uses verbose kernel execve to capture the actual argv
+and environment, plus stable procfs executable device/inode, argv and
+environment snapshots from the same PID. Accept only exact cross-checks
+and retain all alternatives on rejection. Pin the executable member and
+require both observations for each actual Cargo and AST compiler on every
+subsequent native edit. The performance counter and profiled command
+entry remain unchanged.
