@@ -1,0 +1,677 @@
+{
+  "qa": "1f5a25f23bdfabafc1fb2a0b06d33e7095b14115",
+  "subject": "f69f7b7cf6de57972b310900decfac2d3a0c6fd6",
+  "sdk_changes": [
+    "lib/librustc_driver-fa217dfcec654979.so"
+  ],
+  "archive": "7ba35c220d6a1067e4d210a9094b5b9e555e0b7ec18c240ce6c041f0e9c76b7f",
+  "terminal": {
+    "guard": {
+      "C": {
+        "guard-clean-new": 10,
+        "guard-clean-old": 10,
+        "guard-cold": 10,
+        "guard-native-change": 1,
+        "guard-repair": 1,
+        "guard-repeat": 1,
+        "guard-repeat-changed": 1,
+        "guard-restore": 1
+      },
+      "P": {
+        "guard-clean-new": 10,
+        "guard-clean-old": 10,
+        "guard-cold": 10,
+        "guard-native-change": 10,
+        "guard-repair": 10,
+        "guard-repeat": 10,
+        "guard-repeat-changed": 10,
+        "guard-restore": 10
+      }
+    },
+    "ordinary": "402d985230325f483aba82dd11bc7f0ee0d148c2ffe481c86cff99fd7b3991ba",
+    "profiles": {
+      "C": {
+        "clean": {
+          "physical": 95,
+          "same_ordinary": false,
+          "total": 95
+        },
+        "edit": {
+          "physical": 2,
+          "same_ordinary": false,
+          "total": 95
+        },
+        "old": {
+          "physical": 95,
+          "same_ordinary": false,
+          "total": 95
+        },
+        "repeat-1": {
+          "physical": 1,
+          "same_ordinary": false,
+          "total": 95
+        },
+        "repeat-2": {
+          "physical": 1,
+          "same_ordinary": false,
+          "total": 95
+        }
+      },
+      "P": {
+        "clean": {
+          "physical": 95,
+          "same_ordinary": false,
+          "total": 95
+        },
+        "edit": {
+          "physical": 95,
+          "same_ordinary": false,
+          "total": 95
+        },
+        "old": {
+          "physical": 95,
+          "same_ordinary": false,
+          "total": 95
+        },
+        "repeat-1": {
+          "physical": 95,
+          "same_ordinary": false,
+          "total": 95
+        },
+        "repeat-2": {
+          "physical": 95,
+          "same_ordinary": false,
+          "total": 95
+        }
+      }
+    }
+  },
+  "host": {
+    "P": {
+      "cold": {
+        "image": "1018eaf43bf1f181a2f09cd4a4265e110b2cab9e1b58ff450b5a6e899efb7522",
+        "value": "17 41",
+        "physical": 10,
+        "units": 10
+      },
+      "repeat": {
+        "image": "1018eaf43bf1f181a2f09cd4a4265e110b2cab9e1b58ff450b5a6e899efb7522",
+        "value": "17 41",
+        "physical": 10,
+        "units": 10
+      },
+      "native-change": {
+        "image": "32cc7a03b2b1f30aaa159c2bc3c8f480fff598303a130b44e8b0e0ec46444610",
+        "value": "29 41",
+        "physical": 10,
+        "units": 10
+      },
+      "repeat-changed": {
+        "image": "32cc7a03b2b1f30aaa159c2bc3c8f480fff598303a130b44e8b0e0ec46444610",
+        "value": "29 41",
+        "physical": 10,
+        "units": 10
+      },
+      "missing": {
+        "error": true
+      },
+      "repair": {
+        "image": "32cc7a03b2b1f30aaa159c2bc3c8f480fff598303a130b44e8b0e0ec46444610",
+        "value": "29 41",
+        "physical": 10,
+        "units": 10
+      },
+      "restore": {
+        "image": "1018eaf43bf1f181a2f09cd4a4265e110b2cab9e1b58ff450b5a6e899efb7522",
+        "value": "17 41",
+        "physical": 10,
+        "units": 10
+      },
+      "clean-missing": {
+        "error": true
+      },
+      "clean-old": {
+        "image": "1018eaf43bf1f181a2f09cd4a4265e110b2cab9e1b58ff450b5a6e899efb7522",
+        "value": "17 41",
+        "physical": 10,
+        "units": 10
+      },
+      "clean-new": {
+        "image": "32cc7a03b2b1f30aaa159c2bc3c8f480fff598303a130b44e8b0e0ec46444610",
+        "value": "29 41",
+        "physical": 10,
+        "units": 10
+      }
+    },
+    "C": {
+      "cold": {
+        "image": "1018eaf43bf1f181a2f09cd4a4265e110b2cab9e1b58ff450b5a6e899efb7522",
+        "value": "17 41",
+        "physical": 10,
+        "units": 10
+      },
+      "repeat": {
+        "image": "1018eaf43bf1f181a2f09cd4a4265e110b2cab9e1b58ff450b5a6e899efb7522",
+        "value": "17 41",
+        "physical": 1,
+        "units": 10
+      },
+      "native-change": {
+        "image": "32cc7a03b2b1f30aaa159c2bc3c8f480fff598303a130b44e8b0e0ec46444610",
+        "value": "29 41",
+        "physical": 1,
+        "units": 10
+      },
+      "repeat-changed": {
+        "image": "32cc7a03b2b1f30aaa159c2bc3c8f480fff598303a130b44e8b0e0ec46444610",
+        "value": "29 41",
+        "physical": 1,
+        "units": 10
+      },
+      "missing": {
+        "error": true
+      },
+      "repair": {
+        "image": "32cc7a03b2b1f30aaa159c2bc3c8f480fff598303a130b44e8b0e0ec46444610",
+        "value": "29 41",
+        "physical": 1,
+        "units": 10
+      },
+      "restore": {
+        "image": "1018eaf43bf1f181a2f09cd4a4265e110b2cab9e1b58ff450b5a6e899efb7522",
+        "value": "17 41",
+        "physical": 1,
+        "units": 10
+      },
+      "clean-missing": {
+        "error": true
+      },
+      "clean-old": {
+        "image": "1018eaf43bf1f181a2f09cd4a4265e110b2cab9e1b58ff450b5a6e899efb7522",
+        "value": "17 41",
+        "physical": 10,
+        "units": 10
+      },
+      "clean-new": {
+        "image": "32cc7a03b2b1f30aaa159c2bc3c8f480fff598303a130b44e8b0e0ec46444610",
+        "value": "29 41",
+        "physical": 10,
+        "units": 10
+      }
+    }
+  },
+  "ordinary": {
+    "P": {
+      "old-empty": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "ae157aeadb034d3ae8b54014f39678d6578075e1eba9b0b886b74d19274e1864"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "a0d7efa3d39a529c1b545c016f60fa57d9ee9bc843b6b861e0c56f0f0c20201f"
+          ]
+        },
+        "kernel_exec_rows": 79,
+        "object_set": "d404579bdb4444d2621b120562e5ebde4a7864268e2ef6d45fe0690f0c089e8f",
+        "reader": "8c8630aa1527a10ae35287aad0f040884a6668cffed28d21c5b934cc19cbb094",
+        "nobj": 95,
+        "fresh_work": [
+          "build_script_build",
+          "unicode_ident",
+          "build_script_build",
+          "build_script_build",
+          "tinyvec_macros",
+          "memchr",
+          "build_script_build",
+          "rustversion",
+          "proc_macro2",
+          "tinyvec",
+          "castaway",
+          "itoa",
+          "ruff_text_size",
+          "quote",
+          "either",
+          "build_script_build",
+          "ruff_source_file",
+          "syn",
+          "itertools",
+          "syn",
+          "unicode_normalization",
+          "zmij",
+          "unicode_ident",
+          "ryu",
+          "heck",
+          "cfg_if",
+          "rustc_hash",
+          "static_assertions",
+          "ruff_python_trivia",
+          "compact_str",
+          "thiserror_impl",
+          "char_str",
+          "thiserror",
+          "aho_corasick",
+          "bitflags",
+          "thin_vec",
+          "arrayvec",
+          "is_macro",
+          "ruff_python_ast"
+        ]
+      },
+      "edit": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "4a7f198df6d86e896d01d1b2e54fe58a807d27d2895ded6e1cdc3ee06f193c5d"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "a15b681041940de35785c01e78ad999dea69d3bca3fc1697f3329f2e4d666ebb"
+          ]
+        },
+        "kernel_exec_rows": 4,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "zmij",
+          "compact_str",
+          "ruff_python_ast"
+        ]
+      },
+      "unchanged-1": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "4a7f198df6d86e896d01d1b2e54fe58a807d27d2895ded6e1cdc3ee06f193c5d"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "ffc250d574627665511f6e1a997443a87e401cff72a4b8363891a73e2b5ac4dc"
+          ]
+        },
+        "kernel_exec_rows": 4,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "zmij",
+          "compact_str",
+          "ruff_python_ast"
+        ]
+      },
+      "unchanged-2": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "4a7f198df6d86e896d01d1b2e54fe58a807d27d2895ded6e1cdc3ee06f193c5d"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "5abf0722196507f774d3f624c37c09aca31c5cee290a357786bd379fac1f925e"
+          ]
+        },
+        "kernel_exec_rows": 4,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "zmij",
+          "compact_str",
+          "ruff_python_ast"
+        ]
+      },
+      "invalid": {
+        "error": "E0425"
+      },
+      "repair": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "4a7f198df6d86e896d01d1b2e54fe58a807d27d2895ded6e1cdc3ee06f193c5d"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "309a6afa6ac4cdc7c07cbd5f4e198a10a15ecbba4f00b3e183b491a7ca51e474"
+          ]
+        },
+        "kernel_exec_rows": 4,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "zmij",
+          "compact_str",
+          "ruff_python_ast"
+        ]
+      },
+      "empty-edited": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "b4ae3d773b5d990de3227a1040bf790e05b16751af42dcecaabc9dd94ad01079"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "a6a2e6be30eb26ffa6a0779cb534b78b37ec72f791fbc2b76f23fbfd025bbdfd"
+          ]
+        },
+        "kernel_exec_rows": 79,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "build_script_build",
+          "unicode_ident",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "tinyvec_macros",
+          "memchr",
+          "rustversion",
+          "tinyvec",
+          "proc_macro2",
+          "castaway",
+          "ruff_text_size",
+          "quote",
+          "either",
+          "build_script_build",
+          "itoa",
+          "syn",
+          "syn",
+          "itertools",
+          "ruff_source_file",
+          "zmij",
+          "unicode_normalization",
+          "cfg_if",
+          "rustc_hash",
+          "static_assertions",
+          "unicode_ident",
+          "ryu",
+          "heck",
+          "char_str",
+          "ruff_python_trivia",
+          "thiserror_impl",
+          "compact_str",
+          "thiserror",
+          "aho_corasick",
+          "arrayvec",
+          "bitflags",
+          "thin_vec",
+          "is_macro",
+          "ruff_python_ast"
+        ]
+      }
+    },
+    "C": {
+      "old-empty": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "c8185feeb1de70113cef94a3f126d7ba227fb529c55f29fb6996867436552de7"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "89f979e7a91d9fa3306cb529b15a6690969268bba9cb809d9e69fe86022bd069"
+          ]
+        },
+        "kernel_exec_rows": 79,
+        "object_set": "d404579bdb4444d2621b120562e5ebde4a7864268e2ef6d45fe0690f0c089e8f",
+        "reader": "8c8630aa1527a10ae35287aad0f040884a6668cffed28d21c5b934cc19cbb094",
+        "nobj": 95,
+        "fresh_work": [
+          "build_script_build",
+          "build_script_build",
+          "unicode_ident",
+          "build_script_build",
+          "tinyvec_macros",
+          "memchr",
+          "build_script_build",
+          "proc_macro2",
+          "rustversion",
+          "tinyvec",
+          "castaway",
+          "itoa",
+          "quote",
+          "ruff_text_size",
+          "either",
+          "build_script_build",
+          "ruff_source_file",
+          "syn",
+          "syn",
+          "itertools",
+          "unicode_normalization",
+          "zmij",
+          "unicode_ident",
+          "ryu",
+          "heck",
+          "cfg_if",
+          "rustc_hash",
+          "static_assertions",
+          "thiserror_impl",
+          "ruff_python_trivia",
+          "compact_str",
+          "char_str",
+          "thiserror",
+          "aho_corasick",
+          "bitflags",
+          "thin_vec",
+          "arrayvec",
+          "is_macro",
+          "ruff_python_ast"
+        ]
+      },
+      "edit": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "befafcd4ecafbdb5faf9d5f82f58493f4b75bf3118e9ea7c0d6287265a44641f"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "03d7f160cedf8355309070e40e7992943791199bffa783cb144be55ed871697f"
+          ]
+        },
+        "kernel_exec_rows": 4,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "zmij",
+          "compact_str",
+          "ruff_python_ast"
+        ]
+      },
+      "unchanged-1": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "befafcd4ecafbdb5faf9d5f82f58493f4b75bf3118e9ea7c0d6287265a44641f"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "31e2e9f510ec46146d7dded1378ffb36b737f3c0f10fb04e8a760bf1ecf1a966"
+          ]
+        },
+        "kernel_exec_rows": 4,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "zmij",
+          "compact_str",
+          "ruff_python_ast"
+        ]
+      },
+      "unchanged-2": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "befafcd4ecafbdb5faf9d5f82f58493f4b75bf3118e9ea7c0d6287265a44641f"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "0f2811db3ebfeeeae01d993e268139e8650a89e4d253c2268479b70cafb57753"
+          ]
+        },
+        "kernel_exec_rows": 4,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "zmij",
+          "compact_str",
+          "ruff_python_ast"
+        ]
+      },
+      "invalid": {
+        "error": "E0425"
+      },
+      "repair": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "befafcd4ecafbdb5faf9d5f82f58493f4b75bf3118e9ea7c0d6287265a44641f"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "601802202407834b114b2e6c617719de15a329c2b67333401b08075dc24c5834"
+          ]
+        },
+        "kernel_exec_rows": 4,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "zmij",
+          "compact_str",
+          "ruff_python_ast"
+        ]
+      },
+      "empty-edited": {
+        "metadata": {
+          "lib.rmeta": [
+            5902200,
+            "409f8dc9e0a34449d71cb4aaaa022762c0213382d734483ec04f39e785cdba8a"
+          ],
+          "lib.rmeta-link": [
+            7712,
+            "de1bf43c611dbfb2ad5c8b3f821f00c7570c4fade72a6c53de287d0857ec1793"
+          ]
+        },
+        "kernel_exec_rows": 79,
+        "object_set": "82cca737b676424f547d29dcf6900bf47d3ed1eae41e572d15b53a48b111a8f2",
+        "reader": "02da83cd5e75ea0790a87fa122367cadfc7f1fca65cae04638b5d4e37d7e3b65",
+        "nobj": 95,
+        "fresh_work": [
+          "build_script_build",
+          "build_script_build",
+          "unicode_ident",
+          "build_script_build",
+          "memchr",
+          "tinyvec_macros",
+          "rustversion",
+          "build_script_build",
+          "proc_macro2",
+          "tinyvec",
+          "build_script_build",
+          "quote",
+          "castaway",
+          "ruff_text_size",
+          "either",
+          "syn",
+          "itoa",
+          "ruff_source_file",
+          "itertools",
+          "syn",
+          "unicode_normalization",
+          "zmij",
+          "static_assertions",
+          "rustc_hash",
+          "unicode_ident",
+          "heck",
+          "ryu",
+          "cfg_if",
+          "compact_str",
+          "char_str",
+          "thiserror_impl",
+          "ruff_python_trivia",
+          "aho_corasick",
+          "thiserror",
+          "thin_vec",
+          "bitflags",
+          "arrayvec",
+          "is_macro",
+          "ruff_python_ast"
+        ]
+      }
+    }
+  },
+  "profile": {
+    "P": {
+      "old": {
+        "LLVM_units": 95,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "776a2c72106fbff51d4a89ee9e7adeb50747dc576ff242e721d8bde9e13373cc"
+      },
+      "edit": {
+        "LLVM_units": 95,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "7be053db270d620e2b0b97fc8cfffd21f1d26ce882d652bba10021eee23a6a26"
+      },
+      "repeat-1": {
+        "LLVM_units": 95,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "7be053db270d620e2b0b97fc8cfffd21f1d26ce882d652bba10021eee23a6a26"
+      },
+      "repeat-2": {
+        "LLVM_units": 95,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "7be053db270d620e2b0b97fc8cfffd21f1d26ce882d652bba10021eee23a6a26"
+      },
+      "clean": {
+        "LLVM_units": 95,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "7be053db270d620e2b0b97fc8cfffd21f1d26ce882d652bba10021eee23a6a26"
+      }
+    },
+    "C": {
+      "old": {
+        "LLVM_units": 95,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "776a2c72106fbff51d4a89ee9e7adeb50747dc576ff242e721d8bde9e13373cc"
+      },
+      "edit": {
+        "LLVM_units": 2,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "7be053db270d620e2b0b97fc8cfffd21f1d26ce882d652bba10021eee23a6a26"
+      },
+      "repeat-1": {
+        "LLVM_units": 1,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "7be053db270d620e2b0b97fc8cfffd21f1d26ce882d652bba10021eee23a6a26"
+      },
+      "repeat-2": {
+        "LLVM_units": 1,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "7be053db270d620e2b0b97fc8cfffd21f1d26ce882d652bba10021eee23a6a26"
+      },
+      "clean": {
+        "LLVM_units": 95,
+        "total": 95,
+        "compared_to_ordinary": false,
+        "native_set": "7be053db270d620e2b0b97fc8cfffd21f1d26ce882d652bba10021eee23a6a26"
+      }
+    }
+  }
+}
