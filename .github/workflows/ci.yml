@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: linux-checks
-        options: [linux-checks, gc-control, coherent-storage]
+        options: [linux-checks, gc-control, coherent-storage, profile-selectors]
 permissions:
   contents: read
 concurrency:
@@ -427,3 +427,79 @@ jobs:
             "$testsuite" rustflags::ohm_defaults_reexpand_derive_after_native_input_changes \
               --exact --nocapture
           fi
+
+  actual-profile-settings:
+    name: Run both actually-discovered signed-Ohm debug-profile assertions
+    if: ${{ !cancelled() && inputs.task == 'profile-selectors' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    env:
+      CARGO_PROFILE_DEV_DEBUG: 1
+      CARGO_PROFILE_TEST_DEBUG: 1
+      CARGO_INCREMENTAL: 0
+      CARGO_PUBLIC_NETWORK_TESTS: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: depot-ubuntu-24.04-16
+            other: i686-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: qa-protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/ohm-aarch64-versioned/cargo-transport
+            scripts/ohm-cargo-301-linux-ci
+      - name: Authenticate Cargo 301 source, tree and all 3114 entries
+        working-directory: ${{ github.workspace }}
+        run: python3 -IB qa-protocol/scripts/ohm-cargo-301-linux-ci/source.py subject
+      - name: Install Rust
+        run: |
+          # Keep compiled-in test scratch paths outside this repository and any
+          # `target` component, for Git discovery and automatic shared-build admission.
+          echo "CARGO_TARGET_DIR=$RUNNER_TEMP/cargo-tests" >> "$GITHUB_ENV"
+          rustup toolchain install "$RUST_VERSION" --profile minimal --component rustfmt
+          rustup target add --toolchain "$RUST_VERSION" "${{ matrix.other }}" wasm32-unknown-unknown
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y gcc-multilib libsecret-1-0 libsecret-1-dev
+      - name: Verify coherent scratch for the unmodified Cargo and native test commands
+        run: bash ../qa-protocol/scripts/ohm-cargo-301-linux-ci/native_storage.sh
+      - name: Build the real Cargo integration test binary
+        run: cargo +"$RUST_VERSION" test -p cargo --test testsuite --no-run
+      - name: Install Ohm for Clippy worktree coverage
+        env:
+          OHM_VERSION: ohm-1.98.0-9
+          OHM_INSTALLER_SHA256: 573e00024783ab952f7c2d629f12f9e0ba61be96843f7e692dc056642a72affe
+        run: |
+          installer="$RUNNER_TEMP/ohm-clippy-installer.sh"
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+            --output "$installer" \
+            "https://labs.astral.sh/ohm/releases/$OHM_VERSION/install.sh"
+          printf '%s  %s\n' "$OHM_INSTALLER_SHA256" "$installer" | shasum -a 256 --check
+          sh "$installer"
+      - name: Execute both actual profile_settings tests with Ohm
+        env:
+          RUSTUP_TOOLCHAIN: ohm-1.98.0-9
+          # This pinned compiler predates early metadata.
+          __CARGO_HEADSTART: "no"
+        run: |
+          toolchain_bin="$(dirname "$(rustup which rustc)")"
+          rustup_bin="$(dirname "$(command -v rustup)")"
+          # Exclude runner-provided native-tool shims from the trusted-cache fixture.
+          export PATH="$toolchain_bin:$rustup_bin:/usr/bin:/bin:/usr/sbin:/sbin"
+          rustc -Vv
+          clippy-driver -V
+          testsuite="$(find "$CARGO_TARGET_DIR/debug/deps" -maxdepth 1 -type f -name 'testsuite-*' -perm -u+x -print -quit)"
+          if [[ -z "$testsuite" ]]; then
+            echo 'compiled Cargo integration test binary was not found' >&2
+            exit 1
+          fi
+          for case in profile_settings::ohm_default_debuginfo profile_settings::ohm_default_debuginfo_respects_overrides; do
+            log="$RUNNER_TEMP/$case.log"
+            "$testsuite" "$case" --exact --include-ignored --nocapture | tee "$log"
+            grep -Fx "test $case ... ok" "$log"
+            grep -F 'test result: ok. 1 passed; 0 failed;' "$log"
+          done
