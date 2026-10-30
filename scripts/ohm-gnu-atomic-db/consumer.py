@@ -16,13 +16,18 @@ def args_from_training(kernel,src):
     external={x.split('=',1)[0]:x.split('=',1)[1] for x in census.flags(args,'--extern') if '=' in x}
     chosen={}
     for name in ('ruff_python_ast','salsa'):
-        path=Path(external[name]).with_suffix('.rlib')
-        assert path.is_file(),path
-        chosen[name]=str(path)
+        metadata=Path(external[name])
+        archive=metadata.with_suffix('.rlib')
+        assert metadata.suffix=='.rmeta' and metadata.is_file() and archive.is_file(),(name,metadata,archive)
+        chosen[name]=[str(metadata),str(archive)]
+    out_dir,=census.flags(args,'--out-dir')
+    suffix,=[x.split('=',1)[1] for x in census.flags(args,'-C') if x.startswith('extra-filename=')]
+    library=Path(out_dir)/('libruff_db'+suffix+'.rlib')
+    assert library.is_file() and library.with_suffix('.rmeta').is_file(),library
     search=list(census.flags(args,'-L'))
     # Ohm may keep each unit's outputs in a private directory. The standard Cargo command
     # that produced the library is authoritative about which search paths are required.
-    return {'external':chosen,'search':search}
+    return {'external':chosen,'search':search,'root':str(library)}
 
 def run(external,archive,env,src,dest,old=False):
     dest.mkdir()
@@ -33,16 +38,21 @@ def run(external,archive,env,src,dest,old=False):
     cli=['rustc','+ohm','--edition','2024','--crate-name','qa_atomic_subscriber','--target',census.TARGET,
          '-C','linker=/usr/bin/aarch64-linux-gnu-gcc','-C','debuginfo=0','-C','opt-level=1',
          '--extern','ruff_db='+str(archive)]
-    for name,path in external['external'].items():
-        assert Path(path).is_file(),path
-        cli.extend(['--extern',name+'='+path])
+    local=Path(external['root'])
+    assert local.samefile(archive) or census.sha(local)==census.sha(archive)
+    cli.extend(['--extern','ruff_db='+str(local.with_suffix('.rmeta'))])
+    for name,components in external['external'].items():
+        for path in components:
+            assert Path(path).is_file(),path
+            cli.extend(['--extern',name+'='+path])
     for path in external['search']:cli.extend(['-L',path])
     cmd=[*cli,caller,'-o',exe]
     p=subprocess.run(cmd,cwd=src,env=env,capture_output=True,timeout=270)
     census.blob(dest/'rustc.stdout.gz',p.stdout)
     census.blob(dest/'rustc.stderr.gz',p.stderr)
     census.save(dest/'compile.json',{'argv':list(map(str,cmd)),'exit':p.returncode,'archive_sha':census.sha(archive),
-                                     'deps':{n:census.sha(Path(path)) for n,path in external['external'].items()}})
+                                     'root_metadata':census.sha(local.with_suffix('.rmeta')),
+                                     'deps':{n:[census.sha(Path(p)) for p in paths] for n,paths in external['external'].items()}})
     assert p.returncode==0,p.stderr.decode(errors='replace')[-2400:]
     exercise={}
     for count in (1,65):
