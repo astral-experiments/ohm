@@ -55,6 +55,11 @@ from column 1 to column 257 used to leave an incremental caller reporting column
 reports 257, as it does after a clean build. Moving a public identifier in a crate that emits both
 Rust metadata and a native library also invalidates the downstream reader.
 
+A procedural macro can return a span whose endpoint falls inside a multibyte UTF-8 character.
+In 1.99.0-19, hashing that span as a string could make both `cargo check` and `cargo build`
+panic. In 1.99.0-20, rustc hashes the selected bytes directly.
+[Rust #259](https://github.com/astral-experiments/ohm-rust/pull/259)
+
 In a paired Linux comparison on Ruff before 1.99.0-18, the earlier reuse policy reduced the median for an unchanged
 `cargo test --no-run` from 6.09 to 0.96 seconds. All 619 units were fresh, eliminating 50 native
 links. The ordinary workspace build was already fresh with either Cargo. Checking the inputs has a
@@ -98,6 +103,18 @@ dependency. Before relinking, Cargo verifies the list of link inputs and the con
 saved object file. If an input is missing or a checksum fails, Cargo recompiles the target.
 Changes involving procedural macros, build scripts, or native libraries may also require
 recompilation.
+
+In 1.99.0-20, rustc keeps saved link objects separate from its incremental cache. Overwriting
+a saved object can no longer change the cached copy through a hard link. If inline assembly reads
+a file through `.incbin` or `.include`, rustc rebuilds the code that embeds it. Register-only
+instructions, including the x86 atomics used by Ruff, can reuse the compiled code. A build script
+can use `cargo::rerun-if-changed` to tell Cargo which native library or search directory to watch.
+Cargo uses modification times for these declarations, as stock Cargo does.
+[Rust #255](https://github.com/astral-experiments/ohm-rust/pull/255) · [Rust #267](https://github.com/astral-experiments/ohm-rust/pull/267) · [Rust #268](https://github.com/astral-experiments/ohm-rust/pull/268) · [Cargo #294](https://github.com/astral-experiments/ohm-cargo/pull/294)
+
+On Linux, three successive unchanged builds of Ruff's CLI and integration tests invoked no
+compiler or linker. Changing a declared static library relinked both executables. Restoring the
+library reproduced both original executables byte for byte. [Release qualification](https://github.com/astral-experiments/ohm/pull/206)
 
 This helps most when an edit to a dependency would otherwise force an expensive executable or test
 binary to recompile.
@@ -257,6 +274,11 @@ was a symlink, even a fully fresh build could write through it to an unrelated f
 1.99.0-19, Cargo replaces the marker at its own path. The file the symlink pointed to keeps its
 original contents.
 
+In 1.99.0-20, Cargo also replaces symlinks when it writes the workspace resolution, public API
+hash, compiler-message, and integration-test cache entries. A restored resolution cache entry
+that points to a pipe used to hang `cargo metadata --offline`. Cargo now resolves the workspace again.
+[Cargo #284](https://github.com/astral-experiments/ohm-cargo/pull/284)
+
 See:
 
 - [Cargo #101](https://github.com/astral-sh/ohm-cargo/pull/101)
@@ -277,6 +299,12 @@ For example, suppose `parser` exposes a function `parse(&str) -> SyntaxTree`, wh
 Once the compiler has published the parser's interface, it can start checking how the linter uses
 `parse` while it continues checking the parser's function bodies. It still checks both crates; their
 work overlaps.
+
+Starting in 1.99.0-20, Cargo rechecks callers while a dependency's metadata is still provisional.
+Previously, an edit that introduced a second method with the same name could pass an incremental
+check even though a clean check reported an ambiguous call. If a library fails after a dependent
+uses its metadata, reverting the edit also rebuilds that dependent on the first retry.
+[Cargo #279](https://github.com/astral-experiments/ohm-cargo/pull/279) · [Cargo #280](https://github.com/astral-experiments/ohm-cargo/pull/280)
 
 When rechecking first-party crates while reusing pre-compiled third-party dependencies, Ruff's check
 time went from 22.89 to 18.17 seconds (20.6% faster) and rust-analyzer's went from 25.28 to 18.72
@@ -521,6 +549,17 @@ and removes duplicates, preserving the first spelling of equivalent paths.
 On a Ruff workspace with all 520 artifacts up to date, the ten Cargo changes together reduced
 Cargo's instructions for `cargo check` by 10.51%.
 [Paired measurements](https://github.com/astral-sh/ohm-cargo/tree/60f815537745e8dd8867c3062aea061c6865be34/benchmarks/ruff-dev-loop-20261026/ten-cargo-fresh)
+
+In 1.99.0-20, Cargo can reuse the selected dependency versions after edits to workspace Rust or
+Clippy lints and after edits confined to trailing profile tables. It still applies the new lint or
+profile settings. In Ruff, editing an inactive profile cut a warm package build from 190 to 63 ms.
+On a larger parser test build, the unchanged repeat after restoring the manifest was 3.75% slower.
+In a separate test on a second host, a lint edit and its first repeat took 18.42% less time when
+building Ruff's serde tests. [Profile edits](https://github.com/astral-experiments/ohm-cargo/pull/286) · [Lint edits](https://github.com/astral-experiments/ohm-cargo/pull/288)
+
+Cargo also reuses the lockfile bytes it just encoded when it records the workspace resolution.
+In a Ruff dependency edit, Cargo executed 7.77% fewer instructions. The wall-time measurements
+could not establish a speedup. [Cargo #287](https://github.com/astral-experiments/ohm-cargo/pull/287)
 
 In an earlier experiment on a Codex workspace that had already been built, reusing the dependency
 resolution reduced `cargo metadata` time from 413 to 358 milliseconds and Nextest time from 961 to
