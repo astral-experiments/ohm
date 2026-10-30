@@ -12,13 +12,13 @@ import cgu_inputs
 from local_dev import verify_saved
 from measure import capture, fresh, retire, select
 from objc2_cli import CMD, NEW, OLD, SOURCES, CliTrace, checkout, phase as trace_phase, witness
-from receipt_cargo import CANDIDATE
+from versioned_select import AWARE as CANDIDATE, current
 from study import CHILD, MISSING, PARENT, RECHECK, check_host, compress_bytes, digest, env_for, load, need, save, sdk_id, sha
 from ty_disk import snapshot
 
 ENDPOINTS = ("edit","repeat-1","repeat-2")
 SCORES = (*ENDPOINTS, "edit+repeat-1")
-DESIGN = "objc2 ty CLI / local incremental, entire ty CLI with bound native inputs on exact Cargo #293 / inclusive 12 v3"
+DESIGN = "v2 advisory Apple / true local ty CLI with verified native inputs, aware Cargo / inclusive twelve pairs v1"
 ALLOCATION = int(digest((" ".join((DESIGN,PARENT,CHILD,OLD,NEW,CANDIDATE))).encode()),16) % 924
 FIRST = set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS = {"screen":["PC","CP"], "confirmation":["PC" if i in FIRST else "CP" for i in range(12)]}
@@ -96,7 +96,7 @@ def timed(root, out, role):
              "complete held CLI or any native root CGU differs from the independently empty reference")
         need((typed['count'],typed['roster_sha256'],typed['focus'])==
              (control['count'],control['roster_sha256'],control['focus']), "complete roster or measured target freshness changed")
-        need(b'objc2-0.6.3/src/' in marker and (MISSING in marker)==(role=="P") and (RECHECK in marker)==(role=="C"),"objc2 marker changed")
+        need(b'objc2-0.6.3/src/' in marker and (MISSING in marker)==(role=="P") and (RECHECK+b"-v2:" in marker)==(role=="C") and RECHECK+b":" not in marker,"objc2 marker changed")
         row = dict(endpoint=step,signature=typed,reference=control,product=observed,expected=ref["product"],expected_image=ref["cgu"]["same_path_image"],cargo=clock,
                    depinfo=compress_bytes(dest/"objc2.dep.gz",marker))
         save(dest/"result.json",row)
@@ -119,7 +119,8 @@ def enroll(root):
         need(all(all(checks.values()) for checks in study["clean"].values()), "incorrect real CLI")
         for step in ENDPOINTS:
             need([study["physical"][r][step]["objc2"] for r in "PC"]==[1,0], "objc2 compiler work did not change")
-    need(load(root/"receipts/fixed-cargo-293.json")["commit"]==CANDIDATE,"wrong Cargo pin")
+    compat=load(root/"receipts/versioned/terminal.json")
+    need(current(root)["source"]==CANDIDATE and compat["passed"],"wrong Cargo or incomplete old/new compatibility")
     return {"compiler":[PARENT,CHILD],"cargo":CANDIDATE,"ruff":[OLD,NEW],"providers":sha(root/"receipts/provider-matrix/terminal.json"),
             "Ruff":sha(root/"receipts/objc2-cli/mechanism.json")}
 

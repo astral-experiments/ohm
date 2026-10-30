@@ -10,9 +10,9 @@ import time
 from pathlib import Path
 
 TRIPLE = "aarch64-apple-darwin"
-PARENT = "82911b516fb35608fd70ada4deb6f8429277f410"
-CHILD = "7924254acf6ee5a17473ac47dfb33b5842d72005"
-COMPILER_TREE = "a30a5d101ec7942b211dfeceb57c3bd9274175e8"
+PARENT = "9b4b11ce8cb84020be10dc54a6426807bfa87caa"
+CHILD = "d97de79d0462fec6b08474c677857b6b058f56c2"
+COMPILER_TREE = "6e3a13f15765f2412afb25e57e6482ede5f751b2"
 ASM_BLOB = "d0c705b2dec75939fdd61815263ca9e6c5eb98c6"
 RUFF = "97e3bd58752cccffab11bc5af937ee7b9cda0c6b"
 EDIT = "ef23c9c39eb3029bab0139c3ea7ae6d95c4131e0"
@@ -154,11 +154,9 @@ def env_for(root, sdk):
 
 def sdk_id(sdk, env):
     expected_cargo = CARGO_SOURCE
-    if sdk.name == "native" and (sdk.parent / "receipts/fixed-cargo-293.json").is_file():
-        pinned = load(sdk.parent / "receipts/fixed-cargo-293.json")
-        expected_cargo = "735e1528ed741015c57676dccf05dbdc0ff7bed1"
-        need(pinned["commit"] == expected_cargo and physical(sdk/"bin/cargo") == pinned["binary"]
-             and (sdk/"bin/cargo").samefile(sdk.parent/"cargo-293"), "measured Cargo identity changed")
+    if sdk.name == "native" and (sdk.parent / "receipts/versioned-current.json").is_file():
+        from versioned_select import current
+        expected_cargo = current(sdk.parent)["source"]
     compiler = run(["rustc", "+ohm", "-vV"], env=env).decode()
     cargo = run(["cargo", "+ohm", "-Vv"], env=env).decode()
     need(

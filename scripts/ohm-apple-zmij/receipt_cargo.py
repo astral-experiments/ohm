@@ -40,8 +40,9 @@ def materialize(src):
             for p in sorted((src / "src/compiler").glob("native_link*/**/*.rs"))}}
 
 
-def build(root):
-    receipts = root / "receipts/cargo293"
+def build(root, aware=False):
+    label = "cargo-aware" if aware else "cargo293"
+    receipts = root / "receipts" / label
     check_host(root, 12)
     device = run(["df", "-P", str(root)]).decode().splitlines()[-1].split()[0]
     info = plistlib.loads(run(["diskutil", "info", "-plist", device]))
@@ -49,10 +50,20 @@ def build(root):
     need(str(filesystem["FilesystemType"]).lower() == "apfs" and
          os.stat(filesystem["MountPoint"]).st_dev == root.stat().st_dev, "provider qualification requires APFS")
     save(receipts / "filesystem.json", filesystem)
-    src = root / "receipt-cargo-source"
+    src = root / ("aware-cargo-source" if aware else "receipt-cargo-source")
     source = materialize(src)
+    selected = CANDIDATE
+    if aware:
+        sys.path.insert(0, str(Path(__file__).resolve().parent / "source-transport/versioned"))
+        from prepare_versioned import materialize as apply_version
+        from versioned_select import AWARE
+        ancestry = apply_version(src, "cargo")
+        selected = AWARE
+        assert ancestry[-1]["source"] == selected
+        source = {"commit": selected, "tree": ancestry[-1]["tree"], "base": source, "steps": ancestry,
+                  "lock": sha(src / "Cargo.lock")}
     save(receipts / "source.json", source)
-    work = root / "receipt-cargo-build"
+    work = root / ("aware-cargo-build" if aware else "receipt-cargo-build")
     work.mkdir()
     env = env_for(work, root / "signed")
     compiler = run(["rustc", "+ohm", "-vV"], env=env).decode()
@@ -77,10 +88,10 @@ def build(root):
              and x["target"]["kind"] == ["bin"]]
     need(not leaf["fresh"] and {"ohm-defaults","all-static"} <= set(leaf["features"]), "missing release features")
     output = Path(leaf["executable"])
-    dest = root / "cargo-293"
+    dest = root / ("cargo-aware" if aware else "cargo-293")
     shutil.copyfile(output, dest);dest.chmod(0o555)
     version = run([str(dest), "-Vv"]).decode()
-    need(f"commit-hash: {CANDIDATE}" in version and f"host: {TRIPLE}" in version and sha(output)==sha(dest), "wrong native Cargo")
+    need(f"commit-hash: {selected}" in version and f"host: {TRIPLE}" in version and sha(output)==sha(dest), "wrong native Cargo")
     deps = run(["otool","-L",str(dest)]).decode()
     need(str(work) not in deps, "compiler depends on transient build inputs")
     save(receipts / "product.json", {"source":source, "binary":physical(dest), "version":version, "builder":builder,
@@ -91,7 +102,7 @@ def build(root):
 
 if __name__ == "__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("action",choices=("source","build"));parser.add_argument("path",type=Path)
+    parser.add_argument("action",choices=("source","build","aware"));parser.add_argument("path",type=Path)
     args=parser.parse_args()
     if args.action=="source":print(json.dumps(materialize(args.path.resolve()),sort_keys=True))
-    else:build(args.path.resolve())
+    else:build(args.path.resolve(), aware=args.action=="aware")

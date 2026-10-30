@@ -80,9 +80,10 @@ def audit_objc2(units, work, out):
         dep, = unique.values()
         raw = dep.read_bytes()
         need(b"objc2-0.6.3/src/" in raw, "unrelated objc2 dep-info")
+        need(RECHECK+b":" not in raw, "uninstrumented legacy objc2 advisory")
         compress_bytes(out/("objc2-"+str(index)+".dep.gz"), raw)
         evidence.append({"archive": str(archive), "sha256": sha(archive), "features": unit["features"], "fresh": unit["fresh"],
-                         "source": str(src), "dep": digest(raw), "hard": MISSING in raw, "recheck": RECHECK in raw})
+                         "source": str(src), "dep": digest(raw), "hard": MISSING in raw, "recheck": RECHECK+b"-v2:" in raw, "v1_rule": RECHECK+b":" in raw})
     need(evidence and len({a["archive"] for a in evidence}) == len(evidence), "missing or duplicate objc2 artifact")
     return evidence
 

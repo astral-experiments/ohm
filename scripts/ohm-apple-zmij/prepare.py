@@ -255,7 +255,12 @@ def build_pair(root, checkout):
     src = root / "compiler-source"
     run(["git", "clone", "--shared", "--no-checkout", str(checkout), str(src)], timeout=600)
     need(
-        text_git(src, "rev-parse", CHILD + "^") == PARENT
+        text_git(src, "rev-parse", CHILD + "^") == "7924254acf6ee5a17473ac47dfb33b5842d72005"
+        and text_git(src, "rev-parse", PARENT + "^") == "82911b516fb35608fd70ada4deb6f8429277f410"
+        and text_git(src, "rev-parse", PARENT + ":compiler") == "49c6df377f483d1f3db47dbb71988869dfdcdc61"
+        and text_git(src, "rev-parse", PARENT + ":compiler/rustc_interface/src/passes.rs")
+        == text_git(src, "rev-parse", CHILD + ":compiler/rustc_interface/src/passes.rs")
+        == "ca1e085f38ac756aa37baa2edd2395d163bfedae"
         and text_git(src, "rev-parse", CHILD + ":compiler") == COMPILER_TREE
         and text_git(src, "rev-parse", CHILD + ":" + ASM) == ASM_BLOB,
         "unenrolled Rust source",
