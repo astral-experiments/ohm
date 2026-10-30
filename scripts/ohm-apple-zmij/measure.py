@@ -257,7 +257,11 @@ def capture(argv, cwd, env, out, trace=None, clock=False):
             out / "exec.json.gz", json.dumps(rows, separators=(",", ":")).encode()
         )
     if ast_request and trace is not None:
-        after(host, env, out, rows, prior, argv[2])
+        receipt=after(host, env, out, rows, prior, argv[2])
+        if argv[2]=='build' and status==0:
+            from ast_developer_witness import library_work_products
+            archive,_=products(typed(stdout,True)[0])
+            library_work_products(host[0],out,archive,receipt)
     return status, stdout, stderr, rows, dict(streams=sums, **times)
 
 

@@ -179,11 +179,15 @@ def phase(verb, root, work, sdk, env, role, state, label, trace, dest, *, captur
     marker, body = held[1] if held else marked(work)
     compress_bytes(dest / "zmij.dep.gz", body)
     verdict = None
+    test_debug = None
     if ok:
         selected = result_unit(verb, artifacts)
         copy = held[0] if held else None
         verdict = (test_verdict(selected, state, dest, root / "ruff", copy) if verb == "test"
                    else check_verdict(artifacts, selected, state, work, env, dest, copy))
+        if verb=="test" and trace is not None:
+            from ast_macho_witness import trace_product, identity
+            test_debug=identity(trace_product(dest,trace,native,selected["executable"],verdict))
         if native is not None and label == "edit" and verb == "test":
             need("ruff_python_ast" in native["full"] and native["linkers"], "real test edit did not compile and link")
     else:
@@ -191,6 +195,7 @@ def phase(verb, root, work, sdk, env, role, state, label, trace, dest, *, captur
     row = {"verb": verb, "role": role, "state": state, "argv": ARGS[verb], "status": status, "native": native,
            "fresh_zmij": units[0]["fresh"], "marker": marker, "dirty": dirty, "roster": roster,
            "codes": codes, "product": verdict, "cargo": stats, "streams": stats["streams"]}
+    if test_debug is not None:row["test_debug"]=test_debug
     save(dest / "verified.json", row)
     return row
 

@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   ast-on-293:
-    if: github.ref == 'refs/heads/charlie/qa-apple-ast293-developer'
+    if: github.ref == 'refs/heads/charlie/qa-apple-ast293-debug-names'
     runs-on: namespace-profile-macos-15
     timeout-minutes: 355
     env:
@@ -24,12 +24,14 @@ jobs:
         run: |
           root="$RUNNER_TEMP/apple-ast293-developer"
           python3 -IB scripts/ohm-apple-zmij/test_ast_developer.py -v
+          python3 -IB scripts/ohm-apple-zmij/test_ast_combined.py -v
+          python3 -IB scripts/ohm-apple-zmij/run.py test_cgu scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
           python3 -IB scripts/ohm-apple-zmij/ast_developer.py register "$root"
-          cp scripts/ohm-apple-zmij/ast293-developer-plan.md "$root/receipts/registration.md"
+          cp scripts/ohm-apple-zmij/ast293-debug-names-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}

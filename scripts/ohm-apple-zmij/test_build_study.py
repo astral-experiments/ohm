@@ -81,7 +81,7 @@ def compare_clean(root, out, refs, state):
     arms = {role: clean_image(root, out / role / ("empty-" + state) / "clean", refs[role][state]) for role in "PC"}
     same_fields = ("text","tests","verdicts")
     need(all(refs["P"][state][key] == refs["C"][state][key] for key in same_fields), "different executable code or test behavior")
-    return compare_macho(arms)
+    return compare_macho(arms,incremental=True)
 
 
 def verify_installation(root, role, out, timed, anchors):

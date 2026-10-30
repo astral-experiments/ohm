@@ -42,6 +42,7 @@ def after(host, env, out, events, previous, verb):
         need(bool(sessions) and sessions<=current.keys(),'cache is not the compiler-selected AST work')
         if step.startswith('clean') or step in ('cold','edit'):
             need(bool(sessions & delta.keys()),'observed compiler and new on-disk AST generation disagree')
+    return report
 
 
 def timed_final(work, out):
@@ -54,3 +55,12 @@ def timed_final(work, out):
         check_cache(row)
         census[str(directory.relative_to(work))]=row
     save(out/'timed-final-ast-cache.json',{'generations':generations,'census':census})
+
+def library_work_products(work, out, archive, evidence):
+    """Bind each original AST archive member to its actual statted, hashed incremental CGU."""
+    from ast_archive import examine, live_cgu
+    sessions={Path(row[0]).parent for row in evidence['cache']['files'] if row[0].endswith('/work-products.bin')}
+    need(len(sessions)==1,'ambiguous local library work-product generation')
+    session=work/sessions.pop()
+    _,proof=examine(archive.read_bytes(),live_cgu(session))
+    save(out/'ast-archive-work-products.json',{'session':str(session.relative_to(work)),'archive':str(archive),'proof':proof})

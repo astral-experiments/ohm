@@ -27,7 +27,7 @@ MODES=('structural','screen','confirm')
 
 def orders(verb,mode):
     if mode!='confirm':return ['PC','CP'] if verb=='build' else ['CP','PC']
-    key='ohm/native-ast293/dev/v1/'+verb+'/'+SUBJECTS[verb][1]+'/'+PARENT+'/'+CHILD+'/'+CANDIDATE
+    key='ohm/native-ast293/dev/debug-identity-v2/'+verb+'/'+SUBJECTS[verb][1]+'/'+PARENT+'/'+CHILD+'/'+CANDIDATE
     candidates=list(itertools.combinations(range(12),6))
     allocation=int(sha256(key.encode()).hexdigest(),16)%len(candidates)
     return ['PC' if i in candidates[allocation] else 'CP' for i in range(12)]
@@ -36,8 +36,8 @@ def orders(verb,mode):
 def register(root):
     save(root/'receipts/ast-registration.json',{'rust':{'P':PARENT,'C':CHILD},'cargo':CANDIDATE,
         'ruff':SUBJECTS,'argv':{'build':ARGS,'test':verbs.ARGS['test']},
-        'orders':{v:{m:orders(v,m) for m in MODES} for v in VERBS},'harness':fingerprint_sources(),
-        'criterion':'Positive physical mechanism and complete correctness in both mirrored structural pairs. Then 2 + 12 fresh pairs independently per verb, regardless of the size of the first two wall ratios. Primary first unchanged Cargo. No prior CI data.'})
+        'orders':{v:{m:orders(v,m) for m in MODES} for v in VERBS},'native_identity_source':'0fdb71350b882f13a525ce2caa628fa3ec7825b2','endpoints':['edit-plus-repeat','edit','repeat-1','repeat-2'],'harness':fingerprint_sources(),
+        'criterion':'Positive physical mechanism and complete correctness in both mirrored structural pairs. Then 2 + 12 fresh pairs independently per verb, regardless of the size of the first two wall ratios. Primary consecutive edit plus first unchanged Cargo in one dedicated installation and clock. Three additional endpoint-specific independent installations per role and pair. No prior CI data.'})
 
 
 def seed(root):
@@ -77,13 +77,15 @@ def visit(root,verb,role,out,trace,*,clean=None,invalid=False,timed=False):
 
 
 def product(verb,row):
-    if verb=='test':return row['product']
+    if verb=='test':return {**row['product'],'debug_identity':row.get('test_debug')}
     value=row['reader']
     return {k:v for k,v in value.items() if k in {'value','sha256','archive_sha256','archive_metadata','archive_objects','macho_text'}}
 
 
 def match(verb, got, reference):
-    return got==reference
+    if verb=='build':return got==reference
+    return (bool(got.get('debug_identity')) and bool(reference.get('debug_identity'))
+            and {k:v for k,v in got.items() if k!='raw'}=={k:v for k,v in reference.items() if k!='raw'})
 
 
 def verify_values(verb,refs):
@@ -123,7 +125,7 @@ def effect(verb,p,c):
 
 
 def structural(root,verb,out):
-    all_refs={};baseline=[];errors=[]
+    all_refs={};baseline=[];errors=[];raw_differences=[]
     trace=ExecTrace()
     try:
         trace.ready()
@@ -138,9 +140,11 @@ def structural(root,verb,out):
                 visits[role]={k:physical(row) for k,row in rows.items()}
                 for phase,row in rows.items():
                     if phase=='invalid':continue
-                    if not match(verb,product(verb,row),refs[role][row['state']]):
+                    actual=product(verb,row);expected=refs[role][row['state']]
+                    if actual!=expected:raw_differences.append(f'{i}/{role}/{phase}')
+                    if not match(verb,actual,expected):
                         errors.append(f'{i}/{role}/{phase} differs from same-role empty native build')
-                if i>1 and refs[role]!=all_refs[role]:
+                if i>1 and any(not match(verb,refs[role][state],all_refs[role][state]) for state in ('old','new')):
                     errors.append(f'{i}/{role} empty source changed across separate installations')
                 print(verb,'structural',i,role,'captured',flush=True)
             verify_values(verb,refs)
@@ -160,7 +164,7 @@ def structural(root,verb,out):
             baseline.append({'order':order,'roles':visits,'mechanism':effect(verb,visits['P'],visits['C'])})
     finally:trace.close()
     save(out/'empty-references.json',all_refs)
-    return {'safe':not errors,'errors':errors,'mechanism':all(r['mechanism'] for r in baseline),'pairs':baseline}
+    return {'safe':not errors,'errors':errors,'original_raw_differences':raw_differences,'mechanism':all(r['mechanism'] for r in baseline),'pairs':baseline}
 
 
 def clock(root,verb,mode,out):
@@ -171,30 +175,29 @@ def clock(root,verb,mode,out):
     if mode=='confirm':
         pilot=root/'receipts'/('ast-'+verb+'-screen')/'result.json'
         need(load(pilot).get('valid') is True,'clock pilot missing or unsafe')
+    from ast_point_clock import POINTS,run
     refs=load(structural_root/'empty-references.json');patterns=gate['pairs'];pairs=[];allocation=orders(verb,mode)
     for i,order in enumerate(allocation,1):
-        pair={}
-        for role in order:
-            d=out/f'pair-{i:02}'/role; rows=visit(root,verb,role,d,None,timed=True)
-            for phase,row in rows.items():
-                need(match(verb,product(verb,row),refs[role][row['state']]),f'{verb} {mode} {i}{role} {phase}: changed native bytes or verdict')
-                if phase in ENDPOINTS:
-                    pattern=[p['roles'][role][phase]['zmij_fresh'] for p in patterns]
-                    need(pattern==[row['fresh_zmij']]*2 and all(p['roles'][role][phase]['typed']==typed_fingerprint(row) for p in patterns),'clock/structural typed roster or freshness diverged')
-            pair[role]=rows
-            print(verb,mode,i,role,'verified',flush=True)
+        pair={r:{} for r in order}
+        shift=(i-1)%len(POINTS)
+        for point in POINTS[shift:]+POINTS[:shift]:
+            for role in order:
+                d=out/f'pair-{i:02}'/point/role
+                pair[role][point]=run(root,verb,role,point,d,refs[role],patterns)
+                print(verb,mode,i,point,role,'verified',flush=True)
         pairs.append(pair)
     cal=load(root/'receipts/calibration/result.json')
-    results={'acquired':True,'valid':True,'orders':allocation,'wall':summarize(pairs,allocation),'counter_scope':cal['retired_instruction_scope']}
+    results={'acquired':True,'valid':True,'orders':allocation,'wall':summarize(pairs,allocation,endpoints=POINTS),
+             'primary':'edit-plus-repeat','counter_scope':cal['retired_instruction_scope']}
     if cal['tree_CPU_calibrated']:
         for pair in pairs:
             for r in pair.values():
-                for key in ENDPOINTS:
+                for key in POINTS:
                     c=r[key]['cargo'];c['cpu']=c['user']+c['system']
-        results['cpu_seconds']=summarize(pairs,allocation,'cpu')
-    if cal['retired_instruction_scope']=='whole-tree-calibrated':results['retired_instructions']=summarize(pairs,allocation,'instructions')
+        results['cpu_seconds']=summarize(pairs,allocation,'cpu',POINTS)
+    if cal['retired_instruction_scope']=='whole-tree-calibrated':results['retired_instructions']=summarize(pairs,allocation,'instructions',POINTS)
     if mode=='confirm':
-        primary=results['wall']['repeat-1']
+        primary=results['wall']['edit-plus-repeat']
         results['twofold_confirmed']=primary['median_CI_96.14pct'][0]>2 and primary['one_sided_balanced_sharp_2x_p']<=0.05
     return results
 
