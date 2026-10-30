@@ -8,8 +8,9 @@ from pathlib import Path
 from study import digest, load, need, physical, save
 
 
-def check(root, role, sdk, out):
-    paths = load(root / "receipts/pair.json")["differ"]
+def check(root, role, sdk, out, paths=None):
+    if paths is None:
+        paths = load(root / "receipts/pair.json")["differ"]
     drivers = list((sdk / "lib").glob("librustc_driver*.dylib"))
     need(len(drivers) == 1, "unknown driver")
     want = {str(Path(p)) for p in paths} | {str(drivers[0].relative_to(sdk))}

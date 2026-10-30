@@ -183,19 +183,26 @@ def roster(row):
     return by_unit
 
 
-def run_pair_workspace(root, trace):
+def run_pair_workspace(root, trace, release_roles=None, visits=WORKSPACE_PHASES):
     # All arms use one spelling for their work directory. Start empty before each
     # sequence and again before the clean B build, including Cargo's shared files.
     top = root / "receipts/ty-comparison/workspace"
     work = root / "ty-compared-workspace"
-    work.mkdir()
+    if release_roles is None:
+        work.mkdir()
     import collections
     from workspace_images import compare as compare_image
     summary={};clean_by_role={};cross={};all_failures=[]
     for role in ('P','C'):
-        sdk=select(root,role);env=env_for(work,sdk);identity=None;snapshots={}
+        if release_roles is not None:
+            sdk=release_roles[role]
+            work=root/("packaged-workspace-"+role)
+            work.mkdir()
+        else:
+            sdk=select(root,role)
+        env=env_for(work,sdk);identity=None;snapshots={}
         need('CI' not in env and 'TF_BUILD' not in env and 'CARGO_INCREMENTAL' not in env,'not ordinary developer Cargo')
-        for sequence,phases in (('empty-old',[('clean','old')]),('visit',WORKSPACE_PHASES),('empty-new',[('clean','new')])):
+        for sequence,phases in (('empty-old',[('clean','old')]),('visit',visits),('empty-new',[('clean','new')])):
             check_host(root,65);fresh(work,root/'seed')
             current=sdk_id(sdk,env);identity=identity or current;need(current==identity,'workspace compiler drift')
             before=None
@@ -242,7 +249,8 @@ def run_pair_workspace(root, trace):
         for unit in sorted(left):
             a,b=left[unit][1],right[unit][1];status=compare_image(a['proof'],b['proof'],cross=True)
             rows.append({'unit':list(unit),'status':status,'parent':a['sha'],'child':b['sha']})
-            if status not in ('exact','authenticated-cross-compiler'):all_failures.append(['cross',state,[list(unit),status]])
+            if release_roles is None and status not in ('exact','authenticated-cross-compiler'):
+                all_failures.append(['cross',state,[list(unit),status]])
         cross[state]=dict(collections.Counter(r['status'] for r in rows))
         save(top/('all-clean-across-'+state+'.json'),rows)
     save(top/'paired-physical.json',summary)

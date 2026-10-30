@@ -1,15 +1,16 @@
-name: Developer-mode libm math and full Ruff test builds on Cargo 293
+name: Count genuine Apple workspace links in the published Ohm tools
 on: workflow_dispatch
 permissions:
   contents: read
+  actions: read
 concurrency:
-  group: apple-libm-workspace-cargo-293-${{ github.ref }}
+  group: packaged-apple-full-workspace-${{ github.sha }}
   cancel-in-progress: false
 jobs:
-  libm-on-293:
-    if: github.ref == 'refs/heads/charlie/qa-apple-libm-response-workspace'
+  apple-workspace:
+    if: github.ref == 'refs/heads/charlie/qa-release21-full-workspace'
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 355
+    timeout-minutes: 240
     env:
       PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -20,72 +21,30 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Freeze and verify subjects, provider design and native execution observer
+      - name: Calibrate actual Apple linker, held response inode and physical compiler inputs
         run: |
-          root="$RUNNER_TEMP/apple-libm-on-293"
+          root="$RUNNER_TEMP/release-workspace"
           python3 -IB scripts/ohm-apple-zmij/run.py test_cgu scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
-          python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
-          python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
-          test -s "$root/receipts/observer.json"
           python3 -IB scripts/ohm-apple-zmij/response_fs_schema.py "$root/receipts/response-calibration/schema"
           python3 -IB scripts/ohm-apple-zmij/test_xcode_response.py -q
           python3 -IB scripts/ohm-apple-zmij/test_held_response.py -q
           python3 -IB scripts/ohm-apple-zmij/test_held_response.py native "$root/response-control"
           cp -R "$root/response-control/receipts" "$root/receipts/response-calibration/native"
-          python3 -IB scripts/ohm-apple-zmij/reopen_response_native.py "$root/receipts/response-calibration/native"
-          cp scripts/ohm-apple-zmij/libm-response-workspace-plan.md "$root/receipts/registration.md"
-      - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
+      - name: Download, verify and install the two actual published release archives
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          root="$RUNNER_TEMP/apple-libm-on-293"
-          mkdir "$root/assets"
-          gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-          python3 -IB scripts/ohm-apple-zmij/run.py libm_workspace seed "$root"
-      - name: Bootstrap source-bound 82911b and 3dd3afd and run both native compiler tests
-        run: |
-          root="$RUNNER_TEMP/apple-libm-on-293"
-          python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
-          if ! command -v ninja >/dev/null; then brew install ninja; fi
-          (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
-          python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
-          python3 -IB scripts/ohm-apple-zmij/source-transport/crc/prepare.py "$root/enrolled-rust" > "$root/receipts/crc-source-transport.json"
-          python3 -IB scripts/ohm-apple-zmij/source-transport/libm/prepare.py "$root/enrolled-rust" > "$root/receipts/libm-source-transport.json"
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Build unmodified Cargo 735e and bind exactly one Mach-O to both compilers
-        run: |
-          root="$RUNNER_TEMP/apple-libm-on-293"
-          python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$root"
-          python3 -IB scripts/ohm-apple-zmij/fixed_crc.py pin "$root"
-      - name: Test direct and transitive provider safety against independent empty builds
-        id: provider
-        run: |
-          root="$RUNNER_TEMP/apple-libm-on-293"
-          python3 -IB scripts/ohm-apple-zmij/fixed_crc.py providers "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/provider-matrix/terminal.json" >> "$GITHUB_OUTPUT"
+          python3 -IB scripts/packaged-release-workspace/packages.py 20 "$RUNNER_TEMP/release-workspace"
+          python3 -IB scripts/packaged-release-workspace/packages.py 21 "$RUNNER_TEMP/release-workspace"
+      - name: Execute the original 83-program ordinary Ruff workspace and real deleted-file e2e edit
+        run: python3 -IB scripts/packaged-release-workspace/apple.py "$RUNNER_TEMP/release-workspace"
+      - name: Reopen entire original Mach-O bodies, provider and CGU evidence and native PIDs
+        run: python3 -IB scripts/packaged-release-workspace/apple_reopen.py "$RUNNER_TEMP/release-workspace/receipts" --record
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: libm-workspace-verified-response-provider
-          path: ${{ runner.temp }}/apple-libm-on-293/receipts
-          retention-days: 14
-          if-no-files-found: warn
-      - name: Full Ruff 83-program workspace, two empty references, genuine edit, physical objects, metadata reader and repair
-        id: workspace
-        if: steps.provider.outputs.passed == 'true'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py libm_workspace run "$RUNNER_TEMP/apple-libm-on-293"
-      - name: Verify original provider, every physical program, both empty references and native math
-        if: always() && steps.provider.outputs.passed == 'true' && steps.workspace.outcome != 'skipped'
-        run: |
-          root="$RUNNER_TEMP/apple-libm-on-293"
-          python3 -IB scripts/ohm-apple-zmij/libm_workspace_readback.py "$root/receipts"
-          python3 -IB -c 'import json, pathlib, sys; d=pathlib.Path(sys.argv[1]); assert json.loads((d/"provider-matrix/terminal.json").read_text())["passed"]; assert set(json.loads((d/"libm-workspace.json").read_text()))=={"edit","repeat-1","repeat-2","repair"}' "$root/receipts"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: libm-workspace-verified-response-final
-          path: ${{ runner.temp }}/apple-libm-on-293/receipts
+          name: packaged-20-21-ruff-83-original-macos
+          path: ${{ runner.temp }}/release-workspace/receipts
           retention-days: 14
           if-no-files-found: warn
