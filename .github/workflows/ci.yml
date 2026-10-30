@@ -5,6 +5,16 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      apple_zmij:
+        description: Native QA on an isolated branch
+        type: choice
+        default: none
+        options: [none, mechanism, qualified]
+      apple_pilot_run:
+        description: Earlier signed mechanism run on this exact commit, required for qualified
+        required: false
+        type: string
 
 permissions: {}
 
@@ -13,7 +23,77 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  apple-zmij-mechanism:
+    if: github.event_name == 'workflow_dispatch' && (inputs.apple_zmij == 'mechanism' || inputs.apple_zmij == 'qualified')
+    runs-on: ${{ inputs.apple_zmij == 'mechanism' && 'macos-15' || 'namespace-profile-macos-15' }}
+    timeout-minutes: ${{ inputs.apple_zmij == 'mechanism' && 55 || 300 }}
+    permissions:
+      contents: read
+      actions: read
+    env:
+      PYTHONNOUSERSITE: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Calibrate root, child and grandchild counters and kernel exec capture
+        run: |
+          python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
+          python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$RUNNER_TEMP/apple-zmij"
+      - name: Verify the previously accepted signed pilot on this exact revision
+        if: inputs.apple_zmij == 'qualified'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APPLE_PILOT: ${{ inputs.apple_pilot_run }}
+        run: python3 -IB scripts/ohm-apple-zmij/run.py admit "$RUNNER_TEMP/apple-zmij"
+      - name: Download the pinned Apple release from this repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir "$RUNNER_TEMP/apple-zmij/assets"
+          gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" \
+            --dir "$RUNNER_TEMP/apple-zmij/assets" \
+            --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
+      - name: Verify release, source and complete locked offline registry inputs
+        run: |
+          root="$RUNNER_TEMP/apple-zmij"
+          python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
+          python3 -IB scripts/ohm-apple-zmij/run.py prepare ruff "$root"
+      - name: Exercise the signed native compiler and actual Ruff package
+        if: inputs.apple_zmij == 'mechanism'
+        run: python3 -IB scripts/ohm-apple-zmij/run.py pilot release "$RUNNER_TEMP/apple-zmij"
+      - name: Recover the enrolled Rust commits and build both compilers with one native bootstrap
+        if: inputs.apple_zmij == 'qualified'
+        run: |
+          root="$RUNNER_TEMP/apple-zmij"
+          python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
+          if ! command -v ninja >/dev/null; then brew install ninja; fi
+          (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
+          python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
+          python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
+      - name: Collect two mirrored pairs and conditionally open the separate twelve-pair cohort
+        if: inputs.apple_zmij == 'qualified'
+        run: |
+          root="$RUNNER_TEMP/apple-zmij"
+          python3 -IB scripts/ohm-apple-zmij/run.py cohort screen "$root"
+          if python3 -c 'import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))["accept_screen"] else 1)' "$root/receipts/screen/result.json"; then
+            python3 -IB scripts/ohm-apple-zmij/run.py cohort confirm "$root"
+          fi
+      - name: Reopen raw Cargo streams, native readers and each closed paired projection
+        run: python3 -IB scripts/ohm-apple-zmij/run.py verify "$RUNNER_TEMP/apple-zmij/receipts"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: apple-zmij-${{ inputs.apple_zmij }}
+          path: ${{ runner.temp }}/apple-zmij/receipts
+          retention-days: 14
+          if-no-files-found: warn
   manifest:
+    if: github.event_name != 'workflow_dispatch' || inputs.apple_zmij == 'none'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -141,6 +221,7 @@ jobs:
           bash scripts/test-release-packaging.sh
 
   lint:
+    if: github.event_name != 'workflow_dispatch' || inputs.apple_zmij == 'none'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -190,7 +271,7 @@ jobs:
 
   required-checks-passed:
     name: all required jobs passed
-    if: always()
+    if: always() && (github.event_name != 'workflow_dispatch' || inputs.apple_zmij == 'none')
     needs:
       - manifest
       - lint
