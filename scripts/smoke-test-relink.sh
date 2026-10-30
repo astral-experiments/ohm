@@ -110,3 +110,67 @@ EOF
   exercise default
   exercise relink -Zrelink-only=yes
 done
+
+# Both binaries call into the same native archive. Its path and the build
+# script's output stay constant when we replace the archive.
+mkdir -p declared/src/bin declared/native declared/engine/src
+cp Cargo.toml declared/
+cp engine/Cargo.toml declared/engine/
+cd declared
+cat >build.rs <<'EOF'
+fn main() {
+    let dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    println!("cargo::rerun-if-changed=native/libanswer.a");
+    println!("cargo::rustc-link-search=native={dir}/native");
+    println!("cargo::rustc-link-lib=static=answer");
+}
+EOF
+cat >engine/src/lib.rs <<'EOF'
+pub fn register(value: usize) -> usize {
+    unsafe {
+        core::arch::asm!("/* {0} */", in(reg) value, options(nomem, nostack, preserves_flags));
+    }
+    value
+}
+EOF
+cat >src/bin/first.rs <<'EOF'
+extern "C" { fn answer() -> i32; }
+fn main() { println!("{}", engine::register(unsafe { answer() } as usize)); }
+EOF
+cp src/bin/first.rs src/bin/second.rs
+export CARGO_TARGET_DIR="$PWD/target" CARGO_BUILD_BUILD_DIR="$PWD/build"
+export OHM_SMOKE_LINK_LOG="$PWD/links"
+cat >count-links <<'EOF'
+#!/bin/sh
+for arg do
+  if [ "$arg" = -o ]; then echo link >>"$OHM_SMOKE_LINK_LOG"; break; fi
+done
+exec cc "$@"
+EOF
+chmod +x count-links
+host=$(rustc +"$toolchain" -vV | awk '/^host: / {print $2}')
+linker_var="CARGO_TARGET_$(printf '%s' "$host" | tr '[:lower:]-' '[:upper:]_')_LINKER"
+export "$linker_var=$PWD/count-links"
+write_archive() {
+  printf 'int answer(void) { return %s; }\n' "$1" | cc -x c -c -o answer.o -
+  ar rcs native/libanswer.a answer.o
+}
+check_links() {
+  : >"$OHM_SMOKE_LINK_LOG"
+  cargo +"$toolchain" build --bins --offline
+  for bin in first second; do
+    [[ $("$CARGO_TARGET_DIR/debug/$bin") == "$1" ]]
+  done
+  local count
+  count=$(wc -l <"$OHM_SMOKE_LINK_LOG")
+  if (( count != $2 )); then
+    echo "Expected $2 linker calls for two executables returning $1, observed $count" >&2
+    exit 1
+  fi
+}
+write_archive 17
+cargo +"$toolchain" build --bins --offline
+check_links 17 0
+write_archive 29
+check_links 29 2
+check_links 29 0
