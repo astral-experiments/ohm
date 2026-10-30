@@ -6,7 +6,7 @@ on:
         description: Bootstrap source or reopen the registered immutable compiler
         type: choice
         default: qualification
-        options: [qualification, bootstrap, pilots, holdout, ty-oracle, guest]
+        options: [qualification, bootstrap, pilots, holdout, ty-oracle, guest, reader-controls]
 permissions:
   contents: read
   actions: read
@@ -105,13 +105,13 @@ jobs:
             ${{ runner.temp }}/svc-receiver/receipts
 
   qualification:
-    if: contains(fromJSON('["qualification","ty-oracle","guest"]'), inputs.phase) && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+    if: contains(fromJSON('["qualification","ty-oracle","guest","reader-controls"]'), inputs.phase) && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix:
-        mode: ${{ fromJSON(inputs.phase == 'ty-oracle' && '["census"]' || inputs.phase == 'guest' && '["guest-P","guest-C"]' || '["signed","classic","aware","migrate-classic","migrate-signed","census","cli"]') }}
+        mode: ${{ fromJSON(inputs.phase == 'ty-oracle' && '["census"]' || inputs.phase == 'guest' && '["guest-P","guest-C"]' || inputs.phase == 'reader-controls' && '["aware","migrate-classic","migrate-signed"]' || '["signed","classic","aware","migrate-classic","migrate-signed","census","cli"]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -140,12 +140,14 @@ jobs:
             echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
           } >> "$GITHUB_ENV"
       - name: Authenticate the previous Cargo reader and exercise direct and transitive native providers
-        if: inputs.phase == 'qualification' && matrix.mode != 'cli' && matrix.mode != 'census'
+        if: (inputs.phase == 'qualification' || inputs.phase == 'reader-controls') && matrix.mode != 'cli' && matrix.mode != 'census'
         env:
           GH_TOKEN: ${{ github.token }}
           MODE: ${{ matrix.mode }}
         run: |
           set -euo pipefail
+          sudo apt-get install -y --no-install-recommends b3sum
+          test "$(printf '' | b3sum --no-names)" = af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262
           QA_ROOT="$RUNNER_TEMP/gnu-reviewer-ingress" python3 -IB scripts/ohm-aarch64-fallback/acquire.py
           python3 -IB scripts/ohm-gnu-syscall/providers.py "$MODE"
       - name: Retest the genuine Ruff edit against its independent clean executable
