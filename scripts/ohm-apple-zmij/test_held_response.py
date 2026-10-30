@@ -19,6 +19,7 @@ def kernel_stamp(s):
             'st_mtimespec':time_text(s.st_mtime_ns),'st_ctimespec':time_text(s.st_ctime_ns)}
 
 def synthetic(root,mutator=None):
+    root=root.resolve(strict=True)
     args=['/tool/clang',str(root/'stable.o'),'-o',str(root/'output')];path=root/'response-a123fd.txt'
     body=(' '.join('"'+x+'"' for x in args[1:])+'\n').encode()
     parent={'pid':13,'pgid':9,'ppid':2,'seq':7,'path':'/tool/clang','cdhash':'aa','argv':args,'es_pidversion':381,'es_euid':os.getuid(),'es_mach_time':110}
@@ -93,7 +94,7 @@ class Checks(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:self.assertRaises(RuntimeError,synthetic,Path(root),missed)
     def test_initial_linked_alias(self):
         with tempfile.TemporaryDirectory() as root:
-            root=Path(root);p=root/'response-a812ef.txt';p.write_bytes(b'fixture')
+            root=Path(root).resolve(strict=True);p=root/'response-a812ef.txt';p.write_bytes(b'fixture')
             with DirectoryHandles([root],native=False) as h:
                 h.scan();self.assertIn(p.name,h.initial[root]);self.assertFalse(h.files)
 
