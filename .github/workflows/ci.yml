@@ -80,6 +80,10 @@ jobs:
           export CENSUS_ROOT="$RUNNER_TEMP/gnu-ty-marker-census"
           export CENSUS_SDK="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
           python3 -IB scripts/ohm-gnu-ty-input-census/cli.py
+      - name: Observe settled Cargo dirty reasons and the actual GNU linker inputs
+        run: |
+          export CENSUS_ROOT="$RUNNER_TEMP/gnu-ty-marker-census"
+          python3 -IB scripts/ohm-gnu-ty-input-census/why.py
       - name: Retain original process streams, depfiles and test verdicts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
