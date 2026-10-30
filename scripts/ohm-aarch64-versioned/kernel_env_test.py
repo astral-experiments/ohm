@@ -16,7 +16,7 @@ from pathlib import Path
 import os,sys,subprocess,time
 if 'transition-first' in sys.argv:
     time.sleep(.20)
-    os.execv(sys.executable,[sys.executable,*[v for v in sys.argv[1:] if v!='transition-first']])
+    os.execv(sys.executable,[sys.executable,*[v for v in sys.argv if v!='transition-first']])
 if '--crate-name' in sys.argv:
     time.sleep(.60)
 else:
