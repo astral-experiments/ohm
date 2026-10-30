@@ -1,5 +1,6 @@
 """Rebuild the three measured sources and reopen the resulting native compiler installations."""
 import argparse
+from datetime import datetime, timezone
 import io
 import json
 import os
@@ -13,8 +14,9 @@ import tarfile
 HERE = Path(__file__).resolve().parent
 SVC = HERE.parent
 SCRIPTS = SVC.parent
-sys.path.insert(0, str(SVC))
+sys.path[:0] = [str(HERE), str(SVC)]
 from bootstrap import CHILD, PARENT, git, materialize, rt, stage
+from elf import compare, describe
 
 MEMBERS = rt.load(SCRIPTS / "ohm-aarch64-portable-review/source/sdk-members.json")
 CARGO_SOURCE = "c18e91b514b2c4e4966c9ab03232c804af3e1b57"
@@ -105,7 +107,7 @@ def rustc(role, cargo_transfer):
     print(role, rev, "119 original native files match", flush=True)
 
 
-def cargo(builder_root):
+def cargo(builder_root, unfixed_clock, control_product):
     """Build the enrolled Cargo source with the separate, freshly constructed builder SDK."""
     sys.path.insert(0, str(SCRIPTS / "ohm-aarch64-versioned"))
     import cargo_build
@@ -119,16 +121,36 @@ def cargo(builder_root):
     cargo_build.original.CANDIDATE = source["source"]
     cargo_build.original.TREE = source["tree"]
     cargo_build.original.materialize = cargo_build.materialize
-    cargo_build.original.build_with_selected_sdk()
+    historical = rt.load(HERE / "original-cargo-elf.json")
+    assert historical["source"] == CARGO_SOURCE and historical["elf"]["sha256"] == CARGO_HASH
+    stamp = historical["elf"]["openssl_build_time"]["bytes"]
+    epoch = int(datetime.strptime(stamp, "built on: %a %b %d %H:%M:%S %Y UTC").replace(tzinfo=timezone.utc).timestamp())
+    assert epoch == 1793374538
+    cargo_build.original.build_with_selected_sdk(source_date_epoch=None if unfixed_clock else epoch)
     product = rt.load(rt.ROOT / "product/product.json")
-    result = rt.sha(rt.ROOT / "product/cargo")
+    binary = rt.ROOT / "product/cargo"
+    body = binary.read_bytes()
+    elf = describe(body)
+    result = elf["sha256"]
+    rt.save(rt.LOG / "cargo-elf.json", elf)
     rt.save(rt.LOG / "physical-cargo.json", {"source": source, "measured": CARGO_HASH, "rebuilt": result,
+                                            "source_date_epoch": None if unfixed_clock else epoch,
                                             "builder": builder, "product": product})
-    assert result == CARGO_HASH, f"rebuilt Cargo {result}, original {CARGO_HASH}"
     assert product["git"] == CARGO_SOURCE and product["SDK_driver"] == builder["driver"][0]
+    compressed = rt.ROOT / "product/cargo.zst"
+    subprocess.run(["zstd", "-q", "-T2", "-3", binary, "-o", compressed], check=True)
+    if unfixed_clock:
+        assert control_product is None
+        return
+    if control_product is not None:
+        control = rt.LOG / "clock-control"
+        control.mkdir()
+        shutil.copyfile(compressed, control / "pinned-cargo.zst")
+        shutil.copyfile(control_product.with_suffix(".zst"), control / "unpinned-cargo.zst")
+        differences = compare(body, control_product.read_bytes())
+        rt.save(control / "comparison.json", differences)
+    assert result == CARGO_HASH and elf == historical["elf"], f"rebuilt Cargo {result}, original {CARGO_HASH}"
     cargo_build.unit()
-    subprocess.run(["zstd", "-q", "-T2", "-3", str(rt.ROOT / "product/cargo"),
-                    "-o", str(rt.ROOT / "product/cargo.zst")], check=True)
 
 
 def verify_ruff(role, receipts):
@@ -159,6 +181,8 @@ if __name__ == "__main__":
     bootstrap.add_argument("--cargo-transfer", type=Path)
     build_cargo = actions.add_parser("cargo")
     build_cargo.add_argument("builder_root", type=Path)
+    build_cargo.add_argument("--unfixed-clock", action="store_true", help="build a diagnostic current-time Cargo")
+    build_cargo.add_argument("--control-product", type=Path, help="compare every ELF byte to the diagnostic build")
     ruff = actions.add_parser("verify-ruff")
     ruff.add_argument("role", choices=("parent", "patched"))
     ruff.add_argument("receipts", type=Path)
@@ -166,6 +190,6 @@ if __name__ == "__main__":
     if args.action == "rustc":
         rustc(args.role, args.cargo_transfer)
     elif args.action == "cargo":
-        cargo(args.builder_root)
+        cargo(args.builder_root, args.unfixed_clock, args.control_product)
     else:
         verify_ruff(args.role, args.receipts)

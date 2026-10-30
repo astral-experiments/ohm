@@ -15,12 +15,14 @@ def main():
     select,roles,_=compare.installable(inp/'sdk.tar.zst',CURRENT,inp/'native',expected_tree=kit.TREE);select('P')
     build_with_selected_sdk()
 
-def build_with_selected_sdk():
+def build_with_selected_sdk(*, source_date_epoch=None):
     source=rt.ROOT/'exact-cargo-source';entry=materialize(source)
     assert entry['commit']==CANDIDATE and entry['tree']==TREE and entry['entries']==3114
     job=rt.ROOT/'cargo-build';job.mkdir();out=rt.LOG/'cargo-293-source';out.mkdir()
     save(out/'source.json',entry)
     env=rt.environment();env.update(CARGO_HOME=str(job/'registry'),CARGO_TARGET_DIR=str(job/'target'),CARGO_BUILD_BUILD_DIR=str(job/'shared'))
+    if source_date_epoch is not None:
+        env['SOURCE_DATE_EPOCH']=str(source_date_epoch)
     assert not any((job/n).exists() for n in ('target','registry','shared'))
     compiler=rt.record(['rustc','+ohm','-vV'],out/'compiler',source,env)
     base=rt.record(['cargo','+ohm','-Vv'],out/'builder',source,env)

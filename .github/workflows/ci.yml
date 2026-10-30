@@ -8,6 +8,10 @@ on:
         type: choice
         default: qualify
         options: [qualify, holdout]
+      clock_control:
+        description: Also build Cargo with the current system clock and compare both complete ELFs
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -35,13 +39,26 @@ jobs:
         run: bash scripts/ohm-gnu-syscall/source-rebuild/prepare.sh
       - name: Rebuild and verify the original 119-file SDK used to compile Cargo
         run: python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py rustc builder
+      - name: Build the optional OpenSSL clock control at the same physical paths
+        if: inputs.clock_control
+        run: |
+          set -euo pipefail
+          builder="$QA_ROOT"
+          export QA_ROOT="$RUNNER_TEMP/gnu-cargo293-build"
+          mkdir -p "$QA_ROOT/receipts"
+          python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py cargo "$builder" --unfixed-clock
+          mv "$QA_ROOT" "$RUNNER_TEMP/gnu-cargo-clock-control"
       - name: Rebuild and test Cargo at the recorded source and physical paths
         run: |
           set -euo pipefail
           builder="$QA_ROOT"
           export QA_ROOT="$RUNNER_TEMP/gnu-cargo293-build"
           mkdir -p "$QA_ROOT/receipts"
-          python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py cargo "$builder"
+          control=()
+          if [[ -f "$RUNNER_TEMP/gnu-cargo-clock-control/product/cargo" ]]; then
+            control=(--control-product "$RUNNER_TEMP/gnu-cargo-clock-control/product/cargo")
+          fi
+          python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py cargo "$builder" "${control[@]}"
       - name: Transfer the rebuilt Cargo to the two compiler workers in this run
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -59,6 +76,7 @@ jobs:
           name: source-build-builder
           path: |
             ${{ runner.temp }}/gnu-cargo293-build/receipts
+            ${{ runner.temp }}/gnu-cargo-clock-control/receipts
             ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
           if-no-files-found: error
           retention-days: 30
