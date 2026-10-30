@@ -5,12 +5,12 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: qa-gnu-provider-edge-20261030
+  group: qa-gnu-stock-provider-edge-20261030
   cancel-in-progress: false
 jobs:
   ruff:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-register-comments-20261030'
-    name: Validate direct and dependent native input changes with both Rust compilers
+    name: Check matching upstream Cargo 1.99 and Rust 1.99 against direct and library provider changes
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 130
     steps:
@@ -23,7 +23,7 @@ jobs:
       - name: Reopen the fixed protocol, counter and native cross toolchain
         run: |
           set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-provider-edge"
+          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-stock-provider-edge"
           mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inputs"
           printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
           (cd scripts/ohm-aarch64-registers && sha256sum -c SHA256SUMS)
@@ -34,30 +34,13 @@ jobs:
           dpkg-query -W gcc-aarch64-linux-gnu libc6-dev-arm64-cross binutils-aarch64-linux-gnu qemu-user strace valgrind > "$QA_ROOT/receipts/packages"
           echo 'def5fdcf6ae64a4d3e6af3786b622978d8313e0734ecf3f6cbe71d8be9e274c8  /usr/bin/valgrind.bin' | sha256sum -c -
           python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
-      - name: Acquire exactly the two enrolled private artifacts from the successful independent bootstrap
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          cd "$QA_ROOT/inputs"
-          gh api "repos/$GITHUB_REPOSITORY/actions/runs/41057968152" --jq '[.head_sha,.status,.conclusion] | @tsv' > workflow
-          test "$(cat workflow)" = "$(printf 'c54c565ebbf3116322c61689ba6d793c5f637de0\tcompleted\tsuccess')"
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12977632631/zip" > sdk.zip
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12977184593/zip" > native.zip
-          echo 'da327a22d280aca99b74b60b07cb962fe88cacdba2a197960254d1a5c1cd2338  sdk.zip' | sha256sum -c -
-          echo '44cb09e19e4297460c62fab748a7ba8c49d47bbeadf80d23a83d5134a1c917ee  native.zip' | sha256sum -c -
-          test "$(unzip -Z1 sdk.zip)" = linux-aarch64-sdk-pair.tar.zst
-          unzip -qp sdk.zip linux-aarch64-sdk-pair.tar.zst > sdk.tar.zst
-          unzip -q native.zip -d native
-          echo 'd4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b  sdk.tar.zst' | sha256sum -c -
-      - name: Run the registered native provider sequences with both complete SDKs
-        run: |
-          python3 -IB scripts/ohm-aarch64-registers/edges.py "$QA_ROOT/inputs/sdk.tar.zst" d4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b
+      - name: Run both provider graphs with the authenticated official stable Linux host and target
+        run: python3 -IB scripts/ohm-aarch64-registers/stock_edges.py
       - name: Retain sources, original data, all complete programs and any qualification failures
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-register-provider-edges
-          path: ${{ runner.temp }}/gnu-aarch64-provider-edge/receipts
+          name: gnu-register-stock-provider-edges
+          path: ${{ runner.temp }}/gnu-aarch64-stock-provider-edge/receipts
           retention-days: 7
           if-no-files-found: error

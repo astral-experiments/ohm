@@ -33,10 +33,12 @@ BUILD='''fn main(){
 '''
 def write(p,s):
     p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s)
-def run(root, role, placement, defaults):
+def run(root, role, placement, defaults, stock_source=None):
     cwd=rt.ROOT/'edges';cwd.mkdir(); env=rt.environment();work=rt.ROOT/'edges-work';work.mkdir()
     env.update(CARGO_HOME=str(work/'cargo-home'),CARGO_TARGET_DIR=str(work/'target'),CARGO_BUILD_BUILD_DIR=str(work/'shared'),
                CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=q.CROSS)
+    if stock_source:
+        for name in ("target","shared"):(work/name).mkdir()
     manifest='[package]\nname="qa_owned_test"\nversion="0.0.1"\nedition="2021"\n[dependencies]\ntrigger={path="trigger"}\n'
     if placement=='library':manifest+='barrier={path="barrier"}\n'
     write(cwd/'Cargo.toml',manifest);write(cwd/'build.rs',BUILD)
@@ -114,7 +116,7 @@ def run(root, role, placement, defaults):
     visit('malformed-real-Rust-edit');visit('empty-malformed',True)
     early.unlink();version(15);visit('missing-real-Rust-edit');visit('empty-missing',True)
     late.write_bytes(initial);version(19);visit('restored-real-Rust-edit');visit('empty-restored',True);visit('restored-unchanged')
-    save(root/'completed.json',{'source':{'P':subject.BASE,'C':subject.TREATMENT}[role],'placement':placement,'defaults':defaults,'cases':arms,'source_shape':sha(cwd/'src/main.rs'),'build_rs':sha(cwd/'build.rs')})
+    save(root/'completed.json',{'source':stock_source or {'P':subject.BASE,'C':subject.TREATMENT}[role],'placement':placement,'defaults':defaults,'cases':arms,'source_shape':sha(cwd/'src/main.rs'),'build_rs':sha(cwd/'build.rs')})
     parked=rt.ROOT/('closed-'+root.name);parked.mkdir()
     cwd.rename(parked/'source');work.rename(parked/'work')
 
