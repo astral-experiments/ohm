@@ -10,7 +10,7 @@ on:
         description: Native QA on an isolated branch
         type: choice
         default: none
-        options: [none, crc]
+        options: [none, crc-provider]
 
 permissions: {}
 
@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   apple-zmij-mechanism:
-    if: github.event_name == 'workflow_dispatch' && inputs.apple_zmij == 'crc'
+    if: github.event_name == 'workflow_dispatch' && inputs.apple_zmij == 'crc-provider'
     runs-on: namespace-profile-macos-15
     timeout-minutes: 240
     permissions:
@@ -62,15 +62,18 @@ jobs:
           python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/source-transport/crc/prepare.py "$root/enrolled-rust" > "$root/receipts/crc-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Observe both compiler orders with independent clean products and real native inputs
-        run: python3 -IB scripts/ohm-apple-zmij/run.py zlib_study mechanism "$RUNNER_TEMP/apple-zmij"
+      - name: Compare external native archives on the exact CRC parent and candidate
+        run: |
+          python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
+          python3 -IB scripts/ohm-apple-zmij/provider_edges.py "$RUNNER_TEMP/apple-zmij" first
+          python3 -IB scripts/ohm-apple-zmij/provider_edges.py "$RUNNER_TEMP/apple-zmij" rest
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: apple-zlib-crc-mechanism
+          name: crc-native-provider-matrix
           path: ${{ runner.temp }}/apple-zmij/receipts
           retention-days: 14
-          if-no-files-found: warn
+          if-no-files-found: error
   manifest:
     if: github.event_name != 'workflow_dispatch' || inputs.apple_zmij == 'none'
     runs-on: ubuntu-latest
