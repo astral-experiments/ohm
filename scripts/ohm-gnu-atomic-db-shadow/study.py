@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import re
+import runpy
 import shutil
 import stat
 import subprocess
@@ -264,8 +265,7 @@ def main():
             for p in actual_sdk.rglob('*') if p.is_file()} == expected_sdk
     save(out / 'observation.json', {'cmd': CMD, 'compiler': sdk.SOURCE['candidate'], 'states': STATES,
                                     'system_provider': identity['lower'], 'rows': status})
-    from verify import verify_rows
-    result = verify_rows(status)
+    result = runpy.run_path(str(HERE / 'verify.py'))['verify_rows'](status)
     save(out / 'terminal.json', result)
     print(json.dumps(result), flush=True)
     assert not result['failures']
