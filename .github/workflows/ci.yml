@@ -5,14 +5,14 @@ on:
       task:
         description: Verify the enrolled Cargo fix
         type: choice
-        options: [signed-ruff-recovery]
+        options: [signed-ruff-recovery, matched-channel-upgrade]
         required: true
 permissions:
   contents: read
   actions: read
 jobs:
   recovery:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-repair-cache-upgrade-20261030' && inputs.task == 'signed-ruff-recovery'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-repair-cache-upgrade-20261030' && (inputs.task == 'signed-ruff-recovery' || inputs.task == 'matched-channel-upgrade')
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 110
     steps:
@@ -41,6 +41,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Build each Cargo source and exercise the independent Ruff controls
+        if: inputs.task == 'signed-ruff-recovery'
         env:
           QUALIFICATION_TOKEN: ${{ github.token }}
         run: |
@@ -50,25 +51,37 @@ jobs:
           sudo apt-get -qq update
           sudo apt-get install -y --no-install-recommends ninja-build strace build-essential cmake pkg-config libssl-dev perl
           python3 -IB protocol/scripts/cargo-diagnostic-fix/qualification.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c" "$GITHUB_WORKSPACE/protocol/scripts/ohm-apple-zmij/cargo293/source.pack"
+      - name: Run matched dev-channel Cargo migrations and physical output controls
+        if: inputs.task == 'matched-channel-upgrade'
+        env:
+          QUALIFICATION_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
+          test "$(git -C existing-counter rev-parse HEAD)" = 927e20bcad028e5ed4290a58bd330a258ee5da41
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends ninja-build strace build-essential cmake pkg-config libssl-dev perl
+          python3 -IB protocol/scripts/cargo-recovery-upgrade/layout_controls.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c" "$GITHUB_WORKSPACE/protocol/scripts/ohm-apple-zmij/cargo293/source.pack"
       - name: Migrate already poisoned real Ruff and fully fresh check targets
+        if: inputs.task == 'signed-ruff-recovery'
         run: |
           set -eu
           python3 -IB protocol/scripts/cargo-recovery-upgrade/upgrade.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: final-cargo-ruff-repair-and-upgrade
+          name: ${{ inputs.task == 'matched-channel-upgrade' && 'matched-cargo-repair-and-upgrade' || 'final-cargo-ruff-repair-and-upgrade' }}
           path: ${{ runner.temp }}/ordinary-ron-check/packet
           retention-days: 7
           if-no-files-found: warn
       - name: Run the candidate's new in-tree regression tests against both Cargo products
-        if: always()
+        if: always() && inputs.task == 'signed-ruff-recovery'
         run: |
           set -eu
           test -f "$RUNNER_TEMP/ordinary-ron-check/packet/buildkit/C/built.json"
           python3 -IB protocol/scripts/cargo-diagnostic-fix/targeted.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
+        if: always() && inputs.task == 'signed-ruff-recovery'
         with:
           name: final-cargo-unit-and-integration
           path: ${{ runner.temp }}/ordinary-ron-check/test-packet

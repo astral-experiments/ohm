@@ -23,3 +23,14 @@ completely fresh old visit with zero compiler processes. Its upgraded
 recheck must restore the warning, followed by a zero-compiler new visit.
 A defaults-off same-path upgrade, a positive forced missing-output check,
 and a distinct empty Ruff build serve as separate controls.
+
+The independent matched-channel control uses the ordinary release-source build
+with the bootstrap's exact `CFG_RELEASE_CHANNEL=dev` and `CFG_RELEASE=1.99.0-dev`
+for both source roles. On one fixed-path alias a signed Cargo first confirms a
+poisoned real Ruff source. Replacing it with its same-source Cargo must keep
+the old failure and replacing it with the fixed source must recover the
+warning. With defaults disabled the same three binaries must keep the exact
+unit-output path and start no compilers on either replacement. Missing and
+independent empty-output controls retain original bytes, native process
+inventories and compiler JSON. The earlier unlabelled source-build artifact
+and its failed opt-out reuse condition remain independently accessible.

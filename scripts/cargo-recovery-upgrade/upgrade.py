@@ -22,11 +22,11 @@ def init_sdk():
             if f.name!='cargo':(sdk/'bin'/f.name).symlink_to(f,target_is_directory=f.is_dir())
 def install(role,env):
     std=m.R/'sdk-21';sdk=SDK()
-    src=std/'bin/cargo' if role=='signed' else m.R/'sdk-C/bin/cargo'
+    src={'signed':std/'bin/cargo','parent':m.R/'sdk-P/bin/cargo','fixed':m.R/'sdk-C/bin/cargo'}[role]
     dst=sdk/'bin/cargo';temp=sdk/'bin/new-cargo'
     assert not temp.exists();shutil.copyfile(src,temp);temp.chmod(0o755);os.replace(temp,dst)
     ver=m.get(['cargo','+ohm','-Vv'],env=env).decode()
-    head=(q.materialize.BASE if role=='signed' else json.loads((q.HERE/'spec.json').read_bytes())['head'])
+    head=(q.materialize.BASE if role in ('signed','parent') else json.loads((q.HERE/'spec.json').read_bytes())['head'])
     assert 'commit-hash: '+head in ver and m.sha(dst)==m.sha(src)
     st=lambda p:(p.stat().st_dev,p.stat().st_ino,p.stat().st_ctime_ns)
     rust=sdk/'bin/rustc';driver,=(sdk/'lib').glob('librustc_driver*.so')
