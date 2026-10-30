@@ -1,12 +1,17 @@
 name: Private target GC filesystem diagnosis
 on:
   workflow_dispatch:
+    inputs:
+      task:
+        type: choice
+        options: [baseline, qualify]
+        default: baseline
 permissions:
   contents: read
   actions: read
 jobs:
   native:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-private-gc-overlay-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-private-gc-overlay-20261031' && inputs.task == 'baseline'
     strategy:
       fail-fast: false
       matrix:
@@ -56,5 +61,118 @@ jobs:
           path: |
             ${{ runner.temp }}/private-gc/packet
             ${{ runner.temp }}/private-gc/receipts/21
+          retention-days: 7
+          if-no-files-found: error
+  candidates:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-private-gc-overlay-20261031' && inputs.task == 'qualify'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [standalone, combined]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/private-gc-overlay
+            scripts/gc-mount-evidence
+            scripts/cargo-diagnostic-fix
+            scripts/ohm-apple-zmij/cargo293
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: reader
+          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
+          persist-credentials: false
+          sparse-checkout: scripts/packaged-release-workspace
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install verified signed -21 source-build toolchain and stable 1.99 suite compiler
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/private-gc"
+          mkdir -m700 "$root"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends strace libsecret-1-dev libssl-dev pkg-config
+          rustup toolchain install 1.99.0 --profile minimal
+          python3 -IB reader/scripts/packaged-release-workspace/packages.py 21 "$root"
+      - name: Reopen complete product Git tree and build its feature-qualified Cargo
+        run: python3 -IB protocol/scripts/private-gc-overlay/qualify.py build "${{ matrix.role }}" "$RUNNER_TEMP/private-gc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: disposable-private-gc-${{ matrix.role }}
+          path: ${{ runner.temp }}/private-gc/deliver
+          retention-days: 3
+          if-no-files-found: error
+      - name: Public Cargo GC on actual overlay
+        run: |
+          root="$RUNNER_TEMP/private-gc"
+          python3 -IB protocol/scripts/private-gc-overlay/observe.py "$root" "$root/deliver" "${{ matrix.role }}" "$root/visits" overlay
+      - name: Original named library lock test and twelve original overlay integration cases
+        if: '!cancelled()'
+        run: python3 -IB protocol/scripts/private-gc-overlay/qualify.py tests "${{ matrix.role }}" "$RUNNER_TEMP/private-gc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: candidate-overlay-${{ matrix.role }}
+          path: |
+            ${{ runner.temp }}/private-gc/packet
+            ${{ runner.temp }}/private-gc/build-cert
+            ${{ runner.temp }}/private-gc/receipts/21
+          retention-days: 7
+          if-no-files-found: error
+  ext4:
+    needs: candidates
+    if: '!cancelled() && inputs.task == ''qualify'''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [standalone, combined]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/private-gc-overlay
+            scripts/gc-mount-evidence
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: reader
+          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
+          persist-credentials: false
+          sparse-checkout: scripts/packaged-release-workspace
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install original signed SDK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          root="$RUNNER_TEMP/private-gc"
+          mkdir -m700 "$root"
+          if ! command -v strace; then sudo apt-get update -qq; sudo apt-get install -y --no-install-recommends strace; fi
+          python3 -IB reader/scripts/packaged-release-workspace/packages.py 21 "$root"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: disposable-private-gc-${{ matrix.role }}
+          path: ${{ runner.temp }}/download
+      - name: Real ext4 held/released profile and an independent nested bind mount
+        run: |
+          root="$RUNNER_TEMP/private-gc"
+          python3 -IB protocol/scripts/private-gc-overlay/observe.py "$root" "$RUNNER_TEMP/download" "${{ matrix.role }}" "$root/visits" ext4
+          python3 -IB protocol/scripts/private-gc-overlay/mount_control.py "${{ matrix.role }}" "$root"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: candidate-ext4-${{ matrix.role }}
+          path: ${{ runner.temp }}/private-gc/packet
           retention-days: 7
           if-no-files-found: error

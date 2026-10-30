@@ -77,8 +77,15 @@ def main(root,other,role,base,expect_fs):
     sdk=(root/'sdk-21').resolve()
     assert sha(sdk/'bin/cargo') == CARGOS['signed']
     out=root/'packet'/role;out.mkdir(parents=True)
+    candidate=role in ('standalone','combined')
+    if candidate:
+        spec=json.loads((Path(__file__).resolve().parent/'sources'/role/'candidate-source/spec.json').read_bytes())
+        SOURCES[role]=spec['head']
     if role!='signed':
         doc=json.loads((other/'build.json').read_bytes())
+        if candidate:
+            assert doc['qa']==os.environ['GITHUB_SHA'] and doc['tree']['tree']==spec['tree'] and doc['tree']['mode_path_sha256_inventory']==spec['inventory']
+            CARGOS[role]=doc['compiled']
         if role=='shared-fix':
             assert doc['qa']=='5032f93b1a2e08f3bc2f6ed6425df3f6e28bead9'
         assert doc['candidate']==SOURCES[role] and sha(other/'cargo')==doc['compiled']==doc['delivered']==CARGOS[role]
@@ -138,6 +145,18 @@ def main(root,other,role,base,expect_fs):
     assert all(s['outside']==before['outside'] for s in states.values())
     assert all(states['held-real'][name]==before[name] for name in ['inside','root_output','sibling','old_lock','held_lock'])
     assert fstat['held-real']['payload'][2]==1
+    if candidate:
+        assert all(states['released-real'][name] is None for name in ['inside','root_output','sibling'])
+        assert all(states['released-real'][name]==before[name] for name in ['old_lock','held_lock','outside'])
+        assert fstat['released-real']['payload'][2]==0
+        assert str(lock) in cmds['held-real']['stderr'] and 'Busy lock' in cmds['held-dry']['stderr']
+        if expect_fs=='overlay':
+            assert before['profile']['d_ino']!=before['profile']['lstat'][1]
+            assert before['inside']['lstat'][0]!=before['profile']['lstat'][0]
+            assert before['inside']['mount_id']==before['profile']['mount_id']
+            trace=gzip.decompress((out/'released-real.trace.gz').read_bytes())
+            assert any(b'openat2(' in line and b'RESOLVE_NO_XDEV' in line and b'private-visible-output' in line and b' = -1' not in line for line in trace.splitlines())
+        print('Recovered private outputs with unchanged outside and held inode.',role,expect_fs,flush=True)
     print(role,expect_fs,{phase:(v['inside'] is not None,v['root_output'] is not None,v['sibling'] is not None) for phase,v in states.items()},flush=True)
 
 if __name__=='__main__':main(Path(sys.argv[1]),Path(sys.argv[2]),sys.argv[3],Path(sys.argv[4]),sys.argv[5])
