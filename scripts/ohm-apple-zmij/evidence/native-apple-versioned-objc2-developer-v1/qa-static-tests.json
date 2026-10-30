@@ -1,0 +1,72 @@
+{
+  "b3sum": "3d6cd4d70ae70d1a719847a6b9c0810f0d7153db40bccd69ecbc48ed0bdb14ca",
+  "commands": [
+    {
+      "argv": [
+        "versioned_selftest.py"
+      ],
+      "exit": 0,
+      "stderr": "1bac2ada38a6c8e32b725e792dd34c6b63924d865ecff52db9c34b69b4b53b1e",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "run.py",
+        "test_cgu",
+        "native-fixtures/developer-root-cgu-prior.zip"
+      ],
+      "exit": 0,
+      "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "f5fbab11dc4d132a751026ed726741a50e868d88077bd9abc7bd16bee73f98bf"
+    },
+    {
+      "argv": [
+        "test_cli_images.py"
+      ],
+      "exit": 0,
+      "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "1cbefa44cb5454748ec0e230a1838eac4b6e8e30152ec125fd5b8fd7e28cf81d"
+    },
+    {
+      "argv": [
+        "test_provider_edges.py",
+        "-v"
+      ],
+      "exit": 0,
+      "stderr": "e3be62488f4c599fc19291b29b4b8691f88656ed85d21a2a6a6c651f8e123a3c",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "run.py",
+        "test_protocol",
+        "-v"
+      ],
+      "exit": 0,
+      "stderr": "18f75179f10eaaf299ba9e3ad316a9261fa20aada91d1cb7e7716d7bb0061125",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "versioned.py",
+        "--help"
+      ],
+      "exit": 0,
+      "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "a6b4f5fb831d3ce8dad1133a038702fb54d54fdb0ad487d707bbc005bf7771e3"
+    },
+    {
+      "argv": [
+        "versioned_registry.py",
+        "--help"
+      ],
+      "exit": 0,
+      "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "4e077c166dc7726a18ac666966b06f782de60e6932884f970a42cc38f1e602cb"
+    }
+  ],
+  "passed": true,
+  "paths": 25,
+  "transport": "89ad3649b0883fdb1c76d442b5d93f7feee2a2075653fbdbabab466946e7ee22",
+  "workflow": "a9a51ab4a385cc336a07b6c94ecc9663455c80d589dc2dab12dc62b8c86f2b8a"
+}
