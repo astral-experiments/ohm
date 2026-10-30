@@ -16,6 +16,10 @@ import census
 CRATES={'rustix':'1.1.5','tempfile':'3.27.0','portable_atomic':'1.13.1'}
 TEMPLATES=re.compile(rb'\basm(?: [a-z_]+)*\s+"((?:\\[0-9A-Fa-f]{2}|[^"\\]|\\.)*)"\s*,\s*"((?:\\[0-9A-Fa-f]{2}|[^"\\]|\\.)*)"')
 
+def roster(rows):
+    return sorted(json.dumps([m[k] for k in ('package_id','target','features','profile')],sort_keys=True)
+                  for m in rows if m['reason']=='compiler-artifact')
+
 
 def captured():
     argv=sys.argv[1:]
@@ -72,7 +76,7 @@ def reemit(root,out,crate,records,expected):
             'site_record':census.sha(folder/'sites.json')}
 
 
-def counter(root,out,env,src,ordinary,prog):
+def counter(root,out,env,src,ordinary,prog,registered):
     stats=root/'callgrind';stats.mkdir()
     lib=Path(os.environ['CENSUS_SDK']).resolve()
     command=[str(lib/'bin/cargo'),*census.CLI[2:]]
@@ -86,7 +90,7 @@ def counter(root,out,env,src,ordinary,prog):
     assert msgs[-1]=={'reason':'build-finished','success':True}
     listed=[m for m in msgs if m['reason']=='compiler-artifact']
     executable,=[m['executable'] for m in listed if m['profile']['test'] and m['executable'] and m['target']['name']=='ty_project']
-    assert len(listed)==304 and Path(executable).samefile(prog) and census.sha(prog)==before
+    assert roster(listed)==registered and Path(executable).samefile(prog) and census.sha(prog)==before
     for name in sorted(census.NEW_TESTS):
         r=subprocess.run(['qemu-aarch64','-L','/usr/aarch64-linux-gnu',str(prog),'--exact',name,'--test-threads=1'],cwd=src/'crates/ty_project',env=env,capture_output=True,timeout=180)
         assert r.returncode==0 and f'test {name} ... ok'.encode() in r.stdout and b'1 passed; 0 failed' in r.stdout
@@ -129,12 +133,14 @@ def main():
     assert messages[-1]=={'reason':'build-finished','success':True}
     outputs=[m for m in messages if m['reason']=='compiler-artifact']
     prog,=[Path(m['executable']) for m in outputs if m['executable'] and m['profile']['test'] and m['target']['name']=='ty_project']
-    assert len(outputs)==304 and set(p.stem for p in records.glob('*.json'))==set(CRATES)
+    baseline=list(map(json.loads,gzip.decompress((receipts/'repeat/stdout.gz').read_bytes()).splitlines()))
+    registered=roster(baseline)
+    assert registered and roster(outputs)==registered and set(p.stem for p in records.glob('*.json'))==set(CRATES)
     assert census.sha(prog)==terminal['phases']['repeat']['product']['sha256']
     original={r['crate']:r['argv'] for r in prior['rustcs']}
     overview={name:reemit(root,out,name,records,original[name]) for name in sorted(CRATES)}
     census.save(out/'ir-terminal.json',overview)
-    counter(root,out,env,src,prior['rustcs'],prog)
+    counter(root,out,env,src,prior['rustcs'],prog,registered)
 
 
 if __name__=='__main__':
