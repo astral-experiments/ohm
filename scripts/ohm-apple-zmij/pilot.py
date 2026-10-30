@@ -42,7 +42,7 @@ VECTOR = b'asm!("/*{:v}*/", inout(vreg) extended);'
 
 def has_output(argv, output):
     return any(
-        flag == "-o" and Path(p).is_file() and Path(p).samefile(output)
+        flag == "-o" and (Path(p) == output or output.is_file() and Path(p).is_file() and Path(p).samefile(output))
         for flag, p in zip(argv, argv[1:])
     )
 
@@ -52,11 +52,14 @@ def observer_probe(root):
     probe.mkdir()
     clang = run(["xcrun", "--find", "clang"]).decode().strip()
     ld = Path(run(["xcrun", "--find", "ld"]).decode().strip())
+    sdk = Path(run(["xcrun", "--sdk", "macosx", "--show-sdk-path"]).decode().strip()).resolve(strict=True)
+    system = sdk / "usr/lib/libSystem.tbd"
+    need(system.is_file(), "active macOS SDK is missing its libSystem stub")
     source = probe / "main.c"
     source.write_text("int main(void){return 29;}\n")
     def invoke(label, trace):
         output = probe / ("linked-" + label)
-        argv = [clang, "-v", str(source), "-o", str(output)]
+        argv = [clang, "-v", "-isysroot", str(sdk), str(source), "-o", str(output)]
         dest = root / "receipts/observer-probe" / label
         dest.mkdir(parents=True)
         rows, code = [], None
@@ -87,6 +90,7 @@ def observer_probe(root):
                 save(dest / "result.json", {
                     "argv": argv, "status": code, "events": rows, "printed_linker": printed,
                     "clang": [clang, sha(clang)], "ld": [str(ld), sha(ld)],
+                    "sdk": str(sdk), "libSystem": sha(system),
                     "output": digest(data) if data else None, "exit": verdict,
                 })
         return code, rows, output, verdict, printed

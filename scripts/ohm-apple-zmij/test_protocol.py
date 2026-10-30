@@ -17,7 +17,7 @@ from cohort import summarize
 from measure import typed
 from objects import archive_evidence, bag
 from pilot import has_output
-from wrapper import compiler_selector
+from wrapper import WrapperTrace, compiler_selector
 
 
 class Protocol(unittest.TestCase):
@@ -172,6 +172,7 @@ class Protocol(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             output = root / "output"
+            self.assertTrue(has_output(["ld", "-o", str(output)], output))
             output.touch()
             alias = root / "alias"
             alias.symlink_to(output)
@@ -179,6 +180,22 @@ class Protocol(unittest.TestCase):
             foreign.touch()
             self.assertTrue(has_output(["ld", "-o", str(alias)], output))
             self.assertFalse(has_output(["ld", str(output), "-o", str(foreign)], output))
+
+    def test_only_the_diagnostic_sets_the_exact_compiler(self):
+        with tempfile.TemporaryDirectory() as td:
+            rustup = Path(td)
+            compiler = rustup / "toolchains/ohm/bin/rustc"
+            compiler.parent.mkdir(parents=True)
+            compiler.symlink_to(sys.executable)
+            env = dict(os.environ, RUSTUP_HOME=td, RUSTC="rustc")
+            argv = ["cargo", "+ohm", "build"]
+            proc = subprocess.CompletedProcess(argv, 0)
+            with patch("wrapper.subprocess.run", return_value=proc) as child:
+                code, rows = WrapperTrace().command(argv, env=env, cwd=rustup, out=None, err=None)
+            self.assertEqual((code, env["RUSTC"]), (0, "rustc"))
+            self.assertEqual(child.call_args.args[0], argv)
+            self.assertEqual(child.call_args.kwargs["env"]["RUSTC"], str(compiler.resolve()))
+            self.assertEqual(rows[0]["selected_rustc"], str(compiler.resolve()))
 
     def test_whole_single_branch_transition(self):
         with tempfile.TemporaryDirectory() as t:

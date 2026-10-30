@@ -77,6 +77,9 @@ class WrapperTrace:
             source = Path(env["RUSTUP_HOME"]) / "toolchains/ohm/bin/rustc"
             env = dict(env, QA_APPLE_CALLS=directory, QA_APPLE_REAL_RUSTC=str(source.resolve()))
             if argv[:2] == ["cargo", "+ohm"]:
+                # A hosted PATH can contain another rustc shim. Only this diagnostic
+                # invocation names the SDK binary explicitly; ordinary Cargo runs keep their environment.
+                env["RUSTC"] = str(source.resolve(strict=True))
                 env["RUSTC_WRAPPER"] = str(Path(__file__).resolve())
                 cmd = argv
             else:
@@ -84,7 +87,7 @@ class WrapperTrace:
                 cmd = [str(Path(__file__).resolve()), str(source.resolve()), *argv[2:]]
             code = subprocess.run(cmd, env=env, cwd=cwd, stdout=out, stderr=err, timeout=timeout).returncode
             rows = [json.loads(p.read_bytes()) for p in sorted(Path(directory).glob("*.json"))]
-            return code, [{"scope": self.kind}, *rows]
+            return code, [{"scope": self.kind, "selected_rustc": str(source.resolve(strict=True))}, *rows]
 
 
 if __name__ == "__main__":
