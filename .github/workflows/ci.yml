@@ -5,16 +5,12 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: gnu-aarch64-actual-native-fallback-20261030
+  group: gnu-aarch64-actual-native-ruff-eligibility-20261030
   cancel-in-progress: false
 jobs:
   block:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-cargo293-link-fallback-20261030'
-    name: Native provider ELF and actual GNU fallback with Cargo ${{ matrix.cargo }}
-    strategy:
-      fail-fast: false
-      matrix:
-        cargo: ['signed', '293']
+    name: Confirm natural Ruff dependencies and complete AArch64 results on fixed Cargo without profiling
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     steps:
@@ -36,6 +32,7 @@ jobs:
           cp scripts/ohm-aarch64-confirm/{PARKED.md,PLAN.md,schedule.json,SHA256SUMS} "$QA_ROOT/receipts/"
           python3 -IB scripts/ohm-aarch64-confirm/study.py schedule | cmp - "$QA_ROOT/receipts/schedule.json"
           python3 -IB scripts/ohm-aarch64-confirm/local_selector_test.py
+          python3 -IB scripts/ohm-aarch64-fallback/frontend_test.py
           git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd
@@ -51,18 +48,51 @@ jobs:
           python3 -IB scripts/ohm-aarch64-compact/acquire.py
           python3 -IB scripts/ohm-aarch64-fallback/acquire.py
           bash scripts/ohm-aarch64-confirm/ancestor.sh "$RUNNER_TEMP/gnu-compact-public-ancestor"
-      - name: Exercise both literal barriers, native search, matched wrong inputs and independent empty executables
+      - name: Independently reopen the fixed and signed native GNU behavior before the Ruff check
         env:
-          SUBJECT_CARGO: ${{ matrix.cargo }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/ohm-aarch64-fallback/custody.py gh "$QA_ROOT/receipts/provider-admission" require-safe
+      - name: Run the three independent Ruff edit, invalid, clean and real CI-environment controls
         run: |
           set -euo pipefail
-          python3 -IB scripts/ohm-aarch64-fallback/native.py "$SUBJECT_CARGO" "$RUNNER_TEMP/gnu-compact-public-ancestor" "$QA_ROOT/inputs" "$QA_ROOT/inputs/fixed"
-          python3 -IB scripts/ohm-aarch64-fallback/verify_native.py "$QA_ROOT/receipts" "$QA_ROOT/receipts/independent-native.json"
-      - name: Preserve actual successes and any stale or rejected native outcome
+          python3 -IB scripts/ohm-aarch64-fallback/ruff_native.py "$RUNNER_TEMP/gnu-compact-public-ancestor" "$QA_ROOT/inputs" "$QA_ROOT/inputs/fixed"
+          python3 -IB scripts/ohm-aarch64-confirm/verify_transitions.py "$QA_ROOT/receipts" "$QA_ROOT/receipts/independent-nine.json"
+      - name: Retain all work and namespaces before any instruction comparison
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-physical-${{ matrix.cargo }}-provider
+          name: gnu-ruff-735e1528-native-only
           path: ${{ runner.temp }}/gnu-aarch64-ruff-screen/receipts
+          retention-days: 7
+          if-no-files-found: error
+  audit:
+    needs: [block]
+    name: Reopen every ordinary process, ELF and archive from the completed counter-free installation
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Acquire and verify the exact completed native archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          read -r id expected key <<< "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts" --jq '.artifacts[]|select(.name=="gnu-ruff-735e1528-native-only")|[.id,.size_in_bytes,.digest]|@tsv')"
+          test "$expected" -gt 0 && test "$expected" -lt 805306368
+          test "$(df -B1 --output=avail "$PWD" | tail -1)" -gt 17179869184
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip" > native.zip
+          test "$(stat -c%s native.zip)" = "$expected"
+          printf '%s  native.zip\n' "${key#sha256:}" | sha256sum -c -
+          python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-aarch64-fallback/verify_ruff_native.py" native.zip independent-native.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-ruff-735e1528-independent-eligibility
+          path: ${{ runner.temp }}/independent-native.json
           retention-days: 7
           if-no-files-found: error
