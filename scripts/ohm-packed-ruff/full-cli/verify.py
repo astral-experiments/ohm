@@ -33,6 +33,7 @@ def verify_disk(where):
     assert {name:total(keys) for name,keys in rootsets.items()}==disk['roots']
     shared=rootsets['target']&rootsets['build'];assert len(shared)==disk['shared_inodes'] and total(shared)==disk['bytes_aliased_between_roots']
     assert len(packed)==disk['packed_files'] and total(packed)==disk['packed_bytes']
+    assert sorted(p for p in ledger if Path(p).name.startswith('s-') and Path(p).name.endswith('-working') and 'incremental' in Path(p).parts)==disk['failed_sessions']
     return disk
 
 
@@ -71,10 +72,12 @@ def verify(logs,stage):
                 assert events[-1]=={'reason':'build-finished','success':phase!='invalid'} and process['exit']==(101 if phase=='invalid' else 0)
                 assert process['stdout_sha256']==hashlib.sha256(gzip.decompress((where/'cargo.stdout.gz').read_bytes())).hexdigest() and process['argv'][-len(schema.CARGO):]==schema.CARGO
                 if phase=='invalid':
-                    assert any(m.get('message',{}).get('code') and m['message']['code']['code']=='E0308' for m in events);continue
+                    assert any(m.get('message',{}).get('code') and m['message']['code']['code']=='E0308' for m in events)
+                    fail=verify_disk(where);observed=read(where/'working.json');assert fail['failed_sessions']==sorted(observed)
+                    grace=read(slot/'repair'/'failed-session-grace.json');assert grace['sessions']==observed and all(grace['ready_ns']>=r['created_ns']+11_000_000_000 for r in observed.values());continue
                 v=read(where/'visit.json');assert v==rows[phase];r=references[arm,branch];assert v['source']==schema.kit.REVS[branch] and v['phase']==phase
                 units,dirty=schema.roster(events,Path(mode['input_root']));roster=read(where/'roster.json.gz');assert roster=={'members':units,'dirty':dirty} and units==r['graph_rows'] and v['dirty_digest']==schema.commit(dirty)
-                disk=verify_disk(where);assert disk['allocated']==v['allocation'] and disk['packed_bytes']==v['packed_bytes']
+                disk=verify_disk(where);assert disk['allocated']==v['allocation'] and disk['packed_bytes']==v['packed_bytes'] and not disk['failed_sessions']
                 assert schema.stable_sdk.output_directory(events,'tikv-jemalloc-sys')==v['jemalloc_out_dir']==r['jemalloc_out_dir']==mode['full_native_paths'][arm]
                 obs=read(where/'native.json.gz');assert obs==r['native'] and obs['cli']['whole']==v['cli'] and obs['reader']['whole']==v['reader']
                 assert gzip.decompress((where/'reader-run.stdout.gz').read_bytes()).decode().strip()==obs['typed']

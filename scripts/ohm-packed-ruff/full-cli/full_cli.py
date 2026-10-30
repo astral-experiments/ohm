@@ -17,6 +17,7 @@ HERE=Path(__file__).resolve().parent
 sys.path[:0]=[str(HERE),str(HERE.parent),str(HERE.parent/'harness')]
 import study as kit
 import disk
+import failed_session
 import native
 import outputs
 import stable_sdk
@@ -103,11 +104,15 @@ def visited_source(phase, branch, where):
 def run_visit(arm, phase, branch, env, where, *, reference=False, trace=False):
     where.mkdir();require(shutil.disk_usage(WORK).free>512*2**20,'insufficient owned work space')
     require(shutil.disk_usage(OUT).free>1500*2**20,'insufficient QA receipt space')
+    if phase=='repair':failed_session.before_repair(WORK,load(where.parent/'invalid'/'working.json'),where/'failed-session-grace.json')
     visited_source(phase,branch,where)
     prefix=['strace','-f','-qq','--seccomp-bpf','-s','65535','-e','trace=execve','-o',where/'exec.raw'] if trace else []
     res=native.run([*prefix,*CARGO],env,TREE,where/'cargo',101 if phase=='invalid' else 0);msg=list(map(json.loads,res.stdout.splitlines()));require(msg[-1]=={'reason':'build-finished','success':phase!='invalid'},'missing final Cargo success or expected rejection')
     if phase=='invalid':
-        diagnostics=[m['message'] for m in msg if m.get('reason')=='compiler-message'];require(any(m.get('code') and m['code']['code']=='E0308' and any('ohm_branch_switch_invalid' in t['text'] for s in m['spans'] for t in s['text']) for m in diagnostics),'wrong invalid-body failure');publish(where/'invalid.json',{'error':'E0308','exit':101});return {'invalid':True}
+        diagnostics=[m['message'] for m in msg if m.get('reason')=='compiler-message'];require(any(m.get('code') and m['code']['code']=='E0308' and any('ohm_branch_switch_invalid' in t['text'] for s in m['spans'] for t in s['text']) for m in diagnostics),'wrong invalid-body failure')
+        abandoned=failed_session.observed(WORK);publish(where/'working.json',abandoned)
+        disk.allocated(WORK/'target',WORK/'build',where,failed_sessions=abandoned)
+        publish(where/'invalid.json',{'error':'E0308','exit':101});return {'invalid':True}
     native_path=stable_sdk.output_directory(msg,'tikv-jemalloc-sys')
     actual=trace_read(where/'exec.raw',arm,phase,where) if trace else None
     rows,dirty=roster(msg);publish(where/'roster.json.gz',{'members':rows,'dirty':dirty})
@@ -115,7 +120,9 @@ def run_visit(arm, phase, branch, env, where, *, reference=False, trace=False):
     if phase in ('first-B','return-A','return-B'):
         require(0<len(dirty)<len(rows) and {'ruff','ruff_python_ast','ruff_python_parser'}<={r['name'] for r in dirty},('unexpected historical edit set',len(dirty),[r['name'] for r in dirty]))
     if phase=='unchanged-B':require(not dirty,'unchanged CLI was recompiled')
-    storage=disk.allocated(WORK/'target',WORK/'build',where);require(min(storage['roots'].values())>0 and storage['all_inodes']>1000,'missing full target or shared-build tree')
+    remaining=failed_session.observed(WORK) if phase=='repair' else {}
+    if phase=='repair':publish(where/'working-after-repair.json',remaining)
+    storage=disk.allocated(WORK/'target',WORK/'build',where,failed_sessions=remaining);require(min(storage['roots'].values())>0 and storage['all_inodes']>1000,'missing full target or shared-build tree')
     if reference or phase=='empty-A':require(storage['packed_files']==0,'packing on a cold branch')
     if phase in BITS:require((storage['packed_files']>0)==(arm=='Packed'),('unexpected old object file count',phase,arm,storage['packed_files']))
     obs,paths=native.observed(msg,branch,kit.REVS[branch],env,ROOT,TREE,WORK,where)
@@ -128,6 +135,7 @@ def run_visit(arm, phase, branch, env, where, *, reference=False, trace=False):
     reference_data=expected['native']
     for name,path in paths.items():native.same_file(path,obs[name],reference_data[name],BODIES,where)
     require({k:v for k,v in obs.items() if k not in paths}=={k:v for k,v in reference_data.items() if k not in paths},'native behavior differs from own empty reference')
+    require(not remaining,('still-unfinalized session after mature repair; all objects counted',list(remaining)))
     result={'arm':arm,'phase':phase,'branch':branch,'source':kit.REVS[branch],'artifact_count':len(rows),'jemalloc_out_dir':native_path,'graph':commit(rows),'dirty':len(dirty),'dirty_digest':commit(dirty),'actual_execs':actual,'allocation':storage['allocated'],'roots':storage['roots'],'cross_root_alias_bytes':storage['bytes_aliased_between_roots'],'older_exclusive_bytes':storage['older_exclusive_bytes'],'packed_count':storage['packed_files'],'packed_bytes':storage['packed_bytes'],'cli':obs['cli']['whole'],'reader':obs['reader']['whole'],'behavior':commit({k:v for k,v in obs.items() if k not in paths})}
     publish(where/'visit.json',result);return result
 
