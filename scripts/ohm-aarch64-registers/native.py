@@ -35,7 +35,7 @@ def assembly():
     save(root / "complete.json", {n: v.hex() for n, v in text.items()})
 
 
-def links():
+def links(main_source=None, bundle_source=None):
     env = rt.environment()
     root = rt.LOG / "native-provider"
     fixture = rt.ROOT / "native-search-fixture"
@@ -47,7 +47,7 @@ def links():
     env.update(CARGO_HOME=str(home / "cargo-home"), CARGO_TARGET_DIR=str(target), CARGO_BUILD_BUILD_DIR=str(shared),
                CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=q.CROSS)
     (fixture / "Cargo.toml").write_text('[package]\nname="qa-probe"\nversion="0.1.0"\nedition="2021"\n')
-    (fixture / "src/main.rs").write_text('''
+    (fixture / "src/main.rs").write_text(main_source or '''
 #[link(name="qa_ohm_external", kind="static")]
 unsafe extern "C" { fn qa_value() -> i32; }
 fn main() {
@@ -142,7 +142,7 @@ fn main() {
     good = command("repaired", 0, 17, ["late"])
     empty("empty-repaired", good, 0, 17, ["late"])
     # The compiler's own rlib classification independently preserves bundled files.
-    (fixture / "bundle.rs").write_text('''#[link(name="qa_ohm_external",kind="static")] unsafe extern "C" { fn qa_value()->i32; }
+    (fixture / "bundle.rs").write_text(bundle_source or '''#[link(name="qa_ohm_external",kind="static")] unsafe extern "C" { fn qa_value()->i32; }
 pub fn value()->usize{let mut x=unsafe{qa_value()} as usize;unsafe{core::arch::asm!("/*{0}*/",inout(reg)x);}x}''')
     for n, lib in (("17", original), ("29", preferred)):
         late.write_bytes(lib)
