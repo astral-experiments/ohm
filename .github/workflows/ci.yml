@@ -5,12 +5,12 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: gnu-versioned-native-reviewer-20261030
+  group: gnu-versioned-counter-reviewer-20261030
   cancel-in-progress: false
 jobs:
   native:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    name: Replay the ordinary released GNU native reviewer workflow
+    name: Run the independent reviewer for the actual GNU Ruff compiler profiles
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
     steps:
@@ -30,7 +30,7 @@ jobs:
           (cd scripts/ohm-aarch64-versioned && sha256sum --quiet -c SHA256SUMS)
           (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd
           python3 -IB scripts/ohm-aarch64-versioned/acquire_builds.py
           python3 -IB - <<'PY'
           import os,shutil,sys
@@ -51,23 +51,24 @@ jobs:
           temp.replace(sdk/'bin/cargo')
           save(rt.LOG/'reviewer-sdk.json',{'source':product['source'],'cargo':sha(sdk/'bin/cargo'),'capsule':checked})
           PY
-      - name: Run the standalone script exactly as a reviewer would
+      - name: Run the standalone counted ordinary Ruff workflow from a fresh installation
         run: |
           set -euo pipefail
-          python3 -IB scripts/ohm-aarch64-portable-review/replay.py V "$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk" "$RUNNER_TEMP/gnu-reviewer-work"
+          python3 -IB scripts/ohm-aarch64-portable-review/count_ir.py V "$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk" "$RUNNER_TEMP/gnu-reviewer-work"
       - name: Preserve whole ELF bodies, kernel receipts, negative stderr and partial records
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: versioned-gnu-public-reviewer-native
+          name: public-versioned-gnu-counter-raw
           path: |
             ${{ runner.temp }}/gnu-reviewer-work/receipts
             ${{ runner.temp }}/gnu-reviewer-ingress/receipts/reviewer-sdk.json
           retention-days: 7
           if-no-files-found: error
-  codegen:
+  reopen:
+    needs: native
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    name: Reopen actual LLVM calls in both complete pilot blocks
+    name: Independently recount every native guest profile and match complete AArch64 products
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
     steps:
@@ -77,18 +78,18 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Authenticate complete pilot archives and enumerate the three role-specific AST profiles
+      - name: Authenticate the fresh reviewer artifact and reread every genuine PID and profile
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
-          python3 -IB scripts/ohm-aarch64-portable-review/review-pilot.py scripts/ohm-aarch64-versioned/qualified-pilot.json scripts/ohm-aarch64-portable-review/classify-first-edit-codegen.py "$RUNNER_TEMP/gnu-codegen-raw-readback"
-      - name: Preserve the individual reopened compiler profile witnesses
+          python3 -IB scripts/ohm-aarch64-portable-review/review-counter-result.py "$GITHUB_RUN_ID" "$GITHUB_SHA" "$RUNNER_TEMP/gnu-counter-raw-readback"
+      - name: Preserve the independent reviewer projections and source binding
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: versioned-gnu-LLVM-pilot-codegen
-          path: ${{ runner.temp }}/gnu-codegen-raw-readback/codegen.json
+          name: public-versioned-gnu-counter-verified
+          path: ${{ runner.temp }}/gnu-counter-raw-readback/verified
           retention-days: 7
           if-no-files-found: warn

@@ -19,6 +19,16 @@ The replay checks every physical rustc, the three source crates' emitted marker 
 
 The portable replay acquires native correctness and compiler counts. The published instruction protocol additionally trains a second fresh old tree, counts every user-space instruction in the actual Cargo and rustc processes through Callgrind, and compares those counted processes with literal native exec argv and inherited jobserver state. See `registration/COUNT.md` for the complete blocked design.
 
+To reproduce the instruction endpoint from a fresh directory, install the Ubuntu 24.04 Valgrind package containing `/usr/bin/valgrind.bin` SHA-256 `def5fdcf6ae64a4d3e6af3786b622978d8313e0734ecf3f6cbe71d8be9e274c8` and a C compiler for its small parent, child and thread calibration. This command includes the seven native checks. It records independent settled, first-edit and immediate-repeat profiles with the original counter and the original fresh edit-cycle functions. Use a different new directory for each role. A single reviewer run contributes zero observations to the registered 12-block comparisons.
+
+```sh
+python3 -IB count_ir.py V /absolute/versioned-sdk /absolute/new-counted-work
+python3 -IB reopen_native.py /absolute/new-counted-work/receipts
+python3 -IB reopen_counter.py /absolute/new-counted-work/receipts
+```
+
+The last command reads the native terminal, every guest profile and its matching Valgrind log, actual argv and jobserver receipt, then recomputes the per-process counts. The original function hashes are in `registration/counter-sources.json`. The settled command uses the genuine dependency search paths recorded by the same installation’s independently empty AST build.
+
 To inspect the exact unpublished source series, use local copies of the public Rust and Cargo repositories. They must contain Rust commit `444c0273a2e2bc0b161e988d43c882349bc2d7a6` and Cargo commit `735e1528ed741015c57676dccf05dbdc0ff7bed1`. The following commands reconstruct every commit, blob and tree in a fresh private bare repository. They read the public repositories as Git object donors.
 
 ```sh
@@ -27,3 +37,5 @@ python3 -IB source/materialize.py cargo /path/to/ohm-cargo /path/to/new-cargo.gi
 ```
 
 The `V` ref contains both GNU literal-comment classifications and the versioned fallback. The `reader` ref contains the Cargo reader for that fallback. The `M-old` ref documents the previously measured unversioned intermediate. The signed Cargo compatibility qualification uses `V`. The later public #276 head changes workflow files only. The candidate result on top of that public head has the same complete compiler, tests, library and source-tool Git trees as the measured revision. See `source/clean-stack.json`.
+
+The proposed Ohm -21 source pin is Rust `c79998a5cd143c445a4b2528f20953b176a65c5d` with Cargo `2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c`. All three Rust patches applied directly to that authenticated full tree. This retains #277’s Darwin CRC classifier and associated tests and the #278 resolver change. The unmodified -21 sources have neither the GNU classification nor the versioned Cargo reader. The instruction measurements described here cover the exact A, N and V builds with the companion reader. See `source/release21-applicability.json` for the source-only check.
