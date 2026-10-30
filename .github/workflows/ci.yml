@@ -1,22 +1,18 @@
 name: CI
-
 on:
   workflow_dispatch:
-
 permissions:
   contents: read
   actions: read
-
 concurrency:
-  group: qa-gnu-tiny-rust-counter-20261030
+  group: qa-gnu-register-ruff-screen-20261030
   cancel-in-progress: false
-
 jobs:
-  linux-registers:
+  ruff:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-register-comments-20261030'
-    name: Qualify whole-process profiling on a genuine single-crate unchanged Cargo invocation
+    name: Compare both Rust compilers on four independent GNU AArch64 Ruff histories
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 80
+    timeout-minutes: 130
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -24,45 +20,45 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Enroll the fixed compiler, operating system and original program
+      - name: Reopen the fixed protocol, counter and native cross toolchain
         run: |
           set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/gnu-registered-counter-smoke"
-          mkdir -p "$QA_ROOT/receipts"
+          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-ruff-screen"
+          mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inputs"
           printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
           (cd scripts/ohm-aarch64-registers && sha256sum -c SHA256SUMS)
-          cp scripts/ohm-aarch64-registers/{PLAN.md,SHA256SUMS} "$QA_ROOT/receipts/"
+          cp scripts/ohm-aarch64-registers/{RUFF-PLAN.md,SHA256SUMS} "$QA_ROOT/receipts/"
           git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd valgrind
-          dpkg-query -W 'gcc*aarch64-linux-gnu' 'libc6*-arm64-cross' binutils-aarch64-linux-gnu qemu-user strace valgrind > "$QA_ROOT/receipts/packages"
-      - name: Restore the frozen original standalone SDK and bind its complete physical roster
-        id: sdk
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd
+          dpkg-query -W gcc-aarch64-linux-gnu libc6-dev-arm64-cross binutils-aarch64-linux-gnu qemu-user strace valgrind > "$QA_ROOT/receipts/packages"
+          echo 'def5fdcf6ae64a4d3e6af3786b622978d8313e0734ecf3f6cbe71d8be9e274c8  /usr/bin/valgrind.bin' | sha256sum -c -
+          python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
+      - name: Acquire exactly the two enrolled private artifacts from the successful independent bootstrap
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          cd "$QA_ROOT"
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12976363109/zip" > sdk.zip
-          echo '00128ca2b0d66344fab2b36c2cb6e2437e5665fac66e8fe175fdacdf0c5b1e60  sdk.zip' | sha256sum -c -
-          test "$(stat -c %s sdk.zip)" = 230733513
+          cd "$QA_ROOT/inputs"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/41057968152" --jq '[.head_sha,.status,.conclusion] | @tsv' > workflow
+          test "$(cat workflow)" = "$(printf 'c54c565ebbf3116322c61689ba6d793c5f637de0\tcompleted\tsuccess')"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12977632631/zip" > sdk.zip
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12977184593/zip" > native.zip
+          echo 'da327a22d280aca99b74b60b07cb962fe88cacdba2a197960254d1a5c1cd2338  sdk.zip' | sha256sum -c -
+          echo '44cb09e19e4297460c62fab748a7ba8c49d47bbeadf80d23a83d5134a1c917ee  native.zip' | sha256sum -c -
           test "$(unzip -Z1 sdk.zip)" = linux-aarch64-sdk-pair.tar.zst
           unzip -qp sdk.zip linux-aarch64-sdk-pair.tar.zst > sdk.tar.zst
-          mkdir -p "$QA_ROOT/rustup/toolchains"
-          python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-aarch64-linux/capsule.py" sdk.tar.zst 686b11a3c8fe73ee5e663e1f0531d6f79aae8351bfe5da40c52faf76321fbb92 C "$QA_ROOT/rustup/toolchains/ohm" | tee "$QA_ROOT/receipts/restored.json"
-          export RUSTUP_HOME="$QA_ROOT/rustup" RUSTUP_AUTO_INSTALL=0
-          test "$(realpath "$(rustup which --toolchain ohm rustc)")" = "$QA_ROOT/rustup/toolchains/ohm/bin/rustc"
-          rustc +ohm -vV > "$QA_ROOT/receipts/rustc-Vv"
-          cargo +ohm -Vv > "$QA_ROOT/receipts/cargo-Vv"
-          rustc +ohm --target=aarch64-unknown-linux-gnu --print cfg > "$QA_ROOT/receipts/cfg"
-          sha256sum "$QA_ROOT"/rustup/toolchains/ohm/lib/librustc_driver-*.so > "$QA_ROOT/receipts/driver"
-      - name: Run the typed native jobserver and physical rustc counter fixture
-        run: python3 -IB scripts/ohm-aarch64-registers/smoke.py
-      - name: Preserve native receipts, including failures
+          unzip -q native.zip -d native
+          echo 'd4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b  sdk.tar.zst' | sha256sum -c -
+      - name: Run the four independently empty registered histories
+        run: |
+          python3 -IB scripts/ohm-aarch64-registers/compare.py "$QA_ROOT/inputs/sdk.tar.zst" \
+            d4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b "$QA_ROOT/inputs/native"
+      - name: Retain sources, original data, all complete programs and any qualification failures
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-register-live-cargo-counter
-          path: ${{ runner.temp }}/gnu-registered-counter-smoke/receipts
+          name: gnu-register-ruff-screen
+          path: ${{ runner.temp }}/gnu-aarch64-ruff-screen/receipts
           retention-days: 7
           if-no-files-found: error
