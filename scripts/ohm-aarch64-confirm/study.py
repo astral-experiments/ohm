@@ -78,10 +78,12 @@ def physical_jobs(prior, phase):
     need(not j["link_tools"] and not j["compiler_probes"] and len(j["cargo"])==1,"unregistered process")
     return {r["crate"] for r in j["rustcs"]}
 
-def block(number, ancestor, inputs):
-    order=schedule().get(number)
-    need(load(HERE/"schedule.json")==schedule(),"changed blocked order")
-    select,history=setup(ancestor,inputs)
+def block(number, ancestor, inputs, enrolled=None):
+    order_file=HERE/"schedule.json" if enrolled is None else rt.LOG/"schedule.json"
+    order_map=schedule() if enrolled is None else enrolled["order_map"]
+    order=order_map.get(number)
+    need(load(order_file)==order_map,"changed blocked order")
+    select,history=setup(ancestor,inputs,None if enrolled is None else enrolled["cargo"])
     rt.select=select
     rt.select("A")
     q.prepare_graph()
@@ -92,9 +94,10 @@ def block(number, ancestor, inputs):
         return
     q.counter=tree_ir.measure
     tree_ir.calibrate()
-    save(rt.LOG/"heldout-registration.json", {"block":number,"order":order,"source":SOURCE,"drivers":DRIVER,"schedule":sha(HERE/"schedule.json"),
+    save(rt.LOG/"heldout-registration.json", {"block":number,"order":order,"source":SOURCE,"drivers":DRIVER,"schedule":sha(order_file),
         "original":ORIGINAL,"current":CURRENT,"cpu":Path("/proc/cpuinfo").read_text().split("model name",1)[-1].splitlines()[0],
-        "boot_digest":sha(Path("/proc/sys/kernel/random/boot_id")),"signed_tools":rt.TOOLS,"cross_gcc":physical(Path(q.CROSS)),
+        "boot_digest":sha(Path("/proc/sys/kernel/random/boot_id")),"signed_tools":rt.TOOLS,
+        "actual_cargo":sha(rt.SDK/"bin/cargo"),"additional_qualification":None if enrolled is None else enrolled["registration"],"cross_gcc":physical(Path(q.CROSS)),
         "qemu":physical(Path(q.QEMU[0])),"counter":physical(Path(tree_ir.VG)),"counter_source":sha(Path(tree_ir.__file__)),
         "installer":sha(rt.SDK/"bin/rustc"),"host":rt.HOST,"target":rt.TARGET,"lock":q.LOCK,"QA":os.environ["GITHUB_SHA"]})
     summary={}; common=None

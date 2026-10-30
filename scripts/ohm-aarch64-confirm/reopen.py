@@ -54,7 +54,7 @@ def calibrate(a):
     assert all(abs(table['repeat'][k]/v-1)<.01 for k,v in table['ordinary'].items())
     return table
 
-def reopen(path, number, git, remote_digest):
+def reopen(path, number, git, remote_digest, order_file=None):
     assert file_sha(path)==remote_digest
     a=Study(path)
     try:
@@ -64,7 +64,7 @@ def reopen(path, number, git, remote_digest):
         assert a.get('qa-head').decode().strip()==configuration["QA"]==git
         assert terminal["heldout"] and terminal["block"]==configuration["block"]==number
         assert terminal["sources"]==configuration["source"]==source and configuration["drivers"]==drivers
-        assert H(a.get('schedule.json'))==configuration['schedule']==file_sha(HERE/'schedule.json')
+        assert H(a.get('schedule.json'))==configuration['schedule']==file_sha(order_file or HERE/'schedule.json')
         assert configuration["order"]==terminal["order"]==schedule[number]
         rosters={};counts={};shards={};reference_argv=None;reports={};sdk={}
         for role in configuration["order"]:
