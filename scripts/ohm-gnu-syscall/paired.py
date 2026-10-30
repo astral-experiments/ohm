@@ -27,7 +27,7 @@ def check_clock(row):
 
 def calibrate(out,watch,loop):
     out.mkdir()
-    cases=[('0','1'),('1','1'),('2','1'),('2','2'),('exec','1')]
+    cases=[('0','1'),('1','1'),('2','1'),('2','2'),('exec','1'),('thread','1'),('thread','2')]
     observations=[];answers=[]
     n=80000000
     for depth,copies in cases:
@@ -159,10 +159,10 @@ def main():
     stable=rt.ROOT/'paired-sdk';shutil.copytree(Path(os.environ['CENSUS_PARENT']),stable,copy_function=os.link)
     tools=rt.ROOT/'observer';tools.mkdir();watch=tools/'watch';loop=tools/'calibrate'
     for src,bin in [(HERE/'watch.c',watch),(HERE/'calibrate.c',loop)]:
-        subprocess.run(['cc','-std=c11','-O2','-Wall','-Wextra','-Werror',str(src),'-o',str(bin)],check=True)
+        subprocess.run(['cc','-std=c11','-O2','-pthread','-Wall','-Wextra','-Werror',str(src),'-o',str(bin)],check=True)
     hw,cpu=calibrate(out/'calibration',watch,loop)
     rt.save(out/'registration.json',{'order':order,'source':[PARENT,CHILD],'driver':DRIVER,'argv':cli.CLI,
-            'primary':'first unchanged cargo build after Ruff 193984681e','hardware':'only after direct, fork, grandchild, duplicate argv and same-pid exec calibration',
+            'primary':'first unchanged cargo build after Ruff 193984681e','hardware':'only after direct, fork, grandchild, duplicate argv, same-pid exec and one/two simultaneous worker-thread calibrations',
             'clock':'measured alongside native process-tree CPU; all scheduled work included','binary':'edited product, isolated rule verdicts and independent same-path, empty two-root build'})
     os.environ['CENSUS_ROOT']=str(rt.ROOT/'ordinary-ruff')
     arms={r:actual_pair(r,out/r,stable,watch,hw,cpu) for r in order}
