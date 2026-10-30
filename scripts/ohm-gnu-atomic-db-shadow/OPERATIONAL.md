@@ -1,0 +1,7 @@
+# Collection history
+
+The original registration SHA-256 is \`2a9cc54c727933fbbfeb22ff9ea1be78c938e231cf70497000361cbcf2d3dde2\`. The source, commands, providers, physical opening evidence, five mutations, forced and independently empty references, and complete ELF comparison are fixed throughout.
+
+* Run 41144623784, artifact 13020189190, SHA-256 \`9b956638114253d406ec1441b7ced05986a35ba0021caafc13c614e2f1d99d55\`. The independent positive and negative C controls ran. After the old Ruff source compiled successfully, the observer lacked a Python JSON import. No Ruff mutation was started.
+* Run 41145151419, artifact 13021110148, SHA-256 \`03c736b51e5583455ffb8ad8178833a0423f6d446d6202a6ab279f7dd4115189\`. Both Rust training visits, all five ordinary visits and four forced visits completed. Following the forced malformed link, Cargo left its previously deleted root short fingerprint absent. The collector required the physical marker before it could request its deletion again and stopped. The raw incomplete archive independently verifies with \`python3 -IB verify.py --partial first-native.zip\`.
+* The amended forced precondition accepts a missing marker only when the previous forced malformed build genuinely returned 101, the previously observed marker paths have all stayed physically missing, and the following command actually invokes a full root compiler and GNU ld. The same independent comparison is required. No reference or error verdict is waived. The complete replay begins from a new empty runner.

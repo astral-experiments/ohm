@@ -231,17 +231,23 @@ def main():
     visit('training-edit', 'absent', 'training')
     for state in STATES:
         visit('ordinary-' + state, state, 'ordinary')
+    previous_markers = []
     for state in STATES:
-        # A failed rustc can already have emptied this file. Record its exact bytes in either case.
+        # An unsuccessful *forced* compile may leave its previously removed marker absent.
         matches = sorted(p for root in roots if root.exists() for p in root.rglob('test-lib-ruff_db')
                          if p.is_file() and not p.is_symlink() and p.with_suffix('.json').is_file())
-        assert matches, 'no genuine root short fingerprint'
         removed = []
-        for f in matches:
-            data = f.read_bytes()
-            assert re.fullmatch(rb'[0-9a-f]{16}', data) or data == b'', (f, data)
-            removed.append([str(f), data.decode()])
-            f.unlink()
+        if matches:
+            for f in matches:
+                data = f.read_bytes()
+                assert re.fullmatch(rb'[0-9a-f]{16}', data) or data == b'', (f, data)
+                removed.append([str(f), data.decode()])
+                f.unlink()
+            previous_markers = matches
+        else:
+            assert state == 'removed' and status['forced-malformed']['exit'] == 101
+            assert previous_markers and all(not os.path.lexists(f) for f in previous_markers)
+            removed = [[str(f), None] for f in previous_markers]
         visit('forced-' + state, state, 'forced', removed)
     for state in STATES:
         for r in roots:

@@ -36,6 +36,12 @@ def verify_rows(rows):
             require(label + ' own input intact', r['pre_slot'] == r['post_slot'])
             require(label + ' actual root GNU ld', r['root_ld'] is not None)
             require(label + ' actual path', bool(r['selected'] if state in ('higher83', 'same-stamp47', 'malformed') else r['missing']))
+            if family in ('forced', 'empty'):
+                require(label + ' real root compile', any(n == 'ruff_db' and not cached for n, cached, *_ in r['rustcs']))
+            if family == 'forced':
+                require(label + ' root fingerprint invalidated', bool(r['forced_short']) and
+                        all(value is not None or (state == 'removed' and rows['forced-malformed']['exit'] == 101)
+                            for _, value in r['forced_short']))
             if state == 'malformed':
                 require(label + ' native error', r['exit'] == 101 and r['invalid_text'] and r['product'] is None
                         and bool(r['root_ld']) and r['root_ld'][2] != [0])
@@ -53,8 +59,6 @@ def verify_rows(rows):
                         all(record[0]['exit'] == 0 and record[1] for record in r['qemu']['checks'].values()))
             else:
                 require(label + ' different native program', r['product']['sha256'] != healthy and not r['qemu']['tests'])
-            if family in ('forced', 'empty'):
-                require(label + ' real root compile', any(n == 'ruff_db' and not cached for n, cached, *_ in r['rustcs']))
         r83, r47 = (rows[family + '-' + s] for s in ('higher83', 'same-stamp47'))
         require(family + ' unique selected code', r83['product'] and r47['product'] and r83['product']['sha256'] != r47['product']['sha256'])
         if family != 'empty':
@@ -72,20 +76,27 @@ def digest(b):
     return hashlib.sha256(b).hexdigest()
 
 
-def audit(data):
+def audit(data, partial=False):
     z = zipfile.ZipFile(io.BytesIO(data))
-    observation, = [n for n in z.namelist() if n.split('/')[-1] == 'observation.json']
-    prefix = observation[:-len('observation.json')]
+    enrolled_path, = [n for n in z.namelist() if n.split('/')[-1] == 'enrolled.json']
+    prefix = enrolled_path[:-len('enrolled.json')]
     def raw(path):
         return z.read(prefix + path)
     def obj(path):
         return json.loads(raw(path))
-    d = obj('observation.json')
+    enrolled = obj('enrolled.json')
+    if partial:
+        assert prefix + 'terminal.json' not in z.namelist()
+        visits = {n.split('/')[-2]:json.loads(z.read(n)) for n in z.namelist()
+                  if n.startswith(prefix+'visits/') and n.endswith('/verdict.json')}
+        assert visits
+        d = {'rows': visits, 'cmd': enrolled['cli'], 'compiler': enrolled['compiler']}
+    else:
+        d = obj('observation.json')
+        assert len(d['rows']) == 17 and d['states'] == list(STATES)
     rows = d['rows']
-    assert len(rows) == 17 and d['states'] == list(STATES)
     assert d['compiler']['reviewed'] == 'cfb921896461bc6e19f43b5d04355752e78cfba7'
     assert d['compiler']['source'] == '4ed3e4d1fa1da4e93f8c761751b3c81dd55ff6cd'
-    enrolled = obj('enrolled.json')
     assert enrolled['compiler']['driver'][0] == '45d8737f938d6ed97be5903342718f087d0af6ea710dd3c2416babc8c570d4b7'
     assert enrolled['lock_sha256'] == 'e37036fd781578faeafa15fc0a09b938dd78bd160c8e3be958dfb74eb975f61c'
     assert enrolled['trees']['49bf50b1c782a4e443ae3edce2fdb6d81c2df562'] == 'cf34a6e6988e47cea33e0d708ce66d3097788101'
@@ -168,13 +179,18 @@ def audit(data):
                     assert digest(gzip.decompress(raw(base + name + '.' + stream + '.gz'))) == rr[stream]
             listed = gzip.decompress(raw(base + 'list.stdout.gz')).decode().splitlines()
             assert sorted(s.removesuffix(': test') for s in listed if s.endswith(': test')) == q['tests']
-    verdict = verify_rows(rows)
-    assert verdict == obj('terminal.json')
+    verdict = {'incomplete': True, 'observed': sorted(rows)} if partial else verify_rows(rows)
+    if not partial:
+        assert verdict == obj('terminal.json')
     return {'zip_sha256': digest(data), 'zip_size': len(data), 'files': len(z.namelist()), 'elfs': elfs, 'verdict': verdict}
 
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('zip', nargs='?', default='-')
+    p.add_argument('--partial', action='store_true', help='Verify completed raw visits of a failed job only')
     a = p.parse_args()
-    print(json.dumps(audit(sys.stdin.buffer.read() if a.zip == '-' else Path(a.zip).read_bytes()), indent=2, sort_keys=True))
+    result = audit(sys.stdin.buffer.read() if a.zip == '-' else Path(a.zip).read_bytes(), a.partial)
+    print(json.dumps(result, indent=2, sort_keys=True))
+    if not a.partial and result['verdict']['failures']:
+        raise SystemExit(1)
