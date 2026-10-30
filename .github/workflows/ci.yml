@@ -1,37 +1,22 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
-    inputs:
-      apple_zmij:
-        description: Native QA on an isolated branch
-        type: choice
-        default: none
-        options: [none, mechanism, qualified]
-      apple_pilot_run:
-        description: Earlier signed mechanism run on this exact commit, required for qualified
-        required: false
-        type: string
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
+  group: ohm-packed-object-ruff-linux
+  cancel-in-progress: false
 
 jobs:
-  apple-zmij-mechanism:
-    if: github.event_name == 'workflow_dispatch' && (inputs.apple_zmij == 'mechanism' || inputs.apple_zmij == 'qualified')
-    runs-on: ${{ inputs.apple_zmij == 'mechanism' && 'macos-15' || 'namespace-profile-macos-15' }}
-    timeout-minutes: ${{ inputs.apple_zmij == 'mechanism' && 55 || 300 }}
-    permissions:
-      contents: read
-      actions: read
+  parser:
+    name: Compare three native compiler configurations on the Ruff parser
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-packed-object-ruff-linux'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 355
     env:
-      PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -40,255 +25,64 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Calibrate root, child and grandchild counters and kernel exec capture
+      - name: Set up repeatable Linux storage and process measurements
         run: |
-          python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
-          python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$RUNNER_TEMP/apple-zmij"
-      - name: Verify the previously accepted signed pilot on this exact revision
-        if: inputs.apple_zmij == 'qualified'
+          set -euo pipefail
+          root="$RUNNER_TEMP/ohm-branch-object-qa"
+          mkdir -p "$root/work" "$root/logs"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends valgrind strace ninja-build
+          command -v rustup zstd cc
+          test -x /usr/bin/valgrind.bin
+          truncate -s 4G "$root/build-ext4.img"
+          /usr/sbin/mkfs.ext4 -q -m 0 -E lazy_itable_init=0,lazy_journal_init=0 "$root/build-ext4.img"
+          sudo mount -o loop,nosuid,nodev,noatime "$root/build-ext4.img" "$root/work"
+          sudo chown "$(id -u):$(id -g)" "$root/work"
+          printf '%s' "$root" > "$root/work/.owned-by-packed-study"
+          findmnt --target "$root/work" > "$root/logs/filesystem.txt"
+          test "$(findmnt -n -o FSTYPE --target "$root/work")" = ext4
+          strace -f -qq -e trace=execve -o "$root/logs/trace-smoke.log" /bin/true
+          cp scripts/ohm-packed-ruff/PLAN.md "$root/logs/PLAN.md"
+          git rev-parse HEAD > "$root/logs/hosted-study-head.txt"
+          (cd scripts/ohm-packed-ruff && sha256sum -c SHA256SUMS)
+      - name: Obtain the immutable signed native Cargo and Wild
         env:
           GH_TOKEN: ${{ github.token }}
-          APPLE_PILOT: ${{ inputs.apple_pilot_run }}
-        run: python3 -IB scripts/ohm-apple-zmij/run.py admit "$RUNNER_TEMP/apple-zmij"
-      - name: Download the pinned Apple release from this repository
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir "$RUNNER_TEMP/apple-zmij/assets"
-          gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" \
-            --dir "$RUNNER_TEMP/apple-zmij/assets" \
-            --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
-      - name: Verify release, source and complete locked offline registry inputs
+          root="$RUNNER_TEMP/ohm-branch-object-qa"
+          gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root" \
+            --pattern 'ohm-1.99.0-20-x86_64-unknown-linux-gnu.tar.gz'
+      - name: Build parent and candidate with one bootstrap and reopen both native SDKs
+        run: bash scripts/ohm-packed-ruff/prepare.sh
+      - name: Verify the toolchain, baseline and locked Ruff inputs
+        run: python3 -IB scripts/ohm-packed-ruff/study.py prepare
+      - name: Compare independent native readers, archive payloads and invalid edits
+        run: python3 -IB scripts/ohm-packed-ruff/study.py qualify
+      - name: Measure the two mirrored triplets and their complete footprints
+        run: python3 -IB scripts/ohm-packed-ruff/study.py screen
+      - name: Measure the separate confirmation if the screen passes
         run: |
-          root="$RUNNER_TEMP/apple-zmij"
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare ruff "$root"
-      - name: Exercise the signed native compiler and actual Ruff package
-        if: inputs.apple_zmij == 'mechanism'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py pilot release "$RUNNER_TEMP/apple-zmij"
-      - name: Recover the enrolled Rust commits and build both compilers with one native bootstrap
-        if: inputs.apple_zmij == 'qualified'
-        run: |
-          root="$RUNNER_TEMP/apple-zmij"
-          python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
-          if ! command -v ninja >/dev/null; then brew install ninja; fi
-          (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
-          python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Collect two mirrored pairs and conditionally open the separate twelve-pair cohort
-        if: inputs.apple_zmij == 'qualified'
-        run: |
-          root="$RUNNER_TEMP/apple-zmij"
-          python3 -IB scripts/ohm-apple-zmij/run.py cohort screen "$root"
-          if python3 -c 'import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))["accept_screen"] else 1)' "$root/receipts/screen/result.json"; then
-            python3 -IB scripts/ohm-apple-zmij/run.py cohort confirm "$root"
+          if python3 -c 'import json,sys;sys.exit(not json.load(open(sys.argv[1]))["admitted"])' "$RUNNER_TEMP/ohm-branch-object-qa/logs/screen/result.json"; then
+            python3 -IB scripts/ohm-packed-ruff/study.py confirm
           fi
-      - name: Reopen raw Cargo streams, native readers and each closed paired projection
-        run: python3 -IB scripts/ohm-apple-zmij/run.py verify "$RUNNER_TEMP/apple-zmij/receipts"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - name: Preserve the ordinary command streams and all storage receipts
         if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: apple-zmij-${{ inputs.apple_zmij }}
-          path: ${{ runner.temp }}/apple-zmij/receipts
-          retention-days: 14
+          name: packed-object-ruff-ordinary
+          path: ${{ runner.temp }}/ohm-branch-object-qa/logs
+          retention-days: 5
           if-no-files-found: warn
-  manifest:
-    if: github.event_name != 'workflow_dispatch' || inputs.apple_zmij == 'none'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          enable-cache: true
-      - name: Check benchmark runner
+      - name: Count every instruction in both returning rustcs on two fresh mirrors
         run: |
-          uv run scripts/benchmark.py --help
-          python3 scripts/test_benchmark.py
-          python3 scripts/benchmark_workflows.py --help
-          python3 scripts/test_workflow_benchmarks.py
-          python3 scripts/test_workflow_results.py
-          uv run scripts/replay_sessions.py --help
-          python3 scripts/test_replay_sessions.py
-          python3 scripts/benchmark_worktree_start.py --help
-          python3 scripts/test_worktree_start.py
-          python3 scripts/test_publish_benchmarks.py
-          python3 scripts/publish_benchmarks.py --check
-          python3 scripts/test_list_patches.py
-      - name: Validate release bootstrap configuration
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          import tomllib
-
-          config = tomllib.loads(pathlib.Path("release/bootstrap.toml").read_text())
-          build = config.get("build", {})
-          if config.get("profile") != "dist":
-              raise SystemExit("Ohm releases must use Rust's distribution profile")
-          if build.get("locked-deps") is not True:
-              raise SystemExit("Ohm releases must preserve their locked dependencies")
-          if build.get("cargo-native-static") is not True:
-              raise SystemExit(
-                  "Ohm releases must statically link Cargo's native dependencies"
-              )
-          if build.get("metrics") is not True:
-              raise SystemExit(
-                  "Optimized Ohm releases require bootstrap build metrics"
-              )
-          if build.get("profiler") is not True:
-              raise SystemExit(
-                  "Optimized Ohm releases require Rust's profiler runtime"
-              )
-          tools = set(build.get("tools", []))
-          missing_tools = {
-              "analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"
-          } - tools
-          if missing_tools:
-              missing = ", ".join(sorted(missing_tools))
-              raise SystemExit(f"Ohm releases must include these tools: {missing}")
-          cargo_features = set(
-              build.get("tool", {}).get("cargo", {}).get("features", [])
-          )
-          if "ohm-defaults" not in cargo_features:
-              raise SystemExit(
-                  "Ohm releases must enable Cargo's ohm-defaults feature"
-              )
-          rust = config.get("rust", {})
-          if rust.get("lld") is not True:
-              raise SystemExit("Wasm builds require the bundled rust-lld linker")
-          wasm = config.get("target", {}).get("wasm32-unknown-unknown", {})
-          if wasm.get("profiler") is not False:
-              raise SystemExit("Wasm must not build the native profiling runtime")
-          if rust.get("channel") != "dev":
-              raise SystemExit(
-                  "Ohm releases must use the dev channel so their unstable interfaces are available"
-              )
-          if rust.get("omit-git-hash") is not False:
-              raise SystemExit("Ohm releases must retain their source Git revision")
-          if rust.get("codegen-units") != 1:
-              raise SystemExit("Ohm releases must use one compiler codegen unit")
-          if rust.get("codegen-units-std") != 1:
-              raise SystemExit("Ohm releases must use one standard-library codegen unit")
-          if rust.get("lto") != "thin":
-              raise SystemExit("Ohm releases must use ThinLTO")
-          if rust.get("jemalloc") is not True:
-              raise SystemExit("Ohm releases must use Rust's jemalloc allocator")
-          if config.get("llvm", {}).get("download-ci-llvm") is not True:
-              raise SystemExit("Ohm releases must reuse Rust's optimized CI LLVM")
-          if config.get("dist", {}).get("compression-formats") != ["gz"]:
-              raise SystemExit(
-                  "Ohm releases must use deterministic gzip-compressed archives"
-              )
-          PY
-      - name: Validate toolchain manifests
-        run: |
-          mapfile -d '' manifests < <(
-            find toolchains -mindepth 2 -maxdepth 2 -type f -name '*.json' -print0 \
-              | sort -z
-          )
-          if [[ ${#manifests[@]} -eq 0 ]]; then
-            echo "no versioned toolchain manifests found" >&2
-            exit 1
+          if python3 -c 'import json,sys;sys.exit(not json.load(open(sys.argv[1]))["admitted"])' "$RUNNER_TEMP/ohm-branch-object-qa/logs/screen/result.json"; then
+            python3 -IB scripts/ohm-packed-ruff/study.py counter
           fi
-          uvx --from check-jsonschema==0.37.4 check-jsonschema \
-            --check-metaschema toolchains/manifest.schema.json
-          for manifest in "${manifests[@]}"; do
-            ./scripts/validate-release-manifest.sh "$manifest"
-          done
-      - name: Protect existing toolchain manifests
-        env:
-          BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
-        run: ./scripts/check-manifest-history.sh "$BASE_REVISION"
-      - name: Test toolchain manifest history
-        run: bash scripts/test-manifest-history.sh
-      - name: Check shell syntax
-        run: |
-          bash -n scripts/*.sh
-          sh -n scripts/install.sh
-      - name: Test release source verification
-        run: ./scripts/test-release-sources.sh
-      - name: Test optimized release builds
-        run: |
-          bash scripts/test-optimized-dist.sh
-          python3 scripts/test_prepare_wild.py
-      - name: Test the Ohm installer and release packaging
-        run: |
-          bash scripts/test-installer.sh
-          bash scripts/test-release-packaging.sh
-
-  lint:
-    if: github.event_name != 'workflow_dispatch' || inputs.apple_zmij == 'none'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    env:
-      # renovate: datasource=pypi depName=actionlint-py
-      ACTIONLINT_VERSION: 1.7.12.24
-      # renovate: datasource=pypi depName=shellcheck-py
-      SHELLCHECK_VERSION: 0.11.0.1
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Preserve native compiler counters, exit status and native readers
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          persist-credentials: false
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          enable-cache: true
-      - name: Check GitHub Actions workflows
-        run: |
-          uvx --from "actionlint-py==$ACTIONLINT_VERSION" \
-            actionlint -config-file .github/actionlint.yaml
-      - name: Check shell scripts
-        run: |
-          uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
-            shellcheck --shell=sh scripts/install.sh
-
-          bash_scripts=()
-          for script in scripts/*.sh; do
-            if [[ "$script" != scripts/install.sh ]]; then
-              bash_scripts+=("$script")
-            fi
-          done
-
-          uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
-            shellcheck --shell=bash "${bash_scripts[@]}"
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: "24.19.0"
-          package-manager-cache: false
-      - name: Install formatting dependencies
-        run: npm ci --ignore-scripts
-      - name: Check Markdown, YAML, and JSON formatting
-        run: ./node_modules/.bin/prettier --check .
-      - name: Audit GitHub Actions workflows
-        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
-        with:
-          advanced-security: false
-          annotations: true
-
-  required-checks-passed:
-    name: all required jobs passed
-    if: always() && (github.event_name != 'workflow_dispatch' || inputs.apple_zmij == 'none')
-    needs:
-      - manifest
-      - lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check required jobs passed
-        env:
-          NEEDS_JSON: ${{ toJSON(needs) }}
-        run: |
-          failing="$(
-            jq -r '
-              to_entries[]
-              | select(.value.result != "success")
-              | "\(.key): \(.value.result)"
-            ' <<< "$NEEDS_JSON"
-          )"
-          if [[ -n "$failing" ]]; then
-            echo "$failing" >&2
-            exit 1
-          fi
+          name: packed-object-ruff-instructions
+          path: ${{ runner.temp }}/ohm-branch-object-qa/logs/counter
+          retention-days: 5
+          if-no-files-found: ignore
