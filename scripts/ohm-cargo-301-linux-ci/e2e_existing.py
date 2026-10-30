@@ -1,6 +1,7 @@
 """One focused native history per preexisting Cargo. The signed Rust and Wild stay identical."""
 import gzip, hashlib, json, os, re, runpy, struct, subprocess, sys
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 import e2e_reason as e
 w,c,slot,root,out=e.w,e.c,e.slot,e.root,e.out
 def read(p):return json.loads(p.read_bytes())
@@ -25,6 +26,14 @@ def sections(p):
 def snapshot_elf(label):
     row=read(out/label/'observed.json');p=Path(row['e2e']);assert e.sha(p)==row['e2e_sha256']
     e.save(out/label/'elf-sections.json',{'file':file_identity(p),'sections':sections(p)})
+    products=json.loads(gzip.decompress((out/label/'selected-products.json.gz').read_bytes()))
+    blobs=out/'selected-rust-metadata';blobs.mkdir(exist_ok=True)
+    for lit,identity in products.items():
+        path=Path(lit)
+        if path.suffix=='.rmeta' and path.name.startswith(('libron-','libinsta-')):
+            body=path.read_bytes();assert e.digest(body)==identity[1]
+            dest=blobs/(identity[1]+'.gz')
+            if not dest.exists():e.gz(dest,body)
     return row
 def provider(repo,env,tools,observed):
     # An earlier ordinary search root already passed to the actual e2e Wild.
