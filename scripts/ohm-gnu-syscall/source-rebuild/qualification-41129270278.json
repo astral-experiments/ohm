@@ -1,0 +1,410 @@
+{
+  "archives": {
+    "source-build-builder": {
+      "bytes": 38804122,
+      "id": 13012932036,
+      "sha256": "sha256:07b930da8656015725d4a83e2b797dc61d55081f1c5d60354cab6a0662b41080"
+    },
+    "source-build-parent": {
+      "bytes": 4615106,
+      "id": 13012843856,
+      "sha256": "sha256:0bd85f975e016ed93fac934a4a6db1ba8810a4c961a59647c0e3cff98000392b"
+    },
+    "source-build-patched": {
+      "bytes": 4343630,
+      "id": 13013094230,
+      "sha256": "sha256:1afa72a4ac1cc91530c355aed04f026e0d074165bd493c9f73e197b586870842"
+    },
+    "source-built-cargo": {
+      "bytes": 16812895,
+      "id": 13013385479,
+      "sha256": "sha256:acc46c5f82237970b068393484276780aae5984751a1ba7a3829777aae6e8358"
+    }
+  },
+  "builder": {
+    "bootstrap": {
+      "stage0_cargo": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24",
+      "stage0_rustc": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2",
+      "stage0_source": "759b73eca37a7b589b1ecc0fea77d94a1f8ca36cddb94f1401c72343e0dc1d4e",
+      "std_tree": "4f7a8f755164dc68fff80790db8a844ae030fd03"
+    },
+    "cargo": [
+      "abf43741c6c75f7fd4a3bcbf1db0cfc29824a07727bde4a3974b3ea44b379c1a",
+      38860104,
+      493
+    ],
+    "commit": "d3538b42a2dc56edb9bffbc9cc2373fb93c35054",
+    "driver": [
+      "a51424740c111a4cfdfc67b39bf498907eb396b4b1f0800c27c4fcafc9e6eb72",
+      142777456,
+      493
+    ],
+    "manifest_sha256": "60a53bc5f48338bc9b6c51ce7a1820d09a781e0033103cb43439d8422ea8a827",
+    "member_count": 119,
+    "original_complete_builder_manifest": "325d6e037d50d7b15415961dba0f71caca127063292b5adabc5a292388c7a670",
+    "role": "builder",
+    "tree": "5b86b3516db45ace6bbbdd536bbff9face291fbd"
+  },
+  "cargo": {
+    "clock_control": {
+      "changed_sections": [
+        ".note.gnu.build-id",
+        ".rela.dyn",
+        ".rodata",
+        ".text"
+      ],
+      "changed_segments": [
+        2,
+        3,
+        11
+      ],
+      "control": "c63d363fa45beae1846e68faf25e38efdacda5bbb85bd8e841853b60fb428ff3",
+      "control_clock": {
+        "bytes": "built on: Fri Oct 30 21:16:58 2026 UTC",
+        "offset": 4413584
+      },
+      "difference_offsets": {
+        ".rodata section entry size": [],
+        "GNU build ID": [
+          812,
+          813,
+          814,
+          815,
+          816,
+          817,
+          818,
+          819,
+          820,
+          821,
+          822,
+          823,
+          824,
+          825,
+          826,
+          827,
+          828,
+          829,
+          830,
+          831
+        ],
+        "OpenSSL timestamp": [
+          4387448,
+          4387449,
+          4387450,
+          4387452,
+          4387454,
+          4387455,
+          4387456,
+          4387458,
+          4387459,
+          4387460,
+          4387461,
+          4387462,
+          4387463,
+          4387464,
+          4387465,
+          4387466,
+          4387467,
+          4387469,
+          4387470,
+          4387471,
+          4387472,
+          4387473,
+          4387474,
+          4387475,
+          4387476,
+          4387477,
+          4387478,
+          4387479,
+          4387480,
+          4387481,
+          4387482,
+          4387483,
+          4387484,
+          4387485
+        ]
+      },
+      "first_other_differences": [
+        536488,
+        536536,
+        542944,
+        576472,
+        961984,
+        962032,
+        962728,
+        962920,
+        963352,
+        963400,
+        964360,
+        965224,
+        965272,
+        1000168,
+        1000192,
+        1004104,
+        1004105,
+        1006984,
+        1008160,
+        1008161,
+        1008808,
+        1010608,
+        1012912,
+        1013128,
+        1014352,
+        1014353,
+        1014520,
+        1014904,
+        1016920,
+        1017736,
+        1021840,
+        1021888,
+        1023856,
+        1024144,
+        1024504,
+        1026016,
+        1026017,
+        1026064,
+        1026280,
+        1027528,
+        1028176,
+        1034584,
+        1037680,
+        1037752,
+        1064656,
+        1064657,
+        1082680,
+        1082681,
+        1085248,
+        1085272,
+        1086088,
+        1086112,
+        1086232,
+        1086256,
+        1087312,
+        1087336,
+        1088392,
+        1088488,
+        1094296,
+        1094320,
+        1094368,
+        1094392,
+        1094512,
+        1094513
+      ],
+      "original_clock": {
+        "bytes": "built on: Fri Oct 30 15:35:38 2026 UTC",
+        "offset": 4387448
+      },
+      "other_different_bytes": 25206,
+      "pinned": "9fb29f6abecad05acb6015990615c5fbb435a5907543f0bd33cf88cada4f5826"
+    },
+    "clock_control_changed_section_bytes": {
+      ".note.gnu.build-id": 20,
+      ".rela.dyn": 225,
+      ".rodata": 24080,
+      ".text": 935
+    },
+    "elf": "9fb29f6abecad05acb6015990615c5fbb435a5907543f0bd33cf88cada4f5826",
+    "marker_unit": "passed",
+    "root_native_commands": 2,
+    "source": "c18e91b514b2c4e4966c9ab03232c804af3e1b57",
+    "source_date_epoch": 1793374538,
+    "typed_units": 389
+  },
+  "parent": {
+    "SDK": {
+      "bootstrap": {
+        "stage0_cargo": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24",
+        "stage0_rustc": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2",
+        "stage0_source": "759b73eca37a7b589b1ecc0fea77d94a1f8ca36cddb94f1401c72343e0dc1d4e",
+        "std_tree": "4f7a8f755164dc68fff80790db8a844ae030fd03"
+      },
+      "cargo": [
+        "9fb29f6abecad05acb6015990615c5fbb435a5907543f0bd33cf88cada4f5826",
+        50945080,
+        493
+      ],
+      "commit": "8f42a1c11e66c2a55299914d5025e4fa7549ead4",
+      "driver": [
+        "d57260c5e0aca0d5957a8a4efbd8f6012baa2a9beb3d7b6c8a2cd224dee581aa",
+        142756408,
+        493
+      ],
+      "manifest_sha256": "12c0b845bfc7023cbf894cef24762519371a8aaa496f2d01d462e7b8e592a2a7",
+      "member_count": 119,
+      "role": "parent",
+      "tree": "43cf560431e6d70ff01db3d4b9e50272153e9dfb"
+    },
+    "ruff": {
+      "phases": {
+        "cold": {
+          "elf": "3ab4cd62da872e3b3d0a1fd994f1b318537dc7d116a4664ed3b6325e8aeb6b84",
+          "elf_bytes": 151761896,
+          "text": "b2777a89f441d4877b0a68e37819587368d2ef57b3756bb2f983d22e47a4aa68"
+        },
+        "edit": {
+          "elf": "ba37da0cb1cff05deb9cf6c276f167343fe43667326d3edf2f502f32460a0908",
+          "elf_bytes": 151696576,
+          "full_rustc": [
+            "build_script_build",
+            "clap",
+            "clap_builder",
+            "clap_complete",
+            "clap_complete_command",
+            "clap_complete_nushell",
+            "portable_atomic",
+            "ruff",
+            "ruff",
+            "ruff_graph",
+            "ruff_linter",
+            "ruff_markdown",
+            "ruff_python_formatter",
+            "ruff_server",
+            "ruff_workspace",
+            "rustix",
+            "tempfile",
+            "terminal_size",
+            "unicode_names2"
+          ],
+          "link_only_rustc": [],
+          "native_link_outputs": [
+            "build_script_build",
+            "ruff"
+          ],
+          "text": "961767f68c5d04be585a05c305c784801b4449c39905495bb1901b6de9e6d3c5"
+        },
+        "empty-new": {
+          "elf": "ba37da0cb1cff05deb9cf6c276f167343fe43667326d3edf2f502f32460a0908",
+          "elf_bytes": 151696576,
+          "text": "961767f68c5d04be585a05c305c784801b4449c39905495bb1901b6de9e6d3c5"
+        },
+        "invalid": {
+          "error": "E0425"
+        },
+        "repair": {
+          "elf": "ba37da0cb1cff05deb9cf6c276f167343fe43667326d3edf2f502f32460a0908",
+          "elf_bytes": 151696576,
+          "text": "961767f68c5d04be585a05c305c784801b4449c39905495bb1901b6de9e6d3c5"
+        },
+        "repeat": {
+          "elf": "ba37da0cb1cff05deb9cf6c276f167343fe43667326d3edf2f502f32460a0908",
+          "elf_bytes": 151696576,
+          "full_rustc": [
+            "build_script_build",
+            "clap",
+            "clap_builder",
+            "clap_complete",
+            "clap_complete_command",
+            "clap_complete_nushell",
+            "portable_atomic",
+            "ruff",
+            "ruff",
+            "ruff_graph",
+            "ruff_linter",
+            "ruff_markdown",
+            "ruff_python_formatter",
+            "ruff_server",
+            "ruff_workspace",
+            "rustix",
+            "tempfile",
+            "terminal_size",
+            "unicode_names2"
+          ],
+          "link_only_rustc": [],
+          "native_link_outputs": [
+            "build_script_build",
+            "ruff"
+          ],
+          "text": "961767f68c5d04be585a05c305c784801b4449c39905495bb1901b6de9e6d3c5"
+        }
+      },
+      "roster": "fa785f925b6590bd62f20f2e84febf57f9dd166c3c78b8607c3cf5076780ec18",
+      "units": 372
+    }
+  },
+  "patched": {
+    "SDK": {
+      "bootstrap": {
+        "stage0_cargo": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24",
+        "stage0_rustc": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2",
+        "stage0_source": "759b73eca37a7b589b1ecc0fea77d94a1f8ca36cddb94f1401c72343e0dc1d4e",
+        "std_tree": "4f7a8f755164dc68fff80790db8a844ae030fd03"
+      },
+      "cargo": [
+        "9fb29f6abecad05acb6015990615c5fbb435a5907543f0bd33cf88cada4f5826",
+        50945080,
+        493
+      ],
+      "commit": "6ae50e2d0139132d86d4fdf50648a4ddfcb2730e",
+      "driver": [
+        "d38721a8dd46c97d253686d920563654b035f25b6f0687c80871fb0a92401084",
+        142753096,
+        493
+      ],
+      "manifest_sha256": "d3b41ff0625ec1cc9d76fefdd76b4d5c6a2a914499a46bb1c37b0b153fa174d2",
+      "member_count": 119,
+      "role": "patched",
+      "tree": "979169f06d795cbf0752bc6e56e1240dc41caeac"
+    },
+    "ruff": {
+      "phases": {
+        "cold": {
+          "elf": "5f9497147fe39b9bdee3e643bbf353a9472d2e8ff0b40bdafe75d9753fc5eda0",
+          "elf_bytes": 151761896,
+          "text": "b2777a89f441d4877b0a68e37819587368d2ef57b3756bb2f983d22e47a4aa68"
+        },
+        "edit": {
+          "elf": "11fc063c6e8917d0e023dd8448fde016aa515636d882a92cf09054a69e6c78b0",
+          "elf_bytes": 151696576,
+          "full_rustc": [
+            "build_script_build",
+            "portable_atomic",
+            "ruff_linter",
+            "unicode_names2"
+          ],
+          "link_only_rustc": [
+            "ruff"
+          ],
+          "native_link_outputs": [
+            "build_script_build",
+            "ruff"
+          ],
+          "text": "961767f68c5d04be585a05c305c784801b4449c39905495bb1901b6de9e6d3c5"
+        },
+        "empty-new": {
+          "elf": "11fc063c6e8917d0e023dd8448fde016aa515636d882a92cf09054a69e6c78b0",
+          "elf_bytes": 151696576,
+          "text": "961767f68c5d04be585a05c305c784801b4449c39905495bb1901b6de9e6d3c5"
+        },
+        "invalid": {
+          "error": "E0425"
+        },
+        "repair": {
+          "elf": "11fc063c6e8917d0e023dd8448fde016aa515636d882a92cf09054a69e6c78b0",
+          "elf_bytes": 151696576,
+          "text": "961767f68c5d04be585a05c305c784801b4449c39905495bb1901b6de9e6d3c5"
+        },
+        "repeat": {
+          "elf": "11fc063c6e8917d0e023dd8448fde016aa515636d882a92cf09054a69e6c78b0",
+          "elf_bytes": 151696576,
+          "full_rustc": [
+            "build_script_build",
+            "portable_atomic",
+            "unicode_names2"
+          ],
+          "link_only_rustc": [
+            "ruff"
+          ],
+          "native_link_outputs": [
+            "build_script_build",
+            "ruff"
+          ],
+          "text": "961767f68c5d04be585a05c305c784801b4449c39905495bb1901b6de9e6d3c5"
+        }
+      },
+      "roster": "fa785f925b6590bd62f20f2e84febf57f9dd166c3c78b8607c3cf5076780ec18",
+      "units": 372
+    }
+  },
+  "qa": "1e3b37ac28ed11a638d3ba2093b54d83ca10ce14",
+  "run": 41129270278
+}
