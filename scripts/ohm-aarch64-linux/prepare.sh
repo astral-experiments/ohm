@@ -18,9 +18,9 @@ fi
 cd "$src"
 parent=82911b516fb35608fd70ada4deb6f8429277f410
 child=f69f7b7cf6de57972b310900decfac2d3a0c6fd6
-test "$(git rev-parse "$child^^")" = "$parent"
+test "$(git rev-parse "$child^^^")" = "$parent"
 test "$(git rev-parse "$parent:compiler")" = 019b0e35598a054357018731f9f8426c0520fc53
-test "$(git rev-parse "$child:compiler")" = 0640088775e03b6948942395dcdeb7220def02a0
+test "$(git rev-parse "$child:compiler")" = 543ce83b4251f8c9ec0d55cee2833dd224396b90
 test "$(git rev-parse "$parent:library")" = "$(git rev-parse "$child:library")"
 test "$(git diff --name-only "$parent" "$child" | wc -l)" -eq 4
 flags=(--ci false --set build.submodules=false --set rust.omit-git-hash=true
@@ -33,7 +33,7 @@ export AR_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-ar
 if [[ "${1:-build}" == test-host ]]; then
     test "$(git rev-parse HEAD)" = "$child"
     test "$(git rev-parse HEAD:tests/run-make/ohm-checked-dep-info)" = 2dacccc466da9358208d2b9a6d3cc36bac5e6fdf
-    test "$(git rev-parse HEAD:tests/run-make/ohm-relink-assembler-inputs)" = d8dd7a06b044a57b8a684d373a57eadd69d1aec6
+    test "$(git rev-parse HEAD:tests/run-make/ohm-relink-assembler-inputs)" = beeb6077efdac7e300e94a653b13a40a3f8a78bb
     python3 x.py "${flags[@]}" test --stage 1 -j8 --host "$host" --target "$host" \
       tests/run-make/ohm-checked-dep-info tests/run-make/ohm-relink-assembler-inputs 2>&1 | tee "$log/x86-host-run-make.log"
     printf '%s\n' "$child" > "$log/x86-host-run-make-pass"
