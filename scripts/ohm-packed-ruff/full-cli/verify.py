@@ -65,6 +65,7 @@ def verify(logs,stage):
         group={}
         for arm in order:
             slot=folder/f'triplet-{i:02}-{arm}';use=read(slot/'sdk.json');assert use['arm']==arm and use['files']==physical[use['role']];rows=read(slot/'complete.json');assert set(rows)=={p for p,_ in schema.VISITS};group[arm]={}
+            head=read(slot/'return-B'/'watched-git-files.json');assert set(head)=={'HEAD','refs/heads/historical-feature'} and head==read(slot/'unchanged-B'/'watched-git-files.json')
             for phase,branch in schema.VISITS:
                 where=slot/phase;events=list(map(json.loads,gzip.decompress((where/'cargo.stdout.gz').read_bytes()).splitlines()));process=read(where/'cargo.json.gz')
                 assert events[-1]=={'reason':'build-finished','success':phase!='invalid'} and process['exit']==(101 if phase=='invalid' else 0)

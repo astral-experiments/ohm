@@ -78,10 +78,32 @@ def trace_read(path, arm, phase, where):
     path.unlink();return native_summary
 
 
+def visited_source(phase, branch, where):
+    # Ruff watches .git/HEAD. Even switching to the current branch rewrites it.
+    if phase!='unchanged-B':
+        kit.source('recovery' if phase=='repair' else phase,branch)
+    if phase not in ('return-B','unchanged-B'):
+        return
+    reference='refs/heads/'+kit.NAMES[branch]
+    require(kit.git('symbolic-ref','HEAD')==reference and kit.git('rev-parse','HEAD')==kit.REVS[branch],'wrong source for unchanged comparison')
+    def watched():
+        result={}
+        for name in ('HEAD',reference):
+            path=TREE/'.git'/name;st=path.lstat();require(stat.S_ISREG(st.st_mode),'missing watched Ruff Git ref')
+            result[name]={'device':st.st_dev,'inode':st.st_ino,'mtime_ns':st.st_mtime_ns,'ctime_ns':st.st_ctime_ns,'sha256':sha(path)}
+        return result
+    before=watched()
+    require(not kit.git('status','--porcelain') and kit.git('rev-parse','HEAD^{tree}')==kit.TREES[branch],'expected clean original Ruff checkout')
+    require(watched()==before,'read-only source check changed a Ruff input')
+    if phase=='unchanged-B':
+        require(before==load(where.parent/'return-B'/'watched-git-files.json'),'Ruff build-script Git inputs changed before its unchanged call')
+    publish(where/'watched-git-files.json',before)
+
+
 def run_visit(arm, phase, branch, env, where, *, reference=False, trace=False):
     where.mkdir();require(shutil.disk_usage(WORK).free>512*2**20,'insufficient owned work space')
     require(shutil.disk_usage(OUT).free>1500*2**20,'insufficient QA receipt space')
-    kit.source('recovery' if phase=='repair' else phase,branch)
+    visited_source(phase,branch,where)
     prefix=['strace','-f','-qq','--seccomp-bpf','-s','65535','-e','trace=execve','-o',where/'exec.raw'] if trace else []
     res=native.run([*prefix,*CARGO],env,TREE,where/'cargo',101 if phase=='invalid' else 0);msg=list(map(json.loads,res.stdout.splitlines()));require(msg[-1]=={'reason':'build-finished','success':phase!='invalid'},'missing final Cargo success or expected rejection')
     if phase=='invalid':
