@@ -68,6 +68,24 @@ def product(data,src,env,old,out):
     dirty=sorted(m['target']['name'] for m in units if not m['fresh'])
     return {'roster':sha(json.dumps(roster).encode()),'unit_count':len(units),'dirty':dirty},f
 
+def retain_elf(executable, expected, where, chunks):
+    with executable.open('rb') as src:
+        file_hash=hashlib.sha256()
+        ordered=[]
+        while block:=src.read(2**20):
+            file_hash.update(block)
+            name=sha(block)
+            census.blob(chunks/(name+'.gz'),block)
+            ordered.append(name)
+    assert file_hash.hexdigest()==expected['sha256'] and executable.stat().st_size==expected['bytes']
+    rt.save(where/'image.json',{'sha256':file_hash.hexdigest(),'bytes':executable.stat().st_size,'ordered_MiB_chunks':ordered})
+
+def empty_roots(work):
+    for n in ('target','shared'):
+        path=work/n
+        assert path.parent==work and path.is_dir() and not path.is_symlink()
+        shutil.rmtree(path)
+
 def private_bytes(work):
     unique={};sessions=collections.Counter();raw=[]
     for directory in [work/'target',work/'shared']:
@@ -133,14 +151,27 @@ def actual_pair(role,out,stable,watch,hw,cpu):
     allocated,files,sessions=private_bytes(work)
     census.blob(out/'disk-inodes.json.gz',json.dumps(sorted(files),separators=(',',':')).encode())
     rt.save(out/'disk.json',{'allocated':allocated,'count':len(files),'sessions':sessions})
-    for n in ('target','shared'):
-        path=work/n
-        assert path.parent==work and path.is_dir() and not path.is_symlink()
-        shutil.rmtree(path)
+    empty_roots(work)
     clean=run_logged(cmd,src,env,out/'independent-empty')
     same,clean_exe=product(clean,src,env,False,out/'independent-empty')
     clean_new=cli.cli_product(clean_exe,False,out/'independent-empty',src,env)
     assert same['roster']==old['roster'] and clean_new==actual_new,(role,clean_new,actual_new)
+    # All native-image retention is after the measured pair, including the
+    # single edited command whose output is examined before any second build.
+    chunks=out.parent/'native-elf/chunks'
+    retain_elf(clean_exe,clean_new,out/'independent-empty',chunks)
+    empty_roots(work)
+    census.command(['git','restore','--source',cli.OLD,'--staged','--worktree','--','.'],src,env)
+    assert census.command(['git','write-tree'],src,env)==cli.TREES[cli.OLD]
+    prior=run_logged(cmd,src,env,out/'independent-old')
+    graph,old_exe=product(prior,src,env,True,out/'independent-old')
+    assert graph['roster']==old['roster'] and cli.cli_product(old_exe,True,out/'independent-old',src,env)==actual
+    retain_elf(old_exe,actual,out/'independent-old',chunks)
+    census.command(['git','restore','--source',cli.NEW,'--staged','--worktree','--','.'],src,env)
+    edited=run_logged(cmd,src,env,out/'individual-edit')
+    graph,edited_exe=product(edited,src,env,False,out/'individual-edit')
+    assert graph==roster['edit'] and cli.cli_product(edited_exe,False,out/'individual-edit',src,env)==clean_new
+    retain_elf(edited_exe,clean_new,out/'individual-edit',chunks)
     assert after==rt.sha(driver) and census.command(['git','write-tree'],src,env)==cli.TREES[cli.NEW]
     measurements={s:{'elapsed_ns':v['stop']-v['start'],'tree_cpu_us':v['user_us']+v['system_us'] if cpu else None,'user_instructions':v['instructions'] if hw else None} for s,v in samples.items()}
     measurements['edit+repeat']={'elapsed_ns':samples['repeat']['stop']-samples['edit']['start'],
