@@ -1,18 +1,23 @@
 """Require exact standalone marker rules on the actual cross compiler and bundle controls."""
 from pathlib import Path
 import shutil
+import runpy
+import hashlib
 import sys
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE));sys.path.insert(0,str(HERE.parent/"ohm-aarch64-compact"))
 from version_kit import PARENT, CHILD
-from classifier import PRIOR, NEW
+CLASSIFIER=runpy.run_path(str(HERE.parent/'ohm-aarch64-compact/classifier.py'))
+PRIOR,NEW=CLASSIFIER['PRIOR'],CLASSIFIER['NEW']
 from kit import rt
 from study import digest, save, sha
 
 def main(role):
     source=HERE.parent/"ohm-aarch64-compact"/"gnu_aarch64.rs"
     check=rt.ROOT/"rust/tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs"
-    assert source.read_bytes()==check.read_bytes()
+    body=source.read_bytes()
+    assert hashlib.sha1(b'blob '+str(len(body)).encode()+b'\0'+body).hexdigest()=='512b6b021843522be264bb2bf82bcc6ccd58320b'
+    if check.exists():assert body==check.read_bytes()
     work=rt.ROOT/("direct-version-"+role);work.mkdir()
     shutil.copyfile(source,work/source.name);(work/"payload.bin").write_bytes(b"\0"*4)
     dest=rt.LOG/("direct-version-"+role)
