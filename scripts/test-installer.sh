@@ -272,6 +272,9 @@ assert_no_links() {
   fi
 }
 
+mkdir -p "$temporary_directory/back\\slash"
+TMPDIR="$temporary_directory/back\\slash" run_case escaped-tempdir success
+
 run_case help success --help
 assert_contains "$temporary_directory/cases/help/output.log" 'Usage: install.sh'
 assert_no_links help
