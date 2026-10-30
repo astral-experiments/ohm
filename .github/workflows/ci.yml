@@ -5,7 +5,7 @@ on:
       phase:
         type: choice
         default: baseline
-        options: [baseline, compile, pilot, library, guards]
+        options: [baseline, compile, pilot, library, guards, holdout]
 permissions:
   contents: read
   actions: read
@@ -49,6 +49,57 @@ jobs:
           path: |
             ${{ runner.temp }}/qualified-syscall/receipts/candidate.json
             ${{ runner.temp }}/observed-ruff-db/receipts
+          if-no-files-found: error
+          retention-days: 7
+
+  holdout:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-atomic-ruff-db' && inputs.phase == 'holdout'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        position: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify both registered compiler SDKs and the unchanged strict Cargo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          bash scripts/ohm-gnu-syscall/ingress.sh
+          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
+          mkdir -p "$QA_ROOT/receipts"
+          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
+          export CENSUS_SDK="$QA_ROOT/candidate-sdk"
+          export CENSUS_CANDIDATE_RECORD="$QA_ROOT/receipts/candidate.json"
+          python3 -IB scripts/ohm-gnu-atomic-db/sdk.py
+          {
+            echo "CENSUS_SDK=$CENSUS_SDK"
+            echo "CENSUS_CANDIDATE_RECORD=$CENSUS_CANDIDATE_RECORD"
+          } >> "$GITHUB_ENV"
+      - name: Count the registered edit and its first unchanged library build
+        env:
+          POSITION: ${{ matrix.position }}
+        run: python3 -IB scripts/ohm-gnu-atomic-db/measure.py "$POSITION"
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-atomic-db-pair-${{ matrix.position }}
+          path: |
+            ${{ runner.temp }}/atomic-measurements/
+            !${{ runner.temp }}/atomic-measurements/observer/
+            ${{ runner.temp }}/atomic-paired-ruff/receipts/
+            ${{ runner.temp }}/atomic-subjects/*-sdk.json
+            ${{ runner.temp }}/atomic-subjects/origin.json
+            ${{ runner.temp }}/atomic-subjects/atomic-candidate.json
           if-no-files-found: error
           retention-days: 7
 
