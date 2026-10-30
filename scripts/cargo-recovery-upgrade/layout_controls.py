@@ -3,6 +3,7 @@ import gzip
 import json
 import sys
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 import upgrade as u
 m, probe, q = u.m, u.probe, u.q
 ROLE = 'matched-Ruff'
