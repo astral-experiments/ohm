@@ -1,6 +1,7 @@
 """Acquire the exact upstream stable host and target kit and run the same two provider histories."""
 import hashlib,json,shutil,subprocess,sys,tomllib
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 import edges
 from edges import rt,save,need,sha
 
