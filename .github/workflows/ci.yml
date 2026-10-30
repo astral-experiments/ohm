@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: linux-checks
-        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason]
+        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason, e2e-features]
 permissions:
   contents: read
 concurrency:
@@ -570,7 +570,7 @@ jobs:
 
   e2e-reason:
     name: Diagnose the signed Linux ty_server e2e fingerprint
-    if: ${{ inputs.task == 'e2e-reason' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    if: ${{ (inputs.task == 'e2e-reason' || inputs.task == 'e2e-features') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     permissions:
       contents: read
       actions: read
@@ -597,6 +597,7 @@ jobs:
       - name: Verify tools and acquire the single native target history
         env:
           QUALIFICATION_TOKEN: ${{ github.token }}
+          FEATURE_DIAGNOSTIC: ${{ inputs.task }}
         run: |
           set -eu
           test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf

@@ -135,7 +135,28 @@ def main():
     tools=w.tools(root,'21',env)
     save(out/'subjects.json',{'sdk':json.loads((root/'receipts/21/custody.json').read_bytes()),'tools':tools,'source':c.RUFF,'tree':c.TREE,'lock':sha(repo/'Cargo.lock'),'original_qa':w.git(orig,'rev-parse','HEAD').decode().strip(),'history':c.HISTORY})
     prev='original'
-    for name,state,explain in [('cold','original',False),('unchanged','original',False),('explain-unchanged','original',True),('edited','reversed',True),('restored','original',True)]:
+    base=tuple(CMD)
+    if os.environ.get('FEATURE_DIAGNOSTIC')=='e2e-features':
+        # ty_project requests these features for its snapshot tests. Only Ron
+        # changes between the two adjacent selections. Cargo retains its own
+        # independent feature-unit namespaces throughout all nine commands.
+        near=('--features=insta/default,insta/redactions',)
+        complete=('--features=insta/default,insta/redactions,insta/ron',)
+        visits=[('cold','original',False,near),
+                ('near-unchanged','original',True,near),
+                ('with-feature','original',False,complete),
+                ('unchanged','original',False,complete),
+                ('explain-unchanged','original',True,complete),
+                ('edited','reversed',True,complete),
+                ('restored','original',True,complete),
+                ('return-near','original',False,near),
+                ('settled-near','original',True,near)]
+    else:
+        visits=[(name,state,explain,()) for name,state,explain in
+                [('cold','original',False),('unchanged','original',False),('explain-unchanged','original',True),
+                 ('edited','reversed',True),('restored','original',True)]]
+    for name,state,explain,features in visits:
+        CMD[:]=[*base,*features]
         if state!=prev:w.replace(repo,state)
         phase(repo,env,tools,name,state,explain);prev=state
     save(out/'terminal.json',{'phase_files':{p.parent.name:sha(p) for p in sorted(out.glob('*/observed.json'))},'true_historical_edit':c.HISTORY,'scope':'focused -p ty_server --test e2e only; elapsed diagnostics under strace; no timed results'})
