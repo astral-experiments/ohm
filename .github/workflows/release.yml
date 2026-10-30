@@ -142,9 +142,9 @@ jobs:
       matrix:
         include:
           - target: aarch64-apple-darwin
-            runner: ${{ vars.OHM_RELEASE_MACOS_RUNNER || 'depot-macos-15' }}
+            runner: ${{ vars.OHM_RELEASE_MACOS_RUNNER || 'macos-15' }}
           - target: x86_64-unknown-linux-gnu
-            runner: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'github-ubuntu-24.04-x86_64-8' }}
+            runner: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -155,6 +155,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Make room for macOS profile training
+        if: matrix.runner == 'macos-15' && runner.environment == 'github-hosted'
+        run: ./scripts/prepare-hosted-macos-release.sh
 
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
@@ -322,6 +326,7 @@ jobs:
             "https://github.com/llvm/llvm-project/releases/download/llvmorg-$clang_version/LLVM-$clang_version-macOS-ARM64.tar.xz"
           printf '%s  %s\n' "$clang_sha256" "$clang_archive" | shasum -a 256 --check
           tar -xf "$clang_archive" -C "$clang_root" --strip-components=1
+          rm "$clang_archive"
           "$clang_root/bin/clang" --version
           "$clang_root/bin/clang++" --version
           ln -s clang "$clang_root/bin/cc"

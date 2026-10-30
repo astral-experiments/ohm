@@ -89,8 +89,11 @@ Store the GitHub App client ID and Cloudflare account and bucket configuration a
 The bucket is served publicly from `labs.astral.sh` and should be separate from Astral's production
 release bucket. Its credentials should only grant access to the experimental release bucket.
 
-Linux distribution builds use `github-ubuntu-24.04-x86_64-8` and need at least 150 GiB free for
-BOLT profiling. Apple Silicon builds use `depot-macos-15` and need at least 50 GiB free for PGO.
+Linux distribution builds use `namespace-profile-ubuntu-24-04-16` and need at least 150 GiB free
+for BOLT profiling. Apple Silicon builds use GitHub's `macos-15` runner. On that disposable
+runner, the build removes inactive Xcode installations and checks that the selected macOS SDK and
+at least 50 GiB of space remain available for profile training.
+
 To select a different build runner, set `OHM_RELEASE_LINUX_RUNNER` or `OHM_RELEASE_MACOS_RUNNER`
 as a repository or organization variable. Check that the macOS runner can execute PGO-instrumented
 binaries. Those binaries crashed on the Namespace Macs used for smoke tests.
