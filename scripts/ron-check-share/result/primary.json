@@ -1,0 +1,146 @@
+{
+  "calibration": [
+    {
+      "copies": 1,
+      "scope": "0",
+      "selected_delta": 40000125.0,
+      "whole_delta": 60000259.5
+    },
+    {
+      "copies": 1,
+      "scope": "1",
+      "selected_delta": 40000309.5,
+      "whole_delta": 60000419.0
+    },
+    {
+      "copies": 1,
+      "scope": "2",
+      "selected_delta": 40000491.0,
+      "whole_delta": 60000649.0
+    },
+    {
+      "copies": 2,
+      "scope": "2",
+      "selected_delta": 80000679.0,
+      "whole_delta": 100000818.0
+    },
+    {
+      "copies": 1,
+      "scope": "exec",
+      "selected_delta": 40000328.5,
+      "whole_delta": 60000458.5
+    },
+    {
+      "copies": 1,
+      "scope": "thread",
+      "selected_delta": 40000144.5,
+      "whole_delta": 60000295.0
+    },
+    {
+      "copies": 2,
+      "scope": "thread",
+      "selected_delta": 80000128.5,
+      "whole_delta": 100000262.0
+    }
+  ],
+  "graphs": {
+    "ruff_db": {
+      "ron": [],
+      "roots": [
+        "ruff_db"
+      ],
+      "units": 209
+    },
+    "ty_project": {
+      "ron": [
+        [
+          184,
+          [
+            "default",
+            "std"
+          ],
+          "check"
+        ]
+      ],
+      "roots": [
+        "ty_project"
+      ],
+      "units": 338
+    },
+    "ty_server": {
+      "ron": [],
+      "roots": [
+        "ty_server",
+        "e2e"
+      ],
+      "units": 331
+    }
+  },
+  "original_diagnostic_gate": "failed",
+  "phase_verdicts": {
+    "cold": {
+      "artifact_count": 303,
+      "exit": 0,
+      "messages": [],
+      "stderr_sha256": "108e0d601e89d2be29c1005c0bc04e4caa9740bef0e682044b31c3e0c938f4a3",
+      "stdout_sha256": "863adbfd6a7795b508bfa9af1605b2e829bc0d0b425eaccccbd4828af5bb732d"
+    },
+    "edited": {
+      "artifact_count": 303,
+      "exit": 0,
+      "messages": [],
+      "stderr_sha256": "7dc03035b39841ef30c3d154fb61be0108fbbb1802542885ea8dd4180c62a54c",
+      "stdout_sha256": "7273456bec3bc55dbbb546810fd6383d4d7dd20382311dd96f304b5db364bb50"
+    },
+    "first-unchanged": {
+      "artifact_count": 303,
+      "exit": 0,
+      "messages": [],
+      "stderr_sha256": "35f832702a23aec8ce7287b80317f09c65eccdf9b72ca43f7224214de334176c",
+      "stdout_sha256": "27f549e25fee6d8a6574fccc608c34f50952ab75e71a3535e0defe76f23de6fe"
+    },
+    "invalid": {
+      "artifact_count": 302,
+      "exit": 101,
+      "messages": [
+        "error",
+        "failure-note"
+      ],
+      "stderr_sha256": "977c0e3a2540863809a2e69aa8b391937b1394917b2bf44b94d549946bae1541",
+      "stdout_sha256": "689c894f49928d540ed224c6240401a18c81a8a27f97ec8934e075936d32d62f"
+    },
+    "repair": {
+      "artifact_count": 303,
+      "exit": 0,
+      "messages": [
+        "error",
+        "failure-note"
+      ],
+      "stderr_sha256": "6a1d123eb935e2b0d5d89acd94ae061ec0d2c14c9d2388027a96e005408baf45",
+      "stdout_sha256": "f027cb533c6a4e8c47ccfb1d1c46ae54d8197304592cf4c618f6ec32960dc840"
+    }
+  },
+  "separate_native_counts": {
+    "edited": {
+      "native_links": 0,
+      "ron": 1756839615,
+      "rustcs": [
+        "ron",
+        "ty_project"
+      ],
+      "share": 0.32473505354348,
+      "whole": 5410070751
+    },
+    "first-unchanged": {
+      "native_links": 0,
+      "ron": 1756795215,
+      "rustcs": [
+        "ron"
+      ],
+      "share": 0.6912525688603876,
+      "whole": 2541466454
+    }
+  },
+  "sha256": "9e3a59e091c467c5139532dfb09cd8765eef343c938c0680e75da3ec2282ce3e",
+  "whole_instruction_ceiling": 3.2388933449872503
+}
