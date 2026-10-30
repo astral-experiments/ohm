@@ -19,6 +19,11 @@ jobs:
           python-version: '3.13'
       - name: Authenticate actual kernel filesystem fixture, inode and parent
         run: python3 -IB scripts/ohm-apple-zmij/response_fs_schema.py "$RUNNER_TEMP/response-custody/schema"
+      - name: Check held-inode adversarial, path-generation and real Xcode response controls
+        run: |
+          python3 -IB scripts/ohm-apple-zmij/test_xcode_response.py -v
+          python3 -IB scripts/ohm-apple-zmij/test_held_response.py -v
+          python3 -IB scripts/ohm-apple-zmij/test_held_response.py native "$RUNNER_TEMP/response-custody"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
