@@ -1,6 +1,7 @@
 """Retain authentic Cargo/exec traces and the complete root GNU linker search."""
 import ast
 import hashlib
+import json
 from pathlib import Path
 import re
 import shutil
