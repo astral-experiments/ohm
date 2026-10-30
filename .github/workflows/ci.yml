@@ -6,7 +6,7 @@ on:
         description: Bootstrap source or reopen the registered immutable compiler
         type: choice
         default: qualification
-        options: [qualification, bootstrap, pilots, holdout, ty-oracle, guest, reader-controls, release-reader]
+        options: [qualification, bootstrap, pilots, holdout, ty-oracle, guest, reader-controls, release-reader, release-gnu]
 permissions:
   contents: read
   actions: read
@@ -14,6 +14,60 @@ concurrency:
   group: gnu-literal-svc-${{ github.sha }}
   cancel-in-progress: false
 jobs:
+  release-gnu:
+    if: inputs.phase == 'release-gnu' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 118
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        subject: [register-signed, register-integrated, syscall-integrated, syscall-signed, aware, migrate-signed, migrate-classic, named, legacy]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Authenticate both compiler drivers and the independent release-parent Cargo executable
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUBJECT: ${{ matrix.subject }}
+        run: |
+          set -euo pipefail
+          bash scripts/ohm-gnu-syscall/ingress.sh
+          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
+          mkdir -p "$QA_ROOT/receipts"
+          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
+          python3 -IB scripts/ohm-gnu-syscall/release-reader/subjects.py
+          case "$SUBJECT" in
+            register-*|syscall-*) ;;
+            *) sudo apt-get install -y --no-install-recommends b3sum
+               test "$(printf '' | b3sum --no-names)" = af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262
+               QA_ROOT="$RUNNER_TEMP/gnu-reviewer-ingress" python3 -IB scripts/ohm-aarch64-fallback/acquire.py ;;
+          esac
+          printf 'QA_ROOT=%s\nCENSUS_PARENT=%s\nCENSUS_ROOT=%s\n' "$QA_ROOT" "$CENSUS_PARENT" "$RUNNER_TEMP/observed-ruff" >> "$GITHUB_ENV"
+      - name: Rebuild Ruff or replay real native inputs without instrumentation wrappers
+        env:
+          SUBJECT: ${{ matrix.subject }}
+        run: |
+          set -euo pipefail
+          case "$SUBJECT" in
+            register-*|syscall-*) python3 -IB scripts/ohm-gnu-syscall/release-reader/cross_cli.py "${SUBJECT%-*}" "${SUBJECT#*-}" ;;
+            *) python3 -IB scripts/ohm-gnu-syscall/release-reader/providers.py "$SUBJECT" ;;
+          esac
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: integrated-native-${{ matrix.subject }}
+          path: |
+            ${{ runner.temp }}/qualified-syscall/receipts
+            ${{ runner.temp }}/observed-ruff/receipts
+          compression-level: 1
+          if-no-files-found: error
+          retention-days: 14
   release-reader:
     if: inputs.phase == 'release-reader' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
     runs-on: namespace-profile-ubuntu-24-04-16
