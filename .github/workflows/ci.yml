@@ -5,19 +5,14 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: gnu-aarch64-versioned-ruff-confirmation-20261030
+  group: gnu-versioned-native-reviewer-20261030
   cancel-in-progress: false
 jobs:
-  block:
+  native:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    name: Versioned Cargo confirmation Ruff block ${{ matrix.block }}
+    name: Replay the ordinary released GNU native reviewer workflow
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      max-parallel: 3
-      matrix:
-        block: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -25,53 +20,56 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify the prospective registration and the exact physical tools
-        run: |
-          set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-ruff-screen"
-          mkdir -p "$QA_ROOT/inputs" "$QA_ROOT/receipts"
-          printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
-          for family in ohm-aarch64-registers ohm-aarch64-compact ohm-aarch64-confirm ohm-aarch64-fallback ohm-aarch64-versioned; do
-            (cd "scripts/$family" && sha256sum -c SHA256SUMS)
-          done
-          cp scripts/ohm-aarch64-versioned/{COUNT.md,admissible-native.json,SHA256SUMS} "$QA_ROOT/receipts/"
-          python3 -IB scripts/ohm-aarch64-fallback/frontend_test.py
-          python3 -IB scripts/ohm-aarch64-confirm/local_selector_test.py
-          python3 -IB scripts/ohm-aarch64-confirm/selftest.py
-          git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd b3sum
-          dpkg-query -W gcc-aarch64-linux-gnu libc6-dev-arm64-cross binutils-aarch64-linux-gnu qemu-user strace valgrind > "$QA_ROOT/receipts/packages"
-          echo 'def5fdcf6ae64a4d3e6af3786b622978d8313e0734ecf3f6cbe71d8be9e274c8  /usr/bin/valgrind.bin' | sha256sum -c -
-          python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
-          python3 -IB scripts/ohm-aarch64-versioned/kernel_env_test.py
-      - name: Reopen the independent native gates and all three signed and source-built compiler roles
+      - name: Reopen the authenticated 119-file final AArch64 SDK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB scripts/ohm-aarch64-confirm/gates.py
-          python3 -IB scripts/ohm-aarch64-versioned/score_gates.py confirmation
+          export QA_ROOT="$RUNNER_TEMP/gnu-reviewer-ingress"
+          mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inputs"
+          (cd scripts/ohm-aarch64-versioned && sha256sum --quiet -c SHA256SUMS)
+          (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd
           python3 -IB scripts/ohm-aarch64-versioned/acquire_builds.py
-          bash scripts/ohm-aarch64-confirm/ancestor.sh "$RUNNER_TEMP/gnu-compact-public-ancestor"
-      - name: Run three fresh native controls and their independent instruction histories in the assigned order
-        env:
-          BLOCK: ${{ matrix.block }}
-        run: python3 -IB scripts/ohm-aarch64-versioned/score.py "$BLOCK" confirmation "$RUNNER_TEMP/gnu-compact-public-ancestor" "$QA_ROOT/inputs"
-      - name: Retain all native terminals, products and profiles even if incomplete
+          python3 -IB - <<'PY'
+          import os,shutil,sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path('scripts/ohm-aarch64-versioned').resolve()))
+          from version_kit import bind,capsule,rt
+          from study import load,save,sha
+          bind()
+          inputs=rt.ROOT/'inputs/versioned'
+          product=load(Path('scripts/ohm-aarch64-versioned/qualified-builds.json'))
+          assert sha(inputs/'sdk.tar.zst')==product['capsule']
+          sdk=rt.ROOT/'reviewer-sdk'
+          checked=capsule.verify(inputs/'sdk.tar.zst','C',sdk)
+          p=inputs/'cargo/cargo'
+          assert sha(p)==product['cargo_elf'] and sha(sdk/'bin/cargo')==rt.TOOLS['bin/cargo']
+          temp=sdk/'bin/cargo.new'
+          shutil.copy2(p,temp)
+          temp.replace(sdk/'bin/cargo')
+          save(rt.LOG/'reviewer-sdk.json',{'source':product['source'],'cargo':sha(sdk/'bin/cargo'),'capsule':checked})
+          PY
+      - name: Run the standalone script exactly as a reviewer would
+        run: |
+          set -euo pipefail
+          python3 -IB scripts/ohm-aarch64-portable-review/replay.py V "$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk" "$RUNNER_TEMP/gnu-reviewer-work"
+      - name: Preserve whole ELF bodies, kernel receipts, negative stderr and partial records
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-versioned-confirmation-${{ matrix.block }}
-          path: ${{ runner.temp }}/gnu-aarch64-ruff-screen/receipts
+          name: versioned-gnu-public-reviewer-native
+          path: |
+            ${{ runner.temp }}/gnu-reviewer-work/receipts
+            ${{ runner.temp }}/gnu-reviewer-ingress/receipts/reviewer-sdk.json
           retention-days: 7
           if-no-files-found: error
-  reopen:
-    if: always() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    needs: [block]
-    name: Reopen every successful exec, complete compiler profile and native output on a fresh reader
+  codegen:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
+    name: Reopen actual LLVM calls in both complete pilot blocks
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 100
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -79,20 +77,18 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify input authenticity and recompute every held-out decision in block order
+      - name: Authenticate complete pilot archives and enumerate the three role-specific AST profiles
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          (cd scripts/ohm-aarch64-confirm && sha256sum -c SHA256SUMS)
-          (cd scripts/ohm-aarch64-fallback && sha256sum -c SHA256SUMS)
-          (cd scripts/ohm-aarch64-versioned && sha256sum -c SHA256SUMS)
-          python3 -IB scripts/ohm-aarch64-versioned/score.py reopen confirmation
-      - name: Preserve all completed independent projections
+          (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
+          python3 -IB scripts/ohm-aarch64-portable-review/review-pilot.py scripts/ohm-aarch64-versioned/qualified-pilot.json scripts/ohm-aarch64-portable-review/classify-first-edit-codegen.py "$RUNNER_TEMP/gnu-codegen-raw-readback"
+      - name: Preserve the individual reopened compiler profile witnesses
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-versioned-confirmation-readback
-          path: ${{ runner.temp }}/gnu-versioned-raw-reader/verified
+          name: versioned-gnu-LLVM-pilot-codegen
+          path: ${{ runner.temp }}/gnu-codegen-raw-readback/codegen.json
           retention-days: 7
           if-no-files-found: warn
