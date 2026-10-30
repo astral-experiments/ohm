@@ -90,10 +90,7 @@ def run_archive_check(root, role, trace, label=None):
             row.update(value=want, executable=sha(exe))
             lib, = [r for r in arts if r["target"]["name"] == "qa_native_input" and r["target"]["kind"] == ["lib"]]
             archive_path, = [Path(p) for p in lib["filenames"] if p.endswith(".rlib")]
-            name = archive_path.stem.removeprefix("lib") + ".d"
-            files = { (p.stat().st_dev, p.stat().st_ino): p
-                      for folder in ("shared", "target") for p in (work/folder).rglob(name) }
-            dep, = files.values()
+            dep = bundled_depinfo(work, archive_path)
             body = dep.read_bytes()
             need(b"src/lib.rs" in body and MISSING in body, "bundled archive lost its conservative dep-info marker")
             row["bundled_dep_sha256"] = compress_bytes(out/"bundled-library.dep.gz", body)
@@ -116,3 +113,16 @@ def run_archive_check(root, role, trace, label=None):
         p = work / k
         if p.exists():
             shutil.rmtree(p)
+
+
+def bundled_depinfo(work, returned):
+    """Find the internal rlib underlying Cargo's public, sometimes unhashed output."""
+    hits = {}
+    for folder in ("target", "shared"):
+        for member in (work/folder).rglob("libqa_native_input-*.rlib"):
+            if member.samefile(returned) or (member.stat().st_size == returned.stat().st_size and sha(member) == sha(returned)):
+                dep = member.with_name(member.stem.removeprefix("lib") + ".d")
+                if dep.is_file():
+                    hits[(dep.stat().st_dev, dep.stat().st_ino)] = dep
+    result, = hits.values()
+    return result

@@ -173,12 +173,11 @@ def mechanism(root):
             clean, visits = {}, {}
             for role in order:
                 clean[role], visits[role] = installation(root,role,top/order/role,trace)
-                if order=="PC":
-                    run_archive_check(root,role,trace)
             counts = {}
             for role, rows in visits.items():
                 counts[role] = {k:{"rustcs":len(r["native"]["full"]),"ld":len(r["native"]["linkers"]),"root_ld":len(r["root_link_argv"]),
-                                    "zlib_rustcs":r["native"]["full"].count("zlib_rs"),"hard":[u["hard"] for u in r["zlib"]]} for k,r in rows.items()}
+                                    "zlib_rustcs":r["native"]["full"].count("zlib_rs"),"hard":[u["hard"] for u in r["zlib"]],
+                                    "recheck":[u["recheck"] for u in r["zlib"]]} for k,r in rows.items()}
             save(top/order/"physical.json",counts)
             for rev in (OLD,NEW):
                 arms = {}
@@ -190,8 +189,11 @@ def mechanism(root):
                 save(top/order/("equivalence-"+rev+".json"),compare(arms))
             qualifies = all(counts["P"][k]["zlib_rustcs"]>0 and counts["P"][k]["root_ld"]==1
                             and counts["C"][k]["zlib_rustcs"]==counts["C"][k]["root_ld"]==0
-                            and all(counts["P"][k]["hard"]) and not any(counts["C"][k]["hard"]) for k in ("repeat-1","repeat-2"))
+                            and all(counts["P"][k]["hard"]) and not any(counts["C"][k]["hard"])
+                            and all(counts["C"][k]["recheck"]) for k in ("repeat-1","repeat-2"))
             save(top/order/"verdict.json",{"structural_screen":qualifies,"timing":None})
+        for role in "PC":
+            run_archive_check(root,role,trace)
     finally:
         trace.close()
 
