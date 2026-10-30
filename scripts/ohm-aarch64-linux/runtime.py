@@ -69,30 +69,30 @@ def release():
     save(LOG / "release.json", {"release": A, "checksum": SIDE, "provenance": PROV, "tools": found})
 
 
-def inventory(stage):
+def inventory(stage, triple):
     files = [stage / "bin/rustc", *(stage / "lib").glob("*.so*")]
-    for triple in (HOST, TARGET):
-        leaf = stage / "lib/rustlib" / triple / "lib"
-        members = sorted(p for p in leaf.rglob("*") if p.is_file())
-        for component in ("core", "std", "alloc", "proc_macro", "test"):
-            need(any(p.name.startswith("lib" + component + "-") and p.suffix == ".rlib" for p in members),
-                 f"missing complete {triple} {component} rlib")
-        files.extend(members)
-    host_bin = stage / "lib/rustlib" / HOST / "bin"
-    for name in ("rust-lld", "gcc-ld"):
-        item = host_bin / name
-        if item.is_file():
-            files.append(item)
-        elif item.is_dir():
-            files.extend(sorted(p for p in item.rglob("*") if p.is_file()))
+    leaf = stage / "lib/rustlib" / triple / "lib"
+    members = sorted(p for p in leaf.rglob("*") if p.is_file())
+    for component in ("core", "std", "alloc", "proc_macro", "test"):
+        need(any(p.name.startswith("lib" + component + "-") and p.suffix == ".rlib" for p in members),
+             f"missing complete {triple} {component} rlib")
+    files.extend(members)
+    if triple == HOST:
+        host_bin = stage / "lib/rustlib" / HOST / "bin"
+        for name in ("rust-lld", "gcc-ld"):
+            item = host_bin / name
+            if item.is_file():
+                files.append(item)
+            elif item.is_dir():
+                files.extend(sorted(p for p in item.rglob("*") if p.is_file()))
     need(any(p.name.startswith("libLLVM") for p in files) and any(p.name.startswith("librustc_driver") for p in files),
          "incomplete compiler/LLVM runtime")
     names = [p.relative_to(stage).as_posix() for p in files]
-    need(len(files) == len(set(names)) and 60 < len(files) < 600, "unexpected runtime roster")
+    need(len(files) == len(set(names)) and 20 < len(files) < 600, "unexpected runtime slice")
     return sorted(files)
 
 
-def freeze(role):
+def freeze(role, part):
     source = ROOT / "rust"
     rev = {"P": PARENT, "C": CHILD}[role]
     need(text_git(source, "rev-parse", "HEAD") == rev and not git(source, "status", "--porcelain", "--untracked-files=no"),
@@ -101,7 +101,7 @@ def freeze(role):
     files = {}
     objects = CAP / "objects"
     objects.mkdir(parents=True, exist_ok=True)
-    for p in inventory(stage):
+    for p in inventory(stage, {"host": HOST, "target": TARGET}[part]):
         key = sha(p)
         obj = objects / key
         if not obj.exists():
@@ -111,8 +111,19 @@ def freeze(role):
     stage0 = stage.parent / "stage0/bin"
     binding = {"stage0_rustc": sha(stage0 / "rustc"), "stage0_cargo": sha(stage0 / "cargo"),
                "stage0_source": sha(source / "src/stage0"), "std_tree": text_git(source, "rev-parse", "HEAD:library")}
-    save(LOG / (role + "-sdk.json"), {"source": rev, "tree": text_git(source, "rev-parse", "HEAD^{tree}"),
-                                      "files": files, "bootstrap": binding})
+    identity = {"source": rev, "tree": text_git(source, "rev-parse", "HEAD^{tree}"), "bootstrap": binding}
+    save(LOG / (role + "-" + part + "-slice.json"), dict(identity, files=files))
+    if part == "target":
+        earlier = load(LOG / (role + "-host-slice.json"))
+        need(all(earlier[k] == v for k, v in identity.items()), "source or bootstrap changed between slices")
+        compiler = lambda rows: {n: row for n, row in rows.items() if not n.startswith("lib/rustlib/")}
+        need(compiler(earlier["files"]) == compiler(files), "physical compiler changed between host and target library builds")
+        files = earlier["files"] | files
+        need(60 < len(files) < 600, "unexpected complete runtime roster")
+        for key, size, mode in files.values():
+            obj = objects / key
+            need(obj.is_file() and obj.stat().st_size == size and sha(obj) == key, "damaged retained SDK member")
+        save(LOG / (role + "-sdk.json"), dict(identity, files=files))
 
 
 def select(role):

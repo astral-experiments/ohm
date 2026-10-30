@@ -42,6 +42,7 @@ for role in P C; do
     git diff --exit-code --ignore-submodules=none
     python3 -IB "$study/qualify.py" room
     python3 x.py "${flags[@]}" build --stage 1 -j8 --host "$host" --target "$host" compiler/rustc library 2>&1 | tee "$log/host-build-$role.log"
+    python3 -IB "$study/qualify.py" freeze "$role" host
     python3 x.py "${flags[@]}" build --stage 1 -j8 --host "$host" --target "$triple" library 2>&1 | tee "$log/target-build-$role.log"
-    python3 -IB "$study/qualify.py" freeze "$role"
+    python3 -IB "$study/qualify.py" freeze "$role" target
 done

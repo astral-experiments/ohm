@@ -445,7 +445,7 @@ if __name__ == "__main__":
     action = sys.argv[1]
     try:
         if action == "freeze":
-            rt.freeze(sys.argv[2])
+            rt.freeze(sys.argv[2], sys.argv[3])
         else:
             {"selftest": selftest, "room": lambda: rt.room(True), "release": rt.release, "admit": prepare, "screen": screen}[action]()
     except Exception:

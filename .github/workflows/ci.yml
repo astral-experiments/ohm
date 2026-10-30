@@ -53,6 +53,10 @@ jobs:
       - name: Build both Linux host compilers and their host and AArch64 standard libraries
         id: bootstrap
         run: bash scripts/ohm-aarch64-linux/prepare.sh
+      - name: Build and independently reopen the allowlisted private SDK archive
+        id: custody
+        run: python3 -IB scripts/ohm-aarch64-linux/capsule.py build
+        continue-on-error: true
       - name: Reopen the two runtime kits and qualify their native and cross-target readers
         run: python3 -IB scripts/ohm-aarch64-linux/qualify.py admit
       - name: Run both independent mirrored Ruff transitions
@@ -60,6 +64,15 @@ jobs:
       - name: Run both checked-in Linux host assembler controls on the real child
         if: always() && steps.bootstrap.outcome == 'success'
         run: bash scripts/ohm-aarch64-linux/prepare.sh test-host
+      - name: Keep the binary-only SDK for three days
+        if: always() && steps.custody.outcome == 'success'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: linux-aarch64-zmij-replay-sdk
+          path: ${{ runner.temp }}/ohm-aarch64-linux-zmij/private-return/linux-aarch64-sdk-pair.tar.zst
+          retention-days: 3
+          if-no-files-found: error
+          compression-level: 0
       - name: Retain every completed command and the earliest failure
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -68,3 +81,6 @@ jobs:
           path: ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
           retention-days: 7
           if-no-files-found: error
+      - name: Require the private SDK export
+        if: always() && steps.bootstrap.outcome == 'success'
+        run: test "${{ steps.custody.outcome }}" = success
