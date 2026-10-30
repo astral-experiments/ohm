@@ -7,13 +7,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: ohm-packed-object-ruff-linux
+  group: ohm-packed-object-full-ruff-linux
   cancel-in-progress: false
 
 jobs:
-  parser:
-    name: Compare three native compiler configurations on the Ruff parser
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-packed-object-ruff-linux'
+  full-cli:
+    name: Measure allocated bytes across the full Ruff CLI
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-packed-object-full-ruff-linux'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
     env:
@@ -31,10 +31,9 @@ jobs:
           root="$RUNNER_TEMP/ohm-branch-object-qa"
           mkdir -p "$root/work" "$root/logs"
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends valgrind strace ninja-build
+          sudo apt-get install -y --no-install-recommends strace ninja-build
           command -v rustup zstd cc
-          test -x /usr/bin/valgrind.bin
-          truncate -s 4G "$root/build-ext4.img"
+          truncate -s 10G "$root/build-ext4.img"
           /usr/sbin/mkfs.ext4 -q -m 0 -E lazy_itable_init=0,lazy_journal_init=0 "$root/build-ext4.img"
           if sudo mount -o loop,nosuid,nodev,noatime "$root/build-ext4.img" "$root/work"; then
             sudo chown "$(id -u):$(id -g)" "$root/work"
@@ -47,9 +46,14 @@ jobs:
           printf '%s' "$root" > "$root/work/.owned-by-packed-study"
           findmnt --target "$root/work" > "$root/logs/filesystem.txt"
           strace -f -qq -e trace=execve -o "$root/logs/trace-smoke.log" /bin/true
-          cp scripts/ohm-packed-ruff/PLAN.md "$root/logs/PLAN.md"
+          cp scripts/ohm-packed-ruff/full-cli/PLAN.md "$root/logs/PLAN.md"
           git rev-parse HEAD > "$root/logs/hosted-study-head.txt"
+          mkdir -p "$root/logs/reproduction/scripts/ohm-apple-zmij" "$root/logs/reproduction/.github/workflows"
+          cp -a scripts/ohm-packed-ruff "$root/logs/reproduction/scripts/"
+          cp -a scripts/ohm-apple-zmij/source-transport "$root/logs/reproduction/scripts/ohm-apple-zmij/"
+          cp .github/workflows/ci.yml "$root/logs/reproduction/.github/workflows/ci.yml"
           (cd scripts/ohm-packed-ruff && sha256sum -c SHA256SUMS)
+          (cd scripts/ohm-packed-ruff/full-cli && sha256sum -c SHA256SUMS)
           python3 -IB scripts/ohm-packed-ruff/harness/check_allocation.py "$root/work" "$root/logs/storage-fixture"
       - name: Obtain the immutable signed native Cargo and Wild
         env:
@@ -62,33 +66,36 @@ jobs:
         run: bash scripts/ohm-packed-ruff/prepare.sh
       - name: Verify the toolchain, baseline and locked Ruff inputs
         run: python3 -IB scripts/ohm-packed-ruff/study.py prepare
-      - name: Compare independent native readers, archive payloads and invalid edits
-        run: python3 -IB scripts/ohm-packed-ruff/study.py qualify
-      - name: Measure the two mirrored triplets and their complete footprints
-        run: python3 -IB scripts/ohm-packed-ruff/study.py screen
-      - name: Measure the separate confirmation if the screen passes
+      - name: Build and check independent complete CLI and reader references for each option
+        run: python3 -IB scripts/ohm-packed-ruff/full-cli/full_cli.py qualify
+      - name: Measure the two disk-only pilot triplets
         run: |
-          if python3 -c 'import json,sys;sys.exit(not json.load(open(sys.argv[1]))["admitted"])' "$RUNNER_TEMP/ohm-branch-object-qa/logs/screen/result.json"; then
-            python3 -IB scripts/ohm-packed-ruff/study.py confirm
-          fi
-      - name: Preserve the ordinary command streams and all storage receipts
+          python3 -IB scripts/ohm-packed-ruff/full-cli/full_cli.py screen
+          root="$RUNNER_TEMP/ohm-branch-object-qa/logs"
+          python3 -IB scripts/ohm-packed-ruff/full-cli/verify.py "$root" screen > "$root/screen/reopened.json"
+      - name: Preserve independent original executables and the complete pilot observations
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: packed-object-ruff-ordinary
+          name: full-ruff-packed-cli-pilot
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
-          retention-days: 5
+          retention-days: 7
+          compression-level: 1
           if-no-files-found: warn
-      - name: Count every instruction in both returning rustcs on two fresh mirrors
+      - name: Run all six new orders only if the allocation and behavior gates passed
         run: |
-          if python3 -c 'import json,sys;sys.exit(not json.load(open(sys.argv[1]))["admitted"])' "$RUNNER_TEMP/ohm-branch-object-qa/logs/screen/result.json"; then
-            python3 -IB scripts/ohm-packed-ruff/study.py counter
+          result="$RUNNER_TEMP/ohm-branch-object-qa/logs/screen/result.json"
+          if python3 -c 'import json,sys;sys.exit(not json.load(open(sys.argv[1]))["admitted"])' "$result"; then
+            python3 -IB scripts/ohm-packed-ruff/full-cli/full_cli.py confirm
+            root="$RUNNER_TEMP/ohm-branch-object-qa/logs"
+            python3 -IB scripts/ohm-packed-ruff/full-cli/verify.py "$root" confirm > "$root/confirm/reopened.json"
           fi
-      - name: Preserve native compiler counters, exit status and native readers
+      - name: Preserve independent full-graph confirmation receipt and raw measurements
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: packed-object-ruff-instructions
-          path: ${{ runner.temp }}/ohm-branch-object-qa/logs/counter
-          retention-days: 5
+          name: full-ruff-packed-cli-confirmation
+          path: ${{ runner.temp }}/ohm-branch-object-qa/logs/confirm
+          retention-days: 7
+          compression-level: 1
           if-no-files-found: ignore
