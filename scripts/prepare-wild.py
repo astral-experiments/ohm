@@ -33,7 +33,8 @@ def prepare(manifest, target, destination):
     if hashlib.sha256(payload).hexdigest() != checksum:
         raise ValueError("Wild archive checksum mismatch")
 
-    destination = pathlib.Path(destination).resolve()
+    destination = pathlib.Path(destination)
+    destination = destination.parent.resolve() / destination.name
     destination.parent.mkdir(parents=True, exist_ok=True)
     # Extract only the expected regular files; do not follow archive links or
     # interpret paths supplied by the archive as filesystem destinations.
@@ -51,6 +52,8 @@ def prepare(manifest, target, destination):
                         shutil.copyfileobj(source, output)
                 (staged / filename).chmod(0o755 if filename == "wild" else 0o644)
         # Fail on an existing destination instead of reusing unverified bytes.
+        if destination.is_symlink() or destination.exists():
+            raise FileExistsError(f"Wild destination already exists: {destination}")
         staged.rename(destination)
     return destination
 
