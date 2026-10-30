@@ -1,15 +1,27 @@
-name: Native Apple response-file custody calibration
+name: Compare packaged -20 and -21 native inputs
 on: workflow_dispatch
 permissions:
   contents: read
+  actions: read
 concurrency:
-  group: xcode-response-control-${{ github.ref }}
+  group: packaged-native-inputs-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  calibration:
-    if: github.ref == 'refs/heads/charlie/qa-apple-xcode-response-fds'
-    runs-on: namespace-profile-macos-15
-    timeout-minutes: 10
+  packaged:
+    if: github.ref == 'refs/heads/charlie/qa-packaged-release21-native-inputs'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - host: namespace-profile-macos-15
+            target: aarch64-apple-darwin
+          - host: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+    runs-on: ${{ matrix.host }}
+    timeout-minutes: 145
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONNOUSERSITE: '1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -17,22 +29,40 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Authenticate actual kernel filesystem fixture, inode and parent
-        id: schema
-        run: python3 -IB scripts/ohm-apple-zmij/response_fs_schema.py "$RUNNER_TEMP/response-custody/schema"
-      - name: Check held-inode adversarial, path-generation and real Xcode response controls
+      - name: Verify frozen native evidence reader and independent mutation controls
+        run: python3 -IB scripts/packaged-native-21/readback.py --controls
+      - name: Authenticate and install original -20 platform archive
+        id: baseline_install
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/packaged-native-21/packages.py 20 "$RUNNER_TEMP/packaged-native"
+      - name: Run and reopen -20 direct and transitive native programs
         run: |
-          python3 -IB scripts/ohm-apple-zmij/test_xcode_response.py -v
-          python3 -IB scripts/ohm-apple-zmij/test_held_response.py -v
-      - name: Exercise actual Xcode direct and response links and reopen their signed products
-        if: always() && steps.schema.outcome == 'success'
-        run: |
-          python3 -IB scripts/ohm-apple-zmij/test_held_response.py native "$RUNNER_TEMP/response-custody"
-          python3 -IB scripts/ohm-apple-zmij/reopen_response_native.py "$RUNNER_TEMP/response-custody/receipts"
+          python3 -IB scripts/packaged-native-21/probe.py 20 "$RUNNER_TEMP/packaged-native"
+          python3 -IB scripts/packaged-native-21/readback.py "$RUNNER_TEMP/packaged-native/receipts" 20
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: darwin-response-custody
-          path: ${{ runner.temp }}/response-custody
-          if-no-files-found: warn
+          name: signed-20-native-${{ matrix.target }}
+          path: ${{ runner.temp }}/packaged-native/receipts
           retention-days: 14
+          if-no-files-found: warn
+      - name: Wait for and authenticate this platform dist from exact -21 run 41088174292
+        id: candidate_install
+        if: always() && steps.baseline_install.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/packaged-native-21/packages.py 21 "$RUNNER_TEMP/packaged-native"
+      - name: Run, reopen and compare both shipped compilers on the same source states
+        if: always() && steps.candidate_install.outcome == 'success'
+        run: |
+          python3 -IB scripts/packaged-native-21/probe.py 21 "$RUNNER_TEMP/packaged-native"
+          python3 -IB scripts/packaged-native-21/readback.py "$RUNNER_TEMP/packaged-native/receipts" 21
+          python3 -IB scripts/packaged-native-21/readback.py "$RUNNER_TEMP/packaged-native/receipts" both
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: compared-20-21-native-${{ matrix.target }}
+          path: ${{ runner.temp }}/packaged-native/receipts
+          retention-days: 14
+          if-no-files-found: warn
