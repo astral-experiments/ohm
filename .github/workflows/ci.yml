@@ -1,14 +1,15 @@
-name: Native Apple developer-incremental CRC costs on fixed Cargo 293
+name: Native Apple developer Ruff AST on Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: apple-crc-local-incremental-${{ github.ref }}
+  group: apple-ast293-developer-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  local-crc-on-293:
+  ast-on-293:
+    if: github.ref == 'refs/heads/charlie/qa-apple-ast293-developer'
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 250
+    timeout-minutes: 355
     env:
       PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -21,89 +22,96 @@ jobs:
           python-version: '3.13'
       - name: Freeze and verify subjects, clock design and native execution observer
         run: |
-          root="$RUNNER_TEMP/apple-crc-local-incremental"
+          root="$RUNNER_TEMP/apple-ast293-developer"
+          python3 -IB scripts/ohm-apple-zmij/test_ast_developer.py -v
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/crc293-local-incremental-plan.md "$root/receipts/registration.md"
+          python3 -IB scripts/ohm-apple-zmij/ast_developer.py register "$root"
+          cp scripts/ohm-apple-zmij/ast293-developer-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          root="$RUNNER_TEMP/apple-crc-local-incremental"
+          root="$RUNNER_TEMP/apple-ast293-developer"
           mkdir "$root/assets"
           gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
           python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-          python3 -IB scripts/ohm-apple-zmij/run.py zlib_study seed "$root"
-      - name: Bootstrap source-bound 444c and 82911b and run both native compiler tests
+      - name: Verify and separately park both real Ruff source and locked registry seeds
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py seed "$RUNNER_TEMP/apple-ast293-developer"
+      - name: Bootstrap source-bound 2035696c and 444c0273 and run both native compiler tests
         run: |
-          root="$RUNNER_TEMP/apple-crc-local-incremental"
+          root="$RUNNER_TEMP/apple-ast293-developer"
           python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
           if ! command -v ninja >/dev/null; then brew install ninja; fi
           (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
           python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
-          python3 -IB scripts/ohm-apple-zmij/source-transport/crc/prepare.py "$root/enrolled-rust" > "$root/receipts/crc-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
       - name: Build unmodified Cargo 735e and bind exactly one Mach-O to both compilers
         run: |
-          root="$RUNNER_TEMP/apple-crc-local-incremental"
+          root="$RUNNER_TEMP/apple-ast293-developer"
           python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$root"
           python3 -IB scripts/ohm-apple-zmij/fixed_crc.py pin "$root"
-      - name: Test direct and transitive provider safety before any clocks
-        id: provider
+      - name: Qualify the 392 vector-assembly native provider commands
+        id: providers
         run: |
-          root="$RUNNER_TEMP/apple-crc-local-incremental"
+          root="$RUNNER_TEMP/apple-ast293-developer"
           python3 -IB scripts/ohm-apple-zmij/fixed_crc.py providers "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/provider-matrix/terminal.json" >> "$GITHUB_OUTPUT"
+          python3 -IB -c 'import json,sys; assert json.load(open(sys.argv[1]))["passed"]' "$root/receipts/provider-matrix/terminal.json"
+      - name: Verify ordinary developer build and both complete clean native outputs
+        id: structural_build
+        if: always() && steps.providers.outcome == 'success'
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py structural "$RUNNER_TEMP/apple-ast293-developer" build
+      - name: Verify ordinary developer test and both complete clean native outputs
+        id: structural_test
+        if: always() && steps.providers.outcome == 'success'
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py structural "$RUNNER_TEMP/apple-ast293-developer" test
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: crc-local-incremental-provider
-          path: ${{ runner.temp }}/apple-crc-local-incremental/receipts
+          name: ast293-developer-structural
+          path: ${{ runner.temp }}/apple-ast293-developer/receipts
           retention-days: 14
           if-no-files-found: warn
-      - name: Two unscored ordinary developer orders, real incremental CGUs, invalid edits, native security and clean controls
-        id: structural
-        if: steps.provider.outcome == 'success'
-        run: |
-          root="$RUNNER_TEMP/apple-crc-local-incremental"
-          python3 -IB scripts/ohm-apple-zmij/run.py crc_clock structural "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["structural"]).lower())' "$root/receipts/declared-crc-subject.json" >> "$GITHUB_OUTPUT"
-      - name: Mirrored ordinary untraced timers accounting for all native rechecks
-        id: pilot
-        if: steps.structural.outputs.passed == 'true'
-        run: |
-          root="$RUNNER_TEMP/apple-crc-local-incremental"
-          python3 -IB scripts/ohm-apple-zmij/run.py crc_clock screen "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["valid"]).lower())' "$root/receipts/crc-clock-screen/result.json" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: crc-local-incremental-pilots
-          path: ${{ runner.temp }}/apple-crc-local-incremental/receipts
-          retention-days: 14
-          if-no-files-found: warn
-      - name: Twelve independent balanced pairs after both valid pilots, including sub-twofold pilots
-        if: steps.pilot.outputs.passed == 'true'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py crc_clock confirmation "$RUNNER_TEMP/apple-crc-local-incremental"
-      - name: Record the actual terminal gate, including any under-twofold or skipped result
+      - name: screen ordinary standalone build Cargo after qualified local mechanism
+        id: screen_build
+        if: always() && steps.structural_build.outcome == 'success'
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py screen "$RUNNER_TEMP/apple-ast293-developer" build
+      - name: confirm ordinary standalone build Cargo after qualified local mechanism
+        id: confirm_build
+        if: always() && steps.screen_build.outcome == 'success'
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py confirm "$RUNNER_TEMP/apple-ast293-developer" build
+      - name: screen ordinary standalone test Cargo after qualified local mechanism
+        id: screen_test
+        if: always() && steps.structural_test.outcome == 'success'
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py screen "$RUNNER_TEMP/apple-ast293-developer" test
+      - name: confirm ordinary standalone test Cargo after qualified local mechanism
+        id: confirm_test
+        if: always() && steps.screen_test.outcome == 'success'
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py confirm "$RUNNER_TEMP/apple-ast293-developer" test
+      - name: Seal both independent verb outcomes
         if: always()
         run: |
-          root="$RUNNER_TEMP/apple-crc-local-incremental"
-          python3 -IB - "$root/receipts" <<'PYCODE'
+          root="$RUNNER_TEMP/apple-ast293-developer/receipts"
+          python3 -IB - "$root" <<'PYCODE'
           import json,pathlib,sys
-          root=pathlib.Path(sys.argv[1]);root.mkdir(exist_ok=True,parents=True)
-          rows={}
-          for label,rel,key in [('providers','provider-matrix/terminal.json','passed'),('structural','declared-crc-subject.json','structural'),('pilot','crc-clock-screen/result.json','valid'),('independent','crc-clock-confirmation/result.json','passed')]:
-              path=root/rel;rows[label]=json.loads(path.read_text())[key] if path.is_file() else None
-          (root/'terminal-gates.json').write_text(json.dumps(rows,sort_keys=True)+'\n')
-          print(rows);sys.exit(0 if all(x is True for x in rows.values()) else 1)
+          base=pathlib.Path(sys.argv[1]);summary={};valid=True
+          for verb in ('build','test'):
+              vals={}
+              for phase in ('structural','screen','confirm'):
+                  p=base/('ast-'+verb+'-'+phase)/'result.json'
+                  vals[phase]=json.loads(p.read_text()) if p.is_file() else {}
+              s=vals['structural'];c=vals['confirm']
+              ok=s.get('safe') is True and (c.get('valid') is True if s.get('mechanism') else c.get('acquired') is False)
+              summary[verb]={'safe':s.get('safe'),'mechanism':s.get('mechanism'),'observations':c.get('valid',False),'twofold':c.get('twofold_confirmed'),'valid':ok};valid &= ok
+          (base/'ast-ordinary-terminal.json').write_text(json.dumps(summary,sort_keys=True)+'\n')
+          print(summary);sys.exit(0 if valid else 1)
           PYCODE
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: crc-local-incremental-final
-          path: ${{ runner.temp }}/apple-crc-local-incremental/receipts
+          name: ast293-developer-final
+          path: ${{ runner.temp }}/apple-ast293-developer/receipts
           retention-days: 14
           if-no-files-found: warn

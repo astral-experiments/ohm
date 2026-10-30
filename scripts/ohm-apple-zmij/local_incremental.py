@@ -49,10 +49,10 @@ def preparation(work):
     return {'target_entries': 0, 'shared_entries': 0}
 
 
-def census(work, relative):
+def census(work, relative, crate_name="ty_vendored"):
     base = work / relative
     need(local_path(work, base) == relative and base.is_dir(), 'missing actual rustc incremental root')
-    candidates = [base] if base.name.startswith('ty_vendored-') else sorted(base.glob('ty_vendored-*'))
+    candidates = [base] if base.name.startswith(crate_name+'-') else sorted(base.glob(crate_name+'-*'))
     files = []
     for crate in candidates:
         if not crate.is_dir() or crate.is_symlink():
@@ -78,12 +78,12 @@ def check_cache(cache):
          'actual compiler incremental directory has no complete native work-product generation')
 
 
-def observed(work, sdk, env, out, events, step):
+def observed(work, sdk, env, out, events, step, *, crate_name="ty_vendored", test=True):
     rustc = sdk / 'bin/rustc'
     emitters = []
     for event in events:
         args = event['argv']
-        if not ('--test' in args and '--crate-name' in args and args[args.index('--crate-name')+1] == 'ty_vendored'):
+        if not (('--test' in args) == test and '--crate-name' in args and args[args.index('--crate-name')+1] == crate_name):
             continue
         path = Path(event['path'])
         if not path.is_file() or not path.samefile(rustc) or any('link-only' in a for a in args):
@@ -104,10 +104,10 @@ def observed(work, sdk, env, out, events, step):
     if len(roots) == 1:
         rel, = roots
         if (work/rel).is_dir():
-            report['cache'] = census(work, rel)
+            report['cache'] = census(work, rel, crate_name)
     save(out/'local-incremental.json', report)
     need((not emitters and step in ('repeat-1','repeat-2') or len(emitters)==1 and len(emitters[0]['incremental'])==1) and len(roots)==1,
-         'actual local ty_vendored full compiler did not receive exactly one -C incremental')
+         f'actual local {crate_name} full compiler did not receive exactly one -C incremental')
     if step != 'invalid':
         need(report['cache'] is not None,'missing rustc incremental output')
         check_cache(report['cache'])

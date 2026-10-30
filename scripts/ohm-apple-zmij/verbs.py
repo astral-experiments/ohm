@@ -226,6 +226,9 @@ def installed(verb, root, role, out, steps, trace, *, timed=False):
         prev = state
     need(not pending, "truncated timed commands")
     need(ident == sdk_id(sdk, env) and driver.stat().st_ctime_ns==stamp, "SDK changed during run")
+    if timed:
+        from ast_developer_witness import timed_final
+        timed_final(work,out)
     retire(work)
     return rows
 

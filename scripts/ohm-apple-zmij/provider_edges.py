@@ -17,15 +17,11 @@ from measure import capture, native_rows, select, typed
 from study import CHILD, MISSING, PARENT, RECHECK, check_host, compress_bytes, digest, env_for, load, need, physical, run, save, sha
 
 
-BARRIER = '''#[target_feature(enable="crc")]
-#[inline(never)]
-unsafe fn checked_crc(mut value: u32, data: u32) -> u32 {
-    unsafe { core::arch::asm!("crc32w {v:w}, {v:w}, {d:w}", v = inout(reg) value, d = in(reg) data); }
-    value
-}
-#[inline(never)]
+BARRIER = '''#[inline(never)]
 pub fn barrier(value: i32) -> i32 {
-    assert_eq!(unsafe { checked_crc(0, 0) }, 0);
+    let mut vector: core::arch::aarch64::int32x4_t = unsafe { core::mem::zeroed() };
+    unsafe { core::arch::asm!("/*{:v}*/", inout(vreg) vector); }
+    core::hint::black_box(vector);
     value
 }
 '''

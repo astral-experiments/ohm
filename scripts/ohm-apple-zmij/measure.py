@@ -205,6 +205,13 @@ def capture(argv, cwd, env, out, trace=None, clock=False):
     out.mkdir(parents=True)
     rows = None
     times = {}
+    # Only enroll these exact Cargo subjects. Native readers and provider fixtures run separately.
+    ast_request = (len(argv) > 3 and argv[:2] == ["cargo", "+ohm"] and argv[2] in {"build", "test"}
+                   and "-p" in argv and argv[argv.index("-p")+1] == "ruff_python_ast")
+    if ast_request:
+        from ast_developer_witness import before, after, runtime
+        host = runtime(env)
+        prior = before(host[0]) if trace is not None else None
     with tempfile.TemporaryFile() as o, tempfile.TemporaryFile() as e:
         if trace is not None:
             status, rows = trace.command(argv, env=env, cwd=cwd, out=o, err=e)
@@ -249,6 +256,8 @@ def capture(argv, cwd, env, out, trace=None, clock=False):
         sums["native_events"] = compress_bytes(
             out / "exec.json.gz", json.dumps(rows, separators=(",", ":")).encode()
         )
+    if ast_request and trace is not None:
+        after(host, env, out, rows, prior, argv[2])
     return status, stdout, stderr, rows, dict(streams=sums, **times)
 
 
@@ -300,19 +309,25 @@ def caller(work, sdk, env, archive, search, state, out, trace):
         header[:8] == bytes.fromhex("cffaedfe0c000001") and header[12:16] == b"\2\0\0\0",
         "reader is not ARM64 MH_EXECUTE",
     )
+    from verbs import macho_text
     binary_digest = sha(binary)
-    if out.parent.name.startswith("clean-"):
-        copies = work.parent / "receipts" / "clean-readers"
-        copies.mkdir(exist_ok=True)
-        receipt = copies / (binary_digest + ".macho.gz")
-        if not receipt.exists():
-            need(
-                compress_bytes(receipt, binary.read_bytes()) == binary_digest,
-                "native reader changed during custody",
-            )
+    if trace is not None:
+        archived = work.parent / "receipts/ast-rlib" / (sha(archive) + ".rlib.gz")
+        archived.parent.mkdir(exist_ok=True)
+        if not archived.exists():
+            need(compress_bytes(archived, archive.read_bytes()) == sha(archive), "archive changed during custody")
+    copies = work.parent / "receipts" / "clean-readers"
+    copies.mkdir(exist_ok=True)
+    receipt = copies / (binary_digest + ".macho.gz")
+    if not receipt.exists():
+        need(
+            compress_bytes(receipt, binary.read_bytes()) == binary_digest,
+            "native reader changed during custody",
+        )
     return {
         "sha256": binary_digest,
         "value": value,
+        "macho_text": macho_text(binary)["text"],
         **archive_evidence(archive),
         "native": native,
         "streams": stats["streams"],
@@ -349,12 +364,7 @@ def phase(root, work, sdk, env, role, label, state, trace, out, *, captured=None
     need(
         len(zmij) == 1 and sha(zmij[0]["target"]["src_path"]) == ZMIJ_LIB, "unmodified original zmij not used"
     )
-    if label in ("edit", "repeat-1", "repeat-2"):
-        need(zmij[0]["fresh"] == (role == "C"), "wrong ordinary typed zmij freshness")
     mark, body = held[2] if held else marked(work)
-    need(
-        mark["hard"] == (role != "C") and mark["recheck"] == (role == "C"), f"{role} unexpected marker {mark}"
-    )
     compress_bytes(out / "zmij.dep.gz", body)
     if expected:
         archive, search = held[:2] if held else products(arts)
@@ -376,12 +386,9 @@ def phase(root, work, sdk, env, role, label, state, trace, out, *, captured=None
             native["cargo"] in (None, 1) and native["full"].count("zmij") == int(not zmij[0]["fresh"]),
             "actual vs typed zmij mismatch",
         )
-        if label in ("repeat-1", "repeat-2", "edit"):
-            want = int(role != "C")
-            need(
-                native["full"].count("zmij") == want and not native["link_only"] and not native["linkers"],
-                f"{role}/{label}: wrong zmij count or unexpected native link",
-            )
+        need(all(link["stock"] for link in native["linkers"]), "non-Apple linker in Cargo invocation")
+        if label == "edit":
+            need("ruff_python_ast" in native["full"], "real AST library edit did not compile")
     record = {
         "phase": label,
         "role": role,
@@ -391,6 +398,7 @@ def phase(root, work, sdk, env, role, label, state, trace, out, *, captured=None
         "roster": roster,
         "native": native,
         "marker": mark,
+        "fresh_zmij": zmij[0]["fresh"],
         "reader": reader,
         "codes": codes,
         "source": sha(repo / SOURCE),
@@ -442,5 +450,8 @@ def installation(root, role, out, *, trace=None, timed=False, clean_only=None, i
             "phase_sha256": {k: sha(out / k / "verified.json") for k in records},
         },
     )
+    if timed:
+        from ast_developer_witness import timed_final
+        timed_final(work,out)
     retire(work)
     return records
