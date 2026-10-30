@@ -189,78 +189,65 @@ def run_pair_workspace(root, trace):
     top = root / "receipts/ty-comparison/workspace"
     work = root / "ty-compared-workspace"
     work.mkdir()
-    summary = {}
-    shapes = {}
-    for role in ("P", "C"):
-        sdk = select(root, role)
-        env = env_for(work, sdk)
-        identity = None
-        snapshots = {}
-        for sequence, phases in (
-            ("visit", WORKSPACE_PHASES),
-            ("empty-new", [("clean", "new")]),
-        ):
-            check_host(root, 65)
-            fresh(work, root / "seed")
-            current = sdk_id(sdk, env)
-            if identity is None:
-                identity = current
-            need(current == identity, "changed workspace compiler")
-            before = None
-            for label, state in phases:
-                if before != state:
-                    checkout(root / "ruff", state)
-                before = state
-                dest = top / role / sequence / label
-                collect(root, "workspace", work, sdk, env, trace, dest, state, label)
-                snapshots[label] = load(dest / "verified.json")
+    import collections
+    from workspace_images import compare as compare_image
+    summary={};clean_by_role={};cross={};all_failures=[]
+    for role in ('P','C'):
+        sdk=select(root,role);env=env_for(work,sdk);identity=None;snapshots={}
+        need('CI' not in env and 'TF_BUILD' not in env and 'CARGO_INCREMENTAL' not in env,'not ordinary developer Cargo')
+        for sequence,phases in (('empty-old',[('clean','old')]),('visit',WORKSPACE_PHASES),('empty-new',[('clean','new')])):
+            check_host(root,65);fresh(work,root/'seed')
+            current=sdk_id(sdk,env);identity=identity or current;need(current==identity,'workspace compiler drift')
+            before=None
+            for label,state in phases:
+                if before!=state:checkout(root/'ruff',state)
+                before=state;dest=top/role/sequence/label
+                collect(root,'workspace',work,sdk,env,trace,dest,state,label)
+                snapshots['clean-old' if sequence=='empty-old' else label]=load(dest/'verified.json')
             retire(work)
-        need(identity == sdk_id(sdk, env), "workspace SDK drift")
-        clean = roster(snapshots["clean"])
-        summary[role] = {}
-        shapes[role] = set(clean)
-        for phase, row in snapshots.items():
-            if phase=="invalid":
-                need(row["exit"]==101 and row["e2e"] is None, "invalid source returned an e2e program")
+        need(identity==sdk_id(sdk,env),'workspace SDK drift')
+        anchors={state:roster(snapshots[key]) for state,key in (('old','clean-old'),('new','clean'))}
+        need(len(anchors['old'])==len(anchors['new'])==83 and set(anchors['old'])==set(anchors['new']),'missing workspace test')
+        clean_by_role[role]=anchors;summary[role]={}
+        for phase,row in snapshots.items():
+            if phase=='invalid':
+                need(row['exit']==101 and row['e2e'] is None,'invalid source returned an e2e program')
                 continue
-            binaries = roster(row)
-            need(set(binaries) == shapes[role], "different logical test outputs")
-            mismatches = []
-            if phase != "cold":
-                mismatches = [
-                    list(key)
-                    for key, (_, cur) in binaries.items()
-                    if (cur["sha"], cur["bytes"])
-                    != (clean[key][1]["sha"], clean[key][1]["bytes"])
-                ]
-                need(
-                    row["e2e"] == snapshots["clean"]["e2e"],
-                    "workspace e2e differs from clean",
-                )
-            summary[role][phase] = {
-                "physical_rustcs": row["native"]["full"],
-                "link_only": row["native"]["link_only"],
-                "all_linkers": len(row["native"]["linkers"]),
-                "e2e_links": row["e2e_links"],
-                "test_count": len(binaries),
-                "linked_tests": [
-                    list(key)
-                    for key, (_, info) in sorted(binaries.items())
-                    if info["links"]
-                ],
-                "mismatches_to_clean_B": mismatches,
-            }
-            save(top / role / ("counts-" + phase + ".json"), summary[role][phase])
-    need(shapes["P"] == shapes["C"], "different test outputs between compilers")
-    save(top / "paired-physical.json", summary)
-    need(
-        all(
-            not obs["mismatches_to_clean_B"]
-            for arm in summary.values()
-            for obs in arm.values()
-        ),
-        "one or more workspace binaries differ from independent clean B",
-    )
+            state=row['state'];binaries=roster(row);anchors_here=anchors[state]
+            need(set(binaries)==set(anchors_here),'different logical test outputs')
+            verdicts=[];strict=[];mismatches=[]
+            for unit,(raw_path,cur) in sorted(binaries.items()):
+                reference_path,reference=anchors_here[unit]
+                need(raw_path==reference_path and cur['features']==reference['features'] and cur['profile']==reference['profile'],'test identity drift')
+                status=compare_image(cur['proof'],reference['proof'])
+                if cur['sha']!=reference['sha']:strict.append(list(unit))
+                verdicts.append({'unit':list(unit),'status':status,'actual':cur['sha'],'empty':reference['sha'],
+                                 'observed_links':cur['links'],'actual_own_link':cur['proof']['link_origin'],'empty_own_link':reference['proof']['link_origin']})
+                if status not in ('exact','authenticated-local-names'):
+                    mismatches.append([list(unit),status])
+            e2e_clean=snapshots['clean-old' if state=='old' else 'clean']['e2e']
+            if row['e2e']['text']!=e2e_clean['text'] or row['e2e']['inventory']!=e2e_clean['inventory']:
+                mismatches.append(['ty_server e2e','different native instructions or test inventory'])
+            if mismatches:all_failures.append([role,phase,mismatches])
+            summary[role][phase]={'physical_rustcs':row['native']['full'],'link_only':row['native']['link_only'],
+                'all_linkers':len(row['native']['linkers']),'e2e_links':row['e2e_links'],'test_count':len(binaries),
+                'linked_tests':[list(k) for k,(_,v) in sorted(binaries.items()) if v['links']],
+                'raw_differences_to_own_empty':strict,'mismatches_to_clean_B':mismatches,'source_state':state,
+                'image_results':dict(collections.Counter(v['status'] for v in verdicts))}
+            save(top/role/('all-images-'+phase+'.json'),verdicts)
+            save(top/role/('counts-'+phase+'.json'),summary[role][phase])
+    for state in ('old','new'):
+        left,right=[clean_by_role[r][state] for r in 'PC'];need(set(left)==set(right),'unmatched clean compiler test sets')
+        rows=[]
+        for unit in sorted(left):
+            a,b=left[unit][1],right[unit][1];status=compare_image(a['proof'],b['proof'],cross=True)
+            rows.append({'unit':list(unit),'status':status,'parent':a['sha'],'child':b['sha']})
+            if status not in ('exact','authenticated-cross-compiler'):all_failures.append(['cross',state,[list(unit),status]])
+        cross[state]=dict(collections.Counter(r['status'] for r in rows))
+        save(top/('all-clean-across-'+state+'.json'),rows)
+    save(top/'paired-physical.json',summary)
+    save(top/'image-qualification.json',{'safe':not all_failures,'failures':all_failures,'cross_clean':cross,'timed':False})
+    return not all_failures
 
 
 if __name__ == "__main__":

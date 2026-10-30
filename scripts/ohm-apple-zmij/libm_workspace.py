@@ -37,7 +37,7 @@ def run(root):
                  "math assembly did not select the expected marker in provider case")
     trace=CensusTrace()
     try:
-        trace.ready();run_pair_workspace(root,trace)
+        trace.ready();safe=run_pair_workspace(root,trace)
     finally:trace.close()
     top=root/"receipts/ty-comparison/workspace"
     summaries=load(top/"paired-physical.json")
@@ -49,13 +49,16 @@ def run(root):
             units=row["libm"]
             need(units and all(u["hard"]==(r=="P") and u["recheck"]==(r=="C") for u in units),"libm markers differ")
             summary=summaries[r][phase]
-            need(summary["test_count"]==83 and not summary["mismatches_to_clean_B"],"wrong clean workspace outputs")
+            need(summary["test_count"]==83,"missing returned workspace outputs")
             details[r]={**summary,"libm_compiled":row["native"]["full"].count("libm"),"native_drivers":len(row["native"]["cargo_link_driver"])}
         logical=lambda r:{(pkg,name,tuple(kind)) for pkg,name,kind in details[r]["linked_tests"]}
         outcome[phase]={"roles":details,"saved":sorted(logical("P")-logical("C")),"added":sorted(logical("C")-logical("P"))}
     save(root/"receipts/libm-workspace.json",outcome)
+    save(root/"receipts/libm-workspace-qualification.json",{"safe":safe,"timed":False,"source_changes":[A,B],"programs_per_success":83,
+        "source_result":sha(top/"image-qualification.json")})
     for phase,info in outcome.items():
         print(phase,{r:[len(v["physical_rustcs"]),len(v["link_only"]),v["all_linkers"],len(v["linked_tests"])] for r,v in info['roles'].items()},flush=True)
+    need(safe,"one or more real workspace outputs remained unqualified; inspect the full per-program evidence")
 
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("mode",choices=("seed","run"));p.add_argument("root",type=Path)

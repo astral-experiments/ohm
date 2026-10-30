@@ -8,6 +8,7 @@ import subprocess
 
 from execs import ExecTrace
 from local_dev import observe
+import workspace_images
 from measure import capture, fresh, native_rows, retire, select
 from prepare import prepare_ruff
 from study import ZMIJ_LIB, check_host, compress_bytes, digest, env_for, git, need, save, sdk_id, sha, text_git
@@ -99,6 +100,8 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
     if ok:
         need(math_units and native["full"].count("libm")==sum(not x["fresh"] for x in math_units),"physical compiler and Cargo typed libm disagree")
     links=collections.Counter(output_name(l) for l in native["linkers"])
+    certs=workspace_images.outputs(native,events) if scope=="workspace" and ok else {}
+    prior=vars(trace).setdefault("workspace_image_history",{}).setdefault(str(dest.parent),{})
     binaries={}
     e2e=None
     e2e_links=None
@@ -108,7 +111,11 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
         path=Path(r["executable"]).resolve(strict=True)
         key=(r["package_id"],r["target"]["name"],tuple(r["target"]["kind"]),str(path))
         need(str(path) not in binaries,"duplicate typed native executable path")
-        binaries[str(path)]={"unit":key[:-1],"bytes":path.stat().st_size,"sha":sha(path),"links":links[str(path)]}
+        binaries[str(path)]={"unit":key[:-1],"features":r["features"],"profile":r["profile"],"bytes":path.stat().st_size,"sha":sha(path),"links":links[str(path)]}
+        if scope=="workspace" and ok:
+            proof=workspace_images.bind(root,dest,path,key[:-1],certs.get(str(path),[]),prior)
+            need(proof["raw"]==binaries[str(path)]["sha"],"workspace output changed during native readback")
+            binaries[str(path)]["proof"]=proof
         if Path(r["target"]["src_path"]).resolve()==(repo/E2E).resolve():
             need(e2e is None,"ambiguous ty_server e2e")
             e2e=actual_tests(path,repo,env,state,dest)

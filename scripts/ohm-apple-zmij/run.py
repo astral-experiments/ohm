@@ -6,7 +6,7 @@ from pathlib import Path
 
 if __name__ == "__main__":
     directory = Path(__file__).resolve().parent
-    allowed = {"admit", "calibrate", "cohort", "host", "pilot", "prepare", "test_build_study", "test_protocol", "verbs", "verify", "zlib_study", "crc_clock", "objc2_cli", "libm_workspace"}
+    allowed = {"admit", "calibrate", "cohort", "host", "pilot", "prepare", "test_cgu", "test_build_study", "test_protocol", "verbs", "verify", "zlib_study", "crc_clock", "objc2_cli", "libm_workspace"}
     if len(sys.argv) < 2 or sys.argv[1] not in allowed:
         raise SystemExit("select one of " + ", ".join(sorted(allowed)))
     file = directory / (sys.argv[1] + ".py")

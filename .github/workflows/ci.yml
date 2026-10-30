@@ -7,8 +7,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   libm-on-293:
+    if: github.ref == 'refs/heads/charlie/qa-apple-libm-workspace-objects'
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 300
+    timeout-minutes: 355
     env:
       PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -22,11 +23,12 @@ jobs:
       - name: Freeze and verify subjects, provider design and native execution observer
         run: |
           root="$RUNNER_TEMP/apple-libm-on-293"
+          python3 -IB scripts/ohm-apple-zmij/run.py test_cgu scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/libm-secure-plan.md "$root/receipts/registration.md"
+          cp scripts/ohm-apple-zmij/libm-full-objects-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}
@@ -60,21 +62,24 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: libm-development-workspace-on-293-provider
+          name: libm-workspace-physical-objects-provider
           path: ${{ runner.temp }}/apple-libm-on-293/receipts
           retention-days: 14
           if-no-files-found: warn
-      - name: Real full Ruff workspace test builds, true target links, E0425, repair, clean matches and library consumers
+      - name: Full Ruff 83-program workspace, two empty references, genuine edit, physical objects, metadata reader and repair
+        id: workspace
         if: steps.provider.outputs.passed == 'true'
         run: python3 -IB scripts/ohm-apple-zmij/run.py libm_workspace run "$RUNNER_TEMP/apple-libm-on-293"
-      - name: Verify provider and real application outcomes
+      - name: Verify original provider, every physical program, both empty references and native math
+        if: always() && steps.provider.outputs.passed == 'true' && steps.workspace.outcome != 'skipped'
         run: |
           root="$RUNNER_TEMP/apple-libm-on-293"
+          python3 -IB scripts/ohm-apple-zmij/libm_workspace_readback.py "$root/receipts"
           python3 -IB -c 'import json, pathlib, sys; d=pathlib.Path(sys.argv[1]); assert json.loads((d/"provider-matrix/terminal.json").read_text())["passed"]; assert set(json.loads((d/"libm-workspace.json").read_text()))=={"edit","repeat-1","repeat-2","repair"}' "$root/receipts"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: libm-development-workspace-on-293-final
+          name: libm-workspace-physical-objects-final
           path: ${{ runner.temp }}/apple-libm-on-293/receipts
           retention-days: 14
           if-no-files-found: warn

@@ -44,6 +44,12 @@ def observe(events, work, sdk, subjects, dest):
             continue
         if any("link-only" in a for a in argv):
             continue
+        emits=[a[7:] for a in argv if a.startswith("--emit=")]
+        emits.extend(b for a,b in zip(argv,argv[1:]) if a=="--emit")
+        if not any("link" in e.split(",") for e in emits):
+            continue
+        if crate=="e2e":
+            need("--test" in argv,"physical e2e emitter is not a test executable")
         values = [argv[i + 1] for i, arg in enumerate(argv[:-1]) if arg == "-C"]
         values.extend(a[2:] for a in argv if a.startswith("-C") and a != "-C")
         inc = [v.split("=", 1)[1] for v in values if v.startswith("incremental=")]
