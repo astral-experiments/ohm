@@ -12,13 +12,14 @@ if [[ "${1:-build}" == build ]]; then
     python3 -IB "$transport/prepare.py" "$src" > "$log/transport.json"
     python3 -IB "$transport/crc/prepare.py" "$src" > "$log/crc-transport.json"
     python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-cgu-reuse/transport/prepare.py" "$src" > "$log/cgu-transport.json"
+    python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-cgu-reuse/transport/guard/prepare.py" "$src" > "$log/external-input-transport.json"
 fi
 cd "$src"
 parent=82911b516fb35608fd70ada4deb6f8429277f410
-child=3de892a47171543b624e0d360d6d532f2da815f7
-test "$(git rev-parse "$child^")" = "$parent"
+child=919199fc9c2b05ee49ccf7da4d53ec68ef117e5f
+test "$(git rev-parse "$child^^")" = "$parent"
 test "$(git rev-parse "$parent:compiler")" = 019b0e35598a054357018731f9f8426c0520fc53
-test "$(git rev-parse "$child:compiler")" = c768fca8757c42ee807af3b88a90c41e9e38d89c
+test "$(git rev-parse "$child:compiler")" = 0640088775e03b6948942395dcdeb7220def02a0
 test "$(git rev-parse "$parent:library")" = "$(git rev-parse "$child:library")"
 test "$(git diff --name-only "$parent" "$child" | wc -l)" -eq 4
 flags=(--ci false --set build.submodules=false --set rust.omit-git-hash=true
@@ -31,7 +32,7 @@ export AR_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-ar
 if [[ "${1:-build}" == test-host ]]; then
     test "$(git rev-parse HEAD)" = "$child"
     test "$(git rev-parse HEAD:tests/run-make/ohm-checked-dep-info)" = 2dacccc466da9358208d2b9a6d3cc36bac5e6fdf
-    test "$(git rev-parse HEAD:tests/run-make/ohm-relink-assembler-inputs)" = c50aac4788715d02d22dff0cf1d89616e8744554
+    test "$(git rev-parse HEAD:tests/run-make/ohm-relink-assembler-inputs)" = d8dd7a06b044a57b8a684d373a57eadd69d1aec6
     python3 x.py "${flags[@]}" test --stage 1 -j8 --host "$host" --target "$host" \
       tests/run-make/ohm-checked-dep-info tests/run-make/ohm-relink-assembler-inputs 2>&1 | tee "$log/x86-host-run-make.log"
     printf '%s\n' "$child" > "$log/x86-host-run-make-pass"
