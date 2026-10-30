@@ -132,11 +132,18 @@ def acquire(old,new,trees,lock,changed,cli):
     assert not work.exists();work.mkdir()
     out=work/'receipts';out.mkdir();src=work/'ruff'
     table=json.loads((HERE.parent/'ohm-aarch64-portable-review/source/sdk-members.json').read_text())
-    v=table['roles']['M']; expected=table['common']|{table['driver_path']:v['driver']}
+    v=table['roles']['M']
+    assert v['source']=='8f42a1c11e66c2a55299914d5025e4fa7549ead4'
+    if 'CENSUS_CANDIDATE_RECORD' in os.environ:
+        child=json.loads(Path(os.environ['CENSUS_CANDIDATE_RECORD']).read_text())
+        assert child['parent']==v['source'] and child['source']=='6ae50e2d0139132d86d4fdf50648a4ddfcb2730e'
+        assert child['tree']=='979169f06d795cbf0752bc6e56e1240dc41caeac' and child['driver_path']==table['driver_path']
+        assert child['driver']!=v['driver'] and child['unchanged_members']==118
+        v={'source':child['source'],'tree':child['tree'],'driver':child['driver']}
+    expected=table['common']|{table['driver_path']:v['driver']}
     assert len(expected)==119
     for n,(h,size,mode) in expected.items():
         f=sdk/n;assert f.stat().st_size==size and f.stat().st_mode&0o777==mode and sha(f)==h,n
-    assert v['source']=='8f42a1c11e66c2a55299914d5025e4fa7549ead4'
     proxy=Path(shutil.which('rustup')).resolve(strict=True);shim=work/'proxies';shim.mkdir()
     for tool in ('cargo','rustc','rustup'):(shim/tool).symlink_to(proxy)
     home=work/'home';home.mkdir();rh=work/'rustup';(rh/'toolchains').mkdir(parents=True);(rh/'toolchains/ohm').symlink_to(sdk,target_is_directory=True)
