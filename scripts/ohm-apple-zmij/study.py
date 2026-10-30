@@ -10,10 +10,10 @@ import time
 from pathlib import Path
 
 TRIPLE = "aarch64-apple-darwin"
-PARENT = "82911b516fb35608fd70ada4deb6f8429277f410"
-CHILD = "7924254acf6ee5a17473ac47dfb33b5842d72005"
-COMPILER_TREE = "a30a5d101ec7942b211dfeceb57c3bd9274175e8"
-ASM_BLOB = "d0c705b2dec75939fdd61815263ca9e6c5eb98c6"
+PARENT = "2035696c5316079f5b2e4373aee834839aac97e9"
+CHILD = "444c0273a2e2bc0b161e988d43c882349bc2d7a6"
+COMPILER_TREE = "1276de33b6b3042ee60ca5866621a63a12de8894"
+ASM_BLOB = "22d6b32f843490b2168022f44377cbff83264b73"
 RUFF = "97e3bd58752cccffab11bc5af937ee7b9cda0c6b"
 EDIT = "ef23c9c39eb3029bab0139c3ea7ae6d95c4131e0"
 EDIT_TREE = "98a52bb4dd68ff5ce9ccae612fd0dd3c27bdbae5"
@@ -136,12 +136,8 @@ def env_for(root, sdk):
     if not alias.exists():
         alias.symlink_to(sdk.resolve(), target_is_directory=True)
     need(alias.samefile(sdk), "SDK alias moved")
-    environment = os.environ.copy()
-    for key in tuple(environment):
-        if key.startswith(
-            ("CARGO_", "RUSTC_", "RUSTDOC_", "RUSTUP_", "RUSTFLAGS", "DYLD_", "OHM_")
-        ) or key in ("RUSTC", "RUSTDOC", "GH_TOKEN", "GITHUB_TOKEN", "RUSTC_BOOTSTRAP"):
-            del environment[key]
+    from local_dev import environment as dev_environment
+    environment = dev_environment()
     environment.update(
         RUSTUP_HOME=str(rustup),
         CARGO_HOME=str(root / "cargo-home"),

@@ -19,7 +19,9 @@ from study import CHILD, MISSING, PARENT, RECHECK, check_host, compress_bytes, d
 
 BARRIER = '''#[inline(never)]
 pub fn barrier(value: i32) -> i32 {
-    unsafe { core::arch::asm!("mov fp, fp", options(nomem, nostack, preserves_flags)); }
+    let mut vector: core::arch::aarch64::int32x4_t = unsafe { core::mem::zeroed() };
+    unsafe { core::arch::asm!("/*{:v}*/", inout(vreg) vector); }
+    core::hint::black_box(vector);
     value
 }
 '''
