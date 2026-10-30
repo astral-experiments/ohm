@@ -1,0 +1,93 @@
+{
+  "cargo_gitlink": "2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c",
+  "deltas_vs_release": [
+    "compiler/rustc_codegen_llvm/src/asm.rs",
+    "compiler/rustc_interface/src/passes.rs",
+    "tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs",
+    "tests/run-make/ohm-checked-dep-info/rmake.rs"
+  ],
+  "directly_applied_tree": "1d7d8fa473e7694717b82c22dce83ff3c3d00d9a",
+  "exact_patch_application": [
+    {
+      "exit": 0,
+      "patch_sha256": "e7fe15b6e9e881bfabf03d62f21a9c699cbec3fa82b2b7d14a5692d4be372119",
+      "role": "N",
+      "stderr": ""
+    },
+    {
+      "exit": 0,
+      "patch_sha256": "ab5846964383a8f0e8068cb618bebd7c78f2a4c2f950d9fb85cb7466901979a9",
+      "role": "M-old",
+      "stderr": ""
+    },
+    {
+      "exit": 0,
+      "patch_sha256": "ef7916ffba73fde2fda7674b5ea400f4f97a9860688017ff4e3b2381f14044e0",
+      "role": "V",
+      "stderr": ""
+    }
+  ],
+  "has_builtin_gnu_classifier": false,
+  "has_versioned_missing_marker_reader_or_writer": false,
+  "parent_reviewed": "393d667b01dc7072fbc76b965119dd96c911e2c7",
+  "release_cargo_dep_info_git_blob": "33b6eb14419368f15f24def33fbeb88317e9afcb",
+  "release_commit": "c79998a5cd143c445a4b2528f20953b176a65c5d",
+  "release_tree": "77ad1e80afc956a830491544d43695ec699fac2e",
+  "scope": "Source only. This does not measure -21 or certify a new compiler binary.",
+  "upstream_changes": {
+    ".github/workflows/ci.yml": {
+      "bytes": 15091,
+      "git_blob": "a62578a8f27a972f37d7eb3148053e8eed5f33f1",
+      "mode": "100644",
+      "sha256": "2c5bf92bead45bdc81a1400108cde65f58d211d31cf474ce4d3e49dde1959c5b"
+    },
+    "compiler/rustc_codegen_llvm/src/asm.rs": {
+      "bytes": 77139,
+      "git_blob": "8cbe3af554b92ce387c7430a9d88b68dbe4ca51b",
+      "mode": "100644",
+      "sha256": "b80c87beb51a8ac081b8ea755b7b7ece2e24f1d13ce449ade1a3f07ddfddbe75"
+    },
+    "compiler/rustc_resolve/src/lib.rs": {
+      "bytes": 118332,
+      "git_blob": "df7ebac84557230b4a67f315f80331350f5791c4",
+      "mode": "100644",
+      "sha256": "e9b4edee746c60ae3e0c912b73ab39fe09e3bf59ed1efaf706ca1883296b664a"
+    },
+    "compiler/rustc_resolve/src/macros.rs": {
+      "bytes": 54070,
+      "git_blob": "4515937b4b0cc73f0a84a5bc5d409cf7c160237d",
+      "mode": "100644",
+      "sha256": "30dacf287cc94e2d2b555b955726c34825bc0ec58fc5d275116590c648f47e1e"
+    },
+    "tests/run-make/incremental-derive-call-site/observe.rs": {
+      "bytes": 466,
+      "git_blob": "94fca268af4d20765a7fbb181dcdc55687d1a2e1",
+      "mode": "100644",
+      "sha256": "4413d95e886fa18d507cd16735494180e429ca916ab01b40b94f871d899a3057"
+    },
+    "tests/run-make/incremental-derive-call-site/rmake.rs": {
+      "bytes": 1186,
+      "git_blob": "ec89a9a7c9a5e770462be28bf7504f5dc841fa67",
+      "mode": "100644",
+      "sha256": "62dad04865e6dcaafc417a7cb3a577f69583974af5f3634cee66826cae276815"
+    },
+    "tests/run-make/incremental-derive-call-site/template.rs": {
+      "bytes": 263,
+      "git_blob": "c514d2193adb60ef101d9eb4b3ec417834e0842b",
+      "mode": "100644",
+      "sha256": "960d7d18084f06440eda83a9977c158a394ecc5ebab6684b9e4a5aa7aa4dec43"
+    },
+    "tests/run-make/ohm-checked-dep-info/inline.rs": {
+      "bytes": 4946,
+      "git_blob": "89ce772800e304c3af6c2cd7071e423ad798a03f",
+      "mode": "100644",
+      "sha256": "839c2a827ad44aee50f0bee481815a58d13e52e1213a2021162fb2e11534dcd4"
+    },
+    "tests/run-make/ohm-checked-dep-info/rmake.rs": {
+      "bytes": 5497,
+      "git_blob": "c8ec3385925c1beb3fcb0ddbacdcdb66a0050bc2",
+      "mode": "100644",
+      "sha256": "674cd20f11dc8ab6d028fe437c8960beadb22413c90682a6350cb041dfc987d5"
+    }
+  }
+}

@@ -1,0 +1,653 @@
+{
+  "roles": {
+    "aware": {
+      "artifact_sha256": "c53e598086ed8cecd545f0d056c789273c2cb1c83bb4faf6000066ec1fdccde6",
+      "checked_rustc_depfiles": 48,
+      "compiler": "8f42a1c11e66c2a55299914d5025e4fa7549ead4",
+      "distinct_payloads": 2,
+      "marker": "/dev/null/ohm-recheck-dependent-links-v2",
+      "mode": "aware",
+      "negative_controls": 2,
+      "raw_depfile_sha256_by_phase": {
+        "aware-directories-direct/cold-lower": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-directories-direct/higher": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-directories-direct/real-Rust-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-directories-direct/removed-higher": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-directories-direct/repaired-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-directories-direct/restored-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-directories-direct/restored-repeat": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-directories-direct/same-inode-value": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-directories-library/cold-lower": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-directories-library/higher": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-directories-library/real-Rust-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-directories-library/removed-higher": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-directories-library/repaired-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-directories-library/restored-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-directories-library/restored-repeat": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-directories-library/same-inode-value": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-files-direct/cold-lower": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-files-direct/higher": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-files-direct/real-Rust-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-files-direct/removed-higher": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-files-direct/repaired-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-files-direct/restored-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-files-direct/restored-repeat": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-files-direct/same-inode-value": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-files-library/cold-lower": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-files-library/higher": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-files-library/real-Rust-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-files-library/removed-higher": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-files-library/repaired-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-files-library/restored-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-files-library/restored-repeat": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-files-library/same-inode-value": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-undeclared-direct/cold-lower": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-undeclared-direct/higher": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-undeclared-direct/real-Rust-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-undeclared-direct/removed-higher": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-undeclared-direct/repaired-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-undeclared-direct/restored-edit": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-undeclared-direct/restored-repeat": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-undeclared-direct/same-inode-value": [
+          "660a743c4d60f986a740d109e04d44a7044d8872699d17f9d8a4232f5993b326"
+        ],
+        "aware-undeclared-library/cold-lower": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-undeclared-library/higher": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-undeclared-library/real-Rust-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-undeclared-library/removed-higher": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-undeclared-library/repaired-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-undeclared-library/restored-edit": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-undeclared-library/restored-repeat": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ],
+        "aware-undeclared-library/same-inode-value": [
+          "394d6a5c2ea7947d961872380a7185ae8a329d18ed88ae8b14bb6aa7261bcf34"
+        ]
+      },
+      "successful_retained_phases": 48
+    },
+    "classic": {
+      "artifact_sha256": "deb62e49066744a6ad8a17c516b563acd4dd13adbeffbc1e37030865b7a39c9c",
+      "checked_rustc_depfiles": 48,
+      "compiler": "8f42a1c11e66c2a55299914d5025e4fa7549ead4",
+      "distinct_payloads": 2,
+      "marker": "/dev/null/ohm-recheck-dependent-links-v2",
+      "mode": "classic",
+      "negative_controls": 2,
+      "raw_depfile_sha256_by_phase": {
+        "classic-directories-direct/cold-lower": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-directories-direct/higher": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-directories-direct/real-Rust-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-directories-direct/removed-higher": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-directories-direct/repaired-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-directories-direct/restored-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-directories-direct/restored-repeat": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-directories-direct/same-inode-value": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-directories-library/cold-lower": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-directories-library/higher": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-directories-library/real-Rust-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-directories-library/removed-higher": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-directories-library/repaired-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-directories-library/restored-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-directories-library/restored-repeat": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-directories-library/same-inode-value": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-files-direct/cold-lower": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-files-direct/higher": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-files-direct/real-Rust-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-files-direct/removed-higher": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-files-direct/repaired-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-files-direct/restored-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-files-direct/restored-repeat": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-files-direct/same-inode-value": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-files-library/cold-lower": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-files-library/higher": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-files-library/real-Rust-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-files-library/removed-higher": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-files-library/repaired-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-files-library/restored-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-files-library/restored-repeat": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-files-library/same-inode-value": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-undeclared-direct/cold-lower": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-undeclared-direct/higher": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-undeclared-direct/real-Rust-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-undeclared-direct/removed-higher": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-undeclared-direct/repaired-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-undeclared-direct/restored-edit": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-undeclared-direct/restored-repeat": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-undeclared-direct/same-inode-value": [
+          "1b523ebff12301f659b77cafe267fff04a9bc6aa6da9e73b71fd876e3b1d0ae9"
+        ],
+        "classic-undeclared-library/cold-lower": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-undeclared-library/higher": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-undeclared-library/real-Rust-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-undeclared-library/removed-higher": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-undeclared-library/repaired-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-undeclared-library/restored-edit": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-undeclared-library/restored-repeat": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ],
+        "classic-undeclared-library/same-inode-value": [
+          "b09c8b8c770c601414886ceb83ffbdb8bc7154525406fe165195989068803b99"
+        ]
+      },
+      "successful_retained_phases": 48
+    },
+    "legacy-writer": {
+      "artifact_sha256": "0f58629f66143ddf9c9a0023bafedfdad176ecd5ee9516b26735f9661d5522e1",
+      "checked_rustc_depfiles": 16,
+      "compiler": "f2edebc7a23b809749fb0cc44dd6ac902ca448ff",
+      "distinct_payloads": 2,
+      "marker": "/dev/null/ohm-recheck-dependent-links",
+      "mode": "legacy-writer",
+      "negative_controls": 2,
+      "raw_depfile_sha256_by_phase": {
+        "legacy-writer-undeclared-direct/cold-lower": [
+          "8e453d6023c06df51c5d3bdc20cd583325f903af2e371ad9e1da8aa606cb25f9"
+        ],
+        "legacy-writer-undeclared-direct/higher": [
+          "8e453d6023c06df51c5d3bdc20cd583325f903af2e371ad9e1da8aa606cb25f9"
+        ],
+        "legacy-writer-undeclared-direct/real-Rust-edit": [
+          "8e453d6023c06df51c5d3bdc20cd583325f903af2e371ad9e1da8aa606cb25f9"
+        ],
+        "legacy-writer-undeclared-direct/removed-higher": [
+          "8e453d6023c06df51c5d3bdc20cd583325f903af2e371ad9e1da8aa606cb25f9"
+        ],
+        "legacy-writer-undeclared-direct/repaired-edit": [
+          "8e453d6023c06df51c5d3bdc20cd583325f903af2e371ad9e1da8aa606cb25f9"
+        ],
+        "legacy-writer-undeclared-direct/restored-edit": [
+          "8e453d6023c06df51c5d3bdc20cd583325f903af2e371ad9e1da8aa606cb25f9"
+        ],
+        "legacy-writer-undeclared-direct/restored-repeat": [
+          "8e453d6023c06df51c5d3bdc20cd583325f903af2e371ad9e1da8aa606cb25f9"
+        ],
+        "legacy-writer-undeclared-direct/same-inode-value": [
+          "8e453d6023c06df51c5d3bdc20cd583325f903af2e371ad9e1da8aa606cb25f9"
+        ],
+        "legacy-writer-undeclared-library/cold-lower": [
+          "385bbd324751601ec24cb876a8ec72cf86834cfbbfa02777c7c09b2df33a26a2"
+        ],
+        "legacy-writer-undeclared-library/higher": [
+          "385bbd324751601ec24cb876a8ec72cf86834cfbbfa02777c7c09b2df33a26a2"
+        ],
+        "legacy-writer-undeclared-library/real-Rust-edit": [
+          "385bbd324751601ec24cb876a8ec72cf86834cfbbfa02777c7c09b2df33a26a2"
+        ],
+        "legacy-writer-undeclared-library/removed-higher": [
+          "385bbd324751601ec24cb876a8ec72cf86834cfbbfa02777c7c09b2df33a26a2"
+        ],
+        "legacy-writer-undeclared-library/repaired-edit": [
+          "385bbd324751601ec24cb876a8ec72cf86834cfbbfa02777c7c09b2df33a26a2"
+        ],
+        "legacy-writer-undeclared-library/restored-edit": [
+          "385bbd324751601ec24cb876a8ec72cf86834cfbbfa02777c7c09b2df33a26a2"
+        ],
+        "legacy-writer-undeclared-library/restored-repeat": [
+          "385bbd324751601ec24cb876a8ec72cf86834cfbbfa02777c7c09b2df33a26a2"
+        ],
+        "legacy-writer-undeclared-library/same-inode-value": [
+          "385bbd324751601ec24cb876a8ec72cf86834cfbbfa02777c7c09b2df33a26a2"
+        ]
+      },
+      "successful_retained_phases": 16
+    },
+    "migrate-classic": {
+      "artifact_sha256": "f2f1d79b5dfc74080f90d8df77512184c8e16b01a152b7d19ba4934290ae8459",
+      "checked_rustc_depfiles": 16,
+      "compiler": "8f42a1c11e66c2a55299914d5025e4fa7549ead4",
+      "distinct_payloads": 2,
+      "marker": "/dev/null/ohm-recheck-dependent-links-v2",
+      "mode": "migrate-classic",
+      "negative_controls": 2,
+      "raw_depfile_sha256_by_phase": {
+        "migrate-classic-undeclared-direct/cold-lower": [
+          "e41ac8eb29ea47554293e2a51804f3393ec48366b5feb9cb9dd2e2b10f8b36a1"
+        ],
+        "migrate-classic-undeclared-direct/downgrade-repaired": [
+          "e41ac8eb29ea47554293e2a51804f3393ec48366b5feb9cb9dd2e2b10f8b36a1"
+        ],
+        "migrate-classic-undeclared-direct/downgrade-unchanged": [
+          "e41ac8eb29ea47554293e2a51804f3393ec48366b5feb9cb9dd2e2b10f8b36a1"
+        ],
+        "migrate-classic-undeclared-direct/trained-repeat": [
+          "e41ac8eb29ea47554293e2a51804f3393ec48366b5feb9cb9dd2e2b10f8b36a1"
+        ],
+        "migrate-classic-undeclared-direct/upgrade-higher": [
+          "e41ac8eb29ea47554293e2a51804f3393ec48366b5feb9cb9dd2e2b10f8b36a1"
+        ],
+        "migrate-classic-undeclared-direct/upgrade-repaired": [
+          "e41ac8eb29ea47554293e2a51804f3393ec48366b5feb9cb9dd2e2b10f8b36a1"
+        ],
+        "migrate-classic-undeclared-direct/upgrade-restamped": [
+          "e41ac8eb29ea47554293e2a51804f3393ec48366b5feb9cb9dd2e2b10f8b36a1"
+        ],
+        "migrate-classic-undeclared-direct/upgrade-unchanged": [
+          "e41ac8eb29ea47554293e2a51804f3393ec48366b5feb9cb9dd2e2b10f8b36a1"
+        ],
+        "migrate-classic-undeclared-library/cold-lower": [
+          "9a3bf144405d55180573fe77c83fea4ca306d899f16ef8e63a7a1cd8406bf80a"
+        ],
+        "migrate-classic-undeclared-library/downgrade-repaired": [
+          "9a3bf144405d55180573fe77c83fea4ca306d899f16ef8e63a7a1cd8406bf80a"
+        ],
+        "migrate-classic-undeclared-library/downgrade-unchanged": [
+          "9a3bf144405d55180573fe77c83fea4ca306d899f16ef8e63a7a1cd8406bf80a"
+        ],
+        "migrate-classic-undeclared-library/trained-repeat": [
+          "9a3bf144405d55180573fe77c83fea4ca306d899f16ef8e63a7a1cd8406bf80a"
+        ],
+        "migrate-classic-undeclared-library/upgrade-higher": [
+          "9a3bf144405d55180573fe77c83fea4ca306d899f16ef8e63a7a1cd8406bf80a"
+        ],
+        "migrate-classic-undeclared-library/upgrade-repaired": [
+          "9a3bf144405d55180573fe77c83fea4ca306d899f16ef8e63a7a1cd8406bf80a"
+        ],
+        "migrate-classic-undeclared-library/upgrade-restamped": [
+          "9a3bf144405d55180573fe77c83fea4ca306d899f16ef8e63a7a1cd8406bf80a"
+        ],
+        "migrate-classic-undeclared-library/upgrade-unchanged": [
+          "9a3bf144405d55180573fe77c83fea4ca306d899f16ef8e63a7a1cd8406bf80a"
+        ]
+      },
+      "successful_retained_phases": 16
+    },
+    "migrate-signed": {
+      "artifact_sha256": "8d80bf3910f15f17c6d4603d6c5db5421b070b905e9cb9143d999b0eb805c066",
+      "checked_rustc_depfiles": 16,
+      "compiler": "8f42a1c11e66c2a55299914d5025e4fa7549ead4",
+      "distinct_payloads": 2,
+      "marker": "/dev/null/ohm-recheck-dependent-links-v2",
+      "mode": "migrate-signed",
+      "negative_controls": 2,
+      "raw_depfile_sha256_by_phase": {
+        "migrate-signed-undeclared-direct/cold-lower": [
+          "5324369f4d45e002636e5add1c6c71965419b35cf51ee15318a4b229817e77e7"
+        ],
+        "migrate-signed-undeclared-direct/downgrade-repaired": [
+          "5324369f4d45e002636e5add1c6c71965419b35cf51ee15318a4b229817e77e7"
+        ],
+        "migrate-signed-undeclared-direct/downgrade-unchanged": [
+          "5324369f4d45e002636e5add1c6c71965419b35cf51ee15318a4b229817e77e7"
+        ],
+        "migrate-signed-undeclared-direct/trained-repeat": [
+          "5324369f4d45e002636e5add1c6c71965419b35cf51ee15318a4b229817e77e7"
+        ],
+        "migrate-signed-undeclared-direct/upgrade-higher": [
+          "5324369f4d45e002636e5add1c6c71965419b35cf51ee15318a4b229817e77e7"
+        ],
+        "migrate-signed-undeclared-direct/upgrade-repaired": [
+          "5324369f4d45e002636e5add1c6c71965419b35cf51ee15318a4b229817e77e7"
+        ],
+        "migrate-signed-undeclared-direct/upgrade-restamped": [
+          "5324369f4d45e002636e5add1c6c71965419b35cf51ee15318a4b229817e77e7"
+        ],
+        "migrate-signed-undeclared-direct/upgrade-unchanged": [
+          "5324369f4d45e002636e5add1c6c71965419b35cf51ee15318a4b229817e77e7"
+        ],
+        "migrate-signed-undeclared-library/cold-lower": [
+          "ff8f97d258b3e2beea70a3bf13acd2c847e53775705fbf84d58e37af57c59eed"
+        ],
+        "migrate-signed-undeclared-library/downgrade-repaired": [
+          "ff8f97d258b3e2beea70a3bf13acd2c847e53775705fbf84d58e37af57c59eed"
+        ],
+        "migrate-signed-undeclared-library/downgrade-unchanged": [
+          "ff8f97d258b3e2beea70a3bf13acd2c847e53775705fbf84d58e37af57c59eed"
+        ],
+        "migrate-signed-undeclared-library/trained-repeat": [
+          "ff8f97d258b3e2beea70a3bf13acd2c847e53775705fbf84d58e37af57c59eed"
+        ],
+        "migrate-signed-undeclared-library/upgrade-higher": [
+          "ff8f97d258b3e2beea70a3bf13acd2c847e53775705fbf84d58e37af57c59eed"
+        ],
+        "migrate-signed-undeclared-library/upgrade-repaired": [
+          "ff8f97d258b3e2beea70a3bf13acd2c847e53775705fbf84d58e37af57c59eed"
+        ],
+        "migrate-signed-undeclared-library/upgrade-restamped": [
+          "ff8f97d258b3e2beea70a3bf13acd2c847e53775705fbf84d58e37af57c59eed"
+        ],
+        "migrate-signed-undeclared-library/upgrade-unchanged": [
+          "ff8f97d258b3e2beea70a3bf13acd2c847e53775705fbf84d58e37af57c59eed"
+        ]
+      },
+      "successful_retained_phases": 16
+    },
+    "signed": {
+      "artifact_sha256": "7a91a6bc1036a2c27eb8f2b63bcd1e00d613c5c30989c7b8863fb9406a3756aa",
+      "checked_rustc_depfiles": 48,
+      "compiler": "8f42a1c11e66c2a55299914d5025e4fa7549ead4",
+      "distinct_payloads": 2,
+      "marker": "/dev/null/ohm-recheck-dependent-links-v2",
+      "mode": "signed",
+      "negative_controls": 2,
+      "raw_depfile_sha256_by_phase": {
+        "signed-directories-direct/cold-lower": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-directories-direct/higher": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-directories-direct/real-Rust-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-directories-direct/removed-higher": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-directories-direct/repaired-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-directories-direct/restored-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-directories-direct/restored-repeat": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-directories-direct/same-inode-value": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-directories-library/cold-lower": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-directories-library/higher": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-directories-library/real-Rust-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-directories-library/removed-higher": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-directories-library/repaired-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-directories-library/restored-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-directories-library/restored-repeat": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-directories-library/same-inode-value": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-files-direct/cold-lower": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-files-direct/higher": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-files-direct/real-Rust-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-files-direct/removed-higher": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-files-direct/repaired-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-files-direct/restored-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-files-direct/restored-repeat": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-files-direct/same-inode-value": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-files-library/cold-lower": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-files-library/higher": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-files-library/real-Rust-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-files-library/removed-higher": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-files-library/repaired-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-files-library/restored-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-files-library/restored-repeat": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-files-library/same-inode-value": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-undeclared-direct/cold-lower": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-undeclared-direct/higher": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-undeclared-direct/real-Rust-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-undeclared-direct/removed-higher": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-undeclared-direct/repaired-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-undeclared-direct/restored-edit": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-undeclared-direct/restored-repeat": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-undeclared-direct/same-inode-value": [
+          "3e89f33b955c7eeb369d827fb7edc414d4b7e3fdc38987d357eb624ddf4a590e"
+        ],
+        "signed-undeclared-library/cold-lower": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-undeclared-library/higher": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-undeclared-library/real-Rust-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-undeclared-library/removed-higher": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-undeclared-library/repaired-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-undeclared-library/restored-edit": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-undeclared-library/restored-repeat": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ],
+        "signed-undeclared-library/same-inode-value": [
+          "514707dee6509d5eb0d1895d2efdc5abbed25771b08803a95ca54b81ab7f1113"
+        ]
+      },
+      "successful_retained_phases": 48
+    }
+  },
+  "source_run": 41083924872
+}

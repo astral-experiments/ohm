@@ -1,0 +1,11 @@
+# GNU AArch64 native recheck compatibility
+
+The versioned compiler emitted a missing filename for the narrowly classified GNU register-only assembly. Signed -20 Cargo and unmodified #293 Cargo physically recompiled the producer when they encountered that name. The companion Cargo reader recognized the producer's authenticated dep-info trailer and kept the downstream executable's real native link. GNU GCC, collect2 and ld searched the current filesystem. Each successful AArch64 executable was opened, fully hashed and run under QEMU.
+
+The 444 ordinary Cargo commands include independent empty controls for a higher-priority archive, its removal, a same-inode/same-size/restamped replacement, malformed bytes, complete removal, real Rust edits, and repair. Separate direct and rlib placements exercised untracked, directory-declared and file-declared providers. The two migration series switched only the physical Cargo binary, visiting each earlier and later reader repeatedly on the same source, target and build roots. The 36 legacy-writer commands used the old compiler and the new reader.
+
+The 12 collision commands used a real proc macro that called `proc_macro::tracked::path`. Each genuine reserved filename forced the producer to run again on the unchanged command. The no-collision producer stayed fresh. There were 29 checked direct compiler cases per compiler, including deliberately bundled and missing inputs.
+
+Run `python3 -IB verify.py` from this directory to recompute the portable projection and its rejection control. The raw traces, complete programs, returned archive bytes and independently read depfiles were verified before this projection. The source and Actions identities are in `sources.json`. On an authorized checkout, the raw reader from private QA commit `6f51e0030475463731f6c048f63c8f3f7fca3695` is `scripts/ohm-aarch64-versioned/native_proof.py`. Actions retention is finite.
+
+The provider histories and their raw readback passed. Their workflow also contained a separate Ruff native admission rejected by its live-process observer. That Ruff attempt contributed zero performance measurements. This packet measures correctness; compiler instruction counts are reported separately.

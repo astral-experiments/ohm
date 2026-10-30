@@ -1,0 +1,199 @@
+{
+  "all_independent_readbacks": {
+    "aware": "a3f1b0739b6941c3825fad9c97d78651460050a77884295b6850ffb4d83e052c",
+    "classic": "d2a0a2ea8b4cbe32593d2718663984b2a36a637da15abe3ec0d5852a0d692f2d",
+    "direct": "072a9d93b6dd12a0269bacbf91b89509458bdcdd16f99dc9b91bf52792011204",
+    "legacy-writer": "7759f4186a9d133e7baad94a999155c44f477343b68622353b239a4fbd4c0511",
+    "migrate-classic": "a6ddc4c4a41953dcfd333948bc47d0010c10933496f5cc6974a56beb1764c89b",
+    "migrate-signed": "68f814cc6dcc5b15cb4f3fbafe28656951760d4b30f6cd9e979a7c7cc15281a7",
+    "named": "ce5bf65ffa7366779be8aa73bef48eaf4fd5759eb451cff441fe69483f3886c7",
+    "signed": "10c88ff82b4ba20332e856077efeff00e5384f1061cbbc296744b6c8ced74cf2"
+  },
+  "direct_compiler_commands": 58,
+  "named_collision_Cargo": 12,
+  "native_command_counts": {
+    "aware": 108,
+    "classic": 108,
+    "legacy-writer": 36,
+    "migrate-classic": 42,
+    "migrate-signed": 42,
+    "signed": 108
+  },
+  "source": {
+    "cargo": {
+      "parent": "735e1528ed741015c57676dccf05dbdc0ff7bed1",
+      "patch_sha256": "41fab23a44e0c4aecf5d7692143949c01b01bfe3a884ed4ee47d226f28d6c760",
+      "paths": {
+        "src/compiler/fingerprint/dep_info.rs": "5a4558c985edf1758db71151551e693bfc02881f",
+        "src/compiler/fingerprint/mod.rs": "02e726dd3d21101c6e78816befa4bae5f55af879"
+      },
+      "source": "c18e91b514b2c4e4966c9ab03232c804af3e1b57",
+      "tree": "bf643fa158734642bfee4a2aa8eff4d98bd8a09c"
+    },
+    "rust": {
+      "parent": "f2edebc7a23b809749fb0cc44dd6ac902ca448ff",
+      "patch_sha256": "ef7916ffba73fde2fda7674b5ea400f4f97a9860688017ff4e3b2381f14044e0",
+      "paths": {
+        "compiler/rustc_interface/src/passes.rs": "cea232a0be2b84d347a7d44d1020b676b3520b31",
+        "tests/run-make/ohm-checked-dep-info/rmake.rs": "53509131ae44eacf99c9b0875393b5db969043dd"
+      },
+      "source": "8f42a1c11e66c2a55299914d5025e4fa7549ead4",
+      "tree": "43cf560431e6d70ff01db3d4b9e50272153e9dfb"
+    }
+  },
+  "source_runs": [
+    {
+      "QA": "743fcbf759fef2c367210f7078742af76964e564",
+      "artifacts": {
+        "gnu-versioned-native-aware": [
+          12990082730,
+          273313,
+          "bc2be2cee7ca9b74a525c03e6268ba2c5c21a73fd51414fa102da682154b58ef"
+        ],
+        "gnu-versioned-native-classic": [
+          12990222585,
+          273441,
+          "3b4581c41d09600c14fd6f23f031fb42283088309be2913de039b8b556084bdb"
+        ],
+        "gnu-versioned-native-direct": [
+          12991190108,
+          96580,
+          "d5f9e3ea47a46e2f5d3b6b68e75395a16e8e9ae8303da92646135cd563f73a47"
+        ],
+        "gnu-versioned-native-legacy-writer": [
+          12990741620,
+          273841,
+          "6470631fd4ec3dc80b636d006df2b42b3783ac17ed5a59a0c671e45a5876dd51"
+        ],
+        "gnu-versioned-native-migrate-classic": [
+          12990647592,
+          273227,
+          "47c802730d43856372e1554df71ff58e3a1b6d1a44a5ad62e7fe7f8bd4c416f2"
+        ],
+        "gnu-versioned-native-migrate-signed": [
+          12989998102,
+          273252,
+          "291d79f6cc02ba89c8a3c13da8d4e8f397013bb1055ce2824cf3fabc759fcfb9"
+        ],
+        "gnu-versioned-native-named": [
+          12990043033,
+          989253,
+          "a7e23ce0f47c9fe9a73c3db2c13b4f8de6258ee14a67c3312de5864a138192c4"
+        ],
+        "gnu-versioned-native-signed": [
+          12991195121,
+          272920,
+          "4314efb20a2d149d1d33d4e99303f310d36de253ada957d63a4ff6b87b7999bd"
+        ]
+      },
+      "jobs": {
+        "aware": [
+          "failure",
+          124156874429
+        ],
+        "classic": [
+          "failure",
+          124156874678
+        ],
+        "direct": [
+          "success",
+          124156874836
+        ],
+        "legacy-writer": [
+          "failure",
+          124156874709
+        ],
+        "migrate-classic": [
+          "failure",
+          124156874624
+        ],
+        "migrate-signed": [
+          "failure",
+          124156874572
+        ],
+        "named": [
+          "success",
+          124156874653
+        ],
+        "signed": [
+          "failure",
+          124156874716
+        ]
+      },
+      "run": 41083038179,
+      "workflow": "failure"
+    },
+    {
+      "QA": "17cb902d39dca47550a9f51b6a983f7c6c1fa645",
+      "artifacts": {
+        "gnu-versioned-rerun-aware": [
+          12991076419,
+          4698836,
+          "c53e598086ed8cecd545f0d056c789273c2cb1c83bb4faf6000066ec1fdccde6"
+        ],
+        "gnu-versioned-rerun-classic": [
+          12990293552,
+          4811316,
+          "deb62e49066744a6ad8a17c516b563acd4dd13adbeffbc1e37030865b7a39c9c"
+        ],
+        "gnu-versioned-rerun-legacy-writer": [
+          12991550183,
+          2919489,
+          "0f58629f66143ddf9c9a0023bafedfdad176ecd5ee9516b26735f9661d5522e1"
+        ],
+        "gnu-versioned-rerun-migrate-classic": [
+          12991281219,
+          2334595,
+          "f2f1d79b5dfc74080f90d8df77512184c8e16b01a152b7d19ba4934290ae8459"
+        ],
+        "gnu-versioned-rerun-migrate-signed": [
+          12991066701,
+          2403018,
+          "8d80bf3910f15f17c6d4603d6c5db5421b070b905e9cb9143d999b0eb805c066"
+        ],
+        "gnu-versioned-rerun-ruff": [
+          12989854985,
+          9847145,
+          "5aa7b97126a93d8f3a366e476248d975794ac14c1df6670c380a2e8e569728cd"
+        ],
+        "gnu-versioned-rerun-signed": [
+          12990373790,
+          4817870,
+          "7a91a6bc1036a2c27eb8f2b63bcd1e00d613c5c30989c7b8863fb9406a3756aa"
+        ]
+      },
+      "jobs": {
+        "aware": [
+          "success",
+          124159973721
+        ],
+        "classic": [
+          "success",
+          124159973689
+        ],
+        "legacy-writer": [
+          "success",
+          124159972903
+        ],
+        "migrate-classic": [
+          "success",
+          124159973505
+        ],
+        "migrate-signed": [
+          "success",
+          124159973591
+        ],
+        "ruff": [
+          "failure",
+          124159973589
+        ],
+        "signed": [
+          "success",
+          124159974349
+        ]
+      },
+      "run": 41083924872,
+      "workflow": "failure"
+    }
+  ]
+}

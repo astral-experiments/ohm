@@ -1,0 +1,23 @@
+{
+  "actual_merge_base": "7e71d3150938ff8ed82aca03416439d7e5b87ef3",
+  "identical_subject_tree_components": {
+    "compiler": "c7a15a94598064f09fbe38e8d520bb9bf759cb99",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "src": "29f1558cff10c626ea3f322657a4f3d6ea3be4d9",
+    "tests": "86fb808174f758c9803f4e2614c79d542a348878"
+  },
+  "measured_rust_base": "444c0273a2e2bc0b161e988d43c882349bc2d7a6",
+  "measured_rust_head": "8f42a1c11e66c2a55299914d5025e4fa7549ead4",
+  "method": "Apply all three enrolled, SHA-bound patches to an isolated index of the rebased public #276 head, then verify the resulting full Git tree.",
+  "only_paths_different_from_measured_head": [
+    ".github/workflows/ci.yml"
+  ],
+  "replayed_patch_tree": "a6e7abc57180ca893949b42f0ea583cbc36bd42c",
+  "source_paths_from_public_ref": [
+    "compiler/rustc_codegen_llvm/src/asm.rs",
+    "compiler/rustc_interface/src/passes.rs",
+    "tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs",
+    "tests/run-make/ohm-checked-dep-info/rmake.rs"
+  ],
+  "verified_public_ref": "393d667b01dc7072fbc76b965119dd96c911e2c7"
+}

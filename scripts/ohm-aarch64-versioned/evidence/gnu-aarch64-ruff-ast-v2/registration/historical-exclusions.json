@@ -1,0 +1,168 @@
+{
+  "contribution_to_versioned_confirmation": 0,
+  "earlier_signed_unversioned": {
+    "passed_its_own_twelve": true,
+    "portable_SHA256SUMS": "e08706dd9fbe8e7609495f0c804218e395e3ca2eb044500cfa0b86413753f696",
+    "product": "unversioned compiler with signed -20 Cargo",
+    "reason": "Six direct or transitive undeclared-provider results differed from an independent empty build on the signed reader. This pairing does not support the versioned safety claim.",
+    "run": 41072012425
+  },
+  "earlier_unversioned_293": {
+    "blocks": {
+      "01": [
+        124158910115,
+        "success"
+      ],
+      "02": [
+        124158910566,
+        "success"
+      ],
+      "03": [
+        124158910697,
+        "success"
+      ],
+      "04": [
+        124158910522,
+        "success"
+      ],
+      "05": [
+        124158910504,
+        "success"
+      ],
+      "06": [
+        124158910678,
+        "success"
+      ],
+      "07": [
+        124158910478,
+        "success"
+      ],
+      "08": [
+        124158910561,
+        "failure"
+      ],
+      "09": [
+        124158910580,
+        "success"
+      ],
+      "10": [
+        124158910975,
+        "success"
+      ],
+      "11": [
+        124158910581,
+        "success"
+      ],
+      "12": [
+        124158910996,
+        "success"
+      ]
+    },
+    "conclusion": "failure",
+    "failed_block_log_sha256": "3b3edb6f96569f55ca65e9f145e752acecb404070c2dfea8b1a03e62e6f21a9b",
+    "held_out_observations": 0,
+    "qa": "b3a1bbd38e07293168f06cb21648821b8cacd206",
+    "raw_archives": {
+      "gnu-735e1528-confirmation-01": [
+        12991936804,
+        163818582,
+        "2b2397afccdcf02a8e6d9bd34cb9465ba86542cac6bbf8bdc477321b859dacee"
+      ],
+      "gnu-735e1528-confirmation-02": [
+        12991034121,
+        163831503,
+        "8312476149150b01021530ab2777e74de25cff525c12b6e3589f5269aebbdb1c"
+      ],
+      "gnu-735e1528-confirmation-03": [
+        12990874373,
+        163865820,
+        "0763941135813d2b6fe11f900781cbcd71dc197453cbf83122133e8c52bc9eab"
+      ],
+      "gnu-735e1528-confirmation-04": [
+        12993631356,
+        163890735,
+        "a0cb38d94ba5bc5896f89b8d2fe820d8ae4987bf4e223fd226ef97573f224c1f"
+      ],
+      "gnu-735e1528-confirmation-05": [
+        12993980820,
+        163854444,
+        "2a71fafabba4d61db5d1174068804f103a186c66872d25ba1fd6b194be8d6d9e"
+      ],
+      "gnu-735e1528-confirmation-06": [
+        12993438393,
+        163832086,
+        "6fd8af4ef54fc1c71aa169ab7a68111edd1093110ad0a964c6f41c7d580e1f1c"
+      ],
+      "gnu-735e1528-confirmation-07": [
+        12994518951,
+        163878190,
+        "3729b9b5a142d3dd0cce3d904c154ff95b3277d1af30fb5e8aa74c22fbc642ac"
+      ],
+      "gnu-735e1528-confirmation-08": [
+        12994908039,
+        143181966,
+        "bd0e73ff57ccaf8646bb23b86abb5493f05a3134552088514360e4dca2bee96d"
+      ],
+      "gnu-735e1528-confirmation-09": [
+        12995600861,
+        163858690,
+        "b2edcd36973d152af8d84c9b84f0a90ecb8cedb6265f157c8d9f56a7d5309979"
+      ],
+      "gnu-735e1528-confirmation-10": [
+        12997161310,
+        163849360,
+        "e69d0a95d85c93883dbf6ca7df17f63268975deff4d79ac09cf4e10df4add8fb"
+      ],
+      "gnu-735e1528-confirmation-11": [
+        12995434389,
+        163896099,
+        "088e1554b64a48b5de4514be0ab5c1107d7eac71e106c92bf8754c26675705a3"
+      ],
+      "gnu-735e1528-confirmation-12": [
+        12995554054,
+        163836172,
+        "b62399024b52f2fcca174dcc1ac5b43f02c84548e56bf22d9594610ea0f27141"
+      ]
+    },
+    "reader": [
+      124206933457,
+      "failure",
+      "7554d49741a65b5f730cd7675cadc6acce24f28491727966facd151534ac13b3"
+    ],
+    "reason": "Block 08 failed its first live process sample versus native argv/terminal equality assertion. The rejected first-sample tuple was not persisted, so its exact differing field cannot be diagnosed. The independent aggregate required all 12 successful blocks and could not score the run.",
+    "run": 41083617452
+  },
+  "excluded_older_signed_first_schedule": {
+    "all_scores": 0,
+    "counted_archive_payload_retained": false,
+    "counted_cargo_exit": 0,
+    "excluded_run": 41069158147,
+    "prior_cargo_exit": 0,
+    "prior_verified_root_archive": "16f70057023a294df29061879a36c01f256c4ec3b992a3ea5c95a27fcd441c15",
+    "raw_independent_matcher_sha256": "7f286d6ed8ba3e98b9497abcea927d0e68db58aca5ceee42c2d91330b26d5d9d",
+    "rejected_first_public_arm_changed_rustcs": {
+      "compact_str": {
+        "counted_namespace": "ede7afe2adff783f",
+        "counted_pid": 5824,
+        "differing_argv_fields": 13,
+        "prior_namespace": "8334adc62f544fce",
+        "prior_pid": 2509
+      },
+      "ruff_python_ast": {
+        "counted_namespace": "ede7afe2adff783f",
+        "counted_pid": 5841,
+        "differing_argv_fields": 42,
+        "prior_namespace": "8334adc62f544fce",
+        "prior_pid": 2524
+      },
+      "zmij": {
+        "counted_namespace": "ede7afe2adff783f",
+        "counted_pid": 5809,
+        "differing_argv_fields": 2,
+        "prior_namespace": "8334adc62f544fce",
+        "prior_pid": 2495
+      }
+    },
+    "source": "289cb5991cc5af80731f42f6a9b7f10011ea18b2"
+  }
+}
