@@ -2,7 +2,7 @@
 import hashlib,json,os,shutil,subprocess,zipfile
 from pathlib import Path
 import sys
-repo="astral-experiments/ohm"; run="41062797687"; head="1492f034289a806c96070b23f732b33e7b95be79"
+repo="astral-experiments/ohm"; run="41064199666"; head="7e371b32dfaeeb507d10133ce422bc4324c6be08"
 root=Path(os.environ["QA_ROOT"]); dst=root/"inputs";rec=root/"receipts"
 def get(s):return subprocess.check_output(["gh","api","repos/"+repo+"/"+s])
 def write(p,b):
@@ -28,7 +28,7 @@ def main():
             else:z.extractall(dst/'native')
     native=dst/'native'; cap=json.loads((native/'sdk-custody.json').read_bytes())
     assert (native/'qa-head').read_text().strip()==head and cap['sha256']==sha(dst/'sdk.tar.zst')
-    assert (native/'x86-host-run-make-pass').read_text().strip()=='a6c35ad01a98c6bef60b0a1d1af5b94c6433aaf8'
+    assert (native/'x86-host-run-make-pass').read_text().strip()=='f2edebc7a23b809749fb0cc44dd6ac902ca448ff'
     write(dst/'key',(cap['sha256']+'\n').encode())
     write(rec/'ingress.json', (json.dumps({'run':run,'source':head,'artifacts':store,'capsule':cap},indent=2,sort_keys=True)+'\n').encode())
 if __name__=='__main__':main()

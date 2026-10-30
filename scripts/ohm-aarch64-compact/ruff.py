@@ -115,8 +115,13 @@ def main():
     kit.bind()
     select,roles,_=compare.installable(Path(arc),key,native,expected_tree=kit.TREE)
     need(roles["P"]["source"]==kit.BEFORE and roles["C"]["source"]==kit.AFTER,"wrong exact compiler sources")
-    need(load(native/"direct-base/complete.json")["actual"]["compact_input"][:2]==[True,False] and
-         load(native/"direct-extended/complete.json")["actual"]["compact_input"][:2]==[False,True],"missing checked-in red/green")
+    for cfg, shape in (("compact_input","move "),("compact_copy","copy "),("compact_constant","const ")):
+        for arm in ("base","extended"):
+            p=native/("direct-"+arm)
+            allowed=arm=="extended" and cfg!="compact_constant"
+            need(load(p/"complete.json")["actual"][cfg][:2]==[not allowed,allowed], "incorrect checked-in native admission")
+            mir=(p/("mir-"+cfg)/"actual.mir").read_text()
+            need(any('asm!("/* {0} */", in(reg) '+shape in line for line in mir.splitlines()),"unbound actual operand kind")
     need((native/"x86-host-run-make-pass").read_text().strip()==kit.AFTER,"missing both host test cases")
     driver,=select("P")
     need(driver.startswith("lib/librustc_driver-") and roles["P"]["files"][driver][0]==kit.OLD_IR,"prior qualification compiler changed")
