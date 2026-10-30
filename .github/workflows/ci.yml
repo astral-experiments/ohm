@@ -1,18 +1,19 @@
-name: Qualify transitive GNU AArch64 native archive ownership
+name: Compare upstream, signed and prior checked Cargo on the same GNU bundled provider
 on:
   workflow_dispatch:
 permissions:
   contents: read
   actions: read
 jobs:
-  provider:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-atomic-transitive-provider-gate'
+  adjudicate:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-atomic-provider-declarations'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 45
+    timeout-minutes: 30
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
-        role: [P, C]
+        role: [upstream, signed-off, strict-P, strict-C, signed-on]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -20,30 +21,31 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Reopen both LLVM-built SDKs, strict Cargo reader and Linux cross toolchain
+      - name: Restore the enrolled upstream SDK or the immutable release and strict Cargo products
         env:
           GH_TOKEN: ${{ github.token }}
+          PROVIDER_ROLE: ${{ matrix.role }}
         run: |
           set -euo pipefail
-          bash scripts/ohm-gnu-syscall/ingress.sh
-          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
-          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
-          mkdir -p "$QA_ROOT/receipts"
-          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
-          python3 -IB - "${{ matrix.role }}" <<'PY'
-          import pathlib,sys
-          sys.path.insert(0,str(pathlib.Path('scripts/ohm-gnu-atomic-provider').resolve()))
-          import sdk
-          role=sys.argv[1]
-          sdk.prepare(role,13018006260 if role=='C' else 0,
-                      'a6bfc63d174184cf46ef452323c30ef2520f455da866be6998400d55f4d63582' if role=='C' else '')
-          PY
-      - name: Execute each ordinary Cargo command, force the root and producer separately, then start empty
-        run: python3 -IB scripts/ohm-gnu-atomic-provider/gate.py "${{ matrix.role }}"
+          if [[ "$PROVIDER_ROLE" == upstream ]]; then
+            sudo apt-get -qq update
+            sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace
+          else
+            bash scripts/ohm-gnu-syscall/ingress.sh
+            export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+            export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
+            mkdir -p "$QA_ROOT/receipts"
+            python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
+          fi
+          python3 -IB scripts/ohm-gnu-atomic-provider/controls.py "$PROVIDER_ROLE"
+      - name: Run actual Cargo and the GNU-linked AArch64 programs under each native provider declaration
+        env:
+          PROVIDER_ROLE: ${{ matrix.role }}
+        run: python3 -IB scripts/ohm-gnu-atomic-provider/gate.py "$PROVIDER_ROLE"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: atomic-transitive-provider-${{ matrix.role }}
+          name: declared-atomic-provider-${{ matrix.role }}
           path: ${{ runner.temp }}/atomic-transitive-proof/receipt
           if-no-files-found: error
           retention-days: 14

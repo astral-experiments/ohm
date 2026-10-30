@@ -80,7 +80,11 @@ def fixture(src,mode,watched,env):
         put(src/d/'Cargo.toml',f'[package]\nname="{name}"\nversion="0.0.1"\nedition="2021"\n[dependencies]\n'+deps)
     put(src/'leaf/src/lib.rs',LEAF);put(src/'app/src/main.rs',APP)
     put(src/'plain/src/lib.rs',PLAIN.replace('MODE',mode))
-    put(src/'plain/build.rs',BUILD.replace('WATCH','println!("cargo:rerun-if-changed={}",dir.display());' if watched else ''))
+    put(src/'plain/build.rs',BUILD.replace('WATCH',{
+        'unwatched':'','both-directories':'println!("cargo:rerun-if-changed={}",dir.display());',
+        'selected-file':'if name=="late" { println!("cargo:rerun-if-changed={}",dir.join("libqa_owned_atomic.a").display()); }',
+        'all-files':'println!("cargo:rerun-if-changed={}",dir.join("libqa_owned_atomic.a").display());'
+    }[watched]))
     for name in ('early','late'):(src/'plain'/name).mkdir()
     result=run(['cargo','+ohm','generate-lockfile','--offline'],src,env)
     assert result.returncode==0,(result.stderr,env)
@@ -135,8 +139,11 @@ def clean_visit(work,src,env,out,objects):
 def baseline_check(cold,role,mode,late,env):
     assert expectation(cold)==17 and cold['cross_linker_pids']
     assert {'qa_plain','qa_leaf','qa_app'} <= {c for _,k,c in cold['rustc'] if k=='full'}
-    markers={j['kind'] for p,j in cold['depfiles'].items() if Path(p).name.startswith('qa_leaf')}
-    assert ('hard' if role=='P' else 'v2') in markers,markers
+    leaf_deps=[j for p,j in cold['depfiles'].items() if Path(p).name.startswith('qa_leaf')];assert leaf_deps
+    markers={j['kind'] for j in leaf_deps}
+    if role=='strict-C':assert 'v2' in markers,markers
+    elif role in ('signed-on','strict-P'):assert 'hard' in markers,markers
+    else:assert markers<={None},markers
     dis=run(['/usr/bin/aarch64-linux-gnu-objdump','-d',cold['libs']['qa_leaf']['path']],ROOT,env)
     assert dis.returncode==0 and re.search(rb'\bldar\s+x[0-9]+,\s*\[x[0-9]+\]',dis.stdout),dis.stderr
     bundle=cold['libs']['qa_plain']
@@ -149,8 +156,9 @@ def baseline_check(cold,role,mode,late,env):
     assert any(e['owner'] and e['owner'][1:]==(['full','qa_plain'] if mode=='+bundle' else ['linker',None]) for e in hits),(mode,hits)
     return {'leaf_markers':sorted(x for x in markers if x),'bundle_original_objects':sorted(matches),'selected_provider_opens':hits,'rooted_relocations':external,'original_leaf_disassembly':stored(dis.stdout)}
 def one_case(src,work,env,role,mode,mut,watched):
-    namespace=('bundled' if mode=='+bundle' else 'unbundled')+('-watched' if watched else '')
+    namespace='bundled-'+watched
     case=OUT/namespace/mut;case.mkdir(parents=True)
+    for existing in ('target','shared'):(work/existing).mkdir(exist_ok=True)
     srcs=fixture(src,mode,watched,env)
     save(case/'sources.json',srcs)
     inputs,objects=make_inputs(src,case,env)
@@ -164,6 +172,8 @@ def one_case(src,work,env,role,mode,mut,watched):
     assert not early.exists()
     malformed=(b'NOT_A_VALID_GNU_LD_INPUT\n' * ((len(inputs[17])//25)+2))[:len(inputs[17])]
     if mut=='higher-priority':early.write_bytes(inputs[29]);wanted=29
+    elif mut=='normal-replacement':
+        late.write_bytes(inputs[29]);assert late.stat().st_mtime_ns>before['mtime_ns'];wanted=29
     elif mut=='replace-same-mtime':
         saved=late.stat()
         with late.open('r+b') as f:f.write(inputs[29]);f.flush();os.fsync(f.fileno())
@@ -215,10 +225,16 @@ def main():
     work=ROOT/'work';work.mkdir();OBJECTS.mkdir()
     source=ROOT/'source';env=env_for(work)
     summary={}
-    for mode in ('+bundle','-bundle'):
-        for watched,mutations in ((False,MUTATIONS),(True,('higher-priority',))):
-            for mut in mutations:
-                assert shutil.disk_usage(ROOT).free>8*2**30
-                summary[(mode,'watched' if watched else 'unwatched',mut)]=one_case(source,work,env,role,mode,mut,watched)
+    schedules={'unwatched':MUTATIONS,'both-directories':('higher-priority','normal-replacement','replace-same-mtime'),
+               'selected-file':('higher-priority','normal-replacement','replace-same-mtime'),
+               'all-files':('higher-priority',)}
+    if role not in ('upstream','signed-off'):
+        schedules={'unwatched':MUTATIONS,'both-directories':('higher-priority','replace-same-mtime'),
+                   'selected-file':('normal-replacement',)}
+    if role=='signed-on':schedules={'unwatched':MUTATIONS,'both-directories':('higher-priority',)}
+    for watch,mutations in schedules.items():
+        for mut in mutations:
+            assert shutil.disk_usage(ROOT).free>8*2**30
+            summary[('+bundle',watch,mut)]=one_case(source,work,env,role,'+bundle',mut,watch)
     save(OUT/'terminal.json',{'role':role,'cases':[{'identity':k,'result':v} for k,v in summary.items()]})
 if __name__=='__main__':main()

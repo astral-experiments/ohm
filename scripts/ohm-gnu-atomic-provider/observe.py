@@ -2,6 +2,7 @@
 import gzip
 import hashlib
 import io
+import os
 import json
 from pathlib import Path
 import re
@@ -96,7 +97,7 @@ def kind_marker(b):
     return found[0] if found else None
 def visit(src,work,env,where,objects):
     where.mkdir(parents=True);tr=where/'tmptrace';tr.mkdir()
-    cmd=['cargo','+ohm','build','-p','qa_app','--offline','--locked','--target',TARGET,'-j2','--message-format=json']
+    cmd=['cargo','+ohm']+(['-Zohm-defaults=no'] if os.environ.get('PROVIDER_ROLE')=='signed-off' else [])+['build','-p','qa_app','--offline','--locked','--target',TARGET,'-j2','--message-format=json']
     p=run(['strace','-ff','-qq','-s','32768','-e','trace=process,file','-o',tr/'thread',*cmd],src,env)
     for n,b in [('stdout',p.stdout),('stderr',p.stderr)]: (where/(n+'.gz')).write_bytes(gzip.compress(b,mtime=0))
     raw=traces(tr)
