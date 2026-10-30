@@ -15,7 +15,7 @@ from tree_ir import q, rt
 from study import digest, load, need, physical, save, sha
 
 
-def installable(archive, archive_sha, native_dir):
+def installable(archive, archive_sha, native_dir, expected_tree="5b86b3516db45ace6bbbdd536bbff9face291fbd"):
     import capsule
     need(rt.room()["disk"] > 32 * 2**30 and archive.is_file() and sha(archive) == archive_sha, "insufficient room or wrong frozen SDK")
     raw = {}
@@ -35,7 +35,7 @@ def installable(archive, archive_sha, native_dir):
         need(proc.wait() == 0, "truncated physical SDK transport")
     capsule.table(roles)
     need(roles["P"]["source"] == subject.BASE and roles["C"]["source"] == subject.TREATMENT, "wrong Rust sources")
-    need(roles["C"]["tree"] == "5b86b3516db45ace6bbbdd536bbff9face291fbd", "wrong candidate tree")
+    need(roles["C"]["tree"] == expected_tree, "wrong candidate tree")
     for role in "PC":
         registered = load(native_dir / (role + "-sdk.json"))
         need({k:v for k,v in roles[role].items() if k != "files"} == {k:v for k,v in registered.items() if k != "files"}, "damaged host/source receipt")
