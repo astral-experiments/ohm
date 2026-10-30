@@ -10,7 +10,9 @@ NEW='7d4d2fd48f2ef717f19b11cf5e4f21bcea69d16d55e631301b8266d74cf8abd8'
 INV='fe68c95a764685c7677db770a5e302996d8a18b95ed8ccf7d054a320c979b6ac'
 ids=lambda v:H(json.dumps(v,sort_keys=True,separators=(',',':')).encode())
 keyfile=lambda p:hashlib.file_digest(p.open('rb'),'sha256').hexdigest()
-EXEC=re.compile(rb'^execve\(("(?:[^"\\]|\\.)*"), (\[.*\]), (?:NULL|0x[^)]*)\)\s+= 0$')
+STR=rb'"(?:[^"\\]|\\.)*"'
+ARRAY=rb'\[(?:'+STR+rb'(?:, '+STR+rb')*)?\]'
+EXEC=re.compile(rb'^execve\(('+STR+rb'), ('+ARRAY+rb'), (?:NULL|0x[^)]*|'+ARRAY+rb')\)\s+= 0$')
 class Study:
     def __init__(self, path):
         self.z=zipfile.ZipFile(path)

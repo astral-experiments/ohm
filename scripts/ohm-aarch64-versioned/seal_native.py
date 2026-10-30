@@ -15,6 +15,7 @@ from ruff_subjects import REG
 GH_REPO='astral-experiments/ohm'
 FIRST=(41083038179,'743fcbf759fef2c367210f7078742af76964e564')
 FRESH=(41083924872,'17cb902d39dca47550a9f51b6a983f7c6c1fa645')
+RUFF=(41085565706,'6f51e0030475463731f6c048f63c8f3f7fca3695')
 MODES=('signed','classic','aware','migrate-signed','migrate-classic','legacy-writer')
 H=lambda b:hashlib.sha256(b).hexdigest()
 def dump(path,v):
@@ -61,18 +62,24 @@ def collect(gh,dest,first_only=False):
     if first_only:return
     fresh=state(gh,*FRESH);dump(dest/'fresh-native-state.json',fresh)
     modes=set(MODES)|{'ruff'};assert set(fresh['jobs'])==modes and set(fresh['artifacts'])=={'gnu-versioned-rerun-'+n for n in modes}
-    for mode in sorted(modes):
-        if fresh['jobs'][mode][0]!='success':continue
-        check=ruff if mode=='ruff' else lambda z:provider(z,mode)
-        data=reopen(gh,fresh['artifacts']['gnu-versioned-rerun-'+mode],check)
+    rejected=json.loads((HERE/'ruff-initial-rejection.json').read_bytes())
+    assert fresh['workflow']=='failure' and fresh['jobs']['ruff'][0]=='failure'
+    assert fresh['artifacts']['gnu-versioned-rerun-ruff']==rejected['artifact'] and rejected['scored']==0
+    for mode in sorted(MODES):
+        assert fresh['jobs'][mode][0]=='success'
+        data=reopen(gh,fresh['artifacts']['gnu-versioned-rerun-'+mode],lambda z:provider(z,mode))
         proof[mode]=dump(dest/(mode+'.json'),data)
-    assert fresh['workflow']=='success' and set(fresh['jobs'][m][0] for m in modes)=={'success'} and set(proof)==modes|{'direct','named'}
     rosters={n:json.loads((dest/(n+'.json')).read_bytes())['total_Cargo'] for n in MODES}
     assert rosters=={'signed':108,'classic':108,'aware':108,'migrate-signed':42,'migrate-classic':42,'legacy-writer':36}
+    last=state(gh,*RUFF);dump(dest/'kernel-native-state.json',last)
+    assert set(last['jobs'])=={'ruff'} and set(last['artifacts'])=={'gnu-versioned-kernel-ruff'}
+    assert last['workflow']=='success' and last['jobs']['ruff'][0]=='success'
+    proof['ruff']=dump(dest/'ruff.json',reopen(gh,last['artifacts']['gnu-versioned-kernel-ruff'],ruff))
+    assert set(proof)==modes|{'direct','named'}
     verify=json.loads((dest/'ruff.json').read_bytes())
     prov=dump(dest/'providers.json',{'source':REG['source'],'all_independent_readbacks':{k:v for k,v in proof.items() if k!='ruff'},'native_command_counts':rosters,
                                    'direct_compiler_commands':58,'named_collision_Cargo':12,'source_runs':[prior,fresh]})
-    receipt={'run':FRESH[0],'QA':FRESH[1],'immutable_artifacts':fresh['artifacts'],'inherited_native_run':prior,
+    receipt={'run':RUFF[0],'QA':RUFF[1],'immutable_artifacts':last['artifacts'],'inherited_native_run':prior,'inherited_provider_run':fresh,
              'native_readback':proof['ruff'],'provider_readback':prov,'native_terminal':verify['terminal'],'actual_argc':verify['argv_count'],
              'cargo_elf':verify['cargo'],'native_members':proof,**{k:verify[k] for k in ('sources','drivers','namespace_positions','normalized_argv_sha256','reference')}}
     print('Native admissions:',rosters,'Ruff',receipt['sources'],dump(dest/'admissible-native.json',receipt))

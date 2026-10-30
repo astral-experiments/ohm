@@ -7,7 +7,7 @@ import runpy
 import sys
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-from seal_native import FIRST,FRESH,state
+from seal_native import FIRST,FRESH,RUFF,state
 from ruff_subjects import DEFAULT_SOURCE,DEFAULT_DRIVERS,REG,rt
 base=runpy.run_path(str(HERE.parent/'ohm-aarch64-fallback/score_gates.py'))
 def get(p):return json.loads(p.read_bytes())
@@ -15,10 +15,13 @@ def main(stage):
     assert stage in ('pilot','confirmation')
     protocol=get(HERE/'admissible-native.json')
     assert protocol['cargo_elf']==REG['cargo_elf'] and protocol['sources']==DEFAULT_SOURCE and protocol['drivers']==DEFAULT_DRIVERS
-    for source in (FIRST,FRESH):
+    for source in (FIRST,FRESH,RUFF):
         actual=state('gh',*source)
         if source==FIRST:
             assert json.loads(json.dumps(actual))==protocol['inherited_native_run']
+        elif source==FRESH:
+            assert json.loads(json.dumps(actual))==protocol['inherited_provider_run']
+            assert actual['workflow']=='failure' and {mode for mode,v in actual['jobs'].items() if v[0]!='success'}=={'ruff'}
         else:
             assert actual['workflow']=='success' and actual['artifacts']==protocol['immutable_artifacts']
             assert all(row[0]=='success' for row in actual['jobs'].values())
