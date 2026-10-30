@@ -6,7 +6,9 @@ import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
 import sys
+import threading
 import tarfile
 
 HERE = Path(__file__).resolve().parent
@@ -42,6 +44,66 @@ def event_command(profile):
     return hits[0]
 
 
+def counted_command(argv, folder, cwd, env, expected):
+    """Sample the registered real Rust invocation and both kernel jobserver pipes under Callgrind."""
+    if "cargo" not in expected:
+        return rt.record(argv, folder, cwd, env), {}
+    folder.mkdir()
+    seen = {}
+    stop = threading.Event()
+    args = list(map(str, argv))
+    by_args = {tuple(map(os.fsencode, av)): name for name, av in expected.items() if name != "cargo"}
+    with subprocess.Popen(args, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as child:
+        def sample():
+            while not stop.is_set():
+                # Cargo launches its compiler children from worker threads. Match only their full
+                # registered client argv, then validate pipes directly on the observed kernel PID.
+                children = set()
+                for task in Path(f"/proc/{child.pid}/task").glob("*/children"):
+                    try:
+                        children.update(int(v) for v in task.read_text().split())
+                    except (OSError, ValueError):
+                        continue
+                for pid in children:
+                    path = Path(f"/proc/{pid}")
+                    try:
+                        av = (path / "cmdline").read_bytes().split(b"\0")
+                        if av and not av[-1]:
+                            av.pop()
+                        compiler = os.fsencode(rt.SDK / "bin/rustc")
+                        if compiler not in av:
+                            continue
+                        name = by_args.get(tuple(av[av.index(compiler):]))
+                        if not name or name in seen:
+                            continue
+                        inherited = dict(b.split(b"=",1) for b in (path / "environ").read_bytes().split(b"\0") if b and b"=" in b)
+                        flags = inherited.get(b"CARGO_MAKEFLAGS", b"")
+                        numbers = re.search(rb"--jobserver-(?:auth|fds)=(\d+),(\d+)", flags)
+                        if not numbers:
+                            continue
+                        fds = [os.readlink(path / "fd" / fd.decode()) for fd in numbers.groups()]
+                        image = os.readlink(path / "exe")
+                        if fds[0] == fds[1] and re.fullmatch(r"pipe:\[\d+\]", fds[0]) and "callgrind-amd64-linux" in image:
+                            seen[name] = {"pid": pid, "kernel_image": image, "descriptor_numbers": [int(x) for x in numbers.groups()],
+                                          "pipe": fds[0], "jobserver": flags.decode()}
+                    except (OSError, ValueError):
+                        continue
+                stop.wait(.025)
+        monitor = threading.Thread(target=sample, daemon=True)
+        monitor.start()
+        try:
+            out, err = child.communicate(timeout=1800)
+        finally:
+            stop.set()
+            monitor.join()
+    for name, raw in (("stdout",out),("stderr",err)):
+        (folder / (name+".gz")).write_bytes(gzip.compress(raw, compresslevel=2, mtime=0))
+    save(folder / "command.json", {"argv":args,"exit":child.returncode,"stdout":digest(out),"stderr":digest(err)})
+    save(folder / "physical-jobserver.json", seen)
+    need(child.returncode == 0, f"instrumented Cargo returned {child.returncode}: {err[-1500:]!r}")
+    return subprocess.CompletedProcess(args, child.returncode, out, err), seen
+
+
 def count(folder, command, env, expected, cwd):
     folder.mkdir()
     profiles = folder / "profiles"
@@ -49,7 +111,7 @@ def count(folder, command, env, expected, cwd):
     args = [VG, "--tool=callgrind", "--trace-children=yes", "--separate-threads=no",
             "--cache-sim=no", "--branch-sim=no", "--collect-jumps=no",
             "--callgrind-out-file=" + str(profiles / "cg.%p"), "--log-file=" + str(profiles / "log.%p"), *command]
-    result = rt.record(args, folder / "command", cwd, env)
+    result, descriptors = counted_command(args, folder / "command", cwd, env, expected)
     matched = {}
     for file in sorted(profiles.glob("cg.*")):
         pid = int(file.suffix[1:])
@@ -69,6 +131,9 @@ def count(folder, command, env, expected, cwd):
             need(rt.hashlib.file_digest(inp, "sha256").hexdigest() == sha(file), "lost raw profile")
         file.unlink()
     need(matched.keys() == expected.keys(), "lost registered process")
+    if "cargo" in expected:
+        need(descriptors.keys() == expected.keys() - {"cargo"} and all(matched[n]["pid"] == d["pid"] for n,d in descriptors.items()),
+             "actual counted rustc lacks the independently observed native jobserver pipe")
     logs = {int(p.suffix[1:]) for p in profiles.glob("log.*")}
     nonempty = {p for p in logs if (profiles / f"log.{p}").stat().st_size}
     need(nonempty == {r["pid"] for r in matched.values()}, "unaccounted subprocess logger")
@@ -102,7 +167,7 @@ def calibrate():
     save(rt.LOG / "counter-calibrated.json", {"subjects": result, "valgrind": sha(Path(VG)), "source": sha(HERE / "calibrate.c")})
 
 
-def measure(folder, env, ordinary):
+def measure(folder, env, ordinary, leaf="ruff_python_ast"):
     base = load(ordinary / "native.json")
     expected = {"cargo": base["cargo"][0]["argv"]}
     for r in base["rustcs"]:
@@ -151,7 +216,7 @@ def measure(folder, env, ordinary):
     result, observed = count(folder / "whole", expected["cargo"], cargo_env, expected, rt.RUFF)
     need(q.typed(result.stdout, True)[1:3] == q.typed(cap.stdout, True)[1:3], "counter changed the genuine Cargo workload")
     va = load(ordinary / "verified.json")
-    a, = [r for r in q.typed(result.stdout, True)[0] if r["target"]["name"] == "ruff_python_ast"]
+    a, = [r for r in q.typed(result.stdout, True)[0] if r["target"]["name"] == leaf]
     rlib, = [Path(n) for n in a["filenames"] if n.endswith(".rlib")]
     after = q.archive(rlib.read_bytes())
     want = lambda j: [[k, size, h] for k, _, size, h in j["objects"]]
