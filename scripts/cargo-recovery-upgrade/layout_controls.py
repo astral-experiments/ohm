@@ -1,6 +1,9 @@
 """Separately exercise matched dev-channel default and opt-out upgrade identities."""
 import gzip
 import json
+import os
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
@@ -13,6 +16,25 @@ def compiler_owners(rec):
     return [r[1] for r in rec['physical_rustcs']]
 
 
+def use_gc_executable(artifact, spec):
+    seal=m.read(artifact/'build.json')
+    binary=artifact/'cargo'
+    assert seal['qa']==os.environ['GITHUB_SHA'] and seal['candidate']==spec['head']
+    assert seal['tree']['tree']==spec['tree'] and seal['tree']['mode_path_sha256_inventory']==spec['inventory']
+    assert m.sha(binary)==seal['compiled']==seal['delivered']
+    signed=m.read(m.R/'receipts/21/installed.json')
+    for name in ('bin/rustc','bin/cargo',*(p for p in signed if 'librustc_driver' in p)):
+        assert m.sha(m.R/'sdk-21'/name)==signed[name]==seal['signed_runtime'][name]
+    dest=m.R/'sdk-C/bin/cargo'
+    dest.parent.mkdir(parents=True)
+    shutil.copyfile(binary,dest)
+    dest.chmod(0o755)
+    version=subprocess.check_output([dest,'-Vv'],text=True)
+    assert m.sha(dest)==seal['delivered'] and version==seal['version'] and 'commit-hash: '+spec['head'] in version
+    m.save(m.O/'matched-delivered-cargo.json',seal)
+    return {'version':version,'sha256':m.sha(dest)}
+
+
 def main():
     # Both source roles use precisely the channel and release-version semantics
     # of the Rust bootstrap. The signed binary keeps its own release label.
@@ -21,8 +43,12 @@ def main():
     m.run(['cc','-O2','-Wall','-Werror',m.HERE/'observe.c','-o',m.R/'observer'])
     compile_env=q.build_env(base)
     compile_env.update(CFG_RELEASE_CHANNEL='dev',CFG_RELEASE='1.99.0-dev')
+    if len(sys.argv)==5:
+        q.HERE=Path(__file__).resolve().parents[1]/'gc-mount-evidence/candidate-source'
     spec=json.loads((q.HERE/'spec.json').read_bytes())
-    builds={r:q.construct(r,Path(sys.argv[3]).resolve(),spec,compile_env) for r in ('P','C')}
+    pack=Path(sys.argv[3]).resolve()
+    builds={'P':q.construct('P',pack,spec,compile_env)}
+    builds['C']=use_gc_executable(Path(sys.argv[4]).resolve(),spec) if len(sys.argv)==5 else q.construct('C',pack,spec,compile_env)
     assert all('release: 1.99.0-dev\n' in v['version'] for v in builds.values())
     u.init_sdk()
     default=u.usage('same-path-default')

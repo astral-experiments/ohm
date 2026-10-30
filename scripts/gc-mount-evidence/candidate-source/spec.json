@@ -2,10 +2,14 @@
   "changed": [
     "Cargo.lock",
     "Cargo.toml",
+    "src/compiler/fingerprint/dirty_reason.rs",
+    "src/compiler/fingerprint/mod.rs",
+    "src/ops/cargo_report/rebuilds.rs",
     "src/workspace/build_cache_gc/mod.rs",
     "src/workspace/build_cache_gc/mount_path.rs",
     "src/workspace/build_cache_gc/worktrees/mod.rs",
-    "src/workspace/build_cache_gc/worktrees/mounts.rs"
+    "src/workspace/build_cache_gc/worktrees/mounts.rs",
+    "tests/testsuite/freshness.rs"
   ],
   "commits": [
     {
@@ -17,11 +21,21 @@
       "head": "c7f394c8c9aaef1272c621ff11d77dcf569ed94b",
       "key": "delta-2",
       "tree": "07904aadf60050fae426f31ad8fcdcce75e48c7e"
+    },
+    {
+      "head": "70573e256d0d7e8ca0eac763e80f93b5bd79cdc4",
+      "key": "delta-3",
+      "tree": "7f7731b4d5d857711e59d9ba08c06fdd2c0fea0d"
     }
   ],
-  "head": "c7f394c8c9aaef1272c621ff11d77dcf569ed94b",
-  "inventory": "dab9050a7982d54034a9eb3ceb18d3c2ba843c1f0b08fc9f41650d578a382a9c",
+  "head": "70573e256d0d7e8ca0eac763e80f93b5bd79cdc4",
+  "inventory": "80885f6cb1b78652e8cb62918bbf93fc4411d37c08f9a757e8f2de7b2a426886",
   "lock_sha256": "2d8a9c5af5704c6efb7365c699adaa84fdd1879b45f6d98773d7d455041a67bd",
+  "merge_parent": {
+    "commit": "7b29b877b14874055e794e22d19cae2f35cfcab1",
+    "pack": "diagnostic-parent.pack",
+    "pack_sha256": "0c8b0114411c404664a1162e120068b12a5733adbce64777e91acabbfc94ca0f"
+  },
   "parent": "2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c",
-  "tree": "07904aadf60050fae426f31ad8fcdcce75e48c7e"
+  "tree": "7f7731b4d5d857711e59d9ba08c06fdd2c0fea0d"
 }

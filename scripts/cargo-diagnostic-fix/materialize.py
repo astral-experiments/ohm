@@ -51,10 +51,19 @@ def tree(dest,pack,fixed=None):
     visit('parent',BASE,BASE_PARENT,BASE_TREE,True)
     parent=BASE
     if fixed:
+        if 'merge_parent' in fixed:
+            second=fixed['merge_parent']
+            assert second['pack']=='diagnostic-parent.pack'
+            other=(Path(__file__).resolve().parent.parent/'gc-mount-evidence'/'candidate-source'/second['pack']).read_bytes()
+            assert hashlib.sha256(other).hexdigest()==second['pack_sha256']
+            git(dest,'index-pack','--stdin',data=other)
+            assert git(dest,'cat-file','-t',second['commit'])==b'commit\n'
         for element in fixed['commits']:
             visit(element['key'],element['head'],parent,element['tree'],False)
             parent=element['head']
         assert parent==fixed['head']
+        if 'merge_parent' in fixed:
+            assert git(dest,'rev-parse','HEAD^2').decode().strip()==fixed['merge_parent']['commit']
     head=fixed['head'] if fixed else BASE
     git(dest,'fsck','--no-progress','--full','--strict')
     return {'commit':head,'tree':git(dest,'rev-parse','HEAD^{tree}').decode().strip(),'source_pack':PACK,
