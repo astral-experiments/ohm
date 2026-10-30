@@ -1,12 +1,15 @@
 """Check native compiler and linker work for real test-build and metadata edits on Ruff #28335."""
 
 import argparse
+import ctypes
 import json
+import os
+import shutil
 import struct
 from pathlib import Path
 
 from execs import ExecTrace
-from measure import capture, fresh, marked, native_rows, retire, select, typed
+from measure import capture, fresh, marked, marker_bytes, native_rows, retire, select, typed
 from prepare import prepare_ruff
 from study import ZMIJ_LIB, compress_bytes, digest, env_for, git, load, need, run, save, sdk_id, sha, text_git
 
@@ -68,24 +71,33 @@ def macho_text(path):
     return {"raw": digest(data), "text": result[0]}
 
 
-def test_verdict(artifact, state, out):
-    exe = Path(artifact["executable"])
+def test_verdict(artifact, state, out, repo, held):
+    exe = held or Path(artifact["executable"])
     need(exe.is_file() and artifact["profile"]["test"], "missing test executable")
-    inventory = run([str(exe), "--list", "--format", "terse"]).decode().splitlines()
+    cwd = repo / "crates/ruff_python_ast"
+    listing = run([str(exe), "--list", "--format", "terse"], cwd=cwd)
+    compress_bytes(out / "test-list.gz", listing)
+    inventory = listing.decode().splitlines()
     need(len(inventory) == len(set(inventory)) and all(row.endswith(": test") for row in inventory), "unexpected test inventory")
     names = sorted(row.removesuffix(": test") for row in inventory)
     need(SIZE_TEST in names and (NEW_TEST in names) == (state == "new"), "wrong test generation")
     for label in ([SIZE_TEST, NEW_TEST] if state == "new" else [SIZE_TEST]):
-        stdout = run([str(exe), "--exact", label, "--test-threads=1"])
+        stdout = run([str(exe), "--exact", label, "--test-threads=1"], cwd=cwd)
         need(("test " + label + " ... ok").encode() in stdout and b"1 passed; 0 failed" in stdout, "selected test did not run")
         compress_bytes(out / (label.split("::")[-1] + ".gz"), stdout)
-    return {**macho_text(exe), "tests": names}
+    whole = run([str(exe), "--test-threads=1"], cwd=cwd)
+    results = [row.removeprefix("test ").rsplit(" ... ", 1) for row in whole.decode().splitlines()
+               if row.startswith("test ") and " ... " in row]
+    need(sorted(name for name, verdict in results) == names and all(verdict in ("ok", "ignored") for _, verdict in results),
+         "full Ruff unit-test verdict differed from the executable inventory")
+    compress_bytes(out / "test-suite.gz", whole)
+    return {**macho_text(exe), "tests": names, "verdicts": sorted(results)}
 
 
-def check_verdict(artifacts, artifact, state, work, env, out):
+def check_verdict(artifacts, artifact, state, work, env, out, held):
     candidates = [Path(p) for p in artifact["filenames"] if p.endswith(".rmeta")]
     need(len(candidates) == 1 and candidates[0].is_file(), "missing actual check metadata")
-    meta = candidates[0]
+    meta = held or candidates[0]
     search = sorted({Path(p).parent for a in artifacts for p in a["filenames"] if p.endswith((".rmeta", ".rlib", ".dylib"))})
     args = ["rustc", "+ohm", "--edition=2024", "--crate-type=lib", "--crate-name=layout_reader",
             "--emit=metadata", "--error-format=json", "--extern", "ruff_python_ast=" + str(meta)]
@@ -104,36 +116,60 @@ def check_verdict(artifacts, artifact, state, work, env, out):
     return {"raw": sha(meta), "layout": expected}
 
 
-def phase(verb, root, work, sdk, env, role, state, label, trace, dest):
+def result_unit(verb, artifacts):
+    selected = [a for a in artifacts if a["target"]["name"] == "ruff_python_ast" and
+                ((a["executable"] is not None) if verb == "test" else a["target"]["kind"] == ["lib"])]
+    need(len(selected) == 1, "ambiguous Ruff result")
+    return selected[0]
+
+
+def hold(verb, work, label, result):
+    status, stream, _, _, _ = result
+    need(status == 0, "timed subject failed")
+    art = result_unit(verb, typed(stream, True)[0])
+    if verb == "test":
+        src = Path(art["executable"])
+    else:
+        src, = [Path(p) for p in art["filenames"] if p.endswith(".rmeta")]
+    dest = work / "held" / label / src.name
+    dest.parent.mkdir(parents=True)
+    fn = ctypes.CDLL(None, use_errno=True).clonefile
+    fn.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint32]
+    need(fn(os.fsencode(src), os.fsencode(dest), 0) == 0, "APFS result clone failed")
+    return dest, marker_bytes(Path((work / "zmij-dep-location").read_text()).read_bytes())
+
+
+def phase(verb, root, work, sdk, env, role, state, label, trace, dest, *, captured=None, held=None):
     ok = state != "invalid"
-    status, stdout, stderr, events, stats = capture(ARGS[verb], root / "ruff", env, dest, trace)
+    status, stdout, stderr, events, stats = captured or capture(ARGS[verb], root / "ruff", env, dest, trace)
     need(status == (0 if ok else 101), f"{verb} {label} exit {status} {stderr[-1024:]!r}")
     artifacts, dirty, codes, roster = typed(stdout, ok)
     units = [a for a in artifacts if a["target"]["name"] == "zmij" and a["target"]["kind"] == ["lib"]]
     need(len(units) == 1 and sha(units[0]["target"]["src_path"]) == ZMIJ_LIB, "wrong locked zmij")
-    native = native_rows(events, sdk)
-    need(native["cargo"] == 1 and native["full"].count("zmij") == int(not units[0]["fresh"]), "typed/physical count mismatch")
-    need(all(link["stock"] for link in native["linkers"]), "unexpected native linker")
-    marker, body = marked(work)
+    native = native_rows(events, sdk) if events is not None else None
+    if native is not None:
+        need(native["cargo"] == 1 and native["full"].count("zmij") == int(not units[0]["fresh"]), "typed/physical count mismatch")
+        need(all(link["stock"] for link in native["linkers"]), "unexpected native linker")
+    marker, body = held[1] if held else marked(work)
     compress_bytes(dest / "zmij.dep.gz", body)
     verdict = None
     if ok:
-        selected = [a for a in artifacts if a["target"]["name"] == "ruff_python_ast" and
-                    ((a["executable"] is not None) if verb == "test" else a["target"]["kind"] == ["lib"])]
-        need(len(selected) == 1, "ambiguous Ruff result")
-        verdict = test_verdict(selected[0], state, dest) if verb == "test" else check_verdict(artifacts, selected[0], state, work, env, dest)
-        if label == "edit" and verb == "test":
+        selected = result_unit(verb, artifacts)
+        copy = held[0] if held else None
+        verdict = (test_verdict(selected, state, dest, root / "ruff", copy) if verb == "test"
+                   else check_verdict(artifacts, selected, state, work, env, dest, copy))
+        if native is not None and label == "edit" and verb == "test":
             need("ruff_python_ast" in native["full"] and native["linkers"], "real test edit did not compile and link")
     else:
         need("E0425" in codes and BAD_NAME.encode() in stdout, "invalid edit silently passed or wrong diagnostic")
     row = {"verb": verb, "role": role, "state": state, "argv": ARGS[verb], "status": status, "native": native,
            "fresh_zmij": units[0]["fresh"], "marker": marker, "dirty": dirty, "roster": roster,
-           "codes": codes, "product": verdict, "streams": stats["streams"]}
+           "codes": codes, "product": verdict, "cargo": stats, "streams": stats["streams"]}
     save(dest / "verified.json", row)
     return row
 
 
-def installed(verb, root, role, out, steps, trace):
+def installed(verb, root, role, out, steps, trace, *, timed=False):
     work = root / ("signed-verbs-work" if role == "S" else "native-verbs-work")
     work.mkdir(exist_ok=True)
     sdk = select(root, role)
@@ -142,11 +178,24 @@ def installed(verb, root, role, out, steps, trace):
     ident = sdk_id(sdk, env)
     rows = {}
     prev = None
+    pending = []
     for label, state in steps:
         if state != prev:
             restore(root / "ruff", state)
-        rows[label] = phase(verb, root, work, sdk, env, role, state, label, trace, out / label)
+        if timed and label in ("edit", "repeat-1", "repeat-2"):
+            need(trace is None, "observer and clock must run separately")
+            dest = out / label
+            captured = capture(ARGS[verb], root / "ruff", env, dest, clock=True)
+            pending.append((label, dest, captured, hold(verb, work, label, captured)))
+            if label == "repeat-2":
+                for key, where, cap, snapshot in pending:
+                    rows[key] = phase(verb, root, work, sdk, env, role, "new", key, None, where, captured=cap, held=snapshot)
+                shutil.rmtree(work / "held")
+                pending.clear()
+        else:
+            rows[label] = phase(verb, root, work, sdk, env, role, state, label, trace, out / label)
         prev = state
+    need(not pending, "truncated timed commands")
     need(ident == sdk_id(sdk, env), "SDK changed during run")
     retire(work)
     return rows
