@@ -6,13 +6,13 @@ on:
         description: Execute the one ordinary check and its conditional off-clock profile
         type: choice
         required: true
-        options: [ron-check]
+        options: [ron-check, recovery-and-profile]
 permissions:
   contents: read
   actions: read
 jobs:
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-ron-check-20261030' && inputs.task == 'ron-check'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-ron-check-20261030'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 40
     steps:
@@ -38,14 +38,17 @@ jobs:
           python-version: '3.13'
       - name: Acquire and count the two native commands
         env:
+          QA_TASK: ${{ inputs.task }}
           QUALIFICATION_TOKEN: ${{ github.token }}
         run: |
           set -eu
           test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
           test "$(git -C existing-counter rev-parse HEAD)" = 927e20bcad028e5ed4290a58bd330a258ee5da41
           sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends ninja-build
-          python3 -IB protocol/scripts/ron-check-share/measure.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
+          sudo apt-get install -y --no-install-recommends ninja-build strace
+          script=measure.py
+          if [ "$QA_TASK" = recovery-and-profile ]; then script=followthrough.py; fi
+          python3 -B "protocol/scripts/ron-check-share/$script" "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

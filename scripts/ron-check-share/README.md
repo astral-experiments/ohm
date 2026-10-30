@@ -35,3 +35,16 @@ error and repair and takes a separate full Ron self-profile and compiler
 phase report. That independent target, shared store, compiler wrapper and
 profile are outside both measured commands. No elapsed speedup or product
 change is enrolled.
+
+The immutable first archive `primary.zip` is the original 309,996-byte
+GitHub artifact from run 41139480769. Its digest is
+`9e3a59e091c467c5139532dfb09cd8765eef343c938c0680e75da3ec2282ce3e`.
+The first unchanged check crossed the threshold. Its subsequent strict repair
+check failed because the new successful process printed the old E0308.
+The follow-through uses the `recovery-and-profile` input, fresh output trees
+and a separate profiling generation. It does not repeat either measured PMU
+visit. It records Cargo's native child processes, overlay-free source bytes
+and inode/timestamp, physical per-unit diagnostic caches, separate JSON and
+human processes, sequential invalid variants and clean references for signed
+-21, signed -21 with defaults off and signed -20. Its final Ron profile is
+disjoint from the diagnostic sources and targets. All red verdicts are retained.
