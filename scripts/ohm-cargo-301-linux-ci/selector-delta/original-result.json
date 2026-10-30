@@ -1,0 +1,133 @@
+{
+  "cases": {
+    "apple": {
+      "code_sha256": "09bef56fa7b6262faa2060e7ea07ed4d5acb8785ec3c0c815255fa084fe76fca",
+      "config": {
+        "301": 10725792966660892491,
+        "302": 10654494847033814545
+      },
+      "empty_rlib_exact": true,
+      "empty_rlib_sha256": "657bc7608fa59ec8ee1cd7e8ca41037cb773ba337d2ff1f0e30225eb95422a22",
+      "machine": "arm64 Mach-O",
+      "rmeta_sha256": "4391b9113d17a3d4a87265ad1b598e0b81e592d6bc9b9dea0200499d6f0fea96",
+      "rustcs": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "warm_rlib_sha256": "657bc7608fa59ec8ee1cd7e8ca41037cb773ba337d2ff1f0e30225eb95422a22"
+    },
+    "gnu": {
+      "code_sha256": "3d4cdde505909d8447a6c8f2726b29bf834d9609669c70679805c24a1b132d18",
+      "config": {
+        "301": 10654494847033814545,
+        "302": 10654494847033814545
+      },
+      "empty_rlib_exact": false,
+      "empty_rlib_sha256": "148b9aeecb4f5fc4cd06be99aa2a4b29dec4b4ea708b5993616f4e416130aa74",
+      "machine": "AArch64 ELF",
+      "rmeta_sha256": "fd1059e1af37730732ece835ceb12735ea5a531d8c72014b034c7e3411619794",
+      "rustcs": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "warm_rlib_sha256": "788df23c255f5de98888e843a091012d21fcf2bf2d2796553535f0ef75eda935"
+    },
+    "host": {
+      "code_sha256": "f0c81922bf2f7d054bfc63e8205ead2804fb80f627a2d777d26ea6336cc88869",
+      "config": {
+        "301": 10725792966660892491,
+        "302": 10725792966660892491
+      },
+      "empty_rlib_exact": false,
+      "empty_rlib_sha256": "83da7fbca7b11fd651522bd20bf8819c5c78732a62303558a189c818e88d3830",
+      "machine": "x86-64 ELF",
+      "rmeta_sha256": "77492acd2b1b5358d3603a6413362d26f127ced049c987aeaa8ad07c360798d8",
+      "rustcs": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "warm_rlib_sha256": "a318426596d0db41b649d9b6f6d79d20fc714bffb46540c3b014cde89fae7d5b"
+    },
+    "json": {
+      "code_sha256": "4936e4194ebbbd2d480adac6dfb6bbbdec5edff55b30244b17dc7c45d4ceae74",
+      "config": {
+        "301": 10725792966660892491,
+        "302": 10725792966660892491
+      },
+      "empty_rlib_exact": true,
+      "empty_rlib_sha256": "59ef831d7864feef6998e1620b4859c3a14591f146574f15bcab8ebfb959286f",
+      "machine": "arm64 Mach-O",
+      "rmeta_sha256": "f2ef794ee72d2cc403b511dd82896ed6d6e34fe206ba7cdb368db0f684f69f72",
+      "rustcs": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "warm_rlib_sha256": "59ef831d7864feef6998e1620b4859c3a14591f146574f15bcab8ebfb959286f"
+    },
+    "native": {
+      "code_sha256": "3408a4916f69b8463c0f4dea972b1d1273ab8806682f4abf96255b79ad303b80",
+      "config": {
+        "301": 10725792966660892491,
+        "302": 10725792966660892491
+      },
+      "empty_rlib_exact": false,
+      "empty_rlib_sha256": "a3c49aa6064d6090cddcc03786d7ac5a974ed5fdc9640da58a8ab247a64a82f1",
+      "machine": "x86-64 ELF",
+      "rmeta_sha256": "3d94dda6d4d59ce3166837c2c0f6d4c31a5f20cca690bf40d76ca3cba4563fff",
+      "rustcs": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "warm_rlib_sha256": "073c9c1dbb1d09e0cac28378784ed5e47a094315034b33a636a8affcc795e804"
+    }
+  },
+  "commands": 35,
+  "driver_sha256": "70b47f76ba9996e087fea3a91c23d4f12e4ea6d487815e5e0f1f6e75fdc5f547",
+  "phases": [
+    "cold301",
+    "repeat301",
+    "upgrade302",
+    "repeat302",
+    "downgrade301",
+    "settle301",
+    "empty302"
+  ],
+  "physical_selected_rustcs": 12,
+  "preflight": false,
+  "product_elf": {
+    "301": "6f3c0ebe1d50537d7e5767d7bb15aaace278be26e28ad1e8d7770d9b6342896a",
+    "302": "88a566acd61a01ac09272065af918285485c1d19884cbee5acbce842d2e50cca"
+  },
+  "product_sources": {
+    "301": "c18e91b514b2c4e4966c9ab03232c804af3e1b57",
+    "302": "9a102b4519b40f9034aa40533d92c83583dcb289"
+  },
+  "raw": "213f307ebd20caf7ddbb818c8ed958aa8eaf17ac697902b08119020d5cda10c3",
+  "rustc": "rustc 1.99.0-dev (7e71d3150 2026-10-29) (ohm-1.99.0-20)\nbinary: rustc\ncommit-hash: 7e71d3150938ff8ed82aca03416439d7e5b87ef3\ncommit-date: 2026-10-29\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
+  "rustc_sha256": "86d60426c7f3ebba0da187ca4f24339006aafbfb83a54eca94eadf507caea644"
+}
