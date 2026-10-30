@@ -10,11 +10,7 @@ on:
         description: Native QA on an isolated branch
         type: choice
         default: none
-        options: [none, mechanism, paired]
-      workspace_census:
-        description: Also count every actual linked test executable on a separate empty workspace build
-        type: boolean
-        default: false
+        options: [none, clock]
 
 permissions: {}
 
@@ -26,7 +22,7 @@ jobs:
   apple-zmij-mechanism:
     if: github.event_name == 'workflow_dispatch' && inputs.apple_zmij != 'none'
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 180
+    timeout-minutes: 300
     permissions:
       contents: read
       actions: read
@@ -57,60 +53,40 @@ jobs:
           root="$RUNNER_TEMP/apple-zmij"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
           python3 -IB scripts/ohm-apple-zmij/run.py ty_links seed "$root"
-      - name: Exercise the real focused ty_server end-to-end edit and its clean reference
-        if: inputs.apple_zmij == 'mechanism'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py ty_links focus "$RUNNER_TEMP/apple-zmij"
-      - name: Preserve the complete signed focused command and native link records
-        if: always() && inputs.apple_zmij == 'mechanism'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: apple-signed-ty-focus
-          path: ${{ runner.temp }}/apple-zmij/receipts
-          retention-days: 7
-      - name: Count actual linked workspace test outputs on a separately empty build
-        if: inputs.workspace_census && inputs.apple_zmij == 'mechanism'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py ty_links workspace "$RUNNER_TEMP/apple-zmij"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always() && inputs.workspace_census && inputs.apple_zmij == 'mechanism'
-        with:
-          name: apple-signed-ty-workspace
-          path: ${{ runner.temp }}/apple-zmij/receipts/ty-workspace
-          retention-days: 7
-          if-no-files-found: warn
-      - name: Reopen the two signed e2e relinks and rebuild exact parent and PR compilers
-        if: inputs.apple_zmij == 'paired'
+      - name: Reopen native eligibility and build the exact parent and candidate compilers
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           root="$RUNNER_TEMP/apple-zmij"
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12976193634/zip" > "$root/signed-ty.zip"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12978505922/zip" > "$root/mechanism-ty.zip"
           unset GH_TOKEN
-          python3 -IB scripts/ohm-apple-zmij/run.py ty_compare enroll "$root"
+          python3 -IB scripts/ohm-apple-zmij/run.py ty_clock enroll "$root"
           python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
           if ! command -v ninja >/dev/null; then brew install ninja; fi
           (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
           python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Count actual ty_server e2e links, change a native library and compare to clean
-        if: inputs.apple_zmij == 'paired'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py ty_compare focus "$RUNNER_TEMP/apple-zmij"
-      - name: Preserve the raw paired focused artifacts and clean native executables
-        if: always() && inputs.apple_zmij == 'paired'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - name: Verify native edit and inputs then run mirrored ty_server timing and disk pilots
+        run: python3 -IB scripts/ohm-apple-zmij/run.py ty_clock screen "$RUNNER_TEMP/apple-zmij"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
         with:
-          name: apple-paired-ty-focus
+          name: apple-ty-e2e-pilots
           path: ${{ runner.temp }}/apple-zmij/receipts
-          retention-days: 7
-      - name: Trace both compilers on the full workspace and verify every returned test executable
-        if: inputs.workspace_census && inputs.apple_zmij == 'paired'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py ty_compare workspace "$RUNNER_TEMP/apple-zmij"
-      - name: Preserve exact counts and output hashes for every paired workspace test binary
-        if: always() && inputs.workspace_census && inputs.apple_zmij == 'paired'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Run twelve independent balanced pairs when both pilots pass
+        run: |
+          root="$RUNNER_TEMP/apple-zmij"
+          if python3 -IB -c 'import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))["passed"] else 1)' "$root/receipts/ty-clock-screen/result.json"; then
+            python3 -IB scripts/ohm-apple-zmij/run.py ty_clock confirmation "$root"
+          fi
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
         with:
-          name: apple-paired-ty-workspace
-          path: ${{ runner.temp }}/apple-zmij/receipts/ty-comparison/workspace
-          retention-days: 7
+          name: apple-ty-e2e-confirmation
+          path: ${{ runner.temp }}/apple-zmij/receipts/ty-clock-confirmation
+          retention-days: 14
           if-no-files-found: warn
   manifest:
     if: github.event_name != 'workflow_dispatch' || inputs.apple_zmij == 'none'

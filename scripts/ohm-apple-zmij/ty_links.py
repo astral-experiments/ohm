@@ -121,6 +121,9 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
     print(scope,label,"typed",len(units),"full",len(native["full"]),"link-only",len(native["link_only"]),
           "all ld",len(native["linkers"]),"tracked tests",len(binaries),
           "linked tests",sum(bool(v["links"]) for v in binaries.values()),"e2e",e2e_links,flush=True)
+    if scope=="focus" and "ty-comparison" in dest.parts and label in ("cold","edit","repeat-1","repeat-2"):
+        from ty_disk import snapshot
+        snapshot(work, dest)
     return e2e
 
 

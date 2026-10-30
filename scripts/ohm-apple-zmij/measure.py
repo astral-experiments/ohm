@@ -63,17 +63,42 @@ def select(root, role):
         return root / "signed"
     sdk = root / "native"
     pair = load(root / "receipts/pair.json")
-    frozen = root / ("stage-" + role)
-    for name in pair["differ"]:
-        expected = pair["products"][role]["runtime"][name]
-        src, dest = frozen / name, sdk / name
-        need(sha(src) == expected, "changed role driver")
-        if not dest.samefile(src):
-            tmp = dest.with_name(dest.name + ".next")
-            os.link(src, tmp)
-            os.replace(tmp, dest)
-        need(src.samefile(dest) and sha(dest) == expected, "driver switch failed")
+    parked = root / "parked-native-libraries"
+    active = sdk / "lib"
+    if not parked.exists():
+        parked.mkdir()
+        # Switching directory entries preserves the inode and ctime of every
+        # loaded driver. Cargo includes those fields in its workspace namespace.
+        shutil.copytree(active, parked/"C", symlinks=True, copy_function=os.link)
+        for name in pair["differ"]:
+            relative = Path(name).relative_to("lib")
+            before = parked/"C"/relative
+            parent, child = [root/("stage-"+r)/name for r in "PC"]
+            need(before.samefile(parent) and sha(child)==pair["products"]["C"]["runtime"][name], "unexpected initial compiler image")
+            before.unlink()
+            os.link(child, before)
+        save(parked/"identity.json", {r:{n:_driver_stamp(root/("stage-"+r)/n) for n in pair["differ"]} for r in "PC"})
+    other = "C" if role=="P" else "P"
+    names = pair["differ"]
+    if not (sdk/names[0]).samefile(root/("stage-"+role)/names[0]):
+        need(not (parked/other).exists() and (parked/role).is_dir(), "invalid parked installation")
+        active.rename(parked/other)
+        try:
+            (parked/role).rename(active)
+        except OSError:
+            (parked/other).rename(active)
+            raise
+    expected = load(parked/"identity.json")
+    for name in names:
+        selected = sdk/name
+        need(selected.samefile(root/("stage-"+role)/name) and _driver_stamp(selected)==expected[role][name], "changed selected driver identity")
+        need(_driver_stamp(root/("stage-"+other)/name)==expected[other][name], "changed inactive driver identity")
     return sdk
+
+
+def _driver_stamp(path):
+    s = path.stat()
+    return [s.st_dev, s.st_ino, s.st_ctime_ns, s.st_mtime_ns, s.st_size, sha(path)]
 
 
 def stock_linker(path, ld):
