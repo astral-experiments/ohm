@@ -23,6 +23,10 @@ With the old writer, #293 caught all 54 warm-versus-empty comparisons. The integ
 | Both search directories | 18 | 4 | 4 | 0 |
 | None | 18 | 8 | 8 | 0 |
 
+The same old-writer difference appears in an unmodified Ruff Linux build with no additional user linker flags. Adding a shared library in the private copy of Cargo's existing Wild search directory changed a generated Unicode value from 0 to 83 in an empty build. A same-size replacement changed it to 47. A malformed replacement failed. The released and integrated readers reused 0 for all three, while strict #293 and #301 reproduced the clean values and failure. The reader-side Linux reproduction includes all 40 commands and the linker's successful and failed path lookups. [Linux Ruff reproducer](./linux-unicode-implicit-wild-search/)
+
+On Apple silicon, 1,596 native commands covered the signed, strict and integrated readers. The old writer saw six stale warm-versus-clean outcomes with each of the signed and integrated readers, and none with strict #293. The newer writer matched its controls across the native library and reader migration histories. [APFS provider observations and replay](./apple-provider-histories/)
+
 `python3 -IB verify.py` rechecks the preserved readbacks. The records retain the actual Rust and Cargo identities, successful compiler and linker invocations, native ELF and executable-text hashes, QEMU returns, failures and provider searches. `originals.json` binds each readback to the SHA-256 of its complete original Actions archive. The original four Ruff archives include the complete program bytes. Re-run the actual source qualification with the command below. [Pinned workflow](https://github.com/astral-experiments/ohm/blob/6cb68d57fd6b5772f3c862027545bd2935e08ece/.github/workflows/ci.yml)
 
 ```sh
