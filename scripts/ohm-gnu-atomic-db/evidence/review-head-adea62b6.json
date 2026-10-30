@@ -1,0 +1,30 @@
+{
+  "after_tidy": {
+    "commit": "adea62b64bb86ad18946457dfb59f36b2d8fcab4",
+    "compiler": "359e5df0ebc4613cedf4518a021a16790d94f7d5",
+    "fixture_blob": "49e08bc41baa624154e3995e544510f5cb072fe6",
+    "fixture_sha256": "ae60d28ad2ddb57049a42a3c16ef6829b417522c9ab7b2c93a23a9572a6e1b0a",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "non_whitespace_fixture_sha256": "f1b3224d3fb6c11e5b7a307747c6bd03070c5462bb009bdb1e3ef2ea916907ee",
+    "tests": "6eb1c57b16a8a47838ccd98d5dc161c0e1c89b3c",
+    "tree": "4c71a071855b61f18abea37f5bb4e53cad0549d2"
+  },
+  "diff": "diff --git a/tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs b/tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs\nindex 2c4b36a2818b8..49e08bc41baa6 100644\n--- a/tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs\n+++ b/tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs\n@@ -25,7 +25,9 @@ pub unsafe fn barrier(mut x: usize, mut v: core::arch::aarch64::int32x4_t) -> us\n         out(\"x4\") _, out(\"x5\") _, out(\"x6\") _, out(\"x7\") _, options(nostack),\n     );\n     #[cfg(atomic_file)]\n-    core::arch::asm!(\"ldar {v}, [{v}]\", \".incbin \\\"payload.bin\\\"\", v = inout(reg) x, options(nostack));\n+    core::arch::asm!(\n+        \"ldar {v}, [{v}]\", \".incbin \\\"payload.bin\\\"\", v = inout(reg) x, options(nostack)\n+    );\n     #[cfg(atomic_other_extension)]\n     core::arch::asm!(\".arch_extension crc\", \"ldar {v}, [{v}]\", v = inout(reg) x, options(nostack));\n     #[cfg(atomic_literal)]",
+  "measured": {
+    "commit": "4ed3e4d1fa1da4e93f8c761751b3c81dd55ff6cd",
+    "compiler": "359e5df0ebc4613cedf4518a021a16790d94f7d5",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "tree": "5259e4c45518e219a69e0666e1fdc37c40ebd8e4"
+  },
+  "original_review_head": {
+    "commit": "cfb921896461bc6e19f43b5d04355752e78cfba7",
+    "compiler": "359e5df0ebc4613cedf4518a021a16790d94f7d5",
+    "fixture_blob": "2c4b36a2818b80bd2b458bd7bed9907b96655547",
+    "fixture_sha256": "6400082e0eee8ceaf0002d9d9b613825bbf37baeea838eb55990739766107997",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "non_whitespace_fixture_sha256": "f1b3224d3fb6c11e5b7a307747c6bd03070c5462bb009bdb1e3ef2ea916907ee",
+    "tests": "6a42fe0820d012e1790d55a704160e196deee234",
+    "tree": "b9ad49ef8cfdd2f78e30d4bcd23ddf5b25a73783"
+  },
+  "updated_file": "tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs"
+}

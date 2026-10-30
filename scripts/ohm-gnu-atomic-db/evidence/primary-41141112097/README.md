@@ -12,7 +12,7 @@ The command targeted `aarch64-unknown-linux-gnu` on x86-64 Linux with Ohm Rust #
 
 All 48 measured commands recorded 100% scheduled hardware counter time. The seven calibration cases covered direct, forked, grandchild, same-PID exec and one or two concurrent worker threads. The optional process-tree CPU calibration passed for 11 of the 12 pairs, so CPU-time aggregates are omitted. Wall time on the first unchanged command had a paired median ratio of 3.278× with a 3.035–4.051× interval. Hardlink-deduplicated private target plus build allocation was 566,251,520 parent bytes and 566,255,616 candidate bytes at the medians. The paired median difference was +4,096 bytes, with a range of −28,672 to +28,672 bytes. The installed compiler changes one driver by +28,592 bytes. [All endpoints, raw per-pair ratios and storage](results.json) · [Original artifact IDs and digests](manifest.json)
 
-The separate source-built reproduction was registered before the primary result was opened. Its trigger requires this 2× lower bound and successful reconstruction of both complete SDKs and the actual Ruff programs. It will be reported independently. [Conditional replication registration](../../replication.md)
+The separate source-built reproduction was registered before the primary result was opened. Both its qualifying conditions passed. Twelve new workers using the independent source build measured a separate first-unchanged reduction of 10.009489× (96.14% interval 10.007755–10.011816×). [Conditional replication registration](../../replication.md) · [Independent reproduction](../replication-41143416626/)
 
 Recompute the interval and all twelve original counts offline from a checkout containing the data:
 
