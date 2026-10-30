@@ -9,7 +9,7 @@ import runtime as rt
 from study import MISSING, RECHECK, need, save, sha
 
 CASES = ("ordinary", "general_only", "vector_only", "scalar_modifier", "vector_modifier",
-         "spaced", "input_only", "instruction", "file", "escape", "raw", "global")
+         "spaced", "input_only", "late", "discarded", "options", "separate", "instruction", "file", "escape", "raw", "global")
 ALLOWED = set(CASES[:3])
 
 

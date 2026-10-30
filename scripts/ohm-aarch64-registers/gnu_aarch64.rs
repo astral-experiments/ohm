@@ -16,6 +16,18 @@ pub unsafe fn barrier(mut x: usize, mut v: core::arch::aarch64::int32x4_t) -> us
     core::arch::asm!("/* {0} */", inout(reg) x);
     #[cfg(input_only)]
     core::arch::asm!("/*{0}*/", in(reg) x);
+    #[cfg(late)]
+    core::arch::asm!("/*{0}*/", inlateout(reg) x);
+    #[cfg(discarded)]
+    core::arch::asm!("/*{0}*/", inout(reg) x => _);
+    #[cfg(options)]
+    core::arch::asm!("/*{0}*/", inout(reg) x, options(nostack));
+    #[cfg(separate)]
+    {
+        let other: usize;
+        core::arch::asm!("/*{0}*/", inout(reg) x => other);
+        core::hint::black_box((x, other));
+    }
     #[cfg(instruction)]
     core::arch::asm!("nop");
     #[cfg(file)]
