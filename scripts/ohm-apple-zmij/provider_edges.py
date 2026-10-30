@@ -237,6 +237,7 @@ def run_case(root, trace, role, placement, watch, defaults, bodies, *, visits=ST
     sources={str(p.relative_to(src)):p.read_text() for p in sorted(src.rglob("*")) if p.is_file()}
     save(out/"inputs.json",{"role":role,"placement":placement,"watch":watch,"defaults":defaults,"driver":ident,"source":sources,"steps":visits})
     rows={};last_rust=7
+    prior = {"warm": {}, "empty": {}}
     for name,state,rust in visits:
         check_host(root,7)
         if rust!=last_rust:trigger.write_text(f"#[inline(never)] pub fn value()->i32 {{{rust}}}\n");last_rust=rust
@@ -244,7 +245,23 @@ def run_case(root, trace, role, placement, watch, defaults, bodies, *, visits=ST
         def visit(kind):
             d=out/name/kind
             row=capture_visit(root,src,work,sdk,env,trace,d,defaults,placement)
-            if evidence:evidence(work,d,row)
+            if evidence:
+                evidence(work,d,row)
+                if defaults and row["image"]:
+                    from cgu_inputs import witness
+                    key = row["image"]["raw"]
+                    if row["final_links"]:
+                        final, = row["final_links"]
+                        argv, = [l["argv"] for l in row["native"]["linkers"]
+                                 if l["stock"] and digest(json.dumps(l["argv"], separators=(",", ":")).encode()) == final["argv_sha"]]
+                        owned = witness(root, d, Path(row["returned"]).read_bytes(), final["output"], linker=argv)
+                        prior[kind][key] = owned
+                    else:
+                        need(kind == "warm" and key in prior[kind], "no earlier physical link for this returned image")
+                        owned = prior[kind][key]
+                        save(d/"prior-cgu-proof.json", {"raw": key, "recipe": owned["recipe"],
+                                                       "observed_link": owned["linker_argv"]})
+                    row["cgu"] = owned
             return row
         a=visit("warm")
         b=with_empty(work,lambda:visit("empty"))
@@ -254,6 +271,15 @@ def run_case(root, trace, role, placement, watch, defaults, bodies, *, visits=ST
               "empty":[b["status"],b["answer"],b["image"]["raw"] if b["image"] else None],
               "same_raw":a["image"]["raw"]==b["image"]["raw"] if a["image"] and b["image"] else None,
               "same_text":a["image"]["text"]==b["image"]["text"] if a["image"] and b["image"] else None}
+        if evidence:
+            from cgu_inputs import agrees
+            item["same_checked_image"] = item["same_raw"]
+            if defaults and a["image"] and b["image"]:
+                item["same_checked_image"] = agrees(a["cgu"], b["cgu"])
+            if not defaults and item["same_raw"] is False:
+                # In the explicitly disabled mode rustc emits no retained Cargo recipe.
+                # That independent negative must never inherit default-mode proofs.
+                item["same_checked_image"] = False
         save(out/name/"compared.json",item);rows[name]=item
     save(out/"terminal.json",rows)
     # All source states, native provider bytes, raw streams and complete executables remain in the artifact.

@@ -2,6 +2,7 @@
 
 from bisect import bisect_left
 import hashlib
+from pathlib import PurePosixPath
 import re
 import struct
 
@@ -17,8 +18,33 @@ def u32pair(data, offset):
     return struct.unpack_from("<II", data, offset)
 
 
-def canonical(data, returned, linker):
-    """Change only the namespace of authenticated debug-object paths and their page hashes in memory."""
+CGU_NAME = re.compile(
+    r"(?P<unit>[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)?)\."
+    r"(?P<cgu>[0-9a-z]{25})\.(?P<nonce>[0-9a-z]{7})\.rcgu\.o"
+)
+
+
+def root_cgu(path, output):
+    """Identify rustc's single invocation salt on the selected executable's own object."""
+    obj = PurePosixPath(path)
+    exe = PurePosixPath(output)
+    if obj.parent != exe.parent / (exe.name + ".rlink-objects"):
+        return None
+    match = CGU_NAME.fullmatch(obj.name)
+    if match:
+        bare = exe.name.rsplit("-", 1)[0]
+        need(match["unit"] in {exe.name, exe.name + "." + bare}, "foreign crate in Rust CGU")
+        need(int(match["nonce"], 36) <= 0xffffffff, "invalid Rust u32 invocation salt")
+    return match
+
+
+def canonical(data, returned, linker, *, incremental=False, namespace=True):
+    """Verify all signed pages. Mask only authenticated exclusive N_OSO spelling.
+
+    Pass the observed Xcode linker arguments. In same-namespace mode, a decoded
+    rustc CompiledModules record with its physical object inputs is also supported.
+    No namespace is rewritten in this latter mode.
+    """
     need(
         data[:8] == bytes.fromhex("cffaedfe0c000001") and u32pair(data, 12)[0] == 2,
         "wrong Apple ARM64 executable",
@@ -67,10 +93,17 @@ def canonical(data, returned, linker):
     buf = bytearray(data)
     pos = start
     paths = []
+    invocation_nonces = set()
+    nonce_objects = []
     for entry in data[start : start + ssize].split(b"\0"):
         this = pos - start
         pos += len(entry) + 1
         if not entry.startswith(ns[0]):
+            continue
+        path = entry.decode()
+        input_file = path.split("(", 1)[0]
+        nonce_match = root_cgu(path, returned) if incremental and path == input_file else None
+        if not namespace and nonce_match is None:
             continue
         # No code or non-debug symbol may refer to any part of this string.
         owners = offsets[
@@ -80,8 +113,6 @@ def canonical(data, returned, linker):
             owners == [this] and all(r == (N_OSO, 0, 1, 0) for r in refs[this]),
             "object path is not an exclusive N_OSO symbol",
         )
-        path = entry.decode()
-        input_file = path.split("(", 1)[0]
         need(
             input_file in operands
             and (
@@ -96,9 +127,25 @@ def canonical(data, returned, linker):
             data[key : key + 16] == ns["key"],
             "debug symbol namespace differs from its Cargo output",
         )
-        buf[key : key + 16] = b"0" * 16
-        paths.append(path[len(ns[0]) :])
-    need(pos == start + ssize + 1 and paths, "missing N_OSO paths")
+        if namespace:
+            buf[key : key + 16] = b"0" * 16
+        normalized_path = path[len(ns[0]):] if namespace else path
+        if nonce_match:
+            nonce = nonce_match["nonce"]
+            invocation_nonces.add(nonce)
+            offset = len(entry) - len(PurePosixPath(path).name) + nonce_match.start("nonce")
+            begin = start + this + offset
+            need(data[begin:begin+7] == nonce.encode(), "unexpected N_OSO salt range")
+            buf[begin:begin+7] = b"0000000"
+            pos_in_path = offset - len(ns[0]) if namespace else offset
+            normalized_path = normalized_path[:pos_in_path] + "0000000" + normalized_path[pos_in_path+7:]
+            nonce_objects.append({"path": path, "normalized": normalized_path,
+                                  "cgu": nonce_match["cgu"], "nonce": nonce})
+        paths.append(normalized_path)
+    need(len(invocation_nonces) <= 1 and
+         len({e["cgu"] for e in nonce_objects}) == len(nonce_objects),
+         "ambiguous Rust invocation or duplicate codegen unit")
+    need(pos == start + ssize + 1 and (paths or not namespace), "missing N_OSO paths")
     # A linker-signed ad-hoc Mach-O has a SuperBlob containing one SHA-256
     # CodeDirectory. Validate every original page against its stored digest before
     # recomputing those hashes over the canonical debug strings.
@@ -148,14 +195,18 @@ def canonical(data, returned, linker):
         "base": ns["base"].decode(),
         "key": ns["key"].decode(),
         "paths": paths,
+        **({"nonce_objects":nonce_objects} if incremental else {}),
         "code_pages": codes,
         "path_pages": changed,
         "raw": hashlib.sha256(data).hexdigest(),
     }
 
 
-def compare(arms):
-    p, c = [canonical(*arms[role]) for role in "PC"]
+def compare(arms, *, incremental=False, same_namespace=False, namespace=True):
+    p, c = [canonical(*arms[role], incremental=incremental, namespace=namespace) for role in "PC"]
+    if same_namespace:
+        need(p[1]["key"] == c[1]["key"] and arms["P"][1] == arms["C"][1],
+             "independent reference used a different Cargo output")
     need(
         p[0] == c[0],
         "cross-compiler Mach-O differs outside the actual Cargo namespace and verified page hashes",

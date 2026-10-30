@@ -104,7 +104,7 @@ def product(root, repo, rev, out, artifacts, messages, held=None):
     return str(exe), {**macho_text(exe), "zip_sha256":digest(archive), "inputs":changed, "tests":TESTS}
 
 
-def phase(root, work, sdk, env, out, step, rev, trace):
+def phase(root, work, sdk, env, out, step, rev, trace, prior=None):
     repo = root/"ruff"
     ok = step!="invalid"
     code, stdout, stderr, events, streams = capture(CMD, repo, env, out, trace)
@@ -130,6 +130,20 @@ def phase(root, work, sdk, env, out, step, rev, trace):
         need(any((m.get("code") or {}).get("code")=="E0425" and BAD in m["message"] for m in errors) and
              not any(r["target"]["name"]=="ty_vendored" and r["executable"] for r in arts), "wrong invalid edit verdict")
     row = {"step":step,"rev":rev,"code":code,"command":CMD,"output":path,"product":result,"zlib":zlib,"native":native,"root_link_argv":argv,"streams":streams}
+    if ok:
+        from cgu_inputs import witness
+        if argv:
+            need(len(argv) == 1, "ambiguous root link")
+            proof = witness(root, out, Path(path).read_bytes(), path, linker=argv[0])
+        else:
+            # A true no-link result must be identical to a preceding actual product in this installation.
+            need(prior is not None and result["raw"] in prior, "fresh result had no prior observed linker")
+            proof = prior[result["raw"]]
+            save(out/"prior-cgu-proof.json", {"raw": proof["raw"], "recipe": proof["recipe"],
+                                             "observed_link": proof["linker_argv"]})
+        if prior is not None:
+            prior[result["raw"]] = proof
+        row["cgu"] = {k: proof[k] for k in ("output", "raw", "same_path_image", "cross_path_image", "modules")}
     evidence(work,out,row)
     save(out/"verified.json",row)
     print(step,rev[:8],len(native["full"]),len(native["linkers"]),len(argv),"zlib",native["full"].count("zlib_rs"),flush=True)
@@ -152,12 +166,13 @@ def installation(root, role, out, trace):
         fresh(work,root/"seed")
         save(out/group/"initial-empty.json", preparation(work))
         previous = None
+        prior = {}
         result = {}
         for step,rev in steps:
             state = (rev, step=="invalid")
             if previous!=state:
                 checkout(repo, *state)
-            result[step] = phase(root,work,sdk,env,out/group/step,step,rev,trace)
+            result[step] = phase(root,work,sdk,env,out/group/step,step,rev,trace,prior)
             previous = state
         results[group] = result
         retire(work)
@@ -165,7 +180,9 @@ def installation(root, role, out, trace):
     need((stat.st_dev,stat.st_ino,stat.st_ctime_ns)==(after.st_dev,after.st_ino,after.st_ctime_ns) and id_before==sdk_id(sdk,env), "compiler installation changed")
     refs = {rev:results[group]["clean"] for rev,group in ((OLD,"clean-old"),(NEW,"clean-new"))}
     need(refs[OLD]["product"]["zip_sha256"]!=refs[NEW]["product"]["zip_sha256"] and refs[OLD]["product"]["raw"]!=refs[NEW]["product"]["raw"], "historical edit did not change product")
-    comparisons = {phase: row["product"] == refs[row["rev"]]["product"] for phase,row in results["visits"].items() if row["product"]}
+    from cgu_inputs import same_product
+    comparisons = {phase: same_product(row["product"], refs[row["rev"]]["product"], row["cgu"], refs[row["rev"]]["cgu"])
+                   for phase,row in results["visits"].items() if row["product"]}
     save(out/"own-clean-comparisons.json", comparisons)
     return refs, results["visits"]
 

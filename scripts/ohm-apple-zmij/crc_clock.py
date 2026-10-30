@@ -10,6 +10,7 @@ import shutil
 import zipfile
 
 from cohort import fingerprint_sources, summarize
+from cgu_inputs import freeze, same_product, witness
 from execs import ExecTrace
 from local_incremental import census, check_cache, environment_receipt, preparation
 from macho_paths import compare
@@ -20,7 +21,7 @@ from ty_disk import snapshot
 from zlib_study import CMD, NEW, OLD, checkout, installation, product
 
 ENDPOINTS=("edit","repeat-1","repeat-2")
-ALLOCATION=int(digest(("crc typeshed on exact 735e1528, ordinary local incremental complete-compile 12 v1 / "+PARENT+CHILD+OLD+NEW).encode()),16)%924
+ALLOCATION=int(digest(("crc typeshed on exact 735e1528, ordinary local incremental witnessed CGU complete-compile 12 v2 / "+PARENT+CHILD+OLD+NEW).encode()),16)%924
 FIRST=set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS={"screen":["PC","CP"],"confirmation":["PC" if i in FIRST else "CP" for i in range(12)]}
 
@@ -122,20 +123,22 @@ def timed(root, out, role):
         build,=[r for r in msgs if r["reason"]=="build-script-executed" and "/ty_vendored#" in r["package_id"]]
         held=(saved/phase/"program",saved/phase/"typeshed.zip")
         clone(exe,held[0]);clone(Path(build["out_dir"])/"zipped_typeshed.zip",held[1])
+        freeze(exe, saved/phase/"cgu", clone)
         if deps is None:deps=depfiles(work,arts)
         members=[v for z in typed_zlib(arts) for v in z["filenames"] if v.endswith(".rlib")]
         need(set(members)==set(deps),"zlib outputs changed")
         markers=[deps[v].read_bytes() for v in members]
-        pending.append((phase,rev,cap,msgs,arts,sig,clock,held,markers))
+        pending.append((phase,rev,cap,msgs,arts,sig,clock,held,markers,str(exe)))
     relative = load(root/'receipts/crc-clock-before/PC'/role/'visits/edit/local-incremental.json')['cache']['root']
     final_cache = census(work, relative)
     save(out/'local-incremental-final.json', final_cache)
     check_cache(final_cache)
     rows={}
-    for phase,rev,cap,msgs,arts,sig,clock,held,markers in pending:
+    for phase,rev,cap,msgs,arts,sig,clock,held,markers,output in pending:
         ref,wanted=anchored(root,role,phase)
         _,p=product(root,repo,rev,cap,arts,msgs,held)
-        need(p==ref["product"] and sig==wanted,"timed product or actual typed work differs from the separately clean and traced references")
+        proof=witness(root,cap,held[0].read_bytes(),output,held=saved/phase/"cgu")
+        need(same_product(p,ref["product"],proof,ref["cgu"]) and sig==wanted,"timed product or actual typed work differs from the separately clean and traced references")
         mz=[]
         for i,raw in enumerate(markers):
             need(b"zlib-rs-0.5.5/src/" in raw and (MISSING in raw)==(role=="P") and (role=="P" or RECHECK in raw),"registry mechanism changed")
@@ -189,7 +192,8 @@ def initial(root):
                     row=refs[role][rev];image=gzip.decompress((root/'receipts/crc-programs'/(row['product']['raw']+'.gz')).read_bytes())
                     arms[role]=image,row['output'],row['root_link_argv'][0]
                 try:
-                    cross = compare(arms)
+                    cross = compare(arms, incremental=True)
+                    need(refs["P"][rev]["cgu"]["modules"] == refs["C"][rev]["cgu"]["modules"], "cross-compiler root CGU payloads differ")
                 except (RuntimeError, ValueError) as error:
                     cross = {'rejected': str(error), 'raw': {r:digest(arms[r][0]) for r in 'PC'}}
                     eligible = False
@@ -227,7 +231,8 @@ def stage(root, mode):
             for role in "CP":
                 sdk=select(root,role);env=env_for(work,sdk);fresh(work,root/"seed");checkout(root/"ruff",NEW)
                 end=observed(root,work,sdk,env,out/"terminal-clean"/role,"clean",NEW,trace)
-                need(end["product"]==anchored(root,role,"edit")[0]["product"],"independent terminal clean executable drift")
+                ref = anchored(root,role,"edit")[0]
+                need(same_product(end["product"],ref["product"],end["cgu"],ref["cgu"]), "independent terminal clean executable drift")
                 retire(work)
         finally:
             trace.close()

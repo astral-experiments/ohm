@@ -1,4 +1,4 @@
-name: Native Apple developer-incremental CRC costs on fixed Cargo 293
+name: Native Apple developer CRC costs with verified root CGUs and fixed Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
@@ -22,11 +22,12 @@ jobs:
       - name: Freeze and verify subjects, clock design and native execution observer
         run: |
           root="$RUNNER_TEMP/apple-crc-local-incremental"
+          python3 -IB scripts/ohm-apple-zmij/run.py test_cgu scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/crc293-local-incremental-plan.md "$root/receipts/registration.md"
+          cp scripts/ohm-apple-zmij/crc293-local-incremental-objects-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}

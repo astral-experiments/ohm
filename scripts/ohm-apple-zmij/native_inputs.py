@@ -46,6 +46,7 @@ def run_archive_check(root, role, trace, label=None):
     need(refs[17] != refs[29], "real native provider outputs must differ")
     run(["cargo", "+ohm", "generate-lockfile", "--offline"], cwd=src, env=env)
     history = {}
+    prior = {}
     for phase, body, want in (
         ("initial", refs[17], 17),
         ("unchanged", None, 17),
@@ -87,7 +88,22 @@ def run_archive_check(root, role, trace, label=None):
             ]
             value = run([str(exe)]).strip()
             need(value == str(want).encode(), "stale native value")
+            from cgu_inputs import witness
+            from zlib_study import keep
+            image = exe.read_bytes()
+            keep(root, "bundled-programs", image)
             row.update(value=want, executable=sha(exe))
+            final = [l["argv"] for l in roster["linkers"] if l["stock"] and any(
+                a == "-o" and Path(b).name == "qa_native_input" for a,b in zip(l["argv"],l["argv"][1:]))]
+            if final:
+                argv, = final
+                output, = [b for a,b in zip(argv,argv[1:]) if a == "-o"]
+                proof = witness(root, out, image, output, linker=argv)
+                prior[row["executable"]] = proof
+            else:
+                need(phase == "unchanged" and row["executable"] in prior, "fresh native input test without original linker")
+                proof = prior[row["executable"]]
+            row["cgu"] = {k: proof[k] for k in ("output", "raw", "same_path_image", "modules")}
             lib, = [r for r in arts if r["target"]["name"] == "qa_native_input" and r["target"]["kind"] == ["lib"]]
             archive_path, = [Path(p) for p in lib["filenames"] if p.endswith(".rlib")]
             dep = bundled_depinfo(work, archive_path)
@@ -104,8 +120,9 @@ def run_archive_check(root, role, trace, label=None):
             need(b"qa_answer" in stdout + stderr, "unrelated native rejection")
         save(out / "verified.json", row)
         history[phase] = row
+    from cgu_inputs import agrees
     need(
-        history["repair"]["executable"] == history["empty-reference"]["executable"],
+        agrees(history["repair"]["cgu"], history["empty-reference"]["cgu"]),
         "repaired native Mach-O differs from clean",
     )
     save(root / "receipts/native-input" / (label or role) / "terminal.json", history)
