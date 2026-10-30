@@ -149,13 +149,13 @@ def prepare_release(root, inbox):
     shutil.rmtree(unpack)
 
 
-def prepare_ruff(root):
+def prepare_ruff(root, old=RUFF, new=EDIT, verify_source=source_values):
     repo = root / "ruff"
     run(["git", "init", "-q", str(repo)])
     git(repo, "remote", "add", "origin", "https://github.com/astral-sh/ruff.git")
-    git(repo, "fetch", "-q", "--depth=2", "origin", EDIT)
-    git(repo, "switch", "-q", "-c", "qa-apple-zmij", RUFF)
-    source_values(repo)
+    git(repo, "fetch", "-q", "--depth=2", "origin", new)
+    git(repo, "switch", "-q", "-c", "qa-apple-zmij", old)
+    verify_source(repo)
     donor = root / "release-work"
     env = env_for(donor, root / "signed")
     env.pop("CARGO_NET_OFFLINE")
@@ -180,10 +180,10 @@ def prepare_ruff(root):
     save(
         root / "receipts/ruff.json",
         {
-            "old": RUFF,
-            "new": EDIT,
+            "old": old,
+            "new": new,
             "old_tree": text_git(repo, "rev-parse", "HEAD^{tree}"),
-            "new_tree": text_git(repo, "rev-parse", EDIT + "^{tree}"),
+            "new_tree": text_git(repo, "rev-parse", new + "^{tree}"),
             "lock": sha(repo / "Cargo.lock"),
             "archives": verified,
         },
