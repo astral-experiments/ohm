@@ -202,10 +202,10 @@ printf '%s\n' "$installation_prefix" | awk '
 
 info 'verifying archive checksum'
 if command -v sha256sum >/dev/null 2>&1; then
-    actual_checksum=$(sha256sum "$archive_path" | awk '{ print tolower($1) }') ||
+    actual_checksum=$(sha256sum < "$archive_path" | awk '{ print tolower($1) }') ||
         fail 'could not calculate the archive checksum'
 elif command -v shasum >/dev/null 2>&1; then
-    actual_checksum=$(shasum -a 256 "$archive_path" | awk '{ print tolower($1) }') ||
+    actual_checksum=$(shasum -a 256 < "$archive_path" | awk '{ print tolower($1) }') ||
         fail 'could not calculate the archive checksum'
 else
     fail 'sha256sum or shasum is required to verify the archive checksum'
