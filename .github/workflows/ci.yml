@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: linux-checks
-        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason, e2e-features, e2e-existing]
+        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason, e2e-features, e2e-existing, e2e-reopen]
 permissions:
   contents: read
 concurrency:
@@ -665,4 +665,38 @@ jobs:
           name: focused-${{ matrix.receiver }}-published-21-ty-server-e2e
           path: ${{ runner.temp }}/packaged-linux-50/diagnostic
           if-no-files-found: warn
+          retention-days: 7
+
+  e2e-reopen:
+    if: ${{ inputs.task == 'e2e-reopen' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    name: Reopen both original e2e archives without building
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 17
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: reader
+          persist-credentials: false
+          sparse-checkout: scripts/ohm-cargo-301-linux-ci
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: original
+          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
+          persist-credentials: false
+          sparse-checkout: scripts/packaged-release-workspace
+      - name: Reopen every artifact member then repeat native argv and binary checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB reader/scripts/ohm-cargo-301-linux-ci/e2e_compact.py "$GITHUB_WORKSPACE/original" "$RUNNER_TEMP/compact-e2e"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: matched-existing-cargo-e2e-compact
+          path: ${{ runner.temp }}/compact-e2e/native.json
+          if-no-files-found: error
           retention-days: 7
