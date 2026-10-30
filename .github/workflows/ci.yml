@@ -36,11 +36,16 @@ jobs:
           test -x /usr/bin/valgrind.bin
           truncate -s 4G "$root/build-ext4.img"
           /usr/sbin/mkfs.ext4 -q -m 0 -E lazy_itable_init=0,lazy_journal_init=0 "$root/build-ext4.img"
-          sudo mount -o loop,nosuid,nodev,noatime "$root/build-ext4.img" "$root/work"
-          sudo chown "$(id -u):$(id -g)" "$root/work"
+          if sudo mount -o loop,nosuid,nodev,noatime "$root/build-ext4.img" "$root/work"; then
+            sudo chown "$(id -u):$(id -g)" "$root/work"
+            test "$(findmnt -n -o FSTYPE --target "$root/work")" = ext4
+            printf '%s\n' private-ext4 > "$root/logs/storage-mode.txt"
+          else
+            test -d "$root/work" && ! mountpoint -q "$root/work"
+            printf '%s\n' runner-filesystem > "$root/logs/storage-mode.txt"
+          fi
           printf '%s' "$root" > "$root/work/.owned-by-packed-study"
           findmnt --target "$root/work" > "$root/logs/filesystem.txt"
-          test "$(findmnt -n -o FSTYPE --target "$root/work")" = ext4
           strace -f -qq -e trace=execve -o "$root/logs/trace-smoke.log" /bin/true
           cp scripts/ohm-packed-ruff/PLAN.md "$root/logs/PLAN.md"
           git rev-parse HEAD > "$root/logs/hosted-study-head.txt"

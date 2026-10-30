@@ -31,6 +31,16 @@ links and comparing against GNU du. Report after the first switch and each
 return, as well as the observed peak during Cargo in a private mount. Preserve
 object counts/allocations and raw Cargo streams.
 
+The first hosted provisioning attempt stopped before downloading a compiler
+because the runner exposes no working loop mount. When a private ext4 mount
+is unavailable, take the same hardlink-aware allocation census on the runner's
+native filesystem after every Cargo exit. In that case sample only the two
+build directories with GNU du during the separate correctness runs, retaining
+sample start and end times. The resulting maximum is an approximate scoped
+peak. The scored ordinary Cargo and instruction runs have no disk-walking
+observer. Neither host-wide free space nor a failed du sample is a peak for
+this workload. The primary endpoints and admission criteria above are unchanged.
+
 Run two mirrored triplets Off/Full/Packed and Packed/Full/Off. Require all four
 Off/Packed return ratios above two, smaller complete allocations for Packed
 than Full at each of the three switch endpoints in both triplets, real packed

@@ -173,7 +173,7 @@ def source(phase, branch):
     require(git("rev-parse", "HEAD") == REVS[branch], (phase, branch))
 
 
-def measure(directory, phase, branch, arm, env, reference, *, create=False, trace=False, tracer=None):
+def measure(directory, phase, branch, arm, env, reference, *, create=False, trace=False, tracer=None, disk_trace=False):
     directory.mkdir()
     tick = time.monotonic_ns()
     source(phase, branch)
@@ -187,19 +187,30 @@ def measure(directory, phase, branch, arm, env, reference, *, create=False, trac
                    "-o", str(directory / "exec.log"), *CARGO]
     samples = []
     stop = threading.Event()
+    volume = (OUT / "storage-mode.txt").read_text().strip()
+    require(volume in ("private-ext4", "runner-filesystem"), volume)
     def sample():
         while True:
-            info = os.statvfs(WORK)
-            samples.append((time.monotonic_ns(), (info.f_blocks - info.f_bfree) * info.f_frsize))
-            if stop.wait(.005):
+            tick = time.monotonic_ns()
+            if volume == "private-ext4":
+                info = os.statvfs(WORK)
+                used = (info.f_blocks - info.f_bfree) * info.f_frsize
+            else:
+                du = subprocess.run(["du", "-x", "-s", "-B1", "--", WORK / "target", WORK / "build"], capture_output=True)
+                used = sum(int(line.split()[0]) for line in du.stdout.splitlines()) if du.returncode == 0 else None
+            samples.append((tick, time.monotonic_ns(), used))
+            if stop.wait(.005 if volume == "private-ext4" else .1):
                 break
-    observer = threading.Thread(target=sample, daemon=True)
-    observer.start()
+    observer = None
+    if volume == "private-ext4" or disk_trace:
+        observer = threading.Thread(target=sample, daemon=True)
+        observer.start()
     try:
         proc = record_run(command, TREE, env, directory / "cargo", 101 if phase == "invalid" else 0)
     finally:
         stop.set()
-        observer.join()
+        if observer is not None:
+            observer.join()
     raw = json.loads((directory / "cargo.json").read_bytes())
     publish(directory / "samples.json.gz", samples)
     rows = list(map(json.loads, proc.stdout.splitlines()))
@@ -240,7 +251,8 @@ def measure(directory, phase, branch, arm, env, reference, *, create=False, trac
     checked = outputs.compare(json.loads(gzip.decompress(reference.read_bytes())), logical)
     require(all(set(names) <= {"lib.rmeta"} for names in checked.values()), ("changed native archive payload", checked))
     raw.update(git_ns=git_ns, dirty=dirty, traced=trace, counted=profiled,
-               allocated=footprint["target_and_build_bytes"], peak_fs=max(v for _, v in samples),
+               allocated=footprint["target_and_build_bytes"],
+               peak_fs=max((v for _, _, v in samples if v is not None), default=None), storage_mode=volume,
                packed_objects=len(companions), metadata_differences=checked, executable=logical["reader_sha256"],
                expr=logical["typed_size"], branch=branch)
     publish(directory / "result.json", raw)
@@ -278,7 +290,7 @@ def installation(arm, path, *, trace=False, tracer=None):
     for phase in PHASES:
         branch = "A" if phase in ("empty-A", "return-A") else "B"
         data[phase] = measure(path / phase, phase, branch, arm, env, reference_for(arm, phase, branch),
-                              trace=trace and phase in ("return-A", "return-B", "unchanged-B"), tracer=tracer)
+                              trace=trace and phase in ("return-A", "return-B", "unchanged-B"), tracer=tracer, disk_trace=trace)
     require(data["return-A"]["executable"] != data["return-B"]["executable"], (arm, "same native reader on two layouts"))
     publish(path / "installation.json", data)
     return data
