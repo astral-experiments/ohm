@@ -164,7 +164,7 @@ class Protocol(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "rustup selected a different compiler"):
                     compiler_selector("rustc", rustup.parent)
                 (d / "rustc").unlink()
-                (d / "rustc").symlink_to("/bin/false")
+                (d / "rustc").symlink_to("/bin/sh")
                 with self.assertRaisesRegex(RuntimeError, "Cargo passed a different rustc"):
                     compiler_selector("rustc", Path(sys.executable))
 
