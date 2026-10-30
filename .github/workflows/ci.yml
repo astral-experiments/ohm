@@ -1,50 +1,20 @@
-name: Qualify literal AArch64 syscalls on two real Ruff builds
-on:
-  workflow_dispatch:
-    inputs:
-      phase:
-        description: Bootstrap source or reopen the registered immutable compiler
-        type: choice
-        default: qualification
-        options: [qualification, bootstrap, pilots, holdout, ty-oracle, guest, reader-controls, release-reader, release-gnu, reopen-holdout]
+name: Rebuild the GNU Ruff compiler comparison from source
+
+on: workflow_dispatch
+
 permissions:
   contents: read
   actions: read
+
 concurrency:
-  group: gnu-literal-svc-${{ github.sha }}
+  group: gnu-ruff-entire-source-rebuild-${{ github.ref }}
   cancel-in-progress: false
+
 jobs:
-  reopen:
-    if: inputs.phase == 'reopen-holdout' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Reopen all original ZIPs and preserve their clocks and native build records
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/ohm-gnu-syscall/evidence/literal-svc-ruff-cli/collect.py "$RUNNER_TEMP/verified-pairs"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: original-gnu-ruff-cli-build-records
-          path: ${{ runner.temp }}/verified-pairs
-          compression-level: 0
-          if-no-files-found: error
-          retention-days: 90
-  release-gnu:
-    if: inputs.phase == 'release-gnu' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+  cargo:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-svc-source-rebuild'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 118
-    strategy:
-      fail-fast: false
-      max-parallel: 3
-      matrix:
-        subject: [register-signed, register-integrated, syscall-integrated, syscall-signed, aware, migrate-signed, migrate-classic, named, legacy]
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -52,140 +22,48 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Authenticate both compiler drivers and the independent release-parent Cargo executable
+      - name: Acquire the published release, public bootstrap inputs and GNU cross-toolchain
         env:
           GH_TOKEN: ${{ github.token }}
-          SUBJECT: ${{ matrix.subject }}
+        run: bash scripts/ohm-gnu-syscall/source-rebuild/prepare.sh
+      - name: Rebuild and verify the original 119-file SDK used to compile Cargo
+        run: python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py rustc builder
+      - name: Rebuild and test Cargo at the recorded source and physical paths
         run: |
           set -euo pipefail
-          bash scripts/ohm-gnu-syscall/ingress.sh
-          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
-          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
+          builder="$QA_ROOT"
+          export QA_ROOT="$RUNNER_TEMP/gnu-cargo293-build"
           mkdir -p "$QA_ROOT/receipts"
-          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
-          python3 -IB scripts/ohm-gnu-syscall/release-reader/subjects.py
-          case "$SUBJECT" in
-            register-*|syscall-*) ;;
-            *) sudo apt-get install -y --no-install-recommends b3sum
-               test "$(printf '' | b3sum --no-names)" = af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262
-               QA_ROOT="$RUNNER_TEMP/gnu-reviewer-ingress" python3 -IB scripts/ohm-aarch64-fallback/acquire.py ;;
-          esac
-          printf 'QA_ROOT=%s\nCENSUS_PARENT=%s\nCENSUS_ROOT=%s\n' "$QA_ROOT" "$CENSUS_PARENT" "$RUNNER_TEMP/observed-ruff" >> "$GITHUB_ENV"
-      - name: Rebuild Ruff or replay real native inputs without instrumentation wrappers
-        env:
-          SUBJECT: ${{ matrix.subject }}
-        run: |
-          set -euo pipefail
-          case "$SUBJECT" in
-            register-*|syscall-*) python3 -IB scripts/ohm-gnu-syscall/release-reader/cross_cli.py "${SUBJECT%-*}" "${SUBJECT#*-}" ;;
-            *) python3 -IB scripts/ohm-gnu-syscall/release-reader/providers.py "$SUBJECT" ;;
-          esac
-      - if: always()
+          python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py cargo "$builder"
+      - name: Transfer the rebuilt Cargo to the two compiler workers in this run
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: integrated-native-${{ matrix.subject }}
+          name: source-built-cargo
           path: |
-            ${{ runner.temp }}/qualified-syscall/receipts
-            ${{ runner.temp }}/observed-ruff/receipts
-          compression-level: 1
+            ${{ runner.temp }}/gnu-cargo293-build/product/cargo.zst
+            ${{ runner.temp }}/gnu-cargo293-build/product/product.json
           if-no-files-found: error
-          retention-days: 14
-  release-reader:
-    if: inputs.phase == 'release-reader' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 110
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-sh/ruff
-          ref: 93526150df078af7dd8fc4226cdcc469539d2001
-          path: ruff
-          persist-credentials: false
-      - name: Fetch the signed distribution by tag and verify its hashes before use
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          echo "QA_ROOT=$RUNNER_TEMP/ohm-integrated" >> "$GITHUB_ENV"
-          mkdir -p "$RUNNER_TEMP/ohm-integrated/inbox"
-          gh release download ohm-1.99.0-20 --repo astral-experiments/ohm -D "$RUNNER_TEMP/ohm-integrated/inbox" -p 'ohm-1.99.0-20-x86_64-unknown-linux-gnu*'
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends strace zstd libssl-dev pkg-config cmake libclang-dev
-      - name: Build the exact release-parent integration with signed Ohm
-        run: python3 -IB scripts/ohm-gnu-syscall/release-reader/build.py build
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: signed-base-integrated-cargo
-          path: ${{ runner.temp }}/ohm-integrated/product
+          retention-days: 3
           compression-level: 0
-          if-no-files-found: error
-          retention-days: 14
-      - name: Exercise both generated marker versions and ordinary path collisions
-        run: python3 -IB scripts/ohm-gnu-syscall/release-reader/build.py unit
-      - name: Rebuild the real Ruff Unicode generator and compare with clean outputs
-        run: python3 -IB scripts/ohm-gnu-syscall/release-reader/unicode.py ruff
-      - if: always()
+      - name: Preserve manifests, source, native Cargo construction and unit test
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: signed-base-integrated-source-and-ruff
-          path: ${{ runner.temp }}/ohm-integrated/receipts
+          name: source-build-builder
+          path: |
+            ${{ runner.temp }}/gnu-cargo293-build/receipts
+            ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
           if-no-files-found: error
-          retention-days: 14
-  compiler:
-    if: inputs.phase == 'bootstrap' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+          retention-days: 30
+
+  rustc:
+    needs: cargo
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 190
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Verify the original parent SDK, version-aware Cargo and unchanged Wild
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash scripts/ohm-gnu-syscall/ingress.sh
-      - name: Bootstrap the direct rustc child and verify all 119 installed files
-        run: |
-          set -euo pipefail
-          {
-            echo "QA_ROOT=$RUNNER_TEMP/ohm-aarch64-linux-zmij"
-            echo "CENSUS_PARENT=$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
-            echo "CC_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-gcc"
-            echo "CXX_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-g++"
-            echo "AR_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-ar"
-          } >> "$GITHUB_ENV"
-          mkdir -p "$RUNNER_TEMP/ohm-aarch64-linux-zmij/receipts"
-      - run: python3 -IB scripts/ohm-gnu-syscall/bootstrap.py build
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: gnu-literal-svc-driver
-          compression-level: 0
-          if-no-files-found: error
-          retention-days: 14
-          path: ${{ runner.temp }}/ohm-aarch64-linux-zmij/export
-      - name: Check both AArch64 marker edges and execute an actual Linux syscall
-        run: python3 -IB scripts/ohm-gnu-syscall/direct.py
-      - name: Run both existing host run-make regression suites
-        run: python3 -IB scripts/ohm-gnu-syscall/bootstrap.py host-test
-      - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: gnu-literal-svc-bootstrap-and-native-tests
-          retention-days: 14
-          path: ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
-  ruff:
-    needs: compiler
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 150
+    timeout-minutes: 300
     strategy:
       fail-fast: false
       matrix:
-        study: [census, cli]
+        role: [parent, patched]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -193,209 +71,34 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify the original parent SDK, version-aware Cargo and unchanged Wild
+      - name: Acquire the published release, public bootstrap inputs and GNU cross-toolchain
         env:
           GH_TOKEN: ${{ github.token }}
-        run: bash scripts/ohm-gnu-syscall/ingress.sh
+        run: bash scripts/ohm-gnu-syscall/source-rebuild/prepare.sh
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: gnu-literal-svc-driver
-          path: ${{ runner.temp }}/literal-svc-transfer
-      - name: Restore and verify the distinct compiler
+          name: source-built-cargo
+          path: ${{ runner.temp }}/just-built-cargo
+      - name: Rebuild both target libraries and the compiler from this role's Git tree
+        env:
+          ROLE: ${{ matrix.role }}
+        run: python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py rustc "$ROLE" --cargo-transfer "$RUNNER_TEMP/just-built-cargo"
+      - name: Verify the real edit, next rebuild, invalid edit, repair and empty Ruff build
+        env:
+          ROLE: ${{ matrix.role }}
         run: |
           set -euo pipefail
-          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
-          export QA_ROOT="$RUNNER_TEMP/svc-receiver"
-          mkdir -p "$QA_ROOT/receipts"
-          python3 -IB scripts/ohm-gnu-syscall/bootstrap.py restore "$RUNNER_TEMP/literal-svc-transfer"
-          {
-            echo "CENSUS_ROOT=$RUNNER_TEMP/observed-ruff"
-            echo "CENSUS_SDK=$QA_ROOT/candidate-sdk"
-            echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
-          } >> "$GITHUB_ENV"
-      - name: Execute the original builds, real edits, unchanged builds, broken edits and independent clean products
-        run: python3 -IB scripts/ohm-gnu-ty-input-census/${{ matrix.study }}.py
-      - if: always()
+          export CENSUS_ROOT="$RUNNER_TEMP/observed-ruff" CENSUS_SDK="$QA_ROOT/rustup/toolchains/ohm"
+          if [[ "$ROLE" == patched ]]; then export CENSUS_CANDIDATE_RECORD="$QA_ROOT/receipts/candidate.json"; fi
+          python3 -IB scripts/ohm-gnu-ty-input-census/cli.py
+          python3 -IB scripts/ohm-gnu-syscall/source-rebuild/rebuild.py verify-ruff "$ROLE" "$CENSUS_ROOT/receipts"
+      - name: Preserve source, complete physical manifests, native tool executions and Ruff verdicts
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-literal-svc-${{ matrix.study }}-verdicts
-          retention-days: 14
+          name: source-build-${{ matrix.role }}
           path: |
+            ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
             ${{ runner.temp }}/observed-ruff/receipts
-            ${{ runner.temp }}/svc-receiver/receipts
-
-  qualification:
-    if: contains(fromJSON('["qualification","ty-oracle","guest","reader-controls"]'), inputs.phase) && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 140
-    strategy:
-      fail-fast: false
-      matrix:
-        mode: ${{ fromJSON(inputs.phase == 'ty-oracle' && '["census"]' || inputs.phase == 'guest' && '["guest-P","guest-C"]' || inputs.phase == 'reader-controls' && '["aware","migrate-classic","migrate-signed"]' || '["signed","classic","aware","migrate-classic","migrate-signed","census","cli"]') }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Verify the original parent SDK, version-aware Cargo and unchanged Wild
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash scripts/ohm-gnu-syscall/ingress.sh
-      - name: Restore exactly the original compiler driver from run 41099028701
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
-          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
-          mkdir -p "$QA_ROOT/receipts"
-          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
-          {
-            echo "QA_ROOT=$QA_ROOT"
-            echo "CENSUS_PARENT=$CENSUS_PARENT"
-            echo "CENSUS_ROOT=$RUNNER_TEMP/observed-ruff"
-            echo "CENSUS_SDK=$QA_ROOT/candidate-sdk"
-            echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
-          } >> "$GITHUB_ENV"
-      - name: Authenticate the previous Cargo reader and exercise direct and transitive native providers
-        if: (inputs.phase == 'qualification' || inputs.phase == 'reader-controls') && matrix.mode != 'cli' && matrix.mode != 'census'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          MODE: ${{ matrix.mode }}
-        run: |
-          set -euo pipefail
-          sudo apt-get install -y --no-install-recommends b3sum
-          test "$(printf '' | b3sum --no-names)" = af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262
-          QA_ROOT="$RUNNER_TEMP/gnu-reviewer-ingress" python3 -IB scripts/ohm-aarch64-fallback/acquire.py
-          python3 -IB scripts/ohm-gnu-syscall/providers.py "$MODE"
-      - name: Retest the genuine Ruff edit against its independent clean executable
-        if: matrix.mode == 'cli' || matrix.mode == 'census'
-        env:
-          STUDY: ${{ matrix.mode }}
-        run: |
-          set -euo pipefail
-          python3 -IB "scripts/ohm-gnu-ty-input-census/$STUDY.py"
-          python3 -IB scripts/ohm-gnu-ty-input-census/why.py
-      - name: Count the original Cargo and every full or link-only rustc on a settled Ruff CLI build
-        if: inputs.phase == 'guest'
-        env:
-          MODE: ${{ matrix.mode }}
-        run: python3 -IB scripts/ohm-gnu-syscall/guest.py "$MODE"
-      - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: gnu-syscall-native-${{ matrix.mode }}
-          retention-days: 14
-          path: |
-            ${{ runner.temp }}/qualified-syscall/receipts
-            ${{ runner.temp }}/observed-ruff/receipts
-
-  pilots:
-    if: inputs.phase == 'pilots' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 150
-    strategy:
-      fail-fast: false
-      max-parallel: 3
-      matrix:
-        include:
-          - {position: 1, order: PC}
-          - {position: 2, order: CP}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Verify the original parent SDK, version-aware Cargo and unchanged Wild
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash scripts/ohm-gnu-syscall/ingress.sh
-      - name: Restore exactly the original compiler driver from run 41099028701
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
-          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
-          mkdir -p "$QA_ROOT/receipts"
-          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
-          {
-            echo "QA_ROOT=$QA_ROOT"
-            echo "CENSUS_PARENT=$CENSUS_PARENT"
-            echo "CENSUS_ROOT=$RUNNER_TEMP/observed-ruff"
-            echo "CENSUS_SDK=$QA_ROOT/candidate-sdk"
-            echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
-          } >> "$GITHUB_ENV"
-      - name: Count both ordinary Cargo commands and compare to a same-path clean Ruff CLI
-        env:
-          ROLE_ORDER: ${{ matrix.order }}
-        run: python3 -IB scripts/ohm-gnu-syscall/paired.py "$ROLE_ORDER"
-      - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: gnu-svc-pilots-${{ matrix.position }}
-          retention-days: 14
-          path: ${{ runner.temp }}/qualified-syscall/receipts
-
-  holdout:
-    if: inputs.phase == 'holdout' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 150
-    strategy:
-      fail-fast: false
-      max-parallel: 3
-      matrix:
-        include:
-          - {position: 1, order: PC}
-          - {position: 2, order: CP}
-          - {position: 3, order: CP}
-          - {position: 4, order: CP}
-          - {position: 5, order: PC}
-          - {position: 6, order: CP}
-          - {position: 7, order: CP}
-          - {position: 8, order: PC}
-          - {position: 9, order: PC}
-          - {position: 10, order: PC}
-          - {position: 11, order: PC}
-          - {position: 12, order: CP}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Verify the original parent SDK, version-aware Cargo and unchanged Wild
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash scripts/ohm-gnu-syscall/ingress.sh
-      - name: Restore exactly the original compiler driver from run 41099028701
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
-          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
-          mkdir -p "$QA_ROOT/receipts"
-          python3 -IB scripts/ohm-gnu-syscall/restore_prior.py
-          {
-            echo "QA_ROOT=$QA_ROOT"
-            echo "CENSUS_PARENT=$CENSUS_PARENT"
-            echo "CENSUS_ROOT=$RUNNER_TEMP/observed-ruff"
-            echo "CENSUS_SDK=$QA_ROOT/candidate-sdk"
-            echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
-          } >> "$GITHUB_ENV"
-      - name: Count both ordinary Cargo commands and compare to a same-path clean Ruff CLI
-        env:
-          ROLE_ORDER: ${{ matrix.order }}
-        run: python3 -IB scripts/ohm-gnu-syscall/paired.py "$ROLE_ORDER"
-      - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: gnu-svc-holdout-${{ matrix.position }}
-          retention-days: 14
-          path: ${{ runner.temp }}/qualified-syscall/receipts
+          if-no-files-found: error
+          retention-days: 30

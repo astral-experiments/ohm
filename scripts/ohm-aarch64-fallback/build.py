@@ -13,6 +13,9 @@ def main():
     assert rt.HOST=='x86_64-unknown-linux-gnu';rt.room(True);kit.bind()
     inp=rt.ROOT/'inputs'
     select,roles,_=compare.installable(inp/'sdk.tar.zst',CURRENT,inp/'native',expected_tree=kit.TREE);select('P')
+    build_with_selected_sdk()
+
+def build_with_selected_sdk():
     source=rt.ROOT/'exact-cargo-source';entry=materialize(source)
     assert entry['commit']==CANDIDATE and entry['tree']==TREE and entry['entries']==3114
     job=rt.ROOT/'cargo-build';job.mkdir();out=rt.LOG/'cargo-293-source';out.mkdir()
