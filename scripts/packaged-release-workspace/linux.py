@@ -73,6 +73,10 @@ def seed(root):
     actual={p.name:sha(p) for p in reg.glob("cache/*/*.crate")}
     need(len(locks)==498 and actual==locks,"the 498 frozen Ruff registry archives differ")
     shared=root/"receipts/shared";shared.mkdir(exist_ok=True)
+    snapshot=(repo/SNAPSHOT).read_bytes()
+    need(snapshot==git(repo,"show","HEAD:"+SNAPSHOT) and digest(snapshot)==SNAPSHOT_SHA and
+         digest(snapshot.split(b"\n---\n",1)[1])==SNAPSHOT_BODY_SHA,"unexpected pinned e2e snapshot")
+    gz(shared/"e2e-snapshot.snap.gz",snapshot)
     save(shared/"source.json",{"head":RUFF,"tree":TREE,"historical_commit":HISTORY,"lock":LOCK,"patch":digest(patch),"registry":actual,
                               "historical_fifty":sha(FIX/"fifty.json"),"original_archive":ENROLL["source_archive_sha256"]})
     gz(shared/"historical.patch.gz",patch)
@@ -171,10 +175,22 @@ def behaviors(repo,out,env,arts,returned,state):
     need(len(choices)==1 and b"1 passed; 0 failed" in real_program(p,["--exact",choices[0]],env,repo,out,"parser-case"),
          "wrong original parser test inventory or selected native verdict")
     e=Path(returned[E2E]["executable"]);cwd=repo/"crates/ty_server"
-    cases=real_program(e,["--list","--format","terse"],env,cwd,out,"e2e-list")
+    # Only the separately-executed e2e reader needs Insta's real workspace.
+    # Running its ordinary nested Cargo metadata would choose the repo's stock Rust.
+    snapshot_env=env|{"INSTA_WORKSPACE_ROOT":str(repo),"INSTA_UPDATE":"no"}
+    case_args=["--exact",RUN_CASE,"--test-threads=1"]
+    cases=real_program(e,["--list","--format","terse"],snapshot_env,cwd,out,"e2e-list")
     need((RUN_CASE+": test").encode() in cases.splitlines() and
-         b"1 passed; 0 failed" in real_program(e,["--exact",RUN_CASE,"--test-threads=1"],env,cwd,out,"e2e-case"),
+         b"1 passed; 0 failed" in real_program(e,case_args,snapshot_env,cwd,out,"e2e-case") and sha(repo/SNAPSHOT)==SNAPSHOT_SHA,
          "wrong real ty_server integration test or observable native verdict")
+    with tempfile.TemporaryDirectory(dir=env["TMPDIR"]) as missing:
+        negative=subprocess.run([str(e),*case_args],env=snapshot_env|{"INSTA_WORKSPACE_ROOT":missing},cwd=cwd,capture_output=True,timeout=240)
+        gz(out/"e2e-missing.stdout.gz",negative.stdout);gz(out/"e2e-missing.stderr.gz",negative.stderr)
+        need(negative.returncode==101 and b"0 passed; 1 failed" in negative.stdout and
+             missing_snapshot_body(negative.stdout)==(repo/SNAPSHOT).read_bytes().split(b"\n---\n",1)[1] and
+             not any(p.is_file() for p in Path(missing).rglob("*")),"real e2e did not refuse the empty snapshot root")
+    save(out/"e2e-snapshot.json",{"source":SNAPSHOT,"sha256":SNAPSHOT_SHA,"native_test":RUN_CASE,"argv":case_args,"exe":str(e),"program_sha256":sha(e),
+         "positive_runtime_env_changes":{"INSTA_WORKSPACE_ROOT":str(repo),"INSTA_UPDATE":"no"},"missing_root_exit":negative.returncode,"missing_root_body_sha256":SNAPSHOT_BODY_SHA})
     save(out/"behavior.json",{"libraries":check,"parser_case":choices[0],"parser_list":digest(listing),"e2e_case":RUN_CASE,
                              "e2e_list":digest(cases),"e2e_sha256":sha(e)})
 

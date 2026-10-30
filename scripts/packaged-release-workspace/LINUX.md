@@ -40,6 +40,13 @@ A 3 GiB portable original-byte limit is a stop. The other outputs have their
 dual-read whole-file hashes, section witnesses and actual whole-file cmp
 receipts. No full raw-byte reconstruction is claimed for those other outputs.
 
+The separately executed ty_server e2e test sets `INSTA_UPDATE=no` and its
+runtime `INSTA_WORKSPACE_ROOT` to the pinned public Ruff source directory.
+Verify the 2,321-byte checked-in snapshot and all 2,234 diagnostic body bytes.
+The same native test pointed to a separate empty snapshot root must fail
+without writing a snapshot and must print exactly the original diagnostic.
+Neither option enters the Cargo command that builds the workspace.
+
 The original portable archive has SHA-256
 ee336c50bac854f16648f19f870d5dbe915892f9fd5c9cedb08e50ab14e2779d.
 Its 50 actual Wild command lines remain byte-identical to its original

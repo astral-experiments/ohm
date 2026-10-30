@@ -30,9 +30,18 @@ PARSER="crates/ruff_python_parser|ruff_python_parser|lib|true|crates/ruff_python
 SENTINELS={k for k,q in SUBJECTS.items() if not(q["cold_unchanged_same"] and q["restore_unchanged_same"])}|{E2E}
 REAL_RUST={"20":"7e71d3150938ff8ed82aca03416439d7e5b87ef3","21":"c79998a5cd143c445a4b2528f20953b176a65c5d"}
 RUN_CASE="pull_diagnostics::on_did_open"
+SNAPSHOT="crates/ty_server/tests/e2e/snapshots/e2e__pull_diagnostics__on_did_open.snap"
+SNAPSHOT_SHA="282803230460b74fcf3e868325e7c76ba97fde33d443fc30c759660fbb308cb9"
+SNAPSHOT_BODY_SHA="a974634b3a75466bb3018c62ee17ef95e79792f67bd1612cba2918e48168ed90"
 CHUNK=1<<20
 
 def digest(b):return hashlib.sha256(b).hexdigest()
+
+def missing_snapshot_body(stdout):
+    rows=[m.group(1) for line in stdout.decode().splitlines() if (m:=re.fullmatch(r"\s*[0-9]+\s*│\+(.*)",line))]
+    body=("\n".join(rows)+"\n").encode()
+    need(digest(body)==SNAPSHOT_BODY_SHA,"missing snapshot returned a different real diagnostic")
+    return body
 
 def part(p):
     need("/crates/" in p,"non-Ruff package")

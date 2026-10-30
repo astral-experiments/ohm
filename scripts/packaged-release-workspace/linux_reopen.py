@@ -36,6 +36,13 @@ def image(c,base,h):
 
 def behavior(c,where,exe,expected,state):
     q=c.json(where+"/behavior.json")
+    control=c.json(where+"/e2e-snapshot.json");raw_snap=c.raw("shared/e2e-snapshot.snap.gz");miss=c.raw(where+"/e2e-missing.stdout.gz")
+    cwd=expected[E2E]["manifest_path"].split("/crates/",1)[0]
+    need(control["source"]==SNAPSHOT and control["sha256"]==digest(raw_snap)==SNAPSHOT_SHA and control["native_test"]==RUN_CASE and
+         control["positive_runtime_env_changes"]=={"INSTA_WORKSPACE_ROOT":cwd,"INSTA_UPDATE":"no"} and
+         control["argv"]==["--exact",RUN_CASE,"--test-threads=1"] and control["exe"]==expected[E2E]["executable"] and
+         control["program_sha256"]==exe[E2E]["sha256"] and control["missing_root_exit"]==101 and b"0 passed; 1 failed" in miss and
+         control["missing_root_body_sha256"]==SNAPSHOT_BODY_SHA and missing_snapshot_body(miss)==raw_snap.split(b"\n---\n",1)[1],"wrong actual snapshot oracle")
     need(len(q["libraries"])==2 and q["parser_case"]=="parser::tests::test_modes" and q["e2e_case"]==RUN_CASE,"different original physical readers")
     for i,record in enumerate(q["libraries"]):
         p=c.json(where+f"/ordinary-{i}.json");body=c.raw(where+f"/ordinary-{i}.stdout.gz")
