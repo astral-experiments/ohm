@@ -20,7 +20,9 @@ def save(p,data):
     with p.open('x') as f:json.dump(data,f,indent=2,sort_keys=True);f.write('\n')
 def api(path):return json.loads(subprocess.check_output(['gh','api',f'repos/{REPO}/'+path]))
 def fetch(path,dest):
-    with dest.open('xb') as f:subprocess.run(['gh','api','-H','Accept: application/octet-stream',f'repos/{REPO}/'+path],stdout=f,check=True)
+    headers=['-H','Accept: application/octet-stream'] if path.startswith('releases/assets/') else []
+    need(bool(headers) or path.startswith('actions/artifacts/') and path.endswith('/zip'),'foreign GitHub download route')
+    with dest.open('xb') as f:subprocess.run(['gh','api',*headers,f'repos/{REPO}/'+path],stdout=f,check=True)
 def platform_triple():
     host=platform.system();t=TRIPLES[host];need((host,platform.machine()) in [('Darwin','arm64'),('Linux','x86_64')],'wrong native host');return t
 
