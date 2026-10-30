@@ -1,95 +1,250 @@
-name: CI
+name: Cargo 301 Linux checks
 on:
   workflow_dispatch:
 permissions:
   contents: read
-  actions: read
 concurrency:
-  group: gnu-versioned-counter-reviewer-20261030
+  group: private-cargo-301-linux-equivalence
   cancel-in-progress: false
+defaults:
+  run:
+    working-directory: subject
+env:
+  RUST_VERSION: 1.99.0
 jobs:
-  native:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    name: Run the independent reviewer for the actual GNU Ruff compiler profiles
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
+  rustfmt:
+    name: Rustfmt
+    needs: schema
+    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          path: qa-protocol
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Reopen the authenticated 119-file final AArch64 SDK
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/gnu-reviewer-ingress"
-          mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inputs"
-          (cd scripts/ohm-aarch64-versioned && sha256sum --quiet -c SHA256SUMS)
-          (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd
-          python3 -IB scripts/ohm-aarch64-versioned/acquire_builds.py
-          python3 -IB - <<'PY'
-          import os,shutil,sys
-          from pathlib import Path
-          sys.path.insert(0,str(Path('scripts/ohm-aarch64-versioned').resolve()))
-          from version_kit import bind,capsule,rt
-          from study import load,save,sha
-          bind()
-          inputs=rt.ROOT/'inputs/versioned'
-          product=load(Path('scripts/ohm-aarch64-versioned/qualified-builds.json'))
-          assert sha(inputs/'sdk.tar.zst')==product['capsule']
-          sdk=rt.ROOT/'reviewer-sdk'
-          checked=capsule.verify(inputs/'sdk.tar.zst','C',sdk)
-          p=inputs/'cargo/cargo'
-          assert sha(p)==product['cargo_elf'] and sha(sdk/'bin/cargo')==rt.TOOLS['bin/cargo']
-          temp=sdk/'bin/cargo.new'
-          shutil.copy2(p,temp)
-          temp.replace(sdk/'bin/cargo')
-          save(rt.LOG/'reviewer-sdk.json',{'source':product['source'],'cargo':sha(sdk/'bin/cargo'),'capsule':checked})
-          PY
-      - name: Run the standalone counted ordinary Ruff workflow from a fresh installation
-        run: |
-          set -euo pipefail
-          python3 -IB scripts/ohm-aarch64-portable-review/count_ir.py V "$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk" "$RUNNER_TEMP/gnu-reviewer-work"
-      - name: Preserve whole ELF bodies, kernel receipts, negative stderr and partial records
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: public-versioned-gnu-counter-raw
-          path: |
-            ${{ runner.temp }}/gnu-reviewer-work/receipts
-            ${{ runner.temp }}/gnu-reviewer-ingress/receipts/reviewer-sdk.json
-          retention-days: 7
-          if-no-files-found: error
-  reopen:
-    needs: native
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    name: Independently recount every native guest profile and match complete AArch64 products
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/ohm-aarch64-versioned/cargo-transport
+            scripts/ohm-cargo-301-linux-ci
+      - name: Authenticate Cargo 301 source, tree and all 3114 entries
+        working-directory: ${{ github.workspace }}
+        run: python3 -IB qa-protocol/scripts/ohm-cargo-301-linux-ci/source.py subject
+      - name: Install Rust
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal --component rustfmt
+      - name: Check formatting
+        run: cargo +"$RUST_VERSION" fmt --all --check
+
+  clippy:
+    name: Clippy (${{ matrix.os }})
+    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [depot-ubuntu-24.04-8]
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          path: qa-protocol
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/ohm-aarch64-versioned/cargo-transport
+            scripts/ohm-cargo-301-linux-ci
+      - name: Authenticate Cargo 301 source, tree and all 3114 entries
+        working-directory: ${{ github.workspace }}
+        run: python3 -IB qa-protocol/scripts/ohm-cargo-301-linux-ci/source.py subject
+      - name: Install Rust
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal --component clippy
+      - name: Check lints
+        run: cargo +"$RUST_VERSION" clippy --workspace --all-targets --no-deps -- -D warnings
+
+  cargo-tests:
+    name: Cargo tests (${{ matrix.os }})
+    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    env:
+      CARGO_PROFILE_DEV_DEBUG: 1
+      CARGO_PROFILE_TEST_DEBUG: 1
+      CARGO_INCREMENTAL: 0
+      CARGO_PUBLIC_NETWORK_TESTS: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: depot-ubuntu-24.04-16
+            other: i686-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          python-version: '3.13'
-      - name: Authenticate the fresh reviewer artifact and reread every genuine PID and profile
-        env:
-          GH_TOKEN: ${{ github.token }}
+          path: qa-protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/ohm-aarch64-versioned/cargo-transport
+            scripts/ohm-cargo-301-linux-ci
+      - name: Authenticate Cargo 301 source, tree and all 3114 entries
+        working-directory: ${{ github.workspace }}
+        run: python3 -IB qa-protocol/scripts/ohm-cargo-301-linux-ci/source.py subject
+      - name: Install Rust
         run: |
-          set -euo pipefail
-          (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
-          python3 -IB scripts/ohm-aarch64-portable-review/review-counter-result.py "$GITHUB_RUN_ID" "$GITHUB_SHA" "$RUNNER_TEMP/gnu-counter-raw-readback"
-      - name: Preserve the independent reviewer projections and source binding
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+          # Keep compiled-in test scratch paths outside this repository and any
+          # `target` component, for Git discovery and automatic shared-build admission.
+          echo "CARGO_TARGET_DIR=$RUNNER_TEMP/cargo-tests" >> "$GITHUB_ENV"
+          rustup toolchain install "$RUST_VERSION" --profile minimal --component rustfmt
+          rustup target add --toolchain "$RUST_VERSION" "${{ matrix.other }}" wasm32-unknown-unknown
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y gcc-multilib libsecret-1-0 libsecret-1-dev
+      - name: Run Cargo unit and integration tests
+        run: cargo +"$RUST_VERSION" test -p cargo
+      - name: Install Ohm for shared-registry integration coverage
+        if: runner.os == 'Linux'
+        env:
+          OHM_VERSION: ohm-1.97.1-16
+          OHM_INSTALLER_SHA256: e8f33de7d5a2def0205fbde4db499853f44b3444037559637d2d8ff1e6cc92a4
+        run: |
+          installer="$RUNNER_TEMP/ohm-installer.sh"
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+            --output "$installer" \
+            "https://labs.astral.sh/ohm/releases/$OHM_VERSION/install.sh"
+          printf '%s  %s\n' "$OHM_INSTALLER_SHA256" "$installer" | sha256sum --check
+          sh "$installer"
+      - name: Run shared-registry integration with Ohm
+        if: runner.os == 'Linux'
+        env:
+          RUSTUP_TOOLCHAIN: ohm-1.97.1-16
+          # This pinned compiler predates early metadata.
+          __CARGO_HEADSTART: "no"
+        run: |
+          testsuite="$(find "$CARGO_TARGET_DIR/debug/deps" -maxdepth 1 -type f -name 'testsuite-*' -perm -u+x -print -quit)"
+          if [[ -z "$testsuite" ]]; then
+            echo 'compiled Cargo integration test binary was not found' >&2
+            exit 1
+          fi
+          "$testsuite" \
+            build_dir::shared_registry_cache_preserves_cross_workspace_reuse_and_private_early_cutoff \
+            --exact --nocapture
+          "$testsuite" \
+            build_dir::shared_registry_cache_avoids_hashing_immutable_public_apis \
+            --exact --nocapture
+          "$testsuite" \
+            check::ohm_preserves_fresh_checks_while_holding_shared_workspace_locks \
+            --exact --nocapture
+          "$testsuite" \
+            check::ohm_locks_fingerprints_before_preserving_established_check_graphs \
+            --exact --nocapture
+          "$testsuite" \
+            check::ohm_skips_cold_ordinary_check_graphs_after_test_builds \
+            --exact --nocapture
+      - name: Install Ohm for Clippy worktree coverage
+        env:
+          OHM_VERSION: ohm-1.98.0-9
+          OHM_INSTALLER_SHA256: 573e00024783ab952f7c2d629f12f9e0ba61be96843f7e692dc056642a72affe
+        run: |
+          installer="$RUNNER_TEMP/ohm-clippy-installer.sh"
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+            --output "$installer" \
+            "https://labs.astral.sh/ohm/releases/$OHM_VERSION/install.sh"
+          printf '%s  %s\n' "$OHM_INSTALLER_SHA256" "$installer" | shasum -a 256 --check
+          sh "$installer"
+      - name: Run profile and bundled Clippy worktree tests with Ohm
+        env:
+          RUSTUP_TOOLCHAIN: ohm-1.98.0-9
+          # This pinned compiler predates early metadata.
+          __CARGO_HEADSTART: "no"
+        run: |
+          toolchain_bin="$(dirname "$(rustup which rustc)")"
+          rustup_bin="$(dirname "$(command -v rustup)")"
+          # Exclude runner-provided native-tool shims from the trusted-cache fixture.
+          export PATH="$toolchain_bin:$rustup_bin:/usr/bin:/bin:/usr/sbin:/sbin"
+          rustc -Vv
+          clippy-driver -V
+          testsuite="$(find "$CARGO_TARGET_DIR/debug/deps" -maxdepth 1 -type f -name 'testsuite-*' -perm -u+x -print -quit)"
+          if [[ -z "$testsuite" ]]; then
+            echo 'compiled Cargo integration test binary was not found' >&2
+            exit 1
+          fi
+          # The stable-built testsuite marks these nightly tests ignored at compile time.
+          "$testsuite" profiles::ohm_default_debuginfo --include-ignored --nocapture
+          for test in \
+            worktree_import_requires_cloning \
+            bundled_clippy_isolation_defaults_follow_actual_snapshot_cloning \
+            bundled_clippy_preserves_ordinary_seeds_without_importing_lint_state \
+            clippy_isolation_overrides_are_inherited_and_child_flags_take_precedence \
+            forced_clippy_isolation_preserves_compiler_trust_rejections \
+            clippy_wrapper_scripts_still_deny_the_whole_seed; do
+            "$testsuite" "ohm_worktree::$test" --exact --include-ignored --nocapture
+          done
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            "$testsuite" ohm_linker::ohm_defaults_select_wild_and_allow_lld \
+              --exact --include-ignored --nocapture
+            "$testsuite" rustflags::ohm_defaults_reexpand_derive_after_native_input_changes \
+              --exact --nocapture
+          fi
+
+  workspace-tests:
+    name: Workspace tests
+    needs: clippy
+    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          name: public-versioned-gnu-counter-verified
-          path: ${{ runner.temp }}/gnu-counter-raw-readback/verified
-          retention-days: 7
-          if-no-files-found: warn
+          path: qa-protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/ohm-aarch64-versioned/cargo-transport
+            scripts/ohm-cargo-301-linux-ci
+      - name: Authenticate Cargo 301 source, tree and all 3114 entries
+        working-directory: ${{ github.workspace }}
+        run: python3 -IB qa-protocol/scripts/ohm-cargo-301-linux-ci/source.py subject
+      - name: Install Rust
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal
+      - name: Run workspace tests
+        run: cargo +"$RUST_VERSION" test --workspace --exclude cargo --exclude benchsuite --exclude resolver-tests
+
+  resolver:
+    name: Resolver tests
+    needs: workspace-tests
+    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: qa-protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/ohm-aarch64-versioned/cargo-transport
+            scripts/ohm-cargo-301-linux-ci
+      - name: Authenticate Cargo 301 source, tree and all 3114 entries
+        working-directory: ${{ github.workspace }}
+        run: python3 -IB qa-protocol/scripts/ohm-cargo-301-linux-ci/source.py subject
+      - name: Install Rust
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal
+      - name: Run resolver tests
+        run: cargo +"$RUST_VERSION" test -p resolver-tests
+
+  schema:
+    name: Schema tests
+    needs: cargo-tests
+    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: qa-protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/ohm-aarch64-versioned/cargo-transport
+            scripts/ohm-cargo-301-linux-ci
+      - name: Authenticate Cargo 301 source, tree and all 3114 entries
+        working-directory: ${{ github.workspace }}
+        run: python3 -IB qa-protocol/scripts/ohm-cargo-301-linux-ci/source.py subject
+      - name: Install Rust
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal
+      - name: Run schema tests
+        run: cargo +"$RUST_VERSION" test -p cargo-util-schemas --features unstable-schema
