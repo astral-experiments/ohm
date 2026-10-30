@@ -48,6 +48,7 @@ jobs:
           test "$(stat -c %s sdk.zip)" = 230733513
           test "$(unzip -Z1 sdk.zip)" = linux-aarch64-sdk-pair.tar.zst
           unzip -qp sdk.zip linux-aarch64-sdk-pair.tar.zst > sdk.tar.zst
+          mkdir -p "$QA_ROOT/rustup/toolchains"
           python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-aarch64-linux/capsule.py" sdk.tar.zst 686b11a3c8fe73ee5e663e1f0531d6f79aae8351bfe5da40c52faf76321fbb92 C "$QA_ROOT/rustup/toolchains/ohm" | tee "$QA_ROOT/receipts/restored.json"
           export RUSTUP_HOME="$QA_ROOT/rustup" RUSTUP_AUTO_INSTALL=0
           test "$(realpath "$(rustup which --toolchain ohm rustc)")" = "$QA_ROOT/rustup/toolchains/ohm/bin/rustc"
