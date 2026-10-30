@@ -33,13 +33,17 @@ def audit(units,work,out,env,check_math=False):
 }
 ''')
             program=name/"reader"
-            argv=["rustc","+ohm",str(source),"--edition=2021","--extern","libm="+str(archive),"-o",str(program)]
+            metadata, = [Path(v) for v in u["filenames"] if v.endswith(".rmeta")]
+            need(metadata.is_file() and metadata.stem == archive.stem and metadata.parent == archive.parent,
+                 "full libm metadata and archive did not come from the same typed output")
+            argv=["rustc","+ohm",str(source),"--edition=2021","--extern","libm="+str(archive),
+                  "--extern","libm="+str(metadata),"-o",str(program)]
             compiler=subprocess.run(argv,cwd=name,env=env,capture_output=True,timeout=120)
             compress_bytes(name/"compiler.stdout.gz",compiler.stdout);compress_bytes(name/"compiler.stderr.gz",compiler.stderr)
             need(compiler.returncode==0,"failed math consumer: "+compiler.stderr[-700:].decode(errors="replace"))
             actual=subprocess.run([str(program)],cwd=name,env=env,capture_output=True,timeout=25)
             need(actual.returncode==0 and not actual.stderr and actual.stdout==b'3ff6a09e667f3bcd 3fb504f3 4000000000000000 40800000 401a000000000000 40d00000\n',"unexpected libm result")
-            save(name/"verified.json",{"argv":argv,"archive":sha(archive),"stdout":actual.stdout.decode(),"exit":actual.returncode,"program":macho_text(program)})
+            save(name/"verified.json",{"argv":argv,"archive":sha(archive),"metadata":sha(metadata),"stdout":actual.stdout.decode(),"exit":actual.returncode,"program":macho_text(program)})
         evidence.append({"path":str(archive),"sha256":sha(archive),"fresh":u["fresh"],"features":u["features"],
                          "hard":MISSING in body,"recheck":RECHECK in body,"dep":digest(body),"source":str(src)})
     need(len({r["path"] for r in evidence})==len(evidence),"duplicate libm output")

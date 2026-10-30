@@ -136,12 +136,8 @@ def env_for(root, sdk):
     if not alias.exists():
         alias.symlink_to(sdk.resolve(), target_is_directory=True)
     need(alias.samefile(sdk), "SDK alias moved")
-    environment = os.environ.copy()
-    for key in tuple(environment):
-        if key.startswith(
-            ("CARGO_", "RUSTC_", "RUSTDOC_", "RUSTUP_", "RUSTFLAGS", "DYLD_", "OHM_")
-        ) or key in ("RUSTC", "RUSTDOC", "GH_TOKEN", "GITHUB_TOKEN", "RUSTC_BOOTSTRAP"):
-            del environment[key]
+    from local_dev import environment as dev_environment
+    environment = dev_environment()
     environment.update(
         RUSTUP_HOME=str(rustup),
         CARGO_HOME=str(root / "cargo-home"),

@@ -1,4 +1,4 @@
-name: Native libm math in full Ruff workspace on Cargo 293
+name: Developer-mode libm math and full Ruff test builds on Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
@@ -60,7 +60,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: libm-workspace-on-293-provider
+          name: libm-development-workspace-on-293-provider
           path: ${{ runner.temp }}/apple-libm-on-293/receipts
           retention-days: 14
           if-no-files-found: warn
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: libm-workspace-on-293-final
+          name: libm-development-workspace-on-293-final
           path: ${{ runner.temp }}/apple-libm-on-293/receipts
           retention-days: 14
           if-no-files-found: warn

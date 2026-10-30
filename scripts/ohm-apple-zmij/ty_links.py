@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 
 from execs import ExecTrace
+from local_dev import observe
 from measure import capture, fresh, native_rows, retire, select
 from prepare import prepare_ruff
 from study import ZMIJ_LIB, check_host, compress_bytes, digest, env_for, git, need, save, sdk_id, sha, text_git
@@ -85,6 +86,8 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
     units=[r for r in stream if r["reason"]=="compiler-artifact"]
     zmij=[r for r in units if r["target"]["name"]=="zmij" and r["target"]["kind"]==["lib"]]
     need((zmij or not ok) and all(sha(z["target"]["src_path"])==ZMIJ_LIB for z in zmij),"wrong locked zmij")
+    if ok and label in ("cold","edit","clean"):
+        observe(events, work, sdk, {"e2e","ty_server"}, dest)
     native=native_rows(events,sdk)
     need(native["scope"]=="kernel-exec" and native["cargo"]==1 and all(l["stock"] for l in native["linkers"]), "foreign Cargo or linker")
     need(native["full"].count("zmij")==sum(not z["fresh"] for z in zmij), "typed/physical zmij mismatch")
@@ -110,7 +113,7 @@ def collect(root, scope, work, sdk, env, trace, dest, state, label):
             need(e2e is None,"ambiguous ty_server e2e")
             e2e=actual_tests(path,repo,env,state,dest)
             e2e_links=links[str(path)]
-            if label=="clean" and "ty-comparison" in dest.parts:
+            if label in ("cold","edit","clean","repair") and "ty-comparison" in dest.parts:
                 archive=root/"receipts/clean-ty-executables"/(e2e["raw"]+".macho.gz")
                 if not archive.exists():
                     archive.parent.mkdir(exist_ok=True)
