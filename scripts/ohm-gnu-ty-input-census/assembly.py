@@ -79,11 +79,24 @@ def reemit(root,out,crate,records,expected):
 def counter(root,out,env,src,ordinary,prog,registered):
     stats=root/'callgrind';stats.mkdir()
     lib=Path(os.environ['CENSUS_SDK']).resolve()
-    command=[str(lib/'bin/cargo'),*census.CLI[2:]]
+    # Cargo inherits the selected toolchain from its rustup proxy. Replay that
+    # actual environment so the repository's own rust-toolchain cannot take over.
+    import tarfile
+    sys.path.insert(0,str(HERE.parent/'ohm-aarch64-registers'))
+    from tree_ir import rows
+    trace=root/'counter-environment';trace.mkdir()
+    baseline=subprocess.run(['strace','-ff','-q','-v','-s','262144','-e','trace=execve,execveat','-o',str(trace/'proc'),*census.CLI],
+                            cwd=src,env=env,capture_output=True,timeout=1800)
+    assert baseline.returncode==0 and roster(list(map(json.loads,baseline.stdout.splitlines())))==registered
+    principal,=[r for r in rows(trace) if r[1].is_file() and r[1].samefile(lib/'bin/cargo') and r[2][1:]==census.CLI[2:]]
+    _,_,command,activated=principal
+    assert activated['RUSTUP_TOOLCHAIN']=='ohm' and not {'RUSTC_WRAPPER','LD_PRELOAD','GH_TOKEN','GITHUB_TOKEN'}&activated.keys()
+    with tarfile.open(out/'counter-original-env.tar.gz','w:gz',compresslevel=1) as archive:
+        for event in sorted(trace.iterdir()):archive.add(event,arcname=event.name,recursive=False)
     prefix=['/usr/bin/valgrind.bin','--tool=callgrind','--trace-children=yes','--separate-threads=no',
             '--cache-sim=no','--branch-sim=no','--collect-jumps=no','--callgrind-out-file='+str(stats/'cg.%p'),'--log-file='+str(stats/'log.%p')]
     before=census.sha(prog)
-    measured=subprocess.run([*prefix,*command],cwd=src,env=env,capture_output=True,timeout=3900)
+    measured=subprocess.run([*prefix,*command],cwd=src,env=activated,capture_output=True,timeout=3900)
     census.blob(out/'count-stdout.gz',measured.stdout);census.blob(out/'count-stderr.gz',measured.stderr)
     assert measured.returncode==0,measured.stderr[-2500:]
     msgs=list(map(json.loads,measured.stdout.splitlines()))
