@@ -1,17 +1,19 @@
-name: Independently reusable LLVM units with opaque assembly
+name: Whole Cargo instructions for independent LLVM unit reuse
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: llvm-opaque-cgu-qualification-${{ github.ref }}
+  group: cgu-instruction-qualification-${{ github.ref }}
   cancel-in-progress: false
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
 jobs:
-  native-and-ruff:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-cgu-opaque-asm-20261030'
+  bootstrap:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-cgu-opaque-asm-instructions'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 360
-    env:
-      PYTHONDONTWRITEBYTECODE: '1'
+    outputs:
+      sha256: ${{ steps.export.outputs.sha256 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -19,7 +21,7 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify the experiment source and install the cross toolchain
+      - name: Install and verify the native study
         run: |
           set -euo pipefail
           export QA_ROOT="$RUNNER_TEMP/opaque-asm-cgu"
@@ -27,13 +29,12 @@ jobs:
           mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inbox"
           (cd scripts/ohm-aarch64-linux && sha256sum -c SHA256SUMS)
           (cd scripts/ohm-cgu-reuse && sha256sum -c SHA256SUMS)
-          cp scripts/ohm-cgu-reuse/{plan.md,SHA256SUMS} "$QA_ROOT/receipts"
+          cp scripts/ohm-cgu-reuse/{counter-plan.md,SHA256SUMS,counter-golden.json} "$QA_ROOT/receipts"
           git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
           python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind ninja-build
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind ninja-build zstd
           cc -O2 -Wall -Wextra -o "$QA_ROOT/trace" scripts/ohm-aarch64-linux/trace-compilers.c
-          strace -ff -qq -s 65535 -e trace=execve -o "$QA_ROOT/receipts/tracer-check" /bin/true
       - name: Download signed Linux release tools
         env:
           GH_TOKEN: ${{ github.token }}
@@ -41,16 +42,160 @@ jobs:
           release=ohm-1.99.0-20
           archive="$release-x86_64-unknown-linux-gnu"
           gh release download "$release" --repo "$GITHUB_REPOSITORY" --dir "$QA_ROOT/inbox" --pattern "$archive.tar.gz" --pattern "$archive.tar.gz.sha256" --pattern "$archive-provenance.json"
-      - name: Produce the exact two native compilers and matching host and target libraries
-        run: bash scripts/ohm-aarch64-linux/prepare.sh
-      - name: Prove generic external assembly reads and mixed-unit behavior on the candidate
-        run: bash scripts/ohm-aarch64-linux/prepare.sh test-host
-      - name: Compare equal-stamp native guards, real Ruff edits and healthy independent clean builds
-        run: python3 -IB scripts/ohm-cgu-reuse/study_cgu.py
+      - name: Build both exact rustc SDKs and run the original native regressions
+        run: |
+          bash scripts/ohm-aarch64-linux/prepare.sh
+          bash scripts/ohm-aarch64-linux/prepare.sh test-host
+      - name: Reopen the opaque native fixture under both compiler roles
+        run: |
+          python3 -IB - <<'PY'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,str(Path("scripts/ohm-cgu-reuse").resolve()))
+          import study_cgu as s
+          s.stable_selector()
+          rows={k:s.guard(k) for k in "PC"}
+          for role, count in (("P",10),("C",1)):
+              for phase in ("guard-repeat","guard-native-change","guard-restore"):
+                  s.need(rows[role][phase]==count, "unexpected physical LLVM work")
+          PY
+      - name: Freeze and independently reopen the runtime capsule
+        id: export
+        run: |
+          python3 -IB scripts/ohm-cgu-reuse/transfer.py export
+          printf 'sha256=%s\n' "$(sha256sum "$QA_ROOT/private-return/manifest.json" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: opaque-cgu-sdks
+          path: ${{ runner.temp }}/opaque-asm-cgu/private-return
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: native-opaque-cgu-ruff-screen
+          name: cgu-ir-bootstrap
           path: ${{ runner.temp }}/opaque-asm-cgu/receipts
+          retention-days: 7
+          compression-level: 1
+          if-no-files-found: error
+
+  pilot:
+    needs: bootstrap
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 360
+    outputs:
+      eligible: ${{ steps.measure.outputs.eligible }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install and verify the native study
+        run: |
+          set -euo pipefail
+          export QA_ROOT="$RUNNER_TEMP/opaque-asm-cgu"
+          printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
+          mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inbox"
+          (cd scripts/ohm-aarch64-linux && sha256sum -c SHA256SUMS)
+          (cd scripts/ohm-cgu-reuse && sha256sum -c SHA256SUMS)
+          cp scripts/ohm-cgu-reuse/{counter-plan.md,SHA256SUMS,counter-golden.json} "$QA_ROOT/receipts"
+          git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
+          python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind ninja-build zstd
+          cc -O2 -Wall -Wextra -o "$QA_ROOT/trace" scripts/ohm-aarch64-linux/trace-compilers.c
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: opaque-cgu-sdks
+          path: ${{ runner.temp }}/opaque-asm-cgu/distribution
+      - name: Read back every compiler member and the native fixture
+        run: python3 -IB scripts/ohm-cgu-reuse/transfer.py "$QA_ROOT/distribution" "${{ needs.bootstrap.outputs.sha256 }}"
+      - name: Run two independent mirrored pilot pairs
+        id: measure
+        run: python3 -IB scripts/ohm-cgu-reuse/instructions.py pilot
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: cgu-ir-pilot
+          path: ${{ runner.temp }}/opaque-asm-cgu/receipts
+          retention-days: 7
+          compression-level: 1
+          if-no-files-found: error
+
+  confirm:
+    needs: [bootstrap, pilot]
+    if: needs.pilot.outputs.eligible == 'true'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        block: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install and verify the native study
+        run: |
+          set -euo pipefail
+          export QA_ROOT="$RUNNER_TEMP/opaque-asm-cgu"
+          printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
+          mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inbox"
+          (cd scripts/ohm-aarch64-linux && sha256sum -c SHA256SUMS)
+          (cd scripts/ohm-cgu-reuse && sha256sum -c SHA256SUMS)
+          cp scripts/ohm-cgu-reuse/{counter-plan.md,SHA256SUMS,counter-golden.json} "$QA_ROOT/receipts"
+          git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
+          python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind ninja-build zstd
+          cc -O2 -Wall -Wextra -o "$QA_ROOT/trace" scripts/ohm-aarch64-linux/trace-compilers.c
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: opaque-cgu-sdks
+          path: ${{ runner.temp }}/opaque-asm-cgu/distribution
+      - name: Read back every compiler member and the native fixture
+        run: python3 -IB scripts/ohm-cgu-reuse/transfer.py "$QA_ROOT/distribution" "${{ needs.bootstrap.outputs.sha256 }}"
+      - name: Run the assigned held-out pair on private fresh roots
+        run: python3 -IB scripts/ohm-cgu-reuse/instructions.py "${{ matrix.block }}"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: cgu-result-${{ matrix.block }}
+          path: ${{ runner.temp }}/opaque-asm-cgu/receipts/result-${{ matrix.block }}.json
           retention-days: 14
-          if-no-files-found: warn
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: cgu-ir-observations-${{ matrix.block }}
+          path: ${{ runner.temp }}/opaque-asm-cgu/receipts
+          retention-days: 7
+          compression-level: 1
+          if-no-files-found: error
+
+  decide:
+    needs: confirm
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          pattern: cgu-result-*
+          path: ${{ runner.temp }}/rows
+      - name: Apply both registered twofold tests
+        run: PYTHONPATH=scripts/ohm-cgu-reuse python3 -B scripts/ohm-cgu-reuse/decide.py "$RUNNER_TEMP/rows" "$RUNNER_TEMP/decision.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: cgu-ir-confirmation
+          path: ${{ runner.temp }}/decision.json
+          retention-days: 14
+          if-no-files-found: error
