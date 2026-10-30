@@ -1,17 +1,15 @@
-name: Incremental developer ty_server e2e builds on Cargo 293
+name: Native Apple response-file custody calibration
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: developer-ty-server-293-${{ github.ref }}
+  group: xcode-response-control-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  ty-e2e-on-293:
+  calibration:
+    if: github.ref == 'refs/heads/charlie/qa-apple-xcode-response-fds'
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 360
-    env:
-      PYTHONNOUSERSITE: '1'
-      PYTHONDONTWRITEBYTECODE: '1'
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -19,77 +17,12 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Freeze and verify subjects, provider design and native execution observer
-        run: |
-          root="$RUNNER_TEMP/apple-dev-ty293"
-          PYTHONPATH=scripts/ohm-apple-zmij python3 -B scripts/ohm-apple-zmij/test_cgu.py scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
-          python3 -IB scripts/ohm-apple-zmij/test_two_commands.py -v
-          python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
-          python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
-          python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
-          python3 -IB scripts/ohm-apple-zmij/test_xcode_response.py -v
-          python3 -IB scripts/ohm-apple-zmij/test_xcode_response.py native "$root"
-          test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/ty-developer-study.md "$root/receipts/registration.md"
-      - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          root="$RUNNER_TEMP/apple-dev-ty293"
-          mkdir "$root/assets"
-          gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-          python3 -IB scripts/ohm-apple-zmij/run.py ty_links seed "$root"
-      - name: Bootstrap source-bound 2035696 and 444c027 and run both native compiler tests
-        run: |
-          root="$RUNNER_TEMP/apple-dev-ty293"
-          python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
-          if ! command -v ninja >/dev/null; then brew install ninja; fi
-          (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
-          python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Build unmodified Cargo 735e and bind exactly one Mach-O to both compilers
-        run: |
-          root="$RUNNER_TEMP/apple-dev-ty293"
-          python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$root"
-          python3 -IB scripts/ohm-apple-zmij/fixed_crc.py pin "$root"
-      - name: Test direct and transitive provider safety against independent empty builds
-        id: provider
-        run: |
-          root="$RUNNER_TEMP/apple-dev-ty293"
-          python3 -IB scripts/ohm-apple-zmij/fixed_crc.py providers "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/provider-matrix/terminal.json" >> "$GITHUB_OUTPUT"
+      - name: Authenticate actual kernel filesystem fixture, inode and parent
+        run: python3 -IB scripts/ohm-apple-zmij/response_fs_schema.py "$RUNNER_TEMP/response-custody/schema"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: developer-ty293-provider
-          path: ${{ runner.temp }}/apple-dev-ty293/receipts
-          retention-days: 14
+          name: darwin-response-custody
+          path: ${{ runner.temp }}/response-custody
           if-no-files-found: warn
-      - name: Trace genuine edits, both repeats, failures, repair and clean binaries
-        run: python3 -IB scripts/ohm-apple-zmij/run.py ty_clock structure "$RUNNER_TEMP/apple-dev-ty293"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: developer-ty293-structural
-          path: ${{ runner.temp }}/apple-dev-ty293/receipts
           retention-days: 14
-          if-no-files-found: warn
-      - name: Two independently rooted developer-mode pilot pairs
-        run: python3 -IB scripts/ohm-apple-zmij/run.py ty_clock screen "$RUNNER_TEMP/apple-dev-ty293"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: developer-ty293-pilots
-          path: ${{ runner.temp }}/apple-dev-ty293/receipts
-          retention-days: 14
-          if-no-files-found: warn
-      - name: Twelve balanced inclusive developer-mode pairs and terminal clean binaries
-        run: python3 -IB scripts/ohm-apple-zmij/run.py ty_clock confirmation "$RUNNER_TEMP/apple-dev-ty293"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: developer-ty293-confirmation
-          path: ${{ runner.temp }}/apple-dev-ty293/receipts
-          retention-days: 14
-          if-no-files-found: warn
