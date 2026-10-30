@@ -5,18 +5,14 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: qa-gnu-missing-on-settled-edge-20261030
+  group: qa-gnu-ruff-residual-20261030
   cancel-in-progress: false
 jobs:
   ruff:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-register-comments-20261030'
-    name: Recheck malformed and missing undeclared providers after an otherwise settled Rust build
+    name: Find the remaining independent GNU AArch64 Ruff dirty units
     runs-on: namespace-profile-ubuntu-24-04-16
-    strategy:
-      fail-fast: false
-      matrix:
-        compiler: [ohm, ordinary]
-    timeout-minutes: 30
+    timeout-minutes: 65
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -27,19 +23,18 @@ jobs:
       - name: Reopen the fixed protocol, counter and native cross toolchain
         run: |
           set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-provider-negative"
+          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-ruff-screen"
           mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inputs"
           printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
           (cd scripts/ohm-aarch64-registers && sha256sum -c SHA256SUMS)
-          cp scripts/ohm-aarch64-registers/{PROVIDER-NEGATIVES.md,SHA256SUMS} "$QA_ROOT/receipts/"
+          cp scripts/ohm-aarch64-registers/{RESIDUAL-PLAN.md,SHA256SUMS} "$QA_ROOT/receipts/"
           git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd
           dpkg-query -W gcc-aarch64-linux-gnu libc6-dev-arm64-cross binutils-aarch64-linux-gnu qemu-user strace valgrind > "$QA_ROOT/receipts/packages"
           echo 'def5fdcf6ae64a4d3e6af3786b622978d8313e0734ecf3f6cbe71d8be9e274c8  /usr/bin/valgrind.bin' | sha256sum -c -
           python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
-      - if: matrix.compiler == 'ohm'
-        name: Acquire exactly the two enrolled private artifacts from the successful independent bootstrap
+      - name: Acquire exactly the two enrolled private artifacts from the successful independent bootstrap
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -55,18 +50,15 @@ jobs:
           unzip -qp sdk.zip linux-aarch64-sdk-pair.tar.zst > sdk.tar.zst
           unzip -q native.zip -d native
           echo 'd4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b  sdk.tar.zst' | sha256sum -c -
-      - if: matrix.compiler == 'ohm'
-        name: Run the registered native-only cases on both matching SDKs
+      - name: Capture native per-unit dependency markers, Cargo dirtiness and independent LLVM and MIR lowering
         run: |
-          python3 -IB scripts/ohm-aarch64-registers/edges.py "$QA_ROOT/inputs/sdk.tar.zst" d4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b native-only
-      - if: matrix.compiler == 'ordinary'
-        name: Run the same cases with the real stock 1.99 host and target components
-        run: python3 -IB scripts/ohm-aarch64-registers/stock_edges.py native-only
+          python3 -IB scripts/ohm-aarch64-registers/residual.py "$QA_ROOT/inputs/sdk.tar.zst" \
+            d4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b "$QA_ROOT/inputs/native"
       - name: Retain sources, original data, all complete programs and any qualification failures
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-register-provider-negative-${{ matrix.compiler }}
-          path: ${{ runner.temp }}/gnu-aarch64-provider-negative/receipts
+          name: gnu-ruff-settled-causes
+          path: ${{ runner.temp }}/gnu-aarch64-ruff-screen/receipts
           retention-days: 7
           if-no-files-found: error
