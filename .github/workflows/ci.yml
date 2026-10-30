@@ -1,26 +1,29 @@
-name: Signed Linux ty_project check Ron instruction fraction
+name: Cargo diagnostic recovery on signed Ohm Rust and real Ruff
 on:
   workflow_dispatch:
     inputs:
       task:
-        description: Execute the one ordinary check and its conditional off-clock profile
+        description: Verify the enrolled Cargo fix
         type: choice
+        options: [signed-ruff-recovery]
         required: true
-        options: [ron-check, recovery-and-profile]
 permissions:
   contents: read
   actions: read
 jobs:
-  ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-ron-check-20261030'
+  recovery:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-cargo-recovery-fix-20261030' && inputs.task == 'signed-ruff-recovery'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 40
+    timeout-minutes: 110
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: protocol
           persist-credentials: false
-          sparse-checkout: scripts/ron-check-share
+          sparse-checkout: |
+            scripts/cargo-diagnostic-fix
+            scripts/ron-check-share
+            scripts/ohm-apple-zmij/cargo293
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
@@ -36,23 +39,31 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Acquire and count the two native commands
+      - name: Build each Cargo source and exercise the independent Ruff controls
         env:
-          QA_TASK: ${{ inputs.task }}
           QUALIFICATION_TOKEN: ${{ github.token }}
         run: |
           set -eu
           test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
           test "$(git -C existing-counter rev-parse HEAD)" = 927e20bcad028e5ed4290a58bd330a258ee5da41
           sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends ninja-build strace
-          script=measure.py
-          if [ "$QA_TASK" = recovery-and-profile ]; then script=followthrough.py; fi
-          python3 -B "protocol/scripts/ron-check-share/$script" "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
+          sudo apt-get install -y --no-install-recommends ninja-build strace build-essential cmake pkg-config libssl-dev perl
+          python3 -IB protocol/scripts/cargo-diagnostic-fix/qualification.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c" "$GITHUB_WORKSPACE/protocol/scripts/ohm-apple-zmij/cargo293/source.pack"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: signed-21-ty-project-check-instructions
+          name: matched-cargo-signed-ruff-diagnostics
           path: ${{ runner.temp }}/ordinary-ron-check/packet
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Run the candidate's new in-tree regression tests against both Cargo products
+        run: |
+          set -eu
+          python3 -IB protocol/scripts/cargo-diagnostic-fix/targeted.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: matched-cargo-in-tree-test
+          path: ${{ runner.temp }}/ordinary-ron-check/test-packet
           retention-days: 7
           if-no-files-found: warn
