@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: linux-checks
-        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason, e2e-features]
+        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason, e2e-features, e2e-existing]
 permissions:
   contents: read
 concurrency:
@@ -608,6 +608,61 @@ jobs:
         if: ${{ always() }}
         with:
           name: focused-published-21-ty-server-e2e-fingerprints
+          path: ${{ runner.temp }}/packaged-linux-50/diagnostic
+          if-no-files-found: warn
+          retention-days: 7
+
+  e2e-existing:
+    name: Compare existing ${{ matrix.receiver }} Cargo on the signed Linux test
+    if: ${{ inputs.task == 'e2e-existing' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    permissions:
+      contents: read
+      actions: read
+    runs-on: namespace-profile-ubuntu-24-04-16
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        receiver: [shipped, strict-293]
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: focus
+          persist-credentials: false
+          sparse-checkout: scripts/ohm-cargo-301-linux-ci
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
+          path: original-qa
+          persist-credentials: false
+          sparse-checkout: scripts/packaged-release-workspace
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: existing-qa
+          ref: b3a1bbd38e07293168f06cb21648821b8cacd206
+          persist-credentials: false
+          sparse-checkout: scripts/ohm-aarch64-fallback
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify tools and acquire the single native target history
+        env:
+          QUALIFICATION_TOKEN: ${{ github.token }}
+          FOCUSED_CARGO: ${{ matrix.receiver }}
+        run: |
+          set -eu
+          test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends strace ninja-build
+          python3 -IB focus/scripts/ohm-cargo-301-linux-ci/e2e_existing.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-qa/scripts/ohm-aarch64-fallback/acquire.py"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: ${{ always() }}
+        with:
+          name: focused-${{ matrix.receiver }}-published-21-ty-server-e2e
           path: ${{ runner.temp }}/packaged-linux-50/diagnostic
           if-no-files-found: warn
           retention-days: 7
