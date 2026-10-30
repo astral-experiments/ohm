@@ -216,7 +216,11 @@ def inner(f):
         v=observed[k];foreign=k=='separate-device';fixed=f.role=='fixed';safe=fixed or foreign
         gate(v['real_ran'] and v['admitted']!=safe and v['protected_plus_healthy']==safe,k+' dry-run')
         if not v['real_ran']:continue
-        gate(v['healthy_after'] is None,k+' unrelated eligible sibling')
+        # The signed EBUSY can prevent an independently staged sibling from
+        # running, depending on readdir order. Record its complete state.
+        if f.role=='signed' and k=='marked-trash-mounted':
+            gate(v['healthy_after'] is None or v['healthy_after']['sha256']==SHA(HEALTHY),k+' signed independent sibling integrity')
+        else:gate(v['healthy_after'] is None,k+' unrelated eligible sibling')
         if safe:
             gate(v['external_after']==v['base'] and v['held']['nlink']==1,k+' external preserved')
             gate(v['held']['hash']==v['base']['sha256'] and v['actual_exit']==0,k+' successful safe cleanup')

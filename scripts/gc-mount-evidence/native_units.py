@@ -15,16 +15,20 @@ def put(path,body):
     with gzip.open(path,'xb') as f:f.write(body)
 def save(path,obj):
     with path.open('x') as f:json.dump(obj,f,sort_keys=True,indent=2);f.write('\n')
+PANICS={'util::counter::tests::counter_zero_slot','util::dependency_queue::test::rejects_cycle','util::git::tests::duplicate_registration_is_rejected','util::io::tests::over_the_limit'}
+PRIVATE_OVERLAY='workspace::build_cache_gc::worktrees::idle::tests::stock_build_can_finish_opening_a_profile_after_discovery'
 def execute(bin,source,env,out,name,flags,expect):
     p=subprocess.run([bin,*flags],cwd=source,env=env,timeout=390,capture_output=True)
     put(out/(name+'.stdout.gz'),p.stdout);put(out/(name+'.stderr.gz'),p.stderr)
     seen=re.findall(rb'^test (.+?) \.\.\. (ok|FAILED|ignored.*)$',p.stdout,re.M)
     actual={n.decode():v.decode() for n,v in seen};assert len(seen)==len(actual)
+    logical={k.removesuffix(' - should panic') if k.endswith(' - should panic') and k.removesuffix(' - should panic') in PANICS else k:v for k,v in actual.items()}
+    assert len(logical)==len(actual)
     summary=re.findall(rb'test result: (ok|FAILED)\. (\d+) passed; (\d+) failed; (\d+) ignored;',p.stdout)
     rec={'command':[str(bin),*flags],'exit':p.returncode,'TMPDIR':env.get('TMPDIR'),'f_filesystem':subprocess.check_output(['stat','-f','-c','%T',env['TMPDIR']],text=True).strip(),
-         'binary_sha':bc.digest(bin),'listed_expected':len(expect),'actual':actual,'terminal_summary':[[v.decode() for v in s] for s in summary]}
+         'binary_sha':bc.digest(bin),'listed_expected':len(expect),'actual':actual,'logical_names':logical,'raw_names_equal':set(actual)==expect,'terminal_summary':[[v.decode() for v in s] for s in summary]}
     save(out/(name+'.json'),rec)
-    return p.returncode==0 and set(actual)==expect and len(summary)==1 and int(summary[0][2])==0
+    return p.returncode==0 and set(logical)==expect and len(summary)==1 and int(summary[0][2])==0
 
 def build(root):
     out=root/'build-cert';src=root/'source';build=json.loads((out/'build.json').read_bytes());env=build['env']|{'CARGO_NET_OFFLINE':'true','RUSTUP_TOOLCHAIN':'ohm'}
@@ -37,7 +41,7 @@ def build(root):
     deliver=root/'unit-deliver';deliver.mkdir();binary=deliver/'library-tests';shutil.copyfile(native,binary);binary.chmod(0o755)
     listed=subprocess.check_output([binary,'--list'],cwd=src,env=env)
     put(out/'unit-list.gz',listed);names={v.removesuffix(': test') for v in listed.decode().splitlines() if v.endswith(': test')}
-    focus={n for n in names if n.startswith('workspace::build_cache_gc::')}
+    focus={n for n in names if n.startswith('workspace::build_cache_gc')}
     assert any(n.endswith('::shared_cleanup_preserves_a_nested_mount_in_active_and_retired_trees') for n in focus)
     assert any(n.endswith('::mount_path::tests::renamed_parent_and_final_symlink') for n in focus)
     proof={'sha':bc.digest(native),'source':str(src),'candidate':build['candidate'],'qa':build['qa'],'names':sorted(names),'gc':sorted(focus),'cmd':cmd}
@@ -46,8 +50,13 @@ def build(root):
     success={}
     for label,parent in [('namespace-overlay',root),('tmpfs',Path('/dev/shm'))]:
         with tempfile.TemporaryDirectory(prefix='ohm-gc-units-',dir=parent) as tmp:
-            success[label]=execute(binary,src,env|{'TMPDIR':tmp},out,label,['workspace::build_cache_gc::','--test-threads=1','--color','never'],focus)
+            success[label]=execute(binary,src,env|{'TMPDIR':tmp},out,label,['workspace::build_cache_gc','--test-threads=1','--color','never'],focus)
+    ov=json.loads((out/'namespace-overlay.json').read_bytes());failed={k for k,v in ov['logical_names'].items() if v=='FAILED'}
+    success['actual_overlay_failures']=sorted(failed)
+    success['shared_and_other_focus_tests_green']=set(ov['logical_names'])==focus and not (failed-{PRIVATE_OVERLAY})
+    success['old_private_overlay_failure_reproduced']=PRIVATE_OVERLAY in failed
     save(out/'unit-native-results.json',success)
+    assert success['tmpfs'] and success['shared_and_other_focus_tests_green'],success
     print('Native focused GC suites',success,flush=True)
 def ext4(root,artifact,pack):
     out=root/'packet/units';out.mkdir(parents=True,exist_ok=False)
