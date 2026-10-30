@@ -1,18 +1,18 @@
-name: CI
+name: Remaining GNU inputs in Ruff ty_project tests
 on:
   workflow_dispatch:
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: gnu-versioned-native-reviewer-20261030
+  group: gnu-ty-project-hard-cgu-20261030
   cancel-in-progress: false
 jobs:
   native:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    name: Replay the ordinary released GNU native reviewer workflow
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ty-hard-inputs'
+    name: Census ordinary AArch64 ty_project builds on the versioned register rules
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
+    timeout-minutes: 220
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -30,7 +30,7 @@ jobs:
           (cd scripts/ohm-aarch64-versioned && sha256sum --quiet -c SHA256SUMS)
           (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd
           python3 -IB scripts/ohm-aarch64-versioned/acquire_builds.py
           python3 -IB - <<'PY'
           import os,shutil,sys
@@ -51,44 +51,21 @@ jobs:
           temp.replace(sdk/'bin/cargo')
           save(rt.LOG/'reviewer-sdk.json',{'source':product['source'],'cargo':sha(sdk/'bin/cargo'),'capsule':checked})
           PY
-      - name: Run the standalone script exactly as a reviewer would
+
+      - name: Trace the real root-change fix and run the returned target tests
         run: |
           set -euo pipefail
-          python3 -IB scripts/ohm-aarch64-portable-review/replay.py V "$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk" "$RUNNER_TEMP/gnu-reviewer-work"
-      - name: Preserve whole ELF bodies, kernel receipts, negative stderr and partial records
+          export CENSUS_ROOT="$RUNNER_TEMP/gnu-ty-marker-census"
+          export CENSUS_SDK="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          python3 -IB scripts/ohm-gnu-ty-input-census/census.py --self-test
+          python3 -IB scripts/ohm-gnu-ty-input-census/census.py
+      - name: Retain original process streams, depfiles and test verdicts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: versioned-gnu-public-reviewer-native
-          path: |
-            ${{ runner.temp }}/gnu-reviewer-work/receipts
-            ${{ runner.temp }}/gnu-reviewer-ingress/receipts/reviewer-sdk.json
-          retention-days: 7
-          if-no-files-found: error
-  codegen:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-versioned-native-20261030'
-    name: Reopen actual LLVM calls in both complete pilot blocks
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Authenticate complete pilot archives and enumerate the three role-specific AST profiles
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
-          python3 -IB scripts/ohm-aarch64-portable-review/review-pilot.py scripts/ohm-aarch64-versioned/qualified-pilot.json scripts/ohm-aarch64-portable-review/classify-first-edit-codegen.py "$RUNNER_TEMP/gnu-codegen-raw-readback"
-      - name: Preserve the individual reopened compiler profile witnesses
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: versioned-gnu-LLVM-pilot-codegen
-          path: ${{ runner.temp }}/gnu-codegen-raw-readback/codegen.json
-          retention-days: 7
+          name: gnu-ty-project-hard-input-census
+          retention-days: 14
           if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/gnu-ty-marker-census/receipts
+            ${{ runner.temp }}/gnu-reviewer-ingress/receipts/reviewer-sdk.json
