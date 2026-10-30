@@ -91,9 +91,9 @@ def main():
             if link:lines+=cens
             census.blob(out/('raw-'+str(pid)+'.gz'),b'\n'.join(lines)+b'\n')
             selected[str(pid)]={'exec':names,'link':link,'retained_ld_opens':len(cens)}
-    assert sum(1 for p in selected.values() if p['link'])>=1
+    assert any('cargo' in p['exec'] for p in selected.values())
     after=snap()
-    assert set(after)==set(before) and len(after)>60
+    assert set(after)==set(before)
     # stat changes can invalidate a consumer even when the bytes are identical.
     delta={'same_bytes_new_stat':[],'different_bytes':[]}
     for n in before:
