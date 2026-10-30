@@ -4,7 +4,7 @@ import itertools
 import json
 import os
 from pathlib import Path
-import shutil
+import runpy
 import sys
 
 HERE = Path(__file__).resolve().parent
@@ -25,7 +25,7 @@ WANT = {"A":{"zmij","compact_str","ruff_python_ast"}, "N":{"compact_str","ruff_p
 
 def schedule():
     seq = list(map("".join,itertools.permutations("ANM")))
-    key = lambda half,p:hashlib.sha256(f"GNU-compact-heldout-v1/{half}/{p}".encode()).digest()
+    key = lambda half,p:hashlib.sha256(f"GNU-compact-heldout-parked-v2/{half}/{p}".encode()).digest()
     return {f"{i:02d}":p for i,p in enumerate([p for half in (1,2) for p in sorted(seq,key=lambda p:key(half,p))],1)}
 
 def old(base):
@@ -36,7 +36,7 @@ def old(base):
 
 def setup(ancestor, inputs):
     kit.bind()
-    current, pair, _ = compare.installable(inputs/"sdk.tar.zst",CURRENT,inputs/"native",expected_tree=kit.TREE)
+    _, pair, _ = compare.installable(inputs/"sdk.tar.zst",CURRENT,inputs/"native",expected_tree=kit.TREE)
     oldA, oldN = (load(ancestor/"receipts"/(k+"-sdk.json")) for k in "PC")
     need(oldN==pair["P"],"the shared physical N component is not identical across both transports")
     roles = {"A":oldA,"N":pair["P"],"M":pair["C"]}
@@ -47,18 +47,18 @@ def setup(ancestor, inputs):
         files = dict(v["files"])
         need(files.pop(name)[0]==DRIVER[k] and len(files)==118 and files==ref,"more than the one physical driver changed")
         save(rt.LOG/("subject-"+k+".json"),v)
+    origins={"A":ancestor/"donor-P","N":rt.ROOT/"donor-P","M":rt.ROOT/"donor-C"}
+    cls=runpy.run_path(str(HERE/"parked.py"))["Parked"]
+    storage=cls(rt.ROOT/"fixed-role-parking",rt.SDK,{k:v["files"] for k,v in roles.items()},origins,name)
+    save(rt.LOG/"all-named-start-identities.json",storage.initial)
+    history=[]
     def select(k):
-        diff = current("C" if k=="M" else "P")
-        need(diff==[name],"additional compiler operand changed")
-        if k=="A":
-            src=ancestor/"donor-P"/name; dest=rt.SDK/name; tmp=dest.with_name(dest.name+".reinstall")
-            need(not tmp.exists() and sha(src)==DRIVER[k],"wrong ancestor driver")
-            shutil.copyfile(src,tmp)
-            tmp.chmod(oldA["files"][name][2])
-            os.replace(tmp,dest)
-        need([sha(rt.SDK/name),(rt.SDK/name).stat().st_size,(rt.SDK/name).stat().st_mode&0o777]==roles[k]["files"][name],"wrong active driver")
-        return diff
-    return select
+        event=storage.select(k)
+        rec=rt.LOG/"physical-selections"/(f"{len(history):02d}-"+k+".json")
+        sealed=save(rec,event); history.append({k:v for k,v in event.items() if k!="files"} | {"snapshot":rec.relative_to(rt.LOG).as_posix(),"sha256":sealed})
+        return [name]
+    return select, history
+
 
 def physical_jobs(prior, phase):
     j=load(prior/phase/"native.json")
@@ -67,14 +67,19 @@ def physical_jobs(prior, phase):
     return {r["crate"] for r in j["rustcs"]}
 
 def block(number, ancestor, inputs):
-    order=schedule()[number]
+    order=schedule().get(number)
     need(load(HERE/"schedule.json")==schedule(),"changed blocked order")
-    select=setup(ancestor,inputs)
+    select,history=setup(ancestor,inputs)
     rt.select=select
     rt.select("A")
+    q.prepare_graph()
+    transitions=runpy.run_path(str(HERE/"transitions.py"))
+    weights=transitions["check"](rt,q,select,sha,history)
+    save(rt.LOG/"all-nine-actual-transitions.json",weights)
+    if number=="qualify":
+        return
     q.counter=tree_ir.measure
     tree_ir.calibrate()
-    q.prepare_graph()
     save(rt.LOG/"heldout-registration.json", {"block":number,"order":order,"source":SOURCE,"drivers":DRIVER,"schedule":sha(HERE/"schedule.json"),
         "original":ORIGINAL,"current":CURRENT,"cpu":Path("/proc/cpuinfo").read_text().split("model name",1)[-1].splitlines()[0],
         "boot_digest":sha(Path("/proc/sys/kernel/random/boot_id")),"signed_tools":rt.TOOLS,"cross_gcc":physical(Path(q.CROSS)),
@@ -90,6 +95,9 @@ def block(number, ancestor, inputs):
         if common is None:common=reference
         need(reference==common,"different independent old or edited native output")
         markers=load(prior/"native-markers.json")
+        native_edited=load(prior/"edit/native.json")
+        actual_ast,=[r["argv"] for r in native_edited["rustcs"] if r["crate"]=="ruff_python_ast"]
+        need("/"+weights["namespaces"][role]+"/" in actual_ast[actual_ast.index("--out-dir")+1],"working Cargo namespace differs from the prior true transition")
         for phase in ("edit","unchanged-1","unchanged-2"):
             want = WANT[role] | ({"ruff_python_ast"} if phase=="edit" else set())
             need(physical_jobs(prior,phase)==want,"different physical native work")
