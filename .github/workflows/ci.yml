@@ -10,7 +10,13 @@ on:
         description: Native QA on an isolated branch
         type: choice
         default: none
-        options: [none, crc]
+        options: [none, measure-crc]
+      crc_prior_id:
+        description: Authenticated two-order structural artifact
+        type: string
+      crc_prior_sha:
+        description: SHA-256 of the complete structural ZIP
+        type: string
 
 permissions: {}
 
@@ -20,9 +26,9 @@ concurrency:
 
 jobs:
   apple-zmij-mechanism:
-    if: github.event_name == 'workflow_dispatch' && inputs.apple_zmij == 'crc'
+    if: github.event_name == 'workflow_dispatch' && inputs.apple_zmij == 'measure-crc'
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 240
+    timeout-minutes: 300
     permissions:
       contents: read
       actions: read
@@ -48,6 +54,18 @@ jobs:
           gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" \
             --dir "$RUNNER_TEMP/apple-zmij/assets" \
             --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
+      - name: Authenticate the completed two-order native prerequisite
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ inputs.crc_prior_id }}
+          ARTIFACT_SHA: ${{ inputs.crc_prior_sha }}
+        run: |
+          root="$RUNNER_TEMP/apple-zmij"
+          python3 -IB -c 'import os,re; assert re.fullmatch("[1-9][0-9]{1,18}",os.environ["ARTIFACT_ID"]); assert re.fullmatch("[0-9a-f]{64}",os.environ["ARTIFACT_SHA"])'
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID" > "$root/receipts/structural-source.json"
+          python3 -IB -c 'import json,os,sys; d=json.load(open(sys.argv[1])); assert d["name"]=="apple-zlib-crc-mechanism" and d["digest"]=="sha256:"+os.environ["ARTIFACT_SHA"] and d["workflow_run"]["head_sha"]=="41b12b0887742a464242f269d8c3f5cd5c457290"' "$root/receipts/structural-source.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > "$root/prior-typeshed.zip"
+          python3 -IB scripts/ohm-apple-zmij/run.py crc_clock enroll "$root" --sha256 "$ARTIFACT_SHA"
       - name: Verify signed release and enrolled Ruff typeshed change
         run: |
           root="$RUNNER_TEMP/apple-zmij"
@@ -62,13 +80,26 @@ jobs:
           python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/source-transport/crc/prepare.py "$root/enrolled-rust" > "$root/receipts/crc-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Observe both compiler orders with independent clean products and real native inputs
-        run: python3 -IB scripts/ohm-apple-zmij/run.py zlib_study mechanism "$RUNNER_TEMP/apple-zmij"
+      - name: Reproduce the native mechanism and run mirrored timing pilots
+        run: python3 -IB scripts/ohm-apple-zmij/run.py crc_clock screen "$RUNNER_TEMP/apple-zmij"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: apple-zlib-crc-mechanism
+          name: native-apple-crc-pilots
           path: ${{ runner.temp }}/apple-zmij/receipts
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Run another twelve balanced pairs if both pilots clear twofold
+        run: |
+          root="$RUNNER_TEMP/apple-zmij"
+          if python3 -IB -c 'import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))["passed"] else 1)' "$root/receipts/crc-clock-screen/result.json"; then
+            python3 -IB scripts/ohm-apple-zmij/run.py crc_clock confirmation "$root"
+          fi
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: native-apple-crc-confirmation
+          path: ${{ runner.temp }}/apple-zmij/receipts/crc-clock-confirmation
           retention-days: 14
           if-no-files-found: warn
   manifest:

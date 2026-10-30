@@ -74,11 +74,12 @@ def zlib_units(artifacts, work, out):
     return rows
 
 
-def product(root, repo, rev, out, artifacts, messages):
+def product(root, repo, rev, out, artifacts, messages, held=None):
     unit, = [r for r in artifacts if r["target"]["name"]=="ty_vendored" and r["profile"]["test"] and r["executable"]]
-    exe = Path(unit["executable"])
+    exe = held[0] if held else Path(unit["executable"])
     bs, = [r for r in messages if r["reason"]=="build-script-executed" and "/ty_vendored#" in r["package_id"]]
-    archive = (Path(bs["out_dir"])/"zipped_typeshed.zip").read_bytes()
+    disk_zip = held[1] if held else Path(bs["out_dir"])/"zipped_typeshed.zip"
+    archive = disk_zip.read_bytes()
     changed = {}
     with zipfile.ZipFile(io.BytesIO(archive)) as z:
         need(z.testzip() is None and len(z.infolist())==len(set(z.namelist()))==819, "invalid typeshed ZIP")
