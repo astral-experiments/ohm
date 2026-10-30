@@ -85,7 +85,9 @@ def install():
     assert h(prov) == "1bac589fa5a90d9d9ddcbbc1e847ff2bf8cb500aa58df02b0dd8c2933ceeb15a"
     assert side.read_text().split() == [h(archive), archive.name]
     subprocess.run(["tar", "-xzf", archive, "-C", inbox], check=True)
-    subprocess.run([inbox / BASE / "install.sh", "--prefix=" + str(SDK), "--disable-ldconfig"], check=True)
+    installer = inbox / ("rust-1.99.0-dev-" + HOST) / "install.sh"
+    assert list(inbox.glob("*/install.sh")) == [installer]
+    subprocess.run([installer, "--prefix=" + str(SDK), "--disable-ldconfig"], check=True)
     assert h(SDK / "bin/cargo") == SIGNED
     assert h(SDK / "bin/rustc") == "86d60426c7f3ebba0da187ca4f24339006aafbfb83a54eca94eadf507caea644"
     assert h(SDK / "lib/rustlib" / HOST / "bin/wild-ld/ld.bfd") == "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
