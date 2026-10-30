@@ -5,12 +5,12 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: qa-gnu-register-ruff-screen-20261030
+  group: qa-gnu-provider-edge-20261030
   cancel-in-progress: false
 jobs:
   ruff:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-register-comments-20261030'
-    name: Compare both Rust compilers on four independent GNU AArch64 Ruff histories
+    name: Validate direct and dependent native input changes with both Rust compilers
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 130
     steps:
@@ -23,11 +23,11 @@ jobs:
       - name: Reopen the fixed protocol, counter and native cross toolchain
         run: |
           set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-ruff-screen"
+          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-provider-edge"
           mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inputs"
           printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
           (cd scripts/ohm-aarch64-registers && sha256sum -c SHA256SUMS)
-          cp scripts/ohm-aarch64-registers/{RUFF-PLAN.md,SHA256SUMS} "$QA_ROOT/receipts/"
+          cp scripts/ohm-aarch64-registers/{PROVIDER-PLAN.md,SHA256SUMS} "$QA_ROOT/receipts/"
           git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd
@@ -50,15 +50,14 @@ jobs:
           unzip -qp sdk.zip linux-aarch64-sdk-pair.tar.zst > sdk.tar.zst
           unzip -q native.zip -d native
           echo 'd4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b  sdk.tar.zst' | sha256sum -c -
-      - name: Run the four independently empty registered histories
+      - name: Run the registered native provider sequences with both complete SDKs
         run: |
-          python3 -IB scripts/ohm-aarch64-registers/compare.py "$QA_ROOT/inputs/sdk.tar.zst" \
-            d4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b "$QA_ROOT/inputs/native"
+          python3 -IB scripts/ohm-aarch64-registers/edges.py "$QA_ROOT/inputs/sdk.tar.zst" d4a58ad69b0b2427f0fa1c4f3a9945783d7f2a9e3a4de9525d97f69db4f2a79b
       - name: Retain sources, original data, all complete programs and any qualification failures
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-register-ruff-screen
-          path: ${{ runner.temp }}/gnu-aarch64-ruff-screen/receipts
+          name: gnu-register-provider-edges
+          path: ${{ runner.temp }}/gnu-aarch64-provider-edge/receipts
           retention-days: 7
           if-no-files-found: error
