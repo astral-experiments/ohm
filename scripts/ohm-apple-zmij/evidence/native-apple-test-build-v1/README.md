@@ -1,5 +1,7 @@
 # Native Apple Ruff test-build verification
 
+These hosted Apple measurements ran with `CI=true`. The local Ruff compilers ran without rustc incremental compilation. Cargo could reuse finished artifacts between commands. [Original compiler arguments and profile verification](../native-apple-cargo-profile-v1)
+
 The command is `cargo +ohm test --lib --no-run -p ruff_python_ast --locked --offline -j4 --message-format=json` on Apple silicon. The primary observation is the first unchanged command after applying Ruff #28335 to a settled checkout on one branch. The edit and second unchanged command have separate rows. [Native run 41056802208](https://github.com/astral-experiments/ohm/actions/runs/41056802208) · [registered harness](https://github.com/astral-experiments/ohm/tree/51f61408905b3f1abe913641b5c13a1346011d77/scripts/ohm-apple-zmij) · [compiler change](https://github.com/astral-experiments/ohm-rust/pull/276)
 
 | Cohort | Command | P median ms | C median ms | Median paired P/C | Median ratio interval |

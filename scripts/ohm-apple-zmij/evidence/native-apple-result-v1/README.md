@@ -1,5 +1,7 @@
 # Native Apple silicon Ruff build after a Python-version edit
 
+These hosted Apple measurements ran with `CI=true`. The local Ruff compilers ran without rustc incremental compilation. Cargo could reuse finished artifacts between commands. [Original compiler arguments and profile verification](../native-apple-cargo-profile-v1)
+
 On a single fixed checkout, the first unchanged `cargo +ohm build -p ruff_python_ast --locked --offline -j4 --message-format=json` took **157.2 ms with the parent and 41.6 ms with the child**. The median of the twelve independent paired ratios was **3.820×**. The prespecified two-sided 96.14% median interval was **3.583–3.999×**. All twelve ratios exceeded 2 (range 3.473–4.410). The one-sided test against a sharp 2× effect gave **1/924** across the 924 balanced allocations. [Native paired job](https://github.com/astral-experiments/ohm/actions/runs/41048813491) · [Frozen QA source and protocol](https://github.com/astral-experiments/ohm/tree/3290af7b378353c6a2808487bc93ed587ab024bb/scripts/ohm-apple-zmij)
 
 | Whole Cargo command in the confirmation | Parent median | Child median | Median paired speedup | 96.14% interval |
@@ -8,7 +10,7 @@ On a single fixed checkout, the first unchanged `cargo +ohm build -p ruff_python
 | First unchanged build (primary) | 157.2 ms | 41.6 ms | 3.820× | 3.583–3.999× |
 | Further unchanged build | 155.1 ms | 39.2 ms | 3.982× | 3.844–4.062× |
 
-The job applied Ruff commit `ef23c9c39eb3029bab0139c3ea7ae6d95c4131e0` on its actual parent, using one checked-out branch and ordinary single-session incremental compilation. Each independent installation started empty, compiled the old revision, then measured three consecutive foreground Cargo calls with a blocking wait. The timings exclude the source edit itself, the later semantic readers and the native observation runs. Two separate mirrored pairs first passed the 2× gate at 3.901× and 3.491×. The twelve-pair confirmation then ran in a fresh set of installations with six parent-first and six child-first. There are **14 independent pairs across the two separately reported cohorts, 44 total installations, 160 closed Cargo phases and 84 timed commands**. Each confirmation pair contributes one primary observation. [Ruff edit](https://github.com/astral-sh/ruff/commit/ef23c9c39eb3029bab0139c3ea7ae6d95c4131e0)
+The job applied Ruff commit `ef23c9c39eb3029bab0139c3ea7ae6d95c4131e0` on its actual parent, using one checked-out branch and Cargo’s CI profile. Each independent installation started empty, compiled the old revision, then measured three consecutive foreground Cargo calls with a blocking wait. The timings exclude the source edit itself, the later semantic readers and the native observation runs. Two separate mirrored pairs first passed the 2× gate at 3.901× and 3.491×. The twelve-pair confirmation then ran in a fresh set of installations with six parent-first and six child-first. There are **14 independent pairs across the two separately reported cohorts, 44 total installations, 160 closed Cargo phases and 84 timed commands**. Each confirmation pair contributes one primary observation. [Ruff edit](https://github.com/astral-sh/ruff/commit/ef23c9c39eb3029bab0139c3ea7ae6d95c4131e0)
 
 ## What ran
 

@@ -1,5 +1,7 @@
 # Effect of Rust #277 across Ruff’s workspace tests on Apple Silicon
 
+These hosted Apple measurements ran with `CI=true`. The local Ruff compilers ran without rustc incremental compilation. Cargo could reuse finished artifacts between commands. [Original compiler arguments and profile verification](../native-apple-cargo-profile-v1)
+
 With signed Ohm 1.99.0-20 Cargo, Rust #277 removed four rustc launches and one Apple linker launch on each of three `cargo test --workspace --no-run` commands. Both compilers linked the same 60 of the 83 test executables. The additional link saved by #277 built a build-script executable. These measurements count processes. [Rust #277](https://github.com/astral-experiments/ohm-rust/pull/277) · [Native run and full artifact](https://github.com/astral-experiments/ohm/actions/runs/41066385681)
 
 | Command | Parent / candidate full rustc | Parent / candidate Apple ld | Test executables linked by either |

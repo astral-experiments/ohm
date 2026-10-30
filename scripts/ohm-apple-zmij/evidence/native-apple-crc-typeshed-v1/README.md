@@ -1,5 +1,7 @@
 # Apple Silicon typeshed test builds
 
+These hosted Apple measurements ran with `CI=true`. The local Ruff compilers ran without rustc incremental compilation. Cargo could reuse finished artifacts between commands. [Original compiler arguments and profile verification](../native-apple-cargo-profile-v1)
+
 This packet compares rustc `444c0273a2e2bc0b161e988d43c882349bc2d7a6` with its direct child `82911b516fb35608fd70ada4deb6f8429277f410`. Both use the signed Ohm 1.99.0-20 Cargo. Ruff moved from `ccba26cc3af909b7f19060f48f53daeab5070f9d` to `d8dac4cb576bd091a8b6cdc60a65c770ea75a96e`, which updates three vendored typeshed inputs. The command was `cargo +ohm test -p ty_vendored --lib --features deflate --no-run --locked --offline -j4 --message-format=json`. Ruff enables this compression for `ty_wasm` through `ty_project`. [Ruff edit](https://github.com/astral-sh/ruff/pull/29042) · [Ruff feature selection](https://github.com/astral-sh/ruff/blob/d8dac4cb576bd091a8b6cdc60a65c770ea75a96e/crates/ty_wasm/Cargo.toml#L27)
 
 | Cargo invocation | Parent median | Child median | Median paired speedup | 96.14% interval |

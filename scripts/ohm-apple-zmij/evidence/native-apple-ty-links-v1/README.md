@@ -1,5 +1,7 @@
 # Ruff language-server test links on Apple Silicon
 
+These hosted Apple measurements ran with `CI=true`. The local Ruff compilers ran without rustc incremental compilation. Cargo could reuse finished artifacts between commands. [Original compiler arguments and profile verification](../native-apple-cargo-profile-v1)
+
 On both unchanged `cargo test -p ty_server --test e2e --no-run` commands, the parent launched two Rust compilers and the Apple linker. Ohm Rust #276 launched none. After the real deleted-file diagnostics fix, both compilers rebuilt and relinked the e2e executable. Its test inventory grew from 194 to 195. The newly added regression and an existing diagnostics test passed. Both compilers rejected an additional invalid edit with E0425 and exit 101. Repair repeated the required link. Every returned executable matched its own independently empty build byte for byte. [Ruff #28988](https://github.com/astral-sh/ruff/pull/28988) · [Ohm Rust #276](https://github.com/astral-experiments/ohm-rust/pull/276) · [Paired native run](https://github.com/astral-experiments/ohm/actions/runs/41056076188)
 
 | Focused command | Parent rustc / ld | #276 rustc / ld |
@@ -10,7 +12,7 @@ On both unchanged `cargo test -p ty_server --test e2e --no-run` commands, the pa
 | Invalid edit | 2 / 0 | 1 / 0 |
 | Repair | 3 / 1 | 2 / 1 |
 
-The test-build used the normal Cargo defaults, the signed `-20` Cargo and the same stock Apple linker in all arms. The parent rustc was `2035696c5316079f5b2e4373aee834839aac97e9` and the candidate was `444c0273a2e2bc0b161e988d43c882349bc2d7a6`. Each arm started with separately empty worktree and shared build directories. The signed compiler served as a third independent check of the original behavior. [Signed native run](https://github.com/astral-experiments/ohm/actions/runs/41054731602)
+The test-build used Cargo’s defaults for the CI environment, the signed `-20` Cargo and the same stock Apple linker in all arms. The parent rustc was `2035696c5316079f5b2e4373aee834839aac97e9` and the candidate was `444c0273a2e2bc0b161e988d43c882349bc2d7a6`. Each arm started with separately empty worktree and shared build directories. The signed compiler served as a third independent check of the original behavior. [Signed native run](https://github.com/astral-experiments/ohm/actions/runs/41054731602)
 
 The four independently clean e2e executables have the same machine instructions for the same Ruff revision across compilers. Their complete bytes differ in the native debugger’s object paths and corresponding code-signature page hashes. The optional whole-program replay below checks each original signed page, binds each rewritten field to one of the real Apple `ld` inputs, and compares every resulting byte. It checks 19,212 signed pages per executable on the edited revision.
 
