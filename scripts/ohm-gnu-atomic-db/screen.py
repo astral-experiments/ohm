@@ -92,7 +92,7 @@ def count_settled(work, out, src, env, cmd, preceding):
     for _, path, argv, _ in registered:
         is_rustc = path.is_file() and path.samefile(sdk/'bin/rustc')
         crate = argv[argv.index('--crate-name')+1] if is_rustc and '--crate-name' in argv else None
-        physical.append({'name':path.name,'argv':argv,'crate':crate, 'link_only':any(x.startswith('-Zlink-only') for x in argv)})
+        physical.append({'name':path.name,'argv':argv,'crate':crate, 'link_only':any(x.startswith('-Zlink-only') or x=='link-only' for x in argv)})
     census.save(out/'profile-registration.json', physical)
     expected = { ' '.join(r['argv']):r for r in physical if r['crate'] or r['argv'] == cargo }
     need_full = collections.Counter(r['crate'] for r in physical if r['crate'])
@@ -130,16 +130,23 @@ def count_settled(work, out, src, env, cmd, preceding):
     return [json.loads(x) for x in logged.stdout.splitlines()]
 
 
-def main(mode):
+def main(mode, role=None):
     assert mode in ('build','test')
     cmd = ['cargo','+ohm',mode,'-p','ruff_db','--lib',*(['--no-run'] if mode=='test' else []),
            '--target',census.TARGET,'--locked','--offline','-j4','--message-format=json']
-    work,out,src,env = census.acquire(OLD,NEW,TREES,LOCK,[FILE],cmd)
+    if role is None:
+        work,out,src,env = census.acquire(OLD,NEW,TREES,LOCK,[FILE],cmd)
+    else:
+        import sdk
+        work,out,src,env = sdk.acquire(role,cmd)
+    import consumer
+    consumer_inputs = None
     products = work/'products'
     products.mkdir()
     states = {}
     owners = {}
     def visit(label, old=False, invalid=False, wrong=False):
+        nonlocal consumer_inputs
         dest,msg,k = census.trace_build(label,work,out,src,env,cmd,101 if invalid else 0)
         for m in msg:
             if m['reason'] == 'compiler-artifact':
@@ -151,6 +158,11 @@ def main(mode):
             assert any((m.get('message',{}).get('code') or {}).get('code')=='E0425' and INVALID in m['message']['rendered'] for m in msg)
             return None
         f, result = witness(msg,mode,dest,src,env,old,wrong)
+        if role is not None and mode=='build' and label in ('cold','edit','first-repeat','repair','clean'):
+            if label in ('cold','clean'):
+                consumer_inputs=consumer.args_from_training(k,src)
+            result['consumer']=consumer.run(consumer_inputs,f,env,src,dest/'downstream',old=old)
+            shutil.copyfile(src.parent/'qa-atomic-consumer',products/('downstream-'+label))
         assert all(row['terminal']==[0] for row in k['rustcs'])
         result['full']=[(x['crate'],x['marker']) for x in emitted if not x['link_only']]
         result['link_only']=[x['crate'] for x in emitted if x['link_only']]
@@ -170,10 +182,13 @@ def main(mode):
     assert states['edit']['sha256'] != states['cold']['sha256']
     visit('first-repeat')
     visit('second-repeat')
-    raw = count_settled(work,out,src,env,cmd,[p[0] for p in states['second-repeat']['full']]+states['second-repeat']['link_only'])
-    prof = out/'profile-product'
-    prof.mkdir()
-    _, rp = witness(raw,mode,prof,src,env)
+    if role is None:
+        raw = count_settled(work,out,src,env,cmd,[p[0] for p in states['second-repeat']['full']]+states['second-repeat']['link_only'])
+        prof = out/'profile-product'
+        prof.mkdir()
+        _, rp = witness(raw,mode,prof,src,env)
+    else:
+        rp = states['second-repeat']
     (src/FILE).write_text((src/FILE).read_text()+'\nconst _: usize = '+INVALID+';\n')
     visit('invalid',invalid=True)
     census.command(['git','restore','--worktree','--',FILE],src,env)
@@ -190,6 +205,16 @@ def main(mode):
         preserved.mkdir()
         for name in [*changed,'clean']:
             subprocess.run(['zstd','-q','-1','-T2',str(products/name),'-o',str(preserved/(name+'.zst'))],check=True)
+    if role is not None and mode=='build':
+        compared = ('edit','first-repeat','repair','clean')
+        assert all(states[name]['consumer']['verdicts']==states['clean']['consumer']['verdicts'] for name in compared)
+        differences=[name for name in compared if states[name]['consumer']['elf']!=states['clean']['consumer']['elf']]
+        if differences:
+            preserved=out/'downstream-clean-comparison';preserved.mkdir()
+            for name in [*differences,'clean']:
+                subprocess.run(['zstd','-q','-1','-T2',str(products/('downstream-'+name)),'-o',str(preserved/(name+'.zst'))],check=True)
+        census.save(out/'downstream-verdicts.json',{'rolesource':role,'compared':compared,'unequal_elf':differences,
+                   'verdicts_equal':True,'old_elf':states['cold']['consumer']['elf'],'new_elf':states['edit']['consumer']['elf']})
     assert len({r['roster'] for r in states.values()}) == 1
     assert rp['roster'] == states['clean']['roster']
     if mode == 'test':
@@ -203,9 +228,9 @@ def main(mode):
         assert count == 1 and old_body.count('#[should_panic') == source.count('#[should_panic')
         (src/FILE).write_text(old_body)
         visit('pre-fix-method-with-new-tests',wrong=True)
-    census.save(out/'terminal-screen.json',{'mode':mode,'single_baseline':True,'cmd':cmd,'states':states,
+    census.save(out/'terminal-screen.json',{'mode':mode,'single_baseline':role is None,'role':role,'instrumented':role is None,'cmd':cmd,'states':states,
                 'mismatches_against_clean':changed,'profile_matches_clean':rp['sha256']==states['clean']['sha256']})
     print('Rust method, malformed edit and clean controls passed. Warm/clean differences:',changed,flush=True)
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    main(*sys.argv[1:])
