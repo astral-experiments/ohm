@@ -1,0 +1,182 @@
+[
+  {
+    "artifact": 12974869502,
+    "eligible_pairs": 0,
+    "head": "3342d0bc065ab52eebf0161f442655dd442da73a",
+    "old_inventory": 53,
+    "old_rustc": 36,
+    "reason": "Six expected-panic test names include a libtest display annotation.",
+    "recorded_arm_commands_with_clocks": 0,
+    "run": 41052488154,
+    "zip_bytes": 536654,
+    "zip_entries": 76,
+    "zip_sha256": "a9d8d7a964b069794cad68069960b4871c3212d2841fa803e3b8ce7732053c9d"
+  },
+  {
+    "artifact": 12975434252,
+    "by_state": {
+      "new": {
+        "C": "2dabbb796ef91d2ba2fbdb9bb4f81ce09027e93038ac339853bbfe7f79431269",
+        "P": "59eda6f5a6b5830ab22486efb11bc82d1f78251cc4c90d49db9d04c991977caa",
+        "all_ok": true,
+        "bytes": 1612656,
+        "canonically_equal_image_sha256": "ea72a89a6a3fc66d040b981c5045e3a34376360a09364ddd3f5582f6d5368214",
+        "common_workspace_key": "64e8753c5e9f70b3",
+        "different_bytes": 548,
+        "different_debug_path_bytes": 420,
+        "different_signature_bytes": 128,
+        "inventory": 54,
+        "n_oso": 30,
+        "negative_controls": [
+          "inconsistent signed code",
+          "inconsistent signature slot",
+          "validly resigned unobserved N_OSO operand",
+          "unobserved linker argv",
+          "resigned instruction",
+          "resigned UUID"
+        ],
+        "original_pages_changed": [
+          387,
+          388,
+          389,
+          390
+        ],
+        "rlib_members": 14,
+        "sections": 14,
+        "signature_pages": 391,
+        "source_text": [
+          738940,
+          "7af82ddd7afd7178fb7baf60f995cf3f66c2f8b48d470d47838bd71bf73292c4"
+        ],
+        "v2": {
+          "C": "181cdc7206104b52",
+          "P": "8e85bc85636e4a6d"
+        }
+      },
+      "old": {
+        "C": "d4a85e7d8a1a1d58f18ed63e0348b120e2fcb62d29b29a5f9760ecfca68144aa",
+        "P": "72e2aab04cbdd92c61e8229c9f7aec00e28fc6d351e1c5c45bc5f1cd3d7d8122",
+        "all_ok": true,
+        "bytes": 1538288,
+        "canonically_equal_image_sha256": "9dc6da8ce0668cba387420d70794f40be52dc5f56c9e2d4de76835b808087e25",
+        "common_workspace_key": "64e8753c5e9f70b3",
+        "different_bytes": 533,
+        "different_debug_path_bytes": 406,
+        "different_signature_bytes": 127,
+        "inventory": 53,
+        "n_oso": 29,
+        "negative_controls": [
+          "inconsistent signed code",
+          "inconsistent signature slot",
+          "validly resigned unobserved N_OSO operand",
+          "unobserved linker argv",
+          "resigned instruction",
+          "resigned UUID"
+        ],
+        "original_pages_changed": [
+          369,
+          370,
+          371,
+          372
+        ],
+        "rlib_members": 14,
+        "sections": 14,
+        "signature_pages": 373,
+        "source_text": [
+          713340,
+          "3ab6e50dc31d98bf7baf465f861ef8c1c9193bd39f8b3b524bff5062084a2b3e"
+        ],
+        "v2": {
+          "C": "181cdc7206104b52",
+          "P": "8e85bc85636e4a6d"
+        }
+      }
+    },
+    "eligible_pairs": 0,
+    "head": "4912a303c9112a490bcf1efc1b8a56c8bee08fdf",
+    "reason": "Distinct source-built driver installations gave different raw images across the two independently empty builds.",
+    "recorded_arm_commands_with_clocks": 0,
+    "run": 41053629169,
+    "zip_bytes": 3162821,
+    "zip_entries": 294,
+    "zip_sha256": "777a63bd3105370057ec66646b785b4b0e43926e2f17a4ade6d12f39ce5d44bf"
+  },
+  {
+    "artifact": 12977205290,
+    "by_phase": {
+      "cold": {
+        "all_signed_pages": 373,
+        "base_workspace": "64e8753c5e9f70b3",
+        "clean": "83b07088b7eae65296e0698d54a7cca259709a1f27a306df5391f36c1b88f28e",
+        "differing_bytes": 562,
+        "n_oso": 29,
+        "native_clean_key": "e774ce074b8b8c05",
+        "native_clean_linker_stream": "e220688d4746f837c09ec418372adebdfd7369ca735473641797a4e608a59dbc",
+        "observed_cargo_stdout": "51b6e1afcb35c9e11a8d2b6a8195c1742a8147dc3217f1949234f3283c541dc0",
+        "observed_full_macho": "c94ff9b48c7e2b68cfe535d78eb673d7cef6c552d6daeb197208cd60f3f533b2",
+        "ordinary_arm_key": "f5e46b736e65d551",
+        "physical_stock_ld": "2b48a59af70235283aa94c43eb0dd2ef80182c106db43279db936cc87426b443",
+        "reconstructed": "c94ff9b48c7e2b68cfe535d78eb673d7cef6c552d6daeb197208cd60f3f533b2",
+        "size": 1538288,
+        "state": "old"
+      },
+      "edit": {
+        "all_signed_pages": 391,
+        "base_workspace": "64e8753c5e9f70b3",
+        "clean": "58d77d45a9797c36f4fc37e91fba970aed4f773cddd336853bba42b8bc95911b",
+        "differing_bytes": 578,
+        "n_oso": 30,
+        "native_clean_key": "e774ce074b8b8c05",
+        "native_clean_linker_stream": "621a5b84c9aa186292e7561105c15621e0f27f47f20322c7e7cf3d8cc1166f5e",
+        "observed_cargo_stdout": "e37ea3187ed0983c24b2d7eb4e6f89ebd9f098a7eb3f935b4892c0af80ee97e9",
+        "observed_full_macho": "686c350dbfee0f965799af9690ffa5768059447f478a85a4d87d7a03001df2d3",
+        "ordinary_arm_key": "f5e46b736e65d551",
+        "physical_stock_ld": "2b48a59af70235283aa94c43eb0dd2ef80182c106db43279db936cc87426b443",
+        "reconstructed": "686c350dbfee0f965799af9690ffa5768059447f478a85a4d87d7a03001df2d3",
+        "size": 1612656,
+        "state": "new"
+      },
+      "repeat-1": {
+        "all_signed_pages": 391,
+        "base_workspace": "64e8753c5e9f70b3",
+        "clean": "58d77d45a9797c36f4fc37e91fba970aed4f773cddd336853bba42b8bc95911b",
+        "differing_bytes": 578,
+        "n_oso": 30,
+        "native_clean_key": "e774ce074b8b8c05",
+        "native_clean_linker_stream": "621a5b84c9aa186292e7561105c15621e0f27f47f20322c7e7cf3d8cc1166f5e",
+        "observed_cargo_stdout": "a3a47174479f82a304e77047400d041f4538ccb431f78d8a55f9f601d6e8f1fe",
+        "observed_full_macho": "686c350dbfee0f965799af9690ffa5768059447f478a85a4d87d7a03001df2d3",
+        "ordinary_arm_key": "f5e46b736e65d551",
+        "physical_stock_ld": "2b48a59af70235283aa94c43eb0dd2ef80182c106db43279db936cc87426b443",
+        "reconstructed": "686c350dbfee0f965799af9690ffa5768059447f478a85a4d87d7a03001df2d3",
+        "size": 1612656,
+        "state": "new"
+      },
+      "repeat-2": {
+        "all_signed_pages": 391,
+        "base_workspace": "64e8753c5e9f70b3",
+        "clean": "58d77d45a9797c36f4fc37e91fba970aed4f773cddd336853bba42b8bc95911b",
+        "differing_bytes": 578,
+        "n_oso": 30,
+        "native_clean_key": "e774ce074b8b8c05",
+        "native_clean_linker_stream": "621a5b84c9aa186292e7561105c15621e0f27f47f20322c7e7cf3d8cc1166f5e",
+        "observed_cargo_stdout": "62eeb5a07f56158d1aca41b9bb7811ca365b7d81ff3c4e0c424ac8d99ccc9164",
+        "observed_full_macho": "686c350dbfee0f965799af9690ffa5768059447f478a85a4d87d7a03001df2d3",
+        "ordinary_arm_key": "f5e46b736e65d551",
+        "physical_stock_ld": "2b48a59af70235283aa94c43eb0dd2ef80182c106db43279db936cc87426b443",
+        "reconstructed": "686c350dbfee0f965799af9690ffa5768059447f478a85a4d87d7a03001df2d3",
+        "size": 1612656,
+        "state": "new"
+      }
+    },
+    "eligible_pairs": 0,
+    "head": "34de61d43a7360a4b24bf3f48d860e46c6fe3254",
+    "reason": "Reselecting the parent driver hard link changed the driver inode ctime and the Cargo build namespace before the first installation.",
+    "recorded_arm_commands_with_clocks": 3,
+    "run": 41055128844,
+    "subject": "pair 1 parent only",
+    "zip_bytes": 3207382,
+    "zip_entries": 338,
+    "zip_sha256": "99f178765966efbcd18ac82d20c9a0de6ea5b4fa25c9a03b8e9cd9cde36cac58"
+  }
+]
