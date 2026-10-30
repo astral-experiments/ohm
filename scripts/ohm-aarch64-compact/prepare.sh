@@ -10,7 +10,7 @@ subject="$GITHUB_WORKSPACE/scripts/ohm-aarch64-compact"
 prior="$GITHUB_WORKSPACE/scripts/ohm-aarch64-registers"
 upstream=444c0273a2e2bc0b161e988d43c882349bc2d7a6
 parent=d3538b42a2dc56edb9bffbc9cc2373fb93c35054
-child=a6c35ad01a98c6bef60b0a1d1af5b94c6433aaf8
+child=f2edebc7a23b809749fb0cc44dd6ac902ca448ff
 if [[ "${1:-build}" == build ]]; then
     (cd "$transport" && sha256sum --check SHA256SUMS)
     python3 -IB "$study/qualify.py" release
@@ -24,7 +24,7 @@ if [[ "${1:-build}" == build ]]; then
     git update-ref --no-deref HEAD "$parent" "$upstream"
     test "$(git hash-object -t commit "$subject/transport/commit")" = "$child"
     gzip -dc "$subject/transport/source.patch.gz" | git apply --index --binary -
-    test "$(git write-tree)" = 00744a1b6a89c3dca0678e6abbec1b055123eaff
+    test "$(git write-tree)" = c4205f70f7807a7309d0a56abc7d772cb18899c1
     git hash-object -w -t commit "$subject/transport/commit" > "$log/new-commit"
     test "$(cat "$log/new-commit")" = "$child"
     git update-ref --no-deref HEAD "$child" "$parent"
@@ -32,7 +32,7 @@ fi
 cd "$src"
 test "$(git rev-parse "$child^")" = "$parent"
 test "$(git rev-parse "$parent:compiler")" = e589051c299788c2ee8ab47a06cbc5fe1a300211
-test "$(git rev-parse "$child:compiler")" = c4232f5fca7a1d0aca8138c29b141da1afa0feed
+test "$(git rev-parse "$child:compiler")" = df7a2fe72fd4caf809227afb0e95af130a38ab37
 test "$(git rev-parse "$parent:library")" = "$(git rev-parse "$child:library")"
 test "$(git diff --name-only "$parent" "$child" | wc -l)" -eq 3
 flags=(--ci false --set build.submodules=false --set rust.omit-git-hash=true
@@ -44,7 +44,7 @@ export CXX_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-g++
 export AR_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-ar
 if [[ "${1:-build}" == test-host ]]; then
     test "$(git rev-parse HEAD)" = "$child"
-    test "$(git rev-parse HEAD:tests/run-make/ohm-checked-dep-info)" = 1c9359025130e8d04238a8e60f2eaf4e03afedc4
+    test "$(git rev-parse HEAD:tests/run-make/ohm-checked-dep-info)" = c264eb8249adf7e10801f8a22172a23fd7c1cd8d
     test "$(git rev-parse HEAD:tests/run-make/ohm-relink-assembler-inputs)" = bdb3382107ead13c43d1b04272904de4c3a4c532
     python3 x.py "${flags[@]}" test --stage 1 -j8 --host "$host" --target "$host" \
       tests/run-make/ohm-checked-dep-info tests/run-make/ohm-relink-assembler-inputs 2>&1 | tee "$log/x86-host-run-make.log"

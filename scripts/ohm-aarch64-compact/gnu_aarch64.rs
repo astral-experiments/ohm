@@ -3,6 +3,11 @@
 #[cfg(global)]
 core::arch::global_asm!(".macro qa_unseen", ".incbin \"payload.bin\"", ".endm");
 
+#[cfg(compact_copy)]
+pub unsafe fn compact_copy(x: usize) {
+    core::arch::asm!("/* {value} */", value = in(reg) x, options(nomem, nostack));
+}
+
 pub unsafe fn barrier(mut x: usize, mut v: core::arch::aarch64::int32x4_t) -> usize {
     #[cfg(not(vector_only))]
     core::arch::asm!("/*{0}*/", inout(reg) x);
@@ -30,6 +35,8 @@ pub unsafe fn barrier(mut x: usize, mut v: core::arch::aarch64::int32x4_t) -> us
     }
     #[cfg(compact_input)]
     core::arch::asm!("/* {value} */", value = in(reg) x, options(nomem, nostack));
+    #[cfg(compact_constant)]
+    core::arch::asm!("/* {value} */", value = in(reg) 7usize, options(nomem, nostack));
     #[cfg(compact_modifier)]
     core::arch::asm!("/* {0:x} */", in(reg) x, options(nomem, nostack));
     #[cfg(compact_options)]

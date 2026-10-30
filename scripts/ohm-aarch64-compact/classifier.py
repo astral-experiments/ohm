@@ -8,7 +8,7 @@ sys.path.insert(0, str(HERE.parent / "ohm-aarch64-linux"))
 import runtime as rt
 from study import MISSING, RECHECK, digest, need, save, sha
 
-NEW = ("compact_input", "compact_modifier", "compact_options", "compact_output", "compact_two_operands", "compact_file")
+NEW = ("compact_input", "compact_copy", "compact_constant", "compact_modifier", "compact_options", "compact_output", "compact_two_operands", "compact_file")
 PRIOR = ("ordinary", "general_only", "vector_only", "scalar_modifier", "vector_modifier", "spaced",
          "input_only", "late", "discarded", "options", "separate", "instruction", "file", "escape", "raw", "global")
 def run(role):
@@ -25,9 +25,18 @@ def run(role):
     for cfg in PRIOR + NEW:
         p = rt.record([*cmd, "--cfg", cfg], root / cfg, work, env)
         got = [MISSING in p.stdout, RECHECK in p.stdout]
-        allowed = (role != "unextended276" and cfg in PRIOR[:3]) or (role == "extended" and cfg == "compact_input")
+        allowed = (role != "unextended276" and cfg in PRIOR[:3]) or (role == "extended" and cfg in ("compact_input", "compact_copy"))
         need(got == [not allowed, allowed], f"unexpected {role}/{cfg}: {got}")
         result[cfg] = [*got, digest(p.stdout), sha(work / "libgnu_aarch64.rlib")]
+    # Read the same target after the ordinary native command, separating actual MIR input kinds.
+    for cfg,kind in (("compact_input","move "),("compact_copy","copy "),("compact_constant","const ")):
+        inspect = [*cmd[:-1], "--emit=link,dep-info=-,mir", "--cfg", cfg]
+        p = rt.record(inspect, root / ("mir-" + cfg), work, env)
+        data = (work / "gnu_aarch64.mir").read_bytes()
+        rows = [ln for ln in data.decode().splitlines() if 'asm!("/* {0} */", in(reg)' in ln]
+        need(len(rows) == 1 and ("in(reg) " + kind) in rows[0], f"wrong concrete {cfg} MIR: {rows}")
+        need(result[cfg][:2] == [MISSING in p.stdout, RECHECK in p.stdout], "MIR observation changed the verdict")
+        (root / ("mir-" + cfg) / "actual.mir").write_bytes(data)
     (work / "payload.bin").unlink()
     for cfg in ("file", "escape", "compact_file"):
         (work / "libgnu_aarch64.rlib").unlink(missing_ok=True)
