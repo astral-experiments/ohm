@@ -1,0 +1,12 @@
+[workspace]
+
+[package]
+name = "cgu_guard"
+version = "0.0.0"
+edition = "2024"
+
+[profile.dev]
+debug = 0
+codegen-units = 16
+
+lto = "off"

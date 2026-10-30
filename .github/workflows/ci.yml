@@ -1,16 +1,16 @@
-name: Native Apple CRC on fixed Cargo 293
+name: Independently reusable LLVM units with opaque assembly
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: apple-crc-on-cargo-293-${{ github.ref }}
+  group: llvm-opaque-cgu-qualification-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  crc-on-293:
-    runs-on: namespace-profile-macos-15
-    timeout-minutes: 250
+  native-and-ruff:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-cgu-opaque-asm-20261030'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 360
     env:
-      PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -19,91 +19,38 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Freeze and verify subjects, clock design and native execution observer
+      - name: Verify the experiment source and install the cross toolchain
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
-          python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
-          python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
-          test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/crc293-plan.md "$root/receipts/registration.md"
-      - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
+          set -euo pipefail
+          export QA_ROOT="$RUNNER_TEMP/opaque-asm-cgu"
+          printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
+          mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inbox"
+          (cd scripts/ohm-aarch64-linux && sha256sum -c SHA256SUMS)
+          (cd scripts/ohm-cgu-reuse && sha256sum -c SHA256SUMS)
+          cp scripts/ohm-cgu-reuse/{plan.md,SHA256SUMS} "$QA_ROOT/receipts"
+          git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
+          python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind ninja-build
+          cc -O2 -Wall -Wextra -o "$QA_ROOT/trace" scripts/ohm-aarch64-linux/trace-compilers.c
+          strace -ff -qq -s 65535 -e trace=execve -o "$QA_ROOT/receipts/tracer-check" /bin/true
+      - name: Download signed Linux release tools
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          mkdir "$root/assets"
-          gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-          python3 -IB scripts/ohm-apple-zmij/run.py zlib_study seed "$root"
-      - name: Bootstrap source-bound 444c and 82911b and run both native compiler tests
-        run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
-          if ! command -v ninja >/dev/null; then brew install ninja; fi
-          (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
-          python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
-          python3 -IB scripts/ohm-apple-zmij/source-transport/crc/prepare.py "$root/enrolled-rust" > "$root/receipts/crc-source-transport.json"
-          python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Build unmodified Cargo 735e and bind exactly one Mach-O to both compilers
-        run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$root"
-          python3 -IB scripts/ohm-apple-zmij/fixed_crc.py pin "$root"
-      - name: Test direct and transitive provider safety before any clocks
-        id: provider
-        run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB scripts/ohm-apple-zmij/fixed_crc.py providers "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/provider-matrix/terminal.json" >> "$GITHUB_OUTPUT"
+          release=ohm-1.99.0-20
+          archive="$release-x86_64-unknown-linux-gnu"
+          gh release download "$release" --repo "$GITHUB_REPOSITORY" --dir "$QA_ROOT/inbox" --pattern "$archive.tar.gz" --pattern "$archive.tar.gz.sha256" --pattern "$archive-provenance.json"
+      - name: Produce the exact two native compilers and matching host and target libraries
+        run: bash scripts/ohm-aarch64-linux/prepare.sh
+      - name: Prove generic external assembly reads and mixed-unit behavior on the candidate
+        run: bash scripts/ohm-aarch64-linux/prepare.sh test-host
+      - name: Compare equal-stamp native guards, real Ruff edits and healthy independent clean builds
+        run: python3 -IB scripts/ohm-cgu-reuse/study_cgu.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: crc-on-293-provider
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
-          retention-days: 14
-          if-no-files-found: warn
-      - name: Two independently rooted orders, actual Ruff links, invalid source, archive repair and clean references
-        id: structural
-        if: steps.provider.outputs.passed == 'true'
-        run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB scripts/ohm-apple-zmij/run.py crc_clock structural "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["structural"]).lower())' "$root/receipts/declared-crc-subject.json" >> "$GITHUB_OUTPUT"
-      - name: Mirrored ordinary untraced timers accounting for all native rechecks
-        id: pilot
-        if: steps.structural.outputs.passed == 'true'
-        run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB scripts/ohm-apple-zmij/run.py crc_clock screen "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/crc-clock-screen/result.json" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: crc-on-293-pilots
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
-          retention-days: 14
-          if-no-files-found: warn
-      - name: Twelve independent balanced pairs only if both first-repeat pilots clear twofold
-        if: steps.pilot.outputs.passed == 'true'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py crc_clock confirmation "$RUNNER_TEMP/apple-crc-on-293"
-      - name: Record the actual terminal gate, including any under-twofold or skipped result
-        if: always()
-        run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB - "$root/receipts" <<'PYCODE'
-          import json,pathlib,sys
-          root=pathlib.Path(sys.argv[1]);root.mkdir(exist_ok=True,parents=True)
-          rows={}
-          for label,rel,key in [('providers','provider-matrix/terminal.json','passed'),('structural','declared-crc-subject.json','structural'),('pilot','crc-clock-screen/result.json','passed'),('independent','crc-clock-confirmation/result.json','passed')]:
-              path=root/rel;rows[label]=json.loads(path.read_text())[key] if path.is_file() else None
-          (root/'terminal-gates.json').write_text(json.dumps(rows,sort_keys=True)+'\n')
-          print(rows);sys.exit(0 if all(x is True for x in rows.values()) else 1)
-          PYCODE
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: crc-on-293-final
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
+          name: native-opaque-cgu-ruff-screen
+          path: ${{ runner.temp }}/opaque-asm-cgu/receipts
           retention-days: 14
           if-no-files-found: warn
