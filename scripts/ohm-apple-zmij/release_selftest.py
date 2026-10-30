@@ -5,6 +5,9 @@ import hashlib
 import itertools
 import json
 import sys
+import subprocess
+import tempfile
+import os
 import unittest
 here=Path(__file__).resolve().parent
 sys.path.insert(0,str(here))
@@ -18,6 +21,26 @@ import versioned_selftest as previous
 class Release(unittest.TestCase):
     test_actual_depfile_rules=previous.Protocol.test_exact_dummy_rules
     test_reject_bad_marker_witness=previous.Protocol.test_opaque_suffix_and_wrong_indices
+    def test_actual_freeze_entrypoint(self):
+        from study import physical,save
+        from versioned_select import choose
+        with tempfile.TemporaryDirectory() as where:
+            root=Path(where)
+            for name,(revision,subject) in CARGOS.items():
+                src=root/subject;src.parent.mkdir(parents=True,exist_ok=True)
+                src.write_text('#!/bin/sh\necho "commit-hash: '+revision+'"\n');src.chmod(0o555)
+                if name=="signed":save(root/"receipts/release.json",{"cargo":physical(src)})
+                else:save(root/("receipts/cargo293/product.json" if name=="classic" else "receipts/cargo-aware/product.json"),{"source":{"commit":revision},"binary":physical(src)})
+            active=root/"native/bin";active.mkdir(parents=True);os.link(root/"signed/bin/cargo",active/"cargo")
+            (active/"rustc").write_bytes(b"fixed test frontend")
+            save(root/"receipts/versioned/terminal.json",{"passed":True})
+            save(root/"receipts/versioned/legacy/terminal.json",{"signed_integrated_differences":[]})
+            subprocess.run([sys.executable,"-IB",here/"release_bins.py",root],cwd=root,check=True)
+            old={name:stamp(root/p) for name,(_,p) in CARGOS.items()}
+            for name in ("aware","signed","classic","aware","signed"):
+                self.assertEqual(choose(root,name)["source"],CARGOS[name][0])
+                self.assertTrue((active/"cargo").samefile(root/CARGOS[name][1]))
+                self.assertEqual(old,{n:stamp(root/p) for n,(_,p) in CARGOS.items()})
     def test_source_and_binary_custody(self):
         z=previous.source
         records=z.SOURCES

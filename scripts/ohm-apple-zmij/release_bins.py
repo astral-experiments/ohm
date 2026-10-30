@@ -1,6 +1,7 @@
 """Keep the signed, prior, and merged native Cargo inodes immutable across clocked installations."""
 from pathlib import Path
-import os,shutil
+import os,shutil,sys
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 from study import load,need,save,sha
 def stamp(p):
     s=p.stat();return [s.st_dev,s.st_ino,s.st_ctime_ns,s.st_mtime_ns,s.st_size,sha(p)]
