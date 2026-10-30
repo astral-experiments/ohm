@@ -307,6 +307,10 @@ def prepare():
                                 "host_compiler": rt.HOST, "cross_target": rt.TARGET, "signed": rt.TOOLS,
                                 "link_driver": physical(Path(CROSS)), "qemu": physical(Path(QEMU[0])),
                                 "loader": physical(Path("/usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1"))})
+    prepare_graph()
+
+
+def prepare_graph():
     rt.WORK.mkdir()
     run(["git", "init", "-q", "--template=", str(rt.RUFF)])
     git(rt.RUFF, "fetch", "--no-tags", "--depth=2", "https://github.com/astral-sh/ruff.git", EDIT)

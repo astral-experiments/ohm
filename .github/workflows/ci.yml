@@ -5,19 +5,18 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
-  group: qa-aarch64-linux-zmij-20261030
+  group: qa-gnu-register-comments-20261030
   cancel-in-progress: false
 
 jobs:
-  linux-cross:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-linux-aarch64-zmij-20261030'
-    name: Build and run the Linux AArch64 Ruff AST qualification
+  linux-registers:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-register-comments-20261030'
+    name: Identify the real AArch64 GNU assembler and native inputs
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 350
-    env:
-      PYTHONDONTWRITEBYTECODE: '1'
+    timeout-minutes: 80
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -25,63 +24,47 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify the plan and acquire the Ubuntu cross toolchain
+      - name: Enroll the fixed compiler, operating system and original program
         run: |
           set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/ohm-aarch64-linux-zmij"
+          export QA_ROOT="$RUNNER_TEMP/gnu-asm-comment-baseline"
+          mkdir -p "$QA_ROOT/receipts"
           printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
-          mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inbox"
-          (cd scripts/ohm-aarch64-linux && sha256sum -c SHA256SUMS)
-          cp scripts/ohm-aarch64-linux/{PLAN.md,SHA256SUMS} "$QA_ROOT/receipts"
+          (cd scripts/ohm-aarch64-registers && sha256sum -c SHA256SUMS)
+          cp scripts/ohm-aarch64-registers/{PLAN.md,SHA256SUMS} "$QA_ROOT/receipts/"
           git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
-          python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
-          python3 -IB scripts/ohm-aarch64-linux/capsule.py --help
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind ninja-build
-          dpkg-query -W 'gcc*aarch64-linux-gnu' 'libc6*-arm64-cross' binutils-aarch64-linux-gnu qemu-user valgrind strace > "$QA_ROOT/receipts/packages"
-          cc -O2 -Wall -Wextra -o "$QA_ROOT/trace" scripts/ohm-aarch64-linux/trace-compilers.c
-          test -x /usr/bin/valgrind.bin
-          test -e /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1
-          strace -ff -qq -s 65535 -e trace=execve -o "$QA_ROOT/receipts/tracer-check" /bin/true
-      - name: Download the original signed Linux release
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd
+          dpkg-query -W 'gcc*aarch64-linux-gnu' 'libc6*-arm64-cross' binutils-aarch64-linux-gnu qemu-user strace > "$QA_ROOT/receipts/packages"
+      - name: Restore the frozen original standalone SDK and bind its complete physical roster
+        id: sdk
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          release=ohm-1.99.0-20
-          archive="$release-x86_64-unknown-linux-gnu"
-          gh release download "$release" --repo "$GITHUB_REPOSITORY" --dir "$QA_ROOT/inbox" \
-            --pattern "$archive.tar.gz" --pattern "$archive.tar.gz.sha256" --pattern "$archive-provenance.json"
-      - name: Build both Linux host compilers and their host and AArch64 standard libraries
-        id: bootstrap
-        run: bash scripts/ohm-aarch64-linux/prepare.sh
-      - name: Build and independently reopen the allowlisted private SDK archive
-        id: custody
-        run: python3 -IB scripts/ohm-aarch64-linux/capsule.py build
-        continue-on-error: true
-      - name: Reopen the two runtime kits and qualify their native and cross-target readers
-        run: python3 -IB scripts/ohm-aarch64-linux/qualify.py admit
-      - name: Run both independent mirrored Ruff transitions
-        run: python3 -IB scripts/ohm-aarch64-linux/qualify.py screen
-      - name: Run both checked-in Linux host assembler controls on the real child
-        if: always() && steps.bootstrap.outcome == 'success'
-        run: bash scripts/ohm-aarch64-linux/prepare.sh test-host
-      - name: Keep the binary-only SDK for three days
-        if: always() && steps.custody.outcome == 'success'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: linux-aarch64-zmij-replay-sdk
-          path: ${{ runner.temp }}/ohm-aarch64-linux-zmij/private-return/linux-aarch64-sdk-pair.tar.zst
-          retention-days: 3
-          if-no-files-found: error
-          compression-level: 0
-      - name: Retain every completed command and the earliest failure
+          set -euo pipefail
+          cd "$QA_ROOT"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12976363109/zip" > sdk.zip
+          echo '00128ca2b0d66344fab2b36c2cb6e2437e5665fac66e8fe175fdacdf0c5b1e60  sdk.zip' | sha256sum -c -
+          test "$(stat -c %s sdk.zip)" = 230733513
+          test "$(unzip -Z1 sdk.zip)" = linux-aarch64-sdk-pair.tar.zst
+          unzip -qp sdk.zip linux-aarch64-sdk-pair.tar.zst > sdk.tar.zst
+          python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-aarch64-linux/capsule.py" sdk.tar.zst 686b11a3c8fe73ee5e663e1f0531d6f79aae8351bfe5da40c52faf76321fbb92 C "$QA_ROOT/rustup/toolchains/ohm" | tee "$QA_ROOT/receipts/restored.json"
+          export RUSTUP_HOME="$QA_ROOT/rustup" RUSTUP_AUTO_INSTALL=0
+          test "$(realpath "$(rustup which --toolchain ohm rustc)")" = "$QA_ROOT/rustup/toolchains/ohm/bin/rustc"
+          rustc +ohm -vV > "$QA_ROOT/receipts/rustc-Vv"
+          cargo +ohm -Vv > "$QA_ROOT/receipts/cargo-Vv"
+          rustc +ohm --target=aarch64-unknown-linux-gnu --print cfg > "$QA_ROOT/receipts/cfg"
+          sha256sum "$QA_ROOT"/rustup/toolchains/ohm/lib/librustc_driver-*.so > "$QA_ROOT/receipts/driver"
+      - name: Verify GNU assembly and run independently empty native-provider controls
+        run: python3 -IB scripts/ohm-aarch64-registers/native.py
+      - name: Build genuine Ruff and identify all active assembly classifications
+        if: always() && steps.sdk.outcome == 'success'
+        run: python3 -IB scripts/ohm-aarch64-registers/roster.py
+      - name: Preserve native receipts, including failures
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: linux-aarch64-zmij-mechanism
-          path: ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
+          name: linux-aarch64-registered-asm-baseline
+          path: ${{ runner.temp }}/gnu-asm-comment-baseline/receipts
           retention-days: 7
           if-no-files-found: error
-      - name: Require the private SDK export
-        if: always() && steps.bootstrap.outcome == 'success'
-        run: test "${{ steps.custody.outcome }}" = success
