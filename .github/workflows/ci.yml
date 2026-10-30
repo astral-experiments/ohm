@@ -1,6 +1,13 @@
 name: Rebuild the GNU Ruff compiler comparison from source
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: Run the source proof, optionally followed by all twelve registered pairs
+        type: choice
+        default: qualify
+        options: [qualify, holdout]
 
 permissions:
   contents: read
@@ -102,3 +109,75 @@ jobs:
             ${{ runner.temp }}/observed-ruff/receipts
           if-no-files-found: error
           retention-days: 30
+      - name: Export the parent SDK or the patched driver for this run's holdout
+        if: inputs.phase == 'holdout'
+        env:
+          ROLE: ${{ matrix.role }}
+        run: python3 -IB scripts/ohm-gnu-syscall/source-rebuild/kits.py pack "$ROLE" "$RUNNER_TEMP/paired-kit"
+      - if: inputs.phase == 'holdout'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: source-kit-${{ matrix.role }}
+          path: ${{ runner.temp }}/paired-kit
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 2
+
+  holdout:
+    needs: rustc
+    if: inputs.phase == 'holdout'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - {position: 1, order: PC}
+          - {position: 2, order: CP}
+          - {position: 3, order: CP}
+          - {position: 4, order: CP}
+          - {position: 5, order: PC}
+          - {position: 6, order: CP}
+          - {position: 7, order: CP}
+          - {position: 8, order: PC}
+          - {position: 9, order: PC}
+          - {position: 10, order: PC}
+          - {position: 11, order: PC}
+          - {position: 12, order: CP}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          pattern: source-kit-*
+          path: ${{ runner.temp }}/just-built-kits
+      - name: Check all original SDK members on this fresh worker
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
+            libc6-dev-arm64-cross qemu-user strace valgrind ninja-build zstd
+          export CENSUS_PARENT="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          export QA_ROOT="$RUNNER_TEMP/qualified-syscall"
+          mkdir -p "$QA_ROOT/receipts"
+          python3 -IB scripts/ohm-gnu-syscall/source-rebuild/kits.py restore \
+            "$RUNNER_TEMP/just-built-kits/source-kit-parent" "$RUNNER_TEMP/just-built-kits/source-kit-patched"
+          printf '%s\n' "QA_ROOT=$QA_ROOT" "CENSUS_PARENT=$CENSUS_PARENT" \
+            "CENSUS_ROOT=$RUNNER_TEMP/observed-ruff" "CENSUS_SDK=$QA_ROOT/candidate-sdk" \
+            "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json" >> "$GITHUB_ENV"
+      - name: Run the registered counter, Ruff history and same-path clean builds
+        env:
+          ROLE_ORDER: ${{ matrix.order }}
+        run: python3 -IB scripts/ohm-gnu-syscall/paired.py "$ROLE_ORDER"
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: gnu-svc-holdout-${{ matrix.position }}
+          retention-days: 14
+          path: ${{ runner.temp }}/qualified-syscall/receipts
+          if-no-files-found: error

@@ -15,7 +15,7 @@ import zipfile
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from paired_counts import paired_stats, verify
+from paired_counts import ORIGINAL_QA, ORIGINAL_RUN, paired_stats, verify
 
 
 def digest(data):
@@ -43,14 +43,14 @@ class Retained:
         return self.files[name]
 
 
-def complete(item, order, scratch):
+def complete(item, order, scratch, run_id, head):
     gh = os.environ.get("GH_BIN") or shutil.which("gh-auto") or shutil.which("gh")
     if not gh:
         raise RuntimeError("Set GH_BIN to the GitHub CLI used to access the original run.")
     endpoint = "repos/astral-experiments/ohm/actions/artifacts/" + str(item["archive"])
     meta = json.loads(subprocess.check_output([gh, "api", endpoint]))
     assert not meta["expired"] and meta["digest"] == "sha256:" + item["zip_sha256"]
-    assert (meta["workflow_run"]["id"], meta["workflow_run"]["head_sha"]) == (41104410375, "61127b2e9531769dea162b31a267d86a0368b479")
+    assert (meta["workflow_run"]["id"], meta["workflow_run"]["head_sha"]) == (run_id, head)
     scratch.seek(0)
     scratch.truncate(0)
     subprocess.run([gh, "api", endpoint + "/zip"], stdout=scratch, check=True)
@@ -64,31 +64,36 @@ def complete(item, order, scratch):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--records", type=Path, default=HERE, help="directory containing one cohort's records")
+    parser.add_argument("--run", type=int, default=ORIGINAL_RUN, help="expected holdout workflow run")
+    parser.add_argument("--head", default=ORIGINAL_QA, help="expected QA commit for the holdout")
     parser.add_argument("--complete-archives", action="store_true",
                         help="download the original Actions ZIPs and reopen all 72 Linux AArch64 ELF files")
     args = parser.parse_args()
-    registration = json.loads((HERE / "registration.json").read_bytes())
+    registration = json.loads((args.records / "registration.json").read_bytes())
+    assert (registration["run"], registration["workflow"]) == (args.run, args.head)
     plan = json.loads((HERE / "registered-pairs.json").read_bytes())
     orders = plan["schedules"]["holdout"]
     assert len(orders) == 12 and orders.count("PC") == orders.count("CP") == 6
     assert [item["position"] for item in registration["pairs"]] == list(range(1, 13))
+    assert len({item["archive"] for item in registration["pairs"]}) == 12
     observations = []
     with tempfile.TemporaryFile() as scratch:
         for item, order in zip(registration["pairs"], orders):
-            compact = Retained(HERE / "pairs" / f'{item["position"]:02}.tar.zst', item["retained_sha256"])
+            compact = Retained(args.records / "pairs" / f'{item["position"]:02}.tar.zst', item["retained_sha256"])
             original = json.loads(compact.read("native-archive-readback.json"))
             assert (original["artifact"], original["sha256"], original["size"]) == (item["archive"], item["zip_sha256"], item["zip_bytes"])
-            assert original["run"] == registration["run"] == 41104410375 and original["head"] == registration["workflow"]
+            assert (original["run"], original["head"], original["position"]) == (args.run, args.head, item["position"])
             verified = verify(compact, order, True, original_images=False)
             assert verified["physical_ELFs"] == 0 and original["pair"]["physical_ELFs"] == 6
             same = json.loads(json.dumps(verified))
             same.pop("physical_ELFs")
             assert same == {k: v for k, v in original["pair"].items() if k != "physical_ELFs"}
             if args.complete_archives:
-                assert json.loads(json.dumps(complete(item, order, scratch))) == original["pair"]
+                assert json.loads(json.dumps(complete(item, order, scratch, args.run, args.head))) == original["pair"]
             observations.append(verified)
     results = paired_stats(observations, orders)
-    assert results == json.loads((HERE / "results.json").read_bytes())
+    assert results == json.loads((args.records / "results.json").read_bytes())
     for phase, metrics in results.items():
         for metric, row in metrics.items():
             print(phase, metric, row["n"], "pairs; median", round(row["median"], 4),

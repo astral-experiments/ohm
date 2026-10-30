@@ -16,10 +16,8 @@ import zipfile
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from paired_counts import paired_stats, verify
+from paired_counts import ORIGINAL_QA, ORIGINAL_RUN, paired_stats, verify
 
-RUN = 41104410375
-HEAD = "61127b2e9531769dea162b31a267d86a0368b479"
 API = "repos/astral-experiments/ohm/actions/"
 GH = os.environ.get("GH_BIN") or shutil.which("gh-auto") or shutil.which("gh")
 
@@ -64,9 +62,9 @@ def compact(z, verified):
     return subprocess.check_output(["zstd", "-q", "-9", "-c"], input=body.getvalue()), len(retained)
 
 
-def reopen(asset, i, order, out):
+def reopen(asset, i, order, out, run_id, head):
     assert asset["name"] == f"gnu-svc-holdout-{i}" and not asset["expired"]
-    assert (asset["workflow_run"]["id"], asset["workflow_run"]["head_sha"]) == (RUN, HEAD)
+    assert (asset["workflow_run"]["id"], asset["workflow_run"]["head_sha"]) == (run_id, head)
     with tempfile.TemporaryFile() as f:
         endpoint = API + f'artifacts/{asset["id"]}/zip'
         for attempt in range(5):
@@ -87,7 +85,7 @@ def reopen(asset, i, order, out):
         f.seek(0)
         with zipfile.ZipFile(f) as z:
             values = verify(z, order, True)
-            checked = {"run": RUN, "head": HEAD, "position": i, "artifact": asset["id"],
+            checked = {"run": run_id, "head": head, "position": i, "artifact": asset["id"],
                        "size": asset["size_in_bytes"], "sha256": digest, "pair": values}
             blob, count = compact(z, checked)
     (out / "pairs" / f"{i:02}.tar.zst").write_bytes(blob)
@@ -99,29 +97,39 @@ def reopen(asset, i, order, out):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("destination", type=Path)
+    parser.add_argument("--run", type=int, default=ORIGINAL_RUN, help="the holdout workflow run to enroll")
+    parser.add_argument("--head", default=ORIGINAL_QA, help="the complete QA commit used to dispatch that run")
+    parser.add_argument("--source-rebuilt", action="store_true", help="require both same-run source builds and kit exports")
     args = parser.parse_args()
     out = args.destination
-    run = get(f"runs/{RUN}")
-    assert run["head_sha"] == HEAD and run["event"] == "workflow_dispatch"
-    assert run["head_branch"] == "charlie/qa-gnu-ruff-syscall" and run["conclusion"] == "success"
+    run = get(f"runs/{args.run}")
+    assert run["id"] == args.run and run["head_sha"] == args.head and run["event"] == "workflow_dispatch"
+    assert run["path"] == ".github/workflows/ci.yml"
+    branch = "charlie/qa-gnu-svc-source-rebuild" if args.source_rebuilt else "charlie/qa-gnu-ruff-syscall"
+    assert run["head_branch"] == branch and run["conclusion"] == "success"
     registered = json.loads((HERE / "registered-pairs.json").read_bytes())
     orders = registered["schedules"]["holdout"]
-    assets = get(f"runs/{RUN}/artifacts?per_page=50")["artifacts"]
+    assets = get(f"runs/{args.run}/artifacts?per_page=50")["artifacts"]
     by_name = {r["name"]: r for r in assets}
-    assert len(assets) == len(by_name) == len(orders) == 12
-    assert set(by_name) == {f"gnu-svc-holdout-{i}" for i in range(1, 13)}
+    names = {f"gnu-svc-holdout-{i}" for i in range(1, 13)}
+    if args.source_rebuilt:
+        names.update({"source-built-cargo", "source-build-builder", "source-build-parent", "source-build-patched",
+                      "source-kit-parent", "source-kit-patched"})
+    assert len(orders) == 12 and len(assets) == len(by_name) and set(by_name) == names
+    assert all((a["workflow_run"]["id"], a["workflow_run"]["head_sha"]) == (args.run, args.head) for a in assets)
     (out / "pairs").mkdir(parents=True, exist_ok=True)
     records, results = [], []
     for i, order in enumerate(orders, 1):
-        meta, values = reopen(by_name[f"gnu-svc-holdout-{i}"], i, order, out)
+        meta, values = reopen(by_name[f"gnu-svc-holdout-{i}"], i, order, out, args.run, args.head)
         records.append(meta)
         results.append(values)
         print(f"Block {i}: complete native bytes and calibrated clocks agree", flush=True)
-    json_file(out / "registration.json", {"run": RUN, "workflow": HEAD, "pairs": records})
+    json_file(out / "registration.json", {"run": args.run, "workflow": args.head, "pairs": records})
     json_file(out / "results.json", paired_stats(results, orders))
     for name in ("registered-pairs.json", "paired_counts.py", "verify.py"):
         shutil.copyfile(HERE / name, out / name)
-    subprocess.run([sys.executable, "-IB", out / "verify.py"], check=True)
+    subprocess.run([sys.executable, "-IB", out / "verify.py", "--run", str(args.run), "--head", args.head],
+                   check=True)
 
 
 if __name__ == "__main__":

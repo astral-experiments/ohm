@@ -12,4 +12,25 @@ Two further Linux workers bootstrap `8f42a1c1` (#282) and `6ae50e2d` (#283) sepa
 
 The normal Ruff command builds the historical PLE0643 fix and immediately rebuilds it, using the ordinary dev profile, 372 Cargo units and the locked dependencies. Each worker preserves its raw kernel executions. The verifier checks the original full rustc counts, the real Ruff link, the E0425 verdict on an invalid edit, and byte-for-byte agreement with the same toolchain's empty build after edit, repeat and repair. QEMU executes the resulting Ruff binaries on a starred tuple, a genuine out-of-bounds access and a valid access. This qualification collects no timing or instruction samples. [Ruff edit](https://github.com/astral-sh/ruff/commit/193984681ef7185c90b548c27b0ac6326908f2ec) · [Original paired measurements](../evidence/literal-svc-ruff-cli/)
 
-Every dispatch downloads normal published bootstrap and CI LLVM components, the checksummed Ohm `-20` distribution, the checked-out Rust release ancestry, and Ruff's locked source packages. The only Actions binary input is the freshly generated Cargo from the same dispatch. A changed builder or installed SDK member fails the byte-identity check and leaves its observed and historical hashes in `physical-cargo.json` or `physical-sdk.json`.
+The source qualification downloads normal published bootstrap and CI LLVM components, the checksummed Ohm `-20` distribution, the checked-out Rust release ancestry, and Ruff's locked source packages. The only Actions binary input to the qualification is the freshly generated Cargo from the same dispatch. A changed builder or installed SDK member fails the byte-identity check and leaves its observed and historical hashes in `physical-cargo.json` or `physical-sdk.json`.
+
+## Repeat the instruction counts from a fresh source build
+
+Record the QA revision and ask for the registered holdout. Substitute `gh` for `gh-auto` if that is your authenticated CLI.
+
+```sh
+qa_commit=$(gh-auto api 'repos/astral-experiments/ohm/commits/charlie%2Fqa-gnu-svc-source-rebuild' --jq .sha)
+gh-auto workflow run ci.yml --repo astral-experiments/ohm \
+  --ref charlie/qa-gnu-svc-source-rebuild -f phase=holdout
+```
+
+The workflow first repeats all three source builds and the two untimed Ruff histories. It transfers the verified parent SDK once and just the changed rustc driver from the patched worker. Each of 12 new jobs reconstructs and validates both SDKs before it runs the original `paired.py` with the registered counter and role order. The libraries are shared between SDKs when installed in each worker. Each compiler still gets its own fresh Ruff build directories.
+
+The transfer was exercised separately with the three original, SHA-verified archives. Reopening the resulting two kits reproduced all 238 file hashes, sizes and modes and shared the same 118 inodes between the two SDKs. A mismatched run identifier was rejected. [Original parent SDK](https://github.com/astral-experiments/ohm/actions/runs/41081958994/artifacts/12989079541) · [Cargo](https://github.com/astral-experiments/ohm/actions/runs/41081958994/artifacts/12989289345) · [Patched driver](https://github.com/astral-experiments/ohm/actions/runs/41099028701/artifacts/12998240646)
+
+Set `holdout_run` to the numeric ID of that dispatch. After it succeeds, run this from the QA checkout to verify the 12 pairs, reopen their 72 AArch64 ELF files and compute their intervals from the original clocks. The collector checks the run ID, source branch, exact QA commit and every expected source-build and pair artifact. [Registered orders, controls and endpoints](../registered-pairs.json)
+
+```sh
+python3 -IB scripts/ohm-gnu-syscall/evidence/literal-svc-ruff-cli/collect.py \
+  --source-rebuilt --run "$holdout_run" --head "$qa_commit" "source-holdout-$holdout_run"
+```
