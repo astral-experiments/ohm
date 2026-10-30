@@ -1,0 +1,67 @@
+name: Verify distribution runners after the repository transfer
+
+on:
+  push:
+    branches: [charlie/verify-ohm-release-runners]
+
+permissions: {}
+
+jobs:
+  probe:
+    name: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: github-ubuntu-24.04-x86_64-8
+            target: x86_64-unknown-linux-gnu
+          - runner: namespace-profile-ubuntu-24-04-16
+            target: x86_64-unknown-linux-gnu
+          - runner: depot-macos-15
+            target: aarch64-apple-darwin
+          - runner: macos-15
+            target: aarch64-apple-darwin
+    env:
+      TARGET: ${{ matrix.target }}
+    steps:
+      - name: Report the machine and space available to the build
+        shell: bash
+        run: |
+          set -eu
+          uname -srm
+          df -h "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
+          if [[ "$RUNNER_OS" == macOS ]]; then
+            sw_vers
+            test "$(uname -m)" = arm64
+            test "$(sw_vers -productVersion | cut -d. -f1)" = 15
+          else
+            . /etc/os-release
+            printf '%s\n' "$PRETTY_NAME"
+            test "$ID" = ubuntu && test "$VERSION_ID" = 24.04
+            test "$(uname -m)" = x86_64
+          fi
+      - name: Run a profile-instrumented Rust executable on Apple Silicon
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -eu
+          probe_dir=$(mktemp -d "$RUNNER_TEMP/ohm-probe.XXXXXX")
+          printf '%s\n' 'fn main() { assert_eq!(std::env::args().nth(1).as_deref(), Some("profile")); }' > "$probe_dir/probe.rs"
+          rustc -Vv
+          rustc -Cprofile-generate="$probe_dir" "$probe_dir/probe.rs" -o "$probe_dir/probe"
+          "$probe_dir/probe" profile
+          find "$probe_dir" -type f -name '*.profraw' -size +0c | grep .
+      - name: Check the distribution workspace capacity
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os, platform
+          fs = os.statvfs(os.environ['GITHUB_WORKSPACE'])
+          free = fs.f_bavail * fs.f_frsize
+          required = (50 if platform.system() == 'Darwin' else 150) * 2**30
+          print('OHM_RUNNER_PROBE ' + json.dumps({'target': os.environ['TARGET'], 'arch': platform.machine(), 'free_bytes': free, 'required_bytes': required}), flush=True)
+          if free < required:
+              raise SystemExit('The build workspace has insufficient space for the distribution.')
+          PY
