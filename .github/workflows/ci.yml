@@ -30,7 +30,7 @@ jobs:
           (cd scripts/ohm-aarch64-versioned && sha256sum --quiet -c SHA256SUMS)
           (cd scripts/ohm-aarch64-portable-review && sha256sum --quiet -c SHA256SUMS)
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace zstd
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd
           python3 -IB scripts/ohm-aarch64-versioned/acquire_builds.py
           python3 -IB - <<'PY'
           import os,shutil,sys
@@ -59,6 +59,11 @@ jobs:
           export CENSUS_SDK="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
           python3 -IB scripts/ohm-gnu-ty-input-census/census.py --self-test
           python3 -IB scripts/ohm-gnu-ty-input-census/census.py
+      - name: Inspect the remaining three registry code generators and one unchanged instruction profile
+        run: |
+          export CENSUS_ROOT="$RUNNER_TEMP/gnu-ty-marker-census"
+          export CENSUS_SDK="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
+          python3 -IB scripts/ohm-gnu-ty-input-census/assembly.py
       - name: Retain original process streams, depfiles and test verdicts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
