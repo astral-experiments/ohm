@@ -61,8 +61,8 @@ def logs(z,p,code,elf,expected,qemu):
  return {'cargo_exit':code,'answer':r['answer'],'elf':elf,'all_processes':dict(sorted(counts.items())),'actual_provider_ld':len(candidates),'selected_provider':prov,
          'earlier_negative':any('/early/' in v and 'ENOENT' in v for v in lookups),'later_negative':any('/late/' in v and 'ENOENT' in v for v in lookups),'opening_trace':H(wire),'receipt':H(z.read(p+'/result.json'))}
 def verify(z):
- j=lambda n:json.loads(z.read(n));info=j('native-group.json');tag=info['cargo'];assert tag in ('293','signed')
- assert len(info['all'])==18;res={};elfs={};rogue=[]
+ j=lambda n:json.loads(z.read(n));info=j('native-group.json');tag=info['cargo'];assert tag in ('293','signed','stock')
+ assert len(info['all'])==(6 if tag=='stock' else 18);res={};elfs={};rogue=[]
  for label,summary in sorted(info['all'].items()):
   role,watch,place=label.split('-');src=j(label+'/completed.json');mut=j(label+'/physical-provider-bytes.json')
   assert H(z.read(label+'/completed.json'))==summary['complete'] and H(z.read(label+'/physical-provider-bytes.json'))==summary['physical_mutations']

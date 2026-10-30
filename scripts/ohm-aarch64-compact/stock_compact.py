@@ -14,8 +14,7 @@ MANIFEST_SHA="ce6dddc886364f8d786514771212cebe9b731ba82d6b859951c6b0ccc516b6a2"
 def fetch(url,path):
     subprocess.run(["curl","--fail","--location","--silent","--show-error","--retry","3","-o",str(path),url],check=True)
 
-def main():
-    mode=sys.argv[1:];need(mode in ([],["native-only"]),"bad scope")
+def install():
     table=json.loads((HERE.parent/"ohm-aarch64-registers/stock-components.json").read_bytes());root=rt.ROOT/"official";root.mkdir()
     manifest=root/"channel-rust-1.99.0.toml";fetch("https://static.rust-lang.org/dist/channel-rust-1.99.0.toml",manifest);need(sha(manifest)==MANIFEST_SHA,"upstream manifest changed")
     d=tomllib.loads(manifest.read_text());rt.SDK.parent.mkdir(parents=True,exist_ok=True)
@@ -37,8 +36,12 @@ def main():
         tools[tool]=sha(Path(physical))
     save(rt.LOG/"stock-sdk.json",{"manifest":sha(manifest),"version":COMMIT,"components":table,"executables":tools,
          "driver":{p.name:sha(p) for p in (rt.SDK/"lib").glob("librustc_driver*.so")},"plain_Cargo":True})
+    return tools
+
+def main():
+    assert not sys.argv[1:]
+    install()
     rec={}
-    assert not mode
     edges.BARRIER=edge_guard.BARRIER
     original=edges.BUILD
     for watch in ("files","directories","undeclared"):
