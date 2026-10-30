@@ -93,6 +93,16 @@ jobs:
           path: ${{ runner.temp }}/gc-compiler-build/deliver
           if-no-files-found: error
           retention-days: 1
+      - name: Build the native Cargo library suite and run the GC roster on overlay and tmpfs
+        continue-on-error: true
+        run: python3 -IB protocol/scripts/gc-mount-evidence/native_units.py build "$RUNNER_TEMP/gc-compiler-build"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        continue-on-error: true
+        with:
+          name: disposable-gc-compiled-library-tests
+          path: ${{ runner.temp }}/gc-compiler-build/unit-deliver
+          if-no-files-found: error
+          retention-days: 1
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -110,7 +120,10 @@ jobs:
         with:
           path: protocol
           persist-credentials: false
-          sparse-checkout: scripts/gc-mount-evidence
+          sparse-checkout: |
+            scripts/gc-mount-evidence
+            scripts/cargo-diagnostic-fix
+            scripts/ohm-apple-zmij/cargo293
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: signed-reader
@@ -137,6 +150,14 @@ jobs:
           set -eu
           if ! command -v strace; then sudo apt-get update -qq; sudo apt-get install -y --no-install-recommends strace; fi
           python3 -IB protocol/scripts/gc-mount-evidence/compare.py "$RUNNER_TEMP/gc-mount-qualification" "$RUNNER_TEMP/candidate-download"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: always()
+        with:
+          name: disposable-gc-compiled-library-tests
+          path: ${{ runner.temp }}/candidate-native-units
+      - name: Run the full same native library suite on ext4
+        if: always()
+        run: python3 -IB protocol/scripts/gc-mount-evidence/native_units.py ext4 "$RUNNER_TEMP/gc-mount-qualification" "$RUNNER_TEMP/candidate-native-units" "$GITHUB_WORKSPACE/protocol/scripts/ohm-apple-zmij/cargo293/source.pack"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

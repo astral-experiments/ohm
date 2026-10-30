@@ -68,7 +68,8 @@ class Fixture:
         case=self.makecase('version')
         p=self.cmd(case,'version',['-Vv'])
         assert p.returncode==0 and ('commit-hash: '+commit).encode() in p.stdout
-        o.save(output/'identity.json',{'expected':commit,'cargo':o.st(runtime/'bin/cargo'),'rustc':o.st(runtime/'bin/rustc'),'driver':o.st(next((runtime/'lib').glob('librustc_driver*.so'))),
+        o.save(output/'identity.json',{'expected':commit,'cargo':o.st(runtime/'bin/cargo'),'rustc':o.st((runtime/'bin/rustc').resolve(strict=True)),'driver':o.st(next((runtime/'lib').glob('librustc_driver*.so')).resolve(strict=True)),
+                'wild':o.st((runtime/'lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd').resolve(strict=True)),
                 'uid':uid,'base':str(w),'namespace':o.ns(),'parent_namespace':outer_ns,'version':p.stdout.decode()})
     def mkdir(self,p):
         assert p.is_relative_to(self.w) and p.resolve()==p
@@ -87,7 +88,7 @@ class Fixture:
     def cmd(self,c,name,args):
         loc=self.o/(c['label']+'-'+name);loc.mkdir();os.chown(loc,self.uid,self.gid);trace=loc/'native.trace'
         cmd=[str(self.w/'shims/cargo'),'+ohm',*map(str,args)]
-        call=['/usr/bin/strace','-f','-qq','-ttt','-yy','-s','2048','-e','trace=execve,openat2,rename,renameat,renameat2,unlink,unlinkat,rmdir','-o',str(trace),'--',*cmd]
+        call=['/usr/bin/strace','-f','-qq','-ttt','-yy','-s','2048','-e','trace=execve,openat,openat2,statx,fstatfs,rename,renameat,renameat2,unlink,unlinkat,rmdir','-o',str(trace),'--',*cmd]
         p=subprocess.run(call,env=c['env'],cwd=c['cwd'],user=self.uid,group=self.gid,extra_groups=[],timeout=120,capture_output=True)
         for key,b in [('stdout',p.stdout),('stderr',p.stderr),('native.trace',trace.read_bytes())]:
             with gzip.open(loc/(key+'.gz'),'xb') as f:f.write(b)

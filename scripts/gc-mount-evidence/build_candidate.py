@@ -33,6 +33,7 @@ def main(root,pack):
     materialize.HERE=bundle
     src=root/'source';tree=materialize.tree(src,pack,spec)
     assert tree['commit']==spec['head'] and tree['tree']==spec['tree'] and tree['mode_path_sha256_inventory']==spec['inventory']
+    assert tree['lock']==spec['lock_sha256']
     rustup=Path(shutil.which('rustup'));home=root/'build-home';home.mkdir()
     alias=root/'build-rustup/toolchains/ohm';alias.parent.mkdir(parents=True);alias.symlink_to(native,target_is_directory=True)
     shims=root/'build-shims';shims.mkdir()
