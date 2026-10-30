@@ -6,7 +6,7 @@ on:
         description: Bootstrap source or reopen the registered immutable compiler
         type: choice
         default: qualification
-        options: [qualification, bootstrap, pilots, holdout, ty-oracle, guest, reader-controls]
+        options: [qualification, bootstrap, pilots, holdout, ty-oracle, guest, reader-controls, release-reader]
 permissions:
   contents: read
   actions: read
@@ -14,6 +14,50 @@ concurrency:
   group: gnu-literal-svc-${{ github.sha }}
   cancel-in-progress: false
 jobs:
+  release-reader:
+    if: inputs.phase == 'release-reader' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-sh/ruff
+          ref: 93526150df078af7dd8fc4226cdcc469539d2001
+          path: ruff
+          persist-credentials: false
+      - name: Fetch the signed distribution by tag and verify its hashes before use
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo "QA_ROOT=$RUNNER_TEMP/ohm-integrated" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/ohm-integrated/inbox"
+          gh release download ohm-1.99.0-20 --repo astral-experiments/ohm -D "$RUNNER_TEMP/ohm-integrated/inbox" -p 'ohm-1.99.0-20-x86_64-unknown-linux-gnu*'
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends strace zstd libssl-dev pkg-config cmake libclang-dev
+      - name: Build the exact release-parent integration with signed Ohm
+        run: python3 -IB scripts/ohm-gnu-syscall/release-reader/build.py build
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: signed-base-integrated-cargo
+          path: ${{ runner.temp }}/ohm-integrated/product
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 14
+      - name: Exercise both generated marker versions and ordinary path collisions
+        run: python3 -IB scripts/ohm-gnu-syscall/release-reader/build.py unit
+      - name: Rebuild the real Ruff Unicode generator and compare with clean outputs
+        run: python3 -IB scripts/ohm-gnu-syscall/release-reader/unicode.py ruff
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: signed-base-integrated-source-and-ruff
+          path: ${{ runner.temp }}/ohm-integrated/receipts
+          if-no-files-found: error
+          retention-days: 14
   compiler:
     if: inputs.phase == 'bootstrap' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
     runs-on: namespace-profile-ubuntu-24-04-16
