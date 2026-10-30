@@ -12,7 +12,7 @@ from zipfile import ZipFile
 from cgu_inputs import modules
 from macho_paths import canonical
 from study import digest, need
-from xcode_response import resolved
+from response_custody import resolved
 
 
 def json_body(z, name):

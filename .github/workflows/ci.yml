@@ -28,7 +28,11 @@ jobs:
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           python3 -IB scripts/ohm-apple-zmij/test_xcode_response.py -v
-          python3 -IB scripts/ohm-apple-zmij/test_xcode_response.py native "$root"
+          python3 -IB scripts/ohm-apple-zmij/test_held_response.py -v
+          python3 -IB scripts/ohm-apple-zmij/test_held_response.py native "$root/linker-response"
+          python3 -IB scripts/ohm-apple-zmij/reopen_response_native.py "$root/linker-response/receipts"
+          mkdir "$root/receipts/linker-response"
+          cp -R "$root/linker-response/receipts/." "$root/receipts/linker-response/"
           test -s "$root/receipts/observer.json"
           cp scripts/ohm-apple-zmij/ty-developer-study.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
