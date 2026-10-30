@@ -1,6 +1,6 @@
 # AArch64 portable-atomic on the Ruff database build loop
 
-The first twelve-pair hardware study measured a 10.0093× reduction in whole-command instructions on the first unchanged library build, 1.4773× on the actual edited build and 1.9072× for the two commands together. [Primary result and offline recount](evidence/primary-41141112097/) · [Conditional independent replication](replication.md)
+The first twelve-pair hardware study measured a 10.0093× reduction in whole-command instructions on the first unchanged library build, 1.4773× on the actual edited build and 1.9072× for the two commands together. Both 119-member compiler SDKs, Cargo and the external Ruff programs reproduced from source. [Draft compiler PR](https://github.com/astral-experiments/ohm-rust/pull/285) · [Primary result and offline recount](evidence/primary-41141112097/) · [Source qualification](evidence/source-41141810291.md) · [Conditional independent replication](replication.md)
 
 This baseline asks whether the usual Ruff library build, or its test executable, leaves enough work attributable to portable-atomic for a compiler optimization to halve the command's instruction count. It uses the original, independently rebuilt 119-member GNU AArch64 SDK from Ohm Rust #283 and Cargo #301. The signed -21 Linux package has a different compiler and ships only x86-64 Linux libraries. [SDK provenance and source reconstruction](../ohm-gnu-syscall/source-rebuild/)
 
@@ -72,6 +72,6 @@ Set `holdout_run` to that second run ID, then collect the pairs while its seven-
 
 ```sh
 gh-auto run watch "$holdout_run" --repo "$repo" --exit-status
-python3 -IB scripts/ohm-gnu-atomic-db/pairs.py collect "atomic-counts-$holdout_run" --run "$holdout_run" --head "$qa_commit"
+python3 -IB scripts/ohm-gnu-atomic-db/pairs.py collect "atomic-counts-$holdout_run" --run "$holdout_run" --head "$qa_commit" --source-run "$source_run"
 python3 -IB scripts/ohm-gnu-atomic-db/pairs.py verify "atomic-counts-$holdout_run"
 ```

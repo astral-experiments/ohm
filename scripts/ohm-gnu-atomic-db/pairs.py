@@ -73,7 +73,7 @@ def graph(messages):
     return {'units':174,'roster':digest('\n'.join(roster).encode()),'dirty':sorted(m['target']['name'] for m in units if not m['fresh'])}
 
 
-def verify(rows,position,run,head):
+def verify(rows,position,run,head,source_run=None):
     def read(path):return rows[PREFIX+path]
     def doc(path):return json.loads(read(path))
     def lines(path):return [json.loads(l) for l in read(path).splitlines()]
@@ -100,7 +100,10 @@ def verify(rows,position,run,head):
     if origin.get('mode')=='locally-source-built':
         assert origin['head']==head and origin['parent_enrollment']['run']==origin['run']
         assert origin['parent_enrollment']['source']==REG['source']['parent']['source'] and origin['parent_enrollment']['members']==119
+        assert source_run is None or source_run==origin['run']
+        assert set(origin['artifacts'])=={'gnu-atomic-source-parent-sdk','gnu-atomic-registered-compiler'}
     else:
+        assert source_run is None
         assert (origin['run'],origin['head'],origin['artifact'],origin['digest']) == (
             41138808306,'f251bcb417be911fc3ed9c4814b17ffa7b360c28',13018006260,
             'sha256:a6bfc63d174184cf46ef452323c30ef2520f455da866be6998400d55f4d63582')
@@ -175,7 +178,8 @@ def verify(rows,position,run,head):
     out={s:{k:[arms[r]['measurements'][s][k] for r in 'PC'] for k in ('instructions','elapsed_ns','tree_cpu_us')}
          for s in ('repeat','edit','edit+repeat')}
     assert out==pair['measurements']
-    return {'position':position,'order':expected,'endpoints':out,'arms':arms,'tree_cpu_valid':cpu}
+    return {'position':position,'order':expected,'endpoints':out,'arms':arms,'tree_cpu_valid':cpu,
+            'source_run':origin['run'] if origin.get('mode')=='locally-source-built' else None}
 
 
 def project(z):
@@ -227,15 +231,28 @@ def write(path,obj):
     else:path.write_bytes(data)
 
 
-def collect(out,run,head):
-    r=api('runs/'+str(run))
-    assert (r['head_sha'],r['head_branch'],r['event'],r['status'],r['conclusion'])==(head,BRANCH,'workflow_dispatch','completed','success')
+def workers(out,run):
     jobs=api('runs/'+str(run)+'/jobs?per_page=100')['jobs']
     got={j['name']:j for j in jobs if j['conclusion']!='skipped'}
     assert set(got)=={f'holdout ({n})' for n in range(1,13)} and all(j['conclusion']=='success' for j in got.values())
+    rows=[]
+    for i in range(1,13):
+        j=got[f'holdout ({i})']
+        assert j['runner_id']>0 and j['runner_name'] and j['run_id']==run
+        rows.append({k:j[k] for k in ('id','runner_id','runner_name','runner_group_id','labels','started_at','completed_at')}|{'position':i})
+    assert len({r['runner_id'] for r in rows})==len({r['runner_name'] for r in rows})==12
+    write(out/'workers.json',{'run':run,'workers':rows})
+    return got
+
+
+def collect(out,run,head,source_run=None):
+    r=api('runs/'+str(run))
+    assert (r['head_sha'],r['head_branch'],r['event'],r['status'],r['conclusion'])==(head,BRANCH,'workflow_dispatch','completed','success')
+    out.mkdir(parents=True,exist_ok=True)
+    got=workers(out,run)
     arts=api('runs/'+str(run)+'/artifacts?per_page=100')['artifacts']
     assert {a['name'] for a in arts}=={f'gnu-atomic-db-pair-{n}' for n in range(1,13)} and len(arts)==12
-    out.mkdir(parents=True,exist_ok=True);records=[]
+    records=[];inputs=set()
     for i in range(1,13):
         a,=[a for a in arts if a['name']==f'gnu-atomic-db-pair-{i}']
         assert not a['expired'] and (a['workflow_run']['id'],a['workflow_run']['head_sha'])==(run,head)
@@ -243,7 +260,7 @@ def collect(out,run,head):
             subprocess.run([GH,'api',BASE+'artifacts/'+str(a['id'])+'/zip'],stdout=f,check=True)
             f.seek(0);assert hashlib.file_digest(f,'sha256').hexdigest()==a['digest'].split(':')[1]
             with zipfile.ZipFile(f) as z:rows=project(z)
-        verify(rows,i,run,head)
+        inputs.add(verify(rows,i,run,head,source_run)['source_run'])
         raw=json.dumps(rows,sort_keys=True,separators=(',',':')).encode()
         compressed=subprocess.check_output(['zstd','-q','-9','-c'],input=raw)
         name=f'{i:02}.json.zst';path=out/name
@@ -252,7 +269,8 @@ def collect(out,run,head):
         records.append({'position':i,'order':ORDERS[i-1],'artifact':a['id'],'job':got[f'holdout ({i})']['id'],
                         'source_zip':a['digest'],'retained_sha256':digest(compressed),'file':name})
         print('verified',i,len(compressed),flush=True)
-    write(out/'manifest.json',{'run':run,'head':head,'registration':REG_HASH,'pairs':records})
+    rebuilt,=inputs
+    write(out/'manifest.json',{'run':run,'head':head,'registration':REG_HASH,'pairs':records}|({'source_run':rebuilt} if rebuilt else {}))
 
 
 def offline(out):
@@ -262,8 +280,13 @@ def offline(out):
         assert p['position']==i and p['order']==ORDERS[i-1]
         f=out/p['file'];assert digest(f.read_bytes())==p['retained_sha256']
         text=subprocess.check_output(['zstd','-qdc',f])
-        rows.append(verify(json.loads(text),i,manifest['run'],manifest['head']))
+        rows.append(verify(json.loads(text),i,manifest['run'],manifest['head'],manifest.get('source_run')))
     assert len(rows)==12
+    assert {row['source_run'] for row in rows}=={manifest.get('source_run')}
+    if (out/'workers.json').exists():
+        w=json.loads((out/'workers.json').read_text())
+        assert w['run']==manifest['run'] and [j['id'] for j in w['workers']]==[p['job'] for p in manifest['pairs']]
+        assert len({r['runner_id'] for r in w['workers']})==len({r['runner_name'] for r in w['workers']})==12
     summary=stats(rows)
     write(out/'results.json',summary)
     med=summary['repeat']['instructions'];print('Whole-command first unchanged hardware instructions',med)
@@ -273,6 +296,7 @@ def offline(out):
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['collect','verify']);parser.add_argument('out',type=Path)
     parser.add_argument('--run',type=int,default=ORIGINAL_RUN);parser.add_argument('--head',default=ORIGINAL_HEAD)
+    parser.add_argument('--source-run',type=int)
     cli=parser.parse_args()
-    if cli.mode=='collect':collect(cli.out,cli.run,cli.head)
+    if cli.mode=='collect':collect(cli.out,cli.run,cli.head,cli.source_run)
     offline(cli.out)
