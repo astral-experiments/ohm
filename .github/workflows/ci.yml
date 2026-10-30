@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      apple_ld_receipt:
+        description: Record the stock Apple linker's native archive lookups
+        type: boolean
+        default: false
 
 permissions: {}
 
@@ -13,6 +18,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  apple-ld-receipt:
+    if: github.event_name == 'workflow_dispatch' && inputs.apple_ld_receipt
+    runs-on: namespace-profile-macos-15
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.0.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Link and run each native provider state with the same Apple ld as the Ruff experiment
+        run: python3 -IB scripts/apple_ld_native_inputs.py "$RUNNER_TEMP/apple-ld-receipts"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: stock-apple-ld-native-inputs
+          path: ${{ runner.temp }}/apple-ld-receipts
+          if-no-files-found: error
+          retention-days: 14
   manifest:
     runs-on: ubuntu-latest
     permissions:
