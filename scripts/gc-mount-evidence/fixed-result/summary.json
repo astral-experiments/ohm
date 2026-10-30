@@ -1,0 +1,389 @@
+{
+  "cohorts": {
+    "final": {
+      "candidate": "c7f394c8c9aaef1272c621ff11d77dcf569ed94b",
+      "fixed": {
+        "boundaries": {
+          "eligible-mounted": {
+            "exit": 0,
+            "external_intact": true,
+            "healthy_removed": true,
+            "held_links": 1,
+            "native_unlink": [],
+            "same_mount_position": true
+          },
+          "marked-trash-mounted": {
+            "exit": 0,
+            "external_intact": true,
+            "healthy_removed": true,
+            "held_links": 1,
+            "native_unlink": [],
+            "same_mount_position": true
+          },
+          "separate-device": {
+            "exit": 0,
+            "external_intact": true,
+            "healthy_removed": true,
+            "held_links": 1,
+            "native_unlink": [],
+            "same_mount_position": true
+          }
+        },
+        "cargo": "2e78b6774f1a04e6ce60ed82d3287808a09e157f433287c72f7cec1b40e598d5",
+        "commands": 18,
+        "driver": {
+          "dev": 66305,
+          "filesystem": "ext4",
+          "ino": 854743,
+          "mode": 420,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "dae4f8dc64b2b2ac9dc04dfe2cfad633d6af1a87da2dfc532e757ffe758680e3",
+          "size": 162180768
+        },
+        "held_lock_preserved": true,
+        "overlay_file_removed": true,
+        "private_mount_preserved": true,
+        "rustc": {
+          "dev": 66305,
+          "filesystem": "ext4",
+          "ino": 854737,
+          "mode": 493,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "f7663fb7dec7e5c7ea613a85ff1d6e4c00bf97b8c50534f17e5c95cd599712b9",
+          "size": 171720
+        },
+        "symlink_destinations_preserved": true,
+        "wild": {
+          "dev": 66305,
+          "filesystem": "ext4",
+          "ino": 854762,
+          "mode": 493,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+          "size": 10319072
+        }
+      },
+      "native_unit_suites": {
+        "suite_sha": "3bae85e9f08209eeac6d5ea7a99cb05ecea764e4fd8cda35922cd2c385e6c2ae",
+        "tested": {
+          "full-ext4": {
+            "exit": 0,
+            "failed": [],
+            "filesystem": "ext2/ext3",
+            "passed": 411,
+            "selected": 411
+          },
+          "namespace-overlay": {
+            "exit": 101,
+            "failed": [
+              "workspace::build_cache_gc::worktrees::idle::tests::stock_build_can_finish_opening_a_profile_after_discovery"
+            ],
+            "filesystem": "overlayfs",
+            "passed": 61,
+            "selected": 62
+          },
+          "tmpfs": {
+            "exit": 0,
+            "failed": [],
+            "filesystem": "tmpfs",
+            "passed": 62,
+            "selected": 62
+          }
+        }
+      },
+      "opened_source_tree": "07904aadf60050fae426f31ad8fcdcce75e48c7e",
+      "prior_overlay_failures_not_enrolled": [],
+      "prior_overlay_failures_now_passed": [
+        "workspace::build_cache_gc::tests::busy_context_preserves_its_artifacts_without_blocking_other_contexts_or_trash",
+        "workspace::build_cache_gc::tests::busy_usage_writer_only_postpones_context_and_dependency_rows",
+        "workspace::build_cache_gc::tests::file_based_contexts_remain_collectable_without_creating_a_database",
+        "workspace::build_cache_gc::tests::idle_context_expires_with_installed_compiler_at_one_hour",
+        "workspace::build_cache_gc::tests::idle_dependency_variants_expire_while_overlapping_graphs_stay_warm",
+        "workspace::build_cache_gc::tests::legacy_cleanup_needs_no_records_or_age_and_preview_is_read_only",
+        "workspace::build_cache_gc::tests::legacy_locks_only_block_legacy_namespaces",
+        "workspace::build_cache_gc::tests::legacy_thinlto_obeys_the_old_pruner_lock_and_preserves_unknown_paths",
+        "workspace::build_cache_gc::tests::retirement_is_batched_and_removes_completed_bookkeeping",
+        "workspace::build_cache_gc::tests::thinlto_retirement_is_bounded_and_resumable",
+        "workspace::build_cache_gc::tests::thinlto_uses_object_activity_within_a_live_context",
+        "workspace::build_cache_gc::tests::trash_deletion_is_bounded_resumable_and_does_not_follow_links",
+        "workspace::build_cache_gc_roots::tests::reports_payload_counts_during_each_cleanup_batch"
+      ],
+      "qa": "5032f93b1a2e08f3bc2f6ed6425df3f6e28bead9",
+      "run": 41146551109,
+      "signed": {
+        "boundaries": {
+          "eligible-mounted": {
+            "exit": 101,
+            "external_intact": false,
+            "healthy_removed": true,
+            "held_links": 0,
+            "native_unlink": [
+              "4345  1793404287.043433 unlink(\"/home/runner/work/_temp/gc-mount-qualification/qa-signed-84pb5yo_/eligible-mounted/shared/debug/.ohm-gc-trash-v1/entry-5SzZXS/payload/mounted/QA_SENTINEL\") = 0"
+            ],
+            "same_mount_position": false
+          },
+          "marked-trash-mounted": {
+            "exit": 101,
+            "external_intact": false,
+            "healthy_removed": false,
+            "held_links": 0,
+            "native_unlink": [
+              "4367  1793404287.169158 unlink(\"/home/runner/work/_temp/gc-mount-qualification/qa-signed-84pb5yo_/marked-trash-mounted/shared/debug/.ohm-gc-trash-v1/entry-0123456789abcdef/payload/mounted/QA_SENTINEL\") = 0"
+            ],
+            "same_mount_position": true
+          },
+          "separate-device": {
+            "exit": 0,
+            "external_intact": true,
+            "healthy_removed": true,
+            "held_links": 1,
+            "native_unlink": [],
+            "same_mount_position": false
+          }
+        },
+        "cargo": "4695ab8e260ba4d6363e42b785c8f410dd79d9255f0313dab6c19e978878f43e",
+        "commands": 18,
+        "driver": {
+          "dev": 66305,
+          "filesystem": "ext4",
+          "ino": 854743,
+          "mode": 420,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "dae4f8dc64b2b2ac9dc04dfe2cfad633d6af1a87da2dfc532e757ffe758680e3",
+          "size": 162180768
+        },
+        "held_lock_preserved": true,
+        "overlay_file_removed": false,
+        "private_mount_preserved": true,
+        "rustc": {
+          "dev": 66305,
+          "filesystem": "ext4",
+          "ino": 854737,
+          "mode": 493,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "f7663fb7dec7e5c7ea613a85ff1d6e4c00bf97b8c50534f17e5c95cd599712b9",
+          "size": 171720
+        },
+        "symlink_destinations_preserved": true,
+        "wild": {
+          "dev": 66305,
+          "filesystem": "ext4",
+          "ino": 854762,
+          "mode": 493,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+          "size": 10319072
+        }
+      },
+      "source_files": 3109,
+      "workflow_conclusion": "success"
+    },
+    "first": {
+      "candidate": "2802082f3ba36be5af9bab9fa6c33bc78afb203c",
+      "fixed": {
+        "boundaries": {
+          "eligible-mounted": {
+            "exit": 0,
+            "external_intact": true,
+            "healthy_removed": true,
+            "held_links": 1,
+            "native_unlink": [],
+            "same_mount_position": true
+          },
+          "marked-trash-mounted": {
+            "exit": 0,
+            "external_intact": true,
+            "healthy_removed": true,
+            "held_links": 1,
+            "native_unlink": [],
+            "same_mount_position": true
+          },
+          "separate-device": {
+            "exit": 0,
+            "external_intact": true,
+            "healthy_removed": true,
+            "held_links": 1,
+            "native_unlink": [],
+            "same_mount_position": true
+          }
+        },
+        "cargo": "5ceeab41c3eda24ece204e1986765d4b061dea5c418e4af46615d2ca772c43e4",
+        "commands": 18,
+        "driver": {
+          "dev": 2049,
+          "filesystem": "ext4",
+          "ino": 854735,
+          "mode": 420,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "dae4f8dc64b2b2ac9dc04dfe2cfad633d6af1a87da2dfc532e757ffe758680e3",
+          "size": 162180768
+        },
+        "held_lock_preserved": true,
+        "overlay_file_removed": true,
+        "private_mount_preserved": true,
+        "rustc": {
+          "dev": 2049,
+          "filesystem": "ext4",
+          "ino": 854729,
+          "mode": 493,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "f7663fb7dec7e5c7ea613a85ff1d6e4c00bf97b8c50534f17e5c95cd599712b9",
+          "size": 171720
+        },
+        "symlink_destinations_preserved": true,
+        "wild": {
+          "dev": 2049,
+          "filesystem": "ext4",
+          "ino": 854754,
+          "mode": 493,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+          "size": 10319072
+        }
+      },
+      "native_unit_suites": {
+        "suite_sha": "2d5eb900dc2276882bc4ba4eb4125db300bcad96597edc7dec6d6d27e13b65e3",
+        "tested": {
+          "full-ext4": {
+            "exit": 0,
+            "failed": [],
+            "filesystem": "ext2/ext3",
+            "passed": 411,
+            "selected": 411
+          },
+          "namespace-overlay": {
+            "exit": 101,
+            "failed": [
+              "workspace::build_cache_gc::worktrees::idle::tests::stock_build_can_finish_opening_a_profile_after_discovery"
+            ],
+            "filesystem": "overlayfs",
+            "passed": 55,
+            "selected": 56
+          },
+          "tmpfs": {
+            "exit": 0,
+            "failed": [],
+            "filesystem": "tmpfs",
+            "passed": 56,
+            "selected": 56
+          }
+        }
+      },
+      "opened_source_tree": "88386e44d1665a8a5886bea5aa7f43eaf7dcec4b",
+      "prior_overlay_failures_not_enrolled": [
+        "workspace::build_cache_gc_roots::tests::reports_payload_counts_during_each_cleanup_batch"
+      ],
+      "prior_overlay_failures_now_passed": [
+        "workspace::build_cache_gc::tests::busy_context_preserves_its_artifacts_without_blocking_other_contexts_or_trash",
+        "workspace::build_cache_gc::tests::busy_usage_writer_only_postpones_context_and_dependency_rows",
+        "workspace::build_cache_gc::tests::file_based_contexts_remain_collectable_without_creating_a_database",
+        "workspace::build_cache_gc::tests::idle_context_expires_with_installed_compiler_at_one_hour",
+        "workspace::build_cache_gc::tests::idle_dependency_variants_expire_while_overlapping_graphs_stay_warm",
+        "workspace::build_cache_gc::tests::legacy_cleanup_needs_no_records_or_age_and_preview_is_read_only",
+        "workspace::build_cache_gc::tests::legacy_locks_only_block_legacy_namespaces",
+        "workspace::build_cache_gc::tests::legacy_thinlto_obeys_the_old_pruner_lock_and_preserves_unknown_paths",
+        "workspace::build_cache_gc::tests::retirement_is_batched_and_removes_completed_bookkeeping",
+        "workspace::build_cache_gc::tests::thinlto_retirement_is_bounded_and_resumable",
+        "workspace::build_cache_gc::tests::thinlto_uses_object_activity_within_a_live_context",
+        "workspace::build_cache_gc::tests::trash_deletion_is_bounded_resumable_and_does_not_follow_links"
+      ],
+      "qa": "c80d81f5d2f95fb30f7f132ad67884d5e70c0f0a",
+      "run": 41145906532,
+      "signed": {
+        "boundaries": {
+          "eligible-mounted": {
+            "exit": 101,
+            "external_intact": false,
+            "healthy_removed": true,
+            "held_links": 0,
+            "native_unlink": [
+              "4172  1793403814.722619 unlink(\"/home/runner/work/_temp/gc-mount-qualification/qa-signed-eckz2de8/eligible-mounted/shared/debug/.ohm-gc-trash-v1/entry-hpo4FF/payload/mounted/QA_SENTINEL\") = 0"
+            ],
+            "same_mount_position": false
+          },
+          "marked-trash-mounted": {
+            "exit": 101,
+            "external_intact": false,
+            "healthy_removed": false,
+            "held_links": 0,
+            "native_unlink": [
+              "4194  1793403814.863418 unlink(\"/home/runner/work/_temp/gc-mount-qualification/qa-signed-eckz2de8/marked-trash-mounted/shared/debug/.ohm-gc-trash-v1/entry-0123456789abcdef/payload/mounted/QA_SENTINEL\") = 0"
+            ],
+            "same_mount_position": true
+          },
+          "separate-device": {
+            "exit": 0,
+            "external_intact": true,
+            "healthy_removed": true,
+            "held_links": 1,
+            "native_unlink": [],
+            "same_mount_position": false
+          }
+        },
+        "cargo": "4695ab8e260ba4d6363e42b785c8f410dd79d9255f0313dab6c19e978878f43e",
+        "commands": 18,
+        "driver": {
+          "dev": 2049,
+          "filesystem": "ext4",
+          "ino": 854735,
+          "mode": 420,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "dae4f8dc64b2b2ac9dc04dfe2cfad633d6af1a87da2dfc532e757ffe758680e3",
+          "size": 162180768
+        },
+        "held_lock_preserved": true,
+        "overlay_file_removed": false,
+        "private_mount_preserved": true,
+        "rustc": {
+          "dev": 2049,
+          "filesystem": "ext4",
+          "ino": 854729,
+          "mode": 493,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "f7663fb7dec7e5c7ea613a85ff1d6e4c00bf97b8c50534f17e5c95cd599712b9",
+          "size": 171720
+        },
+        "symlink_destinations_preserved": true,
+        "wild": {
+          "dev": 2049,
+          "filesystem": "ext4",
+          "ino": 854754,
+          "mode": 493,
+          "mount_id": 61,
+          "nlink": 1,
+          "sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+          "size": 10319072
+        }
+      },
+      "source_files": 3109,
+      "workflow_conclusion": "failure"
+    }
+  },
+  "prior_namespace_overlay_failed": [
+    "workspace::build_cache_gc::tests::busy_context_preserves_its_artifacts_without_blocking_other_contexts_or_trash",
+    "workspace::build_cache_gc::tests::busy_usage_writer_only_postpones_context_and_dependency_rows",
+    "workspace::build_cache_gc::tests::file_based_contexts_remain_collectable_without_creating_a_database",
+    "workspace::build_cache_gc::tests::idle_context_expires_with_installed_compiler_at_one_hour",
+    "workspace::build_cache_gc::tests::idle_dependency_variants_expire_while_overlapping_graphs_stay_warm",
+    "workspace::build_cache_gc::tests::legacy_cleanup_needs_no_records_or_age_and_preview_is_read_only",
+    "workspace::build_cache_gc::tests::legacy_locks_only_block_legacy_namespaces",
+    "workspace::build_cache_gc::tests::legacy_thinlto_obeys_the_old_pruner_lock_and_preserves_unknown_paths",
+    "workspace::build_cache_gc::tests::retirement_is_batched_and_removes_completed_bookkeeping",
+    "workspace::build_cache_gc::tests::thinlto_retirement_is_bounded_and_resumable",
+    "workspace::build_cache_gc::tests::thinlto_uses_object_activity_within_a_live_context",
+    "workspace::build_cache_gc::tests::trash_deletion_is_bounded_resumable_and_does_not_follow_links",
+    "workspace::build_cache_gc::worktrees::idle::tests::stock_build_can_finish_opening_a_profile_after_discovery",
+    "workspace::build_cache_gc_roots::tests::reports_payload_counts_during_each_cleanup_batch"
+  ]
+}
