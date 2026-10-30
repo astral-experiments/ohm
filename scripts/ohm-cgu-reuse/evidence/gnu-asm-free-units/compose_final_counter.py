@@ -16,12 +16,12 @@ PRIMARY = ("first-real-edit", "immediate-repeat")
 ENDPOINTS = (*PRIMARY, "edit-plus-repeat", "settled")
 
 
-def observations(directory):
+def observations(directory, qa):
     blocks = []
     ids = set()
     for number in range(12):
         record = json.loads((directory / f"confirmed-{number}.json").read_text())
-        assert record["qa"] == QA and record["source"] == RUST and record["artifact"] not in ids
+        assert record["qa"] == qa and record["source"] == RUST and record["artifact"] not in ids
         ids.add(record["artifact"])
         assert list(record["blocks"]) == [str(number)] and record["archive_bytes"] > 0
         row = record["blocks"][str(number)]
@@ -70,14 +70,15 @@ def main():
     parser.add_argument("directory", type=Path)
     parser.add_argument("hosted_decision", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--qa", default=QA)
     args = parser.parse_args()
-    rows = observations(args.directory)
+    rows = observations(args.directory, args.qa)
     result = {endpoint: evaluate(rows, endpoint) for endpoint in ENDPOINTS}
     hosted = json.loads(args.hosted_decision.read_text())
     assert hosted["sources"] == ["82911b516fb35608fd70ada4deb6f8429277f410", RUST]
     assert hosted["endpoints"] == result and hosted["eligible"] == any(result[e]["passes"] for e in PRIMARY)
     disk = {arm: [r["matched"][arm]["allocated_bytes"] for r in rows] for arm in ("P","C")}
-    details = {"qa": QA, "rust": RUST, "registered_parent_first": list(PARENT_FIRST),
+    details = {"qa": args.qa, "rust": RUST, "registered_parent_first": list(PARENT_FIRST),
                "endpoints": result, "median_allocated_bytes": {k: median(v) for k,v in disk.items()},
                "allocated_bytes": disk, "reopened_blocks": rows}
     with args.output.open('x') as f:
