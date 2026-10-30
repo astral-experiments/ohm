@@ -128,6 +128,15 @@ def phase(root, work, sdk, env, out, step, rev, trace):
         need(any((m.get("code") or {}).get("code")=="E0425" and BAD in m["message"] for m in errors) and
              not any(r["target"]["name"]=="ty_vendored" and r["executable"] for r in arts), "wrong invalid edit verdict")
     row = {"step":step,"rev":rev,"code":code,"command":CMD,"output":path,"product":result,"zlib":zlib,"native":native,"root_link_argv":argv,"streams":streams}
+    if (root/'receipts/relay-registration.json').is_file():
+        scripts=[Path(f) for m in arts if m['target']['src_path'].endswith('/crates/ty_vendored/build.rs') for f in m['filenames']]
+        files=[Path(m['out_dir'])/'zipped_typeshed.zip' for m in messages if m['reason']=='build-script-executed'
+               and '/ty_vendored#' in m['package_id'] and (Path(m['out_dir'])/'zipped_typeshed.zip').is_file()]
+        def stat(p):
+            s=p.stat();return {'sha256':sha(p),'dev':s.st_dev,'inode':s.st_ino,'size':s.st_size,'mtime_ns':s.st_mtime_ns,'ctime_ns':s.st_ctime_ns}
+        script_runs=[{'pid':e['pid'],'cdhash':e['cdhash']} for e in events if Path(e['path']) in scripts]
+        row['relay_script']={'files':{str(p):stat(p) for p in scripts if p.is_file()},'executions':script_runs,
+                             'zip':{str(p):stat(p) for p in files}}
     evidence(work,out,row)
     save(out/"verified.json",row)
     print(step,rev[:8],len(native["full"]),len(native["linkers"]),len(argv),"zlib",native["full"].count("zlib_rs"),flush=True)

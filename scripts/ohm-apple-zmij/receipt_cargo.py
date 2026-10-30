@@ -40,8 +40,8 @@ def materialize(src):
             for p in sorted((src / "src/compiler").glob("native_link*/**/*.rs"))}}
 
 
-def build(root):
-    receipts = root / "receipts/cargo293"
+def build(root, experimental=None):
+    receipts = root / ("receipts/cargo-experiment" if experimental else "receipts/cargo293")
     check_host(root, 12)
     device = run(["df", "-P", str(root)]).decode().splitlines()[-1].split()[0]
     info = plistlib.loads(run(["diskutil", "info", "-plist", device]))
@@ -49,10 +49,12 @@ def build(root):
     need(str(filesystem["FilesystemType"]).lower() == "apfs" and
          os.stat(filesystem["MountPoint"]).st_dev == root.stat().st_dev, "provider qualification requires APFS")
     save(receipts / "filesystem.json", filesystem)
-    src = root / "receipt-cargo-source"
+    src = root / ("experiment-cargo-source" if experimental else "receipt-cargo-source")
     source = materialize(src)
+    if experimental:
+        source = experimental(src, source)
     save(receipts / "source.json", source)
-    work = root / "receipt-cargo-build"
+    work = root / ("experiment-cargo-build" if experimental else "receipt-cargo-build")
     work.mkdir()
     env = env_for(work, root / "signed")
     compiler = run(["rustc", "+ohm", "-vV"], env=env).decode()
@@ -77,10 +79,10 @@ def build(root):
              and x["target"]["kind"] == ["bin"]]
     need(not leaf["fresh"] and {"ohm-defaults","all-static"} <= set(leaf["features"]), "missing release features")
     output = Path(leaf["executable"])
-    dest = root / "cargo-293"
+    dest = root / ("cargo-experiment" if experimental else "cargo-293")
     shutil.copyfile(output, dest);dest.chmod(0o555)
     version = run([str(dest), "-Vv"]).decode()
-    need(f"commit-hash: {CANDIDATE}" in version and f"host: {TRIPLE}" in version and sha(output)==sha(dest), "wrong native Cargo")
+    need(f"commit-hash: {source['commit']}" in version and f"host: {TRIPLE}" in version and sha(output)==sha(dest), "wrong native Cargo")
     deps = run(["otool","-L",str(dest)]).decode()
     need(str(work) not in deps, "compiler depends on transient build inputs")
     save(receipts / "product.json", {"source":source, "binary":physical(dest), "version":version, "builder":builder,

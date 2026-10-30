@@ -158,7 +158,13 @@ def env_for(root, sdk):
 
 def sdk_id(sdk, env):
     expected_cargo = CARGO_SOURCE
-    if sdk.name == "native" and (sdk.parent / "receipts/fixed-cargo-293.json").is_file():
+    if sdk.name == "native" and (sdk.parent / "receipts/experimental-cargo-selected.json").is_file():
+        from relay_source import CHILD as EXPERIMENT
+        expected_cargo = EXPERIMENT
+        pinned = load(sdk.parent / "receipts/experimental-cargo-selected.json")
+        need(pinned["commit"] == expected_cargo and physical(sdk/"bin/cargo") == pinned["binary"]
+             and (sdk/"bin/cargo").samefile(sdk.parent/"cargo-experiment"), "experimental Cargo identity changed")
+    elif sdk.name == "native" and (sdk.parent / "receipts/fixed-cargo-293.json").is_file():
         pinned = load(sdk.parent / "receipts/fixed-cargo-293.json")
         expected_cargo = "735e1528ed741015c57676dccf05dbdc0ff7bed1"
         need(pinned["commit"] == expected_cargo and physical(sdk/"bin/cargo") == pinned["binary"]

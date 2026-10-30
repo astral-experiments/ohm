@@ -78,11 +78,11 @@ def pin(root):
     save(root/'receipts/293-runtime/pair.json',rg)
 
 
-def providers(root):
+def providers(root, roles="PC"):
     matrix=root/'receipts/provider-matrix';matrix.mkdir();
     for n in ('edge-images','edge-markers'):(root/'receipts'/n).mkdir()
     need('crc32w {v:w}, {v:w}, {d:w}' in edge.BARRIER and edge.BARRIER.count('asm!')==1,'wrong assembly source')
-    order=[(p,w,default,r) for p in ('direct','library') for w in ('unwatched','declared') for default in (True,False) for r in 'PC']
+    order=[(p,w,default,r) for p in ('direct','library') for w in ('unwatched','declared') for default in (True,False) for r in roles]
     save(matrix/'registration.json',{'cargo':CANDIDATE,'rust':{'P':PARENT,'C':CHILD},'cases':order,'steps':edge.STEPS,'inplace':INPLACE,'barrier':edge.BARRIER,'fixture':sha(Path(edge.__file__))})
     bodies=edge.provider_factory(root,matrix);trace=ExecTrace();trace.ready();checks={};off=[]
     try:
@@ -97,7 +97,7 @@ def providers(root):
                     if v['warm'][:2]!=expected or v['same_raw'] is False:checks[label].append(name)
                 elif v['warm'][:2]!=expected:off.append([label,name,v['warm'][:2],expected])
             print('closed',label,checks[label],flush=True)
-        for r in 'PC':
+        for r in roles:
             for p in ('direct','library'):
                 label=f'{r}stamp-{p}-unwatched-default';checks[label]=[]
                 rows=edge.run_case(root,trace,r,p,'unwatched',True,bodies,visits=INPLACE,change=same_stamp,evidence=evidence,label=r+'stamp')
@@ -106,7 +106,7 @@ def providers(root):
                     need(v['empty'][:2]==expected,'wrong empty in-place reference')
                     if v['warm'][:2]!=expected or v['same_raw'] is not True:checks[label].append(name)
     finally:trace.close()
-    passed=not any(checks.values());save(matrix/'terminal.json',{'passed':passed,'wrong_or_raw_mismatch':checks,'off_unwatched_comparisons':off,'commands':352+40})
+    passed=not any(checks.values());save(matrix/'terminal.json',{'passed':passed,'wrong_or_raw_mismatch':checks,'off_unwatched_comparisons':off,'commands':196*len(roles)})
     print('native provider gate',passed,flush=True)
 
 if __name__=='__main__':
