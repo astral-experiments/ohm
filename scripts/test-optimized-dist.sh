@@ -218,9 +218,10 @@ assert_optimized_build() {
   local expect_bolt="$3"
   local component_pgo="$4"
   local output="$5"
+  local isolate_training="${6:-false}"
 
   python3 - "$trace" "$bootstrap_config" "$rust_checkout" "$toolchain" \
-    "$target" "$expected_llvm_directory" "$expect_bolt" "$component_pgo" "$output" <<'PY'
+    "$target" "$expected_llvm_directory" "$expect_bolt" "$component_pgo" "$output" "$isolate_training" <<'PY'
 import json
 import pathlib
 import sys
@@ -236,6 +237,7 @@ import tomllib
     expect_bolt,
     component_pgo,
     output_path,
+    isolate_training,
 ) = sys.argv[1:]
 checkout = pathlib.Path(checkout).resolve()
 generated_config = checkout / "build" / "ohm-release-bootstrap.toml"
@@ -360,10 +362,22 @@ if option(pipeline_arguments, "--llvm-shared") != "false":
     raise SystemExit("opt-dist must not override downloaded CI LLVM settings")
 if ("--use-bolt" in pipeline_arguments) != (expect_bolt == "true"):
     raise SystemExit(f"incorrect target-specific BOLT selection: {pipeline_arguments}")
+config_flag = "--benchmark-cargo-config"
+training_configs = [
+    option(pipeline_arguments[i:], config_flag)
+    for i, argument in enumerate(pipeline_arguments)
+    if argument == config_flag or argument.startswith(config_flag + "=")
+]
+if training_configs != (["unstable.ohm-defaults=false"] if isolate_training == "true" else []):
+    raise SystemExit(f"unexpected Cargo config for rustc-perf: {training_configs}")
+if (
+    "unstable.ohm-defaults=false" in bootstrap_arguments + distribution_arguments
+    or "CARGO_UNSTABLE_OHM_DEFAULTS" in optimized["environment"]
+):
+    raise SystemExit("the training override escaped into the release build")
 for unsupported_argument in (
     "--run-tests",
     "--rustc-perf-checkout-dir",
-    "--benchmark-cargo-config",
 ):
     if any(
         argument == unsupported_argument
@@ -456,10 +470,15 @@ assert_optimized_build \
 mkdir -p "$(dirname -- "$component_pgo_marker")"
 printf '%s\n' 'fixture component-specific PGO capability' > "$component_pgo_marker"
 
+# The release workflow checks out the exact manifest revision with a detached HEAD.
+toolchain='ohm-1.99.0-20'
+git init --quiet "$rust_checkout"
+jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/20.json" > "$rust_checkout/.git/HEAD"
+
 : > "$trace"
 linux_output="$test_directory/linux-output.log"
 run_optimized_build "$linux_target" "$linux_output"
-assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output"
+assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output" true
 
 : > "$trace"
 macos_output="$test_directory/macos-output.log"
@@ -469,7 +488,9 @@ assert_optimized_build \
   "$rust_checkout/build/$macos_target/ci-llvm" \
   false \
   true \
-  "$macos_output"
+  "$macos_output" true
+
+jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/19.json" > "$rust_checkout/.git/HEAD"
 
 allocator_marker="$rust_checkout/compiler/rustc/mimalloc-v1"
 mkdir -p "$(dirname -- "$allocator_marker")"
