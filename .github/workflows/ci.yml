@@ -1,89 +1,53 @@
-name: Cargo diagnostic recovery on signed Ohm Rust and real Ruff
+name: Signed Cargo shared-GC mount boundary
 on:
   workflow_dispatch:
     inputs:
       task:
-        description: Verify the enrolled Cargo fix
-        type: choice
-        options: [signed-ruff-recovery, matched-channel-upgrade]
+        description: Exercise the private mount-namespace fixture
         required: true
+        type: choice
+        options: [signed-gc-mount]
 permissions:
   contents: read
-  actions: read
 jobs:
-  recovery:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-repair-cache-upgrade-20261030' && (inputs.task == 'signed-ruff-recovery' || inputs.task == 'matched-channel-upgrade')
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 110
+  gc:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-gc-mounted-storage-20261030' && inputs.task == 'signed-gc-mount'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: protocol
           persist-credentials: false
-          sparse-checkout: |
-            scripts/cargo-diagnostic-fix
-            scripts/cargo-recovery-upgrade
-            scripts/ron-check-share
-            scripts/ohm-apple-zmij/cargo293
+          sparse-checkout: scripts/gc-mount-evidence
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          path: signed-reader
           ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
-          path: original-qa
           persist-credentials: false
           sparse-checkout: scripts/packaged-release-workspace
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 927e20bcad028e5ed4290a58bd330a258ee5da41
-          path: existing-counter
-          persist-credentials: false
-          sparse-checkout: scripts/ohm-gnu-syscall
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Build each Cargo source and exercise the independent Ruff controls
-        if: inputs.task == 'signed-ruff-recovery'
+      - name: Authenticate the original signed SDK against the private release
         env:
-          QUALIFICATION_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
-          test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
-          test "$(git -C existing-counter rev-parse HEAD)" = 927e20bcad028e5ed4290a58bd330a258ee5da41
-          sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends ninja-build strace build-essential cmake pkg-config libssl-dev perl
-          python3 -IB protocol/scripts/cargo-diagnostic-fix/qualification.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c" "$GITHUB_WORKSPACE/protocol/scripts/ohm-apple-zmij/cargo293/source.pack"
-      - name: Run matched dev-channel Cargo migrations and physical output controls
-        if: inputs.task == 'matched-channel-upgrade'
-        env:
-          QUALIFICATION_TOKEN: ${{ github.token }}
+          test "$(git -C signed-reader rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
+          mkdir -m700 "$RUNNER_TEMP/gc-signed21"
+          python3 -IB signed-reader/scripts/packaged-release-workspace/packages.py 21 "$RUNNER_TEMP/gc-signed21"
+      - name: Use only owned disposable storage and a private mount namespace
         run: |
           set -eu
-          test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
-          test "$(git -C existing-counter rev-parse HEAD)" = 927e20bcad028e5ed4290a58bd330a258ee5da41
-          sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends ninja-build strace build-essential cmake pkg-config libssl-dev perl
-          python3 -IB protocol/scripts/cargo-recovery-upgrade/layout_controls.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c" "$GITHUB_WORKSPACE/protocol/scripts/ohm-apple-zmij/cargo293/source.pack"
-      - name: Migrate already poisoned real Ruff and fully fresh check targets
-        if: inputs.task == 'signed-ruff-recovery'
-        run: |
-          set -eu
-          python3 -IB protocol/scripts/cargo-recovery-upgrade/upgrade.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
+          if ! command -v strace; then sudo apt-get update -qq; sudo apt-get install -y --no-install-recommends strace; fi
+          python3 -IB protocol/scripts/gc-mount-evidence/observe.py "$RUNNER_TEMP/gc-signed21"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ${{ inputs.task == 'matched-channel-upgrade' && 'matched-cargo-repair-and-upgrade' || 'final-cargo-ruff-repair-and-upgrade' }}
-          path: ${{ runner.temp }}/ordinary-ron-check/packet
+          name: signed21-native-gc-mount-facts
+          path: |
+            ${{ runner.temp }}/gc-signed21/packet
+            ${{ runner.temp }}/gc-signed21/receipts/21
           retention-days: 7
-          if-no-files-found: warn
-      - name: Run the candidate's new in-tree regression tests against both Cargo products
-        if: always() && inputs.task == 'signed-ruff-recovery'
-        run: |
-          set -eu
-          test -f "$RUNNER_TEMP/ordinary-ron-check/packet/buildkit/C/built.json"
-          python3 -IB protocol/scripts/cargo-diagnostic-fix/targeted.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always() && inputs.task == 'signed-ruff-recovery'
-        with:
-          name: final-cargo-unit-and-integration
-          path: ${{ runner.temp }}/ordinary-ron-check/test-packet
-          retention-days: 7
-          if-no-files-found: warn
+          if-no-files-found: error
