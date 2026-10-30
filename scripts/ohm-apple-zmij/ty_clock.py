@@ -12,7 +12,7 @@ import zipfile
 
 from cohort import fingerprint_sources, summarize
 from measure import capture, fresh, retire, select
-from study import CHILD, PARENT, ZMIJ_LIB, check_host, digest, env_for, load, need, save, sdk_id, sha
+from study import CHILD, PARENT, ZMIJ_LIB, check_host, compress_bytes, digest, env_for, load, need, save, sdk_id, sha
 from ty_compare import run_pair_focus
 from ty_disk import snapshot
 from ty_links import A, B, E2E, CensusTrace, actual_tests, checkout
@@ -20,6 +20,7 @@ from ty_links import A, B, E2E, CensusTrace, actual_tests, checkout
 MECHANISM_SHA="795507e5d0bf58e49b4cbb4050fa65e1c62097ec69502b8e7655f9686b427121"
 CMD=["cargo","+ohm","test","-p","ty_server","--test","e2e","--no-run","--locked","--offline","-j4","--message-format=json"]
 PHASES=("edit","repeat-1","repeat-2")
+SUBJECTS={"e2e","ty_server","zmij"}
 ALLOCATION=int(digest(("ty_server e2e/native v1/"+MECHANISM_SHA).encode()), 16) % 924
 P_FIRST=set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS={"screen":["PC","CP"],"confirmation":["PC" if x in P_FIRST else "CP" for x in range(12)]}
@@ -112,7 +113,15 @@ def timed(root, out, role):
     for step,(copy,sig,clock) in snapshot_rows.items():
         expected, baseline=anchored(root,role,step)
         observed=actual_tests(copy,repo,env,"old" if step=="cold" else "new",out/step)
-        need(observed==expected and sig==baseline,"timed native binary or typed Cargo plan differs from clean/traced")
+        subject=lambda signature: [name for name in signature["dirty"] if name in SUBJECTS]
+        check={"expected":expected,"observed":observed,"reference_signature":baseline,"actual_signature":sig,
+               "whole_image_equal":observed==expected,"roster_equal":sig["units"]==baseline["units"],
+               "subject_equal":subject(sig)==subject(baseline)}
+        save(out/step/"validation.json",check)
+        if not check["whole_image_equal"]:
+            compress_bytes(out/step/"unexpected-program.macho.gz",copy.read_bytes())
+        need(check["whole_image_equal"],"native program differs from independent clean, raw failing Mach-O retained")
+        need(check["roster_equal"] and check["subject_equal"],"resolved graph or focused compiler work changed")
         row={"endpoint":step,"signature":sig,"product":observed,"cargo":clock}
         save(out/step/"result.json",row)
         rows[step]=row
@@ -134,6 +143,7 @@ def run_stage(root, mode):
         need(pilot["passed"] and pilot["harness"]==harness,"independent pilot gate")
     save(top/"registration.json",{"order":order,"assignment":ALLOCATION,"harness":harness,"primary":PHASES[1],
          "secondary":[PHASES[0],PHASES[2]],"correctness":"all raw Mach-O files, complete inventory, actual old/new test, stable exact driver; two native controls",
+         "work_eligibility":"fixed complete unit graph and dirty states for e2e, ty_server, zmij; retain and charge unrelated compiler work in either arm",
          "argv":CMD,"sources":[PARENT,CHILD,A,B],"unscored_prior":MECHANISM_SHA,
          "disk":"Both isolated roots after the last clock; hardlinks charged once, APFS extents across different inodes can be shared."})
     if mode=="screen":
