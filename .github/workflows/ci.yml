@@ -6,7 +6,7 @@ on:
         description: Bootstrap source or reopen the registered immutable compiler
         type: choice
         default: qualification
-        options: [qualification, bootstrap, pilots, holdout, ty-oracle]
+        options: [qualification, bootstrap, pilots, holdout, ty-oracle, guest]
 permissions:
   contents: read
   actions: read
@@ -105,13 +105,13 @@ jobs:
             ${{ runner.temp }}/svc-receiver/receipts
 
   qualification:
-    if: (inputs.phase == 'qualification' || inputs.phase == 'ty-oracle') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+    if: contains(fromJSON('["qualification","ty-oracle","guest"]'), inputs.phase) && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix:
-        mode: ${{ fromJSON(inputs.phase == 'ty-oracle' && '["census"]' || '["signed","classic","aware","migrate-classic","migrate-signed","census","cli"]') }}
+        mode: ${{ fromJSON(inputs.phase == 'ty-oracle' && '["census"]' || inputs.phase == 'guest' && '["guest-P","guest-C"]' || '["signed","classic","aware","migrate-classic","migrate-signed","census","cli"]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -140,7 +140,7 @@ jobs:
             echo "CENSUS_CANDIDATE_RECORD=$QA_ROOT/receipts/candidate.json"
           } >> "$GITHUB_ENV"
       - name: Authenticate the previous Cargo reader and exercise direct and transitive native providers
-        if: matrix.mode != 'cli' && matrix.mode != 'census'
+        if: inputs.phase == 'qualification' && matrix.mode != 'cli' && matrix.mode != 'census'
         env:
           GH_TOKEN: ${{ github.token }}
           MODE: ${{ matrix.mode }}
@@ -156,6 +156,11 @@ jobs:
           set -euo pipefail
           python3 -IB "scripts/ohm-gnu-ty-input-census/$STUDY.py"
           python3 -IB scripts/ohm-gnu-ty-input-census/why.py
+      - name: Count the original Cargo and every full or link-only rustc on a settled Ruff CLI build
+        if: inputs.phase == 'guest'
+        env:
+          MODE: ${{ matrix.mode }}
+        run: python3 -IB scripts/ohm-gnu-syscall/guest.py "$MODE"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:

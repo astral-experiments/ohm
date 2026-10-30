@@ -44,7 +44,7 @@ def event_command(profile):
     return hits[0]
 
 
-def counted_command(argv, folder, cwd, env, expected):
+def counted_command(argv, folder, cwd, env, expected, *, timeout=1800):
     """Sample the registered real Rust invocation and both kernel jobserver pipes under Callgrind."""
     if "cargo" not in expected:
         return rt.record(argv, folder, cwd, env), {}
@@ -92,7 +92,7 @@ def counted_command(argv, folder, cwd, env, expected):
         monitor = threading.Thread(target=sample, daemon=True)
         monitor.start()
         try:
-            out, err = child.communicate(timeout=1800)
+            out, err = child.communicate(timeout=timeout)
         finally:
             stop.set()
             monitor.join()
