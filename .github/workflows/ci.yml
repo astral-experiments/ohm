@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: linux-checks
-        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector]
+        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason]
 permissions:
   contents: read
 concurrency:
@@ -567,3 +567,43 @@ jobs:
           name: exact-cargo-302-linux-selector
           retention-days: 7
           path: receipt
+
+  e2e-reason:
+    name: Diagnose the signed Linux ty_server e2e fingerprint
+    if: ${{ inputs.task == 'e2e-reason' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    permissions:
+      contents: read
+      actions: read
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: focus
+          persist-credentials: false
+          sparse-checkout: scripts/ohm-cargo-301-linux-ci
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
+          path: original-qa
+          persist-credentials: false
+          sparse-checkout: scripts/packaged-release-workspace
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify tools and acquire the single native target history
+        env:
+          QUALIFICATION_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends strace ninja-build
+          python3 -IB focus/scripts/ohm-cargo-301-linux-ci/e2e_reason.py "$GITHUB_WORKSPACE/original-qa"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: ${{ always() }}
+        with:
+          name: focused-published-21-ty-server-e2e-fingerprints
+          path: ${{ runner.temp }}/packaged-linux-50/diagnostic
+          if-no-files-found: warn
+          retention-days: 7
