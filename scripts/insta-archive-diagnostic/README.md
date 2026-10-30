@@ -17,7 +17,11 @@ and change the modification time. Only then does that same thread submit a real
 `utimensat` omitting both timestamps. All other operations pass through. Both
 policies use the same hooked executable and environment. The calibration includes
 a hard link, another inode, another executable and a same-size changed archive.
-A separate ordinary repeat has no adapter. Each touched file, time, fd and native
+An independent empty-target ordinary arm runs a cold build and repeat without
+an adapter. Its private outputs are parked before the hooked cold build and
+unarmed repeat. The initial attempt switched LD_PRELOAD mid-generation, rebuilt
+306 units and stopped at the untouched inode guard before any hold. [Rejected
+cross-environment control](https://github.com/astral-experiments/ohm/actions/runs/41137063070). Each touched file, time, fd and native
 process is recorded, with an independent strace of the actual syscalls and execs.
 The archive, its 18 members, every distinct returned ELF, Cargo JSON and native
 verdict streams are retained.

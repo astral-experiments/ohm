@@ -192,6 +192,13 @@ def main():
     allrows={}
     def run(label,**kw):
         row,calls,arts=visit(repo,env,tools,label,**kw);allrows[label]=row;return row,calls,arts
+    # Cargo fingerprints loader environment. Obtain the unwrapped baseline in
+    # its own empty same-path generation, then keep LD_PRELOAD constant through
+    # every phase of the independent allowed/held generation.
+    raw_cold,_,_=run('unwrapped-cold',raw=True)
+    raw_second,_,_=run('unwrapped-repeat',raw=True)
+    assert raw_cold['file']['sha256']==raw_second['file']['sha256'] and raw_second['timestamp_syscalls']
+    park('unwrapped')
     cold,calls,arts=run('cold')
     args,=[v for k,v in calls if k=='e2e'];wild,=[v for k,v in calls if k=='wild']
     insta,={Path(a.split('=',1)[1]) for k,a in zip(args,args[1:]) if k=='--extern' and a.startswith('insta=') and a.endswith('.rlib')}
@@ -214,7 +221,7 @@ def main():
             assert ep.is_relative_to(slot) and ep.resolve()==ep and ep.is_file()
             z(out/(label+'-removed-identity.json.gz'),json.dumps(state(ep)).encode());ep.unlink()
         return run(label,mode=mode,watch=insta,provider=earlier if provider else None,raw=raw)[0]
-    warm('unwrapped-repeat',raw=True)
+    warm('unarmed-hook-repeat')
     for pol in ('allow','hold'):
         for n in (1,2):warm(f'{pol}-repeat-{n}',pol)
         w.replace(repo,'reversed');warm(pol+'-edited',pol)
