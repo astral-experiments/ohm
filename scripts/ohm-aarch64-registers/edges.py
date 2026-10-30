@@ -33,7 +33,7 @@ BUILD='''fn main(){
 '''
 def write(p,s):
     p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s)
-def run(root, role, placement, defaults, stock_source=None):
+def run(root, role, placement, defaults, stock_source=None, native_only=False):
     cwd=rt.ROOT/'edges';cwd.mkdir(); env=rt.environment();work=rt.ROOT/'edges-work';work.mkdir()
     env.update(CARGO_HOME=str(work/'cargo-home'),CARGO_TARGET_DIR=str(work/'target'),CARGO_BUILD_BUILD_DIR=str(work/'shared'),
                CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=q.CROSS)
@@ -96,12 +96,15 @@ def run(root, role, placement, defaults, stock_source=None):
         seen=set();markers={}
         crate='barrier' if placement=='library' else 'qa_owned_test'
         for directory in homes:
-            for f in directory.rglob(crate+'-*.d'):
+            for f in directory.rglob('*.d'):
                 body=f.read_bytes();st=f.stat()
                 if (st.st_dev,st.st_ino) in seen:continue
                 seen.add((st.st_dev,st.st_ino))
-                if b'/src/lib.rs' in body or b'/src/main.rs' in body or b'src/main.rs' in body:
-                    markers[f.name]=[MISSING in body,RECHECK in body,hashlib.sha256(body).hexdigest()]
+                needle=b'src/main.rs' if placement=='direct' else b'barrier/src/lib.rs'
+                if needle in body and (f.name.startswith(('qa_owned_test','qa-owned-test')) if placement=='direct' else f.name.startswith('barrier')):
+                    key=hashlib.sha256(body).hexdigest();markers[f.name]=[MISSING in body,RECHECK in body,key]
+                    depdir=root/'raw-depfiles';depdir.mkdir(exist_ok=True);saved_dep=depdir/key
+                    if not saved_dep.exists():saved_dep.write_bytes(body)
         result=dict(name=name,exit=ps.returncode,answer=answer,elf=elf,dirty=dirty,rustcs=sorted(compilers),actual_GNU_linkers=drivers,
                     selected=opened,native_lookup=providers,markers=markers,trigger=sha(src),argv=args,trace=sha(path/'trace.tar.gz'))
         save(path/'result.json',result);arms.append(result)
@@ -110,25 +113,36 @@ def run(root, role, placement, defaults, stock_source=None):
                 p.rename(saved/('empty-'+p.name));(saved/p.name).rename(p)
         return result
     visit('cold-lower')
-    ar(29,early);visit('higher-no-Rust-edit');visit('empty-higher',True)
-    version(11);visit('higher-real-Rust-edit');visit('empty-edited-higher',True)
-    early.write_bytes(b'!<arch>\n'+b'\0'*60);late.unlink();version(13)
-    visit('malformed-real-Rust-edit');visit('empty-malformed',True)
-    early.unlink();version(15);visit('missing-real-Rust-edit');visit('empty-missing',True)
-    late.write_bytes(initial);version(19);visit('restored-real-Rust-edit');visit('empty-restored',True);visit('restored-unchanged')
+    if native_only:
+        early.write_bytes(b'!<arch>\n'+b'\0'*60);late.unlink()
+        visit('malformed-no-Rust-edit');visit('empty-malformed',True)
+        early.unlink();late.write_bytes(initial)
+        visit('repaired-no-Rust-edit');visit('empty-repaired',True);visit('settled-restored')
+        late.unlink()
+        visit('missing-no-Rust-edit');visit('empty-missing',True)
+        late.write_bytes(initial);version(11)
+        visit('restored-real-Rust-edit');visit('empty-restored-edited',True)
+    else:
+        ar(29,early);visit('higher-no-Rust-edit');visit('empty-higher',True)
+        version(11);visit('higher-real-Rust-edit');visit('empty-edited-higher',True)
+        early.write_bytes(b'!<arch>\n'+b'\0'*60);late.unlink();version(13)
+        visit('malformed-real-Rust-edit');visit('empty-malformed',True)
+        early.unlink();version(15);visit('missing-real-Rust-edit');visit('empty-missing',True)
+        late.write_bytes(initial);version(19);visit('restored-real-Rust-edit');visit('empty-restored',True);visit('restored-unchanged')
     save(root/'completed.json',{'source':stock_source or {'P':subject.BASE,'C':subject.TREATMENT}[role],'placement':placement,'defaults':defaults,'cases':arms,'source_shape':sha(cwd/'src/main.rs'),'build_rs':sha(cwd/'build.rs')})
     parked=rt.ROOT/('closed-'+root.name);parked.mkdir()
     cwd.rename(parked/'source');work.rename(parked/'work')
 
 def main():
-    archive,key=sys.argv[1:];archive=Path(archive);need(sha(archive)==key,'wrong complete SDK')
+    archive,key,*mode=sys.argv[1:];need(mode in ([],['native-only']),'bad scope');archive=Path(archive);need(sha(archive)==key,'wrong complete SDK')
     import capsule
     results={}
     for role in 'PC':
         rt.SDK.parent.mkdir(parents=True,exist_ok=True);capsule.verify(archive,role,rt.SDK)
-        for mode in ('default','off'):
+        modes=('default',) if mode else ('default','off')
+        for setting in modes:
             for placement in ('direct','library'):
-                label=role+'-'+mode+'-'+placement;root=rt.LOG/label;root.mkdir();run(root,role,placement,mode=='default')
+                label=role+'-'+setting+'-'+placement;root=rt.LOG/label;root.mkdir();run(root,role,placement,setting=='default',native_only=bool(mode))
                 results[label]=sha(root/'completed.json')
         rt.SDK.rename(rt.ROOT/('finished-SDK-'+role))
     save(rt.LOG/'terminal.json',{'registered_no_edit_is_classification_only':True,'complete':results})

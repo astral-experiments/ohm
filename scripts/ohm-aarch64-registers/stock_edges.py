@@ -12,6 +12,7 @@ def fetch(url,path):
     subprocess.run(["curl","--fail","--location","--silent","--show-error","--retry","3","-o",str(path),url],check=True)
 
 def main():
+    mode=sys.argv[1:];need(mode in ([],["native-only"]),"bad scope")
     table=json.loads((Path(__file__).parent/"stock-components.json").read_bytes());root=rt.ROOT/"official";root.mkdir()
     manifest=root/"channel-rust-1.99.0.toml";fetch("https://static.rust-lang.org/dist/channel-rust-1.99.0.toml",manifest);need(sha(manifest)==MANIFEST_SHA,"upstream manifest changed")
     d=tomllib.loads(manifest.read_text());rt.SDK.parent.mkdir(parents=True,exist_ok=True)
@@ -36,7 +37,7 @@ def main():
     rec={}
     for placement in ("direct","library"):
         label="stock-"+placement;p=rt.LOG/label;p.mkdir()
-        edges.run(p,"stock",placement,True,stock_source=COMMIT)
+        edges.run(p,"stock",placement,True,stock_source=COMMIT,native_only=bool(mode))
         rec[label]=sha(p/"completed.json")
     save(rt.LOG/"terminal.json",{"native_stock":COMMIT,"completed":rec})
 if __name__=="__main__":main()
