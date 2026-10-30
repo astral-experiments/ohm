@@ -10,11 +10,12 @@ from dyld import check as check_dyld
 from execs import ExecTrace
 from fixed_crc import evidence as native_receipt
 from local_dev import observe
+import cgu_inputs
+import cli_images
 from measure import capture, fresh, native_rows, retire, select
 from prepare import prepare_ruff
 from study import MISSING, RECHECK, check_host, compress_bytes, digest, env_for, git, need, save, sdk_id, sha, text_git
 from verbs import macho_text
-from zlib_study import keep
 
 OLD = "4710e1aa962b13720cf64aa84eb279c5333896d7"
 NEW = "915bb2b4bf9ae7eee47cf55646bbfebae254a23b"
@@ -93,13 +94,13 @@ def witness(root, out, path, rev):
     compress_bytes(out/"ty-stderr.gz", actual.stderr)
     save(out/"ty-exit.json", actual.returncode)
     program = macho_text(path)
-    keep(root, "objc2-cli-programs", path.read_bytes())
+    need(cli_images.keep(root, path.read_bytes()) == program["raw"], "returned CLI differs from held bytes")
     want = (0, b"All checks passed!\n") if rev == OLD else (1, NEW_STDOUT)
     need((actual.returncode, actual.stdout) == want and actual.stderr == b"", f"wrong CLI behavior {actual.returncode}: {actual.stdout!r} {actual.stderr!r}")
     return program | {"exit": actual.returncode, "stdout": digest(actual.stdout), "stderr": digest(actual.stderr)}
 
 
-def phase(root, work, sdk, env, out, step, rev, trace):
+def phase(root, work, sdk, env, out, step, rev, trace, prior=None):
     ok = step != "invalid"
     code, stdout, stderr, events, streams = capture(CMD, root/"ruff", env, out, trace)
     need(code == (0 if ok else 101), f"wrong Cargo exit {code}: {stderr[-600:]!r}")
@@ -139,6 +140,20 @@ def phase(root, work, sdk, env, out, step, rev, trace):
     row = {"step": step, "rev": rev, "code": code, "command": CMD, "streams": streams, "native": native,
            "units": len(units), "dirty": sorted(u["target"]["name"] for u in units if not u["fresh"]),
            "objc2": objc2, "links": links, "product": product}
+    if ok:
+        if links:
+            output, = links
+            linker, = [l["argv"] for l in native["linkers"] if
+                       [b for a,b in zip(l["argv"],l["argv"][1:]) if a=="-o"] == [output]]
+            proof = cgu_inputs.witness(root, out, path.read_bytes(), output, linker=linker)
+        else:
+            need(prior is not None and product["raw"] in prior, "no earlier physical linker for this exact CLI")
+            proof = prior[product["raw"]]
+            save(out/"prior-cgu-proof.json", {"raw": proof["raw"], "recipe": proof["recipe"],
+                                             "observed_link": proof["linker_argv"]})
+        if prior is not None:
+            prior[product["raw"]] = proof
+        row["cgu"] = {k: proof[k] for k in ("output", "raw", "same_path_image", "cross_path_image", "modules")}
     save(out/"verified.json", row)
     native_receipt(work, out, row)
     print(step, rev[:8], "full", len(native["full"]), "link-only", len(native["link_only"]), "ld", len(native["linkers"]),
@@ -153,6 +168,7 @@ def installation(root, role, trace, prefix):
     sdk = select(root, role)
     env = env_for(work, sdk)
     before = sdk_id(sdk, env)
+    save(prefix/"development-environment.json",{k:digest(v.encode()) for k,v in sorted(env.items())})
     save(prefix/"installation.json", before)
     check_dyld(root, role, sdk, prefix/"dyld")
     results = {}
@@ -160,18 +176,20 @@ def installation(root, role, trace, prefix):
         check_host(root, 28)
         fresh(work, root/"seed")
         results[group] = {}
+        prior = {}
         previous = None
         for label, rev in steps:
             state = (rev, label == "invalid")
             if previous != state:
                 checkout(root/"ruff", *state)
-            results[group][label] = phase(root, work, sdk, env, prefix/group/label, label, rev, trace)
+            results[group][label] = phase(root, work, sdk, env, prefix/group/label, label, rev, trace, prior)
             previous = state
         retire(work)
-    refs = {rev: results[group]["clean"]["product"] for rev, group in ((OLD, "clean-old"), (NEW, "clean-new"))}
-    comparisons = {label: row["product"] == refs[row["rev"]] for label, row in results["visits"].items() if row["product"]}
+    refs = {rev: results[group]["clean"] for rev, group in ((OLD, "clean-old"), (NEW, "clean-new"))}
+    comparisons = {label: cgu_inputs.same_product(row["product"],refs[row["rev"]]["product"],row["cgu"],refs[row["rev"]]["cgu"])
+                   for label, row in results["visits"].items() if row["product"]}
     save(prefix/"comparison.json", comparisons)
-    need(refs[OLD]["raw"] != refs[NEW]["raw"] and before == sdk_id(sdk, env), "missing real edit or compiler changed")
+    need(refs[OLD]["product"]["raw"] != refs[NEW]["product"]["raw"] and before == sdk_id(sdk, env), "missing real edit or compiler changed")
     counts = {label: {"rustc": len(row["native"]["full"]), "link_only": len(row["native"]["link_only"]),
                     "ld": len(row["native"]["linkers"]), "ty_ld": len(row["links"]),
                     "objc2": row["native"]["full"].count("objc2")} for label, row in results["visits"].items()}
@@ -201,7 +219,14 @@ def mechanism(root):
                     proof = json.loads((prefix/order/role/"visits"/label/"verified.json").read_text())
                     need(all(v["hard"] == (role=="P") and v["recheck"] == (role=="C")
                              for v in proof["objc2"]), "unexpected objc2 dep-info classification")
-            orders[order] = {"physical": physical, "clean": checks}
+            cross = {}
+            for source in ("clean-old", "clean-new"):
+                roots = {r: json.loads((prefix/order/r/source/"clean/verified.json").read_bytes()) for r in order}
+                p, c = [roots[r]["cgu"] for r in "PC"]
+                need(p["cross_path_image"] == c["cross_path_image"] and p["modules"] == c["modules"],
+                     "physical cross-compiler complete CLI or root objects differ beyond verified paths")
+                cross[source] = p["cross_path_image"]
+            orders[order] = {"physical": physical, "clean": checks, "cross": cross}
             save(prefix/(order+"-closed.json"), orders[order])
         save(prefix/"mechanism.json", {"orders": orders, "timing": None, "command": CMD})
     finally:

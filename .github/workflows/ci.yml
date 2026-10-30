@@ -1,4 +1,4 @@
-name: Developer-mode ty CLI edits and repeats on fixed Cargo 293
+name: Developer-mode ty CLI edits with verified native objects on fixed Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
@@ -22,11 +22,13 @@ jobs:
       - name: Freeze and verify subjects, provider design and native execution observer
         run: |
           root="$RUNNER_TEMP/apple-objc2-on-293"
+          python3 -IB scripts/ohm-apple-zmij/run.py test_cgu scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
+          python3 -IB scripts/ohm-apple-zmij/test_cli_images.py
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/objc2-secure-plan.md "$root/receipts/registration.md"
+          cp scripts/ohm-apple-zmij/objc2-secure-cgu-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}

@@ -8,6 +8,7 @@ import shutil
 
 from cohort import fingerprint_sources, summarize
 from crc_clock import clone
+import cgu_inputs
 from local_dev import verify_saved
 from measure import capture, fresh, retire, select
 from objc2_cli import CMD, NEW, OLD, SOURCES, CliTrace, checkout, phase as trace_phase, witness
@@ -17,7 +18,7 @@ from ty_disk import snapshot
 
 ENDPOINTS = ("edit","repeat-1","repeat-2")
 SCORES = (*ENDPOINTS, "edit+repeat-1")
-DESIGN = "objc2 ty CLI / local incremental on exact Cargo #293 / independent inclusive 12 v2"
+DESIGN = "objc2 ty CLI / local incremental, entire ty CLI with bound native inputs on exact Cargo #293 / inclusive 12 v3"
 ALLOCATION = int(digest((" ".join((DESIGN,PARENT,CHILD,OLD,NEW,CANDIDATE))).encode()),16) % 924
 FIRST = set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS = {"screen":["PC","CP"], "confirmation":["PC" if i in FIRST else "CP" for i in range(12)]}
@@ -44,7 +45,7 @@ def signature(stdout, root):
 def anchor(root, role, step):
     name = "old" if step=="cold" else "new"
     base = root/"receipts/objc2-cli/PC"/role
-    ref = load(base/("clean-"+name)/"clean/verified.json")["product"]
+    ref = load(base/("clean-"+name)/"clean/verified.json")
     with gzip.open(base/"visits"/step/"stdout.gz","rb") as f:
         _,_,expected = signature(f.read(),root)
     return ref,expected
@@ -56,8 +57,12 @@ def timed(root, out, role):
     check_host(root,24)
     fresh(work,root/"seed")
     identity = sdk_id(sdk,env)
+    save(out/"development-environment.json",{k:digest(v.encode()) for k,v in sorted(env.items())})
     held = work/"clock-held"
     need(not held.exists(),"stale held outputs")
+    references = {step: load(root/"receipts/objc2-cli/PC"/role/
+                            ("clean-old" if step == "cold" else "clean-new")/"clean/verified.json")
+                  for step in ("cold", *ENDPOINTS)}
     phases = {}
     dep = None
     for step in ("cold", *ENDPOINTS):
@@ -71,6 +76,12 @@ def timed(root, out, role):
         need(exe.samefile(work/"target/debug/ty"),"different ty output")
         copy = held/step/"ty"
         clone(exe,copy)
+        # Cargo promotes this ordinary binary to target/debug/ty. Bind its owned
+        # internal path using the original physically-observed selected root linker.
+        internal = Path(references[step]["cgu"]["output"])
+        need(internal.is_file() and (internal.samefile(exe) or sha(internal) == sha(exe)),
+             "recorded root compiler output differs from the current typed program")
+        cgu_inputs.freeze(internal, held/step/"cgu", clone)
         if dep is None:
             basename = archive.stem.removeprefix("lib")+".d"
             places = {(p.stat().st_dev,p.stat().st_ino):p for area in ("target","shared") for p in (work/area).rglob(basename)}
@@ -80,11 +91,13 @@ def timed(root, out, role):
     for step,(rev,dest,typed,clock,copy,marker) in phases.items():
         ref,control = anchor(root,role,step)
         observed = witness(root,dest,copy,rev)
-        need(observed==ref, "complete held CLI differs from its independent clean reference")
+        proof = cgu_inputs.witness(root,dest,copy.read_bytes(),ref["cgu"]["output"],held=held/step/"cgu")
+        need(cgu_inputs.same_product(observed,ref["product"],proof,ref["cgu"]),
+             "complete held CLI or any native root CGU differs from the independently empty reference")
         need((typed['count'],typed['roster_sha256'],typed['focus'])==
              (control['count'],control['roster_sha256'],control['focus']), "complete roster or measured target freshness changed")
         need(b'objc2-0.6.3/src/' in marker and (MISSING in marker)==(role=="P") and (RECHECK in marker)==(role=="C"),"objc2 marker changed")
-        row = dict(endpoint=step,signature=typed,reference=control,product=observed,expected=ref,cargo=clock,
+        row = dict(endpoint=step,signature=typed,reference=control,product=observed,expected=ref["product"],expected_image=ref["cgu"]["same_path_image"],cargo=clock,
                    depinfo=compress_bytes(dest/"objc2.dep.gz",marker))
         save(dest/"result.json",row)
         rows[step] = row
@@ -99,7 +112,7 @@ def timed(root, out, role):
 
 def enroll(root):
     native = load(root/"receipts/provider-matrix/terminal.json")
-    need(native["passed"] and native["commands"]==392 and not any(native["wrong_or_raw_mismatch"].values()),"native protection failed")
+    need(native["passed"] and native["commands"]==392 and not any(native["wrong_or_image_mismatch"].values()),"native protection failed")
     proof = load(root/"receipts/objc2-cli/mechanism.json")
     need(proof["command"]==CMD and set(proof["orders"])=={"PC","CP"}, "missing mirrored native reference")
     for order,study in proof["orders"].items():
@@ -150,7 +163,9 @@ def run_stage(root,mode):
                 fresh(work,root/"seed")
                 checkout(root/"ruff",NEW,False)
                 row=trace_phase(root,work,sdk,env,top/"terminal-clean"/role,"clean",NEW,trace)
-                need(row["product"]==anchor(root,role,"edit")[0],"terminal independent empty CLI changed")
+                ref = anchor(root,role,"edit")[0]
+                need(cgu_inputs.same_product(row["product"],ref["product"],row["cgu"],ref["cgu"]),
+                     "terminal independent empty CLI changed")
                 retire(work)
         finally:
             trace.close()

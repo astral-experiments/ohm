@@ -94,7 +94,7 @@ def providers(root):
                 v=rows[name];value=edge.NATIVE[state];expected=[0,[value,rust]] if value is not None else [101,None]
                 need(v['empty'][:2]==expected,'wrong independently empty native reference')
                 if default or w=='declared' or name not in edge.NO_RUST:
-                    if v['warm'][:2]!=expected or v['same_raw'] is False:checks[label].append(name)
+                    if v['warm'][:2]!=expected or v['same_checked_image'] is False:checks[label].append(name)
                 elif v['warm'][:2]!=expected:off.append([label,name,v['warm'][:2],expected])
             print('closed',label,checks[label],flush=True)
         for r in 'PC':
@@ -104,9 +104,9 @@ def providers(root):
                 for name,state,rust in INPLACE:
                     v=rows[name];expected=[0,[17 if state=='overwrite' else 29,rust]]
                     need(v['empty'][:2]==expected,'wrong empty in-place reference')
-                    if v['warm'][:2]!=expected or v['same_raw'] is not True:checks[label].append(name)
+                    if v['warm'][:2]!=expected or v['same_checked_image'] is not True:checks[label].append(name)
     finally:trace.close()
-    passed=not any(checks.values());save(matrix/'terminal.json',{'passed':passed,'wrong_or_raw_mismatch':checks,'off_unwatched_comparisons':off,'commands':352+40})
+    passed=not any(checks.values());save(matrix/'terminal.json',{'passed':passed,'wrong_or_image_mismatch':checks,'off_unwatched_comparisons':off,'commands':352+40})
     print('native provider gate',passed,flush=True)
 
 if __name__=='__main__':
