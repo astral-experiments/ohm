@@ -1,0 +1,3303 @@
+{
+  "cases": 20,
+  "commands": 392,
+  "eligible": true,
+  "hits": 7,
+  "issues": {
+    "C-direct-declared-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "C-direct-declared-off": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "C-direct-unwatched-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "C-direct-unwatched-off": {
+      "default_declared_or_rust": [],
+      "off_unwatched": [
+        "higher-no-rust",
+        "malformed-no-rust",
+        "missing-no-rust"
+      ]
+    },
+    "C-library-declared-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "C-library-declared-off": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "C-library-unwatched-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "C-library-unwatched-off": {
+      "default_declared_or_rust": [],
+      "off_unwatched": [
+        "higher-no-rust",
+        "malformed-no-rust",
+        "missing-no-rust"
+      ]
+    },
+    "Cstamp-direct-unwatched-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "Cstamp-library-unwatched-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "P-direct-declared-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "P-direct-declared-off": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "P-direct-unwatched-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "P-direct-unwatched-off": {
+      "default_declared_or_rust": [],
+      "off_unwatched": [
+        "higher-no-rust",
+        "malformed-no-rust",
+        "missing-no-rust"
+      ]
+    },
+    "P-library-declared-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "P-library-declared-off": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "P-library-unwatched-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "P-library-unwatched-off": {
+      "default_declared_or_rust": [],
+      "off_unwatched": [
+        "higher-no-rust",
+        "malformed-no-rust",
+        "missing-no-rust"
+      ]
+    },
+    "Pstamp-direct-unwatched-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    },
+    "Pstamp-library-unwatched-default": {
+      "default_declared_or_rust": [],
+      "off_unwatched": []
+    }
+  },
+  "native_images": 30,
+  "providers": {
+    "17": {
+      "archive": "fa128d58b233012bd853595ac79542710c08b0805a7bb4018029603ef7ff548d",
+      "archive_bytes": 712,
+      "object": "2198a32afde04a930e3153e4e721cf79dff5a4ded86d64649f23113fc998faf3",
+      "object_text": "20028052c0035fd6"
+    },
+    "29": {
+      "archive": "fe3e1aaa7c97f295ad69d5e82fe364bf1dd12eece4672eb069596f9f26e5a0b9",
+      "archive_bytes": 712,
+      "object": "d2d8c174aa8b047f2cd38d839fdf185ba24d9ac79114ec294de7dc1721dabf3f",
+      "object_text": "a0038052c0035fd6"
+    }
+  },
+  "run": 41071825672,
+  "sha256": "436f88d34c0efa52f05ab33e62a25f4e0c5bba883a385411c7d21d30665b6c13",
+  "sources": {
+    "cargo_ctime_ns": 1793371066690994575,
+    "cargo_sha256": "2469d45bd86e45e21427166897b7ea9f7ff1e56b0b48efd0d08f6ad1aed23e66",
+    "cargo_source": "735e1528ed741015c57676dccf05dbdc0ff7bed1",
+    "child_run_make_log": "1881318d7605a808736d2fb415dd2977d7503ab41db6b19eb80b8d7f8ba47d6f",
+    "distribution_cargo": "505008003127f597cf2bdbd967d2bac9158d706b55a18f8bf17790e9ea3bbac9",
+    "frontend": "92d7cf9e0b57f3479a462bdf9684c54a5427687615d72a1511883147a50dbc5f",
+    "kernel_cargo_cdhash": "50309343D7D05572667373CC01DFED46E460D37C",
+    "observer_ld_sha256": "2b48a59af70235283aa94c43eb0dd2ef80182c106db43279db936cc87426b443",
+    "rust": {
+      "C": {
+        "driver": "f131ba51b57059918cad5bed1c623fcbfd5e3a01a367336b4d902e2a7f99e791",
+        "members": 2466,
+        "source": "82911b516fb35608fd70ada4deb6f8429277f410"
+      },
+      "P": {
+        "driver": "f455daabe18b7d66ad4ea6057df036101ad55575da83629aa3af57309766f23e",
+        "members": 2466,
+        "source": "444c0273a2e2bc0b161e988d43c882349bc2d7a6"
+      }
+    },
+    "std": {
+      "libLLVM.dylib": "f4d57a9992cfd52f05233255f5cb04b07f8abe81d20a89bcdcc060efd8d1ff2d",
+      "libaddr2line-5bb5793b669b27b8.rlib": "698d9656df13dbdba5d118afedeef8fadface21ba1e9e00f42b5b89b8ad458c6",
+      "libaddr2line-5bb5793b669b27b8.rmeta": "ed4619852c9dcf7f0ebc19effa490650e87f18dc1cc0b2ce28493ca691a0f515",
+      "libadler2-dbe17e5e6158769d.rlib": "e09ad5f65ead8f5834c80272535d9064bb22ff89845252d52a3131491b1c20d5",
+      "libadler2-dbe17e5e6158769d.rmeta": "d1cb78089d1c07705c7d3b33fa942243ecf9e4c514c2400c199aff69290a77a1",
+      "liballoc-812b9c1f5ac317ac.rlib": "98bb5360825bf1553a9c8c8bf0e247fc72c3e0ca64ff5d6467a581323c712412",
+      "liballoc-812b9c1f5ac317ac.rmeta": "867cdfa5dacb9969d15d7658d1a8055058b3676ac11fb0e4a3d9bf204b4438e9",
+      "libcfg_if-8cca75db05af3b00.rlib": "bf4836ce1d93654c08745702cdc5e65f5bedba57f1ca08a6bc3756e1317360de",
+      "libcfg_if-8cca75db05af3b00.rmeta": "423db28ef80c0af612b7ed1ee68d6649e64a9c1f33c8f519b03ff1567908dda0",
+      "libcompiler_builtins-af703250a9afb59d.rlib": "6dc359f698ce9bb15140f40ebe6888d28025790ab3dc3b1cb61f271d81f9816c",
+      "libcompiler_builtins-af703250a9afb59d.rmeta": "572d620d89d29dc1513e496a96652c5f25b02b0714af47599ac18f6e67a5bf61",
+      "libcore-59f2685a537685e9.rlib": "26d0ee3dd28f2b38f8172452cc14492424c959346c8299c57560a298214a32f2",
+      "libcore-59f2685a537685e9.rmeta": "1a904bc6d416d753ed1063878cb688f327e3e91890c8bf631c2b002708e1e32d",
+      "libgetopts-7a025d0cf8e52c00.rlib": "d47226232033fd1af27971a1eb856920df2a3edae5f6895699137d4c617ab774",
+      "libgetopts-7a025d0cf8e52c00.rmeta": "7dee3703d6123b2d961d6d849bffd854b5a6604f66d167387af1dc4abea68388",
+      "libgimli-575c1367ca1c8891.rlib": "c437afa7f04fc469df1a8899f575879de1ccfa6f0113ab1ce05ba150a79abf4c",
+      "libgimli-575c1367ca1c8891.rmeta": "d5086f49cd5b75fe8e2b53f32fc3f03c2052a15b28c9387451aaaeeb248a910e",
+      "libhashbrown-7c0798b16d7bc5a4.rlib": "e102dae6169866af817f1addf6252ac8e99f7e3f52c6c4f3a5f153bf5b1b5eb6",
+      "libhashbrown-7c0798b16d7bc5a4.rmeta": "d9d3e262f54ad5940e3a23ebbe08bf98a7e424fa884eeb51712ba358a320889a",
+      "liblibc-787b3fa734f69e18.rlib": "246cde9e761faa7c6ac265bf61be03275d6b8f93fcf9e33f33d8e3803c3368ee",
+      "liblibc-787b3fa734f69e18.rmeta": "25b373d4e8f64de26941f3be91d3094e3af4f882aeafb93cbe8b00d0e3bec812",
+      "libmemchr-1e922aa2dca3c8a0.rlib": "a745cfb464618c36888cc6b7c9560f18f5940542f3680b37be335ca4f8da7312",
+      "libmemchr-1e922aa2dca3c8a0.rmeta": "1651625ed377030dc787db2b8f19a20a3f269d68d1d1234e0215831e9b321c3f",
+      "libminiz_oxide-82ead9b2ffe508c6.rlib": "bf49142f82e6376d9a91e2d1c2784734984a2a4c81fee59cc17eaf17277fc646",
+      "libminiz_oxide-82ead9b2ffe508c6.rmeta": "8cb2380aeafa765dd2f3c653d5ff65ef477a198953996c1d94d166d16892b71a",
+      "libobject-c5d7746c2a6afc9b.rlib": "a24ab54b26e01e391839e52d0f6316d9f6befdb7010ee1c9331c675980fb3e41",
+      "libobject-c5d7746c2a6afc9b.rmeta": "04454c4e1aed48df4385fb6589ec6a77034888746ccc0f8fab8f846e47717b26",
+      "libpanic_abort-c0e08ec5aed2088f.rlib": "2d8f8beb24c1626a5c1d8f93ea2e893106887fb83a9a878e6af29367b77741a6",
+      "libpanic_abort-c0e08ec5aed2088f.rmeta": "9dee19a885e3a839d97deef73e9c3ec921dc8c377fe46a7d873cac3e8a149c13",
+      "libpanic_unwind-4c67ff06a9ec4d9f.rlib": "adb1f8c906674c89f0035cd1db72530686c2aa1ada7a391e6ed2cf4ab58cc2b2",
+      "libpanic_unwind-4c67ff06a9ec4d9f.rmeta": "7b397863f8e676ba9bf3331a840b6dbc1a9419eea7ad9306b069b8a1d55d07d9",
+      "libproc_macro-0345b2f5d211bb98.rlib": "2a835ce4ac67498fa779cce1a5bd47129388e0d73d746de5f6ed1924556ca990",
+      "libproc_macro-0345b2f5d211bb98.rmeta": "76bbc5ae7ba75084babd2cb98db4b075059e010e3adaf3df7e7d4387ebb7bb73",
+      "librustc_demangle-b6aa94cd60e6363b.rlib": "39ec06c3813686cea2ec02cb889c921b47ce0ae6055f1b9851763589fb4a4ae5",
+      "librustc_demangle-b6aa94cd60e6363b.rmeta": "9980f426ea4aa0a49569e81db394ca733e72bb615d1207a7edc8f504eab0721b",
+      "librustc_literal_escaper-49e6a09a7de5d287.rlib": "7cde01997b64c4c6b6078df890cd500d5cac65aab5f5701e516e6fdec9e18f22",
+      "librustc_literal_escaper-49e6a09a7de5d287.rmeta": "f8dc7671898c478a6828acae256e42f16f34d34bc4055c445574685f48d197fb",
+      "librustc_std_workspace_alloc-8d6a996f3bff1e39.rlib": "4afa0bcb397c9c684a54e3133c16849ff5e2297002403d0478d115ccd730592f",
+      "librustc_std_workspace_alloc-8d6a996f3bff1e39.rmeta": "21cef617018504287b040dbdafe233b7f1687eeb09db5389eb4f7f63b53f5c2c",
+      "librustc_std_workspace_core-2da398ad4d577efe.rlib": "7afe1127bd94f3e7eabd1718cdeddb4de5c63b40bf8b3e53d39822a0a207c13c",
+      "librustc_std_workspace_core-2da398ad4d577efe.rmeta": "919e4681e407163b97e9cc27ff2051cafb4125fa966eb086fa04a92b31ca2ef0",
+      "librustc_std_workspace_std-18a654379c18bf1b.rlib": "e526dba04f35cb7dc4775b4296585ee9ceb6d858cdca13cc844ebee75df28527",
+      "librustc_std_workspace_std-18a654379c18bf1b.rmeta": "6b0f2562287436baa5496380114331a51bd6bab54d947ab6f5cc7967ed3e5695",
+      "libstd-c4c1a8608a1799e2.dylib": "5323c2d179a77d5c3e84ec51832ca131a0cff85b70767bfd145826b2991e02a4",
+      "libstd-c4c1a8608a1799e2.rlib": "ad1a3663f8577ca9515a699c66dfcb336618dc356b8f6e989f78a22cc390d49a",
+      "libstd-c4c1a8608a1799e2.rmeta": "5706cc93154a1eb57ce4c3b7bd793ce8a454da99f93e054570565f188464a254",
+      "libstd_detect-80905e36b1239959.rlib": "f4d80740d67ed4b11514fe347462841d7d53652a9cebd58e9bac97946ae1a589",
+      "libstd_detect-80905e36b1239959.rmeta": "2057f4d784f791f18c1688dd253a9ca87415585d97253b59e904e1d130dabbc1",
+      "libsysroot-219193068b093add.rlib": "2cf578d1183d65972199ee996001988e92166f296dbe08d530ff4adcb7cb5d19",
+      "libsysroot-219193068b093add.rmeta": "6bcec1cb6014eb816ef85428348ed33e6b66e2be3b479120d146e387f19f0803",
+      "libtest-e47418337796ca0d.rlib": "754bde5ec3abc216da7a219137f37d53271b5fec65e3e5a56031c642d97c594a",
+      "libtest-e47418337796ca0d.rmeta": "31926ac4998421e6e4193f3921fddcd6b64b9bcd7a7092f0a7ee977a75a3fb2a",
+      "libunwind-0a2f33fe94fba776.rlib": "fb290f2ebb3a7fdf7fa235cac16f856f42bac8e9299107df9965ec746c2151f8",
+      "libunwind-0a2f33fe94fba776.rmeta": "59a65fbe9b121c00dd108891b5bd4c78974ee7a0547fcc3f14df593f0045e47a"
+    },
+    "target": "aarch64-apple-darwin",
+    "time_instruction_scope": "unavailable-or-inconclusive"
+  },
+  "stock_Xcode": [
+    [
+      "3065220D3CF77318B8575B0059DF4D34597EA84B",
+      "2b48a59af70235283aa94c43eb0dd2ef80182c106db43279db936cc87426b443"
+    ]
+  ],
+  "work": {
+    "C-direct-declared-default": {
+      "higher-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "62772d9f689faf399bc35106d7ef31b2e7b7fd6b165fad29b45123f11c1c5acf",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "trigger"
+        ],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "61175f8d91f80cc1657eea0c85c095b23da90ab972b26a57190476f25d1be5b3",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "09514770eedfd12ec5cef15c34be25d47cc0c5298a8f14b08a714fb7e765230b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "e75f9e6ea37d24e6601e54e6aa15ea6f9fd9f1f568fd17e7b90b2095a2bbe154",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "d9eedba9447c25cb364cb073c27c813863b40c90a236ccbd14dc716adec4ec56",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "d9eedba9447c25cb364cb073c27c813863b40c90a236ccbd14dc716adec4ec56",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "09514770eedfd12ec5cef15c34be25d47cc0c5298a8f14b08a714fb7e765230b",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "C-direct-declared-off": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "81f9355b957d873b3975ca959288ad990df9518c173edc56864715e4c224f55b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "7e1bdbc41eefa7e0681c5be5d7019776bb3d205d450b29b5bcfe9ca9cf36ff50",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "aef26306f95059a3424a6a44ef4e1f2a5fde8141101c0dbd0281c4a098884d5b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "4653dff8448537d93751422213dd03ef4e1d06096942fa945b9cab2a02051fd3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "4653dff8448537d93751422213dd03ef4e1d06096942fa945b9cab2a02051fd3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "C-direct-unwatched-default": {
+      "higher-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "62772d9f689faf399bc35106d7ef31b2e7b7fd6b165fad29b45123f11c1c5acf",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "trigger"
+        ],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "61175f8d91f80cc1657eea0c85c095b23da90ab972b26a57190476f25d1be5b3",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "09514770eedfd12ec5cef15c34be25d47cc0c5298a8f14b08a714fb7e765230b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "e75f9e6ea37d24e6601e54e6aa15ea6f9fd9f1f568fd17e7b90b2095a2bbe154",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "d9eedba9447c25cb364cb073c27c813863b40c90a236ccbd14dc716adec4ec56",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "d9eedba9447c25cb364cb073c27c813863b40c90a236ccbd14dc716adec4ec56",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "09514770eedfd12ec5cef15c34be25d47cc0c5298a8f14b08a714fb7e765230b",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "C-direct-unwatched-off": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": false,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "7e1bdbc41eefa7e0681c5be5d7019776bb3d205d450b29b5bcfe9ca9cf36ff50",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "7e1bdbc41eefa7e0681c5be5d7019776bb3d205d450b29b5bcfe9ca9cf36ff50",
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "aef26306f95059a3424a6a44ef4e1f2a5fde8141101c0dbd0281c4a098884d5b",
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "aef26306f95059a3424a6a44ef4e1f2a5fde8141101c0dbd0281c4a098884d5b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "4653dff8448537d93751422213dd03ef4e1d06096942fa945b9cab2a02051fd3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "4653dff8448537d93751422213dd03ef4e1d06096942fa945b9cab2a02051fd3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "C-library-declared-default": {
+      "higher-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "1d928bec04e27e1be896bb908e741f9e212c007e546fdc753dcc219fb2546ff0",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "trigger"
+        ],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "d997c1a2a0736978343804e48f55e4ef3d33e72f5dba91136869189f7697ffe1",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "cb6c7636d5f4fe04a107ab7f5fe00a1795a2e64203144ea905f28125ddf1baac",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "25ea7009cf2fcbee9d76901c2f3b00b9c485d0488abda69846c10fc99c911bcc",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "9846e2d34bec8cba83141afc0d876898204d892680781e944ddbafc1a9920167",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 1,
+        "existing_seal_hit": true,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "9846e2d34bec8cba83141afc0d876898204d892680781e944ddbafc1a9920167",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 1,
+        "existing_seal_hit": true,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "cb6c7636d5f4fe04a107ab7f5fe00a1795a2e64203144ea905f28125ddf1baac",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "C-library-declared-off": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "67a9322776e299b607a3c6f38fca34e5c4c44b3419c2f8c9f4f47a003669471d",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "407a525cee4f34dd6596f452c13fa87fad29f1c2ba89ad94e0bb6a870c8e1758",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "62244589c8802f2fe29f416c835d6f346962563eaebe9ad26d252bcbf463958e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "f310796223f320b0b24d651cb0a567a49dc02e74e30fa63e2cbb7fe24504957c",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "f310796223f320b0b24d651cb0a567a49dc02e74e30fa63e2cbb7fe24504957c",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "C-library-unwatched-default": {
+      "higher-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "1d928bec04e27e1be896bb908e741f9e212c007e546fdc753dcc219fb2546ff0",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "trigger"
+        ],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "d997c1a2a0736978343804e48f55e4ef3d33e72f5dba91136869189f7697ffe1",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "cb6c7636d5f4fe04a107ab7f5fe00a1795a2e64203144ea905f28125ddf1baac",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 1,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "25ea7009cf2fcbee9d76901c2f3b00b9c485d0488abda69846c10fc99c911bcc",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "9846e2d34bec8cba83141afc0d876898204d892680781e944ddbafc1a9920167",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 1,
+        "existing_seal_hit": true,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "9846e2d34bec8cba83141afc0d876898204d892680781e944ddbafc1a9920167",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 1,
+        "existing_seal_hit": true,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "cb6c7636d5f4fe04a107ab7f5fe00a1795a2e64203144ea905f28125ddf1baac",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "C-library-unwatched-off": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": false,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "407a525cee4f34dd6596f452c13fa87fad29f1c2ba89ad94e0bb6a870c8e1758",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "407a525cee4f34dd6596f452c13fa87fad29f1c2ba89ad94e0bb6a870c8e1758",
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "62244589c8802f2fe29f416c835d6f346962563eaebe9ad26d252bcbf463958e",
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "62244589c8802f2fe29f416c835d6f346962563eaebe9ad26d252bcbf463958e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "f310796223f320b0b24d651cb0a567a49dc02e74e30fa63e2cbb7fe24504957c",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "f310796223f320b0b24d651cb0a567a49dc02e74e30fa63e2cbb7fe24504957c",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "Cstamp-direct-unwatched-default": {
+      "original-higher": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "62772d9f689faf399bc35106d7ef31b2e7b7fd6b165fad29b45123f11c1c5acf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "overwrite-same-stamp": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "09514770eedfd12ec5cef15c34be25d47cc0c5298a8f14b08a714fb7e765230b",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "repeat-higher": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "62772d9f689faf399bc35106d7ef31b2e7b7fd6b165fad29b45123f11c1c5acf",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "repeat-replacement": {
+        "driver": 1,
+        "existing_seal_hit": true,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "09514770eedfd12ec5cef15c34be25d47cc0c5298a8f14b08a714fb7e765230b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "restore-same-stamp": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "62772d9f689faf399bc35106d7ef31b2e7b7fd6b165fad29b45123f11c1c5acf",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          7
+        ]
+      }
+    },
+    "Cstamp-library-unwatched-default": {
+      "original-higher": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "1d928bec04e27e1be896bb908e741f9e212c007e546fdc753dcc219fb2546ff0",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "overwrite-same-stamp": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "cb6c7636d5f4fe04a107ab7f5fe00a1795a2e64203144ea905f28125ddf1baac",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "repeat-higher": {
+        "driver": 1,
+        "existing_seal_hit": true,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "1d928bec04e27e1be896bb908e741f9e212c007e546fdc753dcc219fb2546ff0",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "repeat-replacement": {
+        "driver": 1,
+        "existing_seal_hit": true,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "cb6c7636d5f4fe04a107ab7f5fe00a1795a2e64203144ea905f28125ddf1baac",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "restore-same-stamp": {
+        "driver": 1,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [],
+        "link_only": [
+          "qa_owned_test"
+        ],
+        "raw": "1d928bec04e27e1be896bb908e741f9e212c007e546fdc753dcc219fb2546ff0",
+        "raw_equals_empty": true,
+        "reports": 1,
+        "verdict": [
+          29,
+          7
+        ]
+      }
+    },
+    "P-direct-declared-default": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "9ef2d3f17b759b640fe7569030c1c59e97af082e187583b231f6c330e37494d6",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "291d2ecf9cd51542431e9f3bc21998a5536a5395b88f83162c515bf43892a8bf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "1061b6977516719f7107c01c5a2cbc07082df92b27a2e90092721461af9602bf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "c782638d3f1c1ccb741d86a5dc9694ff7ac7fc6911b4f84dddff237150d378c3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "91440e64a5a38b4393bd47aa5c3fa7d3133644e14b922d27a3ab422a4bf1f656",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "91440e64a5a38b4393bd47aa5c3fa7d3133644e14b922d27a3ab422a4bf1f656",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "1061b6977516719f7107c01c5a2cbc07082df92b27a2e90092721461af9602bf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "P-direct-declared-off": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "81f9355b957d873b3975ca959288ad990df9518c173edc56864715e4c224f55b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "7e1bdbc41eefa7e0681c5be5d7019776bb3d205d450b29b5bcfe9ca9cf36ff50",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "aef26306f95059a3424a6a44ef4e1f2a5fde8141101c0dbd0281c4a098884d5b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "4653dff8448537d93751422213dd03ef4e1d06096942fa945b9cab2a02051fd3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "4653dff8448537d93751422213dd03ef4e1d06096942fa945b9cab2a02051fd3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "P-direct-unwatched-default": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "9ef2d3f17b759b640fe7569030c1c59e97af082e187583b231f6c330e37494d6",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "291d2ecf9cd51542431e9f3bc21998a5536a5395b88f83162c515bf43892a8bf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "1061b6977516719f7107c01c5a2cbc07082df92b27a2e90092721461af9602bf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "c782638d3f1c1ccb741d86a5dc9694ff7ac7fc6911b4f84dddff237150d378c3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "91440e64a5a38b4393bd47aa5c3fa7d3133644e14b922d27a3ab422a4bf1f656",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "91440e64a5a38b4393bd47aa5c3fa7d3133644e14b922d27a3ab422a4bf1f656",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "1061b6977516719f7107c01c5a2cbc07082df92b27a2e90092721461af9602bf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "P-direct-unwatched-off": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": false,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "7e1bdbc41eefa7e0681c5be5d7019776bb3d205d450b29b5bcfe9ca9cf36ff50",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "7e1bdbc41eefa7e0681c5be5d7019776bb3d205d450b29b5bcfe9ca9cf36ff50",
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "aef26306f95059a3424a6a44ef4e1f2a5fde8141101c0dbd0281c4a098884d5b",
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "aef26306f95059a3424a6a44ef4e1f2a5fde8141101c0dbd0281c4a098884d5b",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "4653dff8448537d93751422213dd03ef4e1d06096942fa945b9cab2a02051fd3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "4653dff8448537d93751422213dd03ef4e1d06096942fa945b9cab2a02051fd3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6e40e2d7536c346c56016f33cc9232bee752cc04a731ff3b4477bdd1a6b9b404",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "P-library-declared-default": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "0e3b870fcefe29b003b151d171d4ae0f30378da1dd72082dca7b2687a98d3b4e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "5009b648847a94801f36bec647cb5e638d4a8f39e25bb1e2482a69199fe69fe3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "593cea9521b8b6d147c15e38e1cf469c3d8ecda85c929a57ec8a6a5d24996669",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "bc713e6d42d232f5e58dd88fa56d79d5ab321bfcea829baa8b6ba6cecfc9c1fb",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "fcc099e9f9f35ceb2bfee252ca9bd5e8aa93e2ead3e1f8107fc57b8f2d404803",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "fcc099e9f9f35ceb2bfee252ca9bd5e8aa93e2ead3e1f8107fc57b8f2d404803",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "593cea9521b8b6d147c15e38e1cf469c3d8ecda85c929a57ec8a6a5d24996669",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "P-library-declared-off": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "67a9322776e299b607a3c6f38fca34e5c4c44b3419c2f8c9f4f47a003669471d",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "407a525cee4f34dd6596f452c13fa87fad29f1c2ba89ad94e0bb6a870c8e1758",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "62244589c8802f2fe29f416c835d6f346962563eaebe9ad26d252bcbf463958e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "f310796223f320b0b24d651cb0a567a49dc02e74e30fa63e2cbb7fe24504957c",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "f310796223f320b0b24d651cb0a567a49dc02e74e30fa63e2cbb7fe24504957c",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "P-library-unwatched-default": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "0e3b870fcefe29b003b151d171d4ae0f30378da1dd72082dca7b2687a98d3b4e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "5009b648847a94801f36bec647cb5e638d4a8f39e25bb1e2482a69199fe69fe3",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "593cea9521b8b6d147c15e38e1cf469c3d8ecda85c929a57ec8a6a5d24996669",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "bc713e6d42d232f5e58dd88fa56d79d5ab321bfcea829baa8b6ba6cecfc9c1fb",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "fcc099e9f9f35ceb2bfee252ca9bd5e8aa93e2ead3e1f8107fc57b8f2d404803",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "fcc099e9f9f35ceb2bfee252ca9bd5e8aa93e2ead3e1f8107fc57b8f2d404803",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "593cea9521b8b6d147c15e38e1cf469c3d8ecda85c929a57ec8a6a5d24996669",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "P-library-unwatched-off": {
+      "higher-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": false,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "higher-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "407a525cee4f34dd6596f452c13fa87fad29f1c2ba89ad94e0bb6a870c8e1758",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "malformed-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "407a525cee4f34dd6596f452c13fa87fad29f1c2ba89ad94e0bb6a870c8e1758",
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": [
+          29,
+          11
+        ]
+      },
+      "malformed-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "missing-no-rust": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "62244589c8802f2fe29f416c835d6f346962563eaebe9ad26d252bcbf463958e",
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "missing-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": null,
+        "raw_equals_empty": null,
+        "reports": 0,
+        "verdict": 101
+      },
+      "repair-before-missing": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "62244589c8802f2fe29f416c835d6f346962563eaebe9ad26d252bcbf463958e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          13
+        ]
+      },
+      "restored-rust-edit": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "f310796223f320b0b24d651cb0a567a49dc02e74e30fa63e2cbb7fe24504957c",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "restored-unchanged": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "f310796223f320b0b24d651cb0a567a49dc02e74e30fa63e2cbb7fe24504957c",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          19
+        ]
+      },
+      "unchanged-lower": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 0,
+        "full": [],
+        "link_only": [],
+        "raw": "6062375a08acb2c22d2973feac2a235622356b7a4ff3172b6546f03714ebaf9f",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      }
+    },
+    "Pstamp-direct-unwatched-default": {
+      "original-higher": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "9ef2d3f17b759b640fe7569030c1c59e97af082e187583b231f6c330e37494d6",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "overwrite-same-stamp": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "1061b6977516719f7107c01c5a2cbc07082df92b27a2e90092721461af9602bf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "repeat-higher": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "9ef2d3f17b759b640fe7569030c1c59e97af082e187583b231f6c330e37494d6",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "repeat-replacement": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "1061b6977516719f7107c01c5a2cbc07082df92b27a2e90092721461af9602bf",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "restore-same-stamp": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "9ef2d3f17b759b640fe7569030c1c59e97af082e187583b231f6c330e37494d6",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      }
+    },
+    "Pstamp-library-unwatched-default": {
+      "original-higher": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "build_script_build",
+          "qa_owned_test",
+          "trigger"
+        ],
+        "link_only": [],
+        "raw": "0e3b870fcefe29b003b151d171d4ae0f30378da1dd72082dca7b2687a98d3b4e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "overwrite-same-stamp": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "593cea9521b8b6d147c15e38e1cf469c3d8ecda85c929a57ec8a6a5d24996669",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "repeat-higher": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "0e3b870fcefe29b003b151d171d4ae0f30378da1dd72082dca7b2687a98d3b4e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      },
+      "repeat-replacement": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "593cea9521b8b6d147c15e38e1cf469c3d8ecda85c929a57ec8a6a5d24996669",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          17,
+          7
+        ]
+      },
+      "restore-same-stamp": {
+        "driver": 0,
+        "existing_seal_hit": false,
+        "final_ld": 1,
+        "full": [
+          "barrier",
+          "qa_owned_test"
+        ],
+        "link_only": [],
+        "raw": "0e3b870fcefe29b003b151d171d4ae0f30378da1dd72082dca7b2687a98d3b4e",
+        "raw_equals_empty": true,
+        "reports": 0,
+        "verdict": [
+          29,
+          7
+        ]
+      }
+    }
+  }
+}
