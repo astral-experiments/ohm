@@ -1,0 +1,130 @@
+diff --git a/crates/ruff_linter/resources/mdtest/flake8-return/superfluous-else-return.md b/crates/ruff_linter/resources/mdtest/flake8-return/superfluous-else-return.md
+new file mode 100644
+index 0000000000..2246bd5b53
+--- /dev/null
++++ b/crates/ruff_linter/resources/mdtest/flake8-return/superfluous-else-return.md
+@@ -0,0 +1,40 @@
++# `superfluous-else-return` (`RET505`)
++
++```toml
++lint.select = ["RET505"]
++```
++
++## Multiple leading comments
++
++Removing the `else` dedents its body based on the first statement, regardless of the indentation of
++leading comments. The second `return` stays outside the `if`, so `f(False)` still returns `2`.
++
++```py
++def f(condition):
++    if condition:
++        return 1
++    else:  # snapshot: superfluous-else-return
++        # First comment.
++          # Second comment.
++        return 2
++```
++
++```snapshot
++error[RET505]: Unnecessary `else` after `return` statement
++ --> src/mdtest_snippet.py:4:5
++  |
++4 |     else:  # snapshot: superfluous-else-return
++  |     ^^^^
++help: Remove unnecessary `else`
++  |
++3 |         return 1
++  -     else:  # snapshot: superfluous-else-return
++  -         # First comment.
++  -           # Second comment.
++  -         return 2
++4 +     # snapshot: superfluous-else-return
++5 +     # First comment.
++6 +       # Second comment.
++7 +     return 2
++  |
++```
+diff --git a/crates/ruff_linter/src/rules/pylint/snapshots/ruff_linter__rules__pylint__tests__collapsible-else-if_collapsible_else_if.py.snap b/crates/ruff_linter/src/rules/pylint/snapshots/ruff_linter__rules__pylint__tests__collapsible-else-if_collapsible_else_if.py.snap
+index 7d26d79e5e..d38943662b 100644
+--- a/crates/ruff_linter/src/rules/pylint/snapshots/ruff_linter__rules__pylint__tests__collapsible-else-if_collapsible_else_if.py.snap
++++ b/crates/ruff_linter/src/rules/pylint/snapshots/ruff_linter__rules__pylint__tests__collapsible-else-if_collapsible_else_if.py.snap
+@@ -272,18 +272,18 @@ PLR5501 [*] Use `elif` instead of `else` then `if`, to reduce indentation
+ help: Convert to `elif`
+     |
+ 138 |         pass
+-139 +         # inner comment which has mixed
+-140 +     # indentation levels
+-141 +             # which is pretty weird
+-142 +     elif 2:
+-143 +         pass
+-144 |     else:
++    -     else:
+     -             # inner comment which has mixed
+-    -         # indentation levels
++139 +     # inner comment which has mixed
++140 |         # indentation levels
+     -                 # which is pretty weird
+     -         if 2:
+     -             pass
+     -         else:
+     -             pass  # final pass comment
++141 +         # which is pretty weird
++142 +     elif 2:
++143 +         pass
++144 +     else:
+ 145 +         pass  # final pass comment
+     |
+diff --git a/crates/ruff_python_trivia/src/textwrap.rs b/crates/ruff_python_trivia/src/textwrap.rs
+index df7b1618de..c9afa786cd 100644
+--- a/crates/ruff_python_trivia/src/textwrap.rs
++++ b/crates/ruff_python_trivia/src/textwrap.rs
+@@ -225,8 +225,10 @@ pub fn dedent_to(text: &str, indent: &str) -> Option<String> {
+ 
+             let indent_len = trimmed_start_of_line_formfeed.len() - trimmed.len();
+ 
+-            if trimmed.starts_with('#') && first_comment_indent.is_none() {
+-                first_comment_indent = Some(indent_len);
++            if trimmed.starts_with('#') {
++                if first_comment_indent.is_none() {
++                    first_comment_indent = Some(indent_len);
++                }
+                 None
+             } else {
+                 Some(indent_len)
+@@ -592,11 +594,35 @@ mod tests {
+         ].join("\n");
+         let y = [
+             "  # foo",
+-            "  # bar",
++            "    # bar",
+             "# baz"
+         ].join("\n");
+         assert_eq!(dedent_to(&x, "  "), Some(y));
+ 
++        let x = [
++            "       # foo",
++            "       # bar",
++            "        return 2",
++        ].join("\n");
++        let y = [
++            "       # foo",
++            "       # bar",
++            "    return 2",
++        ].join("\n");
++        assert_eq!(dedent_to(&x, "    "), Some(y));
++
++        let x = [
++            "        # foo",
++            "          # bar",
++            "        return 2",
++        ].join("\n");
++        let y = [
++            "    # foo",
++            "      # bar",
++            "    return 2",
++        ].join("\n");
++        assert_eq!(dedent_to(&x, "    "), Some(y));
++
+         let x = [
+             "  # foo",
+             "    bar",

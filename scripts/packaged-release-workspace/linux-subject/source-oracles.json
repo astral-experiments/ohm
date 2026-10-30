@@ -1,0 +1,24 @@
+{
+  "historical_commit": "83a3afc3156d73ae4296f3fa74ede28e4c72bfcd",
+  "oracles": {
+    "original": "       # foo\n       # bar\n    return 2",
+    "restored": "       # foo\n       # bar\n    return 2",
+    "reversed": "    # foo\n    # bar\n     return 2"
+  },
+  "patch_sha256": "9dc8166f1280da1c57cdfce63c5e78fb9b1b67f0c5ed9769fc5f7c619c785f6a",
+  "ruff": "93526150df078af7dd8fc4226cdcc469539d2001",
+  "source": {
+    "crates/ruff_linter/resources/mdtest/flake8-return/superfluous-else-return.md": {
+      "original": "f540703fc021735d0439e7c369ff4cb78e5fee682eb3f841d4b742860cf874f3",
+      "reversed": null
+    },
+    "crates/ruff_linter/src/rules/pylint/snapshots/ruff_linter__rules__pylint__tests__collapsible-else-if_collapsible_else_if.py.snap": {
+      "original": "c6a3506a96f7de2fc25ab42cab1aca854f61ad6b0dffcbff48ffc34f654fd863",
+      "reversed": "9e6bde6977d07a569d5bd5d6aa079922e5b227528ba6289db3e2f21c4a46f1ea"
+    },
+    "crates/ruff_python_trivia/src/textwrap.rs": {
+      "original": "28924b3e970299c42f667703bf8fc803f5ed17f28363d0821f7a571275dbd273",
+      "reversed": "a4b093032e40a7253daa36bfb8fdaf522bee0c037baf0066e47588669cf238d5"
+    }
+  }
+}
