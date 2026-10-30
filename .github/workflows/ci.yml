@@ -8,6 +8,7 @@ on:
         default: ty-project
         options:
           - ty-project
+          - ty-oracle
           - ruff-cli
 permissions:
   contents: read
@@ -69,7 +70,7 @@ jobs:
           python3 -IB scripts/ohm-gnu-ty-input-census/census.py --self-test
           python3 -IB scripts/ohm-gnu-ty-input-census/census.py
       - name: Inspect the remaining three registry code generators and one unchanged instruction profile
-        if: inputs.workload != 'ruff-cli'
+        if: inputs.workload == 'ty-project'
         run: |
           export CENSUS_ROOT="$RUNNER_TEMP/gnu-ty-marker-census"
           export CENSUS_SDK="$RUNNER_TEMP/gnu-reviewer-ingress/reviewer-sdk"
