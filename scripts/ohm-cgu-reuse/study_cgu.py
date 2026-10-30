@@ -147,7 +147,7 @@ def profile_ruff(role):
     return {k:{'total':len(v['cgus']),'physical':len(v['actual']['physical_codegen']),'same_ordinary':v['compared_to_ordinary']} for k,v in rows.items()}
 
 def main():
-    need(PARENT=='82911b516fb35608fd70ada4deb6f8429277f410' and CHILD=='919199fc9c2b05ee49ccf7da4d53ec68ef117e5f','different Rust subjects')
+    need(PARENT=='82911b516fb35608fd70ada4deb6f8429277f410' and CHILD=='f69f7b7cf6de57972b310900decfac2d3a0c6fd6','different Rust subjects')
     stable_selector()
     def retire(name):
         for n in ('target','shared','cargo-home'):

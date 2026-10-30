@@ -13,10 +13,11 @@ if [[ "${1:-build}" == build ]]; then
     python3 -IB "$transport/crc/prepare.py" "$src" > "$log/crc-transport.json"
     python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-cgu-reuse/transport/prepare.py" "$src" > "$log/cgu-transport.json"
     python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-cgu-reuse/transport/guard/prepare.py" "$src" > "$log/external-input-transport.json"
+    python3 -IB "$GITHUB_WORKSPACE/scripts/ohm-cgu-reuse/transport/host/prepare.py" "$src" > "$log/host-tuning-transport.json"
 fi
 cd "$src"
 parent=82911b516fb35608fd70ada4deb6f8429277f410
-child=919199fc9c2b05ee49ccf7da4d53ec68ef117e5f
+child=f69f7b7cf6de57972b310900decfac2d3a0c6fd6
 test "$(git rev-parse "$child^^")" = "$parent"
 test "$(git rev-parse "$parent:compiler")" = 019b0e35598a054357018731f9f8426c0520fc53
 test "$(git rev-parse "$child:compiler")" = 0640088775e03b6948942395dcdeb7220def02a0

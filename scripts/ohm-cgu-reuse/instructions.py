@@ -18,7 +18,7 @@ from study import load, need, save, sha
 
 GOLD = count_cycle.GOLDEN
 ALLOCS = tuple(itertools.combinations(range(12), 6))
-SEED = b"ohm:independent-cgus:919199fc:ef23c9c3:whole-cargo-ir-v2"
+SEED = b"ohm:independent-cgus:f69f7b7c:ef23c9c3:whole-cargo-ir-v3"
 SELECTION = ALLOCS[int.from_bytes(hashlib.sha256(SEED).digest(), "big") % len(ALLOCS)]
 
 
