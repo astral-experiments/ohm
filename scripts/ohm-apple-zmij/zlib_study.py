@@ -9,6 +9,7 @@ from pathlib import Path
 from dyld import check as check_dyld
 from execs import ExecTrace
 from macho_paths import compare
+from local_incremental import observed, preparation
 from measure import capture, fresh, native_rows, retire, select
 from native_inputs import run_archive_check
 from prepare import prepare_ruff
@@ -113,6 +114,7 @@ def phase(root, work, sdk, env, out, step, rev, trace):
     arts = [r for r in messages if r["reason"]=="compiler-artifact"]
     native = native_rows(events,sdk)
     need(native["scope"]=="kernel-exec" and native["cargo"]==1 and all(x["stock"] for x in native["linkers"]), "incomplete kernel trace")
+    observed(work, sdk, env, out, events, step)
     zlib = zlib_units(arts,work,out)
     # Cargo can report dirty before the native scheduler chooses a less expensive action.
     # Retain every typed row above and use the enrolled kernel compiler PIDs as the physical census.
@@ -148,6 +150,7 @@ def installation(root, role, out, trace):
     results = {}
     for group, steps in (("clean-old",[("clean",OLD)]),("clean-new",[("clean",NEW)]),("visits",PHASES)):
         fresh(work,root/"seed")
+        save(out/group/"initial-empty.json", preparation(work))
         previous = None
         result = {}
         for step,rev in steps:
@@ -162,9 +165,8 @@ def installation(root, role, out, trace):
     need((stat.st_dev,stat.st_ino,stat.st_ctime_ns)==(after.st_dev,after.st_ino,after.st_ctime_ns) and id_before==sdk_id(sdk,env), "compiler installation changed")
     refs = {rev:results[group]["clean"] for rev,group in ((OLD,"clean-old"),(NEW,"clean-new"))}
     need(refs[OLD]["product"]["zip_sha256"]!=refs[NEW]["product"]["zip_sha256"] and refs[OLD]["product"]["raw"]!=refs[NEW]["product"]["raw"], "historical edit did not change product")
-    for row in results["visits"].values():
-        if row["product"]:
-            need(row["product"]==refs[row["rev"]]["product"], "whole returned program differs from independent clean")
+    comparisons = {phase: row["product"] == refs[row["rev"]]["product"] for phase,row in results["visits"].items() if row["product"]}
+    save(out/"own-clean-comparisons.json", comparisons)
     return refs, results["visits"]
 
 

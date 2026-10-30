@@ -11,6 +11,7 @@ import zipfile
 
 from cohort import fingerprint_sources, summarize
 from execs import ExecTrace
+from local_incremental import census, check_cache, environment_receipt, preparation
 from macho_paths import compare
 from measure import capture, fresh, retire, select
 from native_inputs import run_archive_check
@@ -19,7 +20,7 @@ from ty_disk import snapshot
 from zlib_study import CMD, NEW, OLD, checkout, installation, product
 
 ENDPOINTS=("edit","repeat-1","repeat-2")
-ALLOCATION=int(digest(("crc typeshed on exact 735e1528, inclusive complete-compile 12 v2 / "+PARENT+CHILD+OLD+NEW).encode()),16)%924
+ALLOCATION=int(digest(("crc typeshed on exact 735e1528, ordinary local incremental complete-compile 12 v1 / "+PARENT+CHILD+OLD+NEW).encode()),16)%924
 FIRST=set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS={"screen":["PC","CP"],"confirmation":["PC" if i in FIRST else "CP" for i in range(12)]}
 
@@ -105,6 +106,8 @@ def anchored(root,role,phase):
 def timed(root, out, role):
     work=root/"crc-work";repo=root/"ruff";sdk=select(root,role);env=env_for(work,sdk)
     check_host(root,8);fresh(work,root/"seed"); before=sdk_id(sdk,env)
+    save(out/"initial-empty.json", preparation(work))
+    save(out/"development-environment.json", environment_receipt(env))
     saved=work/"clock-hold";need(not saved.exists(),"stale timed program")
     pending=[]
     deps=None
@@ -124,6 +127,10 @@ def timed(root, out, role):
         need(set(members)==set(deps),"zlib outputs changed")
         markers=[deps[v].read_bytes() for v in members]
         pending.append((phase,rev,cap,msgs,arts,sig,clock,held,markers))
+    relative = load(root/'receipts/crc-clock-before/PC'/role/'visits/edit/local-incremental.json')['cache']['root']
+    final_cache = census(work, relative)
+    save(out/'local-incremental-final.json', final_cache)
+    check_cache(final_cache)
     rows={}
     for phase,rev,cap,msgs,arts,sig,clock,held,markers in pending:
         ref,wanted=anchored(root,role,phase)
@@ -146,14 +153,16 @@ def timed(root, out, role):
 def initial(root):
     from receipt_cargo import CANDIDATE
     native=load(root/'receipts/provider-matrix/terminal.json')
-    need(native['passed'] and native['commands']==392, 'CRC provider safety rejected the stack')
-    out=root/'receipts/crc-clock-before'; trace=ExecTrace();trace.ready();eligible=True
+    need(native['commands']==392, 'incomplete provider acquisition')
+    out=root/'receipts/crc-clock-before'; trace=ExecTrace();trace.ready();eligible=native["passed"]
     try:
         for order in ('PC','CP'):
             refs={};baseline={}
             for role in order:
                 check_host(root,8)
-                refs[role],baseline[role]=installation(root,role,out/order/role,trace)
+                where = out/order/role
+                refs[role],baseline[role]=installation(root,role,where,trace)
+                eligible = eligible and all(load(where/'own-clean-comparisons.json').values())
             per={}
             for step in ENDPOINTS:
                 phases={}
@@ -168,22 +177,29 @@ def initial(root):
                        'hard':[x['hard'] for x in row['zlib']],'recheck':[x['recheck'] for x in row['zlib']]}
                     phases[r]=p
                 p,c=phases['P'],phases['C']
-                retained=['build_script_build','ty_vendored']
-                passed=(c['full']==retained and p['full']==retained+['zlib_rs','zlib_rs']
-                        and len(p['hard'])==len(c['hard'])==2 and all(p['hard']) and not any(c['hard']) and all(c['recheck'])
-                        and all(not role['link_only'] and role['ld']==2 and role['root_ld']==role['build_script_ld']==1
-                                and role['driver']==1 and role['sealed_output'] for role in (p,c)))
+                # The developer profile is independently enrolled. Local scheduling can differ from CI.
+                # Attribute the two registry compiles physically and charge all remaining work.
+                passed=(p['zlib_full']==2 and c['zlib_full']==0 and
+                        len(p['hard'])==len(c['hard'])==2 and all(p['hard']) and not any(c['hard']) and all(c['recheck']) and
+                        all(q['sealed_output'] and q['ld']==q['root_ld']+q['build_script_ld'] for q in (p,c)))
                 eligible=eligible and passed;per[step]={'passed':passed,'roles':phases}
             for rev in (OLD,NEW):
                 arms={}
                 for role in 'PC':
                     row=refs[role][rev];image=gzip.decompress((root/'receipts/crc-programs'/(row['product']['raw']+'.gz')).read_bytes())
                     arms[role]=image,row['output'],row['root_link_argv'][0]
-                save(out/order/(rev+'-cross.json'),compare(arms))
+                try:
+                    cross = compare(arms)
+                except (RuntimeError, ValueError) as error:
+                    cross = {'rejected': str(error), 'raw': {r:digest(arms[r][0]) for r in 'PC'}}
+                    eligible = False
+                save(out/order/(rev+'-cross.json'),cross)
             save(out/order/'verdict.json',per)
+        left,right=[load(out/order/'verdict.json') for order in ('PC','CP')]
+        need(left==right, 'native local phase oracles differed between mirrored installations')
         for role in 'PC':run_archive_check(root,role,trace)
     finally:trace.close()
-    gate={'cargo':CANDIDATE,'rust':[PARENT,CHILD],'ruff':[OLD,NEW],'structural':eligible,'provider':sha(root/'receipts/provider-matrix/terminal.json'),'harness':fingerprint_sources()}
+    gate={'cargo':CANDIDATE,'rust':[PARENT,CHILD],'ruff':[OLD,NEW],'structural':eligible,'provider_passed':native['passed'],'provider':sha(root/'receipts/provider-matrix/terminal.json'),'harness':fingerprint_sources()}
     save(root/'receipts/declared-crc-subject.json',gate);print('structural',eligible,flush=True)
 
 

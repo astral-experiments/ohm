@@ -142,6 +142,9 @@ def env_for(root, sdk):
             ("CARGO_", "RUSTC_", "RUSTDOC_", "RUSTUP_", "RUSTFLAGS", "DYLD_", "OHM_")
         ) or key in ("RUSTC", "RUSTDOC", "GH_TOKEN", "GITHUB_TOKEN", "RUSTC_BOOTSTRAP"):
             del environment[key]
+    if Path(sdk).name == "native":
+        from local_incremental import developer_environment
+        environment = developer_environment(os.environ)
     environment.update(
         RUSTUP_HOME=str(rustup),
         CARGO_HOME=str(root / "cargo-home"),

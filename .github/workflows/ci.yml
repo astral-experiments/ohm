@@ -1,12 +1,12 @@
-name: Native Apple inclusive CRC costs on fixed Cargo 293
+name: Native Apple developer-incremental CRC costs on fixed Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: apple-crc-on-cargo-293-${{ github.ref }}
+  group: apple-crc-local-incremental-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  crc-on-293:
+  local-crc-on-293:
     runs-on: namespace-profile-macos-15
     timeout-minutes: 250
     env:
@@ -21,24 +21,24 @@ jobs:
           python-version: '3.13'
       - name: Freeze and verify subjects, clock design and native execution observer
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-crc-local-incremental"
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/crc293-inclusive-plan.md "$root/receipts/registration.md"
+          cp scripts/ohm-apple-zmij/crc293-local-incremental-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-crc-local-incremental"
           mkdir "$root/assets"
           gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
           python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
           python3 -IB scripts/ohm-apple-zmij/run.py zlib_study seed "$root"
       - name: Bootstrap source-bound 444c and 82911b and run both native compiler tests
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-crc-local-incremental"
           python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
           if ! command -v ninja >/dev/null; then brew install ninja; fi
           (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
@@ -47,50 +47,50 @@ jobs:
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
       - name: Build unmodified Cargo 735e and bind exactly one Mach-O to both compilers
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-crc-local-incremental"
           python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$root"
           python3 -IB scripts/ohm-apple-zmij/fixed_crc.py pin "$root"
       - name: Test direct and transitive provider safety before any clocks
         id: provider
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-crc-local-incremental"
           python3 -IB scripts/ohm-apple-zmij/fixed_crc.py providers "$root"
           python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/provider-matrix/terminal.json" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: crc-on-293-provider
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
+          name: crc-local-incremental-provider
+          path: ${{ runner.temp }}/apple-crc-local-incremental/receipts
           retention-days: 14
           if-no-files-found: warn
-      - name: Two independently rooted orders, actual Ruff links, invalid source, archive repair and clean references
+      - name: Two unscored ordinary developer orders, real incremental CGUs, invalid edits, native security and clean controls
         id: structural
-        if: steps.provider.outputs.passed == 'true'
+        if: steps.provider.outcome == 'success'
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-crc-local-incremental"
           python3 -IB scripts/ohm-apple-zmij/run.py crc_clock structural "$root"
           python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["structural"]).lower())' "$root/receipts/declared-crc-subject.json" >> "$GITHUB_OUTPUT"
       - name: Mirrored ordinary untraced timers accounting for all native rechecks
         id: pilot
         if: steps.structural.outputs.passed == 'true'
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-crc-local-incremental"
           python3 -IB scripts/ohm-apple-zmij/run.py crc_clock screen "$root"
           python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["valid"]).lower())' "$root/receipts/crc-clock-screen/result.json" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: crc-on-293-pilots
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
+          name: crc-local-incremental-pilots
+          path: ${{ runner.temp }}/apple-crc-local-incremental/receipts
           retention-days: 14
           if-no-files-found: warn
       - name: Twelve independent balanced pairs after both valid pilots, including sub-twofold pilots
         if: steps.pilot.outputs.passed == 'true'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py crc_clock confirmation "$RUNNER_TEMP/apple-crc-on-293"
+        run: python3 -IB scripts/ohm-apple-zmij/run.py crc_clock confirmation "$RUNNER_TEMP/apple-crc-local-incremental"
       - name: Record the actual terminal gate, including any under-twofold or skipped result
         if: always()
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-crc-local-incremental"
           python3 -IB - "$root/receipts" <<'PYCODE'
           import json,pathlib,sys
           root=pathlib.Path(sys.argv[1]);root.mkdir(exist_ok=True,parents=True)
@@ -103,7 +103,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: crc-on-293-final
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
+          name: crc-local-incremental-final
+          path: ${{ runner.temp }}/apple-crc-local-incremental/receipts
           retention-days: 14
           if-no-files-found: warn

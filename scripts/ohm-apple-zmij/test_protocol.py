@@ -22,6 +22,32 @@ from wrapper import WrapperTrace, compiler_selector
 
 
 class Protocol(unittest.TestCase):
+    def test_local_developer_env_and_incremental_work_products(self):
+        from local_incremental import census, check_cache, developer_environment, environment_receipt, increment_dirs, local_path, preparation
+        with tempfile.TemporaryDirectory() as tmp:
+            top = Path(tmp).resolve()
+            sdk = top/'native'; sdk.mkdir()
+            work = top/'unit'; (work/'target').mkdir(parents=True); (work/'shared').mkdir()
+            self.assertEqual(preparation(work), {'target_entries':0, 'shared_entries':0})
+            host = {'HOME':tmp, 'PATH':'/usr/bin', 'CI':'','TF_BUILD':'true','GITHUB_ACTIONS':'true',
+                    'CARGO_INCREMENTAL':'0','RUSTFLAGS':'-Cincremental=/injected','GITHUB_TOKEN':'unrelated','RUNNER_OS':'hosted'}
+            self.assertEqual(developer_environment(host), {'HOME':tmp, 'PATH':'/usr/bin'})
+            with patch.dict(os.environ, host, clear=True):
+                env = study.env_for(work, sdk)
+            self.assertTrue(environment_receipt(env))
+            with self.assertRaises(RuntimeError): environment_receipt({**env,'CI':''})
+            obj = work/'shared'/'private'/'incremental'/'ty_vendored-unique'/'s-current'
+            obj.mkdir(parents=True)
+            for name in ('query-cache.bin','dep-graph.bin','work-products.bin','1.abc.o'):(obj/name).write_bytes(name.encode())
+            base=obj.parent.parent; rel=local_path(work,base)
+            for argv in (['-C','incremental='+str(base)], ['-Cincremental='+str(base)]):
+                self.assertEqual(increment_dirs(argv), [str(base)])
+            self.assertEqual(increment_dirs(['--cfg','incremental=test']), [])
+            with self.assertRaises(RuntimeError): local_path(work,top/'other-directory')
+            cache=census(work,rel);check_cache(cache);self.assertEqual(cache['objects'],1)
+            (obj/'work-products.bin').unlink()
+            with self.assertRaises(RuntimeError): check_cache(census(work,rel))
+
     def test_balanced_order(self):
         seed = f"ohm/Apple-zmij/confirm/1:{study.ARCHIVE_SHA}:{study.EDIT}"
         value = int.from_bytes(hashlib.sha256(seed.encode()).digest(), "big")

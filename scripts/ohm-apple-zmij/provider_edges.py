@@ -229,6 +229,8 @@ def run_case(root, trace, role, placement, watch, defaults, bodies, *, visits=ST
     driver,=(sdk/"lib").glob("librustc_driver*.dylib")
     ident={**physical(driver),"ctime_ns":driver.stat().st_ctime_ns}
     need(ident["sha256"]==load(root/"receipts/pair.json")["products"][role]["runtime"]["lib/"+driver.name],"wrong driver")
+    from local_incremental import environment_receipt
+    save(out/"development-environment.json", environment_receipt(env))
     trigger=form(src,placement,watch=="declared")
     trigger.write_text("#[inline(never)] pub fn value()->i32 {7}\n")
     run(["cargo","+ohm","generate-lockfile","--offline"],cwd=src,env=env)
