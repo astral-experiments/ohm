@@ -24,6 +24,19 @@ The median within-triplet speedups versus the default were 3.27× (3.19–3.28) 
 
 Empty builds provided separate native references for each arm and checkout. Every positive visit reproduced its reference reader executable, native archive object payloads and matching expression layout. A contrary typed layout failed, the invalid parser edit failed, and the repaired edit succeeded. In all 288 successful confirmation visits, at least one archive differed from its clean reference in `lib.rmeta`. Native object bytes and normalized link indexes agreed in every comparison. In a native archive control the caller changed from 17 to 29, a truncated library failed and the repaired executable matched clean.
 
+## Compiler instructions on the two branch returns
+
+Two additional triplets ran in opposite arm orders. Each return invoked exactly two compilers, for `ruff_python_ast` and `ruff_python_parser`, and zero Wild linkers. The table sums complete Callgrind `Ir` counts for those two rustc processes. It excludes Cargo and the independently executed native verifier. The time measurements above come from separate runs.
+
+| Return and run order | Default | Current branch-cache draft | Packed | Default / packed |
+| --- | ---: | ---: | ---: | ---: |
+| Parent, forward | 67.657 B | 13.433 B | 13.929 B | 4.857× |
+| Parent, reverse | 67.637 B | 13.431 B | 13.936 B | 4.853× |
+| Feature, forward | 67.925 B | 16.922 B | 17.657 B | 3.847× |
+| Feature, reverse | 67.959 B | 16.922 B | 17.662 B | 3.848× |
+
+Packing added 3.69–3.77% to compiler instructions on the return to the parent and 4.35–4.38% on the return to the feature, relative to keeping the old objects uncompressed. The raw verifier sums the exclusive instruction counts in each profile, validates the terminal counter, process identity and captured compiler arguments, and reopens the observed native outputs against independently clean builds.
+
 ## Replay
 
 With Python 3.11 or newer, run the commands in this directory.
@@ -31,10 +44,17 @@ With Python 3.11 or newer, run the commands in this directory.
 ```sh
 sha256sum -c SHA256SUMS
 python3 -IB verify.py
+python3 -IB verify_instructions.py
 ```
 
 The compressed observations include every ordinary elapsed time and disk measurement for the two pilot and twelve confirmation triplets, native compiler and linker counts, reference identities and result hashes. To repeat the full check against the hosted archive, download the `packed-object-ruff-ordinary` artifact while it is available and supply the original ZIP. Its SHA-256 is `6b57edb09de2a77f6dbec1fe4bb0b80c9aac845bbc7a001b3019f62e76570218`.
 
 ```sh
 python3 -IB verify.py --raw /path/to/packed-object-ruff-ordinary.zip
+```
+
+To repeat the counter verification, also download `packed-object-ruff-instructions` from the same run. Its SHA-256 is `e8b5cf57d5879b7c688206d1a16e89b471ae5f6dd5d11b375cd6d1473bb92a81`.
+
+```sh
+python3 -IB verify_instructions.py --raw /path/to/packed-object-ruff-ordinary.zip /path/to/packed-object-ruff-instructions.zip
 ```
