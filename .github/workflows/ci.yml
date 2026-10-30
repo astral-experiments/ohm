@@ -1,40 +1,26 @@
-name: Isolate the signed Linux Insta archive timestamp
+name: Signed Linux ty_project check Ron instruction fraction
 on:
   workflow_dispatch:
     inputs:
       task:
-        description: Run the frozen single-target structural diagnostic
+        description: Execute the one ordinary check and its conditional off-clock profile
         type: choice
         required: true
-        options: [insta-archive]
+        options: [ron-check]
 permissions:
   contents: read
   actions: read
 jobs:
-  reader:
-    name: Compare existing ${{ matrix.receiver }} Cargo on the signed Linux test
-    if: ${{ inputs.task == 'insta-archive' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-insta-archive-time-20261030' }}
-    permissions:
-      contents: read
-      actions: read
+  ordinary:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-ron-check-20261030' && inputs.task == 'ron-check'
     runs-on: namespace-profile-ubuntu-24-04-16
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        receiver: [shipped, strict-293]
-    timeout-minutes: 65
-    defaults:
-      run:
-        working-directory: ${{ github.workspace }}
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          path: focus
+          path: protocol
           persist-credentials: false
-          sparse-checkout: |
-            scripts/ohm-cargo-301-linux-ci
-            scripts/insta-archive-diagnostic
+          sparse-checkout: scripts/ron-check-share
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
@@ -43,28 +29,27 @@ jobs:
           sparse-checkout: scripts/packaged-release-workspace
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          path: existing-qa
-          ref: b3a1bbd38e07293168f06cb21648821b8cacd206
+          ref: 927e20bcad028e5ed4290a58bd330a258ee5da41
+          path: existing-counter
           persist-credentials: false
-          sparse-checkout: scripts/ohm-aarch64-fallback
+          sparse-checkout: scripts/ohm-gnu-syscall
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify tools and acquire the single native target history
+      - name: Acquire and count the two native commands
         env:
           QUALIFICATION_TOKEN: ${{ github.token }}
-          FOCUSED_CARGO: ${{ matrix.receiver }}
         run: |
           set -eu
           test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
+          test "$(git -C existing-counter rev-parse HEAD)" = 927e20bcad028e5ed4290a58bd330a258ee5da41
           sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends strace ninja-build
-          python3 -IB focus/scripts/insta-archive-diagnostic/study.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-qa/scripts/ohm-aarch64-fallback/acquire.py"
+          sudo apt-get install -y --no-install-recommends ninja-build
+          python3 -IB protocol/scripts/ron-check-share/measure.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: ${{ always() }}
+        if: always()
         with:
-          name: insta-archive-${{ matrix.receiver }}-published-21-ty-server-e2e
-          path: ${{ runner.temp }}/packaged-linux-50/diagnostic
-          if-no-files-found: warn
-          compression-level: 0
+          name: signed-21-ty-project-check-instructions
+          path: ${{ runner.temp }}/ordinary-ron-check/packet
           retention-days: 7
+          if-no-files-found: warn
