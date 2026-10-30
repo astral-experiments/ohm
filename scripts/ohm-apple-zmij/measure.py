@@ -76,6 +76,18 @@ def select(root, role):
     return sdk
 
 
+def stock_linker(path, ld):
+    """Resolve Xcode's active native linker or its separately installed Apple variant by inode."""
+    if not path.is_file():
+        return False
+    if path.samefile(ld):
+        return True
+    if path.name not in ("ld-classic", "ld-prime", "ld64"):
+        return False
+    found = subprocess.run(["xcrun", "--find", path.name], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    return found.returncode == 0 and path.samefile(found.stdout.decode().strip())
+
+
 def native_rows(rows, sdk):
     partial = bool(rows and rows[0].get("scope") == "compiler-wrapper-unscored")
     if partial:
@@ -107,7 +119,7 @@ def native_rows(rows, sdk):
             and path.samefile(ld)
         ):
             linkers.append(
-                {"name": path.name, "sha": sha(path), "stock": path.samefile(ld), "argv": r["argv"]}
+                {"name": path.name, "sha": sha(path), "stock": stock_linker(path, ld), "argv": r["argv"]}
             )
     return {
         "scope": "compiler-wrapper-unscored" if partial else "kernel-exec",

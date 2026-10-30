@@ -72,7 +72,7 @@ class ExecTrace:
                 self.errors.append(type(e).__name__ + ": " + str(e)[:150])
                 pending = ""
 
-    def command(self, argv, *, env, cwd, out, err, timeout=600):
+    def command(self, argv, *, env, cwd, out, err, timeout=600, observed_rows=None):
         # Hold before the real exec so a fast child cannot beat group registration.
         r, w = os.pipe()
         pid = os.fork()
@@ -90,7 +90,7 @@ class ExecTrace:
             except BaseException:
                 os._exit(123)
         os.close(r)
-        rows = self.groups[pid] = []
+        rows = self.groups[pid] = [] if observed_rows is None else observed_rows
         os.write(w, b"1")
         os.close(w)
         expired = threading.Event()

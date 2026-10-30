@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import shlex
 import subprocess
 import sys
 import tarfile
@@ -10,7 +11,7 @@ import tempfile
 from pathlib import Path
 
 from execs import ExecTrace
-from measure import capture, fresh, installation, marked, native_rows, retire, typed
+from measure import capture, fresh, installation, marked, native_rows, retire, stock_linker, typed
 from native_inputs import run_archive_check
 from objects import bag
 from wrapper import WrapperTrace
@@ -39,6 +40,13 @@ from study import (
 VECTOR = b'asm!("/*{:v}*/", inout(vreg) extended);'
 
 
+def has_output(argv, output):
+    return any(
+        flag == "-o" and Path(p).is_file() and Path(p).samefile(output)
+        for flag, p in zip(argv, argv[1:])
+    )
+
+
 def observer_probe(root):
     probe = root / "observer"
     probe.mkdir()
@@ -46,30 +54,74 @@ def observer_probe(root):
     ld = Path(run(["xcrun", "--find", "ld"]).decode().strip())
     source = probe / "main.c"
     source.write_text("int main(void){return 29;}\n")
-    output = probe / "linked"
-    trace = ExecTrace()
-    try:
-        trace.ready()
+    def invoke(label, trace):
+        output = probe / ("linked-" + label)
+        argv = [clang, "-v", str(source), "-o", str(output)]
+        dest = root / "receipts/observer-probe" / label
+        dest.mkdir(parents=True)
+        rows, code = [], None
         with tempfile.TemporaryFile() as o, tempfile.TemporaryFile() as e:
-            code, rows = trace.command(
-                [clang, str(source), "-o", str(output)], env=os.environ, cwd=probe, out=o, err=e
-            )
-        accepted = [r for r in rows if Path(r["path"]).is_file() and Path(r["path"]).samefile(ld)]
+            try:
+                if trace is None:
+                    code = subprocess.run(argv, cwd=probe, stdout=o, stderr=e, timeout=45).returncode
+                else:
+                    code, _ = trace.command(argv, env=os.environ, cwd=probe, out=o, err=e, observed_rows=rows)
+            finally:
+                o.seek(0)
+                e.seek(0)
+                verbose = e.read()
+                compress_bytes(dest / "stdout.gz", o.read())
+                compress_bytes(dest / "clang-verbose.gz", verbose)
+                data = output.read_bytes() if output.is_file() else b""
+                macho = data[:8] == bytes.fromhex("cffaedfe0c000001") and data[12:16] == b"\2\0\0\0"
+                verdict = subprocess.run([str(output)], timeout=15).returncode if macho else None
+                if data:
+                    compress_bytes(dest / "output.macho.gz", data)
+                # Clang -v prints the complete selected linker command immediately before spawning it.
+                printed = []
+                for line in verbose.decode(errors="replace").splitlines():
+                    if line.lstrip().startswith(('"', '/')):
+                        tokens = shlex.split(line)
+                        if tokens and stock_linker(Path(tokens[0]), ld) and has_output(tokens, output):
+                            printed.append(tokens)
+                save(dest / "result.json", {
+                    "argv": argv, "status": code, "events": rows, "printed_linker": printed,
+                    "clang": [clang, sha(clang)], "ld": [str(ld), sha(ld)],
+                    "output": digest(data) if data else None, "exit": verdict,
+                })
+        return code, rows, output, verdict, printed
+
+    trace = None
+    try:
+        trace = ExecTrace()
+        trace.ready()
+        code, rows, output, verdict, printed = invoke("observed", trace)
+        need(len(printed) == 1, "clang did not report one active Xcode linker for the native output")
+        selected = Path(printed[0][0])
+        accepted = [
+            r for r in rows if Path(r["path"]).is_file() and Path(r["path"]).samefile(selected)
+            and has_output(r["argv"], output)
+        ]
         need(
-            code == 0 and len(accepted) == 1 and any(str(output) in r["argv"] for r in accepted),
+            code == 0 and len(accepted) == 1,
             "lost actual Apple linker exec",
         )
-        need(subprocess.run([str(output)], check=False).returncode == 29, "wrong native arm64 executable")
+        need(verdict == 29, "wrong native arm64 executable")
         need(
             any(Path(r["path"]).is_file() and Path(r["path"]).samefile(clang) for r in rows),
             "clang missing from native process group",
         )
         save(
             root / "receipts/observer.json",
-            {"clang": sha(clang), "ld": sha(ld), "executable": sha(output), "exit": 29, "rows": rows},
+            {"clang": sha(clang), "ld": sha(selected), "executable": sha(output), "exit": 29, "rows": rows},
         )
+    except (RuntimeError, OSError, subprocess.SubprocessError):
+        # Preserve native clang/ld/output evidence even if ES could not start or identify the linker.
+        invoke("foreground", None)
+        raise
     finally:
-        trace.close()
+        if trace is not None:
+            trace.close()
 
 
 def causal(root, trace, output_label="causal"):

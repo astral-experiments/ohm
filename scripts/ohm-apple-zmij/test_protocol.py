@@ -16,6 +16,8 @@ from calibrate import classify, fields
 from cohort import summarize
 from measure import typed
 from objects import archive_evidence, bag
+from pilot import has_output
+from wrapper import compiler_selector
 
 
 class Protocol(unittest.TestCase):
@@ -149,6 +151,34 @@ class Protocol(unittest.TestCase):
             finally:
                 os.close(r)
                 os.close(fd)
+
+    def test_bare_rustc_proxy_must_select_the_enrolled_sdk(self):
+        with tempfile.TemporaryDirectory() as td:
+            d = Path(td)
+            rustup = d / "rustup"
+            rustup.write_text('#!/bin/sh\n[ "$1 $2" = "which rustc" ] || exit 1\nprintf "%s\\n" "$REAL"\n')
+            rustup.chmod(0o755)
+            (d / "rustc").symlink_to(rustup)
+            with patch.dict(os.environ, PATH=td, REAL=sys.executable):
+                self.assertEqual(compiler_selector("rustc", Path(sys.executable))["kind"], "rustup")
+                with self.assertRaisesRegex(RuntimeError, "rustup selected a different compiler"):
+                    compiler_selector("rustc", rustup.parent)
+                (d / "rustc").unlink()
+                (d / "rustc").symlink_to("/bin/false")
+                with self.assertRaisesRegex(RuntimeError, "Cargo passed a different rustc"):
+                    compiler_selector("rustc", Path(sys.executable))
+
+    def test_only_the_selected_linker_output_counts(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            output = root / "output"
+            output.touch()
+            alias = root / "alias"
+            alias.symlink_to(output)
+            foreign = root / "other"
+            foreign.touch()
+            self.assertTrue(has_output(["ld", "-o", str(alias)], output))
+            self.assertFalse(has_output(["ld", str(output), "-o", str(foreign)], output))
 
     def test_whole_single_branch_transition(self):
         with tempfile.TemporaryDirectory() as t:

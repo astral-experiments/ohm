@@ -9,14 +9,30 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from study import need
+from study import need, sha
+
+
+def compiler_selector(argument, physical):
+    given = Path(shutil.which(argument) or argument)
+    if given.samefile(physical):
+        return {"kind": "direct"}
+    # Cargo may hand its wrapper the bare rustc rustup proxy. Resolve the actual
+    # active toolchain in this Cargo child (including its cwd and environment).
+    rustup = shutil.which("rustup")
+    need(
+        given.name == "rustc" and rustup
+        and (given.samefile(rustup) or sha(given) == sha(rustup)),
+        "Cargo passed a different rustc to the diagnostic wrapper",
+    )
+    selected = subprocess.check_output([rustup, "which", "rustc"], timeout=15).decode().strip()
+    need(Path(selected).samefile(physical), "rustup selected a different compiler")
+    return {"kind": "rustup", "proxy": str(given), "selected": selected}
 
 
 def forward():
     physical = Path(os.environ["QA_APPLE_REAL_RUSTC"])
     argv = sys.argv[1:]
-    given = Path(shutil.which(argv[0]) or argv[0])
-    need(given.samefile(physical), "Cargo passed a different rustc to the diagnostic wrapper")
+    selector = compiler_selector(argv[0], physical)
     before = physical.stat()
     # close_fds=False preserves the actual inherited Cargo jobserver. Popen's CLOEXEC
     # handshake raises rather than reporting a successful child if execv fails.
@@ -36,6 +52,7 @@ def forward():
                 "pid": p.pid,
                 "ppid": os.getpid(),
                 "physical": [before.st_dev, before.st_ino, before.st_size],
+                "selector": selector,
                 "exit": code,
             }
         )
