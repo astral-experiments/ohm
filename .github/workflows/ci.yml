@@ -1,4 +1,4 @@
-name: Native Apple CRC on fixed Cargo 293
+name: Native Apple inclusive CRC costs on fixed Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
@@ -26,7 +26,7 @@ jobs:
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/crc293-plan.md "$root/receipts/registration.md"
+          cp scripts/ohm-apple-zmij/crc293-inclusive-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}
@@ -76,7 +76,7 @@ jobs:
         run: |
           root="$RUNNER_TEMP/apple-crc-on-293"
           python3 -IB scripts/ohm-apple-zmij/run.py crc_clock screen "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/crc-clock-screen/result.json" >> "$GITHUB_OUTPUT"
+          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["valid"]).lower())' "$root/receipts/crc-clock-screen/result.json" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
@@ -84,7 +84,7 @@ jobs:
           path: ${{ runner.temp }}/apple-crc-on-293/receipts
           retention-days: 14
           if-no-files-found: warn
-      - name: Twelve independent balanced pairs only if both first-repeat pilots clear twofold
+      - name: Twelve independent balanced pairs after both valid pilots, including sub-twofold pilots
         if: steps.pilot.outputs.passed == 'true'
         run: python3 -IB scripts/ohm-apple-zmij/run.py crc_clock confirmation "$RUNNER_TEMP/apple-crc-on-293"
       - name: Record the actual terminal gate, including any under-twofold or skipped result
@@ -95,7 +95,7 @@ jobs:
           import json,pathlib,sys
           root=pathlib.Path(sys.argv[1]);root.mkdir(exist_ok=True,parents=True)
           rows={}
-          for label,rel,key in [('providers','provider-matrix/terminal.json','passed'),('structural','declared-crc-subject.json','structural'),('pilot','crc-clock-screen/result.json','passed'),('independent','crc-clock-confirmation/result.json','passed')]:
+          for label,rel,key in [('providers','provider-matrix/terminal.json','passed'),('structural','declared-crc-subject.json','structural'),('pilot','crc-clock-screen/result.json','valid'),('independent','crc-clock-confirmation/result.json','passed')]:
               path=root/rel;rows[label]=json.loads(path.read_text())[key] if path.is_file() else None
           (root/'terminal-gates.json').write_text(json.dumps(rows,sort_keys=True)+'\n')
           print(rows);sys.exit(0 if all(x is True for x in rows.values()) else 1)

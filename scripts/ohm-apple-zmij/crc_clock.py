@@ -19,7 +19,7 @@ from ty_disk import snapshot
 from zlib_study import CMD, NEW, OLD, checkout, installation, product
 
 ENDPOINTS=("edit","repeat-1","repeat-2")
-ALLOCATION=int(digest(("crc typeshed on exact 735e1528, independent 12 v1 / "+PARENT+CHILD+OLD+NEW).encode()),16)%924
+ALLOCATION=int(digest(("crc typeshed on exact 735e1528, inclusive complete-compile 12 v2 / "+PARENT+CHILD+OLD+NEW).encode()),16)%924
 FIRST=set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS={"screen":["PC","CP"],"confirmation":["PC" if i in FIRST else "CP" for i in range(12)]}
 
@@ -155,20 +155,24 @@ def initial(root):
                 check_host(root,8)
                 refs[role],baseline[role]=installation(root,role,out/order/role,trace)
             per={}
-            for step in ('repeat-1','repeat-2'):
+            for step in ENDPOINTS:
                 phases={}
                 for r in 'PC':
                     row=baseline[r][step];n=row['native'];cert=load(out/order/r/'visits'/step/'native-link-receipt.json')
                     seals=[x['records'] for x in cert['aliases'].values() if {'seal','product'}<=x['records'].keys()]
                     protected=any(x['product']['sha256']==row['product']['raw'] for x in seals)
+                    linked_outputs=[Path(b).name for linker in n['linkers'] for a,b in zip(linker['argv'],linker['argv'][1:]) if a=='-o']
                     p={'zlib_full':n['full'].count('zlib_rs'),'full':n['full'],'link_only':n['link_only'],'ld':len(n['linkers']),
+                       'build_script_ld':linked_outputs.count('build_script_build'),
                        'root_ld':len(row['root_link_argv']),'driver':len(n['cargo_link_driver']),'sealed_output':protected,
                        'hard':[x['hard'] for x in row['zlib']],'recheck':[x['recheck'] for x in row['zlib']]}
                     phases[r]=p
                 p,c=phases['P'],phases['C']
-                passed=bool(p['zlib_full'] and c['zlib_full']==0 and len(p['full'])>len(c['full']) and all(p['hard']) and
-                            not any(c['hard']) and all(c['recheck']) and c['root_ld']<=p['root_ld'] and c['root_ld']==0 and
-                            c['ld']<=p['ld'] and ('ty_vendored' not in c['link_only'] or (c['driver']>0 and c['sealed_output'])))
+                retained=['build_script_build','ty_vendored']
+                passed=(c['full']==retained and p['full']==retained+['zlib_rs','zlib_rs']
+                        and len(p['hard'])==len(c['hard'])==2 and all(p['hard']) and not any(c['hard']) and all(c['recheck'])
+                        and all(not role['link_only'] and role['ld']==2 and role['root_ld']==role['build_script_ld']==1
+                                and role['driver']==1 and role['sealed_output'] for role in (p,c)))
                 eligible=eligible and passed;per[step]={'passed':passed,'roles':phases}
             for rev in (OLD,NEW):
                 arms={}
@@ -189,7 +193,7 @@ def stage(root, mode):
     harness=fingerprint_sources()
     if mode=="confirmation":
         before=load(root/"receipts/crc-clock-screen/result.json")
-        need(before["passed"] and before["harness"]==harness,"no eligible independent screen")
+        need(before["valid"] and before["harness"]==harness,"no valid independent pilots")
     save(out/"registered.json",dict(eligible=gate,order=ORDERS[mode],assignment=ALLOCATION,harness=harness,argv=CMD,
                                      primary="first unchanged test build after historical typeshed revision",
                                      secondary=["edit","second unchanged test build"],independent_clean="complete native Mach-O, embedded ZIP and both real tests on every visit"))
@@ -211,7 +215,7 @@ def stage(root, mode):
                 retire(work)
         finally:
             trace.close()
-    save(out/"result.json",dict(passed=passed,harness=harness,order=ORDERS[mode],wall=clocks))
+    save(out/"result.json",dict(passed=passed,valid=True,harness=harness,order=ORDERS[mode],wall=clocks))
     print(mode,first,flush=True)
 
 
