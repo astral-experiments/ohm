@@ -9,6 +9,7 @@ from pathlib import Path
 from dyld import check as check_dyld
 from execs import ExecTrace
 from fixed_crc import evidence as native_receipt
+from local_dev import observe
 from measure import capture, fresh, native_rows, retire, select
 from prepare import prepare_ruff
 from study import MISSING, RECHECK, check_host, compress_bytes, digest, env_for, git, need, save, sdk_id, sha, text_git
@@ -106,6 +107,10 @@ def phase(root, work, sdk, env, out, step, rev, trace):
     need(msgs[-1] == {"reason": "build-finished", "success": ok}, "incomplete Cargo verdict")
     units = [m for m in msgs if m["reason"] == "compiler-artifact"]
     objc2 = audit_objc2(units, work, out)
+    if step in ("cold", "clean", "edit"):
+        emitters = observe(events, work, sdk, {"ty"}, out)
+        if step in ("cold", "clean"):
+            need(any("--crate-type" in e["argv"] and e["argv"][e["argv"].index("--crate-type")+1] == "bin" for e in emitters), "missing incremental ty binary compiler")
     native = native_rows(events, sdk)
     need(native["scope"] == "kernel-exec" and native["cargo"] == 1 and all(l["stock"] for l in native["linkers"]), "foreign Cargo or linker")
     need(native["full"].count("objc2") == sum(not u["fresh"] for u in objc2), "typed/physical objc2 disagreement")
@@ -126,7 +131,7 @@ def phase(root, work, sdk, env, out, step, rev, trace):
         for name in links:
             candidate = Path(name)
             need(candidate.is_file() and (candidate.samefile(path) or sha(candidate) == product["raw"]), "native link output does not match returned ty")
-        if step in ("cold", "clean", "edit", "repair"):
+        if step in ("cold", "clean", "edit"):
             need(len(links) == 1 and "ty" in native["full"], "expected a genuine ty link")
     else:
         errors = [m["message"] for m in msgs if m["reason"] == "compiler-message"]

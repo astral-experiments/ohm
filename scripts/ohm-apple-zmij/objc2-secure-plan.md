@@ -1,4 +1,4 @@
-# Apple Silicon ty build on Cargo 293
+# Apple Silicon developer ty build on Cargo 293
 
 Freeze Cargo at 735e1528 in both roles. Parent 82911b51 and child 7924254a differ by the Apple frame-pointer marker and its native compiler test. Each completed role must execute its source-checked driver at one stable SDK spelling.
 
@@ -11,3 +11,5 @@ Independently run the actual Ruff CLI on the complete source trees before and af
 The primary endpoint is the first unchanged ty build after Ruff #28877. Report the real edit, second unchanged build, and sum of edit and first repeat separately. Two fresh mirrored screening pairs precede twelve additional independently rooted pairs in an order fixed by the hash of the exact Rust, Cargo, and Ruff revisions. All twelve run after the correctness checks even if either screening ratio falls below two. No pilot is pooled. The median paired interval uses the third and tenth order statistics. The primary twofold claim also requires a one-sided exact permutation test over all 924 balanced assignments at 0.05.
 
 The timer includes the ordinary Cargo command and all descendants, including any real Cargo receipt checks and Apple linker. Compare the whole typed artifact roster, the per-unit freshness of objc2 and the local ty targets, and each returned native program against that role and source revision's independent clean reference. Charge all incidental work in either arm. Capture each CLI by APFS clone after its timed Cargo exit. Execute every clone against both literal response-file paths and compare the complete bytes. Record hardlink-deduplicated steady allocated size for target and shared after the last timer. Timing eligibility also requires a terminal empty build. Report instruction counts only if the independent observer counted grandchildren.
+
+This independent cohort excludes the CI and TF_BUILD environment variables by construction. Capture real local ty compiler arguments and the matching durable incremental graph, work-products index and objects in both structural arms, then verify those files after each timed arm. Both orders and all twelve confirmation pairs run regardless of pilot timing. Analyze this cohort separately from the earlier CI profile.

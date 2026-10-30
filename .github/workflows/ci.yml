@@ -1,4 +1,4 @@
-name: Measure ty CLI edits and repeats on fixed Cargo 293
+name: Developer-mode ty CLI edits and repeats on fixed Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: objc2-clock-traced
+          name: objc2-development-clock-traced
           path: ${{ runner.temp }}/apple-objc2-on-293/receipts
           retention-days: 14
           if-no-files-found: warn
@@ -83,7 +83,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: objc2-clock-pilot
+          name: objc2-development-clock-pilot
           path: ${{ runner.temp }}/apple-objc2-on-293/receipts
           retention-days: 14
           if-no-files-found: warn
@@ -92,7 +92,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: objc2-clock-confirmation
+          name: objc2-development-clock-confirmation
           path: ${{ runner.temp }}/apple-objc2-on-293/receipts
           retention-days: 14
           if-no-files-found: warn

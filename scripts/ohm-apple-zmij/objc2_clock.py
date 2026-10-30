@@ -8,6 +8,7 @@ import shutil
 
 from cohort import fingerprint_sources, summarize
 from crc_clock import clone
+from local_dev import verify_saved
 from measure import capture, fresh, retire, select
 from objc2_cli import CMD, NEW, OLD, SOURCES, CliTrace, checkout, phase as trace_phase, witness
 from receipt_cargo import CANDIDATE
@@ -16,7 +17,7 @@ from ty_disk import snapshot
 
 ENDPOINTS = ("edit","repeat-1","repeat-2")
 SCORES = (*ENDPOINTS, "edit+repeat-1")
-DESIGN = "objc2 normal ty CLI on exact Cargo #293 / independent inclusive 12 v1"
+DESIGN = "objc2 ty CLI / local incremental on exact Cargo #293 / independent inclusive 12 v2"
 ALLOCATION = int(digest((" ".join((DESIGN,PARENT,CHILD,OLD,NEW,CANDIDATE))).encode()),16) % 924
 FIRST = set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS = {"screen":["PC","CP"], "confirmation":["PC" if i in FIRST else "CP" for i in range(12)]}
@@ -88,6 +89,8 @@ def timed(root, out, role):
         save(dest/"result.json",row)
         rows[step] = row
     shutil.rmtree(held)
+    evidence = load(root/"receipts/objc2-cli/PC"/role/"visits/edit/development-emitters.json")
+    verify_saved(work, evidence, out)
     disk = snapshot(work,out/"steady-disk")
     need(identity==sdk_id(sdk,env), "native compiler changed")
     retire(work)
