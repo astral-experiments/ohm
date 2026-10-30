@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import struct
+import subprocess
 from pathlib import Path
 
 from execs import ExecTrace
@@ -19,6 +20,11 @@ TREES = {A: "2b61306d708a211b3725c8d920e7590be6da41ad", B: "97ca36909f1ae8fa028b
 LOCK = "839edc8250480bb523619b8d24bd57176a6e1f57c152cca85c5adc61ea5f94eb"
 NEW_TEST = "nodes::tests::f_string_parts"
 SIZE_TEST = "nodes::tests::size"
+PANICS = {"token::tokens::tests::" + name for name in (
+    "tokens_after_offset_inside_token", "tokens_before_offset_inside_token",
+    "tokens_in_range_start_offset_inside_token", "tokens_in_range_end_offset_inside_token",
+    "tokens_split_at_inside_token", "tokens_split_at_matches_before_and_after_zero_length",
+)}
 BAD_NAME = "ohm_test_build_missing_28335"
 ARGS = {
     "check": ["cargo", "+ohm", "check", "--lib"],
@@ -71,6 +77,21 @@ def macho_text(path):
     return {"raw": digest(data), "text": result[0]}
 
 
+def suite_verdicts(whole, names):
+    records = []
+    for line in whole.decode().splitlines():
+        if not line.startswith("test ") or " ... " not in line:
+            continue
+        formatted, verdict = line.removeprefix("test ").rsplit(" ... ", 1)
+        name = formatted.removesuffix(" - should panic")
+        need((formatted != name) == (name in PANICS) and verdict == "ok", "unexpected libtest verdict: " + line)
+        records.append([name, verdict])
+    need(sorted(name for name, _ in records) == names, "full suite did not execute the exact inventory")
+    need(PANICS <= set(names) and f"{len(names)} passed; 0 failed; 0 ignored".encode() in whole,
+         "missing annotated case or wrong suite summary")
+    return sorted(records)
+
+
 def test_verdict(artifact, state, out, repo, held):
     exe = held or Path(artifact["executable"])
     need(exe.is_file() and artifact["profile"]["test"], "missing test executable")
@@ -85,13 +106,19 @@ def test_verdict(artifact, state, out, repo, held):
         stdout = run([str(exe), "--exact", label, "--test-threads=1"], cwd=cwd)
         need(("test " + label + " ... ok").encode() in stdout and b"1 passed; 0 failed" in stdout, "selected test did not run")
         compress_bytes(out / (label.split("::")[-1] + ".gz"), stdout)
-    whole = run([str(exe), "--test-threads=1"], cwd=cwd)
-    results = [row.removeprefix("test ").rsplit(" ... ", 1) for row in whole.decode().splitlines()
-               if row.startswith("test ") and " ... " in row]
-    need(sorted(name for name, verdict in results) == names and all(verdict in ("ok", "ignored") for _, verdict in results),
-         "full Ruff unit-test verdict differed from the executable inventory")
-    compress_bytes(out / "test-suite.gz", whole)
-    return {**macho_text(exe), "tests": names, "verdicts": sorted(results)}
+    completed = subprocess.run([str(exe), "--test-threads=1"], cwd=cwd, capture_output=True, timeout=180)
+    compress_bytes(out / "test-suite.gz", completed.stdout)
+    compress_bytes(out / "test-suite-stderr.gz", completed.stderr)
+    save(out / "test-suite-exit.json", completed.returncode)
+    need(completed.returncode == 0, "full unit-test suite reported a failure")
+    verdicts = suite_verdicts(completed.stdout, names)
+    product = macho_text(exe)
+    if out.parent.name in ("empty-old", "empty-new"):
+        archive = repo.parent / "receipts/test-executables" / (product["raw"] + ".macho.gz")
+        archive.parent.mkdir(exist_ok=True)
+        if not archive.exists():
+            need(compress_bytes(archive, exe.read_bytes()) == product["raw"], "clean test executable changed during custody")
+    return {**product, "tests": names, "verdicts": verdicts}
 
 
 def check_verdict(artifacts, artifact, state, work, env, out, held):
