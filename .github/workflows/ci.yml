@@ -4,7 +4,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: packaged-native-inputs-${{ github.ref }}
+  group: packaged-native-inputs-v2-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   packaged:

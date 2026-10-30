@@ -109,6 +109,16 @@ def remove_owned(root,name):
     need(name in ('fixture','stores') and root.is_absolute() and (root/'receipts').is_dir(),'unowned temporary path');p=root/name
     if p.exists():need(p.is_dir() and not p.is_symlink() and p.parent==root,'foreign temporary directory');shutil.rmtree(p)
 
+def cargo_messages(data):
+    rows=[];build_lines=[]
+    for line in data.splitlines():
+        if line.startswith(b'{'):
+            rows.append(json.loads(line));continue
+        m=re.fullmatch(rb'\[(?:qa_release_app|owned) 0\.0\.1\] (cargo:(?:rerun-if-changed|rustc-link-search)=.+)',line)
+        need(m is not None,'unexpected Cargo stdout framing: '+repr(line[:320]));build_lines.append(m[1].decode())
+    need(rows and rows[-1].get('reason')=='build-finished','missing final typed record')
+    return rows,build_lines
+
 def allocated_sections(data):
     out={}
     if data[:4]==b'\x7fELF':

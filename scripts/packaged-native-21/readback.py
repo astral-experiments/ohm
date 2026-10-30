@@ -3,7 +3,7 @@ from __future__ import annotations
 import gzip,io,json,os,re,subprocess,sys,tempfile,unittest,zipfile
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from fixture import CASES,PARITY,STATES,allocated_sections,digest,form,native_state
+from fixture import CASES,PARITY,STATES,allocated_sections,cargo_messages,digest,form,native_state
 from packages import ASSETS,CARGO,HEAD,RUN,need
 from probe import expected
 
@@ -17,7 +17,7 @@ class Corpus:
     def raw(self,k):return gzip.decompress(self.get(k))
 
 def parse(c,base,selected,caches):
-    q=c.json(base+'/observed.json');a=c.raw(base+'/cargo-stdout.gz');b=c.raw(base+'/cargo-stderr.gz');need(digest(a)==q['stdout'] and digest(b)==q['stderr'],'raw Cargo streams differ');rows=[json.loads(s) for s in a.splitlines()];need(rows[-1]=={'reason':'build-finished','success':q['exit']==0},'raw typed Cargo final result differs');art=[r for r in rows if r['reason']=='compiler-artifact'];need(q['units']==[[e['target']['name'],e['target']['kind'],e['fresh']] for e in art],'incorrect typed artifact inventory');main=[r for r in art if r['target']['name']==selected and r['executable']];need('-vv' in q['argv'] and q['argv'][:2]==['cargo','+ohm'] and '--offline' in q['argv'] and '--locked' in q['argv'] and ('--no-run' in q['argv'])==(selected=='qa_release_test'),'wrong Cargo entrypoint');
+    q=c.json(base+'/observed.json');a=c.raw(base+'/cargo-stdout.gz');b=c.raw(base+'/cargo-stderr.gz');need(digest(a)==q['stdout'] and digest(b)==q['stderr'],'raw Cargo streams differ');rows,build_text=cargo_messages(a);need(build_text==q['decoded_verbose_build_outputs'],'wrong verbose build-script text');need(rows[-1]=={'reason':'build-finished','success':q['exit']==0},'raw typed Cargo final result differs');art=[r for r in rows if r['reason']=='compiler-artifact'];need(q['units']==[[e['target']['name'],e['target']['kind'],e['fresh']] for e in art],'incorrect typed artifact inventory');main=[r for r in art if r['target']['name']==selected and r['executable']];need('-vv' in q['argv'] and q['argv'][:2]==['cargo','+ohm'] and '--offline' in q['argv'] and '--locked' in q['argv'] and ('--no-run' in q['argv'])==(selected=='qa_release_test'),'wrong Cargo entrypoint');
     markers=[]
     for path,h,hard,recheck in q['dep_info']:
         d=c.raw('dep-info/'+h+'.gz');need(digest(d)==h and (b'ohm-untracked-relink-inputs' in d)==hard and (b'/dev/null/ohm-recheck-dependent-links' in d)==recheck,'wrong raw dep-info markers');markers.append([hard,recheck]);
@@ -71,6 +71,10 @@ def verify(c,roles):
     return all_results
 
 class Controls(unittest.TestCase):
+    def test_verbose_cargo_framing(self):
+        msg=b'{"reason":"build-finished","success":true}';line=b'[owned 0.0.1] cargo:rerun-if-changed=build.rs';r,b=cargo_messages(line+b'\n'+msg+b'\n');self.assertEqual((r,b),([{'reason':'build-finished','success':True}],['cargo:rerun-if-changed=build.rs']))
+        for bad in (b'extra',b'[foreign 0.0.1] cargo:rerun-if-changed=build.rs',b'[owned 0.0.1] debug-text',b'[owned 0.0.1] cargo:rustc-link-arg=-x'):
+            with self.assertRaises(RuntimeError):cargo_messages(bad+b'\n'+msg+b'\n')
     def test_independent_expected(self):
         self.assertEqual(expected('higher',11),('ok',[29,11]));self.assertEqual(expected('malformed',11),('native-error',None));self.assertEqual(expected('missing',None),('rust-error',None))
     def test_filename_owner_and_same_timestamp_control(self):

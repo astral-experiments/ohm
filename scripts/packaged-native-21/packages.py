@@ -68,7 +68,11 @@ def prepare(root,role):
     certified={}
     for relative in ['bin/cargo','bin/rustc']:
         component='cargo' if relative.endswith('cargo') else 'rustc';need(sha(d/component/relative)==sha(sdk/relative),'different installed product');certified[relative]=sha(sdk/relative)
-    drivers=list((sdk/'lib').glob('librustc_driver*'));need(len(drivers)==1,'ambiguous driver');certified[str(drivers[0].relative_to(sdk))]=sha(drivers[0]);wild=[v for v in sdk.rglob('wild-ld') if v.is_file()];need(bool(wild)==(t=='x86_64-unknown-linux-gnu'),'unexpected Wild membership');certified.update({str(v.relative_to(sdk)):sha(v) for v in wild})
+    drivers=list((sdk/'lib').glob('librustc_driver*'));need(len(drivers)==1,'ambiguous driver');certified[str(drivers[0].relative_to(sdk))]=sha(drivers[0]);wild_path=Path('lib/rustlib')/t/'bin/wild-ld/ld.bfd';wild=sdk/wild_path
+    need(wild.is_file()==(t=='x86_64-unknown-linux-gnu'),'wrong platform Wild membership')
+    if wild.is_file():
+        stock=d/'rustc'/wild_path;need(os.access(wild,os.X_OK) and sha(wild)==sha(stock),'Wild differs from original package')
+        version=subprocess.check_output([str(wild),'--version'],text=True).strip();need(version=='Wild 0.11.0' or version.startswith('Wild 0.11.0 '),'unexpected bundled Wild');certified[str(wild_path)]=sha(wild);save(out/'wild.json',{'package_member':str(stock.relative_to(d)),'installed':str(wild_path),'sha256':sha(wild),'version':version})
     save(out/'installed.json',certified);shutil.rmtree(inbox)
 
 if __name__=='__main__':
