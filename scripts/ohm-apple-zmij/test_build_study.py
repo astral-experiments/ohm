@@ -14,7 +14,7 @@ from cohort import ENDPOINTS, fingerprint_sources, summarize
 from dyld import check as check_dyld
 from execs import ExecTrace
 from measure import select
-from macho_paths import compare as compare_macho
+from macho_paths import canonical, compare as compare_macho
 from native_inputs import run_archive_check
 from study import ARCHIVE_SHA, CHILD, ORDERS, PARENT, check_host, load, need, run, save, sha
 from verbs import A, ARGS, B, NEW_TEST, installed
@@ -60,27 +60,51 @@ def assert_product(row, clean):
     need(row["product"] == clean[row["state"]], "actual test executable, code, inventory or suite differs from independent clean")
 
 
+def clean_image(root, prefix, reference):
+    record = load(prefix / "verified.json")
+    with gzip.open(prefix / "stdout.gz", "rb") as f:
+        artifacts = [json.loads(line) for line in f]
+    executables = [r["executable"] for r in artifacts if r.get("executable") and
+                   r["target"]["name"] == "ruff_python_ast" and r["profile"]["test"]]
+    need(len(executables) == 1, "ambiguous actual test executable")
+    path = executables[0]
+    links = [link["argv"] for link in record["native"]["linkers"]
+             if [v for k,v in zip(link["argv"],link["argv"][1:]) if k == "-o"] == [path]]
+    need(len(links) == 1, "ambiguous actual test linker")
+    original = reference["raw"]
+    data = gzip.decompress((root / "receipts/test-executables" / (original + ".macho.gz")).read_bytes())
+    need(hashlib.sha256(data).hexdigest()==original, "clean native file changed")
+    return data, path, links[0]
+
+
 def compare_clean(root, out, refs, state):
-    arms = {}
-    for role in "PC":
-        prefix = out / role / ("empty-" + state) / "clean"
-        record = load(prefix / "verified.json")
-        with gzip.open(prefix / "stdout.gz","rb") as f:
-            artifacts = [json.loads(line) for line in f]
-        executables = [r["executable"] for r in artifacts if r.get("executable") and
-                       r["target"]["name"] == "ruff_python_ast" and r["profile"]["test"]]
-        need(len(executables) == 1, "ambiguous actual test executable")
-        path = executables[0]
-        links = [link["argv"] for link in record["native"]["linkers"]
-                 if [v for k,v in zip(link["argv"],link["argv"][1:]) if k == "-o"] == [path]]
-        need(len(links) == 1, "ambiguous actual test linker")
-        original = refs[role][state]["raw"]
-        data = gzip.decompress((root / "receipts/test-executables" / (original + ".macho.gz")).read_bytes())
-        need(hashlib.sha256(data).hexdigest()==original, "clean native file changed")
-        arms[role] = data,path,links[0]
+    arms = {role: clean_image(root, out / role / ("empty-" + state) / "clean", refs[role][state]) for role in "PC"}
     same_fields = ("text","tests","verdicts")
     need(all(refs["P"][state][key] == refs["C"][state][key] for key in same_fields), "different executable code or test behavior")
     return compare_macho(arms)
+
+
+def verify_installation(root, role, out, timed, anchors):
+    """Build empty A and B after the last clock, before changing the compiler driver."""
+    selected = load(out / "selected-driver.json")
+    trace = ExecTrace()
+    try:
+        trace.ready()
+        for state, phases in (("old", ("cold",)), ("new", ENDPOINTS)):
+            where = out / "reference" / ("empty-" + state)
+            row = installed("test", root, role, where, [("clean", state)], trace)["clean"]
+            need(load(where / "selected-driver.json") == selected, "different driver installation for the clean reference")
+            clean = row["product"]
+            for phase in phases:
+                need(timed[phase]["state"] == state and timed[phase]["product"] == clean,
+                     "timed executable differs from same-installation clean build")
+            data, proof = canonical(*clean_image(root, where/"clean", clean))
+            key = hashlib.sha256(data).hexdigest()
+            need(key == anchors[state]["canonical_sha256"] and proof["paths"] == anchors[state][role]["paths"] and
+                 proof["base"] == anchors[state][role]["base"], "different clean executable between installations")
+            save(where/"checked.json", {"compared":list(phases), "canonical_sha256":key, "driver":selected, "proof":proof})
+    finally:
+        trace.close()
 
 
 def verify_trace(root, out, *, negative=True):
@@ -135,28 +159,34 @@ def execute(root, mode):
            "old": A, "new": B, "compilers": [PARENT, CHILD], "order": ORDERS[mode], "pilot_sha": SIGNED_SHA,
            "paired": "independent private Cargo/target/build for each installation",
            "admission": "both pilot ratios above two; separate balanced n=12 lower median bound above two and p<=.05",
-           "correctness": "same-compiler complete Mach-O must equal clean; cross-compiler files must match after replacing only verified linker N_OSO Cargo namespaces and recomputing independently validated ad-hoc page hashes; identical 53/54 complete suite records; actual edit must link",
+           "correctness": "every complete timed Mach-O must equal a separately empty native build of the same source and exact driver installation including ctime, executed after the last clock; native reference files must agree across installations and compilers after replacing only verified linker N_OSO Cargo namespaces and recomputing independently validated ad-hoc page hashes; identical 53/54 complete suite records; actual edit must link",
            "harness": fingerprint_sources()}
     if mode == "confirm":
         prior = load(root / "receipts/test-screen/result.json")
         need(prior["accept"] and prior["harness"]==reg["harness"], "no qualifying separate two-pair screen")
     save(out / "registered.json", reg)
-    before, refs = verify_trace(root, out / "native-before")
+    before, _ = verify_trace(root, out / "native-before")
+    anchors = load(out / "native-before/verified.json")["cross_compiler"]
     pairs = []
     for n, order in enumerate(ORDERS[mode],1):
         both = {}
         for role in order:
             check_host(root, 7)
-            rows = installed("test",root,role,out/f"pair-{n:02}"/role,STEPS,None,timed=True)
+            installation = out/f"pair-{n:02}"/role
+            rows = installed("test",root,role,installation,STEPS,None,timed=True)
+            verify_installation(root, role, installation, rows, anchors)
             for key, row in rows.items():
-                assert_product(row, refs[role])
                 need(row["dirty"] == before[role][key]["dirty"] and row["roster"] == before[role][key]["roster"]
                      and row["roster"] == before["P"][key]["roster"] and row["native"] is None,
                      "timed Cargo changed its workload")
             both[role] = rows
         pairs.append(both)
-    after, after_refs = verify_trace(root, out/"native-after", negative=False)
-    need(refs == after_refs, "independent test binary reference drift")
+    after, _ = verify_trace(root, out/"native-after", negative=False)
+    terminal = load(out/"native-after/verified.json")["cross_compiler"]
+    for state in ("old","new"):
+        need(anchors[state]["canonical_sha256"] == terminal[state]["canonical_sha256"] and
+             all(anchors[state][role]["paths"] == terminal[state][role]["paths"] for role in "PC"),
+             "independent clean test executable drift")
     for role in "PC":
         for key in ENDPOINTS:
             need(signature(before[role][key]) == signature(after[role][key]), "physical collector changed at terminal flank")

@@ -113,11 +113,10 @@ def test_verdict(artifact, state, out, repo, held):
     need(completed.returncode == 0, "full unit-test suite reported a failure")
     verdicts = suite_verdicts(completed.stdout, names)
     product = macho_text(exe)
-    if out.parent.name in ("empty-old", "empty-new"):
-        archive = repo.parent / "receipts/test-executables" / (product["raw"] + ".macho.gz")
-        archive.parent.mkdir(exist_ok=True)
-        if not archive.exists():
-            need(compress_bytes(archive, exe.read_bytes()) == product["raw"], "clean test executable changed during custody")
+    archive = repo.parent / "receipts/test-executables" / (product["raw"] + ".macho.gz")
+    archive.parent.mkdir(exist_ok=True)
+    if not archive.exists():
+        need(compress_bytes(archive, exe.read_bytes()) == product["raw"], "test executable changed during custody")
     return {**product, "tests": names, "verdicts": verdicts}
 
 
@@ -203,6 +202,9 @@ def installed(verb, root, role, out, steps, trace, *, timed=False):
     env = env_for(work, sdk)
     fresh(work, root / "seed")
     ident = sdk_id(sdk, env)
+    driver, = (sdk / "lib").glob("librustc_driver*.dylib")
+    stamp = driver.stat().st_ctime_ns
+    save(out / "selected-driver.json", {"role":role,"image":ident["driver"],"ctime_ns":stamp})
     rows = {}
     prev = None
     pending = []
@@ -223,7 +225,7 @@ def installed(verb, root, role, out, steps, trace, *, timed=False):
             rows[label] = phase(verb, root, work, sdk, env, role, state, label, trace, out / label)
         prev = state
     need(not pending, "truncated timed commands")
-    need(ident == sdk_id(sdk, env), "SDK changed during run")
+    need(ident == sdk_id(sdk, env) and driver.stat().st_ctime_ns==stamp, "SDK changed during run")
     retire(work)
     return rows
 
