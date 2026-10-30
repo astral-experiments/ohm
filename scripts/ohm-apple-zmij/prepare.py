@@ -255,7 +255,7 @@ def build_pair(root, checkout):
     src = root / "compiler-source"
     run(["git", "clone", "--shared", "--no-checkout", str(checkout), str(src)], timeout=600)
     need(
-        text_git(src, "rev-parse", CHILD + "^") == "7924254acf6ee5a17473ac47dfb33b5842d72005"
+        text_git(src, "rev-parse", CHILD + "^") == "57271bfcb15f42e65da0ed00fa1b2080348e0775"
         and text_git(src, "rev-parse", PARENT + "^") == "82911b516fb35608fd70ada4deb6f8429277f410"
         and text_git(src, "rev-parse", PARENT + ":compiler") == "49c6df377f483d1f3db47dbb71988869dfdcdc61"
         and text_git(src, "rev-parse", PARENT + ":compiler/rustc_interface/src/passes.rs")
@@ -269,6 +269,7 @@ def build_pair(root, checkout):
     need(
         set(paths)
         == {
+            ".github/workflows/ci.yml",
             ASM,
             "tests/run-make/ohm-checked-dep-info/inline.rs",
             "tests/run-make/ohm-checked-dep-info/rmake.rs",

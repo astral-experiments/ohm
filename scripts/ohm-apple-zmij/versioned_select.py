@@ -20,7 +20,10 @@ def choose(root, name):
     else:
         record=json.loads((root/("receipts/cargo293/product.json" if name=="classic" else "receipts/cargo-aware/product.json")).read_bytes())
         need(record["source"]["commit"]==rev and record["binary"]==physical(expected),"unauthenticated source build")
-    if not dst.samefile(expected):
+    if (root/"release-cargo-bins/frozen.json").is_file():
+        from release_bins import selected
+        selected(root,name,CARGOS)
+    elif not dst.samefile(expected):
         tmp=dst.with_name("cargo-versioned.next");need(not tmp.exists(), "abandoned selection")
         os.link(expected,tmp);os.replace(tmp,dst)
     version=run([dst,"-Vv"]).decode()

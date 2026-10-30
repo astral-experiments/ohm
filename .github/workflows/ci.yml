@@ -1,14 +1,15 @@
-name: Qualify the Apple Cargo merge on the shipped -20 compiler
+name: Qualify shipped and release-integrated Cargo on Apple native providers and real ty edits
 on: workflow_dispatch
 permissions:
   contents: read
+  actions: read
 concurrency:
-  group: apple-shipped-reader-intake-${{ github.ref }}
+  group: apple-shipped-reader-developer-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  native-release-reader:
+  apple-shipped-release-reader:
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 125
+    timeout-minutes: 360
     env:
       PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -19,36 +20,126 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Calibrate real Xcode and kernel exec observation
+      - name: Freeze and verify subjects, provider design and native execution observer
         run: |
-          root="$RUNNER_TEMP/apple-release-reader"
+          root="$RUNNER_TEMP/apple-shipped-reader-developer"
+          python3 -IB scripts/ohm-apple-zmij/run.py test_cgu scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
+          if ! command -v b3sum >/dev/null; then brew install b3sum; fi
+          b3sum --version
+          python3 -IB scripts/ohm-apple-zmij/release_selftest.py
+          python3 -IB scripts/ohm-apple-zmij/test_cli_images.py
+          python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
+          python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
-          cp scripts/ohm-apple-zmij/release-intake-plan.md "$root/receipts/registration.md"
-      - name: Authenticate and install the signed Darwin release
+          test -s "$root/receipts/observer.json"
+          cp scripts/ohm-apple-zmij/release-stack-plan.md "$root/receipts/registration.md"
+      - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          root="$RUNNER_TEMP/apple-release-reader"
+          root="$RUNNER_TEMP/apple-shipped-reader-developer"
           mkdir "$root/assets"
           gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
           python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-      - name: Build the integrated reader from its authenticated two-parent tree, then package the native Cargo
+          python3 -IB scripts/ohm-apple-zmij/run.py objc2_cli seed "$root"
+      - name: Reopen the enrolled merged Apple Cargo and its separate signed Unicode observations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/ohm-apple-zmij/release_import.py "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Bootstrap the exact Darwin-versioned CRC and ObjC compilers on identical stage0 inputs
         run: |
-          root="$RUNNER_TEMP/apple-release-reader"
-          python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py aware "$root"
-          python3 -IB scripts/ohm-apple-zmij/release_unicode.py pack "$root"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: native-apple-integrated-fd55-cargo
-          path: ${{ runner.temp }}/apple-release-reader/result-product
-          retention-days: 14
-          if-no-files-found: error
-      - name: Check both Cargo executables on the identical signed SDK and pinned real Ruff Unicode build
-        run: python3 -IB scripts/ohm-apple-zmij/release_unicode.py run "$RUNNER_TEMP/apple-release-reader"
+          root="$RUNNER_TEMP/apple-shipped-reader-developer"
+          python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
+          if ! command -v ninja >/dev/null; then brew install ninja; fi
+          (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
+          python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
+          python3 -IB scripts/ohm-apple-zmij/source-transport/crc/prepare.py "$root/enrolled-rust" > "$root/receipts/crc-source-transport.json"
+          python3 -IB scripts/ohm-apple-zmij/source-transport/objc2/prepare.py "$root/enrolled-rust" > "$root/receipts/objc2-source-transport.json"
+          python3 -IB scripts/ohm-apple-zmij/source-transport/versioned/prepare_versioned.py rust "$root/enrolled-rust" > "$root/receipts/versioned-rust-source.json"
+          python3 -IB scripts/ohm-apple-zmij/release-rust/install.py "$root/enrolled-rust" > "$root/receipts/published-rust-281-source.json"
+          python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
+      - name: Build the previous #293 Cargo as an independent third receiver on APFS
+        run: |
+          root="$RUNNER_TEMP/apple-shipped-reader-developer"
+          python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$root"
+      - name: Check native archives with signed Cargo in an ordinary development environment
+        run: python3 -IB scripts/ohm-apple-zmij/versioned.py signed "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Check native archives with classic Cargo in an ordinary development environment
+        run: python3 -IB scripts/ohm-apple-zmij/versioned.py classic "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Check native archives with aware Cargo in an ordinary development environment
+        run: python3 -IB scripts/ohm-apple-zmij/versioned.py aware "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Separately qualify both real zmij and zlib-rs on the versioned CRC parent and every receiver
+        run: python3 -IB scripts/ohm-apple-zmij/versioned_registry.py "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Check same-target Cargo upgrade and downgrade through the real provider changes
+        run: python3 -IB scripts/ohm-apple-zmij/versioned.py migration "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Exercise authentic and literal v1 and v2 paths in all three receivers
+        run: |
+          root="$RUNNER_TEMP/apple-shipped-reader-developer"
+          python3 -IB scripts/ohm-apple-zmij/versioned.py named "$root"
+          python3 -IB scripts/ohm-apple-zmij/versioned.py terminal "$root"
+      - name: Genuine signed compiler legacy v1, both marker names and all direct or transitive provider transitions
+        run: python3 -IB scripts/ohm-apple-zmij/release_legacy.py "$RUNNER_TEMP/apple-shipped-reader-developer"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: native-apple-integrated-fd55-unicode
-          path: ${{ runner.temp }}/apple-release-reader/receipts
+          name: apple-release-reader-provider-and-migration
+          path: ${{ runner.temp }}/apple-shipped-reader-developer/receipts
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Freeze both Cargo and Rust physical identities before any dependent program references
+        run: python3 -IB scripts/ohm-apple-zmij/release_bins.py "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Real ty builds in both orders, native links, invalid edits, clean matches and actual program behavior
+        run: python3 -IB scripts/ohm-apple-zmij/run.py objc2_cli mechanism "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Mirrored compiler-only pilots holding the release-integrated Cargo fixed
+        id: rustscreen
+        run: python3 -IB scripts/ohm-apple-zmij/run.py objc2_clock screen "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: apple-release-reader-rust-only-pilots
+          path: ${{ runner.temp }}/apple-shipped-reader-developer/receipts
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Twelve independent #281 compiler pairs on the same release-integrated Cargo
+        if: steps.rustscreen.outputs.admitted == 'true'
+        run: python3 -IB scripts/ohm-apple-zmij/run.py objc2_clock confirmation "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: apple-release-reader-rust-only-final
+          path: ${{ runner.temp }}/apple-shipped-reader-developer/receipts
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Hold published #281 Rust fixed and run the same real CLI across both Cargo receivers in both orders
+        run: python3 -IB scripts/ohm-apple-zmij/release_cli.py native "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - name: Verify provider and real application outcomes
+        run: |
+          root="$RUNNER_TEMP/apple-shipped-reader-developer"
+          python3 -IB -c 'import json, pathlib, sys; d=pathlib.Path(sys.argv[1]); assert json.loads((d/"provider-matrix/terminal.json").read_text())["passed"]; assert set(json.loads((d/"objc2-cli/mechanism.json").read_text())["orders"])=={"PC","CP"}' "$root/receipts"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: apple-release-reader-local-ty-traced
+          path: ${{ runner.temp }}/apple-shipped-reader-developer/receipts
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Two mirrored untraced release-Cargo pilots on the published compiler
+        id: screen
+        run: python3 -IB scripts/ohm-apple-zmij/release_cli.py screen "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: apple-release-reader-local-ty-pilots
+          path: ${{ runner.temp }}/apple-shipped-reader-developer/receipts
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Twelve independent balanced pairs and terminal empty builds
+        if: steps.screen.outputs.admitted == 'true'
+        run: python3 -IB scripts/ohm-apple-zmij/release_cli.py confirmation "$RUNNER_TEMP/apple-shipped-reader-developer"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: apple-release-reader-local-ty-final
+          path: ${{ runner.temp }}/apple-shipped-reader-developer/receipts
           retention-days: 14
           if-no-files-found: warn

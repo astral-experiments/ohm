@@ -42,7 +42,8 @@ NATIVE = {"lower":17, "higher":29, "malformed":None, "missing":None}
 NO_RUST = {"higher-no-rust", "malformed-no-rust", "missing-no-rust", "repair-before-missing"}
 
 
-def form(src, placement, watched):
+def form(src, placement, watched, barrier=None):
+    barrier = BARRIER if barrier is None else barrier
     def put(name, body):
         n=src/name;n.parent.mkdir(parents=True,exist_ok=True);n.write_text(body)
     crate='[package]\nname="{}"\nversion="0.0.1"\nedition="2021"\n'
@@ -50,10 +51,10 @@ def form(src, placement, watched):
     if placement=="library":
         deps+='barrier={path="barrier"}\n'
         put("barrier/Cargo.toml",crate.format("barrier"))
-        put("barrier/src/lib.rs", BARRIER)
+        put("barrier/src/lib.rs", barrier)
     put("Cargo.toml",crate.format("qa_owned_test")+deps+'[workspace]\nresolver="2"\n')
     put("trigger/Cargo.toml",crate.format("trigger"))
-    put("src/main.rs",(BARRIER if placement=="direct" else "use barrier::barrier;\n")+MAIN)
+    put("src/main.rs",(barrier if placement=="direct" else "use barrier::barrier;\n")+MAIN)
     watches='println!("cargo:rerun-if-changed={name}");' if watched else ""
     put("build.rs",'''fn main() {
     let root=std::path::PathBuf::from(std::env::var_os("CARGO_MANIFEST_DIR").unwrap());
@@ -214,17 +215,22 @@ def with_empty(work, task):
         parked.rmdir()
 
 
-def run_case(root, trace, role, placement, watch, defaults, bodies, *, visits=STEPS, change=configure, evidence=None, label=None):
+def run_case(root, trace, role, placement, watch, defaults, bodies, *, visits=STEPS, change=configure, evidence=None, label=None, sdk_override=None, barrier=None):
     name="-".join((label or role,placement,watch,"default" if defaults else "off"))
     out=root/"receipts/provider-matrix"/name;out.mkdir()
     work=root/"provider-build";src=root/"provider-source";work.mkdir();src.mkdir()
     for n in ("target","shared","cargo-home"):(work/n).mkdir()
-    sdk=select(root,role);env=env_for(work,sdk)
+    sdk=sdk_override if sdk_override is not None else select(root,role);env=env_for(work,sdk)
     driver,=(sdk/"lib").glob("librustc_driver*.dylib")
     ident={**physical(driver),"ctime_ns":driver.stat().st_ctime_ns}
-    need(ident["sha256"]==load(root/"receipts/pair.json")["products"][role]["runtime"]["lib/"+driver.name],"wrong driver")
+    if sdk_override is None:
+        expected=load(root/"receipts/pair.json")["products"][role]["runtime"]["lib/"+driver.name]
+    else:
+        expected=load(root/"receipts/release.json")["driver"]["sha256"]
+        need((sdk/"bin/cargo").samefile(root/"native/bin/cargo"),"legacy fixture missed selected Cargo")
+    need(ident["sha256"]==expected,"wrong driver")
     save(out/"development-environment.json", {k:digest(v.encode()) for k,v in sorted(env.items())})
-    trigger=form(src,placement,watch=="declared")
+    trigger=form(src,placement,watch=="declared",barrier)
     trigger.write_text("#[inline(never)] pub fn value()->i32 {7}\n")
     run(["cargo","+ohm","generate-lockfile","--offline"],cwd=src,env=env)
     sources={str(p.relative_to(src)):p.read_text() for p in sorted(src.rglob("*")) if p.is_file()}

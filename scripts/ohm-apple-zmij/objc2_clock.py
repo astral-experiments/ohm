@@ -1,7 +1,8 @@
-"""Measure genuine ty builds with complete binary and native input validation on Cargo #293."""
+"""Measure genuine ty builds with complete binary and native input validation on release-integrated Cargo."""
 import argparse
 import gzip
 import itertools
+import os
 import json
 from pathlib import Path
 import shutil
@@ -18,7 +19,7 @@ from ty_disk import snapshot
 
 ENDPOINTS = ("edit","repeat-1","repeat-2")
 SCORES = (*ENDPOINTS, "edit+repeat-1")
-DESIGN = "v2 advisory Apple / true local ty CLI with verified native inputs, aware Cargo / inclusive twelve pairs v1"
+DESIGN = "Release-integrated Cargo fd55 with held markers, prior versioned CRC parent versus published #281 rustc on the ordinary Apple ty CLI v1"
 ALLOCATION = int(digest((" ".join((DESIGN,PARENT,CHILD,OLD,NEW,CANDIDATE))).encode()),16) % 924
 FIRST = set(list(itertools.combinations(range(12),6))[ALLOCATION])
 ORDERS = {"screen":["PC","CP"], "confirmation":["PC" if i in FIRST else "CP" for i in range(12)]}
@@ -42,15 +43,16 @@ def signature(stdout, root):
     archive, = [Path(f) for f in objc["filenames"] if f.endswith(".rlib")]
     return Path(binary["executable"]),archive,info
 
-def anchor(root, role, step):
+def anchor(root, role, step, reference=None):
     name = "old" if step=="cold" else "new"
-    base = root/"receipts/objc2-cli/PC"/role
+    base = reference if reference is not None else root/"receipts/objc2-cli/PC"/role
     ref = load(base/("clean-"+name)/"clean/verified.json")
     with gzip.open(base/"visits"/step/"stdout.gz","rb") as f:
         _,_,expected = signature(f.read(),root)
     return ref,expected
 
-def timed(root, out, role):
+def timed(root, out, role, reference=None):
+    reference = reference if reference is not None else root/"receipts/objc2-cli/PC"/role
     work = root/"objc2-work"
     sdk = select(root,role)
     env = env_for(work,sdk)
@@ -60,7 +62,7 @@ def timed(root, out, role):
     save(out/"development-environment.json",{k:digest(v.encode()) for k,v in sorted(env.items())})
     held = work/"clock-held"
     need(not held.exists(),"stale held outputs")
-    references = {step: load(root/"receipts/objc2-cli/PC"/role/
+    references = {step: load(reference/
                             ("clean-old" if step == "cold" else "clean-new")/"clean/verified.json")
                   for step in ("cold", *ENDPOINTS)}
     phases = {}
@@ -89,7 +91,7 @@ def timed(root, out, role):
         phases[step] = (rev,dest,typed,clock,copy,dep.read_bytes())
     rows = {}
     for step,(rev,dest,typed,clock,copy,marker) in phases.items():
-        ref,control = anchor(root,role,step)
+        ref,control = anchor(root,role,step,reference)
         observed = witness(root,dest,copy,rev)
         proof = cgu_inputs.witness(root,dest,copy.read_bytes(),ref["cgu"]["output"],held=held/step/"cgu")
         need(cgu_inputs.same_product(observed,ref["product"],proof,ref["cgu"]),
@@ -102,7 +104,7 @@ def timed(root, out, role):
         save(dest/"result.json",row)
         rows[step] = row
     shutil.rmtree(held)
-    evidence = load(root/"receipts/objc2-cli/PC"/role/"visits/edit/development-emitters.json")
+    evidence = load(reference/"visits/edit/development-emitters.json")
     verify_saved(work, evidence, out)
     disk = snapshot(work,out/"steady-disk")
     need(identity==sdk_id(sdk,env), "native compiler changed")
@@ -111,6 +113,9 @@ def timed(root, out, role):
     return rows
 
 def enroll(root):
+    assert (root/"release-cargo-bins/frozen.json").is_file()
+    assert not load(root/"receipts/versioned/legacy/terminal.json")["signed_integrated_differences"]
+    assert load(root/"receipts/cargo-aware/import.json")["selected"]=="9f09941432a849b13ee6177c2f4b0f35f5d9c350e518688d64325ce513ec532d"
     native = load(root/"receipts/provider-matrix/terminal.json")
     need(native["passed"] and native["commands"]==392 and not any(native["wrong_or_image_mismatch"].values()),"native protection failed")
     proof = load(root/"receipts/objc2-cli/mechanism.json")
@@ -131,7 +136,7 @@ def run_stage(root,mode):
     order=ORDERS[mode]
     if mode=="confirmation":
         screen=load(root/"receipts/objc2-clock-screen/result.json")
-        need(screen["subjects"]==subjects and screen["harness"]==sources and screen["complete"], "pilot validation missing")
+        need(screen["subjects"]==subjects and screen["harness"]==sources and screen["complete"] and screen["admit_confirmation"], "pilot validation missing")
     save(top/"registration.json",dict(order=order,assignment=ALLOCATION,subjects=subjects,harness=sources,argv=CMD,primary="repeat-1",
          secondary=["edit","repeat-2","edit+repeat-1"],design=DESIGN))
     pairs=[]
@@ -171,8 +176,11 @@ def run_stage(root,mode):
         finally:
             trace.close()
     qualifies=mode=="confirmation" and primary["median_CI_96.14pct"][0]>2 and primary["one_sided_balanced_sharp_2x_p"]<=.05
-    save(top/"result.json",dict(complete=True,twofold_first_repeat=qualifies,harness=sources,subjects=subjects,order=order,
+    admit=mode=="screen" and min(primary["ratios_P_over_C"])>2
+    save(top/"result.json",dict(complete=True,admit_confirmation=admit,twofold_first_repeat=qualifies,harness=sources,subjects=subjects,order=order,
          metrics=metrics,counter_calibration=cal["retired_instruction_scope"]))
+    if mode=="screen" and os.environ.get("GITHUB_OUTPUT"):
+        with open(os.environ["GITHUB_OUTPUT"],"a") as f:f.write("admitted="+str(admit).lower()+"\n")
     print(mode,primary,flush=True)
 
 if __name__=="__main__":

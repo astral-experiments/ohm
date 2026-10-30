@@ -11,7 +11,7 @@ from pathlib import Path
 
 TRIPLE = "aarch64-apple-darwin"
 PARENT = "9b4b11ce8cb84020be10dc54a6426807bfa87caa"
-CHILD = "d97de79d0462fec6b08474c677857b6b058f56c2"
+CHILD = "01dccb633d12cc0124c06e02c858aff74af1dcea"
 COMPILER_TREE = "6e3a13f15765f2412afb25e57e6482ede5f751b2"
 ASM_BLOB = "d0c705b2dec75939fdd61815263ca9e6c5eb98c6"
 RUFF = "97e3bd58752cccffab11bc5af937ee7b9cda0c6b"

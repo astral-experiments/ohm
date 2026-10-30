@@ -19,23 +19,24 @@ from versioned import CAGES,V1,V2
 def write(cwd,name,text):
     p=cwd/name;p.parent.mkdir(exist_ok=True,parents=True);p.write_text(text)
 
-def case(root,trace,name,mode):
+def case(root,trace,name,mode, *, legacy_sdk=None, barrier=None):
+    generated=V1 if legacy_sdk is not None else V2
     cwd=root/"native-collision-source";work=root/"native-collision-work";cwd.mkdir();work.mkdir()
     for directory in ("target", "shared", "cargo-home"):
         (work / directory).mkdir()
-    top=root/"receipts/versioned/named"/name/mode;top.mkdir(parents=True)
+    top=root/"receipts/versioned"/("legacy-named" if legacy_sdk is not None else "named")/name/mode;top.mkdir(parents=True)
     write(cwd,"Cargo.toml",'[package]\nname="qa_collision_reader"\nversion="0.0.1"\nedition="2021"\n[dependencies]\nqa_collision={path="qa_collision"}\n[workspace]\nresolver="2"\n')
     write(cwd,"qa_collision/Cargo.toml",'[package]\nname="qa_collision"\nversion="0.0.1"\nedition="2021"\n[dependencies]\nwatch_marker={path="../watch_marker"}\n')
     write(cwd,"watch_marker/Cargo.toml",'[package]\nname="watch_marker"\nversion="0.0.1"\nedition="2021"\n[lib]\nproc-macro=true\n')
     write(cwd,"watch_marker/src/lib.rs",Path(__file__).with_name("versioned_collision.rs").read_text())
-    write(cwd,"qa_collision/src/lib.rs",edges.BARRIER+f'\npub fn value()->i32 {{barrier(watch_marker::observed!({mode}) as i32)}}\n')
+    write(cwd,"qa_collision/src/lib.rs",(edges.BARRIER if barrier is None else barrier)+f'\npub fn value()->i32 {{barrier(watch_marker::observed!({mode}) as i32)}}\n')
     write(cwd,"src/main.rs",'fn main(){println!("{}",qa_collision::value());}\n')
     for s in (V1,V2):
         try:os.stat(s)
         except OSError as e:need(e.errno==errno.ENOTDIR,"sentinel has unexpected filesystem state")
         else:raise RuntimeError("literal sentinel unexpectedly exists")
     names={"none":[],"v1":[V1],"v2":[V2],"both":[V1,V2]}[mode]
-    sdk=select(root,"C");env=env_for(work,sdk);env["RUSTC_BOOTSTRAP"]="watch_marker"
+    sdk=legacy_sdk if legacy_sdk is not None else select(root,"C");env=env_for(work,sdk);env["RUSTC_BOOTSTRAP"]="watch_marker"
     run(["cargo","+ohm","generate-lockfile","--offline"],cwd=cwd,env=env)
     save(top/"source.json",{str(p.relative_to(cwd)):p.read_text() for p in sorted(cwd.rglob("*")) if p.is_file()})
     results={};owned={}
@@ -53,13 +54,22 @@ def case(root,trace,name,mode):
         raw=read_files(out,[work/"target",work/"shared"],"qa_collision")
         ds=[v for v in raw.values() if v["kind"]=="depfile"];disk=[v for v in raw.values() if v["kind"]=="encoded"]
         need(ds and disk and current(root)["name"]==name, "missing compared dep-info or Cargo selection")
-        need(all(sorted(f["ordinary"])==sorted(names) and sorted(f["first"])==sorted(names+[V2]) and
-                 sorted(f["fake"])==sorted(names+[V2]) for f in ds),"actual tracked path became indistinguishable from the synthetic rule")
-        expect_lnk=name=="aware" and not names
-        need(all(f["has_LNK1"]==expect_lnk and f["marker_v2"] for f in disk),"receiver did not authenticate exactly one synthetic marker")
-        if expect_lnk:need(all(f["linked_marker"]==V2 for f in disk),"authority points at a different dependency")
+        need(all(sorted(f["ordinary"])==sorted(names) and sorted(f["first"])==sorted(names+[generated]) and
+                 sorted(f["fake"])==sorted(names+[generated]) for f in ds),"actual tracked path became indistinguishable from the synthetic rule")
+        if generated==V2:
+            expect_lnk=name=="aware" and not names
+            tracks_generated=True
+        else:
+            # The old #293 reader only reserved v1. The shipping receiver removes
+            # its unambiguous v1. The integrated reader preserves both real names.
+            expect_lnk=name=="classic" and V1 not in names
+            tracks_generated=(name=="classic" or V1 in names or (name=="aware" and bool(names)))
+        need(all(f["has_LNK1"]==expect_lnk for f in disk),"unrecognized marker trailer")
+        if expect_lnk:need(all(f["linked_marker"]==generated for f in disk),"authority points at a different dependency")
+        expect_disk=set(names)|({generated} if tracks_generated else set())
+        need(all(set(f["ordinary_or_synthetic_markers"])==expect_disk for f in disk),"literal input disappeared from Cargo dep-info")
         full=facts["full"].count("qa_collision")
-        need(full==int(not typed["fresh"]) and full==int(phase!="repeat" or not expect_lnk),
+        need(full==int(not typed["fresh"]) and full==int(phase!="repeat" or bool(names) or (generated==V2 and not expect_lnk)),
              "wrong physical library freshness for a real vs generated path")
         from cgu_inputs import witness
         candidates=[]
