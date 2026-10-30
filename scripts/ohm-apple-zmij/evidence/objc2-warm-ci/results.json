@@ -1,0 +1,520 @@
+{
+  "run": 41072664769,
+  "source": {
+    "qa": "3bdeb29d225ac56793e22c7be9b1ac3c83bec4af",
+    "cargo": "735e1528ed741015c57676dccf05dbdc0ff7bed1",
+    "rust": [
+      "82911b516fb35608fd70ada4deb6f8429277f410",
+      "7924254acf6ee5a17473ac47dfb33b5842d72005"
+    ],
+    "ruff": [
+      "4710e1aa962b13720cf64aa84eb279c5333896d7",
+      "915bb2b4bf9ae7eee47cf55646bbfebae254a23b"
+    ]
+  },
+  "primary": "repeat-1",
+  "profile": "warm CI retained by Cargo, rustc incremental disabled",
+  "counter": "unavailable-or-inconclusive",
+  "reference_artifacts": {
+    "native": [
+      12986949737,
+      "13cc1b4a9b682bd4e47cd06fac490d20bef667ac9c48726dc953c75e41ee219e"
+    ],
+    "pilots": [
+      12988995901,
+      "13cc1b4a9b682bd4e47cd06fac490d20bef667ac9c48726dc953c75e41ee219e"
+    ],
+    "confirmation": [
+      12991680853,
+      "a2219184c435fa6c1d71407d01e32ddfbae2cfce631a334c41c09afb09bb2d60"
+    ]
+  },
+  "native": {
+    "PC": {
+      "P": {
+        "edit": {
+          "full": [
+            "objc2",
+            "ruff_cli",
+            "ty",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 1
+        },
+        "invalid": {
+          "full": [
+            "objc2",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 0
+        },
+        "repair": {
+          "full": [
+            "objc2",
+            "ty",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 1
+        },
+        "repeat-1": {
+          "full": [
+            "objc2"
+          ],
+          "link_only": [
+            "ty"
+          ],
+          "xcode_ld": 1
+        },
+        "repeat-2": {
+          "full": [
+            "objc2"
+          ],
+          "link_only": [
+            "ty"
+          ],
+          "xcode_ld": 1
+        }
+      },
+      "C": {
+        "edit": {
+          "full": [
+            "ruff_cli",
+            "ty",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 1
+        },
+        "invalid": {
+          "full": [
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 0
+        },
+        "repair": {
+          "full": [
+            "ty",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 1
+        },
+        "repeat-1": {
+          "full": [],
+          "link_only": [
+            "ty"
+          ],
+          "xcode_ld": 1
+        },
+        "repeat-2": {
+          "full": [],
+          "link_only": [
+            "ty"
+          ],
+          "xcode_ld": 1
+        }
+      }
+    },
+    "CP": {
+      "P": {
+        "edit": {
+          "full": [
+            "objc2",
+            "ruff_cli",
+            "ty",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 1
+        },
+        "invalid": {
+          "full": [
+            "objc2",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 0
+        },
+        "repair": {
+          "full": [
+            "objc2",
+            "ty",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 1
+        },
+        "repeat-1": {
+          "full": [
+            "objc2"
+          ],
+          "link_only": [
+            "ty"
+          ],
+          "xcode_ld": 1
+        },
+        "repeat-2": {
+          "full": [
+            "objc2"
+          ],
+          "link_only": [
+            "ty"
+          ],
+          "xcode_ld": 1
+        }
+      },
+      "C": {
+        "edit": {
+          "full": [
+            "ruff_cli",
+            "ty",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 1
+        },
+        "invalid": {
+          "full": [
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 0
+        },
+        "repair": {
+          "full": [
+            "ty",
+            "ty"
+          ],
+          "link_only": [],
+          "xcode_ld": 1
+        },
+        "repeat-1": {
+          "full": [],
+          "link_only": [
+            "ty"
+          ],
+          "xcode_ld": 1
+        },
+        "repeat-2": {
+          "full": [],
+          "link_only": [
+            "ty"
+          ],
+          "xcode_ld": 1
+        }
+      }
+    }
+  },
+  "confirmation": {
+    "stage": "confirmation",
+    "scores": {
+      "edit": {
+        "median_P": 1.9795512085,
+        "median_C": 1.5967435005,
+        "paired": 1.239940697496922,
+        "pairs": [
+          [
+            1965648459,
+            1596319084
+          ],
+          [
+            1994030917,
+            1604646417
+          ],
+          [
+            1981401750,
+            1601552750
+          ],
+          [
+            2226637334,
+            1590618791
+          ],
+          [
+            2198726541,
+            1770789291
+          ],
+          [
+            1970281125,
+            1595510250
+          ],
+          [
+            1962940125,
+            1638831250
+          ],
+          [
+            1968893250,
+            1628973542
+          ],
+          [
+            1975244875,
+            1592911833
+          ],
+          [
+            1983790333,
+            1590626125
+          ],
+          [
+            1986337167,
+            1597167917
+          ],
+          [
+            1977700667,
+            1595100083
+          ]
+        ],
+        "ci": [
+          1.231363127022542,
+          1.2436620757640726
+        ],
+        "p": 1.0
+      },
+      "repeat-1": {
+        "median_P": 0.7473581665,
+        "median_C": 0.3486781045,
+        "paired": 2.1497015187201245,
+        "pairs": [
+          [
+            747122542,
+            350793416
+          ],
+          [
+            734770750,
+            345639625
+          ],
+          [
+            736475500,
+            344697667
+          ],
+          [
+            850963417,
+            351199542
+          ],
+          [
+            848104291,
+            393594416
+          ],
+          [
+            747593791,
+            346582000
+          ],
+          [
+            737016542,
+            355301125
+          ],
+          [
+            754621417,
+            349080667
+          ],
+          [
+            763919666,
+            345986416
+          ],
+          [
+            746924250,
+            348275542
+          ],
+          [
+            763479166,
+            347646916
+          ],
+          [
+            740428625,
+            349645125
+          ]
+        ],
+        "ci": [
+          2.125829033635828,
+          2.1961338670411217
+        ],
+        "p": 0.0010822510822510823
+      },
+      "repeat-2": {
+        "median_P": 0.74338325,
+        "median_C": 0.34744325,
+        "paired": 2.1470060367199917,
+        "pairs": [
+          [
+            747517500,
+            343628583
+          ],
+          [
+            743576375,
+            344871000
+          ],
+          [
+            742205958,
+            342861750
+          ],
+          [
+            853308625,
+            368701583
+          ],
+          [
+            841781750,
+            391888625
+          ],
+          [
+            739729209,
+            342698625
+          ],
+          [
+            749943458,
+            355728333
+          ],
+          [
+            739708000,
+            355386958
+          ],
+          [
+            740087209,
+            347696208
+          ],
+          [
+            743190125,
+            347712958
+          ],
+          [
+            742162375,
+            347190292
+          ],
+          [
+            744045875,
+            346713000
+          ]
+        ],
+        "ci": [
+          2.128545529032632,
+          2.164738288829244
+        ],
+        "p": 0.0010822510822510823
+      },
+      "edit+repeat-1": {
+        "median_P": 2.726158167,
+        "median_C": 1.945532625,
+        "paired": 1.399318696434035,
+        "pairs": [
+          [
+            2712771001,
+            1947112500
+          ],
+          [
+            2728801667,
+            1950286042
+          ],
+          [
+            2717877250,
+            1946250417
+          ],
+          [
+            3077600751,
+            1941818333
+          ],
+          [
+            3046830832,
+            2164383707
+          ],
+          [
+            2717874916,
+            1942092250
+          ],
+          [
+            2699956667,
+            1994132375
+          ],
+          [
+            2723514667,
+            1978054209
+          ],
+          [
+            2739164541,
+            1938898249
+          ],
+          [
+            2730714583,
+            1938901667
+          ],
+          [
+            2749816333,
+            1944814833
+          ],
+          [
+            2718129292,
+            1944745208
+          ]
+        ],
+        "ci": [
+          1.3932276645545647,
+          1.4127427998930542
+        ],
+        "p": 1.0
+      }
+    },
+    "ordinary_cli_executions": 96,
+    "disk_allocated_MiB_medians": {
+      "P": 1478.140625,
+      "C": 1477.84765625
+    },
+    "harness": {
+      "README.md": "fe4936e22cf785bb4d6c7e16966df68e260c55a5688748800a8d4ca4c251e588",
+      "admit.py": "d3e483b922e1ac044d819c288d5896149f3c95d1a9cee5eafaf3168030d49d8c",
+      "calibrate.py": "cdcbcede5eddb58a8c015c3147c31ed4115ad217f48d4d6737b368401e15bf77",
+      "cohort.py": "c9f7d6e273524417bf1eba14d127f9f8e905601f9b82fb27abb96aee4daec1c2",
+      "crc293-plan.md": "f3eb1c00e098fd2fb832de7a4abf94b07b7957bc245a7bca05fa8aeb482d0b2d",
+      "crc_clock.py": "7aa66084b0c50cd3d3ddce63b3277cb9ddcc0dc2dcade3adb0f9aeea4262287d",
+      "dyld.py": "104cb74ba70dbf50f7a745c639c66bec2a93cbf438420d482f4618210ee996e6",
+      "execs.py": "1a7d45ee84344ee8883bd782747be8425079604390fa48f53c7cce55c5bcf24a",
+      "fixed_crc.py": "ced303cecb6b4729c564733ea594c402fb064a113319a370b3e1504df3577237",
+      "host.py": "3580e2a9a10c9d30320f1e66b3253e1836cda8ca39c177cc138c65fc29cf6b85",
+      "macho_paths.py": "13f244e940d7391f550a282247f1fadbf6e1d19db315332d104abd37e4d821fd",
+      "measure.py": "d6a88beee243355b4ae56f6b319dc6bec0198ec0ac1005d81b0ba68ca86762ba",
+      "native_inputs.py": "3bb567a5bc4dd6d01b3e0fff76c2a4d65316cf5dff543caedf8fc230709f1298",
+      "objc2-secure-plan.md": "949dbc38cfda50929071dc71c561658369bf6549b1aac32ee3c137c1f46a0cdf",
+      "objc2_cli.py": "427deb7f7b8a988e793f27ca67f44ba75be58c345c18b94c7cdf87162fb46017",
+      "objc2_clock.py": "690e13971897ea915c582dcd905042fc09943e63917541bd69d1ee06f93310a9",
+      "objects.py": "7a3194669c877624e6e9bdf4280c9804ebb37682e2fe5247d0ad67c74f19e8db",
+      "pilot.py": "4bb405557f8eba4af952ae83fff96e07b1c3c27a39b43ff487046a58ed21d8e7",
+      "prepare.py": "5074988249fe043a81e645af8f08f87e03500a6e13bdf0731673f146782c8552",
+      "provider-edges.md": "9d9e43d06196cacd3e7acbc819c0cdac481d39619ed02d95bbb83c885d746cfd",
+      "provider_edges.py": "8a99390a3f5b85bb0fec363b3dfbee7a513db2c032f0479bb61afb082efa335b",
+      "receipt_cargo.py": "e03274f9511ec2096302856a4310c656e3e8367d305c0bb27e1b4842c75a86aa",
+      "reopen_test_programs.py": "146159ab1a354e9e50dfe2c665f9fc48f2758825f00a27d097ca7ff7c68145cd",
+      "run.py": "b22f0d22ebf58e030f78b21e3398b7ac79f2e016da047c918b1dee2df2def1fa",
+      "study.py": "8cde509b52c8c64861b5466e7f4f434ccd08270bd5f12f74a02f04f5557f973f",
+      "test-build-native-equivalence.md": "ed83087bf7cdfc130346b4ee118d1745d760aaef52361cacee52fcaa9b8a8f1a",
+      "test_build_study.py": "84ec83c311f335620a8b654764b996432b3fa565f11cac146ae0bab3604dd685",
+      "test_protocol.py": "3f8ff49733b4197f50b41b0013bcb282ece7541b27b03d646d084615208f7b3a",
+      "test_provider_edges.py": "61bcd15bdedea3364177225311b244045740dd058833c03ab99356c0edeb5cb4",
+      "ty_disk.py": "5902fe92100593ccff2d9752ea8936686699ed8ea1e9025a34881f5c2be1880d",
+      "verbs.py": "34f5b278f239e41cfc4288b0cbc0a9967563dd73cdd2cf1c5516d54337d660c3",
+      "verify.py": "a681dc4cfed132878052955f5eeddcf2d53e5254c76a98d6508c24546425eb60",
+      "wrapper.py": "d91e0ed6b1791538165c3a4997e7171229865158eb85273355994cf9ac74f4f6",
+      "zlib_study.py": "bc047c9d9425aca1248c47b7ea65185bafd4511b37a55e3b40a9574d67bf6feb"
+    },
+    "archive": "a2219184c435fa6c1d71407d01e32ddfbae2cfce631a334c41c09afb09bb2d60",
+    "counter_calibration": "unavailable-or-inconclusive",
+    "incidental": [],
+    "twofold_primary": true
+  },
+  "pilot_ratios": {
+    "edit": [
+      1.23506751156967,
+      1.2395500948357274
+    ],
+    "repeat-1": [
+      2.036867714696054,
+      2.1110210012014643
+    ],
+    "repeat-2": [
+      2.1721709412148384,
+      2.132734136640385
+    ],
+    "edit+repeat-1": [
+      1.383621204654927,
+      1.3977387822264455
+    ]
+  }
+}
