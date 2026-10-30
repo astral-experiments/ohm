@@ -1,5 +1,7 @@
 # AArch64 portable-atomic on the Ruff database build loop
 
+The first twelve-pair hardware study measured a 10.0093× reduction in whole-command instructions on the first unchanged library build, 1.4773× on the actual edited build and 1.9072× for the two commands together. [Primary result and offline recount](evidence/primary-41141112097/) · [Conditional independent replication](replication.md)
+
 This baseline asks whether the usual Ruff library build, or its test executable, leaves enough work attributable to portable-atomic for a compiler optimization to halve the command's instruction count. It uses the original, independently rebuilt 119-member GNU AArch64 SDK from Ohm Rust #283 and Cargo #301. The signed -21 Linux package has a different compiler and ships only x86-64 Linux libraries. [SDK provenance and source reconstruction](../ohm-gnu-syscall/source-rebuild/)
 
 Run the isolated screen on GitHub Actions.
@@ -14,7 +16,7 @@ An undefined symbol must produce E0425. Each worker builds again after a repair 
 
 ## Structural result
 
-On the GNU AArch64 cross-target build of Ruff, the real AST bounds edit still compiled `ruff_db` with both compilers. Both unchanged library builds ran one full `portable_atomic` rustc with #283. The candidate ran zero rustcs. Neither compiler invoked a linker in those two library builds. A separate baseline-only diagnostic attributed 2,541,911,126 of 2,824,041,161 Callgrind instructions to the single `portable_atomic` compilation. There is no paired speed estimate yet. [Fresh matched library build](https://github.com/astral-experiments/ohm/actions/runs/41140125827) · [Baseline process counts](evidence/baseline-build.json) · [Preregistered experimental design](registered.json)
+On the GNU AArch64 cross-target build of Ruff, the real AST bounds edit still compiled `ruff_db` with both compilers. Both unchanged library builds ran one full `portable_atomic` rustc with #283. The candidate ran zero rustcs. Neither compiler invoked a linker in those two library builds. A separate baseline-only diagnostic attributed 2,541,911,126 of 2,824,041,161 Callgrind instructions to the single `portable_atomic` compilation. [Fresh matched library build](https://github.com/astral-experiments/ohm/actions/runs/41140125827) · [Baseline process counts](evidence/baseline-build.json) · [Preregistered experimental design](registered.json)
 
 | Actual work after the edit | #283 | Candidate |
 | --- | --- | --- |
