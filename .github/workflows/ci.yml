@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: linux-checks
-        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason, e2e-features, e2e-existing, e2e-reopen]
+        options: [linux-checks, gc-control, coherent-storage, profile-selectors, apple-selector, e2e-reason, e2e-features, e2e-existing, e2e-reopen, e2e-replay]
 permissions:
   contents: read
 concurrency:
@@ -569,8 +569,13 @@ jobs:
           path: receipt
 
   e2e-reason:
-    name: Diagnose the signed Linux ty_server e2e fingerprint
-    if: ${{ (inputs.task == 'e2e-reason' || inputs.task == 'e2e-features') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    name: Diagnose the signed Linux ty_server e2e fingerprint (${{ matrix.history }})
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        history: ${{ fromJSON(inputs.task == 'e2e-replay' && '["e2e-reason","e2e-features"]' || format('["{0}"]', inputs.task)) }}
+    if: ${{ (inputs.task == 'e2e-reason' || inputs.task == 'e2e-features' || inputs.task == 'e2e-replay') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     permissions:
       contents: read
       actions: read
@@ -597,7 +602,7 @@ jobs:
       - name: Verify tools and acquire the single native target history
         env:
           QUALIFICATION_TOKEN: ${{ github.token }}
-          FEATURE_DIAGNOSTIC: ${{ inputs.task }}
+          FEATURE_DIAGNOSTIC: ${{ matrix.history }}
         run: |
           set -eu
           test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
@@ -607,14 +612,15 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: ${{ always() }}
         with:
-          name: focused-published-21-ty-server-e2e-fingerprints
+          name: ${{ inputs.task == 'e2e-replay' && format('focused-{0}-ty-server-e2e', matrix.history) || 'focused-published-21-ty-server-e2e-fingerprints' }}
           path: ${{ runner.temp }}/packaged-linux-50/diagnostic
           if-no-files-found: warn
           retention-days: 7
 
   e2e-existing:
     name: Compare existing ${{ matrix.receiver }} Cargo on the signed Linux test
-    if: ${{ inputs.task == 'e2e-existing' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    needs: e2e-reason
+    if: ${{ !cancelled() && (inputs.task == 'e2e-existing' || (inputs.task == 'e2e-replay' && needs.e2e-reason.result == 'success')) && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     permissions:
       contents: read
       actions: read
