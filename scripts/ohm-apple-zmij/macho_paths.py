@@ -1,5 +1,6 @@
 """Compare Apple test executables across Cargo's per-compiler output directories."""
 
+from bisect import bisect_left
 import hashlib
 import re
 import struct
@@ -62,6 +63,7 @@ def canonical(data, returned, linker):
     ):
         need(idx < ssize, "bad string reference")
         refs.setdefault(idx, []).append((kind, sect, desc, val))
+    offsets = sorted(refs)
     buf = bytearray(data)
     pos = start
     paths = []
@@ -71,7 +73,9 @@ def canonical(data, returned, linker):
         if not entry.startswith(ns[0]):
             continue
         # No code or non-debug symbol may refer to any part of this string.
-        owners = [i for i in refs if this <= i < this + len(entry)]
+        owners = offsets[
+            bisect_left(offsets, this) : bisect_left(offsets, this + len(entry))
+        ]
         need(
             owners == [this] and all(r == (N_OSO, 0, 1, 0) for r in refs[this]),
             "object path is not an exclusive N_OSO symbol",

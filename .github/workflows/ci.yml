@@ -10,7 +10,7 @@ on:
         description: Native QA on an isolated branch
         type: choice
         default: none
-        options: [none, mechanism, qualified]
+        options: [none, crc]
 
 permissions: {}
 
@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   apple-zmij-mechanism:
-    if: github.event_name == 'workflow_dispatch' && (inputs.apple_zmij == 'mechanism' || inputs.apple_zmij == 'qualified')
+    if: github.event_name == 'workflow_dispatch' && inputs.apple_zmij == 'crc'
     runs-on: namespace-profile-macos-15
     timeout-minutes: 240
     permissions:
@@ -48,50 +48,26 @@ jobs:
           gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" \
             --dir "$RUNNER_TEMP/apple-zmij/assets" \
             --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
-      - name: Authenticate the independently qualified signed test-build opportunity
-        if: inputs.apple_zmij == 'qualified'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/ohm-apple-zmij/run.py test_build_study admit "$RUNNER_TEMP/apple-zmij"
-      - name: Reopen all four prior clean executables and reject damaged comparison controls
-        if: inputs.apple_zmij == 'qualified'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          root="$RUNNER_TEMP/apple-zmij"
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12975434252/zip" > "$root/earlier-clean.zip"
-          python3 -IB scripts/ohm-apple-zmij/reopen_test_programs.py "$root/earlier-clean.zip" "$root/receipts/reopened-native-programs.json"
-      - name: Verify release, source and complete locked offline registry inputs
+      - name: Verify signed release and enrolled Ruff typeshed change
         run: |
           root="$RUNNER_TEMP/apple-zmij"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-          python3 -IB scripts/ohm-apple-zmij/run.py verbs seed "$root"
-      - name: Observe real check and test-build edits, invalid results, repair and unchanged visits
-        if: inputs.apple_zmij == 'mechanism'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py verbs signed "$RUNNER_TEMP/apple-zmij"
-      - name: Rebuild the exact native parent and PR compilers with one bootstrap
-        if: inputs.apple_zmij == 'qualified'
+          python3 -IB scripts/ohm-apple-zmij/run.py zlib_study seed "$root"
+      - name: Bootstrap exact parent and CRC candidate and run native rustc regression tests
         run: |
           root="$RUNNER_TEMP/apple-zmij"
           python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
           if ! command -v ninja >/dev/null; then brew install ninja; fi
           (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
           python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
+          python3 -IB scripts/ohm-apple-zmij/source-transport/crc/prepare.py "$root/enrolled-rust" > "$root/receipts/crc-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
-      - name: Run two mirrored test-build pairs and verify real edit and native library changes
-        if: inputs.apple_zmij == 'qualified'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py test_build_study screen "$RUNNER_TEMP/apple-zmij"
-      - name: Run independent twelve-pair confirmation if both pilots qualify
-        if: inputs.apple_zmij == 'qualified'
-        run: |
-          root="$RUNNER_TEMP/apple-zmij"
-          if python3 -IB -c 'import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))["accept"] else 1)' "$root/receipts/test-screen/result.json"; then
-            python3 -IB scripts/ohm-apple-zmij/run.py test_build_study confirm "$root"
-          fi
+      - name: Observe both compiler orders with independent clean products and real native inputs
+        run: python3 -IB scripts/ohm-apple-zmij/run.py zlib_study mechanism "$RUNNER_TEMP/apple-zmij"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: apple-zmij-${{ inputs.apple_zmij }}-verbs
+          name: apple-zlib-crc-mechanism
           path: ${{ runner.temp }}/apple-zmij/receipts
           retention-days: 14
           if-no-files-found: warn

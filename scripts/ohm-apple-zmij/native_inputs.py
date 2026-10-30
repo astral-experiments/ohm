@@ -5,7 +5,7 @@ import shutil
 from pathlib import Path
 
 from measure import capture, native_rows, select, typed
-from study import env_for, need, run, save, sha
+from study import MISSING, compress_bytes, env_for, need, run, save, sha
 
 
 def run_archive_check(root, role, trace, label=None):
@@ -21,12 +21,16 @@ def run_archive_check(root, role, trace, label=None):
     )
     (src / "build.rs").write_text(
         'fn main(){let d=std::env::var("CARGO_MANIFEST_DIR").unwrap();'
-        'println!("cargo:rerun-if-changed=native/libqa_answer.a");println!("cargo:rustc-link-search=native={d}/native");'
-        'println!("cargo:rustc-link-lib=static=qa_answer");}\n'
+        'println!("cargo:rerun-if-changed=native/libqa_answer.a");println!("cargo:rustc-link-search=native={d}/native");}\n'
     )
-    (src / "src/main.rs").write_text(
-        'unsafe extern "C" {fn qa_answer()->i32;} fn main(){println!("{}",unsafe{qa_answer()});}\n'
+    (src / "src/lib.rs").write_text(
+        '#[link(name="qa_answer", kind="static")] unsafe extern "C" {fn qa_answer()->i32;}\n'
+        '#[target_feature(enable="crc")] unsafe fn crc(mut a:u32,b:u32)->u32 {'
+        'unsafe {core::arch::asm!("crc32w {a:w}, {a:w}, {b:w}",a=inout(reg)a,b=in(reg)b)}; a}\n'
+        'pub fn answer()->i32 {assert!(std::arch::is_aarch64_feature_detected!("crc"));'
+        'unsafe { assert_eq!(crc(0,0),0); qa_answer() }}\n'
     )
+    (src / "src/main.rs").write_text('fn main(){println!("{}",qa_native_input::answer());}\n')
     native = src / "native"
     native.mkdir(exist_ok=True)
     command = ["cargo", "+ohm", "build", "--locked", "--offline", "--message-format=json"]
@@ -84,6 +88,15 @@ def run_archive_check(root, role, trace, label=None):
             value = run([str(exe)]).strip()
             need(value == str(want).encode(), "stale native value")
             row.update(value=want, executable=sha(exe))
+            lib, = [r for r in arts if r["target"]["name"] == "qa_native_input" and r["target"]["kind"] == ["lib"]]
+            archive_path, = [Path(p) for p in lib["filenames"] if p.endswith(".rlib")]
+            name = archive_path.stem.removeprefix("lib") + ".d"
+            files = { (p.stat().st_dev, p.stat().st_ino): p
+                      for folder in ("shared", "target") for p in (work/folder).rglob(name) }
+            dep, = files.values()
+            body = dep.read_bytes()
+            need(b"src/lib.rs" in body and MISSING in body, "bundled archive lost its conservative dep-info marker")
+            row["bundled_dep_sha256"] = compress_bytes(out/"bundled-library.dep.gz", body)
             if (
                 phase in ("initial", "replace", "repair", "empty-reference")
                 and roster
