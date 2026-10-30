@@ -10,6 +10,7 @@ import tarfile
 import tomllib
 from pathlib import Path
 
+from measure import capture
 from study import (
     ARCHIVE,
     ARCHIVE_SHA,
@@ -44,6 +45,52 @@ RELEASE = "astral-experiments/ohm"
 TAG = "ohm-1.99.0-20"
 PROV = "1c69f4ffadeed83885a4f1b4c5878b912516223b9b061de3f884bd45dc87b060"
 ASM = "compiler/rustc_codegen_llvm/src/asm.rs"
+
+
+def probe_proc_macro(root, sdk, role):
+    """Build a native proc macro, expand it in a second compiler, and execute the result."""
+    work = root / "proc-macro-probe" / role
+    work.mkdir(parents=True)
+    env = env_for(work, sdk)
+    sysroot = Path(run(["rustc", "+ohm", "--print", "sysroot"], env=env).decode().strip())
+    need(sysroot.samefile(sdk), "wrong proc-macro probe SDK")
+    sources = {
+        "count.rs": (
+            "extern crate proc_macro;\nuse proc_macro::TokenStream;\n#[proc_macro]\n"
+            "pub fn count(input: TokenStream) -> TokenStream {\n"
+            "    input.into_iter().count().to_string().parse().unwrap()\n}\n"
+        ),
+        "reader.rs": 'fn main() { println!("{}", qa_count::count!(one two three)); }\n',
+    }
+    for name, contents in sources.items():
+        (work / name).write_text(contents)
+    out = root / "receipts/proc-macro" / role
+    rustc = ["rustc", "+ohm", "--edition=2024"]
+    for label, args in (
+        ("producer", [*rustc, "--crate-name=qa_count", "--crate-type=proc-macro", "count.rs", "-o", "libqa_count.dylib"]),
+        ("consumer", [*rustc, "reader.rs", "--extern", "qa_count=libqa_count.dylib", "-o", "reader"]),
+        ("run", ["./reader"]),
+    ):
+        status, stdout, stderr, _, stats = capture(args, work, env, out / label)
+        save(out / label / "command.json", {"argv": args, "exit": status, **stats})
+        need(status == 0, f"{role} proc-macro {label}: {stderr.decode(errors='replace')[-1000:]}")
+    need(stdout == b"3\n", "wrong expanded token count")
+    files = {}
+    for name, kind in (("libqa_count.dylib", 6), ("reader", 2)):
+        path = work / name
+        with path.open("rb") as f:
+            header = f.read(16)
+        need(
+            header[:8] == bytes.fromhex("cffaedfe0c000001") and int.from_bytes(header[12:16], "little") == kind,
+            "wrong native proc-macro probe output",
+        )
+        files[name] = {"sha256": sha(path), "bytes": path.stat().st_size, "header": header.hex()}
+    members = {p.name: sha(p) for p in (sdk / "lib/rustlib" / TRIPLE / "lib").glob("libproc_macro-*")}
+    need(any(n.endswith(".rlib") for n in members), "missing sysroot proc_macro rlib")
+    save(
+        out / "verified.json",
+        {"rustc": physical(sdk / "bin/rustc"), "members": members, "sources": sources, "outputs": files, "value": 3},
+    )
 
 
 def checked_archive(inbox):
@@ -98,6 +145,7 @@ def prepare_release(root, inbox):
         archive=ARCHIVE_SHA, checksum=SIDECAR, provenance=PROV, packed_cargo=physical(packed_cargo)
     )
     save(root / "receipts/release.json", manifest)
+    probe_proc_macro(root, sdk, "S")
     shutil.rmtree(unpack)
 
 
@@ -258,9 +306,10 @@ def build_pair(root, checkout):
             "--set",
             "llvm.download-ci-llvm=true",
         ]
+        build = [*base, "build", "--stage", "1", "-j4", "compiler/rustc", "library"]
         with log.open("xb") as stream:
             subprocess.run(
-                [*base, "build", "--stage", "1", "-j4", "compiler/rustc", "library/std"],
+                build,
                 cwd=src,
                 stdout=stream,
                 stderr=subprocess.STDOUT,
@@ -289,8 +338,10 @@ def build_pair(root, checkout):
             "build_log": sha(log),
             "rustc": run([str(frozen / "bin/rustc"), "-vV"]).decode(),
             "build_flags": base[1:],
+            "build_argv": build,
         }
         save(root / "receipts" / f"bootstrap-{name}-product.json", products[name])
+        probe_proc_macro(root, frozen, name)
     p, c = (products[k] for k in "PC")
     need(
         identity_digest(root / "stage-P", p["runtime"]) == p["physical_inventory"]
