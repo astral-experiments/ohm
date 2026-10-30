@@ -1,14 +1,14 @@
-name: Native Apple objc2 ty CLI on fixed Cargo 293
+name: Measure ty CLI edits and repeats on fixed Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: apple-objc2-on-cargo-293-${{ github.ref }}
+  group: apple-objc2-clock-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   objc2-on-293:
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 300
+    timeout-minutes: 360
     env:
       PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -74,7 +74,25 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: objc2-cli-on-293-final
+          name: objc2-clock-traced
+          path: ${{ runner.temp }}/apple-objc2-on-293/receipts
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Run two mirrored untraced pilots
+        run: python3 -IB scripts/ohm-apple-zmij/run.py objc2_clock screen "$RUNNER_TEMP/apple-objc2-on-293"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: objc2-clock-pilot
+          path: ${{ runner.temp }}/apple-objc2-on-293/receipts
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Twelve independent balanced pairs and terminal empty builds
+        run: python3 -IB scripts/ohm-apple-zmij/run.py objc2_clock confirmation "$RUNNER_TEMP/apple-objc2-on-293"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: objc2-clock-confirmation
           path: ${{ runner.temp }}/apple-objc2-on-293/receipts
           retention-days: 14
           if-no-files-found: warn

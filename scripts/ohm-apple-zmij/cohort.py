@@ -78,9 +78,9 @@ def acquire(root, roles, trace, out):
     return baseline, refs
 
 
-def summarize(pairs, orders, key="ns"):
+def summarize(pairs, orders, key="ns", endpoints=ENDPOINTS):
     answer = {}
-    for phase in ENDPOINTS:
+    for phase in endpoints:
         raw = [[p[role][phase]["cargo"][key] for role in "PC"] for p in pairs]
         if key != "ns" and any(a <= 0 or b <= 0 for a, b in raw):
             answer[phase] = {"unavailable": "counter or timer resolution", "raw_PC": raw}
