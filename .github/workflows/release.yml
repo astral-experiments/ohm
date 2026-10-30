@@ -23,7 +23,7 @@ concurrency:
 jobs:
   plan:
     environment: release
-    runs-on: depot-ubuntu-24.04-4
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     outputs:
@@ -88,7 +88,7 @@ jobs:
       - name: Check out pinned ohm-rust
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: astral-sh/ohm-rust
+          repository: ${{ github.repository_owner }}/ohm-rust
           ref: ${{ steps.manifest.outputs.rust-revision }}
           token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
@@ -97,7 +97,7 @@ jobs:
       - name: Check out pinned ohm-cargo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: astral-sh/ohm-cargo
+          repository: ${{ github.repository_owner }}/ohm-cargo
           ref: ${{ steps.manifest.outputs.cargo-revision }}
           token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
@@ -106,7 +106,7 @@ jobs:
       - name: Check out pinned ohm-rust-clippy
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: astral-sh/ohm-rust-clippy
+          repository: ${{ github.repository_owner }}/ohm-rust-clippy
           ref: ${{ steps.manifest.outputs.clippy-revision }}
           token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
@@ -115,7 +115,7 @@ jobs:
       - name: Check out pinned ohm-rustfmt
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: astral-sh/ohm-rustfmt
+          repository: ${{ github.repository_owner }}/ohm-rustfmt
           ref: ${{ steps.manifest.outputs.rustfmt-revision }}
           token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
@@ -142,10 +142,9 @@ jobs:
       matrix:
         include:
           - target: aarch64-apple-darwin
-            # Namespace Apple Silicon runners crash PGO-instrumented binaries.
-            runner: depot-macos-15
+            runner: ${{ vars.OHM_RELEASE_MACOS_RUNNER || 'depot-macos-15' }}
           - target: x86_64-unknown-linux-gnu
-            runner: github-ubuntu-24.04-x86_64-8
+            runner: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'github-ubuntu-24.04-x86_64-8' }}
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -178,7 +177,7 @@ jobs:
       - name: Check out pinned ohm-rust
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: astral-sh/ohm-rust
+          repository: ${{ github.repository_owner }}/ohm-rust
           ref: ${{ needs.plan.outputs.rust-revision }}
           token: ${{ steps.source-token.outputs.token }}
           # Bootstrap needs the upstream history to locate a compatible LLVM artifact.
@@ -189,7 +188,7 @@ jobs:
       - name: Check out pinned ohm-cargo into the Rust source tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: astral-sh/ohm-cargo
+          repository: ${{ github.repository_owner }}/ohm-cargo
           ref: ${{ needs.plan.outputs.cargo-revision }}
           token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
@@ -198,7 +197,7 @@ jobs:
       - name: Check out pinned ohm-rust-clippy into the Rust source tree
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          repository: astral-sh/ohm-rust-clippy
+          repository: ${{ github.repository_owner }}/ohm-rust-clippy
           ref: ${{ needs.plan.outputs.clippy-revision }}
           token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
@@ -207,7 +206,7 @@ jobs:
       - name: Check out pinned ohm-rustfmt into the Rust source tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: astral-sh/ohm-rustfmt
+          repository: ${{ github.repository_owner }}/ohm-rustfmt
           ref: ${{ needs.plan.outputs.rustfmt-revision }}
           token: ${{ steps.source-token.outputs.token }}
           persist-credentials: false
@@ -471,7 +470,7 @@ jobs:
     needs:
       - plan
       - build
-    runs-on: depot-ubuntu-24.04-4
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     env:
@@ -516,7 +515,7 @@ jobs:
           - target: aarch64-apple-darwin
             runner: namespace-profile-macos-15
           - target: x86_64-unknown-linux-gnu
-            runner: depot-ubuntu-24.04-4
+            runner: ubuntu-24.04
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -559,7 +558,7 @@ jobs:
       - plan
       - smoke-test
     environment: release
-    runs-on: depot-ubuntu-24.04-4
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     env:

@@ -89,11 +89,11 @@ Store the GitHub App client ID and Cloudflare account and bucket configuration a
 The bucket is served publicly from `labs.astral.sh` and should be separate from Astral's production
 release bucket. Its credentials should only grant access to the experimental release bucket.
 
-Apple Silicon builds use `depot-macos-15` because PGO-instrumented binaries crash on Namespace
-runners; macOS smoke tests still use `namespace-profile-macos-15`. x86_64 Linux builds use
-`github-ubuntu-24.04-x86_64-8`. macOS builds need at least 50 GiB of available disk space, while
-Linux builds need at least 150 GiB for the temporary BOLT profiling corpus. Planning and publication
-use `depot-ubuntu-24.04-4` runners.
+Linux distribution builds use `github-ubuntu-24.04-x86_64-8` and need at least 150 GiB free for
+BOLT profiling. Apple Silicon builds use `depot-macos-15` and need at least 50 GiB free for PGO.
+To select a different build runner, set `OHM_RELEASE_LINUX_RUNNER` or `OHM_RELEASE_MACOS_RUNNER`
+as a repository or organization variable. Check that the macOS runner can execute PGO-instrumented
+binaries. Those binaries crashed on the Namespace Macs used for smoke tests.
 
 Component-PGO-capable Rust source revisions additionally optimize rustdoc, Cargo, Clippy, rustfmt,
 and cargo-fmt on both platforms; historical source revisions retain rustc-only PGO. Cargo shares
@@ -107,7 +107,7 @@ Run the release workflow from `main` with the pinned manifest and enable the ful
 build:
 
 ```console
-gh workflow run release.yml --repo astral-sh/ohm --ref main \
+gh workflow run release.yml --repo astral-experiments/ohm --ref main \
   -f manifest="$manifest" -F build=true
 ```
 
