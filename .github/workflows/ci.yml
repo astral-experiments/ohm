@@ -1,13 +1,13 @@
-name: Native Apple developer Ruff AST on Cargo 293
+name: Developer Ruff AST test builds with the shared link-only fallback
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: apple-ast293-developer-${{ github.ref }}
+  group: apple-ast293-real-test-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   ast-on-293:
-    if: github.ref == 'refs/heads/charlie/qa-apple-ast293-debug-names'
+    if: github.ref == 'refs/heads/charlie/qa-apple-ast293-real-test'
     runs-on: namespace-profile-macos-15
     timeout-minutes: 355
     env:
@@ -22,7 +22,7 @@ jobs:
           python-version: '3.13'
       - name: Freeze and verify subjects, clock design and native execution observer
         run: |
-          root="$RUNNER_TEMP/apple-ast293-developer"
+          root="$RUNNER_TEMP/apple-ast293-real-test"
           python3 -IB scripts/ohm-apple-zmij/test_ast_developer.py -v
           python3 -IB scripts/ohm-apple-zmij/test_ast_combined.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_cgu scripts/ohm-apple-zmij/native-fixtures/developer-root-cgu-prior.zip
@@ -31,20 +31,20 @@ jobs:
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
           python3 -IB scripts/ohm-apple-zmij/ast_developer.py register "$root"
-          cp scripts/ohm-apple-zmij/ast293-debug-names-plan.md "$root/receipts/registration.md"
+          cp scripts/ohm-apple-zmij/ast293-real-test-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          root="$RUNNER_TEMP/apple-ast293-developer"
+          root="$RUNNER_TEMP/apple-ast293-real-test"
           mkdir "$root/assets"
           gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
           python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-      - name: Verify and separately park both real Ruff source and locked registry seeds
-        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py seed "$RUNNER_TEMP/apple-ast293-developer"
+      - name: Verify and park the real historical Ruff test source and locked registry seed
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py seed "$RUNNER_TEMP/apple-ast293-real-test"
       - name: Bootstrap source-bound 2035696c and 444c0273 and run both native compiler tests
         run: |
-          root="$RUNNER_TEMP/apple-ast293-developer"
+          root="$RUNNER_TEMP/apple-ast293-real-test"
           python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
           if ! command -v ninja >/dev/null; then brew install ninja; fi
           (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
@@ -52,60 +52,56 @@ jobs:
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
       - name: Build unmodified Cargo 735e and bind exactly one Mach-O to both compilers
         run: |
-          root="$RUNNER_TEMP/apple-ast293-developer"
+          root="$RUNNER_TEMP/apple-ast293-real-test"
           python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$root"
           python3 -IB scripts/ohm-apple-zmij/fixed_crc.py pin "$root"
       - name: Qualify the 392 vector-assembly native provider commands
         id: providers
         run: |
-          root="$RUNNER_TEMP/apple-ast293-developer"
+          root="$RUNNER_TEMP/apple-ast293-real-test"
           python3 -IB scripts/ohm-apple-zmij/fixed_crc.py providers "$root"
           python3 -IB -c 'import json,sys; assert json.load(open(sys.argv[1]))["passed"]' "$root/receipts/provider-matrix/terminal.json"
-      - name: Verify ordinary developer build and both complete clean native outputs
-        id: structural_build
-        if: always() && steps.providers.outcome == 'success'
-        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py structural "$RUNNER_TEMP/apple-ast293-developer" build
       - name: Verify ordinary developer test and both complete clean native outputs
         id: structural_test
         if: always() && steps.providers.outcome == 'success'
-        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py structural "$RUNNER_TEMP/apple-ast293-developer" test
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py structural "$RUNNER_TEMP/apple-ast293-real-test" test
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: ast293-developer-structural
-          path: ${{ runner.temp }}/apple-ast293-developer/receipts
+          name: ast293-real-test-structural
+          path: ${{ runner.temp }}/apple-ast293-real-test/receipts
           retention-days: 14
           if-no-files-found: warn
-      - name: screen ordinary standalone build Cargo after qualified local mechanism
-        id: screen_build
-        if: always() && steps.structural_build.outcome == 'success'
-        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py screen "$RUNNER_TEMP/apple-ast293-developer" build
-      - name: confirm ordinary standalone build Cargo after qualified local mechanism
-        id: confirm_build
-        if: always() && steps.screen_build.outcome == 'success'
-        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py confirm "$RUNNER_TEMP/apple-ast293-developer" build
       - name: screen ordinary standalone test Cargo after qualified local mechanism
         id: screen_test
         if: always() && steps.structural_test.outcome == 'success'
-        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py screen "$RUNNER_TEMP/apple-ast293-developer" test
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py screen "$RUNNER_TEMP/apple-ast293-real-test" test
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always() && steps.screen_test.outcome == 'success'
+        with:
+          name: ast293-real-test-screen
+          path: ${{ runner.temp }}/apple-ast293-real-test/receipts
+          retention-days: 14
+          if-no-files-found: error
       - name: confirm ordinary standalone test Cargo after qualified local mechanism
         id: confirm_test
         if: always() && steps.screen_test.outcome == 'success'
-        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py confirm "$RUNNER_TEMP/apple-ast293-developer" test
-      - name: Seal both independent verb outcomes
+        run: python3 -IB scripts/ohm-apple-zmij/ast_developer.py confirm "$RUNNER_TEMP/apple-ast293-real-test" test
+      - name: Seal native and gated test-only outcomes
         if: always()
         run: |
-          root="$RUNNER_TEMP/apple-ast293-developer/receipts"
+          root="$RUNNER_TEMP/apple-ast293-real-test/receipts"
           python3 -IB - "$root" <<'PYCODE'
           import json,pathlib,sys
           base=pathlib.Path(sys.argv[1]);summary={};valid=True
-          for verb in ('build','test'):
+          for verb in ('test',):
               vals={}
               for phase in ('structural','screen','confirm'):
                   p=base/('ast-'+verb+'-'+phase)/'result.json'
                   vals[phase]=json.loads(p.read_text()) if p.is_file() else {}
               s=vals['structural'];c=vals['confirm']
-              ok=s.get('safe') is True and (c.get('valid') is True if s.get('mechanism') else c.get('acquired') is False)
+              p=vals['screen'];eligible=p.get('selected_endpoint') is not None
+              ok=s.get('safe') is True and (p.get('valid') is True and (c.get('valid') is True if eligible else c.get('acquired') is False and c.get('required') is False) if s.get('mechanism') else c.get('acquired') is False)
               summary[verb]={'safe':s.get('safe'),'mechanism':s.get('mechanism'),'observations':c.get('valid',False),'twofold':c.get('twofold_confirmed'),'valid':ok};valid &= ok
           (base/'ast-ordinary-terminal.json').write_text(json.dumps(summary,sort_keys=True)+'\n')
           print(summary);sys.exit(0 if valid else 1)
@@ -113,7 +109,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: ast293-developer-final
-          path: ${{ runner.temp }}/apple-ast293-developer/receipts
+          name: ast293-real-test-final
+          path: ${{ runner.temp }}/apple-ast293-real-test/receipts
           retention-days: 14
           if-no-files-found: warn

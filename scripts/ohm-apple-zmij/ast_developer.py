@@ -20,14 +20,15 @@ from study import ARGS, CHILD, EDIT, EXPECTED, PARENT, RUFF, check_host, env_for
 from test_build_study import NEGATIVE, STEPS, compare_clean
 import verbs
 
-VERBS=('build','test')
-SUBJECTS={'build':[RUFF,EDIT], 'test':[verbs.A,verbs.B]}
+VERBS=('test',)
+SUBJECTS={'test':[verbs.A,verbs.B]}
+SELECTION=('edit-plus-repeat','repeat-1','repeat-2','edit')
 MODES=('structural','screen','confirm')
 
 
 def orders(verb,mode):
-    if mode!='confirm':return ['PC','CP'] if verb=='build' else ['CP','PC']
-    key='ohm/native-ast293/dev/debug-identity-v2/'+verb+'/'+SUBJECTS[verb][1]+'/'+PARENT+'/'+CHILD+'/'+CANDIDATE
+    if mode!='confirm':return ['PC','CP']
+    key='ohm/native-ast293/dev/retained-test-driver-v3/'+verb+'/'+SUBJECTS[verb][1]+'/'+PARENT+'/'+CHILD+'/'+CANDIDATE
     candidates=list(itertools.combinations(range(12),6))
     allocation=int(sha256(key.encode()).hexdigest(),16)%len(candidates)
     return ['PC' if i in candidates[allocation] else 'CP' for i in range(12)]
@@ -35,9 +36,9 @@ def orders(verb,mode):
 
 def register(root):
     save(root/'receipts/ast-registration.json',{'rust':{'P':PARENT,'C':CHILD},'cargo':CANDIDATE,
-        'ruff':SUBJECTS,'argv':{'build':ARGS,'test':verbs.ARGS['test']},
+        'ruff':SUBJECTS,'argv':{'test':verbs.ARGS['test']},
         'orders':{v:{m:orders(v,m) for m in MODES} for v in VERBS},'native_identity_source':'0fdb71350b882f13a525ce2caa628fa3ec7825b2','endpoints':['edit-plus-repeat','edit','repeat-1','repeat-2'],'harness':fingerprint_sources(),
-        'criterion':'Positive physical mechanism and complete correctness in both mirrored structural pairs. Then 2 + 12 fresh pairs independently per verb, regardless of the size of the first two wall ratios. Primary consecutive edit plus first unchanged Cargo in one dedicated installation and clock. Three additional endpoint-specific independent installations per role and pair. No prior CI data.'})
+        'criterion':'Fresh test-only structural flanks must remove exactly one full zmij compiler while retaining the identical AST link-only fallback and zero Xcode ld on both unchanged commands. Four fresh point-specific installs per role with two mirrored wall pilot pairs. Open 12 fresh independent balanced pairs only if each pilot individually exceeds 2x on the same named endpoint. Freeze one qualifying endpoint by priority edit-plus-repeat, repeat-1, repeat-2, edit for held-out inference. Include every latency and all physical verifications. No old CI, negative structural or calibration sample enters a timing estimate.'})
 
 
 def seed(root):
@@ -114,14 +115,27 @@ def physical(row):
 
 
 def effect(verb,p,c):
-    for repeat in ('repeat-1','repeat-2'):
-        a,b=p[repeat],c[repeat]
-        if not (a['full'].count('zmij')==1 and not b['full'].count('zmij') and not a['zmij_fresh'] and b['zmij_fresh']
-                and a['marker']['hard'] and not a['marker']['recheck'] and not b['marker']['hard'] and b['marker']['recheck']
-                and not (collections.Counter(b['full'])-collections.Counter(a['full']))
-                and len(b['full'])<len(a['full']) and not a['link_only'] and not b['link_only'] and a['links']>=b['links']):
+    if verb!='test':return False
+    if p['cold']['full']!=c['cold']['full'] or p['cold']['link_only']!=c['cold']['link_only'] or p['cold']['links']!=c['cold']['links']:
+        return False
+    for phase in ('edit','invalid','repair','repeat-1','repeat-2'):
+        a,b=p[phase],c[phase]
+        repeat=phase.startswith('repeat')
+        expected_full=[] if repeat else ['ruff_python_ast']
+        expected_driver=['ruff_python_ast'] if repeat else []
+        expected_ld=0 if repeat or phase=='invalid' else 1
+        if not (a['full']==sorted(expected_full+['zmij']) and b['full']==expected_full
+                and not a['zmij_fresh'] and b['zmij_fresh']
+                and a['link_only']==b['link_only']==expected_driver and a['links']==b['links']==expected_ld
+                and a['marker']['hard'] and not a['marker']['recheck'] and not b['marker']['hard'] and b['marker']['recheck']):
             return False
     return True
+
+
+def selected_endpoint(wall):
+    return next((key for key in SELECTION if len(wall[key]['ratios_P_over_C'])==2
+                 and min(wall[key]['ratios_P_over_C'])>2.0),None)
+
 
 
 def structural(root,verb,out):
@@ -174,7 +188,11 @@ def clock(root,verb,mode,out):
         return {'acquired':False,'reason':'fresh local developer structural gate did not qualify','source':sha(structural_root/'result.json')}
     if mode=='confirm':
         pilot=root/'receipts'/('ast-'+verb+'-screen')/'result.json'
-        need(load(pilot).get('valid') is True,'clock pilot missing or unsafe')
+        screen=load(pilot);need(screen.get('valid') is True,'clock pilot missing or unsafe')
+        selected=selected_endpoint(screen['wall'])
+        need(selected==screen['selected_endpoint'],'pilot gate changed')
+        if selected is None:
+            return {'acquired':False,'required':False,'reason':'neither two-pair matched endpoint exceeded 2x in both orders','pilot':sha(pilot)}
     from ast_point_clock import POINTS,run
     refs=load(structural_root/'empty-references.json');patterns=gate['pairs'];pairs=[];allocation=orders(verb,mode)
     for i,order in enumerate(allocation,1):
@@ -196,8 +214,11 @@ def clock(root,verb,mode,out):
                     c=r[key]['cargo'];c['cpu']=c['user']+c['system']
         results['cpu_seconds']=summarize(pairs,allocation,'cpu',POINTS)
     if cal['retired_instruction_scope']=='whole-tree-calibrated':results['retired_instructions']=summarize(pairs,allocation,'instructions',POINTS)
-    if mode=='confirm':
-        primary=results['wall']['edit-plus-repeat']
+    if mode=='screen':
+        results['selected_endpoint']=selected_endpoint(results['wall'])
+    else:
+        results['primary']=selected
+        primary=results['wall'][selected]
         results['twofold_confirmed']=primary['median_CI_96.14pct'][0]>2 and primary['one_sided_balanced_sharp_2x_p']<=0.05
     return results
 
