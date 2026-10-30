@@ -1,6 +1,13 @@
 name: Cargo 301 Linux checks
 on:
   workflow_dispatch:
+    inputs:
+      task:
+        description: Reproduce the complete Linux checks or compare the existing GC failures
+        type: choice
+        required: true
+        default: linux-checks
+        options: [linux-checks, gc-control]
 permissions:
   contents: read
 concurrency:
@@ -15,7 +22,7 @@ jobs:
   rustfmt:
     name: Rustfmt
     needs: schema
-    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    if: ${{ !cancelled() && inputs.task == 'linux-checks' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -36,7 +43,7 @@ jobs:
 
   clippy:
     name: Clippy (${{ matrix.os }})
-    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    if: ${{ !cancelled() && inputs.task == 'linux-checks' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     runs-on: namespace-profile-ubuntu-24-04-16
     strategy:
       fail-fast: false
@@ -61,7 +68,7 @@ jobs:
 
   cargo-tests:
     name: Cargo tests (${{ matrix.os }})
-    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    if: ${{ !cancelled() && inputs.task == 'linux-checks' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     runs-on: namespace-profile-ubuntu-24-04-16
     env:
       CARGO_PROFILE_DEV_DEBUG: 1
@@ -186,7 +193,7 @@ jobs:
   workspace-tests:
     name: Workspace tests
     needs: clippy
-    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    if: ${{ !cancelled() && inputs.task == 'linux-checks' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     runs-on: namespace-profile-ubuntu-24-04-16
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -208,7 +215,7 @@ jobs:
   resolver:
     name: Resolver tests
     needs: workspace-tests
-    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    if: ${{ !cancelled() && inputs.task == 'linux-checks' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     runs-on: namespace-profile-ubuntu-24-04-16
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -230,7 +237,7 @@ jobs:
   schema:
     name: Schema tests
     needs: cargo-tests
-    if: ${{ !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
+    if: ${{ !cancelled() && inputs.task == 'linux-checks' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030' }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -248,3 +255,49 @@ jobs:
         run: rustup toolchain install "$RUST_VERSION" --profile minimal
       - name: Run schema tests
         run: cargo +"$RUST_VERSION" test -p cargo-util-schemas --features unstable-schema
+
+  gc-control:
+    name: Compare direct parent and candidate collector tests on the same Linux filesystems
+    if: inputs.task == 'gc-control' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-native-reader-linux-ci-20261030'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 35
+    env:
+      CARGO_PROFILE_DEV_DEBUG: 1
+      CARGO_PROFILE_TEST_DEBUG: 1
+      CARGO_INCREMENTAL: 0
+      CARGO_PUBLIC_NETWORK_TESTS: 1
+    strategy:
+      matrix:
+        other: [i686-unknown-linux-gnu]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: qa-protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/ohm-aarch64-versioned/cargo-transport
+            scripts/ohm-cargo-301-linux-ci
+      - name: Authenticate Cargo 301 source, tree and all 3114 entries
+        working-directory: ${{ github.workspace }}
+        run: python3 -IB qa-protocol/scripts/ohm-cargo-301-linux-ci/source.py subject
+      - name: Install Rust
+        run: |
+          # Keep compiled-in test scratch paths outside this repository and any
+          # `target` component, for Git discovery and automatic shared-build admission.
+          echo "CARGO_TARGET_DIR=$RUNNER_TEMP/cargo-tests" >> "$GITHUB_ENV"
+          rustup toolchain install "$RUST_VERSION" --profile minimal --component rustfmt
+          rustup target add --toolchain "$RUST_VERSION" "${{ matrix.other }}" wasm32-unknown-unknown
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y gcc-multilib libsecret-1-0 libsecret-1-dev
+      - name: Run the original library tests on both physical binaries
+        run: python3 -IB ../qa-protocol/scripts/ohm-cargo-301-linux-ci/gc_control.py
+      - name: Preserve source, filesystem and test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cargo-301-and-parent-native-gc
+          path: ${{ runner.temp }}/gc-controls
+          retention-days: 14
+          if-no-files-found: error
