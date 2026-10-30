@@ -5,12 +5,12 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: qa-gnu-compact-input-ruff-20261030
+  group: qa-compact-input-lowering-only-20261030
   cancel-in-progress: false
 jobs:
   ruff:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-register-comments-20261030'
-    name: Qualify declared inputs, then count two real Ruff GNU cross-build workflows
+    name: Inspect the already-failed source-built classifier without any Ruff measurements
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     steps:
@@ -20,51 +20,23 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Reopen the preregistered mechanism and deterministic counter
-        run: |
-          set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/gnu-aarch64-ruff-screen"
-          mkdir -p "$QA_ROOT/inputs" "$QA_ROOT/receipts" "$RUNNER_TEMP/gnu-compact-provider/receipts"
-          printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
-          (cd scripts/ohm-aarch64-registers && sha256sum -c SHA256SUMS)
-          (cd scripts/ohm-aarch64-compact && sha256sum -c SHA256SUMS)
-          cp scripts/ohm-aarch64-compact/{RUFF-PLAN.md,SHA256SUMS} "$QA_ROOT/receipts"
-          git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
-          cp "$QA_ROOT/receipts/qa-head" "$RUNNER_TEMP/gnu-compact-provider/receipts/"
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind zstd
-          dpkg-query -W gcc-aarch64-linux-gnu libc6-dev-arm64-cross binutils-aarch64-linux-gnu qemu-user strace valgrind > "$QA_ROOT/receipts/packages"
-          echo 'def5fdcf6ae64a4d3e6af3786b622978d8313e0734ecf3f6cbe71d8be9e274c8  /usr/bin/valgrind.bin' | sha256sum -c -
-          python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
-      - name: Independently authenticate both source-built compiler kits
+      - name: Open only the rejected native pair for a bounded lowering inspection
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/ohm-aarch64-compact/acquire.py
-      - name: Declared files and directories, real Rust edits, malformed and missing providers, empty counterparts and unwatched classification
         run: |
           set -euo pipefail
-          transport="$QA_ROOT/inputs"
-          export QA_ROOT="$RUNNER_TEMP/gnu-compact-provider"
-          python3 -IB scripts/ohm-aarch64-compact/edge_guard.py "$transport/sdk.tar.zst" "$(cat "$transport/key")"
-      - name: Preserve actual native controls before any counted command
+          export QA_ROOT="$RUNNER_TEMP/compact-input-diagnostic"
+          mkdir -p "$QA_ROOT/inputs" "$QA_ROOT/receipts"
+          echo "QA_ROOT=$QA_ROOT" >> "$GITHUB_ENV"
+          (cd scripts/ohm-aarch64-compact && sha256sum -c SHA256SUMS)
+          python3 -IB scripts/ohm-aarch64-compact/acquire_failed.py
+      - name: Capture ordinary dep-info, MIR, LLVM, HIR and THIR
+        run: python3 -IB scripts/ohm-aarch64-compact/diagnose.py
+      - name: Keep the complete unscored observation
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: gnu-compact-input-provider-controls
-          path: ${{ runner.temp }}/gnu-compact-provider/receipts
-          retention-days: 7
-          if-no-files-found: error
-      - name: Run the four ordinary mirrors and their separately trained real first edits
-        run: |
-          set -euo pipefail
-          test -s "$RUNNER_TEMP/gnu-compact-provider/receipts/terminal.json"
-          sha256sum "$RUNNER_TEMP/gnu-compact-provider/receipts/terminal.json" > "$QA_ROOT/receipts/declared-source-and-native-gate.sha256"
-          python3 -IB scripts/ohm-aarch64-compact/ruff.py "$QA_ROOT/inputs/sdk.tar.zst" "$(cat "$QA_ROOT/inputs/key")" "$QA_ROOT/inputs/native"
-      - name: Retain every native stream, complete product and successful or failed counter
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: gnu-compact-input-ruff-complete
-          path: ${{ runner.temp }}/gnu-aarch64-ruff-screen/receipts
+          name: compact-input-precise-lowering
+          path: ${{ runner.temp }}/compact-input-diagnostic/receipts
           retention-days: 7
           if-no-files-found: error
