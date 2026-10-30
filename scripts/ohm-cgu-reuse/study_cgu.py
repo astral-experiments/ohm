@@ -80,6 +80,9 @@ def guard(role):
             shutil.copytree(p,dest/p.name)
             continue
         row=record(p)
+        votes=dict(re.findall(rb'^CGU_REUSE (\S+) (No|PostLto)$',(p/'stdout').read_bytes(),re.M))
+        need(votes and {k.decode() for k,v in votes.items() if v==b'No'}==set(row['physical_codegen']),
+             'driver reuse and physical LLVM modules disagree')
         asm,=[unit for unit,items in row['assignments'].items() if 'fn opaque::payload' in items]
         need(asm in row['physical_codegen'],"LLVM skipped the known file-reading unit")
         summary[p.name]={'asm_unit':asm,**row}
@@ -162,6 +165,13 @@ def main():
     for k in ('cold','old'):
         need(ordinary['P'][k]['native']==ordinary['C'][k]['native'] and ordinary['P'][k]['value']==ordinary['C'][k]['value'],
              'the two roles produced different native payloads or values')
+    for role in 'PC':
+        for label in ('old-empty','edit','empty-edited'):
+            result=load(rt.LOG/('ordinary-'+role)/label/'native.json')
+            ast,=[r for r in result['rustcs'] if r['crate']=='ruff_python_ast']
+            args=ast['argv']
+            need('lto=off' in args and len([v for flag,v in zip(args,args[1:]) if flag=='-C' and v.startswith('incremental=')])==1,
+                 'Ruff emitter omitted developer incremental compilation')
     save(rt.LOG/'ordinary-complete.json',{'guard':guard_rows,'roles':ordinary})
     profiles={r:profile_ruff(r) for r in 'CP'}
     save(rt.LOG/'terminal.json',{'guard':guard_rows,'profiles':profiles,'ordinary':sha(rt.LOG/'ordinary-complete.json')})
