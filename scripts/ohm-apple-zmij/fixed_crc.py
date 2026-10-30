@@ -1,4 +1,4 @@
-"""Pin one native Cargo #293 for both Rust roles and qualify real CRC native provider transitions."""
+"""Pin one native Cargo #293 for both Rust roles and qualify native objc2 frame-pointer provider transitions."""
 import argparse
 import gzip
 import json
@@ -81,7 +81,7 @@ def pin(root):
 def providers(root):
     matrix=root/'receipts/provider-matrix';matrix.mkdir();
     for n in ('edge-images','edge-markers'):(root/'receipts'/n).mkdir()
-    need('crc32w {v:w}, {v:w}, {d:w}' in edge.BARRIER and edge.BARRIER.count('asm!')==1,'wrong assembly source')
+    need('asm!("mov fp, fp", options(nomem, nostack, preserves_flags))' in edge.BARRIER and edge.BARRIER.count('asm!')==1,'wrong assembly source')
     order=[(p,w,default,r) for p in ('direct','library') for w in ('unwatched','declared') for default in (True,False) for r in 'PC']
     save(matrix/'registration.json',{'cargo':CANDIDATE,'rust':{'P':PARENT,'C':CHILD},'cases':order,'steps':edge.STEPS,'inplace':INPLACE,'barrier':edge.BARRIER,'fixture':sha(Path(edge.__file__))})
     bodies=edge.provider_factory(root,matrix);trace=ExecTrace();trace.ready();checks={};off=[]

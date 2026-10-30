@@ -1,14 +1,14 @@
-name: Native Apple CRC on fixed Cargo 293
+name: Native Apple objc2 ty CLI on fixed Cargo 293
 on: workflow_dispatch
 permissions:
   contents: read
 concurrency:
-  group: apple-crc-on-cargo-293-${{ github.ref }}
+  group: apple-objc2-on-cargo-293-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  crc-on-293:
+  objc2-on-293:
     runs-on: namespace-profile-macos-15
-    timeout-minutes: 250
+    timeout-minutes: 300
     env:
       PYTHONNOUSERSITE: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -19,91 +19,62 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Freeze and verify subjects, clock design and native execution observer
+      - name: Freeze and verify subjects, provider design and native execution observer
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-objc2-on-293"
           python3 -IB scripts/ohm-apple-zmij/test_provider_edges.py -v
           python3 -IB scripts/ohm-apple-zmij/run.py test_protocol -v
           python3 -IB scripts/ohm-apple-zmij/run.py pilot calibrate "$root"
           test -s "$root/receipts/observer.json"
-          cp scripts/ohm-apple-zmij/crc293-plan.md "$root/receipts/registration.md"
+          cp scripts/ohm-apple-zmij/objc2-secure-plan.md "$root/receipts/registration.md"
       - name: Authenticate exact signed Apple release and seed the real locked Ruff repository
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-objc2-on-293"
           mkdir "$root/assets"
           gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root/assets" --pattern 'ohm-1.99.0-20-aarch64-apple-darwin*'
           python3 -IB scripts/ohm-apple-zmij/run.py prepare release "$root" "$root/assets"
-          python3 -IB scripts/ohm-apple-zmij/run.py zlib_study seed "$root"
-      - name: Bootstrap source-bound 444c and 82911b and run both native compiler tests
+          python3 -IB scripts/ohm-apple-zmij/run.py objc2_cli seed "$root"
+      - name: Bootstrap source-bound 82911b and 7924254 and run both native compiler tests
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-objc2-on-293"
           python3 -IB scripts/ohm-apple-zmij/run.py host "$root" 32
           if ! command -v ninja >/dev/null; then brew install ninja; fi
           (cd scripts/ohm-apple-zmij/source-transport && shasum -a 256 -c SHA256SUMS)
           python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$root/enrolled-rust" > "$root/receipts/public-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/source-transport/crc/prepare.py "$root/enrolled-rust" > "$root/receipts/crc-source-transport.json"
+          python3 -IB scripts/ohm-apple-zmij/source-transport/objc2/prepare.py "$root/enrolled-rust" > "$root/receipts/objc2-source-transport.json"
           python3 -IB scripts/ohm-apple-zmij/run.py prepare pair "$root" "$root/enrolled-rust"
       - name: Build unmodified Cargo 735e and bind exactly one Mach-O to both compilers
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-objc2-on-293"
           python3 -IB scripts/ohm-apple-zmij/receipt_cargo.py build "$root"
           python3 -IB scripts/ohm-apple-zmij/fixed_crc.py pin "$root"
-      - name: Test direct and transitive provider safety before any clocks
+      - name: Test direct and transitive provider safety against independent empty builds
         id: provider
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
+          root="$RUNNER_TEMP/apple-objc2-on-293"
           python3 -IB scripts/ohm-apple-zmij/fixed_crc.py providers "$root"
           python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/provider-matrix/terminal.json" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: crc-on-293-provider
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
+          name: objc2-cli-on-293-provider
+          path: ${{ runner.temp }}/apple-objc2-on-293/receipts
           retention-days: 14
           if-no-files-found: warn
-      - name: Two independently rooted orders, actual Ruff links, invalid source, archive repair and clean references
-        id: structural
+      - name: Real ty builds in both orders, native links, invalid edits, clean matches and actual program behavior
         if: steps.provider.outputs.passed == 'true'
+        run: python3 -IB scripts/ohm-apple-zmij/run.py objc2_cli mechanism "$RUNNER_TEMP/apple-objc2-on-293"
+      - name: Verify provider and real application outcomes
         run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB scripts/ohm-apple-zmij/run.py crc_clock structural "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["structural"]).lower())' "$root/receipts/declared-crc-subject.json" >> "$GITHUB_OUTPUT"
-      - name: Mirrored ordinary untraced timers accounting for all native rechecks
-        id: pilot
-        if: steps.structural.outputs.passed == 'true'
-        run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB scripts/ohm-apple-zmij/run.py crc_clock screen "$root"
-          python3 -IB -c 'import json,sys; d=json.load(open(sys.argv[1])); print("passed="+str(d["passed"]).lower())' "$root/receipts/crc-clock-screen/result.json" >> "$GITHUB_OUTPUT"
+          root="$RUNNER_TEMP/apple-objc2-on-293"
+          python3 -IB -c 'import json, pathlib, sys; d=pathlib.Path(sys.argv[1]); assert json.loads((d/"provider-matrix/terminal.json").read_text())["passed"]; assert set(json.loads((d/"objc2-cli/mechanism.json").read_text())["orders"])=={"PC","CP"}' "$root/receipts"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: crc-on-293-pilots
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
-          retention-days: 14
-          if-no-files-found: warn
-      - name: Twelve independent balanced pairs only if both first-repeat pilots clear twofold
-        if: steps.pilot.outputs.passed == 'true'
-        run: python3 -IB scripts/ohm-apple-zmij/run.py crc_clock confirmation "$RUNNER_TEMP/apple-crc-on-293"
-      - name: Record the actual terminal gate, including any under-twofold or skipped result
-        if: always()
-        run: |
-          root="$RUNNER_TEMP/apple-crc-on-293"
-          python3 -IB - "$root/receipts" <<'PYCODE'
-          import json,pathlib,sys
-          root=pathlib.Path(sys.argv[1]);root.mkdir(exist_ok=True,parents=True)
-          rows={}
-          for label,rel,key in [('providers','provider-matrix/terminal.json','passed'),('structural','declared-crc-subject.json','structural'),('pilot','crc-clock-screen/result.json','passed'),('independent','crc-clock-confirmation/result.json','passed')]:
-              path=root/rel;rows[label]=json.loads(path.read_text())[key] if path.is_file() else None
-          (root/'terminal-gates.json').write_text(json.dumps(rows,sort_keys=True)+'\n')
-          print(rows);sys.exit(0 if all(x is True for x in rows.values()) else 1)
-          PYCODE
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: crc-on-293-final
-          path: ${{ runner.temp }}/apple-crc-on-293/receipts
+          name: objc2-cli-on-293-final
+          path: ${{ runner.temp }}/apple-objc2-on-293/receipts
           retention-days: 14
           if-no-files-found: warn
