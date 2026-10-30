@@ -232,7 +232,7 @@ class Protocol(unittest.TestCase):
                 self.assertEqual((child / path).read_bytes(), b"C")
             self.assertEqual(role_files(frozen), before)
             self.assertEqual(identity_digest(frozen, before), physical)
-            self.assertTrue((frozen / "lib/rustlib/host").resolve().is_relative_to(frozen))
+            self.assertTrue((frozen / "lib/rustlib/host").samefile(frozen / "lib/rustlib/native"))
             self.assertFalse((frozen / "lib/rustlib/rustc-src/rust").exists())
             self.assertFalse((frozen / "lib/rustlib/src/rust/library/.git").exists())
             self.assertEqual((frozen / "lib/rustlib/src/rust/library/std/src/lib.rs").read_bytes(), std.read_bytes())
