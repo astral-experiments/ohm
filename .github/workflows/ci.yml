@@ -124,6 +124,57 @@ jobs:
           compression-level: 1
           if-no-files-found: error
 
+  structure:
+    needs: bootstrap
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install and verify the native study
+        run: |
+          set -euo pipefail
+          export QA_ROOT="$RUNNER_TEMP/opaque-asm-cgu"
+          printf 'QA_ROOT=%s\n' "$QA_ROOT" >> "$GITHUB_ENV"
+          mkdir -p "$QA_ROOT/receipts" "$QA_ROOT/inbox"
+          (cd scripts/ohm-aarch64-linux && sha256sum -c SHA256SUMS)
+          (cd scripts/ohm-cgu-reuse && sha256sum -c SHA256SUMS)
+          cp scripts/ohm-cgu-reuse/{counter-plan.md,SHA256SUMS,counter-golden.json} "$QA_ROOT/receipts"
+          git rev-parse HEAD > "$QA_ROOT/receipts/qa-head"
+          python3 -IB scripts/ohm-aarch64-linux/qualify.py selftest
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user strace valgrind ninja-build zstd
+          cc -O2 -Wall -Wextra -o "$QA_ROOT/trace" scripts/ohm-aarch64-linux/trace-compilers.c
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: opaque-cgu-sdks
+          path: ${{ runner.temp }}/opaque-asm-cgu/distribution
+      - name: Read back every compiler member and the native fixture
+        run: python3 -IB scripts/ohm-cgu-reuse/transfer.py "$QA_ROOT/distribution" "${{ needs.bootstrap.outputs.sha256 }}"
+      - name: Reproduce physical LLVM units and all native Ruff outputs on the final compiler pair
+        run: |
+          python3 -IB scripts/ohm-cgu-reuse/study_cgu.py
+          python3 -IB - "$QA_ROOT/receipts/terminal.json" <<'PYCODE'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          for arm in "PC":
+              got=r["profiles"][arm]
+              assert set(got)=={"old","edit","repeat-1","repeat-2","clean"}
+              assert all(row["total"]==95 for row in got.values())
+              assert {k:v["physical"] for k,v in got.items()}==dict(old=95,clean=95,edit=95 if arm=="P" else 2,**{k:95 if arm=="P" else 1 for k in ("repeat-1","repeat-2")})
+          PYCODE
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: guarded-cgu-native-ruff-units
+          path: ${{ runner.temp }}/opaque-asm-cgu/receipts
+          retention-days: 14
+          if-no-files-found: error
+
   pilot:
     needs: [bootstrap, original-profile-control]
     runs-on: namespace-profile-ubuntu-24-04-16
@@ -170,7 +221,7 @@ jobs:
           if-no-files-found: error
 
   confirm:
-    needs: [bootstrap, pilot]
+    needs: [bootstrap, structure, pilot]
     if: needs.pilot.outputs.eligible == 'true'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 360
