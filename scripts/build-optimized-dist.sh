@@ -36,6 +36,7 @@ if [[ ! -f "$bootstrap_config" ]]; then
 fi
 
 rust_checkout="$(cd -- "$rust_checkout" && pwd -P)"
+script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 bootstrap_config="$(
   cd -- "$(dirname -- "$bootstrap_config")"
   printf '%s/%s\n' "$PWD" "$(basename -- "$bootstrap_config")"
@@ -242,10 +243,15 @@ fi
 
 # This compiler rechecks dependencies with native inputs. rustc-perf expects
 # the selected crate to be the only one compiled during each training run.
-if [[ "$toolchain" == ohm-1.99.0-20 && \
-  "$(git -C "$rust_checkout" rev-parse --verify HEAD)" == 7e71d3150938ff8ed82aca03416439d7e5b87ef3 ]]; then
-  opt_dist_arguments+=(--benchmark-cargo-config unstable.ohm-defaults=false)
-fi
+case "$toolchain" in
+  ohm-1.99.0-20 | ohm-1.99.0-21)
+    manifest="$script_directory/../toolchains/1.99.0/${toolchain##*-}.json"
+    pinned_rust="$(jq -er '.sources.rust.revision' "$manifest")"
+    if [[ "$(git -C "$rust_checkout" rev-parse --verify HEAD)" == "$pinned_rust" ]]; then
+      opt_dist_arguments+=(--benchmark-cargo-config unstable.ohm-defaults=false)
+    fi
+    ;;
+esac
 
 dist_arguments=(--set "build.description=$toolchain")
 if [[ -n "${OHM_WILD_LINKER_DIR:-}" ]]; then

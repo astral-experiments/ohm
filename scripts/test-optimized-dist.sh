@@ -471,24 +471,26 @@ mkdir -p "$(dirname -- "$component_pgo_marker")"
 printf '%s\n' 'fixture component-specific PGO capability' > "$component_pgo_marker"
 
 # The release workflow checks out the exact manifest revision with a detached HEAD.
-toolchain='ohm-1.99.0-20'
 git init --quiet "$rust_checkout"
-jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/20.json" > "$rust_checkout/.git/HEAD"
+for revision in 20 21; do
+  toolchain="ohm-1.99.0-$revision"
+  jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/$revision.json" > "$rust_checkout/.git/HEAD"
 
-: > "$trace"
-linux_output="$test_directory/linux-output.log"
-run_optimized_build "$linux_target" "$linux_output"
-assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output" true
+  : > "$trace"
+  linux_output="$test_directory/linux-$revision-output.log"
+  run_optimized_build "$linux_target" "$linux_output"
+  assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output" true
 
-: > "$trace"
-macos_output="$test_directory/macos-output.log"
-run_optimized_build "$macos_target" "$macos_output"
-assert_optimized_build \
-  "$macos_target" \
-  "$rust_checkout/build/$macos_target/ci-llvm" \
-  false \
-  true \
-  "$macos_output" true
+  : > "$trace"
+  macos_output="$test_directory/macos-$revision-output.log"
+  run_optimized_build "$macos_target" "$macos_output"
+  assert_optimized_build \
+    "$macos_target" \
+    "$rust_checkout/build/$macos_target/ci-llvm" \
+    false \
+    true \
+    "$macos_output" true
+done
 
 jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/19.json" > "$rust_checkout/.git/HEAD"
 
