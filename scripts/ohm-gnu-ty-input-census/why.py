@@ -15,8 +15,9 @@ def independent_ty(work,root,enrolled):
     src=work/'ruff';env=enrolled['env'];cli=enrolled['cli']
     assert cli==census.CLI
     census.qualify.rt.SDK=(work/'rustup/toolchains/ohm').resolve(strict=True)
-    phases=json.loads((root/'terminal.json').read_text())['phases']
-    expected=phases['edit']['product']
+    expected=json.loads((root/'edit/census.json').read_text())['product']
+    summary=json.loads((root/'terminal.json').read_text())['phases']['edit']['product']
+    assert expected['control'] in expected['tests'] and all(expected[k]==v for k,v in summary.items())
     rule=next(name for name in enrolled['changed'] if name.endswith('/exclude.rs'))
     marker='OHM_TY_PROJECT_NATIVE_REPLAY_INVALID'
     with (src/rule).open('a') as f:f.write('\nconst _: usize = '+marker+';\n')

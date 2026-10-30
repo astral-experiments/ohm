@@ -6,7 +6,7 @@ on:
         description: Bootstrap source or reopen the registered immutable compiler
         type: choice
         default: qualification
-        options: [qualification, bootstrap, pilots, holdout]
+        options: [qualification, bootstrap, pilots, holdout, ty-oracle]
 permissions:
   contents: read
   actions: read
@@ -105,13 +105,13 @@ jobs:
             ${{ runner.temp }}/svc-receiver/receipts
 
   qualification:
-    if: inputs.phase == 'qualification' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
+    if: (inputs.phase == 'qualification' || inputs.phase == 'ty-oracle') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-syscall'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix:
-        mode: [signed, classic, aware, migrate-classic, migrate-signed, census, cli]
+        mode: ${{ fromJSON(inputs.phase == 'ty-oracle' && '["census"]' || '["signed","classic","aware","migrate-classic","migrate-signed","census","cli"]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
