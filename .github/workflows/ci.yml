@@ -1,52 +1,88 @@
-name: Attribute the GNU Ruff renderer library edit to native codegen workers
+name: Qualify and screen P/F/C on real Ruff GNU renderer edits
+run-name: GNU renderer ${{ inputs.phase }} ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
+    inputs:
+      phase:
+        type: choice
+        options: [qualify, screen]
+        required: true
+      reviewed_head:
+        description: Exact 40-character packaging commit reviewed for this phase
+        required: true
+        type: string
 permissions:
   actions: read
   contents: read
 jobs:
-  diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-renderer-library-workers-20261031' && github.run_attempt == '1'
+  study:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-renderer-pfc-hardware-20261031' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 60
+    timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix:
-        position: ['01', '02']
-    name: Library worker attribution (${{ matrix.position }})
+        position: ${{ fromJSON(inputs.phase == 'qualify' && '["gate"]' || '["01","02"]') }}
+    name: ${{ inputs.phase }} (${{ matrix.position }})
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: enrolled
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: scripts/gnu-renderer-pfc-hardware
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify one approved enrollment and its sealed local programs
+        id: gate
+        env:
+          PHASE: ${{ inputs.phase }}
+          POSITION: ${{ matrix.position }}
+        run: |
+          set -euo pipefail
+          cd enrolled/scripts/gnu-renderer-pfc-hardware
+          sha256sum --strict --check SHA256SUMS
+          err="$RUNNER_TEMP/pfc-admission-stderr"
+          if ! source_head=$(python3 -IB ingress.py "$PHASE" 2>"$err"); then
+            out="$RUNNER_TEMP/gnu-renderer-pfc-$PHASE-$POSITION/receipt"
+            mkdir -p "$out"
+            cp "$err" "$out/registration-refusal.txt"
+            cp registration.json "$out/"
+            cat "$err" >&2
+            exit 1
+          fi
+          test "${#source_head}" -eq 40
+          printf 'source_head=%s\n' "$source_head" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: observers
+          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
           persist-credentials: false
           sparse-checkout: |
             scripts/gnu-example-ceiling
             scripts/gnu-renderer-library-workers
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          path: signed-inputs
-          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
+          path: source
+          ref: ${{ steps.gate.outputs.source_head }}
           persist-credentials: false
-          sparse-checkout: scripts/packaged-release-workspace
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Calibrate command, compiler and individual thread counters, then run the library edit
+          sparse-checkout: scripts/gnu-renderer-cgu-source
+      - name: Reopen original source and native observations; run this enrolled worker
         env:
           GH_TOKEN: ${{ github.token }}
+          PHASE: ${{ inputs.phase }}
           POSITION: ${{ matrix.position }}
+          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         run: |
           set -euo pipefail
-          (cd enrolled/scripts/gnu-example-ceiling && sha256sum --strict --check SHA256SUMS)
-          cd enrolled/scripts/gnu-renderer-library-workers
-          sha256sum --strict --check SHA256SUMS
-          python3 -IB study.py worker "$POSITION" "$GITHUB_WORKSPACE/signed-inputs"
+          cd enrolled/scripts/gnu-renderer-pfc-hardware
+          python3 -IB worker.py "$PHASE" "$POSITION" --source "$GITHUB_WORKSPACE/source" --observers "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: gnu-renderer-library-workers-${{ matrix.position }}
-          path: |
-            ${{ runner.temp }}/gnu-renderer-library-workers/receipt
-            !${{ runner.temp }}/gnu-renderer-library-workers/receipt/custody/cargo-301
+          name: gnu-renderer-pfc-${{ inputs.phase }}-${{ matrix.position }}
+          path: ${{ runner.temp }}/gnu-renderer-pfc-${{ inputs.phase }}-${{ matrix.position }}/receipt
+          include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn

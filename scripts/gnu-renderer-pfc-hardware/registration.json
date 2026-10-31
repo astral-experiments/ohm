@@ -1,0 +1,109 @@
+{
+  "adapter": {
+    "file": "adapter.tar.gz",
+    "files": {
+      "PLAN.md": "70076984ab6feb82a8a9eae43cb9a9c34eec7a9cc42a50305c018391c14afe66",
+      "README.md": "74ff73e5b6dfbc7f6c25472ab50615b1a3c9cf92c492fdc4ff1fcb03c7671838",
+      "SHA256SUMS": "c2818f326024896cf9fce61e4d26d600c6c8a9631737bcc24e70569c8a1e93e9",
+      "arm.py": "f648e3d23e7a7dd5f8c7268db2248d2420fb18c7bb0105010af6c975682a3216",
+      "behavior.py": "0d6ccd80ee132bfa09daf2016ce248a320b856c367f1e251ad038170a97599d1",
+      "inputs/expect/new/patch_with_primary_path_cell-ascii": "7c77fbb29e8ce342d9b79b198bc227e442d8031907bb4fe0625e31c8291c6fe3",
+      "inputs/expect/new/patch_with_primary_path_cell-unicode": "80f906c40f085a3fc9c6c223d6a6cd24de0ca71108684be77b31d9cf33900149",
+      "inputs/expect/new/patch_with_primary_path_incrementing_cell-ascii": "ec1eb8dc946ab2a55d835631b022fbb50bfb9d98d8d3cba8013ace8ab6b14dee",
+      "inputs/expect/new/patch_with_primary_path_incrementing_cell-unicode": "c3edb05ba6dd9eeea61a05588cea06050d1f35eeff8cf19196a27127d54c32ed",
+      "inputs/expect/old/patch_with_primary_path_cell-ascii": "8fe93dd75edcc219d3229586798f8ca13879582a591afc2b6b139d01b0067548",
+      "inputs/expect/old/patch_with_primary_path_cell-unicode": "8ddf0f93dd97e5afecfe5d817deb2e2377a1e320621efbc7b1d121d5a80b41eb",
+      "inputs/expect/old/patch_with_primary_path_incrementing_cell-ascii": "0f31623d97a4c1f636a6d1a2e784336641846d35b269f61de30612e29309a8df",
+      "inputs/expect/old/patch_with_primary_path_incrementing_cell-unicode": "41518cd16b6054297fc9f8000e42b0abec6dc5dd64cc0c5f23b485a38b51bde2",
+      "inputs/holdout.patch": "a5acdb9f155cb0aab4fc8f9d4d2cea468a056b95faeabb0c78a5bfe6c764ef9c",
+      "inputs/kernel.py": "d9661a99e58517690053216e823073f1a6c7644b853b85f610229590262c02e5",
+      "inputs/oracle.py": "0489d64f2ea7c976fd3e0d230f9aaaa8913526db5500ae11c3f87b61a239ad9d",
+      "inputs/reader.rs": "ee795b4c2c6a32a98f4a6ffebf75156dadbcb7a0651f7472d6d7b24036523522",
+      "inputs/registration.json": "3d2ae970855a5422468541650aa30759d2c283ec643ea4bb16a5e50eca8b6e96",
+      "inputs/renderer.patch": "012fcde7a72bbdb761e6ba80bf485b989ba93626726ca373a3a848ce455cb5c7",
+      "inputs/roster.json": "c4f4071e98f82e318ae656185d5d463629f54d637bd1559e6095752d62afb6e6",
+      "inputs/worker_artifacts.py": "d1895e5f575d1259a413745c72cc31b6b6566ba88b9b35fffbc6101bd423d95e",
+      "receipts.py": "1f64213e18d67a0664fc5fe1a575e21dbd1081a154a19b07bf298dc2b480b0b8",
+      "reopen.py": "88c4c1ea09a24832c627194bc95cb72a6b13ad19b7e376e10a260bf99b234d6f",
+      "selfcheck.py": "667c0e23d7b06bf4a591501644127071ef8899ef45d86e5c775cf668f2fd99fe",
+      "workload.py": "659deae8179922279e0b17dc226872b88535ed0da91372de834162267da4ccb8"
+    },
+    "sha256": "8ddb65df65ef6157ef6a2cbbf43f5de08b17934a5cc2bf56f16993100fa6a369"
+  },
+  "excluded_source_runs": [
+    {
+      "head": "e8571bf66528aae18c2fc81d381de52eeead9264",
+      "observation_bytes": 199320,
+      "observation_sha256": "5acbeab0a523551b6e7b2efaba44fafc08c7f73f8fbe75b9edd4968838b64750",
+      "observation_zip": 13036475306,
+      "reason": "P bootstrap returned 0, collection could not find libcore-*.rlib; no P/F/C transfer",
+      "run": 41183356225
+    },
+    {
+      "head": "b7b8d790d22663c722405e4f25c39c7fcf55e619",
+      "observation_bytes": 496503,
+      "observation_sha256": "6ab48be60f65dfb7fea52f08600c84dc5ddfefdd0036165e03ea042ccf36d6e8",
+      "observation_zip": 13036036593,
+      "partial_transfer": [
+        13036660707,
+        234384845,
+        "83d177c0f91aeb2e52cb19153228732097179f923e60e4e587faabdea27083a1"
+      ],
+      "reason": "P completed its 81-member SDK and actual native controls. F could not compile due to rustc::usage_of_qualified_ty; C never ran. No three-role transfer.",
+      "run": 41184069572
+    }
+  ],
+  "kind": "two-host-structurally-qualified-screen",
+  "membership": {
+    "file": "membership.tar.gz",
+    "files": {
+      "replay.py": "d87664ae321549daaa6ba4ba18beae7a02adeb718746639e2504bd87bbcfb28f",
+      "run.py": "c3fea96dd799b923a4a5f5a55d03d15e0762f68ba34c97d67f328fa084def729",
+      "source/closures.rs": "554efea66715e86425795ef53c5caa86fc8b4ca1cff92c59d1eb6033bd72ca19",
+      "source/forwarders.rs": "b9ce396882134098e0693db55451a9387b6dfa18fb631c9c5a98a4a2d7750605",
+      "source/reader.rs": "fcd77b3b037f766b7d71b799e9399b299651b11298f08196faf11fd1e8e0e981"
+    },
+    "sha256": "04479a75ee5f882d76ef5a8bf38637af4d4955acdf0cfbe6e3717e5d55fd75c7"
+  },
+  "mono": {
+    "file": "mono.tar.gz",
+    "files": {
+      "mono-signed-edit.gz": "dc6facdef6abffde4a00a45c7079ab2dac44c991797ccf5df159858be09f2ed4",
+      "mono-signed-old.gz": "1e2f81e432350b42bd6dd93dc4448849c415eb2c3f7861e12bcfa883e329d2cb",
+      "mono-witnesses.json.gz": "895a0501a439868f60757b7721fe6a6fe7f9026134b34af152f1b71035978678",
+      "mono.py": "a5fbb28ec21a9a51a6e7056ec675c1c6dda4372d95eb8ced847243f2d048660d",
+      "native_elf.py": "e87c707180c4193bd2b9d70a8f8157806fc9a8e8d81c628d726997b38bfde032"
+    },
+    "sha256": "ea95a867ae7581836d90f2e95494778979ec9f80a3444cd02dab786bcb5e3ee5"
+  },
+  "observers": "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc",
+  "oracle": null,
+  "plan_sha256": "70076984ab6feb82a8a9eae43cb9a9c34eec7a9cc42a50305c018391c14afe66",
+  "positions": {
+    "01": {
+      "histories": [
+        "source-map",
+        "notebook"
+      ],
+      "roles": [
+        "P",
+        "F",
+        "C"
+      ]
+    },
+    "02": {
+      "histories": [
+        "notebook",
+        "source-map"
+      ],
+      "roles": [
+        "C",
+        "F",
+        "P"
+      ]
+    }
+  },
+  "root_acceptance": null,
+  "source": null,
+  "structural": null
+}
