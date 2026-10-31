@@ -4,7 +4,7 @@ on:
     inputs:
       task:
         type: choice
-        options: [baseline, qualify, suites]
+        options: [baseline, qualify, suites, reattached]
         default: baseline
 permissions:
   contents: read
@@ -211,5 +211,58 @@ jobs:
         with:
           name: official-suites-${{ matrix.role }}
           path: ${{ runner.temp }}/private-gc/build-cert
+          retention-days: 7
+          if-no-files-found: error
+  reattached:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-private-gc-overlay-20261031' && inputs.task == 'reattached'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/private-gc-overlay
+            scripts/gc-mount-evidence
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: reader
+          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
+          persist-credentials: false
+          sparse-checkout: scripts/packaged-release-workspace
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Acquire two physically already available Cargo subjects
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          roots="$RUNNER_TEMP/private-bind-graft"
+          mkdir -m700 "$roots"
+          python3 -IB reader/scripts/packaged-release-workspace/packages.py 21 "$roots"
+          gh api repos/astral-experiments/ohm/actions/artifacts/13021667897/zip >"$roots/combined.zip"
+          echo "1b366dfc45807663d29665716fd977b11ced0e71bf3666f33d911ca7299c72ee  $roots/combined.zip" | sha256sum -c -
+          unzip -q "$roots/combined.zip" -d "$roots/product"
+          if ! command -v strace; then sudo apt-get update -qq; sudo apt-get install -y --no-install-recommends strace; fi
+      - name: Reattach the very same directory inode after the last native discovery snapshot
+        run: |
+          set -euo pipefail
+          roots="$RUNNER_TEMP/private-bind-graft"
+          for role in signed combined; do
+            base="$roots/$role"; mkdir -m700 "$base"
+            ln -s "$roots/sdk-21" "$base/sdk-21"
+            ln -s "$roots/product" "$base/product"
+            python3 -IB protocol/scripts/private-gc-overlay/reattached.py "$role" "$base"
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: genuine-reattached-private-directory
+          path: |
+            ${{ runner.temp }}/private-bind-graft/signed/packet
+            ${{ runner.temp }}/private-bind-graft/combined/packet
+            ${{ runner.temp }}/private-bind-graft/receipts/21
           retention-days: 7
           if-no-files-found: error
