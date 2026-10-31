@@ -263,11 +263,8 @@ def run(out, feature, collector, required_run=None, required_sha=None):
     )
     allcases = {}
     enrollment = read(out / "sampling-enrollment.json")
-    c.require(enrollment == {"admitted": True} or
-              (enrollment.get("admitted") is False and isinstance(enrollment.get("reason"), str)
-               and bool(enrollment["reason"])), "unregistered native sampling disposition")
-    if enrollment["admitted"]:
-        sampling.verify_calibration(out)
+    c.require(enrollment == {"admitted": True}, "missing calibrated native sampling")
+    sampling.verify_calibration(out)
     with tempfile.TemporaryDirectory() as tmp:
         study, pmu, topology = support.load_modules(feature, collector, Path(tmp) / "original-ledger")
         pmu.calibration(out / "counter-programs", out, replay=True)

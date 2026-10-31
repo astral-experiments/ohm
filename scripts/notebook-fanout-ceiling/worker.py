@@ -165,7 +165,7 @@ def run_all(workspace, incoming, root):
         os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and os.environ["GITHUB_REF"]
-        == "refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-20261031"
+        == "refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-v2-20261031"
         and support.git(HERE, "rev-parse", "HEAD")
         == os.environ["GITHUB_SHA"]
         == os.environ["REVIEWED_HEAD"],
@@ -206,11 +206,9 @@ def run_all(workspace, incoming, root):
     try:
         perf = sampling.prepare(root, tools, out)
     except Exception as err:
-        # Continue with the independent native-output experiment if this host cannot sample PMIs.
-        perf = None
         inputs.save(out / "sampling-enrollment.json", {"admitted": False, "reason": repr(err)})
-    else:
-        inputs.save(out / "sampling-enrollment.json", {"admitted": True})
+        raise
+    inputs.save(out / "sampling-enrollment.json", {"admitted": True})
     s.source(root)
     inputs.save(
         out / "environment.json",
@@ -261,7 +259,7 @@ def run_all(workspace, incoming, root):
                 all(topology.location(Path(p)) == physical[n] for n, p in paths.items()),
                 "native selectors changed",
             )
-            sampled = perf is not None and lane == "T" and phase in ("edited", "restored")
+            sampled = lane == "T" and phase in ("edited", "restored")
             if sampled:
                 raw = sampling.record(folder, tools, paths, c.CLI, root / "ruff", s.env(root), perf)
             else:

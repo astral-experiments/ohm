@@ -2,9 +2,11 @@
 
 from collections import Counter, defaultdict
 from contextlib import contextmanager
+import ctypes
 import gzip
 import hashlib
 import json
+import mmap
 import os
 from pathlib import Path
 import re
@@ -47,9 +49,53 @@ def sha(path):
 
 def identity(path):
     path = Path(path).resolve(strict=True)
-    st = path.stat()
-    return dict(
-        path=str(path), dev=st.st_dev, ino=st.st_ino, size=st.st_size, sha256=sha(path)
+    with path.open("rb") as fp:
+        st = os.fstat(fp.fileno())
+        digest = hashlib.file_digest(fp, "sha256").hexdigest()
+        # MAP_PRIVATE makes the buffer address available without modifying the file. On overlayfs,
+        # mmap and stat can report different devices for this same open file description.
+        with mmap.mmap(fp.fileno(), mmap.PAGESIZE, access=mmap.ACCESS_COPY) as mapping:
+            address = ctypes.addressof(ctypes.c_char.from_buffer(mapping))
+            for line in Path("/proc/self/maps").read_text().splitlines():
+                region, perms, offset, dev, inode, *name = line.split(maxsplit=5)
+                lo, hi = (int(n, 16) for n in region.split("-"))
+                if lo <= address < hi:
+                    require(
+                        lo == address
+                        and hi >= address + mmap.PAGESIZE
+                        and perms == "rw-p"
+                        and int(offset, 16) == 0
+                        and name == [str(path)]
+                        and int(inode) > 0
+                        and mapping[:4] == b"\x7fELF",
+                        "different enrolled ELF mapping",
+                    )
+                    major, minor = (int(n, 16) for n in dev.split(":"))
+                    return dict(
+                        path=str(path),
+                        dev=st.st_dev,
+                        ino=st.st_ino,
+                        size=st.st_size,
+                        sha256=digest,
+                        mapping_dev=os.makedev(major, minor),
+                        mapping_ino=int(inode),
+                        proc_self_maps=line,
+                    )
+    raise ValueError("enrolled ELF mapping absent")
+
+
+def verify_mapping(image):
+    region, perms, offset, dev, inode, name = image["proc_self_maps"].split(maxsplit=5)
+    lo, hi = (int(n, 16) for n in region.split("-"))
+    major, minor = (int(n, 16) for n in dev.split(":"))
+    require(
+        hi - lo >= mmap.PAGESIZE
+        and perms == "rw-p"
+        and int(offset, 16) == 0
+        and name == image["path"]
+        and image["mapping_ino"] == int(inode) > 0
+        and image["mapping_dev"] == os.makedev(major, minor),
+        "inconsistent enrolled map",
     )
 
 
@@ -94,7 +140,7 @@ def raw_report(fp):
     require(
         regs
         and not mask
-        & ~(1 | 2 | 4 | 8 | 32 | 64 | 128 | 256 | 512 | 4096 | 8192 | 65536),
+        & ~(1 | 2 | 4 | 8 | 32 | 64 | 128 | 256 | 512 | 4096 | 8192 | 32768 | 65536),
         "unsupported native sample fields",
     )
     take(start - attr - nattrs)
@@ -128,9 +174,10 @@ def raw_report(fp):
                 pos += 8 * regs
             (captured,) = struct.unpack_from("<Q", data, pos)
             pos += 8
+            # PERF_SAMPLE_DATA_SRC contributes a u64 after the complete user stack.
+            end = len(data) - (8 if mask & 32768 else 0)
             require(
-                captured <= 4096
-                and pos + captured + (8 if captured else 0) == len(data),
+                captured <= 4096 and pos + captured + (8 if captured else 0) == end,
                 "truncated user stack or register record",
             )
             if captured:
@@ -368,13 +415,13 @@ def target_image(mapping, address, named):
     hits = [
         x
         for x in mapping
-        if x[0] <= address < x[1] and (x[3], x[4]) == (named["dev"], named["ino"])
+        if x[0] <= address < x[1]
+        and (x[3], x[4]) == (named["mapping_dev"], named["mapping_ino"])
     ]
     if not hits:
         return None
     require(
-        len({(p[0], p[2], p[5]) for p in hits}) == 1
-        and Path(hits[0][5]).name == Path(named["path"]).name,
+        len({(p[0], p[2], p[5]) for p in hits}) == 1 and hits[0][5] == named["path"],
         ("ambiguous underlying sampled ELF", hits),
     )
     return address - hits[0][0] + hits[0][2]
@@ -460,6 +507,7 @@ def verify_calibration(out):
     manifest = load(folder / "tools.json")
     binary = out / "counter-programs" / "loop"
     require(sha(binary) == manifest["loop"]["sha256"], "different calibration program")
+    verify_mapping(manifest["loop"])
     sites = loop_sites(binary)
     result = {
         label: expensive(folder / label, manifest["loop"], label, sites)
@@ -559,6 +607,7 @@ def proof_inputs(folder, counted):
         registered = json.load(f)
     for name, h in PIN.items():
         v = ids[name]
+        verify_mapping(v)
         orig = registered["lib/" + name]
         require(
             v["sha256"] == orig["sha256"] == h
@@ -606,7 +655,7 @@ def breakdown(folder, counted):
     ids, subject = proof_inputs(folder, counted)
     _, groups, parents = task_groups(folder)
     samples, maps, execs, record_counts = joined(folder)
-    inodes = {(f["dev"], f["ino"]) for f in ids.values()}
+    inodes = {(f["mapping_dev"], f["mapping_ino"]) for f in ids.values()}
     selected = {
         pid: [v for v in maps[pid] if (v[3], v[4]) in inodes] for pid in subject
     }
