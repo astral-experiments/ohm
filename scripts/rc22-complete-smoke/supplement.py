@@ -50,15 +50,34 @@ def worktree(files):
             r for r in map(json.loads, e["stdout"].splitlines()) if r.get("target", {}).get("name") == "itoa"
         ]
         need(r["fresh"] and r["filenames"] == expected, "stale child worktree")
-    last = events[-1]
+    checked, seal = events[-2:]
     need(
-        last["argv"][:3] == ["cargo", "+" + CFG["release"], "check"]
-        and last["status"] == 101
+        [i for i, event in enumerate(events) if event["status"]] == [len(events) - 2]
+        and checked["argv"]
+        == ["cargo", "+" + CFG["release"], "check", "--locked", "--offline", "--message-format=json"]
+        and checked["status"] == 101
+        and seal["argv"]
+        == [
+            "git",
+            "-c",
+            "user.name=Ohm native smoke",
+            "-c",
+            "user.email=qa@invalid.example",
+            "-c",
+            "commit.gpgsign=false",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "rev-parse",
+            "--path-format=absolute",
+            "--git-common-dir",
+        ]
+        and seal["status"] == 0
+        and seal["stdout"].strip() == proof["common_repository"]
         and any(
             r.get("message", {}).get("code")
             and r["message"]["code"]["code"] == "E0277"
             and any(s["is_primary"] and s["file_name"] == "src/main.rs" for s in r["message"]["spans"])
-            for r in map(json.loads, last["stdout"].splitlines())
+            for r in map(json.loads, checked["stdout"].splitlines())
         ),
         "wrong typed negative",
     )

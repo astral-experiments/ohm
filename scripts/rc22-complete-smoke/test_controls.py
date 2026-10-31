@@ -207,7 +207,34 @@ class Controls(unittest.TestCase):
                 "spans": [{"is_primary": True, "file_name": "src/main.rs"}],
             }
         }
-        events.append({"argv": cli + ["check"], "status": 101, "stdout": json.dumps(diag)})
+        events.append(
+            {
+                "argv": cli + ["check", "--locked", "--offline", "--message-format=json"],
+                "status": 101,
+                "stdout": json.dumps(diag),
+            }
+        )
+        proof["common_repository"] = "/private/donor/.git"
+        events.append(
+            {
+                "argv": [
+                    "git",
+                    "-c",
+                    "user.name=Ohm native smoke",
+                    "-c",
+                    "user.email=qa@invalid.example",
+                    "-c",
+                    "commit.gpgsign=false",
+                    "-c",
+                    "core.hooksPath=/dev/null",
+                    "rev-parse",
+                    "--path-format=absolute",
+                    "--git-common-dir",
+                ],
+                "status": 0,
+                "stdout": proof["common_repository"] + "\n",
+            }
+        )
         save(self.root / "worktree-commands.json", events)
         save(self.root / "worktree-registry.json", owners)
         save(self.root / "worktree.json", proof)
@@ -232,10 +259,11 @@ class Controls(unittest.TestCase):
         self.assertNotIn("permissions: write", workflow)
         self.assertNotIn("secrets.", workflow)
         self.assertNotIn("pull_request:", workflow)
-        self.assertEqual(workflow.count("GH_TOKEN:"), 2)
+        self.assertEqual(workflow.count("GH_TOKEN:"), 1)
         self.assertIn("inputs.reviewed_head == github.sha", workflow)
-        self.assertIn("inputs.source == '41237680370'", workflow)
-        self.assertIn("inputs.previous == '41249054242'", workflow)
+        self.assertIn("inputs.source == '41250511954'", workflow)
+        self.assertNotIn("run.py static-fourfix", workflow)
+        self.assertNotIn("static_cargo.py", workflow)
         expected = {HERE / "SHA256SUMS"}
         for row in (HERE / "SHA256SUMS").read_text().splitlines():
             digest, path = row.split("  ", 1)
