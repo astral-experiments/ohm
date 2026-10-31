@@ -14,6 +14,8 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import registration as reg
 import native_guard
+import lineage_calibration
+import retained_full
 import restore
 from registration import need, sha, write
 
@@ -123,7 +125,7 @@ def native(b,root,sdk,log,role):
     (testdir/"bad.rs").write_text("pub fn broken(_: UnavailableBranchQaType) {}\n")
     rc=b.log_run(["rustdoc","+ohm",testdir/"bad.rs","-o",testdir/"bad-doc"],testdir,log/"rustdoc-invalid.log",env)
     txt=(log/"rustdoc-invalid.log").read_text()
-    need(rc==1 and "error[E0412]" in txt and "UnavailableBranchQaType" in txt and "internal compiler error" not in txt,"wrong native doc diagnostic")
+    need(rc==1 and txt.count("error[E0425]: cannot find type `UnavailableBranchQaType` in this scope")==1 and "aborting due to 1 previous error" in txt and "internal compiler error" not in txt,"wrong native doc diagnostic")
     sys.path.insert(0,str(HERE.parent/"ohm-packed-ruff/full-cli"))
     from provider import native_controls
     native_controls(role,env,testdir,log)
@@ -145,28 +147,35 @@ def main(trusted):
     src=reg.source(repo,True,rec);write(rec/"source-transplant.json",src)
     roles={k:src["roles"][k] for k in ("F","K")};members={};versions=[];changes={}
     bound={"qa":os.environ["GITHUB_SHA"],"run":os.environ["GITHUB_RUN_ID"],"attempt":os.environ["GITHUB_RUN_ATTEMPT"]}
+    inbox=retained_full.acquire(root)
+    calibration=rec/"lineage-calibration"
+    write(rec/"lineage-calibration.json",lineage_calibration.check(calibration))
     for role in ("F","K"):
         log=rec/role;log.mkdir()
         srcid=roles[role]["commit"];b.git(repo,"checkout","--detach",srcid);b.check_source(repo,srcid)
         need(not (repo/"build").exists(),"old bootstrap products present")
-        write(log/"source.json",dict(**roles[role],**bound,launcher=b.launcher(repo),llvm=b.LLVM))
-        sdk_build=["./x",*b.OPTIONS,"build",*b.HOST_FLAGS,*b.SDK_COMPONENTS]
-        b.succeeded(sdk_build,repo,log/"bootstrap.log")
-        stage=repo/"build"/b.HOST/"stage1"
-        actual0={"source":sha(repo/"src/stage0"),**{k:sha(stage.parent/"stage0/bin"/k) for k in ("rustc","cargo")}}
-        need(actual0==b.STAGE0,"stage0 bytes differ")
-        files=selected(b,stage,root);before=b.manifest(files);write(log/"before-tests.json",before)
+        write(log/"qualification-job.json",dict(**bound,source=srcid,launcher=b.launcher(repo),llvm=b.LLVM))
         if role=="F":
-            b.archive(files,transfer/"F-sdk.tar.zst")
+            files,actual,origin=retained_full.reopen(root,inbox,repo,log,transfer,b,sys.modules[__name__])
+            stage=root/"original-full-sdk"
         else:
-            before_diff={Path(n):files[Path(n)] for n,row in before.items() if members["F"].get(n)!=row}
-            need(bool(before_diff),"Packed did not change the native driver")
+            write(log/"source.json",dict(**roles[role],**bound,launcher=b.launcher(repo),llvm=b.LLVM))
+            sdk_build=["./x",*b.OPTIONS,"build",*b.HOST_FLAGS,*b.SDK_COMPONENTS]
+            b.succeeded(sdk_build,repo,log/"bootstrap.log")
+            stage=repo/"build"/b.HOST/"stage1"
+            actual0={"source":sha(repo/"src/stage0"),**{k:sha(stage.parent/"stage0/bin"/k) for k in ("rustc","cargo")}}
+            need(actual0==b.STAGE0,"stage0 bytes differ")
+            files=selected(b,stage,root);before=b.manifest(files);write(log/"before-tests.json",before)
+            need(set(before)==set(members["F"]),"candidate has a different native installation")
+            before_diff={Path(n):files[Path(n)] for n,row in before.items() if members["F"][n]!=row}
+            need(Path(driver_key) in before_diff and set(before_diff)<={Path(driver_key),Path("bin/rustdoc")},"unexpected Packed native differences")
             b.archive(before_diff,transfer/"K-delta.tar.zst")
-        product_tests(b,repo,role,log)
-        rem=b.manifest({k:p for k,p in files.items() if p.is_file()});need(all(before[n]==row for n,row in rem.items()),"tests rewrote retained SDK members")
-        b.succeeded(sdk_build,repo,log/"reassemble.log")
-        files=selected(b,stage,root);actual=b.manifest(files);write(log/"inventory.json",actual)
-        need(actual==before,"tests changed the complete rebuilt SDK")
+            product_tests(b,repo,role,log)
+            rem=b.manifest({k:p for k,p in files.items() if p.is_file()})
+            need(all(before[n]==row for n,row in rem.items()),"tests rewrote retained SDK members")
+            b.succeeded(sdk_build,repo,log/"reassemble.log")
+            files=selected(b,stage,root);actual=b.manifest(files);write(log/"inventory.json",actual)
+            need(actual==before,"tests changed the complete rebuilt SDK")
         driver,=[n for n in actual if n.startswith("lib/librustc_driver") and n.endswith(".so")]
         members[role]=actual
         if role=="F":
@@ -184,12 +193,14 @@ def main(trusted):
         for rel,p in files.items():
             target=sdk/rel;target.parent.mkdir(parents=True,exist_ok=True);os.link(p.resolve(),target)
         native(b,root,sdk,log,role)
-        need(b.manifest(selected(b,stage,root))==actual,"ordinary use altered source-built SDK")
+        need(b.manifest(files)==actual,"ordinary use altered source-built SDK")
         shutil.rmtree(sdk);b.check_source(repo,srcid)
-        folder=repo/"build";need(folder.resolve()==b.ROOT/"rust/build" and not folder.is_symlink(),"foreign bootstrap folder")
-        shutil.rmtree(folder)
+        if role=="K":
+            folder=repo/"build";need(folder.resolve()==b.ROOT/"rust/build" and not folder.is_symlink(),"foreign bootstrap folder")
+            shutil.rmtree(folder)
     products={p.name:[sha(p),p.stat().st_size] for p in transfer.iterdir()}
     m=dict(**bound,qualified=True,roles=roles,files=members,driver=driver_key,delta=sorted(changes),products=products,
+           source_builds={"F":origin,"K":dict(**bound,source=roles["K"]["commit"],built_here=True)},
            strict_cargo=reg.CARGO,wild=reg.WILD,host=reg.HOST,stage0=b.STAGE0,llvm=b.LLVM,compiler_verbose=versions[0].decode(),
            tests={r:sha(rec/r/"checked-in-tests.json") for r in roles},origin=sha(rec/"cargo-origin.json"))
     out=transfer/"manifest.json";write(out,m)
@@ -200,7 +211,7 @@ def main(trusted):
         terminal["cargo_version"]=subprocess.check_output(["cargo","+ohm","-Vv"],env=env_for(root),text=True)
         need("commit-hash: "+reg.CARGO in terminal["cargo_version"],"wrong restored Cargo")
         write(rec/role/"restored.json",terminal);shutil.rmtree(dest)
-    write(rec/"qualified.json",dict(**bound,manifest=sha(out),roles=roles,products=products,common=len(members["F"])-len(changes),changed=sorted(changes)))
+    write(rec/"qualified.json",dict(**bound,manifest=sha(out),roles=roles,products=products,common=len(members["F"])-len(changes),changed=sorted(changes),source_builds=m["source_builds"]))
     print((rec/"qualified.json").read_text(),flush=True)
 
 

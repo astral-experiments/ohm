@@ -15,30 +15,20 @@ MARKER=b"/dev/null/ohm-recheck-dependent-links"
 ASMS='unsafe {core::arch::asm!("/* {0} */",inout(reg) n,options(pure,nomem,nostack));core::arch::asm!("nop");}'
 
 def evidence(logs, out, expected, sdk):
-    wild=set();threads={};selected=set(); actual_cargo=set()
+    from native_trace import owner_reads
+    raw={}
     with gzip.GzipFile(out,"xb",mtime=0) as archive:
         for path in sorted(logs.glob("pid.*")):
-            pid=int(path.suffix[1:]); data=path.read_bytes()
-            archive.write(("== "+str(pid)+" ==\n").encode()+data)
-            for raw in data.decode(errors="strict").splitlines():
-                child=re.match(r"^(?:clone3?\(|<\.\.\. clone3? resumed>).*CLONE_THREAD.* = (\d+)$",raw)
-                if child:threads[int(child[1])]=pid
-                cmd=re.match(r'^execve\("([^"]+)",.*= 0$',raw)
-                if cmd:
-                    fn=Path(cmd[1])
-                    if fn.is_absolute() and fn.is_file():
-                        if fn.samefile(sdk/WILD):wild.add(pid)
-                        if fn.samefile(sdk/"bin/cargo"):actual_cargo.add(pid)
-                returned=re.search(r"^openat\(.*\bO_RDONLY\b.*\)\s+= [0-9]+<([^>]+)>$",raw)
-                if returned and returned[1]==str(expected):selected.add(pid)
-    def group(pid):
-        seen=set()
-        while pid in threads:
-            need(pid not in seen,"thread ancestry cycle");seen.add(pid);pid=threads[pid]
-        return pid
-    observed={pid for pid in selected if group(pid) in wild}
-    need(actual_cargo and wild and observed,"no authenticated Cargo, stock Wild or positively observed selected native archive")
-    return dict(cargo=sorted(actual_cargo),wild=sorted(wild),archive_read_by=sorted(observed),resolved=str(expected),sha256=sha(expected))
+            pid=int(path.suffix[1:]);data=path.read_bytes();archive.write(("== "+str(pid)+" ==\n").encode()+data)
+            raw[pid]=data.decode("utf-8").splitlines()
+    def live_image(path):
+        exe=Path(path)
+        if exe.is_absolute() and exe.is_file():
+            if exe.samefile(sdk/WILD):return "wild"
+            if exe.samefile(sdk/"bin/cargo"):return "cargo"
+        return "other"
+    observed=owner_reads(raw,str(expected),live_image)
+    return dict(**observed,resolved=str(expected),sha256=sha(expected))
 
 
 def write_fixture(work):
@@ -83,7 +73,7 @@ def guard(root,sdk,env,receipt):
             if kind=="empty":
                 for p in (target,shared):p.rename(p.with_suffix(".held"))
             invocation=["cargo","+ohm","build","--offline","--locked","-p","qa_branch_app","-j2","--message-format=json"]
-            proc=subprocess.run(["strace","-ff","-qq","-yy","-s","16384","-e","trace=execve,execveat,openat,clone,clone3",
+            proc=subprocess.run(["strace","-ff","-qq","-yy","-s","16384","-e","trace=execve,execveat,openat,clone,clone3,fork,vfork",
                 "-o",str(logs/"pid"),*invocation],cwd=work,env=env|{"CARGO_TARGET_DIR":str(target),"CARGO_BUILD_BUILD_DIR":str(shared)},capture_output=True)
             for stream,data in [("stdout",proc.stdout),("stderr",proc.stderr)]:(dst/(stream+".gz")).write_bytes(gzip.compress(data,mtime=0))
             need(proc.returncode==(101 if value is None else 0),"unexpected real provider build: "+str(dst)+" "+proc.stderr.decode()[-1000:])

@@ -42,6 +42,12 @@ def restore(transfer, dest, role, qa, run, attempt, digest):
     reg=SOURCE()
     need((m["qa"],m["run"],m["attempt"],m["roles"])==(qa,str(run),str(attempt),{k:reg["roles"][k] for k in ("F","K")}),"wrong source enrollment")
     need(m["strict_cargo"]==CARGO and m["wild"]==WILD and m["host"]==HOST and m["qualified"] is True,"unqualified tools")
+    import retained_full
+    original=m["source_builds"]["F"]
+    need((original["run"],original["attempt"],original["job"],original["qa"],original["original_run_conclusion"],original["inventory_sha256"],original["archive"])==
+         (retained_full.RUN,1,retained_full.JOB,retained_full.HEAD,"failure",retained_full.INVENTORY,retained_full.NATIVE)
+         and m["products"]["F-sdk.tar.zst"]==retained_full.NATIVE and original["source"]==m["roles"]["F"],"wrong retained Full compiler")
+    need(m["source_builds"]["K"]=={"qa":qa,"run":run,"attempt":attempt,"source":m["roles"]["K"]["commit"],"built_here":True},"wrong fresh Packed compiler")
     need(set(m["files"])=={"F","K"} and set(m["files"]["F"])==set(m["files"]["K"]),"wrong SDK inventory")
     for files in m["files"].values():
         need(all(valid(p) and len(row)==3 for p,row in files.items()) and files["bin/cargo"][0]==ELF and files[WILD][0]==WILD_SHA and
