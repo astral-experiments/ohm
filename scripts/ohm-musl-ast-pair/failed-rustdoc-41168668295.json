@@ -1,0 +1,110 @@
+{
+  "artifact": [
+    13029903813,
+    "0f26e2c9818f8c10b82e3bdc081b8b7543f7fb12204aab21152816c4d0472af5",
+    10897266
+  ],
+  "attempt": 1,
+  "candidate_host_components": 64,
+  "candidate_host_different_non_driver": {},
+  "candidate_host_driver": [
+    "6ed064d74164c9d558744e884aad3c470fc4811057732d9e7f8298369d55c65c",
+    142787440,
+    493
+  ],
+  "candidate_ordinary_Ruff_visits": 0,
+  "candidate_provider_visits": 0,
+  "changed_sections": [
+    ".data.rel.ro",
+    ".note.gnu.build-id",
+    ".strtab",
+    ".symtab"
+  ],
+  "differing_data_rel_ro_byte_offsets": [
+    85648,
+    85672
+  ],
+  "head": "314709fc6fdd118221455b294e2fcd321cb048c8",
+  "job": 124441681835,
+  "llvm_names_with_only_local_suffix_change": 374,
+  "normalized_static_symbol_shapes_addresses_sizes": 23645,
+  "parent_run_make": {
+    "command": [
+      "test",
+      "--stage",
+      "1",
+      "-j8",
+      "--host",
+      "x86_64-unknown-linux-gnu",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "tests/run-make/ohm-checked-dep-info"
+    ],
+    "compiler": "359e5df0ebc4613cedf4518a021a16790d94f7d5",
+    "log": "f56b656fdfb9295b76dcc3558f3efd47b7cb48bf68051aef78d3ccb0141bb860",
+    "source": "4ed3e4d1fa1da4e93f8c761751b3c81dd55ff6cd",
+    "status": 1
+  },
+  "physical_rustdoc": [
+    [
+      "db2c67930584f89f1fa456065151b814f5988a785cd09deff3643e8783738c23",
+      14705112,
+      493
+    ],
+    [
+      "85ed5fc3001d3ab2ad692dea4f0e145f550cbff9b90b1abf8dc9b5b6b72d8469",
+      14705416,
+      493
+    ]
+  ],
+  "qualified_parent_components": 183,
+  "raw_full_doc_objects": "Both complete files are in musl-ast/pair-receipts/different-members/<sha256>.zst in the official ZIP.",
+  "rodata_sha256": [
+    "8be39a4d5f5c0ae11cebc3f94a84d74484e40265e5160851064a261e776e9fa2",
+    "8be39a4d5f5c0ae11cebc3f94a84d74484e40265e5160851064a261e776e9fa2"
+  ],
+  "run": 41168668295,
+  "source_locations": [
+    [
+      "P",
+      "0xad2950",
+      "0xf7f27",
+      "compiler/rustc_interface/src/passes.rs",
+      1093,
+      62,
+      "let feed = tcx.create_crate_num(stable_crate_id).unwrap();"
+    ],
+    [
+      "P",
+      "0xad2968",
+      "0xf7f27",
+      "compiler/rustc_interface/src/passes.rs",
+      1094,
+      13,
+      "assert_eq!(feed.key(), LOCAL_CRATE);"
+    ],
+    [
+      "C",
+      "0xad2950",
+      "0xf7f27",
+      "compiler/rustc_interface/src/passes.rs",
+      1098,
+      62,
+      "let feed = tcx.create_crate_num(stable_crate_id).unwrap();"
+    ],
+    [
+      "C",
+      "0xad2968",
+      "0xf7f27",
+      "compiler/rustc_interface/src/passes.rs",
+      1099,
+      13,
+      "assert_eq!(feed.key(), LOCAL_CRATE);"
+    ]
+  ],
+  "text_sha256": [
+    "930998cf666c5db4dd90061a4cd4f8889df95486f5b351b951dd1ee76555ecd6",
+    "930998cf666c5db4dd90061a4cd4f8889df95486f5b351b951dd1ee76555ecd6"
+  ],
+  "verdict": "rejected independent C rustdoc before full candidate standard library and Ruff qualification"
+}

@@ -41,6 +41,8 @@ def restore(role,run,head,id_,digest,seal):
     u=json.loads((TMP/"identity.json").read_text())
     assert s.sha(TMP/"identity.json")==seal and (u["run"],u["head"],u["attempt"])==(run,head,1)
     assert u["source"]==q.SOURCE and u["base"]==q.PREVIOUS["files"] and u["candidate_driver"]!=u["base"][q.DRIVER]
+    assert u["rustdoc"]["operational"]==u["base"]["bin/rustdoc"] and u["rustdoc"]["fresh_candidate"]==q.docaudit.C_DOC
+    assert all(len(u["rustdoc"][k])==64 for k in ("comparison","four_native_combinations"))
     assert set(u["sha256"])==names-{"identity.json"} and all(v==[s.sha(TMP/n),(TMP/n).stat().st_size] for n,v in u["sha256"].items())
     SDK.mkdir(parents=True)
     seen=set()

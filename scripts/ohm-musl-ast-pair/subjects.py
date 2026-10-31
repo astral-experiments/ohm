@@ -13,6 +13,7 @@ import zipfile
 HERE=Path(__file__).resolve().parent
 sys.path[:0]=[str(HERE.parent/"ohm-musl-ast")]
 import sdk as s
+import rustdoc_audit as docaudit
 
 SOURCE=json.loads((HERE/"source.json").read_text())
 PREVIOUS=json.loads((HERE/"parent.json").read_text())
@@ -141,6 +142,7 @@ def build():
     musl_opts=[f"target.{s.MUSL}.{k}={v}" for k,v in (("musl-libdir",str(s.DEST/"rust-1.99-musl-native")),("cc","/usr/bin/musl-gcc"),
             ("cxx","/usr/bin/musl-gcc"),("ar","/usr/bin/ar"),("linker","/usr/bin/musl-gcc"))]
     product=PACK/"driver-C.zst"
+    fresh_doc=s.DEST/"independent-rustdoc-C"
     for part,triple,what,opts in (("host",s.rt.HOST,["compiler/rustc","library"],[]),("rustdoc",s.rt.HOST,["src/tools/rustdoc"],[]),
                                    ("gnu",s.rt.TARGET,["library"],[]),("musl",s.MUSL,["library"],musl_opts)):
         args=[*[v for opt in opts for v in ("--set",opt)],"build","--stage","1","-j8","--host",s.rt.HOST,"--target",triple,*what]
@@ -159,18 +161,33 @@ def build():
                 dest=LOG/"different-members"/(row[0]+".zst");dest.parent.mkdir(exist_ok=True)
                 if not dest.exists():subprocess.run(["zstd","-q","-3",source_file,"-o",dest],check=True)
             remaining-=max(old[1],new[1])
-        assert not extra,extra
+        if part=="rustdoc":
+            assert list(extra)==["bin/rustdoc"]
+            shutil.copy2((STAGE/"bin/rustdoc").resolve(strict=True),fresh_doc)
+            original=s.rt.SDK/"bin/rustdoc"
+            def source_line(role,line):
+                rev=SOURCE["qa_parent"] if role=="P" else candidate
+                return git("show",rev+":"+docaudit.FILE).splitlines()[line-1].strip()
+            s.save(LOG/"rustdoc-elf-audit.json",docaudit.audit(original.read_bytes(),fresh_doc.read_bytes(),source_line))
+            # The independent candidate documenter above is retained and exercised. Both operational kits use P's original rustdoc.
+            rows["bin/rustdoc"]=parent["bin/rustdoc"]
+        else:assert not extra,extra
         for n,v in rows.items():assert v==out.setdefault(n,v),n
         assert rows[DRIVER]!=parent[DRIVER]
         if part=="host":subprocess.run(["zstd","-q","-3",STAGE/DRIVER,"-o",product],check=True)
     out|={n:parent[n] for n in s.rt.TOOLS}
     assert set(out)==set(parent) and [n for n,v in out.items() if v!=parent[n]]==[DRIVER]
     assert inventory(s.rt.SDK)==parent
+    assert s.sha(STAGE/DRIVER)==out[DRIVER][0] and s.sha(fresh_doc)==docaudit.C_DOC
+    docaudit.exercise(s.rt.SDK,parent,DRIVER,(STAGE/DRIVER).resolve(strict=True),fresh_doc,s.DEST/"rustdoc-quadrants",LOG/"rustdoc-quadrants",
+                      s.MUSL,s.save)
+    assert inventory(s.rt.SDK)==parent
     runmake("C",0)
     archive={n:[s.sha(p),p.stat().st_size] for p in PACK.iterdir() if p.is_file() for n in [p.name]}
     s.save(PACK/"identity.json",{"run":int(os.environ["GITHUB_RUN_ID"]),"head":os.environ["GITHUB_SHA"],"attempt":int(os.environ["GITHUB_RUN_ATTEMPT"]),
         "sha256":archive,"base":parent,"candidate_driver":out[DRIVER],"legacy":OLD,"source":SOURCE,"synthetic_candidate":candidate,
-        "previous_parent_seal":s.sha(HERE/"parent.json")})
+        "previous_parent_seal":s.sha(HERE/"parent.json"),"rustdoc":{"operational":parent["bin/rustdoc"],"fresh_candidate":docaudit.C_DOC,
+        "comparison":s.sha(LOG/"rustdoc-elf-audit.json"),"four_native_combinations":s.sha(LOG/"rustdoc-quadrants/terminal.json")}})
     s.save(LOG/"qualified.json",{"roles":{"P":parent,"C":out},"source":SOURCE,"reactivation":candidate,"products":archive})
 
 
