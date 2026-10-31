@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -10,12 +11,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from media import CFG, need, save, sha
 
 
+def registry_path(search):
+    cargo = shutil.which("cargo", path=search)
+    need(cargo and Path(cargo).is_absolute(), "missing real Cargo proxy")
+    return os.pathsep.join([str(Path(cargo).parent), "/usr/bin", "/bin"])
+
+
 def main():
     root, smoke, receipt = map(Path, sys.argv[1:])
     donor = smoke / "registry-crate"
     child = smoke / "qa-real-worktree"
     env = dict(
         os.environ,
+        PATH=registry_path(os.environ["PATH"]),
         CARGO_BUILD_BUILD_DIR=str(smoke / "shared-build"),
         CARGO_TARGET_DIR=str(smoke / "registry-target"),
         CARGO_NET_OFFLINE="true",
@@ -67,6 +75,21 @@ def main():
         and sha(crates[0]) == "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c",
         "wrong authentic registry artifact",
     )
+    shared = smoke / "shared-build/debug/build/registries"
+
+    def identity(f):
+        st = f.stat()
+        return [st.st_dev, st.st_ino, st.st_size, sha(f)]
+
+    before = {
+        str(f): identity(f)
+        for f in shared.rglob("libitoa-*")
+        if f.suffix in (".rlib", ".rmeta") and f.is_file()
+    }
+    need(any(k.endswith(".rlib") for k in before), "parent must provide actual shared itoa")
+    save(receipt / "worktree-registry.json", {"PATH": env["PATH"], "parent_assets": before})
+    visited = []
+    observed = []
     git("init", "--quiet", "-b", "smoke-parent")
     git("add", "Cargo.toml", "Cargo.lock", "src/main.rs")
     git("commit", "--quiet", "-m", "Original real package")
@@ -92,10 +115,13 @@ def main():
         (itoa,) = [
             m for m in rows if m.get("reason") == "compiler-artifact" and m["target"]["name"] == "itoa"
         ]
+        files = {f: identity(Path(f)) for f in itoa["filenames"]}
         need(
-            itoa["fresh"] and all(Path(f).is_file() for f in itoa["filenames"]),
+            itoa["fresh"] and files and all(f in before and ident == before[f] for f, ident in files.items()),
             "workspace did not reuse real expected registry artifact",
         )
+        visited.append(itoa["filenames"])
+        observed.append(files)
         (exe,) = [Path(m["executable"]) for m in rows if m.get("executable")]
         need(
             exe.is_relative_to(target) and command([exe], child, child_env).strip() == str(value),
@@ -125,6 +151,8 @@ def main():
             "parent": 42,
             "child": [42, 73],
             "wrong_type": "E0277",
+            "shared_itoa": visited,
+            "observed_identities": observed,
             "restored_registry_sha256": sha(crates[0]),
         },
     )

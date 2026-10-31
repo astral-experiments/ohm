@@ -14,7 +14,7 @@ import zipfile
 HERE = Path(__file__).resolve().parent
 CFG = json.loads((HERE / "registration.json").read_bytes())
 REPO = "astral-experiments/ohm"
-BRANCH = "charlie/qa-rc22-complete-input-smoke-20261031"
+BRANCH = "charlie/qa-rc22-native-static-worktree-20261031"
 
 
 def need(condition, detail):
@@ -36,7 +36,7 @@ def locations():
     if role := os.environ.get("OHM_QA_ROLE"):
         root = temp.parent.parent
         need(
-            role in ("packaged", "fourfix")
+            role in ("packaged", "fourfix", "static-fourfix")
             and temp == root / "sessions" / role
             and root.name == "rc22-complete-smoke",
             "wrong child installation scope",

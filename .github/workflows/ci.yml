@@ -1,7 +1,13 @@
-name: Read-only complete original -22 smoke
+name: Native-static Cargo and same-PATH Git worktree
 on:
   workflow_dispatch:
     inputs:
+      previous:
+        description: Reviewed terminal full-shell qualification
+        required: true
+        type: choice
+        options:
+          - '41249054242'
       reviewed_head:
         description: Exact 40-character SHA reviewed for this manual run
         required: true
@@ -15,18 +21,18 @@ on:
 permissions: {}
 jobs:
   smoke:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-complete-input-smoke-20261031' && inputs.source == '41237680370' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-static-worktree-20261031' && inputs.source == '41237680370' && inputs.previous == '41249054242' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
     strategy:
       fail-fast: false
       matrix:
         include:
           - target: x86_64-unknown-linux-gnu
-            runner: ubuntu-24.04
+            runner: namespace-profile-ubuntu-24-04-16
           - target: aarch64-apple-darwin
             runner: namespace-profile-macos-15
-    name: Complete smoke (${{ matrix.target }})
+    name: Native package supplement (${{ matrix.target }})
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 95
+    timeout-minutes: 125
     permissions:
       contents: read
       actions: read
@@ -41,6 +47,30 @@ jobs:
           sparse-checkout: |
             .github/workflows
             scripts/rc22-complete-smoke
+            release
+      - name: Checkout exact Cargo delta and receiver
+        if: runner.os == 'Linux'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 7bc72b798b019a9ec0de6eeea3bc22b783917b27
+          path: transport
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/rc22-native/common.py
+            /scripts/rc22-native/materialize.py
+            /scripts/rc22-native/source/cargo.json
+            /scripts/rc22-native/source/cargo.pack
+      - name: Checkout exact Cargo source seed
+        if: runner.os == 'Linux'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
+          path: cargo-seed
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/cargo-diagnostic-fix
+            scripts/ohm-apple-zmij/cargo293
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
@@ -49,41 +79,48 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git rev-parse HEAD^)" = e8468d0d0221379e7152a748a8735d78a88eda2f
+          test "$(git rev-parse HEAD^)" = b029efc9d462e47b8d62256a986b14644da40c1c
           test "$(git hash-object scripts/smoke-test-release.sh)" = dc978769b3d0fa3b8e797b7041fdbdaf5c04dc1e
           test "$(git hash-object scripts/smoke-test-relink.sh)" = 3743c253445a2b796445a90fe31c08db53304ba8
           python3 -IB scripts/rc22-complete-smoke/test_controls.py
-      - name: Authenticate original platform and global release ZIPs
-        id: original
+      - name: Authenticate original release and preceding QA ZIP
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/rc22-complete-smoke/media.py original
-      - name: Verify physical upstream 1.99.0 rust-analyzer and archive members
-        id: stock
         run: |
-          python3 -IB scripts/rc22-complete-smoke/stock.py
-          python3 -IB scripts/rc22-complete-smoke/installed.py catalog
-      - name: Entire corrected smoke on the unmodified original distribution
-        id: packaged
-        run: python3 -IB scripts/rc22-complete-smoke/run.py packaged
-      - name: Authenticate the separate source-built corrected Cargo binary
-        id: corrected
-        if: ${{ !cancelled() && steps.original.outcome == 'success' && steps.stock.outcome == 'success' }}
+          python3 -IB scripts/rc22-complete-smoke/media.py original
+          python3 -IB scripts/rc22-complete-smoke/prior.py
+      - name: Reopen physical distribution contents
+        run: python3 -IB scripts/rc22-complete-smoke/installed.py catalog
+      - name: Authenticate previous native Apple four-fix Cargo
+        if: runner.os == 'macOS'
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB scripts/rc22-complete-smoke/media.py fixed
-      - name: Entire corrected smoke on the private Cargo replacement
-        id: replacement
-        if: ${{ !cancelled() && steps.corrected.outcome == 'success' }}
-        run: python3 -IB scripts/rc22-complete-smoke/run.py fourfix
-      - name: Independently check both completed arms
-        if: ${{ !cancelled() && steps.packaged.outcome == 'success' && steps.replacement.outcome == 'success' }}
-        run: python3 -IB scripts/rc22-complete-smoke/reopen.py "$RUNNER_TEMP/rc22-complete-smoke/receipts"
+      - name: Apple original package same-PATH linked Git worktree
+        if: runner.os == 'macOS'
+        run: python3 -IB scripts/rc22-complete-smoke/focused.py packaged
+      - name: Apple private four-fix same-PATH linked Git worktree
+        if: runner.os == 'macOS'
+        run: python3 -IB scripts/rc22-complete-smoke/focused.py fourfix
+      - name: GNU static build prerequisites and exact upstream analyzer
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends build-essential binutils cmake perl pkg-config libssl-dev zstd
+          python3 -IB scripts/rc22-complete-smoke/stock.py
+      - name: Build only four-fix Cargo with authenticated native static settings
+        if: runner.os == 'Linux'
+        run: python3 -IB scripts/rc22-complete-smoke/static_cargo.py
+      - name: Entire GNU release smoke and same-PATH worktree on the new private ELF
+        if: runner.os == 'Linux'
+        run: python3 -IB scripts/rc22-complete-smoke/run.py static-fourfix
+      - name: Independently decode new native product, commands and same-inode outputs
+        run: python3 -IB scripts/rc22-complete-smoke/supplement.py "$RUNNER_TEMP/rc22-complete-smoke/receipts"
       - name: Retain original, partial, or complete QA receipts only
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: rc22-complete-smoke-${{ matrix.target }}
+          name: rc22-native-static-worktree-${{ matrix.target }}
           path: ${{ runner.temp }}/rc22-complete-smoke/receipts
           if-no-files-found: warn
           retention-days: 14

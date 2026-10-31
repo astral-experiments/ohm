@@ -1,6 +1,7 @@
 """Host-independent preflight. These fixtures do not count as platform smoke results."""
 
 import os
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -25,16 +26,16 @@ class Controls(unittest.TestCase):
 
     def test_unmodified_outer_and_scoped_substitute(self):
         self.assertEqual(stage(self.outer, self.helper, self.root / "unused", "packaged", False), self.outer)
-        for role in ("packaged", "fourfix"):
+        for role in ("packaged", "fourfix", "static-fourfix"):
             for residual in (False, True):
                 p = stage(self.outer, self.helper, self.root / (role + str(residual)), role, residual)
                 code = p.read_text()
-                self.assertEqual(code.count(SWAP), int(role == "fourfix"))
+                self.assertEqual(code.count(SWAP), int(role != "packaged"))
                 self.assertEqual(code.count(GATE), int(not residual))
                 self.assertEqual(sha(p.parent / self.helper.name), CFG["helper_sha256"])
                 if not residual:
                     self.assertEqual(sha(p), expected_outer(role))
-                if role == "fourfix":
+                if role != "packaged":
                     self.assertIn(AFTER + SWAP, code)
 
     def test_edited_helper_fails_closed(self):
@@ -132,6 +133,96 @@ class Controls(unittest.TestCase):
             with self.assertRaises(ValueError):
                 archive_origin(spec, *inputs, step)
 
+    def test_authenticated_bootstrap_and_native_archive_refusals(self):
+        from static_cargo import policy, releases, zproof
+
+        self.assertEqual(policy()["tool_rs_git_blob"], "17e71f71bb3bc0d41939440fd28e62adf6a8aa5e")
+        healthy = "  0x1 (NEEDED) Shared library: [libc.so.6]"
+        self.assertEqual(releases(healthy, "libc.so.6 => /lib/libc.so.6 (0x1)"), ["libc.so.6"])
+        with self.assertRaises(ValueError):
+            releases(healthy + "\\n  0x1 (NEEDED) Shared library: [libz.so.1]", "libc")
+        with self.assertRaises(ValueError):
+            releases(healthy, "libz.so.1 => /lib/libz.so.1 (0x123)")
+        with self.assertRaises(ValueError):
+            zproof(
+                [
+                    {
+                        "reason": "build-script-executed",
+                        "package_id": "registry+x#libz-sys@1",
+                        "linked_libs": ["z"],
+                        "out_dir": str(self.root),
+                    }
+                ],
+                self.root,
+            )
+
+    def test_real_proxy_directory_for_both_registry_commands(self):
+        from worktree import registry_path
+        from unittest.mock import patch
+
+        with patch("shutil.which", return_value="/isolated/.cargo/bin/cargo"):
+            self.assertEqual(
+                registry_path("/extra/vendor/path:/isolated/.cargo/bin:/usr/bin"),
+                "/isolated/.cargo/bin:/usr/bin:/bin",
+            )
+        with patch("shutil.which", return_value=None), self.assertRaises(ValueError):
+            registry_path("/unknown/vendor/path")
+
+    def test_old_dynamic_cargo_does_not_satisfy_new_static_role(self):
+        from installed import replacement_digest
+
+        with self.assertRaises(ValueError):
+            replacement_digest(self.root, "aarch64-apple-darwin", "static-fourfix")
+        with self.assertRaises(FileNotFoundError):
+            replacement_digest(self.root, "x86_64-unknown-linux-gnu", "static-fourfix")
+
+    def test_successful_build_is_insufficient_if_file_identity_or_freshness_changes(self):
+        from media import save
+        from supplement import worktree
+
+        f = "/private/shared/debug/build/registries/unit/libitoa-cafe.rlib"
+        ident = [4, 7, 100, "a" * 64]
+        owners = {"PATH": "/private/proxies:/usr/bin:/bin", "parent_assets": {f: ident}}
+        proof = {
+            "parent": 42,
+            "child": [42, 73],
+            "wrong_type": "E0277",
+            "shared_itoa": [[f], [f]],
+            "observed_identities": [{f: ident[:]}, {f: ident[:]}],
+        }
+        cli = ["cargo", "+" + CFG["release"]]
+        itoa = {"target": {"name": "itoa"}, "fresh": True, "filenames": [f]}
+        events = [
+            {
+                "argv": cli + ["build", "--locked", "--offline", "--message-format=json"],
+                "status": 0,
+                "stdout": json.dumps(itoa),
+            }
+            for _ in range(2)
+        ]
+        events.extend({"argv": ["/private/reader"], "status": 0, "stdout": str(i)} for i in [42, 73, 42])
+        diag = {
+            "message": {
+                "code": {"code": "E0277"},
+                "spans": [{"is_primary": True, "file_name": "src/main.rs"}],
+            }
+        }
+        events.append({"argv": cli + ["check"], "status": 101, "stdout": json.dumps(diag)})
+        save(self.root / "worktree-commands.json", events)
+        save(self.root / "worktree-registry.json", owners)
+        save(self.root / "worktree.json", proof)
+        self.assertEqual(worktree(self.root)["native_outputs"], ["42", "73", "42"])
+        proof["observed_identities"][1][f][1] += 1
+        save(self.root / "worktree.json", proof)
+        with self.assertRaisesRegex(ValueError, "shared file"):
+            worktree(self.root)
+        proof["observed_identities"][1][f][1] -= 1
+        save(self.root / "worktree.json", proof)
+        events[1]["stdout"] = json.dumps(itoa | {"fresh": False})
+        save(self.root / "worktree-commands.json", events)
+        with self.assertRaisesRegex(ValueError, "stale child"):
+            worktree(self.root)
+
     def test_checked_source_and_readonly_dispatch(self):
         root = HERE.parents[1]
         workflow = (root / ".github/workflows/ci.yml").read_text()
@@ -144,6 +235,7 @@ class Controls(unittest.TestCase):
         self.assertEqual(workflow.count("GH_TOKEN:"), 2)
         self.assertIn("inputs.reviewed_head == github.sha", workflow)
         self.assertIn("inputs.source == '41237680370'", workflow)
+        self.assertIn("inputs.previous == '41249054242'", workflow)
         expected = {HERE / "SHA256SUMS"}
         for row in (HERE / "SHA256SUMS").read_text().splitlines():
             digest, path = row.split("  ", 1)

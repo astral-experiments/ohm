@@ -19,7 +19,7 @@ SWAP = '"$OHM_QA_PY" -IB "$OHM_QA_TOOLS/installed.py" swap "$toolchain_root"\n'
 
 def stage(source, helper, folder, role, residual):
     need(
-        role in ("packaged", "fourfix")
+        role in ("packaged", "fourfix", "static-fourfix")
         and sha(source) == CFG["outer_sha256"]
         and sha(helper) == CFG["helper_sha256"],
         "unregistered checked-in shell",
@@ -29,7 +29,7 @@ def stage(source, helper, folder, role, residual):
     folder.mkdir()
     code = source.read_text()
     need(code.count(GATE) == code.count(AFTER) == 1, "ambiguous script splice")
-    if role == "fourfix":
+    if role in ("fourfix", "static-fourfix"):
         code = code.replace(AFTER, AFTER + SWAP)
     if residual:
         code = code.replace(
@@ -61,7 +61,7 @@ def main():
     root, target = locations()
     role = sys.argv[1]
     need(
-        role in ("packaged", "fourfix") and shutil.disk_usage(root).free > 8 << 30,
+        role in ("packaged", "fourfix", "static-fourfix") and shutil.disk_usage(root).free > 8 << 30,
         "private smoke volume needs 8 GiB free",
     )
     src = HERE.parent / "smoke-test-release.sh"

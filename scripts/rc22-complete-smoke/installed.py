@@ -53,6 +53,15 @@ def catalog(root, target):
     return rows
 
 
+def replacement_digest(root, target, role):
+    if role == "fourfix":
+        return CFG["targets"][target]["fourfix_sha256"]
+    need(role == "static-fourfix" and target == "x86_64-unknown-linux-gnu", "wrong static role")
+    from static_cargo import verify_product
+
+    return verify_product(root)["sha256"]
+
+
 def inspect(root, target, prefix, role):
     rows = json.loads((root / "receipts/archive-binaries.json").read_bytes())
     observed = {}
@@ -63,8 +72,8 @@ def inspect(root, target, prefix, role):
             "non-regular or external installed member",
         )
         got = sha(f)
-        if role == "fourfix" and name == "bin/cargo":
-            need(got == CFG["targets"][target]["fourfix_sha256"], "different substitute Cargo")
+        if role != "packaged" and name == "bin/cargo":
+            need(got == replacement_digest(root, target, role), "different substitute Cargo")
         else:
             need(f.stat().st_size == n and got == digest, ("wrong installed archive bytes", name))
         observed[name] = got
@@ -72,7 +81,7 @@ def inspect(root, target, prefix, role):
         name: subprocess.check_output([prefix / "bin" / name, "-vV"], text=True)
         for name in ("rustc", "cargo")
     }
-    for k, rev in [("rustc", CFG["rust"]), ("cargo", CFG["fourfix"] if role == "fourfix" else CFG["cargo"])]:
+    for k, rev in [("rustc", CFG["rust"]), ("cargo", CFG["cargo"] if role == "packaged" else CFG["fourfix"])]:
         need(
             "commit-hash: " + rev + "\n" in versions[k] and "host: " + target + "\n" in versions[k],
             "unexpected installed version",
@@ -98,15 +107,16 @@ def main():
     if operation == "swap":
         before = inspect(root, target, prefix, "packaged")
         save(receipts / "before-swap.json", before)
-        src = root / "fourfix-cargo"
-        need(sha(src) == CFG["targets"][target]["fourfix_sha256"], "unauthenticated Cargo")
+        role = os.environ["OHM_QA_ROLE"]
+        src = root / ("static-cargo" if role == "static-fourfix" else "fourfix-cargo")
+        need(sha(src) == replacement_digest(root, target, role), "unauthenticated Cargo")
         dest = prefix / "bin/cargo"
         tmp = dest.with_name("cargo.qa-replacement")
         with src.open("rb") as f, tmp.open("xb") as out:
             shutil.copyfileobj(f, out, 1 << 20)
         tmp.chmod(0o755)
         os.replace(tmp, dest)
-        after = inspect(root, target, prefix, "fourfix")
+        after = inspect(root, target, prefix, role)
         need(
             {k for k in before["actual"] if before["actual"][k] != after["actual"][k]} == {"bin/cargo"},
             "unexpected SDK change",

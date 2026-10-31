@@ -23,7 +23,7 @@ def digest(data):
 def expected_outer(role):
     code = (HERE.parent / "smoke-test-release.sh").read_bytes()
     need(digest(code) == CFG["outer_sha256"], "unexpected original release shell")
-    if role == "fourfix":
+    if role in ("fourfix", "static-fourfix"):
         install = b'  sh "$RELEASE_DIRECTORY/ohm-installer.sh"\n'
         need(code.count(install) == 1, "no unique installer")
         code = code.replace(
@@ -91,7 +91,7 @@ def observed(trace, target):
     return len(records)
 
 
-def complete(arm, role, catalog, target, analyzer):
+def complete(arm, role, catalog, target, analyzer, *, native_static_digest=None):
     root = arm / "full"
     need(
         load(arm / "outcome.json") == {"role": role, "statuses": {"full": 0}}
@@ -116,8 +116,17 @@ def complete(arm, role, catalog, target, analyzer):
     installed = load(root / "installed.json")
     original_files = {n: row[1] for n, row in catalog.items()}
     expected = dict(original_files)
-    if role == "fourfix":
-        expected["bin/cargo"] = CFG["targets"][target]["fourfix_sha256"]
+    if role in ("fourfix", "static-fourfix"):
+        if role == "static-fourfix":
+            need(
+                target == "x86_64-unknown-linux-gnu"
+                and native_static_digest
+                and re.fullmatch("[0-9a-f]{64}", native_static_digest),
+                "missing static Cargo",
+            )
+            expected["bin/cargo"] = native_static_digest
+        else:
+            expected["bin/cargo"] = CFG["targets"][target]["fourfix_sha256"]
         need(
             load(root / "before-swap.json")["actual"] == original_files
             and load(root / "after-swap.json") == installed
