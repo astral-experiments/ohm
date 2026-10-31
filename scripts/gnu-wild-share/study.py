@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+from runpy import run_path
 import shutil
 import subprocess
 import sys
@@ -45,6 +46,10 @@ NATIVE = {
 }
 ORDERS = (("tree", "plain"), ("plain", "tree"), ("plain", "tree"), ("tree", "plain"))
 ABSENT = "/__ohm_wild_share_required_missing_provider_e9b769f__"
+
+
+def enrolled_verdict(receipts, donor):
+    return run_path(str(HERE / "verify.py"))["verdict"](receipts, donor)
 
 
 def check_git(p, *cmd):
@@ -607,9 +612,7 @@ def main(role_root, src, donor):
             and {p.name: digest(p) for p in archives} == born["archives"],
             "registered source archives changed",
         )
-        from verify import verdict
-
-        dump(out / "qualified.json", verdict(out, donor))
+        dump(out / "qualified.json", enrolled_verdict(out, donor))
     except BaseException:
         (out / "refused.txt").write_text(traceback.format_exc())
         raise

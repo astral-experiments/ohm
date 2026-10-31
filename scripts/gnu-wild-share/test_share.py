@@ -3,6 +3,7 @@
 from copy import deepcopy
 from pathlib import Path
 import struct
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -154,6 +155,32 @@ class Tests(unittest.TestCase):
     def test_missing_pair(self):
         with self.assertRaises(ValueError):
             pair_results([])
+
+    def test_terminal_reader_is_bound_to_the_enrolled_source(self):
+        (self.d / "verify.py").write_text("def verdict(*args): return 'donor'\n")
+        (self.d / "study.py").write_text("raise ImportError('shadowed study')\n")
+        (self.d / "refused.txt").touch()
+        # Reproduce a donor with the same basename both cached in sys.modules and first on sys.path.
+        source = """
+import os, runpy, sys
+from pathlib import Path
+fixture, study = map(Path, sys.argv[1:])
+os.environ.setdefault('RUNNER_TEMP', str(fixture))
+sys.path.insert(0, str(fixture))
+import verify as donor
+assert donor.verdict() == 'donor'
+worker = runpy.run_path(str(study))
+sys.path.insert(0, str(fixture))
+try:
+    worker['enrolled_verdict'](fixture, fixture)
+except ValueError as error:
+    assert str(error) == 'refused/changed plan'
+else:
+    raise AssertionError('enrolled terminal gate did not run')
+"""
+        subprocess.run(
+            [sys.executable, "-IB", "-c", source, self.d, HERE / "study.py"], check=True
+        )
 
 
 if __name__ == "__main__":
