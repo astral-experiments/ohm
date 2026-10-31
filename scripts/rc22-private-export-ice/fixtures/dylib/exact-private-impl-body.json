@@ -1,0 +1,25 @@
+{
+  "A": "use std::net::Ipv4Addr;\n\npub(super) struct Layout(u8);\nstruct Input(u8);\n\nimpl Layout {\n    fn adjusted(self) -> u8 {\n        self.0 as u8 + 1\n    }\n}\n\nimpl From<Input> for Ipv4Addr {\n    #[inline(never)]\n    fn from(input: Input) -> Self {\n        Self::new(0, 0, 0, input.0)\n    }\n}\n\npub(super) fn converted() -> u8 {\n    Ipv4Addr::from(Input(Layout(0).adjusted())).octets()[3]\n}\n",
+  "B": "use std::net::Ipv4Addr;\n\npub(super) struct Layout(u8);\nstruct Input(u8);\n\nimpl Layout {\n\n    fn adjusted(self) -> u8 {\n        self.0 as u8 + 2\n    }\n}\n\nimpl From<Input> for Ipv4Addr {\n    #[inline(never)]\n    fn from(input: Input) -> Self {\n        Self::new(0, 0, 0, input.0)\n    }\n}\n\npub(super) fn converted() -> u8 {\n    Ipv4Addr::from(Input(Layout(0).adjusted())).octets()[3]\n}\n",
+  "commands": [
+    "cargo",
+    "+ohm",
+    "build",
+    "-p",
+    "dylib_owner",
+    "--lib",
+    "--locked",
+    "--offline",
+    "-j4",
+    "--message-format=json"
+  ],
+  "files": {
+    "Cargo.toml": "[workspace]\nmembers=[\"dep\",\"owner\"]\nresolver=\"3\"\n",
+    "dep/Cargo.toml": "[package]\nname=\"dylib_leaf\"\nversion=\"0.0.0\"\nedition=\"2024\"\n",
+    "dep/src/lib.rs": "\nmod hidden;\n\npub fn layout<T>(_: T) -> usize {\n    std::mem::size_of::<hidden::Layout>()\n}\n\n#[inline(never)]\npub fn value() -> u8 {\n    hidden::converted()\n}\n\n#[inline(never)] pub fn read(_:u64)->u64 { u64::from(value()) }\n",
+    "owner/Cargo.toml": "[package]\nname=\"dylib_owner\"\nversion=\"0.0.0\"\nedition=\"2024\"\n[lib]\ncrate-type=[\"dylib\"]\n[dependencies]\ndylib_leaf={path=\"../dep\"}\n",
+    "owner/src/lib.rs": "#[unsafe(no_mangle)] pub extern \"C\" fn dylib_native_value(x:u64)->u64 { dylib_leaf::read(x) }\n"
+  },
+  "original_enrollment": "c7a590ab0667ade136b46dc888eb1124f96042479c8a1bc199caa01f6ad39279",
+  "reader": "import ctypes,sys\nlib=ctypes.CDLL(sys.argv[1]);f=lib.dylib_native_value;f.argtypes=[ctypes.c_uint64];f.restype=ctypes.c_uint64;print(f(0x1_00000011))\n"
+}

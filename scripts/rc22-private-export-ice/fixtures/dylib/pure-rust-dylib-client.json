@@ -1,0 +1,27 @@
+{
+  "A": "#[repr(C)]\nstruct Input { value: u32 }\nimpl From<Input> for std::time::Duration {\n    #[inline(never)]\n    fn from(input: Input) -> Self { Self::from_secs(input.value as u64) }\n}\n#[inline(never)]\npub(super) fn converted(x: u64) -> u64 { std::time::Duration::from(Input { value: x as _ }).as_secs() }\n",
+  "B": "#[repr(C)]\nstruct Input { value: u64 }\nimpl From<Input> for std::time::Duration {\n    #[inline(never)]\n    fn from(input: Input) -> Self { Self::from_secs(input.value as u64) }\n}\n#[inline(never)]\npub(super) fn converted(x: u64) -> u64 { std::time::Duration::from(Input { value: x as _ }).as_secs() }\n",
+  "commands": [
+    "cargo",
+    "+ohm",
+    "build",
+    "-p",
+    "dylib_client",
+    "--bin",
+    "dylib_client",
+    "--locked",
+    "--offline",
+    "-j4",
+    "--message-format=json"
+  ],
+  "files": {
+    "Cargo.toml": "[workspace]\nmembers=[\"dep\",\"owner\",\"reader\"]\nresolver=\"3\"\n",
+    "dep/Cargo.toml": "[package]\nname=\"dylib_leaf\"\nversion=\"0.0.0\"\nedition=\"2024\"\n",
+    "dep/src/lib.rs": "mod hidden;\n#[inline(never)]\npub fn read(x: u64) -> u64 { hidden::converted(x) }\n",
+    "owner/Cargo.toml": "[package]\nname=\"dylib_owner\"\nversion=\"0.0.0\"\nedition=\"2024\"\n[lib]\ncrate-type=[\"dylib\"]\n[dependencies]\ndylib_leaf={path=\"../dep\"}\n",
+    "owner/src/lib.rs": "#[inline(never)] pub fn read(x:u64)->u64 { dylib_leaf::read(x) }\n",
+    "reader/Cargo.toml": "[package]\nname=\"dylib_client\"\nversion=\"0.0.0\"\nedition=\"2024\"\n[dependencies]\ndylib_owner={path=\"../owner\"}\n",
+    "reader/src/main.rs": "fn main(){ println!(\"actual Rust client = {}\",dylib_owner::read(std::hint::black_box(0x1_00000011))); }\n"
+  },
+  "original_enrollment": "5a029fb32ea941e12d6f014997508dd0219bcdd99080676f2c2cd6a3e1e84c3e"
+}

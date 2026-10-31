@@ -13,9 +13,10 @@ import tarfile
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from native import CARGO_SHA, HOST, PARENT, WILD, need, save, sha
+PREVIOUS = "bbd6c9b7da30dee3f8b3ed8121116873707b7a58"
 BASE = "625207d26ce4449c9c95d871c88cfb50e904c09f"
 SEED = "7bc72b798b019a9ec0de6eeea3bc22b783917b27"
-TEST = "tests/run-make/rdr-native-export-metadata"
+TEST = "tests/run-make/rdr-public-hash-native-exports"
 REGRESSIONS = [TEST, *["tests/run-make/" + n for n in ("rdr-public-hash-body-changes",
     "rdr-public-hash-private-native-derive", "rdr-public-hash-private-native-impls", "rdr-public-hash-staticlib")]]
 FLAGS = ["--ci", "false", "--set", "build.submodules=false", "--set", "rust.channel=dev", "--set",
@@ -28,19 +29,21 @@ def git(repo, *args):
 
 
 def catalog(repo, candidate):
-    need(git(repo, "rev-parse", candidate + "^") == PARENT, "candidate must directly fix distributed rustc")
+    need(git(repo, "rev-parse", candidate + "^") == PREVIOUS and git(repo,"rev-parse",PREVIOUS+"^")==PARENT,
+         "candidate must be the reviewed follow-up to the preserved original")
     need(git(repo, "rev-parse", PARENT + "^{tree}") == "277af1f4d727b2e634696548e3a938e9d518b86f", "different parent")
     for key in ("compiler", "library", "tests", "src/bootstrap", "library/backtrace"):
         need(git(repo, "rev-parse", PARENT + ":" + key) == git(repo, "rev-parse", BASE + ":" + key), key)
     files = {}
     for name in git(repo, "diff", "--name-only", PARENT, candidate).splitlines():
-        allowed = name.startswith("compiler/rustc_metadata/") or name == "compiler/rustc_incremental/src/persist/file_format.rs" or name.startswith(TEST + "/")
+        allowed = (name.startswith("compiler/rustc_metadata/") or name in ("compiler/rustc_incremental/src/persist/file_format.rs",
+                  "compiler/rustc_middle/src/queries.rs") or name.startswith(TEST + "/"))
         need(allowed, ("outside qualification", name))
         data = subprocess.check_output(["git", "-C", repo, "show", candidate + ":" + name])
         files[name] = {"blob": git(repo, "rev-parse", candidate + ":" + name),
                        "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}
     need(TEST + "/rmake.rs" in files, "named regression missing")
-    return {"base": BASE, "parent": PARENT, "candidate": candidate, "files": files,
+    return {"base": BASE, "parent": PARENT, "previous": PREVIOUS, "candidate": candidate, "files": files,
             "trees": {s:git(repo, "rev-parse", candidate + (":" + s if s else "^{tree}"))
                       for s in ("", "compiler", "library", "tests", "src/bootstrap", "src/tools/cargo")}}
 
@@ -87,7 +90,7 @@ def build(root):
     spec = json.loads((HERE / "source.json").read_bytes())
     need(git(repo, "rev-parse", "HEAD") == spec["candidate"] and catalog(repo,spec["candidate"])["trees"] == spec["trees"], "dirty source identity")
     need(shutil.disk_usage(root).free > 32 << 30, "insufficient disk at compiler start")
-    cmd = [sys.executable, "x.py", *FLAGS, "build", "--stage", "1", "-j8", "--host", HOST, "--target", HOST,
+    cmd = ["./x", *FLAGS, "build", "--stage", "1", "-j8", "--host", HOST, "--target", HOST,
            "compiler/rustc", "library", "src/tools/rustdoc"]
     sdk.log_run(cmd, repo, root / "reports/bootstrap.log")
     dest = root / "candidate"
@@ -124,22 +127,28 @@ def build(root):
     save(root/"reports/built-sdk.json", receipt)
 
 
-def tests(root):
+INCREMENTAL_TESTS = ["tests/incremental/rdr/"+n+"/main.rs" for n in
+                     ("trait_impl_unreachable_local_trait","trait_impl_reachable_local_trait")]
+
+
+def tests(root, incremental=False):
     seed()
     import sdk
-    cmd = [sys.executable, "x.py", *FLAGS, "--set", "rust.verbose-tests=true", "test", "--stage", "1",
-           "-j8", "--host", HOST, "--target", HOST, *REGRESSIONS]
-    log = root / "reports/run-make.log"
+    targets = INCREMENTAL_TESTS if incremental else REGRESSIONS
+    label = "incremental" if incremental else "run-make"
+    cmd = ["./x", *FLAGS, "--set", "rust.verbose-tests=true", "test", "--stage", "1",
+           "-j8", "--host", HOST, "--target", HOST, *targets]
+    log = root / "reports" / (label+".log")
     sdk.log_run(cmd, root / "rust", log)
     rows = log.read_text(errors="replace").splitlines()
-    for test in REGRESSIONS:
+    for test in targets:
         need(any(test in l and " ok" in l for l in rows), ("named successful run-make did not execute", test))
-    save(root/"reports/run-make.json", {"argv":cmd, "log":sha(log), "lines":[l for l in rows if any(t in l for t in REGRESSIONS)]})
+    save(root/"reports"/(label+".json"), {"argv":cmd, "log":sha(log), "lines":[l for l in rows if any(t in l for t in targets)]})
 
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("operation", choices=("pack","prepare","build","tests"))
+    p.add_argument("operation", choices=("pack","prepare","build","tests","incremental"))
     p.add_argument("root", type=Path)
     a = p.parse_args()
-    {"pack":pack,"prepare":prepare,"build":build,"tests":tests}[a.operation](a.root.resolve())
+    {"pack":pack,"prepare":prepare,"build":build,"tests":tests,"incremental":lambda root:tests(root,True)}[a.operation](a.root.resolve())

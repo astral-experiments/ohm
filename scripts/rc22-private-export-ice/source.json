@@ -1,56 +1,87 @@
 {
   "base": "625207d26ce4449c9c95d871c88cfb50e904c09f",
-  "candidate": "bbd6c9b7da30dee3f8b3ed8121116873707b7a58",
+  "candidate": "00526133a6352eb88eca70382000e6221253235c",
   "files": {
     "compiler/rustc_incremental/src/persist/file_format.rs": {
-      "blob": "8d8a2537487e24935ccdb8b9f662a0d48ab3fb47",
-      "bytes": 7493,
-      "sha256": "4740a21807210d56904e611069d2542e8b3f10586a7c7ba819e8578cdd3f6f05"
+      "blob": "9a0ba14e7641b0402d6eb79c26510016b42de241",
+      "bytes": 7494,
+      "sha256": "c31f70fce3f8d9df5ec8c24143f775887ad303dd9e3d66e0e1040c7ef4e3eeb9"
+    },
+    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs": {
+      "blob": "8fd6c8eb5d5a9bf10efdae4c4a6fd06c84fc8e8a",
+      "bytes": 37985,
+      "sha256": "8409e780146963be9fcfd745e5cfcd75fdd2d0cce6bea38f3723b1b80bb150c3"
     },
     "compiler/rustc_metadata/src/rmeta/encoder.rs": {
-      "blob": "dda10b9e2e3162e0534dfd8861515d3cb9b02687",
-      "bytes": 171376,
-      "sha256": "4db386859ff658072f307a3a003fc89e42c015e90917995f2b0c0701339eb37f"
+      "blob": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50",
+      "bytes": 171418,
+      "sha256": "bc15dcf7634ead1ddf42e3bed50ba252874e6bba2f804023a910805e743c8473"
     },
     "compiler/rustc_metadata/src/rmeta/encoder/public_api_hasher.rs": {
-      "blob": "61b7808dcc8abd79b4becc9966d293e391588cd5",
-      "bytes": 52514,
-      "sha256": "e676d637586c2bbe96bf58c2b4ed173844db64f4f818b34facb3e3483aca9219"
+      "blob": "3198f7dfeb058e3b7c80f871ed9c106352b13372",
+      "bytes": 52424,
+      "sha256": "da7cb04c824e6531d834e9bf756f11527b1f0d8c35d650bd2a4fe1504faf45fc"
     },
     "compiler/rustc_metadata/src/rmeta/mod.rs": {
-      "blob": "db2a87cdb916e680c537a1461ac1688e1302e2a1",
+      "blob": "3978c04307904c9710620f4b065e63167c02e415",
       "bytes": 29857,
-      "sha256": "12fa84d48b14057eb0364dd82fdb9e256bf491998c114b4a1a177d312475459b"
+      "sha256": "939927ea4e04ceeae1cbd63a7be80a91d213f594dafdce596ac0e7815ce8ca2c"
     },
-    "tests/run-make/rdr-native-export-metadata/hidden.rs": {
-      "blob": "d040058fe89e137fb3e73c11773a0f08ad6bbc1a",
-      "bytes": 652,
-      "sha256": "39e8749cd7e4e01e49b9858df492e956c063aee4b7749369da7f71ae140fd25e"
+    "compiler/rustc_middle/src/queries.rs": {
+      "blob": "ec361c536bfbd61616757e5587964b240f16d166",
+      "bytes": 130155,
+      "sha256": "cc49d95d7de929ccfaeba09708c123525e2d0b7bfbd9b58c747185b2846ea8d4"
     },
-    "tests/run-make/rdr-native-export-metadata/library.rs": {
+    "tests/run-make/rdr-public-hash-native-exports/dylib/client.rs": {
+      "blob": "17d2dea0ee0e38de8a92b167352641766a252732",
+      "bytes": 83,
+      "sha256": "b8ddf27f162bfd840fedb8d6b06ce136561b9d98644aa67af8cfce68ccbf6010"
+    },
+    "tests/run-make/rdr-public-hash-native-exports/dylib/hidden.rs": {
+      "blob": "9c55c7eb0211337b2b20e5f4e0d72e827f0ea858",
+      "bytes": 327,
+      "sha256": "e63394b76b1b25b8f367537556154ae67568ed95248d3ca404c5c220d721c395"
+    },
+    "tests/run-make/rdr-public-hash-native-exports/dylib/leaf.rs": {
+      "blob": "27dbaf6cef858b034b154b278ac1986a8498cc55",
+      "bytes": 86,
+      "sha256": "434d6b375c6c0fc269b1b71e3f0b6a13c02b2018f3107326606e02942527e4b8"
+    },
+    "tests/run-make/rdr-public-hash-native-exports/dylib/owner.rs": {
+      "blob": "35e883f4c822b205cacae8c2b230fa1f7545e75e",
+      "bytes": 66,
+      "sha256": "5e578320c082fc35a30a8690bc45541f86d546138ccfe43ccbe5265d1e0c584e"
+    },
+    "tests/run-make/rdr-public-hash-native-exports/hidden.rs": {
+      "blob": "5bc976145952826a04c3b5b7d20bb7c5fa08c1ef",
+      "bytes": 780,
+      "sha256": "1399cefaf2972426dd978b2fd7245c6fee47cd5f3c2bb0f6512ff146479bb855"
+    },
+    "tests/run-make/rdr-public-hash-native-exports/library.rs": {
       "blob": "3c2b1117e08658148e0b8f90c7073599bb0c20a3",
       "bytes": 285,
       "sha256": "5ae16f2c88e0228c4b3177b64e63e189a1cb1af88dc201758045e41e24bfdb8f"
     },
-    "tests/run-make/rdr-native-export-metadata/main.rs": {
+    "tests/run-make/rdr-public-hash-native-exports/main.rs": {
       "blob": "6375ab98237524cdea9d70bdecb6f3df00fad609",
       "bytes": 91,
       "sha256": "7b480b3d05533132a0fc5a05680adee19aeaadd0cbf33666310138a1451046f5"
     },
-    "tests/run-make/rdr-native-export-metadata/rmake.rs": {
-      "blob": "462cfefb184a4ea8c92943765922283387586a0b",
-      "bytes": 1184,
-      "sha256": "688f74fbf5056cbac432b4675d28e061c3ab6ee06ac4e3064c3907d2a876291e"
+    "tests/run-make/rdr-public-hash-native-exports/rmake.rs": {
+      "blob": "36bc640cf9539e0b3ebe0ade5076afa951119d0a",
+      "bytes": 2544,
+      "sha256": "7a67360558078d8277b6bf6cf6a8b4481869df85399ab671bcc6cb0537af4dbc"
     }
   },
-  "pack_sha256": "2828d56cd1300339498ac5cf25cc710c389bfe6b1081669f70e5e1b9fd063c94",
+  "pack_sha256": "c4f52f7275604aaa2e62ecabb28b44b513e7c79ed95decdaa92d83cc123acd78",
   "parent": "556a8364f1485a03be31b1a50c250d63198a943d",
+  "previous": "bbd6c9b7da30dee3f8b3ed8121116873707b7a58",
   "trees": {
-    "": "6f3ed5e06717513b36597020b5f21835c537743a",
-    "compiler": "ee77cb2eef02ccec4ed28f36e02dbddb0a7972de",
+    "": "2080285f6fcfa69a23f4589eef8e5306dd4161ea",
+    "compiler": "56204f7d037d7dfcac798c33568b544c7e5cbe18",
     "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
     "src/bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
     "src/tools/cargo": "8269d772aa1ef02e5efaa331dfb40eb55d71f719",
-    "tests": "6024d8671cebce9c75ef8fe8398c2020943364d3"
+    "tests": "75389e64976f82d299379b3c27163e3dba18b8f1"
   }
 }

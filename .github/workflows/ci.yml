@@ -60,7 +60,7 @@ jobs:
           echo "WORK=$RUNNER_TEMP/rc22-private-export" >> "$GITHUB_ENV"
           echo "QA=$tools" >> "$GITHUB_ENV"
           echo "PARENT=556a8364f1485a03be31b1a50c250d63198a943d" >> "$GITHUB_ENV"
-          echo "CANDIDATE=bbd6c9b7da30dee3f8b3ed8121116873707b7a58" >> "$GITHUB_ENV"
+          echo "CANDIDATE=00526133a6352eb88eca70382000e6221253235c" >> "$GITHUB_ENV"
       - name: Verify original release and separately built static Cargo
         env:
           GH_TOKEN: ${{ github.token }}
@@ -69,23 +69,40 @@ jobs:
         run: |
           python3 -IB "$QA/native.py" "$WORK/receipts/parent" "$WORK/work-P" "$WORK/baseline" "$PARENT"
           python3 -IB "$QA/verify.py" "$WORK/receipts/parent" parent "$PARENT"
+      - name: Reproduce original Rust dylib layout, section and span failures
+        run: |
+          python3 -IB "$QA/dylib.py" run "$WORK/receipts/parent-dylib" parent --work "$WORK/work-P-dylib" --sdk "$WORK/baseline" --revision "$PARENT"
+          python3 -IB "$QA/dylib.py" read "$WORK/receipts/parent-dylib" parent --sdk "$WORK/baseline"
       - name: Reconstruct exact parent and candidate source
         run: python3 -IB "$QA/subject.py" prepare "$WORK"
       - name: Bootstrap GNU candidate compiler, std and rustdoc
+        id: bootstrap
         run: python3 -IB "$QA/subject.py" build "$WORK"
       - name: Ordinary fixed build and test, fresh reference and Rust diagnostics
         run: |
           python3 -IB "$QA/native.py" "$WORK/receipts/candidate" "$WORK/work-C" "$WORK/candidate" "$CANDIDATE"
           python3 -IB "$QA/verify.py" "$WORK/receipts/candidate" candidate "$CANDIDATE"
+      - name: Fixed Rust dylib foreign impl metadata and pure-Rust dynamic client
+        if: always() && steps.bootstrap.outcome == 'success'
+        run: |
+          python3 -IB "$QA/dylib.py" run "$WORK/receipts/candidate-dylib" candidate --work "$WORK/work-C-dylib" --sdk "$WORK/candidate" --revision "$CANDIDATE"
+          python3 -IB "$QA/dylib.py" read "$WORK/receipts/candidate-dylib" candidate --sdk "$WORK/candidate"
       - name: Replace the SDK for an existing Cargo target and shared build tree
+        if: always() && steps.bootstrap.outcome == 'success'
         run: |
           python3 -IB "$QA/native.py" "$WORK/receipts/migration" "$WORK/work-migration" "$WORK/baseline" "$PARENT" --migration-sdk "$WORK/candidate" --migration-revision "$CANDIDATE" --case test --case abi --case nested
           python3 -IB "$QA/verify.py" "$WORK/receipts/migration" migration "$CANDIDATE" --case test --case abi --case nested
       - name: Independently exercise both metadata readers and identical-stamp graph migration
-        run: python3 -IB "$QA/formats.py" "$WORK/format-work" "$WORK/receipts/formats" "$WORK/baseline" --candidate "$WORK/candidate"
+        if: always() && steps.bootstrap.outcome == 'success'
+        run: python3 -IB "$QA/formats.py" "$WORK/format-work" "$WORK/receipts/formats" "$WORK/baseline" --candidate "$WORK/candidate" --previous "$WORK/receipts/previous/libsubject.rmeta"
       - name: Execute named new and existing rustc run-make regressions
+        if: always() && steps.bootstrap.outcome == 'success'
         run: python3 -IB "$QA/subject.py" tests "$WORK"
-      - name: Retain qualified candidate SDK
+      - name: Check both reachable and unreachable local trait incremental regressions
+        if: always() && steps.bootstrap.outcome == 'success'
+        run: python3 -IB "$QA/subject.py" incremental "$WORK"
+      - name: Retain source-built SDK for independent native replay
+        if: always() && steps.bootstrap.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: native-private-export-sdk-x86_64-unknown-linux-gnu

@@ -1,0 +1,25 @@
+{
+  "A": "#[repr(C)]\nstruct Input { value: u32 }\nimpl From<Input> for std::time::Duration {\n    #[inline(never)]\n    fn from(input: Input) -> Self { Self::from_secs(input.value as u64) }\n}\n#[inline(never)]\npub(super) fn converted(x: u64) -> u64 { std::time::Duration::from(Input { value: x as _ }).as_secs() }\n",
+  "B": "#[repr(C)]\nstruct Input { value: u64 }\nimpl From<Input> for std::time::Duration {\n    #[inline(never)]\n    fn from(input: Input) -> Self { Self::from_secs(input.value as u64) }\n}\n#[inline(never)]\npub(super) fn converted(x: u64) -> u64 { std::time::Duration::from(Input { value: x as _ }).as_secs() }\n",
+  "commands": [
+    "cargo",
+    "+ohm",
+    "build",
+    "-p",
+    "dylib_owner",
+    "--lib",
+    "--locked",
+    "--offline",
+    "-j4",
+    "--message-format=json"
+  ],
+  "files": {
+    "Cargo.toml": "[workspace]\nmembers=[\"dep\",\"owner\"]\nresolver=\"3\"\n",
+    "dep/Cargo.toml": "[package]\nname=\"dylib_leaf\"\nversion=\"0.0.0\"\nedition=\"2024\"\n",
+    "dep/src/lib.rs": "mod hidden;\n#[inline(never)]\npub fn read(x: u64) -> u64 { hidden::converted(x) }\n",
+    "owner/Cargo.toml": "[package]\nname=\"dylib_owner\"\nversion=\"0.0.0\"\nedition=\"2024\"\n[lib]\ncrate-type=[\"dylib\"]\n[dependencies]\ndylib_leaf={path=\"../dep\"}\n",
+    "owner/src/lib.rs": "#[unsafe(no_mangle)] pub extern \"C\" fn dylib_native_value(x:u64)->u64 { dylib_leaf::read(x) }\n"
+  },
+  "original_enrollment": "5f25d3b54553840e0a5b6a7afb332efd433de86b5cf5a8d0a2be6a6d88833ea1",
+  "reader": "import ctypes,sys\nlib=ctypes.CDLL(sys.argv[1]);f=lib.dylib_native_value;f.argtypes=[ctypes.c_uint64];f.restype=ctypes.c_uint64;print(f(0x1_00000011))\n"
+}
