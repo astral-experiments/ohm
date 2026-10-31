@@ -1,0 +1,315 @@
+{
+  "excluded": [
+    {
+      "archives_and_physical_rustcs": [
+        {
+          "actual_driver_sha256": "b83289a6adecf1a24b790dcff1a42d77337909349c5745677485f8e914627447",
+          "archive": {
+            "digest": "sha256:8ad9dbb7d3886dae7c57435ef7a0309531b2f247d36b1c8bbd516947517f5387",
+            "id": 13026239599,
+            "name": "actual-compiler-loop-01",
+            "size_in_bytes": 2702746,
+            "workflow_run": {
+              "head_branch": "charlie/qa-native-compiler-mixed-generics-loop-20261031",
+              "head_repository_id": 1319437234,
+              "head_sha": "6eb4eb436b5341865b3d3ff83f0ed3f661191ebe",
+              "id": 41159195063,
+              "repository_id": 1319437234
+            }
+          },
+          "physical_compiler_processes": [
+            [
+              10441,
+              "build_script_build",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ],
+            [
+              10444,
+              "ron",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ],
+            [
+              10494,
+              "unicode_names2",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ]
+          ],
+          "subject": "P0",
+          "trace_compressed_SHA256": "7575c3bde34eb6cac956b8f6dc2831f8201a691bf8ea1e760c13f6cbbee5a0ce",
+          "typed_artifacts": 303
+        },
+        {
+          "actual_driver_sha256": "5af5a6a20ccb67bdf4196ca2f3df5677ce19076f66110a955e903e32b124889c",
+          "archive": {
+            "digest": "sha256:8958aa2c9d48d968099c64dc59408e0b79440f03014f1c4ee440e476a614decc",
+            "id": 13026043164,
+            "name": "actual-compiler-loop-02",
+            "size_in_bytes": 2331025,
+            "workflow_run": {
+              "head_branch": "charlie/qa-native-compiler-mixed-generics-loop-20261031",
+              "head_repository_id": 1319437234,
+              "head_sha": "6eb4eb436b5341865b3d3ff83f0ed3f661191ebe",
+              "id": 41159195063,
+              "repository_id": 1319437234
+            }
+          },
+          "physical_compiler_processes": [
+            [
+              10414,
+              "build_script_build",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ],
+            [
+              10417,
+              "ron",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ],
+            [
+              10471,
+              "unicode_names2",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ]
+          ],
+          "subject": "C2",
+          "trace_compressed_SHA256": "4df6c8f50fb99d8dab6f39e4f98f29fe02943fd2125d930c7e9281c3d85718d3",
+          "typed_artifacts": 303
+        }
+      ],
+      "first_uncaught_exception": "ModuleNotFoundError: opened_driver under isolated Python",
+      "head": "6eb4eb436b5341865b3d3ff83f0ed3f661191ebe",
+      "run": 41159195063
+    },
+    {
+      "first_cells": [
+        {
+          "actual_rustc_with_loaded_driver": [
+            [
+              10466,
+              "build_script_build",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ],
+            [
+              10469,
+              "ron",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ],
+            [
+              10521,
+              "unicode_names2",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ]
+          ],
+          "archive": {
+            "digest": "sha256:e6380048615f87ea1cf6436287e2947cc7b79d0f888c8957d7435fe18d7dbc70",
+            "id": 13026576876,
+            "name": "actual-compiler-loop-01",
+            "size_in_bytes": 4114998,
+            "workflow_run": {
+              "head_branch": "charlie/qa-native-compiler-mixed-generics-loop-20261031",
+              "head_repository_id": 1319437234,
+              "head_sha": "c8b852d8e835342a5d11febd8d4f60d906ba3eea",
+              "id": 41159537050,
+              "repository_id": 1319437234
+            }
+          },
+          "classification": "excluded, no within-profile pair available",
+          "cold_native": {
+            "all_shared_stage": 254,
+            "compiled_names": null,
+            "full": 304,
+            "wild": 48,
+            "workspace_shared_stage": 31
+          },
+          "first_arm": "P0",
+          "graph_units": 338,
+          "neutral_elf": "dbb5954b5df089f513a86f022dc30163cf65fbd68019fba7ed42341658612904",
+          "repair_owns_clean": true,
+          "row": "01",
+          "selection_dirs": [
+            "P",
+            "C"
+          ],
+          "settings": "true true true\n",
+          "single_cell_phases": 10,
+          "true_invalid": "E0308",
+          "typed_healthy": 303
+        },
+        {
+          "actual_rustc_with_loaded_driver": [
+            [
+              10443,
+              "build_script_build",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ],
+            [
+              10455,
+              "ron",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ],
+            [
+              10500,
+              "unicode_names2",
+              [
+                "/home/runner/work/_temp/ordinary-ron-check/rustup-21/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so"
+              ]
+            ]
+          ],
+          "archive": {
+            "digest": "sha256:6c529209b400142d5bcbfd5a2f1397291f2f0f22d078989f5465e4291986dd2d",
+            "id": 13026462204,
+            "name": "actual-compiler-loop-02",
+            "size_in_bytes": 3197742,
+            "workflow_run": {
+              "head_branch": "charlie/qa-native-compiler-mixed-generics-loop-20261031",
+              "head_repository_id": 1319437234,
+              "head_sha": "c8b852d8e835342a5d11febd8d4f60d906ba3eea",
+              "id": 41159537050,
+              "repository_id": 1319437234
+            }
+          },
+          "classification": "excluded, no within-profile pair available",
+          "cold_native": {
+            "all_shared_stage": 254,
+            "compiled_names": null,
+            "full": 304,
+            "wild": 48,
+            "workspace_shared_stage": 31
+          },
+          "first_arm": "C2",
+          "graph_units": 338,
+          "neutral_elf": "ab33e257d3069bf15d2008b5c76bc7aeb53745c0f19a68b0a48b32ec872fb100",
+          "repair_owns_clean": true,
+          "row": "02",
+          "selection_dirs": [
+            "C",
+            "P"
+          ],
+          "settings": "true true true\n",
+          "single_cell_phases": 10,
+          "true_invalid": "E0308",
+          "typed_healthy": 303
+        }
+      ],
+      "first_uncaught_exception": "FileExistsError on second SDK selection aggregate exclusive creation",
+      "head": "c8b852d8e835342a5d11febd8d4f60d906ba3eea",
+      "run": 41159537050
+    }
+  ],
+  "scored_comparisons": 0,
+  "synthetic_replay_script_sha256": "249aa7d300bbcbb78b4bf7ddacd3b7dad815c1eb5f51c8da73ad97d195eff95d",
+  "unscored_ordinary_filesystem_replays": {
+    "01": {
+      "actual_primary_and_linked_and_provider_orchestration": true,
+      "closed_logical_files": 5641,
+      "complete": true,
+      "constant_synthetic_counter": 1,
+      "hosted_original_assets": [
+        "13026576876",
+        "13026462204"
+      ],
+      "identities_from_actual_native_selected_source_custody": false,
+      "layout_sha": "7c862657bb1998defbb86e8db64380e58837dfea64ffe67dc0279f263401f71a",
+      "linked_roles": 6,
+      "linked_visits": 36,
+      "no_rust_or_cargo_process": true,
+      "original_first_cell": "P0",
+      "physical_selection_directories": 16,
+      "primary_cells": 6,
+      "primary_phases": 60,
+      "provider_visits": 18,
+      "role_select_calls": 50,
+      "row": "01",
+      "selected_sequence": [
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C"
+      ],
+      "unique_writes": {
+        "absent_name_reused_after_verified_directory_rename": 282,
+        "archived_native_filenames": 4862,
+        "fresh_gz": 362,
+        "write_once_json": 393
+      }
+    },
+    "02": {
+      "actual_primary_and_linked_and_provider_orchestration": true,
+      "closed_logical_files": 5639,
+      "complete": true,
+      "constant_synthetic_counter": 1,
+      "hosted_original_assets": [
+        "13026576876",
+        "13026462204"
+      ],
+      "identities_from_actual_native_selected_source_custody": false,
+      "layout_sha": "b9cc7764efc534820ec92e55026a5b731f497261f28e8cc95253f7b03e026abf",
+      "linked_roles": 6,
+      "linked_visits": 36,
+      "no_rust_or_cargo_process": true,
+      "original_first_cell": "C2",
+      "physical_selection_directories": 15,
+      "primary_cells": 6,
+      "primary_phases": 60,
+      "provider_visits": 18,
+      "role_select_calls": 50,
+      "row": "02",
+      "selected_sequence": [
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C",
+        "P",
+        "C"
+      ],
+      "unique_writes": {
+        "absent_name_reused_after_verified_directory_rename": 282,
+        "archived_native_filenames": 4862,
+        "fresh_gz": 362,
+        "write_once_json": 392
+      }
+    }
+  }
+}
