@@ -1,5 +1,7 @@
 """Bootstrap only E, beside the original K. No Ruff performance measurements run here."""
 
+import hashlib
+import json
 import os
 from pathlib import Path
 import platform
@@ -19,19 +21,21 @@ from registration import need, sha, write
 
 def unit_record(text, crate, expected):
     text = re.sub(r"\x1b\[[0-9;]*m", "", text)
-    text = re.split(r"(?m)^\s*Doc-tests ", text, maxsplit=1)[0]
+    need(not re.search(r"(?m)^\s*Doc-tests ", text), "mixed unit/rustdoc stream " + crate)
     suites = re.findall(
         r"(?m)^\s*Running unittests src/lib\.rs \(.*?/build/(rustc_fs_util|rustc_incremental)/.*?/out/(?:rustc_fs_util|rustc_incremental)-[a-z0-9]+\)$",
         text,
     )
     passed = re.findall(r"(?m)^test (\S+) \.\.\. ok$", text)
     totals = re.findall(
-        r"(?m)^test result: ok\. (\d+) passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;", text
+        r"(?m)^test result: ok\. (\d+) passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;",
+        text,
     )
     need(
         suites == [crate]
         and sorted(passed) == sorted(expected)
         and totals == [str(len(expected))]
+        and len(re.findall(r"(?m)^test result:", text)) == 1
         and "test result: FAILED" not in text
         and re.findall(r"(?m)^running (\d+) tests?$", text) == [str(len(expected))],
         "incomplete native unit suite " + crate,
@@ -39,15 +43,55 @@ def unit_record(text, crate, expected):
     return sorted(passed)
 
 
+DOC_TEST = "compiler/rustc_incremental/src/assert_dep_graph.rs - assert_dep_graph (line 25)"
+
+
+def doc_record(text, crate):
+    text = re.sub(r"\x1b\[[0-9;]*m", "", text)
+    ignored = [DOC_TEST] if crate == "rustc_incremental" else []
+    need(
+        re.findall(r"(?m)^\s*Doc-tests (\w+)$", text) == [crate]
+        and not re.search(r"(?m)^\s*Running unittests ", text)
+        and re.findall(r"(?m)^running (\d+) tests?$", text) == [str(len(ignored))]
+        and re.findall(r"(?m)^test (.+) \.\.\. (\w+)$", text) == [(n, "ignored") for n in ignored]
+        and re.findall(r"(?m)^test result: (.+?); finished in ", text)
+        == [f"ok. 0 passed; 0 failed; {len(ignored)} ignored; 0 measured; 0 filtered out"]
+        and len(re.findall(r"(?m)^test result:", text)) == 1
+        and "test result: FAILED" not in text,
+        "incomplete independent rustdoc suite " + crate,
+    )
+    return ignored
+
+
+def individual(command, text, crate, switch):
+    need(
+        command["returncode"] == 0
+        and command["output_sha256"] == hashlib.sha256(text).hexdigest()
+        and command["argv"][-2:] == [switch, "compiler/" + crate]
+        and command["argv"].count(switch) == 1
+        and ({"--doc", "--tests"} & set(command["argv"])) == {switch}
+        and command["cwd"] == "/tmp/ohm-gnu-renderer-source-native/rust",
+        "different process status, target or raw test stream",
+    )
+    return text.decode()
+
+
 def tests(b, repo, log, candidate, previous):
     args = ["./x", *b.OPTIONS, "--set", "rust.verbose-tests=true", "test", *b.HOST_FLAGS]
     completed = {}
+    docs = {}
     for crate, new in candidate["additional_linux_units"].items():
         required = (previous["unit"] if crate == "rustc_incremental" else []) + new
         need(len(set(required)) == len(required), "duplicate required test")
-        path = log / (crate + ".log")
-        b.succeeded([*args, "compiler/" + crate], repo, path)
-        completed[crate] = unit_record(path.read_text(errors="replace"), crate, required)
+        for switch, label in (("--tests", crate), ("--doc", crate + "-doc")):
+            path = log / (label + ".log")
+            b.succeeded([*args, switch, "compiler/" + crate], repo, path)
+            command = json.loads((log / (label + ".command.json")).read_bytes())
+            text = individual(command, path.read_bytes(), crate, switch)
+            if switch == "--tests":
+                completed[crate] = unit_record(text, crate, required)
+            else:
+                docs[crate] = doc_record(text, crate)
     names = previous["run_make"] + candidate["additional_run_make"]
     need(len(names) == len(set(names)), "duplicate native test")
     fixtures = {}
@@ -63,7 +107,7 @@ def tests(b, repo, log, candidate, previous):
         path = log / (name + ".log")
         b.succeeded([*args, rel], repo, path)
         b.verdict(path.read_text(errors="replace"), name, True, 0)
-    write(log / "checked-in-tests.json", {"units": completed, "run_make": names, "fixtures": fixtures})
+    write(log / "checked-in-tests.json", {"units": completed, "docs": docs, "run_make": names, "fixtures": fixtures})
 
 
 def anchor_k(b, root, transfer, log):

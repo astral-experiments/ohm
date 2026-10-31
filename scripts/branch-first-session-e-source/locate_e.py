@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import subject as s
 import read_cross
 import selector_record
+import qualify_e
 
 NAME = "Exact E source, Rust regressions and native providers"
 STEPS = (
@@ -176,7 +177,24 @@ def media(catalog, folder):
             )
         own = json.loads(read("E/native-shadow/complete.json"))
         checked = json.loads(read("E/checked-in-tests.json"))
-        s.need(len(checked["units"]["rustc_incremental"]) == 10
+        for crate in ("rustc_fs_util", "rustc_incremental"):
+            for switch, label in (("--tests", crate), ("--doc", crate + "-doc")):
+                raw = read("E/" + label + ".log")
+                command = json.loads(read("E/" + label + ".command.json"))
+                content = qualify_e.individual(command, raw, crate, switch)
+                if switch == "--tests":
+                    s.need(
+                        qualify_e.unit_record(content, crate, checked["units"][crate])
+                        == checked["units"][crate],
+                        "different unit process output",
+                    )
+                else:
+                    s.need(
+                        qualify_e.doc_record(content, crate) == checked["docs"][crate],
+                        "different rustdoc process output",
+                    )
+
+        s.need(checked["units"]["rustc_incremental"] == json.loads((s.HERE / "inputs/suite-controls.json").read_bytes())["K"]["named_units"]
                and checked["units"]["rustc_fs_util"] == [] and len(checked["run_make"]) == 7
                and checked["fixtures"]["ohm-packed-branch-cache"]
                == s.names_for(end["commit"])["changed_files"]["tests/run-make/ohm-packed-branch-cache/rmake.rs"],

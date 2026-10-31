@@ -32,6 +32,7 @@ jobs:
         run: |
           (cd scripts/branch-first-session-e-source && sha256sum --strict --status --check SHA256SUMS)
           python3 -IB scripts/branch-first-session-e-source/subject.py preflight
+          python3 -IB scripts/branch-first-session-e-source/test_split.py
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: a4afd181ae07107de6174a17a4ec189061fd18aa
