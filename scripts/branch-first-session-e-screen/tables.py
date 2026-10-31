@@ -121,7 +121,7 @@ def digest_body(stream, kind, producer, packed):
     }
 
 
-def scan(root, folder, *, cold=False, arm):
+def scan(root, folder, *, cold=False, arm, cold_table_arm="Eon"):
     ledger = read_ledger(folder)
     current = units(ledger)
     all_aliases = defaultdict(set)
@@ -196,7 +196,7 @@ def scan(root, folder, *, cold=False, arm):
                 streams["G"]["mode"] == streams["Q"]["mode"],
                 ("mixed packed/raw table pair", session),
             )
-            if cold and arm != "Eon":
+            if cold and arm != cold_table_arm:
                 need(
                     streams["G"]["mode"] == "raw",
                     "unexpected first-checkout packing in original/off role",

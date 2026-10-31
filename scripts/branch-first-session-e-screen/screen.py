@@ -124,9 +124,9 @@ def special_visit(arm, phase, state, lane, env, d, refs):
     return row
 
 
-def install(arm, lane, rows, refs, base, variant):
+def install(arm, lane, rows, refs, base, variant, policy=subjects):
     base.mkdir()
-    env = subjects.activate(arm, rows, base)
+    env = policy.activate(arm, rows, base)
     b.fresh_outputs()
     if lane == "clean":
         full_reference(arm, refs, env, base)
@@ -143,6 +143,12 @@ def install(arm, lane, rows, refs, base, variant):
             record = worker.receipt(arm, phase, branch, lane, env, d, refs, sample=watcher)
         else:
             record = special_visit(arm, phase, branch, lane, env, d, refs)
+        if arm not in policy.PACKED_OBJECTS:
+            storage = json.loads((d / "storage.json").read_bytes())
+            need(
+                storage["packed_files"] == storage["packed_bytes"] == 0,
+                ("codegen objects packed by an arm that has no such policy", arm, phase),
+            )
         records[phase] = record
         if lane == "ordinary" and phase in {
             "cold-A",
@@ -152,7 +158,13 @@ def install(arm, lane, rows, refs, base, variant):
             "same-repeat",
             "same-first-B",
         }:
-            observed = tables.scan(WORK, d, cold=phase in {"cold-A", "same-cold-A"}, arm=arm)
+            observed = tables.scan(
+                WORK,
+                d,
+                cold=phase in {"cold-A", "same-cold-A"},
+                arm=arm,
+                cold_table_arm=policy.COLD_TABLE_ARM,
+            )
             if previous is not None:
                 save(d / "table-transitions.json", tables.relate(previous, observed, phase))
             previous = observed
@@ -210,17 +222,17 @@ def compare_ordinary(records, order):
                 )
 
 
-def main(pos, source, calibration, observer, provider):
-    order = subjects.ORDERS[pos]
+def main(pos, source, calibration, observer, provider, *, policy=subjects):
+    order = policy.ORDERS[pos]
     head = os.environ["GITHUB_SHA"]
     need(
         os.environ["GITHUB_REPOSITORY"] == b.REPO
-        and os.environ["GITHUB_REF"] == "refs/heads/" + subjects.REF
+        and os.environ["GITHUB_REF"] == "refs/heads/" + policy.REF
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and head == os.environ["REVIEWED_HEAD"] == b.git(HERE, "rev-parse", "HEAD"),
         "unregistered workflow or QA checkout",
     )
-    e = subjects.enrollment()
+    candidate = policy.enrollment()
     need(
         ROOT.resolve() == ROOT
         and (WORK / ".owned-by-packed-study").read_text() == str(ROOT)
@@ -229,16 +241,17 @@ def main(pos, source, calibration, observer, provider):
     )
     for name in ("clean", "ordinary", "measured", "providers", "initial"):
         (OUT / name).mkdir()
-    for name in (
-        "PLAN.md",
-        "inputs/e-source.json",
-        "inputs/source-replay.json",
-        "inputs/cold-units.json",
-        "inputs/ruff-28233.json",
-        "inputs/ruff-28233.patch",
-        "inputs/excluded-boots.json",
+    for file in (
+        policy.HERE / "PLAN.md",
+        policy.RUNTIME,
+        policy.HERE / "inputs/source-replay.json",
+        policy.EXCLUDED,
+        *getattr(policy, "EXTRA_INPUTS", ()),
+        HERE / "inputs/cold-units.json",
+        HERE / "inputs/ruff-28233.json",
+        HERE / "inputs/ruff-28233.patch",
     ):
-        shutil.copy2(HERE / name, OUT / Path(name).name)
+        shutil.copy2(file, OUT / file.name)
     oracle = json.loads(
         (subjects.HERE.parent / "branch-return-pmu/historical-sources.json").read_bytes()
     )
@@ -261,7 +274,7 @@ def main(pos, source, calibration, observer, provider):
     os.sched_setaffinity(0, ready["affinity"])
     need(
         sorted(os.sched_getaffinity(0)) == ready["affinity"]
-        and ready["boot"] not in json.loads((HERE / "inputs/excluded-boots.json").read_bytes()),
+        and ready["boot"] not in json.loads(policy.EXCLUDED.read_bytes()),
         "overlapping boot or collector CPU scope",
     )
     save(
@@ -274,14 +287,14 @@ def main(pos, source, calibration, observer, provider):
             "attempt": 1,
             "boot": ready["boot"],
             "runner": os.environ["RUNNER_NAME"],
-            "K": b.spec(),
-            "E": e,
+            policy.BASE_ROLE: b.spec(),
+            policy.TREATMENT: candidate,
             "command": worker.CARGO,
-            "plan": sha(HERE / "PLAN.md"),
+            "plan": sha(policy.HERE / "PLAN.md"),
         },
     )
-    rows = subjects.acquire(source)
-    env = subjects.activate(order[0], rows, OUT / "initial")
+    rows = policy.acquire(source)
+    env = policy.activate(order[0], rows, OUT / "initial")
     b.fresh_outputs()
     b.prepare_inputs(kit, env)
     full.calibration()
@@ -301,16 +314,16 @@ def main(pos, source, calibration, observer, provider):
     )
     refs = {}
     for arm in order:
-        install(arm, "clean", rows, refs, OUT / "clean" / arm, "main")
+        install(arm, "clean", rows, refs, OUT / "clean" / arm, "main", policy)
     compare_clean(refs, order)
-    exercise(rows, provider, order, activate=subjects.activate)
+    exercise(rows, provider, order, activate=policy.activate)
     records = {}
     for lane in ("ordinary", "measured"):
         for arm in order:
             (OUT / lane / arm).mkdir()
             for study in ("main", "same"):
                 records[lane, arm, study] = install(
-                    arm, lane, rows, refs, OUT / lane / arm / study, study
+                    arm, lane, rows, refs, OUT / lane / arm / study, study, policy
                 )
     compare_ordinary(records, order)
     seed = {p.name: sha(p) for p in (b.HOME / ".cargo/registry/cache").glob("*/*.crate")}
@@ -327,7 +340,10 @@ def main(pos, source, calibration, observer, provider):
         )
     save(
         OUT / "sdk/terminal.json",
-        {"both_complete_byte_and_inode_inventories_unchanged": True, "registry": full.commit(seed)},
+        {
+            "both_complete_byte_and_inode_inventories_unchanged": True,
+            "registry": full.commit(seed),
+        },
     )
     save(
         OUT / "complete.json",

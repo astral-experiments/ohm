@@ -18,6 +18,10 @@ ORDERS = {"01": ("Eoff", "Kon", "Eon"), "02": ("Eon", "Kon", "Eoff")}
 BASE_COMMIT = "0afbeff303d3658bff52582d8f1a996d59e6c8ce"
 REF = "charlie/qa-branch-first-session-e-screen-20261031"
 RUNTIME = HERE / "inputs/e-source.json"
+BASE_ROLE, TREATMENT = "K", "E"
+COLD_TABLE_ARM = "Eon"
+PACKED_OBJECTS = {"Kon", "Eon"}
+EXCLUDED = HERE / "inputs/excluded-boots.json"
 
 
 def enrollment(binding=RUNTIME, certificate=HERE / "inputs/source-replay.json"):
@@ -91,9 +95,7 @@ def capture(args, output, cwd=None):
     return child.stdout
 
 
-def acquire(source):
-    e = enrollment()
-    b.prepare_checkout(source, e["head"], "scripts")
+def original_sdk(source, base_role, base_commit):
     code = source / "scripts/branch-first-session-e-source"
     sys.path.insert(0, str(code))
     import prior
@@ -109,12 +111,13 @@ def acquire(source):
     prior.fetch(inbox)
     ktransfer = b.ROOT / "original-transfer"
     k, _, _, _ = prior.reopen(inbox, ktransfer)
-    b.need(k["roles"]["K"]["commit"] == BASE_COMMIT, "different physical K")
-    e_archive = b.ROOT / "e-archives"
-    e_archive.mkdir()
-    driver_name = "first-session-linux-source-driver"
-    for name, row in e["artifacts"].items():
-        target = e_archive / (name + ".zip")
+    b.need(k["roles"][base_role]["commit"] == base_commit, "different previous SDK")
+    return dir_, ktransfer, k
+
+
+def download(entries, directory):
+    for name, row in entries.items():
+        target = directory / (name + ".zip")
         with target.open("xb") as f:
             subprocess.run(
                 ["gh", "api", f"repos/{b.REPO}/actions/artifacts/{row['id']}/zip"],
@@ -124,8 +127,32 @@ def acquire(source):
         b.need(
             target.stat().st_size == row["size_in_bytes"]
             and "sha256:" + b.sha(target) == row["digest"],
-            ("different official E media", name),
+            ("different official source media", name),
         )
+
+
+def extract_delta(archive, capsule, role):
+    capsule.mkdir()
+    with zipfile.ZipFile(archive) as z:
+        b.need(
+            len(z.infolist()) == 2 and set(z.namelist()) == {"manifest.json", f"{role}-delta.tar.zst"},
+            "different source capsule",
+        )
+        for rec in z.infolist():
+            b.need(0 < rec.file_size < 256 * 2**20, "unbounded capsule member")
+            with z.open(rec) as src, (capsule / rec.filename).open("xb") as dst:
+                shutil.copyfileobj(src, dst, 1 << 20)
+
+
+def acquire(source):
+    e = enrollment()
+    b.prepare_checkout(source, e["head"], "scripts")
+    code = source / "scripts/branch-first-session-e-source"
+    dir_, ktransfer, k = original_sdk(source, "K", BASE_COMMIT)
+    e_archive = b.ROOT / "e-archives"
+    e_archive.mkdir()
+    driver_name = "first-session-linux-source-driver"
+    download(e["artifacts"], e_archive)
     actual = json.loads(
         capture(
             [
@@ -146,16 +173,7 @@ def acquire(source):
     b.save(dir_ / "native-media-identities.json", identities)
     b.need(actual == e, "different source job or original qualification evidence")
     capsule = b.ROOT / "E-transfer"
-    capsule.mkdir()
-    with zipfile.ZipFile(e_archive / (driver_name + ".zip")) as z:
-        b.need(
-            len(z.infolist()) == 2 and set(z.namelist()) == {"manifest.json", "E-delta.tar.zst"},
-            "different E capsule",
-        )
-        for rec in z.infolist():
-            b.need(0 < rec.file_size < 256 * 2**20, "unbounded E member")
-            with z.open(rec) as src, (capsule / rec.filename).open("xb") as dst:
-                shutil.copyfileobj(src, dst, 1 << 20)
+    extract_delta(e_archive / (driver_name + ".zip"), capsule, "E")
     m = json.loads((capsule / "manifest.json").read_bytes())
     b.need(b.sha(capsule / "manifest.json") == e["qualified"]["manifest"], "foreign E manifest")
     b.PARK.mkdir()
@@ -197,6 +215,11 @@ def acquire(source):
         dir_ / "reopen-E",
     )
     roles = {"K": (k["roles"]["K"], k["files"]["K"]), "E": (m["source"], m["files"])}
+    return physical_roles(roles, k["driver"], dir_)
+
+
+def physical_roles(roles, driver, dir_):
+    base, child = roles
     rows = {}
     for role, (source_id, manifest) in roles.items():
         files = b.inventory(b.PARK / role)
@@ -214,11 +237,11 @@ def acquire(source):
         rows[role] = files
         b.save(
             dir_ / (role + ".json"),
-            {"role": role, "source": source_id, "driver": k["driver"], "files": files},
+            {"role": role, "source": source_id, "driver": driver, "files": files},
         )
-    changed = sorted(name for name in rows["K"] if m["files"][name] != k["files"]["K"][name])
+    changed = sorted(name for name in rows[base] if roles[child][1][name] != roles[base][1][name])
     b.need(
-        k["driver"] in changed and set(changed) <= {k["driver"], "bin/rustdoc"},
+        driver in changed and set(changed) <= {driver, "bin/rustdoc"},
         "incompatible SDKs",
     )
     b.PROXIES.mkdir(parents=True)
