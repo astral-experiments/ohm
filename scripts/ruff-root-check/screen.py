@@ -28,6 +28,8 @@ BRANCH="charlie/qa-ruff-root-check-f-screen-20261031"
 ORDERS={"01":["Foff","Fon"],"02":["Fon","Foff"]}
 COMMAND=graph.CARGO
 EXPECTED=q.read_gz(HERE/"enrolled-graph.json.gz")
+PREFLIGHT=json.loads((HERE/"preflight-rejection.json").read_bytes())
+PREVIOUS_RUNNERS={p["runner"] for p in PREFLIGHT["positions"].values()}
 CLEAN=ROOT/"root-check-reference-bodies"
 KEPT=OUT/"complete-bodies"
 
@@ -168,7 +170,9 @@ def main(position,source,calibrator,observers):
     head=os.environ["GITHUB_SHA"]
     need(os.environ["GITHUB_REPOSITORY"]==b.REPO and os.environ["GITHUB_REF"]=="refs/heads/"+BRANCH and
          os.environ["GITHUB_RUN_ATTEMPT"]=="1" and os.environ["REVIEWED_HEAD"]==head==b.git(HERE,"rev-parse","HEAD"),"wrong source admission")
-    need(b.git(HERE,"rev-parse","HEAD^")=="6b377bea5f032f0e47877b48235cdbeb71daeb08" and
+    runner=os.environ["RUNNER_NAME"]
+    need(runner and runner not in PREVIOUS_RUNNERS and int(os.environ["GITHUB_RUN_ID"])!=PREFLIGHT["run"],"previous rejected preflight worker")
+    need(b.git(HERE,"rev-parse","HEAD^")==PREFLIGHT["head"] and
          b.git(HERE,"rev-parse","HEAD:scripts/ruff-integration-pmu","HEAD:scripts/branch-return-pmu","HEAD:scripts/ohm-packed-ruff").splitlines()==
          ["1c117c3853e7bf3906922f5aac040673bed0087a","8036cb549845a905ab83882f5b01766229e0e636","d9fd6c8e4152d468a3a40d600ee1c6ebda13e5f2"],"changed independent capture sources")
     need(shutil.disk_usage(OUT).free>=32*2**30 and shutil.disk_usage(WORK).free>=14*2**30 and
@@ -182,7 +186,7 @@ def main(position,source,calibrator,observers):
     meter=json.loads((OUT/"meter-ready.json").read_bytes())
     need(meter["boot"] not in boot_identity.prior(),"previous physical worker")
     os.sched_setaffinity(0,meter["affinity"])
-    save(OUT/"enrollment.json",{"head":head,"run":int(os.environ["GITHUB_RUN_ID"]),"attempt":1,"position":position,"order":order,"boot":meter["boot"],
+    save(OUT/"enrollment.json",{"head":head,"run":int(os.environ["GITHUB_RUN_ID"]),"attempt":1,"position":position,"order":order,"boot":meter["boot"],"runner":runner,
          "argv":COMMAND,"selection":graph.census(EXPECTED),"plan":b.sha(HERE/"PLAN.md"),"source":b.spec(),"visible_work":str(WORK)})
     tr.calibrate(OUT/"initial/kernel-events")
     registry=b.acquire(source)

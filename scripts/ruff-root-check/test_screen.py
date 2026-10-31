@@ -114,12 +114,15 @@ class Gates(unittest.TestCase):
     def test_original_run_and_resource_guards(self):
         run=dict(id=500,head_sha="a"*40,head_branch=s.BRANCH,run_attempt=1,repository={"full_name":s.b.REPO},event="workflow_dispatch",
                  path=".github/workflows/ci.yml",display_title="Two fresh root Ruff check screenings "+"a"*40,status="completed",conclusion="success")
-        jobs={"total_count":2,"jobs":[dict(id=i,name=originals.LABEL+p,head_sha=run["head_sha"],run_id=500,run_attempt=1,status="completed",conclusion="success") for i,p in enumerate(s.ORDERS,10)]}
+        jobs={"total_count":2,"jobs":[dict(id=i,name=originals.LABEL+p,runner_name="fresh-"+p,head_sha=run["head_sha"],run_id=500,run_attempt=1,status="completed",conclusion="success") for i,p in enumerate(s.ORDERS,10)]}
         art={"total_count":2,"artifacts":[dict(id=i,name=originals.PREFIX+p,workflow_run={"id":500,"head_sha":run["head_sha"]},expired=False,size_in_bytes=150,digest="sha256:"+"2"*64) for i,p in enumerate(s.ORDERS,20)]}
         self.assertEqual(set(originals.bind(run,jobs,art,500,"a"*40)),set(s.ORDERS))
         for rr,jj,aa in [(run|{"run_attempt":2},jobs,art),(run|{"conclusion":"failure"},jobs,art),(run,jobs|{"total_count":3},art),
                           (run,jobs,art|{"artifacts":2*[art["artifacts"][0]]})]:
             with self.assertRaises(ValueError): originals.bind(rr,jj,aa,500,"a"*40)
+        for old in s.PREVIOUS_RUNNERS | {"fresh-02"}:
+            reused=copy.deepcopy(jobs);reused["jobs"][0]["runner_name"]=old
+            with self.assertRaises(ValueError):originals.bind(run,reused,art,500,"a"*40)
         capacity={k:n*2**30 for k,n in zip(("available_memory","work_free","durable_free"),(12,14,32))}
         self.assertTrue(guard.passes(capacity,(12,14,32)))
         for k,v in capacity.items():self.assertFalse(guard.passes(capacity|{k:v-1},(12,14,32)))
@@ -131,6 +134,8 @@ class Gates(unittest.TestCase):
             else:self.assertIn(b"usage:",raw)
         workflow=(HERE.parent.parent/".github/workflows/ci.yml").read_text()
         self.assertIn("path: enrolled\n          fetch-depth: 2",workflow)
+        enrolled=workflow.split("path: enrolled\n",1)[1].split("      - ",1)[0]
+        self.assertIn("            .github/workflows",enrolled.splitlines())
         self.assertIn("max-parallel: 2",workflow)
 
     def test_boot_provenance_and_competing_enrollments(self):

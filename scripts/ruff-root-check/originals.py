@@ -25,13 +25,15 @@ def bind(run,jobs,artifacts,run_id,head):
     js={j['name']:j for j in jobs['jobs']}; zs={z['name']:z for z in artifacts['artifacts']}
     need(jobs['total_count']==len({j['id'] for j in js.values()})==len(js)==2 and set(js)=={LABEL+p for p in reopen.s.ORDERS} and
          artifacts['total_count']==len({z['id'] for z in zs.values()})==len(zs)==2 and set(zs)=={PREFIX+p for p in reopen.s.ORDERS},'missing, duplicate or extra original')
+    names={j['runner_name'] for j in js.values()}
+    need(run_id!=reopen.s.PREFLIGHT['run'] and len(names)==2 and all(names) and not names & reopen.s.PREVIOUS_RUNNERS,'previous or shared preflight worker')
     enrolled={}
     for pos in reopen.s.ORDERS:
         j,z=js[LABEL+pos],zs[PREFIX+pos]
         need(j['run_id']==run_id and j['head_sha']==head and j['run_attempt']==1 and j['status']=='completed' and j['conclusion']=='success','different original job')
         need(z['workflow_run']['id']==run_id and z['workflow_run']['head_sha']==head and not z['expired'] and
              type(z['size_in_bytes']) is int and z['size_in_bytes']>0 and re.fullmatch(r'sha256:[0-9a-f]{64}',z['digest']),'invalid original receipt')
-        enrolled[pos]={'job':j['id'],'archive':{k:z[k] for k in ('name','id','size_in_bytes','digest')}}
+        enrolled[pos]={'job':j['id'],'runner':j['runner_name'],'archive':{k:z[k] for k in ('name','id','size_in_bytes','digest')}}
     return enrolled
 
 
@@ -58,7 +60,7 @@ def main():
                      {'enrollment.json','complete.json','independent-screen.json'}<=set(names),'incorrect archive terminal')
                 orig=json.loads(archive.read('independent-screen.json'));en=json.loads(archive.read('enrollment.json'));end=json.loads(archive.read('complete.json'))
         local=json.loads((args.readback_directory/f'worker-{pos}.json').read_bytes())
-        need(local==orig and (orig['run'],orig['head'],orig['position'],orig['boot'])==(args.run,head,pos,en['boot']) and en['attempt']==1 and
+        need(local==orig and en['runner']==r['runner'] and (orig['run'],orig['head'],orig['position'],orig['boot'])==(args.run,head,pos,en['boot']) and en['attempt']==1 and
              end['qualified'] and end['boot']==orig['boot'] and end['head']==head and end['position']==pos,'independent original readback differs')
         workers.append(local)
     print(json.dumps({'originals':refs,'corrected_e_identity':competing,**reopen.decide(*workers,competing)},sort_keys=True))
