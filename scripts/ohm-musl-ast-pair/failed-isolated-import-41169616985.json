@@ -1,0 +1,38 @@
+{
+  "artifact": 13030072637,
+  "attempt": 1,
+  "bytes": 447,
+  "conclusion": "failure",
+  "entrypoint": [
+    "python3",
+    "-IB",
+    "scripts/ohm-musl-ast-pair/subjects.py",
+    "legacy"
+  ],
+  "head": "120fe7c9707498c635a5c403ff99838dbf15b6a6",
+  "job": 124444536344,
+  "module_error": "ModuleNotFoundError: No module named 'rustdoc_audit'",
+  "original_ELF_input_receipt": {
+    "artifacts": {
+      "gnu-atomic-registered-compiler": [
+        13019785650,
+        "sha256:5df2159acdd551b3b6812a5025509b5a42c21d93fdfe2288023d81eb5c40fb23",
+        34684290
+      ],
+      "gnu-atomic-source-cargo": [
+        13019926099,
+        "sha256:388e6b8eff4a62bf2d13192b636150397aef60fdf03c86444afedaa1595f1e9b",
+        16812895
+      ]
+    },
+    "attempt": 1,
+    "head": "20cf3bd81dd7d30009ae75062eed9acf113f935a",
+    "run": 41141810291
+  },
+  "provider_visits": 0,
+  "qualified_Rust_source_builds": 0,
+  "rendered_failed_step_sha256": "0f70e585f79d5e7000b216f111dab92ae281eca477196e0fe96a4d5e60a1c2d3",
+  "ruff_visits": 0,
+  "run": 41169616985,
+  "sha256": "d3ab4da864352d2f336f834d8b149f2c747d871af2bd4577d1dbbe56a328264a"
+}

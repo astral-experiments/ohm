@@ -11,7 +11,7 @@ import tarfile
 import zipfile
 
 HERE=Path(__file__).resolve().parent
-sys.path[:0]=[str(HERE.parent/"ohm-musl-ast")]
+sys.path[:0]=[str(HERE),str(HERE.parent/"ohm-musl-ast")]
 import sdk as s
 import rustdoc_audit as docaudit
 
