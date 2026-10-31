@@ -55,6 +55,7 @@ OPTIONS = [
     "llvm.download-ci-llvm=true",
 ]
 HOST_FLAGS = ["--stage", "1", "-j8", "--host", HOST, "--target", HOST]
+SDK_COMPONENTS = ["compiler/rustc", "library", "src/tools/rustdoc"]
 BASE_CONTROLS = ("caller-local-codegen", "ohm-split-large-cgus")
 
 
@@ -561,15 +562,9 @@ def main(root):
                 review_base=BASE,
             ),
         )
-        for name, what in [
-            ("bootstrap", ["compiler/rustc", "library"]),
-            ("rustdoc-build", ["src/tools/rustdoc"]),
-        ]:
-            succeeded(
-                ["./x", *OPTIONS, "build", *HOST_FLAGS, *what],
-                repo,
-                log / (name + ".log"),
-            )
+        # Each bootstrap process creates a new stage sysroot with only the components it requests.
+        sdk_build = ["./x", *OPTIONS, "build", *HOST_FLAGS, *SDK_COMPONENTS]
+        succeeded(sdk_build, repo, log / "bootstrap.log")
         stage = repo / "build" / HOST / "stage1"
         bootstrap = stage.parent / "stage0/bin"
         found = {
@@ -581,6 +576,13 @@ def main(root):
         before = manifest(selected)
         write(log / "physical-files-before-tests.json", before)
         product_tests(repo, sources["C"]["commit"], role, log)
+        remaining = manifest({key: path for key, path in selected.items() if path.is_file()})
+        write(log / "physical-files-after-tests.json", remaining)
+        need(
+            all(before[name] == row for name, row in remaining.items()),
+            "native tests changed a retained SDK file",
+        )
+        succeeded(sdk_build, repo, log / "reassemble.log")
         selected = collect(stage, root)
         actual = manifest(selected)
         write(log / "physical-files.json", actual)
