@@ -1,11 +1,11 @@
-name: Signed Rust generic-sharing bridge on Ruff
+name: Ordinary shared-stage Rust generic sharing on Ruff
 on: workflow_dispatch
 permissions:
   contents: read
   actions: read
 jobs:
   pair:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-strict-unicode-share-bridge-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-strict-unicode-profile-rustflags-20261031'
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -18,7 +18,9 @@ jobs:
         with:
           path: registered
           persist-credentials: false
-          sparse-checkout: scripts/strict-share-bridge
+          sparse-checkout: |
+            scripts/strict-share-bridge
+            scripts/strict-unwrapped-profile
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: one
@@ -70,19 +72,19 @@ jobs:
         env:
           QUALIFICATION_TOKEN: ${{ github.token }}
           QA_ROW: ${{ matrix.row }}
-        run: python3 -IB registered/scripts/strict-share-bridge/bridge.py
+        run: python3 -IB registered/scripts/strict-unwrapped-profile/study.py
       - name: Compact original packet
         if: always()
         run: |
           set -eu
           if test -d "$RUNNER_TEMP/ordinary-ron-check/packet"; then
             cp "$RUNNER_TEMP/strict-qualified-cargo/custody.json" "$RUNNER_TEMP/ordinary-ron-check/packet/strict-cargo-artifact.json"
-            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/share-bridge-${{ matrix.row }}.tar.gz" .
+            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/unwrapped-profile-${{ matrix.row }}.tar.gz" .
           fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: share-bridge-${{ matrix.row }}
-          path: ${{ runner.temp }}/share-bridge-${{ matrix.row }}.tar.gz
+          name: unwrapped-profile-${{ matrix.row }}
+          path: ${{ runner.temp }}/unwrapped-profile-${{ matrix.row }}.tar.gz
           retention-days: 7
           if-no-files-found: error
