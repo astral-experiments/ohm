@@ -1,0 +1,94 @@
+name: Confirm Ruff PEP 723 musl test-build instructions
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: Registered confirmation cohort
+        required: true
+        type: choice
+        options: [primary, independent]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  paired:
+    if: github.repository == 'astral-experiments/ohm' && github.ref_name == 'charlie/qa-musl-pep723-hardware-screen-20261031'
+    name: PEP 723 ${{ inputs.phase }} block ${{ matrix.block }} position ${{ matrix.position }}
+    env:
+      COHORT: ${{ inputs.phase }}
+      BLOCK: ${{ matrix.block }}
+      POSITION: ${{ matrix.position }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        block: [1, 2, 3, 4, 5, 6]
+        position: [1, 2]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: screen
+          persist-credentials: false
+      - name: Check the separately bound source and scheduling clearance
+        working-directory: screen/scripts/ohm-musl-pep723-test-hardware
+        run: |
+          set -euo pipefail
+          sha256sum --strict --check SHA256SUMS
+          python3 -IB -c "import pathlib,sys; sys.path.insert(0,'.'); import support; support.gate(pathlib.Path('clearance.json'))"
+          python3 -IB confirmation/enroll.py "$RUNNER_TEMP/pep723-host-enrollment.json"
+          echo "QA_ROOT=$RUNNER_TEMP/ohm-aarch64-linux-zmij" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 58aad7854096055e3b1b8ea4a42dc231fa46e92b
+          path: structural
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 5d6abc7cf533b1a85264c18525c9f8917aeb47d3
+          path: hardware
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 89a055549f4335e6e172f96c65d162dcd9cb1046
+          path: qualification
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Acquire the immutable source and admission records
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends strace musl-tools zstd b3sum
+          adapter="$GITHUB_WORKSPACE/screen/scripts/ohm-musl-pep723-test-hardware"
+          python3 -IB "$adapter/stage.py" acquire --qual "$GITHUB_WORKSPACE/qualification" \
+            --original "$RUNNER_TEMP/pep723-original.zip" --clearance "$adapter/clearance.json"
+      - name: Run one complete counterbalanced ordinary test-build pair
+        run: |
+          set -euo pipefail
+          adapter="$GITHUB_WORKSPACE/screen/scripts/ohm-musl-pep723-test-hardware"
+          python3 -IB "$adapter/worker.py" --qual "$GITHUB_WORKSPACE/qualification" --hardware "$GITHUB_WORKSPACE/hardware" \
+            --structural "$GITHUB_WORKSPACE/structural" --original "$RUNNER_TEMP/pep723-original.zip" \
+            --receipts "$RUNNER_TEMP/musl-ast/receipts" --root "$RUNNER_TEMP/pep723-test-screen" \
+            --clearance "$adapter/clearance.json" --position "$POSITION"
+      - if: always()
+        name: Seal any complete or partial original data
+        run: |
+          set -euo pipefail
+          adapter="$GITHUB_WORKSPACE/screen/scripts/ohm-musl-pep723-test-hardware"
+          if [[ -d "$RUNNER_TEMP/pep723-test-screen/counts" && -f "$RUNNER_TEMP/pep723-host-enrollment.json" ]]; then
+            cp "$RUNNER_TEMP/pep723-host-enrollment.json" "$RUNNER_TEMP/pep723-test-screen/counts/confirmation-host.json"
+          fi
+          python3 -IB "$adapter/stage.py" seal "$RUNNER_TEMP/pep723-test-screen"
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: pep723-${{ inputs.phase }}-block-${{ matrix.block }}-position-${{ matrix.position }}
+          path: ${{ runner.temp }}/pep723-test-screen/evidence
+          if-no-files-found: error
+          retention-days: 21
+          compression-level: 1

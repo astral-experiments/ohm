@@ -1,18 +1,30 @@
-name: Ruff PEP 723 musl test-build instruction screen
+name: Confirm Ruff PEP 723 musl test-build instructions
 on:
   workflow_dispatch:
+    inputs:
+      phase:
+        description: Registered confirmation cohort
+        required: true
+        type: choice
+        options: [primary, independent]
 permissions:
   contents: read
   actions: read
 jobs:
   paired:
     if: github.repository == 'astral-experiments/ohm' && github.ref_name == 'charlie/qa-musl-pep723-hardware-screen-20261031'
-    name: PEP 723 test-build position ${{ matrix.position }}
+    name: PEP 723 ${{ inputs.phase }} block ${{ matrix.block }} position ${{ matrix.position }}
+    env:
+      COHORT: ${{ inputs.phase }}
+      BLOCK: ${{ matrix.block }}
+      POSITION: ${{ matrix.position }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 100
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
+        block: [1, 2, 3, 4, 5, 6]
         position: [1, 2]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -25,6 +37,7 @@ jobs:
           set -euo pipefail
           sha256sum --strict --check SHA256SUMS
           python3 -IB -c "import pathlib,sys; sys.path.insert(0,'.'); import support; support.gate(pathlib.Path('clearance.json'))"
+          python3 -IB confirmation/enroll.py "$RUNNER_TEMP/pep723-host-enrollment.json"
           echo "QA_ROOT=$RUNNER_TEMP/ohm-aarch64-linux-zmij" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -55,8 +68,6 @@ jobs:
           python3 -IB "$adapter/stage.py" acquire --qual "$GITHUB_WORKSPACE/qualification" \
             --original "$RUNNER_TEMP/pep723-original.zip" --clearance "$adapter/clearance.json"
       - name: Run one complete counterbalanced ordinary test-build pair
-        env:
-          POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
           adapter="$GITHUB_WORKSPACE/screen/scripts/ohm-musl-pep723-test-hardware"
@@ -69,11 +80,14 @@ jobs:
         run: |
           set -euo pipefail
           adapter="$GITHUB_WORKSPACE/screen/scripts/ohm-musl-pep723-test-hardware"
+          if [[ -d "$RUNNER_TEMP/pep723-test-screen/counts" && -f "$RUNNER_TEMP/pep723-host-enrollment.json" ]]; then
+            cp "$RUNNER_TEMP/pep723-host-enrollment.json" "$RUNNER_TEMP/pep723-test-screen/counts/confirmation-host.json"
+          fi
           python3 -IB "$adapter/stage.py" seal "$RUNNER_TEMP/pep723-test-screen"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: pep723-test-hardware-position-${{ matrix.position }}
+          name: pep723-${{ inputs.phase }}-block-${{ matrix.block }}-position-${{ matrix.position }}
           path: ${{ runner.temp }}/pep723-test-screen/evidence
           if-no-files-found: error
           retention-days: 21
