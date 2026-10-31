@@ -1,11 +1,11 @@
-name: Actual compiler intrinsic sharing on ordinary Ruff commands
+name: Native mixed generics on the ordinary Ruff Unicode build
 on: workflow_dispatch
 permissions:
   contents: read
   actions: read
 jobs:
   pair:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-native-compiler-mixed-generics-loop-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-native-linked-generics-rustup-20261031'
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -73,23 +73,23 @@ jobs:
             registered/scripts/native-compiler-loop/custody/inputs/native-seal.json
           mkdir "$RUNNER_TEMP/strict-qualified-cargo"
           cp "$RUNNER_TEMP/admitted-native-kits/parent/bin/cargo" "$RUNNER_TEMP/strict-qualified-cargo/cargo"
-      - name: Whole-command inherited counts, clean and provider references
+      - name: Qualify native workspace trust and the single linked build
         env:
           QUALIFICATION_TOKEN: ${{ github.token }}
           QA_ROW: ${{ matrix.row }}
-        run: python3 -IB registered/scripts/native-compiler-loop/measure.py
+        run: python3 -IB registered/scripts/native-compiler-loop/linked-only/measure_link.py
       - name: Compact original packet
         if: always()
         run: |
           set -eu
           if test -d "$RUNNER_TEMP/ordinary-ron-check/packet"; then
             cp "$RUNNER_TEMP/admitted-native-kits/admission.json" "$RUNNER_TEMP/ordinary-ron-check/packet/compiler-source-seal.json"
-            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/actual-compiler-loop-${{ matrix.row }}.tar.gz" .
+            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/supported-linked-${{ matrix.row }}.tar.gz" .
           fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: actual-compiler-loop-${{ matrix.row }}
-          path: ${{ runner.temp }}/actual-compiler-loop-${{ matrix.row }}.tar.gz
+          name: supported-linked-${{ matrix.row }}
+          path: ${{ runner.temp }}/supported-linked-${{ matrix.row }}.tar.gz
           retention-days: 7
           if-no-files-found: error
