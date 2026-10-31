@@ -14,6 +14,7 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 os.environ.setdefault("RUNNER_TEMP",tempfile.gettempdir())
 import pilot
+import confirmation
 a,s,w=pilot.admission,pilot.s,pilot.w
 need,b=a.need,pilot.b
 ORDER=pilot.ORDERS
@@ -99,6 +100,8 @@ def worker(logs,calibrator,observer):
     need(pos in ORDER and tuple(end["order"])==tuple(en["order"])==ORDER[pos] and en["head"]==end["head"] and end["qualified"] and
          en["attempt"]==1 and en["plan"]==b.sha(HERE/"PLAN.md")==b.sha(logs/"PLAN.md") and en["argv"]==s.CARGO and
          en["structural_proof"]==a.SHA,"different registration, order or literal selection")
+    need(en["pilot_run"]==end["pilot_run"]==confirmation.SCREEN["run"] and
+         en["screen"]==end["screen"]==b.sha(HERE/"qualified-screen.json"),"unqualified earlier two-boot pilot")
     adj=read(logs/"structural-source.json");need(adj==read(HERE/"structure.json") and a.canonical_hash(adj)==en["structured"],"wrong physical antecedent")
     sdk=read(logs/"sdk/F.json")
     need(en["source"]==read(logs/"source-kit.json")==b.spec() and sdk["source_commit"]==b.HEADS["F"] and
@@ -165,7 +168,7 @@ def worker(logs,calibrator,observer):
     for branch in "AB":
         for name in ("cli","harness","reader"):
             need(all(refs["Foff",branch][name][k]==refs["Fon",branch][name][k] for k in ("executable","loads")),"cross-arm code area changed")
-    return {"kind":"two-boot F whole-Cargo integration pilot","run":en["run"],"head":en["head"],"position":pos,
+    return {"kind":"independent F whole-Cargo integration confirmation","screen":en["screen"],"registration":en["plan"],"run":en["run"],"head":en["head"],"position":pos,
             "boot":en["boot"],"order":list(ORDER[pos]),"calibration":cal,"observations":observations,
             "unique_clean_elfs":sorted(cache),"structural":a.SHA,"host_filesystem":(logs/"filesystem.txt").read_text().strip()}
 

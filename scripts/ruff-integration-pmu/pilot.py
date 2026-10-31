@@ -13,14 +13,15 @@ HERE=Path(__file__).resolve().parent
 SRC=HERE.parent/"ruff-integration-structure"
 sys.path[:0]=[str(HERE),str(SRC)]
 import admission
+import confirmation
 import trace_events
 import run as s
 
 b,w,kit,native=s.b,s.historical,s.kit,s.native
 need,save=s.b.need,s.b.save
 OUT,ROOT,WORK=b.OUT,b.ROOT,b.WORK
-BRANCH="charlie/qa-ruff-integration-exec-events-20261031"
-ORDERS={"01":("Foff","Fon"),"02":("Fon","Foff")}
+BRANCH="charlie/qa-ruff-integration-f-confirmation-20261031"
+ORDERS={p:confirmation.order(p) for p in confirmation.POSITIONS}
 
 
 def enter(position,source,calibrator,observers):
@@ -33,6 +34,8 @@ def enter(position,source,calibrator,observers):
          "structural oracle, recorder or native controls changed")
     need(ROOT.resolve()==ROOT and (WORK/".owned-by-packed-study").read_text()==str(ROOT) and
          shutil.disk_usage(OUT).free>=32*2**30 and shutil.disk_usage(WORK).free>=14*2**30,"runner floor")
+    screen=b.sha(HERE/"qualified-screen.json")
+    need(os.environ.get("QUALIFIED_SCREEN")==screen,"qualified-screen job did not reopen the two pilot originals")
     structural=admission.qualify()
     need(structural["source"]==b.HEADS["F"] and structural["cargo"]==b.CARGO and structural["wild"]==b.WILD_ELF and
          structural["argv"]==s.CARGO,"different SDK or workload in physical antecedent")
@@ -47,7 +50,7 @@ def enter(position,source,calibrator,observers):
          sorted(os.sched_getaffinity(0))==ready["affinity"],"non-independent boot or wrong affinity")
     prefix=s.suite.permission_prefix(OUT/"initial")
     save(OUT/"enrollment.json",dict(head=head,attempt=1,run=int(os.environ["GITHUB_RUN_ID"]),position=position,
-         order=ORDERS[position],boot=ready["boot"],plan=b.sha(HERE/"PLAN.md"),argv=s.CARGO,
+         screen=screen,pilot_run=confirmation.SCREEN["run"],order=ORDERS[position],boot=ready["boot"],plan=b.sha(HERE/"PLAN.md"),argv=s.CARGO,
          arm_option="-Zohm-branch-cache=yes",source=b.spec(),structural_proof=admission.SHA,
          structured=admission.canonical_hash(structural),suite_prefix=prefix))
     trace_events.calibrate(OUT/"initial"/"kernel-events")
@@ -131,7 +134,7 @@ def main(position,source,calibrator,observers):
         for phase,branch in w.PHASES:
             records[arm][phase]=visit(arm,phase,branch,env,root/phase,refs,identities,antecedent[arm+"/"+phase],prefix)
     b.verify_physical(b.SDK,registry["F"])
-    save(OUT/"complete.json",dict(qualified=True,position=position,head=os.environ["GITHUB_SHA"],
+    save(OUT/"complete.json",dict(qualified=True,screen=b.sha(HERE/"qualified-screen.json"),pilot_run=confirmation.SCREEN["run"],position=position,head=os.environ["GITHUB_SHA"],
               boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip(),order=ORDERS[position],histories=records))
 
 
