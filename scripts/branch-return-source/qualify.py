@@ -1,5 +1,6 @@
 """Build two complete, source-bound SDKs and test their exact emitted native products."""
 import hashlib
+import gzip
 import json
 import os
 from pathlib import Path
@@ -27,21 +28,51 @@ def toolchain(trusted):
     return helper
 
 
-def product_tests(b,repo,role,log):
+def unit_names(repo,role):
+    macsrc=repo/"compiler/rustc_fs_util/src"
+    native_cfg='#[cfg(all(test, target_os = "macos"))]\nmod tests;'
+    need(native_cfg in (macsrc/"lib.rs").read_text() and '#[cfg(target_os = "macos")]\npub fn clone_directory(' in (macsrc/"lib.rs").read_text(), "the three original FS tests no longer have their registered macOS scope")
+    named=lambda src: re.findall(r"(?m)^#\[test\]\nfn ([a-z0-9_]+)\(",src.read_text())
+    mac=["tests::"+n for n in named(macsrc/"tests.rs")]
+    need(len(mac)==3,"changed macOS-only module")
     tests=[]
-    for source,prefix in [("compiler/rustc_fs_util/src/tests.rs","tests::"),("compiler/rustc_incremental/src/persist/fs/tests.rs","persist::fs::tests::"),
+    for source,prefix in [("compiler/rustc_incremental/src/persist/fs/tests.rs","persist::fs::tests::"),
                          ("compiler/rustc_incremental/src/persist/fs/packed/tests.rs","persist::fs::packed::tests::")]:
-        names=re.findall(r"(?m)^#\[test\]\nfn ([a-z0-9_]+)\(",(repo/source).read_text())
-        need(len(names)==(3 if prefix=="tests::" else 5 if prefix=="persist::fs::tests::" or role=="K" else 3),"unexpected original native tests")
+        names=named(repo/source)
+        need(len(names)==(5 if prefix=="persist::fs::tests::" or role=="K" else 3),"unexpected original Linux native tests")
         tests.extend(prefix+n for n in names)
     need(all(any(t.endswith("::"+n) for t in tests)==(role=="K") for n in PACKED_NAMES),"wrong packed controls")
+    return tests,mac
+
+
+def unit_verdict(text,tests,mac):
+    text=re.sub(r"\x1b\[[0-9;]*m","",text)
+    for name in tests:
+        need(text.splitlines().count("test "+name+" ... ok")==1,"missing checked-in Linux unit "+name)
+    need(not any("test "+n+" ..." in text for n in mac) and "test result: FAILED" not in text and
+         re.search(r"(?m)^ *Running unittests src/lib.rs \(.*?/rustc_fs_util/.*?/rustc_fs_util-[a-z0-9]+\)$",text) and
+         re.search(r"(?m)^ *Running unittests src/lib.rs \(.*?/rustc_incremental/.*?/rustc_incremental-[a-z0-9]+\)$",text) and
+         "running 0 tests" in text and f"test result: ok. {len(tests)} passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;" in text,
+         "incorrect selected native Linux suites")
+
+
+def product_tests(b,repo,role,log):
+    tests,mac=unit_names(repo,role)
     args=["./x",*b.OPTIONS,"--set","rust.verbose-tests=true","test",*b.HOST_FLAGS]
     loc=log/"rustc-units.log"
     b.succeeded([*args,"compiler/rustc_fs_util","compiler/rustc_incremental"],repo,loc)
-    text=re.sub(r"\x1b\[[0-9;]*m","",loc.read_text())
-    for name in tests:
-        need(text.splitlines().count("test "+name+" ... ok")==1,"missing checked-in unit "+name)
-    need("test result: FAILED" not in text,"native unit error")
+    unit_verdict(loc.read_text(),tests,mac)
+    receipt=json.loads((HERE/"mac-source-origin.json").read_bytes())
+    original=gzip.decompress((HERE/"official-macos-step.log.gz").read_bytes())
+    need(reg.SOURCE()["roles"]["F"]["commit"]==receipt["source"] and receipt["job"]==124343467588 and
+         receipt["step"]["conclusion"]=="success" and hashlib.sha256(original).hexdigest()==receipt["selected_interval_sha256"],"different existing official macOS receipt")
+    maclog=original.decode()
+    start=maclog.index("Running unittests src/lib.rs (build/aarch64-apple-darwin",maclog.index("Testing stage1 {rustc_fs_util, rustc_incremental}"))
+    end=maclog.index("Running unittests src/lib.rs (build/aarch64-apple-darwin",start+1)
+    need("/rustc_fs_util/" in maclog[start:end] and "running 3 tests" in maclog[start:end] and
+         "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;" in maclog[start:end],"expected scoped actual macOS count at Full only")
+    write(log/"unit-platforms.json",{"host":reg.HOST,"linux_fs_util":0,"linux_incremental_names":tests,
+         "mac_only_source_names":mac,"historical_full_only":receipt})
     for test in NATIVE_TESTS:
         loc=log/(test+".log")
         b.succeeded([*args,"tests/run-make/"+test],repo,loc)
@@ -125,6 +156,12 @@ def main(trusted):
         actual0={"source":sha(repo/"src/stage0"),**{k:sha(stage.parent/"stage0/bin"/k) for k in ("rustc","cargo")}}
         need(actual0==b.STAGE0,"stage0 bytes differ")
         files=selected(b,stage,root);before=b.manifest(files);write(log/"before-tests.json",before)
+        if role=="F":
+            b.archive(files,transfer/"F-sdk.tar.zst")
+        else:
+            before_diff={Path(n):files[Path(n)] for n,row in before.items() if members["F"].get(n)!=row}
+            need(bool(before_diff),"Packed did not change the native driver")
+            b.archive(before_diff,transfer/"K-delta.tar.zst")
         product_tests(b,repo,role,log)
         rem=b.manifest({k:p for k,p in files.items() if p.is_file()});need(all(before[n]==row for n,row in rem.items()),"tests rewrote retained SDK members")
         b.succeeded(sdk_build,repo,log/"reassemble.log")
@@ -133,12 +170,11 @@ def main(trusted):
         driver,=[n for n in actual if n.startswith("lib/librustc_driver") and n.endswith(".so")]
         members[role]=actual
         if role=="F":
-            b.archive(files,transfer/"F-sdk.tar.zst");driver_key=driver
+            driver_key=driver
         else:
             need(driver==driver_key and set(actual)==set(members["F"]),"different installed namespace")
             changes={n:[members["F"][n],row] for n,row in actual.items() if members["F"][n]!=row}
             write(log/"all-differences.json",changes)
-            b.archive({Path(n):files[Path(n)] for n in changes},transfer/"K-delta.tar.zst")
             need(driver in changes and set(changes)<={driver,"bin/rustdoc"},"non-driver/library/source mismatch")
         b.operational(root,stage,files,{"F":"P","K":"C"}[role],log)
         versions.append((log/"rustc.log").read_bytes())
