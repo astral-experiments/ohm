@@ -1,4 +1,4 @@
-name: Price the eight retained libraries on the real Ruff notebook edit
+name: Sample two expensive rustcs on Ruff's notebook edit
 on:
   workflow_dispatch:
     inputs:
@@ -10,11 +10,11 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: signed21-notebook-fanout-ceiling
+  group: signed21-notebook-heavy-compiler-samples
   cancel-in-progress: false
 jobs:
   diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-notebook-fanout-instructions-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-20261031'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 130
     env:
@@ -80,10 +80,19 @@ jobs:
           test "$GITHUB_RUN_ATTEMPT" = 1
           sudo apt-get -qq update
           sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd binutils git
+          if sudo apt-get install -y --no-install-recommends linux-tools-generic; then
+            mapfile -t perf_bins < <(find -L /usr/lib/linux-tools -mindepth 2 -maxdepth 2 -type f -name perf | sort -V)
+            if (("${#perf_bins[@]}" > 0)); then
+              perf_bin="$(realpath "${perf_bins[-1]}")"
+              dpkg-query -S "$perf_bin"
+              "$perf_bin" version --build-options
+              printf 'OHM_DIAGNOSTIC_PERF=%s\n' "$perf_bin" >> "$GITHUB_ENV"
+            fi
+          fi
           for t in git rustup rustc cargo cc zstd du cp; do command -v "$t"; done
           (cd registered/scripts/notebook-fanout-ceiling && sha256sum --strict --check SHA256SUMS)
           python3 -IB feature/scripts/featureless-e2e/acquire.py "$GITHUB_WORKSPACE" "$RUNNER_TEMP/selected-e2e-cargo" strict
-      - name: Measure untraced whole flanks and disjoint native compiler subtrees
+      - name: Sample the actual compiler processes and preserve five native objects
         run: |
           set -euo pipefail
           python3 -IB registered/scripts/notebook-fanout-ceiling/worker.py \
@@ -96,7 +105,7 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: signed21-notebook-edit-compiler-ceiling
+          name: signed21-notebook-heavy-compiler-profile
           path: ${{ runner.temp }}/ohm-featureless-e2e/receipts/
           if-no-files-found: warn
           retention-days: 14

@@ -16,7 +16,9 @@ import uuid
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import contract as c
+import heavy
 import inputs
+import sampling
 import support
 
 
@@ -163,7 +165,7 @@ def run_all(workspace, incoming, root):
         os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and os.environ["GITHUB_REF"]
-        == "refs/heads/charlie/qa-signed21-notebook-fanout-instructions-20261031"
+        == "refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-20261031"
         and support.git(HERE, "rev-parse", "HEAD")
         == os.environ["GITHUB_SHA"]
         == os.environ["REVIEWED_HEAD"],
@@ -201,6 +203,14 @@ def run_all(workspace, incoming, root):
     tools = pmu.compilers(root)
     shutil.copytree(tools, out / "counter-programs")
     pmu.calibration(tools, out)
+    try:
+        perf = sampling.prepare(root, tools, out)
+    except Exception as err:
+        # Continue with the independent native-output experiment if this host cannot sample PMIs.
+        perf = None
+        inputs.save(out / "sampling-enrollment.json", {"admitted": False, "reason": repr(err)})
+    else:
+        inputs.save(out / "sampling-enrollment.json", {"admitted": True})
     s.source(root)
     inputs.save(
         out / "environment.json",
@@ -251,7 +261,11 @@ def run_all(workspace, incoming, root):
                 all(topology.location(Path(p)) == physical[n] for n, p in paths.items()),
                 "native selectors changed",
             )
-            raw = pmu.record(folder, tools, mode, paths, c.CLI, root / "ruff", s.env(root))
+            sampled = perf is not None and lane == "T" and phase in ("edited", "restored")
+            if sampled:
+                raw = sampling.record(folder, tools, paths, c.CLI, root / "ruff", s.env(root), perf)
+            else:
+                raw = pmu.record(folder, tools, mode, paths, c.CLI, root / "ruff", s.env(root))
             inventory, products = c.typed(raw, root)
             c.require(
                 inventory == names and products == first_products,
@@ -264,6 +278,10 @@ def run_all(workspace, incoming, root):
                 c.activation_boundaries(folder / "trace", counted)
             inputs.save(folder / "counts.json", counted)
             # Everything below is outside the command and kernel PMU lifetime on each lane.
+            if sampled:
+                sampling.summarize(folder, counted, perf)
+            if f"{lane}/{phase}" in heavy.STATES:
+                heavy.capture(root, folder, products, out / "heavy-cas")
             actual = study.observe.native_reader(root, f"{lane}/{phase}", Path(products["e2e"]), state)
             check_program({"status": 0, "issues": [], "test": actual}, state)
             inputs.save(folder / "program.json", actual)
@@ -293,6 +311,10 @@ def run_all(workspace, incoming, root):
         s.fresh(root, registry=True)
         row = study.panel.visit(root, study.PANEL, "clean", state, state, stamp)
         references[state] = check_program(row, state)
+        folder = out / "clean" / state
+        graph, clean_products = c.typed(gzip.decompress((folder / "stdout.jsonl.gz").read_bytes()), root)
+        c.require(graph == names and clean_products == first_products, "clean product identities changed")
+        heavy.capture(root, folder, clean_products, out / "heavy-cas")
     errors["empty"] = bad_input(root, "invalid/empty", True, study)
     c.require(errors["empty"] == errors["populated"], "independent invalid diagnostic differs")
     repaired = study.panel.visit(root, study.PANEL, "repair", "empty", "original", stamp)
@@ -326,6 +348,7 @@ def run_all(workspace, incoming, root):
         },
     )
     c.require(not issues, (issues, "native images or verdicts differ from empty controls"))
+    inputs.save(out / "heavy-result.json", heavy.reopen(out))
     result = {}
     for key in ("edited", "restored"):
         tsp = history["T/" + key]

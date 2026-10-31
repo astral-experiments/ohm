@@ -14,6 +14,8 @@ import zipfile
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import inputs
+import heavy
+import sampling
 import support
 import contract as c
 
@@ -260,6 +262,12 @@ def run(out, feature, collector, required_run=None, required_sha=None):
         "bad clean reference",
     )
     allcases = {}
+    enrollment = read(out / "sampling-enrollment.json")
+    c.require(enrollment == {"admitted": True} or
+              (enrollment.get("admitted") is False and isinstance(enrollment.get("reason"), str)
+               and bool(enrollment["reason"])), "unregistered native sampling disposition")
+    if enrollment["admitted"]:
+        sampling.verify_calibration(out)
     with tempfile.TemporaryDirectory() as tmp:
         study, pmu, topology = support.load_modules(feature, collector, Path(tmp) / "original-ledger")
         pmu.calibration(out / "counter-programs", out, replay=True)
@@ -291,6 +299,10 @@ def run(out, feature, collector, required_run=None, required_sha=None):
                 if mode == "tree":
                     c.activation_boundaries(loc / "trace", x)
                 c.require(x == read(loc / "counts.json"), "reported scope mismatch")
+                sampled = enrollment["admitted"] and lane == "T" and changed
+                c.require((loc / "sampling-summary.json").exists() == sampled, "partial or unexpected profile")
+                if sampled:
+                    sampling.verify(loc, x)
                 prog = native(out, loc, state)
                 c.require(prog == refs[state], "stale or inconsistent native program")
                 snap = audit_metadata(out, loc, raw, root, products, seen)
@@ -346,6 +358,8 @@ def run(out, feature, collector, required_run=None, required_sha=None):
         with subprocess.Popen(["zstd", "-qdc", path], stdout=subprocess.PIPE) as proc:
             h = hashlib.file_digest(proc.stdout, "sha256").hexdigest()
             c.require(proc.wait() == 0 and h == key, "incomplete archived ELF")
+    products = heavy.reopen(out)
+    c.require(products == read(out / "heavy-result.json"), "heavy object histories differ from originals")
     return {
         "qualified_baseline_feasibility": True,
         "run": rec["run"],
@@ -355,6 +369,8 @@ def run(out, feature, collector, required_run=None, required_sha=None):
         "native_members_per_edit": sum(c.EIGHT.values()),
         "cas_members": len(seen),
         "outcome": result,
+        "heavy_products": products,
+        "native_sample_enrollment": enrollment,
     }
 
 
