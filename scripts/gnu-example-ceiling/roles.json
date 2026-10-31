@@ -1,0 +1,48 @@
+{
+  "cargo": "c18e91b514b2c4e4966c9ab03232c804af3e1b57",
+  "cargo_sha256": "9fb29f6abecad05acb6015990615c5fbb435a5907543f0bd33cf88cada4f5826",
+  "cargo_source_build": {
+    "head": "78801e0c551576349aa36eaf39a4f8afbd291b7f",
+    "product_zip": 12989289345,
+    "receipts_zip": 12989647504,
+    "run": 41081958994,
+    "verified_against_later_183_member_musl_kit": true
+  },
+  "examples": [
+    "custom_error",
+    "custom_level",
+    "elide_header",
+    "expected_type",
+    "footer",
+    "format",
+    "highlight_message",
+    "highlight_source",
+    "id_hyperlink",
+    "multi_suggestion",
+    "multislice",
+    "struct_name_as_context"
+  ],
+  "orders": {
+    "01": [
+      "tree",
+      "plain"
+    ],
+    "02": [
+      "plain",
+      "tree"
+    ]
+  },
+  "original_registration_sha256": "022028b366d934f3f3ee0da5b459913332ecaf7a7c925bdf4c63917189c4373b",
+  "plan_sha256": "12da58f768d32ebd9cce5a88ca79697705591217480fe158c0665edbdfb3d6c6",
+  "source_inputs": {
+    "corrected": {
+      "crates/ruff_annotate_snippets/src/renderer/source_map.rs": "f466e84cbf6bc3d1ac7280685bb73fe3813565801c0ea7fe054926f384a59fb1",
+      "crates/ruff_annotate_snippets/tests/ruff.rs": "d95ed9d60465aafdee0e2e2e465b94fdf5a7335b460d1aaa0366756ff123d217"
+    },
+    "old": {
+      "crates/ruff_annotate_snippets/src/renderer/source_map.rs": "039cdafb24a352bf1b6f707ad1b9bcccea8eba4b1be13c810a065579c1836566",
+      "crates/ruff_annotate_snippets/tests/ruff.rs": "0021bec4d34b7465a5fd38b193d437c95cdf2322da25be73634a99f9e2de26a5"
+    }
+  },
+  "worker": "two diagnostic workers, overlap permitted on different kernels"
+}
