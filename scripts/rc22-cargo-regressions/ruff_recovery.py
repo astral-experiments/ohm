@@ -35,6 +35,49 @@ def archive(path, data):
         file.write(gzip.compress(data, compresslevel=2, mtime=0))
 
 
+def retain_metadata(store, path, crate, env):
+    """Keep exact compiler inputs and the producing compiler's own metadata listing."""
+    data = path.read_bytes()
+    assert 0 < len(data) <= 16 * 2**20
+    digest = hashlib.sha256(data).hexdigest()
+    body = store / (digest + ".rmeta.gz")
+    listing = store / (digest + ".ls.gz")
+    if body.exists():
+        assert gzip.decompress(body.read_bytes()) == data and listing.is_file()
+    else:
+        kind = "all" if crate == "ron" else "root"
+        decoded = read_output(["rustc", "+ohm", "-Zls=" + kind, str(path)], env)
+        lines = decoded.splitlines()
+        assert lines[0] == b"Crate info:" and lines[1].split(b"-", 1)[0] == b"name " + crate.encode()
+        assert b"=External Dependencies=" in lines
+        archive(body, data)
+        archive(listing, decoded)
+    assert len(data) == path.stat().st_size and digest == sha(path)
+    return [len(data), digest]
+
+
+def capture_ron(out, label, artifacts, env):
+    store = out / "metadata"
+    store.mkdir(exist_ok=True)
+    roots = tuple(Path(env[k]).resolve() for k in ("CARGO_TARGET_DIR", "CARGO_BUILD_BUILD_DIR"))
+    selected = {"ron", "bitflags", "once_cell", "serde", "serde_core", "serde_derive", "typeid", "unicode_ident"}
+    records = []
+    for row in artifacts:
+        name = row["target"]["name"]
+        if name not in selected or row["target"]["kind"] not in (["lib"], ["proc-macro"]):
+            continue
+        outputs = {}
+        for fname in row["filenames"]:
+            path = Path(fname).resolve(strict=True)
+            assert any(path.is_relative_to(root) for root in roots)
+            outputs[fname] = (retain_metadata(store, path, name, env) if path.suffix == ".rmeta"
+                              else [path.stat().st_size, sha(path)])
+        records.append({"crate": name, "package": row["package_id"], "features": row["features"],
+                        "fresh": row["fresh"], "profile": row["profile"], "outputs": outputs})
+    assert {r["crate"] for r in records} == selected
+    save(out / (label + ".metadata.json"), records)
+
+
 def read_output(command, env=None, cwd=None):
     return subprocess.check_output(command, env=env, cwd=cwd, timeout=1500)
 
@@ -186,6 +229,7 @@ def main(a):
         artifacts = [r for r in rows if r["reason"] == "compiler-artifact"]
         assert len(artifacts) == (302 if verdict == "invalid" else 303)
         assert any(r["target"]["name"] == "ron" for r in artifacts)
+        capture_ron(out, label, artifacts, working)
         names = [r for r in artifacts if r["target"]["name"] == "ty_project"]
         assert bool(names) == (verdict != "invalid")
         outputs = {}

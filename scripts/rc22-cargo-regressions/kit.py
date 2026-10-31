@@ -32,7 +32,7 @@ BOOTSTRAP = ["x.py", "--ci", "false", "--set", "build.submodules=false", "--set"
              "--set", "llvm.download-ci-llvm=true", "build", "--stage", "1", "-j8", "--host", TRIPLE, "--target", TRIPLE,
              "compiler/rustc", "library", "src/tools/rustdoc"]
 WORKERS = {"native_mounts.py": "afa6fa62a26e8cdcedc9eb4b5009acbbe6128904a0a74b3bb1c6801c3e52029b",
-           "ruff_recovery.py": "b950ccd6cde4e1beb6058948bdb1ac3ac55c1ff13fd3c57415b7393e11f83078"}
+           "ruff_recovery.py": "cdaa90c5d11622e11f126eee30cc7d2116fc5103c9160870cf8d064d17b5c7e2"}
 ZIP_LIMITS = {"receipt.json": 1 << 20, "members.json": 8 << 20, "kit.tar.zst": 2 << 30}
 LIMIT = 4 << 30
 
