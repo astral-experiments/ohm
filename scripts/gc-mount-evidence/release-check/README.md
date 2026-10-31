@@ -11,10 +11,12 @@ One release-style Linux Cargo executable included the repaired-check fix, the sh
 
 The private signed negative, the rejected first fix, and the independent ext4 and overlay controls are preserved separately. On the public #308 source, the private collector respected the held profile lock, then reclaimed 28 eligible files once unlocked. [Private-target original records](https://github.com/astral-experiments/ohm/tree/2dc85901b87e5df168bf6b0cbc727f18c9f524b2/scripts/private-gc-overlay/evidence)
 
+The same Cargo source passed all eight ordinary CI jobs. Linux passed 4,826 tests plus 15 pinned Ohm cases. macOS passed 4,798 tests plus eight pinned Ohm cases. Both complete suites included the two affected ready-test cases. The full libtest name inventory, platform-specific ignores and two macOS storage-observer setup failures are preserved. [Linux and macOS verdicts and offline replay](https://github.com/astral-experiments/ohm-cargo/tree/74b503ed1d97cc9bafe13879cef57fc2129f408a/qa/combined-cargo-native)
+
 The five ZIPs are the original GitHub artifact bytes. `artifacts.json` records each GitHub ID, size and digest. The verifier checks those bytes, release-build output, runtime identities, file contents and link counts, kernel observations, compiler and linker counts, and per-visit Ruff diagnostics. This command reproduces the stored summary from this directory.
 
 ```sh
 python3 -IB verify.py | cmp - summary.json
 ```
 
-The corpus here covers these three specific fixes. The separate comparison with the direct parent of #294 examines the older native-link marker when a library appears in the linker's own search directory. [Original stale native result](https://github.com/astral-experiments/ohm/tree/927e20bcad028e5ed4290a58bd330a258ee5da41/scripts/ohm-gnu-syscall/evidence/release-reader-compatibility/linux-unicode-implicit-wild-search) · [Matched source builds](https://github.com/astral-experiments/ohm/actions/runs/41150296326)
+The corpus here covers these three specific fixes. The separate comparison with the direct parent of #294 examines the older native-link marker when a library appears in the linker's own search directory. [Original stale native result](https://github.com/astral-experiments/ohm/tree/927e20bcad028e5ed4290a58bd330a258ee5da41/scripts/ohm-gnu-syscall/evidence/release-reader-compatibility/linux-unicode-implicit-wild-search) · [Matched source builds with isolated outputs](https://github.com/astral-experiments/ohm/actions/runs/41150601667)
