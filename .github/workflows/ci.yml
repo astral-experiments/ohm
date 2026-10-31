@@ -1,22 +1,28 @@
-name: One-package compiled-host mode on ordinary Ruff checks
+name: Signed Rust generic-sharing bridge on Ruff
 on: workflow_dispatch
 permissions:
   contents: read
   actions: read
 jobs:
   pair:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-strict-one-host-package-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-strict-unicode-share-bridge-20261031'
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 2
       matrix:
-        row: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+        row: ['01', '02']
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 95
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: registered
+          persist-credentials: false
+          sparse-checkout: scripts/strict-share-bridge
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: one
+          ref: 3c9c82bb960564dbe3b0df7c0a736662354e502d
           persist-credentials: false
           sparse-checkout: scripts/strict-one-package
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -64,19 +70,19 @@ jobs:
         env:
           QUALIFICATION_TOKEN: ${{ github.token }}
           QA_ROW: ${{ matrix.row }}
-        run: python3 -IB registered/scripts/strict-one-package/single.py
+        run: python3 -IB registered/scripts/strict-share-bridge/bridge.py
       - name: Compact original packet
         if: always()
         run: |
           set -eu
           if test -d "$RUNNER_TEMP/ordinary-ron-check/packet"; then
             cp "$RUNNER_TEMP/strict-qualified-cargo/custody.json" "$RUNNER_TEMP/ordinary-ron-check/packet/strict-cargo-artifact.json"
-            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/one-package-${{ matrix.row }}.tar.gz" .
+            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/share-bridge-${{ matrix.row }}.tar.gz" .
           fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: one-package-${{ matrix.row }}
-          path: ${{ runner.temp }}/one-package-${{ matrix.row }}.tar.gz
+          name: share-bridge-${{ matrix.row }}
+          path: ${{ runner.temp }}/share-bridge-${{ matrix.row }}.tar.gz
           retention-days: 7
           if-no-files-found: error
