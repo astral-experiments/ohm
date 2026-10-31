@@ -1,13 +1,13 @@
-name: Check native generator reuse and changed library outputs
+name: Test native link checks for workspace build scripts
 on:
   workflow_dispatch:
     inputs:
       expected_head: {description: Qualification commit, required: true, type: string}
 permissions: {contents: read, actions: read}
-concurrency: {group: rc22-generator-cutoff, cancel-in-progress: false}
+concurrency: {group: rc22-build-script-link, cancel-in-progress: false}
 jobs:
   trace:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22-test-generator-cutoff'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22-test-generator-link'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 45
     steps:
@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get -qq update
-          sudo apt-get -y install --no-install-recommends zstd b3sum clang
+          sudo apt-get -y install --no-install-recommends zstd b3sum clang strace
           python3 -IB protocol/scripts/rc22-native/acquire_plain.py protocol/scripts/rc22-native/source/sdk-gnu.json "$RUNNER_TEMP/rc22-inbox" "$RUNNER_TEMP/rc22-source"
           gh api repos/astral-experiments/ohm/actions/artifacts/13050858750/zip > "$RUNNER_TEMP/standalone.zip"
       - name: Build the isolated Cargo change with the qualified driver
@@ -44,7 +44,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: rc22-gnu-generator-trial
+          name: rc22-gnu-generator-link
           path: |
             ${{ runner.temp }}/generator-trial/reports/
             ${{ runner.temp }}/rc22-source/

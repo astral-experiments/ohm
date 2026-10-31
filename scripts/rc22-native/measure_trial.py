@@ -13,6 +13,7 @@ import build_generator_trial as trial
 import common
 import native_generator_case
 import sdk
+import trace_execs
 import trace_generator as control
 from warm_ty import WARNING
 
@@ -26,9 +27,11 @@ def measure(out,kit,reported,role,reports):
     subprocess.run(["cargo","+ohm","fetch","--locked","--target",common.GNU],cwd=root,env=env,check=True,stdout=subprocess.DEVNULL)
     results=[]
     try:
-        for step in ("clean","edit","repeat1","repeat2","repeat3"):
+        for step in ("clean","edit","repeat1","repeat2","repeat3","observed"):
             if step=="edit":source.write_bytes(original+WARNING)
-            start=time.monotonic();proc=subprocess.run(cmd,cwd=root,env=env,capture_output=True);elapsed=time.monotonic()-start
+            launch=trace_execs.argv(cmd,work) if step=="observed" else cmd
+            start=time.monotonic();proc=subprocess.run(launch,cwd=root,env=env,capture_output=True);elapsed=time.monotonic()-start
+            if step=="observed":trace_execs.finish(work,reports)
             for key,b in (("stdout",proc.stdout),("stderr",proc.stderr)):(reports/(step+"."+key+".gz")).write_bytes(gzip.compress(b,mtime=0))
             proc.check_returncode()
             rows=[json.loads(l) for l in proc.stdout.splitlines()];assert rows[-1]=={"reason":"build-finished","success":True}
@@ -72,6 +75,7 @@ def main():
     common.save(out/"reports/ty-comparison.json",dict(job=common.job(),controls={k:[dict(step=q["step"],dirty=len(q["dirty"]),seconds=q["elapsed_s"]) for q in v] for k,v in results.items()}))
     # The control was already exercised on ordinary native links. The generator check is new for both binaries.
     for role,(body,stamp) in paths.items():
+        if role=="control":continue
         install=kit/"sdk/bin/cargo-generator-subject";install.write_bytes(body);install.chmod(0o755);install.replace(kit/"sdk/bin/cargo")
         assert common.sha(kit/"sdk/bin/cargo")==stamp["sha256"]
         native_generator_case.exercise(out,kit/"sdk",role)

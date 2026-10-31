@@ -10,8 +10,8 @@ import common
 import materialize
 import sdk
 
-REV = "cc483e5b78b876d647e2f3f78e791936670de47a"
-TREE = "23acb5e5ae4861990047845d53862158317339f2"
+REV = "52755fb8bebc06cbfbd579f3886bc6f882f62000"
+TREE = "ef1c3cb38ac22eb0a8f333679afc1c5d2f557f36"
 PARENT = "8269d772aa1ef02e5efaa331dfb40eb55d71f719"
 ROLE = "candidate330"
 FEATURES = {"all-static", "ohm-defaults"}
@@ -48,13 +48,13 @@ def build(bundle):
     materialize.cargo(root)
     source = root/"cargo-source"
     packed=Path(__file__).with_name("generator-candidate.pack")
-    common.require(common.sha(packed) == "2f46a73c1d77b1928bcd370421ee3af4594dd8444f9a59f0cf67e637ab289bbb", "experimental source digest")
+    common.require(common.sha(packed) == "00f35cf2e7e8bcdf0133a33dcf5310c5617cdace25d37f5e14223e6bd0ec1db1", "experimental source digest")
     with packed.open("rb") as stream:
         subprocess.run(["git","index-pack","--stdin"],cwd=source,stdin=stream,check=True)
     common.git(source, "checkout", "--detach", "-q", REV)
     common.require(common.git(source, "rev-parse", "HEAD^{tree}") == TREE and common.git(source, "rev-parse", "HEAD^") == PARENT, "wrong standalone tree")
     paths = set(common.git(source, "diff", "--name-only", PARENT, REV).splitlines())
-    common.require(paths == {'src/compiler/mod.rs', 'src/compiler/fingerprint/mod.rs', 'src/compiler/fingerprint/worktree.rs'}, paths)
+    common.require(paths == {'src/compiler/fingerprint/mod.rs', 'src/compiler/mod.rs'}, paths)
     common.require(not common.git(source,"status","--porcelain"), "dirty source")
     work = root/"build"
     work.mkdir()
