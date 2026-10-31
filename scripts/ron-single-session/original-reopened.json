@@ -1,0 +1,141 @@
+{
+  "instructions": {
+    "allowable_ron_if_others_fixed": 486061988.0,
+    "fraction_ron_required_saving": 0.7233246175479822,
+    "other": 784671239,
+    "ron": 1756795215,
+    "whole": 2541466454
+  },
+  "scope": "The original native profiler did not record per-call function arguments; only Serde was a native macro extern. Source sites are independently inferred.",
+  "signed_profiles": [
+    {
+      "derive_calls": {
+        "expand_derive_proc_macro_outer": 16,
+        "expand_proc_macro": 16
+      },
+      "mir_borrowck": 913,
+      "observed_events": {
+        "ArtifactSize": 1,
+        "GenericActivity": 44020,
+        "Query": 126211,
+        "QueryBlocked": 7,
+        "QueryCacheHitCount": 78175
+      },
+      "only_native_macro_extern": [
+        "serde_derive"
+      ],
+      "phase": "profile-training",
+      "profile": "5dbf272febfd30e546d4e09e0251cf424257dcd394ed14fa72ab80406698cbd8",
+      "typeck_root": 945
+    },
+    {
+      "derive_calls": {
+        "expand_derive_proc_macro_outer": 16,
+        "expand_proc_macro": 16
+      },
+      "mir_borrowck": 913,
+      "observed_events": {
+        "ArtifactSize": 1,
+        "GenericActivity": 44020,
+        "Query": 126211,
+        "QueryBlocked": 205,
+        "QueryCacheHitCount": 78175
+      },
+      "only_native_macro_extern": [
+        "serde_derive"
+      ],
+      "phase": "profile-repeat",
+      "profile": "6490579943c81677b7b94edec1dfb1254a5c80f4e1740ff0311fcafc85f0ed3c",
+      "typeck_root": 945
+    }
+  ],
+  "source_derived_sites": [
+    {
+      "calls": [
+        "Deserialize",
+        "Serialize"
+      ],
+      "file": "src/extensions.rs",
+      "line": 5,
+      "source": "#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]"
+    },
+    {
+      "calls": [
+        "Deserialize",
+        "Serialize"
+      ],
+      "file": "src/options.rs",
+      "line": 38,
+      "source": "#[derive(Clone, Debug, Serialize, Deserialize)] // GRCOV_EXCL_LINE"
+    },
+    {
+      "calls": [
+        "Deserialize",
+        "Serialize"
+      ],
+      "file": "src/ser/mod.rs",
+      "line": 80,
+      "source": "#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]"
+    },
+    {
+      "calls": [
+        "Deserialize",
+        "Serialize"
+      ],
+      "file": "src/ser/path_meta.rs",
+      "line": 112,
+      "source": "#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]"
+    },
+    {
+      "calls": [
+        "Deserialize",
+        "Serialize"
+      ],
+      "file": "src/ser/path_meta.rs",
+      "line": 241,
+      "source": "#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]"
+    },
+    {
+      "calls": [
+        "Deserialize",
+        "Serialize"
+      ],
+      "file": "src/value/map.rs",
+      "line": 18,
+      "source": "#[derive(Clone, Debug, Default, Deserialize, Serialize)]"
+    },
+    {
+      "calls": [
+        "Deserialize"
+      ],
+      "file": "src/de/mod.rs",
+      "line": 1051,
+      "source": "#[derive(serde_derive::Deserialize)]"
+    },
+    {
+      "calls": [
+        "Deserialize"
+      ],
+      "file": "src/de/mod.rs",
+      "line": 1055,
+      "source": "#[derive(serde_derive::Deserialize)]"
+    },
+    {
+      "calls": [
+        "Deserialize"
+      ],
+      "file": "src/de/mod.rs",
+      "line": 1110,
+      "source": "#[derive(serde_derive::Deserialize)]"
+    },
+    {
+      "calls": [
+        "Deserialize"
+      ],
+      "file": "src/de/mod.rs",
+      "line": 1113,
+      "source": "#[derive(serde_derive::Deserialize)]"
+    }
+  ],
+  "source_revision": "c6a8cff1eff986cc1ad9b026e838335187d411f0"
+}

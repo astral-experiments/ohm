@@ -1,0 +1,1 @@
+The common Cargo `b76dc8006155d48a8cd7d6c5543acb9c18e2ce4b` passed this workflow’s diagnostic-repair prerequisite. A separate old-v1 native-provider upgrade qualification found that this binary retained stale native inputs. This one-session metadata check is confined to Ron; no release or native-link safety conclusion follows.
