@@ -1,4 +1,4 @@
-name: Adjacent Cargo commits on Ruff's implicit Linux provider
+name: Migrate two poisoned signed targets to strict Cargo
 on:
   workflow_dispatch:
     inputs:
@@ -11,9 +11,9 @@ permissions:
   actions: read
 jobs:
   provider:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-linux-implicit-294-parent-20261031' && inputs.stage == 'provider'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-294-292-target-migration' && inputs.stage == 'provider'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 55
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -39,8 +39,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends strace build-essential binutils
-          rustup toolchain install 1.99.0 --profile minimal
+          sudo apt-get install -y --no-install-recommends strace build-essential binutils b3sum
       - name: Authenticate the signed release and previous exact source build
         env:
           GH_TOKEN: ${{ github.token }}
@@ -50,11 +49,11 @@ jobs:
           mkdir -m700 "$RUNNER_TEMP/adjacent-provider"
           python3 -IB signed-reader/scripts/packaged-release-workspace/packages.py 21 "$RUNNER_TEMP/adjacent-provider"
           python3 -IB protocol/scripts/linux-294-parent/supply.py "$RUNNER_TEMP/adjacent-provider"
-      - name: Exercise the six independent Cargo roles against the same Linux provider
+      - name: Run the same-path signed upgrades and real generator edit
         run: |
           set -eu
           python3 -IB protocol/scripts/linux-294-parent/experiment.py "$RUNNER_TEMP/adjacent-provider" "$GITHUB_WORKSPACE/ruff"
-      - name: Read actual probes and compare each returned program with its empty references
+      - name: Check poisoned and empty verdicts, retained ELF, Cargo marker and physical links
         run: |
           set -eu
           python3 -IB protocol/scripts/linux-294-parent/verify.py "$RUNNER_TEMP/adjacent-provider/private/host-unicode-wild-dir-v1/results" > "$RUNNER_TEMP/adjacent-provider/terminal.json"
@@ -62,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: native-adjacent-Cargo-Ruff-Unicode
+          name: signed21-to-strict-native-targets
           path: |
             ${{ runner.temp }}/adjacent-provider/private/host-unicode-wild-dir-v1/results
             ${{ runner.temp }}/adjacent-provider/private/host-unicode-wild-dir-v1/fixture-config.json

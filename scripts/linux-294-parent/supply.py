@@ -1,52 +1,37 @@
-"""Download built Cargo inputs with the private repository's own job token, before the offline experiment."""
+"""Get the one sealed Cargo at the registered GitHub run and check its release SDK."""
 from pathlib import Path
-import hashlib,json,os,re,shutil,subprocess,sys,zipfile
+import hashlib, io, json, os, subprocess, sys, zipfile
 REPO='astral-experiments/ohm'
-P='7277e6cdaba44c43294a07c0661fc8e69fd8e3e7'
-S='2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c'
-C='b76dc8006155d48a8cd7d6c5543acb9c18e2ce4b'
-A=41150601667; AH='96051e5c262ce0d04dc5bb9631a65eb80e848de4'
-B=41149649623; BH='0db917cab8e5cfb2cbd51ee794d9f6ce958bc495'
-def hx(p):
-    with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
-def api(path):return json.loads(subprocess.check_output(['gh','api','repos/'+REPO+'/'+path]))
+RUN=41151297839
+QA='f23a67771c625785cd70f58e9b46e8d26af3d317'
+SIGNED='2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c'
+STRICT='761ea115605c34f11a1cd29afd68812c1e1359dd'
+ELF='035e681081683f4141e4c544b8cf9492b73784051e4541c12bb3cbdb73a798a4'
+def h(b):return hashlib.sha256(b).hexdigest()
+def api(path):return subprocess.check_output(['gh','api',f'repos/{REPO}/{path}'])
 def supply(root):
-    saved=root/'input';saved.mkdir()
-    artifacts=[]
-    def archive(run,head,name,expected=None):
-        r=api('actions/runs/'+str(run));assert r['status']=='completed' and r['conclusion']=='success' and r['head_sha']==head
-        a,=[v for v in api(f'actions/runs/{run}/artifacts')['artifacts'] if v['name']==name and not v['expired']]
-        assert a['workflow_run']['id']==run and a['workflow_run']['head_sha']==head
-        if expected:assert a['id']==expected[0] and a['size_in_bytes']==expected[1] and a['digest']=='sha256:'+expected[2]
-        dest=saved/(name+'.zip')
-        with dest.open('xb') as f:subprocess.run(['gh','api',f'repos/{REPO}/actions/artifacts/{a["id"]}/zip'],stdout=f,check=True)
-        assert hx(dest)==a['digest'].split(':')[1] and a['size_in_bytes']==dest.stat().st_size
-        artifacts.append({k:a[k] for k in ['id','name','size_in_bytes','digest','workflow_run']})
-        return zipfile.ZipFile(dest)
+    dest=root/'input';dest.mkdir()
+    run=json.loads(api(f'actions/runs/{RUN}'));assert run['head_sha']==QA and run['event']=='workflow_dispatch'
+    jobs=json.loads(api(f'actions/runs/{RUN}/jobs'))['jobs'];assert any(j['conclusion']=='success' and any('Build native Cargo' in s['name'] and s['conclusion']=='success' for s in j['steps']) for j in jobs)
+    items=json.loads(api(f'actions/runs/{RUN}/artifacts'))['artifacts']
+    def acquire(name,ident,length,dig):
+        a,=[a for a in items if a['name']==name];assert a['workflow_run']['head_sha']==QA and a['workflow_run']['id']==RUN and not a['expired']
+        assert (a['id'],a['size_in_bytes'],a['digest'])==(ident,length,'sha256:'+dig)
+        b=api(f'actions/artifacts/{ident}/zip');assert len(b)==length and h(b)==dig
+        (dest/(name+'.json')).write_text(json.dumps(a,indent=2)+'\n');return zipfile.ZipFile(io.BytesIO(b))
+    z=acquire('disposable-gc-qualified-cargo',13023471212,17661123,'9a259bfc8b82d2bbf67d7d45b01c56902e8e4eff7654cc34d1537881868a76c2')
+    zz=acquire('gc-qualified-cargo-build-record',13023271637,37080,'c3316118ecb13fd54259b7ae760f9daccb978ee0acd39437404dfcec654a3eff')
+    assert set(z.namelist())=={'cargo','build.json'} and z.read('build.json')==zz.read('build.json')
+    b=z.read('build.json');assert h(b)=='d54bc38a259b60b17168c745fa19389d81f9d861b7be42ef04e09b4de4e8ea4c';p=json.loads(b)
+    assert p['candidate']==STRICT and p['qa']==QA and p['compiled']==p['delivered']==ELF
+    assert (p['tree']['files'],p['tree']['tree'],p['tree']['mode_path_sha256_inventory'])==(3109,'19c379477ec24be16c82b952dc2e892c0563e2c7','c43d43954ae37b222933baae703bbac6dcb7905de4caaa5e27bef3ecfc1618c3')
+    signed=json.loads((root/'receipts/21/installed.json').read_bytes());assert p['signed_runtime']==signed and {'ohm-defaults','all-static'}<=set(p['features'])
+    (dest/'build.json').write_bytes(b); binary=z.read('cargo');assert len(binary)==51101864 and h(binary)==ELF
+    cargo=dest/'strict-cargo';cargo.write_bytes(binary);cargo.chmod(0o755)
     roles={}
-    def register(role,path,commit,h,version):
-        assert path.is_file() and hx(path)==h and version==subprocess.check_output([path,'-Vv'],text=True)
-        assert len(commit)==40 and 'commit-hash: '+commit+'\n' in version
-        roles[role]=dict(binary=str(path),head=commit,sha256=h,version=version)
-    sr=json.loads((root/'receipts/21/installed.json').read_bytes())
-    with archive(A,AH,'same-compiler-adjacent-cargo') as z:
-        assert set(z.namelist())=={'parent','matched294','parent.json','matched294.json'}
-        for role,commit in [('parent',P),('matched294',S)]:
-            b=json.loads(z.read(role+'.json'));assert b['qa']==AH and b['commit']==commit and b['signed_sdk']==sr and 'all-static' in b['features']
-            f=saved/role;f.write_bytes(z.read(role));f.chmod(0o755)
-            register(role,f,commit,b['compiled'],b['version'])
-            (saved/(role+'.json')).write_bytes(z.read(role+'.json'))
-    with archive(B,BH,'disposable-gc-qualified-cargo',(13022058572,17668587,'f3d870572356d2751ea5ea7e8e8178b2a01be33122114e925459582e3a8d13aa')) as z:
-        assert set(z.namelist())=={'cargo','build.json'}
-        b=json.loads(z.read('build.json'));assert b['qa']==BH and b['candidate']==C and b['signed_runtime']==sr
-        f=saved/'combined';f.write_bytes(z.read('cargo'));f.chmod(0o755)
-        assert b['compiled']==b['delivered']=='f1a88bf5fb2bf431eeea068455d9d4e98dcfbfee3dc381ee47cc7c96df3e128f'
-        register('combined',f,C,b['compiled'],b['version']);(saved/'combined.json').write_bytes(z.read('build.json'))
-    f=root/'sdk-21/bin/cargo';register('signed',f,S,sr['bin/cargo'],subprocess.check_output([f,'-Vv'],text=True));roles['defaults-off']=roles['signed']
-    stock=Path(subprocess.check_output(['rustup','which','--toolchain','1.99.0','cargo'],text=True).strip()).resolve(strict=True)
-    version=subprocess.check_output([stock,'-Vv'],text=True);assert 'release: 1.99.0\n' in version and 'ohm' not in version.lower()
-    commit=re.search('^commit-hash: ([0-9a-f]{40})$',version,re.M)[1];register('stock-cargo',stock,commit,hx(stock),version)
-    ordered={r:roles[r] for r in ('parent','signed','matched294','combined','defaults-off','stock-cargo')}
-    (saved/'products.json').write_text(json.dumps(ordered,indent=2)+'\n')
-    (saved/'artifacts.json').write_text(json.dumps(artifacts,sort_keys=True,indent=2)+'\n')
+    for name,exe,sha,commit in [('signed',root/'sdk-21/bin/cargo',signed['bin/cargo'],SIGNED),('strict',cargo,ELF,STRICT)]:
+        assert h(exe.read_bytes())==sha
+        version=subprocess.check_output([exe,'-Vv'],text=True);assert 'commit-hash: '+commit+'\n' in version
+        roles[name]=dict(binary=str(exe),sha256=sha,head=commit,version=version)
+    (dest/'products.json').write_text(json.dumps(roles,indent=2)+'\n')
 if __name__=='__main__':supply(Path(sys.argv[1]).resolve())

@@ -8,11 +8,11 @@ SIDE=SDK/'lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/libutil.so'
 R=Path(CFG['ruff']);PROXY=Path(CFG['proxy']);FLOOR=11*(1<<28);rec=D/sys.argv[2]
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import observed
-records={k:(Path(v['binary']),v['head'],v['sha256']) for k in ('parent','signed','matched294','combined','defaults-off','stock-cargo') for v in [CFG['roles'][k]]}
+records={k:(Path(v['binary']),v['head'],v['sha256']) for k in CFG['roles'] for v in [CFG['roles'][k]]}
 ROLES=records
 ORDINARY=[str(PROXY/'cargo'),'+ohm','build','-p','ruff_unicode_names2','--locked','--offline','-j4','--message-format=json']
 CARGO=ORDINARY
-READSRC='extern crate unicode_names2; fn main() { for n in ["NULL","NUL"] {println!("{:?}", unicode_names2::character(n).map(u32::from));} }\n'
+READSRC='extern crate unicode_names2; fn main() { for n in ["NULL","NUL","NEW LINE","NEWLINE"] {println!("{:?}", unicode_names2::character(n).map(u32::from));} }\n'
 ENV={'RUSTUP_AUTO_INSTALL':'0','HOME':CFG['effective_home'],'PATH':str(PROXY)+':/usr/local/bin:/usr/bin:/bin','RUSTUP_HOME':str(D/'rustup'),'CARGO_TARGET_DIR':str(W/'target'),'CARGO_BUILD_BUILD_DIR':str(W/'shared'),'CARGO_HOME':str(D/'cargo-home'),'CARGO_NET_OFFLINE':'true','CARGO_CACHE_AUTO_CLEAN_FREQUENCY':'never','CARGO_TERM_COLOR':'never','LC_ALL':'C'}
 # Preserve PIDs/operands from every successful exec, escaped bytes, and all probe/open results.
 def digest(p):
@@ -77,7 +77,7 @@ def setup():
             dst=conf/src.name
             if not dst.exists():dst.symlink_to(src,target_is_directory=True)
             assert dst.samefile(src)
-    rec.mkdir();shutil.copytree(N,rec/'native-fixture');jd(rec/'protocol.json',dict(source='93526150df078af7dd8fc4226cdcc469539d2001',sdk=[digest(SDK/'bin/rustc'),digest(driver),digest(SIDE.with_name('ld.bfd'))],cargo={k:[str(p),c,h] for k,(p,c,h) in ROLES.items()},command=CARGO,env=ENV,min_free=FLOOR,per_install_min=FLOOR+80*(1<<20),scope='No-time physical consumer test. Cold→settled→new higher 83→same inode/times 47→malformed same inode→removed. Independent empty per mode. Weak vs strict behavior differences reported, never imputed.',native_sources={p.name:digest(p) for p in N.iterdir()},reader=READSRC,script=digest(__file__)))
+    rec.mkdir();shutil.copytree(N,rec/'native-fixture');jd(rec/'protocol.json',dict(source='93526150df078af7dd8fc4226cdcc469539d2001',sdk=[digest(SDK/'bin/rustc'),digest(driver),digest(SIDE.with_name('ld.bfd'))],cargo={k:[str(p),c,h] for k,(p,c,h) in ROLES.items()},command=CARGO,env=ENV,min_free=FLOOR,per_install_min=FLOOR+80*(1<<20),scope='Migrate two signed poisoned target/shared directories to strict Cargo at the same binary path and mtime. Independently empty signed and strict references and a real Ruff generator edit. Native work counts only.',native_sources={p.name:digest(p) for p in N.iterdir()},reader=READSRC,script=digest(__file__)))
 def phase(base,name):
     q=base/name;q.mkdir();tr=W/'trace';tr.mkdir()
     rc,s,e,f=run(['/usr/bin/strace','-ff','-qq','-ttt','-s','16384','-e','trace=execve,execveat,clone,clone3,fork,vfork,openat,openat2,statx,newfstatat,access,faccessat,faccessat2','-o',str(tr/'exec'),*CARGO],q,'cargo')
@@ -108,7 +108,7 @@ def phase(base,name):
         rr,_,err,_=run([PROXY/'rustc','+ohm','--edition=2024',W/'consumer.rs','--extern','unicode_names2='+str(lib),*['-Ldependency='+str(p) for p in dirs],'-o',W/'consumer'],q,'reader-compile')
         assert rr==0,(rr,err[-1500:])
         rr,std,err,_=run([W/'consumer'],q,'reader-exec')
-        assert rr==0 and std.decode().splitlines()==['Some('+str(int(m,16))+')','Some(0)'],(rr,std,err)
+        assert rr==0 and std.decode().splitlines()[:2]==['Some('+str(int(m,16))+')','Some(0)'],(rr,std,err)
         u.update(reader_sha256=digest(W/'consumer'),reader=std.decode().splitlines())
         for source in [W/'consumer',*gen.glob('*.rs')]:
             archive=rec/'objects'/(digest(source)+'.gz')
@@ -117,7 +117,7 @@ def phase(base,name):
                 archive.write_bytes(gzip.compress(source.read_bytes(),compresslevel=2,mtime=0))
     jd(q/'observation.json',u)
     print(base.name,name,rc,u.get('generate_code'),{k:len(v) for k,v in exe_groups.items()},'opened',len(u['higher']),flush=True)
-    if rc and not ('linking' in u['error_tail'] or b'linking' in s or b'linking' in e):raise RuntimeError((rc,e[-3000:],s[-3000:]))
+    if rc and not (b'E0425' in s or 'linking' in u['error_tail'] or b'linking' in s or b'linking' in e):raise RuntimeError((rc,e[-3000:],s[-3000:]))
     return u
 def main():
     global CARGO

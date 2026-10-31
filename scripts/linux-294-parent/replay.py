@@ -18,7 +18,7 @@ def main():
         cli.add_argument('--'+name,type=Path,required=True)
     cli.add_argument('--products',type=Path,required=True)
     a=cli.parse_args(); supplied=a.signed_sdk.resolve(strict=True)
-    roles=json.loads(a.products.read_bytes());assert list(roles)==['parent','signed','matched294','combined','defaults-off','stock-cargo']
+    roles=json.loads(a.products.read_bytes());assert list(roles)==['signed','strict']
     a.output=a.output.resolve(); a.output.mkdir(); private=a.output/'host-unicode-wild-dir-v1';private.mkdir()
     if shutil.disk_usage(private).free<11*(1<<28)+300*(1<<20):
         raise SystemExit('private copy, native fixtures and standing 2.75 GiB physical reserve require another 300 MiB')
@@ -52,6 +52,6 @@ def main():
     cfg=dict(private_state=str(private),signed_sdk=str(supplied),ruff=str(a.ruff.resolve(strict=True)),proxy=str(a.rustup_bin.resolve(strict=True)),registry_home=str(a.registry_home.resolve(strict=True)),effective_home=str(Path.home()),
              roles=roles,qa=os.environ['GITHUB_SHA'])
     f=private/'fixture-config.json';f.write_text(json.dumps(cfg,sort_keys=True,indent=2)+'\n')
-    subprocess.run([sys.executable,'-IB',str(HERE/'capture.py'),str(f),'results'],check=True)
-    completed=json.loads((private/'results/complete.json').read_bytes());assert set(completed)==set(roles)
+    subprocess.run([sys.executable,'-IB',str(HERE/'migrate.py'),str(f),'results'],check=True)
+    completed=json.loads((private/'results/complete.json').read_bytes());assert set(completed)=={'83','bad','empty-signed','empty-strict','edit','edit-empty'}
 if __name__=='__main__':main()
