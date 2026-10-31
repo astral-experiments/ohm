@@ -1,0 +1,81 @@
+{
+  "attempt": "1",
+  "changed": [
+    "bin/rustdoc",
+    "lib/librustc_driver-c5276fb6f0cdddb4.so"
+  ],
+  "common": 79,
+  "manifest": "c29e2e57626491804d9c24e5fa50a709015a002067a3bf39e884d8b6ef0fea43",
+  "products": {
+    "F-sdk.tar.zst": [
+      "fbc494b4706cdbc171b61df3db3c18071322e0bb8aaad0f64643a254bdb7674e",
+      234444818
+    ],
+    "K-delta.tar.zst": [
+      "362a5a43eb069e6ce60eb196d6a55ae50c78ba4c3d3a1d4894cbbc898913578d",
+      40100155
+    ]
+  },
+  "qa": "caef389ed580829583f1a63df129b7b649e43508",
+  "roles": {
+    "F": {
+      "commit": "c6fe8ecda65452c105f85367a009af80cbb5efbc",
+      "compiler": "1df08b3c45a7e6fa3739a8e753132f707f97896a",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "f3ba9b0a487eee53b714b298b9058d33e7452615",
+      "tree": "02135f4e7c8b39eb4b6d246c878d368bf9ec6062"
+    },
+    "K": {
+      "commit": "0afbeff303d3658bff52582d8f1a996d59e6c8ce",
+      "compiler": "b8fa7ed926a6589fb8fd7e913b0eaadc36875611",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "cbd3891dd193602e3c2c4a43740551f64b03610f",
+      "tree": "1104c72b0c821aad039e7f572c52db9a01950493"
+    }
+  },
+  "run": "41199659076",
+  "source_builds": {
+    "F": {
+      "archive": [
+        "fbc494b4706cdbc171b61df3db3c18071322e0bb8aaad0f64643a254bdb7674e",
+        234444818
+      ],
+      "artifacts": {
+        "full": [
+          13041139543,
+          "branch-return-unqualified-partial-native",
+          234444958,
+          "f081870df83a87ad765ccedf2ceab06ccadfcabb4f6b0e32881f7aad72c4f81a"
+        ],
+        "observations": [
+          13041084875,
+          "branch-return-source-observations",
+          122242,
+          "897962e3c24957f9b80c5e96d1ac2b99e9c4f665569a7f1db0169dc563c7786d"
+        ]
+      },
+      "attempt": 1,
+      "inventory_sha256": "c008008a6b483c3613c0f7f3089cb95383016fc5ca3943dedee0ec9e37aeacf6",
+      "job": 124530126763,
+      "native_build_and_checked_in_tests": "authenticated from original Full job",
+      "operational_requalification": "the new job reruns ordinary Rustup, strict Cargo, native linker, doc and provider validation on the exact same archived bytes",
+      "original_run_conclusion": "failure",
+      "qa": "172164400c7e99ed2bfcf074ae55c76cf92023db",
+      "run": 41198740643,
+      "source": {
+        "commit": "c6fe8ecda65452c105f85367a009af80cbb5efbc",
+        "compiler": "1df08b3c45a7e6fa3739a8e753132f707f97896a",
+        "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+        "tests": "f3ba9b0a487eee53b714b298b9058d33e7452615",
+        "tree": "02135f4e7c8b39eb4b6d246c878d368bf9ec6062"
+      }
+    },
+    "K": {
+      "attempt": "1",
+      "built_here": true,
+      "qa": "caef389ed580829583f1a63df129b7b649e43508",
+      "run": "41199659076",
+      "source": "0afbeff303d3658bff52582d8f1a996d59e6c8ce"
+    }
+  }
+}

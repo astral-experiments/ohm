@@ -1,0 +1,342 @@
+{
+  "changed": [
+    "bin/rustdoc",
+    "lib/librustc_driver-c5276fb6f0cdddb4.so"
+  ],
+  "fixture_hashes": {},
+  "identical": 79,
+  "manifest_sha256": "c29e2e57626491804d9c24e5fa50a709015a002067a3bf39e884d8b6ef0fea43",
+  "official": {
+    "artifacts": {
+      "branch-return-source-observations": [
+        13041943456,
+        1961414,
+        "10231fdc356a0ed95fde6c0db7dd49ed6d8b8a633d9dcf12720830ae5dfdbedd"
+      ],
+      "branch-return-source-sdk": [
+        13041858613,
+        274580080,
+        "3e8b9f19c21b90b1a281c349f6c812453ad7afe327ce0930dbd6be9d4c46a620"
+      ]
+    },
+    "attempt": 1,
+    "job": 124532776606,
+    "qa": "caef389ed580829583f1a63df129b7b649e43508",
+    "run": 41199659076
+  },
+  "products": {
+    "F-sdk.tar.zst": [
+      "fbc494b4706cdbc171b61df3db3c18071322e0bb8aaad0f64643a254bdb7674e",
+      234444818
+    ],
+    "K-delta.tar.zst": [
+      "362a5a43eb069e6ce60eb196d6a55ae50c78ba4c3d3a1d4894cbbc898913578d",
+      40100155
+    ]
+  },
+  "roles": {
+    "F": {
+      "doc": [
+        "636680b705f7d69bb0124bb04738efe01ccbf1d2a5c9e09c486682fe460415e9",
+        14705280,
+        493
+      ],
+      "driver": [
+        "fe62e729ee976d9b808b4f94f0a9751c7f6d7b2201aecf3636e9eff8acb88273",
+        142785016,
+        493
+      ],
+      "native": {
+        "cold": {
+          "elf": "ebd4af295d0b9e4fedd492cf386fc5af9769149b9b2dc70ec6515918129bdaa2",
+          "value": 17
+        },
+        "higher": {
+          "elf": "c8ec4535c84d5707e76351b6b9c1f57a3a41b2851c19bcd09a6aa5ef474de1fb",
+          "value": 29
+        },
+        "malformed": {
+          "elf": null,
+          "value": null
+        },
+        "removed": {
+          "elf": "ebd4af295d0b9e4fedd492cf386fc5af9769149b9b2dc70ec6515918129bdaa2",
+          "value": 17
+        },
+        "repair": {
+          "elf": "c8ec4535c84d5707e76351b6b9c1f57a3a41b2851c19bcd09a6aa5ef474de1fb",
+          "value": 29
+        },
+        "repeat": {
+          "elf": "ebd4af295d0b9e4fedd492cf386fc5af9769149b9b2dc70ec6515918129bdaa2",
+          "value": 17
+        },
+        "repeat-malformed": {
+          "elf": null,
+          "value": null
+        },
+        "same-stat": {
+          "elf": "f097c4f6a74d8335687132813c457f23af28bb9de444baebe09af8f50fe54216",
+          "value": 47
+        }
+      },
+      "original_native": {
+        "cold-A": {
+          "archive": "b59f5b585723f95e93ca6f8cd12a49347910cd46fee1c7334a696b3a69d3c205",
+          "binary": "65ce6c4ebee33b9c72bd130d76580462dadc5837a3e744e4accfdc5c4c136613",
+          "exit": 0,
+          "output": "17 1"
+        },
+        "empty-repair": {
+          "archive": "1df96130f873c83c532aeb960a72c301bd96da602d65c575e03812e23e47f270",
+          "binary": "e8baafaa14d6c1b7cac95ca892c2cb08ce44b615a7a3d472a476727e07d93b32",
+          "exit": 0,
+          "output": "29 1"
+        },
+        "first-B": {
+          "archive": "1df96130f873c83c532aeb960a72c301bd96da602d65c575e03812e23e47f270",
+          "binary": "84c6e3eef1dbbdca6f5857522726f392fd3d2ba0b151206e68f6b58cc0f5b4f4",
+          "exit": 0,
+          "output": "29 2"
+        },
+        "invalid": {
+          "archive": "c060e90be9e3e62564c1ec042111ef0fcfe7bb492c8365145a102da95665bccc",
+          "exit": 101
+        },
+        "repair": {
+          "archive": "1df96130f873c83c532aeb960a72c301bd96da602d65c575e03812e23e47f270",
+          "binary": "e8baafaa14d6c1b7cac95ca892c2cb08ce44b615a7a3d472a476727e07d93b32",
+          "exit": 0,
+          "output": "29 1"
+        },
+        "returned-A": {
+          "archive": "1df96130f873c83c532aeb960a72c301bd96da602d65c575e03812e23e47f270",
+          "binary": "e8baafaa14d6c1b7cac95ca892c2cb08ce44b615a7a3d472a476727e07d93b32",
+          "exit": 0,
+          "output": "29 1"
+        }
+      },
+      "reexecuted": {
+        "c8ec4535c84d5707e76351b6b9c1f57a3a41b2851c19bcd09a6aa5ef474de1fb": 29,
+        "ebd4af295d0b9e4fedd492cf386fc5af9769149b9b2dc70ec6515918129bdaa2": 17,
+        "f097c4f6a74d8335687132813c457f23af28bb9de444baebe09af8f50fe54216": 47
+      },
+      "run_make": [
+        [
+          "incremental-directory-copy",
+          "fd6de151438aadfd746896913b7569c7430e76efac6c3beb5159b5c030248bbc"
+        ],
+        [
+          "incremental-session-fail",
+          "c5b23126aa7cf89d5fe6ef203da40e71ca5c15f5eac687be8b8e5f50fdb06ebb"
+        ],
+        [
+          "ohm-branch-cache-opt-out",
+          "c441b1d879820e129621b3338394c1a454e117007fade140eec61a439c5a787f"
+        ],
+        [
+          "ohm-packed-branch-cache",
+          "3073ec154895fd1d3673d426c3a48ca28fd281c0d6411c3c17fdcec50f14ceed"
+        ],
+        [
+          "ohm-checked-dep-info",
+          "c48a82013d49e718ab8a4acd4d37bc6c2f5f9d9313b90fe992228af6b13b1dce"
+        ],
+        [
+          "ohm-relink-assembler-inputs",
+          "37ec2eadd6a44e3e47dcd3acf0a607591044a016f1d33647e5560adf86cf5488"
+        ],
+        [
+          "ohm-relink-incremental-objects",
+          "c89b7df512f6ad9ecfe4ca4d7e9d413f50dd390cded394c9f15ed8b32eaf8942"
+        ]
+      ],
+      "source": "c6fe8ecda65452c105f85367a009af80cbb5efbc",
+      "unit_tests": [
+        "persist::fs::tests::test_all_except_most_recent",
+        "persist::fs::tests::test_timestamp_serialization",
+        "persist::fs::tests::test_find_source_directory_in_iter",
+        "persist::fs::tests::checkout_sessions_prefer_a_match_and_keep_one_alternate",
+        "persist::fs::tests::pack_only_on_checkout_switch",
+        "persist::fs::packed::tests::hydrates_only_private_tables_and_their_inode_aliases",
+        "persist::fs::packed::tests::externally_shared_or_missing_group_leaves_both_tables_raw",
+        "persist::fs::packed::tests::rejects_incomplete_or_mixed_generations_and_damaged_streams"
+      ]
+    },
+    "K": {
+      "doc": [
+        "64e4955883a68c0a6ff78ebf87fd89ea95fc710f496f2fe6f3617fef58faea1b",
+        14705608,
+        493
+      ],
+      "driver": [
+        "72f0f62adf9c301a87c2db3427b097bab60bfb3857caa84123489f69d339f9fa",
+        142819928,
+        493
+      ],
+      "native": {
+        "cold": {
+          "elf": "ebd4af295d0b9e4fedd492cf386fc5af9769149b9b2dc70ec6515918129bdaa2",
+          "value": 17
+        },
+        "higher": {
+          "elf": "c8ec4535c84d5707e76351b6b9c1f57a3a41b2851c19bcd09a6aa5ef474de1fb",
+          "value": 29
+        },
+        "malformed": {
+          "elf": null,
+          "value": null
+        },
+        "removed": {
+          "elf": "ebd4af295d0b9e4fedd492cf386fc5af9769149b9b2dc70ec6515918129bdaa2",
+          "value": 17
+        },
+        "repair": {
+          "elf": "c8ec4535c84d5707e76351b6b9c1f57a3a41b2851c19bcd09a6aa5ef474de1fb",
+          "value": 29
+        },
+        "repeat": {
+          "elf": "ebd4af295d0b9e4fedd492cf386fc5af9769149b9b2dc70ec6515918129bdaa2",
+          "value": 17
+        },
+        "repeat-malformed": {
+          "elf": null,
+          "value": null
+        },
+        "same-stat": {
+          "elf": "f097c4f6a74d8335687132813c457f23af28bb9de444baebe09af8f50fe54216",
+          "value": 47
+        }
+      },
+      "original_native": {
+        "cold-A": {
+          "archive": "b59f5b585723f95e93ca6f8cd12a49347910cd46fee1c7334a696b3a69d3c205",
+          "binary": "65ce6c4ebee33b9c72bd130d76580462dadc5837a3e744e4accfdc5c4c136613",
+          "exit": 0,
+          "output": "17 1"
+        },
+        "empty-repair": {
+          "archive": "1df96130f873c83c532aeb960a72c301bd96da602d65c575e03812e23e47f270",
+          "binary": "e8baafaa14d6c1b7cac95ca892c2cb08ce44b615a7a3d472a476727e07d93b32",
+          "exit": 0,
+          "output": "29 1"
+        },
+        "first-B": {
+          "archive": "1df96130f873c83c532aeb960a72c301bd96da602d65c575e03812e23e47f270",
+          "binary": "84c6e3eef1dbbdca6f5857522726f392fd3d2ba0b151206e68f6b58cc0f5b4f4",
+          "exit": 0,
+          "output": "29 2"
+        },
+        "invalid": {
+          "archive": "c060e90be9e3e62564c1ec042111ef0fcfe7bb492c8365145a102da95665bccc",
+          "exit": 101
+        },
+        "repair": {
+          "archive": "1df96130f873c83c532aeb960a72c301bd96da602d65c575e03812e23e47f270",
+          "binary": "e8baafaa14d6c1b7cac95ca892c2cb08ce44b615a7a3d472a476727e07d93b32",
+          "exit": 0,
+          "output": "29 1"
+        },
+        "returned-A": {
+          "archive": "1df96130f873c83c532aeb960a72c301bd96da602d65c575e03812e23e47f270",
+          "binary": "e8baafaa14d6c1b7cac95ca892c2cb08ce44b615a7a3d472a476727e07d93b32",
+          "exit": 0,
+          "output": "29 1"
+        }
+      },
+      "reexecuted": {
+        "c8ec4535c84d5707e76351b6b9c1f57a3a41b2851c19bcd09a6aa5ef474de1fb": 29,
+        "ebd4af295d0b9e4fedd492cf386fc5af9769149b9b2dc70ec6515918129bdaa2": 17,
+        "f097c4f6a74d8335687132813c457f23af28bb9de444baebe09af8f50fe54216": 47
+      },
+      "run_make": [
+        [
+          "incremental-directory-copy",
+          "3f7d6201f2c00bcad01acac843dc75b1b3923c1e88d58b726bdf33aa8ae43d94"
+        ],
+        [
+          "incremental-session-fail",
+          "65c2e6c0620b63825100c8c1c6e4694d296850498b5b5ca705f57feac7ccc048"
+        ],
+        [
+          "ohm-branch-cache-opt-out",
+          "ea30c100361d40af6c1f21da51b1bc9bc13b9989ffa6acb5616bbcde877524ae"
+        ],
+        [
+          "ohm-packed-branch-cache",
+          "05888e83f1220e3f33910a63620bbe60fee1a5cff242706a9a20a630d1bd21b1"
+        ],
+        [
+          "ohm-checked-dep-info",
+          "1af28568d2f4b8f7c35dfe7be371aa45c02204113564a61cc91770e611d88398"
+        ],
+        [
+          "ohm-relink-assembler-inputs",
+          "b9d782a2ce39ad3b8d729b18f5fa4a5eb1178c5ff139e954776dfac6efcb6098"
+        ],
+        [
+          "ohm-relink-incremental-objects",
+          "a41d8233c8a5ebdc844a7521d535c3337c4627dd9afea26d1b0a00e0705b0314"
+        ]
+      ],
+      "source": "0afbeff303d3658bff52582d8f1a996d59e6c8ce",
+      "unit_tests": [
+        "persist::fs::tests::test_all_except_most_recent",
+        "persist::fs::tests::test_timestamp_serialization",
+        "persist::fs::tests::test_find_source_directory_in_iter",
+        "persist::fs::tests::checkout_sessions_prefer_a_match_and_keep_one_alternate",
+        "persist::fs::tests::pack_only_on_checkout_switch",
+        "persist::fs::packed::tests::packs_only_private_and_superseded_objects_and_restores_exact_bytes",
+        "persist::fs::packed::tests::rejects_swapped_object_contents_with_the_same_session_and_filename",
+        "persist::fs::packed::tests::hydrates_only_private_tables_and_their_inode_aliases",
+        "persist::fs::packed::tests::externally_shared_or_missing_group_leaves_both_tables_raw",
+        "persist::fs::packed::tests::rejects_incomplete_or_mixed_generations_and_damaged_streams"
+      ]
+    }
+  },
+  "sdk_files": 81,
+  "source_builds": {
+    "F": {
+      "archive": [
+        "fbc494b4706cdbc171b61df3db3c18071322e0bb8aaad0f64643a254bdb7674e",
+        234444818
+      ],
+      "artifacts": {
+        "full": [
+          13041139543,
+          "branch-return-unqualified-partial-native",
+          234444958,
+          "f081870df83a87ad765ccedf2ceab06ccadfcabb4f6b0e32881f7aad72c4f81a"
+        ],
+        "observations": [
+          13041084875,
+          "branch-return-source-observations",
+          122242,
+          "897962e3c24957f9b80c5e96d1ac2b99e9c4f665569a7f1db0169dc563c7786d"
+        ]
+      },
+      "attempt": 1,
+      "inventory_sha256": "c008008a6b483c3613c0f7f3089cb95383016fc5ca3943dedee0ec9e37aeacf6",
+      "job": 124530126763,
+      "native_build_and_checked_in_tests": "authenticated from original Full job",
+      "operational_requalification": "the new job reruns ordinary Rustup, strict Cargo, native linker, doc and provider validation on the exact same archived bytes",
+      "original_run_conclusion": "failure",
+      "qa": "172164400c7e99ed2bfcf074ae55c76cf92023db",
+      "run": 41198740643,
+      "source": {
+        "commit": "c6fe8ecda65452c105f85367a009af80cbb5efbc",
+        "compiler": "1df08b3c45a7e6fa3739a8e753132f707f97896a",
+        "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+        "tests": "f3ba9b0a487eee53b714b298b9058d33e7452615",
+        "tree": "02135f4e7c8b39eb4b6d246c878d368bf9ec6062"
+      }
+    },
+    "K": {
+      "attempt": "1",
+      "built_here": true,
+      "qa": "caef389ed580829583f1a63df129b7b649e43508",
+      "run": "41199659076",
+      "source": "0afbeff303d3658bff52582d8f1a996d59e6c8ce"
+    }
+  }
+}
