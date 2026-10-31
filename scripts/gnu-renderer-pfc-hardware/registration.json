@@ -2,9 +2,10 @@
   "adapter": {
     "file": "adapter.tar.gz",
     "files": {
+      "PLAN-V2.md": "1697b1e098ef8398714d55023da7a46c2838d19447108176eb8606bd66296a01",
       "PLAN.md": "70076984ab6feb82a8a9eae43cb9a9c34eec7a9cc42a50305c018391c14afe66",
-      "README.md": "74ff73e5b6dfbc7f6c25472ab50615b1a3c9cf92c492fdc4ff1fcb03c7671838",
-      "SHA256SUMS": "c2818f326024896cf9fce61e4d26d600c6c8a9631737bcc24e70569c8a1e93e9",
+      "README.md": "4f6b19bbf2ae351d03d14d2bada7ca8fc446df562be06f70b7206e798943f91b",
+      "SHA256SUMS": "36f8cf184596acbc43b4ece89de12af5e4d090c1ea6759e45d64ec0924c011ee",
       "arm.py": "f648e3d23e7a7dd5f8c7268db2248d2420fb18c7bb0105010af6c975682a3216",
       "behavior.py": "0d6ccd80ee132bfa09daf2016ce248a320b856c367f1e251ad038170a97599d1",
       "inputs/expect/new/patch_with_primary_path_cell-ascii": "7c77fbb29e8ce342d9b79b198bc227e442d8031907bb4fe0625e31c8291c6fe3",
@@ -26,10 +27,11 @@
       "receipts.py": "1f64213e18d67a0664fc5fe1a575e21dbd1081a154a19b07bf298dc2b480b0b8",
       "reopen.py": "88c4c1ea09a24832c627194bc95cb72a6b13ad19b7e376e10a260bf99b234d6f",
       "selfcheck.py": "667c0e23d7b06bf4a591501644127071ef8899ef45d86e5c775cf668f2fd99fe",
-      "workload.py": "659deae8179922279e0b17dc226872b88535ed0da91372de834162267da4ccb8"
+      "workload.py": "c998796fda0ae2ca8693d80d7981d3af5345af825ad873f953337711f0babe5d"
     },
-    "sha256": "8ddb65df65ef6157ef6a2cbbf43f5de08b17934a5cc2bf56f16993100fa6a369"
+    "sha256": "7292c081de1d8636871a879334439223f4554ce85576eaee12e97e0a818798cb"
   },
+  "amendment_sha256": "1697b1e098ef8398714d55023da7a46c2838d19447108176eb8606bd66296a01",
   "excluded_source_runs": [
     {
       "head": "e8571bf66528aae18c2fc81d381de52eeead9264",
@@ -103,7 +105,49 @@
       ]
     }
   },
+  "previous_local_registration": "2b1ee9503aadbfa01ac952ab9db6ec1a37906909",
+  "role_trees": {
+    "C": {
+      "bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
+      "commit": "11876886792274b44a9a37567fbac57bf843a24c",
+      "compiler": "d4b3be137de57d758c2f68712ffb5c819496ec1c",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "5f6eead6522eb6f0a19328000ea1976e181921a5",
+      "tree": "35ffc3ff5252c8452f66b8aabd20ef66a16ceded"
+    },
+    "F": {
+      "bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
+      "commit": "51e72261c0b36dfd49c078b35732956d6b950e8e",
+      "compiler": "84107218ae14ae41937c2bbea83b84338ac18d9d",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "11dd8df4477f89afadead0ec557c620ac204e8bd",
+      "tree": "aacfb9fcda863558da825e194e113b07a77d20d6"
+    },
+    "P": {
+      "bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
+      "commit": "4e7c5b1f765b24ccd585d8ddb7eeae99a02b514e",
+      "compiler": "b429aa02503b16993d9b8f94a6ab17f4f3bfaa01",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "5d8b49626e6ad278864623fd8be9c2241d4e5fd4",
+      "tree": "d0647532bd782f92e3155bb0158de5a3c9b339bb"
+    }
+  },
   "root_acceptance": null,
-  "source": null,
-  "structural": null
+  "source": {
+    "artifacts": null,
+    "attempt": 1,
+    "branch": "charlie/qa-gnu-renderer-cgu-source-20261031",
+    "head": "a4afd181ae07107de6174a17a4ec189061fd18aa",
+    "job_ids": [
+      124490558713
+    ],
+    "jobs": [
+      "native"
+    ],
+    "manifest_sha256": null,
+    "repo": "astral-experiments/ohm",
+    "run": 41185180848
+  },
+  "structural": null,
+  "whole_oracle": null
 }

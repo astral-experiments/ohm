@@ -1,6 +1,8 @@
 """One unscored native qualification or one half of the pre-registered two-boot screen."""
 
 import argparse
+import gzip
+import json
 import os
 import shutil
 import subprocess
@@ -14,6 +16,7 @@ import calibration
 import evidence
 import seed
 from ingress import (
+    AMENDMENT,
     BRANCH,
     HERE,
     PLAN,
@@ -33,9 +36,9 @@ ROOT = Path("/tmp/ohm-gnu-renderer-pfc-study")
 PACKETS = ("adapter", "oracle", "mono", "membership")
 
 
-def programs(reg, root):
+def programs(reg, root, phase):
     out = {}
-    for name in PACKETS:
+    for name in (*PACKETS, *(("whole_oracle",) if phase == "screen" else ())):
         binding = reg[name]
         folder = root / "packets" / name
         folder.mkdir(parents=True)
@@ -56,6 +59,15 @@ def programs(reg, root):
                 done[m.name] = sha(dst)
         need(done == binding["files"], "incomplete or changed " + name + " source")
         out[name] = folder
+    if phase == "screen":
+        # The tiny additional whole-lane executable shares the exact decoder already used by qualification.
+        for member, h in reg["oracle"]["files"].items():
+            installed = out["whole_oracle"] / member
+            if installed.exists():
+                need(sha(installed) == h, "screen overrides qualified native decoder")
+            else:
+                installed.parent.mkdir(parents=True, exist_ok=True)
+                os.link(out["oracle"] / member, installed)
     return out
 
 
@@ -93,6 +105,19 @@ def accepted(folder, log, files):
         },
     )
     return sha(folder / "verified.json")
+
+
+def checked_oracle(path, history, roles):
+    report = json.loads(gzip.decompress(path.read_bytes()))
+    need(
+        report.get("accepted") is True
+        and not report.get("refusal")
+        and report["history"] == history
+        and set(report["roles"]) == set(roles),
+        "unexpected native semantic verdict",
+    )
+    if len(roles) > 1:
+        need(not report.get("pending"), "unresolved cross-role native or metadata evidence")
 
 
 def runner_identity(reg, phase, pos, boot):
@@ -152,6 +177,24 @@ def runner_identity(reg, phase, pos, boot):
     }
 
 
+def inspection_tools():
+    programs = {}
+    for name in ("strace", "c++filt", "readelf", "ar", "git", "zstd", "cc", "rustup"):
+        path = shutil.which(name)
+        need(path, "missing native tool " + name)
+        resolved = Path(path).resolve(strict=True)
+        run = subprocess.run([path, "--version"], capture_output=True, check=True)
+        programs[name] = {
+            "path": path,
+            "physical_path": str(resolved),
+            "sha256": sha(resolved),
+            "stdout": run.stdout.decode(errors="replace"),
+            "stderr": run.stderr.decode(errors="replace"),
+        }
+    programs["python"] = {"path": sys.executable, "sha256": sha(sys.executable), "version": sys.version}
+    return programs
+
+
 def disk(path):
     u = shutil.disk_usage(path)
     return {"total": u.total, "free": u.free}
@@ -172,7 +215,13 @@ def retired_sdk(sdk, manifest, role, root):
     d = sdk / manifest["driver"]
     st = d.stat()
     os.link(d, save / "driver")
+    usage = {}
+    for p in (sdk, *sdk.rglob("*")):
+        physical = p.lstat()
+        usage[physical.st_dev, physical.st_ino] = physical.st_blocks * 512
     return {
+        "allocated_sdk_bytes": sum(usage.values()),
+        "allocated_driver_bytes": st.st_blocks * 512,
         "driver": [st.st_dev, st.st_ino, actual[manifest["driver"]]],
         "files": len(actual),
         "bytes": sum(v[1] for v in actual.values()),
@@ -273,8 +322,9 @@ def verify_cell(
     where.mkdir(parents=True)
     script(
         logs / "native-oracle",
-        packets["oracle"] / "oracle.py",
+        packets["oracle"] / "oracle.py" if lane == "structural" else packets["whole_oracle"] / "whole.py",
         "role",
+        *(["--structural-root", root / "qualified-cells"] if lane == "whole" else []),
         "--history",
         hist,
         "--cell",
@@ -282,6 +332,7 @@ def verify_cell(
         "--out",
         where / "oracle.json.gz",
     )
+    checked_oracle(where / "oracle.json.gz", hist, [role])
     row["external_oracle"] = accepted(where, logs / "native-oracle", [where / "oracle.json.gz"])
     row["replayed_ordinary"] = sha(logs / "reopen-arm" / "stdout")
     rootids = evidence.read(out / "independent-empty.json")["original"]
@@ -300,10 +351,15 @@ def worker(args):
     need(
         (phase == "qualify") == (pos == "gate") and pos in ("gate", "01", "02"), "incompatible phase and host"
     )
-    receipt = Path(os.environ["RUNNER_TEMP"]) / ("gnu-renderer-pfc-" + phase + "-" + pos) / "receipt"
+    receipt = (
+        Path(os.environ["RUNNER_TEMP"]).resolve(strict=True)
+        / ("gnu-renderer-pfc-" + phase + "-" + pos)
+        / "receipt"
+    )
     receipt.mkdir(parents=True, exist_ok=False)
     shutil.copy2(HERE / "registration.json", receipt / "registration.json")
     shutil.copy2(HERE / "PLAN.md", receipt / "PLAN.md")
+    shutil.copy2(HERE / "PLAN-V2.md", receipt / "PLAN-V2.md")
     try:
         ROOT.mkdir(mode=0o700)
         root = ROOT
@@ -313,7 +369,9 @@ def worker(args):
         )
         boot = calibration.host(args.observers, receipt)
         result = runner_identity(reg, phase, pos, boot)
+        result["logical_receipt"] = str(receipt)
         put(receipt / "enrollment.json", result)
+        put(receipt / "inspection-tools.json", inspection_tools())
         expected_head = subprocess.check_output(
             ["git", "-C", args.source, "rev-parse", "HEAD"], text=True
         ).strip()
@@ -327,7 +385,7 @@ def worker(args):
             os.environ.pop(key, None)
         import restore
 
-        packets = programs(reg, root)
+        packets = programs(reg, root, phase)
         restore_role = lambda role, dst: restore.restore(
             root / "transfer",
             dst,
@@ -353,7 +411,9 @@ def worker(args):
                 reg["source"]["attempt"],
                 reg["source"]["manifest_sha256"],
             ],
+            whole_oracle=reg["whole_oracle"]["sha256"] if phase == "screen" else None,
             plan=PLAN,
+            amendment=AMENDMENT,
             packets={k: reg[k]["sha256"] for k in PACKETS},
             cells={},
             mono={},
@@ -390,12 +450,24 @@ def worker(args):
                     "--driver",
                     driver,
                     "--work",
-                    root / ("fixture-" + role),
+                    root / "fixture-work",
                     "--out",
                     where,
                 )
                 script(log / "readback", g / "replay.py", where, role, driver)
+                verified = evidence.read(log / "readback/stdout")
+                need(
+                    [
+                        verified["role"],
+                        verified["elfs"],
+                        verified["native_verdicts"],
+                        verified["result_sha256"],
+                    ]
+                    == [role, 4, 12, sha(where / "result.json")],
+                    "native membership readback differs",
+                )
                 result["membership"][role] = accepted(where, log / "readback", [where / "result.json"])
+                (root / "fixture-work").rename(root / ("finished-membership-" + role))
             for hist in schedule["histories"]:
                 k = role + "-" + hist
                 result["acquisition_order"].append(k)
@@ -437,8 +509,11 @@ def worker(args):
             out.mkdir()
             script(
                 log,
-                packets["oracle"] / "oracle.py",
+                packets["oracle"] / "oracle.py"
+                if phase == "qualify"
+                else packets["whole_oracle"] / "whole.py",
                 "compare",
+                *(["--structural-root", root / "qualified-cells"] if phase == "screen" else []),
                 "--history",
                 hist,
                 "--parent",
@@ -450,6 +525,7 @@ def worker(args):
                 "--out",
                 out / "oracle.json.gz",
             )
+            checked_oracle(out / "oracle.json.gz", hist, RUST)
             result["cross"][hist] = accepted(out, log, [out / "oracle.json.gz"])
             for state in ("edit", "empty"):
                 ref = result["cells"]["P-" + hist]["storage"][state]

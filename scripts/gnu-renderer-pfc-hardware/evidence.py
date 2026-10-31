@@ -8,7 +8,7 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ingress import PLAN, RUST, STUDIES, digest, legal, need, required_digest, sha
+from ingress import AMENDMENT, PLAN, RUST, STUDIES, digest, legal, need, required_digest, sha
 
 CLI = [
     "cargo",
@@ -112,7 +112,8 @@ def storage(z, state):
     }
 
 
-def cell(folder, role, history, lane, plain, boot):
+def cell(folder, role, history, lane, plain, boot, logical_folder=None):
+    logical_folder = folder if logical_folder is None else logical_folder
     complete = read(folder / "complete.json")
     run = read(folder / "runtime.json")
     need(
@@ -191,7 +192,8 @@ def cell(folder, role, history, lane, plain, boot):
             physical[phase] = names
         elif phase in SCORED:
             need(
-                begin["launch"] == [str(plain), str(d / "pmu.json"), *CLI] and not (d / "strace.gz").exists(),
+                begin["launch"] == [str(plain), str(logical_folder / "raw" / phase / "pmu.json"), *CLI]
+                and not (d / "strace.gz").exists(),
                 "wrong counter/trace in scored command",
             )
             raw = read(d / "pmu.json")
@@ -202,6 +204,33 @@ def cell(folder, role, history, lane, plain, boot):
         need((d / "pmu.json").exists() == (lane == "whole" and phase in SCORED), "extra or missing event")
         if not bad:
             st = read(folder / "states" / phase / "state.json")
+            externs = st["dependency_rmeta"]
+            need(set(externs) == UNITS - {"annotate_snippets"}, "wrong three compiler metadata inputs")
+            target_args = None
+            if lane == "structural" and "annotate_snippets" in physical[phase]:
+                (compiler,) = [q for q in native["compilers"] if q["name"] == "annotate_snippets"]
+                target_args = compiler["argv"]
+            for name, item in externs.items():
+                need(required_digest(item["sha256"]), "invalid external CAS key")
+                blob = (folder / "objects" / item["sha256"]).read_bytes()
+                need(
+                    len(blob) == item["bytes"]
+                    and digest(blob) == item["sha256"]
+                    and item["path"] in st["dependency_products"][name],
+                    "archived external metadata differs",
+                )
+                need(
+                    bool(item.get("compiler_opens")) == (target_args is not None),
+                    "incorrect kernel metadata reader",
+                )
+                if target_args is not None:
+                    need(
+                        any(
+                            opt == "--extern" and target_args[i + 1] == name + "=" + item["path"]
+                            for i, opt in enumerate(target_args)
+                        ),
+                        "compiler selected different external metadata",
+                    )
             z = json.loads(gzip.decompress((folder / "states" / phase / "storage.json.gz").read_bytes()))
             space[phase] = storage(z, st)
             need(
@@ -245,6 +274,7 @@ def header(c, r, tag):
         c["schema"] == 1
         and c["phase"] == tag
         and c["plan"] == PLAN
+        and c["amendment"] == AMENDMENT
         and c["source"] == [source["run"], source["head"], source["attempt"], source["manifest_sha256"]],
         "wrong source provenance in gate",
     )
@@ -257,7 +287,13 @@ def header(c, r, tag):
         set(c["cross"]) == set(STUDIES) and all(required_digest(x) for x in c["cross"].values()),
         "missing across-role semantic gate",
     )
+    if tag == "screen":
+        need(
+            c["whole_oracle"] == r["whole_oracle"]["sha256"],
+            "different independent whole-run native verifier",
+        )
     if tag == "qualify":
+        need(c.get("whole_oracle") is None, "structural native input was mislabelled as counted")
         need(
             set(c["mono"]) == set(RUST)
             and set(c["membership"]) == set(RUST)
@@ -285,8 +321,10 @@ def header(c, r, tag):
                 )
 
 
-def qualify_zip(path, r):
+def qualify_zip(path, r, destination=None):
     """Authenticate all uncompressed observations in the original official qualification ZIP."""
+    if destination is not None:
+        destination.mkdir(mode=0o700)
     with zipfile.ZipFile(path) as z:
         names = [i.filename for i in z.infolist() if not i.is_dir()]
         need(
@@ -316,7 +354,21 @@ def qualify_zip(path, r):
                 "invalid structural member",
             )
             with z.open(name) as f:
-                need(hashlib.file_digest(f, "sha256").hexdigest() == wanted, "bad evidence " + name)
+                if destination is not None and name.startswith("cells/"):
+                    target = destination / name.removeprefix("cells/")
+                    need(
+                        target.is_relative_to(destination) and target != destination, "unsafe witness member"
+                    )
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    checksum = hashlib.sha256()
+                    with target.open("xb") as out:
+                        while chunk := f.read(2**20):
+                            out.write(chunk)
+                            checksum.update(chunk)
+                    target.chmod(0o444)
+                else:
+                    checksum = hashlib.file_digest(f, "sha256")
+                need(checksum.hexdigest() == wanted, "bad evidence " + name)
         tree = zipfile.Path(z)
         for k, v in c["cells"].items():
             independent = cell(tree / "cells" / k, v["role"], v["history"], "structural", None, c["boot"])

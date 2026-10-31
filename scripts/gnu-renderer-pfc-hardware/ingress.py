@@ -15,10 +15,11 @@ REPO = "astral-experiments/ohm"
 BRANCH = "charlie/qa-gnu-renderer-pfc-hardware-20261031"
 OBSERVERS = "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc"
 PLAN = "70076984ab6feb82a8a9eae43cb9a9c34eec7a9cc42a50305c018391c14afe66"
+AMENDMENT = "1697b1e098ef8398714d55023da7a46c2838d19447108176eb8606bd66296a01"
 RUST = {
     "P": "4e7c5b1f765b24ccd585d8ddb7eeae99a02b514e",
-    "F": "96e6c29c1ed9bf7229ef3b89843712139529cd10",
-    "C": "b79ec99c44772853c313161bee2bbfaecc80e0de",
+    "F": "51e72261c0b36dfd49c078b35732956d6b950e8e",
+    "C": "11876886792274b44a9a37567fbac57bf843a24c",
 }
 CARGO = "9fb29f6abecad05acb6015990615c5fbb435a5907543f0bd33cf88cada4f5826"
 WILD = "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
@@ -59,6 +60,8 @@ def registration(phase="inspect"):
     need(phase in ("inspect", "qualify", "screen"), "unknown enrollment phase")
     need(
         sha(HERE / "PLAN.md") == r["plan_sha256"] == PLAN
+        and sha(HERE / "PLAN-V2.md") == r["amendment_sha256"] == AMENDMENT
+        and {k: v["commit"] for k, v in r["role_trees"].items()} == RUST
         and r["positions"] == POSITIONS
         and r["observers"] == OBSERVERS,
         "registration changed",
@@ -83,7 +86,13 @@ def registration(phase="inspect"):
         and required_digest(s["manifest_sha256"]),
         "native originals not enrolled",
     )
-    for name in ("adapter", "oracle", "mono", "membership"):
+    for name in (
+        "adapter",
+        "oracle",
+        "mono",
+        "membership",
+        *(("whole_oracle",) if phase == "screen" else ()),
+    ):
         packet = r[name]
         need(
             isinstance(packet, dict)
@@ -110,7 +119,9 @@ def registration(phase="inspect"):
                 "source": s["head"],
                 "source_manifest": s["manifest_sha256"],
                 "plan": PLAN,
+                "amendment": AMENDMENT,
                 "structural_certificate": g["certificate_sha256"],
+                "whole_oracle": r["whole_oracle"]["sha256"],
             },
             "root has not admitted this structural evidence",
         )
@@ -243,6 +254,12 @@ def members(r, source_code, kit_zip, logs_zip, transfer):
         and len(m["files"]) == m["common_member_count"] + 1,
         "role or SDK membership differs",
     )
+    for role, expected in r["role_trees"].items():
+        observed = m["roles"][role]["source"]
+        need(
+            all(observed.get(k) == v for k, v in expected.items()),
+            "different library/bootstrap/compiler/test tree in " + role,
+        )
     need(
         set(m["products"]) == names - {"manifest.json"}
         and all([sha(transfer / n), (transfer / n).stat().st_size] == rr for n, rr in m["products"].items()),
@@ -316,7 +333,9 @@ def provenance(r, phase, root, source_code):
     if phase == "screen":
         from evidence import qualify_zip
 
-        result["matched_structural"] = qualify_zip(inbox / "gnu-renderer-pfc-qualify-gate.zip", r)
+        result["matched_structural"] = qualify_zip(
+            inbox / "gnu-renderer-pfc-qualify-gate.zip", r, root / "qualified-cells"
+        )
     return result
 
 
