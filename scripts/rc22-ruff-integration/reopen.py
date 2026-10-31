@@ -54,7 +54,9 @@ def reopen(root,apple,marker):
     aggregate={}; enrollment=js(root/"enrollment.json"); done=js(root/"complete.json")
     need(done["scored"] is False and enrollment["command"]==q.CLI and enrollment["trees"]==q.TREES and
          js(root/"calibration/complete.json")["program_exit"]==13,"unexpected study")
-    for role in ("pinned","fourfix"):
+    candidate=js(root/"candidate330.json")
+    need(candidate==enrollment["cargos"]["candidate330"] and candidate["commit"]=="8269d772aa1ef02e5efaa331dfb40eb55d71f719" and candidate["tree"]=="2391718877e88c16c6bc2b99ec9c6831f10b5288" and candidate["parent"]==enrollment["cargos"]["pinned"]["commit"],"incorrect standalone Cargo")
+    for role in ("pinned","candidate330"):
         role_root=root/role;seen={};refs={};rows={}
         selector=js(role_root/"selector.json")
         need(selector["sha256"]==enrollment["cargos"][role]["sha256"],"incorrect active reader")

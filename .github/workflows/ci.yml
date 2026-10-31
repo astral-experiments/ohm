@@ -1,18 +1,24 @@
-name: RC22 structural Ruff CLI and integration-test check
+name: Qualify the standalone Cargo 330 reader
 on:
   workflow_dispatch:
     inputs:
-      expected_head: {description: Exact reviewed packaging commit, required: true, type: string}
+      expected_head: {description: Reviewed qualification commit, required: true, type: string}
 permissions: {contents: read, actions: read}
-concurrency: {group: rc22-ruff-real-integration, cancel-in-progress: false}
+concurrency: {group: rc22-standalone-cargo330, cancel-in-progress: false}
 jobs:
   native:
-    name: Unscored real Ruff CLI and integration test (arm64 macOS)
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-ruff-real-integration-20261031'
-    runs-on: namespace-profile-macos-15
-    timeout-minutes: 170
+    name: Cargo 330 native qualification (${{ matrix.triple }})
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22-verify-cargo-330'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {triple: x86_64-unknown-linux-gnu, key: gnu, runner: namespace-profile-ubuntu-24-04-16}
+          - {triple: aarch64-apple-darwin, key: apple, runner: namespace-profile-macos-15}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 220
     steps:
-      - name: Require the reviewed branch head
+      - name: Check the reviewed commit
         env: {EXPECTED: '${{ inputs.expected_head }}'}
         run: test "$GITHUB_SHA" = "$EXPECTED"
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -23,37 +29,75 @@ jobs:
             scripts/rc22-native
             scripts/rc22-ruff-integration
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {repository: astral-sh/ruff, ref: 915bb2b4bf9ae7eee47cf55646bbfebae254a23b, fetch-depth: 2, path: ruff, persist-credentials: false}
+        with: {repository: astral-sh/ruff, ref: 93526150df078af7dd8fc4226cdcc469539d2001, path: ruff, persist-credentials: false}
+      - if: runner.os == 'macOS'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with: {repository: astral-sh/ruff, ref: 915bb2b4bf9ae7eee47cf55646bbfebae254a23b, fetch-depth: 2, path: ruff-integration, persist-credentials: false}
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
+          path: cargo-seed
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/cargo-diagnostic-fix
+            scripts/ohm-apple-zmij/cargo293
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with: {ref: 89a055549f4335e6e172f96c65d162dcd9cb1046, path: marker-reader, persist-credentials: false, sparse-checkout: scripts/ohm-musl-ast-pair/v2}
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - if: runner.os == 'macOS'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with: {ref: 14c9d13d68f3dd21c53f1ef6c3721de8363c0123, path: apple-reader, persist-credentials: false, sparse-checkout: scripts/ohm-apple-zmij}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with: {python-version: '3.13'}
-      - name: Authenticate the independently qualified native SDK and both Cargo binaries
+      - name: Authenticate the donor SDK
         env: {GH_TOKEN: '${{ github.token }}'}
-        run: |
-          set -euo pipefail
-          test "$(git -C protocol rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git -C protocol rev-parse HEAD:scripts/rc22-native)" = 784d42db3f6f633a899219406265027cb537ab95
-          python3 -IB protocol/scripts/rc22-native/acquire_plain.py protocol/scripts/rc22-native/source/sdk-apple.json "$RUNNER_TEMP/rc22-inbox" "$RUNNER_TEMP/rc22-source"
-      - name: Qualify the source, native controls, and exact ordinary Cargo visits
         shell: bash
         run: |
           set -euo pipefail
-          command -v b3sum >/dev/null || brew install b3sum
-          command -v zstd >/dev/null || brew install zstd
+          test "$(git -C protocol rev-parse HEAD)" = "$GITHUB_SHA"
+          python3 -IB protocol/scripts/rc22-native/acquire_plain.py protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json "$RUNNER_TEMP/rc22-inbox" "$RUNNER_TEMP/rc22-source"
+      - name: Install native build prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            sudo apt-get -qq update
+            sudo apt-get install -y --no-install-recommends b3sum cmake ninja-build pkg-config perl libssl-dev zstd clang lld build-essential curl
+          else
+            for item in b3sum cmake ninja pkg-config zstd; do command -v "$item" >/dev/null || brew install "$item"; done
+            xcodebuild -version
+          fi
+          python3 -IB protocol/scripts/rc22-native/test_protocol.py
+      - name: Build the exact Cargo 330 revision
+        id: cargo330
+        run: python3 -IB protocol/scripts/rc22-native/candidate330.py "$RUNNER_TEMP/rc22-inbox"
+      - name: Compare edited native providers with forced links and clean builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -IB protocol/scripts/rc22-native/plain.py "$RUNNER_TEMP/rc22-plain" "$RUNNER_TEMP/rc22-inbox" protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json
+          python3 -IB protocol/scripts/rc22-native/plain_verify.py "$RUNNER_TEMP/rc22-plain/receipts" protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json "$RUNNER_TEMP/rc22-plain/receipts/independent.json"
+      - name: Count dirty units on an unchanged ty check
+        if: "!cancelled() && runner.os == 'Linux' && steps.cargo330.outcome == 'success'"
+        run: python3 -IB protocol/scripts/rc22-native/warm_ty.py "$RUNNER_TEMP/rc22-inbox"
+      - name: Trace Xcode linker calls for Ruff and its integration test
+        if: "!cancelled() && runner.os == 'macOS' && steps.cargo330.outcome == 'success'"
+        shell: bash
+        run: |
+          set -euo pipefail
           python3 -IB protocol/scripts/rc22-ruff-integration/test_protocol.py
           python3 -IB protocol/scripts/rc22-ruff-integration/study.py "$RUNNER_TEMP/rc22-ruff-check" "$RUNNER_TEMP/rc22-inbox"
-      - name: Independently replay raw kernel events, dep-info and complete signed programs
-        run: python3 -IB protocol/scripts/rc22-ruff-integration/reopen.py "$RUNNER_TEMP/rc22-ruff-check/receipts" apple-reader/scripts/ohm-apple-zmij marker-reader/scripts/ohm-musl-ast-pair/v2 "$RUNNER_TEMP/rc22-ruff-check/receipts/independent.json"
-      - name: Preserve original observation streams and complete native bodies, including any refusal
+          python3 -IB protocol/scripts/rc22-ruff-integration/reopen.py "$RUNNER_TEMP/rc22-ruff-check/receipts" apple-reader/scripts/ohm-apple-zmij marker-reader/scripts/ohm-musl-ast-pair/v2 "$RUNNER_TEMP/rc22-ruff-check/receipts/independent.json"
+      - name: Retain the exact binary, comparison logs and partial results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: rc22-ruff-real-integration
+          name: rc22-cargo330-${{ matrix.triple }}
           path: |
             ${{ runner.temp }}/rc22-source/
+            ${{ runner.temp }}/rc22-cargo330/reports/
+            ${{ runner.temp }}/rc22-cargo330/cargo
+            ${{ runner.temp }}/rc22-plain/receipts/
+            ${{ runner.temp }}/rc22-ty/receipts/
             ${{ runner.temp }}/rc22-ruff-check/receipts/
           if-no-files-found: warn
           compression-level: 1

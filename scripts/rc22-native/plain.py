@@ -12,6 +12,7 @@ import campaign as pre
 import fixture as f
 import observe as ob
 from common import *
+import candidate330
 from sdk import reopen
 
 def marker(row, work, store):
@@ -86,7 +87,7 @@ def verdict(row,state,value):
 def case(root,kit,receipt,kind,history,cache=None):
     sdk=kit/'sdk';base=root/'cases'/(kind+'-'+history);base.mkdir(parents=True);work=base/'work';work.mkdir()
     out=root/'receipts'/(kind+'-'+history);out.mkdir();store=root/'receipts/cas'; src=base/'src'
-    initial_role='fourfix' if history=='fixed' else 'pinned'
+    initial_role='candidate330' if history=='fixed' else 'pinned'
     current=pre.switch(kit,initial_role,sdk,receipt);env=context(work,sdk)
     rust=ident(sdk/'bin/rustc');driver=ident(kit/receipt['rust']['driver_path'])
     require(run(['rustc','+ohm','-vV'],env=env)==receipt['rust']['version_verbose'],'different Rust')
@@ -109,7 +110,7 @@ def case(root,kit,receipt,kind,history,cache=None):
         main=original.replace(f.INITIAL,f.BAD) if state=='source-invalid' else original
         if (src/'src/main.rs').read_text()!=main:(src/'src/main.rs').write_text(main)
         require(all(sha(src/n)==source[n] for n in ('Cargo.toml','Cargo.lock','build.rs')),'immutable fixture sources or lock changed')
-        role='fourfix' if history=='fixed' or (history=='migration' and not phase.startswith('old-')) else 'pinned'
+        role='candidate330' if history=='fixed' or (history=='migration' and not phase.startswith('old-')) else 'pinned'
         if phase=='upgrade':
             paths=[src,base/'native',work/'target',work/'shared'];before=pre.snapshot(paths);old=current
             current=pre.switch(kit,role,sdk,receipt);require(before==pre.snapshot(paths) and old['path']==current['path'] and old['sha256']!=current['sha256'],'upgrade touched warm tree')
@@ -133,7 +134,7 @@ def case(root,kit,receipt,kind,history,cache=None):
             return (r['code'],r['value'],identity,tuple(r['diagnostics']))
         require(key(forced)==key(empty),('complete forced/empty divergence',phase))
         equal=key(warm)==key(empty)
-        if role=='fourfix' or kind=='objc2' or phase in ('lower','old-lower','repeat-lower','rust-error','rust-repair'):
+        if role=='candidate330' or kind=='objc2' or phase in ('lower','old-lower','repeat-lower','rust-error','rust-repair'):
             verdict(warm,state,v);require(equal,('warm differs from clean',phase))
         if role=='pinned' and kind=='zmij' and phase in ('appearance','old-higher','same-stat','malformed'):
             require(not equal and warm['value']==17 and warm['code']==0,'original failure not reproduced')
@@ -168,6 +169,7 @@ def execute(root,bundle,expected,cache=None):
     require(receipt['qa']=={'GITHUB_JOB':'sdk','GITHUB_REPOSITORY':'astral-experiments/ohm','GITHUB_RUN_ATTEMPT':'1','GITHUB_RUN_ID':str(expected['run']),'GITHUB_SHA':expected['head']},'wrong native source build')
     require(sha(bundle/'kit.tar.zst')==expected['kit'] and sha(bundle/'members.json')==expected['members'] and sha(bundle/'receipt.json')==expected['receipt'],'wrong restored official SDK')
     r=root/'receipts';(r/'cas').mkdir(parents=True);save(r/'source-release.json',receipt);save(r/'original.json',expected)
+    receipt=candidate330.enroll(kit,receipt,r)
     linker=current_linker(kit,receipt);save(r/'host-linker-before.json',linker)
     reports={}
     for kind in (('zmij','objc2') if host()==APPLE else ('zmij',)):

@@ -279,16 +279,17 @@ def main(root, bundle):
     need(root.parent==Path(os.environ["RUNNER_TEMP"]).resolve() and not root.exists(),"new private state required")
     root.mkdir(); (root/"receipts/markers").mkdir(parents=True)
     sys.path.insert(0,str(ws/"protocol/scripts/rc22-native"))
-    import common, sdk, campaign, plain, observe
+    import common, sdk, campaign, plain, observe, candidate330
     need(common.host()==common.APPLE and shutil.disk_usage(root).free>=28*1024**3,"Apple hardware with 28 GiB entry")
     expected=common.read(ws/"protocol/scripts/rc22-native/source/sdk-apple.json")
     need(common.git(ws/"protocol","rev-parse","HEAD")==os.environ["GITHUB_SHA"] and
-         common.git(ws/"protocol","rev-parse","HEAD:scripts/rc22-native")=="784d42db3f6f633a899219406265027cb537ab95" and
+         common.git(ws/"protocol","rev-parse","HEAD:scripts/rc22-native")=="80cfc5f5e7dfbd59a02e993cf6db67a06c3f39bf" and
          sha(bundle/"receipt.json")==expected["receipt"] and sha(bundle/"members.json")==expected["members"] and sha(bundle/"kit.tar.zst")==expected["kit"],"source-bound protocol/kit")
     kit=root/"kit";receipt=sdk.reopen(bundle,kit); active=kit/"sdk"; work=root/"work";work.mkdir()
+    receipt=candidate330.enroll(kit,receipt,root/"receipts")
     (work/".owned-empty-stores").write_bytes(b"rc22-ruff-integration\n")
     env=common.context(work,active);env.update(CARGO_NET_OFFLINE="true",CARGO_CACHE_AUTO_CLEAN_FREQUENCY="never",TZ="UTC")
-    repo=ws/"ruff"; need(git(repo,"rev-parse","HEAD").decode().strip()==NEW and git(repo,"rev-parse",NEW+"^").decode().strip()==OLD,"unexpected Ruff pair")
+    repo=ws/"ruff-integration"; need(git(repo,"rev-parse","HEAD").decode().strip()==NEW and git(repo,"rev-parse",NEW+"^").decode().strip()==OLD,"unexpected Ruff pair")
     need(lockset(repo,OLD)==lockset(repo,NEW),"different registry package resolution")
     git(repo,"switch","--detach",OLD); trees(repo,OLD)
     allowed=lockset(repo,OLD)
@@ -311,7 +312,7 @@ def main(root, bundle):
     try:
         trace.ready()
         calibrate(root,trace,env,Path(linker["image"]["path"]))
-        for role in ("pinned","fourfix"):
+        for role in ("pinned","candidate330"):
             installed=campaign.switch(kit,role,active,receipt)
             need(common.run(["cargo","+ohm","-Vv"],env=env)==receipt["cargos"][role]["version_verbose"],"active Cargo version")
             save(root/"receipts"/role/"selector.json",installed)
@@ -337,9 +338,9 @@ def main(root, bundle):
     finally:
         trace.close()
     for rev in (OLD,NEW):
-        p=finished["pinned"]["refs"][rev];f=finished["fourfix"]["refs"][rev]
+        p=finished["pinned"]["refs"][rev];f=finished["candidate330"]["refs"][rev]
         need((p["cli"],p["tests"])==(f["cli"],f["tests"]),"cross-reader behavior/inventory differs")
-    cross={p:{k:compare(finished["pinned"]["refs"][p],finished["fourfix"]["refs"][p])[k] for k in NAMES} for p in (OLD,NEW)}
+    cross={p:{k:compare(finished["pinned"]["refs"][p],finished["candidate330"]["refs"][p])[k] for k in NAMES} for p in (OLD,NEW)}
     need(not refusals,("independent clean equivalence",refusals))
     save(root/"receipts/complete.json",{"native":{r:v["visits"] for r,v in finished.items()},"cross_reader":cross,
                                         "clean_controls":"each revision independently empty for each Cargo at identical paths",

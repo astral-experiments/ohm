@@ -8,6 +8,7 @@ import tomllib
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from common import *
+import candidate330
 import fixture
 import observe
 
@@ -15,6 +16,8 @@ def verify(root,reference):
     root=Path(root);index=read(root/'complete.json');source=read(root/'source-release.json')
     require(read(root/'original.json')==reference and source['qa']['GITHUB_SHA']==reference['head'] and source['qa']['GITHUB_RUN_ID']==str(reference['run']) and source['kit_sha256']==reference['kit'],'unbound source kit')
     require(source['rust']['commit']==RUST and source['rust']['tree']==RTREE and all((source['cargos'][s]['commit'],source['cargos'][s]['tree'])==r for s,r in ROLES.items()),'foreign compiler or Cargo')
+    candidate=candidate330.verify(read(root/'candidate330.json'),source)
+    source={**source,'cargos':{'pinned':source['cargos']['pinned'],'candidate330':candidate}}
     target=source['rust']['host'];all_kinds=['zmij'] if target==GNU else ['zmij','objc2']
     require(target in (GNU,APPLE) and index['host']==target and index['native_launch_count'] is None,'collector scope')
     linker=read(root/'host-linker-before.json');published,=source['native_linkers']
@@ -44,7 +47,7 @@ def verify(root,reference):
             for phase,state,value in cover:
                 out=d/phase;comp=read(out/'comparison.json')
                 require(comp==terminal['phases'][phase] and comp['expected']==value,'phase declaration')
-                role='fourfix' if history=='fixed' or (history=='migration' and not phase.startswith('old-')) else 'pinned'
+                role='candidate330' if history=='fixed' or (history=='migration' and not phase.startswith('old-')) else 'pinned'
                 require(comp['reader']==role,'reader identity');visits={}
                 for lane in ('warm','force','empty'):
                     a=out/lane;row=read(a/'observed.json');raw=gzip.decompress((a/'stdout.gz').read_bytes());err=gzip.decompress((a/'stderr.gz').read_bytes());typed=[json.loads(x) for x in raw.splitlines() if x.strip()]
@@ -64,7 +67,7 @@ def verify(root,reference):
                         src=unit['source'];decl=subject['registry'][n.replace('_','-')]
                         require(src['sha256']==decl['sources']['src/lib.rs'] and real['package_id'].endswith('#'+n.replace('_','-')+'@'+decl['version']),'producer does not match authentic crate')
                         flags=[] if n!=k else [evidence.V1 if k=='zmij' else evidence.V2]
-                        mark=flags[0] if flags and (role=='fourfix' or k=='objc2') else None
+                        mark=flags[0] if flags and (role=='candidate330' or k=='objc2') else None
                         require(unit['raw_path']==str(suffix.with_name(suffix.name[3:-5]+'.d')) and unit['record_path']==str(suffix.parent.parent/'fingerprint'/('dep-lib-'+n)),'different unit record')
                         require(evidence.raw_rule(Path(unit['raw_path']),cas[unit['raw']])==unit['rules']==flags,'wrong raw rules')
                         binary=evidence.encoded(cas[unit['translated']])
@@ -83,7 +86,7 @@ def verify(root,reference):
                             apple_ids[image]=apple_plain.reopen(root,program,row['apple_proof'])
                         runtime=read(a/'runtime.json');require(runtime=={'code':0,'elf':image,'stdout':f'{v} OHM_RC22_SELECTED_NATIVE_IMAGE_{v}\n'},'native behavior differs')
                     else:require(not leaf and row['value'] is None and row['image'] is None,'failed build recorded as a program')
-                    if lane!='warm' or role=='fourfix' or k=='objc2' or phase in ('lower','old-lower','repeat-lower','rust-error','rust-repair'):
+                    if lane!='warm' or role=='candidate330' or k=='objc2' or phase in ('lower','old-lower','repeat-lower','rust-error','rust-repair'):
                         if state=='source-invalid':require(row['code']==101 and 'E0308' in codes,'missing type error')
                         elif value is None:require(row['code']==101 and row['native_error'] and (fixture.LIB.encode() in raw+err or b'qa_rc22_value' in raw+err),'not a native failure')
                         else:require(row['code']==0 and row['value']==value,'wrong native value')
@@ -93,12 +96,12 @@ def verify(root,reference):
                     return (r['code'],r['value'],apple_ids.get(r['image'],r['image']),tuple(r['diagnostics']))
                 warm=visits['warm'];force=visits['force'];empty=visits['empty']
                 require(verdict(force)==verdict(empty) and comp['warm_equals_empty']==(verdict(warm)==verdict(empty)),'wrong full-output comparison')
-                if role=='fourfix' or k=='objc2':require(comp['warm_equals_empty'],'corrected path diverges')
+                if role=='candidate330' or k=='objc2':require(comp['warm_equals_empty'],'corrected path diverges')
                 if role=='pinned' and k=='zmij' and phase in ('appearance','old-higher','same-stat','malformed'):
                     require(not comp['warm_equals_empty'] and warm['value']==17 and warm['app_fresh'] is True,'baseline failed to reproduce')
                 if phase=='upgrade':
                     txn=read(out/'same-path.json');snap=json.loads(gzip.decompress((out/'pre-existing-tree.json.gz').read_bytes()));u=previous['units'][k]
-                    require(len(snap)==txn['entries'] and txn['old']['path']==txn['new']['path'] and [txn[n]['sha256'] for n in ('old','new')]==[source['cargos'][n]['sha256'] for n in ('pinned','fourfix')],'wrong migration')
+                    require(len(snap)==txn['entries'] and txn['old']['path']==txn['new']['path'] and [txn[n]['sha256'] for n in ('old','new')]==[source['cargos'][n]['sha256'] for n in ('pinned','candidate330')],'wrong migration')
                     require(txn['previous_unit']==u and txn['old_image']==previous['image'] and snap[u['raw_path']][-1]==u['raw'] and snap[u['record_path']][-1]==u['translated'] and not warm['units'][k]['fresh'],'historical record not witnessed')
                 info=comp['provider']
                 for n in ('early','late'):
