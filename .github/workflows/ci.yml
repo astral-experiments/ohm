@@ -1,53 +1,31 @@
-name: Test native link checks for workspace build scripts
+name: Compare native link smoke requirements on GNU
 on:
   workflow_dispatch:
     inputs:
       expected_head: {description: Qualification commit, required: true, type: string}
 permissions: {contents: read, actions: read}
-concurrency: {group: rc22-build-script-link, cancel-in-progress: false}
+concurrency: {group: rc22-declared-input-comparison, cancel-in-progress: false}
 jobs:
-  trace:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22-test-generator-link'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 45
+  compare:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22-declared-input-comparison'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
     steps:
-      - name: Verify the submitted source
+      - name: Verify the qualification commit
         env: {EXPECTED: '${{ inputs.expected_head }}'}
         run: test "$GITHUB_SHA" = "$EXPECTED"
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {path: protocol, persist-credentials: false, sparse-checkout: scripts/rc22-native}
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {repository: astral-sh/ruff, ref: 93526150df078af7dd8fc4226cdcc469539d2001, path: ruff, persist-credentials: false}
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
-          path: cargo-seed
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/cargo-diagnostic-fix
-            scripts/ohm-apple-zmij/cargo293
+        with: {persist-credentials: false, sparse-checkout: scripts/rc22-declared-inputs}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with: {python-version: '3.13'}
-      - name: Reuse the qualified driver and Cargo executable
+      - name: Exercise the original test, proposed test and hidden second archive
         env: {GH_TOKEN: '${{ github.token }}'}
-        run: |
-          set -euo pipefail
-          sudo apt-get -qq update
-          sudo apt-get -y install --no-install-recommends zstd b3sum clang strace
-          python3 -IB protocol/scripts/rc22-native/acquire_plain.py protocol/scripts/rc22-native/source/sdk-gnu.json "$RUNNER_TEMP/rc22-inbox" "$RUNNER_TEMP/rc22-source"
-          gh api repos/astral-experiments/ohm/actions/artifacts/13050858750/zip > "$RUNNER_TEMP/standalone.zip"
-      - name: Build the isolated Cargo change with the qualified driver
-        run: python3 -IB protocol/scripts/rc22-native/build_generator_trial.py "$RUNNER_TEMP/rc22-inbox"
-      - name: Compare repeated unchanged ty checks and challenge native-generated diagnostics
-        run: python3 -IB protocol/scripts/rc22-native/measure_trial.py
-      - name: Preserve raw commands, output identities and fingerprint diagnostics
+        run: python3 -IB scripts/rc22-declared-inputs/compare.py
+      - name: Keep the commands, failures and exact binary identities
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: rc22-gnu-generator-link
-          path: |
-            ${{ runner.temp }}/generator-trial/reports/
-            ${{ runner.temp }}/rc22-source/
-            ${{ runner.temp }}/rc22-generator-cargo/reports/
-          if-no-files-found: warn
+          name: rc22-declared-input-comparison
+          path: ${{ runner.temp }}/rc22-candidate-replay/reports/
+          if-no-files-found: error
           retention-days: 30
