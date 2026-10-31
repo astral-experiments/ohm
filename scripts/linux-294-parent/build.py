@@ -33,7 +33,14 @@ def build(root,pack):
     dest=root/'deliver';dest.mkdir();reports=root/'reports';reports.mkdir()
     run([*cargo,'fetch','--locked','--target','x86_64-unknown-linux-gnu'],path,env,reports/'fetch')
     for role,proof in [('parent',parent),('matched294',child)]:
-        if role=='matched294':git('checkout','-q','--detach',source.BASE)
+        if role=='matched294':
+            # Both modes produce Cargo's git stamp at build-script time. Use an empty
+            # private build and target at the same logical path for the second role.
+            for old in (root/'target',root/'shared'):
+                if old.exists():
+                    assert old.parent==root and not old.is_symlink()
+                    old.rename(root/('completed-parent-'+old.name))
+            git('checkout','-q','--detach',source.BASE)
         assert git('status','--porcelain')==b'' and git('rev-parse','HEAD').decode().strip()==proof['commit']
         cmd=[*cargo,'build','--release','--offline','--locked','-p','cargo','--bin','cargo','--features','all-static,ohm-defaults','-j12','--message-format=json']
         invocation=run(cmd,path,env,reports/role)
@@ -42,6 +49,7 @@ def build(root,pack):
         binary=Path(leaf['executable']);assert binary.resolve().is_relative_to(root/'target')
         output=dest/role;shutil.copyfile(binary,output);output.chmod(0o755)
         version=subprocess.check_output([output,'-Vv'],env=env,text=True)
+        (reports/(role+'-version.txt')).write_text(version)
         assert 'commit-hash: '+proof['commit'] in version and 'release: 1.99.0-dev' in version
         data={'role':role,'source':proof,'commit':proof['commit'],'version':version,'sha256':digest(output),'compiled':digest(binary),'features':leaf['features'],
               'command':cmd,'environment':env,'qa':os.environ['GITHUB_SHA'],'signed_sdk':json.loads((root/'receipts/21/installed.json').read_bytes())}
