@@ -1,5 +1,5 @@
-name: Measure Ruff table-only branch storage
-run-name: Ruff direct table storage ${{ inputs.reviewed_head }}
+name: Confirm Ruff first-checkout and retained-object storage
+run-name: Ruff whole-CLI storage confirmation ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -11,16 +11,42 @@ permissions:
   actions: read
   contents: read
 jobs:
+  antecedents:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-storage-e-confirmation-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    name: Verify source-pilot records and all prior integration boots
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      binding: ${{ steps.prior.outputs.binding }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: scripts/branch-storage-e-confirmation
+      - name: Verify official prior jobs, original media and immutable boot set
+        id: prior
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+        run: |
+          set -euo pipefail
+          cd scripts/branch-storage-e-confirmation
+          sha256sum --strict --check --status SHA256SUMS
+          python3 -IB confirm_binding.py >> "$GITHUB_OUTPUT"
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-first-session-t-screen-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    needs: antecedents
+    env:
+      PREVIOUS_BINDING: ${{ needs.antecedents.outputs.binding }}
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-storage-e-confirmation-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
-    name: Ruff direct table storage ${{ matrix.position }}
+    name: Confirm E whole-Ruff storage ${{ matrix.position }}
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 4
       matrix:
-        position: ['01','02']
+        position: ['01','02','03','04','05','06','07','08','09','10','11','12']
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -30,7 +56,7 @@ jobs:
           sparse-checkout: |
             scripts/branch-return-pmu
             scripts/branch-first-session-e-screen
-            scripts/branch-first-session-t-screen
+            scripts/branch-storage-e-confirmation
             scripts/ohm-packed-ruff/full-cli
             scripts/ohm-packed-ruff/harness
       - name: Read the binding to the independently completed native source run
@@ -39,7 +65,7 @@ jobs:
           set -euo pipefail
           (cd enrolled/scripts/branch-return-pmu && sha256sum --strict --check --status SHA256SUMS)
           (cd enrolled/scripts/branch-first-session-e-screen && sha256sum --strict --check --status SHA256SUMS)
-          cd enrolled/scripts/branch-first-session-t-screen
+          cd enrolled/scripts/branch-storage-e-confirmation
           sha256sum --strict --check --status SHA256SUMS
           python3 -IB policy.py >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -48,7 +74,6 @@ jobs:
           path: source
           persist-credentials: false
           sparse-checkout: |
-            scripts/tables-only-source
             scripts/branch-first-session-e-source
             scripts/branch-return-source
             scripts/ohm-packed-ruff
@@ -104,11 +129,11 @@ jobs:
           POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/branch-first-session-t-screen/run.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
+          python3 -IB enrolled/scripts/branch-storage-e-confirmation/run.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: table-only-ordinary-${{ matrix.position }}
+          name: e-storage-confirmation-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

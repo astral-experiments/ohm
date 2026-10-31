@@ -8,6 +8,7 @@ PHASES = ("cold-A", "first-B", "return-A", "return-B", "unchanged-B", "invalid",
 SAME = ("same-cold-A", "same-edit", "same-repeat", "same-first-B")
 ARMS = ("Eoff", "Kon", "Eon")
 TABLE_ONLY = ("Foff", "Fon", "Ton")
+CONFIRMED = ("Foff", "Fon", "Eon")
 
 
 def ratio(a, b):
@@ -16,7 +17,7 @@ def ratio(a, b):
 
 def evaluate(arms, roles=ARMS):
     """Calculate one host. The separate media reader owns provenance and correctness admission."""
-    if roles not in (ARMS, TABLE_ONLY) or set(arms) != set(roles):
+    if roles not in (ARMS, TABLE_ONLY, CONFIRMED) or set(arms) != set(roles):
         raise ValueError("three distinct role names required")
     disabled, previous, candidate = roles
     saved_bytes = f"{previous}_minus_{candidate}"

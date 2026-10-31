@@ -144,11 +144,11 @@ def extract_delta(archive, capsule, role):
                 shutil.copyfileobj(src, dst, 1 << 20)
 
 
-def acquire(source):
+def acquire(source, *, base_role=BASE_ROLE, base_commit=BASE_COMMIT):
     e = enrollment()
     b.prepare_checkout(source, e["head"], "scripts")
     code = source / "scripts/branch-first-session-e-source"
-    dir_, ktransfer, k = original_sdk(source, "K", BASE_COMMIT)
+    dir_, ktransfer, k = original_sdk(source, base_role, base_commit)
     e_archive = b.ROOT / "e-archives"
     e_archive.mkdir()
     driver_name = "first-session-linux-source-driver"
@@ -204,17 +204,20 @@ def acquire(source):
             "-IB",
             source / "scripts/branch-return-source/restore.py",
             ktransfer,
-            b.PARK / "K",
-            "K",
+            b.PARK / base_role,
+            base_role,
             *kargs,
         ],
-        dir_ / "reopen-K",
+        dir_ / ("reopen-" + base_role),
     )
     capture(
         [sys.executable, "-IB", code / "restore_e.py", ktransfer, capsule, b.PARK / "E", *eargs],
         dir_ / "reopen-E",
     )
-    roles = {"K": (k["roles"]["K"], k["files"]["K"]), "E": (m["source"], m["files"])}
+    roles = {
+        base_role: (k["roles"][base_role], k["files"][base_role]),
+        "E": (m["source"], m["files"]),
+    }
     return physical_roles(roles, k["driver"], dir_)
 
 

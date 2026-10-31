@@ -244,7 +244,7 @@ def main(pos, source, calibration, observer, provider, *, policy=subjects):
     for file in (
         policy.HERE / "PLAN.md",
         policy.RUNTIME,
-        policy.HERE / "inputs/source-replay.json",
+        getattr(policy, "SOURCE_REPLAY", policy.HERE / "inputs/source-replay.json"),
         policy.EXCLUDED,
         *getattr(policy, "EXTRA_INPUTS", ()),
         HERE / "inputs/cold-units.json",
