@@ -1,0 +1,28 @@
+# Darwin release smoke with the packaged compiler
+
+This single manual job uses the aarch64-apple-darwin distribution from the failed, unpublished release run 41237680370. The original worker evaluated two actual programs at 17 and counted two entries in its configured cc wrapper where its assertion required zero. Its two declared archive mutation steps had yet to run. This study makes no performance measurement.
+
+The release manifest and native platform SHA sidecars are checked against the global checksum table and the two immutable official Actions ZIPs. Every original installed file and symlink is bound across role switches. Only bin/cargo is replaced. The compiler, loaded runtime, platform std, tools and actual clang/Xcode ld stay with the release. The two source-built Cargo executables come from the successful native SDK job 124571532918 in a historically failed multi-job qualification. Their raw native image, source, build features, original ZIP and native host stamps are checked independently. Release Rust 556a8364 and the current #225 Rust ceafeeda have the same compiler tree fe04efe2. The old package's compiler build remains the actual compiler here. The two supplemental Cargo binaries use the native release profile with all-static and ohm-defaults, without distribution PGO.
+
+The fixed reader runs the exact release script from packaging e8468d0d, including all four executable/library × default/relink assembler histories. The 29 genuine offline Cargo commands check both 17→29 transitions, four missing .incbin failures, the Rust edit and repair to 2:37, the unmarked 0/2/0 declared archive, and backdated marked undeclared replacement, malformed archive and repair to 37. The worker also re-executes all eight surviving native programs. If the kernel observer cannot calibrate, the script still runs normally in the foreground and its verdict is retained separately. The physical matrix requires the observer.
+
+## Two-bin matrix
+
+Both the exact packaged Cargo 8269d772 and the source-built #225 Cargo 4591cf45 receive each independent arm. All seven minimal source files originate in the original release script. Every arm gets an empty target and separate empty build directory, standard release environment, CARGO_INCREMENTAL=1 and the same visible source path. The actual compiler writes a V1 marker for the original scalar register comment. Both executable names, actual provider bytes/mtime/inode, Cargo stdout/stderr, complete native exec argument lists and process IDs, root CGUs, original Mach-Os, and both running-program verdicts are retained.
+
+| Arm | Rust engine | Build script watches | Final linker |
+| --- | --- | --- | --- |
+| A | Original register comment | native/libanswer.a | Exact release count-links invoking cc |
+| B | Pure identity function | native/libanswer.a | Same wrapper |
+| C | Original register comment | native/libanswer.a | Stock Cargo selection observed via the kernel |
+| U | Original register comment | build.rs only | Same wrapper |
+
+After cold17, the worker runs two unchanged 17 visits, replaces 17 with 29, repeats 29, supplies a malformed archive, repairs to 29, removes the archive, repairs to 37, and repeats. The U writes keep the original device, inode, length and nanosecond modification time where the file still exists. The archive has one real answer.o, and each positive independently links and executes a native C consumer. Missing/malformed return Cargo 101 and an appropriate linker diagnostic naming answer after an actual selected Xcode linker ran. On B, unchanged 17 and 29 require zero native links. Changing the declared file requires exactly two. The original packaged A arm must reproduce both actual Xcode links at its first unchanged 17 observation. Other unchanged marked visits retain both physical counts and values, allowing a sound implementation to avoid redundant work. C records the first and subsequently settled stock-linker decisions and seal/product contents. A zero-link return requires the same physical previously linked binary and its matching per-output seal product. Each lane builds independent empty references for 17, 29, malformed, missing and 37 at the same path, holding the actual Cargo inode stable throughout.
+
+The extra historical #328 Cargo 2554a1df receives just U's six-phase prefix plus three empty references. It is a registered adverse control. It must return the original 17 on the unannounced change and malformed warm calls, while independent empty sees 29 and rejects malformed. A changed historical expectation is reported rather than silently adopted.
+
+All positive whole-image comparisons preserve actual original SHA separately. The already enrolled Apple reader checks every original CodeDirectory page and restricts changes to the compiler's invocation nonce on physically stored root CGUs in Xcode N_OSO references, then requires full same-path normalized image and complete stable CGU-to-object byte hashes to equal the independent empty. A raw difference outside this rule refuses. The stock linker is identified by exact executable identity and the actual Xcode command printed by the independent clang calibration. A wrapper count alone cannot qualify a link.
+
+## Running and reviewing
+
+On the exact reviewed checkout, run python3 -B scripts/rc22-apple-declared-smoke/test_matrix.py. The CI workflow is manual and read-only. Enter its full reviewed commit as reviewed_head. It accepts one workflow_dispatch across all states and one attempt on the exact private packaging QA branch. Source inputs, original release/SDK Actions media, probe inputs and complete smoke source hashes are in registration.json. The job retains its original results on failure. No package, release, tag or source ref is published.

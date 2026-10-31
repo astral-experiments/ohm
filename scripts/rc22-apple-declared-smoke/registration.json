@@ -1,0 +1,105 @@
+{
+  "cargo_trees": {
+    "2554a1dfaf22474b360a4298883acf41f82bd78f": {
+      "src/compiler/fingerprint/dep_info.rs": "2592c14bea1db613c7b927dc85900c3a6cb0ec93",
+      "src/compiler/native_link": "49f12586e085732825cc472a24d79715e14e0ae3",
+      "src/compiler/native_link_driver.rs": "b0cf4887e83130ee2e2466bcaaba1baff7ffed28"
+    },
+    "4591cf45cc10abb19d2456c40b99606e08167f29": {
+      "src/compiler/fingerprint/dep_info.rs": "9fcf8f966ae99e2332cbfbce1d2fe02299627bdd",
+      "src/compiler/native_link": "49f12586e085732825cc472a24d79715e14e0ae3",
+      "src/compiler/native_link_driver.rs": "b0cf4887e83130ee2e2466bcaaba1baff7ffed28"
+    },
+    "8269d772aa1ef02e5efaa331dfb40eb55d71f719": {
+      "src/compiler/fingerprint/dep_info.rs": "9fcf8f966ae99e2332cbfbce1d2fe02299627bdd",
+      "src/compiler/native_link": "49f12586e085732825cc472a24d79715e14e0ae3",
+      "src/compiler/native_link_driver.rs": "b0cf4887e83130ee2e2466bcaaba1baff7ffed28"
+    }
+  },
+  "corrected_smoke": {
+    "blob": "3743c253445a2b796445a90fe31c08db53304ba8",
+    "cargo": "4591cf45cc10abb19d2456c40b99606e08167f29",
+    "common_compiler_tree": "fe04efe2bcbf28820e9c3361d62b299d273e9a24",
+    "coordinator": "e8468d0d0221379e7152a748a8735d78a88eda2f",
+    "coordinator_tree": "47cf397c528ad537a981666783287717126ee321",
+    "manifest_rust": "ceafeeda61cc18293545cc4e4039099cdabc0be3",
+    "sha256": "9f259bbbe7949cf46079d0af4fb7a6b17ea541c8913cda99d307d977c815cc30"
+  },
+  "distribution": {
+    "artifact": 13058479585,
+    "bytes": 292145229,
+    "head": "007da57ba792129adb5754546e1158e7e6d732b7",
+    "job": 124644935441,
+    "name": "ohm-1.99.0-22-aarch64-apple-darwin",
+    "run": 41237680370,
+    "sha256": "79d173e48efde0fc45897b8205858a291a1b3079582d34a353d3f1c3a5769907"
+  },
+  "global": {
+    "artifact": 13059239725,
+    "bytes": 5442,
+    "head": "007da57ba792129adb5754546e1158e7e6d732b7",
+    "job": 124671520971,
+    "name": "ohm-1.99.0-22-global",
+    "run": 41237680370,
+    "sha256": "4307a9b0433c82fa2bae404de6a9280c0779f2980031786453ac4ab9d3a22471"
+  },
+  "observer": {
+    "cgu_inputs": "4b90c2ff246c88e21c0f6d1eac259f7dc4908f7b",
+    "execs": "9fc180908f16ef9abeafe4a5bb21ff74dc8f236e",
+    "head": "14c9d13d68f3dd21c53f1ef6c3721de8363c0123",
+    "macho_paths": "da4c47f6e348599566e2dec11bd033ce50f5931b",
+    "pilot": "233fe676635f24f46187e92560f458df3628a512",
+    "tree": "998664c9cbccc3b750f5f90e0228679a41c3aab0"
+  },
+  "original_smoke": {
+    "blob": "907a6ea030653eedfbba167da684179c2c20104f",
+    "job": 124671631175,
+    "run": 41237680370,
+    "sha256": "be92fafc84b4e74000f9fdc0f093debf17e591bc7e22c2fff7fc0a780bf8f38f"
+  },
+  "readers": {
+    "fourfix": [
+      "actual-corrected-script",
+      "A",
+      "B",
+      "C",
+      "U"
+    ],
+    "old328": [
+      "U-legacy"
+    ],
+    "packaged": [
+      "A",
+      "B",
+      "C",
+      "U"
+    ]
+  },
+  "rust_trees": {
+    "556a8364f1485a03be31b1a50c250d63198a943d": {
+      "compiler": "fe04efe2bcbf28820e9c3361d62b299d273e9a24",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "src/tools/cargo": "8269d772aa1ef02e5efaa331dfb40eb55d71f719",
+      "tests": "76f8c0ecd0eed35042848dfa7036dc546bd1ad6f"
+    },
+    "ceafeeda61cc18293545cc4e4039099cdabc0be3": {
+      "compiler": "fe04efe2bcbf28820e9c3361d62b299d273e9a24",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "src/tools/cargo": "4591cf45cc10abb19d2456c40b99606e08167f29",
+      "tests": "76f8c0ecd0eed35042848dfa7036dc546bd1ad6f"
+    }
+  },
+  "scope": "Native correctness on the unpublished release artifact, with only the named Cargo replaced. No clock or performance endpoint.",
+  "source_kit": {
+    "artifact": 13047576657,
+    "bytes": 206494914,
+    "head": "4db6d401407e14c6b755e3ff23f829cd5e401d9d",
+    "job": 124571532918,
+    "kit": "20d4e78705ad56a8c11bccbc4288662dafc4eeae0a05d1e8d2b40cd7ae960f3e",
+    "members": "d16d2f065346e7d90e88b899b57774c90078d9e4e8be880bebe6ec6f8dbb011f",
+    "name": "rc22-native-sdk-aarch64-apple-darwin",
+    "receipt": "2548947a6e2d138874633eef4f556e7aeace5107a00d9ee9d8a4e65934e8f593",
+    "run": 41212939515,
+    "sha256": "b302e2417f6dd5a46a009595fdcba7473d46f712748b2cf1b698ab916afc768c"
+  }
+}
