@@ -1,28 +1,21 @@
-name: Actual mixed-compiler Ruff link and same-path upgrades
+name: Diagnose feature-free Ruff ty_server e2e codegen on signed Linux
 on:
   workflow_dispatch:
-    inputs:
-      panel:
-        type: choice
-        description: Registered independent native roles
-        required: true
-        default: migration
-        options: [migration, e2e, all]
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: actual-mixed-sdk-ruff-${{ github.ref }}-${{ inputs.panel }}
+  group: signed-featureless-e2e-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  role:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-mixed-generics-real-ruff-20261031'
+  native:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-featureless-e2e-codegen-20261031'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 240
+    timeout-minutes: 50
     strategy:
       fail-fast: false
       matrix:
-        role: ${{ fromJSON(inputs.panel == 'migration' && '["stage-to-candidate","stage-to-sham","signed-to-candidate"]' || inputs.panel == 'e2e' && '["e2e-parent","e2e-candidate"]' || '["e2e-parent","e2e-candidate","stage-to-candidate","stage-to-sham","signed-to-candidate"]') }}
+        role: [strict, '293']
     env:
       ROLE: ${{ matrix.role }}
     steps:
@@ -30,74 +23,54 @@ jobs:
         with:
           path: registered
           persist-credentials: false
-          sparse-checkout: scripts/mixed-generics-ruff
+          sparse-checkout: |
+            scripts/mixed-generics-ruff
+            scripts/featureless-e2e
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          path: pmu
-          ref: 927e20bcad028e5ed4290a58bd330a258ee5da41
+          path: signed
+          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
           persist-credentials: false
-          sparse-checkout: scripts/ohm-gnu-syscall
+          sparse-checkout: scripts/packaged-release-workspace
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           path: physical
           ref: 9d1dd09be4d2346142957cc298093d8a75c755c3
           persist-credentials: false
           sparse-checkout: scripts/ron-check-share
-      - if: matrix.role == 'signed-to-candidate'
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          path: signed-reader
-          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
+          path: tree
+          ref: 77e33ee7781b8d823dc7f046d3bd9bea43818bc8
           persist-credentials: false
-          sparse-checkout: scripts/packaged-release-workspace
-      - name: Reopen the two complete gated SDKs and their physical custody receipts
+          sparse-checkout: scripts/strict-unicode-cost
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: classic
+          ref: b3a1bbd38e07293168f06cb21648821b8cacd206
+          persist-credentials: false
+          sparse-checkout: scripts/ohm-aarch64-fallback
+      - name: Verify signed SDK and reopen the original native Cargo ELF
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           test "$(git -C registered rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$GITHUB_RUN_ATTEMPT" = 1
           sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends build-essential ninja-build cmake pkg-config perl libssl-dev zstd
-          qa=registered/scripts/mixed-generics-ruff
-          python3 -IB "$qa/kits.py" acquire "$RUNNER_TEMP/mixed-rust-kits" "$RUNNER_TEMP/mixed-rust-download" "$qa/inputs/native-seal.json"
-          if [ "$ROLE" = signed-to-candidate ]; then
-            python3 -IB signed-reader/scripts/packaged-release-workspace/packages.py 21 "$RUNNER_TEMP/mixed-signed-release"
-            mv "$RUNNER_TEMP/mixed-signed-release/sdk-21" "$RUNNER_TEMP/mixed-rust-kits/signed"
-          fi
-      - name: Run actual untraced instructions, independent physical process census and empty comparisons
+          sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd
+          python3 -IB registered/scripts/featureless-e2e/acquire.py "$GITHUB_WORKSPACE" "$RUNNER_TEMP/selected-e2e-cargo" "$ROLE"
+      - name: Check two repeats, two physical edits, own empty builds, Cargo INFO and bounded hardware scopes
         run: |
           set -euo pipefail
-          python3 -IB registered/scripts/mixed-generics-ruff/panel.py "$RUNNER_TEMP/ohm-mixed-rust-ruff" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/mixed-rust-kits" "$ROLE"
+          python3 -IB registered/scripts/featureless-e2e/study.py \
+            --workspace "$GITHUB_WORKSPACE" --role "$ROLE" --root "$RUNNER_TEMP/ohm-featureless-e2e" \
+            --signed "$RUNNER_TEMP/selected-e2e-cargo/signed" --cargo "$RUNNER_TEMP/selected-e2e-cargo/selected"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: mixed-ruff-${{ matrix.role }}
-          path: ${{ runner.temp }}/ohm-mixed-rust-ruff/receipts/
-          compression-level: 1
+          name: signed-featureless-e2e-${{ matrix.role }}
+          path: ${{ runner.temp }}/ohm-featureless-e2e/receipts/
           if-no-files-found: error
           retention-days: 7
-  reopen:
-    if: always() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-mixed-generics-real-ruff-20261031'
-    needs: role
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          sparse-checkout: scripts/mixed-generics-ruff
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          pattern: mixed-ruff-*
-          path: receipts
-      - name: Recompute the command/SDK identity, physical cost, native test sets and whole-store allocation
-        env:
-          PANEL: ${{ inputs.panel }}
-        run: python3 -IB scripts/mixed-generics-ruff/reopen.py receipts "$PANEL" "$RUNNER_TEMP/mixed-ruff-qualification.json" --head "$GITHUB_SHA" --run "$GITHUB_RUN_ID"
-      - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: mixed-ruff-independent-readback
-          path: ${{ runner.temp }}/mixed-ruff-qualification.json
-          if-no-files-found: error
-          retention-days: 21
+          compression-level: 1
