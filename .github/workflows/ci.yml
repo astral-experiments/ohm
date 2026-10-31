@@ -1,132 +1,103 @@
-name: Mixed-profile rustc native admission
-on: workflow_dispatch
+name: Actual mixed-compiler Ruff link and same-path upgrades
+on:
+  workflow_dispatch:
+    inputs:
+      panel:
+        type: choice
+        description: Registered independent native roles
+        required: true
+        default: migration
+        options: [migration, e2e, all]
 permissions:
-  actions: read
   contents: read
+  actions: read
 concurrency:
-  group: signed-mixed-generics-native-${{ github.ref }}
+  group: actual-mixed-sdk-ruff-${{ github.ref }}-${{ inputs.panel }}
   cancel-in-progress: false
-
 jobs:
-  build:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed-mixed-generics-20261031'
+  role:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-mixed-generics-real-ruff-20261031'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 210
+    timeout-minutes: 240
     strategy:
       fail-fast: false
       matrix:
-        role: [parent, candidate, legacy]
+        role: ${{ fromJSON(inputs.panel == 'migration' && '["stage-to-candidate","stage-to-sham","signed-to-candidate"]' || inputs.panel == 'e2e' && '["e2e-parent","e2e-candidate"]' || '["e2e-parent","e2e-candidate","stage-to-candidate","stage-to-sham","signed-to-candidate"]') }}
     env:
       ROLE: ${{ matrix.role }}
-      QA_ROOT: /tmp/ohm-signed-mixed-generics-native
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          path: registered
           persist-credentials: false
-          sparse-checkout: scripts/strict-mixed-generics
+          sparse-checkout: scripts/mixed-generics-ruff
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a
-          path: public-seed
+          path: pmu
+          ref: 927e20bcad028e5ed4290a58bd330a258ee5da41
           persist-credentials: false
-          sparse-checkout: scripts/ohm-apple-zmij/source-transport
-      - name: Install native bootstrap dependencies on a fresh host
-        run: |
-          set -euo pipefail
-          mkdir "$QA_ROOT"
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends cmake ninja-build pkg-config perl libssl-dev zstd clang lld build-essential curl
-          dpkg-query -W cmake clang gcc ninja-build python3 zstd
-      - name: Reconstruct exact Git objects and the independent signed-source transplant
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git -C public-seed rev-parse HEAD)" = 85c467e1190d80fa8607fb0f9ef0824b4271266a
-          packet=public-seed/scripts/ohm-apple-zmij/source-transport
-          (cd "$packet" && sha256sum --check SHA256SUMS)
-          python3 -IB "$packet/prepare.py" "$QA_ROOT/rust"
-          python3 -IB scripts/strict-mixed-generics/source.py materialize "$QA_ROOT/rust" "$ROLE"
-      - if: matrix.role != 'legacy'
+          sparse-checkout: scripts/ohm-gnu-syscall
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: physical
+          ref: 9d1dd09be4d2346142957cc298093d8a75c755c3
+          persist-credentials: false
+          sparse-checkout: scripts/ron-check-share
+      - if: matrix.role == 'signed-to-candidate'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          path: signed-reader
           ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
-          path: package-reader
           persist-credentials: false
           sparse-checkout: scripts/packaged-release-workspace
-      - if: matrix.role != 'legacy'
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: 5d26c524606e556b4934842568ed4acd2e91219d
-          path: strict-reader
-          persist-credentials: false
-          sparse-checkout: scripts/strict-host-opt
-      - if: matrix.role != 'legacy'
-        name: Verify the published Linux -21 package and strict Cargo
+      - name: Reopen the two complete gated SDKs and their physical custody receipts
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB package-reader/scripts/packaged-release-workspace/packages.py 21 "$QA_ROOT/packages"
-          python3 -IB strict-reader/scripts/strict-host-opt/acquire_cargo.py "$QA_ROOT/strict-cargo"
-      - name: Build the compiler and matching complete host libraries
-        run: python3 -IB scripts/strict-mixed-generics/build.py "$ROLE" "$QA_ROOT"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: ${{ matrix.role }}
-          path: /tmp/ohm-signed-mixed-generics-native/transfer/
-          if-no-files-found: error
-          compression-level: 0
-          retention-days: 5
+          test "$(git -C registered rev-parse HEAD)" = "$GITHUB_SHA"
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends build-essential ninja-build cmake pkg-config perl libssl-dev zstd
+          qa=registered/scripts/mixed-generics-ruff
+          python3 -IB "$qa/kits.py" acquire "$RUNNER_TEMP/mixed-rust-kits" "$RUNNER_TEMP/mixed-rust-download" "$qa/inputs/native-seal.json"
+          if [ "$ROLE" = signed-to-candidate ]; then
+            python3 -IB signed-reader/scripts/packaged-release-workspace/packages.py 21 "$RUNNER_TEMP/mixed-signed-release"
+            mv "$RUNNER_TEMP/mixed-signed-release/sdk-21" "$RUNNER_TEMP/mixed-rust-kits/signed"
+          fi
+      - name: Run actual untraced instructions, independent physical process census and empty comparisons
+        run: |
+          set -euo pipefail
+          python3 -IB registered/scripts/mixed-generics-ruff/panel.py "$RUNNER_TEMP/ohm-mixed-rust-ruff" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/mixed-rust-kits" "$ROLE"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: bootstrap-observations-${{ matrix.role }}
-          path: |
-            /tmp/ohm-signed-mixed-generics-native/receipts
-            /tmp/ohm-signed-mixed-generics-native/packages/receipts
-            /tmp/ohm-signed-mixed-generics-native/strict-cargo/custody.json
-          if-no-files-found: warn
-          retention-days: 21
-  admit:
-    needs: build
-    runs-on: namespace-profile-ubuntu-24-04-16
+          name: mixed-ruff-${{ matrix.role }}
+          path: ${{ runner.temp }}/ohm-mixed-rust-ruff/receipts/
+          compression-level: 1
+          if-no-files-found: error
+          retention-days: 7
+  reopen:
+    if: always() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-mixed-generics-real-ruff-20261031'
+    needs: role
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
-    env:
-      QA_ROOT: /tmp/ohm-signed-mixed-generics-admission
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-          sparse-checkout: scripts/strict-mixed-generics
+          sparse-checkout: scripts/mixed-generics-ruff
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: parent
-          path: kits/parent
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          name: candidate
-          path: kits/candidate
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          name: legacy
-          path: kits/legacy
-      - name: Admit profile semantics, direct symbols, Cargo transitions and metadata provenance
-        run: |
-          set -euo pipefail
-          mkdir "$QA_ROOT"
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends zstd gcc libc6-dev
-          rustup toolchain install 1.99.0 --profile minimal
-          stock=$(rustc +1.99.0 --print sysroot)
-          python3 -IB scripts/strict-mixed-generics/admit.py kits "$stock"
+          pattern: mixed-ruff-*
+          path: receipts
+      - name: Recompute the command/SDK identity, physical cost, native test sets and whole-store allocation
+        env:
+          PANEL: ${{ inputs.panel }}
+        run: python3 -IB scripts/mixed-generics-ruff/reopen.py receipts "$PANEL" "$RUNNER_TEMP/mixed-ruff-qualification.json" --head "$GITHUB_SHA" --run "$GITHUB_RUN_ID"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: compiler-native-admission
-          path: |
-            /tmp/ohm-signed-mixed-generics-admission/receipts/
-            /tmp/ohm-signed-mixed-generics-admission/incremental-transaction/partial.json
-            /tmp/ohm-signed-mixed-generics-admission/incremental-transaction/completed.json
-            /tmp/ohm-signed-mixed-generics-admission/incremental-transaction/raw
+          name: mixed-ruff-independent-readback
+          path: ${{ runner.temp }}/mixed-ruff-qualification.json
           if-no-files-found: error
           retention-days: 21
