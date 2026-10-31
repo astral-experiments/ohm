@@ -1,0 +1,1 @@
+#[test] fn library_answer() { let value=abi_probe_dep::read(std::hint::black_box(0x1_0000_0011));println!("actual ABI value={value}");assert_eq!(value, std::env::var("EXPECTED_VALUE").unwrap().parse::<u64>().unwrap()) }
