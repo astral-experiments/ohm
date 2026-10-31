@@ -69,3 +69,25 @@ def check(archive,search,scratch,result,env,expected,frame):
             out[mode+"/"+label]=verdict
             save(result/(mode+"-"+label+".json"),verdict)
     return out
+
+def wrong_provider(archive, search, scratch, result, env, frame):
+    """The unmodified compiler must expose the previous E0463 on the untouched old file and the new provider tree."""
+    result.mkdir()
+    meta=archive.with_suffix(".rmeta")
+    dest=scratch/"missing-provider.rmeta"
+    require(not dest.exists() and file_sha(Path(frame["driver"][0]))==frame["driver"][1],"unexpected provider control state")
+    args=["rustc","+ohm","--edition","2024","--crate-name","qa_musl_meta_consumer","--target","x86_64-unknown-linux-musl","-Cdebuginfo=0","--extern","ruff_python_ast="+str(meta)]
+    for d in search:args+=["-L",d]
+    args+=["--emit=metadata","--error-format=json",str(scratch/"positive.rs"),"-o",str(dest)]
+    trace=scratch/"bad-inputs.trace"
+    pr=subprocess.run(["strace","-f","-qq","-yy","-s","65535","-e","trace=execve,execveat,openat,openat2","-o",trace,*args],env=env,cwd=scratch,capture_output=True,timeout=90)
+    raw=trace.read_bytes()
+    for name,b in (("stdout",pr.stdout),("stderr",pr.stderr),("kernel",raw)):
+        (result/(name+".gz")).write_bytes(gzip.compress(b,mtime=0))
+    errors=[d for line in pr.stderr.splitlines() if line.startswith(b"{") and (d:=json.loads(line)).get("level")=="error" and d.get("spans")]
+    own=trace_open(raw.splitlines(),meta);r=Path(frame["rustc"][0]);driver=Path(frame["driver"][0])
+    require(own and any(b'execve("'+bytes(r)+b'"' in l and l.endswith(b" = 0") for l in raw.splitlines()) and any(b"openat" in l and b"<"+bytes(driver.resolve(strict=True))+b">" in l for l in raw.splitlines()),"failed case did not use its actual compiler and input")
+    require(pr.returncode==1 and len(errors)==1 and errors[0]["code"]["code"]=="E0463" and errors[0]["message"]=="can't find crate for `ruff_python_ast`" and not dest.exists(),"expected original missing native provider diagnostic")
+    record={"argv":args,"rc":pr.returncode,"actual_driver":frame,"literal_metadata_sha256":file_sha(meta),"input_opens":len(own),"diagnostic":errors[0]["message"],"code":errors[0]["code"]["code"],"trace":sha(raw)}
+    save(result/"receipt.json",record)
+    return record

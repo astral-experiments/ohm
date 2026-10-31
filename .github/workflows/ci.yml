@@ -24,7 +24,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB scripts/ohm-musl-ast-opaque/run.py acquire
-      - name: Build independent dependencies and physically open all original and new products
+      - name: Restore independent 39-unit closures and verify the five ordinary visits on both compilers
         run: python3 -IB scripts/ohm-musl-ast-opaque/run.py verify
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
