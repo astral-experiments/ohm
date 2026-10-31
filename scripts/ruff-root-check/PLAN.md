@@ -1,0 +1,52 @@
+# Does keeping the prior checkout reduce instructions for a complete Ruff workspace check?
+
+Run the following command from the root of Ruff's virtual workspace on Linux x86-64. There is no package selector. At both revisions all 52 workspace members are default members. This command type-checks 55 root targets, including six bins. It also builds native host dependencies, proc macros and build scripts. The earlier parser check, Ruff CLI build and CLI integration-test build were different selections. [Ruff source change](https://github.com/astral-sh/ruff/pull/28335) · [Ohm Rust #274](https://github.com/astral-experiments/ohm-rust/pull/274)
+
+```sh
+cargo +ohm check --locked --offline -j4 --message-format=json
+```
+
+## Inputs and prior contact
+
+A is `b5dba861cc38e3f7fb4524c9ceba3e01a474ea13`. B is its child `7b13f01ba1569887a25670820764b24c206da8e5`. The commit changes 169 files. There are 76 changed Rust files under seven crates' `src` directories. Following the actual unit-graph edges reaches 39 of the 55 root targets. That count describes dependencies. Only the counter experiment can establish the work saved.
+
+Both settings use the same physical source-built compiler F `c6fe8ecda65452c105f85367a009af80cbb5efbc`, the original strict Cargo `761ea115605c34f11a1cd29afd68812c1e1359dd`, the same standard library, rustup and stock Wild. The 81-member F SDK and its source acquisition are verified before use. Foff uses the normal command. Fon enables F's `-Zohm-branch-cache=yes` using the pre-existing Cargo encoded flags setting. Ordinary native-input checks remain active. Registry archive contents are shared read-only. Each measured installation starts independently empty at the same visible paths. [Source build](https://github.com/astral-experiments/ohm/actions/runs/41199659076)
+
+`enrolled-graph.json.gz` was generated independently from both checkouts using that exact compiler and Cargo. They have the same `Cargo.lock`, 557 locked packages, all 505 registry archives authenticated. Both full unit graphs and the projected graph agree byte-for-byte. Cargo selected 405 packages, 564 units and 1,743 edges. These include 357 checks, 155 builds and 52 build-script executions. The 55 roots are 46 libraries, six binaries, two libraries also emitting cdylibs, and one proc macro. Each worker must produce this graph from the actual checkout for every arm and state. All 512 planned compiler-artifact messages, including repeated same-crate targets or feature variants, must be present independently of their `fresh` bits. The successful raw commands, checksums and standalone one-library type calibration are summarized in `local-contact.json`. That calibration used six real `ruff_text_size` checks and twelve actual downstream compiler invocations. It supplies no estimate for this root command.
+
+## Two disposable hosts
+
+Enroll the first attempt of one reviewed manual dispatch. Position 01 runs Foff then Fon. Position 02 runs Fon then Foff. Each host must have a distinct Linux boot ID outside `excluded-boots.json`. Require the same CPU and PMU. Preserve rejection or incomplete output from either original. There is no replacement position or automatic confirmation.
+
+Each worker first reopens its physical SDK, source binding, 505 registry archives and arithmetic/exec/fork/thread PMU calibration. It builds independent A and B empty references for *both* settings at stable paths. Each B reference also receives the invalid edit and repair. Then, in the first setting in that position, it traces one whole native history using kernel-bounded argv/exec evidence. That history must pass every reference and verdict before this host may measure either setting. Across the pair this admits a native job roster for each setting. Preserve the complete real rustcs, build scripts, stock Wild, other native tools and outputs. Their actual counts are observations. No predetermined number of links or dirty units is assumed.
+
+The seven visits are cold A, first switch to B, return A, return B, unchanged B, an invalid B edit, and repair. After the invalid call, apply the inherited rustc failed-session grace admission before repair. Only each whole ordinary Cargo process tree is inside the PMU. It includes real build scripts, native helpers, errors and all rustc descendants. Git operations, artifact reads, type clients and disk accounting occur outside the counted interval. No exec tracer or compiler wrapper runs in a scored interval. Each worker makes 15 uncounted traced Cargo calls and 14 counted Cargo calls. The four graph selections are separate planning calls per worker. Each worker starts seven independent empty target/build installations.
+
+## What must match
+
+Hash every physical filename from every successful Cargo artifact, plus the generated `ty_vendored` typeshed ZIP. Verify the complete typed Cargo roster, profiles, features, build-script rows and all compiler diagnostics including spans and rendered source. Only the relative order of different Cargo messages is discarded. Compare all actual product paths, sizes and byte digests to that setting's own same-state empty reference. Both full originals of any differing file are saved where available. Full originals of all five chosen provider metadata files, the generated ZIP and the accepted typed client are always retained. An unexplained difference refuses the screen even if the client accepts it. Whole inactive target/build allocation is independently reconstructed from every recorded inode/block ledger.
+
+For the client, trace `ruff_dev`'s real `--emit=dep-info,metadata` rustc on the empty reference, bind its single exact `--extern` file for each of `ruff_linter`, `ruff_python_ast`, `ruff_python_parser`, `ty_project` and `ty_python_semantic`, and preserve its real dependency search directories. Re-open all five through `rustc +ohm -Zls=root`. An independent Rust client exercises parser/AST type agreement, constructs semantic settings and resolves the public rule/project types. Actual compiler checks require 64/56 bytes for `Expr` on A/B respectively. The opposite width must fail at its own expression with E0308. Preserve the accepted reader's complete `.rmeta`. The check's root bins emit compiler metadata. Validation uses a real downstream typechecker; no root-bin executable is claimed. The native `ty_vendored` ZIP must match its whole same-state empty body and inventory. Decode two actual library stubs and compare their bytes to the checked-out sources. A genuine injected parser type error must fail Cargo with code 101 and exactly the enrolled primary diagnostic, then restore the accepted output inventories and type clients.
+
+## Resource and decision rules
+
+Each fresh hosted runner has a 220-minute limit. Check at entry for 32 GiB of durable space, 14 GiB on the target/build filesystem and 12 GiB of effective memory. Recheck while running with hard minima of 6 GiB durable, 3 GiB working and 5 GiB effective memory. Memory is the lower of the host's availability and any effective cgroup limits. Prefer the owned 18 GiB ext4 image. If the host refuses its mount, admit only positively identified runner-overlay and record it. Output hashes and PMU guards remain the same. The complete reference body store uses deduplicated compressed bytes on the disposable runner. A failed resource or product gate earns zero scored positions. Never use an old target or delete another study's artifacts to gain admission.
+
+Report the fourteen integer counts per host, CPU, elapsed interval, disk and all phases. For each position compute Foff/Fon for return A, return B and the sum of both. The exploratory screen passes only if *each* of those three integer comparisons strictly exceeds 2× on *each* position. Report the first visit, unchanged B, invalid/repair and the cold-through-return/all-seven totals separately, including all adverse results. Two mirrored positions do not yield a confirmatory interval. Run any future holdout only after separate review and registration.
+
+## Offline replay
+
+Use the reviewed packaging checkout. Fetch both original artifacts from attempt 1 at the exact QA head and compare their sizes and SHA-256s with GitHub's artifact metadata. Bind both successful jobs by their exact position and native boot IDs. Each archive contains an independently produced `independent-screen.json`. Recompute it from each extracted archive and byte-compare the JSON values before scoring. The two physical observer checkouts are the immutable revisions in the workflow, `2f413ca94b84af2dbd6d6231bcf8d860c97ebee8` and `8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc`. `zstd` is required.
+
+```sh
+python3 -IB scripts/ruff-root-check/test_screen.py
+python3 -IB scripts/ruff-root-check/reopen.py worker ORIGINAL_01 CALIBRATOR_CHECKOUT OBSERVER_CHECKOUT > worker-01.json
+python3 -IB scripts/ruff-root-check/reopen.py worker ORIGINAL_02 CALIBRATOR_CHECKOUT OBSERVER_CHECKOUT > worker-02.json
+python3 -IB scripts/ruff-root-check/reopen.py pair worker-01.json worker-02.json
+```
+
+Authenticate the two local raw ZIPs against the immutable original GitHub jobs and their own readbacks in one command. In `ZIP_DIRECTORY` the file names are `RUN_ID-ARTIFACT_ID.zip`. Use `worker-01.json` and `worker-02.json` from the two independent `worker` commands in `READBACK_DIRECTORY`.
+
+```sh
+python3 -IB scripts/ruff-root-check/originals.py --run RUN_ID --zip-directory ZIP_DIRECTORY --readback-directory READBACK_DIRECTORY
+```
