@@ -21,17 +21,36 @@ def run(cmd,repo,env,out):
     if result.returncode:print(result.stderr.decode(errors='replace')[-2500:],file=sys.stderr)
     assert result.returncode==0
     return result
+
+def strict_source(dest, seed, specdir, spec):
+    """Restore the signed source and both PR branches from their sealed Git objects."""
+    original = materialize.tree(dest, seed)
+    assert original['commit'] == materialize.BASE
+    extra = (specdir / 'strict-candidate.pack').read_bytes()
+    assert hashlib.sha256(extra).hexdigest() == spec['pack_sha256']
+    git = materialize.git
+    git(dest, 'index-pack', '--stdin', data=extra)
+    assert git(dest, 'cat-file', '-t', spec['base_parent']) == b'commit\n'
+    shallow = dest / '.git/shallow'
+    assert set(shallow.read_text().splitlines()) == {materialize.SEED, materialize.BASE}
+    shallow.write_text(spec['base_parent'] + '\n')
+    git(dest, 'checkout', '--quiet', '--detach', spec['head'])
+    assert git(dest, 'show', '-s', '--format=%P', 'HEAD').decode().split() == spec['parents']
+    assert git(dest, 'rev-parse', materialize.BASE + '^').decode().strip() == spec['base_parent']
+    assert git(dest, 'rev-parse', 'HEAD^^^').decode().strip() == spec['base_parent']
+    assert git(dest, 'status', '--porcelain') == b''
+    git(dest, 'fsck', '--no-progress', '--full', '--strict')
+    return {'commit': git(dest, 'rev-parse', 'HEAD').decode().strip(),
+            'tree': git(dest, 'rev-parse', 'HEAD^{tree}').decode().strip(),
+            'source_pack': original['source_pack'], 'extra_pack': spec['pack_sha256'],
+            'lock': digest(dest / 'Cargo.lock'), **materialize.hash_files(dest, spec['head'])}
+
 def main(root,pack):
     specdir=HERE/'candidate-source';spec=json.loads((specdir/'spec.json').read_bytes())
     assert spec['parent']==materialize.BASE
     data=root/'build-cert';data.mkdir()
     native=root/'sdk-21';assert digest(native/'bin/cargo')=='4695ab8e260ba4d6363e42b785c8f410dd79d9255f0313dab6c19e978878f43e'
-    bundle=root/'deltas';bundle.mkdir()
-    for n in ('parent.commit','parent.patch.gz'):shutil.copyfile(materialize.HERE/n,bundle/n)
-    for child in spec['commits']:
-        for suffix in ('.commit','.patch.gz'):shutil.copyfile(specdir/(child['key']+suffix),bundle/(child['key']+suffix))
-    materialize.HERE=bundle
-    src=root/'source';tree=materialize.tree(src,pack,spec)
+    src=root/'source';tree=strict_source(src,pack,specdir,spec)
     assert tree['commit']==spec['head'] and tree['tree']==spec['tree'] and tree['mode_path_sha256_inventory']==spec['inventory']
     assert tree['lock']==spec['lock_sha256']
     rustup=Path(shutil.which('rustup'));home=root/'build-home';home.mkdir()

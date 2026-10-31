@@ -14,7 +14,7 @@ def main(product,sdk,protocol,root):
     repo=Path(__file__).resolve().parent
     spec=json.loads((repo/'candidate-source/spec.json').read_bytes());seal=json.loads((product/'build.json').read_bytes())
     assert not root.exists() and product.is_dir() and sdk.is_dir()
-    assert spec['head']=='b76dc8006155d48a8cd7d6c5543acb9c18e2ce4b' and spec['tree']=='c8d0e89c4226add0ae40b6604025f5e7b04489f5'
+    assert spec['head']=='761ea115605c34f11a1cd29afd68812c1e1359dd' and spec['tree']=='19c379477ec24be16c82b952dc2e892c0563e2c7'
     assert seal['qa']==os.environ['GITHUB_SHA'] and seal['candidate']==seal['tree']['commit']==spec['head']
     assert seal['tree']['tree']==spec['tree'] and seal['tree']['mode_path_sha256_inventory']==spec['inventory']
     assert digest(product/'cargo')==seal['compiled']==seal['delivered']==os.environ['BUILT_CARGO_SHA256']

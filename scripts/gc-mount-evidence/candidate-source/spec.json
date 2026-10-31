@@ -1,9 +1,12 @@
 {
+  "base_parent": "7277e6cdaba44c43294a07c0661fc8e69fd8e3e7",
   "changed": [
     "Cargo.lock",
     "Cargo.toml",
+    "src/compiler/fingerprint/dep_info.rs",
     "src/compiler/fingerprint/dirty_reason.rs",
     "src/compiler/fingerprint/mod.rs",
+    "src/compiler/mod.rs",
     "src/ops/cargo_report/rebuilds.rs",
     "src/workspace/build_cache_gc/mod.rs",
     "src/workspace/build_cache_gc/mount_path.rs",
@@ -14,36 +17,15 @@
     "src/workspace/build_cache_gc/worktrees/mounts.rs",
     "tests/testsuite/freshness.rs"
   ],
-  "commits": [
-    {
-      "head": "2802082f3ba36be5af9bab9fa6c33bc78afb203c",
-      "key": "delta-1",
-      "tree": "88386e44d1665a8a5886bea5aa7f43eaf7dcec4b"
-    },
-    {
-      "head": "c7f394c8c9aaef1272c621ff11d77dcf569ed94b",
-      "key": "delta-2",
-      "tree": "07904aadf60050fae426f31ad8fcdcce75e48c7e"
-    },
-    {
-      "head": "f1f1cde375c2562e4a39d12f8835092a106a4fb8",
-      "key": "delta-3",
-      "tree": "1d2cfbe147b64cd4eb9d76f3bec2e7dfe7e736c5"
-    },
-    {
-      "head": "b76dc8006155d48a8cd7d6c5543acb9c18e2ce4b",
-      "key": "delta-4",
-      "tree": "c8d0e89c4226add0ae40b6604025f5e7b04489f5"
-    }
-  ],
-  "head": "b76dc8006155d48a8cd7d6c5543acb9c18e2ce4b",
-  "inventory": "a4577f82988cc0de84fd0faa94e9b03318624eed7af0bb4314a2e4915c650510",
+  "files": 3109,
+  "head": "761ea115605c34f11a1cd29afd68812c1e1359dd",
+  "inventory": "c43d43954ae37b222933baae703bbac6dcb7905de4caaa5e27bef3ecfc1618c3",
   "lock_sha256": "2d8a9c5af5704c6efb7365c699adaa84fdd1879b45f6d98773d7d455041a67bd",
-  "merge_parent": {
-    "commit": "7b29b877b14874055e794e22d19cae2f35cfcab1",
-    "pack": "diagnostic-parent.pack",
-    "pack_sha256": "0c8b0114411c404664a1162e120068b12a5733adbce64777e91acabbfc94ca0f"
-  },
+  "pack_sha256": "7825401d062452a29fedb925a3b335089743d4cbb6f5338e68b74cdacef45353",
   "parent": "2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c",
-  "tree": "c8d0e89c4226add0ae40b6604025f5e7b04489f5"
+  "parents": [
+    "98d431a99779ccfbcfe42dfa74dd541de3a92d05",
+    "b76dc8006155d48a8cd7d6c5543acb9c18e2ce4b"
+  ],
+  "tree": "19c379477ec24be16c82b952dc2e892c0563e2c7"
 }
