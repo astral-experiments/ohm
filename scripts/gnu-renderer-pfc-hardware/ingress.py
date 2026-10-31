@@ -16,6 +16,7 @@ BRANCH = "charlie/qa-gnu-renderer-pfc-hardware-20261031"
 OBSERVERS = "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc"
 PLAN = "70076984ab6feb82a8a9eae43cb9a9c34eec7a9cc42a50305c018391c14afe66"
 AMENDMENT = "1697b1e098ef8398714d55023da7a46c2838d19447108176eb8606bd66296a01"
+CONDITIONAL_ORDER = "2bd86204b49982bcd48d0861d481a0dfbc53df9324a210a8583f16b81d408168"
 RUST = {
     "P": "4e7c5b1f765b24ccd585d8ddb7eeae99a02b514e",
     "F": "51e72261c0b36dfd49c078b35732956d6b950e8e",
@@ -62,6 +63,7 @@ def registration(phase="inspect"):
         sha(HERE / "PLAN.md") == r["plan_sha256"] == PLAN
         and sha(HERE / "PLAN-V2.md") == r["amendment_sha256"] == AMENDMENT
         and {k: v["commit"] for k, v in r["role_trees"].items()} == RUST
+        and sha(HERE / "cohort-order.json") == r["conditional_cohort_order_sha256"] == CONDITIONAL_ORDER
         and r["positions"] == POSITIONS
         and r["observers"] == OBSERVERS,
         "registration changed",

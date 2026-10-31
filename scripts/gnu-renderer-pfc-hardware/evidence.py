@@ -8,7 +8,18 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ingress import AMENDMENT, PLAN, RUST, STUDIES, digest, legal, need, required_digest, sha
+from ingress import (
+    AMENDMENT,
+    CONDITIONAL_ORDER,
+    PLAN,
+    RUST,
+    STUDIES,
+    digest,
+    legal,
+    need,
+    required_digest,
+    sha,
+)
 
 CLI = [
     "cargo",
@@ -275,6 +286,7 @@ def header(c, r, tag):
         and c["phase"] == tag
         and c["plan"] == PLAN
         and c["amendment"] == AMENDMENT
+        and c["conditional_cohort_order"] == CONDITIONAL_ORDER
         and c["source"] == [source["run"], source["head"], source["attempt"], source["manifest_sha256"]],
         "wrong source provenance in gate",
     )

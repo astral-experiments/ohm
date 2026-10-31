@@ -18,6 +18,7 @@ import seed
 from ingress import (
     AMENDMENT,
     BRANCH,
+    CONDITIONAL_ORDER,
     HERE,
     PLAN,
     REPO,
@@ -360,6 +361,7 @@ def worker(args):
     shutil.copy2(HERE / "registration.json", receipt / "registration.json")
     shutil.copy2(HERE / "PLAN.md", receipt / "PLAN.md")
     shutil.copy2(HERE / "PLAN-V2.md", receipt / "PLAN-V2.md")
+    shutil.copy2(HERE / "cohort-order.json", receipt / "cohort-order.json")
     try:
         ROOT.mkdir(mode=0o700)
         root = ROOT
@@ -414,6 +416,7 @@ def worker(args):
             whole_oracle=reg["whole_oracle"]["sha256"] if phase == "screen" else None,
             plan=PLAN,
             amendment=AMENDMENT,
+            conditional_cohort_order=CONDITIONAL_ORDER,
             packets={k: reg[k]["sha256"] for k in PACKETS},
             cells={},
             mono={},

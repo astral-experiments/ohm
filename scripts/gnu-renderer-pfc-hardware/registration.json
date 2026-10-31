@@ -32,6 +32,7 @@
     "sha256": "7292c081de1d8636871a879334439223f4554ce85576eaee12e97e0a818798cb"
   },
   "amendment_sha256": "1697b1e098ef8398714d55023da7a46c2838d19447108176eb8606bd66296a01",
+  "conditional_cohort_order_sha256": "2bd86204b49982bcd48d0861d481a0dfbc53df9324a210a8583f16b81d408168",
   "excluded_source_runs": [
     {
       "head": "e8571bf66528aae18c2fc81d381de52eeead9264",
@@ -147,7 +148,18 @@
   },
   "root_acceptance": null,
   "source": {
-    "artifacts": null,
+    "artifacts": {
+      "gnu-renderer-qualified-native": {
+        "bytes": 303780362,
+        "id": 13036884070,
+        "sha256": "b526f3f4c4fd9a07974cc7456904b506f13aed106bee26553a421311cb21b2bc"
+      },
+      "gnu-renderer-source-native-observations": {
+        "bytes": 1024910,
+        "id": 13036848222,
+        "sha256": "fc48c08002248c776ac82372c97dd308ef385e9ba43224fdd0a9b783b8289624"
+      }
+    },
     "attempt": 1,
     "branch": "charlie/qa-gnu-renderer-cgu-source-20261031",
     "head": "a4afd181ae07107de6174a17a4ec189061fd18aa",
@@ -157,7 +169,7 @@
     "jobs": [
       "native"
     ],
-    "manifest_sha256": null,
+    "manifest_sha256": "0b9c998d560decb25c9f30fb97a8d1f336fd151150edca1087b5e542a0923c72",
     "repo": "astral-experiments/ohm",
     "run": 41185180848
   },
