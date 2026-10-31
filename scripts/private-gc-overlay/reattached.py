@@ -1,5 +1,6 @@
 """Stop actual x86_64 public Cargo at a verified directory open and attach one owned bind."""
 import ctypes as C
+import errno
 import hashlib
 import json
 import os
@@ -24,6 +25,17 @@ def ptrace(cmd,pid=0,a=0,b=0):
     if ret<0 and C.get_errno():raise OSError(C.get_errno(),os.strerror(C.get_errno()))
     return ret
 
+def no_openat2():
+    # x86_64 only. Force exactly openat2 to ENOSYS, leaving every mount/FD/stat syscall genuine.
+    class Ins(C.Structure):
+        _fields_=[('op',C.c_ushort),('yes',C.c_ubyte),('no',C.c_ubyte),('k',C.c_uint)]
+    class Program(C.Structure):
+        _fields_=[('size',C.c_ushort),('filter',C.POINTER(Ins))]
+    code=(Ins*4)(Ins(0x20,0,0,0),Ins(0x15,0,1,437),Ins(0x06,0,0,0x50000|errno.ENOSYS),Ins(0x06,0,0,0x7fff0000))
+    program=Program(4,code)
+    assert os.uname().machine=='x86_64' and lib.prctl(38,1,0,0,0)==0
+    assert lib.prctl(22,2,C.byref(program),0,0)==0,C.get_errno()
+
 def state(path):
     try:
         fd=os.open(path,os.O_PATH|os.O_NOFOLLOW)
@@ -34,7 +46,7 @@ def state(path):
                     sha256=hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None)
     finally:os.close(fd)
 
-def trace(f,c,target,relocated,leaf,out):
+def trace(f,c,target,relocated,leaf,out,mask):
     src='private-after-scan.bin';output=out/'cargo.stdout';err=out/'cargo.stderr';pid=os.fork()
     if pid==0:
         try:
@@ -42,6 +54,7 @@ def trace(f,c,target,relocated,leaf,out):
                 fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o644);os.dup2(fd,n);os.close(fd)
             os.chdir(c['cwd']);os.setgroups([]);os.setgid(f.gid);os.setuid(f.uid)
             assert lib.prctl(4,1,0,0,0)==0
+            if mask:no_openat2()
             ptrace(0);os.kill(os.getpid(),signal.SIGSTOP)
             binary=str(f.w/'shims/cargo');os.execve(binary,[binary,'+ohm','gc','-v','--color','never'],c['env'])
         except BaseException as exc:
@@ -77,6 +90,8 @@ def trace(f,c,target,relocated,leaf,out):
         if name=='/proc/self/mountinfo':
             mountinfo+=1
             observed.append({'mountinfo':mountinfo,'pid':pid})
+        if phase and '/proc/self/fdinfo/' in name:
+            active={'kind':'mount-id-open','name':name,'pid':pid}
         if num==263 and name==src:
             active={'kind':'unlinkat-payload','dirfd':dfd,'name':name,'flags':flags,'pid':pid}
         if name==target.name and Path(dfd)==target.parent and flags&os.O_DIRECTORY and flags&os.O_NOFOLLOW:
@@ -98,7 +113,15 @@ def trace(f,c,target,relocated,leaf,out):
     return {'exit':code,'binding':binding,'events':observed,'outside_after':state(relocated/src),'visible_after':state(leaf),'err':err.read_text(),'stdout':output.read_text()}
 
 def main(role,root,inside):
-    expect,digest=VERSION[role];out=root/'packet'/'fixed';sdk=root/'sdk-fixed'
+    if role.startswith('final'):
+        assert role in ('final','final-enosys')
+        spec=json.loads((HERE/'sources/final/candidate-source/spec.json').read_bytes())
+        doc=json.loads((root/'product/build.json').read_bytes())
+        expect=spec['head'];digest=doc['compiled']
+        assert expect=='f1f1cde375c2562e4a39d12f8835092a106a4fb8' and doc['candidate']==expect and doc['tree']['tree']==spec['tree'] and doc['tree']['mode_path_sha256_inventory']==spec['inventory'] and doc['delivered']==digest
+    else:
+        expect,digest=VERSION[role]
+    out=root/'packet'/'fixed';sdk=root/'sdk-fixed'
     if not inside:
         out.mkdir(parents=True)
         if role=='signed':
@@ -130,10 +153,16 @@ def main(role,root,inside):
     target=t/'debug/deps';old=c['outside']/'relocated-deps';leaf=target/'private-after-scan.bin';f.write(leaf,b'actual owned frozen output after discovery\n')
     original=state(leaf);assert original['nlink']==1 and original['sha256']
     with leaf.open('rb') as held:
-        record=trace(f,c,target,old,leaf,out);record['physical_held_after']={'nlink':os.fstat(held.fileno()).st_nlink,'sha256':hashlib.sha256(held.read()).hexdigest()}
+        record=trace(f,c,target,old,leaf,out,role=='final-enosys');record['physical_held_after']={'nlink':os.fstat(held.fileno()).st_nlink,'sha256':hashlib.sha256(held.read()).hexdigest()}
     assert record['binding']['sha256']==digest and original==record['binding']['before_leaf'] and record['physical_held_after']['sha256']==original['sha256']
     # Record either real native outcome before interpreting. The outside copy stays private to this job.
     ctrl.o.save(out/'reattached-result.json',record)
+    if role.startswith('final'):
+        assert record['exit']==0 and record['outside_after']==record['binding']['outside_leaf'] and record['physical_held_after']['nlink']==1,record
+        assert not any(ev.get('kind')=='unlinkat-payload' for ev in record['events'])
+        opens=[ev for ev in record['events'] if ev.get('kind')=='openat2']
+        assert any(ev['resolve']&1 and ev['return']==(-errno.ENOSYS if role=='final-enosys' else -errno.EXDEV) for ev in opens),record
+        if role=='final-enosys':assert any(ev.get('kind')=='mount-id-open' and ev.get('return',-1)>=0 for ev in record['events'])
     mid=state(target)['mount'];assert mid==record['binding']['bound_dir']['mount']
     f.unmount(mid)
     assert record['exit'] in (0,101) and record['physical_held_after']['nlink']==int(record['outside_after'] is not None)

@@ -77,7 +77,7 @@ def main(root,other,role,base,expect_fs):
     sdk=(root/'sdk-21').resolve()
     assert sha(sdk/'bin/cargo') == CARGOS['signed']
     out=root/'packet'/role;out.mkdir(parents=True)
-    candidate=role in ('standalone','combined')
+    candidate=role in ('standalone','combined','final')
     if candidate:
         spec=json.loads((Path(__file__).resolve().parent/'sources'/role/'candidate-source/spec.json').read_bytes())
         SOURCES[role]=spec['head']

@@ -65,7 +65,14 @@ def suites(role,root):
     suite=binary('test','testsuite');unit=binary('lib','cargo')
     cli=target/'debug/cargo';assert cli.is_file() and os.access(cli,os.X_OK)
     jobs={}
-    for label,exe,wanted in [('profile-unit',unit,{'workspace::build_cache_gc::worktrees::idle::tests::stock_build_can_finish_opening_a_profile_after_discovery'}),('old-twelve',suite,names)]:
+    tasks=[('profile-unit',unit,{'workspace::build_cache_gc::worktrees::idle::tests::stock_build_can_finish_opening_a_profile_after_discovery'}),('old-twelve',suite,names)]
+    if role=='final':
+        available=run(cert,'gc-lib-list', [unit,'--list'],src,env)
+        assert available.returncode==0
+        have={s.removesuffix(': test') for s in available.stdout.decode().splitlines() if s.startswith('workspace::build_cache_gc') and s.endswith(': test')}
+        assert len(have)==63 and 'workspace::build_cache_gc::worktrees::at::tests::private_directory_and_entry_lookup_refuse_a_nested_mount' in have and tasks[0][2]<=have
+        tasks.append(('all-gc-library',unit,have))
+    for label,exe,wanted in tasks:
         listed=run(cert,label+'-list',[exe,'--list'],src,env)
         assert listed.returncode==0 and wanted<={r[:-6] for r in listed.stdout.decode().splitlines() if r.endswith(': test')}
         p=run(cert,label,[exe,'--color','never','--test-threads=4','--exact',*sorted(wanted)],src,env)

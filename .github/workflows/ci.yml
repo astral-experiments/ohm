@@ -4,7 +4,7 @@ on:
     inputs:
       task:
         type: choice
-        options: [baseline, qualify, suites, reattached]
+        options: [baseline, qualify, suites, reattached, final]
         default: baseline
 permissions:
   contents: read
@@ -64,13 +64,13 @@ jobs:
           retention-days: 7
           if-no-files-found: error
   candidates:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-private-gc-overlay-20261031' && inputs.task == 'qualify'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-private-gc-overlay-20261031' && (inputs.task == 'qualify' || inputs.task == 'final')
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        role: [standalone, combined]
+        role: ${{ fromJSON(inputs.task == 'final' && '["final"]' || '["standalone","combined"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -128,13 +128,13 @@ jobs:
           if-no-files-found: error
   ext4:
     needs: candidates
-    if: '!cancelled() && inputs.task == ''qualify'''
+    if: '!cancelled() && (inputs.task == ''qualify'' || inputs.task == ''final'')'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        role: [standalone, combined]
+        role: ${{ fromJSON(inputs.task == 'final' && '["final"]' || '["standalone","combined"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -169,6 +169,23 @@ jobs:
           root="$RUNNER_TEMP/private-gc"
           python3 -IB protocol/scripts/private-gc-overlay/observe.py "$root" "$RUNNER_TEMP/download" "${{ matrix.role }}" "$root/visits" ext4
           python3 -IB protocol/scripts/private-gc-overlay/mount_control.py "${{ matrix.role }}" "$root"
+      - name: Reattach actual original directory after discovery with both Linux resolver paths
+        if: inputs.task == 'final'
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/private-gc"
+          for policy in final final-enosys; do
+            base="$RUNNER_TEMP/$policy-graft"; mkdir -m700 "$base"
+            ln -s "$root/sdk-21" "$base/sdk-21"
+            ln -s "$RUNNER_TEMP/download" "$base/product"
+            set +e
+            python3 -IB protocol/scripts/private-gc-overlay/reattached.py "$policy" "$base"
+            verdict=$?
+            set -e
+            mkdir -p "$root/packet/grafts"
+            cp -a "$base/packet/fixed" "$root/packet/grafts/$policy"
+            test "$verdict" -eq 0
+          done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
