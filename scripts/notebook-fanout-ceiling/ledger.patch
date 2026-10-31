@@ -1,0 +1,18 @@
+--- a/topology.py
++++ b/topology.py
+@@ -35,4 +35,4 @@
+-def read(d, selectors, mode, *, synthetic=False, names=(), registry_target=None):
++def read(d, selectors, mode, *, synthetic=False, names=(), registry_target=None, component=None):
+     (abi,) = lines(d, "abi.tsv")
+     size, kind, config, read_format, inherit, disabled, kernel, hv, cloexec = map(int, abi)
+     assert 96 <= size <= 256 and (
+@@ -162,6 +162,9 @@
+         assert all(v == [0, 0] for v in exits.values()), {
+             p: v for p, v in exits.items() if v != [0, 0]
+         }
++    if component is not None:
++        assert mode == "tree" and not synthetic
++        return component(root, events, selected, samples, tasks, chains)
+     compilers = [e for e in selected.values() if e["kind"] == 1]
+     roots = {e["pid"] for e in compilers}
+     assert len(roots) == len(compilers)
