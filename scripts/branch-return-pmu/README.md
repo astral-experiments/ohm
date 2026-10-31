@@ -30,3 +30,19 @@ Both workers at `2f80a736` stopped during the unscored first return to A, before
 The structural observer binds each library to its emitted metadata inode and the binary to the stable crate ID in its defined `ruff::main` symbol. It records the physical compiler identity. For each finalized owner it reads both tables, the work-product index and the native object inventory. For packed tables it authenticates the complete zlib stream, typed tag, alias mask, decoded length, session prefix and compiler header, then records both stored and decoded SHA-256s. This observer runs outside all hardware windows. [Source table format](https://github.com/astral-experiments/ohm-rust/blob/c6fe8ecda65452c105f85367a009af80cbb5efbc/compiler/rustc_incremental/src/persist/fs/packed.rs)
 
 Run `RUNNER_TEMP=/tmp python3 -IB scripts/branch-return-pmu/test_session_tables.py` for the corruption and ownership controls. Its optional `--native DIR` reopens the 384-function native fixture's original table archives, compares every decoded table to its recorded digest and tries four changes to each compiler's real streams. The local source-qualified fixture used the same official F and K drivers, normal Cargo, and six unscored builds. Its programs printed 17, 29 and 17 on both. [Qualified SDK and original compiler tests](https://github.com/astral-experiments/ohm/tree/d4a51f5df64991bf76a2ca20bd743d0a89fc545c/scripts/branch-return-source/result)
+
+## Unchanged GNU native link
+
+The original two workers each reported one dirty Ruff binary on unchanged B. In a separate unscored run, strict Cargo read the authenticated `zmij` record and reported the missing native-link sentinel. The real Wild linker selected a newly added earlier provider, changing the Ruff executable's exit from 0 to 83. Replacing the provider with malformed bytes made Cargo exit 101. Repair and removal restored the respective program, and independently forced links agreed. The diagnostic found ten marked units. The per-arm structural check follows one concrete emitter from the Ruff bin through `serde_json` to `zmij`. [Original native diagnostic](https://github.com/astral-experiments/ohm/actions/runs/41203835321)
+
+Each structural arm saves `settled-origin.json`, `zmij.d` and `dep-lib-zmij` on cold A, return B and unchanged B. Return B also saves its complete `settled-ruff.rlink.gz`. On unchanged B the worker checks the sole dirty bin, sole link-only rustc, actual Wild operands and the identity of the returned executable. Both watched Git refs, the recipe and the marked files are checked across the repeat. The ordinary counter includes the entire physical link. The independent disk, clean ELF, typed, invalid/repair and paired thresholds use the original registration.
+
+To recheck the native calibration, put the authenticated diagnostic ZIP and the two original refused pilot ZIPs on disk, install `b3sum`, and run from this directory:
+
+```sh
+RUNNER_TEMP=/home/runner/work/_temp python3 -IB test_settled_link.py \
+  --diagnostic /path/to/41203835321-13042799674.zip \
+  --off /path/to/41200174886-01-13042772691.zip /path/to/41200174886-02-13043111933.zip
+```
+
+The reopener checks the three complete ZIP hashes and preserves the two earlier refusals. It flips every bit in the real 97-byte LNK1 record and checks missing, substituted or additional compiler, linker, operand, output, source and Make rules. Its small temporary filesystem verifies the source/Git rules, recipe bytes, native output inode and selected producer records without compiling Ruff.

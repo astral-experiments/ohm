@@ -71,7 +71,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends binutils build-essential ca-certificates coreutils git ninja-build strace util-linux zstd
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates coreutils git ninja-build strace util-linux zstd
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           test ! -e "$base"
           mkdir -p "$base/work" "$base/logs"

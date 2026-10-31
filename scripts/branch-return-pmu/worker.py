@@ -24,6 +24,8 @@ import study as kit
 from omission import publish
 from meter import clock
 import processes
+import link_diagnostic
+import settled_link
 
 PHASES = (
     ("cold-A", "A"),
@@ -207,7 +209,9 @@ def receipt(arm, phase, branch, lane, env, where, refs):
     if phase in ("first-B", "return-A", "return-B"):
         names = {r["name"] for r in dirty}
         need(
-            {"ruff", "ruff_python_ast", "ruff_python_parser"} <= names and len(dirty) < 375,
+            {"ruff", "ruff_python_ast", "ruff_python_parser"} <= names
+            and len(dirty) == 20
+            and historical.commit(dirty) == settled_link.SWITCH_DIRTY,
             ("historical source did not affect its real graph", names),
         )
         need(
@@ -219,6 +223,7 @@ def receipt(arm, phase, branch, lane, env, where, refs):
                 "missing real Ruff compilation or link",
             )
     if phase == "unchanged-B":
+        settled_link.sole_bin(dirty)
         need((storage["packed_files"] > 0) == (arm == "Kon"), "incorrect settled object retention")
     products, files = native.observed(
         messages, branch, kit.REVS[branch], env, ROOT, kit.TREE, WORK, where
@@ -244,6 +249,10 @@ def receipt(arm, phase, branch, lane, env, where, refs):
         )
         for name, path in files.items():
             native.same_file(path, products[name], original["products"][name], BODIES, where)
+    if lane == "structural" and phase in ("cold-A", "return-B", "unchanged-B"):
+        settled_link.collect(where, phase, physical, messages, files["cli"])
+        if phase == "unchanged-B":
+            settled_link.watched_after(where, kit.TREE)
     result.update(
         artifact_count=len(rows),
         dirty=len(dirty),
@@ -317,17 +326,14 @@ def finish(registry, orders, records):
             ):
                 need(a.get(k) == c.get(k), ("structural and ordinary lane disagree", arm, phase, k))
             if phase == "unchanged-B":
-                p = historical.load(OUT / "structural" / arm / phase / "native-execs.json.gz")
-                if p["rustcs"] or p["wild"] or a["dirty"]:
-                    unexpected.append(
-                        dict(
-                            arm=arm,
-                            phase=phase,
-                            dirty=a["dirty"],
-                            rustcs=[r["crate"] for r in p["rustcs"]],
-                            wild=p["wild"],
-                        )
-                    )
+                where = OUT / "structural" / arm / phase
+                proof = settled_link.read(where / "settled-origin.json")
+                native = historical.load(where / "native-execs.json.gz")
+                settled_link.sole_bin(historical.load(where / "roster.json.gz")["dirty"])
+                need(
+                    proof["link"] == settled_link.link(native, proof["cold"]),
+                    ("missing authenticated settled native link", arm),
+                )
     for phase, _ in PHASES:
         rows = {records["measured", arm][phase].get("dirty_digest") for arm in orders}
         if len(rows) != 1:
@@ -396,6 +402,7 @@ def main(pos, source, calibrator, observer, provider_repo):
         (OUT / name).mkdir()
     shutil.copy2(HERE / "PLAN.md", OUT / "PLAN.md")
     shutil.copy2(b.RUNTIME, OUT / "source-kit.json")
+    link_diagnostic.acquire()
     subprocess.run([sys.executable, "-IB", HERE / "meter.py", calibrator, observer], check=True)
     ready = json.loads((OUT / "meter-ready.json").read_bytes())
     os.sched_setaffinity(0, ready["affinity"])
