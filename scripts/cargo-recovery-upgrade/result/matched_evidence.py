@@ -42,7 +42,7 @@ def reopen(m,prior):
         assert not leaf['fresh'] and set(leaf['features'])>={'all-static','ohm-defaults'}
     return verify_visits(m,C,tools)
 
-def verify_visits(m,product,tools):
+def verify_visits(m,product,tools,native_rechecks=None):
     j=lambda name:json.loads(m[name])
     subjects=j('subjects.json')
     lane='matched-Ruff';pj=lambda name:j(lane+'/'+name+'.json')
@@ -54,7 +54,9 @@ def verify_visits(m,product,tools):
     for env in envs.values():assert not {'CI','TF_BUILD','CFG_RELEASE','CFG_RELEASE_CHANNEL','RUSTC_WRAPPER','GH_TOKEN','GITHUB_TOKEN','RUSTFLAGS'}&env.keys()
     assert len({e['CARGO_TARGET_DIR'] for e in envs.values()})==len({e['CARGO_BUILD_BUILD_DIR'] for e in envs.values()})==3
     terminal=j('matched-terminal.json')
-    assert terminal['product']['head']==product and not terminal['issues'] and set(terminal['summary'])==set(PHASES)
+    assert terminal['product']['head']==product and set(terminal['summary'])==set(PHASES)
+    native_rechecks = native_rechecks or {}
+    expected_issues = []
     table={};recs={};raw_msgs={}
     for name,want in PHASES.items():
         r=pj(name+'/receipt');recs[name]=r;pre=lane+'/'+name+'/'
@@ -117,10 +119,14 @@ def verify_visits(m,product,tools):
                             assert args[args.index('--crate-name')+1].startswith('autocfg_') and '/memoffset/' in args[args.index('--out-dir')+1]
                 assert len(links)==len(outs)==len(set(outs.values()))==48
                 assert dict(emits)=={'--emit=dep-info,metadata,link':66,'--emit=dep-info,link':48,'--emit=dep-info,metadata':189,'--emit=llvm-ir':1}
+            elif name in native_rechecks:
+                native_rechecks[name](m, pre, tools[tool], subjects, workers, links, want)
+                expected_issues.append([name, 'physical-rustcs', workers])
             else:assert workers==want and links==[],(name,want,workers,links)
         assert terminal['summary'][name]=={'actual_rustcs':workers,'warning':warn,'E0308':errs,'exit':r['exit']}
         table[name]={'rustcs':len(workers) if workers is not None else None,'named_rustcs':workers if workers is not None and len(workers)<6 else None,
                      'physical_links':None if links is None else len(links),'exit':r['exit'],'E0308':errs,'real_warning':warn}
+    assert terminal['issues'] == expected_issues and set(native_rechecks) == {i[0] for i in expected_issues}
     for phase in ('fixed-first','fixed-repeat','off-fixed-first','fixed-forced-one-missing','fixed-after-forced','fixed-independent-repeat'):
         assert raw_msgs[phase]==raw_msgs['fixed-independent-empty']
     paths=lambda ns:{recs[n]['ty_artifacts'][0][1][0][0] for n in ns}

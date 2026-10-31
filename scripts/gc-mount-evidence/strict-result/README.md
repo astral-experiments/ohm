@@ -1,0 +1,31 @@
+# Release handoff for the Cargo fixes
+
+**Cargo `761ea115605c34f11a1cd29afd68812c1e1359dd` passed the reproduced correctness gates on Linux x86-64 and Apple silicon with signed `-21` Rust `c79998a5cd143c445a4b2528f20953b176a65c5d` and the existing bundled Wild 0.11.0.** For a correctness hotfix, use this Cargo tree with those Rust and linker pins. The measured cost of the conservative native link is 5.94× as many retired user instructions on one unchanged Linux Ruff check. That tradeoff matters for a performance release. [Exact Cargo tree](https://github.com/astral-experiments/ohm-cargo/commit/761ea115605c34f11a1cd29afd68812c1e1359dd) · [Signed toolchain manifest](https://github.com/astral-experiments/ohm/blob/6920a42c1f5ab44ccd8b6a3638478acd1b5efaf1/toolchains/1.99.0/21.json)
+
+The tree combines #291 and #292 with #305, #306 and #308. Applying the complete changes in either direction produced Git tree `19c379477ec24be16c82b952dc2e892c0563e2c7`. The shipped #294 reader and the three-fix-only Cargo `b76dc800` retained a stale result after a new library appeared in Cargo's own Linux linker search directory. With the same compiler and paths, #294's immediate parent both used the new provider and rejected malformed bytes. [Parent comparison and all 60 builds](https://github.com/astral-experiments/ohm/tree/8b6d208b982fb3cb4a803a2976934c80bfcc66b5/scripts/linux-294-parent/result) · [Source integration and all eight passing CI jobs](https://github.com/astral-experiments/ohm-cargo/tree/26ca799478148cb6d425db5010309aa2463e969b/qa/strict-native-three-hotfixes)
+
+| Tested workflow | Outcome at this pin |
+| --- | --- |
+| Recover two previously poisoned Linux Ruff targets by replacing Cargo at the same path | First build returned 83 for the valid provider and failed with exit 101 for the malformed provider. A same-size, same-mtime replacement returned 47. Both valid 1,367,736-byte consumer ELFs and all three generated files matched independent empty builds. A historical Rust generator edit changed the observable result, an invalid edit failed, and repair restored the original executable. [Two workers and original traces](https://github.com/astral-experiments/ohm/tree/ea7d4e23dba715023cb43c82a9e99bec8c8262a4/scripts/linux-294-parent/migration-result) |
+| Recover previously poisoned Apple targets after swapping Cargo | Eight upgrades covered seven stale cases plus a declared-input control. All reached the clean program's result or its linker error. The 39 comparable successful images differed in raw Mach-O bytes. The verifier traced those differences to build-specific CGU debug-name salt and the resulting CodeDirectory bytes and checked the signed pages and actual native inputs. All 12 unchanged strict visits used zero full compilers, one link-only rustc and one real Xcode link. [116 native commands and offline replay](https://github.com/astral-experiments/ohm/tree/0dbd23cd51033e6b54eefc8d712d58e2225e7169/scripts/apple-strict-761/result) |
+| Repair a Ruff type error and repeat `cargo check -p ty_project --tests` | The candidate cleared the stale E0308 and restored the original warning, matching the independent empty build. All 19 visits preserved their expected diagnostics. Forced metadata regeneration produced the original bytes. |
+| Garbage-collect through existing, late and same-inode replacement bind mounts | An unprivileged strict Cargo preserved the outside names, contents and link counts. Shared GC reclaimed an eligible sibling. The private fallback made 102 successful mount-ID reads. Signed Cargo unlinked the outside sentinel. [Original private-target negative and overlay controls](https://github.com/astral-experiments/ohm/tree/2dc85901b87e5df168bf6b0cbc727f18c9f524b2/scripts/private-gc-overlay/evidence) |
+| Full Cargo CI and named Ohm tests | Linux passed 4,827 standard tests plus 15 pinned Ohm cases. macOS passed 4,799 plus eight. Both full suites had zero failures or filtered tests. [Test-name inventories](https://github.com/astral-experiments/ohm-cargo/tree/26ca799478148cb6d425db5010309aa2463e969b/qa/strict-native-three-hotfixes) |
+
+## Cost on a correct unchanged Ruff check
+
+| Linux JSON check | Three fixes with #294 | Strict candidate |
+| --- | ---: | ---: |
+| First repeat after recovery | 2,825,325,302 | 16,787,124,817 |
+| Repeat after forcing one metadata output | 2,824,535,982 | 16,781,835,124 |
+| Repeat after independently empty build | 2,826,564,597 | 16,793,644,663 |
+
+Each entry is the hardware count for the whole command in user mode. All reads recorded equal time enabled and running. Both executables returned the same valid warning on these visits. Ron accounted for about 1.76 billion instructions in either executable. The strict reader also compiled Ruff's Unicode build script, ran Wild, ran the resulting generator, and compiled the Unicode library metadata. On the same visits the three-fix-only Cargo compiled only Ron and ran zero linkers. These cross-run observations describe a performance cost to the verified workflow. [Earlier binary and raw evidence](https://github.com/astral-experiments/ohm/tree/ed90527eb9530cc8a53f68156adb5c59935e766b/scripts/gc-mount-evidence/release-check)
+
+The original Ruff job is red. Five of its 19 visits exceeded the old compiler-count expectation. The archived verifier checks each of those five failures against the real compiler, Wild output and subsequent generator execution. It keeps all the diagnostic, cache-recovery, native mount and source-identity checks. The other four jobs passed. [Original workflow](https://github.com/astral-experiments/ohm/actions/runs/41151297839) · [Criteria recorded before reading the Ruff result](https://github.com/astral-experiments/ohm/blob/bba9dae56f7059c7264dd34656a68e4e5a4c1f97/scripts/gc-mount-evidence/strict-release-criteria.md)
+
+The qualified Linux Cargo ELF had SHA-256 `035e681081683f4141e4c544b8cf9492b73784051e4541c12bb3cbdb73a798a4`. The Apple Cargo executable had SHA-256 `ffb32cb6a9eac1f356921b5f08c3f012b904fc3cf6b38b5696af712830a62516`. Both used the signed compiler and the release's Cargo feature set and channel. The five ZIPs in this directory are the original GitHub artifacts. From this directory, this command reopens the raw observations and reproduces the stored summary.
+
+```sh
+python3 -IB verify.py | cmp - summary.json
+```

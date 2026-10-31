@@ -34,7 +34,7 @@ def deleted_sentinel(trace):
     return [int(s.split()[0]) for s in trace.splitlines() if re.search(rb'\b(?:unlink|unlinkat)\([^\n]*QA_SENTINEL[^\n]*\)\s+=\s+0$',s)]
 
 
-def verify(packets, product, tree, binary, inventory, workflow, late_workflow):
+def verify(packets, product, tree, binary, inventory, workflow, late_workflow, native_rechecks=None):
     j=lambda data,key:json.loads(data[key]);build,ruff,gc,late=[packets[n] for n in ('build','ruff','gc','late')]
     compiled=j(build,'build.json')
     assert compiled==j(ruff,'matched-delivered-cargo.json')==j(gc,'packet/build.json')==j(late,'packet/build.json')
@@ -50,7 +50,7 @@ def verify(packets, product, tree, binary, inventory, workflow, late_workflow):
     subjects=j(ruff,'subjects.json');assert subjects['qa']==workflow and subjects['source']=='93526150df078af7dd8fc4226cdcc469539d2001'
     assert subjects['lock']=='c9e345325bec5ff08dbbe3916edd39ad0c3d1c7797a8c241ae32f62754e764bf'
     assert subjects['kit']['provenance']['sources']['rust']['revision']=='c79998a5cd143c445a4b2528f20953b176a65c5d'
-    recovery=verify_visits(ruff,product,runtimes)
+    recovery=verify_visits(ruff,product,runtimes,native_rechecks)
     cases={};races={}
     for data,qa in ((gc,workflow),(late,late_workflow)):
         terminal=j(data,'packet/terminal.json');assert terminal['qa']==qa and terminal['roles']=={'signed':0,'fixed':0}
