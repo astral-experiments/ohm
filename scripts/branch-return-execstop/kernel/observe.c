@@ -30,6 +30,7 @@ static struct image images[MAX_IMAGE];
 static unsigned image_count, serial, exec_count, births, final, replacements;
 static pid_t ceiling;
 static FILE *events;
+static FILE *diagnostic;
 static char *argv_bytes;
 
 static void refuse(const char *message) {
@@ -43,7 +44,10 @@ static struct task *get(pid_t p) {
     struct task *t=slot(p); if(!t->serial) t->serial=++serial; return t;
 }
 static void resume(pid_t p,int op,int sig) {
-    if(ptrace(op,p,0,(void *)(intptr_t)sig)<0 && errno!=ESRCH) refuse("ptrace resume");
+    if(ptrace(op,p,0,(void *)(intptr_t)sig)<0) {
+        if(errno!=ESRCH) refuse("ptrace resume");
+        if(diagnostic) fprintf(diagnostic,"ESRCH\t%u\t%d\t%d\t%d\n",slot(p)->serial,p,op,sig);
+    }
 }
 static void hex(const void *data,size_t n) {
     static const char table[]="0123456789abcdef";
@@ -140,6 +144,10 @@ static void syscall_stop(pid_t p,struct task *t) {
     need(bytes>=0&&info.arch==AUDIT_ARCH_X86_64,"unsupported syscall ABI");
     if(info.op==PTRACE_SYSCALL_INFO_ENTRY){
         uint64_t n=info.entry.nr;
+        if(diagnostic && (n==SYS_exit||n==SYS_exit_group)) {
+            fprintf(diagnostic,"%s\t%u\t%d\t%d\t%llu\n",n==SYS_exit?"EXIT":"EXIT_GROUP",
+                    t->serial,p,t->tgid,(unsigned long long)info.entry.args[0]);
+        }
         need(!(n&0x40000000) || n==(uint64_t)-1,"x32 syscall ABI");
         need(!t->pending,"previous observed syscall did not close");
         if(n==SYS_fork||n==SYS_vfork||n==SYS_clone||n==SYS_clone3){
@@ -172,6 +180,12 @@ int main(int argc,char **argv) {
     if(argc<4||strcmp(argv[2],"--")){fprintf(stderr,"usage: observe NEW_LEDGER -- COMMAND [ARGS]\n");return 125;}
     int logfd=open(argv[1],O_CREAT|O_EXCL|O_WRONLY|O_CLOEXEC,0600);
     need(logfd>=0,"new private ledger");events=fdopen(logfd,"w");need(events!=NULL,"private ledger stream");
+    char *diagnostic_name=NULL;
+    need(asprintf(&diagnostic_name,"%s.exits",argv[1])>=0,"diagnostic path");
+    int diagnostic_fd=open(diagnostic_name,O_CREAT|O_EXCL|O_WRONLY|O_CLOEXEC,0600);
+    free(diagnostic_name);
+    need(diagnostic_fd>=0,"new private exit log");
+    diagnostic=fdopen(diagnostic_fd,"w");need(diagnostic!=NULL,"diagnostic stream");
     FILE *lim=fopen("/proc/sys/kernel/pid_max","re");need(lim&&fscanf(lim,"%d",&ceiling)==1&&ceiling>1&&ceiling<=4194304,"pid bound");fclose(lim);
     tasks=calloc((size_t)ceiling+1,sizeof(*tasks));argv_bytes=malloc(CAP);need(tasks&&argv_bytes,"alloc");
     int gate[2];need(pipe2(gate,O_CLOEXEC)==0,"pipe");
@@ -193,6 +207,13 @@ int main(int argc,char **argv) {
         need(p>0,"wait");
         struct task *t=WIFSTOPPED(st)&&((unsigned)st>>16)==PTRACE_EVENT_EXEC?slot(p):get(p);
         if(WIFEXITED(st)||WIFSIGNALED(st)){
+            if(!(t->known&&t->born&&t->exit_seen&&!t->pending)) {
+                int saved_errno=errno;
+                fprintf(diagnostic,"REFUSE_FINAL\t%d\t%u\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%u\n",
+                        p,t->serial,st,t->tgid,t->known,t->born,t->exit_seen,t->pending,t->spawned,t->ordinal);
+                need(!ferror(diagnostic)&&fflush(diagnostic)==0,"incomplete refusal evidence");
+                errno=saved_errno;
+            }
             need(t->known&&t->born&&t->exit_seen&&!t->pending,"unclosed final task");
             fprintf(events,"T\t%u\t%d\t%d\n",t->serial,p,st);final++;
             if(p==root)root_code=WIFEXITED(st)?WEXITSTATUS(st):128+WTERMSIG(st);
@@ -225,5 +246,6 @@ int main(int argc,char **argv) {
     }
     need(root_code>=0&&exec_count>0&&serial==births+1&&serial==final+replacements,"incomplete family closure");
     fprintf(events,"OK\t%d\t%u\t%u\t%u\t%u\t%u\n",root_code,exec_count,serial,births,final,replacements);
+    need(!ferror(diagnostic)&&fclose(diagnostic)==0,"diagnostic flush");
     need(!ferror(events)&&fclose(events)==0,"ledger flush");return root_code;
 }

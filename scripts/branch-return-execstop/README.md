@@ -1,29 +1,17 @@
-# Cold Ruff worker qualification
+# Reopen the cold Ruff exit diagnostic
 
-This branch runs one uninstrumented empty reference and one kernel-observed empty build on the exact same Koff installation. Both use the 169-path study's original parent Ruff checkout and default Cargo flags. The comparison covers all 375 returned artifacts, the actual 147 MB Ruff command-line program, its independent typed AST reader, and the compiler and linker processes. The worker never acquires a performance counter. Its native stream remains useful for diagnosis if the positive observer refuses.
+Each job produces cold-Ruff-Foff-exit-diagnostic or cold-Ruff-Kon-exit-diagnostic. Keep both original ZIPs when an observed build refuses. Run the matching commands below from this exact QA checkout on Linux with Python 3.11 or newer, zstd and b3sum. Choose the refusal reader only for a worker that rejected the native family.
 
-The physical enrollment is recorded in `source-kit.json` and `historical-sources.json` in the inherited `../branch-return-pmu` tree. `cold.json` comes from the original successful cold Foff and Koff visits on different hosts. The full old pilot on those hosts subsequently stopped on a different gate. Both cold visits report the same 375-unit graph, 379 actual Rust compilations, 69 Wild links and 62 configure links. Exactly four Rust invocations came from the locked autocfg library. Its `new_crate_name` method uses an arbitrary UUID and a probe ordinal. The new checker binds the generating package, its actual out directory, contiguous owner-specific ordinals, LLVM-IR emission and physical rustc. No compiler rows are removed.
+    python3 -IB scripts/branch-return-execstop/reopen.py /path/to/first/artifact Foff > Foff.json
+    python3 -IB scripts/branch-return-execstop/reopen.py /path/to/second/artifact Kon --refusal > Kon.json
+    python3 -IB scripts/branch-return-execstop/pair.py Foff.json Kon.json
 
-The Linux observer is an unprivileged ptrace parent. Each successful exec contributes an installed executable FD, full NUL-delimited argv, working directory, AT_EXECFN and task lifetime. An ordinary errno or a task killed while a requested exec is still pending remains distinguishable from a successfully installed program. The native fixture uses an actual invalid-address exec blocked in seccomp and killed before installation. Loss or corruption of an image, argv, lifecycle or completion record fails its own decoder. A shebang's physical image is the actual interpreter. Its requested script spelling and installed arguments are also recorded.
+The kernel files are observed/cold-A/kernel.tsv.gz and kernel.tsv.exits.gz. The accepted case has independent closure, subsidiary exit audit and the counted native roster. A refused case has the exact original REFUSE and supplementary task snapshot, verified against its recorded generation. No count is imputed for an incomplete ledger. Both kinds of artifacts retain their SDK catalog, source, native controls, registered ordinary Cargo arguments and completed unwrapped CLI/reader. The checkout's PLAN.md records the exact acceptance rules.
 
-The original kernel ledger is `observed/cold-A/kernel.tsv.gz` in the extracted artifact. Its enrolled executable identities are in `observed/catalog.json`. The full live observer and native fixture ELF are under `fixtures/`. The role selection, complete Cargo streams, native evidence and independent current-host ELF bodies are nearby. The comparison does not require an old Cargo output's inode or path to match across hosts.
+From scripts/branch-return-execstop, the following commands regenerate the historical off and on receipts and exercise the host fixture suite. Both fixture destinations must be absent children of a private owned directory. The host must allow unprivileged tracing of the observer's own child.
 
-On Linux with Python 3.11 or later, zstd and b3sum, verify the extracted original using this checkout.
-
-```sh
-python3 -IB scripts/branch-return-execstop/reopen.py /path/to/extracted/artifact
-```
-
-To regenerate the two original cold compiler/link rosters and validate the separate application-specific negative tests, run these from the packet directory.
-
-```sh
-python3 -IB history.py /path/to/41200174886-01-13042772691.zip /path/to/41200174886-02-13043111933.zip | cmp - cold.json
-python3 -IB test_projection.py
-python3 -IB qualify.py --preflight
-```
-
-To run only the local event fixtures, provide two absent absolute paths under an existing, owned private directory. This needs Linux x86-64, a C compiler, OpenSSL development headers, working unprivileged ptrace and no Ruff SDK.
-
-```sh
-RUNNER_TEMP=/tmp python3 -IB fixtures.py /path/to/new-tools /path/to/new-receipts
-```
+    python3 -IB history.py /path/to/41200174886-01-13042772691.zip /path/to/41200174886-02-13043111933.zip | cmp - cold.json
+    python3 -IB history.py --grades /path/to/41200174886-01-13042772691.zip /path/to/41200174886-02-13043111933.zip | cmp - grades.json
+    python3 -IB test_projection.py
+    python3 -IB qualify.py --preflight
+    RUNNER_TEMP=/tmp python3 -IB fixtures.py /path/to/new-tools /path/to/new-receipts

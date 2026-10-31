@@ -50,13 +50,15 @@ def main(tools, out):
     assert len(native["negative"]) == 2 and len(native["mutations_rejected"]) == 16 and native["long_argument_bytes"] == 98003
     capture([sys.executable, "-IB", HERE / "test_projection.py"], out, "projection")
     projection = json.loads((out / "projection.stdout").read_bytes())
-    assert len(projection["refusals"]) == 12
+    assert len(projection["refusals"]) == 15 and projection["positive"] == ["Foff", "Kon"]
+    capture([sys.executable, "-IB", HERE / "test_exits.py", preserved], out, "exits")
+    exit_evidence = json.loads((out / "exits.stdout").read_bytes())
     for name in ("observe", "fixture"):
         shutil.copy2(tools / name, out / (name + ".elf"))
     result = {"qualified": True, "cc": cc, "cc_sha256": digest(Path(cc)), "observer_sha256": digest(tools / "observe"),
               "originals": {p.name: digest(p) for p in sorted(preserved.iterdir())},
               "sources": {p.name: digest(p) for p in sorted((HERE / "kernel").iterdir()) if p.is_file()},
-              "native": native, "ruff_projection": projection}
+              "native": native, "ruff_projection": projection, "exit_evidence": exit_evidence}
     with (out / "qualified.json").open("x") as f:
         json.dump(result, f, sort_keys=True, separators=(",", ":"))
         f.write("\n")

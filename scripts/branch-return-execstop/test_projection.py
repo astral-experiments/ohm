@@ -53,12 +53,12 @@ def setup():
 
 def suite():
     baseline, rows, catalog, expected = setup()
-    def project(d, text, directory):
+    def project(d, text, directory, arm="Foff"):
         from processes import other_link
         p = directory / "fixture.tsv"
         p.write_text("".join(text))
         return images.inventory(p, {"execs": d, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()},
-                                catalog, expected, other_link)
+                                catalog, expected, other_link, arm)
     failures = {}
     with tempfile.TemporaryDirectory() as tmp:
         directory = Path(tmp)
@@ -89,7 +89,20 @@ def suite():
                 failures[case] = str(err)
             else:
                 raise AssertionError((case, "qualified corrupt projection"))
-    return {"positive": "synthetic native-role projection", "refusals": failures}
+        enabled = copy.deepcopy(baseline)
+        enabled[1]["argv"].append("-Zohm-branch-cache=yes")
+        need(project(enabled, rows, directory, "Kon")["wild"] == 1, "physical on mode")
+        for case, additions in (("on-missing", []), ("on-other", ["-Zohm-branch-cache=no"]),
+                                ("on-duplicate", ["-Zohm-branch-cache=yes"] * 2)):
+            bad = copy.deepcopy(baseline)
+            bad[1]["argv"].extend(additions)
+            try:
+                project(bad, rows, directory, "Kon")
+            except ValueError as err:
+                failures[case] = str(err)
+            else:
+                raise AssertionError(case)
+    return {"positive": ["Foff", "Kon"], "refusals": failures}
 
 
 if __name__ == "__main__":

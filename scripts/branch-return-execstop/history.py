@@ -78,5 +78,17 @@ def registration(first, second):
     return {"originals": [origin1, origin2], "typed": origin1["typed"], "native": a, "successful_execs": 4188}
 
 
+def grades(first, second):
+    """Reopen the historical on and off rosters, retaining only the variable link names."""
+    off = registration(first, second)
+    a, orig_a = original(Path(first), "Fon")
+    b, orig_b = original(Path(second), "Kon")
+    need(a == b and all(r["successful_execs"] == 4188 and r["typed"] == off["typed"] for r in (orig_a, orig_b)),
+         "original enabled cold visits disagree")
+    need({k for k in a if a[k] != off["native"][k]} == {"wild_outputs"}, "unexpected grade-specific differences")
+    return {"originals": [orig_a, orig_b], "on_wild_outputs": a["wild_outputs"]}
+
+
 if __name__ == "__main__":
-    print(json.dumps(registration(*sys.argv[1:]), separators=(",", ":"), sort_keys=True))
+    selector, args = (grades, sys.argv[2:]) if sys.argv[1:2] == ["--grades"] else (registration, sys.argv[1:])
+    print(json.dumps(selector(*args), separators=(",", ":"), sort_keys=True))

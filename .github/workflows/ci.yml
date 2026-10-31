@@ -1,5 +1,5 @@
-name: Qualify the Linux exec observer on a cold Ruff build
-run-name: Cold Ruff Koff native qualification ${{ inputs.reviewed_head }}
+name: Diagnose Linux task exits on two cold Ruff builds
+run-name: Unscored cold Ruff exit diagnostic ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -12,7 +12,14 @@ permissions:
   contents: read
 jobs:
   native:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-return-execstop-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-return-exit-events-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    name: Cold Ruff exit diagnostic (${{ matrix.arm }})
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [Foff, Kon]
+    env:
+      COLD_ARM: ${{ matrix.arm }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 225
     steps:
@@ -74,12 +81,21 @@ jobs:
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/branch-return-execstop/qualify.py "$GITHUB_WORKSPACE/source" "$base/tools/observe" "$base/logs/fixtures/qualified.json"
-          python3 -IB enrolled/scripts/branch-return-execstop/reopen.py "$base/logs" > "$base/logs/offline-reopened.json"
+          python3 -IB enrolled/scripts/branch-return-execstop/qualify.py "$GITHUB_WORKSPACE/source" "$base/tools/observe" "$base/logs/fixtures/qualified.json" "$COLD_ARM"
+      - name: Independently reopen a successful or refused observation
+        if: always()
+        run: |
+          set -euo pipefail
+          logs="$RUNNER_TEMP/ohm-branch-object-qa/logs"
+          if test -f "$logs/complete.json"; then
+            python3 -IB enrolled/scripts/branch-return-execstop/reopen.py "$logs" "$COLD_ARM" > "$logs/offline-reopened.json"
+          elif test -f "$logs/observed/cold-A/kernel.tsv.exits.gz"; then
+            python3 -IB enrolled/scripts/branch-return-execstop/reopen.py "$logs" "$COLD_ARM" --refusal > "$logs/offline-refusal.json"
+          fi
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: cold-Ruff-Koff-exec-qualification
+          name: cold-Ruff-${{ matrix.arm }}-exit-diagnostic
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

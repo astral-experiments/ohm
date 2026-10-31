@@ -37,8 +37,9 @@ def predecessors(ledger, sha):
     return before, interrupted
 
 
-def inventory(ledger, verified, catalog, expected, other_link):
+def inventory(ledger, verified, catalog, expected, other_link, arm):
     """Project only the independently closed kernel images, using physical identities."""
+    need(arm in ("Foff", "Kon"), "unregistered cold arm")
     identities = {}
     lookups = {}
     for role, row in catalog.items():
@@ -78,8 +79,9 @@ def inventory(ledger, verified, catalog, expected, other_link):
             need(not any(a in ("link-only", "ohm-link-only") or a.startswith(("link-only=", "-Zlink-only")) for a in argv),
                  ("link-only on a true empty", crate))
             if crate in {"ruff", "ruff_python_ast", "ruff_python_parser"}:
-                need("-Zohm-check-relink-inputs" in argv and not any("ohm-branch-cache" in a for a in argv),
-                     ("unexpected Koff compiler flags", crate))
+                retention = [a for a in argv if "ohm-branch-cache" in a]
+                need("-Zohm-check-relink-inputs" in argv and retention == (["-Zohm-branch-cache=yes"] if arm == "Kon" else []),
+                     ("unexpected native compiler flags", arm, crate))
             rustcs.append({**row, "crate": crate, "mode": "full"})
         elif role == "cargo":
             (cargo_queries if argv[1:] in (["--version"], ["-V"], ["-Vv"]) else cargos).append(row)
