@@ -50,6 +50,13 @@ def test(tmp):
         fixture.project(out,name,lock);body=(out/'src/main.rs').read_text();require('qa_rc22_value' in body and 'qa_rc22_origin' in body and 'asm!' not in body and 'global_asm!' not in body and 'rerun-if-changed=build.rs' in (out/'build.rs').read_text(),'native provenance fixture')
     home=tmp/'platform';receipts=tmp/'receipts';receipts.mkdir()
     vals=fixture.providers(home,receipts);fixture.configure(home,vals,'low');fixture.configure(home,vals,'high29')
+    blob=vals[17];obj=(receipts/'17-member.o').read_bytes()
+    for body,name,contents,apple in [(blob+b'x','member.o',obj,host()==APPLE),
+            (blob,'other.o',obj,host()==APPLE),(blob,'member.o',obj[:-1],host()==APPLE),
+            (blob,'member.o',obj,host()!=APPLE),(blob[:8]+blob[8:]+blob[8:],'member.o',obj,host()==APPLE)]:
+        try:fixture.provider_archive(body,name,contents,apple)
+        except RuntimeError:pass
+        else:raise RuntimeError('invalid provider archive admitted')
     good=fixture.configure(home,vals,'high41');bad=fixture.configure(home,vals,'bad');repair=fixture.configure(home,vals,'high29')
     for change in [good,bad,repair]:
         before,after=change['early'].values();require(before['sha256']!=after['sha256'] and all(before[k]==after[k] for k in ('ino','dev','bytes','mtime_ns')),'same-stat controls')

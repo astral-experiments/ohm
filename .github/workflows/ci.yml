@@ -10,13 +10,12 @@ concurrency:
 jobs:
   sdk:
     name: Native SDK (${{ matrix.triple }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-markers-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-markers-apple-20261031'
     timeout-minutes: 300
     strategy:
       fail-fast: false
       matrix:
         include:
-          - {triple: x86_64-unknown-linux-gnu, runner: namespace-profile-ubuntu-24-04-16}
           - {triple: aarch64-apple-darwin, runner: namespace-profile-macos-15}
     runs-on: ${{ matrix.runner }}
     steps:
@@ -95,13 +94,12 @@ jobs:
   provider:
     name: Ordinary native providers (${{ matrix.triple }})
     needs: sdk
-    if: ${{ always() && !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-markers-20261031' && (needs.sdk.result == 'success' || needs.sdk.result == 'failure') }}
+    if: ${{ always() && !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-markers-apple-20261031' && (needs.sdk.result == 'success' || needs.sdk.result == 'failure') }}
     timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
         include:
-          - {triple: x86_64-unknown-linux-gnu, runner: namespace-profile-ubuntu-24-04-16}
           - {triple: aarch64-apple-darwin, runner: namespace-profile-macos-15}
     runs-on: ${{ matrix.runner }}
     steps:

@@ -36,3 +36,12 @@ test "$(/home/dev-user/.local/bin/gh-auto api repos/astral-experiments/ohm/git/r
 ```
 
 The source of the classifier and both Cargo readers are available at [the release compiler](https://github.com/astral-experiments/ohm-rust/blob/625207d26ce4449c9c95d871c88cfb50e904c09f/compiler/rustc_codegen_llvm/src/asm.rs#L1579-L1618), [marker emission](https://github.com/astral-experiments/ohm-rust/blob/625207d26ce4449c9c95d871c88cfb50e904c09f/compiler/rustc_interface/src/passes.rs#L712-L717), and [the pinned Cargo reader](https://github.com/astral-experiments/ohm-cargo/blob/2554a1dfaf22474b360a4298883acf41f82bd78f/src/compiler/fingerprint/dep_info.rs#L604-L620).
+
+
+The Apple-only continuation preserves run 41212542603 and its GNU SDK job.
+The original Xcode 16.0 worker refused its archive listing during protocol
+preflight, before Rust source acquisition. The continuation qualifies the actual
+archive index followed by one byte-identical provider object. It records the
+platform listing separately. Six native Xcode archive/object pairs from
+41114554812 used `__.SYMDEF SORTED`, while LLVM Darwin format used `__.SYMDEF`.
+Both SDKs and both Cargo source identities stay fixed.

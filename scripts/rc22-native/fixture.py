@@ -41,6 +41,31 @@ def project(src,kind,upstream):
     if kind=='objc2':require(main['dependencies']==['objc2-encode'],'foreign objc2 dependency graph')
     return {f:sha(src/f) for f in ('Cargo.toml','src/main.rs','build.rs','Cargo.lock')}
 
+def provider_archive(body, object_name, object_body, apple):
+    """Bind the only object and its order independently of how the platform ar lists its index."""
+    require(body.startswith(b'!<arch>\n'), 'wrong archive magic')
+    pos=8; members=[]
+    while pos<len(body):
+        header=body[pos:pos+60]
+        require(len(header)==60 and header[58:]==b'`\n', 'broken native member header')
+        size=int(header[48:58]);start=pos+60;end=start+size
+        require(0<size and end<=len(body), 'native member size')
+        name=header[:16].rstrip(b' ');payload=body[start:end]
+        if name.startswith(b'#1/'):
+            n=int(name[3:])
+            require(0<n<len(payload), 'broken BSD extended member')
+            name=payload[:n].rstrip(b'\x00');payload=payload[n:]
+        elif name!=b'/':
+            name=name.removesuffix(b'/')
+        members.append((name.decode('ascii'),payload))
+        pos=end+size%2
+        require(pos<=len(body) and body[end:pos] in (b'',b'\n'), 'broken archive padding')
+    expected=('__.SYMDEF','__.SYMDEF SORTED') if apple else ('/',)
+    require(len(members)==2 and members[0][0] in expected and members[1][0]==object_name,
+            ('unexpected native members',[k for k,_ in members]))
+    require(members[1][1]==object_body, 'archived provider object differs')
+    return [k for k,_ in members]
+
 def providers(base,receipts):
     for name in ('early','late','source'):(base/name).mkdir(parents=True)
     wd=base/'source';src=wd/'member.c';obj=wd/'member.o'
@@ -52,10 +77,11 @@ def providers(base,receipts):
         subprocess.run([cc,'-O2','-g0','-c',src,'-o',obj],check=True)
         output=wd/('role-'+str(value)+'.a')
         subprocess.run([ar,'crs',output,obj.name],cwd=wd,check=True,env={**os.environ,'ZERO_AR_DATE':'1'})
-        require(run([ar,'t',output])==obj.name,'wrong archive member')
-        body=output.read_bytes();require(body.startswith(b'!<arch>\n') and body.count(obj.read_bytes())==1,'not a real object')
+        body=output.read_bytes()
+        members=provider_archive(body,obj.name,obj.read_bytes(),host()==APPLE)
+        listing=run([ar,'t',output]).splitlines()
         for f in (obj,output):shutil.copy2(f,receipts/(str(value)+'-'+f.name))
-        proof[str(value)]={'source':text,'archive_sha256':sha(output),'object_sha256':sha(obj),'bytes':len(body)}
+        proof[str(value)]={'source':text,'archive_sha256':sha(output),'object_sha256':sha(obj),'bytes':len(body),'members':members,'ar_t':listing}
         bodies[value]=body
     require(len({len(b) for b in bodies.values()})==1 and len(set(bodies.values()))==3,'same-stat native challenge inadmissible')
     save(receipts/'providers.json',{'cc':ident(cc),'ar':ident(ar),'bodies':proof});return bodies
