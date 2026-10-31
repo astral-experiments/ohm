@@ -16,10 +16,14 @@ from bindings import OUT, ROOT, WORK, need, save, sha
 from extra_provider import exercise
 
 b = worker.b
-PLAN = "52075870a19ae3b0944c2b7341d6d0c8737127465a21eb85aff305dd55c50aae"
-BRANCH = "charlie/qa-packed-ordinary-efficacy-20261031"
-ORDERS = {"01": ("Koff", "Kon"), "02": ("Kon", "Koff")}
+PLAN = "0fa12e49ce2857c57f8ebace3b4743189651d9664bda74e9bfefa77c219a475f"
+PILOT_PLAN = "52075870a19ae3b0944c2b7341d6d0c8737127465a21eb85aff305dd55c50aae"
+PILOT_RUN = 41217046302
+BRANCH = "charlie/qa-packed-ordinary-confirmation-20261031"
+ARMS = ("Koff", "Kon")
 PREVIOUS_BOOTS = {
+    "78a866b0-afbc-4843-a44c-17a8d5bf8e1a",
+    "efc22aa1-dd29-4916-985b-d7a54f481433",
     "0f45fd59-1c8c-4474-8ab8-e9886ad48fda",
     "12c3aea9-28c1-4831-a481-1b614286b3b4",
     "198293fe-416e-48d0-aef9-0611a36675a0",
@@ -34,9 +38,18 @@ PREVIOUS_BOOTS = {
 }
 
 
+def assignment(cohort, position):
+    need(
+        cohort in ("c1", "c2") and position in {f"{i:02}" for i in range(1, 13)},
+        "unknown position",
+    )
+    off_first = (int(position) % 2 == 1) == (cohort == "c1")
+    return ARMS if off_first else tuple(reversed(ARMS))
+
+
 def compare_clean(refs):
     for branch in ("A", "B"):
-        off, on = (refs[arm, branch] for arm in ORDERS["01"])
+        off, on = (refs[arm, branch] for arm in ARMS)
         need(
             off["typed"] == on["typed"] and off["graph"] == on["graph"],
             "clean typed graph",
@@ -50,7 +63,7 @@ def compare_clean(refs):
 
 def compare_histories(records):
     for phase, _ in worker.PHASES:
-        for arm in ORDERS["01"]:
+        for arm in ARMS:
             ordinary, measured = (
                 records[lane, arm][phase] for lane in ("ordinary", "measured")
             )
@@ -71,21 +84,23 @@ def compare_histories(records):
                 ordinary["instructions"] is None and measured["instructions"] > 0,
                 ("only the calibrated command can carry counts", arm, phase),
             )
-        left, right = (records["ordinary", arm][phase] for arm in ORDERS["01"])
+        left, right = (records["ordinary", arm][phase] for arm in ARMS)
         for key in ("source", "status", "graph", "dirty_digest"):
             need(left.get(key) == right.get(key), ("same-SDK matched arm", phase, key))
 
 
 def main(position, source, calibrator, observers, provider):
-    order = ORDERS[position]
+    cohort = os.environ["COHORT"]
+    order = assignment(cohort, position)
     head = os.environ["GITHUB_SHA"]
     need(
         os.environ["GITHUB_REPOSITORY"] == b.REPO
         and os.environ["GITHUB_REF"] == "refs/heads/" + BRANCH
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and head == os.environ["REVIEWED_HEAD"] == b.git(HERE, "rev-parse", "HEAD")
-        and sha(HERE / "PLAN.md") == PLAN,
-        "screen identity",
+        and sha(HERE / "CONFIRMATION.md") == PLAN
+        and sha(HERE / "PLAN.md") == PILOT_PLAN,
+        "confirmation identity",
     )
     trees = b.git(
         HERE,
@@ -117,7 +132,7 @@ def main(position, source, calibrator, observers, provider):
     )
     for name in ("clean", "ordinary", "measured", "providers", "initial"):
         (OUT / name).mkdir()
-    shutil.copy2(HERE / "PLAN.md", OUT / "PLAN.md")
+    shutil.copy2(HERE / "CONFIRMATION.md", OUT / "PLAN.md")
     shutil.copy2(b.RUNTIME, OUT / "source-kit.json")
     worker.link_diagnostic.acquire()
     subprocess.run(
@@ -134,6 +149,8 @@ def main(position, source, calibrator, observers, provider):
         OUT / "enrollment.json",
         dict(
             position=position,
+            cohort=cohort,
+            pilot_run=PILOT_RUN,
             order=order,
             head=head,
             attempt=1,
@@ -187,6 +204,8 @@ def main(position, source, calibrator, observers, provider):
         OUT / "complete.json",
         dict(
             host_complete=True,
+            cohort=cohort,
+            position=position,
             arms=order,
             phases=[p for p, _ in worker.PHASES],
             raw_counts_unscaled=True,
