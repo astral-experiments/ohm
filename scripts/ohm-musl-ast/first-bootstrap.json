@@ -1,0 +1,59 @@
+{
+  "files_per_source_slice": [
+    64,
+    57,
+    117
+  ],
+  "failure": "2026-10-31T03:57:18.0863803Z FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/ohm-aarch64-linux-zmij/rust/build/x86_64-unknown-linux-gnu/stage1/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-319ab9ba5de9a3e1.rlib'",
+  "frozen_host": [
+    "lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-319ab9ba5de9a3e1.rlib",
+    [
+      "1a745fce5d3c8d2776f6b44b4b74e06803cc50a4fe5569f06076c275e3f5b901",
+      27402,
+      420
+    ]
+  ],
+  "missing_live_relative_path": "lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-319ab9ba5de9a3e1.rlib",
+  "normal_ruff_visits": 0,
+  "not_in_last_cross_slice": true,
+  "note": "The live stage1 retained the cross sysroot. The source builder had already frozen the matching host object by its recorded SHA-256.",
+  "original": {
+    "artifact": [
+      13028503377,
+      "sha256:f4c87ebd5e5a4ac5971801be678899f2e2ffb2499dc3f03c15d0547e9ca7184c",
+      24955
+    ],
+    "conclusion": "failure",
+    "head": "fd9b546a7581582aba666a305d9ebc38bbb7cbb1",
+    "job": 124434501961,
+    "run": 41166300262,
+    "runner": "nsc-runner-sp41f0rcbf6mm"
+  },
+  "source": {
+    "compiler": "359e5df0ebc4613cedf4518a021a16790d94f7d5",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "reproduced_driver": [
+      "45d8737f938d6ed97be5903342718f087d0af6ea710dd3c2416babc8c570d4b7",
+      142781688,
+      493
+    ],
+    "sha": "4ed3e4d1fa1da4e93f8c761751b3c81dd55ff6cd"
+  },
+  "verified_transfers": {
+    "artifacts": {
+      "gnu-atomic-registered-compiler": [
+        13019785650,
+        "sha256:5df2159acdd551b3b6812a5025509b5a42c21d93fdfe2288023d81eb5c40fb23",
+        34684290
+      ],
+      "gnu-atomic-source-cargo": [
+        13019926099,
+        "sha256:388e6b8eff4a62bf2d13192b636150397aef60fdf03c86444afedaa1595f1e9b",
+        16812895
+      ]
+    },
+    "attempt": 1,
+    "head": "20cf3bd81dd7d30009ae75062eed9acf113f935a",
+    "run": 41141810291
+  }
+}
