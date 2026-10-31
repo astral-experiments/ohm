@@ -146,6 +146,20 @@ def case(root,kit,receipt,kind,history,cache=None):
     return 3*len(result)
 
 
+def current_linker(kit,receipt):
+    entry,=receipt['native_linkers']
+    if host()==GNU:
+        name=Path('lib/rustlib')/GNU/'bin/wild-ld/ld.bfd'
+        require(entry['kind']=='bundled-wild' and entry['path']==str(name) and entry['sha256']==WILD,'wrong GNU linker in native source receipt')
+        tool=kit/'sdk'/name;version=run([tool,'--version'])
+        require(version==entry['version'],'different bundled Wild version')
+    else:
+        tool=Path(run(['/usr/bin/xcrun','-f','ld'])).resolve(strict=True)
+        version=run(['/usr/bin/xcodebuild','-version'])
+        require(entry['kind']=='xcode-ld' and str(tool)==entry['path'] and version==entry['toolchain'],'different selected Xcode linker')
+    identity=ident(tool);require(identity['sha256']==entry['sha256'],'host linker bytes differ from admitted native SDK')
+    return {'image':identity,'version':version,'kind':entry['kind']}
+
 def execute(root,bundle,expected,cache=None):
     root.mkdir();kit=root/'kit';receipt=reopen(bundle,kit)
     sys.path.insert(0,str(seed('marker-reader')/'scripts/ohm-musl-ast-pair/v2'))
@@ -154,6 +168,7 @@ def execute(root,bundle,expected,cache=None):
     require(receipt['qa']=={'GITHUB_JOB':'sdk','GITHUB_REPOSITORY':'astral-experiments/ohm','GITHUB_RUN_ATTEMPT':'1','GITHUB_RUN_ID':str(expected['run']),'GITHUB_SHA':expected['head']},'wrong native source build')
     require(sha(bundle/'kit.tar.zst')==expected['kit'] and sha(bundle/'members.json')==expected['members'] and sha(bundle/'receipt.json')==expected['receipt'],'wrong restored official SDK')
     r=root/'receipts';(r/'cas').mkdir(parents=True);save(r/'source-release.json',receipt);save(r/'original.json',expected)
+    linker=current_linker(kit,receipt);save(r/'host-linker-before.json',linker)
     reports={}
     for kind in (('zmij','objc2') if host()==APPLE else ('zmij',)):
         for history in ('baseline','fixed','migration'):
@@ -163,6 +178,8 @@ def execute(root,bundle,expected,cache=None):
                 reports[kind+'-'+history]=traceback.format_exc()
                 save(r/(kind+'-'+history+'-refused.json'),{'traceback':reports[kind+'-'+history]})
                 print(reports[kind+'-'+history],flush=True)
+    final=current_linker(kit,receipt);save(r/'host-linker-after.json',final)
+    require(final==linker,'native linker changed across ordinary visits')
     save(r/'account.json',reports)
     require(all(type(n) is int and n==33 for n in reports.values()),'incomplete, see raw refusal')
     save(r/'complete.json',{'visits':sum(reports.values()),'cases':reports,'host':host(),'literal_command':['cargo','+ohm','build','--locked','--offline','-j4','--message-format=json'],'native_launch_count':None,'kit':expected['kit']})

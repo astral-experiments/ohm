@@ -17,6 +17,11 @@ def verify(root,reference):
     require(source['rust']['commit']==RUST and source['rust']['tree']==RTREE and all((source['cargos'][s]['commit'],source['cargos'][s]['tree'])==r for s,r in ROLES.items()),'foreign compiler or Cargo')
     target=source['rust']['host'];all_kinds=['zmij'] if target==GNU else ['zmij','objc2']
     require(target in (GNU,APPLE) and index['host']==target and index['native_launch_count'] is None,'collector scope')
+    linker=read(root/'host-linker-before.json');published,=source['native_linkers']
+    require(linker==read(root/'host-linker-after.json') and linker['kind']==published['kind'] and linker['image']['sha256']==published['sha256'],'different host native linker')
+    if target==GNU:require(published['sha256']==WILD and linker['version']==published['version'] and linker['image']['path'].endswith('/sdk/'+published['path']),'uncertified GNU Wild')
+    else:require(linker['image']['path']==published['path'] and linker['version']==published['toolchain'],'uncertified Apple ld')
+
     sys.path.insert(0,str(seed('marker-reader')/'scripts/ohm-musl-ast-pair/v2'));import evidence
     cas={}
     for p in (root/'cas').glob('*.gz'):
