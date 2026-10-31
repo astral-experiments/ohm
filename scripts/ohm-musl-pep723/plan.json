@@ -1,0 +1,65 @@
+{
+  "C": "d52336754e01c65758f0be7335b191be47baf02f",
+  "E0308": {
+    "byte_end": 9317,
+    "byte_start": 9295,
+    "line": 300
+  },
+  "P": "adea62b64bb86ad18946457dfb59f36b2d8fcab4",
+  "admission_sha256": "e9e11fbec680e55e877e22401957e7d77f40edff54acbd09165a6b7a74135c61",
+  "anchor": "helpers::tests::any_over_stmt_type_alias",
+  "cargo": "c18e91b514b2c4e4966c9ab03232c804af3e1b57",
+  "normal_argv": [
+    "cargo",
+    "+ohm",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "ruff_python_ast",
+    "--lib",
+    "--no-run",
+    "--target",
+    "x86_64-unknown-linux-musl",
+    "-j4",
+    "--message-format=json"
+  ],
+  "qa_head": "89a055549f4335e6e172f96c65d162dcd9cb1046",
+  "source_registration": "8f2bc6bb73acecf9dd4fc8450cba35c0e6e9ce140e93899a936f296e8340c587",
+  "states": {
+    "invalid": "e4bc1ca131176cad792ac19af74c25cc9610fbed044738072b9bd537cfc68de5",
+    "new": "6940edeafc67a0cfbc2c29ca238f90dcb3d091c9e3696b8e2a0cec0cd915200f",
+    "wrong": "4ae297ae2757dfb16bd414f48048d7489dd48163cf81812ef3f77d3210d15345"
+  },
+  "tested_same_source_baseline_sha256": "69299ba2847c203be227919caa37a8e6ba74ff8d35cccaed8c904b02d34253dc",
+  "venues": [
+    "old",
+    "edit",
+    "unchanged",
+    "settled",
+    "wrong",
+    "invalid",
+    "repair",
+    "empty-new",
+    "empty-old",
+    "empty-wrong",
+    "empty-invalid"
+  ],
+  "verified_input_files": {
+    "composite.py": "2fc067323f98be3013a47b8f27e100092a309c9bf9c7e055b8dbf572a8cc5152",
+    "lookup.py": "70feb1c702447e1af3b4f5cee429d77d408a34c9fe3f9619d718d199ddbe2bb3",
+    "original-source-and-ordinary.json": "f40006f622335cc400aa42533f04ff4f9c29bde398c7144b63250795cb1e94eb",
+    "parent.json": "b82d00c57662d25a910e96b8bf60fd2e0f011a379866d30404b7a026f5860d50",
+    "prior-native-replay.json": "1cce40745ce7df3da56ce1f4fa57cd0d45af2a7e5e456537b84cf2a8f83287ad",
+    "provider_stage.py": "46192a1628ed78dbbb8280a0841694c70ba8c3c53745cd3401e66afdad647b82",
+    "restore.py": "acc6ce2fc507808cd0f549ee218062d1d8090a092fa826313b8eda65b2a8cdbe",
+    "rustdoc_audit.py": "efa00f8e3b2a5a0da3808f1b04b64f4d932b3de524342d8a87b2ab0099ff721a",
+    "source.json": "4177a4e8baf50347861b1e789e5ec4ba5eccff5aea6df944606085801229add8",
+    "subjects.py": "16948ef6af70fd230c47a341d81b28a4e3970cbb9f9da3cc06eb711bbb4068a8",
+    "v2/evidence.py": "253162420c2b030e1ba3c9ae8556a0dbc7bf4e680b2a509299b3e182b6aa4872",
+    "v2/fixture.py": "67924e8d5a55e579df22f2f0d243ff4f11f790efa0db2b9839f5323e5c9b3dd5",
+    "v2/guard.py": "97fdc5412b4192bd98f5e0d0775767c660adc95f6268264c233a1783ceb99627",
+    "v2/subjects.py": "6812df19f273b5a50f3b58a6c0b6d94da70dd94fc3d0bf046d600facbbc8e572"
+  },
+  "wrong_test": "script::tests::last_closing_delimiter_discards_following_comments"
+}

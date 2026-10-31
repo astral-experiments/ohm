@@ -1,0 +1,45 @@
+{
+  "old": {
+    "commit": "b96364cbf66e27df3c87beed5923f561f033b52c",
+    "tree": "f800057496de6ba68020cd30d7cd1ae39f8cfa2a",
+    "path": "crates/ruff_python_ast/src/script.rs",
+    "file_sha256": "7ca42768b998fbea5e9da81649f8e005e1110579d54eec5f6fcb118b57d8fd39",
+    "cargo_lock_sha256": "f5b5d7a44b61456e332ec18d8e78fca45740e79e179cc14f7a7eaf5deb6da57e",
+    "selected_registry_inputs": {
+      "compact_str": [
+        "0.10.0",
+        "79fcda08c33bb58b97008b2cdada6622500e949e060f5913361763121abd2416"
+      ],
+      "zmij": [
+        "1.0.10",
+        "30e0d8dffbae3d840f64bda38e28391faef673a7b5a6017840f2a106c8145868"
+      ]
+    },
+    "tests_in_this_file": []
+  },
+  "new": {
+    "commit": "672bb4edf04c84f8b0753346359daee4057158f2",
+    "tree": "37c0250911edfe5f888c2db4652c4190e2afb9f2",
+    "path": "crates/ruff_python_ast/src/script.rs",
+    "file_sha256": "6940edeafc67a0cfbc2c29ca238f90dcb3d091c9e3696b8e2a0cec0cd915200f",
+    "cargo_lock_sha256": "e37036fd781578faeafa15fc0a09b938dd78bd160c8e3be958dfb74eb975f61c",
+    "selected_registry_inputs": {
+      "compact_str": [
+        "0.10.0",
+        "79fcda08c33bb58b97008b2cdada6622500e949e060f5913361763121abd2416"
+      ],
+      "zmij": [
+        "1.0.10",
+        "30e0d8dffbae3d840f64bda38e28391faef673a7b5a6017840f2a106c8145868"
+      ]
+    },
+    "tests_in_this_file": [
+      "carriage_return_line_endings",
+      "metadata_block_range_includes_both_delimiters",
+      "metadata_range_accounts_for_unicode_crlf_and_multiline_values",
+      "last_closing_delimiter_discards_following_comments"
+    ]
+  },
+  "meaning": "Historical AST implementation change that also adds four real unit tests. A future independent test-build study can demand a changed test-binary inventory. No candidate or timing observations are attached.",
+  "lock_change": "diff --git a/Cargo.lock b/Cargo.lock\nindex 65d26aed2e..3f710cce15 100644\n--- a/Cargo.lock\n+++ b/Cargo.lock\n@@ -3698,0 +3699 @@ dependencies = [\n+ \"ruff_python_ast\","
+}

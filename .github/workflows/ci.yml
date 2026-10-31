@@ -1,61 +1,82 @@
-name: Qualify the musl compiler on the reviewed Ruff AST edit
+name: Check Ruff's edited musl PEP 723 test executable
 on:
   workflow_dispatch:
 permissions:
   actions: read
   contents: read
 jobs:
-  provider:
-    name: Unbundled native provider (${{ matrix.layout }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-musl-ast-reviewed-compiler'
+  historical-tests:
+    name: Compare two source-built rustc drivers on Ruff's four new tests
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-musl-pep723-structural-20261031'
     runs-on: ubuntu-24.04
-    timeout-minutes: 100
-    strategy:
-      fail-fast: false
-      matrix:
-        layout: [private, shared]
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          path: harness
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 89a055549f4335e6e172f96c65d162dcd9cb1046
+          path: qualification
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify both compiler drivers and three physically distinct Cargo readers
+      - name: Verify the registered study and the original source and native provider artifacts
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends musl-tools strace zstd b3sum
-          bash scripts/ohm-musl-ast-pair/native-volume.sh
-      - name: Reopen the exact source and original Ruff results and exercise all seven real hardlinks
+          (cd harness/scripts/ohm-musl-pep723; sha256sum --strict --check SHA256SUMS)
+          cd qualification
+          test "$(git rev-parse HEAD)" = 89a055549f4335e6e172f96c65d162dcd9cb1046
+          python3 -IB scripts/ohm-musl-ast-pair/lookup.py 41173218253 89a055549f4335e6e172f96c65d162dcd9cb1046 >> "$GITHUB_ENV"
+      - name: Restore all 183 parent SDK members and the independent candidate driver
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          RUNNER_TEMP="$MUSL_GUARD_VOLUME" QA_ROOT="$MUSL_GUARD_VOLUME/ohm-aarch64-linux-zmij" \
-            python3 -IB scripts/ohm-musl-ast-pair/provider_stage.py stage "$MUSL_GUARD_EVIDENCE"
-      - name: Exercise the v2 producer and both older Cargo readers
-        env:
-          LAYOUT: ${{ matrix.layout }}
+          export QA_ROOT="$RUNNER_TEMP/ohm-aarch64-linux-zmij"
+          cd qualification
+          python3 -IB scripts/ohm-musl-ast-pair/restore.py P
+      - name: Run both complete Ruff test-build histories and invoke each real static test executable
         run: |
           set -euo pipefail
-          cd scripts/ohm-musl-ast-pair/v2
-          sha256sum --strict --check SHA256SUMS
-          subject="$MUSL_GUARD_EVIDENCE/guard-subjects.json"
-          status=0
-          for suite in mechanism signed strict; do
-            args=(--suite mechanism)
-            if [[ $suite != mechanism ]]; then args=(--suite migration --legacy "$suite"); fi
-            python3 -IB guard.py --subjects "$subject" --work "$MUSL_GUARD_VOLUME/native-guard/$suite" \
-              --out "$MUSL_GUARD_EVIDENCE/$suite" --layout "$LAYOUT" "${args[@]}" || status=1
+          python3 -IB harness/scripts/ohm-musl-pep723/run.py \
+            --qa "$GITHUB_WORKSPACE/qualification" --receipts "$RUNNER_TEMP/musl-ast/receipts" \
+            --work "$RUNNER_TEMP/pep723-pair-work" --out "$RUNNER_TEMP/pep723-pair-results"
+      - name: Seal all native streams and exact source manifests
+        if: always()
+        run: |
+          set -euo pipefail
+          dir="$RUNNER_TEMP/pep723-pair-results"
+          mkdir -p "$dir/admission"
+          cp harness/scripts/ohm-musl-pep723/{SHA256SUMS,plan.json,admission.json,source.json} "$dir/admission/"
+          for name in sdk.json guard-subjects.json; do
+            item="$RUNNER_TEMP/musl-ast/receipts/$name"
+            if test -f "$item"; then cp "$item" "$dir/admission/"; fi
           done
-          exit "$status"
+          identity="$RUNNER_TEMP/musl-ast/reopened/identity.json"
+          if test -f "$identity"; then cp "$identity" "$dir/admission/transfer-identity.json"; fi
+          cd "$dir"
+          python3 -IB - <<'PY'
+          import hashlib,os
+          from pathlib import Path
+          rows=[]
+          for f in sorted(Path('.').rglob('*')):
+              if f.is_file():
+                  with f.open('rb') as stream: digest=hashlib.file_digest(stream,'sha256').hexdigest()
+                  rows.append(f'{digest}  {f.as_posix()}\n')
+          with Path('SHA256SUMS').open('x') as out: out.writelines(rows)
+          print('Source, raw records and executable members:',len(rows))
+          PY
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: musl-285-native-${{ matrix.layout }}
-          path: ${{ runner.temp }}/musl-provider-evidence
-          retention-days: 14
+          name: musl-pep723-real-test-pair
+          path: ${{ runner.temp }}/pep723-pair-results
           if-no-files-found: error
+          retention-days: 14
