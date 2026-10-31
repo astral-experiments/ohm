@@ -12,10 +12,12 @@ import tempfile
 HERE = Path(__file__).resolve().parent
 SIGNED = "c79998a5cd143c445a4b2528f20953b176a65c5d"
 BASE = "4e7c5b1f765b24ccd585d8ddb7eeae99a02b514e"
-FORWARD = "96e6c29c1ed9bf7229ef3b89843712139529cd10"
-COMBINED = "b79ec99c44772853c313161bee2bbfaecc80e0de"
+FORWARD = "51e72261c0b36dfd49c078b35732956d6b950e8e"
+COMBINED = "11876886792274b44a9a37567fbac57bf843a24c"
 HISTORICAL_F = "e420faa7fc34004b5e56b2c9f1456ae2ee5eab50"
 HISTORICAL_C = "19d9b2a1d88e470ea2bea2e29b3b65a74ab08850"
+PRE_LINT_F = "96e6c29c1ed9bf7229ef3b89843712139529cd10"
+PRE_LINT_C = "b79ec99c44772853c313161bee2bbfaecc80e0de"
 SIGNED_TREE = "77ad1e80afc956a830491544d43695ec699fac2e"
 COMPILER = "b429aa02503b16993d9b8f94a6ab17f4f3bfaa01"
 LIBRARY = "4f7a8f755164dc68fff80790db8a844ae030fd03"
@@ -26,13 +28,13 @@ LIVE_TREES = {
     "P": (BASE, "d0647532bd782f92e3155bb0158de5a3c9b339bb", COMPILER),
     "F": (
         FORWARD,
-        "611c96dce4a45e85551e12418bbdf262181aa4d8",
-        "d6974700d89c4081ce287a1f798ce516d17e2950",
+        "aacfb9fcda863558da825e194e113b07a77d20d6",
+        "84107218ae14ae41937c2bbea83b84338ac18d9d",
     ),
     "C": (
         COMBINED,
-        "b0b1a3f38c1cf85dc79f87e2be7fd4429d9c5c37",
-        "186b90f52fbc633bcd7caa0b16bced5e91553a33",
+        "35ffc3ff5252c8452f66b8aabd20ef66a16ceded",
+        "d4b3be137de57d758c2f68712ffb5c819496ec1c",
     ),
 }
 FORWARD_TEST = "ohm-derived-forwarder-cgus"
@@ -82,6 +84,17 @@ def two_dot(repo, left, right):
     return git(repo, "diff", "--binary", "--full-index", "--no-renames", left, right)
 
 
+def check_type_import(repo, old, new):
+    need(git(repo, "diff", "--name-only", old, new).decode().splitlines() == [PRODUCT], "unexpected lint edit")
+    source = git(repo, "show", old + ":" + PRODUCT)
+    old_import = b"self, InstanceKind, ShimKind, TyCtxt"
+    old_use = b"|ty: ty::Ty<'tcx>|"
+    need(source.count(old_import) == source.count(old_use) == 1, "wrong old type spelling")
+    expected = source.replace(old_import, b"self, InstanceKind, ShimKind, Ty, TyCtxt")
+    expected = expected.replace(old_use, b"|ty: Ty<'tcx>|")
+    need(expected == git(repo, "show", new + ":" + PRODUCT), "lint correction changed the algorithm")
+
+
 def live_base(repo, packet):
     raw = (packet / "live-over-signed.pack").read_bytes()
     need(len(raw) == 112293 and digest(raw) == LIVE_PACK, "corrupt live-base pack")
@@ -116,23 +129,25 @@ def validate(repo, reg, require_combined):
     )
     need(
         obj(repo, HISTORICAL_F + ":compiler") == "cee5a54f537678194263fed0e5f4167b31cee3a3"
-        and obj(repo, HISTORICAL_C + ":compiler") == LIVE_TREES["C"][2],
+        and obj(repo, HISTORICAL_C + ":compiler") == obj(repo, PRE_LINT_C + ":compiler"),
         "signed-source control differs",
     )
     need(files(repo, FORWARD) == FTEST | {PRODUCT}, "wrong isolated forwarder paths")
+    check_type_import(repo, PRE_LINT_F, FORWARD)
     if "C" in actual:
         need(
             obj(repo, COMBINED + "^") == FORWARD and files(repo, COMBINED) == FTEST | KTEST | {PRODUCT},
             "wrong combined parent or paths",
         )
+        check_type_import(repo, PRE_LINT_C, COMBINED)
         for k in ("compiler", "library", "tests"):
             need(
-                obj(repo, HISTORICAL_C + ":" + k) == actual["C"][k],
-                "final live and historical " + k + " differ",
+                obj(repo, HISTORICAL_C + ":" + k) == obj(repo, PRE_LINT_C + ":" + k),
+                "pre-lint live and historical " + k + " differ",
             )
         need(
-            digest(two_dot(repo, HISTORICAL_C, COMBINED)) == TWO_DOT,
-            "live C and signed C differ beyond the two original files",
+            digest(two_dot(repo, HISTORICAL_C, PRE_LINT_C)) == TWO_DOT,
+            "pre-lint live C and signed C differ beyond the two original files",
         )
         for head in (FORWARD, COMBINED):
             need(
@@ -167,6 +182,7 @@ def enroll(repo, packet, combined):
             "--reverse",
             "--topo-order",
             HISTORICAL_C,
+            PRE_LINT_C,
             *list(roles.values())[1:],
             "^" + SIGNED,
             "^" + BASE
