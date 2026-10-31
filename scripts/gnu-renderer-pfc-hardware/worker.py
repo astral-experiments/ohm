@@ -374,6 +374,7 @@ def worker(args):
         result["logical_receipt"] = str(receipt)
         put(receipt / "enrollment.json", result)
         put(receipt / "inspection-tools.json", inspection_tools())
+        logged(receipt / "linux-prerequisites", ["bash", HERE / "linux-prereqs.sh", root / "tool-probe"])
         expected_head = subprocess.check_output(
             ["git", "-C", args.source, "rev-parse", "HEAD"], text=True
         ).strip()

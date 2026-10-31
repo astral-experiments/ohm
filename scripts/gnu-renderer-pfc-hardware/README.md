@@ -14,6 +14,8 @@ Until the source and all four source packets have been physically reopened, `pyt
 
 ## One unscored qualification
 
+The first ordinary qualification stopped at the tool check because the hosted image lacked `strace`. It restored zero SDKs and ran zero Ruff cells. The workflow installs the system C toolchain, binutils, strace and the fetch and verification tools first. An unprivileged preflight compiles and traces a separate C executable and requires a successful exec and libc open before the original source is acquired. [Original failure](prior-qualification-41186153700.json)
+
 The gate runs six cells at the same exposed work and SDK paths, using P, F and C on the full historical source-map and notebook edits. Each run starts with new private target, shared store, source, Rustup alias, home, registry and temporary files. The union of both complete lockfiles is fetched once before the first cell. Every cell copies and checks the original crates.io bytes into its private registry. These locked sources are the only registry inputs to the ordinary offline Cargo commands.
 
 The adapter records genuine source and corrected empty builds, the immediate first repeat, E0308 with exit 101 on both warm and empty stores, repair and genuine executable readers. It reruns the original three source-map test binaries including the prior panic and stale-assertion negative. The command/kernel records distinguish the four original rustcs, the one changed library, and the first unchanged visit with no compiler or linker. The externally sealed native reader compares full object payloads, relocations, DWARF, metadata and behavioral evidence across all P/F/C cells. These checks may reject a genuine change; the raw failed cell is retained.

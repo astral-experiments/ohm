@@ -68,6 +68,12 @@ jobs:
           ref: ${{ steps.gate.outputs.source_head }}
           persist-credentials: false
           sparse-checkout: scripts/gnu-renderer-cgu-source
+      - name: Install native compiler and observation prerequisites
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            binutils build-essential ca-certificates coreutils git grep strace util-linux zstd
       - name: Reopen original source and native observations; run this enrolled worker
         env:
           GH_TOKEN: ${{ github.token }}

@@ -1,0 +1,47 @@
+{
+  "artifact": {
+    "bytes": 12315,
+    "id": 13036943445,
+    "name": "gnu-renderer-pfc-qualify-gate",
+    "sha256": "8904567aee9f2c2a36f8f40cace152b5f3f0258b3ed878f3cdae95265ca09b81"
+  },
+  "attempt": 1,
+  "failure": "Traceback (most recent call last):\n  File \"/home/runner/work/ohm/ohm/enrolled/scripts/gnu-renderer-pfc-hardware/worker.py\", line 376, in worker\n    put(receipt / \"inspection-tools.json\", inspection_tools())\n                                           ~~~~~~~~~~~~~~~~^^\n  File \"/home/runner/work/ohm/ohm/enrolled/scripts/gnu-renderer-pfc-hardware/worker.py\", line 185, in inspection_tools\n    need(path, \"missing native tool \" + name)\n    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/ohm/ohm/enrolled/scripts/gnu-renderer-pfc-hardware/ingress.py\", line 37, in need\n    raise ValueError(msg)\nValueError: missing native tool strace\n",
+  "head": "7042df86d95959e60269260f81ac43e1209dd61e",
+  "job": 124493381943,
+  "members": {
+    "PLAN-V2.md": [
+      "1697b1e098ef8398714d55023da7a46c2838d19447108176eb8606bd66296a01",
+      2487
+    ],
+    "PLAN.md": [
+      "70076984ab6feb82a8a9eae43cb9a9c34eec7a9cc42a50305c018391c14afe66",
+      7927
+    ],
+    "cohort-order.json": [
+      "2bd86204b49982bcd48d0861d481a0dfbc53df9324a210a8583f16b81d408168",
+      6004
+    ],
+    "enrollment.json": [
+      "423f05ac0dc8bef33da8a11a51828509de49c585f81b5f15d68c076e1efa9f57",
+      514
+    ],
+    "failed.txt": [
+      "5396d5aef033f771541fa49fa55aca63227af8acc60db4f025b40460651b2ae4",
+      652
+    ],
+    "host.json": [
+      "e3c39c9d32ae9b713770066ef5aefd1f5dae73504f5d8ef0beafbdb43ced619c",
+      2556
+    ],
+    "registration.json": [
+      "7b2c1934f071fef3e01d7098173fe168c4c0b6bb2ee2cb20379632b239a733b8",
+      9620
+    ]
+  },
+  "owned_hardware_observations": 0,
+  "role": "unscored qualifier",
+  "ruff_cells": 0,
+  "run": 41186153700,
+  "source_restores": 0
+}

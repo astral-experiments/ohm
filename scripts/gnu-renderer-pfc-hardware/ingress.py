@@ -109,6 +109,7 @@ def registration(phase="inspect"):
         g = r["structural"]
         need(
             isinstance(g, dict)
+            and g["run"] not in [x["run"] for x in r["excluded_qualification_runs"]]
             and g["branch"] == BRANCH
             and g["jobs"] == ["qualify (gate)"]
             and set(g["artifacts"]) == {"gnu-renderer-pfc-qualify-gate"}
