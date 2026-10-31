@@ -1,0 +1,57 @@
+{
+  "A": "b5dba861cc38e3f7fb4524c9ceba3e01a474ea13",
+  "B": "7b13f01ba1569887a25670820764b24c206da8e5",
+  "complete_patch_sha256": "8f5df0673081205c8aac262563e3bd2d174e264b6b643e16ad1ddc424a017ba5",
+  "edit": "0ecff877901a0377ad966ffab528488ce872b50e",
+  "edits": {
+    "crates/ruff_python_parser/resources/inline/err/signed_pattern_non_literal_operand.py": {
+      "A": "90b9ba10524d4c742e48f288a7e9a1656f8b5597da91ab06d0be793f2f904d04",
+      "reversed": null
+    },
+    "crates/ruff_python_parser/src/parser/pattern.rs": {
+      "A": "da5e9a4ce7e4d9e01c19d8b2797c666a8e7b87c41362937546abd10a46289ccc",
+      "reversed": "8fdc43aca04b07c900a152349e2af4572a6d0f03850e432d816a22d772b2c799"
+    },
+    "crates/ruff_python_parser/tests/snapshots/invalid_syntax@signed_pattern_non_literal_operand.py.snap": {
+      "A": "e1de065cc927644726c6cee3f8c5a7825472cdd3962198456a8bf9538f5997dd",
+      "reversed": null
+    }
+  },
+  "parent": "1edf9fe2cab23e34c383419b8c7830324c428a58",
+  "positive_control": {
+    "A_ELF": "37e119a61caf20043894fd99718fa4d156cbc95457790235e736c1c33819e61d",
+    "argv": [
+      "check",
+      "--no-cache",
+      "--isolated",
+      "--ignore",
+      "ALL",
+      "--target-version",
+      "py315",
+      "--output-format=json",
+      "--stdin-filename",
+      "match.py",
+      "-"
+    ],
+    "artifact": 13050556244,
+    "observed": {
+      "case": {
+        "exit": 1,
+        "stderr": "warning: Support for Python 3.15 is under development and may be unstable. Enable `preview` to remove this warning.\n",
+        "stdin": "match value:\n    case -1**2: ...\n",
+        "stdout": "[\n  {\n    \"cell\": null,\n    \"code\": \"invalid-syntax\",\n    \"end_location\": {\n      \"column\": 15,\n      \"row\": 2\n    },\n    \"filename\": \"/tmp/tmpbibkodwr/match.py\",\n    \"fix\": null,\n    \"location\": {\n      \"column\": 11,\n      \"row\": 2\n    },\n    \"message\": \"Expected a numeric literal after unary operator\",\n    \"name\": \"invalid-syntax\",\n    \"noqa_row\": null,\n    \"severity\": \"error\",\n    \"url\": null\n  }\n]"
+      },
+      "neighbor": {
+        "exit": 0,
+        "stderr": "warning: Support for Python 3.15 is under development and may be unstable. Enable `preview` to remove this warning.\n",
+        "stdin": "match value:\n    case -1: ...\n",
+        "stdout": "[]"
+      }
+    },
+    "real_reversed_tree_not_built_here": true,
+    "run": 41221390896,
+    "wrong_role_refused": true,
+    "zip_sha256": "99c8caed1c871739262b2a8496ff375a05c8cf1215b176a24b7b7095e8521315"
+  },
+  "source_only": true
+}

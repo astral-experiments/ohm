@@ -1,5 +1,5 @@
-name: Compare Ruff branch cache implementations
-run-name: Ruff branch-cache attribution ${{ inputs.reviewed_head }}
+name: Measure Ruff first-checkout table storage
+run-name: Ruff first-checkout storage ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -12,10 +12,10 @@ permissions:
   contents: read
 jobs:
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-cache-three-arm-attribution-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-first-session-e-screen-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
-    name: Ruff branch-cache attribution ${{ matrix.position }}
+    name: Ruff first-checkout storage ${{ matrix.position }}
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -29,22 +29,27 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             scripts/branch-return-pmu
-            scripts/packed-ordinary-efficacy
+            scripts/branch-first-session-e-screen
             scripts/ohm-packed-ruff/full-cli
             scripts/ohm-packed-ruff/harness
       - name: Read the binding to the independently completed native source run
         id: binding
         run: |
           set -euo pipefail
-          cd enrolled/scripts/branch-return-pmu
+          (cd enrolled/scripts/branch-return-pmu && sha256sum --strict --check --status SHA256SUMS)
+          cd enrolled/scripts/branch-first-session-e-screen
           sha256sum --strict --check --status SHA256SUMS
-          python3 -IB bind.py >> "$GITHUB_OUTPUT"
+          python3 -IB subjects.py >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ steps.binding.outputs.source_head }}
           path: source
           persist-credentials: false
-          sparse-checkout: scripts/branch-return-source
+          sparse-checkout: |
+            scripts/branch-first-session-e-source
+            scripts/branch-return-source
+            scripts/ohm-packed-ruff
+            scripts/ohm-apple-zmij/source-transport
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
@@ -89,18 +94,18 @@ jobs:
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           (cd enrolled/scripts/ohm-packed-ruff/full-cli && sha256sum --strict --check --status SHA256SUMS)
-      - name: Measure the original cache switch and incremental packing cost
+      - name: Compare pristine and same-branch-edited first checkouts with four native provider outcomes
         env:
           GH_TOKEN: ${{ github.token }}
           REVIEWED_HEAD: ${{ inputs.reviewed_head }}
           POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/packed-ordinary-efficacy/ordinary.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
+          python3 -IB enrolled/scripts/branch-first-session-e-screen/screen.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: branch-cache-attribution-${{ matrix.position }}
+          name: first-session-ordinary-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

@@ -133,18 +133,18 @@ def open_provider(repo, env):
     return c, local
 
 
-def exercise(rows, repo, arms):
+def exercise(rows, repo, arms, *, activate=b.activate):
     from provider import native_controls
 
     start = OUT / "provider-seed"
     start.mkdir()
-    base = b.activate(arms[0], rows, start)
+    base = activate(arms[0], rows, start)
     c, local = open_provider(repo, base)
     original_run = c.run
     for arm in arms:
         out = OUT / "providers" / arm
         out.mkdir()
-        env = b.activate(arm, rows, out)
+        env = activate(arm, rows, out)
         native_controls(arm, env, ROOT, out)
         # Keep the established ordinary Cargo command. Profile selection is exactly the enclosing arm's.
         active = env | {

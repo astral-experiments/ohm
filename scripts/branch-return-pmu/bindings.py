@@ -281,8 +281,8 @@ def install_locations(out, manifest):
     return rows
 
 
-def environment(arm):
-    need(arm in ORDERS["01"], "unknown arm")
+def environment(arm, *, permitted=None):
+    need(arm in (ORDERS["01"] if permitted is None else permitted), "unknown arm")
     env = dict(
         HOME=str(HOME),
         PATH=str(PROXIES) + ":/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
@@ -316,9 +316,10 @@ def verify_physical(root, desired):
     )
 
 
-def activate(arm, rows, out):
+def activate(arm, rows, out, *, permitted=None, source_manifest=None):
     role = arm[0]
-    old = next((r for r in COMPARE if not (PARK / r).exists()), None)
+    need(role in rows, "unregistered physical compiler")
+    old = next((r for r in rows if not (PARK / r).exists()), None)
     if old is not None:
         verify_physical(SDK, rows[old])
     if old != role:
@@ -336,7 +337,7 @@ def activate(arm, rows, out):
     # Native path, bytes, inode and ctime for the tools Cargo uses to form its context.
     roles = {p: files[p] for p in ("bin/cargo", "bin/rustc", "bin/rustdoc", record["driver"], WILD)}
     need(all(sha(SDK / p) == v[0] for p, v in roles.items()), "active tools differ")
-    env = environment(arm)
+    env = environment(arm, permitted=permitted)
     versions = {}
     for name in ("rustc", "cargo", "rustdoc"):
         actual = Path(
@@ -368,7 +369,7 @@ def activate(arm, rows, out):
             files=roles,
             versions=versions,
             env=env,
-            source_manifest=spec()["manifest"],
+            source_manifest=spec()["manifest"] if source_manifest is None else source_manifest,
         ),
     )
     return env

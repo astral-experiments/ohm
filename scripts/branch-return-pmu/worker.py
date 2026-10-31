@@ -9,6 +9,7 @@ import subprocess
 import sys
 import traceback
 from pathlib import Path
+from contextlib import nullcontext
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -160,7 +161,7 @@ def same_products(got, want):
     }
 
 
-def receipt(arm, phase, branch, lane, env, where, refs):
+def receipt(arm, phase, branch, lane, env, where, refs, *, sample=None):
     where.mkdir()
     need(
         shutil.disk_usage(WORK).free > 3 * 2**30 and shutil.disk_usage(OUT).free > 5 * 2**30,
@@ -174,7 +175,8 @@ def receipt(arm, phase, branch, lane, env, where, refs):
         )
     checked_source(phase, branch, where)
     rc = 101 if phase == "invalid" else 0
-    messages, insn, physical = invocation(where, env, lane, rc, arm)
+    with sample(ROOT, WORK, where) if sample is not None else nullcontext():
+        messages, insn, physical = invocation(where, env, lane, rc, arm)
     working = failed_session.observed(WORK)
     if phase == "invalid":
         save(where / "working.json", working)
@@ -215,7 +217,7 @@ def receipt(arm, phase, branch, lane, env, where, refs):
             ("historical source did not affect its real graph", names),
         )
         need(
-            (storage["packed_files"] > 0) == (arm == "Kon"), "incorrect older branch object format"
+            (storage["packed_files"] > 0) == (arm in ("Kon", "Eon")), "incorrect older branch object format"
         )
         if physical:
             need(
@@ -224,7 +226,7 @@ def receipt(arm, phase, branch, lane, env, where, refs):
             )
     if phase == "unchanged-B":
         settled_link.sole_bin(dirty)
-        need((storage["packed_files"] > 0) == (arm == "Kon"), "incorrect settled object retention")
+        need((storage["packed_files"] > 0) == (arm in ("Kon", "Eon")), "incorrect settled object retention")
     products, files = native.observed(
         messages, branch, kit.REVS[branch], env, ROOT, kit.TREE, WORK, where
     )
