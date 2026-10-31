@@ -1,19 +1,32 @@
-name: Qualify the musl compiler on the reviewed Ruff AST edit
+name: Ruff AST musl whole-Cargo retired instructions
 on:
   workflow_dispatch:
+    inputs:
+      phase:
+        description: A single previously authorized acquisition
+        required: true
+        type: choice
+        options:
+          - screen
+          - primary
+          - independent
 permissions:
-  actions: read
   contents: read
+  actions: read
 jobs:
-  provider:
-    name: Unbundled native provider (${{ matrix.layout }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-musl-ast-reviewed-compiler'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 100
+  enrolled:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-x86-musl-ast-hardware'
+    name: Native pair (${{ inputs.phase }}, ${{ matrix.position }})
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 130
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
-        layout: [private, shared]
+        position: ${{ fromJSON(inputs.phase == 'screen' && '[1,2]' || '[1,2,3,4,5,6,7,8,9,10,11,12]') }}
+    env:
+      COHORT: ${{ inputs.phase }}
+      PAIR_POSITION: ${{ matrix.position }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -21,41 +34,26 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify both compiler drivers and three physically distinct Cargo readers
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Install the ordinary musl host support, read-only counter and observer prerequisites
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends musl-tools strace zstd b3sum
-          bash scripts/ohm-musl-ast-pair/native-volume.sh
-      - name: Reopen the exact source and original Ruff results and exercise all seven real hardlinks
+          sudo apt-get install -y --no-install-recommends musl-tools strace zstd
+      - name: Reopen the source, ordinary Ruff and both native provider layouts and restore the original SDK
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          RUNNER_TEMP="$MUSL_GUARD_VOLUME" QA_ROOT="$MUSL_GUARD_VOLUME/ohm-aarch64-linux-zmij" \
-            python3 -IB scripts/ohm-musl-ast-pair/provider_stage.py stage "$MUSL_GUARD_EVIDENCE"
-      - name: Exercise the v2 producer and both older Cargo readers
-        env:
-          LAYOUT: ${{ matrix.layout }}
-        run: |
-          set -euo pipefail
-          cd scripts/ohm-musl-ast-pair/v2
-          sha256sum --strict --check SHA256SUMS
-          subject="$MUSL_GUARD_EVIDENCE/guard-subjects.json"
-          status=0
-          for suite in mechanism signed strict; do
-            args=(--suite mechanism)
-            if [[ $suite != mechanism ]]; then args=(--suite migration --legacy "$suite"); fi
-            python3 -IB guard.py --subjects "$subject" --work "$MUSL_GUARD_VOLUME/native-guard/$suite" \
-              --out "$MUSL_GUARD_EVIDENCE/$suite" --layout "$LAYOUT" "${args[@]}" || status=1
-          done
-          exit "$status"
+        run: python3 -IB scripts/ohm-musl-ast-hardware/ingress.py "$COHORT" "$PAIR_POSITION"
+      - name: Acquire the two normally invoked Rust builds, then reopen independent static visitor and storage evidence
+        run: python3 -IB scripts/ohm-musl-ast-hardware/measure.py "$COHORT" "$PAIR_POSITION"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: musl-285-native-${{ matrix.layout }}
-          path: ${{ runner.temp }}/musl-provider-evidence
-          retention-days: 14
+          name: musl-ast-hardware-${{ inputs.phase }}-${{ matrix.position }}
           if-no-files-found: error
+          retention-days: 21
+          compression-level: 1
+          path: |
+            ${{ runner.temp }}/musl-hardware-handoff.json
+            ${{ runner.temp }}/musl-measurements
+            ${{ runner.temp }}/musl-ast/receipts
+            ${{ runner.temp }}/*.json.zst
