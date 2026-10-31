@@ -13,6 +13,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from clocked import CMD, assignment, file_sha, require, save, sha
 from products import product
+import qualification
 
 FROZEN = json.loads((HERE / "subjects.json").read_bytes())
 SOURCE_RUN, SOURCE_HEAD = FROZEN["source_run"], FROZEN["source_head"]
@@ -68,6 +69,7 @@ def admitted(here, phase):
             and len(set(cert["boot_ids"])) == len(cert["positions"]),
             "missing predecessor positions",
         )
+    qualification.previous(here, q)
     return q, cert
 
 
@@ -185,6 +187,7 @@ def main(phase, pos):
         "wrong QA ref/attempt",
     )
     config, cert = admitted(HERE, phase)
+    opaque_preflight = qualification.recheck_api(HERE, config, request)
     sys.path.insert(0, str(HERE.parent / "ohm-musl-ast-pair"))
     import lookup, restore
 
@@ -226,6 +229,7 @@ def main(phase, pos):
             "transfer": located,
             "qualification": guards,
             "admitted": cert,
+            "opaque_preflight": opaque_preflight,
             "sdk": str(restore.SDK),
             "sdk_receipt": file_sha(restore.s.LOG / "sdk.json"),
             "guard_subjects": file_sha(restore.s.LOG / "guard-subjects.json"),

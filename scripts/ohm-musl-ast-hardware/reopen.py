@@ -12,6 +12,7 @@ sys.path.insert(0, str(HERE))
 import clocked as c
 import products
 import ingress
+import qualification, semantic_readback
 
 
 def archive_bytes(members, body):
@@ -48,6 +49,11 @@ def verify(path, pinned):
         hand = doc(prefix + "admission.json")
         config, cert = ingress.admitted(HERE, pair["phase"])
         c.require(hand["admitted"] == cert and hand["transfer"] == config["source_transfer"], "authenticated source and both provider histories")
+        _,opaque=qualification.previous(HERE,config)
+        c.require(doc(prefix+"opaque-consumer-sources.json")==opaque["consumer_sources"],"qualified ten-method source set differs")
+        c.require(qualification.source(gzip.decompress(raw(prefix+"nodes.rs.gz")))==opaque["finite_source"]==doc(prefix+"finite-source.json"),"source-pinned lifetime admission")
+        c.require(hand["opaque_preflight"]==opaque and pair["original_failed_hardware"]==opaque["excluded_hardware_run"]
+                  and pair["boot_id"] not in opaque["excluded_hardware_boots"] and pair["opaque_qualification"]==opaque["passed_artifact_sha256"],"failed screen or wrong semantic qualification")
         for key in ("source_run", "source_head", "provider_run", "provider_head"):
             c.require(pair[key] == hand["transfer"][key.upper()] == str(config[key]), ("source or provider mismatch", key))
         for role in "PC":
@@ -102,10 +108,7 @@ def verify(path, pinned):
                     and c.sha(native_body(members["separate_rmeta"])) == st["rmeta"],
                     "entire actual rlib, .rmeta and ELF",
                 )
-            for n in ("old", "empty", "replay-edit", "measured-final", "repair"):
-                st = terminal["artifacts"][n]
-                if n not in ("old", "empty"):
-                    products.equal_state(st, terminal["artifacts"]["empty"])
+            named=semantic_readback.verify(arm,terminal,opaque,raw)
             for state, sub in [("warm", "measured-final"), ("empty", "empty")]:
                 ledger = terminal["storage"][state]
                 buf = raw(arm + "proof/" + sub + "/allocated-inodes.json.gz")
@@ -123,6 +126,7 @@ def verify(path, pinned):
                 )
             summary[role] = {
                 "complete_native_visits": len(terminal["artifacts"]),
+                "named_archive_checks": named,
                 "storage": {k: v["allocated_unique"] for k, v in terminal["storage"].items()},
             }
         return {

@@ -1,5 +1,15 @@
 {
   "independent": null,
+  "opaque_preflight": {
+    "accepted_sha256": "674f5ed8e32e761383c0e221b5514bd34112a41dc7244190fbbc5aa8aa1ab4bc",
+    "artifact_id": 13033698376,
+    "head": "fddcdf9f79cddbdc42bbc3e68d3012b0acf94d37",
+    "job_id": 124470845156,
+    "passed": true,
+    "run": 41178481141,
+    "zip_bytes": 65093532,
+    "zip_sha256": "dc9fd1b5da4e597bab1e75cfc131c937aee7c5da2c00b0c70895da0bda155882"
+  },
   "original_provider_failures": {
     "private": [
       13030064833,
@@ -13,6 +23,31 @@
   "primary": null,
   "provider_head": "89a055549f4335e6e172f96c65d162dcd9cb1046",
   "provider_run": 41173218253,
+  "rejected_hardware": {
+    "before": {
+      "accepted_sha256": "c468c2f57a033b18c28da0f9f8443e49e9984bb2c0484af02771be9048cbe2f9",
+      "after": "source"
+    },
+    "head": "5d6abc7cf533b1a85264c18525c9f8917aeb47d3",
+    "positions": [
+      {
+        "boot": "a8efcadb-8a2a-4f67-b802-2a03e8355d3f",
+        "job": 124456779315,
+        "number": 1,
+        "sha256": "2a30ac5f9d11b96ad12c30849471e30e27f07110fe3460c7e05eea3d8a4ad180",
+        "zip": 13032242373
+      },
+      {
+        "boot": "c12de6e6-9832-45de-bac8-771d7b8db058",
+        "job": 124456779460,
+        "number": 2,
+        "sha256": "e84e00bb86c558f41970816dc1838bd7a7d60c5a8b62475f0cbcbedc4706f334",
+        "zip": 13031562810
+      }
+    ],
+    "run": 41173700698,
+    "terminal": "Both arms stopped at the existing warm/empty raw rmeta and canonical ar equality gate. Zero complete positions. All counts excluded."
+  },
   "rejected_provider_runs": [
     {
       "head": "c836892dbb9d4dca937c4a7cab9442eaa585b53b",
@@ -53,7 +88,7 @@
     }
   ],
   "screen": {
-    "accepted_sha256": "c468c2f57a033b18c28da0f9f8443e49e9984bb2c0484af02771be9048cbe2f9",
+    "accepted_sha256": "ab4eaedec656ee93ed4d241a25c418e09380c55baacfa7a4dee17074acd74fbe",
     "after": "source"
   },
   "source_head": "42ab8393dcb7da2e468ed336933fa90c392d58a5",

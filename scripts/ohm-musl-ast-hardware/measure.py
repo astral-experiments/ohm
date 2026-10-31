@@ -1,5 +1,6 @@
 """Acquire one registered paired whole-Cargo exposure on a fresh private Linux worker."""
 
+import gzip
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import clocked as c
 import products
+sys.path.insert(0, str(HERE.parent / "ohm-musl-ast-opaque"))
+import consumer, verified_state, qualification
 from clocked import require, save, file_sha, sha
 
 EXPECTED_ENV = {
@@ -285,6 +288,25 @@ def run_arm(r, restore, role, hand, env, out, watch, seed, registry_expected):
     visits = {}
     physical = {}
 
+    opaque_readers = {}
+    archive_proofs = {}
+    frame = {n: [str(tools[n]), before[n]["sha256"]] for n in ("rustc", "driver", "cargo", "wild")}
+    lifetimes = arm / "lifetimes"
+    lifetimes.mkdir()
+
+    def check_lifetimes(name, training, state):
+        checks = consumer.check(training[0],training[1],r.W/"opaque-consumer",lifetimes/name,env,r.WANT[state],frame,image_store=arm/"lifetime-images")
+        digest = checks["archive/positive"]["product"]
+        require(digest == hand["opaque_preflight"]["native_outputs"][state], "complete independent opaque-lifetime native client")
+        opaque_readers[name] = {k: {"status": value["status"], "product": value.get("product"),
+            "input_sha256": value["input_sha256"], "diagnostic":value.get("diagnostic")} for k,value in checks.items()}
+
+    def equal(a, b):
+        # The raw rmeta and canonical archive comparison are also preserved in every result.
+        result = verified_state.from_paths(proof,states,a,b)
+        archive_proofs[a+"--"+b] = result
+        save(arm/"archive-comparisons"/(a+"--"+b+".json"),result)
+
     def traced(name):
         d, messages, k = r.census.trace_build(name, trace, proof, r.R, env, c.CMD)
         products.complete_execs(d / "execs.tar.gz")
@@ -312,6 +334,7 @@ def run_arm(r, restore, role, hand, env, out, watch, seed, registry_expected):
             and states[name]["elf"] == expected["behavior"]["old" if state == "old" else "empty"]["reader"],
             "independent previous host complete ELF/visitor mismatch",
         )
+        check_lifetimes(name,training,state)
         return training
 
     empty(r)
@@ -334,16 +357,21 @@ def run_arm(r, restore, role, hand, env, out, watch, seed, registry_expected):
     d = proof / "measured-final"
     d.mkdir()
     states["measured-final"] = products.checked_reader(r, training, msgs["repeat"], d, env, "new")
+    check_lifetimes("measured-final",training,"new")
     physical["warm"] = products.ledger(r.W, d)
     park(r, role, "warm")
     cold("empty", "new")
     physical["empty"] = products.ledger(r.W, proof / "empty")
-    products.equal_state(states["empty"], states["measured-final"])
+    equal("empty","measured-final")
     park(r, role, "empty")
+    cold("empty-again", "new")
+    equal("empty","empty-again")
+    equal("measured-final","empty-again")
+    park(r, role, "empty-again")
     old_again = apply(r, env, "old")
     require({n: h[0] for n, h in old_again.items()} == {n: h[0] for n, h in old.items()}, "old source replay")
     cold("replay-old", "old")
-    products.equal_state(states["old"], states["replay-old"])
+    equal("old","replay-old")
     apply(r, env, "new")
     d = proof / "replay-edit"
     msg, k = products.observed_edit(r, env, tools["driver"], d)
@@ -355,7 +383,8 @@ def run_arm(r, restore, role, hand, env, out, watch, seed, registry_expected):
         "kernel full roster on actual edit",
     )
     states["replay-edit"] = products.checked_reader(r, r.training(k["rustcs"]), msg, d, env, "new")
-    products.equal_state(states["replay-edit"], states["empty"])
+    check_lifetimes("replay-edit",r.training(k["rustcs"]),"new")
+    equal("replay-edit","empty")
     d, msg, k = traced("replay-repeat")
     visits["replay-repeat"] = terminal_native(k)
     require(
@@ -369,7 +398,8 @@ def run_arm(r, restore, role, hand, env, out, watch, seed, registry_expected):
     visits["repair"] = terminal_native(k)
     require(r.N in visits["repair"]["full_rustcs"], "real repaired AST not recompiled")
     states["repair"] = products.checked_reader(r, r.training(k["rustcs"]), msg, d, env, "new")
-    products.equal_state(states["repair"], states["empty"])
+    check_lifetimes("repair",r.training(k["rustcs"]),"new")
+    equal("repair","empty")
     require(
         states["old"]["result"] != states["empty"]["result"] and states["old"]["elf"] != states["empty"]["elf"],
         "source edit not visible to linked native visitor",
@@ -388,6 +418,8 @@ def run_arm(r, restore, role, hand, env, out, watch, seed, registry_expected):
         "shared": env["CARGO_BUILD_BUILD_DIR"],
         "source_heads": {k: {n: v[0] for n, v in rec.items()} for k, rec in [("old", old), ("new", new)]},
         "artifacts": states,
+        "opaque_readers": opaque_readers,
+        "archive_comparisons": archive_proofs,
         "visits": visits,
         "storage": physical,
         "driver": before["driver"],
@@ -464,7 +496,8 @@ def main(phase, pos):
     platform_info = host()
     save(out / "host.json", platform_info)
     require(
-        platform_info["boot_id"] not in hand["admitted"].get("boot_ids", []),
+        platform_info["boot_id"] not in hand["admitted"].get("boot_ids", [])
+        and platform_info["boot_id"] not in hand["opaque_preflight"]["excluded_hardware_boots"],
         "reused worker from a prior cohort",
     )
     require(
@@ -486,6 +519,14 @@ def main(phase, pos):
     r.census.qualify.rt.SDK = restore.SDK
     require(restore.SDK == Path(hand["sdk"]) and r.s.rt.SDK == restore.SDK, "different SDK paths")
     env = r.prepare()
+    nodes=(r.R/"crates/ruff_python_ast/src/nodes.rs").read_bytes()
+    finite=qualification.source(nodes)
+    require(finite==hand["opaque_preflight"]["finite_source"],"native preflight used different nodes.rs")
+    (out/"nodes.rs.gz").write_bytes(gzip.compress(nodes,mtime=0))
+    save(out/"finite-source.json",finite)
+    inputs=consumer.setup(r.W/"opaque-consumer",r.s.HERE/"client.rs")
+    require(inputs==hand["opaque_preflight"]["consumer_sources"],"changed real lifetime consumer/visitor source")
+    save(out/"opaque-consumer-sources.json",inputs)
     require(
         set(env) == EXPECTED_ENV
         and env["CARGO_NET_OFFLINE"] == "true"
@@ -526,12 +567,12 @@ def main(phase, pos):
         all(p[k] == q[k] for k in ("usual_source", "sdk", "target", "shared", "source_heads", "typed_roster")),
         "role inputs differ",
     )
-    for name in ("old", "empty", "replay-edit", "measured-final", "repair"):
+    for name in ("old", "replay-old", "empty", "empty-again", "replay-edit", "measured-final", "repair"):
         require(
             all(
                 p["artifacts"][name][k] == q["artifacts"][name][k]
                 for k in ("elf", "elf_bytes", "result", "reader_link")
-            ),
+            ) and p["opaque_readers"][name]["archive/positive"]["product"] == q["opaque_readers"][name]["archive/positive"]["product"],
             ("cross-compiler complete linked output differs", name),
         )
     saved = storage_gate(records)
@@ -547,6 +588,8 @@ def main(phase, pos):
         "provider_run": hand["transfer"]["PROVIDER_RUN"],
         "provider_head": hand["transfer"]["PROVIDER_HEAD"],
         "workflow_sha": hand["workflow_sha"],
+        "original_failed_hardware": hand["opaque_preflight"]["excluded_hardware_run"],
+        "opaque_qualification": hand["opaque_preflight"]["passed_artifact_sha256"],
         "workflow_run": int(os.environ["GITHUB_RUN_ID"]),
         "whole_command": c.CMD,
         "plan_sha256": c.PLAN_SHA,
