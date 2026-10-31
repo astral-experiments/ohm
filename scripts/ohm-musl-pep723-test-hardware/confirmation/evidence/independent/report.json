@@ -1,0 +1,404 @@
+{
+  "edit_C_over_P_median": {
+    "decimal": 0.7086669446487205,
+    "exact": "201108351151998065535/283784015425872002738"
+  },
+  "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+  "metrics": {
+    "edit": {
+      "candidate_median_instructions": 11932834664.5,
+      "interval_96_14": [
+        {
+          "decimal": 1.4098947472481054,
+          "exact": "3364482311/2386335801"
+        },
+        {
+          "decimal": 1.412176966920088,
+          "exact": "16852906259/11933990324"
+        }
+      ],
+      "median": {
+        "decimal": 1.4111001368258804,
+        "exact": "67036117050666021845/47506279179772905264"
+      },
+      "one_sided_sign_p": "1",
+      "parent_median_instructions": 16835320128.0,
+      "ties": 0,
+      "wins_above_2": 0
+    },
+    "edit+repeat": {
+      "candidate_median_instructions": 12514785897.0,
+      "interval_96_14": [
+        {
+          "decimal": 2.1648133484758363,
+          "exact": "9041023181/4176352288"
+        },
+        {
+          "decimal": 2.168028125660878,
+          "exact": "27120002272/12509063859"
+        }
+      ],
+      "median": {
+        "decimal": 2.1666426330509605,
+        "exact": "5849044176360091417/2699588795649125024"
+      },
+      "one_sided_sign_p": "1/4096",
+      "parent_median_instructions": 27111959591.5,
+      "ties": 0,
+      "wins_above_2": 12
+    },
+    "repeat": {
+      "candidate_median_instructions": 581897909.0,
+      "interval_96_14": [
+        {
+          "decimal": 17.658113380676813,
+          "exact": "10275334384/581904429"
+        },
+        {
+          "decimal": 17.66327113598887,
+          "exact": "1712727935/96965501"
+        }
+      ],
+      "median": {
+        "decimal": 17.66054182312963,
+        "exact": "5980159121878929691/338616967801454657"
+      },
+      "one_sided_sign_p": "1/4096",
+      "parent_median_instructions": 10276811283.0,
+      "ties": 0,
+      "wins_above_2": 12
+    }
+  },
+  "phase": "independent",
+  "plan": "a8b56745c858d9c6ca9df86c8ac6b7ddfe3ea5f1afaed786fd7516c88d9f1d2b",
+  "positions": [
+    {
+      "block": 1,
+      "boot": "a708eef3-e850-4890-a3fe-72a5947dcccf",
+      "counts": {
+        "C": {
+          "edit": 11948123952,
+          "edit+repeat": 12530046512,
+          "repeat": 581922560
+        },
+        "P": {
+          "edit": 16857467098,
+          "edit+repeat": 27131136057,
+          "repeat": 10273668959
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "mn7525ejsj82i",
+      "order": "PC",
+      "position": 1,
+      "run": "41181013450",
+      "runner": "nsc-runner-mn7525ejsj82i",
+      "source_zip": "457fc3885db29ec0231480de80d03aac9fbfd37e6b7b80a92abd8433ef505415"
+    },
+    {
+      "block": 1,
+      "boot": "b2002961-2530-4e64-a746-b5daa432ab22",
+      "counts": {
+        "C": {
+          "edit": 11933990324,
+          "edit+repeat": 12515995359,
+          "repeat": 582005035
+        },
+        "P": {
+          "edit": 16852906259,
+          "edit+repeat": 27130823544,
+          "repeat": 10277917285
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "hum42ul98cggm",
+      "order": "CP",
+      "position": 2,
+      "run": "41181013450",
+      "runner": "nsc-runner-hum42ul98cggm",
+      "source_zip": "6bb22057db4e1687ab2d813c4421adf9f67b149516bd9c8e2a6d61999f616698"
+    },
+    {
+      "block": 2,
+      "boot": "1df10f05-54aa-4cfd-8c19-d09597e25659",
+      "counts": {
+        "C": {
+          "edit": 11931679005,
+          "edit+repeat": 12513576435,
+          "repeat": 581897430
+        },
+        "P": {
+          "edit": 16822411555,
+          "edit+repeat": 27098450037,
+          "repeat": 10276038482
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "2a156qdb3lvga",
+      "order": "PC",
+      "position": 1,
+      "run": "41181013450",
+      "runner": "nsc-runner-2a156qdb3lvga",
+      "source_zip": "6f704337f3b3e834892c8ca34a9c5c271598738e9ec36a25ec6abe43f39d9944"
+    },
+    {
+      "block": 2,
+      "boot": "d0eeb0d4-18d5-4bfa-a9e2-320ef7a4dc8e",
+      "counts": {
+        "C": {
+          "edit": 11915218044,
+          "edit+repeat": 12497122473,
+          "repeat": 581904429
+        },
+        "P": {
+          "edit": 16861189801,
+          "edit+repeat": 27136524185,
+          "repeat": 10275334384
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "7v670ukmcidlo",
+      "order": "CP",
+      "position": 2,
+      "run": "41181013450",
+      "runner": "nsc-runner-7v670ukmcidlo",
+      "source_zip": "8580b636e810f05e7a48ca8fecc265ebc2198326e7acacd141b9992361ec579d"
+    },
+    {
+      "block": 3,
+      "boot": "7dee7472-78ba-484c-ad04-4a051a54b56a",
+      "counts": {
+        "C": {
+          "edit": 11943565914,
+          "edit+repeat": 12525358920,
+          "repeat": 581793006
+        },
+        "P": {
+          "edit": 16818157752,
+          "edit+repeat": 27094525362,
+          "repeat": 10276367610
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "5ivorcidv0b70",
+      "order": "PC",
+      "position": 1,
+      "run": "41181013450",
+      "runner": "nsc-runner-5ivorcidv0b70",
+      "source_zip": "e33cd864daf87abc63f978cd7e86d409a3adce8733c9da2c965706196bbac849"
+    },
+    {
+      "block": 3,
+      "boot": "4f2b7e38-7726-4379-8b77-a395f8cec725",
+      "counts": {
+        "C": {
+          "edit": 11905350488,
+          "edit+repeat": 12487162651,
+          "repeat": 581812163
+        },
+        "P": {
+          "edit": 16823564699,
+          "edit+repeat": 27102237373,
+          "repeat": 10278672674
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "n8mlj8e5ib4qc",
+      "order": "CP",
+      "position": 2,
+      "run": "41181013450",
+      "runner": "nsc-runner-n8mlj8e5ib4qc",
+      "source_zip": "23fd698a340b9d86659f3c0f91d3fcd0d4ec14bf294789534f8650ad634c54e4"
+    },
+    {
+      "block": 4,
+      "boot": "da6f03fc-ca9d-4404-a5db-e76f940e573f",
+      "counts": {
+        "C": {
+          "edit": 11934079206,
+          "edit+repeat": 12516055393,
+          "repeat": 581976187
+        },
+        "P": {
+          "edit": 16834919368,
+          "edit+repeat": 27111410728,
+          "repeat": 10276491360
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "m4rv9ipine32c",
+      "order": "PC",
+      "position": 1,
+      "run": "41181013450",
+      "runner": "nsc-runner-m4rv9ipine32c",
+      "source_zip": "722a524d26b302739bc22b16f908931fad3a5d61b7fddf2372d5531a748c6bb4"
+    },
+    {
+      "block": 4,
+      "boot": "defaca28-4760-4709-b6bd-11f32743eb9a",
+      "counts": {
+        "C": {
+          "edit": 11946712007,
+          "edit+repeat": 12528610395,
+          "repeat": 581898388
+        },
+        "P": {
+          "edit": 16826342141,
+          "edit+repeat": 27104515786,
+          "repeat": 10278173645
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "6f4njtbp256hg",
+      "order": "CP",
+      "position": 2,
+      "run": "41181013450",
+      "runner": "nsc-runner-6f4njtbp256hg",
+      "source_zip": "a48cc3311e55ebbd44ebe02561434f0ae11f41f924f8d6e87bbc171d85c13c74"
+    },
+    {
+      "block": 5,
+      "boot": "b9791044-2c76-4b30-af77-08559819594d",
+      "counts": {
+        "C": {
+          "edit": 11927186148,
+          "edit+repeat": 12509063859,
+          "repeat": 581877711
+        },
+        "P": {
+          "edit": 16842861534,
+          "edit+repeat": 27120002272,
+          "repeat": 10277140738
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "l1epaec4vrjri",
+      "order": "PC",
+      "position": 1,
+      "run": "41181013450",
+      "runner": "nsc-runner-l1epaec4vrjri",
+      "source_zip": "adc99641fefccbb5affefe7bb62573e7b996d87f763434c1e0c9a7460aa7faa0"
+    },
+    {
+      "block": 5,
+      "boot": "f3bdfe49-109f-413a-a013-47ed6a6d3b43",
+      "counts": {
+        "C": {
+          "edit": 11947206621,
+          "edit+repeat": 12529056864,
+          "repeat": 581850243
+        },
+        "P": {
+          "edit": 16844696545,
+          "edit+repeat": 27123069543,
+          "repeat": 10278372998
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "2b0orrck4lssi",
+      "order": "CP",
+      "position": 2,
+      "run": "41181013450",
+      "runner": "nsc-runner-2b0orrck4lssi",
+      "source_zip": "7779c0321fdde5f7e37f3343e904e8d79bc3e7795393610f9857f93b40f7fad2"
+    },
+    {
+      "block": 6,
+      "boot": "3ecda153-6223-456d-b382-b31b37e19e8c",
+      "counts": {
+        "C": {
+          "edit": 11928135171,
+          "edit+repeat": 12510023744,
+          "repeat": 581888573
+        },
+        "P": {
+          "edit": 16834321181,
+          "edit+repeat": 27111156180,
+          "repeat": 10276834999
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "s43msm7ai4vos",
+      "order": "PC",
+      "position": 1,
+      "run": "41181013450",
+      "runner": "nsc-runner-s43msm7ai4vos",
+      "source_zip": "a7460027f6efcf98ebeb471ff280f7f90d9fd3fc6da3db1c76767222d633eb29"
+    },
+    {
+      "block": 6,
+      "boot": "fcab5606-9063-4743-94e2-b51cd5c685ce",
+      "counts": {
+        "C": {
+          "edit": 11926514405,
+          "edit+repeat": 12508441914,
+          "repeat": 581927509
+        },
+        "P": {
+          "edit": 16835720888,
+          "edit+repeat": 27112508455,
+          "repeat": 10276787567
+        }
+      },
+      "head": "0842cf8db4ee976d24dde809a96fa4d921299593",
+      "host": "jeem8ggs0mcj0",
+      "order": "CP",
+      "position": 2,
+      "run": "41181013450",
+      "runner": "nsc-runner-jeem8ggs0mcj0",
+      "source_zip": "8d51ebaaa98c54ef615805ec24eadbe71845406eff51416695ee549409d5cf9d"
+    }
+  ],
+  "qualifies": true,
+  "run": 41181013450,
+  "storage_C_minus_P": [
+    {
+      "empty": 0,
+      "warm": -1069056
+    },
+    {
+      "empty": 0,
+      "warm": -1069056
+    },
+    {
+      "empty": 0,
+      "warm": -1069056
+    },
+    {
+      "empty": 0,
+      "warm": -1056768
+    },
+    {
+      "empty": 4096,
+      "warm": -1077248
+    },
+    {
+      "empty": 0,
+      "warm": -1077248
+    },
+    {
+      "empty": 0,
+      "warm": -1073152
+    },
+    {
+      "empty": 0,
+      "warm": -1073152
+    },
+    {
+      "empty": 0,
+      "warm": -1073152
+    },
+    {
+      "empty": 4096,
+      "warm": -1064960
+    },
+    {
+      "empty": 0,
+      "warm": -1069056
+    },
+    {
+      "empty": 0,
+      "warm": -1064960
+    }
+  ]
+}
