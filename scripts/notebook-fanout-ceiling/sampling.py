@@ -298,6 +298,7 @@ def acquire(folder, tools, paths, cmd, cwd, env, perf):
         "insufficient private disk for bounded sample",
     )
     folder.mkdir()
+    save(folder / "target-environment.json", dict(cwd=str(cwd.resolve()), env=env))
     trace = folder / "trace"
     trace.mkdir()
     native = list(
@@ -586,6 +587,68 @@ def record(folder, tools, paths, cargo_cli, src, env, perf):
     return acquire(folder, tools, paths, cargo_cli, src, env, perf)
 
 
+NAMESPACE_COMMAND = [
+    "cargo",
+    "+ohm",
+    "build",
+    "-p",
+    "parking_lot",
+    "--lib",
+    "--locked",
+    "--offline",
+    "-j8",
+    "--message-format=json",
+]
+
+
+def verify_namespace(out, env):
+    files = []
+    for name, fresh in (("plain", False), ("sampled", True), ("plain-repeat", True)):
+        visit = out / "namespace-calibration" / name
+        call = load(visit / "invocation.json")
+        require(
+            call["argv"] == NAMESPACE_COMMAND and call["status"] == 0,
+            "wrong namespace probe",
+        )
+        with gzip.open(visit / "stdout.gz", "rt") as f:
+            rows = [
+                row
+                for line in f
+                if (row := json.loads(line)).get("reason") == "compiler-artifact"
+                and row["target"]["name"] == "cfg_if"
+            ]
+        (row,) = rows
+        require(
+            "#cfg-if@1.0.4" in row["package_id"]
+            and row["fresh"] is fresh
+            and row["filenames"]
+            and all("/registries/v2-" in p for p in row["filenames"]),
+            "changed cfg-if cache namespace",
+        )
+        files.append(row["filenames"])
+    require(
+        files[0] == files[1] == files[2]
+        and load(out / "namespace-calibration/sampled/target-environment.json") == env,
+        "sampled Cargo selected different compiler output paths or environment",
+    )
+    return files[0]
+
+
+def probe_namespace(out, tools, pmu, cwd, env, perf):
+    base = out / "namespace-calibration"
+    base.mkdir()
+    paths = {n: tools / "roles" / n for n in ROLES}
+    for name in ("plain", "sampled", "plain-repeat"):
+        if name == "sampled":
+            acquire(base / name, tools, paths, NAMESPACE_COMMAND, cwd, env, perf)
+        else:
+            pmu.record(
+                base / name, tools, "topology", paths, NAMESPACE_COMMAND, cwd, env
+            )
+    selected = verify_namespace(out, dict(cwd=str(cwd.resolve()), env=env))
+    save(base / "qualified.json", selected)
+
+
 # Match the defining path, not a type parameter in a different function's mangled name.
 PHASES = (
     (
@@ -861,7 +924,25 @@ def summarize(folder, counted, perf):
 if __name__ == "__main__" and sys.argv[1:2] == ["forward"]:
     path = Path(sys.argv[2])
     args = sys.argv[3:]
+    original = load(path / "target-environment.json")
+    require(
+        str(Path.cwd()) == original["cwd"],
+        "perf changed the selected Cargo working directory",
+    )
+    actual = os.environ
+    expected = original["env"]
+    # perf can prepend its helper directory to PATH. Cargo includes tool discovery in its cache key.
+    save(
+        path / "sampler-environment-diff.json",
+        dict(
+            extra=sorted(actual.keys() - expected.keys()),
+            missing=sorted(expected.keys() - actual.keys()),
+            changed=sorted(
+                k for k in expected.keys() & actual.keys() if expected[k] != actual[k]
+            ),
+        ),
+    )
     with (path / "stdout").open("xb") as so, (path / "stderr").open("xb") as se:
         os.dup2(so.fileno(), 1)
         os.dup2(se.fileno(), 2)
-    os.execv(args[0], args)
+    os.execve(args[0], args, expected)

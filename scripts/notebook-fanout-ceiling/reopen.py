@@ -213,6 +213,11 @@ def run(out, feature, collector, required_run=None, required_sha=None):
         "unqualified or unexpected registration",
     )
     root = Path(read(out / "environment.json")["cwd"]).parent
+    environment = {key: read(out / "environment.json")[key] for key in ("env", "cwd")}
+    c.require(sampling.verify_namespace(out, environment) == read(out / "namespace-calibration/qualified.json"), "namespace preflight did not reopen")
+    for phase in ("edited", "restored"):
+        c.require(read(out / "T" / phase / "target-environment.json") == environment,
+                  "sampled Cargo ran in a different environment")
     c.require(root.is_absolute() and root.name == "ohm-featureless-e2e", "canonical SDK path")
     c.require(read(out / "graph.json") == sorted(read(out / "graph.json")), "entered graph")
     sdk = read(out / "sdk/actual-installed.json.gz")

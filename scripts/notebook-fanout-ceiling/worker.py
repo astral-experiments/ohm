@@ -165,7 +165,7 @@ def run_all(workspace, incoming, root):
         os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and os.environ["GITHUB_REF"]
-        == "refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-v3-20261031"
+        == "refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-v4-20261031"
         and support.git(HERE, "rev-parse", "HEAD")
         == os.environ["GITHUB_SHA"]
         == os.environ["REVIEWED_HEAD"],
@@ -225,6 +225,8 @@ def run_all(workspace, incoming, root):
     s.seed_registry(root)
     (out / "sdk/issuer").mkdir()
     stamp = study.observe.issuer(root, "sdk/issuer")
+    s.fresh(root, registry=True)
+    sampling.probe_namespace(out, tools, pmu, root / "ruff", s.env(root), perf)
     s.fresh(root, registry=True)
     cold = study.panel.visit(root, study.PANEL, "trace", "cold", "original", stamp)
     check_program(cold, "original")

@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-v3-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-v4-20261031'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 130
     env:
