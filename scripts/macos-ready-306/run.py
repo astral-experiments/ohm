@@ -61,6 +61,9 @@ def main():
     assert suite.is_relative_to(tdir) and subject==tdir/'debug/cargo'
     assert [x for x in subprocess.check_output([suite,'--list'],cwd=base,text=True).splitlines() if x==NAME+': test']==[NAME+': test']
     save(out/'products.json',{'suite':str(suite),'suite_sha256':sha(suite),'cargo':str(subject),'cargo_sha256':sha(subject),'version':subprocess.check_output([subject,'-Vv'],cwd=base,text=True),'fixture':sha(product)})
+    if sys.argv[2:]==['named']:
+        import named
+        return named.run(suite,subject,out,base)
     fixture=tdir/'tmp/cit/testsuite/ohm_ready_tests'/NAME.split('::')[-1];summary=[]
     previous_subject=sha(subject)
     failures=0

@@ -1,11 +1,17 @@
 name: Reproduce the ordinary macOS ready-test integration
 on:
   workflow_dispatch:
+    inputs:
+      phase:
+        type: choice
+        options: [targeted, named-installed]
+        default: targeted
+        required: true
 permissions:
   contents: read
 jobs:
   ready:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ready-tests-parent-306-20261030'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ready-tests-parent-306-20261030' && inputs.phase == 'targeted'
     runs-on: namespace-profile-macos-15
     strategy:
       fail-fast: false
@@ -42,5 +48,51 @@ jobs:
         with:
           name: ready-native-${{ matrix.role }}
           path: ${{ runner.temp }}/ready-306/record
+          if-no-files-found: error
+          retention-days: 7
+  named-installed:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ready-tests-parent-306-20261030' && inputs.phase == 'named-installed'
+    runs-on: namespace-profile-macos-15
+    timeout-minutes: 25
+    env:
+      RUST_VERSION: 1.99.0
+      CARGO_PROFILE_DEV_DEBUG: 1
+      CARGO_PROFILE_TEST_DEBUG: 1
+      CARGO_INCREMENTAL: 0
+      CARGO_PUBLIC_NETWORK_TESTS: 1
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ohm-apple-zmij/cargo293
+            scripts/gc-mount-evidence/candidate-source
+            scripts/cargo-diagnostic-fix
+            scripts/macos-ready-306
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install pinned source-build compiler
+        run: |
+          echo "CARGO_TARGET_DIR=$RUNNER_TEMP/cargo-tests" >> "$GITHUB_ENV"
+          rustup toolchain install "$RUST_VERSION" --profile minimal --component rustfmt
+          rustup target add --toolchain "$RUST_VERSION" x86_64-apple-darwin wasm32-unknown-unknown
+      - name: Fetch the signed current Darwin installer and full archive from this release repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/macos-ready-306/named.py fetch
+      - name: Install pinned release locally without fetching another SDK
+        run: |
+          cd "$RUNNER_TEMP/current-306"
+          OHM_DOWNLOAD_URL="file://$PWD" sh install.sh
+      - name: Verify eight exact test names, compiler and Clippy products, and original native output
+        run: python3 -IB scripts/macos-ready-306/run.py candidate named
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: exact-current-306-macos-profiles-and-clippy
+          path: |
+            ${{ runner.temp }}/ready-306/record
+            ${{ runner.temp }}/current-306/custody.json
           if-no-files-found: error
           retention-days: 7
