@@ -117,22 +117,18 @@ mkdir -p declared/src/bin declared/native declared/engine/src
 cp Cargo.toml declared/
 cp engine/Cargo.toml declared/engine/
 cd declared
-cat >build.rs <<'EOF'
+write_build_script() {
+  cat >build.rs <<EOF
 fn main() {
     let dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-    println!("cargo::rerun-if-changed=native/libanswer.a");
+    println!("cargo::rerun-if-changed=$1");
     println!("cargo::rustc-link-search=native={dir}/native");
     println!("cargo::rustc-link-lib=static=answer");
 }
 EOF
-cat >engine/src/lib.rs <<'EOF'
-pub fn register(value: usize) -> usize {
-    unsafe {
-        core::arch::asm!("/* {0} */", in(reg) value, options(nomem, nostack, preserves_flags));
-    }
-    value
 }
-EOF
+write_build_script native/libanswer.a
+echo 'pub fn register(value: usize) -> usize { value }' >engine/src/lib.rs
 cat >src/bin/first.rs <<'EOF'
 extern "C" { fn answer() -> i32; }
 fn main() { println!("{}", engine::register(unsafe { answer() } as usize)); }
@@ -153,15 +149,23 @@ linker_var="CARGO_TARGET_$(printf '%s' "$host" | tr '[:lower:]-' '[:upper:]_')_L
 export "$linker_var=$PWD/count-links"
 write_archive() {
   printf 'int answer(void) { return %s; }\n' "$1" | cc -x c -c -o answer.o -
-  ar rcs native/libanswer.a answer.o
+  ar rcs next-answer.a answer.o
+  cat next-answer.a >native/libanswer.a
 }
 check_links() {
+  local bin actual count
   : >"$OHM_SMOKE_LINK_LOG"
   cargo +"$toolchain" build --bins --offline
   for bin in first second; do
-    [[ $("$CARGO_TARGET_DIR/debug/$bin") == "$1" ]]
+    actual=$("$CARGO_TARGET_DIR/debug/$bin")
+    if [[ "$actual" != "$1" ]]; then
+      echo "$bin: expected $1, got $actual" >&2
+      exit 1
+    fi
   done
-  local count
+  if (( $# == 1 )); then
+    return
+  fi
   count=$(wc -l <"$OHM_SMOKE_LINK_LOG")
   if (( count != $2 )); then
     echo "Expected $2 linker calls for two executables returning $1, observed $count" >&2
@@ -174,3 +178,36 @@ check_links 17 0
 write_archive 29
 check_links 29 2
 check_links 29 0
+
+# A library with the compiler's native-link marker can require a relink even
+# when the build script reports no changes. Replace the archive at the same
+# path, preserving its inode and modification time.
+cat >engine/src/lib.rs <<'EOF'
+pub fn register(value: usize) -> usize {
+    unsafe {
+        core::arch::asm!("/* {0} */", in(reg) value, options(nomem, nostack, preserves_flags));
+    }
+    value
+}
+EOF
+write_build_script build.rs
+export CARGO_TARGET_DIR="$PWD/marked-target" CARGO_BUILD_BUILD_DIR="$PWD/marked-build"
+write_archive 17
+cargo +"$toolchain" build --bins --offline
+check_links 17
+touch -r native/libanswer.a archive-timestamp
+archive_size=$(wc -c <native/libanswer.a)
+write_archive 29
+test "$(wc -c <native/libanswer.a)" = "$archive_size"
+touch -r archive-timestamp native/libanswer.a
+check_links 29 2
+: >"$OHM_SMOKE_LINK_LOG"
+echo 'malformed archive' >native/libanswer.a
+if cargo +"$toolchain" build --bins --offline >bad-archive.log 2>&1; then
+  echo "Build succeeded with a malformed native archive" >&2
+  exit 1
+fi
+test -s "$OHM_SMOKE_LINK_LOG"
+grep -F 'libanswer.a' bad-archive.log
+write_archive 37
+check_links 37 2
