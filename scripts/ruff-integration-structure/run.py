@@ -39,7 +39,7 @@ def refuse_existing_work():
     need(all(not any((WORK / key).iterdir()) for key in ("target", "build")), "not an empty installation")
 
 
-def receipt(arm, phase, branch, env, where, refs, last, clean, prefix):
+def receipt(arm, phase, branch, env, where, refs, last, clean, prefix, invoke=historical.invocation):
     where.mkdir()
     need(shutil.disk_usage(WORK).free > 3 * 2**30 and shutil.disk_usage(OUT).free > 5 * 2**30,
          "below native output and evidence space floor")
@@ -48,7 +48,7 @@ def receipt(arm, phase, branch, env, where, refs, last, clean, prefix):
                                                where / "failed-session-grace.json")
     historical.checked_source(phase, branch, where)
     rc = 101 if phase == "invalid" else 0
-    streams, count, physical = historical.invocation(where, env, "structural", rc, arm)
+    streams, count, physical = invoke(where, env, "structural", rc, arm)
     need(count is None, "unexpected clock in structural admission")
     trace_boundary(where)
     rows, dirty = selection.roster(streams, kit.TREE)

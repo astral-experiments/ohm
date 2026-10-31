@@ -105,6 +105,8 @@ def worker(logs,calibrator,observer):
          sdk["compiler_tree"]==b.COMPARE["F"] and len(sdk["files"])==81 and
          sdk["files"][sdk["driver"]][0]=="fe62e729ee976d9b808b4f94f0a9751c7f6d7b2201aecf3636e9eff8acb88273","wrong compiler kit or driver")
     tools={k:sdk["files"][k] for k in ("bin/cargo","bin/rustc","bin/rustdoc",sdk["driver"],b.WILD)}
+    trace_cal=logs/"initial/kernel-events"
+    need(pilot.trace_events.controls(trace_cal)==read(trace_cal/"calibration.json")["proof"],"missing native kernel tracer preflight")
     cal=calibrate(logs,calibrator,observer);ready=read(logs/"meter-ready.json")
     need(ready["boot"]==en["boot"]==end["boot"]==cal["boot"] and ready["boot"] not in {adj["boot"],*read(HERE/"excluded-boots.json")},"wrong boot or identity")
     refs,cache,observations={},{},{};last=0
@@ -127,7 +129,10 @@ def worker(logs,calibrator,observer):
                 typed,dirty=s.selection.roster(rows,Path(cmd["cwd"]))
                 if stage=="clean":
                     need(not (d/"clock.json").exists() and len(typed)==len(dirty)==390,"empty control or unwanted counter")
+                    proof,_,_=pilot.trace_events.checked_replay(d)
+                    need(read(d/"kernel-commits.json")["observer_argv"]==cmd["observer_argv"],"wrong native observer argv")
                     phys=read(d/"native-execs.json.gz")
+                    need(proof["installed_images"]==phys["successful_exec_count"],"cold native events differ from kernel image count")
                     with gzip.open(d/"exec.raw.gz","rt") as f: events={(p,e,tuple(x)) for p,e,x in w.processes.execs(f)}
                     for tr in [*phys["cargos"],*phys["rustcs"],*phys["wild_processes"],*phys["other_linkers"]]:
                         need((tr["pid"],tr["exe"],tuple(tr["argv"])) in events,"missing native executable in positive control")
@@ -166,7 +171,9 @@ def worker(logs,calibrator,observer):
 
 
 def pair(x,y):
+    excluded=set(read(HERE/"excluded-boots.json"))
     need(x["head"]==y["head"] and x["run"]==y["run"] and x["boot"]!=y["boot"] and
+         not excluded.intersection((x["boot"],y["boot"])) and
          (x["position"],y["position"])==("01","02") and all(tuple(i["order"])==ORDER[i["position"]] for i in (x,y)) and
          x["calibration"]["cpu"]==y["calibration"]["cpu"] and x["calibration"]["pmu"]==y["calibration"]["pmu"] and
          x["structural"]==y["structural"]==a.SHA,"positions not independent or unmatched hardware/source")

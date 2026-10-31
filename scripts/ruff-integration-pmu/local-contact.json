@@ -1,0 +1,66 @@
+{
+  "archive_bytes": 768565,
+  "archive_sha256": "77c1ea829510e10892bf186858555f7dd35f59dc57b1ed74bb4e47d23cb39a92",
+  "assets": 65,
+  "exit_group": {
+    "accepted": 17,
+    "refusal": "('non-error syscall in kernel-uncommitted task', 1931719, b'1931719 <... execve resumed>)           = 59\\n')",
+    "refused": 1
+  },
+  "kind": "Separately reopened off-clock native Linux controls",
+  "real_cargo": {
+    "cold": {
+      "exit": 0,
+      "images": 15,
+      "literal_exes": [
+        "sh",
+        "cargo",
+        "cargo",
+        "rustc",
+        "rustc",
+        "rustc",
+        "rustc",
+        "rustc",
+        "rustc",
+        "rustc",
+        "rustc",
+        "rustc",
+        "cc",
+        "collect2",
+        "ld.bfd"
+      ],
+      "opaque_tids": 0,
+      "output": "native release 17",
+      "phase": "cold",
+      "sha256": "8ef05a3b0eafedc92e53a265aea2180becf028cbf421c3c14c57c396782e9e27",
+      "source_scope": "current locally installed ohm; off-window trace test only",
+      "tasks": 64
+    },
+    "unchanged": {
+      "exit": 0,
+      "images": 3,
+      "literal_exes": [
+        "sh",
+        "cargo",
+        "cargo"
+      ],
+      "opaque_tids": 0,
+      "output": "native release 17",
+      "phase": "unchanged",
+      "sha256": "8ef05a3b0eafedc92e53a265aea2180becf028cbf421c3c14c57c396782e9e27",
+      "source_scope": "current locally installed ohm; off-window trace test only",
+      "tasks": 11
+    }
+  },
+  "strace": {
+    "proof": {
+      "installed_images": 5,
+      "installed_pids": 3,
+      "noninstalled_terminal_tasks": {},
+      "supplied_argv_sha256": "0894f2b7aa212ab6bc13491cf7a149414bbc5535653164ffb20b3e993716b85f",
+      "waited_tasks": 3
+    },
+    "strace_sha256": "28f957c227012de0b18d1bd7fff2d396cb693ea60ed8013be68de071e84b5001",
+    "version": "strace -- version 6.8"
+  }
+}

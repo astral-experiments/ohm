@@ -13,12 +13,13 @@ HERE=Path(__file__).resolve().parent
 SRC=HERE.parent/"ruff-integration-structure"
 sys.path[:0]=[str(HERE),str(SRC)]
 import admission
+import trace_events
 import run as s
 
 b,w,kit,native=s.b,s.historical,s.kit,s.native
 need,save=s.b.need,s.b.save
 OUT,ROOT,WORK=b.OUT,b.ROOT,b.WORK
-BRANCH="charlie/qa-ruff-integration-ordinary-pmu-20261031"
+BRANCH="charlie/qa-ruff-integration-exec-events-20261031"
 ORDERS={"01":("Foff","Fon"),"02":("Fon","Foff")}
 
 
@@ -28,7 +29,7 @@ def enter(position,source,calibrator,observers):
          os.environ["GITHUB_RUN_ATTEMPT"]=="1" and os.environ["REVIEWED_HEAD"]==head==b.git(HERE,"rev-parse","HEAD") and
          position in ORDERS,"wrong review head, branch, slot or repeat")
     need(b.git(HERE,"rev-parse","HEAD:scripts/ruff-integration-structure","HEAD:scripts/branch-return-pmu",
-               "HEAD:scripts/ohm-packed-ruff").splitlines()==["6f7323ccd20b1b495bb3c3161296d82c8a9a8981",*s.BASE_TREES],
+               "HEAD:scripts/ohm-packed-ruff").splitlines()==["1cf44417f951f37cf28276cfc308c6c2402e30d8",*s.BASE_TREES],
          "structural oracle, recorder or native controls changed")
     need(ROOT.resolve()==ROOT and (WORK/".owned-by-packed-study").read_text()==str(ROOT) and
          shutil.disk_usage(OUT).free>=32*2**30 and shutil.disk_usage(WORK).free>=14*2**30,"runner floor")
@@ -49,6 +50,7 @@ def enter(position,source,calibrator,observers):
          order=ORDERS[position],boot=ready["boot"],plan=b.sha(HERE/"PLAN.md"),argv=s.CARGO,
          arm_option="-Zohm-branch-cache=yes",source=b.spec(),structural_proof=admission.SHA,
          structured=admission.canonical_hash(structural),suite_prefix=prefix))
+    trace_events.calibrate(OUT/"initial"/"kernel-events")
     registry=b.acquire(source)
     env=b.activate(ORDERS[position][0],registry,OUT/"initial")
     b.fresh_outputs();b.prepare_inputs(kit,env);w.historical.calibration()
@@ -115,7 +117,7 @@ def main(position,source,calibrator,observers):
         for branch in ("A","B"):
             s.refuse_existing_work()
             v=root/branch
-            s.receipt(arm,"cold-"+branch,branch,env,v,refs,{},True,prefix)
+            s.receipt(arm,"cold-"+branch,branch,env,v,refs,{},True,prefix,invoke=trace_events.reference)
             identities[arm,branch]=json.loads((v/"physical-owners.json").read_bytes())["owners"]
     for branch in ("A","B"):
         left,right=(refs[a,branch] for a in s.ARMS)

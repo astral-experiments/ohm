@@ -55,6 +55,16 @@ def project(original):
 
 def qualify():
     api=lambda p:json.loads(subprocess.check_output(["gh","api",f"repos/{REPO}/actions/{p}"]))
+    refused=json.loads((HERE/"old-pilot.json").read_bytes());old=api(f"runs/{refused['run']}")
+    need((old["id"],old["head_sha"],old["run_attempt"],old["conclusion"])==
+         (41229888294,refused["head"],1,"failure"),"old cohort did not fail under the frozen source")
+    for pos,row in refused["positions"].items():
+        past_job=api(f"jobs/{row['job']}");past_art=api(f"artifacts/{row['id']}")
+        need((past_job["run_id"],past_job["name"],past_job["head_sha"],past_job["conclusion"])==
+             (old["id"],"Integration F whole-Cargo PMU "+pos,old["head_sha"],row["native_conclusion"]) and
+             (past_art["workflow_run"]["id"],past_art["name"],past_art["digest"],past_art["size_in_bytes"])==
+             (old["id"],"ruff-integration-pmu-pilot-"+pos,"sha256:"+row["sha256"],row["bytes"]),"old cohort identity")
+        need(row["boot"] in json.loads((HERE/"excluded-boots.json").read_bytes()),"refused cohort boot admitted")
     r=api(f"runs/{RUN}");j=api(f"jobs/{JOB}");a=api(f"artifacts/{ART}")
     need((r["head_sha"],r["run_attempt"],r["conclusion"],r["head_branch"])==
          (HEAD,1,"success","charlie/qa-ruff-integration-structure-20261031"),"wrong source admission run")
