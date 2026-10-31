@@ -16,10 +16,12 @@ from bindings import OUT, ROOT, WORK, need, save, sha
 from extra_provider import exercise
 
 b = worker.b
-PLAN = "52075870a19ae3b0944c2b7341d6d0c8737127465a21eb85aff305dd55c50aae"
-BRANCH = "charlie/qa-packed-ordinary-efficacy-20261031"
-ORDERS = {"01": ("Koff", "Kon"), "02": ("Kon", "Koff")}
+PLAN = "4b3674feca534b2622cb4c33efdbd2f778099573f1cf964a96fad69697f0a7b6"
+BRANCH = "charlie/qa-branch-cache-three-arm-attribution-20261031"
+ORDERS = {"01": ("Foff", "Fon", "Kon"), "02": ("Kon", "Fon", "Foff")}
 PREVIOUS_BOOTS = {
+    "78a866b0-afbc-4843-a44c-17a8d5bf8e1a",
+    "efc22aa1-dd29-4916-985b-d7a54f481433",
     "0f45fd59-1c8c-4474-8ab8-e9886ad48fda",
     "12c3aea9-28c1-4831-a481-1b614286b3b4",
     "198293fe-416e-48d0-aef9-0611a36675a0",
@@ -36,16 +38,25 @@ PREVIOUS_BOOTS = {
 
 def compare_clean(refs):
     for branch in ("A", "B"):
-        off, on = (refs[arm, branch] for arm in ORDERS["01"])
-        need(
-            off["typed"] == on["typed"] and off["graph"] == on["graph"],
-            "clean typed graph",
-        )
-        need(worker.same_products(off["products"], on["products"]), "clean behavior")
-        for binary in ("cli", "reader"):
-            left, right = (r["products"][binary] for r in (off, on))
-            for key in ("executable", "loads"):
-                need(left[key] == right[key], ("clean ELF", branch, binary, key))
+        reference = refs["Foff", branch]
+        for arm in ("Fon", "Kon"):
+            other = refs[arm, branch]
+            need(
+                reference["typed"] == other["typed"]
+                and reference["graph"] == other["graph"],
+                ("clean typed graph", arm, branch),
+            )
+            need(
+                worker.same_products(reference["products"], other["products"]),
+                ("clean behavior", arm, branch),
+            )
+            for binary in ("cli", "reader"):
+                for key in ("executable", "loads"):
+                    need(
+                        reference["products"][binary][key]
+                        == other["products"][binary][key],
+                        ("clean ELF", arm, branch, binary, key),
+                    )
 
 
 def compare_histories(records):
@@ -71,9 +82,12 @@ def compare_histories(records):
                 ordinary["instructions"] is None and measured["instructions"] > 0,
                 ("only the calibrated command can carry counts", arm, phase),
             )
-        left, right = (records["ordinary", arm][phase] for arm in ORDERS["01"])
+        rows = [records["ordinary", arm][phase] for arm in ORDERS["01"]]
         for key in ("source", "status", "graph", "dirty_digest"):
-            need(left.get(key) == right.get(key), ("same-SDK matched arm", phase, key))
+            need(
+                all(row.get(key) == rows[0].get(key) for row in rows),
+                ("matched arms", phase, key),
+            )
 
 
 def main(position, source, calibrator, observers, provider):
@@ -84,8 +98,8 @@ def main(position, source, calibrator, observers, provider):
         and os.environ["GITHUB_REF"] == "refs/heads/" + BRANCH
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and head == os.environ["REVIEWED_HEAD"] == b.git(HERE, "rev-parse", "HEAD")
-        and sha(HERE / "PLAN.md") == PLAN,
-        "screen identity",
+        and sha(HERE / "ATTRIBUTION.md") == PLAN,
+        "attribution identity",
     )
     trees = b.git(
         HERE,
@@ -117,7 +131,7 @@ def main(position, source, calibrator, observers, provider):
     )
     for name in ("clean", "ordinary", "measured", "providers", "initial"):
         (OUT / name).mkdir()
-    shutil.copy2(HERE / "PLAN.md", OUT / "PLAN.md")
+    shutil.copy2(HERE / "ATTRIBUTION.md", OUT / "PLAN.md")
     shutil.copy2(b.RUNTIME, OUT / "source-kit.json")
     worker.link_diagnostic.acquire()
     subprocess.run(
