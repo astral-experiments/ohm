@@ -1,0 +1,51 @@
+{
+  "attempt": 1,
+  "cargo": 9232,
+  "head": "c836892dbb9d4dca937c4a7cab9442eaa585b53b",
+  "linker": 9311,
+  "opened_bad_provider_fds": [
+    26,
+    28,
+    28,
+    26
+  ],
+  "partial": "signed/transition/child-driver-malformed-warm/",
+  "records": {
+    "private": {
+      "artifact": 13032130908,
+      "bytes": 9582329,
+      "closed": {
+        "mechanism": 42,
+        "signed": 22,
+        "strict": 26
+      },
+      "conclusion": "failure",
+      "decoded_unique_dep_info": 27,
+      "independent_projection_sha256": "96b58fe470d7f3c8ace5cd6be6a69123c0a6c345aaf0540a998cbfd4b05232d8",
+      "job": 124453678425,
+      "reexecuted_complete_elfs": 7,
+      "sha256": "f0e966bbeefc4b9982b30bcbde246340eaf092e2a4d8d701c26dd4458eb32786"
+    },
+    "shared": {
+      "artifact": 13032405164,
+      "bytes": 9775604,
+      "closed": {
+        "mechanism": 42,
+        "signed": 26,
+        "strict": 26
+      },
+      "conclusion": "success",
+      "decoded_unique_dep_info": 29,
+      "independent_projection_sha256": "06375ef9041fbfa30ff007069ae7b3d887b86bf952fe5867df3c3c75885a2594",
+      "job": 124453678442,
+      "reexecuted_complete_elfs": 7,
+      "sha256": "de9196e5ad0c627d9ecb79b601ed47d2f00af39cafc1e2d43f95bd6e106dbc86"
+    }
+  },
+  "run": 41172642028,
+  "rustc": 9291,
+  "thread": 9293,
+  "tracees": 80,
+  "unclosed_syscalls_sha256": "9295f5baceeecae8c8bcfc6d63fd81b26e29fa5189670360c1e5d5126db7ba9c",
+  "valid_verdict": "Cargo 101; the app compiler and GNU ld exited 1 after the loader recognized the malformed higher-priority file. The original guard rejected an unfinished failed-entry decode on the positively identified failing rustc worker."
+}

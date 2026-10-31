@@ -4,6 +4,8 @@ import hashlib
 import io
 import json
 import os
+import re
+import tarfile
 from pathlib import Path
 import subprocess
 import sys
@@ -73,7 +75,35 @@ def original():
                     assert u['last_closed']==[] and 'use same-filesystem private scratch' in u['traceback'] and 'driver-P' in u['traceback']
     return {'SOURCE_RUN':str(run),'SOURCE_HEAD':head,'TRANSFER_ID':str(t['artifact']),'TRANSFER_DIGEST':t['sha256'],'TRANSFER_SEAL':seal}
 
+def prior_native():
+    p=json.loads((HERE/'prior-native-replay.json').read_text());run,head=p['run'],p['head']
+    jobs=enrolled(run,head,'failure');assert set(jobs)==set(JOBS.values())
+    for layout,row in p['records'].items():
+        job=jobs[JOBS[layout]];assert (job['id'],job['conclusion'])==(row['job'],row['conclusion'])
+        with arc(run,head,'native-'+layout,row['artifact'],row['sha256'],row['bytes']) as z:
+            names=z.namelist()
+            for suite,num in row['closed'].items():
+                assert len([n for n in names if n.startswith(suite+'/') and n.endswith('/result.json')])==num
+            refused=[n for n in names if n.endswith('/refused.json')]
+            if layout=='shared':assert not refused;continue
+            assert refused==['signed/refused.json'] and 'exited with 0' in file_json(z,refused[0])['traceback']
+            d=p['partial'];body=z.read(d+'syscalls.tgz');assert SHA(body)==p['unclosed_syscalls_sha256']
+            typed=[json.loads(l) for l in gzip.decompress(z.read(d+'cargo.stdout.gz')).splitlines()]
+            assert typed[-1]=={'reason':'build-finished','success':False}
+            assert any('libohm_musl_v2_choice.a: file format not recognized' in m['message']['rendered'] for m in typed if m['reason']=='compiler-message')
+            with tarfile.open(fileobj=io.BytesIO(body),mode='r:gz') as tar:
+                assert len(tar.getnames())==p['tracees']
+                text=lambda pid:tar.extractfile('pid.'+str(pid)).read().decode().splitlines()
+                worker,rustc,ld,cargo=[text(p[k]) for k in ('thread','rustc','linker','cargo')]
+                assert len(worker)==2 and worker[0].endswith(' ???( <unfinished ...>') and worker[1].endswith(' +++ exited with 1 +++')
+                assert rustc[-1].endswith(' +++ exited with 1 +++') and any('execve(' in l and '"--crate-name", "ohm_v2_app"' in l for l in rustc)
+                assert any('CLONE_THREAD' in l and l.endswith('= '+str(p['thread'])) for l in rustc)
+                assert ld[-1].endswith(' +++ exited with 1 +++') and any('execve("/usr/bin/ld"' in l for l in ld) and cargo[-1].endswith(' +++ exited with 101 +++')
+                fd=[int(m[1]) for l in ld if '/native/early/libohm_musl_v2_choice.a"' in l and (m:=re.search(r'= ([0-9]+)<[^>]+/native/early/libohm_musl_v2_choice.a>$',l))]
+                assert fd==p['opened_bad_provider_fds']
+
 def provider(run,head,source):
+    prior_native()
     assert run!=PIN['run'] and head!=PIN['head']
     jobs=enrolled(run,head,'success');assert set(jobs)==set(JOBS.values()) and all(x['conclusion']=='success' for x in jobs.values())
     arts=get(f'runs/{run}/artifacts?per_page=100')['artifacts'];assert {x['name'] for x in arts}=={'musl-285-native-'+layout for layout in JOBS} and len(arts)==2
@@ -112,6 +142,14 @@ def provider(run,head,source):
                             e=gzip.decompress(z.read(case+'cas/'+row['elf']+'.elf.gz'));assert e[:6]==b'\x7fELF\x02\x01' and SHA(e)==row['elf'];seen.add(row['elf'])
                         assert file_json(z,root+'result.json')==row and SHA(z.read(root+'syscalls.tgz'))==row['raw_trace'] and SHA(z.read(root+'kernel.json'))==row['kernel']
                         raw_msgs=gzip.decompress(z.read(root+'cargo.stdout.gz')).splitlines();assert json.loads(raw_msgs[-1])=={'reason':'build-finished','success':row['cargo']==0}
+                        if row['failed_app_threads']:
+                            mate=rows[label.rsplit('-',1)[0]+('-empty' if label.endswith('-warm') else '-warm')]
+                            assert label.rsplit('-',1)[0] in {'bad','bad-repeat','malformed','old-reader-of-LNK1','child-driver-malformed'}
+                            assert row['cargo']==mate['cargo']==101 and row['elf']==mate['elf']==row['verdict']==mate['verdict']==None
+                            native,=row['native'];assert '/early/' in native and row['native']==mate['native'] and row['native_files']==mate['native_files']
+                            assert len(row['ld'])==1 and row['ld'][0][2]==1
+                            errors=[m['message']['rendered'] or m['message']['message'] for b in raw_msgs if (m:=json.loads(b))['reason']=='compiler-message' and m['message']['level']=='error']
+                            assert any('linking with' in e and native+': file format not recognized' in e for e in errors)
                     visits+=len(h['phases'])
                 assert visits==n,(suite,visits)
             receipts[layout]=[jobs[jname]['id'],art['id'],digest]

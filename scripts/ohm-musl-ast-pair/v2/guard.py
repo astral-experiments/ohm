@@ -84,7 +84,11 @@ class Trial:
             require(not any(line.startswith(b"strace:") and b"seccomp" in line.lower() for line in p.stderr.splitlines()),label,"kernel syscall filter unavailable",p.stderr[-600:])
             with tarfile.open(folder/"syscalls.tgz","x:gz",compresslevel=2) as archive:
                 for raw in sorted(traces.iterdir()):archive.add(raw,arcname=raw.name,recursive=False)
-            data=observe(traces,fix.project,sdk,roots,{str(x) for x in fix.paths})
+            allow_malformed=None
+            if want is None and native=="link" and label.rsplit("-",1)[0] in {"bad","bad-repeat","malformed","old-reader-of-LNK1","child-driver-malformed"}:
+                require(fix.paths[0].read_bytes()==fix.archives["bad"],label,"expected the trained malformed higher-priority provider")
+                allow_malformed=str(fix.paths[0])
+            data=observe(traces,fix.project,sdk,roots,{str(x) for x in fix.paths},malformed_link=allow_malformed)
         save(folder/"kernel.json",data)
         post=dep_records(roots,cas)
         save(folder/"dep-files.json",{"before":pre,"after":post,"opened":data["dep_read"],"writes":data["dep_writes"]})
@@ -184,6 +188,8 @@ class Trial:
             msg="\n".join(m["message"]["rendered"] or m["message"]["message"] for m in typed
                           if m["reason"]=="compiler-message" and m["message"]["level"]=="error")
             require("ohm_musl_v2_choice" in msg,label,msg)
+            if data["failed_app_thread_exits"]:
+                require("linking with" in msg and str(fix.paths[0])+": file format not recognized" in msg,label,"expected the real malformed archive linker diagnostic",msg)
         overlap=[]
         for before in pre:
             if before["kind"]!="encoded" or before["role"]!=PRODUCER:continue
@@ -194,7 +200,7 @@ class Trial:
                        for t,_,name,line in data["dep_writes"]):continue
                 overlap.append([path,before["identity"],before["raw_sha256"],before["parsed"]["LNK1"],when])
         if kept_child_receipt:require(any(read[3]==V2 for read in overlap),label,"fresh same-stamp parent did not read the old child receipt")
-        report={"producer_outdir":str(outdir),"producer_dep_record":str(finger),"retained_child_receipt_on_parent":kept_child_receipt,"label":label,"roles":self.s.active,"verdict":want,"cargo":code,"elf":exe,"producer":[c["kind"] for c in pc],
+        report={"failed_app_threads":data["failed_app_thread_exits"],"producer_outdir":str(outdir),"producer_dep_record":str(finger),"retained_child_receipt_on_parent":kept_child_receipt,"label":label,"roles":self.s.active,"verdict":want,"cargo":code,"elf":exe,"producer":[c["kind"] for c in pc],
                 "consumer":[c["kind"] for c in bc],"build_scripts":len(data["scripts"]),"native":data["selected"],
                 "native_files":native_state,"ld":[[e["image"],e["sha256"],e["exit"]] for e in data["linkers"]],
                 "translated_preexisting_reads":overlap,"roots":{str(r):fid(r)[:2] for r in roots},
@@ -218,6 +224,10 @@ class Trial:
                              marker=mark,translated=trailer)
         require((warm["elf"],warm["cargo"],warm["verdict"])==(clean["elf"],clean["cargo"],clean["verdict"]),label,warm,clean)
         if not skip:require(warm["native"]==clean["native"],label)
+        if warm["failed_app_threads"] or clean["failed_app_threads"]:
+            require(want is None and native=="link" and warm["cargo"]==clean["cargo"]==101 and
+                    warm["native_files"]==clean["native_files"] and warm["native"]==clean["native"]==[str(self.fix.paths[0])],
+                    label,"a failed-thread trace requires the same real malformed linker failure in an independently empty target")
         # Only discard this invocation's known independent empty target after all evidence is retained.
         ref=self.work/("park-"+label)/"reference"
         require(ref.parent.parent==self.work and set(p.name for p in ref.iterdir())=={"target","shared"} and not ref.is_symlink(),ref)

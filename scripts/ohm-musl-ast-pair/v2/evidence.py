@@ -45,7 +45,7 @@ def lines(raw):
         stamp,sep,line=original.partition(" ")
         assert sep and re.fullmatch(r"[0-9]+\.[0-9]+", stamp),original
         if line=="???( <unfinished ...>":
-            assert not pending and index+2==len(rows) and re.fullmatch(r"[0-9]+\.[0-9]+ \+\+\+ exited with 0 \+\+\+",rows[-1]),original
+            assert not pending and index+2==len(rows) and re.fullmatch(r"[0-9]+\.[0-9]+ \+\+\+ exited with [01] \+\+\+",rows[-1]),original
             yield stamp,line
         elif line.endswith("<unfinished ...>"):
             name = line.partition("(")[0]
@@ -57,7 +57,7 @@ def lines(raw):
             yield stamp,line
     assert not pending, pending
 
-def observe(trace, cwd, sdk, roots, native):
+def observe(trace, cwd, sdk, roots, native, *, malformed_link=None):
     events, parents, fd, eno, dep_read, dep_writes, driver_open, exits = [], {}, [], [], [], [], [], {}
     thread_parent={}; native_order=[]; opaque={}
     for f in sorted(trace.glob("pid.*")):
@@ -118,12 +118,15 @@ def observe(trace, cwd, sdk, roots, native):
         return pid
     rustc_pids={e["pid"] for e in events if Path(e["image"]).samefile(sdk/"bin/rustc")}
     exec_pids={e["pid"] for e in events}
-    opaque_threads=[]
+    opaque_threads=[]; failed_threads=[]
     for pid,stamp in sorted(opaque.items()):
         leader=tid_group(pid)
-        assert pid in thread_parent and pid not in exec_pids and leader in rustc_pids and exits.get(pid)==0,(pid,leader)
+        assert pid in thread_parent and pid not in exec_pids and leader in rustc_pids and exits.get(pid) in (0,1),(pid,leader)
         assert ancestor(leader,{rootpid})==rootpid
         opaque_threads.append([pid,stamp,thread_parent[pid],leader])
+        if exits[pid]:
+            assert malformed_link is not None and exits.get(leader)==1,(pid,leader)
+            failed_threads.append([pid,leader])
     compilers, scripts, linkers, targets = [], [], [], []
     for e in events:
         a = e["argv"]
@@ -151,7 +154,12 @@ def observe(trace, cwd, sdk, roots, native):
         e["lookup_order"]=sorted(r for r in native_order if ancestor(r[1],{e["pid"]}) is not None)
         e["exit"]=exits.get(e["pid"])
         targets.extend(e["selected"])
-    return {"cargo":cargo[0],"status":exits[rootpid],"compilers":compilers,"scripts":scripts,"linkers":linkers,
+    if failed_threads:
+        apps=[c["pid"] for c in compilers if c["crate"]==APP]
+        assert len(apps)==len(linkers)==1 and exits[rootpid]==101 and all(leader==apps[0] for _,leader in failed_threads)
+        ld=linkers[0]
+        assert Path(ld["image"]).samefile("/usr/bin/ld") and ld["exit"]==1 and set(ld["selected"])=={malformed_link}
+    return {"failed_app_thread_exits":failed_threads,"cargo":cargo[0],"status":exits[rootpid],"compilers":compilers,"scripts":scripts,"linkers":linkers,
             "selected":sorted(set(targets)),"dep_read":[[t,pid,n] for t,pid,n,_ in dep_read if tid_group(pid)==rootpid],
             "dep_writes":dep_writes,"driver_open":driver_open,"opaque_rustc_thread_exits":opaque_threads,
             "provider_fd":fd,"provider_enoent":eno,"parent_pids":parents,"all_exec":events}

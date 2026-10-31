@@ -46,7 +46,8 @@ def main():
     # Only the actual -o app linker's worker may determine the selected provider.
     with tempfile.TemporaryDirectory() as td:
         root=Path(td);sdk=root/'sdk';(sdk/'bin').mkdir(parents=True)
-        for n in ('cargo','rustc','ld'):(sdk/'bin'/n).write_bytes(n.encode())
+        for n in ('cargo','rustc'):(sdk/'bin'/n).write_bytes(n.encode())
+        (sdk/'bin/ld').symlink_to('/usr/bin/ld')
         driver=sdk/'librustc_driver-abc.so';driver.write_bytes(b'D')
         target=root/'target';target.mkdir()
         early=str(root/'early'/LIB);late=str(root/'late'/LIB)
@@ -80,6 +81,18 @@ def main():
         for bad in ([opaque,'+++ exited with 1 +++'],[opaque,opened(late),'+++ exited with 0 +++'],['openat( <unfinished ...>','+++ exited with 0 +++']):
             rows(15,*bad)
             assert rejected(lambda:observe(trace,root,sdk,[target],{early,late})),bad
+        saved={n:(trace/f'pid.{n}').read_text() for n in (10,12,13)}
+        for n,rc in ((10,101),(12,1),(13,1)):
+            (trace/f'pid.{n}').write_text(saved[n].replace('exited with 0','exited with '+str(rc)))
+        rows(15,opaque,'+++ exited with 1 +++')
+        assert observe(trace,root,sdk,[target],{early,late},malformed_link=late)['failed_app_thread_exits']==[[15,12]]
+        assert rejected(lambda:observe(trace,root,sdk,[target],{early,late}))
+        assert rejected(lambda:observe(trace,root,sdk,[target],{early,late},malformed_link=early))
+        for n in (10,12,13):
+            active=(trace/f'pid.{n}').read_text();(trace/f'pid.{n}').write_text(saved[n])
+            assert rejected(lambda:observe(trace,root,sdk,[target],{early,late},malformed_link=late)),n
+            (trace/f'pid.{n}').write_text(active)
+        for n in (10,12,13):(trace/f'pid.{n}').write_text(saved[n])
         (trace/'pid.15').unlink();(trace/'pid.12').write_text(leader)
         broken=(trace/'pid.12').read_text().replace(' = 13',' = 16')
         (trace/'pid.12').write_text(broken)
