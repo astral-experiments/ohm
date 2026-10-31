@@ -1,5 +1,5 @@
-name: Measure complete Ruff branch-return work
-run-name: Whole Rust branch-return CLI pilot ${{ inputs.reviewed_head }}
+name: Measure ordinary Ruff branch returns
+run-name: Ordinary packed Ruff CLI screen ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -12,10 +12,10 @@ permissions:
   contents: read
 jobs:
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-return-pmu-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-packed-ordinary-efficacy-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
-    name: Whole branch-return pilot ${{ matrix.position }}
+    name: Ordinary packed Ruff CLI ${{ matrix.position }}
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -29,6 +29,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             scripts/branch-return-pmu
+            scripts/packed-ordinary-efficacy
             scripts/ohm-packed-ruff/full-cli
             scripts/ohm-packed-ruff/harness
       - name: Read the binding to the independently completed native source run
@@ -95,11 +96,11 @@ jobs:
           POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/branch-return-pmu/worker.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
+          python3 -IB enrolled/scripts/packed-ordinary-efficacy/ordinary.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: branch-return-pmu-${{ matrix.position }}
+          name: packed-ordinary-efficacy-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true
