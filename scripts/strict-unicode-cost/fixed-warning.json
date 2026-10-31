@@ -1,0 +1,67 @@
+[
+  {
+    "$message_type": "diagnostic",
+    "children": [
+      {
+        "children": [],
+        "code": null,
+        "level": "note",
+        "message": "the lint level is defined here",
+        "rendered": null,
+        "spans": [
+          {
+            "byte_end": 47912,
+            "byte_start": 47902,
+            "column_end": 18,
+            "column_start": 8,
+            "expansion": null,
+            "file_name": "crates/ty_project/src/lib.rs",
+            "is_primary": true,
+            "label": null,
+            "line_end": 1242,
+            "line_start": 1242,
+            "suggested_replacement": null,
+            "suggestion_applicability": null,
+            "text": [
+              {
+                "highlight_end": 18,
+                "highlight_start": 8,
+                "text": "#[warn(deprecated)]"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "code": {
+      "code": "deprecated",
+      "explanation": null
+    },
+    "level": "warning",
+    "message": "use of deprecated constant `OHM_QA_OLD_CONST`: OHM_QA_PRESERVED_WARNING",
+    "rendered": "warning: use of deprecated constant `OHM_QA_OLD_CONST`: OHM_QA_PRESERVED_WARNING\n    --> crates/ty_project/src/lib.rs:1243:15\n     |\n1243 | const _: u8 = OHM_QA_OLD_CONST;\n     |               ^^^^^^^^^^^^^^^^\n     |\nnote: the lint level is defined here\n    --> crates/ty_project/src/lib.rs:1242:8\n     |\n1242 | #[warn(deprecated)]\n     |        ^^^^^^^^^^\n\n",
+    "spans": [
+      {
+        "byte_end": 47945,
+        "byte_start": 47929,
+        "column_end": 31,
+        "column_start": 15,
+        "expansion": null,
+        "file_name": "crates/ty_project/src/lib.rs",
+        "is_primary": true,
+        "label": null,
+        "line_end": 1243,
+        "line_start": 1243,
+        "suggested_replacement": null,
+        "suggestion_applicability": null,
+        "text": [
+          {
+            "highlight_end": 31,
+            "highlight_start": 15,
+            "text": "const _: u8 = OHM_QA_OLD_CONST;"
+          }
+        ]
+      }
+    ]
+  }
+]
