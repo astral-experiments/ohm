@@ -157,6 +157,16 @@ def native_outputs(native, selected):
             result[name]=(p,argv)
     return result
 
+def bind_same_path(proof, output, argv):
+    """Bind the saved module/input proof to the one physical Xcode link at this output."""
+    owner=output.with_suffix(".rlink-objects")
+    actual=[arg for arg in argv if Path(arg).parent==owner and arg.endswith(".o")]
+    need(proof["source"]=="saved-rustc-recipe" and proof["output"]==str(output) and
+         ld_output(argv)==output and actual and len(set(actual))==len(actual) and
+         set(actual)==set(proof["physical"]),"actual Xcode ld and saved root objects differ")
+    return {**proof,"source":"kernel-xcode-ld+rustc-recipe",
+            "linker_argv":hashlib.sha256(json.dumps(argv,separators=(",",":")).encode()).hexdigest()}
+
 def phase(root,repo,work,sdk,env,role,name,rev,trace,prior):
     import cgu_inputs,measure
     out=root/"receipts"/role/name;out.mkdir(parents=True)
@@ -193,7 +203,11 @@ def phase(root,repo,work,sdk,env,role,name,rev,trace,prior):
         key=keep_image(root/"receipts",public)
         if target in hits:
             p,argv=hits[target]
-            proof=cgu_inputs.witness(root,products,public.read_bytes(),str(p),linker=argv)
+            # Check only our own output path. The frozen helper also supports a different
+            # cross-namespace study, whose rewriting of dependency paths does not apply here.
+            held=products/"same-path-recipe";held.mkdir()
+            proof=bind_same_path(cgu_inputs.witness(root,held,public.read_bytes(),str(p)),p,argv)
+            save(products/"cgu-proof.json",proof)
             need(proof["raw"]==key,"saved Mach-O is not the observed linker result")
             prior[(target,key)]=proof
         else:

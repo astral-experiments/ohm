@@ -36,6 +36,21 @@ class Contract(unittest.TestCase):
             with self.assertRaises(RuntimeError):hits(["ruff","ruff-0123456789abcdef"])
             (root/"ruff-0123456789abcdef").write_bytes(b"STALE")
             with self.assertRaises(RuntimeError):hits(["ruff-0123456789abcdef"])
+    def test_same_path_proof_requires_exact_physical_output_and_every_object_once(self):
+        out=Path("/canonical/out/ruff");obj=str(out.with_suffix(".rlink-objects")/"a.rcgu.o")
+        argv=["ld","-o",str(out),obj]
+        held={"source":"saved-rustc-recipe","output":str(out),"physical":{obj:{"sha256":"1"*64}}}
+        proof=s.bind_same_path(held,out,argv)
+        self.assertEqual(proof["physical"],held["physical"])
+        self.assertEqual(proof["source"],"kernel-xcode-ld+rustc-recipe")
+        for args in (argv[:-1],argv+[obj],argv[:-1]+[obj+"x.o"],["ld","-o","/other",obj]):
+            with self.assertRaises(RuntimeError):s.bind_same_path(held,out,args)
+
+    def test_ordinary_edited_behavior_rejects_a_successful_silent_program(self):
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(RuntimeError,"incorrect edited Ruff behavior"):
+                s.check_cli("/usr/bin/true",Path(d),s.NEW,{})
+
     def test_pure_linker_queries_are_separate(self):
         self.assertIsNone(s.ld_output(["ld","-v"]))
         self.assertEqual(s.ld_output(["ld","-v","file.o","-o","app"]),Path("app"))
