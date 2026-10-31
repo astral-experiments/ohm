@@ -138,6 +138,10 @@ def main(trusted):
     need(not (repo / "build").exists(), "native output already exists")
     write(log / "source.json", {**candidate, **bound, "launcher": b.launcher(repo), "llvm": b.LLVM})
     anchor_k(b, root, transfer, log)
+    b.succeeded(
+        [sys.executable, "-IB", s.HERE / "selector.py", repo, root / "genuine-K", log / "selector"],
+        root, log / "selector.log",
+    )
     args = ["./x", *b.OPTIONS, "build", *b.HOST_FLAGS, *b.SDK_COMPONENTS]
     need(
         args == previous_command["argv"] and str(repo) == previous_command["cwd"], "different bootstrap"
@@ -183,6 +187,7 @@ def main(trusted):
         "qualified": True,
         "source": candidate,
         "base": s.K_ORIGIN,
+        "selector": sha(log / "selector/result.json"),
         "host": b.HOST,
         "driver": k["driver"],
         "llvm": b.LLVM,
@@ -212,6 +217,7 @@ def main(trusted):
         {
             **bound,
             **restored,
+            "selector": m["selector"],
             "tests": m["tests"],
             "native": m["native"],
             "cross_readers": m["cross_readers"],

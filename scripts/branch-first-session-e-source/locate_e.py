@@ -13,6 +13,7 @@ import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import subject as s
 import read_cross
+import selector_record
 
 NAME = "Exact E source, Rust regressions and native providers"
 STEPS = (
@@ -117,7 +118,13 @@ def media(catalog, folder):
         s.need(
             base["commit"] == s.K and base["manifest"] == s.K_ORIGIN["manifest"], "wrong donor compiler"
         )
+        selector = selector_record.verify(lambda n: read("E/selector/" + n))
+        s.need(selector["source"] == m["source"]["role"]["commit"]
+               and selector["driver_sha256"] == base["driver"][0]
+               and selector["sdk_executable_sha256"] == m["files"]["bin/rustc"][0],
+               "foreign native selector/driver")
         for name, key in (
+            ("E/selector/result.json", "selector"),
             ("E/checked-in-tests.json", "tests"),
             ("E/native-shadow/complete.json", "native"),
             ("E/cross-readers/complete.json", "cross_readers"),

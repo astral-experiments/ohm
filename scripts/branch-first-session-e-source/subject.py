@@ -13,6 +13,8 @@ HERE = Path(__file__).resolve().parent
 OLD = HERE.parent / "branch-return-source"
 sys.path.insert(0, str(OLD))
 import registration as reg
+sys.path.insert(0, str(HERE))
+import selector_record
 
 K = "0afbeff303d3658bff52582d8f1a996d59e6c8ce"
 SOURCE = "caef389ed580829583f1a63df129b7b649e43508"
@@ -142,15 +144,12 @@ def validate(s):
         "unsafe source path",
     )
     need(
-        len(paths) == 3
-        and len(paths) == len(set(paths))
-        and all(
-            p == "compiler/rustc_session/src/session.rs"
-            or p.startswith(
-                ("compiler/rustc_incremental/", "tests/run-make/")
-            )
-            for p in paths
-        ),
+        len(paths) == 4 and set(paths) == {
+            "compiler/rustc_incremental/src/persist/fs.rs",
+            "compiler/rustc_interface/src/queries.rs",
+            "compiler/rustc_session/src/session.rs",
+            "tests/run-make/ohm-packed-branch-cache/rmake.rs",
+        },
         "unreviewed source scope",
     )
     need(
@@ -167,6 +166,7 @@ def validate(s):
 
 def load():
     inherited()
+    selector_record.signed()
     candidate = validate(json.loads((HERE / "inputs/subject.json").read_bytes())["candidate"])
     pack = HERE / "inputs/E.pack"
     need(pack.is_file() and not pack.is_symlink() and pack.stat().st_size == candidate["pack"]["bytes"]

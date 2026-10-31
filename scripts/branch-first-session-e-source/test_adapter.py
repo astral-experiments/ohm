@@ -213,7 +213,7 @@ def run(inbox, rustrepo=None):
         "unregistered_product_refused": True,
         "subject": enrolled["role"],
         "candidate_pack_objects": candidate_pack,
-        "subject_tampers_refused": 6,
+        "subject_tampers_refused": 3 + len(enrolled["delta"]["rows"]),
     }
 
 
