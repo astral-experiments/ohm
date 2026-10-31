@@ -94,14 +94,26 @@ def install():
             tmp.chmod(mode)
             tmp.replace(dest)
         elif not dest.exists():
+            # x.py changes the live stage1 sysroot between host and cross builds.
+            # The registered source builder freezes each full slice before switching.
+            frozen = rt.CAP / "objects" / digest
+            assert sha(frozen) == digest and frozen.stat().st_size == size
             dest.parent.mkdir(parents=True, exist_ok=True)
-            os.link((stage / path).resolve(strict=True), dest)
+            if frozen.stat().st_mode & 0o777 == mode:
+                os.link(frozen, dest)
+            else:
+                shutil.copyfile(frozen, dest)
+                dest.chmod(mode)
         assert rt.sha(dest) == digest and (dest.stat().st_size, dest.stat().st_mode & 0o777) == (size, mode), path
     assert rows([p for p in kit.rglob("*") if p.is_file()], kit) == reference
     assert sha(stage / ORIGINAL["driver_path"]) == reference[ORIGINAL["driver_path"]][0]
     save(LOG / "base-119.json", reference)
     assert not (kit / "bin/rustdoc").exists()
     bc.stage(["build","--stage","1","-j8","--host",rt.HOST,"--target",rt.HOST,"src/tools/rustdoc"], "matching-rustdoc")
+    assert sha(stage / ORIGINAL["driver_path"]) == reference[ORIGINAL["driver_path"]][0]
+    doc = stage / "bin/rustdoc"
+    shutil.copy2(doc.resolve(strict=True), kit/"bin/rustdoc")
+    save(LOG/"matching-rustdoc.json", rows([kit/"bin/rustdoc"],kit))
     llvm = src / "src/llvm-project"
     assert srcgit("HEAD:src/llvm-project") == LLVM
     subprocess.run(["git","-C",llvm,"init","--quiet"], check=True)
@@ -139,11 +151,8 @@ def install():
         ("musl-libdir", str(crt)), ("cc","/usr/bin/musl-gcc"), ("cxx","/usr/bin/musl-gcc"),
         ("ar","/usr/bin/ar"), ("linker","/usr/bin/musl-gcc"))]
     bc.stage([*[s for o in options for s in ("--set",o)], "build","--stage","1","-j8","--host",rt.HOST,"--target",MUSL,"library"], "matching-musl-std")
-    for n in reference:
-        if n not in rt.TOOLS:
-            assert (stage/n).is_file() and sha(stage/n)==reference[n][0], n
-    doc = stage / "bin/rustdoc"
-    os.link(doc.resolve(strict=True), kit/"bin/rustdoc")
+    assert sha(stage / ORIGINAL["driver_path"])==reference[ORIGINAL["driver_path"]][0]
+    assert rows([kit/n for n in reference],kit)==reference
     lib = stage / "lib/rustlib" / MUSL / "lib"
     target = kit / lib.relative_to(stage)
     shutil.copytree(lib, target, copy_function=lambda a,b: os.link(Path(a).resolve(strict=True),b))
