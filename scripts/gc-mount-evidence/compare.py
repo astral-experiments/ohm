@@ -24,7 +24,7 @@ def outer(root,artifact,late=False):
     assert root.is_absolute() and root==root.resolve() and root.parent==Path(os.environ['RUNNER_TEMP']).resolve() and root.name=='gc-mount-qualification'
     manifest=json.loads((Path(__file__).resolve().parent/'candidate-source/spec.json').read_bytes())
     sealed=json.loads((artifact/'build.json').read_bytes())
-    build_qa='46d28e8bff1c6b52f3e7b7bc13192019e964a7da' if late else os.environ['GITHUB_SHA']
+    build_qa=os.environ.get('SOURCE_CARGO_QA',os.environ['GITHUB_SHA'])
     assert manifest['head']==sealed['candidate'] and manifest['parent']==sealed['parent'] and sealed['qa']==build_qa
     assert o.st(artifact/'cargo')['sha256']==sealed['delivered']==sealed['compiled']
     signed=root/'sdk-21';dirs={'signed':signed,'fixed':root/'sdk-fixed'}
