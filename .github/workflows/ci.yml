@@ -1,73 +1,60 @@
-name: RC22 normal Cargo native provider qualification
+name: RC22 structural Ruff CLI and integration-test check
 on:
   workflow_dispatch:
-permissions:
-  contents: read
-  actions: read
-concurrency:
-  group: rc22-provider-plain-${{ github.ref }}
-  cancel-in-progress: false
+    inputs:
+      expected_head: {description: Exact reviewed packaging commit, required: true, type: string}
+permissions: {contents: read, actions: read}
+concurrency: {group: rc22-ruff-real-integration, cancel-in-progress: false}
 jobs:
-  provider:
-    name: Plain native providers (${{ matrix.triple }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-markers-plain-20261031'
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - {triple: x86_64-unknown-linux-gnu, key: gnu, runner: namespace-profile-ubuntu-24-04-16}
-          - {triple: aarch64-apple-darwin, key: apple, runner: namespace-profile-macos-15}
-    runs-on: ${{ matrix.runner }}
+  native:
+    name: Unscored real Ruff CLI and integration test (arm64 macOS)
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-ruff-real-integration-20261031'
+    runs-on: namespace-profile-macos-15
+    timeout-minutes: 170
     steps:
+      - name: Require the reviewed branch head
+        env: {EXPECTED: '${{ inputs.expected_head }}'}
+        run: test "$GITHUB_SHA" = "$EXPECTED"
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {path: protocol, persist-credentials: false, sparse-checkout: scripts/rc22-native}
+        with:
+          path: protocol
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/rc22-native
+            scripts/rc22-ruff-integration
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {repository: astral-sh/ruff, ref: 93526150df078af7dd8fc4226cdcc469539d2001, path: ruff, persist-credentials: false, sparse-checkout: Cargo.lock, sparse-checkout-cone-mode: false}
+        with: {repository: astral-sh/ruff, ref: 915bb2b4bf9ae7eee47cf55646bbfebae254a23b, fetch-depth: 2, path: ruff, persist-credentials: false}
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with: {ref: 89a055549f4335e6e172f96c65d162dcd9cb1046, path: marker-reader, persist-credentials: false, sparse-checkout: scripts/ohm-musl-ast-pair/v2}
-      - if: runner.os == 'macOS'
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with: {ref: 14c9d13d68f3dd21c53f1ef6c3721de8363c0123, path: apple-reader, persist-credentials: false, sparse-checkout: scripts/ohm-apple-zmij}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with: {python-version: '3.13'}
-      - name: Verify the enrolled source job and original native SDK archive
+      - name: Authenticate the independently qualified native SDK and both Cargo binaries
         env: {GH_TOKEN: '${{ github.token }}'}
-        shell: bash
         run: |
           set -euo pipefail
           test "$(git -C protocol rev-parse HEAD)" = "$GITHUB_SHA"
-          python3 -IB protocol/scripts/rc22-native/acquire_plain.py protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json "$RUNNER_TEMP/rc22-inbox" "$RUNNER_TEMP/rc22-source"
-      - name: Prepare native archive and checksum tools
+          test "$(git -C protocol rev-parse HEAD:scripts/rc22-native)" = 784d42db3f6f633a899219406265027cb537ab95
+          python3 -IB protocol/scripts/rc22-native/acquire_plain.py protocol/scripts/rc22-native/source/sdk-apple.json "$RUNNER_TEMP/rc22-inbox" "$RUNNER_TEMP/rc22-source"
+      - name: Qualify the source, native controls, and exact ordinary Cargo visits
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$RUNNER_OS" == Linux ]]; then
-            sudo apt-get -qq update
-            sudo apt-get install -y --no-install-recommends b3sum build-essential zstd
-          else
-            command -v b3sum >/dev/null || brew install b3sum
-            command -v zstd >/dev/null || brew install zstd
-            xcodebuild -version
-          fi
-          python3 -IB protocol/scripts/rc22-native/test_protocol.py
-      - name: Reopen both exact SDK roles and run the ordinary native provider matrix
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 -IB protocol/scripts/rc22-native/plain.py "$RUNNER_TEMP/rc22-plain" "$RUNNER_TEMP/rc22-inbox" protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json
-      - name: Independently verify every complete program, record and native transition
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 -IB protocol/scripts/rc22-native/plain_verify.py "$RUNNER_TEMP/rc22-plain/receipts" protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json "$RUNNER_TEMP/rc22-plain/receipts/independent.json"
-      - name: Preserve source binding and all complete or partial provider observations
+          command -v b3sum >/dev/null || brew install b3sum
+          command -v zstd >/dev/null || brew install zstd
+          python3 -IB protocol/scripts/rc22-ruff-integration/test_protocol.py
+          python3 -IB protocol/scripts/rc22-ruff-integration/study.py "$RUNNER_TEMP/rc22-ruff-check" "$RUNNER_TEMP/rc22-inbox"
+      - name: Independently replay raw kernel events, dep-info and complete signed programs
+        run: python3 -IB protocol/scripts/rc22-ruff-integration/reopen.py "$RUNNER_TEMP/rc22-ruff-check/receipts" apple-reader/scripts/ohm-apple-zmij marker-reader/scripts/ohm-musl-ast-pair/v2 "$RUNNER_TEMP/rc22-ruff-check/receipts/independent.json"
+      - name: Preserve original observation streams and complete native bodies, including any refusal
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: rc22-plain-native-${{ matrix.triple }}
+          name: rc22-ruff-real-integration
           path: |
             ${{ runner.temp }}/rc22-source/
-            ${{ runner.temp }}/rc22-plain/receipts/
+            ${{ runner.temp }}/rc22-ruff-check/receipts/
           if-no-files-found: warn
+          compression-level: 1
           retention-days: 30
