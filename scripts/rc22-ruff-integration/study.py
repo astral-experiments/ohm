@@ -240,16 +240,25 @@ def calibrate(root, trace, env, active_linker):
     out=root/"receipts/calibration";out.mkdir()
     src=out/"probe.c";exe=out/"probe";src.write_text("int main(void){return 13;}\n")
     clang=Path(subprocess.check_output(["xcrun","--find","clang"],text=True).strip())
-    for label,argv,want in [("positive",[str(clang),str(src),"-o",str(exe)],1),("negative",["/usr/bin/true"],0)]:
+    apple_sdk=Path(subprocess.check_output(["xcrun","--sdk","macosx","--show-sdk-path"],text=True).strip()).resolve(strict=True)
+    developer,=[p for p in active_linker.parents if p.name=="Developer" and p.parent.name=="Contents"]
+    stub=apple_sdk/"usr/lib/libSystem.tbd"
+    need(apple_sdk.is_relative_to(developer/"Platforms/MacOSX.platform/Developer/SDKs") and
+         clang.resolve().is_relative_to(developer) and stub.is_file(),"stock Xcode calibration SDK")
+    for label,argv,want in [("positive",[str(clang),"-isysroot",str(apple_sdk),str(src),"-o",str(exe)],1),("negative",["/usr/bin/true"],0)]:
         rows=[]
         with (out/(label+".out")).open("xb") as oo,(out/(label+".err")).open("xb") as ee:
             try: status,_=trace.command(argv,cwd=out,env=env,out=oo,err=ee,observed_rows=rows,timeout=50)
             finally: packed(out/(label+"-events.json.gz"),json.dumps(rows).encode())
         hits=[r for r in rows if Path(r["path"]).exists() and Path(r["path"]).samefile(active_linker)]
-        need(status==0 and len(hits)==want and (not hits or
-             [Path(p).resolve() for a,p in zip(hits[0]["argv"],hits[0]["argv"][1:]) if a=="-o"]==[exe.resolve()]), "uncalibrated Xcode exec observer "+label)
+        need(status==0 and len(hits)==want, "uncalibrated Xcode exec observer "+label)
+        if hits:
+            pairs=list(zip(hits[0]["argv"],hits[0]["argv"][1:]))
+            need([Path(p).resolve() for a,p in pairs if a=="-o"]==[exe.resolve()] and
+                 [Path(p).resolve() for a,p in pairs if a=="-syslibroot"]==[apple_sdk],"unbound Xcode calibration output or SDK")
     need(run([exe],cwd=out,env=env).returncode==13,"native sentinel executable changed")
-    save(out/"complete.json",{"linker":str(active_linker),"sha256":sha(active_linker),"positive":1,"negative":0,"program_exit":13})
+    save(out/"complete.json",{"linker":str(active_linker),"sha256":sha(active_linker),"sdk":str(apple_sdk),
+                              "system_stub_sha256":sha(stub),"positive":1,"negative":0,"program_exit":13})
 
 def main(root, bundle):
     root=root.resolve(); ws=Path(os.environ["GITHUB_WORKSPACE"]).resolve()
