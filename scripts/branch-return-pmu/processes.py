@@ -169,12 +169,29 @@ def compact(source, target):
 
 
 def sessions(where, physical, work):
-    from bindings import save, sha
+    from bindings import OUT, numbers, save
+    from session_tables import finalized, owner
 
     selected = {}
+    manifest = json.loads((OUT / "sdk/manifest.json").read_bytes())
+    arm = json.loads((where.parent / "arm.json").read_bytes())
+    driver = manifest["driver"]
+    source = manifest["roles"][arm["role"]]["commit"]
+    match = manifest["files"][arm["role"]][driver][0]
+    need(
+        arm["sdk"] == str(SDK)
+        and arm["files"][driver] == [match, *numbers(SDK / driver)],
+        "wrong physical compiler for incremental tables",
+    )
+    first_line = manifest["compiler_verbose"].splitlines()[0]
+    need(first_line.startswith("rustc "), "missing qualified compiler version")
+    version = first_line.removeprefix("rustc ")
     for row in physical["rustcs"]:
         crate = row["crate"]
-        if crate not in {"ruff", "ruff_python_ast", "ruff_python_parser"} or row["mode"] != "full":
+        if (
+            crate not in {"ruff", "ruff_python_ast", "ruff_python_parser"}
+            or row["mode"] != "full"
+        ):
             continue
         choices = [
             a.split("=", 1)[1]
@@ -184,32 +201,33 @@ def sessions(where, physical, work):
         need(len(choices) == 1, ("missing real incremental flag", crate, choices))
         base = Path(choices[0])
         need(
-            base.is_relative_to(work / "target") or base.is_relative_to(work / "build"),
+            base.resolve() == base
+            and (
+                base.is_relative_to(work / "target")
+                or base.is_relative_to(work / "build")
+            ),
             ("foreign codegen cache", base),
         )
+        producer, proof = owner(row, base, work)
         artifact = []
-        for owner in sorted(base.glob(crate + "-*")):
-            for session in sorted(owner.glob("s-*")):
-                if not session.is_dir() or session.name.endswith("-working"):
-                    continue
-                graph = session / "dep-graph.bin"
-                products = session / "work-products.bin"
-                if not (graph.is_file() and products.is_file()):
-                    continue
-                need(
-                    graph.stat().st_size > 0 and products.stat().st_size > 0,
-                    "empty compiler cache files",
+        for session in sorted(producer.glob("s-*")):
+            if not session.is_dir() or session.name.endswith("-working"):
+                continue
+            artifact.append(
+                dict(
+                    session=str(session.relative_to(work)),
+                    **finalized(session, version),
                 )
-                artifact.append(
-                    dict(
-                        session=str(session.relative_to(work)),
-                        graph_bytes=graph.stat().st_size,
-                        work_products=[products.stat().st_size, sha(products)],
-                        objects=sum(1 for _ in session.glob("*.o")),
-                    )
-                )
+            )
         need(artifact, ("missing actual owner incremental work products", crate, base))
         selected[str(row["pid"])] = dict(
-            crate=crate, flag=str(base), current_or_prior_complete_sessions=artifact
+            crate=crate,
+            flag=str(base),
+            owner=str(producer.relative_to(work)),
+            producer=proof,
+            role=arm["role"],
+            source=source,
+            driver_sha256=match,
+            current_or_prior_complete_sessions=artifact,
         )
     save(where / "incremental-owners.json", selected)
