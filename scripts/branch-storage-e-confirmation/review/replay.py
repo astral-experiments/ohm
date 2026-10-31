@@ -12,13 +12,13 @@ import zipfile
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent)]
 import decision
+import checked_source
 import media
 import physical as p
 import confirm_binding as r
 from replay_metrics import measured_count, need
 
 BASE_ZIP = "3e8b9f19c21b90b1a281c349f6c812453ad7afe327ce0930dbd6be9d4c46a620"
-CHILD_ZIP = "b4372e9d8d51decdd0d68ddb620ddfc8807368d1de76f5f607bc745bb7a2115c"
 BASE_MANIFEST = "c29e2e57626491804d9c24e5fa50a709015a002067a3bf39e884d8b6ef0fea43"
 
 
@@ -57,15 +57,13 @@ def archive_input(z, pos, head, run, schedule, old, seen):
     )
     need(
         en["F"]["manifest"] == BASE_MANIFEST
-        and en["E"] == json.loads((p.SCREEN / "inputs/e-source.json").read_bytes())["source"],
+        and en["E"] == checked_source.enrollment(),
         "unbound compiler sources",
     )
     for directory, files in [
         (
             p.SCREEN / "inputs",
             (
-                "e-source.json",
-                "source-replay.json",
                 "ruff-28233.json",
                 "ruff-28233.patch",
                 "cold-units.json",
@@ -80,8 +78,12 @@ def archive_input(z, pos, head, run, schedule, old, seen):
                 "pilots.json",
                 "integration-boots.json",
                 "projections.json",
+                "checked-e-source.json",
+                "checked-source-replay.json",
+                "checked-provider.json",
             ),
         ),
+        (r.HERE, ("SOURCE-ADDENDUM.md",)),
     ]:
         for name in files:
             need(z.read(name) == (directory / name).read_bytes(), "changed enrollment file " + name)
@@ -176,11 +178,12 @@ def main(a):
     docs = json.loads(a.catalog.read_bytes())
     rows = media.catalog(a.run, a.head, docs, require_success=True)
     kits = {"F": a.f_sdk, "E": a.e_sdk}
+    child_zip = checked_source.enrollment()["artifacts"][checked_source.DRIVER_ZIP]["digest"].removeprefix("sha256:")
     for role, path in kits.items():
         with path.open("rb") as h:
             need(
                 hashlib.file_digest(h, "sha256").hexdigest()
-                == {"F": BASE_ZIP, "E": CHILD_ZIP}[role],
+                == {"F": BASE_ZIP, "E": child_zip}[role],
                 "different source archive",
             )
     inputs, parsers = p.corpus.source(a.ruff)

@@ -12,7 +12,7 @@ permissions:
   contents: read
 jobs:
   antecedents:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-storage-e-confirmation-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-storage-checked-confirmation-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
     name: Verify source-pilot records and all prior integration boots
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -38,10 +38,10 @@ jobs:
     needs: antecedents
     env:
       PREVIOUS_BINDING: ${{ needs.antecedents.outputs.binding }}
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-storage-e-confirmation-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-storage-checked-confirmation-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
-    name: Confirm E whole-Ruff storage ${{ matrix.position }}
+    name: Confirm corrected E whole-Ruff storage ${{ matrix.position }}
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -74,6 +74,7 @@ jobs:
           path: source
           persist-credentials: false
           sparse-checkout: |
+            scripts/branch-checked-packed-source
             scripts/branch-first-session-e-source
             scripts/branch-return-source
             scripts/ohm-packed-ruff
@@ -133,7 +134,7 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: e-storage-confirmation-${{ matrix.position }}
+          name: checked-e-storage-confirmation-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

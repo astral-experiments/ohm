@@ -1,0 +1,5 @@
+# Corrected compiler for the twelve-host confirmation
+
+The enrolled treatment replaces the historical E in PLAN.md with Rust 393b4b05a4bfa3f531a36023846f86236a6b71a9. The baseline Foff and Fon are the same native #274 compiler. The previous E could accept A's ordinary object in B's packed session and produce the complete A executable. The corrected compiler rejects both representations together, then rebuilds B from the current source. A genuine legacy F writer produced the inverse arrangement, with a current ordinary object and an older packed object. Both writer histories, their empty references, the original failed worker, and the explicit raw-only limitation are required source evidence.
+
+The enrollment keeps the two Ruff histories, command lines, order, five thresholds, simultaneous sign intervals, sampling, allocations, source and native controls, and all 66 independent predecessor boot exclusions frozen in the original PLAN and inputs. The earlier E pilot can guide feasibility. It contributes zero observations to the corrected compiler's confirmation.

@@ -6,6 +6,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 
 HERE = Path(__file__).resolve().parent
 INPUTS = HERE / "inputs"
@@ -38,7 +39,7 @@ KNOWN_SHA = "691b1d4a6597261df2795f7cddbb0b5167ac288332014e414a7a8bc267d382e8"
 PLAN = "bd0b036f8f18176404051697513ce784c38cd2669b776b22008c99578969e519"
 ORDERS_SHA = "a1ed3813eafe2f80a18c8765fdb032917dd597865daaa7818f559bd5cb573652"
 REPO = "astral-experiments/ohm"
-REF = "charlie/qa-branch-storage-e-confirmation-20261031"
+REF = "charlie/qa-branch-storage-checked-confirmation-20261031"
 BOOT = re.compile(r"[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 DIGEST = re.compile(r"[0-9a-f]{64}")
 
@@ -100,9 +101,12 @@ def validated_prior(prior, registered, pilots):
 def local():
     files = {
         HERE / "PLAN.md": PLAN,
+        HERE / "SOURCE-ADDENDUM.md": "349a0fe529fcabb7a9c0b2c744704f80b6bcad559ed2302cb62301f62e0339e1",
         INPUTS / "orders.json": ORDERS_SHA,
         INPUTS / "pilots.json": PILOTS_SHA,
         INPUTS / "previous-boots.json": KNOWN_SHA,
+        INPUTS / "integration-boots.json": "b7e6531caa7eb7db9a9a36fd18eea1d9a242383268bebe8d37692473ba34ed6d",
+        INPUTS / "excluded-boots.json": "e7874956be4febf7003cef92076951c1b89a469dcdaaa17730fdc11eb703b0dc",
     }
     check(all(sha(p) == d for p, d in files.items()), "different frozen study or pilot witness")
     pilots = json.loads((INPUTS / "pilots.json").read_bytes())
@@ -176,6 +180,11 @@ def github(suffix):
 
 
 def live():
+    sys.path.insert(0, str(HERE))
+    import checked_source
+
+    checked = checked_source.enrollment()
+    checked_source.official(github, checked)
     pilots, old, boots = local()
     for seed in pilots["runs"].values():
         official(github, seed, 2)

@@ -145,9 +145,15 @@ def extract_delta(archive, capsule, role):
 
 
 def acquire(source, *, base_role=BASE_ROLE, base_commit=BASE_COMMIT):
-    e = enrollment()
-    b.prepare_checkout(source, e["head"], "scripts")
     code = source / "scripts/branch-first-session-e-source"
+    return acquire_from(
+        source, base_role, base_commit, enrollment(),
+        code / "locate_e.py", code / "restore_e.py", source_media.corrected,
+    )
+
+
+def acquire_from(source, base_role, base_commit, e, locator, restorer, verify_media):
+    b.prepare_checkout(source, e["head"], "scripts")
     dir_, ktransfer, k = original_sdk(source, base_role, base_commit)
     e_archive = b.ROOT / "e-archives"
     e_archive.mkdir()
@@ -158,7 +164,7 @@ def acquire(source, *, base_role=BASE_ROLE, base_commit=BASE_COMMIT):
             [
                 sys.executable,
                 "-IB",
-                code / "locate_e.py",
+                locator,
                 str(e["run"]),
                 e["head"],
                 "--gh",
@@ -169,7 +175,7 @@ def acquire(source, *, base_role=BASE_ROLE, base_commit=BASE_COMMIT):
             dir_ / "official-E",
         )
     )
-    actual, identities = source_media.corrected(actual, e_archive)
+    actual, identities = verify_media(actual, e_archive)
     b.save(dir_ / "native-media-identities.json", identities)
     b.need(actual == e, "different source job or original qualification evidence")
     capsule = b.ROOT / "E-transfer"
@@ -211,7 +217,7 @@ def acquire(source, *, base_role=BASE_ROLE, base_commit=BASE_COMMIT):
         dir_ / ("reopen-" + base_role),
     )
     capture(
-        [sys.executable, "-IB", code / "restore_e.py", ktransfer, capsule, b.PARK / "E", *eargs],
+        [sys.executable, "-IB", restorer, ktransfer, capsule, b.PARK / "E", *eargs],
         dir_ / "reopen-E",
     )
     roles = {

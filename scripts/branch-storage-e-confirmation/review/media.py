@@ -14,8 +14,8 @@ sys.path.insert(0, str(HERE.parent))
 import decision
 import confirm_binding as r
 
-LABEL = "Confirm E whole-Ruff storage "
-PREFIX = "e-storage-confirmation-"
+LABEL = "Confirm corrected E whole-Ruff storage "
+PREFIX = "checked-e-storage-confirmation-"
 PREFLIGHT = "Verify source-pilot records and all prior integration boots"
 CARGO_STEP = (
     "Compare pristine and same-branch-edited first checkouts with four native provider outcomes"
