@@ -254,7 +254,6 @@ class Toolchains:
             },
         )
         self.use.append({"role": short, "version": version, "tools": infos, "record": out.name})
-        m.save(O / "all-selections.json", self.use)
 
 
 def settings_probe(where, env, level, ref):
@@ -526,6 +525,7 @@ def main():
     b.edited(False)
     settings(env, "0")
     assert len({x["version"] for x in kits.use}) == 1
+    m.save(O / "all-selections.json", kits.use)
     m.save(
         O / "complete.json",
         {
