@@ -13,6 +13,7 @@ import subprocess
 import sys
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 point = HERE.parent / "strict-unwrapped-profile/study.py"
 for rel, digest in (
     (
