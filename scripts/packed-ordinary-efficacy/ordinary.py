@@ -1,4 +1,4 @@
-"""Measure identical, complete Cargo histories with the packed cache disabled and enabled."""
+"""Confirm the published branch-cache compiler and measure the separate cost of packing."""
 
 import json
 import os
@@ -16,9 +16,16 @@ from bindings import OUT, ROOT, WORK, need, save, sha
 from extra_provider import exercise
 
 b = worker.b
-PLAN = "4b3674feca534b2622cb4c33efdbd2f778099573f1cf964a96fad69697f0a7b6"
-BRANCH = "charlie/qa-branch-cache-three-arm-attribution-20261031"
-ORDERS = {"01": ("Foff", "Fon", "Kon"), "02": ("Kon", "Fon", "Foff")}
+PLAN = "e110fd5e73b3f6a8f102a9837229d8bd2644693c39aa2b6a0c75ca7de2f778d8"
+BRANCH = "charlie/qa-direct-branch-cache-confirmation-20261031"
+ORDERS = {
+    "01": ("Foff", "Fon", "Kon"),
+    "02": ("Kon", "Fon", "Foff"),
+    "03": ("Fon", "Kon", "Foff"),
+    "04": ("Foff", "Kon", "Fon"),
+    "05": ("Kon", "Foff", "Fon"),
+    "06": ("Fon", "Foff", "Kon"),
+}
 PREVIOUS_BOOTS = {
     "78a866b0-afbc-4843-a44c-17a8d5bf8e1a",
     "efc22aa1-dd29-4916-985b-d7a54f481433",
@@ -34,6 +41,34 @@ PREVIOUS_BOOTS = {
     "cf938e9c-a8d2-4a0d-8260-fb5f89d89d65",
     "eb13685b-610e-43dd-a65e-72a6b88482f1",
 }
+
+
+def eligible_screen():
+    """Require the reviewed three-arm screen and both original GitHub archive digests."""
+    screen = json.loads((HERE / "DIRECT-SCREEN.json").read_bytes())
+    run = 41219824213
+    head = "43111cc1644cc2fb89cc33eac321f3e2905edf1e"
+    api = f"repos/{b.REPO}/actions/runs/{run}"
+    metadata = json.loads(subprocess.check_output(["gh", "api", api]))
+    need((metadata["run_attempt"], metadata["head_sha"], metadata["status"], metadata["conclusion"])
+         == (1, head, "completed", "success"), "original attribution run")
+    listed = json.loads(subprocess.check_output(["gh", "api", api + "/artifacts?per_page=100"]))
+    media = {row["name"]: (row["id"], row["size_in_bytes"], row["digest"]) for row in listed["artifacts"]
+             if not row["expired"] and row["workflow_run"]["id"] == run and row["workflow_run"]["head_sha"] == head}
+    need(listed["total_count"] == len(media) == 2 and screen["run"] == run and screen["head"] == head
+         and screen["branch_cache_passes_exploratory_screen"] is True, "original attribution evidence")
+    for pos in ("01", "02"):
+        artifact = screen["artifacts"][pos]
+        need(media["branch-cache-attribution-" + pos] == (artifact["id"], artifact["size_in_bytes"],
+                                                           "sha256:" + artifact["sha256"]), "original ZIP changed")
+        arms = screen["hosts"][pos]["arms"]
+        for phase in ("return-A", "return-B"):
+            before = arms["Foff"][phase]["instructions"]
+            after = arms["Fon"][phase]["instructions"]
+            need(type(before) is type(after) is int and before >= 2 * after > 0, "original screen missed threshold")
+    boots = {v["boot"] for v in screen["hosts"].values()}
+    need(set(screen["hosts"]) == {"01", "02"} and len(boots) == 2, "original screen collection")
+    return boots
 
 
 def compare_clean(refs):
@@ -98,8 +133,8 @@ def main(position, source, calibrator, observers, provider):
         and os.environ["GITHUB_REF"] == "refs/heads/" + BRANCH
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and head == os.environ["REVIEWED_HEAD"] == b.git(HERE, "rev-parse", "HEAD")
-        and sha(HERE / "ATTRIBUTION.md") == PLAN,
-        "attribution identity",
+        and sha(HERE / "DIRECT-CONFIRMATION.md") == PLAN,
+        "six-boot direct confirmation identity",
     )
     trees = b.git(
         HERE,
@@ -131,7 +166,8 @@ def main(position, source, calibrator, observers, provider):
     )
     for name in ("clean", "ordinary", "measured", "providers", "initial"):
         (OUT / name).mkdir()
-    shutil.copy2(HERE / "ATTRIBUTION.md", OUT / "PLAN.md")
+    screen_boots = eligible_screen()
+    shutil.copy2(HERE / "DIRECT-CONFIRMATION.md", OUT / "PLAN.md")
     shutil.copy2(b.RUNTIME, OUT / "source-kit.json")
     worker.link_diagnostic.acquire()
     subprocess.run(
@@ -140,7 +176,7 @@ def main(position, source, calibrator, observers, provider):
     ready = json.loads((OUT / "meter-ready.json").read_bytes())
     os.sched_setaffinity(0, ready["affinity"])
     need(
-        ready["boot"] not in PREVIOUS_BOOTS
+        ready["boot"] not in PREVIOUS_BOOTS | screen_boots
         and sorted(os.sched_getaffinity(0)) == ready["affinity"],
         "reused boot or wrong affinity",
     )
@@ -156,6 +192,7 @@ def main(position, source, calibrator, observers, provider):
             runner=os.environ["RUNNER_NAME"],
             source=b.spec(),
             plan=PLAN,
+            attribution_screen=sha(HERE / "DIRECT-SCREEN.json"),
             command=worker.CARGO,
         ),
     )

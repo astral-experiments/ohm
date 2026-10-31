@@ -1,0 +1,815 @@
+{
+  "artifacts": {
+    "01": {
+      "id": 13050203233,
+      "job": 124591883271,
+      "sha256": "9ca42b73ab91df7515fc7239cbd2959a29f07b8c3327f0c2f283bf1ba45264eb",
+      "size_in_bytes": 242814838
+    },
+    "02": {
+      "id": 13050422706,
+      "job": 124591883429,
+      "sha256": "ce681e0543ce16b6d9f2d9c3f6ba4069da55e01cf25a244d622598fd00f2babd",
+      "size_in_bytes": 242815951
+    }
+  },
+  "branch_cache_passes_exploratory_screen": true,
+  "head": "43111cc1644cc2fb89cc33eac321f3e2905edf1e",
+  "hosts": {
+    "01": {
+      "arms": {
+        "Foff": {
+          "cold-A": {
+            "allocated": 2393059328,
+            "enabled": 384855304183,
+            "instructions": 2616480119807,
+            "running": 384855304183,
+            "unmetered_allocated": 2393026560
+          },
+          "first-B": {
+            "allocated": 2505498624,
+            "enabled": 124601055072,
+            "instructions": 843977405980,
+            "running": 124601055072,
+            "unmetered_allocated": 2505117696
+          },
+          "invalid": {
+            "allocated": 2397384704,
+            "enabled": 298221775,
+            "instructions": 1927491581,
+            "running": 298221775,
+            "unmetered_allocated": 2397396992
+          },
+          "repair": {
+            "allocated": 2403446784,
+            "enabled": 7976552449,
+            "instructions": 54173203097,
+            "running": 7976552449,
+            "unmetered_allocated": 2403385344
+          },
+          "return-A": {
+            "allocated": 2612801536,
+            "enabled": 125135679070,
+            "instructions": 844824247186,
+            "running": 125135679070,
+            "unmetered_allocated": 2612760576
+          },
+          "return-B": {
+            "allocated": 2394845184,
+            "enabled": 125997432740,
+            "instructions": 846591197628,
+            "running": 125997432740,
+            "unmetered_allocated": 2394796032
+          },
+          "unchanged-B": {
+            "allocated": 2394845184,
+            "enabled": 722554594,
+            "instructions": 3479751689,
+            "running": 722554594,
+            "unmetered_allocated": 2394796032
+          }
+        },
+        "Fon": {
+          "cold-A": {
+            "allocated": 2393079808,
+            "enabled": 384917804929,
+            "instructions": 2616618384480,
+            "running": 384917804929,
+            "unmetered_allocated": 2393067520
+          },
+          "first-B": {
+            "allocated": 3022774272,
+            "enabled": 127099300724,
+            "instructions": 895529478907,
+            "running": 127099300724,
+            "unmetered_allocated": 3022917632
+          },
+          "invalid": {
+            "allocated": 2700005376,
+            "enabled": 367172212,
+            "instructions": 2574847393,
+            "running": 367172212,
+            "unmetered_allocated": 2700259328
+          },
+          "repair": {
+            "allocated": 2886959104,
+            "enabled": 10320192745,
+            "instructions": 77780810431,
+            "running": 10320192745,
+            "unmetered_allocated": 2886877184
+          },
+          "return-A": {
+            "allocated": 2662957056,
+            "enabled": 11432819967,
+            "instructions": 107492053027,
+            "running": 11432819967,
+            "unmetered_allocated": 2662989824
+          },
+          "return-B": {
+            "allocated": 2670809088,
+            "enabled": 13636855727,
+            "instructions": 133989978555,
+            "running": 13636855727,
+            "unmetered_allocated": 2671001600
+          },
+          "unchanged-B": {
+            "allocated": 2670809088,
+            "enabled": 804131539,
+            "instructions": 3480675448,
+            "running": 804131539,
+            "unmetered_allocated": 2671001600
+          }
+        },
+        "Kon": {
+          "cold-A": {
+            "allocated": 2393038848,
+            "enabled": 386834626645,
+            "instructions": 2616667970294,
+            "running": 386834626645,
+            "unmetered_allocated": 2393038848
+          },
+          "first-B": {
+            "allocated": 2884104192,
+            "enabled": 128367261215,
+            "instructions": 902187993353,
+            "running": 128367261215,
+            "unmetered_allocated": 2884149248
+          },
+          "invalid": {
+            "allocated": 2426646528,
+            "enabled": 361441313,
+            "instructions": 2657871026,
+            "running": 361441313,
+            "unmetered_allocated": 2426802176
+          },
+          "repair": {
+            "allocated": 2741788672,
+            "enabled": 10690542479,
+            "instructions": 80903785910,
+            "running": 10690542479,
+            "unmetered_allocated": 2741837824
+          },
+          "return-A": {
+            "allocated": 2385371136,
+            "enabled": 12084191221,
+            "instructions": 113761398306,
+            "running": 12084191221,
+            "unmetered_allocated": 2385453056
+          },
+          "return-B": {
+            "allocated": 2393284608,
+            "enabled": 14598932791,
+            "instructions": 143489684311,
+            "running": 14598932791,
+            "unmetered_allocated": 2393477120
+          },
+          "unchanged-B": {
+            "allocated": 2393284608,
+            "enabled": 766576175,
+            "instructions": 3479912699,
+            "running": 766576175,
+            "unmetered_allocated": 2393477120
+          }
+        }
+      },
+      "bodies": {
+        "0937584718eff4e110e490b089295599cdaee53fd5427b39b4ee85004a2139c6": {
+          "bytes": 147278784,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "0937584718eff4e110e490b089295599cdaee53fd5427b39b4ee85004a2139c6"
+        },
+        "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8": {
+          "bytes": 13239680,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "sections": 41,
+          "whole": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8"
+        },
+        "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08": {
+          "bytes": 13247832,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "sections": 41,
+          "whole": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08"
+        },
+        "80b42ec1310a693d37ce488e001d5ba39d07e6d9c888e8ad2472130932cadc96": {
+          "bytes": 147395472,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "80b42ec1310a693d37ce488e001d5ba39d07e6d9c888e8ad2472130932cadc96"
+        },
+        "876284c5d444613252093c52e396248ae9d9dc9c05c503ff85e7dccf72f5f0ce": {
+          "bytes": 147278784,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "876284c5d444613252093c52e396248ae9d9dc9c05c503ff85e7dccf72f5f0ce"
+        },
+        "89c352c68024c8174139356a8ba1d7364dc8539f324dcaa21c864df6de37b3d9": {
+          "bytes": 147395472,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "89c352c68024c8174139356a8ba1d7364dc8539f324dcaa21c864df6de37b3d9"
+        },
+        "b5d99e5d2ad7af0135143b455a92db8f8d973fb7a92457fde99d152ba4fe6795": {
+          "bytes": 147278784,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "b5d99e5d2ad7af0135143b455a92db8f8d973fb7a92457fde99d152ba4fe6795"
+        },
+        "f875afec973dcb18c91f071135257d7e0edf364fa3426e74a602c34fd9b707c6": {
+          "bytes": 147395472,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "f875afec973dcb18c91f071135257d7e0edf364fa3426e74a602c34fd9b707c6"
+        }
+      },
+      "boot": "a6ff7065-8395-4e3b-bfde-4fb5d90ff3c9",
+      "cpu": {
+        "cpu family": "26",
+        "model": "68",
+        "model name": "AMD EPYC",
+        "stepping": "0",
+        "vendor_id": "AuthenticAMD"
+      },
+      "filesystem": "TARGET SOURCE  FSTYPE  OPTIONS\n/      overlay overlay rw,relatime,lowerdir=/disk/extra0,upperdir=/namespace/containers/rootfs/gv3bs2l0ipies/fs,workdir=/namespace/containers/rootfs/gv3bs2l0ipies/work,uuid=on",
+      "native_binding": {
+        "artifact": {
+          "id": 13042799674,
+          "sha256": "6e9c1d753b9bd2dcb90ad100096447903867e42d961d1ea56fa21a32429986a2",
+          "size": 81914908
+        },
+        "attempt": 1,
+        "complete_sha256": "a5952bbf7b41190543ed0ecbe7195fb5b2bf2bf971ea45f521617c3cba36c109",
+        "head": "d8b51eace7817c784a7bd0a220b745777c1891fd",
+        "independent": "f2860d5156edc217f4011b230d36e9e043fd03147798c53fb10f24d881dfef55",
+        "job": 124544792579,
+        "run": 41203835321
+      },
+      "order": [
+        "Foff",
+        "Fon",
+        "Kon"
+      ],
+      "pmu": {
+        "read_errno": 2
+      },
+      "runner": "nsc-runner-v2adr3to33djm",
+      "source_manifest": "c29e2e57626491804d9c24e5fa50a709015a002067a3bf39e884d8b6ef0fea43",
+      "storage_mode": "runner-filesystem"
+    },
+    "02": {
+      "arms": {
+        "Foff": {
+          "cold-A": {
+            "allocated": 2393042944,
+            "enabled": 399790262413,
+            "instructions": 2616543192998,
+            "running": 399790262413,
+            "unmetered_allocated": 2393030656
+          },
+          "first-B": {
+            "allocated": 2505547776,
+            "enabled": 129471030318,
+            "instructions": 843890414364,
+            "running": 129471030318,
+            "unmetered_allocated": 2505416704
+          },
+          "invalid": {
+            "allocated": 2397470720,
+            "enabled": 310900909,
+            "instructions": 1927340816,
+            "running": 310900909,
+            "unmetered_allocated": 2397425664
+          },
+          "repair": {
+            "allocated": 2403495936,
+            "enabled": 8469799318,
+            "instructions": 54169990244,
+            "running": 8469799318,
+            "unmetered_allocated": 2403438592
+          },
+          "return-A": {
+            "allocated": 2613129216,
+            "enabled": 129388171713,
+            "instructions": 844846287583,
+            "running": 129388171713,
+            "unmetered_allocated": 2612740096
+          },
+          "return-B": {
+            "allocated": 2394873856,
+            "enabled": 131110859154,
+            "instructions": 846520844458,
+            "running": 131110859154,
+            "unmetered_allocated": 2394832896
+          },
+          "unchanged-B": {
+            "allocated": 2394873856,
+            "enabled": 763374365,
+            "instructions": 3478985222,
+            "running": 763374365,
+            "unmetered_allocated": 2394832896
+          }
+        },
+        "Fon": {
+          "cold-A": {
+            "allocated": 2393079808,
+            "enabled": 400676234041,
+            "instructions": 2616491804305,
+            "running": 400676234041,
+            "unmetered_allocated": 2393088000
+          },
+          "first-B": {
+            "allocated": 3022843904,
+            "enabled": 132035319481,
+            "instructions": 895868558142,
+            "running": 132035319481,
+            "unmetered_allocated": 3022733312
+          },
+          "invalid": {
+            "allocated": 2699988992,
+            "enabled": 369129793,
+            "instructions": 2574229689,
+            "running": 369129793,
+            "unmetered_allocated": 2700038144
+          },
+          "repair": {
+            "allocated": 2886877184,
+            "enabled": 10974802522,
+            "instructions": 77792682653,
+            "running": 10974802522,
+            "unmetered_allocated": 2886930432
+          },
+          "return-A": {
+            "allocated": 2662952960,
+            "enabled": 11973684762,
+            "instructions": 107481641589,
+            "running": 11973684762,
+            "unmetered_allocated": 2662858752
+          },
+          "return-B": {
+            "allocated": 2670866432,
+            "enabled": 14278561659,
+            "instructions": 133990705201,
+            "running": 14278561659,
+            "unmetered_allocated": 2670755840
+          },
+          "unchanged-B": {
+            "allocated": 2670866432,
+            "enabled": 776726840,
+            "instructions": 3480870407,
+            "running": 776726840,
+            "unmetered_allocated": 2670755840
+          }
+        },
+        "Kon": {
+          "cold-A": {
+            "allocated": 2393030656,
+            "enabled": 400969573689,
+            "instructions": 2616433763422,
+            "running": 400969573689,
+            "unmetered_allocated": 2393059328
+          },
+          "first-B": {
+            "allocated": 2884030464,
+            "enabled": 131751430394,
+            "instructions": 902080488936,
+            "running": 131751430394,
+            "unmetered_allocated": 2884112384
+          },
+          "invalid": {
+            "allocated": 2426560512,
+            "enabled": 382124827,
+            "instructions": 2657552002,
+            "running": 382124827,
+            "unmetered_allocated": 2426462208
+          },
+          "repair": {
+            "allocated": 2741788672,
+            "enabled": 11246232640,
+            "instructions": 80873101190,
+            "running": 11246232640,
+            "unmetered_allocated": 2741780480
+          },
+          "return-A": {
+            "allocated": 2385297408,
+            "enabled": 12591674771,
+            "instructions": 113744669773,
+            "running": 12591674771,
+            "unmetered_allocated": 2385367040
+          },
+          "return-B": {
+            "allocated": 2393141248,
+            "enabled": 15192079309,
+            "instructions": 143514354426,
+            "running": 15192079309,
+            "unmetered_allocated": 2393186304
+          },
+          "unchanged-B": {
+            "allocated": 2393141248,
+            "enabled": 818216094,
+            "instructions": 3480253373,
+            "running": 818216094,
+            "unmetered_allocated": 2393186304
+          }
+        }
+      },
+      "bodies": {
+        "1bf3afbf126e81ec4956d8bde41dc77552e373765c607a93021f96e75247f8d6": {
+          "bytes": 147395472,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "1bf3afbf126e81ec4956d8bde41dc77552e373765c607a93021f96e75247f8d6"
+        },
+        "200584ff55d05654a70f5560ca0b4f07561a0906ef9ebc9072ef957925737e06": {
+          "bytes": 147395472,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "200584ff55d05654a70f5560ca0b4f07561a0906ef9ebc9072ef957925737e06"
+        },
+        "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8": {
+          "bytes": 13239680,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "sections": 41,
+          "whole": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8"
+        },
+        "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08": {
+          "bytes": 13247832,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "sections": 41,
+          "whole": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08"
+        },
+        "8ed1c05eb6f6c7c0a8b0ef32dee143c1dc416f29a9175d68db58eb897bf8cee9": {
+          "bytes": 147395472,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "8ed1c05eb6f6c7c0a8b0ef32dee143c1dc416f29a9175d68db58eb897bf8cee9"
+        },
+        "b0e138d914ab1b7f38786581f438a49ca0b703468201da98a0e281632171c481": {
+          "bytes": 147278784,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "b0e138d914ab1b7f38786581f438a49ca0b703468201da98a0e281632171c481"
+        },
+        "bcdd0aa5f3ac429c0825211bf9702695d58db82c97f392a219c33cd0949b64c9": {
+          "bytes": 147278784,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "bcdd0aa5f3ac429c0825211bf9702695d58db82c97f392a219c33cd0949b64c9"
+        },
+        "c6d9158c78e4514680053e65f34858d4837cf152aa907689c5932ea6a1ffd023": {
+          "bytes": 147278784,
+          "executable_loads": 1,
+          "executable_sections": 4,
+          "rust_main": {
+            "stable_crate_id": 5001479853910864485,
+            "symbol": "_RNvCs5XsPvzbg3SP_4ruff4main"
+          },
+          "sections": 43,
+          "whole": "c6d9158c78e4514680053e65f34858d4837cf152aa907689c5932ea6a1ffd023"
+        }
+      },
+      "boot": "6238f695-4eb6-4d0e-af3d-3ef4dad957c4",
+      "cpu": {
+        "cpu family": "26",
+        "model": "68",
+        "model name": "AMD EPYC",
+        "stepping": "0",
+        "vendor_id": "AuthenticAMD"
+      },
+      "filesystem": "TARGET SOURCE  FSTYPE  OPTIONS\n/      overlay overlay rw,relatime,lowerdir=/disk/extra0,upperdir=/namespace/containers/rootfs/dvc8gbjt2g0m4/fs,workdir=/namespace/containers/rootfs/dvc8gbjt2g0m4/work,uuid=on",
+      "native_binding": {
+        "artifact": {
+          "id": 13042799674,
+          "sha256": "6e9c1d753b9bd2dcb90ad100096447903867e42d961d1ea56fa21a32429986a2",
+          "size": 81914908
+        },
+        "attempt": 1,
+        "complete_sha256": "a5952bbf7b41190543ed0ecbe7195fb5b2bf2bf971ea45f521617c3cba36c109",
+        "head": "d8b51eace7817c784a7bd0a220b745777c1891fd",
+        "independent": "f2860d5156edc217f4011b230d36e9e043fd03147798c53fb10f24d881dfef55",
+        "job": 124544792579,
+        "run": 41203835321
+      },
+      "order": [
+        "Kon",
+        "Fon",
+        "Foff"
+      ],
+      "pmu": {
+        "read_errno": 2
+      },
+      "runner": "nsc-runner-prv9n5p96eib4",
+      "source_manifest": "c29e2e57626491804d9c24e5fa50a709015a002067a3bf39e884d8b6ef0fea43",
+      "storage_mode": "runner-filesystem"
+    }
+  },
+  "plan": "4b3674feca534b2622cb4c33efdbd2f778099573f1cf964a96fad69697f0a7b6",
+  "registry_archives": 505,
+  "run": 41219824213,
+  "scores": {
+    "01": {
+      "branch_cache_Foff_over_Fon": {
+        "both_returns": {
+          "denominator": 241482031582,
+          "numerator": 1691415444814,
+          "ratio": 7.004311806278831
+        },
+        "from_empty_through_both_returns": {
+          "denominator": 3753629894969,
+          "numerator": 5151872970601,
+          "ratio": 1.3725042464911281
+        },
+        "max_visit_end_allocated": {
+          "Foff": 2612801536,
+          "Fon": 3022774272
+        },
+        "passes_screen": true,
+        "phases": {
+          "cold-A": {
+            "additional_allocated_bytes": 20480,
+            "denominator": 2616618384480,
+            "numerator": 2616480119807,
+            "ratio": 0.9999471590225689
+          },
+          "first-B": {
+            "additional_allocated_bytes": 517275648,
+            "denominator": 895529478907,
+            "numerator": 843977405980,
+            "ratio": 0.9424339743791352
+          },
+          "invalid": {
+            "additional_allocated_bytes": 302620672,
+            "denominator": 2574847393,
+            "numerator": 1927491581,
+            "ratio": 0.7485847845740659
+          },
+          "repair": {
+            "additional_allocated_bytes": 483512320,
+            "denominator": 77780810431,
+            "numerator": 54173203097,
+            "ratio": 0.6964854544046889
+          },
+          "return-A": {
+            "additional_allocated_bytes": 50155520,
+            "denominator": 107492053027,
+            "numerator": 844824247186,
+            "ratio": 7.859411215950968
+          },
+          "return-B": {
+            "additional_allocated_bytes": 275963904,
+            "denominator": 133989978555,
+            "numerator": 846591197628,
+            "ratio": 6.318317285799792
+          },
+          "unchanged-B": {
+            "additional_allocated_bytes": 275963904,
+            "denominator": 3480675448,
+            "numerator": 3479751689,
+            "ratio": 0.9997346035234251
+          }
+        }
+      },
+      "incremental_packing_Fon_over_Kon": {
+        "both_returns": {
+          "denominator": 257251082617,
+          "numerator": 241482031582,
+          "ratio": 0.9387017116717941
+        },
+        "from_empty_through_both_returns": {
+          "denominator": 3776107046264,
+          "numerator": 3753629894969,
+          "ratio": 0.9940475333406561
+        },
+        "max_visit_end_allocated": {
+          "Fon": 3022774272,
+          "Kon": 2884104192
+        },
+        "phases": {
+          "cold-A": {
+            "additional_allocated_bytes": -40960,
+            "denominator": 2616667970294,
+            "numerator": 2616618384480,
+            "ratio": 0.9999810500168295
+          },
+          "first-B": {
+            "additional_allocated_bytes": -138670080,
+            "denominator": 902187993353,
+            "numerator": 895529478907,
+            "ratio": 0.9926195931501444
+          },
+          "invalid": {
+            "additional_allocated_bytes": -273358848,
+            "denominator": 2657871026,
+            "numerator": 2574847393,
+            "ratio": 0.968763106942421
+          },
+          "repair": {
+            "additional_allocated_bytes": -145170432,
+            "denominator": 80903785910,
+            "numerator": 77780810431,
+            "ratio": 0.9613988956898247
+          },
+          "return-A": {
+            "additional_allocated_bytes": -277585920,
+            "denominator": 113761398306,
+            "numerator": 107492053027,
+            "ratio": 0.944890398919531
+          },
+          "return-B": {
+            "additional_allocated_bytes": -277524480,
+            "denominator": 143489684311,
+            "numerator": 133989978555,
+            "ratio": 0.9337952006681518
+          },
+          "unchanged-B": {
+            "additional_allocated_bytes": -277524480,
+            "denominator": 3479912699,
+            "numerator": 3480675448,
+            "ratio": 1.000219186245741
+          }
+        }
+      }
+    },
+    "02": {
+      "branch_cache_Foff_over_Fon": {
+        "both_returns": {
+          "denominator": 241472346790,
+          "numerator": 1691367132041,
+          "ratio": 7.004392654169723
+        },
+        "from_empty_through_both_returns": {
+          "denominator": 3753832709237,
+          "numerator": 5151800739403,
+          "ratio": 1.372410850042955
+        },
+        "max_visit_end_allocated": {
+          "Foff": 2613129216,
+          "Fon": 3022843904
+        },
+        "passes_screen": true,
+        "phases": {
+          "cold-A": {
+            "additional_allocated_bytes": 36864,
+            "denominator": 2616491804305,
+            "numerator": 2616543192998,
+            "ratio": 1.0000196403034458
+          },
+          "first-B": {
+            "additional_allocated_bytes": 517296128,
+            "denominator": 895868558142,
+            "numerator": 843890414364,
+            "ratio": 0.9419801673966538
+          },
+          "invalid": {
+            "additional_allocated_bytes": 302518272,
+            "denominator": 2574229689,
+            "numerator": 1927340816,
+            "ratio": 0.7487058455722752
+          },
+          "repair": {
+            "additional_allocated_bytes": 483381248,
+            "denominator": 77792682653,
+            "numerator": 54169990244,
+            "ratio": 0.696337861050881
+          },
+          "return-A": {
+            "additional_allocated_bytes": 49823744,
+            "denominator": 107481641589,
+            "numerator": 844846287583,
+            "ratio": 7.860377596516577
+          },
+          "return-B": {
+            "additional_allocated_bytes": 275992576,
+            "denominator": 133990705201,
+            "numerator": 846520844458,
+            "ratio": 6.317757960808779
+          },
+          "unchanged-B": {
+            "additional_allocated_bytes": 275992576,
+            "denominator": 3480870407,
+            "numerator": 3478985222,
+            "ratio": 0.9994584156318463
+          }
+        }
+      },
+      "incremental_packing_Fon_over_Kon": {
+        "both_returns": {
+          "denominator": 257259024199,
+          "numerator": 241472346790,
+          "ratio": 0.9386350878918502
+        },
+        "from_empty_through_both_returns": {
+          "denominator": 3775773276557,
+          "numerator": 3753832709237,
+          "ratio": 0.9941891194960714
+        },
+        "max_visit_end_allocated": {
+          "Fon": 3022843904,
+          "Kon": 2884030464
+        },
+        "phases": {
+          "cold-A": {
+            "additional_allocated_bytes": -49152,
+            "denominator": 2616433763422,
+            "numerator": 2616491804305,
+            "ratio": 1.000022183203646
+          },
+          "first-B": {
+            "additional_allocated_bytes": -138813440,
+            "denominator": 902080488936,
+            "numerator": 895868558142,
+            "ratio": 0.9931137732495169
+          },
+          "invalid": {
+            "additional_allocated_bytes": -273428480,
+            "denominator": 2657552002,
+            "numerator": 2574229689,
+            "ratio": 0.9686469679850878
+          },
+          "repair": {
+            "additional_allocated_bytes": -145088512,
+            "denominator": 80873101190,
+            "numerator": 77792682653,
+            "ratio": 0.9619104684787221
+          },
+          "return-A": {
+            "additional_allocated_bytes": -277655552,
+            "denominator": 113744669773,
+            "numerator": 107481641589,
+            "ratio": 0.9449378314034486
+          },
+          "return-B": {
+            "additional_allocated_bytes": -277725184,
+            "denominator": 143514354426,
+            "numerator": 133990705201,
+            "ratio": 0.9336397445183042
+          },
+          "unchanged-B": {
+            "additional_allocated_bytes": -277725184,
+            "denominator": 3480253373,
+            "numerator": 3480870407,
+            "ratio": 1.0001772957120842
+          }
+        }
+      }
+    }
+  }
+}
