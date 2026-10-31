@@ -1,0 +1,166 @@
+{
+  "artifact": 13031245592,
+  "attempt": 1,
+  "bytes": 10976749,
+  "candidate_run_make_exit": 0,
+  "conclusion": "failure",
+  "fresh_source_comparisons": {
+    "C-gnu-source-components.json": {
+      "count": 57,
+      "different": {},
+      "source": "1cb642c602171bbd082fdbd94ede540e0b58fb2d"
+    },
+    "C-host-source-components.json": {
+      "count": 64,
+      "different": {},
+      "source": "1cb642c602171bbd082fdbd94ede540e0b58fb2d"
+    },
+    "C-musl-source-components.json": {
+      "count": 67,
+      "different": {},
+      "source": "1cb642c602171bbd082fdbd94ede540e0b58fb2d"
+    },
+    "C-rustdoc-source-components.json": {
+      "count": 2,
+      "different": {
+        "bin/rustdoc": [
+          [
+            "db2c67930584f89f1fa456065151b814f5988a785cd09deff3643e8783738c23",
+            14705112,
+            493
+          ],
+          [
+            "85ed5fc3001d3ab2ad692dea4f0e145f550cbff9b90b1abf8dc9b5b6b72d8469",
+            14705416,
+            493
+          ]
+        ]
+      },
+      "source": "1cb642c602171bbd082fdbd94ede540e0b58fb2d"
+    }
+  },
+  "full_raw_candidate_log_sha256": "003a8fe1eeb8060670b2d1980c654d3c604b03b835a8a74f05fc2ed013140135",
+  "head": "4e48079602de662ce51eef647686841f3756b16c",
+  "job": 124445199806,
+  "native_doc_combinations": {
+    "C-C": {
+      "diagnostic_code": "E0425",
+      "error": "cannot find type `OHM_MUSL_DOC_UNRESOLVED` in this scope",
+      "html": {
+        "fn.round_trip.html": "c3ba8f5f3b715d6d781a383af2d8dd565260f9d2d9c614b7150a2ba24068df8e",
+        "struct.MuslOnly.html": "4464140c142cb112f8276406e9d50d199e3618ccd4a4733c30df33576e0c158c"
+      },
+      "native_musl_doctests": 1,
+      "version": "rustdoc 1.99.0-dev\nbinary: rustdoc\ncommit-hash: unknown\ncommit-date: unknown\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+    },
+    "C-P": {
+      "diagnostic_code": "E0425",
+      "error": "cannot find type `OHM_MUSL_DOC_UNRESOLVED` in this scope",
+      "html": {
+        "fn.round_trip.html": "c3ba8f5f3b715d6d781a383af2d8dd565260f9d2d9c614b7150a2ba24068df8e",
+        "struct.MuslOnly.html": "4464140c142cb112f8276406e9d50d199e3618ccd4a4733c30df33576e0c158c"
+      },
+      "native_musl_doctests": 1,
+      "version": "rustdoc 1.99.0-dev\nbinary: rustdoc\ncommit-hash: unknown\ncommit-date: unknown\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+    },
+    "P-C": {
+      "diagnostic_code": "E0425",
+      "error": "cannot find type `OHM_MUSL_DOC_UNRESOLVED` in this scope",
+      "html": {
+        "fn.round_trip.html": "c3ba8f5f3b715d6d781a383af2d8dd565260f9d2d9c614b7150a2ba24068df8e",
+        "struct.MuslOnly.html": "4464140c142cb112f8276406e9d50d199e3618ccd4a4733c30df33576e0c158c"
+      },
+      "native_musl_doctests": 1,
+      "version": "rustdoc 1.99.0-dev\nbinary: rustdoc\ncommit-hash: unknown\ncommit-date: unknown\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+    },
+    "P-P": {
+      "diagnostic_code": "E0425",
+      "error": "cannot find type `OHM_MUSL_DOC_UNRESOLVED` in this scope",
+      "html": {
+        "fn.round_trip.html": "c3ba8f5f3b715d6d781a383af2d8dd565260f9d2d9c614b7150a2ba24068df8e",
+        "struct.MuslOnly.html": "4464140c142cb112f8276406e9d50d199e3618ccd4a4733c30df33576e0c158c"
+      },
+      "native_musl_doctests": 1,
+      "version": "rustdoc 1.99.0-dev\nbinary: rustdoc\ncommit-hash: unknown\ncommit-date: unknown\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+    }
+  },
+  "native_provider_visits": 0,
+  "next_reporter": {
+    "bootstrap_renderer": "7f4f98459acabdfbd505cd64015d6d588d288972",
+    "compiletest_json": "c74ed81a36b85ecfba6da1ded7c9027638df87aa",
+    "executed_exact_source_functions": {
+      "render_test_outcome_verbose": "f7b1a7d77e5637ab80e1bfa554dd06b86f1ef7581839662e059e12ec2f1741e6",
+      "write_long": "9dedab0dcc32beb86048dbc44a53e294cd56091952eed441f3e73beef94e28be"
+    },
+    "rendered_outcomes": [
+      "test [run-make] tests/run-make/ohm-checked-dep-info ... ok",
+      "test [run-make] tests/run-make/ohm-checked-dep-info ... FAILED"
+    ],
+    "same_suite_filter": true,
+    "setting": "rust.verbose-tests=true"
+  },
+  "operational_common_components": 182,
+  "ordinary_Ruff_visits": 0,
+  "original_full_parent_log_sha256": "74c5463fbfcaa54dc2932e98a720477adb416347f6dc56d6804645322b77e051",
+  "original_rustdoc_comparison": {
+    "actual_R_X86_64_RELATIVE_and_locations": [
+      [
+        "P",
+        "0xad2950",
+        "0xf7f27",
+        "compiler/rustc_interface/src/passes.rs",
+        1093,
+        62,
+        "let feed = tcx.create_crate_num(stable_crate_id).unwrap();"
+      ],
+      [
+        "P",
+        "0xad2968",
+        "0xf7f27",
+        "compiler/rustc_interface/src/passes.rs",
+        1094,
+        13,
+        "assert_eq!(feed.key(), LOCAL_CRATE);"
+      ],
+      [
+        "C",
+        "0xad2950",
+        "0xf7f27",
+        "compiler/rustc_interface/src/passes.rs",
+        1098,
+        62,
+        "let feed = tcx.create_crate_num(stable_crate_id).unwrap();"
+      ],
+      [
+        "C",
+        "0xad2968",
+        "0xf7f27",
+        "compiler/rustc_interface/src/passes.rs",
+        1099,
+        13,
+        "assert_eq!(feed.key(), LOCAL_CRATE);"
+      ]
+    ],
+    "different_sections": [
+      ".data.rel.ro",
+      ".note.gnu.build-id",
+      ".strtab",
+      ".symtab"
+    ],
+    "differing_loaded_data_offsets": [
+      85648,
+      85672
+    ],
+    "independent_rustdocs": [
+      "db2c67930584f89f1fa456065151b814f5988a785cd09deff3643e8783738c23",
+      "85ed5fc3001d3ab2ad692dea4f0e145f550cbff9b90b1abf8dc9b5b6b72d8469"
+    ],
+    "normalized_static_symbols": 23645
+  },
+  "parent_marker_rejected": true,
+  "run": 41169834709,
+  "scope": "candidate compiletest command succeeded; the outer QA rejected the default dot reporter before source transfer",
+  "selected_outcome_line": ".",
+  "sha256": "c6881f4664e4bf88d43b35f4d67db6bd7e7411a22d54da2dd12f3b260b29f0f6",
+  "terminal_summary": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 564 filtered out; finished in 814.15ms"
+}

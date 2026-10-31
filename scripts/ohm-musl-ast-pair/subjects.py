@@ -3,6 +3,7 @@ import gzip
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -89,7 +90,7 @@ def git(*args, data=None):
 
 
 def runmake(label, expected):
-    args=["test","--stage","1","-j8","--host",s.rt.HOST,"--target",s.rt.HOST,"tests/run-make/ohm-checked-dep-info"]
+    args=["--set","rust.verbose-tests=true","test","--stage","1","-j8","--host",s.rt.HOST,"--target",s.rt.HOST,"tests/run-make/ohm-checked-dep-info"]
     try:
         s.bc.stage(args,"cmp-"+label+"-run-make")
         rc=0
@@ -97,13 +98,19 @@ def runmake(label, expected):
         rc=exc.returncode
     log=s.rt.LOG/("cmp-"+label+"-run-make.log")
     text=log.read_text(errors="replace")
+    result={"status":rc,"source":git("rev-parse","HEAD"),"compiler":git("rev-parse","HEAD:compiler"),"command":args,"log":s.sha(log)}
+    s.save(LOG/(label+"-raw-run-make.json"),result)
     assert rc==expected,(label,rc,text[-2500:])
+    plain=re.sub(r"\x1b\[[0-9;]*m","",text).splitlines()
+    case="test [run-make] tests/run-make/ohm-checked-dep-info ... "+("FAILED" if expected else "ok")
+    assert [line for line in plain if line.startswith("test [run-make] ")]==[case],plain[-30:]
+    assert plain.count("running 1 tests")==1
     if expected:
         assert "rmake.rs:229:" in text and "assertion `left == right` failed" in text
         assert "/dev/null/ohm-untracked-relink-inputs:" in text and "left: false" in text and "right: true" in text
     else:
-        assert "ohm-checked-dep-info" in text and "1 passed" in text, text[-4000:]
-    s.save(LOG/(label+"-run-make.json"),{"status":rc,"source":git("rev-parse","HEAD"),"compiler":git("rev-parse","HEAD:compiler"),"command":args,"log":s.sha(log)})
+        assert len([line for line in plain if re.fullmatch(r"test result: ok\. 1 passed; 0 failed; 0 ignored; 0 measured; 564 filtered out; finished in .+s",line)])==1,plain[-30:]
+    s.save(LOG/(label+"-run-make.json"),result)
 
 
 def inventory(root):return s.rows([k for k in root.rglob("*") if k.is_file()],root)
