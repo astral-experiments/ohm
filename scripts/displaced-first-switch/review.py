@@ -10,6 +10,7 @@ import threading
 import zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import tables as t
+import mount_evidence as m
 
 def native_body(z, desc):
     """Hash the entire archived native ELF without a temporary archive or output file."""
@@ -40,6 +41,10 @@ def read(receipts, streams):
         rawledger=compressed(r,'cold-A/path-inodes.json.gz'); ledger=compressed(r,'first-B/path-inodes.json.gz')
         t.need(ledger==compressed(r,'post-shadow/path-inodes.json.gz') and t.sessions(rawledger).keys()==t.sessions(ledger).keys()==rows.keys()==old.keys(), "changed native corpus")
         shadow=compressed(r,'shadow-inodes.json.gz'); keys={tuple(v[:2]) for v in shadow.values()}; t.need(len(keys)==len(shadow)==61 and keys.isdisjoint(t.names(ledger)), 'one inode for each new node, no input aliases')
+        mount=m.validate(compressed(r,'mount-inodes.json.gz'),ledger,shadow)
+        t.need(mount==obj(r,'mount-admission.json') and r.read('coexistence-du.txt').decode()==end['du_coexistence'], 'physical mount or preserved coexistence differs')
+        frows={tuple(map(int,l.split()[:2])):int(l.split()[2])*512 for l in r.read('shadow-find.txt').splitlines()}
+        t.need(frows=={tuple(v[:2]):v[4]*512 for v in shadow.values()}, 'preserved GNU find disagrees')
         identities=t.names(ledger);totals={k:{'original_A':0,'staged_A':0,'current_B':0} for k in t.KINDS}; sizes={}
         for unit,rec in rows.items():
             owner=old[unit]
@@ -70,5 +75,5 @@ def read(receipts, streams):
         files={tuple(v[:2]):v[4]*512 for v in ledger.values()}; present=sum(files.values())
         originals=sum(v['original_A'] for v in totals.values()); packed=sum(v['staged_A'] for v in totals.values());peak=end['shadow_allocated']
         t.need(present==end['post_original']==end['first']['allocated'] and peak==sum(q[4]*512 for q in shadow.values()) and peak>=packed and int(end['du_coexistence'].splitlines()[-1].split()[0])==present+peak,'actual three-root coexistence')
-        return dict(native_complete_images=len(native_seen),real_displaced_crates=len(rows),decoded_older=40,native_current=40,tables=totals,ordinary_first_B_allocated=present,raw_original=originals,tmp_encoded_payload=packed,observed_shadow_including_directories=peak,actual_all_staged_total=present+peak,conditional_settled_without_staging_dirs=present-originals+packed,conditional_total_reclaimed=originals-packed,conditional_largest_per_crate_staged_file_payload=max(sum(s['packed']['allocated'] for s in v['streams'].values()) for v in rows.values()),no_measured_product_change_or_within_Cargo_peak=True)
+        return dict(mount_admission=mount,native_complete_images=len(native_seen),real_displaced_crates=len(rows),decoded_older=40,native_current=40,tables=totals,ordinary_first_B_allocated=present,raw_original=originals,tmp_encoded_payload=packed,observed_shadow_including_directories=peak,actual_all_staged_total=present+peak,conditional_settled_without_staging_dirs=present-originals+packed,conditional_total_reclaimed=originals-packed,conditional_largest_per_crate_staged_file_payload=max(sum(s['packed']['allocated'] for s in v['streams'].values()) for v in rows.values()),no_measured_product_change_or_within_Cargo_peak=True)
 if __name__=='__main__': print(json.dumps(read(*map(Path,sys.argv[1:])),indent=2,sort_keys=True))

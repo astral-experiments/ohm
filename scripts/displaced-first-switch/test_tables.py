@@ -25,7 +25,7 @@ def main(exe,base):
             source=base/'detached'/(u.name+stem)
             source.write_bytes(b'RSIC'+bytes([ix+65,ord(k)])*34400)
             with source.open('rb') as f: t.encode(exe,f,k,b.name.rsplit('-',1)[0],b/('ohm-packed-'+stem+'.bin'))
-    first=ledger(base); shadow=base/'shadow';tmp=base/'scratch'
+    first=ledger(base); shadow=base/'displaced-shadow';tmp=base/'scratch'
     out=t.observe(base,initial,first,old,shadow,tmp,exe)
     assert len(out)==20 and len(list(shadow.glob('*/*.bin')))==40 and ledger(base)==first
     report={'synthetic_only':True,'real_rust_fast_encoder':t.sha(exe),'old_encoded_and_roundtripped':40,'current_reencoded_byte_identically':40,'peak_shadow_allocated':t.allocated_tree(shadow),'rejections':[]}

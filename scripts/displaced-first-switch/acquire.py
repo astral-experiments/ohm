@@ -12,6 +12,7 @@ import traceback
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import tables as t
+import mount_evidence as m
 
 HIST = "ae9ed53266a0106f19571e692a05fb65d28f06b2"
 SOURCE = "caef389ed580829583f1a63df129b7b649e43508"
@@ -115,25 +116,29 @@ def main(history,source):
         t.save(stages/(f"{index:02d}-"+Path(unit).name+".json"),{unit:row})
         t.need(shutil.disk_usage(root).free>2*2**30,"private workload reserve")
     records=t.observe(root,initial_ledger,ledger,displaced,shadow,scratch,codec,progress)
+    # Capture the actual coexisting files before introducing a portable copy outside these roots.
+    # Escrow every available stream even if the final mount/ownership or allocation check refuses.
+    t.save(out/"tables.json",records)
+    try:
+        shadow_rows={str(p.relative_to(shadow)):t.shape(p.lstat()) for p in (shadow,*sorted(shadow.rglob("*")))}
+        w.publish(out/"shadow-inodes.json.gz",shadow_rows)
+        du=subprocess.check_output(["/usr/bin/du","-sB1","--total","--",root/"target",root/"build",shadow],text=True)
+        (out/"coexistence-du.txt").write_text(du)
+        scanned=subprocess.check_output(["/usr/bin/find",shadow,"-printf","%D %i %b\\n"])
+        (out/"shadow-find.txt").write_bytes(scanned)
+        fdinfo=m.capture(root,shadow,ledger)
+        w.publish(out/"mount-inodes.json.gz",fdinfo)
+    finally:
+        streams=materialize(root,shadow,ledger,records,b.ROOT/"table-streams")
     (out/"post-shadow").mkdir()
     post=w.disk.allocated(root/"target",root/"build",out/"post-shadow")
     t.need(t.load(out/"post-shadow")==ledger and post["allocated"]==switched['allocated'], "diagnostic altered a native product, name, link or allocation")
-    du=subprocess.check_output(["/usr/bin/du","-sB1","--total","--",root/"target",root/"build",shadow],text=True)
     t.need(du.splitlines()[-1].split()==[str(post['allocated']+t.allocated_tree(shadow)),"total"],"independent GNU du measure of all staged bytes disagrees")
     t.need(not list(scratch.iterdir()), "native-B codec calibration files leaked")
-    # Record every new directory + file by physical identity using a second OS reader.
-    shadow_rows={}
-    for p in (shadow,*sorted(shadow.rglob("*"))):
-        shadow_rows[str(p.relative_to(shadow))]=t.shape(p.lstat())
-    native_inodes={tuple(q[:2]) for q in ledger.values()}
-    t.need(all(row[0]==root.stat().st_dev and tuple(row[:2]) not in native_inodes for row in shadow_rows.values()),"shadow shares original inode")
-    scanned=subprocess.check_output(["/usr/bin/find",shadow,"-printf","%D %i %b\\n"])
+    admitted=m.validate(fdinfo,ledger,shadow_rows)
     independent={tuple(map(int,l.split()[:2])):int(l.split()[2])*512 for l in scanned.splitlines()}
     t.need(independent=={tuple(q[:2]):q[4]*512 for q in shadow_rows.values()} and len(independent)==len(shadow_rows)==61,"shadow allocation aliases")
-    w.publish(out/"shadow-inodes.json.gz",shadow_rows)
-    t.save(out/"tables.json",records)
-    # Persist all 80 measured on-disk streams outside target/build without introducing a new alias.
-    streams=materialize(root,shadow,ledger,records,b.ROOT/"table-streams")
+    t.save(out/"mount-admission.json",admitted)
     t.need(t.sha(b.SDK/"bin/cargo")==b.CARGO_ELF and t.sha(b.SDK/b.WILD)==b.WILD_ELF and b.inventory(b.SDK)==reg["K"] and not w.kit.git("status","--porcelain"),"changed SDK or Ruff")
     t.save(out/"complete.json",dict(cold=initial,empty=clean,first=switched,source_table_count=40,native_B_calibrations=40,du_coexistence=du,shadow_allocated=t.allocated_tree(shadow),stream_index_sha256=t.sha(b.ROOT/"table-streams/streams.json"),stream_bytes=sum(v[0] for v in streams.values()),post_original=post["allocated"],qualified=True))
     print("qualified storage-only acquisition",flush=True)

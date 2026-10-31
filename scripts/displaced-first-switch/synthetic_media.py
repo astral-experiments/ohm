@@ -3,6 +3,7 @@ import gzip,hashlib,json,os,shutil,subprocess,sys,zipfile
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import acquire,review,tables as t
+import mount_evidence as m
 
 def test(base,initial,old,first,shadow,out):
     here=base/'synthetic-media';here.mkdir();payloads=here/'streams'
@@ -31,8 +32,12 @@ def test(base,initial,old,first,shadow,out):
             store(phase+'/reader-run.stdout.gz',gzip.compress((typed+"\n").encode()))
             store(phase+'/roster.json.gz',gz({'dirty':list(range(num)),'members':list(range(375))}))
         for phase,led in [('cold-A',initial),('first-B',first),('post-shadow',first)]:store(phase+'/path-inodes.json.gz',gz(led))
+        mount=m.capture(base,shadow,first)
+        store('mount-inodes.json.gz',gz(mount));store('mount-admission.json',text(m.validate(mount,first,archive)))
+        store('shadow-find.txt',subprocess.check_output(['/usr/bin/find',shadow,'-printf','%D %i %b\\n']))
         store('shadow-inodes.json.gz',gz(archive));store('pre-switch-cold-source.json',text(old));store('tables.json',text(out))
         du=subprocess.check_output(['/usr/bin/du','-sB1','--total','--',base/'target',base/'build',shadow],text=True)
+        store('coexistence-du.txt',du)
         store('complete.json',text(dict(qualified=True,cold=visit['cold-A'],empty=visit['empty-B'],first=visit['first-B'],shadow_allocated=peak,post_original=allocated,stream_index_sha256=t.sha(payloads/'streams.json'),du_coexistence=du)))
     with zipfile.ZipFile(stream,'x') as z:
         for p in payloads.rglob('*'):
