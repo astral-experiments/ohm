@@ -1,5 +1,5 @@
-name: Qualify the branch-return Full and Packed native Rust compilers
-run-name: Branch-return source ${{ inputs.reviewed_head }}
+name: Qualify the GNU first-session Rust compiler
+run-name: First-checkout storage source ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -12,8 +12,8 @@ permissions:
   actions: read
 jobs:
   native:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-return-source-20261031' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
-    name: Exact Full and Packed source, Rust tests and native providers
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-first-session-e-source-20261031' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    name: Exact E source, Rust regressions and native providers
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 300
     env:
@@ -24,9 +24,14 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
           sparse-checkout: |
+            scripts/branch-first-session-e-source
             scripts/branch-return-source
             scripts/ohm-packed-ruff
             scripts/ohm-apple-zmij/source-transport
+      - name: Refuse missing or foreign product registration before acquiring inputs
+        run: |
+          (cd scripts/branch-first-session-e-source && sha256sum --strict --status --check SHA256SUMS)
+          python3 -IB scripts/branch-first-session-e-source/subject.py preflight
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: a4afd181ae07107de6174a17a4ec189061fd18aa
@@ -39,12 +44,6 @@ jobs:
           path: signed-source
           persist-credentials: false
           sparse-checkout: scripts/strict-mixed-generics
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
-          path: signed-reader
-          persist-credentials: false
-          sparse-checkout: scripts/packaged-release-workspace
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
@@ -54,7 +53,6 @@ jobs:
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$(git -C trusted rev-parse HEAD)" = a4afd181ae07107de6174a17a4ec189061fd18aa
           test "$(git -C signed-source rev-parse HEAD)" = d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
-          test "$(git -C signed-reader rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
           for d in scripts/branch-return-source scripts/ohm-packed-ruff scripts/ohm-packed-ruff/full-cli scripts/ohm-apple-zmij/source-transport trusted/scripts/gnu-renderer-cgu-source; do
             (cd "$d" && sha256sum --status --strict --check SHA256SUMS)
           done
@@ -65,37 +63,27 @@ jobs:
           for tool in rustup rustc rustdoc cargo ldd cc ar readelf strace gh zstd; do command -v "$tool"; done > "$QA_ROOT/receipts/commands.txt"
           python3 -IB scripts/ohm-apple-zmij/source-transport/prepare.py "$QA_ROOT/rust" > "$QA_ROOT/receipts/public-source.json"
           python3 -IB signed-source/scripts/strict-mixed-generics/source.py materialize "$QA_ROOT/rust" parent > "$QA_ROOT/receipts/signed-source.json"
-      - name: Reopen normal GNU native tools from the signed release
+      - name: Reopen the original successful K source job and its two artifacts
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB signed-reader/scripts/packaged-release-workspace/packages.py 21 "$QA_ROOT/packages"
-      - name: Independently bootstrap both complete SDKs and exercise branch flags, corruption and native input changes
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/branch-return-source/qualify.py "$GITHUB_WORKSPACE/trusted"
+        run: python3 -IB scripts/branch-first-session-e-source/prior.py fetch "$QA_ROOT/k-origin"
+      - name: Build only E and qualify its checked-in tests and real native providers
+        run: python3 -IB scripts/branch-first-session-e-source/qualify_e.py "$GITHUB_WORKSPACE/trusted"
       - if: success()
+        name: Publish the qualified Linux driver capsule
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: branch-return-source-sdk
-          path: /tmp/ohm-gnu-renderer-source-native/transfer/
+          name: first-session-linux-source-driver
+          path: /tmp/ohm-gnu-renderer-source-native/E-transfer/
           compression-level: 0
           if-no-files-found: error
           retention-days: 21
       - if: always()
+        name: Preserve source and native observations
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: branch-return-source-observations
-          path: |
-            /tmp/ohm-gnu-renderer-source-native/receipts
-            /tmp/ohm-gnu-renderer-source-native/packages/receipts
+          name: first-session-linux-source-observations
+          path: /tmp/ohm-gnu-renderer-source-native/receipts/
           compression-level: 1
           if-no-files-found: warn
           retention-days: 21
-      - if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: branch-return-unqualified-partial-native
-          path: /tmp/ohm-gnu-renderer-source-native/transfer/
-          compression-level: 0
-          if-no-files-found: warn
-          retention-days: 7
