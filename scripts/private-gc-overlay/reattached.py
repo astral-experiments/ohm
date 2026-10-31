@@ -119,6 +119,11 @@ def main(role,root,inside):
         doc=json.loads((root/'product/build.json').read_bytes())
         expect=spec['head'];digest=doc['compiled']
         assert expect=='f1f1cde375c2562e4a39d12f8835092a106a4fb8' and doc['candidate']==expect and doc['tree']['tree']==spec['tree'] and doc['tree']['mode_path_sha256_inventory']==spec['inventory'] and doc['delivered']==digest
+    elif role in ('stack','stack-enosys'):
+        reg=json.loads((root/'stack-receipt.json').read_bytes());doc=json.loads((root/'product/build.json').read_bytes())
+        expect,digest=reg['source'],reg['cargo_sha256']
+        assert doc['candidate']==doc['tree']['commit']==expect and doc['tree']['tree']==reg['tree'] and doc['tree']['mode_path_sha256_inventory']==reg['inventory'] and doc['qa']==reg['workflow_sha']
+        assert doc['delivered']==doc['compiled']==digest and ctrl.o.st(root/'product/build.json')['sha256']==reg['build_sha256']
     else:
         expect,digest=VERSION[role]
     out=root/'packet'/'fixed';sdk=root/'sdk-fixed'
@@ -153,16 +158,16 @@ def main(role,root,inside):
     target=t/'debug/deps';old=c['outside']/'relocated-deps';leaf=target/'private-after-scan.bin';f.write(leaf,b'actual owned frozen output after discovery\n')
     original=state(leaf);assert original['nlink']==1 and original['sha256']
     with leaf.open('rb') as held:
-        record=trace(f,c,target,old,leaf,out,role=='final-enosys');record['physical_held_after']={'nlink':os.fstat(held.fileno()).st_nlink,'sha256':hashlib.sha256(held.read()).hexdigest()}
+        record=trace(f,c,target,old,leaf,out,role.endswith('-enosys'));record['physical_held_after']={'nlink':os.fstat(held.fileno()).st_nlink,'sha256':hashlib.sha256(held.read()).hexdigest()}
     assert record['binding']['sha256']==digest and original==record['binding']['before_leaf'] and record['physical_held_after']['sha256']==original['sha256']
     # Record either real native outcome before interpreting. The outside copy stays private to this job.
     ctrl.o.save(out/'reattached-result.json',record)
-    if role.startswith('final'):
+    if role.startswith('final') or role.startswith('stack'):
         assert record['exit']==0 and record['outside_after']==record['binding']['outside_leaf'] and record['physical_held_after']['nlink']==1,record
         assert not any(ev.get('kind')=='unlinkat-payload' for ev in record['events'])
         opens=[ev for ev in record['events'] if ev.get('kind')=='openat2']
-        assert any(ev['resolve']&1 and ev['return']==(-errno.ENOSYS if role=='final-enosys' else -errno.EXDEV) for ev in opens),record
-        if role=='final-enosys':assert any(ev.get('kind')=='mount-id-open' and ev.get('return',-1)>=0 for ev in record['events'])
+        assert any(ev['resolve']&1 and ev['return']==(-errno.ENOSYS if role.endswith('-enosys') else -errno.EXDEV) for ev in opens),record
+        if role.endswith('-enosys'):assert any(ev.get('kind')=='mount-id-open' and ev.get('return',-1)>=0 for ev in record['events'])
     mid=state(target)['mount'];assert mid==record['binding']['bound_dir']['mount']
     f.unmount(mid)
     assert record['exit'] in (0,101) and record['physical_held_after']['nlink']==int(record['outside_after'] is not None)
