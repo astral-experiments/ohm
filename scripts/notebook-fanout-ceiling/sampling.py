@@ -146,6 +146,7 @@ def raw_report(fp):
     take(start - attr - nattrs)
     events, maps, execs = Counter(), defaultdict(list), defaultdict(list)
     samples = Counter()
+    kernel_samples = set()
     seen = 0
     tail = 8 * sum(bool(mask & bit) for bit in (2, 4, 64, 512, 128, 65536))
     while seen < length:
@@ -156,9 +157,13 @@ def raw_report(fp):
         events[kind] += 1
         require(kind not in {2, 5, 6, 13}, ("lost or throttled perf records", kind))
         if kind == 9:
-            require(misc & 7 == 2, ("non-user sample", misc))
             pos = 8 if mask & 65536 else 0
             ip, pid, tid, when = struct.unpack_from("<QIIQ", data, pos)
+            mode = misc & 7
+            require(
+                mode == 2 or (mode == 1 and ip >> 63 == 1),
+                ("unexpected sample mode", misc, ip),
+            )
             pos += 24 + 8 * sum(bool(mask & bit) for bit in (8, 64, 512, 128))
             (weight,) = struct.unpack_from("<Q", data, pos)
             require(
@@ -185,7 +190,10 @@ def raw_report(fp):
                     struct.unpack_from("<Q", data, pos + captured)[0] <= captured,
                     "invalid stack payload extent",
                 )
-            samples[(pid, tid, when, ip, weight)] += 1
+            key = (pid, tid, when, ip, weight)
+            samples[key] += 1
+            if mode == 1:
+                kernel_samples.add(key)
         elif kind == 10:
             pid, tid, addr, size, off = struct.unpack_from("<II3Q", data)
             (prot,) = struct.unpack_from("<I", data, 56)
@@ -211,7 +219,7 @@ def raw_report(fp):
     require(
         samples and events[10] and events[3], "missing samples, MMAP2 or exec records"
     )
-    return samples, maps, execs, {str(k): v for k, v in events.items()}
+    return samples, maps, execs, {str(k): v for k, v in events.items()}, kernel_samples
 
 
 @contextmanager
@@ -429,13 +437,13 @@ def target_image(mapping, address, named):
 
 def joined(folder):
     with original(folder) as fp:
-        native, maps, execs, records = raw_report(fp)
+        native, maps, execs, records, kernel_samples = raw_report(fp)
 
     def iterator():
         for key, leaf, stack in rows(folder):
             require(native[key] > 0, ("decoded sample absent from raw", key))
             native[key] -= 1
-            yield key, leaf, stack
+            yield key, leaf, stack, key in kernel_samples
         require(not any(native.values()), "perf script omitted hardware samples")
 
     return iterator(), maps, execs, records
@@ -465,7 +473,8 @@ def expensive(folder, target, label, sites):
     root, groups, _ = task_groups(folder)
     hot = Counter()
     stacks = Counter()
-    for (pid, tid, _, ip, w), (dso, sym), stack in samples:
+    kernel = Counter()
+    for (pid, tid, _, ip, w), (dso, sym), stack, in_kernel in samples:
         if tid not in groups:
             continue
         require(groups[tid] == pid, "wrong calibration task group")
@@ -473,6 +482,9 @@ def expensive(folder, target, label, sites):
             (label == "child" and tid == pid and pid != root)
             or (label == "thread" and tid != pid and pid == root)
         ):
+            continue
+        if in_kernel:
+            kernel[tid] += w
             continue
         addr = target_image(maps.get(pid, ()), ip, target)
         if addr is None or addr not in sites.get(sym, ()):
@@ -487,9 +499,10 @@ def expensive(folder, target, label, sites):
     need = 1 if label == "child" else 2
     require(
         len(hot) == need
+        and set(kernel) <= set(hot)
         and all(
             0.75 * 160_000_000 <= value <= 1.20 * 160_000_000
-            and stacks[tid] >= 0.60 * value
+            and kernel[tid] <= 0.05 * (value + kernel[tid])
             for tid, value in hot.items()
         ),
         ("sampling/calibration or known stack failed", label, hot, stacks),
@@ -498,6 +511,8 @@ def expensive(folder, target, label, sites):
         expected_per_hot_tid=160_000_000,
         hot_periods={str(k): v for k, v in hot.items()},
         resolved_callchain_periods={str(k): v for k, v in stacks.items()},
+        stack_qualified=all(stacks[tid] >= 0.60 * value for tid, value in hot.items()),
+        kernel_recorded_periods={str(k): v for k, v in kernel.items()},
         raw_record_counts=records,
     )
 
@@ -540,7 +555,6 @@ def prepare(root, tools, out):
         dict(perf=identity(perf), options=build, loop=identity(tools / "loop")),
     )
     paths = {n: tools / "roles" / n for n in ROLES}
-    result = {}
     for label, mode, copies in (("child", "1", "1"), ("thread", "thread", "2")):
         sub = folder / label
         acquire(
@@ -553,9 +567,12 @@ def prepare(root, tools, out):
             perf,
         )
         decode(sub, perf)
-        result[label] = expensive(
-            sub, identity(tools / "loop"), label, loop_sites(tools / "loop")
-        )
+    target = load(folder / "tools.json")["loop"]
+    sites = loop_sites(tools / "loop")
+    result = {
+        label: expensive(folder / label, target, label, sites)
+        for label in ("child", "thread")
+    }
     save(folder / "qualified.json", result)
     verify_calibration(out)
     return perf
@@ -653,6 +670,10 @@ def proof_inputs(folder, counted):
 
 def breakdown(folder, counted):
     ids, subject = proof_inputs(folder, counted)
+    cal = load(folder.parent.parent / "sampling-calibration" / "qualified.json")
+    stacks_calibrated = all(
+        cal[label]["stack_qualified"] for label in ("child", "thread")
+    )
     _, groups, parents = task_groups(folder)
     samples, maps, execs, record_counts = joined(folder)
     inodes = {(f["mapping_dev"], f["mapping_ino"]) for f in ids.values()}
@@ -689,6 +710,7 @@ def breakdown(folder, counted):
     total = Counter()
     known = Counter()
     unwind = Counter()
+    kernel = Counter()
     leaves = defaultdict(Counter)
     stacks = defaultdict(Counter)
     funcs = defaultdict(Counter)
@@ -716,13 +738,18 @@ def breakdown(folder, counted):
         )
         return image, sym
 
-    for (pid, tid, when, ip, weight), leaf, chain in samples:
+    for (pid, tid, when, ip, weight), leaf, chain, in_kernel in samples:
         if pid not in subject or when < epochs[pid]:
             continue
         name = subject[pid]
         require(groups.get(tid) == pid, ("wrong kernel sample owner", pid, tid))
-        tids[name].add(tid)
         total[name] += weight
+        if in_kernel:
+            kernel[name] += weight
+            leaves[name]["kernel-recorded IP"] += weight
+            stacks[name]["kernel-recorded IP"] += weight
+            continue
+        tids[name].add(tid)
         image, sym = frame(pid, ip, *leaf)
         if image and sym not in ("", "[unknown]", "unknown"):
             known[name] += weight
@@ -750,7 +777,7 @@ def breakdown(folder, counted):
         require(
             0.90 * orig <= mass <= 1.10 * orig
             and known[name] >= 0.70 * mass
-            and unwind[name] >= 0.70 * mass
+            and kernel[name] <= 0.01 * mass
             and len(tids[name]) >= 2
             and mass >= 200 * PERIOD,
             (
@@ -773,8 +800,13 @@ def breakdown(folder, counted):
             represented_threads=len(tids[name]),
             signed_named_leaf_periods=known[name],
             oriented_resolved_stack_periods=unwind[name],
+            kernel_recorded_periods=kernel[name],
             exclusive_leaf_periods=dict(leaves[name]),
-            nearest_named_stack_periods=dict(stacks[name]),
+            nearest_named_stack_periods=(
+                dict(stacks[name])
+                if stacks_calibrated and unwind[name] >= 0.70 * mass
+                else None
+            ),
             top_signed_leaf_functions=[[*k, v] for k, v in funcs[name].most_common(40)],
         )
     return dict(
@@ -785,6 +817,7 @@ def breakdown(folder, counted):
             count_ratio=[0.9, 1.1],
             minimum_named_signed_leaf=0.70,
             minimum_oriented_multiframe=0.70,
+            maximum_kernel_recorded=0.01,
         ),
         raw_record_counts=record_counts,
         roles=out,

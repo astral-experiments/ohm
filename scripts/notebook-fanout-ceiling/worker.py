@@ -165,7 +165,7 @@ def run_all(workspace, incoming, root):
         os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and os.environ["GITHUB_REF"]
-        == "refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-v2-20261031"
+        == "refs/heads/charlie/qa-signed21-notebook-heavy-compiler-samples-v3-20261031"
         and support.git(HERE, "rev-parse", "HEAD")
         == os.environ["GITHUB_SHA"]
         == os.environ["REVIEWED_HEAD"],
@@ -238,6 +238,7 @@ def run_all(workspace, incoming, root):
     comparisons = {}
     references = {}
     errors = {}
+    profile_errors = {}
     for lane in ("S1", "T", "S2"):
         c.require(
             shutil.disk_usage(root).free > 5 * 2**30
@@ -277,7 +278,12 @@ def run_all(workspace, incoming, root):
             inputs.save(folder / "counts.json", counted)
             # Everything below is outside the command and kernel PMU lifetime on each lane.
             if sampled:
-                sampling.summarize(folder, counted, perf)
+                try:
+                    sampling.summarize(folder, counted, perf)
+                except Exception as err:
+                    # Keep the other independent edit's raw recording even if this decoder refuses it.
+                    profile_errors[phase] = repr(err)
+                    inputs.save(folder / "refused-profile.json", {"error": repr(err)})
             if f"{lane}/{phase}" in heavy.STATES:
                 heavy.capture(root, folder, products, out / "heavy-cas")
             actual = study.observe.native_reader(root, f"{lane}/{phase}", Path(products["e2e"]), state)
@@ -347,6 +353,7 @@ def run_all(workspace, incoming, root):
     )
     c.require(not issues, (issues, "native images or verdicts differ from empty controls"))
     inputs.save(out / "heavy-result.json", heavy.reopen(out))
+    c.require(not profile_errors, ("unqualified Rust instruction profiles", profile_errors))
     result = {}
     for key in ("edited", "restored"):
         tsp = history["T/" + key]
