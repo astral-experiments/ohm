@@ -176,6 +176,38 @@ def archive(selected, out):
         need(proc.wait() == 0, "SDK compression failed")
 
 
+ENTRYPOINTS = {
+    "x": "768ed1674641e020c4fb9985d53c197ca5bf3e16",
+    "x.py": "928a7496cb70ef2a6caf8e890fb09f12883a26e3",
+}
+
+
+def launcher(repo):
+    for name, oid in ENTRYPOINTS.items():
+        row = git(repo, "ls-tree", "HEAD", "--", name).decode().strip()
+        need(
+            row == f"100755 blob {oid}\t{name}"
+            and os.access(repo / name, os.X_OK)
+            and git(repo, "hash-object", name).decode().strip() == oid,
+            "wrong checked-in native bootstrap entrypoint: " + name,
+        )
+    # The checked-in Linux launcher searches PATH for python3 before every other interpreter.
+    interpreter = shutil.which("python3")
+    need(
+        interpreter
+        and os.path.samefile(interpreter, sys.executable)
+        and sys.version_info[:2] == (3, 13)
+        and not os.environ.get("OSTYPE", "").startswith(("cygwin", "msys")),
+        "./x would not select the pinned Python 3.13",
+    )
+    return {
+        "blobs": ENTRYPOINTS,
+        "python": interpreter,
+        "python_version": sys.version,
+        "python_sha256": sha(Path(interpreter)),
+    }
+
+
 def check_source(repo, head):
     need(
         obj(repo, "HEAD") == head and not git(repo, "status", "--porcelain=v1", "--untracked-files=no"),
@@ -241,8 +273,7 @@ def product_tests(repo, combined, role, log):
             expect = test in BASE_CONTROLS or role == "C" or (role == "F" and test == FORWARD_TEST)
             path = log / (test + ".log")
             args = [
-                sys.executable,
-                "x.py",
+                "./x",
                 *OPTIONS,
                 "--set",
                 "rust.verbose-tests=true",
@@ -520,6 +551,7 @@ def main(root):
                 attempt=os.environ["GITHUB_RUN_ATTEMPT"],
                 llvm=LLVM,
                 stage0=STAGE0,
+                launcher=launcher(repo),
                 base_path=str(repo),
                 role=role,
             ),
@@ -529,7 +561,7 @@ def main(root):
             ("rustdoc-build", ["src/tools/rustdoc"]),
         ]:
             succeeded(
-                [sys.executable, "x.py", *OPTIONS, "build", *HOST_FLAGS, *what],
+                ["./x", *OPTIONS, "build", *HOST_FLAGS, *what],
                 repo,
                 log / (name + ".log"),
             )
