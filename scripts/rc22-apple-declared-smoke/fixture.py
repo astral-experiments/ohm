@@ -1,6 +1,7 @@
 """Build the release's exact two binaries under different source and linker declarations."""
 
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -84,48 +85,91 @@ def cmd(args, **kwargs):
     )
 
 
+def provider_command(out, label, argv, *, required=True, expected=0, env=None):
+    dest = out / label
+    dest.mkdir()
+    p = subprocess.run(argv, env=env, capture_output=True, check=False, timeout=45)
+    (dest / "stdout").write_bytes(p.stdout)
+    (dest / "stderr").write_bytes(p.stderr)
+    save(dest / "command.json", {"argv": list(map(str, argv)), "code": p.returncode})
+    if required:
+        need(p.returncode == expected, (label, p.returncode, p.stderr.decode(errors="replace")[-800:]))
+    return p
+
+
 def make_providers():
+    out = OUT / "providers"
+    out.mkdir()
     PROVIDERS.mkdir()
+    calibration = json.loads((OUT / "observer-probe/observed/result.json").read_bytes())
     c = Path(cmd(["xcrun", "--find", "clang"]).stdout.decode().strip())
     ar = Path(cmd(["xcrun", "--find", "ar"]).stdout.decode().strip())
+    sdk = Path(cmd(["xcrun", "--sdk", "macosx", "--show-sdk-path"]).stdout.decode().strip()).resolve(
+        strict=True
+    )
+    lib = sdk / "usr/lib/libSystem.tbd"
+    need(
+        sha(c) == calibration["clang"][1]
+        and str(sdk) == calibration["sdk"]
+        and sha(lib) == calibration["libSystem"],
+        "provider calibration must use the stock Xcode driver, SDK and libSystem already authenticated by kernel exec",
+    )
     consumer = PROVIDERS / "consumer.c"
     consumer.write_text("extern int answer(void); int main(void) { return answer(); }\n")
+    shutil.copyfile(consumer, out / consumer.name)
     rows = {}
     for value in (17, 29, 37):
         d = PROVIDERS / str(value)
         d.mkdir()
+        dest = out / str(value)
+        dest.mkdir()
         src = d / "answer.c"
         src.write_text("int answer(void) { return %d; }\n" % value)
-        cc = [str(c), "-x", "c", "-c", str(src), "-o", str(d / "answer.o")]
-        cmd(cc)
-        cmd([ar, "rcs", d / "libanswer.a", d / "answer.o"], env=os.environ | {"ZERO_AR_DATE": "1"})
-        names = cmd([ar, "-t", d / "libanswer.a"]).stdout.splitlines()
-        need(
-            [n for n in names if n not in (b"__.SYMDEF", b"__.SYMDEF SORTED")] == [b"answer.o"],
-            "unexpected archive member",
-        )
-        cmd([c, consumer, d / "libanswer.a", "-o", d / "consumer"])
-        verdict = subprocess.run([d / "consumer"], check=False, timeout=10).returncode
-        need(verdict == value, "archive does not implement its stated native behavior")
-        rows[str(value)] = {
-            "archive": sha(d / "libanswer.a"),
-            "bytes": (d / "libanswer.a").stat().st_size,
-            "member": sha(d / "answer.o"),
-            "consumer": sha(d / "consumer"),
-            "exit": verdict,
-            "cc": cc,
-        }
+        obj = d / "answer.o"
+        archive = d / "libanswer.a"
+        exe = d / "consumer"
+        cc = [str(c), "-x", "c", "-c", str(src), "-o", str(obj)]
+        try:
+            provider_command(dest, "compile", cc)
+            provider_command(
+                dest, "archive", [ar, "rcs", archive, obj], env=os.environ | {"ZERO_AR_DATE": "1"}
+            )
+            names = provider_command(dest, "members", [ar, "-t", archive]).stdout.splitlines()
+            need(
+                [n for n in names if n not in (b"__.SYMDEF", b"__.SYMDEF SORTED")] == [b"answer.o"],
+                "unexpected archive member",
+            )
+            argv = [c, consumer, archive, "-o", exe]
+            if value == 17:
+                # The previous runner lost stderr from this exact command. Join both link attempts to one archive.
+                old = provider_command(dest, "prior-no-sdk-link", argv, required=False)
+                if old.returncode == 0:
+                    provider_command(dest, "prior-no-sdk-exit", [exe], expected=value)
+                    shutil.copyfile(exe, dest / "prior-consumer")
+                exe.unlink(missing_ok=True)
+            provider_command(dest, "native-link", [c, "-isysroot", sdk, *argv[1:]])
+            verdict = provider_command(dest, "native-exit", [exe], expected=value)
+            rows[str(value)] = {
+                "archive": sha(archive),
+                "bytes": archive.stat().st_size,
+                "member": sha(obj),
+                "consumer": sha(exe),
+                "exit": verdict.returncode,
+                "cc": cc,
+            }
+        finally:
+            for file in (src, obj, archive, exe):
+                if file.is_file():
+                    shutil.copyfile(file, dest / file.name)
     need(
         len({r["bytes"] for r in rows.values()}) == 1
         and len({r["archive"] for r in rows.values()}) == 3,
         "same-size three distinct native archives required",
     )
-    out = OUT / "providers"
-    out.mkdir()
-    for v in rows:
-        shutil.copytree(PROVIDERS / v, out / v)
-    shutil.copyfile(consumer, out / consumer.name)
-    save(out / "archive-check.json", {"rows": rows, "clang": str(c), "ar": str(ar)})
+    save(
+        out / "archive-check.json",
+        {"rows": rows, "clang": str(c), "ar": str(ar), "sdk": str(sdk), "libSystem": sha(lib)},
+    )
 
 
 def put(path, state, backdate):

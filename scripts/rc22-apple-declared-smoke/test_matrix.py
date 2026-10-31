@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import sys
@@ -161,6 +162,26 @@ class Protocol(unittest.TestCase):
         del row["products"]["second"]
         with self.assertRaises(ValueError):
             matrix.check(row, 17)
+
+    def test_provider_failure_retains_original_stderr_and_argv(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t)
+            cmd = [
+                sys.executable,
+                "-c",
+                'import sys; sys.stderr.write("selected native archive failed");sys.exit(1)',
+            ]
+            with self.assertRaises(ValueError):
+                fixture.provider_command(root, "required", cmd)
+            self.assertEqual((root / "required/stderr").read_bytes(), b"selected native archive failed")
+            self.assertEqual(
+                json.loads((root / "required/command.json").read_bytes()), {"argv": cmd, "code": 1}
+            )
+            observed = fixture.provider_command(root, "historical", cmd, required=False)
+            self.assertEqual(observed.returncode, 1)
+            self.assertEqual(
+                (root / "historical/stderr").read_bytes(), (root / "required/stderr").read_bytes()
+            )
 
     def test_installed_tree_catches_mutated_runtime_and_alias(self):
         with tempfile.TemporaryDirectory() as t:

@@ -564,7 +564,6 @@ def main():
     observed = json.loads((OUT / "observer-probe/observed/result.json").read_bytes())
     ld = Path(observed["printed_linker"][0][0]).resolve(strict=True)
     need(sha(ld) == json.loads((OUT / "observer.json").read_bytes())["ld"], "wrong observed platform ld")
-    make_providers()
     trace = ExecTrace()
     results = {}
     failed = []
@@ -576,6 +575,20 @@ def main():
             before = sdk(role, True)
             save(dest / "selected-sdk.json", before)
             for lane in REG["readers"][role]:
+                if role == "fourfix" and lane == "A":
+                    # The actual corrected release script has an independent outcome even if the C fixture refuses.
+                    try:
+                        make_providers()
+                    except Exception as exc:
+                        row = {
+                            "role": "calibration",
+                            "lane": "C-provider",
+                            "error": str(exc),
+                            "traceback": traceback.format_exc(),
+                        }
+                        failed.append(row)
+                        save(OUT / "C-provider-refused.json", row)
+                        raise
                 try:
                     r = (
                         release_script(trace)
