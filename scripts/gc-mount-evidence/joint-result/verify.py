@@ -34,28 +34,27 @@ def deleted_sentinel(trace):
     return [int(s.split()[0]) for s in trace.splitlines() if re.search(rb'\b(?:unlink|unlinkat)\([^\n]*QA_SENTINEL[^\n]*\)\s+=\s+0$',s)]
 
 
-def main():
-    packets={name:read(HERE/('combined-'+name+'.zip'),digest) for name,digest in DIGESTS.items()}
+def verify(packets, product, tree, binary, inventory, workflow, late_workflow):
     j=lambda data,key:json.loads(data[key]);build,ruff,gc,late=[packets[n] for n in ('build','ruff','gc','late')]
     compiled=j(build,'build.json')
     assert compiled==j(ruff,'matched-delivered-cargo.json')==j(gc,'packet/build.json')==j(late,'packet/build.json')
-    assert compiled['qa']==QA and compiled['candidate']==PRODUCT and compiled['tree']['tree']==TREE
-    assert compiled['compiled']==compiled['delivered']==FIXED
-    assert compiled['tree']['files']==3109 and compiled['tree']['mode_path_sha256_inventory']=='80885f6cb1b78652e8cb62918bbf93fc4411d37c08f9a757e8f2de7b2a426886'
-    checked_build(build,PRODUCT,{'commit':compiled['candidate'],'version':compiled['version'],'env':compiled['env']},True)
+    assert compiled['qa']==workflow and compiled['candidate']==product and compiled['tree']['tree']==tree
+    assert compiled['compiled']==compiled['delivered']==binary
+    assert compiled['tree']['files']==3109 and compiled['tree']['mode_path_sha256_inventory']==inventory
+    checked_build(build,product,{'commit':compiled['candidate'],'version':compiled['version'],'env':compiled['env']},True)
     parent=j(ruff,'buildkit/P/built.json');base=compiled['parent']
     checked_build(ruff,base,{'commit':parent['source']['commit'],'version':parent['version'],'env':j(ruff,'buildkit/P/compile/result.json')['env']})
     runtimes={r:j(ruff,'matched-Ruff/'+r+'-runtime.json') for r in ('signed','parent','fixed')}
-    assert runtimes['signed']['cargo']['sha256']==SIGNED and runtimes['fixed']['cargo']['sha256']==FIXED
+    assert runtimes['signed']['cargo']['sha256']==SIGNED and runtimes['fixed']['cargo']['sha256']==binary
     assert runtimes['parent']['cargo']['sha256']==parent['cargo']['sha256']==parent['compiled']['sha256']
-    subjects=j(ruff,'subjects.json');assert subjects['qa']==QA and subjects['source']=='93526150df078af7dd8fc4226cdcc469539d2001'
+    subjects=j(ruff,'subjects.json');assert subjects['qa']==workflow and subjects['source']=='93526150df078af7dd8fc4226cdcc469539d2001'
     assert subjects['lock']=='c9e345325bec5ff08dbbe3916edd39ad0c3d1c7797a8c241ae32f62754e764bf'
     assert subjects['kit']['provenance']['sources']['rust']['revision']=='c79998a5cd143c445a4b2528f20953b176a65c5d'
-    recovery=verify_visits(ruff,PRODUCT,runtimes)
+    recovery=verify_visits(ruff,product,runtimes)
     cases={};races={}
-    for data,qa in ((gc,QA),(late,'59388fa4afc6f052c3edef2d7701a2823a34c700')):
+    for data,qa in ((gc,workflow),(late,late_workflow)):
         terminal=j(data,'packet/terminal.json');assert terminal['qa']==qa and terminal['roles']=={'signed':0,'fixed':0}
-        for role,expected in (('signed',SIGNED),('fixed',FIXED)):
+        for role,expected in (('signed',SIGNED),('fixed',binary)):
             identity=j(data,'packet/'+role+'/identity.json');assert identity['cargo']['sha256']==expected and identity['uid']>0
             assert identity['rustc']['sha256']==compiled['signed_runtime']['bin/rustc'] and identity['driver']['sha256']==runtimes['fixed']['driver_sha']
             outer=j(data,'packet/'+role+'/outer.json');assert outer['exit']==0 and outer['residual']==[] and outer['before']==outer['after']
@@ -80,6 +79,10 @@ def main():
             if lane=='no-openat2':assert b'ENOSYS' in trace and b'INJECTED' in trace and b'/proc/self/fdinfo/' in trace
             elif fixed:assert b'EXDEV' in trace and b'RESOLVE_NO_XDEV' in trace and b'INJECTED' not in trace
             races[role+'/'+lane]={'exit':row['status'],'held_links':row['held_nlink'],'external_unlinks':pids}
-    return {'cargo':PRODUCT,'tree':TREE,'binary_sha256':FIXED,'Ruff':recovery,'shared_gc':cases,'late_mount':races}
+    return {'cargo':product,'tree':tree,'binary_sha256':binary,'Ruff':recovery,'shared_gc':cases,'late_mount':races}
+
+def main():
+    packets={name:read(HERE/('combined-'+name+'.zip'),digest) for name,digest in DIGESTS.items()}
+    return verify(packets, PRODUCT, TREE, FIXED, '80885f6cb1b78652e8cb62918bbf93fc4411d37c08f9a757e8f2de7b2a426886', QA, '59388fa4afc6f052c3edef2d7701a2823a34c700')
 
 if __name__=='__main__':print(json.dumps(main(),indent=2,sort_keys=True))
