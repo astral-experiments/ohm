@@ -11,6 +11,8 @@ import sys
 import tarfile
 import tempfile
 import zipfile
+from types import SimpleNamespace
+from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -153,6 +155,96 @@ def rejected(files):
     }
 
 
+def safety_layout():
+    counts = {"P": {"old": [100, 900]}, "C": {"old": [200, None]}}
+    descriptive = trial.component_summary(counts, {}, ("old",))
+    assert descriptive["component_P_over_C"] == {"old": [0.5, None]}
+    calls = []
+    with tempfile.TemporaryDirectory() as t:
+        root = Path(t)
+        out = root / "packet"
+        src = root / "source"
+        gen = src / trial.builds.PATH
+        unit = src / "crates/ruff_unicode_names2/src/lib.rs"
+        for file in (gen, unit):
+            file.parent.mkdir(parents=True)
+            file.write_bytes(b"original")
+
+        class Kits:
+            def select(self, role, level):
+                assert level == "1"
+                self.role = role
+
+            def assert_binaries(self, role):
+                assert self.role == role
+
+        kits = Kits()
+
+        def invoke(argv, **options):
+            assert argv == trial.CMD and options["cwd"] == src
+            bad = unit.read_bytes().endswith(trial.BAD)
+            error = {
+                "level": "error",
+                "code": {"code": "E0308"},
+                "spans": [
+                    {
+                        "file_name": "crates/ruff_unicode_names2/src/lib.rs",
+                        "is_primary": True,
+                        "text": [{"text": trial.BAD.decode()}],
+                    }
+                ],
+            }
+            results = (
+                [{"reason": "compiler-message", "message": error}] if bad else []
+            ) + [{"reason": "build-finished", "success": not bad}]
+            calls.append([kits.role, bad])
+            return SimpleNamespace(
+                returncode=101 if bad else 0,
+                stdout="\n".join(map(json.dumps, results)).encode(),
+                stderr=b"",
+            )
+
+        def returned(rows, env, location):
+            assert (
+                root / "reader-stable/reader.rs"
+            ).read_bytes() == trial.builds.READER
+            (root / "reader-stable/reader").write_bytes(b"unscored fixture")
+            return kits.role + "-same-ELF"
+
+        with (
+            patch.object(trial, "R", root),
+            patch.object(trial, "O", out),
+            patch.object(trial.m, "src", src),
+            patch.object(trial.b, "clear", lambda: None),
+            patch.object(trial, "src_states", lambda: (gen, {"old": b"real edit"})),
+            patch.object(trial.subprocess, "run", invoke),
+            patch.object(trial, "valid_after_error", returned),
+        ):
+            trial.errors(kits, {}, "CP", "old")
+        for r in "PC":
+            packet = json.loads(
+                (
+                    out / "invalid-repair" / r / "valid-from-empty-and-repair.json"
+                ).read_bytes()
+            )
+            assert set(packet["reader_elf"]) == {
+                "warm/ready",
+                "warm/repair",
+                "empty/repair",
+            }
+            assert set(packet["reader_elf"].values()) == {r + "-same-ELF"}
+        assert gen.read_bytes() == unit.read_bytes() == b"original"
+        (
+            root / "reader-stable"
+        ).mkdir()  # The unmodified paid donor requires this to be new.
+    assert len(calls) == 10
+    return {
+        "synthetic_source_safety_visits": len(calls),
+        "fresh_canonical_reader_for_paid_donor": True,
+        "subthreshold_and_unavailable_component_is_descriptive": True,
+    }
+
+
 if __name__ == "__main__":
     signed, staged, markers = map(Path, sys.argv[1:])
     observations = json.loads(markers.read_bytes())
@@ -165,7 +257,10 @@ if __name__ == "__main__":
             {k: {"bytes": v} for k, v in item["markers"].items()},
             name in ("scratch-missing", "scratch-missing-again"),
         )
-    records = {"local_signed_minus18_marker_legs": len(observations)}
+    records = {
+        "local_signed_minus18_marker_legs": len(observations),
+        "unscored_layout": safety_layout(),
+    }
     for row in ("01", "02"):
         old, sh = archive(signed / ("one-package-" + row))
         red, rh = archive(staged / ("actual-compiler-loop-" + row))
