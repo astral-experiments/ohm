@@ -1,56 +1,85 @@
-name: Replay final native release-smoke artifacts
+name: Darwin ordinary Cargo native export qualification
 on:
   workflow_dispatch:
     inputs:
-      source:
-        description: Native job run containing the two reviewed original ZIPs
-        required: true
-        type: choice
-        options:
-          - '41250511954'
       reviewed_head:
-        description: Exact 40-character reader commit reviewed for dispatch
+        description: Exact reviewed packaging QA commit
         required: true
         type: string
-permissions: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: darwin-private-export-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
-  readback:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-static-smoke-readback-20261031' && inputs.source == '41250511954' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 12
-    permissions:
-      contents: read
-      actions: read
+  qualify:
+    name: Apple ARM64 ordinary build and test after an export rename
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-darwin-private-native-export-20261031' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    runs-on: namespace-profile-macos-15
+    timeout-minutes: 240
+    env:
+      OHM_QA_TARGET: aarch64-apple-darwin
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with: {ref: '${{ github.sha }}', path: protocol, persist-credentials: false, sparse-checkout: scripts/darwin-native-export}
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with: {ref: 0c9c558ce24212e5da6fb66150790b0af3cee90b, path: source-carrier, persist-credentials: false, sparse-checkout: scripts/rc22-private-export-ice}
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with: {ref: 7bc72b798b019a9ec0de6eeea3bc22b783917b27, path: transport, persist-credentials: false, sparse-checkout: scripts/rc22-native}
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with: {ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a, path: public-seed, persist-credentials: false, sparse-checkout: scripts/ohm-apple-zmij/source-transport}
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with: {ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1, path: signed-rust, persist-credentials: false, sparse-checkout: scripts/strict-mixed-generics}
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ github.sha }}
-          fetch-depth: 2
+          ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
+          path: cargo-seed
           persist-credentials: false
           sparse-checkout: |
-            .github/workflows
+            scripts/cargo-diagnostic-fix
+            scripts/ohm-apple-zmij/cargo293
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 69af8fd3bf8ef6ddb49aa801f25016c6af5171a9
+          path: native-reader
+          persist-credentials: false
+          sparse-checkout: |
             scripts/rc22-complete-smoke
             release
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Verify reviewed reader, native parent, source checksums, and negative controls
+        with: {python-version: '3.13'}
+      - name: Admit pinned media reader, GNU source carrier and native host
+        shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git rev-parse HEAD^)" = cce370a71a4292c14e58bbfc2c62e8b641e712d9
-          sha256sum --quiet --check scripts/rc22-complete-smoke/SHA256SUMS
-          for tool in zstd ar nm readelf; do command -v "$tool"; done
-          python3 -IB scripts/rc22-complete-smoke/test_controls.py
-      - name: Authenticate and fetch the two original GitHub ZIPs
+          test "$(git -C protocol rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C native-reader rev-parse HEAD)" = 69af8fd3bf8ef6ddb49aa801f25016c6af5171a9
+          test "$(git -C source-carrier rev-parse HEAD)" = 0c9c558ce24212e5da6fb66150790b0af3cee90b
+          command -v zstd
+          xcrun -f ld
+          test "$(uname -m)" = arm64
+          echo "WORK=$RUNNER_TEMP/private-export-darwin" >> "$GITHUB_ENV"
+          echo "QA=$GITHUB_WORKSPACE/protocol/scripts/darwin-native-export" >> "$GITHUB_ENV"
+      - name: Authenticate and install the original release and common Cargo
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/rc22-complete-smoke/replay_static.py capture "$RUNNER_TEMP/originals"
-      - name: Decode original GNU and Darwin payloads and reject all 15 transcript mutations
-        run: python3 -IB scripts/rc22-complete-smoke/replay_static.py review "$RUNNER_TEMP/originals" "$RUNNER_TEMP/rc22-smoke-readback.json"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        run: python3 -IB "$QA/drive.py" original "$WORK"
+      - name: Record the original ordinary Cargo and Mach-O behavior
+        run: python3 -IB "$QA/drive.py" probe-parent "$WORK"
+      - name: Reconstruct the exact accepted compiler source
+        run: python3 -IB "$GITHUB_WORKSPACE/source-carrier/scripts/rc22-private-export-ice/subject.py" prepare "$WORK"
+      - name: Build the revised Apple compiler, rustdoc and standard library
+        run: python3 -IB "$QA/drive.py" candidate "$WORK"
+      - name: Verify ordinary native builds, edits, retries, diagnostics and repair
+        run: python3 -IB "$QA/drive.py" probe-candidate "$WORK"
+      - name: Preserve native executables and Cargo streams even on a failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: rc22-smoke-original-readback
-          path: ${{ runner.temp }}/rc22-smoke-readback.json
+          name: darwin-private-export-cargo-qualification
+          path: |
+            ${{ runner.temp }}/private-export-darwin/receipts/
+            ${{ runner.temp }}/private-export-darwin/reports/
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 21
