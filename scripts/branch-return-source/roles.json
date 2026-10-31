@@ -1,0 +1,54 @@
+{
+  "historical_bundle_sha256": "5f12c7fed6e3b36fd151d7d498156fcb73fd6b9d2918c8a534071fce413752a9",
+  "live_only": [
+    "AGENTS.md",
+    "src/ci/citool/Cargo.lock"
+  ],
+  "pack": {
+    "objects": 112,
+    "sha256": "e3187549fbd62a26a526312b5f01dc74832891792603992638d68d6625d23d6c",
+    "size": 149123
+  },
+  "patch_sha256": "a653d1d07044b8bbd7998c3a8de29088a4f99a2d34f8fda795dd3f6c6d279cce",
+  "paths": [
+    "compiler/rustc_incremental/src/persist/fs.rs",
+    "compiler/rustc_incremental/src/persist/fs/packed.rs",
+    "compiler/rustc_incremental/src/persist/fs/packed/objects.rs",
+    "compiler/rustc_incremental/src/persist/fs/packed/tests.rs",
+    "compiler/rustc_interface/src/queries.rs",
+    "compiler/rustc_session/src/session.rs",
+    "tests/run-make/ohm-packed-branch-cache/rmake.rs"
+  ],
+  "required_live_base": "4e7c5b1f765b24ccd585d8ddb7eeae99a02b514e",
+  "roles": {
+    "F": {
+      "commit": "c6fe8ecda65452c105f85367a009af80cbb5efbc",
+      "compiler": "1df08b3c45a7e6fa3739a8e753132f707f97896a",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "f3ba9b0a487eee53b714b298b9058d33e7452615",
+      "tree": "02135f4e7c8b39eb4b6d246c878d368bf9ec6062"
+    },
+    "K": {
+      "commit": "0afbeff303d3658bff52582d8f1a996d59e6c8ce",
+      "compiler": "b8fa7ed926a6589fb8fd7e913b0eaadc36875611",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "cbd3891dd193602e3c2c4a43740551f64b03610f",
+      "tree": "1104c72b0c821aad039e7f572c52db9a01950493"
+    },
+    "old_full": {
+      "commit": "b676a640c76193a0e241d2517a64e37e156659b9",
+      "compiler": "1df08b3c45a7e6fa3739a8e753132f707f97896a",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "f3ba9b0a487eee53b714b298b9058d33e7452615",
+      "tree": "edd4951e95b5206046cea3515f33f9bfb8c239eb"
+    },
+    "old_packed": {
+      "commit": "eb15cd3dc0ab0404f8ad18589569e05a70a4d401",
+      "compiler": "b8fa7ed926a6589fb8fd7e913b0eaadc36875611",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "tests": "cbd3891dd193602e3c2c4a43740551f64b03610f",
+      "tree": "0f3482a144f74362ce578a9ecff3b0e02a734c59"
+    }
+  },
+  "traversable_commits": 262
+}
