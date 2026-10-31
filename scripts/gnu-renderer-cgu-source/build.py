@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from source import (
     HERE,
     BASE,
-    FORWARD,
+    SIGNED,
     FORWARD_TEST,
     CALLABLE_TEST,
     FTEST,
@@ -124,7 +124,11 @@ def verdict(log, name, success, rc):
         )
         if name == FORWARD_TEST:
             need(
-                "<&Derived as std::fmt::Debug>::fmt:" in log
+                name + "/rmake.rs:37:" in log
+                and re.search(
+                    r"<&Derived as std::fmt::Debug>::fmt: forwarders\.[0-9a-f]{16}\.volatile\[External\]",
+                    log,
+                )
                 and "left: false" in log
                 and "right: true" in log,
                 "wrong initial derived placement",
@@ -261,8 +265,7 @@ def product_tests(repo, combined, role, log):
     try:
         for f in sorted(FTEST | KTEST):
             path = repo / f
-            fixture = FORWARD if role == "F" and f in FTEST else combined
-            data = git(repo, "show", fixture + ":" + f)
+            data = git(repo, "show", combined + ":" + f)
             if path.exists():
                 need(path.read_bytes() == data, "unchecked fixture")
             else:
@@ -554,6 +557,8 @@ def main(root):
                 launcher=launcher(repo),
                 base_path=str(repo),
                 role=role,
+                signed_provenance=SIGNED,
+                review_base=BASE,
             ),
         )
         for name, what in [
@@ -648,7 +653,8 @@ def main(root):
         "operative_cargo": CARGO_HASH,
         "native_linker": WILD_HASH,
         "compiler_verbose": vvs[0].decode(),
-        "pr_base_required": "live branch carrying #284, rebase and requalify",
+        "review_base": BASE,
+        "signed_provenance": SIGNED,
     }
     write(transfer / "manifest.json", result)
     # Reopen every complete official transfer using the actual downstream reader before admission.

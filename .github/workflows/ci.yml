@@ -71,6 +71,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          (cd scripts/gnu-renderer-cgu-source && sha256sum --check SHA256SUMS)
           test "$(git -C public-seed rev-parse HEAD)" = 85c467e1190d80fa8607fb0f9ef0824b4271266a
           test "$(git -C signed-source rev-parse HEAD)" = d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
           test "$(git -C package-reader rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf

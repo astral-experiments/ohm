@@ -10,14 +10,31 @@ import subprocess
 import tempfile
 
 HERE = Path(__file__).resolve().parent
-BASE = "c79998a5cd143c445a4b2528f20953b176a65c5d"
-COMBINED = "caf6ddd8b4a7a19acb140f2a030cc5d2035aa424"
-FORWARD = "e420faa7fc34004b5e56b2c9f1456ae2ee5eab50"
-CALLABLE = "f8f32cace6a079c4e9c6a08166a86e572fd1f4fb"
-TREE = "77ad1e80afc956a830491544d43695ec699fac2e"
+SIGNED = "c79998a5cd143c445a4b2528f20953b176a65c5d"
+BASE = "4e7c5b1f765b24ccd585d8ddb7eeae99a02b514e"
+FORWARD = "96e6c29c1ed9bf7229ef3b89843712139529cd10"
+COMBINED = "b79ec99c44772853c313161bee2bbfaecc80e0de"
+HISTORICAL_F = "e420faa7fc34004b5e56b2c9f1456ae2ee5eab50"
+HISTORICAL_C = "19d9b2a1d88e470ea2bea2e29b3b65a74ab08850"
+SIGNED_TREE = "77ad1e80afc956a830491544d43695ec699fac2e"
 COMPILER = "b429aa02503b16993d9b8f94a6ab17f4f3bfaa01"
 LIBRARY = "4f7a8f755164dc68fff80790db8a844ae030fd03"
 BOOT = "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1"
+LIVE_PACK = "12277c6b2c405ea921acf59f7a1ed94eee5f4a069b8dc777c6408d49e998759f"
+TWO_DOT = "fb920ee153c81895b3265fe729a693968dd68e3258ef24568b6b51c8d10e9971"
+LIVE_TREES = {
+    "P": (BASE, "d0647532bd782f92e3155bb0158de5a3c9b339bb", COMPILER),
+    "F": (
+        FORWARD,
+        "611c96dce4a45e85551e12418bbdf262181aa4d8",
+        "d6974700d89c4081ce287a1f798ce516d17e2950",
+    ),
+    "C": (
+        COMBINED,
+        "b0b1a3f38c1cf85dc79f87e2be7fd4429d9c5c37",
+        "186b90f52fbc633bcd7caa0b16bced5e91553a33",
+    ),
+}
 FORWARD_TEST = "ohm-derived-forwarder-cgus"
 CALLABLE_TEST = "ohm-caller-drop-family"
 PRODUCT = "compiler/rustc_monomorphize/src/partitioning.rs"
@@ -27,6 +44,7 @@ FIELDS = {
     "tree": "^{tree}",
     "compiler": ":compiler",
     "library": ":library",
+    "tests": ":tests",
     "bootstrap": ":src/bootstrap",
 }
 
@@ -60,70 +78,99 @@ def identity(repo, head):
     return {"commit": head, **{k: obj(repo, head + suffix) for k, suffix in FIELDS.items()}}
 
 
+def two_dot(repo, left, right):
+    return git(repo, "diff", "--binary", "--full-index", "--no-renames", left, right)
+
+
+def live_base(repo, packet):
+    raw = (packet / "live-over-signed.pack").read_bytes()
+    need(len(raw) == 112293 and digest(raw) == LIVE_PACK, "corrupt live-base pack")
+    git(repo, "index-pack", "--stdin", data=raw)
+    need(
+        obj(repo, SIGNED + "^{tree}") == SIGNED_TREE
+        and obj(repo, BASE + "^{tree}") == LIVE_TREES["P"][1],
+        "wrong signed or live checkout",
+    )
+    need(
+        git(repo, "rev-list", "--count", BASE, "^" + SIGNED).strip() == b"263", "incomplete live history"
+    )
+    git(repo, "merge-base", "--is-ancestor", "f0750c162dc7f095b1c8c0caa9ca3894359404a1", BASE)
+    need(digest(two_dot(repo, SIGNED, BASE)) == TWO_DOT, "actual signed/live two-dot difference changed")
+
+
 def validate(repo, reg, require_combined):
-    actual = {role: identity(repo, item["commit"]) for role, item in reg["roles"].items()}
+    actual = {role: identity(repo, row["commit"]) for role, row in reg["roles"].items()}
     need(actual == reg["roles"], "source Git object or tree differs")
-    need(
-        actual["P"]
-        == {"commit": BASE, "tree": TREE, "compiler": COMPILER, "library": LIBRARY, "bootstrap": BOOT},
-        "wrong signed source",
-    )
-    need(
-        actual["F"]["commit"] == FORWARD
-        and actual["F"]["tree"] == "adfbc281b424f8421de30fa9a178e9e441feb9ab",
-        "wrong forwarder commit",
-    )
-    need(
-        actual["K"]["commit"] == CALLABLE
-        and actual["K"]["tree"] == "876055ca2a21aff0ce49ab1349820ca7e178b76b",
-        "wrong standalone callable",
-    )
-    need(
-        all(a["library"] == LIBRARY and a["bootstrap"] == BOOT for a in actual.values()),
-        "library or bootstrap diff",
-    )
-    need(
-        files(repo, FORWARD) == FTEST | {PRODUCT} and files(repo, CALLABLE) == KTEST | {PRODUCT},
-        "unexpected standalone source path",
-    )
     need("C" in actual or not require_combined, "combined source is intentionally unenrolled")
+    for k, a in actual.items():
+        need((a["commit"], a["tree"], a["compiler"]) == LIVE_TREES[k], "wrong reviewed " + k + " source")
+        need(a["library"] == LIBRARY and a["bootstrap"] == BOOT, "library or bootstrap diff")
+    need(
+        obj(repo, FORWARD + "^") == BASE
+        and obj(repo, BASE + ":compiler") == obj(repo, SIGNED + ":compiler"),
+        "wrong live compiler parent",
+    )
+    need(
+        reg["historical"] == {"signed": SIGNED, "forwarder": HISTORICAL_F, "combined": HISTORICAL_C},
+        "historical controls differ",
+    )
+    need(
+        obj(repo, HISTORICAL_F + ":compiler") == "cee5a54f537678194263fed0e5f4167b31cee3a3"
+        and obj(repo, HISTORICAL_C + ":compiler") == LIVE_TREES["C"][2],
+        "signed-source control differs",
+    )
+    need(files(repo, FORWARD) == FTEST | {PRODUCT}, "wrong isolated forwarder paths")
     if "C" in actual:
-        child = actual["C"]["commit"]
         need(
-            child == COMBINED
-            and actual["C"]["tree"] == "0a87f43a4b3c92f9648d54d0d7fff7a292e3bd10"
-            and actual["C"]["compiler"] == "1be646d90d0024e0ab0334f1de4c3578f83535ec",
-            "wrong combined candidate",
+            obj(repo, COMBINED + "^") == FORWARD and files(repo, COMBINED) == FTEST | KTEST | {PRODUCT},
+            "wrong combined parent or paths",
         )
-        need(files(repo, child) == FTEST | KTEST | {PRODUCT}, "combined source changed another path")
-        coverage = "tests/run-make/" + FORWARD_TEST + "/rmake.rs"
+        for k in ("compiler", "library", "tests"):
+            need(
+                obj(repo, HISTORICAL_C + ":" + k) == actual["C"][k],
+                "final live and historical " + k + " differ",
+            )
         need(
-            obj(repo, child + ":" + coverage) == "e4ba16b96b6dfade1d087414211d524d56c53510",
-            "combined coverage fixture differs",
+            digest(two_dot(repo, HISTORICAL_C, COMBINED)) == TWO_DOT,
+            "live C and signed C differ beyond the two original files",
         )
-        for role, paths in ((FORWARD, FTEST - {coverage}), (CALLABLE, KTEST)):
-            for path in paths:
-                need(
-                    obj(repo, role + ":" + path) == obj(repo, child + ":" + path),
-                    "source fixture differs: " + path,
-                )
+        for head in (FORWARD, COMBINED):
+            need(
+                obj(repo, head + ":tests/run-make/" + FORWARD_TEST)
+                == "5f831d1d8a97cc0736f57fe3e955952ecbfe79ab",
+                "missing exact forwarder coverage case",
+            )
         need(
-            len({actual[r]["compiler"] for r in ("P", "F", "K", "C")}) == 4,
-            "combined compiler does not differ from its parts",
+            obj(repo, COMBINED + ":tests/run-make/" + CALLABLE_TEST)
+            == "f0c04d3a6302bbe1ec430d512303e8c4761764b3",
+            "missing exact sole/mixed HRTB fixtures",
         )
     return actual
 
 
 def enroll(repo, packet, combined):
     packet.mkdir(exist_ok=True)
-    roles = {"P": BASE, "F": FORWARD, "K": CALLABLE}
+    roles = {"P": BASE, "F": FORWARD}
     if combined:
         need(len(combined) == 40 and obj(repo, combined) == combined, "full combined commit required")
         roles["C"] = combined
-    reg = {"roles": {k: identity(repo, v) for k, v in roles.items()}, "steps": []}
+    reg = {
+        "historical": {"signed": SIGNED, "forwarder": HISTORICAL_F, "combined": HISTORICAL_C},
+        "roles": {k: identity(repo, v) for k, v in roles.items()},
+        "steps": [],
+    }
     validate(repo, reg, False)
     commits = (
-        git(repo, "rev-list", "--reverse", "--topo-order", *list(roles.values())[1:], "^" + BASE)
+        git(
+            repo,
+            "rev-list",
+            "--reverse",
+            "--topo-order",
+            HISTORICAL_C,
+            *list(roles.values())[1:],
+            "^" + SIGNED,
+            "^" + BASE
+        )
         .decode()
         .splitlines()
     )
@@ -135,7 +182,7 @@ def enroll(repo, packet, combined):
             for row in whole.split(b"\n\n", 1)[0].splitlines()
             if row.startswith(b"parent ")
         ]
-        need(parents and parents[0] in {BASE, *commits}, "foreign parent")
+        need(parents and parents[0] in {SIGNED, BASE, *commits}, "foreign parent")
         diff = git(
             repo, "diff", "--no-ext-diff", "--binary", "--full-index", "--no-renames", parents[0], commit
         )
@@ -150,7 +197,8 @@ def enroll(repo, packet, combined):
 
 def reconstruct(repo, packet, required):
     reg = json.loads((packet / "registration.json").read_text())
-    known = {BASE}
+    live_base(repo, packet)
+    known = {SIGNED, BASE}
     with tempfile.TemporaryDirectory() as temp:
         env = dict(os.environ, GIT_INDEX_FILE=str(Path(temp) / "index"))
         for rec in reg["steps"]:

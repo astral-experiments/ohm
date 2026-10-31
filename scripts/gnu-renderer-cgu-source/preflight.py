@@ -62,6 +62,11 @@ def main(args):
         patch.write_bytes(old[:-1] + bytes([old[-1] ^ 1]))
         neg = [refuses(lambda: reconstruct(repo, packet, True), "corrupt packed patch")]
         patch.write_bytes(old)
+        live = packet / "live-over-signed.pack"
+        original_live = live.read_bytes()
+        live.write_bytes(original_live[:-1] + bytes([original_live[-1] ^ 1]))
+        neg.append(refuses(lambda: reconstruct(repo, packet, True), "corrupt live-base pack"))
+        live.write_bytes(original_live)
         # Reseal a raw commit with a wrong tree to ensure verification continues inside the compressed transport.
         raw = reg["steps"][0]["tree"]
         reg["steps"][0]["tree"] = "0" * 40
@@ -158,7 +163,7 @@ def main(args):
             "negative_guards": neg,
             "source_parent_runner_stderr": sha(args.derived_failure),
             "callable_parent_listing": sha(args.callable_listing),
-            "real_callable_rmake_on_minus18": sha(args.callable_failure),
+            "callable_rmake_stderr": sha(args.callable_failure),
             "callable_parent_owner": owner,
             "transfer_roundtrips": list(roles),
             "reporter": "synthetic pretty reports using real forwarder and callable rmake stderr, and signed callable MONO_ITEM",
