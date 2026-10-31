@@ -1,19 +1,40 @@
-name: Check Ruff's edited musl PEP 723 test executable
+name: Ruff PEP 723 musl test-build instruction screen
 on:
   workflow_dispatch:
 permissions:
-  actions: read
   contents: read
+  actions: read
 jobs:
-  historical-tests:
-    name: Compare two source-built rustc drivers on Ruff's four new tests
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-musl-pep723-structural-20261031'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 55
+  paired:
+    if: github.repository == 'astral-experiments/ohm' && github.ref_name == 'charlie/qa-musl-pep723-hardware-screen-20261031'
+    name: PEP 723 test-build position ${{ matrix.position }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        position: [1, 2]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          path: harness
+          path: screen
+          persist-credentials: false
+      - name: Check the separately bound source and scheduling clearance
+        working-directory: screen/scripts/ohm-musl-pep723-test-hardware
+        run: |
+          set -euo pipefail
+          sha256sum --strict --check SHA256SUMS
+          python3 -IB -c "import pathlib,sys; sys.path.insert(0,'.'); import support; support.gate(pathlib.Path('clearance.json'))"
+          echo "QA_ROOT=$RUNNER_TEMP/ohm-aarch64-linux-zmij" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 58aad7854096055e3b1b8ea4a42dc231fa46e92b
+          path: structural
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 5d6abc7cf533b1a85264c18525c9f8917aeb47d3
+          path: hardware
           persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -23,60 +44,37 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify the registered study and the original source and native provider artifacts
+      - name: Acquire the immutable source and admission records
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends musl-tools strace zstd b3sum
-          (cd harness/scripts/ohm-musl-pep723; sha256sum --strict --check SHA256SUMS)
-          cd qualification
-          test "$(git rev-parse HEAD)" = 89a055549f4335e6e172f96c65d162dcd9cb1046
-          python3 -IB scripts/ohm-musl-ast-pair/lookup.py 41173218253 89a055549f4335e6e172f96c65d162dcd9cb1046 >> "$GITHUB_ENV"
-      - name: Restore all 183 parent SDK members and the independent candidate driver
+          sudo apt-get install -y --no-install-recommends strace musl-tools zstd b3sum
+          adapter="$GITHUB_WORKSPACE/screen/scripts/ohm-musl-pep723-test-hardware"
+          python3 -IB "$adapter/stage.py" acquire --qual "$GITHUB_WORKSPACE/qualification" \
+            --original "$RUNNER_TEMP/pep723-original.zip" --clearance "$adapter/clearance.json"
+      - name: Run one complete counterbalanced ordinary test-build pair
         env:
-          GH_TOKEN: ${{ github.token }}
+          POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
-          export QA_ROOT="$RUNNER_TEMP/ohm-aarch64-linux-zmij"
-          cd qualification
-          python3 -IB scripts/ohm-musl-ast-pair/restore.py P
-      - name: Run both complete Ruff test-build histories and invoke each real static test executable
+          adapter="$GITHUB_WORKSPACE/screen/scripts/ohm-musl-pep723-test-hardware"
+          python3 -IB "$adapter/worker.py" --qual "$GITHUB_WORKSPACE/qualification" --hardware "$GITHUB_WORKSPACE/hardware" \
+            --structural "$GITHUB_WORKSPACE/structural" --original "$RUNNER_TEMP/pep723-original.zip" \
+            --receipts "$RUNNER_TEMP/musl-ast/receipts" --root "$RUNNER_TEMP/pep723-test-screen" \
+            --clearance "$adapter/clearance.json" --position "$POSITION"
+      - if: always()
+        name: Seal any complete or partial original data
         run: |
           set -euo pipefail
-          python3 -IB harness/scripts/ohm-musl-pep723/run.py \
-            --qa "$GITHUB_WORKSPACE/qualification" --receipts "$RUNNER_TEMP/musl-ast/receipts" \
-            --work "$RUNNER_TEMP/pep723-pair-work" --out "$RUNNER_TEMP/pep723-pair-results"
-      - name: Seal all native streams and exact source manifests
-        if: always()
-        run: |
-          set -euo pipefail
-          dir="$RUNNER_TEMP/pep723-pair-results"
-          mkdir -p "$dir/admission"
-          cp harness/scripts/ohm-musl-pep723/{SHA256SUMS,plan.json,admission.json,source.json} "$dir/admission/"
-          for name in sdk.json guard-subjects.json; do
-            item="$RUNNER_TEMP/musl-ast/receipts/$name"
-            if test -f "$item"; then cp "$item" "$dir/admission/"; fi
-          done
-          identity="$RUNNER_TEMP/musl-ast/reopened/identity.json"
-          if test -f "$identity"; then cp "$identity" "$dir/admission/transfer-identity.json"; fi
-          cd "$dir"
-          python3 -IB - <<'PY'
-          import hashlib,os
-          from pathlib import Path
-          rows=[]
-          for f in sorted(Path('.').rglob('*')):
-              if f.is_file():
-                  with f.open('rb') as stream: digest=hashlib.file_digest(stream,'sha256').hexdigest()
-                  rows.append(f'{digest}  {f.as_posix()}\n')
-          with Path('SHA256SUMS').open('x') as out: out.writelines(rows)
-          print('Source, raw records and executable members:',len(rows))
-          PY
+          adapter="$GITHUB_WORKSPACE/screen/scripts/ohm-musl-pep723-test-hardware"
+          python3 -IB "$adapter/stage.py" seal "$RUNNER_TEMP/pep723-test-screen"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: musl-pep723-real-test-pair
-          path: ${{ runner.temp }}/pep723-pair-results
+          name: pep723-test-hardware-position-${{ matrix.position }}
+          path: ${{ runner.temp }}/pep723-test-screen/evidence
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 21
+          compression-level: 1

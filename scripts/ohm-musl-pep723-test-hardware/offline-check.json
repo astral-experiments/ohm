@@ -1,0 +1,52 @@
+{
+  "calibration_components": [
+    [
+      "01",
+      "2a30ac5f9d11b96ad12c30849471e30e27f07110fe3460c7e05eea3d8a4ad180",
+      28
+    ],
+    [
+      "02",
+      "e84e00bb86c558f41970816dc1838bd7a7d60c5a8b62475f0cbcbedc4706f334",
+      28
+    ]
+  ],
+  "counter_boundary": "all four stream FDs existed before the first fake command; no result/file was inspected until both fake commands exited, in PC and CP",
+  "disk_control": "actual sparse file, symlink, same-inode alias and independently allocated duplicate, checked against GNU du and second reader",
+  "fresh_PMU_or_Ruff_commands": 0,
+  "held_acquisition": "refused before any network access",
+  "kernel_parser_source": "253162420c2b030e1ba3c9ae8556a0dbc7bf4e680b2a509299b3e182b6aa4872",
+  "mutations": [
+    "inconsistent hardlink allocation",
+    "wrong test/lib selection",
+    "missing final build-finished",
+    "duplicate boot",
+    "duplicate host",
+    "duplicate runner",
+    "wrong second order",
+    "historical visitor boot",
+    "multiplexed or disabled calibration 01",
+    "multiplexed or disabled calibration 02"
+  ],
+  "original_22_visit_artifact": "6c10c97233574d921fc4c532f5e888861e9bf8bc2cf96629127c14deed4c87a0",
+  "original_36_unit_roster": "e437a9e85c21387c0efef0246267b45e2489d741d19af38ef6256b7339597fb7",
+  "proven_consecutive_source": "94c5c4a3975ae6ded613e8933e571aa91938a465e64270da9020f7fa3ed35a6c",
+  "synthetic_endpoints_only": true,
+  "trace_fixtures": {
+    "actual_original_compiler_ld_argv_with_synthetic_process_topology": [
+      "P/edit",
+      "P/repeat",
+      "C/edit",
+      "C/repeat"
+    ],
+    "invalid_topology_refusals": [
+      "linker absent",
+      "wrong loaded driver",
+      "actual thread status missing",
+      "unclassified detach",
+      "mixed process masquerades as rustc thread",
+      "unfinished execve",
+      "linker under wrong parent"
+    ]
+  }
+}
