@@ -1,73 +1,75 @@
-name: Adjacent Cargo commits on Ruff's implicit Linux provider
-on:
-  workflow_dispatch:
-    inputs:
-      stage:
-        type: choice
-        options: [provider]
-        required: true
+name: Strict cargo and Ruff developer host build override
+on: workflow_dispatch
 permissions:
   contents: read
   actions: read
 jobs:
-  provider:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-linux-implicit-294-parent-20261031' && inputs.stage == 'provider'
+  pair:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-strict-host-build-opt-20261031'
+    strategy:
+      fail-fast: false
+      matrix:
+        order: ['01', '10']
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 55
+    timeout-minutes: 95
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          path: protocol
+          path: registered
           persist-credentials: false
-          sparse-checkout: scripts/linux-294-parent
+          sparse-checkout: scripts/strict-host-opt
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          path: ron
+          ref: 9d1dd09be4d2346142957cc298093d8a75c755c3
+          persist-credentials: false
+          sparse-checkout: scripts/ron-check-share
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: signed
           ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
-          path: signed-reader
           persist-credentials: false
           sparse-checkout: scripts/packaged-release-workspace
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          repository: astral-sh/ruff
-          ref: 93526150df078af7dd8fc4226cdcc469539d2001
-          path: ruff
+          path: counters
+          ref: 927e20bcad028e5ed4290a58bd330a258ee5da41
           persist-credentials: false
+          sparse-checkout: scripts/ohm-gnu-syscall
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: native
+          ref: 8b6d208b982fb3cb4a803a2976934c80bfcc66b5
+          persist-credentials: false
+          sparse-checkout: scripts/linux-294-parent
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Acquire native tools
-        run: |
-          set -eu
-          sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends strace build-essential binutils
-          rustup toolchain install 1.99.0 --profile minimal
-      - name: Authenticate the signed release and previous exact source build
+      - name: Pin exact source-qualified Linux Cargo and instrumentation
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
-          test "$(git -C signed-reader rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
-          mkdir -m700 "$RUNNER_TEMP/adjacent-provider"
-          python3 -IB signed-reader/scripts/packaged-release-workspace/packages.py 21 "$RUNNER_TEMP/adjacent-provider"
-          python3 -IB protocol/scripts/linux-294-parent/supply.py "$RUNNER_TEMP/adjacent-provider"
-      - name: Exercise the six independent Cargo roles against the same Linux provider
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends strace ninja-build binutils build-essential
+          python3 -IB registered/scripts/strict-host-opt/acquire_cargo.py "$RUNNER_TEMP/strict-qualified-cargo"
+      - name: Whole-command inherited counts, clean and provider references
+        env:
+          QUALIFICATION_TOKEN: ${{ github.token }}
+          QA_ORDER: ${{ matrix.order }}
+        run: python3 -IB registered/scripts/strict-host-opt/study.py
+      - name: Compact original packet
+        if: always()
         run: |
           set -eu
-          python3 -IB protocol/scripts/linux-294-parent/experiment.py "$RUNNER_TEMP/adjacent-provider" "$GITHUB_WORKSPACE/ruff"
-      - name: Read actual probes and compare each returned program with its empty references
-        run: |
-          set -eu
-          python3 -IB protocol/scripts/linux-294-parent/verify.py "$RUNNER_TEMP/adjacent-provider/private/host-unicode-wild-dir-v1/results" > "$RUNNER_TEMP/adjacent-provider/terminal.json"
-          cat "$RUNNER_TEMP/adjacent-provider/terminal.json"
+          if test -d "$RUNNER_TEMP/ordinary-ron-check/packet"; then
+            cp "$RUNNER_TEMP/strict-qualified-cargo/custody.json" "$RUNNER_TEMP/ordinary-ron-check/packet/strict-cargo-artifact.json"
+            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/host-opt-${{ matrix.order }}.tar.gz" .
+          fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: native-adjacent-Cargo-Ruff-Unicode
-          path: |
-            ${{ runner.temp }}/adjacent-provider/private/host-unicode-wild-dir-v1/results
-            ${{ runner.temp }}/adjacent-provider/private/host-unicode-wild-dir-v1/fixture-config.json
-            ${{ runner.temp }}/adjacent-provider/input/*.json
-            ${{ runner.temp }}/adjacent-provider/receipts
-            ${{ runner.temp }}/adjacent-provider/terminal.json
+          name: strict-host-opt-${{ matrix.order }}
+          path: ${{ runner.temp }}/host-opt-${{ matrix.order }}.tar.gz
           retention-days: 7
-          if-no-files-found: warn
+          if-no-files-found: error
