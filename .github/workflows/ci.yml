@@ -1,213 +1,127 @@
-name: CI
-
+name: Qualify the two RC22 Cargo sources on Linux
+run-name: Cargo recovery and GC at ${{ inputs.reviewed_head }}
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
-
-permissions: {}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
-
+    inputs:
+      reviewed_head:
+        description: Reviewed immutable QA commit with the completed GNU source artifact enrolled
+        type: string
+        required: true
+permissions:
+  actions: read
+  contents: read
 jobs:
-  manifest:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
+  source:
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-rc22-cargo-regressions-20261031' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      source_head: ${{ steps.official.outputs.source_head }}
+      anchor_sha: ${{ steps.official.outputs.anchor_sha }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          fetch-depth: 0
+          ref: ${{ github.sha }}
+          fetch-depth: 8
           persist-credentials: false
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          enable-cache: true
-      - name: Check benchmark runner
+          sparse-checkout: scripts/rc22-cargo-regressions
+      - name: Verify five-suite registration and native negative fixtures
         run: |
-          uv run scripts/benchmark.py --help
-          python3 scripts/test_benchmark.py
-          python3 scripts/benchmark_workflows.py --help
-          python3 scripts/test_workflow_benchmarks.py
-          python3 scripts/test_workflow_results.py
-          uv run scripts/replay_sessions.py --help
-          python3 scripts/test_replay_sessions.py
-          python3 scripts/benchmark_worktree_start.py --help
-          python3 scripts/test_worktree_start.py
-          python3 scripts/test_publish_benchmarks.py
-          python3 scripts/publish_benchmarks.py --check
-          python3 scripts/test_list_patches.py
-      - name: Validate release bootstrap configuration
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          import tomllib
-
-          config = tomllib.loads(pathlib.Path("release/bootstrap.toml").read_text())
-          build = config.get("build", {})
-          if config.get("profile") != "dist":
-              raise SystemExit("Ohm releases must use Rust's distribution profile")
-          if build.get("locked-deps") is not True:
-              raise SystemExit("Ohm releases must preserve their locked dependencies")
-          if build.get("cargo-native-static") is not True:
-              raise SystemExit(
-                  "Ohm releases must statically link Cargo's native dependencies"
-              )
-          if build.get("metrics") is not True:
-              raise SystemExit(
-                  "Optimized Ohm releases require bootstrap build metrics"
-              )
-          if build.get("profiler") is not True:
-              raise SystemExit(
-                  "Optimized Ohm releases require Rust's profiler runtime"
-              )
-          tools = set(build.get("tools", []))
-          missing_tools = {
-              "analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"
-          } - tools
-          if missing_tools:
-              missing = ", ".join(sorted(missing_tools))
-              raise SystemExit(f"Ohm releases must include these tools: {missing}")
-          cargo_features = set(
-              build.get("tool", {}).get("cargo", {}).get("features", [])
-          )
-          if "ohm-defaults" not in cargo_features:
-              raise SystemExit(
-                  "Ohm releases must enable Cargo's ohm-defaults feature"
-              )
-          rust = config.get("rust", {})
-          if rust.get("lld") is not True:
-              raise SystemExit("Wasm builds require the bundled rust-lld linker")
-          wasm = config.get("target", {}).get("wasm32-unknown-unknown", {})
-          if wasm.get("profiler") is not False:
-              raise SystemExit("Wasm must not build the native profiling runtime")
-          if rust.get("channel") != "dev":
-              raise SystemExit(
-                  "Ohm releases must use the dev channel so their unstable interfaces are available"
-              )
-          if rust.get("omit-git-hash") is not False:
-              raise SystemExit("Ohm releases must retain their source Git revision")
-          if rust.get("codegen-units") != 1:
-              raise SystemExit("Ohm releases must use one compiler codegen unit")
-          if rust.get("codegen-units-std") != 1:
-              raise SystemExit("Ohm releases must use one standard-library codegen unit")
-          if rust.get("lto") != "thin":
-              raise SystemExit("Ohm releases must use ThinLTO")
-          if rust.get("jemalloc") is not True:
-              raise SystemExit("Ohm releases must use Rust's jemalloc allocator")
-          if config.get("llvm", {}).get("download-ci-llvm") is not True:
-              raise SystemExit("Ohm releases must reuse Rust's optimized CI LLVM")
-          if config.get("dist", {}).get("compression-formats") != ["gz"]:
-              raise SystemExit(
-                  "Ohm releases must use deterministic gzip-compressed archives"
-              )
-          PY
-      - name: Validate toolchain manifests
-        run: |
-          mapfile -d '' manifests < <(
-            find toolchains -mindepth 2 -maxdepth 2 -type f -name '*.json' -print0 \
-              | sort -z
-          )
-          if [[ ${#manifests[@]} -eq 0 ]]; then
-            echo "no versioned toolchain manifests found" >&2
-            exit 1
-          fi
-          uvx --from check-jsonschema==0.37.4 check-jsonschema \
-            --check-metaschema toolchains/manifest.schema.json
-          for manifest in "${manifests[@]}"; do
-            ./scripts/validate-release-manifest.sh "$manifest"
-          done
-      - name: Protect existing toolchain manifests
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 8b2380c1aa9d1707441e79fc549f156516f1aced HEAD
+          mkdir -m 700 "$RUNNER_TEMP/source-proof"
+          python3 -IB scripts/rc22-cargo-regressions/test_carrier.py 2>&1 | tee "$RUNNER_TEMP/source-proof/preflight.log"
+      - name: Confirm successful original GNU source job and immutable SDK
+        id: official
         env:
-          BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
-        run: ./scripts/check-manifest-history.sh "$BASE_REVISION"
-      - name: Test toolchain manifest history
-        run: bash scripts/test-manifest-history.sh
-      - name: Check shell syntax
+          GH_TOKEN: ${{ github.token }}
         run: |
-          bash -n scripts/*.sh
-          sh -n scripts/install.sh
-      - name: Test release source verification
-        run: ./scripts/test-release-sources.sh
-      - name: Test optimized release builds
-        run: |
-          bash scripts/test-optimized-dist.sh
-          python3 scripts/test_prepare_wild.py
-      - name: Test the Ohm installer and release packaging
-        run: |
-          bash scripts/test-installer.sh
-          bash scripts/test-release-packaging.sh
-
-  lint:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    env:
-      # renovate: datasource=pypi depName=actionlint-py
-      ACTIONLINT_VERSION: 1.7.12.24
-      # renovate: datasource=pypi depName=shellcheck-py
-      SHELLCHECK_VERSION: 0.11.0.1
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+          set -euo pipefail
+          d=scripts/rc22-cargo-regressions
+          python3 -IB "$d/media.py" check "$d/anchor.json" "$RUNNER_TEMP/source-proof/catalog.json" >> "$GITHUB_OUTPUT"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
+          name: rc22-cargo-regression-source
+          path: ${{ runner.temp }}/source-proof/
+          if-no-files-found: warn
+          retention-days: 14
+  regressions:
+    needs: source
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 260
+    name: Cargo regression on the GNU SDK (${{ matrix.suite }})
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        include:
+          - {suite: shared, runner: ubuntu-24.04}
+          - {suite: late, runner: ubuntu-24.04}
+          - {suite: private, runner: ubuntu-24.04}
+          - {suite: private-fallback, runner: ubuntu-24.04}
+          - {suite: ruff-recovery, runner: namespace-profile-ubuntu-24-04-16}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+          path: protocol
+          sparse-checkout: scripts/rc22-cargo-regressions
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          enable-cache: true
-      - name: Check GitHub Actions workflows
-        run: |
-          uvx --from "actionlint-py==$ACTIONLINT_VERSION" \
-            actionlint -config-file .github/actionlint.yaml
-      - name: Check shell scripts
-        run: |
-          uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
-            shellcheck --shell=sh scripts/install.sh
-
-          bash_scripts=()
-          for script in scripts/*.sh; do
-            if [[ "$script" != scripts/install.sh ]]; then
-              bash_scripts+=("$script")
-            fi
-          done
-
-          uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
-            shellcheck --shell=bash "${bash_scripts[@]}"
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+          ref: ${{ needs.source.outputs.source_head }}
+          persist-credentials: false
+          path: source
+          sparse-checkout: scripts/rc22-native
+      - if: matrix.suite != 'ruff-recovery'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          node-version: "24.19.0"
-          package-manager-cache: false
-      - name: Install formatting dependencies
-        run: npm ci --ignore-scripts
-      - name: Check Markdown, YAML, and JSON formatting
-        run: ./node_modules/.bin/prettier --check .
-      - name: Audit GitHub Actions workflows
-        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
+          ref: f23a67771c625785cd70f58e9b46e8d26af3d317
+          path: shared
+          persist-credentials: false
+          sparse-checkout: scripts/gc-mount-evidence
+      - if: matrix.suite != 'ruff-recovery'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          advanced-security: false
-          annotations: true
-
-  required-checks-passed:
-    name: all required jobs passed
-    if: always()
-    needs:
-      - manifest
-      - lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check required jobs passed
+          ref: 786e5235c3faf04fcfde6beef6c2b91537d37696
+          path: private
+          persist-credentials: false
+          sparse-checkout: scripts/private-gc-overlay
+      - name: Receive the source-bound GNU ZIP
         env:
-          NEEDS_JSON: ${{ toJSON(needs) }}
+          EXPECTED_ANCHOR: ${{ needs.source.outputs.anchor_sha }}
+          EXPECTED_SOURCE: ${{ needs.source.outputs.source_head }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          failing="$(
-            jq -r '
-              to_entries[]
-              | select(.value.result != "success")
-              | "\(.key): \(.value.result)"
-            ' <<< "$NEEDS_JSON"
-          )"
-          if [[ -n "$failing" ]]; then
-            echo "$failing" >&2
-            exit 1
-          fi
+          set -euo pipefail
+          d=protocol/scripts/rc22-cargo-regressions
+          mkdir -m 700 "$RUNNER_TEMP/rc22-proof"
+          test "$(git -C protocol rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C source rev-parse HEAD)" = "$EXPECTED_SOURCE"
+          test "$(sha256sum "$d/anchor.json" | cut -d' ' -f1)" = "$EXPECTED_ANCHOR"
+          cp "$d/anchor.json" "$RUNNER_TEMP/rc22-proof/source-anchor.json"
+          python3 -IB "$d/media.py" get "$d/anchor.json" "$RUNNER_TEMP/source-sdk.zip"
+      - name: Reopen the complete SDK and validate all actual native executables
+        run: |
+          set -euo pipefail
+          d=protocol/scripts/rc22-cargo-regressions
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends build-essential ca-certificates e2fsprogs git strace util-linux zstd
+          python3 -IB "$d/kit.py" "$RUNNER_TEMP/source-sdk.zip" source "$RUNNER_TEMP/rc22-kit" "$d/anchor.json" 2>&1 | tee "$RUNNER_TEMP/rc22-proof/kit.log"
+      - name: Execute the enrolled native Cargo regression
+        env:
+          SUITE: ${{ matrix.suite }}
+        run: bash protocol/scripts/rc22-cargo-regressions/run-worker.sh "$SUITE"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: rc22-cargo-regression-${{ matrix.suite }}
+          path: |
+            ${{ runner.temp }}/rc22-proof/
+            ${{ runner.temp }}/rc22-kit/qualified.json
+            ${{ runner.temp }}/rc22-kit/registration.json
+          if-no-files-found: warn
+          retention-days: 14
+          compression-level: 1
