@@ -35,6 +35,7 @@ jobs:
           (cd scripts/branch-checked-packed-source && sha256sum --strict --status --check SHA256SUMS)
           python3 -IB scripts/branch-checked-packed-source/corrected.py
           python3 -IB scripts/branch-checked-packed-source/test_binding.py
+          python3 -IB scripts/branch-checked-packed-source/test_selector_route.py
           python3 -IB scripts/branch-first-session-e-source/test_split.py
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

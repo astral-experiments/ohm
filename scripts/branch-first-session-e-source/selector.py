@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 import shutil
+import sys
 import tempfile
 
 parser=argparse.ArgumentParser(description=__doc__)
@@ -117,4 +118,4 @@ for role in 0..4 { for bits in 0u32..64 {
     out=args.receipts/"result.json"
     out.write_text(json.dumps(results,indent=2,sort_keys=True)+"\n")
     verify_native=Path(__file__).with_name("selector_record.py")
-    subprocess.run([shutil.which("python3"),"-IB",verify_native,args.receipts],check=True)
+    subprocess.run([sys.executable, "-IB", verify_native, args.receipts, "--source", E], check=True)

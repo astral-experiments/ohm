@@ -1,10 +1,13 @@
 """Check the native stdout of each case against the complete four-state by 64-mask truth table."""
 
+import argparse
 import gzip
 import hashlib
 import json
 from pathlib import Path
-import sys
+
+HISTORICAL = "c9a6a212d38d778ed0e9d2c7057a9dedb179fff2"
+CORRECTED = "393b4b05a4bfa3f531a36023846f86236a6b71a9"
 
 CORRECT = "97f8e25752996204740fc434544a7d8d3ca35ddb477f451b14973860faabce7f"
 BOTH = "d0f6181019512b457daaf179c5d6268a342286744cf61cf3f057b3f6e617b200"
@@ -35,7 +38,8 @@ def signed():
     return rows
 
 
-def verify(read, *, source="c9a6a212d38d778ed0e9d2c7057a9dedb179fff2"):
+def verify(read, *, source=HISTORICAL):
+    require(source in (HISTORICAL, CORRECTED), "unregistered E")
     reference=signed()
     result=json.loads(read("result.json"))
     require(result["source"]==source,"different E")
@@ -57,6 +61,9 @@ def verify(read, *, source="c9a6a212d38d778ed0e9d2c7057a9dedb179fff2"):
     return result
 
 
-if __name__=="__main__":
-    folder=Path(sys.argv[1])
-    verify(lambda name:(folder/name).read_bytes())
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("folder", type=Path)
+    parser.add_argument("--source", choices=(HISTORICAL, CORRECTED), default=HISTORICAL)
+    args = parser.parse_args()
+    verify(lambda name: (args.folder / name).read_bytes(), source=args.source)
