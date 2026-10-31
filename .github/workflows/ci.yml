@@ -1,106 +1,23 @@
-name: Exact RC22 native provider release qualification
+name: RC22 normal Cargo native provider qualification
 on:
   workflow_dispatch:
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: rc22-native-marker-${{ github.ref }}
+  group: rc22-provider-plain-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  sdk:
-    name: Native SDK (${{ matrix.triple }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-markers-apple-20261031'
-    timeout-minutes: 300
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - {triple: aarch64-apple-darwin, runner: namespace-profile-macos-15}
-    runs-on: ${{ matrix.runner }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {path: protocol, persist-credentials: false, sparse-checkout: scripts/rc22-native}
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a, path: public-seed, persist-credentials: false, sparse-checkout: scripts/ohm-apple-zmij/source-transport}
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1, path: signed-rust, persist-credentials: false, sparse-checkout: scripts/strict-mixed-generics}
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
-          path: cargo-seed
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/cargo-diagnostic-fix
-            scripts/ohm-apple-zmij/cargo293
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {ref: f40b16cdb9c041c941a5e339f816111a80a84bdf, path: signed-reader, persist-credentials: false, sparse-checkout: scripts/packaged-release-workspace}
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with: {python-version: '3.13'}
-      - name: Verify source carrier and install bootstrap prerequisites
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git -C protocol rev-parse HEAD)" = "$GITHUB_SHA"
-          if [[ "$RUNNER_OS" == Linux ]]; then
-            sudo apt-get -qq update
-            sudo apt-get install -y --no-install-recommends cmake ninja-build pkg-config perl libssl-dev zstd clang lld build-essential curl
-          else
-            for item in ninja cmake pkg-config zstd; do command -v "$item" >/dev/null || brew install "$item"; done
-            xcrun --find clang
-            xcodebuild -version
-          fi
-          python3 -IB protocol/scripts/rc22-native/test_protocol.py
-          mkdir -m 700 "$RUNNER_TEMP/rc22-native"
-      - name: Reconstruct exact Rust and Cargo Git histories
-        run: python3 -IB protocol/scripts/rc22-native/materialize.py "$RUNNER_TEMP/rc22-native"
-      - name: Authenticate distributed bootstrap Cargo and stock linker layout
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git -C signed-reader rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
-          python3 -IB signed-reader/scripts/packaged-release-workspace/packages.py 21 "$RUNNER_TEMP/rc22-native/packages"
-      - name: Build exact native Rust, standard library, rustdoc and both Cargo readers
-        run: python3 -IB protocol/scripts/rc22-native/sdk.py build "$RUNNER_TEMP/rc22-native"
-      - name: Reopen every completed SDK member
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 -IB protocol/scripts/rc22-native/sdk.py reopen "$RUNNER_TEMP/rc22-native/export" "$RUNNER_TEMP/rc22-native/roundtrip"
-          "$RUNNER_TEMP/rc22-native/roundtrip/sdk/bin/rustc" -vV
-          "$RUNNER_TEMP/rc22-native/roundtrip/sdk/bin/rustdoc" -vV
-          "$RUNNER_TEMP/rc22-native/roundtrip/roles/pinned/cargo" -Vv
-          "$RUNNER_TEMP/rc22-native/roundtrip/roles/fourfix/cargo" -Vv
-      - name: Publish reusable native SDK
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: rc22-native-sdk-${{ matrix.triple }}
-          path: ${{ runner.temp }}/rc22-native/export/
-          if-no-files-found: error
-          compression-level: 0
-          retention-days: 14
-      - name: Archive source and compiler observations on every outcome
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: rc22-native-bootstrap-observations-${{ matrix.triple }}
-          path: |
-            ${{ runner.temp }}/rc22-native/reports/
-            ${{ runner.temp }}/rc22-native/packages/receipts/
-          if-no-files-found: warn
-          retention-days: 21
   provider:
-    name: Ordinary native providers (${{ matrix.triple }})
-    needs: sdk
-    if: ${{ always() && !cancelled() && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-markers-apple-20261031' && (needs.sdk.result == 'success' || needs.sdk.result == 'failure') }}
-    timeout-minutes: 120
+    name: Plain native providers (${{ matrix.triple }})
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-native-markers-plain-20261031'
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         include:
-          - {triple: aarch64-apple-darwin, runner: namespace-profile-macos-15}
+          - {triple: x86_64-unknown-linux-gnu, key: gnu, runner: namespace-profile-ubuntu-24-04-16}
+          - {triple: aarch64-apple-darwin, key: apple, runner: namespace-profile-macos-15}
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -109,39 +26,48 @@ jobs:
         with: {repository: astral-sh/ruff, ref: 93526150df078af7dd8fc4226cdcc469539d2001, path: ruff, persist-credentials: false, sparse-checkout: Cargo.lock, sparse-checkout-cone-mode: false}
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with: {ref: 89a055549f4335e6e172f96c65d162dcd9cb1046, path: marker-reader, persist-credentials: false, sparse-checkout: scripts/ohm-musl-ast-pair/v2}
-      - if: runner.os == 'Linux'
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with: {ref: 2969895dc49c9d8970ef121e1ff024ef001dc7ce, path: kernel-reader, persist-credentials: false, sparse-checkout: scripts/branch-return-execstop/kernel}
       - if: runner.os == 'macOS'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with: {ref: 14c9d13d68f3dd21c53f1ef6c3721de8363c0123, path: apple-reader, persist-credentials: false, sparse-checkout: scripts/ohm-apple-zmij}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with: {python-version: '3.13'}
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with: {name: 'rc22-native-sdk-${{ matrix.triple }}', path: sdk-inbox}
-      - name: Admit native process facilities and checksum reader
+      - name: Verify the enrolled source job and original native SDK archive
+        env: {GH_TOKEN: '${{ github.token }}'}
         shell: bash
         run: |
           set -euo pipefail
           test "$(git -C protocol rev-parse HEAD)" = "$GITHUB_SHA"
+          python3 -IB protocol/scripts/rc22-native/acquire_plain.py protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json "$RUNNER_TEMP/rc22-inbox" "$RUNNER_TEMP/rc22-source"
+      - name: Prepare native archive and checksum tools
+        shell: bash
+        run: |
+          set -euo pipefail
           if [[ "$RUNNER_OS" == Linux ]]; then
             sudo apt-get -qq update
-            sudo apt-get install -y --no-install-recommends b3sum build-essential libssl-dev zstd
+            sudo apt-get install -y --no-install-recommends b3sum build-essential zstd
           else
             command -v b3sum >/dev/null || brew install b3sum
             command -v zstd >/dev/null || brew install zstd
-            sudo -n test -x /usr/bin/eslogger
+            xcodebuild -version
           fi
-          b3sum --version
-      - name: Exercise original, fixed and same-path upgraded readers
-        run: python3 -IB protocol/scripts/rc22-native/campaign.py "$RUNNER_TEMP/rc22-providers" "$GITHUB_WORKSPACE/sdk-inbox"
-      - name: Reopen native bodies, both marker formats and every control
-        run: python3 -IB protocol/scripts/rc22-native/verify.py "$RUNNER_TEMP/rc22-providers/receipts"
-      - name: Retain complete or partial native evidence
+          python3 -IB protocol/scripts/rc22-native/test_protocol.py
+      - name: Reopen both exact SDK roles and run the ordinary native provider matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -IB protocol/scripts/rc22-native/plain.py "$RUNNER_TEMP/rc22-plain" "$RUNNER_TEMP/rc22-inbox" protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json
+      - name: Independently verify every complete program, record and native transition
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -IB protocol/scripts/rc22-native/plain_verify.py "$RUNNER_TEMP/rc22-plain/receipts" protocol/scripts/rc22-native/source/sdk-${{ matrix.key }}.json "$RUNNER_TEMP/rc22-plain/receipts/independent.json"
+      - name: Preserve source binding and all complete or partial provider observations
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: rc22-native-provider-evidence-${{ matrix.triple }}
-          path: ${{ runner.temp }}/rc22-providers/receipts/
+          name: rc22-plain-native-${{ matrix.triple }}
+          path: |
+            ${{ runner.temp }}/rc22-source/
+            ${{ runner.temp }}/rc22-plain/receipts/
           if-no-files-found: warn
-          retention-days: 21
+          retention-days: 30

@@ -45,3 +45,60 @@ archive index followed by one byte-identical provider object. It records the
 platform listing separately. Six native Xcode archive/object pairs from
 41114554812 used `__.SYMDEF SORTED`, while LLVM Darwin format used `__.SYMDEF`.
 Both SDKs and both Cargo source identities stay fixed.
+## Ordinary native-provider results
+
+The two jobs on this QA ref use the original completed native SDK builds. They
+authenticate the workflow, the native source job, the ZIP and every member before
+running Cargo. Their new receipts contain normal Cargo JSON, both physical
+dep-info encodings, the native archives and complete programs. Use the separate
+source-run kernel traces to inspect native launches. The plain run records no
+process counts.
+
+| Host | Source build | SDK artifact |
+| --- | --- | --- |
+| GNU x86-64 | [41212542603](https://github.com/astral-experiments/ohm/actions/runs/41212542603/job/124570376741) | [13046543047](https://github.com/astral-experiments/ohm/actions/runs/41212542603/artifacts/13046543047) |
+| Apple ARM64 | [41212939515](https://github.com/astral-experiments/ohm/actions/runs/41212939515/job/124571532918) | [13047576657](https://github.com/astral-experiments/ohm/actions/runs/41212939515/artifacts/13047576657) |
+
+The first independently reopened GNU run completed 99 visits. With only the
+higher-priority native archive changed, the proposed Cargo pin returned 17
+after a provider returning 29 appeared and after a same-stat replacement
+returning 41. It also returned success with malformed or missing native data.
+The four-fix Cargo matched each forced and independently empty full executable,
+native error and repaired E0308 control. Replacing only Cargo in the poisoned
+warm tree yielded 29 and the same complete executable as both independent
+controls. The earlier source job captured the expected GNU linker and the
+original-versus-translated marker on six cold visits. The results files retain
+the source and raw evidence commitments.
+
+The original macOS provider job stopped after its normal Cargo commands
+successfully linked, because its collector expected all registry compilation
+products to live under the shared directory. The new receiver binds the actual
+unit reported by Cargo under either isolated output root. A Darwin promotion can
+change inode. The receiver finds the sole byte-identical private program in the
+active Cargo crate directory from the literal build-script output. It decodes its
+retained native recipe and every enclosed physical object. The readback compares
+complete Mach-O bytes under the separately established object-name and signature
+treatment and preserves the complete unmodified input and output files. A genuine
+76,286,112-byte earlier Darwin object- and recipe-backed control passed, and
+body, module, owner or normalized-identity mutations were rejected.
+
+Each host builds all original outputs with `cargo +ohm build --locked --offline
+-j4 --message-format=json`. Each real native transition has a warm, forced and
+independently empty visit at the same absolute paths. The same isolated Cargo
+path holds the old and fixed reader during migration. GNU exercises Ruff's
+locked zmij. Darwin exercises both zmij and objc2. No ABI, time or performance
+claim is taken from the fixture.
+
+After downloading a completed hosted receipt, supply the locally checked-out
+`marker-reader` and `apple-reader` from the commits in `common.py` under
+`GITHUB_WORKSPACE`. On GNU only `marker-reader` is needed. Decompress the
+workflow artifact, locate its `complete.json`, then run the independent verifier.
+
+```sh
+python3 -IB scripts/rc22-native/plain_verify.py /path/to/receipts \
+  scripts/rc22-native/source/sdk-gnu.json /tmp/gnu-native-verified.json
+```
+
+Use `sdk-apple.json` for the Darwin receipt. The `independent.json` result
+contains no development-machine input paths. A public raw run can be reproduced
+by dispatching just this QA workflow on the reviewed ref.

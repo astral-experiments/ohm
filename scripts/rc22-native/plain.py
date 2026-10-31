@@ -54,7 +54,7 @@ def visit(out,work,src,env,store,role,kind):
     require(script['linked_paths']==dirs and not script['linked_libs'],'native search order')
     directives=(Path(script['out_dir']).parent/'run/stdout').read_bytes()
     require(directives.decode().splitlines()==['cargo:rustc-link-search='+d for d in dirs]+['cargo:rerun-if-changed=build.rs'],'unexpected watched input')
-    value=image=None
+    value=image=apple_proof=None
     if p.returncode==0:
         exe=Path(app['executable']);require(exe.resolve().is_relative_to(work/'target'),'foreign returned executable')
         b=exe.read_bytes();image=ob.keep(store,b)
@@ -63,12 +63,16 @@ def visit(out,work,src,env,store,role,kind):
         values={n:f'OHM_RC22_SELECTED_NATIVE_IMAGE_{n}'.encode() for n in (17,29,41)}
         value=next((n for n,tag in values.items() if result.stdout==str(n).encode()+b' '+tag+b'\n'),None)
         require(result.returncode==0 and not result.stderr and value is not None and all((tag+b'\0' in b)==(n==value) for n,tag in values.items()),'executable bytes and behavior disagree')
+        if host()==APPLE:
+            import apple_plain
+            apple_proof=apple_plain.witness(store.parent.parent,out,work,b,exe,script['out_dir'])
         save(out/'runtime.json',{'code':result.returncode,'stdout':result.stdout.decode(),'elf':image})
     diagnostics=[r['message']['code']['code'] for r in typed if r['reason']=='compiler-message' and r['message'].get('code')]
     errors=(p.stdout+b'\n'+p.stderr).decode(errors='replace')
     row={'code':p.returncode,'value':value,'image':image,'app_fresh':None if app is None else app['fresh'],'units':units,
          'native_error':f.LIB in errors or 'qa_rc22_value' in errors,'diagnostics':diagnostics,
          'watch_stdout':ob.keep(store,directives),'command':cmd,'mode':'ordinary-no-process-instrumentation'}
+    if apple_proof:row['apple_proof']=apple_proof
     save(out/'observed.json',row);return row
 
 def verdict(row,state,value):
@@ -122,7 +126,11 @@ def case(root,kit,receipt,kind,history,cache=None):
                     verdict(reply,state,v)
                     if v is not None:require(reply['app_fresh'] is False,'forced/empty did not build consumer')
         warm,forced,empty=(replies[n] for n in ('warm','force','empty'))
-        def key(r):return (r['code'],r['value'],r['image'],tuple(r['diagnostics']))
+        def key(r):
+            identity=r['image']
+            if host()==APPLE and identity:
+                proof=r['apple_proof'];identity=(proof['output'],proof['same_path_image'],proof['modules'])
+            return (r['code'],r['value'],identity,tuple(r['diagnostics']))
         require(key(forced)==key(empty),('complete forced/empty divergence',phase))
         equal=key(warm)==key(empty)
         if role=='fourfix' or kind=='objc2' or phase in ('lower','old-lower','repeat-lower','rust-error','rust-repair'):
