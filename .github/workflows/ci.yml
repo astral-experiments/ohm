@@ -29,6 +29,7 @@ jobs:
           path: enrolled
           persist-credentials: false
           sparse-checkout: |
+            .github/workflows
             scripts/branch-return-execstop
             scripts/branch-return-pmu
             scripts/ohm-packed-ruff/full-cli
