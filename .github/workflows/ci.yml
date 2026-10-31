@@ -1,213 +1,89 @@
-name: CI
-
+name: Read-only complete original -22 smoke
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
-
+    inputs:
+      reviewed_head:
+        description: Exact 40-character SHA reviewed for this manual run
+        required: true
+        type: string
+      source:
+        description: Frozen original release run
+        required: true
+        type: choice
+        options:
+          - '41237680370'
 permissions: {}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
-
 jobs:
-  manifest:
-    runs-on: ubuntu-latest
+  smoke:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-complete-input-smoke-20261031' && inputs.source == '41237680370' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-24.04
+          - target: aarch64-apple-darwin
+            runner: namespace-profile-macos-15
+    name: Complete smoke (${{ matrix.target }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 95
     permissions:
       contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          enable-cache: true
-      - name: Check benchmark runner
-        run: |
-          uv run scripts/benchmark.py --help
-          python3 scripts/test_benchmark.py
-          python3 scripts/benchmark_workflows.py --help
-          python3 scripts/test_workflow_benchmarks.py
-          python3 scripts/test_workflow_results.py
-          uv run scripts/replay_sessions.py --help
-          python3 scripts/test_replay_sessions.py
-          python3 scripts/benchmark_worktree_start.py --help
-          python3 scripts/test_worktree_start.py
-          python3 scripts/test_publish_benchmarks.py
-          python3 scripts/publish_benchmarks.py --check
-          python3 scripts/test_list_patches.py
-      - name: Validate release bootstrap configuration
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          import tomllib
-
-          config = tomllib.loads(pathlib.Path("release/bootstrap.toml").read_text())
-          build = config.get("build", {})
-          if config.get("profile") != "dist":
-              raise SystemExit("Ohm releases must use Rust's distribution profile")
-          if build.get("locked-deps") is not True:
-              raise SystemExit("Ohm releases must preserve their locked dependencies")
-          if build.get("cargo-native-static") is not True:
-              raise SystemExit(
-                  "Ohm releases must statically link Cargo's native dependencies"
-              )
-          if build.get("metrics") is not True:
-              raise SystemExit(
-                  "Optimized Ohm releases require bootstrap build metrics"
-              )
-          if build.get("profiler") is not True:
-              raise SystemExit(
-                  "Optimized Ohm releases require Rust's profiler runtime"
-              )
-          tools = set(build.get("tools", []))
-          missing_tools = {
-              "analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"
-          } - tools
-          if missing_tools:
-              missing = ", ".join(sorted(missing_tools))
-              raise SystemExit(f"Ohm releases must include these tools: {missing}")
-          cargo_features = set(
-              build.get("tool", {}).get("cargo", {}).get("features", [])
-          )
-          if "ohm-defaults" not in cargo_features:
-              raise SystemExit(
-                  "Ohm releases must enable Cargo's ohm-defaults feature"
-              )
-          rust = config.get("rust", {})
-          if rust.get("lld") is not True:
-              raise SystemExit("Wasm builds require the bundled rust-lld linker")
-          wasm = config.get("target", {}).get("wasm32-unknown-unknown", {})
-          if wasm.get("profiler") is not False:
-              raise SystemExit("Wasm must not build the native profiling runtime")
-          if rust.get("channel") != "dev":
-              raise SystemExit(
-                  "Ohm releases must use the dev channel so their unstable interfaces are available"
-              )
-          if rust.get("omit-git-hash") is not False:
-              raise SystemExit("Ohm releases must retain their source Git revision")
-          if rust.get("codegen-units") != 1:
-              raise SystemExit("Ohm releases must use one compiler codegen unit")
-          if rust.get("codegen-units-std") != 1:
-              raise SystemExit("Ohm releases must use one standard-library codegen unit")
-          if rust.get("lto") != "thin":
-              raise SystemExit("Ohm releases must use ThinLTO")
-          if rust.get("jemalloc") is not True:
-              raise SystemExit("Ohm releases must use Rust's jemalloc allocator")
-          if config.get("llvm", {}).get("download-ci-llvm") is not True:
-              raise SystemExit("Ohm releases must reuse Rust's optimized CI LLVM")
-          if config.get("dist", {}).get("compression-formats") != ["gz"]:
-              raise SystemExit(
-                  "Ohm releases must use deterministic gzip-compressed archives"
-              )
-          PY
-      - name: Validate toolchain manifests
-        run: |
-          mapfile -d '' manifests < <(
-            find toolchains -mindepth 2 -maxdepth 2 -type f -name '*.json' -print0 \
-              | sort -z
-          )
-          if [[ ${#manifests[@]} -eq 0 ]]; then
-            echo "no versioned toolchain manifests found" >&2
-            exit 1
-          fi
-          uvx --from check-jsonschema==0.37.4 check-jsonschema \
-            --check-metaschema toolchains/manifest.schema.json
-          for manifest in "${manifests[@]}"; do
-            ./scripts/validate-release-manifest.sh "$manifest"
-          done
-      - name: Protect existing toolchain manifests
-        env:
-          BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
-        run: ./scripts/check-manifest-history.sh "$BASE_REVISION"
-      - name: Test toolchain manifest history
-        run: bash scripts/test-manifest-history.sh
-      - name: Check shell syntax
-        run: |
-          bash -n scripts/*.sh
-          sh -n scripts/install.sh
-      - name: Test release source verification
-        run: ./scripts/test-release-sources.sh
-      - name: Test optimized release builds
-        run: |
-          bash scripts/test-optimized-dist.sh
-          python3 scripts/test_prepare_wild.py
-      - name: Test the Ohm installer and release packaging
-        run: |
-          bash scripts/test-installer.sh
-          bash scripts/test-release-packaging.sh
-
-  lint:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
+      actions: read
     env:
-      # renovate: datasource=pypi depName=actionlint-py
-      ACTIONLINT_VERSION: 1.7.12.24
-      # renovate: datasource=pypi depName=shellcheck-py
-      SHELLCHECK_VERSION: 0.11.0.1
+      OHM_QA_TARGET: ${{ matrix.target }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
           persist-credentials: false
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+          sparse-checkout: |
+            .github/workflows
+            scripts/rc22-complete-smoke
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
-          enable-cache: true
-      - name: Check GitHub Actions workflows
+          python-version: '3.13'
+      - name: Check first-parent source and reviewer tests
+        shell: bash
         run: |
-          uvx --from "actionlint-py==$ACTIONLINT_VERSION" \
-            actionlint -config-file .github/actionlint.yaml
-      - name: Check shell scripts
-        run: |
-          uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
-            shellcheck --shell=sh scripts/install.sh
-
-          bash_scripts=()
-          for script in scripts/*.sh; do
-            if [[ "$script" != scripts/install.sh ]]; then
-              bash_scripts+=("$script")
-            fi
-          done
-
-          uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
-            shellcheck --shell=bash "${bash_scripts[@]}"
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: "24.19.0"
-          package-manager-cache: false
-      - name: Install formatting dependencies
-        run: npm ci --ignore-scripts
-      - name: Check Markdown, YAML, and JSON formatting
-        run: ./node_modules/.bin/prettier --check .
-      - name: Audit GitHub Actions workflows
-        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
-        with:
-          advanced-security: false
-          annotations: true
-
-  required-checks-passed:
-    name: all required jobs passed
-    if: always()
-    needs:
-      - manifest
-      - lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check required jobs passed
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^)" = e8468d0d0221379e7152a748a8735d78a88eda2f
+          test "$(git hash-object scripts/smoke-test-release.sh)" = dc978769b3d0fa3b8e797b7041fdbdaf5c04dc1e
+          test "$(git hash-object scripts/smoke-test-relink.sh)" = 3743c253445a2b796445a90fe31c08db53304ba8
+          python3 -IB scripts/rc22-complete-smoke/test_controls.py
+      - name: Authenticate original platform and global release ZIPs
+        id: original
         env:
-          NEEDS_JSON: ${{ toJSON(needs) }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/rc22-complete-smoke/media.py original
+      - name: Verify physical upstream 1.99.0 rust-analyzer and archive members
+        id: stock
         run: |
-          failing="$(
-            jq -r '
-              to_entries[]
-              | select(.value.result != "success")
-              | "\(.key): \(.value.result)"
-            ' <<< "$NEEDS_JSON"
-          )"
-          if [[ -n "$failing" ]]; then
-            echo "$failing" >&2
-            exit 1
-          fi
+          python3 -IB scripts/rc22-complete-smoke/stock.py
+          python3 -IB scripts/rc22-complete-smoke/installed.py catalog
+      - name: Entire corrected smoke on the unmodified original distribution
+        id: packaged
+        run: python3 -IB scripts/rc22-complete-smoke/run.py packaged
+      - name: Authenticate the separate source-built corrected Cargo binary
+        id: corrected
+        if: ${{ !cancelled() && steps.original.outcome == 'success' && steps.stock.outcome == 'success' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/rc22-complete-smoke/media.py fixed
+      - name: Entire corrected smoke on the private Cargo replacement
+        id: replacement
+        if: ${{ !cancelled() && steps.corrected.outcome == 'success' }}
+        run: python3 -IB scripts/rc22-complete-smoke/run.py fourfix
+      - name: Independently check both completed arms
+        if: ${{ !cancelled() && steps.packaged.outcome == 'success' && steps.replacement.outcome == 'success' }}
+        run: python3 -IB scripts/rc22-complete-smoke/reopen.py "$RUNNER_TEMP/rc22-complete-smoke/receipts"
+      - name: Retain original, partial, or complete QA receipts only
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: rc22-complete-smoke-${{ matrix.target }}
+          path: ${{ runner.temp }}/rc22-complete-smoke/receipts
+          if-no-files-found: warn
+          retention-days: 14

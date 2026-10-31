@@ -1,0 +1,105 @@
+{
+  "cargo": "8269d772aa1ef02e5efaa331dfb40eb55d71f719",
+  "checksums": {
+    "ohm-1.99.0-22-aarch64-apple-darwin-provenance.json": "dd6ad96f169ce4a8cc540bac9751c0e7b5cfb658625fc087ee8e0fc696d195b0",
+    "ohm-1.99.0-22-aarch64-apple-darwin.tar.gz": "6dfc360826f23d06f8224696aa024b2b95d92e6f76cdd7fc822966136eed3a25",
+    "ohm-1.99.0-22-aarch64-apple-darwin.tar.gz.sha256": "8b50f3986782389d36f803d65238ac8681334990b631c3383d66ac7b39d9e0ae",
+    "ohm-1.99.0-22-x86_64-unknown-linux-gnu-provenance.json": "0991baa51668a95b3771d1cd46827be55964d21a5b13f4d8c4f0981b88483db7",
+    "ohm-1.99.0-22-x86_64-unknown-linux-gnu.tar.gz": "68ee7aa1405b0bf7c676f0778862ed27449c9d010a9064ec6e8bc313a2ad78f5",
+    "ohm-1.99.0-22-x86_64-unknown-linux-gnu.tar.gz.sha256": "39b07b00cdee3121c7b92e77aece21d5a11f40da7c6c5698a236ff1c0f258f06",
+    "ohm-1.99.0-22.json": "68c7d720adfc40e7f0cb617b0b1de0621346df863328bd9b56de7c4d516a4ffd",
+    "ohm-installer.sh": "fde72d61e566aac57d9597022b82b55e70c0a3538b14bb132920ca651eb276a2"
+  },
+  "clippy": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
+  "corrected_source": "e8468d0d0221379e7152a748a8735d78a88eda2f",
+  "fixed_rust_pin": "ceafeeda61cc18293545cc4e4039099cdabc0be3",
+  "fourfix": "4591cf45cc10abb19d2456c40b99606e08167f29",
+  "fourfix_tree": "a2c9a62722e1ef849cb68874e79617c92d165a8b",
+  "global": {
+    "artifact": 13059239725,
+    "bytes": 5442,
+    "head": "007da57ba792129adb5754546e1158e7e6d732b7",
+    "job": 124671520971,
+    "name": "ohm-1.99.0-22-global",
+    "run": 41237680370,
+    "sha256": "4307a9b0433c82fa2bae404de6a9280c0779f2980031786453ac4ab9d3a22471"
+  },
+  "global_files": {
+    "SHA256SUMS": "33486a0d2c96a5b99162ccdd42905e195439993e4e4a7250d044279005022013",
+    "ohm-1.99.0-22.json": "68c7d720adfc40e7f0cb617b0b1de0621346df863328bd9b56de7c4d516a4ffd",
+    "ohm-installer.sh": "fde72d61e566aac57d9597022b82b55e70c0a3538b14bb132920ca651eb276a2"
+  },
+  "helper_sha256": "9f259bbbe7949cf46079d0af4fb7a6b17ea541c8913cda99d307d977c815cc30",
+  "outer_sha256": "6450472b7ebdc6789518f26a1675fa9965f0ce4372ee70778441eba38ec5e8e8",
+  "release": "ohm-1.99.0-22",
+  "rust": "556a8364f1485a03be31b1a50c250d63198a943d",
+  "source": "007da57ba792129adb5754546e1158e7e6d732b7",
+  "targets": {
+    "aarch64-apple-darwin": {
+      "analyzer": {
+        "xz_hash": "8004bdc89c8ec77ccb100a8480126af5cf9f65ded9a197e33eed47fa3f8623aa",
+        "xz_url": "https://static.rust-lang.org/dist/2026-10-01/rust-analyzer-1.99.0-aarch64-apple-darwin.tar.xz"
+      },
+      "fourfix_sha256": "32156236e76773728b3e7655d64d32ea8c3023b165f25a2754c7e5c50669f366",
+      "native": {
+        "artifact": 13047576657,
+        "bytes": 206494914,
+        "head": "4db6d401407e14c6b755e3ff23f829cd5e401d9d",
+        "job": 124571532918,
+        "kit": "20d4e78705ad56a8c11bccbc4288662dafc4eeae0a05d1e8d2b40cd7ae960f3e",
+        "members": "d16d2f065346e7d90e88b899b57774c90078d9e4e8be880bebe6ec6f8dbb011f",
+        "name": "rc22-native-sdk-aarch64-apple-darwin",
+        "receipt": "2548947a6e2d138874633eef4f556e7aeace5107a00d9ee9d8a4e65934e8f593",
+        "run": 41212939515,
+        "sha256": "b302e2417f6dd5a46a009595fdcba7473d46f712748b2cf1b698ab916afc768c"
+      },
+      "platform": {
+        "artifact": 13058479585,
+        "bytes": 292145229,
+        "head": "007da57ba792129adb5754546e1158e7e6d732b7",
+        "job": 124644935441,
+        "name": "ohm-1.99.0-22-aarch64-apple-darwin",
+        "run": 41237680370,
+        "sha256": "79d173e48efde0fc45897b8205858a291a1b3079582d34a353d3f1c3a5769907"
+      },
+      "runner": "namespace-profile-macos-15",
+      "smoke_job": 124671631175
+    },
+    "x86_64-unknown-linux-gnu": {
+      "analyzer": {
+        "xz_hash": "52dfae764797c3c7f32ba2ba82d49659741a867e7a3f45bc3291b822c955d6a8",
+        "xz_url": "https://static.rust-lang.org/dist/2026-10-01/rust-analyzer-1.99.0-x86_64-unknown-linux-gnu.tar.xz"
+      },
+      "cargo_sha256": "df35740ab292c3654e0dac2728c3814e4c4c033c266adc4f5ef4f78856320229",
+      "fourfix_sha256": "33b8a25b5277671b0ce95070f8e749801b4f6e643efcbabc0ff08e6086a9c219",
+      "native": {
+        "artifact": 13046543047,
+        "bytes": 274460316,
+        "head": "7bc72b798b019a9ec0de6eeea3bc22b783917b27",
+        "job": 124570376741,
+        "kit": "a282efe9e45b297797ed4ac94ca2987315610e53af7e45d6d8493c3282b5c966",
+        "members": "99cfc5bf1d484672b1f50002858696b52914b1e5ef93d17b1cfe94c8b05cf928",
+        "name": "rc22-native-sdk-x86_64-unknown-linux-gnu",
+        "receipt": "df39d99e13159b2ca341b79b8fc0f525731e69c911eb8e7dba2de8630fc5214c",
+        "run": 41212542603,
+        "sha256": "32a14901e46302ebeebdc3badc5be40284dbfc5c36f8ee176071b3ddd623d6c1"
+      },
+      "platform": {
+        "artifact": 13057710231,
+        "bytes": 356746335,
+        "head": "007da57ba792129adb5754546e1158e7e6d732b7",
+        "job": 124644935360,
+        "name": "ohm-1.99.0-22-x86_64-unknown-linux-gnu",
+        "run": 41237680370,
+        "sha256": "bb270473af5d365049ce2ca2e02eba9c628722510cd4c758e684ca256dffede9"
+      },
+      "runner": "ubuntu-24.04",
+      "smoke_job": 124671631208
+    }
+  },
+  "upstream": {
+    "channel_date": "2026-10-01",
+    "channel_sha256": "ce6dddc886364f8d786514771212cebe9b731ba82d6b859951c6b0ccc516b6a2",
+    "version": "1.99.0"
+  }
+}
