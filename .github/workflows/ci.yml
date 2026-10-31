@@ -1,101 +1,107 @@
-name: CI
-
+name: Measure complete Ruff branch-return work
+run-name: Whole Rust branch-return CLI pilot ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
-
+    inputs:
+      reviewed_head:
+        description: Approved exact packaging commit with successful native sources sealed
+        type: string
+        required: true
 permissions:
+  actions: read
   contents: read
-
-concurrency:
-  group: ohm-packed-object-full-ruff-linux
-  cancel-in-progress: false
-
 jobs:
-  full-cli:
-    name: Measure allocated bytes across the full Ruff CLI
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-packed-object-full-ruff-linux'
+  ordinary:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-return-pmu-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
-    env:
-      PYTHONDONTWRITEBYTECODE: '1'
+    name: Whole branch-return pilot ${{ matrix.position }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        position: ['01','02']
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          ref: ${{ github.sha }}
+          path: enrolled
           persist-credentials: false
+          sparse-checkout: |
+            scripts/branch-return-pmu
+            scripts/ohm-packed-ruff/full-cli
+            scripts/ohm-packed-ruff/harness
+      - name: Read the binding to the independently completed native source run
+        id: binding
+        run: |
+          set -euo pipefail
+          cd enrolled/scripts/branch-return-pmu
+          sha256sum --strict --check --status SHA256SUMS
+          python3 -IB bind.py >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ steps.binding.outputs.source_head }}
+          path: source
+          persist-credentials: false
+          sparse-checkout: scripts/branch-return-source
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
+          path: physical
+          persist-credentials: false
+          sparse-checkout: scripts/gnu-renderer-pfc-hardware
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
+          path: observers
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/gnu-example-ceiling
+            scripts/gnu-renderer-library-workers
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ea7d4e23dba715023cb43c82a9e99bec8c8262a4
+          path: provider
+          persist-credentials: false
+          sparse-checkout: scripts/linux-294-parent
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Set up repeatable Linux storage and process measurements
+      - name: Prepare a bounded task-owned target and build filesystem
         run: |
           set -euo pipefail
-          root="$RUNNER_TEMP/ohm-branch-object-qa"
-          mkdir -p "$root/work" "$root/logs"
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends strace ninja-build
-          command -v rustup zstd cc
-          truncate -s 10G "$root/build-ext4.img"
-          /usr/sbin/mkfs.ext4 -q -m 0 -E lazy_itable_init=0,lazy_journal_init=0 "$root/build-ext4.img"
-          if sudo mount -o loop,nosuid,nodev,noatime "$root/build-ext4.img" "$root/work"; then
-            sudo chown "$(id -u):$(id -g)" "$root/work"
-            test "$(findmnt -n -o FSTYPE --target "$root/work")" = ext4
-            printf '%s\n' private-ext4 > "$root/logs/storage-mode.txt"
+          sudo apt-get install -y --no-install-recommends binutils build-essential ca-certificates coreutils git ninja-build strace util-linux zstd
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          test ! -e "$base"
+          mkdir -p "$base/work" "$base/logs"
+          truncate -s 12G "$base/task-owned.ext4"
+          /usr/sbin/mkfs.ext4 -q -m 0 -E lazy_itable_init=0,lazy_journal_init=0 "$base/task-owned.ext4"
+          if sudo mount -o loop,nosuid,nodev,noatime "$base/task-owned.ext4" "$base/work"; then
+            sudo chown "$(id -u):$(id -g)" "$base/work"
+            test "$(findmnt -n -o FSTYPE --target "$base/work")" = ext4
+            printf '%s\n' private-ext4 > "$base/logs/storage-mode.txt"
           else
-            test -d "$root/work" && ! mountpoint -q "$root/work"
-            printf '%s\n' runner-filesystem > "$root/logs/storage-mode.txt"
+            ! mountpoint -q "$base/work"
+            printf '%s\n' runner-filesystem > "$base/logs/storage-mode.txt"
           fi
-          printf '%s' "$root" > "$root/work/.owned-by-packed-study"
-          findmnt --target "$root/work" > "$root/logs/filesystem.txt"
-          strace -f -qq -e trace=execve -o "$root/logs/trace-smoke.log" /bin/true
-          cp scripts/ohm-packed-ruff/full-cli/PLAN.md "$root/logs/PLAN.md"
-          git rev-parse HEAD > "$root/logs/hosted-study-head.txt"
-          mkdir -p "$root/logs/reproduction/scripts/ohm-apple-zmij" "$root/logs/reproduction/.github/workflows"
-          cp -a scripts/ohm-packed-ruff "$root/logs/reproduction/scripts/"
-          cp -a scripts/ohm-apple-zmij/source-transport "$root/logs/reproduction/scripts/ohm-apple-zmij/"
-          cp .github/workflows/ci.yml "$root/logs/reproduction/.github/workflows/ci.yml"
-          (cd scripts/ohm-packed-ruff && sha256sum -c SHA256SUMS)
-          (cd scripts/ohm-packed-ruff/full-cli && sha256sum -c SHA256SUMS)
-          python3 -IB scripts/ohm-packed-ruff/harness/check_allocation.py "$root/work" "$root/logs/storage-fixture"
-      - name: Obtain the immutable signed native Cargo and Wild
+          printf '%s' "$base" > "$base/work/.owned-by-packed-study"
+          findmnt --target "$base/work" > "$base/logs/filesystem.txt"
+          (cd enrolled/scripts/ohm-packed-ruff/full-cli && sha256sum --strict --check --status SHA256SUMS)
+      - name: Open qualified source SDKs and measure both same-SDK switches
         env:
           GH_TOKEN: ${{ github.token }}
+          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+          POSITION: ${{ matrix.position }}
         run: |
-          root="$RUNNER_TEMP/ohm-branch-object-qa"
-          gh release download ohm-1.99.0-20 --repo "$GITHUB_REPOSITORY" --dir "$root" \
-            --pattern 'ohm-1.99.0-20-x86_64-unknown-linux-gnu.tar.gz'
-      - name: Build parent and candidate with one bootstrap and reopen both native SDKs
-        run: bash scripts/ohm-packed-ruff/prepare.sh
-      - name: Verify the toolchain, baseline and locked Ruff inputs
-        run: python3 -IB scripts/ohm-packed-ruff/study.py prepare
-      - name: Build and check independent complete CLI and reader references for each option
-        run: python3 -IB scripts/ohm-packed-ruff/full-cli/full_cli.py qualify
-      - name: Measure the two disk-only pilot triplets
-        run: |
-          python3 -IB scripts/ohm-packed-ruff/full-cli/full_cli.py screen
-          root="$RUNNER_TEMP/ohm-branch-object-qa/logs"
-          python3 -IB scripts/ohm-packed-ruff/full-cli/verify.py "$root" screen > "$root/screen/reopened.json"
-      - name: Preserve independent original executables and the complete pilot observations
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+          set -euo pipefail
+          python3 -IB enrolled/scripts/branch-return-pmu/worker.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: full-ruff-packed-cli-pilot
+          name: branch-return-pmu-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
-          retention-days: 7
+          retention-days: 14
+          include-hidden-files: true
           compression-level: 1
           if-no-files-found: warn
-      - name: Run all six new orders only if the allocation and behavior gates passed
-        run: |
-          result="$RUNNER_TEMP/ohm-branch-object-qa/logs/screen/result.json"
-          if python3 -c 'import json,sys;sys.exit(not json.load(open(sys.argv[1]))["admitted"])' "$result"; then
-            python3 -IB scripts/ohm-packed-ruff/full-cli/full_cli.py confirm
-            root="$RUNNER_TEMP/ohm-branch-object-qa/logs"
-            python3 -IB scripts/ohm-packed-ruff/full-cli/verify.py "$root" confirm > "$root/confirm/reopened.json"
-          fi
-      - name: Preserve independent full-graph confirmation receipt and raw measurements
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: full-ruff-packed-cli-confirmation
-          path: ${{ runner.temp }}/ohm-branch-object-qa/logs/confirm
-          retention-days: 7
-          compression-level: 1
-          if-no-files-found: ignore
