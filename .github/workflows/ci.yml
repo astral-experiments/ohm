@@ -1,132 +1,122 @@
-name: Mixed-profile rustc native admission
-on: workflow_dispatch
+name: Qualify three native GNU renderer compiler sources
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_head:
+        description: Exact reviewed SHA of this QA workflow
+        required: true
+        type: string
+      cargo_input:
+        description: Enrolled complete Cargo 301 from its original build or literal source reconstruction
+        type: choice
+        options: [archive, source]
+        default: archive
+
 permissions:
-  actions: read
   contents: read
+  actions: read
+
 concurrency:
-  group: signed-mixed-generics-native-${{ github.ref }}
+  group: renderer-gnu-source-only-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  build:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed-mixed-generics-20261031'
+  native:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-renderer-cgu-source-20261031' && github.event.inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 210
-    strategy:
-      fail-fast: false
-      matrix:
-        role: [parent, candidate, legacy]
+    timeout-minutes: 300
     env:
-      ROLE: ${{ matrix.role }}
-      QA_ROOT: /tmp/ohm-signed-mixed-generics-native
+      QA_ROOT: /tmp/ohm-gnu-renderer-source-native
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-          sparse-checkout: scripts/strict-mixed-generics
+          sparse-checkout: scripts/gnu-renderer-cgu-source
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a
           path: public-seed
           persist-credentials: false
           sparse-checkout: scripts/ohm-apple-zmij/source-transport
-      - name: Install native bootstrap dependencies on a fresh host
-        run: |
-          set -euo pipefail
-          mkdir "$QA_ROOT"
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends cmake ninja-build pkg-config perl libssl-dev zstd clang lld build-essential curl
-          dpkg-query -W cmake clang gcc ninja-build python3 zstd
-      - name: Reconstruct exact Git objects and the independent signed-source transplant
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git -C public-seed rev-parse HEAD)" = 85c467e1190d80fa8607fb0f9ef0824b4271266a
-          packet=public-seed/scripts/ohm-apple-zmij/source-transport
-          (cd "$packet" && sha256sum --check SHA256SUMS)
-          python3 -IB "$packet/prepare.py" "$QA_ROOT/rust"
-          python3 -IB scripts/strict-mixed-generics/source.py materialize "$QA_ROOT/rust" "$ROLE"
-      - if: matrix.role != 'legacy'
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
+          path: signed-source
+          persist-credentials: false
+          sparse-checkout: scripts/strict-mixed-generics
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
           path: package-reader
           persist-credentials: false
           sparse-checkout: scripts/packaged-release-workspace
-      - if: matrix.role != 'legacy'
+      - if: inputs.cargo_input == 'archive'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: 5d26c524606e556b4934842568ed4acd2e91219d
-          path: strict-reader
+          ref: 17981f5b807be81496282dd5a58e579e71586962
+          path: cargo-reader
           persist-credentials: false
-          sparse-checkout: scripts/strict-host-opt
-      - if: matrix.role != 'legacy'
-        name: Verify the published Linux -21 package and strict Cargo
+          sparse-checkout: scripts/gnu-example-ceiling
+      - if: inputs.cargo_input == 'source'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 1e3b37ac28ed11a638d3ba2093b54d83ca10ce14
+          path: cargo-reader
+          persist-credentials: false
+          sparse-checkout: scripts
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Validate frozen QA, resources, source transports and bootstrap tools
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C public-seed rev-parse HEAD)" = 85c467e1190d80fa8607fb0f9ef0824b4271266a
+          test "$(git -C signed-source rev-parse HEAD)" = d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
+          test "$(git -C package-reader rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
+          mkdir "$QA_ROOT" "$QA_ROOT/receipts"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ninja-build cmake clang lld build-essential perl libssl-dev pkg-config curl zstd time strace
+          dpkg-query -W ninja-build cmake clang gcc binutils perl libssl-dev pkg-config curl zstd time strace > "$QA_ROOT/receipts/native-packages.tsv"
+          packet=public-seed/scripts/ohm-apple-zmij/source-transport
+          (cd "$packet" && sha256sum --check SHA256SUMS)
+          python3 -IB "$packet/prepare.py" "$QA_ROOT/rust"
+          python3 -IB signed-source/scripts/strict-mixed-generics/source.py materialize "$QA_ROOT/rust" parent
+          python3 -IB scripts/gnu-renderer-cgu-source/source.py verify "$QA_ROOT/rust" > "$QA_ROOT/receipts/source.json"
+      - name: Acquire verified signed tools and exact source-produced Cargo
         env:
           GH_TOKEN: ${{ github.token }}
+          INPUT: ${{ inputs.cargo_input }}
         run: |
           set -euo pipefail
           python3 -IB package-reader/scripts/packaged-release-workspace/packages.py 21 "$QA_ROOT/packages"
-          python3 -IB strict-reader/scripts/strict-host-opt/acquire_cargo.py "$QA_ROOT/strict-cargo"
-      - name: Build the compiler and matching complete host libraries
-        run: python3 -IB scripts/strict-mixed-generics/build.py "$ROLE" "$QA_ROOT"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+          python3 -IB scripts/gnu-renderer-cgu-source/cargo.py "$QA_ROOT" "$INPUT" cargo-reader
+      - name: Clean bootstraps, exact checked-in red/green suites and normal native clients
+        run: python3 -IB scripts/gnu-renderer-cgu-source/build.py "$QA_ROOT"
+      - if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ${{ matrix.role }}
-          path: /tmp/ohm-signed-mixed-generics-native/transfer/
+          name: gnu-renderer-qualified-native
+          path: /tmp/ohm-gnu-renderer-source-native/transfer/
           if-no-files-found: error
           compression-level: 0
-          retention-days: 5
+          retention-days: 14
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: bootstrap-observations-${{ matrix.role }}
+          name: gnu-renderer-source-native-observations
           path: |
-            /tmp/ohm-signed-mixed-generics-native/receipts
-            /tmp/ohm-signed-mixed-generics-native/packages/receipts
-            /tmp/ohm-signed-mixed-generics-native/strict-cargo/custody.json
+            /tmp/ohm-gnu-renderer-source-native/receipts
+            /tmp/ohm-gnu-renderer-source-native/packages/receipts
+            /tmp/ohm-gnu-renderer-source-native/cargo/cargo-product.json
           if-no-files-found: warn
+          compression-level: 0
           retention-days: 21
-  admit:
-    needs: build
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 45
-    env:
-      QA_ROOT: /tmp/ohm-signed-mixed-generics-admission
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          sparse-checkout: scripts/strict-mixed-generics
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          name: parent
-          path: kits/parent
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          name: candidate
-          path: kits/candidate
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          name: legacy
-          path: kits/legacy
-      - name: Admit profile semantics, direct symbols, Cargo transitions and metadata provenance
-        run: |
-          set -euo pipefail
-          mkdir "$QA_ROOT"
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends zstd gcc libc6-dev
-          rustup toolchain install 1.99.0 --profile minimal
-          stock=$(rustc +1.99.0 --print sysroot)
-          python3 -IB scripts/strict-mixed-generics/admit.py kits "$stock"
-      - if: always()
+      - if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: compiler-native-admission
-          path: |
-            /tmp/ohm-signed-mixed-generics-admission/receipts/
-            /tmp/ohm-signed-mixed-generics-admission/incremental-transaction/partial.json
-            /tmp/ohm-signed-mixed-generics-admission/incremental-transaction/completed.json
-            /tmp/ohm-signed-mixed-generics-admission/incremental-transaction/raw
-          if-no-files-found: error
-          retention-days: 21
+          name: gnu-renderer-unqualified-partial-transfer
+          path: /tmp/ohm-gnu-renderer-source-native/transfer/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 7
