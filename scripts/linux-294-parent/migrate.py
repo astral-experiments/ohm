@@ -21,7 +21,7 @@ def record(base,phase,role,state):
     b=c.phase(base,phase);enc=[];obj=c.rec/'objects';obj.mkdir(exist_ok=True)
     for top in [c.W/'shared',c.W/'target']:
         for file in sorted(top.rglob('dep-lib-chacha20')):
-            if file.parent.parent.name!='.fingerprint':continue
+            if not file.is_file():continue
             blob=file.read_bytes();key=c.digest(file)
             out=obj/(key+'.gz')
             if not out.exists():c.gz(out,blob)

@@ -85,7 +85,7 @@ def phase(base,name):
     exe_groups={k:[] for k in ('rustc','ld','cc','collect2','generator')}
     for pid,prog,line in exes:
         n=Path(prog).name
-        if n=='rustc' and '"--crate-name"' in line:
+        if prog==str(SDK/'bin/rustc') and '"--crate-name"' in line:
             m=re.search(r'"--crate-name", "([^"]+)"',line)
             if m and m.group(1)!='___':exe_groups['rustc'].append([pid,m.group(1)])
         elif n in ('ld.bfd','ld','ld.lld','ld.gold','ld.mold','rust-lld','wild'):exe_groups['ld'].append([pid,prog])

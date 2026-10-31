@@ -53,7 +53,7 @@ def verify(root):
             units=[]
             for line in raw.decode().splitlines():
                 m=re.search(r'^\S+ (\d+) execve\("([^"]+/rustc)", .*?"--crate-name", "([^"]+)"',line)
-                if not m or not line.endswith('= 0') or m[3]=='___':continue
+                if not m or m[2]!=str(Path(proto['env']['RUSTUP_HOME'])/'toolchains/ohm/bin/rustc') or not line.endswith('= 0') or m[3]=='___':continue
                 cached='"-Zlink-only"' in line or '"-Z", "link-only"' in line
                 if cached:assert re.search(r'"[^"]+\.rlink"',line)
                 units.append((int(m[1]),m[3],'link-only' if cached else 'full'))
