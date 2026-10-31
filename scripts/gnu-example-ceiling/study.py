@@ -23,14 +23,20 @@ def host():
     allowed = sorted(os.sched_getaffinity(0))
     assert len(allowed) >= 8
     os.sched_setaffinity(0, allowed[:8])
+    def system_value(path):
+        try:
+            return Path(path).read_text().strip()
+        except (PermissionError, FileNotFoundError) as error:
+            if not path.startswith("/sys/"):
+                raise
+            return {"read_errno": error.errno}
+
     return {
         "platform": platform.uname()._asdict(),
         "prior_affinity": allowed,
         "affinity": sorted(os.sched_getaffinity(0)),
         "cpuinfo": Path("/proc/cpuinfo").read_text().split("\n\n")[0],
-        "raw_system": {
-            p: Path(p).read_text().strip() if Path(p).is_file() else None for p in paths
-        },
+        "raw_system": {p: system_value(p) for p in paths},
     }
 
 
