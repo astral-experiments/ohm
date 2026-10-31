@@ -35,10 +35,10 @@ def signed():
     return rows
 
 
-def verify(read):
+def verify(read, *, source="c9a6a212d38d778ed0e9d2c7057a9dedb179fff2"):
     reference=signed()
     result=json.loads(read("result.json"))
-    require(result["source"]=="c9a6a212d38d778ed0e9d2c7057a9dedb179fff2","different E")
+    require(result["source"]==source,"different E")
     for role in ("K","E","both_variants"):
         raw=read(role+"-run.stdout")
         expected=bytes("".join(f"{state} {flags} {2 if flags==8 and (state==3 or (role=='both_variants' and state==2)) else 0}\n"

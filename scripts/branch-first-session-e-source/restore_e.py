@@ -36,8 +36,8 @@ def differences(k, files):
     return changed
 
 
-def restore(ktransfer, capsule, dest, qa, run, attempt, digest):
-    candidate = subject.load()
+def restore(ktransfer, capsule, dest, qa, run, attempt, digest, *, authority=subject):
+    candidate = authority.load()
     origin = subject.K_ORIGIN
     need(
         set(p.name for p in capsule.iterdir()) == {"manifest.json", "E-delta.tar.zst"}

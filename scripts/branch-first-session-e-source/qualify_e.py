@@ -146,8 +146,8 @@ def anchor_k(b, root, transfer, log):
         os.link(held / source, destination)
 
 
-def main(trusted):
-    candidate = s.load()
+def main(trusted, *, authority=s, extra_native=None):
+    candidate = authority.load()
     b = original.toolchain(trusted)
     root, repo = b.ROOT, b.ROOT / "rust"
     env = os.environ
@@ -157,7 +157,7 @@ def main(trusted):
         and root == Path(env["QA_ROOT"])
         and env["GITHUB_EVENT_NAME"] == "workflow_dispatch"
         and env["GITHUB_REPOSITORY"] == s.reg.REPO
-        and env["GITHUB_REF"] == s.REF
+        and env["GITHUB_REF"] == authority.REF
         and env["GITHUB_RUN_ATTEMPT"] == "1"
         and s.reg.rev(s.HERE.parents[1], "HEAD") == env["GITHUB_SHA"]
         and not root.is_symlink()
@@ -175,7 +175,7 @@ def main(trusted):
 
     live_base(repo, b.HERE / "packet")
     s.reg.source(repo, True, rec)
-    s.verify(repo, candidate, install=True)
+    authority.verify(repo, candidate, install=True)
     commit = candidate["role"]["commit"]
     b.git(repo, "checkout", "--detach", commit)
     b.check_source(repo, commit)
@@ -183,7 +183,7 @@ def main(trusted):
     write(log / "source.json", {**candidate, **bound, "launcher": b.launcher(repo), "llvm": b.LLVM})
     anchor_k(b, root, transfer, log)
     b.succeeded(
-        [sys.executable, "-IB", s.HERE / "selector.py", repo, root / "genuine-K", log / "selector"],
+        [sys.executable, "-IB", s.HERE / "selector.py", repo, root / "genuine-K", log / "selector", "--source", commit],
         root, log / "selector.log",
     )
     args = ["./x", *b.OPTIONS, "build", *b.HOST_FLAGS, *b.SDK_COMPONENTS]
@@ -221,6 +221,9 @@ def main(trusted):
         os.link(file.resolve(), target)
     original.native(b, root, sdk, log, "E")
     cross_reader.checked(root, log, sdk, files, k, original.env_for(root))
+    extra = {}
+    if extra_native is not None:
+        extra = extra_native(root, log, sdk, files, before, k, transfer, original.env_for(root))
     need(b.manifest(files) == before, "source-built E changed under native checks")
     b.check_source(repo, commit)
     shutil.rmtree(sdk)
@@ -229,6 +232,7 @@ def main(trusted):
     m = {
         **bound,
         "qualified": True,
+        **extra,
         "source": candidate,
         "base": s.K_ORIGIN,
         "selector": sha(log / "selector/result.json"),
@@ -245,7 +249,7 @@ def main(trusted):
     }
     manifest = capsule / "manifest.json"
     write(manifest, m)
-    restored = restore_e.restore(transfer, capsule, sdk, bound["qa"], bound["run"], "1", sha(manifest))
+    restored = restore_e.restore(transfer, capsule, sdk, bound["qa"], bound["run"], "1", sha(manifest), authority=authority)
     need(
         subprocess.check_output(["rustc", "+ohm", "-vV"], env=original.env_for(root)).decode()
         == k["compiler_verbose"],
@@ -261,6 +265,7 @@ def main(trusted):
         {
             **bound,
             **restored,
+            **extra,
             "selector": m["selector"],
             "tests": m["tests"],
             "native": m["native"],

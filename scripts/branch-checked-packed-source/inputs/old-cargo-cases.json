@@ -1,0 +1,113 @@
+{
+  "cases": {
+    "bad-both": {
+      "marker": true,
+      "panic_or_ice": null,
+      "program": "2539da8f7dbe1b7d51c95079aaf47e899c572cd7d1a44255913d4a30409c4349",
+      "runtime": 17,
+      "status": 0
+    },
+    "bad-digest-name": {
+      "marker": false,
+      "panic_or_ice": null,
+      "program": "13cf5358d41f5c28c7be6d10333639526e9a35fbe6f81a7f9266291f757cdc71",
+      "runtime": 29,
+      "status": 0
+    },
+    "bad-digest-no-raw": {
+      "marker": false,
+      "panic_or_ice": null,
+      "program": "13cf5358d41f5c28c7be6d10333639526e9a35fbe6f81a7f9266291f757cdc71",
+      "runtime": 29,
+      "status": 0
+    },
+    "bad-digest-with-raw": {
+      "marker": true,
+      "panic_or_ice": null,
+      "program": "2539da8f7dbe1b7d51c95079aaf47e899c572cd7d1a44255913d4a30409c4349",
+      "runtime": 17,
+      "status": 0
+    },
+    "bad-zlib": {
+      "marker": false,
+      "panic_or_ice": null,
+      "program": "13cf5358d41f5c28c7be6d10333639526e9a35fbe6f81a7f9266291f757cdc71",
+      "runtime": 29,
+      "status": 0
+    },
+    "conflicting-raw": {
+      "marker": true,
+      "panic_or_ice": null,
+      "program": "2539da8f7dbe1b7d51c95079aaf47e899c572cd7d1a44255913d4a30409c4349",
+      "runtime": 17,
+      "status": 0
+    },
+    "honest": {
+      "marker": true,
+      "panic_or_ice": null,
+      "program": "13cf5358d41f5c28c7be6d10333639526e9a35fbe6f81a7f9266291f757cdc71",
+      "runtime": 29,
+      "status": 0
+    },
+    "locked": {
+      "marker": false,
+      "panic_or_ice": null,
+      "program": "13cf5358d41f5c28c7be6d10333639526e9a35fbe6f81a7f9266291f757cdc71",
+      "runtime": 29,
+      "status": 0
+    },
+    "malformed-raw": {
+      "marker": null,
+      "panic_or_ice": false,
+      "program": null,
+      "runtime": null,
+      "status": 101
+    },
+    "matching-raw": {
+      "marker": true,
+      "panic_or_ice": null,
+      "program": "13cf5358d41f5c28c7be6d10333639526e9a35fbe6f81a7f9266291f757cdc71",
+      "runtime": 29,
+      "status": 0
+    },
+    "nonregular-raw-fifo": {
+      "marker": false,
+      "panic_or_ice": null,
+      "program": "13cf5358d41f5c28c7be6d10333639526e9a35fbe6f81a7f9266291f757cdc71",
+      "runtime": 29,
+      "status": 0
+    },
+    "nonregular-raw-symlink": {
+      "marker": false,
+      "panic_or_ice": null,
+      "program": "13cf5358d41f5c28c7be6d10333639526e9a35fbe6f81a7f9266291f757cdc71",
+      "runtime": 29,
+      "status": 0
+    },
+    "raw-only-old": {
+      "marker": true,
+      "panic_or_ice": null,
+      "program": "2539da8f7dbe1b7d51c95079aaf47e899c572cd7d1a44255913d4a30409c4349",
+      "runtime": 17,
+      "status": 0
+    }
+  },
+  "expected_policy": "original",
+  "forced": [
+    "target/debug/build/workspaces/e9f6d3c4f3cf123e/v2-883bc8c245b947d9/shadow_leaf/1c55978164bff3c0/fingerprint/lib-shadow_leaf",
+    "target/debug/build/workspaces/e9f6d3c4f3cf123e/v2-883bc8c245b947d9/shadow_app/6b393fd6e5764a57/fingerprint/bin-shadow_app"
+  ],
+  "lengths": [
+    114400,
+    114400
+  ],
+  "original_raw_absent": true,
+  "packed_B": "eada820e8476313fae0f1b49aaa8330fe0715b9821294e0a1c69681ebd786793",
+  "packed_filename": "ohm-packed-object-725hr7wo6xl3als474dcjkp17.o-blake3=c4019aa0d3a673e5abb61d44c1ed91f9d0da7d5922e1a980ab6d89fcce886eff",
+  "payloads": {
+    "new": 29,
+    "old": 17
+  },
+  "raw_A": "954860db4f75fe734df921b85b23f21e9330041020244382de232fbc1f54709d",
+  "raw_B": "967a5a50afa58601d2d2f1220a89be9311c11862c31d03149a7c9a08a872646e"
+}

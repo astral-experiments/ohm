@@ -1,10 +1,10 @@
 """Type-check the actual rustc_interface selector against both session layouts."""
+import argparse
 import hashlib
 import json
 import os
 from pathlib import Path
 import subprocess
-import argparse
 import shutil
 import tempfile
 
@@ -12,12 +12,13 @@ parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument("repository", type=Path)
 parser.add_argument("sdk", type=Path)
 parser.add_argument("receipts", type=Path)
+parser.add_argument("--source", default="c9a6a212d38d778ed0e9d2c7057a9dedb179fff2")
 args=parser.parse_args()
 ROOT=args.repository.resolve()
 SDK=args.sdk.resolve()
 args.receipts.mkdir()
 K = "0afbeff303d3658bff52582d8f1a996d59e6c8ce"
-E = "c9a6a212d38d778ed0e9d2c7057a9dedb179fff2"
+E = args.source
 S = "compiler/rustc_session/src/session.rs"
 Q = "compiler/rustc_interface/src/queries.rs"
 

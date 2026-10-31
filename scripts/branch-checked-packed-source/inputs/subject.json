@@ -1,0 +1,121 @@
+{
+  "additional_linux_units": {
+    "rustc_fs_util": [],
+    "rustc_incremental": []
+  },
+  "additional_run_make": [],
+  "anchor": {
+    "commit": "6dbcba66b0fe2c6c205f106a622129557796f86f",
+    "compiler": "1df08b3c45a7e6fa3739a8e753132f707f97896a",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "src/bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
+    "tests": "f3ba9b0a487eee53b714b298b9058d33e7452615",
+    "tree": "2e390f9fbaf0c95bd366a12b401334d31dd4027d"
+  },
+  "base_k": "0afbeff303d3658bff52582d8f1a996d59e6c8ce",
+  "delta": {
+    "raw_sha256": "aadf46b6b85d96af6390cfc0ccfb66ce9593714439e400efa4d0f49eacc692f4",
+    "rows": [
+      {
+        "change": "M",
+        "new": {
+          "bytes": 5290,
+          "mode": "100644",
+          "oid": "188da19b1366d8b7a686622e3fad0fe3be21d417",
+          "sha256": "1f41e9dcf0363ebbeae25fa1e3f5cae2ec9e37d332ea6f52e5513630d33f814c"
+        },
+        "old": {
+          "bytes": 5279,
+          "mode": "100644",
+          "oid": "e848b7c534b1facdb5f1e15f16ba2fbf401d3196",
+          "sha256": "7b55c39161fd33d5a78de88a7f2ca4bbd94985aab49092700f9e9b3f4a4faa33"
+        },
+        "path": "compiler/rustc_incremental/src/persist/fs/packed/objects.rs"
+      },
+      {
+        "change": "M",
+        "new": {
+          "bytes": 9303,
+          "mode": "100644",
+          "oid": "c6a840554a83b98f47939b21c2cbdccb4e824b6e",
+          "sha256": "ffa5aca8c565719553fde8483215d06bcf5ce20a65746ae4a5c986c4528b4d17"
+        },
+        "old": {
+          "bytes": 9219,
+          "mode": "100644",
+          "oid": "b2c5ad506908009d62de887e7d428cedea1ef27a",
+          "sha256": "c16261770e800e71f061421d3da6b161194e43ce7df5bc9fc606885382e94a1e"
+        },
+        "path": "compiler/rustc_incremental/src/persist/fs/packed/tests.rs"
+      },
+      {
+        "change": "M",
+        "new": {
+          "bytes": 7019,
+          "mode": "100644",
+          "oid": "5f926731f00848ec306489b9691ea25616c064fa",
+          "sha256": "6717f1341cccafc496b17834acf390667c8eec2a399730082ea4119f14693042"
+        },
+        "old": {
+          "bytes": 6513,
+          "mode": "100644",
+          "oid": "2bd6f2746b23b6a047b33522753dd1696ddd2d65",
+          "sha256": "78cf7fe9cd315e7a6aaf0d5e2c9f1ff0414d2206a18011951728c3e353248e15"
+        },
+        "path": "tests/run-make/ohm-packed-branch-cache/rmake.rs"
+      }
+    ]
+  },
+  "pack": {
+    "bytes": 216546,
+    "objects": 656,
+    "sha256": "3dd34fa8dc731b871103fdcc28e786ba23f11b4ddd265a1447a6482f76032585"
+  },
+  "parent": "d14aab0ed513d847f30ba5073e0863b7419c9a70",
+  "policy": "discard-session-with-ambiguous-packed-objects",
+  "previous": {
+    "commit": "c9a6a212d38d778ed0e9d2c7057a9dedb179fff2",
+    "compiler": "eea398286613ac6081ad6f957e0fb93d26bb6bbd",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "src/bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
+    "tests": "f509f046065ff2c51960c0d79df5ed635fc3a546",
+    "tree": "41dcb4be54caf1d8ca7ac0b03dfe4be05f57f82b"
+  },
+  "rebase_delta": {
+    "raw_sha256": "7a66fadcd92ef32c33b2ab29f263e43ef3656ff47e7ebbb2cc4d1275ca68adb5",
+    "rows": [
+      {
+        "change": "M",
+        "new": {
+          "bytes": 15157,
+          "mode": "100644",
+          "oid": "9f83009149243960da5d5008da9d009a9efca040",
+          "sha256": "e3ce4345a049b925d06d93e67de09345a99b4f7dd2b562e35613529641f63289"
+        },
+        "old": {
+          "bytes": 14896,
+          "mode": "100644",
+          "oid": "10190f86aa60704e7d6e0f636a9f48eda0deb1fb",
+          "sha256": "b4ca17ab3d9b41d61d3546e96c6069942dfbcf37dfc934e9a70ab70219e2af99"
+        },
+        "path": ".github/workflows/ci.yml"
+      }
+    ]
+  },
+  "rebase_parent": {
+    "commit": "d14aab0ed513d847f30ba5073e0863b7419c9a70",
+    "compiler": "eea398286613ac6081ad6f957e0fb93d26bb6bbd",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "src/bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
+    "tests": "f509f046065ff2c51960c0d79df5ed635fc3a546",
+    "tree": "6bece25345ec6e27b445ab27328a497a4533c38d"
+  },
+  "role": {
+    "commit": "393b4b05a4bfa3f531a36023846f86236a6b71a9",
+    "compiler": "89dcac9002ea6a0307d6fef82c0652b15c85dcca",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "src/bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
+    "tests": "c2f01372cdffaed5229731e74ae5a814622f7f7a",
+    "tree": "f0996ec0915571479ff22b774da977fa25ac690c"
+  }
+}

@@ -26,7 +26,7 @@ STEPS = (
 )
 
 
-def check(run, sha, entry, jobs, artifacts):
+def check(run, sha, entry, jobs, artifacts, *, ref=s.REF, job_name=NAME, steps=STEPS):
     s.need(
         (
             entry["id"],
@@ -40,7 +40,7 @@ def check(run, sha, entry, jobs, artifacts):
         == (
             run,
             sha,
-            s.REF.removeprefix("refs/heads/"),
+            ref.removeprefix("refs/heads/"),
             1,
             "workflow_dispatch",
             ".github/workflows/ci.yml",
@@ -51,10 +51,10 @@ def check(run, sha, entry, jobs, artifacts):
     (job,) = jobs
     s.need(
         (job["name"], job["head_sha"], job["run_attempt"], job["status"], job["conclusion"])
-        == (NAME, sha, 1, "completed", "success"),
+        == (job_name, sha, 1, "completed", "success"),
         "incorrect actual native worker",
     )
-    for name in STEPS:
+    for name in steps:
         (step,) = [r for r in job["steps"] if r["name"] == name]
         s.need(step["conclusion"] == "success", "unqualified " + name)
     names = {"first-session-linux-source-driver", "first-session-linux-source-observations"}
@@ -72,7 +72,7 @@ def check(run, sha, entry, jobs, artifacts):
     return {"run": run, "head": sha, "attempt": 1, "job": job["id"], "artifacts": out}
 
 
-def media(catalog, folder):
+def media(catalog, folder, *, authority=s, extra_read=None):
     """Read the authenticated capsule manifest only after its matching native observations pass."""
     archives = {}
     for name, row in catalog["artifacts"].items():
@@ -106,7 +106,7 @@ def media(catalog, folder):
         s.need(
             m["qualified"] is True
             and m["base"] == end["base"] == s.K_ORIGIN
-            and m["source"] == s.load()
+            and m["source"] == authority.load()
             and end["commit"] == m["source"]["role"]["commit"]
             and end["role"] == "E"
             and (m["qa"], m["run"], m["attempt"])
@@ -119,7 +119,7 @@ def media(catalog, folder):
         s.need(
             base["commit"] == s.K and base["manifest"] == s.K_ORIGIN["manifest"], "wrong donor compiler"
         )
-        selector = selector_record.verify(lambda n: read("E/selector/" + n))
+        selector = selector_record.verify(lambda n: read("E/selector/" + n), source=m["source"]["role"]["commit"])
         s.need(selector["source"] == m["source"]["role"]["commit"]
                and selector["driver_sha256"] == base["driver"][0]
                and selector["sdk_executable_sha256"] == m["files"]["bin/rustc"][0],
@@ -139,14 +139,14 @@ def media(catalog, folder):
             ("K-packed-A-to-E", "K", "E", "packed"),
         ]
         s.need(len(cross) == len(ordered), "incomplete cross-reader histories")
-        for (label, digest, program), (expected, writer, reader, rep) in zip(
+        for (label, case_digest, program), (expected, writer, reader, rep) in zip(
             cross, ordered, strict=True
         ):
             s.need(label == expected, "wrong compiler direction")
             raw_case = read("E/cross-readers/" + label + "/qualified.json")
             c = json.loads(raw_case)
             s.need(
-                hashlib.sha256(raw_case).hexdigest() == digest
+                hashlib.sha256(raw_case).hexdigest() == case_digest
                 and c["producer"] == writer
                 and c["consumer"] == reader
                 and c["representation"] == rep
@@ -171,7 +171,7 @@ def media(catalog, folder):
                 elf.startswith(b"\x7fELF")
                 and hashlib.sha256(elf).hexdigest() == program
                 and c["first_B"] != program
-                and s.required_tests(m["source"]["role"]["commit"])
+                and authority.required_tests(m["source"]["role"]["commit"])
                 <= set(json.loads(read("E/checked-in-tests.json"))["units"]["rustc_incremental"]),
                 "different native units or program",
             )
@@ -197,7 +197,7 @@ def media(catalog, folder):
         s.need(checked["units"]["rustc_incremental"] == json.loads((s.HERE / "inputs/suite-controls.json").read_bytes())["K"]["named_units"]
                and checked["units"]["rustc_fs_util"] == [] and len(checked["run_make"]) == 7
                and checked["fixtures"]["ohm-packed-branch-cache"]
-               == s.names_for(end["commit"])["changed_files"]["tests/run-make/ohm-packed-branch-cache/rmake.rs"],
+               == authority.names_for(end["commit"])["changed_files"]["tests/run-make/ohm-packed-branch-cache/rmake.rs"],
                "different real cold-table regression")
         s.need(
             (own["physical_cargo"], own["physical_wild"], own["visits"], own["branches"])
@@ -214,6 +214,8 @@ def media(catalog, folder):
             == ["17 1", "29 2", "29 1"],
             "stale ordinary provider",
         )
+        if extra_read is not None:
+            extra_read(z, m, end)
     return {
         "manifest": digest,
         "source": end["commit"],
