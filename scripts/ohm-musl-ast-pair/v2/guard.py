@@ -76,11 +76,12 @@ class Trial:
         native_state=fix.state()
         with tempfile.TemporaryDirectory(dir=self.work,prefix="trace-") as t:
             traces=Path(t)
-            cmd=["strace","-ff","-q","-ttt","-yy","-s","131072","-e",
+            cmd=["strace","-ff","--seccomp-bpf","-q","-ttt","-yy","-s","131072","-e",
                  "trace=execve,execveat,clone,clone3,fork,vfork,open,openat,openat2,rename,renameat,renameat2,unlink,unlinkat",
                  "-o",str(traces/"pid"),*self.cli]
             p=subprocess.run(cmd,cwd=fix.project,env=env,capture_output=True,timeout=150)
             blob(folder/"cargo.stdout.gz",p.stdout);blob(folder/"cargo.stderr.gz",p.stderr)
+            require(not any(line.startswith(b"strace:") and b"seccomp" in line.lower() for line in p.stderr.splitlines()),label,"kernel syscall filter unavailable",p.stderr[-600:])
             with tarfile.open(folder/"syscalls.tgz","x:gz",compresslevel=2) as archive:
                 for raw in sorted(traces.iterdir()):archive.add(raw,arcname=raw.name,recursive=False)
             data=observe(traces,fix.project,sdk,roots,{str(x) for x in fix.paths})
@@ -95,8 +96,12 @@ class Trial:
         build=[m for m in typed if m["reason"]=="build-script-executed"]
         require(len(build)==1 and build[0]["linked_paths"]==["native="+str(p.parent) for p in fix.paths],label,build)
         expected_output=b"cargo:rerun-if-changed=build.rs\n"+b"".join(("cargo:rustc-link-search=native="+str(path.parent)+"\n").encode() for path in fix.paths)
-        outputs=[path for root in roots for path in root.rglob("output") if path.is_file() and path.read_bytes()==expected_output]
-        require(outputs,label,"missing exact build.rs stdout; native dirs must not be watched")
+        unit_root=Path(build[0]["out_dir"]).parent
+        require(any(unit_root.is_relative_to(root) for root in roots),label,unit_root)
+        outputs=[path for path in (unit_root/"run/stdout",unit_root/"output") if path.is_file()]
+        require(len(outputs)==1,label,"missing active build.rs stdout",outputs)
+        output=outputs[0].read_bytes();blob(folder/"build-script-stdout.gz",output)
+        require(output==expected_output,label,"build.rs must watch only build.rs",outputs,output)
         for c in [r for r in post if r["role"]==APP and r["kind"]=="raw"]:
             require(c["parsed"]==[],label,"consumer has its own marker",c)
         if code==0:require(any(r["role"]==APP and r["kind"]=="raw" for r in post),label)
@@ -116,13 +121,20 @@ class Trial:
         elif producer=="switch":
             require(not artifact or len(artifact)==1,label)
         else:raise ValueError(producer)
-        # In a migration there can be inactive namespaces. Use the typed rlib suffix to identify the selected producer.
-        suffixes={m[1] for row in artifact for path in row["filenames"]
-                  if (m:=re.search(r"/lib"+PRODUCER+r"-([0-9a-f]+)\.rlib$",path))}
-        if not suffixes:
-            suffixes={a.split("extra-filename=-",1)[1] for c in pc for a in c["argv"] if "extra-filename=-" in a}
+        # A compiler switch can keep multiple namespaces with the exact same unit hash.
+        # Resolve the actual producer from Cargo's artifact and the native compiler arguments.
+        directories={Path(path).parent for row in artifact for path in row["filenames"] if path.endswith(".rlib")}
+        directories.update(Path(c["argv"][c["argv"].index("--out-dir")+1]) for c in pc)
+        for c in bc:
+            for i,v in enumerate(c["argv"][:-1]):
+                spec=c["argv"][i+1]
+                if v=="--extern" and spec.startswith(PRODUCER+"="):
+                    directories.add(Path(spec.split("=",1)[1]).parent)
+        require(len(directories)==1,label,"ambiguous live producer",directories)
+        outdir,=directories;require(outdir.name=="out" and any(outdir.is_relative_to(r) for r in roots),label,outdir)
+        finger=outdir.parent/"fingerprint"/("dep-lib-"+PRODUCER)
         candidates=[r for r in post if r["role"]==PRODUCER]
-        chosen=[r for r in candidates if not suffixes or any(h in r["path"] for h in suffixes)]
+        chosen=[r for r in candidates if Path(r["path"])==finger or r["kind"]=="raw" and Path(r["path"]).parent==outdir]
         kept_child_receipt=retained_v2 and not pc
         if kept_child_receipt:
             require(producer=="switch" and self.s.active==("P","aware"),label)
@@ -182,7 +194,7 @@ class Trial:
                        for t,_,name,line in data["dep_writes"]):continue
                 overlap.append([path,before["identity"],before["raw_sha256"],before["parsed"]["LNK1"],when])
         if kept_child_receipt:require(any(read[3]==V2 for read in overlap),label,"fresh same-stamp parent did not read the old child receipt")
-        report={"retained_child_receipt_on_parent":kept_child_receipt,"label":label,"roles":self.s.active,"verdict":want,"cargo":code,"elf":exe,"producer":[c["kind"] for c in pc],
+        report={"producer_outdir":str(outdir),"producer_dep_record":str(finger),"retained_child_receipt_on_parent":kept_child_receipt,"label":label,"roles":self.s.active,"verdict":want,"cargo":code,"elf":exe,"producer":[c["kind"] for c in pc],
                 "consumer":[c["kind"] for c in bc],"build_scripts":len(data["scripts"]),"native":data["selected"],
                 "native_files":native_state,"ld":[[e["image"],e["sha256"],e["exit"]] for e in data["linkers"]],
                 "translated_preexisting_reads":overlap,"roots":{str(r):fid(r)[:2] for r in roots},
@@ -277,6 +289,7 @@ def main():
     require((args.suite=="migration")==bool(args.legacy),"supply --legacy only for migration")
     for tool in ("rustup","musl-gcc","ar","readelf","b3sum","strace"):
         require(shutil.which(tool),"missing required executable",tool)
+    require(sha(Path(shutil.which("strace")))=="28f957c227012de0b18d1bd7fff2d396cb693ea60ed8013be68de071e84b5001","requires the audited Ubuntu 6.8-0ubuntu2 amd64 strace")
     work=args.work.resolve();out=args.out.resolve()
     require(work!=out and not work.is_relative_to(out) and not out.is_relative_to(work))
     require(not any(x in str(p) for x in (" ",":","\n","\t") for p in (work,out)), "unescaped proof paths required")

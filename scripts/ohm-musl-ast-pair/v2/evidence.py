@@ -40,10 +40,14 @@ def fid(p):
 
 def lines(raw):
     pending = {}
-    for original in raw.splitlines():
+    rows=raw.splitlines()
+    for index,original in enumerate(rows):
         stamp,sep,line=original.partition(" ")
         assert sep and re.fullmatch(r"[0-9]+\.[0-9]+", stamp),original
-        if line.endswith("<unfinished ...>"):
+        if line=="???( <unfinished ...>":
+            assert not pending and index+2==len(rows) and re.fullmatch(r"[0-9]+\.[0-9]+ \+\+\+ exited with 0 \+\+\+",rows[-1]),original
+            yield stamp,line
+        elif line.endswith("<unfinished ...>"):
             name = line.partition("(")[0]
             assert name not in pending
             pending[name] = line.removesuffix("<unfinished ...>")
@@ -55,10 +59,11 @@ def lines(raw):
 
 def observe(trace, cwd, sdk, roots, native):
     events, parents, fd, eno, dep_read, dep_writes, driver_open, exits = [], {}, [], [], [], [], [], {}
-    thread_parent={}; native_order=[]
+    thread_parent={}; native_order=[]; opaque={}
     for f in sorted(trace.glob("pid.*")):
         pid = int(f.suffix[1:])
         for stamp,line in lines(f.read_text(errors="strict")):
+            if line=="???( <unfinished ...>":opaque[pid]=stamp
             if m := CLONE.match(line):
                 child = int(m[1])
                 assert child not in parents or parents[child] == pid
@@ -105,12 +110,20 @@ def observe(trace, cwd, sdk, roots, native):
     cargo = [e for e in events if Path(e["image"]).samefile(sdk/"bin/cargo")]
     assert len(cargo)==1 and cargo[0]["pid"] in exits
     rootpid = cargo[0]["pid"]
-    def is_cargo_thread(pid):
+    def tid_group(pid):
         seen=set()
         while pid in thread_parent:
             assert pid not in seen
             seen.add(pid);pid=thread_parent[pid]
-        return pid==rootpid
+        return pid
+    rustc_pids={e["pid"] for e in events if Path(e["image"]).samefile(sdk/"bin/rustc")}
+    exec_pids={e["pid"] for e in events}
+    opaque_threads=[]
+    for pid,stamp in sorted(opaque.items()):
+        leader=tid_group(pid)
+        assert pid in thread_parent and pid not in exec_pids and leader in rustc_pids and exits.get(pid)==0,(pid,leader)
+        assert ancestor(leader,{rootpid})==rootpid
+        opaque_threads.append([pid,stamp,thread_parent[pid],leader])
     compilers, scripts, linkers, targets = [], [], [], []
     for e in events:
         a = e["argv"]
@@ -139,8 +152,8 @@ def observe(trace, cwd, sdk, roots, native):
         e["exit"]=exits.get(e["pid"])
         targets.extend(e["selected"])
     return {"cargo":cargo[0],"status":exits[rootpid],"compilers":compilers,"scripts":scripts,"linkers":linkers,
-            "selected":sorted(set(targets)),"dep_read":[[t,pid,n] for t,pid,n,_ in dep_read if is_cargo_thread(pid)],
-            "dep_writes":dep_writes,"driver_open":driver_open,
+            "selected":sorted(set(targets)),"dep_read":[[t,pid,n] for t,pid,n,_ in dep_read if tid_group(pid)==rootpid],
+            "dep_writes":dep_writes,"driver_open":driver_open,"opaque_rustc_thread_exits":opaque_threads,
             "provider_fd":fd,"provider_enoent":eno,"parent_pids":parents,"all_exec":events}
 
 def encoded(body):
@@ -195,7 +208,7 @@ def dep_records(roots,folder):
         for p in root.rglob("*"):
             name=p.name
             if not (name in {"dep-lib-"+PRODUCER,"dep-bin-"+APP} or
-                    (name.endswith(".d") and name.startswith((PRODUCER+"-",APP+"-")))):continue
+                    (name in (PRODUCER+".d",APP+".d") or name.endswith(".d") and name.startswith((PRODUCER+"-",APP+"-")))):continue
             data=p.read_bytes()
             key=hashlib.sha256(data).hexdigest()
             store=folder/key

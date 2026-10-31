@@ -1,0 +1,72 @@
+{
+  "attempt": 1,
+  "branch": "charlie/qa-musl-ast-reviewed-compiler",
+  "conclusion": "failure",
+  "driver": {
+    "C": [
+      "6ed064d74164c9d558744e884aad3c470fc4811057732d9e7f8298369d55c65c",
+      142787440,
+      493
+    ],
+    "P": [
+      "45d8737f938d6ed97be5903342718f087d0af6ea710dd3c2416babc8c570d4b7",
+      142781688,
+      493
+    ]
+  },
+  "head": "42ab8393dcb7da2e468ed336933fa90c392d58a5",
+  "identity": "0f6003db4477b22585ac836cae01a299bce2ade92383daf090a7d952bf435ca2",
+  "initial_refusal": "The guard compared a directory st_dev to a regular SDK file before attempting a hardlink. No mechanism or migration Cargo command ran in either layout.",
+  "records": {
+    "native-private": {
+      "artifact": 13030064833,
+      "bytes": 16203,
+      "conclusion": "failure",
+      "job": 124449477633,
+      "name": "Unbundled native provider (private)",
+      "sha256": "fb9327a6ae1ca0071b73a01452f7f36e4db3c468649dd7f6cc9507bdfbca3d3e"
+    },
+    "native-shared": {
+      "artifact": 13030692827,
+      "bytes": 16204,
+      "conclusion": "failure",
+      "job": 124449477672,
+      "name": "Unbundled native provider (shared)",
+      "sha256": "e0dcf57dad3a61885e682b1cf4a6eb74089311d8899ee4399776df27de40b62f"
+    },
+    "ordinary-C": {
+      "artifact": 13031366705,
+      "bytes": 5510808,
+      "conclusion": "success",
+      "job": 124449477643,
+      "name": "Ordinary Ruff (C)",
+      "sha256": "93343357758f1b3947b2ce98f9556f2fd13c77945fb31f3f2b60b8c593865009"
+    },
+    "ordinary-P": {
+      "artifact": 13030489513,
+      "bytes": 5592982,
+      "conclusion": "success",
+      "job": 124449477678,
+      "name": "Ordinary Ruff (P)",
+      "sha256": "a8dbfc087ef6feb9946c40c18936efc887b1fde7c25c967f39505527877e8119"
+    },
+    "source-records": {
+      "artifact": 13030768539,
+      "bytes": 10998412,
+      "conclusion": "success",
+      "job": 124448110930,
+      "name": "Build both source SDKs and run the compiler regression",
+      "sha256": "15c26d5f67cbc064f457da2557cfbdabc2d0cdafd4927a095d32dd0e94c8ae68"
+    },
+    "source-transfer": {
+      "artifact": 13031197422,
+      "bytes": 372774066,
+      "conclusion": "success",
+      "job": 124448110930,
+      "name": "Build both source SDKs and run the compiler regression",
+      "sha256": "c7db74e02fbaa592c1bd6ede5f696de41bc3e34c42fc5387f0c77d6e81499d8c"
+    }
+  },
+  "run": 41170783373,
+  "source_kit_bytes": 966631346
+}

@@ -18,6 +18,10 @@ def locate(run,head):
     r=doc(f"runs/{run}")
     assert (r["head_sha"],r["event"],r["run_attempt"],r["head_branch"],r["status"],r["conclusion"])==(head,"workflow_dispatch",1,restore.q.REF,"completed","success")
     jobs=doc(f"runs/{run}/jobs?per_page=100")["jobs"]
+    if len(jobs)==2:
+        import composite
+        return composite.locate(run,head)
+    assert len(jobs)==5
     assert {j["name"] for j in jobs if j["conclusion"]=="success"}=={
         "Build both source SDKs and run the compiler regression","Ordinary Ruff (P)","Ordinary Ruff (C)",
         "Unbundled native provider (private)","Unbundled native provider (shared)"}

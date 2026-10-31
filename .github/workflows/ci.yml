@@ -5,113 +5,10 @@ permissions:
   actions: read
   contents: read
 jobs:
-  source:
-    name: Build both source SDKs and run the compiler regression
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-musl-ast-reviewed-compiler'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 170
-    outputs:
-      artifact: ${{ steps.transfer.outputs.artifact-id }}
-      digest: ${{ steps.transfer.outputs.artifact-digest }}
-      seal: ${{ steps.enroll.outputs.seal }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Verify the two original source ELF transfers and both historical receiver images
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          python3 -IB scripts/ohm-musl-ast/sdk.py inputs
-          python3 -IB scripts/ohm-musl-ast-pair/subjects.py legacy
-          bash scripts/ohm-gnu-syscall/source-rebuild/prepare.sh
-          sudo apt-get install -y --no-install-recommends musl-tools
-      - name: Rebuild the source-qualified parent with its own rustdoc and musl sysroot
-        run: python3 -IB scripts/ohm-musl-ast/sdk.py build
-      - name: Transplant the reviewed compiler delta and test both exact compiler sources
-        run: python3 -IB scripts/ohm-musl-ast-pair/subjects.py build
-      - name: Transfer one common SDK and just one alternate driver
-        id: transfer
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: musl-285-source-transfer
-          path: ${{ runner.temp }}/musl-ast/pair-transfer
-          compression-level: 0
-          retention-days: 6
-          if-no-files-found: error
-      - id: enroll
-        env:
-          TRANSFER_ID: ${{ steps.transfer.outputs.artifact-id }}
-          TRANSFER_DIGEST: ${{ steps.transfer.outputs.artifact-digest }}
-        run: |
-          set -euo pipefail
-          python3 -IB - <<'PY'
-          import hashlib, json, os
-          from pathlib import Path
-          root=Path(os.environ["RUNNER_TEMP"])/"musl-ast"
-          seal=hashlib.sha256((root/"pair-transfer/identity.json").read_bytes()).hexdigest()
-          with Path(os.environ["GITHUB_OUTPUT"]).open("a") as f:print("seal="+seal,file=f)
-          raw={"run":int(os.environ["GITHUB_RUN_ID"]),"head":os.environ["GITHUB_SHA"],
-               "transfer_id":int(os.environ["TRANSFER_ID"]),"transfer_digest":os.environ["TRANSFER_DIGEST"].removeprefix("sha256:"),"identity_sha256":seal}
-          assert len(raw["transfer_digest"])==64
-          (root/"pair-receipts/transfer.json").write_text(json.dumps(raw,sort_keys=True)+"\n")
-          PY
-      - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: musl-285-source-records
-          path: |
-            ${{ runner.temp }}/musl-ast/pair-receipts
-            ${{ runner.temp }}/musl-ast/receipts
-            ${{ runner.temp }}/ohm-aarch64-linux-zmij/receipts
-          retention-days: 14
-          if-no-files-found: error
-  ordinary:
-    name: Ordinary Ruff (${{ matrix.role }})
-    needs: source
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 100
-    strategy:
-      fail-fast: false
-      matrix:
-        role: [P, C]
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Fetch and verify the complete hardware-independent source installation
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SOURCE_RUN: ${{ github.run_id }}
-          SOURCE_HEAD: ${{ github.sha }}
-          TRANSFER_ID: ${{ needs.source.outputs.artifact }}
-          TRANSFER_DIGEST: ${{ needs.source.outputs.digest }}
-          TRANSFER_SEAL: ${{ needs.source.outputs.seal }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends musl-tools strace zstd
-          python3 -IB scripts/ohm-musl-ast-pair/restore.py ${{ matrix.role }}
-      - name: Build the real old and corrected Ruff AST and inspect every selected native linker
-        run: python3 -IB scripts/ohm-musl-ast-pair/plain.py ${{ matrix.role }}
-      - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: musl-285-ordinary-${{ matrix.role }}
-          path: ${{ runner.temp }}/musl-ast/receipts
-          retention-days: 14
-          if-no-files-found: error
   provider:
     name: Unbundled native provider (${{ matrix.layout }})
-    needs: source
-    runs-on: namespace-profile-ubuntu-24-04-16
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-musl-ast-reviewed-compiler'
+    runs-on: ubuntu-24.04
     timeout-minutes: 100
     strategy:
       fail-fast: false
@@ -127,16 +24,18 @@ jobs:
       - name: Verify both compiler drivers and three physically distinct Cargo readers
         env:
           GH_TOKEN: ${{ github.token }}
-          SOURCE_RUN: ${{ github.run_id }}
-          SOURCE_HEAD: ${{ github.sha }}
-          TRANSFER_ID: ${{ needs.source.outputs.artifact }}
-          TRANSFER_DIGEST: ${{ needs.source.outputs.digest }}
-          TRANSFER_SEAL: ${{ needs.source.outputs.seal }}
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends musl-tools strace zstd b3sum
-          python3 -IB scripts/ohm-musl-ast-pair/restore.py P
+          bash scripts/ohm-musl-ast-pair/native-volume.sh
+      - name: Reopen the exact source and original Ruff results and exercise all seven real hardlinks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          RUNNER_TEMP="$MUSL_GUARD_VOLUME" QA_ROOT="$MUSL_GUARD_VOLUME/ohm-aarch64-linux-zmij" \
+            python3 -IB scripts/ohm-musl-ast-pair/provider_stage.py stage "$MUSL_GUARD_EVIDENCE"
       - name: Exercise the v2 producer and both older Cargo readers
         env:
           LAYOUT: ${{ matrix.layout }}
@@ -144,22 +43,19 @@ jobs:
           set -euo pipefail
           cd scripts/ohm-musl-ast-pair/v2
           sha256sum --strict --check SHA256SUMS
-          subject="$RUNNER_TEMP/musl-ast/receipts/guard-subjects.json"
-          mkdir -p "$RUNNER_TEMP/musl-guard" "$RUNNER_TEMP/musl-guard-raw"
+          subject="$MUSL_GUARD_EVIDENCE/guard-subjects.json"
           status=0
           for suite in mechanism signed strict; do
             args=(--suite mechanism)
             if [[ $suite != mechanism ]]; then args=(--suite migration --legacy "$suite"); fi
-            python3 -IB guard.py --subjects "$subject" --work "$RUNNER_TEMP/musl-guard/$suite" \
-              --out "$RUNNER_TEMP/musl-guard-raw/$suite" --layout "$LAYOUT" "${args[@]}" || status=1
+            python3 -IB guard.py --subjects "$subject" --work "$MUSL_GUARD_VOLUME/native-guard/$suite" \
+              --out "$MUSL_GUARD_EVIDENCE/$suite" --layout "$LAYOUT" "${args[@]}" || status=1
           done
           exit "$status"
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: musl-285-native-${{ matrix.layout }}
-          path: |
-            ${{ runner.temp }}/musl-guard-raw
-            ${{ runner.temp }}/musl-ast/receipts
+          path: ${{ runner.temp }}/musl-provider-evidence
           retention-days: 14
           if-no-files-found: error

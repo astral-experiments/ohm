@@ -20,12 +20,18 @@ TMP=s.DEST/"reopened"
 SDK=s.rt.SDK
 
 
-def restore(role,run,head,id_,digest,seal):
+def restore(role,run,head,id_,digest,seal, *, for_provider=False):
     assert role in ("P","C") and len(head)==40 and len(digest)==len(seal)==64
     api=lambda path:json.loads(subprocess.check_output(["gh","api",s.API+path]))
     job=api(f"runs/{run}")
     assert (job["head_sha"],job["head_branch"],job["event"],job["run_attempt"])==(head,q.REF,"workflow_dispatch",1)
-    assert (job["id"]==int(os.environ["GITHUB_RUN_ID"]) and job["status"]=="in_progress") or (job["status"],job["conclusion"])==("completed","success")
+    if not ((job["id"]==int(os.environ["GITHUB_RUN_ID"]) and job["status"]=="in_progress") or (job["status"],job["conclusion"])==("completed","success")):
+        import composite
+        assert (run,head)==(composite.PIN["run"],composite.PIN["head"])
+        enrolled=composite.original()
+        assert (str(id_),digest,seal)==tuple(enrolled[k] for k in ("TRANSFER_ID","TRANSFER_DIGEST","TRANSFER_SEAL"))
+        if not for_provider:
+            composite.provider(int(os.environ["PROVIDER_RUN"]),os.environ["PROVIDER_HEAD"],enrolled)
     sources=[j for j in api(f"runs/{run}/jobs?per_page=100")["jobs"] if j["name"]=="Build both source SDKs and run the compiler regression"]
     assert len(sources)==1 and sources[0]["head_sha"]==head and sources[0]["conclusion"]=="success"
     a=api(f"artifacts/{id_}")

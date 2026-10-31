@@ -68,6 +68,19 @@ def main():
         assert len(records['linkers'][0]['negative'])==1 and [x[1] for x in records['dep_read']]==[11]
         assert records['compilers'][0]['crate']==APP and records['driver_open'][0][0]==12
         assert list(lines('0123.01 clone( <unfinished ...>\n0123.02 <... clone resumed>) = 23'))==[('0123.02','clone( ) = 23')]
+        opaque='???( <unfinished ...>'
+        leader=(trace/'pid.12').read_text();(trace/'pid.12').write_text(leader.replace('clone(flags=SIGCHLD) = 13','clone(flags=CLONE_THREAD) = 15\n1123456789.000007 clone(flags=SIGCHLD) = 13'))
+        rows(15,opaque,'+++ exited with 0 +++')
+        assert observe(trace,root,sdk,[target],{early,late})['opaque_rustc_thread_exits']==[[15,'1123456789.000001',12,12]]
+        for pid in (10,11,12,13,14):
+            path=trace/f'pid.{pid}';saved=path.read_text()
+            path.write_text(saved.replace('+++ exited with 0 +++',opaque+'\n1123456789.000099 +++ exited with 0 +++'))
+            assert rejected(lambda:observe(trace,root,sdk,[target],{early,late})),pid
+            path.write_text(saved)
+        for bad in ([opaque,'+++ exited with 1 +++'],[opaque,opened(late),'+++ exited with 0 +++'],['openat( <unfinished ...>','+++ exited with 0 +++']):
+            rows(15,*bad)
+            assert rejected(lambda:observe(trace,root,sdk,[target],{early,late})),bad
+        (trace/'pid.15').unlink();(trace/'pid.12').write_text(leader)
         broken=(trace/'pid.12').read_text().replace(' = 13',' = 16')
         (trace/'pid.12').write_text(broken)
         assert rejected(lambda:observe(trace,root,sdk,[target],{early,late}))
