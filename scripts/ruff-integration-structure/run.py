@@ -9,7 +9,7 @@ import sys
 import traceback
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent / "branch-return-pmu"))
+sys.path[:0] = [str(HERE), str(HERE.parent / "branch-return-pmu")]
 import worker as historical
 from bindings import OUT, ROOT, WORK, need, save, sha
 import selection
@@ -168,6 +168,9 @@ def main(source):
 
 
 if __name__ == "__main__":
+    if sys.argv[1:] == ["--print-command"]:
+        print(json.dumps(CARGO))
+        sys.exit(0)
     try:
         main(Path(sys.argv[1]).resolve())
     except BaseException:

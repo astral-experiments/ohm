@@ -1,5 +1,8 @@
 """Offline checks for the integration-specific gates; no Cargo or compiler is invoked."""
 import hashlib
+import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -25,6 +28,12 @@ class Controls(unittest.TestCase):
         operand = "@!.txt" if fixture == suite.EXACT[1] else "@/tmp/legitimate/file_paths.txt"
         return [(100, str(self.libtest), [str(self.libtest), "--exact", fixture, "--test-threads=1", "--color", "never"]),
                 (103, str(self.cli), [str(self.cli), "check", "--no-cache", "--isolated", operand])]
+
+    def test_actual_isolated_worker_entry_point(self):
+        out = subprocess.check_output([sys.executable, "-IB", HERE / "run.py", "--print-command"],
+                                     cwd=self.root, env=os.environ | {"RUNNER_TEMP": str(self.root)})
+        self.assertEqual(json.loads(out), ["cargo", "+ohm", "test", "-p", "ruff", "--test", "integration_test",
+                                           "--no-run", "--locked", "--offline", "-j4", "--message-format=json"])
 
     def test_native_inventory(self):
         data = (HERE / "expected-tests.txt").read_bytes()
