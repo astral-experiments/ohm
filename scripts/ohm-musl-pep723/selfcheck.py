@@ -6,7 +6,10 @@ sp=importlib.util.spec_from_file_location('case',HERE/'run.py');case=importlib.u
 def sink(source, original, tmp, execute):
     git=lambda *a:subprocess.check_output(['git','-C',source,*a])
     a,b=(case.SRC[n] for n in ['old','new'])
+    versions=case.source_versions(source)
+    assert set(versions)=={'old','new'}
     for role,rec in [('old',a),('new',b)]:
+        assert versions[role]=={'rev':rec['commit'],'tree':rec['tree'],'lock':rec['cargo_lock_sha256']}
         assert git('rev-parse',rec['commit']+'^{tree}').decode().strip()==rec['tree']
         assert case.digest(git('show',rec['commit']+':Cargo.lock'))==rec['cargo_lock_sha256']
         assert case.digest(git('show',rec['commit']+':'+rec['path']))==rec['file_sha256']

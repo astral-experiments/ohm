@@ -16,7 +16,21 @@ def save(p,x):
     tmp=p.with_suffix('.writing');tmp.write_text(json.dumps(x,indent=2,sort_keys=True)+'\n');tmp.replace(p)
 def zipraw(p,b):p.write_bytes(gzip.compress(b,mtime=0,compresslevel=4));return digest(b)
 def git(root,*args):return subprocess.check_output(['git','-C',str(root),*map(str,args)]).decode().strip()
+def source_versions(root):
+    versions={}
+    for role in ('old','new'):
+        record=SRC[role]
+        versions[role]={'rev':record['commit'],'tree':git(root,'rev-parse',record['commit']+'^{tree}'),'lock':record['cargo_lock_sha256']}
+    return versions
 def body(p):return [sha(p),p.stat().st_size,p.stat().st_mode&0o777]
+def check_rustdoc(enrolled,admission,parent,dkey):
+    members=HERE/'C-rustdoc-source-components.json'
+    check(sha(members)=='91e99bcc12bda4e8786420718fd0e7b12d94f3a17de1bd63f6caac4738e35f27','original rustdoc source-build record')
+    components=load(members)
+    doc=admission['rustdoc'];fresh=components['all']['bin/rustdoc']
+    check(doc['fresh_candidate']==fresh and doc['operational']==parent['bin/rustdoc'] and components['different_non_driver']=={'bin/rustdoc':[doc['operational'],fresh]},'both independently built rustdoc payloads')
+    check(enrolled['rustdoc']==dict(doc,fresh_candidate=fresh[0]),'rustdoc hashes in the original transfer')
+    check(components['parent_driver']==parent[dkey] and components['all'][dkey]==enrolled['candidate_driver'] and admission['product_driver']=={'P':parent[dkey],'C':enrolled['candidate_driver']},'physical driver pair')
 def wrong_source(raw):
     key=b'if content == "///" {';prefix,test=raw.split(b'#[cfg(test)]',1)
     check(prefix.count(key)==1,'unique production site')
@@ -45,7 +59,7 @@ class Study:
         check(sha(transfer_file)==sm['identity'],'physically authenticated source-transfer receipt')
         enrolled=load(transfer_file)
         check(enrolled['source']==self.kit['source'] and enrolled['base']==self.parent and (enrolled['run'],enrolled['head'],enrolled['attempt'])==(sm['run'],sm['head'],1),'fixture source to product binding')
-        check(enrolled['rustdoc']==admission['rustdoc'] and enrolled['rustdoc']['operational']==self.parent['bin/rustdoc'] and admission['product_driver']=={'P':self.parent[self.dkey],'C':enrolled['candidate_driver']},'independent rustdoc audit and exact operational driver pair')
+        check_rustdoc(enrolled,admission,self.parent,self.dkey)
         check(body(Path(self.roles['drivers']['P']['path']))==self.parent[self.dkey] and body(Path(self.roles['drivers']['C']['path']))==enrolled['candidate_driver'],'two authenticated physical drivers')
         check(self.parent[self.dkey]!=enrolled['candidate_driver'] and body(self.sdk/'bin/cargo')==self.parent['bin/cargo'],'different rustc, identical aware Cargo')
         self.inodes={n:((self.sdk/n).stat().st_dev,(self.sdk/n).stat().st_ino) for n in self.files if n!=self.dkey}
@@ -97,7 +111,7 @@ class Study:
             for n,(v,h) in SRC[state]['selected_registry_inputs'].items():check(self.registry[n+'-'+v+'.crate']==h,(state,n))
         check(all(locked.get(n)==h for n,h in self.registry.items()),'every downloaded crate matches historical locks')
         self.result['preparation']=out;self.result['registry']=self.registry
-        self.result['source_versions']={k:{'rev':s['commit'],'tree':git(self.source,'rev-parse',s['commit']+'^{tree}'),'lock':s['cargo_lock_sha256']} for k,s in SRC.items()}
+        self.result['source_versions']=source_versions(self.source)
         save(self.out/'partial.json',self.result)
     def select(self,state):
         normal='old' if state=='old' else 'new';s=SRC[normal];rel=s['path']
