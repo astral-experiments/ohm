@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -28,6 +29,20 @@ def execute(role,root):
     b.HERE=HERE/'sources'/role
     b.main(root,HERE.parent/'ohm-apple-zmij/cargo293/source.pack')
 
+def restore(role,root):
+    cert=root/'build-cert';cert.mkdir(parents=True)
+    inputs=HERE/'sources'/role/'candidate-source'
+    spec=json.loads((inputs/'spec.json').read_bytes());joined=root/'deltas';joined.mkdir()
+    for f in ('parent.commit','parent.patch.gz'):
+        shutil.copyfile(b.materialize.HERE/f,joined/f)
+    for d in spec['commits']:
+        for end in ('.commit','.patch.gz'):
+            f=d['key']+end;shutil.copyfile(inputs/f,joined/f)
+    b.materialize.HERE=joined
+    proof=b.materialize.tree(root/'source',HERE.parent/'ohm-apple-zmij/cargo293/source.pack',spec)
+    assert proof['commit']==spec['head'] and proof['tree']==spec['tree'] and proof['mode_path_sha256_inventory']==spec['inventory']
+    save(cert/'restored-source.json',proof)
+
 def suites(role,root):
     src=root/'source';cert=root/'build-cert';spec=json.loads((HERE/'sources'/role/'candidate-source/spec.json').read_bytes());assert b.materialize.git(src,'rev-parse','HEAD').decode().strip()==spec['head']
     assert b.materialize.hash_files(src,spec['head'])['mode_path_sha256_inventory']==spec['inventory']
@@ -37,7 +52,8 @@ def suites(role,root):
     for key in ('RUSTFLAGS','CARGO_ENCODED_RUSTFLAGS','CARGO_BUILD_BUILD_DIR','CARGO_TARGET_DIR','TMPDIR','CARGO_HOME','RUSTUP_TOOLCHAIN'):
         env.pop(key,None)
     tmp=Path(tempfile.mkdtemp(dir=env['RUNNER_TEMP'],prefix='private-gc-suite-tmp-'))
-    env.update(CARGO_TARGET_DIR=str(target),TMPDIR=str(tmp),CARGO_HOME=str(root/'stable-registry'),CARGO_PROFILE_DEV_DEBUG='1',CARGO_PROFILE_TEST_DEBUG='1',CARGO_INCREMENTAL='0',RUSTUP_TOOLCHAIN='1.99.0',LANG='C.UTF-8')
+    env.update(CARGO_TARGET_DIR=str(target),TMPDIR=str(tmp),CARGO_PROFILE_DEV_DEBUG='1',CARGO_PROFILE_TEST_DEBUG='1',CARGO_INCREMENTAL='0',RUSTUP_TOOLCHAIN='1.99.0',LANG='C.UTF-8')
+    assert (Path.home()/'.cargo/bin/cargo').is_file() and Path(shutil.which('cargo',path=env['PATH'])).samefile(Path.home()/'.cargo/bin/cargo')
     version=run(cert,'official-version',['rustc','+1.99.0','-vV'],src,env);assert version.returncode==0 and b'commit-hash: b940084d' in version.stdout,version.stdout
     result=run(cert,'official-build',['cargo','+1.99.0','test','--locked','-p','cargo','--lib','--test','testsuite','--no-run','-j12','--message-format=json'],src,env)
     assert result.returncode==0,result.stderr.decode()[-5000:]
@@ -62,4 +78,4 @@ def suites(role,root):
     print(role,{k:list(v['rows'].values()).count('ok') for k,v in jobs.items()},flush=True)
     assert all(v['exit']==0 and all(q=='ok' for q in v['rows'].values()) for v in jobs.values()),jobs
 
-if __name__=='__main__':{'build':execute,'tests':suites}[sys.argv[1]](sys.argv[2],Path(sys.argv[3]).resolve())
+if __name__=='__main__':{'build':execute,'restore':restore,'tests':suites}[sys.argv[1]](sys.argv[2],Path(sys.argv[3]).resolve())
