@@ -40,6 +40,12 @@ def reopen(m,prior):
         assert rows[-1]=={'reason':'build-finished','success':True}
         leaf,=[v for v in rows if v['reason']=='compiler-artifact' and v['target']['name']=='cargo' and v['target']['kind']==['bin']]
         assert not leaf['fresh'] and set(leaf['features'])>={'all-static','ohm-defaults'}
+    return verify_visits(m,C,tools)
+
+def verify_visits(m,product,tools):
+    j=lambda name:json.loads(m[name])
+    subjects=j('subjects.json')
+    lane='matched-Ruff';pj=lambda name:j(lane+'/'+name+'.json')
     assert tools['signed']['cargo']['sha256']==subjects['tools']['cargo']['sha256']
     assert len({t['cargo']['sha256'] for t in tools.values()})==3 and len({t['cargo']['path'] for t in tools.values()})==1
     for field in ('alias','rustc','driver','driver_sha'):assert all(v[field]==tools['signed'][field] for v in tools.values())
@@ -48,7 +54,7 @@ def reopen(m,prior):
     for env in envs.values():assert not {'CI','TF_BUILD','CFG_RELEASE','CFG_RELEASE_CHANNEL','RUSTC_WRAPPER','GH_TOKEN','GITHUB_TOKEN','RUSTFLAGS'}&env.keys()
     assert len({e['CARGO_TARGET_DIR'] for e in envs.values()})==len({e['CARGO_BUILD_BUILD_DIR'] for e in envs.values()})==3
     terminal=j('matched-terminal.json')
-    assert terminal['product']['head']==C and not terminal['issues'] and set(terminal['summary'])==set(PHASES)
+    assert terminal['product']['head']==product and not terminal['issues'] and set(terminal['summary'])==set(PHASES)
     table={};recs={};raw_msgs={}
     for name,want in PHASES.items():
         r=pj(name+'/receipt');recs[name]=r;pre=lane+'/'+name+'/'
@@ -129,5 +135,5 @@ def reopen(m,prior):
     assert all(r['sha256']==a['sha256'] and r['size']==a['size'] for r in (b,c))
     assert a['path']==c['path']==on and a['ino']==b['ino']!=c['ino']
     reason=m[lane+'/fixed-first/stderr.gz']
-    return {'product':C,'signed_source':P,'channel':'dev','bootstrap_release':'1.99.0-dev','same_default_output':on,'same_optout_output':off,
+    return {'product':product,'signed_source':P,'channel':'dev','bootstrap_release':'1.99.0-dev','same_default_output':on,'same_optout_output':off,
             'default_fingerprint_config_changes':reason.count(b'ConfigSettingsChanged'),'forced_rmeta_bytes':c['size'],'phases':table}
