@@ -79,26 +79,35 @@ def other_link(exe, argv):
 def inventory(path, arm):
     with path.open() as f:
         events = execs(f)
-    sdk = {
-        name: (SDK / file).stat()
-        for name, file in [("rustc", "bin/rustc"), ("cargo", "bin/cargo"), ("wild", WILD)]
-    }
-    identities = {(s.st_dev, s.st_ino): n for n, s in sdk.items()}
+    tools = {"rustc": SDK / "bin/rustc", "cargo": SDK / "bin/cargo", "wild": SDK / WILD,
+             "proxy": PROXIES / "rustup"}
+    identities = {}
+    for name, path in tools.items():
+        st = path.stat()
+        identities[st.st_dev, st.st_ino] = name
+    observed = []
+    for pid, exe, argv in events:
+        path = Path(exe)
+        st = path.stat() if path.is_file() else None
+        role = identities.get((st.st_dev, st.st_ino)) if st else None
+        observed.append((role, {"pid": pid, "exe": exe, "argv": argv}))
+    return classify(observed, arm)
+
+
+def classify(events, arm):
+    """Classify complete executable rows after their observer has authenticated the tool."""
     rustcs = []
     wild = []
     cargos = []
     others = []
-    proxy = PROXIES / "rustup"
-    proxy_id = (proxy.stat().st_dev, proxy.stat().st_ino)
     cargo_queries = []
     wild_queries = []
-    for pid, exe, argv in events:
+    for role, row in events:
+        pid, exe, argv = row["pid"], row["exe"], row["argv"]
         file = Path(exe)
-        s = file.stat() if file.is_file() else None
-        role = identities.get((s.st_dev, s.st_ino)) if s else None
         if file.name == "rustc" and "--crate-name" in argv and role != "rustc":
             need(
-                s is not None and (s.st_dev, s.st_ino) == proxy_id,
+                role == "proxy",
                 ("unregistered rustc execution", pid, exe),
             )
         if (
@@ -115,11 +124,9 @@ def inventory(path, arm):
             )
             rustcs.append(
                 dict(
-                    pid=pid,
-                    exe=exe,
+                    **row,
                     crate=crate,
                     mode="link-only" if is_link else "full",
-                    argv=argv,
                 )
             )
             if crate in {"ruff", "ruff_python_ast", "ruff_python_parser"}:
@@ -131,20 +138,20 @@ def inventory(path, arm):
                 )
         elif role == "wild":
             if "-o" in argv:
-                wild.append(dict(pid=pid, exe=exe, argv=argv, output=argv[argv.index("-o") + 1]))
+                wild.append(dict(**row, output=argv[argv.index("-o") + 1]))
             else:
                 need(
                     set(argv[1:])
                     and set(argv[1:]) <= {"-v", "--version", "--help", "--print-output-format"},
                     ("unknown default-output Wild", argv[:10]),
                 )
-                wild_queries.append(dict(pid=pid, exe=exe, argv=argv))
+                wild_queries.append(row)
         elif role == "cargo":
             bucket = cargo_queries if argv[1:] in (["--version"], ["-V"], ["-Vv"]) else cargos
-            bucket.append(dict(pid=pid, exe=exe, argv=argv))
+            bucket.append(row)
         elif file.name in ("ld", "ld.lld", "ld.bfd", "ld.gold", "wild", "rust-lld", "mold"):
             kind, output = other_link(exe, argv)
-            others.append(dict(pid=pid, exe=exe, kind=kind, output=output, argv=argv))
+            others.append(dict(**row, kind=kind, output=output))
     need(len(cargos) == 1, "expected exactly one physical Cargo")
     return dict(
         real_cargo=1,

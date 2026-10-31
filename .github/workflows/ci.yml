@@ -46,6 +46,14 @@ jobs:
           sparse-checkout: scripts/branch-return-source
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          ref: ${{ steps.binding.outputs.kernel_head }}
+          path: kernel
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/branch-return-execstop
+            scripts/branch-return-pmu
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
           ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
           path: physical
           persist-credentials: false
@@ -71,7 +79,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates coreutils git ninja-build strace util-linux zstd
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates coreutils git libssl-dev ninja-build strace util-linux zstd
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           test ! -e "$base"
           mkdir -p "$base/work" "$base/logs"
@@ -95,7 +103,7 @@ jobs:
           POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/branch-return-pmu/worker.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
+          python3 -IB enrolled/scripts/branch-return-pmu/worker.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider" "$GITHUB_WORKSPACE/kernel"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

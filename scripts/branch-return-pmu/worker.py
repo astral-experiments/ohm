@@ -24,6 +24,8 @@ import study as kit
 from omission import publish
 from meter import clock
 import processes
+import kernel_contact
+import kernel_events
 import link_diagnostic
 import settled_link
 
@@ -74,24 +76,18 @@ def invocation(where, env, lane, rc, arm):
     if lane == "measured":
         prefix = [str(OUT / "observers/plain"), str(where / "clock.json")]
     elif lane == "structural":
-        prefix = [
-            "strace",
-            "-f",
-            "-qq",
-            "--seccomp-bpf",
-            "-s",
-            "262144",
-            "-e",
-            "trace=execve,execveat",
-            "-o",
-            str(where / "exec.raw"),
-        ]
+        prefix = kernel_events.wrap(where, arm, env)
     else:
         prefix = []
     command = prefix + CARGO
-    result = subprocess.run(
-        command, cwd=kit.TREE, env=env, input=b"", capture_output=True, timeout=2400
-    )
+    try:
+        result = subprocess.run(
+            command, cwd=kit.TREE, env=env, input=b"", capture_output=True, timeout=2400
+        )
+    except subprocess.TimeoutExpired as error:
+        if lane == "structural":
+            kernel_events.timeout(where, error)
+        raise
     for key, raw in [("stdout", result.stdout), ("stderr", result.stderr)]:
         with (where / ("cargo." + key + ".gz")).open("xb") as f:
             f.write(gzip.compress(raw, compresslevel=2, mtime=0))
@@ -109,6 +105,8 @@ def invocation(where, env, lane, rc, arm):
             stderr_sha256=digest(result.stderr),
         ),
     )
+    if lane == "structural" and result.returncode != rc:
+        kernel_events.preserve(where)
     need(
         result.returncode == rc,
         ("ordinary Cargo exit", where, rc, result.returncode, result.stderr[-800:]),
@@ -117,11 +115,11 @@ def invocation(where, env, lane, rc, arm):
     phys = None
     if lane == "structural":
         try:
-            phys = processes.inventory(where / "exec.raw", arm)
+            phys = kernel_events.inventory(where, arm, rc, env)
             need(phys["cargos"][0]["argv"][1:] == CARGO[2:], "actual Cargo command")
             publish(where / "native-execs.json.gz", phys)
         finally:
-            processes.compact(where / "exec.raw", where / "exec.raw.gz")
+            kernel_events.preserve(where)
     messages = [json.loads(k) for k in result.stdout.splitlines()]
     need(
         messages[-1] == {"reason": "build-finished", "success": rc == 0},
@@ -269,6 +267,8 @@ def receipt(arm, phase, branch, lane, env, where, refs):
 def install(arm, lane, registry, refs, where):
     where.mkdir()
     env = b.activate(arm, registry, where)
+    if lane == "structural":
+        kernel_events.catalog(arm, registry, where)
     b.fresh_outputs()
     results = {}
     if lane == "clean":
@@ -373,7 +373,7 @@ def finish(registry, orders, records):
     )
 
 
-def main(pos, source, calibrator, observer, provider_repo):
+def main(pos, source, calibrator, observer, provider_repo, kernel_repo):
     need(pos in b.ORDERS and sha(HERE / "PLAN.md") == b.PLAN, "wrong enrollment")
     oracle = json.loads((HERE / "historical-sources.json").read_bytes())
     need(
@@ -405,6 +405,7 @@ def main(pos, source, calibrator, observer, provider_repo):
     link_diagnostic.acquire()
     subprocess.run([sys.executable, "-IB", HERE / "meter.py", calibrator, observer], check=True)
     ready = json.loads((OUT / "meter-ready.json").read_bytes())
+    native_qualification = kernel_contact.prepare(kernel_repo, ready["boot"])
     os.sched_setaffinity(0, ready["affinity"])
     need(sorted(os.sched_getaffinity(0)) == ready["affinity"], "ordinary worker affinity")
     save(
@@ -416,6 +417,7 @@ def main(pos, source, calibrator, observer, provider_repo):
             head=os.environ["GITHUB_SHA"],
             attempt=1,
             boot=ready["boot"],
+            kernel_contact=native_qualification,
             runner=os.environ.get("RUNNER_NAME"),
             job=os.environ["GITHUB_JOB"],
             source=b.spec(),
