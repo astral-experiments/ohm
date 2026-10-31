@@ -1,21 +1,28 @@
-name: Strict cargo and Ruff developer host build override
+name: One-package compiled-host mode on ordinary Ruff checks
 on: workflow_dispatch
 permissions:
   contents: read
   actions: read
 jobs:
   pair:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-strict-host-build-opt-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-strict-one-host-package-20261031'
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
-        order: ['01', '10']
+        row: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 95
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: registered
+          persist-credentials: false
+          sparse-checkout: scripts/strict-one-package
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: broad
+          ref: 5d26c524606e556b4934842568ed4acd2e91219d
           persist-credentials: false
           sparse-checkout: scripts/strict-host-opt
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -52,24 +59,24 @@ jobs:
           set -eu
           sudo apt-get -qq update
           sudo apt-get install -y --no-install-recommends strace ninja-build binutils build-essential
-          python3 -IB registered/scripts/strict-host-opt/acquire_cargo.py "$RUNNER_TEMP/strict-qualified-cargo"
+          python3 -IB broad/scripts/strict-host-opt/acquire_cargo.py "$RUNNER_TEMP/strict-qualified-cargo"
       - name: Whole-command inherited counts, clean and provider references
         env:
           QUALIFICATION_TOKEN: ${{ github.token }}
-          QA_ORDER: ${{ matrix.order }}
-        run: python3 -IB registered/scripts/strict-host-opt/study.py
+          QA_ROW: ${{ matrix.row }}
+        run: python3 -IB registered/scripts/strict-one-package/single.py
       - name: Compact original packet
         if: always()
         run: |
           set -eu
           if test -d "$RUNNER_TEMP/ordinary-ron-check/packet"; then
             cp "$RUNNER_TEMP/strict-qualified-cargo/custody.json" "$RUNNER_TEMP/ordinary-ron-check/packet/strict-cargo-artifact.json"
-            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/host-opt-${{ matrix.order }}.tar.gz" .
+            tar -C "$RUNNER_TEMP/ordinary-ron-check/packet" -czf "$RUNNER_TEMP/one-package-${{ matrix.row }}.tar.gz" .
           fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: strict-host-opt-${{ matrix.order }}
-          path: ${{ runner.temp }}/host-opt-${{ matrix.order }}.tar.gz
+          name: one-package-${{ matrix.row }}
+          path: ${{ runner.temp }}/one-package-${{ matrix.row }}.tar.gz
           retention-days: 7
           if-no-files-found: error
