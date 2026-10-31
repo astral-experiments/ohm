@@ -7,7 +7,7 @@ import subprocess
 from evidence import fid, save, sha, TARGET
 
 SOURCE={"P":"adea62b64bb86ad18946457dfb59f36b2d8fcab4",
-        "C":"fa32c39165a3bce9b04d430504c9b506089e4d14",
+        "C":"d52336754e01c65758f0be7335b191be47baf02f",
         "signed":"2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c",
         "strict":"761ea115605c34f11a1cd29afd68812c1e1359dd",
         "aware":"c18e91b514b2c4e4966c9ab03232c804af3e1b57"}

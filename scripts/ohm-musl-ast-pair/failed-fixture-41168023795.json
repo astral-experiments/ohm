@@ -1,0 +1,23 @@
+{
+  "artifact": [
+    13029997117,
+    "642a1f763667af5693bcaf98c33643f7c623c27c71bb28c5bd03aab472b5e47b",
+    53413
+  ],
+  "attempt": 1,
+  "candidate_builds": 0,
+  "code": "E0282",
+  "exact_run_make_log": "8db034859e8ceb8ee05e25a937dbf6c00681a85a89622b455dffe1f5b1540415",
+  "head": "0871eeb14b2aed6786ba7616128007a398d1902a",
+  "job": 124439711483,
+  "message": "error[E0282]: type annotations needed\n   --> /home/runner/work/_temp/ohm-aarch64-linux-zmij/rust/tests/run-make/ohm-checked-dep-info/rmake.rs:223:33\n    |\n223 |     let check = |rules: String, accepted| {\n    |                                 ^^^^^^^^\n...\n226 |             (\"/dev/null/ohm-untracked-relink-inputs:\", !accepted),\n    |                                                        --------- type must be known at this point\n    |\nhelp: consider giving this closure parameter an explicit type\n    |\n223 |     let check = |rules: String, accepted: /* Type */| {\n    |                                         ++++++++++++",
+  "native_provider_visits": 0,
+  "normal_Ruff_visits": 0,
+  "note": "The new fixture did not compile, so its failure cannot qualify the baseline recognition gate. The compiler product delta was not reached.",
+  "qualified_parent_components": 183,
+  "qualified_parent_logical_bytes": 966631346,
+  "run": 41168023795,
+  "source_compiler": "359e5df0ebc4613cedf4518a021a16790d94f7d5",
+  "test_source": "fa32c39165a3bce9b04d430504c9b506089e4d14",
+  "verdict": "failed before the registered parent assertion"
+}

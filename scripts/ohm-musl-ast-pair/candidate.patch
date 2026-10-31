@@ -126,7 +126,7 @@ index 0000000000000000000000000000000000000000..ffee230d0c32a5fdac338bf147bcfbd0
 +    value
 +}
 diff --git a/tests/run-make/ohm-checked-dep-info/rmake.rs b/tests/run-make/ohm-checked-dep-info/rmake.rs
-index 1128b8bf37c4e513f8bb6999268a3e1b75167b61..404037099a871a12bd5fb23d0dc5f4d9bb42724d 100644
+index 1128b8bf37c4e513f8bb6999268a3e1b75167b61..63e77e31765deda84ab95d8959078ad2fc538530 100644
 --- a/tests/run-make/ohm-checked-dep-info/rmake.rs
 +++ b/tests/run-make/ohm-checked-dep-info/rmake.rs
 @@ -1,6 +1,6 @@
@@ -170,7 +170,7 @@ index 1128b8bf37c4e513f8bb6999268a3e1b75167b61..404037099a871a12bd5fb23d0dc5f4d9
 +        cmd
 +    };
 +    let compile = |case| compile_on(target, case);
-+    let check = |rules: String, accepted| {
++    let check = |rules: String, accepted: bool| {
 +        for (marker, expected) in [
 +            ("/dev/null/ohm-recheck-dependent-links-v2:", accepted),
 +            ("/dev/null/ohm-untracked-relink-inputs:", !accepted),
