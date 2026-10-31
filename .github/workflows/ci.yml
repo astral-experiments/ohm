@@ -1,4 +1,4 @@
-name: Measure the compiler share of the unchanged GNU Ruff example build
+name: Attribute the GNU Ruff renderer library edit to native codegen workers
 on:
   workflow_dispatch:
 permissions:
@@ -6,20 +6,22 @@ permissions:
   contents: read
 jobs:
   diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-ruff-example-ceiling-20261031'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-gnu-renderer-library-workers-20261031' && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         position: ['01', '02']
-    name: Renderer instruction ceiling (${{ matrix.position }})
+    name: Library worker attribution (${{ matrix.position }})
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: enrolled
           persist-credentials: false
-          sparse-checkout: scripts/gnu-example-ceiling
+          sparse-checkout: |
+            scripts/gnu-example-ceiling
+            scripts/gnu-renderer-library-workers
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           path: signed-inputs
@@ -29,22 +31,22 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Calibrate complete and native-subtree instruction counters before the ordinary workflow
+      - name: Calibrate command, compiler and individual thread counters, then run the library edit
         env:
           GH_TOKEN: ${{ github.token }}
           POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
-          cd enrolled/scripts/gnu-example-ceiling
+          (cd enrolled/scripts/gnu-example-ceiling && sha256sum --strict --check SHA256SUMS)
+          cd enrolled/scripts/gnu-renderer-library-workers
           sha256sum --strict --check SHA256SUMS
-          python3 -IB study.py "$POSITION" "$GITHUB_WORKSPACE/signed-inputs"
-          python3 -IB verify.py "$RUNNER_TEMP/gnu-example-ceiling/receipt"
+          python3 -IB study.py worker "$POSITION" "$GITHUB_WORKSPACE/signed-inputs"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: gnu-ruff-example-ceiling-${{ matrix.position }}
+          name: gnu-renderer-library-workers-${{ matrix.position }}
           path: |
-            ${{ runner.temp }}/gnu-example-ceiling/receipt
-            !${{ runner.temp }}/gnu-example-ceiling/receipt/custody/cargo-301
+            ${{ runner.temp }}/gnu-renderer-library-workers/receipt
+            !${{ runner.temp }}/gnu-renderer-library-workers/receipt/custody/cargo-301
           retention-days: 14
           if-no-files-found: warn
