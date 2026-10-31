@@ -63,43 +63,44 @@ def main():
     save(out/'products.json',{'suite':str(suite),'suite_sha256':sha(suite),'cargo':str(subject),'cargo_sha256':sha(subject),'version':subprocess.check_output([subject,'-Vv'],cwd=base,text=True),'fixture':sha(product)})
     fixture=tdir/'tmp/cit/testsuite/ohm_ready_tests'/NAME.split('::')[-1];summary=[]
     previous_subject=sha(subject)
-    # The first four are again byte-unmodified, with a physical sampler only after a stall.
-    # Twenty separate traced visits permit cause diagnosis. Any deliberate delay is much
-    # shorter than the fixture's 15-second limit and touches only a's build-script wrapper.
-    for number in range(1,25):
-        if number==5:
-            original,diagnostic=diagnose.instrument(base)
-            assert hashlib.sha256(original).hexdigest()==TESTSHA and original!=diagnostic
-            gz(out/'test-original.rs.gz',original);gz(out/'test-observer.rs.gz',diagnostic)
-            check=subprocess.run([*cargo,*want,'--no-run','--message-format=json'],cwd=base,capture_output=True,timeout=180)
-            gz(out/'fixture-rebuild.stdout.gz',check.stdout);gz(out/'fixture-rebuild.stderr.gz',check.stderr)
-            assert check.returncode==0 and sha(subject)==previous_subject
+    failures=0
+    # The early process sampler can perturb the scheduling window. Leave all builds
+    # uninstrumented until the actual edited z wrapper has already waited for two seconds.
+    for number in range(1,61):
         folder=out/f'visit-{number:02}';folder.mkdir();start=time.monotonic()
         cmd=[*cargo,*want,'--',NAME,'--exact','--nocapture']
         env=os.environ.copy();env.pop('QA_READY_DELAY_MS',None);env.pop('QA_READY_LOG',None)
-        if number>=5:env['QA_READY_LOG']='1'
-        if number>=15:env['QA_READY_DELAY_MS']=str([40,100,200,350,600][(number-15)%5])
-        observed=None;slow_since=None;active_stamp=None
+        observed=None;slow_since=None;active_stamp=None;released=False
+        watched_tag=fixture/'foo/control/slow-active';outcome_tag=fixture/'foo/control/a-timing'
         dest1=folder/'stdout';dest2=folder/'stderr';trans=[];last=None
         with dest1.open('xb') as o1,dest2.open('xb') as o2:
             proc=subprocess.Popen(cmd,cwd=base,stdout=o1,stderr=o2,env=env)
             while proc.poll() is None:
                 assert time.monotonic()-start<120
-                if True:
-                    now=roster(proc.pid);exists=controls(fixture)
-                    state=exists.get('slow-active')
-                    if state and state!=active_stamp:slow_since=time.monotonic();active_stamp=state
-                    if state and 'a-timing' not in exists and observed is None and time.monotonic()-slow_since>2.2:
-                        observed=diagnose.stacks(folder,now,fixture);save(folder/'stall.json',observed)
-                    # Keep distinct concrete process lifetimes plus all marker transitions.
-                    sig=([*sorted(now)],exists)
-                    if sig!=last:
-                        trans.append({'since':time.monotonic()-start,'processes':now,'control':exists});last=sig
-                time.sleep(.10)
+                try:
+                    stamp=(watched_tag.stat().st_mtime_ns,watched_tag.read_text())
+                except FileNotFoundError:stamp=None
+                if stamp and stamp!=active_stamp:slow_since=time.monotonic();active_stamp=stamp
+                # Avoid samples of the prior visit's completed fixture (a-timing exists)
+                # and all short-lived ordinary cases, including the fallback preparation.
+                if stamp and not outcome_tag.exists() and slow_since is not None and time.monotonic()-slow_since>2.15:
+                    if observed is None:
+                        now=roster(proc.pid);observed=diagnose.stacks(folder,now,fixture);save(folder/'stall.json',observed)
+                    now=roster(proc.pid);exists=controls(fixture);sig=([*sorted(now)],exists)
+                    if sig!=last:trans.append({'since':time.monotonic()-start,'processes':now,'control':exists});last=sig
+                    # Preserve the first actual timeout. On exactly the next stall, release
+                    # only the test wrapper after 5s; compare real semantic output afterward.
+                    if not released and failures==1 and time.monotonic()-slow_since>5.0:
+                        try:
+                            with outcome_tag.open('x') as m:m.write('diagnostic release')
+                        except FileExistsError:pass
+                        else:
+                            released=True;save(folder/'release.json',{'state':controls(fixture),'elapsed':time.monotonic()-start})
+                time.sleep(.11)
         stdout=dest1.read_bytes();stderr=dest2.read_bytes();dest1.unlink();dest2.unlink();gz(folder/'stdout.gz',stdout);gz(folder/'stderr.gz',stderr)
         item={'exit':proc.returncode,'argv':cmd,'root':str(fixture),'control':controls(fixture),'duration':time.monotonic()-start,'number':number}
         assert b'running 1 test' in stdout and NAME.encode() in stdout
-        item['diagnostic']=number>=5;item['delay_ms']=int(env.get('QA_READY_DELAY_MS',0));item['had_stall']=observed is not None
+        item['diagnostic']=released;item['delay_ms']=0;item['had_stall']=observed is not None
         save(folder/'final-snapshot.json',diagnose.fixture_snapshot(fixture))
         item['timeout_message']=b'ready test never started' in stdout+stderr
         item['raw_pass']=b'test result: ok. 1 passed; 0 failed;' in stdout and proc.returncode==0
@@ -112,5 +113,7 @@ def main():
         item['wrapper_sha']=sha(exe)
         item['files']={str(p.relative_to(fixture)):[p.stat().st_mtime_ns,p.stat().st_size] for p in (fixture/'foo/target/debug').rglob('*') if p.is_file() and (p.name.startswith(('a-','z-','runtime-')) or p.name in ('output','value','a'))}
         save(folder/'result.json',item);gz(folder/'observer.json.gz',json.dumps(trans,sort_keys=True).encode());summary.append([number,proc.returncode,item['raw_pass'],item['timeout_message']]);print(role,summary[-1],flush=True)
+        if item['timeout_message'] or released:failures+=1
+        if failures>=3:break
     save(out/'terminal.json',{'role':role,'visits':summary,'product_unchanged':sha(subject)==previous_subject})
 if __name__=='__main__':main()
