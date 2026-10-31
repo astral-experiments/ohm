@@ -77,6 +77,7 @@ def observe(m,name,mode,selector,wild,command,env=None,cwd=None):
 
 
 def calibration(m):
+    sys.path.insert(0,str(HERE))
     from verify import calibration_result
     assert m.sha(m.counter_fixture)=='dacd1dd7fef85cacb44a236e0c4191d95db036a623b2a01ae3a5d76d2f3d0b0e'
     for src,out,extra in [(HERE/'tree-counter.c','tree-counter',[]),(HERE/'cal-fanout.c','cal-fanout',[]),
