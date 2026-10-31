@@ -1,4 +1,4 @@
-"""Read the three captured lifetimes through rustc's metadata and link interfaces."""
+"""Read the ten captured receiver lifetimes through rustc's metadata and link interfaces."""
 import gzip
 import hashlib
 import json
@@ -9,8 +9,24 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE.parent/'ohm-musl-ast-hardware'))
 from clocked import file_sha,require,sha,save
 
-TAIL="chars λ🦀; literals left,right; interpolations 1\n"
-BAD={"chars":("StringLiteralValue","char"),"literals":("InterpolatedStringElements","&'a InterpolatedStringLiteralElement"),"interpolations":("InterpolatedStringElements","&'a InterpolatedElement")}
+TAIL=("chars λ🦀; literals left,right; interpolations 1\n"
+      "f-string outer outside-a,outside-b; widths 3,1; body left,{},right,tail\n"
+      "comparison <,is not; lengths 2,1,0\n"
+      "nonvariadic head,normal,key; bytes 00,ff,41; template tee,{},last\n")
+# The key names the public method's owner where methods share a name. The last field is its exact Rust spelling.
+BAD={
+    "chars":("StringLiteralValue","char","chars"),
+    "literals":("InterpolatedStringElements","&'a InterpolatedStringLiteralElement","literals"),
+    "interpolations":("InterpolatedStringElements","&'a InterpolatedElement","interpolations"),
+    "fstring_literals":("FStringValue","&'a StringLiteral","literals"),
+    "f_strings":("FStringValue","&'a FString","f_strings"),
+    "fstring_elements":("FStringValue","&'a InterpolatedStringElement","elements"),
+    "compare_iter":("ExprCompare","(&'a Expr, &'a CmpOp, &'a Expr)","iter"),
+    "parameters":("Parameters","&'a ParameterWithDefault","iter_non_variadic_params"),
+    "bytes":("BytesLiteralValue","u8","bytes"),
+    "template":("TStringValue","&'a InterpolatedStringElement","elements"),
+}
+
 
 
 def setup(scratch,original):
@@ -18,8 +34,8 @@ def setup(scratch,original):
     code=original.read_text()
     require(code.count("fn main() {")==1 and file_sha(original)=="f9b0f26c4b3e601e474a3b41ff8fd5faf8c5b4898348004534c5ffae05c2941f","original Ruff AST consumer")
     (scratch/"positive.rs").write_text(code.replace("fn main() {","fn visitor() {")+"\n"+(HERE/"consumer.rs").read_text())
-    for method,(owner,ret) in BAD.items():
-        (scratch/(method+".rs")).write_text("use ruff_python_ast::*;\npub fn escape<'a>(x: &'a "+owner+") -> Box<dyn Iterator<Item = "+ret+"> + 'static> {\n    Box::new(x."+method+"())\n}\n")
+    for label,(owner,ret,method) in BAD.items():
+        (scratch/(label+".rs")).write_text("use ruff_python_ast::*;\npub fn escape<'a>(x: &'a "+owner+") -> Box<dyn Iterator<Item = "+ret+"> + 'static> {\n    Box::new(x."+method+"())\n}\n")
     return {p.name:file_sha(p) for p in sorted(scratch.glob("*.rs"))}
 
 
@@ -59,12 +75,12 @@ def check(archive,search,scratch,result,env,expected,frame):
                     image=dest.read_bytes()
                     require(image[:7]==b"\x7fELF\x02\x01\x01" and b"INTERP" not in subprocess.check_output(["readelf","-lW",dest]),"real static musl image")
                     got=subprocess.check_output([dest],env=env,timeout=8)
-                    require(got.decode()==expected+TAIL,"visitor and all three iterators")
+                    require(got.decode()==expected+TAIL,"visitor and all ten source-bound iterators")
                     record(".reader.gz",image);verdict["reader_stdout"]=got.decode()
             else:
                 require(run.returncode==1 and len(errors)==1 and not dest.exists(),("wrong negative outcome",label,run.returncode,errors))
                 d=errors[0];spans=[p for p in d["spans"] if p["is_primary"]]
-                require(d["message"]=="lifetime may not live long enough" and len(spans)==1 and spans[0]["line_start"]==3 and spans[0]["column_start"]==5 and spans[0]["label"]=="returning this value requires that `'a` must outlive `'static`" and spans[0]["text"][0]["text"].strip()=="Box::new(x."+label+"())","escaped wrong opaque lifetime")
+                require(d["message"]=="lifetime may not live long enough" and len(spans)==1 and spans[0]["line_start"]==3 and spans[0]["column_start"]==5 and spans[0]["label"]=="returning this value requires that `'a` must outlive `'static`" and spans[0]["text"][0]["text"].strip()=="Box::new(x."+BAD[label][2]+"())","escaped wrong opaque lifetime")
                 verdict["diagnostic"]=[d["message"],spans[0]["line_start"],spans[0]["column_start"],spans[0]["label"]]
             out[mode+"/"+label]=verdict
             save(result/(mode+"-"+label+".json"),verdict)

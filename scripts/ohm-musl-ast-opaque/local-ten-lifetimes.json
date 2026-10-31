@@ -1,0 +1,203 @@
+{
+  "independent_projection_sha256": "491f22d8caff7bcd0b05a7d51ec0fb67596e26899a02c3832a61068e4a6785a8",
+  "methods": {
+    "file": "crates/ruff_python_ast/src/nodes.rs",
+    "file_sha256": "4427c5f979dedcd490ef3e02031c1366341eb80de2137ecf3a11bfbc1bef6cba",
+    "revision": "93526150df078af7dd8fc4226cdcc469539d2001",
+    "rows": [
+      {
+        "byte": 52836,
+        "invalid_item_ty": "char",
+        "label": "chars",
+        "line": 1636,
+        "method": "chars",
+        "owner": "StringLiteralValue",
+        "sig": "pub fn chars(&self) -> impl Iterator<Item = char> + Clone + '_"
+      },
+      {
+        "byte": 45251,
+        "invalid_item_ty": "&'a InterpolatedStringLiteralElement",
+        "label": "literals",
+        "line": 1409,
+        "method": "literals",
+        "owner": "InterpolatedStringElements",
+        "sig": "pub fn literals(&self) -> impl Iterator<Item = &InterpolatedStringLiteralElement>"
+      },
+      {
+        "byte": 45514,
+        "invalid_item_ty": "&'a InterpolatedElement",
+        "label": "interpolations",
+        "line": 1414,
+        "method": "interpolations",
+        "owner": "InterpolatedStringElements",
+        "sig": "pub fn interpolations(&self) -> impl Iterator<Item = &InterpolatedElement>"
+      },
+      {
+        "byte": 18150,
+        "invalid_item_ty": "&'a StringLiteral",
+        "label": "fstring_literals",
+        "line": 608,
+        "method": "literals",
+        "owner": "FStringValue",
+        "sig": "pub fn literals(&self) -> impl Iterator<Item = &StringLiteral>"
+      },
+      {
+        "byte": 18727,
+        "invalid_item_ty": "&'a FString",
+        "label": "f_strings",
+        "line": 624,
+        "method": "f_strings",
+        "owner": "FStringValue",
+        "sig": "pub fn f_strings(&self) -> impl Iterator<Item = &FString>"
+      },
+      {
+        "byte": 19436,
+        "invalid_item_ty": "&'a InterpolatedStringElement",
+        "label": "fstring_elements",
+        "line": 642,
+        "method": "elements",
+        "owner": "FStringValue",
+        "sig": "pub fn elements(&self) -> impl Iterator<Item = &InterpolatedStringElement>"
+      },
+      {
+        "byte": 5300,
+        "invalid_item_ty": "(&'a Expr, &'a CmpOp, &'a Expr)",
+        "label": "compare_iter",
+        "line": 159,
+        "method": "iter",
+        "owner": "ExprCompare",
+        "sig": "pub fn iter(\n        &self,\n    ) -> impl DoubleEndedIterator<Item = (&Expr, &CmpOp, &Expr)> + ExactSizeIterator"
+      },
+      {
+        "byte": 109559,
+        "invalid_item_ty": "&'a ParameterWithDefault",
+        "label": "parameters",
+        "line": 3328,
+        "method": "iter_non_variadic_params",
+        "owner": "Parameters",
+        "sig": "pub fn iter_non_variadic_params(&self) -> impl Iterator<Item = &ParameterWithDefault>"
+      },
+      {
+        "byte": 68702,
+        "invalid_item_ty": "u8",
+        "label": "bytes",
+        "line": 2082,
+        "method": "bytes",
+        "owner": "BytesLiteralValue",
+        "sig": "pub fn bytes(&self) -> impl Iterator<Item = u8> + '_"
+      },
+      {
+        "byte": 28379,
+        "invalid_item_ty": "&'a InterpolatedStringElement",
+        "label": "template",
+        "line": 924,
+        "method": "elements",
+        "owner": "TStringValue",
+        "sig": "pub fn elements(&self) -> impl Iterator<Item = &InterpolatedStringElement>"
+      }
+    ],
+    "tests": {
+      "consumer.py": "c073e43a63a5ffb7c7fdd6f78d925c78250cbdb999bb7afb18ea25fa90a8cf3f",
+      "consumer.rs": "89ab6b501d979d920083e593a73cabafeff774497fb3e014e41e37b34957f4de"
+    }
+  },
+  "observations": {
+    "actual_direct_native_processes": {
+      "C": 60,
+      "P": 60
+    },
+    "both_matching_graphs_recovered": true,
+    "mismatched_provider_each_role": "E0463",
+    "observed": {
+      "C": {
+        "edit": {
+          "linked_image": "5ee693f0b5fce07b0d9ea7cf9add24d2265b128766d4e308428bbb508ca2411e",
+          "raw_physical_files": 95,
+          "restorable": 73,
+          "rustcs": 1
+        },
+        "old": {
+          "linked_image": "49607798cc1559e1a23d484a3171891a65bbc3891477a3f65cbcbf68ad59ec7f",
+          "raw_physical_files": 579,
+          "restorable": 73,
+          "rustcs": 39
+        },
+        "repeat": {
+          "linked_image": "5ee693f0b5fce07b0d9ea7cf9add24d2265b128766d4e308428bbb508ca2411e",
+          "raw_physical_files": 0,
+          "restorable": 73,
+          "rustcs": 0
+        }
+      },
+      "P": {
+        "edit": {
+          "linked_image": "5ee693f0b5fce07b0d9ea7cf9add24d2265b128766d4e308428bbb508ca2411e",
+          "raw_physical_files": 116,
+          "restorable": 73,
+          "rustcs": 3
+        },
+        "old": {
+          "linked_image": "49607798cc1559e1a23d484a3171891a65bbc3891477a3f65cbcbf68ad59ec7f",
+          "raw_physical_files": 579,
+          "restorable": 73,
+          "rustcs": 39
+        },
+        "repeat": {
+          "linked_image": "5ee693f0b5fce07b0d9ea7cf9add24d2265b128766d4e308428bbb508ca2411e",
+          "raw_physical_files": 114,
+          "restorable": 73,
+          "rustcs": 3
+        }
+      }
+    },
+    "ten_independent_method_owners": {
+      "bytes": [
+        "BytesLiteralValue",
+        "bytes"
+      ],
+      "chars": [
+        "StringLiteralValue",
+        "chars"
+      ],
+      "compare_iter": [
+        "ExprCompare",
+        "iter"
+      ],
+      "f_strings": [
+        "FStringValue",
+        "f_strings"
+      ],
+      "fstring_elements": [
+        "FStringValue",
+        "elements"
+      ],
+      "fstring_literals": [
+        "FStringValue",
+        "literals"
+      ],
+      "interpolations": [
+        "InterpolatedStringElements",
+        "interpolations"
+      ],
+      "literals": [
+        "InterpolatedStringElements",
+        "literals"
+      ],
+      "parameters": [
+        "Parameters",
+        "iter_non_variadic_params"
+      ],
+      "template": [
+        "TStringValue",
+        "elements"
+      ]
+    }
+  },
+  "raw": {
+    "artifact": "passed-portable.tgz",
+    "bytes": 12141727,
+    "sha256": "e80c271157a60581c9f8aae63402b724f089b6ccc821b29acad1745280d599df",
+    "status": true
+  },
+  "scope": "local mirrored-registry graph at registered Ruff source; qualifying origin P and C; not a hosted hardware sample"
+}

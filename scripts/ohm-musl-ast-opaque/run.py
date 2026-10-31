@@ -44,6 +44,14 @@ def seal():
     need(len(historical)==previous["bytes"] and c.sha(historical)==previous["sha256"],"prior raw ZIP")
     negative=original_hashes(io.BytesIO(historical),STORE/"P.zip",previous)
     save(OUT/"earlier-literal-E0463.json",{"fixed_inputs":previous,"exercise":negative,"artifact":record["id"]})
+    newer=json.loads((HERE/"historical-second-empty.json").read_bytes())
+    rejected=api(f"runs/{newer['run']}");a=api(f"artifacts/{newer['artifact']}")
+    need((rejected["head_sha"],rejected["run_attempt"],rejected["conclusion"])==(newer["head"],1,"failure")
+         and (a["workflow_run"]["head_sha"],a["digest"],a["size_in_bytes"],a["expired"])==(newer["head"],"sha256:"+newer["sha256"],newer["bytes"],False),"second red native original")
+    historical=ingress.request(f"artifacts/{newer['artifact']}/zip")
+    need(len(historical)==newer["bytes"] and c.sha(historical)==newer["sha256"],"incompatible original source")
+    (STORE/"previous-complete-parent.zip").write_bytes(historical)
+    save(OUT/"earlier-second-empty.json",newer)
     save(OUT/"custody.json",{"transfer":located,"failed_originals":original,"workflow":os.environ["GITHUB_SHA"],"guard":guard})
 
 def fixture_state(archive,meta,summary,reader,graph,link):
@@ -78,6 +86,49 @@ def archived(role, *, materialize=True):
         need(set(verification["strict_differences"])=={"canonical_rlib","rmeta","embedded_metadata"},"original rejection lost")
         save(OUT/(role+"-original-full-archive.json"),verification)
     return out,expected_kernel
+
+def source_proof(nodes):
+    decoder = HERE/"opaque_metadata.py"
+    digest = SHA(decoder)
+    need(digest=="7a59be4dc08224ac412add823b391738beb864eebf07b58f52e2e7ee26574dec", "changed enrolled finite decoder")
+    project= v.opaque_metadata.validate_source(nodes)
+    rows = [(h.hex() if isinstance(h,bytes) else h, fields[0], fields[2], fields[3], fields[4])
+            for h,fields in v.opaque_metadata.CAPTURES.items()]
+    need(len(rows)==len(consumer.BAD)==10 and
+         {(owner,method) for _,owner,method,_,_ in rows}==
+         {(owner,method) for owner,_,method in consumer.BAD.values()}, "ten public clients/source disagreement")
+    return {"nodes":project,"path":"crates/ruff_python_ast/src/nodes.rs","revision":r.REV,"tree":r.TREE,
+            "decoder":digest,"exact_public_receiver_captures":[list(t) for t in rows],
+            "other_opaque_lifetimes_excluded":len(v.opaque_metadata.EXCLUDED)}
+
+
+def earlier_second_empty(source, fixed):
+    need(SHA(source)==fixed["sha256"],"earlier native artifact")
+    all_witness={};states={}
+    with zipfile.ZipFile(source) as z:
+        need(z.testzip() is None and len(z.namelist())==len(set(z.namelist())) and "passed.json" not in z.namelist(),"earlier incomplete gate")
+        def doc(name):return json.loads(z.read(name))
+        for label,orig in fixed["visits"].items():
+            prefix="P/proof/"+label+"/"
+            w=v.witness(doc(prefix+"ar-replay.json"),lambda h:gzip.decompress(z.read("P/proof/ar-content/"+h+".gz")))
+            a,m,_,summary=w
+            rd=doc(prefix+"reader.json");link=doc(prefix+"reader-link.json")
+            raw=gzip.decompress(z.read("P/P-"+label+"/stdout.gz"));roster=products.product([json.loads(l) for l in raw.splitlines()])[0]["roster"]
+            st=fixture_state(a,m,summary,rd,roster,{k:link[k] for k in ("path","physical","linker_sha256","sha256","available_libc_a")})
+            need((st["rlib"],st["rmeta"],st["elf"])==(orig["rlib"],orig["rmeta"],orig["static_original"]),"second original changed")
+            for kind,rc in orig["live_native_checks"].items():
+                obs=doc("P/consumers/"+label+"/"+kind.replace("/","-")+".json")
+                need(obs["status"]==rc and obs["successful_input_opens"]>0,"earlier native compiler return")
+                if kind=="archive/positive":need(obs["product"]==orig["augmented_old_3"],"prior physical image")
+            all_witness[label]=w;states[label]=st
+    result={}
+    for edge,prior in fixed["strict_three_priorities"].items():
+        a,b=edge.split("--");left,right=all_witness[a],all_witness[b]
+        need(sum(x!=y for x,y in zip(left[1],right[1]))==prior["raw_changed_bytes"],"changed archived byte count")
+        rebuilt=v.compare("measured-final","empty",states[a],states[b],left,right)
+        result[edge]={"original_three_verdict":prior["accepted"],"raw_changed_bytes":prior["raw_changed_bytes"],"bidirectional":rebuilt}
+    return {"previous_head":fixed["head"],"original_qualified_roles":[],"old_compiler_completed_native_visits":len(states),"actual":result}
+
 
 def crate_specs(kernel):
     def allvals(args,p):return [a for a in args if a.startswith(p)]
@@ -122,6 +173,11 @@ def work():
     check_ref();hand=json.loads((OUT/"custody.json").read_bytes());r.census.qualify.rt.SDK=restore.SDK
     hand["drivers"]=hand["guard"]["drivers"];hand["aware_cargo"]=hand["guard"]["cargos"]["aware"]
     env=r.prepare()
+    nodes=(r.R/"crates/ruff_python_ast/src/nodes.rs").read_bytes()
+    save(OUT/"finite-source.json",source_proof(nodes))
+    (OUT/"nodes.rs.gz").write_bytes(gzip.compress(nodes,mtime=0))
+    prior=json.loads((HERE/"historical-second-empty.json").read_bytes())
+    save(OUT/"reopened-second-empty.json",earlier_second_empty(STORE/"previous-complete-parent.zip",prior))
     need(set(env)==measure.EXPECTED_ENV and env["CARGO_NET_OFFLINE"]=="true" and "CI" not in env,"ordinary environment")
     scratch=r.W/"opaque-consumer";sources=consumer.setup(scratch,S/"ohm-musl-ast/client.rs");save(OUT/"sources.json",sources)
     trace=r.W/"opaque-traces";trace.mkdir();pool=TMP/"native-closure-content"
@@ -152,13 +208,10 @@ def work():
                 differences=deps_diff(oldset["old"][0].with_suffix(".rmeta").read_bytes(),training[0].with_suffix(".rmeta").read_bytes())
                 save(d/"historical-five-inputs.json",differences)
             if label in ("measured-final","empty1","empty2"):measure.park(r,role,label)
-        comparisons={}
-        for label,a,b in (("edit-to-repeat","edit","measured-final"),("warm-to-empty1","measured-final","empty1"),("warm-to-empty2","measured-final","empty2"),("clean-to-clean","empty1","empty2")):
-            comparisons[label]=compare_here(proof,states,a,b,"measured-final","empty")
-        save(d/"same-installation-comparisons.json",comparisons)
         for lab,z in samples.items():same(z,samples["old" if lab=="old" else "empty1"],lab)
         need(samples["old"]["archive/positive"]["product"]!=samples["empty1"]["archive/positive"]["product"],"historical visitor edit disappeared")
-        all_roles[role]={"frame":frame,"states":states,"samples":samples,"frozen":frozen,"comparisons":{k:j["strict_differences"] for k,j in comparisons.items()},"mixed":wrong["code"],"five":differences["five"]}
+        all_roles[role]={"frame":frame,"states":states,"samples":samples,"frozen":frozen,"mixed":wrong["code"],"five":differences["five"]}
+        save(d/"all-five-live-downstream.json",{"driver":frame,"states":{k:{"rmeta":s["rmeta"],"rlib":s["rlib"]} for k,s in states.items()},"source_visits":{k:{n:q["status"] for n,q in z.items()} for k,z in samples.items()}})
     final={}
     for role in "PC":
         info=all_roles[role];d=OUT/role;(d/"restored").mkdir();tools=measure.activate(restore,role,hand,d/"restored")
@@ -178,9 +231,19 @@ def work():
            "independently_reopened":independent,"old_augmented_elf":info["samples"]["old"]["archive/positive"]["product"],
            "corrected_augmented_elf":info["samples"]["empty1"]["archive/positive"]["product"],"driver":fr,
            "historical_mixed_diagnostic":info["mixed"],"historical_mixed_hashes":info["five"],
-           "one_foreign_dependency_rejected":closed["rejected"]["code"],"one_foreign_dependency_repaired":closed["restored"],"comparisons":info["comparisons"]}
-        save(d/"terminal.json",j);final[role]=j
+           "one_foreign_dependency_rejected":closed["rejected"]["code"],"one_foreign_dependency_repaired":closed["restored"]}
+        save(d/"all-five-independently-restored.json",j)
+        final[role]=j
     need(all(final["P"][k]==final["C"][k] for k in ("old_augmented_elf","corrected_augmented_elf")),"cross-role semantic ELF")
+    # Both native positive and adverse histories survive a later refusal by the exact byte-format verifier.
+    for role in "PC":
+        d=OUT/role;states=all_roles[role]["states"];comparisons={}
+        for label,a,b in (("edit-to-repeat","edit","measured-final"),("warm-to-empty1","measured-final","empty1"),("warm-to-empty2","measured-final","empty2"),("clean-to-clean","empty1","empty2")):
+            comparisons[label]=compare_here(d/"proof",states,a,b,"measured-final","empty")
+            save(d/("bidirectional-"+label+".json"),comparisons[label])
+        save(d/"same-installation-comparisons.json",comparisons)
+        final[role]["comparisons"]={k:j["strict_differences"] for k,j in comparisons.items()}
+        save(d/"terminal.json",final[role])
     save(OUT/"passed.json",final)
 
 if __name__=="__main__":

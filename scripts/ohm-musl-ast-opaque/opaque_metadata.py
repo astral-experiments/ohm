@@ -1,7 +1,7 @@
 """QA decoder for the exact Ruff AST on Ohm d52336754e01.
 
 Decode the fork's metadata table layouts (compiler/rustc_metadata/src/rmeta).
-Only the captured self-borrow of three known impl Iterator methods is movable.
+Only the ten named nodes.rs captured self-borrows in the enrolled source are movable.
 Every byte outside the re-encoded DefIndex-dependent fields stays in place.
 """
 from collections import Counter
@@ -36,9 +36,21 @@ proc_macro""".split()
 KIND = """CrateRoot Impl ForeignMod Use GlobalAsm TypeNs ValueNs MacroNs LifetimeNs Closure Ctor AnonConst
 OpaqueTy OpaqueLifetime AnonAssocTy SyntheticCoroutineBody NestedStatic""".split()
 
-# The byte positions of the full '&self' tokens in the exact nodes.rs.
-# Ruff 93526150df, file SHA-256 4427c5f979dedcd490ef3e02031c1366341eb80de2137ecf3a11bfbc1bef6cba.
-LINES = {52836:1636, 45251:1409, 45514:1414}
+# Each stable path is tied to the exact owner, receiver token and immutable Ruff source.
+NODES_SHA256 = "4427c5f979dedcd490ef3e02031c1366341eb80de2137ecf3a11bfbc1bef6cba"
+CAPTURES = {
+    "0c99f4ef08b3504d": ("Parameters", 125, "iter_non_variadic_params", 3328, 109559),
+    "41b754b8a7e89144": ("BytesLiteralValue", 82, "bytes", 2082, 68702),
+    "a1dc95229fd5234b": ("StringLiteralValue", 67, "chars", 1636, 52836),
+    "7503ca197aa5ef7c": ("InterpolatedStringElements", 55, "literals", 1409, 45251),
+    "6ba6667c4ab0846e": ("InterpolatedStringElements", 55, "interpolations", 1414, 45514),
+    "adfb715dfc7f26d4": ("TStringValue", 44, "elements", 924, 28379),
+    "509d3d60f672e4ed": ("ExprCompare", 2, "iter", 159, 5300),
+    "deb311e9263a3c0a": ("FStringValue", 26, "literals", 608, 18150),
+    "e14ffa155b761e6a": ("FStringValue", 26, "f_strings", 624, 18727),
+    "82cd800d5f969338": ("FStringValue", 26, "elements", 642, 19436),
+}
+LINES = {lo:line for owner, impl, method, line, lo in CAPTURES.values()}
 POINTER_FIELDS = {"def_keys","def_span","def_ident_span"}
 def sha(value):
     return sha256(value).hexdigest()
@@ -75,7 +87,7 @@ class Cursor:
             return Cursor(self.raw, self.uint()).string()
         assert tag == 2
         i = self.uint()
-        return "'_" if i == 56 else f"predefined#{i}"
+        return {56:"'_", 1063:"iter"}.get(i, f"predefined#{i}")
 
 class Table:
     def __init__(self, raw, width, count, position):
@@ -217,19 +229,61 @@ class Metadata:
             self.reverse[h] = (p+8, index)
         assert len(self.reverse) == count
 
-METHODS = {
-    "chars":          ("a1dc95229fd5234b", 67, 1636, 52836),
-    "literals":       ("7503ca197aa5ef7c", 55, 1409, 45251),
-    "interpolations": ("6ba6667c4ab0846e", 55, 1414, 45514),
-}
+def validate_source(nodes):
+    """Tie every recognized lifetime to a distinct receiver in the pinned nodes.rs."""
+    assert sha(nodes) == NODES_SHA256 and len(CAPTURES) == len(LINES) == 10
+    for _, (owner, _, method, line, lo) in CAPTURES.items():
+        assert nodes[lo:lo+5] == b"&self" and nodes.count(b"\n", 0, lo) + 1 == line
+        owner_decl = list(re.finditer(rb"^impl (\w+) \{", nodes[:lo], re.M))[-1].group(1)
+        decl = list(re.finditer(rb"^    pub fn (\w+)\(", nodes[:lo], re.M))[-1]
+        header = nodes[decl.start():nodes.index(b"{", lo)]
+        assert owner_decl.decode() == owner and decl.group(1).decode() == method
+        assert b"-> impl " in header and b"Iterator" in header
+    return NODES_SHA256
+
+
+# These seven are present in this exact crate but never eligible to move.
+EXCLUDED = frozenset("""
+d3cb2ab977013937 08a5653edf8e2595 5cc4a62c4f9d0c25 a8a6736cb3218a67
+a4c3491111a48405 928205b8d050738f e4a3c7db5cdbd1b2
+""".split())
+
+
+def verify_inventory(data):
+    """Recover every opaque lifetime in the crate and identify each enrolled receiver."""
+    assert data.table_count == 18159
+    eligible = {}
+    excluded = set()
+    for h, (_, i) in data.reverse.items():
+        if data.defkey(i)[1] != "OpaqueLifetime":
+            continue
+        key = h.hex()
+        path = data.path(i)
+        if key in EXCLUDED:
+            assert path[1][1] != "nodes"
+            excluded.add(key)
+            continue
+        owner, impl, method, line, lo = CAPTURES[key]
+        assert path == [("CrateRoot","",0), ("TypeNs","nodes",0), ("Impl","",impl),
+                        ("ValueNs",method,0), ("OpaqueTy","",0), ("OpaqueLifetime","'_",0)]
+        assert data.tables["def_kind"].get(i) == bytes([25])
+        for name in ("def_span","def_ident_span"):
+            _, pos = data.span(i, name)
+            assert (pos["nodes_line"], pos["lo"], pos["hi"]) == (line, lo, lo + 1)
+        eligible[i] = key
+    assert set(eligible) == set(range(18149, 18159)) and set(eligible.values()) == CAPTURES.keys()
+    assert excluded == EXCLUDED
+    return eligible
+
 
 def canonical(raw):
-    """Sort three captured lifetimes by stable path, re-encoding every positional reference."""
+    """Put the ten source-validated captures in stable order and re-encode positional fields."""
     data = Metadata(raw)
     data.indices()
+    verify_inventory(data)
     rows = {}
     positions = set()
-    for method, (hex_hash, impl, line, column_in_file) in METHODS.items():
+    for hex_hash, (owner, impl, method, line, column_in_file) in CAPTURES.items():
         h = bytes.fromhex(hex_hash)
         bucket, index = data.reverse[h]
         path = data.path(index)
@@ -283,6 +337,8 @@ def prove_permutation(before, after):
     a, b = Metadata(before), Metadata(after)
     a.indices()
     b.indices()
+    verify_inventory(a)
+    verify_inventory(b)
     assert (a.root, a.table_count, a.stable_crate_id, a.crate_hashes, a.global_fingerprint) == (
         b.root, b.table_count, b.stable_crate_id, b.crate_hashes, b.global_fingerprint)
     assert a.reverse.keys() == b.reverse.keys()
@@ -309,8 +365,8 @@ def prove_permutation(before, after):
         path = a.path(source_index)
         assert path == b.path(dest_index)
         method = path[-3][1]
-        _stable, impl, line, lo = METHODS[method]
-        assert h.hex() == _stable
+        owner, impl, enrolled_method, line, lo = CAPTURES[h.hex()]
+        assert method == enrolled_method
         assert path == [("CrateRoot","",0), ("TypeNs","nodes",0), ("Impl","",impl),
                         ("ValueNs",method,0), ("OpaqueTy","",0), ("OpaqueLifetime","'_",0)]
         akey, bkey = a.defkey(source_index), b.defkey(dest_index)
@@ -336,7 +392,7 @@ def prove_permutation(before, after):
             displacement = new - description["direct_offset"]
             write((new, new_bytes), before[old:old+1]+displacement.to_bytes(new_bytes-1,"little"), field)
             spans[field] = description
-        rows.append({"method":method, "from":source_index, "to":dest_index, "stable_hash_bytes":h.hex(),
+        rows.append({"owner":owner, "method":method, "from":source_index, "to":dest_index, "stable_hash_bytes":h.hex(),
                      "public_fingerprint":fingerprint[1:].hex(), "span":spans["def_span"]})
     if draft != after:
         first = next(i for i, (v, w) in enumerate(zip(draft, after)) if v != w)

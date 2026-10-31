@@ -7,7 +7,7 @@ from clocked import require,sha
 from verified_state import compare,witness
 
 LABS=("old","edit","measured-final","empty1","empty2")
-MODES=(("metadata","positive"),("metadata","chars"),("metadata","literals"),("metadata","interpolations"),("archive","positive"))
+MODES=(("metadata","positive"),*(("metadata",m) for m in consumer.BAD),("archive","positive"))
 
 
 def run_image(raw,want):
@@ -50,6 +50,12 @@ def verify(source,expected_head=None):
         require(z.testzip() is None and len(z.namelist())==len(set(z.namelist())),"native source ZIP")
         read=lambda p:json.loads(z.read(p))
         raw=lambda p:gzip.decompress(z.read(p))
+        source=gate.source_proof(raw("nodes.rs.gz"));require(source==read("finite-source.json"),"changed actual nodes.rs or finite decoder")
+        prior=read("reopened-second-empty.json");fixed=json.loads((HERE/"historical-second-empty.json").read_bytes())
+        require(prior["previous_head"]==fixed["head"] and not prior["original_qualified_roles"] and prior["old_compiler_completed_native_visits"]==5,"incorrect historical result")
+        for edge,o in fixed["strict_three_priorities"].items():
+            item=prior["actual"][edge];l,r=edge.split("--");b=item["bidirectional"]
+            require(item["original_three_verdict"]==o["accepted"] and item["raw_changed_bytes"]==o["raw_changed_bytes"] and b["forward"]["reencoded_ar"]==fixed["visits"][r]["rlib"] and b["reverse"]["reencoded_ar"]==fixed["visits"][l]["rlib"],"prior archive commitment")
         final=read("passed.json");custody=read("custody.json")
         require(set(final)=={"P","C"} and (not expected_head or custody["workflow"]==expected_head),"unregistered result")
         output={}
@@ -102,7 +108,7 @@ def verify(source,expected_head=None):
                                 run_image(image,text)
                         else:
                             require(info["status"]==1 and len(es)==1 and es[0]["message"]=="lifetime may not live long enough","incorrect lifetime error")
-                            ss=[p for p in es[0]["spans"] if p["is_primary"]];require(len(ss)==1 and ss[0]["line_start"]==3 and ss[0]["column_start"]==5 and ss[0]["label"]=="returning this value requires that `'a` must outlive `'static`" and ss[0]["text"][0]["text"].strip()=="Box::new(x."+label+"())","wrong escaped lifetime")
+                            ss=[p for p in es[0]["spans"] if p["is_primary"]];require(len(ss)==1 and ss[0]["line_start"]==3 and ss[0]["column_start"]==5 and ss[0]["label"]=="returning this value requires that `'a` must outlive `'static`" and ss[0]["text"][0]["text"].strip()=="Box::new(x."+consumer.BAD[label][2]+"())","wrong escaped lifetime")
                         native_visits+=1
                 actual_units[lab]=len(units);input_counts[lab]=len(inp["regular_files"]);restores[lab]=len(recv)
             for name,left,right in (("edit-to-repeat","edit","measured-final"),("warm-to-empty1","measured-final","empty1"),("warm-to-empty2","measured-final","empty2"),("clean-to-clean","empty1","empty2")):
@@ -116,7 +122,7 @@ def verify(source,expected_head=None):
             original=read(role+"/literally-reopened-historical-elfs.json");require(original["old"]["stdout"]==gate.r.WANT["old"] and original["empty"]==original["measured-final"] and original["empty"]["stdout"]==gate.r.WANT["new"],"historical actual ELF result")
             output[role]={"full_compilers":actual_units,"opened_file_identities":input_counts,"independently_restored_files":restores,"typed_or_linked_native_visits":native_visits,"actual_process_groups":traces,"valid_old":own_elf["old"],"valid_corrected":own_elf["empty1"],"historic_mismatched_five":mismatch["five"],"negative_then_repair":True}
         require(output["P"]["valid_old"]==output["C"]["valid_old"] and output["P"]["valid_corrected"]==output["C"]["valid_corrected"],"different real outcomes")
-        return {"accepted":True,"run_head":custody["workflow"],"roles":output}
+        return {"accepted":True,"run_head":custody["workflow"],"finite_source":source,"roles":output}
 
 if __name__=="__main__":
     if len(sys.argv)==4 and sys.argv[1]=="previous":

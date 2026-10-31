@@ -1,4 +1,4 @@
-"""Rebuild both original archives, including rustc's three source-bound opaque lifetime identities."""
+"""Rebuild both original archives, including rustc's ten source-bound opaque receiver captures."""
 import gzip
 import json
 from pathlib import Path
@@ -54,6 +54,7 @@ def witness(manifest, read):
     meta = read(manifest["separate_rmeta"])
     require(sha(meta) == manifest["separate_rmeta"], "separate rustc rmeta SHA")
     summary = products.normalized_archive(raw)
+    require(len(summary["ordered_objects"]) == 95, "changed native CGU count")
     start = 8
     offset = None
     for name, header, part in member_readback.archive(raw):
