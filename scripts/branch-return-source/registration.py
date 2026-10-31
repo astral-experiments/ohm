@@ -1,6 +1,9 @@
 """Authenticate the source trees and immutable GitHub donor on a new QA worker."""
 import hashlib
+import gzip
 import json
+import os
+import tempfile
 import subprocess
 import sys
 import zipfile
@@ -35,15 +38,47 @@ def write(path, value):
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
-def git(repo, *args, data=None):
-    return subprocess.check_output(["git", "-C", repo, *args], input=data)
+def git(repo, *args, data=None, env=None):
+    return subprocess.check_output(["git", "-C", repo, *args], input=data, env=env)
 
 
 def rev(repo, value):
     return git(repo, "rev-parse", value).decode().strip()
 
 
-def source(repo, install):
+def identity_delta(repo, left, right):
+    raw=git(repo,"diff-tree","-r","--raw","-z","--no-abbrev","--no-renames",left,right)
+    parts=raw.split(b"\0");need(parts.pop()==b"" and len(parts)%2==0,"invalid binary diff-tree")
+    rows=[]
+    for header, name in zip(parts[::2],parts[1::2],strict=True):
+        a,b,old,new,status=header.decode("ascii").split()
+        row={"path":name.decode("utf-8"),"change":status}
+        for key,mode,oid in (("old",a[1:],old),("new",b,new)):
+            if oid=="0"*40:
+                need(mode=="000000","missing-side mode")
+                row[key]=None
+            else:
+                data=git(repo,"cat-file","blob",oid)
+                need(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()==oid,"invalid Git blob")
+                row[key]={"mode":mode,"oid":oid,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest()}
+        rows.append(row)
+    return {"raw_sha256":hashlib.sha256(raw).hexdigest(),"rows":rows}
+
+
+def exact_patch(repo, left, right, patch):
+    with tempfile.TemporaryDirectory() as d:
+        env=dict(os.environ,GIT_INDEX_FILE=str(Path(d)/"index"))
+        flags=("-c","core.sparseCheckout=false","-c","core.splitIndex=false")
+        git(repo,*flags,"read-tree",left,env=env)
+        args=(*flags,"apply","--cached","--binary","--whitespace=nowarn")
+        git(repo,*args,"--check","-",data=patch,env=env)
+        git(repo,*args,"-",data=patch,env=env)
+        actual=git(repo,*flags,"write-tree",env=env).decode().strip()
+        need(actual==rev(repo,right+"^{tree}"),"original complete patch did not yield the entire intended tree")
+        return actual
+
+
+def source(repo, install, receipt=None):
     reg = SOURCE()
     if install:
         old = HERE.parent / "ohm-packed-ruff/packed-objects.bundle"
@@ -63,10 +98,22 @@ def source(repo, install):
     need(rev(repo, packed+"^") == full, "packed is not the exact reviewed child")
     for newer, older in [(full,old_f),(packed,old_k)]:
         need(git(repo,"diff","--name-only",older,newer).decode().splitlines() == reg["live_only"], "old versus live source")
-    for l, r in [(full, packed), (old_f, old_k)]:
-        diff = git(repo,"diff","--no-renames","--binary","--full-index",l,r)
-        need(hashlib.sha256(diff).hexdigest() == reg["patch_sha256"] and
-             git(repo,"diff","--name-only",l,r).decode().splitlines() == reg["paths"], "nonidentical packed change")
+    patch=gzip.decompress((HERE/"original-full-index.patch.gz").read_bytes())
+    need(hashlib.sha256(patch).hexdigest()==reg["patch_sha256"],"original historical patch changed")
+    expected=json.loads((HERE/"delta.json").read_bytes()); comparisons={}; renders=[]
+    for name,l,r in [("live",full,packed),("historical",old_f,old_k)]:
+        diff=git(repo,"-c","color.ui=false","diff","--no-ext-diff","--no-textconv","--no-renames","--binary","--full-index",l,r)
+        renders.append(diff)
+        ids=identity_delta(repo,l,r)
+        if receipt:
+            (receipt/(name+"-actual-full-index.patch")).write_bytes(diff)
+            write(receipt/(name+"-actual-delta.json"),ids)
+        need(ids==expected and [x["path"] for x in ids["rows"]]==reg["paths"],"foreign changed mode, object, path or blob content")
+        comparisons[name]={"rendered_sha256":hashlib.sha256(diff).hexdigest(),"rendered_size":len(diff),"verified_tree":exact_patch(repo,l,r,patch),"raw_sha256":ids["raw_sha256"]}
+    if receipt:
+        write(receipt/"source-delta-presentation.json",{"historical_reference":reg["patch_sha256"],"pairs":comparisons,
+              "git_version":git(repo,"version").decode().strip(),"attributes":git(repo,"check-attr","--all","--",*reg["paths"]).decode().splitlines()})
+    need(renders[0]==renders[1],"different actual runner full-index diffs")
     need(int(git(repo,"rev-list","--count",packed,"^"+old_k)) == reg["traversable_commits"], "truncated history")
     return reg
 

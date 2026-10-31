@@ -15,3 +15,5 @@ python3 -IB scripts/branch-return-source/restore.py "$TRANSFER" "$K_SDK" K --qa 
 ```
 
 The SDK ZIP contains `F-sdk.tar.zst`, `K-delta.tar.zst` and `manifest.json`. The observations ZIP carries source hashes, original build and named test logs, actual compiler and linker identities, the complete per-file inventories, native observations, real executable outputs and both final restore receipts. A failing job preserves its raw observations separately. The job measures no Ruff workload.
+
+The first source job (41198064217) rejected a Git hunk rendering before compilation. The archived 22,948-byte reference patch is reapplied to both complete parent trees. Admission checks seven exact mode/old/new object identities plus their full byte hashes and requires the live and historic Git renderings to match on the worker. The receipts retain both generated patches and the effective Rust Git attributes.

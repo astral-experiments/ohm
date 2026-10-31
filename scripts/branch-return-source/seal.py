@@ -1,5 +1,6 @@
 """Create the review-only Git child and its role-specific pack in an external object directory."""
 import hashlib
+import gzip
 import json
 import os
 from pathlib import Path
@@ -53,6 +54,7 @@ def seal(repo):
              "required_live_base":LIVE,"patch_sha256":hashlib.sha256(dif).hexdigest(),"paths":s("diff","--name-only",H,O).splitlines(),
              "live_only":live,"historical_bundle_sha256":"5f12c7fed6e3b36fd151d7d498156fcb73fd6b9d2918c8a534071fce413752a9",
              "traversable_commits":int(s("rev-list","--count",child,"^"+O))}
+        (HERE/"original-full-index.patch.gz").write_bytes(gzip.compress(dif,compresslevel=9,mtime=0))
         (HERE/"role-history.pack").write_bytes(pack)
         (HERE/"roles.json").write_text(json.dumps(reg,sort_keys=True,indent=2)+"\n")
         print(json.dumps(reg),flush=True)

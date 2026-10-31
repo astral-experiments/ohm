@@ -111,7 +111,7 @@ def main(trusted):
     # Unmodified checked-in live source materializer is the same as the known successful 3-SDK job.
     from source import live_base
     live_base(repo,b.HERE/"packet")
-    src=reg.source(repo,True);write(rec/"source-transplant.json",src)
+    src=reg.source(repo,True,rec);write(rec/"source-transplant.json",src)
     roles={k:src["roles"][k] for k in ("F","K")};members={};versions=[];changes={}
     bound={"qa":os.environ["GITHUB_SHA"],"run":os.environ["GITHUB_RUN_ID"],"attempt":os.environ["GITHUB_RUN_ATTEMPT"]}
     for role in ("F","K"):
