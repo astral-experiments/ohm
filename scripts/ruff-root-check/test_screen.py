@@ -1,10 +1,12 @@
 import copy
+import base64
+import uuid
 import gzip
 import hashlib
 import json
 import subprocess
 import zipfile
-from unittest.mock import patch
+from unittest.mock import patch,Mock
 import os
 from pathlib import Path
 import sys
@@ -20,6 +22,14 @@ import reopen as v
 import screen as s
 import originals
 import guard
+import boot_identity as boots
+
+
+def authority():
+    def fake_uuid(i):return str(uuid.UUID(int=i))
+    r={p:{"boot":fake_uuid(1000+i),"job":i,"artifact":100+i,"bytes":200,"archive_sha256":"a"*64,
+        "identity_sha256":{n:"b"*64 for n in ("host.json","enrollment.json","meter-ready.json")}} for i,p in enumerate(boots.POSITIONS,1)}
+    return {"repository":boots.REPO,"run":boots.RUN,"head":boots.HEAD,"branch":boots.BRANCH,"attempt":1,"hosts":r}
 
 
 class Gates(unittest.TestCase):
@@ -76,10 +86,19 @@ class Gates(unittest.TestCase):
 
     def test_real_invalid_parser_diagnostic(self):
         p={"reason":"compiler-message","target":{"name":"ruff_python_parser"},"message":{"level":"error","code":{"code":"E0308"},
-           "spans":[{"is_primary":True,"text":[{"text":"const ohm_branch_switch_invalid: () = 1u32;"}]}]}}
-        q.error_check([p])
-        with self.assertRaises(ValueError):q.error_check([p,p])
-        with self.assertRaises(ValueError):q.error_check([p|{"target":{"name":"unrelated"}}])
+           "spans":[{"is_primary":True,"file_name":q.PARSER,"text":[{"text":"const ohm_branch_switch_invalid: () = 1u32;"}]}]}}
+        q.error_check([p],Path("/repo"))
+        with self.assertRaises(ValueError):q.error_check([p,p],Path("/repo"))
+        with self.assertRaises(ValueError):q.error_check([p|{"target":{"name":"unrelated"}}],Path("/repo"))
+        bad=copy.deepcopy(p);bad["message"]["spans"][0]["file_name"]="other/src/lib.rs"
+        with self.assertRaises(ValueError):q.error_check([bad],Path("/repo"))
+        summary={"level":"error","message":"aborting due to 1 previous error","spans":[],"children":[]}
+        q.type_error([p["message"],summary],"ohm_branch_switch_invalid",{q.PARSER})
+        with self.assertRaises(ValueError):q.type_error([p["message"],summary|{"message":"other fatal diagnostic"}],"ohm_branch_switch_invalid",{q.PARSER})
+        with self.assertRaises(ValueError):q.type_error([p["message"]],"ohm_branch_switch_invalid",{"wrong/path.rs"})
+        for dirty in (True,False):
+            row={"parser_sha256":q.PARSER_BYTES[dirty],"status":"M "+q.PARSER if dirty else ""};q.source_check(row,dirty)
+            with self.assertRaises(ValueError):q.source_check(row|{"parser_sha256":q.PARSER_BYTES[not dirty]},dirty)
 
     def test_generated_zip_member_and_source_changes(self):
         with tempfile.TemporaryDirectory() as td:
@@ -114,20 +133,95 @@ class Gates(unittest.TestCase):
         self.assertIn("path: enrolled\n          fetch-depth: 2",workflow)
         self.assertIn("max-parallel: 2",workflow)
 
+    def test_boot_provenance_and_competing_enrollments(self):
+        historical=boots.prior();self.assertEqual(len(historical),66)
+        rs={str(uuid.UUID(int=i)) for i in (1,2)};ledger=authority();self.assertEqual(len(boots.validate(ledger,rs)),12)
+        new=set(json.loads((HERE/"boot-provenance.json").read_bytes())["added"])
+        for b in new|{ledger["hosts"]["12"]["boot"]}:
+            with self.assertRaises(ValueError):boots.validate(ledger,{min(rs),b})
+        for key,val in (("run",999),("attempt",2),("head","x"*40),("hosts",{k:v for k,v in ledger["hosts"].items() if k!="12"})):
+            with self.assertRaises(ValueError):boots.validate(ledger|{key:val},rs)
+        ix=copy.deepcopy(ledger);ix["hosts"]["12"]["artifact"]=ix["hosts"]["01"]["artifact"]
+        with self.assertRaises(ValueError):boots.validate(ix,rs)
+
+    def test_boot_only_reads_no_competing_result(self):
+        p="01";b=authority()['hosts'][p]['boot'];en={'run':boots.RUN,'head':boots.HEAD,'attempt':1,'position':p,'boot':b}
+        with tempfile.TemporaryDirectory() as td:
+            z=Path(td)/'E.zip'
+            with zipfile.ZipFile(z,'w') as w:
+                for name,vv in [('enrollment.json',en),('host.json',{'raw_system':{'/proc/sys/kernel/random/boot_id':b}}),('meter-ready.json',{'boot':b})]:
+                    w.writestr(name,json.dumps(vv))
+                w.writestr('complete.json',b'not an outcome field');w.writestr('clock.json',b'never open')
+            archive={'id':28,'size_in_bytes':z.stat().st_size,'digest':'sha256:'+q.file_sha(z)}
+            original_read=zipfile.ZipFile.read
+            def identity_only(obj,name,*args):
+                self.assertIn(name,('enrollment.json','meter-ready.json','host.json'));return original_read(obj,name,*args)
+            with patch.object(zipfile.ZipFile,'read',identity_only):
+                self.assertEqual(boots.extract(z,{'id':29},archive,p)['boot'],b)
+                with self.assertRaises(ValueError):boots.extract(z,{'id':29},archive,'12')
+                with self.assertRaises(ValueError):boots.extract(z,{'id':29},archive|{'digest':'sha256:'+'0'*64},p)
+
+    def test_full_native_images_and_effective_memory(self):
+        sdk=Path('/sdk');proxy=Path('/home/.cargo/bin/rustup');wild='lib/dist/wild/ld.bfd';d=['bin/cargo','bin/rustc',wild]
+        e=[(1,str(sdk/d[0]),['cargo','check']),(2,str(sdk/d[1]),['rustc','--crate-name','ruff_dev']),
+           (3,str(sdk/d[1]),['rustc','--crate-name','dep','-Zlink-only']),(4,str(sdk/wild),['ld','-o','native']),
+           (5,str(sdk/wild),['ld','--version']),(6,'/usr/bin/ld',['ld','-v']),(7,'random-tool',['tool'])]
+        paths={str(sdk/f):[1,i] for i,f in enumerate(d,100)}|{str(proxy):[1,50],'/usr/bin/ld':[1,60],'random-tool':None}
+        tools={f:['0'*64,*paths[str(sdk/f)]] for f in d};pr={'paths':{str(proxy):[1,50]},'sha256':'1'*64}
+        rek=s.native.read(e,paths,sdk,tools,wild,proxy,pr)
+        self.assertEqual(s.native.counts(rek),{'full':1,'link_only':1,'wild':1,'images':7});self.assertEqual(len(rek['wild_queries']),1);self.assertEqual(len(rek['other_linkers']),1)
+        for key in ('rustcs','wild_processes','other_linkers','wild_queries'):
+            wrong=rek|{key:rek[key][1:]};self.assertNotEqual(wrong,s.native.read(e,paths,sdk,tools,wild,proxy,pr))
+        with self.assertRaises(ValueError):s.native.read(e,{k:v for k,v in paths.items() if k!='random-tool'},sdk,tools,wild,proxy,pr)
+        level={'host_memory':100,'cgroup_remaining':[17],'available_memory':17,'cgroup_leaf':'/group','cgroup_levels':[{'group':'/group','max':20,'current':3},{'group':'/','max':'unlimited-unified-root','current':None}]}
+        self.assertTrue(guard.checked(level));self.assertFalse(guard.checked(level|{'available_memory':100}));self.assertFalse(guard.checked(level|{'cgroup_levels':level['cgroup_levels'][:1]}))
+
+    def test_broken_runtime_guard_stops_only_owned_group(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)/"ohm-branch-object-qa";root.mkdir();(root/'logs').mkdir()
+            child=Mock();child.pid=998877;child.poll.return_value=None;child.wait.side_effect=[subprocess.TimeoutExpired('owned',3),-9]
+            env=os.environ|{'RUNNER_TEMP':td};sample={'host_memory':40<<30,'available_memory':40<<30,'work_free':24<<30,'durable_free':64<<30,
+                'cgroup_remaining':[],'cgroup_leaf':'/','cgroup_levels':[{'group':'/','max':'unlimited-unified-root','current':None}]}
+            with patch.dict(os.environ,env),patch.object(guard,'resources',side_effect=[sample,OSError('lost live memory controller')]), \
+                 patch.object(guard.subprocess,'Popen',return_value=child) as launch,patch.object(guard.os,'killpg') as stop:
+                with self.assertRaises(OSError):guard.main()
+                self.assertTrue(launch.call_args.kwargs['start_new_session']);stop.assert_called_once_with(child.pid,guard.signal.SIGKILL);self.assertEqual(child.wait.call_count,2)
+
+    def test_genuine_metadata_listings(self):
+        c=q.read_gz(HERE/"native-listing-controls.json.gz");self.assertEqual(c["client_codes"]["renamed_reexport"],0)
+        for n,record in c["listings"].items():
+            b=base64.b64decode(record['bytes'] or '');cert=[len(b),hashlib.sha256(b).hexdigest()];out=record['stdout'].encode();err=record['stderr'].encode()
+            if n=='correct':
+                self.assertEqual(q.listing('ruff_linter','libruff_linter.rmeta',cert,out,err,record['status'])['status'],0)
+                for path,body,stderr,code in [('libruff_linter.rmeta',out,b'warning',0),('libruff_linter-0123456789abcdef.rmeta',out,b'',0),
+                                               ('libruff_linter.rmeta',out[:35],b'',0),('libruff_linter.rmeta',out,b'',1)]:
+                    with self.assertRaises(ValueError):q.listing('ruff_linter',path,cert,body,stderr,code)
+            else:
+                with self.assertRaises(ValueError):q.listing('ruff_linter','libruff_linter.rmeta',cert,out,err,record['status'])
+        self.assertIn('ruff_linter',c['listings']['reexport']['stdout']);self.assertIn('name decoy',c['listings']['reexport']['stdout'])
+
+    def test_missing_provider_or_listing(self):
+        with tempfile.TemporaryDirectory() as td:
+            d=Path(td);owners={n:str(d/'target'/('lib'+n+'-0123456789abcdef.rmeta')) for n in graph.PROVIDERS}
+            with self.assertRaises(ValueError):v.reopen_listings(d,owners,{n:{} for n in owners},d,Path('/unreachable/rustc'))
+            with self.assertRaises(ValueError):v.provider_records({'owner':{'providers':owners},'files':{},'providers':{}},[],d,d)
+            for n in owners:(d/(n+'.metadata-listing.gz')).touch()
+            with self.assertRaises(ValueError):v.reopen_listings(d,owners,{n:{} for n in owners},d,Path('/unreachable/rustc'))
+
     def test_pair(self):
         def role(p):
             a={arm:{name:{"instructions":12 if arm=="Foff" else 4} for name,b in s.w.PHASES} for arm in s.ORDERS[p]}
-            return {"position":p,"verified":True,"run":200,"head":"abc","order":s.ORDERS[p],"boot":p,
+            return {"position":p,"verified":True,"run":200,"head":"abc","order":s.ORDERS[p],"boot":str(uuid.UUID(int=int(p))),
                     "calibration":{"cpu":{"model":"X"},"pmu":"Y"},"selection":{"units":564},"all":a}
-        x,y=role("01"),role("02");self.assertTrue(v.decide(x,y)["screen_pass"])
+        x,y=role("01"),role("02");self.assertTrue(v.decide(x,y,authority())["screen_pass"])
         y["all"]["Foff"]["return-A"]["instructions"]=8
-        self.assertFalse(v.decide(x,y)["screen_pass"])
-        with self.assertRaises(ValueError):v.decide(x,role("02")|{"boot":"01"})
-        with self.assertRaises(ValueError):v.decide(x,role("02")|{"run":201})
-        with self.assertRaises(ValueError):v.decide(x,role("02")|{"calibration":{"cpu":{},"pmu":"other"}})
-        with self.assertRaises(ValueError):v.decide(x,role("02")|{"order":s.ORDERS["01"]})
+        self.assertFalse(v.decide(x,y,authority())["screen_pass"])
+        with self.assertRaises(ValueError):v.decide(x,role("02")|{"boot":x["boot"]},authority())
+        with self.assertRaises(ValueError):v.decide(x,role("02")|{"run":201},authority())
+        with self.assertRaises(ValueError):v.decide(x,role("02")|{"calibration":{"cpu":{},"pmu":"other"}},authority())
+        with self.assertRaises(ValueError):v.decide(x,role("02")|{"order":s.ORDERS["01"]},authority())
         y["all"]["Foff"]["return-A"]["instructions"]=True
-        with self.assertRaises(ValueError):v.decide(x,y)
+        with self.assertRaises(ValueError):v.decide(x,y,authority())
 
 
 if __name__=="__main__":

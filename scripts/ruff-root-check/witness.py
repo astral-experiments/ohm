@@ -2,6 +2,7 @@
 import gzip
 import hashlib
 import json
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -35,11 +36,28 @@ def diagnostics(messages):
     return sorted((r for r in messages if r["reason"]=="compiler-message"),key=encoded)
 
 
-def error_check(diags):
-    coded=[r for r in diags if r["message"]["level"]=="error" and r["message"].get("code")]
-    need(len(coded)==1 and coded[0]["target"]["name"]=="ruff_python_parser" and coded[0]["message"]["code"]["code"]=="E0308" and
-         any("ohm_branch_switch_invalid" in t["text"] for s in coded[0]["message"]["spans"] if s["is_primary"] for t in s["text"]),
-         "independent expected primary parser E0308 is missing")
+PARSER="crates/ruff_python_parser/src/lib.rs"
+PARSER_BYTES={False:"ee24a1933840a400c4730778a5c222d30c36d4b1b4f96bd97b502acfc07a4875", True:"3fbac7f54be2b5cd47eee1993f11e6d58724e32301c0ba3e5afb624562283ab5"}
+
+
+def source_check(source,invalid):
+    need(source["parser_sha256"]==PARSER_BYTES[invalid] and source["status"]==("M "+PARSER if invalid else ""),"different actual parser source bytes")
+
+
+def type_error(messages,marker,allowed_paths):
+    errors=[m for m in messages if m['level']=='error'];coded=[m for m in errors if m.get('code')]
+    plain=[m for m in errors if not m.get('code')]
+    need(len(coded)==1 and coded[0]['code']['code']=='E0308' and len(plain)<=1 and
+         all(m.get('message')=='aborting due to 1 previous error' and m.get('spans')==[] and not m.get('children') for m in plain),
+         'unexpected additional compiler error or wrong type diagnosis')
+    primary=[s for s in coded[0]['spans'] if s['is_primary']]
+    need(primary and all(s['file_name'] in allowed_paths for s in primary) and
+         any(marker in text['text'] for s in primary for text in s['text']), 'incorrect primary span or expression')
+
+
+def error_check(diags,cwd):
+    type_error([r['message'] for r in diags],'ohm_branch_switch_invalid',{PARSER,str(cwd/PARSER)})
+    need(all(r['target']['name']=='ruff_python_parser' for r in diags if r['message']['level']=='error'),'unexpected compiler error target')
 
 
 def keep(path, cert, directory):
@@ -118,12 +136,26 @@ def provider_files(mapping,messages,work):
     for name in PROVIDERS:
         wanted=Path(mapping["providers"][name])
         rows=[r for r in messages if r["reason"]=="compiler-artifact" and r["target"]["name"]==name and
-              any(Path(f).samefile(wanted) for f in r["filenames"])]
+              any(Path(f)==wanted and Path(f).samefile(wanted) for f in r["filenames"])]
         need(len(rows)==1,("actual --extern did not match exactly one JSON artifact",name,rows))
         rel,data=file_record(wanted,work)
         need(data[0]>1024,"empty reader input")
         out[name]={"relative":rel,"file":data,"features":rows[0]["features"],"profile":rows[0]["profile"]}
     return out
+
+
+def listing(name, path, body, stdout, stderr, code):
+    """Bind the metadata decoder's own crate header and complete streams to its input file."""
+    need(code==0 and stderr==b"" and body[0]>1024 and re.fullmatch("[0-9a-f]{64}",body[1]),"missing metadata or failed/warning-producing compiler listing")
+    lines=stdout.decode().splitlines()
+    need(len(lines)>12 and lines[0]=="Crate info:" and lines.count("Crate info:")==1 and lines.count("=External Dependencies=")==1 and
+         re.fullmatch(r"name "+re.escape(name)+r"(?:-[0-9a-f]{16})?",lines[1]) and
+         Path(path).name=="lib"+lines[1].removeprefix("name ")+".rmeta" and
+         re.fullmatch(r"private hash [0-9a-f]{32} stable_crate_id StableCrateId\([0-9]+\)",lines[2]) and
+         re.fullmatch(r"public_hash [0-9a-f]{32}",lines[3]) and lines[4:6]==["proc_macro false","triple x86_64-unknown-linux-gnu"],
+         "the selected provider, root header, architecture or dependency listing differs")
+    return {"argv":["rustc","+ohm","-Zls=root",str(path)],"status":code,"input":body,
+            "stdout_sha256":hashlib.sha256(stdout).hexdigest(),"stderr_sha256":hashlib.sha256(stderr).hexdigest()}
 
 
 STUBS={
@@ -188,10 +220,8 @@ def check_client(mapping,branch,env,cwd,private,where):
             shutil.copyfile(out,src_file)
             rows[label]={"status":0,"body":[src_file.stat().st_size,file_sha(src_file)]}
         else:
-            coded=[d for d in js if d.get("code") and d["level"]=="error"]
-            need(len(coded)==1 and coded[0]["code"]["code"]=="E0308" and not out.exists() and
-                 any("EXPRESSION_BYTES" in t["text"] for s in coded[0]["spans"] if s["is_primary"] for t in s["text"]),
-                 "opposite-size metadata was accepted or failed for the wrong reason")
+            need(not out.exists(),"opposite layout unexpectedly emitted a file")
+            type_error(js,"EXPRESSION_BYTES",{str(src)})
             rows[label]={"status":1,"diagnostics":digest(js)}
         (where/(label+".command.json")).write_bytes(encoded({"argv":cmd,"code":r.returncode,"source_sha256":file_sha(src)}))
     return rows

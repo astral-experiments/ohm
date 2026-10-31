@@ -113,7 +113,7 @@ jobs:
         run: |
           set -euo pipefail
           logs="$RUNNER_TEMP/ohm-branch-object-qa/logs"
-          python3 -IB enrolled/scripts/ruff-root-check/reopen.py worker "$logs" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" > "$logs/independent-screen.json"
+          python3 -IB enrolled/scripts/ruff-root-check/reopen.py worker "$logs" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$RUNNER_TEMP/ohm-branch-object-qa/home/.rustup/toolchains/ohm" > "$logs/independent-screen.json"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

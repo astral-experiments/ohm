@@ -38,12 +38,15 @@ def bind(run,jobs,artifacts,run_id,head):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--run',type=int,required=True);p.add_argument('--zip-directory',type=Path,required=True);p.add_argument('--readback-directory',type=Path,required=True)
+    p.add_argument('--corrected-e-originals',type=Path,required=True)
     p.add_argument('--gh',default='gh-auto');args=p.parse_args()
     head=subprocess.check_output(['git','-C',HERE,'rev-parse','HEAD'],text=True).strip()
     need(not subprocess.check_output(['git','-C',HERE,'status','--porcelain','--',HERE]),'reader sources changed')
     def api(resource):
         return json.loads(subprocess.check_output([args.gh,'api',f'repos/{reopen.s.b.REPO}/actions/runs/{args.run}'+resource],cwd=HERE))
     refs=bind(api(''),api('/attempts/1/jobs?per_page=100'),api('/artifacts?per_page=100'),args.run,head)
+    # Seal all competing physical identities before reading a root outcome.
+    competing=reopen.boots.capture(args.corrected_e_originals,args.gh)
     workers=[]
     for pos,r in refs.items():
         z=r['archive'];file=args.zip_directory/f"{args.run}-{z['id']}.zip"
@@ -58,7 +61,7 @@ def main():
         need(local==orig and (orig['run'],orig['head'],orig['position'],orig['boot'])==(args.run,head,pos,en['boot']) and en['attempt']==1 and
              end['qualified'] and end['boot']==orig['boot'] and end['head']==head and end['position']==pos,'independent original readback differs')
         workers.append(local)
-    print(json.dumps({'originals':refs,**reopen.decide(*workers)},sort_keys=True))
+    print(json.dumps({'originals':refs,'corrected_e_identity':competing,**reopen.decide(*workers,competing)},sort_keys=True))
 
 
 if __name__=='__main__':main()

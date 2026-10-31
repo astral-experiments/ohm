@@ -19,6 +19,7 @@ import screen as s
 import graph
 import witness as q
 import guard
+import boot_identity as boots
 from selection import roster
 
 need=graph.need
@@ -35,12 +36,14 @@ def calibrated(logs,calibrator,observers):
 
 
 def client(d, expected, owner, branch, visible):
+    need(set(expected)=={"layout-64","layout-56"},"missing or extra typed-client verdict")
     for size in (64,56):
         label="layout-"+str(size)
         cmd=read(d/(label+".command.json")); args=cmd["argv"]
         need(args[:7]==["rustc","+ohm","--crate-name","root_checked","--crate-type=lib","--edition=2024","--emit=metadata"] and
              args[7]=="--error-format=json" and args[8]==str(visible.parent/"typed-client/reader.rs") and
              args[-2:]==["-o",str(visible.parent/"typed-client/libroot_checked.rmeta")],"changed metadata client")
+        need(args[9:-2]==[v for n in graph.PROVIDERS for v in ("--extern",n+"="+owner["providers"][n])]+[v for opt in owner["search"] for v in ("-L",opt)],"extra or reordered arguments to typecheck")
         externs=[v for i,v in enumerate(args) if i and args[i-1]=="--extern"]
         dirs=[v for i,v in enumerate(args) if i and args[i-1]=="-L"]
         need(externs==[n+"="+owner["providers"][n] for n in graph.PROVIDERS] and dirs==owner["search"],"wrong actual extern")
@@ -53,22 +56,56 @@ def client(d, expected, owner, branch, visible):
                  file.stat().st_size>1024,"changed positive metadata")
         else:
             diag=[json.loads(l) for l in raw.splitlines()]
-            coded=[v for v in diag if v.get("code") and v["level"]=="error"]
-            need(cmd["code"]==1 and len(coded)==1 and coded[0]["code"]["code"]=="E0308" and
-                 any("EXPRESSION_BYTES" in t["text"] for p in coded[0]["spans"] if p["is_primary"] for t in p["text"]) and
-                 expected[label]=={"status":1,"diagnostics":graph.digest(diag)},"different opposite-size rejection")
+            q.type_error(diag,"EXPRESSION_BYTES",{str(visible.parent/"typed-client/reader.rs")})
+            need(cmd["code"]==1 and not (d/(label+".rmeta")).exists() and expected[label]=={"status":1,"diagnostics":graph.digest(diag)},
+                 "different opposite-size rejection")
 
 
-def worker(logs,calibrator,observers):
+def authenticated_sdk(path,manifest):
+    expected=manifest["files"]["F"]
+    actual=s.b.inventory(path)
+    need(len(expected)==81 and {p:[f[0],f[4],f[3]] for p,f in actual.items()}==expected,"independent F metadata decoder is not the complete authenticated SDK")
+    return path/"bin/rustc"
+
+
+def provider_records(observed, messages, directory, visible):
+    own=observed["owner"];records=observed["providers"];files=observed["files"]
+    need(set(records)==set(own["providers"])==set(graph.PROVIDERS),"incomplete or extra observed or physical provider")
+    for cls in graph.PROVIDERS:
+        p=Path(own["providers"][cls]);rel=str(p.relative_to(visible));record=records[cls]
+        matches=[m for m in messages if m["reason"]=="compiler-artifact" and m["target"]["name"]==cls and str(p) in m["filenames"]]
+        need(len(matches)==1 and record=={"relative":rel,"file":files[rel],"features":matches[0]["features"],"profile":matches[0]["profile"]} and
+             p.name.startswith("lib"+cls+"-") and p.suffix==".rmeta" and files[rel][0]>1024 and (directory/(files[rel][1]+".zst")).is_file(),
+             "wrong real provider, feature/profile, path or body")
+
+
+def reopen_listings(d,owners,providers,body_dir,decoder):
+    need(set(owners)==set(providers)==set(graph.PROVIDERS),"listing provider omitted")
+    for pattern in (".metadata-listing.gz",".metadata-listing-stderr.gz",".metadata-command.json"):
+        need({x.name for x in d.glob("*"+pattern)}=={n+pattern for n in graph.PROVIDERS},"absent or unexpected metadata listing files")
+    with tempfile.TemporaryDirectory() as td:
+        for name in graph.PROVIDERS:
+            src=Path(owners[name]);cert=providers[name]["file"];f=Path(td)/src.name
+            raw,err=[gzip.decompress((d/(name+suffix)).read_bytes()) for suffix in (".metadata-listing.gz",".metadata-listing-stderr.gz")]
+            command=read(d/(name+".metadata-command.json"))
+            need(q.listing(name,src,cert,raw,err,command["status"])==command,"original native metadata command or streams differ")
+            with f.open("xb") as dst:subprocess.run(["zstd","-dcq",body_dir/(cert[1]+".zst")],stdout=dst,check=True)
+            need([f.stat().st_size,q.file_sha(f)]==cert,"complete retained metadata input differs")
+            run=subprocess.run([decoder,"-Zls=root",f],env={"PATH":os.defpath,"LC_ALL":"C","LD_LIBRARY_PATH":str(decoder.parent.parent/"lib")},capture_output=True,timeout=120)
+            need((run.returncode,run.stdout,run.stderr)==(command["status"],raw,err),"independent exact F decoder output differs")
+            f.unlink()
+
+
+def worker(logs,calibrator,observers,sdk_path):
     en=read(logs/"enrollment.json");end=read(logs/"complete.json");p=en["position"]
     boot=en["boot"];visible=Path(en["visible_work"])
     need(end["qualified"] and end["head"]==en["head"] and end["position"]==p and end["boot"]==boot and en["attempt"]==1 and
          en["order"]==s.ORDERS[p] and en["argv"]==graph.CARGO and en["plan"]==q.file_sha(HERE/"PLAN.md") and
-         en["selection"]==graph.census(s.EXPECTED) and boot not in read(HERE/"excluded-boots.json"),"different enrollment")
+         en["selection"]==graph.census(s.EXPECTED) and boot not in boots.prior(),"different enrollment")
     admitted=read(logs/"admission-capacity.json")
     capacity=[json.loads(line) for line in (logs/"capacity.jsonl").read_text().splitlines()]
-    need(en["source"]==s.b.spec() and guard.passes(admitted,(12,14,32)) and capacity and
-         all(row["available_memory"]==min([row["host_memory"],*row["cgroup_remaining"]]) and guard.passes(row,(5,3,6)) for row in capacity),
+    need(en["source"]==s.b.spec() and guard.checked(admitted) and guard.passes(admitted,(12,14,32)) and capacity and
+         all(guard.checked(row) and row["cgroup_leaf"]==admitted["cgroup_leaf"] and guard.passes(row,(5,3,6)) for row in capacity),
          "insufficient, missing or inconsistent host resource evidence")
     manifest=read(logs/"sdk/manifest.json");sdk=read(logs/"sdk/F.json");inp=read(logs/"ruff-inputs.json")
     need(q.file_sha(logs/"sdk/manifest.json")==s.b.spec()["manifest"] and read(logs/"source-kit.json")==s.b.spec() and
@@ -77,6 +114,7 @@ def worker(logs,calibrator,observers):
          len(sdk["files"])==81 and sdk["files"][sdk["driver"]][0]=="fe62e729ee976d9b808b4f94f0a9751c7f6d7b2201aecf3636e9eff8acb88273" and
          inp["lock"]=="839edc8250480bb523619b8d24bd57176a6e1f57c152cca85c5adc61ea5f94eb" and len(inp["archives"])==505 and len(inp["changed"])==169,
          "wrong physical tools or historical source")
+    decoder=authenticated_sdk(sdk_path,manifest)
     ready=read(logs/"meter-ready.json");cal=calibrated(logs,calibrator,observers)
     need(cal["boot"]==boot==ready["boot"] and cal["cells"]==28,"wrong or uncalibrated boot")
     need(s.tr.controls(logs/"initial/kernel-events")==read(logs/"initial/kernel-events/calibration.json")["proof"],"native tracer controls")
@@ -103,6 +141,8 @@ def worker(logs,calibrator,observers):
                      cmd["argv"]==graph.CARGO and cmd["env"]==env and source["commit"]==inp["commits"][br] and source["tree"]==inp["trees"][br] and
                      source["registry_lock"]==inp["lock"] and source["status"]==("M crates/ruff_python_parser/src/lib.rs" if rc else ""),
                      "wrong actual source or requested command")
+                q.source_check(source,bool(rc))
+                need(source["branch"]=="refs/heads/"+s.kit.NAMES[br],"different branch identity")
                 stdout,stderr=[gzip.decompress((d/("cargo."+k+".gz")).read_bytes()) for k in ("stdout","stderr")]
                 need(cmd["stdout_sha256"]==hashlib.sha256(stdout).hexdigest() and cmd["stderr_sha256"]==hashlib.sha256(stderr).hexdigest(),"original Cargo bytes")
                 msgs=[json.loads(l) for l in stdout.splitlines()];cwd=Path(cmd["cwd"])
@@ -111,10 +151,12 @@ def worker(logs,calibrator,observers):
                 if lane!="measured":
                     proof,raw,_=s.tr.checked_replay(d);phys=read(d/"native-execs.json.gz")
                     import io
-                    installed={(pid,exe,tuple(argv)) for pid,exe,argv in s.w.processes.execs(io.StringIO(raw.decode()))}
-                    need(not (d/"clock.json").exists() and not r["instructions"] and proof["installed_images"]==phys["successful_exec_count"] and
-                         phys["cargos"][0]["argv"][1:]==graph.CARGO[2:] and all((k["pid"],k["exe"],tuple(k["argv"])) in installed
-                         for k in [*phys["cargos"],*phys["rustcs"],*phys["wild_processes"],*phys["other_linkers"]]),"wrong native trace")
+                    events=s.w.processes.execs(io.StringIO(raw.decode()))
+                    identities=read(d/"exec-inodes.json.gz");native=s.native.read(events,identities,Path(role["sdk"]),role["files"],s.b.WILD,
+                       visible.parent/"home/.cargo/bin/rustup",read(logs/"sdk/proxy.json"))
+                    need(not (d/"clock.json").exists() and not r["instructions"] and proof["installed_images"]==len(events) and
+                         native==phys and phys["cargos"][0]["argv"][1:]==graph.CARGO[2:] and s.native.counts(native)==r["execs"],
+                         "missing, extra or wrongly classified physical compiler, query, linker or image count")
                     counts["traced"]+=1
                     if lane=="structure":structure[name]=r["execs"]
                 else:
@@ -132,11 +174,11 @@ def worker(logs,calibrator,observers):
                 need(512*sum(pairs.values())==read(d/"storage.json")["allocated"]==r["allocated"],"unreconciled physical allocation")
                 diag=q.diagnostics(msgs)
                 if rc:
-                    q.error_check(diag)
+                    q.error_check(diag,cwd)
                     need(read(d/"observed-errors.json.gz")==diag and errors.setdefault(arm,diag)==diag,"different genuine compiler diagnostic")
                     continue
                 orig=read(d/"observed.json.gz");files=orig["files"]
-                need(graph.typed_graph(msgs,s.EXPECTED,cwd)==orig["units"] and
+                need(all(m["filenames"] for m in msgs if m["reason"]=="compiler-artifact") and graph.typed_graph(msgs,s.EXPECTED,cwd)==orig["units"] and
                      set(files)=={str(Path(p).relative_to(visible)) for m in msgs if m["reason"]=="compiler-artifact" for p in m["filenames"]}|{orig["typeshed_file"]} and
                      orig["diagnostics"]==diag and read(d/"differences.json.gz")=={},"incomplete files, warning stream or raw product difference")
                 typed,dirty=roster(msgs,cwd)
@@ -146,13 +188,11 @@ def worker(logs,calibrator,observers):
                      reported=={p:f for p,f in files.items() if p!=orig["typeshed_file"]} and
                      all(Path(p).parts[0] in ("build","target") and ".." not in Path(p).parts for p in files),"edited typed roster or unbound recorded file")
                 own=orig["owner"]
-                if phys and any(row["crate"]=="ruff_dev" and row["mode"]=="full" for row in phys["rustcs"]):
-                    need(s.q.owner(phys,cwd,visible,arm)==own,"unbound real ruff_dev owner")
-                for cls,prov in orig["providers"].items():
-                    a=Path(own["providers"][cls]); rel=str(a.relative_to(visible))
-                    need(prov["relative"]==rel and prov["file"]==files[rel] and (logs/"complete-bodies"/(files[rel][1]+".zst")).is_file() and
-                         sum(a.as_posix() in m["filenames"] for m in msgs if m["reason"]=="compiler-artifact" and m["target"]["name"]==cls)==1,
-                         "different real provider")
+                is_reference=lane=="empty" and name in {"A","B"}
+                if is_reference or (phys and any(row["crate"]=="ruff_dev" and row["mode"]=="full" for row in phys["rustcs"])):
+                    need(phys and s.q.owner(phys,cwd,visible,arm)==own,"absent or unbound actual dirty ruff_dev compiler")
+                provider_records(orig,msgs,logs/"complete-bodies",visible)
+                if is_reference:reopen_listings(d,own["providers"],orig["providers"],logs/"complete-bodies",decoder)
                 zip_hash=files[orig["typeshed_file"]][1]
                 if zip_hash not in zips:
                     with tempfile.TemporaryDirectory() as td:
@@ -173,12 +213,12 @@ def worker(logs,calibrator,observers):
             "calibration":cal,"storage_mode":(logs/"storage-mode.txt").read_text().strip(),"resource_minima":{k:min(row[k] for row in capacity) for k in ("available_memory","work_free","durable_free")},"selection":en["selection"],"counts":dict(counts),"native":structure,"all":actual}
 
 
-def decide(first,second):
+def decide(first,second,e_ledger):
     by={r["position"]:r for r in (first,second)}
     need(set(by)==set(s.ORDERS) and len({r["boot"] for r in by.values()})==2 and len({(r["run"],r["head"]) for r in by.values()})==1 and
          len({graph.digest(r["selection"]) for r in by.values()})==1 and
          len({graph.digest([r["calibration"]["cpu"],r["calibration"]["pmu"]]) for r in by.values()})==1 and all(r["verified"] and r["order"]==s.ORDERS[p] for p,r in by.items()),"not two mirrored fresh hosts")
-    need(not {r["boot"] for r in by.values()}.intersection(read(HERE/"excluded-boots.json")),"a previous experiment installation was reused")
+    e_boot_ids=boots.validate(e_ledger,{r["boot"] for r in by.values()})
     rows={}
     for p,r in sorted(by.items()):
         values={name:[r["all"][a][name]["instructions"] for a in ("Foff","Fon")] for name,br in s.w.PHASES}
@@ -187,13 +227,10 @@ def decide(first,second):
                           ("cold-through-returns",("cold-A","first-B","return-A","return-B")),("all-seven",tuple(values))):
             values[name]=[sum(values[k][i] for k in what) for i in (0,1)]
         rows[p]={"per_phase_clock_and_allocation":r["all"],"raw":values,"off_on":{k:float(Fraction(*v)) for k,v in values.items()}}
-    return {"screen_pass":all(x["raw"][n][0]>2*x["raw"][n][1] for x in rows.values() for n in ("return-A","return-B","both-returns")),"hosts":rows}
+    return {"disjoint_prior_boots":len(boots.prior()),"disjoint_corrected_E_run":boots.RUN,"disjoint_corrected_E_boots":len(e_boot_ids),"screen_pass":all(x["raw"][n][0]>2*x["raw"][n][1] for x in rows.values() for n in ("return-A","return-B","both-returns")),"hosts":rows}
 
 
 if __name__=="__main__":
-    p=argparse.ArgumentParser();sub=p.add_subparsers(dest="mode",required=True)
-    for n,fields in (("worker",("logs","calibrator","observers")),("pair",("first","second"))):
-        x=sub.add_parser(n)
-        for f in fields:x.add_argument(f,type=Path)
-    a=p.parse_args()
-    print(json.dumps(worker(a.logs,a.calibrator,a.observers) if a.mode=="worker" else decide(read(a.first),read(a.second)),sort_keys=True))
+    p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest="mode",required=True)
+    x=sub.add_parser("worker");x.add_argument("logs",type=Path);x.add_argument("calibrator",type=Path);x.add_argument("observers",type=Path);x.add_argument("sdk",type=Path)
+    a=p.parse_args();print(json.dumps(worker(a.logs,a.calibrator,a.observers,a.sdk.resolve()),sort_keys=True))

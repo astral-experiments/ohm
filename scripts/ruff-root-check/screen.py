@@ -11,6 +11,7 @@ import traceback
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import graph
+import boot_identity
 sys.path.insert(0,str(HERE.parent/"ruff-integration-structure"))
 import witness as q
 
@@ -19,6 +20,7 @@ sys.path.insert(0,str(IPMU))
 import trace_events as tr
 
 w=tr.w
+import native_roles as native
 b,kit=w.b,w.kit
 need,save=b.need,b.save
 OUT,WORK,ROOT=b.OUT,b.WORK,b.ROOT
@@ -61,6 +63,9 @@ def traced(where,env,arm,rc):
     code,out,err,_=tr.capture(COMMAND,env,kit.TREE,where,record=record)
     need(code==rc,("real traced Cargo exit",code,rc,err[-1000:]))
     try:
+        with (where/"exec.raw").open() as f:images=w.processes.execs(f)
+        identities=native.capture(images,b.PROXIES/"rustup")
+        w.publish(where/"exec-inodes.json.gz",identities)
         physical=w.processes.inventory(where/"exec.raw",arm)
         need(physical["cargos"][0]["argv"][1:]==COMMAND[2:],"real Cargo selector")
         w.publish(where/"native-execs.json.gz",physical)
@@ -88,7 +93,8 @@ def valid(messages,physical,arm,branch,env,where,ref):
             r=subprocess.run(["rustc","+ohm","-Zls=root",mapping["providers"][name]],cwd=kit.TREE,env=env,capture_output=True,timeout=60)
             q.write_gz(where/(name+".metadata-listing.gz"),r.stdout)
             q.write_gz(where/(name+".metadata-listing-stderr.gz"),r.stderr)
-            need(r.returncode==0 and name.encode() in r.stdout,"unreadable original compiler metadata")
+            cert=q.listing(name,mapping["providers"][name],providers[name]["file"],r.stdout,r.stderr,r.returncode)
+            save(where/(name+".metadata-command.json"),cert)
     for item in providers.values():q.keep(WORK/item["relative"],item["file"],KEPT)
     rel,cert,typeshed=q.typeshed(messages,WORK,kit.TREE,where)
     files[rel]=cert
@@ -122,6 +128,7 @@ def visit(arm,phase,branch,env,where,lane,refs,invalid):
     if phase=="repair":
         w.failed_session.before_repair(WORK,json.loads((where.parent/"invalid/working.json").read_bytes()),where/"failed-session-grace.json")
     w.checked_source(phase,branch,where)
+    q.source_check(json.loads((where/"source.json").read_bytes()),phase=="invalid")
     rc=101 if phase=="invalid" else 0
     tick=time.monotonic_ns()
     if lane=="measured":
@@ -136,7 +143,7 @@ def visit(arm,phase,branch,env,where,lane,refs,invalid):
     usage=w.disk.allocated(WORK/"target",WORK/"build",where,failed_sessions=abandoned)
     if rc:
         save(where/"working.json",abandoned)
-        diags=q.diagnostics(msgs);q.error_check(diags)
+        diags=q.diagnostics(msgs);q.error_check(diags,kit.TREE)
         w.publish(where/"observed-errors.json.gz",diags)
         ok=(diags==invalid[arm]) if arm in invalid else True
         if arm not in invalid:invalid[arm]=diags
@@ -151,9 +158,7 @@ def visit(arm,phase,branch,env,where,lane,refs,invalid):
     result={"arm":arm,"phase":phase,"branch":branch,"lane":lane,"exit":rc,"instructions":ins,"pass":ok,
             "allocated":usage["allocated"],"resources":before,"products":record,"before_cargo":tick,"after_cargo":after,
             "after_output_checks":time.monotonic_ns()}
-    if physical:result["execs"]={"full":sum(r["mode"]=="full" for r in physical["rustcs"]),
-                                "link_only":sum(r["mode"]=="link-only" for r in physical["rustcs"]),
-                                "wild":physical["wild"],"images":physical["successful_exec_count"]}
+    if physical:result["execs"]=native.counts(physical)
     save(where/"visit.json",result)
     print(arm,phase,lane,"validated" if ok else "output differs from empty",flush=True)
     return result
@@ -163,7 +168,7 @@ def main(position,source,calibrator,observers):
     head=os.environ["GITHUB_SHA"]
     need(os.environ["GITHUB_REPOSITORY"]==b.REPO and os.environ["GITHUB_REF"]=="refs/heads/"+BRANCH and
          os.environ["GITHUB_RUN_ATTEMPT"]=="1" and os.environ["REVIEWED_HEAD"]==head==b.git(HERE,"rev-parse","HEAD"),"wrong source admission")
-    need(b.git(HERE,"rev-parse","HEAD^")=="679e72fedd4968636469d958c38225c0ce3fefab" and
+    need(b.git(HERE,"rev-parse","HEAD^")=="6b377bea5f032f0e47877b48235cdbeb71daeb08" and
          b.git(HERE,"rev-parse","HEAD:scripts/ruff-integration-pmu","HEAD:scripts/branch-return-pmu","HEAD:scripts/ohm-packed-ruff").splitlines()==
          ["1c117c3853e7bf3906922f5aac040673bed0087a","8036cb549845a905ab83882f5b01766229e0e636","d9fd6c8e4152d468a3a40d600ee1c6ebda13e5f2"],"changed independent capture sources")
     need(shutil.disk_usage(OUT).free>=32*2**30 and shutil.disk_usage(WORK).free>=14*2**30 and
@@ -175,7 +180,7 @@ def main(position,source,calibrator,observers):
     shutil.copyfile(b.RUNTIME,OUT/"source-kit.json")
     subprocess.run([sys.executable,"-IB",HERE.parent/"branch-return-pmu/meter.py",calibrator,observers],check=True)
     meter=json.loads((OUT/"meter-ready.json").read_bytes())
-    need(meter["boot"] not in json.loads((HERE/"excluded-boots.json").read_bytes()),"previous physical worker")
+    need(meter["boot"] not in boot_identity.prior(),"previous physical worker")
     os.sched_setaffinity(0,meter["affinity"])
     save(OUT/"enrollment.json",{"head":head,"run":int(os.environ["GITHUB_RUN_ID"]),"attempt":1,"position":position,"order":order,"boot":meter["boot"],
          "argv":COMMAND,"selection":graph.census(EXPECTED),"plan":b.sha(HERE/"PLAN.md"),"source":b.spec(),"visible_work":str(WORK)})
