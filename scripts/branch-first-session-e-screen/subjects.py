@@ -10,8 +10,9 @@ import subprocess
 import zipfile
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent / "branch-return-pmu"))
+sys.path[:0] = [str(HERE), str(HERE.parent / "branch-return-pmu")]
 import bindings as b
+import source_media
 
 ORDERS = {"01": ("Eoff", "Kon", "Eon"), "02": ("Eon", "Kon", "Eoff")}
 BASE_COMMIT = "0afbeff303d3658bff52582d8f1a996d59e6c8ce"
@@ -141,6 +142,8 @@ def acquire(source):
             dir_ / "official-E",
         )
     )
+    actual, identities = source_media.corrected(actual, e_archive)
+    b.save(dir_ / "native-media-identities.json", identities)
     b.need(actual == e, "different source job or original qualification evidence")
     capsule = b.ROOT / "E-transfer"
     capsule.mkdir()

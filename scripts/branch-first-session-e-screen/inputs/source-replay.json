@@ -1,1 +1,341 @@
-null
+{
+  "actual_native_test_logs_sha256": {
+    "incremental-directory-copy": "4b54e31ceccedf660caa918dc8561a9f20fff89592d360744c246495af615de1",
+    "incremental-session-fail": "39f800a0e8a418b544dab5f94eabc7aedf46dd698655e304130f74ec3a869c85",
+    "ohm-branch-cache-opt-out": "979549e4a2d881091e03c7854f7c4c8b13c8a8d278323f497ace44797361d209",
+    "ohm-checked-dep-info": "41c9e6e7d9634372b879fc5860f87901623df48113e428c1b9cfefd0d7b6497c",
+    "ohm-packed-branch-cache": "a5a74b434a4b79169d386a90475234d5c1b4959cb676862bc11e7899f5dd8282",
+    "ohm-relink-assembler-inputs": "353c971c5cc6914befd805b199494a2bf3533925a957baaefec06b922c6317c1",
+    "ohm-relink-incremental-objects": "f469ed936b415a30fa53841044d800c334cb7b8de647b6d411fbeb17e8c22f9f",
+    "rustc_fs_util": "dc6775cca163740a8d624e1cebe3e9e7215c61e5314d57d1835532ea6f7bb730",
+    "rustc_fs_util-doc": "fce6c7fd6168f8bd4b0bef9d5292d829014e67d496b366e6543837775a6351d7",
+    "rustc_incremental": "1e7b71b8b7c4962f0b8cda52bcece8a94e4cdeca373bc0d040ad294e2bcb2af5",
+    "rustc_incremental-doc": "fe995f58468d48d3225dae523f45e3e0ae5e3f9ef332022a444c6078922c086d"
+  },
+  "cross_readers": {
+    "E-cold-A-to-K": {
+      "cold_representation": "packed",
+      "consumer": "K",
+      "first_B": "4355b8c804ee84a33ab4ada37c5b3cec9897bcb89831aca70bb9587fbade75ac",
+      "immediate_cold_read": true,
+      "own_empty_elf": "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb",
+      "producer": "E",
+      "representation": "packed",
+      "return_elf": "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb",
+      "source_tables": {
+        "dep-graph.bin": {
+          "bytes": 496216,
+          "decoded_bytes": 1210769,
+          "decoded_sha256": "1252acbac52b7bf9150bc47c232ac2aaa41ad1d0ab0f2798b7d4c2f634815d79",
+          "dev": 33,
+          "ino": 8237223,
+          "path": "/tmp/ohm-gnu-renderer-source-native/cross-reader-work/cache/cross_branch_tables-2kwtlb8w7syw1/s-hnqcvvsx8w-_6ef8ed6e98236c69_0mzcfxz-31evhmblz2w5hib4who96jeum/ohm-packed-dep-graph.bin",
+          "sha256": "9ce3e84570595b5d3b9225b6ea23ef0335e42892f622286681c7cddba634b096"
+        },
+        "query-cache.bin": {
+          "bytes": 67029,
+          "decoded_bytes": 188615,
+          "decoded_sha256": "a824825bf38b3f4664d75bc2f338a9e8b962d25478814f7ad1c7d3613df7c3e1",
+          "dev": 33,
+          "ino": 8237224,
+          "path": "/tmp/ohm-gnu-renderer-source-native/cross-reader-work/cache/cross_branch_tables-2kwtlb8w7syw1/s-hnqcvvsx8w-_6ef8ed6e98236c69_0mzcfxz-31evhmblz2w5hib4who96jeum/ohm-packed-query-cache.bin",
+          "sha256": "11f8407ae18b6b6e2b5b745df8288559267a76465eb4e48d001cd3497ede538d"
+        }
+      }
+    },
+    "E-first-A-to-K": {
+      "cold_representation": "packed",
+      "consumer": "K",
+      "first_B": "4355b8c804ee84a33ab4ada37c5b3cec9897bcb89831aca70bb9587fbade75ac",
+      "immediate_cold_read": false,
+      "own_empty_elf": "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb",
+      "producer": "E",
+      "representation": "packed",
+      "return_elf": "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb",
+      "source_tables": {
+        "dep-graph.bin": {
+          "bytes": 496215,
+          "decoded_bytes": 1210769,
+          "decoded_sha256": "1252acbac52b7bf9150bc47c232ac2aaa41ad1d0ab0f2798b7d4c2f634815d79",
+          "dev": 33,
+          "ino": 8237359,
+          "path": "/tmp/ohm-gnu-renderer-source-native/cross-reader-work/cache/cross_branch_tables-2kwtlb8w7syw1/s-hnqcvw7bwp-_6ef8ed6e98236c69_14dpycg-31evhmblz2w5hib4who96jeum/ohm-packed-dep-graph.bin",
+          "sha256": "5d838bd1ecb07d6b5393d3d209a11ca4308ca1dc4e9e4269619d4f67e87b0371"
+        },
+        "query-cache.bin": {
+          "bytes": 66974,
+          "decoded_bytes": 188615,
+          "decoded_sha256": "441bc9ad7864c80990ae9a6a17e08fb553a3898e7c0072231a564fdaa09ea7fd",
+          "dev": 33,
+          "ino": 8237360,
+          "path": "/tmp/ohm-gnu-renderer-source-native/cross-reader-work/cache/cross_branch_tables-2kwtlb8w7syw1/s-hnqcvw7bwp-_6ef8ed6e98236c69_14dpycg-31evhmblz2w5hib4who96jeum/ohm-packed-query-cache.bin",
+          "sha256": "6b431e8e15581f8f64e752ae87572c0e25b5979dd92f565e681e22719f753e2a"
+        }
+      }
+    },
+    "K-first-A-to-E": {
+      "cold_representation": "raw",
+      "consumer": "E",
+      "first_B": "4355b8c804ee84a33ab4ada37c5b3cec9897bcb89831aca70bb9587fbade75ac",
+      "immediate_cold_read": false,
+      "own_empty_elf": "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb",
+      "producer": "K",
+      "representation": "raw",
+      "return_elf": "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb",
+      "source_tables": {
+        "dep-graph.bin": {
+          "bytes": 1210769,
+          "decoded_bytes": 1210769,
+          "decoded_sha256": "1252acbac52b7bf9150bc47c232ac2aaa41ad1d0ab0f2798b7d4c2f634815d79",
+          "dev": 33,
+          "ino": 8237552,
+          "path": "/tmp/ohm-gnu-renderer-source-native/cross-reader-work/cache/cross_branch_tables-2kwtlb8w7syw1/s-hnqcvwlvmw-_6ef8ed6e98236c69_14g1ls9-31evhmblz2w5hib4who96jeum/dep-graph.bin",
+          "sha256": "1252acbac52b7bf9150bc47c232ac2aaa41ad1d0ab0f2798b7d4c2f634815d79"
+        },
+        "query-cache.bin": {
+          "bytes": 188615,
+          "decoded_bytes": 188615,
+          "decoded_sha256": "2ebc0fc38009ea254008ecc3571e5fb165026e4f280247da790ff85c88d619e4",
+          "dev": 33,
+          "ino": 8237553,
+          "path": "/tmp/ohm-gnu-renderer-source-native/cross-reader-work/cache/cross_branch_tables-2kwtlb8w7syw1/s-hnqcvwlvmw-_6ef8ed6e98236c69_14g1ls9-31evhmblz2w5hib4who96jeum/query-cache.bin",
+          "sha256": "2ebc0fc38009ea254008ecc3571e5fb165026e4f280247da790ff85c88d619e4"
+        }
+      }
+    },
+    "K-packed-A-to-E": {
+      "cold_representation": "raw",
+      "consumer": "E",
+      "first_B": "4355b8c804ee84a33ab4ada37c5b3cec9897bcb89831aca70bb9587fbade75ac",
+      "immediate_cold_read": false,
+      "own_empty_elf": "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb",
+      "producer": "K",
+      "representation": "packed",
+      "return_elf": "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb",
+      "source_tables": {
+        "dep-graph.bin": {
+          "bytes": 496556,
+          "decoded_bytes": 1211055,
+          "decoded_sha256": "b94815fcda42ed6d23afd1ea38e323855ef4da69eec9011138d77dc57c1eec3a",
+          "dev": 33,
+          "ino": 8237789,
+          "path": "/tmp/ohm-gnu-renderer-source-native/cross-reader-work/cache/cross_branch_tables-2kwtlb8w7syw1/s-hnqcvx5zm3-_6ef8ed6e98236c69_0ita68m-31evhmblz2w5hib4who96jeum/ohm-packed-dep-graph.bin",
+          "sha256": "bca07d532866e0a64b65f22889ee7ee954521b46e29db6e3b7b5183992a0d4d2"
+        },
+        "query-cache.bin": {
+          "bytes": 100241,
+          "decoded_bytes": 231810,
+          "decoded_sha256": "c481c8ce58e3bd94ef9101782bd535aebfa19053229d0b471eb54da5374ab79c",
+          "dev": 33,
+          "ino": 8237790,
+          "path": "/tmp/ohm-gnu-renderer-source-native/cross-reader-work/cache/cross_branch_tables-2kwtlb8w7syw1/s-hnqcvx5zm3-_6ef8ed6e98236c69_0ita68m-31evhmblz2w5hib4who96jeum/ohm-packed-query-cache.bin",
+          "sha256": "5c3ab10fff119f18b9529c401590f7f4b271a8308611b6bc5ac87a29a946ad47"
+        }
+      }
+    }
+  },
+  "delta": {
+    "bin/rustdoc": [
+      "08b465fd46ff24e301bb66510a6a223f8dde94cb3271865994cc352c7604da3a",
+      14706552,
+      493
+    ],
+    "lib/librustc_driver-c5276fb6f0cdddb4.so": [
+      "2a59fb867b303820eb117f783aaef246add789581cd63d9874e4fe1937914038",
+      142822680,
+      493
+    ]
+  },
+  "media_identities": {
+    "capsule_manifest_sha256": "5a1a46eb92efbc062f81cd7d52b15551bddb22d6b1bf5edf5abd4c6f7891c4ab",
+    "legacy_final_case": "K-packed-A-to-E",
+    "legacy_returned_case_sha256": "98d03cc99ec11a4d83c7a58feebf997f732a0c728042dc53513cff6fb8a4280f",
+    "terminal_manifest_sha256": "5a1a46eb92efbc062f81cd7d52b15551bddb22d6b1bf5edf5abd4c6f7891c4ab"
+  },
+  "native_replayed_here": {
+    "34a4a02de349203901b1b55fa3b3f328083c0f60c1c3fd997c6e8783decf1ceb": {
+      "bytes": 487720,
+      "observed": {
+        "17": 0,
+        "18": 19
+      },
+      "value": 17
+    },
+    "4355b8c804ee84a33ab4ada37c5b3cec9897bcb89831aca70bb9587fbade75ac": {
+      "bytes": 487720,
+      "observed": {
+        "29": 0,
+        "30": 19
+      },
+      "value": 29
+    }
+  },
+  "official": {
+    "artifacts": {
+      "first-session-linux-source-driver": {
+        "digest": "sha256:b4372e9d8d51decdd0d68ddb620ddfc8807368d1de76f5f607bc745bb7a2115c",
+        "id": 13052926426,
+        "size_in_bytes": 40132591
+      },
+      "first-session-linux-source-observations": {
+        "digest": "sha256:dedb5a559ec6d0ecfd0a1e9b9f93ca439b068856ea2cde6b71742eb44d00b5b0",
+        "id": 13053235847,
+        "size_in_bytes": 5929815
+      }
+    },
+    "attempt": 1,
+    "head": "2c305c16f72e9797a724f42adee34e9adb717792",
+    "job": 124615704444,
+    "qualified": {
+      "delta": [
+        "bin/rustdoc",
+        "lib/librustc_driver-c5276fb6f0cdddb4.so"
+      ],
+      "driver": [
+        "2a59fb867b303820eb117f783aaef246add789581cd63d9874e4fe1937914038",
+        142822680,
+        493
+      ],
+      "manifest": "5a1a46eb92efbc062f81cd7d52b15551bddb22d6b1bf5edf5abd4c6f7891c4ab",
+      "members": 81,
+      "source": "c9a6a212d38d778ed0e9d2c7057a9dedb179fff2"
+    },
+    "run": 41227867294
+  },
+  "official_paths": [
+    "/mnt/devbox-scratch/dev-user/ohm-branch-first-session-native-41227867294/first-session-linux-source-driver.zip",
+    "/mnt/devbox-scratch/dev-user/ohm-branch-first-session-native-41227867294/first-session-linux-source-observations.zip"
+  ],
+  "prior_E_independent_81_file_rebuild_differences": {},
+  "restored": {
+    "cargo": [
+      "035e681081683f4141e4c544b8cf9492b73784051e4541c12bb3cbdb73a798a4",
+      51101864,
+      493
+    ],
+    "changed": [
+      "bin/rustdoc",
+      "lib/librustc_driver-c5276fb6f0cdddb4.so"
+    ],
+    "commit": "c9a6a212d38d778ed0e9d2c7057a9dedb179fff2",
+    "driver": [
+      "2a59fb867b303820eb117f783aaef246add789581cd63d9874e4fe1937914038",
+      142822680,
+      493
+    ],
+    "manifest": "5a1a46eb92efbc062f81cd7d52b15551bddb22d6b1bf5edf5abd4c6f7891c4ab",
+    "members": 81,
+    "role": "E",
+    "rustdoc": [
+      "08b465fd46ff24e301bb66510a6a223f8dde94cb3271865994cc352c7604da3a",
+      14706552,
+      493
+    ],
+    "wild": [
+      "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+      10319072,
+      493
+    ]
+  },
+  "terminal": {
+    "attempt": "1",
+    "base": {
+      "artifacts": {
+        "branch-return-source-observations": {
+          "id": 13041943456,
+          "sha256": "10231fdc356a0ed95fde6c0db7dd49ed6d8b8a633d9dcf12720830ae5dfdbedd",
+          "size": 1961414
+        },
+        "branch-return-source-sdk": {
+          "id": 13041858613,
+          "sha256": "3e8b9f19c21b90b1a281c349f6c812453ad7afe327ce0930dbd6be9d4c46a620",
+          "size": 274580080
+        }
+      },
+      "attempt": 1,
+      "head": "caef389ed580829583f1a63df129b7b649e43508",
+      "jobs": {
+        "124532776606": "Exact Full and Packed source, Rust tests and native providers"
+      },
+      "manifest": "c29e2e57626491804d9c24e5fa50a709015a002067a3bf39e884d8b6ef0fea43",
+      "run": 41199659076
+    },
+    "cargo": [
+      "035e681081683f4141e4c544b8cf9492b73784051e4541c12bb3cbdb73a798a4",
+      51101864,
+      493
+    ],
+    "changed": [
+      "bin/rustdoc",
+      "lib/librustc_driver-c5276fb6f0cdddb4.so"
+    ],
+    "commit": "c9a6a212d38d778ed0e9d2c7057a9dedb179fff2",
+    "cross_readers": "537e1f3ab204f0ca9d384eea0e495783811031d1ea7462585a47c567df3d9f12",
+    "driver": [
+      "2a59fb867b303820eb117f783aaef246add789581cd63d9874e4fe1937914038",
+      142822680,
+      493
+    ],
+    "manifest": "5a1a46eb92efbc062f81cd7d52b15551bddb22d6b1bf5edf5abd4c6f7891c4ab",
+    "members": 81,
+    "native": "b603fcdd9e40708024364d561747773e1d49e9a36103d2f0026e8c8d88bb302a",
+    "qa": "2c305c16f72e9797a724f42adee34e9adb717792",
+    "role": "E",
+    "run": "41227867294",
+    "rustdoc": [
+      "08b465fd46ff24e301bb66510a6a223f8dde94cb3271865994cc352c7604da3a",
+      14706552,
+      493
+    ],
+    "selector": "1826eeb10eb1637712fe90c9d92642d6f594859240c785624d94e6192b66c57b",
+    "tests": "7363e4eeda6b20154f642de74225e4f0412a5871103bc761c697593132dd7f8e",
+    "wild": [
+      "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+      10319072,
+      493
+    ]
+  },
+  "tests": {
+    "docs": {
+      "rustc_fs_util": [],
+      "rustc_incremental": [
+        "compiler/rustc_incremental/src/assert_dep_graph.rs - assert_dep_graph (line 25)"
+      ]
+    },
+    "fixtures": {
+      "incremental-directory-copy": "9125c8d34acb8e87f4b3b6f031563bbf1ceeb284cec953a6c3eeff037c57ac05",
+      "incremental-session-fail": "cbc623c841a7acb6c553b64a2b986c89c9eb4cfaaf674b81a0169f08d01f76a9",
+      "ohm-branch-cache-opt-out": "bb3378bf185722c6ddae91ba1dace8f8e2172f8f93344d8bf743e6078766e90f",
+      "ohm-checked-dep-info": "4fdff92dfecb57c8516995197d3cd818795eb573414ee3d696b34be4ceede3a0",
+      "ohm-packed-branch-cache": "78cf7fe9cd315e7a6aaf0d5e2c9f1ff0414d2206a18011951728c3e353248e15",
+      "ohm-relink-assembler-inputs": "ac92c074e2f5719911b9762dcea62f3e365f697b2090a71ac57b1c173a874b47",
+      "ohm-relink-incremental-objects": "c47ab1304d167ceee205b94d703b46415a13180649d9c41f9c0c99174253be55"
+    },
+    "run_make": [
+      "incremental-directory-copy",
+      "incremental-session-fail",
+      "ohm-branch-cache-opt-out",
+      "ohm-packed-branch-cache",
+      "ohm-checked-dep-info",
+      "ohm-relink-assembler-inputs",
+      "ohm-relink-incremental-objects"
+    ],
+    "units": {
+      "rustc_fs_util": [],
+      "rustc_incremental": [
+        "persist::fs::packed::tests::externally_shared_or_missing_group_leaves_both_tables_raw",
+        "persist::fs::packed::tests::hydrates_only_private_tables_and_their_inode_aliases",
+        "persist::fs::packed::tests::packs_only_private_and_superseded_objects_and_restores_exact_bytes",
+        "persist::fs::packed::tests::rejects_incomplete_or_mixed_generations_and_damaged_streams",
+        "persist::fs::packed::tests::rejects_swapped_object_contents_with_the_same_session_and_filename",
+        "persist::fs::tests::checkout_sessions_prefer_a_match_and_keep_one_alternate",
+        "persist::fs::tests::pack_only_on_checkout_switch",
+        "persist::fs::tests::test_all_except_most_recent",
+        "persist::fs::tests::test_find_source_directory_in_iter",
+        "persist::fs::tests::test_timestamp_serialization"
+      ]
+    }
+  },
+  "trusted_member_count": 81,
+  "whole_cargo_counts": null
+}
