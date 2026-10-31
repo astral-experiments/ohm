@@ -20,11 +20,12 @@ HEALTHY=b'healthy ordinary unrelated owned GC output '*2
 assert len(HEALTHY)!=len(SENTINEL)
 ROOT='0123456789abcdef';OTHER='fedcba9876543210'
 SHA=lambda b:o.sha(b)
-def outer(root,artifact):
+def outer(root,artifact,late=False):
     assert root.is_absolute() and root==root.resolve() and root.parent==Path(os.environ['RUNNER_TEMP']).resolve() and root.name=='gc-mount-qualification'
     manifest=json.loads((Path(__file__).resolve().parent/'candidate-source/spec.json').read_bytes())
     sealed=json.loads((artifact/'build.json').read_bytes())
-    assert manifest['head']==sealed['candidate'] and manifest['parent']==sealed['parent'] and sealed['qa']==os.environ['GITHUB_SHA']
+    build_qa='46d28e8bff1c6b52f3e7b7bc13192019e964a7da' if late else os.environ['GITHUB_SHA']
+    assert manifest['head']==sealed['candidate'] and manifest['parent']==sealed['parent'] and sealed['qa']==build_qa
     assert o.st(artifact/'cargo')['sha256']==sealed['delivered']==sealed['compiled']
     signed=root/'sdk-21';dirs={'signed':signed,'fixed':root/'sdk-fixed'}
     assert o.st(signed/'bin/cargo')['sha256']==o.CARGO
@@ -44,7 +45,7 @@ def outer(root,artifact):
         nonce=str(uuid.uuid4());(case/'.owned').write_text(nonce)
         id_before=o.ns();assert not any(Path(v['path']).is_relative_to(case) for v in o.mounts().values())
         cmd=['sudo','-n','/usr/bin/env','-i','PATH=/usr/sbin:/usr/bin:/sbin:/bin','LANG=C','/usr/bin/unshare','--mount','--propagation','private','--fork','--',
-             '/usr/bin/python3','-IB',str(Path(__file__).resolve()),'inside',role,str(root),str(case),str(runtime),str(output),str(os.getuid()),str(os.getgid()),
+             '/usr/bin/python3','-IB',str(Path(__file__).resolve()),'inside-late' if late else 'inside',role,str(root),str(case),str(runtime),str(output),str(os.getuid()),str(os.getgid()),
              str(id_before),nonce,shutil.which('rustup'),manifest['head'] if role=='fixed' else manifest['parent'],sealed['compiled'] if role=='fixed' else o.CARGO]
         r=subprocess.run(cmd,capture_output=True,env={'PATH':'/usr/bin:/bin','LANG':'C'})
         (output/'inner.stdout').write_bytes(r.stdout);(output/'inner.stderr').write_bytes(r.stderr)
@@ -238,7 +239,12 @@ def inner(f):
     assert not errors and not issues and not residual,(errors,issues,residual)
 
 if __name__=='__main__':
-    if sys.argv[1]=='inside':
+    if sys.argv[1] in ('inside','inside-late'):
         role,root,w,runtime,output,uid,gid,outer_ns,nonce,shim,commit,digest=sys.argv[2:]
-        inner(Fixture(role,Path(root),Path(w),Path(runtime),Path(output),int(uid),int(gid),int(outer_ns),nonce,shim,commit,digest))
+        fixture=Fixture(role,Path(root),Path(w),Path(runtime),Path(output),int(uid),int(gid),int(outer_ns),nonce,shim,commit,digest)
+        if sys.argv[1]=='inside-late':
+            import late_bind
+            late_bind.run(fixture)
+        else:inner(fixture)
+    elif sys.argv[1]=='late':outer(Path(sys.argv[2]),Path(sys.argv[3]),True)
     else:outer(Path(sys.argv[1]),Path(sys.argv[2]))

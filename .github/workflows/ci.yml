@@ -1,62 +1,12 @@
-name: Qualify the combined Cargo recovery and shared GC fixes
+name: Late bind while Cargo GC is traversing trash
 on:
   workflow_dispatch: {}
 permissions:
   contents: read
   actions: read
 jobs:
-  builder:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-cargo-recovery-and-mount-boundaries'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 45
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        path: protocol
-        persist-credentials: false
-        sparse-checkout: |
-          scripts/gc-mount-evidence
-          scripts/cargo-diagnostic-fix
-          scripts/ohm-apple-zmij/cargo293
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        path: signed-reader
-        ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
-        persist-credentials: false
-        sparse-checkout: scripts/packaged-release-workspace
-    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-      with:
-        python-version: '3.13'
-    - name: Install the enrolled release SDK for the source build
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        set -eu
-        test "$(git -C signed-reader rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
-        mkdir -m700 "$RUNNER_TEMP/gc-compiler-build"
-        python3 -IB signed-reader/scripts/packaged-release-workspace/packages.py 21 "$RUNNER_TEMP/gc-compiler-build"
-    - name: Build native Cargo from the locally sealed complete source
-      run: |
-        set -eu
-        sudo apt-get -qq update
-        sudo apt-get install -y --no-install-recommends ninja-build build-essential cmake pkg-config perl libssl-dev
-        python3 -IB protocol/scripts/gc-mount-evidence/build_candidate.py "$RUNNER_TEMP/gc-compiler-build" "$GITHUB_WORKSPACE/protocol/scripts/ohm-apple-zmij/cargo293/source.pack"
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      with:
-        name: disposable-gc-qualified-cargo
-        path: ${{ runner.temp }}/gc-compiler-build/deliver
-        if-no-files-found: error
-        retention-days: 1
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      if: always()
-      with:
-        name: gc-qualified-cargo-build-record
-        path: ${{ runner.temp }}/gc-compiler-build/build-cert
-        if-no-files-found: warn
-        retention-days: 7
-  gc:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-cargo-recovery-and-mount-boundaries'
-    needs: builder
+  late:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-cargo-late-gc-bind-20261030'
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     steps:
@@ -89,70 +39,20 @@ jobs:
       with:
         name: disposable-gc-qualified-cargo
         path: ${{ runner.temp }}/candidate-download
-    - name: Exercise unprivileged public GC on signed and source-fixed Cargo
+        run-id: 41147281908
+        github-token: ${{ github.token }}
+    - name: Attach a bind mount while the unprivileged Cargo process is paused at its owner file
       run: |
         set -eu
         if ! command -v strace; then sudo apt-get update -qq; sudo apt-get install -y --no-install-recommends strace; fi
-        python3 -IB protocol/scripts/gc-mount-evidence/compare.py "$RUNNER_TEMP/gc-mount-qualification" "$RUNNER_TEMP/candidate-download"
+        printf '%s  %s\n' 39ed11556c08de95863961763f9d95e3c61994193dbb756e6667beb3279bffe2 "$RUNNER_TEMP/candidate-download/cargo" | sha256sum --check
+        python3 -IB protocol/scripts/gc-mount-evidence/compare.py late "$RUNNER_TEMP/gc-mount-qualification" "$RUNNER_TEMP/candidate-download"
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: gc-signed-vs-fixed-native-mounts
+        name: late-bind-native-commands
         path: |
           ${{ runner.temp }}/gc-mount-qualification/packet
           ${{ runner.temp }}/gc-mount-qualification/receipts/21
-        retention-days: 7
+        retention-days: 30
         if-no-files-found: error
-  ruff:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-signed21-cargo-recovery-and-mount-boundaries'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 110
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        path: protocol
-        persist-credentials: false
-        sparse-checkout: |-
-          scripts/cargo-diagnostic-fix
-          scripts/cargo-recovery-upgrade
-          scripts/ron-check-share
-          scripts/ohm-apple-zmij/cargo293
-
-          scripts/gc-mount-evidence
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: f40b16cdb9c041c941a5e339f816111a80a84bdf
-        path: original-qa
-        persist-credentials: false
-        sparse-checkout: scripts/packaged-release-workspace
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 927e20bcad028e5ed4290a58bd330a258ee5da41
-        path: existing-counter
-        persist-credentials: false
-        sparse-checkout: scripts/ohm-gnu-syscall
-    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-      with:
-        python-version: '3.13'
-    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-      with:
-        name: disposable-gc-qualified-cargo
-        path: ${{ runner.temp }}/candidate-download
-    - name: Run matched dev-channel Cargo migrations and physical output controls
-      env:
-        QUALIFICATION_TOKEN: ${{ github.token }}
-      run: |
-        set -eu
-        test "$(git -C original-qa rev-parse HEAD)" = f40b16cdb9c041c941a5e339f816111a80a84bdf
-        test "$(git -C existing-counter rev-parse HEAD)" = 927e20bcad028e5ed4290a58bd330a258ee5da41
-        sudo apt-get -qq update
-        sudo apt-get install -y --no-install-recommends ninja-build strace build-essential cmake pkg-config libssl-dev perl
-        python3 -IB protocol/scripts/cargo-recovery-upgrade/layout_controls.py "$GITHUB_WORKSPACE/original-qa" "$GITHUB_WORKSPACE/existing-counter/scripts/ohm-gnu-syscall/calibrate.c" "$GITHUB_WORKSPACE/protocol/scripts/ohm-apple-zmij/cargo293/source.pack" "$RUNNER_TEMP/candidate-download"
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      if: always()
-      with:
-        name: combined-Cargo-real-Ruff-upgrade
-        path: ${{ runner.temp }}/ordinary-ron-check/packet
-        retention-days: 7
-        if-no-files-found: error
-    needs: builder
