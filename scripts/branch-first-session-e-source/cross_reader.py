@@ -228,7 +228,7 @@ def fixture(work):
 
 
 def history(root, log, sdk, driver_name, role_files, env, *, case, producer, consumer, mode,
-            aged=False, direct=False):
+            aged=False, direct=False, producer_cold_mode=None):
     work = root / "cross-reader-work"
     cache = work / "cache"
     need(not cache.exists(), "history needs its own initially empty cache")
@@ -322,7 +322,8 @@ def history(root, log, sdk, driver_name, role_files, env, *, case, producer, con
 
     cold = visit("cold-A", producer, "A", "not-loaded")
     (a,) = sessions(cache)
-    cold_mode = "packed" if producer == "E" else "raw"
+    cold_mode = producer_cold_mode or ("packed" if producer == "E" else "raw")
+    need(cold_mode in ("packed", "raw"), "unknown cold representation")
     baseline = tables(a, cold_mode, folder / "cold-A")
     first = None
     if not direct:

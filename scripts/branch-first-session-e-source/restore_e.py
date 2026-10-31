@@ -14,8 +14,8 @@ import restore as base
 from registration import need, sha
 
 
-def differences(k, files):
-    previous = k["files"]["K"]
+def differences(k, files, base_role="K"):
+    previous = k["files"][base_role]
     need(set(files) == set(previous) and len(files) == 81, "different installed SDK paths")
     driver = k["driver"]
     changed = {}

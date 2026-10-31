@@ -1,0 +1,89 @@
+{
+  "F_native": {
+    "cargo": "035e681081683f4141e4c544b8cf9492b73784051e4541c12bb3cbdb73a798a4",
+    "malformed_warm_or_empty": 4,
+    "ordinary": 6,
+    "owned_provider_reads": 16,
+    "shadow": 16,
+    "wild": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+  },
+  "historical_mixed": {
+    "histories": {
+      "E-cold-A-to-K": "c85d450a76eaf1765dc4583570813b484b6e5302d02a19617af1a099b8fc3e45",
+      "E-first-A-to-K": "a83845de90041540834d2b137f8104bccfe45d6f76a4eb6fc04b2fe9ae988238",
+      "K-first-A-to-E": "4864350d6ae0e041b38b7f47ccb605f633e58f921bf40611dc8cf10b17a73bf3",
+      "K-packed-A-to-E": "98d03cc99ec11a4d83c7a58feebf997f732a0c728042dc53513cff6fb8a4280f"
+    },
+    "original_run": 41227867294
+  },
+  "original_role": "c6fe8ecda65452c105f85367a009af80cbb5efbc",
+  "original_run": 41199659076,
+  "original_sdk_members": 81,
+  "pack_refusals": [
+    "changed transport hash",
+    "one of fourteen object IDs replaced",
+    "wrong T parent/head"
+  ],
+  "restore_refusals": [
+    "unchanged driver",
+    "foreign source",
+    "wrong attempt",
+    "corrupt delta",
+    "changed Cargo"
+  ],
+  "source": {
+    "base": "f70612039692c9ec6abf67d8921f4b5085c0f101",
+    "compiler": "1de34fdeff4d471dda56dd91121f30693a59406c",
+    "files": {
+      "compiler/rustc_incremental/src/persist/fs.rs": "aababc7bbe795beedb86704634bb4aec86e3b59d8b730c074860f35112e5e13b",
+      "compiler/rustc_session/src/session.rs": "9c8396058bd9c95e26ec071063024a08ddb267f9aad92d97cbee4704c1ec21cc",
+      "tests/run-make/ohm-packed-branch-cache/rmake.rs": "a590807281ea7e3f844ad11a1b766b1010e86efcca21c3276624cea78087da54"
+    },
+    "original": "c6fe8ecda65452c105f85367a009af80cbb5efbc",
+    "packs": [
+      [
+        "current-base-history.pack",
+        "c6fe8ecda65452c105f85367a009af80cbb5efbc",
+        "f70612039692c9ec6abf67d8921f4b5085c0f101",
+        387,
+        "dfda7ab9e1113e3874e706bcbb483affb3ec7abd707d35599a7aa9f90f77e54f"
+      ],
+      [
+        "tables-only-history.pack",
+        "f70612039692c9ec6abf67d8921f4b5085c0f101",
+        "a653d40da8cd7e13a6e6c10ac6ebfeb224945c73",
+        14,
+        "f5ff90a37a115be2bacacb69bbb7b512ac60c2b5dfb69f3bade3e32ca8be6227"
+      ]
+    ],
+    "source": "a653d40da8cd7e13a6e6c10ac6ebfeb224945c73",
+    "tree": "8fb5c75a2cd5fa542fbaf7d301db8bb3a88caa84"
+  },
+  "source_test_refusals": [
+    "missing original named unit",
+    "wrong original run-make"
+  ],
+  "source_tests": {
+    "changed_T_fixture": "ohm-packed-branch-cache",
+    "linux_units": [
+      "persist::fs::tests::test_all_except_most_recent",
+      "persist::fs::tests::test_timestamp_serialization",
+      "persist::fs::tests::test_find_source_directory_in_iter",
+      "persist::fs::tests::checkout_sessions_prefer_a_match_and_keep_one_alternate",
+      "persist::fs::tests::pack_only_on_checkout_switch",
+      "persist::fs::packed::tests::hydrates_only_private_tables_and_their_inode_aliases",
+      "persist::fs::packed::tests::externally_shared_or_missing_group_leaves_both_tables_raw",
+      "persist::fs::packed::tests::rejects_incomplete_or_mixed_generations_and_damaged_streams"
+    ],
+    "original_F_native_log_replay": true,
+    "run_make": [
+      "incremental-directory-copy",
+      "incremental-session-fail",
+      "ohm-branch-cache-opt-out",
+      "ohm-packed-branch-cache",
+      "ohm-checked-dep-info",
+      "ohm-relink-assembler-inputs",
+      "ohm-relink-incremental-objects"
+    ]
+  }
+}
