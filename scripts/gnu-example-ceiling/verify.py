@@ -59,6 +59,9 @@ def host(root):
                     assert actual == v["settled"] and a["units"] == v["repeat"]["typed"]
                 else:
                     assert v[n]["native"] == actual and v[n]["typed"] == a["units"]
+                    # The JSON writer sorts maps. Restore the observed kernel exec
+                    # order before comparing the original ordered per-example rows.
+                    v[n]["native"] = actual
         for phase in ("returned", "settled-programs", "empty-programs", "old-programs"):
             expected = v["old_programs"] if phase == "old-programs" else v["programs"]
             products = load(d / phase / "12-images.json")
