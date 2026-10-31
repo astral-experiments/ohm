@@ -1,0 +1,144 @@
+{
+  "official": {
+    "candidate": {
+      "failed": true,
+      "log_sha256": "7cf8e0ebbd8c267a607f08e4cae754a022bdab99aaf9c17682030f41aed1a52e",
+      "passed": 4384
+    },
+    "parent": {
+      "failed": false,
+      "log_sha256": "15ba2b680deb46d9405b37805ae6ebdf7d62f21e8b8bbcb1416cf8218e079563",
+      "passed": 4385
+    }
+  },
+  "supplemental": {
+    "full_library_passed": 403,
+    "full_suite_passed": 4385,
+    "installed_original_filter": {
+      "ohm-1.98.0-9": {
+        "named_worktree_tests": [
+          "ohm_worktree::worktree_import_requires_cloning",
+          "ohm_worktree::bundled_clippy_isolation_defaults_follow_actual_snapshot_cloning",
+          "ohm_worktree::bundled_clippy_preserves_ordinary_seeds_without_importing_lint_state",
+          "ohm_worktree::clippy_isolation_overrides_are_inherited_and_child_flags_take_precedence",
+          "ohm_worktree::forced_clippy_isolation_preserves_compiler_trust_rejections",
+          "ohm_worktree::clippy_wrapper_scripts_still_deny_the_whole_seed"
+        ],
+        "old_profile_filter_count": 0
+      },
+      "ohm-1.99.0-21": {
+        "named_worktree_tests": [
+          "ohm_worktree::worktree_import_requires_cloning",
+          "ohm_worktree::bundled_clippy_isolation_defaults_follow_actual_snapshot_cloning",
+          "ohm_worktree::bundled_clippy_preserves_ordinary_seeds_without_importing_lint_state",
+          "ohm_worktree::clippy_isolation_overrides_are_inherited_and_child_flags_take_precedence",
+          "ohm_worktree::forced_clippy_isolation_preserves_compiler_trust_rejections",
+          "ohm_worktree::clippy_wrapper_scripts_still_deny_the_whole_seed"
+        ],
+        "old_profile_filter_count": 0
+      }
+    },
+    "signed_current_archive": "sha256:27e0c0740571fff0cca0d1b14886826bdd41e4f9ef48dc35281f713cae9263ee",
+    "signed_current_exact_tests": [
+      "profile_settings::ohm_default_debuginfo",
+      "profile_settings::ohm_default_debuginfo_respects_overrides",
+      "ohm_worktree::worktree_import_requires_cloning",
+      "ohm_worktree::bundled_clippy_isolation_defaults_follow_actual_snapshot_cloning",
+      "ohm_worktree::bundled_clippy_preserves_ordinary_seeds_without_importing_lint_state",
+      "ohm_worktree::clippy_isolation_overrides_are_inherited_and_child_flags_take_precedence",
+      "ohm_worktree::forced_clippy_isolation_preserves_compiler_trust_rejections",
+      "ohm_worktree::clippy_wrapper_scripts_still_deny_the_whole_seed"
+    ],
+    "suite_log_sha256": "552f980e7de9ae31a3f4d42b9c9758cdf85faa040f51c00ae2679c0cf82608a1"
+  },
+  "targeted": {
+    "41147398265": {
+      "candidate": {
+        "cargo_sha256": "224e22f0d0786569e8ddbd6f8d0a14f5163a3f231edaba07836d37343fafa2f6",
+        "diagnostic_passed": 0,
+        "diagnostic_total": 0,
+        "explicit_delays": [],
+        "ordinary_passed": 7,
+        "ordinary_total": 8,
+        "stalls_observed": null,
+        "suite_sha256": "5e9ee7958ba254e621751350a5a057f8e4c22e4b33a93fa5b192f4656b04f7e5"
+      },
+      "parent": {
+        "cargo_sha256": "d64620d742c9b3a6a1dab860357aa3c97cbd6d1726020ab1b22c9c9e85ebbb7a",
+        "diagnostic_passed": 0,
+        "diagnostic_total": 0,
+        "explicit_delays": [],
+        "ordinary_passed": 8,
+        "ordinary_total": 8,
+        "stalls_observed": null,
+        "suite_sha256": "85cc22a7822fe034bbcd956ca5d15898e126c9eab292004f51dc7bc117cd337e"
+      }
+    },
+    "41147809007": {
+      "candidate": {
+        "cargo_sha256": "224e22f0d0786569e8ddbd6f8d0a14f5163a3f231edaba07836d37343fafa2f6",
+        "diagnostic_passed": 20,
+        "diagnostic_total": 20,
+        "explicit_delays": [
+          40,
+          100,
+          200,
+          350,
+          600,
+          40,
+          100,
+          200,
+          350,
+          600
+        ],
+        "ordinary_passed": 4,
+        "ordinary_total": 4,
+        "stalls_observed": 0,
+        "suite_sha256": "5e9ee7958ba254e621751350a5a057f8e4c22e4b33a93fa5b192f4656b04f7e5"
+      },
+      "parent": {
+        "cargo_sha256": "d64620d742c9b3a6a1dab860357aa3c97cbd6d1726020ab1b22c9c9e85ebbb7a",
+        "diagnostic_passed": 20,
+        "diagnostic_total": 20,
+        "explicit_delays": [
+          40,
+          100,
+          200,
+          350,
+          600,
+          40,
+          100,
+          200,
+          350,
+          600
+        ],
+        "ordinary_passed": 4,
+        "ordinary_total": 4,
+        "stalls_observed": 0,
+        "suite_sha256": "85cc22a7822fe034bbcd956ca5d15898e126c9eab292004f51dc7bc117cd337e"
+      }
+    },
+    "41148226731": {
+      "candidate": {
+        "cargo_sha256": "224e22f0d0786569e8ddbd6f8d0a14f5163a3f231edaba07836d37343fafa2f6",
+        "diagnostic_passed": 0,
+        "diagnostic_total": 0,
+        "explicit_delays": [],
+        "ordinary_passed": 60,
+        "ordinary_total": 60,
+        "stalls_observed": 0,
+        "suite_sha256": "5e9ee7958ba254e621751350a5a057f8e4c22e4b33a93fa5b192f4656b04f7e5"
+      },
+      "parent": {
+        "cargo_sha256": "d64620d742c9b3a6a1dab860357aa3c97cbd6d1726020ab1b22c9c9e85ebbb7a",
+        "diagnostic_passed": 0,
+        "diagnostic_total": 0,
+        "explicit_delays": [],
+        "ordinary_passed": 60,
+        "ordinary_total": 60,
+        "stalls_observed": 0,
+        "suite_sha256": "85cc22a7822fe034bbcd956ca5d15898e126c9eab292004f51dc7bc117cd337e"
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "attempt": 1,
+  "conclusion": "success",
+  "job": 124381841038,
+  "log_bytes": 561325,
+  "log_sha256": "552f980e7de9ae31a3f4d42b9c9758cdf85faa040f51c00ae2679c0cf82608a1",
+  "qa": "f99c1d58fb79b8a79660ab1a0a8dd0438459db8e",
+  "run": 41149336548,
+  "status": "completed",
+  "steps": [
+    [
+      "Set up job",
+      "success"
+    ],
+    [
+      "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+      "success"
+    ],
+    [
+      "Install Rust",
+      "success"
+    ],
+    [
+      "Install system dependencies",
+      "skipped"
+    ],
+    [
+      "Run Cargo unit and integration tests",
+      "success"
+    ],
+    [
+      "Install Ohm for shared-registry integration coverage",
+      "skipped"
+    ],
+    [
+      "Run shared-registry integration with Ohm",
+      "skipped"
+    ],
+    [
+      "Install Ohm for Clippy worktree coverage",
+      "success"
+    ],
+    [
+      "Run profile and bundled Clippy worktree tests with Ohm",
+      "success"
+    ],
+    [
+      "Record source and both original native compiler identities",
+      "success"
+    ],
+    [
+      "Install and authenticate current signed -21 for separate coverage",
+      "success"
+    ],
+    [
+      "Run the same seven named installed-toolchain controls on current signed -21",
+      "success"
+    ],
+    [
+      "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+      "success"
+    ],
+    [
+      "Complete job",
+      "success"
+    ]
+  ]
+}
