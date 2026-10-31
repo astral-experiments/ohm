@@ -1,0 +1,87 @@
+{
+  "independent_source_manifest_sha256": "6c46d80e12a69c496cbcc9b8db60d0ab33a143905a33044916c4c766b668c409",
+  "intentional_native_refusals": [
+    "escape",
+    "escape3"
+  ],
+  "long_argv_bytes": 98003,
+  "native_mutations_rejected": [
+    "drop-B",
+    "drop-C",
+    "drop-E",
+    "drop-I",
+    "drop-N",
+    "drop-OK",
+    "drop-P",
+    "drop-T",
+    "drop-X",
+    "duplicate-E",
+    "forge-terminal",
+    "misbound-former-tid",
+    "missing-nonleader-displacement",
+    "truncate-argv",
+    "unclosed-before-false-terminal",
+    "wrong-bound-raw-sha"
+  ],
+  "native_sha256": "712a05cc08cfae62f77320c0a4118cf1a0e80bb0798f7b96e632c155a218edeb",
+  "observer_elf": "b5d05309e3c3fd1c3e240b42983e55ec81114765b11b3a67bbf0d196c26c34de",
+  "physical_fixtures": [
+    "abort",
+    "duplicate",
+    "family",
+    "long",
+    "signals",
+    "thread"
+  ],
+  "prior_accepted_cold_same_host": {
+    "cargo.json.gz": {
+      "equal": false,
+      "left": "db26299fdffef1c6264d7fb8d916a0044c3e150fc30072f70411d5bea42c9f9e",
+      "right": "9ff7797e8639e7f0073bd9e6aafc2a5c9e09b0fc0dcd4fbba012945e6ecf4bf2"
+    },
+    "native": {
+      "cli": {
+        "sha256": "65cb22e662909a46caf1727d5d77c6af746353f09638f57e2e470618555af33a",
+        "size": 147395472
+      },
+      "cli_cases": 7,
+      "fstring_cases": 6,
+      "reader": {
+        "sha256": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+        "size": 13247832
+      },
+      "typed": "Expr=64 valid=1 rejected"
+    },
+    "native.json.gz": {
+      "equal": true,
+      "left": "60a264f64d2945bcd365902ebeddc761b58f8e6c349f1618b77b2436f2f46c43",
+      "right": "60a264f64d2945bcd365902ebeddc761b58f8e6c349f1618b77b2436f2f46c43"
+    },
+    "original": "41200174886-02-13043111933.zip",
+    "roster.json.gz": {
+      "equal": true,
+      "left": "cc57db51650a4568be536656e6df65a5a7b5ddb84010e6a01e82c4e8e5984752",
+      "right": "cc57db51650a4568be536656e6df65a5a7b5ddb84010e6a01e82c4e8e5984752"
+    },
+    "source.json": {
+      "equal": true,
+      "left": "5bf73cfd60580b999fc770116096f48b9257456c85d2389e202569b829db2191",
+      "right": "5bf73cfd60580b999fc770116096f48b9257456c85d2389e202569b829db2191"
+    }
+  },
+  "ruff_projection_refusals": [
+    "broken-wild-ancestry",
+    "changed-cold-compiler",
+    "foreign-gnu-link",
+    "foreign-rustc-inode",
+    "interrupted-required-image",
+    "missing-gnu-link",
+    "retention-activated",
+    "unexpected-Wild-output",
+    "wrong-autocfg-name",
+    "wrong-autocfg-owner",
+    "wrong-resolved-ld",
+    "wrong-wild-sha"
+  ],
+  "scope": "Local observer and typed/readback controls only. Full new Ruff run pending."
+}
