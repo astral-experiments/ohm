@@ -468,7 +468,7 @@ unset OHM_TEST_INSTALL_DIR
 
 mkdir -p "$temporary_directory/temp with spaces"
 TMPDIR="$temporary_directory/temp with spaces" \
-  OHM_TEST_INSTALL_DIR="$temporary_directory/cases/space in parent/"'$(false)'"/toolchain" \
+  OHM_TEST_INSTALL_DIR="$temporary_directory/cases/space in parent/\$(false)/toolchain" \
   run_case literal-staging-path success
 
 for component in . ..; do
