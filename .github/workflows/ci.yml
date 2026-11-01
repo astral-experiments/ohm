@@ -1,10 +1,10 @@
-name: Count an ordinary Ruff branch return after a private AST edit
-run-name: Full Ruff counter screen ${{ inputs.reviewed_head }}
+name: Separate fresh incremental table encoding during an ordinary Ruff repair
+run-name: Ruff repair diagnostic ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed commit of the untraced hardware screen
+        description: Exact reviewed commit of the repair diagnostic
         type: string
         required: true
 permissions:
@@ -12,10 +12,10 @@ permissions:
   contents: read
 jobs:
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-counter-screen-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-repair-encode-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
-    name: Count Ruff build instructions ${{ matrix.position }}
+    name: Separate Ruff repair table encoding ${{ matrix.position }}
     strategy:
       fail-fast: false
       matrix:
@@ -31,7 +31,7 @@ jobs:
           sparse-checkout: |
             .github/workflows
             scripts/ctfe-crossover-pilot
-            scripts/ctfe-counter-screen
+            scripts/ctfe-repair-encode
             scripts/gnu-ctfe-literal-identity
             scripts/branch-return-pmu
             scripts/branch-first-session-e-screen
@@ -95,36 +95,37 @@ jobs:
             pilot_object=$(git -C enrolled rev-parse "HEAD:$component_path")
             test "$source_object" = "$pilot_object"
           done
-          for d in ctfe-source/scripts/gnu-ctfe-literal-identity prior-pilot/scripts/ctfe-crossover-pilot enrolled/scripts/{ctfe-counter-screen,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
+          for d in ctfe-source/scripts/gnu-ctfe-literal-identity prior-pilot/scripts/ctfe-crossover-pilot enrolled/scripts/{ctfe-repair-encode,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
-          python3 -IB enrolled/scripts/ctfe-counter-screen/read.py --help > /dev/null
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
+          python3 -IB enrolled/scripts/ctfe-repair-encode/test_gate.py
+          python3 -IB enrolled/scripts/ctfe-repair-encode/read.py --help > /dev/null
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           test ! -e "$base"
           mkdir -p "$base/work" "$base/logs"
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
-      - name: Reconstruct both 81-file compiler installations using original source artifacts
+      - name: Authenticate the source-built candidate SDK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/ctfe-counter-screen/run.py acquire "$GITHUB_WORKSPACE/source"
-      - name: Count both untraced Ruff histories
+          python3 -IB enrolled/scripts/ctfe-repair-encode/run.py acquire "$GITHUB_WORKSPACE/source"
+      - name: Run paired candidate repairs
         env:
           POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-counter-screen/run.py "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-repair-encode/run.py "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ctfe-full-cli-counter-${{ matrix.position }}
+          name: ctfe-repair-encode-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true
