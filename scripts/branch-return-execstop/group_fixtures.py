@@ -35,7 +35,7 @@ def read(path):
 
 def source_files():
     return sorted([p for p in (HERE / "kernel").iterdir() if p.is_file()] +
-                  [HERE / s for s in ("fixtures.py", "group_checks.py", "group_fixtures.py", "test_projection.py",
+                  [HERE / s for s in ("fixtures.py", "group_checks.py", "group_fixtures.py", "test_projection.py", "wild_fork.py",
                                       "group-v2/group.c", "group-v2/pending.c", "group-v2/start.s",
                                       "group-v2/history/v1_reader.py")])
 

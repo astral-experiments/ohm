@@ -25,6 +25,7 @@ def load(name, path):
 
 reader = load("group_schema_2", HERE / "kernel/read_events.py")
 legacy = load("historical_schema_1", HERE / "group-v2/history/v1_reader.py")
+wild_fork = load("wild_lifetimes", HERE / "wild_fork.py")
 need = reader.need
 
 def records(raw):
@@ -88,6 +89,37 @@ def physical(event, identity, argv):
          and all(observed[key] == identity[key] for key in ("dev", "ino", "sha256", "mode", "size", "mtime", "ctime")),
          "installed image, physical file or argv changed")
 
+def wild_workers(raw, parsed, rows, counts, argv):
+    event, = parsed["execs"]
+    need(counts["N"] == 3 and counts["X"] == counts["T"] == 4 and
+         counts["G"] == counts["V"] == 1 and counts["H"] == 0 and counts["Q"] in (1, 2),
+         "stock Wild must fork once and park at least one of its two threads")
+    projected = dict(event=event["ordinal"], lifetime=event["lifetime"], pid=event["pid"],
+                     argv=argv, output=argv[argv.index("-o")+1], rustc_event=None, rustc_crate=None)
+    evidence, = wild_fork.finish(raw, parsed, [projected])
+    leader = next(r for r in rows if r[0] == "G")
+    helper = str(evidence["helper"])
+    need(evidence["closure"] == "parked" and leader[1:] == [helper, str(evidence["helper_pid"]), "0"]
+         and len(evidence["workers"]) == 2 and len(evidence["parked"]) == counts["Q"],
+         "wrong inherited helper, workers or group exit")
+    # The exit stop (X) may precede another thread's group exit while wait (T) arrives later.
+    group_index = rows.index(leader)
+    before = []
+    for worker in evidence["workers"]:
+        life = str(worker)
+        birth, = (r for r in rows if r[0] == "N" and r[4] == life)
+        need(birth[1:4] == [helper, leader[2], "3"], "worker was not cloned by the enrolled helper")
+        stop = rows.index(["X", life, birth[5], "0"])
+        if worker in evidence["parked"]:
+            park, = (r for r in rows if r[0] == "Q" and r[1] == life)
+            need(park[2:5] == [birth[5], helper, leader[2]] and group_index < rows.index(park) < stop,
+                 "worker park does not match its group or terminal stop")
+        else:
+            need(stop < group_index, "unparked worker did not exit before the helper group stop")
+            before.append(worker)
+    return dict(helper=evidence["helper"], workers=evidence["workers"], parked=evidence["parked"],
+                exited_before_group=before)
+
 def positive(raw, stdout, program, argv, identities):
     parsed = reader.parse(raw, expected_code=0, expected_schema=3)
     rows = records(raw)
@@ -96,14 +128,10 @@ def positive(raw, stdout, program, argv, identities):
          counts["G"] + counts["H"] == counts["V"] and counts["E"] == counts["P"], "incomplete native exits or images")
     execs = parsed["execs"]
     physical(execs[0], identities[program], argv)
+    extra = {}
     if program == "wild":
-        need(len(execs) == 1 and counts["X"] == 4 and counts["G"] == 1 and counts["Q"] == 2
-             and counts["N"] == 3 and not stdout, "expected stock forked Wild and its two parked threads")
-        leader, = (r for r in rows if r[0] == "G")
-        births = {(r[1], r[3], r[4]) for r in rows if r[0] == "N"}
-        need(("1", "1", leader[1]) in births and leader[3] == "0"
-             and all((leader[1], "3", r[1]) in births and r[3:5] == leader[1:3]
-                     for r in rows if r[0] == "Q"), "Wild is not the fork helper's inherited physical image")
+        need(len(execs) == 1 and not stdout, "unexpected stock Wild image or output")
+        extra["worker_schedule"] = wild_workers(raw, parsed, rows, counts, argv)
     else:
         cycles = int(argv[1])
         need(len(execs) == cycles + 1 and counts["T"] == cycles*10 + 1, "missing family member")
@@ -134,7 +162,7 @@ def positive(raw, stdout, program, argv, identities):
         for e in execs[1:]:
             physical(e, identities["true"], ["exactly-once"])
     return dict(raw_sha256=parsed["sha256"], counts=dict(counts), lifetimes=parsed["lifetimes"],
-                schema=parsed["schema"], images=len(execs))
+                schema=parsed["schema"], images=len(execs), **extra)
 
 def installed(raw, stdout, argv, identity):
     """Match the parked TIDs and exact executed image to the fixture's independent inventory."""
