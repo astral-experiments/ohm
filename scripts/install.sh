@@ -352,6 +352,17 @@ link_toolchain() {
         fail "refusing to replace an existing managed rustup toolchain: $toolchain_name"
     fi
 
+    if [ "$toolchain_name" = "$version" ]; then
+        RUSTUP_HOME="$temporary_directory/rustup" rustup toolchain link "$version" "$installation_prefix" ||
+            fail "could not register rustup toolchain: $version"
+        # Copy the symlink without replacing a competing registration. cp -n's
+        # exit status for an existing file varies by platform, so check the link.
+        cp -RPn "$temporary_directory/rustup/toolchains/$version" "$toolchains_directory/" 2>/dev/null || :
+        [ -L "$link_path" ] && [ "$link_path" -ef "$installation_prefix" ] ||
+            fail "could not register immutable rustup toolchain: $version"
+        return
+    fi
+
     if ! rustup toolchain link "$toolchain_name" "$installation_prefix"; then
         if [ -n "$alias_backup" ]; then
             mv "$alias_backup" "$link_path" ||
