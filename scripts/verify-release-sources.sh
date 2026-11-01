@@ -31,13 +31,11 @@ for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_
 
   if [[ "$checkout" == "$rust_checkout" ]]; then
     checkout_paths=(.)
-    rust_checkout_path="$(cd -- "$rust_checkout" && pwd -P)"
-
-    if [[ "$(cd -- "$clippy_checkout" && pwd -P)" == "$rust_checkout_path/src/tools/clippy" ]]; then
+    if [[ "$clippy_checkout" -ef "$rust_checkout/src/tools/clippy" ]]; then
       checkout_paths+=(':(exclude)src/tools/clippy')
     fi
 
-    if [[ "$(cd -- "$rustfmt_checkout" && pwd -P)" == "$rust_checkout_path/src/tools/rustfmt" ]]; then
+    if [[ "$rustfmt_checkout" -ef "$rust_checkout/src/tools/rustfmt" ]]; then
       checkout_paths+=(':(exclude)src/tools/rustfmt')
     fi
 

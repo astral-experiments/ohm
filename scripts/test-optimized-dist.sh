@@ -8,7 +8,7 @@ trap 'rm -rf -- "$test_directory"' EXIT
 
 rust_checkout="$test_directory/rust checkout"
 bolt_directory="$test_directory/llvm bolt"
-bootstrap_config="$test_directory/bootstrap.toml"
+bootstrap_config="$test_directory/bootstrap.toml"$'\n'
 toolchain='ohm-1.97.1-16'
 trace="$rust_checkout/commands.jsonl"
 

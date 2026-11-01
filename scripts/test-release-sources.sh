@@ -16,7 +16,7 @@ commit_fixture() {
 cargo_checkout="$test_root/cargo"
 clippy_checkout="$test_root/clippy"
 rustfmt_checkout="$test_root/rustfmt"
-rust_checkout="$test_root/rust"
+rust_checkout="$test_root/rust"$'\n'
 mkdir -p "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout" "$rust_checkout"
 
 git -C "$cargo_checkout" init --quiet
@@ -71,6 +71,14 @@ jq --arg rust "$rust_revision" --arg cargo "$cargo_revision" \
      revision: $rustfmt
    }' \
   "$repository_root/toolchains/1.97.1/2.json" > "$release_manifest"
+
+invalid_version="$manifest_directory"$'\n'
+mkdir "$invalid_version"
+cp "$release_manifest" "$invalid_version/2.json"
+if "$script_dir/validate-release-manifest.sh" "$invalid_version/2.json" >/dev/null 2>&1; then
+  echo 'manifest validation accepted a version directory ending in a newline' >&2
+  exit 1
+fi
 
 "$script_dir/verify-release-sources.sh" \
   "$release_manifest" "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout"

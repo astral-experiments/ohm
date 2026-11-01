@@ -5,10 +5,13 @@ script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 temporary_directory="$(mktemp -d "${TMPDIR:-/tmp}/ohm-packaging-test.XXXXXXXX")"
 trap 'rm -rf "$temporary_directory"' EXIT
 toolchain=ohm-9.9.9-1
-manifest="$temporary_directory/manifest.json"
+manifest="$temporary_directory/manifest.json"$'\n'
 cat > "$manifest" <<EOF
 {"release":{"toolchain_name":"$toolchain"},"bundled_tools":{"wild":{"version":"0.10.0"}}}
 EOF
+
+cp "$manifest" "${manifest%$'\n'}"
+printf '\n' >> "$manifest"
 
 inputs="$temporary_directory/inputs"
 mkdir -p "$inputs" "$temporary_directory/empty"

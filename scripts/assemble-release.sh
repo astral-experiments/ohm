@@ -7,7 +7,10 @@ if [[ $# -ne 3 ]]; then
   exit 2
 fi
 script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-manifest="$(cd -- "$(dirname -- "$1")" && pwd)/$(basename -- "$1")"
+manifest=$1
+if [[ "$manifest" != /* ]]; then
+  manifest="$PWD/$manifest"
+fi
 OHM_TOOLCHAIN=$3
 if [[ ! "$OHM_TOOLCHAIN" =~ ^ohm-[0-9]+\.[0-9]+\.[0-9]+-[1-9][0-9]*$ ]]; then
   echo "invalid toolchain name: $OHM_TOOLCHAIN" >&2
