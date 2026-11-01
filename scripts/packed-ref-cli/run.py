@@ -19,9 +19,9 @@ import packed_watches
 import pilot as h
 
 ORDER = sdk.ARMS
-BRANCH = "charlie/qa-ruff-packed-refs-full-20261101"
-RUN_NAME = "GNU packed Ruff CLI X-B contact"
-ARTIFACT = "gnu-packed-ruff-x-b-contact"
+BRANCH = "charlie/qa-ruff-packed-refs-full-v2-20261101"
+RUN_NAME = "GNU packed Ruff CLI X-B contact v2"
+ARTIFACT = "gnu-packed-ruff-x-b-contact-v2"
 HISTORIES = (
     ("clean", "reference", h.REFS),
     ("structural", "return", h.FULL),
@@ -100,7 +100,7 @@ def main(argv):
     )
     rows = {k: v["files"] for k, v in sdk_rows.items()}
     position = dict(
-        mode="packed-ref-contact",
+        mode="packed-ref-contact-v2",
         position="01",
         order=list(ORDER),
         host=host,

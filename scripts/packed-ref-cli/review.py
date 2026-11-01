@@ -29,9 +29,9 @@ import packed_sdk as sdk
 import packed_watches
 import reopen as n
 
-BRANCH = "charlie/qa-ruff-packed-refs-full-20261101"
-JOB = "GNU packed Ruff CLI X-B contact"
-ARTIFACT = "gnu-packed-ruff-x-b-contact"
+BRANCH = "charlie/qa-ruff-packed-refs-full-v2-20261101"
+JOB = "GNU packed Ruff CLI X-B contact v2"
+ARTIFACT = "gnu-packed-ruff-x-b-contact-v2"
 SCHEDULE = (
     ("clean", "reference", n.REFS),
     ("structural", "return", n.PHASES),
@@ -268,6 +268,82 @@ def execute(z, records):
     return closed
 
 
+def stock_schedule(read):
+    """Rebuild this host's successful stock link and worker partition from original bytes."""
+    host = json.loads(read("host.json"))
+    ident = host["identities"]["wild"]
+    root = host["out"] + "/group-v2"
+    args = [host["wild"], host["tools"] + "/start.o", "-o", root + "/linked.elf"]
+    raw = read("wild.tsv")
+    closed = n.kernel.parse(raw, expected_code=0, expected_schema=3)
+    (event,) = closed["execs"]
+    need(
+        json.loads(read("wild.command.json"))["argv"]
+        == [host["tools"] + "/observe", root + "/wild.tsv", "--", *args]
+        and json.loads(read("wild.terminal.json")) == {"status": 0}
+        and not read("wild.stdout")
+        and not read("wild.stderr")
+        and event["argv"] == args
+        and event["exe"] == ident["resolved"]
+        and all(
+            event["image"][key] == ident[key]
+            for key in ("dev", "ino", "sha256", "mode", "size", "mtime", "ctime")
+        ),
+        "different physical stock link or result",
+    )
+    link = dict(
+        event=event["ordinal"],
+        lifetime=event["lifetime"],
+        pid=event["pid"],
+        argv=args,
+        output=args[-1],
+        rustc_event=None,
+        rustc_crate=None,
+    )
+    (proof,) = prior.wild_fork.finish(raw, closed, [link])
+    rows = [line.decode("ascii").split("\t") for line in raw.splitlines()]
+    (owner,) = (r for r in rows if r[0] == "G")
+    owner_id = str(proof["helper"])
+    need(
+        closed["lifetimes"] == closed["reaped"] == 4
+        and len(proof["workers"]) == 2
+        and owner[1:] == [owner_id, str(proof["helper_pid"]), "0"]
+        and proof["closure"] == "parked",
+        "different native helper group",
+    )
+    early = []
+    for worker in proof["workers"]:
+        (born,) = (r for r in rows if r[0] == "N" and r[4] == str(worker))
+        need(born[1:4] == [owner_id, owner[2], "3"], "different worker ancestry")
+        terminal = ["X", str(worker), born[5], "0"]
+        if worker not in proof["parked"]:
+            need(
+                rows.index(terminal) < rows.index(owner),
+                "live unparked worker at exit_group",
+            )
+            early.append(worker)
+    image_sha = n.digest(read("linked.elf"))
+    need(
+        image_sha == "8999e7633aff70a36e79bbc057c5102b9c36b0f2ba699fd59bc3f8714a9b4bec"
+        and json.loads(read("run-linked.command.json"))["argv"] == [args[-1]]
+        and json.loads(read("run-linked.terminal.json")) == {"status": 37}
+        and not read("run-linked.stdout")
+        and not read("run-linked.stderr"),
+        "different native linked program or verdict",
+    )
+    return dict(
+        raw_sha256=closed["sha256"],
+        linked_elf_sha256=image_sha,
+        exit=37,
+        schedule=dict(
+            helper=proof["helper"],
+            workers=proof["workers"],
+            parked=proof["parked"],
+            exited_before_group=early,
+        ),
+    )
+
+
 def ingress(z, meta, kernel, calibrator, observers):
     names = z.namelist()
     need(
@@ -291,7 +367,7 @@ def ingress(z, meta, kernel, calibrator, observers):
             pos["head"],
         )
         == (
-            "packed-ref-contact",
+            "packed-ref-contact-v2",
             "01",
             meta["run"],
             meta["runner"],
@@ -316,6 +392,15 @@ def ingress(z, meta, kernel, calibrator, observers):
     )
     minimum = prior.host_guards(z, pos)
     observer = n.kernel_binding(z, boot, "contact", kernel, None)
+    prefix = "kernel-qualification/fixtures/group-v2/"
+    stock = stock_schedule(lambda name: z.read(prefix + name))
+    saved = get(z, prefix + "qualified.json")["native"]["wild"]
+    need(
+        saved["raw_sha256"] == stock["raw_sha256"]
+        and saved["worker_schedule"] == stock["schedule"],
+        "fixture receipt differs from kernel worker exits",
+    )
+    observer["stock_wild_schedule"] = stock
     n.replay_controls.PACKAGING, n.replay_controls.OBSERVER = calibrator, observers
     meter = get(z, "meter-ready.json")
     cal = n.replay_controls.calibration(z, boot)
@@ -570,6 +655,7 @@ def verify(
             official=meta,
             boot=pos["boot"],
             resource=minimum,
+            stock_wild_fixture=kernel_binding["stock_wild_schedule"],
             source=sdk.enrolled(),
             counter=cost,
             primary=primary,

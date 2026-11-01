@@ -1,5 +1,7 @@
 # Same-revision inputs on a full Ruff build with packed refs
 
+This distinct one-host contact excludes former run 41326096604, job 124906234610, its runner and boot. That first attempt returned the correct tiny native exit 37, then refused a real already-exiting Wild helper thread before any customer command or counter. The successor uses the same stock linker, observer C and schema-3 event decoder. It requires observed final status 0 for Wild, its fork helper and both genuinely cloned threads, at least one positive park, plus a pre-group successful exit for any unparked thread.
+
 One reviewed manual first attempt runs D (d95494a6) then its immediate child P (70a0f809) on one fresh GNU x86-64 kernel 7.1.4 host. The native source qualification is 41323607555 / 124898828506. Authenticate both complete SDKs. Of their 81 files, only librustc_driver differs. Use the same rustup path, Cargo, standard library, stock Wild and opt-in branch retention in both roles.
 
 The primary endpoint is the first ordinary full foreground invocation on X after it fast-forwards to B, already built on Y. Count userspace retired instructions from Cargo and all its descendants.
@@ -18,7 +20,7 @@ Pre-register the earlier Y-B and X-A dep-graph and query table from each observe
 
 Use the existing calibrated whole-process PMU and separate schema-3 physical observer. Exclude earlier host, runner and source identities and the distinct six-position integration attempt 41321959762. Reopen its identity-only receipt before interpreting this contact. If all source/donor/correctness/admission predicates pass and D uses more than twice P's instructions on X-B, a separately registered confirmation may proceed. This one ordered observation cannot establish repeatability. Report any fail-closed refusal on the original attempt.
 
-Run the independent reader from the exact reviewed QA checkout. Supply original GitHub run, attempt-one jobs, and artifact metadata in METADATA. KERNEL, CALIBRATOR and OBSERVERS are the pinned 19f9a67b, 2f413ca9 and 8a659140 checkouts. The reader verifies and executes each archived native ELF with its declared PT_INTERP.
+Run the independent reader from the exact reviewed QA checkout. Supply original GitHub run, attempt-one jobs, and artifact metadata in METADATA. KERNEL, CALIBRATOR and OBSERVERS are the pinned fb816a6c, 2f413ca9 and 8a659140 checkouts. The reader verifies and executes each archived native ELF with its declared PT_INTERP.
 
 ```sh
 python3 -IB scripts/packed-ref-cli/review.py --head "$REVIEWED_HEAD" --official "$METADATA" --zip "$ZIP" --kernel "$KERNEL" --calibrator "$CALIBRATOR" --observers "$OBSERVERS" --concurrent-admission "$SIX_BOOT_RECEIPT" --concurrent-sha256 "$SIX_BOOT_SHA256"
