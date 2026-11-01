@@ -129,7 +129,10 @@ if [ "$3" = ohm ] && [ "${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" = 1 ]; then
 fi
 
 mkdir -p "$RUSTUP_HOME/toolchains"
-ln -s "$4" "$RUSTUP_HOME/toolchains/$3"
+if [ -n "${OHM_TEST_RUSTUP_RACER:-}" ] && [ "$3" = "$OHM_TEST_VERSION" ]; then
+  ln -s "$OHM_TEST_RUSTUP_RACER/other" "$OHM_TEST_RUSTUP_RACER/rustup-home/toolchains/$3"
+fi
+ln -sfn "$4" "$RUSTUP_HOME/toolchains/$3"
 EOF
 
 cat > "$mock_directory/curl" <<'EOF'
@@ -560,6 +563,14 @@ assert_no_links activation-race
 if [ ! -f "$activation_race_prefix/race-marker" ] || \
    [ -e "$activation_race_prefix/bin/rustc" ]; then
   echo 'installer overwrote the competing activation destination' >&2
+  exit 1
+fi
+
+race_directory="$temporary_directory/cases/immutable-link-race"
+mkdir -p "$race_directory/other"
+OHM_TEST_RUSTUP_RACER="$race_directory" run_case immutable-link-race failure
+if [ ! "$race_directory/rustup-home/toolchains/$version" -ef "$race_directory/other" ]; then
+  echo 'installer replaced the concurrently registered version' >&2
   exit 1
 fi
 
