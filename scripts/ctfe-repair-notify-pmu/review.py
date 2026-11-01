@@ -11,6 +11,7 @@ import zipfile
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import protocol
+import post_sync
 import storage
 import notify_calibration
 
@@ -190,6 +191,18 @@ def observation(z, top, mode, structural, cert, root, files, refs, bodies, reade
     need(
         aliases == [str(PurePosixPath(link["wild_output"]).relative_to(root / "work"))],
         "wrong/nonunique final CLI inode",
+    )
+    barrier = get(z, pre + "/post-sync-tables.json.gz")
+    post_sync.verify(
+        barrier,
+        before,
+        after,
+        pl,
+        post,
+        contact.REG["selected"],
+        mode,
+        root / "work",
+        None if structural else get(z, cp),
     )
     archive.publication(prior, post, before, after, pl, link, native["cli"]["whole"], root / "work")
     report = {
@@ -575,7 +588,7 @@ def paired_official(directory, run, head, media, observer_source, calibrators, m
         == (
             run,
             head,
-            "charlie/qa-ctfe-repair-notify-pmu-20261101",
+            "charlie/qa-ctfe-repair-postsync-20261101",
             1,
             ".github/workflows/ci.yml",
             "workflow_dispatch",

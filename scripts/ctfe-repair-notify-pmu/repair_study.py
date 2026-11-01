@@ -15,7 +15,7 @@ import notify_calibration
 import protocol
 from capture import contact, ev, kernel, original, p, REG
 
-BRANCH = "refs/heads/charlie/qa-ctfe-repair-notify-pmu-20261101"
+BRANCH = "refs/heads/charlie/qa-ctfe-repair-postsync-20261101"
 
 
 def enrollment():

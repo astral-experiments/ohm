@@ -12,7 +12,7 @@ permissions:
   contents: read
 jobs:
   measure:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-repair-notify-pmu-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-repair-postsync-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
     strategy:
@@ -127,6 +127,7 @@ jobs:
           python3 -IB enrolled/scripts/ctfe-repair-encode/test_contact.py
           python3 -IB enrolled/scripts/ctfe-repair-encode/read_contact.py --help > /dev/null
           python3 -IB enrolled/scripts/ctfe-repair-notify-pmu/test_protocol.py
+          python3 -IB enrolled/scripts/ctfe-repair-notify-pmu/test_post_sync.py
           python3 -IB enrolled/scripts/ctfe-repair-notify-pmu/review.py --help >/dev/null
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           test ! -e "$base"

@@ -5,11 +5,13 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import protocol
 import storage
+import post_sync
 
 sys.path.insert(1, str(protocol.FROZEN))
 import run_contact as original
@@ -122,54 +124,61 @@ def physical(scope, where, env, files, refs, issues, reader, *, structural):
     else:
         cmd = protocol.launches(scope, p.ROOT, where, sdk)
     messages = invoke(where, env, cmd, traced=structural)
+    command_completed = time.monotonic_ns()
     after_files = original.physical_members(sdk, files)
     p.save(where / "physical-after.json", after_files)
     ev.need(
         after_files == physical and not p.original.failed_session.observed(p.WORK),
         "SDK changed or unfinished repair",
     )
-    after = ev.sessions(p.WORK, owners)
-    p.publish(where / "after.json.gz", after)
-    observed_wild = None
-    if structural:
-        cat_after = kernel.catalog(sdk, p.b.PROXIES, None)
-        id_after = [ev.sha(Path(cmd[0])), *p.b.numbers(Path(cmd[0]))]
-        p.save(where / "exec-after.json", cat_after)
-        p.save(where / "observer-after.json", id_after)
-        ev.need(cat == cat_after and identity == id_after, "replaced observer or image")
-        raw = gzip.decompress((where / "positive.tsv.gz").read_bytes())
-        top = kernel.topology(
-            reader,
-            raw,
-            cat,
-            files,
-            sdk,
-            p.b.PROXIES,
-            p.original.CARGO,
-            REG["physical_units"],
-            p.kit.TREE,
+    with post_sync.hold(before, selected, scope, p.WORK, command_completed) as settled:
+        after = ev.sessions(p.WORK, owners)
+        p.publish(where / "after.json.gz", after)
+        observed_wild = None
+        if structural:
+            cat_after = kernel.catalog(sdk, p.b.PROXIES, None)
+            id_after = [ev.sha(Path(cmd[0])), *p.b.numbers(Path(cmd[0]))]
+            p.save(where / "exec-after.json", cat_after)
+            p.save(where / "observer-after.json", id_after)
+            ev.need(cat == cat_after and identity == id_after, "replaced observer or image")
+            raw = gzip.decompress((where / "positive.tsv.gz").read_bytes())
+            top = kernel.topology(
+                reader,
+                raw,
+                cat,
+                files,
+                sdk,
+                p.b.PROXIES,
+                p.original.CARGO,
+                REG["physical_units"],
+                p.kit.TREE,
+            )
+            p.publish(where / "topology.json.gz", top)
+            p.save(where / "completion.json", protocol.completion(raw))
+            observed_wild = Path(top["wild_output"])
+        if scope in ("P", "B"):
+            images, events = contact.listener(where / "calls", scope, sdk, sel, all_, files)
+            observed_wild = Path(ev.roster(images, events, REG, p.original.CARGO, before["owners"]))
+            p.publish(where / "physical-compilers.json.gz", ev.compiler_commands(images))
+            placements = ev.certify(
+                before, after, images, events, selected, scope == "B", all_owners=owners
+            )
+        else:
+            placements = ordinary_files(before, after, selected, scope == "O")
+        p.publish(where / "placements.json.gz", placements)
+        rows, dirty = p.original.historical.roster(messages)
+        p.publish(where / "roster.json.gz", dict(members=rows, dirty=dirty))
+        ev.need(
+            rows == refs[role, "clean-edited"][0]
+            and p.original.historical.commit(rows) == protocol.GRAPH
+            and sorted([r["name"], r["kind"][0]] for r in dirty) == REG["physical_units"],
+            "incorrect actual repaired graph",
         )
-        p.publish(where / "topology.json.gz", top)
-        p.save(where / "completion.json", protocol.completion(raw))
-        observed_wild = Path(top["wild_output"])
-    if scope in ("P", "B"):
-        images, events = contact.listener(where / "calls", scope, sdk, sel, all_, files)
-        observed_wild = Path(ev.roster(images, events, REG, p.original.CARGO, before["owners"]))
-        p.publish(where / "physical-compilers.json.gz", ev.compiler_commands(images))
-        placements = ev.certify(before, after, images, events, selected, scope == "B", all_owners=owners)
-    else:
-        placements = ordinary_files(before, after, selected, scope == "O")
-    p.publish(where / "placements.json.gz", placements)
-    rows, dirty = p.original.historical.roster(messages)
-    p.publish(where / "roster.json.gz", dict(members=rows, dirty=dirty))
-    ev.need(
-        rows == refs[role, "clean-edited"][0]
-        and p.original.historical.commit(rows) == protocol.GRAPH
-        and sorted([r["name"], r["kind"][0]] for r in dirty) == REG["physical_units"],
-        "incorrect actual repaired graph",
-    )
-    disk = p.original.disk.allocated(p.WORK / "target", p.WORK / "build", where, failed_sessions=())
-    ledger = read_gz(where / "path-inodes.json.gz")
+        disk = p.original.disk.allocated(p.WORK / "target", p.WORK / "build", where, failed_sessions=())
+        ledger = read_gz(where / "path-inodes.json.gz")
+    p.publish(where / "post-sync-tables.json.gz", settled)
+    clock = None if structural else json.loads((where / "clock.json").read_bytes())
+    post_sync.verify(settled, before, after, placements, ledger, selected, scope, p.WORK, clock)
     products, paths = p.original.native.observed(
         messages, "B", p.kit.REVS["B"], env, p.ROOT, p.kit.TREE, p.WORK, where
     )
@@ -207,7 +216,6 @@ def physical(scope, where, env, files, refs, issues, reader, *, structural):
             fresh=storage.owners(placements, scope, REG),
         ),
     )
-    clock = None if structural else json.loads((where / "clock.json").read_bytes())
     score = None if clock is None else protocol.measured(clock)
     p.save(
         where / "visit.json",
