@@ -17,7 +17,8 @@ plan = json.loads((here / "protocol.json").read_text())
 arm, = sys.argv[1:]
 assert arm in plan["arms"]
 assert os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
-assert os.environ["GITHUB_REF"] == "refs/heads/charlie/codex-rc23-cross-qualification"
+assert arm == "base"
+assert os.environ["GITHUB_REF"] == "refs/heads/charlie/codex-rc23-host-qualification"
 assert os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch"
 
 def git(root, *args):
