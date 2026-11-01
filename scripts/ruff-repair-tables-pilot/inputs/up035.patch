@@ -1,0 +1,12 @@
+diff --git a/crates/ruff_linter/src/rules/pyupgrade/rules/deprecated_import.rs b/crates/ruff_linter/src/rules/pyupgrade/rules/deprecated_import.rs
+index 8cd4b12f13..9c15c59082 100644
+--- a/crates/ruff_linter/src/rules/pyupgrade/rules/deprecated_import.rs
++++ b/crates/ruff_linter/src/rules/pyupgrade/rules/deprecated_import.rs
+@@ -193,7 +193,6 @@ const TYPING_EXTENSIONS_TO_TYPING: &[&str] = &[
+     "ValuesView",
+     "cast",
+     "no_type_check",
+-    "no_type_check_decorator",
+     // Introduced in Python 3.5.2, but `typing_extensions` contains backported bugfixes and
+     // optimizations,
+     // "NewType",

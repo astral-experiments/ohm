@@ -1,0 +1,210 @@
+{
+  "argv": [
+    "cargo",
+    "+ohm",
+    "check",
+    "-Zunstable-options",
+    "--unit-graph",
+    "-p",
+    "ruff",
+    "--bin",
+    "ruff",
+    "--locked",
+    "--offline",
+    "-j4"
+  ],
+  "cargo": "035e681081683f4141e4c544b8cf9492b73784051e4541c12bb3cbdb73a798a4",
+  "compiler": "c8632d96cc22240f89dfba3c0f8263981f6a278cede445189999cba58cc2c900",
+  "modes": {
+    "build": 115,
+    "check": 260,
+    "run-custom-build": 37
+  },
+  "rows": [
+    {
+      "crate": "ruff_linter",
+      "features": [
+        "clap",
+        "default"
+      ],
+      "mode": "check",
+      "platform": null,
+      "profile": {
+        "codegen_backend": null,
+        "codegen_units": null,
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "incremental": true,
+        "lto": "off",
+        "name": "dev",
+        "opt_level": "1",
+        "overflow_checks": true,
+        "panic": "unwind",
+        "rpath": false,
+        "split_debuginfo": null,
+        "strip": {
+          "deferred": "None"
+        }
+      },
+      "unit": 257
+    },
+    {
+      "crate": "ruff_python_ast",
+      "features": [
+        "cache",
+        "get-size",
+        "salsa",
+        "serde"
+      ],
+      "mode": "check",
+      "platform": null,
+      "profile": {
+        "codegen_backend": null,
+        "codegen_units": null,
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "incremental": true,
+        "lto": "off",
+        "name": "dev",
+        "opt_level": "1",
+        "overflow_checks": true,
+        "panic": "unwind",
+        "rpath": false,
+        "split_debuginfo": null,
+        "strip": {
+          "deferred": "None"
+        }
+      },
+      "unit": 263
+    },
+    {
+      "crate": "ruff_python_parser",
+      "features": [],
+      "mode": "check",
+      "platform": null,
+      "profile": {
+        "codegen_backend": null,
+        "codegen_units": null,
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "incremental": true,
+        "lto": "off",
+        "name": "dev",
+        "opt_level": "1",
+        "overflow_checks": true,
+        "panic": "unwind",
+        "rpath": false,
+        "split_debuginfo": null,
+        "strip": {
+          "deferred": "None"
+        }
+      },
+      "unit": 270
+    },
+    {
+      "crate": "ruff_source_file",
+      "features": [],
+      "mode": "build",
+      "platform": null,
+      "profile": {
+        "codegen_backend": null,
+        "codegen_units": null,
+        "debug_assertions": true,
+        "debuginfo": 0,
+        "incremental": true,
+        "lto": "off",
+        "name": "dev",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "panic": "unwind",
+        "rpath": false,
+        "split_debuginfo": null,
+        "strip": {
+          "deferred": "None"
+        }
+      },
+      "unit": 277
+    },
+    {
+      "crate": "ruff_source_file",
+      "features": [
+        "get-size",
+        "serde"
+      ],
+      "mode": "check",
+      "platform": null,
+      "profile": {
+        "codegen_backend": null,
+        "codegen_units": null,
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "incremental": true,
+        "lto": "off",
+        "name": "dev",
+        "opt_level": "1",
+        "overflow_checks": true,
+        "panic": "unwind",
+        "rpath": false,
+        "split_debuginfo": null,
+        "strip": {
+          "deferred": "None"
+        }
+      },
+      "unit": 278
+    },
+    {
+      "crate": "ruff_text_size",
+      "features": [],
+      "mode": "build",
+      "platform": null,
+      "profile": {
+        "codegen_backend": null,
+        "codegen_units": null,
+        "debug_assertions": true,
+        "debuginfo": 0,
+        "incremental": true,
+        "lto": "off",
+        "name": "dev",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "panic": "unwind",
+        "rpath": false,
+        "split_debuginfo": null,
+        "strip": {
+          "deferred": "None"
+        }
+      },
+      "unit": 279
+    },
+    {
+      "crate": "ruff_text_size",
+      "features": [
+        "get-size",
+        "serde"
+      ],
+      "mode": "check",
+      "platform": null,
+      "profile": {
+        "codegen_backend": null,
+        "codegen_units": null,
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "incremental": true,
+        "lto": "off",
+        "name": "dev",
+        "opt_level": "1",
+        "overflow_checks": true,
+        "panic": "unwind",
+        "rpath": false,
+        "split_debuginfo": null,
+        "strip": {
+          "deferred": "None"
+        }
+      },
+      "unit": 280
+    }
+  ],
+  "sha": "21371ade90a7d0bca17b0994329ac765ba5335fa77afb8c7ce6d9a20c158cf84",
+  "source_rev": "7b13f01ba1569887a25670820764b24c206da8e5",
+  "units": 412
+}

@@ -1,0 +1,41 @@
+{
+  "docs": {
+    "rustc_fs_util": [],
+    "rustc_incremental": [
+      "compiler/rustc_incremental/src/assert_dep_graph.rs - assert_dep_graph (line 25)"
+    ]
+  },
+  "fixtures": {
+    "incremental-directory-copy": "9125c8d34acb8e87f4b3b6f031563bbf1ceeb284cec953a6c3eeff037c57ac05",
+    "incremental-session-fail": "cbc623c841a7acb6c553b64a2b986c89c9eb4cfaaf674b81a0169f08d01f76a9",
+    "ohm-branch-cache-opt-out": "bb3378bf185722c6ddae91ba1dace8f8e2172f8f93344d8bf743e6078766e90f",
+    "ohm-checked-dep-info": "4fdff92dfecb57c8516995197d3cd818795eb573414ee3d696b34be4ceede3a0",
+    "ohm-packed-branch-cache": "6717f1341cccafc496b17834acf390667c8eec2a399730082ea4119f14693042",
+    "ohm-relink-assembler-inputs": "ac92c074e2f5719911b9762dcea62f3e365f697b2090a71ac57b1c173a874b47",
+    "ohm-relink-incremental-objects": "c47ab1304d167ceee205b94d703b46415a13180649d9c41f9c0c99174253be55"
+  },
+  "run_make": [
+    "incremental-directory-copy",
+    "incremental-session-fail",
+    "ohm-branch-cache-opt-out",
+    "ohm-packed-branch-cache",
+    "ohm-checked-dep-info",
+    "ohm-relink-assembler-inputs",
+    "ohm-relink-incremental-objects"
+  ],
+  "units": {
+    "rustc_fs_util": [],
+    "rustc_incremental": [
+      "persist::fs::packed::tests::externally_shared_or_missing_group_leaves_both_tables_raw",
+      "persist::fs::packed::tests::hydrates_only_private_tables_and_their_inode_aliases",
+      "persist::fs::packed::tests::packs_only_private_and_superseded_objects_and_restores_exact_bytes",
+      "persist::fs::packed::tests::rejects_incomplete_or_mixed_generations_and_damaged_streams",
+      "persist::fs::packed::tests::rejects_swapped_object_contents_with_the_same_session_and_filename",
+      "persist::fs::tests::checkout_sessions_prefer_a_match_and_keep_one_alternate",
+      "persist::fs::tests::pack_only_on_checkout_switch",
+      "persist::fs::tests::test_all_except_most_recent",
+      "persist::fs::tests::test_find_source_directory_in_iter",
+      "persist::fs::tests::test_timestamp_serialization"
+    ]
+  }
+}

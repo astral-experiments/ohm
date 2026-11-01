@@ -1,76 +1,41 @@
-name: Confirm Ruff first-checkout and retained-object storage
-run-name: Ruff whole-CLI storage confirmation ${{ inputs.reviewed_head }}
+name: Screen same-checkout incremental table compression
+run-name: Ruff fresh-table writer ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Approved exact packaging commit with successful native sources sealed
-        type: string
+        description: Exact reviewed QA commit containing the source and single-host decision
         required: true
+        type: string
 permissions:
   actions: read
   contents: read
 jobs:
-  antecedents:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-storage-checked-confirmation-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
-    name: Verify source-pilot records and all prior integration boots
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    outputs:
-      binding: ${{ steps.prior.outputs.binding }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-          sparse-checkout: scripts/branch-storage-e-confirmation
-      - name: Verify official prior jobs, original media and immutable boot set
-        id: prior
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-        run: |
-          set -euo pipefail
-          cd scripts/branch-storage-e-confirmation
-          sha256sum --strict --check --status SHA256SUMS
-          python3 -IB confirm_binding.py >> "$GITHUB_OUTPUT"
-  ordinary:
-    needs: antecedents
-    env:
-      PREVIOUS_BINDING: ${{ needs.antecedents.outputs.binding }}
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-branch-storage-checked-confirmation-20261031' && inputs.reviewed_head == github.sha && github.run_attempt == '1'
+  pilot:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-repair-tables-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
+    name: GNU source, repair and ordinary edit on one previously unused host
     timeout-minutes: 355
-    name: Confirm corrected E whole-Ruff storage ${{ matrix.position }}
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        position: ['01','02','03','04','05','06','07','08','09','10','11','12']
+    env:
+      QA_ROOT: /tmp/ohm-gnu-renderer-source-native
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ github.sha }}
           path: enrolled
           persist-credentials: false
+          fetch-depth: 2
           sparse-checkout: |
+            .github/workflows
+            scripts/ruff-repair-tables-pilot
             scripts/branch-return-pmu
             scripts/branch-first-session-e-screen
             scripts/branch-storage-e-confirmation
-            scripts/ohm-packed-ruff/full-cli
-            scripts/ohm-packed-ruff/harness
-      - name: Read the binding to the independently completed native source run
-        id: binding
-        run: |
-          set -euo pipefail
-          (cd enrolled/scripts/branch-return-pmu && sha256sum --strict --check --status SHA256SUMS)
-          (cd enrolled/scripts/branch-first-session-e-screen && sha256sum --strict --check --status SHA256SUMS)
-          cd enrolled/scripts/branch-storage-e-confirmation
-          sha256sum --strict --check --status SHA256SUMS
-          python3 -IB policy.py >> "$GITHUB_OUTPUT"
+            scripts/ohm-packed-ruff
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ steps.binding.outputs.source_head }}
+          ref: 762fc25095e317ac5632ec835df3c7f9cfc64a64
           path: source
           persist-credentials: false
           sparse-checkout: |
@@ -81,10 +46,25 @@ jobs:
             scripts/ohm-apple-zmij/source-transport
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          ref: a4afd181ae07107de6174a17a4ec189061fd18aa
+          path: trusted
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/gnu-renderer-cgu-source
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
+          path: signed-source
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/strict-mixed-generics
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
           ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
           path: physical
           persist-credentials: false
-          sparse-checkout: scripts/gnu-renderer-pfc-hardware
+          sparse-checkout: |
+            scripts/gnu-renderer-pfc-hardware
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
@@ -93,50 +73,64 @@ jobs:
           sparse-checkout: |
             scripts/gnu-example-ceiling
             scripts/gnu-renderer-library-workers
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: ea7d4e23dba715023cb43c82a9e99bec8c8262a4
-          path: provider
-          persist-credentials: false
-          sparse-checkout: scripts/linux-294-parent
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Prepare a bounded task-owned target and build filesystem
+      - name: Verify source transport, sealed antecedents and decision/refusal controls
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates coreutils git ninja-build strace util-linux zstd
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          test ! -e "$base"
-          mkdir -p "$base/work" "$base/logs"
-          truncate -s 12G "$base/task-owned.ext4"
-          /usr/sbin/mkfs.ext4 -q -m 0 -E lazy_itable_init=0,lazy_journal_init=0 "$base/task-owned.ext4"
-          if sudo mount -o loop,nosuid,nodev,noatime "$base/task-owned.ext4" "$base/work"; then
-            sudo chown "$(id -u):$(id -g)" "$base/work"
-            test "$(findmnt -n -o FSTYPE --target "$base/work")" = ext4
-            printf '%s\n' private-ext4 > "$base/logs/storage-mode.txt"
-          else
-            ! mountpoint -q "$base/work"
-            printf '%s\n' runner-filesystem > "$base/logs/storage-mode.txt"
-          fi
-          printf '%s' "$base" > "$base/work/.owned-by-packed-study"
-          findmnt --target "$base/work" > "$base/logs/filesystem.txt"
-          (cd enrolled/scripts/ohm-packed-ruff/full-cli && sha256sum --strict --check --status SHA256SUMS)
-      - name: Compare pristine and same-branch-edited first checkouts with four native provider outcomes
+          test "$(git -C enrolled rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C source rev-parse HEAD)" = 762fc25095e317ac5632ec835df3c7f9cfc64a64
+          test "$(git -C trusted rev-parse HEAD)" = a4afd181ae07107de6174a17a4ec189061fd18aa
+          test "$(git -C signed-source rev-parse HEAD)" = d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
+          test "$(git -C physical rev-parse HEAD)" = 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
+          test "$(git -C observers rev-parse HEAD)" = 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
+          for d in enrolled/scripts/{ruff-repair-tables-pilot,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli} source/scripts/{branch-checked-packed-source,branch-first-session-e-source,branch-return-source,ohm-packed-ruff,ohm-apple-zmij/source-transport} trusted/scripts/gnu-renderer-cgu-source physical/scripts/gnu-renderer-pfc-hardware; do
+            (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
+          done
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/test_pilot.py
+          python3 -IB source/scripts/branch-checked-packed-source/test_binding.py
+          python3 -IB source/scripts/branch-checked-packed-source/test_selector_route.py
+      - name: Prepare task-private resources and authenticate the original 81-member compiler SDK
         env:
           GH_TOKEN: ${{ github.token }}
-          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-          POSITION: ${{ matrix.position }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/branch-storage-e-confirmation/run.py "$POSITION" "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers" "$GITHUB_WORKSPACE/provider"
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          test ! -e "$base" && test ! -e "$QA_ROOT"
+          mkdir -p "$base/work" "$base/logs" "$QA_ROOT/receipts"
+          printf '%s' "$base" > "$base/work/.owned-by-packed-study"
+          cat /proc/self/mountinfo > "$base/logs/mountinfo"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py check "$base/work" "$base/logs" > "$base/logs/entry.json"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends b3sum binutils bubblewrap build-essential ca-certificates clang cmake curl git lld libssl-dev ninja-build perl pkg-config strace time util-linux zstd
+          dpkg-query -W b3sum binutils bubblewrap build-essential clang cmake git lld libssl-dev ninja-build strace time util-linux zstd > "$QA_ROOT/receipts/packages.tsv"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/acquire.py "$GITHUB_WORKSPACE/source"
+      - name: Reconstruct signed compiler history and build only the reviewed fresh-table writer
+        run: |
+          set -euo pipefail
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          python3 -IB source/scripts/ohm-apple-zmij/source-transport/prepare.py "$QA_ROOT/rust" > "$QA_ROOT/receipts/public-source.json"
+          python3 -IB signed-source/scripts/strict-mixed-generics/source.py materialize "$QA_ROOT/rust" parent > "$QA_ROOT/receipts/signed-source.json"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$QA_ROOT/receipts/build-resource" python3 -IB enrolled/scripts/ruff-repair-tables-pilot/build_writer.py "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/trusted"
+      - name: Compare matched ordinary repair and subsequent builds with separate native and high-water controls
+        run: python3 -IB enrolled/scripts/ruff-repair-tables-pilot/experiment.py "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+      - name: Independently reopen the sealed ordinary evidence and integer decision
+        run: python3 -IB enrolled/scripts/ruff-repair-tables-pilot/reopen.py "$RUNNER_TEMP/ohm-branch-object-qa/logs" "$QA_ROOT/receipts"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: checked-e-storage-confirmation-${{ matrix.position }}
-          path: ${{ runner.temp }}/ohm-branch-object-qa/logs
-          retention-days: 14
-          include-hidden-files: true
+          name: fresh-table-writer-source
+          path: /tmp/ohm-gnu-renderer-source-native/receipts
+          retention-days: 21
           compression-level: 1
+          if-no-files-found: warn
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: fresh-table-writer-ruff-pilot
+          path: ${{ runner.temp }}/ohm-branch-object-qa/logs
+          retention-days: 21
+          compression-level: 1
+          include-hidden-files: true
           if-no-files-found: warn

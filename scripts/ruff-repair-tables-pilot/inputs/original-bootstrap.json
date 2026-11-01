@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "./x",
+    "--ci",
+    "false",
+    "--set",
+    "build.submodules=false",
+    "--set",
+    "rust.omit-git-hash=true",
+    "--set",
+    "rust.debug-assertions=false",
+    "--set",
+    "rust.lto=off",
+    "--set",
+    "llvm.download-ci-llvm=true",
+    "build",
+    "--stage",
+    "1",
+    "-j8",
+    "--host",
+    "x86_64-unknown-linux-gnu",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "compiler/rustc",
+    "library",
+    "src/tools/rustdoc"
+  ],
+  "cwd": "/tmp/ohm-gnu-renderer-source-native/rust",
+  "elapsed_seconds": 156.94300846199997,
+  "free_bytes": 297656860672,
+  "output_sha256": "a28adf0d008dac5fdada72e784e5a493562106b85c84fa4bf64294f6f3bac38f",
+  "returncode": 0
+}
