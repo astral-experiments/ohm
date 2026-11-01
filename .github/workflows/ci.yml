@@ -1,21 +1,21 @@
-name: Screen same-checkout incremental table compression
-run-name: Ruff fresh-table writer ${{ inputs.reviewed_head }}
+name: Qualify CTFE literal identity across incremental Rust builds
+run-name: Native CTFE identity qualification ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed QA commit containing the source and single-host decision
+        description: Exact reviewed QA commit containing one reviewed source qualification
         required: true
         type: string
 permissions:
   actions: read
   contents: read
 jobs:
-  pilot:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-repair-tables-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+  qualify:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-literal-identity-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
-    name: GNU source, repair and ordinary edit on one previously unused host
-    timeout-minutes: 355
+    name: GNU compiler and ordinary Ruff allocation identity
+    timeout-minutes: 165
     env:
       QA_ROOT: /tmp/ohm-gnu-renderer-source-native
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
@@ -28,6 +28,7 @@ jobs:
           fetch-depth: 2
           sparse-checkout: |
             .github/workflows
+            scripts/gnu-ctfe-literal-identity
             scripts/ruff-repair-tables-pilot
             scripts/branch-return-pmu
             scripts/branch-first-session-e-screen
@@ -58,40 +59,21 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             scripts/strict-mixed-generics
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
-          path: physical
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/gnu-renderer-pfc-hardware
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-          path: observers
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/gnu-example-ceiling
-            scripts/gnu-renderer-library-workers
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify source transport, sealed antecedents and decision/refusal controls
+      - name: Reopen reviewed source and retained compiler verifier
         run: |
           set -euo pipefail
-          test "$(git -C enrolled rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
           test "$(git -C source rev-parse HEAD)" = 762fc25095e317ac5632ec835df3c7f9cfc64a64
           test "$(git -C trusted rev-parse HEAD)" = a4afd181ae07107de6174a17a4ec189061fd18aa
           test "$(git -C signed-source rev-parse HEAD)" = d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
-          test "$(git -C physical rev-parse HEAD)" = 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
-          test "$(git -C observers rev-parse HEAD)" = 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-          for d in enrolled/scripts/{ruff-repair-tables-pilot,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli} source/scripts/{branch-checked-packed-source,branch-first-session-e-source,branch-return-source,ohm-packed-ruff,ohm-apple-zmij/source-transport} trusted/scripts/gnu-renderer-cgu-source physical/scripts/gnu-renderer-pfc-hardware; do
+          for d in enrolled/scripts/{gnu-ctfe-literal-identity,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli} source/scripts/{branch-checked-packed-source,branch-first-session-e-source,branch-return-source,ohm-packed-ruff,ohm-apple-zmij/source-transport} trusted/scripts/gnu-renderer-cgu-source; do
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/test_pilot.py
-          python3 -IB source/scripts/branch-checked-packed-source/test_binding.py
-          python3 -IB source/scripts/branch-checked-packed-source/test_selector_route.py
-      - name: Prepare task-private resources and authenticate the original 81-member compiler SDK
+          python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/test_qualification.py
+      - name: Restore the immutable E SDK and verify sources
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -100,27 +82,28 @@ jobs:
           test ! -e "$base" && test ! -e "$QA_ROOT"
           mkdir -p "$base/work" "$base/logs" "$QA_ROOT/receipts"
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
-          cat /proc/self/mountinfo > "$base/logs/mountinfo"
           python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py check "$base/work" "$base/logs" > "$base/logs/entry.json"
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends b3sum binutils bubblewrap build-essential ca-certificates clang cmake curl git lld libssl-dev ninja-build perl pkg-config strace time util-linux zstd
-          dpkg-query -W b3sum binutils bubblewrap build-essential clang cmake git lld libssl-dev ninja-build strace time util-linux zstd > "$QA_ROOT/receipts/packages.tsv"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/acquire.py "$GITHUB_WORKSPACE/source"
-      - name: Reconstruct signed compiler history and build only the reviewed fresh-table writer
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates clang cmake curl git lld libssl-dev ninja-build perl pkg-config strace zstd
+          dpkg-query -W b3sum binutils build-essential clang cmake git lld libssl-dev ninja-build strace zstd > "$QA_ROOT/receipts/packages.tsv"
+          python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/bootstrap_subject.py restore "$GITHUB_WORKSPACE/source"
+      - name: Build the exact compiler once and run native source and migration fixtures
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           python3 -IB source/scripts/ohm-apple-zmij/source-transport/prepare.py "$QA_ROOT/rust" > "$QA_ROOT/receipts/public-source.json"
           python3 -IB signed-source/scripts/strict-mixed-generics/source.py materialize "$QA_ROOT/rust" parent > "$QA_ROOT/receipts/signed-source.json"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$QA_ROOT/receipts/build-resource" python3 -IB enrolled/scripts/ruff-repair-tables-pilot/build_writer.py "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/trusted"
-      - name: Compare matched ordinary repair and subsequent builds with separate native and high-water controls
-        run: python3 -IB enrolled/scripts/ruff-repair-tables-pilot/experiment.py "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
-      - name: Independently reopen the sealed ordinary evidence and integer decision
-        run: python3 -IB enrolled/scripts/ruff-repair-tables-pilot/reopen.py "$RUNNER_TEMP/ohm-branch-object-qa/logs" "$QA_ROOT/receipts"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$QA_ROOT/receipts/build-resource" python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/bootstrap_subject.py build "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/trusted"
+      - name: Reproduce baseline and compare the exact ordinary Ruff AST edit to an independent empty build
+        run: |
+          set -euo pipefail
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/ast-resources" python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/ruff.py
+          python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/reopen.py "$QA_ROOT/receipts" "$base/logs"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: fresh-table-writer-source
+          name: ctfe-identity-source-and-driver
           path: /tmp/ohm-gnu-renderer-source-native/receipts
           retention-days: 21
           compression-level: 1
@@ -128,9 +111,9 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: fresh-table-writer-ruff-pilot
+          name: ctfe-identity-ruff
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 21
-          compression-level: 1
           include-hidden-files: true
+          compression-level: 1
           if-no-files-found: warn

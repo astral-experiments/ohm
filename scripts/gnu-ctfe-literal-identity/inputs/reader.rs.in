@@ -1,0 +1,3 @@
+use ruff_python_ast::{Expr, PySourceType};
+const _: [(); @WIDTH@] = [(); std::mem::size_of::<Expr>()];
+fn main() { let s=std::env::args().nth(1).unwrap(); let kind=PySourceType::try_from_extension(std::hint::black_box(s.as_str())); println!("{} {:?}", std::mem::size_of::<Expr>(),kind); }
