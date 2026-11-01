@@ -18,6 +18,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 from linux_common import *
 from packages import CARGO,RELEASES,save,sha
 import rc22_sdk
+import rc22_kernel
 import rc22_trace
 import rc22_units
 
@@ -207,8 +208,13 @@ def visit(root,role,slot,repo,out,phase,state,env,tool,vault,previous=None):
     with tempfile.TemporaryDirectory(dir=slot/"tmp") as t:
         temp=Path(t);trace=temp/"events";trace.mkdir()
         with (temp/"stdout").open("xb") as stdout,(temp/"stderr").open("xb") as stderr:
-            flags = rc22_trace.FLAGS if role == "22" else ["-ff","-q","-s","262144","-e","trace=execve,execveat"]
-            proc=subprocess.Popen(["strace",*flags,"-o",str(trace/"exec"),*CMD],
+            if role == "22":
+                binding=json.loads((root/"receipts/shared/kernel-binding.json").read_bytes())
+                argv=rc22_kernel.command(root,trace,binding)
+                save(out/"collector.json",{"argv":argv,"cwd":str(repo),"observer":binding["observer_sha256"]})
+            else:
+                argv=["strace","-ff","-q","-s","262144","-e","trace=execve,execveat","-o",str(trace/"exec"),*CMD]
+            proc=subprocess.Popen(argv,
                                   env=env,cwd=repo,stdout=stdout,stderr=stderr,start_new_session=True)
             try:
                 while proc.poll() is None:
@@ -222,17 +228,16 @@ def visit(root,role,slot,repo,out,phase,state,env,tool,vault,previous=None):
                     gz(out/"cargo.stdout.gz", (temp/"stdout").read_bytes())
                     gz(out/"cargo.stderr.gz", (temp/"stderr").read_bytes())
                     save(out/"exit.json", proc.returncode)
-                    rc22_trace.retain(trace, out/"process.tsv.gz")
+                    rc22_kernel.retain(trace,out)
                 raise
         stream=(temp/"stdout").read_bytes();err=(temp/"stderr").read_bytes()
         gz(out/"cargo.stdout.gz",stream);gz(out/"cargo.stderr.gz",err);save(out/"exit.json",proc.returncode)
         lines=[]; aliases={}
         if role == "22":
-            raw_process = out / "process.tsv.gz"
-            rc22_trace.retain(trace, raw_process)
-            with gzip.open(raw_process, "rb") as stored:
-                lines, parents, leader, exits = rc22_trace.read(stored)
-            aliases = {p: fx(Path(p)) for p in {event(line.encode())[0] for _, line in lines}}
+            rc22_kernel.retain(trace,out)
+            raw=(trace/"positive.tsv").read_bytes()
+            lines,parents,leader,exits,aliases,family=rc22_kernel.projection(raw,tool)
+            save(out/"kernel-family.json",family)
         else:
             for tracefile in sorted(trace.glob("exec.*")):
                 pid=int(tracefile.suffix[1:])

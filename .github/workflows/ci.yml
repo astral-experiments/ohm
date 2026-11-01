@@ -27,6 +27,14 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 2
           persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: d4e1c4bac917a2de3218c13c50875b5c2d301a23
+          path: exec-observer
+          sparse-checkout: |
+            scripts/branch-return-execstop
+            scripts/branch-return-pmu
+          persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
@@ -42,7 +50,7 @@ jobs:
           sha256sum --quiet -c "$qa/RC22-SHA256SUMS"
           python3 -IB "$qa/rc22_sdk.py" enroll "$root"
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends strace ninja-build b3sum
+          sudo apt-get install -y --no-install-recommends strace ninja-build b3sum libssl-dev
           strace --version > "$root/receipts/shared/strace-version.txt"
           python3 -IB "$qa/linux_controls.py"
           python3 -IB "$qa/rc22_controls.py" --native "$root/receipts/shared/trace-control"
@@ -50,6 +58,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB scripts/packaged-release-workspace/rc22_sdk.py install "$RUNNER_TEMP/packaged-linux-50"
+      - name: Qualify the positive kernel exec recorder on this worker and the authenticated stock Wild
+        run: |
+          root="$RUNNER_TEMP/packaged-linux-50"
+          python3 -IB scripts/packaged-release-workspace/rc22_kernel.py "$root" "$GITHUB_WORKSPACE/exec-observer"
       - name: Verify the Ruff source, complete historical edit and 498 locked registry archives
         run: python3 -IB scripts/packaged-release-workspace/linux.py seed-22 "$RUNNER_TEMP/packaged-linux-50"
       - name: Observe the five ordinary workspace visits, separate fingerprint diagnostic and both empty references

@@ -67,6 +67,11 @@ LINKERS={"ld","ld.bfd","ld.gold","ld.lld","rust-lld","wild","wild-ld","mold"}
 RELEVANT=LINKERS|{"cargo","rustc","collect2","rustdoc"}
 
 def event(line):
+    if line.startswith(b"KERNEL2\t"):
+        path, args = json.loads(line.partition(b"\t")[2])
+        need(isinstance(path,str) and os.path.isabs(path) and isinstance(args,list) and
+             all(isinstance(a,str) and "\0" not in a for a in args), "invalid kernel image projection")
+        return path, args
     need(line.startswith(b"execve(") and line.endswith(b"= 0"),"not a successful kernel exec")
     m=EXEC.match(line);need(m is not None,"truncated or unrecognized execve")
     path=ast.literal_eval(m[1].decode());args=ast.literal_eval(m[2].decode())

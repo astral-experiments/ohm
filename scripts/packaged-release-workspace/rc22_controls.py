@@ -14,6 +14,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import linux_common as lc
 from linux_controls import Controls as OriginalControls
+import rc22_kernel as kernel
 import rc22_sdk as sdk
 import rc22_trace as trace
 import rc22_units as units
@@ -42,6 +43,59 @@ def encode(rows):
     return [str(pid).encode() + b"\t" + base64.b64encode(raw) for pid, raw in rows.items()]
 
 class Controls(unittest.TestCase):
+    @staticmethod
+    def kernel_data():
+        return json.loads(gzip.decompress((lc.FIX/"rc22-kernel-sample.json.gz").read_bytes()))
+
+    def test_real_kernel_packaged_cargo_repeat_and_changed_native_verdict(self):
+        packet=self.kernel_data()
+        self.assertEqual(packet["source"],kernel.SOURCE)
+        self.assertEqual(packet["normal_cargo_argv"],lc.CMD)
+        for role,name in (("rustc","bin/rustc"),("cargo","bin/cargo"),
+                          ("wild","lib/rustlib/"+sdk.HOST+"/bin/wild-ld/ld.bfd")):
+            self.assertEqual(packet["tools"][role]["sha256"],sdk.SPEC["files"][name][1])
+        for phase, expected in (("cold",(4,2,0)),("unchanged",(0,0,0)),("changed",(3,2,101))):
+            saved=packet["stages"][phase]
+            raw=gzip.decompress(base64.b64decode(saved["raw"],validate=True))
+            rows,parents,root,exits,aliases,family=kernel.projection(raw,packet["tools"])
+            census=lc.native(rows,packet["tools"],aliases)
+            producer={c["pid"] for c in census["compilers"]}
+            for linker in census["wild"]:
+                chain=trace.ancestry(linker["pid"],parents,root)
+                self.assertEqual(len(producer.intersection(chain)),1)
+                self.assertEqual(exits[linker["pid"]],"0")
+            self.assertEqual(trace.launch(rows,root,aliases,packet["tools"]),saved["expected"]["launch"])
+            self.assertEqual(family,saved["expected"]["family"])
+            self.assertEqual((len(producer),len(census["wild"]),saved["expected"]["native"]["code"]),expected)
+        self.assertIn("1 passed",packet["stages"]["unchanged"]["native_stdout"])
+        self.assertIn("left: 83",packet["stages"]["changed"]["native_stdout"])
+
+    def test_kernel_refuses_lost_foreign_and_historical_unknowns(self):
+        packet=self.kernel_data(); tools=packet["tools"]; raw=gzip.decompress(base64.b64decode(packet["stages"]["cold"]["raw"]))
+        native=kernel.events.parse(raw,expected_code=0,expected_schema=2)
+        wild=next(e for e in native["execs"] if e["image"]["sha256"]==tools["wild"]["sha256"])
+        lines=raw.splitlines(keepends=True)
+        def drop(tag):
+            index=next(i for i,v in enumerate(lines) if v.startswith(tag+b"\t"))
+            return b"".join(lines[:index]+lines[index+1:])
+        post=f"P\t{wild['lifetime']}\t{wild['pid']}\t{wild['ordinal']}\n".encode()
+        self.assertIn(post,lines)
+        variants=[drop(t) for t in (b"E",b"P",b"N",b"B",b"X",b"T",b"OK")]
+        variants += [raw.replace(post,b"L"+post[1:],1),raw+b"???( <unfinished ...>\n",
+                     raw.replace(tools["wild"]["sha256"].encode(),b"0"*64)]
+        for sample in variants:
+            with self.assertRaises((ValueError,RuntimeError)):
+                kernel.projection(sample,tools)
+        original=json.loads((lc.FIX/"rc22-refused-cold.json").read_bytes())
+        self.assertFalse(original["first_unchanged_ran"])
+        self.assertEqual({r["pid"] for r in original["unknown"]},{12375,22045,24336})
+        for refusal in original["unknown"]:
+            for prefix in ("","[ 186] ","[ 202] "):
+                child=(prefix+refusal["raw"]+"\n+++ exited with 0 +++\n").encode()
+                wrapped=encode({1:b"clone3({flags=CLONE_THREAD}, 88) = 2\n+++ exited with 0 +++\n",2:child})
+                with self.assertRaises(RuntimeError): trace.read(wrapped)
+                with self.assertRaises(ValueError): kernel.projection(b"\n".join(wrapped)+b"\n",tools)
+
     def test_original_50_pairs_and_ron(self):
         args = historical()
         result = units.group_by_product(*args)

@@ -12,6 +12,7 @@ sys.path.insert(0,str(HERE))
 from linux_common import *
 from packages import CARGO,RELEASES,need,save
 import rc22_sdk
+import rc22_kernel
 import rc22_trace
 import rc22_units
 
@@ -77,6 +78,7 @@ def verify(c,role,expected_head=None):
         enrollment = c.json("shared/enrollment.json")
         rc22_sdk.check_worker(enrollment, expected_head)
         rc22_sdk.verify_receipt(c)
+        kernel_binding=rc22_kernel.verify_fixtures(c,enrollment)
         sdk = Path(enrollment["work_root"]) / "sdk-22"
         driver, = [key for key in installed if key.startswith("lib/librustc_driver-") and key.endswith(".so")]
         need(tools["physical_driver"]["physical"] == str(sdk / driver) and
@@ -104,7 +106,7 @@ def verify(c,role,expected_head=None):
              "source, ordinary Cargo command or exit changed")
         lines=json.loads(c.raw(d+"/kernel.json.gz"))
         by=native(lines,tools["tools"],c.json(d+"/exec-aliases.json"))
-        need(by==q["actual"],"literal strace census differs")
+        need(by==q["actual"],"native census differs")
         byexe=q["outputs"]; need(sorted(byexe)==sorted(arts),"different native inventory")
         for k,r in byexe.items():
             need(r["sha256"]==r["gnu_sha256"] and re.fullmatch(r"[0-9a-f]{64}",r["sha256"]) and r["path"]==arts[k]["executable"] and
@@ -144,8 +146,16 @@ def verify(c,role,expected_head=None):
             need(original_cargo_log == (rc22_units.LOG if diagnostic else None), "fingerprint instrumentation in the wrong visit")
             need(len(a) == 619 and (not phase.startswith("clean-") and phase != "cold" or not any(t["fresh"] for t in a)),
                  "wrong regular/independent-empty typed inventory")
-            stream, parents, leader, exits = rc22_trace.read(c.raw(d + "/process.tsv.gz").splitlines())
-            need(stream == lines, "missing or extra physical exec")
+            stream,parents,leader,exits,aliases,family=rc22_kernel.projection(c.raw(d+"/"+rc22_kernel.LEDGER),tools["tools"])
+            observer=c.json(d+"/collector.json")
+            argv=observer["argv"]
+            where=Path(argv[1])
+            need(argv==[kernel_binding["observer"],str(where),"--",*CMD] and where.is_absolute() and
+                 where.name=="positive.tsv" and where.parent.name=="events" and where.parent.parent.parent==root/"slot/tmp" and
+                 observer["observer"]==kernel_binding["observer_sha256"] and observer["cwd"]==q["cwd"],
+                 "different recorder, Cargo, location or cwd")
+            need(stream==lines and aliases==c.json(d+"/exec-aliases.json") and family==c.json(d+"/kernel-family.json"),
+                 "missing or extra physical exec, image identity or family")
             need(rc22_trace.launch(stream, leader, c.json(d + "/exec-aliases.json"), tools["tools"]) == c.json(d + "/launch.json"),
                  "wrong packaged Cargo/compilers")
             tracked = rc22_units.group_by_product(a, arts, stream, by, binds, q["cwd"], exits)

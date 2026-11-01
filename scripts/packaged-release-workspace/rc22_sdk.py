@@ -34,7 +34,7 @@ REPO_ID = 1319437234
 STEPS = {"Verify exact coordinator, inputs and all four source trees", "Build optimized extended Rust distribution",
          "Write build provenance", "Retain distribution artifacts"}
 
-PARENT = "f40b16cdb9c041c941a5e339f816111a80a84bdf"
+PARENT = "84518a4be7835b57cf8561f9f5020770fad429e7"
 PILOT = "charlie/qa-rc22-workspace-50-20261101"
 
 def check_worker(q, expected_head):
@@ -43,7 +43,8 @@ def check_worker(q, expected_head):
          q["workflow"] == ".github/workflows/ci.yml" and q["event"] == "workflow_dispatch" and
          q["attempt"] == 1 and q["job"] == "linux-workspace" and q["run"] > 0 and
          q["machine"] == "x86_64" and q["system"] == "Linux" and q["cpus"] >= 16 and
-         q["free_at_entry"] >= (110 << 30) and str(uuid.UUID(q["boot"])) == q["boot"], "unregistered native worker")
+         q["free_at_entry"] >= (110 << 30) and str(uuid.UUID(q["boot"])) == q["boot"] and
+         q["boot"] != "16abddd9-bd9e-4cec-abb2-de8048ac50b0", "unregistered native worker")
     path = Path(q["work_root"])
     need(path.is_absolute() and path.name == "packaged-linux-50", "foreign native workspace root")
 
