@@ -21,10 +21,10 @@ BIND = json.loads((HERE / "source.json").read_bytes())
 GIB = 1 << 30
 PARENT = BIND["historical_distribution_source"]
 CHILD = BIND["candidate"]
-ANCHOR = "2b1f27d5211e65df4e4fe2f58cd1e474289d2c43"
+ANCHOR = "ea5fd483fd65a82b8cd399d2d44dca8df123043a"
 TEST = "tests/run-make/incremental-missing-query-cache"
 HOSTS = {"Linux": "x86_64-unknown-linux-gnu", "Darwin": "aarch64-apple-darwin"}
-BRANCH = "charlie/qa-rc22-worktree-native-20261101"
+BRANCH = "charlie/qa-rc23-rustdoc-native-20261101"
 
 
 def need(cond, message):
@@ -94,8 +94,11 @@ def source_catalog(repo):
     prior = q["prior_native"]
     last = q["last_native"]
     worktree = q["worktree_native"]
+    ready = q["ready_native"]
+    diamond = q["diamond_native"]
     expected = [(graph, q["graph_candidate_tree"]), (prior["rust"], prior["rust_tree"]),
                 (last["rust"], last["rust_tree"]), (worktree["rust"], worktree["rust_tree"]),
+                (ready["rust"], ready["rust_tree"]), (diamond["rust"], diamond["rust_tree"]),
                 (CHILD, q["candidate_full_tree"])]
     parent = q["parent"]
     need(git(repo, "rev-parse", parent + "^{tree}") == q["parent_full_tree"], "wrong base Rust tree")
@@ -118,7 +121,9 @@ def source_catalog(repo):
         (graph, prior["rust"], q["shipped_cargo"], prior["cargo"]),
         (prior["rust"], last["rust"], prior["cargo"], last["cargo"]),
         (last["rust"], worktree["rust"], last["cargo"], worktree["cargo"]),
-        (worktree["rust"], CHILD, worktree["cargo"], q["trees"]["src/tools/cargo"]),
+        (worktree["rust"], ready["rust"], worktree["cargo"], ready["cargo"]),
+        (ready["rust"], diamond["rust"], ready["cargo"], diamond["cargo"]),
+        (diamond["rust"], CHILD, diamond["cargo"], q["trees"]["src/tools/cargo"]),
     ]:
         raw = f":160000 160000 {before} {after} M\tsrc/tools/cargo"
         need(
@@ -164,7 +169,7 @@ def cargo_catalog(repo):
         need(git(repo, "rev-list", "--parents", "-1", commit).split() == [commit, parent],
              "unexpected Cargo ancestry")
         parent = commit
-    for commit, changed in (q["worktree_changes"] | q["ready_changes"]).items():
+    for commit, changed in (q["worktree_changes"] | q["ready_changes"] | q["diamond_changes"]).items():
         need(git(repo, "diff", "--name-only", commit + "^", commit).splitlines() == sorted(changed), "unexpected source delta")
         for name, pair in changed.items():
             need(git(repo, "rev-parse", commit + "^:" + name, commit + ":" + name).splitlines() == pair, "wrong source blob in " + name)
@@ -208,6 +213,8 @@ def install_source(w, repo, r):
         (cargo, "cargo-worktrees.pack"),
         (repo, "rust-ready-pin.pack"),
         (cargo, "cargo-ready.pack"),
+        (repo, "rust-diamond-pin.pack"),
+        (cargo, "cargo-diamond.pack"),
     ]:
         with (assets / name).open("rb") as stream:
             subprocess.run(

@@ -63,3 +63,11 @@ python3 -IB "$qa/qualify.py" read "$packet/slots-previous-to-candidate" --role c
 The prior c0b31830/4591 GNU and native Apple jobs both passed the contained corruption cases, and Apple completed all 27 natural training rows plus a fresh Diesel Opt. Those outcomes retain their original source identity. The rebased candidate/ed0 pair requires its own native and linker outcomes. The original lost Apple graph still cannot identify the malformed row. [Earlier native qualification](https://github.com/astral-experiments/ohm/actions/runs/41298507385)
 
 Run `python3 -IB scripts/dep-graph-slots/read_paths.py PATH_TO_EXTRACTED_REPORTS` to re-execute the retained worktree and terminal binaries on their native platform. Use `--bytes-only` to check the transcripts, hashes and binary format on a different host.
+
+## Native documentation on the prospective -23 sources
+
+The documentation gate compares published -22 with Cargo 39bf4510 and Rust 83f22211 on both native hosts. Packaging 90575c9f carries the unchanged published 22.json and the proposed 23.json. Each host uses its locally built stage1 rustc and rustdoc from the named run-make and the candidate Cargo already tested by the link smoke. The Darwin PGO check continues to use the instrumented stage2.
+
+The offline fixture contains the original ruff_text_size and ruff_source_file sources from Ruff 93526150, its locked memchr 2.8.3 archive, and two small caller crates. A facade takes a directly imported TextSize and passes it through the real SourceCode and LineIndex routines. The receiver re-executes the client, checks its output, opens the three generated HTML pages, and counts the leaf metadata artifacts in the original Cargo JSON.
+
+Each toolchain runs cold documentation and then a separate build followed by documentation, under defaults and with defaults disabled. All histories use the same absolute project, target, build and Cargo home paths, with fresh contents. Published -22 must report the specific StableCrateId collision in both default histories. The corrected Cargo and both defaults-off controls must write all pages. The two original executable bodies per role remain in `slot-diamond`.

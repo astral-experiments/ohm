@@ -1,4 +1,4 @@
-name: Ready tests, worktree paths, native GNU linking and Darwin Diesel
+name: Native Ruff documentation, GNU linking, terminal and Darwin Diesel
 'on':
   workflow_dispatch:
     inputs:
@@ -8,12 +8,12 @@ name: Ready tests, worktree paths, native GNU linking and Darwin Diesel
         type: string
 permissions: {}
 concurrency:
-  group: private-rc22-worktree-inputs-and-native-graph-recovery
+  group: private-rc23-diamond-native-graph-recovery
   cancel-in-progress: false
 jobs:
   native:
     name: Native graph recovery (${{ matrix.host }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-worktree-native-20261101' && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc23-rustdoc-native-20261101' && github.run_attempt
       == 1 && github.sha == inputs.reviewed_head
     strategy:
       fail-fast: false
@@ -39,7 +39,7 @@ jobs:
       with:
         persist-credentials: false
         ref: ${{ github.sha }}
-        fetch-depth: 4
+        fetch-depth: 5
     - name: Make room for macOS profile training
       if: runner.os == 'macOS' && runner.environment == 'github-hosted'
       run: ./scripts/prepare-hosted-macos-release.sh
@@ -103,12 +103,12 @@ jobs:
       run: |-
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
-        test "$(git rev-parse HEAD^)" = 2b1f27d5211e65df4e4fe2f58cd1e474289d2c43
-        test "$(git rev-parse HEAD~3)" = 0e5fc7cc7e4db398884d782be6049d83eda0ae08
-        git diff --exit-code HEAD~3 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
+        test "$(git rev-parse HEAD^)" = ea5fd483fd65a82b8cd399d2d44dca8df123043a
+        test "$(git rev-parse HEAD~4)" = 0e5fc7cc7e4db398884d782be6049d83eda0ae08
+        git diff --exit-code HEAD~4 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
         (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
-        (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py && python3 -IB gnu-defaults/test_cases.py)
+        (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py && python3 -IB gnu-defaults/test_cases.py && python3 -IB diamond/test_case.py)
         df -h "$GITHUB_WORKSPACE"
         available=$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')
         test "$available" -ge 41943040
@@ -270,6 +270,10 @@ jobs:
       id: reopened
       run: python3 -IB scripts/dep-graph-slots/read_paths.py source/reports
       if: success() && steps.ready.outcome == 'success'
+    - name: Build and document the Ruff diamond under both selected native toolchains
+      id: diamond
+      if: success() && steps.reopened.outcome == 'success'
+      run: python3 -IB scripts/dep-graph-slots/diamond/host.py
     - name: Require the complete native outcome on the enrolled platform
       run: |-
         set -euo pipefail
@@ -281,6 +285,7 @@ jobs:
         test "$WORKTREES" = success
         test "$READY" = success
         test "$REOPENED" = success
+        test "$DIAMOND" = success
         if test "$RUNNER_OS" = macOS; then
           test "$NATURAL" = success && test "$ESCROW" = success && test "$COLLECTORS" = success && test "$APPLE_RMAKE" = success
         else
@@ -290,6 +295,7 @@ jobs:
       shell: bash
       env:
         WORKTREES: ${{ steps.worktrees.outcome }}
+        DIAMOND: ${{ steps.diamond.outcome }}
         REOPENED: ${{ steps.reopened.outcome }}
         READY: ${{ steps.ready.outcome }}
         SOURCE: ${{ steps.source.outcome }}
