@@ -64,7 +64,7 @@ def context(root):
     require(os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
             and os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch"
             and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
-            and os.environ["GITHUB_REF"] == "refs/heads/charlie/qa-rc23-profiled-gnu-20261101",
+            and os.environ["GITHUB_REF"] == "refs/heads/charlie/qa-rc23-profiled-gnu-stage-20261101",
             "unexpected QA workflow")
     return {"coordinator": COORDINATOR, "qa": expected, "run": int(os.environ["GITHUB_RUN_ID"]),
             "job": os.environ["GITHUB_JOB"], "manifest": MANIFEST_SHA, "sources": SOURCES}

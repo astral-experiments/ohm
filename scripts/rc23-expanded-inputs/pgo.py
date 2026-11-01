@@ -196,6 +196,25 @@ def reported_temps(lines, temp, rustc=None):
     return found
 
 
+def staged_collector_inputs(perf, pins, complete):
+    # The release recipe patches the copy supplied to opt-dist. Its submodule stays pristine.
+    source = "collector/src/compile/benchmark/mod.rs"
+    need(pins[source] == "b6551dd312aa940fccdd0829453b23a4aa052d63192d7789b51a526a9de59d75",
+         "unexpected upstream benchmark implementation")
+    expected = dict(pins)
+    expected[source] = "00d06a1cf71672549ca18699e242027f213a5635733505f1cd0098ab64586549"
+    present = {}
+    for name, digest in expected.items():
+        path = perf / name
+        if path.exists() or path.is_symlink():
+            need(path.is_file() and not path.is_symlink() and path.resolve() == perf.resolve() / name,
+                 "nonregular staged collector input")
+            present[name] = sha(path)
+            need(present[name] == digest, "different staged native collector source")
+    need(not complete or present == expected, "incomplete staged native collector")
+    return present
+
+
 def evidence(a):
     a.out.mkdir()
     root = Path(os.environ["GITHUB_WORKSPACE"]).resolve(strict=True)
@@ -319,10 +338,8 @@ def evidence(a):
             "different native collector or Diesel inputs",
         )
         record["collector_inputs"] = pins
-    if perf.is_dir():
-        present = {name: sha(perf / name) for name in pins if (perf / name).is_file()}
-        need(all(pins[n] == h for n, h in present.items()), "different staged native collector source")
-        record["collector_inputs_present_after_build"] = present
+    if a.outcome == "success" or perf.is_dir():
+        record["collector_inputs_present_after_build"] = staged_collector_inputs(perf, pins, a.outcome == "success")
     save(a.out / "complete.json", record)
 
 

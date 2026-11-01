@@ -8,7 +8,7 @@ name: Qualify the ordinary GNU Ohm 1.99.0-23 distribution after dependency prepa
         type: string
 permissions: {}
 concurrency:
-  group: qa-rc23-profiled-gnu-${{ github.sha }}
+  group: qa-rc23-profiled-gnu-stage-${{ github.sha }}
   cancel-in-progress: false
 env:
   REVIEWED_HEAD: ${{ inputs.reviewed_head }}
@@ -86,7 +86,7 @@ jobs:
         bash scripts/test-installer.sh
       env:
         QA_PYTHON: ${{ steps.qa_python.outputs.python-path }}
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-rc23-profiled-gnu-20261101'
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-rc23-profiled-gnu-stage-20261101'
       && github.sha == inputs.reviewed_head && github.run_attempt == '1'
   build:
     needs: plan
@@ -370,6 +370,8 @@ jobs:
             --one-line-on-crash 'image list' \
             -- "$rustc" -vV
     - name: Write build provenance
+      id: provenance
+      if: "!cancelled() && steps.distribution.outcome == 'success'"
       env:
         CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
         CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
@@ -415,6 +417,7 @@ jobs:
             }
           }' > source/rust/build/dist/ohm-provenance.json
     - name: Stage versioned distribution assets
+      if: "!cancelled() && steps.provenance.outcome == 'success'"
       id: assets
       env:
         OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
@@ -441,6 +444,7 @@ jobs:
 
         echo "directory=$release_directory" >> "$GITHUB_OUTPUT"
     - name: Retain distribution artifacts
+      if: "!cancelled() && steps.assets.outcome == 'success'"
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}

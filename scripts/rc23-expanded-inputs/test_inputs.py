@@ -18,6 +18,39 @@ import pgo
 
 
 class NativeInputs(unittest.TestCase):
+    def test_actual_prepared_collector(self):
+        name = "collector/src/compile/benchmark/mod.rs"
+        original = "b6551dd312aa940fccdd0829453b23a4aa052d63192d7789b51a526a9de59d75"
+        prepared = gzip.decompress((HERE / "prepared-collector.rs.gz").read_bytes())
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            src = root / name
+            src.parent.mkdir(parents=True)
+            src.write_bytes(prepared)
+            lock = root / "Cargo.lock"
+            lock.write_bytes(b"fixed second input")
+            pins = {name: original, lock.name: sha(lock)}
+            expected = {name: sha(src), lock.name: sha(lock)}
+            self.assertNotEqual(pins, expected)
+            self.assertEqual(pgo.staged_collector_inputs(root, pins, True), expected)
+            with self.assertRaisesRegex(ValueError, "upstream benchmark"):
+                pgo.staged_collector_inputs(root, expected, True)
+            lock.unlink()
+            self.assertEqual(pgo.staged_collector_inputs(root, pins, False), {name: expected[name]})
+            with self.assertRaisesRegex(ValueError, "incomplete"):
+                pgo.staged_collector_inputs(root, pins, True)
+            lock.write_bytes(b"changed sibling")
+            with self.assertRaisesRegex(ValueError, "different staged"):
+                pgo.staged_collector_inputs(root, pins, True)
+            lock.write_bytes(b"fixed second input")
+            src.write_bytes(prepared + b"changed")
+            with self.assertRaisesRegex(ValueError, "different staged"):
+                pgo.staged_collector_inputs(root, pins, True)
+            src.unlink()
+            src.symlink_to(root / "missing")
+            with self.assertRaisesRegex(ValueError, "nonregular"):
+                pgo.staged_collector_inputs(root, pins, False)
+
     def test_installer_and_compiler_transports(self):
         for name in ("rust", "cargo"):
             spec = REG[name + "_tail"]
