@@ -1,62 +1,106 @@
-"""Count actual native linker processes on the new Linux package with its default driver."""
-import ast,hashlib,json,os,re,shutil,subprocess,tarfile,tempfile
+"""Test explicit Rust archive search paths against the candidate's actual GNU linker."""
+import hashlib
+import json
+import os
 from pathlib import Path
-root=Path(os.environ['RUNNER_TEMP'])/'rc22-physical-gnu';root.mkdir()
-reports=root/'reports';reports.mkdir();assets=Path('release').resolve()
-distribution=next(assets.glob('*.tar.gz')); expect=(assets/(distribution.name+'.sha256')).read_text().split()[0]
-actual=hashlib.file_digest(distribution.open('rb'),'sha256').hexdigest(); assert actual==expect
-for d in ('extract','home','rustup','cargo','tmp'):(root/d).mkdir()
-with tarfile.open(distribution) as tf:tf.extractall(root/'extract',filter='data')
-inner=root/'extract/rust-1.99.0-dev-x86_64-unknown-linux-gnu/install.sh'
-assert inner.is_file() and not inner.is_symlink()
-sdk=root/'sdk'
-env=dict(HOME=str(root/'home'),PATH=os.environ['PATH'],RUSTUP_HOME=str(root/'rustup'),CARGO_HOME=str(root/'cargo'),TMPDIR=str(root/'tmp'),LC_ALL='C',CARGO_INCREMENTAL='1')
-with (reports/'inner-install.log').open('wb') as f:subprocess.run(['sh',str(inner),'--prefix='+str(sdk),'--disable-ldconfig'],env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
-alias='ohm-rc22-physical';subprocess.run(['rustup','toolchain','link',alias,str(sdk)],env=env,check=True)
-versions={k:subprocess.check_output([k,'+'+alias,'-vV'],env=env,text=True) for k in ('rustc','cargo')}
-assert '1bc7b35699479d5899a2935d79392b7bdaf7497d' in versions['rustc'] and '4591cf45cc10abb19d2456c40b99606e08167f29' in versions['cargo']
-smoke=Path('scripts/smoke-test-relink.sh').resolve()
-assert hashlib.sha256(smoke.read_bytes()).hexdigest()=='e57b87041abe1f91c78c29bb26e276e7ccd41e8f33a360aec616fb260d7ec175'
-with (reports/'strict-smoke.log').open('wb') as f:
-    strict=subprocess.run(['bash',str(smoke),alias,str(root/'strict')],env=env,stdout=f,stderr=subprocess.STDOUT).returncode
-negative=(reports/'strict-smoke.log').read_text()
-if strict:assert re.search(r'Expected 0 linker calls for two executables returning 17, observed\s+2',negative),negative[-1800:]
-project=root/'default';project.mkdir()
-orig=root/'strict/declared'
-for f in ('Cargo.toml','engine/Cargo.toml','engine/src/lib.rs','src/bin/first.rs','src/bin/second.rs'):
-    dest=project/f;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(orig/f,dest)
-assert 'asm!' in (project/'engine/src/lib.rs').read_text()
-text=(orig/'build.rs').read_text().splitlines()
-assert len([x for x in text if 'cargo::rerun-if-changed=' in x])==1
-(project/'build.rs').write_text('\n'.join('    println!("cargo::rerun-if-changed=native/libanswer.a");' if 'cargo::rerun-if-changed=' in x else x for x in text)+'\n')
-(project/'native').mkdir();env.update(CARGO_TARGET_DIR=str(root/'target'),CARGO_BUILD_BUILD_DIR=str(root/'build'))
-def archive(value):
-    m=root/('member-'+str(value));m.mkdir()
-    subprocess.run(['cc','-x','c','-c','-o','answer.o','-'],env=env,cwd=m,input=f'int answer(void) {{ return {value}; }}\n'.encode(),check=True)
-    subprocess.run(['ar','rcs','libanswer.a','answer.o'],env=env,cwd=m,check=True)
-    shutil.copyfile(m/'libanswer.a',project/'native/libanswer.a')
-records=[]
-ldnames={'ld','ld.bfd','ld.lld','rust-lld','wild','wild-ld','x86_64-linux-gnu-ld','x86_64-linux-gnu-ld.bfd','x86_64-linux-gnu-ld.lld'}
-def stage(name,value):
-    d=reports/name;d.mkdir()
-    with (d/'cargo.log').open('wb') as f:
-        subprocess.run(['strace','-ff','-v','-s','65535','-e','trace=execve,execveat','-o',str(d/'exec'),'cargo','+'+alias,'build','--bins','--offline','-vv'],env=env,cwd=project,stdout=f,stderr=subprocess.STDOUT,check=True)
-    values=[subprocess.check_output([root/'target/debug'/b],env=env,text=True).strip() for b in ('first','second')];assert values==[str(value)]*2,(name,values)
-    events=[];targets=set()
-    for f in d.glob('exec.*'):
-        for line in f.read_text(errors='replace').splitlines():
-            if not (line.startswith('execve(') and re.search(r'\)\s+= 0$',line)):continue
-            exe,sep,rest=line[7:].partition(', [')
-            if not sep:continue
-            exe=ast.literal_eval(exe);argv,sep,_=rest.partition('], [')
-            if not sep:continue
-            if Path(exe).name not in ldnames:continue
-            args=ast.literal_eval('['+argv+']')
-            if '-o' not in args:continue
-            out=args[args.index('-o')+1];b=re.fullmatch(r'(first|second)(?:-[0-9a-f]+)?',Path(out).name) if Path(out).is_relative_to(root/'target') else None
-            if b:events.append(dict(pid=f.suffix[1:],exe=exe,output=out));targets.add(b[1])
-    if name in ('initial','changed'):assert targets=={'first','second'},(name,events)
-    records.append(dict(stage=name,values=values,links=events,outputs=sorted(targets)))
-    (reports/'results.json').write_text(json.dumps(dict(distribution=actual,versions=versions,strict_exit=strict,stages=records),indent=2)+'\n')
-archive(17);stage('initial',17);stage('unchanged',17);archive(29);stage('changed',29);stage('unchanged-again',29)
-print([(r['stage'],r['outputs'],r['values']) for r in records])
+import subprocess
+import tarfile
+
+root = Path(os.environ["RUNNER_TEMP"])/"rc22-gnu-archive-resolution"
+root.mkdir()
+reports = root/"reports"
+reports.mkdir()
+def sha(path):
+    with path.open("rb") as f:
+        return hashlib.file_digest(f, "sha256").hexdigest()
+dist, = Path("release").resolve().glob("*.tar.gz")
+assert sha(dist) == "0b424df45b3bb9ccea5d1eda44f2481cb17a44f31ec6290e82d3db073489fe8a"
+with tarfile.open(dist) as tf:
+    tf.extractall(root/"extract", filter="data")
+install = root/"extract/rust-1.99.0-dev-x86_64-unknown-linux-gnu/install.sh"
+sdk = root/"sdk"
+with (reports/"install.log").open("xb") as log:
+    subprocess.run(["sh",str(install),"--prefix="+str(sdk),"--disable-ldconfig"], cwd=root, stdout=log, stderr=subprocess.STDOUT, check=True)
+driver = sdk/"lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld"
+wild = driver/"ld.bfd"
+version = subprocess.check_output([wild,"--version"],text=True).strip()
+assert "0.11.0" in version, version
+rustc = sdk/"bin/rustc"
+rust_version = subprocess.check_output([rustc,"-vV"], text=True)
+(reports/"tools.json").write_text(json.dumps({"archive":sha(dist),"wild":version,"wild_sha256":sha(wild),"rustc":rust_version},indent=2)+"\n")
+directories = [root/n for n in ("early", "declared", "extra")]
+for d in directories: d.mkdir()
+program=root/"program"
+main=root/"main.rs"
+main.write_text('extern "C" { fn answer() -> i32; fn extra() -> i32; }\nfn main() { println!("{}", unsafe {answer()+extra()}); }\n')
+def archive(d, name, value):
+    obj=root/"value.o"
+    subprocess.run(["cc","-c","-x","c","-o",obj,"-"],input=f"int {name}(void) {{ return {value}; }}\n".encode(),check=True)
+    stage=root/f"{name}-{value}.a"
+    subprocess.run(["ar","rcs",stage,obj],check=True)
+    dest=d/("lib"+name+".a")
+    dest.write_bytes(stage.read_bytes())
+    return dest
+def candidates():
+    return {str(d/("lib"+n+".a")):sha(d/("lib"+n+".a")) if (d/("lib"+n+".a")).is_file() else None
+            for d in directories for n in ("answer","extra")}
+previous=None
+rows=[]
+def build(case, expected, should_link):
+    global previous
+    witnesses=candidates()
+    linked=previous != (witnesses, sha(program) if program.is_file() else None)
+    assert linked == should_link,case
+    row={"case":case,"explicit_candidates":witnesses,"linked":linked}
+    if linked:
+        previous=None
+        dep=reports/(case+".deps")
+        argv=[str(rustc),str(main),"--emit=link","-o",str(program)]
+        argv.extend("-Lnative="+str(d) for d in directories)
+        argv.extend(["-lstatic=answer","-lstatic=extra","-C","link-arg=-fuse-ld=bfd","-C","link-arg=-B"+str(driver),
+                     "-C","link-arg=-Wl,--dependency-file="+str(dep),"--print=link-args="+str(reports/(case+".args"))])
+        if case=="cold":
+            argv=["strace","-f","-e","trace=execve","-s","512","-o",str(reports/"cold.native"),*argv]
+        p=subprocess.run(argv,cwd=root,capture_output=True)
+        (reports/(case+".stderr")).write_bytes(p.stderr)
+        (reports/(case+".stdout")).write_bytes(p.stdout)
+        row["status"]=p.returncode
+        if expected is None:
+            assert p.returncode!=0 and b"extra" in p.stderr,case
+        else:
+            assert p.returncode==0,(case,p.stderr[-1200:])
+            if case=="cold":
+                assert any('execve("'+str(wild)+'"' in l and l.endswith("= 0") for l in (reports/"cold.native").read_text().splitlines())
+            record=dep.read_text().splitlines()[0]
+            assert record.startswith(str(program)+": "),record
+            positive=set(record.split(": ",1)[1].split())
+            def selected(name): return next(str(d/("lib"+name+".a")) for d in directories if witnesses[str(d/("lib"+name+".a"))])
+            assert {selected("answer"),selected("extra")} <= positive,(case,positive)
+            row["positive_user_inputs"]=sorted(positive & set(witnesses))
+            assert all(path not in positive for path, digest in witnesses.items() if digest is None)
+            assert candidates()==witnesses
+            previous=(witnesses,sha(program))
+    if expected is not None:
+        value=int(subprocess.check_output([program],cwd=root))
+        assert value==expected,(case,value,expected)
+        row["value"]=value
+    rows.append(row)
+    (reports/"result.json").write_text(json.dumps(rows,indent=2)+"\n")
+one=archive(directories[1],"answer",17)
+two=archive(directories[2],"extra",3)
+build("cold",20,True)
+build("unchanged",20,False)
+st=two.stat()
+archive(directories[2],"extra",7)
+os.utime(two,ns=(st.st_atime_ns,st.st_mtime_ns))
+assert (two.stat().st_ino,two.stat().st_size,two.stat().st_mtime_ns)==(st.st_ino,st.st_size,st.st_mtime_ns)
+build("same-stat-secondary",24,True)
+archive(directories[0],"answer",41)
+build("new-earlier-library",48,True)
+build("unchanged-again",48,False)
+two.write_bytes(b"not a native archive")
+build("malformed",None,True)
+two.rename(root/"retained-malformed.a")
+build("missing",None,True)
+archive(directories[2],"extra",11)
+build("repaired",52,True)
