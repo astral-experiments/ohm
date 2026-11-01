@@ -1,0 +1,191 @@
+{
+  "attempt": 1,
+  "branch": "charlie/qa-rc22-pgo-diesel-forensics-20261101",
+  "collector": {
+    "bootstrap_config": "74610eaa40e6deb0c7a6e98d6c89fafb0d47b7fd92b04499ecb46bd4138c632a",
+    "collector": "da0002c4bf709c4e0746f60e227794914a9940b94555a1e8ab6f53c2d8f15496",
+    "rustc_fake": "2852d21ea3d76cb5523d29212039aa0e068f226e94b23f2542c254e5074730e7",
+    "source": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
+    "source_members": {
+      "Cargo.lock": "d8d6ac0b19019fead6495e8e1212ce504e7d454b32b7437b71b5a03573100090",
+      "collector/compile-benchmarks/diesel-2.2.10/0-println.patch": "b4db60270000027c344e477cbab9d20f27006bca74e76bf9b035034def9880cc",
+      "collector/compile-benchmarks/diesel-2.2.10/Cargo.lock": "c71b3ad6a412e839520021e4f3c9d0010c2578e6e9fa2cfd6651874fa2e47dae",
+      "collector/compile-benchmarks/diesel-2.2.10/Cargo.toml": "ff68eaa5bd5b1145af7d60a89d4817ddb469130ece95926114403ce2ed904a65",
+      "collector/compile-benchmarks/diesel-2.2.10/src/query_dsl/mod.rs": "3016a57698d460cb43aa038cfe44d44ab64ec3d9f408b474c4feea49daac4202",
+      "collector/src/bin/collector.rs": "c6658d4a3a4656346c864bfc3a2ef74a87e743a277c3a71f46a0073a10a4a302",
+      "collector/src/bin/rustc-fake.rs": "e79d5cae3cea82eab7b6cb46c6f1646dd82349bd0efd2b4d0cbc71afa1045a19",
+      "collector/src/compile/benchmark/mod.rs": "b6551dd312aa940fccdd0829453b23a4aa052d63192d7789b51a526a9de59d75",
+      "collector/src/compile/execute/mod.rs": "87218998d8f96810284d3cea84ed4ef2b3020d4797fc9d998e08b726d8c673b1"
+    }
+  },
+  "driver_member": "lib/librustc_driver-4996ff93a46b9ede.dylib",
+  "head": "e8c4c99286652f27929290e417ff269e32d0bbd5",
+  "inventory": {
+    "distinct_regular_inodes": 2471,
+    "members": 3070,
+    "unique_bytes": 698218911
+  },
+  "job": 124729729200,
+  "job_name": "Original macOS PGO Diesel containment",
+  "official": {
+    "digest": "sha256:a1dd5512ea696b87ae4ca959f29113c3952c241ef8201d0899d07db5915810ef",
+    "id": 13069826622,
+    "name": "diesel-pgo-real-stage2",
+    "size_in_bytes": 239417159
+  },
+  "prior_evidence": {
+    "first_original": {
+      "digest": "sha256:032e42b8389dca3846272eb639cbc9f4afcb7b3455c3e61f4f9aadcb4132b958",
+      "id": 13069677149,
+      "name": "diesel-pgo-first-original",
+      "size_in_bytes": 140187
+    },
+    "focused": {
+      "digest": "sha256:e8fef29d98b82289eb92125234e6cc42dfb83b9e1d19cc7b7099fad845169168",
+      "id": 13070110859,
+      "name": "diesel-pgo-focused-replays",
+      "size_in_bytes": 4666
+    },
+    "runtime_profile_signatures": [
+      "17188767684419827504_0",
+      "7850086961222677497_0"
+    ],
+    "successful_merged_sha256": "fad35bfbf54e989fb9fb223ad12424f52381a9c6060a5e1725a25d325f3637a5"
+  },
+  "repository": "astral-experiments/ohm",
+  "roster": [
+    "Running bitmaps-3.2.1: Check + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running bitmaps-3.2.1: Debug + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running bitmaps-3.2.1: Opt + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running cargo-0.87.1: Check + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running cargo-0.87.1: Debug + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running cargo-0.87.1: Opt + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running ctfe-stress-5: Check + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running ctfe-stress-5: Debug + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running ctfe-stress-5: Opt + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running diesel-2.2.10: Check + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running diesel-2.2.10: Debug + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running diesel-2.2.10: Opt + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running externs: Check + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running externs: Debug + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running externs: Opt + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running match-stress: Check + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running match-stress: Debug + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running match-stress: Opt + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running serde-1.0.219-new-solver: Check + [Full] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running serde-1.0.219-new-solver: Debug + [Full] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running serde-1.0.219-new-solver: Opt + [Full] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running token-stream-stress: Check + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running token-stream-stress: Debug + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running token-stream-stress: Opt + [Full, IncrFull, IncrUnchanged] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running tuple-stress: Check + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running tuple-stress: Debug + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)",
+    "Running tuple-stress: Opt + [Full, IncrFull, IncrUnchanged, IncrPatched] + Llvm + AArch64UnknownLinuxGnu + FrontendThreads(1)"
+  ],
+  "run": 41266309274,
+  "stage0_distribution": {
+    "installed_tools": {
+      "cargo": {
+        "archive": [
+          8894708,
+          "2c2a8bbf3cba4353c0ca2cf1ba8280603f3ca82ceebb538fee4a1a987147f743"
+        ],
+        "binary": [
+          31958872,
+          "1de2e84c15443b70444eecfa959ff9099dd8c1a5606b6d9ef5bc0ea9c25bc7f9"
+        ],
+        "member": "cargo-1.98.0-aarch64-apple-darwin/cargo/bin/cargo",
+        "url": "https://static.rust-lang.org/dist/2026-08-20/cargo-1.98.0-aarch64-apple-darwin.tar.xz"
+      },
+      "rustc": {
+        "archive": [
+          49401680,
+          "287edbc2e285b9c23ef7b085413b90cb8539909eda9c4b49f2a55ec0b52819d4"
+        ],
+        "binary": [
+          412504,
+          "a11618eca0956a8aa4372c2bc898690b513cbdfa2cb9125b2a5301e360ed5b49"
+        ],
+        "member": "rustc-1.98.0-aarch64-apple-darwin/rustc/bin/rustc",
+        "url": "https://static.rust-lang.org/dist/2026-08-20/rustc-1.98.0-aarch64-apple-darwin.tar.xz"
+      }
+    },
+    "source": "c5178286c2661c22ef4ed304d7213589483548ee",
+    "stage0_blob": "2b3c07d4d457c516754477d36a21529d0cabbfdd"
+  },
+  "tools": {
+    "cargo": [
+      69017544,
+      "db9bb52064f06a976190fef9b291d4d4cb52a1d9e76458727437add36feea26e"
+    ],
+    "driver": [
+      154301432,
+      "9f64c15ce126ba37950d596c9bf8eb8c7072f3dd8093704af6b411146442efa8"
+    ],
+    "rustc": [
+      730680,
+      "6a9a7496ac305c27a7a950fed93a2158d1cbeb412146d4d3a80d3fd2304a705d"
+    ]
+  },
+  "trees": {
+    "bitmaps-3.2.1": "fffc6646daa4b2ba80ae2ebcf91d1e67716f2a39",
+    "cargo-0.87.1": "b8d1830845ec0b9a9632f9992de14fab6612c816",
+    "ctfe-stress-5": "0832ec574e23540e5b595477fc069ea0116e3064",
+    "diesel-2.2.10": "df8341fa205001163fa3e51b1c412f88a850f3e7",
+    "externs": "b0ea6d332ab94ea4afe356c8cf368f18b7d3df9f",
+    "match-stress": "424bea99c17026cc6d7e641b13ed89e5cd48ad05",
+    "serde-1.0.219-new-solver": "5ced1221c2a109b1ddd94240c44f9f8cb382e5c9",
+    "token-stream-stress": "05ccb76e8a45a4922036935bdda5eba1356d4e03",
+    "tuple-stress": "0d83aae2da057e767c4947a45659afe019bdd02f"
+  },
+  "versions": {
+    "cargo": "cargo 1.99.0-dev (4591cf45c 2026-10-31) (ohm-1.99.0-22)\nrelease: 1.99.0-dev\ncommit-hash: 4591cf45cc10abb19d2456c40b99606e08167f29\ncommit-date: 2026-10-31\nhost: aarch64-apple-darwin\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.7.1 (sys:0.4.90+curl-8.21.0 system ssl:(SecureTransport) LibreSSL/3.3.6)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Mac OS 15.8.2 [64-bit]\n",
+    "rustc": "rustc 1.99.0-dev (1bc7b3569 2026-11-01) (ohm-1.99.0-22)\nbinary: rustc\ncommit-hash: 1bc7b35699479d5899a2935d79392b7bdaf7497d\ncommit-date: 2026-11-01\nhost: aarch64-apple-darwin\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+  },
+  "zip_members": {
+    "driver-otool.txt": [
+      10476,
+      "85ed26f9504ac1a609f41a39429313cbf555ce80af34472e7956befe0ed55bf5"
+    ],
+    "identity-llvm-profdata.txt": [
+      208,
+      "04d40ef232e22a585d238e2cd609aa5eaa9d28d7eeaaea6bf91042121c65f290"
+    ],
+    "instrumented-sdk.tar.gz": [
+      238344989,
+      "45ed05e147c79eeb10709e58c3ac8545ced01c53778d5902f6bbc755bb2d52ad"
+    ],
+    "instrumented-sdk.tar.inventory.json": [
+      1055158,
+      "b3086041063e618a16e82a89a4ddcf1ac7b80cdf595d70213609c357b09bfa28"
+    ],
+    "runtime-smoke/argv.json": [
+      392,
+      "cb28ef3131e6675d221ab85d1f1a376c4bbf4d79ca7d6e571a23b7bd08866474"
+    ],
+    "runtime-smoke/exit.json": [
+      35,
+      "4d9a3935474bcd7b8135ce4c6e4e640efd3208400a6d965459bd17165230bfae"
+    ],
+    "runtime-smoke/stderr": [
+      0,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "runtime-smoke/stdout": [
+      0,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "runtime.json": [
+      535,
+      "197d10e8f0cea178ceed90dc621665a6295f64078ac95e7a695f099f6c2c82aa"
+    ],
+    "rustc-perf-identity.json": [
+      1398,
+      "199a98108f22bcb3f7d04b3cc1ce218339fa610d5be9cf9a71310844b03a404b"
+    ],
+    "tool-identity.json": [
+      2454,
+      "b7c4d6ffaf6b2fe9f2b28b9c8eeb4609d5a5ee537514b0dd73524ef29b1f3228"
+    ]
+  }
+}

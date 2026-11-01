@@ -1,87 +1,49 @@
-name: Unpublished original Darwin PGO Diesel capture
+name: Sealed Darwin instrumented Diesel collector replay
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact QA commit
+        description: Exact reviewed QA source commit
         required: true
         type: string
 permissions: {}
 concurrency:
-  group: private-darwin-pgo-diesel-original
+  group: sealed-darwin-instrumented-diesel
   cancel-in-progress: false
 jobs:
-  forensics:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-pgo-diesel-forensics-20261101' && github.run_attempt == 1 && github.sha == inputs.reviewed_head
-    timeout-minutes: 180
+  replay:
+    name: Two fresh Apple collector histories on the restored instrumented SDK
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-diesel-instrumented-repeat-20261101' && github.run_attempt == 1 && github.sha == inputs.reviewed_head
     runs-on: macos-15
+    timeout-minutes: 115
     permissions:
       contents: read
-    env:
-      OHM_TARGET: aarch64-apple-darwin
-      OHM_TOOLCHAIN: ohm-1.99.0-22
+      actions: read
     steps:
-    - name: Check out release coordinator
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
-        persist-credentials: false
         ref: ${{ github.sha }}
-        fetch-depth: 3
-    - name: Make room for macOS profile training
-      if: runner.environment == 'github-hosted'
-      run: ./scripts/prepare-hosted-macos-release.sh
-    - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
-      with:
-        enable-cache: true
+        fetch-depth: 2
+        persist-credentials: false
+    - name: Verify isolated QA source and preserve the native environment
+      run: |
+        set -euo pipefail
+        test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+        test "$(git rev-parse HEAD^)" = e8c4c99286652f27929290e417ff269e32d0bbd5
+        git diff --exit-code HEAD^ HEAD -- . ':!scripts/diesel-stage2-repeat' ':!.github/workflows/ci.yml'
+        (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
+        (cd scripts/diesel-stage2-repeat && shasum -a 256 --check SHA256SUMS)
+        ./scripts/prepare-hosted-macos-release.sh
+        test "$(uname -m)" = arm64
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
       with:
         python-version: '3.13'
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
-        ref: 0c9c558ce24212e5da6fb66150790b0af3cee90b
-        path: source-carrier
+        repository: rust-lang/rustc-perf
+        ref: 0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3
+        path: source/rust/build/opt-artifacts/rustc-perf
         persist-credentials: false
-        sparse-checkout: scripts/rc22-private-export-ice
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 7bc72b798b019a9ec0de6eeea3bc22b783917b27
-        path: transport
-        persist-credentials: false
-        sparse-checkout: scripts/rc22-native
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a
-        path: public-seed
-        persist-credentials: false
-        sparse-checkout: scripts/ohm-apple-zmij/source-transport
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
-        path: signed-rust
-        persist-credentials: false
-        sparse-checkout: scripts/strict-mixed-generics
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
-        path: cargo-seed
-        persist-credentials: false
-        sparse-checkout: |-
-          scripts/cargo-diagnostic-fix
-          scripts/ohm-apple-zmij/cargo293
-    - name: Verify exact coordinator, inputs and all four source trees
-      shell: bash
-      run: |-
-        set -euo pipefail
-        test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-        test "$(git rev-parse HEAD^)" = 8b2c911b32b7cad9442b7ddced987c5a1b0a62e5
-        git diff --exit-code HEAD^ HEAD -- .github/workflows/release.yml scripts ':!scripts/darwin-pgo-diesel' release toolchains
-        (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
-        (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS && python3 -IB test_local.py)
-        python3 -IB scripts/integrated-dist-qa/sources.py
-        python3 -IB scripts/darwin-pgo-diesel/worker.py source
-        df -h "$GITHUB_WORKSPACE"
-        available=$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')
-        test "$available" -ge 41943040
     - name: Install matching LLVM tools for native PGO
       env:
         MANIFEST_PATH: toolchains/1.99.0/22.json
@@ -122,99 +84,56 @@ jobs:
           printf 'RANLIB=%s\n' "$clang_root/bin/llvm-ranlib"
           printf 'SDKROOT=%s\n' "$(xcrun --sdk macosx --show-sdk-path)"
         } >> "$GITHUB_ENV"
-    - name: Prepare pinned Wild linker
+    - name: Authenticate source run and restore each of 3070 captured SDK paths
       env:
-        MANIFEST_PATH: toolchains/1.99.0/22.json
+        GH_TOKEN: ${{ github.token }}
       run: |
-        wild_directory="$(python3 scripts/prepare-wild.py \
-          "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
-        printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
-    - name: Run the original optimized release command through all rustc PGO benchmarks
+        python3 -IB scripts/diesel-stage2-repeat/test_replay.py
+        python3 -IB scripts/diesel-stage2-repeat/intake.py restore "$RUNNER_TEMP/diesel-repeat" "$GITHUB_WORKSPACE/source/rust/build/aarch64-apple-darwin/stage2" "$RUNNER_TEMP/diesel-repeat/reports"
+    - name: Prepare the original collector source and verify physical compiler identities
+      run: |
+        rustup toolchain install 1.98.0 --profile minimal --no-self-update
+        python3 -IB scripts/diesel-stage2-repeat/repeat.py prepare
+    - name: Original full nine benchmarks and three profiles, four jobs
       id: primary
-      continue-on-error: true
-      run: python3 -IB scripts/darwin-pgo-diesel/supervise.py
-    - name: Escrow original collector workspace and graph bytes before any diagnostic compiler
-      id: escrow
-      if: '!cancelled() && steps.primary.outcome != ''skipped'''
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py first
-    - name: Save originals before any replay
-      id: originals
+      run: python3 -IB scripts/diesel-stage2-repeat/repeat.py primary
+    - name: Preserve primary originals before any focused or diagnostic compiler
+      id: keep_primary
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: diesel-pgo-first-original
-        path: |-
-          source/reports/diesel-pgo/original-opt-dist.log
-          source/reports/diesel-pgo/entry.json
-          source/reports/diesel-pgo/primary.json
-          source/reports/diesel-pgo/unaccepted-checkpoint.txt
-          source/reports/diesel-pgo/native-training.json
-          source/reports/diesel-pgo/original-graphs
-          source/reports/diesel-pgo/original-workspace.tar.gz
-          source/reports/diesel-pgo/workspace-custody.json
-          source/reports/diesel-pgo/original-workspace.tar.inventory.json
-          source/reports/diesel-pgo/before-replay.json
+        name: sealed-instrumented-nine-original
+        path: ${{ runner.temp }}/diesel-repeat/reports
         if-no-files-found: warn
-        compression-level: 0
-        retention-days: 7
-    - name: Decode every distinct original finalized graph after custody
-      id: decode
-      if: >-
-        !cancelled() && steps.escrow.outcome == 'success' && steps.originals.outcome == 'success'
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py decode
-    - name: Authenticate and escrow the instrumented native compiler and exact Cargo
-      id: runtime
-      if: '!cancelled() && steps.escrow.outcome == ''success'' && steps.originals.outcome == ''success'''
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py runtime
-    - name: Save native instrumented runtime
-      if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: diesel-pgo-real-stage2
-        path: |-
-          source/reports/diesel-pgo/instrumented-sdk.tar.gz
-          source/reports/diesel-pgo/instrumented-sdk.tar.inventory.json
-          source/reports/diesel-pgo/tool-identity.json
-          source/reports/diesel-pgo/driver-otool.txt
-          source/reports/diesel-pgo/identity-llvm-profdata.txt
-          source/reports/diesel-pgo/runtime.json
-          source/reports/diesel-pgo/runtime-smoke
-          source/reports/diesel-pgo/rustc-perf-identity.json
-        if-no-files-found: warn
-        compression-level: 0
-        retention-days: 7
-    - name: Replay authentic saved graphs and two independent empty readers
-      id: direct
-      if: '!cancelled() && steps.escrow.outcome == ''success'' && steps.originals.outcome == ''success'' && hashFiles(''source/reports/diesel-pgo/tool-identity.json'') != '''''
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py direct
-    - name: Run pinned original collector with only the real Diesel Opt benchmark
+        retention-days: 14
+    - name: Fresh focused Diesel Opt collector and observed real Eprintln child PIDs
       id: focused
-      if: '!cancelled() && steps.escrow.outcome == ''success'' && steps.originals.outcome == ''success'' && hashFiles(''source/reports/diesel-pgo/tool-identity.json'') != '''''
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py focused
-    - name: Save off-primary diagnostics
-      if: always()
+      if: steps.primary.outcome == 'success' && steps.keep_primary.outcome == 'success'
+      run: python3 -IB scripts/diesel-stage2-repeat/repeat.py focused
+    - name: Preserve physical focused originals before the additional same-graph read
+      id: keep_focused
+      if: always() && steps.focused.outcome != 'skipped'
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: diesel-pgo-focused-replays
-        path: |-
-          source/reports/diesel-pgo/direct-*
-          source/reports/diesel-pgo/focused-*
-          source/reports/diesel-pgo/original-graph-decode.*
+        name: sealed-instrumented-diesel-original
+        path: |
+          ${{ runner.temp }}/diesel-repeat/reports/focused
+          ${{ runner.temp }}/diesel-repeat/reports/observer.json
+          ${{ runner.temp }}/diesel-repeat/reports/observer-build
+        if-no-files-found: error
+        retention-days: 14
+    - name: Require the previous real A graph for one independent reader of B
+      id: witness
+      if: steps.focused.outcome == 'success' && steps.keep_focused.outcome == 'success'
+      run: python3 -IB scripts/diesel-stage2-repeat/repeat.py witness
+    - name: Preserve the additional loaded-graph witness
+      if: always() && steps.witness.outcome != 'skipped'
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: sealed-instrumented-diesel-graph-witness
+        path: |
+          ${{ runner.temp }}/diesel-repeat/reports/graph-witness.json
+          ${{ runner.temp }}/diesel-repeat/reports/graph-structure.json
+          ${{ runner.temp }}/diesel-repeat/reports/loaded-B-export
         if-no-files-found: warn
-        compression-level: 0
-        retention-days: 7
-    - name: Report original natural training result
-      if: always()
-      run: |-
-        python3 -IB - <<'PY'
-        import json
-        from pathlib import Path
-        r=Path('source/reports/diesel-pgo')
-        assert (r/'before-replay.json').is_file(), 'original qualification failed before its raw worktree admission'
-        first=json.loads((r/'before-replay.json').read_bytes())
-        print(first['outcome'])
-        assert (r/'runtime.json').is_file(), 'no independently reopened instrumented SDK'
-        assert (r/'focused-collector/result.json').is_file(), 'focused same-binary result missing'
-        assert not first['failed_timing_root'], 'the original full PGO training reproduced the release ICE; original and replay receipts retained'
-        PY
-    name: Original macOS PGO Diesel containment
+        retention-days: 14
