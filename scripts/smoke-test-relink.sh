@@ -3,6 +3,8 @@ set -euo pipefail
 
 toolchain=$1
 project=$2
+# The native link driver requires private build directories.
+umask 077
 mkdir -p "$project/src" "$project/engine/src"
 cd "$project"
 export CARGO_INCREMENTAL=1
@@ -122,6 +124,9 @@ write_build_script() {
 fn main() {
     let dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     println!("cargo::rerun-if-changed=$1");
+    if std::path::Path::new(&dir).join("earlier-native").is_dir() {
+        println!("cargo::rustc-link-search=native={dir}/earlier-native");
+    }
     println!("cargo::rustc-link-search=native={dir}/native");
     println!("cargo::rustc-link-lib=static=answer");
 }
@@ -150,7 +155,7 @@ export "$linker_var=$PWD/count-links"
 write_archive() {
   printf 'int answer(void) { return %s; }\n' "$1" | cc -x c -c -o answer.o -
   ar rcs next-answer.a answer.o
-  cat next-answer.a >native/libanswer.a
+  cat next-answer.a >"${2:-native/libanswer.a}"
 }
 check_links() {
   local bin actual count
@@ -217,3 +222,14 @@ test -s "$OHM_SMOKE_LINK_LOG"
 grep -F 'libanswer.a' bad-archive.log
 write_archive 37
 check_links 37 2
+
+# Keep the declared archive unchanged while an earlier search directory gains and loses a library.
+mkdir earlier-native
+write_build_script native/libanswer.a
+export CARGO_TARGET_DIR="$PWD/shadow-target" CARGO_BUILD_BUILD_DIR="$PWD/shadow-build"
+write_archive 29
+check_links 29
+write_archive 41 earlier-native/libanswer.a
+check_links 41 2
+rm earlier-native/libanswer.a
+check_links 29 2
