@@ -1,0 +1,70 @@
+"""Frozen product, workflow, and ordinary command for the attribution-only diagnostic."""
+
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+HERE = Path(__file__).resolve().parent
+BRANCH = "charlie/qa-ruff-default-owner-pmu-20261101"
+REPO = "astral-experiments/ohm"
+COLLECTOR = "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc"
+CONTRACT = "42ab30fd5e6bcdcf908df81de9baac65ca64fbf9"
+PREVIOUS = 41336398017
+PREVIOUS_HEAD = "3c206e8bf2c2236c035f1e8f352d9ad547d69ef7"
+BLOCKED_JOBS = (124937039974, 124937040076, 124937040027, 124937040042, 124937039985, 124937039779)
+CMD = [
+    "cargo",
+    "+ohm",
+    "build",
+    "-p",
+    "ruff",
+    "--bin",
+    "ruff",
+    "--locked",
+    "--offline",
+    "-j4",
+    "--message-format=json",
+]
+PHASES = {
+    "reference": ("B", "A"),
+    "plain-1": ("B", "A"),
+    "attributed": ("B", "A", "unchanged", "invalid", "repair"),
+    "plain-2": ("B", "A"),
+    "empty-invalid": ("invalid", "repair"),
+}
+EXPECTED = {"A": "b5dba861cc38e3f7fb4524c9ceba3e01a474ea13", "B": "7b13f01ba1569887a25670820764b24c206da8e5"}
+INVALID = b"\nconst ohm_branch_switch_invalid: () = 1u32;\n"
+TREES = {"A": "2b61306d708a211b3725c8d920e7590be6da41ad", "B": "97ca36909f1ae8fa028b2c1f48f452fbdcdbbd4c"}
+BRANCHES = {"A": "historical-parent", "B": "historical-feature"}
+PARSER_SHAS = {
+    False: "ee24a1933840a400c4730778a5c222d30c36d4b1b4f96bd97b502acfc07a4875",
+    True: "3fbac7f54be2b5cd47eee1993f11e6d58724e32301c0ba3e5afb624562283ab5",
+}
+PARSER = "crates/ruff_python_parser/src/lib.rs"
+SDK = json.loads((HERE / "signed-sdk.json").read_bytes())
+
+
+def need(condition, why):
+    if not condition:
+        raise ValueError(why)
+
+
+def sha(path):
+    with Path(path).open("rb") as f:
+        return hashlib.file_digest(f, "sha256").hexdigest()
+
+
+def save(path, value):
+    b = (json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n").encode()
+    with path.open("xb") as f:
+        f.write(gzip.compress(b, mtime=0) if path.suffix == ".gz" else b)
+
+
+def read(path):
+    return json.loads(gzip.decompress(path.read_bytes()) if path.suffix == ".gz" else path.read_bytes())
+
+
+def git(repo, *options):
+    return subprocess.check_output(["git", "--no-optional-locks", "-C", repo, *options])
