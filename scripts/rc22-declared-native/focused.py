@@ -71,15 +71,16 @@ def step(name,expected,links=None):
  argv=['cargo','+ohm-declared-proof','build','--bins','--offline','-vv']
  trace=lane/(name+'.strace')
  if mode=='default' and platform.system()=='Linux':
-  argv=['strace','-f','-qq','-s','65535','-e','trace=execve','-o',str(trace),*argv]
+  argv=['strace','-ff','-qq','-s','65535','-e','trace=execve','-o',str(trace),*argv]
  with (lane/(name+'.log')).open('wb') as out: r=subprocess.run(argv,cwd=project,env=env,stdout=out,stderr=subprocess.STDOUT)
  assert r.returncode==0,(name,r.returncode)
  vals=[subprocess.check_output([lane/'target/debug'/n],text=True).strip() for n in ('first','second')]
  count=len((observe/'links').read_text().splitlines())
  targets=[]
- if trace.is_file():
+ if mode=='default' and platform.system()=='Linux':
+  traces=sorted(lane.glob(name+'.strace.*'));assert traces,(name,'no per-process exec traces')
   import ast,re
-  for line in trace.read_text(errors='replace').splitlines():
+  for line in (line for path in traces for line in path.read_text(errors='replace').splitlines()):
    match=re.search(r'execve\((".*?"), (\[.*?\]), (?:0x|\[|/\*).*?\)\s+= 0$',line)
    if not match:continue
    exe=Path(ast.literal_eval(match[1]));args=ast.literal_eval(match[2])
@@ -89,11 +90,13 @@ def step(name,expected,links=None):
    if m and path.is_relative_to(lane):targets.append((m[1],str(exe)))
   count=len(targets)
   expected_targets=[] if name.startswith('warm') else ['first','second']
-  assert sorted(t[0] for t in targets)==expected_targets,(name,targets)
-  assert all('/wild-ld/' in exe for _,exe in targets),(name,targets)
+
  records.append(dict(step=name,values=vals,links=count,physical=targets));(lane/'results.json').write_text(json.dumps(records,indent=2)+'\n')
  print(name,vals,count,flush=True)
  assert vals==[expected,expected],(name,expected,vals)
+ if mode=='default' and platform.system()=='Linux':
+  assert sorted(t[0] for t in targets)==expected_targets,(name,targets)
+  assert all('/wild-ld/' in exe for _,exe in targets),(name,targets)
  if links is not None:assert count==links,(name,count,links)
 step('cold','17:3' if mode=='mixed' else '17')
 step('warm','17:3' if mode=='mixed' else '17',0 if mode=='private' else None)

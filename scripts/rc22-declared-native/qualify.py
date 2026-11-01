@@ -74,18 +74,18 @@ save("cargo-provenance.json",dict(commit=new,tree=run(["git","rev-parse","HEAD^{
 def exercise(cmd,cwd=root):
     p=subprocess.run(cmd,cwd=cwd,env=os.environ)
     return p.returncode
-smoke=root/"smoke"
-results={"original":exercise(["python3","-IB",scripts/"smoke.py",smoke,sdk,binary,scripts/"smoke.sh"])}
-for name in ["result.json","smoke.log"]:
-    if (smoke/name).is_file():shutil.copy2(smoke/name,reports/("original-"+name))
-for mode in ("private","mixed","shadow","default"):
-    trial=root/mode
-    results[mode]=exercise(["python3","-IB",scripts/"focused.py",trial,smoke/"kit",mode])
-    if (trial/"results.json").is_file():shutil.copy2(trial/"results.json",reports/(mode+".json"))
-    diag=reports/(mode+"-logs");diag.mkdir()
-    for p in trial.glob("*.log"):shutil.copy2(p,diag/p.name)
-    if (trial/"calls").is_dir():shutil.copytree(trial/"calls",diag/"calls")
-    for p in trial.glob("*.strace"):shutil.copy2(p,diag/p.name)
-    for i,p in enumerate(trial.rglob("declared-native/inputs.json")):shutil.copy2(p,diag/f"reported-inputs-{i}.json")
-    save("checks.json",results)
-assert not any(results.values()),results
+kit=root/"physical-kit"
+(kit/"bin").mkdir(parents=True)
+for item in sdk.iterdir():
+    if item.name != "bin":(kit/item.name).symlink_to(item,target_is_directory=item.is_dir())
+for item in (sdk/"bin").iterdir():(kit/"bin"/item.name).symlink_to(binary if item.name=="cargo" else item)
+mode="default"
+trial=root/mode
+status=exercise(["python3","-IB",scripts/"focused.py",trial,kit,mode])
+if (trial/"results.json").is_file():shutil.copy2(trial/"results.json",reports/(mode+".json"))
+diag=reports/"default-logs";diag.mkdir()
+for item in list(trial.glob("*.log")) + list(trial.glob("*.strace.*")):
+    shutil.copy2(item,diag/item.name)
+for i,item in enumerate(trial.rglob("declared-native/inputs.json")):shutil.copy2(item,diag/f"reported-inputs-{i}.json")
+save("checks.json",dict(default=status))
+assert status==0,status

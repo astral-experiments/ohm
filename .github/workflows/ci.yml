@@ -46,12 +46,15 @@ jobs:
           path: release
           merge-multiple: true
       - name: Verify native inputs and count real Linux links
-        run: python3 -IB qualification/scripts/rc22-declared-native/qualify.py
+        run: |
+          command -v strace || (sudo apt-get -o Acquire::Retries=3 update -qq && sudo apt-get install -y --no-install-recommends strace)
+          strace --version | head -1
+          python3 -IB qualification/scripts/rc22-declared-native/qualify.py
       - name: Retain executable values, linker counts, compiler identities, and logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: qualified-declared-native-links
+          name: qualified-physical-wild-links
           path: ${{ runner.temp }}/rc22-qualify-native-link/reports/
           retention-days: 21
           if-no-files-found: error
