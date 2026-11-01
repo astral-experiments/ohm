@@ -1,13 +1,13 @@
 {
   "original_coordinator": "90575c9fc302c2af0858c711726b2d211e7d3114",
   "original_manifest_sha256": "a4e1fb3f142e8aecb40eb3188f2d11a8903448c842ba2e9540468f12ac523feb",
-  "build_script_sha256": "cc924169c77f9b0e68eff72a6e5074b254da7293386a201d2794e36521f4460e",
+  "build_script_sha256": "20b8e2ce00596ee96463b0b62335e14c3de3a4eca5b32246deb4ec1ac722c16c",
   "bootstrap_sha256": "5822d2ae682a27193ef413f013281b0849797c88c78545607ab563ea48f87684",
   "sources": {
     "rust": {
       "base": "83f22211d49b85daffa5f12f2a8b52d180a88993",
-      "end": "747400148f28b1787114d81d7fb9f10f8964405d",
-      "tree": "3689d02a27145e05ece713c756f540be806d9d24",
+      "end": "a3fc6da13921586bc374586dee00883e9210aecd",
+      "tree": "736b983382d446c40bd5bd853df881bef65cb6ad",
       "packets": [
         {
           "file": "rust.pack",
@@ -18,6 +18,11 @@
           "file": "rust-current.pack",
           "bytes": 196925,
           "sha256": "e3517f5b0f00bd667d532279ae5620580159292f7d3d624f9e15d94ef26b6202"
+        },
+        {
+          "file": "rust-final.pack",
+          "bytes": 207692,
+          "sha256": "04730dee5c20b98d795b945bafb816f57b211b4d98db4cb3b23f608a357c2110"
         }
       ]
     },
@@ -63,28 +68,7 @@
       ]
     }
   },
-  "cross_paths": [
-    "compiler/rustc_codegen_llvm/src/asm.rs",
-    "tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs",
-    "tests/run-make/ohm-checked-dep-info/musl_x86_64.rs",
-    "tests/run-make/ohm-checked-dep-info/rmake.rs"
-  ],
-  "arms": {
-    "base": {
-      "commit": "f12924d918dbc66898325531940a20aa8cf4f5fc",
-      "tree": "fb561e8f69728f4ee8af0f87470002556f265f41"
-    },
-    "cross": {
-      "commit": "747400148f28b1787114d81d7fb9f10f8964405d",
-      "tree": "3689d02a27145e05ece713c756f540be806d9d24"
-    }
-  },
-  "gnu_ruff_parent": "02c02172ceae316dac14a7657d9c85fa8bb1c3ca",
-  "gnu_ruff_edit": "193984681ef7185c90b548c27b0ac6326908f2ec",
-  "musl_ruff_parent": "b96364cbf66e27df3c87beed5923f561f033b52c",
-  "musl_ruff_edit": "672bb4edf04c84f8b0753346359daee4057158f2",
-  "decision": "Compare signed-source candidates on the same host and pinned Ruff edits. Require matching outputs and correct invalidation before crediting timings. Require a repeatable wall-clock gain on a real workload or an independently reproduced material instruction reduction with no material wall-time regression.",
-  "published_coordinator": "2d8a6fcbfeb99230dff6d7f30448e58fd8e5a98b",
-  "published_manifest_sha256": "634a8b8c22792642adf33766c02c33b7b50eccf6b07e17caa4a180c973f819f6",
+  "published_coordinator": "201eb25ab858598493d22e0d0f9cbe743e1ef60c",
+  "published_manifest_sha256": "b1d9804b6376ae9bab139d9d0ffe3414dc6eebb3800c9bb322b55f358df5be2e",
   "profile_patch_sha256": "e9bf8ac4b08fbdb731f9944689d33d0fc7478b75cce39b0883743ac627872bed"
 }
