@@ -301,7 +301,7 @@ else
     # The distribution installer reparses its arguments and the path to its script.
     # Keep both paths simple while staging the toolchain on its destination filesystem.
     (
-        CDPATH= cd "$temporary_directory" &&
+        CDPATH='' cd "$temporary_directory" &&
             mkdir "$staged_prefix" &&
             ln -s "$staged_prefix" toolchain &&
             sh "$inner_installer" --prefix=toolchain --disable-ldconfig
