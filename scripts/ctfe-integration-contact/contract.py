@@ -1,6 +1,5 @@
 """Source identities, off-window boundaries and the unscored continuation rule."""
 
-from collections import Counter
 import hashlib
 import os
 from pathlib import Path
@@ -9,7 +8,7 @@ import subprocess
 import sys
 
 HERE = Path(__file__).resolve().parent
-BRANCH = "charlie/qa-ctfe-integration-contact-20261101"
+BRANCH = "charlie/qa-donor-integration-xb-contact-20261101"
 COMMAND = [
     "cargo",
     "+ohm",
@@ -39,9 +38,9 @@ BUILD = [
 ]
 F_HEAD = "679e72fedd4968636469d958c38225c0ce3fefab"
 KERNEL = "19f9a67b032cce44cea1e3bb7e324558cd9abd0a"
-CTFE = "a374e7d302feac52fea514a4b2beaf1174297ba9"
-ARMS = ("Eon", "Con")
-EMPTY = ("clean-A", "clean-B", "clean-edited")
+CTFE = "a333316177ef3f9c8b3264ca3bf76c451e0ca079"
+ARMS = ("Eon", "Don")
+EMPTY = ("clean-A", "clean-B", "clean-edited", "clean-semantic")
 HISTORY = ("Y-B", "X-A", "X-B", "comment", "unchanged", "invalid", "repair")
 PHASES = EMPTY + HISTORY
 
@@ -56,7 +55,11 @@ def sha(data):
 
 
 def git(repo, *args):
-    return subprocess.check_output(["git", "--no-optional-locks", "-C", repo, *args]).decode().strip()
+    return (
+        subprocess.check_output(["git", "--no-optional-locks", "-C", repo, *args])
+        .decode()
+        .strip()
+    )
 
 
 def packages():
@@ -68,6 +71,8 @@ def packages():
     import source_guard
 
     source_guard.pilot(ctfe, CTFE)
+    source_guard.tree(ctfe, CTFE, "scripts/gnu-same-revision-donor")
+    source_guard.tree(ctfe, CTFE, "scripts/ctfe-cli-semantic")
     prefix = "scripts/ruff-integration-structure"
     source_guard.tree(f, F_HEAD, prefix)
     sys.path.insert(0, str(f / prefix))
@@ -91,7 +96,9 @@ def check_source(reviewed):
     files = source_guard.tree(
         HERE.parents[1], head, "scripts/" + HERE.name, (".github/workflows/ci.yml",)
     )
-    expected = {Path(f).name for f in files if f.startswith("scripts/")} - {"SHA256SUMS"}
+    expected = {Path(f).name for f in files if f.startswith("scripts/")} - {
+        "SHA256SUMS"
+    }
     expected.add("../../.github/workflows/ci.yml")
     seen = set()
     for line in (HERE / "SHA256SUMS").read_text().splitlines():
@@ -117,6 +124,8 @@ def install_boundary(execs):
 
 
 def reference(phase):
+    if phase in ("clean-semantic", "dirty-X-B"):
+        return "clean-semantic"
     if phase in ("clean-A", "X-A"):
         return "clean-A"
     if phase in ("clean-B", "Y-B", "X-B"):
@@ -139,32 +148,16 @@ def identities(physical):
     rustcs = {r["event"]: identity(r) for r in physical["rustcs"]}
     need(len(rustcs) == len(physical["rustcs"]), "duplicate installed rustc event")
     return dict(
-        full=sorted([rustcs[r["event"]] for r in physical["rustcs"] if r["mode"] == "full"], key=str),
-        link_only=sorted([r["crate"] for r in physical["rustcs"] if r["mode"] == "link-only"]),
-        wild=sorted([rustcs[r["rustc_event"]][:2] for r in physical["wild_processes"]], key=str),
-    )
-
-
-def structural(rows):
-    def mult(arm, key):
-        return Counter(tuple(v) for v in rows[arm]["comment"]["physical"][key])
-
-    e, c = (mult(a, "full") for a in ARMS)
-    need(
-        all(any(v[0] == "ruff_python_ast" for v in s) for s in (e, c)),
-        "no genuine AST compile on comment",
-    )
-
-    def names(arm):
-        # A full driver and a --link-only rustc describe the same terminal ELF by different
-        # flags. Compare the actual output filename family, from the owning GNU ld input.
-        return Counter(rows[arm]["comment"]["wild_outputs"])
-
-    return dict(
-        eligible=e > c and names("Con") <= names("Eon"),
-        removed_full=sorted(list(k) for k in (e - c).elements()),
-        added_full=sorted(list(k) for k in (c - e).elements()),
-        wild_outputs={a: dict(sorted(names(a).items())) for a in ARMS},
+        full=sorted(
+            [rustcs[r["event"]] for r in physical["rustcs"] if r["mode"] == "full"],
+            key=str,
+        ),
+        link_only=sorted(
+            [r["crate"] for r in physical["rustcs"] if r["mode"] == "link-only"]
+        ),
+        wild=sorted(
+            [rustcs[r["rustc_event"]][:2] for r in physical["wild_processes"]], key=str
+        ),
     )
 
 
@@ -176,7 +169,8 @@ def link_outputs(physical):
 
     owners = {r["event"]: r["crate"] for r in physical["rustcs"]}
     return sorted(
-        owners[r["rustc_event"]] + "::" + canonical(r["output"]) for r in physical["wild_processes"]
+        owners[r["rustc_event"]] + "::" + canonical(r["output"])
+        for r in physical["wild_processes"]
     )
 
 
@@ -198,7 +192,11 @@ def semantics():
 
 def operand_files(owners, providers, file_sha):
     paths = {
-        v for owner in owners.values() for arg in owner["externs"].values() for v in arg.values() if v
+        v
+        for owner in owners.values()
+        for arg in owner["externs"].values()
+        for v in arg.values()
+        if v
     }
     paths.update(r["path"] for r in providers.values())
     paths.update(v for r in providers.values() for v in r["actual_rmeta"])
@@ -218,4 +216,17 @@ def excluded_boot(boot):
         re.fullmatch(r"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}", boot)
         and all(boot not in r["boots"] for r in records.values()),
         "duplicate or invalid host boot",
+    )
+
+
+def fresh_runner(boot, runner):
+    import json
+
+    excluded_boot(boot)
+    prior = json.loads((HERE / "contact-exclusions.json").read_bytes())
+    need(
+        boot not in prior["boots"]
+        and re.fullmatch(r"nsc-runner-[a-z0-9]+", runner)
+        and runner not in prior["runners"],
+        "previously enrolled runner or boot",
     )

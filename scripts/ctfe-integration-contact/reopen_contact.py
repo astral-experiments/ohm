@@ -1,5 +1,3 @@
-"""Independently reopen the official contact ZIP, including both whole executables and their true clients."""
-
 import argparse
 import gzip
 import hashlib
@@ -15,90 +13,7 @@ import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import contract as q
 import instructions as policy
-
-
-def official(folder, run, head, archives):
-    def load(name):
-        return json.loads((folder / (name + ".json")).read_bytes())
-
-    info, jobs, artifacts = map(load, ("run", "jobs", "artifacts"))
-    q.need(
-        (
-            info["id"],
-            info["run_attempt"],
-            info["head_sha"],
-            info["head_branch"],
-            info["path"],
-            info["event"],
-            info["conclusion"],
-            info["status"],
-        )
-        == (
-            run,
-            1,
-            head,
-            policy.BRANCH,
-            ".github/workflows/ci.yml",
-            "workflow_dispatch",
-            "success",
-            "completed",
-        )
-        and info["repository"]["full_name"]
-        == info["head_repository"]["full_name"]
-        == "astral-experiments/ohm"
-        and jobs["total_count"]
-        == len(jobs["jobs"])
-        == artifacts["total_count"]
-        == len(artifacts["artifacts"])
-        == 2,
-        "unqualified official run",
-    )
-    result = {}
-    steps = (
-        "Bind sources and reserve the runner",
-        "Restore exact compilers and the original native contact",
-        "Measure the two registered integration histories",
-    )
-    for pos in policy.ORDER:
-        (job,) = [a for a in jobs["jobs"] if a["name"] == "CTFE integration hardware " + pos]
-        (a,) = [x for x in artifacts["artifacts"] if x["name"] == "ctfe-integration-hardware-" + pos]
-        q.need(
-            (
-                job["run_id"],
-                job["run_attempt"],
-                job["head_sha"],
-                job["status"],
-                job["conclusion"],
-                job["labels"],
-            )
-            == (run, 1, head, "completed", "success", ["namespace-profile-ubuntu-24-04-16"])
-            and [s["name"] for s in job["steps"] if s["name"] in steps and s["conclusion"] == "success"]
-            == list(steps)
-            and (a["workflow_run"]["id"], a["workflow_run"]["head_sha"], a["expired"])
-            == (run, head, False)
-            and 0 < a["size_in_bytes"] == archives[pos].stat().st_size < 2**30
-            and job["runner_name"],
-            "different official job or artifact",
-        )
-        with archives[pos].open("rb") as f:
-            data = hashlib.file_digest(f, "sha256").hexdigest()
-        q.need(a["digest"] == "sha256:" + data, "official archive bytes differ")
-        result[pos] = dict(
-            position=pos,
-            run=run,
-            head=head,
-            attempt=1,
-            job=job["id"],
-            runner=job["runner_name"],
-            artifact=a["id"],
-            sha256=data,
-            bytes=a["size_in_bytes"],
-        )
-    q.need(
-        len({v["job"] for v in result.values()}) == len({v["runner"] for v in result.values()}) == 2,
-        "official jobs reused a worker",
-    )
-    return result
+import donor_integrity as integrity
 
 
 def cargo(z, p, root, cert, rc):
@@ -123,7 +38,9 @@ def cargo(z, p, root, cert, rc):
         "incomplete Cargo result",
     )
     errors = [
-        v for v in stream if v["reason"] == "compiler-message" and v["message"]["level"] == "error"
+        v
+        for v in stream
+        if v["reason"] == "compiler-message" and v["message"]["level"] == "error"
     ]
     if rc:
         q.need(
@@ -147,7 +64,10 @@ def cargo(z, p, root, cert, rc):
         q.need(
             all(
                 v in tagged
-                or (not v["message"]["spans"] and v["message"]["message"].startswith("aborting due to "))
+                or (
+                    not v["message"]["spans"]
+                    and v["message"]["message"].startswith("aborting due to ")
+                )
                 for v in errors
             ),
             "additional unexpected error",
@@ -168,8 +88,12 @@ def cargo(z, p, root, cert, rc):
 def selected(z, p, stream, phys, prior, cold, product, sel, root):
     D = lambda f: json.loads(z.read(p + "/" + f))
     proof = D("selected.json")
-    paths, owners, provider, inputs = (proof[k] for k in ("paths", "owners", "reader", "operands"))
-    actual = [v for v in stream if v["reason"] == "compiler-artifact" and v["executable"]]
+    paths, owners, provider, inputs = (
+        proof[k] for k in ("paths", "owners", "reader", "operands")
+    )
+    actual = [
+        v for v in stream if v["reason"] == "compiler-artifact" and v["executable"]
+    ]
     names = {
         "cli": ("ruff", "bin", "src/main.rs"),
         "harness": ("integration_test", "test", "tests/integration_test.rs"),
@@ -189,7 +113,8 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
             == (name, [kind], str(root / "ruff/crates/ruff" / src))
         ]
         q.need(
-            art["executable"] == paths[k] and Path(paths[k]).is_relative_to(root / "work"),
+            art["executable"] == paths[k]
+            and Path(paths[k]).is_relative_to(root / "work"),
             "foreign selected ELF",
         )
         owner = owners[k]
@@ -202,7 +127,8 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
                 if r["mode"] == "full"
                 and r["crate"] == name
                 and any(
-                    a == "crates/ruff/" + src or a.endswith("/crates/ruff/" + src) for a in r["argv"]
+                    a == "crates/ruff/" + src or a.endswith("/crates/ruff/" + src)
+                    for a in r["argv"]
                 )
                 and ("--test" in r["argv"]) == (k == "harness")
             ]
@@ -213,8 +139,14 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
                 r["pid"] == owner["pid"]
                 and sel.selected_externs(r["argv"]) == owner["externs"]
                 and "-Zohm-check-relink-inputs" in r["argv"]
-                and any(a in ("ohm-branch-cache=yes", "-Zohm-branch-cache=yes") for a in r["argv"])
-                and sum(a.startswith(("incremental=", "-Cincremental=")) for a in r["argv"]) == 1,
+                and any(
+                    a in ("ohm-branch-cache=yes", "-Zohm-branch-cache=yes")
+                    for a in r["argv"]
+                )
+                and sum(
+                    a.startswith(("incremental=", "-Cincremental=")) for a in r["argv"]
+                )
+                == 1,
                 "wrong physical owner options",
             )
         else:
@@ -227,7 +159,9 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
         records = proof["terminal_files"][k]
         expected = []
         for ld in phys["wild_processes"] if phys is not None else []:
-            (link_rust,) = [r for r in phys["rustcs"] if r["event"] == ld["rustc_event"]]
+            (link_rust,) = [
+                r for r in phys["rustcs"] if r["event"] == ld["rustc_event"]
+            ]
             # The package also owns a "ruff" lib. It cannot own the installed CLI link or its output basename.
             if link_rust["crate"] == name and re.fullmatch(
                 re.escape(name) + r"(?:-[0-9a-f]{16})?", Path(ld["output"]).name
@@ -235,7 +169,9 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
                 expected.append({"pid": ld["pid"], "path": ld["output"]})
         q.need(
             expected == owner["linked_by"]
-            and (len(expected) == 1 if cold and phys is not None else len(expected) <= 1)
+            and (
+                len(expected) == 1 if cold and phys is not None else len(expected) <= 1
+            )
             and set(records) == {paths[k], *(v["path"] for v in expected)},
             "unaccounted final link",
         )
@@ -276,13 +212,17 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
             args = owners[k]["externs"][name]
             expected_paths.add(args["rlib"])
             q.need(
-                inputs[args["rlib"]] == inputs[r["path"]], "consumer points to different physical rlib"
+                inputs[args["rlib"]] == inputs[r["path"]],
+                "consumer points to different physical rlib",
             )
             if args["rmeta"]:
                 sides.add(args["rmeta"])
         q.need(
             set(r["actual_rmeta"]) == sides
-            and all(n in art["filenames"] and inputs[n][3] == r["actual_rmeta"][n] for n in sides),
+            and all(
+                n in art["filenames"] and inputs[n][3] == r["actual_rmeta"][n]
+                for n in sides
+            ),
             "unexpected actual rmeta inputs",
         )
         expected_paths.update(sides)
@@ -309,12 +249,14 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
         )
         for field in ("stdout", "stderr"):
             q.need(
-                q.sha(gzip.decompress(z.read(f"{p}/{label}.{field}.gz"))) == cmd[field + "_sha256"],
+                q.sha(gzip.decompress(z.read(f"{p}/{label}.{field}.gz")))
+                == cmd[field + "_sha256"],
                 "changed typed command stream",
             )
         if label == "reader-compile":
             q.need(
-                cmd["exit"] == 0 and args[-2:] == ["-o", str(root / "full-cli-reader/reader")],
+                cmd["exit"] == 0
+                and args[-2:] == ["-o", str(root / "full-cli-reader/reader")],
                 "missing actual linked reader",
             )
     rr = json.loads(gzip.decompress(z.read(p + "/reader-run.json.gz")))
@@ -322,7 +264,8 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
         rr["argv"] == [str(root / "full-cli-reader/reader")]
         and rr["exit"] == 0
         and all(
-            rr[x + "_sha256"] == q.sha(gzip.decompress(z.read(p + "/reader-run." + x + ".gz")))
+            rr[x + "_sha256"]
+            == q.sha(gzip.decompress(z.read(p + "/reader-run." + x + ".gz")))
             for x in ("stdout", "stderr")
         ),
         "incorrect external reader execution",
@@ -349,13 +292,17 @@ def full_suite(z, p, paths, cwd, suite, processes, prefix):
     for label in (*commands, *suite.EXACT):
         rec = read(label)
         q.need(
-            (rec["exit"], rec["cwd"], rec["insta_root"], rec["cargo_bin"]) == (0, package, cwd, cli)
+            (rec["exit"], rec["cwd"], rec["insta_root"], rec["cargo_bin"])
+            == (0, package, cwd, cli)
             and all(q.sha(body(label, k)) == rec[k] for k in ("stdout", "stderr")),
             "changed suite process or wrong BIN",
         )
         argv = rec["argv"]
         if label in commands:
-            q.need(argv == [*prefix, *commands[label]], "wrong executed suite/CLI argument list")
+            q.need(
+                argv == [*prefix, *commands[label]],
+                "wrong executed suite/CLI argument list",
+            )
         else:
             rawroot = Path(cwd).parent / "logs" / p
             expected = [
@@ -376,16 +323,24 @@ def full_suite(z, p, paths, cwd, suite, processes, prefix):
                 "--color",
                 "never",
             ]
-            q.need(argv == [*prefix, *expected], "other executable or test case was traced")
+            q.need(
+                argv == [*prefix, *expected], "other executable or test case was traced"
+            )
             records = processes.execs(
-                io.StringIO(gzip.decompress(z.read(p + "/" + label + ".exec.gz")).decode())
+                io.StringIO(
+                    gzip.decompress(z.read(p + "/" + label + ".exec.gz")).decode()
+                )
             )
             (hp, he, ha), (cp, ce, ca) = records
             reg = lib["children"][label]
             q.need(
                 hp != cp
                 and (he, ha, ce)
-                == (harness, [harness, "--exact", label, "--test-threads=1", "--color", "never"], cli)
+                == (
+                    harness,
+                    [harness, "--exact", label, "--test-threads=1", "--color", "never"],
+                    cli,
+                )
                 and ca[:2] == [cli, "check"]
                 and "--isolated" in ca
                 and "--no-cache" in ca
@@ -420,7 +375,10 @@ def stubs(z, p, s, cli, cwd, edited):
     for k in s.CASES:
         tag = p + "/stub-" + k
         row = json.loads(z.read(tag + ".json"))
-        out, err = [gzip.decompress(z.read(tag + "." + ext + ".gz")) for ext in ("stdout", "stderr")]
+        out, err = [
+            gzip.decompress(z.read(tag + "." + ext + ".gz"))
+            for ext in ("stdout", "stderr")
+        ]
         q.need(
             row
             == dict(
@@ -437,72 +395,153 @@ def stubs(z, p, s, cli, cwd, edited):
     return result
 
 
-def read(path, meta, kernel, ruff, reference, calibrator, observers):
+def official(folder, raw, head):
+    """Verify the one attempt, its pre-outcome job enrollment and the complete transferred bytes."""
+    get = lambda name: json.loads((folder / (name + ".json")).read_bytes())
+    r, j, a, before = (get(k) for k in ("run", "jobs", "artifacts", "pre-outcome"))
+    (job,), (art,) = j["jobs"], a["artifacts"]
+    repo = "astral-experiments/ohm"
+    q.need(
+        j["total_count"] == a["total_count"] == 1
+        and int(before["run"]) == r["id"]
+        and before["job"] == job["id"]
+        and before["head"] == head
+        and before["assets"] == 0
+        and (r["repository"]["full_name"], r["head_repository"]["full_name"])
+        == (repo, repo)
+        and (
+            r["head_sha"],
+            r["head_branch"],
+            r["event"],
+            r["run_attempt"],
+            r["path"],
+            r["conclusion"],
+        )
+        == (
+            head,
+            q.BRANCH,
+            "workflow_dispatch",
+            1,
+            ".github/workflows/ci.yml",
+            "success",
+        )
+        and (
+            job["run_id"],
+            job["head_sha"],
+            job["run_attempt"],
+            job["name"],
+            job["labels"],
+            job["status"],
+            job["conclusion"],
+        )
+        == (
+            r["id"],
+            head,
+            1,
+            "GNU E D integration fast-forward contact",
+            ["namespace-profile-ubuntu-24-04-16"],
+            "completed",
+            "success",
+        )
+        and all(x["conclusion"] == "success" for x in job["steps"])
+        and art["workflow_run"]["id"] == r["id"]
+        and art["workflow_run"]["head_sha"] == head
+        and art["name"] == "gnu-donor-integration-fast-forward-contact"
+        and not art["expired"]
+        and art["size_in_bytes"] == raw.stat().st_size,
+        "wrong, failed or substituted official job",
+    )
+    with raw.open("rb") as f:
+        sha = hashlib.file_digest(f, "sha256").hexdigest()
+    q.need(art["digest"] == "sha256:" + sha, "official original digest mismatch")
+    return dict(
+        run=r["id"],
+        job=job["id"],
+        runner=job["runner_name"],
+        head=head,
+        attempt=1,
+        artifact=art["id"],
+        sha256=sha,
+        bytes=art["size_in_bytes"],
+    )
+
+
+def read(raw, meta, kernel, ruff, calibrator, observers):
     ctfe, sel, suite = q.packages()
+    import pilot as local
     import reopen as n
     import contact_review
-    import pilot as local
 
-    semantic = q.semantics()
-    source_receipt, _ = n.corpus.source(ruff)
-    with zipfile.ZipFile(path) as z:
+    source, _ = n.corpus.source(ruff)
+    with zipfile.ZipFile(raw) as z:
         names = set(z.namelist())
         q.need(
             len(names) == len(z.infolist())
-            and all(not Path(f).is_absolute() and ".." not in f.split("/") for f in names)
-            and "failure.txt" not in names
-            and "meter-ready.json" in names,
-            "refusal, ambiguous archive or missing calibration",
+            and all(
+                not Path(k).is_absolute() and ".." not in Path(k).parts for k in names
+            )
+            and "failure.txt" not in names,
+            "failed or ambiguous archive",
         )
-        clocks = {f"{a}/{p}/clock.json" for a in q.ARMS for p in q.HISTORY}
-        observed = {f"{a}/{p}" for a in q.ARMS for p in (*q.EMPTY, "semantic-edit", "semantic-empty")}
-        q.need(
-            {n for n in names if n.endswith("/clock.json")} == clocks
-            and {
-                n.removesuffix("/kernel.tsv.gz")
-                for n in names
-                if n.endswith("/kernel.tsv.gz") and n.split("/")[0] in q.ARMS
-            }
-            == observed
-            and {
-                n.removesuffix("/native-execs.json.gz")
-                for n in names
-                if n.endswith("/native-execs.json.gz") and n.split("/")[0] in q.ARMS
-            }
-            == observed,
-            "missing or overlapping counter and native scopes",
+        D = lambda p: n.dataset(z, p)
+        prefixes = [
+            (arm, l, p, f"{arm}/{l}/{p}")
+            for arm in policy.ORDER
+            for l, p in policy.ACTIONS
+        ]
+
+        def expected(file, pred):
+            q.need(
+                {v for v in names if v.endswith("/" + file)}
+                == {p + "/" + file for a, l, h, p in prefixes if pred(l, h)},
+                "wrong complete inventory " + file,
+            )
+
+        expected("cargo.json.gz", lambda l, p: True)
+        expected("clock.json", policy.is_counter)
+        expected("kernel.tsv.gz", lambda l, p: not policy.is_counter(l, p))
+        expected(
+            "libtest-full.json",
+            lambda l, p: p not in ("invalid", "dirty-X-B", "clean-semantic"),
         )
-        expected_calls = {
-            a + "/" + p + "/cargo.json.gz"
-            for a in q.ARMS
-            for p in (*q.PHASES, "semantic-edit", "semantic-empty")
-        }
-        q.need(
-            {f for f in names if f.endswith("/cargo.json.gz")} == expected_calls,
-            "missing or repeated official Cargo invocation",
+        expected(
+            "live-drivers.json.gz",
+            lambda l, p: (
+                (l == "physical" and p == "X-B")
+                or (l == "ordinary" and p in ("dirty-X-B", "comment"))
+            ),
         )
-        D = lambda key: n.dataset(z, key)
+        expected("donor-opens.json", lambda l, p: l == "ordinary" and p == "comment")
+        expected("fresh.json", lambda l, p: l == "empty" or p == "Y-B")
         pos = D("position.json")
         q.need(
-            (pos["mode"], pos["order"], pos["head"], pos["run"], pos["plan"], pos["command"])
+            (
+                pos["mode"],
+                pos["position"],
+                pos["order"],
+                pos["runner"],
+                pos["run"],
+                pos["head"],
+                pos["command"],
+            )
             == (
-                "counter-pilot",
-                list(policy.ORDER[meta["position"]]),
-                meta["head"],
+                "one-host-contact",
+                "01",
+                list(policy.ORDER),
+                meta["runner"],
                 meta["run"],
-                q.sha((q.HERE / "PLAN.md").read_bytes()),
+                meta["head"],
                 q.COMMAND,
             )
-            and q.sha(z.read("PLAN.md")) == pos["plan"]
-            and D("ruff-inputs.json") == source_receipt,
-            "wrong endpoint, order or source",
+            and pos["plan"]
+            == q.sha((q.HERE / "PLAN.md").read_bytes())
+            == q.sha(z.read("PLAN.md"))
+            and pos["hardware_gate"] == local.reg.hardware_gate()
+            and D("ruff-inputs.json") == source,
+            "wrong observation or source",
         )
-        policy.fresh_boot(pos["boot"])
-        q.need(
-            (pos["position"], pos["runner"]) == (meta["position"], meta["runner"])
-            and D("prior-native-contact.json") == reference,
-            "different job or prior native control",
-        )
+        q.fresh_runner(pos["boot"], meta["runner"])
+        local.reg.host(pos["host"])
         meter = D("meter-ready.json")
         n.replay_controls.PACKAGING, n.replay_controls.OBSERVER = calibrator, observers
         calibration = n.replay_controls.calibration(z, pos["boot"])
@@ -510,36 +549,42 @@ def read(path, meta, kernel, ruff, reference, calibrator, observers):
         q.need(
             meter["boot"] == pos["boot"]
             and calibration["affinity"] == meter["affinity"]
-            and meter["observer"] == n.replay_controls.OBS
-            and meter["calibrator"] == n.replay_controls.CAL,
-            "wrong hardware acquisition source/boot",
+            and (meter["observer"], meter["calibrator"])
+            == (n.replay_controls.OBS, n.replay_controls.CAL),
+            "wrong meter scope",
         )
-        boot_resources = D("bootstrap-resources.json")
-        session = D("resource/resources.json")
-        for state, mem, disk in [(boot_resources, 32, 32), (session["start"], 16, 4)]:
-            cgroups = state["cgroups"]
+        minimum = contact_review.host_guards(z, pos)
+        for state, mem, disk in [
+            (D("bootstrap-resources.json"), 32, 32),
+            (D("resource/resources.json")["start"], 16, 4),
+        ]:
             q.need(
-                state["effective"] == min([state["physical"], *[v for _, v in cgroups if v is not None]])
+                state["effective"]
+                == min(
+                    [
+                        state["physical"],
+                        *[v for _, v in state["cgroups"] if v is not None],
+                    ]
+                )
                 and state["effective"] >= mem * 2**30
                 and state["work"] >= disk * 2**30
                 and state["receipts"] >= max(6, disk) * 2**30,
-                "incorrect physical bootstrap or entry floors",
+                "invalid entry floors",
             )
-        minimum = contact_review.host_guards(z, pos)
-        binding = n.kernel_binding(z, pos["boot"], "contact", kernel, None)
-        kit = n.sdk_pair(z)
-        eax = D("initial/eacces.json")
-        eout = gzip.decompress(z.read("initial/eacces.stdout.gz"))
-        eerr = gzip.decompress(z.read("initial/eacces.stderr.gz"))
+        n.kernel_binding(z, pos["boot"], "contact", kernel, None)
+        kits = n.sdk_pair(z)
+        eac = D("initial/eacces.json")
+        eo = gzip.decompress(z.read("initial/eacces.stdout.gz"))
+        ee = gzip.decompress(z.read("initial/eacces.stderr.gz"))
         q.need(
-            eax["exit"] == 0
-            and eax["stdout"] == q.sha(eout)
-            and eax["stderr"] == q.sha(eerr)
-            and not eerr
-            and re.fullmatch(rb"\d+ file EACCES directory EACCES\n", eout),
-            "permission-negative not exercised",
+            eac["exit"] == 0
+            and eac["stdout"] == q.sha(eo)
+            and eac["stderr"] == q.sha(ee)
+            and not ee
+            and re.fullmatch(rb"\d+ file EACCES directory EACCES\n", eo),
+            "permission test failed",
         )
-        privileges = (
+        priv = (
             [
                 "setpriv",
                 "--bounding-set=-dac_override,-dac_read_search",
@@ -548,290 +593,334 @@ def read(path, meta, kernel, ruff, reference, calibrator, observers):
                 "--no-new-privs",
                 "--",
             ]
-            if eout.startswith(b"0 ")
+            if eo.startswith(b"0 ")
             else []
         )
-        q.need(eax["argv"][: len(privileges)] == privileges, "different privileges in suite")
-        refs, records, bodies, separate, clean_owners = {}, {}, {}, {}, {}
-        installed_hashes = set()
-        for arm in q.ARMS:
-            cert, root = n.active(z, arm, arm, kit[arm[0]]["files"])
-            previous = {}
-            sem_warm = None
+        q.need(eac["argv"][: len(priv)] == priv, "wrong suite privileges")
+        refs, records, bodies, host_images = {}, {}, {}, set()
+        rosters, full_semantics, origin = {}, {}, {}
+        for arm in policy.ORDER:
+            cert, root = n.active(z, arm, arm, kits[arm[0]]["files"])
+            fresh_owners = {}
             rows = {}
-            sem_cert = []
-            for phase in (*q.PHASES, "semantic-edit", "semantic-empty"):
-                p = f"{arm}/{phase}"
-                d = lambda f: D(p + "/" + f)
-                cold = phase in (*q.EMPTY, "Y-B", "semantic-empty")
-                semantic_phase = phase.startswith("semantic-")
+            previous = {}
+            for lane, phase in policy.ACTIONS:
+                p = f"{arm}/{lane}/{phase}"
+                d = lambda key: D(p + "/" + key)
+                counted = policy.is_counter(lane, phase)
+                cold = lane == "empty" or phase == "Y-B"
+                if phase == policy.LAYOUT[lane][0]:
+                    lane_certificate, same_root = n.active(
+                        z, arm + "/" + lane, arm, kits[arm[0]]["files"]
+                    )
+                    q.need(
+                        lane_certificate == cert
+                        and same_root == root
+                        and z.read(arm + "/" + lane + "/arm.json")
+                        == z.read(arm + "/arm.json"),
+                        "compiler installation changed between histories",
+                    )
                 if cold:
                     previous = {}
-                    fresh = d("fresh.json")
+                    f = d("fresh.json")
                     q.need(
-                        set(fresh) == {str(root / "work/target"), str(root / "work/build")}
-                        and len({tuple(v) for v in fresh.values()}) == 2
+                        set(f) == {str(root / "work/target"), str(root / "work/build")}
+                        and len({tuple(v) for v in f.values()}) == 2
                         and all(
                             len(v) == 2 and all(type(i) is int and i > 0 for i in v)
-                            for v in fresh.values()
+                            for v in f.values()
                         ),
-                        "missing distinct native empty roots",
+                        "incorrect empty roots",
                     )
-                else:
-                    q.need(p + "/fresh.json" not in names, "warm visit reset its roots")
                 state = d("source.json")
-                if semantic_phase:
-                    expected = dict(
-                        ref=n.BRANCH["B"],
-                        commit=n.metrics.REVS["B"],
-                        tree=n.corpus.TREES["B"],
-                        modified=sorted([semantic.AST, n.NODE]),
-                        body=semantic.AFTER,
-                        comment=n.AST["edited"],
-                        parser=semantic.GOOD,
+                _, phase_id, lineage = policy.plan(lane, phase)
+                branch, _ = n.source_state(state, phase_id, lineage)
+                if phase == "unchanged":
+                    q.need(
+                        state == D(f"{arm}/{lane}/comment/source.json"),
+                        "source changed on repeat",
                     )
-                    q.need(state == expected, "incorrect semantic edit")
-                    branch = "B"
-                else:
-                    branch, _ = n.source_state(state, phase, "return")
-                    if phase == "unchanged":
-                        q.need(
-                            state == D(arm + "/comment/source.json"), "changed source before unchanged"
-                        )
                 rc = 101 if phase == "invalid" else 0
                 cmd, events = cargo(z, p, root, cert, rc)
-                n.driver(z, arm, p, arm, cert)
-                counted = phase in q.HISTORY
+                n.driver(z, arm + "/" + lane, p, arm, cert)
+                real = phy = wild = None
                 if counted:
                     clock = d("clock.json")
                     policy.timed(clock, phase)
                     q.need(
                         cmd["observer_argv"]
-                        == [meter["plain"], str(root / "logs" / p / "clock.json"), *q.COMMAND]
+                        == [
+                            meter["plain"],
+                            str(root / "logs" / p / "clock.json"),
+                            *q.COMMAND,
+                        ]
                         and meter["plain"] == str(root / "logs/observers/plain"),
-                        "different complete untraced command or counter binary",
+                        "unregistered meter invocation",
                     )
-                    real = phy = wild = None
                 else:
-                    with patch.object(n, "CARGO", q.COMMAND), patch.object(
-                        n.kernel, "COMMAND", q.COMMAND
+                    with (
+                        patch.object(n, "CARGO", q.COMMAND),
+                        patch.object(n.kernel, "COMMAND", q.COMMAND),
                     ):
-                        physical = n.physical(z, p, arm, cert, cmd, rc)
-                    raw = gzip.decompress(z.read(p + "/kernel.tsv.gz"))
+                        raw_kernel = n.physical(z, p, arm, cert, cmd, rc)
                     family = n.kernel.parse(
-                        raw, expected_sha=physical["kernel"], expected_code=rc, expected_schema=3
+                        gzip.decompress(z.read(p + "/kernel.tsv.gz")),
+                        expected_sha=raw_kernel["kernel"],
+                        expected_code=rc,
+                        expected_schema=3,
                     )
                     q.install_boundary(family["execs"])
-                    installed_hashes.update(r["image"]["sha256"] for r in family["execs"])
+                    host_images.update(r["image"]["sha256"] for r in family["execs"])
                     real = d("native-execs.json.gz")
                     phy = q.identities(real)
                     wild = q.link_outputs(real)
                 typed, dirty = sel.roster(events, Path(cmd["cwd"]))
-                q.need(d("roster.json.gz") == dict(units=typed, dirty=dirty), "wrong typed inventory")
-                policy.rosters_admit(reference, arm, phase, typed, dirty)
+                q.need(
+                    d("roster.json.gz") == dict(units=typed, dirty=dirty),
+                    "changed Cargo roster",
+                )
+                rosters[arm, lane, phase] = (typed, dirty)
                 store = d("storage.json")
+                inodes = d("path-inodes.json.gz")
                 allocated = n.metrics.allocation(
-                    d("path-inodes.json.gz"), store, d("allocation-readers.json")
+                    inodes, store, d("allocation-readers.json")
                 )
                 q.need(
                     min(store["roots"].values()) > 0
                     and store["all_inodes"] > 1000
-                    and (not cold or (len(dirty) == 390 and store["packed_files"] == 0)),
-                    "incorrect physical storage or dirty cold",
+                    and (not cold or len(dirty) == 390 and store["packed_files"] == 0),
+                    "false cold or storage",
                 )
-                if not semantic_phase:
-                    rec = dict(
-                        phase=phase,
-                        arm=arm,
-                        status=rc,
-                        allocated=allocated,
-                        typed=len(typed),
-                        dirty=len(dirty),
-                        physical=phy,
-                        wild_outputs=wild,
+                if lane == "ordinary" and phase in (*policy.PLAIN, "dirty-X-B"):
+                    ds = d("donor-state.json")
+                    q.need(ds["source"] == state, "donor source mismatch")
+                    local.dw.check_ledger(ds, inodes, root)
+                if (lane == "physical" and phase == "X-B") or (
+                    lane == "ordinary" and phase in ("dirty-X-B", "comment")
+                ):
+                    integrity.reopen_mappings(
+                        local.dw, d("live-drivers.json.gz"), cert, real
                     )
+                if lane == "ordinary" and phase == "comment":
+                    pref = f"{arm}/ordinary/"
+                    states = [
+                        D(pref + x + "/donor-state.json")
+                        for x in ("Y-B", "X-A", "X-B", "dirty-X-B")
+                    ]
+                    selected_donor = integrity.registered(
+                        local.dw,
+                        *states,
+                        local.dw.rows(D(pref + "dirty-X-B/native-execs.json.gz")),
+                        arm[0],
+                    )
+                    q.need(
+                        selected_donor == d("donor-register.json"),
+                        "incorrect immutable donor registration",
+                    )
+                    local.dw.check_refs(d("both-ref-tips.json"))
+                    with patch.object(local.dw.donors, "OWN", integrity.AST):
+                        selected_tables = local.dw.donors.verify_opens(
+                            selected_donor,
+                            d("donor-opens.json"),
+                            local.dw.rows(real),
+                            arm[0],
+                        )
+                    q.need(
+                        selected_tables == d("donor-selected.json"),
+                        "changed original selected file/PID",
+                    )
+                    origin[arm] = selected_tables
+                rec = dict(
+                    phase=phase,
+                    arm=arm,
+                    lane=lane,
+                    status=rc,
+                    allocated=allocated,
+                    typed=len(typed),
+                    dirty=len(dirty),
+                    physical=phy,
+                    wild_outputs=wild,
+                )
                 if counted:
                     rec["clock"] = clock
                 if rc:
                     q.need(
                         sorted(d("failed.json")) == sorted(store["failed_sessions"]),
-                        "lost incomplete session after invalid compile",
+                        "lost failed compile",
                     )
                 else:
                     products = n.replay_native.native_verdict(z, p, branch)
                     images = {k: products[k] for k in ("cli", "reader")} | {
                         "harness": d("harness-elf.json")
                     }
+                    ref = q.reference(phase)
                     if counted:
-                        ref = q.reference(phase)
-                        comparison = clean_owners[arm, ref]
+                        context = fresh_owners[ref]
                         rec["external_owner_witness"] = ref
                         q.need(
-                            d("selected.json")["owners"] == policy.reference_owners(comparison),
-                            "counted Cargo inputs not bound to same-boot same-role empty owner",
+                            d("selected.json")["owners"]
+                            == policy.reference_owners(context),
+                            "counter provider mismatch",
                         )
                     else:
-                        comparison = previous
-                    paths, previous = selected(z, p, events, real, comparison, cold, images, sel, root)
+                        context = previous
+                    paths, previous = selected(
+                        z, p, events, real, context, cold, images, sel, root
+                    )
                     if phase in q.EMPTY:
-                        clean_owners[arm, phase] = previous
-                    q.need(len(typed) == 390 and not store["failed_sessions"], "incomplete native build")
+                        fresh_owners[phase] = previous
+                    q.need(
+                        len(typed) == 390 and not store["failed_sessions"],
+                        "partial successful build",
+                    )
                     for k, v in images.items():
                         n.verified_body(z, k, v, bodies)
                     whole = {k: v["whole"] for k, v in images.items()}
-                    if semantic_phase:
+                    changed = phase in ("dirty-X-B", "clean-semantic")
+                    if changed or phase in ("comment", "repair", "clean-edited", "X-B"):
+                        local.behavior.verify(
+                            d("semantic-pyi009.json"),
+                            cmd["cwd"],
+                            paths["cli"],
+                            changed,
+                            whole["cli"],
+                        )
+                        full_semantics[p] = whole["cli"]
+                    if (
+                        real is not None
+                        and phase in ("X-A", "X-B", "dirty-X-B")
+                        and lane != "empty"
+                    ):
                         q.need(
-                            all(previous[k]["linked_by"] for k in ("harness", "cli"))
-                            and any(
+                            any(
                                 r["crate"] == "ruff_python_ast" and r["mode"] == "full"
                                 for r in real["rustcs"]
                             )
-                            and whole["cli"] != rows["repair"]["products"]["cli"],
-                            "no true semantic recompilation/relink",
-                        )
-                        signs = stubs(z, p, semantic, paths["cli"], cmd["cwd"], True)
-                        q.need(
-                            d("semantic.json")
-                            == dict(
-                                phase=phase,
-                                products=whole,
-                                stubs=signs,
-                                allocated=allocated,
-                                physical=phy,
-                                wild_outputs=wild,
+                            and all(
+                                previous[k]["linked_by"] for k in ("cli", "harness")
                             ),
-                            "wrong semantic report",
+                            "missing genuine linker or AST emitter",
                         )
-                        current = images, typed, n.behavior(products), signs
-                        if sem_warm is not None:
-                            q.need(current == sem_warm, "edited native body did not match own empty")
-                        sem_warm = current
-                        sem_cert.append(q.sha(z.read(p + "/semantic.json")))
-                        continue
-                    oracle = full_suite(
-                        z, p, paths, cmd["cwd"], suite, local.original.processes, privileges
+                    oracle = (
+                        None
+                        if changed
+                        else full_suite(
+                            z,
+                            p,
+                            paths,
+                            cmd["cwd"],
+                            suite,
+                            local.original.processes,
+                            priv,
+                        )
                     )
-                    behavior = n.behavior(products) | {"suite": oracle}
-                    (outdir,) = {
-                        v["out_dir"]
-                        for v in events
-                        if v.get("reason") == "build-script-executed"
-                        and "tikv-jemalloc-sys" in v["package_id"]
+                    behavior = {
+                        key: value
+                        for key, value in products.items()
+                        if key not in ("cli", "reader")
+                    } | {"suite": oracle}
+                    dirs = {
+                        r["out_dir"]
+                        for r in events
+                        if r.get("reason") == "build-script-executed"
+                        and "tikv-jemalloc-sys" in r["package_id"]
                     }
-                    native_state = (typed, images, behavior, outdir)
+                    q.need(len(dirs) == 1, "native generator path absent")
+                    observed = (typed, images, behavior, dirs)
                     if phase in q.EMPTY:
-                        refs[arm, phase] = native_state
+                        refs[arm, phase] = observed
                     else:
                         q.need(
-                            native_state == refs[arm, q.reference(phase)],
-                            "original products/behavior or path differ from own empty",
+                            observed == refs[arm, ref],
+                            "warm full ELF, behavior, native path, or typed outputs differed from its own empty",
                         )
                     if phase == "repair":
-                        stubs(z, p, semantic, paths["cli"], cmd["cwd"], False)
-                        # The inherited worker records the failed-session grace observation before issuing TOML Cargo.
                         grace = d("grace.json")
-                        invalid = D(arm + "/invalid/failed.json")
+                        invalid = D(f"{arm}/{lane}/invalid/failed.json")
                         cutoff = (
-                            max((v["created_ns"] for v in invalid.values()), default=0) + 11_000_000_000
+                            max((v["created_ns"] for v in invalid.values()), default=0)
+                            + 11_000_000_000
                         )
                         q.need(
                             grace["sessions"] == invalid
                             and grace["cutoff_ns"] == cutoff
                             and grace["rustc_gc_grace_ns"] == 10_000_000_000
                             and grace["ready_ns"] >= max(cutoff, grace["read_ns"]),
-                            "wrong failed-session grace before repair",
+                            "failed session recovery mismatch",
                         )
-                    rec.update(products=whole, suite_count=96)
-                q.need(d("visit.json") == rec, "reported visit differs from raw observations")
-                rows[phase] = rec
-            q.need(
-                all(
-                    rows["X-A"]["products"][k] != rows["X-B"]["products"][k]
-                    for k in ("cli", "harness", "reader")
-                ),
-                "historical products unchanged",
-            )
-            separate[arm] = sem_cert
+                    rec.update(products=whole, suite_count=0 if changed else 96)
+                q.need(
+                    rec == d("visit.json"),
+                    "projected visit differs from raw observations: " + p,
+                )
+                rows[lane + "/" + phase] = rec
             records[arm] = rows
-        for key in q.EMPTY:
-            e, c = (refs[arm, key] for arm in q.ARMS)
+            for phase in policy.PLAIN:
+                q.need(
+                    rosters[arm, "physical", phase] == rosters[arm, "ordinary", phase],
+                    "different typed compiler rows in sibling",
+                )
+        for name in q.EMPTY:
+            e, d = (refs[a, name] for a in policy.ORDER)
             q.need(
-                e[0] == c[0]
-                and e[2] == c[2]
+                e[0] == d[0]
+                and e[2] == d[2]
                 and all(
-                    e[1][r][f] == c[1][r][f]
-                    for r in ("cli", "reader", "harness")
+                    e[1][k][f] == d[1][k][f]
+                    for k in ("harness", "reader", "cli")
                     for f in ("executable", "loads")
                 ),
-                "cross-role clean differences",
+                "different cross-role loaded programs",
             )
         q.need(
-            {f for f in names if f.startswith("native-bodies/") and not f.endswith("/")}
-            == {"native-bodies/" + key[1] + ".zst" for key in bodies},
-            "unexplained or missing full native body",
+            {n for n in names if n.startswith("native-bodies/") and not n.endswith("/")}
+            == {"native-bodies/" + k[1] + ".zst" for k in bodies}
+            and host_images.isdisjoint(k[1] for k in bodies),
+            "unaccounted or in-window native product",
         )
-        q.need(
-            installed_hashes.isdisjoint(key[1] for key in bodies),
-            "an actual selected CLI, libtest or native ABI reader ran inside an observed Cargo call",
-        )
-        result = policy.outcomes(records)
+        outcome = policy.outcomes(records)
         q.need(
             D("complete.json")
             == dict(
                 qualified=True,
-                scored=14,
-                schema=3,
-                phases=list(q.PHASES),
-                visits=records,
-                semantic=separate,
-                observed=result,
-                prerequisite=policy.REGISTERED,
+                decisions=0,
+                kernel_schema=3,
+                layout={k: list(v) for k, v in policy.LAYOUT.items()},
+                records=records,
+                observed=outcome,
             ),
-            "incorrect terminal gate",
+            "wrong final record",
         )
         return dict(
             official=meta,
-            boot=pos["boot"],
             qualified=True,
-            position=meta["position"],
-            runner=meta["runner"],
-            job=meta["job"],
-            run=meta["run"],
-            head=meta["head"],
-            order=pos["order"],
-            prerequisite=policy.REGISTERED,
-            hardware=hardware,
-            scored=14,
-            commands=24,
-            unchanged_histories=2,
-            complete_96_case_suites=18,
-            expected_E0308=2,
-            semantic_commands=4,
-            unique_whole_elfs=sorted({v[1] for v in bodies}),
-            resources=minimum,
-            source=q.KERNEL,
-            observer=binding["observer_sha256"],
+            boot=pos["boot"],
+            result=outcome,
             records=records,
-            observed=result,
+            minimum=minimum,
+            whole_body_count=len(bodies),
+            calibration=calibration,
+            hardware=hardware,
+            donors=origin,
+            semantic_verdicts=full_semantics,
+            complete_suites=sum(
+                v.get("suite_count", 0) == 96
+                for x in records.values()
+                for v in x.values()
+            ),
         )
 
 
 if __name__ == "__main__":
-    a = argparse.ArgumentParser(description=__doc__)
-    a.add_argument("official_folder", type=Path)
-    for key in ("01", "02", "prior", "original_source", "kernel", "ruff", "calibrator", "observers"):
-        a.add_argument("--" + key.replace("_", "-"), dest=key, type=Path, required=True)
-    a.add_argument("--run", type=int, required=True)
-    a.add_argument("--head", required=True)
-    args = a.parse_args()
-    q.check_source(args.head)
-    archives = {p: getattr(args, p) for p in policy.ORDER}
-    require = policy.raw_contact(args.prior, args.original_source, args.ruff, args.kernel)
-    officials = official(args.official_folder, args.run, args.head, archives)
-    results = {
-        p: read(
-            archives[p], officials[p], args.kernel, args.ruff, require, args.calibrator, args.observers
-        )
-        for p in policy.ORDER
-    }
-    print(json.dumps({"positions": results, "paired": policy.pair(results)}, sort_keys=True, indent=2))
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ("zip", "official-dir", "kernel", "ruff", "calibrator", "observers"):
+        parser.add_argument("--" + name, required=True, type=Path)
+    parser.add_argument("--head", required=True)
+    opts = parser.parse_args()
+    os.environ.setdefault("RUNNER_TEMP", "/tmp")
+    q.check_source(opts.head)
+    meta = official(opts.official_dir, opts.zip, opts.head)
+    result = read(
+        opts.zip, meta, opts.kernel, opts.ruff, opts.calibrator, opts.observers
+    )
+    print(json.dumps(result, sort_keys=True, indent=2))
