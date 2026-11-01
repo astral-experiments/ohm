@@ -229,6 +229,31 @@ def outputs(argv):
     return [out / ("libdiesel" + names[0] + ext) for ext in (".rlib", ".rmeta")]
 
 
+def incoming(argv, cwd, inventory):
+    """Distinguish rustc's output paths at B entry from the surviving bytes emitted by A."""
+    rlib, rmeta = outputs(argv)
+    out = rlib.parent
+    need(
+        out.parent.parent == cwd / "target/release/build/diesel" and out.name == "out"
+        and out.parent.name == rlib.stem.removeprefix("libdiesel-"),
+        "unexpected compiler output directory in seed",
+    )
+    published = cwd / "target/release/libdiesel.rlib"
+    paths = {}
+    for path in (rlib, rmeta, published):
+        name = str(path.relative_to(cwd))
+        row = inventory.get(name)
+        if row is not None:
+            need(row["type"] == "file" and row["size"] > 0 and re.fullmatch("[0-9a-f]{64}", row["sha256"]),
+                 "invalid previous compiler product")
+        paths[name] = [row["size"], row["sha256"]] if row is not None else None
+    at_rlib, at_rmeta, at_published = paths.values()
+    # Cargo can remove the per-unit rlib before the next invocation while retaining its published copy.
+    need(at_rmeta and (at_rlib or at_published), "previous compiler products missing")
+    need(not (at_rlib and at_published) or at_rlib == at_published, "previous archive copies differ")
+    return {"paths": paths, "outputs": {rlib.name: at_rlib or at_published, rmeta.name: at_rmeta}}
+
+
 def save(argv, cwd, directory):
     directory.mkdir()
     files = outputs(argv)

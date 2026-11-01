@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
 import time
 import unittest
@@ -21,6 +22,25 @@ import read_outputs
 
 
 class Tests(unittest.TestCase):
+    def test_incoming_archive_locations(self):
+        cwd = Path("/private/test")
+        out = cwd / "target/release/build/diesel/abcd/out"
+        argv = ["rustc", "extra-filename=-abcd", "--out-dir", str(out)]
+        rlib, rmeta = (str(p.relative_to(cwd)) for p in products.outputs(argv))
+        public = "target/release/libdiesel.rlib"
+        lib = {"type": "file", "size": 19, "sha256": "1" * 64}
+        meta = {"type": "file", "size": 17, "sha256": "2" * 64}
+        present = {rmeta: meta, public: lib}
+        expected = {Path(rlib).name: [19, "1" * 64], Path(rmeta).name: [17, "2" * 64]}
+        for rows in (present, {**present, rlib: lib}, {rlib: lib, rmeta: meta}):
+            state = products.incoming(argv, cwd, rows)
+            self.assertEqual(state["outputs"], expected)
+            self.assertEqual(state["paths"][rlib] is not None, rlib in rows)
+            self.assertEqual(state["paths"][public] is not None, public in rows)
+        for bad in ({public: lib}, {rmeta: meta}, {**present, rlib: meta}, {**present, public: {"type": "symlink"}}):
+            with self.assertRaises(ValueError):
+                products.incoming(argv, cwd, bad)
+
     def test_full_literal_name_reconstruction(self):
         clang = shutil.which("clang")
         ar = shutil.which("llvm-ar") or shutil.which("llvm-ar-18")
@@ -235,6 +255,11 @@ class Tests(unittest.TestCase):
             ]
             for f in products.outputs(argv):
                 f.write_bytes(b"seed output")
+            published = dest / "target/release/libdiesel.rlib"
+            os.link(products.outputs(argv)[0], published)
+            untouched = dest / "target/release/build/diesel/other/out/libdiesel-other.rlib"
+            untouched.parent.mkdir(parents=True)
+            untouched.write_bytes(b"plain A sibling")
             record = {"argv": argv, "cwd": str(dest)}
             ex = contact.external_inputs(record)
             alias = base / "logical-workspace"
@@ -247,7 +272,9 @@ class Tests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "foreign explicit dependency"):
                 contact.external_inputs({"cwd": str(alias), "argv": ["--extern", "diesel_derives=" + str(escaped)]})
             cold = contact.cold_unit(dest, record)
-            self.assertEqual(len(cold["removed_outputs"]), 2)
+            self.assertEqual(len(cold["removed_outputs"]), 3)
+            self.assertEqual(untouched.read_bytes(), b"plain A sibling")
+            self.assertFalse(published.exists())
             self.assertEqual(ex, contact.external_inputs(record))
             self.assertFalse(list((dest / "incremental-state").iterdir()) or list(out.iterdir()))
 
@@ -360,7 +387,7 @@ def historic(folder):
                     "native_pid": after(b)["pid"],
                     "collector": read_outputs.read(z, "focused/natural.json"),
                 }
-                seed = {"initial_outputs": after(eb[-2])["outputs"]}
+                seed = {"incoming_products": {"outputs": after(eb[-2])["outputs"]}}
                 # The previous originals carry hashes only. Exercise the same
                 # event/graph/profile reader without claiming their missing bodies.
                 inv = {
@@ -381,8 +408,51 @@ def historic(folder):
     )
 
 
+def native_seed(path):
+    """Check our B-entry reader on the actual Mac archive from before the third physical compile."""
+    assert path.stat().st_size == 216576568
+    assert contact.sha(path) == "c0ffcb6f51f0cf4282dfc341b1ec64d4b27c97c75144b7ddacea0d84cc3022de"
+    with zipfile.ZipFile(path) as z:
+        inv = read_outputs.read(z, "archives/original/before-B-source-and-A-session.tar.inventory.json")
+        before = read_outputs.read(z, "focused/events/12316/before.json")
+        previous = read_outputs.read(z, "focused/events/12035/after.json")
+        cwd = Path(before["cwd"])
+        assert previous["code"] == 0 and previous["pid"] == 12059 and previous["source"] == "A"
+        assert before["source"] == "B" and before["graphs"] == previous["graphs"] and inv["root"] == str(cwd)
+        state = products.incoming(before["argv"], cwd, inv["entries"])
+        assert state["outputs"] == previous["outputs"] and len(inv["entries"]) == 622
+        rlib, rmeta = products.outputs(before["argv"])
+        published = "target/release/libdiesel.rlib"
+        assert state["paths"][str(rlib.relative_to(cwd))] is None
+        names = [published, str(rmeta.relative_to(cwd))]
+        archive = read_outputs.member(z, "archives/original/before-B-source-and-A-session.tar.gz")
+        inode = lambda name: (inv["entries"][name]["dev"], inv["entries"][name]["ino"])
+        requested = {inode(n) for n in names}
+        bodies = {}
+        seen = set()
+        with z.open(archive) as stream, tarfile.open(fileobj=stream, mode="r|gz") as tar:
+            for item in tar:
+                ident = inode(item.name)
+                if ident not in requested:
+                    continue
+                seen.add(item.name)
+                if item.islnk():
+                    assert item.linkname in seen and inode(item.linkname) == ident and ident in bodies
+                else:
+                    assert item.isfile() and ident not in bodies
+                    with tar.extractfile(item) as f:
+                        bodies[ident] = f.read()
+        assert set(names) <= seen
+        inventory = products.archive(*(bodies[inode(n)] for n in names))
+        assert inventory["archive"] == state["outputs"][rlib.name]
+        assert inventory["standalone_metadata"] == state["outputs"][rmeta.name]
+    print("Previous A products and the absent B-entry rlib path match the complete 622-entry Apple seed.")
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 3 and sys.argv[1] == "originals":
         historic(Path(sys.argv[2]))
+    elif len(sys.argv) == 3 and sys.argv[1] == "native-seed":
+        native_seed(Path(sys.argv[2]))
     else:
         unittest.main()

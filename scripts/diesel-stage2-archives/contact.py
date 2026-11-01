@@ -106,10 +106,11 @@ def focused():
     stages, graphs = validate_graphs(r / "focused/events", kit / "bin/rustc")
     before, after = stages[-1]
     literal = read(arm / "natural-B/members.json")
+    prior_outputs = read(arm / "seed.json")["incoming_products"]["outputs"]
     need(
-        literal["archive"] != read(arm / "seed.json")["initial_outputs"][Path(literal["paths"][0]).name]
-        and literal["standalone_metadata"]
-        != read(arm / "seed.json")["initial_outputs"][Path(literal["paths"][1]).name],
+        prior_outputs == stages[-2][1]["outputs"]
+        and literal["archive"] != prior_outputs[Path(literal["paths"][0]).name]
+        and literal["standalone_metadata"] != prior_outputs[Path(literal["paths"][1]).name],
         "natural real edit did not replace both earlier products",
     )
     text = (r / "focused/events" / str(after["wrapper"]) / "rustc.stderr").read_bytes()
@@ -165,15 +166,14 @@ def cold_unit(cwd, rec):
     shutil.rmtree(inc)
     inc.mkdir()
     removed = []
-    for p in sorted((cwd / "target").rglob("*")):
-        if p.is_file() and (
-            (p.name.startswith("libdiesel-") and p.suffix in (".rlib", ".rmeta"))
-            or p.name in ("libdiesel.rlib", "libdiesel.rmeta")
-            or p.parent == out
-        ):
-            need(not p.is_symlink() and p.resolve().is_relative_to(cwd), "foreign cold product")
-            removed.append([str(p.relative_to(cwd)), p.stat().st_size, sha(p)])
-            p.unlink()
+    published = cwd / "target/release/libdiesel.rlib"
+    candidates = list(out.iterdir())
+    if published.exists() or published.is_symlink():
+        candidates.append(published)
+    for p in sorted(candidates):
+        need(p.is_file() and not p.is_symlink() and p.resolve().is_relative_to(cwd), "foreign cold product")
+        removed.append([str(p.relative_to(cwd)), p.stat().st_size, sha(p)])
+        p.unlink()
     need(
         not list(inc.iterdir()) and not list(out.iterdir()) and all(not p.exists() for p in products.outputs(argv)),
         "cold reset incomplete",
@@ -222,8 +222,8 @@ def run_one(role, rec, seed, held, root, dest):
         need(current == staged, "parked inputs changed between their admission and their actual turn")
         state = capture.projection(current)
         need(state == seed["normalized"] and sha(cwd / Q) == PATCHED_B, "source/physical session changed")
-        original = {p.name: [p.stat().st_size, sha(p)] for p in products.outputs(rec["argv"])}
-        need(original == seed["initial_outputs"], "one replay inherited products from another")
+        original = products.incoming(rec["argv"], cwd, current)
+        need(original == seed["incoming_products"], "one replay inherited products from another")
         incoming = graph_rows(cwd, cwd / "incremental-state", root / "reports/focused/graphs")
         key = lambda r: (r["path"], r["size"], r["sha256"])
         need(
@@ -232,13 +232,19 @@ def run_one(role, rec, seed, held, root, dest):
         )
         ext = external_inputs(rec)
         cold = cold_unit(cwd, rec) if role == "cold" else None
+        if cold is not None:
+            removed = {name for name, _, _ in cold["removed_outputs"]}
+            retained = {k: v for k, v in current.items() if not k.startswith("incremental-state/") and k not in removed}
+            after, _ = facts(cwd)
+            cold["retained"] = capture.projection(after)
+            need(cold["retained"] == capture.projection(retained), "cold reset changed an unrelated input or hardlink")
         need(external_inputs(rec) == ext, "cold reset changed compiler externs")
         write(
             folder / "incoming.json",
             {
                 "normalized": state,
                 "prior_A_graphs": incoming,
-                "original_outputs": original,
+                "incoming_products": original,
                 "externs": ext,
                 "source": sha(cwd / Q),
                 "cold_unit_reset": cold,
@@ -258,7 +264,7 @@ def run_one(role, rec, seed, held, root, dest):
             and all(
                 old != new
                 for old, new in zip(
-                    (original[Path(x).name] for x in lib["paths"]),
+                    (original["outputs"][Path(x).name] for x in lib["paths"]),
                     (lib["archive"], lib["standalone_metadata"]),
                     strict=True,
                 )

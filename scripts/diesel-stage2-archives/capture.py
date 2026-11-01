@@ -87,14 +87,16 @@ def observe(phase, wrapper, pid, code, argv):
         slot = root / "before-patched-B"
         need(slot.is_dir() and not slot.is_symlink(), "missing untouched B-start snapshot")
         normalized = clone_matches(cwd, slot)
-        full = pack(cwd, dest / "before-B-source-and-A-session.tar.gz")
+        archive = dest / "before-B-source-and-A-session.tar.gz"
+        full = pack(cwd, archive)
+        entries = json.loads(archive.with_suffix(".inventory.json").read_bytes())["entries"]
         write(
             dest / "seed.json",
             {
                 "cwd": str(cwd),
                 "normalized": normalized,
                 "complete_archive": full,
-                "initial_outputs": {p.name: [p.stat().st_size, sha(p)] for p in products.outputs(argv)},
+                "incoming_products": products.incoming(argv, cwd, entries),
             },
         )
     if phase == "after" and code == 0:

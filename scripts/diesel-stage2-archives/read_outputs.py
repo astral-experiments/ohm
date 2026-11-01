@@ -133,7 +133,7 @@ def natural_evidence(original, first, seed, library):
         and after["pid"] == first["native_pid"]
         and len(before["graphs"]) == 1
         and stages[-2][1]["graphs"] == before["graphs"]
-        and stages[-2][1]["outputs"] == seed["initial_outputs"],
+        and stages[-2][1]["outputs"] == seed["incoming_products"]["outputs"],
         "B seed differs from real preceding A writer",
     )
     products.need(
@@ -179,6 +179,9 @@ def check(original, replays):
     bodies = {"natural": raw}
     prior_inodes = set()
     r = first["before"]
+    entries = read(original, "archives/original/before-B-source-and-A-session.tar.inventory.json")["entries"]
+    products.need(products.incoming(r["argv"], Path(r["cwd"]), entries) == seed["incoming_products"],
+                  "different natural B input paths or previous products")
     handoff = read(replays, "replays/claimed.json")
     first_pipe = first["natural_jobserver"]
     expected_pipe = jobserver.identity(first_pipe["descriptors"])
@@ -206,10 +209,19 @@ def check(original, replays):
         prior_inodes.update(ids)
         products.need(
             inc["normalized"] == seed["normalized"]
-            and inc["original_outputs"] == seed["initial_outputs"]
+            and products.incoming(r["argv"], Path(r["cwd"]), inputs) == inc["incoming_products"] == seed["incoming_products"]
             and bool(inc["cold_unit_reset"]) == (role == "cold"),
             "different initial unit products/session",
         )
+        if role == "cold":
+            out = products.outputs(r["argv"])[0].parent.relative_to(r["cwd"])
+            removed = {n for n, v in inputs.items() if v["type"] == "file" and
+                       (Path(n).parent == out or n == "target/release/libdiesel.rlib")}
+            rows = [[n, inputs[n]["size"], inputs[n]["sha256"]] for n in sorted(removed)]
+            retained = {n: v for n, v in inputs.items() if n not in removed and not n.startswith("incremental-state/")}
+            reset = inc["cold_unit_reset"]
+            products.need(rows == reset["removed_outputs"] and capture.projection(retained) == reset["retained"],
+                          "cold control changed an unrelated artifact")
         products.need(
             start["argv"]
             == done["argv"]
