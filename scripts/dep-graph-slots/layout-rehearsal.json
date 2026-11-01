@@ -1,0 +1,105 @@
+{
+  "changes": {
+    "add": 10,
+    "delete": 18,
+    "modify": 43
+  },
+  "gitlinks": {
+    "library/backtrace": {
+      "commit": "d902726a1dcdc1e1c66f73d1162181b5423c645b",
+      "files": 102,
+      "populated": true
+    },
+    "src/doc/book": {
+      "commit": "917544888a55e4da7109bdba8c88c893c0da70f4",
+      "files": null,
+      "populated": false
+    },
+    "src/doc/edition-guide": {
+      "commit": "5a14f7276ebc0bd100974f02b918f30472c782fc",
+      "files": null,
+      "populated": false
+    },
+    "src/doc/embedded-book": {
+      "commit": "0789b0f29e73ecb91213cac10ad0eec1b9333770",
+      "files": null,
+      "populated": false
+    },
+    "src/doc/nomicon": {
+      "commit": "5012a37c682b26c4e19433888ed2ca9b129696ca",
+      "files": null,
+      "populated": false
+    },
+    "src/doc/reference": {
+      "commit": "82da570bafd9efed421bdbae0f8603ede8dd308b",
+      "files": null,
+      "populated": false
+    },
+    "src/doc/rust-by-example": {
+      "commit": "15308f3e951814ef3475d2b58f48276e6b17b9af",
+      "files": null,
+      "populated": false
+    },
+    "src/gcc": {
+      "commit": "6f155cc3f5a2dff33afe6cc3ed6c2e0e605ae6a3",
+      "files": null,
+      "populated": false
+    },
+    "src/llvm-project": {
+      "commit": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145",
+      "files": null,
+      "populated": false
+    },
+    "src/tools/cargo": {
+      "commit": "4591cf45cc10abb19d2456c40b99606e08167f29",
+      "files": 3115,
+      "populated": true
+    },
+    "src/tools/enzyme": {
+      "commit": "fa6e20ebd80f0e28219abaf174d95baf1513ce92",
+      "files": null,
+      "populated": false
+    },
+    "src/tools/rustc-perf": {
+      "commit": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
+      "files": null,
+      "populated": false
+    }
+  },
+  "included_rust_files": 55718,
+  "layout_sha256": "8e28490a62a2bc2ff4b72a06089b1378f14075cbb277f16099d6d91f0a39537a",
+  "method": "unchanged full integrated bootstrap sources.py then original 48f743 guard, corrected exact install_source, real native slot fixture catalog and live negative controls",
+  "old_failed": true,
+  "old_status_z_sha256": "c15ee7a28a3992efc205024b5ac5d4ea1902965cb38ea8a21d992ded986039f5",
+  "rejected": {
+    "changed-backtrace": "dirty source outside verified overlays: $RUST",
+    "changed-cargo": "dirty source outside verified overlays: $RUST",
+    "changed-clippy": "dirty source outside verified overlays: $RUST/src/tools/clippy",
+    "changed-compiler": "dirty source outside verified overlays: $RUST",
+    "changed-rustfmt": "dirty source outside verified overlays: $RUST/src/tools/rustfmt",
+    "executable-mode": "dirty source outside verified overlays: $RUST/src/tools/rustfmt",
+    "ignored-untracked-clippy-input": "unexpected untracked input: $RUST/src/tools/clippy",
+    "nonempty-uninitialized-gitlink": "nonempty uninitialized gitlink: $RUST/src/tools/enzyme",
+    "restored-unapproved-tool-file": "dirty source outside verified overlays: $RUST/src/tools/clippy",
+    "staged-root-gitlink": "modified Git index: $RUST",
+    "untracked-clippy-input": "dirty source outside verified overlays: $RUST/src/tools/clippy",
+    "untracked-compiler-input": "dirty source outside verified overlays: $RUST",
+    "wrong-physical-Cargo-HEAD": "dirty source outside verified overlays: $RUST"
+  },
+  "release_inputs": {
+    "src/tools/clippy": 4601,
+    "src/tools/rustfmt": 2014
+  },
+  "restored": true,
+  "source": "c0b318301965619c2cbd4b261ff3de84fac6831b",
+  "tools": {
+    "src/tools/clippy": [
+      "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
+      "597138f8e9a24972dd23acd15a8eee063c3a39f9"
+    ],
+    "src/tools/rustfmt": [
+      "3c9620c92b01e6c393324729c4861823cc3676e2",
+      "48c3ccd52f999a69778e9af7930b1d0408c7213c"
+    ]
+  }
+}

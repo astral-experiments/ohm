@@ -14,11 +14,14 @@ import sys
 import tempfile
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import layout
+
 BIND = json.loads((HERE / "source.json").read_bytes())
 GIB = 1 << 30
 PARENT = BIND["equivalent_previous_distribution_source"]
 CHILD = BIND["candidate"]
-ANCHOR = "e8c4c99286652f27929290e417ff269e32d0bbd5"
+ANCHOR = "48f743cbf1ecad76127c512f141be636b0deedff"
 TEST = "tests/run-make/incremental-missing-query-cache"
 HOSTS = {"Linux": "x86_64-unknown-linux-gnu", "Darwin": "aarch64-apple-darwin"}
 BRANCH = "charlie/qa-rc22-reject-node-slots-20261101"
@@ -127,10 +130,21 @@ def install_source(w, repo, r):
     subprocess.run(["git", "-C", repo, "index-pack", "--strict", "--stdin"], input=raw, check=True)
     source_catalog(repo)
     subprocess.run(["git", "-C", repo, "checkout", "--quiet", "--detach", CHILD], check=True)
+    # The production installer replaces two tracked Rust subtrees with separately pinned
+    # release tool repositories. Keep the outer view before validating the complete layout.
+    status = layout.git(repo, "status", "--porcelain", "-z", "--untracked-files=no", "--ignore-submodules=all")
+    (r / "slot-outer-source-status.bin").write_bytes(status)
+    composite = layout.checked(repo, CHILD, BIND["candidate_full_tree"], layout.TOOLS)
+    observed = {os.fsdecode(row[3:]) for row in status.split(b"\0")[:-1]}
+    differences = composite["authorized_differences"]
+    rows = json.dumps(differences, sort_keys=True, separators=(",", ":")).encode()
     need(
-        not git(repo, "status", "--porcelain", "--untracked-files=no", "--ignore-submodules=all"),
-        "dirty source after installation",
+        hashlib.sha256(rows).hexdigest() == "f6773fc213181fa54b43cbfbf781fe685b33e665992a1eb082c805ba81b87eb9",
+        "release tool changes differ from the verified full-source rehearsal",
     )
+    expected = {p for p, (old, _) in differences.items() if old is not None}
+    need(observed == expected, ("unaccounted outer paths", sorted(observed ^ expected)))
+    save(r / "slot-source-layout.json", composite)
     need(
         git(repo / "src/tools/cargo", "rev-parse", "HEAD") == BIND["trees"]["src/tools/cargo"],
         "wrong actual Cargo checkout",

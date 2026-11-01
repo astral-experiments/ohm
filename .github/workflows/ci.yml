@@ -103,8 +103,9 @@ jobs:
       run: |-
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
-        test "$(git rev-parse HEAD^)" = e8c4c99286652f27929290e417ff269e32d0bbd5
-        git diff --exit-code HEAD^ HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
+        test "$(git rev-parse HEAD^)" = 48f743cbf1ecad76127c512f141be636b0deedff
+        test "$(git rev-parse HEAD~2)" = e8c4c99286652f27929290e417ff269e32d0bbd5
+        git diff --exit-code HEAD~2 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
         (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
         (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py)
