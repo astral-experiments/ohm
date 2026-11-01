@@ -21,10 +21,10 @@ BIND = json.loads((HERE / "source.json").read_bytes())
 GIB = 1 << 30
 PARENT = BIND["historical_distribution_source"]
 CHILD = BIND["candidate"]
-ANCHOR = "ea5fd483fd65a82b8cd399d2d44dca8df123043a"
+ANCHOR = "1410df33f7c5ff41d47fadaec35a800117f9462d"
 TEST = "tests/run-make/incremental-missing-query-cache"
 HOSTS = {"Linux": "x86_64-unknown-linux-gnu", "Darwin": "aarch64-apple-darwin"}
-BRANCH = "charlie/qa-rc23-rustdoc-native-20261101"
+BRANCH = "charlie/qa-rc23-rustdoc-apple-20261101"
 
 
 def need(cond, message):
@@ -62,7 +62,7 @@ def guard():
     e = os.environ
     host = HOSTS[platform.system()]
     need(
-        host == e["OHM_TARGET"]
+        host == e["OHM_TARGET"] == "aarch64-apple-darwin"
         and platform.machine() == ("arm64" if host.startswith("aarch64") else "x86_64"),
         "foreign native host",
     )

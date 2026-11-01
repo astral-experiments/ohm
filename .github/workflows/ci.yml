@@ -1,4 +1,4 @@
-name: Native Ruff documentation, GNU linking, terminal and Darwin Diesel
+name: Apple native Ruff documentation, marked-link checks and Darwin Diesel
 'on':
   workflow_dispatch:
     inputs:
@@ -8,19 +8,17 @@ name: Native Ruff documentation, GNU linking, terminal and Darwin Diesel
         type: string
 permissions: {}
 concurrency:
-  group: private-rc23-diamond-native-graph-recovery
+  group: private-rc23-diamond-apple-marked-links
   cancel-in-progress: false
 jobs:
   native:
     name: Native graph recovery (${{ matrix.host }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc23-rustdoc-native-20261101' && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc23-rustdoc-apple-20261101' && github.run_attempt
       == 1 && github.sha == inputs.reviewed_head
     strategy:
       fail-fast: false
       matrix:
         include:
-        - host: x86_64-unknown-linux-gnu
-          worker: namespace-profile-ubuntu-24-04-16
         - host: aarch64-apple-darwin
           worker: macos-15
     runs-on: ${{ matrix.worker }}
@@ -39,7 +37,7 @@ jobs:
       with:
         persist-credentials: false
         ref: ${{ github.sha }}
-        fetch-depth: 5
+        fetch-depth: 6
     - name: Make room for macOS profile training
       if: runner.os == 'macOS' && runner.environment == 'github-hosted'
       run: ./scripts/prepare-hosted-macos-release.sh
@@ -103,12 +101,12 @@ jobs:
       run: |-
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
-        test "$(git rev-parse HEAD^)" = ea5fd483fd65a82b8cd399d2d44dca8df123043a
-        test "$(git rev-parse HEAD~4)" = 0e5fc7cc7e4db398884d782be6049d83eda0ae08
-        git diff --exit-code HEAD~4 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
+        test "$(git rev-parse HEAD^)" = 1410df33f7c5ff41d47fadaec35a800117f9462d
+        test "$(git rev-parse HEAD~5)" = 0e5fc7cc7e4db398884d782be6049d83eda0ae08
+        git diff --exit-code HEAD~5 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
         (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
-        (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py && python3 -IB gnu-defaults/test_cases.py && python3 -IB diamond/test_case.py)
+        (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py && python3 -IB gnu-defaults/test_cases.py && python3 -IB diamond/test_case.py && python3 -IB test_historical_smoke.py)
         df -h "$GITHUB_WORKSPACE"
         available=$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')
         test "$available" -ge 41943040

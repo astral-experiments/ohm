@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -102,6 +103,58 @@ def identities(root, sdk, cargo, rust_revision, cargo_revision, host, env, repor
     return versions
 
 
+def historical_marked_refusal(script, label, code, raw, project, events):
+    """Recognize the historical marked-link failure from its complete shell and native evidence."""
+    if (label != "historical" or code != 1 or script != HERE / "release-22/smoke-test-relink.sh"
+            or events != b"link\nlink\n"):
+        return False
+    lines = raw.split("\n")
+    if lines[-1:] != [""] or len(lines) < 5:
+        return False
+    diagnostic = lines[-3]
+    if (not re.fullmatch(r"Expected 0 linker calls for two executables returning 17, observed[ \t]+2[ \t]*", diagnostic)
+            or lines[-4] != "+ echo '" + diagnostic + "'" or lines[-2] != "+ exit 1"
+            or sum(s.startswith("Expected ") for s in lines) != 1):
+        return False
+    incbin = [line.removeprefix("+ actual=") for line in lines
+              if line.startswith("+ actual=") and ":" in line]
+    if incbin != ["1:17", "1:29", "2:29", "2:37"] * 4:
+        return False
+    # Each check truncates the link log. Match both executed paths, their native output
+    # and actual link counts within their respective target directories.
+    actual = []
+    watching = False
+    declared = project / "declared"
+    for line in lines:
+        if line.startswith("+ check_links "):
+            watching = True
+            actual.append(line)
+        elif line.startswith(("+ CARGO_TARGET_DIR=", "+ CARGO_BUILD_BUILD_DIR=", "+ OHM_SMOKE_LINK_LOG=")) and str(declared) + "/" in line:
+            actual.append(line)
+        elif watching and (line.startswith("++ " + str(declared) + "/") or line.startswith("+ actual=")):
+            actual.append(line)
+        elif watching and line.startswith("+ count="):
+            count = re.fullmatch(r"\+ count=(?:([0-9])|'[ \t]*([0-9])[ \t]*')", line)
+            if not count:
+                return False
+            actual.append("count=" + (count[1] or count[2]))
+    expected = []
+    for variant, build, checks in (
+        ("target", "build", [(17, 0, 0), (29, 2, 2), (29, 0, 0)]),
+        ("marked-declared-target", "marked-declared-build", [(17, 0, 2)]),
+    ):
+        expected += ["+ CARGO_TARGET_DIR=" + str(declared / variant),
+                     "+ CARGO_BUILD_BUILD_DIR=" + str(declared / build)]
+        if variant == "target":
+            expected.append("+ OHM_SMOKE_LINK_LOG=" + str(declared / "links"))
+        for tag, wanted, observed in checks:
+            expected.append(f"+ check_links {tag} {wanted}")
+            for binary in ("first", "second"):
+                expected += ["++ " + str(declared / variant / "debug" / binary), f"+ actual={tag}"]
+            expected.append(f"count={observed}")
+    return actual == expected
+
+
 def smoke(script, label, project, folder, env, historical=False):
     log = folder / (label + ".log")
     argv = ["bash", "-x", str(script), "ohm", str(project)]
@@ -128,8 +181,13 @@ def smoke(script, label, project, folder, env, historical=False):
         dict(code=result.returncode, programs=indexed, log_sha256=checksum(log)),
     )
     text = log.read_text(errors="replace")
-    reason = "Expected 0 linker calls for two executables returning 17, observed 2"
-    old_refusal = historical and result.returncode == 1 and reason in text.splitlines()
+    link_log = project / "declared/links"
+    events = None
+    if historical and result.returncode and link_log.is_file():
+        need(link_log.stat().st_size <= 4096, "unexpected historical native event file")
+        events = link_log.read_bytes()
+        (folder / (label + "-link-events")).write_bytes(events)
+    old_refusal = historical and historical_marked_refusal(script, label, result.returncode, text, project, events)
     need(result.returncode == 0 or old_refusal, f"unexpected {label} outcome; see {log}")
     expected = [("target", "29")]
     if script.name == "smoke-test-relink.sh" and script.parent.name == "release-22":
