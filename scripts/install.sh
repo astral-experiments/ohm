@@ -293,13 +293,19 @@ else
     info 'extracting toolchain'
     tar --no-same-owner -xf "$archive_path" -C "$extracted_directory" ||
         fail 'could not extract the archive'
-    inner_installer=$extracted_directory/$archive_root/install.sh
-    [ -f "$inner_installer" ] && [ ! -L "$inner_installer" ] ||
+    inner_installer=extracted/$archive_root/install.sh
+    [ -f "$temporary_directory/$inner_installer" ] && [ ! -L "$temporary_directory/$inner_installer" ] ||
         fail 'the archive does not contain a regular Rust installation script'
     staged_prefix=$staging_directory/toolchain
     info 'installing toolchain components'
-    sh "$inner_installer" --prefix="$staged_prefix" --disable-ldconfig ||
-        fail 'the Rust distribution installer failed'
+    # The distribution installer reparses its arguments and the path to its script.
+    # Keep both paths simple while staging the toolchain on its destination filesystem.
+    (
+        CDPATH= cd "$temporary_directory" &&
+            mkdir "$staged_prefix" &&
+            ln -s "$staged_prefix" toolchain &&
+            sh "$inner_installer" --prefix=toolchain --disable-ldconfig
+    ) || fail 'the Rust distribution installer failed'
     verify_installation "$staged_prefix"
     printf '%s\n' "$version" > "$staged_prefix/.ohm-version"
 
