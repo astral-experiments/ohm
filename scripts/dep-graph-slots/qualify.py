@@ -21,10 +21,10 @@ BIND = json.loads((HERE / "source.json").read_bytes())
 GIB = 1 << 30
 PARENT = BIND["historical_distribution_source"]
 CHILD = BIND["candidate"]
-ANCHOR = "0e5fc7cc7e4db398884d782be6049d83eda0ae08"
+ANCHOR = "5d953aef3b91bf11bfd8d988bff3398ac98c43d2"
 TEST = "tests/run-make/incremental-missing-query-cache"
 HOSTS = {"Linux": "x86_64-unknown-linux-gnu", "Darwin": "aarch64-apple-darwin"}
-BRANCH = "charlie/qa-rc22-gnu-link-inputs-20261101"
+BRANCH = "charlie/qa-rc22-worktree-native-20261101"
 
 
 def need(cond, message):
@@ -92,9 +92,10 @@ def source_catalog(repo):
     q = BIND
     graph = q["graph_candidate"]
     prior = q["prior_native"]
+    last = q["last_native"]
     need(
-        git(repo, "rev-parse", CHILD + "^", CHILD + "^{tree}", prior["rust"] + "^", prior["rust"] + "^{tree}", graph + "^", graph + "^{tree}", q["parent"] + "^{tree}").splitlines()
-        == [prior["rust"], q["candidate_full_tree"], graph, prior["rust_tree"], q["parent"], q["graph_candidate_tree"], q["parent_full_tree"]],
+        git(repo, "rev-parse", CHILD + "^", CHILD + "^{tree}", last["rust"] + "^", last["rust"] + "^{tree}", prior["rust"] + "^", prior["rust"] + "^{tree}", graph + "^", graph + "^{tree}", q["parent"] + "^{tree}").splitlines()
+        == [last["rust"], q["candidate_full_tree"], prior["rust"], last["rust_tree"], graph, prior["rust_tree"], q["parent"], q["graph_candidate_tree"], q["parent_full_tree"]],
         "wrong complete Rust trees",
     )
     previous = q["previous_slot_parent"]
@@ -111,7 +112,8 @@ def source_catalog(repo):
         (previous, q["parent"], old_cargo, q["shipped_cargo"]),
         (q["previous_slot_candidate"], graph, old_cargo, q["shipped_cargo"]),
         (graph, prior["rust"], q["shipped_cargo"], prior["cargo"]),
-        (prior["rust"], CHILD, prior["cargo"], q["trees"]["src/tools/cargo"]),
+        (prior["rust"], last["rust"], prior["cargo"], last["cargo"]),
+        (last["rust"], CHILD, last["cargo"], q["trees"]["src/tools/cargo"]),
     ]:
         raw = f":160000 160000 {before} {after} M\tsrc/tools/cargo"
         need(
@@ -146,16 +148,21 @@ def cargo_catalog(repo):
     need(git(repo, "rev-list", "--reverse", shipped + ".." + child).splitlines() == q["cargo_commits"],
          "wrong native-input source history")
     before = q["prior_native"]["cargo"]
+    native = q["last_native"]["cargo"]
     spelling = "src/compiler/native_link/declared.rs"
-    need(git(repo, "rev-parse", child + "^", before + "^{tree}").splitlines() == [before, q["prior_native"]["cargo_tree"]]
-         and git(repo, "diff", "--name-only", before, child) == spelling
-         and git(repo, "rev-parse", before + ":" + spelling, child + ":" + spelling).splitlines() == q["cc_spelling_blob"],
+    need(git(repo, "rev-parse", native + "^", before + "^{tree}").splitlines() == [before, q["prior_native"]["cargo_tree"]]
+         and git(repo, "diff", "--name-only", before, native) == spelling
+         and git(repo, "rev-parse", before + ":" + spelling, native + ":" + spelling).splitlines() == q["cc_spelling_blob"],
          "unexpected startup-object spelling change")
     parent = shipped
     for commit in q["cargo_commits"]:
         need(git(repo, "rev-list", "--parents", "-1", commit).split() == [commit, parent],
              "unexpected Cargo ancestry")
         parent = commit
+    for commit, changed in q["worktree_changes"].items():
+        need(git(repo, "diff", "--name-only", commit + "^", commit).splitlines() == sorted(changed), "unexpected worktree delta")
+        for name, pair in changed.items():
+            need(git(repo, "rev-parse", commit + "^:" + name, commit + ":" + name).splitlines() == pair, "wrong worktree source blob in " + name)
     files = q["cargo_changed_blobs"]
     need(git(repo, "diff", "--name-only", shipped, child).splitlines() == sorted(files),
          "unregistered Cargo source file")
@@ -192,6 +199,8 @@ def install_source(w, repo, r):
         (cargo, "cargo-native-resolution.pack"),
         (repo, "rust-cc-spelling.pack"),
         (cargo, "cargo-cc-spelling.pack"),
+        (repo, "rust-worktree-pin.pack"),
+        (cargo, "cargo-worktrees.pack"),
     ]:
         with (assets / name).open("rb") as stream:
             subprocess.run(
@@ -213,20 +222,20 @@ def install_source(w, repo, r):
         (root / "manifest.schema.json").symlink_to(schema)
         (root / "1.99.0").mkdir()
         manifest = root / "1.99.0/22.json"
-        shutil.copyfile(assets / "22.json", manifest)
-        subprocess.run(
-            [
-                w / "scripts/verify-release-sources.sh",
-                manifest,
-                repo,
-                cargo,
-                repo / "src/tools/clippy",
-                repo / "src/tools/rustfmt",
-            ],
-            check=True,
-        )
-    subprocess.run(["git", "-C", repo, "checkout", "--quiet", "--detach", CHILD], check=True)
-    git(cargo, "checkout", "--quiet", "--detach", BIND["trees"]["src/tools/cargo"])
+        for name in ("22.json", "candidate-22.json"):
+            if name == "candidate-22.json":
+                git(repo, "checkout", "--quiet", "--detach", CHILD)
+                git(cargo, "checkout", "--quiet", "--detach", BIND["trees"]["src/tools/cargo"])
+                need(git(w, "hash-object", assets / name) == BIND["candidate_packaging"]["manifest_blob"],
+                     "different release candidate package manifest")
+            shutil.copyfile(assets / name, manifest)
+            result = subprocess.run(
+                [w / "scripts/verify-release-sources.sh", manifest, repo, cargo,
+                 repo / "src/tools/clippy", repo / "src/tools/rustfmt"],
+                capture_output=True, check=False,
+            )
+            (r / ("verify-" + name + ".log")).write_bytes(result.stdout + result.stderr)
+            result.check_returncode()
     # The production installer replaces two tracked Rust subtrees with separately pinned
     # release tool repositories. Keep the outer view before validating the complete layout.
     status = layout.git(repo, "status", "--porcelain", "-z", "--untracked-files=no", "--ignore-submodules=all")

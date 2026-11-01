@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import shutil
 import struct
+import subprocess
 import sys
 import tempfile
 
@@ -30,12 +31,35 @@ def refuse(call, message):
 
 
 def cases():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        installed = root / "bin"
+        installed.mkdir()
+        for tool in ("rustup", "rustc", "cargo"):
+            launcher = installed / tool
+            launcher.write_text(f"#!/bin/sh\nprintf '%s\\n' '{tool}'\n")
+            launcher.chmod(0o755)
+        proxies = root / "proxies"
+        got = release_smoke.named_proxies(proxies, installed / "rustup")
+        for tool, row in got.items():
+            assert subprocess.check_output([proxies / tool]).decode().strip() == tool
+            assert row["sha256"] == qualify.checksum(installed / tool)
+        old = root / "old-rustc"
+        old.symlink_to(installed / "rustup")
+        assert subprocess.check_output([old]).decode().strip() == "rustup"
+        (installed / "cargo").unlink()
+        refuse(lambda: release_smoke.named_proxies(root / "missing", installed / "rustup"), "missing Cargo entrypoint")
+
     env = qualify.BIND
-    assert env["candidate"] == "0c66092268115dc8cc72c6f2046bd7430ff45691"
+    assert env["candidate"] == "494d4afc2e0b2e995000d345c8bfef4e2a4c6e3e"
+    assert env["last_native"]["rust"] == "0c66092268115dc8cc72c6f2046bd7430ff45691"
     assert env["prior_native"]["rust"] == "dc70b47e9ff1926562626246bf996b824a456259"
     assert env["graph_candidate"] == "1686aef9877e0c95faddf6f9c313e451a9744f29"
-    assert env["cargo_commits"][-1] == env["trees"]["src/tools/cargo"] == "0fe9899490ce8b396c991aa39b440145f422255a"
-    assert set(env["cargo_changed_blobs"]) == {"src/compiler/native_link/declared.rs", "src/compiler/native_link/mod.rs"}
+    assert env["cargo_commits"][-1] == env["trees"]["src/tools/cargo"] == "1a548e9b728fa43780dc9bb94578108824f402d4"
+    assert set(env["cargo_changed_blobs"]) == {"src/compiler/native_link/declared.rs", "src/compiler/native_link/mod.rs",
+            "src/compiler/build_runner/compilation_files.rs", "src/compiler/mod.rs", "src/ops/cargo_worktree/mod.rs",
+            "tests/testsuite/ohm_worktree.rs", "tests/testsuite/rustflags.rs"}
+    assert list(sorted(env["worktree_changes"])) == list(sorted(env["cargo_commits"][-2:]))
     assert env["parent"] == "008a21ac0d750dc9a1c18b7959d7e7984c03d887"
     assert env["previous_slot_candidate"] == "c0b318301965619c2cbd4b261ff3de84fac6831b"
     assert env["release_coordinator"] == "8c7d5b4500fdfa6e2234417340aa190e5787e513"
@@ -50,6 +74,10 @@ def cases():
         == env["shipped_cargo"]
         == "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770"
     )
+    candidate = json.loads((assets / "candidate-22.json").read_bytes())
+    assert env["candidate_packaging"] == {"commit":"3eb15b6902ced4d4be9cec1c303e1769a1548536", "manifest_blob":"4fb5b8519905e77a6760f9388614b10bd95d0539"}
+    assert {k: v["revision"] for k,v in candidate["sources"].items()} == {
+        **{k:v["revision"] for k,v in manifest["sources"].items()}, "rust":env["candidate"], "cargo":env["trees"]["src/tools/cargo"]}
     assert env["release_files"]["smoke-test-relink.sh"] == [
         6712,
         "e57b87041abe1f91c78c29bb26e276e7ccd41e8f33a360aec616fb260d7ec175",

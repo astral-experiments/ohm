@@ -1,4 +1,4 @@
-name: Checked GNU native inputs, graph recovery and optimized Darwin Diesel
+name: Checked worktree paths, native GNU linking, graph recovery and Darwin Diesel
 'on':
   workflow_dispatch:
     inputs:
@@ -8,12 +8,12 @@ name: Checked GNU native inputs, graph recovery and optimized Darwin Diesel
         type: string
 permissions: {}
 concurrency:
-  group: private-rc22-checked-gnu-inputs-and-native-graph-recovery
+  group: private-rc22-worktree-inputs-and-native-graph-recovery
   cancel-in-progress: false
 jobs:
   native:
     name: Native graph recovery (${{ matrix.host }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-gnu-link-inputs-20261101' && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-worktree-native-20261101' && github.run_attempt
       == 1 && github.sha == inputs.reviewed_head
     strategy:
       fail-fast: false
@@ -103,8 +103,8 @@ jobs:
       run: |-
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
-        test "$(git rev-parse HEAD^)" = 0e5fc7cc7e4db398884d782be6049d83eda0ae08
-        test "$(git rev-parse HEAD~2)" = b6f12f6fc37410de9896f4cca4a03f8cb76a35ec
+        test "$(git rev-parse HEAD^)" = 5d953aef3b91bf11bfd8d988bff3398ac98c43d2
+        test "$(git rev-parse HEAD~2)" = 0e5fc7cc7e4db398884d782be6049d83eda0ae08
         git diff --exit-code HEAD~2 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
         (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
@@ -142,6 +142,9 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       shell: bash
+    - name: Verify the installed named rustup launchers against the original native SDK
+      id: proxies
+      run: python3 -IB scripts/dep-graph-slots/release_smoke.py original-proxies
     - name: Install matching LLVM tools for native PGO
       env:
         MANIFEST_PATH: toolchains/1.99.0/22.json
@@ -245,6 +248,10 @@ jobs:
       id: defaults
       if: success() && runner.os == 'Linux' && steps.transitive.outcome == 'success'
       run: python3 -IB scripts/dep-graph-slots/gnu-defaults/worker.py
+    - name: Reopen the explicit source paths and physical worktree registration on this host
+      id: worktrees
+      if: success() && steps.links.outcome == 'success'
+      run: python3 -IB scripts/dep-graph-slots/worktree_paths.py
     - name: Execute the same checked-in run-make on the native Apple host
       run: python3 -IB scripts/dep-graph-slots/qualify.py rmake
       id: darwin_rmake
@@ -253,8 +260,10 @@ jobs:
       run: |-
         set -euo pipefail
         test "$SOURCE" = success
+        test "$PROXIES" = success
         test "$MATRIX" = success
         test "$LINKS" = success
+        test "$WORKTREES" = success
         if test "$RUNNER_OS" = macOS; then
           test "$NATURAL" = success && test "$ESCROW" = success && test "$COLLECTORS" = success && test "$APPLE_RMAKE" = success
         else
@@ -263,7 +272,9 @@ jobs:
       if: always()
       shell: bash
       env:
+        WORKTREES: ${{ steps.worktrees.outcome }}
         SOURCE: ${{ steps.source.outcome }}
+        PROXIES: ${{ steps.proxies.outcome }}
         MATRIX: ${{ steps.matrix.outcome }}
         LINKS: ${{ steps.links.outcome }}
         TRANSITIVE: ${{ steps.transitive.outcome }}

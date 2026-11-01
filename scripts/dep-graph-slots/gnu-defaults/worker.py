@@ -494,7 +494,7 @@ def main():
             "HOME": str(work),
             "LC_ALL": "C",
         }
-        versions = identities(sdk, source, cargo, CHILD, BIND["trees"]["src/tools/cargo"], host, env)
+        versions = identities(sdk, source, cargo, CHILD, BIND["trees"]["src/tools/cargo"], host, env, out / "identity")
         for tool in ["driver", "rustc", "cargo"]:
             need(
                 versions[tool]["sha256"] == previous["results"]["rebased"]["versions"][tool]["sha256"],

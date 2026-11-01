@@ -15,8 +15,8 @@ from qualify import BIND, CHILD, PARENT, checksum, git, guard, need, save, verif
 WILD = "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
 RUSTUP = shutil.which("rustup")
 OLD_CARGO = "4591cf45cc10abb19d2456c40b99606e08167f29"
-DIRECT_PARENT = "ec883b0b5c91bbdfc6613555ca3ac4dacceb80d4"
-PARENT_TREE = "9c22867fc0621b4c10d1ccbb3d8a1bdbbb403ab9"
+DIRECT_PARENT = "1ca08234f134d8be51c11e3d804c595de5aff843"
+PARENT_TREE = "cf1f9b08f263c20e9d24c759dcc05927a2cee1fb"
 
 
 def run(argv, env, **kw):
@@ -52,23 +52,44 @@ def toolchain(root, sdk, cargo, host, wild):
         (root / bin_dir / "wild-ld/ld.bfd").symlink_to(wild)
 
 
-def identities(root, sdk, cargo, rust_revision, cargo_revision, host, env):
+def named_proxies(proxies, rustup):
+    """Keep the installed name-specific launchers, including Homebrew environment scripts."""
+    proxies.mkdir()
+    names = {}
+    for name in ("rustup", "cargo", "rustc"):
+        source = Path(rustup).absolute().with_name(name)
+        need(source.is_file() and os.access(source, os.X_OK), "missing installed " + name)
+        (proxies / name).symlink_to(source)
+        names[name] = {"path": str(source), "resolved": str(source.resolve(strict=True)), "sha256": checksum(source)}
+    return names
+
+
+def identities(root, sdk, cargo, rust_revision, cargo_revision, host, env, report):
+    def probe(label, argv):
+        result = subprocess.run(argv, env=env, text=True, capture_output=True, timeout=60)
+        save(report / (label + ".json"), {"argv": list(map(str, argv)), "status": result.returncode,
+                                         "stdout": result.stdout, "stderr": result.stderr})
+        result.check_returncode()
+        return result.stdout.strip()
+
+    report.mkdir()
     versions = {}
     for tool, revision, source in [
         ("rustc", rust_revision, sdk / "bin/rustc"),
         ("cargo", cargo_revision, cargo),
     ]:
-        selected = Path(run([RUSTUP, "which", "--toolchain", "ohm", tool], env))
-        vv = run([tool, "+ohm", "-vV"], env)
+        selected = Path(probe(tool + "-which", [RUSTUP, "which", "--toolchain", "ohm", tool]))
+        vv = probe(tool + "-version", [tool, "+ohm", "-vV"])
         need(
             checksum(selected) == checksum(source)
+            and vv.splitlines() and vv.splitlines()[0].startswith(tool + " ")
             and "host: " + host in vv.splitlines()
             and "commit-hash: " + revision in vv.splitlines(),
             "wrong active " + tool,
         )
         versions[tool] = {"sha256": checksum(source), "path": str(selected), "version": vv}
-    need(Path(run(["rustc", "+ohm", "--print", "sysroot"], env)).samefile(root), "wrong sysroot")
-    lib = Path(run(["rustc", "+ohm", "--print", "target-libdir"], env))
+    need(Path(probe("sysroot", ["rustc", "+ohm", "--print", "sysroot"])).samefile(root), "wrong sysroot")
+    lib = Path(probe("target-libdir", ["rustc", "+ohm", "--print", "target-libdir"]))
     (std,) = lib.glob("libstd-*.rlib")
     need(std.samefile(sdk / "lib/rustlib" / host / "lib" / std.name), "wrong native std")
     (driver,) = (root / "lib").glob("librustc_driver-*")
@@ -183,6 +204,24 @@ def clean_env():
     return {k: v for k, v in os.environ.items() if not k.startswith(("CARGO_", "RUST", "OHM_", "LLVM_"))}
 
 
+def original_proxies(w, repo, reports, tmp, host):
+    darwin = host == "aarch64-apple-darwin"
+    sdk = tmp / ("slot-old-apple/sdk" if darwin else "packaged-linux-50/sdk-22")
+    work = tmp / "slot-proxy-check"
+    work.mkdir()
+    out = reports / "slot-proxy-check"
+    out.mkdir()
+    proxies = work / "proxies"
+    save(out / "launchers.json", named_proxies(proxies, RUSTUP))
+    env = dict(clean_env(), RUSTUP_HOME=str(work / "rustup"), CARGO_HOME=str(work / "cargo"),
+               PATH=str(proxies) + os.pathsep + os.environ["PATH"])
+    if darwin:
+        env["LLVM_PROFILE_FILE"] = str(work / "identity-%m.profraw")
+    run([RUSTUP, "toolchain", "link", "ohm", sdk], env)
+    versions = identities(sdk, sdk, sdk / "bin/cargo", PARENT, OLD_CARGO, host, env, out / "raw")
+    save(out / "complete.json", {"host": host, "versions": versions})
+
+
 def qualify(w, repo, r, tmp, host):
     verify_live(repo)
     need(RUSTUP and shutil.disk_usage(tmp).free > 4 << 30, "rustup or free space unavailable")
@@ -201,9 +240,9 @@ def qualify(w, repo, r, tmp, host):
             repo / "src/tools/cargo", old, work, folder, env, BIND["trees"]["src/tools/cargo"]
         )
     proxies = work / "proxies"
-    proxies.mkdir()
-    for name in ("rustc", "cargo"):
-        (proxies / name).symlink_to(Path(RUSTUP).resolve(strict=True))
+    installed = named_proxies(proxies, RUSTUP)
+    save(folder / "launchers.json", installed)
+    need(installed == json.loads((r / "slot-proxy-check/launchers.json").read_bytes()), "changed installed launchers")
     env["PATH"] = str(proxies) + os.pathsep + env["PATH"]
     env["RUSTUP_HOME"] = str(work / "rustup")
     wild = None if darwin else old / "lib/rustlib" / host / "bin/wild-ld/ld.bfd"
@@ -225,7 +264,7 @@ def qualify(w, repo, r, tmp, host):
             run([RUSTUP, "toolchain", "link", "ohm", view], env)
         if darwin:
             env["LLVM_PROFILE_FILE"] = str(work / "identity-and-smoke-%m.profraw")
-        versions = identities(view, sdk, cargo, rust_revision, cargo_revision, host, env)
+        versions = identities(view, sdk, cargo, rust_revision, cargo_revision, host, env, folder / (role + "-identity"))
         save(folder / (role + "-tools.json"), versions)
         project = work / "project"
         got = smoke(smoke_script, role, project, folder, env, role == "historical")
@@ -456,9 +495,11 @@ def assess_transitive(observed):
 
 
 if __name__ == "__main__":
-    if sys.argv[1:] == ["transitive"]:
+    if sys.argv[1:] == ["original-proxies"]:
+        original_proxies(*guard())
+    elif sys.argv[1:] == ["transitive"]:
         transitive(*guard())
     elif not sys.argv[1:]:
         qualify(*guard())
     else:
-        raise SystemExit("expected release_smoke.py [transitive]")
+        raise SystemExit("expected release_smoke.py [original-proxies|transitive]")
