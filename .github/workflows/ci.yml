@@ -1,213 +1,134 @@
-name: CI
-
+name: Compare the CTFE literal change with ordinary cache retention
+run-name: Single-session Ruff history ${{ inputs.reviewed_head }}
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
-
-permissions: {}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
-
+    inputs:
+      reviewed_head:
+        description: Exact registered study commit
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
 jobs:
-  manifest:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          enable-cache: true
-      - name: Check benchmark runner
-        run: |
-          uv run scripts/benchmark.py --help
-          python3 scripts/test_benchmark.py
-          python3 scripts/benchmark_workflows.py --help
-          python3 scripts/test_workflow_benchmarks.py
-          python3 scripts/test_workflow_results.py
-          uv run scripts/replay_sessions.py --help
-          python3 scripts/test_replay_sessions.py
-          python3 scripts/benchmark_worktree_start.py --help
-          python3 scripts/test_worktree_start.py
-          python3 scripts/test_publish_benchmarks.py
-          python3 scripts/publish_benchmarks.py --check
-          python3 scripts/test_list_patches.py
-      - name: Validate release bootstrap configuration
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          import tomllib
-
-          config = tomllib.loads(pathlib.Path("release/bootstrap.toml").read_text())
-          build = config.get("build", {})
-          if config.get("profile") != "dist":
-              raise SystemExit("Ohm releases must use Rust's distribution profile")
-          if build.get("locked-deps") is not True:
-              raise SystemExit("Ohm releases must preserve their locked dependencies")
-          if build.get("cargo-native-static") is not True:
-              raise SystemExit(
-                  "Ohm releases must statically link Cargo's native dependencies"
-              )
-          if build.get("metrics") is not True:
-              raise SystemExit(
-                  "Optimized Ohm releases require bootstrap build metrics"
-              )
-          if build.get("profiler") is not True:
-              raise SystemExit(
-                  "Optimized Ohm releases require Rust's profiler runtime"
-              )
-          tools = set(build.get("tools", []))
-          missing_tools = {
-              "analysis", "cargo", "clippy", "rust-analyzer-proc-macro-srv", "rustdoc", "rustfmt"
-          } - tools
-          if missing_tools:
-              missing = ", ".join(sorted(missing_tools))
-              raise SystemExit(f"Ohm releases must include these tools: {missing}")
-          cargo_features = set(
-              build.get("tool", {}).get("cargo", {}).get("features", [])
-          )
-          if "ohm-defaults" not in cargo_features:
-              raise SystemExit(
-                  "Ohm releases must enable Cargo's ohm-defaults feature"
-              )
-          rust = config.get("rust", {})
-          if rust.get("lld") is not True:
-              raise SystemExit("Wasm builds require the bundled rust-lld linker")
-          wasm = config.get("target", {}).get("wasm32-unknown-unknown", {})
-          if wasm.get("profiler") is not False:
-              raise SystemExit("Wasm must not build the native profiling runtime")
-          if rust.get("channel") != "dev":
-              raise SystemExit(
-                  "Ohm releases must use the dev channel so their unstable interfaces are available"
-              )
-          if rust.get("omit-git-hash") is not False:
-              raise SystemExit("Ohm releases must retain their source Git revision")
-          if rust.get("codegen-units") != 1:
-              raise SystemExit("Ohm releases must use one compiler codegen unit")
-          if rust.get("codegen-units-std") != 1:
-              raise SystemExit("Ohm releases must use one standard-library codegen unit")
-          if rust.get("lto") != "thin":
-              raise SystemExit("Ohm releases must use ThinLTO")
-          if rust.get("jemalloc") is not True:
-              raise SystemExit("Ohm releases must use Rust's jemalloc allocator")
-          if config.get("llvm", {}).get("download-ci-llvm") is not True:
-              raise SystemExit("Ohm releases must reuse Rust's optimized CI LLVM")
-          if config.get("dist", {}).get("compression-formats") != ["gz"]:
-              raise SystemExit(
-                  "Ohm releases must use deterministic gzip-compressed archives"
-              )
-          PY
-      - name: Validate toolchain manifests
-        run: |
-          mapfile -d '' manifests < <(
-            find toolchains -mindepth 2 -maxdepth 2 -type f -name '*.json' -print0 \
-              | sort -z
-          )
-          if [[ ${#manifests[@]} -eq 0 ]]; then
-            echo "no versioned toolchain manifests found" >&2
-            exit 1
-          fi
-          uvx --from check-jsonschema==0.37.4 check-jsonschema \
-            --check-metaschema toolchains/manifest.schema.json
-          for manifest in "${manifests[@]}"; do
-            ./scripts/validate-release-manifest.sh "$manifest"
-          done
-      - name: Protect existing toolchain manifests
-        env:
-          BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
-        run: ./scripts/check-manifest-history.sh "$BASE_REVISION"
-      - name: Test toolchain manifest history
-        run: bash scripts/test-manifest-history.sh
-      - name: Check shell syntax
-        run: |
-          bash -n scripts/*.sh
-          sh -n scripts/install.sh
-      - name: Test release source verification
-        run: ./scripts/test-release-sources.sh
-      - name: Test optimized release builds
-        run: |
-          bash scripts/test-optimized-dist.sh
-          python3 scripts/test_prepare_wild.py
-      - name: Test the Ohm installer and release packaging
-        run: |
-          bash scripts/test-installer.sh
-          bash scripts/test-release-packaging.sh
-
-  lint:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
+  compare:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-ctfe-default' && inputs.reviewed_head == github.sha
+    name: Paired default-cache Ruff history ${{ matrix.cohort }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 210
+    strategy:
+      fail-fast: false
+      matrix:
+        cohort: ['01','02','03','04']
     env:
-      # renovate: datasource=pypi depName=actionlint-py
-      ACTIONLINT_VERSION: 1.7.12.24
-      # renovate: datasource=pypi depName=shellcheck-py
-      SHELLCHECK_VERSION: 0.11.0.1
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      COHORT: ${{ matrix.cohort }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          ref: ${{ github.sha }}
+          path: current
           persist-credentials: false
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+          sparse-checkout: |
+            .github/workflows
+            scripts/rc23-ctfe-default
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          enable-cache: true
-      - name: Check GitHub Actions workflows
+          repository: astral-sh/ruff
+          ref: 7b13f01ba1569887a25670820764b24c206da8e5
+          path: ruff
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 0b50022990577aadd904731e51c4d6c2a0f9b665
+          path: historical
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ctfe-crossover-pilot
+            scripts/ctfe-cli-semantic
+            scripts/gnu-ctfe-literal-identity
+            scripts/branch-return-pmu
+            scripts/branch-first-session-e-screen
+            scripts/branch-storage-e-confirmation
+            scripts/ohm-packed-ruff
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
+          path: prior-pilot
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ctfe-crossover-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 18b0cf251988b5967f8ffb0b11db850966eae9d1
+          path: ctfe-source
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/gnu-ctfe-literal-identity
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 762fc25095e317ac5632ec835df3c7f9cfc64a64
+          path: source
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/branch-checked-packed-source
+            scripts/branch-first-session-e-source
+            scripts/branch-return-source
+            scripts/ohm-packed-ruff
+            scripts/ohm-apple-zmij/source-transport
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify the historical source and prepare empty task-owned output roots
         run: |
-          uvx --from "actionlint-py==$ACTIONLINT_VERSION" \
-            actionlint -config-file .github/actionlint.yaml
-      - name: Check shell scripts
-        run: |
-          uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
-            shellcheck --shell=sh scripts/install.sh
-
-          bash_scripts=()
-          for script in scripts/*.sh; do
-            if [[ "$script" != scripts/install.sh ]]; then
-              bash_scripts+=("$script")
-            fi
+          set -exuo pipefail
+          test "$(git -C historical rev-parse HEAD)" = 0b50022990577aadd904731e51c4d6c2a0f9b665
+          test "$(git -C current rev-parse HEAD)" = "$REVIEWED_HEAD"
+          (cd current/scripts/rc23-ctfe-default && sha256sum --strict --check SHA256SUMS)
+          test "$(git -C prior-pilot rev-parse HEAD)" = 5c651f1d38c629da2a75d5cac3588db0be8104d7
+          test "$(git -C historical rev-parse HEAD:scripts/ctfe-crossover-pilot)" = "$(git -C prior-pilot rev-parse HEAD:scripts/ctfe-crossover-pilot)"
+          test "$(git -C ctfe-source rev-parse HEAD)" = 18b0cf251988b5967f8ffb0b11db850966eae9d1
+          test "$(git -C source rev-parse HEAD)" = 762fc25095e317ac5632ec835df3c7f9cfc64a64
+          for component_path in scripts/gnu-ctfe-literal-identity scripts/ruff-repair-tables-pilot/guards.py; do
+            source_object=$(git -C ctfe-source rev-parse "HEAD:$component_path")
+            pilot_object=$(git -C historical rev-parse "HEAD:$component_path")
+            test "$source_object" = "$pilot_object"
           done
-
-          uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
-            shellcheck --shell=bash "${bash_scripts[@]}"
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: "24.19.0"
-          package-manager-cache: false
-      - name: Install formatting dependencies
-        run: npm ci --ignore-scripts
-      - name: Check Markdown, YAML, and JSON formatting
-        run: ./node_modules/.bin/prettier --check .
-      - name: Audit GitHub Actions workflows
-        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
-        with:
-          advanced-security: false
-          annotations: true
-
-  required-checks-passed:
-    name: all required jobs passed
-    if: always()
-    needs:
-      - manifest
-      - lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check required jobs passed
+          for d in ctfe-source/scripts/gnu-ctfe-literal-identity prior-pilot/scripts/ctfe-crossover-pilot historical/scripts/{ctfe-cli-semantic,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
+            (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
+          done
+          python3 -IB historical/scripts/ctfe-crossover-pilot/test_subjects.py
+          python3 -IB historical/scripts/ctfe-cli-semantic/test.py
+          python3 -IB historical/scripts/ctfe-cli-semantic/read.py --help > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev strace zstd
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          test ! -e "$base"
+          mkdir -p "$base/work" "$base/logs"
+          printf '%s' "$base" > "$base/work/.owned-by-packed-study"
+          findmnt --target "$base/work" > "$base/logs/filesystem.txt"
+          dpkg-query -W b3sum binutils build-essential git libssl-dev strace zstd > "$base/logs/packages.tsv"
+      - name: Reconstruct both 81-file compiler installations using original source artifacts
         env:
-          NEEDS_JSON: ${{ toJSON(needs) }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          failing="$(
-            jq -r '
-              to_entries[]
-              | select(.value.result != "success")
-              | "\(.key): \(.value.result)"
-            ' <<< "$NEEDS_JSON"
-          )"
-          if [[ -n "$failing" ]]; then
-            echo "$failing" >&2
-            exit 1
-          fi
+          set -euo pipefail
+          python3 -IB historical/scripts/ctfe-cli-semantic/run.py acquire "$GITHUB_WORKSPACE/source"
+      - name: Compare ordinary builds on the same four CPUs and verify each repaired executable against an empty build
+        run: python3 -IB current/scripts/rc23-ctfe-default/compare.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: rc23-ctfe-default-${{ matrix.cohort }}-attempt-${{ github.run_attempt }}
+          retention-days: 14
+          compression-level: 6
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/ctfe-default
+            ${{ runner.temp }}/ohm-branch-object-qa/logs/sdk
