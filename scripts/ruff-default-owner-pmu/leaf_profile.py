@@ -146,10 +146,13 @@ def calibrate(out, tools, sdk, source):
         )
         c.need(result.returncode == 0, "calibration process failed")
     # Calibrate before launching expensive work. Reopen all three original media again in final receipt.
-    from reopen import Directory
-
-    check_calibration(Directory(out), out.parent, tools / "loop", m, kit)
+    check_local_calibration(out, out.parent, tools / "loop", m, kit)
     return kit
+
+
+def check_local_calibration(out, recorded_root, local_loop, module, kit):
+    """Read live or relocated original calibration files with the registered source reader."""
+    return check_calibration(c.Directory(out), recorded_root, local_loop, module, kit)
 
 
 def read_capped(z, name, limit=LIMIT):

@@ -7,17 +7,21 @@ from pathlib import Path
 import subprocess
 
 HERE = Path(__file__).resolve().parent
-BRANCH = "charlie/qa-ruff-first-a-leaves-20261101"
+BRANCH = "charlie/qa-ruff-first-a-leaves-v2-20261101"
 REPO = "astral-experiments/ohm"
 COLLECTOR = "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc"
 CONTRACT = "42ab30fd5e6bcdcf908df81de9baac65ca64fbf9"
-JOB = "Signed GNU Ruff first-A hardware instruction leaves"
-ARTIFACT = "signed-gnu-ruff-first-a-instruction-leaves"
+JOB = "Signed GNU Ruff first-A hardware instruction leaves v2"
+ARTIFACT = "signed-gnu-ruff-first-a-instruction-leaves-v2"
 SAMPLER = "f5667dc0aa2083961065a3a947b06a091e00af98"
 LAST_OWNER = dict(run=41349209691, job=124975532927, artifact=13100907533,
                   digest="sha256:fa0b3bf462528e8a0bef968ffd04aa99e4aeb8f3477d903ad2ea8f4904a6bd06",
                   boot="2ddd5b99-7fe4-4545-8e63-63f687a36969", runner="nsc-runner-f85r66gs8g04s",
                   runner_id=1385, ended="2026-11-01T21:07:13Z")
+LEAF_REFUSED = dict(run=41354759084, job=124992358990, artifact=13102188285,
+                    digest="sha256:97f255055df30004aa580e1da7fdf094b6e12580f0907af342657fb032e39464",
+                    boot="954a9abe-1910-47f4-a883-1ca6ca2f7c25", runner="nsc-runner-4arbprk7idd56",
+                    runner_id=1390, ended="2026-11-01T22:01:16Z")
 PREVIOUS = 41336398017
 PREVIOUS_HEAD = "3c206e8bf2c2236c035f1e8f352d9ad547d69ef7"
 BLOCKED_JOBS = (124937039974, 124937040076, 124937040027, 124937040042, 124937039985, 124937039779)
@@ -79,3 +83,20 @@ def read(path):
 
 def git(repo, *options):
     return subprocess.check_output(["git", "--no-optional-locks", "-C", repo, *options])
+
+
+class Directory:
+    def __init__(self, path):
+        self.path = path.resolve(strict=True)
+
+    def open(self, name):
+        p = self.path / name
+        need(p.resolve(strict=True) == p and p.is_relative_to(self.path), "untrusted path")
+        return p.open("rb")
+
+    def read(self, name):
+        with self.open(name) as f:
+            return f.read()
+
+    def namelist(self):
+        return [str(p.relative_to(self.path)) for p in self.path.rglob("*") if p.is_file()]

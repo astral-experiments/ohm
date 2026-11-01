@@ -221,6 +221,28 @@ def run_visit(lane, phase, refs, tools, topo, sampler):
     c.save(where / "visit.json", summary)
 
 
+def run_histories(tools, topo, sampler):
+    refs = {}
+    for lane, phases in c.PHASES.items():
+        (OUT / lane).mkdir()
+        b.fresh_outputs()
+        switch("A" if lane == "empty-invalid" else "B")
+        try:
+            for phase in phases:
+                if lane == "reference" and phase == "A":
+                    b.fresh_outputs()
+                run_visit(lane, phase, refs, tools, topo, sampler)
+        except Exception:
+            if lane != "attributed":
+                raise
+            (OUT / "attribution-refusal.txt").write_text(traceback.format_exc())
+            if c.git(REPO, "status", "--porcelain"):
+                source("A", "invalid")
+                c.git(REPO, "restore", "--worktree", "--", c.PARSER)
+            # Still collect the second ordinary window. A refused native/PMU
+            # census can never pass the terminal gate, even if it was last.
+
+
 def main(collector, contract, sampler_source):
     c.need(
         not any(os.environ.get(k) for k in ("GH_TOKEN", "GITHUB_TOKEN", "RUSTC_WRAPPER", "LD_PRELOAD")),
@@ -260,25 +282,7 @@ def main(collector, contract, sampler_source):
     c.save(OUT / "selectors.json", selectors)
     c.save(OUT / "selector-sha.json", {n: c.sha(v[2]) for n, v in selectors.items()})
     sampler = leaf_profile.calibrate(OUT, tools, b.SDK, sampler_source)
-    refs = {}
-    for lane, phases in c.PHASES.items():
-        (OUT / lane).mkdir()
-        b.fresh_outputs()
-        switch("A" if lane == "empty-invalid" else "B")
-        try:
-            for phase in phases:
-                if lane == "reference" and phase == "A":
-                    b.fresh_outputs()
-                run_visit(lane, phase, refs, tools, topo, sampler)
-        except Exception:
-            if lane != "attributed":
-                raise
-            (OUT / "attribution-refusal.txt").write_text(traceback.format_exc())
-            if c.git(REPO, "status", "--porcelain"):
-                source("A", "invalid")
-                c.git(REPO, "restore", "--worktree", "--", c.PARSER)
-            # Still collect the second ordinary window. A refused native/PMU
-            # census can never pass the terminal gate, even if it was last.
+    run_histories(tools, topo, sampler)
     after = acquire.verify_sdk(b.SDK)
     c.save(OUT / "sdk-after.json", after)
     c.need(

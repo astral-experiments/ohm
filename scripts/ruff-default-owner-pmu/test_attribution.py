@@ -228,7 +228,7 @@ class Census(unittest.TestCase):
             reopen.thresholds([10000, 10201, 10001], {})
 
     def test_complete_six_distinct_workers(self):
-        now = "2026-11-01T22:00:00+00:00"
+        now = "2026-11-01T23:00:00+00:00"
         end = "2026-11-01T17:59:59+00:00"
         prior = dict(
             id=c.PREVIOUS, head_sha=c.PREVIOUS_HEAD, run_attempt=1, event="workflow_dispatch", status="completed"
@@ -287,8 +287,9 @@ class Census(unittest.TestCase):
             dict(boot=ex[0]["boot"]),
             dict(boot=c.REFUSED["boot"]),
             dict(boot=c.LAST_OWNER["boot"]),
+            dict(boot=c.LEAF_REFUSED["boot"]),
             dict(boots=ex[::-1]),
-            dict(job_rows=[jobs[0] | dict(completed_at="2026-11-01T22:00:01+00:00"), *jobs[1:]]),
+            dict(job_rows=[jobs[0] | dict(completed_at="2026-11-01T23:00:01+00:00"), *jobs[1:]]),
         ):
             with self.assertRaises(ValueError):
                 check(**args)

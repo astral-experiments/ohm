@@ -25,23 +25,6 @@ import leaf_profile
 from counter_members import bounded_files
 
 
-class Directory:
-    def __init__(self, path):
-        self.path = path.resolve(strict=True)
-
-    def open(self, name):
-        p = self.path / name
-        c.need(p.resolve(strict=True) == p and p.is_relative_to(self.path), "untrusted path")
-        return p.open("rb")
-
-    def read(self, name):
-        with self.open(name) as f:
-            return f.read()
-
-    def namelist(self):
-        return [str(p.relative_to(self.path)) for p in self.path.rglob("*") if p.is_file()]
-
-
 def record(z, name):
     data = z.read(name)
     return json.loads(gzip.decompress(data) if name.endswith(".gz") else data)
@@ -521,7 +504,7 @@ def main():
                     "mixed official original",
                 )
         else:
-            value = replay(Directory(a.directory), path, a.head, None, collector, contract, a.sampler_source, a.symbol_sdk)
+            value = replay(c.Directory(a.directory), path, a.head, None, collector, contract, a.sampler_source, a.symbol_sdk)
     print(json.dumps(value, sort_keys=True, separators=(",", ":")))
 
 

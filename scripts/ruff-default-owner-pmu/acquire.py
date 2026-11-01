@@ -90,7 +90,7 @@ def enrollment(prior, jobs, artifacts, excluded, current, this_jobs, env, boot):
         and this["runner_id"] not in {x["runner_id"] for x in earlier},
         "old boot or runner",
     )
-    for previous_worker in (c.REFUSED, c.LAST_OWNER):
+    for previous_worker in (c.REFUSED, c.LAST_OWNER, c.LEAF_REFUSED):
         c.need(this["id"] != previous_worker["job"] and current["id"] != previous_worker["run"]
                and boot != previous_worker["boot"] and this["runner_name"] != previous_worker["runner"]
                and this["runner_id"] != previous_worker["runner_id"]
@@ -100,6 +100,7 @@ def enrollment(prior, jobs, artifacts, excluded, current, this_jobs, env, boot):
         excluded_run=c.PREVIOUS,
         excluded_refusal=c.REFUSED,
         excluded_owner=c.LAST_OWNER,
+        excluded_leaf_refusal=c.LEAF_REFUSED,
         excluded=earlier,
         run=current["id"],
         head=current["head_sha"],
@@ -167,8 +168,6 @@ def verify_sdk(folder):
 
 
 def main():
-    from common import save
-
     root = Path(os.environ["RUNNER_TEMP"]).resolve() / "ohm-branch-object-qa"
     out = root / "logs"
     job = int(os.environ["GITHUB_RUN_ID"])
@@ -196,8 +195,8 @@ def main():
         os.environ,
         Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
     )
-    save(out / "enrollment.json", state)
-    save(
+    c.save(out / "enrollment.json", state)
+    c.save(
         out / "catalog.json",
         dict(
             prior=prior, jobs=old_jobs, artifacts=old_art, excluded=excluded, current=current, this_jobs=this_jobs
@@ -227,8 +226,8 @@ def main():
         )
     sdk = root / "home/.rustup/toolchains/ohm"
     values = extract(package, sdk)
-    save(out / "sdk.json", values)
-    save(out / "asset.json", expected)
+    c.save(out / "sdk.json", values)
+    c.save(out / "asset.json", expected)
     proxies = root / "home/.cargo/bin"
     proxies.mkdir(parents=True)
     rustup = Path(shutil.which("rustup")).resolve(strict=True)
@@ -237,7 +236,7 @@ def main():
     c.need(c.sha(rustup) == c.sha(proxies / "rustup"), "rustup shim")
     for name in ("cargo", "rustc", "rustdoc"):
         (proxies / name).symlink_to("rustup")
-    save(out / "proxy.json", {"host": str(rustup), "sha256": c.sha(rustup)})
+    c.save(out / "proxy.json", {"host": str(rustup), "sha256": c.sha(rustup)})
     package.unlink()
 
 

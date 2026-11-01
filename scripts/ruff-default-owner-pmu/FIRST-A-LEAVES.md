@@ -29,7 +29,7 @@ The same `leaf_charge.charge` and `leaf_charge.cohort` functions can also projec
 
 ## Running and replaying this contact
 
-The checked-in `leaf_profile.py` invokes the physical distro-owned perf ELF selected by dpkg with `-T -P --clockid mono -m 256 --max-size 100M`. Its trusted forwarder is `sampling.py` from f5667dc0. The full command and installed identities are in the original archive. `leaf_events.py` reads PERF records, `leaf_symbols.py` reads the signed ELF tables, and `leaf_leaf_charge.py` joins and counts observations. The `first-a-owners.json` source is the physical 41349209691 first-A ledger.
+The checked-in `leaf_profile.py` invokes the physical distro-owned perf ELF selected by dpkg with `-T -P --clockid mono -m 256 --max-size 100M`. Its trusted forwarder is `sampling.py` from f5667dc0. The full command and installed identities are in the original archive. `leaf_events.py` reads PERF records, `leaf_symbols.py` reads the signed ELF tables, and `leaf_charge.py` joins and counts observations. The `first-a-owners.json` source is the physical 41349209691 first-A ledger.
 
 Run the offline reader on the authentic, completed original with the two earlier collector checkouts named in PLAN.md, the frozen f5667dc0 checkout (SAMPLER_SOURCE), and the installed signed GNU -22 SDK (SIGNED_22_SDK). The SDK supplies symbol bytes independently rehashed against the archive. The old first-A scope replay is e5f8f4fbdf70012586926793c27f9315eeead3adc7e8c977587ae1edfbe37aae. The correction to reopen its four genuine empty untraced exec tables is preserved byte-for-byte in counter_members.py.
 
@@ -39,3 +39,7 @@ python3 -IB scripts/ruff-default-owner-pmu/reopen.py \
   --head "$(git rev-parse HEAD)" --collector "$COLLECTOR" --contract "$CONTRACT" \
   --sampler-source "$SAMPLER_SOURCE" --symbol-sdk "$SIGNED_22_SDK"
 ```
+
+## Origin of the second registration
+
+Worker 124992358990 recorded all 28 whole-counter and eight nested calibration windows, and three independent hardware sample files. It then imported the repair-table reader instead of the attribution reader and stopped before the first Ruff invocation. Its boot, runner and official ZIP are excluded. The new source uses the same directory reader in worker and terminal replay. The checked-in original ZIP is used only to test the import collision and to reopen the measured child, two-thread and empty calibration records. No captured executable is run. The test also checks that a refused middle attribution still permits the second ordinary clock, the independent malformed source, and its repair. [Original failed run](https://github.com/astral-experiments/ohm/actions/runs/41354759084)
