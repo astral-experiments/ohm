@@ -5,6 +5,8 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import runpy
+import subprocess
 import stat
 import sys
 import tempfile
@@ -119,6 +121,40 @@ class SourceTests(unittest.TestCase):
             self.assertIs(s.policy(),old)
 
 
+def acquisition_imports(source):
+    """Load the actual pilot, then stop the donor installer at its first GitHub request."""
+    source = source.resolve(strict=True)
+    call = ["gh", "api", "repos/astral-experiments/ohm/actions/runs/41199659076"]
+    check_output = subprocess.check_output
+
+    class AtSourceRequest(Exception):
+        pass
+
+    def intercept(argv, *args, **kwargs):
+        if argv == call:
+            raise AtSourceRequest
+        if argv[0] != "git":
+            raise AssertionError(("unexpected subprocess before source acquisition", argv))
+        return check_output(argv, *args, **kwargs)
+
+    with tempfile.TemporaryDirectory() as tmp, patch.dict(os.environ, {"RUNNER_TEMP": tmp}):
+        worker = runpy.run_path(str(HERE / "pilot.py"))
+        previous = worker["subjects"].policy()
+        assert previous.b.OUT.is_relative_to(Path(tmp).resolve())
+        previous.b.OUT.mkdir(parents=True)
+        with patch.object(subprocess, "check_output", intercept), unittest.TestCase().assertRaises(AtSourceRequest):
+            previous.acquire(source)
+        prior = sys.modules["prior"]
+        old = source / "scripts/branch-return-source"
+        assert Path(prior.__file__) == source / "scripts/branch-first-session-e-source/prior.py"
+        for mod in (prior.s.reg, prior.locate, prior.old):
+            assert Path(mod.__file__).parent == old
+        assert prior.need is prior.s.reg.need and prior.s.reg is not worker["reg"]
+        assert not any(previous.b.OUT.rglob("*.json")) and not previous.b.PARK.exists()
+        print(json.dumps({"source": previous.checked_source.HEAD, "donor_registration": str(prior.s.reg.__file__),
+                          "pilot_registration": str(worker["reg"].__file__), "intercepted_before_exec": call}))
+
+
 def actual(archive_dir, official_path, original_e, scratch):
     original=json.loads(official_path.read_bytes())
     proof=s.official(original["run"],original["job"],original["artifacts"])
@@ -139,7 +175,9 @@ def actual(archive_dir, official_path, original_e, scratch):
 
 
 if __name__=="__main__":
-    if sys.argv[1:2]==["--originals"]:
+    if sys.argv[1:2]==["--acquisition-imports"]:
+        acquisition_imports(Path(sys.argv[2]))
+    elif sys.argv[1:2]==["--originals"]:
         print(json.dumps(actual(*map(Path,sys.argv[2:])),sort_keys=True))
     else:
         unittest.main()

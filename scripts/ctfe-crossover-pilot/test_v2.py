@@ -9,7 +9,7 @@ import tempfile
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-import registration as reg
+import ctfe_pilot_registration as reg
 import source_guard
 import reopen
 import contact_review

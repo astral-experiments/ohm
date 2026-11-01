@@ -12,7 +12,7 @@ import sys
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import registration as reg
+import ctfe_pilot_registration as reg
 
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE / "kernel-review"), str(HERE.parent / "branch-storage-e-confirmation/review")]

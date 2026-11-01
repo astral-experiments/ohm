@@ -125,6 +125,7 @@ jobs:
           done
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_v2.py "$GITHUB_WORKSPACE/kernel"
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py --acquisition-imports "$GITHUB_WORKSPACE/source"
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/reopen.py --help > /dev/null
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd

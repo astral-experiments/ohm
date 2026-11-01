@@ -51,3 +51,5 @@ Both new modes use only a manual dispatch, attempt one, the exact reviewed head 
    ```
 
 The contact's resource and native verdicts are structural only. It contributes no instructions or measured samples. Any confirmation requires a new registration and fresh boots.
+
+The first schema-2 contact on `ccc50f6df93ed41a55ccc3ff2e77c2f16fe77dce` stopped in the pinned SDK donor's Python import, before any native fixture, Cargo visit or counter ran. The successor keeps that original refusal and checks the pilot and donor module identities in a fresh process through the donor's first GitHub request, offline, before acquiring either compiler. [Original failed job](https://github.com/astral-experiments/ohm/actions/runs/41288606644/job/124794945295)

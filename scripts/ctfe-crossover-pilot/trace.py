@@ -1,7 +1,7 @@
 """Observe separately selected ordinary Cargo visits with the qualified Linux exec collector."""
 
 from functools import cache
-import registration as reg
+import ctfe_pilot_registration as reg
 import gzip
 import importlib.util
 import json

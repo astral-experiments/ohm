@@ -17,7 +17,7 @@ from bindings import OUT, ROOT, WORK, need, save, sha
 from omission import publish
 sys.path.insert(0, str(HERE))
 import routes
-import registration as reg
+import ctfe_pilot_registration as reg
 
 kit = original.kit
 b = original.b
