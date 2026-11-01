@@ -1,4 +1,4 @@
-"""Authenticate and reconstruct the measured compiler from the original E SDK and only changed regular files."""
+"""Authenticate and reconstruct the measured compiler from the original D SDK and only changed regular files."""
 
 import hashlib, json, os, shutil, stat, subprocess, sys
 from pathlib import Path
@@ -96,9 +96,9 @@ def verify(folder, old, new, driver):
 
 
 def restore(folder, logs, original, destination):
-    records = {k: json.loads((logs / "sdk" / (k + ".json")).read_bytes()) for k in ("E", "D")}
-    old, new = ({n: [x[0], x[4], x[3]] for n, x in records[k]["files"].items()} for k in ("E", "D"))
-    verify(folder, old, new, records["D"]["driver"])
+    records = {k: json.loads((logs / "sdk" / (k + ".json")).read_bytes()) for k in ("D", "P")}
+    old, new = ({n: [x[0], x[4], x[3]] for n, x in records[k]["files"].items()} for k in ("D", "P"))
+    verify(folder, old, new, records["P"]["driver"])
     manifest = json.loads((folder / "manifest.json").read_bytes())["members"]
     need(
         not destination.exists()

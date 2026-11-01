@@ -57,6 +57,43 @@ class Checks(unittest.TestCase):
             self.skipTest("complete source is required during actual build after acquisition")
         self.assertEqual(reg.validate(PRODUCT)["pack"]["count"], 9)
 
+    def test_original_native_archive_receipt_refusals(self):
+        import receive_source as receive
+        import zipfile
+        head = "b" * 40
+        run = {"id":21,"head_sha":head,"head_branch":reg.REF.removeprefix("refs/heads/"),"run_attempt":1,
+               "event":"workflow_dispatch","path":".github/workflows/ci.yml","status":"completed","conclusion":"success",
+               "repository":{"id":123,"full_name":receive.REPOSITORY},"head_repository":{"full_name":receive.REPOSITORY}}
+        job = {"id":33,"run_id":21,"run_attempt":1,"head_branch":run["head_branch"],"head_sha":head,"name":receive.JOB_NAME,
+               "labels":["namespace-profile-ubuntu-24-04-16"],"status":"completed","conclusion":"success",
+               "steps":[{"name":s,"status":"completed","conclusion":"success"} for s in sorted(receive.STEPS)]}
+        origin = {"id":21,"head_sha":head,"head_branch":run["head_branch"],"repository_id":123,"head_repository_id":123}
+        rows = [{"name":n,"id":i,"size_in_bytes":300,"digest":"sha256:"+"b"*64,"expired":False,"workflow_run":origin}
+                for i,n in enumerate(receive.ARTIFACTS,1)]
+        def verify(r,j,media):
+            return receive.check_job(head,21,33,r,{"total_count":1,"jobs":[j]},{"total_count":len(media),"artifacts":media})
+        self.assertEqual(set(verify(run,job,rows)),set(receive.ARTIFACTS))
+        for (r,j,media) in [(run|{"run_attempt":2},job,rows),(run,job|{"steps":job["steps"][:-1]},rows),
+                            (run,job|{"conclusion":"failure"},rows),(run,job,rows[:1]),
+                            (run,job,[rows[0]|{"expired":True},rows[1]])]:
+            with self.assertRaises(ValueError):
+                verify(r,j,media)
+        with tempfile.TemporaryDirectory() as tmp:
+            where = Path(tmp)
+            for i,name in enumerate(["P/valid.log","P/../bad.log","/P/absolute.log"]):
+                path=where/(str(i)+".zip")
+                with zipfile.ZipFile(path,"w") as z:
+                    e=zipfile.ZipInfo(name);e.external_attr=0o100644<<16;z.writestr(e,b"actual")
+                rec={"size_in_bytes":path.stat().st_size,"digest":"sha256:"+reg.sha(path)}
+                if i:
+                    with self.assertRaises(ValueError):
+                        receive.extract(path,where/("out"+str(i)),rec,{"P"})
+                else:
+                    receive.extract(path,where/"good",rec,{"P"})
+                    self.assertEqual((where/"good/P/valid.log").read_bytes(),b"actual")
+                    with self.assertRaises(ValueError):
+                        receive.extract(path,where/"other",rec|{"digest":"sha256:"+"0"*64},{"P"})
+
     def test_job_scope(self):
         head = "a" * 40
         env = {
@@ -90,6 +127,35 @@ class Checks(unittest.TestCase):
                             header.replace(b"\n\n", b"\nparent " + head.encode() + b"\n\n")):
                 with mock.patch.object(reg, "git", return_value=invalid), self.assertRaises(ValueError):
                     reg.job()
+
+    def test_native_old_assertion_and_full_suite_receivers(self):
+        import gzip
+        import transplant as t
+        raw = gzip.decompress((HERE / "inputs/controls/prior-D-unit-suite.log.gz").read_bytes())
+        t.prior_suite(raw)
+        contact = reader.load(HERE / "inputs/controls/packed-ref-assertion.json")
+        old = raw.decode()
+        intro, start, suffix = old.partition("running 12 tests")
+        self.assertTrue(start and "test result: ok. 12 passed;" in suffix)
+        original, _, _ = suffix.partition("test result:")
+        for role, red in (("D", True), ("P", False)):
+            # Compose a parser fixture from true standalone output and the original 12-test log.
+            # The actual hosted command must itself run all 13 tests in one invocation.
+            first, sep, rest = contact[role].partition("running 1 test")
+            self.assertTrue(sep)
+            summary = rest.replace("0 passed; 1 failed;", "12 passed; 1 failed;") if red else rest.replace("1 passed; 0 failed;", "13 passed; 0 failed;")
+            fixture = intro + "running 13 tests" + original + first + summary
+            self.assertEqual(set(t.outcomes(fixture, red)), t.registered_tests() | {t.NAME})
+            for changed in (fixture.replace("running 13 tests","running 12 tests"), fixture.replace(" ... ok"," ... ignored",1),
+                            fixture.replace(t.NAME,"foreign_test"), fixture+"\nerror[E0425]: unresolved name\n"):
+                with self.assertRaises(ValueError):
+                    t.outcomes(changed, red)
+            if red:
+                for wrong in ("Some(1)", "None"):
+                    with self.assertRaises(ValueError):
+                        t.outcomes(fixture.replace("right: Some(12379813738877118345)", "right: " + wrong), True)
+        with self.assertRaises(ValueError):
+            t.prior_suite(raw.replace(b"12 passed", b"13 passed"))
 
     def test_actual_test_inventories(self):
         rows = ["test persist::fs::tests::" + n + " ... ok" for n in reg.UNITS]

@@ -1,4 +1,4 @@
-"""Build the registered selector compiler from the original E bootstrap and check the SDK delta."""
+"""Build the registered selector compiler from the original stage inputs on the authenticated D SDK and check the SDK delta."""
 
 import json, os, re, shutil, subprocess, sys, zipfile
 from pathlib import Path
@@ -7,31 +7,27 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import binding as reg
 import overlay
+import transplant
 
 
-def acquire(source):
+def acquire(source, donor):
+    """Use the immutable, previously qualified E-to-D Actions intake with its own module identities."""
+    import importlib.util
     reg.job()
-    sys.path.insert(0, str(HERE.parent / "branch-storage-e-confirmation"))
-    import policy
-
-    b = policy.b
-    reg.need(
-        b.git(source, "rev-parse", "HEAD") == reg.SOURCE_QA and not b.PARK.exists(),
-        "source checkout or nonempty SDK",
-    )
-    original = policy.checked_source.enrollment()
-    policy.checked_source.official(
-        lambda p: json.loads(
-            subprocess.check_output(["gh", "api", "repos/" + b.REPO + "/actions/" + p])
-        ),
-        original,
-    )
-    rows = policy.acquire(source)["E"]
-    reg.need(
-        len(rows) == 81 and rows["bin/cargo"][0] == b.CARGO_ELF and rows[b.WILD][0] == b.WILD_ELF,
-        "source SDK incomplete",
-    )
-    b.save(b.OUT / "sdk/authoritative-E.json", original)
+    reg.need(reg.rev(donor, "HEAD") == reg.DONOR_QA, "wrong immutable D intake")
+    reader = donor / "scripts/ctfe-crossover-pilot/subjects.py"
+    spec = importlib.util.spec_from_file_location("prior_donor_subjects", reader)
+    original = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(original)
+    rows = original.acquire(source)
+    reg.need(set(rows) == {"E", "D"} and len(rows["D"]) == 81
+             and rows["D"][original.DRIVER][0] == "f724a33d4d865ac4f3fc235b322a638d6f6534f669e5b1659adabcd04a2221d7",
+             "missing genuine original D compiler")
+    owner = original.policy().b
+    with zipfile.ZipFile(owner.ROOT / "donor-originals" / (original.SOURCE_ARTIFACT + ".zip")) as archive:
+        log = archive.read("D/incremental.log")
+    transplant.prior_suite(log)
+    (owner.OUT / "sdk/donor-incremental.log").write_bytes(log)
 
 
 def unit_log(body):
@@ -68,10 +64,10 @@ def main(source, trusted):
     root = helper.ROOT
     repo = root / "rust"
     rec = root / "receipts"
-    log = rec / "D"
+    log = rec / "P"
     log.mkdir()
-    baseline = paths.PARK / "E"
-    original_record = json.loads((paths.OUT / "sdk/E.json").read_bytes())
+    baseline = paths.PARK / "D"
+    original_record = json.loads((paths.OUT / "sdk/D.json").read_bytes())
     old_files = {p: [x[0], x[4], x[3]] for p, x in original_record["files"].items()}
     reg.need(
         root == Path("/tmp/ohm-gnu-renderer-source-native")
@@ -94,6 +90,14 @@ def main(source, trusted):
     live_base(repo, helper.HERE / "packet")
     corrected.reg.source(repo, True, rec)
     corrected.verify(repo, corrected.load(), install=True)
+    parent_pack = HERE / "inputs/parent-D.pack"
+    parent = HERE / "inputs/parent-D.json"
+    reg.need(reg.sha(parent) == "329fd87fb40040c9d37afdeeb2586df756e7bbe33ca1d0d6493e7d4a99646623"
+             and reg.sha(parent_pack) == json.loads(parent.read_bytes())["pack"]["sha256"], "wrong original D source")
+    reg.git(repo, "index-pack", "--stdin", body=parent_pack.read_bytes())
+    reg.need(corrected.old.verify_pack(repo, reg.ORIGINAL, reg.OLD, parent_pack.read_bytes()) == 9
+             and reg.rev(repo, reg.OLD + "^{tree}") == json.loads(parent.read_bytes())["source"]["tree"],
+             "incomplete preceding D source")
     subject = reg.validate(repo, install=True)
     reg.need(
         corrected.old.verify_pack(repo, reg.OLD, reg.NEW, (HERE / "inputs/child.pack").read_bytes())
@@ -122,7 +126,7 @@ def main(source, trusted):
             "previous": reg.OLD,
             "release_launcher": helper.launcher(repo),
             "llvm": helper.LLVM,
-            "old_job": json.loads((paths.OUT / "sdk/authoritative-E.json").read_bytes()),
+            "old_job": json.loads((paths.OUT / "sdk/donor-official.json").read_bytes()),
         },
     )
     helper.succeeded(args, repo, log / "bootstrap.log")
@@ -148,7 +152,7 @@ def main(source, trusted):
         ("unexpected SDK differences", sorted(different)),
     )
     # Preserve reconstructible native bytes before any named gate can refuse the build.
-    destination = paths.PARK / "D"
+    destination = paths.PARK / "P"
     destination.mkdir()
     for name, src in selected.items():
         output = destination / name
@@ -164,8 +168,8 @@ def main(source, trusted):
         "candidate copied SDK closure",
     )
     paths.save(
-        paths.OUT / "sdk/D.json",
-        {"role": "D", "source": reg.NEW, "driver": driver, "files": physical},
+        paths.OUT / "sdk/P.json",
+        {"role": "P", "source": reg.NEW, "driver": driver, "files": physical},
     )
     capsule = overlay.archive(log / "overlay", destination, old_files, before, driver)
     args_test = [
@@ -179,7 +183,10 @@ def main(source, trusted):
     helper.succeeded(
         [*args_test, "--tests", "compiler/rustc_incremental"], repo, log / "incremental.log"
     )
-    units = unit_log((log / "incremental.log").read_text(errors="replace"))
+    actual = (log / "incremental.log").read_text(errors="replace")
+    units = unit_log(actual)
+    transplant.outcomes(actual, False)
+    transplant.run(helper, repo, log, [*args_test, "--tests", "compiler/rustc_incremental"], subject)
     cases = reg.RUN_MAKE
     for case in cases:
         logfile = log / (case + ".log")
@@ -232,8 +239,8 @@ def main(source, trusted):
 
 if __name__ == "__main__":
     if sys.argv[1] == "restore":
-        acquire(Path(sys.argv[2]).resolve())
+        acquire(Path(sys.argv[2]).resolve(), Path(sys.argv[3]).resolve())
     elif sys.argv[1] == "build":
         main(Path(sys.argv[2]).resolve(), Path(sys.argv[3]).resolve())
     else:
-        raise SystemExit("restore SOURCE | build SOURCE TRUSTED")
+        raise SystemExit("restore SOURCE PRIOR_D_INTAKE | build SOURCE TRUSTED")

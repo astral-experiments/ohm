@@ -1,4 +1,4 @@
 # Frozen local source; regenerated only on an independent QA enrollment.
-NEW = 'd95494a6a63c22222806c06e3d3aa0de504d8e8a'
-TREE = 'd741b524519a14ff43a896b02f3616add279c7b9'
-SOURCE_RECEIPT = '329fd87fb40040c9d37afdeeb2586df756e7bbe33ca1d0d6493e7d4a99646623'
+NEW = '70a0f8090d1e2d9bd822720eb39076c409667edd'
+TREE = 'be66e74941aed13a5a89797504dca2076b414da9'
+SOURCE_RECEIPT = '654d05836bccf0adbaedcd74c4aac947b776729c487e2c23b62ed93559b675b8'

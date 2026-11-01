@@ -1,4 +1,4 @@
-"""Bind the direct-E source change to the enrolled Git object closure and the reviewed QA run."""
+"""Bind the bounded Git reader on its qualified parent to the enrolled Git object closure and the reviewed QA run."""
 
 from pathlib import Path
 import hashlib
@@ -9,10 +9,12 @@ import subprocess
 import sys
 
 HERE = Path(__file__).resolve().parent
-OLD = "393b4b05a4bfa3f531a36023846f86236a6b71a9"
-CARRIER_PARENT = "5024cfd0058bc378dc69afb9f6c429f3cf9547bf"
+ORIGINAL = "393b4b05a4bfa3f531a36023846f86236a6b71a9"
+OLD = "d95494a6a63c22222806c06e3d3aa0de504d8e8a"
+DONOR_QA = "a333316177ef3f9c8b3264ca3bf76c451e0ca079"
+CARRIER_PARENT = "8f633d8fc21e453f4c81d81588b6dcab125bfeae"
 SOURCE_QA = "762fc25095e317ac5632ec835df3c7f9cfc64a64"
-REF = "refs/heads/charlie/qa-ruff-same-revision-donor-source-20261101"
+REF = "refs/heads/charlie/qa-rust-packed-ref-source-20261101"
 EXPECTED = {
     "compiler/rustc_incremental/src/persist/fs.rs",
     "compiler/rustc_incremental/src/persist/fs/tests.rs",
@@ -25,6 +27,7 @@ UNITS = (
     "pack_only_on_checkout_switch",
     "prefer_the_newest_session_at_the_same_revision",
     "resolve_revisions_in_a_linked_git_worktree",
+    "resolve_complete_rows_at_the_start_of_large_packed_refs",
 )
 RUN_MAKE = (
     "ohm-packed-branch-cache",
