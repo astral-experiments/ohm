@@ -1,0 +1,31 @@
+{
+  "build_run": 41323062793,
+  "build_head": "fd55208f72e2fbfaad9f4856109266805e85885a",
+  "target": "x86_64-unknown-linux-gnu",
+  "jobs": 8,
+  "arms": ["base", "nominal", "both"],
+  "cases": [
+    {
+      "name": "workspace-edit",
+      "pr": 20988,
+      "parent": "b60da7ad468d5bb8a6b3dee7d7e54a47981f23c7",
+      "child": "1979349b68dbaa936b98c0f409c1df0598fa72f1",
+      "patch": "24852ea0d29fe8eb355f2a0d4eb682c54e53fa56af3d048635f4de9049925ecb",
+      "affected": "uv-workspace",
+      "seeds": [232098801, 232098802]
+    },
+    {
+      "name": "git-url-edit",
+      "pr": 22833,
+      "parent": "4954c25a16b246c1b88aef6c3798a76d675c5cd0",
+      "child": "0bbcf757fdf19d43f52c38a5fc2e32a291c262ee",
+      "patch": "ce7a9e41be8607950f6a7f8f36f7eec3ff3b150daab75dbbe80597fe3794b6fb",
+      "affected": "uv-git-types",
+      "seeds": [232283301, 232283302]
+    }
+  ],
+  "command": ["check", "-p", "uv-resolver", "--locked", "--offline", "-j8"],
+  "phases": ["cold", "unchanged-parent", "first-edit", "unchanged-child"],
+  "comparisons": [["base","nominal"], ["nominal","both"], ["base","both"]],
+  "policy": "Measure 12 balanced triples per edit on one CPU set after an excluded warmup for every arm. Report paired medians, 96.14% distribution-free median intervals and both six-triple medians. Favor an individual change with >2% lower first-edit wall time and an interval excluding zero on at least one edit, corroboration on the other, and no repeatable material regression. Examine any cold slowdown above 2%. Require fresh and cached behavioral agreement, matching rebuild rosters across the arms and zero recompiles on settled checks. Keep every rejection."
+}
