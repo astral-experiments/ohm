@@ -111,6 +111,9 @@ if ! awk -v toolchain="$toolchain" -v use_mimalloc="$use_mimalloc" '
 fi
 
 export RUST_BOOTSTRAP_CONFIG="$release_config"
+if [[ -n "${TMPDIR:-}" && "$TMPDIR" != /* ]]; then
+  export TMPDIR="$PWD/$TMPDIR"
+fi
 cd -- "$rust_checkout"
 
 # `opt-dist` is a bootstrap-only tool and does not itself require LLVM. Ask for
