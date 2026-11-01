@@ -94,6 +94,10 @@ def read_subject(z, head, previous):
         == en,
         "source/host enrollment",
     )
+    return (en, *read_product(z))
+
+
+def read_product(z):
     c.need(record(z, "asset.json") == c.SDK["asset"], "wrong published release")
     sdk = record(z, "sdk.json")
     c.need(
@@ -201,7 +205,7 @@ def read_subject(z, head, previous):
         and guard["minimum"]["receipts"] >= 6 << 30,
         "resource refusal",
     )
-    return en, root, work, selectors, sdk, changed
+    return root, work, selectors, sdk, changed
 
 
 def actual_externs(z, where, products, root):

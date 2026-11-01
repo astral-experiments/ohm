@@ -195,6 +195,12 @@ def main():
             prior=prior, jobs=old_jobs, artifacts=old_art, excluded=excluded, current=current, this_jobs=this_jobs
         ),
     )
+    install(root, out)
+
+
+def install(root, out):
+    from common import save
+
     asset = api("releases/assets/" + str(c.SDK["asset"]["id"]))
     expected = c.SDK["asset"]
     c.need(

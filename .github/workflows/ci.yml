@@ -1,14 +1,14 @@
-name: Attribute one signed GNU Ruff first-revision build
-run-name: Default GNU Ruff owner diagnostic ${{ inputs.reviewed_head }}
-on:
+name: Measure a fixed-branch Ruff parser edit on signed GNU Ohm
+run-name: One-file GNU parser edit ${{ inputs.reviewed_head }}
+'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact independently reviewed diagnostic commit
+        description: Exact reviewed QA commit
         required: true
         type: string
       previous_boots:
-        description: Six independently authenticated job/artifact/digest/boot descriptors in position order
+        description: Prior six in position order and terminal first-A custody, including run, job, artifact and boot
         required: true
         type: string
 permissions:
@@ -16,10 +16,10 @@ permissions:
   contents: read
 jobs:
   diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-default-owner-pmu-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-one-file-parser-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 75
-    name: Signed GNU Ruff first-A instruction owners
+    timeout-minutes: 90
+    name: Signed GNU Ruff one-file parser edit
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
@@ -30,6 +30,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
+            scripts/ruff-one-file-parser
             scripts/ruff-default-owner-pmu
             scripts/ohm-packed-ruff
             scripts/branch-return-pmu
@@ -50,13 +51,14 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Check immutable source and native gates
+      - name: Test the source, retained native outcomes and parser mutations
         run: |
           set -euo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
-          (cd enrolled && sha256sum --strict --check --status scripts/ruff-default-owner-pmu/SHA256SUMS)
+          (cd enrolled && sha256sum --strict --check --status scripts/ruff-one-file-parser/SHA256SUMS)
           python3 -IB enrolled/scripts/ruff-default-owner-pmu/test_attribution.py "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
-          python3 -IB enrolled/scripts/ruff-default-owner-pmu/reopen.py --help >/dev/null
+          python3 -IB enrolled/scripts/ruff-one-file-parser/test_onefile.py "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
+          python3 -IB enrolled/scripts/ruff-one-file-parser/verify.py --help >/dev/null
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum binutils build-essential git libssl-dev zstd
           base="$RUNNER_TEMP/ohm-branch-object-qa"
@@ -64,29 +66,28 @@ jobs:
           mkdir -p "$base/work" "$base/logs"
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
-          dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
-      - name: Install the published GNU release
+      - name: Install signed GNU SDK and bind previous boots
         env:
           GH_TOKEN: ${{ github.token }}
           EXCLUDED_BOOT_CUSTODY: ${{ inputs.previous_boots }}
-        run: python3 -IB enrolled/scripts/ruff-default-owner-pmu/acquire.py
-      - name: Run three first-A histories
+        run: python3 -IB enrolled/scripts/ruff-one-file-parser/intake.py
+      - name: Run the two normal fixed-branch workloads
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ruff-default-owner-pmu/worker.py "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
-      - name: Reopen original counters and native products
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ruff-one-file-parser/run.py "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
+      - name: Independently reopen the ordinary counters and native products
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-default-owner-pmu/reopen.py --directory "$base/logs" --collector "$GITHUB_WORKSPACE/collector" --contract "$GITHUB_WORKSPACE/contract" --head "$REVIEWED_HEAD" > "$base/accepted.json"
+          python3 -IB enrolled/scripts/ruff-one-file-parser/verify.py --directory "$base/logs" --head "$REVIEWED_HEAD" --collector "$GITHUB_WORKSPACE/collector" --contract "$GITHUB_WORKSPACE/contract" > "$base/accepted.json"
           mv "$base/accepted.json" "$base/logs/accepted.json"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: signed-gnu-ruff-default-first-a-owners
+          name: signed-gnu-ruff-one-file-parser
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
-          include-hidden-files: true
           compression-level: 1
+          include-hidden-files: true
           if-no-files-found: warn
