@@ -4,6 +4,16 @@ The original proposed Ohm `-22` panicked on both Linux and Apple silicon when a 
 
 The Darwin test used the release installer, fixed Cargo `4591cf45`, and both original and revised rustc with the same stock Xcode linker. The corrected binary and test each returned 17 before the edit, 83 after it, and 17 after reverting. Machine code and initializer section bytes matched the independent empty build on the edited source. The evidence preserves the individual full-file hashes for these Mach-O files. [Per-command results and section digests](darwin.json)
 
+## Earlier GNU releases
+
+Published `-2` and `-6` both built a working executable that returned 17 before a private constructor’s export and value changed. On the edited source, both `cargo build` and `cargo test --no-run` reported success but produced executables that returned 3. Their unchanged retries and type-error repairs also returned 3. Independent empty builds returned the expected 83. With `-Zohm-defaults=no`, the same installed toolchains returned 83 on all four edited paths. Both old release archives matched their published SHA-256 and 68 files in their respective installations. [Archived source, individual native outcomes and binary identities](early-release-export.json)
+
+To repeat the native comparison on Linux, select either release as the Ohm toolchain and run the following from this directory. Use `test` for the test build or add `--defaults-off` for the control. The probe exits 1 if a warmed executable produces the wrong value.
+
+```sh
+python3 replay-early-export.py "$(mktemp -d)/run" build
+```
+
 ## Ruff’s locked defmt
 
 In Ruff’s locked `defmt` 1.1.0, renaming its exported wire-version marker from 4 to 5 made the original `-22` compiler panic on both the stale consumer and the repaired consumer. The revised compiler issued the real undefined-symbol diagnostic for a consumer still asking for 4. The repaired consumer asking for 5 linked, ran, and matched the empty build byte-for-byte. Changing the marker’s value from 0 to 29 also changed the warm executable’s result and matched an independent clean build. [Original](original-defmt.json) · [Corrected](corrected-defmt.json) · [Ruff lockfile](https://github.com/astral-sh/ruff/blob/93526150df078af7dd8fc4226cdcc469539d2001/Cargo.lock)
