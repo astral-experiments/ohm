@@ -244,8 +244,8 @@ def main(mode, position, calibrator, observers):
             directory = traced/phase
             raw = gzip.decompress((directory/'kernel.tsv.gz').read_bytes())
             parsed = trace.packages().reader.parse(raw,expected_code=0,expected_schema=3)
-            original = json.loads(gzip.decompress((directory/'native-execs.json.gz').read_bytes()))
-            outcomes[phase] = wild_fork.finish(raw,parsed,original['wild_processes'])
+            physical = json.loads(gzip.decompress((directory/'native-execs.json.gz').read_bytes()))
+            outcomes[phase] = wild_fork.finish(raw,parsed,physical['wild_processes'])
             need(len(outcomes[phase]) == 1 and outcomes[phase][0]['rustc_crate'] == 'ruff',
                  'no qualified forked helper for the actual Ruff CLI link')
         need(any(compiler_groups.values()), 'no installed Ruff compiler with a protected group exit')
