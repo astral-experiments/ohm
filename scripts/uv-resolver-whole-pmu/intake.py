@@ -54,8 +54,9 @@ def gh_json(*args):
 
 def gh_bytes(endpoint, output, size, digest):
     check(shutil.disk_usage(output.parent).free > size + (20 << 30), "runner disk floor")
+    headers = ["-H", "Accept: application/octet-stream"] if "/releases/assets/" in endpoint else []
     with output.open("xb") as f:
-        subprocess.run(["gh", "api", "--method", "GET", "-H", "Accept: application/octet-stream", endpoint],
+        subprocess.run(["gh", "api", "--method", "GET", *headers, endpoint],
                        stdout=f, check=True, timeout=600)
     check(output.stat().st_size == size and sha(output) == digest, f"archive mismatch: {output.name}")
 
