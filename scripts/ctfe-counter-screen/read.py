@@ -15,20 +15,22 @@ import reopen as old
 
 PRIOR = '18d265bca52c9907b9e53275f80064446c9bd7ccd28431e20450e0e4f11f1efc'
 GRAPH = 'f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660'
-REJECTED = {'4f4d4a31-68c1-447b-9909-8f4c951d6d82', 'c9fb2eab-3d98-4154-b864-cfac6df82005'}
+REJECTED = {'4f4d4a31-68c1-447b-9909-8f4c951d6d82', 'c9fb2eab-3d98-4154-b864-cfac6df82005',
+            '61149494-93be-4462-8cec-12fa66623bc7', '364da3c4-7589-4095-b2e6-efeddb2cf64f'}
+SINGLE = ('Y-B', 'comment', 'unchanged', 'invalid', 'repair')
 require = old.require
 
 
 def media(official, run, head, archives):
     data, jobs, assets = [json.loads((official / (key + '.json')).read_bytes()) for key in ('run', 'jobs', 'artifacts')]
     require((data['id'], data['head_sha'], data['head_branch'], data['event'], data['path'], data['run_attempt'], data['status']) ==
-            (run, head, 'charlie/qa-ctfe-counter-screen-20261101', 'workflow_dispatch', '.github/workflows/ci.yml', 1, 'completed')
+            (run, head, 'charlie/qa-ctfe-repair-scope-20261101', 'workflow_dispatch', '.github/workflows/ci.yml', 1, 'completed')
             and data['repository']['full_name'] == data['head_repository']['full_name'] == 'astral-experiments/ohm', 'wrong run')
     require(jobs['total_count'] == len(jobs['jobs']) == assets['total_count'] == len(assets['artifacts']) == 2, 'incomplete media')
     seen_jobs, seen_assets = set(), set()
     for pos, path in zip(('01', '02'), archives, strict=True):
-        job, = [v for v in jobs['jobs'] if v['name'] == 'Count Ruff build instructions ' + pos]
-        asset, = [v for v in assets['artifacts'] if v['name'] == 'ctfe-full-cli-counter-' + pos]
+        job, = [v for v in jobs['jobs'] if v['name'] == 'Measure Ruff repair instructions ' + pos]
+        asset, = [v for v in assets['artifacts'] if v['name'] == 'ctfe-full-cli-repair-' + pos]
         require((job['run_id'], job['head_sha'], job['run_attempt'], job['status'], job['labels']) ==
                 (run, head, 1, 'completed', ['namespace-profile-ubuntu-24-04-16']), 'unexpected hardware job')
         require((asset['workflow_run']['id'], asset['workflow_run']['head_sha'], asset['size_in_bytes'], asset['expired']) ==
@@ -40,7 +42,7 @@ def media(official, run, head, archives):
     require(len(seen_jobs) == len(seen_assets) == 2, 'duplicate original worker')
     return data['conclusion'] == 'success' and all(j['conclusion'] == 'success' and all(any(
         s['name'] == name and s['status'] == 'completed' and s['conclusion'] == 'success' for s in j['steps']) for name in
-        ('Reconstruct both 81-file compiler installations using original source artifacts', 'Count both untraced Ruff histories'))
+        ('Reconstruct both 81-file compiler installations using original source artifacts', 'Count branch-return and single-checkout repairs'))
         for j in jobs['jobs'])
 
 
@@ -64,14 +66,20 @@ def read_one(path, pos, run, head):
         bodies, envs, rows, refs, issues, clocks = {}, {}, {}, {}, [], set()
         last_stop = 0
         for lane, route, phases in (('clean', 'reference', old.REFS), ('measured', 'return', old.PHASES),
-                                    ('measured', 'stay', old.PHASES[:5])):
+                                    ('measured', 'single', SINGLE)):
             for arm in order:
                 top = '-'.join((lane, route, arm))
                 cert, root = old.active(z, top, arm, sdks[arm[0]]['files'])
                 require(envs.setdefault(arm, cert['env']) == cert['env'] and meter['plain'] == str(root / 'logs/observers/plain'), 'changed environment')
+                single_watched = None
                 for phase in phases:
                     prefix = top + '/' + phase
                     obs = old.read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies)
+                    if route == 'single':
+                        watched = obs['source']['watched']
+                        if phase == 'Y-B':
+                            single_watched = watched
+                        require(watched == single_watched, 'single checkout changed its build-script Git inputs')
                     require(obs['status'] != 0 or obs['graph'] == GRAPH, 'different complete historical Ruff graph')
                     if lane == 'clean':
                         refs[arm, phase] = obs
@@ -90,6 +98,7 @@ def read_one(path, pos, run, head):
                                     issues.append(dict(visit=prefix, product=product, actual=obs[product], empty=wanted[product]))
                     rows[prefix] = {k:v for k,v in obs.items() if k not in ('source','native','start','stop')}
         require(envs['Eon'] == envs['Con'] and len(clocks) == 24 and len(rows) == 30 and
+                {n for n in names if n.endswith('/visit.json')} == {v + '/visit.json' for v in rows} and
                 {n for n in names if n.startswith(('clean-reference-', 'measured-')) and n.endswith('/clock.json')} == clocks,
                 'missing or extra ordinary clock/visit')
         for state in old.REFS:
@@ -100,11 +109,24 @@ def read_one(path, pos, run, head):
                     issues.append(dict(reference=state, different_executable_bytes=k, E=e[k], C=c[k]))
         require(all(refs[a,'clean-A']['cli'] != refs[a,'clean-B']['cli'] for a in order), 'real A/B edit failed to change the program')
         score = old.dataset(z, 'screen.json')
-        primary = {a:rows['measured-return-'+a+'/comment']['instructions'] for a in order}
-        require(score['primary'] == primary and score['process_counts'] == 'unobserved' and
+        repairs = {route:{a:rows[f'measured-{route}-{a}/repair']['instructions'] for a in order} for route in ('return', 'single')}
+        require(score['repairs'] == repairs and score['process_counts'] == 'unobserved' and
                 Counter(map(old.metrics.canonical, score['issues'])) == Counter(map(old.metrics.canonical, issues)), 'wrong reported outcome')
-        return dict(boot=boot, position=pos, instructions=primary, ratio=primary['Eon']/primary['Con'], visits=rows,
+        totals = {route:{a:sum(rows[f'measured-{route}-{a}/{phase}']['instructions'] for phase in phases)
+                         for a in order} for route, phases in (('single', SINGLE), ('return', old.PHASES))}
+        return dict(boot=boot, position=pos, repair_instructions=repairs, history_instructions=totals, visits=rows,
                     issues=issues, native_bodies=len(bodies), hardware=hardware, finished_cleanly='failure.txt' not in names)
+
+
+def assess(workers, route):
+    """Report the predeclared per-boot diagnostic, compared with the parent on that boot."""
+    pair = [w['repair_instructions'][route] for w in workers]
+    require(len(pair) == 2 and all(p['Eon'] > 0 and p['Con'] > 0 for p in pair), 'missing repair pair')
+    if all(10 * p['Con'] >= 11 * p['Eon'] for p in pair):
+        return 'at_least_ten_percent_more_on_both'
+    if all(20 * p['Con'] <= 21 * p['Eon'] for p in pair):
+        return 'at_most_five_percent_more_on_both'
+    return 'inconclusive'
 
 
 if __name__ == '__main__':
@@ -118,6 +140,6 @@ if __name__ == '__main__':
     workers = [read_one(p, pos, args.run, args.head) for pos,p in zip(('01','02'),args.archives,strict=True)]
     require(workers[0]['boot'] != workers[1]['boot'], 'reused hardware boot')
     qualifies = success and all(not r['issues'] and r['finished_cleanly'] for r in workers)
-    print(json.dumps(dict(run=args.run, head=args.head, workers=workers, valid_counter_screen=qualifies,
-            meets_two_per_boot=qualifies and all(r['instructions']['Eon'] >= 2*r['instructions']['Con'] for r in workers),
+    print(json.dumps(dict(run=args.run, head=args.head, workers=workers, valid_repair_scope=qualifies,
+            assessment={r:assess(workers,r) for r in ('return','single')} if qualifies else None,
             process_counts='unobserved', sufficient_for_pr=False), sort_keys=True, indent=2))
