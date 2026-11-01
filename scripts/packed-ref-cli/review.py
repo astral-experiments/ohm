@@ -27,11 +27,12 @@ import git_layout
 import packed_donor
 import packed_sdk as sdk
 import packed_watches
+import qualification
 import reopen as n
 
-BRANCH = "charlie/qa-ruff-packed-refs-full-v2-20261101"
-JOB = "GNU packed Ruff CLI X-B contact v2"
-ARTIFACT = "gnu-packed-ruff-x-b-contact-v2"
+BRANCH = "charlie/qa-ruff-sorted-packed-refs-full-20261101"
+JOB = "GNU sorted packed Ruff CLI X-B contact"
+ARTIFACT = "gnu-sorted-packed-ruff-x-b-contact"
 SCHEDULE = (
     ("clean", "reference", n.REFS),
     ("structural", "return", n.PHASES),
@@ -110,7 +111,7 @@ def official(directory, archive, head):
         )
         and {
             "Verify the packed contact source",
-            "Install the source-qualified D and P SDKs",
+            "Install the source-qualified D and Q SDKs",
             "Run the ordinary packed Ruff histories",
         }
         <= {s["name"] for s in j["steps"]},
@@ -143,7 +144,9 @@ def concurrent_hosts(excluded, current, pos, path, trusted_sha):
     need(
         len(raw) <= 65536
         and re.fullmatch(r"[0-9a-f]{64}", trusted_sha)
-        and n.digest(raw) == trusted_sha,
+        and n.digest(raw)
+        == trusted_sha
+        == excluded["concurrent"]["identity_only_sha256"],
         "different independent identity receipt",
     )
     cohort = json.loads(raw)
@@ -367,7 +370,7 @@ def ingress(z, meta, kernel, calibrator, observers):
             pos["head"],
         )
         == (
-            "packed-ref-contact-v2",
+            "sorted-packed-ref-contact",
             "01",
             meta["run"],
             meta["runner"],
@@ -378,7 +381,8 @@ def ingress(z, meta, kernel, calibrator, observers):
         and pos["plan"] == hist.sha(HERE / "PLAN.md") == n.digest(z.read("PLAN.md"))
         and pos["registered_plan"]
         == hist.sha(HERE / "inputs/registered-plan.md")
-        == "34251812dda5e97898a76e03af900aa38e62856419f8d3c74968d2c2dd9c92eb"
+        == "c10abb820ce6b6da3ab3b2f88d858ee7574ef73d989e55d4a96307aa5c8c26ed"
+        and pos["prerequisites"] == qualification.prereqs()
         and pos["packed_source"]
         == [sdk.SOURCE_RUN, sdk.SOURCE_JOB, sdk.compact(sdk.enrolled())],
         "wrong registered endpoint/SDK",
@@ -420,10 +424,18 @@ def ingress(z, meta, kernel, calibrator, observers):
     )
     git_layout.verify_snapshot(layout["initial"], git_layout.Y, git_layout.B)
     records = sdk.verify_pair({a: get(z, "sdk/" + a + ".json") for a in sdk.SOURCES})
-    physical = get(z, "sdk/p-native-source.json")
+    slot = z.read("sdk/q-source-slot.json")
     need(
-        get(z, "sdk/p-official.json") == sdk.enrolled()
-        and get(z, "sdk/p-published-source.json")
+        n.digest(slot)
+        == "ac8449959882c10a84d36898db68a738aae51b7766b58643d4dea66ba2692cd0"
+        and sdk.content(sdk.qualified_candidate(json.loads(slot))["files"])
+        == sdk.content(records["Q"]["files"]),
+        "candidate source artifact slot or restored Q roster differs",
+    )
+    physical = get(z, "sdk/q-native-source.json")
+    need(
+        get(z, "sdk/q-official.json") == sdk.enrolled()
+        and get(z, "sdk/q-published-source.json")
         == sdk.enrolled()["source"] | {"physical_installation_reopened": True}
         and (
             physical["old"],
@@ -435,14 +447,14 @@ def ingress(z, meta, kernel, calibrator, observers):
         )
         == (
             sdk.D,
-            sdk.P,
-            sdk.P_TREE,
+            sdk.Q,
+            sdk.Q_TREE,
             sdk.SOURCE_QA,
             str(sdk.SOURCE_RUN),
-            sdk.manifests()["P"],
+            sdk.manifests()["Q"],
         )
         and [physical[key + "_driver"] for key in ("old", "new")]
-        == [sdk.content(records[r]["files"])[sdk.DRIVER] for r in ("D", "P")],
+        == [sdk.content(records[r]["files"])[sdk.DRIVER] for r in ("D", "Q")],
         "unbound source-generated driver/original native qualification",
     )
     return pos, minimum, observer, cost, records
@@ -620,7 +632,7 @@ def verify(
             position=pos,
             visits=sum(len(r) for r in rows.values()),
             metered=14,
-            source=[sdk.D, sdk.P],
+            source=[sdk.D, sdk.Q],
             measured=summaries,
             primary=primary,
             all_seven=seven,
@@ -649,7 +661,7 @@ def verify(
             a: {k: {f: v[f] for f in keep if f in v} for k, v in visits.items()}
             for a, visits in rows.items()
         }
-        ratio = Fraction(primary["Don"], primary["Pon"])
+        ratio = Fraction(primary["Don"], primary["Qon"])
         return dict(
             qualified=True,
             official=meta,

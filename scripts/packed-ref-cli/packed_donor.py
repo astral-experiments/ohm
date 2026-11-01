@@ -8,7 +8,7 @@ import donor_witness as dw
 
 A = "b5dba861cc38e3f7fb4524c9ceba3e01a474ea13"
 B = dw.B
-SIDE = {"D": "X", "P": "Y"}
+SIDE = {"D": "X", "Q": "Y"}
 need = dw.need
 
 

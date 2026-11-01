@@ -1,4 +1,4 @@
-"""One ordinary full Ruff D/P contact on a packed Y and a loose, genuinely fast-forwarded X."""
+"""One ordinary full Ruff D/Q contact on a packed Y and a loose, genuinely fast-forwarded X."""
 
 import os
 import runpy
@@ -17,11 +17,12 @@ import packed_donor
 import packed_sdk as sdk
 import packed_watches
 import pilot as h
+import qualification
 
 ORDER = sdk.ARMS
-BRANCH = "charlie/qa-ruff-packed-refs-full-v2-20261101"
-RUN_NAME = "GNU packed Ruff CLI X-B contact v2"
-ARTIFACT = "gnu-packed-ruff-x-b-contact-v2"
+BRANCH = "charlie/qa-ruff-sorted-packed-refs-full-20261101"
+RUN_NAME = "GNU sorted packed Ruff CLI X-B contact"
+ARTIFACT = "gnu-sorted-packed-ruff-x-b-contact"
 HISTORIES = (
     ("clean", "reference", h.REFS),
     ("structural", "return", h.FULL),
@@ -100,7 +101,7 @@ def main(argv):
     )
     rows = {k: v["files"] for k, v in sdk_rows.items()}
     position = dict(
-        mode="packed-ref-contact-v2",
+        mode="sorted-packed-ref-contact",
         position="01",
         order=list(ORDER),
         host=host,
@@ -112,6 +113,7 @@ def main(argv):
         plan=h.sha(HERE / "PLAN.md"),
         registered_plan=h.sha(HERE / "inputs/registered-plan.md"),
         hardware_gate=h.reg.hardware_gate(),
+        prerequisites=qualification.prereqs(),
         packed_source=[sdk.SOURCE_RUN, sdk.SOURCE_JOB, sdk.compact(sdk.enrolled())],
     )
     h.save(h.OUT / "position.json", position)
@@ -197,7 +199,7 @@ def main(argv):
         position=position,
         visits=sum(len(v) for v in rosters.values()),
         metered=2 * len(h.FULL),
-        source=[sdk.D, sdk.P],
+        source=[sdk.D, sdk.Q],
         measured=summaries,
         primary={
             a: rosters["measured", "return", a]["X-B"]["instructions"] for a in ORDER

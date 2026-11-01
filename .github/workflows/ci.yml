@@ -1,5 +1,5 @@
-name: Observe a bounded packed Git branch ref on the full GNU Ruff CLI
-run-name: GNU packed Ruff X-B contact v2 ${{ inputs.reviewed_head }}
+name: Observe a sorted packed Git branch ref on the full GNU Ruff CLI
+run-name: GNU sorted packed Ruff X-B contact ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -12,10 +12,10 @@ permissions:
   contents: read
 jobs:
   contact:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-packed-refs-full-v2-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-sorted-packed-refs-full-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
-    name: GNU packed Ruff CLI X-B contact v2
+    name: GNU sorted packed Ruff CLI X-B contact
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
@@ -46,7 +46,7 @@ jobs:
             scripts/ruff-repair-tables-pilot
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: f93028872101f65e1c748217ac20ddb73a49bab1
+          ref: 8df4ce6334f2bdac5d051135a3535f8bae764900
           path: packed-source
           persist-credentials: false
           sparse-checkout: |
@@ -102,7 +102,7 @@ jobs:
           set -euo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
           test "$(git -C donor-source rev-parse HEAD)" = 8f633d8fc21e453f4c81d81588b6dcab125bfeae
-          test "$(git -C packed-source rev-parse HEAD)" = f93028872101f65e1c748217ac20ddb73a49bab1
+          test "$(git -C packed-source rev-parse HEAD)" = 8df4ce6334f2bdac5d051135a3535f8bae764900
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/source_guard.py enrolled "$REVIEWED_HEAD"
           python3 -IB enrolled/scripts/packed-ref-cli/preflight.py enrolled "$REVIEWED_HEAD"
           for component_path in scripts/gnu-same-revision-donor/{binding.py,source_ids.py,donor_open.py,driver_map.py,live_driver.py,overlay.py} scripts/ruff-repair-tables-pilot/guards.py; do
@@ -134,7 +134,7 @@ jobs:
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
-      - name: Install the source-qualified D and P SDKs
+      - name: Install the source-qualified D and Q SDKs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -151,7 +151,7 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: gnu-packed-ruff-x-b-contact-v2
+          name: gnu-sorted-packed-ruff-x-b-contact
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

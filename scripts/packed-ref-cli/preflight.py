@@ -10,6 +10,7 @@ HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent / "ctfe-crossover-pilot")]
 import git_layout
 import packed_sdk as sdk
+import qualification
 import source_guard
 
 
@@ -34,14 +35,14 @@ def check(repo, head):
         )
     sdk.need(
         sdk.enrolled()["source"]["drivers"][1]
-        == "958e60deef3715e21efb968d38c4ef268bc5b58ab0a4e33810b996ff0c4d271c"
+        == "9d433e8b403b92daef72417ac0c77989f6ee643abde8699a26020eaca910ec20"
         and git_layout.TABLE_BYTES == 117800
         and git_layout.Y_RANGE == (46, 117),
         "wrong native candidate or packed corpus",
     )
     sdk.need(
         hashlib.sha256((HERE / "inputs/registered-plan.md").read_bytes()).hexdigest()
-        == "34251812dda5e97898a76e03af900aa38e62856419f8d3c74968d2c2dd9c92eb",
+        == "c10abb820ce6b6da3ab3b2f88d858ee7574ef73d989e55d4a96307aa5c8c26ed",
         "wrong primary/secondary protocol",
     )
     return {
@@ -49,6 +50,7 @@ def check(repo, head):
         "source_files": len(spec),
         "frozen_blobs": len(fixed),
         "source_run": sdk.SOURCE_RUN,
+        "prerequisites": qualification.prereqs(),
     }
 
 

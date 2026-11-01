@@ -1,4 +1,4 @@
-"""Restore two independently source-qualified, isolated D/P SDKs at the same canonical rustup path."""
+"""Restore two independently source-qualified, isolated D/Q SDKs at the same canonical rustup path."""
 
 import hashlib
 import json
@@ -10,20 +10,20 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 D = "d95494a6a63c22222806c06e3d3aa0de504d8e8a"
-P = "70a0f8090d1e2d9bd822720eb39076c409667edd"
-P_TREE = "be66e74941aed13a5a89797504dca2076b414da9"
-SOURCE_QA = "f93028872101f65e1c748217ac20ddb73a49bab1"
-SOURCE_RUN = 41323607555
-SOURCE_JOB = 124898828506
-SOURCES = {"D": D, "P": P}
+Q = "ed4d666c746f5ba92ac9d8086a934d1701aa6307"
+Q_TREE = "18aee0a978a937dfadb1ace521440c22800354b8"
+SOURCE_QA = "8df4ce6334f2bdac5d051135a3535f8bae764900"
+SOURCE_RUN = 41328534716
+SOURCE_JOB = 124913506341
+SOURCES = {"D": D, "Q": Q}
 TREES = {
     "D": "81461858540cf6f91328f7bfa1a4bcea13e4e9be",
-    "P": "a2c0e754472a6ed281f4b484d0564f1c7fe37c4c",
+    "Q": "9992315c8582d7a66f0f20774e503f5fcd72d6af",
 }
 D_MANIFEST = "5afab54e76787132fa7773d0ede79745dbb858e7870eb89f0d039428f8626981"
 D_CONTENT = "f9bc1f304ad4befd1b21bb4db22379f1c0fb65392aabf9d527d038bd1c9e7456"
 DRIVER = "lib/librustc_driver-c5276fb6f0cdddb4.so"
-ARMS = ("Don", "Pon")
+ARMS = ("Don", "Qon")
 
 
 def need(ok, msg):
@@ -50,7 +50,7 @@ def enrolled():
     blob = (HERE / "source-enrollment.json").read_bytes()
     need(
         hashlib.sha256(blob).hexdigest()
-        == "ebee7fef60f5e97328341110943b6724cacbb0e9b8ac5cc1a657f2fa8b4d859a",
+        == "9e5e6c33ecba63c4db32471f38cdf43c517532f1d53925cf7358feb0fbe7fc03",
         "wrong original independent source report",
     )
     cert = json.loads(blob)
@@ -60,7 +60,7 @@ def enrolled():
         and source["qualified"] is True
         and source["qa"] == SOURCE_QA
         and source["run"] == str(SOURCE_RUN)
-        and source["source"] == [D, P, P_TREE]
+        and source["source"] == [D, Q, Q_TREE]
         and source["physical_installation_reopened"] is False
         and source["native_regression"]
         == {
@@ -76,7 +76,7 @@ def enrolled():
 
 
 def manifests():
-    return {"D": D_MANIFEST, "P": enrolled()["source"]["overlay"]}
+    return {"D": D_MANIFEST, "Q": enrolled()["source"]["overlay"]}
 
 
 def verify_pair(records):
@@ -98,14 +98,24 @@ def verify_pair(records):
             "incomplete or aliased native member",
         )
     need(
-        ids["D"].isdisjoint(ids["P"])
+        ids["D"].isdisjoint(ids["Q"])
         and compact(canon["D"]) == D_CONTENT
-        and canon["D"].keys() == canon["P"].keys()
-        and {k for k in canon["D"] if canon["D"][k] != canon["P"][k]} == {DRIVER}
-        and [canon[r][DRIVER][0] for r in ("D", "P")] == c["drivers"],
+        and canon["D"].keys() == canon["Q"].keys()
+        and {k for k in canon["D"] if canon["D"][k] != canon["Q"][k]} == {DRIVER}
+        and [canon[r][DRIVER][0] for r in ("D", "Q")] == c["drivers"],
         "SDK roster, driver or independent physical installation differs",
     )
     return records
+
+
+def qualified_candidate(original):
+    """Authenticate the source job's P slot before exposing that exact compiler as Q."""
+    need(
+        (original["role"], original["source"], original["driver"]) == ("P", Q, DRIVER)
+        and original["files"][DRIVER][0] == enrolled()["source"]["drivers"][1],
+        "incorrect native compiler in the source archive candidate slot",
+    )
+    return {**original, "role": "Q"}
 
 
 def acquire(parent, source, upstream, b):
@@ -127,33 +137,35 @@ def acquire(parent, source, upstream, b):
         [
             sys.executable,
             "-IB",
-            HERE / "receive_p.py",
+            HERE / "receive_q.py",
             source,
             inbox,
             b.PARK / "D",
-            b.PARK / "P",
+            b.PARK / "Q",
             b.OUT / "sdk",
         ],
         check=True,
     )
     d = read(b.OUT / "sdk/D.json")
-    from_original = read(inbox / "verified-sdk/sdk/P.json")
-    p = {**from_original, "files": b.inventory(b.PARK / "P")}
+    raw = inbox / "verified-sdk/sdk/P.json"
+    original = qualified_candidate(read(raw))
+    q = {**original, "files": b.inventory(b.PARK / "Q")}
     need(
-        content(from_original["files"]) == content(p["files"]),
-        "restored P differs from authenticated source",
+        content(original["files"]) == content(q["files"]),
+        "restored Q differs from authenticated source",
     )
     b.verify_physical(b.PARK / "D", d["files"])
-    verify_pair({"D": d, "P": p})
-    b.save(b.OUT / "sdk/P.json", p)
+    verify_pair({"D": d, "Q": q})
+    shutil.copyfile(raw, b.OUT / "sdk/q-source-slot.json")
+    b.save(b.OUT / "sdk/Q.json", q)
 
 
 def packed_source(role):
     import bindings as b
 
     return (
-        read(b.OUT / "sdk/p-native-source.json"),
-        {"D": "old", "P": "new"}[role],
+        read(b.OUT / "sdk/q-native-source.json"),
+        {"D": "old", "Q": "new"}[role],
         SOURCES[role],
         TREES[role],
     )

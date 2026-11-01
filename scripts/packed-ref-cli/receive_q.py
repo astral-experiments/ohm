@@ -1,4 +1,4 @@
-"""Run the frozen native source verifier in a clean interpreter before selecting P."""
+"""Run the frozen native source verifier in a clean interpreter before selecting Q."""
 
 import gzip
 import json
@@ -35,7 +35,7 @@ def main():
         raw = gzip.decompress((HERE / "inputs/source-run-catalog.json.gz").read_bytes())
         spec.need(
             __import__("hashlib").sha256(raw).hexdigest()
-            == "03f2b1fc275c25c7f760bfb43e6c99f805248bdef0a1c0fea8b020743669d7d9",
+            == "73a8a35aed59097d69359dfa17237d07b5a542694234c1278fa65baa70f87a36",
             "changed source catalog fixture",
         )
         v = json.loads(raw)
@@ -118,9 +118,9 @@ def main():
         ],
         check=True,
     )
-    shutil.copyfile(raw / "P/native-qualified.json", receipts / "p-native-source.json")
-    shutil.copyfile(raw / "source-qualified.json", receipts / "p-published-source.json")
-    (receipts / "p-official.json").write_text(
+    shutil.copyfile(raw / "P/native-qualified.json", receipts / "q-native-source.json")
+    shutil.copyfile(raw / "source-qualified.json", receipts / "q-published-source.json")
+    (receipts / "q-official.json").write_text(
         json.dumps(expected, sort_keys=True, indent=2) + "\n"
     )
 

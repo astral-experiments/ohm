@@ -25,7 +25,7 @@ def snapshot(target, role, *, packed_git=False):
         if not packed_git:
             need(m and (m[3] is None) == (role == "E"), "unregistered surviving session " + str(p))
         else:
-            need(m and role in ("D", "P") and (role == "D" or m[3] is not None),
+            need(m and role in ("D", "Q") and (role == "D" or m[3] is not None),
                  "unregistered packed-ref session " + str(p))
         s = p.stat()
         row = {

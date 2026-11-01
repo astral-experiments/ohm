@@ -21,6 +21,7 @@ import git_layout as git
 import packed_donor as donors
 import packed_sdk as sdk
 import packed_watches as watches
+import qualification
 import review
 
 
@@ -41,7 +42,7 @@ def replace_label(path, old, new):
 
 
 def inputs(role):
-    # Adapt labels only on two real Ruff sessions to exercise prospective D/P registration.
+    # Adapt labels only on two real Ruff sessions to exercise prospective D/Q registration.
     # The separately checked original kernel event fixture retains all original names.
     rec = fixture("original-fanotify")["sides"]["Don"]
     first = {"source": {"revision": git.B, "ref": git.Y}, "sessions": {}}
@@ -73,24 +74,34 @@ class Cases(unittest.TestCase):
         refs = {
             r: fixture("original-sdk-" + r, h)
             for r, h in zip(
-                "DP",
+                "DQ",
                 (
-                    "8a4a285665d939bb3b5874e36833f04246203dc016c5653eac5b56dde6677c97",
-                    "3f7efad9e49e7557673b0837e8388b079671b0eb272a3e5bbcfb140250e0f3dc",
+                    "4d1a0d70454679046cd14d19ee7db5aaedbcfd8544efbedfa9825529ae500386",
+                    "ac8449959882c10a84d36898db68a738aae51b7766b58643d4dea66ba2692cd0",
                 ),
                 strict=True,
             )
         }
+        actual_q = refs["Q"]
+        refs["Q"] = sdk.qualified_candidate(actual_q)
         self.assertEqual(sdk.verify_pair(refs), refs)
+        # The earlier Q-like source fixture actually contains P, including its genuine binary.
+        old_p = fixture(
+            "original-sdk-P",
+            "3f7efad9e49e7557673b0837e8388b079671b0eb272a3e5bbcfb140250e0f3dc",
+        )
+        for other in (old_p, old_p | {"source": sdk.Q}, actual_q | {"role": "Q"}):
+            with self.assertRaises(ValueError):
+                sdk.qualified_candidate(other)
         changes = [
-            lambda r: r["P"]["files"].pop("bin/cargo"),
-            lambda r: r["P"]["files"].__setitem__(
+            lambda r: r["Q"]["files"].pop("bin/cargo"),
+            lambda r: r["Q"]["files"].__setitem__(
                 "bin/cargo", r["D"]["files"]["bin/cargo"]
             ),
-            lambda r: r["P"]["files"][sdk.DRIVER].__setitem__(
+            lambda r: r["Q"]["files"][sdk.DRIVER].__setitem__(
                 0, r["D"]["files"][sdk.DRIVER][0]
             ),
-            lambda r: r["D"].__setitem__("source", sdk.P),
+            lambda r: r["D"].__setitem__("source", sdk.Q),
         ]
         for fn in changes:
             other = deepcopy(refs)
@@ -206,7 +217,7 @@ class Cases(unittest.TestCase):
                 opens(other, side)
 
     def test_x_a_y_b_registration(self):
-        for role in "DP":
+        for role in "DQ":
             first, second, work, rows = inputs(role)
             reg = donors.register(first, second, role, work)
             self.assertEqual(set(reg), set(donors.dw.OWN))
@@ -216,7 +227,7 @@ class Cases(unittest.TestCase):
                 None if role == "D" else git.B[:16],
             )
             with self.assertRaises(ValueError):
-                donors.register(first, second, "D" if role == "P" else "P", work)
+                donors.register(first, second, "D" if role == "Q" else "Q", work)
             with self.assertRaises((ValueError, RuntimeError)):
                 donors.bind_sources(reg, rows[:1])
             tampered = deepcopy(second)
@@ -265,37 +276,67 @@ class Cases(unittest.TestCase):
             with self.assertRaises(ValueError):
                 endpoints.count(dict(reversed(original.items())))
 
+    def test_bound_candidate_controls(self):
+        native = fixture("q-native-verified", qualification.WITNESS)
+        qualification.native(native)
+        self.assertEqual(
+            qualification.prereqs()["six_host_identity"], qualification.SIX
+        )
+        for mutate in (
+            lambda v: v["Q"].__setitem__("unresolved_syscalls", 1),
+            lambda v: next(
+                iter(v["Q"]["selected"]["pack_ref_app"].values())
+            ).__setitem__("donor", "X-A"),
+            lambda v: v["Q_warm_phases"].__setitem__(
+                "08-unchanged", v["Q_independent_empty"]["cold-A"]
+            ),
+            lambda v: v["Q_independent_empty"]["cold-invalid"].clear(),
+            lambda v: v["source"].__setitem__(1, sdk.D),
+        ):
+            bad = deepcopy(native)
+            mutate(bad)
+            with self.assertRaises(ValueError):
+                qualification.native(bad)
+
+    def test_packed_session_snapshot(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            owner = root / "debug/incremental/store/ruff_python_ast-abc"
+            untagged = owner / "s-ab-_0123456789abcdef_123-abc"
+            tagged = owner / ("s-ac-_0123456789abcdef_r" + git.B[:16] + "_123-abc")
+            untagged.mkdir(parents=True)
+            for table in donors.dw.donors.TABLES:
+                (untagged / table).write_bytes(table.encode())
+            snap = donors.dw.donors.snapshot
+            self.assertIsNone(
+                snap(root, "D", packed_git=True)[str(untagged)]["revision"]
+            )
+            with self.assertRaises((ValueError, RuntimeError)):
+                snap(root, "Q", packed_git=True)
+            untagged.rename(tagged)
+            self.assertEqual(
+                snap(root, "Q", packed_git=True)[str(tagged)]["revision"], git.B[:16]
+            )
+            with self.assertRaises((ValueError, RuntimeError)):
+                snap(root, "P", packed_git=True)
+
     def test_collision_denominator(self):
         ex = sdk.read(HERE / "excluded-hosts.json")
         s = ex["concurrent"]
         names = [f"{i:02d}" for i in range(1, 7)]
-        hosts = {
-            p: dict(
-                run=s["run"],
-                head=s["head"],
-                job=j,
-                position=p,
-                boot="sample-boot-" + p,
-                runner="sample-runner-" + p,
-                runner_id=20 + i,
-            )
-            for i, (p, j) in enumerate(zip(names, s["job_ids"], strict=True))
-        }
-        cert = dict(
-            run=s["run"],
-            head=s["head"],
-            hosts=hosts,
-            admitted=True,
-            missing=[],
-            outcomes_opened=0,
-            reason=None,
+        original = qualification.evidence(
+            "integration-boots.json.gz", qualification.SIX
         )
+        cert = json.loads(original)
+        hosts = cert["hosts"]
+        self.assertEqual(set(names), set(hosts))
+        self.assertEqual({r["job"] for r in hosts.values()}, set(s["job_ids"]))
         current = {"job": 1, "runner": "sample-other", "runner_id": 1}
         with tempfile.TemporaryDirectory() as folder:
             dst = Path(folder) / "admission.json"
 
             def check(obj, where, new=current):
-                raw = json.dumps(obj).encode()
+                raw = original if obj == cert else json.dumps(obj).encode()
                 dst.write_bytes(raw)
                 return review.concurrent_hosts(
                     ex, new, {"boot": where}, dst, hashlib.sha256(raw).hexdigest()
@@ -384,7 +425,7 @@ if __name__ == "__main__":
             [
                 sys.executable,
                 "-IB",
-                HERE / "receive_p.py",
+                HERE / "receive_q.py",
                 "--source-preflight",
                 options.source_checkout,
             ],
