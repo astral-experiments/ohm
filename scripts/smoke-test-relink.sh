@@ -124,8 +124,9 @@ write_build_script() {
 fn main() {
     let dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     println!("cargo::rerun-if-changed=$1");
-    if std::path::Path::new(&dir).join("earlier-native").is_dir() {
-        println!("cargo::rustc-link-search=native={dir}/earlier-native");
+    let earlier = "${2:-}";
+    if !earlier.is_empty() {
+        println!("cargo::rustc-link-search=native={dir}/{earlier}");
     }
     println!("cargo::rustc-link-search=native={dir}/native");
     println!("cargo::rustc-link-lib=static=answer");
@@ -224,12 +225,13 @@ write_archive 37
 check_links 37 2
 
 # Keep the declared archive unchanged while an earlier search directory gains and loses a library.
-mkdir earlier-native
-write_build_script native/libanswer.a
+earlier_native=$(mktemp -d earlier-native.XXXXXX)
+write_build_script native/libanswer.a "$earlier_native"
 export CARGO_TARGET_DIR="$PWD/shadow-target" CARGO_BUILD_BUILD_DIR="$PWD/shadow-build"
 write_archive 29
 check_links 29
-write_archive 41 earlier-native/libanswer.a
+write_archive 41 "$earlier_native/libanswer.a"
 check_links 41 2
-rm earlier-native/libanswer.a
+rm "$earlier_native/libanswer.a"
 check_links 29 2
+rmdir "$earlier_native"
