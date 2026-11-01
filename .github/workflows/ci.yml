@@ -1,4 +1,4 @@
-name: Check -23 native library invalidation on both cross targets
+name: Compare native library recovery to both cross-target controls
 on:
   workflow_dispatch:
     inputs:
@@ -9,7 +9,7 @@ on:
 permissions: {}
 jobs:
   replay:
-    name: Cross-target native relinks (${{ matrix.workload }})
+    name: Cross-target file changes (${{ matrix.workload }})
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-cross-qualification' && github.sha == inputs.reviewed_head
     permissions:
       actions: read
@@ -69,7 +69,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: rc23-cross-native-${{ matrix.workload }}-attempt-${{ github.run_attempt }}
+          name: rc23-cross-native-continued-${{ matrix.workload }}-attempt-${{ github.run_attempt }}
           path: |
             cross-results/
             cross-media.json

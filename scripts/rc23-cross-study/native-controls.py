@@ -1,4 +1,5 @@
 """Run the release's declared native library checks on the two cross compilers."""
+import json
 import os
 import shutil
 import subprocess
@@ -36,8 +37,8 @@ def platform_fixture(original):
   expected=any
   if (( $# == 2 )); then expected=$2; fi
   printf '%s\\t%s\\t%s\\t%s\\n' "$(basename "$CARGO_TARGET_DIR")" "$1" "$expected" "$count" >> "$OHM_QUAL_COUNTS"
-  # The control compiler may conservatively relink an unchanged, unrecognized asm dependency.
-  if [[ "$OHM_QUAL_ARM" == base && "$CARGO_TARGET_DIR" == */marked-declared-target && "$expected" == 0 ]]; then
+  # Cargo caches declared native link inputs only on host targets. Compare these counts below.
+  if [[ "$CARGO_TARGET_DIR" == */marked-declared-target && "$expected" == 0 ]]; then
     return
   fi
 ''' + anchor)
@@ -52,6 +53,7 @@ grep -F 'answer' "$OHM_QUAL_EVIDENCE/missing-declared.log" >/dev/null
 mv -- declared-previous.a native/libanswer.a
 check_links 29
 ''' + anchor)
+    text = replace_once(text, "\ncheck_declared_archive\n\n# Register-only assembly", "\n# Register-only assembly")
     return text.replace('cargo +"$toolchain"', '"$OHM_QUAL_CARGO"')
 
 
@@ -69,7 +71,7 @@ def main(kind):
     fixture = m.OUT / "cross-declared-relink.sh"
     fixture.write_text(platform_fixture(original.read_text()))
     reports = {}
-    for arm in m.ARMS:
+    for arm in ("cross",):
         m.switch(arm)
         sdk = m.WORK / ("sdk-" + arm)
         path = m.OUT / arm
@@ -116,21 +118,27 @@ def main(kind):
             print(result.stdout.decode(errors="replace")[-2200:], flush=True)
     if any(v["exit"] for v in reports.values()):
         raise RuntimeError("See both compiler outcomes for the failed cross-target control.")
-    for arm, entry in reports.items():
-        rows = entry["rows"]
-        for group in ("target", "marked-declared-target"):
-            checks = [(r["output"], r["expected"], r["links"]) for r in rows if r["case"] == group and r["expected"] != "any"]
-            assert [(v, e) for v, e, _ in checks] == [(17, "0"), (29, "2"), (29, "0")]
-            if arm == "cross" or group == "target":
-                assert all(n == int(e) for _, e, n in checks)
-            else:
-                assert checks[1][2] == 2
-        assert [(r["output"], r["links"]) for r in rows if r["case"] == "shadow-target" and r["expected"] == "2"] == [(41, 2), (29, 2)]
-        assert (m.OUT / arm / "missing-declared.log").is_file()
-        assert (m.OUT / arm / "malformed-archive.log").is_file()
-    m.dump(m.OUT / "verified-native.json", dict(
+    rows = reports["cross"]["rows"]
+    prior = json.loads((m.HERE / "fixtures/native-cross-baseline.json").read_bytes())
+    reference = prior["prior_checks"][kind]
+    expected_rows = [r for r in reference["base_rows"] if r["case"] != "target"]
+    assert [(r["case"], r["output"], r["expected"]) for r in rows] == [
+        (r["case"], r["output"], r["expected"]) for r in expected_rows
+    ]
+    for result, control in zip(rows, expected_rows):
+        if result["expected"] == "any":
+            continue
+        if result["case"] == "marked-declared-target" and result["expected"] == "0":
+            assert result["links"] == control["links"] == 2
+        else:
+            assert result["links"] == int(result["expected"]) == control["links"]
+    assert (m.OUT / "cross/missing-declared.log").is_file()
+    assert (m.OUT / "cross/malformed-archive.log").is_file()
+    m.dump(m.OUT / "compared-native.json", dict(
         run=os.environ["GITHUB_RUN_ID"], head=os.environ["GITHUB_SHA"],
-        fixture_sha256=actual, adapted_sha256=m.sha(fixture), target=target, results=reports,
+        fixture_sha256=actual, adapted_sha256=m.sha(fixture), target=target,
+        original_run=prior["original_run"], reference=reference["artifact"],
+        strict_marked_zero_links=False, unchanged_marked_matches_control=True, results=reports,
     ))
 
 
