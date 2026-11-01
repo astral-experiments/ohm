@@ -2,17 +2,36 @@ name: CI
 on:
   workflow_dispatch:
     inputs:
-      gnu_only: {description: Only the Linux tracer, type: boolean, default: false}
-      expected_head: {description: Exact reviewed commit, type: string, required: true}
+      expected_head:
+        description: Exact qualification commit
+        type: string
+        required: true
 permissions: {contents: read, actions: read}
 jobs:
-  observe:
+  verify:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22-observe-gnu-native-links' && github.sha == inputs.expected_head && github.run_attempt == 1
-    runs-on: ubuntu-24.04
-    timeout-minutes: 18
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with: {persist-credentials: false}
+        with:
+          path: qualification
+          persist-credentials: false
+          sparse-checkout: scripts/rc22-physical-gnu.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-cargo
+          ref: c92c1c066a3a75a12da46c0b19c16e7a79929688
+          fetch-depth: 2
+          path: cargo-source
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-sh/ruff
+          ref: 93526150df078af7dd8fc4226cdcc469539d2001
+          path: ruff
+          persist-credentials: false
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           artifact-ids: '13064288126'
@@ -20,15 +39,13 @@ jobs:
           github-token: ${{ github.token }}
           path: release
           merge-multiple: true
-      - name: Check explicit archive search paths on the release GNU linker
-        run: |
-          command -v strace || sudo apt-get install -y strace
-          python3 -IB scripts/rc22-physical-gnu.py
-      - name: Retain the archive reports and the cold linker trace
+      - name: Compare build-script compiler calls on unchanged ty checks
+        run: python3 -IB qualification/scripts/rc22-physical-gnu.py
+      - name: Retain both compiler logs and Cargo output from each step
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: gnu-release-archive-search-observations
-          path: ${{ runner.temp }}/rc22-gnu-archive-resolution/reports/
+          name: ty-native-build-script-calls
+          path: ${{ runner.temp }}/rc22-ty-native-scripts/reports/
           retention-days: 21
           if-no-files-found: error
