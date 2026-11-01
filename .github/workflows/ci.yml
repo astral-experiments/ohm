@@ -1,10 +1,10 @@
-name: Measure a Ruff branch return after a private AST edit
-run-name: Whole Ruff CTFE crossover pilot ${{ inputs.reviewed_head }}
+name: Count an ordinary Ruff branch return after a private AST edit
+run-name: Full Ruff counter screen ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed commit of the two-boot instruction pilot
+        description: Exact reviewed commit of the untraced hardware screen
         type: string
         required: true
 permissions:
@@ -12,10 +12,10 @@ permissions:
   contents: read
 jobs:
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-crossover-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-counter-screen-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
-    name: Full Ruff branch return ${{ matrix.position }}
+    name: Count Ruff build instructions ${{ matrix.position }}
     strategy:
       fail-fast: false
       matrix:
@@ -31,6 +31,7 @@ jobs:
           sparse-checkout: |
             .github/workflows
             scripts/ctfe-crossover-pilot
+            scripts/ctfe-counter-screen
             scripts/gnu-ctfe-literal-identity
             scripts/branch-return-pmu
             scripts/branch-first-session-e-screen
@@ -59,20 +60,6 @@ jobs:
             scripts/ohm-apple-zmij/source-transport
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: 2969895dc49c9d8970ef121e1ff024ef001dc7ce
-          path: kernel
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/branch-return-execstop
-            scripts/branch-return-pmu
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 5e91ed3974c0964a912fd38049946f647891dcb2
-          path: projector
-          persist-credentials: false
-          sparse-checkout: scripts/branch-return-pmu
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
           ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
           path: physical
           persist-credentials: false
@@ -92,17 +79,18 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
+          test "$(git -C enrolled rev-parse HEAD:scripts/ctfe-crossover-pilot)" = 1c94fccb2b5fbf22303e4db8b673723ad082092c
           test "$(git -C ctfe-source rev-parse HEAD)" = 18b0cf251988b5967f8ffb0b11db850966eae9d1
           for component_path in scripts/gnu-ctfe-literal-identity scripts/ruff-repair-tables-pilot/guards.py; do
             source_object=$(git -C ctfe-source rev-parse "HEAD:$component_path")
             pilot_object=$(git -C enrolled rev-parse "HEAD:$component_path")
             test "$source_object" = "$pilot_object"
           done
-          for d in ctfe-source/scripts/gnu-ctfe-literal-identity enrolled/scripts/{ctfe-crossover-pilot,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
+          for d in ctfe-source/scripts/gnu-ctfe-literal-identity enrolled/scripts/{ctfe-counter-screen,ctfe-crossover-pilot,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/reopen.py --help > /dev/null
+          python3 -IB enrolled/scripts/ctfe-counter-screen/read.py --help > /dev/null
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd
           base="$RUNNER_TEMP/ohm-branch-object-qa"
@@ -116,20 +104,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py acquire "$GITHUB_WORKSPACE/source"
-      - name: Validate the hardware counter and replay both ordinary branch histories
+          python3 -IB enrolled/scripts/ctfe-counter-screen/run.py acquire "$GITHUB_WORKSPACE/source"
+      - name: Count both untraced Ruff histories
         env:
           POSITION: ${{ matrix.position }}
-          CTFE_EXECS_SOURCE: ${{ github.workspace }}/kernel
-          CTFE_EXECS_PROJECTOR: ${{ github.workspace }}/projector
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-counter-screen/run.py "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ctfe-full-cli-instructions-${{ matrix.position }}
+          name: ctfe-full-cli-counter-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true
