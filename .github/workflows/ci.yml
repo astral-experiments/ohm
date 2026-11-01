@@ -28,7 +28,7 @@ jobs:
         arm:
           - stock_ctfe318
           - fa7a_stack_ctfe318
-    runs-on: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
+    runs-on: nscloud-ubuntu-24.04-amd64-16x80
     timeout-minutes: 360
     env:
       BENCH_ARM: ${{ matrix.arm }}
