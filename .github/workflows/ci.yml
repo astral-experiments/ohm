@@ -40,6 +40,14 @@ jobs:
             scripts/ruff-repair-tables-pilot
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
+          path: prior-pilot
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ctfe-crossover-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
           ref: 18b0cf251988b5967f8ffb0b11db850966eae9d1
           path: ctfe-source
           persist-credentials: false
@@ -77,16 +85,17 @@ jobs:
           python-version: '3.13'
       - name: Verify the enrolled source and prepare empty task-owned output roots
         run: |
-          set -euo pipefail
+          set -exuo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
-          test "$(git -C enrolled rev-parse HEAD:scripts/ctfe-crossover-pilot)" = 1c94fccb2b5fbf22303e4db8b673723ad082092c
+          test "$(git -C prior-pilot rev-parse HEAD)" = 5c651f1d38c629da2a75d5cac3588db0be8104d7
+          test "$(git -C enrolled rev-parse HEAD:scripts/ctfe-crossover-pilot)" = "$(git -C prior-pilot rev-parse HEAD:scripts/ctfe-crossover-pilot)"
           test "$(git -C ctfe-source rev-parse HEAD)" = 18b0cf251988b5967f8ffb0b11db850966eae9d1
           for component_path in scripts/gnu-ctfe-literal-identity scripts/ruff-repair-tables-pilot/guards.py; do
             source_object=$(git -C ctfe-source rev-parse "HEAD:$component_path")
             pilot_object=$(git -C enrolled rev-parse "HEAD:$component_path")
             test "$source_object" = "$pilot_object"
           done
-          for d in ctfe-source/scripts/gnu-ctfe-literal-identity enrolled/scripts/{ctfe-counter-screen,ctfe-crossover-pilot,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
+          for d in ctfe-source/scripts/gnu-ctfe-literal-identity prior-pilot/scripts/ctfe-crossover-pilot enrolled/scripts/{ctfe-counter-screen,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
