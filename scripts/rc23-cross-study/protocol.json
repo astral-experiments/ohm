@@ -1,0 +1,69 @@
+{
+  "producer_run": 41330060496,
+  "producer_head": "e6ff148b647d3033244eb979eb6384963e351db2",
+  "cases": {
+    "gnu": {
+      "parent": "02c02172ceae316dac14a7657d9c85fa8bb1c3ca",
+      "child": "193984681ef7185c90b548c27b0ac6326908f2ec",
+      "parent_tree": "5f59a731d262bb142782a1333d99e894fb1b1cee",
+      "child_tree": "df36660b9ba5936fbffd96197b0c828e9e5f68c6",
+      "files": [
+        "crates/ruff_linter/resources/test/fixtures/pylint/potential_index_error.py",
+        "crates/ruff_linter/src/rules/pylint/rules/potential_index_error.rs"
+      ],
+      "target": "aarch64-unknown-linux-gnu",
+      "seeds": [
+        230283,
+        230285
+      ]
+    },
+    "musl": {
+      "parent": "b96364cbf66e27df3c87beed5923f561f033b52c",
+      "child": "672bb4edf04c84f8b0753346359daee4057158f2",
+      "parent_tree": "f800057496de6ba68020cd30d7cd1ae39f8cfa2a",
+      "child_tree": "37c0250911edfe5f888c2db4652c4190e2afb9f2",
+      "files": [
+        "Cargo.lock",
+        "crates/ruff_python_ast/src/script.rs",
+        "crates/ruff_ranged_value/Cargo.toml",
+        "crates/ruff_ranged_value/src/lib.rs",
+        "crates/ty/tests/cli/scripts.rs",
+        "crates/ty_project/src/script.rs",
+        "crates/ty_server/tests/e2e/snapshots/e2e__publish_diagnostics__on_did_change_script_python_requirement.snap",
+        "crates/ty_server/tests/e2e/snapshots/e2e__publish_diagnostics__on_did_open_virtual_script_reports_inline_configuration_diagnostics.snap"
+      ],
+      "target": "x86_64-unknown-linux-musl",
+      "seeds": [
+        230294,
+        230295
+      ],
+      "added_tests": [
+        "script::tests::carriage_return_line_endings",
+        "script::tests::metadata_block_range_includes_both_delimiters",
+        "script::tests::metadata_range_accounts_for_unicode_crlf_and_multiline_values",
+        "script::tests::last_closing_delimiter_discards_following_comments"
+      ],
+      "anchor": "helpers::tests::any_over_stmt_type_alias"
+    }
+  },
+  "jobs": 4,
+  "pairs": 8,
+  "component_commits": {
+    "cargo": "8e82b0d7a1ffc89f8bda2bf7fb76ec292bccf2f8",
+    "clippy": "5b5d9fb377e21872c83ed1598f9ffee1420c7b39",
+    "rustfmt": "4b772602480c276b46cd51d44ae3ac0770ca81f5"
+  },
+  "compilers": {
+    "base": {
+      "commit": "fcea00ca0149ae647cd8eb1b334d2d56f117fb73",
+      "tree": "5891186ee276a072ee6e1b1a26ae5e4b09a1e534"
+    },
+    "cross": {
+      "commit": "5af5d465e3d6bfa946c649432e51e199bf05cc16",
+      "tree": "53b8670588a7eace337b7e50887394ada983dc79"
+    }
+  },
+  "cohorts": 2,
+  "pairs_per_cohort": 4,
+  "policy": "Each host runs four balanced pairs with independently rebuilt parent states. Compare edit, immediate repeat and their sum. Favor a repeatable wall-time gain on the real workload or independently reproduced material instruction savings with no material wall-time regression. Reject stale products, changed unit rosters across arms or failing negative controls."
+}

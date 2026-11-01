@@ -1,207 +1,72 @@
-name: Qualify the -23 compiler on GNU AArch64 and x86-64 musl
+name: Compare the -23 compiler on two Ruff cross builds
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
         type: string
         required: true
-        description: Exact qualification commit
+        description: Exact comparison commit
 permissions: {}
 jobs:
-  build:
-    name: Build matched -23 cross SDK (${{ matrix.arm }})
+  replay:
+    name: Ruff ${{ matrix.workload }} edits, cohort ${{ matrix.cohort }}
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-cross-qualification' && github.sha == inputs.reviewed_head
     permissions:
+      actions: read
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        arm:
-          - base
-          - cross
+        workload: [gnu, musl]
+        cohort: [1, 2]
     runs-on: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
-    timeout-minutes: 360
+    timeout-minutes: 355
     env:
-      BENCH_ARM: ${{ matrix.arm }}
-      OHM_TOOLCHAIN: ohm-1.99.0-23
-      OHM_TARGET: x86_64-unknown-linux-gnu
-      PYTHONDONTWRITEBYTECODE: "1"
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      WORKLOAD: ${{ matrix.workload }}
+      COHORT: ${{ matrix.cohort }}
+      PYTHONDONTWRITEBYTECODE: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          persist-credentials: false
           ref: ${{ github.sha }}
-          fetch-depth: 2
-      - name: Check out the pinned release build scripts
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
           persist-credentials: false
-          ref: 90575c9fc302c2af0858c711726b2d211e7d3114
-          path: release-reference
-          sparse-checkout: |-
-            scripts
-            release
-            toolchains
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          enable-cache: false
+          repository: astral-sh/ruff
+          ref: ${{ matrix.workload == 'gnu' && '193984681ef7185c90b548c27b0ac6326908f2ec' || '672bb4edf04c84f8b0753346359daee4057158f2' }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+          path: ruff-source
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.13"
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 0c9c558ce24212e5da6fb66150790b0af3cee90b
-          path: source-carrier
-          persist-credentials: false
-          sparse-checkout: scripts/rc22-private-export-ice
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 7bc72b798b019a9ec0de6eeea3bc22b783917b27
-          path: transport
-          persist-credentials: false
-          sparse-checkout: scripts/rc22-native
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a
-          path: public-seed
-          persist-credentials: false
-          sparse-checkout: scripts/ohm-apple-zmij/source-transport
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
-          path: signed-rust
-          persist-credentials: false
-          sparse-checkout: scripts/strict-mixed-generics
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
-          path: cargo-seed
-          persist-credentials: false
-          sparse-checkout: |-
-            scripts/cargo-diagnostic-fix
-            scripts/ohm-apple-zmij/cargo293
-      - name: Verify the four source pins and the compiler comparison
-        run: python3 -IB scripts/rc23-cross-qualification/materialize.py "$BENCH_ARM"
-      - name: Install native GNU bootstrap prerequisites
+      - name: Install the target C toolchain and execution tools
         run: |
           sudo apt-get -qq update
-          sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross musl-tools qemu-user
-      - name: Install pinned LLVM BOLT tools
+          sudo apt-get -y -qq install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu musl-tools qemu-user
+      - name: Read the sealed artifacts from both matched release builds
         env:
-          MANIFEST_PATH: toolchains/1.99.0/23.json
-        run: |
-          if [[ "$(dpkg --print-architecture)" != amd64 ]]; then
-            echo 'LLVM BOLT tools require an amd64 Linux runner' >&2
-            exit 1
-          fi
-
-          case "$(jq -er '.release.upstream_rust_version' "$MANIFEST_PATH")" in
-            1.97.* | 1.98.*)
-              bolt_major=22
-              bolt_version='22.1.8~++20260714014902+ca7933e47d3a-1~exp1~20260714135019.80'
-              bolt_sha256='97a9e4e8d2b2219757c38abef93e913793ebc64580aa51207bd23941c44ec070'
-              runtime_sha256='48639dafeb45892eec58f5d8a2d0d612ce791a2f713f06c794b71d6a72fa582d'
-              ;;
-            1.99.*)
-              bolt_major=23
-              bolt_version='23.1.2'
-              bolt_sha256='b5ed9675149cc837c282e9b6962c276c9fa62863d5b2f91537b60848552995b7'
-              ;;
-            *)
-              echo 'Pin matching LLVM BOLT tools for this Rust version' >&2
-              exit 1
-              ;;
-          esac
-          bolt_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-bolt.XXXXXX")"
-          if [[ "$bolt_major" == 23 ]]; then
-            bolt_archive="$bolt_root/llvm.tar.xz"
-            bolt_directory="LLVM-$bolt_version-Linux-X64"
-            curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
-              --fail --location --retry 3 --show-error --silent \
-              --output "$bolt_archive" \
-              "https://github.com/llvm/llvm-project/releases/download/llvmorg-$bolt_version/$bolt_directory.tar.xz"
-            printf '%s  %s\n' "$bolt_sha256" "$bolt_archive" | sha256sum --check --strict
-            # Leave llvm-profdata for the build to link from Rust's matching LLVM.
-            tar -xJf "$bolt_archive" -C "$bolt_root" --strip-components=1 --occurrence=1 \
-              "$bolt_directory/bin/llvm-bolt" \
-              "$bolt_directory/bin/merge-fdata" \
-              "$bolt_directory/lib/libbolt_rt_hugify.a" \
-              "$bolt_directory/lib/libbolt_rt_instr.a"
-            rm "$bolt_archive"
-            bolt_llvm_dir="$bolt_root"
-          else
-            bolt_base_url="https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-$bolt_major"
-            for package in "bolt-$bolt_major" "libbolt-$bolt_major-dev"; do
-              curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
-                --fail --location --retry 3 --show-error --silent \
-                --output "$bolt_root/$package.deb" \
-                "$bolt_base_url/${package}_${bolt_version}_amd64.deb"
-            done
-
-            printf '%s  %s\n' \
-              "$bolt_sha256" \
-              "$bolt_root/bolt-$bolt_major.deb" \
-              "$runtime_sha256" \
-              "$bolt_root/libbolt-$bolt_major-dev.deb" \
-              | sha256sum --check --strict
-
-            dpkg-deb --extract "$bolt_root/bolt-$bolt_major.deb" "$bolt_root"
-            dpkg-deb --extract "$bolt_root/libbolt-$bolt_major-dev.deb" "$bolt_root"
-            bolt_llvm_dir="$bolt_root/usr/lib/llvm-$bolt_major"
-          fi
-          "$bolt_llvm_dir/bin/llvm-bolt" --version
-          "$bolt_llvm_dir/bin/merge-fdata" --version
-          if [[ ! -f "$bolt_llvm_dir/lib/libbolt_rt_instr.a" ]]; then
-            echo 'LLVM BOLT instrumentation runtime is missing' >&2
-            exit 1
-          fi
-
-          printf 'OHM_BOLT_LLVM_DIR=%s\n' "$bolt_llvm_dir" >> "$GITHUB_ENV"
-        working-directory: release-reference
-      - name: Prepare pinned Wild linker
-        env:
-          MANIFEST_PATH: toolchains/1.99.0/23.json
-        run: |
-          wild_directory="$(python3 scripts/prepare-wild.py \
-            "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
-          printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
-        working-directory: release-reference
-      - name: Build both target libraries with the release PGO and BOLT compiler
-        shell: bash
-        run: |-
-          set -euo pipefail
-          python3 -IB scripts/rc23-cross-qualification/build.py 2>&1 | tee cross-evidence/build.log
-      - name: Seal the host compiler and both target standard libraries
-        shell: bash
-        run: |-
-          set -euo pipefail
-          dist=source/rust/build/dist
-          mkdir cross-sdk
-          for asset in rust-1.99.0-dev-x86_64-unknown-linux-gnu rust-std-1.99.0-dev-aarch64-unknown-linux-gnu rust-std-1.99.0-dev-x86_64-unknown-linux-musl; do
-            test -s "$dist/$asset.tar.gz"
-            ln "$dist/$asset.tar.gz" "cross-sdk/$asset.tar.gz"
-          done
-          cp cross-evidence/source.json cross-sdk/
-          (cd cross-sdk && sha256sum ./*.tar.gz > SHA256SUMS)
-          lscpu > cross-evidence/build-host.txt
-      - name: Retain the candidate SDK for same-host comparisons
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+          GH_TOKEN: ${{ github.token }}
+        run: gh api 'repos/astral-experiments/ohm/actions/runs/41330060496/artifacts?per_page=100' > cross-media.json
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: rc23-cross-sdk-${{ matrix.arm }}
-          path: cross-sdk/
-          if-no-files-found: error
-          compression-level: 0
-          retention-days: 14
-      - name: Retain source identity and build diagnostics
+          run-id: 41330060496
+          github-token: ${{ github.token }}
+          pattern: rc23-cross-sdk-*
+          path: cross-media
+      - name: Check asm invalidation, runtime outputs and paired edit timings
+        run: |
+          (cd scripts/rc23-cross-study && sha256sum --strict --check SHA256SUMS)
+          python3 -Bu scripts/rc23-cross-study/measure.py "$WORKLOAD" "$COHORT"
+      - name: Retain raw logs, timings and excluded attempts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: rc23-cross-build-${{ matrix.arm }}-attempt-${{ github.run_attempt }}
-          path: |-
-            cross-evidence/
-            source/reports/slot-source.json
-            source/reports/verify-23.json.log
+          name: rc23-cross-results-${{ matrix.workload }}-${{ matrix.cohort }}-attempt-${{ github.run_attempt }}
+          path: |
+            cross-results/
+            cross-media.json
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 30
