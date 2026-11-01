@@ -126,6 +126,7 @@ fn main() {
     println!("cargo::rerun-if-changed=$1");
     let earlier = "${2:-}";
     if !earlier.is_empty() {
+        println!("cargo::rerun-if-changed={dir}/{earlier}");
         println!("cargo::rustc-link-search=native={dir}/{earlier}");
     }
     println!("cargo::rustc-link-search=native={dir}/native");
@@ -224,7 +225,7 @@ grep -F 'libanswer.a' bad-archive.log
 write_archive 37
 check_links 37 2
 
-# Keep the declared archive unchanged while an earlier search directory gains and loses a library.
+# Keep the original archive unchanged while a watched search directory gains and loses a library.
 earlier_native=$(mktemp -d earlier-native.XXXXXX)
 write_build_script native/libanswer.a "$earlier_native"
 export CARGO_TARGET_DIR="$PWD/shadow-target" CARGO_BUILD_BUILD_DIR="$PWD/shadow-build"
