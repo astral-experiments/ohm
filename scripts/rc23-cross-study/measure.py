@@ -56,7 +56,6 @@ def switch(arm):
 
 
 def install(kind):
-    expected_job = P["producer_run"]
     target = P["cases"][kind]["target"]
     meta = json.loads((W / "cross-media.json").read_bytes())
     selected = {
@@ -68,19 +67,24 @@ def install(kind):
     installed = {}
     for arm in ARMS:
         name = "rc23-cross-sdk-" + arm
+        producer = P["producers"][arm]
         details = selected[name]
         assert (
             not details["expired"]
-            and details["workflow_run"]["id"] == expected_job
-            and details["workflow_run"]["head_sha"] == P["producer_head"]
-            and re.fullmatch(r"sha256:[a-f0-9]{64}", details["digest"])
+            and details["workflow_run"]["id"] == producer["run"]
+            and details["workflow_run"]["head_sha"] == producer["head"]
+            and details["id"] == producer["artifact_id"]
+            and details["digest"] == producer["artifact_digest"]
         )
         media = W / "cross-media" / name
         identity = json.loads((media / "source.json").read_bytes())
         assert (
             identity["arm"] == arm
-            and int(identity["run"]) == expected_job
-            and identity["workflow"] == P["producer_head"]
+            and identity["published_coordinator"] == P["published_coordinator"]
+            and identity["published_manifest_sha256"] == P["published_manifest_sha256"]
+            and int(identity["run"]) == producer["run"]
+            and identity["workflow"] == producer["head"]
+            and int(identity["attempt"]) == producer["attempt"]
         )
         pins = {k: v["revision"] for k, v in identity["sources"]["sources"].items()}
         assert pins == dict(P["component_commits"], rust=P["compilers"][arm]["commit"])
@@ -91,6 +95,7 @@ def install(kind):
             assert leaf.parent == Path(".") and re.fullmatch(r"[0-9a-f]{64}", digest)
             assert sha(media / leaf) == digest
             seals[leaf.name] = digest
+        assert seals == producer["payload_sha256"]
         components = ["rust-1.99.0-dev-" + HOST, "rust-std-1.99.0-dev-" + target]
         assert set(seals) == {
             "rust-1.99.0-dev-" + HOST + ".tar.gz",

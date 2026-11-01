@@ -1,6 +1,4 @@
 {
-  "producer_run": 41330060496,
-  "producer_head": "e6ff148b647d3033244eb979eb6384963e351db2",
   "cases": {
     "gnu": {
       "parent": "02c02172ceae316dac14a7657d9c85fa8bb1c3ca",
@@ -49,21 +47,49 @@
   "jobs": 4,
   "pairs": 8,
   "component_commits": {
-    "cargo": "8e82b0d7a1ffc89f8bda2bf7fb76ec292bccf2f8",
+    "cargo": "159be68484a7f8cb05debf82bee89e594b7f19b6",
     "clippy": "5b5d9fb377e21872c83ed1598f9ffee1420c7b39",
     "rustfmt": "4b772602480c276b46cd51d44ae3ac0770ca81f5"
   },
   "compilers": {
     "base": {
-      "commit": "fcea00ca0149ae647cd8eb1b334d2d56f117fb73",
-      "tree": "5891186ee276a072ee6e1b1a26ae5e4b09a1e534"
+      "commit": "f12924d918dbc66898325531940a20aa8cf4f5fc",
+      "tree": "fb561e8f69728f4ee8af0f87470002556f265f41"
     },
     "cross": {
-      "commit": "5af5d465e3d6bfa946c649432e51e199bf05cc16",
-      "tree": "53b8670588a7eace337b7e50887394ada983dc79"
+      "commit": "747400148f28b1787114d81d7fb9f10f8964405d",
+      "tree": "3689d02a27145e05ece713c756f540be806d9d24"
     }
   },
   "cohorts": 2,
   "pairs_per_cohort": 4,
-  "policy": "Each host runs four balanced pairs with independently rebuilt parent states. Compare edit, immediate repeat and their sum. Favor a repeatable wall-time gain on the real workload or independently reproduced material instruction savings with no material wall-time regression. Reject stale products, changed unit rosters across arms or failing negative controls."
+  "policy": "Each host runs four balanced pairs with independently rebuilt parent states. Compare edit, immediate repeat and their sum. Favor a repeatable wall-time gain on the real workload or independently reproduced material instruction savings with no material wall-time regression. Reject stale products, changed unit rosters across arms or failing negative controls.",
+  "producers": {
+    "base": {
+      "run": 41337830413,
+      "head": "6e870712b94b8c70682151fe079d22111d72220f",
+      "artifact_id": 13097074447,
+      "artifact_digest": "sha256:1485b2df7ffa92d2c6212aa6ad5ce5e76ec44b2032f7799823e08d1297cd73c0",
+      "attempt": 1,
+      "payload_sha256": {
+        "rust-1.99.0-dev-x86_64-unknown-linux-gnu.tar.gz": "30d4e3f0f99de6b586a33a62d2762199c55416e10d9f5e98fc597bce598b3ffd",
+        "rust-std-1.99.0-dev-aarch64-unknown-linux-gnu.tar.gz": "0afae031ea730ef6b70a040147a61bc70c9a04b4053582d62317bfc91f67e7c8",
+        "rust-std-1.99.0-dev-x86_64-unknown-linux-musl.tar.gz": "bfbb60eef66b038351e69206015294882a4d4b61bd41b17c12b9d15326d0dde6"
+      }
+    },
+    "cross": {
+      "run": 41338756360,
+      "head": "7568c442ede81e1133261c574e0d3651a636568c",
+      "artifact_id": 13097426948,
+      "artifact_digest": "sha256:e9aa9010c95fa7cb193341afd0ac466586a563559df115d0113b50c755d419a3",
+      "attempt": 1,
+      "payload_sha256": {
+        "rust-1.99.0-dev-x86_64-unknown-linux-gnu.tar.gz": "eabafa6aa834478c688a78699878f4b45b5e8cc4e1c4dc96d554bab3447f915b",
+        "rust-std-1.99.0-dev-aarch64-unknown-linux-gnu.tar.gz": "86d8f1470f033707530a05062b2be398bebdbceaa83bb75eee4745d57dfd3c79",
+        "rust-std-1.99.0-dev-x86_64-unknown-linux-musl.tar.gz": "9158568c12fe2f6c713095344fdd36fdd5f496f121639985495a089f94e256d2"
+      }
+    }
+  },
+  "published_coordinator": "2d8a6fcbfeb99230dff6d7f30448e58fd8e5a98b",
+  "published_manifest_sha256": "634a8b8c22792642adf33766c02c33b7b50eccf6b07e17caa4a180c973f819f6"
 }
