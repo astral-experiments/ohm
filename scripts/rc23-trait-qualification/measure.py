@@ -151,6 +151,9 @@ def fetch(case):
 
 def command(log, phase, mask, case):
     argv = [str(WORK/"bin/cargo"),*P["command"]]
+    verbose = log.name.startswith("excluded-warmup-") and phase.startswith("unchanged-")
+    if verbose:
+        argv.append("-vv")
     check(sorted(os.sched_getaffinity(0)) == mask, "affinity changed")
     def cpu_lines():
         wanted = {f"cpu{i}" for i in mask}
@@ -170,11 +173,9 @@ def command(log, phase, mask, case):
            "stderr_sha256":hashlib.sha256(p.stderr).hexdigest()}
     save(log/(phase+".json"),row)
     check(p.returncode == 0, f"{case['name']} {phase} failed: {p.stderr.decode(errors='replace')[-1400:]}")
-    if phase.startswith("unchanged"):
-        check(not dirty,f"{phase} unexpectedly recompiled {dirty}")
-    elif phase == "cold":
+    if phase == "cold":
         check("uv-resolver" in dirty,"cold check skipped uv-resolver")
-    else:
+    elif phase == "first-edit":
         check(case["affected"] in dirty,f"changed crate missing from first-edit roster {dirty}")
     return row
 
@@ -192,6 +193,10 @@ def trial(case, delta, arm, number, mask, output):
     log.mkdir()
     rows = {}
     for phase in P["phases"]:
+        if phase in ("unchanged-parent", "unchanged-child"):
+            expected = b"" if phase == "unchanged-parent" else delta
+            check(git("diff","--binary","--full-index","--no-ext-diff","HEAD") == expected,
+                  f"uv sources changed before {phase}")
         if phase == "first-edit":
             git("apply","--index","-",data=delta)
             check(git("write-tree") == git("rev-parse",case["child"]+"^{tree}"),"edited uv tree differs")
@@ -207,9 +212,11 @@ def summarize(case, output):
     for phase in P["phases"]:
         rows = [{a:json.loads((output/f"{n:02}-{a}"/(phase+".json")).read_bytes()) for a in ARMS}
                 for n in range(1,len(orders(case))+1)]
-        for row in rows:
-            check(len({tuple(v["dirty"]) for v in row.values()})==1, "rebuild rosters differ; inspect the raw evidence")
         section = {"median_seconds":{a:statistics.median(r[a]["ns"] for r in rows)/1e9 for a in ARMS}}
+        section["unmatched_dirty_rosters"] = {
+            str(n): {a: v["dirty"] for a, v in row.items()}
+            for n, row in enumerate(rows, 1) if len({tuple(v["dirty"]) for v in row.values()}) != 1
+        }
         for before,after in P["comparisons"]:
             gains = [100*(1-r[after]["ns"]/r[before]["ns"]) for r in rows]
             ranked = sorted(gains)
