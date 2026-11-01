@@ -121,6 +121,18 @@ on x86-64, and in `zmij` and `zlib-rs` on AArch64. On Linux, the first uv packag
 after an integration-test edit took 3.30 seconds, down from 9.96 seconds with a matched build of the
 1.99.0-20 compiler. [x86-64 floating point](https://github.com/astral-experiments/ohm-rust/pull/270) · [x86-64 register instructions](https://github.com/astral-experiments/ohm-rust/pull/275) · [AArch64 vector instructions](https://github.com/astral-experiments/ohm-rust/pull/276) · [AArch64 CRC instructions](https://github.com/astral-experiments/ohm-rust/pull/277)
 
+In 1.99.0-22, rustc recognizes the register-only instruction that `objc2` emits on Apple Silicon.
+Cargo also recognizes the older native-link marker that rustc emits for `zmij`. In an Apple Silicon Ruff
+replay, two unchanged binaries each needed a rustc check, but both skipped Xcode’s linker. In an earlier
+Linux comparison, an unchanged ty check took 1.15 s with Cargo #330 and 0.39 s with #328.
+[Compiler change](https://github.com/astral-experiments/ohm-rust/pull/281) · [Cargo reader](https://github.com/astral-experiments/ohm-cargo/pull/330) · [Native qualification](https://github.com/astral-experiments/ohm/actions/runs/41223789368)
+
+When a build script links a static archive, it can declare the archive with `cargo::rerun-if-changed`.
+A custom linker must declare any private files it reads through the build script, too. Cargo can then reuse
+the executable while the recorded link inputs match. On Linux and macOS, two binaries skipped the linker on
+an unchanged build. Replacing their archive relinked both, even with its original timestamp.
+[Cargo change](https://github.com/astral-experiments/ohm-cargo/pull/382) · [Linux linker trace](https://github.com/astral-experiments/ohm/actions/runs/41302557061)
+
 This helps most when an edit to a dependency would otherwise force an expensive executable or test
 binary to recompile.
 
@@ -157,6 +169,9 @@ results from compatible builds of libraries, binaries, and tests after checking 
 build inputs, and saved files are compatible. Ohm also replays cached warnings and keeps earlier
 check results when you build tests, so switching between testing and checking can reuse work from
 both.
+
+In 1.99.0-22, Cargo reruns a check if its saved outputs are incomplete. Previously, after you fixed
+a type error, a successful check could still print the old error. [Cargo #305](https://github.com/astral-experiments/ohm-cargo/pull/305)
 
 For example, suppose you run `cargo +ohm build`, then `cargo +ohm check` in the same workspace. The
 build has already checked and compiled a dependency such as `memchr`. If its inputs still match, Ohm
@@ -452,6 +467,10 @@ from builds last used at least two days ago. Omit `--dry-run` to remove the elig
 active build holds a lock, Cargo skips that part of the cleanup and continues elsewhere. Use `-v`
 to see which lock it encountered.
 
+Since 1.99.0-22, the Linux collector stops at mount boundaries inside target directories and the shared
+cache. This keeps garbage collection from deleting files reached through a bind mount.
+[Shared cache](https://github.com/astral-experiments/ohm-cargo/pull/306) · [Private targets](https://github.com/astral-experiments/ohm-cargo/pull/308)
+
 In a macOS benchmark, we ran the same development tasks with Ohm and stock Rust. Ohm used 40% less
 disk space for Ruff and 35% less for uv.
 
@@ -735,6 +754,16 @@ For incremental builds at optimization levels 0 and 1, Ohm can split large codeg
 smaller stable groups. A later edit may then need to recompile only one group. Splitting can
 increase stored object size and affect runtime performance. Use `-Zohm-cgu-split-limit` to change
 the maximum number of groups, or `-Zohm-split-large-cgus=no` to disable splitting.
+
+On the built-in x86-64 and AArch64 GNU Linux targets, 1.99.0-22 also handles crates that mix
+ordinary Rust code with assembly that may read a file. Rustc recompiles the LLVM units that can
+read the file. When the compiler uses LLVM with LTO off, the other units can keep their object code. In a GNU AArch64 cross-build of `ruff_python_ast`, a source
+edit regenerated two of 95 units. Its first repeat regenerated one. The edit and repeat took
+8.24 s with the -22 compiler changes and Cargo #328, down from 12.23 s with -21 across six matched
+pairs. [Compiler change](https://github.com/astral-experiments/ohm-rust/pull/280) · [Source comparison](https://github.com/astral-experiments/ohm/pull/223)
+
+Rustc also invalidates cached metadata when a private item’s native export name changes. An incremental
+build could previously use the old symbol or panic. [Rust #300](https://github.com/astral-experiments/ohm-rust/pull/300)
 
 Ohm also reuses part of the metadata it has already encoded when its inputs have not changed. This
 includes source-written exported macros when their text and source locations match. Generated macros
