@@ -1,76 +1,67 @@
-name: Reopen the original fifty Ruff Linux linker destinations on release -20 and -21
-on: workflow_dispatch
+name: Trace the original fifty Ruff workspace test products on the optimized GNU RC
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_head:
+        description: Exact reviewed packaging commit
+        required: true
+        type: string
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: packaged-linux-original-50-${{ github.sha }}
+  group: rc22-original-fifty-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   linux-workspace:
-    if: github.ref == 'refs/heads/charlie/qa-release21-linux-native-50'
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-workspace-50-20261101' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 260
     env:
       PYTHONDONTWRITEBYTECODE: '1'
       PYTHONNOUSERSITE: '1'
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Check isolated native capacity, original 50 Wild processes, false linker and malformed ELF controls
+      - name: Enroll a fresh native worker and exercise the source and process controls
         run: |
+          set -euo pipefail
           root="$RUNNER_TEMP/packaged-linux-50"
+          mkdir "$root"
           mkdir -p "$root/receipts/shared"
           df -T -B1 "$root" > "$root/receipts/shared/initial-disk.txt"
           findmnt --target "$root" > "$root/receipts/shared/filesystem.txt"
-          python3 -IB -c 'import shutil,sys; v=shutil.disk_usage(sys.argv[1]).free; print(v); assert v>=65*2**30,"original 65 GiB scratch preflight"' "$root"
+          qa=scripts/packaged-release-workspace
+          sha256sum --quiet -c "$qa/RC22-SHA256SUMS"
+          python3 -IB "$qa/rc22_sdk.py" enroll "$root"
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends strace ninja-build
-          strace -ff -q -s 262144 -e trace=execve,execveat -o "$root/receipts/shared/trace-preflight" /bin/true
+          sudo apt-get install -y --no-install-recommends strace ninja-build b3sum
           strace --version > "$root/receipts/shared/strace-version.txt"
-          python3 -IB scripts/packaged-release-workspace/linux_controls.py
-      - name: Authenticate both actual signed Linux archives and packaged native Wild
+          python3 -IB "$qa/linux_controls.py"
+          python3 -IB "$qa/rc22_controls.py" --native "$root/receipts/shared/trace-control"
+      - name: Install the exact completed optimized GNU job from the original distribution ZIP
         env:
           GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/packaged-release-workspace/rc22_sdk.py install "$RUNNER_TEMP/packaged-linux-50"
+      - name: Verify the Ruff source, complete historical edit and 498 locked registry archives
+        run: python3 -IB scripts/packaged-release-workspace/linux.py seed-22 "$RUNNER_TEMP/packaged-linux-50"
+      - name: Observe the five ordinary workspace visits, separate fingerprint diagnostic and both empty references
+        run: python3 -IB scripts/packaged-release-workspace/linux.py 22 "$RUNNER_TEMP/packaged-linux-50"
+      - name: Reopen physical products, all process families, saved recipes and the linked native verdicts
         run: |
-          root="$RUNNER_TEMP/packaged-linux-50"
-          python3 -IB scripts/packaged-release-workspace/packages.py 20 "$root"
-          python3 -IB scripts/packaged-release-workspace/packages.py 21 "$root"
-      - name: Reproduce the complete original historical Ruff edit and its 498 locked archives
-        run: python3 -IB scripts/packaged-release-workspace/linux.py seed "$RUNNER_TEMP/packaged-linux-50"
-      - name: Replay the exact five-phase 50-target enrollment on -20 and independent empty roots
-        run: |
-          root="$RUNNER_TEMP/packaged-linux-50"
-          python3 -IB scripts/packaged-release-workspace/linux.py 20 "$root"
-          python3 -IB scripts/packaged-release-workspace/linux_reopen.py 20 "$root/receipts" --record
+          python3 -IB scripts/packaged-release-workspace/linux_reopen.py 22 "$RUNNER_TEMP/packaged-linux-50/receipts" --expected-head "$REVIEWED_HEAD" --record
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: published-20-ruff-original-50-linux
-          path: |
-            ${{ runner.temp }}/packaged-linux-50/receipts/shared
-            ${{ runner.temp }}/packaged-linux-50/receipts/20
-            ${{ runner.temp }}/packaged-linux-50/receipts/failure-*.json
+          name: optimized-gnu-rc22-ruff-workspace-original-50
+          path: ${{ runner.temp }}/packaged-linux-50/receipts
+          if-no-files-found: error
           retention-days: 14
-          if-no-files-found: warn
-          compression-level: 1
-      - name: Replay the exact five phases on -21 and independent empty roots
-        run: |
-          root="$RUNNER_TEMP/packaged-linux-50"
-          python3 -IB scripts/packaged-release-workspace/linux.py 21 "$root"
-          python3 -IB scripts/packaged-release-workspace/linux_reopen.py 21 "$root/receipts" --record
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always()
-        with:
-          name: published-21-ruff-original-50-linux
-          path: |
-            ${{ runner.temp }}/packaged-linux-50/receipts/shared
-            ${{ runner.temp }}/packaged-linux-50/receipts/21
-            ${{ runner.temp }}/packaged-linux-50/receipts/failure-*.json
-          retention-days: 14
-          if-no-files-found: warn
           compression-level: 1

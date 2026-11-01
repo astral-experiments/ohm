@@ -1,0 +1,160 @@
+{
+  "artifact": {
+    "digest": "sha256:611ee35ee079032afc2f02b9bb832b11b4bde6d9ee7bb82b7332f7485d5b26ee",
+    "id": 13064288126,
+    "name": "qa-dist-x86_64-unknown-linux-gnu",
+    "size_in_bytes": 356748266,
+    "workflow_run": {
+      "head_branch": "charlie/qa-integrated-native-release-smoke-20261101",
+      "head_repository_id": 1319437234,
+      "head_sha": "8b2c911b32b7cad9442b7ddced987c5a1b0a62e5",
+      "id": 41256793646,
+      "repository_id": 1319437234
+    }
+  },
+  "job": {
+    "conclusion": "success",
+    "head_sha": "8b2c911b32b7cad9442b7ddced987c5a1b0a62e5",
+    "id": 124701560401,
+    "name": "Private optimized dist x86_64-unknown-linux-gnu",
+    "run_attempt": 1,
+    "run_id": 41256793646,
+    "status": "completed",
+    "steps": [
+      {
+        "conclusion": "success",
+        "name": "Set up job"
+      },
+      {
+        "conclusion": "success",
+        "name": "Set up runner"
+      },
+      {
+        "conclusion": "success",
+        "name": "Check out release coordinator"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Make room for macOS profile training"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Verify exact coordinator, inputs and all four source trees"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install pinned LLVM BOLT tools"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Install matching LLVM tools for native PGO"
+      },
+      {
+        "conclusion": "success",
+        "name": "Prepare pinned Wild linker"
+      },
+      {
+        "conclusion": "success",
+        "name": "Build optimized extended Rust distribution"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Capture macOS compiler crash"
+      },
+      {
+        "conclusion": "success",
+        "name": "Write build provenance"
+      },
+      {
+        "conclusion": "success",
+        "name": "Stage versioned distribution assets"
+      },
+      {
+        "conclusion": "success",
+        "name": "Retain distribution artifacts"
+      },
+      {
+        "conclusion": "success",
+        "name": "Keep integrated-source-x86_64-unknown-linux-gnu"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Check out release coordinator"
+      },
+      {
+        "conclusion": "success",
+        "name": "Complete job"
+      }
+    ]
+  },
+  "run": {
+    "conclusion": "failure",
+    "event": "workflow_dispatch",
+    "head_branch": "charlie/qa-integrated-native-release-smoke-20261101",
+    "head_sha": "8b2c911b32b7cad9442b7ddced987c5a1b0a62e5",
+    "id": 41256793646,
+    "path": ".github/workflows/ci.yml",
+    "repository": {
+      "full_name": "astral-experiments/ohm",
+      "id": 1319437234
+    },
+    "run_attempt": 1,
+    "status": "completed"
+  }
+}

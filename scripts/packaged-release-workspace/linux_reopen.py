@@ -2,6 +2,7 @@
 from __future__ import annotations
 import gzip
 import io
+import collections
 import json
 import sys
 import zipfile
@@ -10,6 +11,9 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 from linux_common import *
 from packages import CARGO,RELEASES,need,save
+import rc22_sdk
+import rc22_trace
+import rc22_units
 
 class Corpus:
     def __init__(self,location):
@@ -61,7 +65,7 @@ def behavior(c,where,exe,expected,state):
     return {"e2e_sha256":q["e2e_sha256"],"e2e_list_sha256":q["e2e_list"],"parser_list_sha256":q["parser_list"],
             "two_trivia_consumers":ORACLE["oracles"][state]}
 
-def verify(c,role):
+def verify(c,role,expected_head=None):
     need(c.raw("shared/fifty.json.gz")==(FIX/"fifty.json").read_bytes() and c.raw("shared/source-oracles.json.gz")==(FIX/"source-oracles.json").read_bytes() and
          c.raw("shared/historical.patch.gz")==(FIX/"historical.patch").read_bytes() and
          digest(c.raw("shared/historical.patch.gz"))==ORACLE["patch_sha256"],"different historical source or 50 destinations")
@@ -69,17 +73,29 @@ def verify(c,role):
     need((source["head"],source["tree"],source["historical_commit"],source["lock"],len(source["registry"]))
          ==(RUFF,TREE,HISTORY,LOCK,498) and source["original_archive"]==ENROLL["source_archive_sha256"],"foreign historical source")
     cert=c.json(role+"/custody.json");tools=c.json(role+"/tools.json");installed=c.json(role+"/installed.json")
-    need(cert["source"]["release_id"]==RELEASES[role][0] and cert["archive_sha256"]==RELEASES[role][2]["x86_64-unknown-linux-gnu"][2] and
-         cert["provenance"]["sources"]["rust"]["revision"]==REAL_RUST[role] and cert["provenance"]["sources"]["cargo"]["revision"]==CARGO,"not the published SDK")
+    if role == "22":
+        enrollment = c.json("shared/enrollment.json")
+        rc22_sdk.check_worker(enrollment, expected_head)
+        rc22_sdk.verify_receipt(c)
+        sdk = Path(enrollment["work_root"]) / "sdk-22"
+        driver, = [key for key in installed if key.startswith("lib/librustc_driver-") and key.endswith(".so")]
+        need(tools["physical_driver"]["physical"] == str(sdk / driver) and
+             tools["physical_driver"]["sha256"] == installed[driver], "different installed physical driver")
+    else:
+        need(cert["source"]["release_id"]==RELEASES[role][0] and cert["archive_sha256"]==RELEASES[role][2]["x86_64-unknown-linux-gnu"][2] and
+             cert["provenance"]["sources"]["rust"]["revision"]==REAL_RUST[role] and cert["provenance"]["sources"]["cargo"]["revision"]==CARGO,"not the published SDK")
     for k,r in (("cargo","bin/cargo"),("rustc","bin/rustc"),("wild","lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd")):
         need(tools["tools"][k]["sha256"]==installed[r],"different actual "+k)
     dyn=tools["physical_driver"]
     need(dyn["sha256"] in installed.values() and REAL_RUST[role] in tools["versions"]["rustc"] and
-         CARGO in tools["versions"]["cargo"] and b"calling init:" in c.raw(role+"/driver-loader.log.gz") and
+         (rc22_sdk.CARGO if role == "22" else CARGO) in tools["versions"]["cargo"] and b"calling init:" in c.raw(role+"/driver-loader.log.gz") and
          Path(dyn["physical"]).name.encode() in c.raw(role+"/driver-loader.log.gz"),"wrong actually loaded driver")
     snapshot={};visits={};terminal=c.json(role+"/terminal.json")
     figs=c.json(role+"/own-clean-full-cmp.json")
-    for phase,state in (*STEPS,("clean-original","original"),("clean-reversed","reversed")):
+    phases = (*STEPS,("clean-original","original"),("clean-reversed","reversed"))
+    if role == "22":
+        phases += ((rc22_units.DIAG, "original"),)
+    for phase,state in phases:
         d=f"{role}/native/{phase}";q=c.json(d+"/observed.json")
         a,arts=outputs(c.raw(d+"/cargo.stdout.gz"))
         need(c.json(d+"/exit.json")==0 and c.raw(d+"/cargo.stderr.gz") is not None and q["argv"]==CMD and q["phase"]==phase and q["state"]==state and
@@ -105,13 +121,82 @@ def verify(c,role):
             binds.append(bound)
         reader=behavior(c,d,byexe,arts,state)
         linked=[q["unit"] for q in binds if q["unit"] in SUBJECTS]
-        need(len(set(linked))==len(linked),"multiple real Wild calls for a single original destination")
+        if role != "22":
+            need(len(set(linked))==len(linked),"multiple real Wild calls for a single original destination")
         if phase in ("cold","clean-original","clean-reversed"):
             need(set(linked)==set(SUBJECTS),"an empty build did not natively link all 50 historical destinations")
         visits[phase]={"all_native_counts":by["counts"],"all_physical_wild_pids":binds,"all_physical_rustcs":by["compilers"],
                        "historical_50_linked":sorted(linked),"typed_executables":len(arts),"typed_tests":sum(a["profile"]["test"] for a in arts.values()),
                        "native_readers":reader,"all_50_full_elf_sha256":{k:byexe[k]["sha256"] for k in SUBJECTS}}
+        if role == "22":
+            root = Path(enrollment["work_root"])
+            need(q["cwd"] == str(root / "source") and q["env"]["CARGO_TARGET_DIR"] == str(root / "slot/target") and
+                 q["env"]["CARGO_BUILD_BUILD_DIR"] == str(root / "slot/shared") and q["env"]["RUSTUP_HOME"] == str(root / "rustup-22"),
+                 "foreign executable/source or build/output root")
+            original_cargo_log = q["env"].get("CARGO_LOG")
+            diagnostic = phase == rc22_units.DIAG
+            allowed_env = {"HOME","USER","PATH","CARGO_TARGET_DIR","CARGO_BUILD_BUILD_DIR","CARGO_HOME","RUSTUP_HOME",
+                           "RUSTUP_AUTO_INSTALL","CARGO_BUILD_JOBS","GIT_OPTIONAL_LOCKS","CARGO_NET_OFFLINE",
+                           "CARGO_TERM_COLOR","LANG","LC_ALL","TMPDIR"}
+            need(set(q["env"]) == (allowed_env | ({"CARGO_LOG"} if diagnostic else set())) and
+                 q["env"]["CARGO_HOME"] == str(root / "slot/cargo-home") and q["env"]["HOME"] == str(root / "slot/home") and
+                 q["env"]["CARGO_NET_OFFLINE"]=="true" and q["env"]["CARGO_BUILD_JOBS"]=="8", "changed ordinary environment")
+            need(original_cargo_log == (rc22_units.LOG if diagnostic else None), "fingerprint instrumentation in the wrong visit")
+            need(len(a) == 619 and (not phase.startswith("clean-") and phase != "cold" or not any(t["fresh"] for t in a)),
+                 "wrong regular/independent-empty typed inventory")
+            stream, parents, leader, exits = rc22_trace.read(c.raw(d + "/process.tsv.gz").splitlines())
+            need(stream == lines, "missing or extra physical exec")
+            need(rc22_trace.launch(stream, leader, c.json(d + "/exec-aliases.json"), tools["tools"]) == c.json(d + "/launch.json"),
+                 "wrong packaged Cargo/compilers")
+            tracked = rc22_units.group_by_product(a, arts, stream, by, binds, q["cwd"], exits)
+            need(tracked == c.json(d + "/tracked.json") and rc22_trace.owners(tracked, parents, leader, by["compilers"], exits) == c.json(d + "/owners.json"),
+                 "inconsistent physical product/actor/lineage")
+            if diagnostic:
+                why = rc22_units.log_reasons(c.raw(d + "/cargo.stderr.gz"), rc22_units.entries(a, arts))
+                need(why == c.json(d + "/fingerprint-reasons.json"), "different immediate fingerprint reasons")
+            facts = json.loads(c.raw(d + "/recipes.json.gz"))
+            need(set(facts) == set(tracked), "incomplete physical recipes")
+            def load(key):
+                need(re.fullmatch("[0-9a-f]{64}", key), "foreign blob address")
+                return c.raw("22/recipe-blobs/" + key + ".gz")
+            def check_facts(facts):
+                need(set(facts) == set(tracked), "incomplete physical recipes")
+                matches = {}
+                for k, observed in facts.items():
+                    prod = Path(tracked[k]["product"])
+                    fp = prod.parent.parent / "fingerprint"
+                    need(observed["fingerprint_dir"] == str(fp), "foreign fingerprint directory")
+                    for name, fact in observed["fingerprints"].items():
+                        need(Path(name).name == name and fact["path"] == str(fp / name) and digest(load(fact["sha256"])) == fact["sha256"],
+                             "foreign fingerprint bytes/path")
+                    dep = observed["rustc_depinfo"]
+                    if dep:
+                        expected = prod.with_suffix(".d")
+                        if k == rc22_units.RON:
+                            expected = expected.with_name(expected.name.removeprefix("lib"))
+                        need(dep["path"] == str(expected) and digest(load(dep["sha256"])) == dep["sha256"], "foreign rustc dep-info")
+                    if k != rc22_units.RON:
+                        matches[k] = rc22_units.recipe_matches(str(prod), observed, load)
+                return matches
+            matches = check_facts(facts)
+            before = {}
+            if phase not in ("cold", "clean-original", "clean-reversed"):
+                before = check_facts(json.loads(c.raw(d + "/pre-recipes.json.gz")))
+                need(all(before[k] == "matches-recorded-files" for k, v in tracked.items() if any(c["mode"]=="link-only" and c["exit"]=="0" for c in v["rustc"])),
+                     "real link-only invocation lacked its authenticated prior recipe and native objects")
+            visits[phase].update(typed_units=len(a), typed_dirty=sum(not v["fresh"] for v in a),
+                                 historical_modes=dict(collections.Counter(v["mode"] for k, v in tracked.items() if k in SUBJECTS)),
+                                 products=tracked, pre_visit_recipes=before, post_visit_recipes=matches,
+                                 all_compiler_exits={str(v["pid"]):exits[v["pid"]] for v in by["compilers"]},
+                                 all_wild_exits={str(v["pid"]):exits[v["pid"]] for v in by["wild"]},
+                                 fingerprint_reasons=why if diagnostic else None)
         snapshot[phase]=byexe
+    if role == "22":
+        diagnostic=snapshot[rc22_units.DIAG]
+        visits[rc22_units.DIAG]["same_as_clean_original"] = {
+            k: diagnostic[k]["sha256"] == snapshot["clean-original"][k]["sha256"] for k in SUBJECTS}
+        visits[rc22_units.DIAG]["same_as_preceding_repeat"] = {
+            k: diagnostic[k]["sha256"] == snapshot["final-unchanged"][k]["sha256"] for k in SUBJECTS}
     archive=set();failed=[];all_anchor_hashes={}
     for phase,state in STEPS:
         actual=snapshot[phase];base=snapshot["clean-"+state]
@@ -142,7 +227,10 @@ def verify(c,role):
             "e2e_sha256":e2e,"e2e_clean_expected_to_change":e2e["clean-original"]!=e2e["clean-reversed"],"stages":visits,"clock":False}
 
 if __name__=="__main__":
-    role=sys.argv[1];p=Path(sys.argv[2]);c=Corpus(p);q=verify(c,role)
+    role=sys.argv[1];p=Path(sys.argv[2]);c=Corpus(p)
+    head=sys.argv[sys.argv.index("--expected-head")+1] if "--expected-head" in sys.argv else None
+    need(role != "22" or head is not None, "--expected-head is required for the GNU baseline")
+    q=verify(c,role,head)
     name=role+"/independent-linux-50.json"
     if "--record" in sys.argv:save(p/name,q)
     else:need(q==c.json(name),"hosted/independent Linux readbacks disagree")

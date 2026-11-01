@@ -16,7 +16,10 @@ import tomllib
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from linux_common import *
-from packages import RELEASES,save,sha
+from packages import CARGO,RELEASES,save,sha
+import rc22_sdk
+import rc22_trace
+import rc22_units
 
 def gz(path,body):
     path.parent.mkdir(parents=True,exist_ok=True)
@@ -56,7 +59,7 @@ def replace(repo,state):
         f=repo/p;need((sha(f) if f.is_file() else None)==h[state],"wrong real source bytes "+p)
     need(sha(repo/"Cargo.lock")==LOCK,"Cargo.lock changed")
 
-def seed(root):
+def seed(root, role="20"):
     room(root,65)
     repo=root/"source";subprocess.run(["git","init","-q",repo],check=True)
     for depth,rev in ((1,RUFF),(2,HISTORY)):
@@ -66,7 +69,7 @@ def seed(root):
     need(git(repo,"rev-parse","HEAD^{tree}").decode().strip()==TREE and patch==(FIX/"historical.patch").read_bytes() and
          digest(patch)==ORACLE["patch_sha256"] and sha(repo/"Cargo.lock")==LOCK,"public Git fixture differs from the frozen original")
     replace(repo,"reversed");replace(repo,"original")
-    donor=root/"donor";env=environment(root,"20",donor);env.pop("CARGO_NET_OFFLINE")
+    donor=root/"donor";env=environment(root,role,donor);env.pop("CARGO_NET_OFFLINE")
     subprocess.run(["cargo","+ohm","fetch","--locked"],cwd=repo,env=env,check=True,timeout=1200)
     reg=donor/"cargo-home"/"registry"
     locks={v["name"]+"-"+v["version"]+".crate":v["checksum"] for v in tomllib.loads((repo/"Cargo.lock").read_text())["package"] if "checksum" in v}
@@ -91,11 +94,12 @@ def tools(root,role,env):
     sdk=root/("sdk-"+role);dist=json.loads((root/"receipts"/role/"installed.json").read_bytes())
     p={"cargo":sdk/"bin/cargo","rustc":sdk/"bin/rustc","wild":sdk/"lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd",
        "system_ld":Path("/usr/bin/ld.bfd")}
+    if role == "22": p["rustup"] = Path(shutil.which("rustup"))
     out={k:fx(v) for k,v in p.items()};loaded={}
     for k in ("rustc","cargo","wild"):need(out[k]["sha256"]==dist[str(p[k].relative_to(sdk))],"different installed "+k)
     for k,cmd in (("rustc",["rustc","+ohm","-vV"]),("cargo",["cargo","+ohm","-Vv"]),("sysroot",["rustc","+ohm","--print","sysroot"])):
         loaded[k]=command(cmd,env=env,text=True).strip()
-    need(REAL_RUST[role] in loaded["rustc"] and "2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c" in loaded["cargo"] and
+    need(REAL_RUST[role] in loaded["rustc"] and (rc22_sdk.CARGO if role == "22" else CARGO) in loaded["cargo"] and
          Path(loaded["sysroot"]).samefile(sdk),"wrong actually invoked package")
     lib,=(sdk/"lib").glob("librustc_driver*.so");rec=root/"receipts"/role
     obj=rec/"driver-proof.o";proc=subprocess.run(["rustc","+ohm","--crate-name","qa_native_owner","--crate-type=lib","--emit=obj","-o",obj,"-"],
@@ -194,12 +198,17 @@ def behaviors(repo,out,env,arts,returned,state):
     save(out/"behavior.json",{"libraries":check,"parser_case":choices[0],"parser_list":digest(listing),"e2e_case":RUN_CASE,
                              "e2e_list":digest(cases),"e2e_sha256":sha(e)})
 
-def visit(root,role,slot,repo,out,phase,state,env,tool,vault):
+def visit(root,role,slot,repo,out,phase,state,env,tool,vault,previous=None):
     room(root,65);out.mkdir(parents=True)
+    if previous is not None:
+        previous_products = json.loads((previous / "tracked.json").read_bytes())
+        before = rc22_units.facts(out, previous_products)
+        gz(out / "pre-recipes.json.gz", json.dumps(before, sort_keys=True).encode())
     with tempfile.TemporaryDirectory(dir=slot/"tmp") as t:
         temp=Path(t);trace=temp/"events";trace.mkdir()
         with (temp/"stdout").open("xb") as stdout,(temp/"stderr").open("xb") as stderr:
-            proc=subprocess.Popen(["strace","-ff","-q","-s","262144","-e","trace=execve,execveat","-o",str(trace/"exec"),*CMD],
+            flags = rc22_trace.FLAGS if role == "22" else ["-ff","-q","-s","262144","-e","trace=execve,execveat"]
+            proc=subprocess.Popen(["strace",*flags,"-o",str(trace/"exec"),*CMD],
                                   env=env,cwd=repo,stdout=stdout,stderr=stderr,start_new_session=True)
             try:
                 while proc.poll() is None:
@@ -208,19 +217,32 @@ def visit(root,role,slot,repo,out,phase,state,env,tool,vault):
                     except subprocess.TimeoutExpired:pass
             except BaseException:
                 if proc.poll() is None:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
+                if role == "22":
+                    stdout.flush(); stderr.flush()
+                    gz(out/"cargo.stdout.gz", (temp/"stdout").read_bytes())
+                    gz(out/"cargo.stderr.gz", (temp/"stderr").read_bytes())
+                    save(out/"exit.json", proc.returncode)
+                    rc22_trace.retain(trace, out/"process.tsv.gz")
                 raise
         stream=(temp/"stdout").read_bytes();err=(temp/"stderr").read_bytes()
         gz(out/"cargo.stdout.gz",stream);gz(out/"cargo.stderr.gz",err);save(out/"exit.json",proc.returncode)
         lines=[]; aliases={}
-        for tracefile in sorted(trace.glob("exec.*")):
-            pid=int(tracefile.suffix[1:])
-            for line in tracefile.read_bytes().splitlines():
-                if line.startswith(b"execveat(") and line.endswith(b"= 0"):raise RuntimeError("successful execveat requires separate enrollment")
-                if not line.startswith(b"execve(") or not line.endswith(b"= 0"):continue
-                literal,args=event(line)
-                if Path(literal).name in RELEVANT:
-                    if literal not in aliases:aliases[literal]=fx(Path(literal))
-                    lines.append([pid,line.decode()])
+        if role == "22":
+            raw_process = out / "process.tsv.gz"
+            rc22_trace.retain(trace, raw_process)
+            with gzip.open(raw_process, "rb") as stored:
+                lines, parents, leader, exits = rc22_trace.read(stored)
+            aliases = {p: fx(Path(p)) for p in {event(line.encode())[0] for _, line in lines}}
+        else:
+            for tracefile in sorted(trace.glob("exec.*")):
+                pid=int(tracefile.suffix[1:])
+                for line in tracefile.read_bytes().splitlines():
+                    if line.startswith(b"execveat(") and line.endswith(b"= 0"):raise RuntimeError("successful execveat requires separate enrollment")
+                    if not line.startswith(b"execve(") or not line.endswith(b"= 0"):continue
+                    literal,args=event(line)
+                    if Path(literal).name in RELEVANT:
+                        if literal not in aliases:aliases[literal]=fx(Path(literal))
+                        lines.append([pid,line.decode()])
         gz(out/"kernel.json.gz",json.dumps(lines,separators=(",",":")).encode());save(out/"exec-aliases.json",aliases)
     need(proc.returncode==0,"real Cargo failed: "+err[-900:].decode(errors="replace"))
     arts,returned=outputs(stream);actual=native(lines,tool,aliases)
@@ -253,7 +275,18 @@ def visit(root,role,slot,repo,out,phase,state,env,tool,vault):
                  "unmapped output with the name of a historical ELF: "+str(p))
         bind.append({**row,"unit":u,"dev_ino":inode(p) if p.is_file() else None})
     save(out/"observed.json",{"phase":phase,"state":state,"argv":CMD,"env":env,"source":{p:(sha(repo/p) if (repo/p).is_file() else None) for p in ORACLE["source"]},
+                             **({"cwd": str(repo)} if role == "22" else {}),
                              "actual":actual,"bound_wild":bind,"outputs":physical,"available":room(root,60)})
+    if role == "22":
+        need(len(arts) == 619, "different complete typed workspace")
+        save(out / "launch.json", rc22_trace.launch(lines, leader, aliases, tool))
+        tracked = rc22_units.group_by_product(arts, returned, lines, actual, bind, repo, exits)
+        facts = rc22_units.facts(out, tracked)
+        save(out / "tracked.json", tracked)
+        save(out / "owners.json", rc22_trace.owners(tracked, parents, leader, actual["compilers"], exits))
+        gz(out / "recipes.json.gz", json.dumps(facts, sort_keys=True).encode())
+        if phase == rc22_units.DIAG:
+            save(out / "fingerprint-reasons.json", rc22_units.log_reasons(err, rc22_units.entries(arts, returned)))
     behaviors(repo,out,env,arts,returned,state)
     print(role,phase,"native counts",actual["counts"],"historical links",sum(x["unit"] in SUBJECTS for x in bind),flush=True)
     return physical
@@ -283,10 +316,17 @@ def run(root,role):
         slot,env=fresh(root,role)
         if seq=="visit":tool=tools(root,role,env)
         prev=None
+        previous_dir=None
         for phase,state in steps:
             if state!=prev:replace(repo,state)
             prev=state
-            sources[phase]=visit(root,role,slot,repo,out/"native"/phase,phase,state,env,tool,vault)
+            phase_dir = out/"native"/phase
+            sources[phase]=visit(root,role,slot,repo,phase_dir,phase,state,env,tool,vault,previous_dir)
+            if role == "22": previous_dir = phase_dir
+        if role == "22" and seq == "visit":
+            diagnostic = rc22_units.DIAG
+            visit(root, role, slot, repo, out/"native"/diagnostic, diagnostic, "original",
+                  env | {"CARGO_LOG": rc22_units.LOG}, tool, vault, previous_dir)
         retire(root,role,slot)
     replace(repo,"original")
     pairs={};preserve=set()
@@ -316,8 +356,8 @@ if __name__=="__main__":
     action=sys.argv[1];root=Path(sys.argv[2]).resolve(strict=True)
     need(root.name=="packaged-linux-50" and root.parent==Path(os.environ["RUNNER_TEMP"]).resolve(strict=True),"foreign developer root")
     try:
-        if action=="seed":seed(root)
-        else:need(action in ("20","21"),"unknown release");run(root,action)
+        if action in ("seed", "seed-22"):seed(root, "22" if action == "seed-22" else "20")
+        else:need(action in ("20","21","22"),"unknown release");run(root,action)
     except Exception as exc:
         import traceback
         save(root/"receipts"/("failure-"+action+".json"),{"type":type(exc).__name__,"message":str(exc),"traceback":traceback.format_exc()})
