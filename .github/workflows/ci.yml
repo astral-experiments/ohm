@@ -53,8 +53,17 @@ jobs:
           repository: astral-sh/uv
           ref: 5d4a62d7461c7708f3e65d08cef0e99bad94c004
           path: uv-source
-          fetch-depth: 2
+          # The real edit is sixteen linear commits after the last release tag.
+          fetch-depth: 17
+          fetch-tags: false
           persist-credentials: false
+      - name: Admit the actual historical uv tag used by its build script
+        env:
+          GIT_TERMINAL_PROMPT: '0'
+        run: |
+          set -euo pipefail
+          git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.2:refs/tags/0.12.2
+          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py history uv-source | tee trait-results/source-git-history.json
       - name: Admit the signed release and final production distribution with the original verifier
         env:
           GH_TOKEN: ${{ github.token }}

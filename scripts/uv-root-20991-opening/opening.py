@@ -214,6 +214,27 @@ def code_state(source, core, rev, binary):
     return receipt
 
 
+def git_history(path):
+    expected = CFG["uv_git_history"]
+    def git(*args):
+        return subprocess.check_output(["git", "-C", path, *args], env=ENV)
+    tag = expected["tag_ref"]
+    tag_commit = git("rev-parse", "--verify", tag).decode().strip()
+    assert git("cat-file", "-t", tag).strip() == b"commit"
+    blobs = git("rev-parse", B + ":crates/uv-cli/build.rs", C + ":crates/uv-cli/build.rs").decode().splitlines()
+    assert len(blobs) == 2 and blobs[0] == blobs[1]
+    chain = git("rev-list", "--parents", "--topo-order", tag + ".." + C)
+    lines = chain.decode().splitlines()
+    assert len(lines) == 16 and lines[0].split() == [C, B] and lines[-1].split()[1] == tag_commit
+    assert all(len(x.split()) == 2 for x in lines)
+    info = {"tag_ref": tag, "tag_commit": tag_commit, "build_rs_blob": blobs[0],
+            "linear_range_sha256": hashlib.sha256(chain).hexdigest(),
+            "git_describe_lines": {rev: git("log", "-1", "--date=short", "--abbrev=9",
+                "--format=%H %h %cd %(describe:tags)", rev).decode().strip() for rev in (B, C)}}
+    assert info == expected, ("historical uv release tag or build-script Git input changed", info)
+    return info
+
+
 def checkout(src, source, core, delta=None):
     assert not SRC.exists()
     subprocess.run(
@@ -223,6 +244,7 @@ def checkout(src, source, core, delta=None):
         stdout=subprocess.DEVNULL,
     )
     core.git(ENV, "checkout", "-q", "--detach", B)
+    git_history(SRC)
     assert core.git(ENV, "rev-parse", C + "^").decode().strip() == B
     assert [core.git(ENV, "rev-parse", r + "^{tree}").decode().strip() for r in (B, C)] == [
         CASE["B_tree"],
@@ -346,12 +368,24 @@ def product(path, shape, o):
     )
 
 
+def complete_inputs(rows):
+    def canonical(v):
+        return json.dumps(v, sort_keys=True, separators=(",", ":")).encode()
+    facts = {}
+    for label, reason in (("compiler_artifact", "compiler-artifact"), ("build_script", "build-script-executed")):
+        selected = sorted((r for r in rows if r["reason"] == reason), key=canonical)
+        facts[label + "_count"] = len(selected)
+        facts[label + "_sha256"] = hashlib.sha256(canonical(selected)).hexdigest()
+    return facts
+
+
 def journal(path, raw):
     rows, owners = native.events(raw)
     with gzip.open(path / "edited-cargo.jsonl.gz", "xb", compresslevel=2) as z:
         for r in rows:
             z.write((json.dumps(r, separators=(",", ":")) + "\n").encode())
     save(path / "build-output-owners.json", owners)
+    save(path / "complete-inputs.json", complete_inputs(rows))
     return [r for r in rows if r["reason"] == "compiler-artifact"]
 
 
@@ -375,15 +409,19 @@ def role(role, signed, sub, src, reg, srcmod, core, o, ref, out):
     so, se = command(bshape, [*PLAIN, "--timings", "--message-format=json-render-diagnostics"])
     rows = journal(bshape, so)
     shape = o.s.inputs(rows)
-    assert o.s.canon(shape[0]) and hashlib.sha256(o.s.canon(shape[0])).hexdigest() == ref["shape"]
-    assert (
-        sorted(native.identity(r) for r in rows if not r["fresh"]) == sorted(CFG["background_keys"])
-        and native.package_lines(se) == ref["progress"]
-    )
+    criteria = {
+        "all_input_fields": read(bshape / "complete-inputs.json") == CFG["complete_cargo_inputs"],
+        "unit_target_feature_roster": hashlib.sha256(o.s.canon(shape[0])).hexdigest() == ref["shape"],
+        "recurring_artifacts": sorted(native.identity(r) for r in rows if not r["fresh"]) == sorted(CFG["background_keys"]),
+        "typed_progress": native.package_lines(se) == ref["progress"],
+    }
     packlogs(bshape)
     b2 = here / "B-unchanged-ordinary"
     so, se = command(b2, PLAIN)
-    assert not so and native.package_lines(se) == ref["progress"]
+    criteria["ordinary_progress"] = not so and native.package_lines(se) == ref["progress"]
+    refused_parent = not all(criteria.values())
+    if refused_parent:
+        save(here / "parent-input-refusal.json", {"criteria": criteria, "score": False, "eligible": False})
     packlogs(b2)
     assert code_state(srcmod, core, B, b"")
     frozen = ROOT / "frozen-B"
@@ -412,6 +450,25 @@ def role(role, signed, sub, src, reg, srcmod, core, o, ref, out):
         assert code_state(srcmod, core, B, b"")
         return apply(srcmod, core, delta)
 
+    if refused_parent:
+        # Preserve the actual C observations from this ineligible B before stopping.
+        # Each visit starts at the same independently-built B. Neither can clear its veto.
+        for label, args in (("ordinary", PLAIN), ("diagnostic", DIAG)):
+            dest = here / ("quarantined-C-" + label)
+            try:
+                state = restore()
+                so, se = command(dest, args)
+                obs = {"argv": args, "progress": native.package_lines(se), "eligible": False, "score": False}
+                if label == "diagnostic":
+                    journal(dest, so)
+                    obs["actual_rustc_argv"] = native.commands(se.decode(), RUSTC)
+                assert capture() == state
+                save(dest / "observation.json", obs)
+                packlogs(dest)
+            except (AssertionError, ValueError, OSError, subprocess.SubprocessError):
+                save(here / ("quarantined-C-" + label + "-error.json"), {"error": traceback.format_exc(), "score": False})
+        raise ValueError(("ineligible independent B; C evidence is diagnostic only", criteria))
+
     def plain(path, starting, cold=False):
         so, se = command(path, PLAIN)
         assert not so
@@ -430,6 +487,8 @@ def role(role, signed, sub, src, reg, srcmod, core, o, ref, out):
     state = restore()
     so, se = command(p, DIAG)
     rows = journal(p, so)
+    if read(p / "complete-inputs.json") != CFG["complete_cargo_inputs"]:
+        save(here / "C-input-refusal.json", {"actual": read(p / "complete-inputs.json"), "eligible": False, "score": False})
     assert o.s.inputs(rows) == shape
     calls = native.commands(se.decode(), RUSTC)
     save(p / "all-rustc-argv.json", calls)
@@ -498,6 +557,7 @@ def role(role, signed, sub, src, reg, srcmod, core, o, ref, out):
         o.p.plain(o.arm, ordinary, shape), o.p.plain(o.arm, here / "C-independent-cold", shape)
     )
     save(here / "warm-cold-differences.json", partial)
+    assert not (here / "C-input-refusal.json").exists(), "actual C Cargo input fields changed; independent checks retained"
     result = o.audit(here, ref, CASE)
     save(here / "native-audit.json", result)
     actor = CFG["sdk"][role]
@@ -527,11 +587,21 @@ def verify_archive(p):
 def audit(out, o, ref):
     assert read(out / "host.json")["score"] is False and len(read(out / "host.json")["cpus"]) == 8
     assert read(out / "registry.json") == CFG["registry"]
+    assert read(out / "source-git-history.json") == CFG["uv_git_history"] == read(out / "compiler-checkout-git-history.json")
     scoped.replay(out / "scoped-control")
     assert read(out / "trace-negative-controls.json") == scoped.mutations(out / "scoped-control")
     answers = {}
     for role in CFG["role_order"]:
         directory = out / role
+        assert not (directory / "parent-input-refusal.json").exists() and not (directory / "C-input-refusal.json").exists()
+        for visit in ("B-unchanged-typed", "C-from-independent-B-diagnostic"):
+            pv = directory / visit
+            with gzip.open(pv / "cargo.stdout.gz") as f:
+                parsed, owners = native.events(f.read())
+            with gzip.open(pv / "edited-cargo.jsonl.gz") as f:
+                assert parsed == [json.loads(line) for line in f]
+            assert owners == read(pv / "build-output-owners.json")
+            assert complete_inputs(parsed) == read(pv / "complete-inputs.json") == CFG["complete_cargo_inputs"]
         assert sha(out / f"installed-{role}-components.json") == CFG["sdk"][role]["inventory_sha256"]
         receipt = read(out / f"active-{role}.json")
         assert (
@@ -603,6 +673,7 @@ def run():
     CARGO_HOME.mkdir()
     activate(installed["signed"], installed["signed"], out, "signed")
     delta = checkout(src, source, core)
+    save(out / "compiler-checkout-git-history.json", git_history(SRC))
     (out / "B-C.patch").write_bytes(delta)
     fetch = ["/tmp/uv-workflow-search/sdk/bin/cargo", "fetch", "--locked"]
     before = code_state(source, core, B, b"")
@@ -672,7 +743,9 @@ def verify_output(path):
 
 if __name__ == "__main__":
     assert __debug__
-    if sys.argv[1:] == ["early"]:
+    if len(sys.argv) == 3 and sys.argv[1] == "history":
+        print(json.dumps(git_history(Path(sys.argv[2])), sort_keys=True, indent=2))
+    elif sys.argv[1:] == ["early"]:
         early()
     elif sys.argv[1:] == ["intake"]:
         w = sdk.workspace()
