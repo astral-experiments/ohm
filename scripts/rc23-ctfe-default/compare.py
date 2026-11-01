@@ -315,6 +315,47 @@ for arm in order:
         rows[phase] = build(phase, arm, env, top)
     clean = rows["clean-edited"]["output"]
     assert all(rows[k]["output"] == clean for k in ("comment", "unchanged", "repair"))
-    assert not rows["unchanged"]["dirty"] and not rows["unchanged"]["rustc_commands"]
     save(top / "summary.json", rows)
-save(data / "complete.json", {"cohort": nonce, "phases": 8, "arms": 2})
+
+# The archived parent and candidate both predate the fix for a missing native-link marker.
+# Record both arms before applying gates so a control failure cannot erase the paired evidence.
+legacy = {}
+for arm in order:
+    top = data / arm / "unchanged"
+    row = json.loads((top / "receipt.json").read_bytes())
+    dirty = row["dirty"]
+    reasons = [
+        line.strip()
+        for line in (top / "stderr.log").read_text().splitlines()
+        if "Dirty " in line
+    ]
+    skipped = not dirty and not row["rustc_commands"]
+    same_marker = (
+        row["rustc_commands"] == row["codegen_commands"] == 1
+        and len(dirty) == len(reasons) == 1
+        and dirty[0][1:] == ["ruff", ["bin"]]
+        and dirty[0][0].endswith("/crates/ruff#0.16.7")
+        and "Dirty ruff v0.16.7" in reasons[0]
+        and reasons[0].endswith(
+            "the file `/dev/null/ohm-recheck-dependent-links` is missing"
+        )
+    )
+    legacy[arm] = {
+        "skipped": skipped,
+        "historical_marker": same_marker,
+        "dirty": dirty,
+        "reasons": reasons,
+    }
+save(data / "unchanged-gates.json", legacy)
+assert all(x["skipped"] for x in legacy.values()) or all(
+    x["historical_marker"] for x in legacy.values()
+)
+save(
+    data / "complete.json",
+    {
+        "cohort": nonce,
+        "phases": 8,
+        "arms": 2,
+        "relative_only": any(x["historical_marker"] for x in legacy.values()),
+    },
+)

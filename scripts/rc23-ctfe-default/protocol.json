@@ -1,9 +1,18 @@
 {
   "question": "Does Rust #318 pay for itself with a single retained incremental session on a real Ruff branch return?",
-  "arms": {"E": "393b4b05a4bfa3f531a36023846f86236a6b71a9", "C": "df2c077a113a709ab379c8ec34e62c94c7513325"},
+  "arms": {
+    "E": "393b4b05a4bfa3f531a36023846f86236a6b71a9",
+    "C": "df2c077a113a709ab379c8ec34e62c94c7513325"
+  },
   "cargo": "761ea115605c34f11a1cd29afd68812c1e1359dd",
   "baseline": "The authenticated compiler pair from the source PR, with its sole explicit branch-cache flag removed from both arms. This is a screening study on their common Cargo and Rust base. A material win still requires a port onto the release pin.",
   "allocation": "Four independent Ubuntu jobs at the same runner size. Each uses four physical-scheduler CPUs and both arms at the same canonical SDK, checkout, target, and build paths. Arm order alternates E-C, C-E, E-C, C-E.",
   "workload": "Full locked offline historical Ruff CLI build. Time Y-B, X-A, fast-forward X-B, private AST comment after Y return, unchanged, invalid parser edit, and repaired edit. Retain an independent empty build of the repaired source at the same path. All inputs, returned statuses, timing and process CPU, compiler commands, per-CPU intervals, and compiler-artifact events survive.",
-  "interpretation": "Primary are paired comment wall time and compiler work, alongside cumulative post-cold time on the entire edit history. Check the invalid-and-repair pair, unedited repeat, and cold controls separately. A single post-switch win cannot offset a nonrepeatable or regressed total. Require no incorrect freshness, expected native Ruff behavior and warm/empty binary equality on each arm. A missing or failed condition produces no release recommendation. Record all refusals."
+  "interpretation": "Primary are paired comment wall time and compiler work, alongside cumulative post-cold time on the entire edit history. Check the invalid-and-repair pair, unedited repeat, and cold controls separately. A single post-switch win cannot offset a nonrepeatable or regressed total. Require no incorrect freshness, expected native Ruff behavior and warm/empty binary equality on each arm. A missing or failed condition produces no release recommendation. Record all refusals.",
+  "unchanged_control": {
+    "reason": "Both archived compiler kits invoked rustc once for the unchanged Ruff binary because their Cargo looked for the same missing native-link marker. All warm outputs matched their independent empty builds.",
+    "strict_release_gate": "A release candidate must skip unchanged links. This study records whether that gate passed in each archived subject.",
+    "relative_qualification": "Compare all eight phases on each of four same-host pairs with ordinary cache retention. A result is usable for prioritization if both archived compilers skip the unchanged command or both invoke exactly one rustc for the same Ruff binary and the same missing marker. Reject different reasons, extra work, invalid diagnostics or divergent output. If worthwhile, require a separate current-pin check before release.",
+    "original_run": 41333032132
+  }
 }
