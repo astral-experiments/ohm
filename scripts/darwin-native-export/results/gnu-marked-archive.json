@@ -10,9 +10,285 @@
     "error": "Expected 0 linker calls for two executables returning 17, observed 2",
     "exit": 1
   },
+  "first_22": {
+    "artifact_id": 13057710231,
+    "artifact_sha256": "bb270473af5d365049ce2ca2e02eba9c628722510cd4c758e684ca256dffede9",
+    "cargo": "8269d772aa1ef02e5efaa331dfb40eb55d71f719",
+    "higher_priority": {
+      "cold": {
+        "cargo_exit": 0,
+        "values": [
+          17,
+          17
+        ],
+        "wrapper_calls": 3
+      },
+      "declared-edit": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 2
+      },
+      "empty-higher-priority": {
+        "cargo_exit": 0,
+        "values": [
+          83,
+          83
+        ],
+        "wrapper_calls": 3
+      },
+      "empty-malformed": {
+        "cargo_exit": 101,
+        "values": [],
+        "wrapper_calls": 3
+      },
+      "empty-removed": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 3
+      },
+      "higher-priority": {
+        "cargo_exit": 0,
+        "values": [
+          83,
+          83
+        ],
+        "wrapper_calls": 2
+      },
+      "malformed-higher-priority": {
+        "cargo_exit": 101,
+        "values": [],
+        "wrapper_calls": 2
+      },
+      "removed": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 2
+      },
+      "settled": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 2
+      },
+      "unchanged": {
+        "cargo_exit": 0,
+        "values": [
+          17,
+          17
+        ],
+        "wrapper_calls": 2
+      }
+    },
+    "marked_configured_unchanged_edit_settled": [
+      2,
+      2,
+      2
+    ],
+    "release_run": 41237680370,
+    "rust": "556a8364f1485a03be31b1a50c250d63198a943d",
+    "sdk": {
+      "bin/cargo": "df35740ab292c3654e0dac2728c3814e4c4c033c266adc4f5ef4f78856320229",
+      "bin/rustc": "f5af460932d42f5d91578f0ec17a6c27e721892b46c4901e85bcfe30a0b9bde1"
+    }
+  },
   "host": "x86_64-unknown-linux-gnu",
   "original_smoke_commit": "933ca489d20ba0c856d6762fd115a3fad78ff0f8",
   "original_smoke_sha256": "e57b87041abe1f91c78c29bb26e276e7ccd41e8f33a360aec616fb260d7ec175",
+  "published_21": {
+    "archive_sha256": "6f550de85f95440a61b5bd1a9d2ab0528d4fcaf674fdc008f5e986d2138be6c4",
+    "cargo": "2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c",
+    "default_wild_outputs": {
+      "cold": [
+        "build_script_build",
+        "first",
+        "second"
+      ],
+      "declared-edit": [
+        "first",
+        "second"
+      ],
+      "settled": [],
+      "unchanged": []
+    },
+    "exact_release_smoke": {
+      "case": "undeclared archive, same inode, size and mtime",
+      "error": "first: expected 29, got 17",
+      "exit": 1
+    },
+    "higher_priority": {
+      "cold": {
+        "cargo_exit": 0,
+        "values": [
+          17,
+          17
+        ],
+        "wrapper_calls": 3
+      },
+      "declared-edit": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 2
+      },
+      "empty-higher-priority": {
+        "cargo_exit": 0,
+        "values": [
+          83,
+          83
+        ],
+        "wrapper_calls": 3
+      },
+      "empty-malformed": {
+        "cargo_exit": 101,
+        "values": [],
+        "wrapper_calls": 3
+      },
+      "empty-removed": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 3
+      },
+      "higher-priority": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 0
+      },
+      "malformed-higher-priority": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 0
+      },
+      "removed": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 0
+      },
+      "settled": {
+        "cargo_exit": 0,
+        "values": [
+          29,
+          29
+        ],
+        "wrapper_calls": 0
+      },
+      "unchanged": {
+        "cargo_exit": 0,
+        "values": [
+          17,
+          17
+        ],
+        "wrapper_calls": 0
+      }
+    },
+    "host_files_matched": 68,
+    "marked_configured_unchanged_edit_settled": [
+      0,
+      2,
+      0
+    ],
+    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.99.0-21",
+    "rust": "c79998a5cd143c445a4b2528f20953b176a65c5d",
+    "sdk": {
+      "bin/cargo": "4695ab8e260ba4d6363e42b785c8f410dd79d9255f0313dab6c19e978878f43e",
+      "bin/rustc": "f7663fb7dec7e5c7ea613a85ff1d6e4c00bf97b8c50534f17e5c95cd599712b9"
+    }
+  },
+  "second_host_default_gnu": {
+    "artifact": 13065394809,
+    "artifact_sha256": "31e00f91daf5601ee64da3064ef60efd96fab042b79b906b7205849722de54cb",
+    "phases": {
+      "changed": {
+        "actual_links": [
+          [
+            "46713",
+            "first"
+          ],
+          [
+            "46714",
+            "second"
+          ]
+        ],
+        "values": [
+          "29",
+          "29"
+        ]
+      },
+      "initial": {
+        "actual_links": [
+          [
+            "46601",
+            "second"
+          ],
+          [
+            "46604",
+            "first"
+          ]
+        ],
+        "values": [
+          "17",
+          "17"
+        ]
+      },
+      "unchanged": {
+        "actual_links": [
+          [
+            "46645",
+            "second"
+          ],
+          [
+            "46646",
+            "first"
+          ]
+        ],
+        "values": [
+          "17",
+          "17"
+        ]
+      },
+      "unchanged-again": {
+        "actual_links": [
+          [
+            "46757",
+            "first"
+          ],
+          [
+            "46758",
+            "second"
+          ]
+        ],
+        "values": [
+          "29",
+          "29"
+        ]
+      }
+    },
+    "run": 41262892023
+  },
   "variants": {
     "configured": {
       "counting_wrapper_sha256": "633683782a376f61455ce4d5d7665c32d62d8c55f5aca82934c39e4a14e26c53",
