@@ -454,6 +454,17 @@ run_case unsafe-prefix failure
 unset OHM_TEST_INSTALL_DIR
 assert_no_links unsafe-prefix
 
+OHM_TEST_INSTALL_DIR="$temporary_directory/cases/multiline-dot-component/"$'line\n..'"/toolchain"
+run_case multiline-dot-component success
+unset OHM_TEST_INSTALL_DIR
+
+for component in . ..; do
+  OHM_TEST_INSTALL_DIR="$temporary_directory/cases/relative-component/$component"
+  run_case relative-component failure
+  assert_contains "$output" 'OHM_INSTALL_DIR must not contain relative path components'
+done
+unset OHM_TEST_INSTALL_DIR
+
 for unsafe_url in http://example.invalid file://example.invalid/archive ftp://example.invalid; do
   OHM_TEST_DOWNLOAD_URL=$unsafe_url
   run_case unsafe-download-url failure
