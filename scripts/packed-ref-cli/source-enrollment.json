@@ -1,0 +1,88 @@
+{
+  "artifacts": {
+    "packed-ref-sdk-and-resources": {
+      "digest": "sha256:299a1a62c8b6c9f0ef25bcb2652d53fd7e096468bb77318b7513c3c8a3929141",
+      "id": 13090871420,
+      "size_in_bytes": 29971
+    },
+    "packed-ref-source-and-driver": {
+      "digest": "sha256:58eb946847b0b02501c9170b45ce7ae8df04aded731ca687ad48630acff1fd7b",
+      "id": 13089869195,
+      "size_in_bytes": 39177904
+    }
+  },
+  "head": "f93028872101f65e1c748217ac20ddb73a49bab1",
+  "job": 124898828506,
+  "run": 41323607555,
+  "source": {
+    "bootstrap": [
+      "./x",
+      "--ci",
+      "false",
+      "--set",
+      "build.submodules=false",
+      "--set",
+      "rust.omit-git-hash=true",
+      "--set",
+      "rust.debug-assertions=false",
+      "--set",
+      "rust.lto=off",
+      "--set",
+      "llvm.download-ci-llvm=true",
+      "build",
+      "--stage",
+      "1",
+      "-j8",
+      "--host",
+      "x86_64-unknown-linux-gnu",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "compiler/rustc",
+      "library",
+      "src/tools/rustdoc"
+    ],
+    "cargo": "035e681081683f4141e4c544b8cf9492b73784051e4541c12bb3cbdb73a798a4",
+    "drivers": [
+      "f724a33d4d865ac4f3fc235b322a638d6f6534f669e5b1659adabcd04a2221d7",
+      "958e60deef3715e21efb968d38c4ef268bc5b58ab0a4e33810b996ff0c4d271c"
+    ],
+    "fanotify_boot": "738e7ab8-1747-4076-a01d-f7d7d1aff999",
+    "llvm": "fba1b05a7bd8bdc73080edd02f672cef44648267",
+    "members": 81,
+    "native_regression": {
+      "candidate": "12379813738877118345",
+      "parent": "None",
+      "test": "persist::fs::tests::resolve_complete_rows_at_the_start_of_large_packed_refs"
+    },
+    "overlay": "e9b703e444646cadcc00d85f1df31dd3b2abeac6f181dc81763ecb4c7fd0419b",
+    "physical_installation_reopened": false,
+    "prior_source_job": 124839568474,
+    "qa": "f93028872101f65e1c748217ac20ddb73a49bab1",
+    "qualified": true,
+    "run": "41323607555",
+    "source": [
+      "d95494a6a63c22222806c06e3d3aa0de504d8e8a",
+      "70a0f8090d1e2d9bd822720eb39076c409667edd",
+      "be66e74941aed13a5a89797504dca2076b414da9"
+    ],
+    "stage0": {
+      "cargo": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24",
+      "rustc": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2",
+      "source": "759b73eca37a7b589b1ecc0fea77d94a1f8ca36cddb94f1401c72343e0dc1d4e"
+    },
+    "tested": [
+      "checkout_sessions_prefer_a_match_and_keep_one_alternate",
+      "pack_only_on_checkout_switch",
+      "prefer_the_newest_session_at_the_same_revision",
+      "resolve_complete_rows_at_the_start_of_large_packed_refs",
+      "resolve_revisions_in_a_linked_git_worktree",
+      "test_all_except_most_recent",
+      "test_find_source_directory_in_iter",
+      "test_timestamp_serialization",
+      "ohm-packed-branch-cache",
+      "ohm-branch-cache-opt-out",
+      "incremental-missing-query-cache"
+    ],
+    "wild": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+  }
+}

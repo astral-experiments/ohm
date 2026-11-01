@@ -111,7 +111,7 @@ def prepare(mode, host, prior=None):
 def catalog(arm, rows, where, env):
     p = packages()
     b = p.b
-    b.need(arm in p.subjects.ARMS and set(rows) == {'E', 'D'}, 'unexpected structural role')
+    b.need(arm in p.subjects.ARMS and set(rows) == {a[0] for a in p.subjects.ARMS}, 'unexpected structural role')
     paths = {'cargo': b.SDK / 'bin/cargo', 'rustc': b.SDK / 'bin/rustc', 'wild': b.SDK / b.WILD,
              'proxy': b.PROXIES / 'rustup', 'sysld': Path('/usr/bin/ld')}
     tools = {name: {'path': str(path), 'resolved': str(path.resolve(strict=True)), 'identity': [b.sha(path), *b.numbers(path)]}
@@ -134,21 +134,27 @@ def source(where, arm, env, stage):
     role = arm[0]
     path = b.SDK / subjects.DRIVER
     driver = [b.sha(path), *b.numbers(path)]
-    native = record(b.OUT / 'sdk/donor-native-source.json')
-    side = {'E': 'old', 'D': 'new'}[role]
-    commit = {'E': subjects.E, 'D': subjects.D}[role]
+    if hasattr(subjects, 'packed_source'):
+        native, side, commit, tree = subjects.packed_source(role)
+        manifest = subjects.manifests()[role]
+    else:
+        native = record(b.OUT / 'sdk/donor-native-source.json')
+        side = {'E': 'old', 'D': 'new'}[role]
+        commit = {'E': subjects.E, 'D': subjects.D}[role]
+        tree = COMPILER_TREES[role]
+        manifest = subjects.MANIFEST[role]
     b.need(arm in subjects.ARMS and (enrolled['arm'], enrolled['role'], enrolled['sdk']) == (arm, role, str(b.SDK))
            and native[side] == commit and native['driver'] == subjects.DRIVER
            and native[side + '_driver'] == [driver[0], driver[4], driver[3]]
            and driver == enrolled['files'][subjects.DRIVER] == record(where.parent / 'loader.json')['driver_identity']
-           and enrolled['source_manifest'] == subjects.MANIFEST[role]
+           and enrolled['source_manifest'] == manifest
            and env == enrolled['env'] == b.environment(arm, permitted=subjects.ARMS)
            and env['LD_LIBRARY_PATH'] == str(b.SDK / 'lib'), 'wrong source, dynamic driver or Cargo environment')
     for tool in record(where.parent / 'catalog.json').values():
         obj = Path(tool['path'])
         b.need(str(obj.resolve(strict=True)) == tool['resolved'] and b.numbers(obj) == tool['identity'][1:],
                ('changed native executable', obj))
-    proof = {'source': commit, 'compiler_tree': COMPILER_TREES[role], 'driver': str(path), 'driver_identity': driver,
+    proof = {'source': commit, 'compiler_tree': tree, 'driver': str(path), 'driver_identity': driver,
              'source_manifest': enrolled['source_manifest']}
     if stage == 'after':
         b.need(proof == record(where / 'source-before.json'), 'active compiler changed during ordinary Cargo')

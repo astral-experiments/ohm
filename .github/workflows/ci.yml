@@ -1,48 +1,23 @@
-name: Qualify same-revision donor selection on a full GNU Ruff build
-run-name: GNU donor ${{ inputs.mode }} ${{ inputs.reviewed_head }}
+name: Observe a bounded packed Git branch ref on the full GNU Ruff CLI
+run-name: GNU packed Ruff X-B contact ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
-      mode:
-        description: Unscored native contact or fresh counterbalanced full pilot
-        type: choice
-        options: [contact, full-pilot]
-        required: true
-      contact_run:
-        description: Completed contact run on this exact head (full-pilot only)
-        type: string
-        required: false
-      contact_sha256:
-        description: Official contact archive SHA-256 (full-pilot only)
-        type: string
-        required: false
-      contact_readback_sha256:
-        description: Independently reopened contact certificate SHA-256 (full-pilot only)
-        type: string
-        required: false
       reviewed_head:
-        description: Exact reviewed commit of the E/D structural contact and gated pilot
-        type: string
+        description: Exact independently reviewed contact commit
         required: true
+        type: string
 permissions:
   actions: read
   contents: read
 jobs:
-  ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-same-revision-donor-full-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+  contact:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-packed-refs-full-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 175
-    name: GNU donor ${{ inputs.mode }} ${{ matrix.position }}
-    strategy:
-      fail-fast: false
-      matrix:
-        position: ${{ fromJSON(inputs.mode == 'contact' && '["01"]' || '["01","02"]') }}
+    timeout-minutes: 180
+    name: GNU packed Ruff CLI X-B contact
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      MODE: ${{ inputs.mode }}
-      CONTACT_RUN: ${{ inputs.contact_run }}
-      CONTACT_SHA256: ${{ inputs.contact_sha256 }}
-      CONTACT_READBACK_SHA256: ${{ inputs.contact_readback_sha256 }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -52,6 +27,7 @@ jobs:
           sparse-checkout: |
             .github/workflows
             scripts/ctfe-crossover-pilot
+            scripts/packed-ref-cli
             scripts/ctfe-cli-semantic
             scripts/gnu-same-revision-donor
             scripts/branch-return-pmu
@@ -67,6 +43,17 @@ jobs:
           sparse-checkout: |
             .github/workflows
             scripts/gnu-same-revision-donor
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: f93028872101f65e1c748217ac20ddb73a49bab1
+          path: packed-source
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/gnu-same-revision-donor
+            scripts/ctfe-crossover-pilot
+            scripts/branch-return-pmu
             scripts/ruff-repair-tables-pilot
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -110,13 +97,15 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify the enrolled source and prepare empty task-owned output roots
+      - name: Verify the packed contact source
         run: |
           set -euo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
           test "$(git -C donor-source rev-parse HEAD)" = 8f633d8fc21e453f4c81d81588b6dcab125bfeae
+          test "$(git -C packed-source rev-parse HEAD)" = f93028872101f65e1c748217ac20ddb73a49bab1
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/source_guard.py enrolled "$REVIEWED_HEAD"
-          for component_path in scripts/gnu-same-revision-donor/{binding.py,source_ids.py,donors.py,donor_open.py,driver_map.py,live_driver.py,overlay.py} scripts/ruff-repair-tables-pilot/guards.py; do
+          python3 -IB enrolled/scripts/packed-ref-cli/preflight.py enrolled "$REVIEWED_HEAD"
+          for component_path in scripts/gnu-same-revision-donor/{binding.py,source_ids.py,donor_open.py,driver_map.py,live_driver.py,overlay.py} scripts/ruff-repair-tables-pilot/guards.py; do
             source_object=$(git -C donor-source rev-parse "HEAD:$component_path")
             pilot_object=$(git -C enrolled rev-parse "HEAD:$component_path")
             test "$source_object" = "$pilot_object"
@@ -132,6 +121,9 @@ jobs:
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py --acquisition-imports "$GITHUB_WORKSPACE/source"
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/reopen.py --help > /dev/null
+          python3 -IB enrolled/scripts/packed-ref-cli/test_git_layout.py
+          python3 -IB enrolled/scripts/packed-ref-cli/test_contact.py --source-checkout "$GITHUB_WORKSPACE/packed-source"
+          python3 -IB enrolled/scripts/packed-ref-cli/review.py --help >/dev/null
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd
           base="$RUNNER_TEMP/ohm-branch-object-qa"
@@ -140,32 +132,24 @@ jobs:
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
-      - name: Independently verify the official v3 contact
-        if: inputs.mode == 'full-pilot'
+      - name: Install the source-qualified D and P SDKs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/contact_review.py acquire --run "$CONTACT_RUN" --head "$REVIEWED_HEAD" --sha256 "$CONTACT_SHA256" --readback-sha256 "$CONTACT_READBACK_SHA256" --observer-source "$GITHUB_WORKSPACE/kernel" --output "$RUNNER_TEMP/ohm-branch-object-qa/logs/prior-v3-contact.json"
-      - name: Reconstruct both 81-file compiler installations using original source artifacts
+          python3 -IB enrolled/scripts/packed-ref-cli/run.py acquire "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/packed-source"
+      - name: Run the ordinary packed Ruff histories
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py acquire "$GITHUB_WORKSPACE/source"
-      - name: Run the enrolled ordinary Ruff visits
-        env:
-          POSITION: ${{ matrix.position }}
           CTFE_EXECS_SOURCE: ${{ github.workspace }}/kernel
           CTFE_EXECS_PROJECTOR: ${{ github.workspace }}/projector
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py "$MODE" "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/packed-ref-cli/run.py contact "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: gnu-donor-${{ inputs.mode }}-${{ matrix.position }}
+          name: gnu-packed-ruff-x-b-contact
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

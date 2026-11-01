@@ -11,7 +11,7 @@ TABLES = ("dep-graph.bin", "query-cache.bin")
 PATTERN = re.compile(r"s-([0-9a-z]+)-_([0-9a-f]{16})_(?:r([0-9a-f]{16})_)?([0-9a-z]+)-([0-9a-z]+)")
 
 
-def snapshot(target, role):
+def snapshot(target, role, *, packed_git=False):
     result = {}
     for p in sorted((target / "debug/incremental").glob("*/*/s-*")):
         if not p.is_dir() or p.is_symlink() or p.name.endswith("-working"):
@@ -20,7 +20,13 @@ def snapshot(target, role):
         if not owner:
             continue
         m = PATTERN.fullmatch(p.name)
-        need(m and (m[3] is None) == (role == "E"), "unregistered surviving session " + str(p))
+        # D may omit a revision on a packed branch. The packed contact independently
+        # binds every allowed tagged or untagged owner to its actual Git checkout.
+        if not packed_git:
+            need(m and (m[3] is None) == (role == "E"), "unregistered surviving session " + str(p))
+        else:
+            need(m and role in ("D", "P") and (role == "D" or m[3] is not None),
+                 "unregistered packed-ref session " + str(p))
         s = p.stat()
         row = {
             "directory": [s.st_dev, s.st_ino],
@@ -101,7 +107,7 @@ def enrollment(first, old_x, last, role, rev):
     return registered
 
 
-def verify_opens(registration, observed, compiles, role):
+def verify_opens(registration, observed, compiles, role, *, expected_side=None):
     lookup = {}
     for owner, labels in registration.items():
         for side in ("Y", "X"):
@@ -129,7 +135,8 @@ def verify_opens(registration, observed, compiles, role):
             "open from foreign compiler or file",
         )
         actual[owner].setdefault((side, kind), []).append(event)
-    want = "Y" if role == "E" else "X"
+    want = expected_side if expected_side is not None else "Y" if role == "E" else "X"
+    need(want in ("X", "Y"), "unregistered physical donor side")
     for owner in OWN:
         expected = {(want, t) for t in TABLES} if owner in pids.values() else set()
         need(set(actual[owner]) == expected, "wrong or missing physical donor for " + owner)

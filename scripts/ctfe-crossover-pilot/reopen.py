@@ -67,7 +67,7 @@ def dataset(z, path):
     return json.loads(gzip.decompress(raw) if path.endswith(".gz") else raw)
 
 
-def source_state(source, phase, route):
+def source_state(source, phase, route, *, git_check=None):
     branch = "A" if phase in ("clean-A", "X-A") else "B"
     checkout = "A" if branch == "A" or phase == "X-B" or route == "stay" and phase in ("comment", "unchanged") else "B"
     edited = phase in ("clean-edited", "comment", "unchanged", "invalid", "repair")
@@ -83,6 +83,11 @@ def source_state(source, phase, route):
              source["nodes"], source["parser"]) ==
             (branch, metrics.REVS[branch], corpus.TREES[branch], ref, sorted(names), AST["edited" if edited else branch],
              PARSER_SHA[bad]), ("wrong checkout, edit, or repair", phase, route))
+    reference = "clean-semantic" if semantic else "clean-edited" if edited else "clean-" + branch
+    if git_check:
+        git_check(source["git_layout"], ref, source["revision"])
+        require(source["watched"] == source["git_layout"]["watched"], "substituted Git watch inputs")
+        return branch, reference
     watched = source["watched"]
     head = "refs/heads/" + ref
     require(set(watched) == {"HEAD", head} and watched["HEAD"][-1] == digest(("ref: " + head + "\n").encode())
@@ -108,12 +113,12 @@ def sdk_pair(z):
     return pair
 
 
-def active(z, top, arm, files):
+def active(z, top, arm, files, *, manifests=MANIFEST):
     cert = dataset(z, top + "/arm.json")
     env = cert["env"]
     root = PurePosixPath(env["CARGO_TARGET_DIR"]).parent.parent
     require(root.is_absolute() and root.name == "ohm-branch-object-qa"
-            and cert["arm"] == arm and cert["role"] == arm[0] and cert["source_manifest"] == MANIFEST[arm[0]]
+            and cert["arm"] == arm and cert["role"] == arm[0] and cert["source_manifest"] == manifests[arm[0]]
             and cert["files"] == {f: files[f] for f in ("bin/cargo", "bin/rustc", "bin/rustdoc", DRIVER, WILD)}
             and cert["sdk"] == str(root / "home/.rustup/toolchains/ohm")
             and env["CARGO_ENCODED_RUSTFLAGS"] == "-Zohm-branch-cache=yes" and env["CARGO_NET_OFFLINE"] == "true"
@@ -182,10 +187,10 @@ def kernel_binding(z, boot, mode, source, prior):
     return b
 
 
-def driver(z, top, prefix, arm, cert):
+def driver(z, top, prefix, arm, cert, *, sources=SOURCES, trees=TREES):
     path = str(PurePosixPath(cert["sdk"]) / DRIVER)
     identity = cert["files"][DRIVER]
-    proof = dict(source=SOURCES[arm[0]], compiler_tree=TREES[arm[0]], driver=path,
+    proof = dict(source=sources[arm[0]], compiler_tree=trees[arm[0]], driver=path,
                  driver_identity=identity, source_manifest=cert["source_manifest"])
     require(dataset(z, prefix + "/source-before.json") == proof == dataset(z, prefix + "/source-after.json"),
             "unbound compiler before or after positive native observation")
@@ -297,9 +302,9 @@ def typed_inputs(z, prefix, stdout, root):
     require(dataset(z, prefix + "/reader-run.json.gz")["argv"] == [reader], "different external native reader ran")
 
 
-def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
+def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies, *, packed=None):
     source = dataset(z, prefix + "/source.json")
-    branch, reference = source_state(source, phase, route)
+    branch, reference = source_state(source, phase, route, git_check=packed.git_layout.verify_snapshot if packed else None)
     score = dataset(z, prefix + "/visit.json")
     cmd = dataset(z, prefix + "/cargo.json.gz")
     expected = 101 if phase == "invalid" else 0
@@ -309,8 +314,11 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
     raw = replay_native.raw(z, prefix, "cargo.stdout.gz")
     error = replay_native.raw(z, prefix, "cargo.stderr.gz")
     roster = metrics.cargo_messages(raw, error, cmd, expected, cmd["cwd"])
+    ledger = dataset(z, prefix + "/path-inodes.json.gz")
+    if packed:
+        packed.reopen_script(z, prefix, source, raw, root, ledger)
     totals = dataset(z, prefix + "/storage.json")
-    allocated = metrics.allocation(dataset(z, prefix + "/path-inodes.json.gz"), totals,
+    allocated = metrics.allocation(ledger, totals,
                                    dataset(z, prefix + "/allocation-readers.json"))
     require(allocated == score["allocated"] and totals["all_inodes"] > 1000 and min(totals["roots"].values()) > 0,
             "incomplete allocation")
@@ -340,7 +348,7 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
                         any("ohm_branch_switch_invalid" in t["text"] for t in s["text"]) for s in v["message"]["spans"])
                 for v in errors), "wrong actual parser error")
         require(set(totals["failed_sessions"]) == set(dataset(z, prefix + "/failed.json")), "wrong failed sessions")
-    storage=storage_tables.scan(dataset(z,prefix+'/path-inodes.json.gz'))
+    storage=storage_tables.scan(ledger)
     require(storage==dataset(z,prefix+'/table-storage.json') and storage['total']==result['allocated'],
             'wrong session/table or allocated-byte receipt')
     result['table_bytes']=storage['tables']
@@ -360,7 +368,10 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
     else:
         require(clock_path not in z.NameToInfo and score["instructions"] is None, "unexpected counter in structural control")
         if traced:
-            driver(z, prefix.rsplit("/", 1)[0], prefix, arm, cert)
+            if packed:
+                driver(z, prefix.rsplit("/", 1)[0], prefix, arm, cert, sources=packed.SOURCES, trees=packed.TREES)
+            else:
+                driver(z, prefix.rsplit("/", 1)[0], prefix, arm, cert)
             result.update(physical(z, prefix, arm, cert, cmd, expected))
             require(result["compilers"] == score["compilers"] and result["links"] == score["links"], "wrong physical roster")
             if phase in ("comment", "X-A", "X-B"):
@@ -373,14 +384,14 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
     return result
 
 
-def compare(rows):
+def compare(rows, roles=ROLES):
     issues = []
     for state in REFS:
-        e, c = (rows[a]["clean/reference/" + state] for a in ROLES)
+        e, c = (rows[a]["clean/reference/" + state] for a in roles)
         require(e["graph"] == c["graph"] and behavior(e["native"]) == behavior(c["native"]), "different clean behavior")
         for kind in ("cli", "reader"):
             if any(e["native"][kind][key] != c["native"][kind][key] for key in ("executable", "loads")):
-                issues.append(dict(reference=state, different_executable_bytes=kind, E=e[kind], D=c[kind]))
+                issues.append(dict(reference=state, different_executable_bytes=kind, **{roles[0][0]:e[kind], roles[1][0]:c[kind]}))
     for arm, visits in rows.items():
         require(visits["clean/reference/clean-semantic"]["cli"] != visits["clean/reference/clean-B"]["cli"],
                 "actual function edit did not change CLI ELF")

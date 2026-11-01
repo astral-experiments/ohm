@@ -77,7 +77,7 @@ def advance(repo, names, phase, lineage):
         require(phase in ('clean-B', 'Y-B', 'unchanged'), 'unknown history phase')
 
 
-def snapshot(repo, revs, trees, names, phase, lineage):
+def snapshot(repo, revs, trees, names, phase, lineage, *, git_snapshot=None):
     branch = 'A' if phase in ('clean-A', 'X-A') else 'B'
     ref = names['A'] if (branch == 'A' or phase == 'X-B' or
                           lineage == 'stay' and phase in ('comment', 'unchanged')) else names['B']
@@ -102,6 +102,11 @@ def snapshot(repo, revs, trees, names, phase, lineage):
     parser = (repo / PARSER).read_bytes()
     require(parser == git(repo, 'show', 'HEAD:' + PARSER) + (INVALID if phase == 'invalid' else b''),
             'wrong parser bytes')
+    if git_snapshot is not None:
+        layout = git_snapshot(repo, ref, revs[branch])
+        return dict(branch=branch, ref=ref, revision=revs[branch], tree=trees[branch],
+                    modified=sorted(changed), lib=sha(lib), nodes=nodes, parser=sha(parser),
+                    watched=layout["watched"], git_layout=layout)
     head = 'refs/heads/' + ref
     watched = {}
     for name in ('HEAD', head):

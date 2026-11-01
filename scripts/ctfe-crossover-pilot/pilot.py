@@ -68,7 +68,7 @@ def product_check(files, products, reference, where, issues):
                                actual=actual['whole'], empty=wanted['whole']))
 
 
-def visit(arm, lane, lineage, phase, env, where, refs, issues, observer):
+def visit(arm, lane, lineage, phase, env, where, refs, issues, observer, *, packed=None):
     where.mkdir()
     need(shutil.disk_usage(WORK).free > 2 * 2**30 and shutil.disk_usage(OUT).free > 5 * 2**30,
          'insufficient space for an ordinary compilation or its original receipts')
@@ -76,7 +76,8 @@ def visit(arm, lane, lineage, phase, env, where, refs, issues, observer):
         old = json.loads((where.parent / 'invalid/failed.json').read_bytes())
         original.failed_session.before_repair(WORK, old, where / 'grace.json')
     routes.advance(kit.TREE, kit.NAMES, phase, lineage)
-    source = routes.snapshot(kit.TREE, kit.REVS, kit.TREES, kit.NAMES, phase, lineage)
+    source = routes.snapshot(kit.TREE, kit.REVS, kit.TREES, kit.NAMES, phase, lineage,
+                             git_snapshot=packed.git_layout.snapshot if packed else None)
     save(where / 'source.json', source)
     if phase == 'unchanged':
         need(source == json.loads((where.parent / 'comment/source.json').read_bytes()),
@@ -84,7 +85,9 @@ def visit(arm, lane, lineage, phase, env, where, refs, issues, observer):
     rc = 101 if phase == 'invalid' else 0
     traced = lane == 'structural' and phase in TRACED[lineage]
     donor_lane = lane == 'structural' and lineage in ('return','dirty')
-    if donor_lane and phase == 'comment':
+    if packed and donor_lane and phase == 'X-B':
+        messages, instructions, physical = packed.capture(arm, where, env, observer)
+    elif not packed and donor_lane and phase == 'comment':
         entered = [json.loads((where.parent / k / 'donor-state.json').read_bytes()) for k in ('Y-B','X-A','X-B')]
         last = json.loads(gzip.decompress((where.parent/'X-B/native-execs.json.gz').read_bytes()))
         registered = dw.register(entered, dw.rows(last), arm[0])
@@ -109,8 +112,11 @@ def visit(arm, lane, lineage, phase, env, where, refs, issues, observer):
     tables=storage_tables.scan(inode_ledger)
     need(tables['total']==storage['allocated'], 'quiescent table/whole storage census mismatch')
     save(where/'table-storage.json',tables)
+    if packed:
+        packed.script_output(phase, where, source, messages, kit.TREE, WORK, inode_ledger)
     if donor_lane and phase in ('Y-B','X-A','X-B'):
-        state=dict(source=source, sessions=dw.donors.snapshot(WORK/'target',arm[0]))
+        sessions = dw.donors.snapshot(WORK/'target', arm[0], packed_git=bool(packed))
+        state=dict(source=source, sessions=sessions)
         dw.check_ledger(state,inode_ledger,ROOT)
         save(where/'donor-state.json',state)
     observation = 'kernel' if traced else 'pmu' if lane == 'measured' else 'ordinary'
@@ -152,10 +158,10 @@ def visit(arm, lane, lineage, phase, env, where, refs, issues, observer):
     return result
 
 
-def history(arm, lane, lineage, rows, refs, issues, observer, phases=None):
+def history(arm, lane, lineage, rows, refs, issues, observer, phases=None, *, packed=None):
     where = OUT / (lane + '-' + lineage + '-' + arm)
     where.mkdir()
-    env = subjects.activate(arm, rows, where)
+    env = (packed.activate if packed else subjects.activate)(arm, rows, where)
     if lane == 'structural':
         observer.catalog(arm, rows, where, env)
     b.fresh_outputs()
@@ -167,20 +173,21 @@ def history(arm, lane, lineage, rows, refs, issues, observer, phases=None):
         if lane == 'clean' and phase != REFS[0]:
             b.fresh_outputs()
             routes.begin(kit.TREE, kit.REVS, kit.NAMES)
-        results[phase] = visit(arm, lane, lineage, phase, env, where / phase, refs, issues, observer)
+        results[phase] = visit(arm, lane, lineage, phase, env, where / phase, refs, issues, observer, packed=packed)
     return results
 
 
-def cross_role(refs, issues):
+def cross_role(refs, issues, roles=None):
+    roles = roles or ORDERS['01']
     for phase in REFS:
-        erows, e = refs['Eon', phase]
-        crows, c = refs['Don', phase]
+        erows, e = refs[roles[0], phase]
+        crows, c = refs[roles[1], phase]
         need(erows == crows and original.same_products(c, e), ('different clean typed or native verdict', phase))
         for name in ('cli', 'reader'):
             if any(e[name][key] != c[name][key] for key in ('loads', 'executable')):
                 issues.append(dict(reference=phase, different_executable_bytes=name,
-                                   E=e[name]['whole'], D=c[name]['whole']))
-    for arm in ORDERS['01']:
+                                   **{roles[0][0]:e[name]['whole'], roles[1][0]:c[name]['whole']}))
+    for arm in roles:
         need(refs[arm, 'clean-A'][1]['cli']['whole'] != refs[arm, 'clean-B'][1]['cli']['whole'],
              'the real Ruff history changes the executable')
 

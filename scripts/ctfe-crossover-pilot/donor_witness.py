@@ -115,7 +115,7 @@ def register(states, last_full, role, *, refnames=(X, Y)):
     return recorded
 
 
-def capture(call, where, env, arm, record, registered):
+def capture(call, where, env, arm, record, registered, *, expected_side=None):
     files = [
         Path(t["path"])
         for s in registered.values()
@@ -137,11 +137,11 @@ def capture(call, where, env, arm, record, registered):
         invoke, where, 0, sdk, sdk / driver, write, record["files"][driver]
     )
     raw = json.loads((where / "donor-opens.json").read_bytes())
-    write(where / "donor-selected.json", donors.verify_opens(registered, raw, comp, arm[0]))
+    write(where / "donor-selected.json", donors.verify_opens(registered, raw, comp, arm[0], expected_side=expected_side))
     return msgs, count, physical
 
 
-def check_processes(proof, current, driver, files, comp):
+def check_processes(proof, current, driver, files, comp, *, expected_side=None):
     reference = proof["reference"]
     driver_map.check_reference(reference, driver, files)
     need(not proof["refused"] and type(proof["worker_pid"]) is int, "live driver reader refused")
@@ -160,7 +160,7 @@ def check_processes(proof, current, driver, files, comp):
         driver_map.check_process(
             reference, driver, files, p["mount_namespace"], p["visible"], p["maps"]
         )
-    return donors.verify_opens(current[0], current[1], comp, current[2])
+    return donors.verify_opens(current[0], current[1], comp, current[2], expected_side=expected_side)
 
 
 def check_ledger(state, ledger, root):
