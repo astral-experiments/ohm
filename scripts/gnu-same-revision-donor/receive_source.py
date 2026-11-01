@@ -7,15 +7,17 @@ import shutil
 import stat
 import subprocess
 import tempfile
+import sys
 import zipfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import binding as b
 import reopen
 
 
 REPOSITORY = "astral-experiments/ohm"
-ARTIFACTS = ("packed-ref-source-and-driver", "packed-ref-sdk-and-resources")
-JOB_NAME = "Build and qualify the bounded packed Git ref reader"
+ARTIFACTS = ("sorted-packed-ref-source-and-driver", "sorted-packed-ref-sdk-and-resources")
+JOB_NAME = "Build and qualify the sorted packed Git ref reader"
 STEPS = {
     "Reopen reviewed source and retained compiler verifier",
     "Restore the authenticated D and E source SDKs",

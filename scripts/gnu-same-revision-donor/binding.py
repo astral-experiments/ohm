@@ -12,9 +12,9 @@ HERE = Path(__file__).resolve().parent
 ORIGINAL = "393b4b05a4bfa3f531a36023846f86236a6b71a9"
 OLD = "d95494a6a63c22222806c06e3d3aa0de504d8e8a"
 DONOR_QA = "a333316177ef3f9c8b3264ca3bf76c451e0ca079"
-CARRIER_PARENT = "8f633d8fc21e453f4c81d81588b6dcab125bfeae"
+CARRIER_PARENT = "f93028872101f65e1c748217ac20ddb73a49bab1"
 SOURCE_QA = "762fc25095e317ac5632ec835df3c7f9cfc64a64"
-REF = "refs/heads/charlie/qa-rust-packed-ref-source-20261101"
+REF = "refs/heads/charlie/qa-rust-fast-packed-ref-source-20261101"
 EXPECTED = {
     "compiler/rustc_incremental/src/persist/fs.rs",
     "compiler/rustc_incremental/src/persist/fs/tests.rs",

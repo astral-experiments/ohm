@@ -15,6 +15,22 @@ import workload as w
 
 
 class Checks(unittest.TestCase):
+    def test_receiver_help_from_isolated_unrelated_directory(self):
+        # Python -I removes the script directory. Offline or online users should enter
+        # the receiver without executing a same-named module from their working directory.
+        with tempfile.TemporaryDirectory() as root:
+            for module in ("binding", "reopen"):
+                (Path(root) / (module + ".py")).write_text("raise RuntimeError('foreign module')\n")
+            actual = subprocess.run(
+                [sys.executable, "-ISB", HERE / "receive_source.py", "--help"],
+                cwd=root,
+                env=os.environ | {"PYTHONPATH": root},
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(actual.returncode, 0, actual.stderr)
+            self.assertIn("source_zip sdk_zip scratch", actual.stdout)
+
     def test_exact_closed_pack_without_candidate_objects(self):
         spec = reader.load(HERE / "inputs/product.json")
         s = spec["source"]
