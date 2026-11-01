@@ -60,19 +60,22 @@ version = run([rustc,"-vV"])
 assert "commit-hash: 1bc7b35699479d5899a2935d79392b7bdaf7497d" in version and "host: x86_64-unknown-linux-gnu" in version
 env = {k:v for k,v in os.environ.items() if not k.startswith(("CARGO_", "OHM_", "RUST", "LLVM_"))}
 env.update(PATH=str(sdk/"bin")+os.pathsep+env["PATH"], CARGO_HOME=str(root/"registry"), RUSTC=str(rustc), RUSTDOC=str(sdk/"bin/rustdoc"))
-build_env = dict(env, CARGO_TARGET_DIR=str(root/"bootstrap"), CARGO_PROFILE_DEV_DEBUG="0", CARGO_INCREMENTAL="0", CFG_RELEASE="1.99.0-dev", CFG_RELEASE_CHANNEL="dev")
+build_settings = dict(env, CARGO_PROFILE_DEV_DEBUG="0", CARGO_INCREMENTAL="0", CFG_RELEASE="1.99.0-dev", CFG_RELEASE_CHANNEL="dev")
 provenance = dict(ruff=ruff_pin, rustc=version, rustc_sha256=sha(rustc), sdk_sha256=sha(archive), readers={})
 readers = {}
 for role, ref in [("base",base),("patch",new)]:
     subprocess.run(["git","switch","--detach",ref], cwd=cargo_src, check=True)
     assert not run(["git","status","--porcelain"],cargo_src)
+    target = root / "bootstrap" / role
+    build_env = dict(build_settings, CARGO_TARGET_DIR=str(target))
     args=[str(cargo),"-Zohm-defaults=no","build","--locked","-p","cargo","--bin","cargo","--features","all-static,ohm-defaults","-j8"]
     with (reports / (role+"-build.log")).open("wb") as log:
         subprocess.run(args,cwd=cargo_src,env=build_env,stdout=log,stderr=subprocess.STDOUT,check=True)
     binary=root/role/"cargo"
     binary.parent.mkdir()
-    shutil.copy2(root/"bootstrap/debug/cargo",binary)
+    shutil.copy2(target/"debug/cargo",binary)
     stamp=run([binary,"-Vv"],env=env)
+    save(role+"-binary.json",dict(commit=ref,tree=run(["git","rev-parse","HEAD^{tree}"],cargo_src),version=stamp,sha256=sha(binary),build_target=str(target)))
     assert "commit-hash: "+ref in stamp,(role,stamp)
     readers[role]=binary
     provenance["readers"][role]=dict(ref=ref,sha256=sha(binary),version=stamp,command=args)
