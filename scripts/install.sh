@@ -338,10 +338,7 @@ link_toolchain() {
     link_path=$toolchains_directory/$toolchain_name
 
     if [ -L "$link_path" ]; then
-        current_destination=$(cd "$link_path" 2>/dev/null && pwd -P) || current_destination=
-        desired_destination=$(cd "$installation_prefix" && pwd -P) ||
-            fail 'could not resolve the installed toolchain path'
-        if [ "$current_destination" = "$desired_destination" ]; then
+        if [ "$link_path" -ef "$installation_prefix" ]; then
             return
         fi
         if [ "$toolchain_name" != ohm ]; then

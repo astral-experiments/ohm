@@ -25,6 +25,8 @@ esac
   grep '  ohm-installer\.sh$' SHA256SUMS | shasum -a 256 --check
 )
 
+# Install the test toolchain with permissions that allow its native link driver to run.
+umask 077
 smoke_root="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/ohm-smoke.XXXXXX")"
 trap 'rm -rf "$smoke_root"' EXIT
 
@@ -275,8 +277,9 @@ EOF
   if grep -E '(Checking|Compiling) itoa ' "$smoke_root/registry-check.log"; then
     exit 1
   fi
-  if find "$CARGO_BUILD_BUILD_DIR/debug/build/workspaces" \
-    -name '.ohm-worktree-seed-deny-v7' | grep .; then
+  deny_markers="$(find "$CARGO_BUILD_BUILD_DIR" -name '.ohm-worktree-seed-deny-v7')"
+  if [[ -n "$deny_markers" ]]; then
+    printf '%s\n' "$deny_markers" >&2
     exit 1
   fi
 )

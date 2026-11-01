@@ -45,6 +45,18 @@ macos_sha256="$(awk '{print $1}' "$macos_archive.sha256")"
 linux_sha256="$(awk '{print $1}' "$linux_archive.sha256")"
 wild_version="$(jq -r '.bundled_tools.wild.version // empty' "$manifest")"
 
+manifest_name="$OHM_TOOLCHAIN.json"
+outputs=(ohm-installer.sh "$manifest_name" SHA256SUMS)
+for output in "${outputs[@]}"; do
+  if [[ -d "$output" && ! -L "$output" ]]; then
+    echo "release output is a directory: $output" >&2
+    exit 1
+  fi
+done
+staging="$(mktemp -d .ohm-release.XXXXXXXX)"
+trap 'rm -rf -- "$staging"' EXIT
+installer="$staging/ohm-installer.sh"
+
 awk -v version="$OHM_TOOLCHAIN" \
   -v macos_sha256="$macos_sha256" \
   -v linux_sha256="$linux_sha256" \
@@ -75,23 +87,24 @@ awk -v version="$OHM_TOOLCHAIN" \
       exit 1
     }
   }
-' "$script_directory/install.sh" > ohm-installer.sh
-sh -n ohm-installer.sh
-grep -Fx "embedded_version=$OHM_TOOLCHAIN" ohm-installer.sh >/dev/null
+' "$script_directory/install.sh" > "$installer"
+sh -n "$installer"
+grep -Fx "embedded_version=$OHM_TOOLCHAIN" "$installer" >/dev/null
 grep -Fx "embedded_archive_sha256_aarch64_apple_darwin=$macos_sha256" \
-  ohm-installer.sh >/dev/null
+  "$installer" >/dev/null
 grep -Fx "embedded_archive_sha256_x86_64_unknown_linux_gnu=$linux_sha256" \
-  ohm-installer.sh >/dev/null
+  "$installer" >/dev/null
 
-manifest_name="$OHM_TOOLCHAIN.json"
-cp "$manifest" "$manifest_name"
-sha256sum \
-  "$macos_archive" \
-  "$macos_archive.sha256" \
-  "$linux_archive" \
-  "$linux_archive.sha256" \
-  ohm-installer.sh \
-  "$manifest_name" \
-  "$OHM_TOOLCHAIN-aarch64-apple-darwin-provenance.json" \
-  "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu-provenance.json" > SHA256SUMS
+cp "$manifest" "$staging/$manifest_name"
+{
+  sha256sum "$macos_archive" "$macos_archive.sha256" "$linux_archive" "$linux_archive.sha256"
+  (cd -- "$staging" && sha256sum ohm-installer.sh "$manifest_name")
+  sha256sum "$OHM_TOOLCHAIN-aarch64-apple-darwin-provenance.json" \
+    "$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu-provenance.json"
+} > "$staging/SHA256SUMS"
+
+# Publish the checksum list last, after replacing the two files it describes.
+for output in "${outputs[@]}"; do
+  mv -f -- "$staging/$output" .
+done
 sha256sum --check --strict SHA256SUMS
