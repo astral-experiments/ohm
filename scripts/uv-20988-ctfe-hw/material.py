@@ -19,7 +19,7 @@ def host():
     e=os.environ
     guard(__debug__ and e["GITHUB_REPOSITORY"]==P["coordinator_repo"] and e["GITHUB_EVENT_NAME"]=="workflow_dispatch" and
           e["GITHUB_REF"]=="refs/heads/"+P["branch"] and e["GITHUB_RUN_ATTEMPT"]=="1" and re.fullmatch("[0-9a-f]{40}",e["REVIEWED_HEAD"]) and
-          e["GITHUB_SHA"]==e["REVIEWED_HEAD"] and e["GITHUB_WORKFLOW_REF"]==P["coordinator_repo"]+"/.github/workflows/uv-20988-ctfe-hw.yml@"+e["GITHUB_REF"],"unreviewed Actions scope")
+          e["GITHUB_SHA"]==e["REVIEWED_HEAD"] and e["GITHUB_WORKFLOW_REF"]==P["coordinator_repo"]+"/.github/workflows/ci.yml@"+e["GITHUB_REF"],"unreviewed Actions scope")
     return Path(e["GITHUB_WORKSPACE"]).resolve(strict=True),Path(e["RUNNER_TEMP"]).resolve(strict=True)
 ROOT=Path("/tmp/uv-workflow-search")
 SRC,TARGET,CARGO_HOME,HOME,SDK=[ROOT/n for n in ("uv","target","cargo","home","sdk")]

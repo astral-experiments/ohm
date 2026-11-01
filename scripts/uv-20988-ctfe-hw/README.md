@@ -30,7 +30,7 @@ Review the resulting five distinct IDs and digests, the private repository, exac
 
 ## Private Actions placement
 
-Place `workflow.yml` at `.github/workflows/uv-20988-ctfe-hw.yml` and the other files, including `SHA256SUMS`, under `scripts/uv-20988-ctfe-hw/` on the dedicated `charlie/codex-20988-ctfe22-root-hardware` branch. The four required workflow inputs are the reviewed benchmark head, qualified build run ID, reviewed build head and the enrolled SDK-lock digest. The workflow runs once on one private 16-vCPU Namespace runner and selects eight distinct physical cores. Only the artifact admission step receives the repository read token. The Cargo workload receives the exact closed environment recorded in `protocol.json`.
+Place `workflow.yml` at `.github/workflows/ci.yml` and the other files, including `SHA256SUMS`, under `scripts/uv-20988-ctfe-hw/` on the dedicated `charlie/codex-20988-ctfe22-root-hardware` branch. The four required workflow inputs are the reviewed benchmark head, qualified build run ID, reviewed build head and the enrolled SDK-lock digest. The workflow runs once on one private 16-vCPU Namespace runner and selects eight distinct physical cores. Only the artifact admission step receives the repository read token. The Cargo workload receives the exact closed environment recorded in `protocol.json`.
 
 ## What is timed and counted
 
