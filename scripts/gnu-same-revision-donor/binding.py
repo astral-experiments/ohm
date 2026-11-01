@@ -10,7 +10,7 @@ import sys
 
 HERE = Path(__file__).resolve().parent
 OLD = "393b4b05a4bfa3f531a36023846f86236a6b71a9"
-CARRIER_PARENT = "18b0cf251988b5967f8ffb0b11db850966eae9d1"
+CARRIER_PARENT = "d22c1c9d858def79d16332ab147b3ce98f140b2f"
 SOURCE_QA = "762fc25095e317ac5632ec835df3c7f9cfc64a64"
 REF = "refs/heads/charlie/qa-ruff-same-revision-donor-source-20261101"
 EXPECTED = {

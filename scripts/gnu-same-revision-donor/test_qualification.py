@@ -163,7 +163,10 @@ class Checks(unittest.TestCase):
         record = reader.load(path)
         self.assertTrue(record["complete"])
         self.assertEqual(record["prior_readers"], [])
-        self.assertEqual(record["reader_source"], reg.sha(HERE / "reopen_ruff.py"))
+        self.assertEqual(record["reader_source"], reg.digest(reg.git(
+            HERE, "show",
+            "d22c1c9d858def79d16332ab147b3ce98f140b2f:scripts/gnu-same-revision-donor/reopen_ruff.py",
+        )))
         self.assertEqual(record["raw_info"], [512, 42835069])
         self.assertEqual(
             record["originals_sha256"],
@@ -195,6 +198,136 @@ class Checks(unittest.TestCase):
             self.assertTrue(actual["maps"])
         self.assertEqual(record["checked_cgu"], 129)
         self.assertEqual(record["checked_executables"], 10)
+
+    def test_original_overlay_refusal_and_same_path_wrong_mappings(self):
+        import ast, base64, gzip
+        import driver_map
+
+        fixture = reader.load(HERE / "inputs/controls/mapped-driver-contacts.json.gz")
+        raw = base64.b64decode(fixture["live_raw_bytes_base64"], validate=True)
+        self.assertEqual(reg.digest(raw), fixture["live_sha256"])
+        self.assertEqual(fixture["failed_source_run"]["run"], 41301552076)
+        self.assertEqual(fixture["failed_source_run"]["head"], reg.CARRIER_PARENT)
+        self.assertEqual(
+            {(a["id"], a["sha256"]) for a in fixture["failed_source_run"]["artifacts"]},
+            {
+                (
+                    13081547832,
+                    "e0687db88c34318a6983fe124867d7a876b8c2530a014ed89a284ec61420fa3a",
+                ),
+                (
+                    13082041115,
+                    "9fd2cd8297c1a8ba345616d46a0d8deae2ac6894698bd491fc406f26754a7c8a",
+                ),
+            },
+        )
+        self.assertEqual(fixture["selected"][0], reopen.E_DRIVER)
+        original = json.loads(gzip.decompress(raw))
+        self.assertEqual(original["actual"], {})
+        (refusal,) = original["refused"]
+        why, line = ast.literal_eval(
+            refusal.removeprefix("RuntimeError(").removesuffix(")")
+        )
+        self.assertEqual(why, "foreign mapped driver")
+        path = Path(line.split(maxsplit=5)[5])
+        raw_id = driver_map.identity(line, path)[0]
+        self.assertEqual(
+            (raw_id, tuple(fixture["selected"][1:3])), ((32, 7614425), (33, 7614425))
+        )
+        for case in fixture["same_path_after_replacement"]:
+            before, replacement = case["initial_ref"], case["replaced_ref"]
+            self.assertEqual(before["file"][0], replacement["file"][0])
+            self.assertNotEqual(before["file"][1:3], replacement["file"][1:3])
+            self.assertEqual(before["path"], replacement["path"])
+            for proof, observation, accepts in (
+                (before, case["actual"], True),
+                (replacement, case["new_after_bind"], True),
+                (replacement, case["old_after_bind"], False),
+            ):
+                subject = Path(proof["path"])
+                self.assertTrue(
+                    all(
+                        line.split(maxsplit=5)[5] == str(subject)
+                        for line in observation["lines"]
+                    )
+                )
+                args = (
+                    proof,
+                    subject,
+                    proof["file"],
+                    observation["ns"],
+                    observation["visible"],
+                    observation["lines"],
+                )
+                if accepts:
+                    driver_map.check_process(*args)
+                else:
+                    with self.assertRaisesRegex(
+                        ValueError, "different mapped SDK object"
+                    ):
+                        driver_map.check_process(*args)
+            old = case["actual"]
+            with self.assertRaises(ValueError):
+                driver_map.check_process(
+                    before,
+                    Path(before["path"]),
+                    before["file"],
+                    "mnt:[0]",
+                    old["visible"],
+                    old["lines"],
+                )
+
+    def test_live_driver_open_and_replacement(self):
+        import ctypes.util
+        import shutil
+        import driver_map
+
+        # Two copies of one real native library must remain distinguishable even when their bytes agree.
+        lib = Path("/usr/lib/x86_64-linux-gnu") / ctypes.util.find_library("z")
+        child = "import ctypes,sys; z=ctypes.CDLL(sys.argv[1]); z.zlibVersion.restype=ctypes.c_char_p; print(z.zlibVersion().decode(),flush=True); sys.stdin.readline()"
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td).resolve()
+            selected = root / "lib-donor-contact.so"
+            other = root / "second"
+            shutil.copyfile(lib, selected)
+            shutil.copyfile(lib, other)
+            row = lambda: [reg.sha(selected), *driver_map.file_stat(selected.stat())]
+            with subprocess.Popen(
+                [sys.executable, "-IB", "-c", child, selected],
+                text=True,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+            ) as proc:
+                try:
+                    self.assertRegex(proc.stdout.readline(), r"^1\.")
+                    pid = Path("/proc") / str(proc.pid)
+
+                    def inspect(proof, current):
+                        driver_map.check_process(
+                            proof,
+                            selected,
+                            current,
+                            os.readlink(pid / "ns/mnt"),
+                            driver_map.file_stat(
+                                (pid / "root" / selected.relative_to("/")).stat()
+                            ),
+                            driver_map.mappings(pid, selected),
+                        )
+
+                    original = row()
+                    with driver_map.reference(selected, original) as proof:
+                        inspect(proof, original)
+                    other.replace(selected)
+                    replacement = row()
+                    self.assertEqual(original[0], replacement[0])
+                    self.assertNotEqual(original[1:3], replacement[1:3])
+                    with driver_map.reference(selected, replacement) as proof:
+                        with self.assertRaises(ValueError):
+                            inspect(proof, replacement)
+                finally:
+                    proc.stdin.close()
+                    proc.wait(timeout=10)
+                self.assertEqual(proc.returncode, 0)
 
     def test_original_real_client_search_order(self):
         fixture = HERE / "inputs/controls"

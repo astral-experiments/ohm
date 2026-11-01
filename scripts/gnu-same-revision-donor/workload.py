@@ -282,9 +282,10 @@ def visit(root, tag, role, env, rd, expected, flavor="Stub", registered=None):
         )
         return rows, wild, comp
 
-    driver = json.loads((b.OUT / "sdk" / (role + ".json")).read_bytes())["driver"]
+    record = json.loads((b.OUT / "sdk" / (role + ".json")).read_bytes())
+    driver = record["driver"]
     rows, wild, comp = live_driver.watch(
-        cargo, where, expected_rc, b.SDK, b.SDK / driver, out.write, None
+        cargo, where, expected_rc, b.SDK, b.SDK / driver, out.write, record["files"][driver]
     )
     full = [x for x in comp if x["mode"] == "compile"]
     typed = [r for r in rows if r["reason"] == "compiler-artifact"]

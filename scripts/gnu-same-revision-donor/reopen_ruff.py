@@ -16,6 +16,7 @@ sys.path.insert(0, str(HERE))
 os.environ.setdefault("RUNNER_TEMP", tempfile.gettempdir())
 import workload as w
 import donors
+import driver_map
 import events
 import native_provider
 from binding import need, digest, sha, OLD, NEW, SOURCE_RECEIPT
@@ -184,9 +185,12 @@ def source(info, tag, dirty):
     return 64 if a else 56, "Python" if semantic else "Stub"
 
 
-def live(folder, full, record):
+def live(folder, full, record, sdk):
     drivers = load(folder / "live-drivers.json.gz")
     d = record["files"][record["driver"]]
+    path = sdk / record["driver"]
+    proof = drivers["reference"]
+    driver_map.check_reference(proof, path, d)
     need(not drivers["refused"], "live compiler sampler refused")
     for c in full:
         if c["name"] not in w.OWN:
@@ -201,16 +205,7 @@ def live(folder, full, record):
             and v["maps"],
             "selected compiler has no genuine mapped driver",
         )
-        for line in v["maps"]:
-            fields = line.split(maxsplit=5)
-            maj, minor = map(lambda x: int(x, 16), fields[3].split(":"))
-            need(
-                "x" in fields[1]
-                and os.makedev(maj, minor) == d[1]
-                and int(fields[4]) == d[2]
-                and fields[5].endswith("/.rustup/toolchains/ohm/" + record["driver"]),
-                "wrong mapped driver file",
-            )
+        driver_map.check_process(proof, path, d, v["mount_namespace"], v["visible"], v["maps"])
 
 
 def external_args(rows):
@@ -368,7 +363,9 @@ def visit(folder, role, rd, record, cas, tmp, execs, checked, dirty):
         and code == info["code"],
         "actual complete native roster differs",
     )
-    live(folder, allfull, record)
+    sdk = Path(imgs["cargo"]["exe"]).parent.parent
+    need(sdk.parts[-3:] == (".rustup", "toolchains", "ohm"), "foreign physical Cargo SDK")
+    live(folder, allfull, record, sdk)
     fired = [r for r in typed if r["reason"] == "compiler-artifact"]
     diag = [
         r["message"]

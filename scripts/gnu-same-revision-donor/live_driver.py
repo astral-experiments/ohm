@@ -1,15 +1,21 @@
 """Authenticate the physically mapped driver of actual Cargo descendant compilers without changing Cargo."""
 
-import os, re, threading, time
+import os, threading
 from pathlib import Path
 
+import driver_map
 
-def watch(call, folder, code, sdk, driver, write, read):
+
+def watch(call, folder, code, sdk, driver, write, row):
+    with driver_map.reference(driver, row) as proof:
+        return _watch(call, folder, code, sdk, driver, write, row, proof)
+
+
+def _watch(call, folder, code, sdk, driver, write, row, proof):
     stopped = threading.Event()
     found = {}
     base = os.getpid()
     exe = (sdk / "bin/rustc").stat()
-    ds = driver.stat()
 
     def sample():
         todo = [(base, [])]
@@ -30,26 +36,20 @@ def watch(call, folder, code, sdk, driver, write, read):
                     ]
                     if "--crate-name" not in argv:
                         continue
-                    lines = []
-                    for line in (proc / "maps").read_text().splitlines():
-                        bits = line.split(maxsplit=5)
-                        if len(bits) == 6 and "x" in bits[1] and Path(bits[5]).name == driver.name:
-                            maj, minor = (int(a, 16) for a in bits[3].split(":"))
-                            if (
-                                os.makedev(maj, minor) != ds.st_dev
-                                or int(bits[4]) != ds.st_ino
-                                or bits[5] != str(driver)
-                            ):
-                                raise RuntimeError(("foreign mapped driver", line))
-                            lines.append(line)
+                    lines = driver_map.mappings(proc, driver)
                     if lines:
+                        namespace = os.readlink(proc / "ns/mnt")
+                        visible = driver_map.file_stat((proc / "root" / driver.relative_to("/")).stat())
+                        driver_map.check_process(proof, driver, row, namespace, visible, lines)
                         found[pid] = dict(
+                            mount_namespace=namespace,
+                            visible=visible,
                             pid=pid,
                             ancestry=parents,
                             argv=argv,
                             maps=lines,
-                            dev=ds.st_dev,
-                            ino=ds.st_ino,
+                            dev=visible[0],
+                            ino=visible[1],
                         )
                     continue
                 for t in (proc / "task").iterdir():
@@ -78,7 +78,8 @@ def watch(call, folder, code, sdk, driver, write, read):
     finally:
         stopped.set()
         thread.join()
-        write(folder / "live-drivers.json.gz", dict(actual=found, refused=failure, worker_pid=base))
+        write(folder / "live-drivers.json.gz",
+              dict(actual=found, refused=failure, worker_pid=base, reference=proof))
     if failure:
         raise ValueError(failure)
     for c in result[2]:
