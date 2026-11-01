@@ -1,5 +1,5 @@
-name: Separate fresh incremental table encoding during an ordinary Ruff repair
-run-name: Ruff repair diagnostic ${{ inputs.reviewed_head }}
+name: Native contact for fresh incremental tables during a Ruff repair
+run-name: Unscored Ruff repair contact ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -15,11 +15,7 @@ jobs:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-repair-encode-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
-    name: Separate Ruff repair table encoding ${{ matrix.position }}
-    strategy:
-      fail-fast: false
-      matrix:
-        position: ['01', '02']
+    name: Verify native table-notification contact
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
@@ -68,18 +64,12 @@ jobs:
             scripts/ohm-apple-zmij/source-transport
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
-          path: physical
-          persist-credentials: false
-          sparse-checkout: scripts/gnu-renderer-pfc-hardware
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-          path: observers
+          ref: 19f9a67b032cce44cea1e3bb7e324558cd9abd0a
+          path: observer-source
           persist-credentials: false
           sparse-checkout: |
-            scripts/gnu-example-ceiling
-            scripts/gnu-renderer-library-workers
+            scripts/branch-return-execstop
+            scripts/branch-return-pmu
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
@@ -87,6 +77,7 @@ jobs:
         run: |
           set -exuo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
+          test "$(git -C observer-source rev-parse HEAD)" = 19f9a67b032cce44cea1e3bb7e324558cd9abd0a
           test "$(git -C prior-pilot rev-parse HEAD)" = 5c651f1d38c629da2a75d5cac3588db0be8104d7
           test "$(git -C enrolled rev-parse HEAD:scripts/ctfe-crossover-pilot)" = "$(git -C prior-pilot rev-parse HEAD:scripts/ctfe-crossover-pilot)"
           test "$(git -C ctfe-source rev-parse HEAD)" = 18b0cf251988b5967f8ffb0b11db850966eae9d1
@@ -99,33 +90,32 @@ jobs:
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev strace zstd
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
           python3 -IB enrolled/scripts/ctfe-repair-encode/test_gate.py
-          python3 -IB enrolled/scripts/ctfe-repair-encode/read.py --help > /dev/null
+          python3 -IB enrolled/scripts/ctfe-repair-encode/test_contact.py
+          python3 -IB enrolled/scripts/ctfe-repair-encode/read_contact.py --help > /dev/null
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           test ! -e "$base"
           mkdir -p "$base/work" "$base/logs"
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
-          dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
+          dpkg-query -W b3sum binutils build-essential git libssl-dev strace zstd > "$base/logs/packages.tsv"
       - name: Authenticate the source-built candidate SDK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/ctfe-repair-encode/run.py acquire "$GITHUB_WORKSPACE/source"
-      - name: Run paired candidate repairs
-        env:
-          POSITION: ${{ matrix.position }}
+          python3 -IB enrolled/scripts/ctfe-repair-encode/run_contact.py acquire "$GITHUB_WORKSPACE/source"
+      - name: Run the unscored ordinary and notified repairs
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-repair-encode/run.py "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-repair-encode/run_contact.py contact
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ctfe-repair-encode-${{ matrix.position }}
+          name: ctfe-repair-contact
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

@@ -157,7 +157,36 @@ def objects(directory):
     return result
 
 
-def physical(control, sdk, config, *, inventory=None):
+def mapped_driver(control, stem, driver, expected, maps):
+    """Join the executable mmap's live FD to an independent map of the enrolled driver FD."""
+    ref = (control / 'driver.reference').read_text().splitlines()
+    need(len(ref) == 2, 'incomplete driver reference')
+    dev, ino, size, reference_address = ref[0].split('\t')
+    need(tuple(map(int, (dev, ino, size))) == expected, 'wrong reference FD')
+
+    def map_row(line):
+        fields = line.split(maxsplit=5)
+        need(len(fields) == 6, 'missing mapped file')
+        start, end = (int(v, 16) for v in fields[0].split('-'))
+        return start, end, fields[1], int(fields[2], 16), fields[3], int(fields[4]), fields[5]
+
+    a, b, perms, offset, device, inode, pathname = map_row(ref[1])
+    need(a == int(reference_address, 16) and b-a == 4096 and perms == 'r--p' and offset == 0
+         and inode == expected[1] and pathname == str(driver), 'unbound read-only driver reference')
+    fd_dev, fd_ino, fd_size, fd, address, length, offset, path = (control / (stem + '.mmap')).read_text().strip().split('\t')
+    need(tuple(map(int, (fd_dev, fd_ino, fd_size))) == expected and path == str(driver) and int(fd,16)>=0,
+         'different actual driver mmap descriptor')
+    address, length, offset = (int(x,16) for x in (address,length,offset))
+    need(length > 0 and offset > 0 and offset+length <= expected[2], 'invalid file-backed code range')
+    entries = [line for line in maps if len(f:=line.split(maxsplit=5))==6 and 'x' in f[1] and 'librustc_driver' in Path(f[5]).name]
+    need(len(entries)==1, 'missing or multiple executable driver mappings')
+    a, b, perms, file_offset, real_dev, real_ino, real_path = map_row(entries[0])
+    need(a == address and b == a + ((length+4095)//4096)*4096 and perms == 'r-xp' and file_offset == offset
+         and (real_dev,real_ino,real_path)==(device,expected[1],str(driver)), 'unbound executable driver mapping')
+    return entries
+
+
+def physical(control, sdk, config, *, inventory=None, kernel=False):
     expected = list(config)
     events = {}
     images = {}
@@ -177,7 +206,7 @@ def physical(control, sdk, config, *, inventory=None):
             return (st.st_dev, st.st_ino, st.st_size)
 
         need(
-            (int(d), int(i), int(size)) == identity(key) and os.path.normpath(path) == str(sdk / key),
+            (int(d), int(i), int(size)) == identity(key) and (path if kernel else os.path.normpath(path)) == str(sdk / key),
             "wrong kernel image identity",
         )
         images[pid] = dict(role=role, argv=argv, identity=[int(d), int(i), int(size), path])
@@ -186,15 +215,18 @@ def physical(control, sdk, config, *, inventory=None):
         driver = sdk / DRIVER
         ds = identity(DRIVER)
         maps = (control / (p.stem + ".maps")).read_text().splitlines()
-        found = []
-        for m in maps:
-            f = m.split(maxsplit=5)
-            if len(f) != 6 or "x" not in f[1] or Path(f[5]).name != driver.name:
-                continue
-            dev = os.makedev(*(int(x, 16) for x in f[3].split(":")))
-            need((dev, int(f[4])) == ds[:2] and os.path.normpath(f[5]) == str(driver), "wrong mapped driver")
-            found.append(m)
-        need(found, "authentic driver not mapped")
+        if kernel:
+            found = mapped_driver(control, p.stem, driver, ds, maps)
+        else:
+            found = []
+            for m in maps:
+                f = m.split(maxsplit=5)
+                if len(f) != 6 or "x" not in f[1] or Path(f[5]).name != driver.name:
+                    continue
+                dev = os.makedev(*(int(x, 16) for x in f[3].split(":")))
+                need((dev, int(f[4])) == ds[:2] and os.path.normpath(f[5]) == str(driver), "wrong mapped driver")
+                found.append(m)
+            need(found, "authentic driver not mapped")
         images[pid]["driver_maps"] = found
         for line in (control / (p.stem + ".events")).read_text().splitlines():
             tag, idx, flags, fd, err, dev, ino, size, path = line.split("\t")
