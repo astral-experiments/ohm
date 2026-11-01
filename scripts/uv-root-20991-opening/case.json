@@ -1,0 +1,442 @@
+{
+  "background_keys": [
+    [
+      "uv",
+      "uv",
+      [
+        "bin"
+      ],
+      [
+        "default",
+        "performance",
+        "performance-memory-allocator",
+        "test-crates-io",
+        "test-defaults",
+        "test-ecosystem",
+        "test-git",
+        "test-git-lfs",
+        "test-pypi",
+        "test-python",
+        "test-python-eol",
+        "test-python-managed",
+        "test-r2",
+        "test-slow",
+        "test-universal"
+      ]
+    ],
+    [
+      "uv",
+      "uv",
+      [
+        "lib"
+      ],
+      [
+        "default",
+        "performance",
+        "performance-memory-allocator",
+        "test-crates-io",
+        "test-defaults",
+        "test-ecosystem",
+        "test-git",
+        "test-git-lfs",
+        "test-pypi",
+        "test-python",
+        "test-python-eol",
+        "test-python-managed",
+        "test-r2",
+        "test-slow",
+        "test-universal"
+      ]
+    ],
+    [
+      "uv",
+      "uvx",
+      [
+        "bin"
+      ],
+      [
+        "default",
+        "performance",
+        "performance-memory-allocator",
+        "test-crates-io",
+        "test-defaults",
+        "test-ecosystem",
+        "test-git",
+        "test-git-lfs",
+        "test-pypi",
+        "test-python",
+        "test-python-eol",
+        "test-python-managed",
+        "test-r2",
+        "test-slow",
+        "test-universal"
+      ]
+    ],
+    [
+      "uv-build-frontend",
+      "uv_build_frontend",
+      [
+        "lib"
+      ],
+      []
+    ],
+    [
+      "uv-cli",
+      "uv_cli",
+      [
+        "lib"
+      ],
+      [
+        "default"
+      ]
+    ],
+    [
+      "uv-dev",
+      "uv_dev",
+      [
+        "lib"
+      ],
+      [
+        "default",
+        "performance",
+        "performance-memory-allocator"
+      ]
+    ],
+    [
+      "uv-dispatch",
+      "uv_dispatch",
+      [
+        "lib"
+      ],
+      []
+    ],
+    [
+      "uv-distribution",
+      "uv_distribution",
+      [
+        "lib"
+      ],
+      [
+        "default"
+      ]
+    ],
+    [
+      "uv-installer",
+      "uv_installer",
+      [
+        "lib"
+      ],
+      []
+    ],
+    [
+      "uv-python",
+      "build-script-build",
+      [
+        "custom-build"
+      ],
+      [
+        "clap",
+        "schemars"
+      ]
+    ],
+    [
+      "uv-python",
+      "uv_python",
+      [
+        "lib"
+      ],
+      [
+        "clap",
+        "schemars"
+      ]
+    ],
+    [
+      "uv-requirements",
+      "uv_requirements",
+      [
+        "lib"
+      ],
+      []
+    ],
+    [
+      "uv-resolver",
+      "uv_resolver",
+      [
+        "lib"
+      ],
+      [
+        "clap",
+        "schemars"
+      ]
+    ],
+    [
+      "uv-scripts",
+      "uv_scripts",
+      [
+        "lib"
+      ],
+      []
+    ],
+    [
+      "uv-settings",
+      "uv_settings",
+      [
+        "lib"
+      ],
+      [
+        "schemars"
+      ]
+    ],
+    [
+      "uv-test",
+      "uv_test",
+      [
+        "lib"
+      ],
+      []
+    ],
+    [
+      "uv-tool",
+      "uv_tool",
+      [
+        "lib"
+      ],
+      []
+    ],
+    [
+      "uv-types",
+      "uv_types",
+      [
+        "lib"
+      ],
+      [
+        "default"
+      ]
+    ],
+    [
+      "uv-virtualenv",
+      "uv_virtualenv",
+      [
+        "lib"
+      ],
+      []
+    ]
+  ],
+  "branch": "charlie/codex-uv-20991-root-opening",
+  "case": {
+    "B": "1979349b68dbaa936b98c0f409c1df0598fa72f1",
+    "B_tree": "ec9a3f83e89381b5c509ca0c45fb4a87ec71289f",
+    "C": "5d4a62d7461c7708f3e65d08cef0e99bad94c004",
+    "C_tree": "6b64b575807637ad13ee675087ca384145d42ff3",
+    "files": [
+      "crates/uv/src/commands/workspace/metadata.rs",
+      "crates/uv/tests/workspace/workspace_metadata.rs"
+    ],
+    "literal": [
+      "check",
+      "--locked",
+      "--offline",
+      "-j8"
+    ],
+    "lock": "2ab7a7e2d64ab31200b78f1729ca83f15b247f65fcdc63fa5550d41b9f1b2164",
+    "locked_registry": 658,
+    "patch": "0edee297924522615284c36046ca1c7dd03d2f2e11235c1589c997c23a48faa8",
+    "snapshot": {
+      "conflicts": {
+        "sets": []
+      },
+      "members": [
+        {
+          "id": "foo==0.1.0@editable+[TEMP_DIR]/foo/",
+          "name": "foo",
+          "path": "[TEMP_DIR]/foo"
+        }
+      ],
+      "requires_python": ">=3.12",
+      "resolution": {
+        "foo==0.1.0@editable+[TEMP_DIR]/foo/": {
+          "dependencies": [],
+          "kind": "package",
+          "name": "foo",
+          "source": {
+            "editable": "[TEMP_DIR]/foo/"
+          },
+          "version": "0.1.0"
+        },
+        "workspace+[TEMP_DIR]/foo": {
+          "dependencies": [],
+          "kind": "workspace",
+          "path": "[TEMP_DIR]/foo"
+        }
+      },
+      "schema": {
+        "version": "preview"
+      },
+      "workspace": {
+        "id": "workspace+[TEMP_DIR]/foo",
+        "path": "[TEMP_DIR]/foo"
+      },
+      "workspace_root": "[TEMP_DIR]/foo"
+    },
+    "test": {
+      "B": "01d262db56e994703377ae5319fe196ff34772ffcf5817744a2a479898ac34e6",
+      "C": "1538c4a73fd2079b24aa6437293d58c286c87cd9d0666c11c1fffc695c4281d3"
+    },
+    "workspace_packages_in_lock": 70
+  },
+  "coordinator": "8bf1d2c61fa3bb23ccf44a329e74e0359d98848c",
+  "full_source": {
+    "files": {
+      "1979349b68dbaa936b98c0f409c1df0598fa72f1": {
+        "Cargo.lock": {
+          "blob": "74588b85635b44a3c37821d423f179c7a24fdcb3",
+          "sha256": "2ab7a7e2d64ab31200b78f1729ca83f15b247f65fcdc63fa5550d41b9f1b2164"
+        },
+        "crates/uv-bench/benches/workspace_discovery.rs": {
+          "blob": "b247e3248c4b6cf846db1428d9df1e05c015abe4",
+          "sha256": "508a2c25c6d7fa44064dc39ee0426eee1c8bc14dbee7bb0a626278ac7690d0e2"
+        },
+        "crates/uv-workspace/src/workspace.rs": {
+          "blob": "20ad458f8d29ac46414f80d735de02c2c6aeb185",
+          "sha256": "731b3f2b1afaa9b102e15f76c74dc41a62e347183fffaafaa0de3d3fbd26de94"
+        },
+        "crates/uv/src/commands/workspace/metadata.rs": {
+          "blob": "96b7d4c983c5fff4f4590c44c71111321dfbebc9",
+          "sha256": "46c6dde849bda9d758bf652a22676334bd68216b7490fbb9e2b9bfadd3e880d6"
+        },
+        "crates/uv/tests/workspace/workspace_metadata.rs": {
+          "blob": "6bdecddac2176e83ff709ab65cdcc52f9e6cbdd7",
+          "sha256": "01d262db56e994703377ae5319fe196ff34772ffcf5817744a2a479898ac34e6"
+        }
+      },
+      "5d4a62d7461c7708f3e65d08cef0e99bad94c004": {
+        "Cargo.lock": {
+          "blob": "74588b85635b44a3c37821d423f179c7a24fdcb3",
+          "sha256": "2ab7a7e2d64ab31200b78f1729ca83f15b247f65fcdc63fa5550d41b9f1b2164"
+        },
+        "crates/uv-bench/benches/workspace_discovery.rs": {
+          "blob": "b247e3248c4b6cf846db1428d9df1e05c015abe4",
+          "sha256": "508a2c25c6d7fa44064dc39ee0426eee1c8bc14dbee7bb0a626278ac7690d0e2"
+        },
+        "crates/uv-workspace/src/workspace.rs": {
+          "blob": "20ad458f8d29ac46414f80d735de02c2c6aeb185",
+          "sha256": "731b3f2b1afaa9b102e15f76c74dc41a62e347183fffaafaa0de3d3fbd26de94"
+        },
+        "crates/uv/src/commands/workspace/metadata.rs": {
+          "blob": "42fc59779f9f68436f0c3352815e224802ab6434",
+          "sha256": "62f3f1f1eae6dff65e2a0bc966c0238c0e8311238dd43c8224b555d8738baafd"
+        },
+        "crates/uv/tests/workspace/workspace_metadata.rs": {
+          "blob": "03ba2dbe40ce0f8b25190c91414129b5883aa372",
+          "sha256": "1538c4a73fd2079b24aa6437293d58c286c87cd9d0666c11c1fffc695c4281d3"
+        }
+      }
+    },
+    "official_C_snapshot": {
+      "conflicts": {
+        "sets": []
+      },
+      "members": [
+        {
+          "id": "foo==0.1.0@editable+[TEMP_DIR]/foo/",
+          "name": "foo",
+          "path": "[TEMP_DIR]/foo"
+        }
+      ],
+      "requires_python": ">=3.12",
+      "resolution": {
+        "foo==0.1.0@editable+[TEMP_DIR]/foo/": {
+          "dependencies": [],
+          "kind": "package",
+          "name": "foo",
+          "source": {
+            "editable": "[TEMP_DIR]/foo/"
+          },
+          "version": "0.1.0"
+        },
+        "workspace+[TEMP_DIR]/foo": {
+          "dependencies": [],
+          "kind": "workspace",
+          "path": "[TEMP_DIR]/foo"
+        }
+      },
+      "schema": {
+        "version": "preview"
+      },
+      "workspace": {
+        "id": "workspace+[TEMP_DIR]/foo",
+        "path": "[TEMP_DIR]/foo"
+      },
+      "workspace_root": "[TEMP_DIR]/foo"
+    },
+    "trees": {
+      "1979349b68dbaa936b98c0f409c1df0598fa72f1": "ec9a3f83e89381b5c509ca0c45fb4a87ec71289f",
+      "5d4a62d7461c7708f3e65d08cef0e99bad94c004": "6b64b575807637ad13ee675087ca384145d42ff3"
+    }
+  },
+  "minimum_before_GiB": 32,
+  "minimum_ready_GiB": 20,
+  "new_workflow": "ci.yml",
+  "old_design": "8003b0a6273e43bc6d98e492a318e65110e89ae7fb5d7aad8f0dce4ae154f227",
+  "old_files": {
+    "intake.py": "88bf7f852c5616c2b09d395fd4cb662a3c6303c79f8e8866dee25bee621be57f",
+    "protocol.json": "c6be5c49d904060c300e0910b57bc86a07d7c14839dee1e98f50e011fb29e959",
+    "run.py": "ccd44c276d5d3660b361cca9f8c816602536239f6986264a88daa02340b514da"
+  },
+  "reader_sha256": "583de0e35bc39fe69180ead1fd3f5e142b975689a3626556c7c751eab74f453d",
+  "reference_sha256": "ec444b33eff4d32ec0fa41deff2b5d8ac7311ffb0e94dc5e42dd4c2f97a42955",
+  "registry": {
+    "archives_and_sparse_index_rows": 658,
+    "sha256": "7911b4bda97f8f1193976dee63567d4168d82e9b9e001b6b05f0b6c53c86ad60"
+  },
+  "repo": "astral-experiments/ohm",
+  "role_order": [
+    "signed",
+    "rebased"
+  ],
+  "score": false,
+  "sdk": {
+    "rebased": {
+      "bundled_archive": "93936b4afa72b94ebbb3054e3bd095fea2edff0c5a54f019925459698c474aaa",
+      "bytes": 570055654,
+      "cargo": "afebcdeb6a33870db2dccb57234501fdb0e60ad1cb241474135bb3d0f3f5782e",
+      "driver": "2e338b37afd5e291cfc7213286e9653e7b0533a2186c4ed39548b33fa8194383",
+      "inventory_sha256": "bd2bea6876b6713caf319daef74c7864737404532d552c93878c10f4c7e0fc58",
+      "members": 142,
+      "rust": "f12924d918dbc66898325531940a20aa8cf4f5fc",
+      "rustc": "664c3bcb15013312755d73e6bf298466d553bd7cf5dc392e2a00996cb313670f"
+    },
+    "signed": {
+      "bundled_archive": "bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7",
+      "bytes": 570106827,
+      "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+      "driver": "4c8ccf0072e8f382a3a3756fd60e46936a2bd206996201c55caffe58d29725db",
+      "inventory_sha256": "662972c0aaaf87e482298f461ce0d172267ee22b4b1740c6946152483c90bcc6",
+      "members": 142,
+      "rust": "008a21ac0d750dc9a1c18b7959d7e7984c03d887",
+      "rustc": "7e35096dab1b661924cb3c31982c870dd99c7c00a7fba28aa958f451e7c9474e"
+    }
+  },
+  "unscored_argv": [
+    "/tmp/uv-workflow-search/sdk/bin/cargo",
+    "check",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "workload_environment": {
+    "CARGO_HOME": "/tmp/uv-workflow-search/cargo",
+    "CARGO_NET_OFFLINE": "true",
+    "CARGO_TARGET_DIR": "/tmp/uv-workflow-search/target",
+    "CARGO_TERM_COLOR": "never",
+    "GIT_ALLOW_PROTOCOL": "file",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_NO_LAZY_FETCH": "1",
+    "HOME": "/tmp/uv-workflow-search/home",
+    "LC_ALL": "C.UTF-8",
+    "PATH": "/tmp/uv-workflow-search/sdk/bin:/usr/bin:/bin",
+    "RUSTC": "/tmp/uv-workflow-search/sdk/bin/rustc",
+    "RUSTDOC": "/tmp/uv-workflow-search/sdk/bin/rustdoc"
+  }
+}

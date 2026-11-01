@@ -1,101 +1,77 @@
-name: Final rebased compiler after the uv workspace edit
-run-name: Rebased uv-resolver default package check at ${{ inputs.reviewed_head }}
+name: Unscored uv 20991 direct root opening
+run-name: Verify direct uv root edit at ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed coordinator experiment commit
+        description: Exact reviewed private coordinator commit for the unscored opening
         type: string
         required: true
 permissions: {}
+concurrency:
+  group: unscored-uv-20991-root-opening
+  cancel-in-progress: false
 jobs:
-  measure:
-    name: Whole-command counters and separate native resolver checks
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-20988-final-rc23' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+  opening:
+    name: Verify independent cold histories and the actual ordinary-root compiler execs
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-20991-root-opening' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 105
+    timeout-minutes: 75
     permissions:
       contents: read
       actions: read
       attestations: read
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+          sparse-checkout: |
+            scripts/uv-root-20991-opening
+            .github/workflows
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
+          path: previous
+          persist-credentials: false
           sparse-checkout: scripts/uv-resolver-whole-pmu
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
-          path: qualified
-          persist-credentials: false
-          sparse-checkout: scripts/rc23-trait-qualification
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
-          path: pilot
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/ctfe-crossover-pilot
-            scripts/branch-return-pmu
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
-          path: calibrator
-          persist-credentials: false
-          sparse-checkout: scripts/gnu-renderer-pfc-hardware
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-          path: observers
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/gnu-example-ceiling
-            scripts/gnu-renderer-library-workers
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Test the registered design and calibrate the inherited userspace PMU
+      - name: Admit the pinned system Python, disk budget, offline readers and scoped descendant trace
         run: |
           set -euo pipefail
-          python3 -IB scripts/uv-resolver-whole-pmu/controls.py
           mkdir -p trait-results
-          python3 -IBu scripts/uv-resolver-whole-pmu/run.py calibrate 2>&1 | tee trait-results/calibration.log
+          (
+            cd scripts/uv-root-20991-opening
+            sha256sum -c SHA256SUMS
+          )
+          test -x /usr/bin/python3.12 && test -x /usr/bin/strace || { echo 'Opening requires /usr/bin/python3.12 and /usr/bin/strace on this runner' >&2; exit 1; }
+          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py early 2>&1 | tee trait-results/initial.log
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/uv
-          ref: 1979349b68dbaa936b98c0f409c1df0598fa72f1
-          path: uv-src
+          ref: 5d4a62d7461c7708f3e65d08cef0e99bad94c004
+          path: uv-source
           fetch-depth: 2
           persist-credentials: false
-      - name: Verify signed −22, earlier combined and rebased combined SDKs
+      - name: Admit the signed release and final production distribution with the original verifier
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IBu scripts/uv-resolver-whole-pmu/intake.py 2>&1 | tee trait-results/intake.log
-      - name: Verify real native behaviors and the 12 balanced instruction and wall trios
+          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py intake 2>&1 | tee trait-results/acquire.log
+      - name: Run the two genuine root openings and re-read all evidence
         run: |
           set -euo pipefail
-          python3 -IBu scripts/uv-resolver-whole-pmu/run.py run 2>&1 | tee trait-results/experiment.log
-      - name: Preserve partial observer evidence on failure
-        if: always()
-        run: |
-          set -euo pipefail
-          partial="$RUNNER_TEMP/ohm-branch-object-qa/logs"
-          mkdir -p trait-results
-          if test -d "$partial" && ! test -d trait-results/pmu-calibration; then
-            cp -a "$partial" trait-results/pmu-calibration
-          fi
-      - name: Retain every raw stream, PMU calibration, counter and refusal
+          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py run 2>&1 | tee trait-results/opening.log
+          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py verify trait-results
+      - name: Preserve full or partial unscored evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-20988-rebased-rc23-${{ github.run_id }}-${{ github.run_attempt }}
+          name: uv-20991-independent-root-opening-${{ github.run_id }}-${{ github.run_attempt }}
           path: trait-results/
-          if-no-files-found: warn
           retention-days: 14
-          compression-level: 6
+          compression-level: 2
+          if-no-files-found: warn
