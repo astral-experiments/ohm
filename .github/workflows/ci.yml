@@ -46,7 +46,7 @@ jobs:
             cd scripts/uv-root-20991-opening
             sha256sum -c SHA256SUMS
           )
-          test -x /usr/bin/python3.12 && test -x /usr/bin/strace || { echo 'Opening requires /usr/bin/python3.12 and /usr/bin/strace on this runner' >&2; exit 1; }
+          /usr/bin/bash scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
           /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py early 2>&1 | tee trait-results/initial.log
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
