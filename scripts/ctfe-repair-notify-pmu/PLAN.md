@@ -1,0 +1,41 @@
+# Whole Cargo instructions during a Ruff parser repair
+
+This is a two-host diagnostic of a previously observed repair cost. It requires the independent successful three-arm, unscored, real Ruff contact at packaging commit `084db0cf9d1156c9644880fda30f320072734865`. Both original ZIP identity and independent readback SHA-256 are mandatory. Every hardware worker reopens the original before starting its own native/PMU work. The source contact passed under original 13080191362. Its complete native reader output is retained in `source-contact.json`. All 32 logical table-body hashes differed for each O/B and P/B comparison. The per-stream differences passed the registered 2% limit, and both total streams passed the 1% limit. A different or refused contact leaves the hardware registration closed.
+
+## Treatments and schedule
+
+Each boot uses the original E SDK at `393b4b05` and C at `df2c077a`, with strict Cargo `761ea115`, stock GNU Wild `0d633580`, opt-in branch caching and the published 81-file SDK proofs. The actual workspace, Rustup home, target and shared build directory keep their absolute paths throughout. The measured command is `cargo +ohm build -p ruff --bin ruff --locked --offline -j4 --message-format=json`. The counted visit is the successful parser repair after training Y-B, X-A, X-B, the comment, the unchanged repeat, and the real E0308 at line 626 on Y. Every treatment gets independent freshly empty canonical output roots and the complete ordinary training. Only the repair opens the hardware event. Each compiler has its own independent clean A, B and edited B native CLI and layout-reader references.
+
+| Treatment | Compiler | Full repair launch |
+| --- | --- | --- |
+| E | E | calibrated plain meter, Cargo |
+| O | C | calibrated plain meter, Cargo |
+| P | C | qualified seccomp notifier in pass mode, calibrated plain meter, Cargo |
+| B | C | qualified seccomp notifier denying the 14 first creates, calibrated plain meter, Cargo |
+
+Position 01 runs E, O, P, B. Position 02 runs B, P, O, E. Thus all six relative treatment orders reverse, each host supplies its own ordinary E and C, and each sees one P/B pair. Boots and runner identities must differ from one another and all registered hosts, including the required contact. There is no pooling of missing positions. A failed job, ambiguous physical evidence, partial hardware duty, failed source/ELF check, or failed same-source control leaves the comparison unscored.
+
+## Native and hardware scope
+
+The hardware command runs untraced in the ordinary Cargo environment. The verified schema-3 structural contact supplies the independently observed full 375-unit topology and all 14 donor/fault decisions. Each hardware host has a separate uncounted ordinary repair trace, E on 01 and C on 02, with the exact owner and native output tests. The three earlier contact ledgers and the two new unmetered ledgers keep their separate source, role, run, boot and command identities. None supplies counted per-PID instructions. For the untraced E/O repairs, Cargo reports 16 dirty compilation units. The actual E/O process count comes from the separate structural history. P/B also record the actual native Cargo, 16 selected rustc PIDs/argv/mapped driver and one stock Wild during the metered command, without ptrace. The notifier supplies actual table FDs and declines only the enrolled first private output name. Every other product and Rust compiler input is unchanged.
+
+The existing source-bound `watch.c` forks a child, attaches its inherited user-mode hardware instruction event, arms enable-on-exec, and releases that child to exec the normal Cargo proxy. The count includes the proxy, Cargo and its descendant threads, compiler workers and linker helpers within the ordinary return window. Its parent reads the event after waiting for Cargo to exit. The seccomp notifier is the meter's parent on P/B. Its own instructions, kernel notification/ptrace work, and all post-command hashing, testing and storage reads are outside the numerator. The stock helper can be reparented. A separate structural check requires every non-Cargo process to have entered kernel EXIT by Cargo's terminal wait. Any orphan execution after an untraced Cargo return remains unmeasured. The authentic 36+worker calibration controls run on each boot, accompanied by the known fork/re-exec loop passed through both notifier modes. Exact enabled == running > 0, physical source and calibration outputs are required.
+
+## Predeclared estimands
+
+Record the four absolute integer instruction totals, their order, hardware metadata, and each signed paired difference for each host. O is candidate C's ordinary repair. With all totals positive, report the following exact numerator/denominator pairs, leaving negative values and ratios exceeding one intact.
+
+* The ordinary E-to-C repair excess is `H = O - E` and the relative change is `H / E`.
+* The notification treatment contrast is `D = P - B`. Report `D / P` and `D / O`.
+* The observed change in charged Cargo-tree instructions under pass-mode instrumentation is `J = P - O` and `J / O`. The supervisor and kernel contribute only indirectly through their effect on the charged processes.
+* The residual is `H - D`. Report `D / H` only for a positive same-host excess. For a zero or negative excess, preserve both signed differences and print the ratio as undefined. Do not truncate ratios to [0,1]. If each boot has H>0, D>0, 2D>=H and 100|J|<=2O, report that blocking this route removes at least half of the contemporaneous excess on both measured repairs. Otherwise report which tests failed and the observations. These are directional diagnostic gates without a confidence claim or a product speedup endpoint.
+
+The intervention changes two successful fresh writes, their validation/publication and raw removal into first-create EACCES and the original fallback/rollback. It may also change concurrent graph I/O, kernel decisions and scheduling. D measures the whole process-tree effect of that change. A large J limits its applicability to ordinary operation. The published approximately 56% increase (about 41.16B over 73.83B) came from different hosts. Its totals and ratios are never used as the new denominator or calibration.
+
+## Storage and product verdicts
+
+Retain both 64/56 typed contradictions, E0308, actual A/B CLI behavior, independent executed outputs and the full warm/own-empty CLI and reader ELF bytes for all relevant states. C's O/P/B must share 375 target identities, all 337 registry artifact placements, all build-script output directories, identical dirty units, and the actual C physical compiler commands where recorded. Separately verify E’s own 375-unit graph and native outputs. Cross-E/C the native behavior and complete executable/load segments must agree with the original source policy, preserving all distinct whole bodies.
+
+On each physical repaired session reopen the preceding donor, every new graph/query alias and each native object. C O/P publish the 14 packed pairs, B publishes all 16 owners raw; two Ruff roots stay raw across C. C's 748 packed and 918 raw object entries must have identical owner names, bytes, membership and representations across O/P/B. E’s known 16 raw pairs and 1,666 raw native entries are separately verified. Report per-owner logical bytes, physical packed/raw bytes, differing table-body hashes, selection/FD evidence, scope-specific hardlinks, unique inode allocations and file-class totals before/after repair for both output roots. Allocation is sampled after the command, so the result describes retained size. Comparisons remain diagnostic if table bytes differ within the already frozen tight per-stream and total tolerances. Any native object discrepancy is a refusal.
+
+This registration covers two new x86-64 GNU hosts and source-authenticated, prebuilt compiler roles.
