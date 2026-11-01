@@ -6,7 +6,7 @@ import re
 
 HERE = Path(__file__).resolve().parent
 REPO = 'astral-experiments/ohm'
-BRANCH = 'charlie/qa-ctfe-v3-pilot-20261101'
+BRANCH = 'charlie/qa-ctfe-v3-wild-exit-20261101'
 BASE = '5c651f1d38c629da2a75d5cac3588db0be8104d7'
 OBSERVER = '19f9a67b032cce44cea1e3bb7e324558cd9abd0a'
 OBSERVER_MANIFEST = 'dd9079b8bbe00593142dde1def8862a2d1f5d2cb04e6445e2f056f56dbff3292'
@@ -16,6 +16,7 @@ PROJECTOR = '5e91ed3974c0964a912fd38049946f647891dcb2'
 SCREEN = 41285793847
 SCREEN_HEAD = '28fe14afcf485bc99e7bd9036d9b4f4bb990ce86'
 PREVIOUS = {
+    41295435433: ('67ec1c48-d4fc-4394-8cb1-b18026c44af7',),
     41291100905: ('c652a1a6-da1c-4698-b416-cd02e2b88e9a', '5d0531b9-cfc3-4e08-878a-6c03ee6d2b7f'),
     41289369980: ('453a4e51-5e63-4b02-8ef3-aed22a5656be',),
     41290140885: ('d9365602-cd3f-4d2b-8f31-db6e012cab0a', '6af97d29-b3f0-4134-907c-c1f970c0816a'),

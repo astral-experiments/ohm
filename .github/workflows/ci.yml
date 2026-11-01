@@ -29,7 +29,7 @@ permissions:
   contents: read
 jobs:
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-v3-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-v3-wild-exit-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
     name: CTFE v3 ${{ inputs.mode }} ${{ matrix.position }}
@@ -124,6 +124,7 @@ jobs:
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_v2.py "$GITHUB_WORKSPACE/kernel"
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_wild_exit.py
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py --acquisition-imports "$GITHUB_WORKSPACE/source"
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/reopen.py --help > /dev/null

@@ -1,6 +1,7 @@
 """Compare two physical compilers on the ordinary full Ruff CLI build after a branch return."""
 
 import collections
+import gzip
 import importlib.util
 import json
 import os
@@ -18,6 +19,7 @@ from omission import publish
 sys.path.insert(0, str(HERE))
 import routes
 import ctfe_pilot_registration as reg
+import wild_fork
 
 kit = original.kit
 b = original.b
@@ -236,11 +238,21 @@ def main(mode, position, calibrator, observers):
         traced = OUT/'structural-return-Eon'
         helpers = {phase: json.loads((traced/phase/'wild-helpers.json').read_bytes()) for phase in ('X-B','comment')}
         compiler_groups = {phase: json.loads((traced/phase/'compiler-groups.json').read_bytes()) for phase in ('X-B','comment')}
+        stock_fixture = wild_fork.stock_fixture(json.loads((OUT/'kernel-qualification/fixtures/group-v2/qualified.json').read_bytes()))
+        outcomes = {}
+        for phase in ('X-B','comment'):
+            directory = traced/phase
+            raw = gzip.decompress((directory/'kernel.tsv.gz').read_bytes())
+            parsed = trace.packages().reader.parse(raw,expected_code=0,expected_schema=3)
+            original = json.loads(gzip.decompress((directory/'native-execs.json.gz').read_bytes()))
+            outcomes[phase] = wild_fork.finish(raw,parsed,original['wild_processes'])
+            need(len(outcomes[phase]) == 1 and outcomes[phase][0]['rustc_crate'] == 'ruff',
+                 'no qualified forked helper for the actual Ruff CLI link')
         need(any(compiler_groups.values()), 'no installed Ruff compiler with a protected group exit')
-        need(not issues and any(helpers.values()) and refs['Eon','clean-A'][1]['cli']['whole'] != refs['Eon','clean-B'][1]['cli']['whole'],
-             'a native empty comparison, historical product, or inherited Wild fork-group witness failed')
+        need(not issues and refs['Eon','clean-A'][1]['cli']['whole'] != refs['Eon','clean-B'][1]['cli']['whole'],
+             'a native empty comparison or the historical product change failed')
         save(OUT/'contact.json', dict(qualified=True, mode=mode, boot=ready['boot'], scored_commands=0,
-             visits=list(visits), helpers=helpers, compiler_groups=compiler_groups, schema=3, issues=issues))
+             visits=list(visits), helpers=helpers, compiler_groups=compiler_groups, wild_fork_exits=outcomes, stock_wild_fixture=stock_fixture, schema=3, issues=issues))
         return
     cross_role(refs, issues)
     for lane, lineage in [('structural', 'stay'), ('structural', 'return'), ('measured', 'return')]:

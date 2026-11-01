@@ -16,6 +16,7 @@ import zipfile
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import ctfe_pilot_registration as reg
+import wild_fork
 import source_guard
 import reopen as native
 
@@ -75,9 +76,11 @@ def read(zip_path, meta, repo):
         resource = host_guards(z,pos)
         boot = pos['boot']
         binding = native.kernel_binding(z,boot,'contact',repo,None)
+        stock_fixture = wild_fork.stock_fixture(D(z,'kernel-qualification/fixtures/group-v2/qualified.json'))
         sdk = native.sdk_pair(z)
         refs, stages, bodies, checked_files = {}, {}, {}, {}
         visit_paths, traced_paths, helpers, compiler_groups = set(), set(), {}, {}
+        outcomes = {}
         env = None
         for lane, route, phases in [('clean','reference',native.REFS),('structural','return',native.PHASES[:4])]:
             top = lane+'-'+route+'-Eon'
@@ -98,6 +101,12 @@ def read(zip_path, meta, repo):
                     traced_paths.add(prefix+'/kernel.tsv.gz')
                     helpers[phase] = r['wild_helpers']
                     compiler_groups[phase] = r['compiler_groups']
+                    raw = gzip.decompress(z.read(prefix+'/kernel.tsv.gz'))
+                    parsed = native.kernel.parse(raw,expected_code=0,expected_schema=3)
+                    projects = D(z,prefix+'/native-execs.json.gz')['wild_processes']
+                    outcomes[phase] = wild_fork.finish(raw,parsed,projects)
+                    require(len(outcomes[phase]) == 1 and outcomes[phase][0]['rustc_crate'] == 'ruff',
+                            'missing actual Ruff fork and complete stock Wild worker exits')
                 stages[phase] = {k:r[k] for k in ('status','graph','dirty','cli','reader','allocated')}
                 if 'kernel' in r:
                     stages[phase].update(kernel=r['kernel'], native_roster=native.digest(z.read(prefix+'/native-execs.json.gz')),
@@ -105,7 +114,7 @@ def read(zip_path, meta, repo):
                 checked_files[phase] = {name:native.digest(z.read(prefix+'/'+name)) for name in
                                          ('source.json','visit.json','cargo.json.gz','cargo.stdout.gz','cargo.stderr.gz','native.json.gz')}
         require(any(compiler_groups.values()), 'no real installed compiler needed group-exit protection')
-        require(refs['clean-A']['cli'] != refs['clean-B']['cli'] and any(helpers.values()), 'no actual inherited Wild fork-group or historical CLI difference')
+        require(refs['clean-A']['cli'] != refs['clean-B']['cli'], 'historical CLI did not change')
         require(visit_paths == {n for n in names if n.endswith('/visit.json')} and
                 traced_paths == {n for n in names if n.endswith('/kernel.tsv.gz')} and
                 {n.removesuffix('/kernel.tsv.gz') for n in traced_paths} ==
@@ -113,10 +122,10 @@ def read(zip_path, meta, repo):
                 not any(n.endswith('/clock.json') or n in ('meter-ready.json','pilot.json','observer.json') or
                         n.startswith(('measured-','calibration/')) for n in names), 'extra visits, trace or PMU command in contact')
         require(D(z,'contact.json') == dict(qualified=True,mode='contact',boot=boot,scored_commands=0,
-                visits=list(native.PHASES[:4]),helpers=helpers,compiler_groups=compiler_groups,schema=3,issues=[]), 'different host contact conclusion')
+                visits=list(native.PHASES[:4]),helpers=helpers,compiler_groups=compiler_groups,wild_fork_exits=outcomes,stock_wild_fixture=stock_fixture,schema=3,issues=[]), 'different host contact conclusion')
         return dict(qualified=True, schema=3, official=meta, head=pos['head'], boot=boot, kernel=pos['host']['release'],
                     observer_source=reg.OBSERVER, observer_sha256=binding['observer_sha256'], fixture=binding['group_fixtures_sha256'],
-                    historical_readers=reg.hardware_gate(), resource=resource, helpers=helpers, compiler_groups=compiler_groups, visits=stages,
+                    historical_readers=reg.hardware_gate(), resource=resource, helpers=helpers, compiler_groups=compiler_groups, wild_fork_exits=outcomes, stock_wild_fixture=stock_fixture, visits=stages,
                     original_receipts=checked_files, checked_elfs=len(bodies), scored_commands=0)
 
 def from_official(archive, catalog, run, head, repo):
