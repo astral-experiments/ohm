@@ -229,22 +229,38 @@ def prepare(case):
         git("checkout", "--quiet", "--detach", case[key])
         assert git("rev-parse", "HEAD^{tree}").decode().strip() == case[key + "_tree"]
         subprocess.run(
-            [WORK / "bin/cargo", "fetch", "--locked", "--target", case["target"]],
+            [WORK / "bin/cargo", "fetch", "--locked"],
             cwd=SRC,
             env=env(case["target"], True),
             check=True,
         )
-        lock = tomllib.loads((SRC / "Cargo.lock").read_text())
-        for dep in lock["package"]:
-            if dep.get("source", "").startswith("registry+"):
-                # fetch --target may omit other-platform dependencies in Cargo.lock.
-                matches = list(
-                    (DEPS / "registry/cache").glob(
-                        f"*/{dep['name']}-{dep['version']}.crate"
-                    )
-                )
-                for match in matches:
-                    assert sha(match) == dep["checksum"]
+        lockfile = SRC / "Cargo.lock"
+        packages = tomllib.loads(lockfile.read_text())["package"]
+        verified = {}
+        fetched = []
+        for dep in packages:
+            if not dep.get("source", "").startswith("registry+"):
+                continue
+            filename = f"{dep['name']}-{dep['version']}.crate"
+            matches = list((DEPS / "registry/cache").glob("*/" + filename))
+            if not matches:
+                # Cargo can omit an optional crate that a cross-target build later requests offline.
+                assert dep["source"] == "registry+https://github.com/rust-lang/crates.io-index"
+                assert re.fullmatch(r"[A-Za-z0-9_-]+", dep["name"])
+                assert re.fullmatch(r"[A-Za-z0-9.+-]+", dep["version"])
+                cache, = (DEPS / "registry/cache").glob("index.crates.io-*")
+                archive = cache / filename
+                partial = archive.with_suffix(".crate.partial")
+                url = f"https://static.crates.io/crates/{dep['name']}/{filename}"
+                subprocess.run(["curl", "--fail", "--silent", "--show-error", "--retry", "3",
+                                "--output", str(partial), url], check=True)
+                assert sha(partial) == dep["checksum"], filename
+                partial.replace(archive)
+                matches.append(archive)
+                fetched.append(filename)
+            assert len(matches) == 1 and sha(matches[0]) == dep["checksum"], filename
+            verified[filename] = dep["checksum"]
+        dump(OUT / ("prefetch-" + key + ".json"), {"lock": sha(lockfile), "packages": verified, "filled_from_crates_io": fetched})
     git("checkout", "--quiet", "--detach", case["parent"])
     return delta
 
