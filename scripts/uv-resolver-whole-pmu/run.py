@@ -186,19 +186,30 @@ def bridge_native_source(text):
     return text.replace(old_arms, 'ARMS = ("signed","earlier","rebased")').replace(old_epoch, 'PINS["format_epochs"][arm]')
 
 
+def stage_native(qualifier, folder):
+    folder.mkdir()
+    original = qualifier / "native-checks.py"
+    program = folder / original.name
+    program.write_text(bridge_native_source(original.read_text()))
+    check(sha(program) == P["native_bridge_sha256"], "derived native qualifier changed")
+    save(folder / "arms.json", {"format_epochs":P["format_epochs"]})
+    probe = qualifier / "probe.rs"
+    expect = [P["native_probe"]["bytes"], P["native_probe"]["sha256"]]
+    check(core_receipt(probe) == expect, "original native probe changed")
+    shutil.copyfile(probe, folder / probe.name)
+    check(core_receipt(folder / probe.name) == expect, "relocated native probe changed")
+    return program
+
+
 def check_native(m, media, out):
     fixture = media / P["sdk_artifacts"]["both"]["name"] / "fixture"
     check({f.name:sha(f) for f in fixture.iterdir()} == P["fixture_sha256"], "trait fixture changed")
     folder = m.WORK / "native-qualifier"
-    folder.mkdir()
+    program = stage_native(m.HERE, folder)
     original = m.HERE / "native-checks.py"
-    source = bridge_native_source(original.read_text())
-    program = folder / "native-checks.py"
-    program.write_text(source)
-    check(sha(program) == P["native_bridge_sha256"], "derived native qualifier changed")
-    save(folder / "arms.json", {"format_epochs":P["format_epochs"]})
     subprocess.run([sys.executable, "-IB", program, m.WORK, out, fixture], check=True, timeout=900)
-    save(out / "native-source.json", {"base":sha(original), "bridge":sha(program), "fixtures":P["fixture_sha256"]})
+    save(out / "native-source.json", {"base":sha(original), "bridge":sha(program), "fixtures":P["fixture_sha256"],
+                                     "probe":core_receipt(folder / "probe.rs")})
 
 
 def cpu_data(mask):

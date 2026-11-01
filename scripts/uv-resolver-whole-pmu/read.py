@@ -112,7 +112,8 @@ def bridge_receipts(root, cfg):
         need(summaries[arm]["archive_sha256"] == archives[arm], "unregistered archive")
         bridge_identity(cfg, arm, summaries[arm], load(root / f"installed-{arm}-components.json"))
     proof = load(root / "native-source.json")
-    need(proof == {"base":cfg["native_source_sha256"],"bridge":cfg["native_bridge_sha256"],"fixtures":cfg["fixture_sha256"]},
+    need(proof == {"base":cfg["native_source_sha256"],"bridge":cfg["native_bridge_sha256"],"fixtures":cfg["fixture_sha256"],
+                   "probe":[cfg["native_probe"]["bytes"],cfg["native_probe"]["sha256"]]},
          "native qualifier changed")
     native_records(root / "native", actors, cfg["format_epochs"])
 
@@ -145,7 +146,7 @@ def native_records(root, actors, epochs):
 
 
 def read(root):
-    need(hashlib.sha256((root / "protocol.json").read_bytes()).hexdigest() == '9fc9cb8e6cdcd1c9f41aba13e570624749b730feccc5df82e0d660bf267de3c6', "protocol differs from reviewed registration")
+    need(hashlib.sha256((root / "protocol.json").read_bytes()).hexdigest() == 'c6be5c49d904060c300e0910b57bc86a07d7c14839dee1e98f50e011fb29e959', "protocol differs from reviewed registration")
     cfg = load(root / "protocol.json")
     bridge_receipts(root, cfg)
     plan = planner(cfg)

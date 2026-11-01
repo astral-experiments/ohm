@@ -1,5 +1,6 @@
 """Validate the analysis using synthetic observations. Hardware calibration runs separately."""
 import itertools
+import os
 import json
 import sys
 import tempfile
@@ -40,9 +41,81 @@ def bridge_controls():
         rejects(read.bridge_identity,P,name,summary | {"loaded":{"librustc_driver":"x","libLLVM":llvm}},baseline)
 
 
+def real_relocated_lookup(folder):
+    import ast
+    import hashlib
+    from unittest.mock import patch
+    # Load the actual qualifier definitions with their own absolute __file__. Strip only
+    # the three entry-point calls and stop migration after its real reads and mutations.
+    program = folder / "native-checks.py"
+    module = ast.parse(program.read_bytes(), filename=str(program))
+    calls = [stmt.value.func.id for stmt in module.body[-3:]
+             if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call) and isinstance(stmt.value.func, ast.Name)]
+    assert calls == ["trait_changes", "migration", "save"]
+    module.body = module.body[:-3]
+    method, = [f for f in module.body if isinstance(f, ast.FunctionDef) and f.name == "migration"]
+    boundary, = [s.lineno for s in method.body if isinstance(s, ast.Assign) and isinstance(s.targets[0], ast.Name)
+                 and s.targets[0].id == "cache"]
+    class SourceOpened(Exception):
+        pass
+    with tempfile.TemporaryDirectory() as scratch:
+        base = Path(scratch)
+        work, out = base / "work", base / "out"
+        work.mkdir()
+        out.mkdir()
+        ns = {"__file__":str(program), "__name__":"native_definition_readback"}
+        with patch.object(sys, "argv", [str(program), str(work), str(out), str(base / "fixture")]):
+            exec(compile(module, str(program), "exec"), ns)
+        assert ns["HERE"] == folder and ns["PINS"] == {"format_epochs":P["format_epochs"]}
+        def trace(frame, event, value):
+            if frame.f_code is ns["migration"].__code__ and event == "line" and frame.f_lineno == boundary:
+                raw, positive, negative = [frame.f_locals[k] for k in ("a", "b", "bad")]
+                fields = [hashlib.sha256(b).hexdigest() for b in (raw, positive, negative)]
+                expected = [P["native_probe"][k] for k in ("sha256","positive_sha256","negative_sha256")]
+                assert fields == expected and len(set(fields)) == 3
+                raise SourceOpened()
+            return trace
+        old = sys.gettrace()
+        try:
+            with patch("subprocess.run", side_effect=AssertionError("unexpected native execution during input control")):
+                sys.settrace(trace)
+                ns["migration"]()
+        except SourceOpened:
+            return
+        finally:
+            sys.settrace(old)
+        raise AssertionError("actual migration input read did not finish")
+
+
+def relocation_control(qualifier):
+    with tempfile.TemporaryDirectory() as scratch:
+        folder = Path(scratch) / "relocated"
+        run.stage_native(qualifier, folder)
+        real_relocated_lookup(folder)
+        path = folder / "probe.rs"
+        original = path.read_bytes()
+        path.unlink()
+        try:
+            real_relocated_lookup(folder)
+        except FileNotFoundError as e:
+            assert Path(e.filename) == path
+        else:
+            raise AssertionError("missing actual probe accepted")
+        path.write_bytes(original + b"\n")
+        try:
+            real_relocated_lookup(folder)
+        except RuntimeError as e:
+            assert str(e) == "wrong original trait probe"
+        else:
+            raise AssertionError("changed actual probe accepted")
+    print("Passed original qualifier's actual relocated probe and arms reads, both real edits, missing-file and wrong-byte controls.")
+
+
 def main():
     if not __debug__:
         raise RuntimeError("assertions are required")
+    qualifier = Path(sys.argv[1]).resolve(strict=True) if len(sys.argv) == 2 else Path(os.environ["GITHUB_WORKSPACE"]) / "qualified/scripts/rc23-trait-qualification"
+    relocation_control(qualifier)
     bridge_controls()
     plan = run.orders()
     assert read.planner(P) == plan and len(plan) == 2
