@@ -1,7 +1,23 @@
 {
-  "candidate": "1686aef9877e0c95faddf6f9c313e451a9744f29",
-  "candidate_full_tree": "9b572296c4c8d43a516b6a086176195fc8358f49",
-  "cargo_tree": "b4981dc120409cf8eec4321e355071f8abd17a64",
+  "candidate": "dc70b47e9ff1926562626246bf996b824a456259",
+  "candidate_full_tree": "c5dd925d6655eb12613e54115fda127bde14f97d",
+  "cargo_changed_blobs": {
+    "src/compiler/native_link/declared.rs": [
+      "098f7a7cfc196cabb1478e8b2798bb47996f761d",
+      "6f7a2e8bec3f247241c5cc948e7eed7f15e1419a"
+    ],
+    "src/compiler/native_link/mod.rs": [
+      "a60644adcf7d22250fc38371f58ad3fecef2dd6a",
+      "34af788bb182deeb5b814c1dbfa5f5e37239eaa0"
+    ]
+  },
+  "cargo_commits": [
+    "84d13b4b5a8218f2d2b47ed56f0ce78462f873d7",
+    "81427c629c8f8bfbfe0ecf8c48fa7a2fa53eb1cf",
+    "7b643c384568b1598373dc209fcb7c05162e6547",
+    "ec883b0b5c91bbdfc6613555ca3ac4dacceb80d4"
+  ],
+  "cargo_tree": "9c22867fc0621b4c10d1ccbb3d8a1bdbbb403ab9",
   "files": {
     "compiler/rustc_incremental/src/persist/load.rs": {
       "bytes": 15452,
@@ -22,6 +38,8 @@
       "sha256": "0c9adb26cd52a5a2704cc068151d7cbe556f77268796a21fed602987f462f0e6"
     }
   },
+  "graph_candidate": "1686aef9877e0c95faddf6f9c313e451a9744f29",
+  "graph_candidate_tree": "9b572296c4c8d43a516b6a086176195fc8358f49",
   "historical_distribution_source": "1bc7b35699479d5899a2935d79392b7bdaf7497d",
   "pack": {
     "bytes": 1921035,
@@ -42,9 +60,17 @@
       91909,
       "e19fc4bf4105f295fa037c52a249bc4e047d5593e239081539879ac1c3ee94db"
     ],
+    "cargo-native-resolution.pack": [
+      16280,
+      "e9162a41776a5fabe7d9159d000ed41da07bdb4e873a867d165abd9c1dee9cd0"
+    ],
     "cargo-stack.pack": [
       147995,
       "bb8b016abe957304312fca60a098d896e99cd65f49a69a9fba9ba854f20f079f"
+    ],
+    "rust-cargo-pin.pack": [
+      3531,
+      "95c9b7b128ca1df66183bc27f253a90c6f7b915ecba12eff9202236e67f4cc82"
     ],
     "rust-rebase.pack": [
       3811,
@@ -55,11 +81,13 @@
       "e57b87041abe1f91c78c29bb26e276e7ccd41e8f33a360aec616fb260d7ec175"
     ]
   },
+  "shipped_cargo": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
+  "shipped_cargo_tree": "b4981dc120409cf8eec4321e355071f8abd17a64",
   "trees": {
     "compiler": "067241e3198558e78ce90fee3f6b1acdeb461d13",
     "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
     "src/bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
-    "src/tools/cargo": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
+    "src/tools/cargo": "ec883b0b5c91bbdfc6613555ca3ac4dacceb80d4",
     "src/tools/rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3",
     "tests": "e0534879ac7e4ca78c760c4701b202d875eaf2b9"
   }

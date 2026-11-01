@@ -1,4 +1,14 @@
-# Native dep-graph slot recovery
+# Proposed -22 native input validation and graph recovery
+
+This manual nonrelease job builds Rust `dc70b47e9ff1926562626246bf996b824a456259` with Cargo `ec883b0b5c91bbdfc6613555ca3ac4dacceb80d4` on GNU/Linux and macOS. The Rust commit differs from `1686aef9` only in its Cargo gitlink. The source check verifies the shipping manifest against its original tools before reconstructing these exact candidate trees. GNU tests the stage1 compiler and the candidate Cargo built with the original SDK and the `all-static,ohm-defaults` features. Darwin tests the profile-instrumented stage2 compiler and its matching Cargo. All native graph regressions and the original macOS training roster remain required.
+
+The three ordinary GNU histories exercise a transitive linker script, a preferred library in rustc's default Wild prefix, and a replacement `crti.o` with a real constructor. Each records positive kernel execs, Cargo JSON, independently empty native outputs, actual manifests and seals, a malformed same-inode replacement, and a genuine target-only Rust edit. A transitive script which searches for another library must still run Wild. The plain declared archive checks require an intact seal and zero Wild on legitimate unchanged programs. For the short standalone GNU reproducer run
+
+```sh
+bash scripts/dep-graph-slots/gnu-defaults/reproduce.sh report ohm
+```
+
+## Historical source and controls
 
 The Rust subject is `1686aef9877e0c95faddf6f9c313e451a9744f29`, a direct child of the Rust source pinned by the merged release manifest, `008a21ac0d750dc9a1c18b7959d7e7984c03d887`. The old 1bc7 GNU distribution and Darwin instrumented producers use the exact compiler and standard library of 008a21ac. The Cargo submodule changed from 4591cf45 to ed0ae15d. The first containment source c0b31830 and its c5178286 parent have the same compiler and tests as their respective rebased commits. The case concerns a saved row with a null kind, a second writer to the same slot, or a destination beyond the declared node space. The third case previously panicked two lines earlier. The original Apple run retained the compound panic message but lost its mapping, so its particular row and its producer remain unknown. [Original Darwin job](https://github.com/astral-experiments/ohm/actions/runs/41256793646/job/124701560586)
 
@@ -27,11 +37,11 @@ On GNU the SHA-pinned separate test uses the frozen stock Wild and system GNU li
 The following runs without contacting a remote service. `parent-graph.gz` contains an authentic GNU parent graph, raw SHA-256 `cb48adbfc616ceed962d29b17f2171aa6d22788c703a6bffbddeb2745ce18220`. The test moves a genuine variable-length complete record to the front and checks all three independent corruptions both before and after that relocation. The release compiler itself also accepted a complete record permutation with indices 1,0.
 
 ```sh
-qa=/home/dev-user/code/oss/ohm-package-qa-rc22-slots-declared-20261101/scripts/dep-graph-slots
+qa=/home/dev-user/code/oss/ohm-package-qa-rc22-gnu-link-inputs-20261101/scripts/dep-graph-slots
 raw=/home/dev-user/.cache/ohm-rc22-diesel-depgraph-20261101/slot-containment-v1
 (cd "$qa" && shasum -a 256 -c SHA256SUMS)
 python3 -IB "$qa/test_slots.py" --receipt "$raw/qa-parent-1"
-python3 -IB "$qa/qualify.py" catalog /home/dev-user/code/oss/ohm-rust-reject-invalid-node-slots-20261101
+python3 -IB "$qa/qualify.py" catalog /home/dev-user/code/oss/ohm-rust-pin-gnu-native-link-checks-20261101
 ```
 
 On the enrolled target, reopen extracted `slot-native-<host>` using its unmodified original files. The optional `--bytes-only` produces a distinct nonexecuting readback on other hosts.

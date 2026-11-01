@@ -1,4 +1,4 @@
-name: Rebased node-slot recovery, optimized Darwin Diesel and declared native links
+name: Checked GNU native inputs, graph recovery and optimized Darwin Diesel
 'on':
   workflow_dispatch:
     inputs:
@@ -8,12 +8,12 @@ name: Rebased node-slot recovery, optimized Darwin Diesel and declared native li
         type: string
 permissions: {}
 concurrency:
-  group: private-rc22-rebased-node-slots-and-native-links
+  group: private-rc22-checked-gnu-inputs-and-native-graph-recovery
   cancel-in-progress: false
 jobs:
   native:
     name: Native graph recovery (${{ matrix.host }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-slots-declared-20261101' && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-gnu-link-inputs-20261101' && github.run_attempt
       == 1 && github.sha == inputs.reviewed_head
     strategy:
       fail-fast: false
@@ -103,12 +103,12 @@ jobs:
       run: |-
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
-        test "$(git rev-parse HEAD^)" = 995cb8d10ee36c21e7bb05ca262587ef7290a11d
-        test "$(git rev-parse HEAD~2)" = 48f743cbf1ecad76127c512f141be636b0deedff
+        test "$(git rev-parse HEAD^)" = b6f12f6fc37410de9896f4cca4a03f8cb76a35ec
+        test "$(git rev-parse HEAD~2)" = 995cb8d10ee36c21e7bb05ca262587ef7290a11d
         git diff --exit-code HEAD~2 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
         (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
-        (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py)
+        (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py && python3 -IB gnu-defaults/test_cases.py)
         df -h "$GITHUB_WORKSPACE"
         available=$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')
         test "$available" -ge 41943040
@@ -241,6 +241,10 @@ jobs:
       id: transitive
       if: success() && runner.os == 'Linux' && steps.links.outcome == 'success'
       run: python3 -IB scripts/dep-graph-slots/release_smoke.py transitive
+    - name: Verify default GNU script, driver-prefix library and startup-object choices with actual Wild
+      id: defaults
+      if: success() && runner.os == 'Linux' && steps.transitive.outcome == 'success'
+      run: python3 -IB scripts/dep-graph-slots/gnu-defaults/worker.py
     - name: Execute the same checked-in run-make on the native Apple host
       run: python3 -IB scripts/dep-graph-slots/qualify.py rmake
       id: darwin_rmake
@@ -254,7 +258,7 @@ jobs:
         if test "$RUNNER_OS" = macOS; then
           test "$NATURAL" = success && test "$ESCROW" = success && test "$COLLECTORS" = success && test "$APPLE_RMAKE" = success
         else
-          test "$GNU_RMAKE" = success && test "$TRANSITIVE" = success
+          test "$GNU_RMAKE" = success && test "$TRANSITIVE" = success && test "$DEFAULTS" = success
         fi
       if: always()
       shell: bash
@@ -263,6 +267,7 @@ jobs:
         MATRIX: ${{ steps.matrix.outcome }}
         LINKS: ${{ steps.links.outcome }}
         TRANSITIVE: ${{ steps.transitive.outcome }}
+        DEFAULTS: ${{ steps.defaults.outcome }}
         NATURAL: ${{ steps.natural.outcome }}
         ESCROW: ${{ steps.escrow.outcome }}
         COLLECTORS: ${{ steps.darwin_collectors.outcome }}

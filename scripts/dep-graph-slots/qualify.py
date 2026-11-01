@@ -21,10 +21,10 @@ BIND = json.loads((HERE / "source.json").read_bytes())
 GIB = 1 << 30
 PARENT = BIND["historical_distribution_source"]
 CHILD = BIND["candidate"]
-ANCHOR = "995cb8d10ee36c21e7bb05ca262587ef7290a11d"
+ANCHOR = "b6f12f6fc37410de9896f4cca4a03f8cb76a35ec"
 TEST = "tests/run-make/incremental-missing-query-cache"
 HOSTS = {"Linux": "x86_64-unknown-linux-gnu", "Darwin": "aarch64-apple-darwin"}
-BRANCH = "charlie/qa-rc22-slots-declared-20261101"
+BRANCH = "charlie/qa-rc22-gnu-link-inputs-20261101"
 
 
 def need(cond, message):
@@ -90,9 +90,10 @@ def guard():
 
 def source_catalog(repo):
     q = BIND
+    graph = q["graph_candidate"]
     need(
-        git(repo, "rev-parse", CHILD + "^", CHILD + "^{tree}", q["parent"] + "^{tree}").splitlines()
-        == [q["parent"], q["candidate_full_tree"], q["parent_full_tree"]],
+        git(repo, "rev-parse", CHILD + "^", CHILD + "^{tree}", graph + "^", graph + "^{tree}", q["parent"] + "^{tree}").splitlines()
+        == [graph, q["candidate_full_tree"], q["parent"], q["graph_candidate_tree"], q["parent_full_tree"]],
         "wrong complete Rust trees",
     )
     previous = q["previous_slot_parent"]
@@ -105,14 +106,18 @@ def source_catalog(repo):
         "wrong historically qualified compiler sources",
     )
     old_cargo = git(repo, "rev-parse", PARENT + ":src/tools/cargo")
-    raw = f":160000 160000 {old_cargo} {q['trees']['src/tools/cargo']} M\tsrc/tools/cargo"
-    for old, new in [(previous, q["parent"]), (q["previous_slot_candidate"], CHILD)]:
+    for old, new, before, after in [
+        (previous, q["parent"], old_cargo, q["shipped_cargo"]),
+        (q["previous_slot_candidate"], graph, old_cargo, q["shipped_cargo"]),
+        (graph, CHILD, q["shipped_cargo"], q["trees"]["src/tools/cargo"]),
+    ]:
+        raw = f":160000 160000 {before} {after} M\tsrc/tools/cargo"
         need(
             git(repo, "diff-tree", "--no-commit-id", "--no-abbrev", "-r", "--raw", old, new) == raw,
             "rebase changed more than the Cargo gitlink",
         )
     need(
-        git(repo, "diff", "--name-only", q["parent"], CHILD).splitlines() == sorted(q["files"]),
+        git(repo, "diff", "--name-only", q["parent"], graph).splitlines() == sorted(q["files"]),
         "unexpected changed files",
     )
     for name, row in q["files"].items():
@@ -127,6 +132,28 @@ def source_catalog(repo):
     for name, tree in q["trees"].items():
         need(git(repo, "rev-parse", CHILD + ":" + name) == tree, "wrong " + name + " source")
     return q
+
+
+def cargo_catalog(repo):
+    """Check the complete four child commits and the only two changed Cargo blobs."""
+    q = BIND
+    shipped = q["shipped_cargo"]
+    child = q["trees"]["src/tools/cargo"]
+    need(git(repo, "rev-parse", shipped + "^{tree}", child + "^{tree}").splitlines() ==
+         [q["shipped_cargo_tree"], q["cargo_tree"]], "different Cargo root tree")
+    need(git(repo, "rev-list", "--reverse", shipped + ".." + child).splitlines() == q["cargo_commits"],
+         "wrong native-input source history")
+    parent = shipped
+    for commit in q["cargo_commits"]:
+        need(git(repo, "rev-list", "--parents", "-1", commit).split() == [commit, parent],
+             "unexpected Cargo ancestry")
+        parent = commit
+    files = q["cargo_changed_blobs"]
+    need(git(repo, "diff", "--name-only", shipped, child).splitlines() == sorted(files),
+         "unregistered Cargo source file")
+    for name, pair in files.items():
+        need(git(repo, "rev-parse", shipped + ":" + name, child + ":" + name).splitlines() == pair,
+             "different Cargo source blob in " + name)
 
 
 def install_source(w, repo, r):
@@ -153,15 +180,18 @@ def install_source(w, repo, r):
         (repo, "rust-rebase.pack"),
         (cargo, "cargo-stack.pack"),
         (cargo, "cargo-fix.pack"),
+        (repo, "rust-cargo-pin.pack"),
+        (cargo, "cargo-native-resolution.pack"),
     ]:
         with (assets / name).open("rb") as stream:
             subprocess.run(
                 ["git", "-C", directory, "index-pack", "--strict", "--stdin"], stdin=stream, check=True
             )
     source_catalog(repo)
+    cargo_catalog(cargo)
     git(repo, "checkout", "--quiet", "--detach", BIND["parent"])
-    git(cargo, "checkout", "--quiet", "--detach", BIND["trees"]["src/tools/cargo"])
-    need(git(cargo, "rev-parse", "HEAD^{tree}") == BIND["cargo_tree"], "different shipped Cargo tree")
+    git(cargo, "checkout", "--quiet", "--detach", BIND["shipped_cargo"])
+    need(git(cargo, "rev-parse", "HEAD^{tree}") == BIND["shipped_cargo_tree"], "different shipped Cargo tree")
     # The unchanged release verifier authenticates the relative schema and the versioned path.
     with tempfile.TemporaryDirectory() as manifest_root:
         root = Path(manifest_root)
@@ -186,6 +216,7 @@ def install_source(w, repo, r):
             check=True,
         )
     subprocess.run(["git", "-C", repo, "checkout", "--quiet", "--detach", CHILD], check=True)
+    git(cargo, "checkout", "--quiet", "--detach", BIND["trees"]["src/tools/cargo"])
     # The production installer replaces two tracked Rust subtrees with separately pinned
     # release tool repositories. Keep the outer view before validating the complete layout.
     status = layout.git(repo, "status", "--porcelain", "-z", "--untracked-files=no", "--ignore-submodules=all")

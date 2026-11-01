@@ -31,7 +31,10 @@ def refuse(call, message):
 
 def cases():
     env = qualify.BIND
-    assert env["candidate"] == "1686aef9877e0c95faddf6f9c313e451a9744f29"
+    assert env["candidate"] == "dc70b47e9ff1926562626246bf996b824a456259"
+    assert env["graph_candidate"] == "1686aef9877e0c95faddf6f9c313e451a9744f29"
+    assert env["cargo_commits"][-1] == env["trees"]["src/tools/cargo"] == "ec883b0b5c91bbdfc6613555ca3ac4dacceb80d4"
+    assert set(env["cargo_changed_blobs"]) == {"src/compiler/native_link/declared.rs", "src/compiler/native_link/mod.rs"}
     assert env["parent"] == "008a21ac0d750dc9a1c18b7959d7e7984c03d887"
     assert env["previous_slot_candidate"] == "c0b318301965619c2cbd4b261ff3de84fac6831b"
     assert env["release_coordinator"] == "8c7d5b4500fdfa6e2234417340aa190e5787e513"
@@ -43,7 +46,7 @@ def cases():
     assert manifest["sources"]["rust"]["revision"] == env["parent"]
     assert (
         manifest["sources"]["cargo"]["revision"]
-        == env["trees"]["src/tools/cargo"]
+        == env["shipped_cargo"]
         == "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770"
     )
     assert env["release_files"]["smoke-test-relink.sh"] == [

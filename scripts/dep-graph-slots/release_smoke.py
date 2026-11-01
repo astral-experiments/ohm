@@ -15,8 +15,8 @@ from qualify import BIND, CHILD, PARENT, checksum, git, guard, need, save, verif
 WILD = "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
 RUSTUP = shutil.which("rustup")
 OLD_CARGO = "4591cf45cc10abb19d2456c40b99606e08167f29"
-DIRECT_PARENT = "b499ff7f4c28c2d889ca0ed9037dfbec6ca8fa9f"
-PARENT_TREE = "a2c9a62722e1ef849cb68874e79617c92d165a8b"
+DIRECT_PARENT = "7b643c384568b1598373dc209fcb7c05162e6547"
+PARENT_TREE = "617bbc1608e5c456eae6b85997d399bdfb041f39"
 
 
 def run(argv, env, **kw):
@@ -350,7 +350,7 @@ def transitive(w, repo, r, tmp, host):
             "supplementary tool changed",
         )
     new = BIND["trees"]["src/tools/cargo"]
-    fixed = folder / "release-ed0"
+    fixed = folder / "candidate"
     fixed.mkdir()
     outcome = capture_transitive(work, fixed, new, host, env)
     if outcome["qualified"]:
@@ -361,14 +361,14 @@ def transitive(w, repo, r, tmp, host):
     need(shutil.disk_usage(work).free > 5 << 30, "insufficient space for both parent comparison images")
     sub = repo / "src/tools/cargo"
     need(
-        git(sub, "rev-parse", new + "^", DIRECT_PARENT + "^{tree}", OLD_CARGO + "^{tree}").splitlines()
-        == [DIRECT_PARENT, PARENT_TREE, PARENT_TREE],
+        git(sub, "rev-parse", new + "^", DIRECT_PARENT + "^{tree}").splitlines()
+        == [DIRECT_PARENT, PARENT_TREE],
         "different immediate native-link parent",
     )
     reusable = work / "cargo-build/debug/cargo"
     need((work / "sdk/bin/cargo").samefile(reusable), "would replace a different Cargo")
     preserve_cargo(reusable, fixed, new, env)
-    (work / "transitive").rename(work / "transitive-release-ed0")
+    (work / "transitive").rename(work / "transitive-candidate")
     parent = folder / "direct-parent"
     parent.mkdir()
     try:
