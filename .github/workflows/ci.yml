@@ -1,86 +1,143 @@
-name: Unscored uv 20991 direct root opening
-run-name: Verify direct uv root edit at ${{ inputs.reviewed_head }}
-'on':
+name: Real uv 20988 root check on corrected production compilers
+on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed private coordinator commit for the unscored opening
-        type: string
         required: true
-permissions: {}
-concurrency:
-  group: unscored-uv-20991-root-opening
-  cancel-in-progress: false
+        type: string
+        description: Reviewed full SHA of this benchmark
+      build_run_id:
+        required: true
+        type: string
+        description: Completed corrected two-role production build run
+      build_head:
+        required: true
+        type: string
+        description: Reviewed full SHA of that build workflow
+      sdk_lock_sha256:
+        required: true
+        type: string
+        description: SHA256 of the independently enrolled Actions receipt
+permissions:
+  contents: read
+  actions: read
 jobs:
-  opening:
-    name: Verify independent cold histories and the actual ordinary-root compiler execs
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-20991-root-opening' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+  root:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-ctfe22-root-hardware' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 75
-    permissions:
-      contents: read
-      actions: read
-      attestations: read
+    timeout-minutes: 350
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PYTHONDONTWRITEBYTECODE: '1'
+      BUILD_RUN_ID: ${{ inputs.build_run_id }}
+      BUILD_HEAD: ${{ inputs.build_head }}
+      SDK_LOCK_SHA256: ${{ inputs.sdk_lock_sha256 }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Check out coordinator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          path: coordinator
           ref: ${{ github.sha }}
           persist-credentials: false
           sparse-checkout: |
-            scripts/uv-root-20991-opening
-            .github/workflows
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+            scripts/uv-20988-ctfe-hw
+      - name: Check out builder
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
-          path: previous
+          path: builder
+          ref: ${{ inputs.build_head }}
           persist-credentials: false
-          sparse-checkout: scripts/uv-resolver-whole-pmu
-      - name: Admit the pinned system Python, disk budget, offline readers and scoped descendant trace
-        run: |
-          set -euo pipefail
-          mkdir -p trait-results
-          (
-            cd scripts/uv-root-20991-opening
-            sha256sum -c SHA256SUMS
-          )
-          /usr/bin/bash scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py early 2>&1 | tee trait-results/initial.log
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+          sparse-checkout: |
+            .github/workflows
+            scripts/ctfe22-gnu
+      - name: Check out opening
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: opening
+          ref: 341cd92e5d381a50bd380467075f31e780ee6296
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/uv-root-20991-opening
+      - name: Check out previous
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: previous
+          ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/uv-resolver-whole-pmu
+      - name: Check out qualified
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: qualified
+          ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/rc23-trait-qualification
+      - name: Check out pilot
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: pilot
+          ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ctfe-crossover-pilot
+            scripts/branch-return-pmu
+      - name: Check out calibrator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: calibrator
+          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/gnu-renderer-pfc-hardware
+      - name: Check out observers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: observers
+          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/gnu-example-ceiling
+            scripts/gnu-renderer-library-workers
+      - name: Check out uv at the actual landed edit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/uv
-          ref: 5d4a62d7461c7708f3e65d08cef0e99bad94c004
-          path: uv-source
-          # The real edit is sixteen linear commits after the last release tag.
-          fetch-depth: 17
+          ref: 1979349b68dbaa936b98c0f409c1df0598fa72f1
+          fetch-depth: 16
           fetch-tags: false
           persist-credentials: false
-      - name: Admit the actual historical uv tag used by its build script
-        env:
-          GIT_TERMINAL_PROMPT: '0'
+          path: uv-source
+      - name: Restore the real release tag used by uv's build script
+        run: git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.2:refs/tags/0.12.2
+      - name: Check the private payload and host prerequisites
         run: |
           set -euo pipefail
-          git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.2:refs/tags/0.12.2
-          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py history uv-source | tee trait-results/source-git-history.json
-      - name: Admit the signed release and final production distribution with the original verifier
+          mkdir trait-results
+          (cd coordinator/scripts/uv-20988-ctfe-hw && sha256sum --strict --check SHA256SUMS)
+          /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
+      - name: Calibrate inherited userspace instructions for real fork, exec and threads
+        run: |
+          set -euo pipefail
+          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/run.py calibrate 2>&1 | tee trait-results/calibration.log
+      - name: Admit the two qualified production SDKs and the signed Cargo binary
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py intake 2>&1 | tee trait-results/acquire.log
-      - name: Run the two genuine root openings and re-read all evidence
+          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/enroll.py admit 2>&1 | tee trait-results/intake.log
+      - name: Qualify both compiler histories and execute all 12 first-edit pairs
         run: |
           set -euo pipefail
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py run 2>&1 | tee trait-results/opening.log
-          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py verify trait-results
-      - name: Preserve full or partial unscored evidence
+          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/run.py run 2>&1 | tee trait-results/experiment.log
+      - name: Read back the raw clocks, Cargo streams, process trees and metadata independently
+        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/audit.py hosted
+      - name: Preserve raw clocks, source qualification and any incomplete attempt
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-20991-independent-root-opening-${{ github.run_id }}-${{ github.run_attempt }}
+          name: uv-20988-ctfe-production-root-attempt-1
           path: trait-results/
+          if-no-files-found: error
+          compression-level: 1
           retention-days: 14
-          compression-level: 2
-          if-no-files-found: warn
