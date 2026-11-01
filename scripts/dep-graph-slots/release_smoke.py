@@ -15,8 +15,8 @@ from qualify import BIND, CHILD, PARENT, checksum, git, guard, need, save, verif
 WILD = "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
 RUSTUP = shutil.which("rustup")
 OLD_CARGO = "4591cf45cc10abb19d2456c40b99606e08167f29"
-DIRECT_PARENT = "7b643c384568b1598373dc209fcb7c05162e6547"
-PARENT_TREE = "617bbc1608e5c456eae6b85997d399bdfb041f39"
+DIRECT_PARENT = "ec883b0b5c91bbdfc6613555ca3ac4dacceb80d4"
+PARENT_TREE = "9c22867fc0621b4c10d1ccbb3d8a1bdbbb403ab9"
 
 
 def run(argv, env, **kw):

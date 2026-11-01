@@ -31,9 +31,10 @@ def refuse(call, message):
 
 def cases():
     env = qualify.BIND
-    assert env["candidate"] == "dc70b47e9ff1926562626246bf996b824a456259"
+    assert env["candidate"] == "0c66092268115dc8cc72c6f2046bd7430ff45691"
+    assert env["prior_native"]["rust"] == "dc70b47e9ff1926562626246bf996b824a456259"
     assert env["graph_candidate"] == "1686aef9877e0c95faddf6f9c313e451a9744f29"
-    assert env["cargo_commits"][-1] == env["trees"]["src/tools/cargo"] == "ec883b0b5c91bbdfc6613555ca3ac4dacceb80d4"
+    assert env["cargo_commits"][-1] == env["trees"]["src/tools/cargo"] == "0fe9899490ce8b396c991aa39b440145f422255a"
     assert set(env["cargo_changed_blobs"]) == {"src/compiler/native_link/declared.rs", "src/compiler/native_link/mod.rs"}
     assert env["parent"] == "008a21ac0d750dc9a1c18b7959d7e7984c03d887"
     assert env["previous_slot_candidate"] == "c0b318301965619c2cbd4b261ff3de84fac6831b"

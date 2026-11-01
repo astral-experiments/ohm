@@ -21,7 +21,7 @@ BIND = json.loads((HERE / "source.json").read_bytes())
 GIB = 1 << 30
 PARENT = BIND["historical_distribution_source"]
 CHILD = BIND["candidate"]
-ANCHOR = "b6f12f6fc37410de9896f4cca4a03f8cb76a35ec"
+ANCHOR = "0e5fc7cc7e4db398884d782be6049d83eda0ae08"
 TEST = "tests/run-make/incremental-missing-query-cache"
 HOSTS = {"Linux": "x86_64-unknown-linux-gnu", "Darwin": "aarch64-apple-darwin"}
 BRANCH = "charlie/qa-rc22-gnu-link-inputs-20261101"
@@ -91,9 +91,10 @@ def guard():
 def source_catalog(repo):
     q = BIND
     graph = q["graph_candidate"]
+    prior = q["prior_native"]
     need(
-        git(repo, "rev-parse", CHILD + "^", CHILD + "^{tree}", graph + "^", graph + "^{tree}", q["parent"] + "^{tree}").splitlines()
-        == [graph, q["candidate_full_tree"], q["parent"], q["graph_candidate_tree"], q["parent_full_tree"]],
+        git(repo, "rev-parse", CHILD + "^", CHILD + "^{tree}", prior["rust"] + "^", prior["rust"] + "^{tree}", graph + "^", graph + "^{tree}", q["parent"] + "^{tree}").splitlines()
+        == [prior["rust"], q["candidate_full_tree"], graph, prior["rust_tree"], q["parent"], q["graph_candidate_tree"], q["parent_full_tree"]],
         "wrong complete Rust trees",
     )
     previous = q["previous_slot_parent"]
@@ -109,7 +110,8 @@ def source_catalog(repo):
     for old, new, before, after in [
         (previous, q["parent"], old_cargo, q["shipped_cargo"]),
         (q["previous_slot_candidate"], graph, old_cargo, q["shipped_cargo"]),
-        (graph, CHILD, q["shipped_cargo"], q["trees"]["src/tools/cargo"]),
+        (graph, prior["rust"], q["shipped_cargo"], prior["cargo"]),
+        (prior["rust"], CHILD, prior["cargo"], q["trees"]["src/tools/cargo"]),
     ]:
         raw = f":160000 160000 {before} {after} M\tsrc/tools/cargo"
         need(
@@ -135,7 +137,7 @@ def source_catalog(repo):
 
 
 def cargo_catalog(repo):
-    """Check the complete four child commits and the only two changed Cargo blobs."""
+    """Check every candidate commit, both final source blobs and the matched startup spelling delta."""
     q = BIND
     shipped = q["shipped_cargo"]
     child = q["trees"]["src/tools/cargo"]
@@ -143,6 +145,12 @@ def cargo_catalog(repo):
          [q["shipped_cargo_tree"], q["cargo_tree"]], "different Cargo root tree")
     need(git(repo, "rev-list", "--reverse", shipped + ".." + child).splitlines() == q["cargo_commits"],
          "wrong native-input source history")
+    before = q["prior_native"]["cargo"]
+    spelling = "src/compiler/native_link/declared.rs"
+    need(git(repo, "rev-parse", child + "^", before + "^{tree}").splitlines() == [before, q["prior_native"]["cargo_tree"]]
+         and git(repo, "diff", "--name-only", before, child) == spelling
+         and git(repo, "rev-parse", before + ":" + spelling, child + ":" + spelling).splitlines() == q["cc_spelling_blob"],
+         "unexpected startup-object spelling change")
     parent = shipped
     for commit in q["cargo_commits"]:
         need(git(repo, "rev-list", "--parents", "-1", commit).split() == [commit, parent],
@@ -182,6 +190,8 @@ def install_source(w, repo, r):
         (cargo, "cargo-fix.pack"),
         (repo, "rust-cargo-pin.pack"),
         (cargo, "cargo-native-resolution.pack"),
+        (repo, "rust-cc-spelling.pack"),
+        (cargo, "cargo-cc-spelling.pack"),
     ]:
         with (assets / name).open("rb") as stream:
             subprocess.run(
