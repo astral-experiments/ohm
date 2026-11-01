@@ -1,10 +1,11 @@
-"""One ordinary full Ruff D/Q contact on a packed Y and a loose, genuinely fast-forwarded X."""
+"""Acquire one of six independently enrolled full Ruff D/Q histories."""
 
 import os
 import runpy
 import shutil
 import subprocess
 import sys
+import time
 import traceback
 from pathlib import Path
 
@@ -18,11 +19,9 @@ import packed_sdk as sdk
 import packed_watches
 import pilot as h
 import qualification
+import packed_confirmation as six
 
-ORDER = sdk.ARMS
-BRANCH = "charlie/qa-ruff-sorted-packed-refs-full-20261101"
-RUN_NAME = "GNU sorted packed Ruff CLI X-B contact"
-ARTIFACT = "gnu-sorted-packed-ruff-x-b-contact"
+BRANCH = six.BRANCH
 HISTORIES = (
     ("clean", "reference", h.REFS),
     ("structural", "return", h.FULL),
@@ -33,7 +32,7 @@ HISTORIES = (
 
 def activate(arm, rows, top):
     return h.b.activate(
-        arm, rows, top, permitted=ORDER, source_manifest=sdk.manifests()[arm[0]]
+        arm, rows, top, permitted=sdk.ARMS, source_manifest=sdk.manifests()[arm[0]]
     )
 
 
@@ -55,16 +54,8 @@ def bind_host(calibrator, observers):
         release=os.uname().release,
     )
     h.reg.host(host)
-    fresh(host, os.environ["RUNNER_NAME"])
+    six.fresh(host["boot"], os.environ["RUNNER_NAME"])
     return api, host
-
-
-def fresh(host, runner):
-    old = sdk.read(HERE / "excluded-hosts.json")
-    h.need(
-        host["boot"] not in old["boots"] and runner and runner not in old["runners"],
-        "an earlier study used this machine",
-    )
 
 
 def job():
@@ -84,12 +75,14 @@ def job():
 
 def main(argv):
     job()
+    slot = os.environ["CONFIRMATION_POSITION"]
+    order = six.order(slot)
     if len(argv) == 3 and argv[0] == "acquire":
         sdk.acquire(Path(argv[1]), Path(argv[2]), h.subjects, h.b)
         return
     h.need(
         len(argv) == 3
-        and argv[0] == "contact"
+        and argv[0] == "confirmation"
         and shutil.disk_usage(h.OUT).free > 20 * 2**30
         and not (h.OUT / "meter-ready.json").exists(),
         "unregistered action, active counter or insufficient disk",
@@ -101,26 +94,27 @@ def main(argv):
     )
     rows = {k: v["files"] for k, v in sdk_rows.items()}
     position = dict(
-        mode="sorted-packed-ref-contact",
-        position="01",
-        order=list(ORDER),
+        mode=six.MODE,
+        position=slot,
+        order=list(order),
+        **six.ENROLLMENT,
         host=host,
         boot=host["boot"],
         runner=os.environ["RUNNER_NAME"],
         run=int(os.environ["GITHUB_RUN_ID"]),
         head=os.environ["GITHUB_SHA"],
         command=h.original.CARGO,
-        plan=h.sha(HERE / "PLAN.md"),
+        plan=six.PLAN,
         registered_plan=h.sha(HERE / "inputs/registered-plan.md"),
         hardware_gate=h.reg.hardware_gate(),
         prerequisites=qualification.prereqs(),
         packed_source=[sdk.SOURCE_RUN, sdk.SOURCE_JOB, sdk.compact(sdk.enrolled())],
     )
     h.save(h.OUT / "position.json", position)
-    shutil.copyfile(HERE / "PLAN.md", h.OUT / "PLAN.md")
+    shutil.copyfile(HERE / "inputs/six-plan.md", h.OUT / "PLAN.md")
     initial = h.OUT / "initial"
     initial.mkdir()
-    env = activate(ORDER[0], rows, initial)
+    env = activate(order[0], rows, initial)
     tracer = h.component("trace")
     # Dependency for this distinct application, using the original positive observer's own schema.
     tracer.packages().subjects = sdk
@@ -158,15 +152,21 @@ def main(argv):
         capture=packed_donor.capture,
         script_output=packed_watches.script_output,
     )
+    histories = []
     for lane, line, phases in HISTORIES:
-        for arm in ORDER:
+        for arm in order:
+            start = time.monotonic_ns()
             records = h.history(
                 arm, lane, line, rows, refs, issues, tracer, phases, packed=hooks
             )
+            stop = time.monotonic_ns()
+            histories.append(
+                dict(lane=lane, line=line, arm=arm, start_ns=start, stop_ns=stop)
+            )
             rosters[lane, line, arm] = records
         if lane == "clean":
-            h.cross_role(refs, issues, ORDER)
-    for arm in ORDER:
+            h.cross_role(refs, issues, order)
+    for arm in order:
         for phase in h.FULL:
             s = rosters["structural", "return", arm][phase]
             m = rosters["measured", "return", arm][phase]
@@ -180,7 +180,7 @@ def main(argv):
     h.save(h.OUT / "native-issues.json", issues)
     h.need(not issues, "original same-role whole ELFs / cross-role loads refused")
     summaries = {}
-    for arm in ORDER:
+    for arm in order:
         clocks = {
             p: sdk.read(h.OUT / f"measured-return-{arm}" / p / "clock.json")
             for p in h.FULL
@@ -194,6 +194,8 @@ def main(argv):
             ),
             "disjoint ordinary return measurement",
         )
+    six.history_order(slot, histories, summaries)
+    h.save(h.OUT / "history-intervals.json", histories)
     terminal = dict(
         qualified=True,
         position=position,
@@ -202,11 +204,11 @@ def main(argv):
         source=[sdk.D, sdk.Q],
         measured=summaries,
         primary={
-            a: rosters["measured", "return", a]["X-B"]["instructions"] for a in ORDER
+            a: rosters["measured", "return", a]["X-B"]["instructions"] for a in order
         },
         all_seven={
             a: sum(r["instructions"] for r in rosters["measured", "return", a].values())
-            for a in ORDER
+            for a in order
         },
     )
     h.save(h.OUT / "complete.json", terminal)

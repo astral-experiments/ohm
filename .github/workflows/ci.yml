@@ -1,23 +1,29 @@
-name: Observe a sorted packed Git branch ref on the full GNU Ruff CLI
-run-name: GNU sorted packed Ruff X-B contact ${{ inputs.reviewed_head }}
+name: Confirm the first full GNU Ruff CLI build after a fast-forward with packed refs
+run-name: Six GNU sorted packed Ruff X-B comparisons ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact independently reviewed contact commit
+        description: Exact independently reviewed six-host confirmation commit
         required: true
         type: string
 permissions:
   actions: read
   contents: read
 jobs:
-  contact:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-sorted-packed-refs-full-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+  confirm:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-sorted-packed-refs-six-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
-    name: GNU sorted packed Ruff CLI X-B contact
+    name: GNU sorted packed Ruff CLI confirmation ${{ matrix.position }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        position: ['01', '02', '03', '04', '05', '06']
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      CONFIRMATION_POSITION: ${{ matrix.position }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -97,7 +103,7 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify the packed contact source
+      - name: Verify the packed confirmation source
         run: |
           set -euo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
@@ -125,6 +131,7 @@ jobs:
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/reopen.py --help > /dev/null
           python3 -IB enrolled/scripts/packed-ref-cli/test_git_layout.py
           python3 -IB enrolled/scripts/packed-ref-cli/test_contact.py --source-checkout "$GITHUB_WORKSPACE/packed-source"
+          python3 -IB enrolled/scripts/packed-ref-cli/test_six.py
           python3 -IB enrolled/scripts/packed-ref-cli/review.py --help >/dev/null
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd
@@ -147,11 +154,11 @@ jobs:
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/packed-ref-cli/run.py contact "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/packed-ref-cli/run.py confirmation "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: gnu-sorted-packed-ruff-x-b-contact
+          name: gnu-sorted-packed-ruff-cli-confirmation-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

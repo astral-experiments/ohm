@@ -28,6 +28,7 @@ import packed_donor
 import packed_sdk as sdk
 import packed_watches
 import qualification
+import packed_confirmation as six
 import reopen as n
 
 BRANCH = "charlie/qa-ruff-sorted-packed-refs-full-20261101"
@@ -43,7 +44,9 @@ get = n.dataset
 need = sdk.need
 
 
-def official(directory, archive, head):
+def official_contact(directory, archive, head):
+    """Replay the exact, excluded one-host control only when explicitly requested."""
+    need(head == six.CONTACT_HEAD, "wrong historical rehearsal head")
     r, jobs, assets = [
         sdk.read(directory / (k + ".json")) for k in ("run", "jobs", "artifacts")
     ]
@@ -125,6 +128,10 @@ def official(directory, archive, head):
         and archive.stat().st_size == a["size_in_bytes"]
         and "sha256:" + hist.sha(archive) == a["digest"],
         "wrong full original ZIP",
+    )
+    need(
+        r["id"] == six.CONTACT and a["digest"] == "sha256:" + six.CONTACT_ORIGINAL,
+        "other historical original",
     )
     return dict(
         run=r["id"],
@@ -347,7 +354,7 @@ def stock_schedule(read):
     )
 
 
-def ingress(z, meta, kernel, calibrator, observers):
+def ingress(z, meta, kernel, calibrator, observers, rehearsal):
     names = z.namelist()
     need(
         len(names) == len(set(names))
@@ -359,6 +366,30 @@ def ingress(z, meta, kernel, calibrator, observers):
     )
     pos = get(z, "position.json")
     boot = pos["boot"]
+    if rehearsal:
+        need(
+            (meta["run"], meta["head"], meta["sha256"])
+            == (six.CONTACT, six.CONTACT_HEAD, six.CONTACT_ORIGINAL),
+            "wrong excluded rehearsal",
+        )
+        mode, slot, order, plan = (
+            "sorted-packed-ref-contact",
+            "01",
+            sdk.ARMS,
+            hist.sha(HERE / "PLAN.md"),
+        )
+    else:
+        need(
+            n.digest(z.read("position.json")) == meta["position_sha256"],
+            "changed identity-only position",
+        )
+        six.position_record(pos, meta)
+        mode, slot, order, plan = (
+            six.MODE,
+            meta["position"],
+            six.order(meta["position"]),
+            six.PLAN,
+        )
     need(
         (
             pos["mode"],
@@ -370,15 +401,15 @@ def ingress(z, meta, kernel, calibrator, observers):
             pos["head"],
         )
         == (
-            "sorted-packed-ref-contact",
-            "01",
+            mode,
+            slot,
             meta["run"],
             meta["runner"],
-            list(sdk.ARMS),
+            list(order),
             n.CARGO,
             meta["head"],
         )
-        and pos["plan"] == hist.sha(HERE / "PLAN.md") == n.digest(z.read("PLAN.md"))
+        and pos["plan"] == plan == n.digest(z.read("PLAN.md"))
         and pos["registered_plan"]
         == hist.sha(HERE / "inputs/registered-plan.md")
         == "c10abb820ce6b6da3ab3b2f88d858ee7574ef73d989e55d4a96307aa5c8c26ed"
@@ -461,7 +492,15 @@ def ingress(z, meta, kernel, calibrator, observers):
 
 
 def verify(
-    meta, archive, kernel, calibrator, observers, concurrent_path, concurrent_sha
+    meta,
+    archive,
+    kernel,
+    calibrator,
+    observers,
+    concurrent_path,
+    concurrent_sha,
+    *,
+    rehearsal=False,
 ):
     policy = SimpleNamespace(
         git_layout=git_layout,
@@ -480,7 +519,7 @@ def verify(
             concurrent_sha,
         )
         pos, minimum, kernel_binding, cost, records = ingress(
-            z, meta, kernel, calibrator, observers
+            z, meta, kernel, calibrator, observers, rehearsal
         )
         names = set(z.namelist())
         rows = {a: {} for a in sdk.ARMS}
@@ -502,7 +541,7 @@ def verify(
             )
         }
         for lane, line, phases in SCHEDULE:
-            for arm in sdk.ARMS:
+            for arm in pos["order"]:
                 top = f"{lane}-{line}-{arm}"
                 cert, root = n.active(
                     z, top, arm, records[arm[0]]["files"], manifests=sdk.manifests()
@@ -607,9 +646,11 @@ def verify(
             )
             for arm in sdk.ARMS
         }
+        original_clocks = {arm: {} for arm in sdk.ARMS}
         for arm in sdk.ARMS:
             for phase in n.PHASES:
                 native_clock = get(z, f"measured-return-{arm}/{phase}/clock.json")
+                original_clocks[arm][phase] = native_clock
                 need(
                     native_clock["running"] == native_clock["enabled"] > 0,
                     "multiplexed literal hardware observation",
@@ -641,6 +682,12 @@ def verify(
             get(z, "complete.json") == complete,
             "reported terminal or denominator differs",
         )
+        six.check_clocks(original_clocks, summaries)
+        histories = [] if rehearsal else get(z, "history-intervals.json")
+        if not rehearsal:
+            six.history_order(pos["position"], histories, summaries)
+        traced = len(allowed["kernel.tsv.gz"])
+        need(traced == 16, "incomplete per-phase physical coverage")
         native = execute(z, programs)
         keep = (
             "status",
@@ -682,7 +729,11 @@ def verify(
             native_replay=native,
             checked_native_bodies=len(bodies),
             storage="quiescent distinct allocated bytes after each command",
-            scored_samples=0,
+            scored_samples=0,  # The cohort decision is made only after all six actual replays.
+            raw_clocks=original_clocks,
+            histories=histories,
+            metered=len(clocks),
+            traced=traced,
         )
 
 
@@ -693,6 +744,9 @@ if __name__ == "__main__":
     ap.add_argument("--concurrent-admission", type=Path, required=True)
     ap.add_argument("--concurrent-sha256", required=True)
     ap.add_argument("--head", required=True)
+    choice = ap.add_mutually_exclusive_group(required=True)
+    choice.add_argument("--position", choices=six.POSITIONS)
+    choice.add_argument("--rehearsal-contact", action="store_true")
     a = ap.parse_args()
     need(
         subprocess.check_output(
@@ -704,13 +758,18 @@ if __name__ == "__main__":
     print(
         json.dumps(
             verify(
-                official(a.official, a.zip, a.head),
+                (
+                    official_contact(a.official, a.zip, six.CONTACT_HEAD)
+                    if a.rehearsal_contact
+                    else six.official(a.official, a.zip, a.head, a.position)
+                ),
                 a.zip,
                 a.kernel,
                 a.calibrator,
                 a.observers,
                 a.concurrent_admission,
                 a.concurrent_sha256,
+                rehearsal=a.rehearsal_contact,
             ),
             sort_keys=True,
         )

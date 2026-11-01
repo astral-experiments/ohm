@@ -11,6 +11,7 @@ sys.path[:0] = [str(HERE), str(HERE.parent / "ctfe-crossover-pilot")]
 import git_layout
 import packed_sdk as sdk
 import qualification
+import packed_confirmation as six
 import source_guard
 
 
@@ -18,6 +19,7 @@ def check(repo, head):
     repo = repo.resolve(strict=True)
     spec = source_guard.tree(repo, head, "scripts/packed-ref-cli")
     source_guard.tree(repo, head, "scripts/gnu-same-revision-donor")
+    six.frozen()
     fixed = json.loads((HERE / "inherited-objects.json").read_bytes())
     for path, oid in fixed.items():
         actual = subprocess.check_output(
