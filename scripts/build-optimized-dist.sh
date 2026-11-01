@@ -241,11 +241,30 @@ if [[ "$use_bolt" == true ]]; then
   opt_dist_arguments+=(--use-bolt)
 fi
 
+release_name="${toolchain#ohm-}"
+manifest="$script_directory/../toolchains/${release_name%-*}/${release_name##*-}.json"
+prepare_relocated_dependencies=false
+if [[ -f "$manifest" ]]; then
+  prepare_relocated_dependencies="$(jq -r '.prepare_relocated_pgo_dependencies // false' "$manifest")"
+fi
+if [[ "$prepare_relocated_dependencies" == true ]]; then
+  # rustc-perf moves each benchmark after preparing its dependencies. A build
+  # script can embed that original path. Prepare the moved dependencies before
+  # the profiler starts, keeping the upstream collector and the Rust checkout intact.
+  perf_path=src/tools/rustc-perf
+  perf_revision="$(git -C "$rust_checkout" rev-parse "HEAD:$perf_path")"
+  git -C "$rust_checkout" submodule update --init --checkout --depth 1 -- "$perf_path"
+  perf_checkout="$(mktemp -d "${TMPDIR:-/tmp}/ohm-rustc-perf.XXXXXX")"
+  trap 'rm -rf -- "$perf_checkout"' EXIT
+  git -C "$rust_checkout/$perf_path" archive "$perf_revision" | tar -x -C "$perf_checkout"
+  patch -d "$perf_checkout" -t -N -F 0 -p1 -i "$script_directory/../release/rustc-perf-relocated-dependencies.patch"
+  opt_dist_arguments+=(--rustc-perf-checkout-dir "$perf_checkout")
+fi
+
 # This compiler rechecks dependencies with native inputs. rustc-perf expects
 # the selected crate to be the only one compiled during each training run.
 case "$toolchain" in
   ohm-1.99.0-20 | ohm-1.99.0-21)
-    manifest="$script_directory/../toolchains/1.99.0/${toolchain##*-}.json"
     pinned_rust="$(jq -er '.sources.rust.revision' "$manifest")"
     if [[ "$(git -C "$rust_checkout" rev-parse --verify HEAD)" == "$pinned_rust" ]]; then
       opt_dist_arguments+=(--benchmark-cargo-config unstable.ohm-defaults=false)

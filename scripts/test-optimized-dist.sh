@@ -66,6 +66,12 @@ import sys
 
 checkout = pathlib.Path(__file__).resolve().parents[3]
 arguments = sys.argv[1:]
+if "--rustc-perf-checkout-dir" in arguments:
+    perf = pathlib.Path(arguments[arguments.index("--rustc-perf-checkout-dir") + 1])
+    collector = (perf / "collector/src/compile/benchmark/mod.rs").read_text()
+    if ".run_rustc(false)" not in collector or "local edit" in collector:
+        raise SystemExit("expected the prepared copy of the pinned collector")
+
 artifact_directory = checkout / arguments[arguments.index("--artifact-dir") + 1]
 artifact_directory.mkdir(parents=True, exist_ok=True)
 
@@ -218,10 +224,10 @@ assert_optimized_build() {
   local expect_bolt="$3"
   local component_pgo="$4"
   local output="$5"
-  local isolate_training="${6:-false}"
+  local training="${6:-upstream}"
 
   python3 - "$trace" "$bootstrap_config" "$rust_checkout" "$toolchain" \
-    "$target" "$expected_llvm_directory" "$expect_bolt" "$component_pgo" "$output" "$isolate_training" <<'PY'
+    "$target" "$expected_llvm_directory" "$expect_bolt" "$component_pgo" "$output" "$training" <<'PY'
 import json
 import pathlib
 import sys
@@ -237,7 +243,7 @@ import tomllib
     expect_bolt,
     component_pgo,
     output_path,
-    isolate_training,
+    training,
 ) = sys.argv[1:]
 checkout = pathlib.Path(checkout).resolve()
 generated_config = checkout / "build" / "ohm-release-bootstrap.toml"
@@ -368,17 +374,19 @@ training_configs = [
     for i, argument in enumerate(pipeline_arguments)
     if argument == config_flag or argument.startswith(config_flag + "=")
 ]
-if training_configs != (["unstable.ohm-defaults=false"] if isolate_training == "true" else []):
+if training_configs != (["unstable.ohm-defaults=false"] if training == "isolate" else []):
     raise SystemExit(f"unexpected Cargo config for rustc-perf: {training_configs}")
 if (
     "unstable.ohm-defaults=false" in bootstrap_arguments + distribution_arguments
     or "CARGO_UNSTABLE_OHM_DEFAULTS" in optimized["environment"]
 ):
     raise SystemExit("the training override escaped into the release build")
-for unsupported_argument in (
-    "--run-tests",
-    "--rustc-perf-checkout-dir",
-):
+perf_flag = "--rustc-perf-checkout-dir"
+if training == "relocated":
+    if pathlib.Path(option(pipeline_arguments, perf_flag)).exists():
+        raise SystemExit("the temporary profile-training checkout was not removed")
+unsupported = ["--run-tests"] if training == "relocated" else ["--run-tests", perf_flag]
+for unsupported_argument in unsupported:
     if any(
         argument == unsupported_argument
         or argument.startswith(f"{unsupported_argument}=")
@@ -479,7 +487,7 @@ for revision in 20 21; do
   : > "$trace"
   linux_output="$test_directory/linux-$revision-output.log"
   run_optimized_build "$linux_target" "$linux_output"
-  assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output" true
+  assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output" isolate
 
   : > "$trace"
   macos_output="$test_directory/macos-$revision-output.log"
@@ -489,8 +497,46 @@ for revision in 20 21; do
     "$rust_checkout/build/$macos_target/ci-llvm" \
     false \
     true \
-    "$macos_output" true
+    "$macos_output" isolate
 done
+
+# The collector fixture starts with the upstream context used by the release patch.
+perf_remote="$test_directory/perf fixture"
+collector_path=collector/src/compile/benchmark/mod.rs
+mkdir -p "$perf_remote/$(dirname -- "$collector_path")"
+cat > "$perf_remote/$collector_path" <<'RS'
+                // Don't delete the directory on error.
+                let timing_dir = ManuallyDrop::new(self.make_temp_dir(benchmark_dir.dir.path())?);
+                let cwd = timing_dir.path();
+
+                // A full non-incremental build.
+                if scenarios.contains(&Scenario::Full) {
+                    self.mk_cargo_process(
+                        toolchain,
+RS
+(
+  export GIT_AUTHOR_NAME=fixture GIT_COMMITTER_NAME=fixture
+  export GIT_AUTHOR_EMAIL=fixture@example.com GIT_COMMITTER_EMAIL=fixture@example.com
+  git init --quiet "$perf_remote"
+  git -C "$perf_remote" add "$collector_path"
+  git -C "$perf_remote" commit --quiet -m collector
+  git -C "$rust_checkout" symbolic-ref HEAD refs/heads/fixture
+  git -C "$rust_checkout" -c protocol.file.allow=always submodule add --quiet "$perf_remote" src/tools/rustc-perf
+  git -C "$rust_checkout" commit --quiet -m 'Pin collector'
+)
+original_collector="$rust_checkout/src/tools/rustc-perf/$collector_path"
+printf '%s\n' '// local edit' >> "$original_collector"
+toolchain=ohm-1.99.0-23
+: > "$trace"
+relocated_output="$test_directory/relocated-output.log"
+run_optimized_build "$linux_target" "$relocated_output"
+assert_optimized_build "$linux_target" "$bolt_directory" true true "$relocated_output" relocated
+grep -qx '// local edit' "$original_collector"
+if grep -Fq '.run_rustc(false)' "$original_collector"; then
+  echo 'profile training modified the original collector' >&2
+  exit 1
+fi
+toolchain=ohm-1.99.0-21
 
 jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/19.json" > "$rust_checkout/.git/HEAD"
 
