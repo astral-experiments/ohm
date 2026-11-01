@@ -540,17 +540,24 @@ if [ ! -f "$activation_race_prefix/race-marker" ] || \
 fi
 
 existing_alias_directory="$temporary_directory/cases/replace-alias/rustup-home/toolchains"
-existing_alias_target="$temporary_directory/cases/replace-alias/previous-toolchain"
+# Command substitution strips trailing newlines from a path printed by pwd.
+existing_alias_target="$temporary_directory/cases/replace-alias/toolchain"$'\n'
 mkdir -p "$existing_alias_directory" "$existing_alias_target"
 ln -s "$existing_alias_target" "$existing_alias_directory/ohm"
 run_case replace-alias success
 assert_contains "$temporary_directory/cases/replace-alias/rustup.log" \
   'toolchain link ohm '
-if [ "$(readlink "$existing_alias_directory/ohm")" != \
-     "$temporary_directory/cases/replace-alias/toolchain" ]; then
+if [ ! "$existing_alias_directory/ohm" -ef "$temporary_directory/cases/replace-alias/toolchain" ]; then
   echo 'existing custom rustup alias was not updated to the new Ohm toolchain' >&2
   exit 1
 fi
+
+conflicting_version_directory="$temporary_directory/cases/conflicting-version/rustup-home/toolchains"
+conflicting_version_target="$temporary_directory/cases/conflicting-version/toolchain"$'\n'
+mkdir -p "$conflicting_version_directory" "$conflicting_version_target"
+ln -s "$conflicting_version_target" "$conflicting_version_directory/$version"
+run_case conflicting-version failure
+assert_no_links conflicting-version
 
 failing_alias_directory="$temporary_directory/cases/failed-alias/rustup-home/toolchains"
 failing_alias_target="$temporary_directory/cases/failed-alias/previous-toolchain"
