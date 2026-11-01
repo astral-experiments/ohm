@@ -18,7 +18,7 @@ PILOT = HERE.parent / 'branch-return-pmu'
 KERNEL = reg.OBSERVER
 PROJECTOR = '5e91ed3974c0964a912fd38049946f647891dcb2'
 COMPILER_TREES = {'E': '89dcac9002ea6a0307d6fef82c0652b15c85dcca',
-                  'C': '37bae6b16cbb4858b2dd597f70048cb7f2dc041c'}
+                  'D': '81461858540cf6f91328f7bfa1a4bcea13e4e9be'}
 
 
 def load(path, imports=None):
@@ -59,7 +59,7 @@ def packages():
     images = load(kernel / 'images.py', {'history': history})
     reader = load(kernel / 'kernel/read_events.py')
     # The previously exercised invocation owns the exact subprocess, exit, raw streams and E0308 check.
-    # Only its per-visit source and expected phase roster change for this distinct E/C history.
+    # Only its per-visit source and expected phase roster change for this distinct E/D history.
     adapter = SimpleNamespace(wrap=wrap, inventory=inventory, preserve=events.preserve, timeout=events.timeout)
     capture = load(prior / 'worker.py', {'bindings': b, 'kernel_contact': contact, 'kernel_events': adapter,
                                          'processes': processes, 'full_cli': ordinary.historical, 'study': ordinary.kit})
@@ -111,7 +111,7 @@ def prepare(mode, host, prior=None):
 def catalog(arm, rows, where, env):
     p = packages()
     b = p.b
-    b.need(arm in p.subjects.ARMS and set(rows) == {'E', 'C'}, 'unexpected structural role')
+    b.need(arm in p.subjects.ARMS and set(rows) == {'E', 'D'}, 'unexpected structural role')
     paths = {'cargo': b.SDK / 'bin/cargo', 'rustc': b.SDK / 'bin/rustc', 'wild': b.SDK / b.WILD,
              'proxy': b.PROXIES / 'rustup', 'sysld': Path('/usr/bin/ld')}
     tools = {name: {'path': str(path), 'resolved': str(path.resolve(strict=True)), 'identity': [b.sha(path), *b.numbers(path)]}
@@ -134,9 +134,9 @@ def source(where, arm, env, stage):
     role = arm[0]
     path = b.SDK / subjects.DRIVER
     driver = [b.sha(path), *b.numbers(path)]
-    native = record(b.OUT / 'sdk/ctfe-native-source.json')
-    side = {'E': 'old', 'C': 'new'}[role]
-    commit = {'E': subjects.E, 'C': subjects.C}[role]
+    native = record(b.OUT / 'sdk/donor-native-source.json')
+    side = {'E': 'old', 'D': 'new'}[role]
+    commit = {'E': subjects.E, 'D': subjects.D}[role]
     b.need(arm in subjects.ARMS and (enrolled['arm'], enrolled['role'], enrolled['sdk']) == (arm, role, str(b.SDK))
            and native[side] == commit and native['driver'] == subjects.DRIVER
            and native[side + '_driver'] == [driver[0], driver[4], driver[3]]

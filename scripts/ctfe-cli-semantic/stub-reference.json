@@ -1,0 +1,54 @@
+{
+  "archive_bytes": 363231911,
+  "archive_sha256": "abd67ae9a933af39b33132c458fbd5d8ff4e26174691fac75e7981afcfd7436c",
+  "artifact": 13058834903,
+  "bytes": 147278784,
+  "diagnostic": {
+    "cell": null,
+    "code": "PYI009",
+    "end_location": {
+      "column": 9,
+      "row": 2
+    },
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "...",
+          "end_location": {
+            "column": 9,
+            "row": 2
+          },
+          "location": {
+            "column": 5,
+            "row": 2
+          }
+        }
+      ],
+      "message": "Replace `pass` with `...`"
+    },
+    "location": {
+      "column": 5,
+      "row": 2
+    },
+    "message": "Empty body should contain `...`, not `pass`",
+    "name": "pass-statement-stub-body",
+    "noqa_row": 2,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/pass-statement-stub-body"
+  },
+  "member": "clean/Eon/B/native.json.gz",
+  "run": 41243597545,
+  "source": "def f() -> None:\n    pass\n",
+  "version": {
+    "commit_info": {
+      "commit_date": "2026-09-10",
+      "commit_hash": "7b13f01ba1569887a25670820764b24c206da8e5",
+      "commits_since_last_tag": 0,
+      "last_tag": null,
+      "short_commit_hash": "7b13f01ba"
+    },
+    "version": "0.16.7"
+  },
+  "whole_elf": "26af10803ba5389e98ab932f704e4c1c84a89df4486437f2cfd465b3b6b774e2"
+}

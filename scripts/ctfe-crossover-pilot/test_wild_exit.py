@@ -66,7 +66,7 @@ def entry(mode):
     with tempfile.TemporaryDirectory() as temp:
         out = Path(temp)
         (out/'sdk').mkdir()
-        for arm in ('E', 'C'):
+        for arm in ('E', 'D'):
             pilot.save(out/'sdk'/(arm+'.json'), {'files': {}})
         env = dict(GITHUB_RUN_ID='7', GITHUB_SHA='a'*40, CONTACT_RUN='',
                    CONTACT_SHA256='', CONTACT_READBACK_SHA256='')
@@ -89,9 +89,9 @@ def entry(mode):
                 pilot.main(mode, '01', out, out)
             except ReachedSDK:
                 pass
-            activation.assert_called_once_with('Eon', {'E': {}, 'C': {}}, out/'initial')
+            activation.assert_called_once_with('Eon', {'E': {}, 'D': {}}, out/'initial')
         position = json.loads((out/'position.json').read_bytes())
-        assert position['order'] == (['Eon'] if mode == 'contact' else ['Eon','Con'])
+        assert position['order'] == ['Eon','Don']
         assert position['command'] == ['cargo','+ohm','build','-p','ruff','--bin','ruff',
                                        '--locked','--offline','-j4','--message-format=json']
         assert position['mode'] == mode and position['boot'] == boot

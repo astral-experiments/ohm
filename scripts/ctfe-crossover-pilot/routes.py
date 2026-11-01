@@ -1,5 +1,6 @@
 """Replay the two Ruff branches in a disposable, authenticated study checkout."""
 
+import behavior
 import hashlib
 import subprocess
 from pathlib import Path
@@ -33,11 +34,11 @@ def edit_comment(file):
 
 def begin(repo, revs, names):
     """Reset only the known private comment between independent empty histories."""
-    changed = git(repo, 'diff', '--name-only', '-z')
+    changed = [p.decode() for p in git(repo, 'diff', '--name-only', '-z').split(b'\0') if p]
+    allowed = {NODES: AFTER, behavior.cases.AST: behavior.cases.AFTER}
+    require(all(p in allowed and sha((repo/p).read_bytes())==allowed[p] for p in changed), 'unexpected prior edit')
     if changed:
-        require(changed == NODES.encode() + b'\0' and sha((repo / NODES).read_bytes()) == AFTER,
-                'unexpected prior study edit')
-        git(repo, 'restore', '--worktree', '--', NODES)
+        git(repo, 'restore', '--worktree', '--', *changed)
     require(not git(repo, 'status', '--porcelain'), 'unclean owned source')
     git(repo, 'switch', '--quiet', names['B'])
     require(git(repo, 'rev-parse', 'HEAD').decode().strip() == revs['B'], 'Y changed')
@@ -49,10 +50,20 @@ def advance(repo, names, phase, lineage):
         git(repo, 'switch', '--quiet', names['A'])
     elif phase == 'X-B':
         git(repo, 'merge', '--ff-only', '--no-edit', names['B'])
+        if lineage == 'dirty':
+            f=repo/behavior.cases.AST
+            f.write_bytes(behavior.cases.altered(f.read_bytes()))
     elif phase in ('comment', 'clean-edited'):
-        if phase == 'comment' and lineage == 'return':
+        if phase == 'comment' and lineage in ('return','dirty'):
+            if lineage == 'dirty':
+                f=repo/behavior.cases.AST
+                require(sha(f.read_bytes())==behavior.cases.AFTER, 'lost the changed donor source')
+                git(repo, 'restore', '--worktree', '--', behavior.cases.AST)
             git(repo, 'switch', '--quiet', names['B'])
         edit_comment(repo / NODES)
+    elif phase == 'clean-semantic':
+        f=repo/behavior.cases.AST
+        f.write_bytes(behavior.cases.altered(f.read_bytes()))
     elif phase == 'invalid':
         parser = repo / PARSER
         body = parser.read_bytes()
@@ -71,6 +82,12 @@ def snapshot(repo, revs, trees, names, phase, lineage):
     ref = names['A'] if (branch == 'A' or phase == 'X-B' or
                           lineage == 'stay' and phase in ('comment', 'unchanged')) else names['B']
     changed = [NODES] if phase in ('clean-edited', 'comment', 'unchanged', 'invalid', 'repair') else []
+    semantic = phase == 'clean-semantic' or lineage == 'dirty' and phase == 'X-B'
+    lib = (repo/behavior.cases.AST).read_bytes()
+    if semantic:
+        changed.append(behavior.cases.AST)
+    expected = git(repo,'show','HEAD:'+behavior.cases.AST)
+    require(lib == (behavior.cases.altered(expected) if semantic else expected), 'wrong private function body')
     if phase == 'invalid':
         changed.append(PARSER)
     require(git(repo, 'rev-parse', 'HEAD').decode().strip() == revs[branch]
@@ -93,4 +110,4 @@ def snapshot(repo, revs, trees, names, phase, lineage):
         require(path.is_file() and not path.is_symlink(), 'missing Ruff build-script input')
         watched[name] = [s.st_dev, s.st_ino, s.st_ctime_ns, s.st_mtime_ns, sha(path.read_bytes())]
     return dict(branch=branch, ref=ref, revision=revs[branch], tree=trees[branch],
-                modified=sorted(changed), nodes=nodes, parser=sha(parser), watched=watched)
+                modified=sorted(changed), lib=sha(lib), nodes=nodes, parser=sha(parser), watched=watched)

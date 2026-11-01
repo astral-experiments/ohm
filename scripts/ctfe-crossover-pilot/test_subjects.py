@@ -26,10 +26,10 @@ def original_metadata():
     repository = {"full_name": s.REPO, "id": 123}
     origin = dict(id=s.RUN, head_sha=s.HEAD, head_branch=s.BRANCH, repository_id=123, head_repository_id=123)
     run = dict(id=s.RUN, head_branch=s.BRANCH, head_sha=s.HEAD, run_attempt=1, event="workflow_dispatch",
-               path=".github/workflows/ci.yml", conclusion="failure", status="completed",
+               path=".github/workflows/ci.yml", conclusion="success", status="completed",
                repository=repository, head_repository=repository)
     job = dict(id=s.JOB, run_id=s.RUN, head_sha=s.HEAD, head_branch=s.BRANCH, run_attempt=1,
-               name="GNU compiler and ordinary Ruff allocation identity", conclusion="failure", status="completed",
+               name="Build and qualify the exact GNU same-revision selector", conclusion="success", status="completed",
                labels=["namespace-profile-ubuntu-24-04-16"], steps=[
                    dict(number=i, name=n, status="completed", conclusion=c) for i, (n, c) in s.STEPS.items()])
     media = dict(total_count=2, artifacts=[
@@ -39,17 +39,17 @@ def original_metadata():
 
 
 class SourceTests(unittest.TestCase):
-    def test_source_success_and_workload_failure_are_separate(self):
+    def test_source_and_native_workload_must_both_pass(self):
         base = original_metadata()
-        self.assertEqual(s.official(*base)["original_workflow"], "failure")
-        for index, key, value in ((0, "conclusion", "success"), (0, "run_attempt", 2), (1, "id", s.JOB+1),
+        self.assertEqual(s.official(*base)["original_workflow"], "success")
+        for index, key, value in ((0, "conclusion", "failure"), (0, "run_attempt", 2), (1, "id", s.JOB+1),
                                   (1, "head_sha", "0"*40)):
             with self.subTest(index=index, key=key):
                 altered = copy.deepcopy(base)
                 altered[index][key] = value
                 with self.assertRaises(ValueError):
                     s.official(*altered)
-        for step in (10, 11):
+        for step in (11, 12, 13):
             altered = copy.deepcopy(base)
             next(row for row in altered[1]["steps"] if row["number"] == step)["conclusion"] = "skipped"
             with self.assertRaises(ValueError):
@@ -73,21 +73,21 @@ class SourceTests(unittest.TestCase):
                 d = Path(tmp); payload = b"proof"
                 archive = d/"original.zip"
                 with zipfile.ZipFile(archive, "x") as z:
-                    item=zipfile.ZipInfo("C/native-qualified.json")
+                    item=zipfile.ZipInfo("D/native-qualified.json")
                     item.external_attr=(mode|0o644)<<16
                     z.writestr(item, b'{"ok":true}')
-                    item=zipfile.ZipInfo("C/overlay/0.zst")
+                    item=zipfile.ZipInfo("D/overlay/0.zst")
                     item.external_attr=(stat.S_IFREG|0o644)<<16
                     z.writestr(item,payload)
                     # Ineligible archive rows are never joined or passed to an extractor.
                     z.writestr("../wrong",b"foreign")
                 index={s.SOURCE_ARTIFACT:(9,archive.stat().st_size,s.sha(archive))}
                 allowed={s.SOURCE_ARTIFACT:{name:(len(raw),hashlib.sha256(raw).hexdigest())
-                          for name,raw in [("C/native-qualified.json",b'{"ok":true}'),("C/overlay/0.zst",payload)]}}
+                          for name,raw in [("D/native-qualified.json",b'{"ok":true}'),("D/overlay/0.zst",payload)]}}
                 with patch.object(s,"ARTIFACTS",index), patch.object(s,"MEMBERS",allowed):
                     if mode==stat.S_IFREG:
                         self.assertEqual(s.unpack({s.SOURCE_ARTIFACT:archive},d/"selected"),{"ok":True})
-                        self.assertEqual((d/"selected/C/overlay/0.zst").read_bytes(),payload)
+                        self.assertEqual((d/"selected/D/overlay/0.zst").read_bytes(),payload)
                         with self.assertRaises(FileExistsError):
                             s.unpack({s.SOURCE_ARTIFACT:archive},d/"selected")
                     else:
@@ -99,18 +99,18 @@ class SourceTests(unittest.TestCase):
                         s.unpack({s.SOURCE_ARTIFACT:archive},d/"tampered")
 
     def test_no_unregistered_role_can_move_a_toolchain(self):
-        for role, rows in (("Coff",{"E":{},"C":{}}),("Eon",{"E":{}}),("Fon",{"E":{},"C":{}})):
+        for role, rows in (("Doff",{"E":{},"D":{}}),("Eon",{"E":{}}),("Fon",{"E":{},"D":{}})):
             with self.subTest(role=role), self.assertRaises(ValueError):
                 s.activate(role,rows,Path("."))
 
     def test_activation_binds_both_on_arms_to_own_manifest(self):
-        rows = {"E": {}, "C": {}}
+        rows = {"E": {}, "D": {}}
         active = Mock(return_value={"CARGO_ENCODED_RUSTFLAGS": "-Zohm-branch-cache=yes"})
         with patch.object(s, "policy", return_value=SimpleNamespace(b=SimpleNamespace(activate=active))):
-            for arm in ("Eon", "Con"):
+            for arm in ("Eon", "Don"):
                 env = s.activate(arm, rows, Path("/example"))
                 self.assertEqual(env["CARGO_ENCODED_RUSTFLAGS"], "-Zohm-branch-cache=yes")
-                active.assert_called_with(arm, rows, Path("/example"), permitted=("Eon", "Con"),
+                active.assert_called_with(arm, rows, Path("/example"), permitted=("Eon", "Don"),
                                           source_manifest=s.MANIFEST[arm[0]])
 
     def test_pilot_and_donor_subjects_have_distinct_modules(self):
@@ -164,8 +164,8 @@ def actual(archive_dir, official_path, original_e, scratch):
         b=s.policy().b
         parent=b.inventory(original_e)
         candidate=s.reconstruct(transfer,native,parent,original_e,d/"candidate",b)
-        records={r:json.loads((transfer/"sdk"/(r+".json")).read_bytes()) for r in ("E","C")}
-        wrong=copy.deepcopy(records);wrong["C"]["files"]["bin/cargo"][0]="0"*64
+        records={r:json.loads((transfer/"sdk"/(r+".json")).read_bytes()) for r in ("E","D")}
+        wrong=copy.deepcopy(records);wrong["D"]["files"]["bin/cargo"][0]="0"*64
         with unittest.TestCase().assertRaises(ValueError):
             s.classify(parent,wrong,native)
         return {"run":proof["run"],"original_conclusion":proof["original_workflow"],

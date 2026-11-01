@@ -25,12 +25,12 @@ def exercise(original):
             (repo / '.git/shallow').write_bytes((common / 'shallow').read_bytes())
         routes.git(repo, 'config', 'core.sparseCheckout', 'true')
         (repo / '.git/info').mkdir(exist_ok=True)
-        (repo / '.git/info/sparse-checkout').write_text('/' + routes.NODES + '\n/' + routes.PARSER + '\n')
+        (repo / '.git/info/sparse-checkout').write_text('/' + routes.NODES + '\n/' + routes.PARSER + '\n/' + routes.behavior.cases.AST + '\n')
         routes.git(repo, 'branch', NAMES['A'], A)
         routes.git(repo, 'branch', NAMES['B'], B)
         routes.git(repo, 'switch', '--quiet', NAMES['B'])
         phases = ('Y-B', 'X-A', 'X-B', 'comment', 'unchanged')
-        for history, steps in [('return', (*phases, 'invalid', 'repair')), ('stay', phases)]:
+        for history, steps in [('return', (*phases, 'invalid', 'repair')), ('stay', phases), ('dirty', phases)]:
             routes.begin(repo, REVS, NAMES)
             seen = {}
             for phase in steps:
@@ -39,7 +39,7 @@ def exercise(original):
             routes.require(seen['comment'] == seen['unchanged'], 'unchanged probe mutated Git input')
             routes.require(seen['X-B']['ref'] == NAMES['A'] and seen['X-B']['revision'] == B,
                            'did not fast-forward the real parent')
-        for phase in ('clean-A', 'clean-B', 'clean-edited'):
+        for phase in ('clean-A', 'clean-B', 'clean-edited', 'clean-semantic'):
             routes.begin(repo, REVS, NAMES)
             routes.advance(repo, NAMES, phase, 'reference')
             routes.snapshot(repo, REVS, TREES, NAMES, phase, 'reference')

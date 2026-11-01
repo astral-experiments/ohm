@@ -18,8 +18,10 @@ from bindings import OUT, ROOT, WORK, need, save, sha
 from omission import publish
 sys.path.insert(0, str(HERE))
 import routes
+import behavior
+import donor_witness as dw
+import storage_tables
 import ctfe_pilot_registration as reg
-import wild_fork
 
 kit = original.kit
 b = original.b
@@ -34,12 +36,12 @@ def component(name):
 
 
 subjects = component('subjects')
-ORDERS = {'01': ('Eon', 'Con'), '02': ('Con', 'Eon')}
-REFS = ('clean-A', 'clean-B', 'clean-edited')
+ORDERS = {'01': ('Eon', 'Don'), '02': ('Don', 'Eon')}
+REFS = ('clean-A', 'clean-B', 'clean-edited', 'clean-semantic')
 PREFIX = ('Y-B', 'X-A', 'X-B', 'comment', 'unchanged')
 FULL = (*PREFIX, 'invalid', 'repair')
 TRACED = {'return': {'X-B', 'comment', 'unchanged', 'invalid', 'repair'},
-          'stay': {'comment', 'unchanged'}}
+          'stay': {'comment', 'unchanged'}, 'dirty': {'X-B', 'comment', 'unchanged'}}
 BRANCH = 'refs/heads/' + reg.BRANCH
 
 
@@ -81,7 +83,17 @@ def visit(arm, lane, lineage, phase, env, where, refs, issues, observer):
              'a watched source changed before the unchanged call')
     rc = 101 if phase == 'invalid' else 0
     traced = lane == 'structural' and phase in TRACED[lineage]
-    if traced:
+    donor_lane = lane == 'structural' and lineage in ('return','dirty')
+    if donor_lane and phase == 'comment':
+        entered = [json.loads((where.parent / k / 'donor-state.json').read_bytes()) for k in ('Y-B','X-A','X-B')]
+        last = json.loads(gzip.decompress((where.parent/'X-B/native-execs.json.gz').read_bytes()))
+        registered = dw.register(entered, dw.rows(last), arm[0])
+        need(dw.donors.snapshot(WORK/'target', arm[0]) == entered[-1]['sessions'], 'selected donor was changed before the real return')
+        save(where/'both-ref-tips.json',dw.refs(kit.TREE, dw.B))
+        save(where/'donor-register.json',registered)
+        record = json.loads((OUT/'sdk'/(arm[0]+'.json')).read_bytes())
+        messages,instructions,physical=dw.capture(observer.invocation, where, env, arm, record, registered)
+    elif traced:
         messages, instructions, physical = observer.invocation(where, env, rc, arm)
     else:
         capture = 'measured' if lane == 'measured' else 'ordinary'
@@ -93,6 +105,14 @@ def visit(arm, lane, lineage, phase, env, where, refs, issues, observer):
         need(not abandoned, ('unfinished native compile', phase))
     storage = original.disk.allocated(WORK / 'target', WORK / 'build', where, failed_sessions=abandoned)
     need(min(storage['roots'].values()) > 0 and storage['all_inodes'] > 1000, 'incomplete storage census')
+    inode_ledger=json.loads(gzip.decompress((where/'path-inodes.json.gz').read_bytes()))
+    tables=storage_tables.scan(inode_ledger)
+    need(tables['total']==storage['allocated'], 'quiescent table/whole storage census mismatch')
+    save(where/'table-storage.json',tables)
+    if donor_lane and phase in ('Y-B','X-A','X-B'):
+        state=dict(source=source, sessions=dw.donors.snapshot(WORK/'target',arm[0]))
+        dw.check_ledger(state,inode_ledger,ROOT)
+        save(where/'donor-state.json',state)
     observation = 'kernel' if traced else 'pmu' if lane == 'measured' else 'ordinary'
     result = dict(phase=phase, status=rc, observer=observation, instructions=instructions,
                   allocated=storage['allocated'])
@@ -114,8 +134,10 @@ def visit(arm, lane, lineage, phase, env, where, refs, issues, observer):
         branch = source['branch']
         products, files = original.native.observed(messages, branch, kit.REVS[branch], env,
                                                    ROOT, kit.TREE, WORK, where)
-        ref = phase if phase in REFS else ('clean-edited' if routes.NODES in source['modified']
-                                            else 'clean-' + branch)
+        is_semantic = behavior.cases.AST in source['modified']
+        save(where/'pyi009.json',behavior.run(files['cli'], kit.TREE, env, is_semantic, products['cli']['whole']))
+        ref = phase if phase in REFS else ('clean-semantic' if is_semantic else 'clean-edited'
+                                          if routes.NODES in source['modified'] else 'clean-' + branch)
         if phase in REFS:
             for name, path in files.items():
                 original.native.preserve(path, products[name], original.BODIES, original.BUNDLE)
@@ -152,12 +174,12 @@ def history(arm, lane, lineage, rows, refs, issues, observer, phases=None):
 def cross_role(refs, issues):
     for phase in REFS:
         erows, e = refs['Eon', phase]
-        crows, c = refs['Con', phase]
+        crows, c = refs['Don', phase]
         need(erows == crows and original.same_products(c, e), ('different clean typed or native verdict', phase))
         for name in ('cli', 'reader'):
             if any(e[name][key] != c[name][key] for key in ('loads', 'executable')):
                 issues.append(dict(reference=phase, different_executable_bytes=name,
-                                   E=e[name]['whole'], C=c[name]['whole']))
+                                   E=e[name]['whole'], D=c[name]['whole']))
     for arm in ORDERS['01']:
         need(refs[arm, 'clean-A'][1]['cli']['whole'] != refs[arm, 'clean-B'][1]['cli']['whole'],
              'the real Ruff history changes the executable')
@@ -174,13 +196,13 @@ def finish(position, order, records, issues):
                     issues.append(dict(arm=arm, phase=phase, structural_disagreement=key))
         primary[arm] = {key: ordinary['comment'][key] for key in ('instructions', 'allocated')}
         primary[arm].update(compilers=trace['comment']['compilers'], links=trace['comment']['links'])
-    e, c = (primary[a] for a in ('Eon', 'Con'))
+    e, c = (primary[a] for a in ('Eon', 'Don'))
     e_full = collections.Counter(n for n, mode in e['compilers'] if mode == 'full')
     c_full = collections.Counter(n for n, mode in c['compilers'] if mode == 'full')
     ratio = e['instructions'] / c['instructions']
     save(OUT / 'pilot.json', dict(position=position, order=order, primary=primary, ratio=ratio,
                                   skipped_full=dict(e_full - c_full), added_full=dict(c_full - e_full),
-                                  candidate_for_confirmation=bool(not issues and ratio >= 2 and e_full > c_full
+                                  candidate_for_confirmation=bool(not issues and ratio > 2 and e_full > c_full
                                                                   and c['links'] <= e['links']),
                                   qualification_issues=issues))
     need(not issues, 'one or more independent native product gates refused; see pilot.json')
@@ -216,11 +238,11 @@ def main(mode, position, calibrator, observers):
     reg.host(host)
     if prior:
         reg.fresh(host['boot'], [prior['boot']])
-    order = ('Eon',) if mode == 'contact' else ORDERS[position]
+    order = ORDERS[position]
     save(OUT/'position.json', dict(mode=mode, position=position, host=host, boot=ready['boot'], order=order,
          run=os.environ['GITHUB_RUN_ID'], head=os.environ['GITHUB_SHA'], plan=sha(HERE/'PLAN.md'),
          command=original.CARGO, hardware_gate=gate))
-    rows = {a: json.loads((OUT/'sdk'/(a+'.json')).read_bytes())['files'] for a in ('E','C')}
+    rows = {a: json.loads((OUT/'sdk'/(a+'.json')).read_bytes())['files'] for a in ('E','D')}
     start = OUT/'initial'
     start.mkdir()
     env = subjects.activate(order[0], rows, start)
@@ -234,25 +256,31 @@ def main(mode, position, calibrator, observers):
     for arm in order:
         history(arm, 'clean', 'reference', rows, refs, issues, trace)
     if mode == 'contact':
-        visits = history('Eon', 'structural', 'return', rows, refs, issues, trace, PREFIX[:4])
-        traced = OUT/'structural-return-Eon'
-        helpers = {phase: json.loads((traced/phase/'wild-helpers.json').read_bytes()) for phase in ('X-B','comment')}
-        compiler_groups = {phase: json.loads((traced/phase/'compiler-groups.json').read_bytes()) for phase in ('X-B','comment')}
-        stock_fixture = wild_fork.stock_fixture(json.loads((OUT/'kernel-qualification/fixtures/group-v2/qualified.json').read_bytes()))
-        outcomes = {}
-        for phase in ('X-B','comment'):
-            directory = traced/phase
-            raw = gzip.decompress((directory/'kernel.tsv.gz').read_bytes())
-            parsed = trace.packages().reader.parse(raw,expected_code=0,expected_schema=3)
-            physical = json.loads(gzip.decompress((directory/'native-execs.json.gz').read_bytes()))
-            outcomes[phase] = wild_fork.finish(raw,parsed,physical['wild_processes'])
-            need(len(outcomes[phase]) == 1 and outcomes[phase][0]['rustc_crate'] == 'ruff',
-                 'no qualified forked helper for the actual Ruff CLI link')
-        need(any(compiler_groups.values()), 'no installed Ruff compiler with a protected group exit')
+        cross_role(refs, issues)
+        if issues:
+            save(OUT/'contact-issues.json', issues)
+        need(not issues, 'own clean products or cross-role executable/loads differ')
+        scopes = {}
+        for arm in order:
+            scopes[arm] = {}
+            for line in ('return','dirty'):
+                results = history(arm, 'structural', line, rows, refs, issues, trace, PREFIX)
+                place=OUT/('structural-'+line+'-'+arm)
+                dr=json.loads((place/'comment/donor-selected.json').read_bytes())
+                need(results['comment']['status']==0 and results['unchanged']['cli']==results['comment']['cli']
+                     and dr['ruff_python_ast'], 'missing actual donor or unstable repeated executable')
+                scopes[arm][line]=dict(visits=list(results), full=results['comment']['compilers'],
+                                       donor=sha(place/'comment/donor-selected.json'),
+                                       cli=results['comment']['cli'], native_links=results['comment']['links'])
         need(not issues and refs['Eon','clean-A'][1]['cli']['whole'] != refs['Eon','clean-B'][1]['cli']['whole'],
-             'a native empty comparison or the historical product change failed')
-        save(OUT/'contact.json', dict(qualified=True, mode=mode, boot=ready['boot'], scored_commands=0,
-             visits=list(visits), helpers=helpers, compiler_groups=compiler_groups, wild_fork_exits=outcomes, stock_wild_fixture=stock_fixture, schema=3, issues=issues))
+             'strictly refuse native mismatch or ineffective historical edit')
+        before, after = (scopes[a]['return'] for a in order)
+        before_full = collections.Counter(n for n, mode in before['full'] if mode == 'full')
+        after_full = collections.Counter(n for n, mode in after['full'] if mode == 'full')
+        need(before_full > after_full and after['native_links'] <= before['native_links'],
+             'full CLI did not reduce full compilers or introduced additional Wild links')
+        save(OUT/'contact.json',dict(qualified=True, schema=3, mode=mode, boot=ready['boot'],scored_commands=0,
+                                    scopes=scopes,issues=issues))
         return
     cross_role(refs, issues)
     for lane, lineage in [('structural', 'stay'), ('structural', 'return'), ('measured', 'return')]:

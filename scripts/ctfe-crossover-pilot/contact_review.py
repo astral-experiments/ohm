@@ -72,61 +72,77 @@ def read(zip_path, meta, repo):
                 and 'failure.txt' not in names, 'refused, duplicate or unsafe contact')
         pos = D(z,'position.json')
         require((pos['mode'],pos['position'],pos['order'],int(pos['run']),pos['head'],pos['command'],pos['plan']) ==
-                ('contact','01',['Eon'],meta['run'],meta['head'],native.CARGO,reg.sha(HERE/'PLAN.md')), 'different contact enrollment')
-        resource = host_guards(z,pos)
-        boot = pos['boot']
-        binding = native.kernel_binding(z,boot,'contact',repo,None)
-        stock_fixture = wild_fork.stock_fixture(D(z,'kernel-qualification/fixtures/group-v2/qualified.json'))
-        sdk = native.sdk_pair(z)
-        refs, stages, bodies, checked_files = {}, {}, {}, {}
-        visit_paths, traced_paths, helpers, compiler_groups = set(), set(), {}, {}
-        outcomes = {}
-        env = None
-        for lane, route, phases in [('clean','reference',native.REFS),('structural','return',native.PHASES[:4])]:
-            top = lane+'-'+route+'-Eon'
-            cert,root = native.active(z,top,'Eon',sdk['E']['files'])
-            require(binding['observer'] == str(root/'kernel-qualification/tools/observe'), 'wrong current recorder path')
-            require(env is None or env == cert['env'], 'contact Cargo environment changed')
-            env = cert['env']
-            for phase in phases:
-                prefix = top+'/'+phase
-                r = native.read_phase(z,prefix,phase,lane,route,'Eon',cert,root,bodies)
-                visit_paths.add(prefix+'/visit.json')
-                if lane == 'clean':
-                    refs[phase] = r
-                else:
-                    ref=refs[r['reference']]
-                    require(r['native'] == ref['native'] and r['graph'] == ref['graph'], 'warm and own empty native/typed verdict differ')
-                if phase in ('X-B','comment'):
-                    traced_paths.add(prefix+'/kernel.tsv.gz')
-                    helpers[phase] = r['wild_helpers']
-                    compiler_groups[phase] = r['compiler_groups']
-                    raw = gzip.decompress(z.read(prefix+'/kernel.tsv.gz'))
-                    parsed = native.kernel.parse(raw,expected_code=0,expected_schema=3)
-                    projects = D(z,prefix+'/native-execs.json.gz')['wild_processes']
-                    outcomes[phase] = wild_fork.finish(raw,parsed,projects)
-                    require(len(outcomes[phase]) == 1 and outcomes[phase][0]['rustc_crate'] == 'ruff',
-                            'missing actual Ruff fork and complete stock Wild worker exits')
-                stages[phase] = {k:r[k] for k in ('status','graph','dirty','cli','reader','allocated')}
-                if 'kernel' in r:
-                    stages[phase].update(kernel=r['kernel'], native_roster=native.digest(z.read(prefix+'/native-execs.json.gz')),
-                                         full_units=r['full_units'], link_units=r['link_units'])
-                checked_files[phase] = {name:native.digest(z.read(prefix+'/'+name)) for name in
-                                         ('source.json','visit.json','cargo.json.gz','cargo.stdout.gz','cargo.stderr.gz','native.json.gz')}
-        require(any(compiler_groups.values()), 'no real installed compiler needed group-exit protection')
-        require(refs['clean-A']['cli'] != refs['clean-B']['cli'], 'historical CLI did not change')
-        require(visit_paths == {n for n in names if n.endswith('/visit.json')} and
-                traced_paths == {n for n in names if n.endswith('/kernel.tsv.gz')} and
-                {n.removesuffix('/kernel.tsv.gz') for n in traced_paths} ==
-                {n.removesuffix('/compiler-groups.json') for n in names if n.endswith('/compiler-groups.json')} and
-                not any(n.endswith('/clock.json') or n in ('meter-ready.json','pilot.json','observer.json') or
-                        n.startswith(('measured-','calibration/')) for n in names), 'extra visits, trace or PMU command in contact')
-        require(D(z,'contact.json') == dict(qualified=True,mode='contact',boot=boot,scored_commands=0,
-                visits=list(native.PHASES[:4]),helpers=helpers,compiler_groups=compiler_groups,wild_fork_exits=outcomes,stock_wild_fixture=stock_fixture,schema=3,issues=[]), 'different host contact conclusion')
-        return dict(qualified=True, schema=3, official=meta, head=pos['head'], boot=boot, kernel=pos['host']['release'],
-                    observer_source=reg.OBSERVER, observer_sha256=binding['observer_sha256'], fixture=binding['group_fixtures_sha256'],
-                    historical_readers=reg.hardware_gate(), resource=resource, helpers=helpers, compiler_groups=compiler_groups, wild_fork_exits=outcomes, stock_wild_fixture=stock_fixture, visits=stages,
-                    original_receipts=checked_files, checked_elfs=len(bodies), scored_commands=0)
+                ('contact','01',list(native.ROLES),meta['run'],meta['head'],native.CARGO,reg.sha(HERE/'PLAN.md')), 'different contact enrollment')
+        resource=host_guards(z,pos)
+        boot=pos['boot']
+        binding=native.kernel_binding(z,boot,'contact',repo,None)
+        stock=wild_fork.stock_fixture(D(z,'kernel-qualification/fixtures/group-v2/qualified.json'))
+        sdk=native.sdk_pair(z)
+        visit_names,trace_names,selected_names=set(),set(),set()
+        products,loaded,scopes,source_selections,closures={},{},{},{},{}
+        environment=None
+        for arm in native.ROLES:
+            scopes[arm]={};source_selections[arm]={};closures[arm]={}
+            for line,phases in [('reference',native.REFS),('return',native.PHASES[:5]),('dirty',native.PHASES[:5])]:
+                lane='clean' if line=='reference' else 'structural'
+                top=lane+'-'+line+'-'+arm
+                cert,root=native.active(z,top,arm,sdk[arm[0]]['files'])
+                require(binding['observer']==str(root/'kernel-qualification/tools/observe') and
+                        (environment is None or environment==cert['env']), 'different CLI roots or flags')
+                environment=cert['env']
+                visits={}
+                for phase in phases:
+                    p=top+'/'+phase
+                    visits[phase]=v=native.read_phase(z,p,phase,lane,line,arm,cert,root,loaded)
+                    visit_names.add(p+'/visit.json')
+                    if lane=='clean':
+                        products[arm,phase]=v
+                        continue
+                    want=products[arm,v['reference']]
+                    require(v['native']==want['native'] and v['graph']==want['graph'],
+                            'different same-arm clean CLI/consumer or graph')
+                    if phase in native.TRACED[line]:
+                        trace_names.add(p+'/kernel.tsv.gz')
+                        ledger=gzip.decompress(z.read(p+'/kernel.tsv.gz'))
+                        census=native.kernel.parse(ledger,expected_code=0,expected_schema=3)
+                        links=D(z,p+'/native-execs.json.gz')['wild_processes']
+                        closures[arm][line+'/'+phase]=wild_fork.finish(ledger,census,links)
+                        if phase=='X-B':
+                            require(any(x['rustc_crate']=='ruff' for x in links),'real historical change did not link the CLI')
+                if lane=='clean':
+                    require(products[arm,'clean-A']['cli']!=products[arm,'clean-B']['cli']
+                            and products[arm,'clean-semantic']['cli']!=products[arm,'clean-B']['cli'],
+                            'historical/private edits must each change the executable')
+                    continue
+                req=top+'/comment/donor-selected.json'
+                selected_names.add(req)
+                source_selections[arm][line]=native.donor_history(z,top,arm,sdk[arm[0]])
+                c=visits['comment']
+                require(visits['unchanged']['source']==c['source'] and visits['unchanged']['cli']==c['cli'],
+                        'changed inputs or executable on immediate repeat')
+                scopes[arm][line]=dict(visits=list(phases),full=c['compilers'],donor=native.digest(z.read(req)),
+                                       cli=c['cli'],native_links=c['links'])
+        for phase in native.REFS:
+            e,d=(products[arm,phase] for arm in native.ROLES)
+            require(e['graph']==d['graph'] and native.behavior(e['native'])==native.behavior(d['native'])
+                    and all(e['native'][kind][part]==d['native'][kind][part] for kind in ('cli','reader')
+                            for part in ('loads','executable')), 'different native clean reference across compilers')
+        require(all(v=={n for n in names if n.endswith('/'+suffix)}
+                    for v,suffix in ((visit_names,'visit.json'),(trace_names,'kernel.tsv.gz'),(selected_names,'donor-selected.json')))
+                and not any(n.endswith('/clock.json') or n in ('meter-ready.json','pilot.json','observer.json')
+                            or n.startswith(('measured-','calibration/')) for n in names), 'unregistered acquisition on the unscored contact')
+        registered=dict(qualified=True,schema=3,mode='contact',boot=boot,scored_commands=0,scopes=scopes,issues=[])
+        require(D(z,'contact.json')==registered, 'contact reporting differs from reopened originals')
+        from collections import Counter
+        e,d=(scopes[arm]['return'] for arm in native.ROLES)
+        e_full=Counter(n for n,mode in e['full'] if mode=='full')
+        d_full=Counter(n for n,mode in d['full'] if mode=='full')
+        require(e_full>d_full and d['native_links']<=e['native_links'],
+                'no strict reduction of full compilers on the actual CLI or additional Wild links')
+        return dict(qualified=True,schema=3,official=meta,head=pos['head'],boot=boot,kernel=pos['host']['release'],
+                    observer_source=reg.OBSERVER,observer_sha256=binding['observer_sha256'],fixture=binding['group_fixtures_sha256'],
+                    source_qualification=reg.hardware_gate(),resource=resource,scopes=scopes,source_selections=source_selections,
+                    wild_fork_exits=closures,stock_wild_fixture=stock,checked_elfs=len(loaded),scored_commands=0)
 
 def from_official(archive, catalog, run, head, repo):
     meta = reg.official(catalog,run,head,'contact',[archive])

@@ -13,6 +13,9 @@ import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ctfe_pilot_registration as reg
+import behavior as semantic_oracle
+import donor_witness as dw
+import storage_tables
 
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE / "kernel-review"), str(HERE.parent / "branch-storage-e-confirmation/review")]
@@ -29,20 +32,20 @@ for name, expected in KERNEL.items():
     metrics.need(metrics.sha((HERE / "kernel-review" / name).read_bytes()) == expected, "wrong kernel reader " + name)
 import kernel_projection as kernel
 
-ROLES = ("Eon", "Con")
-REFS = ("clean-A", "clean-B", "clean-edited")
+ROLES = ("Eon", "Don")
+REFS = ("clean-A", "clean-B", "clean-edited", "clean-semantic")
 PHASES = ("Y-B", "X-A", "X-B", "comment", "unchanged", "invalid", "repair")
-TRACED = {"return": {"X-B", "comment", "unchanged", "invalid", "repair"}, "stay": {"comment", "unchanged"}}
+TRACED = {"return": {"X-B", "comment", "unchanged", "invalid", "repair"}, "stay": {"comment", "unchanged"}, "dirty": {"X-B","comment","unchanged"}}
 CARGO = metrics.COMMAND
 WILD = kernel.WILD
 DRIVER = "lib/librustc_driver-c5276fb6f0cdddb4.so"
-SOURCES = {"E": "393b4b05a4bfa3f531a36023846f86236a6b71a9", "C": "df2c077a113a709ab379c8ec34e62c94c7513325"}
-TREES = {"E": "89dcac9002ea6a0307d6fef82c0652b15c85dcca", "C": "37bae6b16cbb4858b2dd597f70048cb7f2dc041c"}
+SOURCES = {"E": "393b4b05a4bfa3f531a36023846f86236a6b71a9", "D": "d95494a6a63c22222806c06e3d3aa0de504d8e8a"}
+TREES = {"E": "89dcac9002ea6a0307d6fef82c0652b15c85dcca", "D": "81461858540cf6f91328f7bfa1a4bcea13e4e9be"}
 MANIFEST = {"E": "2f104fd6f02b2cf583a6b203e55cc17af4fbb9539398d915277cdfe2be9c0113",
-            "C": "5c852dd08970b9762189eb1e1094df97bfba84bf06aea35e7db6e10530bcd701"}
-# Canonical content of every member of the two original SDK records in official ZIP 13073252134.
+            "D": "5afab54e76787132fa7773d0ede79745dbb858e7870eb89f0d039428f8626981"}
+# Canonical content of every member of the two original SDK records in official ZIP 13082841346.
 SDK_CONTENT = {"E": "d6fcbf8965036941a40a46acfb0147c53bbf160d0f51db7b8ee4c9edcc2b3786",
-               "C": "a51417a5cb8bdc6d20570b879e52e19fd07c40e686410815544a113779b6ed57"}
+               "D": "f9bc1f304ad4befd1b21bb4db22379f1c0fb65392aabf9d527d038bd1c9e7456"}
 NODE = "crates/ruff_python_ast/src/nodes.rs"
 PARSER = "crates/ruff_python_parser/src/lib.rs"
 AST = {"A": "19d7a907a8ff1cb9a6030e04d20d4e58e78a03a9de7d40c67f5644ad45ab025c",
@@ -68,9 +71,14 @@ def source_state(source, phase, route):
     branch = "A" if phase in ("clean-A", "X-A") else "B"
     checkout = "A" if branch == "A" or phase == "X-B" or route == "stay" and phase in ("comment", "unchanged") else "B"
     edited = phase in ("clean-edited", "comment", "unchanged", "invalid", "repair")
+    semantic = phase=="clean-semantic" or route=="dirty" and phase=="X-B"
     bad = phase == "invalid"
     ref = BRANCH[checkout]
     names = ([NODE] if edited else []) + ([PARSER] if bad else [])
+    if semantic:
+        names.append(semantic_oracle.cases.AST)
+    expected_lib=semantic_oracle.cases.AFTER if semantic else semantic_oracle.cases.BEFORE
+    require(source["lib"]==expected_lib, "different actual function under test")
     require((source["branch"], source["revision"], source["tree"], source["ref"], source["modified"],
              source["nodes"], source["parser"]) ==
             (branch, metrics.REVS[branch], corpus.TREES[branch], ref, sorted(names), AST["edited" if edited else branch],
@@ -81,7 +89,7 @@ def source_state(source, phase, route):
             and watched[head][-1] == digest((metrics.REVS[branch] + "\n").encode())
             and all(len(x) == 5 and all(type(i) is int and i > 0 for i in x[:4]) for x in watched.values()),
             "wrong physical build-script Git inputs")
-    return branch, "clean-edited" if edited else "clean-" + branch
+    return branch, "clean-semantic" if semantic else "clean-edited" if edited else "clean-" + branch
 
 
 def sdk_pair(z):
@@ -234,6 +242,29 @@ def physical(z, prefix, arm, cert, cmd, expected):
             "system": [r["kind"] for r in rows["other_linkers"]], "kernel": life["sha256"]}
 
 
+def donor_history(z, top, arm, record):
+    root = PurePosixPath(dataset(z,top+"/arm.json")["env"]["CARGO_TARGET_DIR"]).parent.parent
+    states=[]
+    for phase in ("Y-B","X-A","X-B"):
+        p=top+"/"+phase
+        now=dataset(z,p+"/donor-state.json")
+        require(now["source"]==dataset(z,p+"/source.json"), "different training source for donor")
+        dw.check_ledger(now,dataset(z,p+"/path-inodes.json.gz"),root)
+        states.append(now)
+    x=dw.rows(dataset(z,top+"/X-B/native-execs.json.gz"))
+    registered=dw.register(states,x,arm[0])
+    ret=top+"/comment"
+    require(registered==dataset(z,ret+"/donor-register.json"),"different enrolled donor files")
+    dw.check_refs(dataset(z,ret+"/both-ref-tips.json"))
+    current=dataset(z,ret+"/donor-opens.json")
+    proof=dataset(z,ret+"/live-drivers.json.gz")
+    workers=dw.rows(dataset(z,ret+"/native-execs.json.gz"))
+    sdk=Path(dataset(z,top+"/arm.json")["sdk"])
+    chosen=dw.check_processes(proof,(registered,current,arm[0]),sdk/DRIVER,record["files"][DRIVER],workers)
+    require(chosen==dataset(z,ret+"/donor-selected.json") and chosen["ruff_python_ast"],"wrong native donor selection")
+    return {owner:sorted(sides) for owner,sides in chosen.items()}
+
+
 def verified_body(z, name, desc, checked):
     key = (name, desc["whole"])
     if key not in checked:
@@ -292,6 +323,11 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
             require(len(roster["dirty"]) == 375 and totals["packed_files"] == 0, "false empty reference")
         native = replay_native.native_verdict(z, prefix, branch)
         typed_inputs(z, prefix, raw, root)
+        cargo_rows=list(map(json.loads,raw.splitlines()))
+        ev,=[Path(z["executable"]) for z in cargo_rows if z["reason"]=="compiler-artifact" and
+             z["target"]["name"]=="ruff" and z["target"]["kind"]==["bin"] and z.get("executable")]
+        semantic_oracle.verify(dataset(z,prefix+"/pyi009.json"),root/"ruff",ev,
+                               semantic_oracle.cases.AST in source["modified"],native["cli"]["whole"])
         for name in ("cli", "reader"):
             require(native[name]["whole"] == score[name], "unbound native product")
             verified_body(z, name, native[name], bodies)
@@ -304,6 +340,11 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
                         any("ohm_branch_switch_invalid" in t["text"] for t in s["text"]) for s in v["message"]["spans"])
                 for v in errors), "wrong actual parser error")
         require(set(totals["failed_sessions"]) == set(dataset(z, prefix + "/failed.json")), "wrong failed sessions")
+    storage=storage_tables.scan(dataset(z,prefix+'/path-inodes.json.gz'))
+    require(storage==dataset(z,prefix+'/table-storage.json') and storage['total']==result['allocated'],
+            'wrong session/table or allocated-byte receipt')
+    result['table_bytes']=storage['tables']
+    result['retained_sessions']=len(storage['sessions'])
     clock_path = prefix + "/clock.json"
     traced = lane == "structural" and phase in TRACED[route]
     require(score["observer"] == ("kernel" if traced else "pmu" if lane == "measured" else "ordinary"), "wrong observation header")
@@ -339,8 +380,10 @@ def compare(rows):
         require(e["graph"] == c["graph"] and behavior(e["native"]) == behavior(c["native"]), "different clean behavior")
         for kind in ("cli", "reader"):
             if any(e["native"][kind][key] != c["native"][kind][key] for key in ("executable", "loads")):
-                issues.append(dict(reference=state, different_executable_bytes=kind, E=e[kind], C=c[kind]))
+                issues.append(dict(reference=state, different_executable_bytes=kind, E=e[kind], D=c[kind]))
     for arm, visits in rows.items():
+        require(visits["clean/reference/clean-semantic"]["cli"] != visits["clean/reference/clean-B"]["cli"],
+                "actual function edit did not change CLI ELF")
         require(visits["clean/reference/clean-A"]["cli"] != visits["clean/reference/clean-B"]["cli"],
                 "historical A/B did not change the full Ruff executable")
         for key, data in visits.items():
@@ -377,9 +420,9 @@ def decision(rows, issues):
     insn = {arm: rows[arm]["measured/return/comment"]["instructions"] for arm in ROLES}
     def units(counter):
         return [list(k) for k in sorted(counter.elements())]
-    return dict(instructions=insn, ratio=insn["Eon"] / insn["Con"], skipped=units(full[0] - full[1]),
+    return dict(instructions=insn, ratio=insn["Eon"] / insn["Don"], skipped=units(full[0] - full[1]),
                 added=units(full[1] - full[0]), added_link_owners=units(links[1] - links[0]),
-                eligible=not issues and insn["Eon"] >= 2 * insn["Con"] and full[0] > full[1]
+                eligible=not issues and insn["Eon"] > 2 * insn["Don"] and full[0] > full[1]
                 and links[1] <= links[0] and other[1] <= other[0])
 
 
@@ -433,7 +476,9 @@ def reopen(path, position, source, prior):
         require({n for n in names if n.startswith(("structural-", "measured-", "clean-reference-")) and n.endswith("/kernel.tsv.gz")} == ledgers
                 and {n for n in names if n.startswith(("structural-", "measured-", "clean-reference-")) and n.endswith("/clock.json")} == clocks,
                 "unexpected extra or absent meter/structural observation")
-        require(envs["Eon"] == envs["Con"], "different compiler-role Cargo environments")
+        for arm in order:
+            donor_history(z,"structural-return-"+arm,arm,pair[arm[0]])
+        require(envs["Eon"] == envs["Don"], "different compiler-role Cargo environments")
         issues = compare(rows)
         verdict = decision(rows, issues)
         pilot = dataset(z, "pilot.json")
@@ -449,7 +494,10 @@ def reopen(path, position, source, prior):
         require("failure.txt" not in names or not verdict["eligible"], "incomplete worker promoted")
         report = {arm: {key: {k: v for k, v in obs.items() if k not in ("source", "native", "start", "stop")}
                         for key, obs in visits.items()} for arm, visits in rows.items()}
-        return dict(position=position, boot=boot, head=pos["head"], run=int(pos["run"]), **verdict,
+        inclusive={arm:dict(all_seven=sum(rows[arm]["measured/return/"+p]["instructions"] for p in PHASES),
+                            maximum_observed_quiescent_bytes=max(rows[arm]["measured/return/"+p]["allocated"] for p in PHASES))
+                   for arm in ROLES}
+        return dict(position=position, boot=boot, head=pos["head"], run=int(pos["run"]), **verdict, inclusive=inclusive,
                     worker_accepted=pilot["candidate_for_confirmation"], issues=issues,
                     checked_elfs=len(bodies), calibration=clock_proof, visits=report)
 

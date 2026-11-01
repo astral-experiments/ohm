@@ -6,7 +6,7 @@ import re
 
 HERE = Path(__file__).resolve().parent
 REPO = 'astral-experiments/ohm'
-BRANCH = 'charlie/qa-ctfe-v3-wild-exit-20261101'
+BRANCH = 'charlie/qa-ruff-same-revision-donor-full-20261101'
 BASE = '5c651f1d38c629da2a75d5cac3588db0be8104d7'
 OBSERVER = '19f9a67b032cce44cea1e3bb7e324558cd9abd0a'
 OBSERVER_MANIFEST = 'dd9079b8bbe00593142dde1def8862a2d1f5d2cb04e6445e2f056f56dbff3292'
@@ -16,6 +16,9 @@ PROJECTOR = '5e91ed3974c0964a912fd38049946f647891dcb2'
 SCREEN = 41285793847
 SCREEN_HEAD = '28fe14afcf485bc99e7bd9036d9b4f4bb990ce86'
 PREVIOUS = {
+    41303656721: ('e2c543c2-6e4d-43f5-84b0-7818e04d9dca',),
+    41301552076: ('b54107ac-1475-4a48-932c-e2248d479f5d',),
+
     41296950309: ('5589abc8-0aa8-4fb5-af09-41d799eb0139',),
     41295435433: ('67ec1c48-d4fc-4394-8cb1-b18026c44af7',),
     41291100905: ('c652a1a6-da1c-4698-b416-cd02e2b88e9a', '5d0531b9-cfc3-4e08-878a-6c03ee6d2b7f'),
@@ -27,6 +30,12 @@ PREVIOUS = {
     41200174886: ('cf938e9c-a8d2-4a0d-8260-fb5f89d89d65', '3b0e4081-536a-4f6a-a945-674825be2329'),
     41204995845: ('3060b886-0ac1-46a3-a1c1-a3c34b9073b6', '701225ea-feee-4195-82a3-9a1f70d39c46'),
 }
+_machine_file = HERE/'enrollment/additional-machines.json'
+if hashlib.sha256(_machine_file.read_bytes()).hexdigest() != "53c1885b102865c68461544cf4381d45ef9f94edbd1e07a8cf8aa7b06d8670c7":
+    raise ValueError('additional boot ledger changed')
+_machines = json.loads(_machine_file.read_bytes())
+PREVIOUS.update({int(k):tuple(v['boots']) for k,v in _machines['originals'].items()})
+
 STEP_SOURCE = 'Reconstruct both 81-file compiler installations using original source artifacts'
 STEP_RUN = 'Run the enrolled ordinary Ruff visits'
 STEP_INTAKE = 'Independently verify the official v3 contact'
@@ -41,15 +50,27 @@ def sha(path):
     with Path(path).open('rb') as f:
         return hashlib.file_digest(f, 'sha256').hexdigest()
 
-def hardware_gate():
+def previous_meter():
     for name, expected in SCREEN_FILES.items():
         require(sha(HERE/'enrollment'/name) == expected, 'wrong original hardware readback')
     report, summary = (json.loads((HERE/'enrollment'/name).read_bytes()) for name in SCREEN_FILES)
-    require(report['valid_counter_screen'] is True and report['meets_two_per_boot'] is True and
-            report['head'] == SCREEN_HEAD and report['run'] == SCREEN and summary['continue_to_structural_pilot']
+    require(report['valid_counter_screen'] is True and
+            report['head'] == SCREEN_HEAD and report['run'] == SCREEN
             and summary['result_sha256'] == SCREEN_FILES['independent.json'] and
             tuple(w['boot'] for w in summary['workers']) == PREVIOUS[SCREEN], 'previous two independent hardware gates')
     return dict(run=SCREEN, head=SCREEN_HEAD, readbacks=SCREEN_FILES)
+
+def hardware_gate():
+    # A prior counter calibration validates the meter only; the structural result belongs to E and D.
+    prior_meter = previous_meter()
+    path = HERE / 'enrollment/donor-source.json'
+    require(sha(path) == "97f7e95aea09f24822d4f71f3d77c7d934e7271635551e7f8fc205fd7c03a1d0", 'changed source/donor enrollment')
+    data = json.loads(path.read_bytes())
+    result = data['native_reader']
+    require(result['source'] == ['393b4b05a4bfa3f531a36023846f86236a6b71a9', 'd95494a6a63c22222806c06e3d3aa0de504d8e8a']
+            and result['qualified'] and result['workspace_cargo_commands'] == 36 and result['provider_cargo_commands'] == 22,
+            'unqualified source or real donor controls')
+    return dict(source_run=data['run'], source_head=data['head'], native=data['source_sha256'], meter=prior_meter)
 
 def fresh(boot, excluded=()):
     require(re.fullmatch(r'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}', boot) and
@@ -79,8 +100,10 @@ def official(directory, run, head, mode, files=None):
         require(len(files) == len(positions), 'incomplete supplied original archives')
     result = []
     for i, pos in enumerate(positions):
-        j, = (x for x in js['jobs'] if x['name'] == f'CTFE v3 {mode} {pos}')
-        a, = (x for x in ar['artifacts'] if x['name'] == f'ctfe-v3-{mode}-{pos}')
+        j, = (x for x in js['jobs'] if x['name'] == f'GNU donor {mode} {pos}')
+        a, = (x for x in ar['artifacts'] if x['name'] == f'gnu-donor-{mode}-{pos}')
+        require(j['runner_id']>0 and j['runner_name'] and all(j['runner_id']!=v['id'] and j['runner_name']!=v['name']
+                for v in _machines['source_jobs'].values()), 'reused source worker including the no-boot refusal')
         steps = {s['name']: (s['status'],s['conclusion']) for s in j['steps']}
         needed = [STEP_SOURCE,STEP_RUN] + ([STEP_INTAKE] if mode == 'full-pilot' else [])
         require((j['run_id'],j['head_sha'],j['run_attempt'],j['status'],j['conclusion']) ==
