@@ -7,13 +7,17 @@ from pathlib import Path
 import subprocess
 
 HERE = Path(__file__).resolve().parent
-BRANCH = "charlie/qa-ruff-default-owner-pmu-20261101"
+BRANCH = "charlie/qa-ruff-default-owner-git-probe-20261101"
 REPO = "astral-experiments/ohm"
 COLLECTOR = "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc"
 CONTRACT = "42ab30fd5e6bcdcf908df81de9baac65ca64fbf9"
 PREVIOUS = 41336398017
 PREVIOUS_HEAD = "3c206e8bf2c2236c035f1e8f352d9ad547d69ef7"
 BLOCKED_JOBS = (124937039974, 124937040076, 124937040027, 124937040042, 124937039985, 124937039779)
+REFUSED = dict(run=41346940188, job=124968691232, artifact=13100172316,
+               digest="sha256:478477d4a73271fdab470c5da3ceae5b3b3a2e0dbacf321b2f260e8390314f34",
+               boot="e77e07dd-2fe9-4e31-8b24-83458644e258", runner="nsc-runner-9gc9c85qfst6q",
+               runner_id=1382, ended="2026-11-01T20:41:07Z")
 CMD = [
     "cargo",
     "+ohm",

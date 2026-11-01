@@ -2,6 +2,8 @@
 
 This one-host GNU diagnostic prices the first build of Ruff A after building B with the published Ohm 1.99.0-22 package. It does not change any compiler operation. No source or throughput improvement is being measured.
 
+The first attempt refused attribution after the real Ruff version build script ran `git log` in the tagless checkout. Git's nested `describe --tags` exited 128, while Git log, the script and Cargo succeeded. That attempt remains unscored. This separate registration excludes its runner and boot as well as the earlier six. The counter binaries, ordinary commands, native behavior checks and 2% admission bracket are identical. The reader recognizes only the specific optional Git leaf on the registered commit, verifies both Git argument lists and the Ruff script's Cargo product inode, and still rejects every other failed child. [Original refusal](https://github.com/astral-experiments/ohm/actions/runs/41346940188)
+
 Use the ordinary command below. A is `b5dba861cc38e3f7fb4524c9ceba3e01a474ea13`; its child B is `7b13f01ba1569887a25670820764b24c206da8e5`. They differ at 169 paths in seven crate directories in Ruff #28335. The same `CARGO_TARGET_DIR`, separate explicit `CARGO_BUILD_BUILD_DIR`, HOME, installed SDK, registry, workspace and 4 physical CPUs are used throughout.
 
 ```sh

@@ -1,0 +1,9 @@
+--- a/topology.py
++++ b/topology.py
+@@ -36 +36 @@
+-def read(d, selectors, mode, *, synthetic=False, names=(), registry_target=None, component=None):
++def read(d, selectors, mode, *, synthetic=False, names=(), registry_target=None, component=None, optional_exit=None):
+@@ -160,0 +161,3 @@
++    elif optional_exit is not None:
++        assert component is not None and mode == "tree"
++        optional_exit(exits, events, chains)

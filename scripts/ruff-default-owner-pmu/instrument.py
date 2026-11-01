@@ -30,6 +30,9 @@ def compile_sources(collector, contract, output):
     subprocess.run(["git", "apply", "--no-index", "--check", rules / "ledger.patch"], cwd=output, check=True)
     subprocess.run(["git", "apply", "--no-index", rules / "ledger.patch"], cwd=output, check=True)
     c.need(c.sha(output / "topology.py") == manifest["joined_topology"], "different historical reader seam")
+    subprocess.run(["git", "apply", "--no-index", "--unidiff-zero", c.HERE / "tag-probe.patch"], cwd=output, check=True)
+    c.need(c.sha(output / "topology.py") == "642ee802c814e00b1a5700a94dd104b01237b4c65f20cb3e5a90ef6a3552f5e5",
+           "different optional-child reader")
     sys.path.insert(0, str(output))
     import topology, pmu, kit
 

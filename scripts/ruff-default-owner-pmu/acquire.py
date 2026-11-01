@@ -90,8 +90,14 @@ def enrollment(prior, jobs, artifacts, excluded, current, this_jobs, env, boot):
         and this["runner_id"] not in {x["runner_id"] for x in earlier},
         "old boot or runner",
     )
+    c.need(this["id"] != c.REFUSED["job"] and current["id"] != c.REFUSED["run"]
+           and boot != c.REFUSED["boot"] and this["runner_name"] != c.REFUSED["runner"]
+           and this["runner_id"] != c.REFUSED["runner_id"]
+           and dt.datetime.fromisoformat(this["started_at"]) >= dt.datetime.fromisoformat(c.REFUSED["ended"]),
+           "overlapping or repeated worker from the rejected metadata-probe census")
     return dict(
         excluded_run=c.PREVIOUS,
+        excluded_refusal=c.REFUSED,
         excluded=earlier,
         run=current["id"],
         head=current["head_sha"],

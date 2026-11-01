@@ -1,9 +1,43 @@
 """Map kernel exec-stop counters to physical Cargo units without double-counting linkers."""
 
 import json
+from functools import partial
 from pathlib import Path
 
 import common as c
+
+
+def optional_tag_probe(repo, work, products, inodes, trace, revision, exits, events, chains):
+    """Recognize Git's one optional tag lookup underneath Ruff's successful version build script."""
+    bad = [(pid, status) for pid, status in exits.items() if status != [0, 0]]
+    if not bad:
+        return
+    c.need(len(bad) == 1, "multiple failing children in a successful build")
+    pid, status = bad[0]
+    chain = chains[pid]
+    c.need(status == [128, 0] and len(chain) >= 4 and not any(pid in parents[1:] for parents in chains.values()),
+           "failed child was not one ordinary Git leaf")
+    leaf, parent, builder = chain[:3]
+    rows = [[e for e in events if e["pid"] == expected] for expected in (leaf, parent, builder)]
+    c.need(all(len(es) == 1 and es[0]["kind"] == 0 for es in rows), "failed probe has an unexpected exec or owner")
+    git, log, build = (es[0] for es in rows)
+    c.need(git["path"] == "/usr/lib/git-core/git" and git["argv"] == [git["path"], "describe", "--tags", revision]
+           and log["path"] == "/usr/bin/git"
+           and log["argv"] == ["git", "log", "-1", "--date=short", "--abbrev=9", "--format=%H %h %cd %(describe:tags)"],
+           "failed child is not the registered Git metadata probe")
+    scripts = [p["filenames"] for p in products if p["target"]["kind"] == ["custom-build"]
+               and p["target"]["src_path"] == str(repo / "crates/ruff/build.rs")]
+    c.need(scripts == [[build["path"]]] and build["argv"] == [build["path"]],
+           "Git was not run by the actual Ruff build script")
+    expected = inodes[str(Path(build["path"]).relative_to(work))][:2]
+    raw = (trace / "exec.tsv").read_text().splitlines()[build["serial"] - 1].split("\t")
+    c.need(raw[6] == build["path"] and [int(raw[4]), int(raw[5])] == expected, "foreign Ruff build script inode")
+
+
+def read_attributed(topo, trace, selectors, repo, work, products, inodes):
+    return topo.read(trace, selectors, "tree",
+                     component=partial(classify, repo, work, products, inodes),
+                     optional_exit=partial(optional_tag_probe, repo, work, products, inodes, trace, c.EXPECTED["A"]))
 
 
 def option(argv, name):

@@ -1,6 +1,5 @@
 """Run one signed GNU baseline, two plain bounds, and one separately attributed first-A."""
 
-from functools import partial
 import gzip
 import hashlib
 import json
@@ -208,9 +207,7 @@ def run_visit(lane, phase, refs, tools, topo):
         ownership.signed_cargo_images(
             where / "trace", b.SDK / "bin/cargo", c.read(OUT / "sdk.json")["bin/cargo"][1:3]
         )
-        classified = topo.read(
-            where / "trace", selectors, mode, component=partial(ownership.classify, REPO, WORK, products, inodes)
-        )
+        classified = ownership.read_attributed(topo, where / "trace", selectors, REPO, WORK, products, inodes)
         ownership.early_children(where / "trace", classified)
         c.save(where / "owner-raw.json", classified)
         summary["whole"] = classified["whole"]

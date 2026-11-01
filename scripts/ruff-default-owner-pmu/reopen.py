@@ -1,7 +1,6 @@
 """Rebuild the default-mode first-A instruction ledger from the retained original."""
 
 import argparse
-from functools import partial
 import gzip
 import hashlib
 import json
@@ -408,12 +407,7 @@ def replay(z, temp, head, previous, collector, contract):
                 ownership.signed_cargo_images(
                     trace, root / "home/.rustup/toolchains/ohm/bin/cargo", sdk["bin/cargo"][1:3]
                 )
-                results = topo.read(
-                    trace,
-                    selectors,
-                    "tree",
-                    component=partial(ownership.classify, root / "ruff", work, products, ledger),
-                )
+                results = ownership.read_attributed(topo, trace, selectors, root / "ruff", work, products, ledger)
                 ownership.early_children(trace, results)
                 c.need(results == record(z, w + "/owner-raw.json"), "changed owner ledger")
                 clock = results["whole"]

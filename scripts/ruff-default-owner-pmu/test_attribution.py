@@ -16,6 +16,56 @@ import ownership
 import reopen
 
 
+class OptionalTagProbe(unittest.TestCase):
+    def setUp(self):
+        self.data = c.read(HERE / "tag-probe-fixture.json.gz")
+        self.assertEqual(self.data["original_artifact_sha256"],
+                         "478477d4a73271fdab470c5da3ceae5b3b3a2e0dbacf321b2f260e8390314f34")
+
+    def examine(self, data, extra_child=False):
+        with tempfile.TemporaryDirectory() as tmp:
+            trace = Path(tmp)
+            (trace / "exec.tsv").write_text("\n".join(data["raw"]) + "\n")
+            chain = data["chain"]
+            chains = {pid: chain[index:] for index, pid in enumerate(chain)}
+            if extra_child:
+                chains[12] = [12, *chain]
+            exits = {pid: [0, 0] for pid in chains}
+            exits.update({int(pid): status for pid, status in data["nonzero"].items()})
+            ownership.optional_tag_probe(Path(data["repo"]), Path(data["work"]), data["products"], data["inode"],
+                                         trace, c.EXPECTED["A"], exits, data["events"], chains)
+
+    def test_real_tagless_process(self):
+        self.examine(self.data)
+        self.examine(self.data | {"nonzero": {}})
+
+    def test_unrelated_failure_still_refuses(self):
+        for what in ("signal", "second", "revision", "log", "image", "script", "inode", "owner", "reexec", "child"):
+            with self.subTest(what=what):
+                data = copy.deepcopy(self.data)
+                probe, parent, build = reversed(data["events"])
+                if what == "signal":
+                    data["nonzero"][str(probe["pid"])] = [143, 15]
+                if what == "second":
+                    data["nonzero"][str(parent["pid"])] = [128, 0]
+                if what == "revision":
+                    probe["argv"][-1] = c.EXPECTED["B"]
+                if what == "log":
+                    parent["argv"][-1] = "--format=%H"
+                if what == "image":
+                    probe["path"] = "/tmp/git"
+                if what == "script":
+                    data["products"][0]["target"]["src_path"] = "/other/build.rs"
+                if what == "inode":
+                    next(iter(data["inode"].values()))[1] += 1
+                if what == "owner":
+                    build["kind"] = 1
+                if what == "reexec":
+                    data["events"].append(probe)
+                with self.assertRaises(ValueError):
+                    self.examine(data, extra_child=what == "child")
+
+
 class Census(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -178,7 +228,7 @@ class Census(unittest.TestCase):
             reopen.thresholds([10000, 10201, 10001], {})
 
     def test_complete_six_distinct_workers(self):
-        now = "2026-11-01T18:00:00+00:00"
+        now = "2026-11-01T21:00:00+00:00"
         end = "2026-11-01T17:59:59+00:00"
         prior = dict(
             id=c.PREVIOUS, head_sha=c.PREVIOUS_HEAD, run_attempt=1, event="workflow_dispatch", status="completed"
@@ -235,8 +285,9 @@ class Census(unittest.TestCase):
         self.assertEqual(check()["boot"], fresh)
         for args in (
             dict(boot=ex[0]["boot"]),
+            dict(boot=c.REFUSED["boot"]),
             dict(boots=ex[::-1]),
-            dict(job_rows=[jobs[0] | dict(completed_at="2026-11-01T18:00:01+00:00"), *jobs[1:]]),
+            dict(job_rows=[jobs[0] | dict(completed_at="2026-11-01T21:00:01+00:00"), *jobs[1:]]),
         ):
             with self.assertRaises(ValueError):
                 check(**args)
