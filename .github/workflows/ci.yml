@@ -1,53 +1,55 @@
-name: Qualify whole Ruff branch returns with the schema-2 native observer
-run-name: CTFE v2 ${{ inputs.mode }} ${{ inputs.reviewed_head }}
+name: E and C ordinary Ruff integration binary contact
+run-name: CTFE ordinary integration native contact ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
-      mode:
-        description: Unscored native contact or fresh counterbalanced full pilot
-        type: choice
-        options: [contact, full-pilot]
-        required: true
-      contact_run:
-        description: Completed contact run on this exact head (full-pilot only)
-        type: string
-        required: false
-      contact_sha256:
-        description: Official contact archive SHA-256 (full-pilot only)
-        type: string
-        required: false
-      contact_readback_sha256:
-        description: Independently reopened contact certificate SHA-256 (full-pilot only)
-        type: string
-        required: false
       reviewed_head:
-        description: Exact reviewed commit of the two-boot instruction pilot
         type: string
+        description: Exact reviewed SHA of this one-host, unscored registration
         required: true
 permissions:
   actions: read
   contents: read
 jobs:
-  ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-v2-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+  native:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-integration-contact-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    name: CTFE integration true Cargo contact
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 175
-    name: CTFE v2 ${{ inputs.mode }} ${{ matrix.position }}
-    strategy:
-      fail-fast: false
-      matrix:
-        position: ${{ fromJSON(inputs.mode == 'contact' && '["01"]' || '["01","02"]') }}
+    timeout-minutes: 180
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      MODE: ${{ inputs.mode }}
-      CONTACT_RUN: ${{ inputs.contact_run }}
-      CONTACT_SHA256: ${{ inputs.contact_sha256 }}
-      CONTACT_READBACK_SHA256: ${{ inputs.contact_readback_sha256 }}
+      CTFE_CARRIER: ${{ github.workspace }}/ctfe
+      INTEGRATION_CARRIER: ${{ github.workspace }}/integration
+      SEMANTIC_CARRIER: ${{ github.workspace }}/semantic
+      CTFE_EXECS_SOURCE: ${{ github.workspace }}/kernel
+      CTFE_EXECS_PROJECTOR: ${{ github.workspace }}/projector
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ github.sha }}
           path: enrolled
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ctfe-integration-contact
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 679e72fedd4968636469d958c38225c0ce3fefab
+          path: integration
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-integration-structure
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 0b50022990577aadd904731e51c4d6c2a0f9b665
+          path: semantic
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ctfe-cli-semantic
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: a374e7d302feac52fea514a4b2beaf1174297ba9
+          path: ctfe
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
@@ -80,7 +82,7 @@ jobs:
             scripts/ohm-apple-zmij/source-transport
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: d4e1c4bac917a2de3218c13c50875b5c2d301a23
+          ref: 19f9a67b032cce44cea1e3bb7e324558cd9abd0a
           path: kernel
           persist-credentials: false
           sparse-checkout: |
@@ -109,58 +111,41 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify the enrolled source and prepare empty task-owned output roots
+      - name: Bind sources and reserve the runner
         run: |
           set -euo pipefail
-          test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
-          test "$(git -C ctfe-source rev-parse HEAD)" = 18b0cf251988b5967f8ffb0b11db850966eae9d1
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/source_guard.py enrolled "$REVIEWED_HEAD"
-          for component_path in scripts/gnu-ctfe-literal-identity scripts/ruff-repair-tables-pilot/guards.py; do
-            source_object=$(git -C ctfe-source rev-parse "HEAD:$component_path")
-            pilot_object=$(git -C enrolled rev-parse "HEAD:$component_path")
-            test "$source_object" = "$pilot_object"
+          dir=enrolled/scripts/ctfe-integration-contact
+          python3 -IB "$dir/test_contact.py" --enrolled "$REVIEWED_HEAD"
+          python3 -IB ctfe/scripts/ctfe-crossover-pilot/test_v2.py "$GITHUB_WORKSPACE/kernel"
+          python3 -IB ctfe/scripts/ctfe-crossover-pilot/test_subjects.py --acquisition-imports "$GITHUB_WORKSPACE/source"
+          for s in scripts/gnu-ctfe-literal-identity scripts/ruff-repair-tables-pilot/guards.py; do
+            test "$(git -C ctfe rev-parse "HEAD:$s")" = "$(git -C ctfe-source rev-parse "HEAD:$s")"
           done
-          for d in ctfe-source/scripts/gnu-ctfe-literal-identity enrolled/scripts/{ctfe-crossover-pilot,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
+          for d in ctfe-source/scripts/gnu-ctfe-literal-identity ctfe/scripts/{branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_v2.py "$GITHUB_WORKSPACE/kernel"
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py --acquisition-imports "$GITHUB_WORKSPACE/source"
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/reopen.py --help > /dev/null
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd strace util-linux
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           test ! -e "$base"
           mkdir -p "$base/work" "$base/logs"
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
-          dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
-      - name: Independently verify the official v2 contact
-        if: inputs.mode == 'full-pilot'
+          dpkg-query -W b3sum binutils build-essential git libssl-dev zstd strace util-linux > "$base/logs/packages.tsv"
+          python3 -IB ctfe/scripts/ruff-repair-tables-pilot/guards.py check "$base/work" "$base/logs" > "$base/logs/bootstrap-resources.json"
+      - name: Restore the two exact original compiler installations
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/contact_review.py acquire --run "$CONTACT_RUN" --head "$REVIEWED_HEAD" --sha256 "$CONTACT_SHA256" --readback-sha256 "$CONTACT_READBACK_SHA256" --observer-source "$GITHUB_WORKSPACE/kernel" --output "$RUNNER_TEMP/ohm-branch-object-qa/logs/prior-v2-contact.json"
-      - name: Reconstruct both 81-file compiler installations using original source artifacts
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py acquire "$GITHUB_WORKSPACE/source"
-      - name: Run the enrolled ordinary Ruff visits
-        env:
-          POSITION: ${{ matrix.position }}
-          CTFE_EXECS_SOURCE: ${{ github.workspace }}/kernel
-          CTFE_EXECS_PROJECTOR: ${{ github.workspace }}/projector
+        run: python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py acquire "$GITHUB_WORKSPACE/source"
+      - name: Run the unscored integration contact
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py "$MODE" "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB ctfe/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py contact "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ctfe-v2-${{ inputs.mode }}-${{ matrix.position }}
+          name: ctfe-integration-contact-original
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true
