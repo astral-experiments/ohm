@@ -1,5 +1,6 @@
 """Compare real rustc invocations for the same unchanged ty check on Linux."""
 import gzip
+import importlib.util
 import hashlib
 import json
 import os
@@ -27,7 +28,24 @@ ruff_pin = "93526150df078af7dd8fc4226cdcc469539d2001"
 cargo_src = Path("cargo-source").resolve()
 ruff = Path("ruff").resolve()
 assert run(["git", "rev-parse", "HEAD"], ruff) == ruff_pin
-assert run(["git", "rev-parse", "HEAD"], cargo_src) == new and run(["git", "rev-parse", "HEAD^"], cargo_src) == base
+seed = Path("cargo-seed/scripts").resolve()
+spec = importlib.util.spec_from_file_location("cargo_source_seed", seed/"cargo-diagnostic-fix/materialize.py")
+materialize = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(materialize)
+origin = materialize.tree(cargo_src,seed/"ohm-apple-zmij/cargo293/source.pack")
+assert origin["mode_path_sha256_inventory"] == "da5d8cde02be6fcd82b87b490b937224dcd46f8e72841343d9fe00ce16d253d1"
+overlay=Path("intake/scripts/rc22-native/source/cargo.pack")
+fresh=Path("qualification/scripts/rc22-cargo-ty-stack.pack")
+overlay_manifest=json.loads(overlay.with_name("cargo.json").read_bytes())
+assert origin["commit"]==overlay_manifest["base"] and sha(overlay)==overlay_manifest["sha256"]
+assert sha(fresh)=="bb8b016abe957304312fca60a098d896e99cd65f49a69a9fba9ba854f20f079f"
+for pack in [overlay,fresh]:
+    with pack.open("rb") as f:
+        subprocess.run(["git","index-pack","--strict","--stdin"],cwd=cargo_src,stdin=f,check=True)
+assert run(["git","rev-parse",base+"^{tree}"],cargo_src)=="a2c9a62722e1ef849cb68874e79617c92d165a8b"
+assert run(["git","rev-parse",new+"^{tree}"],cargo_src)=="3e62f0bb49e3a1ce8491ae5f36d400643709f81c"
+assert run(["git","rev-parse",new+"^"],cargo_src)==base
+save("source.json",dict(seed=origin["commit"],stock_overlay=sha(overlay),integration_overlay=sha(fresh),base=base,patch=new))
 sdk = root / "sdk"
 archive, = Path("release").resolve().glob("*.tar.gz")
 assert sha(archive) == "0b424df45b3bb9ccea5d1eda44f2481cb17a44f31ec6290e82d3db073489fe8a"

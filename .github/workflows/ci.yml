@@ -17,15 +17,27 @@ jobs:
         with:
           path: qualification
           persist-credentials: false
-          sparse-checkout: scripts/rc22-physical-gnu.py
+          sparse-checkout: |
+            scripts/rc22-physical-gnu.py
+            scripts/rc22-cargo-ty-stack.pack
           sparse-checkout-cone-mode: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          repository: astral-experiments/ohm-cargo
-          ref: c92c1c066a3a75a12da46c0b19c16e7a79929688
-          fetch-depth: 2
-          path: cargo-source
+          ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
+          path: cargo-seed
           persist-credentials: false
+          sparse-checkout: |
+            scripts/cargo-diagnostic-fix
+            scripts/ohm-apple-zmij/cargo293
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 1a749d7784498cd5a883d69474813f3ca46f176e
+          path: intake
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            scripts/rc22-native/source/cargo.pack
+            scripts/rc22-native/source/cargo.json
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/ruff
