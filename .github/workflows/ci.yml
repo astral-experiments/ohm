@@ -1,23 +1,26 @@
-name: Qualify CTFE literal identity across incremental Rust builds
-run-name: Native CTFE identity qualification ${{ inputs.reviewed_head }}
+name: Measure a Ruff branch return after a private AST edit
+run-name: Whole Ruff CTFE crossover pilot ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed QA commit containing one reviewed source qualification
-        required: true
+        description: Exact reviewed commit of the two-boot instruction pilot
         type: string
+        required: true
 permissions:
   actions: read
   contents: read
 jobs:
-  qualify:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-literal-identity-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+  ordinary:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-crossover-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
-    name: GNU compiler and ordinary Ruff allocation identity
-    timeout-minutes: 165
+    timeout-minutes: 175
+    name: Full Ruff branch return ${{ matrix.position }}
+    strategy:
+      fail-fast: false
+      matrix:
+        position: ['01', '02']
     env:
-      QA_ROOT: /tmp/ohm-gnu-renderer-source-native
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -25,15 +28,24 @@ jobs:
           ref: ${{ github.sha }}
           path: enrolled
           persist-credentials: false
-          fetch-depth: 2
           sparse-checkout: |
             .github/workflows
+            scripts/ctfe-crossover-pilot
             scripts/gnu-ctfe-literal-identity
-            scripts/ruff-repair-tables-pilot
             scripts/branch-return-pmu
             scripts/branch-first-session-e-screen
             scripts/branch-storage-e-confirmation
             scripts/ohm-packed-ruff
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 18b0cf251988b5967f8ffb0b11db850966eae9d1
+          path: ctfe-source
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/gnu-ctfe-literal-identity
+            scripts/ruff-repair-tables-pilot
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: 762fc25095e317ac5632ec835df3c7f9cfc64a64
@@ -47,73 +59,79 @@ jobs:
             scripts/ohm-apple-zmij/source-transport
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: a4afd181ae07107de6174a17a4ec189061fd18aa
-          path: trusted
+          ref: 2969895dc49c9d8970ef121e1ff024ef001dc7ce
+          path: kernel
           persist-credentials: false
           sparse-checkout: |
-            scripts/gnu-renderer-cgu-source
+            scripts/branch-return-execstop
+            scripts/branch-return-pmu
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
-          path: signed-source
+          ref: 5e91ed3974c0964a912fd38049946f647891dcb2
+          path: projector
+          persist-credentials: false
+          sparse-checkout: scripts/branch-return-pmu
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
+          path: physical
+          persist-credentials: false
+          sparse-checkout: scripts/gnu-renderer-pfc-hardware
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
+          path: observers
           persist-credentials: false
           sparse-checkout: |
-            scripts/strict-mixed-generics
+            scripts/gnu-example-ceiling
+            scripts/gnu-renderer-library-workers
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Reopen reviewed source and retained compiler verifier
+      - name: Verify the enrolled source and prepare empty task-owned output roots
         run: |
           set -euo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
-          test "$(git -C source rev-parse HEAD)" = 762fc25095e317ac5632ec835df3c7f9cfc64a64
-          test "$(git -C trusted rev-parse HEAD)" = a4afd181ae07107de6174a17a4ec189061fd18aa
-          test "$(git -C signed-source rev-parse HEAD)" = d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
-          for d in enrolled/scripts/{gnu-ctfe-literal-identity,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli} source/scripts/{branch-checked-packed-source,branch-first-session-e-source,branch-return-source,ohm-packed-ruff,ohm-apple-zmij/source-transport} trusted/scripts/gnu-renderer-cgu-source; do
+          test "$(git -C ctfe-source rev-parse HEAD)" = 18b0cf251988b5967f8ffb0b11db850966eae9d1
+          for component_path in scripts/gnu-ctfe-literal-identity scripts/ruff-repair-tables-pilot/guards.py; do
+            source_object=$(git -C ctfe-source rev-parse "HEAD:$component_path")
+            pilot_object=$(git -C enrolled rev-parse "HEAD:$component_path")
+            test "$source_object" = "$pilot_object"
+          done
+          for d in ctfe-source/scripts/gnu-ctfe-literal-identity enrolled/scripts/{ctfe-crossover-pilot,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
-          python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/test_qualification.py
-      - name: Restore the immutable E SDK and verify sources
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/reopen.py --help > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates git libssl-dev zstd
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          test ! -e "$base"
+          mkdir -p "$base/work" "$base/logs"
+          printf '%s' "$base" > "$base/work/.owned-by-packed-study"
+          findmnt --target "$base/work" > "$base/logs/filesystem.txt"
+          dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
+      - name: Reconstruct both 81-file compiler installations using original source artifacts
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          test ! -e "$base" && test ! -e "$QA_ROOT"
-          mkdir -p "$base/work" "$base/logs" "$QA_ROOT/receipts"
-          printf '%s' "$base" > "$base/work/.owned-by-packed-study"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py check "$base/work" "$base/logs" > "$base/logs/entry.json"
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential ca-certificates clang cmake curl git lld libssl-dev ninja-build perl pkg-config strace zstd
-          dpkg-query -W b3sum binutils build-essential clang cmake git lld libssl-dev ninja-build strace zstd > "$QA_ROOT/receipts/packages.tsv"
-          python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/bootstrap_subject.py restore "$GITHUB_WORKSPACE/source"
-      - name: Build the exact compiler once and run native source and migration fixtures
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py acquire "$GITHUB_WORKSPACE/source"
+      - name: Validate the hardware counter and replay both ordinary branch histories
+        env:
+          POSITION: ${{ matrix.position }}
+          CTFE_EXECS_SOURCE: ${{ github.workspace }}/kernel
+          CTFE_EXECS_PROJECTOR: ${{ github.workspace }}/projector
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB source/scripts/ohm-apple-zmij/source-transport/prepare.py "$QA_ROOT/rust" > "$QA_ROOT/receipts/public-source.json"
-          python3 -IB signed-source/scripts/strict-mixed-generics/source.py materialize "$QA_ROOT/rust" parent > "$QA_ROOT/receipts/signed-source.json"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$QA_ROOT/receipts/build-resource" python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/bootstrap_subject.py build "$GITHUB_WORKSPACE/source" "$GITHUB_WORKSPACE/trusted"
-      - name: Reproduce baseline and compare the exact ordinary Ruff AST edit to an independent empty build
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/ast-resources" python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/ruff.py
-          python3 -IB enrolled/scripts/gnu-ctfe-literal-identity/reopen.py "$QA_ROOT/receipts" "$base/logs"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ctfe-identity-source-and-driver
-          path: /tmp/ohm-gnu-renderer-source-native/receipts
-          retention-days: 21
-          compression-level: 1
-          if-no-files-found: warn
-      - if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: ctfe-identity-ruff
+          name: ctfe-full-cli-instructions-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
-          retention-days: 21
+          retention-days: 14
           include-hidden-files: true
           compression-level: 1
           if-no-files-found: warn
