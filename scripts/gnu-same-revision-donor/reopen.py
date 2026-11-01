@@ -96,6 +96,14 @@ def host_contact(raw, logs, parked):
     return proof["boot"]
 
 
+def check_original_d_source(recorded, prior):
+    reg.need(recorded == prior and prior["run"] == 41303656721 and prior["job"] == 124839568474
+             and prior["head"] == "8f633d8fc21e453f4c81d81588b6dcab125bfeae" and prior["original_workflow"] == "success"
+             and prior["attempt"] == 1 and prior["artifacts"]["same-revision-donor-source-and-driver"]["digest"]
+             == "sha256:130ae568b848980cf6ecc15e822439ada1f8cb44f758be0dae92421ac0806067",
+             "different original D source")
+
+
 def verify(raw, logs, parked):
     recorded_boot = host_contact(raw, logs, parked)
     native = raw / "P"
@@ -180,11 +188,7 @@ def verify(raw, logs, parked):
                               "only_changed_from_D":[transplant.TESTS], "test":transplant.NAME},
              "red source differs from the exact old production and unedited new test")
     prior = load(logs / "sdk/donor-official.json")
-    reg.need(baseline["old_job"] == prior and prior["run"] == 41303656721 and prior["job"] == 124839568474
-             and prior["head"] == reg.CARRIER_PARENT and prior["original_workflow"] == "success"
-             and prior["attempt"] == 1 and prior["artifacts"]["same-revision-donor-source-and-driver"]["digest"]
-             == "sha256:130ae568b848980cf6ecc15e822439ada1f8cb44f758be0dae92421ac0806067",
-             "different original D source")
+    check_original_d_source(baseline["old_job"], prior)
     for case in reg.RUN_MAKE:
         native_pass(command(native, case, cli + ["tests/run-make/" + case], cwd), case)
     if parked:

@@ -73,6 +73,22 @@ class Checks(unittest.TestCase):
             self.skipTest("complete source is required during actual build after acquisition")
         self.assertEqual(reg.validate(PRODUCT)["pack"]["count"], 9)
 
+    def test_genuine_original_d_source_receipt(self):
+        raw = (HERE / "inputs/original-D-source.json").read_bytes()
+        self.assertEqual(
+            reg.digest(raw),
+            "7ddf1a7370e26b5851786a7871f9f589409210e8aeca52763a37a62638f9f363",
+        )
+        original = json.loads(raw)
+        reopen.check_original_d_source(original, original.copy())
+        # Both sides can agree on the wrong head when a newer carrier is stacked.
+        for wrong in (reg.CARRIER_PARENT, "f93028872101f65e1c748217ac20ddb73a49bab1"):
+            replaced = original | {"head": wrong}
+            with self.subTest(head=wrong), self.assertRaisesRegex(ValueError, "different original D source"):
+                reopen.check_original_d_source(replaced, replaced.copy())
+        with self.assertRaisesRegex(ValueError, "different original D source"):
+            reopen.check_original_d_source(original, original | {"attempt": 2})
+
     def test_original_native_archive_receipt_refusals(self):
         import receive_source as receive
         import zipfile
