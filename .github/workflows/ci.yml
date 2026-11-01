@@ -1,25 +1,38 @@
-name: Unpublished original Darwin PGO Diesel capture
+name: Native incremental node-slot containment and optimized Darwin Diesel
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact QA commit
+        description: Exact reviewed nonrelease QA commit
         required: true
         type: string
 permissions: {}
 concurrency:
-  group: private-darwin-pgo-diesel-original
+  group: private-rc22-node-slot-containment
   cancel-in-progress: false
 jobs:
-  forensics:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-pgo-diesel-forensics-20261101' && github.run_attempt == 1 && github.sha == inputs.reviewed_head
-    timeout-minutes: 180
-    runs-on: macos-15
+  native:
+    name: Native graph recovery (${{ matrix.host }})
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-reject-node-slots-20261101' && github.run_attempt
+      == 1 && github.sha == inputs.reviewed_head
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - host: x86_64-unknown-linux-gnu
+          worker: namespace-profile-ubuntu-24-04-16
+        - host: aarch64-apple-darwin
+          worker: macos-15
+    runs-on: ${{ matrix.worker }}
+    timeout-minutes: 230
     permissions:
       contents: read
+      actions: read
     env:
-      OHM_TARGET: aarch64-apple-darwin
+      OHM_TARGET: ${{ matrix.host }}
       OHM_TOOLCHAIN: ohm-1.99.0-22
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
     - name: Check out release coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -28,11 +41,11 @@ jobs:
         ref: ${{ github.sha }}
         fetch-depth: 3
     - name: Make room for macOS profile training
-      if: runner.environment == 'github-hosted'
+      if: runner.os == 'macOS' && runner.environment == 'github-hosted'
       run: ./scripts/prepare-hosted-macos-release.sh
     - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       with:
-        enable-cache: true
+        enable-cache: false
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
       with:
         python-version: '3.13'
@@ -68,20 +81,66 @@ jobs:
         sparse-checkout: |-
           scripts/cargo-diagnostic-fix
           scripts/ohm-apple-zmij/cargo293
-    - name: Verify exact coordinator, inputs and all four source trees
-      shell: bash
+    - name: Check out the authenticated Linux binary verifier
+      if: runner.os == 'Linux'
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: f303f8a74c44879280427bef5dc5a0cd7dfbd39c
+        path: gnu-media
+        persist-credentials: false
+        sparse-checkout: scripts/packaged-release-workspace
+    - name: Check out the authenticated macOS binary verifier
+      if: runner.os == 'macOS'
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 87d296ac3b05648c082193fdb91d1145652797ff
+        path: apple-media
+        persist-credentials: false
+        sparse-checkout: |-
+          scripts/diesel-stage2-repeat
+          scripts/darwin-pgo-diesel
+    - name: Require the exact review, inherited production scripts and source envelope
       run: |-
         set -euo pipefail
-        test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-        test "$(git rev-parse HEAD^)" = 8b2c911b32b7cad9442b7ddced987c5a1b0a62e5
-        git diff --exit-code HEAD^ HEAD -- .github/workflows/release.yml scripts ':!scripts/darwin-pgo-diesel' release toolchains
+        test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
+        test "$(git rev-parse HEAD^)" = e8c4c99286652f27929290e417ff269e32d0bbd5
+        git diff --exit-code HEAD^ HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
         (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
-        (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS && python3 -IB test_local.py)
-        python3 -IB scripts/integrated-dist-qa/sources.py
-        python3 -IB scripts/darwin-pgo-diesel/worker.py source
+        (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
+        (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py)
         df -h "$GITHUB_WORKSPACE"
         available=$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')
         test "$available" -ge 41943040
+        python3 -IB scripts/integrated-dist-qa/sources.py
+        if test "$RUNNER_OS" = macOS; then python3 -IB scripts/darwin-pgo-diesel/worker.py source; fi
+        python3 -IB scripts/dep-graph-slots/qualify.py source
+      id: source
+      shell: bash
+    - name: Install native GNU bootstrap prerequisites
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
+    - name: Authenticate the original optimized GNU parent SDK
+      run: |-
+        set -euo pipefail
+        mkdir -p "$RUNNER_TEMP/packaged-linux-50/receipts"
+        python3 -IB gnu-media/scripts/packaged-release-workspace/rc22_sdk.py install "$RUNNER_TEMP/packaged-linux-50"
+        cp -R "$RUNNER_TEMP/packaged-linux-50/receipts/22" source/reports/old-gnu
+      if: runner.os == 'Linux'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+    - name: Authenticate the original instrumented Apple parent SDK
+      run: |-
+        set -euo pipefail
+        root="$RUNNER_TEMP/slot-old-apple"
+        python3 -IB apple-media/scripts/diesel-stage2-repeat/intake.py restore "$root" "$root/sdk" "$root/report"
+        cp -R "$root/report" source/reports/old-darwin
+      if: runner.os == 'macOS'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
     - name: Install matching LLVM tools for native PGO
       env:
         MANIFEST_PATH: toolchains/1.99.0/22.json
@@ -122,6 +181,7 @@ jobs:
           printf 'RANLIB=%s\n' "$clang_root/bin/llvm-ranlib"
           printf 'SDKROOT=%s\n' "$(xcrun --sdk macosx --show-sdk-path)"
         } >> "$GITHUB_ENV"
+      if: runner.os == 'macOS'
     - name: Prepare pinned Wild linker
       env:
         MANIFEST_PATH: toolchains/1.99.0/22.json
@@ -129,20 +189,26 @@ jobs:
         wild_directory="$(python3 scripts/prepare-wild.py \
           "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
         printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
+      if: runner.os == 'macOS'
+    - name: Compile and execute the source-bound GNU run-make
+      run: python3 -IB scripts/dep-graph-slots/qualify.py rmake
+      id: linux_rmake
+      if: runner.os == 'Linux'
     - name: Run the original optimized release command through all rustc PGO benchmarks
-      id: primary
+      id: natural
       continue-on-error: true
       run: python3 -IB scripts/darwin-pgo-diesel/supervise.py
+      if: runner.os == 'macOS'
     - name: Escrow original collector workspace and graph bytes before any diagnostic compiler
       id: escrow
-      if: '!cancelled() && steps.primary.outcome != ''skipped'''
+      if: '!cancelled() && runner.os == ''macOS'' && steps.natural.outcome != ''skipped'''
       run: python3 -IB scripts/darwin-pgo-diesel/worker.py first
     - name: Save originals before any replay
       id: originals
-      if: always()
+      if: always() && runner.os == 'macOS'
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: diesel-pgo-first-original
+        name: slot-darwin-original-before-any-replay
         path: |-
           source/reports/diesel-pgo/original-opt-dist.log
           source/reports/diesel-pgo/entry.json
@@ -157,64 +223,48 @@ jobs:
         if-no-files-found: warn
         compression-level: 0
         retention-days: 7
-    - name: Decode every distinct original finalized graph after custody
-      id: decode
-      if: >-
-        !cancelled() && steps.escrow.outcome == 'success' && steps.originals.outcome == 'success'
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py decode
-    - name: Authenticate and escrow the instrumented native compiler and exact Cargo
-      id: runtime
-      if: '!cancelled() && steps.escrow.outcome == ''success'' && steps.originals.outcome == ''success'''
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py runtime
-    - name: Save native instrumented runtime
-      if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: diesel-pgo-real-stage2
-        path: |-
-          source/reports/diesel-pgo/instrumented-sdk.tar.gz
-          source/reports/diesel-pgo/instrumented-sdk.tar.inventory.json
-          source/reports/diesel-pgo/tool-identity.json
-          source/reports/diesel-pgo/driver-otool.txt
-          source/reports/diesel-pgo/identity-llvm-profdata.txt
-          source/reports/diesel-pgo/runtime.json
-          source/reports/diesel-pgo/runtime-smoke
-          source/reports/diesel-pgo/rustc-perf-identity.json
-        if-no-files-found: warn
-        compression-level: 0
-        retention-days: 7
-    - name: Replay authentic saved graphs and two independent empty readers
-      id: direct
-      if: '!cancelled() && steps.escrow.outcome == ''success'' && steps.originals.outcome == ''success'' && hashFiles(''source/reports/diesel-pgo/tool-identity.json'') != '''''
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py direct
-    - name: Run pinned original collector with only the real Diesel Opt benchmark
-      id: focused
-      if: '!cancelled() && steps.escrow.outcome == ''success'' && steps.originals.outcome == ''success'' && hashFiles(''source/reports/diesel-pgo/tool-identity.json'') != '''''
-      run: python3 -IB scripts/darwin-pgo-diesel/worker.py focused
-    - name: Save off-primary diagnostics
-      if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: diesel-pgo-focused-replays
-        path: |-
-          source/reports/diesel-pgo/direct-*
-          source/reports/diesel-pgo/focused-*
-          source/reports/diesel-pgo/original-graph-decode.*
-        if-no-files-found: warn
-        compression-level: 0
-        retention-days: 7
-    - name: Report original natural training result
-      if: always()
+    - name: Verify the original scenario roster, instrumented child and fresh Diesel Opt
+      run: python3 -IB scripts/dep-graph-slots/qualify.py mac
+      id: darwin_collectors
+      if: success() && runner.os == 'macOS' && steps.natural.outcome == 'success' && steps.escrow.outcome == 'success' && steps.originals.outcome
+        == 'success'
+    - name: Qualify the parent faults, candidate recovery and old-producer sessions
+      run: python3 -IB scripts/dep-graph-slots/qualify.py native
+      id: matrix
+      if: success() && (steps.linux_rmake.outcome == 'success' || steps.darwin_collectors.outcome == 'success')
+    - name: Execute the same checked-in run-make on the native Apple host
+      run: python3 -IB scripts/dep-graph-slots/qualify.py rmake
+      id: darwin_rmake
+      if: success() && runner.os == 'macOS' && steps.matrix.outcome == 'success'
+    - name: Require the complete native outcome on the enrolled platform
       run: |-
-        python3 -IB - <<'PY'
-        import json
-        from pathlib import Path
-        r=Path('source/reports/diesel-pgo')
-        assert (r/'before-replay.json').is_file(), 'original qualification failed before its raw worktree admission'
-        first=json.loads((r/'before-replay.json').read_bytes())
-        print(first['outcome'])
-        assert (r/'runtime.json').is_file(), 'no independently reopened instrumented SDK'
-        assert (r/'focused-collector/result.json').is_file(), 'focused same-binary result missing'
-        assert not first['failed_timing_root'], 'the original full PGO training reproduced the release ICE; original and replay receipts retained'
-        PY
-    name: Original macOS PGO Diesel containment
+        set -euo pipefail
+        test "$SOURCE" = success
+        test "$MATRIX" = success
+        if test "$RUNNER_OS" = macOS; then
+          test "$NATURAL" = success && test "$ESCROW" = success && test "$COLLECTORS" = success && test "$APPLE_RMAKE" = success
+        else
+          test "$GNU_RMAKE" = success
+        fi
+      if: always()
+      shell: bash
+      env:
+        SOURCE: ${{ steps.source.outcome }}
+        MATRIX: ${{ steps.matrix.outcome }}
+        NATURAL: ${{ steps.natural.outcome }}
+        ESCROW: ${{ steps.escrow.outcome }}
+        COLLECTORS: ${{ steps.darwin_collectors.outcome }}
+        GNU_RMAKE: ${{ steps.linux_rmake.outcome }}
+        APPLE_RMAKE: ${{ steps.darwin_rmake.outcome }}
+    - name: Preserve native inputs, diagnostics, executables and source logs on every verdict
+      if: always()
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: slot-native-${{ matrix.host }}
+        path: |-
+          source/reports/
+          !source/reports/diesel-pgo/original-workspace.tar.gz
+          !source/reports/diesel-pgo/original-graphs
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
