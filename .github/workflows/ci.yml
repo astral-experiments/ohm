@@ -119,7 +119,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB historical/scripts/ctfe-cli-semantic/run.py acquire "$GITHUB_WORKSPACE/source"
+          python3 -IB current/scripts/rc23-ctfe-default/acquire.py
       - name: Compare ordinary builds on the same four CPUs and verify each repaired executable against an empty build
         run: python3 -IB current/scripts/rc23-ctfe-default/compare.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
