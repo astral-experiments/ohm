@@ -54,11 +54,10 @@ def same_qualified_producer(src, sdk):
         "different native.source or mixed controls",
     )
     a, b = (read(sdk / (k + ".json")) for k in ("E", "R"))
+    reg.check_sdk_sources(a, b)
     need(
         set(a["files"]) == set(b["files"])
         and len(a["files"]) == 81
-        and a["source"] == reg.P
-        and b["source"] == reg.R
         and a["driver"] == b["driver"]
         and a["files"][a["driver"]][0] == q["old_driver"][0]
         and b["files"][b["driver"]][0] == q["new_driver"][0]
@@ -386,6 +385,7 @@ def main(root, source):
     excluded = read(HERE / "inputs/previous.json")["old_excluded_boots"]
     need(
         identity["meter"]["boot"] not in excluded
+        and identity["runner"] != reg.REFUSED_RUNNER
         and identity["attempt"] == 1
         and identity["job"] == "pilot"
         and identity["command"] == P.COMMAND,

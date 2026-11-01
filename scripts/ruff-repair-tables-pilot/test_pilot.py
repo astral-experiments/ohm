@@ -109,6 +109,53 @@ class Decision(unittest.TestCase):
 
 
 class Inputs(unittest.TestCase):
+    def test_original_sdk_keeps_its_complete_source_record(self):
+        raw = (HERE / "inputs/original-E-source.json").read_bytes()
+        self.assertEqual(
+            hashlib.sha256(raw).hexdigest(),
+            "4639e8c5eec62e90c2c42cab54adfcab848009b3fb08395d773381d1bfe41efd",
+        )
+        parent = {"role": "E", "source": json.loads(raw)}
+        candidate = {"role": "R", "source": source_binding.R}
+        source_binding.check_sdk_sources(parent, candidate)
+        changed = copy.deepcopy(parent)
+        changed["source"]["role"]["tree"] = "0" * 40
+        for a, b in (
+            (changed, candidate),
+            (parent | {"source": source_binding.P}, candidate),
+            (parent, parent),
+            (parent, candidate | {"source": source_binding.P}),
+        ):
+            with self.assertRaises(ValueError):
+                source_binding.check_sdk_sources(a, b)
+
+    def test_reviewed_patch_ignores_checkout_only_rust_hunk_labels(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source_binding.git(repo, "init", "--template=", "-q")
+
+            def tree(value):
+                body = "fn snapshot() -> u32\nwhere\n    u8: Copy,\n{\n" + "    let _ = ();\n" * 5
+                blob = source_binding.git(
+                    repo, "hash-object", "-w", "--stdin", body=(body + value + "\n}\n").encode()
+                )
+                source_binding.git(
+                    repo, "update-index", "--add", "--cacheinfo", "100644", blob.decode().strip(), "lib.rs"
+                )
+                return source_binding.git(repo, "write-tree").decode().strip()
+
+            left, right, other = (tree(value) for value in ("    17", "    29", "    83"))
+            args = ("diff", "--full-index", "--binary", left, right, "--")
+            reviewed = source_binding.git(repo, *args)
+            self.assertEqual(source_binding.review_patch(repo, left, right), reviewed)
+            (repo / ".gitattributes").write_text("*.rs diff=rust\n")
+            attributed = source_binding.git(repo, *args)
+            self.assertNotEqual(attributed, reviewed)
+            self.assertIn(b"@@ where\n", reviewed)
+            self.assertIn(b"@@ fn snapshot() -> u32\n", attributed)
+            self.assertEqual(source_binding.review_patch(repo, left, right), reviewed)
+            self.assertNotEqual(source_binding.review_patch(repo, left, other), reviewed)
+
     def test_registered_source_and_workflow(self):
         d = json.loads((HERE / "inputs/product.json").read_bytes())
         history = json.loads((HERE / "inputs/previous.json").read_bytes())

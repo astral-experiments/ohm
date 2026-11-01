@@ -14,6 +14,8 @@ R = "7c0c305743727cb08e3c1de61183c9cb953d3f33"
 REF = "refs/heads/charlie/qa-ruff-repair-tables-pilot-20261101"
 QA = "762fc25095e317ac5632ec835df3c7f9cfc64a64"
 HISTORICAL = "b1f863353a63c91bebf5d2bc2ca68a4aca93f6bb"
+QA_PARENT = "6894b244568856bf0f30b5b155d8fb7f000c00c4"
+REFUSED_RUNNER = "nsc-runner-q2lf6o1hf07tq"
 PACK = "fc4c45fe401cfb23a63c3c7b9552502349a5b8ca71acea66447538bc13e029ab"
 EXPECTED = {
     "compiler/rustc_incremental/src/persist/fs.rs",
@@ -42,6 +44,24 @@ def git(repo, *args, body=None):
 
 def identity(repo, ref):
     return git(repo, "rev-parse", ref).decode().strip()
+
+
+def review_patch(repo, left, right):
+    # Reproduce the reviewed sparse checkout's hunk labels even in a full Rust checkout.
+    empty_tree = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+    return git(repo, "--attr-source=" + empty_tree, "diff", "--full-index", "--binary", left, right, "--")
+
+
+def check_sdk_sources(parent, candidate):
+    original = json.loads((HERE / "inputs/original-E-source.json").read_bytes())
+    need(
+        parent["role"] == "E"
+        and parent["source"] == original
+        and original["role"]["commit"] == P
+        and candidate["role"] == "R"
+        and candidate["source"] == R,
+        "wrong parent/child physical source",
+    )
 
 
 def checked(repo, *, install=False):
@@ -95,8 +115,7 @@ def checked(repo, *, install=False):
                 path,
             )
     need(
-        hashlib.sha256(git(repo, "diff", "--full-index", "--binary", P, R, "--")).hexdigest()
-        == data["patches"]["candidate-narrow.patch"],
+        hashlib.sha256(review_patch(repo, P, R)).hexdigest() == data["patches"]["candidate-narrow.patch"],
         "full review patch differs",
     )
     return data
@@ -109,10 +128,11 @@ def official_job():
         and os.environ.get("GITHUB_REF") == REF
         and os.environ.get("GITHUB_RUN_ATTEMPT") == "1"
         and os.environ.get("REVIEWED_HEAD") == os.environ["GITHUB_SHA"] == identity(HERE, "HEAD")
+        and os.environ["RUNNER_NAME"] != REFUSED_RUNNER
         and os.environ.get("GITHUB_JOB") == "pilot",
         "wrong official QA job",
     )
-    need(identity(HERE, "HEAD^") == HISTORICAL, "unreviewed carrier ancestry")
+    need(identity(HERE, "HEAD^") == QA_PARENT, "unreviewed carrier ancestry")
 
 
 if __name__ == "__main__":

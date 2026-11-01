@@ -20,10 +20,7 @@ need = P.need
 
 def records():
     result = {r: json.loads((b.OUT / "sdk" / (r + ".json")).read_bytes()) for r in ("E", "R")}
-    need(
-        [(r, d["source"]) for r, d in result.items()] == [("E", reg.P), ("R", reg.R)],
-        "wrong parent/child physical source",
-    )
+    reg.check_sdk_sources(result["E"], result["R"])
     proof = json.loads((b.OUT / "sdk/R-source-qualified.json").read_bytes())
     need(
         proof["members"] == 81
