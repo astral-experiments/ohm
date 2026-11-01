@@ -1,0 +1,47 @@
+--- a/run.py
++++ b/run.py
+@@ -1,4 +1,5 @@
+ """Run the public and candidate rustdoc on a cold and a build-trained real Ruff diamond."""
++from diamond_policy import collision
+ import gzip
+ from html.parser import HTMLParser
+ import json
+@@ -136,7 +137,8 @@
+                 if op=="doc":
+                     leaf=[u for u in typed if u["target"]["name"]=="ruff_text_size"]
+                     files=sorted(sorted(Path(f).suffix for f in u["filenames"]) for u in leaf)
+-                    expected_files=([[".rlib",".rmeta"],[".rmeta"]] if mode=="default" and role in ("published-22","fd98-control") else [[".rmeta"]])
++                    old_collision = collision(role, host, mode, history, run.returncode)
++                    expected_files=([[".rlib",".rmeta"],[".rmeta"]] if old_collision else [[".rmeta"]])
+                     need(files==expected_files, "unexpected leaf metadata/rlib topology")
+                     item["leaf_products"]=[u["filenames"] for u in leaf]
+                 if op=="build":
+@@ -147,7 +149,7 @@
+                     need(native.returncode==0 and native.stdout==b"4 5\n" and not native.stderr, "wrong linked nominal result")
+                     data=Path(client).read_bytes();need(0<len(data)<16<<20,"oversized client")
+                     (case/"client.gz").write_bytes(gzip.compress(data,mtime=0));item.update(client=digest(data),output=native.stdout.decode())
+-                elif role in ("published-22","fd98-control") and mode=="default":
++                elif old_collision:
+                     need(run.returncode==101 and errors==[COLLISION] and not (root/"target/doc/facade/struct.TextSize.html").exists(),"old compiler did not reproduce the exact collision")
+                 else:
+                     need(run.returncode==0 and not errors,"rustdoc failed")
+--- a/reopen.py
++++ b/reopen.py
+@@ -1,4 +1,5 @@
+ """Reopen raw Cargo messages, native tool receipts, executable bodies and rendered documentation."""
++from diamond_policy import collision
+ import gzip
+ import hashlib
+ from html.parser import HTMLParser
+@@ -125,7 +126,10 @@
+         default, trained = state.startswith("default-"), "build-doc" in state
+         prefix = ["cargo", "+ohm"] + ([] if default else ["-Zohm-defaults=no"])
+         common = ["--offline", "--locked", "-j2", "--message-format=json"]
+-        code = 101 if role != "corrected" and default else 0
++        observed = js(case / "doc/exit.json")
++        mode = "default" if default else "off"
++        history = "build-doc" if trained else "cold-doc"
++        code = 101 if collision(role, host, mode, history, observed) else 0
+         phase = r["cases"][state]
+         need(set(phase) == ({"build", "doc"} if trained else {"doc"}), "wrong phase inventory")
+         units, doc = cargo(case / "doc", prefix + ["doc", "-p", "facade", "--no-deps"] + common, ctx, code)
