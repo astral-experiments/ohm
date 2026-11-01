@@ -135,12 +135,13 @@ def focused():
 
 def external_inputs(rec):
     args = rec["argv"]
+    cwd = Path(rec["cwd"]).resolve(strict=True)
     result = {}
     for i, token in enumerate(args):
         if token == "--extern":
             name, path = args[i + 1].split("=", 1)
             p = Path(path)
-            need(p.is_file() and p.resolve().is_relative_to(Path(rec["cwd"])), "foreign explicit dependency")
+            need(p.is_file() and p.resolve(strict=True).is_relative_to(cwd), "foreign explicit dependency")
             result[name] = {"path": str(p), "bytes": p.stat().st_size, "sha256": sha(p)}
     need("diesel_derives" in result, "missing native proc-macro dependency")
     return result

@@ -202,7 +202,7 @@ class Tests(unittest.TestCase):
 
     def test_replay_seed_and_cold(self):
         with tempfile.TemporaryDirectory() as tmp:
-            base = Path(tmp)
+            base = Path(tmp).resolve(strict=True)
             slot = base / "seed"
             slot.mkdir()
             (slot / "a").write_bytes(b"immutable")
@@ -237,10 +237,44 @@ class Tests(unittest.TestCase):
                 f.write_bytes(b"seed output")
             record = {"argv": argv, "cwd": str(dest)}
             ex = contact.external_inputs(record)
+            alias = base / "logical-workspace"
+            alias.symlink_to(dest, target_is_directory=True)
+            self.assertEqual(ex, contact.external_inputs({**record, "cwd": str(alias)}))
+            outside = base / "foreign.dylib"
+            outside.write_bytes(b"unrelated library")
+            escaped = dest / "escape.dylib"
+            escaped.symlink_to(outside)
+            with self.assertRaisesRegex(ValueError, "foreign explicit dependency"):
+                contact.external_inputs({"cwd": str(alias), "argv": ["--extern", "diesel_derives=" + str(escaped)]})
             cold = contact.cold_unit(dest, record)
             self.assertEqual(len(cold["removed_outputs"]), 2)
             self.assertEqual(ex, contact.external_inputs(record))
             self.assertFalse(list((dest / "incremental-state").iterdir()) or list(out.iterdir()))
+
+    def test_darwin_pipe_status(self):
+        # Endpoint snapshots from the first macOS 15 run, before and after SCM_RIGHTS.
+        def snapshot(platform, read_flags, write_flags):
+            return {
+                "platform": platform,
+                "ends": [
+                    {"fd": 7, "dev": 0, "ino": 2119632488035979604, "mode": 4528, "flags": read_flags},
+                    {"fd": 11, "dev": 0, "ino": 14995846943073723440, "mode": 4528, "flags": write_flags},
+                ],
+            }
+
+        before = snapshot("darwin", 0, 65537)
+        after = snapshot("darwin", 4096, 69633)
+        self.assertEqual(jobserver.identity(before), jobserver.identity(after))
+        self.assertEqual([end["flags"] for end in after["ends"]], [4096, 69633])
+        self.assertEqual(jobserver.identity(before), jobserver.identity(snapshot("darwin", 8192, 73729)))
+        self.assertNotEqual(jobserver.identity(before), jobserver.identity(snapshot("darwin", 4, 65537)))
+        self.assertNotEqual(jobserver.identity(before), jobserver.identity(snapshot("darwin", 0, 1)))
+        self.assertNotEqual(jobserver.identity(snapshot("linux", 0, 1)), jobserver.identity(snapshot("linux", 4096, 1)))
+        swapped = snapshot("darwin", 0, 65537)
+        swapped["ends"][1]["ino"] += 1
+        self.assertNotEqual(jobserver.identity(before), jobserver.identity(swapped))
+        with self.assertRaises(ValueError):
+            jobserver.identity(snapshot("darwin", 1, 65537))
 
     def test_independent_seed_zip(self):
         with tempfile.TemporaryDirectory() as t:

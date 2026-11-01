@@ -29,8 +29,8 @@ jobs:
       run: |
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-        test "$(git rev-parse HEAD^)" = 87d296ac3b05648c082193fdb91d1145652797ff
-        git diff --exit-code HEAD^ HEAD -- . ':!scripts/diesel-stage2-archives' ':!scripts/diesel-stage2-repeat/repeat.py' ':!scripts/diesel-stage2-repeat/SHA256SUMS' ':!.github/workflows/ci.yml'
+        test "$(git rev-parse HEAD^)" = 5b7c2772dcb8dce2a9f1b46dc4de87b8aedb7db2
+        git diff --exit-code HEAD^ HEAD -- . ':!scripts/diesel-stage2-archives' ':!.github/workflows/ci.yml'
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
         (cd scripts/diesel-stage2-repeat && shasum -a 256 --check SHA256SUMS)
         (cd scripts/diesel-stage2-archives && shasum -a 256 --check SHA256SUMS)

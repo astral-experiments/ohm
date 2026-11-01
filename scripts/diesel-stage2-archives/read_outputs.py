@@ -180,8 +180,13 @@ def check(original, replays):
     prior_inodes = set()
     r = first["before"]
     handoff = read(replays, "replays/claimed.json")
+    first_pipe = first["natural_jobserver"]
+    expected_pipe = jobserver.identity(first_pipe["descriptors"])
     products.need(
-        jobserver.identity(first["natural_jobserver"]["descriptors"]) == jobserver.identity(handoff["claim"]),
+        first_pipe["descriptors"]["platform"] == "darwin"
+        and expected_pipe == jobserver.identity(first_pipe["held_same_open_files"])
+        == jobserver.identity(read(original, "archives/original/natural-after-jobserver.json"))
+        == jobserver.identity(handoff["claim"]),
         "different kernel endpoints",
     )
     for role in ("ordinary-1", "ordinary-2", "loaded", "cold", "closed-fds"):

@@ -37,11 +37,21 @@ def describe(fds):
         ends.append({"fd": fd, "dev": st.st_dev, "ino": st.st_ino, "mode": st.st_mode, "flags": access})
     n = array("i", [0])
     fcntl.ioctl(fds[0], termios.FIONREAD, n, True)
-    return {"ends": ends, "available_bytes": n[0]}
+    return {"platform": sys.platform, "ends": ends, "available_bytes": n[0]}
 
 
 def identity(description):
-    return [{k: value for k, value in end.items() if k != "fd"} for end in description["ends"]]
+    """Compare the pipe endpoints and their open status while preserving raw F_GETFL in each receipt."""
+    platform = description["platform"]
+    need(platform in ("darwin", "linux") and len(description["ends"]) == 2, "unknown pipe description")
+    # XNU exposes FMARK and FDEFER from Unix-socket garbage collection in F_GETFL.
+    # Neither controls pipe I/O. Every other bit still has to match across SCM_RIGHTS.
+    gc_bits = (0x1000 | 0x2000) if platform == "darwin" else 0
+    ends = []
+    for end, mode in zip(description["ends"], (os.O_RDONLY, os.O_WRONLY), strict=True):
+        need(stat.S_ISFIFO(end["mode"]) and end["flags"] & os.O_ACCMODE == mode, "invalid recorded pipe")
+        ends.append((end["dev"], end["ino"], end["mode"], end["flags"] & ~gc_bits))
+    return platform, ends
 
 
 def process_list(pid):
