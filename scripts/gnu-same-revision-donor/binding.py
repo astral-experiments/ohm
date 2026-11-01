@@ -10,7 +10,7 @@ import sys
 
 HERE = Path(__file__).resolve().parent
 OLD = "393b4b05a4bfa3f531a36023846f86236a6b71a9"
-CARRIER_PARENT = "d22c1c9d858def79d16332ab147b3ce98f140b2f"
+CARRIER_PARENT = "5024cfd0058bc378dc69afb9f6c429f3cf9547bf"
 SOURCE_QA = "762fc25095e317ac5632ec835df3c7f9cfc64a64"
 REF = "refs/heads/charlie/qa-ruff-same-revision-donor-source-20261101"
 EXPECTED = {
@@ -91,6 +91,8 @@ def save(path, result):
 
 
 def job():
+    header = git(HERE, "cat-file", "commit", "HEAD").split(b"\n\n", 1)[0]
+    parents = [line[7:].decode() for line in header.splitlines() if line.startswith(b"parent ")]
     need(
         os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
         and os.environ.get("GITHUB_REPOSITORY") == "astral-experiments/ohm"
@@ -98,7 +100,7 @@ def job():
         and os.environ.get("GITHUB_RUN_ATTEMPT") == "1"
         and os.environ.get("GITHUB_JOB") == "qualify"
         and os.environ.get("REVIEWED_HEAD") == os.environ["GITHUB_SHA"] == rev(HERE, "HEAD")
-        and rev(HERE, "HEAD^") == CARRIER_PARENT,
+        and parents == [CARRIER_PARENT],
         "foreign QA source or invocation",
     )
 

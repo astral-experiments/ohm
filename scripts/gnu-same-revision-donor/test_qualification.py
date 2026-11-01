@@ -68,9 +68,8 @@ class Checks(unittest.TestCase):
             "REVIEWED_HEAD": head,
             "GITHUB_SHA": head,
         }
-        with mock.patch.object(
-            reg, "rev", lambda _, k: head if k == "HEAD" else reg.CARRIER_PARENT
-        ):
+        header = ("tree " + "a" * 40 + "\nparent " + reg.CARRIER_PARENT + "\n\nbody").encode()
+        with mock.patch.object(reg, "rev", return_value=head), mock.patch.object(reg, "git", return_value=header):
             with mock.patch.dict(os.environ, env, clear=True):
                 reg.job()
             for k, v in (
@@ -84,6 +83,12 @@ class Checks(unittest.TestCase):
                 with self.subTest(k=k), mock.patch.dict(
                     os.environ, env | {k: v}, clear=True
                 ), self.assertRaises(ValueError):
+                    reg.job()
+
+        with mock.patch.object(reg, "rev", return_value=head), mock.patch.dict(os.environ, env, clear=True):
+            for invalid in (header.replace(reg.CARRIER_PARENT.encode(), head.encode()),
+                            header.replace(b"\n\n", b"\nparent " + head.encode() + b"\n\n")):
+                with mock.patch.object(reg, "git", return_value=invalid), self.assertRaises(ValueError):
                     reg.job()
 
     def test_actual_test_inventories(self):
@@ -163,10 +168,10 @@ class Checks(unittest.TestCase):
         record = reader.load(path)
         self.assertTrue(record["complete"])
         self.assertEqual(record["prior_readers"], [])
-        self.assertEqual(record["reader_source"], reg.digest(reg.git(
-            HERE, "show",
-            "d22c1c9d858def79d16332ab147b3ce98f140b2f:scripts/gnu-same-revision-donor/reopen_ruff.py",
-        )))
+        historical = reader.body(HERE / "inputs/controls/parent-reader-d22c1c9d.py.gz")
+        self.assertEqual(len(historical), 26797)
+        self.assertEqual(reg.digest(historical), "b04246b441706df7ebef7cbdcdcb26c5526fff0f8acee88f20b62434a5c09eb7")
+        self.assertEqual(record["reader_source"], reg.digest(historical))
         self.assertEqual(record["raw_info"], [512, 42835069])
         self.assertEqual(
             record["originals_sha256"],
@@ -207,7 +212,7 @@ class Checks(unittest.TestCase):
         raw = base64.b64decode(fixture["live_raw_bytes_base64"], validate=True)
         self.assertEqual(reg.digest(raw), fixture["live_sha256"])
         self.assertEqual(fixture["failed_source_run"]["run"], 41301552076)
-        self.assertEqual(fixture["failed_source_run"]["head"], reg.CARRIER_PARENT)
+        self.assertEqual(fixture["failed_source_run"]["head"], "d22c1c9d858def79d16332ab147b3ce98f140b2f")
         self.assertEqual(
             {(a["id"], a["sha256"]) for a in fixture["failed_source_run"]["artifacts"]},
             {

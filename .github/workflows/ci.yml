@@ -25,7 +25,7 @@ jobs:
           ref: ${{ github.sha }}
           path: enrolled
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 1
           sparse-checkout: |
             .github/workflows
             scripts/gnu-same-revision-donor
