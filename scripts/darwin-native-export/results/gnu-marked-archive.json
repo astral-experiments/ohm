@@ -1,0 +1,475 @@
+{
+  "candidate": {
+    "cargo": "4591cf45cc10abb19d2456c40b99606e08167f29",
+    "cargo_executable": "39757e62befda4ebee24110766bd63fb9cbbc88e694f3df4ef7121763b3b2d91",
+    "rust": "1bc7b35699479d5899a2935d79392b7bdaf7497d",
+    "rustc_executable": "e8b49d5a640da8ad62db0b60a47ec943e173e1d967f576f4d5d5dcf19955ac97",
+    "wild": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+  },
+  "exact_smoke": {
+    "error": "Expected 0 linker calls for two executables returning 17, observed 2",
+    "exit": 1
+  },
+  "host": "x86_64-unknown-linux-gnu",
+  "original_smoke_commit": "933ca489d20ba0c856d6762fd115a3fad78ff0f8",
+  "original_smoke_sha256": "e57b87041abe1f91c78c29bb26e276e7ccd41e8f33a360aec616fb260d7ec175",
+  "variants": {
+    "configured": {
+      "counting_wrapper_sha256": "633683782a376f61455ce4d5d7665c32d62d8c55f5aca82934c39e4a14e26c53",
+      "phases": {
+        "cold": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 3,
+          "declared_archive": "067d3316b7b8c74cb6de7102d0fb16b8e5ddeff1de567c0f19c021c1374f1b87",
+          "executables": {
+            "first": {
+              "elf": "d8fe5ab40f4e9d3782b97646d79780c1b6d2d3bbf5a88f2fd97536ffd719594d",
+              "value": 17
+            },
+            "second": {
+              "elf": "014bb1356f0da54555e31b52f53f5b37719a72507f26092e1bab9c0e0a4b6c3c",
+              "value": 17
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "declared-edit": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "efd0d8ec4bf422c283f98b97484b7e06e5baa0c15be17e32a6c49b27cfb28c93",
+              "value": 29
+            },
+            "second": {
+              "elf": "10a828333bb70f25497b688a53e9280a9db63a28fb7a01602bca11e977c47e43",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "settled": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "efd0d8ec4bf422c283f98b97484b7e06e5baa0c15be17e32a6c49b27cfb28c93",
+              "value": 29
+            },
+            "second": {
+              "elf": "10a828333bb70f25497b688a53e9280a9db63a28fb7a01602bca11e977c47e43",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "unchanged": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "067d3316b7b8c74cb6de7102d0fb16b8e5ddeff1de567c0f19c021c1374f1b87",
+          "executables": {
+            "first": {
+              "elf": "d8fe5ab40f4e9d3782b97646d79780c1b6d2d3bbf5a88f2fd97536ffd719594d",
+              "value": 17
+            },
+            "second": {
+              "elf": "014bb1356f0da54555e31b52f53f5b37719a72507f26092e1bab9c0e0a4b6c3c",
+              "value": 17
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        }
+      }
+    },
+    "default": {
+      "counting_wrapper_sha256": null,
+      "phases": {
+        "cold": {
+          "cargo_exit": 0,
+          "declared_archive": "067d3316b7b8c74cb6de7102d0fb16b8e5ddeff1de567c0f19c021c1374f1b87",
+          "executables": {
+            "first": {
+              "elf": "c8afb41b34865e2f178e90aa24abd93dcc4e68a3135a914664c775b137e0c53b",
+              "value": 17
+            },
+            "second": {
+              "elf": "ad6c31047c23d287f39638b1520ae5bc45d61cd0ae12bdeb9155a4488fb255f0",
+              "value": 17
+            }
+          },
+          "execution_trace_sha256": "45ac849169e0192d977c15a2412820d391bedd03b43ee73e883843297e7f8e66",
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b",
+          "wild_final_outputs": [
+            "build_script_build",
+            "second",
+            "first"
+          ]
+        },
+        "declared-edit": {
+          "cargo_exit": 0,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "9b504001df0deeadc8b9e8e0e9cc7fb6fac57007eeb588f75a31c941413cb98a",
+              "value": 29
+            },
+            "second": {
+              "elf": "ae1c84b61a01fb93c50ec418bb3cc9f3279fdcb5ad05d96c3031b382e149673b",
+              "value": 29
+            }
+          },
+          "execution_trace_sha256": "ca89fef4a097a74e0ad206449c14659b5993b41cedfe1ba093a65942f811144d",
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b",
+          "wild_final_outputs": [
+            "first",
+            "second"
+          ]
+        },
+        "settled": {
+          "cargo_exit": 0,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "9b504001df0deeadc8b9e8e0e9cc7fb6fac57007eeb588f75a31c941413cb98a",
+              "value": 29
+            },
+            "second": {
+              "elf": "ae1c84b61a01fb93c50ec418bb3cc9f3279fdcb5ad05d96c3031b382e149673b",
+              "value": 29
+            }
+          },
+          "execution_trace_sha256": "357e7ed959916f306febe77b02b32d27761d513a725f9bf105e53b14c744b4c3",
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b",
+          "wild_final_outputs": [
+            "first",
+            "second"
+          ]
+        },
+        "unchanged": {
+          "cargo_exit": 0,
+          "declared_archive": "067d3316b7b8c74cb6de7102d0fb16b8e5ddeff1de567c0f19c021c1374f1b87",
+          "executables": {
+            "first": {
+              "elf": "c8afb41b34865e2f178e90aa24abd93dcc4e68a3135a914664c775b137e0c53b",
+              "value": 17
+            },
+            "second": {
+              "elf": "ad6c31047c23d287f39638b1520ae5bc45d61cd0ae12bdeb9155a4488fb255f0",
+              "value": 17
+            }
+          },
+          "execution_trace_sha256": "a85f67b7aa34d5748573b7c42ad4a51fc853a81d08252696152fe37b21c28b87",
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b",
+          "wild_final_outputs": [
+            "second",
+            "first"
+          ]
+        }
+      }
+    },
+    "higher_priority": {
+      "counting_wrapper_sha256": "633683782a376f61455ce4d5d7665c32d62d8c55f5aca82934c39e4a14e26c53",
+      "extra_cc": "#!/bin/sh\nexec /usr/bin/cc \"-L$OHM_DRIVER_SEARCH\" \"$@\"\n",
+      "phases": {
+        "cold": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 3,
+          "declared_archive": "067d3316b7b8c74cb6de7102d0fb16b8e5ddeff1de567c0f19c021c1374f1b87",
+          "executables": {
+            "first": {
+              "elf": "d8fe5ab40f4e9d3782b97646d79780c1b6d2d3bbf5a88f2fd97536ffd719594d",
+              "value": 17
+            },
+            "second": {
+              "elf": "014bb1356f0da54555e31b52f53f5b37719a72507f26092e1bab9c0e0a4b6c3c",
+              "value": 17
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "declared-edit": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "efd0d8ec4bf422c283f98b97484b7e06e5baa0c15be17e32a6c49b27cfb28c93",
+              "value": 29
+            },
+            "second": {
+              "elf": "10a828333bb70f25497b688a53e9280a9db63a28fb7a01602bca11e977c47e43",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "empty-higher-priority": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 3,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "0ec844d39996231c1419da7953816972e81d04935bb9ff18d7e8d859b5923d1d",
+              "value": 83
+            },
+            "second": {
+              "elf": "9d07eb50905901925ce8f7601bef582fe1a12f3065ddcdfb357d2554817d7d10",
+              "value": 83
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "empty-malformed": {
+          "cargo_exit": 101,
+          "configured_driver_calls": 3,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "empty-removed": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 3,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "efd0d8ec4bf422c283f98b97484b7e06e5baa0c15be17e32a6c49b27cfb28c93",
+              "value": 29
+            },
+            "second": {
+              "elf": "10a828333bb70f25497b688a53e9280a9db63a28fb7a01602bca11e977c47e43",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "higher-priority": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "0ec844d39996231c1419da7953816972e81d04935bb9ff18d7e8d859b5923d1d",
+              "value": 83
+            },
+            "second": {
+              "elf": "9d07eb50905901925ce8f7601bef582fe1a12f3065ddcdfb357d2554817d7d10",
+              "value": 83
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "malformed-higher-priority": {
+          "cargo_exit": 101,
+          "configured_driver_calls": 2,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "removed": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "efd0d8ec4bf422c283f98b97484b7e06e5baa0c15be17e32a6c49b27cfb28c93",
+              "value": 29
+            },
+            "second": {
+              "elf": "10a828333bb70f25497b688a53e9280a9db63a28fb7a01602bca11e977c47e43",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "settled": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "efd0d8ec4bf422c283f98b97484b7e06e5baa0c15be17e32a6c49b27cfb28c93",
+              "value": 29
+            },
+            "second": {
+              "elf": "10a828333bb70f25497b688a53e9280a9db63a28fb7a01602bca11e977c47e43",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "unchanged": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "067d3316b7b8c74cb6de7102d0fb16b8e5ddeff1de567c0f19c021c1374f1b87",
+          "executables": {
+            "first": {
+              "elf": "d8fe5ab40f4e9d3782b97646d79780c1b6d2d3bbf5a88f2fd97536ffd719594d",
+              "value": 17
+            },
+            "second": {
+              "elf": "014bb1356f0da54555e31b52f53f5b37719a72507f26092e1bab9c0e0a4b6c3c",
+              "value": 17
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        }
+      }
+    },
+    "higher_priority_defaults_off": {
+      "counting_wrapper_sha256": "633683782a376f61455ce4d5d7665c32d62d8c55f5aca82934c39e4a14e26c53",
+      "extra_cc": "#!/bin/sh\nexec /usr/bin/cc \"-L$OHM_DRIVER_SEARCH\" \"$@\"\n",
+      "phases": {
+        "cold": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 3,
+          "declared_archive": "067d3316b7b8c74cb6de7102d0fb16b8e5ddeff1de567c0f19c021c1374f1b87",
+          "executables": {
+            "first": {
+              "elf": "ecc7754b10cf712d50c36d5e5eaab8629d373e55c4b3bed6cd5d0a5a33934f5e",
+              "value": 17
+            },
+            "second": {
+              "elf": "f6072062320f21f71cfbb331363489d52808dad870623f33a386b0d6eeb49efd",
+              "value": 17
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "declared-edit": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 2,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "e0d929c71ccee537c9fa4437322116e0687cd3d3b2d70dbfa789cc2e7f98188f",
+              "value": 29
+            },
+            "second": {
+              "elf": "7edcbf209fe3716f14f8f365efbbe42263496477acba5a53255757da6e154ce9",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "empty-higher-priority": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 3,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "a2701c2636cb63c65ba604ee77b722b04ab850456d6874c050a051e3ef51534b",
+              "value": 83
+            },
+            "second": {
+              "elf": "4136b027f584078fc43c936076066547af5d4a6358b02d49ac8dedce11d20aa2",
+              "value": 83
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "empty-malformed": {
+          "cargo_exit": 101,
+          "configured_driver_calls": 3,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "empty-removed": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 3,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "e0d929c71ccee537c9fa4437322116e0687cd3d3b2d70dbfa789cc2e7f98188f",
+              "value": 29
+            },
+            "second": {
+              "elf": "7edcbf209fe3716f14f8f365efbbe42263496477acba5a53255757da6e154ce9",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "higher-priority": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 0,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "e0d929c71ccee537c9fa4437322116e0687cd3d3b2d70dbfa789cc2e7f98188f",
+              "value": 29
+            },
+            "second": {
+              "elf": "7edcbf209fe3716f14f8f365efbbe42263496477acba5a53255757da6e154ce9",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "malformed-higher-priority": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 0,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "e0d929c71ccee537c9fa4437322116e0687cd3d3b2d70dbfa789cc2e7f98188f",
+              "value": 29
+            },
+            "second": {
+              "elf": "7edcbf209fe3716f14f8f365efbbe42263496477acba5a53255757da6e154ce9",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "removed": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 0,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "e0d929c71ccee537c9fa4437322116e0687cd3d3b2d70dbfa789cc2e7f98188f",
+              "value": 29
+            },
+            "second": {
+              "elf": "7edcbf209fe3716f14f8f365efbbe42263496477acba5a53255757da6e154ce9",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "settled": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 0,
+          "declared_archive": "d1604037f4bb2e2eb2318ae6bd08f052dc5a92c6e0947321acc734e16b645d9d",
+          "executables": {
+            "first": {
+              "elf": "e0d929c71ccee537c9fa4437322116e0687cd3d3b2d70dbfa789cc2e7f98188f",
+              "value": 29
+            },
+            "second": {
+              "elf": "7edcbf209fe3716f14f8f365efbbe42263496477acba5a53255757da6e154ce9",
+              "value": 29
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        },
+        "unchanged": {
+          "cargo_exit": 0,
+          "configured_driver_calls": 0,
+          "declared_archive": "067d3316b7b8c74cb6de7102d0fb16b8e5ddeff1de567c0f19c021c1374f1b87",
+          "executables": {
+            "first": {
+              "elf": "ecc7754b10cf712d50c36d5e5eaab8629d373e55c4b3bed6cd5d0a5a33934f5e",
+              "value": 17
+            },
+            "second": {
+              "elf": "f6072062320f21f71cfbb331363489d52808dad870623f33a386b0d6eeb49efd",
+              "value": 17
+            }
+          },
+          "unchanged_build_script": "a6d93b74e0b12c67ff0d83da1fedfa961410ba70f42a7bb8bdcbe9b9f839b60b"
+        }
+      }
+    }
+  }
+}

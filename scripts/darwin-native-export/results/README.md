@@ -26,6 +26,12 @@ The optimized Linux package also passed a 275-unit `cargo check -p ty_project` a
 
 The warmed and empty `ty_project` metadata differed by 127 bytes in size on both the previous and proposed compilers. On the proposed compiler both builds used the same absolute output paths. In its 422-line decoded metadata listing, all 28 differing lines differed only in hash values. Those same lines also differed on the previous compiler. [Source and binary identities, decoded hashes, and line comparison](ty-check-metadata.json)
 
+## Native archive rechecks on GNU
+
+The strengthened `-22` smoke test runs two executables whose Rust dependency uses register-only assembly. The current optimized GNU package correctly returned 17 from both. On the unchanged build its configured linker ran twice, failing the zero-call assertion. Removing that wrapper and tracing kernel `execve` calls still found two real Wild links on the unchanged build, two when the declared archive changed to 29, and two on the next unchanged build. [Candidate binary identities, actual outputs and trace hashes](gnu-marked-archive.json) · [Exact release smoke](https://github.com/astral-experiments/ohm/blob/933ca489d20ba0c856d6762fd115a3fad78ff0f8/scripts/smoke-test-relink.sh#L175-L196)
+
+In a separate control the same configured linker passed an additional search directory to `cc`. Adding an archive to that directory changed the warmed binaries from 29 to 83. Malforming it made the warm and empty builds both fail. Throughout those visits the declared archive kept the same bytes, inode and modification time. Turning off Ohm defaults achieved zero unchanged links, but both warmed executables returned 29 after the new archive appeared. The warm build also accepted the malformed archive. [Warm and independent empty comparisons](gnu-marked-archive.json)
+
 ## Ruff parser edit
 
 The baseline and revised toolchains ran 24 ordinary Cargo checks, builds and test builds apiece, plus six same-command repeats. The workload reverses the real parser change for `from x import (*)`, tries invalid Rust, repairs it, then checks an independently empty build. The full target rosters, nonfresh sets and typed diagnostics agreed. Both compiled integration-test inventories agreed. On each reopened fixture binary all 558 tests passed on the original source. Exactly the intentionally mismatched snapshot failed on the edited source. [Comparison](corrected-ruff.json) · [Source change](https://github.com/astral-sh/ruff/commit/a50dc58628691ee00a21809e19bdea71958e4f3c)
