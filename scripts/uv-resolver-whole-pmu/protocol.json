@@ -1,0 +1,139 @@
+{
+  "argv": [
+    "check",
+    "-p",
+    "uv-resolver",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "arms": [
+    "signed",
+    "base",
+    "both"
+  ],
+  "build_head": "fd55208f72e2fbfaad9f4856109266805e85885a",
+  "build_run": 41323062793,
+  "calibrator": "2f413ca94b84af2dbd6d6231bcf8d860c97ebee8",
+  "case": {
+    "affected": "uv-workspace",
+    "child": "1979349b68dbaa936b98c0f409c1df0598fa72f1",
+    "name": "workspace-edit",
+    "parent": "b60da7ad468d5bb8a6b3dee7d7e54a47981f23c7",
+    "patch": "24852ea0d29fe8eb355f2a0d4eb682c54e53fa56af3d048635f4de9049925ecb",
+    "pr": 20988,
+    "seeds": [
+      232098801,
+      232098802
+    ]
+  },
+  "coverage": "Every scored PMU read requires raw positive instructions and time_running == time_enabled. Each mode uses a separate new cold A target, one unchanged A check, one genuine working-tree A to B edit and one unchanged B check.",
+  "dispatch_deadline_utc": "2026-11-04T00:00:00+00:00",
+  "donor_cargo": "39bf4510b889030a40c8c49611d9c6230566d37d",
+  "expected_first_dirty": [
+    "uv-distribution",
+    "uv-python",
+    "uv-resolver",
+    "uv-types",
+    "uv-workspace"
+  ],
+  "expected_unchanged_dirty": [
+    "uv-distribution",
+    "uv-python",
+    "uv-resolver",
+    "uv-types"
+  ],
+  "holds": [
+    20988061,
+    20988062
+  ],
+  "measured_cargo": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
+  "meter": "0b50022990577aadd904731e51c4d6c2a0f9b665",
+  "modes": [
+    "native",
+    "pmu"
+  ],
+  "observer": "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc",
+  "pilot": "5c651f1d38c629da2a75d5cac3588db0be8104d7",
+  "primary": "base/both inherited whole-command instructions",
+  "qualifier": "1286210a06dcc353a4f03dcf8c7bb15f99a56cad",
+  "sdk_artifacts": {
+    "base": {
+      "artifact_id": 13091302519,
+      "cargo_sha256": "747819e3aec82d19b4ffa2959b5e8ef19ed42448bcb7d3831e049019a6ed8092",
+      "compressed_bytes": 359874685,
+      "driver_sha256": "103da481979700c4093accbdf091bac852e41dc30f09cf64ded34acd623d8094",
+      "inner_sha256": "db76f899d8274d88755e90ecee34e666e7f9fe223732bbd9b25b354a89a1c0a7",
+      "job_id": 124897183905,
+      "launcher_sha256": "1b43428399974377542054eafbeb9590fc750f4f2d959d0eacd016f6031b5e5f",
+      "name": "rc23-trait-sdk-base",
+      "outer_sha256": "7cf6f47cdd9d34e0bbb4e7cdb21e4f1be16ee831fbb134d664d4a33cc923888d",
+      "rust_tree": "a18524fcb112ed12c7d38982033017d967f45031",
+      "source_commit": "83f22211d49b85daffa5f12f2a8b52d180a88993",
+      "source_tree": "a18524fcb112ed12c7d38982033017d967f45031"
+    },
+    "both": {
+      "artifact_id": 13091103580,
+      "cargo_sha256": "8440495dc12f2a0230aa041af8c2974f1f624e29fbf841eab5691b47ca429881",
+      "compressed_bytes": 359877961,
+      "driver_sha256": "23a3a59eea3e337bb8999a8e9e876f7c4568c81761455d2380c569832e42d5a7",
+      "inner_sha256": "90ded364e29bc06bc7fbf160d899de15de6fff7189e144a14c8ef57925a9366f",
+      "job_id": 124897183943,
+      "launcher_sha256": "c59737ebdcc331c79bea16771543483bd01433fbc59f39e6a4573381fea4ddc3",
+      "name": "rc23-trait-sdk-both",
+      "outer_sha256": "ab8b1807bed76881fb34930ceba36127b59ba093db50d54ad45a1b38d9735d3e",
+      "rust_tree": "ff59aa0d6e1b51593f63c1bc5b86e656799699cd",
+      "source_commit": "9c29c72b39941ffd9df30051c5014b76378545de",
+      "source_tree": "ff59aa0d6e1b51593f63c1bc5b86e656799699cd"
+    },
+    "nominal": {
+      "artifact_id": 13091781033,
+      "cargo_sha256": "7f6c3d66041f24caa8959b4657deeb487525c170acbb7d45ff68d97efcfe4bcd",
+      "compressed_bytes": 359907109,
+      "driver_sha256": "d419bde09af515f43635fc32a718a29d5bb61d972873a5d4ee5d2b0ccb57e593",
+      "inner_sha256": "7a53ec6c1f611bc5ddd7adf64a93a8bbfc8772c08e2b85cc713d9324414a99f1",
+      "job_id": 124897183700,
+      "launcher_sha256": "06eb3158e63a4e2b6d154d5169973bcb891510a906b2e63cf0269107701a31bb",
+      "name": "rc23-trait-sdk-nominal",
+      "outer_sha256": "f2ed21bc6d8924fe2801fafa526b9ae725573070fe5d2155033b3206d188ffa4",
+      "rust_tree": "5e6950a050583745e1f0d7d0b994fafccb9102d5",
+      "source_commit": "fcd7d5a0274e4dad7666c5e0b5816841c26126e4",
+      "source_tree": "5e6950a050583745e1f0d7d0b994fafccb9102d5"
+    }
+  },
+  "signed": {
+    "assets": {
+      "ohm-1.99.0-22-x86_64-unknown-linux-gnu-provenance.json": {
+        "digest": "sha256:0466305b42f3af0189acbb22da574df6f2eff1c0c631ea9305a23b5464a00c62",
+        "id": 698533756,
+        "size": 877
+      },
+      "ohm-1.99.0-22-x86_64-unknown-linux-gnu.tar.gz": {
+        "digest": "sha256:bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7",
+        "id": 698533704,
+        "size": 359852703
+      },
+      "ohm-1.99.0-22.json": {
+        "digest": "sha256:67a62c80e9ae1dda7650819511f2329add5db7a9ccf35ef7b1b9b64a314b18a2",
+        "id": 698533739,
+        "size": 973
+      }
+    },
+    "cargo": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
+    "cargo_sha256": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+    "coordinator": "8c7d5b4500fdfa6e2234417340aa190e5787e513",
+    "driver_sha256": "4c8ccf0072e8f382a3a3756fd60e46936a2bd206996201c55caffe58d29725db",
+    "launcher_sha256": "7e35096dab1b661924cb3c31982c870dd99c7c00a7fba28aa958f451e7c9474e",
+    "rust": "008a21ac0d750dc9a1c18b7959d7e7984c03d887",
+    "tag": "ohm-1.99.0-22"
+  },
+  "study": "whole resolver check after the real uv #20988 edit",
+  "supporting": [
+    "signed/both instructions",
+    "base/both native wall",
+    "signed/both native wall",
+    "signed/base for context"
+  ],
+  "target": "x86_64-unknown-linux-gnu",
+  "workflow_branch": "charlie/codex-uv-20988-whole-instructions"
+}

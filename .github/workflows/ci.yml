@@ -1,21 +1,23 @@
-name: Measure -23 trait lookup on two uv edits
-on:
+name: Whole-command instructions after the uv workspace edit
+run-name: Whole uv-resolver check hardware counts at ${{ inputs.reviewed_head }}
+'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
+        description: Exact reviewed coordinator experiment commit
         type: string
         required: true
-        description: Exact qualification commit
 permissions: {}
 jobs:
   measure:
-    name: Paired Linux uv timings and cache migration
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-trait-qualification' && github.sha == inputs.reviewed_head
+    name: Whole-command counters and separate native resolver checks
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-20988-whole-instructions' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 105
     permissions:
       contents: read
       actions: read
-    runs-on: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
-    timeout-minutes: 360
+      attestations: read
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PYTHONDONTWRITEBYTECODE: "1"
@@ -24,33 +26,76 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+          sparse-checkout: scripts/uv-resolver-whole-pmu
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
+          path: qualified
+          persist-credentials: false
+          sparse-checkout: scripts/rc23-trait-qualification
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
+          path: pilot
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ctfe-crossover-pilot
+            scripts/branch-return-pmu
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
+          path: calibrator
+          persist-credentials: false
+          sparse-checkout: scripts/gnu-renderer-pfc-hardware
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
+          path: observers
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/gnu-example-ceiling
+            scripts/gnu-renderer-library-workers
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
-          python-version: "3.13"
-      - name: Check out the public uv history
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+          python-version: '3.13'
+      - name: Test the registered design and calibrate the inherited userspace PMU
+        run: |
+          set -euo pipefail
+          python3 -IB scripts/uv-resolver-whole-pmu/controls.py
+          mkdir -p trait-results
+          python3 -IBu scripts/uv-resolver-whole-pmu/run.py calibrate 2>&1 | tee trait-results/calibration.log
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/uv
-          ref: 0bbcf757fdf19d43f52c38a5fc2e32a291c262ee
+          ref: 1979349b68dbaa936b98c0f409c1df0598fa72f1
           path: uv-src
+          fetch-depth: 2
           persist-credentials: false
-          fetch-depth: 0
-          fetch-tags: true
-      - name: Download the three previous release builds
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          run-id: 41323062793
-          github-token: ${{ github.token }}
-          pattern: rc23-trait-sdk-*
-          path: sdk-media
-      - name: Verify compiler identity and correctness, then time the edits
-        shell: bash
-        run: python3 -IBu scripts/rc23-trait-qualification/measure.py
-      - name: Preserve all raw observations, including failures
+      - name: Verify the official signed release and the three existing optimized SDKs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 -IBu scripts/uv-resolver-whole-pmu/intake.py 2>&1 | tee trait-results/intake.log
+      - name: Verify real native behaviors and the 12 balanced instruction and wall trios
+        run: |
+          set -euo pipefail
+          python3 -IBu scripts/uv-resolver-whole-pmu/run.py run 2>&1 | tee trait-results/experiment.log
+      - name: Preserve partial observer evidence on failure
+        if: always()
+        run: |
+          set -euo pipefail
+          partial="$RUNNER_TEMP/ohm-branch-object-qa/logs"
+          mkdir -p trait-results
+          if test -d "$partial" && ! test -d trait-results/pmu-calibration; then
+            cp -a "$partial" trait-results/pmu-calibration
+          fi
+      - name: Retain every raw stream, PMU calibration, counter and refusal
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: rc23-trait-measurements-attempt-${{ github.run_attempt }}
+          name: uv-20988-whole-command-${{ github.run_id }}-${{ github.run_attempt }}
           path: trait-results/
           if-no-files-found: warn
-          retention-days: 30
+          retention-days: 14
+          compression-level: 6
