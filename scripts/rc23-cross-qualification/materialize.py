@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory() as stage:
     root = Path(stage) / "toolchains"
     versions = root / "1.99.0"
     versions.mkdir(parents=True)
-    (root / "manifest.schema.json").write_bytes((reference / "toolchains/manifest.schema.json").read_bytes())
+    (root / "manifest.schema.json").write_bytes((published_root / "toolchains/manifest.schema.json").read_bytes())
     candidate = versions / "23.json"
     candidate.write_text(json.dumps(manifest, indent=2) + "\n")
     checked = published_path if arm == "base" else candidate

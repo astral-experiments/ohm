@@ -17,7 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         arm:
-          - base
           - cross
     runs-on: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
     timeout-minutes: 360
