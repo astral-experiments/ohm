@@ -15,8 +15,8 @@ from qualify import BIND, CHILD, PARENT, checksum, git, guard, need, save, verif
 WILD = "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
 RUSTUP = shutil.which("rustup")
 OLD_CARGO = "4591cf45cc10abb19d2456c40b99606e08167f29"
-DIRECT_PARENT = "1ca08234f134d8be51c11e3d804c595de5aff843"
-PARENT_TREE = "cf1f9b08f263c20e9d24c759dcc05927a2cee1fb"
+DIRECT_PARENT = "ab210821bfcb6363de19463e714cab3055ed2027"
+PARENT_TREE = "25412d211c95c780e62b492fe7549a2b28169245"
 
 
 def run(argv, env, **kw):
@@ -250,8 +250,10 @@ def qualify(w, repo, r, tmp, host):
     need(checksum(smoke_script) == BIND["release_files"][smoke_script.name][1], "changed release smoke")
     # The program exercises declared 0/2/0, then undeclared same-stat replacement, malformed input and repair.
     results = {}
+    published = tmp / "slot-published-22/sdk"
     for role, sdk, rust_revision, cargo, cargo_revision in (
         ("historical", old, PARENT, old / "bin/cargo", OLD_CARGO),
+        ("published-22", published, BIND["parent"], published / "bin/cargo", BIND["shipped_cargo"]),
         ("cargo-only", old, PARENT, new_cargo, BIND["trees"]["src/tools/cargo"]),
         ("rebased", candidate, CHILD, new_cargo, BIND["trees"]["src/tools/cargo"]),
     ):
@@ -265,6 +267,11 @@ def qualify(w, repo, r, tmp, host):
         if darwin:
             env["LLVM_PROFILE_FILE"] = str(work / "identity-and-smoke-%m.profraw")
         versions = identities(view, sdk, cargo, rust_revision, cargo_revision, host, env, folder / (role + "-identity"))
+        if role == "published-22":
+            original = json.loads((r / "slot-published-22/complete.json").read_bytes())
+            need(all(versions[k]["sha256"] == original["versions"][k]["sha256"] for k in ("cargo", "rustc", "driver")), "different published native tools")
+        if role == "rebased":
+            need(BIND["candidate_toolchain"] in versions["rustc"]["version"].splitlines()[0], "different candidate toolchain description")
         save(folder / (role + "-tools.json"), versions)
         project = work / "project"
         got = smoke(smoke_script, role, project, folder, env, role == "historical")

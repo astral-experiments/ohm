@@ -1,4 +1,4 @@
-name: Checked worktree paths, native GNU linking, graph recovery and Darwin Diesel
+name: Ready tests, worktree paths, native GNU linking and Darwin Diesel
 'on':
   workflow_dispatch:
     inputs:
@@ -30,7 +30,7 @@ jobs:
       actions: read
     env:
       OHM_TARGET: ${{ matrix.host }}
-      OHM_TOOLCHAIN: ohm-1.99.0-22
+      OHM_TOOLCHAIN: ohm-1.99.0-23
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
@@ -39,7 +39,7 @@ jobs:
       with:
         persist-credentials: false
         ref: ${{ github.sha }}
-        fetch-depth: 3
+        fetch-depth: 4
     - name: Make room for macOS profile training
       if: runner.os == 'macOS' && runner.environment == 'github-hosted'
       run: ./scripts/prepare-hosted-macos-release.sh
@@ -103,9 +103,9 @@ jobs:
       run: |-
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
-        test "$(git rev-parse HEAD^)" = 5d953aef3b91bf11bfd8d988bff3398ac98c43d2
-        test "$(git rev-parse HEAD~2)" = 0e5fc7cc7e4db398884d782be6049d83eda0ae08
-        git diff --exit-code HEAD~2 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
+        test "$(git rev-parse HEAD^)" = 2b1f27d5211e65df4e4fe2f58cd1e474289d2c43
+        test "$(git rev-parse HEAD~3)" = 0e5fc7cc7e4db398884d782be6049d83eda0ae08
+        git diff --exit-code HEAD~3 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
         (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
         (cd scripts/dep-graph-slots && shasum -a 256 --check SHA256SUMS && python3 -IB test_slots.py && python3 -IB gnu-defaults/test_cases.py)
@@ -147,7 +147,7 @@ jobs:
       run: python3 -IB scripts/dep-graph-slots/release_smoke.py original-proxies
     - name: Install matching LLVM tools for native PGO
       env:
-        MANIFEST_PATH: toolchains/1.99.0/22.json
+        MANIFEST_PATH: toolchains/1.99.0/23.json
       run: |
         case "$(jq -er '.release.upstream_rust_version' "$MANIFEST_PATH")" in
           1.97.* | 1.98.*) exit 0 ;;
@@ -188,7 +188,7 @@ jobs:
       if: runner.os == 'macOS'
     - name: Prepare pinned Wild linker
       env:
-        MANIFEST_PATH: toolchains/1.99.0/22.json
+        MANIFEST_PATH: toolchains/1.99.0/23.json
       run: |
         wild_directory="$(python3 scripts/prepare-wild.py \
           "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
@@ -201,7 +201,7 @@ jobs:
     - name: Run the original optimized release command through all rustc PGO benchmarks
       id: natural
       continue-on-error: true
-      run: python3 -IB scripts/darwin-pgo-diesel/supervise.py
+      run: python3 -IB scripts/dep-graph-slots/qualify.py natural
       if: runner.os == 'macOS'
     - name: Escrow original collector workspace and graph bytes before any diagnostic compiler
       id: escrow
@@ -236,9 +236,15 @@ jobs:
       run: python3 -IB scripts/dep-graph-slots/qualify.py native
       id: matrix
       if: success() && (steps.linux_rmake.outcome == 'success' || steps.darwin_collectors.outcome == 'success')
+    - name: Authenticate and privately install the actual published -22 native comparison
+      id: published
+      run: python3 -IB scripts/dep-graph-slots/published.py
+      env:
+        GH_TOKEN: ${{ github.token }}
+      if: success() && steps.matrix.outcome == 'success'
     - name: Run the merged declared and undeclared provider smoke with each native tool pair
       id: links
-      if: success() && steps.matrix.outcome == 'success'
+      if: success() && steps.published.outcome == 'success'
       run: python3 -IB scripts/dep-graph-slots/release_smoke.py
     - name: Compare a transitive GNU provider with its independent empty native links
       id: transitive
@@ -256,14 +262,25 @@ jobs:
       run: python3 -IB scripts/dep-graph-slots/qualify.py rmake
       id: darwin_rmake
       if: success() && runner.os == 'macOS' && steps.matrix.outcome == 'success'
+    - name: Run the source test through installed Cargo and a real foreground Bash on this host
+      id: ready
+      run: python3 -IB scripts/dep-graph-slots/ready_terminal.py
+      if: success() && steps.worktrees.outcome == 'success'
+    - name: Reopen the native worktree and terminal binaries from the recorded originals
+      id: reopened
+      run: python3 -IB scripts/dep-graph-slots/read_paths.py source/reports
+      if: success() && steps.ready.outcome == 'success'
     - name: Require the complete native outcome on the enrolled platform
       run: |-
         set -euo pipefail
         test "$SOURCE" = success
         test "$PROXIES" = success
+        test "$PUBLISHED" = success
         test "$MATRIX" = success
         test "$LINKS" = success
         test "$WORKTREES" = success
+        test "$READY" = success
+        test "$REOPENED" = success
         if test "$RUNNER_OS" = macOS; then
           test "$NATURAL" = success && test "$ESCROW" = success && test "$COLLECTORS" = success && test "$APPLE_RMAKE" = success
         else
@@ -273,8 +290,11 @@ jobs:
       shell: bash
       env:
         WORKTREES: ${{ steps.worktrees.outcome }}
+        REOPENED: ${{ steps.reopened.outcome }}
+        READY: ${{ steps.ready.outcome }}
         SOURCE: ${{ steps.source.outcome }}
         PROXIES: ${{ steps.proxies.outcome }}
+        PUBLISHED: ${{ steps.published.outcome }}
         MATRIX: ${{ steps.matrix.outcome }}
         LINKS: ${{ steps.links.outcome }}
         TRANSITIVE: ${{ steps.transitive.outcome }}

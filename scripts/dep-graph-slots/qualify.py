@@ -21,7 +21,7 @@ BIND = json.loads((HERE / "source.json").read_bytes())
 GIB = 1 << 30
 PARENT = BIND["historical_distribution_source"]
 CHILD = BIND["candidate"]
-ANCHOR = "5d953aef3b91bf11bfd8d988bff3398ac98c43d2"
+ANCHOR = "2b1f27d5211e65df4e4fe2f58cd1e474289d2c43"
 TEST = "tests/run-make/incremental-missing-query-cache"
 HOSTS = {"Linux": "x86_64-unknown-linux-gnu", "Darwin": "aarch64-apple-darwin"}
 BRANCH = "charlie/qa-rc22-worktree-native-20261101"
@@ -93,11 +93,15 @@ def source_catalog(repo):
     graph = q["graph_candidate"]
     prior = q["prior_native"]
     last = q["last_native"]
-    need(
-        git(repo, "rev-parse", CHILD + "^", CHILD + "^{tree}", last["rust"] + "^", last["rust"] + "^{tree}", prior["rust"] + "^", prior["rust"] + "^{tree}", graph + "^", graph + "^{tree}", q["parent"] + "^{tree}").splitlines()
-        == [last["rust"], q["candidate_full_tree"], prior["rust"], last["rust_tree"], graph, prior["rust_tree"], q["parent"], q["graph_candidate_tree"], q["parent_full_tree"]],
-        "wrong complete Rust trees",
-    )
+    worktree = q["worktree_native"]
+    expected = [(graph, q["graph_candidate_tree"]), (prior["rust"], prior["rust_tree"]),
+                (last["rust"], last["rust_tree"]), (worktree["rust"], worktree["rust_tree"]),
+                (CHILD, q["candidate_full_tree"])]
+    parent = q["parent"]
+    need(git(repo, "rev-parse", parent + "^{tree}") == q["parent_full_tree"], "wrong base Rust tree")
+    for commit, tree in expected:
+        need(git(repo, "rev-parse", commit + "^", commit + "^{tree}").splitlines() == [parent, tree], "wrong Rust ancestry or tree")
+        parent = commit
     previous = q["previous_slot_parent"]
     need(
         git(
@@ -113,7 +117,8 @@ def source_catalog(repo):
         (q["previous_slot_candidate"], graph, old_cargo, q["shipped_cargo"]),
         (graph, prior["rust"], q["shipped_cargo"], prior["cargo"]),
         (prior["rust"], last["rust"], prior["cargo"], last["cargo"]),
-        (last["rust"], CHILD, last["cargo"], q["trees"]["src/tools/cargo"]),
+        (last["rust"], worktree["rust"], last["cargo"], worktree["cargo"]),
+        (worktree["rust"], CHILD, worktree["cargo"], q["trees"]["src/tools/cargo"]),
     ]:
         raw = f":160000 160000 {before} {after} M\tsrc/tools/cargo"
         need(
@@ -159,10 +164,10 @@ def cargo_catalog(repo):
         need(git(repo, "rev-list", "--parents", "-1", commit).split() == [commit, parent],
              "unexpected Cargo ancestry")
         parent = commit
-    for commit, changed in q["worktree_changes"].items():
-        need(git(repo, "diff", "--name-only", commit + "^", commit).splitlines() == sorted(changed), "unexpected worktree delta")
+    for commit, changed in (q["worktree_changes"] | q["ready_changes"]).items():
+        need(git(repo, "diff", "--name-only", commit + "^", commit).splitlines() == sorted(changed), "unexpected source delta")
         for name, pair in changed.items():
-            need(git(repo, "rev-parse", commit + "^:" + name, commit + ":" + name).splitlines() == pair, "wrong worktree source blob in " + name)
+            need(git(repo, "rev-parse", commit + "^:" + name, commit + ":" + name).splitlines() == pair, "wrong source blob in " + name)
     files = q["cargo_changed_blobs"]
     need(git(repo, "diff", "--name-only", shipped, child).splitlines() == sorted(files),
          "unregistered Cargo source file")
@@ -201,6 +206,8 @@ def install_source(w, repo, r):
         (cargo, "cargo-cc-spelling.pack"),
         (repo, "rust-worktree-pin.pack"),
         (cargo, "cargo-worktrees.pack"),
+        (repo, "rust-ready-pin.pack"),
+        (cargo, "cargo-ready.pack"),
     ]:
         with (assets / name).open("rb") as stream:
             subprocess.run(
@@ -221,9 +228,9 @@ def install_source(w, repo, r):
         )
         (root / "manifest.schema.json").symlink_to(schema)
         (root / "1.99.0").mkdir()
-        manifest = root / "1.99.0/22.json"
-        for name in ("22.json", "candidate-22.json"):
-            if name == "candidate-22.json":
+        for name in ("22.json", "23.json"):
+            manifest = root / "1.99.0" / name
+            if name == "23.json":
                 git(repo, "checkout", "--quiet", "--detach", CHILD)
                 git(cargo, "checkout", "--quiet", "--detach", BIND["trees"]["src/tools/cargo"])
                 need(git(w, "hash-object", assets / name) == BIND["candidate_packaging"]["manifest_blob"],
@@ -236,6 +243,10 @@ def install_source(w, repo, r):
             )
             (r / ("verify-" + name + ".log")).write_bytes(result.stdout + result.stderr)
             result.check_returncode()
+    configured = w / "toolchains/1.99.0/23.json"
+    with configured.open("xb") as file:
+        file.write((assets / "23.json").read_bytes())
+    need(checksum(configured) == BIND["release_files"]["23.json"][1], "wrong native build manifest")
     # The production installer replaces two tracked Rust subtrees with separately pinned
     # release tool repositories. Keep the outer view before validating the complete layout.
     status = layout.git(repo, "status", "--porcelain", "-z", "--untracked-files=no", "--ignore-submodules=all")
@@ -290,6 +301,8 @@ def rmake(w, repo, r, host):
         "rust.channel=dev",
         "--set",
         "rust.omit-git-hash=false",
+        "--set",
+        "build.description=" + BIND["candidate_toolchain"],
         "--set",
         "rust.debug-assertions=false",
         "--set",
@@ -654,9 +667,19 @@ def validate_native(folder, role, mixed, allow_proxy=False, execute=True):
     }
 
 
+def natural(w, repo, r, host):
+    """Run the original release build and stop only at its complete profile checkpoint."""
+    verify_live(repo)
+    need(host == "aarch64-apple-darwin" and os.environ["OHM_TOOLCHAIN"] == BIND["candidate_toolchain"], "wrong native PGO toolchain")
+    sys.path.insert(0, str(HERE.parent / "darwin-pgo-diesel"))
+    from supervise import run_child
+    args = [str(w / "scripts/build-optimized-dist.sh"), host, BIND["candidate_toolchain"], str(repo), str(w / "release/bootstrap.toml")]
+    return run_child(args, w, r / "diesel-pgo")
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("action", choices=["source", "catalog", "rmake", "mac", "native", "read"])
+    p.add_argument("action", choices=["source", "catalog", "rmake", "mac", "native", "natural", "read"])
     p.add_argument("repo", type=Path, nargs="?")
     p.add_argument("--role", choices=["parent", "candidate"])
     p.add_argument("--mixed", action="store_true")
@@ -680,6 +703,8 @@ if __name__ == "__main__":
         w, repo, r, tmp, host = guard()
         if a.action == "source":
             install_source(w, repo, r)
+        elif a.action == "natural":
+            raise SystemExit(natural(w, repo, r, host))
         elif a.action == "rmake":
             rmake(w, repo, r, host)
         elif a.action == "mac":

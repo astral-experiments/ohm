@@ -20,6 +20,7 @@ from graph_forensics import read, record
 import native
 import qualify
 import release_smoke
+import published
 
 
 def refuse(call, message):
@@ -31,6 +32,19 @@ def refuse(call, message):
 
 
 def cases():
+    live = copy.deepcopy(published.REGISTER)
+    live["draft"] = False
+    for asset in live["assets"]:
+        asset["state"] = "uploaded"
+    tag = {"ref":"refs/tags/" + published.TAG,"object":{"type":"commit", "sha":qualify.BIND["release_coordinator"]}}
+    for host in qualify.HOSTS.values():
+        accepted = published.admit(live, tag, host)
+        assert len(accepted) == 5 and accepted[published.TAG + "-" + host + ".tar.gz"]["size"] > 200_000_000
+        bad = copy.deepcopy(live)
+        next(a for a in bad["assets"] if a["name"].endswith(host + ".tar.gz"))["digest"] = "sha256:" + "0" * 64
+        refuse(lambda: published.admit(bad, tag, host), "changed official distribution bytes")
+        refuse(lambda: published.admit(live | {"draft":True}, tag, host), "draft release")
+        refuse(lambda: published.admit(live, tag | {"object":{"type":"commit", "sha":qualify.CHILD}}, host), "different published tag")
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         installed = root / "bin"
@@ -51,15 +65,18 @@ def cases():
         refuse(lambda: release_smoke.named_proxies(root / "missing", installed / "rustup"), "missing Cargo entrypoint")
 
     env = qualify.BIND
-    assert env["candidate"] == "494d4afc2e0b2e995000d345c8bfef4e2a4c6e3e"
+    assert env["candidate"] == "6318c9795bf996860175bb3396be8673fb5952b5"
+    assert env["worktree_native"]["rust"] == "494d4afc2e0b2e995000d345c8bfef4e2a4c6e3e"
     assert env["last_native"]["rust"] == "0c66092268115dc8cc72c6f2046bd7430ff45691"
     assert env["prior_native"]["rust"] == "dc70b47e9ff1926562626246bf996b824a456259"
     assert env["graph_candidate"] == "1686aef9877e0c95faddf6f9c313e451a9744f29"
-    assert env["cargo_commits"][-1] == env["trees"]["src/tools/cargo"] == "1a548e9b728fa43780dc9bb94578108824f402d4"
+    assert env["cargo_commits"][-1] == env["trees"]["src/tools/cargo"] == "fd98ecd186d2bb8d8e0455561c4257e90e1bff02"
     assert set(env["cargo_changed_blobs"]) == {"src/compiler/native_link/declared.rs", "src/compiler/native_link/mod.rs",
             "src/compiler/build_runner/compilation_files.rs", "src/compiler/mod.rs", "src/ops/cargo_worktree/mod.rs",
-            "tests/testsuite/ohm_worktree.rs", "tests/testsuite/rustflags.rs"}
-    assert list(sorted(env["worktree_changes"])) == list(sorted(env["cargo_commits"][-2:]))
+            "tests/testsuite/ohm_worktree.rs", "tests/testsuite/rustflags.rs", "src/ops/cargo_test/ready_test_process.rs",
+            "src/ops/cargo_test/ready_tests.rs", "tests/testsuite/ohm_ready_tests.rs"}
+    assert set(env["ready_changes"]) == set(env["cargo_commits"][-2:])
+    assert set(env["worktree_changes"]) == set(env["cargo_commits"][-4:-2])
     assert env["parent"] == "008a21ac0d750dc9a1c18b7959d7e7984c03d887"
     assert env["previous_slot_candidate"] == "c0b318301965619c2cbd4b261ff3de84fac6831b"
     assert env["release_coordinator"] == "8c7d5b4500fdfa6e2234417340aa190e5787e513"
@@ -74,8 +91,10 @@ def cases():
         == env["shipped_cargo"]
         == "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770"
     )
-    candidate = json.loads((assets / "candidate-22.json").read_bytes())
-    assert env["candidate_packaging"] == {"commit":"3eb15b6902ced4d4be9cec1c303e1769a1548536", "manifest_blob":"4fb5b8519905e77a6760f9388614b10bd95d0539"}
+    candidate = json.loads((assets / "23.json").read_bytes())
+    assert candidate["release"]["toolchain_name"] == env["candidate_toolchain"] == "ohm-1.99.0-23"
+    assert manifest["release"]["toolchain_name"] == "ohm-1.99.0-22"
+    assert env["candidate_packaging"] == {"commit":"99aaccb2f2eb778831a7522d5b8542d7ddac7f29", "manifest_blob":"fbfe9bf54e4bd366dfa6e6e6db30a2a9aaf40a86"}
     assert {k: v["revision"] for k,v in candidate["sources"].items()} == {
         **{k:v["revision"] for k,v in manifest["sources"].items()}, "rust":env["candidate"], "cargo":env["trees"]["src/tools/cargo"]}
     assert env["release_files"]["smoke-test-relink.sh"] == [

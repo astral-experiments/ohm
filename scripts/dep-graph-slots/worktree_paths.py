@@ -279,14 +279,12 @@ def main():
     states = {}
     with tempfile.TemporaryDirectory(prefix="ohm-release-worktree-", dir=tmp) as t:
         root = Path(t).resolve()
-        for key, sdk in [("historical", link / "historical/sdk"), ("rebased", link / "sdk")]:
+        for key, sdk, rust, cargo in [
+            ("historical", link / "historical/sdk", PARENT, "4591cf45cc10abb19d2456c40b99606e08167f29"),
+            ("published-22", link / "published-22/sdk", BIND["parent"], BIND["shipped_cargo"]),
+            ("rebased", link / "sdk", CHILD, BIND["trees"]["src/tools/cargo"]),
+        ]:
             versions = prior["results"][key]["versions"]
-            rust = CHILD if key == "rebased" else PARENT
-            cargo = (
-                BIND["trees"]["src/tools/cargo"]
-                if key == "rebased"
-                else "4591cf45cc10abb19d2456c40b99606e08167f29"
-            )
             need(
                 "commit-hash: " + rust in versions["rustc"]["version"].splitlines()
                 and "commit-hash: " + cargo in versions["cargo"]["version"].splitlines(),
