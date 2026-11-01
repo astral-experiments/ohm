@@ -172,16 +172,17 @@ check_links() {
     exit 1
   fi
 }
-write_archive 17
-cargo +"$toolchain" build --bins --offline
-check_links 17 0
-write_archive 29
-check_links 29 2
-check_links 29 0
+check_declared_archive() {
+  write_archive 17
+  cargo +"$toolchain" build --bins --offline
+  check_links 17 0
+  write_archive 29
+  check_links 29 2
+  check_links 29 0
+}
+check_declared_archive
 
-# A library with the compiler's native-link marker can require a relink even
-# when the build script reports no changes. Replace the archive at the same
-# path, preserving its inode and modification time.
+# Register-only assembly makes rustc mark this dependency for native-link rechecks.
 cat >engine/src/lib.rs <<'EOF'
 pub fn register(value: usize) -> usize {
     unsafe {
@@ -190,6 +191,11 @@ pub fn register(value: usize) -> usize {
     value
 }
 EOF
+# An unchanged marked dependency must also skip both links when the archive is declared.
+export CARGO_TARGET_DIR="$PWD/marked-declared-target" CARGO_BUILD_BUILD_DIR="$PWD/marked-declared-build"
+check_declared_archive
+
+# Leave the archive off the build script's watch list and preserve its inode and timestamp.
 write_build_script build.rs
 export CARGO_TARGET_DIR="$PWD/marked-target" CARGO_BUILD_BUILD_DIR="$PWD/marked-build"
 write_archive 17
