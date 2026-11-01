@@ -53,7 +53,7 @@ def stage(name,value):
             if Path(exe).name not in ldnames:continue
             args=ast.literal_eval('['+argv+']')
             if '-o' not in args:continue
-            out=args[args.index('-o')+1];b=re.fullmatch(r'(first|second)-[0-9a-f]+',Path(out).name)
+            out=args[args.index('-o')+1];b=re.fullmatch(r'(first|second)(?:-[0-9a-f]+)?',Path(out).name) if Path(out).is_relative_to(root/'target') else None
             if b:events.append(dict(pid=f.suffix[1:],exe=exe,output=out));targets.add(b[1])
     if name in ('initial','changed'):assert targets=={'first','second'},(name,events)
     records.append(dict(stage=name,values=values,links=events,outputs=sorted(targets)))

@@ -2,6 +2,7 @@ name: CI
 on:
   workflow_dispatch:
     inputs:
+      gnu_only: {description: Only the Linux tracer, type: boolean, default: false}
       expected_head: {description: Exact reviewed commit, type: string, required: true}
 permissions: {contents: read, actions: read}
 jobs:
@@ -33,7 +34,7 @@ jobs:
           if-no-files-found: error
   apple-graph:
     name: Replay the optimized Diesel edit on matched Apple compilers
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22-observe-gnu-native-links' && github.sha == inputs.expected_head && github.run_attempt == 1
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22-observe-gnu-native-links' && github.sha == inputs.expected_head && github.run_attempt == 1 && !inputs.gnu_only
     runs-on: namespace-profile-macos-15
     timeout-minutes: 240
     env:
