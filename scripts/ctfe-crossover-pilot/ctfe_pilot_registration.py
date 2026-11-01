@@ -1,4 +1,4 @@
-"""Immutable past controls, fresh boot and official archive enrollment for the two v2 modes."""
+"""Immutable past controls, fresh boot and official archive enrollment for the two schema-3 modes."""
 import hashlib
 import json
 from pathlib import Path
@@ -6,16 +6,20 @@ import re
 
 HERE = Path(__file__).resolve().parent
 REPO = 'astral-experiments/ohm'
-BRANCH = 'charlie/qa-ctfe-v2-pilot-20261101'
+BRANCH = 'charlie/qa-ctfe-v3-pilot-20261101'
 BASE = '5c651f1d38c629da2a75d5cac3588db0be8104d7'
-OBSERVER = 'd4e1c4bac917a2de3218c13c50875b5c2d301a23'
-OBSERVER_MANIFEST = '89c34159602f33bf865477be9b69eadbaf2460e8b1bbc7602b500c63703bcdc0'
-SOURCE = '9a7df0422b9cba724b612fe2e0a07e218cd6ae26be9171f5cdd9755d3db54054'
-READER = '6303e38aad48eec1924a4015aa9a8f7387009fdd269d4e0bed189345a11f4238'
+OBSERVER = '19f9a67b032cce44cea1e3bb7e324558cd9abd0a'
+OBSERVER_MANIFEST = 'dd9079b8bbe00593142dde1def8862a2d1f5d2cb04e6445e2f056f56dbff3292'
+SOURCE = '3e859dbcd5456d8a1cac6fcd320dcff9540e07c9e5ccf766b5c43b4a7087ede1'
+READER = '99ce628b4cd2e422857f9b4ac9dd59b135cd6c306848b09b0cbdfe7a6d856b41'
 PROJECTOR = '5e91ed3974c0964a912fd38049946f647891dcb2'
 SCREEN = 41285793847
 SCREEN_HEAD = '28fe14afcf485bc99e7bd9036d9b4f4bb990ce86'
 PREVIOUS = {
+    41291100905: ('c652a1a6-da1c-4698-b416-cd02e2b88e9a', '5d0531b9-cfc3-4e08-878a-6c03ee6d2b7f'),
+    41289369980: ('453a4e51-5e63-4b02-8ef3-aed22a5656be',),
+    41290140885: ('d9365602-cd3f-4d2b-8f31-db6e012cab0a', '6af97d29-b3f0-4134-907c-c1f970c0816a'),
+    41289034546: ('464040f9-d0d7-4d3a-ba23-06a9a898b0f4', '66b96dca-6f95-4fde-aa78-ce2ebc5c959a'),
     41283234972: ('4f4d4a31-68c1-447b-9909-8f4c951d6d82', 'c9fb2eab-3d98-4154-b864-cfac6df82005'),
     SCREEN: ('61149494-93be-4462-8cec-12fa66623bc7', '364da3c4-7589-4095-b2e6-efeddb2cf64f'),
     41200174886: ('cf938e9c-a8d2-4a0d-8260-fb5f89d89d65', '3b0e4081-536a-4f6a-a945-674825be2329'),
@@ -23,7 +27,7 @@ PREVIOUS = {
 }
 STEP_SOURCE = 'Reconstruct both 81-file compiler installations using original source artifacts'
 STEP_RUN = 'Run the enrolled ordinary Ruff visits'
-STEP_INTAKE = 'Independently verify the official v2 contact'
+STEP_INTAKE = 'Independently verify the official v3 contact'
 SCREEN_FILES = {'independent.json':'fe8fbf97dcb1416069be2f02d3c593fa7dd99e37185c6bd41baafb1aba2ad2e4',
                 'summary.json':'fef729df7be0705ffc5a105e7920cc8ed6aab74cf72cfbceb62fb52e04425a05'}
 
@@ -73,8 +77,8 @@ def official(directory, run, head, mode, files=None):
         require(len(files) == len(positions), 'incomplete supplied original archives')
     result = []
     for i, pos in enumerate(positions):
-        j, = (x for x in js['jobs'] if x['name'] == f'CTFE v2 {mode} {pos}')
-        a, = (x for x in ar['artifacts'] if x['name'] == f'ctfe-v2-{mode}-{pos}')
+        j, = (x for x in js['jobs'] if x['name'] == f'CTFE v3 {mode} {pos}')
+        a, = (x for x in ar['artifacts'] if x['name'] == f'ctfe-v3-{mode}-{pos}')
         steps = {s['name']: (s['status'],s['conclusion']) for s in j['steps']}
         needed = [STEP_SOURCE,STEP_RUN] + ([STEP_INTAKE] if mode == 'full-pilot' else [])
         require((j['run_id'],j['head_sha'],j['run_attempt'],j['status'],j['conclusion']) ==
@@ -121,5 +125,22 @@ def wild_helpers(raw, wild_rows):
             owner = int(f[1])
             require(len(peers[owner]) == int(f[3]), 'uncounted Wild peer')
             groups[owner]['parked'] = sorted(peers[owner])
-    # The schema-2 parser separately verifies the witnessed X/T of every owner and parked peer.
+    # The process-family parser separately verifies the witnessed X/T of every owner and parked peer.
     return [g for g in groups.values() if g.get('parked')]
+
+
+def compiler_groups(raw, rustcs):
+    """Attribute fully stopped groups to the installed rustc in a previously closed raw ledger."""
+    by_install = {(r['lifetime'], r['event']): r for r in rustcs}
+    groups = {}
+    for line in raw.splitlines():
+        f = line.split(b'\t', 5)
+        if f[0] == b'H':
+            owner, pid, status, ordinal = map(int, f[1:])
+            r = by_install.get((owner, ordinal))
+            if r is not None:
+                require(r['pid']==pid, 'different compiler group leader')
+                groups[owner] = dict(owner=owner,pid=pid,event=ordinal,status=status,crate=r['crate'])
+        elif f[0] == b'V' and int(f[1]) in groups:
+            groups[int(f[1])]['workers'] = int(f[3])
+    return [g for g in groups.values() if g['workers'] > 0]

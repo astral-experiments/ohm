@@ -1,5 +1,5 @@
-name: Qualify whole Ruff branch returns with the schema-2 native observer
-run-name: CTFE v2 ${{ inputs.mode }} ${{ inputs.reviewed_head }}
+name: Qualify whole Ruff branch returns with the schema-3 native observer
+run-name: CTFE v3 ${{ inputs.mode }} ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -29,10 +29,10 @@ permissions:
   contents: read
 jobs:
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-v2-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-v3-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
-    name: CTFE v2 ${{ inputs.mode }} ${{ matrix.position }}
+    name: CTFE v3 ${{ inputs.mode }} ${{ matrix.position }}
     strategy:
       fail-fast: false
       matrix:
@@ -80,7 +80,7 @@ jobs:
             scripts/ohm-apple-zmij/source-transport
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: d4e1c4bac917a2de3218c13c50875b5c2d301a23
+          ref: 19f9a67b032cce44cea1e3bb7e324558cd9abd0a
           path: kernel
           persist-credentials: false
           sparse-checkout: |
@@ -135,13 +135,13 @@ jobs:
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
-      - name: Independently verify the official v2 contact
+      - name: Independently verify the official v3 contact
         if: inputs.mode == 'full-pilot'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/ctfe-crossover-pilot/contact_review.py acquire --run "$CONTACT_RUN" --head "$REVIEWED_HEAD" --sha256 "$CONTACT_SHA256" --readback-sha256 "$CONTACT_READBACK_SHA256" --observer-source "$GITHUB_WORKSPACE/kernel" --output "$RUNNER_TEMP/ohm-branch-object-qa/logs/prior-v2-contact.json"
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/contact_review.py acquire --run "$CONTACT_RUN" --head "$REVIEWED_HEAD" --sha256 "$CONTACT_SHA256" --readback-sha256 "$CONTACT_READBACK_SHA256" --observer-source "$GITHUB_WORKSPACE/kernel" --output "$RUNNER_TEMP/ohm-branch-object-qa/logs/prior-v3-contact.json"
       - name: Reconstruct both 81-file compiler installations using original source artifacts
         env:
           GH_TOKEN: ${{ github.token }}
@@ -160,7 +160,7 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ctfe-v2-${{ inputs.mode }}-${{ matrix.position }}
+          name: ctfe-v3-${{ inputs.mode }}-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

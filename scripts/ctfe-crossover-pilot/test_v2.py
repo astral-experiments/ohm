@@ -71,6 +71,19 @@ def main(repo):
         fails(curr.parse,b''.join(lines[:ix]+lines[ix+1:]),expected_schema=2)
     footer=raw.splitlines(keepends=True)
     fails(curr.parse,b''.join(footer[:-1])+b'OK\t0\t1\t4\t3\t4\t0\t1\t0\n',expected_schema=2)
+    # A separate installed-image fixture has eight parked threads and no forked Wild image.
+    fails(curr.parse,raw,expected_schema=3)
+    installed=gzip.decompress((HERE/'enrollment/installed-v3-local.tsv.gz').read_bytes())
+    installed_ledger=curr.parse(installed,expected_code=37,expected_schema=3)
+    installed_image,=installed_ledger['execs']
+    row=dict(lifetime=installed_image['lifetime'],event=installed_image['ordinal'],pid=installed_image['pid'],
+             crate='installed_fixture')
+    g,=reg.compiler_groups(installed,[row])
+    assert g==dict(owner=row['lifetime'],pid=row['pid'],event=row['event'],status=37,crate='installed_fixture',workers=8)
+    assert not reg.wild_helpers(installed,[]) and not reg.compiler_groups(raw,[row])
+    assert not reg.compiler_groups(installed,[dict(row,event=row['event']+1)])
+    fails(reg.compiler_groups,installed,[dict(row,pid=row['pid']+1)])
+    fails(curr.parse,installed,expected_schema=2)
     for boots in reg.PREVIOUS.values():
         for boot in boots:
             fails(reg.fresh,boot)

@@ -23,8 +23,8 @@ import replay_elf
 import replay_metrics as metrics
 import replay_native
 
-KERNEL = {"kernel_projection.py": "2dbd95558e3455d21f55877d8779aaa05da755fd80e980794074ceb4717a1b53",
-          "read_events.py": "6303e38aad48eec1924a4015aa9a8f7387009fdd269d4e0bed189345a11f4238"}
+KERNEL = {"kernel_projection.py": "fb3f2f38d0ef14eb99c4456f668837e5367f032243747e1ee1192bcc724d4ecf",
+          "read_events.py": reg.READER}
 for name, expected in KERNEL.items():
     metrics.need(metrics.sha((HERE / "kernel-review" / name).read_bytes()) == expected, "wrong kernel reader " + name)
 import kernel_projection as kernel
@@ -134,7 +134,7 @@ def kernel_fixtures(z, base, source):
     for name, code in pos.items():
         raw = z.read(base + "/original/" + name + ".tsv")
         record = q["native"]["positive"][name]
-        checked = kernel.parse(raw, code, record["sha256"], expected_schema=2)
+        checked = kernel.parse(raw, code, record["sha256"], expected_schema=3)
         require(all(checked[k] == record[k] for k in ("code", "lifetimes", "reaped", "displaced", "spawned", "images"))
                 and len(checked["execs"]) == record["image_installs"], "different physical fixture closure")
     for name in refused:
@@ -143,7 +143,7 @@ def kernel_fixtures(z, base, source):
         require(digest(bad) == q["native"]["negative"][name] and bad.splitlines()[-1].split(b"\t")[:2] == [b"REFUSE", reason],
                 "wrong escape negative")
         try:
-            kernel.parse(bad, expected_schema=2)
+            kernel.parse(bad, expected_schema=3)
         except kernel.Refused:
             continue
         raise ValueError("accepted an escaped process family")
@@ -163,10 +163,10 @@ def kernel_binding(z, boot, mode, source, prior):
             and b["fixtures_sha256"] == digest(z.read(base + "/fixtures/qualified.json")), "wrong enrolled kernel history")
     group = kernel_fixtures(z, base + "/fixtures", source)
     reg.fresh(boot, [b["official"]["boot"]] + ([prior["boot"]] if prior else []))
-    require(b["mode"] == mode and b["prior_v2"] == (prior["official"] if prior else None) and
+    require(b["mode"] == mode and b["prior_v3"] == (prior["official"] if prior else None) and
             ((mode == "full-pilot") == (prior is not None)) and
             b["group_fixtures_sha256"] == digest(z.read(base + "/fixtures/group-v2/qualified.json")) and
-            group["schema"] == 2 and group["qualified"] is True and group["boot"] == boot and
+            group["schema"] == 3 and group["qualified"] is True and group["boot"] == boot and
             group["kernel"] == dataset(z,"host.json")["platform"]["release"] and
             group["observer_sha256"] == b["observer_sha256"] == digest(z.read(base + "/fixtures/observe.elf")) and
             (not prior or prior["observer_sha256"] == b["observer_sha256"]) and
@@ -209,7 +209,7 @@ def physical(z, prefix, arm, cert, cmd, expected):
     raw = gzip.decompress(z.read(prefix + "/kernel.tsv.gz"))
     life = dataset(z, prefix + "/lifecycle.json")
     rows, closed = kernel.classify(raw, catalog, tuple(proxy["paths"]), CARGO, arm, expected, cmd["cwd"], life["sha256"])
-    require(closed["schema"] == 2 and life == {k: len(v) if isinstance(v, list) else v for k, v in closed.items()}, "unclosed process family")
+    require(closed["schema"] == 3 and life == {k: len(v) if isinstance(v, list) else v for k, v in closed.items()}, "unclosed process family")
     kernel.match_rows(rows, dataset(z, prefix + "/native-execs.json.gz"))
     if expected == 101:
         parser, = [r for r in rows["rustcs"] if (r["crate"], r["mode"]) == ("ruff_python_parser", "full")]
@@ -228,7 +228,9 @@ def physical(z, prefix, arm, cert, cmd, expected):
     links = sorted(workers[r["rustc_event"]] for r in rows["wild_processes"])
     helpers = reg.wild_helpers(raw, rows["wild_processes"])
     require(helpers == dataset(z,prefix+"/wild-helpers.json"), "different inherited physical Wild fork-group")
-    return {"compilers": compilers, "full_units": full, "link_units": links, "links": len(links), "wild_helpers": helpers,
+    groups = reg.compiler_groups(raw, rows["rustcs"])
+    require(groups == dataset(z,prefix+"/compiler-groups.json"), "different installed compiler exit groups")
+    return {"compilers": compilers, "full_units": full, "link_units": links, "links": len(links), "wild_helpers": helpers, "compiler_groups": groups,
             "system": [r["kind"] for r in rows["other_linkers"]], "kernel": life["sha256"]}
 
 
@@ -307,7 +309,7 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
     require(score["observer"] == ("kernel" if traced else "pmu" if lane == "measured" else "ordinary"), "wrong observation header")
     if lane == "measured":
         require(cmd["observer_argv"] == [str(root / "logs/observers/plain"), str(where / "clock.json"), *CARGO]
-                and all(prefix + "/" + name not in z.NameToInfo for name in ("kernel.tsv.gz","native-execs.json.gz","lifecycle.json","wild-helpers.json")), "wrong or traced PMU launch")
+                and all(prefix + "/" + name not in z.NameToInfo for name in ("kernel.tsv.gz","native-execs.json.gz","lifecycle.json","wild-helpers.json","compiler-groups.json")), "wrong or traced PMU launch")
         clock = dataset(z, clock_path)
         require(set(clock) == {"start", "stop", "user_us", "system_us", "instructions", "enabled", "running", "event_errno", "code"}
                 and all(type(v) is int for v in clock.values()) and clock["stop"] > clock["start"]
@@ -325,7 +327,7 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
                         (phase == "comment" or result["links"] > 0), "historical source did not run its compiler/link")
         else:
             require(cmd["observer_argv"] is None and prefix + "/kernel.tsv.gz" not in z.NameToInfo
-                    and all(prefix+"/"+n not in z.NameToInfo for n in ("native-execs.json.gz","lifecycle.json","wild-helpers.json"))
+                    and all(prefix+"/"+n not in z.NameToInfo for n in ("native-execs.json.gz","lifecycle.json","wild-helpers.json","compiler-groups.json"))
                     and "compilers" not in score and "links" not in score, "invented physical rows or instrumented clean")
     return result
 
@@ -392,7 +394,7 @@ def reopen(path, position, source, prior):
         meter = dataset(z, "meter-ready.json")
         boot = pos["boot"]
         require(pos["mode"] == "full-pilot" and prior["qualified"] is True and prior["head"] == pos["head"]
-                and dataset(z,"prior-v2-contact.json") == prior, "borrowed or missing independent prior contact")
+                and dataset(z,"prior-v3-contact.json") == prior, "borrowed or missing independent prior contact")
         host_guards(z,pos)
         binding = kernel_binding(z,boot,"full-pilot",source,prior)
         cal = replay_controls.calibration(z, boot)

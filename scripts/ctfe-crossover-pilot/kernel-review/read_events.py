@@ -15,7 +15,7 @@ def parse(blob,expected_code=None,expected_sha=None,expected_schema=None):
     need(expected_sha is None or sha==expected_sha,'raw ledger SHA')
     need(blob.endswith(b'\n'),'unterminated ledger')
     procs={}; live={}; images={}; execs=[]; open_ex={}; reaped=[]; discard=[]; creturn=[]; failed=[]; aborted=[]; roots=[]; terminal=None
-    groups={}; parks={}
+    groups={}; parks={}; image_groups=set()
     def state(g,p):
         need(g in procs and procs[g]['pid']==p and live.get(p)==g,'unknown/reused native task')
         return procs[g]
@@ -30,11 +30,11 @@ def parse(blob,expected_code=None,expected_sha=None,expected_schema=None):
         s=state(g,p);need(s['parent'] is not None and s['tgid'] is not None and s['preexit'] is None,'not a live entered task');return s
     def number(xs):return tuple(int(x) for x in xs)
     shapes={'R':2,'B':3,'N':5,'I':8,'E':9,'C':4,'Y':3,'F':3,'A':3,'P':3,'L':3,'D':3,'X':3,'T':3,'OK':6,
-            'G':3,'Q':6,'V':3}
+            'G':3,'H':4,'Q':6,'V':3}
     for row,raw in enumerate(blob[:-1].split(b'\n'),1):
         try:
             tag,*f=raw.decode('ascii').split('\t')
-            need(terminal is None and tag in shapes and (len(f)==shapes[tag] or tag=='OK' and len(f)==8),
+            need(terminal is None and tag in shapes and (len(f)==shapes[tag] or tag=='OK' and len(f) in (8,9)),
                  f'unknown or truncated record {tag!r}')
             # A parked peer never receives a user-mode restart; a committed group
             # exit caller can only report its irreversible EXIT and terminal wait.
@@ -58,10 +58,15 @@ def parse(blob,expected_code=None,expected_sha=None,expected_schema=None):
                 pg,p,k,g,ch=number(f);a=active(pg,p);s=birth(g,ch)
                 need(k in (1,2,3) and g!=pg and s['parent'] is None and a['pending'] is None,'bad fork lineage')
                 s['parent']=pg;s['create_kind']=k;a['pending']=ch
-            elif tag=='G':
-                g,p,code=number(f);s=active(g,p)
-                need(s['tgid']==p and s.get('create_kind')==1 and not any(e['lifetime']==g for e in execs)
-                     and s['pending'] is None and g not in groups and 0<=code<=255,'invalid exit_group caller')
+            elif tag in ('G','H'):
+                g,p,code=number(f[:3]);s=active(g,p)
+                need(s['tgid']==p and s['pending'] is None and g not in open_ex
+                     and g not in groups and 0<=code<=255,'invalid exit_group caller')
+                if tag=='G':
+                    need(s.get('create_kind')==1 and 'image_ordinal' not in s,'unexpected image in fork helper')
+                else:
+                    need(s.get('image_ordinal')==int(f[3]),'group exit lacks its latest installed image')
+                    image_groups.add(g)
                 groups[g]={'code':code<<8,'verified':False,'peers':set()}
             elif tag=='Q':
                 g,p,owner,tgid=number(f[:4]);kind=f[4];nr=int(f[5]);s=active(g,p);a=active(owner,tgid)
@@ -95,7 +100,7 @@ def parse(blob,expected_code=None,expected_sha=None,expected_schema=None):
                 need(arg.endswith(b'\0') and len(arg)<8*1024**2,'truncated installed argv')
                 execs.append(dict(ordinal=i,lifetime=g,pid=p,former_tid=old,image=images[image],exe=os.fsdecode(nm),cwd=os.fsdecode(cwd),
                                   execfn=os.fsdecode(fn),argv=[os.fsdecode(z) for z in arg[:-1].split(b'\0')]))
-                open_ex[g]=i
+                open_ex[g]=i;s['image_ordinal']=i
             elif tag in ('P','L'):
                 g,p,i=number(f);active(g,p);need(open_ex.pop(g,None)==i,'exec completion lacks matching irreversible image')
                 if tag=='L':procs[g]['exec_interrupted']=i
@@ -124,9 +129,10 @@ def parse(blob,expected_code=None,expected_sha=None,expected_schema=None):
     need(all(v['verified'] and procs[g]['preexit']==v['code'] and
          procs[g]['terminal']=='wait' for g,v in groups.items()),'missing group caller EXIT and wait')
     code,nexec,ntask,nborn,nwait,nd,*extra=terminal
-    schema=2 if extra else 1
-    need((expected_schema is None or schema==expected_schema) and
-         (extra==[len(groups),len(parks)] if extra else not groups and not parks),'group receipt counts or schema')
+    schema=3 if len(extra)==3 else 2 if extra else 1
+    counts={1:[],2:[len(groups),len(parks)],3:[len(groups),len(parks),len(image_groups)]}
+    need((expected_schema is None or schema==expected_schema) and extra==counts[schema] and
+         (schema>=2 or not groups and not parks) and (schema==3 or not image_groups),'group receipt counts or schema')
     need((nexec,ntask,nborn,nwait,nd)==(len(execs),len(procs),len(procs)-1,len(reaped),len(discard)) and
          nwait+nd==ntask and nexec>0,'family counts')
     for g,s in procs.items():

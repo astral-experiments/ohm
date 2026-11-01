@@ -190,10 +190,10 @@ def main(mode, position, calibrator, observers):
     gate = reg.hardware_gate()
     prior = None
     if mode == 'full-pilot':
-        prior = json.loads((OUT/'prior-v2-contact.json').read_bytes())
+        prior = json.loads((OUT/'prior-v3-contact.json').read_bytes())
         need(prior['official']['run'] == int(os.environ['CONTACT_RUN']) and
              prior['official']['files'][0]['sha256'] == os.environ['CONTACT_SHA256'] and
-             sha(OUT/'prior-v2-contact.json') == os.environ['CONTACT_READBACK_SHA256'] and
+             sha(OUT/'prior-v3-contact.json') == os.environ['CONTACT_READBACK_SHA256'] and
              prior['head'] == os.environ['GITHUB_SHA'] and prior['qualified'] is True,
              'missing independently replayed contact on this exact head')
         subprocess.run([sys.executable, '-IB', HERE.parent/'branch-return-pmu/meter.py', calibrator, observers], check=True)
@@ -235,10 +235,12 @@ def main(mode, position, calibrator, observers):
         visits = history('Eon', 'structural', 'return', rows, refs, issues, trace, PREFIX[:4])
         traced = OUT/'structural-return-Eon'
         helpers = {phase: json.loads((traced/phase/'wild-helpers.json').read_bytes()) for phase in ('X-B','comment')}
+        compiler_groups = {phase: json.loads((traced/phase/'compiler-groups.json').read_bytes()) for phase in ('X-B','comment')}
+        need(any(compiler_groups.values()), 'no installed Ruff compiler with a protected group exit')
         need(not issues and any(helpers.values()) and refs['Eon','clean-A'][1]['cli']['whole'] != refs['Eon','clean-B'][1]['cli']['whole'],
              'a native empty comparison, historical product, or inherited Wild fork-group witness failed')
         save(OUT/'contact.json', dict(qualified=True, mode=mode, boot=ready['boot'], scored_commands=0,
-             visits=list(visits), helpers=helpers, schema=2, issues=issues))
+             visits=list(visits), helpers=helpers, compiler_groups=compiler_groups, schema=3, issues=issues))
         return
     cross_role(refs, issues)
     for lane, lineage in [('structural', 'stay'), ('structural', 'return'), ('measured', 'return')]:

@@ -22,7 +22,7 @@ Advance to a separately enrolled 12-boot confirmation only if **each** complete 
 
 Source run 41280518860 built the candidate and passed the compiler, cache-generation and pointer-identity controls. Its subsequent cross-compiler artifact comparison failed. Intake verifies that exact terminal history and reconstructs both native SDKs. The full CLI product checks run anew here.
 
-## Schema-2 contact and enrollment
+## Earlier schema-2 contact and enrollment
 
 The Git base is `5c651f1d38c629da2a75d5cac3588db0be8104d7`. The rejected two-boot kernel run was 41283234972. Both of its original incomplete terminal ledgers must still be refused by both parsers. The independently qualified, untraced screen was 41285793847 on `28fe14afcf485bc99e7bd9036d9b4f4bb990ce86`. It had two jobs, 124786714800 and 124786714903. The corresponding original ZIPs were 13075477706 (161,720,973 bytes, SHA-256 `ebbe8f31f3e680684b9cc05a93a9c85defb87f6d7a29b34dc7dd61ab718d5b77`) and 13075995840 (161,721,392 bytes, `439ceda73ab4a8bc23043024ce793e0b5f27c1cd6fa75b298e52d21d420b0d95`). Their original independent readback and summary are in `enrollment/`. All four of these boots and the earlier kernel calibration boots remain excluded.
 
@@ -53,3 +53,13 @@ Both new modes use only a manual dispatch, attempt one, the exact reviewed head 
 The contact's resource and native verdicts are structural only. It contributes no instructions or measured samples. Any confirmation requires a new registration and fresh boots.
 
 The first schema-2 contact on `ccc50f6df93ed41a55ccc3ff2e77c2f16fe77dce` stopped in the pinned SDK donor's Python import, before any native fixture, Cargo visit or counter ran. The successor keeps that original refusal and checks the pilot and donor module identities in a fresh process through the donor's first GitHub request, offline, before acquiring either compiler. [Original failed job](https://github.com/astral-experiments/ohm/actions/runs/41288606644/job/124794945295)
+
+## Schema-3 qualification for installed compiler workers
+
+Schema 2 passed the two complete pilot boots in run 41290140885. Each measured a 5.41× instruction reduction under the preselected edit, with 20 full compiler invocations falling to 3 and one real Wild link in each arm. Repair after the intentionally invalid source cost the candidate about 56% more instructions. The seven-visit sequence improved about 1.47%. The original data and the two earlier incomplete ledgers retain their original verdicts.
+
+A local ordinary compiler repair exposed incomplete final waits in schema 2 at an installed rustc that called exit_group with live threads. The original ledgers continue to fail the parser. Observer commit `19f9a67b032cce44cea1e3bb7e324558cd9abd0a` parks the installed leader's remaining workers and records their kernel exit events and final waits. The independent reader attributes each such group to a specific installed compiler using its lifetime, PID and successful exec ordinal. The separate forked stock Wild helper still needs its own complete ledger. Four ordinary local repairs produced the complete expected native executable and two actual installed compiler groups each. They contribute no hosted measurements.
+
+Use branch `charlie/qa-ctfe-v3-pilot-20261101` with the schema-3 observer for both manual modes above. Reconstruct both original SDKs. First run one unscored contact. Its two structural visits together must exercise both a real installed compiler with at least one parked worker and a real forked Wild helper with a parked peer. All other IDs, command arguments, native products, sweeps, required exits and resource gates remain as enrolled. Read the entire official contact archive using the command above. Only a passing independent readback admits the two new, opposite-order pilot boots. Each pilot independently reopens the contact, qualifies the schema-3 observer on its own boot, and meets all original hardware and native thresholds. Reject kernel receipts in a PMU or ordinary visit. Pilot, contact and exploratory repair boots stay outside any later confirmation count.
+
+The original 12-host primary and order-statistic thresholds remain in force. No product recommendation follows from these pilots alone. A separate causal study is investigating the branch-return repair cost and the whole-history tradeoff.

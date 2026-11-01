@@ -34,7 +34,7 @@ def fixtures(z, base, repo):
     names = [p.filename[len(base)+1:] for p in members]
     require(0 < len(names) <= 144 and len(set(names)) == len(names) and
             sum(p.file_size for p in members) <= 12*2**20, 'fixture inventory or byte budget')
-    with tempfile.TemporaryDirectory(prefix='ctfe-v2-fixtures-') as d:
+    with tempfile.TemporaryDirectory(prefix='ctfe-v3-fixtures-') as d:
         out = Path(d)
         for name,item in zip(names,members,strict=True):
             file = out/name
@@ -77,7 +77,7 @@ def read(zip_path, meta, repo):
         binding = native.kernel_binding(z,boot,'contact',repo,None)
         sdk = native.sdk_pair(z)
         refs, stages, bodies, checked_files = {}, {}, {}, {}
-        visit_paths, traced_paths, helpers = set(), set(), {}
+        visit_paths, traced_paths, helpers, compiler_groups = set(), set(), {}, {}
         env = None
         for lane, route, phases in [('clean','reference',native.REFS),('structural','return',native.PHASES[:4])]:
             top = lane+'-'+route+'-Eon'
@@ -97,22 +97,26 @@ def read(zip_path, meta, repo):
                 if phase in ('X-B','comment'):
                     traced_paths.add(prefix+'/kernel.tsv.gz')
                     helpers[phase] = r['wild_helpers']
+                    compiler_groups[phase] = r['compiler_groups']
                 stages[phase] = {k:r[k] for k in ('status','graph','dirty','cli','reader','allocated')}
                 if 'kernel' in r:
                     stages[phase].update(kernel=r['kernel'], native_roster=native.digest(z.read(prefix+'/native-execs.json.gz')),
                                          full_units=r['full_units'], link_units=r['link_units'])
                 checked_files[phase] = {name:native.digest(z.read(prefix+'/'+name)) for name in
                                          ('source.json','visit.json','cargo.json.gz','cargo.stdout.gz','cargo.stderr.gz','native.json.gz')}
+        require(any(compiler_groups.values()), 'no real installed compiler needed group-exit protection')
         require(refs['clean-A']['cli'] != refs['clean-B']['cli'] and any(helpers.values()), 'no actual inherited Wild fork-group or historical CLI difference')
         require(visit_paths == {n for n in names if n.endswith('/visit.json')} and
                 traced_paths == {n for n in names if n.endswith('/kernel.tsv.gz')} and
+                {n.removesuffix('/kernel.tsv.gz') for n in traced_paths} ==
+                {n.removesuffix('/compiler-groups.json') for n in names if n.endswith('/compiler-groups.json')} and
                 not any(n.endswith('/clock.json') or n in ('meter-ready.json','pilot.json','observer.json') or
                         n.startswith(('measured-','calibration/')) for n in names), 'extra visits, trace or PMU command in contact')
         require(D(z,'contact.json') == dict(qualified=True,mode='contact',boot=boot,scored_commands=0,
-                visits=list(native.PHASES[:4]),helpers=helpers,schema=2,issues=[]), 'different host contact conclusion')
-        return dict(qualified=True, schema=2, official=meta, head=pos['head'], boot=boot, kernel=pos['host']['release'],
+                visits=list(native.PHASES[:4]),helpers=helpers,compiler_groups=compiler_groups,schema=3,issues=[]), 'different host contact conclusion')
+        return dict(qualified=True, schema=3, official=meta, head=pos['head'], boot=boot, kernel=pos['host']['release'],
                     observer_source=reg.OBSERVER, observer_sha256=binding['observer_sha256'], fixture=binding['group_fixtures_sha256'],
-                    historical_readers=reg.hardware_gate(), resource=resource, helpers=helpers, visits=stages,
+                    historical_readers=reg.hardware_gate(), resource=resource, helpers=helpers, compiler_groups=compiler_groups, visits=stages,
                     original_receipts=checked_files, checked_elfs=len(bodies), scored_commands=0)
 
 def from_official(archive, catalog, run, head, repo):
@@ -124,7 +128,7 @@ def encoded(result):
 
 def acquire(run, digest, expected_readback, head, repo, output):
     require(not output.exists() and run>0 and all(re.fullmatch('[0-9a-f]{64}',v) for v in (digest,expected_readback)), 'invalid sealed contact input')
-    with tempfile.TemporaryDirectory(prefix='ctfe-v2-intake-') as tmp:
+    with tempfile.TemporaryDirectory(prefix='ctfe-v3-intake-') as tmp:
         t=Path(tmp)
         for name,url in [('run.json',f'actions/runs/{run}'),('jobs.json',f'actions/runs/{run}/attempts/1/jobs?per_page=100'),
                          ('artifacts.json',f'actions/runs/{run}/artifacts?per_page=100')]:
