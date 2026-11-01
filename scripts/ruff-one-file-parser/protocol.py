@@ -12,7 +12,7 @@ import common as c  # shared source-bound SDK and raw IO API
 import fixture as f
 import ownership
 
-BRANCH = "charlie/qa-ruff-one-file-parser-20261101"
+BRANCH = "charlie/qa-ruff-one-file-saved-link-20261101"
 JOB = "Signed GNU Ruff one-file parser edit"
 FIRST = "5cc8582fa5e9c067d1f463cb27b9de311b2ff648"
 ROLES = {

@@ -138,92 +138,47 @@ class Original(unittest.TestCase):
             analyze(selected)
 
     def test_separate_workers_and_frozen_custody(self):
-        jobtime = lambda i: f"2026-11-01T18:00:0{i}+00:00"
-        boot = lambda i: str(uuid.UUID(int=i))
+        fixed = c.read(p.HERE / "excluded-hosts.json")
+        terminal = c.read(p.HERE / "excluded-catalogs.json.gz")
+        original = terminal["one_file"]["book"]
+        book = copy.deepcopy(original)
+        book["replays"] = {
+            k: [v["run"], [v["job"]], [v["artifact"]]] for k, v in terminal["catalogs"].items()
+        }
         head = "a" * 40
-        run = dict(
-            run_attempt=1,
-            event="workflow_dispatch",
-            path=".github/workflows/ci.yml",
-            status="completed",
-            repository=dict(full_name=c.REPO),
-        )
-        six = run | dict(id=c.PREVIOUS, head_sha=c.PREVIOUS_HEAD)
-        jobs, arts, sealed = [], [], []
-        for i, job in enumerate(c.BLOCKED_JOBS, 1):
-            jobs.append(
-                dict(
-                    id=job,
-                    name=f"GNU sorted packed Ruff CLI confirmation {i:02}",
-                    status="completed",
-                    runner_name=f"old{i:02}",
-                    runner_id=100 + i,
-                    completed_at=jobtime(0),
-                )
-            )
-            art = dict(
-                id=i,
-                name=f"gnu-sorted-packed-ruff-cli-confirmation-{i:02}",
-                digest=f"sha256:{i:064x}",
-                size_in_bytes=1000,
-            )
-            arts.append(art)
-            sealed.append(dict(job=job, artifact=i, digest=art["digest"], boot=boot(i)))
-        first = run | dict(id=200, head_sha=p.FIRST, head_branch=c.BRANCH)
-        prev = dict(
-            id=220,
-            run_id=200,
-            name="Signed GNU Ruff first-A instruction owners",
-            status="completed",
-            runner_id=220,
-            runner_name="first-stage",
-            started_at=jobtime(1),
-            completed_at=jobtime(2),
-        )
-        original = dict(
-            id=221,
-            name="signed-gnu-ruff-default-first-a-owners",
-            size_in_bytes=123,
-            digest="sha256:" + "a" * 64,
-            expired=False,
-            workflow_run=dict(id=200, head_sha=p.FIRST),
-        )
-        now = run | dict(id=300, head_sha=head, head_branch=p.BRANCH, status="in_progress")
-        fresh = dict(
-            id=320, run_id=300, name=p.JOB, runner_id=320, runner_name="one-file", started_at=jobtime(3)
-        )
-        prior = dict(run=200, job=220, artifact=221, digest=original["digest"], boot=boot(20))
-        book = dict(
-            six=six,
-            six_jobs=jobs,
-            six_artifacts=arts,
-            previous=dict(six=sealed, first=prior),
-            first=first,
-            first_jobs=[prev],
-            first_artifacts=[original],
-            current=now,
-            jobs=[fresh],
-            initial_artifacts=[],
-        )
+        run, job = 500, 501
+        now = book["current"] | dict(id=run, head_sha=head, head_branch=p.BRANCH)
+        fresh = book["jobs"][0] | dict(id=job, run_id=run, runner_name="fresh",
+                                       runner_id=2000, started_at="2026-11-01T23:00:00Z")
+        book.update(current=now, jobs=[fresh], initial_artifacts=[])
 
-        def accept(book, actual_boot=boot(30)):
-            return intake.enroll(book, head, "one-file", actual_boot)
+        def accept(data, boot=str(uuid.UUID(int=300))):
+            return intake.enroll(data, head, "fresh", boot)
 
-        self.assertEqual(accept(book)["first"], prior)
+        self.assertEqual(accept(book)["first"], fixed["previous"]["first"])
+        self.assertEqual(len(accept(book)["refused_replays"]), 2)
+        exclusions = list(fixed["replays"].values())
+        for prev in exclusions:
+            with self.assertRaises(ValueError):
+                accept(book, prev["boot"])
+            with self.assertRaises(ValueError):
+                accept(book | {"jobs": [fresh | {"runner_id": prev["runner_id"]}]})
+        for row in [*fixed["previous"]["six"], fixed["previous"]["first"]]:
+            with self.assertRaises(ValueError):
+                accept(book, row["boot"])
         for conflict in (
-            {"jobs": [fresh | dict(runner_id=220)]},
-            {"jobs": [fresh | dict(started_at=jobtime(1))]},
-            {"initial_artifacts": [original]},
-            {"first": first | dict(head_sha="0" * 40)},
-            {"first_artifacts": [original | dict(digest="sha256:" + "b" * 64)]},
-            {"first_artifacts": [original | dict(workflow_run=dict(id=101, head_sha=p.FIRST))]},
-            {"previous": dict(six=sealed[::-1], first=prior)},
+            {"replays": {}}, {"jobs": [fresh | {"started_at": "2026-11-01T20:59:00Z"}]},
+            {"initial_artifacts": book["first_artifacts"]},
+            {"first": book["first"] | {"head_sha": "0"*40}},
+            {"previous": dict(six=fixed["previous"]["six"][::-1], first=fixed["previous"]["first"])},
         ):
             with self.assertRaises(ValueError):
                 accept(book | conflict)
-        for occupied in (boot(1), boot(20)):
+        for k in book["replays"]:
+            bad = copy.deepcopy(book)
+            bad["replays"][k][2][0]["digest"] = "sha256:" + "0"*64
             with self.assertRaises(ValueError):
-                accept(book, occupied)
+                accept(bad)
 
     def test_wrong_causal_or_meter_scope(self):
         self.assertEqual(

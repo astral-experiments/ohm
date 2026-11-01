@@ -13,6 +13,7 @@ import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import protocol as p
 import inventory
+import file_witness
 import intake
 import parser_tests
 import instrument
@@ -23,6 +24,8 @@ f, c = p.f, p.c
 
 def counter_files(z, temp):
     prefixes = ("calibration/", "counter-programs/", *[r + "/inventory/edited/trace/" for r in p.ROLES])
+    expected_empty = {f"calibration/nested-plain-{i}/exec.tsv" for i in range(4)}
+    seen_empty = set()
     total = 0
     count = 0
     for label in z.namelist():
@@ -37,13 +40,16 @@ def counter_files(z, temp):
         count += 1
         total += len(body)
         f.require(
-            0 < len(body) <= 4 << 20 and count < 2800 and total < 48 << 20,
+            (not body) == (label in expected_empty) and len(body) <= 4 << 20 and count < 2800 and total < 48 << 20,
             "oversized raw calibration/trace",
         )
+        if not body:
+            seen_empty.add(label)
         out = temp / path
         out.parent.mkdir(parents=True, exist_ok=True)
         with out.open("xb") as dst:
             dst.write(body)
+    f.require(seen_empty == expected_empty, "missing original process-free calibration ledger")
 
 
 def source(obs, state):
@@ -92,6 +98,7 @@ def review(z, temp, head, collect, contract, previous=None):
     collection = get("collection.json")
     f.require(
         "refusal.txt" not in z.namelist()
+        and not any(n.endswith("-inventory-refusal.txt") for n in z.namelist())
         and collection["roles"] == list(p.ROLES)
         and collection["lanes"] == {k: list(v) for k, v in p.LANES.items()},
         "incomplete histories",
@@ -252,7 +259,15 @@ def review(z, temp, head, collect, contract, previous=None):
                         sdk,
                         selectors,
                     )
-                    f.require(counts == get(name + "/inventory.json"), "physical kernel census differs")
+                    file_witness.validate(get(name + "/input-files-before.json.gz"),
+                                          get(name + "/input-files-after.json.gz"), role, products, counts,
+                                          get(name + "/output-inodes.json.gz"), repo, work)
+                    key = "cli" if role == "cli" else "fixtures"
+                    file_witness.final_image(get(name + "/native-final-before.json"),
+                                             get(name + "/native-final-after.json"), binary, desc[key],
+                                             get(name + "/output-inodes.json.gz"), work)
+                    f.require(counts == get(name + "/native-owners.json") == get(name + "/inventory.json"),
+                              "physical kernel census differs")
         key = "cli" if role == "cli" else "fixtures"
         f.require(
             len(clocks) == 2

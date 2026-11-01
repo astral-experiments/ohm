@@ -14,6 +14,28 @@ import acquire
 c, f = p.c, p.f
 
 
+def excluded_host(catalog, expected):
+    run, jobs, artifacts = catalog
+    (job,) = jobs
+    (asset,) = artifacts
+    f.require(
+        run["id"] == job["run_id"] == asset["workflow_run"]["id"] == expected["run"]
+        and run["head_sha"] == asset["workflow_run"]["head_sha"] == expected["head"]
+        and run["head_branch"] == expected["branch"] and run["run_attempt"] == 1
+        and run["path"] == ".github/workflows/ci.yml" and run["event"] == "workflow_dispatch"
+        and run["repository"]["full_name"] == c.REPO
+        and run["status"] == job["status"] == "completed"
+        and run["conclusion"] == job["conclusion"] == "failure"
+        and (job["id"], job["name"], job["runner_name"], job["runner_id"], job["completed_at"])
+            == (expected["job"], expected["name"], expected["runner"], expected["runner_id"], expected["ended"])
+        and (asset["id"], asset["name"], asset["digest"], asset["size_in_bytes"])
+            == (expected["artifact"], expected["archive_name"], expected["digest"], expected["size"])
+        and not asset["expired"],
+        "wrong original refused replay",
+    )
+    return expected
+
+
 def enroll(book, head, runner, boot):
     assigned = book["jobs"]
     (this,) = assigned
@@ -52,6 +74,10 @@ def enroll(book, head, runner, boot):
         GITHUB_JOB="diagnostic",
         RUNNER_NAME=earlier["runner_name"],
     )
+    fixed = c.read(p.HERE / "excluded-hosts.json")
+    f.require(spec == fixed["previous"] and set(book["replays"]) == set(fixed["replays"]),
+              "different predeclared original hosts")
+    replays = [excluded_host(book["replays"][k], shadow) for k, shadow in sorted(fixed["replays"].items())]
     old = acquire.enrollment(
         six,
         book["six_jobs"],
@@ -63,6 +89,7 @@ def enroll(book, head, runner, boot):
         prev["boot"],
     )
     all_old = [
+        *replays,
         *old["excluded"],
         dict(boot=old["boot"], runner=old["runner"], runner_id=old["runner_id"]),
     ]
@@ -71,14 +98,15 @@ def enroll(book, head, runner, boot):
         and now["head_branch"] == p.BRANCH
         and now["run_attempt"] == 1
         and now["event"] == "workflow_dispatch"
-        and now["id"] not in {first["id"], six["id"]}
+        and now["id"] not in {first["id"], six["id"], *(r["run"] for r in replays)}
         and now["repository"]["full_name"] == c.REPO
         and not book["initial_artifacts"]
         and this["run_id"] == now["id"]
         and this["name"] == p.JOB
         and this["runner_name"] == runner
         and this["runner_id"] > 0
-        and this["id"] not in {prev["job"], *c.BLOCKED_JOBS}
+        and this["id"] not in {prev["job"], *c.BLOCKED_JOBS, *(r["job"] for r in replays)}
+        and all(dt.datetime.fromisoformat(r["ended"]) <= dt.datetime.fromisoformat(this["started_at"]) for r in replays)
         and dt.datetime.fromisoformat(earlier["completed_at"])
         <= dt.datetime.fromisoformat(this["started_at"])
         and str(uuid.UUID(boot)) == boot
@@ -89,7 +117,7 @@ def enroll(book, head, runner, boot):
         "overlap, reassigned earlier boot, or incorrect new job",
     )
     return dict(
-        head=head, run=now["id"], job=this["id"], runner=runner, boot=boot, first=prev, six=spec["six"]
+        head=head, run=now["id"], job=this["id"], runner=runner, boot=boot, first=prev, six=spec["six"], refused_replays=replays
     )
 
 
@@ -123,6 +151,7 @@ def main():
     first, fs, fa = catalog(prior)
     now, ns, na = catalog(run)
     book = dict(
+        replays={k: catalog(v["run"]) for k, v in c.read(p.HERE / "excluded-hosts.json")["replays"].items()},
         six=six,
         six_jobs=ss,
         six_artifacts=sa,

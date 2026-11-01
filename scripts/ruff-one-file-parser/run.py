@@ -14,6 +14,7 @@ import protocol as p
 import parser_tests
 import check_checkout
 import inventory
+import file_witness
 import worker as base
 import instrument
 import acquire
@@ -150,6 +151,7 @@ def history(role, tools, topo, selectors, sdk):
         here = dest / lane
         here.mkdir()
         starting = roots()
+        baseline_records = None
         for idx, phase in enumerate(phases):
             mark = p.STATE.get(phase, phase)
             p.change(repo, state, mark)
@@ -160,6 +162,15 @@ def history(role, tools, topo, selectors, sdk):
                 c.save(where / "empty-roots.json", starting)
             before = f.state(repo, mark)
             c.save(where / "source-before.json", before)
+            structural = phase == "edited" and lane == "inventory"
+            if structural:
+                def capture_before():
+                    f.require(baseline_records is not None, "missing inventory baseline")
+                    before_files = file_witness.capture(role, baseline_records, repo, work)
+                    c.save(where / "input-files-before.json.gz", before_files)
+                    return before_files
+
+                input_files = file_witness.record(where, "before", capture_before)
             actual = cmd
             if phase == "edited" and lane.startswith("plain-"):
                 actual = [tools / "plain", where / "clock.json", *cmd]
@@ -190,15 +201,26 @@ def history(role, tools, topo, selectors, sdk):
             p.validate_planned(plan, records)
             if idx == 0:
                 f.require(dirty == graph, "fresh roots reused artifacts")
+                baseline_records = records
             c.save(where / "roster.json.gz", dict(graph=graph, dirty=dirty))
-            if phase == "edited" and lane == "inventory":
-                ins = store_aliases(where, records)
-                actual_roles = inventory.read(
-                    where / "trace", topo, role, repo, work, records, ins, sdk, selectors
-                )
-                c.save(where / "inventory.json", actual_roles)
+            if structural:
+                ins = file_witness.record(where, "output", lambda: store_aliases(where, records))
+
+                def capture_after():
+                    after_files = file_witness.capture(role, records, repo, work)
+                    c.save(where / "input-files-after.json.gz", after_files)
+                    return after_files
+
+                after_files = file_witness.record(where, "after", capture_after)
             if phase == "edited" and lane.startswith("plain-"):
                 instrument.strict_clock(where / "clock.json")
+            if structural:
+                def final_file(tag):
+                    identity = file_witness.identify(binary, work)
+                    c.save(where / f"native-final-{tag}.json", identity)
+                    return identity
+
+                physical_before = file_witness.record(where, "final-before", lambda: final_file("before"))
             try:
                 desc, files = observe(where, role, mark, rows, binary)
             except Exception:
@@ -221,6 +243,22 @@ def history(role, tools, topo, selectors, sdk):
                 for k, path in files.items():
                     base.native.same_file(path, desc[k], old[k], base.BODIES, where)
             f.require(before == f.state(repo, mark), "native clients changed the checkout")
+            if structural:
+                physical_after = file_witness.record(where, "final-after", lambda: final_file("after"))
+
+                def classify():
+                    actual_roles = inventory.read(
+                        where / "trace", topo, role, repo, work, records, ins, sdk, selectors
+                    )
+                    c.save(where / "native-owners.json", actual_roles)
+                    file_witness.validate(
+                        input_files, after_files, role, records, actual_roles, ins, repo, work
+                    )
+                    key = "cli" if role == "cli" else "fixtures"
+                    file_witness.final_image(physical_before, physical_after, binary, desc[key], ins, work)
+                    c.save(where / "inventory.json", actual_roles)
+
+                file_witness.record(where, "classification", classify)
     p.change(repo, state, "baseline")
 
 
@@ -283,6 +321,7 @@ def main(collector, contract):
         logs / "collection.json",
         {"roles": list(p.ROLES), "lanes": p.LANES, "source": f.state(repo, "baseline")},
     )
+    file_witness.complete(logs)
 
 
 if __name__ == "__main__":
