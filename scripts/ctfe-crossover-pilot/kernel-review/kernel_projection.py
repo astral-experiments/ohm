@@ -60,7 +60,7 @@ def system_link(args):
          'unknown unlabelled platform link')
     return 'historical GCC configure default executable','a.out'
 def classify(raw,cat,proxies,command,arm,code,cwd,expected_sha=None):
-    closed=parse(raw,code,expected_sha);ids=catalog_guard(cat);es=iter(closed['execs'])
+    closed=parse(raw,code,expected_sha,expected_schema=2);ids=catalog_guard(cat);es=iter(closed['execs'])
     rows={k:[] for k in ('rustcs','wild_processes','wild_queries','other_linkers','cargos','cargo_queries')}
     ancestry={}; selected=set(); count=0
     for line in raw.splitlines():

@@ -21,3 +21,33 @@ Each successful visit checks the 375 Cargo product records, runs the real CLI on
 Advance to a separately enrolled 12-boot confirmation only if **each** complete pilot has at least 2× fewer instructions at the preselected return-and-edit build, the candidate drops at least one full compiler without adding another or an extra real link there, and all native and hardware gates pass. Report the cold, training, unchanged, diagnostic, recovery, and storage costs alongside the primary result. Pilot boots cannot enter the confirmation. A speed claim requires a paired interval over independent new boots and the underlying skipped work. The small-library measurements used to design this study are separate from this full CLI endpoint.
 
 Source run 41280518860 built the candidate and passed the compiler, cache-generation and pointer-identity controls. Its subsequent cross-compiler artifact comparison failed. Intake verifies that exact terminal history and reconstructs both native SDKs. The full CLI product checks run anew here.
+
+## Schema-2 contact and enrollment
+
+The Git base is `5c651f1d38c629da2a75d5cac3588db0be8104d7`. The rejected two-boot kernel run was 41283234972. Both of its original incomplete terminal ledgers must still be refused by both parsers. The independently qualified, untraced screen was 41285793847 on `28fe14afcf485bc99e7bd9036d9b4f4bb990ce86`. It had two jobs, 124786714800 and 124786714903. The corresponding original ZIPs were 13075477706 (161,720,973 bytes, SHA-256 `ebbe8f31f3e680684b9cc05a93a9c85defb87f6d7a29b34dc7dd61ab718d5b77`) and 13075995840 (161,721,392 bytes, `439ceda73ab4a8bc23043024ce793e0b5f27c1cd6fa75b298e52d21d420b0d95`). Their original independent readback and summary are in `enrollment/`. All four of these boots and the earlier kernel calibration boots remain excluded.
+
+Both new modes use only a manual dispatch, attempt one, the exact reviewed head and branch `charlie/qa-ctfe-v2-pilot-20261101`. Both require the registered Linux 7.1.4 x86-64 runner, reconstructed 81-file SDKs, the original enrolled source and effective-memory/disk guards. The checkout of the observer is `d4e1c4bac917a2de3218c13c50875b5c2d301a23` and the physical-role projector remains `5e91ed3974c0964a912fd38049946f647891dcb2`. The checked-out observer fixture sources, the retained acquired sources, the current compiler executable, the native closure and the raw output are independently compared on every host. The previous schema-1 cold contact is retained as historical evidence.
+
+1. Dispatch `mode=contact` once with the reviewed head and empty contact inputs. One Eon worker runs independently empty A, B and edited B at fixed paths, then Y-B, X-A, X-B and comment. All seven Cargo commands are outside the PMU. X-B and comment alone have whole-process kernel tracing. A completed contact must verify both warm CLI and typed reader against their own clean executables and the complete 375-unit Cargo inventory. At least one of the two actual Ruff ledgers must identify a positive-output stock Wild image, its rustc ancestor and a distinct fork helper that inherits that image, with at least one parked peer, every terminal wait and a schema-2 footer. A local fixture with the same mechanism is retained only to test the reader.
+2. Download the original contact ZIP and the official `run.json`, attempt-one `jobs.json`, and `artifacts.json`. From the enrolled checkout, use an independent checkout of the pinned observer and run:
+
+   ```sh
+   python3 -IB scripts/ctfe-crossover-pilot/contact_review.py offline \
+       --run "$CONTACT_RUN" --head "$REVIEWED_HEAD" --official "$CONTACT_CATALOG" \
+       --observer-source "$OBSERVER_CHECKOUT" "$CONTACT_ZIP" > contact-readback.json
+   sha256sum "$CONTACT_ZIP" contact-readback.json
+   ```
+
+   The reader verifies the official job and archive identity, checks the full raw fixture suite and both ELF products, and records actual boot, tool, source and per-phase digests. It reads archived data without executing any archived binary. A refusal preserves the evidence and stops enrollment.
+3. Only after this readback, dispatch `mode=full-pilot` on the same head, supplying `contact_run`, `contact_sha256` and `contact_readback_sha256`. Each worker first independently downloads and verifies that official contact and reproduces its certificate. It then qualifies its own observer on a fresh boot. The original two opposite orders, separate structural and measured acquisitions, three fresh references per role, stay-X, invalid/repair and decision rule above remain fixed. A measured phase containing any kernel/role evidence is refused. The stage cannot grant a third run or substitute a prior boot.
+4. With the two new original ZIPs in position order, replay:
+
+   ```sh
+   python3 -IB scripts/ctfe-crossover-pilot/reopen.py \
+       --run "$PILOT_RUN" --head "$REVIEWED_HEAD" --official "$PILOT_CATALOG" \
+       --observer-source "$OBSERVER_CHECKOUT" --contact-run "$CONTACT_RUN" \
+       --contact-official "$CONTACT_CATALOG" --contact-archive "$CONTACT_ZIP" \
+       "$POSITION_01_ZIP" "$POSITION_02_ZIP"
+   ```
+
+The contact's resource and native verdicts are structural only. It contributes no instructions or measured samples. Any confirmation requires a new registration and fresh boots.

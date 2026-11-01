@@ -6,15 +6,16 @@ def need(x,why):
 def data(token):
     need(bool(re.fullmatch(r'(?:[0-9a-f]{2})*',token)),'noncanonical hex')
     return bytes.fromhex(token)
-def read(path,expected_code=None,expected_sha=None):
+def read(path,expected_code=None,expected_sha=None,expected_schema=None):
     path=pathlib.Path(path);blob=path.read_bytes()
     if blob.startswith(b'\x1f\x8b'):blob=gzip.decompress(blob)
-    return parse(blob,expected_code,expected_sha)
-def parse(blob,expected_code=None,expected_sha=None):
+    return parse(blob,expected_code,expected_sha,expected_schema)
+def parse(blob,expected_code=None,expected_sha=None,expected_schema=None):
     sha=hashlib.sha256(blob).hexdigest()
     need(expected_sha is None or sha==expected_sha,'raw ledger SHA')
     need(blob.endswith(b'\n'),'unterminated ledger')
     procs={}; live={}; images={}; execs=[]; open_ex={}; reaped=[]; discard=[]; creturn=[]; failed=[]; aborted=[]; roots=[]; terminal=None
+    groups={}; parks={}
     def state(g,p):
         need(g in procs and procs[g]['pid']==p and live.get(p)==g,'unknown/reused native task')
         return procs[g]
@@ -28,11 +29,18 @@ def parse(blob,expected_code=None,expected_sha=None):
     def active(g,p):
         s=state(g,p);need(s['parent'] is not None and s['tgid'] is not None and s['preexit'] is None,'not a live entered task');return s
     def number(xs):return tuple(int(x) for x in xs)
-    shapes={'R':2,'B':3,'N':5,'I':8,'E':9,'C':4,'Y':3,'F':3,'A':3,'P':3,'L':3,'D':3,'X':3,'T':3,'OK':6}
+    shapes={'R':2,'B':3,'N':5,'I':8,'E':9,'C':4,'Y':3,'F':3,'A':3,'P':3,'L':3,'D':3,'X':3,'T':3,'OK':6,
+            'G':3,'Q':6,'V':3}
     for row,raw in enumerate(blob[:-1].split(b'\n'),1):
         try:
             tag,*f=raw.decode('ascii').split('\t')
-            need(terminal is None and tag in shapes and len(f)==shapes[tag],f'unknown or truncated record {tag!r}')
+            need(terminal is None and tag in shapes and (len(f)==shapes[tag] or tag=='OK' and len(f)==8),
+                 f'unknown or truncated record {tag!r}')
+            # A parked peer never receives a user-mode restart; a committed group
+            # exit caller can only report its irreversible EXIT and terminal wait.
+            if tag in ('N','C','Y','F','A','P','L','D','E'):
+                g=int(f[1] if tag=='E' else f[0])
+                need(g not in parks and g not in groups,'active event after group teardown')
             if tag=='R':
                 g,p=number(f);need(row==1 and g==1 and not roots,'duplicate root')
                 s=birth(g,p);s['parent']=0;s['tgid']=p;roots.append(p)
@@ -44,10 +52,33 @@ def parse(blob,expected_code=None,expected_sha=None):
             elif tag=='B':
                 g,p,tgid=number(f);s=birth(g,p)
                 need(g>1 and tgid>0 and s['tgid'] is None,'duplicate birth stop');s['tgid']=tgid
+                need(not any(q['verified'] and procs[leader]['pid']==tgid and procs[leader]['terminal'] is None
+                             for leader,q in groups.items()),'late birth in sealed fork group')
             elif tag=='N':
                 pg,p,k,g,ch=number(f);a=active(pg,p);s=birth(g,ch)
                 need(k in (1,2,3) and g!=pg and s['parent'] is None and a['pending'] is None,'bad fork lineage')
                 s['parent']=pg;s['create_kind']=k;a['pending']=ch
+            elif tag=='G':
+                g,p,code=number(f);s=active(g,p)
+                need(s['tgid']==p and s.get('create_kind')==1 and not any(e['lifetime']==g for e in execs)
+                     and s['pending'] is None and g not in groups and 0<=code<=255,'invalid exit_group caller')
+                groups[g]={'code':code<<8,'verified':False,'peers':set()}
+            elif tag=='Q':
+                g,p,owner,tgid=number(f[:4]);kind=f[4];nr=int(f[5]);s=active(g,p);a=active(owner,tgid)
+                gate=groups[owner]
+                need(not gate['verified'] and a['tgid']==s['tgid']==tgid and g!=owner and p!=tgid and
+                     g not in parks and g not in open_ex and s['pending'] is None,'unbound or unresolved parked peer')
+                need((kind in ('i','x') and nr==-1) or (kind=='e' and 0<=nr<0x40000000
+                     and nr not in (56,57,58,59,231,322,435)),'unsafe or unknown parked syscall')
+                gate['peers'].add(g);parks[g]=owner
+            elif tag=='V':
+                owner,p,n=number(f);active(owner,p);gate=groups[owner]
+                need(not gate['verified'] and n==len(gate['peers']) and
+                     all(g==owner or s['tgid']!=p or s['preexit'] is not None or s['terminal'] is not None
+                         or g in gate['peers'] for g,s in procs.items()) and
+                     not any(s['tgid'] is None and s['parent'] is not None and procs[s['parent']]['tgid']==p
+                             for s in procs.values()),'incomplete group park')
+                gate['verified']=True
             elif tag in ('C','Y'):
                 g,p,num=number(f[:3]);s=active(g,p);ch=int(f[3]) if tag=='C' else num
                 if num>0:need(s['pending']==num==ch,'positive or interrupted create without exact child')
@@ -76,6 +107,8 @@ def parse(blob,expected_code=None,expected_sha=None):
             elif tag=='X':
                 g,p,status=number(f);s=active(g,p);need(g not in open_ex and s['pending'] is None and s.get('aborted',status)==status,'unclosed exit')
                 need(os.WIFSIGNALED(status) or os.WIFEXITED(status),'unrecognized exit event')
+                owner=parks.get(g,g)
+                if owner in groups:need(groups[owner]['verified'] and status==groups[owner]['code'],'group EXIT mismatch')
                 s['preexit']=status
             elif tag=='T':
                 g,p,rc=number(f);s=state(g,p);need(s['preexit']==rc and s['terminal'] is None,'wait mismatch')
@@ -88,7 +121,12 @@ def parse(blob,expected_code=None,expected_sha=None):
             elif tag=='OK':terminal=number(f)
         except (Refused,ValueError,IndexError,KeyError) as e:raise Refused(f'line {row}: {e}') from e
     need(terminal is not None and len(roots)==1 and not live and not open_ex,'missing terminal or live task')
-    code,nexec,ntask,nborn,nwait,nd=terminal
+    need(all(v['verified'] and procs[g]['preexit']==v['code'] and
+         procs[g]['terminal']=='wait' for g,v in groups.items()),'missing group caller EXIT and wait')
+    code,nexec,ntask,nborn,nwait,nd,*extra=terminal
+    schema=2 if extra else 1
+    need((expected_schema is None or schema==expected_schema) and
+         (extra==[len(groups),len(parks)] if extra else not groups and not parks),'group receipt counts or schema')
     need((nexec,ntask,nborn,nwait,nd)==(len(execs),len(procs),len(procs)-1,len(reaped),len(discard)) and
          nwait+nd==ntask and nexec>0,'family counts')
     for g,s in procs.items():
@@ -98,7 +136,7 @@ def parse(blob,expected_code=None,expected_sha=None):
     need(len(roots_reaped)==1,'root has no unique reaped status')
     target=roots_reaped[0];need(code==(target if target>=0 else 128-target) and (expected_code is None or code==expected_code),'root return')
     used={e['image']['id'] for e in execs};need(used==set(images),'unconsumed image')
-    return dict(schema=1,sha256=sha,code=code,images=len(images),lifetimes=ntask,reaped=nwait,displaced=nd,
+    return dict(schema=schema,sha256=sha,code=code,images=len(images),lifetimes=ntask,reaped=nwait,displaced=nd,
                 execs=execs,failed_exec_returns=failed,interrupted_execs=aborted,spawned=nborn)
 if __name__=='__main__':
     a=argparse.ArgumentParser();a.add_argument('ledger');a.add_argument('--code',type=int);a.add_argument('--sha256');a.add_argument('--summary',action='store_true')

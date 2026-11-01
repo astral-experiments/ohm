@@ -1,8 +1,25 @@
-name: Measure a Ruff branch return after a private AST edit
-run-name: Whole Ruff CTFE crossover pilot ${{ inputs.reviewed_head }}
+name: Qualify whole Ruff branch returns with the schema-2 native observer
+run-name: CTFE v2 ${{ inputs.mode }} ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: Unscored native contact or fresh counterbalanced full pilot
+        type: choice
+        options: [contact, full-pilot]
+        required: true
+      contact_run:
+        description: Completed contact run on this exact head (full-pilot only)
+        type: string
+        required: false
+      contact_sha256:
+        description: Official contact archive SHA-256 (full-pilot only)
+        type: string
+        required: false
+      contact_readback_sha256:
+        description: Independently reopened contact certificate SHA-256 (full-pilot only)
+        type: string
+        required: false
       reviewed_head:
         description: Exact reviewed commit of the two-boot instruction pilot
         type: string
@@ -12,16 +29,20 @@ permissions:
   contents: read
 jobs:
   ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-crossover-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-v2-pilot-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
-    name: Full Ruff branch return ${{ matrix.position }}
+    name: CTFE v2 ${{ inputs.mode }} ${{ matrix.position }}
     strategy:
       fail-fast: false
       matrix:
-        position: ['01', '02']
+        position: ${{ fromJSON(inputs.mode == 'contact' && '["01"]' || '["01","02"]') }}
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      MODE: ${{ inputs.mode }}
+      CONTACT_RUN: ${{ inputs.contact_run }}
+      CONTACT_SHA256: ${{ inputs.contact_sha256 }}
+      CONTACT_READBACK_SHA256: ${{ inputs.contact_readback_sha256 }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -59,7 +80,7 @@ jobs:
             scripts/ohm-apple-zmij/source-transport
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: 2969895dc49c9d8970ef121e1ff024ef001dc7ce
+          ref: d4e1c4bac917a2de3218c13c50875b5c2d301a23
           path: kernel
           persist-credentials: false
           sparse-checkout: |
@@ -93,6 +114,7 @@ jobs:
           set -euo pipefail
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
           test "$(git -C ctfe-source rev-parse HEAD)" = 18b0cf251988b5967f8ffb0b11db850966eae9d1
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/source_guard.py enrolled "$REVIEWED_HEAD"
           for component_path in scripts/gnu-ctfe-literal-identity scripts/ruff-repair-tables-pilot/guards.py; do
             source_object=$(git -C ctfe-source rev-parse "HEAD:$component_path")
             pilot_object=$(git -C enrolled rev-parse "HEAD:$component_path")
@@ -101,6 +123,7 @@ jobs:
           for d in ctfe-source/scripts/gnu-ctfe-literal-identity enrolled/scripts/{ctfe-crossover-pilot,branch-return-pmu,branch-first-session-e-screen,branch-storage-e-confirmation,ohm-packed-ruff,ohm-packed-ruff/full-cli}; do
             (cd "$d" && sha256sum --strict --check --status SHA256SUMS)
           done
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_v2.py "$GITHUB_WORKSPACE/kernel"
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/test_subjects.py
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/reopen.py --help > /dev/null
           sudo apt-get update -qq
@@ -111,13 +134,20 @@ jobs:
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
+      - name: Independently verify the official v2 contact
+        if: inputs.mode == 'full-pilot'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 -IB enrolled/scripts/ctfe-crossover-pilot/contact_review.py acquire --run "$CONTACT_RUN" --head "$REVIEWED_HEAD" --sha256 "$CONTACT_SHA256" --readback-sha256 "$CONTACT_READBACK_SHA256" --observer-source "$GITHUB_WORKSPACE/kernel" --output "$RUNNER_TEMP/ohm-branch-object-qa/logs/prior-v2-contact.json"
       - name: Reconstruct both 81-file compiler installations using original source artifacts
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py acquire "$GITHUB_WORKSPACE/source"
-      - name: Validate the hardware counter and replay both ordinary branch histories
+      - name: Run the enrolled ordinary Ruff visits
         env:
           POSITION: ${{ matrix.position }}
           CTFE_EXECS_SOURCE: ${{ github.workspace }}/kernel
@@ -125,11 +155,11 @@ jobs:
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-crossover-pilot/pilot.py "$MODE" "$POSITION" "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ctfe-full-cli-instructions-${{ matrix.position }}
+          name: ctfe-v2-${{ inputs.mode }}-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

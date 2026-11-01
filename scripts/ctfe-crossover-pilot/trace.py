@@ -1,6 +1,7 @@
 """Observe separately selected ordinary Cargo visits with the qualified Linux exec collector."""
 
 from functools import cache
+import registration as reg
 import gzip
 import importlib.util
 import json
@@ -14,7 +15,7 @@ from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 PILOT = HERE.parent / 'branch-return-pmu'
-KERNEL = '2969895dc49c9d8970ef121e1ff024ef001dc7ce'
+KERNEL = reg.OBSERVER
 PROJECTOR = '5e91ed3974c0964a912fd38049946f647891dcb2'
 COMPILER_TREES = {'E': '89dcac9002ea6a0307d6fef82c0652b15c85dcca',
                   'C': '37bae6b16cbb4858b2dd597f70048cb7f2dc041c'}
@@ -68,23 +69,43 @@ def packages():
                            events=events, images=images, reader=reader, capture=capture)
 
 
-def prepare():
+def prepare(mode, host, prior=None):
     p = packages()
     b, contact = p.b, p.contact
     seal, audit, root_audit = contact.spec()
     boot = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
     contact.fresh_boot(boot, audit)
-    b.need(record(b.OUT / 'meter-ready.json')['boot'] == boot, 'different meter and structural boot')
+    reg.host(host)
+    b.need(boot == host['boot'], 'different fixture and visit boot')
+    if mode == 'full-pilot':
+        b.need(record(b.OUT / 'meter-ready.json')['boot'] == boot and prior, 'unqualified prior contact or hardware boot')
+        reg.fresh(boot, [prior['boot']])
+    else:
+        b.need(mode == 'contact' and prior is None and not (b.OUT/'meter-ready.json').exists(), 'unexpected PMU setup')
     contact.WORK.mkdir()
     contact.OUT.mkdir()
     fixtures = contact.OUT / 'fixtures'
-    subprocess.run([sys.executable, '-IB', p.kernel / 'fixtures.py', contact.WORK / 'tools', fixtures], check=True)
-    physical = record(fixtures / 'qualified.json')
-    b.need(physical['qualified'] is True and b.sha(contact.OBSERVER) == b.sha(fixtures / 'observe.elf')
-           == physical['observer_sha256'] == audit['observer_sha256'], 'unqualified physical observer')
-    b.save(contact.OUT / 'binding.json', {'official': seal, 'independent': audit, 'root_independent': root_audit,
-           'source': str(p.kernel), 'source_head': KERNEL, 'projector': str(p.prior), 'projector_head': PROJECTOR,
-           'observer': str(contact.OBSERVER), 'boot': boot, 'fixtures_sha256': b.sha(fixtures / 'qualified.json')})
+    tool = p.kernel / 'group_fixtures.py'
+    b.need(b.sha(p.kernel/'kernel/observe.c') == reg.SOURCE and b.sha(p.kernel/'kernel/read_events.py') == reg.READER,
+           'wrong source or schema-2 reader')
+    subprocess.run([sys.executable, '-IB', tool, 'run', contact.WORK/'tools', fixtures, b.SDK / b.WILD], check=True)
+    physical = record(fixtures/'qualified.json')
+    group = record(fixtures/'group-v2/qualified.json')
+    reopened = json.loads(subprocess.check_output([sys.executable,'-IB',tool,'reopen',fixtures]))
+    b.need(group == reopened and group['qualified'] is True and group['schema'] == 2 and group['boot'] == boot
+           and group['stock_wild_sha256'] == b.WILD_ELF and physical['qualified'] is True
+           and b.sha(contact.OBSERVER) == b.sha(fixtures/'observe.elf') == physical['observer_sha256'],
+           'unqualified actual host observer and native fixtures')
+    # Identify the source and executable separately. A contact binary is not a substitute for host qualification.
+    if prior:
+        b.need(prior['observer_source'] == KERNEL and prior['observer_sha256'] == physical['observer_sha256'],
+               'activated observer differs from independently reopened v2 contact')
+    b.save(contact.OUT/'binding.json', {'official':seal, 'independent':audit, 'root_independent':root_audit,
+           'mode':mode, 'source':str(p.kernel), 'source_head':KERNEL, 'projector':str(p.prior),
+           'projector_head':PROJECTOR, 'observer':str(contact.OBSERVER), 'observer_sha256':physical['observer_sha256'],
+           'boot':boot, 'fixtures_sha256':b.sha(fixtures/'qualified.json'),
+           'group_fixtures_sha256':b.sha(fixtures/'group-v2/qualified.json'),
+           'prior_v2':None if prior is None else prior['official']})
 
 
 def catalog(arm, rows, where, env):
@@ -143,7 +164,7 @@ def inventory(where, arm, rc, env):
     p = packages()
     source(where, arm, env, 'after')
     path = where / 'kernel.tsv'
-    family = p.reader.read(path, expected_code=rc)
+    family = p.reader.read(path, expected_code=rc, expected_schema=2)
     p.b.save(where / 'lifecycle.json', {k: len(v) if isinstance(v, list) else v for k, v in family.items()})
     with gzip.open(where / 'cargo.json.gz') as stream:
         call = json.load(stream)
@@ -152,6 +173,7 @@ def inventory(where, arm, rc, env):
              and call['argv'] == command and call['env'] == env and call['exit'] == call['expected'] == rc
              and call['cwd'] == str(p.capture.kit.TREE), 'wrong wrapped ordinary Cargo')
     native = p.events.project(path, family, record(where.parent / 'catalog.json'), arm, p.images, command)
+    p.b.save(where/'wild-helpers.json', reg.wild_helpers(path.read_bytes(), native['wild_processes']))
     if rc == 101:
         parser, = (r for r in native['rustcs'] if (r['crate'], r['mode']) == ('ruff_python_parser', 'full'))
         # Raw exit events and final waits are already paired by lifetime, PID and wait status in read().

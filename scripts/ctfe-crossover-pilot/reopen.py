@@ -11,6 +11,9 @@ import re
 import sys
 import zipfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import registration as reg
+
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE / "kernel-review"), str(HERE.parent / "branch-storage-e-confirmation/review")]
 import corpus
@@ -20,8 +23,8 @@ import replay_elf
 import replay_metrics as metrics
 import replay_native
 
-KERNEL = {"kernel_projection.py": "b9fe5b144f9eaeb52da7dd1a91441603cef8906f6e24540dc8efa30bf59fbf82",
-          "read_events.py": "4da51b789fd54e57ab1250371d92500597e98620326070928cb809f3b63382da"}
+KERNEL = {"kernel_projection.py": "2dbd95558e3455d21f55877d8779aaa05da755fd80e980794074ceb4717a1b53",
+          "read_events.py": "6303e38aad48eec1924a4015aa9a8f7387009fdd269d4e0bed189345a11f4238"}
 for name, expected in KERNEL.items():
     metrics.need(metrics.sha((HERE / "kernel-review" / name).read_bytes()) == expected, "wrong kernel reader " + name)
 import kernel_projection as kernel
@@ -112,13 +115,16 @@ def active(z, top, arm, files):
     return cert, root
 
 
-def kernel_fixtures(z, base):
+def kernel_fixtures(z, base, source):
+    from contact_review import fixtures
+    group = fixtures(z, base, source)
     q = dataset(z, base + "/qualified.json")
     pos = {"abort": 13, "duplicate": 19, "family": 23, "long": 0, "signals": 14, "thread": 37}
     refused = {"escape", "escape3"}
     expected = {name + "." + ext for name in set(pos) | refused for ext in ("stderr", "stdout", "tsv")} | {"run.json"}
     require(q["qualified"] and digest(z.read(base + "/observe.elf")) == q["observer_sha256"]
-            and compact(q["sources"]) == "304c8428d5af590269617a1287df088df4b1edca01402777806d523ce12e31a8"
+            and q["sources"] == {k.split("/")[1]: v for k,v in group["sources"].items() if k.startswith("kernel/")}
+            and q["sources"]["observe.c"] == reg.SOURCE and q["sources"]["read_events.py"] == reg.READER
             and q["native"]["live_physical_reopen"] and q["native"]["long_argument_bytes"] == 98003
             and set(q["originals"]) == expected and set(q["native"]["positive"]) == set(pos)
             and set(q["native"]["negative"]) == refused and len(q["native"]["mutations_rejected"]) == 16
@@ -128,7 +134,7 @@ def kernel_fixtures(z, base):
     for name, code in pos.items():
         raw = z.read(base + "/original/" + name + ".tsv")
         record = q["native"]["positive"][name]
-        checked = kernel.parse(raw, code, record["sha256"])
+        checked = kernel.parse(raw, code, record["sha256"], expected_schema=2)
         require(all(checked[k] == record[k] for k in ("code", "lifetimes", "reaped", "displaced", "spawned", "images"))
                 and len(checked["execs"]) == record["image_installs"], "different physical fixture closure")
     for name in refused:
@@ -137,23 +143,34 @@ def kernel_fixtures(z, base):
         require(digest(bad) == q["native"]["negative"][name] and bad.splitlines()[-1].split(b"\t")[:2] == [b"REFUSE", reason],
                 "wrong escape negative")
         try:
-            kernel.parse(bad)
+            kernel.parse(bad, expected_schema=2)
         except kernel.Refused:
             continue
         raise ValueError("accepted an escaped process family")
+    return group
 
 
-def kernel_binding(z, boot):
+def kernel_binding(z, boot, mode, source, prior):
     base = "kernel-qualification"
     b = dataset(z, base + "/binding.json")
     require(compact(b["official"]) == "4e1f6dfa8d05fb00d6db418db7efdbc3e7c130a38865263883d9e7801c67eef5"
             and compact(b["independent"]) == b["official"]["independent_sha256"]
             and digest((json.dumps(b["root_independent"], sort_keys=True, indent=2) + "\n").encode())
             == b["official"]["root_independent_sha256"]
-            and b["source_head"] == b["official"]["head"] and b["projector_head"] == "5e91ed3974c0964a912fd38049946f647891dcb2"
+            and b["official"]["head"] == "2969895dc49c9d8970ef121e1ff024ef001dc7ce"
+            and b["source_head"] == reg.OBSERVER and b["projector_head"] == reg.PROJECTOR
             and b["boot"] == boot != b["official"]["boot"]
             and b["fixtures_sha256"] == digest(z.read(base + "/fixtures/qualified.json")), "wrong enrolled kernel history")
-    kernel_fixtures(z, base + "/fixtures")
+    group = kernel_fixtures(z, base + "/fixtures", source)
+    reg.fresh(boot, [b["official"]["boot"]] + ([prior["boot"]] if prior else []))
+    require(b["mode"] == mode and b["prior_v2"] == (prior["official"] if prior else None) and
+            ((mode == "full-pilot") == (prior is not None)) and
+            b["group_fixtures_sha256"] == digest(z.read(base + "/fixtures/group-v2/qualified.json")) and
+            group["schema"] == 2 and group["qualified"] is True and group["boot"] == boot and
+            group["kernel"] == dataset(z,"host.json")["platform"]["release"] and
+            group["observer_sha256"] == b["observer_sha256"] == digest(z.read(base + "/fixtures/observe.elf")) and
+            (not prior or prior["observer_sha256"] == b["observer_sha256"]) and
+            group["stock_wild_sha256"] == kernel.STOCK, "wrong host fixture, prior contact or binary")
     return b
 
 
@@ -192,7 +209,7 @@ def physical(z, prefix, arm, cert, cmd, expected):
     raw = gzip.decompress(z.read(prefix + "/kernel.tsv.gz"))
     life = dataset(z, prefix + "/lifecycle.json")
     rows, closed = kernel.classify(raw, catalog, tuple(proxy["paths"]), CARGO, arm, expected, cmd["cwd"], life["sha256"])
-    require(life == {k: len(v) if isinstance(v, list) else v for k, v in closed.items()}, "unclosed process family")
+    require(closed["schema"] == 2 and life == {k: len(v) if isinstance(v, list) else v for k, v in closed.items()}, "unclosed process family")
     kernel.match_rows(rows, dataset(z, prefix + "/native-execs.json.gz"))
     if expected == 101:
         parser, = [r for r in rows["rustcs"] if (r["crate"], r["mode"]) == ("ruff_python_parser", "full")]
@@ -209,7 +226,9 @@ def physical(z, prefix, arm, cert, cmd, expected):
     # Distinguish a workspace lib from its like-named bin. Associate links with the actual rustc ancestor.
     full = sorted(workers[r["event"]] for r in rows["rustcs"] if r["mode"] == "full")
     links = sorted(workers[r["rustc_event"]] for r in rows["wild_processes"])
-    return {"compilers": compilers, "full_units": full, "link_units": links, "links": len(links),
+    helpers = reg.wild_helpers(raw, rows["wild_processes"])
+    require(helpers == dataset(z,prefix+"/wild-helpers.json"), "different inherited physical Wild fork-group")
+    return {"compilers": compilers, "full_units": full, "link_units": links, "links": len(links), "wild_helpers": helpers,
             "system": [r["kind"] for r in rows["other_linkers"]], "kernel": life["sha256"]}
 
 
@@ -288,7 +307,7 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
     require(score["observer"] == ("kernel" if traced else "pmu" if lane == "measured" else "ordinary"), "wrong observation header")
     if lane == "measured":
         require(cmd["observer_argv"] == [str(root / "logs/observers/plain"), str(where / "clock.json"), *CARGO]
-                and prefix + "/kernel.tsv.gz" not in z.NameToInfo, "wrong or traced PMU launch")
+                and all(prefix + "/" + name not in z.NameToInfo for name in ("kernel.tsv.gz","native-execs.json.gz","lifecycle.json","wild-helpers.json")), "wrong or traced PMU launch")
         clock = dataset(z, clock_path)
         require(set(clock) == {"start", "stop", "user_us", "system_us", "instructions", "enabled", "running", "event_errno", "code"}
                 and all(type(v) is int for v in clock.values()) and clock["stop"] > clock["start"]
@@ -306,6 +325,7 @@ def read_phase(z, prefix, phase, lane, route, arm, cert, root, bodies):
                         (phase == "comment" or result["links"] > 0), "historical source did not run its compiler/link")
         else:
             require(cmd["observer_argv"] is None and prefix + "/kernel.tsv.gz" not in z.NameToInfo
+                    and all(prefix+"/"+n not in z.NameToInfo for n in ("native-execs.json.gz","lifecycle.json","wild-helpers.json"))
                     and "compilers" not in score and "links" not in score, "invented physical rows or instrumented clean")
     return result
 
@@ -361,7 +381,8 @@ def decision(rows, issues):
                 and links[1] <= links[0] and other[1] <= other[0])
 
 
-def reopen(path, position):
+def reopen(path, position, source, prior):
+    from contact_review import host_guards
     with zipfile.ZipFile(path) as z:
         names = z.namelist()
         require(len(names) == len(set(names)) and all(not PurePosixPath(n).is_absolute()
@@ -370,7 +391,10 @@ def reopen(path, position):
         order = list(ROLES if position == "01" else reversed(ROLES))
         meter = dataset(z, "meter-ready.json")
         boot = pos["boot"]
-        binding = kernel_binding(z, boot)
+        require(pos["mode"] == "full-pilot" and prior["qualified"] is True and prior["head"] == pos["head"]
+                and dataset(z,"prior-v2-contact.json") == prior, "borrowed or missing independent prior contact")
+        host_guards(z,pos)
+        binding = kernel_binding(z,boot,"full-pilot",source,prior)
         cal = replay_controls.calibration(z, boot)
         clock_proof = hardware.verify(z, cal, meter)
         require(pos["position"] == position and pos["order"] == order and pos["command"] == CARGO
@@ -428,49 +452,23 @@ def reopen(path, position):
                     checked_elfs=len(bodies), calibration=clock_proof, visits=report)
 
 
-def catalog(directory, run, head, files):
-    run_info, jobs, assets = [json.loads((directory / name).read_bytes())
-                              for name in ("run.json", "jobs.json", "artifacts.json")]
-    require((run_info["id"], run_info["run_attempt"], run_info["head_sha"], run_info["head_branch"], run_info["event"],
-             run_info["path"], run_info["status"], run_info["conclusion"]) ==
-            (run, 1, head, "charlie/qa-ctfe-crossover-pilot-20261101", "workflow_dispatch", ".github/workflows/ci.yml",
-             "completed", "success") and run_info["repository"]["full_name"] == run_info["head_repository"]["full_name"]
-            == "astral-experiments/ohm", "wrong official attempt/repository")
-    require(jobs["total_count"] == len(jobs["jobs"]) == assets["total_count"] == len(assets["artifacts"]) == 2,
-            "incomplete official catalog")
-    job_ids, artifact_ids = set(), set()
-    for position, path in zip(("01", "02"), files, strict=True):
-        job, = [j for j in jobs["jobs"] if j["name"] == "Full Ruff branch return " + position]
-        asset, = [a for a in assets["artifacts"] if a["name"] == "ctfe-full-cli-instructions-" + position]
-        require(job["run_id"] == run and job["head_sha"] == head and job["run_attempt"] == 1
-                and job["status"] == "completed" and job["conclusion"] == "success"
-                and all(any(s["name"] == name and s["status"] == "completed" and s["conclusion"] == "success" for s in job["steps"])
-                        for name in ("Reconstruct both 81-file compiler installations using original source artifacts",
-                                     "Validate the hardware counter and replay both ordinary branch histories"))
-                and asset["workflow_run"]["id"] == run and asset["workflow_run"]["head_sha"] == head
-                and not asset["expired"] and path.stat().st_size == asset["size_in_bytes"], "wrong job/ZIP identity")
-        with path.open("rb") as f:
-            require(asset["digest"] == "sha256:" + hashlib.file_digest(f, "sha256").hexdigest(), "wrong official ZIP bytes")
-        job_ids.add(job["id"])
-        artifact_ids.add(asset["id"])
-    require(len(job_ids) == len(artifact_ids) == 2, "duplicated official job/artifact")
-
-
 if __name__ == "__main__":
     args = argparse.ArgumentParser(description=__doc__)
-    args.add_argument("archives", type=Path, nargs=2, metavar="ZIP")
-    args.add_argument("--official", type=Path, help="saved official run.json, jobs.json (attempt 1), artifacts.json")
-    args.add_argument("--run", type=int)
-    args.add_argument("--head")
-    opt = args.parse_args()
-    if opt.official is not None:
-        require(opt.run and opt.head, "--official requires the registered --run and --head")
-        catalog(opt.official, opt.run, opt.head, opt.archives)
-    pair = [reopen(p, pos) for pos, p in zip(("01", "02"), opt.archives, strict=True)]
-    require(pair[0]["boot"] != pair[1]["boot"] and pair[0]["run"] == pair[1]["run"]
-            and pair[0]["head"] == pair[1]["head"], "reused boot, different run or source")
-    if opt.official is not None:
-        require(all((r["run"], r["head"]) == (opt.run, opt.head) for r in pair), "archive belongs to a different attempt")
-    print(json.dumps(dict(positions=pair, official=opt.official is not None,
-                          advance=opt.official is not None and all(r["eligible"] and r["worker_accepted"] for r in pair)),
-                     sort_keys=True, indent=2))
+    args.add_argument("archives",type=Path,nargs=2,metavar="ZIP")
+    args.add_argument("--official",type=Path,required=True)
+    args.add_argument("--run",type=int,required=True)
+    args.add_argument("--head",required=True)
+    args.add_argument("--observer-source",type=Path,required=True)
+    args.add_argument("--contact-archive",type=Path,required=True)
+    args.add_argument("--contact-official",type=Path,required=True)
+    args.add_argument("--contact-run",type=int,required=True)
+    opt=args.parse_args()
+    from contact_review import from_official
+    source=opt.observer_source.resolve(strict=True)
+    prior=from_official(opt.contact_archive,opt.contact_official,opt.contact_run,opt.head,source)
+    meta=reg.official(opt.official,opt.run,opt.head,"full-pilot",opt.archives)
+    pair=[reopen(p,pos,source,prior) for pos,p in zip(("01","02"),opt.archives,strict=True)]
+    require(len({prior["boot"], *(r["boot"] for r in pair)}) == 3 and
+            all((r["run"],r["head"])==(opt.run,opt.head) for r in pair), "reused boot or different source/run")
+    print(json.dumps(dict(positions=pair,official=meta,contact=prior["official"],
+                          advance=all(r["eligible"] and r["worker_accepted"] for r in pair)),sort_keys=True,indent=2))

@@ -1,0 +1,682 @@
+{
+  "head": "28fe14afcf485bc99e7bd9036d9b4f4bb990ce86",
+  "meets_two_per_boot": true,
+  "process_counts": "unobserved",
+  "run": 41285793847,
+  "sufficient_for_pr": false,
+  "valid_counter_screen": true,
+  "workers": [
+    {
+      "boot": "61149494-93be-4462-8cec-12fa66623bc7",
+      "finished_cleanly": true,
+      "hardware": {
+        "abi": {
+          "config": "PERF_COUNT_HW_INSTRUCTIONS",
+          "cpu": -1,
+          "disabled": 1,
+          "enable_on_exec": 1,
+          "exclude_hv": 1,
+          "exclude_kernel": 1,
+          "group_fd": -1,
+          "inherit": 1,
+          "pid": "fork child blocked on its one-byte pipe before execvp cargo +ohm",
+          "read_bytes": 24,
+          "read_format": [
+            "PERF_FORMAT_TOTAL_TIME_ENABLED",
+            "PERF_FORMAT_TOTAL_TIME_RUNNING"
+          ],
+          "type": "PERF_TYPE_HARDWARE"
+        },
+        "binary_sha256": "09269e316b90e6abb741803c5e8fe698f11269a4d14f7e359dbe3f2862a01d06",
+        "sources": {
+          "scripts/gnu-example-ceiling/calibrate.c": "dacd1dd7fef85cacb44a236e0c4191d95db036a623b2a01ae3a5d76d2f3d0b0e",
+          "scripts/gnu-example-ceiling/nested.c": "099e82abfbb786dd6f776f43abeab1ab822eb98c8f2903d38d048259be67a158",
+          "scripts/gnu-example-ceiling/observer.c": "c258cd838bae37b9df99a2ee82b932c98b1acf92fe9c3619e02647851ce9940a",
+          "scripts/gnu-example-ceiling/watch.c": "ee82d0f9f0410861f3680c7ebf7f26547cd3a73833290d7272e83b4e29e0d903",
+          "scripts/gnu-renderer-library-workers/calibrator.c": "b2c7c6c3f1914383befe5e26b2c3050761ee831ad9a4c9e46a47a4b5aa5e1c9d",
+          "scripts/gnu-renderer-library-workers/workers.c": "9a3145936e2d02309edb431abaac64de2e79b2091dc2f324a708f75ec2b9bd53"
+        }
+      },
+      "instructions": {
+        "Con": 24625363294,
+        "Eon": 133289957719
+      },
+      "issues": [],
+      "native_bodies": 6,
+      "position": "01",
+      "ratio": 5.412710307160271,
+      "visits": {
+        "clean-reference-Con/clean-A": {
+          "allocated": 1986404352,
+          "cli": "a9c17a9b0fc976b58c9307a6fd9a4cd39d3f32d596d6926132645af413d87f15",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "clean-reference-Con/clean-B": {
+          "allocated": 1986215936,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "clean-reference-Con/clean-edited": {
+          "allocated": 1986162688,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "clean-reference-Eon/clean-A": {
+          "allocated": 1986412544,
+          "cli": "9442b600ca30c820810f7113181b4e1e429e60242b9a8fde2c51c8ef0edb68b4",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "clean-reference-Eon/clean-B": {
+          "allocated": 1986191360,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "clean-reference-Eon/clean-edited": {
+          "allocated": 1986191360,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Con/X-A": {
+          "allocated": 2477547520,
+          "cli": "a9c17a9b0fc976b58c9307a6fd9a4cd39d3f32d596d6926132645af413d87f15",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 919012757442,
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "measured-return-Con/X-B": {
+          "allocated": 3163074560,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 867560318641,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-return-Con/Y-B": {
+          "allocated": 1986158592,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 2666055702033,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-return-Con/comment": {
+          "allocated": 3148783616,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 24625363294,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Con/invalid": {
+          "allocated": 3173965824,
+          "cli": null,
+          "dirty": null,
+          "graph": null,
+          "instructions": 2456577852,
+          "reader": null,
+          "reference": "clean-edited",
+          "status": 101
+        },
+        "measured-return-Con/repair": {
+          "allocated": 3067006976,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "ebc3915712cc4bbf57ac119472172a0af006f03f42b02347ab67fe9b66ad3c12",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 115006231798,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Con/unchanged": {
+          "allocated": 3148783616,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "66140f264663e536a2cc7c778cece33c9e8e20becf9d30d15a4ce442019310d7",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 3480333423,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Eon/X-A": {
+          "allocated": 2477670400,
+          "cli": "9442b600ca30c820810f7113181b4e1e429e60242b9a8fde2c51c8ef0edb68b4",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 919348607528,
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "measured-return-Eon/X-B": {
+          "allocated": 3163623424,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 867816921555,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-return-Eon/Y-B": {
+          "allocated": 1986211840,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 2666693598222,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-return-Eon/comment": {
+          "allocated": 3035242496,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 133289957719,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Eon/invalid": {
+          "allocated": 3064864768,
+          "cli": null,
+          "dirty": null,
+          "graph": null,
+          "instructions": 2562486458,
+          "reader": null,
+          "reference": "clean-edited",
+          "status": 101
+        },
+        "measured-return-Eon/repair": {
+          "allocated": 3514343424,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "ebc3915712cc4bbf57ac119472172a0af006f03f42b02347ab67fe9b66ad3c12",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 73843087306,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Eon/unchanged": {
+          "allocated": 3035246592,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "66140f264663e536a2cc7c778cece33c9e8e20becf9d30d15a4ce442019310d7",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 3480712271,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-stay-Con/X-A": {
+          "allocated": 2477776896,
+          "cli": "a9c17a9b0fc976b58c9307a6fd9a4cd39d3f32d596d6926132645af413d87f15",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 919020770105,
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "measured-stay-Con/X-B": {
+          "allocated": 3163013120,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 867369235797,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-stay-Con/Y-B": {
+          "allocated": 1986170880,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 2666111823150,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-stay-Con/comment": {
+          "allocated": 3134873600,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 12105011844,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-stay-Con/unchanged": {
+          "allocated": 3134873600,
+          "cli": "57f543958b18de813ddef33a0e5fe43e85be3f55a68976639067f3b43bccb2cc",
+          "dirty": "66140f264663e536a2cc7c778cece33c9e8e20becf9d30d15a4ce442019310d7",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 3480207147,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-stay-Eon/X-A": {
+          "allocated": 2477744128,
+          "cli": "9442b600ca30c820810f7113181b4e1e429e60242b9a8fde2c51c8ef0edb68b4",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 919277530677,
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "measured-stay-Eon/X-B": {
+          "allocated": 3162869760,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 867851516886,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-stay-Eon/Y-B": {
+          "allocated": 1986220032,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 2666633101964,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-stay-Eon/comment": {
+          "allocated": 3134779392,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 12150463595,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-stay-Eon/unchanged": {
+          "allocated": 3134779392,
+          "cli": "0be690eae4ea52274adb32176da47f4db98568e9337ee55dbc6855414a0acdd5",
+          "dirty": "66140f264663e536a2cc7c778cece33c9e8e20becf9d30d15a4ce442019310d7",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 3480809449,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        }
+      }
+    },
+    {
+      "boot": "364da3c4-7589-4095-b2e6-efeddb2cf64f",
+      "finished_cleanly": true,
+      "hardware": {
+        "abi": {
+          "config": "PERF_COUNT_HW_INSTRUCTIONS",
+          "cpu": -1,
+          "disabled": 1,
+          "enable_on_exec": 1,
+          "exclude_hv": 1,
+          "exclude_kernel": 1,
+          "group_fd": -1,
+          "inherit": 1,
+          "pid": "fork child blocked on its one-byte pipe before execvp cargo +ohm",
+          "read_bytes": 24,
+          "read_format": [
+            "PERF_FORMAT_TOTAL_TIME_ENABLED",
+            "PERF_FORMAT_TOTAL_TIME_RUNNING"
+          ],
+          "type": "PERF_TYPE_HARDWARE"
+        },
+        "binary_sha256": "09269e316b90e6abb741803c5e8fe698f11269a4d14f7e359dbe3f2862a01d06",
+        "sources": {
+          "scripts/gnu-example-ceiling/calibrate.c": "dacd1dd7fef85cacb44a236e0c4191d95db036a623b2a01ae3a5d76d2f3d0b0e",
+          "scripts/gnu-example-ceiling/nested.c": "099e82abfbb786dd6f776f43abeab1ab822eb98c8f2903d38d048259be67a158",
+          "scripts/gnu-example-ceiling/observer.c": "c258cd838bae37b9df99a2ee82b932c98b1acf92fe9c3619e02647851ce9940a",
+          "scripts/gnu-example-ceiling/watch.c": "ee82d0f9f0410861f3680c7ebf7f26547cd3a73833290d7272e83b4e29e0d903",
+          "scripts/gnu-renderer-library-workers/calibrator.c": "b2c7c6c3f1914383befe5e26b2c3050761ee831ad9a4c9e46a47a4b5aa5e1c9d",
+          "scripts/gnu-renderer-library-workers/workers.c": "9a3145936e2d02309edb431abaac64de2e79b2091dc2f324a708f75ec2b9bd53"
+        }
+      },
+      "instructions": {
+        "Con": 24623344969,
+        "Eon": 133325131601
+      },
+      "issues": [],
+      "native_bodies": 6,
+      "position": "02",
+      "ratio": 5.414582452906055,
+      "visits": {
+        "clean-reference-Con/clean-A": {
+          "allocated": 1986412544,
+          "cli": "683125c1f45d57f130fb4a6b095c85f49373cb8a776cadec9f7d9aa3fdeffc71",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "clean-reference-Con/clean-B": {
+          "allocated": 1986191360,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "clean-reference-Con/clean-edited": {
+          "allocated": 1986252800,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "clean-reference-Eon/clean-A": {
+          "allocated": 1986400256,
+          "cli": "20029658c105338cdbb4ccf8c095c1b079c7d095858d2e703c71e847d0d64766",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "clean-reference-Eon/clean-B": {
+          "allocated": 1986207744,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "clean-reference-Eon/clean-edited": {
+          "allocated": 1986195456,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Con/X-A": {
+          "allocated": 2477760512,
+          "cli": "683125c1f45d57f130fb4a6b095c85f49373cb8a776cadec9f7d9aa3fdeffc71",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 919101718865,
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "measured-return-Con/X-B": {
+          "allocated": 3162771456,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 867268860225,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-return-Con/Y-B": {
+          "allocated": 1986158592,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 2665956327188,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-return-Con/comment": {
+          "allocated": 3148468224,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 24623344969,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Con/invalid": {
+          "allocated": 3173580800,
+          "cli": null,
+          "dirty": null,
+          "graph": null,
+          "instructions": 2457018910,
+          "reader": null,
+          "reference": "clean-edited",
+          "status": 101
+        },
+        "measured-return-Con/repair": {
+          "allocated": 3066658816,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "ebc3915712cc4bbf57ac119472172a0af006f03f42b02347ab67fe9b66ad3c12",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 114990412743,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Con/unchanged": {
+          "allocated": 3148468224,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "66140f264663e536a2cc7c778cece33c9e8e20becf9d30d15a4ce442019310d7",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 3480513618,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Eon/X-A": {
+          "allocated": 2477715456,
+          "cli": "20029658c105338cdbb4ccf8c095c1b079c7d095858d2e703c71e847d0d64766",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 919338549615,
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "measured-return-Eon/X-B": {
+          "allocated": 3163095040,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 867870532262,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-return-Eon/Y-B": {
+          "allocated": 1986158592,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 2666595420081,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-return-Eon/comment": {
+          "allocated": 3034591232,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 133325131601,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Eon/invalid": {
+          "allocated": 3064279040,
+          "cli": null,
+          "dirty": null,
+          "graph": null,
+          "instructions": 2562626429,
+          "reader": null,
+          "reference": "clean-edited",
+          "status": 101
+        },
+        "measured-return-Eon/repair": {
+          "allocated": 3513831424,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "ebc3915712cc4bbf57ac119472172a0af006f03f42b02347ab67fe9b66ad3c12",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 73818616541,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-return-Eon/unchanged": {
+          "allocated": 3034591232,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "66140f264663e536a2cc7c778cece33c9e8e20becf9d30d15a4ce442019310d7",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 3479658603,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-stay-Con/X-A": {
+          "allocated": 2477686784,
+          "cli": "683125c1f45d57f130fb4a6b095c85f49373cb8a776cadec9f7d9aa3fdeffc71",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 919085577599,
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "measured-stay-Con/X-B": {
+          "allocated": 3163131904,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 867554565712,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-stay-Con/Y-B": {
+          "allocated": 1986215936,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 2665903478135,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-stay-Con/comment": {
+          "allocated": 3135025152,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 12104064399,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-stay-Con/unchanged": {
+          "allocated": 3135025152,
+          "cli": "025d14dd108fd1772028697f880dfd3d576973a2f9a4552163227e2346dcd919",
+          "dirty": "66140f264663e536a2cc7c778cece33c9e8e20becf9d30d15a4ce442019310d7",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 3479337596,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-stay-Eon/X-A": {
+          "allocated": 2477776896,
+          "cli": "20029658c105338cdbb4ccf8c095c1b079c7d095858d2e703c71e847d0d64766",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 919267976116,
+          "reader": "75d1ec18095bba0314a4b3b244ee3a15780740d0f33904132a79315304131b08",
+          "reference": "clean-A",
+          "status": 0
+        },
+        "measured-stay-Eon/X-B": {
+          "allocated": 3163131904,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 867803039299,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-stay-Eon/Y-B": {
+          "allocated": 1986170880,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 2666614005342,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-B",
+          "status": 0
+        },
+        "measured-stay-Eon/comment": {
+          "allocated": 3134992384,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "051ce242f7e322de5461eb39ad55f6a52cd275b665490eb0c95afe678fb14d8c",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 12151175482,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        },
+        "measured-stay-Eon/unchanged": {
+          "allocated": 3134992384,
+          "cli": "29899d02fd1b6d0d5850aa9b02d018496ee7dc63ce37f4beb60f1bbd3a0ed084",
+          "dirty": "66140f264663e536a2cc7c778cece33c9e8e20becf9d30d15a4ce442019310d7",
+          "graph": "f5909e1cbd4832369f783bdbd733e54562bcce15e44592b8ec15793e9996c660",
+          "instructions": 3480029287,
+          "reader": "6db695bae59367ba98acdf8be6769486f613e51e0e655f05667ce2d2553e39e8",
+          "reference": "clean-edited",
+          "status": 0
+        }
+      }
+    }
+  ]
+}
