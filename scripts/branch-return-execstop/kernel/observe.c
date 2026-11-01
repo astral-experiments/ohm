@@ -29,7 +29,7 @@ struct image { struct stat st; int fd; };
 static struct task *tasks;
 static struct image images[MAX_IMAGE];
 static unsigned image_count, serial, exec_count, births, final, replacements;
-static unsigned group_exits, parked_peers;
+static unsigned group_exits, parked_peers, image_group_exits;
 static pid_t ceiling;
 static FILE *events;
 static char *argv_bytes;
@@ -146,12 +146,12 @@ static void exec_image(pid_t p,unsigned long old) {
 static unsigned long message(pid_t p) {
     unsigned long val;need(ptrace(PTRACE_GETEVENTMSG,p,0,&val)==0,"ptrace event payload");return val;
 }
-/* A forked helper can call exit_group while workers are at ptrace stops. Linux
+/* A process can call exit_group while workers are at ptrace stops. Linux
    may omit their EXIT notifications under the resulting fatal signal. Before
    releasing that syscall, park every still-running peer at a witnessed stop.
    No parked peer is restarted except after its irreversible EXIT event. */
 static void park_group(pid_t p, struct task *owner, int code) {
-    if (p!=owner->tgid || owner->origin!=PTRACE_EVENT_FORK || owner->ordinal) return;
+    if (p!=owner->tgid || (!owner->ordinal && owner->origin!=PTRACE_EVENT_FORK)) return;
     char path[64];snprintf(path,sizeof(path),"/proc/%d/task",p);
     DIR *dir=opendir(path);need(dir!=NULL,"group task directory");
     unsigned parked=0;bool started=false;
@@ -168,7 +168,13 @@ static void park_group(pid_t p, struct task *owner, int code) {
             need(s->known && s->born && s->tgid==p,"unregistered fork-group peer");
             if(s->exit_seen)continue;
             if(pass){need(s->parked_by==owner->serial,"unparked live fork-group peer");continue;}
-            if(!started){fprintf(events,"G\t%u\t%d\t%d\n",owner->serial,p,code);started=true;}
+            if(!started){
+                if(owner->ordinal){
+                    fprintf(events,"H\t%u\t%d\t%d\t%u\n",owner->serial,p,code,owner->ordinal);
+                    image_group_exits++;
+                }else fprintf(events,"G\t%u\t%d\t%d\n",owner->serial,p,code);
+                started=true;
+            }
             need(!s->pending && !s->parked_by,"fork-group peer has unresolved syscall");
             need(ptrace(PTRACE_INTERRUPT,tid,0,0)==0,"interrupt active fork-group peer");
             int st;pid_t got;do{got=waitpid(tid,&st,__WALL);}while(got<0 && errno==EINTR);
@@ -300,7 +306,7 @@ int main(int argc,char **argv) {
         resume(p,PTRACE_SYSCALL,0);
     }
     need(root_code>=0&&exec_count>0&&serial==births+1&&serial==final+replacements,"incomplete family closure");
-    fprintf(events,"OK\t%d\t%u\t%u\t%u\t%u\t%u\t%u\t%u\n",root_code,exec_count,serial,births,
-            final,replacements,group_exits,parked_peers);
+    fprintf(events,"OK\t%d\t%u\t%u\t%u\t%u\t%u\t%u\t%u\t%u\n",root_code,exec_count,serial,births,
+            final,replacements,group_exits,parked_peers,image_group_exits);
     need(!ferror(events)&&fclose(events)==0,"ledger flush");return root_code;
 }

@@ -1,5 +1,7 @@
 # Group-exit fixture for the Linux exec observer
 
+Schema 3 also protects a thread-group leader whose current executable was installed under the observer. An `H` record names the exact successful exec ordinal. The reader checks that the image is still current, all peers have exited or reached safe stops, and every terminal status agrees. The `installed` fixture starts eight workers and exits with 37. It identifies its workers independently of ptrace. Six negative checks cover a substituted image, a missing installation, a false inherited image and incorrect footer attribution.
+
 Run as an ordinary user on a two-CPU-or-larger x86-64 Linux host with ptrace, native cc, OpenSSL development headers, Python 3.11+ and the original GNU stock Wild. Both destination paths must be absent and their parent must exist. The fixture restricts its own process and children to two available CPUs.
 
 ```sh

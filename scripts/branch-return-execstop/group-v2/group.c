@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string.h>
 #include <sys/syscall.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -28,6 +29,13 @@ static void *work(void *unused) {
 }
 int main(int argc, char **argv) {
     if (argc != 2) return 61;
+    if (!strcmp(argv[1],"--installed")) {
+        pthread_t threads[THREADS];
+        for(int i=0;i<THREADS;i++)if(pthread_create(&threads[i],NULL,work,NULL))return 64;
+        while(atomic_load(&ready)<THREADS)sched_yield();
+        syscall(SYS_exit_group,37);
+        return 68;
+    }
     int cycles = atoi(argv[1]);
     peers_exit=getenv("FIXTURE_RACING_THREAD_EXIT")!=NULL;
     if (cycles < 1 || cycles > 128) return 62;

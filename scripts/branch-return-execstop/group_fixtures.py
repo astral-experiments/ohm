@@ -1,4 +1,4 @@
-"""Acquire or independently reopen schema-2 kernel fixtures, with no hardware counter."""
+"""Acquire or independently reopen kernel fixtures, including an installed multithreaded leader."""
 import argparse
 import hashlib
 import json
@@ -16,7 +16,8 @@ import fixtures
 import group_checks as checks
 
 CASES = (("racing-1", "group", 4), ("racing-2", "group", 4),
-         ("active", "group", 1), ("wild", "wild", 0), ("pending", "pending", 0))
+         ("active", "group", 1), ("wild", "wild", 0), ("pending", "pending", 0),
+         ("installed", "group", 0))
 CODES = dict(family=23, thread=37, duplicate=19, abort=13, signals=14, long=0)
 HISTORY = HERE / "group-v2/history"
 need = checks.need
@@ -71,6 +72,8 @@ def helper_builds(cc, tools, source):
         ("start", [cc, "-c", str(source / "start.s"), "-o", str(tools / "start.o")])]
 
 def args(name, program, cycles, root, tools, wild):
+    if name == "installed":
+        return [str(tools / "group"), "--installed"]
     if program == "wild":
         return [str(wild), str(tools / "start.o"), "-o", str(root / "linked.elf")]
     if program == "group":
@@ -125,7 +128,7 @@ def acquire(tools, out, wild):
         if name.startswith("racing"):
             env["FIXTURE_RACING_THREAD_EXIT"] = "1"
         command = args(name, program, cycles, root, tools, wild)
-        capture(stem, [tools/"observe", stem.with_suffix(".tsv"), "--", *command], 125 if program == "pending" else 0, env)
+        capture(stem, [tools/"observe", stem.with_suffix(".tsv"), "--", *command], case_status(name), env)
         if program == "wild":
             capture(root/"run-linked", [root/"linked.elf"], 37)
     for name, historic in idents.items():
@@ -159,7 +162,7 @@ def replay(out):
          and len(result["mutations_rejected"]) == 16 and len(result["negative"]) == 2 and set(result["positive"]) == set(CODES),
          "inherited native controls or mutation refusal changed")
     for name, code in CODES.items():
-        positive = checks.reader.read(oldraw/(name+".tsv"), expected_code=code, expected_schema=2)
+        positive = checks.reader.read(oldraw/(name+".tsv"), expected_code=code, expected_schema=3)
         need(positive["sha256"] == result["positive"][name]["sha256"], "legacy schema or wrong inherited ledger")
     projection = json.loads(subprocess.check_output([sys.executable, "-IB", HERE/"test_projection.py"]))
     need(projection == original["ruff_projection"] and len(projection["refusals"]) == 12, "native projection mismatch")
@@ -179,10 +182,13 @@ def replay(out):
     for name, program, cycles in CASES:
         stem=root/name
         command = args(name, program, cycles, root_path, tools, facts["wild"])
-        check_command(stem, [tools/"observe", (root_path/name).with_suffix(".tsv"), "--", *command], 125 if program == "pending" else 0)
+        check_command(stem, [tools/"observe", (root_path/name).with_suffix(".tsv"), "--", *command], case_status(name))
         raw, stdout, stderr = [stem.with_suffix(s).read_bytes() for s in (".tsv",".stdout",".stderr")]
         if program == "pending":
             negative = checks.pending(raw, stdout, stderr, command, ident["pending"])
+        elif name == "installed":
+            need(not stderr, "unexpected installed fixture diagnostic")
+            native[name] = checks.installed(raw, stdout, command, ident["group"])
         else:
             need(not stderr, "unexpected successful fixture diagnostic")
             native[name] = checks.positive(raw, stdout, program, command, ident)
@@ -193,11 +199,14 @@ def replay(out):
     # Bind every acquired source, executable, command, stream and partial event byte.
     originals = {str(p.relative_to(out)):sha(p) for p in sorted(out.rglob("*"))
                  if p.is_file() and p != root/"qualified.json"}
-    return dict(schema=2, qualified=True, boot=facts["boot"], kernel=facts["kernel"], cpus=facts["cpus"],
+    return dict(schema=3, qualified=True, boot=facts["boot"], kernel=facts["kernel"], cpus=facts["cpus"],
                 cc_sha256=ident["cc"]["sha256"], cc_version=version, observer_sha256=ident["observe"]["sha256"],
                 stock_wild_sha256=checks.WILD, linked_elf_sha256=checks.OUTPUT, sources=sources, native=native,
                 inherited_sha256=sha(out/"qualified.json"), pending_exec_refused=negative, historical_refusals=past,
                 mutations_rejected=mutations, originals=originals)
+
+def case_status(name):
+    return {"pending":125, "installed":37}.get(name,0)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

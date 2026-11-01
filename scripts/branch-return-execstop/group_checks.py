@@ -57,7 +57,7 @@ def mutations(raw):
     reasons = {}
     def trial(name, changed):
         forged = ("\n".join("\t".join(row) for row in changed) + "\n").encode()
-        reasons[name] = refused(reader, forged, expected_code=0, expected_schema=2)
+        reasons[name] = refused(reader, forged, expected_code=0, expected_schema=3)
     def drop(name, match):
         i = next(i for i, row in enumerate(rows) if match(row))
         trial(name, rows[:i] + rows[i+1:])
@@ -89,11 +89,11 @@ def physical(event, identity, argv):
          "installed image, physical file or argv changed")
 
 def positive(raw, stdout, program, argv, identities):
-    parsed = reader.parse(raw, expected_code=0, expected_schema=2)
+    parsed = reader.parse(raw, expected_code=0, expected_schema=3)
     rows = records(raw)
     counts = collections.Counter(row[0] for row in rows)
     need(parsed["lifetimes"] == parsed["reaped"] == counts["X"] == counts["T"] and
-         counts["G"] == counts["V"] and counts["E"] == counts["P"], "incomplete native exits or images")
+         counts["G"] + counts["H"] == counts["V"] and counts["E"] == counts["P"], "incomplete native exits or images")
     execs = parsed["execs"]
     physical(execs[0], identities[program], argv)
     if program == "wild":
@@ -135,6 +135,37 @@ def positive(raw, stdout, program, argv, identities):
             physical(e, identities["true"], ["exactly-once"])
     return dict(raw_sha256=parsed["sha256"], counts=dict(counts), lifetimes=parsed["lifetimes"],
                 schema=parsed["schema"], images=len(execs))
+
+def installed(raw, stdout, argv, identity):
+    """Match the parked TIDs and exact executed image to the fixture's independent inventory."""
+    parsed = reader.parse(raw, expected_code=37, expected_schema=3)
+    image, = parsed["execs"]
+    physical(image, identity, argv)
+    rows = records(raw)
+    group, = (row for row in rows if row[0] == "H")
+    need(group[1:] == [str(image["lifetime"]),str(image["pid"]),"37",str(image["ordinal"])],
+         "wrong installed group leader, status or image")
+    workers = set()
+    for line in stdout.splitlines():
+        match = re.fullmatch(rb"worker (\d+) group (\d+)", line)
+        need(match is not None and int(match[2]) == image["pid"], "wrong independent group")
+        workers.add(int(match[1]))
+    parked = {int(r[2]) for r in rows if r[0] == "Q" and r[3:5] == group[1:3]}
+    need(len(workers) == 8 and workers == parked and parsed["lifetimes"] == parsed["reaped"] == 9,
+         "an installed worker was omitted")
+    def replace(tag, transform):
+        return ("\n".join("\t".join(transform(row) if row[0]==tag else row) for row in rows)+"\n").encode()
+    corrupt = {
+        "missing-installation":replace("H",lambda r:[*r[:4],"0"]),
+        "different-installation":replace("H",lambda r:[*r[:4],str(image["ordinal"]+1)]),
+        "inherited-image":replace("H",lambda r:["G",*r[1:4]]),
+        "wrong-count":replace("OK",lambda r:[*r[:-1],"0"]),
+        "old-footer":replace("OK",lambda r:r[:-1]),
+    }
+    refusals = {k:refused(reader,body,expected_schema=3) for k,body in corrupt.items()}
+    refusals["old-reader-selection"] = refused(reader,raw,expected_schema=2)
+    return dict(ledger=parsed["sha256"], image_sha256=image["image"]["sha256"],
+                ordinal=image["ordinal"], workers=sorted(workers), rejected=refusals)
 
 def pending(raw, stdout, stderr, argv, identity):
     rows = records(raw)
