@@ -47,7 +47,7 @@ def enrollment(prior, jobs, artifacts, excluded, current, this_jobs, env, boot):
     )
     this = this_jobs[0]
     c.need(
-        this["name"] == "Signed GNU Ruff first-A instruction owners"
+        this["name"] == c.JOB
         and this["runner_name"] == env["RUNNER_NAME"]
         and this["runner_id"] > 0
         and this["id"] not in c.BLOCKED_JOBS,
@@ -90,14 +90,16 @@ def enrollment(prior, jobs, artifacts, excluded, current, this_jobs, env, boot):
         and this["runner_id"] not in {x["runner_id"] for x in earlier},
         "old boot or runner",
     )
-    c.need(this["id"] != c.REFUSED["job"] and current["id"] != c.REFUSED["run"]
-           and boot != c.REFUSED["boot"] and this["runner_name"] != c.REFUSED["runner"]
-           and this["runner_id"] != c.REFUSED["runner_id"]
-           and dt.datetime.fromisoformat(this["started_at"]) >= dt.datetime.fromisoformat(c.REFUSED["ended"]),
-           "overlapping or repeated worker from the rejected metadata-probe census")
+    for previous_worker in (c.REFUSED, c.LAST_OWNER):
+        c.need(this["id"] != previous_worker["job"] and current["id"] != previous_worker["run"]
+               and boot != previous_worker["boot"] and this["runner_name"] != previous_worker["runner"]
+               and this["runner_id"] != previous_worker["runner_id"]
+               and dt.datetime.fromisoformat(this["started_at"]) >= dt.datetime.fromisoformat(previous_worker["ended"]),
+               "overlapping or repeated original diagnostic worker")
     return dict(
         excluded_run=c.PREVIOUS,
         excluded_refusal=c.REFUSED,
+        excluded_owner=c.LAST_OWNER,
         excluded=earlier,
         run=current["id"],
         head=current["head_sha"],

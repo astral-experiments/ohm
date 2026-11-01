@@ -16,6 +16,7 @@ import common as c
 import acquire
 import instrument
 import ownership
+import leaf_profile
 
 HIST = HERE.parent / "ohm-packed-ruff"
 sys.path[:0] = [str(HERE.parent / "branch-return-pmu"), str(HIST / "full-cli"), str(HIST), str(HIST / "harness")]
@@ -113,8 +114,11 @@ def switch(revision):
         c.git(REPO, "switch", "--quiet", ruff.NAMES[revision])
 
 
-def invoke(where, cmd, want):
-    proc = subprocess.run([str(v) for v in cmd], cwd=REPO, env=ENV, capture_output=True, timeout=1200)
+def invoke(where, cmd, want, sampler=None):
+    if sampler is None:
+        proc = subprocess.run([str(v) for v in cmd], cwd=REPO, env=ENV, capture_output=True, timeout=1200)
+    else:
+        proc = leaf_profile.record(where / "leaves", sampler, cmd, REPO, ENV)
     for k, data in (("stdout", proc.stdout), ("stderr", proc.stderr)):
         (where / ("cargo." + k + ".gz")).write_bytes(gzip.compress(data, compresslevel=2, mtime=0))
     c.save(
@@ -125,7 +129,7 @@ def invoke(where, cmd, want):
     return [json.loads(line) for line in proc.stdout.splitlines()]
 
 
-def run_visit(lane, phase, refs, tools, topo):
+def run_visit(lane, phase, refs, tools, topo, sampler):
     branch = "B" if phase == "B" else "A"
     if phase in ("A", "B"):
         switch(branch)
@@ -170,7 +174,7 @@ def run_visit(lane, phase, refs, tools, topo):
         trace.mkdir()
         selectors = c.read(OUT / "selectors.json")
         command = [tools / "tree", trace, mode, *[selectors[n][2] for n in topo.ROLES], *command]
-    rows = invoke(where, command, 101 if bad else 0)
+    rows = invoke(where, command, 101 if bad else 0, sampler=sampler if mode == "tree" else None)
     c.need(before == source(branch, phase), "source changed during compile")
     c.save(where / "source-after.json", before)
     diag = ownership.typed(rows, bad)
@@ -217,7 +221,7 @@ def run_visit(lane, phase, refs, tools, topo):
     c.save(where / "visit.json", summary)
 
 
-def main(collector, contract):
+def main(collector, contract, sampler_source):
     c.need(
         not any(os.environ.get(k) for k in ("GH_TOKEN", "GITHUB_TOKEN", "RUSTC_WRAPPER", "LD_PRELOAD")),
         "ambient credentials or interposition in hardware step",
@@ -255,6 +259,7 @@ def main(collector, contract):
     selectors = {n: topo.location(p) for n, p in zip(topo.ROLES, paths, strict=True)}
     c.save(OUT / "selectors.json", selectors)
     c.save(OUT / "selector-sha.json", {n: c.sha(v[2]) for n, v in selectors.items()})
+    sampler = leaf_profile.calibrate(OUT, tools, b.SDK, sampler_source)
     refs = {}
     for lane, phases in c.PHASES.items():
         (OUT / lane).mkdir()
@@ -264,7 +269,7 @@ def main(collector, contract):
             for phase in phases:
                 if lane == "reference" and phase == "A":
                     b.fresh_outputs()
-                run_visit(lane, phase, refs, tools, topo)
+                run_visit(lane, phase, refs, tools, topo, sampler)
         except Exception:
             if lane != "attributed":
                 raise

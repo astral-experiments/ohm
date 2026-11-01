@@ -10,6 +10,10 @@ Use the ordinary command below. A is `b5dba861cc38e3f7fb4524c9ceba3e01a474ea13`;
 cargo +ohm build -p ruff --bin ruff --locked --offline -j4 --message-format=json
 ```
 
+## First-A instruction samples
+
+The current contact adds a fixed-period leaf observation to the middle A visit of these three histories. Read [the registered gates](FIRST-A-LEAVES.md) alongside the original whole and per-owner controls. The central `perf` process starts outside the counter, and its pinned forwarder restores the original environment and Cargo output streams. The prior separate run's original showed 20 full compilers in A. The first two, `ruff_linter` and `ruff_workspace`, would have had to shed 84.87% of their combined instructions to halve the whole command. Those costs explain why the receiver enrolls all 20.
+
 ## Which question can this answer?
 
 Six earlier opt-in E/D histories retired roughly 919 billion userspace instructions on their first A. They had no per-compiler counters in that window. The separate default-mode wall-clock study ran source-built SDKs and did not count instructions. The ranking from a different signed -21 `ty_server` edit shows the established collector can assign real compiler work, but cannot price this build. The 76 same-named `ruff_server` codegen units likewise give no cost estimate. [Six-host sources and results](https://github.com/astral-experiments/ohm/actions/runs/41312535998) · [Default wall-clock study](https://github.com/astral-experiments/ohm/actions/runs/41334379753) · [Calibrated operator](https://github.com/astral-experiments/ohm/actions/runs/41189297097)
@@ -40,7 +44,7 @@ Plan one 16-vCPU GNU host, restricted to four distinct physical CPUs, with at le
 
 ```sh
 python3 -IB scripts/ruff-default-owner-pmu/test_attribution.py /path/to/collector /path/to/contract
-python3 -IB scripts/ruff-default-owner-pmu/reopen.py --zip official.zip --catalog terminal-catalog.json --excluded six-source-boot-records.json --head "$REVIEWED_HEAD" --collector /path/to/collector --contract /path/to/contract
+python3 -IB scripts/ruff-default-owner-pmu/reopen.py --zip official.zip --catalog terminal-catalog.json --excluded six-source-boot-records.json --head "$REVIEWED_HEAD" --collector /path/to/collector --contract /path/to/contract --sampler-source /path/to/sampler-source --symbol-sdk /path/to/signed-22-sdk
 ```
 
 `terminal-catalog.json` contains the independently acquired official `run`, `job` and `artifact` API objects. The reader checks exact SHA/size, official successful steps, source, boot and identities, recalibrates from raw observations without executing an archived executable, and rereads all four ELF bodies, all successful checkouts and both independent error/repair histories. It emits an instruction ranking only after all registered gates pass.

@@ -7,10 +7,17 @@ from pathlib import Path
 import subprocess
 
 HERE = Path(__file__).resolve().parent
-BRANCH = "charlie/qa-ruff-default-owner-git-probe-20261101"
+BRANCH = "charlie/qa-ruff-first-a-leaves-20261101"
 REPO = "astral-experiments/ohm"
 COLLECTOR = "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc"
 CONTRACT = "42ab30fd5e6bcdcf908df81de9baac65ca64fbf9"
+JOB = "Signed GNU Ruff first-A hardware instruction leaves"
+ARTIFACT = "signed-gnu-ruff-first-a-instruction-leaves"
+SAMPLER = "f5667dc0aa2083961065a3a947b06a091e00af98"
+LAST_OWNER = dict(run=41349209691, job=124975532927, artifact=13100907533,
+                  digest="sha256:fa0b3bf462528e8a0bef968ffd04aa99e4aeb8f3477d903ad2ea8f4904a6bd06",
+                  boot="2ddd5b99-7fe4-4545-8e63-63f687a36969", runner="nsc-runner-f85r66gs8g04s",
+                  runner_id=1385, ended="2026-11-01T21:07:13Z")
 PREVIOUS = 41336398017
 PREVIOUS_HEAD = "3c206e8bf2c2236c035f1e8f352d9ad547d69ef7"
 BLOCKED_JOBS = (124937039974, 124937040076, 124937040027, 124937040042, 124937039985, 124937039779)

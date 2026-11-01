@@ -21,6 +21,8 @@ import acquire
 import common as c
 import instrument
 import ownership
+import leaf_profile
+from counter_members import bounded_files
 
 
 class Directory:
@@ -228,25 +230,6 @@ def actual_externs(z, where, products, root):
     )
 
 
-def bounded_files(z, target):
-    total = 0
-    selected = 0
-    for name in z.namelist():
-        if not name.startswith(("calibration/", "counter-programs/", "attributed/A/trace/")) or name.endswith("/"):
-            continue
-        leaf = Path(name)
-        c.need(not leaf.is_absolute() and ".." not in leaf.parts and str(leaf) == name, "unsafe counter member")
-        p = target / leaf
-        p.parent.mkdir(parents=True, exist_ok=True)
-        with z.open(name) as src, p.open("xb") as out:
-            data = src.read((4 << 20) + 1)
-            c.need(0 < len(data) <= 4 << 20, "counter file length")
-            total += len(data)
-            selected += 1
-            c.need(total <= 32 << 20 and selected <= 1800, "counter evidence bound")
-            out.write(data)
-
-
 def thresholds(whole, spend):
     c.need(
         len(whole) == 3 and min(whole) > 0 and 50 * (max(whole) - min(whole)) <= min(whole),
@@ -265,7 +248,7 @@ def thresholds(whole, spend):
     }
 
 
-def replay(z, temp, head, previous, collector, contract):
+def replay(z, temp, head, previous, collector, contract, sampler_source, symbol_sdk):
     en, root, work, selectors, sdk, changed = read_subject(z, head, previous)
     c.need(
         record(z, "collection.json")
@@ -425,6 +408,7 @@ def replay(z, temp, head, previous, collector, contract):
     c.need(len({b["whole"] for b in bodies.values()}) == 4, "independent branches or native clients collapsed")
     changed_crates = {p.split("/")[1] for row in changed for p in row.split("\t")[1:] if p.startswith("crates/")}
     owners = results["owners"]
+    leaf_report = leaf_profile.reopen(z, temp, root, sdk, selectors, owners, sampler_source, symbol_sdk)
     eligible = []
     for owner in owners:
         path = Path(owner["src"])
@@ -445,6 +429,7 @@ def replay(z, temp, head, previous, collector, contract):
     }
     return {
         "enrollment": en,
+        "retired_instruction_leaves": leaf_report,
         "source": c.EXPECTED,
         "plain_before_attributed_plain_after": clocks,
         "instruction_budgets": thresholds(clocks, spend),
@@ -474,7 +459,7 @@ def official(value, zpath, head):
     c.need(
         job["run_id"] == run["id"]
         and job["conclusion"] == "success"
-        and job["name"] == "Signed GNU Ruff first-A instruction owners"
+        and job["name"] == c.JOB
         and {s["name"] for s in job["steps"] if s["conclusion"] == "success"}
         >= {
             "Install the published GNU release",
@@ -485,7 +470,7 @@ def official(value, zpath, head):
     )
     c.need(
         a["workflow_run"]["id"] == run["id"]
-        and a["name"] == "signed-gnu-ruff-default-first-a-owners"
+        and a["name"] == c.ARTIFACT
         and zpath.stat().st_size == a["size_in_bytes"]
         and a["digest"] == "sha256:" + c.sha(zpath),
         "incorrect official ZIP identity",
@@ -505,6 +490,8 @@ def main():
     arg.add_argument("--collector", type=Path, required=True)
     arg.add_argument("--contract", type=Path, required=True)
     arg.add_argument("--head", required=True)
+    arg.add_argument("--sampler-source", type=Path, required=True, help="frozen original recorder source checkout")
+    arg.add_argument("--symbol-sdk", type=Path, required=True, help="authentic GNU signed -22 SDK for offline ELF lookup")
     a = arg.parse_args()
     collector = a.collector.resolve()
     contract = a.contract.resolve()
@@ -527,14 +514,14 @@ def main():
                     ),
                     "unbounded official archive",
                 )
-                value = replay(z, path, a.head, c.read(a.excluded), collector, contract)
+                value = replay(z, path, a.head, c.read(a.excluded), collector, contract, a.sampler_source, a.symbol_sdk)
                 c.need(value == record(z, "accepted.json"), "terminal replay differs from original worker result")
                 c.need(
                     (run, job) == (value["enrollment"]["run"], value["enrollment"]["job"]),
                     "mixed official original",
                 )
         else:
-            value = replay(Directory(a.directory), path, a.head, None, collector, contract)
+            value = replay(Directory(a.directory), path, a.head, None, collector, contract, a.sampler_source, a.symbol_sdk)
     print(json.dumps(value, sort_keys=True, separators=(",", ":")))
 
 
