@@ -1,0 +1,21 @@
+# Diesel Opt on the captured Apple stage2 compiler
+
+This one-worker, 65-minute diagnostic preserves six complete Diesel libraries and their standalone metadata. The previous run retained only hashes for its two libraries. Its three official ZIPs, SHA-256s, observed build results and jobserver diagnostic are recorded in `previous.json`.
+
+The job restores the 3,070 SDK paths from official artifact 13069826622. The instrumented Rust source is `1bc7b356`, Cargo is `4591cf45`, and the compiler, driver, Cargo, host stage0 tools, rustc-perf source and original collector source files use the seals in `../diesel-stage2-repeat/enrollment.json`. The native stage2 compiler and its LLVM driver are the original binary images. Collector executable identity after rebuilding the pinned helper source is recorded separately.
+
+1. Run the original focused Diesel 2.2.10 Opt collector, including its genuine `0-println.patch`. Record every physical Diesel compiler PID and both instrumented modules, the prior incremental graph, diagnostics and the full emitted A/B product hashes. A Cargo hit during the reported unchanged scenario can omit a compiler process.
+2. Before the actual B compiler starts, save the patched workspace including A's previous finalized session and both outstanding product bodies. After that compiler exits, save the B archive and standalone metadata before their temporary directory disappears. Upload this original artifact before starting any independent readers.
+3. Make five independent APFS clones from that untouched seed. Verify source bytes, file mtimes, modes and complete intra-root hardlink relationships. All five pristine trees coexist and must have disjoint regular-file identities. Run one at a time at the exact original cwd and output paths. The first two runs use the literal captured B argv and env. The third appends only `-Zassert-incr-state=loaded`. The fourth keeps the same argv but clears Diesel's own incremental state and outputs, with the actual dependency and proc-macro bytes preserved. The fifth repeats the ordinary warm B invocation with only the advertised jobserver descriptors closed.
+4. The natural Cargo pipe is passed once through a private local socket using `SCM_RIGHTS`. The first four direct processes receive its original open file descriptions at their original numbers. Record `fstat`, access mode, available-byte count without reading tokens, each physical rustc and its native FD observation when available. The fifth must report the old bad-descriptor warning, and the first four must accept their descriptors. Kernel token availability is recorded per observation. A difference involving the fifth trial alone needs further evidence before assigning a cause.
+
+Every archive is stored verbatim and inventoried by actual member magic. The independent reader checks BSD and GNU ar framing, ordered raw member/section hashes and unclassified native extents. It also tries a separate two-direction reconstruction. The only permitted replacements are corresponding full native CGU filenames carrying a single seven-character invocation suffix, once in the archive's actual filename fields and once in the typed Rust-object vector in `lib.rmeta-link`. It requires identical native CGU bodies, standalone metadata and equality of the entire reconstructed archive with the target. Other differences remain visible in the raw archive and comparison. The real source locations are `compiler/rustc_session/src/config.rs::temp_path_ext_for_cgu`, `rustc_codegen_ssa/src/back/link.rs::link_rlib`, and `rustc_codegen_ssa/src/back/rmeta_link.rs::RmetaLink::encode`. On the enrolled Rust tree their Git blob IDs are `02733fb830b4082a7a9ed0056537d4009bae9a41`, `878bd83103681efc90c08adf074a10e075d152ee` and `69ec3788ac6323bcce67916fa4b66af6e1af04c0`.
+
+From the QA checkout, reopen the two new original ZIPs with Python 3.11 or newer.
+
+```sh
+python3 -IB scripts/diesel-stage2-archives/read_outputs.py \
+  /path/to/diesel-native-archive-original.zip /path/to/diesel-native-archive-replays.zip
+```
+
+For the local mechanism controls use `python3 -IB scripts/diesel-stage2-archives/test_contact.py`. To recheck the three historical originals, append `originals /path/to/41273385731-zips`. This is a focused compiler-output diagnostic. It has no counters or release-publication step.

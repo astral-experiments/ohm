@@ -247,7 +247,7 @@ def failure(tmp, out, logs, rustc):
     return {"matching_ice": True, "original": original, "failed_workspace_count": len(saved)}
 
 
-def lane(role):
+def lane(role, observer=None):
     w, root, r, build, perf, kit = work()
     dest = r / role
     dest.mkdir()
@@ -295,7 +295,7 @@ def lane(role):
             OHM_DIESEL_WORK=str(root),
             OHM_DIESEL_RECORD=str(dest),
             OHM_DIESEL_PYTHON=sys.executable,
-            OHM_DIESEL_OBSERVER=str(HERE / "observe.py"),
+            OHM_DIESEL_OBSERVER=str(observer or HERE / "observe.py"),
             OHM_DIESEL_RUSTC=str(rustc),
         )
         run = [actor, *args]

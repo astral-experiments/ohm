@@ -1,4 +1,4 @@
-name: Sealed Darwin instrumented Diesel collector replay
+name: Focused Darwin Diesel compiler archive comparison
 'on':
   workflow_dispatch:
     inputs:
@@ -8,14 +8,14 @@ name: Sealed Darwin instrumented Diesel collector replay
         type: string
 permissions: {}
 concurrency:
-  group: sealed-darwin-instrumented-diesel
+  group: sealed-darwin-diesel-archives
   cancel-in-progress: false
 jobs:
   replay:
-    name: Two fresh Apple collector histories on the restored instrumented SDK
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-diesel-instrumented-repeat-20261101' && github.run_attempt == 1 && github.sha == inputs.reviewed_head
+    name: Escrow natural and independent Diesel B libraries on the restored instrumented Apple SDK
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-diesel-instrumented-archives-20261101' && github.run_attempt == 1 && github.sha == inputs.reviewed_head
     runs-on: macos-15
-    timeout-minutes: 115
+    timeout-minutes: 65
     permissions:
       contents: read
       actions: read
@@ -29,10 +29,11 @@ jobs:
       run: |
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-        test "$(git rev-parse HEAD^)" = e8c4c99286652f27929290e417ff269e32d0bbd5
-        git diff --exit-code HEAD^ HEAD -- . ':!scripts/diesel-stage2-repeat' ':!.github/workflows/ci.yml'
+        test "$(git rev-parse HEAD^)" = 87d296ac3b05648c082193fdb91d1145652797ff
+        git diff --exit-code HEAD^ HEAD -- . ':!scripts/diesel-stage2-archives' ':!scripts/diesel-stage2-repeat/repeat.py' ':!scripts/diesel-stage2-repeat/SHA256SUMS' ':!.github/workflows/ci.yml'
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
         (cd scripts/diesel-stage2-repeat && shasum -a 256 --check SHA256SUMS)
+        (cd scripts/diesel-stage2-archives && shasum -a 256 --check SHA256SUMS)
         ./scripts/prepare-hosted-macos-release.sh
         test "$(uname -m)" = arm64
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
@@ -89,51 +90,38 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: |
         python3 -IB scripts/diesel-stage2-repeat/test_replay.py
+        python3 -IB scripts/diesel-stage2-archives/test_contact.py
         python3 -IB scripts/diesel-stage2-repeat/intake.py restore "$RUNNER_TEMP/diesel-repeat" "$GITHUB_WORKSPACE/source/rust/build/aarch64-apple-darwin/stage2" "$RUNNER_TEMP/diesel-repeat/reports"
     - name: Prepare the original collector source and verify physical compiler identities
       run: |
         rustup toolchain install 1.98.0 --profile minimal --no-self-update
         python3 -IB scripts/diesel-stage2-repeat/repeat.py prepare
-    - name: Original full nine benchmarks and three profiles, four jobs
-      id: primary
-      run: python3 -IB scripts/diesel-stage2-repeat/repeat.py primary
-    - name: Preserve primary originals before any focused or diagnostic compiler
-      id: keep_primary
+    - name: Run only the original focused Diesel Opt history and escrow the complete natural B products and incoming state
+      id: focused
+      run: python3 -IB scripts/diesel-stage2-archives/contact.py focused
+    - name: Upload the natural compiler outputs and complete original seed before any direct replay
+      id: original
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: sealed-instrumented-nine-original
+        name: diesel-native-archive-original
         path: ${{ runner.temp }}/diesel-repeat/reports
-        if-no-files-found: warn
-        retention-days: 14
-    - name: Fresh focused Diesel Opt collector and observed real Eprintln child PIDs
-      id: focused
-      if: steps.primary.outcome == 'success' && steps.keep_primary.outcome == 'success'
-      run: python3 -IB scripts/diesel-stage2-repeat/repeat.py focused
-    - name: Preserve physical focused originals before the additional same-graph read
-      id: keep_focused
-      if: always() && steps.focused.outcome != 'skipped'
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: sealed-instrumented-diesel-original
-        path: |
-          ${{ runner.temp }}/diesel-repeat/reports/focused
-          ${{ runner.temp }}/diesel-repeat/reports/observer.json
-          ${{ runner.temp }}/diesel-repeat/reports/observer-build
         if-no-files-found: error
         retention-days: 14
-    - name: Require the previous real A graph for one independent reader of B
-      id: witness
-      if: steps.focused.outcome == 'success' && steps.keep_focused.outcome == 'success'
-      run: python3 -IB scripts/diesel-stage2-repeat/repeat.py witness
-    - name: Preserve the additional loaded-graph witness
-      if: always() && steps.witness.outcome != 'skipped'
+    - name: Compare two ordinary B readers, one explicit loaded B, a fresh unit and the separate closed-jobserver control
+      id: replays
+      if: steps.focused.outcome == 'success' && steps.original.outcome == 'success'
+      run: python3 -IB scripts/diesel-stage2-archives/contact.py trials
+    - name: Stop the read-only jobserver handoff
+      if: always()
+      run: python3 -IB scripts/diesel-stage2-archives/contact.py stop
+    - name: Preserve each complete replay archive, standalone metadata, native process and archive breakdown
+      if: always() && steps.replays.outcome != 'skipped'
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: sealed-instrumented-diesel-graph-witness
+        name: diesel-native-archive-replays
         path: |
-          ${{ runner.temp }}/diesel-repeat/reports/graph-witness.json
-          ${{ runner.temp }}/diesel-repeat/reports/graph-structure.json
-          ${{ runner.temp }}/diesel-repeat/reports/loaded-B-export
-        if-no-files-found: warn
+          ${{ runner.temp }}/diesel-repeat/reports/archives/replays
+          ${{ runner.temp }}/diesel-repeat/archive-handoff/broker.log
+        if-no-files-found: error
         retention-days: 14
