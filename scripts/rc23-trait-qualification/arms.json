@@ -1,0 +1,53 @@
+{
+  "arms": {
+    "base": {
+      "rust": "83f22211d49b85daffa5f12f2a8b52d180a88993",
+      "tree": "a18524fcb112ed12c7d38982033017d967f45031"
+    },
+    "both": {
+      "original": "9a5c767f83959802f6d6634deec4aba99b820bc1",
+      "parent": "fcd7d5a0274e4dad7666c5e0b5816841c26126e4",
+      "patch_sha256": "f4fa68186f9656ef4f3febf1f3e511f78e736d9017084796d3f729aaddf4d825",
+      "paths": [
+        "compiler/rustc_middle/src/dep_graph/graph.rs",
+        "compiler/rustc_query_impl/src/dep_kind_vtables.rs",
+        "compiler/rustc_query_impl/src/execution.rs",
+        "tests/run-make/trait-impl-bucket-projection/reader.rs",
+        "tests/run-make/trait-impl-bucket-projection/rmake.rs",
+        "tests/run-make/trait-impl-bucket-projection/roster.rs"
+      ],
+      "pr": 306,
+      "rust": "9c29c72b39941ffd9df30051c5014b76378545de",
+      "tree": "ff59aa0d6e1b51593f63c1bc5b86e656799699cd"
+    },
+    "nominal": {
+      "original": "b3d745e44826c2d1e4b5ca89222ddbab7af5cc35",
+      "parent": "83f22211d49b85daffa5f12f2a8b52d180a88993",
+      "patch_sha256": "e62a7e6f6ba7a58d6a1380e40e4934b1e6aa8d1a0483cb47b8bf35dc3240966c",
+      "paths": [
+        "compiler/rustc_incremental/src/persist/file_format.rs",
+        "compiler/rustc_middle/src/dep_graph/graph.rs",
+        "compiler/rustc_middle/src/queries.rs",
+        "compiler/rustc_middle/src/query/keys.rs",
+        "compiler/rustc_middle/src/ty/context/impl_interner.rs",
+        "compiler/rustc_middle/src/ty/mod.rs",
+        "compiler/rustc_middle/src/ty/trait_def.rs",
+        "compiler/rustc_query_impl/src/dep_kind_vtables.rs",
+        "compiler/rustc_query_impl/src/execution.rs",
+        "tests/run-make/trait-impl-bucket-projection/reader.rs",
+        "tests/run-make/trait-impl-bucket-projection/rmake.rs",
+        "tests/run-make/trait-impl-bucket-projection/roster.rs"
+      ],
+      "pr": 296,
+      "rust": "fcd7d5a0274e4dad7666c5e0b5816841c26126e4",
+      "tree": "5e6950a050583745e1f0d7d0b994fafccb9102d5"
+    }
+  },
+  "base_epoch": 10,
+  "cargo": "39bf4510b889030a40c8c49611d9c6230566d37d",
+  "epoch": 26655,
+  "objects": 46,
+  "pack_bytes": 173465,
+  "pack_sha256": "51d6cf9e05a7101143c37a1baf1181f85c70be43e28fed5cdf2f1e0e75b57574",
+  "source_manifest_sha256": "a4e1fb3f142e8aecb40eb3188f2d11a8903448c842ba2e9540468f12ac523feb"
+}
