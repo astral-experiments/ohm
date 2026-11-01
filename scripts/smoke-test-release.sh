@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
 
 if [[ $# -ne 4 ]]; then
   echo "usage: smoke-test-release.sh RELEASE_DIRECTORY TOOLCHAIN TARGET CLIPPY_REVISION" >&2

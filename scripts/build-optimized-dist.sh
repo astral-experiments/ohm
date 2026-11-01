@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
 
 if [[ $# -ne 4 ]]; then
   echo 'usage: build-optimized-dist.sh TARGET TOOLCHAIN RUST_CHECKOUT BOOTSTRAP_CONFIG' >&2

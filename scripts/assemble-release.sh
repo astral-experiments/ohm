@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
 
 if [[ $# -ne 3 ]]; then
   echo "usage: assemble-release.sh MANIFEST RELEASE_DIRECTORY TOOLCHAIN" >&2

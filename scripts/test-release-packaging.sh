@@ -26,7 +26,13 @@ done
 
 valid="$temporary_directory/valid"
 cp -R "$inputs" "$valid"
-bash "$script_directory/assemble-release.sh" "$manifest" "$valid" "$toolchain"
+mkdir "$temporary_directory/search"
+cp -R "$inputs" "$temporary_directory/search/valid"
+(
+  cd -- "$temporary_directory"
+  CDPATH="$temporary_directory/search" bash "$script_directory/assemble-release.sh" "$manifest" valid "$toolchain"
+)
+test ! -e "$temporary_directory/search/valid/SHA256SUMS"
 (
   cd "$valid"
   sha256sum --check --strict SHA256SUMS
