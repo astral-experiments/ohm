@@ -13,6 +13,7 @@ import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import contract as q
 import instructions as policy
+import confirmation
 import donor_integrity as integrity
 
 
@@ -395,77 +396,6 @@ def stubs(z, p, s, cli, cwd, edited):
     return result
 
 
-def official(folder, raw, head):
-    """Verify the one attempt, its pre-outcome job enrollment and the complete transferred bytes."""
-    get = lambda name: json.loads((folder / (name + ".json")).read_bytes())
-    r, j, a, before = (get(k) for k in ("run", "jobs", "artifacts", "pre-outcome"))
-    (job,), (art,) = j["jobs"], a["artifacts"]
-    repo = "astral-experiments/ohm"
-    q.need(
-        j["total_count"] == a["total_count"] == 1
-        and int(before["run"]) == r["id"]
-        and before["job"] == job["id"]
-        and before["head"] == head
-        and before["assets"] == 0
-        and (r["repository"]["full_name"], r["head_repository"]["full_name"])
-        == (repo, repo)
-        and (
-            r["head_sha"],
-            r["head_branch"],
-            r["event"],
-            r["run_attempt"],
-            r["path"],
-            r["conclusion"],
-        )
-        == (
-            head,
-            q.BRANCH,
-            "workflow_dispatch",
-            1,
-            ".github/workflows/ci.yml",
-            "success",
-        )
-        and (
-            job["run_id"],
-            job["head_sha"],
-            job["run_attempt"],
-            job["name"],
-            job["labels"],
-            job["status"],
-            job["conclusion"],
-        )
-        == (
-            r["id"],
-            head,
-            1,
-            "GNU E D integration fast-forward contact",
-            ["namespace-profile-ubuntu-24-04-16"],
-            "completed",
-            "success",
-        )
-        and all(x["conclusion"] == "success" for x in job["steps"])
-        and art["workflow_run"]["id"] == r["id"]
-        and art["workflow_run"]["head_sha"] == head
-        and art["name"] == "gnu-donor-integration-fast-forward-contact"
-        and not art["expired"]
-        and art["size_in_bytes"] == raw.stat().st_size,
-        "wrong, failed or substituted official job",
-    )
-    with raw.open("rb") as f:
-        sha = hashlib.file_digest(f, "sha256").hexdigest()
-    q.need(art["digest"] == "sha256:" + sha, "official original digest mismatch")
-    return dict(
-        run=r["id"],
-        job=job["id"],
-        runner=job["runner_name"],
-        head=head,
-        attempt=1,
-        artifact=art["id"],
-        sha256=sha,
-        bytes=art["size_in_bytes"],
-    )
-
-
 def read(raw, meta, kernel, ruff, calibrator, observers):
     ctfe, sel, suite = q.packages()
     import pilot as local
@@ -514,33 +444,14 @@ def read(raw, meta, kernel, ruff, calibrator, observers):
         expected("donor-opens.json", lambda l, p: l == "ordinary" and p == "comment")
         expected("fresh.json", lambda l, p: l == "empty" or p == "Y-B")
         pos = D("position.json")
+        confirmation.position_record(pos, meta)
         q.need(
-            (
-                pos["mode"],
-                pos["position"],
-                pos["order"],
-                pos["runner"],
-                pos["run"],
-                pos["head"],
-                pos["command"],
-            )
-            == (
-                "one-host-contact",
-                "01",
-                list(policy.ORDER),
-                meta["runner"],
-                meta["run"],
-                meta["head"],
-                q.COMMAND,
-            )
-            and pos["plan"]
-            == q.sha((q.HERE / "PLAN.md").read_bytes())
-            == q.sha(z.read("PLAN.md"))
+            q.sha(z.read("position.json")) == meta["position_sha256"]
+            and pos["plan"] == q.sha((q.HERE / "PLAN.md").read_bytes()) == q.sha(z.read("PLAN.md"))
             and pos["hardware_gate"] == local.reg.hardware_gate()
             and D("ruff-inputs.json") == source,
-            "wrong observation or source",
+            "wrong observed position, source or admission",
         )
-        q.fresh_runner(pos["boot"], meta["runner"])
         local.reg.host(pos["host"])
         meter = D("meter-ready.json")
         n.replay_controls.PACKAGING, n.replay_controls.OBSERVER = calibrator, observers
@@ -599,7 +510,7 @@ def read(raw, meta, kernel, ruff, calibrator, observers):
         q.need(eac["argv"][: len(priv)] == priv, "wrong suite privileges")
         refs, records, bodies, host_images = {}, {}, {}, set()
         rosters, full_semantics, origin = {}, {}, {}
-        for arm in policy.ORDER:
+        for arm in confirmation.order(meta["position"]):
             cert, root = n.active(z, arm, arm, kits[arm[0]]["files"])
             fresh_owners = {}
             rows = {}
@@ -878,12 +789,15 @@ def read(raw, meta, kernel, ruff, calibrator, observers):
             and host_images.isdisjoint(k[1] for k in bodies),
             "unaccounted or in-window native product",
         )
+        confirmation.subjects(records, meta["position"])
         outcome = policy.outcomes(records)
         q.need(
             D("complete.json")
             == dict(
                 qualified=True,
                 decisions=0,
+                position=meta["position"],
+                order=list(confirmation.order(meta["position"])),
                 kernel_schema=3,
                 layout={k: list(v) for k, v in policy.LAYOUT.items()},
                 records=records,
@@ -915,11 +829,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("zip", "official-dir", "kernel", "ruff", "calibrator", "observers"):
         parser.add_argument("--" + name, required=True, type=Path)
+    parser.add_argument("--position", choices=confirmation.POSITIONS, required=True)
     parser.add_argument("--head", required=True)
     opts = parser.parse_args()
     os.environ.setdefault("RUNNER_TEMP", "/tmp")
     q.check_source(opts.head)
-    meta = official(opts.official_dir, opts.zip, opts.head)
+    meta = confirmation.official(opts.official_dir, opts.zip, opts.head, opts.position)
     result = read(
         opts.zip, meta, opts.kernel, opts.ruff, opts.calibrator, opts.observers
     )

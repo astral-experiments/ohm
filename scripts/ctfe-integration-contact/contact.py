@@ -13,6 +13,7 @@ import traceback
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import contract as q
 import instructions as policy
+import confirmation
 import donor_integrity as integrity
 
 
@@ -298,22 +299,26 @@ def main(argv):
         and (h.WORK / ".owned-by-packed-study").read_text() == str(h.ROOT),
         "wrong registration or private roots",
     )
+    pos = os.environ["CONFIRMATION_POSITION"]
+    order = confirmation.order(pos)
+    confirmation.fresh(Path("/proc/sys/kernel/random/boot_id").read_text().strip(), os.environ["RUNNER_NAME"])
     if argv[0] == "acquire" and len(argv) == 2:
         h.subjects.acquire(Path(argv[1]))
         return
     q.need(
-        argv[0] == "contact"
+        argv[0] == "confirm"
         and len(argv) == 3
         and not (h.OUT / "meter-ready.json").exists(),
         "unknown mode or active counters",
     )
-    pos, order = "01", policy.ORDER
     host = local_host(h, *map(Path, argv[1:]))
-    q.fresh_runner(host["boot"], os.environ["RUNNER_NAME"])
+    confirmation.fresh(host["boot"], os.environ["RUNNER_NAME"])
     h.save(
         h.OUT / "position.json",
         dict(
-            mode="one-host-contact",
+            mode=confirmation.MODE,
+            contact=confirmation.CONTACT,
+            exclusions=confirmation.EXCLUSIONS,
             position=pos,
             runner=os.environ["RUNNER_NAME"],
             order=order,
@@ -365,7 +370,7 @@ def main(argv):
     prefix = suite.permission_prefix(initial)
 
     refs, records = {}, {}
-    for arm in policy.ORDER:
+    for arm in order:
         top = h.OUT / arm
         top.mkdir()
         env = h.subjects.activate(arm, rows, top)
@@ -416,12 +421,15 @@ def main(argv):
             ),
             "different clean loaded executable bytes or semantic behavior",
         )
+    confirmation.subjects(records, pos)
     result = policy.outcomes(records)
     h.save(
         h.OUT / "complete.json",
         dict(
             qualified=True,
             decisions=0,
+            position=pos,
+            order=order,
             kernel_schema=3,
             layout=policy.LAYOUT,
             records=records,

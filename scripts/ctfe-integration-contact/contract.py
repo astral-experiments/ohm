@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 HERE = Path(__file__).resolve().parent
-BRANCH = "charlie/qa-donor-integration-xb-contact-20261101"
+BRANCH = "charlie/qa-donor-integration-xb-six-20261101"
 COMMAND = [
     "cargo",
     "+ohm",

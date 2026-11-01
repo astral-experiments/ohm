@@ -1,22 +1,28 @@
 name: E and D fast-forward on the Ruff integration test
-run-name: Ruff integration fast-forward contact ${{ inputs.reviewed_head }}
+run-name: Ruff integration fast-forward six-host confirmation ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
         type: string
-        description: Exact reviewed SHA of the one-host integration-test contact
+        description: Exact reviewed SHA of the six-host confirmation
         required: true
 permissions:
   actions: read
   contents: read
 jobs:
   native:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-donor-integration-xb-contact-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
-    name: GNU E D integration fast-forward contact
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-donor-integration-xb-six-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    name: GNU E D integration fast-forward confirmation ${{ matrix.position }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        position: ['01', '02', '03', '04', '05', '06']
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 185
     env:
+      CONFIRMATION_POSITION: ${{ matrix.position }}
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       CTFE_CARRIER: ${{ github.workspace }}/ctfe
       INTEGRATION_CARRIER: ${{ github.workspace }}/integration
@@ -119,6 +125,7 @@ jobs:
           python3 -IB "$dir/test_fast_forward.py" --enrolled "$REVIEWED_HEAD"
           python3 -IB "$dir/test_contact.py"
           python3 -IB "$dir/test_instructions.py"
+          python3 -IB "$dir/test_confirmation.py"
           python3 -IB ctfe/scripts/ctfe-crossover-pilot/test_v2.py "$GITHUB_WORKSPACE/kernel"
           python3 -IB ctfe/scripts/ctfe-crossover-pilot/test_subjects.py --acquisition-imports "$GITHUB_WORKSPACE/source"
           for s in scripts/gnu-same-revision-donor/{binding.py,source_ids.py,donors.py,donor_open.py,driver_map.py,live_driver.py,overlay.py} scripts/ruff-repair-tables-pilot/guards.py; do
@@ -140,15 +147,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py acquire "$GITHUB_WORKSPACE/source"
-      - name: Run one hardware and structural contact
+      - name: Run the registered native and hardware histories
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB ctfe/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py contact "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB ctfe/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py confirm "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: gnu-donor-integration-fast-forward-contact
+          name: gnu-donor-integration-fast-forward-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

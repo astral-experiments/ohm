@@ -63,7 +63,7 @@ class Gates(unittest.TestCase):
             Path(h.__file__).resolve(), donor / "scripts/ctfe-crossover-pilot/pilot.py"
         )
         self.assertEqual(plan.ORDER, tuple(h.subjects.ARMS))
-        self.assertTrue(callable(review.official) and callable(review.read))
+        self.assertTrue(callable(review.confirmation.official) and callable(review.read))
         self.assertEqual(
             q.COMMAND,
             [
