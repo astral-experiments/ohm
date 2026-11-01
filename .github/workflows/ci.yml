@@ -1,4 +1,4 @@
-name: Native incremental node-slot containment and optimized Darwin Diesel
+name: Rebased node-slot recovery, optimized Darwin Diesel and declared native links
 'on':
   workflow_dispatch:
     inputs:
@@ -8,12 +8,12 @@ name: Native incremental node-slot containment and optimized Darwin Diesel
         type: string
 permissions: {}
 concurrency:
-  group: private-rc22-node-slot-containment
+  group: private-rc22-rebased-node-slots-and-native-links
   cancel-in-progress: false
 jobs:
   native:
     name: Native graph recovery (${{ matrix.host }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-reject-node-slots-20261101' && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-rc22-slots-declared-20261101' && github.run_attempt
       == 1 && github.sha == inputs.reviewed_head
     strategy:
       fail-fast: false
@@ -103,8 +103,8 @@ jobs:
       run: |-
         set -euo pipefail
         test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
-        test "$(git rev-parse HEAD^)" = 48f743cbf1ecad76127c512f141be636b0deedff
-        test "$(git rev-parse HEAD~2)" = e8c4c99286652f27929290e417ff269e32d0bbd5
+        test "$(git rev-parse HEAD^)" = 995cb8d10ee36c21e7bb05ca262587ef7290a11d
+        test "$(git rev-parse HEAD~2)" = 48f743cbf1ecad76127c512f141be636b0deedff
         git diff --exit-code HEAD~2 HEAD -- .github/workflows/release.yml release toolchains scripts ':!scripts/dep-graph-slots'
         (cd scripts/integrated-dist-qa && shasum -a 256 --check SHA256SUMS)
         (cd scripts/darwin-pgo-diesel && shasum -a 256 --check SHA256SUMS)
@@ -233,6 +233,14 @@ jobs:
       run: python3 -IB scripts/dep-graph-slots/qualify.py native
       id: matrix
       if: success() && (steps.linux_rmake.outcome == 'success' || steps.darwin_collectors.outcome == 'success')
+    - name: Run the merged declared and undeclared provider smoke with each native tool pair
+      id: links
+      if: success() && steps.matrix.outcome == 'success'
+      run: python3 -IB scripts/dep-graph-slots/release_smoke.py
+    - name: Compare a transitive GNU provider with its independent empty native links
+      id: transitive
+      if: success() && runner.os == 'Linux' && steps.links.outcome == 'success'
+      run: python3 -IB scripts/dep-graph-slots/release_smoke.py transitive
     - name: Execute the same checked-in run-make on the native Apple host
       run: python3 -IB scripts/dep-graph-slots/qualify.py rmake
       id: darwin_rmake
@@ -242,16 +250,19 @@ jobs:
         set -euo pipefail
         test "$SOURCE" = success
         test "$MATRIX" = success
+        test "$LINKS" = success
         if test "$RUNNER_OS" = macOS; then
           test "$NATURAL" = success && test "$ESCROW" = success && test "$COLLECTORS" = success && test "$APPLE_RMAKE" = success
         else
-          test "$GNU_RMAKE" = success
+          test "$GNU_RMAKE" = success && test "$TRANSITIVE" = success
         fi
       if: always()
       shell: bash
       env:
         SOURCE: ${{ steps.source.outcome }}
         MATRIX: ${{ steps.matrix.outcome }}
+        LINKS: ${{ steps.links.outcome }}
+        TRANSITIVE: ${{ steps.transitive.outcome }}
         NATURAL: ${{ steps.natural.outcome }}
         ESCROW: ${{ steps.escrow.outcome }}
         COLLECTORS: ${{ steps.darwin_collectors.outcome }}

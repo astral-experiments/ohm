@@ -18,6 +18,7 @@ from eager_header import scan
 from graph_forensics import read, record
 import native
 import qualify
+import release_smoke
 
 
 def refuse(call, message):
@@ -30,7 +31,25 @@ def refuse(call, message):
 
 def cases():
     env = qualify.BIND
-    assert env["candidate"] == "c0b318301965619c2cbd4b261ff3de84fac6831b"
+    assert env["candidate"] == "1686aef9877e0c95faddf6f9c313e451a9744f29"
+    assert env["parent"] == "008a21ac0d750dc9a1c18b7959d7e7984c03d887"
+    assert env["previous_slot_candidate"] == "c0b318301965619c2cbd4b261ff3de84fac6831b"
+    assert env["release_coordinator"] == "8c7d5b4500fdfa6e2234417340aa190e5787e513"
+    assets = HERE / "release-22"
+    for name, value in env["release_files"].items():
+        b = (assets / name).read_bytes()
+        assert [len(b), hashlib.sha256(b).hexdigest()] == value
+    manifest = json.loads((assets / "22.json").read_bytes())
+    assert manifest["sources"]["rust"]["revision"] == env["parent"]
+    assert (
+        manifest["sources"]["cargo"]["revision"]
+        == env["trees"]["src/tools/cargo"]
+        == "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770"
+    )
+    assert env["release_files"]["smoke-test-relink.sh"] == [
+        6712,
+        "e57b87041abe1f91c78c29bb26e276e7ccd41e8f33a360aec616fb260d7ec175",
+    ]
     assert set(env["files"]) == {
         "compiler/rustc_incremental/src/persist/load.rs",
         "compiler/rustc_middle/src/dep_graph/serialized.rs",
@@ -78,6 +97,77 @@ def cases():
             refuse(lambda: native.damage(p, "duplicate"), "foreign file accepted")
     print(
         "Physical parent graph accepted before and after an arbitrary complete-row move; 6 directed slot faults and 2 negative headers distinguished."
+    )
+
+
+def provider_controls():
+    digest = lambda tag: hashlib.sha256(str(tag).encode()).hexdigest()
+    statuses = {
+        "seed": 17,
+        "unchanged": 17,
+        "new": 29,
+        "new-clean": 29,
+        "bad": None,
+        "bad-clean": None,
+        "restored": 17,
+        "old-clean": 17,
+    }
+    rows = {
+        p: {
+            "status": 0 if tag else 101,
+            "links": 1,
+            "closures": {},
+            **({"elf": digest(tag), "value": tag} if tag else {}),
+        }
+        for p, tag in statuses.items()
+    }
+    depfiles = {
+        "old": "libohm_private.a",
+        "new": "libohm_private.so",
+        "bad": "",
+        "restored": "libohm_private.a",
+    }
+    native = {
+        p: {"link": 0 if tag else 1, "exit": tag, "depfile": depfiles[p]}
+        for p, tag in [("old", 17), ("new", 29), ("bad", None), ("restored", 17)]
+    }
+    fixture = {
+        "wild": {"sha256": release_smoke.WILD},
+        "cargo": rows,
+        "direct": {tool: copy.deepcopy(native) for tool in ("gnu", "wild")},
+        "commands": {
+            "cargo-" + phase: {
+                "argv": ["cargo", "+ohm", "build", "--offline", "--message-format=json"],
+                "status": row["status"],
+            }
+            for phase, row in rows.items()
+        },
+    }
+    assert release_smoke.assess_transitive(fixture)["qualified"]
+    stale = copy.deepcopy(fixture)
+    stale["cargo"]["new"].update(value=17, elf=digest(17), links=0)
+    assert not release_smoke.assess_transitive(stale)["qualified"]
+    stale["cargo"]["new"].update(value=29)
+    assert not release_smoke.assess_transitive(stale)["qualified"]  # same tag, wrong ELF
+    for edit in ["missing", "forged-command", "different-provider", "wrong-clean", "unbound-Wild"]:
+        wrong = copy.deepcopy(fixture)
+        if edit == "missing":
+            del wrong["cargo"]["unchanged"]
+        if edit == "forged-command":
+            wrong["commands"]["cargo-new"]["argv"].append("--release")
+        if edit == "different-provider":
+            wrong["direct"]["wild"]["new"]["depfile"] = "libohm_private.a"
+        if edit == "wrong-clean":
+            wrong["cargo"]["new-clean"]["value"] = 17
+        if edit == "unbound-Wild":
+            wrong["wild"]["sha256"] = "0" * 64
+        refuse(lambda: release_smoke.assess_transitive(wrong), edit)
+    assert (
+        release_smoke.checksum(HERE / "gnu_transitive.py")
+        == "ed5166df83e6b6230e134e33b30be5bf398f0992312d3777d5c63fb64ae218d4"
+    )
+    print(
+        "Transitive GNU qualification detects stale output, byte disagreement and five malformed registrations."
     )
 
 
@@ -146,5 +236,6 @@ if __name__ == "__main__":
     p.add_argument("--receipt", type=Path)
     a = p.parse_args()
     cases()
+    provider_controls()
     if a.receipt:
         packet(a.receipt)
