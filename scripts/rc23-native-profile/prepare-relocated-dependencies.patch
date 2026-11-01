@@ -1,0 +1,9 @@
+--- a/collector/src/compile/benchmark/mod.rs
++++ b/collector/src/compile/benchmark/mod.rs
+@@ -457,0 +458,6 @@
++                // A dependency can embed the absolute path to its generated files.
++                // Prepare it at the final path before the profiler isolates the selected crate.
++                self.mk_cargo_process(toolchain, cwd, profile, backend, target, frontend_threads)
++                    .run_rustc(false)
++                    .await?;
++

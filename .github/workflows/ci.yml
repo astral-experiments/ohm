@@ -1,4 +1,4 @@
-name: Qualify the -23 compiler on GNU AArch64 and x86-64 musl
+name: Qualify the expanded -23 release profile on native Linux
 on:
   workflow_dispatch:
     inputs:
@@ -9,24 +9,25 @@ on:
 permissions: {}
 jobs:
   build:
-    name: Build matched -23 cross SDK (${{ matrix.arm }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-cross-qualification' && github.sha == inputs.reviewed_head
+    name: Native PGO and BOLT (${{ matrix.mode }})
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-profile-diagnostic' && github.sha == inputs.reviewed_head
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        arm:
-          - base
-          - cross
+        mode:
+          - exact
+          - prepare
     runs-on: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
     timeout-minutes: 360
     env:
-      BENCH_ARM: ${{ matrix.arm }}
+      BENCH_ARM: base
       OHM_TOOLCHAIN: ohm-1.99.0-23
       OHM_TARGET: x86_64-unknown-linux-gnu
       PYTHONDONTWRITEBYTECODE: "1"
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      QUALIFY_MODE: ${{ matrix.mode }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -39,6 +40,16 @@ jobs:
           persist-credentials: false
           ref: 90575c9fc302c2af0858c711726b2d211e7d3114
           path: release-reference
+          sparse-checkout: |-
+            scripts
+            release
+            toolchains
+      - name: Check out the exact coordinator release candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: 4e4c6ec61e4bc519e4d89dec92e20f6244c2daaf
+          path: release-candidate
           sparse-checkout: |-
             scripts
             release
@@ -81,13 +92,15 @@ jobs:
           sparse-checkout: |-
             scripts/cargo-diagnostic-fix
             scripts/ohm-apple-zmij/cargo293
-      - name: Verify the four source pins and the compiler comparison
-        run: python3 -IB scripts/rc23-cross-qualification/materialize.py "$BENCH_ARM"
+      - name: Reconstruct and verify the published four-component manifest
+        run: |-
+          python3 -IB scripts/rc23-cross-qualification/materialize.py "$BENCH_ARM"
+          (cd scripts/rc23-native-profile && sha256sum --strict --check SHA256SUMS)
+          python3 -IB scripts/rc23-native-profile/qualify.py
       - name: Install native GNU bootstrap prerequisites
-        run: |
+        run: |-
           sudo apt-get -qq update
           sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
-          sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross musl-tools qemu-user
       - name: Install pinned LLVM BOLT tools
         env:
           MANIFEST_PATH: toolchains/1.99.0/23.json
@@ -159,7 +172,7 @@ jobs:
           fi
 
           printf 'OHM_BOLT_LLVM_DIR=%s\n' "$bolt_llvm_dir" >> "$GITHUB_ENV"
-        working-directory: release-reference
+        working-directory: release-candidate
       - name: Prepare pinned Wild linker
         env:
           MANIFEST_PATH: toolchains/1.99.0/23.json
@@ -167,41 +180,45 @@ jobs:
           wild_directory="$(python3 scripts/prepare-wild.py \
             "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
           printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
-        working-directory: release-reference
-      - name: Build both target libraries with the release PGO and BOLT compiler
+        working-directory: release-candidate
+      - name: Run the native release training and validate all six tool profiles
         shell: bash
-        run: |-
+        run: |
           set -euo pipefail
-          python3 -IB scripts/rc23-cross-qualification/build.py 2>&1 | tee cross-evidence/build.log
-      - name: Seal the host compiler and both target standard libraries
+          mkdir -p native-evidence
+          python3 -IB scripts/rc23-native-profile/run.py "$QUALIFY_MODE" 2>&1 | tee native-evidence/build.log | awk '/stage|Training|Profiling|collector error|error:|PGO and BOLT|Traceback/ {print; fflush()}'
+      - name: Seal the complete native distribution
         shell: bash
-        run: |-
+        run: |
           set -euo pipefail
-          dist=source/rust/build/dist
-          mkdir cross-sdk
-          for asset in rust-1.99.0-dev-x86_64-unknown-linux-gnu rust-std-1.99.0-dev-aarch64-unknown-linux-gnu rust-std-1.99.0-dev-x86_64-unknown-linux-musl; do
-            test -s "$dist/$asset.tar.gz"
-            ln "$dist/$asset.tar.gz" "cross-sdk/$asset.tar.gz"
-          done
-          cp cross-evidence/source.json cross-sdk/
-          (cd cross-sdk && sha256sum ./*.tar.gz > SHA256SUMS)
-          lscpu > cross-evidence/build-host.txt
-      - name: Retain the candidate SDK for same-host comparisons
+          asset=source/rust/build/dist/rust-1.99.0-dev-x86_64-unknown-linux-gnu.tar.gz
+          test -s "$asset"
+          mkdir native-sdk
+          ln "$asset" native-sdk/ohm.tar.gz
+          cp native-evidence/identity.json native-evidence/recipe-used.json native-sdk/
+          (cd native-sdk && sha256sum ohm.tar.gz > SHA256SUMS)
+      - name: Retain the exact four-pin native SDK
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: rc23-cross-sdk-${{ matrix.arm }}
-          path: cross-sdk/
+          name: rc23-native-profile-sdk-${{ matrix.mode }}
+          path: native-sdk/
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+      - name: Compress the complete training log
+        if: always()
+        shell: bash
+        run: if test -f native-evidence/build.log; then gzip -1 native-evidence/build.log; fi
       - name: Retain source identity and build diagnostics
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: rc23-cross-build-${{ matrix.arm }}-attempt-${{ github.run_attempt }}
+          name: rc23-native-profile-${{ matrix.mode }}-attempt-${{ github.run_attempt }}
           path: |-
-            cross-evidence/
+            native-evidence/
+            cross-evidence/source.json
             source/reports/slot-source.json
             source/reports/verify-23.json.log
           if-no-files-found: warn
           retention-days: 14
+run-name: Native release training ${{ inputs.reviewed_head }}
