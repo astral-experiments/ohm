@@ -1,0 +1,259 @@
+{
+  "cargo": "39757e62befda4ebee24110766bd63fb9cbbc88e694f3df4ef7121763b3b2d91",
+  "original_repair_stdout_sha256": "9a06c654b510c79ecf059943379e39c863f71dabdffaa758d00554726e8e41cf",
+  "real_edit": "32c5cd5daba51d9c3da691c5b43afa6a7a4bb731",
+  "ruff": "93526150df078af7dd8fc4226cdcc469539d2001",
+  "sdk": "e8b49d5a640da8ad62db0b60a47ec943e173e1d967f576f4d5d5dcf19955ac97",
+  "typed_consumers": {
+    "empty-final": {
+      "bad": {
+        "errors": [
+          "E0308"
+        ],
+        "exit": 1,
+        "rmeta": null
+      },
+      "good": {
+        "errors": [],
+        "exit": 0,
+        "rmeta": "9b08a081fcf52ef7efa735b39f52944ef0271005e258ec9fe9c15ffc583b7340"
+      },
+      "input_sha": "5edb188f8f87639970f44b08aecd4ca100b6dd82117ddccec3d0c10ef6fadb30"
+    },
+    "repair-final": {
+      "bad": {
+        "errors": [
+          "E0308"
+        ],
+        "exit": 1,
+        "rmeta": null
+      },
+      "good": {
+        "errors": [],
+        "exit": 0,
+        "rmeta": "53219f6e37e0f80229c619141e2f3e0cc2bbdf11f43cb853b4388b7c9461d068"
+      },
+      "input_sha": "3d47eb78e21ef87e5967cdda03419b0a67026c4ade693ccd06b1e5edfee36f54"
+    },
+    "repeat-final": {
+      "bad": {
+        "errors": [
+          "E0308"
+        ],
+        "exit": 1,
+        "rmeta": null
+      },
+      "good": {
+        "errors": [],
+        "exit": 0,
+        "rmeta": "53219f6e37e0f80229c619141e2f3e0cc2bbdf11f43cb853b4388b7c9461d068"
+      },
+      "input_sha": "3d47eb78e21ef87e5967cdda03419b0a67026c4ade693ccd06b1e5edfee36f54"
+    }
+  },
+  "visit": {
+    "cold": {
+      "diagnostics": [],
+      "dirty_count": 275,
+      "exit": 0,
+      "messages_sha256": "adc8331caeef0ae307459039722d86bba3be79ab32648a53d7fe4e8278e93d13",
+      "roster_sha256": "38629f462d2720e12d166a101cb722e5d3af6048187f4ddaa4b151e943c8a708",
+      "sources": {
+        "crates/ty_project/src/lib.rs": "d560695aa852f6f95c0218c0aba27aecd10e1d26980d9b4679e51d08ab69d309",
+        "crates/ty_project/src/uv/metadata/dependencies.rs": "01d87f69fef8eb4f3def06dc3efe3f64df4bf66020e65c3546b0c943c0c5f3f8"
+      },
+      "units": 275
+    },
+    "empty-final": {
+      "diagnostics": [
+        [
+          "warning",
+          "deprecated",
+          "use of deprecated constant `OHM_QA_OLD_CONST`: OHM_QA_PRESERVED_WARNING",
+          [
+            [
+              "crates/ty_project/src/lib.rs",
+              1243,
+              [
+                "const _: u8 = OHM_QA_OLD_CONST;"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "dirty_count": 275,
+      "exit": 0,
+      "messages_sha256": "bd513ec88805c2b314d0b6d25d5407e0f88bae18fdcd28b78a6a500f8b31589e",
+      "roster_sha256": "38629f462d2720e12d166a101cb722e5d3af6048187f4ddaa4b151e943c8a708",
+      "sources": {
+        "crates/ty_project/src/lib.rs": "3e9f6852ac58d9b26ac7571ae92d424e2241e772eca7d9538d033817816ecc18",
+        "crates/ty_project/src/uv/metadata/dependencies.rs": "09658ee6eb278bc73283d079e9d04c9bd541d0897af8623f1acbccd35a1b92d6"
+      },
+      "units": 275
+    },
+    "historical": {
+      "diagnostics": [],
+      "dirty_count": 14,
+      "exit": 0,
+      "messages_sha256": "f1a7c81b35972810fb468a971c7680ef64a1f8cd4651f4305451fb95b102fb85",
+      "roster_sha256": "38629f462d2720e12d166a101cb722e5d3af6048187f4ddaa4b151e943c8a708",
+      "sources": {
+        "crates/ty_project/src/lib.rs": "d560695aa852f6f95c0218c0aba27aecd10e1d26980d9b4679e51d08ab69d309",
+        "crates/ty_project/src/uv/metadata/dependencies.rs": "09658ee6eb278bc73283d079e9d04c9bd541d0897af8623f1acbccd35a1b92d6"
+      },
+      "units": 275
+    },
+    "invalid": {
+      "diagnostics": [
+        [
+          "error",
+          "E0308",
+          "mismatched types",
+          [
+            [
+              "crates/ty_project/src/lib.rs",
+              1240,
+              [
+                "const _: u8 = \"OHM_RON_CHECK_BAD_TYPE\";"
+              ]
+            ]
+          ]
+        ],
+        [
+          "failure-note",
+          null,
+          "For more information about this error, try `rustc --explain E0308`.",
+          []
+        ]
+      ],
+      "dirty_count": 13,
+      "exit": 101,
+      "messages_sha256": "d4bc9d6208d95cb8e35e464f67b88e3c24ab5e918d30e948ca800b172a4bb211",
+      "roster_sha256": "4b8a3eef2fc1ba62b5c403dbff37377076cc38333cf5a9f590d49ade9ef2d259",
+      "sources": {
+        "crates/ty_project/src/lib.rs": "0aa431793a70f0d44070f8d880be777f8ce0ab198c9036953786bc745dc03597",
+        "crates/ty_project/src/uv/metadata/dependencies.rs": "09658ee6eb278bc73283d079e9d04c9bd541d0897af8623f1acbccd35a1b92d6"
+      },
+      "units": 274
+    },
+    "invalid-replay": {
+      "diagnostics": [
+        [
+          "error",
+          "E0308",
+          "mismatched types",
+          [
+            [
+              "crates/ty_project/src/lib.rs",
+              1240,
+              [
+                "const _: u8 = \"OHM_RON_CHECK_BAD_TYPE\";"
+              ]
+            ]
+          ]
+        ],
+        [
+          "failure-note",
+          null,
+          "For more information about this error, try `rustc --explain E0308`.",
+          []
+        ]
+      ],
+      "dirty_count": 13,
+      "exit": 101,
+      "messages_sha256": "9259cc04dad29b53d7feacbb13a592f4201a632739b47e153ebbeaf351f4e53e",
+      "roster_sha256": "4b8a3eef2fc1ba62b5c403dbff37377076cc38333cf5a9f590d49ade9ef2d259",
+      "sources": {
+        "crates/ty_project/src/lib.rs": "0aa431793a70f0d44070f8d880be777f8ce0ab198c9036953786bc745dc03597",
+        "crates/ty_project/src/uv/metadata/dependencies.rs": "09658ee6eb278bc73283d079e9d04c9bd541d0897af8623f1acbccd35a1b92d6"
+      },
+      "units": 274
+    },
+    "repair-final": {
+      "diagnostics": [
+        [
+          "warning",
+          "deprecated",
+          "use of deprecated constant `OHM_QA_OLD_CONST`: OHM_QA_PRESERVED_WARNING",
+          [
+            [
+              "crates/ty_project/src/lib.rs",
+              1243,
+              [
+                "const _: u8 = OHM_QA_OLD_CONST;"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "dirty_count": 14,
+      "exit": 0,
+      "messages_sha256": "ca4d06d68630dd3874818fa18496d888b2bc3fb6fdde363ce768d2699ce41bae",
+      "roster_sha256": "38629f462d2720e12d166a101cb722e5d3af6048187f4ddaa4b151e943c8a708",
+      "sources": {
+        "crates/ty_project/src/lib.rs": "3e9f6852ac58d9b26ac7571ae92d424e2241e772eca7d9538d033817816ecc18",
+        "crates/ty_project/src/uv/metadata/dependencies.rs": "09658ee6eb278bc73283d079e9d04c9bd541d0897af8623f1acbccd35a1b92d6"
+      },
+      "units": 275
+    },
+    "repeat-final": {
+      "diagnostics": [
+        [
+          "warning",
+          "deprecated",
+          "use of deprecated constant `OHM_QA_OLD_CONST`: OHM_QA_PRESERVED_WARNING",
+          [
+            [
+              "crates/ty_project/src/lib.rs",
+              1243,
+              [
+                "const _: u8 = OHM_QA_OLD_CONST;"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "dirty_count": 14,
+      "exit": 0,
+      "messages_sha256": "41bba63c60865800042531afb6483225d5866122183e5acd72c872f6647a8a36",
+      "roster_sha256": "38629f462d2720e12d166a101cb722e5d3af6048187f4ddaa4b151e943c8a708",
+      "sources": {
+        "crates/ty_project/src/lib.rs": "3e9f6852ac58d9b26ac7571ae92d424e2241e772eca7d9538d033817816ecc18",
+        "crates/ty_project/src/uv/metadata/dependencies.rs": "09658ee6eb278bc73283d079e9d04c9bd541d0897af8623f1acbccd35a1b92d6"
+      },
+      "units": 275
+    },
+    "warning": {
+      "diagnostics": [
+        [
+          "warning",
+          "deprecated",
+          "use of deprecated constant `OHM_QA_OLD_CONST`: OHM_QA_PRESERVED_WARNING",
+          [
+            [
+              "crates/ty_project/src/lib.rs",
+              1243,
+              [
+                "const _: u8 = OHM_QA_OLD_CONST;"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "dirty_count": 14,
+      "exit": 0,
+      "messages_sha256": "956d8d7bc2783d56c79569a81e4cdbae50e77ca957a4606b71cc263019b91f40",
+      "roster_sha256": "38629f462d2720e12d166a101cb722e5d3af6048187f4ddaa4b151e943c8a708",
+      "sources": {
+        "crates/ty_project/src/lib.rs": "3e9f6852ac58d9b26ac7571ae92d424e2241e772eca7d9538d033817816ecc18",
+        "crates/ty_project/src/uv/metadata/dependencies.rs": "09658ee6eb278bc73283d079e9d04c9bd541d0897af8623f1acbccd35a1b92d6"
+      },
+      "units": 275
+    }
+  },
+  "warm_matches_empty": [
+    "target_keys",
+    "diag",
+    "src"
+  ]
+}
