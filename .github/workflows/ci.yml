@@ -24,11 +24,11 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: 201eb25ab858598493d22e0d0f9cbe743e1ef60c
+        ref: e408863e7ba61fac3e054a580e149dbf4c89f582
     - name: Verify the published candidate and manifest
       run: |
-        test "$(git rev-parse HEAD)" = 201eb25ab858598493d22e0d0f9cbe743e1ef60c
-        printf '%s  %s\n' b1d9804b6376ae9bab139d9d0ffe3414dc6eebb3800c9bb322b55f358df5be2e toolchains/1.99.0/23.json | sha256sum --check --strict
+        test "$(git rev-parse HEAD)" = e408863e7ba61fac3e054a580e149dbf4c89f582
+        printf '%s  %s\n' ef76f8eb83ea78d7ab3bf272bb3aea0ba2729bd3f626af0faf4842f0c2b51c65 toolchains/1.99.0/23.json | sha256sum --check --strict
     - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       with:
         enable-cache: true
@@ -50,7 +50,7 @@ jobs:
           echo "manifest=$MANIFEST_PATH"
           echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")"
         } >> "$GITHUB_OUTPUT"
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-final-qualification' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-formatter-qualified' && github.sha == inputs.reviewed_head
   build:
     needs: plan
     timeout-minutes: 360
@@ -125,7 +125,7 @@ jobs:
     - name: Check out the published candidate manifest and release driver
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
-        ref: 201eb25ab858598493d22e0d0f9cbe743e1ef60c
+        ref: e408863e7ba61fac3e054a580e149dbf4c89f582
         path: release-candidate
         persist-credentials: false
         sparse-checkout: |-
@@ -301,7 +301,7 @@ jobs:
         CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
         CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
         COORDINATOR_REPOSITORY: ${{ github.repository }}
-        COORDINATOR_REVISION: 201eb25ab858598493d22e0d0f9cbe743e1ef60c
+        COORDINATOR_REVISION: e408863e7ba61fac3e054a580e149dbf4c89f582
         MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
         OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
         RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
@@ -405,7 +405,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: 201eb25ab858598493d22e0d0f9cbe743e1ef60c
+        ref: e408863e7ba61fac3e054a580e149dbf4c89f582
     - name: Download verified distribution assets
       uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
       with:
@@ -448,7 +448,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: 201eb25ab858598493d22e0d0f9cbe743e1ef60c
+        ref: e408863e7ba61fac3e054a580e149dbf4c89f582
     - name: Download platform distribution assets
       uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
       with:
