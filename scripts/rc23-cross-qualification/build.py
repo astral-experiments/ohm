@@ -7,7 +7,7 @@ import shutil
 import subprocess
 
 work = Path(os.environ["GITHUB_WORKSPACE"])
-root = work / "release-reference"
+root = work / "release-candidate"
 out = work / "cross-evidence"
 rust = work / "source/rust"
 plan = json.loads((Path(__file__).resolve().parent / "protocol.json").read_text())
@@ -45,7 +45,10 @@ script = source.read_text()
 for previous, added in [('  --std-target wasm32-unknown-unknown\n', f'  --std-target wasm32-unknown-unknown\n  --std-target {gnu}\n  --std-target {musl}\n'), ('  --target "$target,wasm32-unknown-unknown"', f'  --target "$target,wasm32-unknown-unknown,{gnu},{musl}"')]:
     assert script.count(previous) == 1
     script = script.replace(previous, added)
-driver = out / "build-cross-dist.sh"
+assert hashlib.sha256((root / "release/rustc-perf-relocated-dependencies.patch").read_bytes()).hexdigest() == plan["profile_patch_sha256"]
+driver = source.with_name("build-cross-dist.sh")
+assert not driver.exists()
 driver.write_text(script)
+(out / "build-cross-dist.sh").write_text(script)
 subprocess.run(["bash", "-n", driver], check=True)
 subprocess.run(["bash", driver, host, "ohm-1.99.0-23", rust, cfg], check=True)
