@@ -97,28 +97,108 @@ def calibrate():
          "unmultiplexed_calibration_clocks": len(clocks), "abi": read(dest / "observer.json")["abi"]})
 
 
-def signed_install(m, media):
-    cfg = P["signed"]
-    with tempfile.TemporaryDirectory(prefix="signed-install-", dir=m.WORK) as tmp:
-        archive, = (media / "signed").glob("*.tar.gz")
-        with tarfile.open(archive) as t:
-            t.extractall(tmp, filter="data")
-        dist = Path(tmp) / ("rust-1.99.0-dev-" + P["target"])
-        install = m.WORK / "sdk-signed"
-        subprocess.run([dist / "install.sh", "--prefix=" + str(install), "--disable-ldconfig",
-                        "--components=rustc,cargo,rust-std-" + P["target"]], check=True, timeout=360)
-    driver, = (install / "lib").glob("librustc_driver-*.so")
-    for f, key in ((driver, "driver_sha256"), (install / "bin/rustc", "launcher_sha256"),
-                   (install / "bin/cargo", "cargo_sha256")):
-        check(sha(f) == cfg[key], f)
-    for tool, key in (("rustc", "rust"), ("cargo", "cargo")):
-        banner = subprocess.check_output([install / "bin" / tool, "-Vv"], text=True)
-        check("commit-hash: " + cfg[key] in banner and "host: " + P["target"] in banner, banner)
-    cargo = m.WORK / "bin/cargo"
-    check(cargo.is_symlink() and cargo.resolve() == m.WORK / "sdk-base/bin/cargo", "unexpected original Cargo path")
-    cargo.unlink()
-    cargo.symlink_to(install / "bin/cargo")
-    return install
+def core_receipt(path):
+    return [path.stat().st_size, sha(path)]
+
+
+def install_roles(m, media, out):
+    earlier = P["sdk_artifacts"]["both"]
+    prior = media / earlier["name"]
+    source = read(prior / "source.json")
+    check(sha(prior / "source.json") == P["earlier_source_bytes_sha256"] and source["arm"] == "both" and
+          source["source"]["rust"] == P["role_rust"]["earlier"] and source["source"]["tree"] == earlier["rust_tree"] and
+          source["manifest"]["sources"]["cargo"]["revision"] == P["role_cargo"]["earlier"] and
+          source["epoch"] == P["format_epochs"]["earlier"], "wrong earlier production source")
+    save(out / "earlier-source.json", source)
+    signed_tar, = (media / "signed").glob("*.tar.gz")
+    final = P["final"]
+    files = {"signed":signed_tar, "earlier":prior / "ohm.tar.gz", "rebased":media / "rebased" / (final["name"] + ".tar.gz")}
+    pins = {"signed":P["signed"]["assets"][signed_tar.name]["digest"][7:], "earlier":earlier["inner_sha256"],
+            "rebased":final["pkg_files"][files["rebased"].name]["sha256"]}
+    summaries = {}
+    for arm in P["arms"]:
+        archive = files[arm]
+        check(sha(archive) == pins[arm], f"{arm} distribution changed")
+        sdk = m.WORK / ("sdk-" + arm)
+        with tempfile.TemporaryDirectory(prefix="install-", dir=m.WORK) as tmp:
+            with tarfile.open(archive) as tar:
+                tar.extractall(tmp, filter="data")
+            dist = Path(tmp) / ("rust-1.99.0-dev-" + P["target"])
+            check(list(Path(tmp).iterdir()) == [dist], "unexpected distribution root")
+            components = ["rustc", "cargo", "rust-std-" + P["target"]]
+            subprocess.run([dist / "install.sh", "--prefix=" + str(sdk), "--disable-ldconfig",
+                            "--components=" + ",".join(components)], check=True, timeout=360)
+            inventories = {}
+            for component in components:
+                component_root = dist / component
+                lines = (component_root / "manifest.in").read_text().splitlines()
+                check(lines and all(line.startswith("file:") for line in lines), "unknown distribution manifest item")
+                members = [line[5:] for line in lines]
+                check(len(set(members)) == len(members) and
+                      set(members) == {f.relative_to(component_root).as_posix() for f in component_root.rglob("*")
+                                       if f.is_file() and f != component_root / "manifest.in"}, "incomplete distribution manifest")
+                for name in members:
+                    src, dst = component_root / name, sdk / name
+                    check(name not in inventories and src.resolve().is_relative_to(component_root) and
+                          dst.resolve().is_relative_to(sdk) and not src.is_symlink() and not dst.is_symlink(),
+                          "duplicate or external component")
+                    original = core_receipt(src)
+                    check(core_receipt(dst) == original, (arm, "installer bytes", name))
+                    inventories[name] = original
+        check(all(inventories.get(k) == v for k, v in P["role_core"][arm].items()), f"{arm} component hashes differ from registered inputs")
+        actual = {}
+        for command in ("rustc", "cargo"):
+            actual[command] = subprocess.check_output([sdk / "bin" / command, "-Vv"], text=True)
+            revision = P["role_rust"][arm] if command == "rustc" else P["role_cargo"][arm]
+            check("commit-hash: " + revision in actual[command] and "host: " + P["target"] in actual[command], "SDK banner")
+        check(Path(subprocess.check_output([sdk / "bin/rustc", "--print", "sysroot"], text=True).strip()).resolve() == sdk, "wrong SDK sysroot")
+        ldd = subprocess.check_output(["ldd", sdk / "bin/rustc"], text=True)
+        loaded = {}
+        for kind in ("librustc_driver", "libLLVM"):
+            matches = [Path(p).resolve(strict=True) for n,p in re.findall(r"^\s*(\S+) => (\S+)", ldd, re.M) if n.startswith(kind)]
+            check(len(matches) == 1 and matches[0].is_relative_to(sdk), f"wrong loaded {kind}")
+            rel = matches[0].relative_to(sdk).as_posix()
+            check(inventories[rel] == core_receipt(matches[0]), "loader picked different bytes")
+            loaded[kind] = rel
+        sections = subprocess.check_output(["readelf", "-SW", sdk / loaded["librustc_driver"]], text=True)
+        check(".note.bolt_info" in sections, f"{arm} driver lacks BOLT section")
+        summaries[arm] = {"labels":P["labels"][arm], "sdk":str(sdk), "rust":P["role_rust"][arm], "cargo":P["role_cargo"][arm],
+                          "archive_sha256":pins[arm], "loaded":loaded, "banner":actual, "bolt":True}
+        save(out / f"installed-{arm}-components.json", inventories)
+    check(len({P["role_core"][arm]["lib/librustc_driver-b03bf00bec23bb9a.so"][1] for arm in P["arms"]}) == 3, "aliased compiler drivers")
+    (m.WORK / "bin").mkdir()
+    (m.WORK / "bin/cargo").symlink_to(m.WORK / "sdk-signed/bin/cargo")
+    # The pinned qualifier uses this historical name solely for its unscored locked dependency fetch.
+    (m.WORK / "sdk-base").symlink_to(m.WORK / "sdk-signed", target_is_directory=True)
+    check(sha(m.WORK / "bin/cargo") == P["signed"]["cargo_sha256"] and
+          (m.WORK / "sdk-base/bin/cargo").resolve() == (m.WORK / "bin/cargo").resolve(), "wrong common Cargo")
+    save(out / "active-cargo.json", {"path":str((m.WORK / "bin/cargo").resolve()),
+                                     "sha256":sha(m.WORK / "bin/cargo"), "source":P["measured_cargo"]})
+    save(out / "installed-bridge.json", summaries)
+
+
+def bridge_native_source(text):
+    import hashlib
+    check(hashlib.sha256(text.encode()).hexdigest() == P["native_source_sha256"], "native qualifier changed")
+    old_arms = 'ARMS = ("base","nominal","both")'
+    old_epoch = 'PINS["base_epoch"] if arm=="base" else PINS["epoch"]'
+    check(text.count(old_arms) == text.count(old_epoch) == 1, "native role or epoch scope changed")
+    return text.replace(old_arms, 'ARMS = ("signed","earlier","rebased")').replace(old_epoch, 'PINS["format_epochs"][arm]')
+
+
+def check_native(m, media, out):
+    fixture = media / P["sdk_artifacts"]["both"]["name"] / "fixture"
+    check({f.name:sha(f) for f in fixture.iterdir()} == P["fixture_sha256"], "trait fixture changed")
+    folder = m.WORK / "native-qualifier"
+    folder.mkdir()
+    original = m.HERE / "native-checks.py"
+    source = bridge_native_source(original.read_text())
+    program = folder / "native-checks.py"
+    program.write_text(source)
+    check(sha(program) == P["native_bridge_sha256"], "derived native qualifier changed")
+    save(folder / "arms.json", {"format_epochs":P["format_epochs"]})
+    subprocess.run([sys.executable, "-IB", program, m.WORK, out, fixture], check=True, timeout=900)
+    save(out / "native-source.json", {"base":sha(original), "bridge":sha(program), "fixtures":P["fixture_sha256"]})
 
 
 def cpu_data(mask):
@@ -215,20 +295,8 @@ def run():
     check(m.EVIDENCE == out and m.WORK == tmp / "rc23-trait-work", "unexpected frozen harness layout")
     m.WORK.mkdir()
     media = w / "sdk-media"
-    m.install()
-    shipped = signed_install(m, media)
-    installed = read(out / "installed.json")
-    for name, pin in P["sdk_artifacts"].items():
-        row = installed[name]
-        check(row["source"]["source"]["rust"] == pin["source_commit"] and
-              row["source"]["source"]["tree"] == pin["rust_tree"] and row["archive_sha256"] == pin["inner_sha256"] and
-              row["rustc_sha256"] == pin["launcher_sha256"] and row["cargo_sha256"] == pin["cargo_sha256"] and
-              row["libraries"]["librustc_driver"] == pin["driver_sha256"], "installed optimized SDK mismatch")
-    save(out / "active-cargo.json", {"path": str((m.WORK / "bin/cargo").resolve()), "sha256": sha(shipped / "bin/cargo"),
-                                     "source": P["measured_cargo"]})
-    native_checks = m.HERE / "native-checks.py"
-    subprocess.run([sys.executable, "-IB", native_checks, m.WORK, out, media / "rc23-trait-sdk-both/fixture"],
-                   check=True, timeout=900)
+    install_roles(m, media, out)
+    check_native(m, media, out)
     case = P["case"]
     delta = m.fetch(case)
     save(out / "protocol.json", P)

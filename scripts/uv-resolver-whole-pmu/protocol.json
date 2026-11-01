@@ -9,8 +9,8 @@
   ],
   "arms": [
     "signed",
-    "base",
-    "both"
+    "earlier",
+    "rebased"
   ],
   "build_head": "fd55208f72e2fbfaad9f4856109266805e85885a",
   "build_run": 41323062793,
@@ -27,9 +27,10 @@
       232098802
     ]
   },
-  "coverage": "Every scored PMU read requires raw positive instructions and time_running == time_enabled. Each mode uses a separate new cold A target, one unchanged A check, one genuine working-tree A to B edit and one unchanged B check.",
+  "coverage": "One historical uv change. Ordinary cargo check -p uv-resolver --locked --offline -j8 using default package features. Distinct clean A targets per visit on one host boot. Signed \u221222 Cargo for every role. The earlier/rebased bridge includes source, training and build differences.",
   "dispatch_deadline_utc": "2026-11-04T00:00:00+00:00",
   "donor_cargo": "39bf4510b889030a40c8c49611d9c6230566d37d",
+  "earlier_source_bytes_sha256": "72aa5be1ff60b87494fc6cc57309cf74454092c8b34b26a0b8b3425169553799",
   "expected_first_dirty": [
     "uv-distribution",
     "uv-python",
@@ -43,35 +44,206 @@
     "uv-resolver",
     "uv-types"
   ],
+  "final": {
+    "artifact_id": 13098437385,
+    "compressed_bytes": 356863009,
+    "coordinator": "634d090f0f565936996a817bcb884c64cbe7e6cc",
+    "event": "00f4192b5507f8c028898ce5bd66958d20f341c5",
+    "expected_installed": {
+      "bin/cargo": [
+        39223352,
+        "afebcdeb6a33870db2dccb57234501fdb0e60ad1cb241474135bb3d0f3f5782e"
+      ],
+      "bin/rustc": [
+        171720,
+        "664c3bcb15013312755d73e6bf298466d553bd7cf5dc392e2a00996cb313670f"
+      ],
+      "lib/librustc_driver-b03bf00bec23bb9a.so": [
+        162598512,
+        "2e338b37afd5e291cfc7213286e9653e7b0533a2186c4ed39548b33fa8194383"
+      ]
+    },
+    "job_id": 124948244459,
+    "name": "ohm-1.99.0-23-x86_64-unknown-linux-gnu",
+    "outer_sha256": "cc805992f95550eba1c6864c48cf62793b6c4dd6d812739d0900783950ea582d",
+    "pkg_files": {
+      "ohm-1.99.0-23-x86_64-unknown-linux-gnu-provenance.json": {
+        "bytes": 877,
+        "sha256": "5399842fdb1c1ae64a8049c1e76fbc6eb9be40edd42885d4c3db4f7e4edf35ae"
+      },
+      "ohm-1.99.0-23-x86_64-unknown-linux-gnu-provenance.json.sha256": {
+        "bytes": 121,
+        "sha256": "e53afae7ba2d931da82660db3e69f94d51d8b3da27f7437ec91459c4f8dec9bb"
+      },
+      "ohm-1.99.0-23-x86_64-unknown-linux-gnu.tar.gz": {
+        "bytes": 359904992,
+        "sha256": "93936b4afa72b94ebbb3054e3bd095fea2edff0c5a54f019925459698c474aaa"
+      },
+      "ohm-1.99.0-23-x86_64-unknown-linux-gnu.tar.gz.sha256": {
+        "bytes": 112,
+        "sha256": "713be274d32e725d917bf3e161321d0bbf70a311a45571a9f4b9176835244cfa"
+      }
+    },
+    "provenance": {
+      "bundled_tools": {
+        "wild": {
+          "sha256": "25012a78de164686f552b7703b5d0223adab4829c79cd1fb351108221d61c7d8",
+          "version": "0.11.0"
+        }
+      },
+      "coordinator": {
+        "repository": "astral-experiments/ohm",
+        "revision": "634d090f0f565936996a817bcb884c64cbe7e6cc"
+      },
+      "manifest": {
+        "path": "toolchains/1.99.0/23.json",
+        "sha256": "634a8b8c22792642adf33766c02c33b7b50eccf6b07e17caa4a180c973f819f6"
+      },
+      "schema_version": 1,
+      "sources": {
+        "cargo": {
+          "revision": "159be68484a7f8cb05debf82bee89e594b7f19b6"
+        },
+        "clippy": {
+          "revision": "5b5d9fb377e21872c83ed1598f9ffee1420c7b39"
+        },
+        "rust": {
+          "revision": "f12924d918dbc66898325531940a20aa8cf4f5fc"
+        },
+        "rustfmt": {
+          "revision": "4b772602480c276b46cd51d44ae3ac0770ca81f5"
+        }
+      },
+      "target": "x86_64-unknown-linux-gnu",
+      "toolchain": "ohm-1.99.0-23"
+    },
+    "qa": {
+      "digest": "sha256:0eec78337fe958c4a09601b6689660a456b1bdfd112438d4c2002944b5ebdf3f",
+      "expired": false,
+      "id": 13098447420,
+      "name": "qa-expanded-build-x86_64-unknown-linux-gnu",
+      "size_in_bytes": 134845
+    },
+    "qa_context": {
+      "coordinator": "634d090f0f565936996a817bcb884c64cbe7e6cc",
+      "job": "build",
+      "manifest": "634a8b8c22792642adf33766c02c33b7b50eccf6b07e17caa4a180c973f819f6",
+      "qa": "00f4192b5507f8c028898ce5bd66958d20f341c5",
+      "run": 41340119846,
+      "sources": {
+        "cargo": "159be68484a7f8cb05debf82bee89e594b7f19b6",
+        "clippy": "5b5d9fb377e21872c83ed1598f9ffee1420c7b39",
+        "rust": "f12924d918dbc66898325531940a20aa8cf4f5fc",
+        "rustfmt": "4b772602480c276b46cd51d44ae3ac0770ca81f5"
+      }
+    },
+    "run": 41340119846,
+    "source_cargo": "159be68484a7f8cb05debf82bee89e594b7f19b6",
+    "source_commit": "f12924d918dbc66898325531940a20aa8cf4f5fc",
+    "source_tree": "fb561e8f69728f4ee8af0f87470002556f265f41"
+  },
+  "fixture_sha256": {
+    "reader.rs": "edf0261f6c741e345b5efbd2e5fa68f5c3d137a28e84efed0752a5758014f9e5",
+    "rmake.rs": "6c4087bce24e60081b537d3befeb0347ae014a908e1d17e8500c688494a24718",
+    "roster.rs": "2562806dac000cc0a491ebf97c4d36efb1e4aa3de95d863b28d7def077bc5889"
+  },
+  "format_epochs": {
+    "earlier": 26655,
+    "rebased": 26655,
+    "signed": 10
+  },
   "holds": [
-    20988061,
-    20988062
+    20988131,
+    20988132
   ],
+  "labels": {
+    "earlier": "earlier optimized proposed \u221223 with #296+#306 (9c29c72b)",
+    "rebased": "rebased optimized proposed \u221223 with #296+#306 (f12924d9)",
+    "signed": "signed shipped Ohm 1.99.0-22"
+  },
   "measured_cargo": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
   "meter": "0b50022990577aadd904731e51c4d6c2a0f9b665",
   "modes": [
     "native",
     "pmu"
   ],
+  "native_bridge_sha256": "b3abed1b8435ab22872688d589f662251b6d5f817c65a7cacafe0383c820d72a",
+  "native_source_sha256": "dfa2759c01cbfc16e0f73da23c09196fccefcf314ed8f04ce94cad6219c3cb3b",
   "observer": "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc",
   "pilot": "5c651f1d38c629da2a75d5cac3588db0be8104d7",
-  "primary": "base/both inherited whole-command instructions",
+  "primary": "signed/rebased ordinary native wall seconds; both six-permutation hold medians and the exact 99.365% median lower endpoint must exceed 2",
   "qualifier": "1286210a06dcc353a4f03dcf8c7bb15f99a56cad",
-  "sdk_artifacts": {
-    "base": {
-      "artifact_id": 13091302519,
-      "cargo_sha256": "747819e3aec82d19b4ffa2959b5e8ef19ed42448bcb7d3831e049019a6ed8092",
-      "compressed_bytes": 359874685,
-      "driver_sha256": "103da481979700c4093accbdf091bac852e41dc30f09cf64ded34acd623d8094",
-      "inner_sha256": "db76f899d8274d88755e90ecee34e666e7f9fe223732bbd9b25b354a89a1c0a7",
-      "job_id": 124897183905,
-      "launcher_sha256": "1b43428399974377542054eafbeb9590fc750f4f2d959d0eacd016f6031b5e5f",
-      "name": "rc23-trait-sdk-base",
-      "outer_sha256": "7cf6f47cdd9d34e0bbb4e7cdb21e4f1be16ee831fbb134d664d4a33cc923888d",
-      "rust_tree": "a18524fcb112ed12c7d38982033017d967f45031",
-      "source_commit": "83f22211d49b85daffa5f12f2a8b52d180a88993",
-      "source_tree": "a18524fcb112ed12c7d38982033017d967f45031"
+  "role_cargo": {
+    "earlier": "39bf4510b889030a40c8c49611d9c6230566d37d",
+    "rebased": "159be68484a7f8cb05debf82bee89e594b7f19b6",
+    "signed": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770"
+  },
+  "role_core": {
+    "earlier": {
+      "bin/cargo": [
+        39071360,
+        "8440495dc12f2a0230aa041af8c2974f1f624e29fbf841eab5691b47ca429881"
+      ],
+      "bin/rustc": [
+        171720,
+        "c59737ebdcc331c79bea16771543483bd01433fbc59f39e6a4573381fea4ddc3"
+      ],
+      "lib/libLLVM.so.23.1-rust-1.99.0-beta": [
+        208144480,
+        "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+      ],
+      "lib/librustc_driver-b03bf00bec23bb9a.so": [
+        162803504,
+        "23a3a59eea3e337bb8999a8e9e876f7c4568c81761455d2380c569832e42d5a7"
+      ],
+      "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": [
+        10319072,
+        "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+      ]
     },
+    "rebased": {
+      "bin/cargo": [
+        39223352,
+        "afebcdeb6a33870db2dccb57234501fdb0e60ad1cb241474135bb3d0f3f5782e"
+      ],
+      "bin/rustc": [
+        171720,
+        "664c3bcb15013312755d73e6bf298466d553bd7cf5dc392e2a00996cb313670f"
+      ],
+      "lib/librustc_driver-b03bf00bec23bb9a.so": [
+        162598512,
+        "2e338b37afd5e291cfc7213286e9653e7b0533a2186c4ed39548b33fa8194383"
+      ]
+    },
+    "signed": {
+      "bin/cargo": [
+        39041072,
+        "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871"
+      ],
+      "bin/rustc": [
+        171720,
+        "7e35096dab1b661924cb3c31982c870dd99c7c00a7fba28aa958f451e7c9474e"
+      ],
+      "lib/libLLVM.so.23.1-rust-1.99.0-beta": [
+        208144480,
+        "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+      ],
+      "lib/librustc_driver-b03bf00bec23bb9a.so": [
+        162836400,
+        "4c8ccf0072e8f382a3a3756fd60e46936a2bd206996201c55caffe58d29725db"
+      ],
+      "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": [
+        10319072,
+        "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+      ]
+    }
+  },
+  "role_rust": {
+    "earlier": "9c29c72b39941ffd9df30051c5014b76378545de",
+    "rebased": "f12924d918dbc66898325531940a20aa8cf4f5fc",
+    "signed": "008a21ac0d750dc9a1c18b7959d7e7984c03d887"
+  },
+  "sdk_artifacts": {
     "both": {
       "artifact_id": 13091103580,
       "cargo_sha256": "8440495dc12f2a0230aa041af8c2974f1f624e29fbf841eab5691b47ca429881",
@@ -85,20 +257,6 @@
       "rust_tree": "ff59aa0d6e1b51593f63c1bc5b86e656799699cd",
       "source_commit": "9c29c72b39941ffd9df30051c5014b76378545de",
       "source_tree": "ff59aa0d6e1b51593f63c1bc5b86e656799699cd"
-    },
-    "nominal": {
-      "artifact_id": 13091781033,
-      "cargo_sha256": "7f6c3d66041f24caa8959b4657deeb487525c170acbb7d45ff68d97efcfe4bcd",
-      "compressed_bytes": 359907109,
-      "driver_sha256": "d419bde09af515f43635fc32a718a29d5bb61d972873a5d4ee5d2b0ccb57e593",
-      "inner_sha256": "7a53ec6c1f611bc5ddd7adf64a93a8bbfc8772c08e2b85cc713d9324414a99f1",
-      "job_id": 124897183700,
-      "launcher_sha256": "06eb3158e63a4e2b6d154d5169973bcb891510a906b2e63cf0269107701a31bb",
-      "name": "rc23-trait-sdk-nominal",
-      "outer_sha256": "f2ed21bc6d8924fe2801fafa526b9ae725573070fe5d2155033b3206d188ffa4",
-      "rust_tree": "5e6950a050583745e1f0d7d0b994fafccb9102d5",
-      "source_commit": "fcd7d5a0274e4dad7666c5e0b5816841c26126e4",
-      "source_tree": "5e6950a050583745e1f0d7d0b994fafccb9102d5"
     }
   },
   "signed": {
@@ -127,13 +285,12 @@
     "rust": "008a21ac0d750dc9a1c18b7959d7e7984c03d887",
     "tag": "ohm-1.99.0-22"
   },
-  "study": "whole resolver check after the real uv #20988 edit",
+  "study": "Independent hosted bridge for the November 1 rebased optimized compiler after uv #20988",
   "supporting": [
-    "signed/both instructions",
-    "base/both native wall",
-    "signed/both native wall",
-    "signed/base for context"
+    "signed/rebased inherited userspace hardware instructions",
+    "earlier/rebased measures optimized build and source drift",
+    "signed/earlier rechecks the previously observed release-relative comparison"
   ],
   "target": "x86_64-unknown-linux-gnu",
-  "workflow_branch": "charlie/codex-uv-20988-whole-instructions"
+  "workflow_branch": "charlie/codex-uv-20988-final-rc23"
 }

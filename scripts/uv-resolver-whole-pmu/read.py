@@ -80,8 +80,74 @@ def verify(folder, cfg, mode, mask):
     return clock(pmu)
 
 
+def bridge_identity(cfg, arm, summary, files):
+    driver = "lib/librustc_driver-b03bf00bec23bb9a.so"
+    need(summary["labels"] == cfg["labels"][arm] and summary["rust"] == cfg["role_rust"][arm] and
+         summary["cargo"] == cfg["role_cargo"][arm] and summary["bolt"] is True and
+         Path(summary["sdk"]).name == "sdk-" + arm, "SDK receipt mislabeled")
+    need(all(files.get(k) == v for k,v in cfg["role_core"][arm].items()) and
+         summary["loaded"]["librustc_driver"] == driver and summary["loaded"]["libLLVM"] in files and
+         any(k.startswith("lib/rustlib/" + cfg["target"] + "/lib/libstd-") for k in files) and
+         any(k.endswith("/bin/wild-ld/ld.bfd") for k in files), "incomplete or incorrect installed runtime")
+    for tool, pin in (("rustc",cfg["role_rust"][arm]), ("cargo",cfg["role_cargo"][arm])):
+        need("commit-hash: " + pin in summary["banner"][tool] and "host: " + cfg["target"] in summary["banner"][tool],
+             "wrong toolchain banner")
+
+
+def bridge_receipts(root, cfg):
+    actors = cfg["arms"]
+    need(actors == ["signed", "earlier", "rebased"] and len(set(cfg["role_rust"].values())) == 3 and
+         cfg["measured_cargo"] == cfg["signed"]["cargo"] and cfg["argv"] == ["check","-p","uv-resolver","--locked","--offline","-j8"],
+         "registered package or release roles changed")
+    final = cfg["final"]
+    member = final["name"] + ".tar.gz"
+    shipped_archive = next(a["digest"][7:] for k,a in cfg["signed"]["assets"].items() if k.endswith(".tar.gz"))
+    archives = {"signed":shipped_archive, "earlier":cfg["sdk_artifacts"]["both"]["inner_sha256"],
+                "rebased":final["pkg_files"][member]["sha256"]}
+    summaries = load(root / "installed-bridge.json")
+    need(set(summaries) == set(actors) and load(root / "rebased-qa-context.json") == final["qa_context"] and
+         load(root / "rebased-provenance.json") == final["provenance"] and
+         load(root / "rebased-qa-binaries.json") == final["expected_installed"], "rebased provenance changed")
+    for arm in actors:
+        need(summaries[arm]["archive_sha256"] == archives[arm], "unregistered archive")
+        bridge_identity(cfg, arm, summaries[arm], load(root / f"installed-{arm}-components.json"))
+    proof = load(root / "native-source.json")
+    need(proof == {"base":cfg["native_source_sha256"],"bridge":cfg["native_bridge_sha256"],"fixtures":cfg["fixture_sha256"]},
+         "native qualifier changed")
+    native_records(root / "native", actors, cfg["format_epochs"])
+
+
+def native_records(root, actors, epochs):
+    values = ["3 3 3 3 3", "3 3 3 3 3", "7 3 11 13 17", "3 7 3 3 3", "3 3 3 3 3", "3 7 3 3 3", "3 3 3 3 3"]
+    for arm in actors:
+        for rev, answer in enumerate(values):
+            for solver, kind in itertools.product(("default","next"), ("warm","clean")):
+                folder = root / ("trait-" + arm)
+                label = f"{rev}-{solver}-{kind}-run"
+                raw = (folder / (label + ".stdout")).read_bytes()
+                result = load(folder / (label + ".json"))
+                need(result["exit"] == 0 and hashlib.sha256(raw).hexdigest() == result["stdout_sha256"] and
+                     raw.decode().strip() == answer, "cached or clean trait result changed")
+    transitions = load(root / "cache-behavior.json")
+    for mode in ("native", "forced"):
+        section = transitions[mode]
+        headers = section["headers"]
+        need(set(headers) == set(actors) and len(section["transitions"]) == 9, "incomplete migration matrix")
+        for key, h in headers.items():
+            need(h["format"] == epochs[key] and (mode != "forced" or h["version"] == "rustc-perf"), "incorrect cache header")
+        for writer, reader in itertools.product(actors, repeat=2):
+            label = writer + "-to-" + reader
+            expected = "loaded" if headers[writer] == headers[reader] else "rejected"
+            need(section["transitions"][label] == expected, "readback disposition inconsistent")
+            case = root / "migration" / mode / label
+            need(load(case / "negative.json")["exit"] == 1 and b"E0277" in (case / "negative.stderr").read_bytes(),
+                 "cached negative case missing")
+
+
 def read(root):
+    need(hashlib.sha256((root / "protocol.json").read_bytes()).hexdigest() == '9fc9cb8e6cdcd1c9f41aba13e570624749b730feccc5df82e0d660bf267de3c6', "protocol differs from reviewed registration")
     cfg = load(root / "protocol.json")
+    bridge_receipts(root, cfg)
     plan = planner(cfg)
     need(load(root / "orders.json") == plan, "registration order changed")
     need(hashlib.sha256((root / "workspace-edit.patch").read_bytes()).hexdigest() == cfg["case"]["patch"], "patch changed")
@@ -97,7 +163,7 @@ def read(root):
          hashlib.sha256((raw_calibration / "observers/plain").read_bytes()).hexdigest() == meter["plain_sha256"] and
          load(raw_calibration / "meter-ready.json") == meter["ready"], "original hardware calibrations failed readback")
     need(load(root / "active-cargo.json")["sha256"] == cfg["signed"]["cargo_sha256"] and
-         load(root / "native/completed.json") == {"arms":["base", "nominal", "both"], "trait_edits":7,
+         load(root / "native/completed.json") == {"arms":cfg["arms"], "trait_edits":7,
                                                    "solvers":["default", "next"], "cache_transitions":18},
          "native fixtures or common Cargo failed")
     for arm in cfg["arms"]:
@@ -128,10 +194,10 @@ def read(root):
         summary[mode] = {"metric": "inherited userspace hardware instructions" if mode == "pmu" else "ordinary wall seconds",
                          "rows": rows, "medians": {a: statistics.median(r[a] for r in rows) for a in cfg["arms"]},
                          "comparisons": {a + "/" + b: factors(rows, a, b)
-                                         for a, b in (("base", "both"), ("signed", "both"), ("signed", "base"))}}
+                                         for a, b in (("signed", "rebased"), ("earlier", "rebased"), ("signed", "earlier"))}}
     return {"results": summary, "boot": host["boot"], "enrolled_trios_per_mode": 12, "calibration_sha256":meter["plain_sha256"],
-            "rust": {**{k: cfg["sdk_artifacts"][k]["source_commit"] for k in ("base","both")}, "signed":cfg["signed"]["rust"]},
-            "cargo": cfg["measured_cargo"], "scope":"One runner boot, two balanced holds, one historical uv-resolver first edit."}
+            "rust": cfg["role_rust"], "labels": cfg["labels"],
+            "cargo": cfg["measured_cargo"], "scope":"One host boot, two balanced holds, ordinary default package features for uv-resolver after #20988. Earlier/rebased measures combined source and training drift."}
 
 
 if __name__ == "__main__":

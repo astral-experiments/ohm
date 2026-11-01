@@ -91,6 +91,68 @@ def sdk_input(root, result, name, protocol):
     save(result / ("github-artifact-" + name + ".json"), meta)
 
 
+def checked_action_artifact(cfg, run, head, folder, output):
+    ident = cfg["id"]
+    ep = f"repos/{REPO}/actions/artifacts/{ident}"
+    meta = gh_json("api", "--method", "GET", ep)
+    check(meta["id"] == ident and not meta["expired"] and meta["name"] == cfg["name"] and
+          meta["size_in_bytes"] == cfg["size_in_bytes"] and meta["digest"] == cfg["digest"] and
+          meta["workflow_run"]["id"] == run and meta["workflow_run"]["head_sha"] == head, "wrong final Actions artifact")
+    save(folder / f"github-artifact-{ident}.json", meta)
+    gh_bytes(ep + "/zip", output, cfg["size_in_bytes"], cfg["digest"].removeprefix("sha256:"))
+
+
+def rebased_input(root, out):
+    cfg = P["final"]
+    run = gh_json("api", "--method", "GET", f"repos/{REPO}/actions/runs/{cfg['run']}")
+    check(run["id"] == cfg["run"] and run["head_sha"] == cfg["event"] and
+          run["run_attempt"] == 1 and run["conclusion"] == "success", "wrong original release-build execution")
+    job = gh_json("api", "--method", "GET", f"repos/{REPO}/actions/jobs/{cfg['job_id']}")
+    check(job["run_id"] == cfg["run"] and job["conclusion"] == "success", "wrong release-build job")
+    save(out / "rebased-build-run.json", run)
+    save(out / "rebased-build-job.json", job)
+    folder = root / "rebased"
+    folder.mkdir()
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        zipped = Path(temp) / "release.zip"
+        spec = {"id":cfg["artifact_id"], "name":cfg["name"], "size_in_bytes":cfg["compressed_bytes"],
+                "digest":"sha256:" + cfg["outer_sha256"]}
+        checked_action_artifact(spec, cfg["run"], cfg["event"], out, zipped)
+        with zipfile.ZipFile(zipped) as z:
+            check(len(z.infolist()) == len(cfg["pkg_files"]) and set(z.namelist()) == set(cfg["pkg_files"]), "release ZIP layout")
+            for item in z.infolist():
+                pin = cfg["pkg_files"][item.filename]
+                check(not item.is_dir() and Path(item.filename).name == item.filename and item.file_size == pin["bytes"],
+                      "release component size or name")
+                path = folder / item.filename
+                with z.open(item) as src, path.open("xb") as dst:
+                    shutil.copyfileobj(src, dst, 1 << 20)
+                check(sha(path) == pin["sha256"], "authenticated release member digest")
+        for src in [cfg["name"] + ".tar.gz", cfg["name"] + "-provenance.json"]:
+            check((folder / (src + ".sha256")).read_text().split() == [cfg["pkg_files"][src]["sha256"], src], "release checksum sidecar")
+        provenance = read(folder / (cfg["name"] + "-provenance.json"))
+        check(provenance == cfg["provenance"], "source, coordinator, target or manifest mismatch")
+        save(out / "rebased-provenance.json", provenance)
+        qa = Path(temp) / "qa.zip"
+        checked_action_artifact(cfg["qa"], cfg["run"], cfg["event"], out, qa)
+        with zipfile.ZipFile(qa) as z:
+            context = json.loads(z.read("context.json"))
+            source = json.loads(z.read("source.json"))
+            complete = json.loads(z.read("pgo/complete.json"))
+            check(context == cfg["qa_context"] and source["rust_tail"]["chain"][0] ==
+                  [cfg["source_commit"], "0a38b3aa6d1bbb55ec5e8c01c9e88d1cf0f9f118", cfg["source_tree"]] and
+                  source["epoch"] == P["format_epochs"]["rebased"] and complete["outcome"] == "success",
+                  "build QA sources, end state or epoch changed")
+            members = {}
+            for name, suffix in (("bin/rustc","/stage2/bin/rustc"), ("bin/cargo","/stage2-tools-bin/cargo"),
+                                 ("lib/librustc_driver-b03bf00bec23bb9a.so","/stage2/lib/librustc_driver-b03bf00bec23bb9a.so")):
+                found = [pair for key, pair in complete["present_after_build"].items() if key.endswith(suffix)]
+                check(found == [cfg["expected_installed"][name]], "stage2 component digest")
+                members[name] = found[0]
+            save(out / "rebased-qa-binaries.json", members)
+            save(out / "rebased-qa-context.json", context)
+
+
 def released(root, result):
     cfg = P["signed"]
     tag = cfg["tag"]
@@ -139,6 +201,7 @@ def main():
     for name, subject in P["sdk_artifacts"].items():
         sdk_input(media, out, name, subject)
     released(media, out)
+    rebased_input(media, out)
 
 
 if __name__ == "__main__":

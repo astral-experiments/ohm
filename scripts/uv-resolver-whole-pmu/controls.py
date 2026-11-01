@@ -19,9 +19,31 @@ def rejects(fn, *args):
     raise AssertionError("negative control was accepted")
 
 
+def bridge_controls():
+    assert P["arms"] == ["signed","earlier","rebased"] and P["format_epochs"] == {"signed":10,"earlier":26655,"rebased":26655}
+    assert P["argv"] == ["check","-p","uv-resolver","--locked","--offline","-j8"]
+    assert len(set(P["role_rust"].values())) == 3 and P["role_rust"]["rebased"] == P["final"]["qa_context"]["sources"]["rust"]
+    for name, sdk in P["role_core"].items():
+        baseline=dict(sdk)
+        driver="lib/librustc_driver-b03bf00bec23bb9a.so"
+        llvm="lib/libLLVM.so.test"
+        baseline.setdefault(llvm,[4,"fixture"])
+        baseline.setdefault("lib/rustlib/"+P["target"]+"/lib/libstd-fixture",[3,"std"])
+        baseline.setdefault("lib/rustlib/"+P["target"]+"/bin/wild-ld/ld.bfd",[8,"wild"])
+        summary={"labels":P["labels"][name], "rust":P["role_rust"][name], "cargo":P["role_cargo"][name],
+                 "bolt":True,"sdk":"/tmp/sdk-"+name,"loaded":{"librustc_driver":driver,"libLLVM":llvm},
+                 "banner":{tool:"commit-hash: "+rev+"\nhost: "+P["target"] for tool,rev in
+                           (("rustc",P["role_rust"][name]),("cargo",P["role_cargo"][name]))}}
+        read.bridge_identity(P,name,summary,baseline)
+        rejects(read.bridge_identity,P,name,summary,baseline | {"bin/rustc":[0,"substituted"]})
+        rejects(read.bridge_identity,P,name,summary | {"rust":P["role_rust"][next(a for a in P["arms"] if a!=name)]},baseline)
+        rejects(read.bridge_identity,P,name,summary | {"loaded":{"librustc_driver":"x","libLLVM":llvm}},baseline)
+
+
 def main():
     if not __debug__:
         raise RuntimeError("assertions are required")
+    bridge_controls()
     plan = run.orders()
     assert read.planner(P) == plan and len(plan) == 2
     for hold in plan:
