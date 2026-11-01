@@ -1,22 +1,28 @@
-name: E and C ordinary Ruff integration binary contact
-run-name: CTFE ordinary integration native contact ${{ inputs.reviewed_head }}
+name: Ordinary Ruff integration-test E versus C hardware pilot
+run-name: Two-host Ruff integration instructions ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
         type: string
-        description: Exact reviewed SHA of this one-host, unscored registration
+        description: Exact reviewed SHA of this two-boot hardware registration
         required: true
 permissions:
   actions: read
   contents: read
 jobs:
   native:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-integration-contact-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
-    name: CTFE integration true Cargo contact
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ctfe-integration-hardware-20261101' && github.run_attempt == '1' && inputs.reviewed_head == github.sha
+    strategy:
+      fail-fast: false
+      matrix:
+        position: ['01', '02']
+    name: CTFE integration hardware ${{ matrix.position }}
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 180
+    timeout-minutes: 355
     env:
+      POSITION: ${{ matrix.position }}
+      CONTACT_BASE: ${{ github.workspace }}/contact-original
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       CTFE_CARRIER: ${{ github.workspace }}/ctfe
       INTEGRATION_CARRIER: ${{ github.workspace }}/integration
@@ -28,6 +34,14 @@ jobs:
         with:
           ref: ${{ github.sha }}
           path: enrolled
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ctfe-integration-contact
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 6bb98896980d427001e7a4ec7a687aaf730774ba
+          path: contact-original
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
@@ -116,6 +130,9 @@ jobs:
           set -euo pipefail
           dir=enrolled/scripts/ctfe-integration-contact
           python3 -IB "$dir/test_contact.py" --enrolled "$REVIEWED_HEAD"
+          python3 -IB "$dir/test_instructions.py"
+          python3 -IB contact-original/scripts/ctfe-integration-contact/test_contact.py --enrolled 6bb98896980d427001e7a4ec7a687aaf730774ba
+          echo "INTEGRATION_ORIGINAL=$RUNNER_TEMP/contact-41296525800" >> "$GITHUB_ENV"
           python3 -IB ctfe/scripts/ctfe-crossover-pilot/test_v2.py "$GITHUB_WORKSPACE/kernel"
           python3 -IB ctfe/scripts/ctfe-crossover-pilot/test_subjects.py --acquisition-imports "$GITHUB_WORKSPACE/source"
           for s in scripts/gnu-ctfe-literal-identity scripts/ruff-repair-tables-pilot/guards.py; do
@@ -133,19 +150,22 @@ jobs:
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           dpkg-query -W b3sum binutils build-essential git libssl-dev zstd strace util-linux > "$base/logs/packages.tsv"
           python3 -IB ctfe/scripts/ruff-repair-tables-pilot/guards.py check "$base/work" "$base/logs" > "$base/logs/bootstrap-resources.json"
-      - name: Restore the two exact original compiler installations
+      - name: Restore exact compilers and the original native contact
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py acquire "$GITHUB_WORKSPACE/source"
-      - name: Run the unscored integration contact
+        run: |
+          set -euo pipefail
+          python3 -IB enrolled/scripts/ctfe-integration-contact/instructions.py "$INTEGRATION_ORIGINAL"
+          python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py acquire "$GITHUB_WORKSPACE/source"
+      - name: Measure the two registered integration histories
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB ctfe/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py contact "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
+          python3 -IB ctfe/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ctfe-integration-contact/contact.py run "$GITHUB_WORKSPACE/physical" "$GITHUB_WORKSPACE/observers"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ctfe-integration-contact-original
+          name: ctfe-integration-hardware-${{ matrix.position }}
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

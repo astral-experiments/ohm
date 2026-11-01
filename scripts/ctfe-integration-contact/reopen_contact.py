@@ -14,18 +14,14 @@ import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import contract as q
+import instructions as policy
 
 
-def official(folder, run, head, archive):
+def official(folder, run, head, archives):
     def load(name):
         return json.loads((folder / (name + ".json")).read_bytes())
 
     info, jobs, artifacts = map(load, ("run", "jobs", "artifacts"))
-    steps = (
-        "Bind sources and reserve the runner",
-        "Restore the two exact original compiler installations",
-        "Run the unscored integration contact",
-    )
     q.need(
         (
             info["id"],
@@ -35,54 +31,74 @@ def official(folder, run, head, archive):
             info["path"],
             info["event"],
             info["conclusion"],
-        )
-        == (run, 1, head, q.BRANCH, ".github/workflows/ci.yml", "workflow_dispatch", "success")
-        and info["repository"]["full_name"]
-        == info["head_repository"]["full_name"]
-        == "astral-experiments/ohm",
-        "different official run",
-    )
-    (job,) = jobs["jobs"]
-    (art,) = artifacts["artifacts"]
-    q.need(
-        jobs["total_count"] == artifacts["total_count"] == 1
-        and (
-            job["run_id"],
-            job["run_attempt"],
-            job["head_sha"],
-            job["name"],
-            job["status"],
-            job["conclusion"],
-            job["labels"],
+            info["status"],
         )
         == (
             run,
             1,
             head,
-            "CTFE integration true Cargo contact",
-            "completed",
+            policy.BRANCH,
+            ".github/workflows/ci.yml",
+            "workflow_dispatch",
             "success",
-            ["namespace-profile-ubuntu-24-04-16"],
+            "completed",
         )
-        and [(s["name"], s["conclusion"]) for s in job["steps"] if s["name"] in steps]
-        == [(s, "success") for s in steps]
-        and (art["workflow_run"]["id"], art["workflow_run"]["head_sha"], art["name"], art["expired"])
-        == (run, head, "ctfe-integration-contact-original", False)
-        and 0 < art["size_in_bytes"] == archive.stat().st_size < 2**30,
-        "different official job or archive",
+        and info["repository"]["full_name"]
+        == info["head_repository"]["full_name"]
+        == "astral-experiments/ohm"
+        and jobs["total_count"]
+        == len(jobs["jobs"])
+        == artifacts["total_count"]
+        == len(artifacts["artifacts"])
+        == 2,
+        "unqualified official run",
     )
-    with archive.open("rb") as stream:
-        digest = hashlib.file_digest(stream, "sha256").hexdigest()
-    q.need(art["digest"] == "sha256:" + digest, "official ZIP mismatch")
-    return dict(
-        run=run,
-        head=head,
-        attempt=1,
-        job=job["id"],
-        artifact=art["id"],
-        sha256=digest,
-        bytes=art["size_in_bytes"],
+    result = {}
+    steps = (
+        "Bind sources and reserve the runner",
+        "Restore exact compilers and the original native contact",
+        "Measure the two registered integration histories",
     )
+    for pos in policy.ORDER:
+        (job,) = [a for a in jobs["jobs"] if a["name"] == "CTFE integration hardware " + pos]
+        (a,) = [x for x in artifacts["artifacts"] if x["name"] == "ctfe-integration-hardware-" + pos]
+        q.need(
+            (
+                job["run_id"],
+                job["run_attempt"],
+                job["head_sha"],
+                job["status"],
+                job["conclusion"],
+                job["labels"],
+            )
+            == (run, 1, head, "completed", "success", ["namespace-profile-ubuntu-24-04-16"])
+            and [s["name"] for s in job["steps"] if s["name"] in steps and s["conclusion"] == "success"]
+            == list(steps)
+            and (a["workflow_run"]["id"], a["workflow_run"]["head_sha"], a["expired"])
+            == (run, head, False)
+            and 0 < a["size_in_bytes"] == archives[pos].stat().st_size < 2**30
+            and job["runner_name"],
+            "different official job or artifact",
+        )
+        with archives[pos].open("rb") as f:
+            data = hashlib.file_digest(f, "sha256").hexdigest()
+        q.need(a["digest"] == "sha256:" + data, "official archive bytes differ")
+        result[pos] = dict(
+            position=pos,
+            run=run,
+            head=head,
+            attempt=1,
+            job=job["id"],
+            runner=job["runner_name"],
+            artifact=a["id"],
+            sha256=data,
+            bytes=a["size_in_bytes"],
+        )
+    q.need(
+        len({v["job"] for v in result.values()}) == len({v["runner"] for v in result.values()}) == 2,
+        "official jobs reused a worker",
+    )
+    return result
 
 
 def cargo(z, p, root, cert, rc):
@@ -106,7 +122,9 @@ def cargo(z, p, root, cert, rc):
         and sum(v["reason"] == "build-finished" for v in stream) == 1,
         "incomplete Cargo result",
     )
-    errors = [v for v in stream if v["reason"] == "compiler-message" and v["message"]["level"] == "error"]
+    errors = [
+        v for v in stream if v["reason"] == "compiler-message" and v["message"]["level"] == "error"
+    ]
     if rc:
         q.need(
             json.loads(raw("diagnostics.json")) == errors,
@@ -175,14 +193,20 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
             "foreign selected ELF",
         )
         owner = owners[k]
-        full = [
-            r
-            for r in phys["rustcs"]
-            if r["mode"] == "full"
-            and r["crate"] == name
-            and any(a == "crates/ruff/" + src or a.endswith("/crates/ruff/" + src) for a in r["argv"])
-            and ("--test" in r["argv"]) == (k == "harness")
-        ]
+        full = (
+            []
+            if phys is None
+            else [
+                r
+                for r in phys["rustcs"]
+                if r["mode"] == "full"
+                and r["crate"] == name
+                and any(
+                    a == "crates/ruff/" + src or a.endswith("/crates/ruff/" + src) for a in r["argv"]
+                )
+                and ("--test" in r["argv"]) == (k == "harness")
+            ]
+        )
         if full:
             (r,) = full
             q.need(
@@ -195,12 +219,14 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
             )
         else:
             q.need(
-                not cold and owner["pid"] is None and owner["externs"] == prior[k]["externs"],
+                (phys is None or not cold)
+                and owner["pid"] is None
+                and owner["externs"] == prior[k]["externs"],
                 "missing or mislabeled emitter",
             )
         records = proof["terminal_files"][k]
         expected = []
-        for ld in phys["wild_processes"]:
+        for ld in phys["wild_processes"] if phys is not None else []:
             (link_rust,) = [r for r in phys["rustcs"] if r["event"] == ld["rustc_event"]]
             # The package also owns a "ruff" lib. It cannot own the installed CLI link or its output basename.
             if link_rust["crate"] == name and re.fullmatch(
@@ -209,7 +235,7 @@ def selected(z, p, stream, phys, prior, cold, product, sel, root):
                 expected.append({"pid": ld["pid"], "path": ld["output"]})
         q.need(
             expected == owner["linked_by"]
-            and (len(expected) == 1 if cold else len(expected) <= 1)
+            and (len(expected) == 1 if cold and phys is not None else len(expected) <= 1)
             and set(records) == {paths[k], *(v["path"] for v in expected)},
             "unaccounted final link",
         )
@@ -411,7 +437,7 @@ def stubs(z, p, s, cli, cwd, edited):
     return result
 
 
-def read(path, meta, kernel, ruff):
+def read(path, meta, kernel, ruff, reference, calibrator, observers):
     ctfe, sel, suite = q.packages()
     import reopen as n
     import contact_review
@@ -424,9 +450,27 @@ def read(path, meta, kernel, ruff):
         q.need(
             len(names) == len(z.infolist())
             and all(not Path(f).is_absolute() and ".." not in f.split("/") for f in names)
-            and not {"failure.txt", "meter-ready.json"} & names
-            and not any(f.endswith("/clock.json") for f in names),
-            "refusal, ambiguous archive or counters present",
+            and "failure.txt" not in names
+            and "meter-ready.json" in names,
+            "refusal, ambiguous archive or missing calibration",
+        )
+        clocks = {f"{a}/{p}/clock.json" for a in q.ARMS for p in q.HISTORY}
+        observed = {f"{a}/{p}" for a in q.ARMS for p in (*q.EMPTY, "semantic-edit", "semantic-empty")}
+        q.need(
+            {n for n in names if n.endswith("/clock.json")} == clocks
+            and {
+                n.removesuffix("/kernel.tsv.gz")
+                for n in names
+                if n.endswith("/kernel.tsv.gz") and n.split("/")[0] in q.ARMS
+            }
+            == observed
+            and {
+                n.removesuffix("/native-execs.json.gz")
+                for n in names
+                if n.endswith("/native-execs.json.gz") and n.split("/")[0] in q.ARMS
+            }
+            == observed,
+            "missing or overlapping counter and native scopes",
         )
         expected_calls = {
             a + "/" + p + "/cargo.json.gz"
@@ -442,8 +486,8 @@ def read(path, meta, kernel, ruff):
         q.need(
             (pos["mode"], pos["order"], pos["head"], pos["run"], pos["plan"], pos["command"])
             == (
-                "contact",
-                list(q.ARMS),
+                "counter-pilot",
+                list(policy.ORDER[meta["position"]]),
                 meta["head"],
                 meta["run"],
                 q.sha((q.HERE / "PLAN.md").read_bytes()),
@@ -453,7 +497,23 @@ def read(path, meta, kernel, ruff):
             and D("ruff-inputs.json") == source_receipt,
             "wrong endpoint, order or source",
         )
-        q.excluded_boot(pos["boot"])
+        policy.fresh_boot(pos["boot"])
+        q.need(
+            (pos["position"], pos["runner"]) == (meta["position"], meta["runner"])
+            and D("prior-native-contact.json") == reference,
+            "different job or prior native control",
+        )
+        meter = D("meter-ready.json")
+        n.replay_controls.PACKAGING, n.replay_controls.OBSERVER = calibrator, observers
+        calibration = n.replay_controls.calibration(z, pos["boot"])
+        hardware = n.hardware.verify(z, calibration, meter)
+        q.need(
+            meter["boot"] == pos["boot"]
+            and calibration["affinity"] == meter["affinity"]
+            and meter["observer"] == n.replay_controls.OBS
+            and meter["calibrator"] == n.replay_controls.CAL,
+            "wrong hardware acquisition source/boot",
+        )
         boot_resources = D("bootstrap-resources.json")
         session = D("resource/resources.json")
         for state, mem, disk in [(boot_resources, 32, 32), (session["start"], 16, 4)]:
@@ -492,7 +552,7 @@ def read(path, meta, kernel, ruff):
             else []
         )
         q.need(eax["argv"][: len(privileges)] == privileges, "different privileges in suite")
-        refs, records, bodies, separate = {}, {}, {}, {}
+        refs, records, bodies, separate, clean_owners = {}, {}, {}, {}, {}
         installed_hashes = set()
         for arm in q.ARMS:
             cert, root = n.active(z, arm, arm, kit[arm[0]]["files"])
@@ -541,19 +601,34 @@ def read(path, meta, kernel, ruff):
                 rc = 101 if phase == "invalid" else 0
                 cmd, events = cargo(z, p, root, cert, rc)
                 n.driver(z, arm, p, arm, cert)
-                with patch.object(n, "CARGO", q.COMMAND), patch.object(n.kernel, "COMMAND", q.COMMAND):
-                    physical = n.physical(z, p, arm, cert, cmd, rc)
-                raw = gzip.decompress(z.read(p + "/kernel.tsv.gz"))
-                family = n.kernel.parse(
-                    raw, expected_sha=physical["kernel"], expected_code=rc, expected_schema=3
-                )
-                q.install_boundary(family["execs"])
-                installed_hashes.update(r["image"]["sha256"] for r in family["execs"])
-                real = d("native-execs.json.gz")
-                phy = q.identities(real)
-                wild = q.link_outputs(real)
+                counted = phase in q.HISTORY
+                if counted:
+                    clock = d("clock.json")
+                    policy.timed(clock, phase)
+                    q.need(
+                        cmd["observer_argv"]
+                        == [meter["plain"], str(root / "logs" / p / "clock.json"), *q.COMMAND]
+                        and meter["plain"] == str(root / "logs/observers/plain"),
+                        "different complete untraced command or counter binary",
+                    )
+                    real = phy = wild = None
+                else:
+                    with patch.object(n, "CARGO", q.COMMAND), patch.object(
+                        n.kernel, "COMMAND", q.COMMAND
+                    ):
+                        physical = n.physical(z, p, arm, cert, cmd, rc)
+                    raw = gzip.decompress(z.read(p + "/kernel.tsv.gz"))
+                    family = n.kernel.parse(
+                        raw, expected_sha=physical["kernel"], expected_code=rc, expected_schema=3
+                    )
+                    q.install_boundary(family["execs"])
+                    installed_hashes.update(r["image"]["sha256"] for r in family["execs"])
+                    real = d("native-execs.json.gz")
+                    phy = q.identities(real)
+                    wild = q.link_outputs(real)
                 typed, dirty = sel.roster(events, Path(cmd["cwd"]))
                 q.need(d("roster.json.gz") == dict(units=typed, dirty=dirty), "wrong typed inventory")
+                policy.rosters_admit(reference, arm, phase, typed, dirty)
                 store = d("storage.json")
                 allocated = n.metrics.allocation(
                     d("path-inodes.json.gz"), store, d("allocation-readers.json")
@@ -575,6 +650,8 @@ def read(path, meta, kernel, ruff):
                         physical=phy,
                         wild_outputs=wild,
                     )
+                if counted:
+                    rec["clock"] = clock
                 if rc:
                     q.need(
                         sorted(d("failed.json")) == sorted(store["failed_sessions"]),
@@ -585,7 +662,19 @@ def read(path, meta, kernel, ruff):
                     images = {k: products[k] for k in ("cli", "reader")} | {
                         "harness": d("harness-elf.json")
                     }
-                    paths, previous = selected(z, p, events, real, previous, cold, images, sel, root)
+                    if counted:
+                        ref = q.reference(phase)
+                        comparison = clean_owners[arm, ref]
+                        rec["external_owner_witness"] = ref
+                        q.need(
+                            d("selected.json")["owners"] == policy.reference_owners(comparison),
+                            "counted Cargo inputs not bound to same-boot same-role empty owner",
+                        )
+                    else:
+                        comparison = previous
+                    paths, previous = selected(z, p, events, real, comparison, cold, images, sel, root)
+                    if phase in q.EMPTY:
+                        clean_owners[arm, phase] = previous
                     q.need(len(typed) == 390 and not store["failed_sessions"], "incomplete native build")
                     for k, v in images.items():
                         n.verified_body(z, k, v, bodies)
@@ -629,22 +718,13 @@ def read(path, meta, kernel, ruff):
                         if v.get("reason") == "build-script-executed"
                         and "tikv-jemalloc-sys" in v["package_id"]
                     }
-                    reference = (typed, images, behavior, outdir)
+                    native_state = (typed, images, behavior, outdir)
                     if phase in q.EMPTY:
-                        refs[arm, phase] = reference
+                        refs[arm, phase] = native_state
                     else:
                         q.need(
-                            reference == refs[arm, q.reference(phase)],
+                            native_state == refs[arm, q.reference(phase)],
                             "original products/behavior or path differ from own empty",
-                        )
-                    if phase in ("X-A", "X-B"):
-                        q.need(
-                            all(previous[k]["linked_by"] for k in ("harness", "cli"))
-                            and any(
-                                r["crate"] == "ruff_python_ast" and r["mode"] == "full"
-                                for r in real["rustcs"]
-                            ),
-                            "historical links missing",
                         )
                     if phase == "repair":
                         stubs(z, p, semantic, paths["cli"], cmd["cwd"], False)
@@ -694,25 +774,34 @@ def read(path, meta, kernel, ruff):
             installed_hashes.isdisjoint(key[1] for key in bodies),
             "an actual selected CLI, libtest or native ABI reader ran inside an observed Cargo call",
         )
-        result = q.structural(records)
+        result = policy.outcomes(records)
         q.need(
             D("complete.json")
             == dict(
                 qualified=True,
-                scored=0,
+                scored=14,
                 schema=3,
                 phases=list(q.PHASES),
                 visits=records,
                 semantic=separate,
-                continuation=result,
+                observed=result,
+                prerequisite=policy.REGISTERED,
             ),
             "incorrect terminal gate",
         )
         return dict(
             official=meta,
             boot=pos["boot"],
-            contact_only=True,
-            scored=0,
+            qualified=True,
+            position=meta["position"],
+            runner=meta["runner"],
+            job=meta["job"],
+            run=meta["run"],
+            head=meta["head"],
+            order=pos["order"],
+            prerequisite=policy.REGISTERED,
+            hardware=hardware,
+            scored=14,
             commands=24,
             unchanged_histories=2,
             complete_96_case_suites=18,
@@ -723,19 +812,26 @@ def read(path, meta, kernel, ruff):
             source=q.KERNEL,
             observer=binding["observer_sha256"],
             records=records,
-            continuation=result,
+            observed=result,
         )
 
 
 if __name__ == "__main__":
     a = argparse.ArgumentParser(description=__doc__)
-    a.add_argument("archive", type=Path)
     a.add_argument("official_folder", type=Path)
+    for key in ("01", "02", "prior", "original_source", "kernel", "ruff", "calibrator", "observers"):
+        a.add_argument("--" + key.replace("_", "-"), dest=key, type=Path, required=True)
     a.add_argument("--run", type=int, required=True)
     a.add_argument("--head", required=True)
-    a.add_argument("--kernel", type=Path, required=True)
-    a.add_argument("--ruff", type=Path, required=True)
     args = a.parse_args()
     q.check_source(args.head)
-    meta = official(args.official_folder, args.run, args.head, args.archive)
-    print(json.dumps(read(args.archive, meta, args.kernel, args.ruff), sort_keys=True, indent=2))
+    archives = {p: getattr(args, p) for p in policy.ORDER}
+    require = policy.raw_contact(args.prior, args.original_source, args.ruff, args.kernel)
+    officials = official(args.official_folder, args.run, args.head, archives)
+    results = {
+        p: read(
+            archives[p], officials[p], args.kernel, args.ruff, require, args.calibrator, args.observers
+        )
+        for p in policy.ORDER
+    }
+    print(json.dumps({"positions": results, "paired": policy.pair(results)}, sort_keys=True, indent=2))

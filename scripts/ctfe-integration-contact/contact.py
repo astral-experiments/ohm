@@ -1,4 +1,4 @@
-"""One unscored, positive-kernel-observed E/C integration-test contact."""
+"""Collect two ordinary hardware-counted Ruff integration histories with separately observed references."""
 
 import gzip
 import json
@@ -12,6 +12,7 @@ import traceback
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import contract as q
+import instructions as policy
 
 
 def read(path):
@@ -30,7 +31,7 @@ def fresh(h, env):
     return s.physical_roots(paths, empty=True)
 
 
-def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fresh_state):
+def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fresh_state, reference):
     w = top / phase
     w.mkdir()
     if fresh_state is not None:
@@ -49,10 +50,18 @@ def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fre
     if phase == "unchanged":
         q.need(state == read(top / "comment/source.json"), "checkout changed between repeat and comment")
     rc = 101 if phase == "invalid" else 0
-    events, count, physical = observer.invocation(w, env, rc, arm)
-    q.need(count is None, "a counter ran during the unscored contact")
-    seen = observer.packages().reader.read(w / "kernel.tsv.gz", expected_code=rc, expected_schema=3)
-    q.install_boundary(seen["execs"])
+    counted = phase in q.HISTORY
+    if counted:
+        observer.source(w, arm, env, "before")
+        events, count, physical = h.original.invocation(w, env, "measured", rc, arm)
+        observer.source(w, arm, env, "after")
+        clock = read(w / "clock.json")
+        q.need(physical is None and count == policy.timed(clock, phase), "uncertified counter")
+    else:
+        events, count, physical = observer.invocation(w, env, rc, arm)
+        q.need(count is None, "counter active during clean reference")
+        seen = observer.packages().reader.read(w / "kernel.tsv.gz", expected_code=rc, expected_schema=3)
+        q.install_boundary(seen["execs"])
     pending = h.original.failed_session.observed(h.WORK)
     ledger = h.original.disk.allocated(h.WORK / "target", h.WORK / "build", w, failed_sessions=pending)
     q.need(
@@ -61,6 +70,7 @@ def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fre
     )
     typed, dirty = s.roster(events, h.kit.TREE)
     h.publish(w / "roster.json.gz", {"units": typed, "dirty": dirty})
+    policy.rosters_admit(reference, arm, phase, typed, dirty)
     rec = dict(
         phase=phase,
         arm=arm,
@@ -68,9 +78,11 @@ def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fre
         allocated=ledger["allocated"],
         typed=len(typed),
         dirty=len(dirty),
-        physical=q.identities(physical),
-        wild_outputs=q.link_outputs(physical),
+        physical=None if counted else q.identities(physical),
+        wild_outputs=None if counted else q.link_outputs(physical),
     )
+    if counted:
+        rec["clock"] = clock
     if rc:
         h.save(w / "failed.json", pending)
     else:
@@ -82,7 +94,12 @@ def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fre
             "wrong typed installation, pending session or false cold",
         )
         paths = s.selected_paths(events, h.kit.TREE, h.WORK)
-        mapping = s.join_native(physical, paths, cold, owners, h.sha, True)
+        if counted:
+            ref = q.reference(phase)
+            mapping = policy.reference_owners(refs[arm, ref]["owners"])
+            rec["external_owner_witness"] = ref
+        else:
+            mapping = s.join_native(physical, paths, cold, owners, h.sha, True)
         filtered, providers = s.reader_stream(events, mapping, h.sha)
         # Collect the physical operand and Cargo's promoted executable independently for warm links too.
         identities = {}
@@ -129,7 +146,9 @@ def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fre
                 native.preserve(p, images[role], h.original.BODIES, h.original.BUNDLE)
         else:
             prior = refs[arm, expected]
-            q.need(typed == prior["typed"], "same branch typed roster differs from own independent clean")
+            q.need(
+                typed == prior["typed"], "same branch typed roster differs from own independent clean"
+            )
             for role, p in files.items():
                 native.same_file(p, images[role], prior["images"][role], h.original.BODIES, w)
         oracle = suite.exercise(
@@ -138,7 +157,9 @@ def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fre
         behavior = {k: v for k, v in prod.items() if k not in ("cli", "reader")} | {"suite": oracle}
         native_dir = h.original.historical.stable_sdk.output_directory(events, "tikv-jemalloc-sys")
         if phase in q.EMPTY:
-            refs[arm, phase] = dict(typed=typed, images=images, behavior=behavior, native_dir=native_dir)
+            refs[arm, phase] = dict(
+                typed=typed, images=images, behavior=behavior, native_dir=native_dir, owners=mapping
+            )
         else:
             q.need(
                 (behavior, native_dir) == (prior["behavior"], prior["native_dir"]),
@@ -146,12 +167,6 @@ def trial(h, s, suite, observer, arm, phase, env, top, refs, owners, prefix, fre
             )
         rec["products"] = {k: v["whole"] for k, v in images.items()}
         rec["suite_count"] = 96
-        if phase in ("X-A", "X-B"):
-            q.need(
-                any(r["crate"] == "ruff_python_ast" and r["mode"] == "full" for r in physical["rustcs"])
-                and all(mapping[k]["linked_by"] for k in ("cli", "harness")),
-                "true historical change did not compile and link",
-            )
     q.need(snapshot() == state, "off-window validations changed source")
     h.save(w / "visit.json", rec)
     print(arm, phase, rec.get("suite_count", "expected E0308"), flush=True)
@@ -187,7 +202,7 @@ def main(argv):
     q.need(
         os.environ["GITHUB_REPOSITORY"] == h.b.REPO
         and os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch"
-        and os.environ["GITHUB_REF"] == "refs/heads/" + q.BRANCH
+        and os.environ["GITHUB_REF"] == "refs/heads/" + policy.BRANCH
         and os.environ["GITHUB_SHA"] == os.environ["REVIEWED_HEAD"]
         and os.environ["GITHUB_RUN_ATTEMPT"] == "1"
         and h.ROOT.resolve() == h.ROOT
@@ -198,15 +213,20 @@ def main(argv):
         h.subjects.acquire(Path(argv[1]))
         return
     q.need(
-        argv[0] == "contact" and len(argv) == 3 and not (h.OUT / "meter-ready.json").exists(),
+        argv[0] == "run" and len(argv) == 3 and not (h.OUT / "meter-ready.json").exists(),
         "unknown mode or active counters",
     )
+    pos = os.environ["POSITION"]
+    order = policy.ORDER[pos]
     host = local_host(h, *map(Path, argv[1:]))
+    policy.fresh_boot(host["boot"])
     h.save(
         h.OUT / "position.json",
         dict(
-            mode="contact",
-            order=q.ARMS,
+            mode="counter-pilot",
+            position=pos,
+            runner=os.environ["RUNNER_NAME"],
+            order=order,
             run=int(os.environ["GITHUB_RUN_ID"]),
             head=os.environ["GITHUB_SHA"],
             command=q.COMMAND,
@@ -229,15 +249,39 @@ def main(argv):
         "unexpected base adapter",
     )
     capture.CARGO = q.COMMAND.copy()
+    h.original.CARGO = q.COMMAND.copy()
+    calibration = runpy.run_path(str(Path(argv[1]) / "scripts/gnu-renderer-pfc-hardware/calibration.py"))
+    binary = calibration["setup"](Path(argv[2]), h.ROOT, h.OUT)
+    q.need(
+        binary == h.OUT / "observers/plain" and len(os.sched_getaffinity(0)) == 8,
+        "wrong counter/affinity",
+    )
+    h.save(
+        h.OUT / "meter-ready.json",
+        dict(
+            boot=host["boot"],
+            affinity=host["affinity"],
+            observer=h.b.OBS,
+            calibrator=h.b.CAL,
+            plain=str(binary),
+        ),
+    )
     h.b.fresh_outputs()
     h.b.prepare_inputs(h.kit, env)
+    reference = policy.raw_contact(
+        Path(os.environ["INTEGRATION_ORIGINAL"]),
+        Path(os.environ["CONTACT_BASE"]),
+        h.kit.TREE,
+        Path(os.environ["CTFE_EXECS_SOURCE"]),
+    )
+    h.save(h.OUT / "prior-native-contact.json", reference)
     h.original.historical.calibration()
     suite.inventory((Path(suite.__file__).with_name("expected-tests.txt")).read_bytes())
     prefix = suite.permission_prefix(initial)
     import semantic
 
     refs, records, separate = {}, {}, {}
-    for arm in q.ARMS:
+    for arm in order:
         top = h.OUT / arm
         top.mkdir()
         env = h.subjects.activate(arm, rows, top)
@@ -249,7 +293,7 @@ def main(argv):
                 new = fresh(h, env)
                 owners = {}
             visits[phase] = trial(
-                h, select, suite, trace, arm, phase, env, top, refs, owners, prefix, new
+                h, select, suite, trace, arm, phase, env, top, refs, owners, prefix, new, reference
             )
         q.need(
             all(
@@ -259,6 +303,9 @@ def main(argv):
             "historical native products did not change",
         )
         separate[arm] = semantic.run(h, select, suite, trace, arm, env, top, owners, fresh)
+        for phase in ("semantic-edit", "semantic-empty"):
+            actual = json.loads(gzip.decompress((top / phase / "roster.json.gz").read_bytes()))
+            policy.rosters_admit(reference, arm, phase, actual["units"], actual["dirty"])
         h.b.verify_physical(h.b.SDK, rows[arm[0]])
         records[arm] = visits
     for phase in q.EMPTY:
@@ -276,12 +323,13 @@ def main(argv):
         h.OUT / "complete.json",
         dict(
             qualified=True,
-            scored=0,
+            scored=14,
             schema=3,
             phases=list(q.PHASES),
             visits=records,
             semantic=separate,
-            continuation=q.structural(records),
+            observed=policy.outcomes(records),
+            prerequisite=policy.REGISTERED,
         ),
     )
 

@@ -147,12 +147,23 @@ class Contract(unittest.TestCase):
         for file in q.HERE.glob("*.py"):
             ast.parse(file.read_bytes(), filename=str(file))
         w = (q.HERE.parents[1] / ".github/workflows/ci.yml").read_text()
-        for v in (q.BRANCH, q.CTFE, q.F_HEAD, q.KERNEL, "0b50022990577aadd904731e51c4d6c2a0f9b665"):
+        import instructions
+
+        for v in (
+            instructions.BRANCH,
+            instructions.CONTACT,
+            q.CTFE,
+            q.F_HEAD,
+            q.KERNEL,
+            "0b50022990577aadd904731e51c4d6c2a0f9b665",
+        ):
             self.assertIn(v, w)
         self.assertEqual(w.count("GH_TOKEN:"), 1)
         self.assertEqual(w.count("actions/checkout@"), w.count("persist-credentials: false"))
         self.assertNotIn("pull_request:", w)
-        self.assertNotIn("meter.py", w)
+        self.assertIn("position: ['01', '02']", w)
+        self.assertIn("Measure the two registered integration histories", w)
+        self.assertIn("raw_contact", (q.HERE / "contact.py").read_text())
         self.assertNotIn("CARGO_UNSTABLE_OHM_", w)
 
 
@@ -209,7 +220,9 @@ def previous(archive):
                     }
                     pref = D("initial/eacces.json")["argv"]
                     pref = pref[: pref.index("--") + 1] if pref[:1] == ["setpriv"] else []
-                    v = replay.full_suite(z, p, paths, cmd["cwd"], suite, common.original.processes, pref)
+                    v = replay.full_suite(
+                        z, p, paths, cmd["cwd"], suite, common.original.processes, pref
+                    )
                     q.need(
                         len(v["names"]) == 96 and imgs["source"] in native.metrics.REVS.values(),
                         "wrong real old suite",
