@@ -54,6 +54,12 @@ jobs:
           fetch-depth: 2
           path: ruff
           persist-credentials: false
+      - name: Install and exercise the process tracer used by the original workspace census
+        if: inputs.whole_workspace
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends strace
+          strace -ff -qq -e trace=%process -o "$RUNNER_TEMP/ruff-census-trace-admission" -- /usr/bin/true
       - name: Install the original distribution and bind its provenance
         env:
           GH_TOKEN: ${{ github.token }}
