@@ -1,0 +1,2517 @@
+{
+  "accepted_artifact": 13154446386,
+  "accepted_run": 41468593729,
+  "accepted_sha256": "d25511aba2e879420c8969f93d8080c0ab7c16fb3dc031a1f4c4ed9515ed5677",
+  "boot": "fe577d35-98ed-4bfb-b4c1-dadff90bc2ae",
+  "cgu_and_hash_bounds": {
+    "changed_complete_files": 52,
+    "edit_clean_different": 0,
+    "edit_clean_identical_complete_files": 0,
+    "objects": 3096,
+    "old_edit_different": 11,
+    "old_edit_unchanged_complete_files": 0,
+    "operand_edges_changed": 118,
+    "rlib_units": 25,
+    "units_with_wholly_equal_native_rosters": 18
+  },
+  "class_top_leaf": {
+    "Wild": [
+      [
+        "[unknown]",
+        1484
+      ],
+      [
+        "realloc",
+        6
+      ],
+      [
+        "cfree",
+        2
+      ],
+      [
+        "malloc",
+        1
+      ]
+    ],
+    "archive assembly": [
+      [
+        "_mi_theap_realloc_zero",
+        3
+      ],
+      [
+        "<core::hash::sip::Hasher<core::hash::sip::Sip13Rounds> as core::hash::Hasher>::write",
+        2
+      ],
+      [
+        "ar_archive_writer::archive_writer::write_symbol_table::<alloc::io::buffered::bufwriter::BufWriter<std::fs::File>>",
+        1
+      ],
+      [
+        "<alloc::io::buffered::bufwriter::BufWriter<std::fs::File>>::write_all_cold",
+        1
+      ],
+      [
+        "<std::hash::random::RandomState as core::hash::BuildHasher>::hash_one::<&&str>",
+        1
+      ],
+      [
+        "<u32 as core::fmt::Octal>::fmt",
+        1
+      ]
+    ],
+    "external child of rustc": [
+      [
+        "[unknown]",
+        5
+      ]
+    ],
+    "front-end semantic work": [
+      [
+        "<rustc_proc_macro::bridge::server::Dispatcher<rustc_expand::proc_macro_server::Rustc>>::dispatch::{closure#12}",
+        255
+      ],
+      [
+        "<rustc_ast_lowering::LoweringContext>::lower_qpath",
+        232
+      ],
+      [
+        "<rustc_resolve::Resolver>::resolve_ident_in_scope_set_inner",
+        220
+      ],
+      [
+        "<rustc_resolve::late::LateResolutionVisitor>::resolve_path",
+        194
+      ],
+      [
+        "<rustc_expand::expand::MacroExpander>::fully_expand_fragment",
+        185
+      ],
+      [
+        "<rustc_type_ir::ty_kind::TyKind<rustc_middle::ty::context::TyCtxt> as rustc_data_structures::stable_hash::StableHash>::stable_hash::<rustc_middle::ich::StableHashState>",
+        166
+      ]
+    ],
+    "incremental graph and persistence": [
+      [
+        "<rustc_middle::dep_graph::serialized::SerializedDepGraph>::try_decode",
+        319
+      ],
+      [
+        "<std::sync::once::Once>::call_once_force::<<std::sync::once_lock::OnceLock<hashbrown::table::HashTable<rustc_middle::dep_graph::serialized::SerializedDepNodeIndex>>>::initialize<<std::sync::once_lock::OnceLock<hashbrown::table::HashTable<rustc_middle::dep_graph::serialized::SerializedDepNodeIndex>>>::get_or_init<<rustc_middle::dep_graph::serialized::LazyKindIndex>::fingerprint_map::{closure#0}>::{closure#0}, !>::{closure#0}>::{closure#0}",
+        176
+      ],
+      [
+        "core::slice::sort::unstable::quicksort::quicksort::<(rustc_middle::dep_graph::serialized::SerializedDepNodeIndex, rustc_middle::dep_graph::serialized::SerializedDepNodeIndex), <[(rustc_middle::dep_graph::serialized::SerializedDepNodeIndex, rustc_middle::dep_graph::serialized::SerializedDepNodeIndex)]>::sort_unstable_by_key<u32, <rustc_middle::query::on_disk_cache::OnDiskCache>::take_query_cache_promotion::{closure#0}>::{closure#0}>",
+        115
+      ],
+      [
+        "core::slice::sort::unstable::quicksort::quicksort::<rustc_middle::dep_graph::serialized::SerializedDepNodeIndex, <[rustc_middle::dep_graph::serialized::SerializedDepNodeIndex]>::sort_unstable_by_key<u32, <rustc_middle::query::on_disk_cache::OnDiskCache>::cached_query_indices::{closure#0}>::{closure#0}>",
+        113
+      ],
+      [
+        "<rustc_middle::ty::Ty as rustc_serialize::serialize::Decodable<rustc_middle::query::on_disk_cache::CacheDecoder>>::decode",
+        108
+      ],
+      [
+        "<alloc::vec::Vec<(rustc_middle::dep_graph::serialized::SerializedDepNodeIndex, rustc_middle::query::on_disk_cache::AbsoluteBytePos)> as rustc_serialize::serialize::Decodable<rustc_serialize::opaque::MemDecoder>>::decode",
+        59
+      ]
+    ],
+    "mono collection": [
+      [
+        "rustc_monomorphize::collector::collect_items_rec",
+        72
+      ],
+      [
+        "rustc_monomorphize::partitioning::place_mono_items::<core::iter::adapters::copied::Copied<core::slice::iter::Iter<rustc_middle::mono::MonoItem>>>",
+        50
+      ],
+      [
+        "<rustc_middle::mono::MonoItem>::instantiation_mode",
+        46
+      ],
+      [
+        "<rustc_middle::mono::MonoItem as rustc_data_structures::stable_hash::ToStableHashKey>::to_stable_hash_key::<rustc_middle::ich::StableHashState>",
+        37
+      ],
+      [
+        "rustc_monomorphize::partitioning::partition::<core::iter::adapters::copied::Copied<core::slice::iter::Iter<rustc_middle::mono::MonoItem>>>",
+        16
+      ],
+      [
+        "<rustc_middle::mono::CodegenUnit>::mangle_name",
+        10
+      ]
+    ],
+    "native code generation": [
+      [
+        "_ZN4llvm12MachineInstr10addOperandERNS_15MachineFunctionERKNS_14MachineOperandE",
+        123
+      ],
+      [
+        "_ZN12_GLOBAL__N_116RegAllocFastImpl20runOnMachineFunctionERN4llvm15MachineFunctionE",
+        81
+      ],
+      [
+        "_ZN12_GLOBAL__N_114VarLocBasedLDV12ExtendRangesERN4llvm15MachineFunctionEPNS1_20MachineDominatorTreeEbjj.llvm.2829444073677789182",
+        70
+      ],
+      [
+        "rustc_codegen_ssa::mir::codegen_mir::<rustc_codegen_llvm::builder::GenericBuilder<rustc_codegen_llvm::context::FullCx>>",
+        58
+      ],
+      [
+        "_ZN4llvm10AsmPrinter16emitFunctionBodyEv",
+        53
+      ],
+      [
+        "_ZNK12_GLOBAL__N_116X86MCCodeEmitter17encodeInstructionERKN4llvm6MCInstERNS1_15SmallVectorImplIcEERNS5_INS1_7MCFixupEEERKNS1_15MCSubtargetInfoE.llvm.2056416561633246377",
+        46
+      ]
+    ],
+    "native link preparation": [
+      [
+        "rustc_codegen_ssa::back::link::add_order_independent_options",
+        1
+      ]
+    ],
+    "other query or graph work": [
+      [
+        "<rustc_stable_hash[613b013458b1412]::sip128::SipHasher128>::short_write_process_buffer::<8: usize>",
+        194
+      ],
+      [
+        "rustc_query_impl::execution::try_execute_query::<rustc_middle::query::caches::DefIdCache<rustc_middle::query::erase::ErasedData<[u8; 8: usize]>>, true: bool>",
+        166
+      ],
+      [
+        "<rustc_middle::mir::BasicBlockData as rustc_data_structures::stable_hash::StableHash>::stable_hash::<rustc_middle::ich::StableHashState>",
+        147
+      ],
+      [
+        "<rustc_middle::query::on_disk_cache::CacheDecoder as rustc_span::SpanDecoder>::decode_span",
+        143
+      ],
+      [
+        "<rustc_middle::dep_graph::graph::DepGraphData>::alloc_and_color_node",
+        130
+      ],
+      [
+        "rustc_middle::dep_graph::read_deps::<<rustc_middle::dep_graph::graph::DepGraph>::read_index::{closure#0}>::{closure#0}",
+        119
+      ]
+    ],
+    "other/unclassified": [
+      [
+        "[unknown]",
+        905
+      ],
+      [
+        "<rustc_parse::lexer::Lexer>::next_token_from_cursor",
+        151
+      ],
+      [
+        "<alloc::string::String>::push",
+        106
+      ],
+      [
+        "<core::slice::iter::Iter<u8> as core::iter::traits::iterator::Iterator>::next",
+        99
+      ],
+      [
+        "malloc",
+        91
+      ],
+      [
+        "<core::iter::sources::once::Once<proc_macro2::TokenTree> as core::iter::traits::iterator::Iterator>::next",
+        83
+      ]
+    ],
+    "query color/force": [
+      [
+        "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+        1567
+      ],
+      [
+        "<rustc_middle::dep_graph::graph::DepGraph>::try_mark_green",
+        6
+      ],
+      [
+        "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_green",
+        2
+      ],
+      [
+        "[unknown]",
+        1
+      ],
+      [
+        "mi_bitmap_setN",
+        1
+      ]
+    ],
+    "rmeta decode": [
+      [
+        "<rustc_middle::ty::Ty as rustc_serialize::serialize::Decodable<rustc_metadata::rmeta::decoder::MetadataDecodeContext>>::decode",
+        343
+      ],
+      [
+        "<rustc_metadata::rmeta::decoder::MetadataDecodeContext as rustc_span::SpanDecoder>::decode_span",
+        273
+      ],
+      [
+        "<rustc_metadata::rmeta::decoder::MetadataDecodeContext as rustc_span::SpanDecoder>::decode_syntax_context",
+        37
+      ],
+      [
+        "<rustc_type_ir::sty::Region<rustc_middle::ty::context::TyCtxt> as rustc_serialize::serialize::Decodable<rustc_metadata::rmeta::decoder::MetadataDecodeContext>>::decode",
+        36
+      ],
+      [
+        "rustc_metadata::rmeta::decoder::cstore_impl::provide_extern::implementations_of_trait",
+        33
+      ],
+      [
+        "<rustc_middle::ty::context::CtxtInterners>::intern_ty_shared",
+        33
+      ]
+    ],
+    "rmeta encode/public hash": [
+      [
+        "<rustc_metadata::rmeta::encoder::EncodeContext<rustc_metadata::rmeta::encoder::DefPathHashDefIdEncoder> as rustc_span::SpanEncoder>::encode_span",
+        273
+      ],
+      [
+        "<rustc_metadata::rmeta::encoder::EncodeContext<rustc_metadata::rmeta::encoder::DefPathHashDefIdEncoder>>::encode_def_ids::<rustc_metadata::rmeta::encoder::public_api_hasher::PublicApiHashingContext<true: bool>>",
+        258
+      ],
+      [
+        "<rustc_metadata::rmeta::encoder::public_api_hasher::ReachabilityGraphBuilder>::build_graph",
+        249
+      ],
+      [
+        "rustc_metadata::rmeta::encoder::public_api_hasher::build_public_hashes",
+        165
+      ],
+      [
+        "rustc_interface::callbacks::track_span_parent",
+        150
+      ],
+      [
+        "core::slice::sort::stable::quicksort::quicksort::<indexmap::Bucket<rustc_metadata::rmeta::encoder::public_api_hasher::Node, rustc_data_structures::fingerprint::Fingerprint>, <[indexmap::Bucket<rustc_metadata::rmeta::encoder::public_api_hasher::Node, rustc_data_structures::fingerprint::Fingerprint>]>::sort_by_key<rustc_data_structures::fingerprint::Fingerprint, <indexmap::map::IndexMap<rustc_metadata::rmeta::encoder::public_api_hasher::Node, rustc_data_structures::fingerprint::Fingerprint, rustc_hash::FxBuildHasher>>::sort_by_key<rustc_data_structures::fingerprint::Fingerprint, <rustc_metadata::rmeta::encoder::public_api_hasher::ReachabilityGraphBuilder>::build_graph::{closure#3}>::{closure#0}::{closure#0}>::{closure#0}>",
+        125
+      ]
+    ]
+  },
+  "clock": 60969897935,
+  "consumer_offered_edges": {
+    "ruff": [
+      [
+        "ruff",
+        "libruff-db4b2d0c013dc1fb.rlib",
+        true
+      ],
+      [
+        "ruff",
+        "libruff-db4b2d0c013dc1fb.rmeta",
+        true
+      ],
+      [
+        "ruff_db",
+        "libruff_db-ff74b3654ebbf4bc.rlib",
+        true
+      ],
+      [
+        "ruff_db",
+        "libruff_db-ff74b3654ebbf4bc.rmeta",
+        true
+      ],
+      [
+        "ruff_graph",
+        "libruff_graph-58f84aa391838527.rlib",
+        true
+      ],
+      [
+        "ruff_graph",
+        "libruff_graph-58f84aa391838527.rmeta",
+        true
+      ],
+      [
+        "ruff_linter",
+        "libruff_linter-1ebfba3e634b8a34.rlib",
+        true
+      ],
+      [
+        "ruff_linter",
+        "libruff_linter-1ebfba3e634b8a34.rmeta",
+        true
+      ],
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ],
+      [
+        "ruff_markdown",
+        "libruff_markdown-b8efdcc7bbc202ec.rlib",
+        true
+      ],
+      [
+        "ruff_markdown",
+        "libruff_markdown-b8efdcc7bbc202ec.rmeta",
+        true
+      ],
+      [
+        "ruff_notebook",
+        "libruff_notebook-2b891a9394dc0d3c.rlib",
+        true
+      ],
+      [
+        "ruff_notebook",
+        "libruff_notebook-2b891a9394dc0d3c.rmeta",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rlib",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_formatter",
+        "libruff_python_formatter-e363b18e106fe648.rlib",
+        true
+      ],
+      [
+        "ruff_python_formatter",
+        "libruff_python_formatter-e363b18e106fe648.rmeta",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rlib",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rmeta",
+        true
+      ],
+      [
+        "ruff_server",
+        "libruff_server-9b852efc1540bddb.rlib",
+        true
+      ],
+      [
+        "ruff_server",
+        "libruff_server-9b852efc1540bddb.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rlib",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ],
+      [
+        "ruff_workspace",
+        "libruff_workspace-f33f262f304239da.rlib",
+        true
+      ],
+      [
+        "ruff_workspace",
+        "libruff_workspace-f33f262f304239da.rmeta",
+        true
+      ]
+    ],
+    "ruff_db": [
+      [
+        "ruff_notebook",
+        "libruff_notebook-2b891a9394dc0d3c.rmeta",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rmeta",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ],
+      [
+        "ty_static",
+        "libty_static-fab02df503422af0.rmeta",
+        true
+      ]
+    ],
+    "ruff_formatter": [
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ]
+    ],
+    "ruff_graph": [
+      [
+        "ruff_db",
+        "libruff_db-ff74b3654ebbf4bc.rmeta",
+        true
+      ],
+      [
+        "ruff_linter",
+        "libruff_linter-1ebfba3e634b8a34.rmeta",
+        true
+      ],
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rmeta",
+        true
+      ],
+      [
+        "ty_module_resolver",
+        "libty_module_resolver-aad39266d4d4c06f.rmeta",
+        true
+      ],
+      [
+        "ty_site_packages",
+        "libty_site_packages-9b43a6be0190fec5.rmeta",
+        true
+      ]
+    ],
+    "ruff_index": [
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ]
+    ],
+    "ruff_linter": [
+      [
+        "ruff_db",
+        "libruff_db-ff74b3654ebbf4bc.rmeta",
+        true
+      ],
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ],
+      [
+        "ruff_notebook",
+        "libruff_notebook-2b891a9394dc0d3c.rmeta",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_codegen",
+        "libruff_python_codegen-a3a5ce665e85645a.rmeta",
+        true
+      ],
+      [
+        "ruff_python_importer",
+        "libruff_python_importer-ac3123785785d347.rmeta",
+        true
+      ],
+      [
+        "ruff_python_index",
+        "libruff_python_index-1f91c8726e606d9b.rmeta",
+        true
+      ],
+      [
+        "ruff_python_literal",
+        "libruff_python_literal-b5b0f19da7b44449.rmeta",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rmeta",
+        true
+      ],
+      [
+        "ruff_python_semantic",
+        "libruff_python_semantic-e219c73455a1475c.rmeta",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ]
+    ],
+    "ruff_macros": [
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-b6513ba17a4b84a6.rlib",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-b6513ba17a4b84a6.rmeta",
+        true
+      ]
+    ],
+    "ruff_markdown": [
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_formatter",
+        "libruff_python_formatter-e363b18e106fe648.rmeta",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ],
+      [
+        "ruff_workspace",
+        "libruff_workspace-f33f262f304239da.rmeta",
+        true
+      ]
+    ],
+    "ruff_notebook": [
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_ast": [
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_codegen": [
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_literal",
+        "libruff_python_literal-b5b0f19da7b44449.rmeta",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_formatter": [
+      [
+        "ruff_db",
+        "libruff_db-ff74b3654ebbf4bc.rmeta",
+        true
+      ],
+      [
+        "ruff_formatter",
+        "libruff_formatter-5b6026268e4fb5e4.rmeta",
+        true
+      ],
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rmeta",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_importer": [
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_codegen",
+        "libruff_python_codegen-a3a5ce665e85645a.rmeta",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_index": [
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_literal": [
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_parser": [
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_semantic": [
+      [
+        "ruff_index",
+        "libruff_index-a820f749c9148a45.rmeta",
+        true
+      ],
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rmeta",
+        true
+      ]
+    ],
+    "ruff_python_trivia": [
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-e9ee2ab970ab7db3.rmeta",
+        true
+      ]
+    ],
+    "ruff_server": [
+      [
+        "ruff_db",
+        "libruff_db-ff74b3654ebbf4bc.rmeta",
+        true
+      ],
+      [
+        "ruff_formatter",
+        "libruff_formatter-5b6026268e4fb5e4.rmeta",
+        true
+      ],
+      [
+        "ruff_linter",
+        "libruff_linter-1ebfba3e634b8a34.rmeta",
+        true
+      ],
+      [
+        "ruff_markdown",
+        "libruff_markdown-b8efdcc7bbc202ec.rmeta",
+        true
+      ],
+      [
+        "ruff_notebook",
+        "libruff_notebook-2b891a9394dc0d3c.rmeta",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_codegen",
+        "libruff_python_codegen-a3a5ce665e85645a.rmeta",
+        true
+      ],
+      [
+        "ruff_python_formatter",
+        "libruff_python_formatter-e363b18e106fe648.rmeta",
+        true
+      ],
+      [
+        "ruff_python_index",
+        "libruff_python_index-1f91c8726e606d9b.rmeta",
+        true
+      ],
+      [
+        "ruff_python_parser",
+        "libruff_python_parser-f8c2b5d39f46d58e.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ],
+      [
+        "ruff_workspace",
+        "libruff_workspace-f33f262f304239da.rmeta",
+        true
+      ]
+    ],
+    "ruff_workspace": [
+      [
+        "ruff_formatter",
+        "libruff_formatter-5b6026268e4fb5e4.rmeta",
+        true
+      ],
+      [
+        "ruff_graph",
+        "libruff_graph-58f84aa391838527.rmeta",
+        true
+      ],
+      [
+        "ruff_linter",
+        "libruff_linter-1ebfba3e634b8a34.rmeta",
+        true
+      ],
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_formatter",
+        "libruff_python_formatter-e363b18e106fe648.rmeta",
+        true
+      ],
+      [
+        "ruff_python_semantic",
+        "libruff_python_semantic-e219c73455a1475c.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ]
+    ],
+    "ty_module_resolver": [
+      [
+        "ruff_db",
+        "libruff_db-ff74b3654ebbf4bc.rmeta",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ]
+    ],
+    "ty_site_packages": [
+      [
+        "ruff_db",
+        "libruff_db-ff74b3654ebbf4bc.rmeta",
+        true
+      ],
+      [
+        "ruff_python_ast",
+        "libruff_python_ast-5a2d1a22d0fcf0c1.rmeta",
+        true
+      ],
+      [
+        "ruff_python_trivia",
+        "libruff_python_trivia-a3170c88d500ff09.rmeta",
+        true
+      ],
+      [
+        "ruff_source_file",
+        "libruff_source_file-4d18d41a9d82da5a.rmeta",
+        true
+      ],
+      [
+        "ty_static",
+        "libty_static-fab02df503422af0.rmeta",
+        true
+      ]
+    ],
+    "ty_static": [
+      [
+        "ruff_macros",
+        "libruff_macros-7e99546a5854adfd.so",
+        true
+      ]
+    ]
+  },
+  "consumer_offered_edges_by_crate_name_scope": "Actual --extern arguments resolving to the 27 captured edited units. A repeated identical registration on the same crate name counts once. Each original process has a retained full command.",
+  "deliveries": [
+    [
+      "ruff",
+      [
+        "bin"
+      ],
+      [],
+      [
+        [
+          "ELF",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_db",
+      [
+        "lib"
+      ],
+      [
+        "ignore",
+        "junit",
+        "os",
+        "serde"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_formatter",
+      [
+        "lib"
+      ],
+      [
+        "serde"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_graph",
+      [
+        "lib"
+      ],
+      [
+        "clap",
+        "schemars",
+        "serde"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_index",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_linter",
+      [
+        "lib"
+      ],
+      [
+        "clap",
+        "default"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_macros",
+      [
+        "proc-macro"
+      ],
+      [],
+      [
+        [
+          ".so",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_markdown",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_notebook",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_ast",
+      [
+        "lib"
+      ],
+      [
+        "cache",
+        "get-size",
+        "salsa",
+        "serde"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_codegen",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_formatter",
+      [
+        "lib"
+      ],
+      [
+        "default",
+        "serde"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_importer",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_index",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_literal",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_parser",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_semantic",
+      [
+        "lib"
+      ],
+      [
+        "serde"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_trivia",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_python_trivia",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_server",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_source_file",
+      [
+        "lib"
+      ],
+      [
+        "get-size",
+        "serde"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_source_file",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ruff_workspace",
+      [
+        "lib"
+      ],
+      [
+        "default"
+      ],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ty_module_resolver",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ty_site_packages",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ],
+    [
+      "ty_static",
+      [
+        "lib"
+      ],
+      [],
+      [
+        [
+          ".rlib",
+          false,
+          false
+        ],
+        [
+          ".rmeta",
+          false,
+          false
+        ]
+      ]
+    ]
+  ],
+  "files_by_type_old_edit_edit_clean": [
+    [
+      ".rlib",
+      false,
+      false,
+      25
+    ],
+    [
+      ".rmeta",
+      false,
+      false,
+      25
+    ],
+    [
+      ".so",
+      false,
+      false,
+      1
+    ],
+    [
+      "ELF",
+      false,
+      false,
+      1
+    ]
+  ],
+  "leaf_deepest_any_frame": {
+    "Wild": [
+      1493,
+      1493,
+      1493
+    ],
+    "archive assembly": [
+      0,
+      10,
+      91
+    ],
+    "external child of rustc": [
+      5,
+      5,
+      5
+    ],
+    "front-end semantic work": [
+      3215,
+      5268,
+      6313
+    ],
+    "incremental graph and persistence": [
+      1010,
+      1345,
+      3077
+    ],
+    "mono collection": [
+      181,
+      350,
+      1361
+    ],
+    "native code generation": [
+      1452,
+      1709,
+      2504
+    ],
+    "native link preparation": [
+      1,
+      1,
+      91
+    ],
+    "other query or graph work": [
+      1500,
+      3535,
+      6975
+    ],
+    "other/unclassified": [
+      10422,
+      4903,
+      0
+    ],
+    "query color/force": [
+      1575,
+      1577,
+      2675
+    ],
+    "rmeta decode": [
+      869,
+      1024,
+      1062
+    ],
+    "rmeta encode/public hash": [
+      1621,
+      2124,
+      2768
+    ]
+  },
+  "ordinary": 41460616635,
+  "ordinary_clock": 61066244767,
+  "owner_deepest": {
+    "Wild": {
+      "Wild": 1493
+    },
+    "child of rustc ruff": {
+      "external child of rustc": 3
+    },
+    "child of rustc ruff_macros": {
+      "external child of rustc": 2
+    },
+    "other": {
+      "other/unclassified": 249
+    },
+    "rustc ruff": {
+      "front-end semantic work": 290,
+      "incremental graph and persistence": 75,
+      "mono collection": 27,
+      "native code generation": 39,
+      "native link preparation": 1,
+      "other query or graph work": 266,
+      "other/unclassified": 164,
+      "query color/force": 94,
+      "rmeta decode": 200,
+      "rmeta encode/public hash": 47
+    },
+    "rustc ruff_db": {
+      "archive assembly": 1,
+      "front-end semantic work": 217,
+      "incremental graph and persistence": 70,
+      "mono collection": 35,
+      "native code generation": 24,
+      "other query or graph work": 215,
+      "other/unclassified": 95,
+      "query color/force": 88,
+      "rmeta decode": 76,
+      "rmeta encode/public hash": 99
+    },
+    "rustc ruff_formatter": {
+      "front-end semantic work": 114,
+      "incremental graph and persistence": 30,
+      "native code generation": 4,
+      "other query or graph work": 65,
+      "other/unclassified": 80,
+      "query color/force": 32,
+      "rmeta decode": 21,
+      "rmeta encode/public hash": 95
+    },
+    "rustc ruff_graph": {
+      "front-end semantic work": 32,
+      "incremental graph and persistence": 10,
+      "native code generation": 5,
+      "other query or graph work": 52,
+      "other/unclassified": 25,
+      "query color/force": 13,
+      "rmeta decode": 48,
+      "rmeta encode/public hash": 9
+    },
+    "rustc ruff_index": {
+      "front-end semantic work": 10,
+      "incremental graph and persistence": 1,
+      "native code generation": 1,
+      "other query or graph work": 11,
+      "other/unclassified": 13,
+      "query color/force": 1,
+      "rmeta encode/public hash": 4
+    },
+    "rustc ruff_linter": {
+      "front-end semantic work": 2212,
+      "incremental graph and persistence": 632,
+      "mono collection": 209,
+      "native code generation": 1012,
+      "other query or graph work": 1363,
+      "other/unclassified": 2425,
+      "query color/force": 647,
+      "rmeta decode": 121,
+      "rmeta encode/public hash": 766
+    },
+    "rustc ruff_macros": {
+      "front-end semantic work": 174,
+      "incremental graph and persistence": 9,
+      "native code generation": 2,
+      "other query or graph work": 44,
+      "other/unclassified": 38,
+      "query color/force": 9,
+      "rmeta decode": 22
+    },
+    "rustc ruff_markdown": {
+      "front-end semantic work": 16,
+      "incremental graph and persistence": 2,
+      "other query or graph work": 27,
+      "other/unclassified": 19,
+      "query color/force": 3,
+      "rmeta decode": 42,
+      "rmeta encode/public hash": 1
+    },
+    "rustc ruff_notebook": {
+      "front-end semantic work": 55,
+      "incremental graph and persistence": 15,
+      "mono collection": 8,
+      "native code generation": 5,
+      "other query or graph work": 58,
+      "other/unclassified": 57,
+      "query color/force": 17,
+      "rmeta decode": 18,
+      "rmeta encode/public hash": 27
+    },
+    "rustc ruff_python_ast": {
+      "archive assembly": 3,
+      "front-end semantic work": 493,
+      "incremental graph and persistence": 112,
+      "native code generation": 8,
+      "other query or graph work": 236,
+      "other/unclassified": 508,
+      "query color/force": 123,
+      "rmeta decode": 22,
+      "rmeta encode/public hash": 382
+    },
+    "rustc ruff_python_codegen": {
+      "front-end semantic work": 27,
+      "incremental graph and persistence": 3,
+      "native code generation": 1,
+      "other query or graph work": 23,
+      "other/unclassified": 19,
+      "query color/force": 3,
+      "rmeta decode": 9,
+      "rmeta encode/public hash": 4
+    },
+    "rustc ruff_python_formatter": {
+      "front-end semantic work": 264,
+      "incremental graph and persistence": 61,
+      "native code generation": 10,
+      "other query or graph work": 157,
+      "other/unclassified": 117,
+      "query color/force": 68,
+      "rmeta decode": 31,
+      "rmeta encode/public hash": 116
+    },
+    "rustc ruff_python_importer": {
+      "front-end semantic work": 4,
+      "incremental graph and persistence": 2,
+      "other query or graph work": 9,
+      "other/unclassified": 14,
+      "query color/force": 2,
+      "rmeta decode": 5
+    },
+    "rustc ruff_python_index": {
+      "front-end semantic work": 7,
+      "incremental graph and persistence": 1,
+      "other query or graph work": 19,
+      "other/unclassified": 13,
+      "query color/force": 5,
+      "rmeta decode": 9,
+      "rmeta encode/public hash": 2
+    },
+    "rustc ruff_python_literal": {
+      "archive assembly": 1,
+      "front-end semantic work": 29,
+      "incremental graph and persistence": 6,
+      "native code generation": 1,
+      "other query or graph work": 25,
+      "other/unclassified": 18,
+      "query color/force": 4,
+      "rmeta decode": 9,
+      "rmeta encode/public hash": 28
+    },
+    "rustc ruff_python_parser": {
+      "front-end semantic work": 139,
+      "incremental graph and persistence": 27,
+      "native code generation": 16,
+      "other query or graph work": 81,
+      "other/unclassified": 84,
+      "query color/force": 21,
+      "rmeta decode": 25,
+      "rmeta encode/public hash": 72
+    },
+    "rustc ruff_python_semantic": {
+      "front-end semantic work": 207,
+      "incremental graph and persistence": 35,
+      "native code generation": 1,
+      "other query or graph work": 98,
+      "other/unclassified": 148,
+      "query color/force": 62,
+      "rmeta decode": 19,
+      "rmeta encode/public hash": 144
+    },
+    "rustc ruff_python_trivia": {
+      "archive assembly": 1,
+      "front-end semantic work": 25,
+      "incremental graph and persistence": 6,
+      "native code generation": 2,
+      "other query or graph work": 28,
+      "other/unclassified": 27,
+      "query color/force": 12,
+      "rmeta decode": 13,
+      "rmeta encode/public hash": 16
+    },
+    "rustc ruff_server": {
+      "front-end semantic work": 380,
+      "incremental graph and persistence": 112,
+      "mono collection": 69,
+      "native code generation": 538,
+      "other query or graph work": 376,
+      "other/unclassified": 194,
+      "query color/force": 152,
+      "rmeta decode": 174,
+      "rmeta encode/public hash": 71
+    },
+    "rustc ruff_source_file": {
+      "front-end semantic work": 44,
+      "incremental graph and persistence": 14,
+      "mono collection": 1,
+      "native code generation": 23,
+      "other query or graph work": 49,
+      "other/unclassified": 40,
+      "query color/force": 3,
+      "rmeta decode": 16,
+      "rmeta encode/public hash": 25
+    },
+    "rustc ruff_workspace": {
+      "archive assembly": 2,
+      "front-end semantic work": 327,
+      "incremental graph and persistence": 73,
+      "native code generation": 11,
+      "other query or graph work": 174,
+      "other/unclassified": 395,
+      "query color/force": 107,
+      "rmeta decode": 70,
+      "rmeta encode/public hash": 140
+    },
+    "rustc ty_module_resolver": {
+      "archive assembly": 1,
+      "front-end semantic work": 144,
+      "incremental graph and persistence": 43,
+      "mono collection": 1,
+      "native code generation": 5,
+      "other query or graph work": 119,
+      "other/unclassified": 109,
+      "query color/force": 86,
+      "rmeta decode": 54,
+      "rmeta encode/public hash": 66
+    },
+    "rustc ty_site_packages": {
+      "archive assembly": 1,
+      "front-end semantic work": 56,
+      "incremental graph and persistence": 6,
+      "native code generation": 1,
+      "other query or graph work": 37,
+      "other/unclassified": 41,
+      "query color/force": 25,
+      "rmeta decode": 20,
+      "rmeta encode/public hash": 10
+    },
+    "rustc ty_static": {
+      "front-end semantic work": 2,
+      "other query or graph work": 3,
+      "other/unclassified": 11
+    }
+  },
+  "owner_leaf_symbols": [
+    [
+      "Wild",
+      "[unknown]",
+      "ld.bfd",
+      1425
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      641
+    ],
+    [
+      "rustc ruff_linter",
+      "[unknown]",
+      "libc.so.6",
+      266
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_middle::ty::Ty as rustc_serialize::serialize::Decodable<rustc_middle::query::on_disk_cache::CacheDecoder>>::decode",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      154
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_proc_macro::bridge::server::Dispatcher<rustc_expand::proc_macro_server::Rustc>>::dispatch::{closure#12}",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      152
+    ],
+    [
+      "rustc ruff_server",
+      "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      151
+    ],
+    [
+      "rustc ruff_python_ast",
+      "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      121
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_metadata::rmeta::encoder::EncodeContext<rustc_metadata::rmeta::encoder::DefPathHashDefIdEncoder>>::encode_def_ids::<rustc_metadata::rmeta::encoder::public_api_hasher::PublicApiHashingContext<true: bool>>",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      118
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_resolve::Resolver>::resolve_ident_in_scope_set_inner",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      114
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_ast_lowering::LoweringContext>::lower_qpath",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      113
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_middle::dep_graph::serialized::SerializedDepGraph>::try_decode",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      110
+    ],
+    [
+      "rustc ruff_linter",
+      "malloc",
+      "rustc",
+      108
+    ],
+    [
+      "rustc ruff_workspace",
+      "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      107
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_metadata::rmeta::encoder::EncodeContext<rustc_metadata::rmeta::encoder::DefPathHashDefIdEncoder> as rustc_span::SpanEncoder>::encode_span",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      98
+    ],
+    [
+      "rustc ruff",
+      "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      94
+    ],
+    [
+      "rustc ruff",
+      "<rustc_middle::ty::Ty as rustc_serialize::serialize::Decodable<rustc_metadata::rmeta::decoder::MetadataDecodeContext>>::decode",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      92
+    ],
+    [
+      "rustc ruff_linter",
+      "_ZN4llvm12MachineInstr10addOperandERNS_15MachineFunctionERKNS_14MachineOperandE",
+      "libLLVM.so.23.1-rust-1.99.0-beta",
+      91
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_parse::lexer::Lexer>::next_token_from_cursor",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      90
+    ],
+    [
+      "rustc ruff_db",
+      "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      88
+    ],
+    [
+      "rustc ty_module_resolver",
+      "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      85
+    ],
+    [
+      "rustc ruff_linter",
+      "<std::sync::once::Once>::call_once_force::<<std::sync::once_lock::OnceLock<hashbrown::table::HashTable<rustc_middle::dep_graph::serialized::SerializedDepNodeIndex>>>::initialize<<std::sync::once_lock::OnceLock<hashbrown::table::HashTable<rustc_middle::dep_graph::serialized::SerializedDepNodeIndex>>>::get_or_init<<rustc_middle::dep_graph::serialized::LazyKindIndex>::fingerprint_map::{closure#0}>::{closure#0}, !>::{closure#0}>::{closure#0}",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      84
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_middle::ich::StableHashState as rustc_data_structures::stable_hash::StableHashCtxt>::stable_hash_span",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      84
+    ],
+    [
+      "rustc ruff_linter",
+      "<alloc::string::String>::push",
+      "libruff_macros-7e99546a5854adfd.so",
+      82
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_hir::hir::QPath as rustc_data_structures::stable_hash::StableHash>::stable_hash::<rustc_middle::ich::StableHashState>",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      79
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_metadata::rmeta::encoder::public_api_hasher::ReachabilityGraphBuilder>::build_graph",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      78
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_resolve::late::LateResolutionVisitor>::resolve_path",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      77
+    ],
+    [
+      "rustc ruff_linter",
+      "<rustc_middle::query::on_disk_cache::CacheDecoder as rustc_span::SpanDecoder>::decode_span",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      75
+    ],
+    [
+      "rustc ruff_linter",
+      "<core::slice::iter::Iter<u8> as core::iter::traits::iterator::Iterator>::next",
+      "libruff_macros-7e99546a5854adfd.so",
+      71
+    ],
+    [
+      "rustc ruff_linter",
+      "free",
+      "rustc",
+      70
+    ],
+    [
+      "rustc ruff_python_formatter",
+      "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      68
+    ],
+    [
+      "rustc ruff_server",
+      "<rustc_middle::ty::Ty as rustc_serialize::serialize::Decodable<rustc_metadata::rmeta::decoder::MetadataDecodeContext>>::decode",
+      "librustc_driver-b03bf00bec23bb9a.so",
+      65
+    ],
+    [
+      "other",
+      "[unknown]",
+      "libc.so.6",
+      62
+    ]
+  ],
+  "owners": {
+    "Wild": 1493,
+    "child of rustc ruff": 3,
+    "child of rustc ruff_macros": 2,
+    "other": 249,
+    "rustc ruff": 1203,
+    "rustc ruff_db": 920,
+    "rustc ruff_formatter": 441,
+    "rustc ruff_graph": 194,
+    "rustc ruff_index": 41,
+    "rustc ruff_linter": 9387,
+    "rustc ruff_macros": 298,
+    "rustc ruff_markdown": 110,
+    "rustc ruff_notebook": 260,
+    "rustc ruff_python_ast": 1887,
+    "rustc ruff_python_codegen": 89,
+    "rustc ruff_python_formatter": 824,
+    "rustc ruff_python_importer": 36,
+    "rustc ruff_python_index": 56,
+    "rustc ruff_python_literal": 121,
+    "rustc ruff_python_parser": 465,
+    "rustc ruff_python_semantic": 714,
+    "rustc ruff_python_trivia": 130,
+    "rustc ruff_server": 2066,
+    "rustc ruff_source_file": 215,
+    "rustc ruff_workspace": 1299,
+    "rustc ty_module_resolver": 628,
+    "rustc ty_site_packages": 197,
+    "rustc ty_static": 16
+  },
+  "period": 2500003,
+  "phase_columns": [
+    "cargo_products",
+    "dirty",
+    "rustcs",
+    "wild"
+  ],
+  "phases": {
+    "clean": [
+      357,
+      357,
+      363,
+      67
+    ],
+    "edit": [
+      357,
+      27,
+      27,
+      2
+    ],
+    "old": [
+      357,
+      357,
+      363,
+      67
+    ],
+    "unchanged": [
+      357,
+      0,
+      0,
+      0
+    ]
+  },
+  "profile_producer": 41466356507,
+  "receivers": {
+    "independent_reader_conclusion": "success",
+    "independent_reader_head": "f2e03c1e9957d94c8b254b0816efd908f0e56a78",
+    "sampler_artifact": 13154575612,
+    "sampler_digest": "2500e9d894aff9bf31314ae4e03a7e37e81d36ed9210b6a832902b72e8193e73",
+    "sampler_head": "7f3ee9ecfb89d1443e90a5a1b9ec32259fc792b7",
+    "sampler_raw_conclusion": "failure",
+    "summary_job": 41468878382
+  },
+  "rlib_native_columns": [
+    "crate",
+    "archive",
+    "features",
+    "old_object_count",
+    "old_vs_edit_changed",
+    "edit_vs_empty_new_changed",
+    "old_vs_empty_new_embedded_rmeta_changed",
+    "old_vs_edit_embedded_rmeta_changed",
+    "edit_vs_empty_new_embedded_rmeta_changed"
+  ],
+  "rlib_native_payloads": [
+    [
+      "ruff",
+      "libruff-db4b2d0c013dc1fb.rlib",
+      [],
+      207,
+      3,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_db",
+      "libruff_db-ff74b3654ebbf4bc.rlib",
+      [
+        "ignore",
+        "junit",
+        "os",
+        "serde"
+      ],
+      217,
+      2,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_formatter",
+      "libruff_formatter-5b6026268e4fb5e4.rlib",
+      [
+        "serde"
+      ],
+      140,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_graph",
+      "libruff_graph-58f84aa391838527.rlib",
+      [
+        "clap",
+        "schemars",
+        "serde"
+      ],
+      131,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_index",
+      "libruff_index-a820f749c9148a45.rlib",
+      [],
+      1,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_linter",
+      "libruff_linter-1ebfba3e634b8a34.rlib",
+      [
+        "clap",
+        "default"
+      ],
+      256,
+      1,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_markdown",
+      "libruff_markdown-b8efdcc7bbc202ec.rlib",
+      [],
+      35,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_notebook",
+      "libruff_notebook-2b891a9394dc0d3c.rlib",
+      [],
+      165,
+      1,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_ast",
+      "libruff_python_ast-5a2d1a22d0fcf0c1.rlib",
+      [
+        "cache",
+        "get-size",
+        "salsa",
+        "serde"
+      ],
+      200,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_codegen",
+      "libruff_python_codegen-a3a5ce665e85645a.rlib",
+      [],
+      50,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_formatter",
+      "libruff_python_formatter-e363b18e106fe648.rlib",
+      [
+        "default",
+        "serde"
+      ],
+      206,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_importer",
+      "libruff_python_importer-ac3123785785d347.rlib",
+      [],
+      27,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_index",
+      "libruff_python_index-1f91c8726e606d9b.rlib",
+      [],
+      47,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_literal",
+      "libruff_python_literal-b5b0f19da7b44449.rlib",
+      [],
+      63,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_parser",
+      "libruff_python_parser-f8c2b5d39f46d58e.rlib",
+      [],
+      77,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_semantic",
+      "libruff_python_semantic-e219c73455a1475c.rlib",
+      [
+        "serde"
+      ],
+      152,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_trivia",
+      "libruff_python_trivia-a3170c88d500ff09.rlib",
+      [],
+      72,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_python_trivia",
+      "libruff_python_trivia-b6513ba17a4b84a6.rlib",
+      [],
+      72,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_server",
+      "libruff_server-9b852efc1540bddb.rlib",
+      [],
+      215,
+      1,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_source_file",
+      "libruff_source_file-4d18d41a9d82da5a.rlib",
+      [
+        "get-size",
+        "serde"
+      ],
+      96,
+      2,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_source_file",
+      "libruff_source_file-e9ee2ab970ab7db3.rlib",
+      [],
+      75,
+      1,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ruff_workspace",
+      "libruff_workspace-f33f262f304239da.rlib",
+      [
+        "default"
+      ],
+      247,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ty_module_resolver",
+      "libty_module_resolver-aad39266d4d4c06f.rlib",
+      [],
+      246,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ty_site_packages",
+      "libty_site_packages-9b43a6be0190fec5.rlib",
+      [],
+      94,
+      0,
+      0,
+      true,
+      true,
+      true
+    ],
+    [
+      "ty_static",
+      "libty_static-fab02df503422af0.rlib",
+      [],
+      5,
+      0,
+      0,
+      true,
+      true,
+      true
+    ]
+  ],
+  "sample_coverage": 0.9571948126634173,
+  "samples": 23344,
+  "stack_depths": {
+    "1": 676,
+    "10": 1359,
+    "11": 1203,
+    "12": 1010,
+    "13": 845,
+    "14": 677,
+    "15": 447,
+    "16": 231,
+    "17": 156,
+    "18": 121,
+    "19": 77,
+    "2": 742,
+    "20": 71,
+    "21": 69,
+    "22": 76,
+    "23": 66,
+    "24": 65,
+    "25": 17,
+    "26": 13,
+    "27": 9,
+    "28": 4,
+    "29": 15,
+    "3": 2149,
+    "30": 9,
+    "31": 5,
+    "32": 7,
+    "33": 2,
+    "34": 1,
+    "35": 3,
+    "37": 1,
+    "38": 1,
+    "4": 2581,
+    "40": 1,
+    "41": 3,
+    "42": 1,
+    "5": 2913,
+    "6": 2313,
+    "7": 2045,
+    "8": 1698,
+    "9": 1662
+  },
+  "tool_count": 40,
+  "units_by_kind_old_edit_edit_clean": [
+    [
+      [
+        "bin"
+      ],
+      false,
+      false,
+      1
+    ],
+    [
+      [
+        "lib"
+      ],
+      false,
+      false,
+      25
+    ],
+    [
+      [
+        "proc-macro"
+      ],
+      false,
+      false,
+      1
+    ]
+  ],
+  "unknown_leaf": {
+    "Wild": 1484,
+    "child of rustc ruff": 3,
+    "child of rustc ruff_macros": 2,
+    "other": 63,
+    "rustc ruff": 47,
+    "rustc ruff_db": 34,
+    "rustc ruff_formatter": 19,
+    "rustc ruff_graph": 14,
+    "rustc ruff_index": 11,
+    "rustc ruff_linter": 317,
+    "rustc ruff_macros": 17,
+    "rustc ruff_markdown": 11,
+    "rustc ruff_notebook": 16,
+    "rustc ruff_python_ast": 76,
+    "rustc ruff_python_codegen": 10,
+    "rustc ruff_python_formatter": 32,
+    "rustc ruff_python_importer": 10,
+    "rustc ruff_python_index": 11,
+    "rustc ruff_python_literal": 12,
+    "rustc ruff_python_parser": 24,
+    "rustc ruff_python_semantic": 39,
+    "rustc ruff_python_trivia": 24,
+    "rustc ruff_server": 76,
+    "rustc ruff_source_file": 27,
+    "rustc ruff_workspace": 46,
+    "rustc ty_module_resolver": 25,
+    "rustc ty_site_packages": 15,
+    "rustc ty_static": 10
+  }
+}
