@@ -5,6 +5,7 @@ from pathlib import Path
 HERE=Path(__file__).resolve().parent;sys.path.insert(0,str(HERE));import old_probe as old,role_graph as rg
 CFG=json.loads((HERE/'matched.json').read_bytes());need,sha,save=old.need,old.sha,old.store
 WS=Path(os.environ['GITHUB_WORKSPACE']).resolve();ROOT=Path(os.environ['RUNNER_TEMP']).resolve()/'upstream-mono-study';OUT=ROOT/'heldout-proof';W=ROOT/'heldout-private';SRC=WS/'ruff';STATE=W/'state';CHANGED=['crates/ruff_annotate_snippets/src/renderer/source_map.rs','crates/ruff_annotate_snippets/tests/ruff.rs']
+NATIVE=OUT/'native'
 FACTORY=WS/'factory';QUERY=WS/'dictionary';sys.path.insert(0,str(QUERY/'scripts/ruff-query-dictionary'));import resolve
 sys.path.insert(0,str(FACTORY/'scripts/ruff-upstream-mono-pilot'));import normal_registry
 SCHEMA_FILE=FACTORY/'scripts/ruff-upstream-mono-pilot/graph-kinds.json';need(sha(SCHEMA_FILE)==CFG['schema_sha256'],'schema source changed');SCHEMA=json.loads(SCHEMA_FILE.read_bytes())
@@ -30,7 +31,7 @@ def gz(path,out):
     return sha(path)
 
 def blob(path):
-    key=sha(path);out=OUT/'native'/f'{key}.zst'
+    key=sha(path);out=NATIVE/f'{key}.zst'
     if not out.exists():
         need(0<path.stat().st_size<512<<20 and shutil.disk_usage(OUT).free>15*old.GB+path.stat().st_size,'insufficient archive scope')
         with out.open('xb')as f:subprocess.run(['zstd','-q','-2','-c',path],stdout=f,check=True,timeout=120)
@@ -129,8 +130,8 @@ def roster(rows):
         result.append([pkg,r['target']['name'],r['target']['kind'],r['features'],r['profile']['test']])
     return hashlib.sha256(json.dumps(sorted(result),separators=(',',':')).encode()).hexdigest()
 
-def visit(which,rev,label,env,key,old_paths,pinned=None,focus=()):
-    schema=SCHEMA[CFG['roles'][which]['commit']];switch(rev);case=OUT/(which+'-'+label);case.mkdir();planenv=dict(env,CARGO_TARGET_DIR=str(W/'plan-target'),CARGO_BUILD_BUILD_DIR=str(W/'plan-build'));plan=subprocess.check_output(old.CMD+['-Zunstable-options','--unit-graph'],cwd=SRC,env=planenv,timeout=75);need(old.plan_id(plan)==old.PLAN,'changed ordinary unit graph');old.command(old.CMD,env,SRC,case,STATE);rows=[json.loads(line)for line in (case/'cargo.stdout').read_bytes().splitlines()];need(rows[-1]=={'reason':'build-finished','success':True},'unknown successful Cargo');cold=label in ('old','clean');need(not cold or not any(r['fresh']for r in rows if r.get('reason')=='compiler-artifact'),'independent empty build saw a prebuilt product');placement=normal_registry.capture(rows,STATE,True);want=CFG['registry'];need((placement['sha256'],placement['products'],placement['shared'])==(want['sha256'],want['entries'],want['shared']),'real normal signed registry placement changed');save(case/'registry.json',placement)
+def visit(which,rev,label,env,key,old_paths,pinned=None,focus=(),run_cargo=None):
+    schema=SCHEMA[CFG['roles'][which]['commit']];switch(rev);case=OUT/(which+'-'+label);case.mkdir();planenv=dict(env,CARGO_TARGET_DIR=str(W/'plan-target'),CARGO_BUILD_BUILD_DIR=str(W/'plan-build'));plan=subprocess.check_output(old.CMD+['-Zunstable-options','--unit-graph'],cwd=SRC,env=planenv,timeout=75);need(old.plan_id(plan)==old.PLAN,'changed ordinary unit graph');(run_cargo or old.command)(old.CMD,env,SRC,case,STATE);rows=[json.loads(line)for line in (case/'cargo.stdout').read_bytes().splitlines()];need(rows[-1]=={'reason':'build-finished','success':True},'unknown successful Cargo');cold=label in ('old','clean');need(not cold or not any(r['fresh']for r in rows if r.get('reason')=='compiler-artifact'),'independent empty build saw a prebuilt product');placement=normal_registry.capture(rows,STATE,True);want=CFG['registry'];need((placement['sha256'],placement['products'],placement['shared'])==(want['sha256'],want['entries'],want['shared']),'real normal signed registry placement changed');save(case/'registry.json',placement)
     native_result=native(rev,rows,case,env);folder,new=safe_session(old_paths);graph=folder/'dep-graph.bin';work=folder/'work-products.bin';bucket=['upstream_monomorphizations_in'] if 'upstream_monomorphizations_in' in schema['names'] else [];g=rg.graph(graph,schema['format'],schema['names'],query=key if which=='P' else None,observe_kinds=bucket);refs=rg.products(work,schema['format']);need(set(g['roots'])==set(refs),'native CGU/work-product names do not join exactly');phase_focus={refs[k]['name']for k in g['paths']} if which=='P' and label=='old' else set(focus);objects={}
     for ck,entry in sorted(refs.items()):
         fn=entry['files'].get('o');need(fn and Path(fn).name==fn,'missing object donor');obj=folder/fn;stat=obj.stat();rec={'cgukey':ck,'product':entry['product'],'filename':fn,'identity':[stat.st_dev,stat.st_ino,stat.st_size],'sha256':sha(obj)};name=entry['name'];objects[name]=rec
@@ -152,8 +153,8 @@ def governance():
         need(subprocess.check_output(['git','-C',repo,'rev-parse','HEAD'],text=True).strip()==rev and not subprocess.check_output(['git','-C',repo,'status','--porcelain','--untracked-files=all']), 'unregistered diagnostic source')
     need(os.environ['REVIEWED_HEAD']==os.environ['GITHUB_SHA'],'wrong QA commit')
 
-def host():
-    governance();runid=int(os.environ['GITHUB_RUN_ID']);base='repos/astral-experiments/ohm/actions/runs/'+str(runid);r=json.loads(subprocess.check_output(['gh','api',base]));alljobs=json.loads(subprocess.check_output(['gh','api',base+'/attempts/1/jobs?per_page=100']));j,=alljobs['jobs'];need(r['head_sha']==os.environ['REVIEWED_HEAD'] and r['run_attempt']==1 and alljobs['total_count']==1 and j['name']=='Matched real Ruff test calibration' and j['runner_name']==os.environ['RUNNER_NAME'] and j['runner_id']>0,'wrong assigned worker');save(ROOT/'logs/heldout-worker.json',dict(run=runid,job=j['id'],runner_id=j['runner_id'],runner=j['runner_name'],head=r['head_sha'],boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip()))
+def host(expected_job='Matched real Ruff test calibration'):
+    governance();runid=int(os.environ['GITHUB_RUN_ID']);base='repos/astral-experiments/ohm/actions/runs/'+str(runid);r=json.loads(subprocess.check_output(['gh','api',base]));alljobs=json.loads(subprocess.check_output(['gh','api',base+'/attempts/1/jobs?per_page=100']));j,=alljobs['jobs'];need(r['head_sha']==os.environ['REVIEWED_HEAD'] and r['run_attempt']==1 and alljobs['total_count']==1 and j['name']==expected_job and j['runner_name']==os.environ['RUNNER_NAME'] and j['runner_id']>0,'wrong assigned worker');save(ROOT/'logs/heldout-worker.json',dict(run=runid,job=j['id'],runner_id=j['runner_id'],runner=j['runner_name'],head=r['head_sha'],boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip()))
 
 def value(q):
     values={r['value'] for r in q['matches']};need(len(values)<=1,'conflicting full-key rows');return next(iter(values),None)
@@ -191,7 +192,7 @@ def pack():
     for f in ('heldout-worker.json','factory.json','compiler-installations.json'):
         p=ROOT/'logs'/f
         if p.is_file():shutil.copyfile(p,OUT/f)
-    if not (OUT/'terminal.json').exists():save(OUT/'incomplete.json',dict(ref=os.environ['REVIEWED_HEAD'],run=os.environ['GITHUB_RUN_ID']))
+    if not (OUT/'terminal.json').exists() and not (OUT/'hardware-pilot.json').exists():save(OUT/'incomplete.json',dict(ref=os.environ['REVIEWED_HEAD'],run=os.environ['GITHUB_RUN_ID']))
     with tarfile.open(ROOT/'matched-heldout-proof.tar','x')as tf:tf.add(OUT,arcname='receipt',recursive=True)
 
 def named_profiles():

@@ -108,7 +108,7 @@ def available():
         p=p.parent
     return n
 
-def command(argv,env,src,out,state):
+def command(argv,env,src,out,state,expected=0):
     start=time.monotonic();floor=shutil.disk_usage(state).free;low=available();minimum=floor
     need(low>9*GB and floor>20*GB,'insufficient admission headroom')
     with (out/'cargo.stdout').open('xb') as stdout,(out/'cargo.stderr').open('xb') as stderr:
@@ -120,7 +120,7 @@ def command(argv,env,src,out,state):
         finally:
             if p.poll() is None:os.killpg(p.pid,signal.SIGKILL);p.wait()
             store(out/'process.json',dict(argv=argv,exit=p.returncode,min_memory=low,min_disk=minimum))
-    need(p.returncode==0,'ordinary Cargo failed; see cargo.stderr')
+    need(p.returncode==expected,'ordinary Cargo returned an unexpected status; see cargo.stderr')
 
 def sdk_identity(sdk,env):
     driver,=sdk.glob('lib/librustc_driver-*.so');meta,=(sdk/'lib/rustlib/x86_64-unknown-linux-gnu/lib').glob('libcore-*.rmeta')
