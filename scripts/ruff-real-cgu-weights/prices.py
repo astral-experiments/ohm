@@ -116,7 +116,18 @@ def history(kit, where, work, repo, env, which, suite, graph, cmd, extras, gold,
         loc=where.parent/"new-profiled"
         profenv={**env,"RUSTC_WRAPPER":str(HERE/"profile-owner"),"OHM_PROBE_PROFILE_DIR":str(profiles)}
         cloned=[kit,loc,work,repo,profenv,which,suite,graph,cmd,extras,gold,False,True,True]
-        observed=bare(*cloned)
+        original_check=prior.runtime.childenv.check
+        expected_env={"RUSTC_WRAPPER":str(HERE/"profile-owner"), "OHM_PROBE_PROFILE_DIR":str(profiles)}
+        assert DIGEST((HERE/"profile-owner").read_bytes())==DIGEST(subprocess.check_output(["git","-C",HERE,"show","HEAD:scripts/ruff-real-cgu-weights/profile-owner"]))
+        def check_profile_env(actual,sdk=None):
+            # Keep the ordinary allowlist, with only the exact enrolled tool and output directory added.
+            for key,value in expected_env.items():
+                if key in actual and actual[key]!=value:
+                    raise ValueError("different diagnostic environment: "+key)
+            return original_check({k:v for k,v in actual.items() if k not in expected_env},sdk)
+        assert not check_profile_env(profenv)
+        with patch.object(prior.runtime,"clean",check_profile_env), patch.object(prior.runtime.childenv,"check",check_profile_env):
+            observed=bare(*cloned)
         rows=prior.replay.cargo_rows((loc/"outer.stdout").read_bytes())
         arc=prior.study.artifact(prior.study.results(rows,True),prior.study.OWNER)
         names=elf_members(arc,reference)
@@ -125,6 +136,11 @@ def history(kit, where, work, repo, env, which, suite, graph, cmd, extras, gold,
         n, argv=observed["root_argv"][0]
         assert all(argv.count(flag)==1 for flag in feature)
         assert [n,[a for a in argv if a not in feature]]==baseline["root_argv"][0]
+        for phase,folder in (("ordinary",where),("profiled",loc)):
+            for name in ("actual-libraries.json", "build-script-flags.json", "linker-argv.json"):
+                path=folder/name
+                assert path.is_file()
+                (out/(phase+"-"+name)).write_bytes(path.read_bytes())
         profile,=profiles.glob("*.mm_profdata")
         raw=profile.read_bytes()
         save(out/"record.json",{"argv":argv,"normal_native_matches":len(names),"sha256":DIGEST(raw),"roster":observed["raw_roster"]})
