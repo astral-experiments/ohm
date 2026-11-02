@@ -1,23 +1,23 @@
-name: Discover ordinary uv 22635 rustc and workspace instruction changes
+name: Admit the ordinary uv-resolver check after uv 22635
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
         required: true
         type: string
-        description: Reviewed full SHA of this private discovery panel
+        description: Reviewed exact private package admission SHA
 permissions:
   contents: read
   actions: read
   attestations: read
 concurrency:
-  group: uv-22635-corrected-production-discovery
+  group: uv-22635-resolver-admission
   cancel-in-progress: false
 jobs:
   screen:
-    if: github.repository == 'astral-experiments/ohm' && github.event.repository.private == true && github.ref == 'refs/heads/charlie/codex-uv-22635-production-discovery' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    if: github.repository == 'astral-experiments/ohm' && github.event.repository.private == true && github.ref == 'refs/heads/charlie/codex-uv-22635-resolver-admission' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 200
+    timeout-minutes: 115
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       BUILD_HEAD: 'cddb036d81e4313a8e422171f39f0840b44110db'
@@ -33,6 +33,7 @@ jobs:
           sparse-checkout: |
             scripts/uv-22635-opening
             scripts/uv-22635-discovery
+            scripts/uv-22635-resolver
           persist-credentials: false
       - name: Check out effective qualified production SDK reader
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -115,29 +116,22 @@ jobs:
           mkdir trait-results
           git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.13.1:refs/tags/0.13.1
           (cd coordinator/scripts/uv-22635-discovery && sha256sum --strict --check SHA256SUMS)
+          (cd coordinator/scripts/uv-22635-resolver && sha256sum --strict --check SHA256SUMS)
           /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-      - name: Calibrate inherited whole-command and actual selected-process PMU
-        run: |
-          set -euo pipefail
-          p=coordinator/scripts/uv-22635-discovery
-          /usr/bin/python3.12 -ISBu "$p/bridge.py" calibrate 2>&1 | tee trait-results/whole-calibration.log
-          cc -O2 -Wall -Wextra -Werror -fPIC -shared "$p/pmu.c" -o "$RUNNER_TEMP/libohm_pmu.so"
-          cc -O2 -Wall -Wextra -Werror -pthread "$p/workload.c" -o "$RUNNER_TEMP/target-counter-workload"
-          mkdir trait-results/target-calibration
-          /usr/bin/python3.12 -ISBu "$p/per_rustc.py" calibrate "$PWD/trait-results/target-calibration" "$RUNNER_TEMP/libohm_pmu.so" "$RUNNER_TEMP/target-counter-workload"
       - name: Verify corrected production sources, full GNU SDKs and the signed Cargo
         env:
           GH_TOKEN: ${{ github.token }}
-        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-22635-discovery/bridge.py admit
-      - name: Verify two independent A to B histories per compiler and retain all original outputs
-        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-22635-discovery/study.py
-      - name: Independently replay the two discovery pairs
-        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-22635-discovery/audit.py
+        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-22635-resolver/bridge.py admit
+      - name: Enroll untouched signed Cargo package units in both production SDKs and run the real edit
+        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-22635-resolver/admit.py
+      - name: Audit all available local and warm versus cold evidence
+        if: always()
+        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-22635-resolver/audit.py trait-results
       - name: Preserve original samples, diagnostics and incomplete gates
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-22635-corrected-discovery-attempt-1
+          name: uv-22635-resolver-admission-attempt-1
           path: trait-results/
           if-no-files-found: error
           compression-level: 1
