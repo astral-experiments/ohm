@@ -11,6 +11,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+from urllib.parse import unquote, urlsplit
 
 
 QA = "f3f5ca9e62b41e2e1fb2bb79207c5d74bd881b5e"
@@ -104,7 +105,31 @@ def unit_graph(cli, repo, env, case, work, out, flags):
     return expected, graph
 
 
-def verify_argv(lines, flags):
+def cargo_rows(raw, graph=None):
+    """Read Cargo JSON, accepting package-prefixed build-script output only in a verbose run."""
+    script_prefixes = set()
+    if graph is not None:
+        for unit in graph["units"]:
+            if unit["target"]["kind"] != ["custom-build"]:
+                continue
+            location, spec = unit["pkg_id"].rsplit("#", 1)
+            name, sep, version = spec.partition("@")
+            if not sep:
+                name, version = unquote(urlsplit(location).path.rsplit("/", 1)[-1]), spec
+            script_prefixes.add(f"[{name} {version}] ".encode())
+    records = []
+    for line in raw.splitlines():
+        if line.startswith(b"["):
+            prefix, sep, _ = line.partition(b"] ")
+            if sep and prefix + sep in script_prefixes:
+                continue
+        record = json.loads(line)
+        need(isinstance(record, dict) and isinstance(record.get("reason"), str), "invalid Cargo JSON message")
+        records.append(record)
+    return records
+
+
+def verify_argv(lines, flags, compiler=None):
     from study import OWNER
     selected = [l for l in lines.splitlines() if "Running " in l and "--crate-name " + OWNER + " " in l]
     need(len(selected) == 1 and "-C opt-level=1" in selected[0], ("missing actual signed owner argv", selected))
@@ -113,6 +138,9 @@ def verify_argv(lines, flags):
         if "Running " in line and "--crate-name " in line:
             args = shlex.split(line.split("Running \x60",1)[1].removesuffix("\x60"))
             need([s for s in args if s in leaves] == (flags if line == selected[0] else []), ("wrong codegen flags", line))
+            if compiler is not None:
+                position = args.index("--crate-name")
+                need(position > 0 and Path(args[position - 1]).samefile(compiler), ("wrong compiler", args[:position]))
     return selected[0]
 
 
@@ -196,6 +224,12 @@ def main(args):
     need(clock.is_file() and any(sha(q) == sha(clock) for q in (original / "counter-kit").rglob("plain")),
          "counter is not identical to original executable")
     guards.admit(guards.resources(scratch.parent, out.parent), entry=True, bootstrap=True)
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import e2e
+    if args.suite == "e2e":
+        need(args.e2e_source is not None, "missing test fixture checkout")
+        return e2e.run(sys.modules[__name__], args, w, registry, expected_registry, original_cargo, clock)
+    manifest = e2e.compiler_manifest(sys.modules[__name__], args.e2e_rustcs)
     scratch.mkdir()
     out.mkdir()
     here = scratch / "helper"
@@ -214,23 +248,36 @@ def main(args):
         (here / target).write_bytes(payload)
     bodies = out / "client-bodies"
     bodies.mkdir()
-    env = {**w.ENV, "CARGO_HOME": str(work / "cargo-home"), "CARGO_TARGET_DIR": str(work / "target"),
-           "CARGO_BUILD_BUILD_DIR": str(work / "build")}
+    base_env = {**w.ENV, "CARGO_HOME": str(work / "cargo-home"), "CARGO_TARGET_DIR": str(work / "target"),
+                "CARGO_BUILD_BUILD_DIR": str(work / "build")}
     conf = scratch / "profile.toml"
-    cli = [*p.CMD[:2], "-Zprofile-rustflags", "--config", str(conf), *p.CMD[2:]]
     for prog, commit in (("cargo", w.c.SDK["cargo"]), ("rustc", w.c.SDK["rust"])):
         actual = subprocess.check_output(["rustup", "which", "--toolchain", "ohm", prog], env=w.ENV, text=True).strip()
         version = subprocess.check_output([prog, "+ohm", "-vV"], env=w.ENV, text=True)
         need(Path(actual).samefile(w.SDK / "bin" / prog) and commit in version and "ohm-1.99.0-22" in version, prog)
     put(out / "identity.json", {"qa": QA, "old": p.OLD, "new": p.NEW, "counter": sha(clock),
         "sdk_ledger": sdk_ledger, "source_common_dir": str(upstream), "boot": Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
-        "driver": sha(Path(__file__)), "profiles": sha(ARM_FILE), "reader": sha(here / "measure-client.rs"), "order": args.order})
+        "driver": sha(Path(__file__)), "profiles": sha(ARM_FILE), "reader": sha(here / "measure-client.rs"), "order": args.order,
+        "study_mode": "matched-rustc" if manifest else "signed-profile-control"})
     norm_graph = None
     observations = []
     # Each arm has an independently empty OLD history and a second independently empty clean NEW reference.
     for ix, arm in enumerate(args.order.split(",")):
-        flags = ARMS[arm]
-        conf.write_text("[profile.dev.package.ruff_workspace]\nrustflags = " + json.dumps(flags) + "\n")
+        env, flags, compiler, identity = e2e.compiler_arm(sys.modules[__name__], w, manifest, arm, base_env)
+        put(out / f"compiler-{arm}.json", identity)
+        cli = p.CMD
+        client_env = env
+        if compiler is None:
+            conf.write_text("[profile.dev.package.ruff_workspace]\nrustflags = " + json.dumps(flags) + "\n")
+            cli = [*p.CMD[:2], "-Zprofile-rustflags", "--config", str(conf), *p.CMD[2:]]
+        else:
+            # Run the registered downstream rustc commands against the same compiler and sysroot as Cargo.
+            home = scratch / ("consumer-rustup-" + arm)
+            (home / "toolchains").mkdir(parents=True)
+            (home / "toolchains/ohm").symlink_to(compiler.parent.parent, target_is_directory=True)
+            client_env = {**env, "RUSTUP_HOME": str(home), "RUSTUP_AUTO_INSTALL": "0"}
+            selected = subprocess.check_output(["rustup", "which", "--toolchain", "ohm", "rustc"], text=True, env=client_env)
+            need(Path(selected.strip()).samefile(compiler), "downstream compiler differs from Cargo")
         for history, phases in (("edit", ("old", "new", "unchanged", "invalid", "repair")),
                                 ("clean", ("clean-new",))):
             case = out / f"{ix}-{arm}-{history}"
@@ -262,7 +309,7 @@ def main(args):
                                 clock=None if phase == "clean-new" else clock)
                     need(before == p.source_state(repo, rev, bad), "source changed while Cargo ran")
                     put(dest / "source.json", before)
-                    rows = [json.loads(line) for line in (dest / "outer.stdout").read_bytes().splitlines()]
+                    rows = cargo_rows((dest / "outer.stdout").read_bytes(), graph if phase == "clean-new" else None)
                     products = p.results(rows, not bad)
                     w.ownership.check_roots(rows, work)
                     if not bad:
@@ -274,10 +321,10 @@ def main(args):
                         if phase == "new":
                             need(p.OWNER in dirty, ("changed source did not rebuild its owner", dirty))
                         if phase == "clean-new":
-                            put(dest / "actual-argv.json", verify_argv((dest / "outer.stderr").read_text(), flags))
-                        native = w.native.client(dest, rows, products, here, work, env, gold[rev], bodies)
+                            put(dest / "actual-argv.json", verify_argv((dest / "outer.stderr").read_text(), flags, compiler))
+                        native = w.native.client(dest, rows, products, here, work, client_env, gold[rev], bodies)
                         ar = p.artifact(products, p.OWNER)
-                        dyn = runtime(here, work, env, dest, out, clock, gold[rev]) if phase in ("new","clean-new") else None
+                        dyn = runtime(here, work, client_env, dest, out, clock, gold[rev]) if phase in ("new","clean-new") else None
                         results = {"cargo": count, "unfresh": dirty, "consumer": native, "archive_bytes": ar.stat().st_size,
                                    "archive_sha256": sha(ar), "runtime": dyn, "output_sha256": p.EXPECTED[rev]}
                     else:
@@ -285,6 +332,7 @@ def main(args):
                     observations.append({"arm": arm, "history": history, "phase": phase, **results})
                     put(dest / "qualified.json", results)
                 need(registry(home)==expected_registry, "changed registry inputs during history")
+        need(e2e.compiler_arm(sys.modules[__name__], w, manifest, arm, base_env)[3] == identity, "changed compiler")
     need(w.acquire.verify_sdk(w.SDK) == extra and registry(original_cargo)==expected_registry, "changed SDK or registry")
     put(out / "observations.json", observations)
 
@@ -295,4 +343,7 @@ if __name__ == "__main__":
         parser.add_argument("--" + name, type=Path, required=True)
     orders = [f"{a},{b}" for a in ARMS for b in ARMS if a != b and "normal" in (a,b)]
     parser.add_argument("--order", required=True, choices=orders)
+    parser.add_argument("--suite", choices=["build", "e2e"], default="build")
+    parser.add_argument("--e2e-source", type=Path)
+    parser.add_argument("--matched-rustcs", type=Path, dest="e2e_rustcs")
     main(parser.parse_args())

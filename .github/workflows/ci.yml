@@ -14,6 +14,14 @@ on:
         options:
           - normal,defer
           - defer,normal
+      suite:
+        description: Ruff dev workflow to replay
+        required: true
+        default: build
+        type: choice
+        options:
+          - build
+          - e2e
 permissions:
   actions: read
   contents: read
@@ -26,6 +34,7 @@ jobs:
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PAIR_ORDER: ${{ inputs.pair_order }}
+      PAIR_SUITE: ${{ inputs.suite }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -60,6 +69,14 @@ jobs:
           ref: 088b7b5f77fcb05994fd2a17cbc940cd9edb341a
           fetch-depth: 2
           path: ruff
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        if: inputs.suite == 'e2e'
+        with:
+          repository: astral-sh/ruff
+          ref: f9115b8deefa56b18b79449f8acafe25475c54d3
+          fetch-depth: 2
+          path: ruff-e2e
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
@@ -109,12 +126,14 @@ jobs:
           mkdir "$root" "$root/guard" "$root/driver"
           cp -a enrolled/scripts/ruff-workspace-remat/. "$root/driver/"
           (cd "$root/driver" && sha256sum --check --strict SHA256SUMS)
+          args=(--suite "$PAIR_SUITE")
+          if [[ "$PAIR_SUITE" == e2e ]]; then args+=(--e2e-source "$GITHUB_WORKSPACE/ruff-e2e"); fi
           python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch \
             "$root" "$root/guard" "$root/guard/resources" \
             python3 -IB "$root/driver/replay.py" \
             --qa "$GITHUB_WORKSPACE/enrolled" --source "$GITHUB_WORKSPACE/ruff" \
             --original "$base" --scratch "$root/work" --results "$root/observations" \
-            --order "$PAIR_ORDER"
+            --order "$PAIR_ORDER" "${args[@]}"
       - name: Preserve hardware clocks, counter settings, compiler argv and runnable results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
