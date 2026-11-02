@@ -1,25 +1,58 @@
 """Hosted intake. Reuse the published SDK and signature readers without any workload or score from their original experiment."""
 from pathlib import Path
-import gzip,json,os,shutil,subprocess,sys
+import gzip,json,os,shutil,subprocess,sys,time
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from basis import CASE,HERE,LOCK,PLAN,Env,digest,filehash,read,write,setup
-PARENT='a5e7ea6ef00903fae7b671f54c6bffdca3c2fee6';BRANCH='charlie/codex-22536-source-session-check'
+PARENT='4a3e200f344abe561fd28e790a6465501b8e450f';BRANCH='charlie/codex-22536-source-session-check'
 def git(d,*v):return subprocess.check_output(['git','-C',d,*v],text=True).strip()
+def historical_enrollment(co,en,guard):
+    assert git(co,'rev-parse','HEAD^^')==guard['original_parent']and guard['previous_head']==PARENT
+    assert filehash(HERE/'dispatch-enrollment.json')==guard['scientific_enrollment']and guard['true_prior_calibrated_boots']==27
+    path='scripts/uv-check-22536/dispatch-enrollment.json'
+    # Blobless Actions checkouts always have the three commit/tree layers. The
+    # compressed member preserves the historical bytes without a credentialed fetch.
+    for rev,field in [(PARENT,'previous_workflow_blob'),('HEAD','depth3_workflow_blob')]:
+        assert git(co,'ls-tree',rev,'--','.github/workflows/ci.yml').split()==['100644','blob',guard[field],'.github/workflows/ci.yml']
+    row=git(co,'ls-tree',guard['original_parent'],'--',path).split()
+    b=gzip.decompress((HERE/guard['source_bytes_from_content_member']).read_bytes())
+    import hashlib
+    oid=hashlib.sha1(b'blob '+str(len(b)).encode()+bytes([0])+b).hexdigest()
+    assert row==['100644','blob',oid,path]and oid==guard['original_enrollment_git_blob']
+    assert digest(b)==en['prior_enrollment']==guard['original_enrollment_sha256']
+    return json.loads(b)
+def assigned_runner(read_jobs,run,head,name,prior,job_name,pause=time.sleep):
+    """Await only publication of the correct live service identity, up to 55 seconds."""
+    observations=[];seen=None
+    for attempt in range(12):
+        data=read_jobs();rows=data['jobs']
+        assert data['total_count']==len(rows)and len(rows)<=1
+        if rows:
+            row,=rows;job=row['id'];rid=row['runner_id'];actual=row['runner_name']
+            assert row['run_id']==int(run)and row['head_sha']==head and row['name']==job_name and row['run_attempt']==1
+            assert type(job)is int and job>0 and job!=prior['previous_job']and seen in (None,job)
+            assert row['status']in ('queued','in_progress')and rid!=prior['previous_runner_id']and actual!=prior['previous_runner_name']
+            seen=job;observations.append({'job':job,'status':row['status'],'runner_id':rid,'runner_name':actual})
+            if type(rid)is int and rid>0:
+                assert actual==name and name
+                return {k:row[k]for k in ('run_id','id','head_sha','runner_id','runner_name','name')},observations
+            assert (rid is None or(type(rid)is int and rid==0))and actual in ('',None)
+        else:observations.append({'unindexed':True})
+        if attempt<11:pause(5)
+    raise RuntimeError('Actions did not publish the required nonzero runner identity within 55 seconds')
 def checked_binding():
     e=os.environ;assert e['GITHUB_REPOSITORY']=='astral-experiments/ohm'and e['GITHUB_REPOSITORY_ID']=='1319437234'and e['GITHUB_EVENT_NAME']=='workflow_dispatch'and e['GITHUB_REF']=='refs/heads/'+BRANCH and e['GITHUB_WORKFLOW_REF']==e['GITHUB_REPOSITORY']+'/.github/workflows/ci.yml@'+e['GITHUB_REF']and e['GITHUB_RUN_ATTEMPT']=='1'
     w=Path(e['GITHUB_WORKSPACE']).resolve();t=Path(e['RUNNER_TEMP']).resolve();co=w/'coordinator'
     assert git(co,'rev-parse','HEAD')==e['GITHUB_SHA']==e['REVIEWED_HEAD']and git(co,'rev-parse','HEAD^')==PARENT
-    assert not git(co,'status','--porcelain','--untracked-files=no')and not git(co,'diff',PARENT,'HEAD','--','scripts/uv-client-22958','scripts/uv-callables-21041','scripts/handwritten-panel')
+    assert not git(co,'status','--porcelain','--untracked-files=no')and not git(co,'diff','--name-only','--no-renames',PARENT,'HEAD','--','scripts/uv-client-22958','scripts/uv-callables-21041','scripts/handwritten-panel')
     assert HERE==co/'scripts/uv-check-22536';en=read(HERE/'dispatch-enrollment.json')
     assert en.get('local_native_gates_accepted')is True and en['submit_authority']=='explicit workflow_dispatch of the operator-reviewed exact SHA' and en['protocol']==CASE['protocol']and en['prior_public_case']==CASE['frozen_initial_case']
     assert len(en['excluded_boots'])==len(set(en['excluded_boots']))==27 and en['local_native']['held_out_signed_control']=='R' and en['local_native']['treatment']=='F'
     assert en['local_native']['typed_graph']['live_raw_argv_differences']==[0,0,0]and en['local_native']['typed_graph']['previous_separate_path_raw_differences']==6942
-    old_bytes=subprocess.check_output(['git','-C',co,'show',PARENT+':scripts/uv-check-22536/dispatch-enrollment.json'])
-    prior=json.loads(old_bytes);add=read(HERE/'eligibility-addendum.json')
-    assert en['eligibility_addendum']==filehash(HERE/'eligibility-addendum.json')and en['prior_enrollment']==digest(old_bytes)
-    assert en['excluded_boots']==prior['excluded_boots']+[add['prospective_panel']['new_boot_exclusion']['boot']]and add['previous']['head']==PARENT
+    guard=read(HERE/'partial-checkout-authority.json');prior=historical_enrollment(co,en,guard);add=read(HERE/'eligibility-addendum.json')
+    assert en['eligibility_addendum']==filehash(HERE/'eligibility-addendum.json')and en['excluded_boots']==prior['excluded_boots']+[add['prospective_panel']['new_boot_exclusion']['boot']]and add['previous']['head']==guard['original_parent']
+    assert e['GITHUB_RUN_ID']!=str(guard['previous_run'])and e['RUNNER_NAME']!=guard['previous_runner_name']
     assert en['local_native']['true_role_source']=={n:LOCK['roles'][n]['source']for n in ('R','F')}and en['local_native']['runtime_inventory_sha256']=={n:LOCK['roles'][n]['hash']for n in ('R','F')}
-    assert not git(co,'diff',PARENT,'HEAD','--','.github/workflows/ci.yml',*['scripts/uv-check-22536/'+n for n in ('protocol.json','score.py','basis.py','instruments.json','case.json','production-inputs.json.gz','metadata-kit.json','producer_map.py','fixed-layout-rule.json','opening.py','science.py','semantics.py','compatibility.py','fixed_products.py')])
+    assert not git(co,'diff','--name-only','--no-renames',PARENT,'HEAD','--',*['scripts/uv-check-22536/'+n for n in ('protocol.json','score.py','basis.py','instruments.json','case.json','production-inputs.json.gz','metadata-kit.json','producer_map.py','fixed-layout-rule.json','opening.py','science.py','semantics.py','compatibility.py','fixed_products.py')])
     return w,t,en
 def scope():
     w,t,en=checked_binding()
@@ -35,6 +68,10 @@ def oracle():
 def acquire():
     w,t,boot=scope();fresh=oracle();proof=w/'trait-results';proof.mkdir()
     write(proof/'unscored-start.json',{'reviewed':os.environ['REVIEWED_HEAD'],'boot':boot,'frozen_case':CASE['protocol'],'expected_release':LOCK['release']['tag']})
+    enhost=read(HERE/'partial-checkout-authority.json');transport=fresh.transport()
+    endpoint='repos/astral-experiments/ohm/actions/runs/'+os.environ['GITHUB_RUN_ID']+'/attempts/1/jobs?per_page=10'
+    host,observations=assigned_runner(lambda:transport.gh_json('api','--method','GET','-H','Cache-Control: no-cache',endpoint),os.environ['GITHUB_RUN_ID'],os.environ['GITHUB_SHA'],os.environ['RUNNER_NAME'],enhost,'eight-real-session-pairs')
+    write(proof/'previous-unmeasured-runner-exclusion.json',{'observed':host,'observations':observations,'closed_pre_intake_original':enhost,'fresh_calibrated_boot_checked_separately':True})
     current=fresh.transport().gh_json('api','--method','GET','repos/astral-experiments/ohm/releases/latest');write(proof/'release-observed.json',{k:current[k]for k in('id','tag_name','immutable','published_at','draft','prerelease','target_commitish')});assert current['id']==LOCK['release']['release_id']and current['tag_name']==LOCK['release']['tag'],'signed release changed; independent projection intake is required'
     assert min(shutil.disk_usage(f).free for f in(t,w))>=80<<30
     fresh.admit();incoming=t/'release-22958-incoming';signed,=(incoming/'signed').glob('*.tar.gz');assert filehash(signed)==LOCK['release']['sha256']
