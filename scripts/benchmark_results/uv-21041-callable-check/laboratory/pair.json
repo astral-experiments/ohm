@@ -1,0 +1,111 @@
+{
+  "actual_build": [
+    "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "/home/runner/work/ohm/ohm/source/rust/x.py",
+    "--ci",
+    "false",
+    "--config",
+    "/home/runner/work/ohm/ohm/trait-evidence/bootstrap.toml",
+    "build",
+    "--stage",
+    "1",
+    "-j8",
+    "--host",
+    "x86_64-unknown-linux-gnu",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "compiler/rustc",
+    "library",
+    "src/tools/rustdoc"
+  ],
+  "arms": {
+    "fa7a_stack_ctfe318_handwritten": {
+      "artifact": {
+        "bytes": 214194187,
+        "id": 13109193886,
+        "sha256": "9d5bc0ce4af1a2a48292dc93475a83df2147af95f7079f3370eca9018d63ae60"
+      },
+      "artifact_name": "handwritten-stage1-fa7a_stack_ctfe318_handwritten",
+      "branch": "charlie/codex-20988-handwritten-stage1",
+      "checked_files": {
+        ".github/workflows/ci.yml": "13cf3a47b2badf9b77b3236c01504ba99220a17b81f1ccb44325791bd2091113",
+        "scripts/handwritten-stage1/arms.json": "22e5b5f32c48ff2f11d1657d9d8d270fcceeb37f1c5be70ebe0989aa8d5550bd",
+        "scripts/handwritten-stage1/candidates.pack": "39f77995d828e3c5f40e933dc203013c0a7c74a3448e73b7024cbdc05861a46b",
+        "scripts/handwritten-stage1/export_sdk.py": "241cead5c7c6db7021ca075888c9795001374f1b624ee1ba294fe317b75dc7b1",
+        "scripts/handwritten-stage1/files.json": "21ca65f8ffc5c0a428211f9dfe33b84df0ddfdf60f4d48739212f7a9d9c9444a",
+        "scripts/handwritten-stage1/gate.py": "63c6941c5f59c353a6beac9873f7cb517a5f97f355a256d098b3cb5dbb148123",
+        "scripts/handwritten-stage1/materialize.py": "63144bce9dd445d79e074d4e309a02dc876b45a158a65c0c2647ce9320515147",
+        "scripts/handwritten-stage1/stage.py": "69b532906a01824004757e27ead0fbc36b8cbcabde51deb956713870e9413d9f"
+      },
+      "checkout": "builder",
+      "command_log": "1709972ab393ad20dc6c63a0cc91e7346ff8dcc8ff27082f1583f27ad2e63fc7",
+      "driver": "0119b70bef5389051016022b671b2af262aa9df103c36176791512280b6da116",
+      "head": "682930c7b58a62cd46c6f951b60d8cab8d3c7869",
+      "job_id": 125041656652,
+      "job_name": "Handwritten stage1 SDK (fa7a_stack_ctfe318_handwritten)",
+      "parent": "413e2cb249d4d25309c75a8d06fdd6712ff54091",
+      "required_steps": [
+        "Build optimized compiler and host std, run correctness suites, and export the SDK"
+      ],
+      "rid": 41371136314,
+      "scripts": "scripts/handwritten-stage1",
+      "source": {
+        "commit": "26210096e48c5c62ef4a5e8fd1aa612631b2f7d7",
+        "epoch": 43311,
+        "tree": "414066f99d9ebc4f7a857d178b7ef5c733835482"
+      }
+    },
+    "fa7a_stack_ctfe318_handwritten_coroutine_callables": {
+      "artifact": {
+        "bytes": 216299397,
+        "id": 13119343111,
+        "sha256": "1bf9aabdfc5092e1a8f48d3b669c6475753daf6d6e3cbcb3ae471bc7af1fef28"
+      },
+      "artifact_name": "callables-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables",
+      "branch": "charlie/codex-21041-callables-stage1",
+      "checked_files": {
+        ".github/workflows/ci.yml": "6509ba4cf3ad1f5d3aee7076b33731c8759d52af55780561b71eae06e299f72d",
+        "scripts/callables-stage1/arms.json": "53e633715a3d384fdbca43cfdc25dfa2104d47e3b78ce91381447ef602133db8",
+        "scripts/callables-stage1/callable-source.json": "0f3d01e72692c222bcba14f57476c21ff63523f73ab444caa9f569311e36eded",
+        "scripts/callables-stage1/callable.pack": "ec0280b7d227dea98866d09dd04d8468cc06c7394bd9b843799ebfe813b44817",
+        "scripts/callables-stage1/callables-oracle.py": "3326cdf8a441b33e95acc74f096b2ed02991d8393486d85363056b7e13819f04",
+        "scripts/callables-stage1/candidates.pack": "39f77995d828e3c5f40e933dc203013c0a7c74a3448e73b7024cbdc05861a46b",
+        "scripts/callables-stage1/coroutine-source.json": "a56e08abd18b18cfa47f6325059fe01870be6adec1efaec05df8cae3f118b406",
+        "scripts/callables-stage1/coroutine.pack": "0f076ac4f64ac883f269a48efac1bdeb859d09a3d136f646c598df66863722b1",
+        "scripts/callables-stage1/export_sdk.py": "241cead5c7c6db7021ca075888c9795001374f1b624ee1ba294fe317b75dc7b1",
+        "scripts/callables-stage1/files.json": "390e84135b2e6836cd2cba107eefb0de2b0d9e51cb06dbf2c6416bd0fc1ddef4",
+        "scripts/callables-stage1/gate.py": "63c6941c5f59c353a6beac9873f7cb517a5f97f355a256d098b3cb5dbb148123",
+        "scripts/callables-stage1/materialize.py": "469fef8f3a15781d702025cced598710d8311b6260ee5ddad19e08ab2bc42ef3",
+        "scripts/callables-stage1/oracle.py": "c845db0781def1b5f3bac50df44eb01cf917fc0ce482fa4a498e8d7b2cdfcbb4",
+        "scripts/callables-stage1/profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219",
+        "scripts/callables-stage1/stage.py": "2947b7cb2483c02b8900007dca9fcb326f9b8d377a0ff3bea7dfac5beb39a04a"
+      },
+      "checkout": "inventory-builder",
+      "command_log": "8a81bf214904399fac26d1ddb92a512c033c2bd5b861de476617e69d7b2e3f17",
+      "driver": "8de096a2425ca8580071d117345aa04d76db2e4617ae72a0ac8b60f1a7f2a5de",
+      "head": "ee90d022e7abb6c2c2f61b751c49de06bba29aed",
+      "job_id": 125114385350,
+      "job_name": "Callable stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables)",
+      "parent": "797d99e885991d0fef500102392e2117562d9ebf",
+      "required_steps": [
+        "Verify all three source packs and the direct callable child",
+        "Build optimized compiler and host std, run correctness suites, and export the SDK"
+      ],
+      "rid": 41395027122,
+      "scripts": "scripts/callables-stage1",
+      "source": {
+        "commit": "f22825348d834ad9a8ef3934647181fb69f778ae",
+        "epoch": 43311,
+        "tree": "96580055f15f61821eefb6875350ce0570995d8c"
+      }
+    }
+  },
+  "bootstrap_sha256": "45880ce3806d4ce13439f4235d2d8af43465b6f685244b39419252851f91692f",
+  "capsules_from_independent_source_enrollments": true,
+  "native_receipt_sha256": "0a848d39d46b4ec5fdef966a55006706a81cb2bd27257c9d87e9665de5a6933b",
+  "producer": "two separately admitted matched optimized stage1 SDKs, same signed \u221222 Cargo",
+  "roles": [
+    "fa7a_stack_ctfe318_handwritten",
+    "fa7a_stack_ctfe318_handwritten_coroutine_callables"
+  ]
+}
