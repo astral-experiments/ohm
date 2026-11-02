@@ -1,4 +1,4 @@
-name: Build the coroutine recovery compiler for uv 21041
+name: Build the callable recovery compiler for uv 21041
 'on':
   workflow_dispatch:
     inputs:
@@ -8,16 +8,16 @@ name: Build the coroutine recovery compiler for uv 21041
         description: Exact qualification commit
 permissions: {}
 jobs:
-  coroutine:
-    name: Coroutine stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine)
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-coroutine-stage1'
+  callables:
+    name: Callable stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables)
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-callables-stage1'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     permissions:
       contents: read
     env:
-      BENCH_ARM: fa7a_stack_ctfe318_handwritten_coroutine
+      BENCH_ARM: fa7a_stack_ctfe318_handwritten_coroutine_callables
       OHM_TOOLCHAIN: ohm-1.99.0-22
       OHM_TARGET: x86_64-unknown-linux-gnu
       PYTHONDONTWRITEBYTECODE: '1'
@@ -94,11 +94,11 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 682930c7b58a62cd46c6f951b60d8cab8d3c7869
+        test "$(git rev-parse HEAD^)" = 797d99e885991d0fef500102392e2117562d9ebf
 
         '
-    - name: Verify both source packs and the direct coroutine child
-      run: python3 -IB scripts/coroutine-stage1/materialize.py "$BENCH_ARM"
+    - name: Verify all three source packs and the direct callable child
+      run: python3 -IB scripts/callables-stage1/materialize.py "$BENCH_ARM"
     - name: Install native GNU bootstrap prerequisites
       run: 'sudo apt-get -qq update
 
@@ -108,10 +108,10 @@ jobs:
         '
     - name: Build optimized compiler and host std, run correctness suites, and export the SDK
       id: probe
-      run: python3 -ISB scripts/coroutine-stage1/stage.py "$BENCH_ARM"
+      run: python3 -ISB scripts/callables-stage1/stage.py "$BENCH_ARM"
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: coroutine-stage1-fa7a_stack_ctfe318_handwritten_coroutine
+        name: callables-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables
         path: stage1-capsule/
         if-no-files-found: error
         compression-level: 0
@@ -119,7 +119,7 @@ jobs:
       id: bundle
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: coroutine-stage1-incomplete-fa7a_stack_ctfe318_handwritten_coroutine
+        name: callables-stage1-incomplete-fa7a_stack_ctfe318_handwritten_coroutine_callables
         path: trait-evidence/
         if-no-files-found: warn
         compression-level: '0'
