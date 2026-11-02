@@ -80,6 +80,12 @@ def main(role):
         catalogs[phase]=names
         result=dict(code=0,sha256=sha(exe),bytes=exe.stat().st_size,executable=str(exe),tests=len(names),
                     test=case,witness=left,dirty=[m['target']['name'] for m in arts if not m['fresh']],units=len(arts))
+        if phase in ('old','historical-implementation','clean-new'):
+            # The three distinct binaries let another machine replay the native warning assertion.
+            archive=out/(result['sha256']+'.elf.gz')
+            with exe.open('rb') as raw, archive.open('xb') as body:
+                with gzip.GzipFile(fileobj=body,mode='wb',compresslevel=2,mtime=0) as compressed:
+                    shutil.copyfileobj(raw,compressed,length=1024*1024)
         if phase=='restored-new':
             found=[]
             for linker in census.genealogy(folder)['linkers']:
