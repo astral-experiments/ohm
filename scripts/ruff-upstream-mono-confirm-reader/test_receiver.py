@@ -173,12 +173,14 @@ class Receiver(unittest.TestCase):
         if not (root.exists() and producer.exists()):self.skipTest("optional exact factory unavailable")
         _,registration=e.readers(producer)
         self.assertEqual(p.digest(root),registration["factory_artifacts"]["ohm-upstream-mono-owner-stage1-receipts"][2][7:])
-        install={"schema":"ohm-matched-rustcs-v1","arms":{}}
         with zipfile.ZipFile(root) as z:
+            install=json.loads(z.read("rustcs.json"))
             for role,label in (("P","normal"),("C","defer")):
                 raw=json.loads(z.read(role+".json"));self.assertEqual(raw["commit"],e.SOURCE[role])
-                install["arms"][label]={"files":{k:v[0] for k,v in raw["files"].items()}}
-                self.assertIn("bin/rustdoc",install["arms"][label]["files"])
+                files=install["arms"][label]["files"]; signed=set(files)-set(raw["files"])
+                self.assertEqual(signed,{"bin/cargo","lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"})
+                self.assertEqual({k:files[k] for k in raw["files"]},{k:v[0] for k,v in raw["files"].items()})
+                self.assertIn("bin/rustdoc",files)
             archive_sha=z.read("archive.sha256").decode().split()[0]
         with tempfile.TemporaryDirectory(dir=HERE) as temp:
             d=Path(temp)

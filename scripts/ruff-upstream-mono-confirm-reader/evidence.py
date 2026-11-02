@@ -18,10 +18,9 @@ MODULES = {"read":"750b94aba0a68c946876a48d640c6f7a983bd8055ea62f9edf98004caa37e
            "live_family":"69e1c2cb35b0895829e412d0c717cf150f614da5d7de8660d402847a14b19813",
            "native_reference":"a7e10b0849bfee0336fca9b08ee081b03aaa6b8d274666ef1c888a58b593ef03"}
 SOURCE = dict(P="a3fc6da13921586bc374586dee00883e9210aecd", C="259ad7069e47eaf08cf106f187b2b6393f7fd7c2")
-# SHA-256 of the sorted logical path->physical digest map for every file, from the
-# immutable factory receipt's P.json and C.json. Includes rustdoc and each driver.
-FILES = dict(P="59ca0d46c655a1df75ead444cc59fef2b2d97f6ee49ef98bebd03df41fd1b7f1",
-             C="bfb6ea0190ff028df019a81dfdd6437f3624dd9f27f3908307b2872c66612843")
+# Factory rustcs.json binds the 64 stage1 files plus signed Cargo and Wild in each capsule.
+FILES = dict(P="08b6047c7880f6be14d8e32d4bd8096cd7331ebb5b4907961fbbd12307c600ac",
+             C="c85792a82bfd85c9448c2a70668e4bc0034f8e1be25671aa3856944673f48153")
 OWNERS = ("ruff_workspace","ruff_linter")
 PHASES = ("B","A","unchanged")
 
