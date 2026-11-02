@@ -4,6 +4,11 @@ run-name: Ruff 28444 frontend source attribution ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
+      experiment:
+        description: Registered experiment to execute
+        type: choice
+        options: [baseline, macro-host-o1]
+        default: baseline
       reviewed_head:
         description: Exact independently reviewed nonrelease QA commit
         type: string
@@ -57,7 +62,11 @@ jobs:
       - name: Fetch the exact registry closure without compiling
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py prefetch
       - name: Compare the ordinary and sampled edit with the independent clean result
+        if: inputs.experiment == 'baseline'
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py study
+      - name: Compare the fixed ordinary check with one recompiled native macro
+        if: inputs.experiment == 'macro-host-o1'
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/macro_host.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
