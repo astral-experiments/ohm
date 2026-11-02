@@ -46,12 +46,22 @@ def test():
             raise ValueError(("actual GDB fixture failed", acquired.stderr.decode()[-1100:], acquired.stdout.decode()[-900:]))
         proof = json.loads((w / "actual.json").read_bytes())
         assert proof["exit"] == 0 and proof["hits"] == {"selected": 1}
-        spec["driver"]["inode"] += 1
-        spec["output"] = str(w / "wrong.json")
-        m.write_text(json.dumps(spec))
-        subprocess.run(cmd, cwd=w, env=env, capture_output=True, timeout=35)
-        assert not (w / "wrong.json").exists(), "accepted unrelated loaded inode"
-        print("Pending-library mapping, actual instructions, real process argv, stock-header address and wrong-inode negative passed.")
+        assert all(proof["loader_fds"][k]["file_sha"] == spec[k]["sha256"] and
+                   proof["loader_fds"][k]["mapped_build_id"][1] == spec[k]["build_id"]["hex"] for k in ("driver","llvm"))
+        for wrong in ("inode","file-digest","mapped-note"):
+            false = json.loads(json.dumps(spec))
+            if wrong == "inode":
+                false["driver"]["inode"] += 1
+            elif wrong == "file-digest":
+                false["llvm"]["sha256"] = "0" * 64
+            else:
+                x = false["driver"]["build_id"]
+                x["hex"] = bytes(i ^ 1 for i in bytes.fromhex(x["hex"])).hex()
+            false["output"] = str(w / (wrong + ".json"))
+            m.write_text(json.dumps(false))
+            rejected = subprocess.run(cmd, cwd=w, env=env, capture_output=True, timeout=35)
+            assert rejected.returncode and not Path(false["output"]).exists(), ("accepted corrupted evidence",wrong)
+        print("Actual loader mmap FD device, inode and SHA, mapped build ID, instructions, argv and three negative controls passed.")
 
 
 if __name__ == "__main__":

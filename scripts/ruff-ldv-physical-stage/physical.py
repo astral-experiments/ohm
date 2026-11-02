@@ -58,11 +58,43 @@ def first_load_vaddr(elf):
     raise ValueError("missing offset-zero PT_LOAD")
 
 
+def elf_build_id(path):
+    """Return the file offset and exact immutable GNU build-ID note from ELF64."""
+    notes = []
+    with path.open("rb") as f:
+        head = f.read(64)
+        need(head[:6] == b"\x7fELF\x02\x01", "expected little-endian ELF64 driver")
+        phoff = struct.unpack_from("<Q", head, 32)[0]
+        stride, count = struct.unpack_from("<HH", head, 54)
+        need(stride == 56 and 0 < count < 256, "invalid ELF program header table")
+        f.seek(phoff)
+        headers = f.read(stride * count)
+        for i in range(count):
+            kind, _, offset, _, _, size, _, _ = struct.unpack_from("<IIQQQQQQ", headers, i*stride)
+            if kind != 4:
+                continue
+            need(size < 1 << 20, "oversized ELF notes")
+            f.seek(offset)
+            data, pos = f.read(size), 0
+            while pos + 12 <= len(data):
+                n, d, typ = struct.unpack_from("<III", data, pos)
+                pos += 12
+                label = data[pos:pos+n]
+                pos += (n+3) & ~3
+                need(pos+d <= len(data), "truncated ELF note")
+                if label == b"GNU\0" and typ == 3:
+                    need(8 <= d <= 64, "invalid GNU build ID")
+                    notes.append({"offset": offset+pos, "hex": data[pos:pos+d].hex()})
+                pos += (d+3) & ~3
+    need(len(notes) == 1, "expected exactly one loadable driver build ID")
+    return notes[0]
+
+
 def binding(path):
     p = path.resolve(strict=True)
     st = p.stat()
     return {"path": str(p), "sha256": sha(p), "device": [os.major(st.st_dev), os.minor(st.st_dev)],
-            "inode": st.st_ino}
+            "inode": st.st_ino, "build_id": elf_build_id(p)}
 
 
 def contact(root):
