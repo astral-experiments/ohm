@@ -17,6 +17,7 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 from common import WORKFLOW, enrollment, need, save, sha
 import receiver
+import originals
 import storage
 import tracking
 sys.path.insert(0,str(WORKFLOW))
@@ -243,6 +244,17 @@ def handoff_read(z,idx,sdk,vals,bodies,spec):
     return complete
 
 
+def kit_sources(kit, source, physical, signed):
+    need(set(kit)=={"front","driver","llvm","cargo","wild"},"unregistered runtime inputs")
+    need(kit["driver"]["sha"]==physical["driver"],"different driver from the reopened factory")
+    for key in ("front","driver","llvm"):
+        row=kit[key]
+        need(source["files"][row["name"]][0]==row["sha"],"different compiler file or source identity")
+    for key,name in (("cargo","bin/cargo"),("wild","lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd")):
+        row=kit[key]
+        need(row["name"]==name and row["sha"]==signed[name][3],"different signed Cargo or real linker")
+
+
 def scan(z,run,qa,stage,slot):
     infos=z.infolist()
     need(len(infos)==len(set(i.filename for i in infos)) and sum(i.file_size for i in infos)<80<<30 and all(
@@ -261,8 +273,8 @@ def scan(z,run,qa,stage,slot):
     docs=read(z,"physical/docs-qualification.json")
     for r in ("P","C"):
         source=read(z,"physical/"+r+"-source-kit.json");kit=roledef[r];doc=roles["documentation"][r]
-        need(source["commit"]==e["source"][r]["revision"] and all(source["files"][v["name"]][0]==v["sha"] for v in kit.values()) and
-             kit["driver"]["sha"]==proof["physical"][r]["driver"] and doc["rustdoc"]==docs["actual"][r]["rustdoc"][0]
+        kit_sources(kit,source,proof["physical"][r],reg["signed_cargo"]["members"])
+        need(source["commit"]==e["source"][r]["revision"] and doc["rustdoc"]==docs["actual"][r]["rustdoc"][0]
              and doc["html"]==whole(z,"physical/doc-control-"+r+"/actual.html") and all(
              doc["actual_libs"][k]["sha"]==kit[k]["sha"] for k in ("driver","llvm")),"different physical compiler or real documentation body")
     need(roledef["P"]["driver"]["sha"]!=roledef["C"]["driver"]["sha"] and roles["versions"]["P"]==roles["versions"]["C"] and
@@ -319,6 +331,9 @@ def scan(z,run,qa,stage,slot):
 if __name__=="__main__":
     stage,slot,dest=sys.argv[1:];slot=int(slot);run=int(os.environ["GITHUB_RUN_ID"]);qa=os.environ["GITHUB_SHA"]
     artifact=Path(os.environ["RUNNER_TEMP"])/"placement-subject.zip"
-    row=receiver.archive(run,qa,f"placement-{stage}-raw-{slot}",artifact,13<<30,current=True)
-    with zipfile.ZipFile(artifact) as z:report=scan(z,run,qa,stage,slot)
-    save(Path(dest),dict(raw=row,**report));print("Complete originals independently reopened",row,stage,slot,flush=True)
+    frozen=os.environ.get("READ_FROZEN_NATIVE")=="yes"
+    source_run,source_qa=(originals.ORIGIN,originals.ORIGINAL_QA) if frozen else (run,qa)
+    row=originals.fetch(source_run,source_qa,stage,slot,"raw",artifact,13<<30,frozen=frozen)
+    with zipfile.ZipFile(artifact) as z:report=scan(z,source_run,source_qa,stage,slot)
+    save(Path(dest),dict(raw=row,reader_run=run,reader_qa=qa,**report))
+    print("Complete originals independently reopened",row,stage,slot,flush=True)

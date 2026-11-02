@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-admit, ldv-placement-score]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-admit, ldv-placement-reopen, ldv-placement-score]
         default: single-22
       ldv_admission:
         description: Same-commit successful wrapper-free native workflow run ID for scoring
@@ -1045,7 +1045,12 @@ jobs:
 
   placement-readback:
     needs: placement-workflow
-    if: inputs.mode == 'ldv-placement-admit' || inputs.mode == 'ldv-placement-score'
+    if: >-
+      always() && !cancelled() && github.event_name == 'workflow_dispatch' && github.run_attempt == '1' &&
+      github.ref == 'refs/heads/charlie/qa-ruff-workspace-link-census-20261102' && github.sha == inputs.reviewed_head &&
+      inputs.placement_source == '4e546b27c311f29d99f9528e64420887f57c7538' &&
+      (inputs.mode == 'ldv-placement-reopen' || (needs.placement-workflow.result == 'success' &&
+      (inputs.mode == 'ldv-placement-admit' || inputs.mode == 'ldv-placement-score')))
     name: Independent whole placement artifact and native reader ${{ inputs.mode }} ${{ matrix.slot }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
@@ -1057,7 +1062,8 @@ jobs:
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PLACEMENT_SOURCE: ${{ inputs.placement_source }}
-      STAGE: ${{ inputs.mode == 'ldv-placement-admit' && 'admit' || 'score' }}
+      STAGE: ${{ inputs.mode == 'ldv-placement-score' && 'score' || 'admit' }}
+      READ_FROZEN_NATIVE: ${{ inputs.mode == 'ldv-placement-reopen' && 'yes' || 'no' }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -1084,6 +1090,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum
+          python3 -IB scripts/ruff-source-placement/reader_tests.py
           python3 -IB -u scripts/ruff-source-placement/readback.py "$STAGE" "${{ matrix.slot }}" "$RUNNER_TEMP/reopened.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

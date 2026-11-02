@@ -9,18 +9,22 @@ import zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from common import HERE, REPO, enrollment, need, save, sha
 from receiver import FACTORY, archive, api
+import originals
 
 
 def get(run,head,stage,i,root,current):
     fname=f"placement-{stage}-verified-{i}";zfile=root/(fname+".zip")
-    rec=archive(run,head,fname,zfile,8<<20,current=current)
+    rec=(originals.fetch(run,head,stage,i,"verified",zfile,8<<20) if current else
+         archive(run,head,fname,zfile,8<<20))
     with zipfile.ZipFile(zfile) as z:
         need(z.namelist()==["reopened.json"] and z.getinfo("reopened.json").file_size<64<<20,"wrong portable receipt")
         v=json.loads(z.read("reopened.json"))
-    rows=api(f"repos/{REPO}/actions/runs/{run}/artifacts?per_page=100")["artifacts"]
+    source_run,source_head=((originals.ORIGIN,originals.ORIGINAL_QA) if stage=="admit" else (run,head))
+    need((v["reader_run"],v["reader_qa"])==(run,head),"different independently executed receiver")
+    rows=api(f"repos/{REPO}/actions/runs/{source_run}/artifacts?per_page=100")["artifacts"]
     raw,=[a for a in rows if a["name"]==f"placement-{stage}-raw-{i}"]
-    need(not raw["expired"] and v["raw"]=={k:raw[k] for k in v["raw"]} and raw["workflow_run"]["id"]==run and
-         (v["qa"],v["run"],v["stage"],v["slot"])==(head,run,stage,i) and v["source"]==enrollment()["roles"] and
+    need(not raw["expired"] and v["raw"]=={k:raw[k] for k in v["raw"]} and raw["workflow_run"]["id"]==source_run and
+         (v["qa"],v["run"],v["stage"],v["slot"])==(source_head,source_run,stage,i) and v["source"]==enrollment()["roles"] and
          set(v["roles"])=={"P","C"} and len(v["raw_consumer_bodies"]["native-bodies"])>=2,"different enrolled/custodied input")
     return v,rec
 
