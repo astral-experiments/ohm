@@ -36,7 +36,7 @@ def validate(role,d,qa,root,ctx):
 def main():
  e=os.environ;w=Path(e["GITHUB_WORKSPACE"]).resolve();archive=w/"intake";out=w/"pair-evidence";out.mkdir();tmp=w/"pair-native";tmp.mkdir()
  ctx={"evidence_repository":"astral-experiments/ohm","reviewed_head":e["GITHUB_SHA"],"workflow_ref":e["GITHUB_WORKFLOW_REF"],"run_id":int(e["GITHUB_RUN_ID"]),"run_attempt":int(e["GITHUB_RUN_ATTEMPT"])}
- assert e["GITHUB_EVENT_NAME"]=="workflow_dispatch" and e["GITHUB_REF"]=="refs/heads/charlie/codex-ctfe22-gnu-20988" and ctx["reviewed_head"]==e["REVIEWED_HEAD"]
+ assert e["GITHUB_EVENT_NAME"]=="workflow_dispatch" and e["GITHUB_REF"]=="refs/heads/charlie/codex-ctfe22-standard-20988" and ctx["reviewed_head"]==e["REVIEWED_HEAD"]
  arts={};roles={};roots={}
  for role,key in zip(ROLES,("STOCK","TRAITS")):
   root=tmp/role;root.mkdir();r,src,roots[role]=validate(role,archive/role,archive/(role+"-qa"),root,ctx);roles[role]={"role":r,"source":src};arts[role]=bindings(e,key)

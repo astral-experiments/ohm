@@ -18,7 +18,7 @@ def assert_sources(manifest,source):
  return heads
 def main(role):
  arm=S["arms"][role];event=os.environ
- assert event["GITHUB_EVENT_NAME"]=="workflow_dispatch" and event["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and event["GITHUB_REF"]=="refs/heads/charlie/codex-ctfe22-gnu-20988"
+ assert event["GITHUB_EVENT_NAME"]=="workflow_dispatch" and event["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and event["GITHUB_REF"]=="refs/heads/charlie/codex-ctfe22-standard-20988"
  assert git(W,"rev-parse","HEAD")==event["REVIEWED_HEAD"]==event["GITHUB_SHA"] and git(REF,"rev-parse","HEAD")==S["released_coordinator"]
  for path,oid in {"scripts/integrated-dist-qa":"2c2e6387acb6d2ac12ba7b35d337f02243447faa","scripts/dep-graph-slots":"40a553983d5d79b49f042af27b5816999860caf4","scripts/verify-release-sources.sh":"6d2652796e16b3152e181eedb772d725a42975dd","toolchains/manifest.schema.json":"47956809e9a9942075dae8456c757f5516f41950","toolchains/1.99.0/22.json":"e3e1e9b6bdd08cba01773237ae14a341670b2598"}.items():assert git(W,"rev-parse","HEAD:"+path)==oid
  manifest=REF/"toolchains/1.99.0/22.json";assert sha(manifest)==S["signed_manifest_sha256"]

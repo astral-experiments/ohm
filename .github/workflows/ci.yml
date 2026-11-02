@@ -10,7 +10,7 @@ permissions: {}
 jobs:
   build:
     name: Production GNU SDK (${{ matrix.arm }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-gnu-20988' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-standard-20988' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     permissions:
       contents: read
     outputs:
@@ -28,7 +28,7 @@ jobs:
         arm:
           - stock_ctfe318
           - fa7a_stack_ctfe318
-    runs-on: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
+    runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 360
     env:
       BENCH_ARM: ${{ matrix.arm }}
@@ -90,21 +90,20 @@ jobs:
           sparse-checkout: |-
             scripts/cargo-diagnostic-fix
             scripts/ohm-apple-zmij/cargo293
-      - name: Verify the disposable runner and report capacity
-        run: |
-          set -euo pipefail
-          mkdir trait-evidence
-          df -B1 "$GITHUB_WORKSPACE" | tee trait-evidence/capacity-initial.txt
-          python3 -c 'import os,shutil; w=os.environ["GITHUB_WORKSPACE"]; assert shutil.disk_usage(w).free >= 300*2**30, "production GNU build requires 300 GiB initially available"'
+      - name: Admit this production workspace and allocate its physical emergency reserve
+        run: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py init
       - name: Reconstruct and verify the exact compiler source
+        shell: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py watch materialize {0}
         run: python3 -IB scripts/ctfe22-gnu/materialize.py "$BENCH_ARM"
       - name: Install native GNU bootstrap prerequisites
+        shell: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py watch prerequisites {0}
         run: |
           sudo apt-get -qq update
           sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
       - name: Install pinned LLVM BOLT tools
         env:
           MANIFEST_PATH: toolchains/1.99.0/22.json
+        shell: python3 -ISB ../scripts/ctfe22-gnu/standard-capacity.py watch bolt-tools {0}
         run: |
           if [[ "$(dpkg --print-architecture)" != amd64 ]]; then
             echo 'LLVM BOLT tools require an amd64 Linux runner' >&2
@@ -177,18 +176,23 @@ jobs:
       - name: Prepare pinned Wild linker
         env:
           MANIFEST_PATH: toolchains/1.99.0/22.json
+        shell: python3 -ISB ../scripts/ctfe22-gnu/standard-capacity.py watch wild {0}
         run: |
           wild_directory="$(python3 scripts/prepare-wild.py \
             "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
           printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
         working-directory: release-reference
       - name: Build the production PGO and BOLT distribution
-        shell: bash
+        shell: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py watch production {0}
         run: |-
           set -euo pipefail
           release-reference/scripts/build-optimized-dist.sh "$OHM_TARGET" "$OHM_TOOLCHAIN" "$GITHUB_WORKSPACE/source/rust" "$GITHUB_WORKSPACE/release-reference/release/bootstrap.toml" 2>&1 | tee trait-evidence/build.log
       - name: Verify the production SDK and exercise the original regression
+        shell: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py watch native-qa {0}
         run: python3 -ISB scripts/ctfe22-gnu/native.py "$BENCH_ARM"
+      - name: Validate this role's complete capacity evidence before its SDK upload
+        if: always()
+        run: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py summarize
       - name: Upload the native-qualified SDK
         id: sdk
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -228,7 +232,7 @@ jobs:
   pair:
     name: Qualify both cache migration directions
     needs: build
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-gnu-20988' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-standard-20988' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -282,8 +286,12 @@ jobs:
           artifact-ids: ${{ needs.build.outputs.traits_qa_id }}
           path: intake/fa7a_stack_ctfe318-qa
           merge-multiple: true
+      - name: Independently replay the two raw capacity histories
+        run: python3 -ISB scripts/ctfe22-gnu/capacity-audit.py 52779265edb1486bceb9f6abf0c7a24dfc0f234caea4a067653b0eceb514772b
       - name: Verify the archives and exercise bidirectional cache rejection
         run: python3 -ISB scripts/ctfe22-gnu/pair.py
+      - name: Bind the two capacity proofs to the native pair qualification
+        run: install -m 644 capacity-pair.json pair-evidence/capacity-admission.json
       - name: Retain paired source and cache qualification
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
