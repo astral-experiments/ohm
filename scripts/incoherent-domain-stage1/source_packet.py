@@ -43,9 +43,9 @@ def pack(repo,parent,child,folder):
     desc['pack_size']=len(data);desc['pack_sha256']=sha256(data).hexdigest();desc['pack_git_id']=data[-20:].hex()
     (folder/'derive.pack').write_bytes(data);(folder/'derive-source.json').write_text(json.dumps(desc,sort_keys=True,indent=2)+'\n')
     return desc
-def install(repo,folder,parent,parent_tree,manifest_digest):
-    f=folder/'derive-source.json';assert filehash(f)==manifest_digest
-    desc=json.loads(f.read_bytes());data=folder/'derive.pack'
+def install(repo,folder,parent,parent_tree,manifest_digest,name='derive'):
+    f=folder/(name+'-source.json');assert filehash(f)==manifest_digest
+    desc=json.loads(f.read_bytes());data=folder/(name+'.pack')
     assert desc['parent']==parent and desc['parent_tree']==parent_tree and git(repo,'rev-parse',parent+'^{tree}')==parent_tree
     assert data.stat().st_size==desc['pack_size'] and filehash(data)==desc['pack_sha256']
     with data.open('rb')as stream:

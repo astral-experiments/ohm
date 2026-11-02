@@ -17,9 +17,9 @@ def assert_sources(manifest,source):
  assert git(R,"rev-parse","HEAD")==source and not git(R,"diff","--name-only","HEAD","--","compiler","tests","src/tools/opt-dist")
  return heads
 def main(role):
- assert role == "fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive"
+ assert role == "fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive_clause_positions"
  arm=S["arms"]["fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain"];event=os.environ
- assert event["GITHUB_EVENT_NAME"]=="workflow_dispatch" and event["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and event["GITHUB_REF"]=="refs/heads/charlie/codex-21041-proc-derive-stage1"
+ assert event["GITHUB_EVENT_NAME"]=="workflow_dispatch" and event["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and event["GITHUB_REF"]=="refs/heads/charlie/codex-21041-impl-clauses-stage1"
  assert git(W,"rev-parse","HEAD")==event["REVIEWED_HEAD"]==event["GITHUB_SHA"] and git(REF,"rev-parse","HEAD")==S["released_coordinator"]
  for path,oid in {"scripts/integrated-dist-qa":"2c2e6387acb6d2ac12ba7b35d337f02243447faa","scripts/dep-graph-slots":"40a553983d5d79b49f042af27b5816999860caf4","scripts/verify-release-sources.sh":"6d2652796e16b3152e181eedb772d725a42975dd","toolchains/manifest.schema.json":"47956809e9a9942075dae8456c757f5516f41950","toolchains/1.99.0/22.json":"e3e1e9b6bdd08cba01773237ae14a341670b2598"}.items():assert git(W,"rev-parse","HEAD:"+path)==oid
  manifest=REF/"toolchains/1.99.0/22.json";assert sha(manifest)==S["signed_manifest_sha256"]
@@ -90,8 +90,13 @@ def main(role):
  assert set(git(R,'diff','--name-only',arm['parent'],arm['commit']).splitlines())==set(arm['query_change_blobs'])
  for p,v in arm['query_change_blobs'].items():assert git(R,'rev-parse',arm['commit']+':'+p)==v
  for p,v in S['domain_original_blobs'].items():assert git(R,'rev-parse',arm['parent']+':'+p)==v
- child=S["arms"][role]
+ child=S["arms"]["fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive"]
  desc=load(H/"source_packet.py").install(R,H,arm["commit"],arm["tree"],child["derive_source_sha256"])
+ assert (child["commit"],child["tree"],child["parent"],child["parent_tree"])==(desc["commit"],desc["tree"],desc["parent"],desc["parent_tree"])
+ assert child["query_change_blobs"]=={p:v[1] for p,v in desc["delta"].items()}
+ arm=child
+ child=S["arms"][role]
+ desc=load(H/"source_packet.py").install(R,H,arm["commit"],arm["tree"],child["clauses_source_sha256"],"clauses")
  assert (child["commit"],child["tree"],child["parent"],child["parent_tree"])==(desc["commit"],desc["tree"],desc["parent"],desc["parent_tree"])
  assert child["query_change_blobs"]=={p:v[1] for p,v in desc["delta"].items()}
  arm=child
@@ -110,5 +115,5 @@ def main(role):
   d=Path(tmp);(d/"1.99.0").mkdir();(d/"manifest.schema.json").write_bytes((REF/"toolchains/manifest.schema.json").read_bytes());m=d/"1.99.0/22.json";write(m,original)
   assert heads==assert_sources(m,arm["commit"])
  recipes={p:sha(REF/p) for p in ("release/bootstrap.toml","scripts/build-optimized-dist.sh","scripts/prepare-wild.py")}
- write(QA/"source.json",{"role":role,"source":arm,"signed_manifest_sha256":sha(manifest),"released_coordinator":S["released_coordinator"],"recipe":recipes,"training_objects":training,"component_git":heads,"source_pack_sha256":sha(packet),"evidence_repository":event["GITHUB_REPOSITORY"],"reviewed_head":event["GITHUB_SHA"],"workflow_ref":event["GITHUB_WORKFLOW_REF"],"run_id":int(event["GITHUB_RUN_ID"]),"run_attempt":int(event["GITHUB_RUN_ATTEMPT"]),"classification":"private optimized stage1 procedural derive identity experiment"})
+ write(QA/"source.json",{"role":role,"source":arm,"signed_manifest_sha256":sha(manifest),"released_coordinator":S["released_coordinator"],"recipe":recipes,"training_objects":training,"component_git":heads,"source_pack_sha256":sha(packet),"evidence_repository":event["GITHUB_REPOSITORY"],"reviewed_head":event["GITHUB_SHA"],"workflow_ref":event["GITHUB_WORKFLOW_REF"],"run_id":int(event["GITHUB_RUN_ID"]),"run_attempt":int(event["GITHUB_RUN_ATTEMPT"]),"classification":"private optimized stage1 trait-impl predicate experiment"})
 if __name__=="__main__":main(*sys.argv[1:])

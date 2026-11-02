@@ -5,8 +5,8 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 import gate as g
 import export_sdk
 
-H=Path(__file__).resolve().parent;S=g.load(H/"arms.json");BASE="fa7a_stack_ctfe318";CAND=BASE+"_handwritten_coroutine_callables_incoherent_domain_proc_derive"
-BRANCH="charlie/codex-21041-proc-derive-stage1"; HOST="x86_64-unknown-linux-gnu";UNIT="only_the_original_ctfe_literal_id_is_restored"
+H=Path(__file__).resolve().parent;S=g.load(H/"arms.json");BASE="fa7a_stack_ctfe318";CAND=BASE+"_handwritten_coroutine_callables_incoherent_domain_proc_derive_clause_positions"
+BRANCH="charlie/codex-21041-impl-clauses-stage1"; HOST="x86_64-unknown-linux-gnu";UNIT="only_the_original_ctfe_literal_id_is_restored"
 NATIVE=S["fixture_directory"];QUERY=S["arms"][CAND]["query_fixture"];REG="tests/run-make/"
 def context():
     e=os.environ
@@ -37,7 +37,7 @@ def verified_version(vv, commit):
     return lines[0].removeprefix("rustc ")
 def suites(role):
     assert role in (BASE,CAND)
-    return [NATIVE, REG+"rdr-public-hash-native-exports", REG+"trait-impl-bucket-projection", QUERY, REG+"trait-impl-bucket-coroutine", REG+"trait-impl-bucket-callables", REG+"crate-incoherent-impl-domain", S["arms"][CAND]["derive_fixture"]]
+    return [NATIVE, REG+"rdr-public-hash-native-exports", REG+"trait-impl-bucket-projection", QUERY, REG+"trait-impl-bucket-coroutine", REG+"trait-impl-bucket-callables", REG+"crate-incoherent-impl-domain", S["arms"][CAND]["derive_fixture"], S["arms"][CAND]["clauses_fixture"]]
 def passed(raw,which,role):
     text=raw.decode(errors="replace");assert "test result: FAILED" not in text and re.search(r"(?m)^test result: ok\. [1-9]\d* passed; 0 failed; 0 ignored;",text)
     expected=["test mir::interpret::tests::"+UNIT+" ... ok"] if which=="unit" else ["test [run-make] "+test+" ... ok" for test in suites(role)]
@@ -50,7 +50,7 @@ def match_source(v,role,ctx):
     arm=S["arms"][role]
     assert v["role"]==role and v["source"]==arm and v["released_coordinator"]==S["released_coordinator"] and v["signed_manifest_sha256"]==S["signed_manifest_sha256"] and v["source_pack_sha256"]==S["pack_sha256"]
     assert v["reviewed_head"]==ctx["GITHUB_SHA"] and str(v["run_id"])==ctx["GITHUB_RUN_ID"] and str(v["run_attempt"])==ctx["GITHUB_RUN_ATTEMPT"] and v["workflow_ref"]==ctx["GITHUB_WORKFLOW_REF"] and v["evidence_repository"]==ctx["GITHUB_REPOSITORY"]
-    assert v["classification"]=="private optimized stage1 procedural derive identity experiment"
+    assert v["classification"]=="private optimized stage1 trait-impl predicate experiment"
 def git(repo,*args):return subprocess.check_output(["git","-C",repo,*args],text=True).strip()
 def run(role):
     assert __debug__ and role==CAND;ctx=context();bundle=file_map()
@@ -130,5 +130,17 @@ def run(role):
     assert domain_proof["actual_empty_edit_typeck"]==dict.fromkeys(("read_adt","read_reference","read_str"),0)
     assert domain_proof["warm_cold_binary_and_errors"]is True and domain_proof["observed"]==g.file_hash(domain_dir/"observed.json")
     g.put(out/"domain-oracle.json",domain_proof)
+    clause_dir=out/"clause-native"
+    argv=[sys.executable,"-ISB",H/"clause-oracle.py",sdk/"bin/rustc",r/arm["clauses_fixture"],clause_dir,"candidate"]
+    checked=subprocess.run(argv,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env={**os.environ,**senv})
+    (out/"clause-native.log").write_bytes(checked.stdout)
+    checked.check_returncode()
+    clause=json.loads((clause_dir/"accepted.json").read_bytes())
+    assert clause["role"]=="candidate" and clause["compilers"]==105 and clause["source"].strip()==vv.strip()
+    assert clause["rustc_sha256"]==g.file_hash(sdk/"bin/rustc")
+    assert clause["all_warm_cold_diagnostics_rmeta_and_binaries_equal"] and clause["all_separate_native_and_profiled_inputs_outputs_equal"]
+    assert not clause["typeck"]["unchanged-a"] and not clause["typeck"]["unchanged-b"]
+    assert "reader::through_projection" not in clause["typeck"]["edit"] and "reader::through_projection" in clause["typeck"]["changed"]
+    g.put(out/"clause-oracle.json",clause)
     export_sdk.run(role,sdk,ctx,arm,bundle,out,w,ident)
 if __name__=="__main__":run(*sys.argv[1:])

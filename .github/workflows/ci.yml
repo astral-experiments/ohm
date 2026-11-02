@@ -1,4 +1,4 @@
-name: Build the procedural derive identity compiler for uv 21041
+name: Build the trait-impl predicate compiler for uv 21041
 'on':
   workflow_dispatch:
     inputs:
@@ -9,15 +9,15 @@ name: Build the procedural derive identity compiler for uv 21041
 permissions: {}
 jobs:
   domain:
-    name: Proc-derive identity stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive)
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-proc-derive-stage1'
+    name: Impl-clause predicate stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive_clause_positions)
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-impl-clauses-stage1'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     permissions:
       contents: read
     env:
-      BENCH_ARM: fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive
+      BENCH_ARM: fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive_clause_positions
       OHM_TOOLCHAIN: ohm-1.99.0-22
       OHM_TARGET: x86_64-unknown-linux-gnu
       PYTHONDONTWRITEBYTECODE: '1'
@@ -94,10 +94,10 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = fe4508b67b49a062bfcc4c2ee39addcec6d9d644
+        test "$(git rev-parse HEAD^)" = aff9b95167c76ffe95af7e896ae8c115bfd8a591
 
         '
-    - name: Verify the source packs and direct procedural derive child
+    - name: Verify the source packs and direct trait-impl predicate child
       run: python3 -IB scripts/incoherent-domain-stage1/materialize.py "$BENCH_ARM"
     - name: Install native GNU bootstrap prerequisites
       run: 'sudo apt-get -qq update
@@ -111,7 +111,7 @@ jobs:
       run: python3 -ISB scripts/incoherent-domain-stage1/stage.py "$BENCH_ARM"
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: proc-derive-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive
+        name: impl-clauses-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive_clause_positions
         path: stage1-capsule/
         if-no-files-found: error
         compression-level: 0
@@ -119,7 +119,7 @@ jobs:
       id: bundle
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: proc-derive-stage1-incomplete-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive
+        name: impl-clauses-stage1-incomplete-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive_clause_positions
         path: trait-evidence/
         if-no-files-found: warn
         compression-level: '0'
