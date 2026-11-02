@@ -1,21 +1,70 @@
 {
-  "original_fixed_cargo_compiler_native_pcp_sha256": "7562d4be911d3abcb4e13d8b5e1178e8c231cda52c98c98f04102a03cb77a0d9",
-  "original_stable_launcher_cargo_query_pcp_sha256": "b02158116edfebe286cc6febbe8bb014c9f462e30ea43ff0a21cfb0915e5982a",
-  "pair_sha256": "dbb190765a6be6f2ef90be903efaf63c1feb7bf817c142cdaacc0cb0b9f067ae",
-  "parent_coordinator": "e12e6778ebfaf38ea35fdd8a4084230f6bf1b937",
+  "actual_reader_commit": "0aecea4345b011433b5f65daf055a924946605ae",
+  "closed_reader_tree": "e005e6eb4f7a3e5974b24d101b92debeae61e8d8",
+  "native_owning_fixture_sha256": "fd1a89a0b3d6648c62619c06667eda87942d8601aa0cfe5700cac891ece8be7a",
+  "native_two_way_sha256": "df678ad4d64fe12a41ace9a8c4e1e0cd3ad7b0e0d239e3b59c64199d5abb9645",
+  "pair_sha256": "05da3145fde2e38d09bf33331b79acd8bc1e16d2160bb10a8d3ee8017069849f",
+  "parent_coordinator": "8faa7cece115f300a0d15bb1d915cbf43a992801",
   "reader_trees": {
     "scripts/handwritten-panel": "685a8e30c274a105e38040c5839f96bf83d11463",
-    "scripts/uv-callables-21041": "dbf2097a87b102852fb7ecf2bfcb0a5e42c44fb5",
+    "scripts/uv-callables-21041": "86ceb453dfbf6852601e4932da897aee74eab118",
     "scripts/uv-resolver-whole-pmu": "1a5dffe4d7243f5ecfcbb7b82ac6713abd775228"
   },
   "roles": {
     "candidate": {
-      "actual_local_native_hashes": {
-        "across_cold_seeds": "073bfe7623cbaaa7131bcc5b25b8465856460af413c2448725d4b264024db6fc",
-        "kernel_blocking": "f51397764ad6eef7a19f1a07b241edb057a685687eb5b3213abe78ae8cb0c6ed",
-        "material_and_linked": "b01e851f2e834aecc7d9f5915483066b9aab1d8784e9323d2facb6895858588e",
-        "physical": "34c0e5c5b0e4209fa3cacc7cdce537f597137a618dde1249fbb881628bc0d199"
+      "driver": "b179c2694c8daf8746deb637e96dd06f4e4f6ad1cbee9fdcd7245cc1720f9b50",
+      "pair_arm": {
+        "artifact": {
+          "bytes": 359932679,
+          "id": 13151202059,
+          "sha256": "490efcc659a5b0f0170be117973eceabbb2c4ef211e80ebea048b95ad781da4c"
+        },
+        "builder_tree": "db66d3e57e8b6f6880e451e2b5cb0bdd5f0d0fc9",
+        "driver": "b179c2694c8daf8746deb637e96dd06f4e4f6ad1cbee9fdcd7245cc1720f9b50",
+        "initial_sdk_enrollment": "67441379209fed903be4e29ae678c8202fead04007aa2b6d628e4f77e58fc3cd",
+        "installed_sdk_receipt": "614210b447c59ea7a99de14035afc7c85de599add505b748f60ff84a96457e40",
+        "native_registration_sha256": "92358a0a7a750e2dd79b4591ad38c18eaafe6ae8d9c228355bb6712e32d39924",
+        "origin_epoch_qa_sha256": "a8590ea746338dcf3a856b019916225439cfec4635fd41e2c70c920ec7c445a4",
+        "role_sha256": "7a29f598ebeac3ec3b2e022d9009494419e458b64b8446eb43492e696b795f3a",
+        "service": {
+          "branch": "charlie/codex-21041-trait-origin-production22",
+          "head": "b1d42cb19bed32c5c8e045b55a2a0aecb6da7315",
+          "job": 125323190406,
+          "jobs": {
+            "Production GNU trait-directory SDK": 125323190406
+          },
+          "members": {
+            "trait-origin-production-qa-attempt-1": {
+              "bytes": 315314,
+              "id": 13151147270,
+              "sha256": "4301313d69cb10f8ebc8627ff5be8b12aeb61e8034316e00929e59452c75b0e3"
+            },
+            "trait-origin-production-sdk": {
+              "bytes": 359932679,
+              "id": 13151202059,
+              "sha256": "490efcc659a5b0f0170be117973eceabbb2c4ef211e80ebea048b95ad781da4c"
+            }
+          },
+          "run": 41459079009,
+          "runner": 1717,
+          "runner_name": "nsc-runner-23i51or55dmva"
+        },
+        "source": {
+          "commit": "e4edbdd943f2ceac098ddde880e8f97a3bb3270f",
+          "epoch": 43323,
+          "metadata_epoch": 43319,
+          "tree": "8fdc0aa6f4833c25814f97056ed639212e53b6d5"
+        },
+        "source_sha256": "5a0c066034901eae1ddfe04ea6869dd8e5556315014062e61228e592b7817f7e",
+        "trait_origin_test_sha256": "9b23e1cb7a2e3ffdd3a10450f15e59da627c063179d08f21cffcf7466b06d739"
       },
+      "qa_original": "4301313d69cb10f8ebc8627ff5be8b12aeb61e8034316e00929e59452c75b0e3",
+      "role": "callables_ctfe318_incoherent_domain_proc_derive_trait_origin",
+      "role_sha256": "7a29f598ebeac3ec3b2e022d9009494419e458b64b8446eb43492e696b795f3a",
+      "sdk_original_sha256": "675610b1e46a0801e74eef0d2e9461337868b5d27add801840a0f4b293099132",
+      "source_run": 41459079009
+    },
+    "parent": {
       "driver": "30b37542247b66141d3b5cfaafc47ea423785de4048f65b2cf2e6806181b7e0b",
       "pair_arm": {
         "artifact": {
@@ -26,6 +75,9 @@
         "builder_tree": "8d5f195fb1d97919c826772023d6e41e6ca54d88",
         "driver": "30b37542247b66141d3b5cfaafc47ea423785de4048f65b2cf2e6806181b7e0b",
         "generated_prerequisite_sha256": "cb80f5ebd4809e03fc3621b256bf27d1e9b0b340b5cc9d91d5016060a4e99530",
+        "initial_sdk_enrollment": "b68ee5229ac063c8178463015f1e259d334b89d46181f08207265cf45086ef14",
+        "installed_sdk_receipt": "728d909c850fc3de6207d6fe0abe7cec48bf7eb5baac52fa01d64f56d680c51d",
+        "native_registration_sha256": "c43e5ad518a942fd92d4bbbde4b14d39d7898cbe2c73faf133d8068441482c54",
         "role_sha256": "3a9a232fd2869b98885436f8687a10122167e674a6abe4f880460560571462ef",
         "service": {
           "branch": "charlie/codex-21041-derive-production22",
@@ -53,65 +105,17 @@
         "source": {
           "commit": "ac67101cb973e35ce8ff044cc8014c2c76bab69e",
           "epoch": 43319,
+          "metadata_epoch": 43319,
           "tree": "1c07367341a9cc53272e9eefdae1ac8823d44839"
         },
         "source_sha256": "88b103e2fb967ab17884d9c4b7880c95dba5dd0b537fb063d8336544e5316a8a"
       },
+      "qa_original": "bfebd4b68ed93a378f6bee237c9d644661294e365b83699b383498b6c42143e1",
       "role": "callables_ctfe318_incoherent_domain_proc_derive",
       "role_sha256": "3a9a232fd2869b98885436f8687a10122167e674a6abe4f880460560571462ef",
+      "sdk_original_sha256": "b68ee5229ac063c8178463015f1e259d334b89d46181f08207265cf45086ef14",
       "source_run": 41434876352
-    },
-    "parent": {
-      "actual_local_native_hashes": {
-        "across_cold_seeds": "ea192abfacadefe16173bb029428a522ef204e7f797455e26c0ddabc603b84ee",
-        "kernel_blocking": "981dad3a06f31825287ca2c0ad99b4f291bc1cbaef9ac8c53d165406eaf29ff8",
-        "material_and_linked": "5d7ff88210b35ff8bc5f83faf2cc8a9407a332ecd45c5fd47ac7e40a18b0d893",
-        "physical": "f5c6a495f4bcac5b0ea0585fd151290d443292257fa81541ee57bb482886e105"
-      },
-      "driver": "8f61821deebfa179fa6f56183a4f824c99172ba87671a57e92069836c49703b8",
-      "pair_arm": {
-        "artifact": {
-          "bytes": 359916519,
-          "id": 13129955278,
-          "sha256": "5b075150e2460193078bdf8de7d834a057c097655e685bfb1943d91dfc2cabd2"
-        },
-        "builder_tree": "fb746eb96b458a310aa374f83a4589e02d5b1ba2",
-        "driver": "8f61821deebfa179fa6f56183a4f824c99172ba87671a57e92069836c49703b8",
-        "role_sha256": "8aed5acfd2808160e1aab0a9bcfd643b517551915bd478a5887cbb5728fd0701",
-        "service": {
-          "branch": "charlie/codex-21041-domain-production22",
-          "head": "5f7e5680285caa6b9a848db810b63ef58dfe0143",
-          "job": 125175283448,
-          "jobs": {
-            "Production GNU incoherent-impl domain SDK": 125175283448
-          },
-          "members": {
-            "domain-production-qa-attempt-1": {
-              "bytes": 303122,
-              "id": 13128848535,
-              "sha256": "22d8008b9d2ded9650e1760a457714b192e66950792052a6f7b7dc67b7e979e2"
-            },
-            "domain-production-sdk": {
-              "bytes": 359916519,
-              "id": 13129955278,
-              "sha256": "5b075150e2460193078bdf8de7d834a057c097655e685bfb1943d91dfc2cabd2"
-            }
-          },
-          "run": 41414598941,
-          "runner": 1590,
-          "runner_name": "nsc-runner-g0ikrcv2932u0"
-        },
-        "source": {
-          "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
-          "epoch": 43317,
-          "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2"
-        },
-        "source_sha256": "dd7bbb06d72aed8351ac94037d0e03a891d3933e6b2009aa722752cebf33c9f6"
-      },
-      "role": "callables_ctfe318_incoherent_domain",
-      "role_sha256": "8aed5acfd2808160e1aab0a9bcfd643b517551915bd478a5887cbb5728fd0701",
-      "source_run": 41414598941
     }
   },
-  "services_sha256": "1edd2fd4ec073a5f9ea27766f1d2b1b3e54bdfab9163684e0b30c89a6f1ca32c"
+  "services_sha256": "3f6a2d97d7a0f665182860b328712d0906635108491efe6630a7755b1ffecfbf"
 }

@@ -1,0 +1,722 @@
+{
+  "candidate-1": {
+    "accepted": {
+      "accepted": true,
+      "bare_clock": "2e9a7f9d029206bab8e3d5789a9cbe04151e14affd5a8a59ac287bbca289504a",
+      "dirty": [
+        "build_script_build",
+        "uv_cli",
+        "uv_python"
+      ],
+      "independent_native": "a4258a61425db1d1a6f9f5fd0039cc62e84e579e5b2ce2926380266c37fac249",
+      "kernel": "d383b12ab26e8f736645e44dd3c64718f40b3776eff7c82f39aff41aa46aa4b9",
+      "label": "candidate-1",
+      "linked_transition": {
+        "A_objects": 209,
+        "B_objects": 209,
+        "same_content_any_name": 181,
+        "same_name": 0,
+        "same_name_and_content": 0
+      },
+      "physical_sha256": "c550a6c328f6ec98c56f207af22caad4156ebb124322fcfb1206dc0c196a3eaa",
+      "products": 1794,
+      "role": "candidate",
+      "seed": {
+        "bytes": 655526241,
+        "files": {
+          "count": 12851,
+          "sha256": "403d96396b892fe515fd16d2fa5772b4a3f4130dc77e6b29195790a456a93e87"
+        },
+        "sha256": "e368f642b4478c1d912fcea6f0ea34cf6088a176142cb004f9a9e30def2db878"
+      },
+      "source": {
+        "commit": "e4edbdd943f2ceac098ddde880e8f97a3bb3270f",
+        "epoch": 43323,
+        "tree": "8fdc0aa6f4833c25814f97056ed639212e53b6d5"
+      },
+      "wall_ns": 5463536333,
+      "warm_and_cold_B_sidecars": 448
+    },
+    "clock": {
+      "after": {
+        "affinity": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "files": {
+          "/proc/loadavg": "29.25 23.21 20.95 22/1082 16520",
+          "/proc/pressure/cpu": "some avg10=7.89 avg60=8.43 avg300=5.24 total=14672298176\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "/proc/pressure/io": "some avg10=0.00 avg60=0.01 avg300=0.02 total=6554837203\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=6148783309",
+          "/sys/fs/cgroup/cpu.stat": "usage_usec 2196290298082\nuser_usec 1549866250827\nsystem_usec 646424047255\nnice_usec 124682926339\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "argv": [
+        "/tmp/ohm-over18-named-test/sdk/bin/cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-j8",
+        "-p",
+        "uv-cli"
+      ],
+      "before": {
+        "affinity": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "files": {
+          "/proc/loadavg": "28.31 22.92 20.84 37/1076 16018",
+          "/proc/pressure/cpu": "some avg10=8.29 avg60=8.54 avg300=5.20 total=14671855541\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "/proc/pressure/io": "some avg10=0.00 avg60=0.01 avg300=0.02 total=6554835215\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=6148781928",
+          "/sys/fs/cgroup/cpu.stat": "usage_usec 2196178480962\nuser_usec 1549799551607\nsystem_usec 646378929355\nnice_usec 124639414042\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "end_monotonic_ns": 576231303209763,
+      "exit": 0,
+      "source": "/tmp/ohm-over18-named-test/source",
+      "start_monotonic_ns": 576225839673430,
+      "stderr": "6f7f1a57f5c5bbc1fa7340fa4a1568147b832a9e103050203ecca3789c911b3f",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "wait4": {
+        "ru_inblock": 0,
+        "ru_majflt": 6,
+        "ru_maxrss": 1100528,
+        "ru_minflt": 289046,
+        "ru_nivcsw": 5430,
+        "ru_nvcsw": 4522,
+        "ru_oublock": 8,
+        "ru_stime": 2.14589,
+        "ru_utime": 9.553768
+      },
+      "wall_ns": 5463536333
+    },
+    "digests": {
+      "clock": "2e9a7f9d029206bab8e3d5789a9cbe04151e14affd5a8a59ac287bbca289504a",
+      "cold": "a4258a61425db1d1a6f9f5fd0039cc62e84e579e5b2ce2926380266c37fac249",
+      "physical": "c550a6c328f6ec98c56f207af22caad4156ebb124322fcfb1206dc0c196a3eaa",
+      "seed_document": "984d86a22c6b3b556076ab2d60bbda341e52f8faf83538f13798175b417828d8"
+    },
+    "edit": {
+      "changed": {
+        "crates/uv-cli/src/lib.rs": "6ae2e6c387acb1c50de02b45287a606d0c227b10",
+        "crates/uv/src/commands/cache_size.rs": "25513b30eb8b8d7e024d21098917f082a43c4290",
+        "crates/uv/src/lib.rs": "83ca7001d30d794188749df9b68233d1de2f179a",
+        "crates/uv/tests/build/cache_size.rs": "a31bde79e97a05ecef287311f5827c96abef4b28"
+      },
+      "head": "5d4a62d7461c7708f3e65d08cef0e99bad94c004",
+      "index": "1a65966e47af6cbd53cfbe74926c3d482797cd2cdfdd488c226f7984100a2313",
+      "lock": "2ab7a7e2d64ab31200b78f1729ca83f15b247f65fcdc63fa5550d41b9f1b2164",
+      "source": "544157b31dbc6007bfdfe2789d3d068278fdb57d",
+      "tag": "0.12.2-16-g5d4a62d",
+      "tracked": 1608,
+      "tree": "d349e21ea9daed41d08d6b70b2583701f0dffa03"
+    },
+    "kernel_sha": "d383b12ab26e8f736645e44dd3c64718f40b3776eff7c82f39aff41aa46aa4b9",
+    "observed": {
+      "accepted": true,
+      "bare_clock": "2e9a7f9d029206bab8e3d5789a9cbe04151e14affd5a8a59ac287bbca289504a",
+      "dirty": [
+        "build_script_build",
+        "uv_cli",
+        "uv_python"
+      ],
+      "independent_native": "a4258a61425db1d1a6f9f5fd0039cc62e84e579e5b2ce2926380266c37fac249",
+      "kernel": "d383b12ab26e8f736645e44dd3c64718f40b3776eff7c82f39aff41aa46aa4b9",
+      "label": "candidate-1",
+      "linked_transition": {
+        "A_objects": 209,
+        "B_objects": 209,
+        "same_content_any_name": 181,
+        "same_name": 0,
+        "same_name_and_content": 0
+      },
+      "products": 1794,
+      "role": "candidate",
+      "seed": {
+        "bytes": 655526241,
+        "files": {
+          "count": 12851,
+          "sha256": "403d96396b892fe515fd16d2fa5772b4a3f4130dc77e6b29195790a456a93e87"
+        },
+        "sha256": "e368f642b4478c1d912fcea6f0ea34cf6088a176142cb004f9a9e30def2db878"
+      },
+      "wall_ns": 5463536333,
+      "warm_and_cold_B_sidecars": 448
+    },
+    "physical": {
+      "boot": "5a939a53-79ef-4ab0-8ada-c57a788992d3",
+      "exit": 0,
+      "registration": "237cfbea4c46afa5e534c961c379d824abd81b32e216f19c0ab59ff2e81811d8",
+      "registry": "read-only",
+      "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sdk": {
+      "candidate": {
+        "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+        "driver": "b179c2694c8daf8746deb637e96dd06f4e4f6ad1cbee9fdcd7245cc1720f9b50",
+        "source": "e4edbdd943f2ceac098ddde880e8f97a3bb3270f"
+      }
+    },
+    "seed": {
+      "bytes": 655526241,
+      "files": {
+        "count": 12851,
+        "sha256": "403d96396b892fe515fd16d2fa5772b4a3f4130dc77e6b29195790a456a93e87"
+      },
+      "sha256": "e368f642b4478c1d912fcea6f0ea34cf6088a176142cb004f9a9e30def2db878"
+    }
+  },
+  "candidate-2": {
+    "accepted": {
+      "accepted": true,
+      "bare_clock": "04bb1ba0a4876860cdacdf134ce4d949f14164c33bab92e0297d90b890f474d0",
+      "dirty": [
+        "build_script_build",
+        "uv_cli",
+        "uv_python"
+      ],
+      "independent_native": "2a774bed0661af785aecc540c006e08fab0ffc9d5514227480b4e53ddb94819d",
+      "kernel": "cdaf1d9753afba03ec06bda041378b3df4dc11d2b7cf128fedf2259ed0df2d04",
+      "label": "candidate-2",
+      "linked_transition": {
+        "A_objects": 209,
+        "B_objects": 209,
+        "same_content_any_name": 181,
+        "same_name": 0,
+        "same_name_and_content": 0
+      },
+      "physical_sha256": "b4609a4e019dec988af98f0903f070a59542848e3464b81ac829ed9d18c0c174",
+      "products": 1794,
+      "role": "candidate",
+      "seed": {
+        "bytes": 655553043,
+        "files": {
+          "count": 12851,
+          "sha256": "322717772b8670f4e8d2369df9757708f7ecc98c3137dcdf67e85fefa45613b1"
+        },
+        "sha256": "a5b07d57db9393618ee2aee6bc19f9e16a617e110133626e582a1b2e2f1a1938"
+      },
+      "source": {
+        "commit": "e4edbdd943f2ceac098ddde880e8f97a3bb3270f",
+        "epoch": 43323,
+        "tree": "8fdc0aa6f4833c25814f97056ed639212e53b6d5"
+      },
+      "wall_ns": 4942325461,
+      "warm_and_cold_B_sidecars": 448
+    },
+    "clock": {
+      "after": {
+        "affinity": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "files": {
+          "/proc/loadavg": "24.43 25.33 22.66 12/994 16522",
+          "/proc/pressure/cpu": "some avg10=0.88 avg60=5.20 avg300=6.30 total=14696843211\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "/proc/pressure/io": "some avg10=0.00 avg60=0.00 avg300=0.00 total=6555008532\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=6148922440",
+          "/sys/fs/cgroup/cpu.stat": "usage_usec 2201784511565\nuser_usec 1553154042780\nsystem_usec 648630468784\nnice_usec 126402634151\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "argv": [
+        "/tmp/ohm-over18-named-test/sdk/bin/cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-j8",
+        "-p",
+        "uv-cli"
+      ],
+      "before": {
+        "affinity": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "files": {
+          "/proc/loadavg": "25.17 25.49 22.69 10/985 16020",
+          "/proc/pressure/cpu": "some avg10=1.31 avg60=5.55 avg300=6.39 total=14696801071\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "/proc/pressure/io": "some avg10=0.00 avg60=0.00 avg300=0.00 total=6555008240\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=6148922159",
+          "/sys/fs/cgroup/cpu.stat": "usage_usec 2201720178037\nuser_usec 1553111966266\nsystem_usec 648608211771\nnice_usec 126383195714\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "end_monotonic_ns": 576546986843493,
+      "exit": 0,
+      "source": "/tmp/ohm-over18-named-test/source",
+      "start_monotonic_ns": 576542044518032,
+      "stderr": "3605143d3e62f2aff2e2310865ec1f8a561301ab8225059db377f15295d00268",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "wait4": {
+        "ru_inblock": 0,
+        "ru_majflt": 0,
+        "ru_maxrss": 1129504,
+        "ru_minflt": 296549,
+        "ru_nivcsw": 1370,
+        "ru_nvcsw": 6497,
+        "ru_oublock": 8,
+        "ru_stime": 2.254945,
+        "ru_utime": 8.835058
+      },
+      "wall_ns": 4942325461
+    },
+    "digests": {
+      "clock": "04bb1ba0a4876860cdacdf134ce4d949f14164c33bab92e0297d90b890f474d0",
+      "cold": "2a774bed0661af785aecc540c006e08fab0ffc9d5514227480b4e53ddb94819d",
+      "physical": "b4609a4e019dec988af98f0903f070a59542848e3464b81ac829ed9d18c0c174",
+      "seed_document": "21044b955662644ec6af5bebe1b4a0dd9012aeeb68491ebd29a35bbfa8a51b4b"
+    },
+    "edit": {
+      "changed": {
+        "crates/uv-cli/src/lib.rs": "6ae2e6c387acb1c50de02b45287a606d0c227b10",
+        "crates/uv/src/commands/cache_size.rs": "25513b30eb8b8d7e024d21098917f082a43c4290",
+        "crates/uv/src/lib.rs": "83ca7001d30d794188749df9b68233d1de2f179a",
+        "crates/uv/tests/build/cache_size.rs": "a31bde79e97a05ecef287311f5827c96abef4b28"
+      },
+      "head": "5d4a62d7461c7708f3e65d08cef0e99bad94c004",
+      "index": "1a65966e47af6cbd53cfbe74926c3d482797cd2cdfdd488c226f7984100a2313",
+      "lock": "2ab7a7e2d64ab31200b78f1729ca83f15b247f65fcdc63fa5550d41b9f1b2164",
+      "source": "544157b31dbc6007bfdfe2789d3d068278fdb57d",
+      "tag": "0.12.2-16-g5d4a62d",
+      "tracked": 1608,
+      "tree": "d349e21ea9daed41d08d6b70b2583701f0dffa03"
+    },
+    "kernel_sha": "cdaf1d9753afba03ec06bda041378b3df4dc11d2b7cf128fedf2259ed0df2d04",
+    "observed": {
+      "accepted": true,
+      "bare_clock": "04bb1ba0a4876860cdacdf134ce4d949f14164c33bab92e0297d90b890f474d0",
+      "dirty": [
+        "build_script_build",
+        "uv_cli",
+        "uv_python"
+      ],
+      "independent_native": "2a774bed0661af785aecc540c006e08fab0ffc9d5514227480b4e53ddb94819d",
+      "kernel": "cdaf1d9753afba03ec06bda041378b3df4dc11d2b7cf128fedf2259ed0df2d04",
+      "label": "candidate-2",
+      "linked_transition": {
+        "A_objects": 209,
+        "B_objects": 209,
+        "same_content_any_name": 181,
+        "same_name": 0,
+        "same_name_and_content": 0
+      },
+      "products": 1794,
+      "role": "candidate",
+      "seed": {
+        "bytes": 655553043,
+        "files": {
+          "count": 12851,
+          "sha256": "322717772b8670f4e8d2369df9757708f7ecc98c3137dcdf67e85fefa45613b1"
+        },
+        "sha256": "a5b07d57db9393618ee2aee6bc19f9e16a617e110133626e582a1b2e2f1a1938"
+      },
+      "wall_ns": 4942325461,
+      "warm_and_cold_B_sidecars": 448
+    },
+    "physical": {
+      "boot": "5a939a53-79ef-4ab0-8ada-c57a788992d3",
+      "exit": 0,
+      "registration": "237cfbea4c46afa5e534c961c379d824abd81b32e216f19c0ab59ff2e81811d8",
+      "registry": "read-only",
+      "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sdk": {
+      "candidate": {
+        "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+        "driver": "b179c2694c8daf8746deb637e96dd06f4e4f6ad1cbee9fdcd7245cc1720f9b50",
+        "source": "e4edbdd943f2ceac098ddde880e8f97a3bb3270f"
+      }
+    },
+    "seed": {
+      "bytes": 655553043,
+      "files": {
+        "count": 12851,
+        "sha256": "322717772b8670f4e8d2369df9757708f7ecc98c3137dcdf67e85fefa45613b1"
+      },
+      "sha256": "a5b07d57db9393618ee2aee6bc19f9e16a617e110133626e582a1b2e2f1a1938"
+    }
+  },
+  "parent-1": {
+    "accepted": {
+      "accepted": true,
+      "bare_clock": "497844a0967ce1d837040241a29fdc1c6495ab655132dc1017d13ff2f1068d11",
+      "dirty": [
+        "build_script_build",
+        "uv_cli",
+        "uv_python"
+      ],
+      "independent_native": "04c694e19142f6a4836968b1f3bbf6ced9f659e7d3b6f788cba77cb1d71a3b00",
+      "kernel": "e769f6bfbcbce734ac4e942659a63439c652d8f11e2da35fe2ae03b4b01c9c84",
+      "label": "parent-1",
+      "linked_transition": {
+        "A_objects": 209,
+        "B_objects": 209,
+        "same_content_any_name": 181,
+        "same_name": 0,
+        "same_name_and_content": 0
+      },
+      "physical_sha256": "70f9faa511a78b113a78bf2bb4fcc01394ebd1f55906eceeb7a49834d3d115f6",
+      "products": 1794,
+      "role": "parent",
+      "seed": {
+        "bytes": 656621969,
+        "files": {
+          "count": 12858,
+          "sha256": "20d4bca766cdd3d9af353cfaa17a277f2c1813a82ff03d30b496587dd2e5f3a9"
+        },
+        "sha256": "4bfa543828e2ae0814802a224c27d792adddf5850a498cb41b894c139375516b"
+      },
+      "source": {
+        "commit": "ac67101cb973e35ce8ff044cc8014c2c76bab69e",
+        "epoch": 43319,
+        "tree": "1c07367341a9cc53272e9eefdae1ac8823d44839"
+      },
+      "wall_ns": 5309712732,
+      "warm_and_cold_B_sidecars": 448
+    },
+    "clock": {
+      "after": {
+        "affinity": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "files": {
+          "/proc/loadavg": "23.37 22.44 20.08 15/1021 16531",
+          "/proc/pressure/cpu": "some avg10=2.71 avg60=4.52 avg300=4.43 total=14563139487\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "/proc/pressure/io": "some avg10=0.00 avg60=0.00 avg300=0.00 total=6551448891\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=6146127589",
+          "/sys/fs/cgroup/cpu.stat": "usage_usec 2163555674538\nuser_usec 1530646332268\nsystem_usec 632909342270\nnice_usec 112808636192\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "argv": [
+        "/tmp/ohm-over18-named-test/sdk/bin/cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-j8",
+        "-p",
+        "uv-cli"
+      ],
+      "before": {
+        "affinity": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "files": {
+          "/proc/loadavg": "22.53 22.26 20.01 18/1055 16030",
+          "/proc/pressure/cpu": "some avg10=1.61 avg60=4.60 avg300=4.44 total=14562885772\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "/proc/pressure/io": "some avg10=0.00 avg60=0.00 avg300=0.00 total=6551442884\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=6146122760",
+          "/sys/fs/cgroup/cpu.stat": "usage_usec 2163469260643\nuser_usec 1530597193976\nsystem_usec 632872066666\nnice_usec 112779636107\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "end_monotonic_ns": 574032853448412,
+      "exit": 0,
+      "source": "/tmp/ohm-over18-named-test/source",
+      "start_monotonic_ns": 574027543735680,
+      "stderr": "0204623e179c2dc50be3bbc1af018265e8e6f93502b5d78e8c82af8bb06c74dc",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "wait4": {
+        "ru_inblock": 0,
+        "ru_majflt": 0,
+        "ru_maxrss": 1050936,
+        "ru_minflt": 294536,
+        "ru_nivcsw": 3193,
+        "ru_nvcsw": 5638,
+        "ru_oublock": 8,
+        "ru_stime": 2.125846,
+        "ru_utime": 9.515545
+      },
+      "wall_ns": 5309712732
+    },
+    "digests": {
+      "clock": "497844a0967ce1d837040241a29fdc1c6495ab655132dc1017d13ff2f1068d11",
+      "cold": "04c694e19142f6a4836968b1f3bbf6ced9f659e7d3b6f788cba77cb1d71a3b00",
+      "physical": "70f9faa511a78b113a78bf2bb4fcc01394ebd1f55906eceeb7a49834d3d115f6",
+      "seed_document": "a9bb5702934b28c6fd8b978882554bed4fe590855a0097de1c6cf88fba5d41a9"
+    },
+    "edit": {
+      "changed": {
+        "crates/uv-cli/src/lib.rs": "6ae2e6c387acb1c50de02b45287a606d0c227b10",
+        "crates/uv/src/commands/cache_size.rs": "25513b30eb8b8d7e024d21098917f082a43c4290",
+        "crates/uv/src/lib.rs": "83ca7001d30d794188749df9b68233d1de2f179a",
+        "crates/uv/tests/build/cache_size.rs": "a31bde79e97a05ecef287311f5827c96abef4b28"
+      },
+      "head": "5d4a62d7461c7708f3e65d08cef0e99bad94c004",
+      "index": "1a65966e47af6cbd53cfbe74926c3d482797cd2cdfdd488c226f7984100a2313",
+      "lock": "2ab7a7e2d64ab31200b78f1729ca83f15b247f65fcdc63fa5550d41b9f1b2164",
+      "source": "544157b31dbc6007bfdfe2789d3d068278fdb57d",
+      "tag": "0.12.2-16-g5d4a62d",
+      "tracked": 1608,
+      "tree": "d349e21ea9daed41d08d6b70b2583701f0dffa03"
+    },
+    "kernel_sha": "e769f6bfbcbce734ac4e942659a63439c652d8f11e2da35fe2ae03b4b01c9c84",
+    "observed": {
+      "accepted": true,
+      "bare_clock": "497844a0967ce1d837040241a29fdc1c6495ab655132dc1017d13ff2f1068d11",
+      "dirty": [
+        "build_script_build",
+        "uv_cli",
+        "uv_python"
+      ],
+      "independent_native": "04c694e19142f6a4836968b1f3bbf6ced9f659e7d3b6f788cba77cb1d71a3b00",
+      "kernel": "e769f6bfbcbce734ac4e942659a63439c652d8f11e2da35fe2ae03b4b01c9c84",
+      "label": "parent-1",
+      "linked_transition": {
+        "A_objects": 209,
+        "B_objects": 209,
+        "same_content_any_name": 181,
+        "same_name": 0,
+        "same_name_and_content": 0
+      },
+      "products": 1794,
+      "role": "parent",
+      "seed": {
+        "bytes": 656621969,
+        "files": {
+          "count": 12858,
+          "sha256": "20d4bca766cdd3d9af353cfaa17a277f2c1813a82ff03d30b496587dd2e5f3a9"
+        },
+        "sha256": "4bfa543828e2ae0814802a224c27d792adddf5850a498cb41b894c139375516b"
+      },
+      "wall_ns": 5309712732,
+      "warm_and_cold_B_sidecars": 448
+    },
+    "physical": {
+      "boot": "5a939a53-79ef-4ab0-8ada-c57a788992d3",
+      "exit": 0,
+      "registration": "237cfbea4c46afa5e534c961c379d824abd81b32e216f19c0ab59ff2e81811d8",
+      "registry": "read-only",
+      "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sdk": {
+      "parent": {
+        "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+        "driver": "30b37542247b66141d3b5cfaafc47ea423785de4048f65b2cf2e6806181b7e0b",
+        "source": "ac67101cb973e35ce8ff044cc8014c2c76bab69e"
+      }
+    },
+    "seed": {
+      "bytes": 656621969,
+      "files": {
+        "count": 12858,
+        "sha256": "20d4bca766cdd3d9af353cfaa17a277f2c1813a82ff03d30b496587dd2e5f3a9"
+      },
+      "sha256": "4bfa543828e2ae0814802a224c27d792adddf5850a498cb41b894c139375516b"
+    }
+  },
+  "parent-2": {
+    "accepted": {
+      "accepted": true,
+      "bare_clock": "779fd40e2f32f0fd6ac4393ebeaafcce2f5c00bcae76e3e3e5213971eaf4f8ad",
+      "dirty": [
+        "build_script_build",
+        "uv_cli",
+        "uv_python"
+      ],
+      "independent_native": "9b305ba743b5feecd512d34e3ddafd563d5a50a85ac8d016a0707f4311d62112",
+      "kernel": "0013e59c664532a2bb3adc52533ada2d4342f9077a85692000b7d2baa1101212",
+      "label": "parent-2",
+      "linked_transition": {
+        "A_objects": 209,
+        "B_objects": 209,
+        "same_content_any_name": 181,
+        "same_name": 0,
+        "same_name_and_content": 0
+      },
+      "physical_sha256": "0e7aa58af5957362bd70fabcccc6ebc05cfbb518b3dea4e4a2ed162b7c117e38",
+      "products": 1794,
+      "role": "parent",
+      "seed": {
+        "bytes": 656662929,
+        "files": {
+          "count": 12858,
+          "sha256": "64a9ac1274bf4255e599120ee6c9216dc640905346a6e3a16a18249e371707ef"
+        },
+        "sha256": "cfac696da2ecfe486bf2bb359c7fa2aa0cede859dcf957899e5ea145f0a7c27c"
+      },
+      "source": {
+        "commit": "ac67101cb973e35ce8ff044cc8014c2c76bab69e",
+        "epoch": 43319,
+        "tree": "1c07367341a9cc53272e9eefdae1ac8823d44839"
+      },
+      "wall_ns": 5313064982,
+      "warm_and_cold_B_sidecars": 448
+    },
+    "clock": {
+      "after": {
+        "affinity": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "files": {
+          "/proc/loadavg": "20.96 22.84 22.37 20/1018 16530",
+          "/proc/pressure/cpu": "some avg10=1.19 avg60=2.70 avg300=4.17 total=14708549412\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "/proc/pressure/io": "some avg10=0.00 avg60=0.00 avg300=0.00 total=6555166810\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=6149057165",
+          "/sys/fs/cgroup/cpu.stat": "usage_usec 2206240944074\nuser_usec 1555841018213\nsystem_usec 650399925861\nnice_usec 127510269876\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "argv": [
+        "/tmp/ohm-over18-named-test/sdk/bin/cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-j8",
+        "-p",
+        "uv-cli"
+      ],
+      "before": {
+        "affinity": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "files": {
+          "/proc/loadavg": "20.70 22.82 22.37 24/1006 16029",
+          "/proc/pressure/cpu": "some avg10=0.97 avg60=2.79 avg300=4.21 total=14708407489\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "/proc/pressure/io": "some avg10=0.00 avg60=0.00 avg300=0.00 total=6555165756\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=6149056150",
+          "/sys/fs/cgroup/cpu.stat": "usage_usec 2206162053840\nuser_usec 1555793222428\nsystem_usec 650368831412\nnice_usec 127485685257\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "end_monotonic_ns": 576864968948861,
+      "exit": 0,
+      "source": "/tmp/ohm-over18-named-test/source",
+      "start_monotonic_ns": 576859655883879,
+      "stderr": "749f47cfb3021a470a946a7985790e6849bd37e9baca3fa70c1555daccfce0fc",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "wait4": {
+        "ru_inblock": 0,
+        "ru_majflt": 0,
+        "ru_maxrss": 1059696,
+        "ru_minflt": 296329,
+        "ru_nivcsw": 2743,
+        "ru_nvcsw": 5823,
+        "ru_oublock": 8,
+        "ru_stime": 2.292839,
+        "ru_utime": 9.919068
+      },
+      "wall_ns": 5313064982
+    },
+    "digests": {
+      "clock": "779fd40e2f32f0fd6ac4393ebeaafcce2f5c00bcae76e3e3e5213971eaf4f8ad",
+      "cold": "9b305ba743b5feecd512d34e3ddafd563d5a50a85ac8d016a0707f4311d62112",
+      "physical": "0e7aa58af5957362bd70fabcccc6ebc05cfbb518b3dea4e4a2ed162b7c117e38",
+      "seed_document": "0aa29b51bf99456b129d433772e3574cfb02b45fe5c8ad46b0d363ae3e462caa"
+    },
+    "edit": {
+      "changed": {
+        "crates/uv-cli/src/lib.rs": "6ae2e6c387acb1c50de02b45287a606d0c227b10",
+        "crates/uv/src/commands/cache_size.rs": "25513b30eb8b8d7e024d21098917f082a43c4290",
+        "crates/uv/src/lib.rs": "83ca7001d30d794188749df9b68233d1de2f179a",
+        "crates/uv/tests/build/cache_size.rs": "a31bde79e97a05ecef287311f5827c96abef4b28"
+      },
+      "head": "5d4a62d7461c7708f3e65d08cef0e99bad94c004",
+      "index": "1a65966e47af6cbd53cfbe74926c3d482797cd2cdfdd488c226f7984100a2313",
+      "lock": "2ab7a7e2d64ab31200b78f1729ca83f15b247f65fcdc63fa5550d41b9f1b2164",
+      "source": "544157b31dbc6007bfdfe2789d3d068278fdb57d",
+      "tag": "0.12.2-16-g5d4a62d",
+      "tracked": 1608,
+      "tree": "d349e21ea9daed41d08d6b70b2583701f0dffa03"
+    },
+    "kernel_sha": "0013e59c664532a2bb3adc52533ada2d4342f9077a85692000b7d2baa1101212",
+    "observed": {
+      "accepted": true,
+      "bare_clock": "779fd40e2f32f0fd6ac4393ebeaafcce2f5c00bcae76e3e3e5213971eaf4f8ad",
+      "dirty": [
+        "build_script_build",
+        "uv_cli",
+        "uv_python"
+      ],
+      "independent_native": "9b305ba743b5feecd512d34e3ddafd563d5a50a85ac8d016a0707f4311d62112",
+      "kernel": "0013e59c664532a2bb3adc52533ada2d4342f9077a85692000b7d2baa1101212",
+      "label": "parent-2",
+      "linked_transition": {
+        "A_objects": 209,
+        "B_objects": 209,
+        "same_content_any_name": 181,
+        "same_name": 0,
+        "same_name_and_content": 0
+      },
+      "products": 1794,
+      "role": "parent",
+      "seed": {
+        "bytes": 656662929,
+        "files": {
+          "count": 12858,
+          "sha256": "64a9ac1274bf4255e599120ee6c9216dc640905346a6e3a16a18249e371707ef"
+        },
+        "sha256": "cfac696da2ecfe486bf2bb359c7fa2aa0cede859dcf957899e5ea145f0a7c27c"
+      },
+      "wall_ns": 5313064982,
+      "warm_and_cold_B_sidecars": 448
+    },
+    "physical": {
+      "boot": "5a939a53-79ef-4ab0-8ada-c57a788992d3",
+      "exit": 0,
+      "registration": "237cfbea4c46afa5e534c961c379d824abd81b32e216f19c0ab59ff2e81811d8",
+      "registry": "read-only",
+      "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sdk": {
+      "parent": {
+        "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+        "driver": "30b37542247b66141d3b5cfaafc47ea423785de4048f65b2cf2e6806181b7e0b",
+        "source": "ac67101cb973e35ce8ff044cc8014c2c76bab69e"
+      }
+    },
+    "seed": {
+      "bytes": 656662929,
+      "files": {
+        "count": 12858,
+        "sha256": "64a9ac1274bf4255e599120ee6c9216dc640905346a6e3a16a18249e371707ef"
+      },
+      "sha256": "cfac696da2ecfe486bf2bb359c7fa2aa0cede859dcf957899e5ea145f0a7c27c"
+    }
+  }
+}

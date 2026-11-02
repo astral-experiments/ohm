@@ -6,21 +6,31 @@ name: 'Ordinary uv-cli build after the landed #20992 edit'
         description: Exact inspected coordinator commit
         required: true
         type: string
+      check_reader_head:
+        description: Published qualifying production check coordinator
+        required: true
+        type: string
+      activation_sha256:
+        description: Reviewed source, pilot and four local build gates
+        required: true
+        type: string
 permissions:
   contents: read
   actions: read
   attestations: read
 concurrency:
-  group: uv-20992-derive-production-build-guard
+  group: uv-20992-origin-production-build-guard
   cancel-in-progress: false
 jobs:
   guard:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20992-production-build-guard' && github.run_attempt == 1 && github.sha == inputs.reviewed_head
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20992-trait-origin-production-build-guard' && github.run_attempt == 1 && github.sha == inputs.reviewed_head && inputs.check_reader_head == '0aecea4345b011433b5f65daf055a924946605ae' && inputs.activation_sha256 == 'b31ced6e872b500eaddc33bfd870434965be61591d02fa322146f96ed7fc5a01'
     name: Eight paired ordinary linked-library builds on production rustc
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 120
+    timeout-minutes: 240
     env:
       PYTHONDONTWRITEBYTECODE: '1'
+      CHECK_READER_HEAD: ${{ inputs.check_reader_head }}
+      ACTIVATION_SHA256: ${{ inputs.activation_sha256 }}
       INPUT_SOURCE: ${{ inputs.reviewed_head }}
     steps:
       - name: Check out the exact reviewed study and existing release readers
@@ -29,12 +39,22 @@ jobs:
           path: measure
           ref: ${{ github.sha }}
           persist-credentials: false
+      - name: Check out the published and independently qualified SDK readers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: sdk-readers
+          ref: ${{ inputs.check_reader_head }}
+          sparse-checkout: |
+            scripts/uv-callables-21041
+            scripts/handwritten-panel
+          persist-credentials: false
       - name: Verify the complete carrier before any physical visit
         shell: bash
         run: |
           set -eu
           printf 'OHM20992_RESULT=%s/build-results\nOHM20992_TRANSIENT=%s/ohm-20992-native-state\n' "$GITHUB_WORKSPACE" "$RUNNER_TEMP" >> "$GITHUB_ENV"
           python3 -ISB measure/scripts/uv-library-build-20992/source_guard.py
+          python3 -ISB measure/scripts/uv-library-build-20992/guard_admission.py
       - name: Check out the existing inherited counter
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -65,7 +85,7 @@ jobs:
       - name: Retain the fresh physical boot and all three calibration identities
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-20992-production-early-boot
+          name: uv-20992-origin-build-early-boot
           path: build-results/calibration.json
           if-no-files-found: error
           retention-days: 7
@@ -73,14 +93,14 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           path: control-builder
-          ref: 5f7e5680285caa6b9a848db810b63ef58dfe0143
+          ref: 731d81a4cb3498cf4221d53a267bbf4a76ca250f
           sparse-checkout: scripts/ctfe22-gnu
           persist-credentials: false
-      - name: Check out the generated-derive production verifier
+      - name: Check out the trait-directory production verifier
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           path: treatment-builder
-          ref: 731d81a4cb3498cf4221d53a267bbf4a76ca250f
+          ref: b1d42cb19bed32c5c8e045b55a2a0aecb6da7315
           sparse-checkout: scripts/ctfe22-gnu
           persist-credentials: false
       - name: Verify original service metadata, PGO+BOLT packages, native QA, and official signed Cargo
@@ -111,7 +131,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-20992-production-original
+          name: uv-20992-origin-build-original
           path: build-results
           if-no-files-found: error
           compression-level: 1

@@ -8,7 +8,7 @@ sys.path.insert(0,str(HERE))
 import native
 import material
 def main():
-    assert os.environ["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and os.environ["GITHUB_REF"]=="refs/heads/charlie/codex-20992-production-build-guard"
+    assert os.environ["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and os.environ["GITHUB_REF"]=="refs/heads/charlie/codex-20992-trait-origin-production-build-guard"
     w=Path(os.environ["GITHUB_WORKSPACE"]);donor=w/"uv-donor";assert donor.is_dir()
     names=[];places=set()
     for p in (donor,native.SRC,w,Path(os.environ["HOME"])):

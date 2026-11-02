@@ -74,7 +74,7 @@ def verify_role_roundtrips():
     records={}
     for role in ("candidate","parent"):
         sdk=select(role);w,seed,receipt=read_seed(role,1)
-        prior=[native.read(anchors(role,h)/"sdk.json")for h in (1,2)]
+        prior=[native.read(anchors(role,h)/"sdk.json")for h in range(1,9)]
         assert all(k["launcher_file"]==sdk["launcher_file"] and k["cargo_file"]==sdk["cargo_file"] for k in prior)
         dest=native.ROOT/("preclock-return-"+role);reseed(seed,receipt,"A",dest)
         observed=kernel.enroll(dest/"process","A")
@@ -108,35 +108,42 @@ def enrollment():
     hardware.enter();bank=native.TRANSIENT/"registry";assert native.read(native.ROOT/"registry.json")["count"]==658
     donor=Path(os.environ["GITHUB_WORKSPACE"])/"uv-donor"
     base_shapes={}
-    for hold,order in enumerate((("parent","candidate"),("candidate","parent")),start=1):
-        for role in order:
+    orders = [order for block in P["orders"] for order in block]
+    for hold,order in enumerate(orders,start=1):
+        for letter in order:
+            role = ROLES[letter]
             hardware.caller_watchdog();info=select(role);where,seed,_,_=native.open_seed(role,hold,donor,bank)
             open_from_seed(role,hold,seed,native.read(where/"seed.json"),where,info["driver"])
             for state in ("A","B"):
                 k=native.read(where/(state+"-kernel")/"process/observed-rustcs.json")
                 if state not in base_shapes:base_shapes[state]=k
                 else:native.save(where/(state+"-cross-kernel-shape.json"),kernel.match(base_shapes[state],k))
-                if hold==2:
+                if hold>1:
                     left=native.read(anchors(role,1)/("anchor-"+state)/"native-products.json")
                     right=native.read(where/("anchor-"+state)/"native-products.json")
                     native.save(where/(state+"-across-independent.json"),evidence.compare(left,right,state,independent=True))
             native.save(where/"opening.json",dict(hold=hold,role=role,A_B=native.sha(where/"A-B-behavior.json"),seed=native.sha(where/"seed.json"),A=native.sha(where/"anchor-A/native-products.json"),B=native.sha(where/"anchor-B/native-products.json"),actual_A=native.sha(where/"A-kernel/process/observed-rustcs.json"),actual_B=native.sha(where/"B-kernel/process/observed-rustcs.json")))
     sealed={}
     cargo_receipts=[]
-    for h in (1,2):
+    for h in range(1,9):
         for r in ("parent","candidate"):
             w=anchors(r,h);sealed[f"{r}-{h}"]={p.relative_to(w).as_posix():native.sha(p) for p in sorted(w.rglob("*.json"))}
             sdk=native.read(w/"sdk.json");cargo_receipts.append((tuple(sdk["cargo_file"]),sdk["canonical_cargo"],sdk["canonical_sysroot"]))
     assert len(set(cargo_receipts))==1
     verify_role_roundtrips()
-    native.save(native.ROOT/"all-four-openings.json",sealed)
+    native.save(native.ROOT/"all-sixteen-openings.json",sealed)
 def verify_openings():
-    record=native.read(native.ROOT/"all-four-openings.json")
-    assert len(record)==4
+    record=native.read(native.ROOT/"all-sixteen-openings.json")
+    expected = {f"{role}-{pair}" for pair in range(1,9) for role in ("parent","candidate")}
+    assert record.keys() == expected
+    cold = [native.read(native.ROOT / ("opening-" + tag) / "ordinary-cold-A" / "record.json") for tag in sorted(expected)]
+    windows = sorted((item["start_monotonic_ns"], item["end_monotonic_ns"]) for item in cold)
+    assert all(item["exit"] == 0 and item["argv"] == kernel.command(verbose=True) for item in cold)
+    assert all(start < end for start,end in windows) and all(a[1] < b[0] for a,b in zip(windows,windows[1:]))
     for tag,files in record.items():
         assert all(native.sha(native.ROOT/("opening-"+tag)/n)==h for n,h in files.items())
 def one(number,arm,hold,role,mode):
-    info=select(role);w,s,j=read_seed(role,hold);out=native.ROOT/f"pair-{number:02d}"/f"{arm}-{role}"/mode
+    info=select(role);w,s,j=read_seed(role,number);out=native.ROOT/f"pair-{number:02d}"/f"{arm}-{role}"/mode
     reseed(s,j,"B",out);anchor=native.read(w/"anchor-B/native-products.json")
     selector=native.read(w/"B-kernel/process/observed-rustcs.json")
     if mode=="ordinary":
@@ -170,7 +177,7 @@ def measure():
         bucket.setdefault(r["role"],{})[r["mode"]]=r
     assert len(samples)==48 and len(rows)==8
     summary=wall_rule(rows)
-    native.save(native.ROOT/"result.json",dict(registration=native.sha(HERE/"protocol.json"),all_four=native.sha(native.ROOT/"all-four-openings.json"),clock_pre=native.sha(native.ROOT/"clock-pre/passed.json"),clock_post=native.sha(native.ROOT/"clock-post/passed.json"),rows=rows,**summary))
+    native.save(native.ROOT/"result.json",dict(registration=native.sha(HERE/"protocol.json"),all_sixteen=native.sha(native.ROOT/"all-sixteen-openings.json"),clock_pre=native.sha(native.ROOT/"clock-pre/passed.json"),clock_post=native.sha(native.ROOT/"clock-post/passed.json"),rows=rows,**summary))
 def wall_rule(rows):
     assert set(rows)==set(range(1,9))
     ratios=[]

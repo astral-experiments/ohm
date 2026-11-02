@@ -58,6 +58,7 @@ def archive_seed(seed,receipt):
     subprocess.run(["/usr/bin/tar","--sort=name","--format=pax","--pax-option=delete=atime,delete=ctime","-I","zstd -T2 -2 --no-progress","-cf",seed,"-C",V,*MUT],env=environment(),check=True)
     assert 0<seed.stat().st_size<1800<<20
     seed.chmod(0o400)
+    assert 0 < seed.stat().st_size <= 1 << 30, "compressed original A seed exceeds its one-GiB slot"
     save(receipt,dict(bytes=seed.stat().st_size,sha256=sha(seed),files=snapshot()))
 def clear_mutable():
     assert V==Path("/tmp/ohm-over18-named-test") and (V/".owned-20992").is_file()

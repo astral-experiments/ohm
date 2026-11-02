@@ -9,7 +9,7 @@ def reopen():
         prior=root/f"opening-{role}-1";dest=root/("preclock-return-"+role);p=dest/"process"
         sdk=native.read(prior/"sdk.json");assert sdk["launcher_file"]==receipt["launcher"] and sdk["cargo_file"]==receipt["cargo"]
         for n in ("launcher_file","cargo_file","source","driver"):
-            assert native.read(root/f"opening-{role}-2/sdk.json")[n]==sdk[n]
+            assert all(native.read(root/f"opening-{role}-{pair}/sdk.json")[n]==sdk[n] for pair in range(2,9))
         actual=native.read(p/"observed-rustcs.json");k=kernel.EVENTS["decode"](native.read(p/"kernel-events.json"))
         assert actual["kernel_sha"]==native.sha(p/"kernel-events.json") and k["root"]==actual["root"] and k["exits"][k["root"]]==0
         cargo,=[x for x in k["images"]if x["pid"]==k["root"]];assert cargo["file"]==sdk["cargo_file"] and cargo["argv"]==actual["cargo"]==kernel.command()

@@ -19,10 +19,10 @@ def git(path,*args):return subprocess.check_output(["git","-C",path,*args],text=
 def main():
     w=Path(os.environ["GITHUB_WORKSPACE"]);tmp=Path(os.environ["RUNNER_TEMP"])/"ohm-20992-release-custody";tmp.mkdir()
     out=Path(os.environ["OHM20992_RESULT"]);proof=out/"intake";proof.mkdir()
-    check(os.environ["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and os.environ["GITHUB_REF"]=="refs/heads/charlie/codex-20992-production-build-guard","wrong study")
-    p=get(HERE/"protocol.json");lock=get(HERE/"physical-roles.json");metadata=w/"measure/scripts/uv-callables-21041"
-    check(sha(metadata/"pair.json")==lock["pair_sha256"] and sha(metadata/"derive/services.json")==lock["services_sha256"],"SDK role inputs changed")
-    for f,h in lock["reader_trees"].items():check(git(w/"measure","rev-parse","HEAD:"+f)==h,"release reader tree differs")
+    check(os.environ["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and os.environ["GITHUB_REF"]=="refs/heads/charlie/codex-20992-trait-origin-production-build-guard","wrong study")
+    p=get(HERE/"protocol.json");lock=get(HERE/"physical-roles.json");metadata=w/"sdk-readers/scripts/uv-callables-21041"
+    check(sha(metadata/"pair.json")==lock["pair_sha256"] and sha(metadata/"origin/services.json")==lock["services_sha256"],"SDK role inputs changed")
+    for f,h in lock["reader_trees"].items():check(git(w/("sdk-readers" if f=="scripts/uv-callables-21041" else "measure"),"rev-parse","HEAD:"+f)==h,"release reader tree differs")
     sys.path.insert(0,str(metadata));import production_archive as archive
     from production_service import service,PRODUCERS,ROLES
     assert ROLES==[lock["roles"][x]["role"]for x in ("parent","candidate")]
@@ -34,7 +34,7 @@ def main():
     old.released(tmp,proof);signed,=(tmp/"signed").glob("*.tar.gz");fixed=archive.official_cargo(signed,tmp);check(sha(fixed)==p["signed_cargo_sha256"],"unexpected signed Cargo")
     pool=tmp/"pool";pool.mkdir();identities={};locations={}
     for name,bench_builder in (("parent","control-builder"),("candidate","treatment-builder")):
-        check(shutil.disk_usage(tmp).free>48<<30,"insufficient space for the enrolled SDKs, scratch allowance and independent physical floor")
+        check(shutil.disk_usage(tmp).free>64<<30,"insufficient space for the enrolled SDKs, scratch allowance and independent physical floor")
         admitted=lock["roles"][name];role=admitted["role"];arm=get(metadata/"pair.json")["arms"][role];pr=PRODUCERS[role]
         check(role in ROLES and arm==admitted["pair_arm"],"different verified two-role package")
         d=proof/name;d.mkdir();docs=[]

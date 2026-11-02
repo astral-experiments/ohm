@@ -6,7 +6,7 @@ import os
 import subprocess
 import sys
 HERE=Path(__file__).resolve().parent
-scope="charlie/codex-20992-production-build-guard"
+scope="charlie/codex-20992-trait-origin-production-build-guard"
 manifest=HERE/"SHA256SUMS"
 def sha(p):
     with p.open("rb")as f:return hashlib.file_digest(f,"sha256").hexdigest()
@@ -18,7 +18,7 @@ def main():
         rows[name]=digest
     present={x.relative_to(HERE).as_posix() for x in HERE.rglob("*") if x.is_file() and x!=manifest}
     assert present==rows.keys() and all(sha(HERE/n)==h for n,h in rows.items())
-    assert sha(HERE/"protocol.json")=="d9f0648ba06a9623a55f1b1e1f11100a6d9fa20d808d38c5b9479669001094e9"
+    assert sha(HERE/"protocol.json")=="8a66ce06486d149045f2f806e537589d35f61bea767b1c5738d6a03cd7379ef2"
     bindings=json.loads((HERE/"physical-roles.json").read_bytes())
     assert set(bindings["roles"])=={"parent","candidate"} and len(bindings["reader_trees"])>=3
     if len(sys.argv)>1 and sys.argv[1]=="sources-only":return

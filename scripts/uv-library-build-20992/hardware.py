@@ -24,13 +24,16 @@ def machine():
     return dict(boot=boot(),cpus=selected,runner=os.environ["RUNNER_NAME"],run=int(os.environ["GITHUB_RUN_ID"]),job_key=os.environ["GITHUB_JOB"],attempt=int(os.environ["GITHUB_RUN_ATTEMPT"]),head=os.environ["GITHUB_SHA"])
 def preflight_scope():
     assert os.environ["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and os.environ["GITHUB_EVENT_NAME"]=="workflow_dispatch"
-    assert os.environ["GITHUB_REF"]=="refs/heads/charlie/codex-20992-production-build-guard" and os.environ["GITHUB_RUN_ATTEMPT"]=="1"
+    assert os.environ["GITHUB_REF"]=="refs/heads/charlie/codex-20992-trait-origin-production-build-guard" and os.environ["GITHUB_RUN_ATTEMPT"]=="1"
     assert os.environ["RUNNER_OS"]=="Linux" and os.environ["RUNNER_ARCH"]=="X64"
     return machine()
 def caller_watchdog():
     free=min(shutil.disk_usage(p).free for p in (native.TRANSIENT,native.V,native.ROOT))
     owned={p:int(subprocess.check_output(["du","-sb",p],text=True).split()[0])for p in (native.TRANSIENT,native.V,native.ROOT)}
-    total=sum(owned.values());assert total<24<<30 and free>(20<<30)+(24<<30)-total,(free,owned)
+    seeds=list(native.TRANSIENT.glob("seed-*-*.tar.zst"))
+    assert len(seeds)<=16 and all(0 < p.stat().st_size <= 1<<30 for p in seeds)
+    total=sum(owned.values())
+    assert total < 40<<30 and free > (20<<30)+max((40<<30)-total,(16-len(seeds))*(1<<30)),(free,owned,len(seeds))
 def clock_control(slot):
     where=native.ROOT/slot;where.mkdir();c=HERE/"timer.c";exe=native.TRANSIENT/"timer"
     subprocess.run(["cc","-std=gnu11","-O2","-Wall","-Wextra","-Werror",c,"-o",exe],check=True)

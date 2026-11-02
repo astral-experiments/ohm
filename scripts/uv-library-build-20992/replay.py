@@ -26,7 +26,7 @@ def main():
         for role in ("parent","candidate"):
             active_driver=native.read(root/"sdk-identities.json")[role]["driver"]
             for state in ("A","B"):
-                for hold in (1,2):
+                for hold in range(1,9):
                     w=worker.anchors(role,hold);z=w/("anchor-"+state);A=native.read(z/"native-products.json");links=native.read(z/"linked.json");native.linked.check_probe(links)
                     assert native.read(z/"hostile-native-mutants.json")==evidence.hostile(A)
                     assert native.read(z/"native-metadata.json")=={n:evidence.wire.ident(readonly_header(evidence.meta.metadata_member(evidence.unpack(a))[1]))for n,a in A["archives"].items()}
@@ -37,14 +37,15 @@ def main():
                         for n,v in k["targets"].items():
                             assert len([im for im in ev["images"]if im["pid"]==v["pid"] and im.get("argv")==v["argv"] and im["file"]==v["inode"]])==1 and ev["exits"][v["pid"]]==0
                         assert kernel.match(pure,k);obs=native.read(ck/"native-products.json");assert evidence.compare(A,obs,state)==native.read(ck/"all-equivalent.json")
-                first=native.read(worker.anchors(role,1)/("anchor-"+state)/"native-products.json")
-                assert evidence.compare(first,A,state,True)==native.read(worker.anchors(role,2)/(state+"-across-independent.json"))
+                    if hold > 1:
+                        first=native.read(worker.anchors(role,1)/("anchor-"+state)/"native-products.json")
+                        assert evidence.compare(first,A,state,True)==native.read(w/(state+"-across-independent.json"))
         ratios=[];roles={"C":"candidate","P":"parent"}
         for h,orders in enumerate(p["orders"],start=1):
             for i,order in enumerate(orders,start=1):
                 k=(h-1)*4+i;pair={}
                 for pos,ch in enumerate(order,start=1):
-                    role=roles[ch];w=worker.anchors(role,h);anchor=native.read(w/"anchor-B/native-products.json")
+                    role=roles[ch];w=worker.anchors(role,k);anchor=native.read(w/"anchor-B/native-products.json")
                     labels=kernel.vectors(native.read(w/"B-kernel/process/observed-rustcs.json"))
                     for mode in ("ordinary","whole-instructions","rustcs"):
                         d=root/f"pair-{k:02d}"/f"{pos}-{role}"/mode;co=d/"native";a=native.read(d/"accepted.json");assert a==result["rows"][str(k)][role][mode] and (a["number"],a["position"],a["hold"],a["role"],a["mode"])==(k,pos,h,role,mode)
