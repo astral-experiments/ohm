@@ -51,6 +51,10 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
+      - name: Install native tracing and source-certificate verifier
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential libssl-dev pkg-config strace zstd
       - name: Verify the original matched compiler source capsule
         working-directory: enrolled
         env:
