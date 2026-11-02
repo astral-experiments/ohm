@@ -116,7 +116,7 @@ In 1.99.0-23, a procedural macro stays fresh when one of its dependencies contai
 assembly. Previously, Cargo could recompile the macro and its consumers on every build. In the
 release test, replacing a declared native library relinks both executables. Building again leaves
 both executables fresh.
-[Cargo change](https://github.com/astral-experiments/ohm-cargo/pull/424) · [Release test](https://github.com/astral-experiments/ohm/blob/aeab3bb6d4187e8607bdf35d75fb90921dda022d/scripts/smoke-test-relink.sh)
+[Cargo change](https://github.com/astral-experiments/ohm-cargo/pull/424) · [Release test](https://github.com/astral-experiments/ohm/blob/4b0ec186008e6220f78776fda60e1cf9ad20e3eb/scripts/smoke-test-relink.sh)
 
 On Linux, three successive unchanged builds of Ruff's CLI and integration tests invoked no
 compiler or linker. Changing a declared static library relinked both executables. Restoring the
