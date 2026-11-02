@@ -17,6 +17,7 @@ run-name: Ruff test link reason ${{ inputs.reviewed_head }}
           - rc253
           - candidates
           - callable
+          - callable-confirm
       native_witness:
         type: boolean
         description: Exercise a real higher-priority and malformed native provider on the RC
@@ -33,7 +34,7 @@ permissions: {}
 jobs:
   diagnose:
     name: Inspect Ruff test link on Ohm ${{ matrix.role }}
-    if: inputs.distributions != 'callable' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    if: inputs.distributions != 'callable' && inputs.distributions != 'callable-confirm' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 55
     permissions:
@@ -117,16 +118,22 @@ jobs:
           retention-days: 14
           if-no-files-found: error
   callable:
-    name: Compare the historical ty callable edit with both source-built compilers
-    if: inputs.distributions == 'callable' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    name: Compare the historical ty callable edit on independent block ${{ matrix.block }}
+    if: startsWith(inputs.distributions, 'callable') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        block: ${{ fromJSON(inputs.distributions == 'callable-confirm' && '[1,2,3,4,5,6]' || '[0]') }}
     permissions:
       contents: read
       actions: read
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PLACEMENT_FACTORY: '41475100027'
+      PAIR_BLOCK: ${{ matrix.block }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -183,7 +190,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: callable-placement-diagnostic
+          name: ${{ matrix.block && format('callable-placement-pair-{0}', matrix.block) || 'callable-placement-diagnostic' }}
           path: ${{ runner.temp }}/callable-placement.tar.zst
           retention-days: 14
           if-no-files-found: warn

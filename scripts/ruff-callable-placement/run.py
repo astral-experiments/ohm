@@ -169,6 +169,11 @@ def run(reader, repo):
     scratch.mkdir()
     out, root = scratch/"evidence", scratch/"trial"
     out.mkdir(); root.mkdir()
+    block = int(os.environ.get("PAIR_BLOCK", "0"))
+    order, expected = ["P", "C"], []
+    if block:
+        import replication
+        order, expected = replication.qualify(receiver.api, scratch, block)
     for folder in (out/"workproduct-indices", out/"native-witnesses", root/"work"):
         folder.mkdir()
     inputs = scratch/"sdks"
@@ -178,17 +183,20 @@ def run(reader, repo):
         shutil.copyfile(inputs / name, out / name)
     native.emit(out/"entry.json", {"reader": binding, "run": os.environ["GITHUB_RUN_ID"], "qa": head(HERE),
         "cpu": cpus, "boot": Path("/proc/sys/kernel/random/boot_id").read_text().strip(), "source": reg["roles"],
-        "plan": native.sha(HERE/"registration.json"), "order": ["P", "C"]})
+        "plan": native.sha(HERE/"registration.json"), "order": order, "block": block})
     donor = root/"registry-donor"
     donor.mkdir()
     subprocess.run(["cargo", "+ohm", "fetch", "--locked"], cwd=repo, env={**kit.base, "CARGO_HOME":str(donor)}, check=True)
     locked = {p["name"]+"-"+p["version"]+".crate":p["checksum"] for p in tomllib.loads((repo/"Cargo.lock").read_text())["package"] if "checksum" in p}
     assert worker.pilot.registry(donor) == locked
     native.emit(out/"registry.json", locked)
-    reports = {role: one_role(kit, worker, root, out, repo, donor, plan, role) for role in ("P", "C")}
+    reports = {role: one_role(kit, worker, root, out, repo, donor, plan, role) for role in order}
     kit.finish()
     native.emit(out/"histories.json", reports)
-    native.emit(out/"decision.json", decide(out, reports))
+    decision = decide(out, reports)
+    native.emit(out/"decision.json", decision)
+    if block:
+        replication.finish(out, reports, decision, block, order, expected)
 
 
 if __name__ == "__main__":
