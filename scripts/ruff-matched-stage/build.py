@@ -44,10 +44,12 @@ def bundle(repo):
     )
     git(repo, "bundle", "verify", str(packet))
     git(repo, "fetch", "--no-tags", "--no-recurse-submodules", str(packet), entry["branch"])
+    coalescer = REG["coalescer_commit"]
     need(
-        git(repo, "rev-parse", "FETCH_HEAD", c + "^").splitlines() == [c, p]
-        and git(repo, "rev-list", c, "^" + p).splitlines() == [c],
-        "not the single prepared compiler commit",
+        git(repo, "rev-parse", "FETCH_HEAD") == c
+        and git(repo, "rev-list", "--parents", c, "^" + p).splitlines()
+        == [f"{c} {coalescer}", f"{coalescer} {p}"],
+        "incorrect coalescer and bootstrap commit chain",
     )
     pin = REG["upstream_pin"]
     need(git(repo, "rev-list", "--reverse", p, "^"+pin["transport_base"]).splitlines() == pin["commits"],

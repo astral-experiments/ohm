@@ -17,8 +17,8 @@
   ],
   "bundle": {
     "branch": "refs/heads/charlie/rc23-repair-rematerialized-copy-intervals",
-    "bytes": 52177,
-    "sha256": "d3be835876123508771d64c97272fd1dbdb3a9bcc9b2d73af5296b573e5e41a5"
+    "bytes": 53285,
+    "sha256": "b0f122f8ae8b4caea67cbc36880dfc7c4229e1854f5f469339c9be08b3bb85ba"
   },
   "changed_sources": {
     "compiler/rustc_codegen_llvm/src/back/write.rs": {
@@ -49,11 +49,20 @@
       "C": "477f804cf18f920a2aa25e816ec27bcc82c840cd",
       "P": "e58d418a1717e7ec6e47770d19bedf22948ac679"
     },
+    "src/bootstrap/src/core/builder/cargo.rs": {
+      "C": "3daf097780ab5be546b669966676eaf8781dc6e7",
+      "P": "05467deb05d8b94aef92dbd0f04f064485159bb0"
+    },
+    "src/bootstrap/src/core/builder/tests.rs": {
+      "C": "92e1d5935fdf3e774ccc2b950c9f7b6c2fb21a3a",
+      "P": "00dc633b41c095ecde349435ce8d67ac7a8c51fd"
+    },
     "src/bootstrap/src/core/download.rs": {
       "C": "01700a8acf88d217835fbf053435b74002832733",
       "P": "0b3f43a7e79ef5f0e9b04fa8e326ba12afb12810"
     }
   },
+  "coalescer_commit": "74d8eeab285ee9e1b7b6ea00c94ae0d2dc21ecb6",
   "kit": {
     "commit": "bc0e3e18ccf825c4eeaece4727b9ac3b4ecd8a89",
     "prepare.sh": "de6653dc519f7bc22d8115b87fe8fc9a21bacac9843690f4651a7fc24afe54ec",
@@ -62,8 +71,8 @@
   "roles": {
     "C": {
       "compiler": "0fda038c2fbd3c23ffa881ad2e2e064d428c9ea6",
-      "revision": "74d8eeab285ee9e1b7b6ea00c94ae0d2dc21ecb6",
-      "tree": "844709399cc806838d3af7efac62ed45233c3d37"
+      "revision": "1589b5884e0a690776147e3a72223843ab83dccb",
+      "tree": "1c05e647c4619661ca8726a0b91552af3a04c67e"
     },
     "P": {
       "compiler": "5f25f548bfc4983f74a29f0796093191b2220c1f",

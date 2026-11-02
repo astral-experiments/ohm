@@ -156,7 +156,7 @@ def source_control(clean):
         build.git(repo, "update-ref", "refs/heads/parent", parent)
         build.bundle(repo)
         print(
-            "Exact nine-commit release lineage, direct product parent, compiler trees and eight changed source blobs passed."
+            "Verified the release lineage, both product commits, compiler trees and every changed source blob."
         )
 
 
