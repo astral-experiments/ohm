@@ -4,12 +4,13 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import material as m, enroll, run, score
 import receipt, capacity
+import unit_panel
 def journal(path,kind,ref,o,api):
     vals=(gzip.decompress((path/("cargo."+k+".gz")).read_bytes()) for k in ("stdout","stderr"))
     shape,actual=run.typed_events(*vals,kind,ref,o,api)
     m.guard(actual==m.read(path/"observed.json") and shape==m.shape(),"raw Cargo/argv journal or immutable graph changed")
 def audit(out,opening):
-    m.guard(m.read(out/"panel-finished.json")=={"observed_pairs":12,"primary_unscored_until_independent_replay":True},"incomplete panel")
+    m.guard(m.read(out/"panel-finished.json")=={"observed_pairs":8,"primary_unscored_until_independent_replay":True},"incomplete panel")
     p=out/"intake";lock=enroll.lock(*[m.read(p/(k+".json")) for k in ("run","jobs","artifacts")]);m.guard(lock==m.read(p/"sdk-lock.json"),"hosted build metadata changed")
     capacity.replay(p)
     pair=m.read(p/"pair-passed.json");m.guard(m.filesha(p/"cache-transition.json")==pair["cross_sdk_cache_rejection_sha256"],"migration proof")
@@ -30,9 +31,8 @@ def audit(out,opening):
                 m.guard(receipt.matches(run.compared(q/l,q/h,shape,api,decoder),proof[k]),"full cold root/definition/allocation oracle")
             for design in m.P["orders"]:
                 path=out/f"hold{design['hold']}-pair{design['pair']:02d}-{role}"
-                journal(path/"settled-A","background",ref,o,api);journal(path/"typed","edit",ref,o,api);trace.replay(path/"scoped")
-                m.guard(receipt.matches(run.compared(path/"native",q/"cold-B1",shape,api,decoder),m.read(path/"accepted.json")["independent_cold"]),"per-seed independent cold semantics")
-    return score.report(out)
+                unit_panel.verify_arm(path,role,ref,o,api,decoder,trace,shape,journal)
+    return unit_panel.report(out)
 if __name__=="__main__":
     if len(sys.argv)==3:
         r=audit(Path(sys.argv[1]).resolve(),Path(sys.argv[2]).resolve());print(json.dumps(r,sort_keys=True,indent=2))

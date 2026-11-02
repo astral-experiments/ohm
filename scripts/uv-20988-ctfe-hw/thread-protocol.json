@@ -1,0 +1,200 @@
+{
+  "estimand": "userspace PMU retired instructions in each selected process and its threads under ordinary root cargo check; no wall or whole-Cargo metric in this independent trial",
+  "family": "two prespecified processes; strict positive paired signs above 5/4; Bonferroni familywise alpha .05; both hold and compiler-order medians must exceed 5/4; ties count as nonwins",
+  "format": 1,
+  "labels": [
+    "build_script_build-bin",
+    "uv-bin",
+    "uv-lib",
+    "uv_build_frontend-lib",
+    "uv_cli-lib",
+    "uv_dev-lib",
+    "uv_dispatch-lib",
+    "uv_distribution-lib",
+    "uv_installer-lib",
+    "uv_python-lib",
+    "uv_requirements-lib",
+    "uv_resolver-lib",
+    "uv_scripts-lib",
+    "uv_settings-lib",
+    "uv_tool-lib",
+    "uv_types-lib",
+    "uv_workspace-lib",
+    "uvx-bin"
+  ],
+  "meter_calibration_service": {
+    "id": 13113886561,
+    "run": 41382342799,
+    "sha256": "d0a63329b4702026d84de55c11496c3999a43f3e2fd988c2eaad88638e1d146f"
+  },
+  "meter_commit": "9abd7452ac090f69aeae632f02a32be7b9a2a3cc",
+  "meter_files": {
+    "SHA256SUMS": "c6713c7ef2878aa70a927e845e41ec9f4d237091b6c7a6c45d4799de047fb0d1",
+    "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
+    "per_rustc.py": "92d46fc2443a1af027a01890c03d4450ad562a45b82608d815b281facec1d99e",
+    "pmu.c": "ac49b8795708a9054bb2fb258729734a6e8a9304b5cd92f138c97de45af034cc",
+    "preflight.py": "801b589108ddbcbd41d3cfd5757586ff85cb9223623b99cf86aa649f6245706f",
+    "workload.c": "ab9d81c8202657bfe9cf93add0e3607c18c6b75ebe337c922a36db286eec016a"
+  },
+  "order": [
+    {
+      "hold": 1,
+      "modes": [
+        "native",
+        "typed",
+        "scoped",
+        "counted"
+      ],
+      "pair": 1,
+      "roles": [
+        "stock_ctfe318",
+        "fa7a_stack_ctfe318"
+      ]
+    },
+    {
+      "hold": 1,
+      "modes": [
+        "native",
+        "typed",
+        "scoped",
+        "counted"
+      ],
+      "pair": 2,
+      "roles": [
+        "fa7a_stack_ctfe318",
+        "stock_ctfe318"
+      ]
+    },
+    {
+      "hold": 1,
+      "modes": [
+        "native",
+        "typed",
+        "scoped",
+        "counted"
+      ],
+      "pair": 3,
+      "roles": [
+        "stock_ctfe318",
+        "fa7a_stack_ctfe318"
+      ]
+    },
+    {
+      "hold": 1,
+      "modes": [
+        "native",
+        "typed",
+        "scoped",
+        "counted"
+      ],
+      "pair": 4,
+      "roles": [
+        "fa7a_stack_ctfe318",
+        "stock_ctfe318"
+      ]
+    },
+    {
+      "hold": 2,
+      "modes": [
+        "native",
+        "typed",
+        "scoped",
+        "counted"
+      ],
+      "pair": 1,
+      "roles": [
+        "fa7a_stack_ctfe318",
+        "stock_ctfe318"
+      ]
+    },
+    {
+      "hold": 2,
+      "modes": [
+        "native",
+        "typed",
+        "scoped",
+        "counted"
+      ],
+      "pair": 2,
+      "roles": [
+        "stock_ctfe318",
+        "fa7a_stack_ctfe318"
+      ]
+    },
+    {
+      "hold": 2,
+      "modes": [
+        "native",
+        "typed",
+        "scoped",
+        "counted"
+      ],
+      "pair": 3,
+      "roles": [
+        "fa7a_stack_ctfe318",
+        "stock_ctfe318"
+      ]
+    },
+    {
+      "hold": 2,
+      "modes": [
+        "native",
+        "typed",
+        "scoped",
+        "counted"
+      ],
+      "pair": 4,
+      "roles": [
+        "stock_ctfe318",
+        "fa7a_stack_ctfe318"
+      ]
+    }
+  ],
+  "primary": [
+    "uv-lib",
+    "uv_resolver-lib"
+  ],
+  "primary_enrollment": {
+    "uv-lib": {
+      "features": [
+        "feature=\"default\"",
+        "feature=\"performance\"",
+        "feature=\"performance-memory-allocator\"",
+        "feature=\"test-crates-io\"",
+        "feature=\"test-defaults\"",
+        "feature=\"test-ecosystem\"",
+        "feature=\"test-git\"",
+        "feature=\"test-git-lfs\"",
+        "feature=\"test-pypi\"",
+        "feature=\"test-python\"",
+        "feature=\"test-python-eol\"",
+        "feature=\"test-python-managed\"",
+        "feature=\"test-r2\"",
+        "feature=\"test-slow\"",
+        "feature=\"test-universal\""
+      ],
+      "source": "crates/uv/src/lib.rs"
+    },
+    "uv_resolver-lib": {
+      "features": [
+        "feature=\"clap\"",
+        "feature=\"schemars\""
+      ],
+      "source": "crates/uv-resolver/src/lib.rs"
+    }
+  },
+  "repeated_calibration": "same worker fixed loop, 3 threads, fork excluded, selected re-exec veto; same boot/affinity and zero multiplexing required",
+  "role_order": [
+    "stock_ctfe318",
+    "fa7a_stack_ctfe318"
+  ],
+  "sdk_build_head": "cddb036d81e4313a8e422171f39f0840b44110db",
+  "sdk_builder": 41374825846,
+  "sdk_lock": "b7b8705a2200ac514d219383339009d92ed3fe4046846b60010c60359d06f019",
+  "threshold": "5/4",
+  "whole_command_study": {
+    "head": "a08fbd2dc6330acc9a908657671a45611ab91478",
+    "original_run": 41379994255,
+    "replay_sha256": "12bcc1f6afaad65e83925e13474f715492fe0a1c43cb1ba0efb138f2129fa12d"
+  }
+}

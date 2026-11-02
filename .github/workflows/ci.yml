@@ -1,4 +1,4 @@
-name: Real uv 20988 root check on corrected production compilers
+name: Actual rustc instructions after uv 20988 on two production compilers
 on:
   workflow_dispatch:
     inputs:
@@ -24,7 +24,7 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-ctfe22-root-hardware' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-production-rustc-instructions' && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41374825846' && inputs.build_head == 'cddb036d81e4313a8e422171f39f0840b44110db' && inputs.sdk_lock_sha256 == 'b7b8705a2200ac514d219383339009d92ed3fe4046846b60010c60359d06f019'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 350
     env:
@@ -121,23 +121,27 @@ jobs:
         run: |
           set -euo pipefail
           /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/run.py calibrate 2>&1 | tee trait-results/calibration.log
+      - name: Calibrate retirements in one selected image with threads and fork exclusions
+        run: |
+          set -euo pipefail
+          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/unit_panel.py calibrate 2>&1 | tee trait-results/thread-calibration.log
       - name: Admit the two qualified production SDKs and the signed Cargo binary
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/enroll.py admit 2>&1 | tee trait-results/intake.log
-      - name: Qualify both compiler histories and execute all 12 first-edit pairs
+      - name: Qualify both histories and count the two real rustc images in eight pairs
         run: |
           set -euo pipefail
-          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/run.py run 2>&1 | tee trait-results/experiment.log
+          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/unit_panel.py run 2>&1 | tee trait-results/experiment.log
       - name: Read back the raw clocks, Cargo streams, process trees and metadata independently
         run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/audit.py hosted
       - name: Preserve raw clocks, source qualification and any incomplete attempt
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-20988-ctfe-production-root-attempt-1
+          name: uv-20988-ctfe-production-rustc-attempt-1
           path: trait-results/
           if-no-files-found: error
           compression-level: 1

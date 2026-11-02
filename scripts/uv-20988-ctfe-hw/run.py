@@ -173,7 +173,7 @@ def main():
     for role in m.P["roles"]:
         m.choose(role,bank,installed);verified[role]=final_sdk(role,installed,m.SDK,out)
     m.save(out/"final-sdk.json",verified)
-    m.save(out/"panel-finished.json",{"observed_pairs":12,"primary_unscored_until_independent_replay":True})
+    m.save(out/"panel-finished.json",{"observed_pairs":len(m.P["orders"]),"primary_unscored_until_independent_replay":True})
 if __name__=="__main__":
     try:main()
     except Exception:
