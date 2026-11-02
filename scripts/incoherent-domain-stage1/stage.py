@@ -130,10 +130,17 @@ def run(role):
     assert domain_proof["actual_empty_edit_typeck"]==dict.fromkeys(("read_adt","read_reference","read_str"),0)
     assert domain_proof["warm_cold_binary_and_errors"]is True and domain_proof["observed"]==g.file_hash(domain_dir/"observed.json")
     g.put(out/"domain-oracle.json",domain_proof)
-    clause_dir=out/"clause-native"
+    clause_dir=w/"clause-native"
     argv=[sys.executable,"-ISB",H/"clause-oracle.py",sdk/"bin/rustc",r/arm["clauses_fixture"],clause_dir,"candidate"]
     checked=subprocess.run(argv,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env={**os.environ,**senv})
+    assert len(checked.stdout)<2<<20
     (out/"clause-native.log").write_bytes(checked.stdout)
+    with zipfile.ZipFile(out/"clause-oracle.zip","w",zipfile.ZIP_DEFLATED,compresslevel=5)as archive:
+        paths=sorted(p for p in clause_dir.rglob("*") if p.is_file())
+        assert len(paths)<=512 and sum(p.stat().st_size for p in paths)<24<<20
+        for p in paths:
+            assert not p.is_symlink()
+            archive.write(p,p.relative_to(clause_dir))
     checked.check_returncode()
     clause=json.loads((clause_dir/"accepted.json").read_bytes())
     assert clause["role"]=="candidate" and clause["compilers"]==105 and clause["source"].strip()==vv.strip()

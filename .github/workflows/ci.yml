@@ -94,7 +94,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = aff9b95167c76ffe95af7e896ae8c115bfd8a591
+        test "$(git rev-parse HEAD^)" = b897eea929fea486b38abfc9cf1f4ac592e40ae8
 
         '
     - name: Verify the source packs and direct trait-impl predicate child
