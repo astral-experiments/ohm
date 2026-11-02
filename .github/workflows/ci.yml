@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl]
         default: single-22
       reviewed_head:
         description: Exact reviewed QA commit
@@ -108,6 +108,16 @@ jobs:
       - name: Price actual constructors links and test incumbent and input integrity
         if: inputs.mode == 'constructors-wild-preflight'
         run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/wild_preflight.py run "$GITHUB_WORKSPACE/ruff"
+      - name: Read file protection capabilities of the three actual GNU system providers
+        if: inputs.mode == 'native-guard-ioctl'
+        run: |
+          set -euo pipefail
+          d="$RUNNER_TEMP/ohm-ruff-whole-census/evidence"
+          mkdir -p "$d"
+          printf 'private root fixture' | sudo -n tee "$d/foreign-control" >/dev/null
+          sudo -n chmod 0444 "$d/foreign-control"
+          printf 'private owned fixture' > "$d/owned-control"
+          sudo -n setpriv --reuid="$(id -u)" --regid="$(id -g)" --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all --no-new-privs -- env QA_SOURCE="$GITHUB_SHA" /usr/bin/python3 -IB enrolled/scripts/ruff-workspace-link-census/protection.py "$d/file-protection.json" "$d/foreign-control" "$d/owned-control"
       - name: Retain the native process tree, Cargo products, link markers and verdicts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
