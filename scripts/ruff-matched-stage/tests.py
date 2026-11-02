@@ -99,6 +99,10 @@ class Protocol(unittest.TestCase):
         self.assertEqual(header[2], c.REG["roles"]["C"]["revision"] + " " + c.REG["bundle"]["branch"])
         self.assertEqual(len(header), 3)
 
+    def test_immutable_workflow_helper_matches_registration(self):
+        workflow = (HERE.parents[1] / ".github/workflows/ci.yml").read_text()
+        self.assertIn("ref: " + c.REG["kit"]["commit"] + "\n        path: packed\n", workflow)
+
     def test_mutated_common_llvm(self):
         self.alter(lambda d: d["files"]["lib/libLLVM-test.so"].__setitem__(0, "a" * 64))
         with self.assertRaisesRegex(ValueError, "different standard library"):
