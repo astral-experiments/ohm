@@ -536,7 +536,7 @@ relocated_output="$test_directory/relocated-output.log"
 mkdir -p "$test_directory/profile tmp"
 (
   cd -- "$test_directory"
-  run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp"
+  rust_checkout="${rust_checkout##*/}" run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp" CDPATH=.
 )
 assert_optimized_build "$linux_target" "$bolt_directory" true true "$relocated_output" relocated
 [[ "$(git -C "$perf_source" rev-parse HEAD)" == "$original_head" ]]

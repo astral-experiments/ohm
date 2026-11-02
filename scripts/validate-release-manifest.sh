@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
 
 require_pinned=false
 if [[ "${1:-}" == "--require-pinned" ]]; then

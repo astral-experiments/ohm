@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
 
 if [[ $# -ne 5 ]]; then
   echo "usage: verify-release-sources.sh MANIFEST OHM_RUST_CHECKOUT OHM_CARGO_CHECKOUT OHM_CLIPPY_CHECKOUT OHM_RUSTFMT_CHECKOUT" >&2
