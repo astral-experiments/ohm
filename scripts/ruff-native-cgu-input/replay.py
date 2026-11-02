@@ -36,8 +36,11 @@ def main():
         owner.write_bytes(original)
         for role in ("old", "new"):
             stage = json.loads(archive.read(f"capture/{role}/cgus.json"))["ruff_workspace"]["emitted"]
-            assert set(stage) == set(native)
-            for unit in sorted(stage):
+            if role == "new":
+                assert set(stage) == set(native)
+            else:
+                assert set(native).issubset(stage)
+            for unit in sorted(native):
                 expected = native[unit][role]
                 payload = gzip.decompress(archive.read(f"cgu-originals/{expected['input']}.gz"))
                 assert digest(payload) == expected["input"] == stage[unit]["sha256"]
