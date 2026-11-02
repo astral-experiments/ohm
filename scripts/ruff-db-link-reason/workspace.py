@@ -75,7 +75,8 @@ def main(role):
         assert dst.is_file() and dst.resolve().is_relative_to(work)
         links.append(dict(pid=linker['pid'],compiler=parent['pid'],owner=parent['owner'],link_only=parent['link_only'],dst=str(dst),sha256=sha(dst)))
     assert len({r['dst'] for r in links})==len(links)
-    rust=[r for r in tree['processes'] if r['owner']]
+    rust=[r for r in tree['processes'] if r['owner'] and os.path.samefile(r['path'],SDK/'bin/rustc')]
+    assert len({r['pid'] for r in rust})==len(rust)
     counts=Counter(r['owner'] for r in rust)
     save('workspace/joins.json',dict(links=links,compilers=rust,counts=counts,role=role,source=census.RUFF,command=census.COMMAND))
     save('workspace/accepted.json',dict(role=role,links=len(links),rustcs=len(rust),ron=counts['ron'],
