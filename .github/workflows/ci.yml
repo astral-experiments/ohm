@@ -94,7 +94,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 8e738eae331c797b4bf7e7e33a9954cfd6f962d2
+        test "$(git rev-parse HEAD^)" = 413e2cb249d4d25309c75a8d06fdd6712ff54091
 
         '
     - name: Verify both compiler sources and the authenticated 105-object delta
@@ -211,7 +211,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 8e738eae331c797b4bf7e7e33a9954cfd6f962d2
+        test "$(git rev-parse HEAD^)" = 413e2cb249d4d25309c75a8d06fdd6712ff54091
 
         '
     - name: Verify both compiler sources and the authenticated 105-object delta
