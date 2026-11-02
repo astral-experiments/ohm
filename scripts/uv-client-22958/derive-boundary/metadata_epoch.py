@@ -24,7 +24,6 @@ def metadata(sdks,out,*,expected=None):
     verified=EPOCHS if expected is None else dict(expected)
     assert list(sdks)==list(verified) and len(verified)==2
     assert all(len(rev)==40 and set(rev)<=set('0123456789abcdef') and len(pair)==2 and all(type(x) is int and 0<x<65536 for x in pair) for rev,pair in verified.items())
-    assert len({v[1]for v in verified.values()})==2
     labels=dict(zip(verified,('parent','candidate'),strict=True))
     out=Path(out).resolve();out.mkdir()
     (out / 'dep.rs').write_text('pub const VALUE: u32 = 41;\npub fn add(value: u32) -> u32 { VALUE + value }\n')
@@ -57,6 +56,8 @@ def metadata(sdks,out,*,expected=None):
         encoded = banner_and_epoch(path)
         assert encoded == f'{real_banner} (Ohm metadata {verified[rev][1]})' and rev[:9] in encoded, encoded
         headers[rev] = {'path':str(path),'sha256':sh(path),'bytes':path.stat().st_size,'native_banner':real_banner,'encoded_version':encoded,'metadata_epoch':verified[rev][1]}
+    # Distinct compilers can share a wire epoch. Their actual, unmodified encoded banners determine admission.
+    assert len({row["encoded_version"] for row in headers.values()}) == 2
     for receiver in sdks:
         for donor in sdks:
             name = labels[donor]+'-to-'+labels[receiver]; p = Path(headers[donor]['path'])
@@ -73,6 +74,6 @@ def metadata(sdks,out,*,expected=None):
                 assert headers[donor]['encoded_version'] in errors[0]['rendered'] and headers[receiver]['encoded_version'] in errors[0]['rendered'], errors[0]['rendered']
                 assert not (out/(name+'.rmeta')).exists()
             assert sh(p) == headers[donor]['sha256']
-    receipt = {'actual_originals':headers,'real_reader_invocations':traces,'own_crate_reads':2,'own_native_typecheck_errors':2,'cross_crate_E0514':2,'source':src,'file_edits':False,'compiler_version_overrides':False,'scope':'The ordinary native -vV banners differ alongside the genuine encoded metadata epochs. The complete compiler interpretation is rejected before extern item access in both directions. The encoded metadata version is read from both untouched native files. Source references, when locally enrolled, are separate evidence.'}
+    receipt = {'actual_originals':headers,'real_reader_invocations':traces,'own_crate_reads':2,'own_native_typecheck_errors':2,'cross_crate_E0514':2,'source':src,'file_edits':False,'compiler_version_overrides':False,'scope':'Each encoded version matches the genuine compiler banner and its selected, possibly shared, metadata epoch. The complete compiler interpretation is rejected before extern item access in both directions. The encoded metadata version is read from both untouched native files. Source references, when locally enrolled, are separate evidence.'}
     save(out/'passed.json',receipt)
     return receipt

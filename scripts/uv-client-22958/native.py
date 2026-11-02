@@ -1,4 +1,4 @@
-"""Qualify both distributions and sixteen independent histories before the eight wall pairs."""
+"""Qualify three distributions and 24 independent histories before timing the eight trios."""
 
 from pathlib import Path
 import gzip
@@ -129,6 +129,18 @@ def refusal(ds, inp, blobs):
     return result
 
 
+def matching_openings(comparable, observations):
+    assert set(comparable) == set(observations) == set(s.ROLES)
+    reference = observations["S"]
+    def recurring(entry):
+        return {state: {name: [cc.comparable_argv(argv) for argv in items] for name, items in forms.items()}
+                for state, forms in entry["recurring"].items()}
+    for role in s.ROLES:
+        assert comparable[role] == comparable["S"]
+        assert all(observations[role][key] == reference[key] for key in ("A_observable", "B_observable"))
+        assert recurring(observations[role]) == recurring(reference)
+
+
 def run():
     w, tmp, boot = s.host()
     out = w / "trait-results"
@@ -150,7 +162,9 @@ def run():
         and len(scoped.cal_raw(out / "per-rustc-calibration")) == 3
     )
     migration=m.read(out/"intake/release-migration.json")
-    assert migration["fixtures_only"] and migration["ordinary_benchmark_caches_separate"] and set(migration["roles"]) == {"S-F","F-S"}
+    assert migration["fixtures_only"] and migration["ordinary_benchmark_caches_separate"]
+    assert set(migration["roles"]) == {a+"-"+b for a in s.ROLES for b in s.ROLES if a!=b}
+    assert set(migration["native_format_proofs"]) == {"S-P", "S-F", "P-F"}
     clk=m.read(out/"blocking-clock-pre/verified.json")
     assert clk["eligible_blocking_calibration"] and clk["boot"]==boot and clk["affinity"]==sorted(mask)
     load = m.read(out / "intake.json")
@@ -194,13 +208,8 @@ def run():
         role: {name: cc.comparable_argv(argv) for name, argv in inp["labels"].items()}
         for role, inp in openings.items()
     }
-    assert comparable[s.ROLES[0]] == comparable[s.ROLES[1]]
     m.save(panel / "full-cross-arm-arguments.json", comparable)
-    openings_seen=[m.read(panel/("opening-"+r)/"admitted.json") for r in s.ROLES]
-    for k in ("A_observable","B_observable"):
-        assert openings_seen[0][k] == openings_seen[1][k]
-    names=lambda x:{state:{n:len(a)for n,a in forms.items()}for state,forms in x["recurring"].items()}
-    assert names(openings_seen[0]) == names(openings_seen[1])
+    matching_openings(comparable, {r:m.read(panel/("opening-"+r)/"admitted.json") for r in s.ROLES})
 
     def accept(d, role, warm):
         inp = openings[role]
@@ -274,12 +283,12 @@ def run():
                     all_uncertain=proof["fixed_input_owners_required"],
                 ),
             )
-    assert len({v[1]["sha256"] for v in stages.values()}) == 16
+    assert len({v[1]["sha256"] for v in stages.values()}) == 24
     m.save(
         panel / "all-native-guards.json",
         dict(
             roles=list(s.ROLES),
-            independent=16,
+            independent=24,
             orders=orders,
             boot=boot,
             fixed={
@@ -326,7 +335,7 @@ def run():
                     ),
                 )
             m.save(d/"visit-order.json",visits)
-            print("completed pair arm", i + 1, role, flush=True)
+            print("completed trio arm", i + 1, role, flush=True)
     for role in s.ROLES:
         m.choose(role, bank, sdks)
         m.save(

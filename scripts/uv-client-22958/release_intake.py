@@ -19,9 +19,9 @@ def transport():
     w,_,_=s.host();_,prior=m.check_sources(w)
     return m.load("signed_release_intake",prior/"intake.py")
 
-def latest(dest):
-    data=transport().gh_json("api","--method","GET","repos/"+REPO+"/releases/latest")
+def pinned_release(dest):
     source=s.lock["signed_release"]
+    data=transport().gh_json("api","--method","GET","repos/"+REPO+"/releases/tags/"+source["tag"])
     assert data["id"]==source["release_id"] and data["tag_name"]==source["tag"] and data["target_commitish"]==source["coordinator"]
     assert data["immutable"] and not data["draft"] and not data["prerelease"]
     m.save(dest,data)
@@ -54,8 +54,19 @@ def install_archive(archive,dest,role):
     assert seen==set(inv) and set(manifests)==set(COMP)
     for comp,rows in manifests.items():assert len(rows)==len(set(rows)) and set(rows)=={n for n,r in inv.items()if r["component"]==comp}
 
-def production(proof,temp,donor):
-    f=s.lock["production_compiler"];prefix="repos/"+REPO+"/actions/runs/"+str(f["run"])
+def production(proof,temp,donor,role):
+    assert role in ("P", "F")
+    if role == "P":
+        subject=m.read(s.HERE/"preceding-material.json")
+        f=subject["compiler"]
+        members={"qa":subject["qa_members"],"sdk":subject["sdk_members"]}
+        archive=subject["archive"]
+    else:
+        f=s.lock["production_compiler"]
+        members={"qa":s.lock["production_qa_members"],"sdk":s.lock["production_member_sha256"]}
+        archive=s.lock["production_archive"]
+    assert f["source"]==s.SOURCES[role]["commit"] and f["tree"]==s.SOURCES[role]["tree"]
+    prefix="repos/"+REPO+"/actions/runs/"+str(f["run"])
     run,jobs,art=[donor.gh_json("api","--method","GET",prefix+x) for x in ("","/attempts/1/jobs?per_page=100","/artifacts?per_page=100")]
     for n,row in (("run",run),("jobs",jobs),("artifacts",art)):m.save(proof/(n+".json"),row)
     job,=jobs["jobs"]
@@ -70,7 +81,7 @@ def production(proof,temp,donor):
         assert actual["workflow_run"]["id"]==f["run"] and actual["workflow_run"]["head_sha"]==f["coordinator"]
         assert actual["workflow_run"]["repository_id"]==actual["workflow_run"]["head_repository_id"]==1319437234
         dst=temp/(kind+".zip");donor.gh_bytes("repos/"+REPO+"/actions/artifacts/"+str(actual["id"])+"/zip",dst,expect["size_in_bytes"],expect["digest"][7:])
-        memberlock=s.lock["production_qa_members" if kind=="qa" else "production_member_sha256"]
+        memberlock=members[kind]
         with zipfile.ZipFile(dst)as z:
             files={i.filename:i for i in z.infolist() if not i.is_dir()}
             assert len(files)==sum(not i.is_dir()for i in z.infolist()) and files.keys()==(set(memberlock)|({"ohm.tar.gz"}if kind=="sdk"else set()))
@@ -80,20 +91,24 @@ def production(proof,temp,donor):
                 if kind=="sdk":
                     p=proof/name;p.write_bytes(raw)
             if kind=="sdk":
-                row=s.lock["production_archive"];target=temp/"production.tar.gz"
-                with z.open("ohm.tar.gz")as stream:copy_checked(stream,target,row["bytes"],row["sha256"])
+                target=temp/"production.tar.gz"
+                with z.open("ohm.tar.gz")as stream:copy_checked(stream,target,archive["bytes"],archive["sha256"])
     native=m.read(proof/"role.json");source=m.read(proof/"source.json")
     assert source["source"]["commit"]==native["source_commit"]==f["source"] and source["source"]["tree"]==native["source_tree"]==f["tree"]
     assert source["source_pack_sha256"]==f["source_pack"] and source["training_objects"]==f["training_objects"]
     assert native["bolt_note"]is True and native["epoch"]==f["epoch"] and native["execution_pgo"] and native["installed_callable_tests"]
-    projection=m.read(s.HERE/"derive-projection.json")
-    assert source["source"]==projection["source"] and projection["pack_sha256"]==f["derive_pack"]
-    assert source["source"]["metadata_epoch"]==source["source"]["epoch"]==43319
     assert native["installed_original_runmake"] and native["installed_crate_domain_test"]["both_solvers"]
-    generated=native["installed_generated_impl_test"]
-    assert generated["final_linked_output"]=="(5, 11, 7)"
-    assert generated["fixture_blobs"]=={p:v["after"]["oid"] for p,v in projection["files"].items() if p.startswith("tests/run-make/proc-derive-impl-identity/")}
-    assert native["effective_benchmark_cargo_sha256"]==s.lock["signed_cargo"] and m.read(proof/"sdk-inventory.json")==s.lock["raw"]["F"]
+    if role == "F":
+        projection=m.read(s.HERE/"derive-projection.json")
+        assert source["source"]==projection["source"] and projection["pack_sha256"]==f["derive_pack"]
+        assert source["source"]["metadata_epoch"]==source["source"]["epoch"]==43319
+        generated=native["installed_generated_impl_test"]
+        assert generated["final_linked_output"]=="(5, 11, 7)"
+        assert generated["fixture_blobs"]=={p:v["after"]["oid"] for p,v in projection["files"].items() if p.startswith("tests/run-make/proc-derive-impl-identity/")}
+    else:
+        assert native["role"]=="callables_ctfe318_incoherent_domain" and native["epoch"]==43317
+        assert m.filesha(proof/"source.json")==subject["arm"]["source_sha256"] and m.filesha(proof/"role.json")==subject["arm"]["role_sha256"]
+    assert native["effective_benchmark_cargo_sha256"]==s.lock["signed_cargo"] and m.read(proof/"sdk-inventory.json")==s.lock["raw"][role]
     return target
 
 def role_sdk(role,path,proof):
@@ -172,12 +187,15 @@ def signed_cargo(archive,target):
 def admit():
     w,tmp,_=s.host();out=w/"trait-results";proof=out/"intake";proof.mkdir();temp=tmp/"release-22958-incoming";temp.mkdir()
     sdk=tmp/"ctfe22-root-sdks";sdk.mkdir();old=transport()
-    latest(proof/"latest.json");old.released(temp,proof)
+    pinned_release(proof/"release.json");old.released(temp,proof)
     signed,=(temp/"signed").glob("*.tar.gz");assert m.filesha(signed)==s.lock["signed_release"]["sha256"]
     cargo=signed_cargo(signed,temp/"official-22-cargo")
-    product=proof/"production";product.mkdir();full=production(product,temp,old)
     stock=proof/"corrected-stock";stock.mkdir();control=stock_production(stock,temp,old)
-    for r,a in (("S",control),("F",full)):
+    archives={"S":control}
+    for role in ("P","F"):
+        product=proof/("production-"+role);product.mkdir();incoming=temp/role;incoming.mkdir()
+        archives[role]=production(product,incoming,old,role)
+    for r,a in archives.items():
         install_archive(a,sdk/r,r)
         assert m.filesha(sdk/r/"bin/cargo")==s.lock["raw"][r]["bin/cargo"]["sha256"]
         shutil.copy2(cargo,sdk/r/"bin/cargo")
@@ -191,7 +209,7 @@ def migration():
 def verify_migrations(pool,out,tmp):
     env={"PATH":"/usr/bin:/bin","LC_ALL":"C","RUSTC_BOOTSTRAP":"1"}
     results={}
-    for first,second in (("S","F"),("F","S")):
+    for first,second in ((a,b) for a in s.ROLES for b in s.ROLES if a!=b):
         scope=tmp/("fixture-22958-"+first+second);scope.mkdir();src=scope/"main.rs";bin=scope/"fixture";rows=[]
         for role,val,cache in ((first,7,"shared"),(second,19,"shared"),(second,19,"independent")):
             src.write_text('const VALUE: i32 = '+str(val)+'; fn main() { println!("{}", VALUE); }\n')
@@ -201,19 +219,23 @@ def verify_migrations(pool,out,tmp):
             rows.append(dict(role=role,argv=argv,observed=observed.decode().strip(),source=m.filesha(src),binary=m.filesha(bin)))
         assert rows[1]["binary"]==rows[2]["binary"]
         results[first+"-"+second]=rows
-    stock, candidate = s.SOURCES["S"], s.SOURCES["F"]
-    epochs = {stock["commit"]: (43310, 3), candidate["commit"]: (43319, 43319)}
-    assert (stock["epoch"], candidate["epoch"]) == (43310, 43319)
+    expected = {"S": (43310, 3), "P": (43317, 3), "F": (43319, 43319)}
     wire = s.HERE / "derive-boundary"
     increment = runpy.run_path(str(wire / "epoch.py"))["run"]
     metadata = runpy.run_path(str(wire / "metadata_epoch.py"))["metadata"]
-    inc_dir, meta_dir = out / "incremental-boundary", out / "metadata-boundary"
-    increment(pool/"S", pool/"F", inc_dir, "actual", expected=[(rev, pair[0]) for rev,pair in epochs.items()])
-    metadata({stock["commit"]:pool/"S", candidate["commit"]:pool/"F"}, meta_dir, expected=epochs)
-    inc, meta = m.read(inc_dir/"passed.json"), m.read(meta_dir/"passed.json")
-    assert inc["signed_argv_refusal_both_directions"] and inc["same_sdk_self_loaded_before_and_after"] and inc["reader_compilations"]==10
-    assert inc["no_header_edit"] and inc["no_compiler_version_override"]
-    assert meta["cross_crate_E0514"]==meta["own_crate_reads"]==meta["own_native_typecheck_errors"]==2
-    assert not meta["file_edits"] and not meta["compiler_version_overrides"]
-    m.save(out/"release-migration.json",{"fixtures_only":True,"roles":results,"ordinary_benchmark_caches_separate":True,
-           "native_format_proofs":{"incremental":m.filesha(inc_dir/"passed.json"),"metadata":m.filesha(meta_dir/"passed.json")}})
+    proofs = {}
+    for first, second in (("S", "P"), ("S", "F"), ("P", "F")):
+        pair = first + "-" + second
+        sources = {s.SOURCES[r]["commit"]: expected[r] for r in (first, second)}
+        assert all(s.SOURCES[r]["epoch"] == expected[r][0] for r in (first, second))
+        inc_dir = out / ("format-incremental-" + pair)
+        meta_dir = out / ("format-metadata-" + pair)
+        increment(pool/first, pool/second, inc_dir, "actual", expected=[(rev, value[0]) for rev, value in sources.items()])
+        metadata({s.SOURCES[r]["commit"]:pool/r for r in (first, second)}, meta_dir, expected=sources)
+        inc, meta = m.read(inc_dir/"passed.json"), m.read(meta_dir/"passed.json")
+        assert inc["signed_argv_refusal_both_directions"] and inc["same_sdk_self_loaded_before_and_after"] and inc["reader_compilations"]==10
+        assert inc["no_header_edit"] and inc["no_compiler_version_override"]
+        assert meta["cross_crate_E0514"]==meta["own_crate_reads"]==meta["own_native_typecheck_errors"]==2
+        assert not meta["file_edits"] and not meta["compiler_version_overrides"]
+        proofs[pair] = {"incremental":m.filesha(inc_dir/"passed.json"), "metadata":m.filesha(meta_dir/"passed.json")}
+    m.save(out/"release-migration.json", {"fixtures_only":True, "roles":results, "ordinary_benchmark_caches_separate":True, "native_format_proofs":proofs})

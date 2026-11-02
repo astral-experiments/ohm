@@ -1,4 +1,4 @@
-name: Check uv 22958 with corrected stock and full production Rust
+name: Attribute the compiler stack on edited uv 22958
 'on':
   workflow_dispatch:
     inputs:
@@ -12,16 +12,16 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-optimized-check-repeat'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-component-attribution'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      EXCLUDED_PRODUCTION_BOOT: 'ecb0e23983b9aca584bb35892726331a571eb301bd506b9881813fc819d088f3'
+      EXCLUDED_PRODUCTION_BOOT: '5d9d75f39b41bdcb3a0488accb3fe7bcca2c1761364ed6092c1c3b84e9ab0acc'
       BUILD_RUN_ID: '41434876352'
       BUILD_HEAD: '731d81a4cb3498cf4221d53a267bbf4a76ca250f'
-      RELEASE_LOCK: 'ddbedbac4a523086977b50752b4157a764a369e0c83a07d7f46c9132e4703d26'
+      RELEASE_LOCK: 'acf0980dda7d153e75a6e2a6163f8cea2a2de5506444cf296bf2c3096129fd14'
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -110,11 +110,11 @@ jobs:
     - name: Seal the fresh physical runner and its blocking wall calibration
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-corrected-production-runner-boot
+        name: uv-22958-component-attribution-boot
         path: trait-results/boot-attestation.json
         if-no-files-found: error
         retention-days: 5
-    - name: Admit the two original optimized GNU packages and the released Cargo binary
+    - name: Admit the three original optimized GNU packages and the released Cargo binary
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
@@ -122,11 +122,11 @@ jobs:
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py admit 2>&1 | tee trait-results/intake.log
     - name: Isolate both release formats and exercise a linked program across both compiler transitions
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py migration
-    - name: Compare original cold and warm identities before any of sixteen ordinary histories can be timed
+    - name: Compare original cold and warm identities before any of twenty-four ordinary histories can be timed
       run: |
         set -euo pipefail
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py study 2>&1 | tee trait-results/experiment.log
-    - name: Independently reduce the eight blocking wall pairs and their hardware declarations
+    - name: Independently reduce the eight blocking wall trios and their hardware declarations
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
@@ -136,7 +136,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-corrected-production-wall-eight-pairs
+        name: uv-22958-component-attribution-eight-trios
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

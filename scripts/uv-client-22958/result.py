@@ -21,6 +21,8 @@ def stats(rows):
     n = above + below
     return dict(
         control_and_treatment=rows,
+        exact_control_over_treatment=[str(x) for x in speed],
+        all_eight_at_least_twenty_percent_reduction=all(5*b <= 4*a for a,b in rows),
         paired_treatment_over_control=[float(v) for v in ratios],
         paired_median=float(median(ratios)),
         percent_reduction=100 * (1 - float(median(ratios))),
@@ -41,7 +43,8 @@ def verify(out, meter, check_binary=False):
     ready = cal["ready"]
     order = s.ORDERS
     assert (
-        guards["independent"] == 16
+        guards["independent"] == 24
+        and guards["roles"] == list(s.ROLES)
         and guards["orders"] == list(order)
         and guards["boot"] == ready["boot"]
         and guards["case"] == s.case["registered"]
@@ -58,6 +61,7 @@ def verify(out, meter, check_binary=False):
     assert observed_clock["boot"]==ready["boot"] and observed_clock["eligible_blocking_calibration"] and observed_clock["affinity"]==ready["affinity"]
     assert m.filesha(out/"blocking-clock-pre/verified.json")==allocation["blocking"]
     states = []
+    prior_end = 0
     cargo_lines=[]
     history = set()
     for i, rr in enumerate(order):
@@ -83,6 +87,8 @@ def verify(out, meter, check_binary=False):
             baseline = cc.streams(d / "kernel-B")
             assert baseline == cc.streams(d / "bare-B")
             visits=m.read(d/"visit-order.json")
+            assert visits[0][1] >= prior_end
+            prior_end = visits[-1][2]
             assert [x[0] for x in visits]==["wall","whole","threads"] and all(x[1]<x[2]for x in visits) and all(a[2]<=b[1]for a,b in zip(visits,visits[1:]))
             own = {}
             for mode in ("wall", "whole", "threads"):
@@ -159,23 +165,28 @@ def verify(out, meter, check_binary=False):
             dict.fromkeys(x[2] for x in by)
         ) == list(rr)
         states.append(data)
-    metrics = {}
-    for key in ("uv_client", "sum_two", "uv_configuration", "whole", "wall"):
-        metrics[key] = stats([[x[s.ROLES[0]][key], x[s.ROLES[1]][key]] for x in states])
-    primary = metrics["wall"]["all_eight_strictly_above_2x"]
+    assert len(history) == 24 and all(set(state) == set(s.ROLES) for state in states)
+    contrasts = {}
+    for control, treatment in (("S", "P"), ("S", "F"), ("P", "F")):
+        contrasts[control+"-"+treatment] = {
+            scope: stats([[state[control][scope], state[treatment][scope]] for state in states])
+            for scope in ("uv_client", "sum_two", "uv_configuration", "whole", "wall")
+        }
     return dict(
         complete=True,
         actual_signed_Cargo=s.CHECK,
         sources=s.SOURCES,
         boot=ready["boot"],
-        metrics=metrics,
-        primary_wall_twofold_all_eight=primary,
+        roles=list(s.ROLES),
+        ordered_trios=order,
+        raw_by_role=states,
+        contrasts=contrasts,
         observed_Cargo_Finished_lines=cargo_lines,
         original_exact_cold_gate_redeemed=False,
         independent_histories=len(history),
         registered=s.case["registered"],
         release_lock=m.filesha(s.HERE/"release-lock.json"),
-        scope="The two private production compilers share the signed −22 source and CTFE serializer fix. The comparison covers the cumulative performance stack. It measures eight paired ordinary blocking Cargo wall visits and separately restored userspace counters.",
+        scope="P/F isolates #336. S/P and S/F compare the earlier and full compiler stacks against corrected −22 on the same worker. All three use signed −22 Cargo. An independent second worker is required for a repeatability claim.",
     )
 
 

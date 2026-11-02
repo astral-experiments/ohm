@@ -1,4 +1,4 @@
-"""Enforce the corrected stock and full production comparison on one genuine edited Cargo check."""
+"""Compare corrected stock, the stack through #328 and its direct #336 child on the same edit."""
 from pathlib import Path
 import json
 import os
@@ -14,18 +14,23 @@ m=old.m
 register=m.read(HERE/"registration.json")
 case=m.read(HERE/"case.json")
 lock=m.read(HERE/"release-lock.json")
-ROLES=("S","F")
+component=m.read(HERE/"component-plan.json")
+ROLES=("S","P","F")
 SOURCES=lock["sources"]
-ORDERS=register["orders"]
-assert ORDERS==[["S","F"],["F","S"],["F","S"],["S","F"],["F","S"],["S","F"],["S","F"],["F","S"]]
-assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="187a9ff09d03ce98eb5afecc31001db24147c51f9d08d1527b00cd97ef54d8b3"
+ORDERS=component["orders"]
+assert ORDERS==[list(row) for row in ("SPF","FPS","PFS","SFP","FSP","PSF","SPF","FPS")]
+assert case["registered"]==lock["registration"]==m.filesha(HERE/"component-plan.json")=="5871772a0a844bd11c83c1326e2310bd1bf15f1b488d4e68fced3ad124d2c166"
+assert lock["authority_prior"]==m.filesha(HERE/"registration.json")=="187a9ff09d03ce98eb5afecc31001db24147c51f9d08d1527b00cd97ef54d8b3"
+assert lock["preceding_source_sha256"]==m.filesha(HERE/"preceding-material.json")==component["P_F_material_receipts"]["production/rehearsed-77ce-material.json"]
+assert component["argv"]==register["argv"] and component["uv"]==[case["A"],case["B"]]
 assert m.filesha(HERE/"clock-amendment.json")==lock["clock"] and m.filesha(HERE/"trigger-carrier-addendum.json")==lock["trigger"]
 assert m.filesha(HERE/"prespecified-transfer.json") == register["authority_sha256"]
 assert m.filesha(HERE/"eligibility-addendum.json") == register["eligibility_addendum"]
 assert m.filesha(HERE/"replication-plan.json")==register["independent_replication"]
 prior=m.read(HERE/"heldout-passed.json")
 assert prior["primary_and_secondary"]==[True,True] and prior["raw_sha256"]==lock["heldout_original"]
-assert {k:w["commit"] for k,w in SOURCES.items()}=={"S":"10d56274a98801b5ef8f80aab734e835749458e1","F":"ac67101cb973e35ce8ff044cc8014c2c76bab69e"}
+assert SOURCES["S"]["commit"]==component["S"]["rust"] and SOURCES["P"]==component["P"] and SOURCES["F"]==component["F"]
+assert set(SOURCES)==set(ROLES) and lock["signed_cargo"]==component["signed_minus22_cargo_sha256"]
 m.P.update(branch=case["branch"],roles=SOURCES)
 old.P["edited_workspace_roster"]=["uv_client","uv_configuration"]
 CHECK=old.CHECK=[str(m.SDK/"bin/cargo"),*register["argv"][1:]]
@@ -38,7 +43,7 @@ def host():
     assert e["GITHUB_REPOSITORY_ID"]=="1319437234" and e["RELEASE_LOCK"]==m.filesha(HERE/"release-lock.json")
     assert m.sha_git(co,"rev-parse","HEAD").decode().strip()==e["REVIEWED_HEAD"] and m.sha_git(co,"rev-parse","HEAD^").decode().strip()==case["parent"]
     absent={r["boot"] for r in lock["excluded"].values()};boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
-    assert len(absent)==len(lock["excluded"])>=19 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
+    assert len(absent)==len(lock["excluded"])>=25 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
     assert e["EXCLUDED_PRODUCTION_BOOT"]==lock["boot_list_sha256"]==m.digest(("\n".join(sorted(absent))+"\n").encode())
     assert e["BUILD_RUN_ID"]==str(lock["production_compiler"]["run"]) and e["BUILD_HEAD"]==lock["production_compiler"]["coordinator"]
     return w,t,boot
@@ -73,7 +78,7 @@ def main(mode):
         native.run()
     elif mode=="reduce":
         import release_intake
-        release_intake.latest(out/"latest-after-study.json")
+        release_intake.pinned_release(out/"fixed-release-after-study.json")
         import result
         result.close(out)
     else:raise ValueError(mode)
