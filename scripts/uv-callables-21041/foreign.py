@@ -6,7 +6,7 @@ m=c.m
 def transition_sources(folder):
     expected={
         'transition.py':'0790bd45182a550ed820cdca65dd09daad588de012f8fa2f5a357b7a71a7ee39',
-        'transition_v2.py':'f94426329c33d46faa8cf90db5e085463843dd8203f87e38bdacd7636722c62f',
+        'transition_v2.py':'0468395a3e51a1538b6dcc689295ce802e0c99f7faacbd76fcb4e21af7a7013d',
         'transition_sessions.py':'b7ccb7c36b617d5de6b835df4e9e4752dbbf5a79ec939c69bc08d9470b79085a',
     }
     for name,digest in expected.items():

@@ -2,7 +2,7 @@
 from pathlib import Path
 import hashlib, json, os, runpy, shutil, subprocess, sys, tempfile
 S=runpy.run_path(str(Path(__file__).with_name("transition_sessions.py")))
-assert hashlib.sha256(Path(__file__).with_name("transition.py").read_bytes()).hexdigest()=="073ef2c3677d693a62c4943d5586f7b3365628ecba895331c2114350faa2f047" if Path(__file__).with_name("transition.py").exists() else True
+assert hashlib.sha256(Path(__file__).with_name("transition.py").read_bytes()).hexdigest()=="0790bd45182a550ed820cdca65dd09daad588de012f8fa2f5a357b7a71a7ee39" if Path(__file__).with_name("transition.py").exists() else True
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def main(control,candidate,fixture,output,self_test=False):
     control,candidate,fx,out=map(lambda s:Path(s).resolve(),(control,candidate,fixture,output));out.mkdir()

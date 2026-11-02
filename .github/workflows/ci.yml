@@ -26,7 +26,7 @@ jobs:
   root:
     if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-callables-production-check'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41398925829' && inputs.build_head == '4e34ea9c7232977f95498d7bf48d382157e8558b'
-      && inputs.sdk_lock_sha256 == '60b02674ec990167d3e9437dd9f2da10e9556064c1af2bf107bad1f911e3334c'
+      && inputs.sdk_lock_sha256 == 'c8cef3c955e3dfaa319ba15d551d8a5961c95f8411cfb8ee54aac46b6abe7ebb'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
     env:
