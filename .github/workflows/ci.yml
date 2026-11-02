@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-admit, ldv-placement-reopen, ldv-placement-score]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-c3b-factory, ldv-placement-admit, ldv-placement-reopen, ldv-placement-score]
         default: single-22
       ldv_admission:
         description: Same-commit successful wrapper-free native workflow run ID for scoring
@@ -798,7 +798,8 @@ jobs:
           retention-days: 30
 
   placement-factory:
-    if: inputs.mode == 'ldv-placement-factory' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-workspace-link-census-20261102'
+    name: Independently build the normal and guarded source-placement compilers
+    if: inputs.mode == 'ldv-placement-c3b-factory' && inputs.placement_source == 'ed0262f9bdc384576925229764971f23a141c95f' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-c3b-20261102'
       && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
@@ -825,6 +826,7 @@ jobs:
           .github/workflows
           scripts/ruff-ldv-physical-stage
           scripts/ruff-source-placement
+          scripts/ruff-source-placement-c3b
         persist-credentials: false
         fetch-depth: 16
     - name: Check out the exact source factory shared with the public coalescer
@@ -918,7 +920,9 @@ jobs:
         ./scripts/validate-release-manifest.sh --require-pinned toolchains/1.99.0/23.json
         (cd qa-code/scripts/ruff-ldv-physical-stage && sha256sum --check --strict --quiet SHA256SUMS)
         (cd qa-code/scripts/ruff-source-placement && sha256sum --check --strict --quiet factory.sha256)
-        python3 -IB qa-code/scripts/ruff-source-placement/factory.py preflight
+        (cd qa-code/scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet factory.sha256)
+        python3 -IB qa-code/scripts/ruff-source-placement-c3b/test_source_packet.py
+        python3 -IB qa-code/scripts/ruff-source-placement-c3b/factory.py preflight
         python3 -IB qa-code/scripts/ruff-ldv-physical-stage/tests.py
         python3 -IB qa-code/scripts/ruff-ldv-physical-stage/contact-tests.py
     - name: Assemble the complete pinned Rust, Cargo, Clippy and rustfmt checkouts
@@ -934,11 +938,11 @@ jobs:
         set -euo pipefail
         gh api -H "Accept: application/octet-stream" repos/astral-experiments/ohm/releases/assets/698533704 > "$RUNNER_TEMP/ohm-branch-object-qa/signed-cargo.tar.gz"
     - name: Build the independently empty source compilers and prove each physical constructor
-      run: python3 -IB -u qa-code/scripts/ruff-source-placement/factory.py build
+      run: python3 -IB -u qa-code/scripts/ruff-source-placement-c3b/factory.py build
     - name: Retain both complete stage1 kits and source-matched rustdoc
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
-        name: placement-matched-stage
+        name: placement-c3b-matched-stage
         path: ${{ runner.temp }}/ohm-branch-object-qa/transport
         compression-level: 0
         retention-days: 7
@@ -947,7 +951,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
-        name: placement-factory-originals
+        name: placement-c3b-factory-originals
         path: ${{ runner.temp }}/ohm-branch-object-qa/logs
         compression-level: 6
         retention-days: 7

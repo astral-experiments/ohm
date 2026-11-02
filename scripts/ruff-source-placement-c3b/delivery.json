@@ -1,0 +1,20 @@
+{
+  "C3b": "ed0262f9bdc384576925229764971f23a141c95f",
+  "C3b_tree": "d4a6f3ab70185bec03263086863376298c293360",
+  "guarded_changed_sources": {
+    "compiler/rustc_codegen_llvm/src/back/placed_object.rs": "3bf7f1dd73199607ebd6d5a71b29eb06699de59d84d737591a191570f799bcf1",
+    "compiler/rustc_codegen_llvm/src/back/source_placement/maps.rs": "831c0792d05b1b765aaf024b154b0d911d02076f0442bb0b01eb762745e679bc",
+    "compiler/rustc_llvm/llvm-wrapper/OhmSourcePlacement.cpp": "6d3e776e9582f1f27cea2fd8715562b6f9fdbcc13d660591c665171218f3c2c9"
+  },
+  "independent_QA_handoff": {
+    "C2-to-C3b-QA.tar.gz": "ff87c91363068fa64a3f09dff99af61ebee8722c4ae3f4759bfaf4ddc52eae17",
+    "C2-to-C3b.patch": "bd89565b91e17384b33ac0d5a1ad3e0b4fb7847e7f484fb8f854928cc5565a10",
+    "compact-one.json": "324ed29e989c793dab6d8c0e33e7b06a2bcde3fee97af3f865e7c4a41aca42f1",
+    "complete-21.json": "dfb4887e1cdb60bfe403bffff195b1cae42886b72ca48e2ea354c982d695402c",
+    "rehearsal.json": "be7ea7b15992f53fc0cb3b6689797de1c4204219dc587bf72cde1a85cc312974"
+  },
+  "parent": "4e546b27c311f29d99f9528e64420887f57c7538",
+  "schema": "true-C2-to-C3b-three-product-files-1",
+  "source_packet": "ba690e7f427398a70d74017577efd2cb9a6e2eb1792d15975a8a79c7c08f59e4",
+  "verification": "Ran git apply --check and git apply on the three original C2 Git blob bodies. Each resulting file matched its independent packet digest and the remotely reopened, complete candidate commit. The factory builds both P and C3b from full registered source."
+}
