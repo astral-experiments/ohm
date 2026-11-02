@@ -252,6 +252,9 @@ def compiler_arm(r, w, manifest, arm, env):
                    if family in line and (m := re.search(r"=> (/\S+) \(", line))]
         need(matches and all(any(p.samefile(root/f) for f in files) for p in matches),
              ("unanalyzed compiler library", family, loaded))
+    # ldd reports a fresh ASLR address on each invocation. The sonames and
+    # resolved paths identify the providers whose physical files we checked.
+    loaded = re.sub(r" \(0x[0-9a-fA-F]+\)$", "", loaded, flags=re.MULTILINE)
     return selected, [], cc, {"mode": "matched-rustc", "root": str(root), "files": files, "version": version,
                               "loaded_compiler_libraries": loaded}
 
@@ -381,7 +384,7 @@ def run(r, args, w, registry, expected_registry, original_cargo, clock):
                     import sys
                     need(manifest is None and cli == CARGO, "trace requires the ordinary signed compiler")
                     link_trace.collect(r, sys.modules[__name__], w, cli, repo, env, work, case/"link-trace",
-                                       graph, expected, owners, blobs, dirt["unchanged"][arm], binary)
+                                       expected, owners, blobs, dirt["unchanged"][arm], binary)
                 need(registry(home) == expected_registry, "modified private registry")
         need(compiler_arm(r, w, manifest, arm, base_env)[3] == identity, "compiler changed during its histories")
     need(set(catalogs["new"]) - set(catalogs["old"]) == {ADDED}

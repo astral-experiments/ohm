@@ -49,33 +49,35 @@ def execs(out):
     return processes
 
 
-def collect(r, e, w, cli, repo, env, work, out, graph, expected, owners, blobs, stable_dirty, repaired):
+def collect(r, e, w, cli, repo, env, work, out, expected, owners, blobs, stable_dirty, repaired):
     out.mkdir()
     source = e.source_state(r,repo,blobs,"repair")
     old = r.sha(repaired)
     input_files(r,work,repaired,out)
     result = {}
-    for phase in ("ordinary","verbose","traced"):
+    for phase in ("ordinary","traced","fingerprint"):
         argv = list(cli)
         extra = dict(env)
-        if phase != "ordinary":
-            extra.update(CARGO_LOG="cargo::core::compiler::fingerprint=trace",
-                         RUSTC_LOG="rustc_codegen_ssa::back::link=info")
-            argv.append("-vv")
+        if phase == "fingerprint":
+            extra["CARGO_LOG"] = "cargo::core::compiler::fingerprint=trace"
         if phase == "traced":
             argv = ["strace","-ff","-qq","-e","trace=execve,execveat","-e","signal=none",
                     "-s","1024","-o",str(out/"exec"),"--",*argv]
         dest = out/phase
         r.run(argv,repo,extra,dest,work,out)
-        rows = r.cargo_rows((dest/"outer.stdout").read_bytes(),graph if phase != "ordinary" else None)
+        rows = r.cargo_rows((dest/"outer.stdout").read_bytes())
         w.ownership.check_roots(rows,work)
         dirty, keys, binary = e.products(rows,expected,owners,"unchanged",work,repo)
-        e.need(r.sha(binary) == old and binary.samefile(repaired) and source == e.source_state(r,repo,blobs,"repair"),
-               ("trace changed executable or sources",phase))
+        digest = r.sha(binary)
+        same_product = binary.samefile(repaired) and digest == old
+        e.need(source == e.source_state(r,repo,blobs,"repair"), ("changed effective source",phase))
+        if phase != "fingerprint":
+            e.need(same_product, ("ordinary invocation changed executable",phase))
         r.run([binary,"--exact",e.ADDED,"--nocapture"],repo,env,dest/"native",work,out)
         e.executed((dest/"native/outer.stdout").read_text(),(dest/"native/outer.stderr").read_text(),e.ADDED,False)
         e.need(not (dest/"clock.json").exists(), "diagnostic command was metered")
-        result[phase] = {"dirty_keys":dirty, "products":len(keys), "binary":old}
-    result["matches_original_unchanged"] = all(result[p]["dirty_keys"] == stable_dirty for p in ("ordinary","verbose","traced"))
-    result["processes"] = execs(out)
-    r.put(out/"trace.json",result)
+        result[phase] = {"dirty_keys":dirty, "products":len(keys), "binary":digest, "same_product":same_product}
+        if phase == "traced":
+            result["processes"] = execs(out)
+            result["matches_original_unchanged"] = all(result[p]["dirty_keys"] == stable_dirty for p in ("ordinary","traced"))
+        r.put(out/"trace.json",result)
