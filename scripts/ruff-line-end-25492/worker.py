@@ -117,21 +117,55 @@ def fetch(private,env):
     save(LOG/'registry.json',{'lock':LOCK,'crates':expected,'git_source':gits,'git_checkout_heads':heads})
 
 
-def witness(folder,env,products,rows,old):
-    libs=[Path(f) for r in products if r['target']['name']=='ruff_source_file' for f in r['filenames'] if f.endswith('.rlib')]
-    lib,=libs
+def source_variants(phase,products,compilers):
+    variants={(): 'no-features', ('get-size','serde'): 'get-size+serde'}
+    libs={}
+    for r in products:
+        if r['target']['name']=='ruff_source_file':
+            label=variants[tuple(sorted(r['features']))]
+            lib,=[Path(f) for f in r['filenames'] if f.endswith('.rlib')]
+            assert label not in libs
+            libs[label]=lib
+    assert sorted(libs)==sorted(variants.values())
+    seen={};literal=[]
+    for proc in compilers:
+        a=proc['args']
+        if proc['crate']=='ruff_source_file' and not proc['link_only']:
+            features=tuple(sorted(f[len('feature="'):-1] for flag,f in zip(a,a[1:]) if flag=='--cfg' and f.startswith('feature="') and f.endswith('"')))
+            label=variants[features]
+            extra,=[v.split('=',1)[1] for v in a if v.startswith('extra-filename=')]
+            assert libs[label].name=='libruff_source_file'+extra+'.rlib' and label not in seen
+            seen[label]=proc['pid']
+        if proc['crate']=='ruff' and '--crate-type' in a and a[a.index('--crate-type')+1]=='bin':
+            paths=[Path(v.split('=',1)[1]) for flag,v in zip(a,a[1:]) if flag=='--extern' and v.startswith('ruff_source_file=')]
+            archives=[p for p in paths if p.suffix=='.rlib']
+            if archives:
+                assert archives==[libs['get-size+serde']]
+                assert all(p.with_suffix('.rlib')==libs['get-size+serde'] for p in paths)
+                literal.append({'pid':proc['pid'],'paths':list(map(str,paths))})
+    if phase in ('old','clean'):
+        assert set(seen)==set(libs) and len(literal)==1,(phase,seen,literal)
+    return libs,{'libraries':{k:str(v) for k,v in libs.items()},'physical_compilers':seen,'physical_cli_externs':literal}
+
+
+def witness(folder,env,products,rows,old,libs):
     root,={Path(r['executable']) for r in products if r.get('executable') and r['target']['name']=='ruff' and 'bin' in r['target']['kind']}
     dirs={Path(f).parent for r in products for f in r['filenames'] if f.endswith(('.rlib','.rmeta','.so'))}
-    argv=['rustc','+ohm','--edition=2024','--crate-name','line_end_reader',HERE/'witness.rs','--extern','ruff_source_file='+str(lib)]
-    for d in sorted(dirs):argv+=['-L','dependency='+str(d)]
-    for d in sorted({d for r in rows if r['reason']=='build-script-executed' for d in r['linked_paths']}):argv+=['-L',d]
-    binary=folder.parent.parent/'study'/'line-reader'
-    argv+=['-o',binary]
-    save(folder/'reader.argv.json',list(map(str,argv)))
-    run(argv,env,SRC)
-    result=run([binary],env,SRC)
+    native={d for r in rows if r['reason']=='build-script-executed' for d in r['linked_paths']}
     expected='lf 1 3\ncrlf '+('2' if old else '1')+' 4\ncr 1 3\nunicode '+('3' if old else '2')+' 6\n'
-    assert result.stdout.decode()==expected and not result.stderr,(result.stdout,result.stderr)
+    typed={};commands={}
+    for label,lib in sorted(libs.items()):
+        argv=['rustc','+ohm','--edition=2024','--crate-name','line_end_reader',HERE/'witness.rs','--extern','ruff_source_file='+str(lib)]
+        for d in sorted(dirs):argv+=['-L','dependency='+str(d)]
+        for d in sorted(native):argv+=['-L',d]
+        binary=folder.parent.parent/'study'/('line-reader-'+label)
+        argv+=['-o',binary]
+        commands[label]=list(map(str,argv))
+        run(argv,env,SRC)
+        result=run([binary],env,SRC)
+        assert result.stdout.decode()==expected and not result.stderr,(result.stdout,result.stderr)
+        typed[label]=result.stdout.decode()
+    save(folder/'reader.argv.json',commands)
     version=run([root,'--version'],env,SRC)
     assert version.stdout.startswith(b'ruff ')
     cli=[root,'check','--isolated','--no-cache','--select','F401','--output-format','json','--stdin-filename','registered-crlf.py','-']
@@ -151,7 +185,8 @@ def witness(folder,env,products,rows,old):
         nb=json.loads(cp.stdout)
         assert [d['code'] for d in nb]==['F401'] and not cp.stderr,(nb,cp.stderr)
         cases.append({'notebook_cells':cells,'exit':1,'json':nb})
-    verdict={'typed':result.stdout.decode(),'cli_cases':cases,'cli_version':version.stdout.decode(),'cli_sha256':sha(root),'archive_sha256':sha(lib)}
+    verdict={'typed':typed['get-size+serde'],'typed_by_features':typed,'cli_cases':cases,'cli_version':version.stdout.decode(),'cli_sha256':sha(root),
+             'archive_sha256s':{k:sha(v) for k,v in libs.items()}}
     save(folder/'verdict.json',verdict)
     return verdict
 
@@ -211,9 +246,8 @@ def case(phase,private,base_env,state,perf,old=None,retain=None):
     products=[r for r in rows if r['reason']=='compiler-artifact']
     assert len(products)>150
     assert all(r['target']['src_path'] for r in products)
-    primary=[r for r in procs if r['crate']=='ruff_source_file' and not r['link_only']]
-    if phase in ('old','edit','clean'):
-        assert len(primary)==1,(phase,primary)
+    libs,units=source_variants(phase,products,procs)
+    save(folder/'source-units.json',units)
     if phase in ('old','clean'):
         assert all(not r['fresh'] for r in products)
         assert set(OWNERS)<={r['crate'] for r in procs if not r['link_only']}
@@ -225,7 +259,7 @@ def case(phase,private,base_env,state,perf,old=None,retain=None):
              'roster':sorted([r['crate'],r['link_only']] for r in procs),'wild':len(links),'products':len(products),
              'sampled':sampled,'storage':{'overall':storage(state),'roots':target_sizes}}
     save(folder/'summary.json',summary)
-    verdict=witness(folder,env,products,rows,phase=='old')
+    verdict=witness(folder,env,products,rows,phase=='old',libs)
     return summary,ledger,verdict
 
 

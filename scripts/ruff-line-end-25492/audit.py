@@ -77,21 +77,22 @@ def exec_roster(trace, dst, sdk, host):
 
 
 def incremental(roots, owners, previous=None, retain=None):
-    candidates = {owner:[] for owner in owners}
+    candidates = {}
     for path in roots.rglob('dep-graph.bin'):
         session = path.parent
         if session.name.startswith('s-') and not session.name.endswith('-working'):
             for owner in owners:
                 if session.parent.name.startswith(owner+'-'):
-                    candidates[owner].append(session)
+                    key=(owner,session.parent.name)
+                    candidates.setdefault(key,[]).append(session)
     results = {}
-    for owner, matches in candidates.items():
-        prior = (previous or {}).get(owner,{})
+    for (owner, unit), matches in sorted(candidates.items()):
+        prior = (previous or {}).get(unit,{})
         old_session = prior.get('session')
         if len(matches)>1 and old_session:
             matches = [p for p in matches if str(p)!=old_session]
         if len(matches)!=1:
-            results[owner]={'sessions':list(map(str,matches)),'objects':{},'unqualified':True}
+            results[unit]={'owner':owner,'sessions':list(map(str,matches)),'objects':{},'unqualified':True}
             continue
         session, = matches
         objects = {}
@@ -107,7 +108,10 @@ def incremental(roots, owners, previous=None, retain=None):
                 row['same_old_bytes'] = row['sha256']==old[p.name]['sha256']
                 row['physically_reused'] = row['same_old_inode'] and row['same_old_bytes']
             objects[p.name]=row
-        results[owner]={'session':str(session),'objects':objects}
+        results[unit]={'owner':owner,'session':str(session),'objects':objects}
+    for owner in owners:
+        if not any(v['owner']==owner for v in results.values()):
+            results[owner]={'owner':owner,'sessions':[],'objects':{},'unqualified':True}
     return results
 
 
