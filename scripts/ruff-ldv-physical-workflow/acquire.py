@@ -12,6 +12,7 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import runtime
 import shards
+import extern_inputs
 from runtime import census,guards,need,put,sha,support,transport
 import micro
 import pilot
@@ -35,7 +36,7 @@ def source_entry(source,suite):
     return selected
 
 
-def phase(kit,loc,work,repo,env,which,suite,graph,cmd,extras,gold,score,opens):
+def phase(kit,loc,work,repo,env,which,suite,graph,cmd,extras,gold,score,opens,admit):
     rusts,actual,roster,probes,pmsha,dso=runtime.visit(kit,loc,work,repo,env,cmd,101 if which=="invalid" else 0,
         score=score,cold=which in ("old","clean-new"),observe=opens)
     rows=replay.cargo_rows((loc/"outer.stdout").read_bytes())
@@ -72,6 +73,8 @@ def phase(kit,loc,work,repo,env,which,suite,graph,cmd,extras,gold,score,opens):
             need(f.is_file(),"shared registry extern named by the actual owner is missing after compilation")
             direct[value]={"sha256":sha(f),"identity":runtime.stat_id(f)}
         put(loc/"shared-extern-files.json",direct)
+    if admit and which in ("old","new","clean-new"):
+        extern_inputs.capture(kit,loc,env,rusts,namespace,suite,kit.active,which)
     put(loc/"result.json",result)
     return result
 
@@ -132,7 +135,7 @@ def suite_run(kit,root,source,suite,stage,role_order):
                     before=source_state(which,True)
                     loc=case/which
                     actual=phase(kit,loc,work,repo,base,which,suite,graph,cmd,extras,gold,
-                        stage=="score" and kind=="edit" and which in ("old","new","unchanged"),stage=="admit" and which=="new")
+                        stage=="score" and kind=="edit" and which in ("old","new","unchanged"),stage=="admit" and which=="new",stage=="admit")
                     need(before==source_state(which,False),"real source mutation during visit")
                     put(loc/"source.json",before)
                     observed[which]=actual

@@ -14,6 +14,7 @@ import zipfile
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import doc_support
+import extern_diff
 import shards
 import transport as t
 import childenv
@@ -355,6 +356,7 @@ def scan(z,run,head,stage,slot):
     bodies=verify_bytes(z)
     stats={}
     counts={}
+    registry_input_audits={}
     total=Counter()
     for suite in start["assignment"]["suites"]:
         d="physical/"+suite+"/"
@@ -397,9 +399,11 @@ def scan(z,run,head,stage,slot):
                  "changed behavior/argv/roster outside the verified compiler identity")
         need(read(z,d+"cross-role.json")=={"shards":{r:sorted(v) for r,v in groups.items()},"mismatches":[],"own_clean_mismatches":[]},
              "different source-role comparison")
+        if stage=="admit":
+            registry_input_audits[suite]=extern_diff.scan(z,suite,dirs,{r:next(iter(v)) for r,v in groups.items()})
     return {"stage":stage,"slot":slot,"qa":head,"run":run,"factory":t.BUILD,"confirmation":t.CONFIRM,"boot":start["boot"],
             "assignment":start["assignment"],"terminal_sha":digest(z.read("physical/complete.json")),"roles":proof["physical"],
-            "coverage":dict(total),"inputs":{s:end["suites"][s]["source"] for s in end["suites"]},"source_docs":spec,"behavior":stats,
+            "coverage":dict(total),"inputs":{s:end["suites"][s]["source"] for s in end["suites"]},"source_docs":spec,"comparison_of_role_generated_inputs":registry_input_audits,"behavior":stats,
             "bodies":{k:sorted(v) for k,v in bodies.items()},"calibration":hardware,"events":counts}
 
 

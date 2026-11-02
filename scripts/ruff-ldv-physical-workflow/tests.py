@@ -223,5 +223,24 @@ class Controls(unittest.TestCase):
                 doc_support.qualification("P",row|change,o)
 
 
+    def test_full_input_body_comparison(self):
+        import extern_diff as x
+        def member(name,b):
+            h=name.encode().ljust(16)+b"0".ljust(12)+b"0".ljust(6)+b"0".ljust(6)+b"100644".ljust(8)+str(len(b)).encode().ljust(10)+bytes((96,10))
+            return h+b+(b"\n" if len(b)%2 else b"")
+        p,c="v2-1122334455667788","v2-ffeeddccbbaa0099"
+        a=(p+"/src/abc").encode();b=a.replace(p.encode(),c.encode())
+        self.assertTrue(x.delta(a,b,p,c)["all_bytes_equal_after_exact_v2"])
+        with_extra=x.delta(a,b[:-1]+b"d",p,c)
+        self.assertEqual(with_extra["residual_byte_count"],1)
+        self.assertFalse(with_extra["all_bytes_equal_after_exact_v2"])
+        mk=lambda data:b"!<arch>\n"+member("lib.rmeta/",data)+member("fixed.o/",b"immutable")
+        diff=x.archive_delta(mk(a),mk(b),p,c)
+        self.assertEqual([r["member"] for r in diff["different_members"]],["lib.rmeta"])
+        self.assertTrue(diff["headers_match"] and diff["ordered_names_match"])
+        with self.assertRaises(ValueError):
+            x.ar(mk(a)[:-3])
+
+
 if __name__=="__main__":
     unittest.main()
