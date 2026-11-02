@@ -214,7 +214,12 @@ archive_size=$(wc -c <native/libanswer.a)
 write_archive 29
 test "$(wc -c <native/libanswer.a)" = "$archive_size"
 touch -r archive-timestamp native/libanswer.a
-check_links 29 2
+check_links 17 0
+
+# Declare the archive before checking that the linker sees a broken replacement.
+write_build_script native/libanswer.a
+check_links 29
+check_links 29 0
 : >"$OHM_SMOKE_LINK_LOG"
 echo 'malformed archive' >native/libanswer.a
 if cargo +"$toolchain" build --bins --offline >bad-archive.log 2>&1; then
@@ -237,3 +242,51 @@ check_links 41 2
 rm "$earlier_native/libanswer.a"
 check_links 29 2
 rmdir "$earlier_native"
+
+# A register-only assembly dependency must leave a procedural macro and its
+# consumers fresh when none of their declared inputs changed.
+write_build_script native/libanswer.a
+cat >>engine/src/lib.rs <<'RS'
+pub fn pair(mut hi: usize, mut lo: usize) -> usize {
+    unsafe { core::arch::asm!("/*{0}{1}*/", inout(reg) hi, inout(reg) lo) };
+    hi + lo
+}
+RS
+mkdir -p value-macro/src
+cat >value-macro/Cargo.toml <<'TOML'
+[package]
+name = "value-macro"
+version = "0.1.0"
+edition = "2021"
+[lib]
+proc-macro = true
+[dependencies]
+engine = { path = "../engine" }
+TOML
+cat >value-macro/src/lib.rs <<'RS'
+use proc_macro::TokenStream;
+#[proc_macro]
+pub fn value(_: TokenStream) -> TokenStream {
+    engine::pair(8, 9).to_string().parse().unwrap()
+}
+RS
+echo 'value-macro = { path = "value-macro" }' >>Cargo.toml
+for bin in first second; do
+  echo 'const _: usize = value_macro::value!();' >>"src/bin/$bin.rs"
+done
+check_links 29
+for repeat in 1 2; do
+  cargo +"$toolchain" build --bins --offline --message-format=json >"macro-warm-$repeat.jsonl"
+  python3 - "macro-warm-$repeat.jsonl" <<'PY'
+import json, sys
+with open(sys.argv[1]) as lines:
+    records = (json.loads(line) for line in lines if line.startswith("{"))
+    artifacts = [item for item in records if item["reason"] == "compiler-artifact"]
+names = {item["target"]["name"] for item in artifacts}
+if not {"value_macro", "first", "second"} <= names:
+    sys.exit("Expected the procedural macro and both binaries in the warm build")
+dirty = [item["target"]["name"] for item in artifacts if not item["fresh"]]
+if dirty:
+    sys.exit("Unchanged build recompiled " + ", ".join(dirty))
+PY
+done
