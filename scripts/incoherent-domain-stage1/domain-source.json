@@ -1,5 +1,5 @@
 {
-  "commit": "3aa96764bb1f1c17652849247bd1b82ae25aff6f",
+  "commit": "b9b3f6bba90145e25eb3b76864cfd0b5f4cbdc1f",
   "epoch": 43317,
   "files": {
     "compiler/rustc_hir_analysis/src/coherence/inherent_impls.rs": "f4fefb1bfbaa543ca381337dbd2af2c5897a035c",
@@ -14,7 +14,7 @@
     "tests/run-make/crate-incoherent-impl-domain/local.rs": "2493cf102d3498ba66745da69fe616f8568c6c2e",
     "tests/run-make/crate-incoherent-impl-domain/owner.rs": "eda2abd20b473bb323011083fa6584b860b20198",
     "tests/run-make/crate-incoherent-impl-domain/reader.rs": "5a180497558e50524025aee9c3b784b4911251d1",
-    "tests/run-make/crate-incoherent-impl-domain/rmake.rs": "5be4d9890a3f6cf94dedf95dfd6057aa96906240",
+    "tests/run-make/crate-incoherent-impl-domain/rmake.rs": "fe15c81459d899431f345a8f0744f42b18975b12",
     "tests/run-make/crate-incoherent-impl-domain/roster.rs": "8f9a5804dbe11306486563404a24d457fd335be5"
   },
   "metadata_epoch": 43311,
@@ -32,8 +32,8 @@
       "read_str": 1
     }
   },
-  "pack_bytes": 104433,
-  "pack_git_id": "8dc0ffd02bb8b871ab2cd13ee976d8a88ba8eefb",
+  "pack_bytes": 104437,
+  "pack_git_id": "30c815d440aee2b8ed824d09c26cd776fb6033b2",
   "pack_kind": "strict relative to exact parent",
   "pack_objects": 35,
   "parent": "f22825348d834ad9a8ef3934647181fb69f778ae",
@@ -51,7 +51,7 @@
   "parent_tree": "96580055f15f61821eefb6875350ce0570995d8c",
   "run_make": "tests/run-make/crate-incoherent-impl-domain",
   "sha256": {
-    "domain.pack": "2aa887d353038af89741024d2c8dc5e54874e6cf00120f25445943eba374337b",
+    "domain.pack": "df71905d2519363b2d9abff55af598cf5f522d2cde7695aab2bb07562a07572e",
     "fixture/oracle.py": "0574aea58e30cc9af22a06be5bf934d56ec8b609aa6cb03dfb25440a45b241fe",
     "fixture/profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219",
     "fork-epochs.json": "e5d9a6338b51de567ebb3572c61d58865d5e86c2907cc1e55d1b1fa171072dc9",
@@ -59,8 +59,16 @@
     "parent-local01/qualified.json": "5705f66ec37b6a5c9940881d9e35a42574b1d00f4888c863991d5c508e46e976",
     "parent-official02/observed.json": "debeef4a20500a3170f1e5f783a5a891a2c7cce030fe8bd1fec59bb4f7fddeb5",
     "parent-official02/qualified.json": "3fc34c76e5828a5b165504973c482050bcace8d5693ffb98f99451562a6ef74d",
-    "source-delta.patch": "cec51a746b21134d3663dd4bf488496e661e60e43855fe852111ca669252cf47",
+    "source-delta.patch": "30f3e75a01252c05afbb7373ccd55af55f7796dba0da98168ffaadecb2923e46",
     "study/protocol.json": "391734d56e4a34e80abee9479dec42ac04289eaf3e689e6677bfb61016161c93"
   },
-  "tree": "e5fcf44bbdbc4757d7f8c05b3639e9fc9d0521fc"
+  "sole_correction_from_first": {
+    "actual_original_and_repaired": "76f9d4e112b42e79328e604e5cde81c0d67c7d341c91f870f9e934ca4cd80809",
+    "blob": "fe15c81459d899431f345a8f0744f42b18975b12",
+    "file": "tests/run-make/crate-incoherent-impl-domain/rmake.rs",
+    "same_compiler_tree": "2e928ad4bc47304222879e0ae2d45cf2d5e79e2a",
+    "source": "3aa96764bb1f1c17652849247bd1b82ae25aff6f",
+    "source_test_numstat": "1\t1\ttests/run-make/crate-incoherent-impl-domain/rmake.rs"
+  },
+  "tree": "8e353a94876b12f57f10fb5e2988ba305d538266"
 }

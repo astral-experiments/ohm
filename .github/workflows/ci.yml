@@ -94,7 +94,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = ee90d022e7abb6c2c2f61b751c49de06bba29aed
+        test "$(git rev-parse HEAD^)" = acfa00adf70348b8555820e03c038731b847f351
 
         '
     - name: Verify all four source packs and the direct f228 child
