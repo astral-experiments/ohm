@@ -89,11 +89,26 @@ def checked_visit(role,rev,phase,env,prior,key,*,pins=None,is_counted=False):
     commit=checked.CFG['roles'][role]['commit'];save(case/'storage.json',dict(total=allocated(),ruff_db=graph_costs.session_costs(now,commit)));return now,objs,visit
 
 
+def physical(path):
+    st=path.stat();return [st.st_dev,st.st_ino,st.st_size,st.st_mtime_ns,sha(path)]
+
+
+def regular_unchanged(role,env,folder):
+    real=PROTOCOL['unchanged_rehearsal'];prior=checked.OUT/(role+'-edit');visit=json.loads((prior/'visit.json').read_bytes());session=Path(visit['session']);old_sessions=checked.sessions();objects=json.loads((prior/'objects.json').read_bytes());rows=[json.loads(line)for line in (prior/'cargo.stdout').read_bytes().splitlines()];test,=[r for r in rows if r.get('reason')=='compiler-artifact' and r['target']['name']=='ruff_db' and r['target']['kind']==['lib'] and r['profile']['test']];renderer,=[r for r in rows if r.get('reason')=='compiler-artifact' and r['target']['name']=='annotate_snippets' and r['target']['kind']==['lib'] and r['features']==['default','simd','std']];rlib,=(Path(p)for p in renderer['filenames']if p.endswith('.rlib'));final=Path(test['executable']);paths={n:session/v['filename']for n,v in objects.items()};paths[':elf']=final;paths[':rlib']=rlib;need(len(paths)==real['all_cgus']+2 and session in old_sessions,'unobserved unchanged session/objects')
+    with ExitStack()as stack:
+        pinned={n:(stack.enter_context(path.open('rb')),physical(path))for n,path in paths.items()};events,count=run_cargo(env,folder,True);now_sessions=checked.sessions();need(not now_sessions-old_sessions and session in now_sessions,'unchanged published a new incremental session or lost the current one');observations={}
+        for n,(fd,before)in pinned.items():
+            now=physical(paths[n]);st=os.fstat(fd.fileno());fd.seek(0);live=[st.st_dev,st.st_ino,st.st_size,st.st_mtime_ns,hashlib.file_digest(fd,'sha256').hexdigest()];need(before[:3]==now[:3]==live[:3] and before[-1]==now[-1]==live[-1] and (before[3]!=now[3])==(n==':elf') and now[3]==live[3],'unchanged physical output differs: '+n);observations[n]=dict(before=before,after=now,live_old=live)
+    arcs=[x for x in events if x.get('reason')=='compiler-artifact'];nonfresh=[x for x in arcs if not x['fresh']];need(len(arcs)==real['fresh_other']+1 and len(nonfresh)==1 and nonfresh[0]['target']['name']==real['nonfresh_target'] and nonfresh[0]['target']['kind']==['lib'] and nonfresh[0]['profile']['test'] and nonfresh[0]['executable']==str(final),'different normal unchanged Cargo work');save(folder/'unchanged-physical.json',dict(caller_objects=real['all_cgus'],nonfresh=real['nonfresh_target'],session=str(session),protected=observations));return events,count
+
+
 def control(role,phase,env,*,invalid=False):
-    folder=checked.OUT/(role+'-'+phase);folder.mkdir();rows,count=run_cargo(env,folder,phase=='unchanged',invalid=invalid);info={'exit':101 if invalid else 0,'source':checked.git('rev-parse','HEAD'),'allocated':allocated(),'counted':count is not None}
+    folder=checked.OUT/(role+'-'+phase);folder.mkdir()
+    if phase=='unchanged':rows,count=regular_unchanged(role,env,folder)
+    else:rows,count=run_cargo(env,folder,False,invalid=invalid)
+    info={'exit':101 if invalid else 0,'source':checked.git('rev-parse','HEAD'),'allocated':allocated(),'counted':count is not None}
     if not invalid:
         placement=checked.normal_registry.capture(rows,checked.STATE,True);need((placement['sha256'],placement['products'],placement['shared'])==(checked.CFG['registry']['sha256'],123,114),'incorrect signed registry map');save(folder/'registry.json',placement);native=checked.native('new',rows,folder,env);check_native(role,'new',folder,rows,dict(native=native),None);info['native']=native
-        if phase=='unchanged':need(all(v['fresh']for v in rows if v.get('reason')=='compiler-artifact'),'unchanged compiled a Cargo unit')
     save(folder/'visit.json',info)
 
 
