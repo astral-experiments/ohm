@@ -1,0 +1,1544 @@
+{
+  "run": 41413027168,
+  "head": "612ed6519a7b69b5b583ea9cf7c4d98a110010ea",
+  "initial_test_registration_refused": 41407781135,
+  "independent_signed_reference": {
+    "run": 41412344287,
+    "head": "eb30225b818ca2b5eb806f77da847a321c6954d3",
+    "job": 125168020408,
+    "artifact": 13125439826,
+    "sha256": "04e7829a6d52b9991de318ca18c4c0065c385d31850ed6618bdc236a6d1a7683"
+  },
+  "signed_complete_elf_sha256s_by_source_and_target": {
+    "new": {
+      "example/custom_error/False": [
+        "8300f4f99e5452855bcca017ef153af3d709b3c61a2b1a6ae0678b8b03021c6d"
+      ],
+      "example/custom_level/False": [
+        "8bcb4dbe835bb729a018f4162069dcd70cdf3316192e5661bf7aa7d9068b5246"
+      ],
+      "example/elide_header/False": [
+        "f40710b146e793200d394dd7d4bb77f53878fa88e277c4fc03197bae9b52cf65"
+      ],
+      "example/expected_type/False": [
+        "2752a299bfff78afa41a29cb8599c5d25cc23e4b59427456f4594d26a39ea534"
+      ],
+      "example/footer/False": [
+        "83d79d69748fe687abb7edbc395271581664f4633cff44bbd7bc1fa6e245a901"
+      ],
+      "example/format/False": [
+        "3c411e6a942563b565742800b1dd7f4e5da850ceea0a2f1d699d534ff201d5ac"
+      ],
+      "example/highlight_message/False": [
+        "2c3ef196468143556d26123444c6bc529ba5785e22e09e4bfc53c4d4b76c2e38"
+      ],
+      "example/highlight_source/False": [
+        "a83b2e6d231d3e555de6012f356bb0b336bdc4269bf5d4fabaab9ec97d15d267"
+      ],
+      "example/id_hyperlink/False": [
+        "aa5ac57371193ae9d885c5a73a4d4769d20a363c9ecfd4aee3e75b1445f8ea2d"
+      ],
+      "example/multi_suggestion/False": [
+        "4b395848625140ba997c1bc44664e0c7991cbdb4b7a94aeced89bc5100f5bf31"
+      ],
+      "example/multislice/False": [
+        "b0f827fe09c5c9bf88f54846f99cac67935284cdea1fcda77f6ab04dda68c4c6"
+      ],
+      "example/struct_name_as_context/False": [
+        "39a945105fee786cbafef2b6642e12c95f66115359576652b4e935c97a44c97b"
+      ],
+      "test/color/True": [
+        "3090192b1eafab0242f8ee2f8190c9580ddea909258fce677fb38b7cb2c1444a"
+      ],
+      "test/examples/True": [
+        "112ad2c32dda4981b51288d7fadbadbfd66d653e527959a747e5ce7a687c3a2a"
+      ],
+      "test/formatter/True": [
+        "29afeb6a98ce3d77e8915d873904b79056bdd6fbdb7ff4429128206cbf5ac164",
+        "2e2f780b033f6578ec7943a9ee9798e63e480ab02b9762737c4d55e67173bbb3"
+      ],
+      "test/ruff/True": [
+        "440975329fd077c844bbab43a74260c373bc26d72eac979bfe3c03f74dca93d4",
+        "943e42e387876b4b7bd6ced125fc8bfdf37ea4ab53bf482afff5b4181d4683ce"
+      ],
+      "test/rustc_tests/True": [
+        "bab7ac9a9eea549f086c877c8651566736a7025f999e43b69dae31f5ce0861ee",
+        "caa00f235513cea7a3ddb54b0934ffee58915c6c6df2f0b5119d4b1c63669076"
+      ]
+    },
+    "old": {
+      "example/custom_error/False": [
+        "933653e8410d94330470565243449d7afce6a64be6599e1077621becbde85277"
+      ],
+      "example/custom_level/False": [
+        "6c5c0cc1ab92a996c0667c03fa73ba817f54235ba786aac455ac626fb8ddbf23"
+      ],
+      "example/elide_header/False": [
+        "200cb2d713fa79ac8d8fb32139f77a44be9d812b5e19f66453300ff55d61b03e"
+      ],
+      "example/expected_type/False": [
+        "98a6d50100256bbd4a62177dc89240cefc464148d0bf385235ed9e71222b0e99"
+      ],
+      "example/footer/False": [
+        "cac222c7933c445634435944c70680667ad3b9b74ddcf973200740e9e8fa6485"
+      ],
+      "example/format/False": [
+        "52f27e3ff364a423314a95de48e222ed022316595d54cc15e7e3bfd1d5ca7955"
+      ],
+      "example/highlight_message/False": [
+        "f3034424eb8114716fca82776c52a46e5512b28a89864872531fcde9dc1e70b6"
+      ],
+      "example/highlight_source/False": [
+        "a54e0b9bb76b0ae4332eb95d8a206973de1e4909b2b6df4ba916cc8a1edcdb36"
+      ],
+      "example/id_hyperlink/False": [
+        "cab4cedc4c76bc4d1d5dae5c3d43a9203d2af9238e80a20f149c58bac73c1730"
+      ],
+      "example/multi_suggestion/False": [
+        "cdb44791f04816b18195463494bcd82fb8fbee877fb618820dad806bd6bf6645"
+      ],
+      "example/multislice/False": [
+        "00f857c562406c448abc58a55be256f0dbb05da75a5148b62ee01330a9cb67d5"
+      ],
+      "example/struct_name_as_context/False": [
+        "8b1fb9ad817767954e836bf2bed32740c2d6ec1c4a485aa95a89ea2028e21d5b"
+      ],
+      "test/color/True": [
+        "e69d76dcebfdafd20d7571aeb538e9c756c703593d36c1c8b2fc6b1bb4ee4454"
+      ],
+      "test/examples/True": [
+        "112ad2c32dda4981b51288d7fadbadbfd66d653e527959a747e5ce7a687c3a2a"
+      ],
+      "test/formatter/True": [
+        "669bbf9812d61ef65ba5ffe04c0f6b72d0cf7ad65cf9b0e4e751dd768bf4384b",
+        "cc1f381f18f3e83a9a1bbf160ff3cedfa9800e66166d50f84a14b2b8ef667190"
+      ],
+      "test/ruff/True": [
+        "8d5905772ee2168f03c9e4e92e7dcc2652aca9fc16d194f73180e4e295e243a5",
+        "ccd791da2ea58774a48c5d04506f90fa0dc14519c1f1e1ad699656a0342bdc2b"
+      ],
+      "test/rustc_tests/True": [
+        "3e0fbf333ed9c2983f16093d3dfd024f4ba096a09a008e1503d202278b439a05",
+        "a8b573941977835c78f764b71869a11cf0ca23580feda179b50dac418a68598a"
+      ]
+    }
+  },
+  "signed_complete_elf_sizes_by_sha256": {
+    "00f857c562406c448abc58a55be256f0dbb05da75a5148b62ee01330a9cb67d5": 1800168,
+    "112ad2c32dda4981b51288d7fadbadbfd66d653e527959a747e5ce7a687c3a2a": 5858896,
+    "200cb2d713fa79ac8d8fb32139f77a44be9d812b5e19f66453300ff55d61b03e": 1801464,
+    "2752a299bfff78afa41a29cb8599c5d25cc23e4b59427456f4594d26a39ea534": 1812248,
+    "29afeb6a98ce3d77e8915d873904b79056bdd6fbdb7ff4429128206cbf5ac164": 7001184,
+    "2c3ef196468143556d26123444c6bc529ba5785e22e09e4bfc53c4d4b76c2e38": 1818976,
+    "2e2f780b033f6578ec7943a9ee9798e63e480ab02b9762737c4d55e67173bbb3": 7001184,
+    "3090192b1eafab0242f8ee2f8190c9580ddea909258fce677fb38b7cb2c1444a": 6403792,
+    "39a945105fee786cbafef2b6642e12c95f66115359576652b4e935c97a44c97b": 1813120,
+    "3c411e6a942563b565742800b1dd7f4e5da850ceea0a2f1d699d534ff201d5ac": 1814280,
+    "3e0fbf333ed9c2983f16093d3dfd024f4ba096a09a008e1503d202278b439a05": 6756040,
+    "440975329fd077c844bbab43a74260c373bc26d72eac979bfe3c03f74dca93d4": 6139840,
+    "4b395848625140ba997c1bc44664e0c7991cbdb4b7a94aeced89bc5100f5bf31": 1821496,
+    "52f27e3ff364a423314a95de48e222ed022316595d54cc15e7e3bfd1d5ca7955": 1803680,
+    "669bbf9812d61ef65ba5ffe04c0f6b72d0cf7ad65cf9b0e4e751dd768bf4384b": 6990720,
+    "6c5c0cc1ab92a996c0667c03fa73ba817f54235ba786aac455ac626fb8ddbf23": 1809984,
+    "8300f4f99e5452855bcca017ef153af3d709b3c61a2b1a6ae0678b8b03021c6d": 1814088,
+    "83d79d69748fe687abb7edbc395271581664f4633cff44bbd7bc1fa6e245a901": 1814208,
+    "8b1fb9ad817767954e836bf2bed32740c2d6ec1c4a485aa95a89ea2028e21d5b": 1802672,
+    "8bcb4dbe835bb729a018f4162069dcd70cdf3316192e5661bf7aa7d9068b5246": 1820432,
+    "8d5905772ee2168f03c9e4e92e7dcc2652aca9fc16d194f73180e4e295e243a5": 6128888,
+    "933653e8410d94330470565243449d7afce6a64be6599e1077621becbde85277": 1803632,
+    "943e42e387876b4b7bd6ced125fc8bfdf37ea4ab53bf482afff5b4181d4683ce": 6139840,
+    "98a6d50100256bbd4a62177dc89240cefc464148d0bf385235ed9e71222b0e99": 1801656,
+    "a54e0b9bb76b0ae4332eb95d8a206973de1e4909b2b6df4ba916cc8a1edcdb36": 1804896,
+    "a83b2e6d231d3e555de6012f356bb0b336bdc4269bf5d4fabaab9ec97d15d267": 1815344,
+    "a8b573941977835c78f764b71869a11cf0ca23580feda179b50dac418a68598a": 6756040,
+    "aa5ac57371193ae9d885c5a73a4d4769d20a363c9ecfd4aee3e75b1445f8ea2d": 1814616,
+    "b0f827fe09c5c9bf88f54846f99cac67935284cdea1fcda77f6ab04dda68c4c6": 1810632,
+    "bab7ac9a9eea549f086c877c8651566736a7025f999e43b69dae31f5ce0861ee": 6766512,
+    "caa00f235513cea7a3ddb54b0934ffee58915c6c6df2f0b5119d4b1c63669076": 6766512,
+    "cab4cedc4c76bc4d1d5dae5c3d43a9203d2af9238e80a20f149c58bac73c1730": 1804040,
+    "cac222c7933c445634435944c70680667ad3b9b74ddcf973200740e9e8fa6485": 1803632,
+    "cc1f381f18f3e83a9a1bbf160ff3cedfa9800e66166d50f84a14b2b8ef667190": 6990720,
+    "ccd791da2ea58774a48c5d04506f90fa0dc14519c1f1e1ad699656a0342bdc2b": 6128888,
+    "cdb44791f04816b18195463494bcd82fb8fbee877fb618820dad806bd6bf6645": 1811048,
+    "e69d76dcebfdafd20d7571aeb538e9c756c703593d36c1c8b2fc6b1bb4ee4454": 6393344,
+    "f3034424eb8114716fca82776c52a46e5512b28a89864872531fcde9dc1e70b6": 1808520,
+    "f40710b146e793200d394dd7d4bb77f53878fa88e277c4fc03197bae9b52cf65": 1811912
+  },
+  "physical_native_provider_error_gate": 41407253489,
+  "frozen_signed_wild_input_control": 41410572959,
+  "workers": [
+    {
+      "position": 1,
+      "boot": "aaaf2b8f-d8e3-4e7d-acf3-0165491afec4",
+      "runner": "nsc-runner-hfcrr87jod8fu",
+      "runner_id": 1586,
+      "job": 125170196877,
+      "artifact": 13126557339,
+      "digest": "sha256:5a3bfe31b5e4e90cedaabd497bd43634977b8ad6b6c275671baabbb7c3db4266",
+      "raw_pmu_by_arm_and_repeat": {
+        "parent": [
+          {
+            "cold": {
+              "instructions": 129302214282,
+              "enabled": 21116439448,
+              "running": 21116439448,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10734686546,
+              "enabled": 2185387789,
+              "running": 2185387789,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2557958025,
+              "enabled": 701851343,
+              "running": 701851343,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2567969134,
+              "enabled": 731112804,
+              "running": 731112804,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129280439181,
+              "enabled": 20794385535,
+              "running": 20794385535,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10734459582,
+              "enabled": 2147917173,
+              "running": 2147917173,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2557871028,
+              "enabled": 705365533,
+              "running": 705365533,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2570852042,
+              "enabled": 722217428,
+              "running": 722217428,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ],
+        "candidate": [
+          {
+            "cold": {
+              "instructions": 129312464224,
+              "enabled": 20910151447,
+              "running": 20910151447,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10742203632,
+              "enabled": 2156065126,
+              "running": 2156065126,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2094359783,
+              "enabled": 456101726,
+              "running": 456101726,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2093657049,
+              "enabled": 460189194,
+              "running": 460189194,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129296573288,
+              "enabled": 20664882251,
+              "running": 20664882251,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10748275056,
+              "enabled": 2155510688,
+              "running": 2155510688,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2094650418,
+              "enabled": 455417114,
+              "running": 455417114,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2097735379,
+              "enabled": 454519367,
+              "running": 454519367,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "position": 2,
+      "boot": "0949e1a6-feb9-4c18-a364-cf7a57473321",
+      "runner": "nsc-runner-66rppco1ttelk",
+      "runner_id": 1580,
+      "job": 125170196283,
+      "artifact": 13125599732,
+      "digest": "sha256:56e1a66fa0bf8bbacdb6d4c6efb3e70f593be7ca9b5d6e9782a12d088bca9064",
+      "raw_pmu_by_arm_and_repeat": {
+        "parent": [
+          {
+            "cold": {
+              "instructions": 129311523570,
+              "enabled": 20793217331,
+              "running": 20793217331,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10741081336,
+              "enabled": 2109264047,
+              "running": 2109264047,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2558003449,
+              "enabled": 691987789,
+              "running": 691987789,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2573336089,
+              "enabled": 747473519,
+              "running": 747473519,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129324801595,
+              "enabled": 20574607783,
+              "running": 20574607783,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10740168123,
+              "enabled": 2101483466,
+              "running": 2101483466,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2558415734,
+              "enabled": 722615510,
+              "running": 722615510,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2569896771,
+              "enabled": 723275065,
+              "running": 723275065,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ],
+        "candidate": [
+          {
+            "cold": {
+              "instructions": 129307996121,
+              "enabled": 20676423291,
+              "running": 20676423291,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10740396013,
+              "enabled": 3469708180,
+              "running": 3469708180,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2098380824,
+              "enabled": 668229047,
+              "running": 668229047,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2094861228,
+              "enabled": 510197979,
+              "running": 510197979,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129295768173,
+              "enabled": 20526338739,
+              "running": 20526338739,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10746362492,
+              "enabled": 2130537110,
+              "running": 2130537110,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2094019972,
+              "enabled": 455794217,
+              "running": 455794217,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2094536002,
+              "enabled": 446040370,
+              "running": 446040370,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "position": 3,
+      "boot": "abbefc5e-491a-4bb9-8351-9be714a1eaf6",
+      "runner": "nsc-runner-bq3b1an1l4gc2",
+      "runner_id": 1583,
+      "job": 125170196605,
+      "artifact": 13126159085,
+      "digest": "sha256:07e41f8030064ba98cb4201f529c291c224d2c5dc8ccb7a4f03fd45cf9707bb3",
+      "raw_pmu_by_arm_and_repeat": {
+        "parent": [
+          {
+            "cold": {
+              "instructions": 129283463045,
+              "enabled": 24016167862,
+              "running": 24016167862,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10727201970,
+              "enabled": 2377978088,
+              "running": 2377978088,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2557172546,
+              "enabled": 768409718,
+              "running": 768409718,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2569124069,
+              "enabled": 819940423,
+              "running": 819940423,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129283612249,
+              "enabled": 24336413826,
+              "running": 24336413826,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10742587403,
+              "enabled": 2430322733,
+              "running": 2430322733,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2559764553,
+              "enabled": 807610570,
+              "running": 807610570,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2569732230,
+              "enabled": 822252276,
+              "running": 822252276,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ],
+        "candidate": [
+          {
+            "cold": {
+              "instructions": 129305055415,
+              "enabled": 24251139388,
+              "running": 24251139388,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10750191371,
+              "enabled": 2411215623,
+              "running": 2411215623,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2094206640,
+              "enabled": 513301312,
+              "running": 513301312,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2094211612,
+              "enabled": 520407011,
+              "running": 520407011,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129317045125,
+              "enabled": 24148907146,
+              "running": 24148907146,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10749782808,
+              "enabled": 2497737041,
+              "running": 2497737041,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2094459199,
+              "enabled": 523088776,
+              "running": 523088776,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2097313316,
+              "enabled": 524157350,
+              "running": 524157350,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "position": 4,
+      "boot": "e2f97351-6514-473b-899d-111e613fdbd5",
+      "runner": "nsc-runner-kd5o435ts7fu8",
+      "runner_id": 1585,
+      "job": 125170196643,
+      "artifact": 13127215462,
+      "digest": "sha256:9cb34aa0f5746b95072a45f5a8f284d482d4cccbe1c3e4001df3ba27682217fc",
+      "raw_pmu_by_arm_and_repeat": {
+        "parent": [
+          {
+            "cold": {
+              "instructions": 129302691858,
+              "enabled": 20263126114,
+              "running": 20263126114,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10738031945,
+              "enabled": 2074420010,
+              "running": 2074420010,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2557607051,
+              "enabled": 697800786,
+              "running": 697800786,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2569838999,
+              "enabled": 717773245,
+              "running": 717773245,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129296480307,
+              "enabled": 20416946706,
+              "running": 20416946706,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10787237423,
+              "enabled": 2169255135,
+              "running": 2169255135,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2561422117,
+              "enabled": 716843787,
+              "running": 716843787,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2571340077,
+              "enabled": 719697693,
+              "running": 719697693,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ],
+        "candidate": [
+          {
+            "cold": {
+              "instructions": 129311716686,
+              "enabled": 20457231314,
+              "running": 20457231314,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10750574325,
+              "enabled": 2316567626,
+              "running": 2316567626,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2096541472,
+              "enabled": 470200806,
+              "running": 470200806,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2094433458,
+              "enabled": 448668419,
+              "running": 448668419,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129297257670,
+              "enabled": 20325200218,
+              "running": 20325200218,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10752191208,
+              "enabled": 2141785453,
+              "running": 2141785453,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2094745531,
+              "enabled": 446184540,
+              "running": 446184540,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2094632186,
+              "enabled": 446665285,
+              "running": 446665285,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "position": 5,
+      "boot": "59ed3d7a-e5d5-487d-b3c3-84f8137eb47d",
+      "runner": "nsc-runner-vjjeo52dmadi4",
+      "runner_id": 1587,
+      "job": 125170196948,
+      "artifact": 13126323190,
+      "digest": "sha256:e52214b925dc0e1aefd02373fc870a17bca3751e33480b4993b8a687b77f1d25",
+      "raw_pmu_by_arm_and_repeat": {
+        "parent": [
+          {
+            "cold": {
+              "instructions": 129286089152,
+              "enabled": 23829235508,
+              "running": 23829235508,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10748973238,
+              "enabled": 2537275419,
+              "running": 2537275419,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2558843491,
+              "enabled": 773663383,
+              "running": 773663383,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2569716093,
+              "enabled": 819440561,
+              "running": 819440561,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129319788122,
+              "enabled": 23005490202,
+              "running": 23005490202,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10742366761,
+              "enabled": 2354012297,
+              "running": 2354012297,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2561556686,
+              "enabled": 809264318,
+              "running": 809264318,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2568942015,
+              "enabled": 816464431,
+              "running": 816464431,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ],
+        "candidate": [
+          {
+            "cold": {
+              "instructions": 129316232212,
+              "enabled": 24136634910,
+              "running": 24136634910,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10760595194,
+              "enabled": 2821363732,
+              "running": 2821363732,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2097984736,
+              "enabled": 553248308,
+              "running": 553248308,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2094388834,
+              "enabled": 502459283,
+              "running": 502459283,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129316919540,
+              "enabled": 23973996839,
+              "running": 23973996839,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10765474715,
+              "enabled": 2477347472,
+              "running": 2477347472,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2094413709,
+              "enabled": 508624219,
+              "running": 508624219,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2094828063,
+              "enabled": 527907610,
+              "running": 527907610,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "position": 6,
+      "boot": "8c64c96c-913e-43a1-b0c1-552a3cc2503b",
+      "runner": "nsc-runner-u4pjei75ptdom",
+      "runner_id": 1584,
+      "job": 125170196647,
+      "artifact": 13125984953,
+      "digest": "sha256:15fcd8dda495b34a17e1d0fb15e5abd359a595675ccc0ca9948a0e2941aec29c",
+      "raw_pmu_by_arm_and_repeat": {
+        "parent": [
+          {
+            "cold": {
+              "instructions": 129310716575,
+              "enabled": 20649790779,
+              "running": 20649790779,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10740033870,
+              "enabled": 2164866431,
+              "running": 2164866431,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2558341273,
+              "enabled": 747563539,
+              "running": 747563539,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2574121045,
+              "enabled": 739843040,
+              "running": 739843040,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129283660284,
+              "enabled": 20677875153,
+              "running": 20677875153,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10735088921,
+              "enabled": 2123326053,
+              "running": 2123326053,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2558340445,
+              "enabled": 708288739,
+              "running": 708288739,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2571568195,
+              "enabled": 721718468,
+              "running": 721718468,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ],
+        "candidate": [
+          {
+            "cold": {
+              "instructions": 129303736222,
+              "enabled": 20531411958,
+              "running": 20531411958,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10744683526,
+              "enabled": 2089293348,
+              "running": 2089293348,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2098121447,
+              "enabled": 444618383,
+              "running": 444618383,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2097662939,
+              "enabled": 449009272,
+              "running": 449009272,
+              "event_errno": 0,
+              "code": 0
+            }
+          },
+          {
+            "cold": {
+              "instructions": 129301805772,
+              "enabled": 20481876089,
+              "running": 20481876089,
+              "event_errno": 0,
+              "code": 0
+            },
+            "edit": {
+              "instructions": 10748881622,
+              "enabled": 2132585138,
+              "running": 2132585138,
+              "event_errno": 0,
+              "code": 0
+            },
+            "first-unchanged": {
+              "instructions": 2094596306,
+              "enabled": 448167746,
+              "running": 448167746,
+              "event_errno": 0,
+              "code": 0
+            },
+            "settled": {
+              "instructions": 2094570160,
+              "enabled": 453599034,
+              "running": 453599034,
+              "event_errno": 0,
+              "code": 0
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "endpoints": {
+    "cold": {
+      "reduction": -6.257967946865506e-05,
+      "interval": [
+        -0.00013846073128864766,
+        2.2050326440203882e-05
+      ],
+      "sign_randomization_p": 0.21875,
+      "per_boot": [
+        -0.0001020349870490822,
+        0.0001258942234071414,
+        -0.00021280732691608684,
+        -3.7903684356077605e-05,
+        -0.00010547584325881765,
+        -4.318169412043105e-05
+      ]
+    },
+    "edit": {
+      "reduction": -0.0006809672692484892,
+      "interval": [
+        -0.001303597288167646,
+        7.924897428090993e-05
+      ],
+      "sign_randomization_p": 0.15625,
+      "per_boot": [
+        -0.0009935981353732526,
+        -0.00025642070010145623,
+        -0.0014061769313087336,
+        0.001042854033275531,
+        -0.0016160171501709009,
+        -0.0008587851630481591
+      ]
+    },
+    "first-unchanged": {
+      "reduction": 0.18103783624108005,
+      "interval": [
+        0.18078954213316,
+        0.18128271565695775
+      ],
+      "sign_randomization_p": 0.03125,
+      "per_boot": [
+        0.18116689433416033,
+        0.1805990886156137,
+        0.18141140144074397,
+        0.18123385418311466,
+        0.1812363550196513,
+        0.18057903497860084
+      ]
+    },
+    "settled": {
+      "reduction": 0.18490324746218145,
+      "interval": [
+        0.18455908633964302,
+        0.1852419115171342
+      ],
+      "sign_randomization_p": 0.03125,
+      "per_boot": [
+        0.18436720020753494,
+        0.18545431091717535,
+        0.18434695079007546,
+        0.18519356048206725,
+        0.1847644203099187,
+        0.18529233333920536
+      ]
+    },
+    "edit+first": {
+      "reduction": 0.03427600137420739,
+      "interval": [
+        0.033802092261041694,
+        0.03486150102374119
+      ],
+      "sign_randomization_p": 0.03125,
+      "per_boot": [
+        0.03406010621188027,
+        0.03453345475522085,
+        0.03377928391174745,
+        0.03566223095609078,
+        0.03356682329475247,
+        0.03405264100227656
+      ]
+    }
+  },
+  "storage": {
+    "cold_storage": {
+      "parent": {
+        "manifest": [
+          [
+            5,
+            5.0,
+            5
+          ],
+          [
+            42143,
+            42147.5,
+            42152
+          ],
+          [
+            53248,
+            53248.0,
+            53248
+          ]
+        ],
+        "object": [
+          [
+            111,
+            111.0,
+            111
+          ],
+          [
+            5131152,
+            5131152.0,
+            5131152
+          ],
+          [
+            5320704,
+            5320704.0,
+            5320704
+          ]
+        ],
+        "other": [
+          [
+            952,
+            952.0,
+            952
+          ],
+          [
+            152435155,
+            152439316.5,
+            152453194
+          ],
+          [
+            154796032,
+            154800128.0,
+            154816512
+          ]
+        ],
+        "rlink": [
+          [
+            5,
+            5.0,
+            5
+          ],
+          [
+            129722,
+            129722.0,
+            129722
+          ],
+          [
+            135168,
+            135168.0,
+            135168
+          ]
+        ],
+        "total": [
+          [
+            1073,
+            1073.0,
+            1073
+          ],
+          [
+            157738181,
+            157742336.0,
+            157756216
+          ],
+          [
+            160305152,
+            160309248.0,
+            160325632
+          ]
+        ]
+      },
+      "candidate": {
+        "manifest": [
+          [
+            17,
+            17.0,
+            17
+          ],
+          [
+            89039,
+            89044.5,
+            89051
+          ],
+          [
+            106496,
+            106496.0,
+            106496
+          ]
+        ],
+        "object": [
+          [
+            231,
+            231.0,
+            231
+          ],
+          [
+            6137592,
+            6137592.0,
+            6137592
+          ],
+          [
+            6557696,
+            6557696.0,
+            6557696
+          ]
+        ],
+        "other": [
+          [
+            952,
+            952.0,
+            952
+          ],
+          [
+            152435314,
+            152437500.5,
+            152441065
+          ],
+          [
+            154796032,
+            154800128.0,
+            154804224
+          ]
+        ],
+        "rlink": [
+          [
+            17,
+            17.0,
+            17
+          ],
+          [
+            304282,
+            304282.0,
+            304282
+          ],
+          [
+            331776,
+            331776.0,
+            331776
+          ]
+        ],
+        "total": [
+          [
+            1217,
+            1217.0,
+            1217
+          ],
+          [
+            158966236,
+            158968421.5,
+            158971978
+          ],
+          [
+            161792000,
+            161796096.0,
+            161800192
+          ]
+        ]
+      }
+    },
+    "new_storage": {
+      "parent": {
+        "manifest": [
+          [
+            5,
+            5.0,
+            5
+          ],
+          [
+            42144,
+            42146.0,
+            42150
+          ],
+          [
+            53248,
+            53248.0,
+            53248
+          ]
+        ],
+        "object": [
+          [
+            111,
+            111.0,
+            111
+          ],
+          [
+            5131632,
+            5131632.0,
+            5131632
+          ],
+          [
+            5320704,
+            5320704.0,
+            5320704
+          ]
+        ],
+        "other": [
+          [
+            952,
+            952.0,
+            952
+          ],
+          [
+            153266721,
+            153269315.0,
+            153317595
+          ],
+          [
+            155615232,
+            155619328.0,
+            155668480
+          ]
+        ],
+        "rlink": [
+          [
+            5,
+            5.0,
+            5
+          ],
+          [
+            147660,
+            147660.0,
+            147660
+          ],
+          [
+            159744,
+            159744.0,
+            159744
+          ]
+        ],
+        "total": [
+          [
+            1073,
+            1073.0,
+            1073
+          ],
+          [
+            158588158,
+            158590753.5,
+            158639035
+          ],
+          [
+            161148928,
+            161153024.0,
+            161202176
+          ]
+        ]
+      },
+      "candidate": {
+        "manifest": [
+          [
+            17,
+            17.0,
+            17
+          ],
+          [
+            89032,
+            89046.0,
+            89049
+          ],
+          [
+            106496,
+            106496.0,
+            106496
+          ]
+        ],
+        "object": [
+          [
+            231,
+            231.0,
+            231
+          ],
+          [
+            6138072,
+            6138072.0,
+            6138072
+          ],
+          [
+            6557696,
+            6557696.0,
+            6557696
+          ]
+        ],
+        "other": [
+          [
+            952,
+            952.0,
+            952
+          ],
+          [
+            154148223,
+            154150366.5,
+            154167024
+          ],
+          [
+            156499968,
+            156502016.0,
+            156516352
+          ]
+        ],
+        "rlink": [
+          [
+            17,
+            17.0,
+            17
+          ],
+          [
+            341318,
+            341318.0,
+            341318
+          ],
+          [
+            360448,
+            360448.0,
+            360448
+          ]
+        ],
+        "total": [
+          [
+            1217,
+            1217.0,
+            1217
+          ],
+          [
+            160716654,
+            160718800.0,
+            160735459
+          ],
+          [
+            163524608,
+            163526656.0,
+            163540992
+          ]
+        ]
+      }
+    }
+  },
+  "observed_complete_elf_sha256_frequencies_in_measured_cold_and_warm_histories": {
+    "old": {
+      "example/custom_error/False": {
+        "933653e8410d94330470565243449d7afce6a64be6599e1077621becbde85277": 24
+      },
+      "example/custom_level/False": {
+        "6c5c0cc1ab92a996c0667c03fa73ba817f54235ba786aac455ac626fb8ddbf23": 24
+      },
+      "example/elide_header/False": {
+        "200cb2d713fa79ac8d8fb32139f77a44be9d812b5e19f66453300ff55d61b03e": 24
+      },
+      "example/expected_type/False": {
+        "98a6d50100256bbd4a62177dc89240cefc464148d0bf385235ed9e71222b0e99": 24
+      },
+      "example/footer/False": {
+        "cac222c7933c445634435944c70680667ad3b9b74ddcf973200740e9e8fa6485": 24
+      },
+      "example/format/False": {
+        "52f27e3ff364a423314a95de48e222ed022316595d54cc15e7e3bfd1d5ca7955": 24
+      },
+      "example/highlight_message/False": {
+        "f3034424eb8114716fca82776c52a46e5512b28a89864872531fcde9dc1e70b6": 24
+      },
+      "example/highlight_source/False": {
+        "a54e0b9bb76b0ae4332eb95d8a206973de1e4909b2b6df4ba916cc8a1edcdb36": 24
+      },
+      "example/id_hyperlink/False": {
+        "cab4cedc4c76bc4d1d5dae5c3d43a9203d2af9238e80a20f149c58bac73c1730": 24
+      },
+      "example/multi_suggestion/False": {
+        "cdb44791f04816b18195463494bcd82fb8fbee877fb618820dad806bd6bf6645": 24
+      },
+      "example/multislice/False": {
+        "00f857c562406c448abc58a55be256f0dbb05da75a5148b62ee01330a9cb67d5": 24
+      },
+      "example/struct_name_as_context/False": {
+        "8b1fb9ad817767954e836bf2bed32740c2d6ec1c4a485aa95a89ea2028e21d5b": 24
+      },
+      "test/color/True": {
+        "e69d76dcebfdafd20d7571aeb538e9c756c703593d36c1c8b2fc6b1bb4ee4454": 24
+      },
+      "test/examples/True": {
+        "112ad2c32dda4981b51288d7fadbadbfd66d653e527959a747e5ce7a687c3a2a": 24
+      },
+      "test/formatter/True": {
+        "669bbf9812d61ef65ba5ffe04c0f6b72d0cf7ad65cf9b0e4e751dd768bf4384b": 24
+      },
+      "test/ruff/True": {
+        "8d5905772ee2168f03c9e4e92e7dcc2652aca9fc16d194f73180e4e295e243a5": 24
+      },
+      "test/rustc_tests/True": {
+        "3e0fbf333ed9c2983f16093d3dfd024f4ba096a09a008e1503d202278b439a05": 4,
+        "a8b573941977835c78f764b71869a11cf0ca23580feda179b50dac418a68598a": 20
+      }
+    },
+    "new": {
+      "example/custom_error/False": {
+        "8300f4f99e5452855bcca017ef153af3d709b3c61a2b1a6ae0678b8b03021c6d": 24
+      },
+      "example/custom_level/False": {
+        "8bcb4dbe835bb729a018f4162069dcd70cdf3316192e5661bf7aa7d9068b5246": 24
+      },
+      "example/elide_header/False": {
+        "f40710b146e793200d394dd7d4bb77f53878fa88e277c4fc03197bae9b52cf65": 24
+      },
+      "example/expected_type/False": {
+        "2752a299bfff78afa41a29cb8599c5d25cc23e4b59427456f4594d26a39ea534": 24
+      },
+      "example/footer/False": {
+        "83d79d69748fe687abb7edbc395271581664f4633cff44bbd7bc1fa6e245a901": 24
+      },
+      "example/format/False": {
+        "3c411e6a942563b565742800b1dd7f4e5da850ceea0a2f1d699d534ff201d5ac": 24
+      },
+      "example/highlight_message/False": {
+        "2c3ef196468143556d26123444c6bc529ba5785e22e09e4bfc53c4d4b76c2e38": 24
+      },
+      "example/highlight_source/False": {
+        "a83b2e6d231d3e555de6012f356bb0b336bdc4269bf5d4fabaab9ec97d15d267": 24
+      },
+      "example/id_hyperlink/False": {
+        "aa5ac57371193ae9d885c5a73a4d4769d20a363c9ecfd4aee3e75b1445f8ea2d": 24
+      },
+      "example/multi_suggestion/False": {
+        "4b395848625140ba997c1bc44664e0c7991cbdb4b7a94aeced89bc5100f5bf31": 24
+      },
+      "example/multislice/False": {
+        "b0f827fe09c5c9bf88f54846f99cac67935284cdea1fcda77f6ab04dda68c4c6": 24
+      },
+      "example/struct_name_as_context/False": {
+        "39a945105fee786cbafef2b6642e12c95f66115359576652b4e935c97a44c97b": 24
+      },
+      "test/color/True": {
+        "3090192b1eafab0242f8ee2f8190c9580ddea909258fce677fb38b7cb2c1444a": 24
+      },
+      "test/examples/True": {
+        "112ad2c32dda4981b51288d7fadbadbfd66d653e527959a747e5ce7a687c3a2a": 24
+      },
+      "test/formatter/True": {
+        "29afeb6a98ce3d77e8915d873904b79056bdd6fbdb7ff4429128206cbf5ac164": 24
+      },
+      "test/ruff/True": {
+        "440975329fd077c844bbab43a74260c373bc26d72eac979bfe3c03f74dca93d4": 23,
+        "943e42e387876b4b7bd6ced125fc8bfdf37ea4ab53bf482afff5b4181d4683ce": 1
+      },
+      "test/rustc_tests/True": {
+        "caa00f235513cea7a3ddb54b0934ffee58915c6c6df2f0b5119d4b1c63669076": 23,
+        "bab7ac9a9eea549f086c877c8651566736a7025f999e43b69dae31f5ce0861ee": 1
+      }
+    }
+  },
+  "signed_reference_test_case_counts": {
+    "new": {
+      "color": 32,
+      "examples": 13,
+      "formatter": 114,
+      "ruff": 10,
+      "rustc_tests": 72
+    },
+    "old": {
+      "color": 32,
+      "examples": 13,
+      "formatter": 114,
+      "ruff": 10,
+      "rustc_tests": 72
+    }
+  }
+}
