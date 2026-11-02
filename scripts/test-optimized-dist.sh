@@ -529,7 +529,11 @@ printf '%s\n' '// local edit' >> "$original_collector"
 toolchain=ohm-1.99.0-23
 : > "$trace"
 relocated_output="$test_directory/relocated-output.log"
-run_optimized_build "$linux_target" "$relocated_output"
+mkdir -p "$test_directory/profile tmp"
+(
+  cd -- "$test_directory"
+  run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp"
+)
 assert_optimized_build "$linux_target" "$bolt_directory" true true "$relocated_output" relocated
 grep -qx '// local edit' "$original_collector"
 if grep -Fq '.run_rustc(false)' "$original_collector"; then
