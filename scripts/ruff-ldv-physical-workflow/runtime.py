@@ -13,6 +13,7 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import transport
 import childenv
+import doc_support
 sys.path.insert(0,str(HERE.parent/"ruff-ldv-needed"))
 import needed
 import probes
@@ -24,13 +25,14 @@ clean=childenv.check
 
 def stat_id(path):
     s=path.stat()
-    return [s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns]
+    return [s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns,s.st_ctime_ns]
 
 
 class Runtime:
     def __init__(self, work, inputs, out, tools):
         self.inputs,self.evidence,self.tools=inputs,out,tools
         self.manifests=transport.capsule.admit(inputs/"capsule")
+        self.docs=json.loads((inputs/"docs-qualification.json").read_bytes()) if (inputs/"docs-qualification.json").is_file() else None
         self.proof=json.loads((inputs/"source-qualification.json").read_bytes())
         self.sdk=work/"rustup/toolchains/ohm"
         self.sdk.parent.mkdir(parents=True)
@@ -53,6 +55,7 @@ class Runtime:
                    "LD_LIBRARY_PATH":str(self.sdk/"lib"),"LC_ALL":"C","TZ":"UTC"}
         (work/"home").mkdir()
         versions={}
+        docs={}
         for role in ("P","C"):
             self.select(role)
             versions[role]={}
@@ -60,10 +63,12 @@ class Runtime:
                 lookup=Path(subprocess.check_output(["rustup","which","--toolchain","ohm",which],env=self.base,text=True).strip())
                 need(lookup.samefile(self.sdk/"bin"/which),"rustup selected a different installed tool")
                 versions[role][which]=subprocess.check_output([which,"+ohm","-vV"],env=self.base,text=True)
+            if self.docs:
+                docs[role]=doc_support.exercise(self,role,out/("doc-control-"+role))
         need(versions["P"]==versions["C"],"source compilers do not share the registered version output")
         self.select("P")
         put(out/"physical-roles.json",{"kits":self.refs,"versions":versions,"sdk":str(self.sdk),
-                                       "source_qualification":sha(inputs/"source-qualification.json")})
+                                       "source_qualification":sha(inputs/"source-qualification.json"),"documentation":docs})
 
     def select(self, role):
         need(role in self.parked,"unknown physical role")
@@ -74,6 +79,8 @@ class Runtime:
             need(self.parked[role].is_dir() and not self.parked[role].is_symlink() and not self.sdk.exists(),"unavailable SDK")
             self.parked[role].rename(self.sdk)
             self.active=role
+        if self.docs:
+            need((self.sdk/"bin/rustdoc").samefile(self.inputs/"doc-products"/role/"rustdoc"),"changed source documentation inode")
         for n,r in self.refs[role].items():
             p=self.sdk/r["name"]
             need(stat_id(p)==r["id"] and p.samefile(self.inputs/"capsule/objects"/r["sha"]),"changed enrolled SDK identity")
@@ -91,6 +98,9 @@ class Runtime:
             for n,item in self.manifests[role].items():
                 p=root/n
                 need(p.samefile(self.inputs/"capsule/objects"/item[0]) and sha(p)==item[0],"source-built SDK changed")
+        if self.docs:
+            for role,p in self.parked.items():
+                need(sha(p/"bin/rustdoc")==self.docs["actual"][role]["rustdoc"][0],"source documentation was changed")
         transport.capsule.admit(self.inputs/"capsule")
 
 

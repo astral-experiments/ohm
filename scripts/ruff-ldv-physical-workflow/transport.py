@@ -6,6 +6,7 @@ import sys
 import zipfile
 
 HERE=Path(__file__).resolve().parent
+sys.path.insert(0,str(HERE))
 STAGE=HERE.parent/"ruff-ldv-physical-stage"
 sys.path.append(str(STAGE))
 from retained import (ARCHIVE,BUILD,BUILD_QA,BRANCH,CONFIRM,REPO,acquire,artifact,capsule,factory,fetch,need,
@@ -109,4 +110,11 @@ def install(root):
 
 
 if __name__=="__main__":
-    install(Path(sys.argv[1]))
+    root=Path(sys.argv[1])
+    install(root)
+    if len(sys.argv)==3:
+        need(sys.argv[2]=="--matched-rustdoc","unknown source enrollment")
+        import doc_support
+        doc_support.install(root)
+    else:
+        need(len(sys.argv)==2,"unexpected source enrollment arguments")

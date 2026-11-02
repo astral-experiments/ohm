@@ -133,6 +133,31 @@ class Controls(unittest.TestCase):
             with self.assertRaises(ValueError):
                 raw.childenv.owners(events,parents,actual,entry)
 
+    def test_scope_of_the_source_compiler_namespace(self):
+        import shards
+        paths={"CARGO_BUILD_BUILD_DIR":"/work/build","CARGO_TARGET_DIR":"/work/target"}
+        def rec(key):
+            r="/work/build/debug/build/registries/v2-"+key+"/dep/aaa/out/libdep.rmeta"
+            w="/work/target/debug/build/workspaces/123456789abcdef0/v2-"+key+"/owner/bbb/out"
+            body={"suffix":"0","owner":w+"/build_script_build","argv":["rustc","--out-dir",w],
+                  "stdin_sha256":"abc","owner_sha256":"def"}
+            return {"root_argv":[["owner",["rustc","--extern","dep="+r,"--out-dir",w,"-L","dependency="+str(Path(r).parent),
+                                          "-Z","temps-dir="+w+"/test.rlink-objects"]]],"roster":{"rustc":[],"linkers":[],"autocfg":[body]}}
+        a,b=rec("0"*16),rec("1"*16)
+        self.assertEqual(shards.comparable(a,paths),shards.comparable(b,paths))
+        self.assertEqual(shards.project(a,paths)[2]["ids"],["v2-"+"0"*16])
+        bad=copy.deepcopy(b); bad["roster"]["autocfg"][0]["stdin_sha256"]="changed"
+        self.assertNotEqual(shards.comparable(a,paths),shards.comparable(bad,paths))
+        bad=copy.deepcopy(b); bad["root_argv"][0][1][2]=bad["root_argv"][0][1][2].replace("libdep","libother")
+        self.assertNotEqual(shards.comparable(a,paths),shards.comparable(bad,paths))
+        for rewrite in (lambda a:a.replace("/work/build/","/external/"),lambda a:a.replace("registries/","other/"),
+                        lambda a:a.replace("dep/aaa","../aaa")):
+            bad=copy.deepcopy(b); bad["root_argv"][0][1][2]=rewrite(bad["root_argv"][0][1][2])
+            with self.assertRaises(ValueError): shards.project(bad,paths)
+        for change in (lambda args:args.__setitem__(1,"--cfg"),lambda args:args.__setitem__(4,args[4].replace("1"*16,"2"*16))):
+            bad=copy.deepcopy(b); change(bad["root_argv"][0][1])
+            with self.assertRaises(ValueError): shards.project(bad,paths)
+
     def test_sort_out_the_pmu_proxy(self):
         ordinary=["cargo","+ohm","build"]
         a=["/count","/m/pmu.json","/proxy",*ordinary]
@@ -167,6 +192,35 @@ class Controls(unittest.TestCase):
         changed["segments"][0]["actual_rx_sha256"]="a"*64
         with self.assertRaises(ValueError):
             raw.t.live_input(changed,info)
+
+
+    def test_link_only_positional_exact_outfile(self):
+        import shards
+        root="/build/target";mem="/build/shared"
+        dst=root+"/debug/build/workspaces/123456789abcdef0/v2-9999888877776666/pkg/2513aa8180818188/out"
+        out=dst+"/e2e-2513aa8180818188.rlink"
+        args=["rustc","--crate-name","e2e",out,"--out-dir",dst,"-C","extra-filename=-2513aa8180818188","-Z","link-only"]
+        env={"CARGO_TARGET_DIR":root,"CARGO_BUILD_BUILD_DIR":mem}
+        accepted=shards.argv(args,env,set())
+        self.assertEqual(accepted[3],out.replace("v2-9999888877776666",shards.PLACEHOLDER))
+        for i,value in ((3,out+"x"),(2,"other"),(9,"ordinary"),(7,"extra-filename=-0000000000000000")):
+            bad=args.copy();bad[i]=value
+            with self.assertRaises(ValueError):
+                shards.argv(bad,env,set())
+
+    def test_reject_substituted_documentation(self):
+        import doc_support
+        o=json.loads((doc_support.t.STAGE/"documentation-originals.json").read_bytes())["P"]
+        driver,=[n for n in o["files"] if n.startswith("lib/librustc_driver-")]
+        row={"source":o["commit"],"tree":o["compiler_tree"],"driver":[driver,o["files"][driver][0]],
+             "all_previous_files":63,"before_differences":{},"after_differences":{},"original_physical_kit_untouched":True,
+             "native_compile_verified":True,"stage0_matches_original":True,"stage0":[o["stage0_rustc"],o["stage0_cargo"]],
+             "html_sha256":"1"*64,"rustdoc":["2"*64,7032,0o755],"actual_loader_init_paths":["/lib/driver"]}
+        self.assertEqual(doc_support.qualification("P",row,o),("2"*64,7032))
+        for change in ({"driver":[driver,"3"*64]},{"before_differences":{"bin/rustc":["4"*64,"5"*64]}},
+                       {"rustdoc":["2"*64,7032,0o644]},{"stage0_matches_original":False},{"all_previous_files":62}):
+            with self.assertRaises(ValueError):
+                doc_support.qualification("P",row|change,o)
 
 
 if __name__=="__main__":

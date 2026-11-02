@@ -31,7 +31,7 @@ def fetch_slot(run,head,stage,slot,root):
         v=raw.read(z,"reopened.json")
     need(v["stage"]==stage and v["slot"]==slot and v["qa"]==head and v["run"]==run and
          v["assignment"]==assignment(stage,slot) and v["original_archive"]=={k:data[k] for k in v["original_archive"]} and
-         not data["expired"] and v["factory"]==t.BUILD and v["confirmation"]==t.CONFIRM and
+         not data["expired"] and v["source_docs"]==json.loads((HERE/"source-equivalence.json").read_bytes())["source_docs"] and v["factory"]==t.BUILD and v["confirmation"]==t.CONFIRM and
          re.fullmatch("[0-9a-f]{64}",v["terminal_sha"]),"incorrect independent original or source enrollment")
     return v,fid
 

@@ -13,6 +13,8 @@ import zipfile
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
+import doc_support
+import shards
 import transport as t
 import childenv
 sys.path.insert(0,str(HERE.parent/"ruff-ldv-needed"))
@@ -280,6 +282,13 @@ def phase_read(z,folder,phase,suite,stage,role,obs,actual_role,sdk,bodies,files)
         reopen.physical_probe(z,folder,row,eq,bodies["probe-owners"])
         owner_pids={pid for pid,rs in executions.items() if any(path==eq["owner"] for path,_ in rs)}
         need(any(descendant(row["pid"],pid,parents) for pid in owner_pids),"wrong actual build-script owner of the nonce")
+    counts=Counter((r["kind"],r["name"]) for r in rusts)
+    for row in orig:
+        counts["full",row["actual_crate"]]-=1
+    physical={"rustc":[[a,b,n] for (a,b),n in sorted(counts.items()) if n],"linkers":k["linkers"]}
+    if orig:
+        physical["autocfg"]=sorted((r["equivalence"] for r in orig),key=lambda r:json.dumps(r,sort_keys=True))
+    need(physical==obs["roster"],"different complete source-bound cold/settled physical roster")
     expected=PLAN["suites"][suite]["source"]
     physical=read(z,folder+"/source.json")
     need(physical["base"]==expected["OLD"] and physical["invalid"]==(phase=="invalid"),"wrong actual historical source")
@@ -289,6 +298,13 @@ def phase_read(z,folder,phase,suite,stage,role,obs,actual_role,sdk,bodies,files)
         need(physical["effective"]=={p:(expected["OLD"] if phase=="old" or (phase=="negative" and p==e2e.SESSION)
              else expected["NEW"]) for p in e2e.PATHS},"not the enrolled Ruff e2e edit or independent contrary assertion")
     task=read(z,folder+"/command.json")
+    _,_,ns=shards.project(obs,task["environment"])
+    need(ns==obs["compiler_namespace"],"different original shared-workspace proof")
+    if stage=="admit" and phase=="new":
+        files=read(z,folder+"/shared-extern-files.json")
+        need(set(files)==set(ns["shared_owner_extern_paths"]) and all(len(v["identity"])==5 and
+             v["identity"][1]>0 and v["identity"][2]>0 and re.fullmatch(r"[0-9a-f]{64}",v["sha256"]) for v in files.values()),
+             "different filenames or invalid physical provenance for the owners' shared registry inputs")
     need(task["ordinary"]==PLAN["suites"][suite]["cargo"],"altered original public Cargo command")
     wanted=stage=="score" and phase in ("old","new","unchanged")
     need(wanted==(obs["counter_member_sha"] is not None),"unexpected or missing hardware event")
@@ -318,6 +334,21 @@ def scan(z,run,head,stage,slot):
          proof["contact"]==json.loads((HERE/"worker.json").read_bytes())["contact"] and
          roles["versions"]["P"]==roles["versions"]["C"] and roles["source_qualification"]==start["source_qualification"],
          "incorrect physical source, common version, or contact receipt")
+    docs=checked_json(z,"physical/docs-qualification.json",start["documentation"])
+    spec=json.loads((HERE/"source-equivalence.json").read_bytes())["source_docs"]
+    need(docs["immutable"]==spec and [docs["archive"][k] for k in ("id","digest","size_in_bytes")]==spec["artifact"],
+         "wrong original source documentation artifact")
+    for role in ("P","C"):
+        source=read(z,f"physical/source-receipts/{role}.json")
+        original=(json.dumps(docs["actual"][role],sort_keys=True,indent=2)+"\n").encode()
+        need(digest(original)==spec["receipts"][role],"documentation receipt disagrees with factory")
+        key,_=doc_support.qualification(role,docs["actual"][role],source)
+        observed=roles["documentation"][role]
+        need(observed["rustdoc"]==key and observed["version"]==docs["actual"][role]["version"] and
+             observed["source"]==digest(doc_support.DOC_SOURCE) and z.read(f"physical/doc-control-{role}/doc_input.rs")==doc_support.DOC_SOURCE and
+             observed["html"]==digest(z.read(f"physical/doc-control-{role}/actual.html")) and all(
+             observed["actual_libs"][k]["sha"]==roles["kits"][role][k]["sha"] for k in ("driver","llvm")),
+             "different source documentation or HTML subject")
     for n,key in proof["receipt_hashes"].items():
         need(digest(z.read("physical/source-receipts/"+n))==key,"changed original source proof")
     hardware=calibration(z)
@@ -356,12 +387,19 @@ def scan(z,run,head,stage,slot):
                 need(all(vals[phase][n]==vals["clean-new"][n] for n in ("elf","verdict","inventory")),"different independent clean binary or verdict")
             need(vals["old"]["elf"]!=vals["new"]["elf"],"no observable real source change")
             stats[suite][role]={p:{n:vals[p][n] for n in ("dirty","raw_roster","elf","verdict","error") if n in vals[p]} for p in phases}
+        groups={r:{s for v in rs.values() for s in v["compiler_namespace"]["ids"]} for r,rs in result.items()}
+        need(len(groups["P"])==len(groups["C"])==1 and groups["P"]!=groups["C"],"missing stable role-specific compiler identity")
         for phase in phases:
-            need(all(result["P"][phase].get(n)==result["C"][phase].get(n) for n in
-                 ("dirty","inventory","root_argv","roster","verdict","elf","error")),"direct parent/candidate changed behavior/argv/roster")
+            parent,candidate=result["P"][phase],result["C"][phase]
+            dirs=parent["compiler_namespace"]["paths"]
+            need(dirs==candidate["compiler_namespace"]["paths"] and
+                 shards.comparable(parent,dirs)==shards.comparable(candidate,dirs),
+                 "changed behavior/argv/roster outside the verified compiler identity")
+        need(read(z,d+"cross-role.json")=={"shards":{r:sorted(v) for r,v in groups.items()},"mismatches":[],"own_clean_mismatches":[]},
+             "different source-role comparison")
     return {"stage":stage,"slot":slot,"qa":head,"run":run,"factory":t.BUILD,"confirmation":t.CONFIRM,"boot":start["boot"],
             "assignment":start["assignment"],"terminal_sha":digest(z.read("physical/complete.json")),"roles":proof["physical"],
-            "coverage":dict(total),"inputs":{s:end["suites"][s]["source"] for s in end["suites"]},"behavior":stats,
+            "coverage":dict(total),"inputs":{s:end["suites"][s]["source"] for s in end["suites"]},"source_docs":spec,"behavior":stats,
             "bodies":{k:sorted(v) for k,v in bodies.items()},"calibration":hardware,"events":counts}
 
 

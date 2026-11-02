@@ -701,7 +701,11 @@ jobs:
       - name: Materialize previously authenticated physical source stage1 parent and child
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB enrolled/scripts/ruff-ldv-physical-workflow/transport.py "$RUNNER_TEMP/ldv-qualified-sdks"
+        shell: bash
+        run: |
+          args=()
+          if [[ "${{ inputs.mode }}" != ldv-source-layout ]]; then args=(--matched-rustdoc); fi
+          python3 -IB enrolled/scripts/ruff-ldv-physical-workflow/transport.py "$RUNNER_TEMP/ldv-qualified-sdks" "${args[@]}"
       - name: Acquire the intact released SDK for the isolated documentation control
         if: inputs.mode == 'ldv-source-layout'
         env:

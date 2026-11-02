@@ -11,6 +11,7 @@ import tomllib
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import runtime
+import shards
 from runtime import census,guards,need,put,sha,support,transport
 import micro
 import pilot
@@ -62,13 +63,17 @@ def phase(kit,loc,work,repo,env,which,suite,graph,cmd,extras,gold,score,opens):
     result.update({"root_argv":sorted([r["name"],r["argv"]] for r in genuine),"roster":roster,"raw_roster":actual,
         "physical_autocfg":probes,"counter_member_sha":pmsha,"kernel_sha256":sha(loc/"kernel.json"),
         "linker_argv_sha256":sha(loc/"linker-argv.json"),"source_libraries_sha":sha(loc/"actual-libraries.json")})
+    _,_,namespace=shards.project(result,env)
+    result["compiler_namespace"]=namespace
+    if opens:
+        direct={}
+        for value in namespace["shared_owner_extern_paths"]:
+            f=Path(value)
+            need(f.is_file(),"shared registry extern named by the actual owner is missing after compilation")
+            direct[value]={"sha256":sha(f),"identity":runtime.stat_id(f)}
+        put(loc/"shared-extern-files.json",direct)
     put(loc/"result.json",result)
     return result
-
-
-def exact(x,y,keys,when):
-    for k in keys:
-        need(x.get(k)==y.get(k),("actual P/C or own independent-clean mismatch",when,k))
 
 
 def suite_run(kit,root,source,suite,stage,role_order):
@@ -100,7 +105,8 @@ def suite_run(kit,root,source,suite,stage,role_order):
         return fn(repo,state["old"] if which=="old" else state["new"],which=="invalid")
     graph=None
     all_rows={}
-    peer_keys=["dirty","inventory","root_argv","roster","verdict","elf","error"]
+    failures=[]
+    own_failures=[]
     for role in role_order:
         kit.select(role)
         observed={}
@@ -131,16 +137,27 @@ def suite_run(kit,root,source,suite,stage,role_order):
                     put(loc/"source.json",before)
                     observed[which]=actual
                     if role!=role_order[0]:
-                        exact(all_rows[role_order[0]][which],actual,peer_keys,[suite,role,which])
+                        left=shards.comparable(all_rows[role_order[0]][which],base)
+                        right=shards.comparable(actual,base)
+                        failures.extend([which,k] for k in left if left[k]!=right[k])
         for returned in ("new","unchanged","repair",*(("restored-new",) if suite=="e2e" else ())):
-            exact(observed["clean-new"],observed[returned],["inventory","elf","verdict"],[role,suite,returned,"independent-empty"])
+            for k in ("inventory","elf","verdict"):
+                if observed["clean-new"].get(k)!=observed[returned].get(k):
+                    own_failures.append([role,returned,k])
         need(observed["old"]["elf"]!=observed["new"]["elf"] and observed["invalid"]["error"]=="E0308","genuine edit or error absent")
         if suite=="e2e":
             need(observed["old"]["verdict"]["count"]==151 and observed["new"]["verdict"]["count"]==152 and
                  isinstance(observed["negative"]["verdict"]["negative_left"],str) and
                  observed["negative"]["verdict"]["negative_left"]!=e2e.WARNING,"genuine test inventory or contrary runtime missing")
+        namespace={s for v in observed.values() for s in v["compiler_namespace"]["ids"]}
+        need(len(namespace)==1,"one physical compiler selected multiple cache namespaces")
+    groups={r:{s for v in rows.values() for s in v["compiler_namespace"]["ids"]} for r,rows in all_rows.items()}
+    need(groups["P"]!=groups["C"],"could not distinguish different actual driver identities")
     need(pilot.registry(donor)==deps,"original donor changed")
     put(dest/"acquired.json",all_rows)
+    put(dest/"cross-role.json",{"shards":{r:sorted(v) for r,v in groups.items()},"mismatches":failures,"own_clean_mismatches":own_failures})
+    need(not own_failures,("different own independent clean product or verdict",own_failures))
+    need(not failures,("different native behavior, compiler argv or corpus across source roles",failures))
     return {"phases":sum(map(len,all_rows.values())),"graph":graph[2],"registry":sha(dest/"registry.json"),
             "acquired":sha(dest/"acquired.json"),"command":cmd,"source":[state["old"],state["new"]]}
 
@@ -161,6 +178,7 @@ def run(stage,slot,sources):
     inputs=Path(os.environ["RUNNER_TEMP"])/"ldv-qualified-sdks"
     shutil.copytree(inputs/"source-receipts",out/"source-receipts")
     shutil.copyfile(inputs/"source-qualification.json",out/"source-qualification.json")
+    shutil.copyfile(inputs/"docs-qualification.json",out/"docs-qualification.json")
     guards.admit(guards.resources(root,out),entry=True,bootstrap=True)
     cpus={}
     for cpu in sorted(os.sched_getaffinity(0)):
@@ -187,7 +205,8 @@ def run(stage,slot,sources):
     boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
     entry={"qa":os.environ["GITHUB_SHA"],"run":int(os.environ["GITHUB_RUN_ID"]),"boot":boot,"cpus":physical_cpus,"stage":stage,
            "assignment":assignment,"confirmation":transport.CONFIRM,"factory":transport.BUILD,"roles":transport.capsule.REG["roles"],
-           "counter_sha":sha(tools/"count"),"source_qualification":sha(out/"source-qualification.json")}
+           "counter_sha":sha(tools/"count"),"source_qualification":sha(out/"source-qualification.json"),
+           "documentation":sha(out/"docs-qualification.json")}
     put(out/"entry.json",entry)
     if stage=="score":
         need(boot not in (v["boot"] for v in gate["boots"].values()),"native admission boot reused for scoring")
