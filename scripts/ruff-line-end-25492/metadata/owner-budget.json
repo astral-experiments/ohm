@@ -1,0 +1,547 @@
+{
+  "actual_raw_compiler_inputs_or_query_graphs": [],
+  "normalized_physical_donor_totals": {
+    "ruff_db-1r3bu1zlwlyu4": {
+      "objects": 217,
+      "old_inode_and_bytes": 215,
+      "same_bytes_different_inode": 0,
+      "unqualified": false
+    },
+    "ruff_linter-34l13eh8i4e95": {
+      "objects": 256,
+      "old_inode_and_bytes": 254,
+      "same_bytes_different_inode": 1,
+      "unqualified": false
+    },
+    "ruff_source_file-2bu7x0b08w5f2": {
+      "objects": 96,
+      "old_inode_and_bytes": 94,
+      "same_bytes_different_inode": 0,
+      "unqualified": false
+    },
+    "ruff_source_file-2nstu9mevvohj": {
+      "objects": 75,
+      "old_inode_and_bytes": 74,
+      "same_bytes_different_inode": 0,
+      "unqualified": false
+    }
+  },
+  "owners": {
+    "ruff_linter": {
+      "changed_native": [
+        {
+          "clean": [
+            200240,
+            "a5aef9843bdd6353725c594b18f6d56f30c194a1e290c1b21940838668bd4e0b"
+          ],
+          "edited": [
+            200240,
+            "a5aef9843bdd6353725c594b18f6d56f30c194a1e290c1b21940838668bd4e0b"
+          ],
+          "old": [
+            200240,
+            "6bf29b1b5c7a57ff9dedb63a564c2b0c81cc7daef27ee0d23a002cc55da0631c"
+          ],
+          "unit": "ruff_linter-1ebfba3e634b8a34.24hdueqpruf9yj3et7jm3a65y.<invocation0>.rcgu.o"
+        }
+      ],
+      "deepest": {
+        "front-end semantic work": 2212,
+        "incremental graph and persistence": 632,
+        "mono collection": 209,
+        "native code generation": 1012,
+        "other query or graph work": 1363,
+        "other/unclassified": 2425,
+        "query color/force": 647,
+        "rmeta decode": 121,
+        "rmeta encode/public hash": 766
+      },
+      "extern_names": [
+        "aho_corasick",
+        "anyhow",
+        "bitflags",
+        "clap",
+        "colored",
+        "compact_str",
+        "fern",
+        "glob",
+        "globset",
+        "hashbrown",
+        "imperative",
+        "is_macro",
+        "itertools",
+        "jiff",
+        "libcst_native",
+        "libcst_native",
+        "log",
+        "memchr",
+        "natord",
+        "path_absolutize",
+        "pep440_rs",
+        "pep440_rs",
+        "pyproject_toml",
+        "regex",
+        "ruff_cache",
+        "ruff_db",
+        "ruff_diagnostics",
+        "ruff_macros",
+        "ruff_notebook",
+        "ruff_python_ast",
+        "ruff_python_codegen",
+        "ruff_python_importer",
+        "ruff_python_index",
+        "ruff_python_literal",
+        "ruff_python_parser",
+        "ruff_python_semantic",
+        "ruff_python_stdlib",
+        "ruff_python_trivia",
+        "ruff_source_file",
+        "ruff_text_size",
+        "rustc_hash",
+        "serde",
+        "serde_json",
+        "similar",
+        "smallvec",
+        "strum",
+        "strum_macros",
+        "thiserror",
+        "toml",
+        "typed_arena",
+        "unicode_normalization",
+        "unicode_width",
+        "unicode_names2",
+        "url"
+      ],
+      "inclusive": {
+        "any foreign metadata loader": 126,
+        "archive assembly": 21,
+        "front-end semantic work": 2587,
+        "incremental graph and persistence": 1220,
+        "incremental query cache decoder": 439,
+        "mono collection": 628,
+        "native code generation": 1197,
+        "native link preparation": 21,
+        "other query or graph work": 2637,
+        "proc_macro or expand": 1504,
+        "query color/force": 964,
+        "rmeta decode": 126,
+        "rmeta encode/public hash": 1022
+      },
+      "native_members": 256,
+      "pid": 20023,
+      "primary": {
+        "front-end semantic work": 1323,
+        "incremental graph and persistence": 439,
+        "mono collection": 106,
+        "native code generation": 870,
+        "other query or graph work": 641,
+        "other/unclassified": 4659,
+        "query color/force": 646,
+        "rmeta decode": 104,
+        "rmeta encode/public hash": 599
+      },
+      "rlib_rmeta": {
+        "clean": [
+          "165b995238789549378bea16c4f4d54b843a834bb68dd3dd15093b340a97a9d9",
+          "177cd5084b3ff93e217d9c862ed868f08f578626457676f89e6794e266f12113"
+        ],
+        "edit": [
+          "ed2ca5ec7d16250a34ff2ed00c9f24ffd43fb7bd66dd1644276803dcff6938ea",
+          "f377a87c237fb4de0e71c664196ef1e91a1dbe9985711cf2f9b6bcf440b6bb37"
+        ],
+        "old": [
+          "416b7a89288601de8f0f779260600f31cb884e37650e5af133589734db784075",
+          "5264646d00b9575d043d0bc263bf2255e6afb2f294e59083a1b795234fed0214"
+        ]
+      },
+      "samples": 9387,
+      "top_leaf": [
+        [
+          "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+          641
+        ],
+        [
+          "[unknown]",
+          317
+        ],
+        [
+          "<rustc_middle::ty::Ty as rustc_serialize::serialize::Decodable<rustc_middle::query::on_disk_cache::CacheDecoder>>::decode",
+          154
+        ],
+        [
+          "<rustc_proc_macro::bridge::server::Dispatcher<rustc_expand::proc_macro_server::Rustc>>::dispatch::{closure#12}",
+          152
+        ],
+        [
+          "<rustc_metadata::rmeta::encoder::EncodeContext<rustc_metadata::rmeta::encoder::DefPathHashDefIdEncoder>>::encode_def_ids::<rustc_metadata::rmeta::encoder::public_api_hasher::PublicApiHashingContext<true: bool>>",
+          118
+        ],
+        [
+          "<rustc_resolve::Resolver>::resolve_ident_in_scope_set_inner",
+          114
+        ],
+        [
+          "<rustc_ast_lowering::LoweringContext>::lower_qpath",
+          113
+        ],
+        [
+          "<rustc_middle::dep_graph::serialized::SerializedDepGraph>::try_decode",
+          110
+        ],
+        [
+          "malloc",
+          108
+        ],
+        [
+          "<rustc_metadata::rmeta::encoder::EncodeContext<rustc_metadata::rmeta::encoder::DefPathHashDefIdEncoder> as rustc_span::SpanEncoder>::encode_span",
+          98
+        ],
+        [
+          "_ZN4llvm12MachineInstr10addOperandERNS_15MachineFunctionERKNS_14MachineOperandE",
+          91
+        ],
+        [
+          "<rustc_parse::lexer::Lexer>::next_token_from_cursor",
+          90
+        ]
+      ],
+      "unions_do_not_sum": {
+        "all foreign metadata decode or query color/force": 1063,
+        "also includes expanding all proc macros": 2996,
+        "including incremental query cache decode": 1495
+      }
+    },
+    "ruff_python_ast": {
+      "changed_native": [],
+      "deepest": {
+        "archive assembly": 3,
+        "front-end semantic work": 493,
+        "incremental graph and persistence": 112,
+        "native code generation": 8,
+        "other query or graph work": 236,
+        "other/unclassified": 508,
+        "query color/force": 123,
+        "rmeta decode": 22,
+        "rmeta encode/public hash": 382
+      },
+      "extern_names": [
+        "aho_corasick",
+        "bitflags",
+        "compact_str",
+        "get_size2",
+        "is_macro",
+        "memchr",
+        "ruff_cache",
+        "ruff_macros",
+        "ruff_python_trivia",
+        "ruff_source_file",
+        "ruff_text_size",
+        "rustc_hash",
+        "salsa",
+        "serde",
+        "thin_vec",
+        "thiserror"
+      ],
+      "inclusive": {
+        "any foreign metadata loader": 22,
+        "archive assembly": 8,
+        "front-end semantic work": 565,
+        "incremental graph and persistence": 193,
+        "incremental query cache decoder": 74,
+        "mono collection": 34,
+        "native code generation": 32,
+        "native link preparation": 8,
+        "other query or graph work": 449,
+        "proc_macro or expand": 316,
+        "query color/force": 141,
+        "rmeta decode": 22,
+        "rmeta encode/public hash": 483
+      },
+      "native_members": 200,
+      "pid": 18946,
+      "primary": {
+        "front-end semantic work": 278,
+        "incremental graph and persistence": 93,
+        "native code generation": 2,
+        "other query or graph work": 138,
+        "other/unclassified": 949,
+        "query color/force": 122,
+        "rmeta decode": 21,
+        "rmeta encode/public hash": 284
+      },
+      "rlib_rmeta": {
+        "clean": [
+          "ff0eb61b0ab262e022fdd8298f9157ff1a855bcb9e6980af8e182f59272f4cce",
+          "4163621a2e6a1be41527a4ba656018c33096258b3ab057cf0a7b3751e95364fe"
+        ],
+        "edit": [
+          "1211030b3920edc6b50444e90ac87d69f40ab233a1bc016348f62637c347b9ab",
+          "473c3a1bf73d89d7e80bd1c78580d721257323d56d76bf336eeee733b0b5e2b1"
+        ],
+        "old": [
+          "e54c7a3fd19ff4fb9402d81ba601f3ec208f296ebb51f00bff9e379f33ecf827",
+          "2c196a25f5f5ac756ba11d4b257cb436749130702286aeabbbeb3f7036651191"
+        ]
+      },
+      "samples": 1887,
+      "top_leaf": [
+        [
+          "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+          121
+        ],
+        [
+          "[unknown]",
+          76
+        ],
+        [
+          "<rustc_metadata::rmeta::encoder::public_api_hasher::ReachabilityGraphBuilder>::build_graph",
+          48
+        ],
+        [
+          "<rustc_metadata::rmeta::encoder::EncodeContext<rustc_metadata::rmeta::encoder::DefPathHashDefIdEncoder> as rustc_span::SpanEncoder>::encode_span",
+          46
+        ],
+        [
+          "rustc_metadata::rmeta::encoder::public_api_hasher::build_public_hashes",
+          36
+        ],
+        [
+          "<rustc_metadata::rmeta::encoder::EncodeContext<rustc_metadata::rmeta::encoder::DefPathHashDefIdEncoder>>::encode_def_ids::<rustc_metadata::rmeta::encoder::public_api_hasher::PublicApiHashingContext<true: bool>>",
+          33
+        ],
+        [
+          "<rustc_resolve::late::LateResolutionVisitor>::resolve_path",
+          31
+        ],
+        [
+          "<rustc_middle::dep_graph::serialized::SerializedDepGraph>::try_decode",
+          29
+        ],
+        [
+          "rustc_interface::callbacks::track_span_parent",
+          28
+        ],
+        [
+          "<rustc_proc_macro::bridge::server::Dispatcher<rustc_expand::proc_macro_server::Rustc>>::dispatch::{closure#12}",
+          26
+        ],
+        [
+          "core::slice::sort::stable::quicksort::quicksort::<indexmap::Bucket<rustc_metadata::rmeta::encoder::public_api_hasher::Node, rustc_data_structures::fingerprint::Fingerprint>, <[indexmap::Bucket<rustc_metadata::rmeta::encoder::public_api_hasher::Node, rustc_data_structures::fingerprint::Fingerprint>]>::sort_by_key<rustc_data_structures::fingerprint::Fingerprint, <indexmap::map::IndexMap<rustc_metadata::rmeta::encoder::public_api_hasher::Node, rustc_data_structures::fingerprint::Fingerprint, rustc_hash::FxBuildHasher>>::sort_by_key<rustc_data_structures::fingerprint::Fingerprint, <rustc_metadata::rmeta::encoder::public_api_hasher::ReachabilityGraphBuilder>::build_graph::{closure#3}>::{closure#0}::{closure#0}>::{closure#0}>",
+          26
+        ],
+        [
+          "rustc_query_impl::execution::try_execute_query::<rustc_middle::query::caches::DefIdCache<rustc_middle::query::erase::ErasedData<[u8; 8: usize]>>, true: bool>",
+          24
+        ]
+      ],
+      "unions_do_not_sum": {
+        "all foreign metadata decode or query color/force": 163,
+        "also includes expanding all proc macros": 550,
+        "including incremental query cache decode": 237
+      }
+    },
+    "ruff_server": {
+      "changed_native": [
+        {
+          "clean": [
+            2228104,
+            "3ce165f412dc26c10f798a27fb9b76d5f866e8c7dea72ee095f791e66c898ef5"
+          ],
+          "edited": [
+            2228104,
+            "3ce165f412dc26c10f798a27fb9b76d5f866e8c7dea72ee095f791e66c898ef5"
+          ],
+          "old": [
+            2228104,
+            "551333fc579563fbfa35873319dcf4ab33a87a4a9cef8c5fdf6c1be62d3b24a7"
+          ],
+          "unit": "ruff_server-9b852efc1540bddb.4t939guk7r9kldlc2gel8afb6.<invocation0>.rcgu.o"
+        }
+      ],
+      "deepest": {
+        "front-end semantic work": 380,
+        "incremental graph and persistence": 112,
+        "mono collection": 69,
+        "native code generation": 538,
+        "other query or graph work": 376,
+        "other/unclassified": 194,
+        "query color/force": 152,
+        "rmeta decode": 174,
+        "rmeta encode/public hash": 71
+      },
+      "extern_names": [
+        "anyhow",
+        "crossbeam",
+        "ignore",
+        "jod_thread",
+        "lsp_server",
+        "lsp_types",
+        "regex",
+        "ruff_db",
+        "ruff_diagnostics",
+        "ruff_formatter",
+        "ruff_linter",
+        "ruff_markdown",
+        "ruff_notebook",
+        "ruff_python_ast",
+        "ruff_python_codegen",
+        "ruff_python_formatter",
+        "ruff_python_index",
+        "ruff_python_parser",
+        "ruff_source_file",
+        "ruff_text_size",
+        "ruff_workspace",
+        "rustc_hash",
+        "serde",
+        "serde_json",
+        "shellexpand",
+        "thiserror",
+        "toml",
+        "tracing",
+        "tracing_log",
+        "tracing_subscriber"
+      ],
+      "inclusive": {
+        "any foreign metadata loader": 189,
+        "archive assembly": 10,
+        "front-end semantic work": 457,
+        "incremental graph and persistence": 304,
+        "incremental query cache decoder": 64,
+        "mono collection": 262,
+        "native code generation": 663,
+        "native link preparation": 10,
+        "other query or graph work": 774,
+        "proc_macro or expand": 105,
+        "query color/force": 290,
+        "rmeta decode": 189,
+        "rmeta encode/public hash": 98
+      },
+      "native_members": 215,
+      "pid": 21360,
+      "primary": {
+        "front-end semantic work": 238,
+        "incremental graph and persistence": 89,
+        "mono collection": 40,
+        "native code generation": 483,
+        "other query or graph work": 125,
+        "other/unclassified": 736,
+        "query color/force": 152,
+        "rmeta decode": 150,
+        "rmeta encode/public hash": 53
+      },
+      "rlib_rmeta": {
+        "clean": [
+          "28bc28e3e97d11a7a3f2ed73c54a4822d2ffddea98b8fbf5c62c13e13d8c3093",
+          "81d9e3a2b3d7d1f9f00aca65b9b54928be0c77d725fec0d368c5a32c6c9c778e"
+        ],
+        "edit": [
+          "640ecdc7bf5b68e25ae12237317033243fbe076f756845871f02109694b376cf",
+          "bea671be502b81dcd17acf908f5ec0aba065f7cf6a61c23688de8a76a8f1fb93"
+        ],
+        "old": [
+          "0c46057834d9b83174a8c8c59cca1d98709936446f040f695bc27caee8a2e1fc",
+          "75151061d86a201e558ec6e4483a0ab66e2d507a210e31b57313a632666b236c"
+        ]
+      },
+      "samples": 2066,
+      "top_leaf": [
+        [
+          "<rustc_middle::dep_graph::graph::DepGraphData>::try_mark_previous_green",
+          151
+        ],
+        [
+          "[unknown]",
+          76
+        ],
+        [
+          "<rustc_middle::ty::Ty as rustc_serialize::serialize::Decodable<rustc_metadata::rmeta::decoder::MetadataDecodeContext>>::decode",
+          65
+        ],
+        [
+          "<rustc_stable_hash[613b013458b1412]::sip128::SipHasher128>::short_write_process_buffer::<8: usize>",
+          47
+        ],
+        [
+          "<rustc_metadata::rmeta::decoder::MetadataDecodeContext as rustc_span::SpanDecoder>::decode_span",
+          33
+        ],
+        [
+          "<rustc_type_ir::ty_kind::TyKind<rustc_middle::ty::context::TyCtxt> as rustc_data_structures::stable_hash::StableHash>::stable_hash::<rustc_middle::ich::StableHashState>",
+          33
+        ],
+        [
+          "<rustc_middle::mir::BasicBlockData as rustc_data_structures::stable_hash::StableHash>::stable_hash::<rustc_middle::ich::StableHashState>",
+          29
+        ],
+        [
+          "_ZN4llvm12MachineInstr10addOperandERNS_15MachineFunctionERKNS_14MachineOperandE",
+          28
+        ],
+        [
+          "<rustc_middle::dep_graph::serialized::SerializedDepGraph>::try_decode",
+          27
+        ],
+        [
+          "<&rustc_middle::ty::list::RawList<(), rustc_middle::ty::generic_args::GenericArg> as rustc_data_structures::stable_hash::StableHash>::stable_hash::<rustc_middle::ich::StableHashState>",
+          27
+        ],
+        [
+          "<rustc_expand::expand::MacroExpander>::fully_expand_fragment",
+          22
+        ],
+        [
+          "_ZN12_GLOBAL__N_114VarLocBasedLDV12ExtendRangesERN4llvm15MachineFunctionEPNS1_20MachineDominatorTreeEbjj.llvm.2829444073677789182",
+          21
+        ]
+      ],
+      "unions_do_not_sum": {
+        "all foreign metadata decode or query color/force": 428,
+        "also includes expanding all proc macros": 593,
+        "including incremental query cache decode": 488
+      }
+    }
+  },
+  "source": {
+    "artifact": 13154575612,
+    "metered": 60969897935,
+    "ordinary_workflow_instructions": 61066244767,
+    "period": 2500003,
+    "run": 41466356507,
+    "samples": 23344,
+    "zip_sha256": "2500e9d894aff9bf31314ae4e03a7e37e81d36ed9210b6a832902b72e8193e73"
+  },
+  "top_complete_units": [
+    [
+      "rustc ruff_linter",
+      9387
+    ],
+    [
+      "rustc ruff_server",
+      2066
+    ],
+    [
+      "rustc ruff_python_ast",
+      1887
+    ],
+    [
+      "rustc ruff_workspace",
+      1299
+    ],
+    [
+      "rustc ruff",
+      1203
+    ],
+    [
+      "rustc ruff_db",
+      920
+    ],
+    [
+      "rustc ruff_python_formatter",
+      824
+    ],
+    [
+      "rustc ruff_python_semantic",
+      714
+    ]
+  ]
+}
