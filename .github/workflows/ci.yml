@@ -1,4 +1,4 @@
-name: Check uv 22958 with corrected stock and full production Rust
+name: 'Two real uv #22536 code edits and the intervening rustdoc edit'
 'on':
   workflow_dispatch:
     inputs:
@@ -11,17 +11,12 @@ permissions:
   actions: read
   attestations: read
 jobs:
-  root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-optimized-check-repeat'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1
+  eight-real-session-pairs:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22536-source-session-check' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 120
+    timeout-minutes: 210
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      EXCLUDED_PRODUCTION_BOOT: 'ecb0e23983b9aca584bb35892726331a571eb301bd506b9881813fc819d088f3'
-      BUILD_RUN_ID: '41434876352'
-      BUILD_HEAD: '731d81a4cb3498cf4221d53a267bbf4a76ca250f'
-      RELEASE_LOCK: 'ddbedbac4a523086977b50752b4157a764a369e0c83a07d7f46c9132e4703d26'
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -29,10 +24,13 @@ jobs:
         path: coordinator
         ref: ${{ github.sha }}
         persist-credentials: 'false'
-        sparse-checkout: |-
-          scripts/handwritten-panel
+        sparse-checkout: 'scripts/handwritten-panel
+
           scripts/uv-callables-21041
+
           scripts/uv-client-22958
+
+          scripts/uv-check-22536'
         fetch-depth: '2'
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -40,104 +38,155 @@ jobs:
         path: opening
         ref: 341cd92e5d381a50bd380467075f31e780ee6296
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/uv-root-20991-opening
+        sparse-checkout: 'scripts/uv-root-20991-opening
+
+          '
     - name: Check out previous
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: previous
         ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/uv-resolver-whole-pmu
+        sparse-checkout: 'scripts/uv-resolver-whole-pmu
+
+          '
     - name: Check out qualified
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: qualified
         ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/rc23-trait-qualification
+        sparse-checkout: 'scripts/rc23-trait-qualification
+
+          '
     - name: Check out pilot
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: pilot
         ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/ctfe-crossover-pilot
+        sparse-checkout: 'scripts/ctfe-crossover-pilot
+
           scripts/branch-return-pmu
+
+          '
     - name: Check out calibrator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: calibrator
         ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/gnu-renderer-pfc-hardware
+        sparse-checkout: 'scripts/gnu-renderer-pfc-hardware
+
+          '
     - name: Check out observers
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: observers
         ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/gnu-example-ceiling
+        sparse-checkout: 'scripts/gnu-example-ceiling
+
           scripts/gnu-renderer-library-workers
-    - name: Check out uv at the actual landed edit
+
+          '
+    - name: Check out the genuine final review revision
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: astral-sh/uv
-        ref: 362613dbf38f60fe285cdd6bca53641149a23c04
-        fetch-depth: '64'
+        ref: d9ed4be043e33e1494d17fa555bc0f6d9af9ed06
+        fetch-depth: '96'
         fetch-tags: 'false'
         persist-credentials: 'false'
         path: uv-source
-    - name: Fetch and verify the historical release tag for the real uv build script
-      run: |
-        git -C uv-source fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.13.6:refs/tags/0.13.6
-        test "$(git -C uv-source rev-parse 'refs/tags/0.13.6^{}')" = 329bf9448afd9f9088d14a4d57fbc61eb454f117
-    - name: Check the private payload and host prerequisites
-      run: |
-        set -euo pipefail
-        mkdir trait-results
-        /usr/bin/python3.12 -ISB coordinator/scripts/uv-client-22958/manifest.py
-        /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-    - name: Calibrate inherited userspace instructions for real fork, exec and threads
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py calibrate 2>&1 | tee trait-results/calibration.log
-    - name: Seal the fresh physical runner and its blocking wall calibration
+    - name: Verify the reviewed historical uv release tag
+      shell: bash
+      run: 'set -euo pipefail
+
+        git -C uv-source fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.13.4:refs/tags/0.13.4
+
+        test "$(git -C uv-source rev-parse ''refs/tags/0.13.4^{}'')" = 7456b60bc6bc348e13e06e3691bf08e78d3aef54
+
+        '
+    - name: Verify every local file and host instruction permissions
+      shell: bash
+      run: 'set -euo pipefail
+
+        (cd coordinator/scripts/uv-check-22536 && sha256sum --strict -c SHA256SUMS)
+
+        /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh
+
+        '
+    - name: Admit all three source-native distributions and the 654 genuine locked crates
+      shell: bash
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/authority.py acquire
+
+        '
+      env: &id001
+        GH_TOKEN: ${{ github.token }}
+    - name: Calibrate inherited, scoped, blocking and short-child controls
+      shell: bash
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/science.py calibrate session-config.json
+
+        '
+    - name: Publish only the early physical attestation
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-corrected-production-runner-boot
-        path: trait-results/boot-attestation.json
+        name: uv-22536-session-boot
+        path: session-results/calibration/accepted.json
         if-no-files-found: error
         retention-days: 5
-    - name: Admit the two original optimized GNU packages and the released Cargo binary
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py admit 2>&1 | tee trait-results/intake.log
-    - name: Isolate both release formats and exercise a linked program across both compiler transitions
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py migration
-    - name: Compare original cold and warm identities before any of sixteen ordinary histories can be timed
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py study 2>&1 | tee trait-results/experiment.log
-    - name: Independently reduce the eight blocking wall pairs and their hardware declarations
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py reduce 2>&1 | tee trait-results/reduction.log
-    - name: Preserve raw clocks, source qualification and any incomplete attempt
+    - name: Use separate real native warm/cold histories, source probes and landed tests
+      shell: bash
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/science.py open session-config.json
+
+        '
+    - name: Check both real compiler epochs and native metadata in both directions
+      shell: bash
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/science.py epochs session-config.json
+
+        '
+    - name: Recheck the current published signed release before the first bare vote
+      shell: bash
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/authority.py latest
+
+        '
+      env: *id001
+    - name: Acquire eight new independent pairs and all three genuine edits
+      shell: bash
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/science.py measure session-config.json
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/score.py session-results > session-results/independent-replay.json
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/native_reader.py session-results > session-results/native-replay.json
+
+        '
+    - name: Pack all raw measurements and custody on failure or success
+      if: always()
+      shell: bash
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/evidence.py
+
+        '
+    - name: Preserve the single durable result
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-corrected-production-wall-eight-pairs
-        path: trait-results/
+        name: uv-22536-two-code-edits
+        path: session-evidence/
         if-no-files-found: error
-        compression-level: '1'
-        retention-days: 5
+        retention-days: 7
+        compression-level: 0

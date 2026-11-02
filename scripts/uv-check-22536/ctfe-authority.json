@@ -1,0 +1,38 @@
+{
+  "native_originals": {
+    "R": {
+      "actual_correctness": false,
+      "actual_driver_launcher": "7e35096dab1b661924cb3c31982c870dd99c7c00a7fba28aa958f451e7c9474e",
+      "checks": {
+        "A_differs_from_B": true,
+        "B_warm_equals_cold": false,
+        "C_warm_equals_cold": true,
+        "pointer_switch_changes_public_hash": true
+      },
+      "compiler": "008a21ac0d750dc9a1c18b7959d7e7984c03d887",
+      "original": "d0c391f8c579e731d9dd00899c89272a6c0f1376a6ae389f28985f39b66bdc70"
+    },
+    "S": {
+      "actual_correctness": true,
+      "actual_driver_launcher": "87d3a9878286115d871d3fa0eed88470fb083181f7ffeaf223d5a5c40111cc18",
+      "checks": {
+        "A_differs_from_B": true,
+        "B_warm_equals_cold": true,
+        "C_warm_equals_cold": true,
+        "pointer_switch_changes_public_hash": true
+      },
+      "compiler": "10d56274a98801b5ef8f80aab734e835749458e1",
+      "original": "926830b5158b89dc87e6a85cb8a9d8a9fea7ab0d4c7c27adbb8e17cc4f388245"
+    }
+  },
+  "real_inputs": {
+    "capture.py": "700cd46e7684529fb0b2938f35044c0b0dccb280773a74f9b92306f8596caa97",
+    "captured.json": "7f33e55cb9beae9c50e68d256fa6c641a407bbbc1984fad4db374d13e27b6d3c",
+    "ctfe_check.py": "91ad411d555592b9fd7bf590a238a6041d53def3e03ad95670c364ec5f3c8cdc",
+    "objects/0567540a4eea5724ead25d17d098dfd3877a7795": "163d0ac1da2d49b3c5015e75d7a5686d000d0f71f85c03eb74046ebb4cc0ddd8",
+    "objects/0f2bb7d7f6da8a0d7221796bfd8ad0bd4a8c7a2c": "5a9697f6f817af54e0d0d01047a12d9d043cc416c5aa6f52f51790893f141bda",
+    "objects/85fe829d8474b6cfce28c0f7c483b6f75ddd85fd": "5fa5888c5092a1f096b730903d0cb89db9e0259e0fd589735f3c1d606696fbb9",
+    "objects/b77c91d6d0203aba236987a6bc9f9fa85c7715a2": "fa0676f06a1777ab6c0f2a05286921f1ac8d53ae08c1469be02358e75d460e05"
+  },
+  "scope": "Canonical CTFE regression only. #22536 source-specific independent cold election is separate."
+}
