@@ -11,6 +11,7 @@ import sys
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
+import consumer
 from install import HOST, RECORDS, ROOT, SDK, save, sha
 
 SRC = Path(os.environ['GITHUB_WORKSPACE']) / 'ruff'
@@ -105,6 +106,14 @@ def main(role):
         st=exe.stat()
         visits[phase]=dict(path=str(exe),roster=roster,dirty=dirty,sha256=sha(exe),dev=st.st_dev,
                            inode=st.st_ino,mtime_ns=st.st_mtime_ns,bytes=st.st_size)
+        if phase in ('old','edit'):
+            sessions,pins,objects=consumer.capture(STATE,set() if phase=='old' else old_sessions,tools['rustc'].splitlines()[0].removeprefix('rustc '),folder)
+            save(phase+'/consumer-objects.json',objects)
+            if phase=='old':
+                old_sessions,old_pins,old_objects=sessions,pins,objects
+            else:
+                save('edit/retained-consumer.json',consumer.retained(old_objects,objects,old_pins))
+                for handle in (*old_pins.values(),*pins.values()):handle.close()
         if phase in ('old','edit','fingerprint'):
             collect_markers(folder)
         if phase=='old':
