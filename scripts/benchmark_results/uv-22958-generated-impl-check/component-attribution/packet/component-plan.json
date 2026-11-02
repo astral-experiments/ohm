@@ -1,0 +1,89 @@
+{
+  "F": {
+    "commit": "ac67101cb973e35ce8ff044cc8014c2c76bab69e",
+    "epoch": 43319,
+    "tree": "1c07367341a9cc53272e9eefdae1ac8823d44839"
+  },
+  "P": {
+    "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
+    "epoch": 43317,
+    "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2"
+  },
+  "P_F_material_receipts": {
+    "production/ac671-material.json": "f4a7a4f04ef528dbd22209a94dea3bd442e3c92ea6be93e92985b2301826302a",
+    "production/rehearsed-77ce-material.json": "67a89b77b7399dcd00498ee55d9e9335cbaf8ce174b0a029d8839bdb4f850966",
+    "replication/remote-immutable-packet/independent-replication/origin.json": "e76cb0fece0f2a34e48ac5e4d359b190c79779f5f8f6c46962872c0b570400b0",
+    "replication/remote-immutable-packet/independent-replication/registration.json": "187a9ff09d03ce98eb5afecc31001db24147c51f9d08d1527b00cd97ef54d8b3"
+  },
+  "S": {
+    "meaning": "corrected Ohm -22 with #318",
+    "rust": "10d56274a98801b5ef8f80aab734e835749458e1"
+  },
+  "argv": [
+    "cargo",
+    "check",
+    "-p",
+    "uv-client",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "case": "https://github.com/astral-sh/uv/pull/22958",
+  "design": "Each block starts three independent genuine cold uv A histories. Compare separately restored ordinary first-edit Cargo wall, all compiler PID-bound retired user instructions, and inherited Cargo instructions. Include every block, both halves, and every scope. Check unchanged A/B plus actual B vs independently cold B workspace products and source identity in all three roles. Do not infer P from measurements on another host.",
+  "interpretation": "P contains several earlier compiler changes. Only P vs F isolates #336. The previous S vs F two-worker result remains independent evidence. This is attribution of that -22 result, even if a successor release ships.",
+  "orders": [
+    [
+      "S",
+      "P",
+      "F"
+    ],
+    [
+      "F",
+      "P",
+      "S"
+    ],
+    [
+      "P",
+      "F",
+      "S"
+    ],
+    [
+      "S",
+      "F",
+      "P"
+    ],
+    [
+      "F",
+      "S",
+      "P"
+    ],
+    [
+      "P",
+      "S",
+      "F"
+    ],
+    [
+      "S",
+      "P",
+      "F"
+    ],
+    [
+      "F",
+      "P",
+      "S"
+    ]
+  ],
+  "question": "On uv #22958, did the stack before Rust #336 already exceed 2x ordinary wall vs corrected -22, and what does #336 add on its own?",
+  "registered_before_attribution_measurement": "2026-11-02T17:57:23.027637+00:00",
+  "signed_minus22_cargo_sha256": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+  "status": "Source plan only. The current-release campaigns and the pending trait-directory sensitivity guard take priority. No worker has been dispatched.",
+  "threshold": "On one worker, a 2x wall threshold for any declared S/P, S/F, or P/F contrast requires all eight ratios strictly >2 and both half medians >2. A repeatability claim requires the same on a second fresh worker. Report each contrast whatever it finds. A 20% instruction reduction means all eight paired candidate/parent ratios <=0.80 for the named scope.",
+  "unit_names": [
+    "uv_configuration",
+    "uv_client"
+  ],
+  "uv": [
+    "8ca75796365f348e25d3f7bea9daa1440218d40b",
+    "362613dbf38f60fe285cdd6bca53641149a23c04"
+  ]
+}
