@@ -47,6 +47,10 @@ jobs:
       with:
         python-version: '3.13'
         update-environment: true
+    - name: Install the release manifest validator's uvx runner
+      uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      with:
+        enable-cache: false
     - name: Check out legacy
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
@@ -113,11 +117,12 @@ jobs:
       run: |
         set -euo pipefail
         sudo apt-get update -qq
-        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config libssl-dev zstd
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config libssl-dev jq zstd
     - name: Admit this reviewed nonrelease worker
       run: |-
         set -euo pipefail
         (cd qa-code/scripts/rc23-expanded-inputs && sha256sum --check --strict --quiet SHA256SUMS)
+        ./scripts/validate-release-manifest.sh --require-pinned toolchains/1.99.0/23.json
         python3 -IB qa-code/scripts/ruff-matched-stage/build.py preflight
         python3 -IB qa-code/scripts/ruff-matched-stage/tests.py
     - name: Assemble the complete pinned Rust, Cargo, Clippy and rustfmt checkouts
