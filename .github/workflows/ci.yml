@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22]
+        options: [single-22, paired-18-22, source-bisect-330]
         default: single-22
       reviewed_head:
         description: Exact reviewed QA commit
@@ -14,6 +14,7 @@ on:
         type: string
 permissions:
   contents: read
+  actions: read
 jobs:
   census:
     name: Signed Ohm workspace link census
@@ -53,12 +54,12 @@ jobs:
           strace -ff -qq -e trace=%process -o "$RUNNER_TEMP/census-trace-admission" -- /bin/true
           grep -F 'execve("/bin/true"' "$RUNNER_TEMP"/census-trace-admission.*
       - name: Authenticate all 79 signed GNU SDK files
-        if: inputs.mode != 'paired-18-22'
+        if: inputs.mode == 'single-22'
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB enrolled/scripts/ruff-workspace-link-census/census.py install
       - name: Build the complete workspace and trace the unchanged command
-        if: inputs.mode != 'paired-18-22'
+        if: inputs.mode == 'single-22'
         run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/census.py "$GITHUB_WORKSPACE/ruff"
       - name: Verify the independently empty signed -18 SDK
         if: inputs.mode == 'paired-18-22'
@@ -76,6 +77,14 @@ jobs:
       - name: Capture signed -22 workspace roots, unchanged compilers and native bytes
         if: inputs.mode == 'paired-18-22'
         run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/paired.py run 22 "$GITHUB_WORKSPACE/ruff"
+      - name: Verify the signed compiler and both source-bound native Cargo products
+        if: inputs.mode == 'source-bisect-330'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/bisect330.py fetch
+      - name: Run the true Ruff constructors test and changing native provider on both readers
+        if: inputs.mode == 'source-bisect-330'
+        run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/bisect330.py run "$GITHUB_WORKSPACE/ruff"
       - name: Retain the native process tree, Cargo products, link markers and verdicts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
