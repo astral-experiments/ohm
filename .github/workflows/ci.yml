@@ -28,7 +28,7 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-callables-native'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-callables-native-odht'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41395027122' && inputs.build_head == 'ee90d022e7abb6c2c2f61b751c49de06bba29aed'
       && inputs.sdk_lock_sha256 == '08b0f933ed9dda4bc7079d63e81321e7c8ff279e321b47888da4408781ebdacf'
     runs-on: namespace-profile-ubuntu-24-04-16
