@@ -39,6 +39,62 @@
       },
       "source_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
     },
+    "fa7a_stack_ctfe318": {
+      "artifact": {
+        "bytes": 359918996,
+        "id": 13112830698,
+        "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
+      },
+      "builder_tree": "85761b7d3b377c90c26c635f7231c29df024e9ff",
+      "driver": "3f8168fac2af20edf3ca51d940b4653df40746ff2ef43be50fcd0090ba260a7b",
+      "role_sha256": "72d366265342c92095c94c174181b7837c19add96cd0ef5719755c115e6273a2",
+      "service": {
+        "branch": "charlie/codex-ctfe22-standard-20988",
+        "head": "cddb036d81e4313a8e422171f39f0840b44110db",
+        "job": 125052685273,
+        "jobs": {
+          "Production GNU SDK (fa7a_stack_ctfe318)": 125052685273,
+          "Production GNU SDK (stock_ctfe318)": 125052685479,
+          "Qualify both cache migration directions": 125067990029
+        },
+        "members": {
+          "ctfe22-gnu-build-fa7a_stack_ctfe318-attempt-1": {
+            "bytes": 324152,
+            "id": 13111789509,
+            "sha256": "dafc9171fd92bdb0360d09c401bed69d21688a6241e27ff33854a2899d2e972b"
+          },
+          "ctfe22-gnu-build-stock_ctfe318-attempt-1": {
+            "bytes": 320732,
+            "id": 13112616460,
+            "sha256": "a303a36f25e7b2019661800c9d1cf194fbef8bf084b8ea024a2fe0df00c45ea6"
+          },
+          "ctfe22-gnu-pair-qa-attempt-1": {
+            "bytes": 61651,
+            "id": 13112632778,
+            "sha256": "b1502aed447aebb3a2bf79784f47e8af92e126378448da72735996b70a29502e"
+          },
+          "ctfe22-gnu-sdk-fa7a_stack_ctfe318": {
+            "bytes": 359918996,
+            "id": 13112830698,
+            "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
+          },
+          "ctfe22-gnu-sdk-stock_ctfe318": {
+            "bytes": 359881451,
+            "id": 13112756183,
+            "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
+          }
+        },
+        "run": 41374825846,
+        "runner": 1429,
+        "runner_name": "nsc-runner-qf17h1b297vk4"
+      },
+      "source": {
+        "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
+        "epoch": 43309,
+        "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
+      },
+      "source_sha256": "039577238fed403d7043209f042157c38a781cf14073ff8250b0c2dbcb17661b"
+    },
     "stock_ctfe318": {
       "artifact": {
         "bytes": 359881451,
@@ -101,7 +157,7 @@
     "epoch": 43309,
     "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
   },
-  "plan": "6ab4910153ebdbc331926d553941166dbefca464e96fb0794927852261e91bb1",
+  "plan": "bd30a2a2ced22335a8dc63f5162e241c444eb991f4577cb2a89e539dcf51a2ee",
   "prior_boots": {
     "41379994255": {
       "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
@@ -126,6 +182,15 @@
     "41404703005": {
       "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
       "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
+    },
+    "41406359806": {
+      "boot": "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
+      "raw_sha256": "725410f6d7202a0922756cfcad85e421c24e9b9ef23886f43aff111732ea22ab"
+    },
+    "41407544748": {
+      "artifact": 13124530356,
+      "boot": "13895848-ed2e-435a-b313-9e006b9ff3e2",
+      "raw_sha256": "5fa8a1a93165f1ca3f4e2fdf339be44368feb5d360b810d36c61b26a29abf769"
     }
   },
   "prior_case": {
@@ -196,6 +261,7 @@
   "relative_source": "f6b55d2817bb059f9c0bd65de1fd33b0381225c0bcb721459514b49cf5e7d146",
   "roles": [
     "stock_ctfe318",
+    "fa7a_stack_ctfe318",
     "callables_ctfe318"
   ],
   "scope": "separate original production jobs, original signed Cargo, instance-specific service SDK archives and native QA"

@@ -30,6 +30,7 @@ def host():
         and ROLES
         == [
             "stock_ctfe318",
+            "fa7a_stack_ctfe318",
             "callables_ctfe318",
         ],
         "wrong physical roles",
@@ -64,7 +65,7 @@ def host():
     )
     guard(
         PAIR["arms"][ROLES[0]]["source"]["epoch"] == 43310
-        and PAIR["arms"][ROLES[1]]["source"]["epoch"] == 43309,
+        and all(PAIR["arms"][role]["source"]["epoch"] == 43309 for role in ROLES[1:]),
         "cache/metadata epochs",
     )
     plan = m.read(HERE / "measurement-plan.json")
@@ -72,9 +73,12 @@ def host():
     replay = m.read(HERE / "source-replay.json")
     guard(filehash(HERE / "measurement-plan.json") == P["measurement_plan_sha256"] == PAIR["plan"]
           and filehash(HERE / "production-source.json") == PAIR["relative_source"] == replay["role_sha256"]
-          and plan["control"]["source"] == PAIR["arms"][ROLES[0]]["source"]["commit"]
-          and src["parent"] == PAIR["overlay_parent"]["commit"]
-          and plan["candidate"]["source"] == src["commit"] == PAIR["arms"][ROLES[1]]["source"]["commit"]
+          and plan["roles"] == ROLES and plan["source"] == {r:PAIR["arms"][r]["source"] for r in ROLES}
+          and plan["orders"] == P["orders"] and plan["holds"] == P["independent_holds"]
+          and plan["command"] == P["score_commands"] and plan["signed_cargo"] == m.P["signed_cargo_sha256"]
+          and plan["unmodified_Cargo_SDKs"] == {r:PAIR["arms"][r]["artifact"] for r in ROLES}
+          and src["parent"] == PAIR["arms"][ROLES[1]]["source"]["commit"] == PAIR["overlay_parent"]["commit"]
+          and src["commit"] == PAIR["arms"][ROLES[-1]]["source"]["commit"]
           and replay["candidate"] == src["commit"] and replay["exact_pack_membership"] is True
           and PAIR["prior_boots"] == m.read(HERE / "prior-boots.json"),
           "unqualified production source, offline replay or study")
@@ -88,8 +92,8 @@ def main():
     cmd = sys.argv[1:]
     guard(len(cmd) == 1, "one action")
     if cmd == ["calibrate"]:
-        old, _ = m.pmu(w, tmp)
-        old.calibrate()
+        import trio
+        trio.calibrate_host(w,tmp)
     elif cmd == ["admit"]:
         import admit_pair
 

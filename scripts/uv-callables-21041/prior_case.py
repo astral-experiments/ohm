@@ -3,8 +3,8 @@ def gate(c,old,proof):
     m=c.m;x=m.read(c.HERE/'first-qualification.json')
     expected=c.PAIR['prior_case']
     c.guard(x==expected and x['all_eight_valid']is True and x['explicit_full_stack_go']is True
-            and x['candidate_source']==c.PAIR['arms'][c.ROLES[1]]['source']['commit']
-            and x['candidate_sdk']==c.PAIR['arms'][c.ROLES[1]]['artifact'],"different or unqualified predecessor")
+            and x['candidate_source']==c.PAIR['arms'][c.ROLES[-1]]['source']['commit']
+            and x['candidate_sdk']==c.PAIR['arms'][c.ROLES[-1]]['artifact'],"different or unqualified predecessor")
     root='repos/astral-experiments/ohm'
     last=old.gh_json('api',root+'/releases/latest')
     c.guard(last['id']==x['release_id'] and last['tag_name']=='ohm-1.99.0-22' and last['draft'] is False and last['prerelease'] is False,

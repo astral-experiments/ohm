@@ -1,4 +1,4 @@
-name: Can the cumulative corrected Ohm compiler halve an ordinary uv-client check?
+name: Can the corrected Ohm stack halve uv-client wall time measured by a blocking native wait?
 'on':
   workflow_dispatch:
     inputs:
@@ -24,9 +24,9 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-cumulative-production-check'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-production-blocking-wall'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41398925829' && inputs.build_head == '4e34ea9c7232977f95498d7bf48d382157e8558b'
-      && inputs.sdk_lock_sha256 == '4fa28d0a3026871350a13a19f04e05de53d97a84ca4538a80a24d176a4ff86f5'
+      && inputs.sdk_lock_sha256 == 'd1938d96af23db32ae8a3e3fd5ec54f88cb0bb58f214d2778c25cb120fda839d'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
     env:
@@ -148,13 +148,20 @@ jobs:
         /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
 
         '
-    - name: Calibrate inherited userspace instructions for real fork, exec and threads
+    - name: Calibrate the native blocking wait on fixed and deliberately failing short children
       run: 'set -euo pipefail
 
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py calibrate 2>&1 | tee trait-results/calibration.log
 
         '
-    - name: Admit both production SDKs from their original independent producers and signed Cargo
+    - name: Retain the calibrated unique runner before acquiring the compilers
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: uv-21041-blocking-timer-boot
+        path: trait-results/boot.json
+        if-no-files-found: error
+        retention-days: 7
+    - name: Admit all three existing production compilers and exact signed Cargo
       env:
         GH_TOKEN: ${{ github.token }}
       run: 'set -euo pipefail
@@ -162,22 +169,22 @@ jobs:
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py admit 2>&1 | tee trait-results/intake.log
 
         '
-    - name: Verify only natural cross-epoch isolation, same-compiler reuse and known-negative assertions
+    - name: Exercise cross-epoch separation and both directions of same-epoch reuse
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py migration
-    - name: Qualify native roots and collect eight balanced pairs for each independent physical metric
+    - name: Open two independent real histories, record diagnostic unit events and time twelve restored native trios
       run: 'set -euo pipefail
 
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/screen.py 2>&1 | tee trait-results/experiment.log'
-    - name: Verify original restored outputs, PMU clocks and separate uninstrumented wall
+    - name: Reconstruct native blocking clocks, complete rooted products and original timeline logs
       run: 'set -euo pipefail
 
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/score.py 2>&1 | tee trait-results/reduction.log'
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/trio_score.py 2>&1 | tee trait-results/reduction.log'
     - name: Preserve raw clocks, source qualification and any incomplete attempt
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-cumulative-production-eight-pair-1
+        name: uv-21041-precise-production-trios
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
-        retention-days: 5
+        retention-days: 7

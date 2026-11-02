@@ -1,48 +1,188 @@
 {
-  "registered_utc": "2026-11-02T06:52:53Z",
-  "purpose": "Can the cumulative rustc stack halve the wall time of a real normal uv-client check? This is separate from measuring the additional callable change.",
-  "selection": "Use the already admitted uv #21041 edit and all eight actual rustcs. The new production SDK is not yet available. No full-stack hardware numbers for this case were consulted. The previous laboratory comparison measures only the additional callable change.",
-  "uv": {
-    "parent": "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
-    "child": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
-    "command": "cargo check -p uv-client --locked --offline -j8"
+  "clock": "CLOCK_MONOTONIC_NS around direct Popen and blocking waitpid, with separate kernel SIGALRM deadline and dedicated session; never use subprocess timeout polling in timed visits. Validate child self times in five 0,3,13,31,53 ms native children per round, five rounds; maximum <=12 ms enclosing overhead, median <=4 ms, correct failure and timeout. Repeat after panel.",
+  "command": [
+    "check",
+    "-p",
+    "uv-client",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "controls": "Each role/history native A/fresh, warm B, settled B, cold B with full same-seed byte and independent semantics; preserve real behavior. Independently retain the original compatible and cross-epoch native fixtures. Cross-role rooted shapes, eight genuine release Cargo compiler commands/486 products. Actual released data with no source rebuild.",
+  "holds": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "hypotheses": [
+    [
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318",
+      1
+    ],
+    [
+      "stock_ctfe318",
+      "callables_ctfe318",
+      2
+    ]
+  ],
+  "inference": "Complete 12, paired medians, 3rd/10th descriptive order-statistic interval, order stratum and independent hold medians, all comparisons and counts above 1 and 2. Exact one-sided sign tests treating ties as failures; Holm for two confirmatory thresholds; both hold medians must clear threshold. Actual CLI nanoseconds, no independent-machine generalization.",
+  "orders": [
+    [
+      "stock_ctfe318",
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318"
+    ],
+    [
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318",
+      "stock_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "stock_ctfe318",
+      "fa7a_stack_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318",
+      "stock_ctfe318"
+    ],
+    [
+      "fa7a_stack_ctfe318",
+      "stock_ctfe318",
+      "callables_ctfe318"
+    ],
+    [
+      "stock_ctfe318",
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318",
+      "stock_ctfe318"
+    ],
+    [
+      "stock_ctfe318",
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318"
+    ],
+    [
+      "fa7a_stack_ctfe318",
+      "stock_ctfe318",
+      "callables_ctfe318"
+    ],
+    [
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318",
+      "stock_ctfe318"
+    ],
+    [
+      "stock_ctfe318",
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "stock_ctfe318",
+      "fa7a_stack_ctfe318"
+    ]
+  ],
+  "prior_boots": {
+    "41379994255": {
+      "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
+      "raw_sha256": "f3f19e05c29b16520b996d0b1557555522465fc99b213af4e789befb721c2ade"
+    },
+    "41385306015": {
+      "boot": "fc71919f-27b4-4483-ab95-9bcac5e7131b",
+      "raw_sha256": "c6abea2a2978d98c8ecd250e42cf1b6f7ce2b2e4bb41964a0ee1b5f1c4bca376"
+    },
+    "41393501771": {
+      "boot": "db4d2941-1bd1-402f-8099-cc50036b6df3",
+      "raw_sha256": "e0c2483d07ffb8f81a44209a016ee0187f07a78a85399d9fb7a5693b008d8842"
+    },
+    "41399090905": {
+      "boot": "8461ebca-9583-4d70-8eac-198744186904",
+      "raw_sha256": "f67f1edcb62f453d08caa7d8efa8996281277b4e17e13c112d87da825f00f92f"
+    },
+    "41403723884": {
+      "boot": "8287559a-635a-47d0-bc39-859bb3efd4f2",
+      "raw_sha256": "2fb75a9fc058b58a7dddc2ab3706432d3cc3410ddef8b5c4743c1b4895e96471"
+    },
+    "41404703005": {
+      "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
+      "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
+    },
+    "41406359806": {
+      "boot": "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
+      "raw_sha256": "725410f6d7202a0922756cfcad85e421c24e9b9ef23886f43aff111732ea22ab"
+    },
+    "41407544748": {
+      "artifact": 13124530356,
+      "boot": "13895848-ed2e-435a-b313-9e006b9ff3e2",
+      "raw_sha256": "5fa8a1a93165f1ca3f4e2fdf339be44368feb5d360b810d36c61b26a29abf769"
+    }
   },
-  "control": {
-    "scope": "Ohm -22 sources plus the independent #318 CTFE correctness fix, with the production PGO+BOLT recipe and original signed -22 Cargo. The literal shipped compiler already showed a warm/cold metadata mismatch on this source.",
-    "source": "10d56274a98801b5ef8f80aab734e835749458e1",
-    "tree": "1a0e58a855e1782a93cdf8c56b337fb4354142ef",
-    "epoch": 43310,
-    "role": "stock_ctfe318",
-    "producer_run": 41374825846,
-    "artifact": {
+  "roles": [
+    "stock_ctfe318",
+    "fa7a_stack_ctfe318",
+    "callables_ctfe318"
+  ],
+  "schema": 1,
+  "scope": "One fresh dedicated Linux host with eight distinct physical cores, one bare restored real edit per compiler per trio. Each hold opens independent A for every compiler. All six orders exactly once per hold. No PMU visit.",
+  "signed_cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+  "source": {
+    "callables_ctfe318": {
+      "commit": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+      "epoch": 43309,
+      "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4"
+    },
+    "fa7a_stack_ctfe318": {
+      "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
+      "epoch": 43309,
+      "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
+    },
+    "stock_ctfe318": {
+      "commit": "10d56274a98801b5ef8f80aab734e835749458e1",
+      "epoch": 43310,
+      "tree": "1a0e58a855e1782a93cdf8c56b337fb4354142ef"
+    }
+  },
+  "source_comparisons": {
+    "cumulative": "4fa28d0a3026871350a13a19f04e05de53d97a84ca4538a80a24d176a4ff86f5",
+    "marginal": "c8cef3c955e3dfaa319ba15d551d8a5961c95f8411cfb8ee54aac46b6abe7ebb"
+  },
+  "timeline": "For treatment in each history, separately restore A for nonverbose native and verbose exact-argv audit with CARGO_BUILD_ANALYSIS_ENABLED=true and -Zbuild-analysis. Require same complete products and eight real commands as native, no unchanged launches. Capture original signed JSONL and all actual unit indices, monotonic start/rmeta-ready/finish and unblocks. Diagnostic runs unscored.",
+  "unmodified_Cargo_SDKs": {
+    "callables_ctfe318": {
+      "bytes": 359917871,
+      "id": 13122178340,
+      "sha256": "8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1"
+    },
+    "fa7a_stack_ctfe318": {
+      "bytes": 359918996,
+      "id": 13112830698,
+      "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
+    },
+    "stock_ctfe318": {
       "bytes": 359881451,
       "id": 13112756183,
       "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
-    },
-    "role_sha256": "f690831cea34edfe64585a0b92b8fc9338d39e447482eba83dc45554426b7e80",
-    "historical_cold_headers": {
-      "global_public_hash": 0,
-      "private_svh": 0,
-      "public_svh": 0,
-      "stable_crate_id": 0
     }
   },
-  "candidate": {
-    "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
-    "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4",
-    "role": "callables_ctfe318",
-    "epoch": 43309,
-    "producer_run": 41398925829,
-    "source_registration_sha256": "f5d914ee1f1359e1990ce0f755110caa076ff00b3ff8ac77067f895451adf235"
-  },
-  "condition": "Proceed after the additional callable change passes the clean production comparison and if the source release is still the current signed release. Reassess the baseline before dispatch if Ohm has released a newer compiler.",
-  "design": "Eight within-host, independently restored pairs in two separately cold-built holds of four. Run order is balanced 2/2 in both holds. Require a new boot, bare ordinary clocks in their own visits, independent kernel-traced whole userspace instructions and per-process counters for exactly the same eight true compiler execs with no multiplexing. No time spent running uv tests is included.",
-  "native_admission": "Replay each producer and its source-specific epoch. No cross-format forced sharing: the stock and treatment file epochs differ. Real parent histories are isolated by role. Require real first edit, zero no-op recompiles, exact same-seed emitted products and argv, semantic equality of all 37 workspace products against independent cold B, real linked parser and API controls, and known-positive and known-negative controls of the actual hosted checker. Preserve every raw mismatch, and reject any missing or changed semantic property.",
-  "inference": {
-    "primary": "Paired control/candidate bare wall ratios against 2.0. To call it repeatable 2x, require all eight pairs above 2.0, both independently prepared holds above 2.0 and a passing exact threshold test.",
-    "secondary": "Paired control/candidate ratio of summed kernel user instructions for all eight actual rustcs against 1.25, i.e. a 20% cut. Report the terminal and all individual processes descriptively.",
-    "multiplicity": "Holm-correct the two exact one-sided sign tests at 0.05, counting ties as misses. Show all eight ratios and separate hold medians. Do not pool the increment-only study, #22958, or the #20988 numbers."
-  },
-  "research_boundary": "Separate measurement, with no change to uv, existing locked protocols or the candidate source. A failed qualification or unmet wall threshold is retained. No third SDK build.",
-  "preflight": "The producer source role spelling was corrected against the sealed release workflow before any production result. Both full source OIDs, epochs, tests and thresholds are unchanged."
+  "upstream_uv_edit": [
+    "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
+    "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
+    "crates/uv-pypi-types/src/simple_json.rs"
+  ]
 }

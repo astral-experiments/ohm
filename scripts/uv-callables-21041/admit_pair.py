@@ -16,7 +16,7 @@ def admit():
     old.released(temp,proof)
     (signed,)=(temp/"signed").glob("*.tar.gz")
     fixed=archive.official_cargo(signed,temp)
-    ctrl,treat=c.ROLES
+    ctrl,mature,treat=c.ROLES
     control=m.read(c.HERE/"verified-control-lock.json")
     seals=m.read(c.HERE/"original-control.json")
     result={}
@@ -35,7 +35,7 @@ def admit():
             items[kind]=work/kind
             archive.unpack(f,items[kind],kind)
         scratch=work/"restored";scratch.mkdir()
-        builder=w/("control-builder" if role==ctrl else "treatment-builder")
+        builder=w/("treatment-builder" if role==treat else "control-builder")
         subprocess.run([sys.executable,"-ISBu",c.HERE/"verify_role.py",role,builder,items["sdk"],items["qa"],scratch,fixed,meta/role,pool],check=True)
         if role==ctrl:
             prior=items["prior_pair"]
@@ -47,14 +47,22 @@ def admit():
                     and transition["native_processes"]==16 and pair["required_benchmark_cargo_sha256"]==m.filesha(fixed)
                     and all(pair["artifacts"][ctrl][k]=={x:live["members"][p[k]][x]for x in ("id","sha256")}for k in ("sdk","qa")), "wrong original paired qualification")
         result[role]=m.read(meta/role/"registered.json")
-    a,b=(m.read(meta/r/"source.json")for r in c.ROLES)
-    x,y=(m.read(meta/r/"role.json")for r in c.ROLES)
-    c.guard(all(a[k]==b[k] for k in ("recipe","training_objects","component_git","released_coordinator","signed_manifest_sha256")) and
-            x["execution_pgo"]==y["execution_pgo"] and x["bolt_note"] is y["bolt_note"] is True and x["driver"]["sha256"]!=y["driver"]["sha256"]
-            and x["archive_sha256"]!=y["archive_sha256"] and x["effective_benchmark_cargo_sha256"]==y["effective_benchmark_cargo_sha256"]==m.filesha(fixed),
-            "not a matched production compiler pair")
+    # The second compiler shares the control producer and its exact original two-role native qualification.
+    pair=m.read(proof/"pair-passed.json")
+    c.guard(pair["roles"][mature]=={k:m.read(meta/mature/(k+".json")) for k in ("source","role")} and
+            all(pair["artifacts"][mature][k]=={x:c.PAIR["arms"][mature]["service"]["members"][PRODUCERS[mature][k]][x]
+                                           for x in ("id","sha256")} for k in ("sdk","qa")), "wrong original mature compiler")
+    sources=[m.read(meta/r/"source.json") for r in c.ROLES]
+    builds=[m.read(meta/r/"role.json") for r in c.ROLES]
+    c.guard(all(all(v[k]==sources[0][k] for v in sources) for k in ("recipe","training_objects","component_git","released_coordinator","signed_manifest_sha256"))
+            and all(v["execution_pgo"]==builds[0]["execution_pgo"] and v["bolt_note"] is True and
+                    v["effective_benchmark_cargo_sha256"]==m.filesha(fixed) for v in builds)
+            and all(len({v[k]["sha256"] if k=="driver" else v[k] for v in builds})==3 for k in ("driver","archive_sha256")),
+            "three distinct matched source-native optimized SDKs")
     m.save(out/"intake.json",{"installed":result,"sdk_lock_sha256":m.filesha(c.HERE/"pair.json"),"signed_cargo_sha256":m.filesha(fixed)})
 
 def migration():
     import epoch_transition
-    epoch_transition.gate()
+    import foreign
+    epoch_transition.gate([c.ROLES[0],c.ROLES[2]])
+    foreign.gate([c.ROLES[1],c.ROLES[2]])

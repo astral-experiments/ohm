@@ -43,7 +43,7 @@ def main(role, builder, image, qa, scratch, fixed, dest, pool):
          and sha(qa/"source.json")==arm["source_sha256"], "source, driver, or QA record does not match independent enrollment")
     ctx=dict(evidence_repository=REPO,reviewed_head=p["head"],workflow_ref=REPO+"/.github/workflows/ci.yml@refs/heads/"+p["branch"],
              run_id=p["run"],run_attempt=1)
-    if role==ROLES[1]:
+    if role==ROLES[-1]:
         spec=read(HERE/"production-source.json")
         cfg=read(compiler/"callable-source.json")
         prior=read(qa/"previous-production-source.json")
@@ -74,7 +74,7 @@ def main(role, builder, image, qa, scratch, fixed, dest, pool):
     dest.mkdir()
     for name in ("SHA256SUMS","role.json","source.json","sdk-inventory.json","component-inventory.json"):
         shutil.copyfile(image/name,dest/name)
-    if role==ROLES[1]:
+    if role==ROLES[-1]:
         shutil.copyfile(qa/"previous-production-source.json",dest/"previous-production-source.json")
     save(dest/"resource-replay.json",limits)
     (installed/"bin/cargo").unlink()

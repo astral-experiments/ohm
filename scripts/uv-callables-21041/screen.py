@@ -29,11 +29,8 @@ def output_controls(path):
     return {'stdout':m.filesha(path/'cargo.stdout'),'rendered_other_than_progress_and_wall':rendered,'finished':finished,'progress':progress(stderr)}
 def acquire_context():
     w,tmp=c.host();out=w/'trait-results';vault=out/'rmeta-by-content';vault.mkdir();h.guard_space(w,tmp)
-    old,meter=m.pmu(w,tmp);cal=m.read(out/'calibration.json');ready=cal['ready'];mask=set(ready['affinity'])
-    c.guard(mask and mask<=os.sched_getaffinity(0),'enrolled calibration CPU set unavailable');os.sched_setaffinity(0,mask)
-    current=old.cpu_receipt(out);c.guard(current['cpus']==ready['affinity']and current['boot']==ready['boot']and cal['unmultiplexed_calibration_clocks']==28,'counter qualification/host')
-    prior=c.PAIR['prior_boots'];c.guard(prior and all(re.fullmatch(r'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}',v['boot']) and re.fullmatch('[0-9a-f]{64}',v['raw_sha256']) for v in prior.values()) and ready['boot'] not in {v['boot']for v in prior.values()},'not an independent measurement boot')
-    binary=Path(ready['plain']);c.guard(m.filesha(binary)==cal['plain_sha256'],'calibrated inherited meter')
+    import trio
+    ready=trio.accept_host(out);binary=meter=None
     load=m.read(out/'intake.json');sdk=load['installed'];gate=c.PAIR['arms']
     c.guard(set(sdk)==set(c.ROLES)and load['sdk_lock_sha256']==P['sdk_lock_sha256'],'SDK roles')
     for r in c.ROLES:
@@ -41,7 +38,9 @@ def acquire_context():
     from epoch_transition import validate
     tr=m.read(out/'intake/natural-epoch-transition/passed.json');c.guard(tr['ordinary_only'] is True and tr['positive_native_calls']==8 and tr['negative_native_calls']==2,'native default epoch isolation')
     source={r:c.PAIR['arms'][r]['source']for r in c.ROLES}
-    for a,b in (c.ROLES,list(reversed(c.ROLES))):validate(tr['histories'][a+'-to-'+b],[a,b],source)
+    endpoints=[c.ROLES[0],c.ROLES[-1]]
+    for name in ("coroutine-transition","foreign-transition"):c.guard(len(m.read(out/("intake/"+name+"/passed.json"))["modes"])==4,"mixed-SDK qualification")
+    for a,b in (endpoints,list(reversed(endpoints))):validate(tr['histories'][a+'-to-'+b],[a,b],source)
     read=parser(w,tmp);bank=m.ROOT/'bank';a=h.open_source(w,bank);m.save(out/'real-A.json',a)
     pool=tmp/'ctfe22-root-sdks'
     for r in c.ROLES:shutil.move(str(pool/r),str(bank/('sdk-'+r)))
@@ -52,9 +51,7 @@ def acquire_context():
     m.save(out/'full-unit-graph.json',h.graph());return w,tmp,out,vault,bank,sdk,a['source_mtime_ns'],read,ready,binary,meter
 def run():
     w,tmp,out,store,bank,sdks,atime,parse,ready,binary,meter=acquire_context();panel=out/'uv-client';panel.mkdir();reports=[]
-    try:scoped.calibrate();per_meter_ready=True
-    except (OSError,ValueError,AssertionError,RuntimeError,subprocess.SubprocessError)as error:
-        per_meter_ready=False;m.save(panel/'per-rustc-calibration-refused.json',{'type':type(error).__name__,'error':str(error),'per_rustc_endpoint':False})
+    import trio
     def products(path):return prod.aggregate(m.TARGET,path,store,parse)
     for hold in(0,1):
         histories={};baseline={}
@@ -90,36 +87,22 @@ def run():
             streams=output_controls(q/'warm-B');m.save(q/'ordinary-controls.json',streams)
             m.save(q/'actual-cargo-opening.json',{'ordinary_progress':normal,'typed_active':proof['artifact_crates'],'actual_typed_commands':len(proof['commands'])})
             histories[role]=(seed,seal,rr);baseline[role]=(b,streams)
-        for phase in ('ordinary-A','warm-B','cold-B'):
-            left,right=[m.read(panel/f'hold-{hold}-{r}'/phase/'products.json')for r in c.ROLES]
-            same=(left['structural']==right['structural'])
-            m.save(panel/f'hold-{hold}-{phase}-cross-role.json',{'all_defs_and_reachable_shape_equal':same,'different':[k for k in left['structural']if left['structural'][k]!=right['structural'][k]],'absolute_headers':{role:{k:v['header'] for k,v in product['semantic'].items()}for role,product in zip(c.ROLES,(left,right))}})
-            c.guard(same,'cross-role rooted DefKeys or reachable public definition set differ; see the complete per-SDK headers')
-        for i in [n for n,x in enumerate(P['independent_holds'])if x==hold]:
+        trio.cross(panel,hold)
+        trio.audit_treatment(panel,hold,histories,baseline,sdks,bank,atime,products,output_controls)
+        for i in [n for n,v in enumerate(P['independent_holds']) if v==hold]:
             values={}
             for role in P['orders'][i]:
-                m.choose(role,bank,sdks);roleout=panel/f'pair-{i}-{role}';roleout.mkdir();values[role]={}
-                seed,seal,rr=histories[role];expected,scheduled=baseline[role]
-                for mode in P['mode_orders'][i]:
-                    s=h.restore(seed,seal,rr,atime);path=roleout/mode
-                    if mode=='scoped':
-                        q=panel/f'hold-{hold}-{role}'
-                        scoped_result=physical.visit(role,roleout,q,sdks,s,expected,scheduled,products,output_controls,per_meter_ready)
-                        values[role][mode]=dict(scoped_result,checkpoint_sha256=seal['sha256'])
-                        continue
-                    primary.command(path,c.CHECK,'pmu'if mode=='clock'else'native',binary if mode=='clock'else None)
-                    rec=m.read(path/'ordinary.json');c.guard(rec['boot']==ready['boot']and rec['cpus']==ready['affinity']and rec['argv']==c.CHECK,'command/boot/cores')
-                    result=products(path);m.save(path/'source.json',h.state('B'));c.guard(h.state('B')==s,'command changed source')
-                    ok=prod.compare(path/'same-seed-equivalence.json',expected,result,True)
-                    observed=output_controls(path);m.save(path/'ordinary-controls.json',observed);c.guard(observed==scheduled,'ordinary roster or output changed within role')
-                    val=rec['ns']
-                    if mode=='clock':
-                        counter=meter.clock(path/'whole-clock.json',0);c.guard(counter['enabled']==counter['running']>0,'multiplexed PMU');val=counter['instructions']
-                    values[role][mode]={'value':val,'same_seed_qualified':ok,'source_sha256':s['source'],'checkpoint_sha256':seal['sha256']}
-            reports.append({'pair':i,'hold':hold,'order':P['orders'][i],'modes':P['mode_orders'][i],'values':values})
+                m.choose(role,bank,sdks)
+                seed,seal,rr=histories[role]
+                expected,streams=baseline[role]
+                roleout=panel/f'trio-{i}-{role}';roleout.mkdir()
+                values[role]=trio.bare(roleout,seed,seal,rr,atime,expected,streams,products,output_controls,ready)
+            reports.append({'trio':i,'hold':hold,'order':P['orders'][i],'values':values})
         h.clean(m.TARGET)
         for seed,_,_ in histories.values():h.clean(seed)
     for role in c.ROLES:
         m.choose(role,bank,sdks);primary.final_sdk(role,sdks,m.SDK,out)
-    m.save(panel/'raw-pairs.json',reports)
+    m.save(panel/'raw-trios.json',reports)
+    import wall_clock
+    wall_clock.calibrate(out/'clock-post',tmp/'trio-wall-probe')
 if __name__=='__main__':run()

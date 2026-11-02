@@ -11,10 +11,10 @@ def transition_sources(folder):
     }
     for name,digest in expected.items():
         c.guard(hashlib.sha256((folder/name).read_bytes()).hexdigest()==digest,'changed original '+name)
-def gate():
+def gate(roles):
     transition_sources(c.HERE)
-    w,tmp=c.host();pool=tmp/'ctfe22-root-sdks';ctrl,child=c.ROLES
-    expected=[c.PAIR['arms'][r]['source']['commit'] for r in c.ROLES]
+    w,tmp=c.host();pool=tmp/'ctfe22-root-sdks';ctrl,child=roles
+    expected=[c.PAIR['arms'][r]['source']['commit'] for r in roles]
     for script,fixture,label in [('transition_v2.py','fixture','coroutine-transition'),('foreign-transition.py','callable-fixture','foreign-transition')]:
         out=w/'trait-results/intake'/label
         subprocess.run([sys.executable,'-ISB',c.HERE/script,pool/ctrl,pool/child,c.HERE/fixture,out],check=True,timeout=240)

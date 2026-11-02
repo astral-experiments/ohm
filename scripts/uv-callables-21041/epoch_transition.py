@@ -35,15 +35,15 @@ def validate(rows,roles,sources):
         elif n==2:
             need(rows[n-1]["cache_basename"]!=r["cache_basename"] or r["header_rejections"],"incompatible switch lacked a natural separation or epoch rejection")
         if n!=2:need(not r["header_rejections"],"unexpected native header rejection")
-def gate():
+def gate(pair_roles):
     import core as c
     w,temp=c.host();origin=c.HERE/"epoch-fixture.rs";need(sha(origin)==FIXTURE,"changed native fixture")
     out=w/"trait-results/intake/natural-epoch-transition";out.mkdir()
     root=temp/"natural-production-epoch-check";root.mkdir()
-    sources={r:c.PAIR["arms"][r]["source"]for r in c.ROLES};pool=temp/"ctfe22-root-sdks"
-    need([sources[r]["epoch"]for r in c.ROLES]==[43310,43309],"wrong source-specific epochs")
+    sources={r:c.PAIR["arms"][r]["source"]for r in pair_roles};pool=temp/"ctfe22-root-sdks"
+    need([sources[r]["epoch"]for r in pair_roles]==[43310,43309],"wrong source-specific epochs")
     histories={};negatives={}
-    for roles in (c.ROLES,list(reversed(c.ROLES))):
+    for roles in (pair_roles,list(reversed(pair_roles))):
         name=roles[0]+"-to-"+roles[1];wd=root/name;wd.mkdir();q=out/name;q.mkdir()
         (wd/"lib.rs").write_bytes(origin.read_bytes());cache=wd/"cache";cache.mkdir();slot=wd/"sdk";rows=[]
         for n,(role,state)in enumerate(zip((roles[0],roles[0],roles[1],roles[1]),("not-loaded","loaded","not-loaded","loaded"),strict=True)):

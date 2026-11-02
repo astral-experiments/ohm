@@ -5,7 +5,7 @@
   "B": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
   "B_file": "3d91d5195930020a6740f68341549629681eb8654048962cc618fe02e7130360",
   "B_tree": "ce502617cfbf3fd59980e29731c10b5391d12139",
-  "branch": "charlie/codex-21041-cumulative-production-check",
+  "branch": "charlie/codex-21041-production-blocking-wall",
   "candidate_selection": "Cumulative trait and callable stack vs stock with the same CTFE correction on matched release-optimized Ohm -22.",
   "describe_A": "0.12.3-27-ga2a0242",
   "describe_B": "0.12.3-28-g9049e07",
@@ -26,6 +26,10 @@
     0,
     0,
     0,
+    0,
+    0,
+    1,
+    1,
     1,
     1,
     1,
@@ -33,7 +37,7 @@
   ],
   "local_selection": "Previously selected landed uv #21041, separate from the input-qualifying marginal study.",
   "lock_sha256": "84893face6e0c3f1641af8ce022475d859b99bb43c3ccfb540e2e9cee98095f9",
-  "measurement_plan_sha256": "6ab4910153ebdbc331926d553941166dbefca464e96fb0794927852261e91bb1",
+  "measurement_plan_sha256": "bd30a2a2ced22335a8dc63f5162e241c444eb991f4577cb2a89e539dcf51a2ee",
   "meter_files": {
     "SHA256SUMS": "c6713c7ef2878aa70a927e845e41ec9f4d237091b6c7a6c45d4799de047fb0d1",
     "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
@@ -44,44 +48,40 @@
   },
   "mode_orders": [
     [
-      "clock",
-      "wall",
-      "scoped"
-    ],
-    [
-      "scoped",
-      "wall",
-      "clock"
-    ],
-    [
-      "wall",
-      "scoped",
-      "clock"
-    ],
-    [
-      "clock",
-      "scoped",
       "wall"
     ],
     [
-      "wall",
-      "clock",
-      "scoped"
-    ],
-    [
-      "scoped",
-      "clock",
       "wall"
     ],
     [
-      "clock",
-      "wall",
-      "scoped"
+      "wall"
     ],
     [
-      "scoped",
-      "wall",
-      "clock"
+      "wall"
+    ],
+    [
+      "wall"
+    ],
+    [
+      "wall"
+    ],
+    [
+      "wall"
+    ],
+    [
+      "wall"
+    ],
+    [
+      "wall"
+    ],
+    [
+      "wall"
+    ],
+    [
+      "wall"
+    ],
+    [
+      "wall"
     ]
   ],
   "native_cargo_artifacts": 486,
@@ -1119,42 +1119,71 @@
   "orders": [
     [
       "stock_ctfe318",
+      "fa7a_stack_ctfe318",
       "callables_ctfe318"
     ],
     [
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318",
+      "stock_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "stock_ctfe318",
+      "fa7a_stack_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318",
+      "stock_ctfe318"
+    ],
+    [
+      "fa7a_stack_ctfe318",
+      "stock_ctfe318",
+      "callables_ctfe318"
+    ],
+    [
+      "stock_ctfe318",
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318",
+      "stock_ctfe318"
+    ],
+    [
+      "stock_ctfe318",
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318"
+    ],
+    [
+      "fa7a_stack_ctfe318",
+      "stock_ctfe318",
+      "callables_ctfe318"
+    ],
+    [
+      "fa7a_stack_ctfe318",
       "callables_ctfe318",
       "stock_ctfe318"
     ],
     [
       "stock_ctfe318",
+      "fa7a_stack_ctfe318",
       "callables_ctfe318"
     ],
     [
       "callables_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
       "stock_ctfe318",
-      "callables_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "stock_ctfe318",
-      "callables_ctfe318"
+      "fa7a_stack_ctfe318"
     ]
   ],
   "original_patch_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
-  "parent": "9720d7075f8b88e1122f4fc258419e58584f4b69",
+  "parent": "125cef4f90f572d8a8d19da42b0bc2b1fcae87a8",
   "per_rustc_threshold": "Secondary summed eight native rustc instructions against 1.25, Holm with the primary bare-wall 2.0 threshold.",
   "physical_scope": "Terminal uv_client on uv #21041 with eight genuine fresh first-edit lib invocations",
   "plan_units": 530,
+  "prior_actual_argv_sha256": "2c6a09f122e5293f696ffb63d11e6469d88491bfd5a331897765c6a916e384fc",
   "producer_head": "4e34ea9c7232977f95498d7bf48d382157e8558b",
   "producer_run": 41398925829,
   "reference_features": {
@@ -1229,6 +1258,7 @@
   "repo": "astral-experiments/ohm",
   "roles": [
     "stock_ctfe318",
+    "fa7a_stack_ctfe318",
     "callables_ctfe318"
   ],
   "root_features": [],
@@ -1241,7 +1271,7 @@
     "--offline",
     "-j8"
   ],
-  "sdk_lock_sha256": "4fa28d0a3026871350a13a19f04e05de53d97a84ca4538a80a24d176a4ff86f5",
+  "sdk_lock_sha256": "d1938d96af23db32ae8a3e3fd5ec54f88cb0bb58f214d2778c25cb120fda839d",
   "source_case_sha256": "576103c648f8b31662b0ddf1d49632573023a9cbe699bb1811df57d4f2a6cfd2",
   "source_mode": "real unstaged edit at A and genuine 0.12.3 ancestry; same absolute source/target for each restoration",
   "structural_graph_sha256": "17277138e393245b99609f9da43bfcfdf091f2c57ea8bdf2217669cd6b1fe74f",
