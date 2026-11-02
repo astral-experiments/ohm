@@ -10,6 +10,7 @@ on:
         options:
           - gate
           - price
+          - bytes
       reviewed_head:
         description: Exact reviewed nonrelease QA commit
         type: string
@@ -120,6 +121,51 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: ruff-example-replay-price-${{ matrix.position }}
+          path: ${{ runner.temp }}/ruff-example-price/evidence
+          if-no-files-found: warn
+          retention-days: 14
+  inspect-bytes:
+    if: inputs.phase == 'bytes' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-example-replay-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    name: Genuine warm and clean integration harnesses on signed and matched Cargo
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          path: enrolled
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-example-replay
+            scripts/ruff-default-owner-pmu
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 17981f5b807be81496282dd5a58e579e71586962
+          path: historical
+          persist-credentials: false
+          sparse-checkout: scripts/gnu-example-ceiling
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install the physical observation tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential binutils strace zstd
+          command -v gh rustup cargo git strace nm zstd
+      - name: Compare all original bytes and execute actual test cases outside performance clocks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+        run: |
+          set -euo pipefail
+          cd enrolled/scripts/ruff-example-replay
+          sha256sum --strict --check SHA256SUMS
+          python3 -IB byte_probe.py
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ruff-example-replay-harness-bytes
           path: ${{ runner.temp }}/ruff-example-price/evidence
           if-no-files-found: warn
           retention-days: 14
