@@ -13,7 +13,7 @@ evidence = work / "cross-evidence"
 evidence.mkdir(exist_ok=True)
 plan = json.loads((here / "protocol.json").read_bytes())
 assert os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
-assert os.environ["GITHUB_REF"] == "refs/heads/charlie/codex-rc23-qualify-ohm-only-v2"
+assert os.environ["GITHUB_REF"] == "refs/heads/charlie/codex-rc23-qualify-cached-doctests-v2"
 assert os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch"
 
 def git(repo, *args):
@@ -37,6 +37,7 @@ before = json.loads(initial.read_bytes())
 final = json.loads(manifest.read_bytes())
 assert final["release"] == before["release"] and final["bundled_tools"] == before["bundled_tools"]
 assert final["prepare_relocated_pgo_dependencies"] is True
+assert sha(published/"scripts/smoke-test-release.sh") == plan["smoke_script_sha256"]
 assert sha(published/"scripts/build-optimized-dist.sh") == plan["build_script_sha256"]
 assert sha(published/"release/bootstrap.toml") == plan["bootstrap_sha256"]
 assert sha(published/"release/rustc-perf-relocated-dependencies.patch") == plan["profile_patch_sha256"]
