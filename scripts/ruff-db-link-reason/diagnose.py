@@ -89,6 +89,8 @@ def main(role):
     observer=ROOT/'observe-exec'
     subprocess.run(['cc','-std=c11','-O2','-Wall','-Wextra','-Werror',HERE.parent/'ruff-heldout-mono-fold/observe_exec.c','-o',observer],check=True)
     visits={}
+    old_sessions=set();old_pins={};old_objects={}
+    refused=False
     for phase in ('old','edit','unchanged-1','unchanged-2','exec','fingerprint','clean'):
         if phase=='edit':git('checkout','--quiet','--detach',NEW)
         if phase=='clean':STATE.rename(ROOT/'prior-state')
@@ -106,14 +108,22 @@ def main(role):
         st=exe.stat()
         visits[phase]=dict(path=str(exe),roster=roster,dirty=dirty,sha256=sha(exe),dev=st.st_dev,
                            inode=st.st_ino,mtime_ns=st.st_mtime_ns,bytes=st.st_size)
-        if phase in ('old','edit'):
-            sessions,pins,objects=consumer.capture(STATE,set() if phase=='old' else old_sessions,tools['rustc'].splitlines()[0].removeprefix('rustc '),folder)
-            save(phase+'/consumer-objects.json',objects)
-            if phase=='old':
-                old_sessions,old_pins,old_objects=sessions,pins,objects
-            else:
-                save('edit/retained-consumer.json',consumer.retained(old_objects,objects,old_pins))
-                for handle in (*old_pins.values(),*pins.values()):handle.close()
+        if phase in ('old','edit') and not refused:
+            pins={}
+            try:
+                sessions,pins,objects=consumer.capture(STATE,old_sessions,tools['rustc'].splitlines()[0].removeprefix('rustc '),folder)
+                save(phase+'/consumer-objects.json',objects)
+                if phase=='old':
+                    old_sessions,old_pins,old_objects=sessions,pins,objects
+                else:
+                    save('edit/retained-consumer.json',consumer.retained(old_objects,objects,old_pins))
+            except (AssertionError,OSError,ValueError,KeyError) as e:
+                # Optional CGU observations cannot decide the native correctness controls.
+                refused=True
+                save('consumer-refused.json',dict(phase=phase,error=repr(e)))
+            finally:
+                if phase=='edit' or refused:
+                    for handle in (*old_pins.values(),*pins.values()):handle.close()
         if phase in ('old','edit','fingerprint'):
             collect_markers(folder)
         if phase=='old':

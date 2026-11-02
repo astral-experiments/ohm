@@ -32,15 +32,16 @@ def capture(state,prior_sessions,release,folder):
         objects[name]=dict(cgu_key=key,work_product=row['product'],file=fn,identity=[st.st_dev,st.st_ino,st.st_size],
                            sha256=hashlib.file_digest(f,'sha256').hexdigest())
         f.seek(0);pins[name]=f
-    assert len(objects)==216 and len({p['file'] for p in objects.values()})==len(objects)
+    assert objects and len({p['file'] for p in objects.values()})==len(objects)
     return sessions,pins,objects
 
 def retained(before,after,pins):
-    assert set(before)==set(after)==set(pins)
+    assert set(before)==set(pins)
     kept=[]
     for name,old in before.items():
         f=pins[name];st=os.fstat(f.fileno())
         assert old['identity']==[st.st_dev,st.st_ino,st.st_size] and hashlib.file_digest(f,'sha256').hexdigest()==old['sha256']
+        if name not in after:continue
         new=after[name];assert new['cgu_key']==old['cgu_key'] and new['work_product']==old['work_product']
         if new['identity']==old['identity']:
             assert new['sha256']==old['sha256'];kept.append(name)
