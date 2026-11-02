@@ -11,18 +11,9 @@ import threading
 import time
 from pathlib import Path
 
-HERE=Path(__file__).resolve().parent
-sys.path.insert(0,str(HERE))
-import worker as w
-
-ROOT,OUT,SDK,STATE,SRC=w.ROOT,w.OUT,w.SDK,w.STATE,w.SRC
-need,sha,save=w.need,w.sha,w.save
-PRIVATE=ROOT/'macro-private'
-BODIES=ROOT/'native-alternatives'
-KNOWN=('P','C')
-
-
 def child_exec(path):
+    def need(ok,why):
+        if not ok:raise ValueError(why)
     doc=json.loads(path.read_bytes()); env=doc['env']; spec=env.get('CARGO_MAKEFLAGS','')
     matches=re.findall(r'--jobserver-(?:auth|fds)=(\d+),(\d+)',spec)
     if spec:
@@ -30,6 +21,21 @@ def child_exec(path):
         a,b=map(int,matches[0]);need(2<a<1024 and 2<b<1024 and a!=b,'unusual jobserver descriptor');rd,wr=os.pipe();import fcntl
         safe=max(a,b,wr,rd)+1;r=fcntl.fcntl(rd,fcntl.F_DUPFD_CLOEXEC,safe);v=fcntl.fcntl(wr,fcntl.F_DUPFD_CLOEXEC,safe);os.close(rd);os.close(wr);os.write(v,b'+'*7);os.dup2(r,a,inheritable=True);os.dup2(v,b,inheritable=True);os.close(r);os.close(v)
     os.chdir(doc['cwd']);os.execve(doc['argv'][0],doc['argv'],env)
+
+
+# The replay trampoline runs in the actual stripped Cargo environment. Do not
+# import GitHub runner helpers before exec, even to obtain a temporary path.
+if __name__=='__main__' and len(sys.argv)==3 and sys.argv[1]=='exec':
+    child_exec(Path(sys.argv[2]));raise RuntimeError('exec unexpectedly returned')
+
+HERE=Path(__file__).resolve().parent
+sys.path.insert(0,str(HERE))
+import worker as w
+ROOT,OUT,SDK,STATE,SRC=w.ROOT,w.OUT,w.SDK,w.STATE,w.SRC
+need,sha,save=w.need,w.sha,w.save
+PRIVATE=ROOT/'macro-private'
+BODIES=ROOT/'native-alternatives'
+KNOWN=('P','C')
 
 
 class Images(dict):
@@ -164,5 +170,4 @@ def study():
     w.fresh_state();d=OUT/'complete-empty';d.mkdir();pure=stage(d,'new',env,w.NEW);keys=('messages','native_object','executable');need(all(pure['record'][k]==allrows['0']['edit']['record'][k] for k in keys),'new independent native mismatch');first=allrows['0']['edit'];need(all(v['edit']==first for v in allrows.values()) and len(set(expansions.values()))==1,'full Cargo or expansion interface differs across ordinary and optimized native checks');save(OUT/'macro-admitted.json',dict(rows=allrows,printed_expanded_hygiene=expansions,independent=pure['record'],producer=producer,unchanged_original=ordinary_sha,scope='Matched one-worker paired upper-bound ablation of only the compiled Ruff native macro unit. Cargo always reads the original metadata; the audit hook chooses only one DSO for dlopen.'));print('Accepted native implementation counterfactual and complete real edit controls.',flush=True)
 
 if __name__=='__main__':
-    if len(sys.argv)==3 and sys.argv[1]=='exec':child_exec(Path(sys.argv[2]))
-    else:study()
+    study()
