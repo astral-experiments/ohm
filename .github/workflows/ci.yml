@@ -1,4 +1,4 @@
-name: Do per-crate foreign inherent-impl lookups cut uv_metadata rustc instructions after the actual uv edit?
+name: Do generated derive impl identities reduce uv-client rustc instructions after the actual uv edit?
 'on':
   workflow_dispatch:
     inputs:
@@ -24,8 +24,8 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-domain-prod-certified' && github.sha == inputs.reviewed_head
-      && github.run_attempt == 1 && inputs.build_run_id == '41414598941' && inputs.build_head == '5f7e5680285caa6b9a848db810b63ef58dfe0143' && inputs.sdk_lock_sha256 == '403777de9a8827bcf95517caf1f55998fc39bfa408e67b6a162ef77cd6f8595b'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-proc-derive-production-check' && github.sha == inputs.reviewed_head
+      && github.run_attempt == 1 && inputs.build_run_id == '41434876352' && inputs.build_head == '731d81a4cb3498cf4221d53a267bbf4a76ca250f' && inputs.sdk_lock_sha256 == 'dbb190765a6be6f2ef90be903efaf63c1feb7bf817c142cdaacc0cb0b9f067ae'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 170
     env:
@@ -48,14 +48,14 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: control-builder
-        ref: 4e34ea9c7232977f95498d7bf48d382157e8558b
+        ref: 5f7e5680285caa6b9a848db810b63ef58dfe0143
         persist-credentials: 'false'
         sparse-checkout: scripts/ctfe22-gnu
     - name: Check out the exact treatment-builder
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: treatment-builder
-        ref: 5f7e5680285caa6b9a848db810b63ef58dfe0143
+        ref: 731d81a4cb3498cf4221d53a267bbf4a76ca250f
         persist-credentials: 'false'
         sparse-checkout: scripts/ctfe22-gnu
     - name: Check out opening
@@ -156,7 +156,7 @@ jobs:
     - name: Retain the calibrated unique runner before acquiring the compilers
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-domain-production-boot
+        name: uv-21041-proc-derive-production-boot
         path: trait-results/fresh-boot.json
         if-no-files-found: error
         retention-days: 7
@@ -170,11 +170,11 @@ jobs:
         '
     - name: Exercise the eleven real foreign transitions, separate epochs and same-role reuse
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py migration
-    - name: Open two independently built histories and collect eight separately restored per-rustc plus bare wall pairs
+    - name: Open two independent histories and collect eight separately restored scoped, whole-Cargo and blocking-wall pairs
       run: 'set -euo pipefail
 
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/screen.py 2>&1 | tee trait-results/experiment.log'
-    - name: Reopen all 128 actual compiler counters, 16 separate bare clocks and all native metadata
+    - name: Reopen 128 compiler counters, 16 whole-Cargo counters, 16 separate blocking waits and the native derive inventories
       run: 'set -euo pipefail
 
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/score.py 2>&1 | tee trait-results/reduction.log'
@@ -182,7 +182,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-domain-production-eight-pair
+        name: uv-21041-proc-derive-production-eight-pair
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

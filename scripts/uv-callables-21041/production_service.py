@@ -1,8 +1,10 @@
 """Require the correct, separate private producer's physical job and both original artifacts."""
 import re
 REPO = "astral-experiments/ohm"
-ROLES = ("callables_ctfe318", "callables_ctfe318_incoherent_domain")
-PRODUCERS = {ROLES[0]:dict(run=41398925829,head="4e34ea9c7232977f95498d7bf48d382157e8558b",branch="charlie/codex-21041-callable-production22",job="Production GNU callable SDK",id=125126258067,sdk="callable-production-sdk",qa="callable-production-qa-attempt-1"),ROLES[1]:dict(run=41414598941,head="5f7e5680285caa6b9a848db810b63ef58dfe0143",branch="charlie/codex-21041-domain-production22",job="Production GNU incoherent-impl domain SDK",id=125175283448,sdk="domain-production-sdk",qa="domain-production-qa-attempt-1")}
+from pathlib import Path
+import json
+ROLES=["callables_ctfe318_incoherent_domain","callables_ctfe318_incoherent_domain_proc_derive"]
+PRODUCERS=json.loads((Path(__file__).with_name("derive")/"services.json").read_bytes())
 COMMON = {"Admit this production workspace and allocate its physical emergency reserve","Reconstruct and verify the exact compiler source","Install native GNU bootstrap prerequisites","Install pinned LLVM BOLT tools","Prepare pinned Wild linker","Build the production PGO and BOLT distribution","Verify the production SDK and exercise the original regression","Validate this role's complete capacity evidence before its SDK upload","Upload the native-qualified SDK","Retain role identity, release build and native diagnostics"}
 def need(ok,why):
     if not ok:raise ValueError(why)
@@ -12,7 +14,8 @@ def service(role,run,jobs,artifacts):
     need(len(jobs['jobs'])==jobs['total_count']==1,'extra or missing native producer');job,=jobs['jobs']
     need(job['id']==p['id'] and job['name']==p['job'] and job['run_id']==p['run'] and job['head_sha']==p['head'] and job['run_attempt']==1 and job['runner_id']>0 and job['labels']==['namespace-profile-ubuntu-24-04-16'] and job['status']=='completed' and job['conclusion']=='success','invalid native producer')
     ok={s['name']for s in job['steps']if s['status']=='completed'and s['conclusion']=='success'}
-    extra={'Validate the independently qualified stage1 hardware prerequisite'}if role==ROLES[1]else set()
+    extra={'Validate the independently qualified stage1 hardware prerequisite'}
+    if role==ROLES[1]:extra.add('Check both generated-impl histories and the cold and build guards')
     need(COMMON|extra<=ok,'missing release/native/capacity or prerequisite step')
     arts=artifacts['artifacts'];need(len(arts)==artifacts['total_count']==2 and {a['name']for a in arts}=={p['sdk'],p['qa']}and len({a['id']for a in arts})==2,'wrong service upload roster')
     compact={}

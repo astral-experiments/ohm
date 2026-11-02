@@ -10,12 +10,15 @@ def migration():
  w,tmp=c.host();pool=tmp/'ctfe22-root-sdks';o=w/'trait-results/intake/domain-native';o.mkdir()
  source=[pool/r for r in c.ROLES];e=runpy.run_path(str(D/'epoch.py'))['run'];e(*source,o/'epoch','actual')
  proof=m.read(o/'epoch/passed.json');c.guard(proof['signed_argv_refusal_both_directions']and proof['same_sdk_self_loaded_before_and_after']and proof['no_header_edit']and proof['no_compiler_version_override']and proof['reader_compilations']==10,'cross-epoch refusal')
+ from derive.metadata_epoch import metadata,EPOCHS
+ real={commit:sdk for commit,sdk in zip(EPOCHS,source,strict=True)}
+ md=metadata(real,o/'metadata');c.guard(md['own_crate_reads']==md['own_native_typecheck_errors']==md['cross_crate_E0514']==2,'external metadata rejection or own genuine source diagnostic')
  f=runpy.run_path(str(D/'fixture/oracle.py'))['main'];outputs={}
- for role,g,root,v in zip(c.ROLES,['control','candidate'],source,[1,0]):
-  f(root,D/'fixture',o/g,g);res=m.read(o/g/'qualified.json')
-  c.guard(res['role']==g and res['actual_empty_edit_typeck']==dict.fromkeys(('read_adt','read_reference','read_str'),v)and res['registered_foreign_transitions']==11,'true local foreign method transitions')
-  outputs[role]={'oracle':m.filesha(o/g/'qualified.json'),'actual_empty_edit_typeck':res['actual_empty_edit_typeck']}
- m.save(o/'accepted.json',{'roles':outputs,'epochs':m.filesha(o/'epoch/passed.json'),'modes':10,'canonical_inputs':m.filesha(S/'pair.json')})
+ for role,root in zip(c.ROLES,source,strict=True):
+  f(root,D/'fixture',o/role,'candidate',inherited_source=c.PAIR['arms'][role]['source']['commit']);res=m.read(o/role/'qualified.json')
+  c.guard(res['role']=='candidate' and res['actual_empty_edit_typeck']==dict.fromkeys(('read_adt','read_reference','read_str'),0)and res['registered_foreign_transitions']==11,'either compiler lost the existing native domain treatment')
+  outputs[role]={'oracle':m.filesha(o/role/'qualified.json'),'actual_empty_edit_typeck':res['actual_empty_edit_typeck']}
+ m.save(o/'accepted.json',{'roles':outputs,'epochs':m.filesha(o/'epoch/passed.json'),'rmeta_epochs':m.filesha(o/'metadata/passed.json'),'modes':10,'canonical_inputs':m.filesha(S/'pair.json')})
 def boot():
  w,tmp=c.host();p=w/'trait-results';ready=m.read(p/'calibration.json')['ready'];now=Path('/proc/sys/kernel/random/boot_id').read_text().strip();ids={f['boot']for f in c.PAIR['prior_boots'].values()}
  c.guard(now==ready['boot']and len(ids)==len(c.PAIR['prior_boots'])and now not in ids,'previously enrolled host or changed boot')
@@ -35,11 +38,8 @@ def check_zero(path,state):
  else:m.save(f,out)
  return out
 def hypothesis(metrics):
- p=metrics['uv_metadata']['raw_control_candidate'];c.guard(len(p)==8 and all(a>0 and b>0 for a,b in p),'missing true primary retired instructions')
- ratios=[Fraction(b,a)for a,b in p];wins=sum(v<Fraction(4,5)for v in ratios);prob=Fraction(sum(comb(8,j)for j in range(wins,9)),256)
- from statistics import median
- holds=[median(ratios[:4]),median(ratios[4:])]
- return {'primary':'uv_metadata','strict_candidate_over_control_below':.80,'raw_candidate_over_control':[float(v)for v in ratios],'wins':wins,'one_sided_exact_sign_p_ties_counted_against':float(prob),'two_hold_median_ratios':[float(v)for v in holds],'qualified':all(v<Fraction(4,5)for v in holds)and prob<=Fraction(1,20),'secondary':'all eight processes, their sum, paired uninstrumented blocking-wait wall'}
+    from derive.policy import assess
+    return assess(metrics)
 
 def post_clock(out,ready):
  import wall_clock

@@ -12,7 +12,12 @@ STATES=[
  ('switch',('token',),'0 0 31'),('two',('token','shared'),'0 23 31'),
  ('one-left',('shared',),'0 23 0'),('foreign-signature',('string_argument',),'E0061'),
  ('last-removed',(), '0 0 0'),('restored',('string',),'11 0 0')]
-def main(sdk,src,out,role):
+def main(sdk,src,out,role,*,inherited_source=None):
+ original={'control':'f53496e2dd363b1455fc7e0a9d2dedea1bf7650e','candidate':'77ce0545653df71f43e601c28dde01a5e4f02b09'}
+ expected=original[role]
+ if inherited_source is not None:
+  assert role=='candidate'and inherited_source in (original['candidate'],'ac67101cb973e35ce8ff044cc8014c2c76bab69e'),'unregistered inherited compiler source'
+  expected=inherited_source
  sdk,src,out=[Path(p).resolve()for p in(sdk,src,out)];assert role in('control','candidate');out.mkdir()
  compiler=sdk/'bin/rustc';env={'PATH':str(sdk/'bin')+':/usr/bin:/bin','LC_ALL':'C','RUSTC_BOOTSTRAP':'1','LD_LIBRARY_PATH':str(sdk/'lib')}
  common=[str(compiler),'--sysroot',str(sdk),'--edition=2024','-Zthreads=1','-Zincremental-verify-ich=yes','--error-format=json'];profile=runpy.run_path(str(Path(__file__).resolve().with_name('profile_v9.py')))['Profile']
@@ -37,7 +42,7 @@ def main(sdk,src,out,role):
    if ctx=='Query'and q.startswith('typeck_root\x1e'):seen[q.partition('\x1e')[2]]+=1
   assert activity and all(v==1 for v in seen.values()),seen
   return {'profile':sha(p),'owners':{n:seen['reader::'+n]for n in OWNERS},'all_typeck':dict(seen)}
- outdata={};banners=subprocess.check_output([compiler,'-vV'],text=True,env=env);assert 'commit-hash: '+{'control':'f53496e2dd363b1455fc7e0a9d2dedea1bf7650e','candidate':'77ce0545653df71f43e601c28dde01a5e4f02b09'}[role] in banners.splitlines()
+ outdata={};banners=subprocess.check_output([compiler,'-vV'],text=True,env=env);assert 'commit-hash: '+expected in banners.splitlines()
  with tempfile.TemporaryDirectory(dir=out)as temp:
   w=Path(temp);[(shutil.copyfile(src/(n+'.rs'),w/(n+'.rs')))for n in ('owner','roster','reader')]
   compile(w,out/'owner','owner',['--emit=metadata,link'])

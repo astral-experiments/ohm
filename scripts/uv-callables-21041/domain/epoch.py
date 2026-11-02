@@ -15,9 +15,12 @@ def bins(root):
    ver=f.read(head[6]).decode()
   ret[str(p.relative_to(root))]={'epoch':int.from_bytes(head[4:6],'little'),'version':ver,'sha256':sha(p),'bytes':p.stat().st_size}
  return ret
-def run(control,candidate,out,mode):
+def run(control,candidate,out,mode,*,expected=None):
  roots=[Path(control).resolve(),Path(candidate).resolve()];out=Path(out).resolve();out.mkdir();assert mode in('actual','fixture')
- proj=json.loads((H/'source-role.json').read_bytes());shim=[('f53496e2dd363b1455fc7e0a9d2dedea1bf7650e', 43309),(proj['commit'],43317)if mode=='actual'else('4cc83ad906d8cd570c15b4508bc82ec3712cfb81',43309)];zz={}
+ assert mode=="actual";shim=[('77ce0545653df71f43e601c28dde01a5e4f02b09', 43317), ('ac67101cb973e35ce8ff044cc8014c2c76bab69e', 43319)]
+ if expected is not None:shim=list(expected)
+ assert len(shim)==2 and len({rev for rev,ep in shim})==len({ep for rev,ep in shim})==2 and all(re.fullmatch(r'[0-9a-f]{40}',rev) and type(ep) is int and 0<ep<65536 for rev,ep in shim)
+ zz={}
  for sdk,(rev,epoch) in zip(roots,shim):
   env={'PATH':str(sdk/'bin')+':/usr/bin:/bin','LD_LIBRARY_PATH':str(sdk/'lib'),'RUSTC_BOOTSTRAP':'1','LC_ALL':'C'}
   banner=subprocess.check_output([sdk/'bin/rustc','-vV'],env=env,text=True);assert 'commit-hash: '+rev in banner

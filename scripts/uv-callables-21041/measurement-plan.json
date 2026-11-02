@@ -1,204 +1,311 @@
 {
-  "boot_rule": "forbid all prior registered hosts; a newly authenticated overlapping host may only add a new exclusion before intake",
-  "build": {
-    "parent_service": {
-      "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
-      "producer": 41398925829,
-      "qa": {
-        "digest": "sha256:9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
-        "id": 13122138377,
-        "name": "callable-production-qa-attempt-1",
-        "size_in_bytes": 296464
-      },
-      "role_record_sha256": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
-      "sdk": {
-        "digest": "sha256:8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1",
-        "id": 13122178340,
-        "name": "callable-production-sdk",
-        "size_in_bytes": 359917871
-      },
-      "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
-      "source_record_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
-    },
-    "relative_pack": "7dfc978d69b648546d46bbd5cadd53586ca173756e60c4963ccf22915fa68749",
-    "source_replay_sha256": "7adabe7ed9341a13a2bf2281d5d3b817816d6155c96b335847f31627a2b5d354",
-    "stage1_prerequisite_run": 41412729838,
-    "stage1_registration_sha256": "4ee4df862fa133649f49f07a92ed4ba6279f9b96a95f78751a35b68dc3da0df8",
-    "treatment": "69f19f63eb905f7103aca35ad1b4ea532260b7e25771766d05323b0095d6b3be"
+ "candidate_expected_source_receipts": {
+  "remainder/derive-expansion-21041-study/production-build/source-preflight.json": "81620b053e1d64b4c5e6de057ab53cecddb85116a4a1789772bcf299fd15554b",
+  "remainder/trait-selection-21041/production77/repair01/qualified-source.json": "6a428fabe37454e55810bf903195d1cf36e21386677cad942feaffb16b51c1a2",
+  "remainder/trait-selection-21041/production77/repair01/role-replay.json": "221aca0b6159a621b238ce0fe38b287590608e5f650ac5626d6b3c258b5c2e79",
+  "remainder/trait-selection-21041/production77/repair01/source-role.json": "da7eb7ada9264fd8263b0c1c1a5e1bdf90aa0ca6deaa5d766c445f9613bff649"
+ },
+ "candidate_sdk_admission": "Requires actual successful separately routed producer head/job/source/API IDs, immutable SDK and QA hashes, matched capacity and PGO+BOLT+ThinLTO components, previous-domain source receipts and all 8 run-make and allocator/native tests. No unissued binary registered here.",
+ "case": {
+  "A": "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
+  "B": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
+  "file": "crates/uv-pypi-types/src/simple_json.rs",
+  "landed_pr": 21041,
+  "lock_sha256": "84893face6e0c3f1641af8ce022475d859b99bb43c3ccfb540e2e9cee98095f9",
+  "original_blob_A": "6b712c74dabbee079ab7fe19ec38364b9b8ac0ff",
+  "original_blob_B": "a5561a2ad9e48fdd98c0bc8a8d578e63bfa6d580",
+  "patch_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
+  "session_edit_unmerged": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
+  "session_ref": "a5882b33dad7d963569bd7a7fe69844164bcbad7"
+ },
+ "coordinator_parent": "37eb27d53652479648be37ff573e142b99b122f8",
+ "device": "one fresh calibrated same core set; retain early attestation, thread and inherited PMU and pre/post blocking child calibrations",
+ "exclude_known_boots": {
+  "41379994255": {
+   "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
+   "raw_sha256": "f3f19e05c29b16520b996d0b1557555522465fc99b213af4e789befb721c2ade"
   },
-  "case": {
-    "all_cargo_artifacts": 486,
-    "all_public_sidecars": 415,
-    "all_workspace_rmeta": 37,
-    "complete_native_argv_sha256": "2c6a09f122e5293f696ffb63d11e6469d88491bfd5a331897765c6a916e384fc",
-    "control": "ordinary seed A, edited B, independent cold B, full allocated semantic and rooted products, all 37 exact raw plus 415 sidecars within each seed, unchanged repeat no rustc, real parser linked, source checked after every visit",
-    "declared_unit_surface_sha256": "cc0c29b3aa3ddbd3ab296d68ad19d238f7a0e4367790bbfa8a9ffe17c7e5ccf7"
+  "41385306015": {
+   "boot": "fc71919f-27b4-4483-ab95-9bcac5e7131b",
+   "raw_sha256": "c6abea2a2978d98c8ecd250e42cf1b6f7ce2b2e4bb41964a0ee1b5f1c4bca376"
   },
-  "command": [
-    "check",
-    "-p",
-    "uv-client",
-    "--locked",
-    "--offline",
-    "-j8"
+  "41393501771": {
+   "boot": "db4d2941-1bd1-402f-8099-cc50036b6df3",
+   "raw_sha256": "e0c2483d07ffb8f81a44209a016ee0187f07a78a85399d9fb7a5693b008d8842"
+  },
+  "41399090905": {
+   "boot": "8461ebca-9583-4d70-8eac-198744186904",
+   "raw_sha256": "f67f1edcb62f453d08caa7d8efa8996281277b4e17e13c112d87da825f00f92f"
+  },
+  "41403723884": {
+   "boot": "8287559a-635a-47d0-bc39-859bb3efd4f2",
+   "raw_sha256": "2fb75a9fc058b58a7dddc2ab3706432d3cc3410ddef8b5c4743c1b4895e96471"
+  },
+  "41404703005": {
+   "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
+   "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
+  },
+  "41406359806": {
+   "boot": "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
+   "raw_sha256": "725410f6d7202a0922756cfcad85e421c24e9b9ef23886f43aff111732ea22ab"
+  },
+  "41407544748": {
+   "artifact": 13124530356,
+   "boot": "13895848-ed2e-435a-b313-9e006b9ff3e2",
+   "raw_sha256": "5fa8a1a93165f1ca3f4e2fdf339be44368feb5d360b810d36c61b26a29abf769"
+  },
+  "41411015186": {
+   "artifact": 13125113101,
+   "boot": "105d4e65-c7e4-4912-b8be-39318a1ebd61",
+   "boot_record_sha256": "4a2b72ff1493d6f4525591b973c6483a50008e5f1f066b89eadd0695c69f1609",
+   "job": 125163844234,
+   "run": 41411015186,
+   "zip_sha256": "fd2fd1436baffae76492e472b67c9073607cf00af8767b48ad33a8c5e36834d7"
+  },
+  "41411252543": {
+   "artifact": 13125512762,
+   "boot": "7bf853cc-35d6-49bd-ab54-994d55b3d111",
+   "boot_record_sha256": "7d452270c6bee2b67b9aa8d45863ed4fceae292e0e7ea26164d8f94734ed8723",
+   "job": 125164580588,
+   "run": 41411252543,
+   "zip_sha256": "60f88028ed66d67fa439a5401cd5ae82b33a0f21664465134b9c1497d1b43faf"
+  },
+  "41412729838": {
+   "artifact": 13125969207,
+   "boot": "b48533ba-18c2-433d-a56e-5d7d03110bab",
+   "boot_record_sha256": "027b9c6dc740093b034571d78bf87145e01855beee4d796d1f9de1ab02974abb",
+   "job": 125169398989,
+   "run": 41412729838,
+   "zip_sha256": "ea3ebe0bd78c33bf8cf4ca39bac9bbd586d606b690b6a6f971d1339c035a4a19"
+  },
+  "41417420490": {
+   "archive_sha256": "74e1892d5196a126dae30f865238bd114b979c3562e2a19686966b658e863717",
+   "artifact": 13128565917,
+   "attestation_sha256": "a3a63b36430c2822757610a240bb01e75d33e463486443493bee2d09ebb6b130",
+   "blocking_clock_calibration": "62e670a5307a801eb76cb14abbbab5ed2c6caf08c5fcfabf7b43eb1d34d83ac0",
+   "boot": "e23076e2-fe81-4d25-a110-edecaa347f15",
+   "head": "a99dff16c540a1f0d50be94adbb034558e20b96b",
+   "inherited_calibration": "ecc92d057537d314eb4b7166b894b314d3c94e10b50f2ef384e80057051b952e",
+   "job": 125184564924,
+   "raw_sha256": "a3a63b36430c2822757610a240bb01e75d33e463486443493bee2d09ebb6b130",
+   "source_registration": "99f08c48eda8e9592d46b7a4a8ce732eb5117ffb6185a2a377f87eb6b7c4913a",
+   "thread_calibration": "54a006c4cea49df22b4dd9190260451365e222dd768bd045fad93dbfe2cc9c1c"
+  },
+  "41420397868": {
+   "archive_sha256": "24e612309cd512c85476df50d6a9ccf0516ec1ab24949d0fd85312f10bdbca8b",
+   "artifact": 13130075925,
+   "attestation_sha256": "24760437bcd0af8c6d9dbdd47b6fb103864cf2d74996d3968a775d428c0c9433",
+   "blocking_clock_calibration": "842ee535e4af7ac13772f80ff289e3ab2f67764072a4a8936e73b6dba7481c3e",
+   "boot": "d5aa006d-e248-44bf-8635-a0f26186c053",
+   "head": "070b201d526382408acb684f7f6f778f567becb0",
+   "inherited_calibration": "24dcb5fcdcde516b9e89271d3c9389d87a969b202b091881e087cf899f25c95e",
+   "job": 125194285297,
+   "raw_sha256": "24760437bcd0af8c6d9dbdd47b6fb103864cf2d74996d3968a775d428c0c9433",
+   "source_registration": "1e05085b9c64161f669fffd580787c63e15ad354e7c2b5d512fe0732fc785e93",
+   "thread_calibration": "65d5d08c6f86c246b8cb19fad4dfd0f02e92ae0445cfa7dea6322e07ff7adbfa"
+  },
+  "41421756085": {
+   "archive_sha256": "e63dd51c35d3672d416ba3716299cb77d85e7d0af8f14bdb5ea53b214a804b36",
+   "artifact": 13129453930,
+   "attestation_sha256": "01ac32df72d824b5246762f54593da80db3e7cc1c7ba50946692f1bce0ad6f21",
+   "blocking_clock_calibration": "5a452f00c776946601b40fb1fdcbc3ffd3686d623d0f37dce1b46c168ca3f1c3",
+   "boot": "d4ad8776-10c1-4fc1-a536-531abb953a1d",
+   "head": "226ff01f857cd86ecc72000299d5bf3fac338ecd",
+   "inherited_calibration": "9a178af73856f68788f5d73f43c29b48c5b48b61005151c0ae9960d9d1be47c9",
+   "job": 125198701783,
+   "raw_sha256": "01ac32df72d824b5246762f54593da80db3e7cc1c7ba50946692f1bce0ad6f21",
+   "source_registration": "17d5169055d5c683eab646bc9cd0d15bb07d3ce79d61c844fd9387664490772e",
+   "thread_calibration": "46e71f4b24bc49923a2a57b2a1d6d6cc439e8657c4a00b3cc24e3859f957f79a"
+  },
+  "41423715247": {
+   "attestation_sha256": "294f0a6ed5b2472d8df1d470598c2e4d0e3d93279ed79c2ea5952520ad3d8fee",
+   "boot": "c0cef69c-0c2e-4bf2-a63b-eee0dc0947d6",
+   "early_original_sha256": "ab5d64e56172c46341fc31cd59862e55f467bb6a5b8b81a1d1aade6051fef179",
+   "head": "37eb27d53652479648be37ff573e142b99b122f8",
+   "run": 41423715247,
+   "service": "ca364e8e1d715973ac8a5a5929df122456a3dda58f40eb98ba906b269f5d187a"
+  }
+ },
+ "excluded_scope": [
+  "#20992 ordinary build guard",
+  "#22958 cumulative endpoint",
+  "any absolute production vs signed release wall claim"
+ ],
+ "experimental_branch": "charlie/codex-21041-proc-derive-production-check",
+ "holds": 2,
+ "independent_A_per_arm_and_hold": 1,
+ "later_boot_rule": "add any independently allocated same-workload or sibling-family boot whose authentic early calibration is available before final hardware enrollment, recording the original service and receipt; no removal",
+ "native_qualification": [
+  "positive genuine 77ce\u2192ac671 and reverse, 10 incremental visits, both same-SDK cache reuse and two real untouched foreign .rmeta E0514 controls",
+  "both installed real compiler render precise stable compile/link behavior including #327/#328 and fresh derive fixtures; no overriding headers or runtime flags in measured arms",
+  "per role and hold, six original generated impls from actual uv_pypi_types A/warm-B/independent B, Linux real proc macro, actual registry trait and all local DefPath hashes; control may move, treatment must retain",
+  "linked PyPI/PyX behavior across A, B and cold B, 37 workspace units, 415 sidecars and real eight rustc argvs before timing. Unchanged kernel observations require zero compiler launches. Independent cold semantics, within-seed raw outputs remain strict",
+  "stale boot, altered argv, changed output, wrong SDK, missing source row, forged epoch, mispaired/partial original all reject before scoring"
+ ],
+ "orders": [
+  [
+   "PC",
+   "CP",
+   "CP",
+   "PC"
   ],
-  "holds": [
-    0,
-    0,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1
-  ],
-  "orders": [
-    [
-      "callables_ctfe318",
-      "callables_ctfe318_incoherent_domain"
-    ],
-    [
-      "callables_ctfe318_incoherent_domain",
-      "callables_ctfe318"
-    ],
-    [
-      "callables_ctfe318_incoherent_domain",
-      "callables_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "callables_ctfe318_incoherent_domain"
-    ],
-    [
-      "callables_ctfe318_incoherent_domain",
-      "callables_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "callables_ctfe318_incoherent_domain"
-    ],
-    [
-      "callables_ctfe318",
-      "callables_ctfe318_incoherent_domain"
-    ],
-    [
-      "callables_ctfe318_incoherent_domain",
-      "callables_ctfe318"
-    ]
-  ],
-  "prespecified_physical": {
-    "intake": "exact real SDK production source+PGO+BOLT+ThinLTO, installed native tests and cache-epoch boundaries, shared signed Cargo and one distinct calibrated physical host",
-    "original": "one run, all original bytes kept even on refusal; no migration of timers from failed visits",
-    "per_role_per_trio": "independently restored PID-PMU capture then independently restored ordinary wall, with both fixture/compile controls; zero profiler, wrapper or logging in bare wall"
-  },
-  "primary": {
-    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
-    "effect": "candidate/control < 4/5",
-    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
-    "order_per_hold": "two per order",
-    "pairs": 8,
-    "scope": "actual uv_metadata library rustc only",
-    "two_independent_A_histories": true
-  },
-  "prior_boots": {
-    "41379994255": {
-      "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
-      "raw_sha256": "f3f19e05c29b16520b996d0b1557555522465fc99b213af4e789befb721c2ade"
-    },
-    "41385306015": {
-      "boot": "fc71919f-27b4-4483-ab95-9bcac5e7131b",
-      "raw_sha256": "c6abea2a2978d98c8ecd250e42cf1b6f7ce2b2e4bb41964a0ee1b5f1c4bca376"
-    },
-    "41393501771": {
-      "boot": "db4d2941-1bd1-402f-8099-cc50036b6df3",
-      "raw_sha256": "e0c2483d07ffb8f81a44209a016ee0187f07a78a85399d9fb7a5693b008d8842"
-    },
-    "41399090905": {
-      "boot": "8461ebca-9583-4d70-8eac-198744186904",
-      "raw_sha256": "f67f1edcb62f453d08caa7d8efa8996281277b4e17e13c112d87da825f00f92f"
-    },
-    "41403723884": {
-      "boot": "8287559a-635a-47d0-bc39-859bb3efd4f2",
-      "raw_sha256": "2fb75a9fc058b58a7dddc2ab3706432d3cc3410ddef8b5c4743c1b4895e96471"
-    },
-    "41404703005": {
-      "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
-      "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
-    },
-    "41406359806": {
-      "boot": "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
-      "raw_sha256": "725410f6d7202a0922756cfcad85e421c24e9b9ef23886f43aff111732ea22ab"
-    },
-    "41407544748": {
-      "artifact": 13124530356,
-      "boot": "13895848-ed2e-435a-b313-9e006b9ff3e2",
-      "raw_sha256": "5fa8a1a93165f1ca3f4e2fdf339be44368feb5d360b810d36c61b26a29abf769"
-    },
-    "41411015186": {
-      "artifact": 13125113101,
-      "boot": "105d4e65-c7e4-4912-b8be-39318a1ebd61",
-      "boot_record_sha256": "4a2b72ff1493d6f4525591b973c6483a50008e5f1f066b89eadd0695c69f1609",
-      "job": 125163844234,
-      "run": 41411015186,
-      "zip_sha256": "fd2fd1436baffae76492e472b67c9073607cf00af8767b48ad33a8c5e36834d7"
-    },
-    "41411252543": {
-      "artifact": 13125512762,
-      "boot": "7bf853cc-35d6-49bd-ab54-994d55b3d111",
-      "boot_record_sha256": "7d452270c6bee2b67b9aa8d45863ed4fceae292e0e7ea26164d8f94734ed8723",
-      "job": 125164580588,
-      "run": 41411252543,
-      "zip_sha256": "60f88028ed66d67fa439a5401cd5ae82b33a0f21664465134b9c1497d1b43faf"
-    },
-    "41412729838": {
-      "artifact": 13125969207,
-      "boot": "b48533ba-18c2-433d-a56e-5d7d03110bab",
-      "boot_record_sha256": "027b9c6dc740093b034571d78bf87145e01855beee4d796d1f9de1ab02974abb",
-      "job": 125169398989,
-      "run": 41412729838,
-      "zip_sha256": "ea3ebe0bd78c33bf8cf4ca39bac9bbd586d606b690b6a6f971d1339c035a4a19"
-    }
-  },
-  "released_reference": {
-    "id": 430629054,
-    "tag": "ohm-1.99.0-22"
-  },
-  "roles": [
-    "callables_ctfe318",
-    "callables_ctfe318_incoherent_domain"
-  ],
-  "schema": "ordinary uv-client production rustc instruction confirmation v1",
-  "secondary": {
-    "per_rustc": [
-      "uv_cache",
-      "uv_client",
-      "uv_configuration",
-      "uv_distribution_types",
-      "uv_install_wheel",
-      "uv_metadata",
-      "uv_pypi_types",
-      "uv_torch"
-    ],
-    "statistics": "descriptive with ratios/hold splits and full cohort, no other threshold promotion",
-    "sum": "all eight certified distinct rustc processes, same edit, raw instructions",
-    "wall": "separate restored ordinary Cargo visits, blocking wait and independent signal watchdog; pre and post real short-child calibration"
-  },
-  "signed_cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
-  "source": {
-    "callables_ctfe318": {
-      "commit": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
-      "epoch": 43309,
-      "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4"
-    },
-    "callables_ctfe318_incoherent_domain": {
-      "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
-      "epoch": 43317,
-      "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2"
-    }
-  },
-  "uv_edit": [
-    "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
-    "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
-    "crates/uv-pypi-types/src/simple_json.rs"
+  [
+   "CP",
+   "PC",
+   "PC",
+   "CP"
   ]
+ ],
+ "ordinary_command": [
+  "check",
+  "-p",
+  "uv-client",
+  "--locked",
+  "--offline",
+  "-j8"
+ ],
+ "pairs": 8,
+ "parent_original": {
+  "artifact": {
+   "bytes": 359916519,
+   "id": 13129955278,
+   "sha256": "5b075150e2460193078bdf8de7d834a057c097655e685bfb1943d91dfc2cabd2"
+  },
+  "builder_tree": "fb746eb96b458a310aa374f83a4589e02d5b1ba2",
+  "driver": "8f61821deebfa179fa6f56183a4f824c99172ba87671a57e92069836c49703b8",
+  "role_sha256": "8aed5acfd2808160e1aab0a9bcfd643b517551915bd478a5887cbb5728fd0701",
+  "service": {
+   "branch": "charlie/codex-21041-domain-production22",
+   "head": "5f7e5680285caa6b9a848db810b63ef58dfe0143",
+   "job": 125175283448,
+   "jobs": {
+    "Production GNU incoherent-impl domain SDK": 125175283448
+   },
+   "members": {
+    "domain-production-qa-attempt-1": {
+     "bytes": 303122,
+     "id": 13128848535,
+     "sha256": "22d8008b9d2ded9650e1760a457714b192e66950792052a6f7b7dc67b7e979e2"
+    },
+    "domain-production-sdk": {
+     "bytes": 359916519,
+     "id": 13129955278,
+     "sha256": "5b075150e2460193078bdf8de7d834a057c097655e685bfb1943d91dfc2cabd2"
+    }
+   },
+   "run": 41414598941,
+   "runner": 1590,
+   "runner_name": "nsc-runner-g0ikrcv2932u0"
+  },
+  "source": {
+   "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
+   "epoch": 43317,
+   "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2"
+  },
+  "source_sha256": "dd7bbb06d72aed8351ac94037d0e03a891d3933e6b2009aa722752cebf33c9f6"
+ },
+ "prior_328_panel": {
+  "original_bytes": 40167164,
+  "original_sha256": "9cf8d1f99e499755a504266b987000c5a4b476fe9a21f68945e1695cc6338d61",
+  "run": 41423715247,
+  "service_receipts": {
+   "native-replay03/passed.json": "9c86fcc395afbeccc435f27fc6a33085021723f9122791b5b187ce4e0e254688",
+   "portable/first-attempt.json": "b0dd54897486c862270e9fbeb07ec50a6b9a4c165898d74d8494e5775bbed431",
+   "rejected-second.json": "ed90ece2b608fb17a0b821839c8cdcc2217d6b1d714b4c4eeeecdaeb4e2b011a",
+   "run-41423715247/artifacts.json": "5b78105572e15fbe5563e4218f768736798c9a4710cb907d2806a81416ebfcea",
+   "run-41423715247/jobs.json": "fcc7fd1cc91b2e3d43afb46d8ed8570c9002f8972d32ce7a9c31761a8b7ce31b",
+   "run-41423715247/original.json": "beeb00ee4d37d30730d96841c3bf20c7739077958a1ed24b1dd799aa85ef0c0c",
+   "run-41423715247/run.json": "9a39eb70d1c3b2fc898fe1671b68fdd0c763e011b8be564868da139e845367e9",
+   "verified-remote.json": "3e23cc861c1dea2797e19d6bab04810c6df60a2c52321481e902bf86faf29ac4"
+  }
+ },
+ "production_format_epochs": {
+  "incremental": [
+   43317,
+   43319
+  ],
+  "rmeta": [
+   3,
+   43319
+  ]
+ },
+ "research_protocol": {
+  "correctness": [
+   "Native procedural macro execution on all source histories. The compiled macro source, invocation count and output behavior remain authentic. Preserve builtin, attribute, nested/opaque and root behavior outside the new completed-derive path.",
+   "Within each compiler fresh A, untouched A, warm B, untouched B and independent clean B. Verify known native metadata, key and dependency outputs and linked PyPI/PyX behavior on #21041; account for all 486 units, 37 workspace crates, eight actual rebuilds and zero on the unchanged rerun.",
+   "Prove all six original generated implementations retain the expansion identity and in-expansion ordinal across true A/warm B/fresh B, plus unique looked-up stable definition keys for all local defs. No accepting a decoded row solely by a display path.",
+   "Exercise generated sibling impls and nested/ambiguous spellings, changed signatures and bodies, relocated original spans, resolved trait changes, removed/inserted invocations, cross-crate symbol linkage, diagnostics, duplicate-impl rejection, warm/cold agreement, and source/ABI tests of fallback or hard collision handling.",
+   "Confirm exact SDK epochs by reading actual metadata and incremental files. Both directions must refuse incompatible old/new inputs. Both same-SDK repeats must load correct history. Preserve all hard failures."
+  ],
+  "selected_subsection": {
+   "build_guard": "paired #20992 ordinary build fixed Cargo and actual linked consumer; practical guard requires each four-pair hold median candidate/control <1.05 and a one-sided exact sign p<=0.05 below a 1.10 wall ratio. A wall gain or cold-build claim needs its own positive evidence.",
+   "opening": "sixteen independent native source openings on one calibrated new boot; no pair dropped or rerolled",
+   "orders_per_hold": [
+    [
+     "PC",
+     "CP",
+     "CP",
+     "PC"
+    ],
+    [
+     "CP",
+     "PC",
+     "PC",
+     "CP"
+    ]
+   ],
+   "pairs": 8,
+   "primary": "terminal userspace instructions, actual uv_client rustc after #21041. Substantial 20% cut requires both independent hold medians <0.80, and one-sided exact sign p<=0.05 at ratio 0.80 across all eight.",
+   "raw": "keep source and tool digests, candidate and control original SDKs, actual executable/argv and inventory, boot gate, native first-edit and unchanged receipts, signed PMU scope, original service artifacts, independent offline verifier and all failed openings",
+   "report": "entire Cargo process-tree counter and all eight rustc process counters, blocking-wait ordinary wall clock from separate restored histories, ratio of medians and median of paired ratios, all eight pairs and both holds"
+  },
+  "sha256": "b2801bb8a8f30b4facd5cc4c1a7b0b9142a7841906f17fd241629504a9273ab2",
+  "source_stage1": "b9b3f6bba90145e25eb3b76864cfd0b5f4cbdc1f",
+  "stage1_epochs": {
+   "incremental": [
+    43317,
+    43318
+   ],
+   "metadata": [
+    43311,
+    43318
+   ]
+  }
+ },
+ "role_order": [
+  "callables_ctfe318_incoherent_domain",
+  "callables_ctfe318_incoherent_domain_proc_derive"
+ ],
+ "schema": 1,
+ "scope": "Prospective marginal optimized Ohm -22, with #318 + #296 + #306 + callable and crate-domain recovery present in both. Only the completed proc-derive impl-identity source differs.",
+ "scoring": {
+  "other_metrics": [
+   "both absolute arm medians",
+   "median paired ratios and ratio of medians",
+   "all eight actual rustc thread-PMUs separately and their sum",
+   "inherited whole-Cargo userspace PMU on separate restored A",
+   "bare native CLOCK_MONOTONIC blocking wait on separate restored A",
+   "2\u00d7 wall count explicitly descriptive"
+  ],
+  "rule": "all eight valid, both hold medians of treatment/control strictly <4/5 and one-sided exact sign tail at 4/5 \u22640.05; ties go against",
+  "sole_threshold_primary": "retired userspace instructions in Cargo-selected terminal uv_client --crate-type lib and its threads"
+ },
+ "signed_cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+ "underlying_source_roles": {
+  "candidate": {
+   "commit": "ac67101cb973e35ce8ff044cc8014c2c76bab69e",
+   "epoch": 43319,
+   "metadata_epoch": [
+    3,
+    43319
+   ],
+   "parent": "77ce0545653df71f43e601c28dde01a5e4f02b09",
+   "tree": "1c07367341a9cc53272e9eefdae1ac8823d44839"
+  },
+  "control": {
+   "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
+   "epoch": 43317,
+   "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2"
+  }
+ }
 }

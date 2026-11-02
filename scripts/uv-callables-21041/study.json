@@ -5,33 +5,8 @@
   "B": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
   "B_file": "3d91d5195930020a6740f68341549629681eb8654048962cc618fe02e7130360",
   "B_tree": "ce502617cfbf3fd59980e29731c10b5391d12139",
-  "branch": "charlie/codex-21041-domain-prod-certified",
-  "candidate_selection": {
-    "parent_service": {
-      "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
-      "producer": 41398925829,
-      "qa": {
-        "digest": "sha256:9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
-        "id": 13122138377,
-        "name": "callable-production-qa-attempt-1",
-        "size_in_bytes": 296464
-      },
-      "role_record_sha256": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
-      "sdk": {
-        "digest": "sha256:8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1",
-        "id": 13122178340,
-        "name": "callable-production-sdk",
-        "size_in_bytes": 359917871
-      },
-      "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
-      "source_record_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
-    },
-    "relative_pack": "7dfc978d69b648546d46bbd5cadd53586ca173756e60c4963ccf22915fa68749",
-    "source_replay_sha256": "7adabe7ed9341a13a2bf2281d5d3b817816d6155c96b335847f31627a2b5d354",
-    "stage1_prerequisite_run": 41412729838,
-    "stage1_registration_sha256": "4ee4df862fa133649f49f07a92ed4ba6279f9b96a95f78751a35b68dc3da0df8",
-    "treatment": "69f19f63eb905f7103aca35ad1b4ea532260b7e25771766d05323b0095d6b3be"
-  },
+  "branch": "charlie/codex-21041-proc-derive-production-check",
+  "candidate_selection": "Prior native resolved-derive/impl DefPathHash preservation on six real shifts, two independent stage1 guest holds and both cold/build correctness qualifications; no native retired threshold inferred.",
   "describe_A": "0.12.3-27-ga2a0242",
   "describe_B": "0.12.3-28-g9049e07",
   "edit_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
@@ -57,11 +32,16 @@
     1
   ],
   "local_selection": {
-    "qualified_stage1_process": "uv_metadata",
-    "receipt_sha256": "78fa58ed82d6c7f2d3beefdd42a28e6988819292e64670347a99c03f17da3ee5"
+    "eight_rustcs_guest_percent_cut": 4.89,
+    "scope": "two independent rooted histories in opposite order; candidate selection only",
+    "stage1_sources": [
+      "b9b3f6bb",
+      "bd03d570"
+    ],
+    "uv_client_guest_percent_cut": 12.03
   },
   "lock_sha256": "84893face6e0c3f1641af8ce022475d859b99bb43c3ccfb540e2e9cee98095f9",
-  "measurement_plan_sha256": "1a4cd14fc2776f0e73625fe205f197e044b7b5f68dc6ff2cc64f9a763848dd8e",
+  "measurement_plan_sha256": "098184b8463f2852b641a0317266c084b3326fbe8d5c954aa90074818f608f1c",
   "meter_files": {
     "SHA256SUMS": "c6713c7ef2878aa70a927e845e41ec9f4d237091b6c7a6c45d4799de047fb0d1",
     "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
@@ -72,36 +52,44 @@
   },
   "mode_orders": [
     [
+      "clock",
       "wall",
       "scoped"
     ],
     [
       "scoped",
-      "wall"
+      "wall",
+      "clock"
     ],
     [
       "wall",
-      "scoped"
+      "scoped",
+      "clock"
     ],
     [
+      "clock",
       "scoped",
       "wall"
     ],
     [
       "wall",
+      "clock",
       "scoped"
     ],
     [
       "scoped",
+      "clock",
       "wall"
     ],
     [
+      "clock",
       "wall",
       "scoped"
     ],
     [
       "scoped",
-      "wall"
+      "wall",
+      "clock"
     ]
   ],
   "native_cargo_artifacts": 486,
@@ -1138,78 +1126,59 @@
   },
   "orders": [
     [
-      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318_incoherent_domain_proc_derive"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain_proc_derive",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain_proc_derive",
       "callables_ctfe318_incoherent_domain"
     ],
     [
       "callables_ctfe318_incoherent_domain",
-      "callables_ctfe318"
+      "callables_ctfe318_incoherent_domain_proc_derive"
     ],
     [
-      "callables_ctfe318_incoherent_domain",
-      "callables_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain_proc_derive",
       "callables_ctfe318_incoherent_domain"
     ],
     [
       "callables_ctfe318_incoherent_domain",
-      "callables_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "callables_ctfe318_incoherent_domain"
-    ],
-    [
-      "callables_ctfe318",
-      "callables_ctfe318_incoherent_domain"
+      "callables_ctfe318_incoherent_domain_proc_derive"
     ],
     [
       "callables_ctfe318_incoherent_domain",
-      "callables_ctfe318"
+      "callables_ctfe318_incoherent_domain_proc_derive"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain_proc_derive",
+      "callables_ctfe318_incoherent_domain"
     ]
   ],
   "original_patch_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
-  "parent": "226ff01f857cd86ecc72000299d5bf3fac338ecd",
+  "parent": "37eb27d53652479648be37ff573e142b99b122f8",
   "per_rustc_threshold": {
-    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
-    "effect": "candidate/control < 4/5",
-    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
-    "order_per_hold": "two per order",
-    "pairs": 8,
-    "scope": "actual uv_metadata library rustc only",
-    "two_independent_A_histories": true
-  },
-  "physical_primary": {
-    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
-    "effect": "candidate/control < 4/5",
-    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
-    "order_per_hold": "two per order",
-    "pairs": 8,
-    "scope": "actual uv_metadata library rustc only",
-    "two_independent_A_histories": true
-  },
-  "physical_scope": "Per-rustc userspace retired instructions on all eight kernel-verified rustc processes and their own threads; separately restored uninstrumented blocking whole Cargo wall",
-  "physical_secondary": {
-    "per_rustc": [
-      "uv_cache",
-      "uv_client",
-      "uv_configuration",
-      "uv_distribution_types",
-      "uv_install_wheel",
-      "uv_metadata",
-      "uv_pypi_types",
-      "uv_torch"
+    "other_metrics": [
+      "both absolute arm medians",
+      "median paired ratios and ratio of medians",
+      "all eight actual rustc thread-PMUs separately and their sum",
+      "inherited whole-Cargo userspace PMU on separate restored A",
+      "bare native CLOCK_MONOTONIC blocking wait on separate restored A",
+      "2\u00d7 wall count explicitly descriptive"
     ],
-    "statistics": "descriptive with ratios/hold splits and full cohort, no other threshold promotion",
-    "sum": "all eight certified distinct rustc processes, same edit, raw instructions",
-    "wall": "separate restored ordinary Cargo visits, blocking wait and independent signal watchdog; pre and post real short-child calibration"
+    "rule": "all eight valid, both hold medians of treatment/control strictly <4/5 and one-sided exact sign tail at 4/5 \u22640.05; ties go against",
+    "sole_threshold_primary": "retired userspace instructions in Cargo-selected terminal uv_client --crate-type lib and its threads"
   },
+  "physical_primary": "uv_client actual kernel-selected rustc threads only, < 4/5 in both four-pair median ratios plus one-sided sign threshold p<=0.05 across exactly eight",
+  "physical_scope": "ordinary cargo check -p uv-client --locked --offline -j8 on the landed uv edit, release-matched 77ce versus its one-commit ac671 child, fixed signed -22 Cargo",
+  "physical_secondary": "All eight named rustcs, sum, full inherited Cargo instructions, and separate uninstrumented blocking whole-command wall, including counts above 2x",
   "plan_units": 530,
   "prior_actual_argv_sha256": "2c6a09f122e5293f696ffb63d11e6469d88491bfd5a331897765c6a916e384fc",
-  "producer_head": "5f7e5680285caa6b9a848db810b63ef58dfe0143",
-  "producer_run": 41414598941,
+  "producer_head": "731d81a4cb3498cf4221d53a267bbf4a76ca250f",
+  "producer_run": 41434876352,
   "reference_features": {
     "uv_auth": [],
     "uv_cache": [],
@@ -1281,8 +1250,8 @@
   "registry_uncompressed_sha256": "cb48aafbd06b0f81d56dc44f61476fc2fe2a609c2637e33b6569f8290ac64fc0",
   "repo": "astral-experiments/ohm",
   "roles": [
-    "callables_ctfe318",
-    "callables_ctfe318_incoherent_domain"
+    "callables_ctfe318_incoherent_domain",
+    "callables_ctfe318_incoherent_domain_proc_derive"
   ],
   "root_features": [],
   "root_unit": "73295104ae181bf6a8a99b926325f476c7036c7d1edebd997fde08b2f3c7625e",
@@ -1294,7 +1263,7 @@
     "--offline",
     "-j8"
   ],
-  "sdk_lock_sha256": "403777de9a8827bcf95517caf1f55998fc39bfa408e67b6a162ef77cd6f8595b",
+  "sdk_lock_sha256": "dbb190765a6be6f2ef90be903efaf63c1feb7bf817c142cdaacc0cb0b9f067ae",
   "source_case_sha256": "576103c648f8b31662b0ddf1d49632573023a9cbe699bb1811df57d4f2a6cfd2",
   "source_mode": "real unstaged edit at A and genuine 0.12.3 ancestry; same absolute source/target for each restoration",
   "structural_graph_sha256": "17277138e393245b99609f9da43bfcfdf091f2c57ea8bdf2217669cd6b1fe74f",

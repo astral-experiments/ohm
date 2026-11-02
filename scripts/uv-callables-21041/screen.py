@@ -56,7 +56,12 @@ def run():
     c.guard(boot['thread_calibration']==m.filesha(sc/'calibration.json')and m.read(sc/'source.json')['host']==scoped.machine()and scoped.cal_raw(sc),'per-rustc calibration changed')
     c.guard(boot['blocking_clock']==m.filesha(out/'blocking-clock/passed.json'),'different calibrated blocking clock')
     per_meter_ready=True
-    def products(path):return prod.aggregate(m.TARGET,path,store,parse)
+    from derive import panel as derive_panel
+    derive_panel.wire.bind(parse)
+    def products(path):
+        value=prod.aggregate(m.TARGET,path,store,parse)
+        derive_panel.capture(m.TARGET,m.SDK,m.SRC,path,value,role,out,tmp)
+        return value
     for hold in(0,1):
         histories={};baseline={}
         for role in (c.ROLES if hold==0 else reversed(c.ROLES)):
@@ -96,11 +101,12 @@ def run():
             streams=output_controls(q/'warm-B');m.save(q/'ordinary-controls.json',streams)
             m.save(q/'actual-cargo-opening.json',{'ordinary_progress':normal,'typed_active':proof['artifact_crates'],'actual_typed_commands':len(proof['commands'])})
             histories[role]=(seed,seal,rr);baseline[role]=(b,streams)
+        derive_panel.verify_hold(out,tmp,hold,c.ROLES,parse)
         for phase in ('ordinary-A','warm-B','cold-B'):
             left,right=[m.read(panel/f'hold-{hold}-{r}'/phase/'products.json')for r in c.ROLES]
             same=(left['structural']==right['structural'])
             m.save(panel/f'hold-{hold}-{phase}-cross-role.json',{'all_defs_and_reachable_shape_equal':same,'different':[k for k in left['structural']if left['structural'][k]!=right['structural'][k]],'absolute_headers':{role:{k:v['header'] for k,v in product['semantic'].items()}for role,product in zip(c.ROLES,(left,right))}})
-            c.guard(same,'cross-role rooted DefKeys or reachable public definition set differ; see the complete per-SDK headers')
+            c.guard(left['relative_paths']==right['relative_paths'] and len(left['structural'])==len(right['structural'])==37,'unmatched native workspace product')
         for i in [n for n,x in enumerate(P['independent_holds'])if x==hold]:
             values={}
             for role in P['orders'][i]:
@@ -113,13 +119,18 @@ def run():
                         scoped_result=physical.visit(role,roleout,q,sdks,s,expected,scheduled,products,output_controls,per_meter_ready)
                         values[role][mode]=dict(scoped_result,checkpoint_sha256=seal['sha256'])
                         continue
-                    c.guard(mode=='wall','only the separately restored uninstrumented wall visit is enrolled')
-                    wall_clock.command(path,c.CHECK,'native',m.SRC,m.ENV)
+                    if mode=='wall':
+                        wall_clock.command(path,c.CHECK,'native',m.SRC,m.ENV)
+                    elif mode=='clock':
+                        primary.command(path,c.CHECK,'pmu',binary)
+                    else:raise ValueError(('unregistered visit mode',mode))
                     rec=m.read(path/'ordinary.json');c.guard(rec['boot']==ready['boot']and rec['cpus']==ready['affinity']and rec['argv']==c.CHECK,'command/boot/cores')
                     result=products(path);m.save(path/'source.json',h.state('B'));c.guard(h.state('B')==s,'command changed source')
                     ok=prod.compare(path/'same-seed-equivalence.json',expected,result,True)
                     observed=output_controls(path);m.save(path/'ordinary-controls.json',observed);c.guard(observed==scheduled,'ordinary roster or output changed within role')
                     val=rec['ns']
+                    if mode=='clock':
+                        counter=meter.clock(path/'whole-clock.json',0);c.guard(counter['enabled']==counter['running']>0,'multiplexed PMU');val=counter['instructions']
                     values[role][mode]={'value':val,'same_seed_qualified':ok,'source_sha256':s['source'],'checkpoint_sha256':seal['sha256']}
             reports.append({'pair':i,'hold':hold,'order':P['orders'][i],'modes':P['mode_orders'][i],'values':values})
         h.clean(m.TARGET)

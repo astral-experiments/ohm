@@ -11,7 +11,7 @@ m=c.m;P=c.P
 def num(v):return {'fraction':str(v),'factor':round(float(v),6)}
 def summary(rows):
     c.guard(len(rows)==8,'eight preregistered pairs');result={}
-    for metric in ('wall',):
+    for metric in ('wall','clock'):
         ratios=[];holds=[[],[]];arms={r:[] for r in c.ROLES}
         for i,row in enumerate(rows):
             c.guard(row['pair']==i and row['order']==P['orders'][i] and row['hold']==P['independent_holds'][i] and row['modes']==P['mode_orders'][i],'pair design')
@@ -36,7 +36,9 @@ def score():
                 checked[key]=(n,size,m.canon(c.deep.project(lambda *_:decoded,b,name)),wire_shape.shape(*decoded[:2]))
             c.guard(checked[key]==(n,size,m.canon(obj['semantic'][n]),obj['structural'][n]),'independently decoded complete rmeta and rooted key shape')
         return obj
+    from derive import panel as derive_panel
     for hold in (0,1):
+        derive_panel.verify_hold(out,tmp,hold,c.ROLES,parser,independent=True)
         for r in c.ROLES:
             q=panel/f'hold-{hold}-{r}';a=check_products(q/'ordinary-A');b=check_products(q/'warm-B')
             c.guard(a==check_products(q/'settled-A')==check_products(q/'typed-fresh-A'),'same-seed fresh A bytes')
@@ -74,14 +76,14 @@ def score():
                 else:
                     clock=meter.clock(at/'whole-clock.json',0);c.guard(rec['invoked']==[ready['plain'],str(at/'whole-clock.json'),*c.CHECK]and clock['running']==clock['enabled']>0 and v['value']==clock['instructions'],'inherited unmultiplexed whole-command instructions')
     import physical
-    report={'scope':'matched signed-release production builds, foreign incoherent directory input, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
+    perf=physical.reduce(panel,raw,data,check_products,output_controls)
+    report={'scope':'matched signed-release production builds, procedural derive impl identity, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
         'verified_unique_workspace_products':len(checked),'metrics':None if refusals else summary(raw),'branch':P['branch']}
     if report['metrics']:
-        for mode in ('wall',):
+        for mode in ('wall','clock'):
             x=report['metrics'][mode]['raw_by_role']
             report['metrics'][mode]['paired_statistics']=physical.metric(list(zip(x[c.ROLES[0]],x[c.ROLES[1]],strict=True)))
     m.save(panel/'ordinary-score.json',report)
-    perf=physical.reduce(panel,raw,data,check_products,output_controls)
     left=m.read(out/'blocking-clock/passed.json');right=m.read(out/'blocking-clock-post/passed.json')
     c.guard(left['machine']==right['machine']=={'boot':ready['boot'],'cpus':ready['affinity']} and left['probe']==right['probe'] and all(len(t['samples'])==25 and t['nonzero_exit']==17 and t['deadline_exit']==-9 for t in (left,right)),'different pre/post wait calibration')
     if perf['complete']:perf['primary_test']=physical.preregistered_tests(perf['metrics'])
