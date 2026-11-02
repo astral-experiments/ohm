@@ -78,6 +78,9 @@ def main(role):
     ordinary=json.loads((RECORDS/'visits.json').read_text())['clean']
     libs=compile_libraries(ROOT/'native-loader')
     proof=RECORDS/'provider';proof.mkdir()
+    for letter,payload in libs.items():
+        (proof/('libohm-ruff-db-'+letter+'.so')).write_bytes(payload)
+    (proof/'native-witness.c').write_text(C_SOURCE)
     reference={}; rows={}
     def observe(label, allowed, *, may_fail=False, must_fail=False):
         folder=proof/label;folder.mkdir()
