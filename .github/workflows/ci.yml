@@ -60,7 +60,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
           (cd scripts/ruff-source-placement && sha256sum --strict --quiet -c factory.sha256 && sha256sum --strict --quiet -c worker.sha256)
-          python3 -IB scripts/ruff-source-placement/receiver.py "$RUNNER_TEMP/placement-qualified-sdks"
+          python3 -IB scripts/ruff-real-cgu-weights/prices.py receive "$RUNNER_TEMP/placement-qualified-sdks"
       - name: Prove native equality before reading the per-unit instruction counts
         run: python3 -IB -u enrolled/scripts/ruff-real-cgu-weights/prices.py "$GITHUB_WORKSPACE/ruff-option"
       - name: Preserve the profile and native verdicts

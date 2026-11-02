@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent/"ruff-source-placement")]
+import common
 import decode
 import worker as prior
 
@@ -165,4 +166,10 @@ def main():
          "source":EXPECTED["source"],"ordinary_parent":"531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5"})
 
 if __name__=="__main__":
-    main()
+    # This run has its own head. The downloaded factory remains on its original branch.
+    with patch.object(common, "BRANCH", BRANCH):
+        assert common.git(common.HERE, "rev-parse", "HEAD:scripts/ruff-source-placement") == "0cc1467837102b563b445be2193cd155006517a2"
+        if len(sys.argv) == 3 and sys.argv[1] == "receive":
+            prior.receiver.install(Path(sys.argv[2]), registration=common.enrollment())
+        else:
+            main()
