@@ -1,0 +1,532 @@
+{
+  "archive_253": {
+    "bytes": 162704285,
+    "id": 13144224899,
+    "sha256": "37b4aac76dce38c4d84c51cf17d39857f96fc1860e8d9d3456f8ba89e553ca7d"
+  },
+  "original_release_artifacts": {
+    "package_228": 13101900298,
+    "package_253": 13144147426
+  },
+  "package_228": {
+    "native": {
+      "observed": {
+        "absent": {
+          "dirty_count": 171,
+          "native": "system",
+          "status": 0
+        },
+        "broken": {
+          "dirty_count": null,
+          "native": null,
+          "status": 101
+        },
+        "clean-A": {
+          "dirty_count": 171,
+          "native": "A",
+          "status": 0
+        },
+        "clean-B": {
+          "dirty_count": 171,
+          "native": "B",
+          "status": 0
+        },
+        "clean-removed": {
+          "dirty_count": 171,
+          "native": "system",
+          "status": 0
+        },
+        "insert-A": {
+          "dirty_count": 1,
+          "native": "A",
+          "status": 0
+        },
+        "removed": {
+          "dirty_count": 1,
+          "native": "system",
+          "status": 0
+        },
+        "repaired": {
+          "dirty_count": 1,
+          "native": "B",
+          "status": 0
+        },
+        "swap-B": {
+          "dirty_count": 1,
+          "native": "B",
+          "status": 0
+        }
+      },
+      "programs": {
+        "23dc6bd1caa6e24ae8f1231fa5c79ae87c6ee2fa0bde8e1b8b3b66eccd2594ee": "B",
+        "668a0995274587cf668d06288a0c4387bb23c61f03fd345c21dc0da5d172e75e": "",
+        "990286025a491798a421c8fb341494cdcc8eadb1df2b746f548707cf8a73f606": "A"
+      },
+      "run": 41444949106,
+      "zip_sha256": "dd286ecb71794e4b6527199c223f563526ff92880ea85fc162efb3e7b3ce3856"
+    },
+    "ruff_db": {
+      "artifact": 13140717098,
+      "binaries": {
+        "bin/cargo": "3aa65a66042127aa697ca6caa096dc5606b06a3429305bd340d34559a2975c4e",
+        "bin/rustc": "458ba12e50d2eb212dd4f41649fa2ff31f726f4810128207dac9c3377377c5de",
+        "bin/rustdoc": "4a34c6c0b93f91233513e76def6f7e269e91dae64477a1d53c35fad575871561",
+        "lib/librustc_driver-b03bf00bec23bb9a.so": "d8e217b8905c7826b6706d3c17f48d95593f6841901481b59f7c9578b374d8d5",
+        "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+      },
+      "clean": "668a0995274587cf668d06288a0c4387bb23c61f03fd345c21dc0da5d172e75e",
+      "digest": "sha256:142c8268e6f60dfc07fe90ad9794b9fd3c0cf5d715ea85e275f33b9232e3baef",
+      "job": 125263680996,
+      "old": "f05eef0d71f23364b79fbfb361bb26e0cc2b2e3a21c2117fe331dd5eb7d46aee",
+      "qa_head": "d2ef9b02a41b8f7442a249dc02108218ea7d554e",
+      "run": 41441340483,
+      "units": 171,
+      "visits": {
+        "edit": {
+          "dirty": [
+            "annotate_snippets",
+            "ruff_db"
+          ],
+          "sha256": "668a0995274587cf668d06288a0c4387bb23c61f03fd345c21dc0da5d172e75e"
+        },
+        "exec": {
+          "dirty": [
+            "ruff_db"
+          ],
+          "sha256": "668a0995274587cf668d06288a0c4387bb23c61f03fd345c21dc0da5d172e75e"
+        },
+        "fingerprint": {
+          "dirty": [
+            "ruff_db"
+          ],
+          "sha256": "668a0995274587cf668d06288a0c4387bb23c61f03fd345c21dc0da5d172e75e"
+        },
+        "unchanged-1": {
+          "dirty": [
+            "ruff_db"
+          ],
+          "sha256": "668a0995274587cf668d06288a0c4387bb23c61f03fd345c21dc0da5d172e75e"
+        },
+        "unchanged-2": {
+          "dirty": [
+            "ruff_db"
+          ],
+          "sha256": "668a0995274587cf668d06288a0c4387bb23c61f03fd345c21dc0da5d172e75e"
+        }
+      },
+      "wild": 1
+    },
+    "ty": {
+      "correct": "fc92a76917bec134945f6d46cc03c4d5579e5bc5a02295971b6e6cf0cb62f64c",
+      "digest": "sha256:dd6d32946fc20385352e5e7845843db915babb59677891de00773b3dc26abd25",
+      "dirty_after_edit": [
+        "ty_server",
+        "e2e"
+      ],
+      "dirty_unchanged": [
+        "e2e"
+      ],
+      "invalid": "E0308",
+      "job": 125286649848,
+      "linker": [
+        29559,
+        29419,
+        "/home/runner/work/_temp/ruff-db-link-reason/ty-edit/state/target/debug/build/workspaces/935b47016741afc2/v2-a04be20b4ce1dafb/ty_server/b8b0227818d12786/out/e2e-b8b0227818d12786"
+      ],
+      "new_names": 152,
+      "old": "ad1b1826c571dbff8516fb9ae99df4bddc1386edc0fc9fc8a80c458c8780df45",
+      "old_names": 151,
+      "rerun": {},
+      "run": 41448240223,
+      "stale_control": "e22266b60ccf1e106d6edc98c5f2dcd28efb9b06bd5704ff124baf6e3376becc",
+      "units": 302,
+      "warning": "0:0..0:7[WARNING]: Name `missing` used when not defined"
+    },
+    "workspace": {
+      "dirty": 133,
+      "dirty_reasons": {
+        "foreign span": 1,
+        "native recheck": 32,
+        "upstream": 101
+      },
+      "head": "8373a8f8c838db7945c1ec8e14711b5ac32e6d78",
+      "job": 125279994664,
+      "link_only": 83,
+      "ron": 1,
+      "run": 41446263214,
+      "rustcs": 105,
+      "units": 619,
+      "wild": 103
+    }
+  },
+  "package_253": {
+    "native": {
+      "observed": {
+        "absent": {
+          "dirty_count": 171,
+          "native": "system",
+          "status": 0
+        },
+        "broken": {
+          "dirty_count": 0,
+          "native": "A",
+          "status": 0
+        },
+        "clean-A": {
+          "dirty_count": 171,
+          "native": "A",
+          "status": 0
+        },
+        "clean-B": {
+          "dirty_count": 171,
+          "native": "B",
+          "status": 0
+        },
+        "clean-removed": {
+          "dirty_count": 171,
+          "native": "system",
+          "status": 0
+        },
+        "fresh-link-broken": {
+          "dirty_count": null,
+          "native": null,
+          "status": 101
+        },
+        "insert-A": {
+          "dirty_count": 0,
+          "native": "system",
+          "status": 0
+        },
+        "removed": {
+          "dirty_count": 0,
+          "native": "B",
+          "status": 0
+        },
+        "repaired": {
+          "dirty_count": 1,
+          "native": "B",
+          "status": 0
+        },
+        "swap-B": {
+          "dirty_count": 0,
+          "native": "A",
+          "status": 0
+        }
+      },
+      "programs": {
+        "10326a68aa9d2a1e8bd8f488fefb75705d453a46c3cc7243c66e3e84b8760f5c": "",
+        "bdb5f25d1191388e44680d1028c1df7fdf789ee677af2524c058e6ad941fea76": "B",
+        "cbf8b6ac7c3769a091478963fe687ef36aba6e422f64626679656af357f751d1": "A"
+      },
+      "run": 41450882756,
+      "zip_sha256": "37b4aac76dce38c4d84c51cf17d39857f96fc1860e8d9d3456f8ba89e553ca7d"
+    },
+    "ruff_db": {
+      "artifact": 13144224899,
+      "binaries": {
+        "bin/cargo": "5788018794b720b7fef81d2984e4a638be2788799aaa431787721c4a06266039",
+        "bin/rustc": "e658002325984c8c13eff77a3cd0dbead00b984cbb2c09655917cc9fe675970a",
+        "bin/rustdoc": "333f2ac2592987142628255048381aaab11b5847b1cedf8e48fee7596ee30335",
+        "lib/librustc_driver-b03bf00bec23bb9a.so": "e017287b3223b33cec8fc9f45f3a70a32f074e692d7ad84ef2353a8d7dbff89f",
+        "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+      },
+      "clean": "10326a68aa9d2a1e8bd8f488fefb75705d453a46c3cc7243c66e3e84b8760f5c",
+      "digest": "sha256:37b4aac76dce38c4d84c51cf17d39857f96fc1860e8d9d3456f8ba89e553ca7d",
+      "edit_consumer": {
+        "added": [],
+        "dropped": [],
+        "edited": 218,
+        "old": 218,
+        "retained": 180
+      },
+      "job": 125295496756,
+      "old": "eb2c75d3f5246da92f025f3447fa52e2164aac89687ba7cb11760905559cc49d",
+      "qa_head": "1d6b3796f659359efb9ab9dfc6c0cf860eb9f1ee",
+      "run": 41450882756,
+      "units": 171,
+      "visits": {
+        "edit": {
+          "dirty": [
+            "annotate_snippets",
+            "ruff_db"
+          ],
+          "sha256": "10326a68aa9d2a1e8bd8f488fefb75705d453a46c3cc7243c66e3e84b8760f5c"
+        },
+        "exec": {
+          "dirty": [],
+          "sha256": "10326a68aa9d2a1e8bd8f488fefb75705d453a46c3cc7243c66e3e84b8760f5c"
+        },
+        "fingerprint": {
+          "dirty": [],
+          "sha256": "10326a68aa9d2a1e8bd8f488fefb75705d453a46c3cc7243c66e3e84b8760f5c"
+        },
+        "unchanged-1": {
+          "dirty": [],
+          "sha256": "10326a68aa9d2a1e8bd8f488fefb75705d453a46c3cc7243c66e3e84b8760f5c"
+        },
+        "unchanged-2": {
+          "dirty": [],
+          "sha256": "10326a68aa9d2a1e8bd8f488fefb75705d453a46c3cc7243c66e3e84b8760f5c"
+        }
+      },
+      "wild": 0
+    },
+    "ty": {
+      "correct": "c07945d801a62e9f2c6151e97af6aa036369af7c5a29c7a510673802496ad5bc",
+      "digest": "sha256:37b4aac76dce38c4d84c51cf17d39857f96fc1860e8d9d3456f8ba89e553ca7d",
+      "dirty_after_edit": [
+        "ty_server",
+        "e2e"
+      ],
+      "dirty_unchanged": [],
+      "invalid": "E0308",
+      "job": 125295496756,
+      "linker": [
+        90257,
+        90117,
+        "/home/runner/work/_temp/ruff-db-link-reason/ty-edit/state/target/debug/build/workspaces/935b47016741afc2/v2-a49bc30d182e3771/ty_server/b8b0227818d12786/out/e2e-b8b0227818d12786"
+      ],
+      "new_names": 152,
+      "old": "f1378718a17f50d91de7cc9bf43aa5abf777e773e769af8e36220a172ad21dec",
+      "old_names": 151,
+      "rerun": {
+        "1f835070d11391bbd7ebed6914c74d4dcef35bfab46522fbdce04ca9e459838c": {
+          "case": "workspace_folders::single_file_workspace",
+          "code": 101,
+          "tests": 152
+        },
+        "c07945d801a62e9f2c6151e97af6aa036369af7c5a29c7a510673802496ad5bc": {
+          "case": "workspace_folders::single_file_workspace",
+          "code": 0,
+          "tests": 152
+        },
+        "f1378718a17f50d91de7cc9bf43aa5abf777e773e769af8e36220a172ad21dec": {
+          "case": "workspace_folders::initialize_multiple_workspace_folders",
+          "code": 0,
+          "tests": 151
+        }
+      },
+      "run": 41450882756,
+      "stale_control": "1f835070d11391bbd7ebed6914c74d4dcef35bfab46522fbdce04ca9e459838c",
+      "units": 302,
+      "warning": "0:0..0:7[WARNING]: Name `missing` used when not defined"
+    },
+    "workspace": {
+      "dirty": 56,
+      "dirty_reasons": {
+        "foreign span": 1,
+        "upstream": 55
+      },
+      "head": "1d6b3796f659359efb9ab9dfc6c0cf860eb9f1ee",
+      "job": 125295496756,
+      "link_only": 50,
+      "ron": 1,
+      "run": 41450882756,
+      "rustcs": 51,
+      "units": 619,
+      "wild": 50
+    }
+  },
+  "source_93526150": {
+    "native_inputs_253": {
+      "actual_fresh": {
+        "cold": {
+          "ron": false,
+          "unicode_names2": false
+        },
+        "fingerprint": {
+          "ron": false,
+          "unicode_names2": true
+        },
+        "ordinary": {
+          "ron": false,
+          "unicode_names2": true
+        },
+        "traced": {
+          "ron": false,
+          "unicode_names2": true
+        }
+      },
+      "all_1060_product_changes": {
+        "cold-ordinary": [
+          "libron-13dc21a1a402ac6a.rmeta",
+          "ty_python_semantic-762226a465a7ee8c"
+        ],
+        "ordinary-traced": [],
+        "traced-fingerprint": [
+          "libron-13dc21a1a402ac6a.rmeta",
+          "fixtures-b2cec8ee41a33397"
+        ]
+      },
+      "archive_sha256": "sha256:37b4aac76dce38c4d84c51cf17d39857f96fc1860e8d9d3456f8ba89e553ca7d",
+      "artifact": 13144224899,
+      "complete_ron_products": {
+        "cold": {
+          "libron-13dc21a1a402ac6a.rlib": [
+            2106340,
+            "47b162ba3960c3969ce13478b789c2ec5a028586f14613780d9191b4a3066441"
+          ],
+          "libron-13dc21a1a402ac6a.rmeta": [
+            1440420,
+            "fc800e9aa736ab53a3c1aa5132c738b514eeb356bea50638c6ff41b81393b774"
+          ]
+        },
+        "fingerprint": {
+          "libron-13dc21a1a402ac6a.rlib": [
+            2106340,
+            "47b162ba3960c3969ce13478b789c2ec5a028586f14613780d9191b4a3066441"
+          ],
+          "libron-13dc21a1a402ac6a.rmeta": [
+            1440420,
+            "7070d8ae15a547c2905b0cd2cb189c30f2ae99fa9e342e974d5006d7365455e0"
+          ]
+        },
+        "ordinary": {
+          "libron-13dc21a1a402ac6a.rlib": [
+            2106340,
+            "47b162ba3960c3969ce13478b789c2ec5a028586f14613780d9191b4a3066441"
+          ],
+          "libron-13dc21a1a402ac6a.rmeta": [
+            1440420,
+            "0471a180941a748ed513a52901133f504db8ef74d7a5ae76bf0cde113bf99834"
+          ]
+        },
+        "traced": {
+          "libron-13dc21a1a402ac6a.rlib": [
+            2106340,
+            "47b162ba3960c3969ce13478b789c2ec5a028586f14613780d9191b4a3066441"
+          ],
+          "libron-13dc21a1a402ac6a.rmeta": [
+            1440420,
+            "0471a180941a748ed513a52901133f504db8ef74d7a5ae76bf0cde113bf99834"
+          ]
+        }
+      },
+      "dirty": 56,
+      "first_stale_dependencies": {
+        "158": 48,
+        "200": 2
+      },
+      "head": "1d6b3796f659359efb9ab9dfc6c0cf860eb9f1ee",
+      "link_only": 50,
+      "links_with_any_changed_typed_Wild_operand": 0,
+      "links_with_literal_ron_rlib": 35,
+      "minimum_absolute_operands_outside_typed_product_table": 34,
+      "minimum_symbolic_libraries": 7,
+      "original_links_present": 50,
+      "other_53_links_present": 0,
+      "per_target_first_stale_index": {
+        "crates/mdtest|mdtest|lib|true|crates/mdtest/src/lib.rs": 158,
+        "crates/ruff_db|ruff_db|lib|true|crates/ruff_db/src/lib.rs": 158,
+        "crates/ruff_linter|ruff_linter|lib|true|crates/ruff_linter/src/lib.rs": 158,
+        "crates/ruff_markdown|ruff_markdown|lib|true|crates/ruff_markdown/src/lib.rs": 158,
+        "crates/ruff_mdtest|mdtest|test|true|crates/ruff_mdtest/tests/mdtest.rs": 200,
+        "crates/ruff_python_ast_integration_tests|comparable|test|true|crates/ruff_python_ast_integration_tests/tests/comparable.rs": 158,
+        "crates/ruff_python_ast_integration_tests|identifier|test|true|crates/ruff_python_ast_integration_tests/tests/identifier.rs": 158,
+        "crates/ruff_python_ast_integration_tests|match_pattern|test|true|crates/ruff_python_ast_integration_tests/tests/match_pattern.rs": 158,
+        "crates/ruff_python_ast_integration_tests|parentheses|test|true|crates/ruff_python_ast_integration_tests/tests/parentheses.rs": 158,
+        "crates/ruff_python_ast_integration_tests|parenthesize|test|true|crates/ruff_python_ast_integration_tests/tests/parenthesize.rs": 158,
+        "crates/ruff_python_ast_integration_tests|source_order|test|true|crates/ruff_python_ast_integration_tests/tests/source_order.rs": 158,
+        "crates/ruff_python_ast_integration_tests|stmt_if|test|true|crates/ruff_python_ast_integration_tests/tests/stmt_if.rs": 158,
+        "crates/ruff_python_ast_integration_tests|visitor|test|true|crates/ruff_python_ast_integration_tests/tests/visitor.rs": 158,
+        "crates/ruff_python_formatter|fixtures|test|true|crates/ruff_python_formatter/tests/fixtures.rs": 158,
+        "crates/ruff_python_formatter|normalizer|test|true|crates/ruff_python_formatter/tests/normalizer.rs": 158,
+        "crates/ruff_python_formatter|ruff_python_formatter|bin|true|crates/ruff_python_formatter/src/main.rs": 158,
+        "crates/ruff_python_formatter|ruff_python_formatter|lib|true|crates/ruff_python_formatter/src/lib.rs": 158,
+        "crates/ruff_python_importer|ruff_python_importer|lib|true|crates/ruff_python_importer/src/lib.rs": 158,
+        "crates/ruff_python_parser|fixtures|test|true|crates/ruff_python_parser/tests/fixtures.rs": 158,
+        "crates/ruff_python_parser|generate_inline_tests|test|true|crates/ruff_python_parser/tests/generate_inline_tests.rs": 158,
+        "crates/ruff_python_parser|ruff_python_parser|lib|true|crates/ruff_python_parser/src/lib.rs": 158,
+        "crates/ruff_python_semantic|ruff_python_semantic|lib|true|crates/ruff_python_semantic/src/lib.rs": 158,
+        "crates/ruff_python_trivia_integration_tests|block_comments|test|true|crates/ruff_python_trivia_integration_tests/tests/block_comments.rs": 158,
+        "crates/ruff_python_trivia_integration_tests|simple_tokenizer|test|true|crates/ruff_python_trivia_integration_tests/tests/simple_tokenizer.rs": 158,
+        "crates/ruff_python_trivia_integration_tests|whitespace|test|true|crates/ruff_python_trivia_integration_tests/tests/whitespace.rs": 158,
+        "crates/ruff_server|document|test|true|crates/ruff_server/tests/document.rs": 158,
+        "crates/ruff_server|e2e|test|true|crates/ruff_server/tests/e2e/main.rs": 158,
+        "crates/ruff_server|ruff_server|lib|true|crates/ruff_server/src/lib.rs": 158,
+        "crates/ruff|analyze_graph|test|true|crates/ruff/tests/analyze_graph.rs": 158,
+        "crates/ruff|cli|test|true|crates/ruff/tests/cli/main.rs": 158,
+        "crates/ruff|config|test|true|crates/ruff/tests/config.rs": 158,
+        "crates/ruff|direxist_guard|test|true|crates/ruff/tests/direxist_guard.rs": 158,
+        "crates/ruff|integration_test|test|true|crates/ruff/tests/integration_test.rs": 158,
+        "crates/ruff|resolve_files|test|true|crates/ruff/tests/resolve_files.rs": 158,
+        "crates/ruff|ruff|bin|true|crates/ruff/src/main.rs": 158,
+        "crates/ruff|ruff|lib|true|crates/ruff/src/lib.rs": 158,
+        "crates/ty_ide|ty_ide|lib|true|crates/ty_ide/src/lib.rs": 158,
+        "crates/ty_module_resolver|ty_module_resolver|lib|true|crates/ty_module_resolver/src/lib.rs": 158,
+        "crates/ty_project|ty_project|lib|true|crates/ty_project/src/lib.rs": 158,
+        "crates/ty_python_semantic|corpus|test|true|crates/ty_python_semantic/tests/corpus.rs": 158,
+        "crates/ty_python_semantic|mdtest|test|true|crates/ty_python_semantic/tests/mdtest.rs": 158,
+        "crates/ty_python_semantic|ty_python_semantic|lib|true|crates/ty_python_semantic/src/lib.rs": 158,
+        "crates/ty_server|e2e|test|true|crates/ty_server/tests/e2e/main.rs": 158,
+        "crates/ty_server|ty_server|lib|true|crates/ty_server/src/lib.rs": 158,
+        "crates/ty_test|ty_test|lib|true|crates/ty_test/src/lib.rs": 200,
+        "crates/ty|cli|test|true|crates/ty/tests/cli/main.rs": 158,
+        "crates/ty|file_watching|test|true|crates/ty/tests/file_watching.rs": 158,
+        "crates/ty|self_environment|test|true|crates/ty/tests/self_environment.rs": 158,
+        "crates/ty|ty|bin|true|crates/ty/src/main.rs": 158,
+        "crates/ty|ty|lib|true|crates/ty/src/lib.rs": 158
+      },
+      "physical_wild": 50,
+      "run": 41450882756,
+      "rustcs": 51,
+      "sdk_sources": {
+        "cargo": {
+          "revision": "4109dd69209a642f309555cac0cee8b05e18f0ea"
+        },
+        "clippy": {
+          "revision": "5b5d9fb377e21872c83ed1598f9ffee1420c7b39"
+        },
+        "rust": {
+          "revision": "a21de69d085aa07b3b5ac94058bac9e5aed482b4"
+        },
+        "rustfmt": {
+          "revision": "59e87b3b3eb731560e1c3a1da4319af04bda5483"
+        }
+      },
+      "source_commit": "93526150df078af7dd8fc4226cdcc469539d2001"
+    },
+    "ron_228": {
+      "cold": {
+        "libron-13dc21a1a402ac6a.rlib": [
+          2106454,
+          "bb3480ac3054e0b6e4d154a562fac2747de52c316ada644af7876fdfe1959904"
+        ],
+        "libron-13dc21a1a402ac6a.rmeta": [
+          1440420,
+          "813fc4124abddbba58f45c7787f0aa4f22bd0e027c9516e849bc923ecc64e69d"
+        ]
+      },
+      "fingerprint": {
+        "libron-13dc21a1a402ac6a.rlib": [
+          2106454,
+          "bb3480ac3054e0b6e4d154a562fac2747de52c316ada644af7876fdfe1959904"
+        ],
+        "libron-13dc21a1a402ac6a.rmeta": [
+          1440420,
+          "813fc4124abddbba58f45c7787f0aa4f22bd0e027c9516e849bc923ecc64e69d"
+        ]
+      },
+      "ordinary": {
+        "libron-13dc21a1a402ac6a.rlib": [
+          2106454,
+          "bb3480ac3054e0b6e4d154a562fac2747de52c316ada644af7876fdfe1959904"
+        ],
+        "libron-13dc21a1a402ac6a.rmeta": [
+          1440420,
+          "813fc4124abddbba58f45c7787f0aa4f22bd0e027c9516e849bc923ecc64e69d"
+        ]
+      },
+      "traced": {
+        "libron-13dc21a1a402ac6a.rlib": [
+          2106454,
+          "bb3480ac3054e0b6e4d154a562fac2747de52c316ada644af7876fdfe1959904"
+        ],
+        "libron-13dc21a1a402ac6a.rmeta": [
+          1440420,
+          "813fc4124abddbba58f45c7787f0aa4f22bd0e027c9516e849bc923ecc64e69d"
+        ]
+      }
+    }
+  }
+}
