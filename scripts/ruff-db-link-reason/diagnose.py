@@ -80,6 +80,7 @@ def main(role):
     assert role in ('22','23') and git('rev-parse',NEW+'^')==OLD and len(git('diff','--name-only',OLD,NEW).splitlines())==2
     assert sha(SRC/'Cargo.lock')==LOCK and not git('status','--porcelain')
     env=environment()
+    save("environment.json",env)
     tools={k:subprocess.check_output([k,'+ohm','-vV'],env=env,text=True) for k in ('cargo','rustc')}
     save('versions.json',tools)
     git('checkout','--quiet','--detach',OLD)

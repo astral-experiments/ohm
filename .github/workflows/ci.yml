@@ -14,6 +14,10 @@ run-name: Ruff test link reason ${{ inputs.reviewed_head }}
         options:
           - both
           - rc23
+      native_witness:
+        type: boolean
+        description: Exercise a real higher-priority and malformed native provider on the RC
+        default: false
 permissions: {}
 jobs:
   diagnose:
@@ -50,6 +54,9 @@ jobs:
         run: python3 -IB qa/scripts/ruff-db-link-reason/install.py ${{ matrix.role }}
       - name: Inspect the ordinary and fingerprint-observed commands
         run: python3 -IB qa/scripts/ruff-db-link-reason/diagnose.py ${{ matrix.role }}
+      - name: Prove changed and malformed native library behavior on the real test ELF
+        if: inputs.native_witness && matrix.role == '23'
+        run: python3 -IB qa/scripts/ruff-db-link-reason/provider.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
