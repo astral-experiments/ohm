@@ -3,7 +3,7 @@ from pathlib import Path
 import gzip,json,os,shutil,subprocess,sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from basis import CASE,HERE,LOCK,PLAN,Env,digest,filehash,read,write,setup
-PARENT='5182899ebd032b193efe2cf7ebf37c4c0a6e2e88';BRANCH='charlie/codex-22536-source-session-check'
+PARENT='a5e7ea6ef00903fae7b671f54c6bffdca3c2fee6';BRANCH='charlie/codex-22536-source-session-check'
 def git(d,*v):return subprocess.check_output(['git','-C',d,*v],text=True).strip()
 def checked_binding():
     e=os.environ;assert e['GITHUB_REPOSITORY']=='astral-experiments/ohm'and e['GITHUB_REPOSITORY_ID']=='1319437234'and e['GITHUB_EVENT_NAME']=='workflow_dispatch'and e['GITHUB_REF']=='refs/heads/'+BRANCH and e['GITHUB_WORKFLOW_REF']==e['GITHUB_REPOSITORY']+'/.github/workflows/ci.yml@'+e['GITHUB_REF']and e['GITHUB_RUN_ATTEMPT']=='1'
@@ -12,8 +12,14 @@ def checked_binding():
     assert not git(co,'status','--porcelain','--untracked-files=no')and not git(co,'diff',PARENT,'HEAD','--','scripts/uv-client-22958','scripts/uv-callables-21041','scripts/handwritten-panel')
     assert HERE==co/'scripts/uv-check-22536';en=read(HERE/'dispatch-enrollment.json')
     assert en.get('local_native_gates_accepted')is True and en['submit_authority']=='explicit workflow_dispatch of the operator-reviewed exact SHA' and en['protocol']==CASE['protocol']and en['prior_public_case']==CASE['frozen_initial_case']
-    assert len(en['excluded_boots'])==len(set(en['excluded_boots']))==26 and en['local_native']['held_out_signed_control']=='R' and en['local_native']['treatment']=='F'
+    assert len(en['excluded_boots'])==len(set(en['excluded_boots']))==27 and en['local_native']['held_out_signed_control']=='R' and en['local_native']['treatment']=='F'
     assert en['local_native']['typed_graph']['live_raw_argv_differences']==[0,0,0]and en['local_native']['typed_graph']['previous_separate_path_raw_differences']==6942
+    old_bytes=subprocess.check_output(['git','-C',co,'show',PARENT+':scripts/uv-check-22536/dispatch-enrollment.json'])
+    prior=json.loads(old_bytes);add=read(HERE/'eligibility-addendum.json')
+    assert en['eligibility_addendum']==filehash(HERE/'eligibility-addendum.json')and en['prior_enrollment']==digest(old_bytes)
+    assert en['excluded_boots']==prior['excluded_boots']+[add['prospective_panel']['new_boot_exclusion']['boot']]and add['previous']['head']==PARENT
+    assert en['local_native']['true_role_source']=={n:LOCK['roles'][n]['source']for n in ('R','F')}and en['local_native']['runtime_inventory_sha256']=={n:LOCK['roles'][n]['hash']for n in ('R','F')}
+    assert not git(co,'diff',PARENT,'HEAD','--','.github/workflows/ci.yml',*['scripts/uv-check-22536/'+n for n in ('protocol.json','score.py','basis.py','instruments.json','case.json','production-inputs.json.gz','metadata-kit.json','producer_map.py','fixed-layout-rule.json','opening.py','science.py','semantics.py','compatibility.py','fixed_products.py')])
     return w,t,en
 def scope():
     w,t,en=checked_binding()

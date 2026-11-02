@@ -3,9 +3,10 @@ from pathlib import Path
 from statistics import median
 import hashlib,json,os,struct
 from basis import CASE,HERE,LOCK,PLAN,SIX,WORKSPACE,canon,digest,filehash,read,readz
-import fixed_products,producer_map
+import fixed_products,producer_map,live_review
 def affirm(root):
     cal=read(root/'calibration/accepted.json');qual=read(root/'qualification/accepted.json');selected=qual['control'];mat=read(root/'actual-inputs.json');bounds=read(root/'compatibility.json');dc=root/'calibration';assert cal['protocol']==qual['plan']==CASE['protocol']and cal['boot']not in cal['excluded']and len(cal['excluded'])==len(set(cal['excluded']))>24 and len(cal['cpus'])==len(set(cal['cpus']))==8
+    assert set(cal['excluded'])==set(read(HERE/'dispatch-enrollment.json')['excluded_boots'])and len(cal['excluded'])==27
     assert filehash(dc/'scoped/calibration.json')==cal['scoped']and filehash(dc/'wall/passed.json')==cal['blocking'];sc=read(dc/'scoped/calibration.json');assert sc['reexec_rejected']and set(sc['known_two_instruction_loop'])=={'serial','threads','fork'}
     for key,expected in {'serial':22000000,'threads':66000000,'fork':0}.items():
         v=sc['known_two_instruction_loop'][key];assert v['expected_delta']==expected and v['counts'][1]-v['counts'][0]==v['measured_delta']and abs(v['measured_delta']-expected)<=100000
@@ -54,7 +55,7 @@ def affirm(root):
         if dst.name=='sdk':assert dst not in position.values()
         position[role]=dst;moves.append(role)
     assert {selected,'F'}<=set(stable) and all(p.name==r for r,p in position.items()) and len(moves)>=16
-    return {'full_Cargo_producer_graph':producer_map.eligible_histories(root),'dedicated_boot':cal['boot'],'original_sdk_families':sorted(roles),'scoped_hardware_calibrator':cal['scoped'],'bare_wall_calibrator':cal['blocking'],'native_original_groups':folders,'live_source_histories_admitted':True}
+    return {'additional_fixed_native_certificates':live_review.replay(root),'full_Cargo_producer_graph':producer_map.eligible_histories(root),'dedicated_boot':cal['boot'],'original_sdk_families':sorted(roles),'scoped_hardware_calibrator':cal['scoped'],'bare_wall_calibrator':cal['blocking'],'native_original_groups':folders,'live_source_histories_admitted':True}
 
 if __name__=='__main__':
     import sys

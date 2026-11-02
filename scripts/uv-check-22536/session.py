@@ -5,7 +5,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 from basis import CASE,HERE,LOCK,PLAN,Env,EVENTS,SIX,canon,digest,filehash,kernel,read,readz,setup,shape,write,writez
 from opening import qualify,changed_forms
 from semantics import products,probe,typed_compare
-import fixed_products,producer_map
+import fixed_products,producer_map,live_metadata
 from managed_sdk import Managed
 K=HERE/'kit';W=runpy.run_path(str(K/'wall_clock.py'));P=runpy.run_path(str(K/'per_rustc.py'))
 def current():return Path('/proc/sys/kernel/random/boot_id').read_text().strip(),sorted(os.sched_getaffinity(0))
@@ -83,10 +83,10 @@ def arm(e,role,armname,index,cal,ref):
             e.source(state);dest=d/(mode+'-'+state)
             if mode=='native':
                 before=fixed_products.ordinary_stats(e.target)
-                rec=kernel(e,dest,'edited');form[state]=changed_forms(rec);assert form[state]==ref[state][2],(role,index,state,'literal per-role argv changed');assert rec['workspace_rmeta_from_argv']=={n:paths[n]for n in SIX};golden[state]=products(e,paths,store=True);writez(dest/'products.json.gz',golden[state]);probe(e,state,form[state],dest)
+                rec=kernel(e,dest,'edited');form[state]=changed_forms(rec);assert form[state]==ref[state][2],(role,index,state,'literal per-role argv changed');assert rec['workspace_rmeta_from_argv']=={n:paths[n]for n in SIX};golden[state]=products(e,paths,store=True);writez(dest/'products.json.gz',golden[state]);oracle=probe(e,state,form[state],dest)
                 fixed_products.changed(before,fixed_products.ordinary_stats(e.target),expected);ordinary[state]=fixed_products.recorded(e.target,expected);writez(dest/'fixed-products.json.gz',ordinary[state])
                 cert=ref[state][1];coverage={n:r['coverage']for n,r in cert['covered'].items()}if cert else {}
-                assert typed_compare(e,golden[state],ref[state][0],dest,coverage)['accepted'];kernel(e,d/('noedit-'+state),'unchanged');assert products(e,paths)==golden[state]
+                assert live_metadata.qualify(e,role,state,dest,paths,cold['forms']|rec['forms'],ref[state][3],golden[state],ref[state][0],oracle,coverage)['accepted'];kernel(e,d/('noedit-'+state),'unchanged');assert products(e,paths)==golden[state]
             else:
                 value=capture(e,state,mode,dest,form[state],mask);observed=products(e,paths);assert observed==golden[state],(role,index,state,mode,'same-seed product mismatch');writez(dest/'products.json.gz',observed);rows.setdefault(state,{})[mode]=value
                 stable=fixed_products.recorded(e.target,expected);assert stable==ordinary[state],(role,index,state,mode,'Cargo fixed output mismatch');writez(dest/'fixed-products.json.gz',stable)
@@ -103,7 +103,7 @@ def main(cfg,e=None):
         for st in 'BCD':
             dr=folder/('fresh-'+st);cf=dr/'fixed/fixed-input.json.gz';cert=readz(cf)if cf.is_file()else None
             assert cert is None or(cert['role']==role and cert['source']==CASE['states'][st]['source']and cert['state']==st and cert['rule']==filehash(HERE/'fixed-layout-rule.json'))
-            fresh[char][st]=(readz(dr/'products.json.gz'),cert,readz(folder/('warm-'+st)/'argv.json.gz')['forms'])
+            fresh[char][st]=(readz(dr/'products.json.gz'),cert,readz(folder/('warm-'+st)/'argv.json.gz')['forms'],readz(dr/'argv.json.gz')['forms'])
     barrier=read(e.results/'compatibility.json');assert barrier['eligible']and barrier['roles']==[lookup['P'],'F']and barrier['runtime']=={k:LOCK['roles'][v]['hash']for k,v in lookup.items()}
     for i,order in enumerate(PLAN['pairs']['pair_orders']):
         visits=[arm(e,lookup[k],k,i,cal,fresh[k])for k in order];assert visits[0]['argument_surface']==visits[1]['argument_surface'],('unexpected cross-arm argument surface',i)

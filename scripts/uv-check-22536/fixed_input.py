@@ -14,12 +14,14 @@ def native_header(e,p):
     # This invocation only reads the finished .rmeta. Its private environment
     # is never inherited by the Cargo child producing either compared artifact.
     z=subprocess.run([e.bin,'-Zls=root',p],env=dict(e.env,RUSTC_BOOTSTRAP='1'),capture_output=True,check=True);assert not z.stderr and z.stdout;return z.stdout
-def certify(e,role,state,folder,paths,forms,before,oracle,needs):
+def certify(e,role,state,folder,paths,forms,before,oracle,needs,*,preserve_original=False):
     assert role in('R','S','F')and state in'BCD'and filehash(WRAP)==RULE['wrapper']and os.access(WRAP,os.X_OK)
-    src=e.source(state);folder.mkdir();saved=e.bank/('fixed-'+role+'-'+state);shutil.copytree(e.target,saved,symlinks=True)
+    src=e.source(state);folder.mkdir();saved=e.bank/('fixed-'+role+'-'+state);assert not saved.exists()
     form_file=folder/'forms.json';write(form_file,forms);complete={}
     def restore():
         e.reset();shutil.copytree(saved,e.target,dirs_exist_ok=True,symlinks=True)
+    if preserve_original:os.rename(e.target,saved)
+    else:shutil.copytree(e.target,saved,symlinks=True)
     try:
         dec=decoder(e)
         for owner,wanted in needs.items():
@@ -46,6 +48,9 @@ def certify(e,role,state,folder,paths,forms,before,oracle,needs):
                 w.append({'threads':n,'result':result,'argv':digest(canon(selected['executed'])),'inputs':digest(canon(fixed)),'semantic':comp,'other_unit_names':[r['name']for r in marks if r is not selected]})
             assert len(seen)>=2 and set(wanted)<=coverage,(owner,state,role,wanted,sorted(coverage));complete[owner]={'held_inputs':fixed,'checked_argv':orig,'coverage':sorted(coverage),'original_native_header':digest(old_header),'rows':w}
     finally:
-        restore();shutil.rmtree(saved)
+        if preserve_original:
+            if e.target.exists():shutil.rmtree(e.target)
+            os.rename(saved,e.target)
+        else:restore();shutil.rmtree(saved)
     result={'role':role,'source':src,'state':state,'rule':filehash(HERE/'fixed-layout-rule.json'),'covered':complete}
     writez(folder/'fixed-input.json.gz',result);return result

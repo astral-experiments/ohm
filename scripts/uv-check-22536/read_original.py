@@ -1,6 +1,6 @@
 """Verify the original bounded ZIP and independently reconstruct the three real edits and paired B+D."""
 from pathlib import Path
-import hashlib,json,shutil,stat,sys,tempfile,zipfile
+import gzip,hashlib,json,shutil,stat,sys,tempfile,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from score import replay
 from basis import canon,digest
@@ -18,8 +18,20 @@ def unpack(path,expected):
             if n.startswith('session-results/'):
                 dest=root/n;dest.parent.mkdir(exist_ok=True,parents=True)
                 with z.open(n)as fp,dest.open('xb')as out:shutil.copyfileobj(fp,out)
+        priority=set(manifest.get('priority_refused_metadata_and_externs',[]));found=set();raw_bytes=0
+        for name in manifest['members']:
+            if not name.startswith('metadata-origins/'):continue
+            key=Path(name).name.removesuffix('.gz');acc=hashlib.sha256();n=0
+            with z.open(name)as source,gzip.GzipFile(fileobj=source)as original:
+                while block:=original.read(1<<20):
+                    n+=len(block);raw_bytes+=len(block);assert n<=128<<20 and raw_bytes<=2<<30;acc.update(block)
+            assert acc.hexdigest()==key;found.add(key)
+        if 'all_priority_raw_retained'in manifest:
+            assert priority-found<=set(manifest['omitted_after_safe_budget'])|set(manifest['requested_but_missing'])
+            assert manifest['all_priority_raw_retained']==(priority<=found)
+        custody={'raw_digests_reopened':len(found),'raw_bytes_reopened':raw_bytes,'requested_on_refusal':len(priority),'missing_requested':sorted(priority-found)}
         gold=root/'session-results/result.json'
-        if not gold.is_file():return {'accepted':False,'reason':'Incomplete original; no score.','members_verified':len(members)}
+        if not gold.is_file():return {'accepted':False,'reason':'Incomplete original; no score.','members_verified':len(members),'custody':custody}
         gates=affirm(root/'session-results');original=json.loads(gold.read_bytes());actual=replay(root/'session-results');assert canon(original)==canon(actual)
-        return {'accepted':True,'independent_score_sha256':digest(canon(actual)),'physical_and_native':gates,'original':actual}
+        return {'accepted':True,'independent_score_sha256':digest(canon(actual)),'physical_and_native':gates,'custody':custody,'original':actual}
 if __name__=='__main__':print(json.dumps(unpack(Path(sys.argv[1]),sys.argv[2]),indent=2,sort_keys=True))
