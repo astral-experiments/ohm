@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 unset CDPATH
+# Bootstrap and collect profiles from the requested checkout, even inside a Git hook.
+unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR
+unset GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_QUARANTINE_PATH
 
 if [[ $# -ne 4 ]]; then
   echo 'usage: build-optimized-dist.sh TARGET TOOLCHAIN RUST_CHECKOUT BOOTSTRAP_CONFIG' >&2
