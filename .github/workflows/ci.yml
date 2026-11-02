@@ -20,13 +20,17 @@ run-name: Ruff test link reason ${{ inputs.reviewed_head }}
         type: boolean
         description: Exercise a real higher-priority and malformed native provider on the RC
         default: false
+      whole_workspace:
+        type: boolean
+        description: Count the original 619-product Ruff workspace and physical link destinations
+        default: false
 permissions: {}
 jobs:
   diagnose:
     name: Inspect Ruff test link on Ohm ${{ matrix.role }}
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 36
+    timeout-minutes: 55
     permissions:
       contents: read
       actions: read
@@ -59,6 +63,28 @@ jobs:
       - name: Prove changed and malformed native library behavior on the real test ELF
         if: inputs.native_witness && matrix.role != '22'
         run: python3 -IB qa/scripts/ruff-db-link-reason/provider.py ${{ matrix.role }}
+      - name: Check out the original unchanged-workspace reader
+        if: inputs.whole_workspace
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-experiments/ohm
+          ref: a43236131847bb5906247e46656d702e543d3c50
+          path: census-code
+          sparse-checkout: |
+            scripts/ruff-workspace-link-census
+            scripts/ruff-default-owner-pmu
+          persist-credentials: false
+      - name: Check out the original 50-link Ruff source
+        if: inputs.whole_workspace
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: 93526150df078af7dd8fc4226cdcc469539d2001
+          path: ruff-whole
+          persist-credentials: false
+      - name: Count actual warm compilers and links on the same 619-product workspace
+        if: inputs.whole_workspace
+        run: python3 -IB qa/scripts/ruff-db-link-reason/workspace.py ${{ matrix.role }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
