@@ -502,6 +502,7 @@ done
 
 # The collector fixture starts with the upstream context used by the release patch.
 perf_remote="$test_directory/perf fixture"
+perf_source="$rust_checkout/src/tools/rustc-perf"
 collector_path=collector/src/compile/benchmark/mod.rs
 mkdir -p "$perf_remote/$(dirname -- "$collector_path")"
 cat > "$perf_remote/$collector_path" <<'RS'
@@ -523,8 +524,11 @@ RS
   git -C "$rust_checkout" symbolic-ref HEAD refs/heads/fixture
   git -C "$rust_checkout" -c protocol.file.allow=always submodule add --quiet "$perf_remote" src/tools/rustc-perf
   git -C "$rust_checkout" commit --quiet -m 'Pin collector'
+  printf '%s\n' '// local commit' >> "$perf_source/$collector_path"
+  git -C "$perf_source" commit --quiet -am 'Local collector change'
 )
-original_collector="$rust_checkout/src/tools/rustc-perf/$collector_path"
+original_head="$(git -C "$perf_source" rev-parse HEAD)"
+original_collector="$perf_source/$collector_path"
 printf '%s\n' '// local edit' >> "$original_collector"
 toolchain=ohm-1.99.0-23
 : > "$trace"
@@ -535,6 +539,7 @@ mkdir -p "$test_directory/profile tmp"
   run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp"
 )
 assert_optimized_build "$linux_target" "$bolt_directory" true true "$relocated_output" relocated
+[[ "$(git -C "$perf_source" rev-parse HEAD)" == "$original_head" ]]
 grep -qx '// local edit' "$original_collector"
 if grep -Fq '.run_rustc(false)' "$original_collector"; then
   echo 'profile training modified the original collector' >&2
