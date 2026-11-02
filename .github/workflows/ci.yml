@@ -40,7 +40,7 @@ jobs:
           scripts/rc23-expanded-inputs
           scripts/ruff-matched-stage
         persist-credentials: false
-        fetch-depth: 3
+        fetch-depth: 16
     - name: Install Python for QA readers
       id: qa_python
       uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
@@ -109,6 +109,11 @@ jobs:
         path: packed
         sparse-checkout: scripts/ohm-packed-ruff
         persist-credentials: false
+    - name: Install the native build tools before recording their versions
+      run: |
+        set -euo pipefail
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config libssl-dev zstd
     - name: Admit this reviewed nonrelease worker
       run: |-
         set -euo pipefail
