@@ -226,6 +226,7 @@ def validate_sources(case):
 
 
 def revision(case, roots, to_b):
+    added_dirs = set()
     for row in case["changes"]:
         mode, name = row.split("\t")
         f = SRC / name
@@ -241,6 +242,10 @@ def revision(case, roots, to_b):
                 "incorrect Ruff preimage",
             )
         if not path.exists():
+            parent = Path(name).parent
+            while parent != Path(".") and not (roots[0] / parent).is_dir():
+                added_dirs.add(parent)
+                parent = parent.parent
             need(mode == "A" and not to_b, "unexpected deletion")
             f.unlink(missing_ok=True)
             continue
@@ -248,6 +253,17 @@ def revision(case, roots, to_b):
         shutil.copyfile(path, f)
         if not to_b:
             os.utime(f, ns=(1650000000000000000, 1650000000000000000))
+    for relative in sorted(added_dirs, key=lambda p: len(p.parts), reverse=True):
+        directory = SRC / relative
+        if directory.exists():
+            directory.rmdir()
+    # Cargo expands the physical crates/* wildcard, including untracked empty directories.
+    donor_crates = roots[1 if to_b else 0] / "crates"
+    need(
+        {p.name for p in (SRC / "crates").iterdir() if p.is_dir()}
+        == {p.name for p in donor_crates.iterdir() if p.is_dir()},
+        "restored Cargo workspace membership differs from its registered donor",
+    )
     need(
         (SRC / "Cargo.lock").read_bytes()
         == (roots[1 if to_b else 0] / "Cargo.lock").read_bytes(),
