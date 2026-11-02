@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import time
 D=Path(os.environ["WILD_DIAG_JOB"]);cfg=json.loads((D/"dispatch.json").read_bytes())
 argv=sys.argv
 stock=cfg["stock"];matched=cfg["matched"]
@@ -40,10 +41,10 @@ while pid>1 and len(ancestry)<12:
     pid=int((proc/"stat").read_text().rsplit(")",1)[1].split()[1])
 front,=[x for x in ancestry if Path(x["path"]).name=="rustc" and "--crate-name" in x["args"] and x["args"][x["args"].index("--crate-name")+1]=="constructors"]
 assert any(Path(x["path"]).name=="cargo" for x in ancestry)
-proof={"ancestry":ancestry,"owning_rustc_is_link_only":any(x=="link-only" or x.startswith("-Zlink-only") for x in front["args"]),"args":argv,"mode":mode,"subject":subject,"uid":os.geteuid(),"output":str(out),"output_before":fs(out),
+proof={"dispatch_pid":os.getpid(),"observed_ns":time.monotonic_ns(),"ancestry":ancestry,"owning_rustc_is_link_only":any(x=="link-only" or x.startswith("-Zlink-only") for x in front["args"]),"args":argv,"mode":mode,"subject":subject,"uid":os.geteuid(),"output":str(out),"output_before":fs(out),
        "symbols_file":str(syms[0]),"symbols_bytes":syms[0].stat().st_size,"symbols_sha256":hashlib.sha256(syms[0].read_bytes()).hexdigest(),
        "argv_binding":"unchanged physical arguments as received from GCC"}
-with (phase/"link-selection.json").open("x") as f:json.dump(proof,f)
+with (phase/("link-selection."+str(os.getpid())+".json")).open("x") as f:json.dump(proof,f)
 if "-count" not in mode:
     os.execve(subject,[argv[0],*argv[1:]],env)
 sel=cfg["counter"]

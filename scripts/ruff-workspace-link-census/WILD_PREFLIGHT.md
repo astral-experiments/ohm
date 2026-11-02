@@ -13,3 +13,5 @@ For the final race, prepare the same writable shared mapping of the true earlier
 ```sh
 gh workflow run ci.yml -R astral-experiments/ohm --ref charlie/qa-ruff-workspace-link-census-20261102 -f mode=constructors-wild-preflight -f reviewed_head="$(git rev-parse HEAD)"
 ```
+
+The first acquisition's hardware counter, archive and source-built candidate passed. The genuinely empty #330 target requested two full constructors compiles and two stock link invocations naming the same output. A diagnostic file opened exclusively once per Cargo phase interrupted the second link. No training or primary command ran. The replacement registration records each observed process before its exec and joins those PIDs back to the kernel. An ordinary measured command must still contain one genuine link-only constructors caller and one actual Wild, while independently empty controls retain every full compiler and link. Both campaigns start from independent empty state. [Unscored original](https://github.com/astral-experiments/ohm/actions/runs/41400245165)

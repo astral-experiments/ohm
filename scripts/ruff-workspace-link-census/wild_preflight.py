@@ -130,7 +130,12 @@ def worker(src,work,label,mode):
         exe=Path(a["executable"]);native=subprocess.run([exe,"--exact","main","--nocapture"],cwd=src,env=env,capture_output=True,check=True);(phase/"native.stdout").write_bytes(native.stdout)
         res={"exit":0,"typed":len(arts),"dirty":["constructors"],"elf":census.sha(exe),"native":native.stdout.decode(),"features":a["features"],"instructions":measured(phase)}
         if load(D/"dispatch.json")["counter"]=="callgrind":assert len(list(phase.glob("callgrind.*")))==1
-    selected=load(phase/"link-selection.json") if (phase/"link-selection.json").exists() else None
+    actual=sorted((load(p) for p in phase.glob("link-selection.[0-9]*.json")),key=lambda x:x["observed_ns"])
+    if len(actual)>1:
+        assert mode=="stock" and (label=="cold" or "empty" in label)
+        assert len({x["output"] for x in actual})==1 and all(not x["owning_rustc_is_link_only"] for x in actual)
+    selected=actual[-1] if actual else None
+    if selected is not None:put(phase/"link-selection.json",selected)
     ev=(phase/"events").read_text().splitlines() if (phase/"events").exists() else []
     kinds=CounterEvents(ev)
     if res["exit"]==0:
@@ -140,7 +145,7 @@ def worker(src,work,label,mode):
         if not escrow.exists():shutil.copyfile(exe,escrow)
         assert census.sha(escrow)==key
     if "-count" in mode:assert selected["owning_rustc_is_link_only"]
-    res.update(events=kinds,selection=selected is not None);put(phase/"verified.json",res);print(label,mode,res["exit"],res.get("instructions"),res.get("elf"),kinds,flush=True)
+    res.update(events=kinds,selection=selected is not None,actual_link_requests=len(actual));put(phase/"verified.json",res);print(label,mode,res["exit"],res.get("instructions"),res.get("elf"),kinds,flush=True)
 
 
 def CounterEvents(rows):
