@@ -18,7 +18,7 @@ def assert_sources(manifest,source):
  return heads
 def main(role):
  arm=S["arms"][role];event=os.environ
- assert event["GITHUB_EVENT_NAME"]=="workflow_dispatch" and event["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and event["GITHUB_REF"]=="refs/heads/charlie/codex-ctfe22-gnu-20988"
+ assert event["GITHUB_EVENT_NAME"]=="workflow_dispatch" and event["GITHUB_REPOSITORY"]=="astral-experiments/ohm" and event["GITHUB_REF"]=="refs/heads/charlie/codex-ctfe22-stock-space-pilot" and role=="stock_ctfe318"
  assert git(W,"rev-parse","HEAD")==event["REVIEWED_HEAD"]==event["GITHUB_SHA"] and git(REF,"rev-parse","HEAD")==S["released_coordinator"]
  for path,oid in {"scripts/integrated-dist-qa":"2c2e6387acb6d2ac12ba7b35d337f02243447faa","scripts/dep-graph-slots":"40a553983d5d79b49f042af27b5816999860caf4","scripts/verify-release-sources.sh":"6d2652796e16b3152e181eedb772d725a42975dd","toolchains/manifest.schema.json":"47956809e9a9942075dae8456c757f5516f41950","toolchains/1.99.0/22.json":"e3e1e9b6bdd08cba01773237ae14a341670b2598"}.items():assert git(W,"rev-parse","HEAD:"+path)==oid
  manifest=REF/"toolchains/1.99.0/22.json";assert sha(manifest)==S["signed_manifest_sha256"]
@@ -50,5 +50,5 @@ def main(role):
   d=Path(tmp);(d/"1.99.0").mkdir();(d/"manifest.schema.json").write_bytes((REF/"toolchains/manifest.schema.json").read_bytes());m=d/"1.99.0/22.json";write(m,original)
   assert heads==assert_sources(m,arm["commit"])
  recipes={p:sha(REF/p) for p in ("release/bootstrap.toml","scripts/build-optimized-dist.sh","scripts/prepare-wild.py")}
- write(QA/"source.json",{"role":role,"source":arm,"signed_manifest_sha256":sha(manifest),"released_coordinator":S["released_coordinator"],"recipe":recipes,"training_objects":training,"component_git":heads,"source_pack_sha256":sha(packet),"evidence_repository":event["GITHUB_REPOSITORY"],"reviewed_head":event["GITHUB_SHA"],"workflow_ref":event["GITHUB_WORKFLOW_REF"],"run_id":int(event["GITHUB_RUN_ID"]),"run_attempt":int(event["GITHUB_RUN_ATTEMPT"]),"classification":"private unsigned production-recipe qualification"})
+ write(QA/"source.json",{"role":role,"source":arm,"signed_manifest_sha256":sha(manifest),"released_coordinator":S["released_coordinator"],"recipe":recipes,"training_objects":training,"component_git":heads,"source_pack_sha256":sha(packet),"evidence_repository":event["GITHUB_REPOSITORY"],"reviewed_head":event["GITHUB_SHA"],"workflow_ref":event["GITHUB_WORKFLOW_REF"],"run_id":int(event["GITHUB_RUN_ID"]),"run_attempt":int(event["GITHUB_RUN_ATTEMPT"]),"classification":"unscored disposable workspace-capacity pilot"})
 if __name__=="__main__":main(*sys.argv[1:])
