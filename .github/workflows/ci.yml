@@ -24,6 +24,10 @@ run-name: Ruff test link reason ${{ inputs.reviewed_head }}
         type: boolean
         description: Count the original 619-product Ruff workspace and physical link destinations
         default: false
+      ty_edit:
+        type: boolean
+        description: Require the actual historical ty_server change to relink and match an empty build
+        default: false
 permissions: {}
 jobs:
   diagnose:
@@ -55,7 +59,7 @@ jobs:
           path: ruff
           persist-credentials: false
       - name: Install and exercise the process tracer used by the original workspace census
-        if: inputs.whole_workspace
+        if: inputs.whole_workspace || inputs.ty_edit
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends strace
@@ -70,7 +74,7 @@ jobs:
         if: inputs.native_witness && matrix.role != '22'
         run: python3 -IB qa/scripts/ruff-db-link-reason/provider.py ${{ matrix.role }}
       - name: Check out the original unchanged-workspace reader
-        if: inputs.whole_workspace
+        if: inputs.whole_workspace || inputs.ty_edit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: astral-experiments/ohm
@@ -79,6 +83,7 @@ jobs:
           sparse-checkout: |
             scripts/ruff-workspace-link-census
             scripts/ruff-default-owner-pmu
+            scripts/ruff-workspace-remat
           persist-credentials: false
       - name: Check out the original 50-link Ruff source
         if: inputs.whole_workspace
@@ -91,6 +96,18 @@ jobs:
       - name: Count actual warm compilers and links on the same 619-product workspace
         if: inputs.whole_workspace
         run: python3 -IB qa/scripts/ruff-db-link-reason/workspace.py ${{ matrix.role }}
+      - name: Check out both sides of the historical ty_server source change
+        if: inputs.ty_edit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: f9115b8deefa56b18b79449f8acafe25475c54d3
+          fetch-depth: 2
+          path: ruff-e2e
+          persist-credentials: false
+      - name: Require a real ty_server relink and clean native verdict
+        if: inputs.ty_edit
+        run: python3 -IB qa/scripts/ruff-db-link-reason/ty_edit.py ${{ matrix.role }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
