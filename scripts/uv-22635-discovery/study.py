@@ -1,5 +1,7 @@
 """Compare authentic ordinary uv checks using disjoint observations of each saved parent."""
 import gzip,hashlib,json,os,re,shutil,subprocess,sys,time,traceback
+from collections import Counter
+from urllib.parse import unquote
 from pathlib import Path
 here=Path(__file__).resolve().parent;sys.path.insert(0,str(here))
 import bridge
@@ -26,10 +28,32 @@ def snapshot(path,workspace):
         if f in side:
             raw=f.read_bytes();G(0<len(raw)<=1024,'invalid public hash')
             if not dest.exists():dest.write_bytes(gzip.compress(raw,mtime=0))
-    M.save(path/'all-products.json',form);return form
+    receipt=path/'all-products.json'
+    if receipt.exists():G(M.read(receipt)==form,'actual products changed since initial capture')
+    else:M.save(receipt,form)
+    return form
+def cargo_stream(raw):
+    counts=Counter();owners=Counter();executed=set();tail=False
+    for line in raw.decode('utf-8').splitlines():
+        G(not tail,'data after native build-finished')
+        if not line.startswith('{'):
+            match=re.fullmatch(r'\[([^\s\]]+) ([^\s\]]+)\](?: .*)?',line)
+            G(match is not None,'untagged stdout in Cargo stream');owners[match.groups()]+=1;continue
+        row=json.loads(line);reason=row['reason']
+        G(reason in ('compiler-artifact','build-script-executed','build-finished'),'unexpected signed Cargo event')
+        counts[reason]+=1
+        if reason=='build-script-executed':
+            base,frag=row['package_id'].rsplit('#',1)
+            executed.add(tuple(frag.rsplit('@',1))if '@'in frag else(unquote(base.rsplit('/',1)[1]),frag))
+        if reason=='build-finished':
+            G(row=={'reason':'build-finished','success':True},'failed or malformed final event');tail=True
+    G(tail and counts=={'compiler-artifact':649,'build-script-executed':54,'build-finished':1} and set(owners)<=executed,'incomplete or foreign signed Cargo stream')
+    return {'counts':dict(counts),'script_stdout':sorted([*k,v]for k,v in owners.items())}
 def typed(path,verbose=False):
-    form=O.typed(path,O.TYPED+(['-vv']if verbose else[]),META);events,_=N.events((path/'stdout').read_bytes())
-    G(events[-1]=={'reason':'build-finished','success':True}and form['workspace']==REF['workspace']and form['roster_sha256']==REF['signed_roster'],'signed Cargo target, feature, file or event roster')
+    form=O.typed(path,O.TYPED+(['-vv']if verbose else[]),META)
+    G(form['workspace']==REF['workspace']and form['roster_sha256']==REF['signed_roster'],'signed Cargo target, feature or file roster')
+    # Save the real outputs before applying additional diagnostic interpretation.
+    snapshot(path,form['workspace']);M.save(path/'events.json',cargo_stream((path/'stdout').read_bytes()))
     if verbose:
         args=N.commands((path/'stderr').read_text(),str(M.RUSTC));G(args and len({tuple(a)for a in args})==len(args),'typed compile roster')
         M.save(path/'actual-rustc.json',args)
@@ -64,6 +88,24 @@ def selectors(args):
         out[label]=a;used.add(tuple(a))
     G(len(out)==len(args)==len(used)<=128,'one-to-one scores for all actual compiler processes')
     return out
+def record_link_origins(path,tree):
+    def file(p):
+        st=p.stat();return {'bytes':st.st_size,'sha256':M.filesha(p),'mtime_ns':st.st_mtime_ns,'stat_ctime_ns':st.st_ctime_ns}
+    markers=(b'/dev/null/ohm-recheck-dependent-links:',b'/dev/null/ohm-recheck-dependent-links-v2:')
+    root=O.TARGET/'debug';rows=[];positive={};dest=path/'native-marker-inputs';dest.mkdir();total=0
+    for f in sorted(root.rglob('*.d')):
+        G(f.resolve(strict=True)==f and f.is_relative_to(root)and f.stat().st_size<=16<<20,'unsafe or excessive dependency file')
+        data=f.read_bytes();total+=len(data);G(total<=512<<20 and len(rows)<8000,'bounded dep-info diagnostic')
+        found=[m.decode()for m in markers if any(line.strip()==m for line in data.splitlines())]
+        # Exact Makefile phony definitions distinguish these markers from incidental string/file matches.
+        key=str(f.relative_to(O.TARGET));h=M.digest(data);rows.append([key,len(data),h,found])
+        if found:
+            positive[key]=found;blob=dest/(h+'.gz')
+            if not blob.exists():blob.write_bytes(gzip.compress(data,compresslevel=2,mtime=0))
+    fp=O.SRC/'crates/uv-python-managed';generated=sorted((root/'build/uv-python-managed').glob('*/out/download-metadata.json.zst'))
+    exes={Path(e['exe'])for e in tree['images']if '/build/uv-python-managed/'in e['exe']and Path(e['exe']).is_relative_to(O.TARGET)}
+    objects={str(f):file(f)for f in [fp/'build.rs',fp/'download-metadata.json',*generated,*sorted(exes)]if f.is_file()}
+    M.save(path/'link-origins.json',{'diagnostic_only':True,'raw_dep_info':rows,'native_marker_inputs':positive,'script_source_executables_and_generated':objects,'all_kernel_target_images':sorted(map(str,exes))})
 def same_kernel(path,expected,with_logs,role,measured=False):
     env=O.ENV|({'CARGO_LOG':'cargo::core::compiler::fingerprint=trace'}if with_logs else{})
     if measured:
@@ -81,7 +123,11 @@ def same_kernel(path,expected,with_logs,role,measured=False):
             G(im['file']==ident and a[0]==im['exe']==str(M.RUSTC)and tree['exits'].get(im['pid'])==0,'rustc identity/exit')
             seen.append((im['pid'],a))
     G(sorted(a for _,a in seen)==sorted(expected),'all real rustc arg vectors across Cargo and kernel')
-    if with_logs:G(b'cargo::core::compiler::fingerprint'in(path/'stderr').read_bytes(),'missing requested Cargo fingerprint trace')
+    if with_logs:
+        G(b'cargo::core::compiler::fingerprint'in(path/'stderr').read_bytes(),'missing requested Cargo fingerprint trace')
+        # The native outputs and kernel visit have already completed. Diagnostics never alter Cargo's environment or files.
+        try:record_link_origins(path,tree)
+        except (OSError,ValueError)as err:M.save(path/'link-origin-unavailable.json',{'diagnostic_only':True,'failure':str(err)})
     if measured:
         by=dict(seen)
         for k,v in report['targets'].items():
