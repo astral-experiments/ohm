@@ -32,28 +32,37 @@ def child_exec(path):
     os.chdir(doc['cwd']);os.execve(doc['argv'][0],doc['argv'],env)
 
 
-def roles(epochs):
-    data={}; costs={}; cfg=[x.split()for x in (epochs/'epochs.tsv').read_text().splitlines()]
+class Images(dict):
+    def __init__(self):
+        super().__init__();self.executed=set()
+
+
+def roles(epochs, *, roster_only=False):
+    data=Images(); costs={}; bad=[]; cfg=[x.split()for x in (epochs/'epochs.tsv').read_text().splitlines()]
     for row in cfg:
         if row[0]=='I':
             i=int(row[1]);e=(epochs/f'{i:05}.nul').read_bytes().split(b'\0');need(e[-1]==b'','complete process args');data[i]=(int(e[0]),os.fsdecode(e[3]),[os.fsdecode(k)for k in e[4:-1]])
+            if row[5]=='exec':data.executed.add(i)
         elif row[0]=='C':
-            need(len(row)==7 and row[5]==row[6] and (int(row[5]) or not int(row[4])), 'event counter was multiplexed');i=int(row[1]);costs[i]=costs.get(i,0)+int(row[4])
-    return data,costs
+            need(len(row)==7,'wrong counter layout');i=int(row[1]);value,enabled,running=map(int,row[4:]);need(i in data,'unknown image interval');costs[i]=costs.get(i,0)+value
+            if enabled!=running or (value and not enabled):bad.append([int(v)for v in row[1:]])
+    if roster_only:
+        save(epochs/'roster-only.json',dict(priced=False,invalid_intervals=bad));return data,{}
+    need(not bad,'hardware intervals had incomplete scheduling');return data,costs
 
 
 def rustc_call(data,owner):
-    terms=[(key,pid,argv)for key,(pid,exe,argv)in data.items() if exe==str(SDK/'bin/rustc') and '--crate-name'in argv and argv[argv.index('--crate-name')+1]==owner]
+    terms=[(key,pid,argv)for key,(pid,exe,argv)in data.items() if key in data.executed and exe==str(SDK/'bin/rustc') and '--crate-name'in argv and argv[argv.index('--crate-name')+1]==owner]
     item,=terms;return item
 
 
 def cold_record():
     source=(w.KITS/'exec_count.c').read_text();hook=(HERE/'macro_capture.c.inc').read_text();marker='static void record_image(struct task *task, const char *trigger) {';after='require(n==0 && total && close(fd)==0 && fclose(f)==0,"argv completed");';need(source.count(marker)==source.count(after)==1,'observer source');source=source.replace(marker,hook+'\n'+marker).replace(after,after+'\n    capture_compiler(task->tid, executable, id, trigger);');PRIVATE.mkdir(mode=0o700);c=PRIVATE/'recorder.c';c.write_text(source);exe=PRIVATE/'recorder';subprocess.run(['/usr/bin/cc','-Wall','-Wextra','-Werror','-O2','-DOHM_SIGNED_RUSTC='+json.dumps(str(SDK/'bin/rustc')),'-DOHM_PRIVATE_ROOT='+json.dumps(str(PRIVATE)),c,'-o',exe],check=True)
-    epochs=OUT/'prepare-epochs';epochs.mkdir();out=OUT/'prepare-old';w.run([exe,epochs,*w.CMD],w.environment(),out,timeout=2100);inv,meta,dirs=w.cargo_result(out);normal=w.native(out,w.OLD,meta,dirs,w.environment());rs,cs=roles(epochs);rec={}
+    epochs=OUT/'prepare-epochs';epochs.mkdir();out=OUT/'prepare-old';w.run([exe,epochs,*w.CMD],w.environment(),out,timeout=2100);inv,meta,dirs=w.cargo_result(out);normal=w.native(out,w.OLD,meta,dirs,w.environment());rs,cs=roles(epochs,roster_only=True);rec={}
     for owner in ('ruff_macros','ruff_linter'):
         key,pid,argv=rustc_call(rs,owner);f=PRIVATE/owner;need(int((f/'record').read_text())==key,'selected physical image wrong');raw=(f/'environment').read_bytes().split(b'\0');need(raw.pop()==b''and len(raw)<180,'private environment');env=dict(os.fsdecode(a).split('=',1)for a in raw);need(len(env)==len(raw) and not any(k in env for k in ('GH_TOKEN','GITHUB_TOKEN','RUSTC_WRAPPER','RUSTC_WORKSPACE_WRAPPER','RUSTFLAGS','LD_PRELOAD')),'unexpected compiler environment');cwd=(f/'cwd').read_text();need(Path(cwd).is_dir() and Path(cwd).is_relative_to(SRC),'compiler working directory');need(argv[0].endswith('rustc'),'compiler argv0');argv[0]=str(SDK/'bin/rustc');rec[owner]=dict(argv=argv,env=env,cwd=cwd);save(OUT/(owner+'-original.json'),dict(argv=argv,cwd=cwd,image=key,pid=pid,environment_keys=sorted(env),environment_hash=hashlib.sha256((f/'environment').read_bytes()).hexdigest(),retired_user=cs.get(key)))
     for name in ('syn','quote','proc_macro2'):
-        rows=[dict(id=i,argv=a) for i,(_,e,a)in rs.items() if e==str(SDK/'bin/rustc') and '--crate-name'in a and a[a.index('--crate-name')+1]==name];need(rows,'missing cold dependency rustc');save(OUT/(name+'-original.json'),rows)
+        rows=[dict(id=i,argv=a) for i,(_,e,a)in rs.items() if i in rs.executed and e==str(SDK/'bin/rustc') and '--crate-name'in a and a[a.index('--crate-name')+1]==name];need(rows,'missing cold dependency rustc');save(OUT/(name+'-original.json'),rows)
     macro,=[r for r in inv if r[1]=='ruff_macros'and r[2]==['proc-macro']];profile=json.loads(macro[4]);need(profile['opt_level']=='0'and profile['debug_assertions']and profile['overflow_checks']and profile['debuginfo']==0,'native crate profile not O0 with both checks');extern,=[a for a in rec['ruff_linter']['argv']if a.startswith('ruff_macros=')];file=Path(extern.split('=',1)[1]);need(file.is_absolute()and file.resolve().is_relative_to(STATE)and file.name==macro[5][0] and file.is_file() and not file.is_symlink(),'actual declared macro object');return rec,file,normal
 
 
