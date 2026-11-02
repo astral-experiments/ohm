@@ -19,6 +19,7 @@ STOP = 48 * GIB
 FLOOR = 32 * GIB
 INTERVAL = 0.25
 MAX_GAP = 2.0
+CHILD_GRACE_NS = 5_000_000_000
 BRANCH = "refs/heads/charlie/codex-ctfe22-stock-space-pilot"
 STAGES = ("materialize", "prerequisites", "bolt-tools", "wild", "production", "native-qa")
 SENTINEL = ".ctfe22-physical-emergency-reserve"
@@ -35,16 +36,28 @@ def sha(path):
         return hashlib.file_digest(f, "sha256").hexdigest()
 
 
-def filesystem(path):
+def fd_filesystem(fd):
     with open("/proc/self/mountinfo") as f:
         ids = {int(l.split()[0]): l.split(" - ", 1)[1].split()[0] for l in f}
+    info = Path(f"/proc/self/fdinfo/{fd}").read_text()
+    mid = int(re.search(r"(?m)^mnt_id:\s*(\d+)$", info)[1])
+    fs = os.fstatvfs(fd)
+    return {"device": os.fstat(fd).st_dev, "mount_id": mid, "kind": ids[mid],
+            "statvfs_fsid": fs.f_fsid, "bytes_total": fs.f_blocks*fs.f_frsize, "fs_block": fs.f_frsize}
+
+
+def same_mount(a, b):
+    # Overlay mounts may report different st_dev for a directory and a regular
+    # file. Retain both object st_dev values and identify the live VFS mount by FD.
+    return all(a[k] == b[k] for k in ("mount_id","kind","statvfs_fsid","bytes_total","fs_block"))
+
+
+def filesystem(path):
     fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
     try:
-        info = Path(f"/proc/self/fdinfo/{fd}").read_text()
-        mid = int(re.search(r"(?m)^mnt_id:\s*(\d+)$", info)[1])
-        fs = os.fstatvfs(fd)
-        return {"device": os.fstat(fd).st_dev, "mount_id": mid, "kind": ids[mid],
-                "bytes_total": fs.f_blocks*fs.f_frsize, "fs_block": fs.f_frsize}
+        result = fd_filesystem(fd)
+        assert result["device"] == path.stat().st_dev
+        return result
     finally:
         os.close(fd)
 
@@ -61,6 +74,10 @@ def allocate(path, size):
             os.posix_fallocate(f.fileno(), 0, size)
             os.fsync(f.fileno())
             st = os.fstat(f.fileno())
+            reserve_fs = fd_filesystem(f.fileno())
+            parent_fs = filesystem(path.parent)
+            name_stat = path.stat(follow_symlinks=False)
+            assert (name_stat.st_dev,name_stat.st_ino)==(reserve_fs["device"],st.st_ino)
             after = space(path.parent)
             assert st.st_size == size and st.st_blocks*512 >= size
             assert before-after >= size-min(size//16, 8<<20), (size,before,after)
@@ -68,7 +85,21 @@ def allocate(path, size):
             path.unlink()
             raise
     return {"inode":st.st_ino,"device":st.st_dev,"bytes":size,"allocated_bytes":st.st_blocks*512,
-            "available_before":before,"available_after":after}
+            "available_before":before,"available_after":after,"file_filesystem":reserve_fs,"parent_filesystem":parent_fs}
+
+
+def verify_held(path, held, workspace_fs):
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        st = os.fstat(fd)
+        fs = fd_filesystem(fd)
+        current = path.stat(follow_symlinks=False)
+        assert stat.S_ISREG(st.st_mode) and st.st_nlink == 1
+        assert (current.st_dev,current.st_ino)==(st.st_dev,st.st_ino)==(held["device"],held["inode"])
+        assert st.st_size==held["bytes"] and st.st_blocks*512>=held["bytes"]
+        assert fs==held["file_filesystem"] and workspace_fs==held["parent_filesystem"] and same_mount(workspace_fs,fs)
+    finally:
+        os.close(fd)
 
 
 def release(path, held):
@@ -89,7 +120,8 @@ def context():
     assert e["GITHUB_SHA"] == e["REVIEWED_HEAD"] and re.fullmatch("[0-9a-f]{40}",e["GITHUB_SHA"])
     w = Path(e["GITHUB_WORKSPACE"]).resolve()
     head=subprocess.check_output(["git","-C",w,"rev-parse","HEAD","HEAD^"],text=True).splitlines()
-    assert head==[e["GITHUB_SHA"],"c831ac63c8ce2489c5c77b0cbeefc10e42a8e2a3"]
+    assert head==[e["GITHUB_SHA"],"44d5d173326981139079b2004b2b28a3a1798d9d"]
+    assert e["GITHUB_RUN_ATTEMPT"]=="1"
     return w, w/"capacity-evidence"
 
 
@@ -104,9 +136,13 @@ def initialize(w, evidence):
               "physical_reserve":RESERVE,"raw_free_stop":STOP,"raw_free_floor":FLOOR,
               "runner_temp_fs":filesystem(Path(os.environ["RUNNER_TEMP"]))}
     put(evidence/"intake.json",record)
-    assert record["filesystem"]["device"] == record["runner_temp_fs"]["device"] and initial >= INITIAL
+    assert record["filesystem"]["device"] == record["runner_temp_fs"]["device"] and same_mount(record["filesystem"],record["runner_temp_fs"]) and initial >= INITIAL
     held = allocate(w/SENTINEL, RESERVE)
     put(evidence/"reserve.json",held)
+    try:verify_held(w/SENTINEL,held,record["filesystem"])
+    except BaseException:
+        release(w/SENTINEL,held)
+        raise
 
 
 def remaining_subtree(root):
@@ -128,13 +164,59 @@ def remaining_subtree(root):
     return children
 
 
+def adopted_states():
+    # Log only PID and state of this single-threaded subreaper's current direct children.
+    ids = Path(f"/proc/self/task/{os.getpid()}/children").read_text().split()
+    states = []
+    for item in ids[:32]:
+        try:
+            row = Path(f"/proc/{int(item)}/stat").read_bytes().rsplit(b")", 1)[1].split()
+        except (FileNotFoundError, ProcessLookupError):
+            continue
+        if int(row[1]) == os.getpid():
+            states.append([int(item), row[0].decode("ascii")])
+    return {"direct_count_at_read": len(ids), "first_32": states}
+
+
+def drain_adopted(diagnostic, mon):
+    drain = diagnostic.get("adopted")
+    if drain is None:
+        drain = diagnostic["adopted"] = {"start_ns": mon, "grace_ns": CHILD_GRACE_NS,
+                                         "initial": adopted_states(), "reaped": [], "samples": 0}
+    drain["samples"] += 1
+    drain["last_sample_ns"] = mon
+    # The foreground Popen was already reaped. waitpid now covers only this
+    # subreaper's descendants. Each tick is bounded so the space watchdog keeps running.
+    reason = "reap batch limit"
+    for _ in range(128):
+        try:
+            pid, status = os.waitpid(-1, os.WNOHANG)
+        except ChildProcessError:
+            drain["no_children"] = True
+            return True
+        if pid == 0:
+            reason = "live adopted child"
+            break
+        code = os.waitstatus_to_exitcode(status)
+        drain["reaped"].append([pid, status, code])
+        if code != 0:
+            raise RuntimeError("adopted child exited unsuccessfully")
+    if mon - drain["start_ns"] >= CHILD_GRACE_NS:
+        drain["at_timeout"] = adopted_states()
+        raise RuntimeError("release command child grace expired: " + reason)
+    return False
+
+
 def stop_owned(p):
     # New sessions remain in the child-subreaper's subtree. Avoid unrelated runner processes.
     denied = set()
     for sig in (signal.SIGSTOP, signal.SIGKILL, signal.SIGKILL):
-        try:os.killpg(p.pid,sig)
-        except ProcessLookupError:pass
-        except PermissionError:denied.add(p.pid)
+        # Once the foreground was reaped, its former numerical process group
+        # may be reused. The subreaper's current subtree is sufficient then.
+        if p.poll() is None:
+            try:os.killpg(p.pid,sig)
+            except ProcessLookupError:pass
+            except PermissionError:denied.add(p.pid)
         for pid in remaining_subtree(os.getpid()):
             try:os.kill(pid,sig)
             except ProcessLookupError:pass
@@ -168,8 +250,9 @@ def watch(w, evidence, stage, shellfile):
     assert stage in STAGES
     baseline = json.loads((evidence/"intake.json").read_bytes())["filesystem"]
     held = json.loads((evidence/"reserve.json").read_bytes())
-    assert filesystem(w) == baseline and filesystem(Path.cwd())["device"] == baseline["device"]
-    assert (w/SENTINEL).stat().st_blocks*512 >= held["bytes"]
+    cwd_fs = filesystem(Path.cwd())
+    assert filesystem(w) == baseline and cwd_fs["device"] == baseline["device"] and same_mount(cwd_fs,baseline)
+    verify_held(w/SENTINEL,held,baseline)
     assert ctypes.CDLL(None).prctl(36,1,0,0,0) == 0  # PR_SET_CHILD_SUBREAPER, Linux
     diagnostic = {"stage":stage,"raw_samples":0,"min_available":None,"max_gap_s":0.0,"cause":None}
     proc = None
@@ -194,8 +277,7 @@ def watch(w, evidence, stage, shellfile):
                 elif proc.poll() is not None:
                     diagnostic["exit"]=proc.returncode
                     if proc.returncode:raise RuntimeError("release command failed")
-                    if remaining_subtree(os.getpid()):raise RuntimeError("release command left an unattached process")
-                    break
+                    if drain_adopted(diagnostic,mon):break
                 last_mon,last_free=mon,free
                 time.sleep(INTERVAL)
         except BaseException as e:
@@ -288,6 +370,8 @@ def score(w,evidence):
         test=role["installed_original_runmake"]
         assert test["exit"]==0 and test["log_sha256"]==proofs["optimized-run-make.log"]["sha256"] and test["driver_sha256"]==role["driver"]["sha256"]
         assert all(v["min_available"]>STOP and v["max_gap_s"]<=MAX_GAP for v in steps.values())
+        assert all(v["adopted"]["no_children"] is True and v["adopted"]["grace_ns"]==CHILD_GRACE_NS
+                   and all(code==status==0 for _,status,code in v["adopted"]["reaped"]) for v in steps.values())
     for stage,r in steps.items():
         assert r["raw_samples"]==samples[stage]["count"] and r["min_available"]==by_stage[stage]
         if complete:
