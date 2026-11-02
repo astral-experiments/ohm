@@ -1,0 +1,228 @@
+--- a/llvm/include/llvm/CodeGen/LiveIntervals.h
++++ b/llvm/include/llvm/CodeGen/LiveIntervals.h
+@@ -194,6 +194,16 @@
+   LLVM_ABI bool shrinkToUses(LiveInterval *li,
+                              SmallVectorImpl<MachineInstr *> *dead = nullptr);
+ 
++  /// Walk the values in \p LI and check for dead values:
++  /// - Dead PHIDef values are marked as unused.
++  /// - Dead operands are marked as such.
++  /// - Completely dead machine instructions are added to the \p dead vector
++  ///   if it is not nullptr.
++  /// Returns true if any PHI value numbers have been removed which may
++  /// have separated the interval into multiple connected components.
++  bool computeDeadValues(LiveInterval &LI,
++                         SmallVectorImpl<MachineInstr *> *dead);
++
+   /// Specialized version of
+   /// shrinkToUses(LiveInterval *li, SmallVectorImpl<MachineInstr*> *dead)
+   /// that works on a subregister live range and only looks at uses matching
+@@ -482,16 +492,6 @@
+   /// Compute RegMaskSlots and RegMaskBits.
+   void computeRegMasks();
+ 
+-  /// Walk the values in \p LI and check for dead values:
+-  /// - Dead PHIDef values are marked as unused.
+-  /// - Dead operands are marked as such.
+-  /// - Completely dead machine instructions are added to the \p dead vector
+-  ///   if it is not nullptr.
+-  /// Returns true if any PHI value numbers have been removed which may
+-  /// have separated the interval into multiple connected components.
+-  bool computeDeadValues(LiveInterval &LI,
+-                         SmallVectorImpl<MachineInstr *> *dead);
+-
+   LLVM_ABI static LiveInterval *createInterval(Register Reg);
+ 
+   void printInstrs(raw_ostream &O) const;
+--- a/llvm/lib/CodeGen/RegisterCoalescer.cpp
++++ b/llvm/lib/CodeGen/RegisterCoalescer.cpp
+@@ -238,7 +238,8 @@
+   /// coalesce this interval, but it may be possible if other things get
+   /// coalesced, then it returns true by reference in 'Again'.
+   bool joinCopy(MachineInstr *CopyMI, bool &Again,
+-                SmallPtrSetImpl<MachineInstr *> &CurrentErasedInstrs);
++                SmallPtrSetImpl<MachineInstr *> &CurrentErasedInstrs,
++                Register PreviouslyExact, Register &NextExact);
+ 
+   /// Attempt to join these two intervals.  On failure, this
+   /// returns false.  The output "SrcInt" will not have been modified, so we
+@@ -298,7 +299,8 @@
+   /// If the source of a copy is defined by a CheapAsAMove computation,
+   /// replace the copy by rematerialize the definition.
+   bool reMaterializeDef(const CoalescerPair &CP, MachineInstr *CopyMI,
+-                        bool &IsDefCopy);
++                        bool &IsDefCopy, Register PreviouslyExact,
++                        Register &NextExact);
+ 
+   /// Return true if a copy involving a physreg should be joined.
+   bool canJoinPhys(const CoalescerPair &CP);
+@@ -342,15 +344,19 @@
+   /// Wrapper method for \see LiveIntervals::shrinkToUses.
+   /// This method does the proper fixing of the live-ranges when the afore
+   /// mentioned method returns true.
+-  void shrinkToUses(LiveInterval *LI,
+-                    SmallVectorImpl<MachineInstr *> *Dead = nullptr) {
++  bool shrinkToUses(LiveInterval *LI,
++                    SmallVectorImpl<MachineInstr *> *Dead = nullptr,
++                    bool SegmentsUnchanged = false) {
+     NumShrinkToUses++;
+-    if (LIS->shrinkToUses(LI, Dead)) {
++    bool CanSeparate = SegmentsUnchanged ? LIS->computeDeadValues(*LI, Dead)
++                                        : LIS->shrinkToUses(LI, Dead);
++    if (CanSeparate) {
+       /// Check whether or not \p LI is composed by multiple connected
+       /// components and if that is the case, fix that.
+       SmallVector<LiveInterval *, 8> SplitLIs;
+       LIS->splitSeparateComponents(*LI, SplitLIs);
+     }
++    return CanSeparate;
+   }
+ 
+   /// Wrapper Method to do all the necessary work when an Instruction is
+@@ -1288,9 +1294,65 @@
+   return true;
+ }
+ 
++static bool isFullVirtualCopy(const MachineInstr &MI, Register Src,
++                              Register Dst) {
++  if (!MI.isCopy() || MI.getNumOperands() != 2 || MI.isBundled() ||
++      !Src.isVirtual() || !Dst.isVirtual() || Src == Dst)
++    return false;
++  const MachineOperand &Def = MI.getOperand(0), &Use = MI.getOperand(1);
++  return Def.isReg() && Def.isDef() && Def.getReg() == Dst &&
++         !Def.getSubReg() && !Def.isImplicit() && !Def.isEarlyClobber() &&
++         !Def.isTied() && Use.isReg() && Use.isUse() && Use.readsReg() &&
++         Use.getReg() == Src && !Use.getSubReg() && !Use.isImplicit() &&
++         !Use.isTied() && !Use.isUndef();
++}
++
++// An ordinary read in the immediately following instruction keeps the same
++// value live across the removed COPY. Other uses, including PHI and subrange
++// uses, keep the complete shrink.
++static bool hasAdjacentRead(const MachineInstr &Replacement,
++                            const MachineBasicBlock &MBB, SlotIndex Cut,
++                            const VNInfo &Value, const LiveInterval &LI,
++                            LiveIntervals &LIS) {
++  Register Reg = LI.reg();
++  const MachineInstr *Next = Replacement.getNextNode();
++  if (!Next || LI.hasSubRanges() || Replacement.getParent() != &MBB ||
++      Replacement.isBundled() || Replacement.isBundle() ||
++      Replacement.isDebugInstr() || Replacement.isPHI() ||
++      Replacement.isTerminator() || Replacement.isCall() ||
++      Replacement.isInlineAsm() || Replacement.hasUnmodeledSideEffects() ||
++      LIS.getInstructionFromIndex(Cut) != &Replacement ||
++      Next->getParent() != &MBB || Next->isDebugInstr() || Next->isBundled() ||
++      Next->isPHI() || Next->isBundle() || !LIS.getSlotIndexes()->hasIndex(*Next) ||
++      llvm::any_of(Replacement.operands(), [&](const MachineOperand &MO) {
++        return MO.isReg() && MO.getReg() == Reg;
++      }))
++    return false;
++
++  SlotIndex At = LIS.getInstructionIndex(*Next).getRegSlot();
++  auto Segment = LI.FindSegmentContaining(Cut.getPrevSlot());
++  if (At <= Cut || LIS.getInstructionFromIndex(At) != Next ||
++      Segment == LI.end() || Segment->valno != &Value ||
++      !Segment->contains(At.getPrevSlot()))
++    return false;
++
++  bool ReadsValue = false;
++  for (const MachineOperand &MO : Next->operands()) {
++    if (!MO.isReg() || MO.getReg() != Reg)
++      continue;
++    if (MO.isDef() || MO.isImplicit() || MO.isTied() || MO.getSubReg() ||
++        MO.isUndef())
++      return false;
++    ReadsValue |= MO.isUse() && MO.readsReg();
++  }
++  return ReadsValue;
++}
++
+ bool RegisterCoalescer::reMaterializeDef(const CoalescerPair &CP,
+                                          MachineInstr *CopyMI,
+-                                         bool &IsDefCopy) {
++                                         bool &IsDefCopy,
++                                         Register PreviouslyExact,
++                                         Register &NextExact) {
+   IsDefCopy = false;
+   Register SrcReg = CP.isFlipped() ? CP.getDstReg() : CP.getSrcReg();
+   unsigned SrcIdx = CP.isFlipped() ? CP.getDstIdx() : CP.getSrcIdx();
+@@ -1385,6 +1447,10 @@
+   if (!VirtRegAuxInfo::allUsesAvailableAt(DefMI, CopyIdx, *LIS, *MRI, *TII))
+     return false;
+ 
++  bool PlainCopy = PreviouslyExact == SrcReg && !CP.isPartial() &&
++                   isFullVirtualCopy(*CopyMI, SrcReg, DstReg);
++  const MachineInstr *Prev = CopyMI->getPrevNode();
++  const MachineInstr *Next = CopyMI->getNextNode();
+   DebugLoc DL = CopyMI->getDebugLoc();
+   MachineBasicBlock *MBB = CopyMI->getParent();
+   MachineBasicBlock::iterator MII =
+@@ -1722,10 +1788,15 @@
+       NumCopyUses++;
+   }
+   if (NumCopyUses < LateRematUpdateThreshold) {
+-    // The source interval can become smaller because we removed a use.
+-    shrinkToUses(&SrcInt, &DeadDefs);
++    bool SegmentsUnchanged =
++        PlainCopy && NewMI.getPrevNode() == Prev && NewMI.getNextNode() == Next &&
++        hasAdjacentRead(NewMI, *MBB, CopyIdx.getRegSlot(), *ValNo, SrcInt,
++                        *LIS);
++    bool Split = shrinkToUses(&SrcInt, &DeadDefs, SegmentsUnchanged);
+     if (!DeadDefs.empty())
+       eliminateDeadDefs(&Edit);
++    else if (!Split)
++      NextExact = SrcReg;
+   } else {
+     ToBeUpdated.insert(SrcReg);
+   }
+@@ -2046,7 +2117,8 @@
+ 
+ bool RegisterCoalescer::joinCopy(
+     MachineInstr *CopyMI, bool &Again,
+-    SmallPtrSetImpl<MachineInstr *> &CurrentErasedInstrs) {
++    SmallPtrSetImpl<MachineInstr *> &CurrentErasedInstrs,
++    Register PreviouslyExact, Register &NextExact) {
+   Again = false;
+   LLVM_DEBUG(dbgs() << LIS->getInstructionIndex(*CopyMI) << '\t' << *CopyMI);
+ 
+@@ -2155,7 +2227,7 @@
+       // Before giving up coalescing, try rematerializing the source of
+       // the copy instead if it is cheap.
+       bool IsDefCopy = false;
+-      if (reMaterializeDef(CP, CopyMI, IsDefCopy))
++      if (reMaterializeDef(CP, CopyMI, IsDefCopy, PreviouslyExact, NextExact))
+         return true;
+       if (IsDefCopy)
+         Again = true; // May be possible to coalesce later.
+@@ -2193,7 +2265,7 @@
+ 
+     // Try rematerializing the definition of the source if it is cheap.
+     bool IsDefCopy = false;
+-    if (reMaterializeDef(CP, CopyMI, IsDefCopy))
++    if (reMaterializeDef(CP, CopyMI, IsDefCopy, PreviouslyExact, NextExact))
+       return true;
+ 
+     // If we can eliminate the copy without merging the live segments, do so
+@@ -4081,8 +4153,12 @@
+ bool RegisterCoalescer::copyCoalesceWorkList(
+     MutableArrayRef<MachineInstr *> CurrList) {
+   bool Progress = false;
++  Register NextExact;
+   SmallPtrSet<MachineInstr *, 4> CurrentErasedInstrs;
+   for (MachineInstr *&MI : CurrList) {
++    // Only a completed, unsplit shrink in the adjacent iteration establishes
++    // that this source interval was minimal before the next COPY was removed.
++    Register PreviouslyExact = std::exchange(NextExact, Register());
+     if (!MI)
+       continue;
+     // Skip instruction pointers that have already been erased, for example by
+@@ -4092,7 +4168,8 @@
+       continue;
+     }
+     bool Again = false;
+-    bool Success = joinCopy(MI, Again, CurrentErasedInstrs);
++    bool Success =
++        joinCopy(MI, Again, CurrentErasedInstrs, PreviouslyExact, NextExact);
+     Progress |= Success;
+     if (Success || !Again)
+       MI = nullptr;

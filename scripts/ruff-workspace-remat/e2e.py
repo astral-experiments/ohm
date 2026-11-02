@@ -10,6 +10,7 @@ import shlex
 import shutil
 import subprocess
 import tomllib
+import source_pass
 
 
 SCHEMA = "ohm-ruff-27836-test-no-run-v1"
@@ -25,7 +26,7 @@ ADDED = "workspace_folders::single_file_workspace"
 SIBLING = "workspace_folders::initialize_multiple_workspace_folders"
 WARNING = "0:0..0:7[WARNING]: Name `missing` used when not defined"
 INVALID = b"\nconst OHM_E2E_STUDY_INVALID: () = 1u32;\n"
-FLAGS = {"normal": [], "defer": ["-Cllvm-args=-late-remat-update-threshold=1"]}
+FLAGS = source_pass.ARMS
 CARGO = ["cargo", "+ohm", "test", "-p", "ty_server", "--test", "e2e", "--no-run",
          "--locked", "--offline", "-j4", "--message-format=json"]
 EDIT = ("old", "new", "unchanged", "invalid", "repair")
@@ -227,46 +228,12 @@ def executed(stdout, stderr, name, negative):
 
 
 def compiler_arm(r, w, manifest, arm, env):
-    if manifest is None:
-        return env, FLAGS[arm], None, {"mode": "signed-profile-control", "rustc": str(w.SDK/"bin/rustc")}
-    need(manifest["schema"] == "ohm-matched-rustcs-v1" and set(manifest["arms"]) == set(FLAGS),
-         "unrecognized matched compiler manifest")
-    spec = manifest["arms"][arm]
-    root = Path(spec["root"]).resolve(strict=True)
-    files = spec["files"]
-    need("bin/rustc" in files and any("librustc_driver" in k for k in files)
-         and any(Path(k).name.startswith("libLLVM") for k in files), "missing compiler/driver/LLVM attestation")
-    for rel, value in files.items():
-        f = root/rel
-        need(not Path(rel).is_absolute() and ".." not in Path(rel).parts and f.resolve().is_relative_to(root)
-             and re.fullmatch("[0-9a-f]{64}", value) and r.sha(f) == value, ("unverified compiler input", rel))
-    cc = root/"bin/rustc"
-    selected = {**env, "RUSTC": str(cc)}
-    selected["LD_LIBRARY_PATH"] = os.pathsep.join(filter(None, (str(root/"lib"), env.get("LD_LIBRARY_PATH", ""))))
-    actual = subprocess.check_output([cc, "--print", "sysroot"], env=selected, text=True).strip()
-    need(Path(actual).samefile(root), ("wrong selected codegen sysroot", actual, root))
-    version = subprocess.check_output([cc, "-vV"], env=selected, text=True)
-    loaded = subprocess.check_output(["ldd", cc], env=selected, text=True)
-    for family in ("librustc_driver", "libLLVM"):
-        matches = [Path(m[1]) for line in loaded.splitlines()
-                   if family in line and (m := re.search(r"=> (/\S+) \(", line))]
-        need(matches and all(any(p.samefile(root/f) for f in files) for p in matches),
-             ("unanalyzed compiler library", family, loaded))
-    return selected, [], cc, {"mode": "matched-rustc", "root": str(root), "files": files, "version": version,
-                              "loaded_compiler_libraries": loaded}
+    need(Path(manifest["signed_rustc"]).samefile(w.SDK/"bin/rustc"), "unverified signed compiler")
+    return source_pass.select(manifest, arm, env)
 
 
 def compiler_manifest(r, manifest):
-    if manifest is not None and not isinstance(manifest, dict):
-        manifest = r.read(Path(manifest))
-    if manifest is not None:
-        need(manifest["schema"] == "ohm-matched-rustcs-v1" and set(manifest["arms"]) == set(FLAGS),
-             "unrecognized matched compiler manifest")
-        def compiler_files(arm):
-            return sorted(sha for rel, sha in manifest["arms"][arm]["files"].items()
-                          if rel == "bin/rustc" or Path(rel).name.startswith(("librustc_driver", "libLLVM")))
-        need(compiler_files("normal") != compiler_files("defer"), "identical compiler binaries cannot test treatment")
-    return manifest
+    return source_pass.validate(manifest)
 
 
 def run(r, args, w, registry, expected_registry, original_cargo, clock):
@@ -292,8 +259,7 @@ def run(r, args, w, registry, expected_registry, original_cargo, clock):
     r.git(repo, "checkout", "--quiet", "--detach", OLD)
     base_env = {**w.ENV, "CARGO_HOME": str(work/"cargo-home"), "CARGO_TARGET_DIR": str(work/"target"),
            "CARGO_BUILD_BUILD_DIR": str(work/"build")}
-    profile = scratch/"profile.toml"
-    study_mode = "matched-rustc" if manifest is not None else "signed-profile-control"
+    study_mode = "signed-source-pass"
     r.put(out/"identity.json", {"schema": SCHEMA, "source": [OLD, NEW], "lock": LOCK,
           "driver": r.sha(Path(__file__)), "clock": r.sha(clock), "command": CARGO, "study_mode": study_mode,
           "order": order, "boot": Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
@@ -304,9 +270,6 @@ def run(r, args, w, registry, expected_registry, original_cargo, clock):
     for ix, arm in enumerate(order):
         env, flags, compiler, identity = compiler_arm(r, w, manifest, arm, base_env)
         cli = CARGO
-        if manifest is None:
-            profile.write_text("[profile.test.package.ty_server]\nrustflags = " + json.dumps(flags) + "\n")
-            cli = [*CARGO[:2], "-Zprofile-rustflags", "--config", str(profile), *CARGO[2:]]
         r.put(out/(arm+"-compiler.json"), identity)
         for history, phases in (("edit", EDIT), ("clean", CLEAN)):
             case = out/f"{ix}-{arm}-{history}"
@@ -337,9 +300,14 @@ def run(r, args, w, registry, expected_registry, original_cargo, clock):
                     dest = case/phase
                     before = source_state(r, repo, blobs, phase, write=True)
                     verbose = phase == "clean-new"
+                    inspected = phase in ("negative", "restored-new")
+                    env = source_pass.select(manifest, arm, base_env, inspected)[0]
+                    native_before = source_pass.snapshot(env)
                     count = r.run([*cli, "-vv"] if verbose else cli, repo, env, dest, work, out,
                                   exit_code=101 if phase == "invalid" else 0,
                                   clock=clock if history == "edit" else None)
+                    native = source_pass.collect(env, native_before, arm, inspected)
+                    r.put(dest/"native.json", native)
                     need(before == source_state(r, repo, blobs, phase), "Cargo changed test sources")
                     r.put(dest/"source.json", before)
                     raw = (dest/"outer.stdout").read_bytes()
@@ -349,7 +317,7 @@ def run(r, args, w, registry, expected_registry, original_cargo, clock):
                     if verbose:
                         r.put(dest/"actual-owner-argv.json", verbose_owners((dest/"outer.stderr").read_text(), repo, flags, compiler))
                     result = {"schema": SCHEMA, "arm": arm, "phase": phase, "history": history, "cargo": count,
-                              "dirty": dirty, "artifact_keys": keys, "error": "E0308" if phase == "invalid" else None}
+                              "native": native, "dirty": dirty, "artifact_keys": keys, "error": "E0308" if phase == "invalid" else None}
                     if binary:
                         binary_sha = r.sha(binary)
                         r.run([binary, "--list", "--format", "terse", "--color", "never"], repo, env, dest/"list", work, out)
@@ -393,10 +361,10 @@ def run(r, args, w, registry, expected_registry, original_cargo, clock):
     need(w.acquire.verify_sdk(w.SDK) == original_sdk and registry(original_cargo) == expected_registry
          and enroll(r, source, expected_registry) == blobs, "changed original inputs")
     r.put(out/"catalogs.json", catalogs)
+    r.put(out/"source-proof.json", source_pass.qualify(observed, ("ty_server","e2e")))
     r.put(out/"observations.json", observed)
     r.put(out/"accepted.json", {"schema": SCHEMA, "phases": list(EDIT+CLEAN), "rows": len(observed),
                                 "binary_matches_independent_clean": comparison, "study_mode": study_mode,
-                                "dirty_arm_differences": {p: v for p, v in dirt.items() if v["normal"] != v["defer"]},
-                                "unchanged_regression": bool(set(dirt["unchanged"]["defer"])
-                                                              - set(dirt["unchanged"]["normal"])),
+                                "dirty_arm_differences": {p: v for p, v in dirt.items() if len({tuple(v[a]) for a in order}) > 1},
+                                "unchanged_regression": {a: sorted(set(dirt["unchanged"][a]) - set(dirt["unchanged"]["signed"])) for a in order},
                                 "observation_sha256": r.sha(out/"observations.json")})

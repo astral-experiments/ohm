@@ -53,7 +53,7 @@ CMD = [
     "--message-format=json",
 ]
 FLAG = "-Csave-temps=yes"
-BRANCH = "charlie/qa-ruff-workspace-option-edit-20261101"
+BRANCH = "charlie/qa-llvm-remat-source-20261102"
 JOB = "Signed GNU Ruff workspace option edit"
 HISTORIES = {
     "plain": ("old", "new", "unchanged", "invalid", "repair", "revert"),

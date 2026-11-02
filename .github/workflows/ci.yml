@@ -1,5 +1,5 @@
-name: Inspect a Ruff workspace option edit
-run-name: Signed GNU Ruff workspace option edit ${{ inputs.reviewed_head }}
+name: Qualify a source-built LLVM machine pass on Ruff
+run-name: Source register coalescer ${{ inputs.suite }} ${{ inputs.pair_order }} at ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -8,12 +8,12 @@ on:
         required: true
         type: string
       pair_order:
-        description: Order for the independent complete builds on this worker
+        description: Order of the signed, stock-source and strict-source complete histories
         required: true
         type: choice
         options:
-          - normal,defer
-          - defer,normal
+          - signed,stock,strict
+          - strict,stock,signed
       suite:
         description: Ruff dev workflow to replay
         required: true
@@ -27,10 +27,10 @@ permissions:
   contents: read
 jobs:
   diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-workspace-option-edit-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-llvm-remat-source-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     name: Signed GNU Ruff workspace option edit
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 150
+    timeout-minutes: 210
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PAIR_ORDER: ${{ inputs.pair_order }}
@@ -45,6 +45,7 @@ jobs:
             .github/workflows
             scripts/ruff-workspace-option-edit
             scripts/ruff-workspace-remat
+            scripts/ruff-source-pass
             scripts/ruff-cgu-inputs
             scripts/ruff-default-owner-pmu
             scripts/ohm-packed-ruff
@@ -78,6 +79,15 @@ jobs:
           fetch-depth: 2
           path: ruff-e2e
           persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: rust-lang/llvm-project
+          ref: 1b9c0d5ff9bbe7634aead059efe6b11a7eeba145
+          path: llvm
+          persist-credentials: false
+          sparse-checkout: |
+            llvm/include
+            llvm/lib/CodeGen
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
@@ -91,15 +101,31 @@ jobs:
           findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
           test -z "$(git -C enrolled status --porcelain=v1 --untracked-files=all)"
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py sources
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends binutils build-essential git libssl-dev
+          sudo apt-get install -y --no-install-recommends binutils build-essential clang-18 git libssl-dev
+          (cd enrolled/scripts/ruff-source-pass && sha256sum --check --strict SHA256SUMS)
+          python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py sources
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py compile "$base"
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/tests.py "$GITHUB_WORKSPACE/ruff" "$base/workspace-cgu" | tee "$base/logs/controls.txt"
       - name: Enroll the one fresh worker and install the original signed GNU SDK
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py acquire
+      - name: Build the stock and patched register coalescers from the authenticated LLVM source
+        timeout-minutes: 12
+        run: |
+          set -euo pipefail
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          python3 -IB enrolled/scripts/ruff-source-pass/build.py \
+            --llvm-source "$GITHUB_WORKSPACE/llvm" --sdk "$base/home/.rustup/toolchains/ohm" \
+            --output "$RUNNER_TEMP/ohm-source-pass-kit"
+      - name: Verify direct signed, unchanged, native receipt and cross-target controls
+        run: |
+          set -euo pipefail
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          python3 -IB enrolled/scripts/ruff-source-pass/check.py \
+            --work "$RUNNER_TEMP/ohm-source-pass-fixture" --manifest "$RUNNER_TEMP/ohm-source-pass-kit/manifest.json" \
+            --rustup-home "$base/home/.rustup" --proxies "$base/home/.cargo/bin"
       - name: Verify the root archive and typed client on the installed SDK
         run: |
           set -euo pipefail
@@ -118,7 +144,7 @@ jobs:
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/reopen.py "$base/logs" "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract" "$REVIEWED_HEAD" --execute > "$base/accepted.json"
           mv "$base/accepted.json" "$base/logs/accepted.json"
       - name: Compare full Ruff builds and run the linked option readers
-        timeout-minutes: 100
+        timeout-minutes: 160
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
@@ -133,15 +159,19 @@ jobs:
             python3 -IB "$root/driver/replay.py" \
             --qa "$GITHUB_WORKSPACE/enrolled" --source "$GITHUB_WORKSPACE/ruff" \
             --original "$base" --scratch "$root/work" --results "$root/observations" \
+            --source-pass "$RUNNER_TEMP/ohm-source-pass-kit/manifest.json" \
             --order "$PAIR_ORDER" "${args[@]}"
       - name: Preserve hardware clocks, counter settings, compiler argv and runnable results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ruff-deferred-intervals
+          name: ruff-source-register-coalescer
           path: |
             ${{ runner.temp }}/ohm-remat-comparison/observations
             ${{ runner.temp }}/ohm-remat-comparison/guard
+            ${{ runner.temp }}/ohm-source-pass-kit/manifest.json
+            ${{ runner.temp }}/ohm-source-pass-fixture/passed.json
+            ${{ runner.temp }}/ohm-source-pass-kit/provenance.json
             ${{ runner.temp }}/ohm-branch-object-qa/logs/accepted.json
             ${{ runner.temp }}/ohm-branch-object-qa/logs/enrollment.json
             ${{ runner.temp }}/ohm-branch-object-qa/logs/cpus.json

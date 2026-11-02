@@ -3,6 +3,7 @@
 import argparse
 from collections import Counter
 from contextlib import contextmanager
+from itertools import permutations
 import hashlib
 import json
 import os
@@ -18,7 +19,7 @@ QA = "f3f5ca9e62b41e2e1fb2bb79207c5d74bd881b5e"
 ARM_FILE = Path(__file__).with_name("arms.json")
 QA_LEDGER = Path(__file__).with_name("qa-sha256.json")
 ARMS = json.loads(ARM_FILE.read_bytes())
-if hashlib.sha256(ARM_FILE.read_bytes()).hexdigest() != "bfc3331eb56eebd635a73049bafefe7a6cd840b7cba7bc508bc2de617a8ed36c":
+if hashlib.sha256(ARM_FILE.read_bytes()).hexdigest() != "3ea3708565878bfc3dde928215952e6ebce886df489954ccb9590e100650a2fa":
     raise ValueError("changed comparison profiles")
 
 
@@ -181,7 +182,7 @@ def main(args):
                                       (args.qa, args.source, args.original, args.scratch, args.results))
     need(original.name == "ohm-branch-object-qa", original)
     os.environ["RUNNER_TEMP"] = str(original.parent)
-    need(sha(QA_LEDGER) == "f06a602f6520bd74935fd4e09e523cef18ff9b7810bb20c9818a25a5f8751969", "changed pinned QA ledger")
+    need(sha(QA_LEDGER) == "9c3e77b17282673ada807310f4c5c5fef1b449f458dce1cf15069e5283f658e8", "changed pinned QA ledger")
     ledger = read(QA_LEDGER)
     for file, expected in ledger.items():
         need(sha(qa/file) == expected, ("changed frozen QA input", file))
@@ -226,6 +227,7 @@ def main(args):
     guards.admit(guards.resources(scratch.parent, out.parent), entry=True, bootstrap=True)
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     import e2e
+    import source_pass
     if args.suite == "e2e":
         need(args.e2e_source is not None, "missing test fixture checkout")
         return e2e.run(sys.modules[__name__], args, w, registry, expected_registry, original_cargo, clock)
@@ -250,7 +252,6 @@ def main(args):
     bodies.mkdir()
     base_env = {**w.ENV, "CARGO_HOME": str(work / "cargo-home"), "CARGO_TARGET_DIR": str(work / "target"),
                 "CARGO_BUILD_BUILD_DIR": str(work / "build")}
-    conf = scratch / "profile.toml"
     for prog, commit in (("cargo", w.c.SDK["cargo"]), ("rustc", w.c.SDK["rust"])):
         actual = subprocess.check_output(["rustup", "which", "--toolchain", "ohm", prog], env=w.ENV, text=True).strip()
         version = subprocess.check_output([prog, "+ohm", "-vV"], env=w.ENV, text=True)
@@ -258,7 +259,7 @@ def main(args):
     put(out / "identity.json", {"qa": QA, "old": p.OLD, "new": p.NEW, "counter": sha(clock),
         "sdk_ledger": sdk_ledger, "source_common_dir": str(upstream), "boot": Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
         "driver": sha(Path(__file__)), "profiles": sha(ARM_FILE), "reader": sha(here / "measure-client.rs"), "order": args.order,
-        "study_mode": "matched-rustc" if manifest else "signed-profile-control"})
+        "study_mode": "signed-source-pass"})
     norm_graph = None
     observations = []
     # Each arm has an independently empty OLD history and a second independently empty clean NEW reference.
@@ -266,20 +267,15 @@ def main(args):
         env, flags, compiler, identity = e2e.compiler_arm(sys.modules[__name__], w, manifest, arm, base_env)
         put(out / f"compiler-{arm}.json", identity)
         cli = p.CMD
-        client_env = env
-        if compiler is None:
-            conf.write_text("[profile.dev.package.ruff_workspace]\nrustflags = " + json.dumps(flags) + "\n")
-            cli = [*p.CMD[:2], "-Zprofile-rustflags", "--config", str(conf), *p.CMD[2:]]
-        else:
-            # Run the registered downstream rustc commands against the same compiler and sysroot as Cargo.
-            home = scratch / ("consumer-rustup-" + arm)
-            (home / "toolchains").mkdir(parents=True)
-            (home / "toolchains/ohm").symlink_to(compiler.parent.parent, target_is_directory=True)
-            client_env = {**env, "RUSTUP_HOME": str(home), "RUSTUP_AUTO_INSTALL": "0"}
-            selected = subprocess.check_output(["rustup", "which", "--toolchain", "ohm", "rustc"], text=True, env=client_env)
-            need(Path(selected.strip()).samefile(compiler), "downstream compiler differs from Cargo")
+        # The linked clients also use the original, physically attested signed SDK.
+        home = scratch / ("consumer-rustup-" + arm)
+        (home / "toolchains").mkdir(parents=True)
+        (home / "toolchains/ohm").symlink_to(compiler.parent.parent, target_is_directory=True)
+        client_env = {**env, "RUSTUP_HOME": str(home), "RUSTUP_AUTO_INSTALL": "0"}
+        selected = subprocess.check_output(["rustup", "which", "--toolchain", "ohm", "rustc"], text=True, env=client_env)
+        need(Path(selected.strip()).samefile(compiler), "downstream compiler differs from Cargo")
         for history, phases in (("edit", ("old", "new", "unchanged", "invalid", "repair")),
-                                ("clean", ("clean-new",))):
+                                ("clean", ("clean-new","inspect-old","inspect-new"))):
             case = out / f"{ix}-{arm}-{history}"
             case.mkdir()
             with empty_roots(work, case):
@@ -300,13 +296,18 @@ def main(args):
                     norm_graph = graph
                 need(norm_graph == graph, "unit graph changed beyond owner flags")
                 for phase in phases:
-                    rev, bad = (p.OLD if phase == "old" else p.NEW), phase == "invalid"
+                    inspected = phase in ("inspect-old","inspect-new")
+                    env = source_pass.select(manifest, arm, base_env, inspected)[0]
+                    native_before = source_pass.snapshot(env)
+                    rev, bad = (p.OLD if phase in ("old","inspect-old") else p.NEW), phase == "invalid"
                     before = p.write_source(repo, rev, bad)
                     dest = case / phase
                     # Only the separately empty reference is verbose. It cannot skip compiling the root.
                     cmd = [*cli, "-vv"] if phase == "clean-new" else cli
                     count = run(cmd, repo, env, dest, work, out, 101 if bad else 0,
-                                clock=None if phase == "clean-new" else clock)
+                                clock=clock if history=="edit" else None)
+                    native_evidence = source_pass.collect(env, native_before, arm, inspected)
+                    put(dest/"native.json", native_evidence)
                     need(before == p.source_state(repo, rev, bad), "source changed while Cargo ran")
                     put(dest / "source.json", before)
                     rows = cargo_rows((dest / "outer.stdout").read_bytes(), graph if phase == "clean-new" else None)
@@ -329,11 +330,13 @@ def main(args):
                                    "archive_sha256": sha(ar), "runtime": dyn, "output_sha256": p.EXPECTED[rev]}
                     else:
                         results = {"cargo": count, "error": "E0308"}
+                    results["native"] = native_evidence
                     observations.append({"arm": arm, "history": history, "phase": phase, **results})
                     put(dest / "qualified.json", results)
                 need(registry(home)==expected_registry, "changed registry inputs during history")
         need(e2e.compiler_arm(sys.modules[__name__], w, manifest, arm, base_env)[3] == identity, "changed compiler")
     need(w.acquire.verify_sdk(w.SDK) == extra and registry(original_cargo)==expected_registry, "changed SDK or registry")
+    put(out / "source-proof.json", source_pass.qualify(observations, ("ruff_workspace",)))
     put(out / "observations.json", observations)
 
 
@@ -341,9 +344,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("qa", "source", "original", "scratch", "results"):
         parser.add_argument("--" + name, type=Path, required=True)
-    orders = [f"{a},{b}" for a in ARMS for b in ARMS if a != b and "normal" in (a,b)]
+    orders = [",".join(p) for p in permutations(ARMS)]
     parser.add_argument("--order", required=True, choices=orders)
     parser.add_argument("--suite", choices=["build", "e2e"], default="build")
     parser.add_argument("--e2e-source", type=Path)
-    parser.add_argument("--matched-rustcs", type=Path, dest="e2e_rustcs")
+    parser.add_argument("--source-pass", type=Path, dest="e2e_rustcs", required=True)
     main(parser.parse_args())
