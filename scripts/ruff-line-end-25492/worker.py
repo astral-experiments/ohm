@@ -16,6 +16,9 @@ import tomllib
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from audit import exec_roster, incremental, run, save, sha
+import contact
+import profile_work
+import zipfile
 
 ROOT=Path(os.environ['RUNNER_TEMP'])/'ruff-db-link-reason'
 SRC=Path(os.environ['GITHUB_WORKSPACE'])/'ruff'
@@ -188,14 +191,17 @@ def witness(folder,env,products,rows,old,libs):
     return verdict
 
 
-def case(phase,private,base_env,state,old=None,retain=None):
+def case(phase,private,base_env,state,old=None,retain=None,profiler=None):
     folder=LOG/phase;folder.mkdir()
     trace=private/('trace-'+phase);trace.mkdir()
     state.mkdir(exist_ok=True)
     env={**base_env,'CARGO_TARGET_DIR':str(state/'target'),'CARGO_BUILD_BUILD_DIR':str(state/'build'),'CARGO_NET_OFFLINE':'true'}
     assert sha(SRC/'Cargo.lock')==LOCK and git('rev-parse','HEAD')==(OLD if phase=='old' else NEW)
     assert git('status','--porcelain','--untracked-files=no')==''
-    argv=['strace','-ff','-qq','-v','-s','131072','-e','trace=execve,execveat','-o',trace/'exec','--']
+    argv=['strace','-ff','-qq','-v','-s','131072','-e','trace=execve,execveat,clone,clone3,fork,vfork','-o',trace/'exec','--']
+    if profiler:
+        assert phase=='edit'
+        argv+=profile_work.record(profiler,private/'edit.data',env)
     cp=folder/'clock.json'
     argv += [private/'watch',cp,*CMD]
     save(folder/'command.json',{'argv':list(map(str,argv)),'env':env,'source':git('rev-parse','HEAD'),'prior_storage':storage(state)})
@@ -212,6 +218,8 @@ def case(phase,private,base_env,state,old=None,retain=None):
     assert all(r['target']['src_path'] for r in products)
     libs,units=source_variants(phase,products,procs)
     save(folder/'source-units.json',units)
+    contact.outputs(products,procs,folder)
+    sampled=profile_work.write(folder,private,env,profiler,trace,procs,links,price) if profiler else None
     if phase in ('old','clean'):
         assert all(not r['fresh'] for r in products)
         assert set(OWNERS)<={r['crate'] for r in procs if not r['link_only']}
@@ -225,7 +233,7 @@ def case(phase,private,base_env,state,old=None,retain=None):
     assert layouts
     summary={'price':price,'dirty':sorted(r['target']['name'] for r in products if not r['fresh']),
              'roster':sorted([r['crate'],r['link_only']] for r in procs),'wild':len(links),'products':len(products),
-             'sampled':None,'native_output_namespaces':layouts,'storage':{'overall':storage(state),'roots':target_sizes}}
+             'sampled':sampled,'native_output_namespaces':layouts,'storage':{'overall':storage(state),'roots':target_sizes}}
     save(folder/'summary.json',summary)
     verdict=witness(folder,env,products,rows,phase=='old',libs)
     return summary,ledger,verdict
@@ -234,6 +242,9 @@ def case(phase,private,base_env,state,old=None,retain=None):
 def main():
     private,env=env_and_calibrate()
     fetch(private,env)
+    perf=profile_work.select(env,private)
+    save(LOG/'profile-tool.json',{'path':str(perf),'sha256':sha(perf),'version':run([perf,'version','--build-options'],env,private).stdout.decode(),
+         'period':profile_work.PERIOD,'stack':'dwarf,4096','restored_environment':'/usr/bin/env -i <all declared values>'})
     soft,hard=resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE,(min(max(soft,8192),hard) if hard!=-1 else max(soft,8192),hard))
     history=private/'history';clean=private/'empty-new'
@@ -241,7 +252,7 @@ def main():
     with ExitStack() as pins:
         o,pinned,old_elf=case('old',private,env,history,retain=pins)
         git('checkout','--detach',NEW)
-        e,_,new_elf=case('edit',private,env,history,old=pinned)
+        e,_,new_elf=case('edit',private,env,history,old=pinned,profiler=perf)
         u,_,same=case('unchanged',private,env,history,old=pinned)
         readbacks.update(old=o,edit=e,unchanged=u)
     assert shutil.disk_usage(ROOT).free>readbacks['old']['storage']['overall']['allocated']+(3<<30)
@@ -255,8 +266,30 @@ def main():
     assert new_elf['cli_cases']==same['cli_cases']==empty['cli_cases']
     assert new_elf['cli_version']==same['cli_version']==empty['cli_version']
     assert all(r['products']==o['products'] for r in readbacks.values())
+    gates={}
+    assert sha(contact.REF)==contact.DIGEST
+    with zipfile.ZipFile(contact.REF) as original:
+        for phase in ('old','edit','unchanged','clean'):
+            folder=LOG/phase
+            def local(name):return (LOG/name).read_bytes()
+            rosters=contact.compare(original.read,local,phase,folder)
+            old_native=json.loads(original.read(phase+'/objects.json'));native=json.loads(local(phase+'/objects.json'))
+            def object_keys(data):
+                return {unit:{file:(v['sha256'],v.get('physically_reused')) for file,v in s['objects'].items()} for unit,s in data.items()}
+            previous=json.loads(original.read(phase+'/verdict.json'));now=json.loads(local(phase+'/verdict.json'))
+            old_chain=json.loads(original.read(phase+'/exec-env.json'));new_chain=json.loads(local(phase+'/exec-env.json'))
+            entry=lambda group:{key:(v['path'],v['env']) for key,v in group.items()}
+            gates[phase]={'literal_cargo_exec_environments':entry(old_chain)==entry(new_chain),'full_arguments_and_env':rosters,'native_payloads_and_donors':object_keys(old_native)==object_keys(native),
+                          'typed':previous['typed_by_features']==now['typed_by_features'],'cli':previous['cli_cases']==now['cli_cases']}
+        previous=json.loads(original.read('complete.json'))['visits']
+        shape=lambda r:(r['roster'],r['products'],r['dirty'],r['wild'])
+        gates['four_phases']={'same_dirty_owners_and_wild':all(shape(readbacks[k])==shape(previous[k]) for k in previous),
+           'one_namespace':len({tuple(sorted(r['native_output_namespaces'])) for r in readbacks.values()})==1,
+           'sample_counts':bool(readbacks['edit']['sampled'])}
+    save(LOG/'comparison-gates.json',gates)
     save(LOG/'complete.json',{'visits':readbacks,'typed':[old_elf['typed'],new_elf['typed']],'fixed_cli':new_elf['cli_cases'],
                               'cli_sha256s':[v['cli_sha256'] for v in (old_elf,new_elf,same,empty)],'qa':os.environ['GITHUB_SHA']})
+    assert all(all(v.values()) for v in gates.values()),gates
 
 
 if __name__=='__main__':
