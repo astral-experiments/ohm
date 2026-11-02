@@ -93,19 +93,33 @@ def sample_rows(case):
                 rows.append((pid,tid,at,period,leaf,stack))
     return frames, rows
 
-def setup():
-    h.setup();perf=prepare_perf();observer=m.W/'count-exec';subprocess.run(['cc','-std=c11','-O2','-Wall','-Wextra','-Werror',KITS/'exec_count.c','-o',observer],check=True)
-    env,_=m.role('C');case=B/'source-control';case.mkdir();(case/'exec').mkdir();cmd=[str(observer),str(case/'exec'),str(h.meter.WORK/'watch'),str(case/'clock.json'),str(h.meter.WORK/'loop'),'1','4000001','2']
+def calibrate_images(perf,observer,env,period):
+    # Constant sample density across rates. Only these external loop controls choose the Ruff sampling period.
+    case=B/f'source-control-{period}';case.mkdir();(case/'exec').mkdir();iterations=str((period or 50009)*520+1)
+    cmd=[str(observer),str(case/'exec'),str(h.meter.WORK/'watch'),str(case/'clock.json'),str(h.meter.WORK/'loop'),'1',iterations,'2']
     with (case/'stderr').open('wb')as e:
-        subprocess.run(record(perf,case/'perf.data',cmd,5003),env=env,stdout=subprocess.DEVNULL,stderr=e,check=True,timeout=60)
-    n=decode(perf,case/'perf.data',case);frames,rows=sample_rows(case);need(n==len(rows) and n>1000 and all(r[3]==5003 for r in rows),'native sampler fixture failed')
+        subprocess.run(record(perf,case/'perf.data',cmd,period) if period else cmd,env=env,stdout=subprocess.DEVNULL,stderr=e,check=True,timeout=90)
     events=u.trace(case/'exec');by_image={r['sequence']:r for r in events};clock=json.loads((case/'clock.json').read_bytes());parts=Counter()
     for line in (case/'exec/epochs.tsv').read_text().splitlines():
         cells=line.split()
         if cells[0]=='C':
             _,image,group,tid,cnt,enabled,running=map_or_tag(cells);need(enabled==running,'calibration multiplexed');parts[Path(by_image[image]['exe']).name]+=cnt
-    loop_pids={r['pid']for r in events if Path(r['exe']).name=='loop' and r['argv'][1:] == ['0','4000001','1']};sampled=Counter(pid for pid,tid,at,period,leaf,stack in rows if Path(frames[leaf[0]][0]).name=='loop');need(len(loop_pids)==2 and loop_pids<=set(sampled) and min(sampled[p]for p in loop_pids)>100 and abs(parts['loop']/clock['instructions']-1)<.015 and abs(sum(sampled.values())*5003/parts['loop']-1)<.12,'child self-count/sampling did not independently reproduce inherited loop')
-    save(case/'terminal.json',dict(exact=parts,pmu=clock['instructions'],sampled=sampled,all_samples=n,observer=sha(observer),perf=sha(perf)))
+    need(clock['event_errno']==0 and clock['enabled']==clock['running']>0 and abs(parts['loop']/clock['instructions']-1)<.015,'disjoint child counters disagree with inherited loop')
+    sampled=Counter();n=0
+    if period:
+        n=decode(perf,case/'perf.data',case);frames,rows=sample_rows(case);need(n==len(rows)and n>1000 and all(r[3]==period for r in rows),'wrong calibration sample count or period')
+        pids={r['pid']for r in events if Path(r['exe']).name=='loop' and r['argv'][1:]==['0',iterations,'1']};sampled=Counter(pid for pid,tid,at,weight,leaf,stack in rows if Path(frames[leaf[0]][0]).name=='loop');need(len(pids)==2 and pids<=set(sampled)and min(sampled[p]for p in pids)>600 and abs(sum(sampled.values())*period/parts['loop']-1)<.08,'sampled child instructions do not reproduce exact counters')
+    save(case/'terminal.json',dict(exact=parts,pmu=clock['instructions'],sampled=sampled,all_samples=n,observer=sha(observer),period=period))
+
+def setup():
+    h.setup();perf=prepare_perf();observer=m.W/'count-exec';subprocess.run(['cc','-std=c11','-O2','-Wall','-Wextra','-Werror',KITS/'exec_count.c','-o',observer],check=True);env,_=m.role('C');calibrate_images(perf,observer,env,0)
+    periods=[200003,500009,1000003,2000003];successful=[];refused={}
+    for n in periods:
+        try:calibrate_images(perf,observer,env,n);successful.append(n)
+        except (ValueError,OSError,subprocess.SubprocessError)as err:refused[str(n)]=repr(err);print('Rejected loop sample period',n,repr(err),flush=True)
+    # Use a verified lower sampling rate than the densest admissible calibration when available.
+    selected=successful[1] if len(successful)>1 else next(iter(successful),None)
+    save(B/'capability.json',dict(period=selected,tested=periods,passed=successful,refused=refused,exact_counters=True));print('Selected actual source-independent sample period',selected,flush=True)
 
 def map_or_tag(cells):
     return [cells[0],*(int(x)for x in cells[1:])]
@@ -140,7 +154,12 @@ def classify_exact(case,sdk):
 
 def measure(argv,env,src,case,state):
     need(argv==h.CARGO and src==m.SRC and state==m.STATE,'different entry');perf,version=locate_perf();need(sha(perf)==json.loads((B/'perf-tool.json').read_bytes())['sha256'],'perf changed');trace=case/'exec';trace.mkdir();cmd=[m.W/'count-exec',trace,h.meter.WORK/'watch',case/'clock.json',*argv];raw=case/'perf.data'
-    m.old.command(record(perf,raw,cmd,PERIOD),env,src,case,state);need(0<raw.stat().st_size<192<<20,'unbounded profile');decode(perf,raw,case)
+    period=json.loads((B/'capability.json').read_bytes())['period']
+    if period is None:
+        m.old.command(list(map(str,cmd)),env,src,case,state);save(case/'profile-refusal.json',dict(reason='no admitted hardware sampling period'));return
+    m.old.command(record(perf,raw,cmd,period),env,src,case,state);need(0<raw.stat().st_size<192<<20,'unbounded profile')
+    try:decode(perf,raw,case)
+    except (ValueError,OSError,subprocess.SubprocessError)as err:save(case/'profile-refusal.json',dict(reason=repr(err)))
     with (case/'perf.data.zst').open('xb')as f:subprocess.run(['zstd','-q','-2','-c',raw],stdout=f,check=True)
     save(case/'perf-data.json',dict(raw_sha256=sha(raw),bytes=raw.stat().st_size,compressed_sha256=sha(case/'perf.data.zst')));raw.unlink()
 
@@ -158,17 +177,21 @@ def build(name,profiled):
         m.fresh(name+'-before-clean-new');_,fresh,v2=h.checked_visit('C','new','clean',env,set(),key);need(v2['native']['elf']==v1['native']['elf']and v2['native']['rlib']==v1['native']['rlib']and all(fresh[n]['sha256']==rec['sha256']for n,rec in obj1.items()),'profiled incremental output differs from independent clean')
 
 def summarize():
-    normal=B/'ordinary/C-edit';case=B/'profiled/C-edit';need((normal/'custody.json').read_bytes()==(case/'custody.json').read_bytes(),'different unobserved proof');env,sdk=m.role('C');roles,exact,history,images,tasks,monitor=classify_exact(case,sdk);frames,rows=sample_rows(case);raw=json.loads((case/'record-counts.json').read_bytes());need(len(rows)==raw['PERF_RECORD_SAMPLE']and len(rows)>12000,'incomplete raw IP distribution');self_cost=Counter();inclus=Counter();samples=Counter();unassigned=0
+    normal=B/'ordinary/C-edit';case=B/'profiled/C-edit';need((normal/'custody.json').read_bytes()==(case/'custody.json').read_bytes(),'different unobserved proof');env,sdk=m.role('C');roles,exact,history,images,tasks,monitor=classify_exact(case,sdk)
+    watched=json.loads((case/'clock.json').read_bytes());ordinary=json.loads((normal/'clock.json').read_bytes());need(all(e['enabled']==e['running']>0 and not e['event_errno']for e in (watched,ordinary)),'whole inherited counter not usable');total=sum(v for k,v in exact.items()if k!='instrumentation');need(abs(total/watched['instructions']-1)<.016 and abs(watched['instructions']/ordinary['instructions']-1)<.06,'per-task and whole counters disagree or observed work differs');need(all(exact[r]>0 for r in ('rustc:annotate_snippets','rustc:ruff_db','cargo','Wild')),'missing actual compiler/linker process');base=dict(unscored=True,ordinary=ordinary,profiled=watched,exact_disjoint=exact,exact_total=total,threads=len(tasks),custody=json.loads((case/'custody.json').read_bytes()));save(B/'exact-actors.json',base)
+    if (case/'profile-refusal.json').exists():
+        save(B/'terminal.json',base|{'subsystem_attribution':False,'refusal':json.loads((case/'profile-refusal.json').read_bytes())});return
+    sample_period=json.loads((B/'capability.json').read_bytes())['period'];frames,rows=sample_rows(case);raw=json.loads((case/'record-counts.json').read_bytes());need(len(rows)==raw['PERF_RECORD_SAMPLE'] and len(rows)*sample_period>4500000000,'incomplete raw instruction distribution');self_cost=Counter();inclus=Counter();samples=Counter();unassigned=0
     for pid,tid,at,period,leaf,stack in rows:
-        need(period==PERIOD,'changed sample period');hist=history.get(pid,[]);cut=bisect_right(hist,(at,2**63-1));role=roles[hist[cut-1][1]] if cut else ('instrumentation' if pid==monitor else 'unattributed startup');unassigned+=(role=='unattributed startup');samples[role]+=1;dso,sym=frames[leaf[0]];self_cost[(role,dso,sym)]+=1
+        need(period==sample_period,'changed sample period');hist=history.get(pid,[]);cut=bisect_right(hist,(at,2**63-1));role=roles[hist[cut-1][1]] if cut else ('instrumentation' if pid==monitor else 'unattributed startup');unassigned+=(role=='unattributed startup');samples[role]+=1;dso,sym=frames[leaf[0]];self_cost[(role,dso,sym)]+=1
         for dso,sym in {frames[f[0]]for f in [leaf,*stack]}:inclus[(role,dso,sym)]+=1
-    watched=json.loads((case/'clock.json').read_bytes());ordinary=json.loads((normal/'clock.json').read_bytes());need(all(e['enabled']==e['running']>0 and not e['event_errno']for e in (watched,ordinary)), 'whole inherited counter not usable');total=sum(v for k,v in exact.items()if k!='instrumentation');actual_samples=sum(v for k,v in samples.items()if k not in ('instrumentation','unattributed startup'));need(abs(total/watched['instructions']-1)<.016 and abs(actual_samples*PERIOD/total-1)<.06 and abs(watched['instructions']/ordinary['instructions']-1)<.06 and unassigned/len(rows)<.01,'profile changed work or sampled costs did not reconcile');need(exact['rustc:annotate_snippets']>0 and exact['rustc:ruff_db']>0 and exact['cargo']>0 and exact['Wild']>0,'missing ordinary compiler/linker process');
+    actual_samples=sum(v for k,v in samples.items()if k not in ('instrumentation','unattributed startup'));need(abs(actual_samples*sample_period/total-1)<.06 and unassigned/len(rows)<.01,'sampled instruction mass did not reconcile with exact process counters')
     native_rows=sorted({x for kind in (self_cost,inclus)for (_,_,x) in kind if x});demangled={}
     for i in range(0,len(native_rows),1500):
         raw_names=native_rows[i:i+1500];strings=subprocess.check_output(['/usr/bin/c++filt','-n'],input=('\n'.join(raw_names)+'\n').encode()).decode(errors='replace').splitlines();need(len(strings)==len(raw_names),'invalid demangler mapping');demangled.update(zip(raw_names,strings))
-    def score(c):return [dict(role=k[0],dso=k[1],symbol=k[2],name=demangled.get(k[2],''),samples=count,estimated=count*PERIOD)for k,count in c.most_common()]
+    def score(c):return [dict(role=k[0],dso=k[1],symbol=k[2],name=demangled.get(k[2],''),samples=count,estimated=count*sample_period)for k,count in c.most_common()]
     with gzip.open(case/'symbols.json.gz','wt',compresslevel=2)as f:json.dump(dict(self=score(self_cost),inclusive=score(inclus)),f,separators=(',',':'))
-    save(B/'terminal.json',dict(unscored=True,ordinary=ordinary,profiled=watched,exact_disjoint=exact,exact_total=total,sampled=samples,sample_period=PERIOD,samples=len(rows),unassigned=unassigned,threads=len(tasks),custody=json.loads((case/'custody.json').read_bytes()),top_self=score(self_cost)[:40],top_inclusive=score(inclus)[:40]));print('Exact role instructions',dict(exact),flush=True)
+    save(B/'terminal.json',dict(unscored=True,ordinary=ordinary,profiled=watched,exact_disjoint=exact,exact_total=total,sampled=samples,sample_period=sample_period,subsystem_attribution=True,samples=len(rows),unassigned=unassigned,threads=len(tasks),custody=json.loads((case/'custody.json').read_bytes()),top_self=score(self_cost)[:40],top_inclusive=score(inclus)[:40]));print('Exact role instructions',dict(exact),flush=True)
 
 if __name__=='__main__':
     m.governance()
