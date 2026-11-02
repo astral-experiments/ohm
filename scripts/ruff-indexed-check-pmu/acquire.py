@@ -7,7 +7,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "ruff-matched-stage"))
 from capsule import need, reopen, sha
 
-ROOT = Path(os.environ["RUNNER_TEMP"]) / "indexed-check-study"
+ROOT = Path(os.environ["RUNNER_TEMP"]) / "upstream-mono-study"
 LOG = ROOT / "logs"
 REG = json.loads((HERE / "registration.json").read_bytes())
 
@@ -53,12 +53,13 @@ def main():
         a["name"]: a
         for a in api("actions/runs/" + str(key) + "/artifacts")["artifacts"]
     }
-    base = "ohm-indexed-check-matched-stage1"
+    base = "ohm-upstream-mono-owner-stage1"
     selected = {}
     for name in (base + "-receipts", base):
         a = artifacts[name]
         need(
-            not a["expired"]
+            [a["id"], a["size_in_bytes"], a["digest"]] == REG["factory_artifacts"][name]
+            and not a["expired"]
             and a["workflow_run"]["id"] == key
             and 0 < a["size_in_bytes"] < 1600 * 2**20,
             "wrong artifact",
@@ -87,17 +88,13 @@ def main():
             if name.endswith("-receipts"):
                 names = archive.namelist()
                 expected = archive.read("archive.sha256").decode()
-                fmt = {
-                    role: json.loads(archive.read("check-format-" + role + ".json"))
-                    for role in ("normal", "defer")
-                }
-                json_save(LOG / "physical-formats.json", fmt)
+                accepted = json.loads(archive.read("accepted.json"))
+                smoke = json.loads(archive.read("smoke.json"))
                 need(
-                    all(
-                        {(v["version"], v["magic"]) for v in fmt[k].values()} == {(26655, magic)}
-                        for k, magic in [("normal", "RSIC"), ("defer", "RSIG")]
-                    ),
-                    "factory missed graph versions",
+                    accepted["registration"] == sha(HERE.parent / "ruff-matched-stage/registration.json")
+                    and set(smoke["arms"]) == {"normal", "defer"}
+                    and all(v["invalid"] == "E0308" for v in smoke["arms"].values()),
+                    "factory did not exercise both registered compilers",
                 )
                 need(
                     re.fullmatch(r"[0-9a-f]{64}  matched-stage.tar.zst\s*", expected)

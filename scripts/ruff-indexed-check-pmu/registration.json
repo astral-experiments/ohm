@@ -1,11 +1,23 @@
 {
   "collector": "17981f5b807be81496282dd5a58e579e71586962",
-  "compiler_candidate": "1cec164aceaa9e8a301ab24a8d1295ac638e04b9",
+  "compiler_candidate": "dc0e99bfb6606cfbdca107c81c6a0e475b7cb40e",
   "compiler_parent": "a3fc6da13921586bc374586dee00883e9210aecd",
-  "factory_branch": "charlie/qa-indexed-check-matched-stage-20261102",
-  "factory_head": "c361aff3f68b2fb00cd7578fe403bcc4b65c47f1",
-  "factory_run": 41390733341,
-  "pairs": 8,
+  "factory_artifacts": {
+    "ohm-upstream-mono-owner-stage1": [
+      13129108108,
+      185380675,
+      "sha256:22f4c1dbe6235e925a0378332c13c1e74d12150bc4b8a3a48887463474dd789f"
+    ],
+    "ohm-upstream-mono-owner-stage1-receipts": [
+      13129436947,
+      44538,
+      "sha256:6feff128f07f69f7973dedf9688752f35cd0add0a71df30b8121f217cde25c6a"
+    ]
+  },
+  "factory_branch": "charlie/qa-upstream-mono-owner-20261102",
+  "factory_head": "eb9a39839aea21c67380644a1b2ba00a9afac79b",
+  "factory_run": 41419184460,
+  "pairs": 2,
   "reader": {
     "calibrate.c": "dacd1dd7fef85cacb44a236e0c4191d95db036a623b2a01ae3a5d76d2f3d0b0e",
     "watch.c": "ee82d0f9f0410861f3680c7ebf7f26547cd3a73833290d7272e83b4e29e0d903"
@@ -193,48 +205,6 @@
       "trees": [
         "2b61306d708a211b3725c8d920e7590be6da41ad",
         "97ca36909f1ae8fa028b2c1f48f452fbdcdbbd4c"
-      ]
-    },
-    {
-      "A": "5c64006c01f1b6289d18dd25b0d4ec5f95361424",
-      "B": "a8d5ba53d1378873d75fb46794452dedfd6ac45b",
-      "changes": [
-        "M\t.github/workflows/ci.yaml",
-        "M\t.github/workflows/memory_report.yaml",
-        "M\t.github/workflows/publish-ty-playground.yml",
-        "M\t.github/workflows/ty-ecosystem-analyzer.yaml",
-        "M\t.github/workflows/typing_conformance.yaml",
-        "M\tCargo.lock",
-        "M\tCargo.toml",
-        "M\tcrates/ruff/README.md",
-        "M\tcrates/ruff_linter/Cargo.toml",
-        "M\tcrates/ruff_linter/resources/test/fixtures/ruff/RUF046.py",
-        "M\tcrates/ruff_linter/resources/test/fixtures/ruff/RUF057.py",
-        "M\tcrates/ruff_linter/src/rules/ruff/rules/unnecessary_cast_to_int.rs",
-        "M\tcrates/ruff_linter/src/rules/ruff/rules/unnecessary_round.rs",
-        "M\tcrates/ruff_linter/src/rules/ruff/snapshots/ruff_linter__rules__ruff__tests__unnecessary-cast-to-int_RUF046.py.snap",
-        "M\tcrates/ruff_linter/src/rules/ruff/snapshots/ruff_linter__rules__ruff__tests__unnecessary-round_RUF057.py.snap",
-        "M\tcrates/ruff_python_ast/src/helpers.rs",
-        "M\tcrates/ruff_python_ast/src/operator_precedence.rs",
-        "M\tcrates/ruff_python_ast/src/token.rs",
-        "M\tcrates/ruff_python_ast/src/token/tokens.rs",
-        "M\tcrates/ruff_python_ast_integration_tests/tests/parentheses.rs",
-        "A\tcrates/ruff_python_edits/Cargo.toml",
-        "A\tcrates/ruff_python_edits/README.md",
-        "A\tcrates/ruff_python_edits/src/call.rs",
-        "A\tcrates/ruff_python_edits/src/lib.rs",
-        "M\tcrates/ty_python_semantic/Cargo.toml",
-        "M\tcrates/ty_python_semantic/src/types/function.rs"
-      ],
-      "crates": [
-        "ruff_python_ast",
-        "ruff_python_parser"
-      ],
-      "name": "token",
-      "root": "ruff_python_parser",
-      "trees": [
-        "5ca23839ce5de7495ec87e9f184c4c2530d76ae8",
-        "76d8d24a52faa1a0cbcd58fe9e5e2e0200713cb7"
       ]
     }
   ]
