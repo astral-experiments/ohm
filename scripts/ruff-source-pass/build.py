@@ -5,8 +5,16 @@ import json
 import os
 from pathlib import Path
 import re
+import signal
 import subprocess
 import tarfile
+import sys
+import time
+
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+import frozen
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"ruff-repair-tables-pilot"))
+from guards import resources
 
 HERE = Path(__file__).resolve().parent
 LLVM = "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145"
@@ -17,8 +25,6 @@ LIB = "libLLVM.so.23.1-rust-1.99.0-beta"
 SIGNED = "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
 PATCH = "8df654501c995c2e419a6402c15bed1942df7e423df982448ab0d22cffee051b"
 OVERLAY = "2c438a14544e426cc1f254aa37a918ddbd784d3c333cc484f6aad7c579cc8f66"
-QUALIFIED_PLAIN = {"stock":"692e59901cc2b9f00d4e04d0941df562b159f6d701490855060feda7d6d50947",
-                   "candidate":"074561b2cfaa3b623081b3ce2c701bee34cb40f4d334c1c310b21bf1a19ddf99"}
 OPTIONS = ("join-liveintervals","terminal-rule","join-splitedges","join-globalcopies","verify-coalescing",
            "late-remat-update-threshold","large-interval-size-threshold","large-interval-freq-threshold")
 # Exact output of this Rust-CI distribution's llvm-config --cxxflags, except its include directory.
@@ -42,6 +48,24 @@ def sha(path):
 
 def command(args, cwd, env=None):
     return subprocess.check_output([str(a) for a in args], cwd=cwd, env=env, text=True, timeout=240).strip()
+
+
+def compile_native(args,cwd,env):
+    room=resources(cwd,cwd)
+    need(room["effective"]>9<<30 and room["work"]>768<<20,"native build entry reserve")
+    with subprocess.Popen(list(map(str,args)),cwd=cwd,env=env,start_new_session=True) as process:
+        try:
+            deadline=time.monotonic()+240
+            while process.poll() is None:
+                available=resources(cwd,cwd)
+                need(available["effective"]>=8<<30 and available["work"]>=512<<20 and time.monotonic()<deadline,
+                     ("native process reserve or timeout",available))
+                time.sleep(0.25)
+            need(process.returncode==0,("C++ translation unit failed",process.returncode))
+        finally:
+            if process.poll() is None:
+                os.killpg(process.pid,signal.SIGKILL)
+                process.wait()
 
 
 def replace(text, old, new):
@@ -103,9 +127,8 @@ def headers(src, out):
 def build(src, sdk, output):
     src, sdk, output = src.resolve(strict=True), sdk.resolve(strict=True), output.resolve()
     need(not output.exists() and not output.is_relative_to(src) and not output.is_relative_to(sdk), "new dedicated output required")
-    available = int(re.search(r"^MemAvailable:\s+(\d+)", Path("/proc/meminfo").read_text(), re.M)[1]) * 1024
-    fs = os.statvfs(output.parent)
-    need(available > 9 << 30 and fs.f_bavail*fs.f_frsize > 768 << 20, "native build resource floor")
+    available=resources(output.parent,output.parent)
+    need(available["effective"]>9<<30 and available["work"]>768<<20,"native build resource floor")
     need(command(["git","rev-parse","HEAD"],src)==LLVM and command(["git","rev-parse","HEAD^{tree}"],src)==TREE,
          "unregistered LLVM source checkout")
     library = sdk/"lib"/LIB
@@ -118,10 +141,16 @@ def build(src, sdk, output):
     compiler = "/usr/bin/clang++-18"
     compiler_version = command([compiler,"--version"], src, build_env)
     need(re.search(r"clang version 18\.", compiler_version), ("unexpected C++ compiler", compiler_version))
+    gcc = Path("/usr/lib/gcc/x86_64-linux-gnu/13")
+    need((gcc/"crtbeginS.o").is_file(),"missing GCC 13 development and startup files")
     stats = {"schema":"ohm-machine-source-build-v1","llvm":LLVM,"tree":TREE,"rust_ci":RUST,
              "original_rust_dev_archive":DEV,"original_files":FILES,"headers":provenance,"compiler":compiler_version,
              "cpp_sha256":sha(Path(compiler)), "abi":ABI,"sdk":str(sdk),"signed_llvm":SIGNED,
-             "patch":PATCH,"glue":sha(HERE/"pipeline.inc"),"source_arms":{}}
+             "host_gnu":{"gcc_install_dir":str(gcc),"crtbeginS":sha(gcc/"crtbeginS.o"),
+                         "linker":sha(Path("/usr/bin/ld")),"packages":command(["dpkg-query","-W","clang-18","g++-13","libc6-dev","libstdc++-13-dev","binutils"],src,build_env)},
+             "patch":PATCH,"glue":sha(HERE/"pipeline.inc"),"resources":available,"source_arms":{}}
+    probe=subprocess.run([compiler,"-v","-E","-x","c++","/dev/null"],cwd=src,env=build_env,check=True,capture_output=True,text=True)
+    stats["host_gnu"]["default_search"]=[line for line in probe.stderr.splitlines() if "GCC installation" in line]
     variants = {}
     for arm in ("stock", "candidate"):
         d = output/("build-"+arm)
@@ -142,30 +171,38 @@ def build(src, sdk, output):
             name = ("stock" if arm=="stock" else "strict")+"-"+mode
             lib = output/(name+".so")
             c.write_text(derive(raw,arm,mode=="inspect"))
-            args = [compiler,"-I",d/"llvm/include",*ABI,"-I",common,"-DNDEBUG","-O2","-fPIC",
+            args = [compiler,"--gcc-install-dir="+str(gcc),"-I",d/"llvm/include",*ABI,"-I",common,"-DNDEBUG","-O2","-fPIC",
                     "-fvisibility=hidden","-shared",c,library,"-Wl,-z,defs","-Wl,-Bsymbolic",
                     "-Wl,--version-script="+str(version),"-o",lib]
-            command(args,d,build_env)
+            compile_native(args,d,build_env)
+            if name=="stock-plain":
+                default=output/"host-default-stock.so"
+                auto=[a for a in args if a!="--gcc-install-dir="+str(gcc)]
+                auto[-1]=default
+                compile_native(auto,d,build_env)
+                stats["host_gnu"]["default_stock_sha256"]=sha(default)
             syms = command(["nm","-D","--defined-only",lib],d,build_env).splitlines()
             need(len(syms)==1 and syms[0].endswith(" llvmGetPassPluginInfo"),("unexpected export",syms))
             loaded = command(["ldd",lib],d,build_env)
             refs = re.findall(r"^\s*libLLVM\S*\s+=>\s+(/\S+)",loaded,re.M)
             need(len(refs)==1 and Path(refs[0]).samefile(library) and "not found" not in loaded,("wrong runtime",loaded))
             need(0<lib.stat().st_size<1<<20,"large native module")
-            if mode=="plain":
-                need(sha(lib)==QUALIFIED_PLAIN[arm],("does not reproduce the independently tested native module",arm,sha(lib)))
             lib.chmod(0o444)
             variants[name] = {"sha256":sha(lib),"bytes":lib.stat().st_size,"derived_tu":sha(c),"command":list(map(str,args)),"ldd":loaded}
     for name,args in (("wrapper",["-fPIE","-pie",HERE/"wrapper.c"]),("loader.so",["-fPIC","-shared",HERE/"loader.c","-ldl"])):
         command(["/usr/bin/cc","-std=c11","-Wall","-Wextra","-Werror","-O2",*args,"-Wl,-z,relro,-z,now","-o",output/name],output,build_env)
         variants[name]={"sha256":sha(output/name),"bytes":(output/name).stat().st_size}
     stats["variants"]=variants
+    rebuilt=frozen.install(HERE,output,stats)
     (output/"provenance.json").write_text(json.dumps(stats,indent=2,sort_keys=True)+"\n")
-    manifest={"schema":"ohm-source-pass-suite-v1","root":str(output),"signed_rustc":str(sdk/"bin/rustc"),
-              "signed_llvm":SIGNED,"patch":PATCH,"provenance":sha(output/"provenance.json"),
-              "variants":{name:entry["sha256"] for name,entry in variants.items()}}
-    (output/"manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
-    print(json.dumps(manifest,sort_keys=True))
+    os.link(output/"provenance.json",rebuilt/"provenance.json")
+    for folder,schema,selected in ((output,"ohm-source-pass-suite-v1",stats["variants"]),
+                                  (rebuilt,"ohm-host-source-pass-control-v1",stats["host_variants"])):
+        manifest={"schema":schema,"root":str(folder),"signed_rustc":str(sdk/"bin/rustc"),
+                  "signed_llvm":SIGNED,"patch":PATCH,"provenance":sha(output/"provenance.json"),
+                  "variants":{name:entry["sha256"] for name,entry in selected.items()}}
+        (folder/"manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
+        print(json.dumps(manifest,sort_keys=True))
 
 
 if __name__ == "__main__":

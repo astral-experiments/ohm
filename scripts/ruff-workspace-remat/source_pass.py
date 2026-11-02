@@ -11,6 +11,10 @@ ARMS = {"signed": [], "stock": [], "strict": []}
 LLVM = "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
 PATCH = "8df654501c995c2e419a6402c15bed1942df7e423df982448ab0d22cffee051b"
 FILES = {"wrapper", "loader.so", *(a+"-"+v for a in ("stock","strict") for v in ("plain","inspect"))}
+REGISTERED = {"stock-plain":"692e59901cc2b9f00d4e04d0941df562b159f6d701490855060feda7d6d50947",
+              "strict-plain":"074561b2cfaa3b623081b3ce2c701bee34cb40f4d334c1c310b21bf1a19ddf99",
+              "stock-inspect":"504ecc0509a438d18e7905571f9fa94a92033a6f3809453414b5e618c818351e",
+              "strict-inspect":"c482f99bba95547c37f51966dc45b60fce811742e96355ac1cc18b2feb45c22a"}
 
 
 def need(ok, why):
@@ -23,20 +27,24 @@ def sha(path):
         return hashlib.file_digest(f,"sha256").hexdigest()
 
 
-def validate(m):
+def validate(m, *, host_control=False):
     if not isinstance(m,dict):
         m=json.loads(Path(m).read_bytes())
-    need(m["schema"]=="ohm-source-pass-suite-v1" and m["patch"]==PATCH and m["signed_llvm"]==LLVM
+    schema="ohm-host-source-pass-control-v1" if host_control else "ohm-source-pass-suite-v1"
+    need(m["schema"]==schema and m["patch"]==PATCH and m["signed_llvm"]==LLVM
          and set(m["variants"])==FILES, "wrong source pass manifest")
     root=Path(m["root"]).resolve(strict=True)
     need(sha(root/"provenance.json")==m["provenance"],"changed source build provenance")
     proof=json.loads((root/"provenance.json").read_bytes())
     need(proof["patch"]==PATCH and proof["signed_llvm"]==LLVM and proof["headers"]["source"]==234
+         and proof["registration"]["archive_sha256"]=="ba42780456b37115ab3f1f9368a8a8294195650155e8d51e409fa5d731b54ea6"
          and len(proof["headers"]["generated"])==5 and proof["llvm"]=="1b9c0d5ff9bbe7634aead059efe6b11a7eeba145",
          "unregistered source build inputs")
     for name, digest in m["variants"].items():
         path=root/(name if name in ("wrapper","loader.so") else name+".so")
-        need(path.is_file() and not path.is_symlink() and sha(path)==digest, ("changed native input",path))
+        wanted=proof["host_variants" if host_control else "variants"][name]["sha256"]
+        need((host_control or name not in REGISTERED or digest==REGISTERED[name]) and digest==wanted
+             and path.is_file() and not path.is_symlink() and sha(path)==digest,("changed native input",path))
     return m
 
 

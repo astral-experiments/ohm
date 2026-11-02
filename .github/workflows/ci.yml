@@ -102,7 +102,7 @@ jobs:
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
           test -z "$(git -C enrolled status --porcelain=v1 --untracked-files=all)"
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends binutils build-essential clang-18 git libssl-dev
+          sudo apt-get install -y --no-install-recommends binutils build-essential clang-18 g++-13 libstdc++-13-dev git libssl-dev
           (cd enrolled/scripts/ruff-source-pass && sha256sum --check --strict SHA256SUMS)
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py sources
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py compile "$base"
@@ -125,6 +125,13 @@ jobs:
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           python3 -IB enrolled/scripts/ruff-source-pass/check.py \
             --work "$RUNNER_TEMP/ohm-source-pass-fixture" --manifest "$RUNNER_TEMP/ohm-source-pass-kit/manifest.json" \
+            --rustup-home "$base/home/.rustup" --proxies "$base/home/.cargo/bin"
+      - name: Check the independently rebuilt ABI and both target controls outside all clocks
+        run: |
+          set -euo pipefail
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          python3 -IB enrolled/scripts/ruff-source-pass/check.py --host-rebuild-control \
+            --work "$RUNNER_TEMP/ohm-host-pass-fixture" --manifest "$RUNNER_TEMP/ohm-source-pass-kit/rebuilt/manifest.json" \
             --rustup-home "$base/home/.rustup" --proxies "$base/home/.cargo/bin"
       - name: Verify the root archive and typed client on the installed SDK
         run: |
@@ -171,6 +178,10 @@ jobs:
             ${{ runner.temp }}/ohm-remat-comparison/guard
             ${{ runner.temp }}/ohm-source-pass-kit/manifest.json
             ${{ runner.temp }}/ohm-source-pass-fixture/passed.json
+            ${{ runner.temp }}/ohm-host-pass-fixture/passed.json
+            ${{ runner.temp }}/ohm-source-pass-kit/rebuilt/manifest.json
+            ${{ runner.temp }}/ohm-source-pass-kit/rebuilt/*-plain.so
+            ${{ runner.temp }}/ohm-source-pass-kit/host-default-stock.so
             ${{ runner.temp }}/ohm-source-pass-kit/provenance.json
             ${{ runner.temp }}/ohm-branch-object-qa/logs/accepted.json
             ${{ runner.temp }}/ohm-branch-object-qa/logs/enrollment.json

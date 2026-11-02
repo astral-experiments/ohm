@@ -18,7 +18,7 @@ def run(cmd, cwd, env, code=0):
     return p
 
 
-def check(root, manifest, rustup, proxies):
+def check(root, manifest, rustup, proxies, host_control=False):
     native.need(not root.exists(), "requires a new dedicated fixture")
     root.mkdir()
     repo=root/"ruff"
@@ -30,7 +30,7 @@ def check(root, manifest, rustup, proxies):
     (repo/"Cargo.toml").write_text('[workspace]\nmembers = ["crates/ty_server"]\nresolver = "2"\n[profile.dev]\nopt-level = 1\n')
     (pkg/"Cargo.toml").write_text('[package]\nname = "ty_server"\nversion = "0.0.0"\nedition = "2024"\n')
     (repo/"Cargo.lock").write_text('version = 4\n\n[[package]]\nname = "ty_server"\nversion = "0.0.0"\n')
-    m=native.validate(manifest)
+    m=native.validate(manifest,host_control=host_control)
     sdk=Path(m["signed_rustc"]).parent.parent
     base={"PATH":str(proxies)+":/usr/bin:/bin","LC_ALL":"C","HOME":str(root),
           "LD_LIBRARY_PATH":str(sdk/"lib"),"RUSTUP_HOME":str(rustup),"RUSTUP_AUTO_INSTALL":"0",
@@ -130,5 +130,6 @@ if __name__=="__main__":
     p=argparse.ArgumentParser(description=__doc__)
     for arg in ("work","manifest","rustup-home","proxies"):
         p.add_argument("--"+arg,type=Path,required=True)
+    p.add_argument("--host-rebuild-control",action="store_true")
     a=p.parse_args()
-    check(a.work.resolve(),a.manifest.resolve(strict=True),a.rustup_home.resolve(strict=True),a.proxies.resolve(strict=True))
+    check(a.work.resolve(),a.manifest.resolve(strict=True),a.rustup_home.resolve(strict=True),a.proxies.resolve(strict=True),a.host_rebuild_control)
