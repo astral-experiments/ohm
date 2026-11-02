@@ -1,5 +1,5 @@
-name: Characterize uv-lock after actual uv edit 22619
-run-name: Unscored uv-lock 22619 at ${{ inputs.reviewed_head }}
+name: Preserve uv-lock metadata and compiler graphs across edit 22619
+run-name: Unscored uv-lock metadata forensics at ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
@@ -9,13 +9,13 @@ run-name: Unscored uv-lock 22619 at ${{ inputs.reviewed_head }}
         required: true
 permissions: {}
 concurrency:
-  group: uv-lock-22619-characterization
+  group: uv-lock-22619-metadata-forensics
   cancel-in-progress: false
 jobs:
   characterize:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-22619-lock-characterization' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-22619-lock-rmeta-forensics' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 85
+    timeout-minutes: 45
     permissions:
       actions: read
       contents: read
@@ -27,10 +27,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 2
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
             scripts/uv-lock-22619
+            scripts/uv-lock-22619-forensics
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
@@ -68,11 +70,12 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.13"
-      - name: Check enrolled source and calibrate inherited user-mode instructions
+      - name: Authenticate enrolled source and physical workspace
         run: |
           set -euo pipefail
           (cd scripts/uv-lock-22619 && sha256sum --strict -c SHA256SUMS)
-          python3 -ISBu scripts/uv-lock-22619/study.py calibrate
+          (cd scripts/uv-lock-22619-forensics && sha256sum --strict -c SHA256SUMS)
+          python3 -ISBu scripts/uv-lock-22619-forensics/collect.py prepare
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/uv
@@ -86,15 +89,15 @@ jobs:
       - name: Verify signed Cargo and the exact prior qualified f129 distribution
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -ISBu scripts/uv-lock-22619/study.py intake
-      - name: Validate cold and edited outputs, then separate native and observed visits
-        run: python3 -ISBu scripts/uv-lock-22619/study.py run
+        run: python3 -ISBu scripts/uv-lock-22619-forensics/collect.py intake
+      - name: Collect independent cold and restored metadata, behavior and selected compiler records
+        run: python3 -ISBu scripts/uv-lock-22619-forensics/collect.py run
       - name: Preserve all complete or partial native evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-lock-22619-${{ github.run_id }}-${{ github.run_attempt }}
+          name: uv-lock-22619-rmeta-forensics-${{ github.run_id }}-${{ github.run_attempt }}
           path: trait-results/
           if-no-files-found: warn
-          compression-level: 4
+          compression-level: 3
           retention-days: 14
