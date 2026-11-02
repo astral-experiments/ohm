@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-remat-matched-stage-20261102"
+BRANCH = "charlie/qa-indexed-check-matched-stage-20261102"
 BASE = "00f4192b5507f8c028898ce5bd66958d20f341c5"
 
 
@@ -52,18 +52,17 @@ def bundle(repo):
     changed = sorted(REG["changed_sources"])
     need(
         git(repo, "diff", "--name-status", "--no-renames", p, c).splitlines()
-        == ["M\t" + path for path in changed],
+        == [("M" if REG["changed_sources"][path]["P"] else "A") + "\t" + path for path in changed],
         "different treatment paths",
     )
     for role, entry in REG["roles"].items():
         rev = entry["revision"]
-        need(
-            git(
-                repo, "rev-parse", rev + "^{tree}", rev + ":compiler", *(rev + ":" + p for p in changed)
-            ).splitlines()
-            == [entry["tree"], entry["compiler"], *(REG["changed_sources"][p][role] for p in changed)],
-            "incorrect compiler source trees",
-        )
+        need(git(repo, "rev-parse", rev + "^{tree}", rev + ":compiler").splitlines()
+             == [entry["tree"], entry["compiler"]], "different pinned compiler tree")
+        for path in changed:
+            oid = REG["changed_sources"][path][role]
+            expected = "" if oid is None else "100644 blob " + oid + "\t" + path
+            need(git(repo, "ls-tree", rev, "--", path) == expected, ("different source blob", role, path))
 
 
 def control(workspace, root):

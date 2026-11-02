@@ -16,14 +16,38 @@
     "rust.download-rustc=false"
   ],
   "bundle": {
-    "branch": "refs/heads/charlie/llvm-defer-dev-live-intervals",
-    "bytes": 966,
-    "sha256": "cb524cab328b30c17ee20b5314e58cfe7836eac0d552127e1e02ffdb2d0931e4"
+    "branch": "refs/heads/charlie/qa-indexed-check-wire-source-20261102",
+    "bytes": 11501,
+    "sha256": "af36339f5f1cef45180c5b57d8e48649b6ab10eee4760ff960abf5ecbf8fd6f6"
   },
   "changed_sources": {
-    "compiler/rustc_codegen_llvm/src/llvm_util.rs": {
-      "C": "f411e041cb5b8ae2134e31a85ce0a67965cf43b5",
-      "P": "82ddcca3e15305e8a49fae4a444c437a4b9acb68"
+    "compiler/rustc_incremental/src/persist/file_format.rs": {
+      "C": "6991813104e616818d1843c8b65874bfedb4e61d",
+      "P": "9a0ba14e7641b0402d6eb79c26510016b42de241"
+    },
+    "compiler/rustc_incremental/src/persist/load.rs": {
+      "C": "699fb28edae9c4db8fc7c80f348e46bee05b428b",
+      "P": "cc1f8e52e4182a8f3c578cbe159fd3cc44841329"
+    },
+    "compiler/rustc_middle/src/dep_graph/graph.rs": {
+      "C": "a302bd97a97dc884a32ffd96441813dafeb7ba36",
+      "P": "e5d07fdcf43601fd735dd731f0570c5678a8e782"
+    },
+    "compiler/rustc_middle/src/dep_graph/serialized.rs": {
+      "C": "19e3dc103810fa79d2831dc4ba006a94ed7fe4ed",
+      "P": "006bc1a676dc34e3ba5a32f4aaf3fa6c3a55a7ed"
+    },
+    "compiler/rustc_middle/src/dep_graph/serialized/fixed.rs": {
+      "C": "15d508f84ea3f66768882e99a5eb9c2ed346177b",
+      "P": null
+    },
+    "compiler/rustc_middle/src/dep_graph/serialized/index.rs": {
+      "C": "3569761ff422b8c5994f0a9c412d76270bdb05ff",
+      "P": "b06c6423b57e1f10ed65112310445f6de3e214dc"
+    },
+    "compiler/rustc_middle/src/dep_graph/serialized/tests.rs": {
+      "C": "87aac226f72ea1f73f198fbdfb0f115d0ee0d2c2",
+      "P": "6943b55a93273714f90cafb3a714d7042c0b5c35"
     }
   },
   "kit": {
@@ -33,9 +57,9 @@
   },
   "roles": {
     "C": {
-      "compiler": "43ed11f0d8dc3801c7928c7f8892138b3fdd0d26",
-      "revision": "554704972388b58870ecd3a51c0c2f4eb88d2a58",
-      "tree": "cb31f67642f2123200353a2c19ac72dbe423b12c"
+      "compiler": "6d4ca9403d7dd07207283d8c4c3a7b726a85c3c4",
+      "revision": "33e2c4ae062fff0c8dbaf1726160ca4dce6b482a",
+      "tree": "d61a8d8a922879c1fc5dc628573a74400b86aa1f"
     },
     "P": {
       "compiler": "992fea2dd7c2a88fca8a3b34bb6aa34fc925d1ac",
