@@ -26,9 +26,12 @@ def sha(path):
 def save(name, value):
     (RECORDS / name).write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
 
-def download(endpoint, path):
+def download(endpoint, path, *, release=False):
+    # Release assets negotiate binary content. Actions archives redirect from the JSON endpoint.
+    args=['gh','api']
+    if release:args+=['-H','Accept: application/octet-stream']
     with path.open('xb') as f:
-        subprocess.run(['gh','api','-H','Accept: application/octet-stream',REPO+endpoint],stdout=f,check=True)
+        subprocess.run([*args,REPO+endpoint],stdout=f,check=True)
 
 def main(role):
     if role not in ('22','23') or os.environ['GITHUB_REF']!='refs/heads/charlie/qa-ruff-db-link-cause-20261102':
@@ -41,7 +44,7 @@ def main(role):
     package=ROOT/(stem+'.tar.gz')
     if role=='22':
         assert (cat['name'],cat['size'],cat['digest'])==(package.name,359852703,'sha256:'+RELEASE)
-        download(endpoint,package); assert sha(package)==RELEASE
+        download(endpoint,package,release=True); assert sha(package)==RELEASE
     else:
         assert (cat['name'],cat['size_in_bytes'],cat['digest'],cat['workflow_run']['id'],cat['expired'])==(stem,356855609,'sha256:'+RC,41348186330,False)
         bundle=ROOT/'original.zip';download(endpoint+'/zip',bundle);assert sha(bundle)==RC

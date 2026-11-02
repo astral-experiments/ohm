@@ -7,6 +7,13 @@ run-name: Ruff test link reason ${{ inputs.reviewed_head }}
         description: Reviewed QA commit
         type: string
         required: true
+      distributions:
+        type: choice
+        description: Distribution jobs to run
+        default: both
+        options:
+          - both
+          - rc23
 permissions: {}
 jobs:
   diagnose:
@@ -20,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        role: ['22','23']
+        role: ${{ fromJSON(inputs.distributions == 'rc23' && '["23"]' || '["22","23"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
