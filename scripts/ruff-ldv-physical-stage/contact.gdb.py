@@ -48,6 +48,8 @@ def live(lo, length):
 
 def check_id(rows, info):
     note = info["build_id"]
+    if note is None:
+        return None
     wanted = bytes.fromhex(note["hex"])
     for lo, hi, perms, offset, *_ in rows:
         adr = lo + note["offset"] - offset
@@ -64,7 +66,7 @@ def check_id(rows, info):
 # No pathname-only match and no tracing of a measured Cargo command is accepted.
 gdb.execute("catch syscall mmap", to_string=True)
 trap = gdb.breakpoints()[-1]
-backed = {}
+backed = {k: {} for k in ("driver", "llvm")}
 for _ in range(1024):
     gdb.execute("continue", to_string=True)
     if not (proc / "maps").exists():
@@ -89,21 +91,35 @@ for _ in range(1024):
             chunk = min(64, size, mapping[1] - address)
             obj.seek(off)
             assert chunk >= 16 and live(address, chunk) == obj.read(chunk), ("different mapped code", kind)
-        backed[kind] = {"fd": fd, "returned_address": address, "length": size, "file_offset": off,
-                        "prot": prot, "file_sha": h.hexdigest(), "fd_inode": [st.st_dev, st.st_ino],
-                        "kernel_row": mapping}
-    if len(backed) == 2:
+        for seg in info["exec_loads"]:
+            low = seg["offset"]
+            if not (off <= low and low + seg["size"] <= off + size):
+                continue
+            here = address + low-off
+            entry = {"fd": fd, "returned_address": address, "length": size, "file_offset": off,
+                     "prot": prot, "file_sha": h.hexdigest(), "fd_inode": [st.st_dev, st.st_ino],
+                     "kernel_row": mapping,"segment":seg,"address":here}
+            hmem = hashlib.sha256()
+            for cursor in range(0,seg["size"],1<<20):
+                hmem.update(live(here+cursor,min(1<<20,seg["size"]-cursor)))
+            entry["actual_rx_sha256"] = hmem.hexdigest()
+            assert entry["actual_rx_sha256"] == seg["sha256"], ("different loaded executable segment",kind,low)
+            backed[kind][str(low)] = entry
+    if all(len(backed[k])==len(subject[k]["exec_loads"]) for k in backed):
         break
 else:
-    raise AssertionError(("loader never produced both source-bound RX mappings", backed))
+    raise AssertionError(("loader did not mmap all registered executable regions", backed))
 trap.delete()
 driver, llvm = maps(subject["driver"]), maps(subject["llvm"])
+fdproof={}
 for kind, rows in (("driver", driver), ("llvm", llvm)):
-    backed[kind]["mapped_build_id"] = check_id(rows, subject[kind])
-zero = [row[0] for row in driver if row[3] == 0]
-assert zero
-page = os.sysconf("SC_PAGESIZE")
-base = min(zero) - (subject["vaddr"] // page) * page
+    segs=list(backed[kind].values())
+    assert set(backed[kind])=={str(s["offset"]) for s in subject[kind]["exec_loads"]}
+    fdproof[kind]={"segments":segs,"mapped_build_id":check_id(rows,subject[kind]),
+                   "file_sha":segs[0]["file_sha"],"fd_inode":segs[0]["fd_inode"]}
+bias={s["address"]-s["segment"]["vaddr"] for s in fdproof["driver"]["segments"]}
+assert len(bias)==1
+base=bias.pop()
 hits = {k: 0 for k in subject["symbols"]}
 locations = {}
 
@@ -124,7 +140,8 @@ watch = []
 for kind, row in subject["symbols"].items():
     address = base + row["value"]
     selected, = (r for r in driver if r[0] <= address and address + 16 <= r[1] and "x" in r[2])
-    assert backed["driver"]["returned_address"] <= address < backed["driver"]["returned_address"] + backed["driver"]["length"]
+    assert any(s["address"] <= address and address+16 <= s["address"]+s["segment"]["size"]
+               for s in fdproof["driver"]["segments"])
     with open(subject["driver"]["path"], "rb") as binary:
         binary.seek(selected[3] + address - selected[0])
         assert live(address, 16) == binary.read(16), ("pass address differs from actual installed ELF", kind)
@@ -134,4 +151,4 @@ gdb.execute("continue")
 code = int(gdb.parse_and_eval("$_exitcode"))
 with Path(subject["output"]).open("x") as stream:
     json.dump({"exit": code, "pid": pid, "hits": hits, "addresses": locations,
-               "driver_maps": driver, "llvm_maps": llvm, "loaded_bias": base, "loader_fds": backed}, stream, sort_keys=True)
+               "driver_maps": driver, "llvm_maps": llvm, "loaded_bias": base, "loader_fds": fdproof}, stream, sort_keys=True)

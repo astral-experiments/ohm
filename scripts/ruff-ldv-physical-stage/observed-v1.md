@@ -8,3 +8,15 @@ checks returned executable mappings and live instruction bytes, and reads the
 live GNU build IDs at their registered ELF note offsets. The source bundle,
 factory, six-pair schedule and outcomes are unchanged. The GNU ELF note reader
 is shared with the independently tested 3f7cdcd5 upstream mono-owner probe.
+
+[Run 41425541148](https://github.com/astral-experiments/ohm/actions/runs/41425541148)
+then built both original source trees, passed all factory Cargo controls and
+uploaded the 185,555,780-byte authenticated SDK artifact 13131394450. The
+off-clock reader separately refused the real signed LLVM ELF: it has no GNU
+build ID. Its 40-byte GNU linker script is a distinct link-time file. The
+next observation consumes that frozen artifact, verifies an optional GNU
+build ID where present, and hashes every byte in every actual executable
+PT_LOAD directly from the live mapped library. On the original signed LLVM,
+this covers 69,720,216 and 37,320,372 executable bytes. The complete mmap
+FD bytes and the precise first instructions at each breakpoint are also
+bound. Every other admission and the source experiment is unchanged.

@@ -86,15 +86,63 @@ def elf_build_id(path):
                     need(8 <= d <= 64, "invalid GNU build ID")
                     notes.append({"offset": offset+pos, "hex": data[pos:pos+d].hex()})
                 pos += (d+3) & ~3
-    need(len(notes) == 1, "expected exactly one loadable driver build ID")
-    return notes[0]
+    need(len(notes) <= 1, "multiple GNU file build IDs")
+    return notes[0] if notes else None
+
+
+def executable_segments(path):
+    import hashlib
+    result=[]
+    with path.open("rb") as f:
+        head=f.read(64)
+        need(head[:7]==b"\x7fELF\x02\x01\x01","expected little endian ELF64")
+        offset=struct.unpack_from("<Q",head,32)[0]
+        stride,num=struct.unpack_from("<HH",head,54)
+        need(stride==56 and 0<num<256,"bad program headers")
+        f.seek(offset)
+        headers=f.read(stride*num)
+        for i in range(num):
+            kind,flags,off,vaddr,_,sz,_,_=struct.unpack_from("<IIQQQQQQ",headers,i*stride)
+            if kind!=1 or not flags&1 or not sz:
+                continue
+            need(flags&2==0 and 0<sz<=700*(1<<20),"unexpected writeable/excessive executable segment")
+            f.seek(off)
+            h=hashlib.sha256(); left=sz
+            while left:
+                data=f.read(min(left,1<<20))
+                need(data,"short executable segment")
+                h.update(data);left-=len(data)
+            result.append({"offset":off,"vaddr":vaddr,"size":sz,"sha256":h.hexdigest()})
+    need(0<len(result)<12,"unexpected executable load count")
+    return result
+
+
+def real_llvm(sdk, manifest):
+    root=sdk/"lib"
+    elf=[]
+    scripts=[]
+    for p in root.glob("libLLVM*.so*"):
+        if not p.is_file():
+            continue
+        name=str(p.relative_to(sdk))
+        need(sha(p)==manifest[name],"different registered LLVM member")
+        with p.open("rb") as f:
+            if f.read(4)==b"\x7fELF":
+                elf.append(p)
+            else:
+                need(p.stat().st_size<256,"unexpected LLVM link-time input")
+                scripts.append(p)
+    need(len(elf)==1,"expected exactly one executing ELF LLVM")
+    for p in scripts:
+        need(p.read_bytes()==f"INPUT({elf[0].name})\n".encode(),"unrecognised linker-script alias")
+    return elf[0]
 
 
 def binding(path):
     p = path.resolve(strict=True)
     st = p.stat()
     return {"path": str(p), "sha256": sha(p), "device": [os.major(st.st_dev), os.minor(st.st_dev)],
-            "inode": st.st_ino, "build_id": elf_build_id(p)}
+            "inode": st.st_ino, "build_id": elf_build_id(p), "exec_loads": executable_segments(p)}
 
 
 def contact(root):
@@ -113,12 +161,9 @@ def contact(root):
         native = symbol_inventory(sdk, role)
         recorded = json.loads((root / "logs" / ("ldv-driver-" + role + ".json")).read_bytes())
         need(native == recorded, "different physical compiler from bootstrap")
-        libraries = [p for p in (sdk / "lib").glob("libLLVM*.so*") if p.is_file()]
-        real_llvm = {binding(p)["sha256"]: p for p in libraries}
-        need(len(real_llvm) == 1, "different actual LLVM payloads")
         expected = {n: v[0] for n, v in specs[role].items()}
         driver = sdk / "lib" / native["driver"]
-        llvm = next(iter(real_llvm.values()))
+        llvm = real_llvm(sdk, expected)
         need(all(sha(p) == expected[str(p.relative_to(sdk))] for p in (sdk / "bin/rustc", driver, llvm)),
              "unregistered frontend, driver or LLVM")
         for debug in ("line-tables-only", "2"):
