@@ -1,0 +1,32 @@
+{
+  "schema": "ohm-source-placement-ruff-docs-1",
+  "compiler_parent": "531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5",
+  "compiler_candidate": "4e546b27c311f29d99f9528e64420887f57c7538",
+  "source": {
+    "repository": "astral-sh/ruff",
+    "pr": 28277,
+    "old": "056ce07a895c217dab7929a616540c246cf8a078",
+    "old_tree": "65587ff0988ac98ceabd47b42715f55a7294e296",
+    "new": "7cc9f1ed53e5ce175f17fde3a75fe792ac41e8cd",
+    "new_tree": "982ac8c61cd1448e94beaec58eb24f84a5485527",
+    "path": "crates/ty_python_semantic/src/types/callable.rs",
+    "old_blob": "6bc78401dc749b9c374f4e3b276cc1233bf9fee6",
+    "new_blob": "9fd19b2e9a02bc1bb343a797be765741b2e37079",
+    "lock_sha256": "d68e9d677cca46f89e5bc20c97c62412be9009fd5ffa4f25dfa65f59e57063ef",
+    "e2e_snapshot_blob": "9e08fa15ea4b4d3232ea3a143d786abf7a65944c",
+    "diff_numstat": [258, 12]
+  },
+  "build_argv": ["cargo", "+ohm", "test", "--no-run", "-p", "ty_server", "--test", "e2e", "--locked", "--offline", "-j4"],
+  "profile": {"opt_level": 1, "debug": "line-tables-only", "lto": "off"},
+  "named_test": "signature_help::works_in_function_name",
+  "source_sites": [
+    [386, 632, "fn from(relation: TypeRelation) -> Self"],
+    [520, 766, "fn into_paramspec_value("],
+    [534, 780, "fn partially_apply("],
+    [547, 793, "fn into_functools_partial_instance("]
+  ],
+  "phases": ["empty_old", "edit", "unchanged", "invalid", "repair", "empty_new", "return_old"],
+  "invalid": "Append a uniquely named compile_error to the edited callable.rs. Check must reject it and show the marker. After exact repair, build and execute the previously selected test.",
+  "runtime_control": "In a separate unscored worktree state, inject a unique panicking assertion in the named e2e test. The rebuilt binary must run exactly this test, fail, and print its marker. Restore the exact source and prove the test passes.",
+  "decision": "One paired diagnostic only. A later estimate requires a separate prospective six-pair counterbalanced run on independently primed targets."
+}
