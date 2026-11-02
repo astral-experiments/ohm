@@ -130,7 +130,7 @@ def collect(env,before,arm,inspected):
 
 
 
-def qualify(rows, owners):
+def qualify(rows, owners, *, require_skips=True):
     """Compare real Cargo arguments and the native-pass counters from separate processes."""
     result={}
     clean_argv=None
@@ -151,9 +151,9 @@ def qualify(rows, owners):
         ins=[c for row in group if row["history"]=="clean" for c in row["native"] if "counts" in c]
         counters={k:sum(c["counts"][k] for c in ins) for k in ("installed","machines","direct","skips")}
         if arm!="signed":
-            need(counters["installed"]>0 and counters["machines"]>0 and counters["direct"]>0,
+            need(counters["installed"]>0 and counters["machines"]>0 and (not require_skips or counters["direct"]>0),
                  ("source pass never reached the real compiler backend",arm,counters))
-            if arm=="strict":
+            if arm=="strict" and require_skips:
                 need(counters["skips"]>0,("no direct opportunity on this real workflow",counters))
         result[arm]={"inspection":counters,"measured_native_children":len(measured),
                      "unchanged_native_owners":[c["owner"] for row in group if row["phase"]=="unchanged" for c in row["native"]]}

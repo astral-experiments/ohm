@@ -1,9 +1,8 @@
-"""Measure a real signed Cargo under two root-only LLVM pipelines on Ruff #28106."""
+"""Measure the enrolled compiler source on the held-out Ruff #27924 TOML parser edit."""
 
 import argparse
 from collections import Counter
 from contextlib import contextmanager
-from itertools import permutations
 import hashlib
 import json
 import os
@@ -149,44 +148,12 @@ def verify_argv(lines, flags, compiler, wrapper):
     return selected[0]
 
 
-def runtime(here, work, env, phase, batch, clock, gold):
-    """Measure client startup and a populated metadata/read/format loop independently."""
-    import study as p
-    output = phase / "runtime"
-    output.mkdir()
-    src = here / "measure-client.rs"
-    binary = here / "measure-client"
-    binary.unlink(missing_ok=True)
-    cmd = read(phase / "client/compile.json")["argv"]
-    need(cmd[:2] == ["rustc", "+ohm"] and Path(cmd[2]) == here / "option-client.rs"
-         and cmd[-2:] == ["-o", str(here / "option-client")], ("consumer compiler", cmd))
-    cmd[2] = str(src)
-    cmd[-1] = str(binary)
-    cmd.extend(["-Copt-level=1"])
-    run(cmd, here, env, output / "compile", work, batch)
-    rows = []
-    # Pass option names at run time. The signed driver is identical in both arms.
-    keys = (p.KEY, p.SIBLING, p.MISSING)
-    for i, n in enumerate((0, 128, 1024, 1024, 128, 0)):
-        q = output / str(i)
-        count = run([binary, str(n), *keys], here, env, q, work, batch, clock=clock)
-        digest = 14695981039346656037
-        for _ in range(n):
-            for key in keys:
-                for byte in gold.get(key, b"\xff"):
-                    digest = ((digest ^ byte) * 1099511628211) & ((1 << 64) - 1)
-        need((q / "outer.stdout").read_text() == f"{digest:016x}\n" and not (q / "outer.stderr").stat().st_size,
-             ("wrong measured runtime result", q))
-        rows.append([n, count, f"{digest:016x}"])
-    return {"counts": rows, "bytes": binary.stat().st_size, "sha256": sha(binary)}
-
-
 def main(args):
     qa, src, original, scratch, out = (v.resolve() for v in
                                       (args.qa, args.source, args.original, args.scratch, args.results))
     need(original.name == "ohm-branch-object-qa", original)
     os.environ["RUNNER_TEMP"] = str(original.parent)
-    need(sha(QA_LEDGER) == "9c3e77b17282673ada807310f4c5c5fef1b449f458dce1cf15069e5283f658e8", "changed pinned QA ledger")
+    need(sha(QA_LEDGER) == "08d8de7e0f13f5669dcdfd893dd96762211c5905acc8f6302f8184330e58959d", "changed pinned QA ledger")
     ledger = read(QA_LEDGER)
     for file, expected in ledger.items():
         need(sha(qa/file) == expected, ("changed frozen QA input", file))
@@ -199,7 +166,7 @@ def main(args):
          and not any(a.is_relative_to(b) for a, b in ((out, scratch), (scratch, out), (out, original),
                                                          (scratch, original), (scratch, src), (out, src), (scratch, qa), (out, qa))),
          "use separate new scratch and results directories outside all reference trees")
-    gold = p.source_pair(src)
+    p.source_pair(src)
     logs = original / "logs"
     need(read(logs/"accepted.json")["new_compiler_treatments"] == 0
          and read(logs/"enrollment.json")["boot"] == Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
@@ -230,12 +197,17 @@ def main(args):
          "counter is not identical to original executable")
     guards.admit(guards.resources(scratch.parent, out.parent), entry=True, bootstrap=True)
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    import e2e
     import source_pass
-    if args.suite == "e2e":
-        need(args.e2e_source is not None, "missing test fixture checkout")
-        return e2e.run(sys.modules[__name__], args, w, registry, expected_registry, original_cargo, clock)
-    manifest = e2e.compiler_manifest(sys.modules[__name__], args.e2e_rustcs)
+    import toml_holdout as fixture
+    from reader import members
+    need(Path(sys.modules["reader"].__file__).resolve()==w.setup.CGU/"reader.py", "wrong archive member reader")
+    verify_helpers(qa, ledger)
+    this=sys.modules[__name__]
+    src=args.toml_source.resolve(strict=True)
+    need(all(not a.is_relative_to(b) and not b.is_relative_to(a) for a in (scratch,out) for b in (src,)),"overlapping holdout source")
+    blobs=fixture.enroll(this,src,expected_registry)
+    manifest = source_pass.validate(args.source_pass)
+    need(Path(manifest["signed_rustc"]).samefile(w.SDK / "bin/rustc"), "wrong enrolled compiler")
     scratch.mkdir()
     out.mkdir()
     here = scratch / "helper"
@@ -247,11 +219,9 @@ def main(args):
     upstream = Path(git(src, "rev-parse", "--path-format=absolute", "--git-common-dir").decode().strip())
     subprocess.run(["git", "init", "-q", repo], check=True)
     (repo / ".git/objects/info/alternates").write_text(str(upstream / "objects") + "\n")
-    git(repo, "checkout", "--quiet", "--detach", p.OLD)
-    p.source_state(repo, p.OLD, False)
-    for target, payload in (("option-client.rs", (w.HERE / "client.rs").read_bytes()), ("bad-option-client.rs", p.BAD_CLIENT),
-                            ("measure-client.rs", Path(__file__).with_name("measure-client.rs").read_bytes())):
-        (here / target).write_bytes(payload)
+    git(repo, "checkout", "--quiet", "--detach", fixture.OLD)
+    fixture.source_state(this,repo,blobs,fixture.OLD,False,p.INVALID)
+    shutil.copyfile(Path(__file__).with_name("toml-reader.rs"),here/"toml-reader.rs")
     bodies = out / "client-bodies"
     bodies.mkdir()
     base_env = {**w.ENV, "CARGO_HOME": str(work / "cargo-home"), "CARGO_TARGET_DIR": str(work / "target"),
@@ -260,15 +230,15 @@ def main(args):
         actual = subprocess.check_output(["rustup", "which", "--toolchain", "ohm", prog], env=w.ENV, text=True).strip()
         version = subprocess.check_output([prog, "+ohm", "-vV"], env=w.ENV, text=True)
         need(Path(actual).samefile(w.SDK / "bin" / prog) and commit in version and "ohm-1.99.0-22" in version, prog)
-    put(out / "identity.json", {"qa": QA, "old": p.OLD, "new": p.NEW, "counter": sha(clock),
+    put(out / "identity.json", {"qa": QA, "old": fixture.OLD, "new": fixture.NEW, "counter": sha(clock), "lock":fixture.LOCK,
         "sdk_ledger": sdk_ledger, "source_common_dir": str(upstream), "boot": Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
-        "driver": sha(Path(__file__)), "profiles": sha(ARM_FILE), "reader": sha(here / "measure-client.rs"), "order": args.order,
-        "study_mode": "signed-source-pass"})
+        "driver": sha(Path(__file__)), "profiles": sha(ARM_FILE), "reader": sha(here/"toml-reader.rs"), "order": args.order,
+        "study_mode": "signed-source-pass-toml", "fixture":sha(Path(fixture.__file__))})
     norm_graph = None
     observations = []
     # Each arm has an independently empty OLD history and a second independently empty clean NEW reference.
     for ix, arm in enumerate(args.order.split(",")):
-        env, flags, compiler, identity = e2e.compiler_arm(sys.modules[__name__], w, manifest, arm, base_env)
+        env, flags, compiler, identity = source_pass.select(manifest, arm, base_env)
         put(out / f"compiler-{arm}.json", identity)
         cli = p.CMD
         # The linked clients also use the original, physically attested signed SDK.
@@ -303,8 +273,8 @@ def main(args):
                     inspected = phase in ("inspect-old","inspect-new")
                     env = source_pass.select(manifest, arm, base_env, inspected)[0]
                     native_before = source_pass.snapshot(env)
-                    rev, bad = (p.OLD if phase in ("old","inspect-old") else p.NEW), phase == "invalid"
-                    before = p.write_source(repo, rev, bad)
+                    rev, bad = (fixture.OLD if phase in ("old","inspect-old") else fixture.NEW), phase == "invalid"
+                    before=fixture.source_state(this,repo,blobs,rev,bad,p.INVALID,write=True)
                     dest = case / phase
                     # Only the separately empty reference is verbose. It cannot skip compiling the root.
                     cmd = [*cli, "-vv"] if phase == "clean-new" else cli
@@ -312,7 +282,7 @@ def main(args):
                                 clock=clock if history=="edit" else None)
                     native_evidence = source_pass.collect(env, native_before, arm, inspected)
                     put(dest/"native.json", native_evidence)
-                    need(before == p.source_state(repo, rev, bad), "source changed while Cargo ran")
+                    need(before==fixture.source_state(this,repo,blobs,rev,bad,p.INVALID),"source changed while Cargo ran")
                     put(dest / "source.json", before)
                     rows = cargo_rows((dest / "outer.stdout").read_bytes(), graph if phase == "clean-new" else None)
                     products = p.results(rows, not bad)
@@ -327,30 +297,31 @@ def main(args):
                             need(p.OWNER in dirty, ("changed source did not rebuild its owner", dirty))
                         if phase == "clean-new":
                             put(dest / "actual-argv.json", verify_argv((dest / "outer.stderr").read_text(), flags, compiler, env["RUSTC_WRAPPER"]))
-                        native = w.native.client(dest, rows, products, here, work, client_env, gold[rev], bodies)
+                        native=fixture.client(this,w,dest,rows,products,graph,here,work,client_env,rev,bodies)
                         ar = p.artifact(products, p.OWNER)
-                        dyn = runtime(here, work, client_env, dest, out, clock, gold[rev]) if phase in ("new","clean-new") else None
-                        results = {"cargo": count, "unfresh": dirty, "consumer": native, "archive_bytes": ar.stat().st_size,
-                                   "archive_sha256": sha(ar), "runtime": dyn, "output_sha256": p.EXPECTED[rev]}
+                        need(ar.is_file() and not ar.is_symlink() and 0<ar.stat().st_size<=512<<20,"unexpected library")
+                        objects,metadata=members(ar.read_bytes(),p.OWNER)
+                        results={"cargo":count,"unfresh":dirty,"consumer":native,"archive_bytes":ar.stat().st_size,
+                                 "archive_sha256":sha(ar),"objects":objects,"metadata":metadata}
                     else:
                         results = {"cargo": count, "error": "E0308"}
                     results["native"] = native_evidence
                     observations.append({"arm": arm, "history": history, "phase": phase, **results})
                     put(dest / "qualified.json", results)
                 need(registry(home)==expected_registry, "changed registry inputs during history")
-        need(e2e.compiler_arm(sys.modules[__name__], w, manifest, arm, base_env)[3] == identity, "changed compiler")
+        need(source_pass.select(manifest, arm, base_env)[3] == identity, "changed compiler")
     need(w.acquire.verify_sdk(w.SDK) == extra and registry(original_cargo)==expected_registry, "changed SDK or registry")
-    put(out / "source-proof.json", source_pass.qualify(observations, ("ruff_workspace",)))
     put(out / "observations.json", observations)
+    put(out/"source-proof.json",source_pass.qualify(observations,("ruff_workspace",),require_skips=False))
+    put(out/"accepted.json",fixture.qualify(this,observations,out))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("qa", "source", "original", "scratch", "results"):
         parser.add_argument("--" + name, type=Path, required=True)
-    orders = [",".join(p) for p in permutations(ARMS)]
+    orders = ("signed,stock,strict", "strict,stock,signed")
     parser.add_argument("--order", required=True, choices=orders)
-    parser.add_argument("--suite", choices=["build", "e2e"], default="build")
-    parser.add_argument("--e2e-source", type=Path)
-    parser.add_argument("--source-pass", type=Path, dest="e2e_rustcs", required=True)
+    parser.add_argument("--toml-source", type=Path, required=True)
+    parser.add_argument("--source-pass", type=Path, required=True)
     main(parser.parse_args())

@@ -1,5 +1,5 @@
-name: Qualify a source-built LLVM machine pass on Ruff
-run-name: Source register coalescer ${{ inputs.suite }} ${{ inputs.pair_order }} at ${{ inputs.reviewed_head }}
+name: Qualify the source register coalescer on Ruff TOML deserialization
+run-name: Ruff 27924 source coalescer ${{ inputs.pair_order }} at ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -14,27 +14,18 @@ on:
         options:
           - signed,stock,strict
           - strict,stock,signed
-      suite:
-        description: Ruff dev workflow to replay
-        required: true
-        default: build
-        type: choice
-        options:
-          - build
-          - e2e
 permissions:
   actions: read
   contents: read
 jobs:
   diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-llvm-remat-source-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-llvm-remat-toml-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     name: Signed GNU Ruff workspace option edit
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 210
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PAIR_ORDER: ${{ inputs.pair_order }}
-      PAIR_SUITE: ${{ inputs.suite }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -72,12 +63,11 @@ jobs:
           path: ruff
           persist-credentials: false
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        if: inputs.suite == 'e2e'
         with:
           repository: astral-sh/ruff
-          ref: f9115b8deefa56b18b79449f8acafe25475c54d3
+          ref: e0eb7b07632fce04d24d128c0e10a2d31c9e8282
           fetch-depth: 2
-          path: ruff-e2e
+          path: ruff-toml
           persist-credentials: false
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -150,7 +140,7 @@ jobs:
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/reopen.py "$base/logs" "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract" "$REVIEWED_HEAD" --execute > "$base/accepted.json"
           mv "$base/accepted.json" "$base/logs/accepted.json"
-      - name: Compare full Ruff builds and run the linked option readers
+      - name: Compare full Ruff builds and execute the held-out TOML caller
         timeout-minutes: 160
         run: |
           set -euo pipefail
@@ -159,20 +149,18 @@ jobs:
           mkdir "$root" "$root/guard" "$root/driver"
           cp -a enrolled/scripts/ruff-workspace-remat/. "$root/driver/"
           (cd "$root/driver" && sha256sum --check --strict SHA256SUMS)
-          args=(--suite "$PAIR_SUITE")
-          if [[ "$PAIR_SUITE" == e2e ]]; then args+=(--e2e-source "$GITHUB_WORKSPACE/ruff-e2e"); fi
           python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch \
             "$root" "$root/guard" "$root/guard/resources" \
             python3 -IB "$root/driver/replay.py" \
             --qa "$GITHUB_WORKSPACE/enrolled" --source "$GITHUB_WORKSPACE/ruff" \
             --original "$base" --scratch "$root/work" --results "$root/observations" \
             --source-pass "$RUNNER_TEMP/ohm-source-pass-kit/manifest.json" \
-            --order "$PAIR_ORDER" "${args[@]}"
+            --order "$PAIR_ORDER" --toml-source "$GITHUB_WORKSPACE/ruff-toml"
       - name: Preserve hardware clocks, counter settings, compiler argv and runnable results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ruff-source-register-coalescer
+          name: ruff-toml-source-register-coalescer
           path: |
             ${{ runner.temp }}/ohm-remat-comparison/observations
             ${{ runner.temp }}/ohm-remat-comparison/guard
