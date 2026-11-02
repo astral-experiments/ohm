@@ -1,4 +1,4 @@
-name: 'Screen handwritten impl identities on the uv-client check after uv #22874'
+name: 'Inspect nine real #22874 workspace metadata graphs on the ordinary uv-client check'
 'on':
   workflow_dispatch:
     inputs:
@@ -9,11 +9,11 @@ name: 'Screen handwritten impl identities on the uv-client check after uv #22874
       build_run_id:
         required: true
         type: string
-        description: Completed two-role optimized stage1 build run
+        description: Completed original RDR observer SDK run
       build_head:
         required: true
         type: string
-        description: Reviewed full SHA of that build workflow
+        description: Exact reviewed producer head
       sdk_lock_sha256:
         required: true
         type: string
@@ -24,11 +24,11 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22874-handwritten-uv-client'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41371136314' && inputs.build_head == '682930c7b58a62cd46c6f951b60d8cab8d3c7869'
-      && inputs.sdk_lock_sha256 == '3579524fb6031aba5b9621fbd7414b3ab8e30aec4b6fe8853eb3398f0b840e9f'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rdr-22874-uv-client'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41376572352' && inputs.build_head == 'd24256c96e42cc34a94a17e7d357947fe7375245'
+      && inputs.sdk_lock_sha256 == '930135cf79370a4c75216226a9d88fbcee7b64fb73b62303fc434f8ad9a7264c'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 175
+    timeout-minutes: 100
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       BUILD_RUN_ID: ${{ inputs.build_run_id }}
@@ -41,9 +41,11 @@ jobs:
         path: coordinator
         ref: ${{ github.sha }}
         persist-credentials: 'false'
-        sparse-checkout: |-
-          scripts/handwritten-panel
+        sparse-checkout: 'scripts/handwritten-panel
+
           scripts/uv-inherent-22874
+
+          scripts/rdr-client-22874'
         fetch-depth: '2'
     - name: Check out builder
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -51,59 +53,69 @@ jobs:
         path: builder
         ref: ${{ inputs.build_head }}
         persist-credentials: 'false'
-        sparse-checkout: |-
-          .github/workflows
+        sparse-checkout: '.github/workflows
+
           scripts/handwritten-stage1
+
+          scripts/rdr-observer-stage1'
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: opening
         ref: 341cd92e5d381a50bd380467075f31e780ee6296
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/uv-root-20991-opening
+        sparse-checkout: 'scripts/uv-root-20991-opening
+
+          '
     - name: Check out previous
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: previous
         ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/uv-resolver-whole-pmu
+        sparse-checkout: 'scripts/uv-resolver-whole-pmu
+
+          '
     - name: Check out qualified
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: qualified
         ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/rc23-trait-qualification
+        sparse-checkout: 'scripts/rc23-trait-qualification
+
+          '
     - name: Check out pilot
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: pilot
         ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/ctfe-crossover-pilot
+        sparse-checkout: 'scripts/ctfe-crossover-pilot
+
           scripts/branch-return-pmu
+
+          '
     - name: Check out calibrator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: calibrator
         ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/gnu-renderer-pfc-hardware
+        sparse-checkout: 'scripts/gnu-renderer-pfc-hardware
+
+          '
     - name: Check out observers
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: observers
         ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/gnu-example-ceiling
+        sparse-checkout: 'scripts/gnu-example-ceiling
+
           scripts/gnu-renderer-library-workers
+
+          '
     - name: Check out uv at the actual landed edit
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -114,38 +126,35 @@ jobs:
         persist-credentials: 'false'
         path: uv-source
     - name: Check the private payload and host prerequisites
-      run: |
-        set -euo pipefail
+      run: 'set -euo pipefail
+
         mkdir trait-results
+
+        (cd coordinator/scripts/rdr-client-22874 && sha256sum --strict --check SHA256SUMS)
+
         (cd coordinator/scripts/handwritten-panel && sha256sum --strict --check SHA256SUMS)
+
         (cd coordinator/scripts/uv-inherent-22874 && sha256sum --strict --check SHA256SUMS)
+
         /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-    - name: Calibrate inherited userspace instructions for real fork, exec and threads
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/core.py calibrate 2>&1 | tee trait-results/calibration.log
-    - name: Admit the two qualified stage1 SDKs and the signed Cargo binary
+
+        '
+    - name: Admit the exact observer SDK and eight signed -22 tools
       env:
         GH_TOKEN: ${{ github.token }}
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/core.py admit 2>&1 | tee trait-results/intake.log
-    - name: Check both incremental and metadata migration directions
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/core.py migration
-    - name: Qualify the real 543-unit consumer and collect four first-edit pairs
-      run: |-
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/screen.py 2>&1 | tee trait-results/experiment.log
-    - name: Verify original restored outputs, PMU clocks and separate uninstrumented wall
-      run: |-
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/score.py 2>&1 | tee trait-results/reduction.log
-    - name: Preserve raw clocks, source qualification and any incomplete attempt
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISBu coordinator/scripts/rdr-client-22874/intake.py 2>&1 | tee trait-results/rdr-intake.log'
+    - name: Capture ordinary and independent marked uv-client A, warm B and fresh B
+      run: 'set -euo pipefail
+
+        /usr/bin/python3.12 -ISBu coordinator/scripts/rdr-client-22874/collect.py 2>&1 | tee trait-results/rdr-collect.log'
+    - name: Keep original full rmetas and selected-PID graphs including incomplete results
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22874-handwritten-client-screen-1
+        name: uv-22874-client-rdr-fd02-1
         path: trait-results/
         if-no-files-found: error
-        compression-level: '1'
+        compression-level: '3'
         retention-days: 5
