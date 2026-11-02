@@ -10,9 +10,25 @@ import subprocess
 import sys
 import tomllib
 
+# Isolated Python drops the script directory from sys.path. Name our checked
+# siblings explicitly so the hosted entry cannot import a user module instead.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from support import (HERE, calibrate, census, e2e, guards, instrument, native, need, physical, put, replay,
                      setup_tools, sha, study, visit)
 import smoke
+
+
+def source_plan(source, suite):
+    need(suite in ("option", "e2e"), "unregistered workflow")
+    old, new, cli = ((study.OLD, study.NEW, study.CMD) if suite == "option"
+                     else (e2e.OLD, e2e.NEW, e2e.CARGO))
+    need(census.git(source, "rev-parse", "HEAD") == new
+         and census.git(source, "rev-parse", new + "^") == old
+         and not census.git(source, "status", "--porcelain=v1"), "unexpected historical source")
+    probe_gz = HERE / "guard.so.gz"
+    need(probe_gz.is_file() and sha(probe_gz) == "b9ce23b73265f5140237b338c0e94095cc1fff841bd5299b8acc7741f0eaf53d",
+         "missing or different enrolled public probe")
+    return {"old": old, "new": new, "command": cli, "lock": sha(source / "Cargo.lock"), "suite": suite}
 
 
 def registry(home):
@@ -105,9 +121,8 @@ def main(source, suite, pair):
     assignment, = [s for s in schedule["slots"] if s["suite"] == suite and s["pair"] == pair]
     need(census.git(HERE, "rev-parse", "HEAD") == os.environ["GITHUB_SHA"] == os.environ["REVIEWED_HEAD"], "wrong QA head")
     run, old_evidence, sdk = census.paths()
-    old = study.OLD if suite == "option" else e2e.OLD
-    new = study.NEW if suite == "option" else e2e.NEW
-    need(census.git(source, "rev-parse", "HEAD") == new and not census.git(source, "status", "--porcelain=v1"), "unexpected frozen fixture")
+    plan = source_plan(source, suite)
+    old, new = plan["old"], plan["new"]
     root = run / "ldv"
     root.mkdir()
     out = old_evidence / "ldv"
@@ -140,7 +155,7 @@ def main(source, suite, pair):
     put(out / "registry.json", packages)
     gold = study.source_pair(source) if suite == "option" else None
     blobs = e2e.enroll(replay, source, packages) if suite == "e2e" else None
-    cmd = study.CMD if suite == "option" else e2e.CARGO
+    cmd = plan["command"]
     work = root / "work"
     work.mkdir()
     repo = root / "ruff"
@@ -249,11 +264,14 @@ def main(source, suite, pair):
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == "install":
+    if sys.argv[1] in ("install", "verify-entry"):
         source = Path(sys.argv[2]).resolve(strict=True)
-        census.RUFF = study.NEW if sys.argv[3] == "option" else e2e.NEW
-        need(census.git(source, "rev-parse", "HEAD") == census.RUFF, "wrong signed acquisition source")
-        census.LOCK = sha(source / "Cargo.lock")
-        census.install()
+        plan = source_plan(source, sys.argv[3])
+        if sys.argv[1] == "install":
+            census.RUFF = plan["new"]
+            census.LOCK = plan["lock"]
+            census.install()
+        else:
+            print(json.dumps(plan, sort_keys=True))
     else:
         main(Path(sys.argv[1]).resolve(), sys.argv[2], int(sys.argv[3]))

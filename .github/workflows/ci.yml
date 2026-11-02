@@ -177,6 +177,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
           sha256sum --strict -c scripts/ruff-ldv-pilot/SHA256SUMS
+          python3 -IB scripts/ruff-ldv-pilot/pilot.py verify-entry "$GITHUB_WORKSPACE/ruff" "${{ matrix.suite }}"
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends binutils build-essential libssl-dev pkg-config strace
       - name: Authenticate the 79 signed package members

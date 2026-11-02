@@ -17,4 +17,6 @@ The four assignments, gates and sole primary endpoint are fixed in `schedule.jso
 
 ### Reproduce
 
+The first registration reached isolated Python before acquiring its signed package and failed to import the adjacent helper. Run 41405601637 contributes zero measurements. A fresh four-job schedule adds only explicit module lookup and a pre-installation gate. Both literal entry points reject a missing enrolled plugin before any acquisition. The two ordinary Cargo commands, order, counter and outcome requirements are unchanged.
+
 Run the manual `ci.yml` workflow on this QA branch with `mode=ldv-pilot` and the exact reviewed commit as `reviewed_head`. Each job retains raw native bodies, command output, physical rosters, literal argv, counter calibrations and verdicts. Resource guards and all failing assertions are preserved. A compact `verified.json` is emitted only after all gates in that pair pass.
