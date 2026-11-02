@@ -1,0 +1,24 @@
+{
+  "closed_cli_sha256": "b1f0bdebeef0b94904cf06bd8eac27587a69bcdb1ffaa194e93bcf63b5b13381",
+  "head": "ca8b83712b881b45cbb8e8b0513d0811971e4a98",
+  "job": 125573047814,
+  "official_conclusion": "failure",
+  "original_programs": {
+    "native_reader.py": "11db3afbc8159e4a64508b3eb3d1f4cbdc8e1c04970e5d6e6bd835c4d7a84449",
+    "read_original.py": "0ea2ba8f45f97b0a1d66fe0cf4be339a39237ae9a4e3aad836c7192c8fdc4a87",
+    "score.py": "5f8b7f93684dcbb9e0b7fea4a1d506eb9fdc3287de5c75808e122e015c59cfa9"
+  },
+  "original_protocol": "8ce5b388b9e5ca2a3543abbdf572aff97bf4a7958aa0be69813978d330eaf803",
+  "outer": "1ff317eabf7af5e305a1f123a48a972a7bf229b5166a171498e10002568e2f69",
+  "recorded_before_numeric_unblinding": true,
+  "rule": [
+    "Preserve original failed service status and direct isolated CLI failure. The postprocessor error must be the last of three set -e commands, after both acquisition and the direct independent scorer succeeded.",
+    "Authenticate the full original and every member through the original source-bound read_original.py, including its unchanged native_reader.affirm and score.replay. Require all native/behavioral gates and all 16 genuine cold arms.",
+    "Run the original direct numeric CLI against the member-verified session files. Require equality to both the archived independent replay and the result.",
+    "Run the exact direct native CLI to reproduce the original missing sibling import, then run the same source/argv with only its own reviewed package directory available. Require complete structural equality to the standalone native verdict.",
+    "Label the result a recovered cohort, with the official failed postprocess visible. Preserve every statistical endpoint. A qualifying 2x requires its preregistered independent eight-pair physical replication on a source with the CLI repaired."
+  ],
+  "run": 41531636175,
+  "service_log": "ea2c40765952df0d658f4436ebca94f8183a36aa5aa3ebd049cb44d446b9cee1",
+  "utc": "2026-11-02T22:22:27.164809+00:00"
+}
