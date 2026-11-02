@@ -3,10 +3,19 @@ import hashlib,json,subprocess,sys
 from pathlib import Path
 import core as c
 m=c.m
+def transition_sources(folder):
+    expected={
+        'transition.py':'073ef2c3677d693a62c4943d5586f7b3365628ecba895331c2114350faa2f047',
+        'transition_v2.py':'f94426329c33d46faa8cf90db5e085463843dd8203f87e38bdacd7636722c62f',
+        'transition_sessions.py':'d92869e24344560a26c0cdb7b5941139ac612d9ec6af3a1d1faad3f7f388eb19',
+    }
+    for name,digest in expected.items():
+        c.guard(hashlib.sha256((folder/name).read_bytes()).hexdigest()==digest,'changed original '+name)
 def gate():
+    transition_sources(c.HERE)
     w,tmp=c.host();pool=tmp/'ctfe22-root-sdks';ctrl,child=c.ROLES
     expected=[c.PAIR['arms'][r]['source']['commit'] for r in c.ROLES]
-    for script,fixture,label in [('transition.py','fixture','coroutine-transition'),('foreign-transition.py','callable-fixture','foreign-transition')]:
+    for script,fixture,label in [('transition_v2.py','fixture','coroutine-transition'),('foreign-transition.py','callable-fixture','foreign-transition')]:
         out=w/'trait-results/intake'/label
         subprocess.run([sys.executable,'-ISB',c.HERE/script,pool/ctrl,pool/child,c.HERE/fixture,out],check=True,timeout=240)
         j=m.read(out/'passed.json');c.guard(not j['self_check']and all(expected[i][:9] in j['banners'][k]for i,k in enumerate(['control','candidate'])),'wrong actual compiler identities')
