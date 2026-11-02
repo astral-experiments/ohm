@@ -58,7 +58,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-root-20988-rdr/enroll.py
-      - name: Capture actual native roots and restricted per-process observations
+      - name: Capture original native argv for cold A, cold B and real first-edit observations
         run: |
           set -euo pipefail
           /usr/bin/python3.12 -ISBu coordinator/scripts/uv-root-20988-rdr/run.py 2>&1 | tee trait-results/capture.log

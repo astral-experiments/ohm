@@ -10,7 +10,13 @@ assert argv[0]=='/tmp/uv-workflow-search/sdk/bin/rustc' and 'OHM_RDR_OBSERVER_DI
 if '--crate-name' in argv and '--out-dir' in argv:
     name=argv[argv.index('--crate-name')+1];pid=os.getpid();marked=False
     if name in ('uv','uv_resolver') and '--crate-type'in argv and argv[argv.index('--crate-type')+1]=='lib':
-        assert argv==json.loads((out/'selected-argv.json').read_bytes())[name]
+        declared=json.loads((out/'selected-argv.json').read_bytes())[name]
+        if out.name not in ('marked-A','marked-cold-B'):
+            assert argv==declared
+        else:
+            # Cold argv come from separate, unwrapped native Cargo execs on each cold revision.
+            # The genuine first-edit argv are frozen only for the original first-edit cohort.
+            assert f'crates/{name.replace("_","-")}/src/lib.rs' in argv and '--emit=dep-info,metadata' in argv
         env['OHM_RDR_OBSERVER_DIR']=str(out/'traces'/name);marked=True
     with (out/'processes'/f'{pid}.json').open('x') as f:
         json.dump({'pid':pid,'parent':os.getppid(),'argv':argv,'name':name,'marked':marked},f,separators=(',',':'))

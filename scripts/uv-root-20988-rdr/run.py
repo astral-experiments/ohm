@@ -4,6 +4,7 @@ from zipfile import ZipFile
 import gzip, json, os, re, shutil, subprocess, sys, traceback
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import common as c
+import cold
 m=c.m
 sys.path.insert(0,str(c.PANEL))
 import compiler_observer as kernel
@@ -84,7 +85,7 @@ def main():
         m.save(path/'invocation.json',{'argv':m.ARGS,'cwd':str(m.SRC),'env':env,'source':src,'signed_Cargo':m.filesha(m.SDK/'bin/cargo'),'compiler':c.P['source'],'mode':'marked'if marked else'unwrapped','score':False})
         with (path/'cargo.stdout').open('xb')as so,(path/'cargo.stderr').open('xb')as se:
             x=subprocess.run(m.ARGS,cwd=m.SRC,env=env,stdout=so,stderr=se,timeout=1800)
-        m.save(path/'exit.json',{'exit':x.returncode});m.guard(x.returncode==0 and m.history()==(src,delta),'actual Cargo compilation or source failed')
+        m.save(path/'ordinary.json',dict(m.read(path/'invocation.json'),exit=x.returncode));m.save(path/'exit.json',{'exit':x.returncode});m.guard(x.returncode==0 and m.history()==(src,delta),'actual Cargo compilation or source failed')
         # Write the full unchanged native bytes first. Independent interpretation follows separately.
         shape_names=shape[1];rawmap=panel.inventory(path,shape)
         (path/'workspace-products.json').rename(path/'raw-inventory.json')
@@ -118,6 +119,11 @@ def main():
     m.reset(bank,'A',delta);visit('marked-A','A',True);m.edit(delta);visit('marked-own-warm-B','B',True)
     m.reset(bank,'B',delta);cold=visit('ordinary-cold-B','B')
     m.reset(bank,'B',delta);visit('marked-cold-B','B',True)
+    # Complete all marked histories first, then authenticate their original cold Cargo argv.
+    for state,label in (('A','marked-A'),('B','marked-cold-B')):
+        m.reset(bank,state,delta)
+        status['cold-native-kernel-'+state]=attempt(out,'cold-native-kernel-'+state,
+            lambda state=state,label=label:cold.prove(out,state,label,shape,panel,ROLE))
     eqs={}
     def compare(x,y):
         lo,hi=recorded[x],recorded[y];m.guard(lo.keys()==hi.keys()==shape[1].keys(),'physical product roster')
