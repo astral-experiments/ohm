@@ -1,0 +1,13 @@
+{
+  "run": 41478926939,
+  "qa": "0f3cca0358c697f06401d5a4d553898943000c96",
+  "factory": 41475100027,
+  "artifact": 13159700628,
+  "artifact_bytes": 1796701,
+  "artifact_sha256": "7eba5394e712a0b1183a74816182856806dadbe42f4b094e0a13aba576924ce9",
+  "first_refusal": "The parent compiled the original 168-test executable. Its signature-help response was byte-identical to the 35-line tracked snapshot. Insta invoked a bare cargo metadata to locate the fixture, selected Ruff's uninstalled historical 1.98.0, fell back to the crate directory and looked for the snapshot below the wrong root.",
+  "snapshot_blob": "9e08fa15ea4b4d3232ea3a143d786abf7a65944c",
+  "actual_and_expected_body_sha256": "712a214a29eb9fc6a15ab60975d6b30db03157db0792fdfcd03d2167f14b6ed3",
+  "measured_edit_pairs": 0,
+  "amendment": "Set INSTA_WORKSPACE_ROOT to the registered Ruff checkout for execution of the test alone. Verify the tracked expectation again on disk. The compiler, build environment, Cargo argv, study selection and verdict remain unchanged."
+}

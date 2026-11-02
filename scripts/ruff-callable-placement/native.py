@@ -35,7 +35,14 @@ def root_program(phase, repo, work):
 
 
 def verdict(binary, repo, env, phase, test, expected_failure=False):
-    run_env = {**env, "INSTA_UPDATE": "no", "RUST_BACKTRACE": "0"}
+    # The standalone test oracle has the two source-built Ohm kits, while the
+    # historical Ruff checkout pins a different toolchain for bare cargo metadata.
+    # Bind insta to the actual registered checkout used to build the executable.
+    snapshot = repo / "crates/ty_server/tests/e2e/snapshots/e2e__signature_help__works_in_function_name.snap"
+    snapshot_id = subprocess.check_output(["git", "hash-object", "--no-filters", snapshot], cwd=repo, text=True).strip()
+    if snapshot_id != "9e08fa15ea4b4d3232ea3a143d786abf7a65944c":
+        raise ValueError("different frozen signature-help snapshot")
+    run_env = {**env, "INSTA_UPDATE": "no", "INSTA_WORKSPACE_ROOT": str(repo), "RUST_BACKTRACE": "0"}
     def run(args):
         return subprocess.run([binary, *args], cwd=repo / "crates/ty_server", env=run_env,
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=120)
