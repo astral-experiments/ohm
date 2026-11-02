@@ -214,7 +214,12 @@ archive_size=$(wc -c <native/libanswer.a)
 write_archive 29
 test "$(wc -c <native/libanswer.a)" = "$archive_size"
 touch -r archive-timestamp native/libanswer.a
-check_links 29 2
+check_links 17 0
+
+# Declare the archive before checking that the linker sees a broken replacement.
+write_build_script native/libanswer.a
+check_links 29
+check_links 29 0
 : >"$OHM_SMOKE_LINK_LOG"
 echo 'malformed archive' >native/libanswer.a
 if cargo +"$toolchain" build --bins --offline >bad-archive.log 2>&1; then
