@@ -19,12 +19,15 @@ from support import calibrate, census, e2e, guards, need, put, replay, sha, stud
 
 def entry(source, suite):
     plan = pilot.source_plan(source, suite)
-    manifest = HERE / "SHA256SUMS"
-    need(manifest.is_file(), "absent wrapper-free registration")
-    for row in manifest.read_text().splitlines():
-        digest, path = row.split("  ", 1)
-        target = HERE.parent.parent / path
-        need(target.is_file() and sha(target) == digest, ("missing or different registered resource", path))
+    old = HERE.parent / "ruff-ldv-pilot/SHA256SUMS"
+    for manifest in (old, HERE / "SHA256SUMS"):
+        need(manifest.is_file(), "absent wrapper-free registration")
+        for row in manifest.read_text().splitlines():
+            digest, path = row.split("  ", 1)
+            target = HERE.parent.parent / path
+            if manifest == old and path == ".github/workflows/ci.yml":
+                target = HERE / "predecessor-ci.yml"
+            need(target.is_file() and sha(target) == digest, ("missing or different registered resource", path))
     return plan
 
 

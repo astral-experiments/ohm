@@ -181,9 +181,11 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
-          sha256sum --strict -c scripts/ruff-ldv-pilot/SHA256SUMS
           sha256sum --strict -c scripts/ruff-ldv-needed/SHA256SUMS
+          python3 -IB scripts/ruff-ldv-needed/check_inputs.py
           python3 -IB scripts/ruff-ldv-needed/run.py verify-entry "$GITHUB_WORKSPACE/ruff" "${{ matrix.suite }}"
+      - name: Install tracing and build prerequisites on the fresh runner
+        run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends binutils build-essential libssl-dev pkg-config strace
       - name: Reopen both authentic prior no-wrapper admissions
