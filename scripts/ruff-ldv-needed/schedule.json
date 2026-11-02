@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "scope": "QA-only diagnostic for original vs guarded variable-free LLVM 23 LiveDebugValues; no production compiler claim",
+  "source": "Signed Ohm -22 rustc 008a21ac0d750dc9a1c18b7959d7e7984c03d887, Cargo ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770; stock native linker. All 79 signed members immutable and independently verified; active toolchain has exactly one derived LLVM DSO with identical executable/unwind/rodata sections, frontend/driver/Cargo stat identity invariant.",
+  "allowed_autocfg": "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8",
+  "ordinary": "Ruff #28106 3c77dcc2..088b7b5f lib ruff_workspace; #27836 ec92fb2b..f9115b8d real ty_server e2e --no-run; original dev opt-level=1 line-tables-only; signed cargo +ohm, locked offline, -j4. No wrapper, preload, rustflags, trust or altered argv.",
+  "predecessors": [
+    {
+      "run": 41405601637,
+      "sha": "2c0ccd44b7846b85e030a06e9ba3d3b99ecbaef0",
+      "scored": 0,
+      "reason": "Python isolated-mode import failure before toolchain installation"
+    },
+    {
+      "run": 41406294524,
+      "sha": "669f8462607a994bcd11045578218d5e41a8bbf2",
+      "scored": 0,
+      "reason": "Both real workflows moved 160+ registry search paths under RUSTC_WRAPPER; both e2e unchanged commands replaced link-only with a full compiler. Probe names were also independently randomized. All four pairs irreversibly excluded."
+    }
+  ],
+  "contact": "DT_NEEDED on the verified privately cloned LLVM DSO, preserving actual signed frontend, driver, Cargo and library search paths. Identical public pass 2f7bd28c... and C loader in both roles; direct per-rustc stderr relay and checked frontend/LLVM device+inode receipt, no loader/wrapper variables in any physical exec. Charge all contact/relay/diagnostic work.",
+  "native": "Two completely fresh unwrapped plain references per job, followed by both modes in the registered order. Independent output roots per history. Require literal owner argv including shared registry, dev options, typed inventory, native work, complete ELF and real consumer verdict across modes. On e2e unchanged exactly one link-only e2e and one stock Wild; option unchanged zero full/linker. Include selected E0308, repair, empty, and actual replaced/restored e2e negative. Never use a different path or special compiler flag.",
+  "incidental": "Cold only. Each physical Rust probe with ^autocfg_([0-9a-f]{16})_([01])$ from the verified 1.5.0 SDK build dependency must supply signed-kernel-traced stdin to EOF; hash and literal UTF-8/source, true compiler argv except solely the nonce in --crate-name, and physical build-script owner path/SHA must agree. Exactly two groups with suffixes [0] and [0,1]; _0 is the verified zero-byte standard-library probe; _1 must supply bytes. Refuse new suffix, absent reader, changed inputs, changed multiplicity, or unexplained owner. Preserve literal names, argv and all sources in raw evidence. All other compiler/actual-link counts must match literally. No random probe accepted on a historical edit.",
+  "phases": "First dispatch two independent native-only workers, one per suite. Both must finish green and independently reopen before supplying their exact same-commit run for a new scored dispatch. A failing ordinary owner ends the route. Measurement dispatch repeats admission per worker, uses two reversed pairs per suite on four fresh VMs with no previous samples. No wall/trust/production claim.",
+  "primary": "Retired user instructions over the whole signed Cargo process tree for actual NEW. Include every thread, Cargo, compiler, build tool, native linker and stderr relay using inherited hardware instructions:u, enabled==running, separate main/pthread/fork calibrations. Report both paired ratios and their geometric mean per workload. Unchanged counts are separate descriptive controls. No score on native/admission or from any rejected job; no effect-based replacement. An uninstrumented physical production compiler pair is still required.",
+  "slots": [
+    {
+      "suite": "option",
+      "pair": 1,
+      "order": [
+        "original",
+        "guard"
+      ]
+    },
+    {
+      "suite": "option",
+      "pair": 2,
+      "order": [
+        "guard",
+        "original"
+      ]
+    },
+    {
+      "suite": "e2e",
+      "pair": 1,
+      "order": [
+        "guard",
+        "original"
+      ]
+    },
+    {
+      "suite": "e2e",
+      "pair": 2,
+      "order": [
+        "original",
+        "guard"
+      ]
+    }
+  ]
+}

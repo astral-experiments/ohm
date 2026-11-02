@@ -6,8 +6,12 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score]
         default: single-22
+      ldv_admission:
+        description: Same-commit successful wrapper-free native workflow run ID for scoring
+        required: false
+        type: string
       reviewed_head:
         description: Exact reviewed QA commit
         required: true
@@ -17,7 +21,7 @@ permissions:
   actions: read
 jobs:
   census:
-    if: inputs.mode != 'ldv-pilot'
+    if: "!startsWith(inputs.mode, 'ldv-')"
     name: Signed Ohm workspace link census
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 140
@@ -128,6 +132,128 @@ jobs:
             ${{ runner.temp }}/ohm-ruff-whole-census/evidence
             ${{ runner.temp }}/matched-ruff-workspace-census/*/evidence
           if-no-files-found: warn
+          retention-days: 14
+
+  ldv-needed:
+    if: inputs.mode == 'ldv-needed-admit' || inputs.mode == 'ldv-needed-score'
+    name: ${{ inputs.mode }} ${{ matrix.suite }} pair ${{ matrix.pair }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        suite: [option, e2e]
+        pair: ${{ fromJSON(inputs.mode == 'ldv-needed-admit' && '[1]' || '[1,2]') }}
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      LDV_STAGE: ${{ inputs.mode == 'ldv-needed-admit' && 'admit' || 'score' }}
+      ADMISSION_RUN: ${{ inputs.ldv_admission }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          path: enrolled
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ruff-ldv-needed
+            scripts/ruff-ldv-pilot
+            scripts/ruff-default-owner-pmu
+            scripts/ruff-workspace-link-census
+            scripts/ruff-workspace-remat
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-cgu-inputs
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: ${{ matrix.suite == 'option' && '088b7b5f77fcb05994fd2a17cbc940cd9edb341a' || 'f9115b8deefa56b18b79449f8acafe25475c54d3' }}
+          fetch-depth: 2
+          path: ruff
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify the registered paired Cargo experiment
+        working-directory: enrolled
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          sha256sum --strict -c scripts/ruff-ldv-pilot/SHA256SUMS
+          sha256sum --strict -c scripts/ruff-ldv-needed/SHA256SUMS
+          python3 -IB scripts/ruff-ldv-needed/run.py verify-entry "$GITHUB_WORKSPACE/ruff" "${{ matrix.suite }}"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends binutils build-essential libssl-dev pkg-config strace
+      - name: Reopen both authentic prior no-wrapper admissions
+        if: inputs.mode == 'ldv-needed-score'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-ldv-needed/admission_gate.py "$ADMISSION_RUN" "$RUNNER_TEMP/verified-ldv-native-gate.json"
+      - name: Authenticate the 79 signed package members
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-ldv-needed/run.py install "$GITHUB_WORKSPACE/ruff" "${{ matrix.suite }}"
+      - name: Calibrate, validate native compiler contact and run the isolated matched pair
+        run: python3 -IB -u enrolled/scripts/ruff-ldv-needed/run.py "$GITHUB_WORKSPACE/ruff" "${{ matrix.suite }}" "$LDV_STAGE" "${{ matrix.pair }}"
+      - name: Retain all native originals and kernel evidence, including unsuccessful gates
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ inputs.mode }}-originals-${{ matrix.suite }}-${{ matrix.pair }}
+          path: ${{ runner.temp }}/ohm-ruff-whole-census/evidence
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 6
+      - name: Retain the small terminal independently of the large native archive
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ inputs.mode }}-terminal-${{ matrix.suite }}-${{ matrix.pair }}
+          path: |
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/verified.json
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/physical-contact.json
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/failure.json
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/smoke/**/phase.json
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/checkpoints
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/enrolled.json
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/acquired.json
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/calibration
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence/ldv/smoke/accepted.json
+          if-no-files-found: warn
+          retention-days: 14
+  ldv-raw-verified:
+    needs: ldv-needed
+    if: inputs.mode == 'ldv-needed-admit' || inputs.mode == 'ldv-needed-score'
+    name: Reopen ${{ inputs.mode }} ${{ matrix.suite }} pair ${{ matrix.pair }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    permissions:
+      contents: read
+      actions: read
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        suite: [option, e2e]
+        pair: ${{ fromJSON(inputs.mode == 'ldv-needed-admit' && '[1]' || '[1,2]') }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-ldv-needed
+      - name: Read off-host immutable evidence without compiling
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STAGE: ${{ inputs.mode == 'ldv-needed-admit' && 'admit' || 'score' }}
+        run: python3 -IB scripts/ruff-ldv-needed/reopen.py "$STAGE" "${{ matrix.suite }}" "${{ matrix.pair }}" "$RUNNER_TEMP/reopened.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ inputs.mode }}-independent-${{ matrix.suite }}-${{ matrix.pair }}
+          path: ${{ runner.temp }}/reopened.json
+          if-no-files-found: error
           retention-days: 14
   ldv:
     if: inputs.mode == 'ldv-pilot'
