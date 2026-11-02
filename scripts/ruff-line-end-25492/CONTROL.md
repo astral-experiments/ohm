@@ -1,0 +1,7 @@
+# Ordinary environment control
+
+The source edit, command, ordering, clock and native witnesses remain registered at `f13962a93be15adcb600fa48e1ea2ae4d8168034`. The original SDK and both Ruff revisions are immutable. Run 41455377285 stopped during setup. Run 41456141995 measured only cold OLD, which contained two real feature variants of the source library. The reader now admits both variants independently and verifies the archive the CLI actually names.
+
+Run 41457470799 passed both feature-specific OLD and NEW CRLF witnesses, all independent clean checks and calibrated instruction counters. Its edited command was enclosed in Ubuntu's `perf record`. The original hardware packet (artifact 13147808074, SHA-256 `bee32e6c85dfd0db60647ba2ca91aaeb64f20e1db303a2ac7e0a4f658c09b274`) showed a different Cargo native-tool output namespace on every transition through the profiler. Its edited and repeated prices and profiles are excluded from ordinary workflow decisions.
+
+The new admission uses the same downstream command and the arithmetic-calibrated `watch` alone on **all four** visits. An outer `strace` records the literal inherited environment when executing the watchdog, Cargo proxy and signed Cargo. The probe must fail if an environment cannot be read or if any contractually fixed value changes between visits. Only the two deliberately empty clean target/build paths may differ. The Cargo output namespaces are also recorded directly from its artifact JSON. No real edit is profiled inside these histories.

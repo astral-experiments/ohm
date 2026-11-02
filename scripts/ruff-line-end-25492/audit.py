@@ -1,7 +1,5 @@
 """Bounded observers for native products, physical execs and the instruction sampler."""
 import ast
-from collections import Counter
-import gzip
 import hashlib
 import json
 import os
@@ -48,10 +46,21 @@ def checked_exec(line):
     raise ValueError('truncated native argv')
 
 
-def exec_roster(trace, dst, sdk, host):
+def exec_environment(line):
+    # These three entrypoints have a fixed short argv. Refuse abbreviated envp,
+    # duplicates, or malformed entries rather than inferring the child's PATH.
+    head, sep, tail=line.rpartition('], [')
+    assert sep and head.count('], [')==0 and tail.endswith(') = 0')
+    items=ast.literal_eval('['+tail[:-5])
+    env=dict(x.split('=',1) for x in items)
+    assert len(env)==len(items) and 'PATH' in env
+    return env
+
+
+def exec_roster(trace, dst, sdk, host, private, declared):
     rustc = sdk / 'bin/rustc'
     wild = sdk / 'lib/rustlib' / host / 'bin/wild-ld/ld.bfd'
-    compilers, links = [], []
+    compilers, links, chain = [], [], {}
     with tarfile.open(dst/'exec.tar.gz', 'w:gz', compresslevel=2) as store:
         for p in sorted(trace.glob('exec.*')):
             if p.stat().st_size == 0:
@@ -64,6 +73,16 @@ def exec_roster(trace, dst, sdk, host):
                     continue
                 name, args = event
                 path = Path(name)
+                stage=None
+                if path==private/'watch' and args[2:5]==['cargo','+ohm','build']:
+                    stage='watch'
+                elif path==private/'proxies/cargo' and args[1:3]==['+ohm','build']:
+                    stage='proxy'
+                elif path.name=='cargo' and args[1:2]==['build'] and path.exists() and path.samefile(sdk/'bin/cargo'):
+                    stage='signed_cargo'
+                if stage:
+                    assert stage not in chain
+                    chain[stage]={'pid':pid,'path':str(path),'env':exec_environment(line)}
                 if path.name == 'rustc' and path.exists() and path.samefile(rustc) and '--crate-name' in args:
                     compilers.append({'pid':pid,'crate':args[args.index('--crate-name')+1],
                                       'link_only':any(a in ('-Zlink-only','link-only') or a.startswith(('-Zlink-only=','link-only=')) for a in args),
@@ -72,6 +91,9 @@ def exec_roster(trace, dst, sdk, host):
                     assert args.count('-o') == 1
                     links.append({'pid':pid,'out':args[args.index('-o')+1]})
     assert len({r['pid'] for r in compilers}) == len(compilers)
+    assert set(chain)=={'watch','proxy','signed_cargo'} and chain['watch']['env']==chain['proxy']['env']==declared
+    assert 'linux-tools' not in chain['signed_cargo']['env']['PATH']
+    save(dst/'exec-env.json',chain)
     save(dst/'processes.json', {'compilers':compilers,'wild':links})
     return compilers, links
 
@@ -113,17 +135,3 @@ def incremental(roots, owners, previous=None, retain=None):
         if not any(v['owner']==owner for v in results.values()):
             results[owner]={'owner':owner,'sessions':[],'objects':{},'unqualified':True}
     return results
-
-
-def probe_sampler(env, root, loop):
-    binaries = sorted(Path('/usr/lib').glob('linux-tools*/perf')) + sorted(Path('/usr/lib/linux-tools').glob('*/perf'))
-    for perf in reversed(binaries):
-        path = root/('sampler-probe-'+str(abs(hash(str(perf))))+'.data')
-        cmd=[perf,'record','-q','-e','instructions:u','-c','1000003','-P','-o',path,'--',loop,'0','10000000','1']
-        if run(cmd,env,root,exact=None).returncode!=0:
-            continue
-        rows=run([perf,'script','-i',path,'-F','pid,period'],env,root,exact=None)
-        pairs=[list(map(int,line.split())) for line in rows.stdout.splitlines() if re.fullmatch(rb'\s*\d+\s+\d+\s*',line)]
-        if len(pairs)>=10 and all(b==1000003 for a,b in pairs):
-            return perf
-    return None

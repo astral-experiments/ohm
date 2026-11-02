@@ -1,5 +1,4 @@
 """Price one unmodified historical Ruff edit and keep its independent native verdicts."""
-from collections import Counter
 from contextlib import ExitStack
 import gzip
 import hashlib
@@ -7,7 +6,6 @@ import json
 import os
 from pathlib import Path
 import platform
-import re
 import resource
 import shutil
 import statistics
@@ -17,7 +15,7 @@ import tomllib
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from audit import exec_roster, incremental, probe_sampler, run, save, sha
+from audit import exec_roster, incremental, run, save, sha
 
 ROOT=Path(os.environ['RUNNER_TEMP'])/'ruff-db-link-reason'
 SRC=Path(os.environ['GITHUB_WORKSPACE'])/'ruff'
@@ -94,9 +92,8 @@ def env_and_calibrate():
         expected=2*copies*700000
         assert abs(delta-expected)<max(18000,.025*expected),(m,delta,expected)
         admitted.append([m,copies,values,delta,expected])
-    perf=probe_sampler(env,private,private/'loop')
-    save(LOG/'clocks.json',{'actual':admitted,'sampler':str(perf) if perf else None})
-    return private,env,perf
+    save(LOG/'clocks.json',{'actual':admitted,'sampler':None})
+    return private,env
 
 
 def fetch(private,env):
@@ -191,47 +188,14 @@ def witness(folder,env,products,rows,old,libs):
     return verdict
 
 
-def sample_report(perf,profile,env,folder,compilers,links):
-    report=run([perf,'report','--stdio','-n','-i',profile,'--sort','comm,dso,symbol','--percent-limit','0.1'],env,SRC,exact=None)
-    gz(folder/'sample-symbols.txt.gz',report.stdout+report.stderr)
-    p=run([perf,'script','-i',profile,'-F','pid,period'],env,SRC,exact=None)
-    gz(folder/'sample-periods.txt.gz',p.stdout)
-    (folder/'sample.stderr').write_bytes(p.stderr)
-    valid=[];other=[]
-    for l in p.stdout.splitlines():
-        if re.fullmatch(rb'\s*\d+\s+\d+\s*',l):
-            pid,period=map(int,l.split())
-            if period==1000003:
-                valid.append(pid)
-            else:
-                other.append(l)
-        elif l.strip():
-            other.append(l)
-    parts=Counter(valid)
-    by_pid={r['pid']:('rustc '+r['crate']+(' (link-only)' if r['link_only'] else '')) for r in compilers}
-    by_pid.update({r['pid']:'Wild' for r in links})
-    counts=Counter()
-    for pid,total in parts.items():counts[by_pid.get(pid,'other')]+=total
-    row={'known':not other and p.returncode==0 and len(valid)>=100 and b'lost' not in p.stderr.lower(),
-         'samples':len(valid),'unread':len(other),'pid_counts':dict(parts),'owner_counts':dict(counts),'period':1000003}
-    save(folder/'sample-summary.json',row)
-    assert profile.stat().st_size<512<<20
-    with (folder/'edit.perf.data.gz').open('wb') as raw, gzip.GzipFile(fileobj=raw,mode='wb',compresslevel=2,mtime=0) as out, profile.open('rb') as handle:
-        shutil.copyfileobj(handle,out)
-    return row
-
-
-def case(phase,private,base_env,state,perf,old=None,retain=None):
+def case(phase,private,base_env,state,old=None,retain=None):
     folder=LOG/phase;folder.mkdir()
     trace=private/('trace-'+phase);trace.mkdir()
     state.mkdir(exist_ok=True)
     env={**base_env,'CARGO_TARGET_DIR':str(state/'target'),'CARGO_BUILD_BUILD_DIR':str(state/'build'),'CARGO_NET_OFFLINE':'true'}
     assert sha(SRC/'Cargo.lock')==LOCK and git('rev-parse','HEAD')==(OLD if phase=='old' else NEW)
     assert git('status','--porcelain','--untracked-files=no')==''
-    argv=['strace','-ff','-qq','-s','131072','-e','trace=execve,execveat','-o',trace/'exec','--']
-    profile=private/'edit.perf.data'
-    if perf and phase=='edit':
-        argv += [perf,'record','-q','-e','instructions:u','-c','1000003','-P','-o',profile,'--']
+    argv=['strace','-ff','-qq','-v','-s','131072','-e','trace=execve,execveat','-o',trace/'exec','--']
     cp=folder/'clock.json'
     argv += [private/'watch',cp,*CMD]
     save(folder/'command.json',{'argv':list(map(str,argv)),'env':env,'source':git('rev-parse','HEAD'),'prior_storage':storage(state)})
@@ -240,7 +204,7 @@ def case(phase,private,base_env,state,perf,old=None,retain=None):
     if p.returncode!=0:
         raise RuntimeError((phase,p.returncode,p.stderr[-2800:].decode(errors='replace')))
     price=clock(cp)
-    procs,links=exec_roster(trace,folder,SDK,HOST)
+    procs,links=exec_roster(trace,folder,SDK,HOST,private,env)
     rows=[json.loads(l) for l in p.stdout.splitlines()]
     assert rows[-1]=={'reason':'build-finished','success':True}
     products=[r for r in rows if r['reason']=='compiler-artifact']
@@ -251,34 +215,42 @@ def case(phase,private,base_env,state,perf,old=None,retain=None):
     if phase in ('old','clean'):
         assert all(not r['fresh'] for r in products)
         assert set(OWNERS)<={r['crate'] for r in procs if not r['link_only']}
-    sampled=sample_report(perf,profile,env,folder,procs,links) if perf and phase=='edit' else None
     ledger=incremental(state,OWNERS,old,retain)
     save(folder/'objects.json',ledger)
     target_sizes={key:storage(state/key) for key in ('target','build') if (state/key).is_dir()}
+    layouts={}
+    for product in products:
+        parts={part for path in product['filenames'] for part in Path(path).parts if part.startswith('v2-') and len(part)==19}
+        for part in parts:layouts[part]=layouts.get(part,0)+1
+    assert layouts
     summary={'price':price,'dirty':sorted(r['target']['name'] for r in products if not r['fresh']),
              'roster':sorted([r['crate'],r['link_only']] for r in procs),'wild':len(links),'products':len(products),
-             'sampled':sampled,'storage':{'overall':storage(state),'roots':target_sizes}}
+             'sampled':None,'native_output_namespaces':layouts,'storage':{'overall':storage(state),'roots':target_sizes}}
     save(folder/'summary.json',summary)
     verdict=witness(folder,env,products,rows,phase=='old',libs)
     return summary,ledger,verdict
 
 
 def main():
-    private,env,perf=env_and_calibrate()
+    private,env=env_and_calibrate()
     fetch(private,env)
     soft,hard=resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE,(min(max(soft,8192),hard) if hard!=-1 else max(soft,8192),hard))
     history=private/'history';clean=private/'empty-new'
     readbacks={}
     with ExitStack() as pins:
-        o,pinned,old_elf=case('old',private,env,history,perf,retain=pins)
+        o,pinned,old_elf=case('old',private,env,history,retain=pins)
         git('checkout','--detach',NEW)
-        e,_,new_elf=case('edit',private,env,history,perf,old=pinned)
-        u,_,same=case('unchanged',private,env,history,perf,old=pinned)
+        e,_,new_elf=case('edit',private,env,history,old=pinned)
+        u,_,same=case('unchanged',private,env,history,old=pinned)
         readbacks.update(old=o,edit=e,unchanged=u)
     assert shutil.disk_usage(ROOT).free>readbacks['old']['storage']['overall']['allocated']+(3<<30)
-    c,_,empty=case('clean',private,env,clean,perf)
+    c,_,empty=case('clean',private,env,clean)
     readbacks['clean']=c
+    chains=[json.loads((LOG/ph/'exec-env.json').read_text()) for ph in ('old','edit','unchanged','clean')]
+    for stage in ('watch','proxy','signed_cargo'):
+        envs=[{k:v for k,v in ch[stage]['env'].items() if k not in ('CARGO_TARGET_DIR','CARGO_BUILD_BUILD_DIR')} for ch in chains]
+        assert all(e==envs[0] for e in envs)
     assert old_elf['typed']!=new_elf['typed']==same['typed']==empty['typed']
     assert new_elf['cli_cases']==same['cli_cases']==empty['cli_cases']
     assert new_elf['cli_version']==same['cli_version']==empty['cli_version']
