@@ -22,6 +22,14 @@ on:
         options:
           - build
           - e2e
+      compiler_mode:
+        description: Use the released flag control or the two source-built compilers
+        required: true
+        default: matched
+        type: choice
+        options:
+          - matched
+          - profile-control
 permissions:
   actions: read
   contents: read
@@ -35,6 +43,7 @@ jobs:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PAIR_ORDER: ${{ inputs.pair_order }}
       PAIR_SUITE: ${{ inputs.suite }}
+      COMPILER_MODE: ${{ inputs.compiler_mode }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -51,6 +60,13 @@ jobs:
             scripts/branch-return-pmu
             scripts/branch-storage-e-confirmation/review
             scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        if: inputs.compiler_mode == 'matched'
+        with:
+          ref: c35134e3bd55d5c7766de493b8d87aa8cde8565d
+          path: factory
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-matched-stage
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
@@ -93,13 +109,23 @@ jobs:
           test -z "$(git -C enrolled status --porcelain=v1 --untracked-files=all)"
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py sources
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends binutils build-essential git libssl-dev
+          sudo apt-get install -y --no-install-recommends binutils build-essential git libssl-dev zstd
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py compile "$base"
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/tests.py "$GITHUB_WORKSPACE/ruff" "$base/workspace-cgu" | tee "$base/logs/controls.txt"
       - name: Enroll the one fresh worker and install the original signed GNU SDK
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py acquire
+      - name: Verify and reopen both registered compilers
+        if: inputs.compiler_mode == 'matched'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          python3 -IB enrolled/scripts/ruff-workspace-remat/receive_pair.py \
+            enrolled/scripts/ruff-workspace-remat/factory.json "$GITHUB_WORKSPACE/factory" \
+            "$RUNNER_TEMP/ohm-remat-compilers" > "$base/logs/received-compilers.json"
       - name: Verify the root archive and typed client on the installed SDK
         run: |
           set -euo pipefail
@@ -128,6 +154,11 @@ jobs:
           (cd "$root/driver" && sha256sum --check --strict SHA256SUMS)
           args=(--suite "$PAIR_SUITE")
           if [[ "$PAIR_SUITE" == e2e ]]; then args+=(--e2e-source "$GITHUB_WORKSPACE/ruff-e2e"); fi
+          case "$COMPILER_MODE" in
+            matched) args+=(--matched-rustcs "$RUNNER_TEMP/ohm-remat-compilers/roots/rustcs.json") ;;
+            profile-control) ;;
+            *) exit 2 ;;
+          esac
           python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch \
             "$root" "$root/guard" "$root/guard/resources" \
             python3 -IB "$root/driver/replay.py" \
@@ -140,6 +171,7 @@ jobs:
         with:
           name: ruff-deferred-intervals
           path: |
+            ${{ runner.temp }}/ohm-branch-object-qa/logs/received-compilers.json
             ${{ runner.temp }}/ohm-remat-comparison/observations
             ${{ runner.temp }}/ohm-remat-comparison/guard
             ${{ runner.temp }}/ohm-branch-object-qa/logs/accepted.json
