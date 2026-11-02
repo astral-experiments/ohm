@@ -213,7 +213,7 @@ def kernel(d, warm):
         set(forms) == {"uv_client", "uv_configuration"}
         and all(len(l) == 1 for l in forms.values())
     )
-    if not warm:
+    if warm is False:
         expected = [
             u["target"]["name"].replace("-", "_")
             for u in json.loads(

@@ -1,122 +1,78 @@
-"""Apply the original two-SDK authority and its calibrated PMU to the separately locked uv case."""
-
+"""Enforce the independently registered signed-versus-production ordinary Cargo check."""
 from pathlib import Path
 import json
 import os
-import re
+import subprocess
 import sys
 import uuid
 
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent / "uv-callables-21041"))
+HERE=Path(__file__).resolve().parent
+sys.path.insert(0,str(HERE.parent/"uv-callables-21041"))
 import core as old
-
-sys.path.insert(0, str(HERE))
-m = old.m
-case = m.read(HERE / "case.json")
-register = m.read(HERE / "registration.json")
-assert (
-    m.filesha(HERE / "registration.json")
-    == case["registered"]
-    == "2d2ad20912693be58458ec355dea335e2967c0a6dd3da80e2ef43ac70640f658"
-)
-assert old.PAIR["arms"] == case["upstream_native_inputs"]
-old.P.update(
-    branch=case["branch"],
-    parent=case["parent"],
-    edited_workspace_roster=["uv_client", "uv_configuration"],
-)
-ROLES = old.ROLES
-CHECK = old.CHECK = [
-    str(m.SDK / "bin/cargo"),
-    *register["complete_original_ordinary_argv"][1:],
-]
-assert CHECK[1:] == ["check", "-p", "uv-client", "--locked", "--offline", "-j8"]
-for name, role in zip(("mature", "callable"), ROLES, strict=True):
-    reg = register["artifact_identity"][name]
-    arm = old.PAIR["arms"][role]
-    assert (
-        reg["artifact"] == arm["artifact"]
-        and reg["source"]["commit"] == arm["source"]["commit"]
-        and reg["source"]["tree"] == arm["source"]["tree"]
-    )
-m.ENV.update(
-    LC_ALL="C",
-    GIT_CONFIG_NOSYSTEM="1",
-    GIT_CONFIG_GLOBAL="/dev/null",
-    GIT_ALLOW_PROTOCOL="file",
-    GIT_NO_LAZY_FETCH="1",
-    RUSTC_BOOTSTRAP="1",
-)
-m.ENV.pop("CARGO_TERM_COLOR", None)
-
+sys.path.insert(0,str(HERE))
+m=old.m
+register=m.read(HERE/"registration.json")
+case=m.read(HERE/"case.json")
+lock=m.read(HERE/"release-lock.json")
+ROLES=("R","F")
+SOURCES=lock["sources"]
+ORDERS=register["design"]["pair_orders"]
+assert ORDERS==[["R","F"],["F","R"],["F","R"],["R","F"],["F","R"],["R","F"],["R","F"],["F","R"]]
+assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="3c4868aaf179d6b4512d344d0ded13955ab1bf6b66e4911d50ccb16201438de8"
+assert m.filesha(HERE/"clock-amendment.json")==lock["clock"] and m.filesha(HERE/"trigger-carrier-addendum.json")==lock["trigger"]
+prior=m.read(HERE/"heldout-passed.json")
+assert prior["primary_and_secondary"]==[True,True] and prior["raw_sha256"]==lock["heldout_original"]
+assert {k:w["commit"] for k,w in SOURCES.items()}=={"R":"008a21ac0d750dc9a1c18b7959d7e7984c03d887","F":"f53496e2dd363b1455fc7e0a9d2dedea1bf7650e"}
+m.P.update(branch=case["branch"],roles=SOURCES)
+old.P["edited_workspace_roster"]=["uv_client","uv_configuration"]
+CHECK=old.CHECK=[str(m.SDK/"bin/cargo"),*register["cargo_command"][1:]]
+assert CHECK[1:]==["check","-p","uv-client","--locked","--offline","-j8"]
+m.ENV.update(LC_ALL="C",GIT_CONFIG_NOSYSTEM="1",GIT_CONFIG_GLOBAL="/dev/null",GIT_ALLOW_PROTOCOL="file",GIT_NO_LAZY_FETCH="1",RUSTC_BOOTSTRAP="1")
+m.ENV.pop("CARGO_TERM_COLOR",None)
 
 def host():
-    w, tmp = old.host()
-    boot = Path("/proc/sys/kernel/random/boot_id").read_text().strip()
-    excluded = os.environ["EXCLUDED_PRODUCTION_BOOT"].split(",")
-    assert 1 <= len(excluded) == len(set(excluded)) <= 8 and all(
-        str(uuid.UUID(x)) == x for x in excluded
-    )
-    for key, row in case["required_production_boots"].items():
-        assert (
-            key in excluded
-            and m.filesha(HERE / row["raw_file"]) == row["raw_sha256"]
-            and m.read(HERE / row["raw_file"])["ready"]["boot"] == key
-        )
-    assert boot not in excluded and os.environ["GITHUB_REPOSITORY_ID"] == "1319437234"
-    return w, tmp, boot
+    w,t=m.host();co=w/"coordinator";e=os.environ
+    assert e["GITHUB_REPOSITORY_ID"]=="1319437234" and e["RELEASE_LOCK"]==m.filesha(HERE/"release-lock.json")
+    assert m.sha_git(co,"rev-parse","HEAD").decode().strip()==e["REVIEWED_HEAD"] and m.sha_git(co,"rev-parse","HEAD^").decode().strip()==case["parent"]
+    absent={r["boot"] for r in lock["excluded"].values()};boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+    assert len(absent)==len(lock["excluded"])>=11 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
+    requested=e["EXCLUDED_PRODUCTION_BOOT"].split(",")
+    assert len(requested)==len(set(requested)) and set(requested)==absent
+    assert e["BUILD_RUN_ID"]==str(lock["production_compiler"]["run"]) and e["BUILD_HEAD"]==lock["production_compiler"]["coordinator"]
+    return w,t,boot
 
+def compact_host():
+    w,t,_=host()
+    return w,t
+
+old.host=compact_host
 
 def main(mode):
-    w, tmp, boot = host()
-    out = w / "trait-results"
-    if mode == "calibrate":
-        m.pmu(w, tmp)[0].calibrate()
-        obj = m.read(out / "calibration.json")
-        assert (
-            obj["ready"]["boot"] == boot
-            and obj["unmultiplexed_calibration_clocks"] == 28
-        )
+    w,tmp,boot=host();out=w/"trait-results"
+    if mode=="calibrate":
+        m.pmu(w,tmp)[0].calibrate()
+        cal=m.read(out/"calibration.json");assert cal["ready"]["boot"]==boot and cal["unmultiplexed_calibration_clocks"]==28
+        mask=set(cal["ready"]["affinity"]);assert len(mask)==8 and mask<=os.sched_getaffinity(0)
+        os.sched_setaffinity(0,mask)
         import scoped
-
-        mask = set(obj["ready"]["affinity"])
-        assert mask <= os.sched_getaffinity(0)
-        os.sched_setaffinity(0, mask)
         scoped.calibrate()
-        receipt = dict(
-            boot=boot,
-            workspace=str(w),
-            excluded=os.environ["EXCLUDED_PRODUCTION_BOOT"],
-            run=int(os.environ["GITHUB_RUN_ID"]),
-            job="root",
-            coordinator=os.environ["REVIEWED_HEAD"],
-            inherited=m.filesha(out / "calibration.json"),
-            threads=m.filesha(out / "per-rustc-calibration/calibration.json"),
-            affinity=sorted(mask),
-            registered=case["registered"],
-        )
-        m.save(out / "boot-attestation.json", receipt)
-        print(json.dumps(receipt, sort_keys=True), flush=True)
-    elif mode == "admit":
-        import admit_pair
-
-        admit_pair.admit()
-    elif mode == "migration":
-        import admit_pair
-
-        admit_pair.migration()
-    elif mode == "study":
+        where=out/"blocking-clock-pre";subprocess.run([sys.executable,"-ISBu",HERE/"clock-check.py",where],check=True)
+        admit=m.read(where/"verified.json")
+        assert admit["eligible_blocking_calibration"] and admit["boot"]==boot and admit["affinity"]==sorted(mask)
+        m.save(out/"boot-attestation.json",dict(boot=boot,workspace=str(w),excluded=sorted(x["boot"]for x in lock["excluded"].values()),
+              run=int(os.environ["GITHUB_RUN_ID"]),coordinator=os.environ["REVIEWED_HEAD"],inherited=m.filesha(out/"calibration.json"),
+              threads=m.filesha(out/"per-rustc-calibration/calibration.json"),blocking=m.filesha(where/"verified.json"),
+              affinity=sorted(mask),registered=case["registered"],release_lock=m.filesha(HERE/"release-lock.json")))
+    elif mode in ("admit","migration"):
+        import release_intake
+        getattr(release_intake,mode)()
+    elif mode=="study":
         import native
-
         native.run()
-    elif mode == "reduce":
+    elif mode=="reduce":
+        import release_intake
+        release_intake.latest(out/"latest-after-study.json")
         import result
-
         result.close(out)
-    else:
-        raise ValueError(mode)
-
-
-if __name__ == "__main__":
-    main(*sys.argv[1:])
+    else:raise ValueError(mode)
+if __name__=="__main__":main(*sys.argv[1:])

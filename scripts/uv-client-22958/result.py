@@ -13,21 +13,24 @@ m = s.m
 
 
 def stats(rows):
+    assert len(rows)==8 and all(type(a)==type(b)==int and min(a,b)>0 for a,b in rows)
     ratios = [Fraction(b, a) for a, b in rows]
-    above = sum(q < Fraction(4, 5) for q in ratios)
-    below = sum(q > Fraction(4, 5) for q in ratios)
+    speed = [1/q for q in ratios]
+    above = sum(q > 2 for q in speed)
+    below = sum(q < 2 for q in speed)
     n = above + below
     return dict(
         control_and_treatment=rows,
         paired_treatment_over_control=[float(v) for v in ratios],
         paired_median=float(median(ratios)),
         percent_reduction=100 * (1 - float(median(ratios))),
-        half_medians=[float(median(ratios[:3])), float(median(ratios[3:]))],
-        exact_median_interval_96_875_percent=[float(min(ratios)), float(max(ratios))],
-        one_sided_sign_p=sum(comb(n, k) for k in range(above, n + 1)) / 2**n
+        paired_control_over_treatment=[float(v)for v in speed],median_speedup=float(median(speed)),
+        half_medians_speedup=[float(median(speed[:4])),float(median(speed[4:]))],
+        order_statistic_median_interval_99_21875_percent_speedup=[float(min(speed)),float(max(speed))],
+        one_sided_sign_p_at_two=sum(comb(n, k) for k in range(above, n + 1)) / 2**n
         if n
         else 1,
-        all_six_below_80_percent=above == n == 6,
+        all_eight_strictly_above_2x=above==n==8 and all(median(v)>2 for v in (speed[:4],speed[4:])),
     )
 
 
@@ -36,9 +39,9 @@ def verify(out, meter, check_binary=False):
     guards = m.read(panel / "all-native-guards.json")
     cal = m.read(out / "calibration.json")
     ready = cal["ready"]
-    order = ([s.ROLES[0], s.ROLES[1]], [s.ROLES[1], s.ROLES[0]]) * 3
+    order = s.ORDERS
     assert (
-        guards["independent"] == 12
+        guards["independent"] == 16
         and guards["orders"] == list(order)
         and guards["boot"] == ready["boot"]
         and guards["case"] == s.case["registered"]
@@ -51,7 +54,11 @@ def verify(out, meter, check_binary=False):
         and cal["unmultiplexed_calibration_clocks"] == 28
     )
     scoped.cal_raw(out / "per-rustc-calibration")
+    observed_clock=m.read(out/"blocking-clock-pre/verified.json")
+    assert observed_clock["boot"]==ready["boot"] and observed_clock["eligible_blocking_calibration"] and observed_clock["affinity"]==ready["affinity"]
+    assert m.filesha(out/"blocking-clock-pre/verified.json")==allocation["blocking"]
     states = []
+    cargo_lines=[]
     history = set()
     for i, rr in enumerate(order):
         data = {}
@@ -75,6 +82,8 @@ def verify(out, meter, check_binary=False):
             } == {"uv_client": 64, "uv_configuration": 30}
             baseline = cc.streams(d / "kernel-B")
             assert baseline == cc.streams(d / "bare-B")
+            visits=m.read(d/"visit-order.json")
+            assert [x[0] for x in visits]==["wall","whole","threads"] and all(x[1]<x[2]for x in visits) and all(a[2]<=b[1]for a,b in zip(visits,visits[1:]))
             own = {}
             for mode in ("wall", "whole", "threads"):
                 v = d / mode
@@ -118,6 +127,8 @@ def verify(out, meter, check_binary=False):
                     and q["env"] == m.ENV
                 )
                 assert q["end_ns"] - q["start_ns"] == q["ns"] > 0
+                span,=[v for v in visits if v[0]==mode]
+                assert span[1]<=q["start_ns"]<q["end_ns"]<=span[2]
                 windows.append((q["start_ns"], q["end_ns"], role, mode))
                 if mode == "whole":
                     assert (
@@ -138,7 +149,9 @@ def verify(out, meter, check_binary=False):
                     assert lc["running"] == lc["enabled"] > 0
                     own[mode] = lc["instructions"]
                 else:
-                    assert q["mode"] == "native" and q["invoked"] == s.CHECK
+                    assert q["mode"] == "native" and q["invoked"] == s.CHECK and q["wait"]=="os.waitpid(child.pid, 0)" and type(q["pid"])==int and q["pid"]>0
+                    finished,=[line for line in (v/"cargo.stderr").read_text().splitlines() if line.startswith("    Finished `dev` profile [unoptimized + debuginfo] target(s) in ")]
+                    cargo_lines.append(dict(pair=i+1,role=role,finished=finished,stderr_sha256=m.filesha(v/"cargo.stderr"),blocking_ns=q["ns"]))
                     own[mode] = q["ns"]
             data[role] = own
         by = sorted(windows)
@@ -149,21 +162,20 @@ def verify(out, meter, check_binary=False):
     metrics = {}
     for key in ("uv_client", "sum_two", "uv_configuration", "whole", "wall"):
         metrics[key] = stats([[x[s.ROLES[0]][key], x[s.ROLES[1]][key]] for x in states])
-    primary = metrics["uv_client"]["all_six_below_80_percent"]
-    secondary = primary and metrics["sum_two"]["all_six_below_80_percent"]
+    primary = metrics["wall"]["all_eight_strictly_above_2x"]
     return dict(
         complete=True,
         actual_signed_Cargo=s.CHECK,
-        sources={n: s.old.PAIR["arms"][n]["source"] for n in s.ROLES},
+        sources=s.SOURCES,
         boot=ready["boot"],
         metrics=metrics,
-        primary_terminal_confirmed=primary,
-        secondary_sum_of_two_confirmed=secondary,
-        primary_then_secondary=True,
+        primary_wall_twofold_all_eight=primary,
+        observed_Cargo_Finished_lines=cargo_lines,
         original_exact_cold_gate_redeemed=False,
         independent_histories=len(history),
         registered=s.case["registered"],
-        scope="independent hardware diagnostic; thread-group and inherited whole-package counters and ordinary wall are separate",
+        release_lock=m.filesha(s.HERE/"release-lock.json"),
+        scope="Eight-pair ordinary blocking wall primary with separately restored userspace whole-Cargo and thread-group counters. The comparison covers the complete compiler stacks.",
     )
 
 

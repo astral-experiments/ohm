@@ -1,50 +1,5 @@
 {
-  "already_known": "held-out case, one training pair of guest instructions at registration; zero per-process/native package hardware observations on this edit/intervention",
-  "artifact_identity": {
-    "callable": {
-      "artifact": {
-        "bytes": 216299397,
-        "id": 13119343111,
-        "sha256": "1bf9aabdfc5092e1a8f48d3b669c6475753daf6d6e3cbcb3ae471bc7af1fef28"
-      },
-      "cargo": "cargo 1.99.0-dev (ed0ae15d2 2026-11-01) (ohm-1.99.0-22)\nrelease: 1.99.0-dev\ncommit-hash: ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770\ncommit-date: 2026-11-01\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]\n",
-      "installed_inventory_sha256": "67f9ed9c0c70e0bdd4e6b856a06fca33c3715fb301c201bbe855870a9f0106fb",
-      "local_install_receipt": "911af5d9074a74cd35b36ded014af495c3de7da255ca7b629a2bd06f9d96ca01",
-      "producer": 41395027122,
-      "rustc": "rustc 1.99.0-dev (f22825348 2026-11-02)\nbinary: rustc\ncommit-hash: f22825348d834ad9a8ef3934647181fb69f778ae\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
-      "sdk_lock_sha256": "9981e816da5e0c1003eb8bf75f58d1f6eaed702b2b4b5ea04c0b176dff46f21d",
-      "source": {
-        "commit": "f22825348d834ad9a8ef3934647181fb69f778ae",
-        "epoch": 43311,
-        "tree": "96580055f15f61821eefb6875350ce0570995d8c"
-      }
-    },
-    "mature": {
-      "artifact": {
-        "bytes": 214194187,
-        "id": 13109193886,
-        "sha256": "9d5bc0ce4af1a2a48292dc93475a83df2147af95f7079f3370eca9018d63ae60"
-      },
-      "cargo": "cargo 1.99.0-dev (ed0ae15d2 2026-11-01) (ohm-1.99.0-22)\nrelease: 1.99.0-dev\ncommit-hash: ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770\ncommit-date: 2026-11-01\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]\n",
-      "installed_inventory_sha256": "40cfb2c2cbc242023996b192f9f0b43cd23aced1b9ffdc44629e7a5d9f79c5c6",
-      "local_install_receipt": "05c0fc4aafb700feacf28d0f56c24de1f36287d47efedf33da5982a744f92c3d",
-      "producer": 41371136314,
-      "rustc": "rustc 1.99.0-dev (26210096e 2026-11-02)\nbinary: rustc\ncommit-hash: 26210096e48c5c62ef4a5e8fd1aa612631b2f7d7\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
-      "sdk_lock_sha256": "3579524fb6031aba5b9621fbd7414b3ab8e30aec4b6fe8853eb3398f0b840e9f",
-      "source": {
-        "commit": "26210096e48c5c62ef4a5e8fd1aa612631b2f7d7",
-        "epoch": 43311,
-        "tree": "414066f99d9ebc4f7a857d178b7ef5c733835482"
-      }
-    }
-  },
-  "calibration": {
-    "reference_artifact": 13113886561,
-    "reference_run": 41382342799,
-    "reference_zip": "d0a63329b4702026d84de55c11496c3999a43f3e2fd988c2eaad88638e1d146f",
-    "required": "repeat native known positive serial and thread slopes, zero fork-only parent delta and selected-PID re-exec refusal; no software, wall, or multiplex fallback"
-  },
-  "complete_original_ordinary_argv": [
+  "cargo_command": [
     "cargo",
     "check",
     "-p",
@@ -53,7 +8,68 @@
     "--offline",
     "-j8"
   ],
-  "heldout_real_edit": {
+  "design": {
+    "chronological_holds": [
+      [
+        1,
+        2,
+        3,
+        4
+      ],
+      [
+        5,
+        6,
+        7,
+        8
+      ]
+    ],
+    "fresh_host": "Require positive kernel/calibration boot proof and exclude the actual prerequisite #22958 boot and all known #21041 PMU production/validation boots (including 41403723884, 41404703005 and 41406359806). Freeze their true original calibration and service receipts before dispatch.",
+    "pair_orders": [
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ]
+    ],
+    "per_seed_order": "Native qualifying first B, off-clock kernel enrolment, then distinct bare ordinary wall, inherited whole-Cargo PMU, selected-rustcs PMU. Restore its exact A for each. The same within-role order applies to both compilers, which alternate in counterbalanced pairs. Retain every occurrence even if a gate refuses.",
+    "seeds": "Separate fresh A caches independently built for each role/pair, eight independently generated histories per arm across two holds. No pair reuse, optional stopping, discarding slow pairs, or combining earlier runs. Rehydrate that specific pristine A snapshot before each first-edit visit, likewise apply the full eight-file change while branch+index remain A. Clean between holds and roles; fixed empty logical target path for every restore. One ordinary hosted 16-core physical runner, one isolated allocation. Fix CPU affinity and P-state policy; hold/reject contention, migration, or capacity violations under the previously calibrated runner checks."
+  },
+  "eligibility": [
+    "Authenticate both exact distribution bodies, all 142 installed core files from each real package, official release and provenance attestations, per-role rustc/driver/sysroot/ldd/version and native compile/link/run; only exact eight-byte-verified signed tools where required by the original helper recipe. Check unchanged fixed Cargo SHA before every arm. Use the released Rust implementation untouched, including its original CTFE behavior.",
+    "Assert actual source/trees/tags, eight original changes, unchanged lock and all 654 registry archive digests. For the two actual distributions obtain cold A, true warm B, independent cold B and unchanged replay plus native kernels. Require A/B identical normalized 543-unit graph, complete 40 workspace units and 39 metadata libs, same compiler options/selections and source cases. Preserve natural distinct compiler cache formats, standard library inputs, Cargo disambiguators and unit salts. Never transplant either compiler's incremental directory, force a common version, or edit the normal Cargo vector.",
+    "Before inspecting times, qualify each arm independently. Compare all 39 workspace rmeta raw, public sidecars/diagnostics and all 94 declared first-edit direct externs within its own history. Same restored seed must have byte-identical authoritative output across ordinary, kernel and both PMU visits, including every unchanged declared material. Retain everything before judging; record the uninstrumented wall separately. Never require equal raw files or crate salts across different toolchains; compare public outward semantic/API and complete normalized unit/argv identities across them.",
+    "Independent native A/B controls use the emitted unmodified rmeta, old positive TreeFormat, real missing export E0432 on A and authentic B Copy/serde/default/preview/unknown values, executable downstream uv_client::RegistryClient uses and the expected E0308. Native API, cross-crate diagnostic semantics, CTFE, source and key coverage must agree with independently cold B in each role. New cold baseline discrepancies (public/SVH, CTFE, per-def hash, API/diagnostic, reachable expansion or unclassified raw family) are a full refusal. Preserve original bytes, A/warm/cold products, role and files; withhold every score. In particular a signed \u221222 first-B CTFE/public-hash history failure stays visible even if F passes.",
+    "Keep the old formal raw-byte veto permanently. For this separately registered eight-pair diagnostic, require byte equality or the complete independently fixed physical reconstruction/classification protocol from 2d2ad209 (same five known owners, exact synthetic kinds, separately fixed externs re-encoded by that actual native compiler 8/1/1/8, all keyed and semantic checks, strict registry physical rules). Unknown new owners and unexpected facts veto; no post-result expansion of that allowlist. Preserve residual independently unreconstructed bytes and identify them explicitly. If this semantic exception is used it must be visible in any result.",
+    "Retain exact same-mode bare no-edit and native process rosters; planned dirty pair must be exactly the two actual rustcs across both arms and all first-edit visits. Any extra/missing child, changed normalized argv, failed runtime witnesses, unknown output, duplicate tool process, clock/migration/affinity/capacity failure, truncated original or a new unsigned release status withholds the comparison. A changed codegen/query path can be real; no required speed or private key count as a correctness gate."
+  ],
+  "input": {
     "A": "8ca75796365f348e25d3f7bea9daa1440218d40b",
     "B": "362613dbf38f60fe285cdd6bca53641149a23c04",
     "HEAD_and_index": "A even on first B",
@@ -62,55 +78,127 @@
     "source_sha256": "5a9c3a28eb8c7dba3a68cdcab9a668a0bfe76bd1895b525acee350a66d38bd5d",
     "tag": "0.13.6"
   },
-  "independent_protocol": [
-    "No source edits to uv. Authenticate tag, A and B Git trees, entire eight-file diff, unchanged lock and index A, all 654 locked registry archives; license and network settings identical. Install the same two original SDK capsules and exact signed \u221222 Cargo. Require both self-test/ldd/native-link-and-run contracts.",
-    "Precheck both 543-unit JSON plans, full eligibility of all 40 workspace units and the identical feature/options roster. Record every issued absolute compiler argv, SHA/contents of all 39 workspace products plus both real rustcs' 64 and 30 direct inputs separately. Keep full actual SDK paths, disambiguators and unit salts; any cross-role difference other than the predeclared path/salt components vetoes. Complete every achievable native observation before reading any score.",
-    "First create an ordinary cold A and a separate ordinary fresh B for each compiler entirely on the independent runner. A E0432 for the actual new export, genuine B-positive on emitted production rmeta, A/B old export remains usable, and B serde default/preview/unknown/empty all execute using the original dependency graph. Test the same public uv_client functions in as-produced first and independent fresh B using a separate downstream rustc. All diagnostic codes/source text and linked externally visible outputs must agree.",
-    "For every measured seed/role, generate an independent cold A, preserve it in a distinct archive, apply complete B while HEAD/index remain A, and restore those exact bytes before each visit. Enroll bare ordinary B and full native kernel B; demand two and only two real compiler children, named uv_configuration and uv_client. All same-seed declared native .rmeta/.d/public-sidecar outputs, diagnostics, the 39 libraries and every direct external input must match across plain/kernel/whole-PMU/thread-PMU; measure with no RUSTC_WRAPPER. Reconfirm B's emitted-API and linked witnesses after each actual measured class.",
-    "Fresh-B native bytes are a separate genuine control. Record every comparison. Unequal new/nonworkspace artifacts, other crate names and unforeseen patterns require complete independent raw reconstruction; unsupported files or any mismatching canonical/behavioral fact veto numeric enrollment. Two known 2021 registry variants must raw-reconstruct. The only prospectively kernel-tested workspace cohort allowed a semantic diagnostic when raw differs is uv_auth, uv_client, uv_configuration, uv_extract, uv_git, with the recorded OpaqueLifetime, SyntheticCoroutineBody and AnonAssocTy classes observed on their respective native owners. Require exactly the same stable crate and target, all native public/private/global SVHs and header flags, complete DefPathHash set, named/native DefKey descriptors, all per-def RDR, dependency rows, reachable expansions and CTFE literal multisets; no extra semantic keys, changed source row, unknown ordering class or missing record. All unequal artifacts retained raw and classified separately. Revise the prospective list only in a wholly separate study before observing its values.",
-    "For an allowed source owner whose entire bytes do not reconstruct, separately force a single selected unit's cold native re-encoding from fixed byte-identical externs outside all score lines, under one- and eight-thread controls with actual native headers and external behavior; retain exact change ranges, all guards and typed classification. Fail if the independent runner cannot reproduce the documented physical family. Persist residual raw bytes as unproven. Any such scored study is reported as a native hardware diagnostic with same-seed raw equality and independent semantic controls, never as passing the old exact-cold-byte endpoint.",
-    "Use one prespecified 16-core GNU bench runner with userspace PMU admission and fixed SDK/CPU profile. One bounded job, 90-minute cap; no new compiler build, release secrets or publication. Two physically independent holds, three counterbalanced restored-A pairs each; orders M,C / C,M / M,C then C,M / M,C / C,M. Collect six independent A histories per role and keep all eligible pairs/arms. A failed guard prevents complete confirmation; all raw, missing and excluded cases visible.",
-    "Before statistical reduction, require reviewed coordinator head, immutable capsule and service artifact digests, six calibrated raw counter pairs and two holds, per-PID start/exit/lineage, no re-execs, event ID and exact enabled/running times, source/argv/product equality. Report integer counts, all per-pair C/M ratios, paired median and exact nonparametric paired median bounds [min,max] (96.875% two-sided coverage with six independent continuous measurements), plus a predeclared one-sided sign test for C/M <0.8. Primary qualifies for ~20% only if all six C/M ratios <0.8. Only then test the sum endpoint by the same fixed rule; otherwise secondary descriptive. Whole-Cargo and wall have separate numbers, uncertainty and empirical wording, with no inferred 2x from process instructions."
-  ],
-  "independently_calibrated_meter": {
-    "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
-    "per_rustc.py": "92d46fc2443a1af027a01890c03d4450ad562a45b82608d815b281facec1d99e",
-    "pmu.c": "ac49b8795708a9054bb2fb258729734a6e8a9304b5cd92f138c97de45af034cc",
-    "workload.c": "ab9d81c8202657bfe9cf93add0e3607c18c6b75ebe337c922a36db286eec016a"
+  "primary_gate": {
+    "factor": "S=elapsed_R/elapsed_F greater than 2.0 strictly for every one of the eight usable pairs, both four-pair hold medians >2.0, all native eligibility and signed-current assertions required.",
+    "uncertainty": "Report all raw times and ratios plus both hold medians; unconditional order-statistic paired-median range [min,max] has 99.21875% two-sided coverage for eight independent continuous pairs. All eight exceeding 2 gives exact one-sided sign p=1/256 only under its independence/median assumptions; this one-machine study does not estimate host-to-host variance. No rounding/tie acceptance; use integer nanoseconds, complete pairs and no alternate primary."
   },
-  "local_controls": {
-    "all_599_real_keys": "aa7bfa8c8aeab9780eb425c97529e21e59e08cf4e2d4cf8d6e59d02832dcaa98",
-    "both_registry_full_byte_controls": "f23fa2e24732ac2bef59179d95273347b8a549ecda6d99cd4381cb4c1991581a",
-    "candidate_native": "bb0bf155c09c17879861fc9ce61c3e32085c11b4e06e151b94b5cddb88290657",
-    "first_training_pair": "64f31a0209a4128b97e2a714930eb43dc4a366c66d12ab338b494cf2877d9922",
-    "guest_eligibility": "a1d263a7406b99cd0cd25aa31f4e6a725214f6626416e214d6e5a5642d2d4c49",
-    "mature_fixed_input": "a930dea9d29aeb44990170fd79b543aa87419ceb74e38fbb3c9548158289cd74",
-    "original_formal": "9ea7f68f5812b671a5546440742aa5e10acdd7529e4f6ed7f8bb55111c785ac0",
-    "separate_guest": "a95d6f7cd08b3489698abb2ccf4ba3ab5805a2f6653619d8e012e3ee3fe465b0"
+  "principal": "Strict ordinary monotonic elapsed wall for the full unchanged Cargo command. Record before spawn and after normal process wait, same fixed cwd & paths, bare original argument list. No whole/per-rustc counters, tracing, wrappers, logger, subprocess replay, unstable flags, or data preparation inside its timer.",
+  "registered_utc": "2026-11-02T07:37:35.425243+00:00",
+  "roles": {
+    "F_full": {
+      "classification": "private unsigned release-recipe PGO/ThinLTO/BOLT SDK on signed \u221222 Rust sources, including the #318 CTFE fix and the #296/#306/#327 trait changes. This is a cumulative comparison against the released distribution; it cannot isolate #327.",
+      "coordinator": "4e34ea9c7232977f95498d7bf48d382157e8558b",
+      "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
+      "epoch": 43309,
+      "job": 125126258067,
+      "launcher": "cf214fa73954e2f498f19c94afdcc3ba2c93f47dedab13db722c2d9133eeacf1",
+      "llvm": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
+      "qa": {
+        "digest": "sha256:9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
+        "id": 13122138377,
+        "name": "callable-production-qa-attempt-1",
+        "size_in_bytes": 296464
+      },
+      "recipe": {
+        "release/bootstrap.toml": "5822d2ae682a27193ef413f013281b0849797c88c78545607ab563ea48f87684",
+        "scripts/build-optimized-dist.sh": "8c18058724d2135950706543ddfcc489d641bbd644ff063ab4124c3752817c4c",
+        "scripts/prepare-wild.py": "aa0fa93dab4166ef425abb4ec2f623b7d44cc3367bf1e2051551d5ddb0321189"
+      },
+      "run": 41398925829,
+      "sdk": {
+        "digest": "sha256:8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1",
+        "id": 13122178340,
+        "name": "callable-production-sdk",
+        "size_in_bytes": 359917871
+      },
+      "signed_manifest": "67a62c80e9ae1dda7650819511f2329add5db7a9ccf35ef7b1b9b64a314b18a2",
+      "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+      "source_pack": "47208ca22f8c9cd634941c6f6ad6fd157077462b737b6c619af54743825b5bf7",
+      "source_parent": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
+      "training_objects": {
+        "src/bootstrap": "1dcf3e6b142ba5c132f7a2370dffa6ba090b15e1",
+        "src/llvm-project": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145",
+        "src/stage0": "2b3c07d4d457c516754477d36a21529d0cabbfdd",
+        "src/tools/opt-dist": "8621d963d87ee57b56dfa9682d5eb48479ef05df",
+        "src/tools/rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3"
+      },
+      "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4"
+    },
+    "R_release": {
+      "asset_id": 698533704,
+      "bytes": 359852703,
+      "coordinator": "8c7d5b4500fdfa6e2234417340aa190e5787e513",
+      "driver": "4c8ccf0072e8f382a3a3756fd60e46936a2bd206996201c55caffe58d29725db",
+      "launcher": "7e35096dab1b661924cb3c31982c870dd99c7c00a7fba28aa958f451e7c9474e",
+      "llvm": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
+      "provenance": "0466305b42f3af0189acbb22da574df6f2eff1c0c631ea9305a23b5464a00c62",
+      "published_at": "2026-11-01T14:14:23Z",
+      "release_bolt": true,
+      "release_id": 430629054,
+      "rustc": "008a21ac0d750dc9a1c18b7959d7e7984c03d887",
+      "sha256": "bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7",
+      "tag": "ohm-1.99.0-22",
+      "url": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.99.0-22"
+    },
+    "both": {
+      "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+      "cargo_source": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
+      "release_baseline_prohibited_substitutes": [
+        "stock+#318",
+        "rebuilt stock",
+        "stage1",
+        "proposed \u221223"
+      ],
+      "target": "x86_64-unknown-linux-gnu"
+    }
   },
-  "preexisting_study": "different old uv-cli/compiler comparison; edit was not historically unseen",
-  "primary": "complete userspace hardware instructions of the actual terminal uv_client rustc thread group; no forked-child work",
-  "prior_known_workspace_owners": [
-    "uv_auth",
-    "uv_client",
-    "uv_configuration",
-    "uv_extract",
-    "uv_git"
-  ],
-  "registered_utc": "2026-11-02T06:43:21.516888+00:00",
   "schema": 1,
-  "secondary": "sum of the two actual dirty rustc thread groups, uv_client and uv_configuration, each counted once in the same unaltered package check",
-  "signed_cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
-  "source_bound_cold_classes": [
-    "OpaqueLifetime",
-    "SyntheticCoroutineBody",
-    "AnonAssocTy"
-  ],
-  "study": "22958-independent-ordinary-uv-client-native-hardware-diagnostic-01",
-  "supporting_separate": [
-    "uv_configuration process",
-    "retired userspace instructions of Cargo plus all its descendants from a distinct restored-A ordinary visit",
-    "uninstrumented wall of the exact signed Cargo argv, no CARGO_LOG, wrapper, PMU or kernel tracer, separate restored-A visit"
-  ],
-  "trigger": "Dispatch only if both independently generated guest-primary pairs show at least 20% reduction, independent carrier preflight passes, and parent authorizes hosted mutation. Hardware diagnostic cannot redeem the original raw-byte registration."
+  "scope": "This is a package cargo check after actual uv #22958. A positive result is attributable to this pair of optimized distributions, including CTFE and the cumulative trait work; it is neither whole-workspace nor a causal estimate for #327 alone. The earlier chosen transfer source and its raw-failure record remain immutable.",
+  "secondary": {
+    "prespecified": [
+      "both absolute named thread-group counts separately",
+      "sum of exactly those two dirty rustc groups",
+      "separate inherited whole-Cargo userspace instructions"
+    ],
+    "proof": "Kernel-enrol both unique exact rustc argv for the unaltered first-B command in each role, no compiler wrapper and no forced cargo rustc. Restore the same authentic A bytes; require the same diagnostics/products and both complete exact kernel argvs in scoped/whole-counter visits. Full raw PMU words, nonmultiplexed clocks and positive thread/fork calibration. Report counts, all paired labelled ratios and intervals descriptively. No repair of a failed wall gate.",
+    "selectors": [
+      "uv_client",
+      "uv_configuration"
+    ]
+  },
+  "source_authorities": {
+    "production-21041-callables/measurement-retry/local-native/installed.json": "ee892717cd29b613a8ffde426d5dd4fa420ee4bb1c78cf8cacc19c2ff9d0ac72",
+    "production-21041-callables/run-41398925829/qa.zip": "9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
+    "production-21041-callables/run-41398925829/received.json": "68ba3ae39f50dad4c7e83716a270debcab8e859747b24772061bacaf4e168149",
+    "production-21041-callables/run-41398925829/role.json": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
+    "production-21041-callables/run-41398925829/source.json": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e",
+    "released-recent/22958-client-admission/Cargo.lock": "18b3a3f02435755ca80fcbf68b6033226a92e1fb08f7a0b4ed776412d892089a",
+    "released-recent/22958-client-admission/edit.patch": "bdda9d0db6caaeb02925f56c1e9e04feecee5fca8c93040143b3117a2e28aeb7",
+    "released-recent/22958-client-admission/registry-archives.json": "62c4dc3ff4803e37cf90f631ca9f50d99de32aae801a3fb539b96ba0e60fdd45",
+    "released-recent/22958-client-admission/registry-indices.json": "5d83394d2a57d1357d099fe6af4045995b55af99baab6431ad59685fc40e367f",
+    "released-recent/22958-client-admission/registry.json": "f79a0fed892bc3a1b906b6afebfb7f3ede0ba47621a1ff082048c2a7f32a1c85",
+    "released-recent/22958-client-admission/source.json": "5a9c3a28eb8c7dba3a68cdcab9a668a0bfe76bd1895b525acee350a66d38bd5d",
+    "released-recent/22958-client-admission/transfer/native-hardware-diagnostic-01/negative-controls.json": "8994ff1a1b406cdd151edbf1393c337736f0fd78ab26829b83af457c8fc7f6f5",
+    "released-recent/22958-client-admission/transfer/native-hardware-diagnostic-01/portable-replayed.json": "35883c419608af6db4e040034554f0b674f90be3a176df90eb30b0f3a15caa13",
+    "released-recent/22958-client-admission/transfer/native-hardware-diagnostic-01/registration.json": "2d2ad20912693be58458ec355dea335e2967c0a6dd3da80e2ef43ac70640f658",
+    "released-recent/22958-client-admission/transfer/registration.json": "9ea7f68f5812b671a5546440742aa5e10acdd7529e4f6ed7f8bb55111c785ac0",
+    "released-recent/22958-client-admission/unit-plans.json": "440a9a435fc75b9d399facc7591ae549d1a34b3ff0af310e619515b1d6067dac",
+    "released-sdk/assets/ohm-1.99.0-22-x86_64-unknown-linux-gnu-provenance.json": "0466305b42f3af0189acbb22da574df6f2eff1c0c631ea9305a23b5464a00c62",
+    "released-sdk/coordinator-22.json": "67a62c80e9ae1dda7650819511f2329add5db7a9ccf35ef7b1b9b64a314b18a2",
+    "released-sdk/manifest.json": "a3bf370e35fb2e48d43676e14dfa181e417f4f64438e3d3ce0e089c7052b85f3",
+    "released-sdk/verified-archive.json": "15f9eaad5d6569f4c2dfe23ec1dc308ffcf278f4433e3f1a750e685b511f5c0a",
+    "released-sdk/verified-release.json": "15f9eaad5d6569f4c2dfe23ec1dc308ffcf278f4433e3f1a750e685b511f5c0a",
+    "rustc-pmu-thread/exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
+    "rustc-pmu-thread/per_rustc.py": "92d46fc2443a1af027a01890c03d4450ad562a45b82608d815b281facec1d99e",
+    "rustc-pmu-thread/pmu.c": "ac49b8795708a9054bb2fb258729734a6e8a9304b5cd92f138c97de45af034cc",
+    "rustc-pmu-thread/workload.c": "ab9d81c8202657bfe9cf93add0e3607c18c6b75ebe337c922a36db286eec016a",
+    "upstream/20261102-0736-callable-release.json": "725bb984e4a54357fe369084b2da8b5e137287b4c815d42cacfe0d18736f16dd"
+  },
+  "status_at_lock": "Conditional plan only. Neither the prerequisite six-pair hardware case nor this eight-pair production case had a dispatched workflow when its endpoints were chosen. Two independent stage1 guest pairs were known.",
+  "study": "22958-production-signed22-eight-pair-wall-01",
+  "trigger": {
+    "prior_registration": "2d2ad20912693be58458ec355dea335e2967c0a6dd3da80e2ef43ac70640f658",
+    "prior_reviewed_coordinator": "7e22ae2f48542868c362db465dcc2daf24017f07",
+    "requires": "Independently verify original, unaltered hosted six-pair study and its primary uv_client and hierarchical summed-rustc criteria (all six C/M < 0.8 in both), then obtain parent go, one reviewed dispatch only after real native gates. A new latest signed release at authorization or intake stops the specifically latest-shipped interpretation and dispatch pending fresh decision."
+  }
 }

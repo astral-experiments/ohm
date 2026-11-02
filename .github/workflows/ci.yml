@@ -1,4 +1,4 @@
-name: Confirm callable trait recovery on uv 22958
+name: Ordinary uv 22958 check on signed and optimized production Rust
 'on':
   workflow_dispatch:
     inputs:
@@ -28,17 +28,17 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-callables-native-odht'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41395027122' && inputs.build_head == 'ee90d022e7abb6c2c2f61b751c49de06bba29aed'
-      && inputs.sdk_lock_sha256 == '08b0f933ed9dda4bc7079d63e81321e7c8ff279e321b47888da4408781ebdacf'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-signed22-release-wall'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41398925829' && inputs.build_head == '4e34ea9c7232977f95498d7bf48d382157e8558b'
+      && inputs.sdk_lock_sha256 == '85632299e566d66e0c04b507506ed141641eb192a414f448a412c31514c552ac'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
+    timeout-minutes: 120
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       EXCLUDED_PRODUCTION_BOOT: ${{ inputs.excluded_production_boot }}
       BUILD_RUN_ID: ${{ inputs.build_run_id }}
       BUILD_HEAD: ${{ inputs.build_head }}
-      SDK_LOCK_SHA256: ${{ inputs.sdk_lock_sha256 }}
+      RELEASE_LOCK: ${{ inputs.sdk_lock_sha256 }}
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -51,24 +51,6 @@ jobs:
           scripts/uv-callables-21041
           scripts/uv-client-22958
         fetch-depth: '2'
-    - name: Check out builder
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: builder
-        ref: 682930c7b58a62cd46c6f951b60d8cab8d3c7869
-        persist-credentials: 'false'
-        sparse-checkout: |-
-          .github/workflows
-          scripts/handwritten-stage1
-    - name: Check out exact callable builder
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: inventory-builder
-        ref: ${{ inputs.build_head }}
-        persist-credentials: 'false'
-        sparse-checkout: |-
-          .github/workflows
-          scripts/callables-stage1
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -142,26 +124,28 @@ jobs:
       run: |
         set -euo pipefail
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py calibrate 2>&1 | tee trait-results/calibration.log
-    - name: Provide the actual independent machine to the production qualification
+    - name: Seal the fresh physical runner and its blocking wall calibration
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-runner-boot
+        name: uv-22958-signed22-release-runner-boot
         path: trait-results/boot-attestation.json
         if-no-files-found: error
         retention-days: 5
-    - name: Admit the two qualified stage1 SDKs and the signed Cargo binary
+    - name: Verify the signed release and the original optimized GNU distribution
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
         set -euo pipefail
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py admit 2>&1 | tee trait-results/intake.log
-    - name: Verify both normal and shared-version directions of the native incremental transition
+    - name: Isolate both release formats and exercise a linked program across both compiler transitions
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py migration
-    - name: Admit all twelve native histories and gather separately restored hardware and plain wall
+    - name: Compare original cold and warm identities before any of sixteen ordinary histories can be timed
       run: |
         set -euo pipefail
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py study 2>&1 | tee trait-results/experiment.log
-    - name: Independently reduce both actual compiler processes and ordinary Cargo
+    - name: Independently reduce the eight blocking wall pairs and their hardware declarations
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         set -euo pipefail
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py reduce 2>&1 | tee trait-results/reduction.log
@@ -169,7 +153,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-native-instructions-six-pairs
+        name: uv-22958-signed22-release-wall-eight-pairs
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
