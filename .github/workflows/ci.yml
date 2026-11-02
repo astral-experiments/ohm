@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-admit, ldv-placement-score]
         default: single-22
       ldv_admission:
         description: Same-commit successful wrapper-free native workflow run ID for scoring
@@ -952,3 +952,171 @@ jobs:
         compression-level: 6
         retention-days: 7
         if-no-files-found: warn
+
+  placement-workflow:
+    if: (inputs.mode == 'ldv-placement-admit' || inputs.mode == 'ldv-placement-score') && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-workspace-link-census-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && inputs.placement_source == '4e546b27c311f29d99f9528e64420887f57c7538'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    name: Reversible source placement ordinary Cargo ${{ inputs.mode }} block ${{ matrix.slot }}
+    timeout-minutes: 260
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        slot: [1,2]
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PLACEMENT_SOURCE: ${{ inputs.placement_source }}
+      PLACEMENT_FACTORY: '41475100027'
+      ADMISSION_RUN: ${{ inputs.ldv_admission }}
+      STAGE: ${{ inputs.mode == 'ldv-placement-admit' && 'admit' || 'score' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          path: enrolled
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ruff-source-placement
+            scripts/ruff-ldv-physical-stage
+            scripts/ruff-ldv-physical-workflow
+            scripts/ruff-ldv-needed
+            scripts/ruff-ldv-pilot
+            scripts/ruff-default-owner-pmu
+            scripts/ruff-workspace-link-census
+            scripts/ruff-workspace-remat
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-cgu-inputs
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: 088b7b5f77fcb05994fd2a17cbc940cd9edb341a
+          path: ruff-option
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: f9115b8deefa56b18b79449f8acafe25475c54d3
+          path: ruff-e2e
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Check source, graph, interpreter entry and corruption sentinels
+        working-directory: enrolled
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          (cd scripts/ruff-source-placement && sha256sum --strict --quiet -c factory.sha256 && sha256sum --strict --quiet -c worker.sha256)
+          (cd scripts/ruff-ldv-physical-stage && sha256sum --strict --quiet -c SHA256SUMS)
+          (cd scripts/ruff-ldv-physical-workflow && sha256sum --strict --quiet -c SHA256SUMS)
+          python3 -IB scripts/ruff-source-placement/tests.py
+      - name: Install native tracing and source-certificate verifier
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential libssl-dev pkg-config strace zstd
+      - name: Require both independently reopened native and durability admissions
+        if: inputs.mode == 'ldv-placement-score'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-source-placement/decision.py gate "$ADMISSION_RUN" "$RUNNER_TEMP/placement-native-gate.json"
+      - name: Reopen the two physically attested compiler, std, LLVM, native-link and rustdoc kits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 -IB enrolled/scripts/ruff-source-placement/receiver.py "$RUNNER_TEMP/placement-qualified-sdks"
+          if [[ "$STAGE" == score ]]; then cp "$RUNNER_TEMP/placement-native-gate.json" "$RUNNER_TEMP/placement-qualified-sdks/native-gate.json"; fi
+      - name: Run only the enrolled ordinary historical Ruff workflows on separate targets
+        run: python3 -IB -u enrolled/scripts/ruff-source-placement/worker.py "$STAGE" "${{ matrix.slot }}" "$GITHUB_WORKSPACE/ruff-option" "$GITHUB_WORKSPACE/ruff-e2e"
+      - name: Retain original file traces, every complete checkout, native/diagnostic and counter verdict
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: placement-${{ env.STAGE }}-raw-${{ matrix.slot }}
+          path: ${{ runner.temp }}/ohm-ruff-whole-census/evidence
+          if-no-files-found: warn
+          compression-level: 5
+          retention-days: 7
+
+  placement-readback:
+    needs: placement-workflow
+    if: inputs.mode == 'ldv-placement-admit' || inputs.mode == 'ldv-placement-score'
+    name: Independent whole placement artifact and native reader ${{ inputs.mode }} ${{ matrix.slot }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        slot: [1,2]
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PLACEMENT_SOURCE: ${{ inputs.placement_source }}
+      STAGE: ${{ inputs.mode == 'ldv-placement-admit' && 'admit' || 'score' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-source-placement
+            scripts/ruff-ldv-physical-stage
+            scripts/ruff-ldv-physical-workflow
+            scripts/ruff-ldv-needed
+            scripts/ruff-ldv-pilot
+            scripts/ruff-default-owner-pmu
+            scripts/ruff-workspace-link-census
+            scripts/ruff-workspace-remat
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-cgu-inputs
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Reopen complete raw source, code, memory, allocation, failure and counter evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends b3sum
+          python3 -IB -u scripts/ruff-source-placement/readback.py "$STAGE" "${{ matrix.slot }}" "$RUNNER_TEMP/reopened.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: placement-${{ env.STAGE }}-verified-${{ matrix.slot }}
+          path: ${{ runner.temp }}/reopened.json
+          if-no-files-found: error
+          retention-days: 14
+
+  placement-decision:
+    needs: placement-readback
+    if: inputs.mode == 'ldv-placement-score'
+    name: Read both fresh ordinary hardware pairs and all registered secondary outcomes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PLACEMENT_SOURCE: ${{ inputs.placement_source }}
+      ADMISSION_RUN: ${{ inputs.ldv_admission }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-source-placement
+            scripts/ruff-ldv-physical-stage
+      - name: Report the two total-command hardware pairs and independent reachability witnesses
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/ruff-source-placement/decision.py result "$ADMISSION_RUN" "$RUNNER_TEMP/placement-pilot.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: placement-two-pair-pilot
+          path: ${{ runner.temp }}/placement-pilot.json
+          if-no-files-found: error
+          retention-days: 30
