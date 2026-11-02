@@ -116,7 +116,7 @@ In 1.99.0-23, a procedural macro stays fresh when one of its dependencies contai
 assembly. Previously, Cargo could recompile the macro and its consumers on every build. In the
 release test, replacing a declared native library relinks both executables. Building again leaves
 both executables fresh.
-[Cargo change](https://github.com/astral-experiments/ohm-cargo/pull/424) · [Release test](https://github.com/astral-experiments/ohm/pull/253)
+[Cargo change](https://github.com/astral-experiments/ohm-cargo/pull/424) · [Release test](https://github.com/astral-experiments/ohm/blob/aeab3bb6d4187e8607bdf35d75fb90921dda022d/scripts/smoke-test-relink.sh)
 
 On Linux, three successive unchanged builds of Ruff's CLI and integration tests invoked no
 compiler or linker. Changing a declared static library relinked both executables. Restoring the
@@ -235,6 +235,11 @@ For example, after checking a parser change, you can build the parser and reuse 
 from that check. Release builds, test targets, procedural macros, build scripts, and unsupported
 compiler configurations retain ordinary behavior. The extra checkpoints consume disk space. Use
 `-Zohm-shared-stages=no` on both commands to opt out.
+
+In 1.99.0-23, Ohm discards a shared checkpoint if it contains an invalid node. Rustc falls back
+to the ordinary incremental graph if it can read it. If both graphs are damaged, it starts a fresh
+compilation.
+[Rust #338](https://github.com/astral-experiments/ohm-rust/pull/338)
 
 In a prototype, a first build after a check fell from 104.44 to 80.66 seconds. A separate uv
 warm-cycle comparison was slightly slower with sharing, at 5.80 versus 5.72 seconds.
