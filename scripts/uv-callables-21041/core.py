@@ -29,8 +29,8 @@ def host():
         PAIR["roles"] == ROLES
         and ROLES
         == [
-            "fa7a_stack_ctfe318_handwritten",
-            "fa7a_stack_ctfe318_handwritten_coroutine_callables",
+            "fa7a_stack_ctfe318",
+            "callables_ctfe318",
         ],
         "wrong physical roles",
     )
@@ -63,17 +63,22 @@ def host():
         "unregistered private experiment",
     )
     guard(
-        PAIR["arms"][ROLES[0]]["source"]["epoch"] == 43311
-        and PAIR["arms"][ROLES[1]]["source"]["epoch"] == 43311,
+        PAIR["arms"][ROLES[0]]["source"]["epoch"] == 43309
+        and PAIR["arms"][ROLES[1]]["source"]["epoch"] == 43309,
         "cache/metadata epochs",
     )
-    q = m.read(HERE / "local-native.json")
-    guard(
-        filehash(HERE / "local-native.json") == PAIR["native_receipt_sha256"]
-        and q["matched_source_control"]["commit"] == m.P["roles"][ROLES[0]]["commit"]
-        and q["actual_candidate"]["commit"] == m.P["roles"][ROLES[1]]["commit"],
-        "unqualified compiler sources",
-    )
+    plan = m.read(HERE / "measurement-plan.json")
+    src = m.read(HERE / "production-source.json")
+    replay = m.read(HERE / "source-replay.json")
+    guard(filehash(HERE / "measurement-plan.json") == P["measurement_plan_sha256"] == PAIR["plan"]
+          and filehash(HERE / "production-source.json") == PAIR["relative_source"] == replay["role_sha256"]
+          and plan["control"]["commit"] == src["parent"] == PAIR["arms"][ROLES[0]]["source"]["commit"]
+          and plan["treatment"]["commit"] == src["commit"] == PAIR["arms"][ROLES[1]]["source"]["commit"]
+          and replay["candidate"] == src["commit"] and replay["exact_pack_membership"] is True
+          and PAIR["prior_boots"] == m.read(HERE / "prior-boots.json"),
+          "unqualified production source, offline replay or study")
+    guard("fixture" not in PAIR and all(PAIR["arms"][r]["artifact"]["id"] > 0 for r in ROLES),
+          "mock SDK inputs cannot execute this physical experiment")
     return w, tmp
 
 

@@ -36,7 +36,7 @@ def select(before,after,version):
     for former in old.keys()&new.keys():
         assert old[former]==new[former],("retained session changed in place",former)
     val=new[key];assert set(val["files"])==set(NAMES)
-    assert all(f["epoch"]==43311 and f["version"]==version for f in val["files"].values()),("unexpected active compiler header",key)
+    assert all(f["epoch"]==43309 and f["version"]==version for f in val["files"].values()),("unexpected active compiler header",key)
     assert len({f["raw_header_hex"]for f in val["files"].values()})==1
     return key
 def check_switch(before,after,previous,active,shared_identity):

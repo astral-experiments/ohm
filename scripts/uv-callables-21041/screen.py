@@ -32,6 +32,7 @@ def acquire_context():
     old,meter=m.pmu(w,tmp);cal=m.read(out/'calibration.json');ready=cal['ready'];mask=set(ready['affinity'])
     c.guard(mask and mask<=os.sched_getaffinity(0),'enrolled calibration CPU set unavailable');os.sched_setaffinity(0,mask)
     current=old.cpu_receipt(out);c.guard(current['cpus']==ready['affinity']and current['boot']==ready['boot']and cal['unmultiplexed_calibration_clocks']==28,'counter qualification/host')
+    prior=c.PAIR['prior_boots'];c.guard(prior and all(re.fullmatch(r'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}',v['boot']) and re.fullmatch('[0-9a-f]{64}',v['raw_sha256']) for v in prior.values()) and ready['boot'] not in {v['boot']for v in prior.values()},'not an independent measurement boot')
     binary=Path(ready['plain']);c.guard(m.filesha(binary)==cal['plain_sha256'],'calibrated inherited meter')
     load=m.read(out/'intake.json');sdk=load['installed'];gate=c.PAIR['arms']
     c.guard(set(sdk)==set(c.ROLES)and load['sdk_lock_sha256']==P['sdk_lock_sha256'],'SDK roles')

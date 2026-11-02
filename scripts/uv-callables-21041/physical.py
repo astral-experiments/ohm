@@ -33,7 +33,8 @@ def metric(values):
             'hold_medians':[float(x)for x in h],'fewer_in_both_holds':all(x>1 for x in h),
             'both_hold_medians_at_least_twenty_percent_fewer':all(x>=Fraction(5,4)for x in h),
             'positive':above,'negative':below,'ties':len(rows)-n,'two_sided_paired_sign_p':float(two_sided),
-            'observed_range':[float(min(rows)),float(max(rows))]}
+            'observed_range':[float(min(rows)),float(max(rows))],
+            'exact_median_interval':{'coverage':1-2/2**len(rows),'limits':[float(min(rows)),float(max(rows))]}}
 
 def reduce(panel,raw,baseline,read_products,output_controls):
     all_pairs=[];failed=[]
@@ -75,7 +76,8 @@ def preregistered_tests(metrics):
     for name,threshold in [('uv_client',Fraction(1)),('sum_of_eight',Fraction(1)),('uv_install_wheel',Fraction(5,4))]:
         xs=[Fraction(a,b)for a,b in metrics[name]['raw_control_candidate']]
         up=sum(x>threshold for x in xs);down=sum(x<threshold for x in xs);n=up+down
-        p=Fraction(sum(comb(n,k)for k in range(up,n+1)),2**n)if n else Fraction(1)
+        assert len(xs)==8
+        p=Fraction(sum(comb(len(xs),k)for k in range(up,len(xs)+1)),2**len(xs))  # A tie is not a success.
         tests.append(dict(name=name,threshold=str(threshold),above=up,below=down,ties=len(xs)-n,p=p,
                           hold_medians_clear=all(median(x)>threshold for x in (xs[:4],xs[4:]))))
     adjusted=Fraction(0)

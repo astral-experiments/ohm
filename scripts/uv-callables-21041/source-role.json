@@ -1,62 +1,7 @@
 {
-  "commit": "f22825348d834ad9a8ef3934647181fb69f778ae",
-  "epoch": 43311,
-  "files": {
-    "compiler/rustc_crate_store/src/cstore.rs": "2a3ff5ba6540fc29ff8d4af229ae10750f6f8bd9",
-    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs": "f7249daeac4d42eb8ad235427cb6d1a67baf5634",
-    "compiler/rustc_middle/src/dep_graph/dep_node.rs": "8b522acd298af42680f0169aaf1d61120450c81c",
-    "compiler/rustc_middle/src/ty/mod.rs": "43e1915af9a8aea8e01201a0e7678d8264c2e7a8",
-    "compiler/rustc_query_impl/src/execution.rs": "654d65aff6c33b4757cb9e2300916043a5f27d35",
-    "tests/run-make/trait-impl-bucket-callables/facade.rs": "7de0e1af3456c385ccde338cde4630cfea87c40c",
-    "tests/run-make/trait-impl-bucket-callables/reader.rs.in": "93d944066747b1b9522e13577f3cc00956b29826",
-    "tests/run-make/trait-impl-bucket-callables/rmake.rs": "93dd921424e0cac11ed347c071db84de3759fcef",
-    "tests/run-make/trait-impl-bucket-callables/roster.rs": "0ef64d106aebf37a0d7f7d19ff86c0b000d65263"
-  },
-  "inherited_run_make": "tests/run-make/trait-impl-bucket-coroutine",
-  "metadata_epoch": 43311,
-  "oracle": "python3 -ISB oracle.py SDK FIXTURE_DIR NEW_DIR control|candidate",
-  "oracle_counts": {
-    "candidate": {
-      "only_assoc": 0,
-      "only_closure": 0,
-      "only_ctor": 0,
-      "only_named": 0
-    },
-    "control": {
-      "only_assoc": 1,
-      "only_closure": 1,
-      "only_ctor": 1,
-      "only_named": 1
-    }
-  },
-  "pack_bytes": 76829,
-  "pack_git_id": "d1d37cd85259be601f910e6b31839530cee81dcb",
-  "pack_kind": "strict relative to exact parent",
-  "pack_objects": 27,
-  "parent": "26ae4bbc427b4e0f703cabf7aba264f39afb0a5f",
-  "parent_source_blobs": {
-    "compiler/rustc_crate_store/src/cstore.rs": "e3b339a5ce871edc16cdf8c031b53681272a29dc",
-    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs": "8fd6c8eb5d5a9bf10efdae4c4a6fd06c84fc8e8a",
-    "compiler/rustc_middle/src/dep_graph/dep_node.rs": "8b4564c2ed0260bc1a644ebc8c40f2ac1004cbf3",
-    "compiler/rustc_middle/src/ty/mod.rs": "773e34cbd925cb46f0aa8576b6a281f3f29024c1",
-    "compiler/rustc_query_impl/src/execution.rs": "81799b3e4cc7cb4b23ad86917445e75d7e2b1a1c"
-  },
-  "parent_tree": "7fc6b885c706c30a1686617eca3129b35459d45b",
-  "regression": "ordinary and next solver; foreign named fn, associated fn and variant constructor, real signatures E0061, retired fn as const E0618, local Copy and non-Copy closure E0277, inserted and replaced closure owners, unrelated and restored roster; native assertions",
-  "run_make": "tests/run-make/trait-impl-bucket-callables",
+  "original_case_commit": "667cb67c64eb03973f95df51d68883c0d056e2ee",
+  "purpose": "Only the retained native RDR reader; production compiler sources are in production-source.json.",
   "sha256": {
-    "adt_rows.json": "d7c6171809c05655d779e056f7b82d236dad6f58218ea7a79baa10b64eb8b459",
-    "callable.pack": "ec0280b7d227dea98866d09dd04d8468cc06c7394bd9b843799ebfe813b44817",
-    "guards.json": "c6a359c67a46277a5ab3368210d1104f4d5f8840580385629a8b20de8160ee15",
-    "oracle-control01/qualified.json": "4cd7c58c8d8e1ac4b91132e035b777ec48eff1e66c6275b3be26bff8d71a0f4c",
-    "oracle.py": "3326cdf8a441b33e95acc74f096b2ed02991d8393486d85363056b7e13819f04",
-    "profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219",
-    "screen.json": "4db1a5a10325a72f7e7094b9c1764302b82b21bfc76d401ae6036c785dfd4064",
-    "source-delta.patch": "6f5999bf9f10bcca83db52cb003e801c63310cdda1185d17e07cf3b78542f4f0",
-    "wide-fixture/coroutine-native01/findings.json": "e90a50311b7cf194c441fc1d43471b068cbf16b341b7dc357b9d005db0321a4f",
-    "wide-fixture/coroutine-native01/native.json": "742b1eebc6878058a84b6496ffbe56791925a8fbacb158443f0cb657974f053f",
-    "wide-fixture/fa7a-native01/findings.json": "8e50eada95b33f8de2f051de8b488e3e574bec202505c3f4149bfbd71eacdbae",
-    "wide-fixture/fa7a-native01/native.json": "283a0b6a424176918e47b7f6bc83a4255e562ef5e8fafd2038cb36bf278b116e"
-  },
-  "tree": "96580055f15f61821eefb6875350ce0570995d8c"
+    "profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219"
+  }
 }

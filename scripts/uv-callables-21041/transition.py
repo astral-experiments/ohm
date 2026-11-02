@@ -39,8 +39,8 @@ def main(control,candidate,fixture,output,self_test=False):
                             p,=(w/"cache").glob("reader-*/s-*/"+name)
                             with p.open("rb")as f:
                                 prefix=f.read(7);version=f.read(prefix[6]).decode()
-                            assert prefix[:4]==b'RSIC'and int.from_bytes(prefix[4:6],"little")==43311 and version==("rustc-perf"if shared else banners[role])
-                            headers[name]=[43311,version,sha(p)]
+                            assert prefix[:4]==b'RSIC'and int.from_bytes(prefix[4:6],"little")==43309 and version==("rustc-perf"if shared else banners[role])
+                            headers[name]=[43309,version,sha(p)]
                         assert subprocess.check_output([str(w/"reader")],cwd=w,env=env)==b"7\n"
                     return {"stage":stage,"role":role,"asserted_incremental_state":state,"headers":headers,"binary":None if signature else sha(w/"reader"),"commands":rows}
                 vis.append(step(first,"A","not-loaded"))

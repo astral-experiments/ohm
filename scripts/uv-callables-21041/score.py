@@ -68,7 +68,7 @@ def score():
                 else:
                     clock=meter.clock(at/'whole-clock.json',0);c.guard(rec['invoked']==[ready['plain'],str(at/'whole-clock.json'),*c.CHECK]and clock['running']==clock['enabled']>0 and v['value']==clock['instructions'],'inherited unmultiplexed whole-command instructions')
     import physical
-    report={'scope':'optimized stage1, complete recovery patch, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
+    report={'scope':'matched release-optimized PGO+BOLT corrected Ohm -22, complete callable recovery patch, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
         'verified_unique_workspace_products':len(checked),'metrics':None if refusals else summary(raw),'branch':P['branch']}
     if report['metrics']:
         for mode in ('wall','clock'):

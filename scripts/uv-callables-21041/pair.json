@@ -1,111 +1,124 @@
 {
-  "actual_build": [
-    "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
-    "/home/runner/work/ohm/ohm/source/rust/x.py",
-    "--ci",
-    "false",
-    "--config",
-    "/home/runner/work/ohm/ohm/trait-evidence/bootstrap.toml",
-    "build",
-    "--stage",
-    "1",
-    "-j8",
-    "--host",
-    "x86_64-unknown-linux-gnu",
-    "--target",
-    "x86_64-unknown-linux-gnu",
-    "compiler/rustc",
-    "library",
-    "src/tools/rustdoc"
-  ],
   "arms": {
-    "fa7a_stack_ctfe318_handwritten": {
+    "callables_ctfe318": {
       "artifact": {
-        "bytes": 214194187,
-        "id": 13109193886,
-        "sha256": "9d5bc0ce4af1a2a48292dc93475a83df2147af95f7079f3370eca9018d63ae60"
+        "bytes": 359917871,
+        "id": 13122178340,
+        "sha256": "8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1"
       },
-      "artifact_name": "handwritten-stage1-fa7a_stack_ctfe318_handwritten",
-      "branch": "charlie/codex-20988-handwritten-stage1",
-      "checked_files": {
-        ".github/workflows/ci.yml": "13cf3a47b2badf9b77b3236c01504ba99220a17b81f1ccb44325791bd2091113",
-        "scripts/handwritten-stage1/arms.json": "22e5b5f32c48ff2f11d1657d9d8d270fcceeb37f1c5be70ebe0989aa8d5550bd",
-        "scripts/handwritten-stage1/candidates.pack": "39f77995d828e3c5f40e933dc203013c0a7c74a3448e73b7024cbdc05861a46b",
-        "scripts/handwritten-stage1/export_sdk.py": "241cead5c7c6db7021ca075888c9795001374f1b624ee1ba294fe317b75dc7b1",
-        "scripts/handwritten-stage1/files.json": "21ca65f8ffc5c0a428211f9dfe33b84df0ddfdf60f4d48739212f7a9d9c9444a",
-        "scripts/handwritten-stage1/gate.py": "63c6941c5f59c353a6beac9873f7cb517a5f97f355a256d098b3cb5dbb148123",
-        "scripts/handwritten-stage1/materialize.py": "63144bce9dd445d79e074d4e309a02dc876b45a158a65c0c2647ce9320515147",
-        "scripts/handwritten-stage1/stage.py": "69b532906a01824004757e27ead0fbc36b8cbcabde51deb956713870e9413d9f"
+      "builder_tree": "450fccc6ae4e35748a00a7b73cd9006955416acb",
+      "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
+      "role_sha256": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
+      "service": {
+        "branch": "charlie/codex-21041-callable-production22",
+        "head": "4e34ea9c7232977f95498d7bf48d382157e8558b",
+        "job": 125126258067,
+        "jobs": {
+          "Production GNU callable SDK": 125126258067
+        },
+        "members": {
+          "callable-production-qa-attempt-1": {
+            "bytes": 296464,
+            "id": 13122138377,
+            "sha256": "9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512"
+          },
+          "callable-production-sdk": {
+            "bytes": 359917871,
+            "id": 13122178340,
+            "sha256": "8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1"
+          }
+        },
+        "run": 41398925829,
+        "runner": 1533,
+        "runner_name": "nsc-runner-fr8m9c58q9jum"
       },
-      "checkout": "builder",
-      "command_log": "1709972ab393ad20dc6c63a0cc91e7346ff8dcc8ff27082f1583f27ad2e63fc7",
-      "driver": "0119b70bef5389051016022b671b2af262aa9df103c36176791512280b6da116",
-      "head": "682930c7b58a62cd46c6f951b60d8cab8d3c7869",
-      "job_id": 125041656652,
-      "job_name": "Handwritten stage1 SDK (fa7a_stack_ctfe318_handwritten)",
-      "parent": "413e2cb249d4d25309c75a8d06fdd6712ff54091",
-      "required_steps": [
-        "Build optimized compiler and host std, run correctness suites, and export the SDK"
-      ],
-      "rid": 41371136314,
-      "scripts": "scripts/handwritten-stage1",
       "source": {
-        "commit": "26210096e48c5c62ef4a5e8fd1aa612631b2f7d7",
-        "epoch": 43311,
-        "tree": "414066f99d9ebc4f7a857d178b7ef5c733835482"
-      }
+        "commit": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+        "epoch": 43309,
+        "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4"
+      },
+      "source_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
     },
-    "fa7a_stack_ctfe318_handwritten_coroutine_callables": {
+    "fa7a_stack_ctfe318": {
       "artifact": {
-        "bytes": 216299397,
-        "id": 13119343111,
-        "sha256": "1bf9aabdfc5092e1a8f48d3b669c6475753daf6d6e3cbcb3ae471bc7af1fef28"
+        "bytes": 359918996,
+        "id": 13112830698,
+        "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
       },
-      "artifact_name": "callables-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables",
-      "branch": "charlie/codex-21041-callables-stage1",
-      "checked_files": {
-        ".github/workflows/ci.yml": "6509ba4cf3ad1f5d3aee7076b33731c8759d52af55780561b71eae06e299f72d",
-        "scripts/callables-stage1/arms.json": "53e633715a3d384fdbca43cfdc25dfa2104d47e3b78ce91381447ef602133db8",
-        "scripts/callables-stage1/callable-source.json": "0f3d01e72692c222bcba14f57476c21ff63523f73ab444caa9f569311e36eded",
-        "scripts/callables-stage1/callable.pack": "ec0280b7d227dea98866d09dd04d8468cc06c7394bd9b843799ebfe813b44817",
-        "scripts/callables-stage1/callables-oracle.py": "3326cdf8a441b33e95acc74f096b2ed02991d8393486d85363056b7e13819f04",
-        "scripts/callables-stage1/candidates.pack": "39f77995d828e3c5f40e933dc203013c0a7c74a3448e73b7024cbdc05861a46b",
-        "scripts/callables-stage1/coroutine-source.json": "a56e08abd18b18cfa47f6325059fe01870be6adec1efaec05df8cae3f118b406",
-        "scripts/callables-stage1/coroutine.pack": "0f076ac4f64ac883f269a48efac1bdeb859d09a3d136f646c598df66863722b1",
-        "scripts/callables-stage1/export_sdk.py": "241cead5c7c6db7021ca075888c9795001374f1b624ee1ba294fe317b75dc7b1",
-        "scripts/callables-stage1/files.json": "390e84135b2e6836cd2cba107eefb0de2b0d9e51cb06dbf2c6416bd0fc1ddef4",
-        "scripts/callables-stage1/gate.py": "63c6941c5f59c353a6beac9873f7cb517a5f97f355a256d098b3cb5dbb148123",
-        "scripts/callables-stage1/materialize.py": "469fef8f3a15781d702025cced598710d8311b6260ee5ddad19e08ab2bc42ef3",
-        "scripts/callables-stage1/oracle.py": "c845db0781def1b5f3bac50df44eb01cf917fc0ce482fa4a498e8d7b2cdfcbb4",
-        "scripts/callables-stage1/profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219",
-        "scripts/callables-stage1/stage.py": "2947b7cb2483c02b8900007dca9fcb326f9b8d377a0ff3bea7dfac5beb39a04a"
+      "builder_tree": "85761b7d3b377c90c26c635f7231c29df024e9ff",
+      "driver": "3f8168fac2af20edf3ca51d940b4653df40746ff2ef43be50fcd0090ba260a7b",
+      "role_sha256": "72d366265342c92095c94c174181b7837c19add96cd0ef5719755c115e6273a2",
+      "service": {
+        "branch": "charlie/codex-ctfe22-standard-20988",
+        "head": "cddb036d81e4313a8e422171f39f0840b44110db",
+        "job": 125052685273,
+        "jobs": {
+          "Production GNU SDK (fa7a_stack_ctfe318)": 125052685273,
+          "Production GNU SDK (stock_ctfe318)": 125052685479,
+          "Qualify both cache migration directions": 125067990029
+        },
+        "members": {
+          "ctfe22-gnu-build-fa7a_stack_ctfe318-attempt-1": {
+            "bytes": 324152,
+            "id": 13111789509,
+            "sha256": "dafc9171fd92bdb0360d09c401bed69d21688a6241e27ff33854a2899d2e972b"
+          },
+          "ctfe22-gnu-build-stock_ctfe318-attempt-1": {
+            "bytes": 320732,
+            "id": 13112616460,
+            "sha256": "a303a36f25e7b2019661800c9d1cf194fbef8bf084b8ea024a2fe0df00c45ea6"
+          },
+          "ctfe22-gnu-pair-qa-attempt-1": {
+            "bytes": 61651,
+            "id": 13112632778,
+            "sha256": "b1502aed447aebb3a2bf79784f47e8af92e126378448da72735996b70a29502e"
+          },
+          "ctfe22-gnu-sdk-fa7a_stack_ctfe318": {
+            "bytes": 359918996,
+            "id": 13112830698,
+            "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
+          },
+          "ctfe22-gnu-sdk-stock_ctfe318": {
+            "bytes": 359881451,
+            "id": 13112756183,
+            "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
+          }
+        },
+        "run": 41374825846,
+        "runner": 1429,
+        "runner_name": "nsc-runner-qf17h1b297vk4"
       },
-      "checkout": "inventory-builder",
-      "command_log": "8a81bf214904399fac26d1ddb92a512c033c2bd5b861de476617e69d7b2e3f17",
-      "driver": "8de096a2425ca8580071d117345aa04d76db2e4617ae72a0ac8b60f1a7f2a5de",
-      "head": "ee90d022e7abb6c2c2f61b751c49de06bba29aed",
-      "job_id": 125114385350,
-      "job_name": "Callable stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables)",
-      "parent": "797d99e885991d0fef500102392e2117562d9ebf",
-      "required_steps": [
-        "Verify all three source packs and the direct callable child",
-        "Build optimized compiler and host std, run correctness suites, and export the SDK"
-      ],
-      "rid": 41395027122,
-      "scripts": "scripts/callables-stage1",
       "source": {
-        "commit": "f22825348d834ad9a8ef3934647181fb69f778ae",
-        "epoch": 43311,
-        "tree": "96580055f15f61821eefb6875350ce0570995d8c"
-      }
+        "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
+        "epoch": 43309,
+        "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
+      },
+      "source_sha256": "039577238fed403d7043209f042157c38a781cf14073ff8250b0c2dbcb17661b"
     }
   },
-  "bootstrap_sha256": "45880ce3806d4ce13439f4235d2d8af43465b6f685244b39419252851f91692f",
-  "capsules_from_independent_source_enrollments": true,
-  "native_receipt_sha256": "0a848d39d46b4ec5fdef966a55006706a81cb2bd27257c9d87e9665de5a6933b",
-  "producer": "two separately admitted matched optimized stage1 SDKs, same signed \u221222 Cargo",
+  "plan": "8caeed692f00e805c89a2e71f9ed932b717e2c8d794ea125ff5f0a9fedb8933f",
+  "prior_boots": {
+    "41379994255": {
+      "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
+      "raw_sha256": "f3f19e05c29b16520b996d0b1557555522465fc99b213af4e789befb721c2ade"
+    },
+    "41385306015": {
+      "boot": "fc71919f-27b4-4483-ab95-9bcac5e7131b",
+      "raw_sha256": "c6abea2a2978d98c8ecd250e42cf1b6f7ce2b2e4bb41964a0ee1b5f1c4bca376"
+    },
+    "41393501771": {
+      "boot": "db4d2941-1bd1-402f-8099-cc50036b6df3",
+      "raw_sha256": "e0c2483d07ffb8f81a44209a016ee0187f07a78a85399d9fb7a5693b008d8842"
+    },
+    "41399090905": {
+      "boot": "8461ebca-9583-4d70-8eac-198744186904",
+      "raw_sha256": "f67f1edcb62f453d08caa7d8efa8996281277b4e17e13c112d87da825f00f92f"
+    }
+  },
+  "relative_source": "f6b55d2817bb059f9c0bd65de1fd33b0381225c0bcb721459514b49cf5e7d146",
   "roles": [
-    "fa7a_stack_ctfe318_handwritten",
-    "fa7a_stack_ctfe318_handwritten_coroutine_callables"
-  ]
+    "fa7a_stack_ctfe318",
+    "callables_ctfe318"
+  ],
+  "scope": "separate original production jobs, original signed Cargo, instance-specific service SDK archives and native QA"
 }

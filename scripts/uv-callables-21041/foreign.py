@@ -5,9 +5,9 @@ import core as c
 m=c.m
 def transition_sources(folder):
     expected={
-        'transition.py':'073ef2c3677d693a62c4943d5586f7b3365628ecba895331c2114350faa2f047',
+        'transition.py':'0790bd45182a550ed820cdca65dd09daad588de012f8fa2f5a357b7a71a7ee39',
         'transition_v2.py':'f94426329c33d46faa8cf90db5e085463843dd8203f87e38bdacd7636722c62f',
-        'transition_sessions.py':'d92869e24344560a26c0cdb7b5941139ac612d9ec6af3a1d1faad3f7f388eb19',
+        'transition_sessions.py':'b7ccb7c36b617d5de6b835df4e9e4752dbbf5a79ec939c69bc08d9470b79085a',
     }
     for name,digest in expected.items():
         c.guard(hashlib.sha256((folder/name).read_bytes()).hexdigest()==digest,'changed original '+name)

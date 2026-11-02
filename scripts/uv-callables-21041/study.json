@@ -5,8 +5,8 @@
   "B": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
   "B_file": "3d91d5195930020a6740f68341549629681eb8654048962cc618fe02e7130360",
   "B_tree": "ce502617cfbf3fd59980e29731c10b5391d12139",
-  "branch": "charlie/codex-21041-callables-uv-client",
-  "candidate_selection": "Full coroutine and callable receiver recovery on the original optimized stage1 parent",
+  "branch": "charlie/codex-21041-callables-production-check",
+  "candidate_selection": "Source-matched release-optimized callable receiver recovery on the corrected Ohm -22 trait stack",
   "describe_A": "0.12.3-27-ga2a0242",
   "describe_B": "0.12.3-28-g9049e07",
   "edit_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
@@ -31,23 +31,9 @@
     1,
     1
   ],
-  "local_selection": {
-    "independent_hardware_measurements_seen": 0,
-    "local_guest_report_sha256": "14521b4aea204de94889de09734108089d91849a5f0b1fbdf8832fc5eacd9e92",
-    "sum_guest_counts": [
-      17526008294,
-      15426083087
-    ],
-    "terminal_guest_counts": [
-      6067243854,
-      5255240704
-    ],
-    "wheel_guest_counts": [
-      1040728278,
-      764722516
-    ]
-  },
+  "local_selection": "Real landed uv #21041; original stage1 discovery is separate from this production experiment",
   "lock_sha256": "84893face6e0c3f1641af8ce022475d859b99bb43c3ccfb540e2e9cee98095f9",
+  "measurement_plan_sha256": "8caeed692f00e805c89a2e71f9ed932b717e2c8d794ea125ff5f0a9fedb8933f",
   "meter_files": {
     "SHA256SUMS": "c6713c7ef2878aa70a927e845e41ec9f4d237091b6c7a6c45d4799de047fb0d1",
     "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
@@ -1132,45 +1118,45 @@
   },
   "orders": [
     [
-      "fa7a_stack_ctfe318_handwritten",
-      "fa7a_stack_ctfe318_handwritten_coroutine_callables"
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318_handwritten_coroutine_callables",
-      "fa7a_stack_ctfe318_handwritten"
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318_handwritten_coroutine_callables",
-      "fa7a_stack_ctfe318_handwritten"
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318_handwritten",
-      "fa7a_stack_ctfe318_handwritten_coroutine_callables"
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318_handwritten_coroutine_callables",
-      "fa7a_stack_ctfe318_handwritten"
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318_handwritten",
-      "fa7a_stack_ctfe318_handwritten_coroutine_callables"
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318_handwritten",
-      "fa7a_stack_ctfe318_handwritten_coroutine_callables"
+      "callables_ctfe318",
+      "fa7a_stack_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318_handwritten_coroutine_callables",
-      "fa7a_stack_ctfe318_handwritten"
+      "fa7a_stack_ctfe318",
+      "callables_ctfe318"
     ]
   ],
   "original_patch_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
-  "parent": "5d00c85e5295090721806fd3a3a025461764369e",
+  "parent": "667cb67c64eb03973f95df51d68883c0d056e2ee",
   "per_rustc_threshold": "Family of three prespecified one-sided paired sign tests with Holm familywise alpha 0.05: terminal uv_client and sum of eight vs parity; exploratory-selected, hardware-confirmed uv_install_wheel against control/candidate > 1.25. All eight crates and both non-instrumented wall and whole-Cargo instruction distributions reported.",
   "physical_scope": "Terminal uv_client on uv #21041 with eight genuine fresh first-edit lib invocations",
   "plan_units": 530,
-  "producer_head": "ee90d022e7abb6c2c2f61b751c49de06bba29aed",
-  "producer_run": 41395027122,
+  "producer_head": "4e34ea9c7232977f95498d7bf48d382157e8558b",
+  "producer_run": 41398925829,
   "reference_features": {
     "uv_auth": [],
     "uv_cache": [],
@@ -1242,8 +1228,8 @@
   "registry_uncompressed_sha256": "cb48aafbd06b0f81d56dc44f61476fc2fe2a609c2637e33b6569f8290ac64fc0",
   "repo": "astral-experiments/ohm",
   "roles": [
-    "fa7a_stack_ctfe318_handwritten",
-    "fa7a_stack_ctfe318_handwritten_coroutine_callables"
+    "fa7a_stack_ctfe318",
+    "callables_ctfe318"
   ],
   "root_features": [],
   "root_unit": "73295104ae181bf6a8a99b926325f476c7036c7d1edebd997fde08b2f3c7625e",
@@ -1255,7 +1241,7 @@
     "--offline",
     "-j8"
   ],
-  "sdk_lock_sha256": "08b0f933ed9dda4bc7079d63e81321e7c8ff279e321b47888da4408781ebdacf",
+  "sdk_lock_sha256": "60b02674ec990167d3e9437dd9f2da10e9556064c1af2bf107bad1f911e3334c",
   "source_case_sha256": "576103c648f8b31662b0ddf1d49632573023a9cbe699bb1811df57d4f2a6cfd2",
   "source_mode": "real unstaged edit at A and genuine 0.12.3 ancestry; same absolute source/target for each restoration",
   "structural_graph_sha256": "17277138e393245b99609f9da43bfcfdf091f2c57ea8bdf2217669cd6b1fe74f",
