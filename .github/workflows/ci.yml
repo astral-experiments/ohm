@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout]
         default: single-22
       ldv_admission:
         description: Same-commit successful wrapper-free native workflow run ID for scoring
@@ -631,7 +631,7 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
   ldv-source-workflow:
-    if: (inputs.mode == 'ldv-source-admit' || inputs.mode == 'ldv-source-score') && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-workspace-link-census-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    if: (inputs.mode == 'ldv-source-layout' || inputs.mode == 'ldv-source-admit' || inputs.mode == 'ldv-source-score') && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-workspace-link-census-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     name: Real source-built ordinary Ruff Cargo ${{ inputs.mode }} block ${{ matrix.slot }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 240
@@ -639,10 +639,10 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        slot: ${{ fromJSON(inputs.mode == 'ldv-source-admit' && '[1,2]' || '[1,2,3,4,5,6]') }}
+        slot: ${{ fromJSON(inputs.mode == 'ldv-source-layout' && '[1]' || inputs.mode == 'ldv-source-admit' && '[1,2]' || '[1,2,3,4,5,6]') }}
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      STAGE: ${{ inputs.mode == 'ldv-source-admit' && 'admit' || 'score' }}
+      STAGE: ${{ inputs.mode == 'ldv-source-layout' && 'layout' || inputs.mode == 'ldv-source-admit' && 'admit' || 'score' }}
       ADMISSION_RUN: ${{ inputs.ldv_admission }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -702,7 +702,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB enrolled/scripts/ruff-ldv-physical-workflow/transport.py "$RUNNER_TEMP/ldv-qualified-sdks"
+      - name: Acquire the intact released SDK for the isolated documentation control
+        if: inputs.mode == 'ldv-source-layout'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-ldv-physical-workflow/layout.py signed
+      - name: Run the unscored genuine Rustdoc and Cargo registry control
+        if: inputs.mode == 'ldv-source-layout'
+        run: python3 -IB enrolled/scripts/ruff-ldv-physical-workflow/layout.py trial
       - name: Run ordinary non-wrapped Cargo with original native and failure controls
+        if: inputs.mode != 'ldv-source-layout'
         run: python3 -IB -u enrolled/scripts/ruff-ldv-physical-workflow/acquire.py "$STAGE" "${{ matrix.slot }}" "$GITHUB_WORKSPACE/ruff-option" "$GITHUB_WORKSPACE/ruff-e2e"
       - name: Retain every original native stream, including a refused enrollment
         if: always()
