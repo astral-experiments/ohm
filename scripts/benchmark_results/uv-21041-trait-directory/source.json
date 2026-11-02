@@ -1,0 +1,103 @@
+{
+  "actions": {
+    "first_direct_cumulative": 41482043357,
+    "marginal_check": 41473622846,
+    "marginal_wall_sensitivity": 41484215521,
+    "ordinary_build_guard": 41475005437,
+    "sdk_build": 41459079009
+  },
+  "cargo_sha256": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+  "control_release": {
+    "incremental": 43310,
+    "notes": "Corrected with the same native CTFE fix used by the optimized stack",
+    "release": "ohm-1.99.0-22",
+    "rmeta_private": 3,
+    "rust": "10d56274a98801b5ef8f80aab734e835749458e1"
+  },
+  "crate": "uv-client",
+  "edit": "https://github.com/astral-sh/uv/pull/21041",
+  "edited_uv": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
+  "marginal_parent": {
+    "incremental": 43319,
+    "rmeta_private": 43319,
+    "rust": "ac67101cb973e35ce8ff044cc8014c2c76bab69e"
+  },
+  "measured_child": {
+    "incremental": 43323,
+    "rmeta_private": 43319,
+    "rust": "e4edbdd943f2ceac098ddde880e8f97a3bb3270f"
+  },
+  "parent_uv": "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
+  "path": "crates/uv-pypi-types/src/simple_json.rs",
+  "prior_22958_wall_replication": "https://github.com/astral-experiments/ohm/tree/300dd60e623aa5f668213a362035b79c7d09cf1a/scripts/benchmark_results/uv-22958-generated-impl-check/independent-replication",
+  "review_port": {
+    "adjusted_untouched_context": [
+      "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs"
+    ],
+    "base": "ff15b3d90bde1efba6b49f1b49670e76630a2aeb",
+    "base_branch": "charlie/codex-incoherent-impl-crate-input",
+    "branch": "charlie/codex-trait-directory-defining-crate",
+    "identical_touched_file_contents": [
+      "compiler/rustc_metadata/src/rmeta/decoder.rs",
+      "compiler/rustc_metadata/src/rmeta/decoder/tests.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/ty/trait_def.rs",
+      "tests/run-make/trait-impl-directory/contracts.rs",
+      "tests/run-make/trait-impl-directory/impls.rs"
+    ],
+    "incremental": 43325,
+    "native_leaf_recheck": {
+      "genuine": {
+        "compiled_source_sha256": "9a05b7b4411de27a5a8a94635709042820b4da47f7d07c5d33b954b7f2b61d4f",
+        "native_code": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "567674e44a3c1c2ae67c1f79abab4e8d3473bdd4323f63146d804c2b0b73d0ed"
+      },
+      "missing_local_hash": {
+        "compiled_source_sha256": "e33c71e02e910f0569c9e5fcf8da4f01f42ce5c84f5f0e5424314c4a92b47652",
+        "native_code": 101,
+        "stderr_sha256": "f565729d491754e82673a2e4b0d8c33a4367986abc19a55982b20c5005c32f76",
+        "stdout_sha256": "416ce5fc29dbdc9d1aabc1a2e2f7a5b3f1c3564fdcf3011b2a0c93cca4b45cad"
+      },
+      "skip_dense_private": {
+        "compiled_source_sha256": "fcf92c5533f4b3fe4fd1c1f9d21f9d2d89910aaa3c84a82c3ecbe4a19e94e1e6",
+        "native_code": 101,
+        "stderr_sha256": "e0830c48399115730a6b813eb84e426e826a864dc7af02dc51a4c61361720c7d",
+        "stdout_sha256": "257e6bf9c915bcf79c0204377da83fc2a2def66fdef148620667701d03ced8d7"
+      },
+      "supplier_presence_only": {
+        "compiled_source_sha256": "40f36c860d7a3545fcba0b9e7256e7f1766e93a156fe42d53f4d0d63bc3253e3",
+        "native_code": 101,
+        "stderr_sha256": "f2fabaedfddb4694e4979a37f6e9054c2e49a625199640f8f38971e5fa58d12f",
+        "stdout_sha256": "1216724fb623158e0540a9ceaa80613380277842c893206d78045e83fc57f605"
+      },
+      "take_last_alias": {
+        "compiled_source_sha256": "45e76bab2f5598bf6382f9da67fcd887048df7eb0a84fab415a566e854ca82be",
+        "native_code": 101,
+        "stderr_sha256": "3319dcedc51964cc837c9f637b369887c53c498457ec6adfce18e70685c73cc3",
+        "stdout_sha256": "257e6bf9c915bcf79c0204377da83fc2a2def66fdef148620667701d03ced8d7"
+      }
+    },
+    "rmeta": "unchanged from the #328 review parent",
+    "rust": "db62e0d113bc3659131d348ece54153c08f6999c",
+    "tree": "2ea09ebe18c5ef7083e6a311f6d2ecaf4a4d3bf8"
+  },
+  "source_overlap": {
+    "all_distinct_revisions": 503,
+    "branch_tips": 415,
+    "observed_provider_bodies": [
+      {
+        "sha256": "c3aa591f4a932c4befd911a01897c52dcb25e23364265523710db79c50a7f2ed",
+        "source_trees": 148,
+        "variant": "per-supplier membership"
+      },
+      {
+        "sha256": "d9b8c03ce53a9add6cc7cf92ae38cf0afad13d2dc8cb0b2515e1425184b94f63",
+        "source_trees": 350,
+        "variant": "query every supplier"
+      }
+    ],
+    "open_prs": 200,
+    "revisions_without_a_compiler": 5
+  }
+}
