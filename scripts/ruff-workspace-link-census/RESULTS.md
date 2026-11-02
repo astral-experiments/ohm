@@ -52,3 +52,27 @@ The genuine unchanged Wild and its nine worker tasks observed 58 distinct failed
 python3 -IB reopen_inputs.py 13120196874.zip c0bdfe211bae6b52ad1a5bd0b14c5428024ecfa5e6afca88204dbd39e939f42b > constructors-inputs.json
 gzip -dc constructors-inputs-results.json.gz | cmp - constructors-inputs.json
 ```
+
+## An authenticated pre-layout reuse on the constructors link misses a live native change
+
+The source-built Wild prototype made six genuine receipt hits after resolving the actual files and GNU linker scripts. It hashed inputs from their open file descriptors, verified the complete rustc `symbols.o`, checked the current incumbent ELF's complete digest, and wrote those verified output bytes through Wild's original writer. It stored one 32-byte digest for each of three input states. This experiment required no saved copy of the executable. The separate test archive preserves each observed program as evidence. [Registered protocol](WILD_PREFLIGHT.md) · [Completed run](https://github.com/astral-experiments/ohm/actions/runs/41401051466)
+
+| Unchanged physical link | Median retired user instructions | Range over six visits |
+| --- | ---: | ---: |
+| Signed -22 Wild | 81,011,092 | 80,439,393–83,628,093 |
+| Same rebuilt Wild, full link | 81,161,185 | 80,707,936–82,793,347 |
+| Same rebuilt Wild, receipt hit | 67,394,424 | 66,904,696–67,591,939 |
+
+All 18 commands ran the genuine Rust link-only process and the expected native Ruff test. An x86 hardware event counted Wild's process and threads from physical exec, with independent main-thread, pthread and child calibration. Across the six counterbalanced orderings, the median within-pair ratio was 1.206× against the matched full linker and 1.204× against the signed linker. These are linker instructions alone. The initial observer stopped on the second genuine cold request to the same output and contributed zero primary observations. The registered replacement retained each physical process. [All native counts and outcomes](wild-native-evidence/verified.json.gz) · [First acquisition](https://github.com/astral-experiments/ohm/actions/runs/41400245165)
+
+With stable inputs, the preflight matched stock's complete ELF for initial/29/41 and restored states. The higher script, malformed script, missing nested object and repair all changed the verdict correctly. Independently empty invalid inputs failed in the real build-script links before the root could run. The prior experiment also forced just the constructors root in each invalid state. Same-inode, same-size and restored-mtime incumbent corruption caused a full link and recovered the complete original ELF. An actual hardlinked output with two links and an actual symlink both took the original writer path.
+
+The mutable input falsified the release gate. At the same real post-resolution/pre-layout boundary, the controlled writer changed offsets 180 and 181 in the selected 2,168-byte native object through an existing writable shared mapping. The original writing fd was already closed. Device, inode, size, mode, owner, group, link count, mtime and ctime all remained equal before and after on each run. A full matched link emitted the independently clean 41 executable, SHA-256 `65244fb0c00a895e9b56c5406e17a74bf23dbcbd0d81f500e84a403a16c566cc`. The receipt hit returned the former 29 executable, `cd6a352567277511bb3a8c268a32cce41f5c8cea4513dee60b7f14e2f21c7059`. Both native tests passed; their observed initializer values distinguished the wrong result. Subsequent signed stock links returned 41 in both histories. This rejects unrestricted Linux reuse for this target independently of the measured cost. [Private-source observation implementation](wild-diagnostic/observation_replay.rs) · [Kernel and native outcome verifier](reopen_preflight.py)
+
+Both acquisitions have an indefinitely reopenable copy of every archived payload in this directory. Using a stored ZIP followed by a single Zstandard stream allows compression across similar raw documents. Every filename and member's bytes were compared to the original GitHub zip. Only the ZIP container layout changes. The successful archive retained 6,711 members, including all genuine ELFs, changing native objects, kernel records, CLI verdicts and raw counters, in 911,913 bytes. The interrupted acquisition retained all 1,164 members in 96,050 bytes. Its original ZIP and this replacement have separate whole-archive SHA-256 identities. [Successful capsule](wild-native-evidence/41401051466.zip.zst) · [Content commitments](wild-native-evidence/41401051466.json) · [Interrupted capsule](wild-native-evidence/41400245165.zip.zst)
+
+```sh
+zstd -dc wild-native-evidence/41401051466.zip.zst > /tmp/ohm-wild-constructors.zip
+python3 -IB reopen_preflight.py /tmp/ohm-wild-constructors.zip 18b97ff23ee281263752476663a093aa31b9a847428bbc4c47696ab13850d1f9 > /tmp/ohm-wild-reopened.json
+python3 -IB -c 'import gzip,json; a=json.load(open("/tmp/ohm-wild-reopened.json")); b=json.load(gzip.open("wild-native-evidence/verified.json.gz")); a.pop("archive_sha256"); b.pop("archive_sha256"); assert a==b'
+```
