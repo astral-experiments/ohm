@@ -35,7 +35,8 @@ HISTORIES = {
     "diagnostic": ("B", "A", "unchanged", "invalid", "repair"),
     "green-reasons": ("B", "A"),
 }
-TRACED = {"ordinary-observed": "observe", "diagnostic-empty": "capture", "diagnostic": "capture"}
+TRACED = {"ordinary-observed": "observe", "diagnostic-empty": "capture", "diagnostic": "capture",
+          "green-reasons/B":"observe","green-reasons/A":"cgured"}
 OWNERS = ("ruff_linter", "ruff_workspace")
 REQUEST = "OHM_CGU_REQUEST"
 FLAG = "-Csave-temps=yes"
@@ -72,9 +73,7 @@ def ordinary_env(env):
 
 
 def trace_mode(lane, phase):
-    if lane == "green-reasons":
-        return "cgured" if phase == "A" else "observe"
-    return TRACED.get(lane)
+    return TRACED.get(lane+"/"+phase, TRACED.get(lane))
 
 
 def is_empty(lane, phase):

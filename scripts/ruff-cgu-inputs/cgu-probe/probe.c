@@ -138,11 +138,23 @@ static IRSB *ins(VgCallbackClosure *closure,IRSB *in,const VexGuestLayout *lay,c
     }
     return out;
 }
+static Int fd_access(UInt n) {
+    HChar path[96],buf[384];
+    VG_(snprintf)(path,sizeof(path),"/proc/self/fdinfo/%u",n);
+    SysRes opened=VG_(open)(path,VKI_O_RDONLY,0);
+    if (sr_isError(opened))return -1;
+    Int fd=(Int)sr_Res(opened),size=VG_(read)(fd,buf,sizeof(buf)-1);VG_(close)(fd);
+    if(size<=0)return -1;
+    buf[size]=0;HChar *p=VG_(strstr)(buf,"\nflags:\t");if(!p)return -1;
+    p+=sizeof("\nflags:\t")-1;UInt mode=0,numbers=0;
+    while(*p>='0'&&*p<='7'){mode=8*mode+(*p++-'0');numbers++;}
+    return numbers&&*p=='\n'?(Int)(mode&3):-1;
+}
 static void post(void){
     ULong count=VG_(sizeXA)(VG_(args_for_client));
     VG_(printf)("CGUR CLIENT %llu %s\n",count,VG_(args_the_exename));
     for(UInt i=0;i<256;++i){struct vg_stat b;if(!VG_(fstat)(i,&b))
-        VG_(printf)("CGUR FD %u %llu %llu %u\n",i,b.dev,b.ino,b.mode&0170000);}
+        VG_(printf)("CGUR FD %u %llu %llu %u %d\n",i,b.dev,b.ino,b.mode&0170000,fd_access(i));}
 }
 static void fini(Int rc){VG_(printf)("CGUR END %llu %d\n",seen,rc);}
 static void pre(void){

@@ -94,7 +94,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: signed-gnu-ruff-workspace-green-inputs
-          path: ${{ runner.temp }}/ohm-branch-object-qa/logs
+          path: |
+            ${{ runner.temp }}/ohm-branch-object-qa/logs
+            !${{ runner.temp }}/ohm-branch-object-qa/logs/**/original-fds.bin
           retention-days: 14
           include-hidden-files: true
           compression-level: 1

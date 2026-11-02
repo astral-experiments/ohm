@@ -28,6 +28,15 @@ static void require(int,const char *);
 static void record(int,const char*,const void*,size_t);
 static int stage, capture, probe, sequence;
 static const char launch_prefix[] = "OHM_CGUR_LOADER=";
+static uint16_t original_access(pid_t pid,int number) {
+    char path[96],buf[384];
+    snprintf(path,sizeof(path),"/proc/%d/fdinfo/%d",pid,number);
+    int fd=open(path,O_RDONLY|O_CLOEXEC);require(fd>=0,"read original fd flags");
+    ssize_t n=read(fd,buf,sizeof(buf)-1);require(n>0 && !close(fd),"bounded fdinfo read");buf[n]=0;
+    char *flags=strstr(buf,"\nflags:\t");require(flags!=NULL,"original fd flags header");flags+=8;
+    char *end;unsigned long value=strtoul(flags,&end,8);
+    require(end>flags && *end=='\n',"original octal fd flags");return (uint16_t)(value&O_ACCMODE);
+}
 static void store_fds(pid_t p,int dir) {
     char path[90];snprintf(path,sizeof(path),"/proc/%d/fd",p);
     DIR *d=opendir(path);require(d!=NULL,"selected open descriptors");
@@ -36,7 +45,7 @@ static void store_fds(pid_t p,int dir) {
         char *q;long num=strtol(e->d_name,&q,10);if(*q)continue;
         require(num>=0 && num<=INT32_MAX && n<512,"bounded selected descriptors");
         struct stat b;require(!fstatat(dirfd(d),e->d_name,&b,0),"original file descriptor");
-        rows[n++]=(struct inherited_fd){.number=(int)num,.device=b.st_dev,.inode=b.st_ino,.type=b.st_mode&S_IFMT};
+        rows[n++]=(struct inherited_fd){.number=(int)num,.device=b.st_dev,.inode=b.st_ino,.type=b.st_mode&S_IFMT,.access=original_access(p,(int)num)};
     }
     require(!closedir(d),"close descriptor inventory");record(dir,"original-fds.bin",rows,n*sizeof(*rows));
 }
@@ -190,7 +199,8 @@ static void selected(pid_t pid, struct strings args, const char *owner) {
         memory(fd, regs.rsp + bytes + aux_words * sizeof(uintptr_t), &aux_before[aux_words], 2 * sizeof(uintptr_t), 0);
         aux_words += 2;
     } while (aux_before[aux_words - 2] != 0);
-    if (capture || launch) memory(fd, regs.rsp, post, bytes, 1);
+    if (capture) memory(fd, regs.rsp, post, bytes, 1);
+    else if (launch) memory(fd, regs.rsp + launch_slot*sizeof(uintptr_t), post+launch_slot, sizeof(uintptr_t), 1);
     memory(fd, regs.rsp, checked, bytes, 0);
     memory(fd, regs.rsp + bytes, aux_after, aux_words * sizeof(uintptr_t), 0);
     require(!memcmp(post, checked, bytes) && !memcmp(aux_before, aux_after, aux_words * sizeof(uintptr_t)), "complete pointer and auxiliary vector readback");

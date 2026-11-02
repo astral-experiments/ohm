@@ -95,7 +95,11 @@ def records(owner):
         )
     guests = {int(r[2]): tuple(map(int, r[3:])) for r in trace if r[1] == "FD"}
     require(
-        all(guests.get(fd) == (dev, ino, kind) for fd, dev, ino, kind in launch["fds"]),
+        all(
+            access in (0, 1, 2) and guests.get(fd) == (dev, ino, kind, access)
+            for fd, dev, ino, kind, access in launch["fds"]
+        )
+        and not (owner / "original-fds.bin").exists(),
         "lost original descriptor in the signed compiler client",
     )
     require(

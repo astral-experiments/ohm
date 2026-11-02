@@ -249,6 +249,7 @@ class Orchestration(unittest.TestCase):
         run.a.verify_inherited_sources()
         t = (HERE.parents[1] / ".github/workflows/ci.yml").read_text()
         self.assertIn(run.a.BRANCH, t)
+        self.assertIn("logs/**/original-fds.bin", t)
         self.assertEqual(t.count("persist-credentials: false"), 3)
         self.assertEqual(t.count("${{ github.token }}"), 1)
         self.assertIn("timeout-minutes: 120", t)

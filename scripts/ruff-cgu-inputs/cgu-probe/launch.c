@@ -36,8 +36,10 @@ int __libc_start_main(int (*mainfn)(int,char**,char**),int argc,char **argv,
     char **env=argv+argc+1;size_t preloads=0;const char prefix[]="OHM_CGUR_LOADER=";
     for(size_t i=0;env[i];++i){
         if(!strncmp(env[i],"LD_PRELOAD=",11)){
-            need(!memcmp(env[i]-sizeof(prefix)+1,prefix,sizeof(prefix)-1),"original private route slot");
-            env[i]-=sizeof(prefix)-1;++preloads;
+            size_t suffix=strlen(env[i])+1;
+            char *full=malloc(sizeof(prefix)-1+suffix);need(full!=NULL,"restore private route slot");
+            memcpy(full,prefix,sizeof(prefix)-1);memcpy(full+sizeof(prefix)-1,env[i],suffix);
+            env[i]=full;++preloads;
         }
     }
     need(preloads==1&&!env_value(env,"LD_PRELOAD")&&!env_value(env,"RUSTC_WRAPPER")&&!env_value(env,"RUSTC_WORKSPACE_WRAPPER"),"restore original flags and loader environment");
@@ -51,11 +53,11 @@ int __libc_start_main(int (*mainfn)(int,char**,char**),int argc,char **argv,
     hash_raw(en,envlen,got);need(read_file(d,"original-env.sha256",want,64)==64&&!memcmp(got,want,64),"all original environment bytes restored in order");
     char *original=malloc(avlen);need(original&&read_file(d,"original.nul",original,avlen)==avlen&&avcount==(size_t)argc&&!memcmp(av,original,avlen),"all original signed argv bytes in order");
     struct inherited_fd rows[512];size_t fdbytes=read_file(d,"original-fds.bin",rows,sizeof(rows));need(fdbytes%sizeof(*rows)==0,"whole descriptor inventory");size_t nf=fdbytes/sizeof(*rows);need(nf>=3,"selected inherited descriptors");
-    for(size_t i=0;i<nf;i++){struct stat b;need(!fstat(rows[i].number,&b)&&b.st_dev==rows[i].device&&b.st_ino==rows[i].inode&&(b.st_mode&S_IFMT)==rows[i].type,"same inherited open file description identity");}
+    for(size_t i=0;i<nf;i++){struct stat b;need(!fstat(rows[i].number,&b)&&b.st_dev==rows[i].device&&b.st_ino==rows[i].inode&&(b.st_mode&S_IFMT)==rows[i].type&&(fcntl(rows[i].number,F_GETFL)&O_ACCMODE)==rows[i].access,"same original descriptor number, file identity and read/write mode");}
     int receipt=openat(d,"launch.json",O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC,0600);need(receipt>=0,"unique launch receipt");
     dprintf(receipt,"{\"pid\":%d,\"argc\":%zu,\"argv_bytes\":%zu,\"envc\":%zu,\"env_bytes\":%zu,\"env_sha256\":\"%s\",\"fds\":[",getpid(),avcount,avlen,envcount,envlen,got);
-    for(size_t i=0;i<nf;i++)dprintf(receipt,"%s[%d,%"PRIu64",%"PRIu64",%u]",i?",":"",rows[i].number,rows[i].device,rows[i].inode,rows[i].type);
-    dprintf(receipt,"]}\n");need(!close(receipt)&&!close(d),"close audit receipts");
+    for(size_t i=0;i<nf;i++)dprintf(receipt,"%s[%d,%"PRIu64",%"PRIu64",%u,%u]",i?",":"",rows[i].number,rows[i].device,rows[i].inode,rows[i].type,rows[i].access);
+    dprintf(receipt,"]}\n");need(!close(receipt)&&!unlinkat(d,"original-fds.bin",0)&&!close(d),"remove private descriptor handoff and close audit receipts");
     char log[PATH_MAX];n=snprintf(log,sizeof(log),"--log-file=%s/cgu.log",path);need(n>0&&n<(int)sizeof(log),"bounded diagnostic log");
     char **run=calloc((size_t)argc+7,sizeof(*run));need(run!=NULL,"Valgrind argument vector");
     run[0]="/usr/bin/valgrind";run[1]="--tool=cgured";run[2]="--quiet";run[3]="--trace-children=no";run[4]="--vex-guest-chase=no";run[5]=log;for(int i=0;i<argc;i++)run[6+i]=argv[i];
