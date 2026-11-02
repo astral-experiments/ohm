@@ -1,4 +1,4 @@
-name: Screen handwritten impl stability on ordinary uv cargo check
+name: Count handwritten impl stability in the actual rustc processes of uv cargo check
 'on':
   workflow_dispatch:
     inputs:
@@ -24,7 +24,7 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-handwritten-stage1-check'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-handwritten-rustc-instructions'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 350
@@ -135,6 +135,8 @@ jobs:
         /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/run.py calibrate 2>&1 | tee trait-results/calibration.log
 
         '
+    - name: Calibrate actual single-process retired instructions and thread boundaries
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/unit_panel.py calibrate
     - name: Admit the two qualified stage1 SDKs and the signed Cargo binary
       env:
         GH_TOKEN: ${{ github.token }}
@@ -145,23 +147,17 @@ jobs:
         '
     - name: Check both incremental and metadata migration directions
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/migration.py
-    - name: Qualify both compiler histories and execute all four independently warmed pairs
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/run.py run 2>&1 | tee trait-results/experiment.log
-
-        '
-    - name: Read back the raw clocks, Cargo streams, compiler invocations and metadata independently
+    - name: Qualify both histories and count the 18 actual rustc executions in four pairs
+      run: |
+        set -euo pipefail
+        /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/unit_panel.py run 2>&1 | tee trait-results/experiment.log
+    - name: Independently replay the native surfaces, kernel images and counters
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/audit.py hosted
-    - name: Screen two independently warmed uv production-library checks on the same boot
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/secondary.py 2>&1 | tee trait-results/secondary.log'
     - name: Preserve raw clocks, source qualification and any incomplete attempt
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-20988-handwritten-stage1-exec-check-1
+        name: uv-20988-handwritten-rustc-instructions-1
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

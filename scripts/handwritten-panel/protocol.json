@@ -18,7 +18,7 @@
     "--offline",
     "-j8"
   ],
-  "branch": "charlie/codex-20988-handwritten-stage1-check",
+  "branch": "charlie/codex-20988-handwritten-rustc-instructions",
   "case": {
     "A": "b60da7ad468d5bb8a6b3dee7d7e54a47981f23c7",
     "A_tree": "475eccff53635001b11fa5e2adebc9b27f5152e4",
@@ -70,8 +70,10 @@
     {
       "hold": 1,
       "modes": [
-        "pmu",
-        "native"
+        "native",
+        "typed",
+        "scoped",
+        "counted"
       ],
       "pair": 1,
       "roles": [
@@ -83,7 +85,9 @@
       "hold": 1,
       "modes": [
         "native",
-        "pmu"
+        "typed",
+        "scoped",
+        "counted"
       ],
       "pair": 2,
       "roles": [
@@ -95,7 +99,9 @@
       "hold": 1,
       "modes": [
         "native",
-        "pmu"
+        "typed",
+        "scoped",
+        "counted"
       ],
       "pair": 3,
       "roles": [
@@ -106,8 +112,10 @@
     {
       "hold": 1,
       "modes": [
-        "pmu",
-        "native"
+        "native",
+        "typed",
+        "scoped",
+        "counted"
       ],
       "pair": 4,
       "roles": [

@@ -3,7 +3,8 @@ import gzip,json,sys,tempfile,traceback
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import material as m, enroll, run, score
-import receipt
+import receipt as canonical_receipt
+import unit_panel
 def journal(path,kind,ref,o,api):
     vals=(gzip.decompress((path/("cargo."+k+".gz")).read_bytes()) for k in ("stdout","stderr"))
     shape,actual=run.typed_events(*vals,kind,ref,o,api)
@@ -32,12 +33,11 @@ def audit(out,opening):
             for n in ("settled-A","cold-B1-typed","cold-B2-typed"):journal(q/n,"background",ref,o,api)
             journal(q/"preclock-edit","edit",ref,o,api);m.guard(m.read(q/"preclock-edit/workspace-products.json")==m.read(q/"A-to-B/workspace-products.json"),"unmeasured edited roster qualification")
             for k,l,h in (("cold-B1","A-to-B","cold-B1"),("cold-B2","A-to-B","cold-B2"),("both-independent-cold","cold-B1","cold-B2")):
-                m.guard(receipt.matches(run.compared(q/l,q/h,shape,api,decoder),proof[k]),"full cold root/definition/allocation oracle")
+                m.guard(canonical_receipt.matches(run.compared(q/l,q/h,shape,api,decoder),proof[k]),"full cold root/definition/allocation oracle")
             for design in m.P["orders"]:
                 path=out/f"hold{design['hold']}-pair{design['pair']:02d}-{role}"
-                journal(path/"settled-A","background",ref,o,api);journal(path/"typed","edit",ref,o,api);trace.replay(path/"scoped")
-                m.guard(receipt.matches(run.compared(path/"native",q/"cold-B1",shape,api,decoder),m.read(path/"accepted.json")["independent_cold"]),"per-seed independent cold semantics")
-    return score.report(out)
+                unit_panel.verify_arm(path,role,ref,o,api,decoder,trace,shape,journal)
+    return unit_panel.report(out)
 if __name__=="__main__":
     if len(sys.argv)==3:
         r=audit(Path(sys.argv[1]).resolve(),Path(sys.argv[2]).resolve());print(json.dumps(r,sort_keys=True,indent=2))
