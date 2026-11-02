@@ -1,0 +1,9 @@
+# Production cargo check after uv #22958
+
+The cumulative rustc changes cut instructions in the two real compilers from **8.713B to 3.497B** (59.86% fewer). Terminal `uv_client` fell from 6.430B to 2.215B (65.55% fewer). The changed `uv_configuration` fell from 2.283B to 1.282B (43.86% fewer). The full Cargo process tree fell from 9.562B to 4.346B (54.55% fewer). All eight pairs improved on each instruction measure. [Landed uv edit](https://github.com/astral-sh/uv/pull/22958) · [Original GitHub run](https://github.com/astral-experiments/ohm/actions/runs/41417420490)
+
+Ordinary `cargo check -p uv-client --locked --offline -j8` fell from **1.578 s to 0.771 s**. The paired median was **2.072×**, with hold medians of 2.072× and 2.049×. Every check improved, but only six of eight pairs exceeded the preregistered 2× threshold (one-sided sign *p* = 0.1445). The two misses were 1.560× and 1.930×.
+
+Both release-optimized SDKs used the same signed Ohm −22 Cargo and the #318 CTFE correction. Corrected stock Rust was `10d56274a98801b5ef8f80aab734e835749458e1`. The full compiler was `f53496e2dd363b1455fc7e0a9d2dedea1bf7650e`, including #296, #306 and the callable-receiver change in #327. Sixteen independently built input histories passed the native correctness check. The shipped −22 binary failed that check in a separate study. [Original signed outputs](../signed-22-correctness)
+
+Run `python3 -ISB verify.py` to recompute eight corrected-stock-versus-full production pairs from original members. With the complete GitHub service ZIP, add `--original PATH` to verify every retained member against it. The primary observation is ordinary Cargo elapsed time with a blocking wait after real uv #22958. Independent visits recorded whole-process-tree and selected rustc userspace instructions. The two private Rust compilers share #318 and use the identical signed Ohm −22 Cargo. The shipped signed Rust compiler had a separately recorded native identity refusal.
