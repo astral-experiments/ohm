@@ -52,6 +52,14 @@ def html(kit,real,out):
     put(out/"html.json",{"version":version,"rustdoc":sha(kit.sdk/"bin/rustdoc"),"driver":sha(driver),"llvm":sha(llvm),"html":sha(item)})
 
 
+def registry_externs(args):
+    paths=[Path(v.partition("=")[2]) for i,v in enumerate(args) if i and args[i-1]=="--extern" and v.startswith("autocfg=")]
+    suffixes=[p.suffix for p in paths]
+    need(suffixes.count(".rlib")==1 and suffixes.count(".rmeta")<=1 and set(suffixes)<= {".rlib",".rmeta"}
+         and len({p.with_suffix("") for p in paths})==1,"incorrect ordinary compiler autocfg inputs")
+    return paths
+
+
 def enroll(temp):
     root,evidence,_=census.paths(); root.mkdir();evidence.mkdir()
     prior=temp/"ldv-qualified-sdks"
@@ -95,8 +103,9 @@ def enroll(temp):
         need(code==0,("ordinary tiny build failed",label,code))
         rs,actual=support.observed(out,kit.sdk,"plain",False)
         owner,=[r for r in rs if r["name"]=="ldv_layout" and r["kind"]=="full"]
-        extern,=[v for i,v in enumerate(owner["argv"]) if i and owner["argv"][i-1]=="--extern" and v.startswith("autocfg=")]
-        artifact=Path(extern.split("=",1)[1]);need(artifact.is_file(),"unopened real registry artifact")
+        operands=registry_externs(owner["argv"])
+        artifact,=[p for p in operands if p.suffix==".rlib"]
+        need(all(p.is_file() for p in operands),"missing named compiler dependency")
         schema="registries" if withdoc else "workspaces"
         prefix=build if withdoc else target
         m=re.search(r"/debug/build/"+schema+r"/(?:[0-9a-f]+/)?(v2-[0-9a-f]{16})/",str(artifact))
@@ -108,7 +117,7 @@ def enroll(temp):
             msg=[v for v in (out/"outer.stdout").read_text().splitlines() if "ldv-layout-doc=" in v]
         need(msg and all(("ldv-layout-doc="+(str(doc) if withdoc else "rustdoc")) in a for a in msg),"unexpected script RUSTDOC")
         value={"driver":kit.refs[role]["driver"],"root_argv":owner["argv"],"source":sha(text),"autocfg":checksum,
-               "actual":actual,"extern":str(artifact),"shard":m[1],"artifact":sha(artifact),"schema":schema,
+               "actual":actual,"extern":str(artifact),"all_externs":{str(p):sha(p) for p in operands},"shard":m[1],"artifact":sha(artifact),"schema":schema,
                "binary":sha(target/"debug/ldv-layout"),"verdict":result,"rustdoc":str(doc) if withdoc else "rustdoc"}
         put(out/"accepted.json",value);arms[label]=value
         shutil.move(build,work/("finished-build-"+label));shutil.move(target,work/("finished-target-"+label))

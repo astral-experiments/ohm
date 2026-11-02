@@ -82,12 +82,14 @@ def control(workspace, root, docs=False):
         "incorrect nonrelease receiver",
     )
     need(not git(qa, "status", "--porcelain", "--untracked-files=all"), "modified builder checkout")
-    base = "23d0c5673dd3eb9565f058a3c1ffce778e6684c4" if docs else BASE
+    base = "c1d88027f8aa071d29d889a43453b984c9c1599d" if docs else BASE
     changed = git(qa, "diff", "--name-only", base, "HEAD").splitlines()
     need(
         changed
         and all(
-            p == ".github/workflows/ci.yml" or p.startswith("scripts/ruff-ldv-physical-stage/") for p in changed
+            p == ".github/workflows/ci.yml" or p.startswith("scripts/ruff-ldv-physical-stage/")
+            or (docs and p in ("scripts/ruff-ldv-physical-workflow/layout.py","scripts/ruff-ldv-physical-workflow/SHA256SUMS"))
+            for p in changed
         ),
         "unexpected packaging changes",
     )
@@ -273,6 +275,8 @@ def build(workspace, root, docs=False):
             "compiler/rustc",
             "library",
         ]
+        if docs:
+            argv.append("src/tools/rustdoc")
         save(
             root / "logs" / ("inputs-" + role + ".json"),
             {
@@ -293,7 +297,7 @@ def build(workspace, root, docs=False):
         kit.freeze(directory / HOST / "stage1", role, rev)
         if docs:
             from docs import freeze as freeze_doc
-            freeze_doc(role, root, rust, env, argv, guarded)
+            freeze_doc(role, root, env, argv)
         need(
             json.loads(json.dumps(layout.checked(rust, rev, desc["tree"], substitutions))) == full,
             "bootstrap changed enrolled source",
