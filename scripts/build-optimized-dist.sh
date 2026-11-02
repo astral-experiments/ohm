@@ -259,7 +259,12 @@ if [[ "$prepare_relocated_dependencies" == true ]]; then
   perf_revision="$(git -C "$rust_checkout" rev-parse "HEAD:$perf_path")"
   perf_source="$rust_checkout/$perf_path"
   if [[ ! -e "$perf_source/.git" ]]; then
-    git -C "$rust_checkout" submodule update --init --checkout --depth 1 -- "$perf_path"
+    submodule_command=submodule
+    if [[ "$rust_checkout" == *$'\n' ]]; then
+      # The shell front end strips trailing newlines from the worktree root.
+      submodule_command=submodule--helper
+    fi
+    git -C "$rust_checkout" "$submodule_command" update --init --checkout --depth 1 -- "$perf_path"
   fi
   if ! git -C "$perf_source" cat-file -e "$perf_revision^{commit}" 2>/dev/null; then
     # Supply the revision on stdin so Git selects the checkout's usual fetch remote.

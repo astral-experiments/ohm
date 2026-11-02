@@ -545,6 +545,16 @@ if grep -Fq '.run_rustc(false)' "$original_collector"; then
   echo 'profile training modified the original collector' >&2
   exit 1
 fi
+
+neighbor="$test_directory/fresh checkout"
+literal_checkout="$neighbor"$'\n'
+cp -R "$rust_checkout" "$neighbor"
+git -C "$neighbor" submodule deinit --quiet -f -- src/tools/rustc-perf
+mv -- "$neighbor" "$literal_checkout"
+git clone --quiet --no-hardlinks "$rust_checkout" "$neighbor"
+rust_checkout="$literal_checkout" run_optimized_build "$macos_target" "$test_directory/fresh-checkout.log"
+test ! -e "$neighbor/src/tools/rustc-perf/.git"
+
 toolchain=ohm-1.99.0-21
 
 jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/19.json" > "$rust_checkout/.git/HEAD"
