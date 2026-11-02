@@ -40,6 +40,19 @@ for target in aarch64-apple-darwin x86_64-unknown-linux-gnu; do
 done
 cmp "$manifest" "$valid/$toolchain.json"
 
+linked="$temporary_directory/linked"
+cp -R "$inputs" "$linked"
+archive="$toolchain-x86_64-unknown-linux-gnu.tar.gz"
+ln "$linked/$archive" "$linked/ohm-installer.sh"
+ln -s "$archive" "$linked/$toolchain.json"
+ln "$linked/$archive" "$linked/SHA256SUMS"
+bash "$script_directory/assemble-release.sh" "$manifest" "$linked" "$toolchain"
+cmp "$inputs/$archive" "$linked/$archive"
+for output in ohm-installer.sh "$toolchain.json" SHA256SUMS; do
+  test ! -L "$linked/$output"
+  cmp "$valid/$output" "$linked/$output"
+done
+
 for failure in checksum wrong-archive wrong-provenance symlink identity; do
   broken="$temporary_directory/$failure"
   cp -R "$inputs" "$broken"
