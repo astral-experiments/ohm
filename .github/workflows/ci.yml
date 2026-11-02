@@ -1,14 +1,10 @@
-name: Inspect signed Ruff workspace dependency inputs
-run-name: Signed GNU Ruff workspace dependency inputs ${{ inputs.reviewed_head }}
+name: Resolve signed Ruff query item names
+run-name: Signed Ruff query item dictionary ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact independently reviewed nonrelease diagnostic commit
-        required: true
-        type: string
-      previous_boots:
-        description: Six original job/artifact/digest/boot descriptors in their registered order
+        description: Exact reviewed nonrelease diagnostic commit
         required: true
         type: string
 permissions:
@@ -16,10 +12,10 @@ permissions:
   contents: read
 jobs:
   diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-cgu-green-reasons-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-    name: Signed GNU Ruff workspace dependency and work-product inputs
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-query-item-dictionary-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    name: Signed GNU Ruff workspace stable query item dictionary
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 120
+    timeout-minutes: 55
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
@@ -30,74 +26,51 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
+            scripts/ruff-query-dictionary
             scripts/ruff-cgu-inputs
             scripts/ruff-default-owner-pmu
             scripts/ohm-packed-ruff
             scripts/branch-return-pmu
             scripts/branch-storage-e-confirmation/review
             scripts/ruff-repair-tables-pilot
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-          path: collector
-          persist-credentials: false
-          sparse-checkout: scripts/gnu-example-ceiling
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 42ab30fd5e6bcdcf908df81de9baac65ca64fbf9
-          path: contract
-          persist-credentials: false
-          sparse-checkout: scripts/notebook-fanout-ceiling
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify source, dependencies and orchestration
+      - name: Authenticate source and install tools
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
           test ! -e "$base"
           mkdir -p "$base/work" "$base/logs"
           printf '%s' "$base" > "$base/work/.owned-by-packed-study"
-          findmnt --target "$base/work" > "$base/logs/filesystem.txt"
           test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
-          git -C enrolled diff --exit-code "$REVIEWED_HEAD" -- scripts .github/workflows/ci.yml
           test -z "$(git -C enrolled status --porcelain=v1 --untracked-files=all)"
           python3 -IB enrolled/scripts/ruff-cgu-inputs/acquire_cgu.py --sources
+          python3 -IB enrolled/scripts/ruff-query-dictionary/test.py
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential git libssl-dev valgrind zstd
-          dpkg-query -W b3sum binutils build-essential git libssl-dev valgrind zstd > "$base/logs/packages.tsv"
-          python3 -IB enrolled/scripts/ruff-default-owner-pmu/test_attribution.py "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
-          python3 -IB enrolled/scripts/ruff-cgu-inputs/worker_cgu.py compile-capture
-          python3 -IB enrolled/scripts/ruff-cgu-inputs/test_files.py | tee "$base/logs/cgu-files-fixture.stdout"
-          python3 -IB enrolled/scripts/ruff-cgu-inputs/test_capture.py "$base/cgu-capture" | tee "$base/logs/cgu-capture-fixture.stdout"
-          python3 -IB enrolled/scripts/ruff-cgu-inputs/test_cgu_orchestration.py
-          python3 -IB enrolled/scripts/ruff-cgu-inputs/test_green_inputs.py
-          python3 -IB enrolled/scripts/ruff-cgu-inputs/test_read_products.py
-          python3 -IB enrolled/scripts/ruff-cgu-inputs/cgu-probe/test_duplicate_keys.py "$base/duplicate-graph-fixture"
-      - name: Authenticate the single worker and install the published 79-file GNU release
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential git libssl-dev zstd
+          dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
+          findmnt --target "$base/work" > "$base/logs/filesystem.txt"
+      - name: Verify the independent assignment and signed 79-file release
         env:
           GH_TOKEN: ${{ github.token }}
-          EXCLUDED_BOOT_CUSTODY: ${{ inputs.previous_boots }}
-        run: python3 -IB enrolled/scripts/ruff-cgu-inputs/acquire_cgu.py
-      - name: Run the ordinary and diagnostic histories on independent targets
+        run: python3 -IB enrolled/scripts/ruff-query-dictionary/acquire_dictionary.py
+      - name: Build the full eligible Ruff CLI twice from independent empty roots
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ruff-cgu-inputs/worker_cgu.py run "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
-      - name: Reopen the original compiler arguments, native outputs, bitcode and ordinary hardware clock
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ruff-query-dictionary/run.py
+      - name: Join by each compiler process first and by stable key across histories
         run: |
           set -euo pipefail
           base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-cgu-inputs/worker_cgu.py reopen "$base/logs" "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract" "$REVIEWED_HEAD" > "$base/accepted.json"
-          mv "$base/accepted.json" "$base/logs/accepted.json"
+          python3 -IB enrolled/scripts/ruff-query-dictionary/reopen.py "$base/logs" "$base/logs/names.json"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: signed-gnu-ruff-workspace-green-inputs
-          path: |
-            ${{ runner.temp }}/ohm-branch-object-qa/logs
-            !${{ runner.temp }}/ohm-branch-object-qa/logs/**/original-fds.bin
-          retention-days: 14
+          name: signed-gnu-ruff-workspace-query-items
+          path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           include-hidden-files: true
+          retention-days: 14
           compression-level: 1
           if-no-files-found: warn
