@@ -1,12 +1,58 @@
 """Small ordinary Cargo gate using Ruff's actual locked autocfg dependency."""
 
+import ast
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
 
 import needed
 from support import need, put, replay, sha
+
+
+def cargo_argv(directory):
+    seen = []
+    for file in (directory / "trace").glob("exec.[0-9]*"):
+        for line in file.read_text().splitlines():
+            if line.startswith("execve(") and line.rstrip().endswith("= 0"):
+                m = needed.support.EXEC.fullmatch(line)
+                need(m, "unparsed successful calibration exec")
+                exe, argv = [ast.literal_eval(x) for x in m.groups()[:2]]
+                if Path(exe).name == "cargo":
+                    seen.append([exe, argv])
+    return sorted(seen)
+
+
+def proxy_calibration(contact, env, root, out):
+    out.mkdir()
+    command = ["cargo", "+ohm", "--version"]
+    seen, output = [], []
+    for name, measured in (("plain", False), ("counted", True)):
+        dest = out / name
+        value, rusts, roster, _, _ = needed.visit(contact, dest, root, root, "plain", env, command, score=measured)
+        need(not rusts and not roster["linkers"] and (value is not None) == measured, "different version control")
+        seen.append(cargo_argv(dest))
+        output.append((dest / "outer.stdout").read_bytes())
+    proxy = shutil.which("cargo", path=env["PATH"])
+    sdk_cargo = str(contact.sdk / "bin/cargo")
+    need(seen[0] == seen[1] and len(seen[0]) == 2 and [proxy, command] in seen[0] and
+         any(p == sdk_cargo and a[1:] == ["--version"] for p, a in seen[0]) and
+         output[0] == output[1] and output[0].startswith(b"cargo "), "counter changed the rustup or native Cargo argv")
+    # Reproduce the rejected invocation. It enters rustup with +ohm as argv[0]
+    # and must not execute the installed Cargo or any compiler.
+    bad = out / "rejected"
+    (bad / "trace").mkdir(parents=True)
+    wrong = [contact.tools / "count", bad / "pmu.json", proxy, *command[1:]]
+    proc = subprocess.run(["/usr/bin/strace", "-ff", "-qq", "-v", "-s", "131072", "-e", "trace=%process",
+                           "-o", bad / "trace/exec", "--", *wrong], cwd=root, env=env, capture_output=True, timeout=60)
+    (bad / "stderr").write_bytes(proc.stderr)
+    bad_counter = json.loads((bad / "pmu.json").read_bytes())
+    need(proc.returncode == os.waitstatus_to_exitcode(bad_counter["status"]) == 1 and
+         b"unknown proxy name: '+ohm'" in proc.stderr and cargo_argv(bad) == [[proxy, command[1:]]],
+         "failed to reproduce the rejected argv[0]")
+    put(out / "accepted.json", {"ordinary": command, "plain": seen[0], "counted": seen[1],
+                                "stdout_sha256": sha(out / "plain/outer.stdout"), "rejected": cargo_argv(bad)})
 
 
 def run(contact, base, donor, expected, work, out, *, hosted_shared=True):
@@ -53,9 +99,11 @@ def run(contact, base, donor, expected, work, out, *, hosted_shared=True):
                 if not source.exists() or source.read_text() != body:
                     source.write_text(body)
                 spot = dest / phase
-                _, rusts, raw, roster, actual = needed.visit(contact, spot, work, repo, arm, env,
+                counted_edit = label == "original" and phase == "edit"
+                value, rusts, raw, roster, actual = needed.visit(contact, spot, work, repo, arm, env,
                     ["cargo", "+ohm", "build", "--locked", "--offline", "-j2", "--message-format=json"],
-                    cold=phase == "old", fixture=True)
+                    score=counted_edit, cold=phase == "old", fixture=True)
+                need((value is not None) == counted_edit, "missing small real counted Cargo edit")
                 rows = [json.loads(l) for l in (spot / "outer.stdout").read_bytes().splitlines()]
                 item, = [r for r in rows if r["reason"] == "compiler-artifact" and r["target"]["kind"] == ["bin"]]
                 exe = Path(item["executable"])
@@ -80,6 +128,7 @@ def run(contact, base, donor, expected, work, out, *, hosted_shared=True):
                 need(observed == baseline[phase], ("small no-wrapper workload/bytes differed", label, phase))
                 proofs[label][phase] = {"elf": observed["elf"], "verdict": verdict, "raw_native": raw,
                                         "actual_probes": actual, "root_argv": observed["root_argv"],
-                                        "hits": sum(r["reason_totals"][0] for r in owners)}
+                                        "hits": sum(r["reason_totals"][0] for r in owners),
+                                        "counted_dispatch": counted_edit}
     contact.select("plain")
     put(out / "accepted.json", proofs)

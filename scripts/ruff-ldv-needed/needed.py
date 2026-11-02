@@ -167,6 +167,13 @@ class Contact:
              and sha(self.tools / "guard.so") == support.PLUGIN, "diagnostic tools changed")
 
 
+def counted_argv(counter, result, executable, ordinary):
+    # count.c calls execv(argv[2], argv + 3). The path to execute and the
+    # original argv[0] are separate fields, as required by rustup dispatch.
+    need(ordinary and ordinary[0] == "cargo" and executable, "expected the ordinary Cargo proxy")
+    return [str(counter), str(result), str(executable), *ordinary]
+
+
 def visit(contact, dest, work, repo, arm, env, cmd, expected=0, score=False, cold=False, fixture=False):
     dest.mkdir()
     for subdir in ("native", "trace"):
@@ -175,8 +182,7 @@ def visit(contact, dest, work, repo, arm, env, cmd, expected=0, score=False, col
     runner = list(map(str, cmd))
     if score:
         proxy = shutil.which("cargo", path=env["PATH"])
-        need(runner[0] == "cargo" and proxy, "expected normal Cargo proxy")
-        runner = [str(contact.tools / "count"), str(dest / "pmu.json"), proxy, *runner[1:]]
+        runner = counted_argv(contact.tools / "count", dest / "pmu.json", proxy, runner)
     flags = STDIN_FLAGS if cold else ["-e", "trace=%process"]
     argv = ["/usr/bin/strace", "-ff", "-qq", "-s", "131072", "-v", *flags, "-o", str(dest / "trace/exec"), "--", *runner]
     put(dest / "command.json", {"ordinary": cmd, "actual": argv, "environment": eff})

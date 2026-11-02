@@ -89,6 +89,7 @@ def scan(z, run_id, head, suite, pair, stage):
     observed = json.loads(z.read("ldv/acquired.json"))
     require(set(observed) == {"plain-A", "plain-B", "original", "guard"}, "missing arm")
     compilers = linkers = controls = probes = hits = 0
+    counter_proofs = {}
     for arm, phases in observed.items():
         for phase, obs in phases.items():
             case = "edit" if phase in ("old", "new", "unchanged", "invalid", "repair") else "clean"
@@ -128,6 +129,37 @@ def scan(z, run_id, head, suite, pair, stage):
                 require(k["linkers"] == [["signed-Wild", "e2e", 1]] and
                         [r for r in k["rustc"] if r[0] != "probe"] == [["link-only", "e2e", 1]], "not ordinary e2e")
             rows = {r["pid"]: r for r in k["compilers"]}
+            if stage == "score" and arm in ("original", "guard") and phase in ("new", "unchanged"):
+                body = z.read(folder + "/pmu.json")
+                pm = json.loads(body)
+                require(os.waitstatus_to_exitcode(pm["status"]) == 0 and pm["enabled"] == pm["running"] > 0 and
+                        pm["instructions"] == obs["count"] == terminal["whole_tree_user_instructions"][arm][phase] > 0,
+                        "different raw hardware result")
+                task = json.loads(z.read(folder + "/command.json"))
+                ordinary = task["ordinary"]
+                proxy = task["actual"][task["actual"].index("--") + 3]
+                parents = {int(child): int(parent) for child, parent in k["tree"]["parents"].items()}
+                def counted(pid):
+                    seen = set()
+                    while pid != pm["pid"] and pid in parents:
+                        require(pid not in seen, "cycle in counted process tree")
+                        seen.add(pid)
+                        pid = parents[pid]
+                    return pid == pm["pid"]
+                require(all(counted(pid) for pid, _, _ in verify), "a genuine compiler/linker escaped the hardware event")
+                signed = frontend[:-len("/bin/rustc")] + "/bin/cargo"
+                signed_pids = {s["pid"] for s in k["tree"]["processes"] if s["path"] == signed and counted(s["pid"])}
+                def executed(pid, exe, argv):
+                    with Member(z, folder + f"/trace/exec.{pid}").open() as stream:
+                        for line in stream:
+                            m = EXEC.fullmatch(line.rstrip())
+                            if m and ast.literal_eval(m[1]) == exe and ast.literal_eval(m[2]) == argv:
+                                return True
+                    return False
+                require(executed(pm["pid"], proxy, ordinary) and
+                        any(executed(pid, signed, [signed, *ordinary[2:]]) for pid in signed_pids),
+                        "the event did not start at ordinary Cargo dispatch")
+                counter_proofs[arm + "/" + phase] = {"sha256": digest(body), "signed_cargo": signed, **pm}
             if arm in ("original", "guard"):
                 ids = physical["stable_file_identities"][frontend][:2]
                 for r in rows.values():
@@ -154,6 +186,7 @@ def scan(z, run_id, head, suite, pair, stage):
             controls += 1
     require(hits == terminal["guarded_owner_skips"] > 0 and len(bodies["native-bodies"]) >= 2 and probes >= 12,
             "missing real native/guard coverage")
+    require(len(counter_proofs) == (4 if stage == "score" else 0), "wrong number of raw counter observations")
     for arm in ("plain-B", "original", "guard"):
         for phase in ("old", "new", "unchanged"):
             for key in ("root_argv", "roster", "inventory", "verdict", "elf", "dirty"):
@@ -162,7 +195,8 @@ def scan(z, run_id, head, suite, pair, stage):
             "uncompressed_bytes": sum(i.file_size for i in infos), "native_bodies": sorted(bodies["native-bodies"]),
             "probe_owners": sorted(bodies["probe-owners"]), "phases": controls, "kernel_compilers": compilers,
             "kernel_Wild": linkers, "probe_sources": probes, "new_guard_skips": hits,
-            "terminal_sha256": digest(z.read("ldv/verified.json")), "acquired": terminal["acquired"]}
+            "terminal_sha256": digest(z.read("ldv/verified.json")), "acquired": terminal["acquired"],
+            "hardware_events": counter_proofs}
 
 
 def main(stage, suite, pair, output):

@@ -108,6 +108,7 @@ def run(source, suite, stage, pair):
     calibrate(tools, out / "calibration")
     env = census.environment(run_dir, sdk)
     Path(env["HOME"]).mkdir(exist_ok=True)
+    micro.proxy_calibration(contact, env, root, out / "calibration/cargo-dispatch")
     put(out / "enrolled.json", {"qa": os.environ["GITHUB_SHA"], "run": int(os.environ["GITHUB_RUN_ID"]),
         "stage": stage, "slot": assign, "schedule": sha(HERE / "schedule.json"), "plan": plan, "cpus": chosen,
         "boot": Path("/proc/sys/kernel/random/boot_id").read_text().strip(), "contact": sha(out / "physical-contact.json"),

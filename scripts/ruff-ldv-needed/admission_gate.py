@@ -45,6 +45,20 @@ def acquire(run_id, commit, destination):
             checked(terminal["acquired"] == hashlib.sha256(archive.read("acquired.json")).hexdigest() and
                     terminal["physical"] == hashlib.sha256(archive.read("physical-contact.json")).hexdigest() and
                     "whole_tree_user_instructions" not in terminal, "broken or already-scored native records")
+            dispatch = json.loads(archive.read("calibration/cargo-dispatch/accepted.json"))
+            version = json.loads(archive.read("calibration/cargo-dispatch/counted/pmu.json"))
+            refused = json.loads(archive.read("calibration/cargo-dispatch/rejected/pmu.json"))
+            smoke = json.loads(archive.read("smoke/accepted.json"))
+            checked(dispatch["ordinary"] == ["cargo", "+ohm", "--version"] and
+                    len(dispatch["plain"]) == 2 and dispatch["plain"] == dispatch["counted"] and
+                    dispatch["rejected"] == [[dispatch["rejected"][0][0], ["+ohm", "--version"]]] and
+                    version["enabled"] == version["running"] > 0 and version["instructions"] > 0 and
+                    version["status"] == 0 and os.waitstatus_to_exitcode(refused["status"]) == 1 and
+                    all(v["counted_dispatch"] == (a == "original" and p == "edit")
+                        for a, phases in smoke.items() for p, v in phases.items()) and
+                    smoke["original"]["edit"]["root_argv"] == smoke["plain-A"]["edit"]["root_argv"] and
+                    smoke["original"]["edit"]["elf"] == smoke["plain-A"]["edit"]["elf"],
+                    "missing real version, prior rejection or small measured native edit")
         raw, = [a for a in artifacts if a["name"] == f"ldv-needed-admit-originals-{suite}-1"]
         second, = [a for a in artifacts if a["name"] == f"ldv-needed-admit-independent-{suite}-1"]
         checked(not raw["expired"] and not second["expired"] and 0 < second["size_in_bytes"] <= 65536,
