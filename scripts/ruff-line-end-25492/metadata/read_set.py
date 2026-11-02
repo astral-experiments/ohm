@@ -14,6 +14,7 @@ import worker as w
 from audit import run,save,sha
 import contact
 import native_replay
+import summarize_reader
 
 ARGS=['build','-p','ruff_macros','--lib','--locked','--offline','-j4']
 
@@ -109,5 +110,6 @@ def main():
         accepted=[state('old',h,env,archive,args)];w.git('checkout','--detach',w.NEW)
         accepted.append(state('edit',h,env,archive,args));accepted.append(state('clean',e,env,archive,args))
     assert all(accepted),('host history physically did not match all three original full commands',accepted)
+    summarize_reader.main(summarize_reader.Directory(w.LOG),w.SRC,out)
     print('All three real host readers and typed native controls completed.',flush=True)
 if __name__=='__main__':main()
