@@ -16,7 +16,7 @@ An independent LLVM debugger decoded every accepted Old and reconstructed object
 
 ## Reproduce
 
-Python 3.11 or later and its standard library suffice. From this directory, replay one reconstructed object, one identical object, the actual allocated-data counterexample and the refusal.
+Python 3.11 or later and its standard library suffice. From this directory, replay two reconstructed objects (one changes only one inline call-site byte), the actual allocated-data counterexample and the refusal.
 
 ```sh
 python3 -IB verify.py
@@ -34,3 +34,5 @@ This is an object reconstruction experiment. It prices neither complete Cargo co
 The separately frozen compiler-input study checks the complete pre-optimization module key and reprobes both native counterexamples. [Independent compiler-input evidence](https://github.com/astral-experiments/ohm/tree/fda8bcd899ec1843839c350c118d556af75710fe/scripts/ruff-option-cgu-identity)
 
 LLVM also compares consecutive physical line numbers when computing `is_stmt`, including across file boundaries. A source edit can change that comparison even when both per-file coordinate ranks remain stable. A general compiler path needs to preserve or reconstruct that decision. The 19 byte comparisons above establish the result for this specific cohort. [DWARF statement emission](https://github.com/rust-lang/llvm-project/blob/1b9c0d5ff9bbe7634aead059efe6b11a7eeba145/llvm/lib/CodeGen/AsmPrinter/DwarfDebug.cpp#L2286-L2312)
+
+The [compiler-input reconstruction](ordinal/README.md) replays this cohort using independent per-file coordinates from unoptimized LLVM IR.
