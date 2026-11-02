@@ -50,11 +50,12 @@ def discover(role,out,bank,delta,o,api):
     m.erase(seed,m.SRC,m.TARGET,m.CARGO_HOME,m.HOME)
     return shape,bg,er,ga
 def traced(opening,tmp,argv):
-    d=tmp/'package-strace';d.mkdir();src=(opening/'trace.py').read_bytes();assert m.digest(src)==m.P['pinned_opening']['trace.py'];mark=b'len({r["pid"] for r in found}) == len(found) == 3'
-    assert src.count(mark)==1 and argv
-    (d/'trace.py').write_bytes(src.replace(mark,mark[:-1]+str(len(argv)).encode()))
+    import lifecycle
+    d=tmp/'package-strace';d.mkdir();src=(opening/'trace.py').read_bytes()
+    assert m.digest(src)==m.P['pinned_opening']['trace.py']
+    (d/'trace.py').write_bytes(lifecycle.source(src,len(argv)))
     case=m.read(opening/'case.json');assert case['unscored_argv']==m.P['argv'];case['unscored_argv']=PKG;m.save(d/'case.json',case);m.save(d/'reference.json',{'argv':argv})
-    return m.load('secondary_scoped_exec',d/'trace.py')
+    return lifecycle.attach(m.load('secondary_scoped_exec',d/'trace.py'))
 def stamped(path,mode,ready,meter,progress):
     receipt=m.read(path/'ordinary.json');assert receipt['mode']==mode and receipt['boot']==ready['boot'] and receipt['cpus']==ready['affinity'] and receipt['argv']==PKG and receipt['exit']==0
     assert receipt['env']==m.ENV and not (path/'cargo.stdout').read_bytes()
