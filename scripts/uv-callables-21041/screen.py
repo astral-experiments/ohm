@@ -127,6 +127,5 @@ def run():
     for role in c.ROLES:
         m.choose(role,bank,sdks);primary.final_sdk(role,sdks,m.SDK,out)
     m.save(panel/'raw-pairs.json',reports)
-    import domain_control
     domain_control.post_clock(out,ready)
 if __name__=='__main__':run()
