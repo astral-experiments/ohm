@@ -12,7 +12,8 @@ def input_files(r, work, binary, out):
     for area in ("target", "build"):
         for name in names:
             for p in sorted((work/area).rglob(name)):
-                if p.name != names[0] and not p.parent.name.endswith("-"+suffix):
+                if p.name != names[0] and not (p.parent.name.endswith("-"+suffix) or
+                                               (p.parent.name == "fingerprint" and p.parent.parent.name == suffix)):
                     continue
                 if not p.is_file() or p.is_symlink() or not p.resolve().is_relative_to(work) or p.stat().st_size > 4*1024**2:
                     raise ValueError(("unexpected owner dep-info", p))
@@ -23,6 +24,28 @@ def input_files(r, work, binary, out):
                 matches[key] = {"sha256":r.sha(keep), "bytes":len(data),
                                 "ohm_markers":sorted({m.decode() for m in re.findall(rb"/dev/null/ohm-[a-z0-9-]+",data)})}
     r.put(out/"dependency-files.json", matches)
+
+
+def dependency_markers(r, work, out):
+    names = re.compile(rb"(?:^|/)(ohm-(?:recheck-dependent-links(?:-v2)?|untracked-relink-inputs|foreign-span-bytes|untrackable-foreign-span))(?=[\x00\s:]|$)")
+    marked = {}
+    scanned = 0
+    skipped = []
+    folder = out/"fingerprints"
+    for area in ("target", "build"):
+        for p in sorted((work/area).rglob("*.d")):
+            key = str(p.relative_to(work))
+            if p.is_symlink() or not p.is_file() or not p.resolve().is_relative_to(work) or p.stat().st_size > 16*1024**2:
+                skipped.append(key)
+                continue
+            data = p.read_bytes()
+            scanned += 1
+            hits = sorted({m.decode() for m in names.findall(data)})
+            if hits:
+                stored = folder/f"markers-{len(marked):04}-{p.name}"
+                stored.write_bytes(data)
+                marked[key] = {"saved":stored.name, "sha256":r.sha(stored), "bytes":len(data), "markers":hits}
+    r.put(out/"transitive-markers.json", {"scanned":scanned, "skipped":skipped, "marked":marked})
 
 
 def execs(out):
@@ -59,7 +82,7 @@ def collect(r, e, w, cli, repo, env, work, out, expected, owners, blobs, stable_
         argv = list(cli)
         extra = dict(env)
         if phase == "fingerprint":
-            extra["CARGO_LOG"] = "cargo::core::compiler::fingerprint=trace"
+            extra["CARGO_LOG"] = "cargo::compiler::fingerprint=trace"
         if phase == "traced":
             argv = ["strace","-ff","-qq","-e","trace=execve,execveat","-e","signal=none",
                     "-s","1024","-o",str(out/"exec"),"--",*argv]
@@ -78,8 +101,13 @@ def collect(r, e, w, cli, repo, env, work, out, expected, owners, blobs, stable_
         e.need(not (dest/"clock.json").exists(), "diagnostic command was metered")
         result[phase] = {"dirty_keys":dirty, "products":len(keys), "binary":digest, "same_product":same_product}
         r.put(dest/"result.json",result[phase])
+        if phase == "fingerprint":
+            logs = (dest/"outer.stderr").read_bytes()
+            e.need(b"cargo::compiler::fingerprint" in logs, "signed Cargo emitted no fingerprint records")
+            result["fingerprint_lines"] = sum(b"cargo::compiler::fingerprint" in line for line in logs.splitlines())
         if phase == "traced":
             result["processes"] = execs(out)
             result["matches_original_unchanged"] = all(result[p]["dirty_keys"] == stable_dirty for p in ("ordinary","traced"))
             r.put(out/"ordinary-trace.json",result)
+    dependency_markers(r, work, out)
     r.put(out/"trace.json",result)
