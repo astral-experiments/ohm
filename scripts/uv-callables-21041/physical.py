@@ -33,8 +33,7 @@ def metric(values):
             'hold_medians':[float(x)for x in h],'fewer_in_both_holds':all(x>1 for x in h),
             'both_hold_medians_at_least_twenty_percent_fewer':all(x>=Fraction(5,4)for x in h),
             'positive':above,'negative':below,'ties':len(rows)-n,'two_sided_paired_sign_p':float(two_sided),
-            'observed_range':[float(min(rows)),float(max(rows))],
-            'exact_median_interval':{'coverage':1-2/2**len(rows),'limits':[float(min(rows)),float(max(rows))]}}
+            'observed_range':[float(min(rows)),float(max(rows))]}
 
 def reduce(panel,raw,baseline,read_products,output_controls):
     all_pairs=[];failed=[]
@@ -69,19 +68,8 @@ def reduce(panel,raw,baseline,read_products,output_controls):
                 value=lambda role:sum(arms[role].values())if label=='sum_of_eight'else arms[role][label]
                 values.append([value(ctrl),value(child)])
             metrics[label]=dict(metric(values),raw_control_candidate=values)
-    return {'scope':'Eight true Cargo-dispatched rustc images and their threads, separately restored first edits; forked non-rustc children excluded','confirmatory_process_endpoint':'sum_of_eight','complete':complete,'refused':failed,'raw_pairs':all_pairs,'metrics':metrics}
+    return {'scope':'Eight true Cargo-dispatched rustc images and their threads, separately restored first edits; forked non-rustc children excluded','primary':'uv_metadata','complete':complete,'refused':failed,'raw_pairs':all_pairs,'metrics':metrics}
 
 def preregistered_tests(metrics):
-    tests=[]
-    for name,threshold in [('uv_client',Fraction(1)),('sum_of_eight',Fraction(1)),('uv_install_wheel',Fraction(5,4))]:
-        xs=[Fraction(a,b)for a,b in metrics[name]['raw_control_candidate']]
-        up=sum(x>threshold for x in xs);down=sum(x<threshold for x in xs);n=up+down
-        assert len(xs)==8
-        p=Fraction(sum(comb(len(xs),k)for k in range(up,len(xs)+1)),2**len(xs))  # A tie is not a success.
-        tests.append(dict(name=name,threshold=str(threshold),above=up,below=down,ties=len(xs)-n,p=p,
-                          hold_medians_clear=all(median(x)>threshold for x in (xs[:4],xs[4:]))))
-    adjusted=Fraction(0)
-    for i,row in enumerate(sorted(tests,key=lambda j:j['p'])):
-        adjusted=min(Fraction(1),max(adjusted,row['p']*(len(tests)-i)))
-        row['holm_p']=float(adjusted);row['holm_reject_at_0_05']=adjusted<=Fraction(1,20);row['p']=float(row['p'])
-    return tests
+    from domain_control import hypothesis
+    return hypothesis(metrics)

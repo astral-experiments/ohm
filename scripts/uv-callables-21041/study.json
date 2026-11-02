@@ -5,8 +5,33 @@
   "B": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
   "B_file": "3d91d5195930020a6740f68341549629681eb8654048962cc618fe02e7130360",
   "B_tree": "ce502617cfbf3fd59980e29731c10b5391d12139",
-  "branch": "charlie/codex-21041-production-blocking-wall",
-  "candidate_selection": "Cumulative trait and callable stack vs stock with the same CTFE correction on matched release-optimized Ohm -22.",
+  "branch": "charlie/codex-21041-domain-prod-check",
+  "candidate_selection": {
+    "parent_service": {
+      "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
+      "producer": 41398925829,
+      "qa": {
+        "digest": "sha256:9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
+        "id": 13122138377,
+        "name": "callable-production-qa-attempt-1",
+        "size_in_bytes": 296464
+      },
+      "role_record_sha256": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
+      "sdk": {
+        "digest": "sha256:8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1",
+        "id": 13122178340,
+        "name": "callable-production-sdk",
+        "size_in_bytes": 359917871
+      },
+      "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+      "source_record_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
+    },
+    "relative_pack": "7dfc978d69b648546d46bbd5cadd53586ca173756e60c4963ccf22915fa68749",
+    "source_replay_sha256": "7adabe7ed9341a13a2bf2281d5d3b817816d6155c96b335847f31627a2b5d354",
+    "stage1_prerequisite_run": 41412729838,
+    "stage1_registration_sha256": "4ee4df862fa133649f49f07a92ed4ba6279f9b96a95f78751a35b68dc3da0df8",
+    "treatment": "69f19f63eb905f7103aca35ad1b4ea532260b7e25771766d05323b0095d6b3be"
+  },
   "describe_A": "0.12.3-27-ga2a0242",
   "describe_B": "0.12.3-28-g9049e07",
   "edit_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
@@ -26,18 +51,17 @@
     0,
     0,
     0,
-    0,
-    0,
-    1,
-    1,
     1,
     1,
     1,
     1
   ],
-  "local_selection": "Previously selected landed uv #21041, separate from the input-qualifying marginal study.",
+  "local_selection": {
+    "qualified_stage1_process": "uv_metadata",
+    "receipt_sha256": "78fa58ed82d6c7f2d3beefdd42a28e6988819292e64670347a99c03f17da3ee5"
+  },
   "lock_sha256": "84893face6e0c3f1641af8ce022475d859b99bb43c3ccfb540e2e9cee98095f9",
-  "measurement_plan_sha256": "bd30a2a2ced22335a8dc63f5162e241c444eb991f4577cb2a89e539dcf51a2ee",
+  "measurement_plan_sha256": "1a4cd14fc2776f0e73625fe205f197e044b7b5f68dc6ff2cc64f9a763848dd8e",
   "meter_files": {
     "SHA256SUMS": "c6713c7ef2878aa70a927e845e41ec9f4d237091b6c7a6c45d4799de047fb0d1",
     "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
@@ -48,39 +72,35 @@
   },
   "mode_orders": [
     [
+      "wall",
+      "scoped"
+    ],
+    [
+      "scoped",
       "wall"
     ],
     [
+      "wall",
+      "scoped"
+    ],
+    [
+      "scoped",
       "wall"
     ],
     [
+      "wall",
+      "scoped"
+    ],
+    [
+      "scoped",
       "wall"
     ],
     [
-      "wall"
+      "wall",
+      "scoped"
     ],
     [
-      "wall"
-    ],
-    [
-      "wall"
-    ],
-    [
-      "wall"
-    ],
-    [
-      "wall"
-    ],
-    [
-      "wall"
-    ],
-    [
-      "wall"
-    ],
-    [
-      "wall"
-    ],
-    [
+      "scoped",
       "wall"
     ]
   ],
@@ -1118,74 +1138,77 @@
   },
   "orders": [
     [
-      "stock_ctfe318",
-      "fa7a_stack_ctfe318",
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
       "callables_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318",
-      "callables_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "stock_ctfe318",
-      "fa7a_stack_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "fa7a_stack_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "fa7a_stack_ctfe318",
-      "stock_ctfe318",
-      "callables_ctfe318"
-    ],
-    [
-      "stock_ctfe318",
-      "callables_ctfe318",
-      "fa7a_stack_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "fa7a_stack_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "stock_ctfe318",
-      "callables_ctfe318",
-      "fa7a_stack_ctfe318"
-    ],
-    [
-      "fa7a_stack_ctfe318",
-      "stock_ctfe318",
-      "callables_ctfe318"
-    ],
-    [
-      "fa7a_stack_ctfe318",
-      "callables_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "stock_ctfe318",
-      "fa7a_stack_ctfe318",
+      "callables_ctfe318_incoherent_domain",
       "callables_ctfe318"
     ],
     [
       "callables_ctfe318",
-      "stock_ctfe318",
-      "fa7a_stack_ctfe318"
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
     ]
   ],
   "original_patch_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
-  "parent": "125cef4f90f572d8a8d19da42b0bc2b1fcae87a8",
-  "per_rustc_threshold": "Secondary summed eight native rustc instructions against 1.25, Holm with the primary bare-wall 2.0 threshold.",
-  "physical_scope": "Terminal uv_client on uv #21041 with eight genuine fresh first-edit lib invocations",
+  "parent": "a7bd986f55b7cd8ff2d9715cbc85e8add518c898",
+  "per_rustc_threshold": {
+    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
+    "effect": "candidate/control < 4/5",
+    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
+    "order_per_hold": "two per order",
+    "pairs": 8,
+    "scope": "actual uv_metadata library rustc only",
+    "two_independent_A_histories": true
+  },
+  "physical_primary": {
+    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
+    "effect": "candidate/control < 4/5",
+    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
+    "order_per_hold": "two per order",
+    "pairs": 8,
+    "scope": "actual uv_metadata library rustc only",
+    "two_independent_A_histories": true
+  },
+  "physical_scope": "Per-rustc userspace retired instructions on all eight kernel-verified rustc processes and their own threads; separately restored uninstrumented blocking whole Cargo wall",
+  "physical_secondary": {
+    "per_rustc": [
+      "uv_cache",
+      "uv_client",
+      "uv_configuration",
+      "uv_distribution_types",
+      "uv_install_wheel",
+      "uv_metadata",
+      "uv_pypi_types",
+      "uv_torch"
+    ],
+    "statistics": "descriptive with ratios/hold splits and full cohort, no other threshold promotion",
+    "sum": "all eight certified distinct rustc processes, same edit, raw instructions",
+    "wall": "separate restored ordinary Cargo visits, blocking wait and independent signal watchdog; pre and post real short-child calibration"
+  },
   "plan_units": 530,
-  "prior_actual_argv_sha256": "2c6a09f122e5293f696ffb63d11e6469d88491bfd5a331897765c6a916e384fc",
-  "producer_head": "4e34ea9c7232977f95498d7bf48d382157e8558b",
-  "producer_run": 41398925829,
+  "producer_head": "5f7e5680285caa6b9a848db810b63ef58dfe0143",
+  "producer_run": 41414598941,
   "reference_features": {
     "uv_auth": [],
     "uv_cache": [],
@@ -1257,9 +1280,8 @@
   "registry_uncompressed_sha256": "cb48aafbd06b0f81d56dc44f61476fc2fe2a609c2637e33b6569f8290ac64fc0",
   "repo": "astral-experiments/ohm",
   "roles": [
-    "stock_ctfe318",
-    "fa7a_stack_ctfe318",
-    "callables_ctfe318"
+    "callables_ctfe318",
+    "callables_ctfe318_incoherent_domain"
   ],
   "root_features": [],
   "root_unit": "73295104ae181bf6a8a99b926325f476c7036c7d1edebd997fde08b2f3c7625e",
@@ -1271,11 +1293,11 @@
     "--offline",
     "-j8"
   ],
-  "sdk_lock_sha256": "d1938d96af23db32ae8a3e3fd5ec54f88cb0bb58f214d2778c25cb120fda839d",
+  "sdk_lock_sha256": "a92aa66597e04db1d2f41cb08af802323653f1aabf773131b5288a6dcb0ede3d",
   "source_case_sha256": "576103c648f8b31662b0ddf1d49632573023a9cbe699bb1811df57d4f2a6cfd2",
   "source_mode": "real unstaged edit at A and genuine 0.12.3 ancestry; same absolute source/target for each restoration",
   "structural_graph_sha256": "17277138e393245b99609f9da43bfcfdf091f2c57ea8bdf2217669cd6b1fe74f",
-  "study": "Eight balanced first-edit pairs from two independently warmed A targets per SDK. Three separate restorations per role per pair for whole-command bare wall, inherited userspace PMU and kernel-observed real per-process PMUs.",
+  "study": "Eight matched production pairs on uv #21041 after the same real edit",
   "tag": "0.12.3",
   "tag_commit": "507230998c9541d67814b57463ac00e454ff6991",
   "workspace_check_libraries": {

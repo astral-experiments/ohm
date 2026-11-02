@@ -39,125 +39,47 @@
       },
       "source_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
     },
-    "fa7a_stack_ctfe318": {
+    "callables_ctfe318_incoherent_domain": {
       "artifact": {
-        "bytes": 359918996,
-        "id": 13112830698,
-        "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
+        "bytes": 359916519,
+        "id": 13129955278,
+        "sha256": "5b075150e2460193078bdf8de7d834a057c097655e685bfb1943d91dfc2cabd2"
       },
-      "builder_tree": "85761b7d3b377c90c26c635f7231c29df024e9ff",
-      "driver": "3f8168fac2af20edf3ca51d940b4653df40746ff2ef43be50fcd0090ba260a7b",
-      "role_sha256": "72d366265342c92095c94c174181b7837c19add96cd0ef5719755c115e6273a2",
+      "builder_tree": "fb746eb96b458a310aa374f83a4589e02d5b1ba2",
+      "driver": "8f61821deebfa179fa6f56183a4f824c99172ba87671a57e92069836c49703b8",
+      "role_sha256": "8aed5acfd2808160e1aab0a9bcfd643b517551915bd478a5887cbb5728fd0701",
       "service": {
-        "branch": "charlie/codex-ctfe22-standard-20988",
-        "head": "cddb036d81e4313a8e422171f39f0840b44110db",
-        "job": 125052685273,
+        "branch": "charlie/codex-21041-domain-production22",
+        "head": "5f7e5680285caa6b9a848db810b63ef58dfe0143",
+        "job": 125175283448,
         "jobs": {
-          "Production GNU SDK (fa7a_stack_ctfe318)": 125052685273,
-          "Production GNU SDK (stock_ctfe318)": 125052685479,
-          "Qualify both cache migration directions": 125067990029
+          "Production GNU incoherent-impl domain SDK": 125175283448
         },
         "members": {
-          "ctfe22-gnu-build-fa7a_stack_ctfe318-attempt-1": {
-            "bytes": 324152,
-            "id": 13111789509,
-            "sha256": "dafc9171fd92bdb0360d09c401bed69d21688a6241e27ff33854a2899d2e972b"
+          "domain-production-qa-attempt-1": {
+            "bytes": 303122,
+            "id": 13128848535,
+            "sha256": "22d8008b9d2ded9650e1760a457714b192e66950792052a6f7b7dc67b7e979e2"
           },
-          "ctfe22-gnu-build-stock_ctfe318-attempt-1": {
-            "bytes": 320732,
-            "id": 13112616460,
-            "sha256": "a303a36f25e7b2019661800c9d1cf194fbef8bf084b8ea024a2fe0df00c45ea6"
-          },
-          "ctfe22-gnu-pair-qa-attempt-1": {
-            "bytes": 61651,
-            "id": 13112632778,
-            "sha256": "b1502aed447aebb3a2bf79784f47e8af92e126378448da72735996b70a29502e"
-          },
-          "ctfe22-gnu-sdk-fa7a_stack_ctfe318": {
-            "bytes": 359918996,
-            "id": 13112830698,
-            "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
-          },
-          "ctfe22-gnu-sdk-stock_ctfe318": {
-            "bytes": 359881451,
-            "id": 13112756183,
-            "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
+          "domain-production-sdk": {
+            "bytes": 359916519,
+            "id": 13129955278,
+            "sha256": "5b075150e2460193078bdf8de7d834a057c097655e685bfb1943d91dfc2cabd2"
           }
         },
-        "run": 41374825846,
-        "runner": 1429,
-        "runner_name": "nsc-runner-qf17h1b297vk4"
+        "run": 41414598941,
+        "runner": 1590,
+        "runner_name": "nsc-runner-g0ikrcv2932u0"
       },
       "source": {
-        "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
-        "epoch": 43309,
-        "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
+        "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
+        "epoch": 43317,
+        "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2"
       },
-      "source_sha256": "039577238fed403d7043209f042157c38a781cf14073ff8250b0c2dbcb17661b"
-    },
-    "stock_ctfe318": {
-      "artifact": {
-        "bytes": 359881451,
-        "id": 13112756183,
-        "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
-      },
-      "builder_tree": "85761b7d3b377c90c26c635f7231c29df024e9ff",
-      "driver": "165ecb764f6ea877c24b8620243a0ad31376fbf45d5a44e853638f1375da05e2",
-      "role_sha256": "f690831cea34edfe64585a0b92b8fc9338d39e447482eba83dc45554426b7e80",
-      "service": {
-        "branch": "charlie/codex-ctfe22-standard-20988",
-        "head": "cddb036d81e4313a8e422171f39f0840b44110db",
-        "job": 125052685479,
-        "jobs": {
-          "Production GNU SDK (fa7a_stack_ctfe318)": 125052685273,
-          "Production GNU SDK (stock_ctfe318)": 125052685479,
-          "Qualify both cache migration directions": 125067990029
-        },
-        "members": {
-          "ctfe22-gnu-build-fa7a_stack_ctfe318-attempt-1": {
-            "bytes": 324152,
-            "id": 13111789509,
-            "sha256": "dafc9171fd92bdb0360d09c401bed69d21688a6241e27ff33854a2899d2e972b"
-          },
-          "ctfe22-gnu-build-stock_ctfe318-attempt-1": {
-            "bytes": 320732,
-            "id": 13112616460,
-            "sha256": "a303a36f25e7b2019661800c9d1cf194fbef8bf084b8ea024a2fe0df00c45ea6"
-          },
-          "ctfe22-gnu-pair-qa-attempt-1": {
-            "bytes": 61651,
-            "id": 13112632778,
-            "sha256": "b1502aed447aebb3a2bf79784f47e8af92e126378448da72735996b70a29502e"
-          },
-          "ctfe22-gnu-sdk-fa7a_stack_ctfe318": {
-            "bytes": 359918996,
-            "id": 13112830698,
-            "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
-          },
-          "ctfe22-gnu-sdk-stock_ctfe318": {
-            "bytes": 359881451,
-            "id": 13112756183,
-            "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
-          }
-        },
-        "run": 41374825846,
-        "runner": 1430,
-        "runner_name": "nsc-runner-lv7fc7j7t2v5i"
-      },
-      "source": {
-        "commit": "10d56274a98801b5ef8f80aab734e835749458e1",
-        "epoch": 43310,
-        "tree": "1a0e58a855e1782a93cdf8c56b337fb4354142ef"
-      },
-      "source_sha256": "50bafe359e2819504ec7af9207f4e830a23b043885129cd96df93e487d6e0cd7"
+      "source_sha256": "dd7bbb06d72aed8351ac94037d0e03a891d3933e6b2009aa722752cebf33c9f6"
     }
   },
-  "overlay_parent": {
-    "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
-    "epoch": 43309,
-    "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
-  },
-  "plan": "bd30a2a2ced22335a8dc63f5162e241c444eb991f4577cb2a89e539dcf51a2ee",
+  "measurement_plan_sha256": "1a4cd14fc2776f0e73625fe205f197e044b7b5f68dc6ff2cc64f9a763848dd8e",
   "prior_boots": {
     "41379994255": {
       "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
@@ -191,78 +113,49 @@
       "artifact": 13124530356,
       "boot": "13895848-ed2e-435a-b313-9e006b9ff3e2",
       "raw_sha256": "5fa8a1a93165f1ca3f4e2fdf339be44368feb5d360b810d36c61b26a29abf769"
+    },
+    "41411015186": {
+      "artifact": 13125113101,
+      "boot": "105d4e65-c7e4-4912-b8be-39318a1ebd61",
+      "boot_record_sha256": "4a2b72ff1493d6f4525591b973c6483a50008e5f1f066b89eadd0695c69f1609",
+      "job": 125163844234,
+      "run": 41411015186,
+      "zip_sha256": "fd2fd1436baffae76492e472b67c9073607cf00af8767b48ad33a8c5e36834d7"
+    },
+    "41411252543": {
+      "artifact": 13125512762,
+      "boot": "7bf853cc-35d6-49bd-ab54-994d55b3d111",
+      "boot_record_sha256": "7d452270c6bee2b67b9aa8d45863ed4fceae292e0e7ea26164d8f94734ed8723",
+      "job": 125164580588,
+      "run": 41411252543,
+      "zip_sha256": "60f88028ed66d67fa439a5401cd5ae82b33a0f21664465134b9c1497d1b43faf"
+    },
+    "41412729838": {
+      "artifact": 13125969207,
+      "boot": "b48533ba-18c2-433d-a56e-5d7d03110bab",
+      "boot_record_sha256": "027b9c6dc740093b034571d78bf87145e01855beee4d796d1f9de1ab02974abb",
+      "job": 125169398989,
+      "run": 41412729838,
+      "zip_sha256": "ea3ebe0bd78c33bf8cf4ca39bac9bbd586d606b690b6a6f971d1339c035a4a19"
+    },
+    "41417420490": {
+      "archive_sha256": "74e1892d5196a126dae30f865238bd114b979c3562e2a19686966b658e863717",
+      "artifact": 13128565917,
+      "attestation_sha256": "a3a63b36430c2822757610a240bb01e75d33e463486443493bee2d09ebb6b130",
+      "blocking_clock_calibration": "62e670a5307a801eb76cb14abbbab5ed2c6caf08c5fcfabf7b43eb1d34d83ac0",
+      "boot": "e23076e2-fe81-4d25-a110-edecaa347f15",
+      "head": "a99dff16c540a1f0d50be94adbb034558e20b96b",
+      "inherited_calibration": "ecc92d057537d314eb4b7166b894b314d3c94e10b50f2ef384e80057051b952e",
+      "job": 125184564924,
+      "raw_sha256": "a3a63b36430c2822757610a240bb01e75d33e463486443493bee2d09ebb6b130",
+      "source_registration": "99f08c48eda8e9592d46b7a4a8ce732eb5117ffb6185a2a377f87eb6b7c4913a",
+      "thread_calibration": "54a006c4cea49df22b4dd9190260451365e222dd768bd045fad93dbfe2cc9c1c"
     }
   },
-  "prior_case": {
-    "all_eight_valid": true,
-    "branch": "charlie/codex-21041-callables-production-check",
-    "calibration": {
-      "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
-      "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
-    },
-    "candidate_sdk": {
-      "bytes": 359917871,
-      "id": 13122178340,
-      "sha256": "8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1"
-    },
-    "candidate_source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
-    "decision_sha256": "75840a4e38a9b4db7c3e60942994a8ab96a608d19c9ad4e07f27f15be2104a13",
-    "explicit_full_stack_go": true,
-    "first_independent_reduction": "1cd678085e16f5d6e5f9d555e0d6b2ba76483174be80d1e5b004c85065275e70",
-    "first_registered_qualifiers": [
-      {
-        "above": 8,
-        "below": 0,
-        "hold_medians_clear": true,
-        "holm_p": 0.01171875,
-        "holm_reject_at_0_05": true,
-        "name": "uv_client",
-        "p": 0.00390625,
-        "threshold": "1",
-        "ties": 0
-      },
-      {
-        "above": 8,
-        "below": 0,
-        "hold_medians_clear": true,
-        "holm_p": 0.01171875,
-        "holm_reject_at_0_05": true,
-        "name": "sum_of_eight",
-        "p": 0.00390625,
-        "threshold": "1",
-        "ties": 0
-      },
-      {
-        "above": 8,
-        "below": 0,
-        "hold_medians_clear": true,
-        "holm_p": 0.01171875,
-        "holm_reject_at_0_05": true,
-        "name": "uv_install_wheel",
-        "p": 0.00390625,
-        "threshold": "5/4",
-        "ties": 0
-      }
-    ],
-    "head": "9720d7075f8b88e1122f4fc258419e58584f4b69",
-    "job": 125143989895,
-    "original": {
-      "bytes": 36278721,
-      "id": 13123092911,
-      "sha256": "5755698027a2a18ffc8706b413b5ed6d799ea683b7c5297718768a6069023331"
-    },
-    "qualifying_test": "uv_install_wheel",
-    "registration": "33b7e39680bdb05b7f98369c736f7ae01f5b413dff5015c57d83ab8213bf0002",
-    "release_date": "2026-11-01T14:14:23Z",
-    "release_id": 430629054,
-    "release_tag": "ohm-1.99.0-22",
-    "run": 41404703005
-  },
-  "relative_source": "f6b55d2817bb059f9c0bd65de1fd33b0381225c0bcb721459514b49cf5e7d146",
+  "production_overlay_source_sha256": "69f19f63eb905f7103aca35ad1b4ea532260b7e25771766d05323b0095d6b3be",
+  "qualified_stage1_sha256": "78fa58ed82d6c7f2d3beefdd42a28e6988819292e64670347a99c03f17da3ee5",
   "roles": [
-    "stock_ctfe318",
-    "fa7a_stack_ctfe318",
-    "callables_ctfe318"
-  ],
-  "scope": "separate original production jobs, original signed Cargo, instance-specific service SDK archives and native QA"
+    "callables_ctfe318",
+    "callables_ctfe318_incoherent_domain"
+  ]
 }

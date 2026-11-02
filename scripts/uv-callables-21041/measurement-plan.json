@@ -1,5 +1,39 @@
 {
-  "clock": "CLOCK_MONOTONIC_NS around direct Popen and blocking waitpid, with separate kernel SIGALRM deadline and dedicated session; never use subprocess timeout polling in timed visits. Validate child self times in five 0,3,13,31,53 ms native children per round, five rounds; maximum <=12 ms enclosing overhead, median <=4 ms, correct failure and timeout. Repeat after panel.",
+  "boot_rule": "forbid all prior registered hosts; a newly authenticated overlapping host may only add a new exclusion before intake",
+  "build": {
+    "parent_service": {
+      "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
+      "producer": 41398925829,
+      "qa": {
+        "digest": "sha256:9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
+        "id": 13122138377,
+        "name": "callable-production-qa-attempt-1",
+        "size_in_bytes": 296464
+      },
+      "role_record_sha256": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
+      "sdk": {
+        "digest": "sha256:8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1",
+        "id": 13122178340,
+        "name": "callable-production-sdk",
+        "size_in_bytes": 359917871
+      },
+      "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+      "source_record_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
+    },
+    "relative_pack": "7dfc978d69b648546d46bbd5cadd53586ca173756e60c4963ccf22915fa68749",
+    "source_replay_sha256": "7adabe7ed9341a13a2bf2281d5d3b817816d6155c96b335847f31627a2b5d354",
+    "stage1_prerequisite_run": 41412729838,
+    "stage1_registration_sha256": "4ee4df862fa133649f49f07a92ed4ba6279f9b96a95f78751a35b68dc3da0df8",
+    "treatment": "69f19f63eb905f7103aca35ad1b4ea532260b7e25771766d05323b0095d6b3be"
+  },
+  "case": {
+    "all_cargo_artifacts": 486,
+    "all_public_sidecars": 415,
+    "all_workspace_rmeta": 37,
+    "complete_native_argv_sha256": "2c6a09f122e5293f696ffb63d11e6469d88491bfd5a331897765c6a916e384fc",
+    "control": "ordinary seed A, edited B, independent cold B, full allocated semantic and rooted products, all 37 exact raw plus 415 sidecars within each seed, unchanged repeat no rustc, real parser linked, source checked after every visit",
+    "declared_unit_surface_sha256": "cc0c29b3aa3ddbd3ab296d68ad19d238f7a0e4367790bbfa8a9ffe17c7e5ccf7"
+  },
   "command": [
     "check",
     "-p",
@@ -8,96 +42,64 @@
     "--offline",
     "-j8"
   ],
-  "controls": "Each role/history native A/fresh, warm B, settled B, cold B with full same-seed byte and independent semantics; preserve real behavior. Independently retain the original compatible and cross-epoch native fixtures. Cross-role rooted shapes, eight genuine release Cargo compiler commands/486 products. Actual released data with no source rebuild.",
   "holds": [
     0,
     0,
     0,
     0,
-    0,
-    0,
-    1,
-    1,
     1,
     1,
     1,
     1
   ],
-  "hypotheses": [
-    [
-      "fa7a_stack_ctfe318",
-      "callables_ctfe318",
-      1
-    ],
-    [
-      "stock_ctfe318",
-      "callables_ctfe318",
-      2
-    ]
-  ],
-  "inference": "Complete 12, paired medians, 3rd/10th descriptive order-statistic interval, order stratum and independent hold medians, all comparisons and counts above 1 and 2. Exact one-sided sign tests treating ties as failures; Holm for two confirmatory thresholds; both hold medians must clear threshold. Actual CLI nanoseconds, no independent-machine generalization.",
   "orders": [
     [
-      "stock_ctfe318",
-      "fa7a_stack_ctfe318",
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
       "callables_ctfe318"
     ],
     [
-      "fa7a_stack_ctfe318",
-      "callables_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "stock_ctfe318",
-      "fa7a_stack_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "fa7a_stack_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "fa7a_stack_ctfe318",
-      "stock_ctfe318",
-      "callables_ctfe318"
-    ],
-    [
-      "stock_ctfe318",
-      "callables_ctfe318",
-      "fa7a_stack_ctfe318"
-    ],
-    [
-      "callables_ctfe318",
-      "fa7a_stack_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "stock_ctfe318",
-      "callables_ctfe318",
-      "fa7a_stack_ctfe318"
-    ],
-    [
-      "fa7a_stack_ctfe318",
-      "stock_ctfe318",
-      "callables_ctfe318"
-    ],
-    [
-      "fa7a_stack_ctfe318",
-      "callables_ctfe318",
-      "stock_ctfe318"
-    ],
-    [
-      "stock_ctfe318",
-      "fa7a_stack_ctfe318",
+      "callables_ctfe318_incoherent_domain",
       "callables_ctfe318"
     ],
     [
       "callables_ctfe318",
-      "stock_ctfe318",
-      "fa7a_stack_ctfe318"
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
     ]
   ],
+  "prespecified_physical": {
+    "intake": "exact real SDK production source+PGO+BOLT+ThinLTO, installed native tests and cache-epoch boundaries, shared signed Cargo and one distinct calibrated physical host",
+    "original": "one run, all original bytes kept even on refusal; no migration of timers from failed visits",
+    "per_role_per_trio": "independently restored PID-PMU capture then independently restored ordinary wall, with both fixture/compile controls; zero profiler, wrapper or logging in bare wall"
+  },
+  "primary": {
+    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
+    "effect": "candidate/control < 4/5",
+    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
+    "order_per_hold": "two per order",
+    "pairs": 8,
+    "scope": "actual uv_metadata library rustc only",
+    "two_independent_A_histories": true
+  },
   "prior_boots": {
     "41379994255": {
       "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
@@ -131,15 +133,56 @@
       "artifact": 13124530356,
       "boot": "13895848-ed2e-435a-b313-9e006b9ff3e2",
       "raw_sha256": "5fa8a1a93165f1ca3f4e2fdf339be44368feb5d360b810d36c61b26a29abf769"
+    },
+    "41411015186": {
+      "artifact": 13125113101,
+      "boot": "105d4e65-c7e4-4912-b8be-39318a1ebd61",
+      "boot_record_sha256": "4a2b72ff1493d6f4525591b973c6483a50008e5f1f066b89eadd0695c69f1609",
+      "job": 125163844234,
+      "run": 41411015186,
+      "zip_sha256": "fd2fd1436baffae76492e472b67c9073607cf00af8767b48ad33a8c5e36834d7"
+    },
+    "41411252543": {
+      "artifact": 13125512762,
+      "boot": "7bf853cc-35d6-49bd-ab54-994d55b3d111",
+      "boot_record_sha256": "7d452270c6bee2b67b9aa8d45863ed4fceae292e0e7ea26164d8f94734ed8723",
+      "job": 125164580588,
+      "run": 41411252543,
+      "zip_sha256": "60f88028ed66d67fa439a5401cd5ae82b33a0f21664465134b9c1497d1b43faf"
+    },
+    "41412729838": {
+      "artifact": 13125969207,
+      "boot": "b48533ba-18c2-433d-a56e-5d7d03110bab",
+      "boot_record_sha256": "027b9c6dc740093b034571d78bf87145e01855beee4d796d1f9de1ab02974abb",
+      "job": 125169398989,
+      "run": 41412729838,
+      "zip_sha256": "ea3ebe0bd78c33bf8cf4ca39bac9bbd586d606b690b6a6f971d1339c035a4a19"
     }
   },
+  "released_reference": {
+    "id": 430629054,
+    "tag": "ohm-1.99.0-22"
+  },
   "roles": [
-    "stock_ctfe318",
-    "fa7a_stack_ctfe318",
-    "callables_ctfe318"
+    "callables_ctfe318",
+    "callables_ctfe318_incoherent_domain"
   ],
-  "schema": 1,
-  "scope": "One fresh dedicated Linux host with eight distinct physical cores, one bare restored real edit per compiler per trio. Each hold opens independent A for every compiler. All six orders exactly once per hold. No PMU visit.",
+  "schema": "ordinary uv-client production rustc instruction confirmation v1",
+  "secondary": {
+    "per_rustc": [
+      "uv_cache",
+      "uv_client",
+      "uv_configuration",
+      "uv_distribution_types",
+      "uv_install_wheel",
+      "uv_metadata",
+      "uv_pypi_types",
+      "uv_torch"
+    ],
+    "statistics": "descriptive with ratios/hold splits and full cohort, no other threshold promotion",
+    "sum": "all eight certified distinct rustc processes, same edit, raw instructions",
+    "wall": "separate restored ordinary Cargo visits, blocking wait and independent signal watchdog; pre and post real short-child calibration"
+  },
   "signed_cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
   "source": {
     "callables_ctfe318": {
@@ -147,40 +190,13 @@
       "epoch": 43309,
       "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4"
     },
-    "fa7a_stack_ctfe318": {
-      "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
-      "epoch": 43309,
-      "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
-    },
-    "stock_ctfe318": {
-      "commit": "10d56274a98801b5ef8f80aab734e835749458e1",
-      "epoch": 43310,
-      "tree": "1a0e58a855e1782a93cdf8c56b337fb4354142ef"
+    "callables_ctfe318_incoherent_domain": {
+      "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
+      "epoch": 43317,
+      "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2"
     }
   },
-  "source_comparisons": {
-    "cumulative": "4fa28d0a3026871350a13a19f04e05de53d97a84ca4538a80a24d176a4ff86f5",
-    "marginal": "c8cef3c955e3dfaa319ba15d551d8a5961c95f8411cfb8ee54aac46b6abe7ebb"
-  },
-  "timeline": "For treatment in each history, separately restore A for nonverbose native and verbose exact-argv audit with CARGO_BUILD_ANALYSIS_ENABLED=true and -Zbuild-analysis. Require same complete products and eight real commands as native, no unchanged launches. Capture original signed JSONL and all actual unit indices, monotonic start/rmeta-ready/finish and unblocks. Diagnostic runs unscored.",
-  "unmodified_Cargo_SDKs": {
-    "callables_ctfe318": {
-      "bytes": 359917871,
-      "id": 13122178340,
-      "sha256": "8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1"
-    },
-    "fa7a_stack_ctfe318": {
-      "bytes": 359918996,
-      "id": 13112830698,
-      "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
-    },
-    "stock_ctfe318": {
-      "bytes": 359881451,
-      "id": 13112756183,
-      "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
-    }
-  },
-  "upstream_uv_edit": [
+  "uv_edit": [
     "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
     "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
     "crates/uv-pypi-types/src/simple_json.rs"

@@ -38,28 +38,33 @@ def main(role, builder, image, qa, scratch, fixed, dest, pool):
     source=read(qa/"source.json")
     rv=read(qa/"role.json")
     need(all(rv[k]==expected[v] for k,v in (("source_commit","commit"),("source_tree","tree"),("epoch","epoch")))
-         and {k:source["source"][k] for k in expected}==expected and rv["epoch"]==(43310 if role==ROLES[0] else 43309)
+         and {k:source["source"][k] for k in expected}==expected and rv["epoch"]==(43309 if role==ROLES[0] else 43317)
          and rv["driver"]["sha256"]==arm["driver"] and sha(qa/"role.json")==arm["role_sha256"]
          and sha(qa/"source.json")==arm["source_sha256"], "source, driver, or QA record does not match independent enrollment")
     ctx=dict(evidence_repository=REPO,reviewed_head=p["head"],workflow_ref=REPO+"/.github/workflows/ci.yml@refs/heads/"+p["branch"],
              run_id=p["run"],run_attempt=1)
-    if role==ROLES[-1]:
-        spec=read(HERE/"production-source.json")
-        cfg=read(compiler/"callable-source.json")
-        prior=read(qa/"previous-production-source.json")
-        need(cfg["source_role_sha256"]==sha(HERE/"production-source.json") and cfg["source"]==source["source"]
-             and cfg["files"]==spec["files"] and cfg["pack_sha256"]==sha(compiler/"callable-production.pack")
-             ==spec["sha256"][spec["pack_file"]]==source["source_pack_sha256"]
-             and cfg["pack_objects"]==spec["pack_objects"]==38 and cfg["source"]["parent"]==spec["parent"]==read(HERE/"pair.json")["overlay_parent"]["commit"]
-             and cfg["source"]["parent_tree"]==spec["parent_tree"]==read(HERE/"pair.json")["overlay_parent"]["tree"]
-             and source["overlay_description_sha256"]==sha(compiler/"callable-source.json")
-             and prior["source"]==pair.native.S["arms"]["fa7a_stack_ctfe318"] and prior["source_pack_sha256"]==pair.native.S["pack_sha256"]
-             =="d2b0cf8e4623519d3870a4fc97d028c25f164bc0f52364a3be6945e682ea488f"
-             and source["previous_qualified_source_sha256"]==sha(qa/"previous-production-source.json"),"unqualified overlaid production source")
-        need({k:prior[k]for k in ctx}==ctx and all(prior[k]==source[k] for k in ("released_coordinator","training_objects","component_git","recipe","signed_manifest_sha256")),
-             "overlay changed previously qualified components")
-        # The two-role reader predates this single-role pack. Bind its source check to this producer's exact independently verified relative pack.
-        pair.native.S = dict(pair.native.S,pack_sha256=cfg["pack_sha256"])
+    shared=("recipe","released_coordinator","training_objects","component_git","signed_manifest_sha256")
+    original=read(qa/"previous-production-source.json")
+    need({k:original[k]for k in ctx}==ctx and original["source"]==pair.native.S["arms"]["fa7a_stack_ctfe318"] and original["source_pack_sha256"]=="d2b0cf8e4623519d3870a4fc97d028c25f164bc0f52364a3be6945e682ea488f","wrong older compiler reconstruction")
+    old_config=read(compiler/"callable-source.json");spec=read(HERE/"production-source.json")
+    old=source if role==ROLES[0]else read(qa/"previous-callable-source.json")
+    need(old["source"]==old_config["source"] and old["source"]["commit"]==read(HERE/"pair.json")["arms"][ROLES[0]]["source"]["commit"] and old["role"]==ROLES[0] and old["source"]["parent"]==original["source"]["commit"],"different base compiler")
+    need(old_config["source_role_sha256"]==sha(HERE/"production-source.json")and old_config["files"]==spec["files"]and old_config["pack_sha256"]==sha(compiler/"callable-production.pack")==spec["sha256"][spec["pack_file"]]==old["source_pack_sha256"]and old["overlay_description_sha256"]==sha(compiler/"callable-source.json")and old["previous_qualified_source_sha256"]==sha(qa/"previous-production-source.json")and old_config["pack_objects"]==spec["pack_objects"]==38,"different official original compiler overlay")
+    need(all(old[k]==original[k]==source[k]for k in shared)and {k:old[k]for k in ctx}==ctx,"unmatched release material")
+    config=old_config
+    if role==ROLES[1]:
+        config=read(compiler/"domain-source.json");spec=read(HERE/"domain/source-role.json");actual_parent=read(HERE/"pair.json")["arms"][ROLES[0]]
+        need(config["source"]==source["source"] and config["source_role_sha256"]==sha(HERE/"domain/source-role.json") and config["files"]==spec["delta"] and config["pack_objects"]==spec["pack_objects"]==35 and config["pack_sha256"]==sha(compiler/"domain-production.pack")==spec["pack_sha256"]==source["source_pack_sha256"]and source["source"]["parent"]==old["source"]["commit"] and source["source"]["parent_tree"]==old["source"]["tree"],"different fourteen-file production treatment")
+        need(source["previous_callable_source_sha256"]==sha(qa/"previous-callable-source.json")and source["overlay_description_sha256"]==sha(compiler/"domain-source.json")and config["published_parent_source_sha256"]==actual_parent["source_sha256"] and config["stage1_qualification_sha256"]==sha(HERE/"stage1-qualified.json")==sha(compiler/"stage1-qualified.json"),"different admitted parent, source or independent evidence")
+        ancestry=("role","source","component_git","recipe","training_objects","signed_manifest_sha256","released_coordinator","source_pack_sha256","overlay_description_sha256")
+        rebased=hashlib.sha256(json.dumps({k:old[k]for k in ancestry},sort_keys=True,separators=(",",":")).encode()).hexdigest()
+        need(rebased==source["published_parent_projection_sha256"]==config["published_parent_projection_sha256"],"actual parent source projection")
+        d=rv["installed_crate_domain_test"]
+        fixture={p:v for p,v in config["files"].items()if p.startswith("tests/run-make/crate-incoherent-impl-domain/")}
+        need(len(fixture)==5 and d["fixture_blobs"]==fixture and d["exit"]==0 and d["driver_sha256"]==rv["driver"]["sha256"]and d["log_sha256"]==sha(qa/"optimized-crate-incoherent-impl-domain.log")and d["final_outputs"]=={"reader":"11 0 0","local":"0"}and d["both_solvers"]is True and d["diagnostic"]=="E0061"and [d[k]for k in ("foreign_states","foreign_transitions","local_states","local_transitions")]==[10,9,3,2],"installed production regression incomplete")
+    names={"trait-impl-bucket-callables","trait-impl-bucket-coroutine","trait-impl-bucket-sparse-foreign"}
+    need(set(rv["installed_callable_tests"])==names and all(row["exit"]==0 and row["driver_sha256"]==rv["driver"]["sha256"]and row["log_sha256"]==sha(qa/("optimized-"+n+".log"))for n,row in rv["installed_callable_tests"].items()),"prior production fixture has not qualified")
+    pair.native.S=dict(pair.native.S,pack_sha256=config["pack_sha256"])
     qualified,sources,installed=pair.validate(role,image,qa,scratch,ctx)
     need(rv==qualified and source==sources,"different native QA reader")
     data=runpy.run_path(str(compiler/"capacity-audit.py")); authority="52779265edb1486bceb9f6abf0c7a24dfc0f234caea4a067653b0eceb514772b"
@@ -74,8 +79,8 @@ def main(role, builder, image, qa, scratch, fixed, dest, pool):
     dest.mkdir()
     for name in ("SHA256SUMS","role.json","source.json","sdk-inventory.json","component-inventory.json"):
         shutil.copyfile(image/name,dest/name)
-    if role==ROLES[-1]:
-        shutil.copyfile(qa/"previous-production-source.json",dest/"previous-production-source.json")
+    shutil.copyfile(qa/"previous-production-source.json",dest/"previous-production-source.json")
+    if role==ROLES[1]:shutil.copyfile(qa/"previous-callable-source.json",dest/"previous-callable-source.json")
     save(dest/"resource-replay.json",limits)
     (installed/"bin/cargo").unlink()
     shutil.copy2(fixed,installed/"bin/cargo")

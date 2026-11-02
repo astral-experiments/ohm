@@ -29,9 +29,8 @@ def host():
         PAIR["roles"] == ROLES
         and ROLES
         == [
-            "stock_ctfe318",
-            "fa7a_stack_ctfe318",
             "callables_ctfe318",
+            "callables_ctfe318_incoherent_domain",
         ],
         "wrong physical roles",
     )
@@ -64,26 +63,18 @@ def host():
         "unregistered private experiment",
     )
     guard(
-        PAIR["arms"][ROLES[0]]["source"]["epoch"] == 43310
-        and all(PAIR["arms"][role]["source"]["epoch"] == 43309 for role in ROLES[1:]),
+        PAIR["arms"][ROLES[0]]["source"]["epoch"] == 43309
+        and PAIR["arms"][ROLES[1]]["source"]["epoch"] == 43317,
         "cache/metadata epochs",
     )
-    plan = m.read(HERE / "measurement-plan.json")
-    src = m.read(HERE / "production-source.json")
-    replay = m.read(HERE / "source-replay.json")
-    guard(filehash(HERE / "measurement-plan.json") == P["measurement_plan_sha256"] == PAIR["plan"]
-          and filehash(HERE / "production-source.json") == PAIR["relative_source"] == replay["role_sha256"]
-          and plan["roles"] == ROLES and plan["source"] == {r:PAIR["arms"][r]["source"] for r in ROLES}
-          and plan["orders"] == P["orders"] and plan["holds"] == P["independent_holds"]
-          and plan["command"] == P["score_commands"] and plan["signed_cargo"] == m.P["signed_cargo_sha256"]
-          and plan["unmodified_Cargo_SDKs"] == {r:PAIR["arms"][r]["artifact"] for r in ROLES}
-          and src["parent"] == PAIR["arms"][ROLES[1]]["source"]["commit"] == PAIR["overlay_parent"]["commit"]
-          and src["commit"] == PAIR["arms"][ROLES[-1]]["source"]["commit"]
-          and replay["candidate"] == src["commit"] and replay["exact_pack_membership"] is True
-          and PAIR["prior_boots"] == m.read(HERE / "prior-boots.json"),
-          "unqualified production source, offline replay or study")
-    guard("fixture" not in PAIR and all(PAIR["arms"][r]["artifact"]["id"] > 0 for r in ROLES),
-          "mock SDK inputs cannot execute this physical experiment")
+    guard(filehash(HERE / "measurement-plan.json") == P["measurement_plan_sha256"] == PAIR["measurement_plan_sha256"], "different preregistered study")
+    gate=__import__("runpy").run_path(str(HERE / "stage1-prerequisite.py"))["verify"]
+    guard(filehash(HERE / "stage1-qualified.json")==PAIR["qualified_stage1_sha256"] and gate(m.read(HERE / "stage1-qualified.json"))[0]==8, "unqualified prior native study")
+    for run, item in PAIR["prior_boots"].items():
+        if "attestation_sha256" in item:
+            certificate=HERE / "domain" / ("prior-boot-"+run+".json")
+            witness=m.read(certificate)
+            guard(filehash(certificate)==item["attestation_sha256"] and witness["boot"]==item["boot"] and str(witness["run"])==run and witness["coordinator"]==item["head"], "different additional physical run")
     return w, tmp
 
 
@@ -92,8 +83,16 @@ def main():
     cmd = sys.argv[1:]
     guard(len(cmd) == 1, "one action")
     if cmd == ["calibrate"]:
-        import trio
-        trio.calibrate_host(w,tmp)
+        old, _ = m.pmu(w, tmp)
+        old.calibrate()
+        import domain_control, scoped, wall_clock
+        ready=m.read(w/"trait-results/calibration.json")["ready"]
+        mask=set(ready["affinity"])
+        guard(mask <= os.sched_getaffinity(0),"enrolled calibration CPUs unavailable")
+        os.sched_setaffinity(0,mask)
+        scoped.calibrate()
+        wall_clock.calibrate(w/"trait-results/blocking-clock",tmp/"validated-wall-probe")
+        domain_control.boot()
     elif cmd == ["admit"]:
         import admit_pair
 
@@ -101,7 +100,8 @@ def main():
     elif cmd == ["migration"]:
         import admit_pair
 
-        admit_pair.migration()
+        import domain_control
+        domain_control.migration()
     else:
         raise ValueError(cmd)
 

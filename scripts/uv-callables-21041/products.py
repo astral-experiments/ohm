@@ -23,7 +23,7 @@ def aggregate(target,output,store,parser):
     for key,p in sorted(seen.items()):
         b=p.read_bytes();paths[key]=str(p.relative_to(target));raw[key]=[len(b),stash(store,b)];decoded=parser(b,declared[key]['crate']);semantic[key]=c.deep.project(lambda *_:decoded,b,declared[key]['crate']);structural[key]=wire_shape.shape(*decoded[:2])
     sidecars={str(p.relative_to(target)):m.digest(p.read_bytes())for p in sorted(target.rglob('*.public-api-hash')) if p.is_file()}
-    c.guard(sidecars,'public sidecars absent')
+    c.guard(len(sidecars)==415,'different actual public API sidecar roster')
     obj={'relative_paths':paths,'raw':raw,'semantic':semantic,'structural':structural,'public_sidecars':sidecars}
     m.save(output/'products.json',obj);return obj
 def comparable(obj):return {k:obj[k]for k in ('relative_paths','semantic','structural','public_sidecars')}
