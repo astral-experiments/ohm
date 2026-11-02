@@ -1,89 +1,59 @@
 {
   "original_coordinator": "90575c9fc302c2af0858c711726b2d211e7d3114",
   "original_manifest_sha256": "a4e1fb3f142e8aecb40eb3188f2d11a8903448c842ba2e9540468f12ac523feb",
-  "build_script_sha256": "99582ce39853d1d16403166ab2aa4e5e170a2ade7a07c0735ed116871ec8b457",
+  "build_script_sha256": "88c1655898536f1e1a0ee232afffd0dfb33f0025e6546c7dc8a5d6d353a99591",
   "bootstrap_sha256": "5822d2ae682a27193ef413f013281b0849797c88c78545607ab563ea48f87684",
   "sources": {
     "rust": {
       "base": "83f22211d49b85daffa5f12f2a8b52d180a88993",
-      "end": "a21de69d085aa07b3b5ac94058bac9e5aed482b4",
-      "tree": "7c351422f4e4420118c56f8c6d3dc920e43b2c22",
+      "end": "27f5659481d0d2b35d0b523cb9fb24a44e8246ed",
+      "tree": "59e4c313b2fbb361fa2e2d3e40cf2c670f2b2e70",
       "packets": [
         {
-          "file": "rust.pack",
-          "bytes": 187194,
-          "sha256": "c4556bdbf9cc6f910b1ac7e022eba1e75d4140413e7c1e08be80714906f9ef44"
-        },
-        {
-          "file": "rust-current.pack",
-          "bytes": 196925,
-          "sha256": "e3517f5b0f00bd667d532279ae5620580159292f7d3d624f9e15d94ef26b6202"
-        },
-        {
-          "file": "rust-final.pack",
-          "bytes": 207692,
-          "sha256": "04730dee5c20b98d795b945bafb816f57b211b4d98db4cb3b23f608a357c2110"
-        },
-        {
-          "file": "rust-native-freshness.pack",
-          "bytes": 3516,
-          "sha256": "0ba26d2d47808b295db21f8a43854e3c30a2a32d3431983b3d803475e300a4d9"
+          "file": "rust-fork-only.pack",
+          "bytes": 214932,
+          "sha256": "e8e245aa1b78ee6566b1a7727fb0a02a9308eda4e815b7bc6cada5b1d6e48914"
         }
       ]
     },
     "cargo": {
       "base": "39bf4510b889030a40c8c49611d9c6230566d37d",
-      "end": "4109dd69209a642f309555cac0cee8b05e18f0ea",
-      "tree": "0f588182c4f9ac98888e98fed79d7463fee579c3",
+      "end": "6a956739bb28e7295b914d33c980d6ccde05ae28",
+      "tree": "af3aae0fcb072b02275327d1f84b75750c4292b8",
       "packets": [
         {
-          "file": "cargo.pack",
-          "bytes": 633450,
-          "sha256": "933083e42a2ebafd81f48e25b6319cbbf654af7e0a29fa439d7d150fd100aadd"
-        },
-        {
-          "file": "cargo-current.pack",
-          "bytes": 125014,
-          "sha256": "496059c07f785f30a09147f02cc3485309787a73c8e39ee419c1cf7498d9ab3e"
-        },
-        {
-          "file": "cargo-native-freshness.pack",
-          "bytes": 174251,
-          "sha256": "87655fb93b0bab2b97e68f810b301025fd34f33f00f25643db9b62a9ae4f88b4"
+          "file": "cargo-fork-only.pack",
+          "bytes": 216042,
+          "sha256": "51c76c54a47fd1d3c2ebdbbbbc1957c41a99b3c4ff6192221c13d3d9bb738b3d"
         }
       ]
     },
     "clippy": {
       "base": "0d76dc1f4fe7ffb86ee5e1a8a9cc4d6bef1d1bf6",
-      "end": "5b5d9fb377e21872c83ed1598f9ffee1420c7b39",
-      "tree": "1e7a760581c3c933e9039720b82b78d47229457a",
+      "end": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05",
+      "tree": "42035145f0cb1536205ca0d0ea9353387a9bede9",
       "packets": [
         {
-          "file": "clippy.pack",
-          "bytes": 20727,
-          "sha256": "75a31739443f8386f642f9e2054c2da38187b7bbd54fdd3a198b4cdfe4c40ba2"
+          "file": "clippy-fork-only.pack",
+          "bytes": 2705,
+          "sha256": "0886fcf7ac0d38afe5a820a3a9a12975b07f3337e2aef3c6cf7b98e973f0c13c"
         }
       ]
     },
     "rustfmt": {
       "base": "3c9620c92b01e6c393324729c4861823cc3676e2",
-      "end": "59e87b3b3eb731560e1c3a1da4319af04bda5483",
-      "tree": "1c484adda97b4634eb073f5ed8b32e7220a75662",
+      "end": "e5feafbfd640fe7326971cf7721ca7de38a86e40",
+      "tree": "13cde549b75899fa11b34de587b89b188edfcae5",
       "packets": [
         {
-          "file": "rustfmt.pack",
-          "bytes": 41520,
-          "sha256": "1a91959132efe9aece9348c281eaffcd491f20fe79ebe7d0988a548f04e5174e"
-        },
-        {
-          "file": "rustfmt-final-ci.pack",
-          "bytes": 108957,
-          "sha256": "af34c89d773ee2d2bd26b3fb0c93bc5940236ba92a65b1a62627703a25dc26ad"
+          "file": "rustfmt-fork-only.pack",
+          "bytes": 41225,
+          "sha256": "a36ba71c6307bb7e8966cf4b1555f6a1023de94a9e330a6dead954fd5aab970a"
         }
       ]
     }
   },
-  "published_coordinator": "1e58f2ffc0375901ad13e55ad4b032a44d433155",
-  "published_manifest_sha256": "edcdd760f80cef190d5341208d35d5f6b6825640506e7247cf22a1560adc8e4d",
+  "published_coordinator": "4b0ec186008e6220f78776fda60e1cf9ad20e3eb",
+  "published_manifest_sha256": "602960ba1a0ac49bda3d6904caa0180c9c9569a0c0db63f246f67bfddaf2b11e",
   "profile_patch_sha256": "e9bf8ac4b08fbdb731f9944689d33d0fc7478b75cce39b0883743ac627872bed"
 }

@@ -24,11 +24,11 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: 1e58f2ffc0375901ad13e55ad4b032a44d433155
+        ref: 4b0ec186008e6220f78776fda60e1cf9ad20e3eb
     - name: Verify the published candidate and manifest
       run: |
-        test "$(git rev-parse HEAD)" = 1e58f2ffc0375901ad13e55ad4b032a44d433155
-        printf '%s  %s\n' edcdd760f80cef190d5341208d35d5f6b6825640506e7247cf22a1560adc8e4d toolchains/1.99.0/23.json | sha256sum --check --strict
+        test "$(git rev-parse HEAD)" = 4b0ec186008e6220f78776fda60e1cf9ad20e3eb
+        printf '%s  %s\n' 602960ba1a0ac49bda3d6904caa0180c9c9569a0c0db63f246f67bfddaf2b11e toolchains/1.99.0/23.json | sha256sum --check --strict
     - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       with:
         enable-cache: true
@@ -50,7 +50,7 @@ jobs:
           echo "manifest=$MANIFEST_PATH"
           echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")"
         } >> "$GITHUB_OUTPUT"
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-qualify-native-freshness' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-qualify-ohm-only-v2' && github.sha == inputs.reviewed_head
   build:
     needs: plan
     timeout-minutes: 360
@@ -125,7 +125,7 @@ jobs:
     - name: Check out the published candidate manifest and release driver
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
-        ref: 1e58f2ffc0375901ad13e55ad4b032a44d433155
+        ref: 4b0ec186008e6220f78776fda60e1cf9ad20e3eb
         path: release-candidate
         persist-credentials: false
         sparse-checkout: |-
@@ -301,7 +301,7 @@ jobs:
         CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
         CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
         COORDINATOR_REPOSITORY: ${{ github.repository }}
-        COORDINATOR_REVISION: 1e58f2ffc0375901ad13e55ad4b032a44d433155
+        COORDINATOR_REVISION: 4b0ec186008e6220f78776fda60e1cf9ad20e3eb
         MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
         OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
         RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
@@ -405,7 +405,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: 1e58f2ffc0375901ad13e55ad4b032a44d433155
+        ref: 4b0ec186008e6220f78776fda60e1cf9ad20e3eb
     - name: Download verified distribution assets
       uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
       with:
@@ -448,7 +448,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: 1e58f2ffc0375901ad13e55ad4b032a44d433155
+        ref: 4b0ec186008e6220f78776fda60e1cf9ad20e3eb
     - name: Download platform distribution assets
       uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
       with:
