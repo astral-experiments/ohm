@@ -1,0 +1,1133 @@
+{
+  "admission": {
+    "boots": {
+      "e2e": {
+        "aggregate": "ba1b39dde77f642b30c5643c21e79bd36c51682b5ec065c3b960b9b54f878328",
+        "boot": "be34d741-6249-40d5-9fc1-bd7f5f6d6bd8",
+        "coverage": {
+          "compilers": 1356,
+          "ordinary": 16,
+          "probes": 12,
+          "wild": 210
+        },
+        "independent": {
+          "digest": "sha256:d2a04edd1b9d314f9259d5c6d13fe7dd2ac357ae33244bf82579089170af2803",
+          "id": 13136928329,
+          "name": "ldv-physical-admit-independent-2",
+          "size_in_bytes": 43545
+        },
+        "original": {
+          "digest": "sha256:58790060191e20a18a374972e8729e281411b44eee5ff319fd0a3d3091d2b8b9",
+          "id": 13136967651,
+          "name": "ldv-physical-admit-originals-2",
+          "size_in_bytes": 164469897
+        },
+        "roles": {
+          "C": {
+            "driver": "cb6bd1e8074cfb4c092b270fa1450fcbf59941315615a5af48d537edeaf1933b",
+            "frontend": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0",
+            "llvm": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+          },
+          "P": {
+            "driver": "e47bfe74db67860c7ae4edeecd04d119fe12ece51e4361b251b0c29d7a053bc8",
+            "frontend": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0",
+            "llvm": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+          }
+        }
+      },
+      "option": {
+        "aggregate": "d13012e6b9da21ea0263e1aef57b583971f46839c3897f59a07683b2f5c8ac33",
+        "boot": "6825affb-dfe3-4787-bbd7-784607bf5966",
+        "coverage": {
+          "compilers": 1350,
+          "ordinary": 12,
+          "probes": 12,
+          "wild": 224
+        },
+        "independent": {
+          "digest": "sha256:ecba0d7d462bab57b1a88cd337ed991ebf6d2be39b37bcc821e21cb0126b14c8",
+          "id": 13137298539,
+          "name": "ldv-physical-admit-independent-1",
+          "size_in_bytes": 42529
+        },
+        "original": {
+          "digest": "sha256:fd2a53216de2b335c7b1e651639a7eb381be902dba20f600eee5b8d735f6b59b",
+          "id": 13138200465,
+          "name": "ldv-physical-admit-originals-1",
+          "size_in_bytes": 104773940
+        },
+        "roles": {
+          "C": {
+            "driver": "cb6bd1e8074cfb4c092b270fa1450fcbf59941315615a5af48d537edeaf1933b",
+            "frontend": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0",
+            "llvm": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+          },
+          "P": {
+            "driver": "e47bfe74db67860c7ae4edeecd04d119fe12ece51e4361b251b0c29d7a053bc8",
+            "frontend": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0",
+            "llvm": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+          }
+        }
+      }
+    },
+    "confirmation": "d09957ddf8f4965d902119ca415c18bc06803cd2416c4b19d4fa1701e9b4d3c9",
+    "factory": 41425541148,
+    "run": 41436324816,
+    "sha": "a43236131847bb5906247e46656d702e543d3c50"
+  },
+  "blocks": [
+    {
+      "boot": "dcafcdd7-9ce0-4d82-aeee-8eec92516e6d",
+      "coverage": {
+        "compilers": 2706,
+        "ordinary": 28,
+        "probes": 24,
+        "wild": 434
+      },
+      "order": {
+        "compilers": [
+          "C",
+          "P"
+        ],
+        "slot": 1,
+        "suites": [
+          "e2e",
+          "option"
+        ]
+      },
+      "original": {
+        "digest": "sha256:104478c38e87fef73693f7983725430b120beda3641115eb46a982409618aa56",
+        "id": 13142281380,
+        "name": "ldv-physical-score-originals-1",
+        "size_in_bytes": 243306433
+      },
+      "run": 41442005889,
+      "slot": 1,
+      "terminal_sha": "ac9e26d5120d79a7a283a5446308158c0eb50ca68eb6af5921e916362e5674bc",
+      "whole_events": {
+        "e2e": {
+          "C": {
+            "new": {
+              "enabled": 7081732870,
+              "instructions": 31221936986,
+              "phase": "new",
+              "pid": 9930,
+              "raw_sha256": "98db1dbbb4073697cd4371a6878168bee5c9505535dcc93bab9f563baafca478",
+              "running": 7081732870,
+              "status": 0
+            },
+            "old": {
+              "enabled": 415846761341,
+              "instructions": 2151811596860,
+              "phase": "old",
+              "pid": 1943,
+              "raw_sha256": "6759cc3dff1332dc998497a5afff80ceb7fc3404a0e1fa085385b05198bba45f",
+              "running": 415846761341,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1472207620,
+              "instructions": 3355536721,
+              "phase": "unchanged",
+              "pid": 10326,
+              "raw_sha256": "6f3204ab67515cfdbc6c7a599e4d872d43f0fd3f8adbc6275ea83d9ee00d344a",
+              "running": 1472207620,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 7072129336,
+              "instructions": 32004070238,
+              "phase": "new",
+              "pid": 27743,
+              "raw_sha256": "a25f4eee4d2f2b9e225c7e3c0c58d8088773ed0fb817d1a7f50135a481651001",
+              "running": 7072129336,
+              "status": 0
+            },
+            "old": {
+              "enabled": 422540408657,
+              "instructions": 2209081188818,
+              "phase": "old",
+              "pid": 19771,
+              "raw_sha256": "950ade2df2a11ab5a1c21cac0840b9c77b367096788c7104263a10791a272d67",
+              "running": 422540408657,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1504449640,
+              "instructions": 3356401642,
+              "phase": "unchanged",
+              "pid": 28136,
+              "raw_sha256": "93866b64899d91711359d91e58f10e356dc55749b56f2f7019b7bd733edf7a4a",
+              "running": 1504449640,
+              "status": 0
+            }
+          }
+        },
+        "option": {
+          "C": {
+            "new": {
+              "enabled": 13516830840,
+              "instructions": 112103015879,
+              "phase": "new",
+              "pid": 45306,
+              "raw_sha256": "71f0995b39cd6241aedbe27759c1ef0fd63bd32bdb414089703b6f2d6ea2ad41",
+              "running": 13516830840,
+              "status": 0
+            },
+            "old": {
+              "enabled": 340260958523,
+              "instructions": 1803016587747,
+              "phase": "old",
+              "pid": 37637,
+              "raw_sha256": "9ca0e3e9f357412d043480bdc47fb6963ad2f1cc7595524a9f599f5d6c252a91",
+              "running": 340260958523,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 502643857,
+              "instructions": 485322333,
+              "phase": "unchanged",
+              "pid": 45544,
+              "raw_sha256": "dccc4e108eb5c35eabfe5d49c7e895c941df7e86ed41ddec0d39664d8dc5aee1",
+              "running": 502643857,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 14045255965,
+              "instructions": 117919412665,
+              "phase": "new",
+              "pid": 61421,
+              "raw_sha256": "d2941982ab7b47baa32151d41a26157766be649c174d77dd0a7c19214eab9588",
+              "running": 14045255965,
+              "status": 0
+            },
+            "old": {
+              "enabled": 345031449114,
+              "instructions": 1850141695344,
+              "phase": "old",
+              "pid": 53753,
+              "raw_sha256": "74f3da33b09cd52d5fd9ec843096cca54f9aa90c35470d376737d4a9530888c5",
+              "running": 345031449114,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 485557524,
+              "instructions": 485562934,
+              "phase": "unchanged",
+              "pid": 61654,
+              "raw_sha256": "7ef6ba2cabb3df80eb822d54cc2f7b7bb4708eae63e19796a5b0c86d997e83ef",
+              "running": 485557524,
+              "status": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "boot": "a4b72d4d-105f-4405-8d6e-32c013a18a35",
+      "coverage": {
+        "compilers": 2706,
+        "ordinary": 28,
+        "probes": 24,
+        "wild": 434
+      },
+      "order": {
+        "compilers": [
+          "C",
+          "P"
+        ],
+        "slot": 2,
+        "suites": [
+          "option",
+          "e2e"
+        ]
+      },
+      "original": {
+        "digest": "sha256:1967ba1f4774a07c917fda8bd178356bb413867f3df857ba1a09b94c2e76ee34",
+        "id": 13141981938,
+        "name": "ldv-physical-score-originals-2",
+        "size_in_bytes": 243299019
+      },
+      "run": 41442005889,
+      "slot": 2,
+      "terminal_sha": "7d2e4479233a1775ddeca3d61f3d1bb7119f854d4dcbb1002223a81254cb0f8f",
+      "whole_events": {
+        "e2e": {
+          "C": {
+            "new": {
+              "enabled": 7050227276,
+              "instructions": 31224901859,
+              "phase": "new",
+              "pid": 42213,
+              "raw_sha256": "aeb2183c3196d380a9fdbad0aaa3b92e367e08f56a142e66d21e83a7062f191d",
+              "running": 7050227276,
+              "status": 0
+            },
+            "old": {
+              "enabled": 414308992986,
+              "instructions": 2151724003897,
+              "phase": "old",
+              "pid": 34247,
+              "raw_sha256": "4b6f2fc256a5316209f325dea05f1f303b33d97ab69d38249e8c3ea83c87e240",
+              "running": 414308992986,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1473017246,
+              "instructions": 3356533576,
+              "phase": "unchanged",
+              "pid": 42609,
+              "raw_sha256": "32c83be39dedc7c50a07ef07d440a34825dfde675c9cd61ffa8ec9607def8367",
+              "running": 1473017246,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 7165399885,
+              "instructions": 31999220450,
+              "phase": "new",
+              "pid": 60015,
+              "raw_sha256": "1513585cca869bc54354c8029872562078d56afa2fbad49ee51ce9bc4ce82892",
+              "running": 7165399885,
+              "status": 0
+            },
+            "old": {
+              "enabled": 420010420369,
+              "instructions": 2209050260316,
+              "phase": "old",
+              "pid": 52049,
+              "raw_sha256": "a219391470423be04b61664b405a6edea2f400815d10b956238a31f28d729423",
+              "running": 420010420369,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1476961972,
+              "instructions": 3356382394,
+              "phase": "unchanged",
+              "pid": 60410,
+              "raw_sha256": "5fbc527de3f6e69503960a5c341c47b0dc36b8d35e54fc4f8a81251c3c2b79f2",
+              "running": 1476961972,
+              "status": 0
+            }
+          }
+        },
+        "option": {
+          "C": {
+            "new": {
+              "enabled": 13541048658,
+              "instructions": 112069885159,
+              "phase": "new",
+              "pid": 9625,
+              "raw_sha256": "cc1141f915b8ade5c4c0b0d4f0e2cda3dd1cf8b48baea3f33e1fb60e542c83f9",
+              "running": 13541048658,
+              "status": 0
+            },
+            "old": {
+              "enabled": 339136306721,
+              "instructions": 1802922991058,
+              "phase": "old",
+              "pid": 1940,
+              "raw_sha256": "9061f920ff465abf7ae2339ad427911aa6bdd4900f5dbb745831cdbf0be6bf60",
+              "running": 339136306721,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 482339141,
+              "instructions": 485152133,
+              "phase": "unchanged",
+              "pid": 9858,
+              "raw_sha256": "57e5fb08596fd78224b5e74fb5376acbea88ce749bae0a4b82b6c739a777fbe3",
+              "running": 482339141,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 14141824554,
+              "instructions": 117921381618,
+              "phase": "new",
+              "pid": 25739,
+              "raw_sha256": "6062b6ffe4e5a0e61a367e333d22fbe2ee41da11a1d335378628043c063fc1cc",
+              "running": 14141824554,
+              "status": 0
+            },
+            "old": {
+              "enabled": 343526616510,
+              "instructions": 1849879334796,
+              "phase": "old",
+              "pid": 18069,
+              "raw_sha256": "87a3887876a683e08cfb31753ef46582b1bdd34a19d26544832340e86e411ec1",
+              "running": 343526616510,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 473590198,
+              "instructions": 485245362,
+              "phase": "unchanged",
+              "pid": 25972,
+              "raw_sha256": "16ad7b2e84ac63521dc96c4f3395a120b82625adfb48ac96dc252284bd6189b7",
+              "running": 473590198,
+              "status": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "boot": "f27d6dcc-c98a-41d4-a0d7-575d04bb3ec0",
+      "coverage": {
+        "compilers": 2706,
+        "ordinary": 28,
+        "probes": 24,
+        "wild": 434
+      },
+      "order": {
+        "compilers": [
+          "P",
+          "C"
+        ],
+        "slot": 3,
+        "suites": [
+          "option",
+          "e2e"
+        ]
+      },
+      "original": {
+        "digest": "sha256:9a4033ab4238fb3a175283b5119b0854cbd439ba48d7434c90c83612a97aa6b9",
+        "id": 13144380039,
+        "name": "ldv-physical-score-originals-3",
+        "size_in_bytes": 243301555
+      },
+      "run": 41442005889,
+      "slot": 3,
+      "terminal_sha": "ee86ffd153db2457998a8410c40be4cc6d1e69e2afcb20c231fda98659650723",
+      "whole_events": {
+        "e2e": {
+          "C": {
+            "new": {
+              "enabled": 7036131924,
+              "instructions": 31201064378,
+              "phase": "new",
+              "pid": 60030,
+              "raw_sha256": "0fee1dec33a5a2e5e173a1c5824b94f08351042def2fdc6d563632cc92c596bc",
+              "running": 7036131924,
+              "status": 0
+            },
+            "old": {
+              "enabled": 416237860916,
+              "instructions": 2151542511611,
+              "phase": "old",
+              "pid": 52062,
+              "raw_sha256": "eee385525f8a1a195ffccde922d8b9d91cd09830351ec61e53d7437edff690a7",
+              "running": 416237860916,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1534271598,
+              "instructions": 3356463002,
+              "phase": "unchanged",
+              "pid": 60424,
+              "raw_sha256": "0db7bc56cacf9ea53b9f2ecfec15c1d7796b5d21f9d8ea16ec202a9a47550772",
+              "running": 1534271598,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 7122189952,
+              "instructions": 32024108602,
+              "phase": "new",
+              "pid": 42228,
+              "raw_sha256": "2fe0cf8b119f3e3c7a9983ce3a0fd07c85cb28523664e859f25a600724f5c998",
+              "running": 7122189952,
+              "status": 0
+            },
+            "old": {
+              "enabled": 422371122929,
+              "instructions": 2208880576623,
+              "phase": "old",
+              "pid": 34250,
+              "raw_sha256": "853551d19a501ef598d0e1a5f914b0f1db63d9b2629586fc33e1774326ccc7f7",
+              "running": 422371122929,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1477518312,
+              "instructions": 3356304317,
+              "phase": "unchanged",
+              "pid": 42621,
+              "raw_sha256": "ee41bebc8ffe331af723fdeaa676c2db0b5974cf7dd068e4b603936ffa913a1c",
+              "running": 1477518312,
+              "status": 0
+            }
+          }
+        },
+        "option": {
+          "C": {
+            "new": {
+              "enabled": 13502242926,
+              "instructions": 112077117979,
+              "phase": "new",
+              "pid": 25740,
+              "raw_sha256": "11ddcfe5383af46e24166d292551395c86af4f8786b299222fd4fe807787d203",
+              "running": 13502242926,
+              "status": 0
+            },
+            "old": {
+              "enabled": 340336926794,
+              "instructions": 1802967233571,
+              "phase": "old",
+              "pid": 18067,
+              "raw_sha256": "500f7eed06f19e5d61b3b3bc0c29fe640e909a3ca9e2e87287305eb6d03c319d",
+              "running": 340336926794,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 474820643,
+              "instructions": 485259005,
+              "phase": "unchanged",
+              "pid": 25976,
+              "raw_sha256": "aed9cf3bb763c2e9a258ba0810f694c93b28f9a2b2966de106dfe92ce1dba01e",
+              "running": 474820643,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 14161441574,
+              "instructions": 117897373227,
+              "phase": "new",
+              "pid": 9620,
+              "raw_sha256": "7360da611575618f19d7f9eb8d04830bad9b1ac30b9aa0aeb5e6d74380a73778",
+              "running": 14161441574,
+              "status": 0
+            },
+            "old": {
+              "enabled": 350247159785,
+              "instructions": 1850229566195,
+              "phase": "old",
+              "pid": 1934,
+              "raw_sha256": "6b66dc933166ffe1bb2fe5090d6cc74794b0e64dfed0e2ef87dbce6ad8c1ca39",
+              "running": 350247159785,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 482348838,
+              "instructions": 485381514,
+              "phase": "unchanged",
+              "pid": 9854,
+              "raw_sha256": "93ee4caf81141655db17ed23423b8015daaec903b0d30d19c553791c6c780968",
+              "running": 482348838,
+              "status": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "boot": "158ca696-eddc-4df4-b171-1649597d457d",
+      "coverage": {
+        "compilers": 2706,
+        "ordinary": 28,
+        "probes": 24,
+        "wild": 434
+      },
+      "order": {
+        "compilers": [
+          "C",
+          "P"
+        ],
+        "slot": 4,
+        "suites": [
+          "e2e",
+          "option"
+        ]
+      },
+      "original": {
+        "digest": "sha256:40ca828589e98e6f52074e7fe91336cdf69f2d854b911263875c732e74fe10f5",
+        "id": 13143327685,
+        "name": "ldv-physical-score-originals-4",
+        "size_in_bytes": 243299167
+      },
+      "run": 41442005889,
+      "slot": 4,
+      "terminal_sha": "a7d2eccc6ac1fc2d5f08f58455ae2dc6f180656b091e2baa30c83ba060846816",
+      "whole_events": {
+        "e2e": {
+          "C": {
+            "new": {
+              "enabled": 8141596408,
+              "instructions": 31219283603,
+              "phase": "new",
+              "pid": 9910,
+              "raw_sha256": "2e7c135d2bdbe7ebdb51954c397bfa070fe1232ccd992b613ee11cb205554622",
+              "running": 8141596408,
+              "status": 0
+            },
+            "old": {
+              "enabled": 442353243404,
+              "instructions": 2151858316103,
+              "phase": "old",
+              "pid": 1925,
+              "raw_sha256": "6b60765669ab13e6c1064c362b5f8b0b29a439203bf4370e95996a385e0b6087",
+              "running": 442353243404,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1869020552,
+              "instructions": 3356112662,
+              "phase": "unchanged",
+              "pid": 10304,
+              "raw_sha256": "7e9b1f93a7c53c862dc90d8d37493aac6e11d5aa9256683b39a3c5738acd86d3",
+              "running": 1869020552,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 8164931119,
+              "instructions": 32008437650,
+              "phase": "new",
+              "pid": 27719,
+              "raw_sha256": "43fd382dce8be77189013ff1696b5403aeace3f30e92b2d20341a6ef2c08c96a",
+              "running": 8164931119,
+              "status": 0
+            },
+            "old": {
+              "enabled": 441166349061,
+              "instructions": 2209021628449,
+              "phase": "old",
+              "pid": 19745,
+              "raw_sha256": "466698204a72757c8041c841daf648245f74761907ec0ed6f0ac6bb6b1500384",
+              "running": 441166349061,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1892794539,
+              "instructions": 3356652981,
+              "phase": "unchanged",
+              "pid": 28113,
+              "raw_sha256": "5539321f4b4105ca80afc3927325924ab5eb33b58d6d3cb4ca1a96f367166810",
+              "running": 1892794539,
+              "status": 0
+            }
+          }
+        },
+        "option": {
+          "C": {
+            "new": {
+              "enabled": 14193120789,
+              "instructions": 112105224372,
+              "phase": "new",
+              "pid": 45286,
+              "raw_sha256": "da118bc6cc7b7a7f15310b6e71e7f67f75e74ef040fbb4e350f5e92f757acb08",
+              "running": 14193120789,
+              "status": 0
+            },
+            "old": {
+              "enabled": 394668357356,
+              "instructions": 1803077583782,
+              "phase": "old",
+              "pid": 37615,
+              "raw_sha256": "0c56be053d322c4ca2ffcbfd1032dc209bc0592530ccbd29ec5aeb118da0bab3",
+              "running": 394668357356,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 643294842,
+              "instructions": 485452659,
+              "phase": "unchanged",
+              "pid": 45519,
+              "raw_sha256": "97479201f2d8ca03bea7520e8dd1077f211f241814755de477cd79357a182f6f",
+              "running": 643294842,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 14572452820,
+              "instructions": 117899715909,
+              "phase": "new",
+              "pid": 61389,
+              "raw_sha256": "dc4af02f9bff441064f5215ebfa00c623f1b98fb78ef4d330ef35f3018de5499",
+              "running": 14572452820,
+              "status": 0
+            },
+            "old": {
+              "enabled": 363171426510,
+              "instructions": 1850288223244,
+              "phase": "old",
+              "pid": 53723,
+              "raw_sha256": "5628305d2d08253958e3207543743d9fff9f14caeeeeea5bae0734020775ca8b",
+              "running": 363171426510,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 638260346,
+              "instructions": 485495477,
+              "phase": "unchanged",
+              "pid": 61622,
+              "raw_sha256": "77840bc9c44c3948fcadc3a9fb1237b4e71f282695b7e901dc48de1371e0d909",
+              "running": 638260346,
+              "status": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "boot": "0d8bca66-7972-4be5-87cc-3777fcd25a61",
+      "coverage": {
+        "compilers": 2706,
+        "ordinary": 28,
+        "probes": 24,
+        "wild": 434
+      },
+      "order": {
+        "compilers": [
+          "P",
+          "C"
+        ],
+        "slot": 5,
+        "suites": [
+          "e2e",
+          "option"
+        ]
+      },
+      "original": {
+        "digest": "sha256:1feb38757f62b0d4c9aac85cae281370e2ffba8c135fd2fa13a188b097177868",
+        "id": 13145245750,
+        "name": "ldv-physical-score-originals-5",
+        "size_in_bytes": 243308570
+      },
+      "run": 41442005889,
+      "slot": 5,
+      "terminal_sha": "097b55a84249f650aeddd961fa38f0e46c4fcde7792ce393c021582d603b8958",
+      "whole_events": {
+        "e2e": {
+          "C": {
+            "new": {
+              "enabled": 7137077632,
+              "instructions": 31224966523,
+              "phase": "new",
+              "pid": 27748,
+              "raw_sha256": "2691105b937b1e525aab4136965a1d3fa83ac6d6a1ea17b8bfcd8481b7f90002",
+              "running": 7137077632,
+              "status": 0
+            },
+            "old": {
+              "enabled": 431964473877,
+              "instructions": 2151858826302,
+              "phase": "old",
+              "pid": 19773,
+              "raw_sha256": "432495f4593379d89b38dccb79dc6cb6a20790eb5ec0c52f3e4a5d5131fa7729",
+              "running": 431964473877,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1516985804,
+              "instructions": 3356384574,
+              "phase": "unchanged",
+              "pid": 28141,
+              "raw_sha256": "88d830d0e1b39d4fea3078af162f5778e946583137b9317fd1239faccf5917b2",
+              "running": 1516985804,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 7157530682,
+              "instructions": 32032662060,
+              "phase": "new",
+              "pid": 9932,
+              "raw_sha256": "7e89d1158ff70d5e3da12a638db21cbc6c86740f67e983e95f8b726d9d2a0368",
+              "running": 7157530682,
+              "status": 0
+            },
+            "old": {
+              "enabled": 435684501734,
+              "instructions": 2208938004256,
+              "phase": "old",
+              "pid": 1942,
+              "raw_sha256": "46016182df4b83c6c9486cb9092062fec2c694a29851a62e7304a03f68004ee0",
+              "running": 435684501734,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1524529546,
+              "instructions": 3356272179,
+              "phase": "unchanged",
+              "pid": 10326,
+              "raw_sha256": "1dd597183edfeff54a53b8b3efef64224d045df1692fadb33ee73b2b4146b304",
+              "running": 1524529546,
+              "status": 0
+            }
+          }
+        },
+        "option": {
+          "C": {
+            "new": {
+              "enabled": 13566658312,
+              "instructions": 112066281984,
+              "phase": "new",
+              "pid": 61425,
+              "raw_sha256": "a7d4412f7c2abb3a6572b2eca9b12647f816f58c112d5d1560d6cfd8ae0925b8",
+              "running": 13566658312,
+              "status": 0
+            },
+            "old": {
+              "enabled": 347593660870,
+              "instructions": 1802988978475,
+              "phase": "old",
+              "pid": 53755,
+              "raw_sha256": "c15f3508e6bd7dbe400ce235ed183d0423fbf448568749beb0b04d4bcbe27b46",
+              "running": 347593660870,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 471450457,
+              "instructions": 485179336,
+              "phase": "unchanged",
+              "pid": 61660,
+              "raw_sha256": "0613a5923f5ff741d1b6fd4420e2dc24f8d6f46aa0b5a8b8376d0a4e198ef042",
+              "running": 471450457,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 14381861828,
+              "instructions": 117905919384,
+              "phase": "new",
+              "pid": 45316,
+              "raw_sha256": "5d77cf99dcbd5b16991a46b00edea2792a67d4101828c2b901a0cea03e952864",
+              "running": 14381861828,
+              "status": 0
+            },
+            "old": {
+              "enabled": 348639805557,
+              "instructions": 1850204364867,
+              "phase": "old",
+              "pid": 37646,
+              "raw_sha256": "efc3c963e103f3d77d423154f5c30cf3e15da7c9102534f39b06590337dca671",
+              "running": 348639805557,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 479396464,
+              "instructions": 485520637,
+              "phase": "unchanged",
+              "pid": 45550,
+              "raw_sha256": "20ebeefad0936d42f84acc20b63ea495281e9a7b65607c52e5fc9915fb415b6c",
+              "running": 479396464,
+              "status": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "boot": "8fdba490-d2db-4c2a-b2e3-25187f159189",
+      "coverage": {
+        "compilers": 2706,
+        "ordinary": 28,
+        "probes": 24,
+        "wild": 434
+      },
+      "order": {
+        "compilers": [
+          "P",
+          "C"
+        ],
+        "slot": 6,
+        "suites": [
+          "option",
+          "e2e"
+        ]
+      },
+      "original": {
+        "digest": "sha256:91adafe6fc19ec973b2d8ffed4c9afed564268cdc6e94fdeaec0ed9b3d685da6",
+        "id": 13145880150,
+        "name": "ldv-physical-score-originals-6",
+        "size_in_bytes": 243302984
+      },
+      "run": 41442005889,
+      "slot": 6,
+      "terminal_sha": "23a59bb3b61156e1472b2e872b490d9227a2aa39c5b50349243a8e07787d5b54",
+      "whole_events": {
+        "e2e": {
+          "C": {
+            "new": {
+              "enabled": 6968959437,
+              "instructions": 31202651162,
+              "phase": "new",
+              "pid": 60015,
+              "raw_sha256": "6c45b95a948f1d72fb2485cdfebaf7c72e212268846ca099ea44e38f2086594a",
+              "running": 6968959437,
+              "status": 0
+            },
+            "old": {
+              "enabled": 416582067901,
+              "instructions": 2151781297074,
+              "phase": "old",
+              "pid": 52050,
+              "raw_sha256": "ce236d04cdbeefa2870e023925f6cbf0153fd4951adb6c723e6d4f49f917925e",
+              "running": 416582067901,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1485971932,
+              "instructions": 3355923121,
+              "phase": "unchanged",
+              "pid": 60408,
+              "raw_sha256": "8f0035281545f22c71a42f86336f2441103e75fd857bf4bb2b3a542acee414a0",
+              "running": 1485971932,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 7157203593,
+              "instructions": 31982826281,
+              "phase": "new",
+              "pid": 42211,
+              "raw_sha256": "b3e7d80a0e15c731f8b1c8b4395a7969aa1d32134130b50dd2abc68214e10cd2",
+              "running": 7157203593,
+              "status": 0
+            },
+            "old": {
+              "enabled": 422962114401,
+              "instructions": 2209048995405,
+              "phase": "old",
+              "pid": 34245,
+              "raw_sha256": "e23fbb7212379429fbe24dbc6133db1e3fb744e727c649d7e8d41e95537a7295",
+              "running": 422962114401,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 1478920051,
+              "instructions": 3356397145,
+              "phase": "unchanged",
+              "pid": 42607,
+              "raw_sha256": "c0061fae38e67bad3d02be2ca4165783881c8c81bc7336872498b5b380dfe2a9",
+              "running": 1478920051,
+              "status": 0
+            }
+          }
+        },
+        "option": {
+          "C": {
+            "new": {
+              "enabled": 13439819261,
+              "instructions": 112086041739,
+              "phase": "new",
+              "pid": 25739,
+              "raw_sha256": "8547c31bafb8e145cce3d05289bb74f7a218f4e3251e6ac5a03293acbf300c4a",
+              "running": 13439819261,
+              "status": 0
+            },
+            "old": {
+              "enabled": 339041911655,
+              "instructions": 1803291483028,
+              "phase": "old",
+              "pid": 18066,
+              "raw_sha256": "413523121e65e63c3fc2e8471f2d8943ccee1b85438dbf88398bf66ab990158f",
+              "running": 339041911655,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 473934243,
+              "instructions": 485335562,
+              "phase": "unchanged",
+              "pid": 25974,
+              "raw_sha256": "e8ccfaf0b0ed49cce9efe27d94f80d6c9ea936d6bfd3aa860cdc11a0b40f1a22",
+              "running": 473934243,
+              "status": 0
+            }
+          },
+          "P": {
+            "new": {
+              "enabled": 14071635267,
+              "instructions": 117893106026,
+              "phase": "new",
+              "pid": 9617,
+              "raw_sha256": "29c657175215e9c93b425e43a4d63665aa0806a9aef079a48b2366503fb8e7ad",
+              "running": 14071635267,
+              "status": 0
+            },
+            "old": {
+              "enabled": 346024777672,
+              "instructions": 1850217226614,
+              "phase": "old",
+              "pid": 1932,
+              "raw_sha256": "5baccf82a118cf64f1bb4f60267327071b4da6a2000ee4c2b38fa812d600d68c",
+              "running": 346024777672,
+              "status": 0
+            },
+            "unchanged": {
+              "enabled": 493420932,
+              "instructions": 485273594,
+              "phase": "unchanged",
+              "pid": 9852,
+              "raw_sha256": "636f0511973aea687915c337e6c8212e928104bdc7109dfabe7c3164d7914e4f",
+              "running": 493420932,
+              "status": 0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "median_interval": [
+    1.0516879705603377,
+    1.052212924557727
+  ],
+  "median_interval_coverage": "62/64 (96.875%) marginal, primary only; independent continuous paired effects",
+  "primary": "option/new",
+  "primary_all_above_one": true,
+  "restricted_one_sided_assignment_p": [
+    1,
+    20
+  ],
+  "results": {
+    "e2e/edit_plus_next": {
+      "geomean": 1.0229374923823693,
+      "median": 1.0227422627899383,
+      "p_over_c": [
+        1.022644747838865,
+        1.0223867921982344,
+        1.0238120491073166,
+        1.0228397777410114,
+        1.0233531402441376,
+        1.0225891593966598
+      ],
+      "range": [
+        1.0223867921982344,
+        1.0238120491073166
+      ]
+    },
+    "e2e/new": {
+      "geomean": 1.0253958238474241,
+      "median": 1.0251642678563602,
+      "p_over_c": [
+        1.0250507600585674,
+        1.02479811127979,
+        1.0263787226624337,
+        1.0252777756541527,
+        1.0258669784771446,
+        1.0250034881635357
+      ],
+      "range": [
+        1.02479811127979,
+        1.0263787226624337
+      ]
+    },
+    "e2e/old": {
+      "geomean": 1.0266017641278145,
+      "median": 1.0266143413432036,
+      "p_over_c": [
+        1.0266145939735476,
+        1.0266420118542974,
+        1.0266497476589795,
+        1.0265646264525083,
+        1.0265255216821503,
+        1.0266140887128599
+      ],
+      "range": [
+        1.0265255216821503,
+        1.0266497476589795
+      ]
+    },
+    "e2e/unchanged": {
+      "geomean": 1.0000723593653615,
+      "median": 1.0000538815162927,
+      "p_over_c": [
+        1.000257759360697,
+        0.9999549588894087,
+        0.9999527225535019,
+        1.000160995489251,
+        0.9999665130745533,
+        1.000141249958032
+      ],
+      "range": [
+        0.9999527225535019,
+        1.000257759360697
+      ]
+    },
+    "option/edit_plus_next": {
+      "geomean": 1.051716208588834,
+      "median": 1.0516854486554768,
+      "p_over_c": [
+        1.0516628762745168,
+        1.0519886966304253,
+        1.0517080210364367,
+        1.0514654899304368,
+        1.0518871868255544,
+        1.0515850694752795
+      ],
+      "range": [
+        1.0514654899304368,
+        1.0519886966304253
+      ]
+    },
+    "option/new": {
+      "geomean": 1.0519389623582238,
+      "median": 1.0519075996377443,
+      "p_over_c": [
+        1.0518843916944929,
+        1.052212924557727,
+        1.0519308075809957,
+        1.0516879705603377,
+        1.0521087814873142,
+        1.0518089870683645
+      ],
+      "range": [
+        1.0516879705603377,
+        1.052212924557727
+      ]
+    },
+    "option/old": {
+      "geomean": 1.0261313208020781,
+      "median": 1.0261600893243574,
+      "p_over_c": [
+        1.0261368131148956,
+        1.0260445642830507,
+        1.0262136392409036,
+        1.0261833655338195,
+        1.0261872850891942,
+        1.0260222731752742
+      ],
+      "range": [
+        1.0260222731752742,
+        1.0262136392409036
+      ]
+    },
+    "option/unchanged": {
+      "geomean": 1.0002673562046713,
+      "median": 1.0002223127595546,
+      "p_over_c": [
+        1.0004957550552285,
+        1.000192164464832,
+        1.0002524610542776,
+        1.000088202215409,
+        1.0007034532896923,
+        0.9998723192676328
+      ],
+      "range": [
+        0.9998723192676328,
+        1.0007034532896923
+      ]
+    }
+  },
+  "secondary": "descriptive only, retaining all adverse/null outcomes",
+  "sign_probability_all_positive_if_independent": [
+    1,
+    64
+  ],
+  "study": "source-built whole-Cargo retired user instructions across six independent boots"
+}
