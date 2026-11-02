@@ -1,9 +1,13 @@
 """Build and audit the single, signed workspace compiler observation."""
 
+from contextlib import ExitStack
+import fcntl
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
+import stat
 import subprocess
 
 HERE = Path(__file__).resolve().parent
@@ -34,6 +38,37 @@ def environment(root, stage, work, signed):
     )
 
 
+def high_fd_preflight(kit, env):
+    """Exercise the VEX descriptor reader before the full Cargo histories."""
+    expected = {}
+    with ExitStack() as cleanup:
+        def remember(fd, access):
+            cleanup.callback(os.close, fd)
+            record = os.fstat(fd)
+            expected[fd] = (record.st_dev, record.st_ino, stat.S_IFMT(record.st_mode), access)
+
+        for _ in range(166):
+            read, write = os.pipe()
+            remember(read, os.O_RDONLY)
+            remember(write, os.O_WRONLY)
+        for original, minimum in ((read, 1177), (write, 1537)):
+            duplicate = fcntl.fcntl(original, fcntl.F_DUPFD_CLOEXEC, minimum)
+            remember(duplicate, expected[original][-1])
+        log = kit / "high-fds.log"
+        subprocess.run(
+            ["/usr/bin/valgrind", "--tool=cgured", "--quiet", f"--log-file={log}", "/usr/bin/true"],
+            env=dict(env, VALGRIND_LIB=str(kit / "vglib")), pass_fds=tuple(expected), check=True,
+        )
+    observed = {}
+    for line in log.read_text().splitlines():
+        if "CGUR FD " in line:
+            fd, *identity = map(int, line.split("CGUR FD ", 1)[1].split())
+            require(fd not in observed, "duplicate descriptor in VEX preflight")
+            observed[fd] = tuple(identity)
+    require(all(observed.get(fd) == value for fd, value in expected.items()), "high-fd preflight")
+    return dict(descriptors=len(expected), maximum=max(expected))
+
+
 def build(root, sdk, env):
     driver = sdk / "lib/librustc_driver-b03bf00bec23bb9a.so"
     require(sha(driver) == DRIVER, "unexpected signed compiler layout")
@@ -51,6 +86,7 @@ def build(root, sdk, env):
     return dict(
         version=version,
         driver=DRIVER,
+        high_fds=high_fd_preflight(kit, env),
         sources={p.name: sha(p) for p in sources},
         binaries={
             n: sha(kit / n)

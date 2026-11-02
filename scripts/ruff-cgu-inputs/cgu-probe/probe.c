@@ -1,5 +1,6 @@
 #include "pub_tool_basics.h"
 #include "pub_tool_tooliface.h"
+#include "pub_tool_libcassert.h"
 #include "pub_tool_libcbase.h"
 #include "pub_tool_libcprint.h"
 #include "pub_tool_debuginfo.h"
@@ -153,8 +154,41 @@ static Int fd_access(UInt n) {
 static void post(void){
     ULong count=VG_(sizeXA)(VG_(args_for_client));
     VG_(printf)("CGUR CLIENT %llu %s\n",count,VG_(args_the_exename));
-    for(UInt i=0;i<256;++i){struct vg_stat b;if(!VG_(fstat)(i,&b))
-        VG_(printf)("CGUR FD %u %llu %llu %u %d\n",i,b.dev,b.ino,b.mode&0170000,fd_access(i));}
+    /* Valgrind can inherit hundreds of open Cargo files, with sparse fd numbers.
+     * Query the kernel's current table; the fresh directory fd is our own. */
+    SysRes opened=VG_(open)("/proc/self/fd", VKI_O_RDONLY,0);
+    if(sr_isError(opened))VG_(tool_panic)("cannot enumerate compiler descriptors");
+    Int dir=(Int)sr_Res(opened);
+    ULong buffer[1024];
+    for(;;) {
+        Int size=VG_(getdents64)(dir,(struct vki_dirent64*)buffer,sizeof(buffer));
+        if(size<0)VG_(tool_panic)("reading /proc/self/fd failed");
+        if(size==0)break;
+        UInt offset=0;
+        while(offset<(UInt)size) {
+            const UInt head=__builtin_offsetof(struct vki_dirent64,d_name);
+            if((UInt)size-offset<=head)VG_(tool_panic)("truncated descriptor entry");
+            struct vki_dirent64 *entry=(void*)((UChar*)buffer+offset);
+            UInt length=entry->d_reclen;
+            if(length<=head||length>(UInt)size-offset)VG_(tool_panic)("invalid descriptor entry");
+            offset+=length;
+            const HChar *name=entry->d_name;
+            if(name[0]=='.')continue;
+            UInt number=0,j=0;
+            for(;j<length-head && name[j];++j) {
+                if(name[j]<'0'||name[j]>'9'||number>(2147483647u-(UInt)(name[j]-'0'))/10)
+                    VG_(tool_panic)("invalid numeric descriptor");
+                number=number*10+(UInt)(name[j]-'0');
+            }
+            if(!j||j==length-head)VG_(tool_panic)("unterminated numeric descriptor");
+            if(number==(UInt)dir)continue;
+            struct vg_stat info;
+            if(VG_(fstat)((Int)number,&info))VG_(tool_panic)("open descriptor disappeared");
+            VG_(printf)("CGUR FD %u %llu %llu %u %d\n",number,info.dev,info.ino,
+                        info.mode&0170000,fd_access(number));
+        }
+    }
+    VG_(close)(dir);
 }
 static void fini(Int rc){VG_(printf)("CGUR END %llu %d\n",seen,rc);}
 static void pre(void){
