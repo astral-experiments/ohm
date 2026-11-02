@@ -23,7 +23,7 @@ FLOOR = 32 * GIB
 INTERVAL = 0.25
 MAX_GAP = 2.0
 CHILD_GRACE_NS = 5_000_000_000
-BRANCH = "refs/heads/charlie/codex-21041-domain-production22"
+BRANCH = "refs/heads/charlie/codex-21041-derive-production22"
 STAGES = ("materialize", "prerequisites", "bolt-tools", "wild", "production", "native-qa")
 SENTINEL = ".ctfe22-physical-emergency-reserve"
 
@@ -116,14 +116,14 @@ def release(path, held):
 def context():
     e = os.environ
     assert e["GITHUB_REPOSITORY"] == "astral-experiments/ohm" and e["GITHUB_EVENT_NAME"] == "workflow_dispatch"
-    assert e["GITHUB_REF"] == BRANCH and e["BENCH_ARM"] == "callables_ctfe318_incoherent_domain"
+    assert e["GITHUB_REF"] == BRANCH and e["BENCH_ARM"] == "callables_ctfe318_incoherent_domain_proc_derive"
     assert e["GITHUB_ACTIONS"]=="true" and e["GITHUB_JOB"]=="build" and e["GITHUB_RUN_ATTEMPT"]=="1" and e["GITHUB_WORKFLOW_SHA"]==e["GITHUB_SHA"] and e["GITHUB_WORKFLOW_REF"]==e["GITHUB_REPOSITORY"]+"/.github/workflows/ci.yml@"+BRANCH
     assert e["RUNNER_OS"]=="Linux" and e["RUNNER_ARCH"]=="X64" and e["RUNNER_NAME"].startswith("nsc-runner-")
     assert re.fullmatch(r"/home/runner/work/ohm/ohm/?",e["GITHUB_WORKSPACE"])
     assert e["GITHUB_SHA"] == e["REVIEWED_HEAD"] and re.fullmatch("[0-9a-f]{40}",e["GITHUB_SHA"])
     w = Path(e["GITHUB_WORKSPACE"]).resolve()
     head=subprocess.check_output(["git","-C",w,"rev-parse","HEAD","HEAD^"],text=True).splitlines()
-    assert head==[e["GITHUB_SHA"],"4e34ea9c7232977f95498d7bf48d382157e8558b"]
+    assert head==[e["GITHUB_SHA"],'5f7e5680285caa6b9a848db810b63ef58dfe0143']
     assert e["GITHUB_RUN_ATTEMPT"]=="1"
     return w, w/"capacity-evidence"
 
@@ -365,7 +365,7 @@ def score(w,evidence):
     finished={name for _,name,act in sections if act=="ended: OK"}
     if complete:
         assert all(any(k.startswith(f"Stage {n} (") and " > " not in k for k in finished) for n in (1,3,5))
-        who=os.environ["BENCH_ARM"];arm=json.loads((HOOK/"domain-source.json").read_bytes())["source"]
+        who=os.environ["BENCH_ARM"];arm=json.loads((HOOK/"derive-source.json").read_bytes())["source"]
         assert src["role"]==role["role"]==who and src["source"]==arm and [role[k]for k in ("source_commit","source_tree","epoch")]==[arm[k]for k in ("commit","tree","epoch")]
         assert src["source"]["commit"]==role["source_commit"] and src["classification"]=="private unsigned production-recipe qualification"
         assert role["installed_original_runmake"]["final_linked_output"]=="LShift Or false 17\n" and role["bolt_note"] and role["execution_pgo"]
