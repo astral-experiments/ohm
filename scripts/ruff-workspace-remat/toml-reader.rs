@@ -1,7 +1,9 @@
+use ruff_ranged_value::{ValueSource, ValueSourceGuard};
 use ruff_workspace::options::Options;
 
 fn main() {
     let input = std::env::args().nth(1).expect("one document");
+    let _guard = ValueSourceGuard::new(ValueSource::Cli, false);
     let table = match input.parse::<toml::Table>() {
         Ok(table) => table,
         Err(_) => {

@@ -50,6 +50,13 @@ def enroll(r, source, registry):
         METHOD not in blobs[OLD][OPTIONS] and blobs[NEW][OPTIONS].count(METHOD) == 1,
         "wrong public method edit",
     )
+    guard = b"let _guard = ValueSourceGuard::new(ValueSource::Cli, false);"
+    caller = Path(__file__).with_name("toml-reader.rs").read_bytes()
+    r.need(
+        all(blobs[rev][PATHS[0]].count(guard) == 1 for rev in TREES)
+        and caller.count(guard) == 1 and caller.index(guard) < caller.index(b"Options::from_toml_table("),
+        "downstream caller must establish the historical CLI value source before deserializing",
+    )
     return blobs
 
 
@@ -90,22 +97,20 @@ def client(r, w, dest, rows, products, graph, root, work, env, rev, bodies):
     original = hash_bytes(Path(__file__).with_name("toml-reader.rs").read_bytes())
     r.need(r.sha(source) == original, "downstream source changed")
     unit = graph["units"][graph["roots"][0]]
-    (edge,) = [d for d in unit["dependencies"] if d["extern_crate_name"] == "toml"]
-    dep = graph["units"][edge["index"]]
-    r.need(
-        dep["pkg_id"].endswith("#toml@1.1.4+spec-1.1.0") and dep["target"]["kind"] == ["lib"],
-        "wrong TOML dependency",
-    )
-    toml = [
-        p
-        for p in products
-        if w.graph_key(p["package_id"], p["target"], p["features"])
-        == w.graph_key(dep["pkg_id"], dep["target"], dep["features"])
-    ]
-    toml_archive = w.p.artifact(toml, "toml")
-    (meta,) = [Path(f) for p in toml for f in p["filenames"] if f.endswith(".rmeta")]
-    r.need(meta.is_file() and meta == toml_archive.with_suffix(".rmeta"), "incorrect paired TOML metadata")
-    libs = {"ruff_workspace": w.p.artifact(products, "ruff_workspace"), "toml": meta}
+    libs = {"ruff_workspace": w.p.artifact(products, "ruff_workspace")}
+    for name, suffix in (("toml", "#toml@1.1.4+spec-1.1.0"), ("ruff_ranged_value", "/ruff_ranged_value#0.0.9")):
+        (edge,) = [d for d in unit["dependencies"] if d["extern_crate_name"] == name]
+        dep = graph["units"][edge["index"]]
+        r.need(dep["pkg_id"].endswith(suffix) and dep["target"]["kind"] == ["lib"], ("wrong dependency", name))
+        products_for_dep = [
+            p for p in products
+            if w.graph_key(p["package_id"], p["target"], p["features"])
+            == w.graph_key(dep["pkg_id"], dep["target"], dep["features"])
+        ]
+        archive = w.p.artifact(products_for_dep, name)
+        (meta,) = [Path(f) for p in products_for_dep for f in p["filenames"] if f.endswith(".rmeta")]
+        r.need(meta.is_file() and meta == archive.with_suffix(".rmeta"), ("incorrect paired metadata", name))
+        libs[name] = archive if name == "ruff_ranged_value" else meta
     dirs = sorted(
         {Path(f).parent for p in products for f in p["filenames"] if f.endswith((".rlib", ".rmeta", ".so"))}
         | {p for p in (work / "target/debug/deps", work / "build/debug/deps") if p.is_dir()}
