@@ -24,8 +24,8 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-domain-prod-open2' && github.sha == inputs.reviewed_head
-      && github.run_attempt == 1 && inputs.build_run_id == '41414598941' && inputs.build_head == '5f7e5680285caa6b9a848db810b63ef58dfe0143' && inputs.sdk_lock_sha256 == '5a7c86d42439a1aac1554c4206d7b1a317c123eec3502071a4e16c852d6758d7'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-domain-prod-certified' && github.sha == inputs.reviewed_head
+      && github.run_attempt == 1 && inputs.build_run_id == '41414598941' && inputs.build_head == '5f7e5680285caa6b9a848db810b63ef58dfe0143' && inputs.sdk_lock_sha256 == '403777de9a8827bcf95517caf1f55998fc39bfa408e67b6a162ef77cd6f8595b'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 170
     env:
