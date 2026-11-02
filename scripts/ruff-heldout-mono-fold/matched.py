@@ -148,7 +148,7 @@ def track(which):
     fresh(which+'-before-fresh-new');visit(which,'new','clean',env,key,set(),focus=focus)
 
 def governance():
-    need(os.environ['GITHUB_REPOSITORY']=='astral-experiments/ohm' and os.environ['GITHUB_REF']=='refs/heads/charlie/qa-heldout-mono-fold-27470-20261102' and os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch','wrong hosted event')
+    need(os.environ['GITHUB_REPOSITORY']=='astral-experiments/ohm' and os.environ['GITHUB_REF']=='refs/heads/charlie/qa-heldout-test-residual-27470-20261102' and os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch','wrong hosted event')
     for repo,rev in ((WS/'qa',os.environ['REVIEWED_HEAD']),(FACTORY,CFG['factory_receiver']),(QUERY,CFG['profile_reader'])):
         need(subprocess.check_output(['git','-C',repo,'rev-parse','HEAD'],text=True).strip()==rev and not subprocess.check_output(['git','-C',repo,'status','--porcelain','--untracked-files=all']), 'unregistered diagnostic source')
     need(os.environ['REVIEWED_HEAD']==os.environ['GITHUB_SHA'],'wrong QA commit')
