@@ -34,7 +34,15 @@ def fetch():
             return json.loads(subprocess.check_output(["gh","api",url+p]))
         a, r = api("/artifacts/"+str(aid)), api("/runs/"+str(run))
         assert (a["id"],a["size_in_bytes"],a["digest"],a["expired"],a["workflow_run"]["id"],a["workflow_run"]["head_sha"]) == (aid,size,"sha256:"+digest,False,run,head)
-        assert r["head_sha"] == head and r["conclusion"] == "success" and r["run_attempt"] == 1
+        job_id,job_name,conclusion,steps = (
+            (124570376741,"Native SDK (x86_64-unknown-linux-gnu)","failure",["Reopen every completed SDK member","Publish reusable native SDK"]) if role=="parent" else
+            (124603612571,"Cargo 330 native qualification (x86_64-unknown-linux-gnu)","success",["Build the exact Cargo 330 revision","Retain the exact binary, comparison logs and partial results"]))
+        job=api("/jobs/"+str(job_id))
+        assert r["head_sha"] == head and r["status"]=="completed" and r["conclusion"]==conclusion and r["run_attempt"] == 1
+        assert job["name"]==job_name and job["run_id"]==run and job["head_sha"]==head and job["conclusion"]=="success"
+        actual={s["name"]:s["conclusion"] for s in job["steps"]}
+        assert all(actual.get(k)=="success" for k in steps)
+        census.put(E/(role+"-constructor.json"),{"run":run,"run_conclusion":conclusion,"job":job_id,"outcomes":actual})
         pack = W/(role+".zip")
         with pack.open("xb") as f:
             subprocess.run(["gh","api",url+"/artifacts/"+str(aid)+"/zip"],stdout=f,check=True)
