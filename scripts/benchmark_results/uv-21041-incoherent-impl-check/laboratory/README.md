@@ -1,0 +1,5 @@
+# Native rustc instructions on uv #21041
+
+Run `python3 -ISB verify.py --self-test` from this directory. It reads the trusted snapshots without calling a compiler or downloading an artifact. The optional `--original PATH` compares every included member against the original GitHub ZIP. `--github-cli /path/to/gh-auto` verifies its private Actions provenance with an authorized account.
+
+The compiler builds differ only in how the compiler tracks an external crate’s incoherent-implementation directory. Both use the signed Ohm −22 Cargo executable. The primary measures retired userspace instructions in the real uv_metadata rustc process and its threads across eight ordinary original edits. Seven other rustc processes, their sum, inherited whole-Cargo instructions and separately unwrapped bare wall are reported. The primary requires both four-pair median ratios below 0.80 and a pooled exact one-sided sign test at 0.05; ties count against. Full original metadata products and the independent semantic decoder remain bound to the upstream ZIP by origin.json.

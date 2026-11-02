@@ -1,0 +1,172 @@
+{
+  "actual_build": [
+    "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "/home/runner/work/ohm/ohm/source/rust/x.py",
+    "--ci",
+    "false",
+    "--config",
+    "/home/runner/work/ohm/ohm/trait-evidence/bootstrap.toml",
+    "build",
+    "--stage",
+    "1",
+    "-j8",
+    "--host",
+    "x86_64-unknown-linux-gnu",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "compiler/rustc",
+    "library",
+    "src/tools/rustdoc"
+  ],
+  "arms": {
+    "fa7a_stack_ctfe318_handwritten_coroutine_callables": {
+      "artifact": {
+        "bytes": 216299397,
+        "id": 13119343111,
+        "sha256": "1bf9aabdfc5092e1a8f48d3b669c6475753daf6d6e3cbcb3ae471bc7af1fef28"
+      },
+      "artifact_name": "callables-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables",
+      "branch": "charlie/codex-21041-callables-stage1",
+      "checked_files": {
+        ".github/workflows/ci.yml": "6509ba4cf3ad1f5d3aee7076b33731c8759d52af55780561b71eae06e299f72d",
+        "scripts/callables-stage1/arms.json": "53e633715a3d384fdbca43cfdc25dfa2104d47e3b78ce91381447ef602133db8",
+        "scripts/callables-stage1/callable-source.json": "0f3d01e72692c222bcba14f57476c21ff63523f73ab444caa9f569311e36eded",
+        "scripts/callables-stage1/callable.pack": "ec0280b7d227dea98866d09dd04d8468cc06c7394bd9b843799ebfe813b44817",
+        "scripts/callables-stage1/callables-oracle.py": "3326cdf8a441b33e95acc74f096b2ed02991d8393486d85363056b7e13819f04",
+        "scripts/callables-stage1/candidates.pack": "39f77995d828e3c5f40e933dc203013c0a7c74a3448e73b7024cbdc05861a46b",
+        "scripts/callables-stage1/coroutine-source.json": "a56e08abd18b18cfa47f6325059fe01870be6adec1efaec05df8cae3f118b406",
+        "scripts/callables-stage1/coroutine.pack": "0f076ac4f64ac883f269a48efac1bdeb859d09a3d136f646c598df66863722b1",
+        "scripts/callables-stage1/export_sdk.py": "241cead5c7c6db7021ca075888c9795001374f1b624ee1ba294fe317b75dc7b1",
+        "scripts/callables-stage1/files.json": "390e84135b2e6836cd2cba107eefb0de2b0d9e51cb06dbf2c6416bd0fc1ddef4",
+        "scripts/callables-stage1/gate.py": "63c6941c5f59c353a6beac9873f7cb517a5f97f355a256d098b3cb5dbb148123",
+        "scripts/callables-stage1/materialize.py": "469fef8f3a15781d702025cced598710d8311b6260ee5ddad19e08ab2bc42ef3",
+        "scripts/callables-stage1/oracle.py": "c845db0781def1b5f3bac50df44eb01cf917fc0ce482fa4a498e8d7b2cdfcbb4",
+        "scripts/callables-stage1/profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219",
+        "scripts/callables-stage1/stage.py": "2947b7cb2483c02b8900007dca9fcb326f9b8d377a0ff3bea7dfac5beb39a04a"
+      },
+      "checkout": "builder",
+      "command_log": "8a81bf214904399fac26d1ddb92a512c033c2bd5b861de476617e69d7b2e3f17",
+      "driver": "8de096a2425ca8580071d117345aa04d76db2e4617ae72a0ac8b60f1a7f2a5de",
+      "head": "ee90d022e7abb6c2c2f61b751c49de06bba29aed",
+      "job_id": 125114385350,
+      "job_name": "Callable stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables)",
+      "parent": "797d99e885991d0fef500102392e2117562d9ebf",
+      "required_steps": [
+        "Verify all three source packs and the direct callable child",
+        "Build optimized compiler and host std, run correctness suites, and export the SDK"
+      ],
+      "rid": 41395027122,
+      "scripts": "scripts/callables-stage1",
+      "source": {
+        "commit": "f22825348d834ad9a8ef3934647181fb69f778ae",
+        "epoch": 43311,
+        "tree": "96580055f15f61821eefb6875350ce0570995d8c"
+      }
+    },
+    "fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain": {
+      "artifact": {
+        "bytes": 219945977,
+        "id": 13123968445,
+        "sha256": "7898239bb8bff1e6a7ec5fc2cc79cb946f894d72c88ec2b26831662b1959fe45"
+      },
+      "artifact_name": "domain-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain",
+      "branch": "charlie/codex-21041-incoherent-domain-stage1",
+      "checked_files": {
+        ".github/workflows/ci.yml": "f1dcec3324e5bf5ffc01b69b8736b8b733bd96c0720acb7bfff756c6773fae19",
+        "scripts/incoherent-domain-stage1/arms.json": "e46a0caeccf5e358499b6b27331ae23e744464be07dab6d8d624a2e62d18c020",
+        "scripts/incoherent-domain-stage1/callable-source.json": "0f3d01e72692c222bcba14f57476c21ff63523f73ab444caa9f569311e36eded",
+        "scripts/incoherent-domain-stage1/callable.pack": "ec0280b7d227dea98866d09dd04d8468cc06c7394bd9b843799ebfe813b44817",
+        "scripts/incoherent-domain-stage1/callables-oracle.py": "3326cdf8a441b33e95acc74f096b2ed02991d8393486d85363056b7e13819f04",
+        "scripts/incoherent-domain-stage1/candidates.pack": "39f77995d828e3c5f40e933dc203013c0a7c74a3448e73b7024cbdc05861a46b",
+        "scripts/incoherent-domain-stage1/coroutine-source.json": "a56e08abd18b18cfa47f6325059fe01870be6adec1efaec05df8cae3f118b406",
+        "scripts/incoherent-domain-stage1/coroutine.pack": "0f076ac4f64ac883f269a48efac1bdeb859d09a3d136f646c598df66863722b1",
+        "scripts/incoherent-domain-stage1/domain-oracle.py": "0574aea58e30cc9af22a06be5bf934d56ec8b609aa6cb03dfb25440a45b241fe",
+        "scripts/incoherent-domain-stage1/domain-source.json": "e5ec7584191f300a3526e79ddd2663747880ee752b0dac1b981ca01c080413db",
+        "scripts/incoherent-domain-stage1/domain.pack": "df71905d2519363b2d9abff55af598cf5f522d2cde7695aab2bb07562a07572e",
+        "scripts/incoherent-domain-stage1/export_sdk.py": "241cead5c7c6db7021ca075888c9795001374f1b624ee1ba294fe317b75dc7b1",
+        "scripts/incoherent-domain-stage1/files.json": "b0ec8474f6cf71364420780d2a879e4301765a18f6440e1f85d554933153f946",
+        "scripts/incoherent-domain-stage1/gate.py": "63c6941c5f59c353a6beac9873f7cb517a5f97f355a256d098b3cb5dbb148123",
+        "scripts/incoherent-domain-stage1/materialize.py": "e665a1f00ba4c86ea9c1f44a607c332c6bc0fdbca8f1f1cd32ccd71784b5667f",
+        "scripts/incoherent-domain-stage1/oracle.py": "c845db0781def1b5f3bac50df44eb01cf917fc0ce482fa4a498e8d7b2cdfcbb4",
+        "scripts/incoherent-domain-stage1/profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219",
+        "scripts/incoherent-domain-stage1/stage.py": "d652ccd17125cdbbaadad492e428462d45456449be3c1f727ea3dfc9e486febc"
+      },
+      "checkout": "inventory-builder",
+      "command_log": "3c9460a6dac72e3f9c6e0d904ddece5eb778f60030319872b8e065ad54eea8cc",
+      "driver": "47927d7bd229bfe1faa63c8b96f7886eb24c3121097e2e0d8c0edf8dc9c5f0ac",
+      "head": "ce2c32fb7121fce03a303e46c4be3f05935ec265",
+      "job_id": 125153031671,
+      "job_name": "Incoherent-directory stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_do...",
+      "parent": "acfa00adf70348b8555820e03c038731b847f351",
+      "required_steps": [
+        "Verify all four source packs and the direct f228 child",
+        "Build optimized compiler and host std, run correctness suites, and export the SDK"
+      ],
+      "rid": 41407590585,
+      "scripts": "scripts/incoherent-domain-stage1",
+      "source": {
+        "commit": "b9b3f6bba90145e25eb3b76864cfd0b5f4cbdc1f",
+        "epoch": 43317,
+        "tree": "8e353a94876b12f57f10fb5e2988ba305d538266"
+      }
+    }
+  },
+  "bootstrap_sha256": "45880ce3806d4ce13439f4235d2d8af43465b6f685244b39419252851f91692f",
+  "capsules_from_independent_source_enrollments": true,
+  "native_receipt_sha256": "570e2ccff22b874b48047ee9777ad6e56ad247ad42e47c4606f4724e08d03913",
+  "prior_boots": {
+    "41379994255": {
+      "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
+      "raw_sha256": "f3f19e05c29b16520b996d0b1557555522465fc99b213af4e789befb721c2ade"
+    },
+    "41385306015": {
+      "boot": "fc71919f-27b4-4483-ab95-9bcac5e7131b",
+      "raw_sha256": "c6abea2a2978d98c8ecd250e42cf1b6f7ce2b2e4bb41964a0ee1b5f1c4bca376"
+    },
+    "41393501771": {
+      "boot": "db4d2941-1bd1-402f-8099-cc50036b6df3",
+      "raw_sha256": "e0c2483d07ffb8f81a44209a016ee0187f07a78a85399d9fb7a5693b008d8842"
+    },
+    "41399090905": {
+      "boot": "8461ebca-9583-4d70-8eac-198744186904",
+      "raw_sha256": "f67f1edcb62f453d08caa7d8efa8996281277b4e17e13c112d87da825f00f92f"
+    },
+    "41403723884": {
+      "boot": "8287559a-635a-47d0-bc39-859bb3efd4f2",
+      "raw_sha256": "2fb75a9fc058b58a7dddc2ab3706432d3cc3410ddef8b5c4743c1b4895e96471"
+    },
+    "41404703005": {
+      "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
+      "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
+    },
+    "41406359806": {
+      "boot": "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
+      "raw_sha256": "725410f6d7202a0922756cfcad85e421c24e9b9ef23886f43aff111732ea22ab"
+    },
+    "41407544748": {
+      "artifact": 13124530356,
+      "boot": "13895848-ed2e-435a-b313-9e006b9ff3e2",
+      "raw_sha256": "5fa8a1a93165f1ca3f4e2fdf339be44368feb5d360b810d36c61b26a29abf769"
+    },
+    "41411015186": {
+      "artifact_id": 13125113101,
+      "boot": "105d4e65-c7e4-4912-b8be-39318a1ebd61",
+      "origin_artifact_sha256": "fd2fd1436baffae76492e472b67c9073607cf00af8767b48ad33a8c5e36834d7",
+      "raw_sha256": "4a2b72ff1493d6f4525591b973c6483a50008e5f1f066b89eadd0695c69f1609"
+    },
+    "41411252543": {
+      "artifact_id": 13125512762,
+      "boot": "7bf853cc-35d6-49bd-ab54-994d55b3d111",
+      "origin_artifact_sha256": "60f88028ed66d67fa439a5401cd5ae82b33a0f21664465134b9c1497d1b43faf",
+      "raw_sha256": "7d452270c6bee2b67b9aa8d45863ed4fceae292e0e7ea26164d8f94734ed8723"
+    }
+  },
+  "producer": {
+    "head": "ce2c32fb7121fce03a303e46c4be3f05935ec265",
+    "id": 41407590585
+  },
+  "roles": [
+    "fa7a_stack_ctfe318_handwritten_coroutine_callables",
+    "fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain"
+  ]
+}
