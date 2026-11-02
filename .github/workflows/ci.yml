@@ -1,4 +1,4 @@
-name: Build the callable lookup compiler with the signed Ohm -22 production recipe
+name: Build the incoherent-impl domain compiler with the signed Ohm -22 production recipe
 on:
   workflow_dispatch:
     inputs:
@@ -9,14 +9,14 @@ on:
 permissions: {}
 jobs:
   build:
-    name: Production GNU callable SDK
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-callable-production22' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    name: Production GNU incoherent-impl domain SDK
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-domain-production22' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     permissions:
       contents: read
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 360
     env:
-      BENCH_ARM: callables_ctfe318
+      BENCH_ARM: callables_ctfe318_incoherent_domain
       OHM_TOOLCHAIN: ohm-1.99.0-22
       OHM_TARGET: x86_64-unknown-linux-gnu
       PYTHONDONTWRITEBYTECODE: "1"
@@ -75,11 +75,13 @@ jobs:
           sparse-checkout: |-
             scripts/cargo-diagnostic-fix
             scripts/ohm-apple-zmij/cargo293
+      - name: Validate the independently qualified stage1 hardware prerequisite
+        run: python3 -ISB scripts/ctfe22-gnu/stage1-prerequisite.py scripts/ctfe22-gnu/stage1-qualified.json
       - name: Admit this production workspace and allocate its physical emergency reserve
         run: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py init
       - name: Reconstruct and verify the exact compiler source
         shell: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py watch materialize {0}
-        run: python3 -IB scripts/ctfe22-gnu/materialize-callable.py "$BENCH_ARM"
+        run: python3 -IB scripts/ctfe22-gnu/materialize-domain.py "$BENCH_ARM"
       - name: Install native GNU bootstrap prerequisites
         shell: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py watch prerequisites {0}
         run: |
@@ -182,7 +184,7 @@ jobs:
         id: sdk
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: callable-production-sdk
+          name: domain-production-sdk
           path: trait-sdk/
           if-no-files-found: error
           compression-level: 0
@@ -192,7 +194,7 @@ jobs:
         id: qa
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: callable-production-qa-attempt-${{ github.run_attempt }}
+          name: domain-production-qa-attempt-${{ github.run_attempt }}
           path: trait-evidence/
           if-no-files-found: warn
           retention-days: 14

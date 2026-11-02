@@ -1,0 +1,131 @@
+{
+  "changes": {
+    "compiler/rustc_hir_analysis/src/coherence/inherent_impls.rs": "M",
+    "compiler/rustc_hir_analysis/src/coherence/mod.rs": "M",
+    "compiler/rustc_incremental/src/persist/file_format.rs": "M",
+    "compiler/rustc_metadata/src/rmeta/decoder.rs": "M",
+    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs": "M",
+    "compiler/rustc_middle/src/hooks/mod.rs": "M",
+    "compiler/rustc_middle/src/queries.rs": "M",
+    "compiler/rustc_middle/src/query/keys.rs": "M",
+    "compiler/rustc_middle/src/ty/trait_def.rs": "M",
+    "tests/run-make/crate-incoherent-impl-domain/local.rs": "A",
+    "tests/run-make/crate-incoherent-impl-domain/owner.rs": "A",
+    "tests/run-make/crate-incoherent-impl-domain/reader.rs": "A",
+    "tests/run-make/crate-incoherent-impl-domain/rmake.rs": "A",
+    "tests/run-make/crate-incoherent-impl-domain/roster.rs": "A"
+  },
+  "files": {
+    "compiler/rustc_hir_analysis/src/coherence/inherent_impls.rs": "f4fefb1bfbaa543ca381337dbd2af2c5897a035c",
+    "compiler/rustc_hir_analysis/src/coherence/mod.rs": "18235cab3b21c92ac788c88c3331d2e4643d7088",
+    "compiler/rustc_incremental/src/persist/file_format.rs": "6038cf84ae2b3aed388cf222de6bb338bd6ceb8c",
+    "compiler/rustc_metadata/src/rmeta/decoder.rs": "521d9ba8e9a2d6869ee7626e08b4191daab6b77b",
+    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs": "4b4d76eda9d3859baeb2f28b46a35f3ddb654020",
+    "compiler/rustc_middle/src/hooks/mod.rs": "a1990b42a4ec71f7539040b21191f63836c18df5",
+    "compiler/rustc_middle/src/queries.rs": "84e62af67f9767f182311cff18b6fb389b1e20be",
+    "compiler/rustc_middle/src/query/keys.rs": "2e8ab07d31498ec21c9611539b7581dc8b75ec39",
+    "compiler/rustc_middle/src/ty/trait_def.rs": "b5c0df7eea1299cf1f371c155262fd9791c49bf8",
+    "tests/run-make/crate-incoherent-impl-domain/local.rs": "2493cf102d3498ba66745da69fe616f8568c6c2e",
+    "tests/run-make/crate-incoherent-impl-domain/owner.rs": "eda2abd20b473bb323011083fa6584b860b20198",
+    "tests/run-make/crate-incoherent-impl-domain/reader.rs": "5a180497558e50524025aee9c3b784b4911251d1",
+    "tests/run-make/crate-incoherent-impl-domain/rmake.rs": "fe15c81459d899431f345a8f0744f42b18975b12",
+    "tests/run-make/crate-incoherent-impl-domain/roster.rs": "8f9a5804dbe11306486563404a24d457fd335be5"
+  },
+  "identical_non_epoch_postimages": [
+    "compiler/rustc_hir_analysis/src/coherence/inherent_impls.rs",
+    "compiler/rustc_hir_analysis/src/coherence/mod.rs",
+    "compiler/rustc_metadata/src/rmeta/decoder.rs",
+    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs",
+    "compiler/rustc_middle/src/hooks/mod.rs",
+    "compiler/rustc_middle/src/queries.rs",
+    "compiler/rustc_middle/src/query/keys.rs",
+    "compiler/rustc_middle/src/ty/trait_def.rs",
+    "tests/run-make/crate-incoherent-impl-domain/local.rs",
+    "tests/run-make/crate-incoherent-impl-domain/owner.rs",
+    "tests/run-make/crate-incoherent-impl-domain/reader.rs",
+    "tests/run-make/crate-incoherent-impl-domain/rmake.rs",
+    "tests/run-make/crate-incoherent-impl-domain/roster.rs"
+  ],
+  "measurement_plan_sha256": "1a4cd14fc2776f0e73625fe205f197e044b7b5f68dc6ff2cc64f9a763848dd8e",
+  "native_fixture": "crate-incoherent-impl-domain",
+  "objects_sha256": "33c74dc7aad5900ed708b85079daaae042155c4515fc03bda8e5709cb0bdd1c2",
+  "pack_bytes": 104421,
+  "pack_git_id": "bbd0d020d79166c3fbac4a2a061e650b17e117da",
+  "pack_objects": 35,
+  "pack_sha256": "7dfc978d69b648546d46bbd5cadd53586ca173756e60c4963ccf22915fa68749",
+  "parent": {
+    "commit": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+    "epoch": 43309,
+    "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4"
+  },
+  "parent_files": {
+    "compiler/rustc_hir_analysis/src/coherence/inherent_impls.rs": "4e3aa41942845737d87f2efb70da2dcaf57063ed",
+    "compiler/rustc_hir_analysis/src/coherence/mod.rs": "894cd584ae41d74fa0c3f9c9f65203a6276acfbd",
+    "compiler/rustc_incremental/src/persist/file_format.rs": "5c7ba7dedf312913f2107d410cf4dac263de98df",
+    "compiler/rustc_metadata/src/rmeta/decoder.rs": "791eead8723d75ab2eafbfdcd128f800f1269674",
+    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs": "f7249daeac4d42eb8ad235427cb6d1a67baf5634",
+    "compiler/rustc_middle/src/hooks/mod.rs": "be36a2ebda53a3368a600b74c699442c24af0490",
+    "compiler/rustc_middle/src/queries.rs": "b3dbd5b04f80a33909f190a5cef829d904523c37",
+    "compiler/rustc_middle/src/query/keys.rs": "7e18b765fd54901860a14f2583a5a2800f8355c5",
+    "compiler/rustc_middle/src/ty/trait_def.rs": "0721ed75f8556bfc8a44f3a717c4d3680712eeee"
+  },
+  "parent_service": {
+    "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
+    "producer": 41398925829,
+    "qa": {
+      "digest": "sha256:9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
+      "id": 13122138377,
+      "name": "callable-production-qa-attempt-1",
+      "size_in_bytes": 296464
+    },
+    "role_record_sha256": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
+    "sdk": {
+      "digest": "sha256:8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1",
+      "id": 13122178340,
+      "name": "callable-production-sdk",
+      "size_in_bytes": 359917871
+    },
+    "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+    "source_record_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
+  },
+  "published_parent_projection_sha256": "43c92b47285597d183ea26ee73eaa764f86cf718bb8a74d50506be6a4e972c0a",
+  "published_parent_source_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e",
+  "role": "callables_ctfe318_incoherent_domain",
+  "source": {
+    "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
+    "ctfe_blob_ids": {
+      "compiler/rustc_incremental/src/persist/file_format.rs": "6038cf84ae2b3aed388cf222de6bb338bd6ceb8c",
+      "compiler/rustc_middle/src/mir/interpret/mod.rs": "833e85841a864df51185d4757962381149839b76",
+      "compiler/rustc_middle/src/mir/interpret/tests.rs": "19d8f788d5e29ab0cd3b7f9826042bdb7c77130e",
+      "tests/run-make/rdr-public-hash-ctfe-literal-identity/lib.rs": "85fe829d8474b6cfce28c0f7c483b6f75ddd85fd",
+      "tests/run-make/rdr-public-hash-ctfe-literal-identity/main.rs": "b77c91d6d0203aba236987a6bc9f9fa85c7715a2",
+      "tests/run-make/rdr-public-hash-ctfe-literal-identity/right.rs": "0f2bb7d7f6da8a0d7221796bfd8ad0bd4a8c7a2c",
+      "tests/run-make/rdr-public-hash-ctfe-literal-identity/rmake.rs": "0567540a4eea5724ead25d17d098dfd3877a7795"
+    },
+    "ctfe_patch_sha256": "f9963a3784be4ecc840ba0d2619657b930a63d06a4c387af54ad6df754141ffb",
+    "epoch": 43317,
+    "files_from_control": [
+      "compiler/rustc_hir_analysis/src/coherence/inherent_impls.rs",
+      "compiler/rustc_hir_analysis/src/coherence/mod.rs",
+      "compiler/rustc_incremental/src/persist/file_format.rs",
+      "compiler/rustc_metadata/src/rmeta/decoder.rs",
+      "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs",
+      "compiler/rustc_middle/src/hooks/mod.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/query/keys.rs",
+      "compiler/rustc_middle/src/ty/trait_def.rs",
+      "tests/run-make/crate-incoherent-impl-domain/local.rs",
+      "tests/run-make/crate-incoherent-impl-domain/owner.rs",
+      "tests/run-make/crate-incoherent-impl-domain/reader.rs",
+      "tests/run-make/crate-incoherent-impl-domain/rmake.rs",
+      "tests/run-make/crate-incoherent-impl-domain/roster.rs"
+    ],
+    "parent": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+    "parent_tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4",
+    "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2",
+    "upstream_ctfe_commit": "df2c077a113a709ab379c8ec34e62c94c7513325"
+  },
+  "source_role_sha256": "69f19f63eb905f7103aca35ad1b4ea532260b7e25771766d05323b0095d6b3be",
+  "stage1_qualification_sha256": "78fa58ed82d6c7f2d3beefdd42a28e6988819292e64670347a99c03f17da3ee5",
+  "stage1_source": "b9b3f6bba90145e25eb3b76864cfd0b5f4cbdc1f"
+}
