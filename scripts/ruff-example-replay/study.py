@@ -9,9 +9,10 @@ import shutil
 import subprocess
 import sys
 
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 from factory import build, need, save, sha
 
-HERE = Path(__file__).resolve().parent
 EXAMPLE = "struct_name_as_context"
 PACKAGE = "ruff_annotate_snippets"
 WILD = "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
@@ -250,12 +251,36 @@ def gate(root, src, env, out, w, seed, binaries):
             reset(env, seed, w)
             value = execute(root, src, native_env, s / ("clean-" + state), args,
                             error="provider" if state == "bad" else None, trace=True)
+            if state == "bad":
+                # An empty graph can encounter the malformed library on a prerequisite
+                # executable. The separate forced full owner below tests the example too.
+                need(any(r["kind"] == "wild" for r in value["execs"]), "empty malformed native link")
+                continue
             example_execs(value, "full")
-            if state != "bad":
-                expected = image if state == "absent" else initial[state]
-                got = emitted(value, src, native_env, None if state == "absent" else state)
-                need(got == expected, ("independent clean native bytes and outputs", state))
-                clean[state] = got
+            expected = image if state == "absent" else initial[state]
+            got = emitted(value, src, native_env, None if state == "absent" else state)
+            need(got == expected, ("independent clean native bytes and outputs", state))
+            clean[state] = got
+        # Only this example's private products are removed from the independently built
+        # graph. Its NEW source and compiler flags remain byte-for-byte identical.
+        full, = [r["args"] for r in value["execs"] if r["kind"] == "rustc" and "--crate-name" in r["args"]
+                 and r["args"][r["args"].index("--crate-name")+1] == EXAMPLE]
+        owner_dir = Path(full[full.index("--out-dir")+1])
+        roots = [Path(env[k]) for k in ("CARGO_BUILD_BUILD_DIR", "CARGO_TARGET_DIR")]
+        need(owner_dir.is_dir() and not owner_dir.is_symlink() and owner_dir.name == "out" and
+             any(owner_dir.is_relative_to(path) for path in roots) and
+             owner_dir.parent.parent.name == PACKAGE, ("private example's compiled output", owner_dir))
+        promoted = Path(value["executables"]["example/"+EXAMPLE+"/False"][0])
+        need(promoted.name == EXAMPLE and (promoted.is_relative_to(roots[1]) or promoted.parent == owner_dir),
+             "promoted example")
+        shutil.rmtree(owner_dir)
+        if promoted.exists():
+            promoted.unlink()
+        set_provider(shadow, "bad")
+        forced = execute(root, src, native_env, s / "independent-full-owner-malformed", args,
+                         error="provider", trace=True)
+        example_execs(forced, "full")
+        set_provider(shadow, "absent")
         corrected_oracle = oracle(w, s / "corrected-behavior", src, native_env, "corrected")
         winners[arm] = {"old_image":old_image,"new_image":image,"providers":clean,
                         "old_oracle":old_oracle,"corrected_oracle":corrected_oracle}

@@ -66,18 +66,30 @@ jobs:
           path: ${{ runner.temp }}/ruff-example-replay/evidence
           if-no-files-found: warn
           retention-days: 14
-      - name: Pass the two measured Cargo programs to independent PMU workers
-        if: success()
+      - name: Retain the physical Cargo pair and its current qualification status
+        id: pair
+        if: always()
         run: |
           set -euo pipefail
-          cd "$RUNNER_TEMP/ruff-example-replay"
+          root="$RUNNER_TEMP/ruff-example-replay"
+          if ! test -s "$root/cargo-parent" || ! test -s "$root/cargo-candidate"; then exit 0; fi
+          cd "$root"
           mkdir matched
-          cp cargo-parent cargo-candidate evidence/terminal.json matched/
-          tar -I 'zstd -5 -T2' -cf matched-cargo.tar.zst -C matched cargo-parent cargo-candidate terminal.json
-      - if: success()
+          cp cargo-parent cargo-candidate matched/
+          if test -s evidence/terminal.json; then
+            cp evidence/terminal.json matched/
+            members="cargo-parent cargo-candidate terminal.json"
+            echo 'name=ruff-example-replay-cargo-pair' >> "$GITHUB_OUTPUT"
+          else
+            cp evidence/{parent,candidate}-binary.json matched/
+            members="cargo-parent cargo-candidate parent-binary.json candidate-binary.json"
+            echo 'name=ruff-example-replay-unqualified-cargo-pair' >> "$GITHUB_OUTPUT"
+          fi
+          tar -I 'zstd -5 -T2' -cf matched-cargo.tar.zst -C matched $members
+      - if: always() && steps.pair.outputs.name != ''
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ruff-example-replay-cargo-pair
+          name: ${{ steps.pair.outputs.name }}
           path: ${{ runner.temp }}/ruff-example-replay/matched-cargo.tar.zst
           if-no-files-found: error
           retention-days: 7
