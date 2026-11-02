@@ -2,7 +2,7 @@
 import hashlib,json,os,re,shutil,subprocess,sys
 from pathlib import Path
 H=Path(__file__).resolve().parent;sys.path.insert(0,str(H));import sdk as s
-S=s.read(H/"arms.json");S["arms"]["callables_ctfe318"]=s.read(H/"callable-source.json")["source"];S["arms"]["callables_ctfe318_incoherent_domain"]=s.read(H/"domain-source.json")["source"];S["arms"]["callables_ctfe318_incoherent_domain_proc_derive"]=s.read(H/"derive-source.json")["source"];HOST=s.TARGET;UNIT="only_the_original_ctfe_literal_id_is_restored";PGO="verified executed PGO profile coverage for rustc, rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt"
+S=s.read(H/"arms.json");S["arms"]["callables_ctfe318"]=s.read(H/"callable-source.json")["source"];S["arms"]["callables_ctfe318_incoherent_domain"]=s.read(H/"domain-source.json")["source"];S["arms"]["callables_ctfe318_incoherent_domain_proc_derive"]=s.read(H/"derive-source.json")["source"];S["arms"]["callables_ctfe318_incoherent_domain_proc_derive_trait_origin"]=s.read(H/"origin-source.json")["source"];HOST=s.TARGET;UNIT="only_the_original_ctfe_literal_id_is_restored";PGO="verified executed PGO profile coverage for rustc, rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt"
 def out(*a,env=None):return subprocess.check_output(a,text=True,env=env).strip()
 def obj(data):return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 def fixture(role,where):
@@ -12,16 +12,17 @@ def fixture(role,where):
  return expected
 def suites(role):
  names=[S["fixture_directory"],"tests/run-make/rdr-public-hash-native-exports"]
- assert role=="callables_ctfe318_incoherent_domain_proc_derive"
+ assert role=="callables_ctfe318_incoherent_domain_proc_derive_trait_origin"
  names.extend(['tests/run-make/trait-impl-bucket-projection', 'tests/run-make/trait-impl-bucket-coroutine', 'tests/run-make/trait-impl-bucket-callables', 'tests/run-make/trait-impl-bucket-sparse-foreign'])
  names.append("tests/run-make/crate-incoherent-impl-domain")
- names.append("tests/run-make/proc-derive-impl-identity")
+ names.extend(["tests/run-make/proc-derive-impl-identity", "tests/run-make/trait-impl-directory"])
  return names
 def gate_suites(log,role):
  for test in suites(role):assert log.splitlines().count("test [run-make] "+test+" ... ok")==1
 def gate_log(log,kind):
  if kind=="unit":key="test mir::interpret::tests::"+UNIT+" ... ok"
  elif kind=="derive-unit":key="test definitions::proc_derive_impl_tests::a_derived_slot_reserves_the_dense_ordinal_and_preserves_full_hash_collision_errors ... ok"
+ elif kind=="origin-unit":key="test rmeta::decoder::tests::trait_directory_by_defining_crate ... ok"
  else:key="test [run-make] "+S["fixture_directory"]+" ... ok"
  assert log.splitlines().count(key)==1 and re.search(r"(?m)^test result: ok\. [1-9]\d* passed; 0 failed; 0 ignored;",log) and "test result: FAILED" not in log
 def native(role):
@@ -49,7 +50,7 @@ def native(role):
  assert shutil.disk_usage(W).free >= 50*(1<<30),"need 50 GiB free after production archive for isolated native checks"
  base=[sys.executable,str(R/"x.py"),"--ci","false","--config",str(cfg),"test","--stage","1","--host",HOST,"--target",HOST]
  test_info={}
- for kind,extra in [("unit",["compiler/rustc_middle","--test-args",UNIT]),("derive-unit",["compiler/rustc_hir_id","--test-args","proc_derive_impl_tests"]),("run-make",suites(role))]:
+ for kind,extra in [("unit",["compiler/rustc_middle","--test-args",UNIT]),("derive-unit",["compiler/rustc_hir_id","--test-args","proc_derive_impl_tests"]),("origin-unit",["compiler/rustc_metadata","--test-args","rmeta::decoder::tests::trait_directory_by_defining_crate"]),("run-make",suites(role))]:
   argv=base+extra;log=qa/(kind+".log")
   with log.open("xb") as f:subprocess.run(argv,cwd=R,stdout=f,stderr=subprocess.STDOUT,check=True)
   passed=log.read_text(errors="replace");gate_log(passed,kind)
@@ -70,7 +71,7 @@ def native(role):
  h=out(sdk/"bin/rustc","-Zls=public_hash",native_fixture/"libdep.rlib",env=env);assert re.search(r"[0-9a-f]{32}",h),h
  product={"role":role,"source_commit":arm["commit"],"source_tree":arm["tree"],"epoch":arm["epoch"],"archive_sha256":sha,"archive_bytes":archive.stat().st_size,"source_sha256":s.sha(dest/"source.json"),"sdk_inventory_sha256":s.sha(inv),"component_inventory_sha256":s.sha(tmp/"component-inventory.json"),"launcher":db["bin/rustc"]|{"path":"bin/rustc"},"driver":db[driver]|{"path":driver},"llvm":db[llvm]|{"path":llvm},"bundled_cargo":db["bin/cargo"]|{"path":"bin/cargo"},"effective_benchmark_cargo_sha256":S["signed_cargo_binary_sha256"],"unit_and_original_runmake":test_info,"installed_original_runmake":{"original_files":fixture(role,H/"fixture"),"binary_sha256":s.sha(recipes[0]),"compiler_sha256":s.sha(sdk/"bin/rustc"),"driver_sha256":s.sha(sdk/driver),"log_sha256":s.sha(actual),"exit":0,"final_linked_output":linked.decode(),"final_crate_public_hash":h},"execution_pgo":PGO,"bolt_note":True,"release_recipe":source["recipe"],"training_objects":source["training_objects"],"rustc_banner":rc,"cargo_banner":cg,"resolved_libraries":ld}
  installed_callable={}
- for name in ['trait-impl-bucket-coroutine', 'trait-impl-bucket-callables', 'trait-impl-bucket-sparse-foreign', 'crate-incoherent-impl-domain', 'proc-derive-impl-identity']:
+ for name in ['trait-impl-bucket-coroutine', 'trait-impl-bucket-callables', 'trait-impl-bucket-sparse-foreign', 'crate-incoherent-impl-domain', 'proc-derive-impl-identity', 'trait-impl-directory']:
   path="tests/run-make/"+name
   recipe,=[p for p in testdir.rglob("rmake") if p.is_file() and p.parent.name.split(".",1)[0]==name]
   case=tmp/("optimized-"+name);shutil.copytree(R/path,case)
@@ -93,6 +94,19 @@ def native(role):
  test_blobs={p:v["after"]["oid"] for p,v in files.items() if p.startswith("tests/run-make/proc-derive-impl-identity/")}
  assert len(test_blobs)==6 and all(obj((R/p).read_bytes())==oid for p,oid in test_blobs.items())
  product["installed_generated_impl_test"]=generated|{"final_linked_output":answered,"fixture_blobs":test_blobs}
+ origin=installed_callable.pop("trait-impl-directory")
+ root="tests/run-make/trait-impl-directory/"
+ entries=out("git","-C",R,"ls-tree","-r","HEAD","--",root).splitlines()
+ fixture_blobs={}
+ for entry in entries:
+  meta,path=entry.split("\t");mode,kind,oid=meta.split()
+  assert mode=="100644" and kind=="blob" and path.startswith(root) and obj((R/path).read_bytes())==oid
+  fixture_blobs[path]=oid
+ assert root+"rmake.rs" in fixture_blobs
+ product["installed_trait_origin_test"]=origin|{"fixture_blobs":fixture_blobs,"owning_unit":"rmeta::decoder::tests::trait_directory_by_defining_crate","incremental_epoch":43323,"metadata_epoch":43319}
+ epoch_output=qa/"optimized-origin-epoch.json"
+ subprocess.run([sys.executable,"-ISB",H/"epoch-native.py",tmp,epoch_output,sdk/"bin/rustc","43323","43319"],check=True)
+ product["origin_epoch_qa_sha256"]=s.sha(epoch_output)
  product["installed_callable_tests"]=installed_callable
  s.save(dest/"role.json",product)
  members=("ohm.tar.gz","source.json","role.json","sdk-inventory.json","component-inventory.json")
