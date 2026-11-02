@@ -1,0 +1,41 @@
+{
+  "commit": "26ae4bbc427b4e0f703cabf7aba264f39afb0a5f",
+  "epoch": 43311,
+  "files": {
+    "compiler/rustc_middle/src/dep_graph/graph.rs": "63f34dcf186aa2e2fcb1d0f6a28855e7aa350075",
+    "compiler/rustc_middle/src/ty/mod.rs": "773e34cbd925cb46f0aa8576b6a281f3f29024c1",
+    "compiler/rustc_query_impl/src/execution.rs": "81799b3e4cc7cb4b23ad86917445e75d7e2b1a1c",
+    "tests/run-make/trait-impl-bucket-coroutine/facade.rs": "7928d472b033743be797fcc4ebaad483b73f8233",
+    "tests/run-make/trait-impl-bucket-coroutine/reader.rs.in": "98813f1418bbf253fed13a2fd4d812106dc17aa1",
+    "tests/run-make/trait-impl-bucket-coroutine/rmake.rs": "e66b9a7e70874ecc40e9c9d2a1fa4a29f2d0792d",
+    "tests/run-make/trait-impl-bucket-coroutine/roster.rs": "4bc953ef59cd480ce8cb9645c3bf313fe487469d"
+  },
+  "metadata_epoch": 43311,
+  "oracle": "python3 -ISB oracle.py SDK FIXTURE_DIR NEW_DIR control|candidate",
+  "pack_bytes": 75200,
+  "pack_git_id": "b17e9af09fc5459a932e15e37bfcc2cd174e2144",
+  "pack_kind": "strict relative to exact parent",
+  "pack_objects": 19,
+  "parent": "26210096e48c5c62ef4a5e8fd1aa612631b2f7d7",
+  "parent_source_blobs": {
+    "compiler/rustc_middle/src/dep_graph/graph.rs": "82df919f85b05bc85e6a9fcb5f115124eacef42b",
+    "compiler/rustc_middle/src/ty/mod.rs": "b2d12c787168515fb7f37feab5fe0d0d6e021284",
+    "compiler/rustc_query_impl/src/execution.rs": "02d2cf4752a56da54b48ac9a357cc56e94743979"
+  },
+  "parent_tree": "414066f99d9ebc4f7a857d178b7ef5c733835482",
+  "regression": "ordinary, next solver; unchanged, unrelated, real matching Copy, shifted/retired/ordinary-closure replacement, signature E0061, non-Send capture and restoration",
+  "run_make": "tests/run-make/trait-impl-bucket-coroutine",
+  "sha256": {
+    "26210096-proof02/accepted.json": "0e9a33744b654ce67cfbcd718ed70c0df92d178aa5c5b084279a20475e41fb28",
+    "26210096-proof02/mechanism.json": "c2436faf23ccc37da6f8af990a03e277fc19bebd3937b446b0d94bb78069f74e",
+    "coroutine.pack": "0f076ac4f64ac883f269a48efac1bdeb859d09a3d136f646c598df66863722b1",
+    "corpus.json": "c9a49389a2fd896b7006e06bc8bb3a49cac47ddd2eb18983bcd7b2d15e191be3",
+    "fa7a-proof01/accepted.json": "2c712dba52e732cd74f1749b2acada83ebbdaad2f9062b75f018e33b460875a8",
+    "fa7a-proof01/mechanism.json": "826924fbfcd4ea3ddd9a4be3c47dc4c9a3f94cf8e09973bfd28d846bc3243896",
+    "oracle.py": "c845db0781def1b5f3bac50df44eb01cf917fc0ce482fa4a498e8d7b2cdfcbb4",
+    "profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219",
+    "pure-control01/qualified.json": "f4c00436aeaeba7b52ab4c02a5c5cb5a3b1294faef690ffc113b6e4655a5b7dd",
+    "source-delta.patch": "2d2a4452e5645be19e3793a28e4256d918d97a59d0f81fa2f5bedb7688ea9007"
+  },
+  "tree": "7fc6b885c706c30a1686617eca3129b35459d45b"
+}

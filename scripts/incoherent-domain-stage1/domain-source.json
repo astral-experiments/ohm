@@ -1,0 +1,66 @@
+{
+  "commit": "3aa96764bb1f1c17652849247bd1b82ae25aff6f",
+  "epoch": 43317,
+  "files": {
+    "compiler/rustc_hir_analysis/src/coherence/inherent_impls.rs": "f4fefb1bfbaa543ca381337dbd2af2c5897a035c",
+    "compiler/rustc_hir_analysis/src/coherence/mod.rs": "18235cab3b21c92ac788c88c3331d2e4643d7088",
+    "compiler/rustc_incremental/src/persist/file_format.rs": "6038cf84ae2b3aed388cf222de6bb338bd6ceb8c",
+    "compiler/rustc_metadata/src/rmeta/decoder.rs": "521d9ba8e9a2d6869ee7626e08b4191daab6b77b",
+    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs": "4b4d76eda9d3859baeb2f28b46a35f3ddb654020",
+    "compiler/rustc_middle/src/hooks/mod.rs": "a1990b42a4ec71f7539040b21191f63836c18df5",
+    "compiler/rustc_middle/src/queries.rs": "84e62af67f9767f182311cff18b6fb389b1e20be",
+    "compiler/rustc_middle/src/query/keys.rs": "2e8ab07d31498ec21c9611539b7581dc8b75ec39",
+    "compiler/rustc_middle/src/ty/trait_def.rs": "b5c0df7eea1299cf1f371c155262fd9791c49bf8",
+    "tests/run-make/crate-incoherent-impl-domain/local.rs": "2493cf102d3498ba66745da69fe616f8568c6c2e",
+    "tests/run-make/crate-incoherent-impl-domain/owner.rs": "eda2abd20b473bb323011083fa6584b860b20198",
+    "tests/run-make/crate-incoherent-impl-domain/reader.rs": "5a180497558e50524025aee9c3b784b4911251d1",
+    "tests/run-make/crate-incoherent-impl-domain/rmake.rs": "5be4d9890a3f6cf94dedf95dfd6057aa96906240",
+    "tests/run-make/crate-incoherent-impl-domain/roster.rs": "8f9a5804dbe11306486563404a24d457fd335be5"
+  },
+  "metadata_epoch": 43311,
+  "old_epoch": 43311,
+  "oracle": "fixture/oracle.py SDK source/tests/run-make/crate-incoherent-impl-domain FRESH control|candidate",
+  "oracle_counts": {
+    "candidate": {
+      "read_adt": 0,
+      "read_reference": 0,
+      "read_str": 0
+    },
+    "control": {
+      "read_adt": 1,
+      "read_reference": 1,
+      "read_str": 1
+    }
+  },
+  "pack_bytes": 104433,
+  "pack_git_id": "8dc0ffd02bb8b871ab2cd13ee976d8a88ba8eefb",
+  "pack_kind": "strict relative to exact parent",
+  "pack_objects": 35,
+  "parent": "f22825348d834ad9a8ef3934647181fb69f778ae",
+  "parent_source_blobs": {
+    "compiler/rustc_hir_analysis/src/coherence/inherent_impls.rs": "4e3aa41942845737d87f2efb70da2dcaf57063ed",
+    "compiler/rustc_hir_analysis/src/coherence/mod.rs": "894cd584ae41d74fa0c3f9c9f65203a6276acfbd",
+    "compiler/rustc_incremental/src/persist/file_format.rs": "484075844af143c269970b15961ffae3707ff63a",
+    "compiler/rustc_metadata/src/rmeta/decoder.rs": "791eead8723d75ab2eafbfdcd128f800f1269674",
+    "compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs": "f7249daeac4d42eb8ad235427cb6d1a67baf5634",
+    "compiler/rustc_middle/src/hooks/mod.rs": "be36a2ebda53a3368a600b74c699442c24af0490",
+    "compiler/rustc_middle/src/queries.rs": "b3dbd5b04f80a33909f190a5cef829d904523c37",
+    "compiler/rustc_middle/src/query/keys.rs": "7e18b765fd54901860a14f2583a5a2800f8355c5",
+    "compiler/rustc_middle/src/ty/trait_def.rs": "0721ed75f8556bfc8a44f3a717c4d3680712eeee"
+  },
+  "parent_tree": "96580055f15f61821eefb6875350ce0570995d8c",
+  "run_make": "tests/run-make/crate-incoherent-impl-domain",
+  "sha256": {
+    "domain.pack": "2aa887d353038af89741024d2c8dc5e54874e6cf00120f25445943eba374337b",
+    "fixture/oracle.py": "0574aea58e30cc9af22a06be5bf934d56ec8b609aa6cb03dfb25440a45b241fe",
+    "fixture/profile_v9.py": "0ba4f85441e2843e78be4d026376f425c940687e8a370b47e93f44a3f2181219",
+    "fork-epochs.json": "e5d9a6338b51de567ebb3572c61d58865d5e86c2907cc1e55d1b1fa171072dc9",
+    "maintained-1.99.json": "36d4795ba18396416f1b59809b5ef9fbf7da80bd63c8f42fa879311c185aab5b",
+    "parent-local01/qualified.json": "5705f66ec37b6a5c9940881d9e35a42574b1d00f4888c863991d5c508e46e976",
+    "parent-official02/observed.json": "debeef4a20500a3170f1e5f783a5a891a2c7cce030fe8bd1fec59bb4f7fddeb5",
+    "parent-official02/qualified.json": "3fc34c76e5828a5b165504973c482050bcace8d5693ffb98f99451562a6ef74d",
+    "source-delta.patch": "cec51a746b21134d3663dd4bf488496e661e60e43855fe852111ca669252cf47",
+    "study/protocol.json": "391734d56e4a34e80abee9479dec42ac04289eaf3e689e6677bfb61016161c93"
+  },
+  "tree": "e5fcf44bbdbc4757d7f8c05b3639e9fc9d0521fc"
+}
