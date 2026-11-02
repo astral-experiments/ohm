@@ -20,7 +20,9 @@ def test():
         w = Path(temporary)
         (w / "library.c").write_text("int abi(int a){return a+1;}\n")
         (w / "driver.c").write_text("extern int abi(int); int pass(int a){return abi(a);}\n")
-        (w / "main.c").write_text("extern int pass(int); int main(void){return pass(16)!=17;}\n")
+        (w / "main.c").write_text("#include <signal.h>\nextern int pass(int); static volatile sig_atomic_t delivered; "
+                                  "static void wake(int n){delivered+=(n==SIGUSR1);} "
+                                  "int main(void){signal(SIGUSR1,wake);raise(SIGUSR1);return delivered!=1 || pass(16)!=17;}\n")
         for argv in (["cc", "-fPIC", "-shared", "-Wl,--build-id=none", "library.c", "-o", "libqa-llvm.so"],
                      ["cc", "-fPIC", "-shared", "driver.c", "-L.", "-lqa-llvm", "-Wl,-rpath,$ORIGIN", "-o", "libqa-driver.so"],
                      ["cc", "main.c", "-L.", "-lqa-driver", "-Wl,-rpath,$ORIGIN", "-o", "front"]):
@@ -66,7 +68,7 @@ def test():
             m.write_text(json.dumps(false))
             rejected = subprocess.run(cmd, cwd=w, env=env, capture_output=True, timeout=35)
             assert rejected.returncode and not Path(false["output"]).exists(), ("accepted corrupted evidence",wrong)
-        print("Actual loader mmap FD device, inode and SHA, mapped build ID, instructions, argv and three negative controls passed.")
+        print("Actual loader mmap FD device, inode and SHA, mapped build ID, instructions, argv SIGUSR1 delivery and four negative controls passed.")
 
 def installed(library):
     from physical import sha

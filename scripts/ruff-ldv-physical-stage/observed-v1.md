@@ -20,3 +20,11 @@ PT_LOAD directly from the live mapped library. On the original signed LLVM,
 this covers 69,720,216 and 37,320,372 executable bytes. The complete mmap
 FD bytes and the precise first instructions at each breakpoint are also
 bound. Every other admission and the source experiment is unchanged.
+
+The next readers preserved two pre-installation failures (a missing workflow
+in sparse checkout and a runner without GDB). Run 41428062362 authenticated
+the complete preexisting capsule, then stopped the real P compiler on its
+ordinary SIGUSR1 before exit. The observer now delivers SIGUSR1 to the
+inferior without interrupting it. A sacrificial program must receive exactly
+one genuine wakeup and terminate successfully; all other stop handling and
+every live executable-byte check remain in force.

@@ -10,6 +10,8 @@ gdb.execute("set pagination off")
 gdb.execute("set confirm off")
 gdb.execute("set disable-randomization off")
 gdb.execute("set startup-with-shell off")
+# Let the native worker receive its ordinary user-space wakeup. Other signals retain GDB defaults.
+gdb.execute("handle SIGUSR1 nostop noprint pass", to_string=True)
 gdb.execute("set auto-load safe-path /nonexistent-qa-gdb-autoload")
 gdb.execute("set auto-solib-add off")
 gdb.execute("starti")
@@ -148,6 +150,7 @@ for kind, row in subject["symbols"].items():
     locations[kind] = [row["name"], address, row["value"]]
     watch.append(Observe(kind, address))
 gdb.execute("continue")
+assert gdb.selected_inferior().pid == 0, ("nonterminal stop in native rustc", gdb.execute("info program",to_string=True))
 code = int(gdb.parse_and_eval("$_exitcode"))
 with Path(subject["output"]).open("x") as stream:
     json.dump({"exit": code, "pid": pid, "hits": hits, "addresses": locations,
