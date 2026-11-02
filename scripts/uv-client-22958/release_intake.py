@@ -3,6 +3,7 @@ from pathlib import Path,PurePosixPath
 import hashlib
 import json
 import os
+import runpy
 import shutil
 import subprocess
 import tarfile
@@ -85,6 +86,13 @@ def production(proof,temp,donor):
     assert source["source"]["commit"]==native["source_commit"]==f["source"] and source["source"]["tree"]==native["source_tree"]==f["tree"]
     assert source["source_pack_sha256"]==f["source_pack"] and source["training_objects"]==f["training_objects"]
     assert native["bolt_note"]is True and native["epoch"]==f["epoch"] and native["execution_pgo"] and native["installed_callable_tests"]
+    projection=m.read(s.HERE/"derive-projection.json")
+    assert source["source"]==projection["source"] and projection["pack_sha256"]==f["derive_pack"]
+    assert source["source"]["metadata_epoch"]==source["source"]["epoch"]==43319
+    assert native["installed_original_runmake"] and native["installed_crate_domain_test"]["both_solvers"]
+    generated=native["installed_generated_impl_test"]
+    assert generated["final_linked_output"]=="(5, 11, 7)"
+    assert generated["fixture_blobs"]=={p:v["after"]["oid"] for p,v in projection["files"].items() if p.startswith("tests/run-make/proc-derive-impl-identity/")}
     assert native["effective_benchmark_cargo_sha256"]==s.lock["signed_cargo"] and m.read(proof/"sdk-inventory.json")==s.lock["raw"]["F"]
     return target
 
@@ -177,7 +185,11 @@ def admit():
     m.save(out/"intake.json",{"installed":result,"signed_cargo_sha256":s.lock["signed_cargo"],"release_lock":m.filesha(s.HERE/"release-lock.json")})
 
 def migration():
-    w,tmp,_=s.host();pool=tmp/"ctfe22-root-sdks";out=w/"trait-results/intake";env={"PATH":"/usr/bin:/bin","LC_ALL":"C","RUSTC_BOOTSTRAP":"1"}
+    w,tmp,_=s.host()
+    verify_migrations(tmp/"ctfe22-root-sdks",w/"trait-results/intake",tmp)
+
+def verify_migrations(pool,out,tmp):
+    env={"PATH":"/usr/bin:/bin","LC_ALL":"C","RUSTC_BOOTSTRAP":"1"}
     results={}
     for first,second in (("S","F"),("F","S")):
         scope=tmp/("fixture-22958-"+first+second);scope.mkdir();src=scope/"main.rs";bin=scope/"fixture";rows=[]
@@ -189,4 +201,19 @@ def migration():
             rows.append(dict(role=role,argv=argv,observed=observed.decode().strip(),source=m.filesha(src),binary=m.filesha(bin)))
         assert rows[1]["binary"]==rows[2]["binary"]
         results[first+"-"+second]=rows
-    m.save(out/"release-migration.json",{"fixtures_only":True,"roles":results,"ordinary_benchmark_caches_separate":True})
+    stock, candidate = s.SOURCES["S"], s.SOURCES["F"]
+    epochs = {stock["commit"]: (43310, 3), candidate["commit"]: (43319, 43319)}
+    assert (stock["epoch"], candidate["epoch"]) == (43310, 43319)
+    wire = s.HERE / "derive-boundary"
+    increment = runpy.run_path(str(wire / "epoch.py"))["run"]
+    metadata = runpy.run_path(str(wire / "metadata_epoch.py"))["metadata"]
+    inc_dir, meta_dir = out / "incremental-boundary", out / "metadata-boundary"
+    increment(pool/"S", pool/"F", inc_dir, "actual", expected=[(rev, pair[0]) for rev,pair in epochs.items()])
+    metadata({stock["commit"]:pool/"S", candidate["commit"]:pool/"F"}, meta_dir, expected=epochs)
+    inc, meta = m.read(inc_dir/"passed.json"), m.read(meta_dir/"passed.json")
+    assert inc["signed_argv_refusal_both_directions"] and inc["same_sdk_self_loaded_before_and_after"] and inc["reader_compilations"]==10
+    assert inc["no_header_edit"] and inc["no_compiler_version_override"]
+    assert meta["cross_crate_E0514"]==meta["own_crate_reads"]==meta["own_native_typecheck_errors"]==2
+    assert not meta["file_edits"] and not meta["compiler_version_overrides"]
+    m.save(out/"release-migration.json",{"fixtures_only":True,"roles":results,"ordinary_benchmark_caches_separate":True,
+           "native_format_proofs":{"incremental":m.filesha(inc_dir/"passed.json"),"metadata":m.filesha(meta_dir/"passed.json")}})

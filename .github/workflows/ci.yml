@@ -12,16 +12,16 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-ctfe-wall'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-generated-impl-production'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      EXCLUDED_PRODUCTION_BOOT: 'd3374b9ab2b529dfe6e07ddc79d43a5b40a3fb50b3f4d13617d7d55a8dbc4c73'
-      BUILD_RUN_ID: '41398925829'
-      BUILD_HEAD: '4e34ea9c7232977f95498d7bf48d382157e8558b'
-      RELEASE_LOCK: 'ad322fe1ef836071a6be332070b4055c68c3e29568297b56f554aca3913ae2f3'
+      EXCLUDED_PRODUCTION_BOOT: 'aef9a206e08bc559c82fdfdc0091178e1f0e8880aebb5678f8bff9c12e224db2'
+      BUILD_RUN_ID: '41434876352'
+      BUILD_HEAD: '731d81a4cb3498cf4221d53a267bbf4a76ca250f'
+      RELEASE_LOCK: 'cdac6743a87dcf8f9379ba6cef70732f142c88926ce58c83ca06e6741ce5980c'
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1

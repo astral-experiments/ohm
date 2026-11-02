@@ -18,11 +18,13 @@ ROLES=("S","F")
 SOURCES=lock["sources"]
 ORDERS=register["orders"]
 assert ORDERS==[["S","F"],["F","S"],["F","S"],["S","F"],["F","S"],["S","F"],["S","F"],["F","S"]]
-assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="99f08c48eda8e9592d46b7a4a8ce732eb5117ffb6185a2a377f87eb6b7c4913a"
+assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="d3044a1fdf0d4c244095e43e4d7fba0bdfff26041a0f1db92f0f0b09aa296b73"
 assert m.filesha(HERE/"clock-amendment.json")==lock["clock"] and m.filesha(HERE/"trigger-carrier-addendum.json")==lock["trigger"]
+assert m.filesha(HERE/"prespecified-transfer.json") == register["authority_sha256"]
+assert m.filesha(HERE/"eligibility-addendum.json") == register["eligibility_addendum"]
 prior=m.read(HERE/"heldout-passed.json")
 assert prior["primary_and_secondary"]==[True,True] and prior["raw_sha256"]==lock["heldout_original"]
-assert {k:w["commit"] for k,w in SOURCES.items()}=={"S":"10d56274a98801b5ef8f80aab734e835749458e1","F":"f53496e2dd363b1455fc7e0a9d2dedea1bf7650e"}
+assert {k:w["commit"] for k,w in SOURCES.items()}=={"S":"10d56274a98801b5ef8f80aab734e835749458e1","F":"ac67101cb973e35ce8ff044cc8014c2c76bab69e"}
 m.P.update(branch=case["branch"],roles=SOURCES)
 old.P["edited_workspace_roster"]=["uv_client","uv_configuration"]
 CHECK=old.CHECK=[str(m.SDK/"bin/cargo"),*register["argv"][1:]]
@@ -35,7 +37,7 @@ def host():
     assert e["GITHUB_REPOSITORY_ID"]=="1319437234" and e["RELEASE_LOCK"]==m.filesha(HERE/"release-lock.json")
     assert m.sha_git(co,"rev-parse","HEAD").decode().strip()==e["REVIEWED_HEAD"] and m.sha_git(co,"rev-parse","HEAD^").decode().strip()==case["parent"]
     absent={r["boot"] for r in lock["excluded"].values()};boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
-    assert len(absent)==len(lock["excluded"])>=11 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
+    assert len(absent)==len(lock["excluded"])>=16 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
     assert e["EXCLUDED_PRODUCTION_BOOT"]==lock["boot_list_sha256"]==m.digest(("\n".join(sorted(absent))+"\n").encode())
     assert e["BUILD_RUN_ID"]==str(lock["production_compiler"]["run"]) and e["BUILD_HEAD"]==lock["production_compiler"]["coordinator"]
     return w,t,boot

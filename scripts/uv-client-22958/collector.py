@@ -201,6 +201,15 @@ def kernel(d, warm):
     ev["capture"](d, s.CHECK, m.ENV, str(m.SRC), ev["file_id"](m.RUSTC))
     k = ev["decode"](m.read(d / "kernel-events.json"))
     assert k["exits"][k["root"]] == 0
+    rustc = ev["file_id"](m.RUSTC)
+    launches = [image for image in k["images"] if image.get("file") == rustc]
+    probes = [
+        image["argv"] for image in launches
+        if "--crate-name" not in image["argv"] or not any(arg.startswith("--emit") for arg in image["argv"])
+    ]
+    m.save(d/"rustc-executions.json", {"total":len(launches), "probes":probes})
+    if warm is not False:
+        assert not probes, probes
     forms = {}
     for im in k["images"]:
         argv = im.get("argv", [])
