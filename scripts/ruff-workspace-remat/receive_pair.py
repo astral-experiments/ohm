@@ -35,7 +35,7 @@ def receive(artifact, target):
     size = artifact["size_in_bytes"]
     need(0 < size < 4 * GIB, "unexpected archive size")
     with target.open("xb") as dest, subprocess.Popen(
-        ["gh", "api", "--allow-escape-sequences", f"repos/{REPO}/actions/artifacts/{artifact['id']}/zip"],
+        ["gh", "api", f"repos/{REPO}/actions/artifacts/{artifact['id']}/zip"],
         stdout=subprocess.PIPE,
     ) as get:
         received = 0
