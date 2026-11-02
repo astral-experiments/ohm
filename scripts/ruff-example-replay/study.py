@@ -1,17 +1,20 @@
 """Qualify one genuine executable example against a clean build and a real GNU linker."""
 import ast
+import functools
 import gzip
 import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
+import struct
 import subprocess
 import sys
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from factory import build, need, save, sha
+from factory import need, recover_factory, save, sha
 
 EXAMPLE = "struct_name_as_context"
 PACKAGE = "ruff_annotate_snippets"
@@ -66,6 +69,41 @@ def sdk_executions(trace, root):
     return rows
 
 
+def native_opens(trace, execs):
+    children = {}
+    opened = {}
+    fork = re.compile(rb"^(?:clone3?|fork|vfork)\(.*\)\s*=\s*(\d+)$")
+    record = re.compile(rb'^openat2?\([^,]+,\s*("(?:[^"\\]|\\.)*").*\)\s*=\s*(\d+)$')
+    for entry in trace.glob("exec.*"):
+        pid = int(entry.suffix[1:])
+        for raw in entry.read_bytes().splitlines():
+            edge = fork.match(raw)
+            if edge:
+                children.setdefault(pid, []).append(int(edge.group(1)))
+            event = record.match(raw)
+            if event:
+                path = ast.literal_eval(event.group(1).decode())
+                if Path(path).name.startswith(("libutil.", "OHM_NATIVE_")):
+                    opened.setdefault(pid, []).append([path, sha_from_bytes(raw)])
+    result = {}
+    for row in execs:
+        if row["kind"] != "wild" or "-o" not in row["args"]:
+            continue
+        output = Path(row["args"][row["args"].index("-o")+1]).name
+        pending, seen = [row["pid"]], set()
+        while pending:
+            pid = pending.pop()
+            if pid not in seen:
+                seen.add(pid)
+                pending.extend(children.get(pid, []))
+        result[output] = [[p, *data] for p in sorted(seen) for data in opened.get(p, [])]
+    return result
+
+
+def sha_from_bytes(data):
+    return hashlib.sha256(data).hexdigest()
+
+
 def footprint(env):
     files = []
     seen = set()
@@ -88,7 +126,7 @@ def footprint(env):
                               for name in ("rlink", "manifest", "object", "other"))}
 
 
-def execute(root, src, env, out, args, *, error=None, trace=False, clock=None):
+def execute(root, src, env, out, args, *, error=None, trace=False, clock=None, provider_dir=None):
     out.mkdir()
     need(clock is None or not trace, "tracing excluded from hardware interval")
     cmd = ["cargo", "+ohm", *args, "--locked", "--offline", "-j4", "--message-format=json"]
@@ -96,7 +134,8 @@ def execute(root, src, env, out, args, *, error=None, trace=False, clock=None):
     if trace:
         logs = out / "trace"
         logs.mkdir()
-        actual = ["strace", "-ff", "-qq", "-s", "262144", "-e", "trace=execve",
+        events = "execve,openat,openat2,clone,clone3,fork,vfork" if provider_dir else "execve"
+        actual = ["strace", "-ff", "-qq", "-s", "262144", "-e", "trace="+events,
                   "-o", str(logs / "exec"), *cmd]
     if clock:
         actual = [clock, out / "clock.json", *cmd]
@@ -120,6 +159,7 @@ def execute(root, src, env, out, args, *, error=None, trace=False, clock=None):
         need(b"libutil.so" in text and any(s in text.lower() for s in
              (b"error", b"invalid", b"unrecognized")), ("malformed provider error", text[-3500:]))
     execs = sdk_executions(logs, root) if trace else []
+    opened = native_opens(logs, execs) if trace and provider_dir else {}
     if trace:
         # Preserve every original process stream in the archive, including failed PATH searches.
         import tarfile
@@ -139,7 +179,8 @@ def execute(root, src, env, out, args, *, error=None, trace=False, clock=None):
             need(file.is_file() and file.resolve().is_relative_to(root) and
                  file.read_bytes()[:4] == b"\x7fELF", "private real ELF")
             executables["/".join([*kind, name, str(row["profile"]["test"])])] = [str(file), sha(file), file.stat().st_size]
-    proof = {"argv":cmd, "returncode":result.returncode, "products":sorted(products),
+    proof = {"argv":cmd, "receipt":str(out), "returncode":result.returncode, "products":sorted(products),
+             "native_opens":opened, "provider_dir":str(provider_dir) if provider_dir else None,
              "executables":executables, "execs":execs, "storage":footprint(env)}
     save(out / "result.json", proof)
     return proof
@@ -157,6 +198,26 @@ def example_execs(proof, mode):
     return relink
 
 
+def ctor_proof(file, token):
+    symbol = "ohm_example_constructor_" + token
+    lines = subprocess.check_output(["nm", "-an", "--defined-only", file], text=True).splitlines()
+    found, = [row.split() for row in lines if row.split()[-1:] == [symbol]]
+    address = int(found[0], 16)
+    data = Path(file).read_bytes()
+    need(data[:6] == b"\x7fELF\x02\x01", "registered ELF64 LE")
+    base = struct.unpack_from("<Q",data,40)[0]
+    size, count, names = struct.unpack_from("<3H",data,58)
+    sections = [struct.unpack_from("<IIQQQQIIQQ",data,base+i*size) for i in range(count)]
+    names_start = sections[names][4]
+    section, = [s for s in sections if data.startswith(b".init_array\0", names_start+s[0])]
+    addr, offset, width = section[3:6]
+    direct = any(value == address for (value,) in struct.iter_unpack("<Q",data[offset:offset+width]))
+    relocated = any(addr <= p < addr+width and value == address for s in sections if s[1] == 4
+                    for p,_,value in struct.iter_unpack("<QQq",data[s[4]:s[4]+s[5]]))
+    need(direct or relocated, ("registered constructor in ELF .init_array", symbol, address))
+    return {"symbol":symbol, "address":address, "direct":direct, "relocated":relocated}
+
+
 def emitted(proof, src, env, token=None):
     file, digest, size = proof["executables"]["example/" + EXAMPLE + "/False"]
     need(sha(Path(file)) == digest, "compiler record still refers to the same file")
@@ -164,6 +225,18 @@ def emitted(proof, src, env, token=None):
     need(b"functions are not allowed in struct definitions" in ran.stdout + ran.stderr, "typed original example")
     markers = [line for line in ran.stderr.splitlines() if line.startswith(b"OHM_NATIVE_")]
     need(markers == ([token.encode()] if token else []), ("native constructor", token, markers))
+    dest = Path(proof["receipt"])
+    if not (dest / "program.json").exists():
+        compressed(dest / "program-stdout.gz", ran.stdout)
+        compressed(dest / "program-stderr.gz", ran.stderr)
+        save(dest / "program.json", {"image":digest, "status":ran.returncode, "expected":token,
+                                     "constructor":ctor_proof(file, token) if token else None})
+    if token and proof["execs"]:
+        root = Path(env["CARGO_TARGET_DIR"]).parent.parent
+        required = {str(Path(proof["provider_dir"]) / "libutil.so"),
+                    str(root / "native-provider-objects" / (token + ".o"))}
+        observed = {r[1] for r in proof["native_opens"][EXAMPLE]}
+        need(required <= observed, ("actual example Wild opened the registered script and object",required,observed))
     return [digest, size, hashlib.sha256(ran.stdout).hexdigest(), hashlib.sha256(ran.stderr).hexdigest()]
 
 
@@ -177,7 +250,7 @@ def oracle(w, out, src, env, state):
     return result
 
 
-def set_provider(directory, state):
+def set_provider(directory, objects, state):
     target = directory / "libutil.so"
     if state == "absent":
         if target.exists():
@@ -185,9 +258,10 @@ def set_provider(directory, state):
     elif state == "bad":
         target.write_bytes(b"OHM deliberately malformed registered libutil input\n")
     else:
-        obj = directory / (state + ".o")
+        obj = objects / (state + ".o")
         if not obj.exists():
-            source = '#include <unistd.h>\n__attribute__((constructor)) static void report(void) {\n'
+            source = ('#include <unistd.h>\n__attribute__((constructor,visibility("hidden"))) void '
+                      'ohm_example_constructor_' + state + '(void) {\n')
             source += '  (void)write(2, "' + state + '\\n", sizeof("' + state + '\\n") - 1);\n}\n'
             subprocess.run(["cc", "-fPIC", "-x", "c", "-c", "-o", obj, "-"],
                            input=source.encode(), check=True)
@@ -197,11 +271,13 @@ def set_provider(directory, state):
 def gate(root, src, env, out, w, seed, binaries):
     source = src / ("crates/" + PACKAGE + "/examples/" + EXAMPLE + ".rs")
     original = source.read_bytes()
-    shadow = root / "native-shadow"
-    shadow.mkdir()
-    # GCC adds this ordinary native search directory to its real command line.
-    # Holding it stable also allows a higher-priority provider to appear between commands.
-    native_env = {**env, "LIBRARY_PATH":str(shadow)}
+    shadow = root / "distribution/lib/rustlib/x86_64-unknown-linux-gnu/lib"
+    objects = root / "native-provider-objects"
+    objects.mkdir()
+    need(shadow.is_dir() and not (shadow/"libutil.so").exists(), "vacant private native search location")
+    change = functools.partial(set_provider, shadow, objects)
+    observe = functools.partial(execute, provider_dir=shadow)
+    native_env = env
     args = ["build", "-p", PACKAGE, "--example", EXAMPLE]
     patch = Path(w.__file__).parent / "renderer.patch"
     winners = {}
@@ -210,46 +286,48 @@ def gate(root, src, env, out, w, seed, binaries):
         reset(env, seed, w)
         s = out / arm
         s.mkdir()
-        set_provider(shadow, "absent")
+        change("absent")
         w.git(src, "apply", "--reverse", patch)
         w.sources(src, "old")
-        cold = execute(root, src, native_env, s / "cold-old", args, trace=True)
+        cold = observe(root, src, native_env, s / "cold-old", args, trace=True)
         example_execs(cold, "full")
         old_image = emitted(cold, src, native_env)
         old_oracle = oracle(w, s / "old-behavior", src, native_env, "old")
         w.git(src, "apply", patch)
         w.sources(src, "corrected")
-        edited = execute(root, src, native_env, s / "edit", args)
-        unchanged = execute(root, src, native_env, s / "unchanged", args, trace=True)
+        edited = observe(root, src, native_env, s / "edit", args)
+        unchanged = observe(root, src, native_env, s / "unchanged", args, trace=True)
         mode = "full" if arm == "parent" else "relink"
         example_execs(unchanged, mode)
         image = emitted(unchanged, src, native_env)
         need(emitted(edited, src, native_env) == image, "edit and unchanged image")
         source.write_bytes(original + b'\nconst _: u32 = "ohm type error";\n')
-        execute(root, src, native_env, s / "rust-error", args, error="E0308")
+        observe(root, src, native_env, s / "rust-error", args, error="E0308")
         source.write_bytes(original)
-        repaired = execute(root, src, native_env, s / "rust-repair", args, trace=True)
+        repaired = observe(root, src, native_env, s / "rust-repair", args, trace=True)
         example_execs(repaired, None)
         need(emitted(repaired, src, native_env) == image, "Rust repair result")
         initial = {}
         for step, state in (("first-provider","OHM_NATIVE_A"), ("replace-provider","OHM_NATIVE_B")):
-            set_provider(shadow, state)
-            value = execute(root, src, native_env, s / step, args, trace=True)
+            change(state)
+            value = observe(root, src, native_env, s / step, args, trace=True)
             example_execs(value, mode)
             initial[state] = emitted(value, src, native_env, state)
         need(initial["OHM_NATIVE_A"] != initial["OHM_NATIVE_B"], "provider changed runtime and binary")
-        set_provider(shadow, "bad")
-        failed = execute(root, src, native_env, s / "malformed", args, error="provider", trace=True)
+        change("bad")
+        failed = observe(root, src, native_env, s / "malformed", args, error="provider", trace=True)
         example_execs(failed, mode)
-        set_provider(shadow, "OHM_NATIVE_B")
-        value = execute(root, src, native_env, s / "provider-repair", args, trace=True)
+        need(str(shadow/"libutil.so") in {r[1] for r in failed["native_opens"][EXAMPLE]},
+             "incremental Wild opened the malformed provider")
+        change("OHM_NATIVE_B")
+        value = observe(root, src, native_env, s / "provider-repair", args, trace=True)
         example_execs(value, None)
         need(emitted(value, src, native_env, "OHM_NATIVE_B") == initial["OHM_NATIVE_B"], "native repair")
         clean = {}
         for state in ("bad", "OHM_NATIVE_A", "OHM_NATIVE_B", "absent"):
-            set_provider(shadow, state)
+            change(state)
             reset(env, seed, w)
-            value = execute(root, src, native_env, s / ("clean-" + state), args,
+            value = observe(root, src, native_env, s / ("clean-" + state), args,
                             error="provider" if state == "bad" else None, trace=True)
             if state == "bad":
                 # An empty graph can encounter the malformed library on a prerequisite
@@ -276,11 +354,16 @@ def gate(root, src, env, out, w, seed, binaries):
         shutil.rmtree(owner_dir)
         if promoted.exists():
             promoted.unlink()
-        set_provider(shadow, "bad")
-        forced = execute(root, src, native_env, s / "independent-full-owner-malformed", args,
+        change("bad")
+        forced = observe(root, src, native_env, s / "independent-full-owner-malformed", args,
                          error="provider", trace=True)
         example_execs(forced, "full")
-        set_provider(shadow, "absent")
+        need(str(shadow/"libutil.so") in {r[1] for r in forced["native_opens"][EXAMPLE]},
+             "independent full owner opened the malformed provider")
+        change("absent")
+        import acquire
+        need(acquire.verify_sdk(root / "distribution") == json.loads((out/"signed-inventory.json").read_bytes()),
+             "all 79 signed files are intact after removing the single native provider")
         corrected_oracle = oracle(w, s / "corrected-behavior", src, native_env, "corrected")
         winners[arm] = {"old_image":old_image,"new_image":image,"providers":clean,
                         "old_oracle":old_oracle,"corrected_oracle":corrected_oracle}
@@ -303,7 +386,7 @@ def main():
     root.mkdir()
     out = root / "evidence"
     out.mkdir()
-    binaries = build(root, ws, out)
+    binaries = recover_factory(root, ws, out)
     select(root, binaries, "parent")
     src = w.source(root)
     env = w.env_for(root)
