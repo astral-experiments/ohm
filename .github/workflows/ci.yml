@@ -586,7 +586,9 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-          sparse-checkout: scripts/ruff-ldv-physical-stage
+          sparse-checkout: |
+            .github/workflows
+            scripts/ruff-ldv-physical-stage
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
