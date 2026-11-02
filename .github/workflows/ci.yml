@@ -13,7 +13,7 @@ jobs:
     if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-handwritten-stage1'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: '180'
+    timeout-minutes: 180
     permissions:
       contents: read
     env:
@@ -94,7 +94,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 6b6ea23a315feb005f06e86e67e24c609b10557e
+        test "$(git rev-parse HEAD^)" = 8e738eae331c797b4bf7e7e33a9954cfd6f962d2
 
         '
     - name: Verify both compiler sources and the authenticated 105-object delta
@@ -130,7 +130,7 @@ jobs:
     if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-handwritten-stage1'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: '180'
+    timeout-minutes: 180
     permissions:
       contents: read
     env:
@@ -211,7 +211,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 6b6ea23a315feb005f06e86e67e24c609b10557e
+        test "$(git rev-parse HEAD^)" = 8e738eae331c797b4bf7e7e33a9954cfd6f962d2
 
         '
     - name: Verify both compiler sources and the authenticated 105-object delta
