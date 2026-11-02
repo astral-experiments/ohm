@@ -1,0 +1,198 @@
+{
+  "workload": "codex-tui-active-cell-layout",
+  "platform": "linux-x86_64",
+  "cpu_model": "AMD EPYC-Genoa Processor",
+  "logical_cpus": 32,
+  "cargo_jobs": 8,
+  "harness": "04c83d53483607aec4f93fd2bb55b412f101d677",
+  "codex_source": "74004b5397b24662a87a5264a6ae80664168c7f3",
+  "fixture_sha256": "b9fdc1e06044c7f1b59a87b436f341b8c90ef90b5b90f3986f541ef63401b7bf",
+  "release_candidate": "1.99.0-23",
+  "stock": "1.99.0",
+  "qualification_run": "https://github.com/astral-experiments/ohm/actions/runs/41442788155",
+  "manifest_sha256": "edcdd760f80cef190d5341208d35d5f6b6825640506e7247cf22a1560adc8e4d",
+  "linux_archive_sha256": "4fc04e7610fbbf12df5e13a83a2f48afadd4c4744a2c11bdcaf6c6c61714b85a",
+  "sources": {
+    "rust": "a21de69d085aa07b3b5ac94058bac9e5aed482b4",
+    "cargo": "4109dd69209a642f309555cac0cee8b05e18f0ea",
+    "clippy": "5b5d9fb377e21872c83ed1598f9ffee1420c7b39",
+    "rustfmt": "59e87b3b3eb731560e1c3a1da4319af04bda5483"
+  },
+  "binary_sha256": {
+    "1.99.0": {
+      "cargo": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14",
+      "rustc": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f",
+      "clippy-driver": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6",
+      "rustfmt": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3"
+    },
+    "ohm-1.99.0-23": {
+      "cargo": "5788018794b720b7fef81d2984e4a638be2788799aaa431787721c4a06266039",
+      "rustc": "e658002325984c8c13eff77a3cd0dbead00b984cbb2c09655917cc9fe675970a",
+      "clippy-driver": "5cf587f4461987c8f9486b758bce65091a63aae3aeef13a627a305b1893e5a83",
+      "rustfmt": "5ff4023c7257a9dd6ab11442951726bd699e78ff1dc4a0b4bf976fbcf5f6f416"
+    }
+  },
+  "order": [
+    "stock-0",
+    "ohm-0",
+    "ohm-1",
+    "stock-1"
+  ],
+  "seconds": {
+    "stock-0": 500.7159569609994,
+    "ohm-0": 273.0441768999999,
+    "ohm-1": 278.80772936499943,
+    "stock-1": 515.8948384020005
+  },
+  "mean_seconds": {
+    "stock": 508.3053976814999,
+    "ohm": 275.92595313249967
+  },
+  "change_vs_stock_percent": -45.71650145934656,
+  "focused_commands": [
+    {
+      "toolchain": "stock",
+      "repetition": 0,
+      "index": 7,
+      "seconds": 2.8724887000007584,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "stock",
+      "repetition": 0,
+      "index": 8,
+      "seconds": 2.3786238309994587,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "stock",
+      "repetition": 0,
+      "index": 11,
+      "seconds": 2.580034448999868,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "stock",
+      "repetition": 0,
+      "index": 12,
+      "seconds": 2.147420972999498,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "ohm",
+      "repetition": 0,
+      "index": 7,
+      "seconds": 2.2336426949996167,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "ohm",
+      "repetition": 0,
+      "index": 8,
+      "seconds": 1.9558078709997062,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "ohm",
+      "repetition": 0,
+      "index": 11,
+      "seconds": 2.4861735849999604,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "ohm",
+      "repetition": 0,
+      "index": 12,
+      "seconds": 2.186677269000029,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "ohm",
+      "repetition": 1,
+      "index": 7,
+      "seconds": 2.638475642999765,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "ohm",
+      "repetition": 1,
+      "index": 8,
+      "seconds": 2.1258494439998685,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "ohm",
+      "repetition": 1,
+      "index": 11,
+      "seconds": 2.76448042300035,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "ohm",
+      "repetition": 1,
+      "index": 12,
+      "seconds": 2.0658456430001024,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "stock",
+      "repetition": 1,
+      "index": 7,
+      "seconds": 2.348139095998704,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "stock",
+      "repetition": 1,
+      "index": 8,
+      "seconds": 2.874209673000223,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "stock",
+      "repetition": 1,
+      "index": 11,
+      "seconds": 2.752569236999989,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    },
+    {
+      "toolchain": "stock",
+      "repetition": 1,
+      "index": 12,
+      "seconds": 2.893430864000038,
+      "cargo_compiling_lines": 0,
+      "schemafy_compiling_lines": 0
+    }
+  ],
+  "focused_command_mean_total_seconds": {
+    "stock": 10.423458411499269,
+    "ohm": 9.2284762864997
+  },
+  "measured_commands": 44,
+  "warmup_commands": 4,
+  "endpoint": {
+    "passed": 3439,
+    "skipped": 16,
+    "selected_tests_sha256": "0cc837caecde3fedded4a30ec0a21440ce36d24124fdcd9b48251e182a525677"
+  },
+  "host_cpu_intervals": 1410,
+  "exclusions": [],
+  "results_sha256": "53dc318b6c33117201d96a2c6db0287adad9b6eb7aede70833f4bb07fa56ee50",
+  "raw_evidence_zip_sha256": "d8e03c785197a5b7ddfa01c6213e57dd51db49e020ee2482950dd893a3d0c229",
+  "raw_evidence_files": 183
+}
