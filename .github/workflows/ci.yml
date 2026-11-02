@@ -3,6 +3,11 @@ run-name: Signed GNU Ruff workspace link census ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: One signed release or two independent builds on one boot
+        type: choice
+        options: [single-22, paired-18-22]
+        default: single-22
       reviewed_head:
         description: Exact reviewed QA commit
         required: true
@@ -48,16 +53,36 @@ jobs:
           strace -ff -qq -e trace=%process -o "$RUNNER_TEMP/census-trace-admission" -- /bin/true
           grep -F 'execve("/bin/true"' "$RUNNER_TEMP"/census-trace-admission.*
       - name: Authenticate all 79 signed GNU SDK files
+        if: inputs.mode != 'paired-18-22'
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB enrolled/scripts/ruff-workspace-link-census/census.py install
       - name: Build the complete workspace and trace the unchanged command
+        if: inputs.mode != 'paired-18-22'
         run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/census.py "$GITHUB_WORKSPACE/ruff"
+      - name: Verify the independently empty signed -18 SDK
+        if: inputs.mode == 'paired-18-22'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-workspace-link-census/paired.py install 18 "$GITHUB_WORKSPACE/ruff"
+      - name: Capture signed -18 workspace roots, unchanged compilers and native bytes
+        if: inputs.mode == 'paired-18-22'
+        run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/paired.py run 18 "$GITHUB_WORKSPACE/ruff"
+      - name: Verify the independently empty signed -22 SDK
+        if: inputs.mode == 'paired-18-22'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-workspace-link-census/paired.py install 22 "$GITHUB_WORKSPACE/ruff"
+      - name: Capture signed -22 workspace roots, unchanged compilers and native bytes
+        if: inputs.mode == 'paired-18-22'
+        run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/paired.py run 22 "$GITHUB_WORKSPACE/ruff"
       - name: Retain the native process tree, Cargo products, link markers and verdicts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: signed-ruff-workspace-link-census
-          path: ${{ runner.temp }}/ohm-ruff-whole-census/evidence
+          path: |
+            ${{ runner.temp }}/ohm-ruff-whole-census/evidence
+            ${{ runner.temp }}/matched-ruff-workspace-census/*/evidence
           if-no-files-found: warn
           retention-days: 14

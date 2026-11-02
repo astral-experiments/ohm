@@ -53,7 +53,7 @@ def paths():
     return work, work / "evidence", work / "rustup/toolchains/ohm"
 
 
-def install():
+def install(tag="ohm-1.99.0-22"):
     work, evidence, sdk = paths()
     assert git(HERE, "rev-parse", "HEAD") == os.environ["GITHUB_SHA"] == os.environ["REVIEWED_HEAD"]
     assert (
@@ -62,7 +62,6 @@ def install():
     assert os.environ["GITHUB_REF_NAME"] == "charlie/qa-ruff-workspace-link-census-20261102"
     work.mkdir()
     evidence.mkdir()
-    tag = "ohm-1.99.0-22"
     asset = common.SDK["asset"]
     public = json.loads(
         subprocess.check_output(["gh", "api", "repos/" + common.REPO + "/releases/tags/" + tag])
@@ -100,7 +99,7 @@ def install():
     )
 
 
-def environment(work, sdk):
+def environment(work, sdk, tag="ohm-1.99.0-22"):
     proxy = Path(shutil.which("rustup")).absolute().parent
     env = {
         "HOME": str(work / "home"),
@@ -124,7 +123,7 @@ def environment(work, sdk):
             selected.samefile(sdk / "bin" / tool)
             and sha(selected) == common.SDK["members"]["bin/" + tool][3]
         )
-        assert "ohm-1.99.0-22" in subprocess.check_output([tool, "+ohm", "-vV"], env=env, text=True)
+        assert tag in subprocess.check_output([tool, "+ohm", "-vV"], env=env, text=True)
     return env
 
 
@@ -267,7 +266,7 @@ def genealogy(folder):
     }
 
 
-def study(source):
+def study(source, tag="ohm-1.99.0-22", observe=None):
     work, evidence, sdk = paths()
     assert git(source, "rev-parse", "HEAD") == RUFF and not git(source, "status", "--porcelain=v1")
     lock = (source / "Cargo.lock").read_bytes()
@@ -276,7 +275,7 @@ def study(source):
         for k in ("GH_TOKEN", "GITHUB_TOKEN", "RUSTFLAGS", "RUSTC_WRAPPER", "LD_PRELOAD")
     )
     (work / "home").mkdir()
-    env = environment(work, sdk)
+    env = environment(work, sdk, tag)
     expected = {
         p["name"] + "-" + p["version"] + ".crate": p["checksum"]
         for p in tomllib.loads(lock.decode())["package"]
@@ -319,8 +318,11 @@ def study(source):
                 *argv,
             ]
         elif name == "fingerprint":
-            extra = dict(env, CARGO_LOG="cargo::compiler::fingerprint=trace")
+            extra = dict(env, CARGO_LOG=("cargo::compiler=info,cargo::compiler::fingerprint=trace"
+                                         if observe else "cargo::compiler::fingerprint=trace"))
         results[name] = cargo_phase(name, argv, source, extra, work, evidence)
+        if observe is not None:
+            observe(source, work, evidence / name)
         if name != "cold":
             assert results[name]["inventory"] == results["cold"]["inventory"] and set(
                 results[name]["native"]
