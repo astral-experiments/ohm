@@ -75,9 +75,10 @@ def fetch():
         census.put(E/(role+"-artifact.json"),{"run":run,"source":head,"artifact":aid,"sha256":digest,"bytes":size,"cargo":SOURCE[role]})
 
 
-def visit(folder, argv, cwd, env, target):
+def visit(folder, argv, cwd, env, target, trace_files=False):
     folder.mkdir()
-    traced=["strace","-ff","-qq","-v","-s","1048576","-e","trace=%process","-o",str(folder/"exec"),"--",*argv]
+    filters=["-yy","-e","trace=%process,%file,mmap,close"] if trace_files else ["-e","trace=%process"]
+    traced=["strace","-ff","-qq","-v","-s","1048576",*filters,"-o",str(folder/"exec"),"--",*argv]
     with (folder/"stdout.jsonl").open("xb") as out,(folder/"stderr").open("xb") as err:
         ret=subprocess.run(traced,cwd=cwd,env=env,stdout=out,stderr=err,timeout=900)
     census.put(folder/"command.json",{"argv":argv,"exit":ret.returncode,"cwd":str(cwd)})

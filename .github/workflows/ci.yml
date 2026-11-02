@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input]
         default: single-22
       reviewed_head:
         description: Exact reviewed QA commit
@@ -78,13 +78,16 @@ jobs:
         if: inputs.mode == 'paired-18-22'
         run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/paired.py run 22 "$GITHUB_WORKSPACE/ruff"
       - name: Verify the signed compiler and both source-bound native Cargo products
-        if: inputs.mode == 'source-bisect-330'
+        if: inputs.mode == 'source-bisect-330' || inputs.mode == 'constructors-implicit-input'
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/bisect330.py fetch
       - name: Run the true Ruff constructors test and changing native provider on both readers
         if: inputs.mode == 'source-bisect-330'
         run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/bisect330.py run "$GITHUB_WORKSPACE/ruff"
+      - name: Trace the actual constructors link and qualify the earlier implicit provider in a private view
+        if: inputs.mode == 'constructors-implicit-input'
+        run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/constructors_inputs.py run "$GITHUB_WORKSPACE/ruff"
       - name: Retain the native process tree, Cargo products, link markers and verdicts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
