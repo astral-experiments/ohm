@@ -1,25 +1,25 @@
-name: Qualify an upstream monomorphization consumer in Ruff
-run-name: Old Ruff ruff_db library-test custody ${{ inputs.reviewed_head }}
+name: Calibrate matched Rust compilers on Ruff's library test
+run-name: Matched Ruff held-out library test ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact nonrelease QA commit
+        description: Exact reviewed nonrelease calibration commit
         required: true
         type: string
 permissions: {}
 concurrency:
-  group: heldout-old-ruff-27470-${{ github.sha }}
+  group: heldout-matched-ruff-27470-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   heldout:
-    name: Signed Old ruff_db library test
+    name: Matched real Ruff test calibration
     if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-heldout-mono-fold-27470-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     permissions:
       actions: read
       contents: read
-    timeout-minutes: 55
+    timeout-minutes: 70
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PYTHONDONTWRITEBYTECODE: '1'
@@ -34,14 +34,26 @@ jobs:
             scripts/ruff-heldout-mono-fold
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: bd7b58765ae44b21a1c9273b3ff0be8e923adc47
-          path: donor
+          ref: dcf095ed65b3529c231560bee0c5e10fdf76b282
+          path: factory
           persist-credentials: false
-          sparse-checkout: scripts/ruff-default-owner-pmu
+          sparse-checkout: |
+            scripts/ruff-indexed-check-pmu
+            scripts/ruff-matched-stage
+            scripts/ruff-upstream-mono-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 8af14a72c77092024cd18efd7a5e60dd80113775
+          path: dictionary
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-query-dictionary
+            scripts/ruff-cgu-inputs/cgu-probe
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: astral-sh/ruff
-          ref: bb868838d75876c3b016d8cf1687d33eae80daa6
+          ref: 9c53b5de3aae4b1832eb7ee137647dda2466f888
+          fetch-depth: 2
           path: ruff
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
@@ -50,25 +62,39 @@ jobs:
       - name: Check native tools
         run: |
           set -euo pipefail
-          command -v rustup gh git gcc make pkg-config
+          command -v rustup gh git gcc make pkg-config zstd
           test -x /usr/bin/nm && test -x /usr/bin/c++filt
-          command -v python3
-      - name: Authenticate the worker and all 79 signed Ohm SDK files
+      - name: Reopen the full original source-built pair and enroll this one worker
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/worker.py acquire
-      - name: Prefetch only the locked test source graph
-        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/worker.py prefetch
-      - name: Build the frozen Old library test and inspect its native graph
-        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/worker.py run
-      - name: Retain the raw graph, native outputs and receipts
+        run: |
+          set -euo pipefail
+          python3 -IB factory/scripts/ruff-indexed-check-pmu/acquire.py
+          python3 -IB qa/scripts/ruff-heldout-mono-fold/matched.py host
+      - name: Verify Old and New sources and prefetch the selected locked dependency graph
+        id: setup
+        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/matched.py setup
+      - name: Bind the complete Map fold key to each actual compiler and its core metadata
+        id: keys
+        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/matched.py keys
+      - name: Observe parent Old, edited New and independent empty New without a counter
+        id: parent
+        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/matched.py P
+      - name: Observe candidate Old, edited New and independent empty New without a counter
+        id: candidate
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && steps.keys.outcome == 'success' }}
+        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/matched.py C
+      - name: Compare named physical caller objects and independently clean native outputs
+        if: ${{ !cancelled() && steps.parent.outcome == 'success' && steps.candidate.outcome == 'success' }}
+        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/matched.py finish
+      - name: Retain raw signed-source facts, graphs, native products and receipts
         if: always()
-        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/worker.py seal
+        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/matched.py pack
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruff-27470-old-library-test
-          path: ${{ runner.temp }}/ohm-ruff27470-old/heldout-proof.tar
+          name: ruff-27470-matched-unmetered-library-test
+          path: ${{ runner.temp }}/upstream-mono-study/matched-heldout-proof.tar
           retention-days: 14
           compression-level: 0
           if-no-files-found: error
