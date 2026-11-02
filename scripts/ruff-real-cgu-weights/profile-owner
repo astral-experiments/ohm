@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+"""Add the diagnostic only to the enrolled Ruff library compiler."""
+import os
+import sys
+
+args = sys.argv[1:]
+if "--crate-name" in args and args[args.index("--crate-name") + 1] == "ruff_workspace":
+    args.extend([
+        "-Zself-profile=" + os.environ["OHM_PROBE_PROFILE_DIR"],
+        "-Zself-profile-counter=instructions:u",
+        "-Zself-profile-events=generic-activity,args",
+    ])
+os.execv(args[0], args)
