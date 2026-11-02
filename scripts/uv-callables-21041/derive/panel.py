@@ -13,8 +13,8 @@ from native_units import NativeUnits
 from six import confirm,object_id
 
 PHASES={"ordinary-A":"A","warm-B":"B","cold-B":"cold"}
-SOURCES=("77ce0545653df71f43e601c28dde01a5e4f02b09","ac67101cb973e35ce8ff044cc8014c2c76bab69e")
-SCHEMAS=(3,43319)
+from origin.enrollment import SOURCES
+SCHEMAS=(43319,43319)
 EDIT=Path("crates/uv-pypi-types/src/simple_json.rs")
 def digest(b):return sha256(b).hexdigest()
 def encode(x):return json.dumps(x,sort_keys=True,separators=(",",":")).encode()
@@ -70,10 +70,14 @@ def actual_external(roster,crate,consumer):
     externs=[value.split("=",1)[1]for pos,value in enumerate(cmd)if pos>0 and cmd[pos-1]=="--extern" and value.startswith(crate+"=")]
     path,=externs;return Path(path).name
 
-def verify_hold(out,tmp,hold,roles,parse,independent=False):
+def verify_hold(out,tmp,hold,roles,parse,independent=False,source_repository=None):
     wire.bind(parse)
+    from origin.slots import prove as derive_origins
+    if source_repository is None:
+        import core
+        source_repository=core.m.SRC
     panel=out/"uv-client";evidence=out/"derive-evidence";vault=tmp/"derive-source-vault"
-    qs=[panel/f"hold-{hold}-{r}"for r in roles];stash=out/"rmeta-by-content"
+    qs=[panel/f"opening-{hold}-{r}"for r in roles];stash=out/"rmeta-by-content"
     reopened=None
     if independent:
         reopened=TemporaryDirectory(prefix="derive-original-replay-",dir=tmp)
@@ -100,6 +104,15 @@ def verify_hold(out,tmp,hold,roles,parse,independent=False):
         left,right=[enroll_ledger(q,phase,role,vault)for q,role in zip(qs,roles,strict=True)]
         assert left[1].keys()==right[1].keys() and len(left[1])==37
         states=(left,right)
+        origin_rows={}
+        for i,(ledger,workspace,bank)in enumerate(states):
+            origin_rows[roles[i]]={
+                label:derive_origins(label,"A" if identifier=="A" else "B",product.read_bytes(),bank,source_repository)
+                for label,product in sorted(workspace.items())}
+        origin_file=evidence/f"hold-{hold}-{identifier}-native-origins.json.gz"
+        packed(origin_file,origin_rows)
+        receipts[identifier+"-native-origins"]={"sha256":digest(origin_file.read_bytes()),"native_owners":{
+            role:sum(rec["high_derive_impls"] for rec in origin_rows[role].values()) for role in roles}}
         for i,(ledger,workspace,bank)in enumerate(states):
             file,registry,macro=selected_files(ledger,workspace,roster[i])
             seen[i][identifier]=file;deps[i][identifier]=(registry,macro)
@@ -137,7 +150,7 @@ def verify_hold(out,tmp,hold,roles,parse,independent=False):
     for i,role in enumerate(roles):
         assert len(set(deps[i].values()))==1,"rkyv dependency bytes changed across the same compiler's A, warm B or clean B"
         reg,mac=next(iter(deps[i].values()))
-        obs=confirm(parse,(SOURCES[i],SCHEMAS[i]),seen[i],reg,mac,source,i==1)
+        obs=confirm(parse,(SOURCES[i],SCHEMAS[i]),seen[i],reg,mac,source,True)
         dest=evidence/f"hold-{hold}-{role}-six.json.gz";packed(dest,obs);receipts[role]={"six":digest(dest.read_bytes()),"selected":len(obs["selected_slots"])}
     kept={};size=0
     for f in sorted(retained):

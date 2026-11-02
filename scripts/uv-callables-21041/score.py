@@ -5,6 +5,7 @@ from pathlib import Path
 import gzip,json,sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import core as c
+from origin.checkpoints import enroll as enroll_seed
 from products import comparable
 from screen import output_controls
 m=c.m;P=c.P
@@ -37,10 +38,11 @@ def score():
             c.guard(checked[key]==(n,size,m.canon(obj['semantic'][n]),obj['structural'][n]),'independently decoded complete rmeta and rooted key shape')
         return obj
     from derive import panel as derive_panel
-    for hold in (0,1):
-        derive_panel.verify_hold(out,tmp,hold,c.ROLES,parser,independent=True)
+    opened_seeds = set()
+    for i,hold in enumerate(P['independent_holds']):
+        derive_panel.verify_hold(out,tmp,i,c.ROLES,parser,independent=True)
         for r in c.ROLES:
-            q=panel/f'hold-{hold}-{r}';a=check_products(q/'ordinary-A');b=check_products(q/'warm-B')
+            q=panel/f'opening-{i}-{r}';a=check_products(q/'ordinary-A');b=check_products(q/'warm-B')
             c.guard(a==check_products(q/'settled-A')==check_products(q/'typed-fresh-A'),'same-seed fresh A bytes')
             c.guard(b==check_products(q/'settled-B')==check_products(q/'typed-fresh-B')==check_products(q/'typed-B'),'same-seed B typed/plain/fresh bytes')
             c.guard(comparable(b)==comparable(check_products(q/'cold-B')),'independent B public/private, all definition/expansion/allocation and sidecar values')
@@ -50,7 +52,7 @@ def score():
                 c.guard(units['logical_sha256']==P['native_complete_unit_sha256']and units['count']==P['native_cargo_artifacts']==486 and len(units['workspace'])==37,'complete actual package closure')
                 c.guard(roster['artifact_crates']==({n:1 for n in P['edited_workspace_roster']}if actual else {}),'actual native rustc set')
                 c.guard({k:v['rmeta']for k,v in units['workspace'].items()}==a['relative_paths'],'Cargo unit to original path')
-            if hold==0:
+            if i in (0,4):
                 wits=[m.read(q/('behavior-'+phase)/'witness.json')for phase in('A','B','cold-B')]
                 c.guard(all(x['exact'] and x['fixture_sha256']==m.filesha(c.HERE/'witness.rs') for x in wits)and len({x['output_sha256']for x in wits})==1,'independently linked native behavior')
             import domain_control
@@ -60,10 +62,12 @@ def score():
                 c.guard(compiler['sha256']==installed['runtime']['bin/rustc'],'unchanged kernel trace enrolled another executable')
                 c.guard(check_products(p)==original,'unchanged original byte set differs')
             streams=output_controls(q/'warm-B');c.guard(streams==m.read(q/'ordinary-controls.json'),'opening command outputs')
-            seal=m.read(q/'checkpoint.json')['sha256'];data[(hold,r)]=(b,seal,streams)
+            seal=enroll_seed(opened_seeds,m.read(q/'checkpoint.json'),i,r)
+            data[(i,r)]=(b,seal,streams)
+    c.guard(len(opened_seeds)==16,'incomplete independent A seeds')
     for i,row in enumerate(raw):
         for r in c.ROLES:
-            expected,seal,streams=data[(row['hold'],r)];q=panel/f'pair-{i}-{r}'
+            expected,seal,streams=data[(i,r)];q=panel/f'pair-{i}-{r}'
             for mode in P['mode_orders'][i]:
                 if mode=='scoped':continue
                 at=q/mode;v=row['values'][r][mode];rec=m.read(at/'ordinary.json');s=m.read(at/'source.json')
@@ -77,7 +81,7 @@ def score():
                     clock=meter.clock(at/'whole-clock.json',0);c.guard(rec['invoked']==[ready['plain'],str(at/'whole-clock.json'),*c.CHECK]and clock['running']==clock['enabled']>0 and v['value']==clock['instructions'],'inherited unmultiplexed whole-command instructions')
     import physical
     perf=physical.reduce(panel,raw,data,check_products,output_controls)
-    report={'scope':'matched signed-release production builds, procedural derive impl identity, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
+    report={'scope':'matched signed-release production builds, trait-defining crate query, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
         'verified_unique_workspace_products':len(checked),'metrics':None if refusals else summary(raw),'branch':P['branch']}
     if report['metrics']:
         for mode in ('wall','clock'):

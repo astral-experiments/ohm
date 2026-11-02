@@ -24,7 +24,7 @@ def admit():
         subprocess.run([sys.executable,'-ISBu',c.HERE/'verify_role.py',role,w/builder,work/'sdk',work/'qa',scratch,fixed,meta/role,pool],check=True)
         result[role]=m.read(meta/role/'registered.json')
     left,right=[m.read(meta/r/'source.json')for r in c.ROLES]
-    older=m.read(meta/c.ROLES[1]/'previous-domain-source.json')
+    older=m.read(meta/c.ROLES[1]/'previous-derive-source.json')
     for key in ('role','source','source_pack_sha256','component_git','recipe','training_objects','released_coordinator','signed_manifest_sha256','overlay_description_sha256'):
         c.guard(left[key]==older[key],('different actual preceding compiler',key))
     for key in ('component_git','recipe','training_objects','released_coordinator','signed_manifest_sha256'):c.guard(left[key]==right[key],('unmatched production recipe',key))

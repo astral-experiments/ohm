@@ -229,7 +229,7 @@ def diff(a,b,banks):
         x,y=[d.get(k,[])for d in maps]
         if len(x)!=1 or len(y)!=1:continue
         (xr,ex,n,no),(yr,ey,m,mo)=x[0],y[0]
-        assert n==m and no.keys()==mo.keys() and all(no[k]["lineage"]==mo[k]["lineage"] and no[k]["slot"]<2**31<=mo[k]["slot"] for k in no)
+        assert n==m and no.keys()==mo.keys() and all(no[k]["lineage"]==mo[k]["lineage"] and 2**31<=no[k]["slot"]<2**32 and 2**31<=mo[k]["slot"]<2**32 for k in no)
         agreements.append({"baseline":xr,"treatment":yr,"identity":k,"descendants":n,"typed_owners":len(no),"unique_native_owner_keys":sorted(no),"trait":ex["trait"],"simplified_self":ex["simplified_self"],
                            "macro":ex["macro"],"actual_callsite":ex["callsite"],"owners":[no,mo],"expansion_refs":[[e["expansion_index"],e["parent_expn_ref"],e["expansion_hash"]] for e in (ex,ey)],
                            "macro_hashes":[ex["native_macro_public"],ey["native_macro_public"]],"header_positions":[ex["impl_trait_header_position"],ey["impl_trait_header_position"]]})
@@ -251,6 +251,6 @@ def accept(result):
     owners=[key for item in paired for key in item["unique_native_owner_keys"]]
     assert len(owners)==len(set(owners)) and all(
         set(group["unique_native_owner_keys"])==old.keys()==new.keys() and
-        all(old[k]["lineage"]==new[k]["lineage"] and old[k]["expansion"]==new[k]["expansion"] and old[k]["slot"]<2**31<=new[k]["slot"] for k in old)
+        all(old[k]["lineage"]==new[k]["lineage"] and old[k]["expansion"]==new[k]["expansion"] and 2**31<=old[k]["slot"]<2**32 and 2**31<=new[k]["slot"]<2**32 for k in old)
         for group in paired for old,new in [group["owners"]]),"multiple or inconsistent native owners"
     return {"definitions":old,"common":result["common"],"migrated_paths":count,"maximal_roots":len(paired),"typed_impl_owners":len(owners)}

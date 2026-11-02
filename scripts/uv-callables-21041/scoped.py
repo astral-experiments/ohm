@@ -52,7 +52,7 @@ def read(path,req):
   args=i.get('argv')or []
   if i['file']!=meta['rustc_file']and Path(i['exe']).name!='rustc'and not(args and Path(args[0]).name=='rustc'):continue
   guard(i['file']==meta['rustc_file']and i['exe']==compiler and args and args[0]==compiler and ev['exits'].get(i['pid'])==0,'foreign compiler image or failure')
-  if args==[compiler,'-vV']:continue
+  guard(args!=[compiler,'-vV'],'unenrolled rustc probe in original first edit')
   guard('--crate-name'in args,'unexpected compiler invocation');label=args[args.index('--crate-name')+1]
   guard(label not in seen and req['selectors'].get(label)==args,'incomplete or different true rustc argv');seen[label]=i['pid']
  guard(set(seen)==raw['targets'].keys()==req['selectors'].keys()==set(P['edited_workspace_roster']),'wrong measured compiler set')

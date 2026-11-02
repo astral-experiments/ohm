@@ -8,17 +8,24 @@ import core as c
 m=c.m;S=c.HERE;D=S/'domain';ev=runpy.run_path(str(S/'thread-meter/exec_events.py'))
 def migration():
  w,tmp=c.host();pool=tmp/'ctfe22-root-sdks';o=w/'trait-results/intake/domain-native';o.mkdir()
- source=[pool/r for r in c.ROLES];e=runpy.run_path(str(D/'epoch.py'))['run'];e(*source,o/'epoch','actual')
+ source=[pool/r for r in c.ROLES];e=runpy.run_path(str(D/'epoch.py'))['run'];e(*source,o/'epoch','actual',expected=[(c.PAIR['arms'][r]['source']['commit'],c.PAIR['arms'][r]['source']['epoch'])for r in c.ROLES])
  proof=m.read(o/'epoch/passed.json');c.guard(proof['signed_argv_refusal_both_directions']and proof['same_sdk_self_loaded_before_and_after']and proof['no_header_edit']and proof['no_compiler_version_override']and proof['reader_compilations']==10,'cross-epoch refusal')
- from derive.metadata_epoch import metadata,EPOCHS
+ from origin.compatibility import metadata, common_sysroot
+ from origin.enrollment import SOURCES,FORMATS
+ EPOCHS={rev:epochs for rev,epochs in zip(SOURCES,zip(FORMATS['incremental'],FORMATS['metadata']),strict=True)}
  real={commit:sdk for commit,sdk in zip(EPOCHS,source,strict=True)}
- md=metadata(real,o/'metadata');c.guard(md['own_crate_reads']==md['own_native_typecheck_errors']==md['cross_crate_E0514']==2,'external metadata rejection or own genuine source diagnostic')
+ common=o/'common-version-incremental.json'
+ subprocess.run([sys.executable,'-ISB',S/'origin/epoch-native.py',o,common,source[0]/'bin/rustc','43319','43323',source[1]/'bin/rustc'],check=True)
+ forced=m.read(common);c.guard(set(forced)=={'same-sdk-change-header','parent-to-candidate','candidate-to-parent'} and all(v['other_epoch_rejected']['diagnostics'] for v in forced.values()),'same-version incremental mismatch was not observed in both compiler directions')
+ md=metadata(real,o/'metadata',expected=EPOCHS);c.guard(md['two_immutable_originals'] and not md['file_edits'] and not md['compiler_version_overrides'] and len(md['actual_compatible_pairs'])+len(md['actual_version_rejections'])==4 and len([v for v in md['real_compilations'].values() if v['codes']==['E0308']])==len(md['actual_compatible_pairs']),'wrong natural cross-SDK rmeta result')
+ common_sysroot(real,o/'shared-sysroot')
  f=runpy.run_path(str(D/'fixture/oracle.py'))['main'];outputs={}
  for role,root in zip(c.ROLES,source,strict=True):
   f(root,D/'fixture',o/role,'candidate',inherited_source=c.PAIR['arms'][role]['source']['commit']);res=m.read(o/role/'qualified.json')
   c.guard(res['role']=='candidate' and res['actual_empty_edit_typeck']==dict.fromkeys(('read_adt','read_reference','read_str'),0)and res['registered_foreign_transitions']==11,'either compiler lost the existing native domain treatment')
   outputs[role]={'oracle':m.filesha(o/role/'qualified.json'),'actual_empty_edit_typeck':res['actual_empty_edit_typeck']}
- m.save(o/'accepted.json',{'roles':outputs,'epochs':m.filesha(o/'epoch/passed.json'),'rmeta_epochs':m.filesha(o/'metadata/passed.json'),'modes':10,'canonical_inputs':m.filesha(S/'pair.json')})
+ m.save(o/'accepted.json',{'roles':outputs,'epochs':m.filesha(o/'epoch/passed.json'),'rmeta_epochs':m.filesha(o/'metadata/passed.json'),'modes':10,
+                          'separate_controlled_common_version':m.filesha(common),'true_sysroots':m.filesha(o/'shared-sysroot/passed.json'),'canonical_inputs':m.filesha(S/'pair.json')})
 def boot():
  w,tmp=c.host();p=w/'trait-results';ready=m.read(p/'calibration.json')['ready'];now=Path('/proc/sys/kernel/random/boot_id').read_text().strip();ids={f['boot']for f in c.PAIR['prior_boots'].values()}
  c.guard(now==ready['boot']and len(ids)==len(c.PAIR['prior_boots'])and now not in ids,'previously enrolled host or changed boot')
@@ -38,7 +45,7 @@ def check_zero(path,state):
  else:m.save(f,out)
  return out
 def hypothesis(metrics):
-    from derive.policy import assess
+    from origin.policy import assess
     return assess(metrics)
 
 def post_clock(out,ready):

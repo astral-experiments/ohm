@@ -16,7 +16,7 @@ def main(sdk,src,out,role,*,inherited_source=None):
  original={'control':'f53496e2dd363b1455fc7e0a9d2dedea1bf7650e','candidate':'77ce0545653df71f43e601c28dde01a5e4f02b09'}
  expected=original[role]
  if inherited_source is not None:
-  assert role=='candidate'and inherited_source in (original['candidate'],'ac67101cb973e35ce8ff044cc8014c2c76bab69e'),'unregistered inherited compiler source'
+  assert role=='candidate'and inherited_source in (original['candidate'],'ac67101cb973e35ce8ff044cc8014c2c76bab69e','e4edbdd943f2ceac098ddde880e8f97a3bb3270f'),'unregistered inherited compiler source'
   expected=inherited_source
  sdk,src,out=[Path(p).resolve()for p in(sdk,src,out)];assert role in('control','candidate');out.mkdir()
  compiler=sdk/'bin/rustc';env={'PATH':str(sdk/'bin')+':/usr/bin:/bin','LC_ALL':'C','RUSTC_BOOTSTRAP':'1','LD_LIBRARY_PATH':str(sdk/'lib')}
