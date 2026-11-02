@@ -35,7 +35,8 @@ def artifact_sets(z):
         with compressed(z,ph+'/delivered.json.gz') as f:r=json.load(f)
         rows=r['artifacts'];by={};routes={}
         for unit in rows:
-            key=compact(unit['unit']);assert key not in by
+            output_ids=sorted(Path(v['path']).name for v in unit['files'])
+            key=compact([unit['unit'],output_ids]);assert key not in by,(unit['unit'],output_ids)
             files={}
             for x in unit['files']:
                 name=Path(x['path']).name;assert name not in files and x['path'] not in routes
@@ -47,7 +48,8 @@ def artifact_sets(z):
     out={};changed=set()
     for unit in sorted(a):
         assert set(a[unit])==set(b[unit])==set(u[unit])==set(c[unit])
-        item={'unit':json.loads(unit),'artifacts':[]}
+        description,output_ids=json.loads(unit)
+        item={'unit':description,'output_ids':output_ids,'artifacts':[]}
         for name in sorted(a[unit]):
             src=[stage[unit][name] for stage in (a,b,u,c)]
             full=[r['sha256'] for r in src];assert full[1]==full[2]
@@ -70,7 +72,7 @@ def artifact_sets(z):
         out[unit]=item
     edges=defaultdict(set)
     for name,flag,ext,unit,file in consumer_edges['edit']:
-        edges[name].add((flag,ext,json.loads(unit)[0],file,(unit,file) in changed))
+        edges[name].add((flag,ext,json.loads(unit)[0][0],file,(unit,file) in changed))
     return {'delivered':list(out.values()),'offered_changed_edges_by_consumer':{k:sorted(v) for k,v in edges.items()},'changed_files':len(changed),
             'unchanged_files':sum(len(v) for v in a.values())-len(changed)}
 
