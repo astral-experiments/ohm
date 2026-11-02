@@ -12,7 +12,7 @@ import tarfile
 import zipfile
 
 REPO = "astral-experiments/ohm"
-BRANCH = "charlie/qa-remat-matched-stage-20261102"
+BRANCH = "charlie/qa-remat-live-pin-20261102"
 ARTIFACT = "ohm-remat-matched-stage1"
 GIB = 1024**3
 
