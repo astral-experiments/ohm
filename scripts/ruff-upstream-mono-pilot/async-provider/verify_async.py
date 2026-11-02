@@ -14,7 +14,7 @@ import zipfile
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-SHARED_SCRIPT = "db5ca71012bd898eb8da5a24182fc3d9bf5b5c9c83cb98d0cd17d8cbc120ce89"
+SHARED_SCRIPT = "0e98002528acf5553f5c6aed095a657fd9f88fe936b04697b517d76609e070e7"
 SHARED_SOURCE = "840478a54201183472ee6459ee276c28c12a49ba2280b5e45537217803fdf7ac"
 CTOR = "core::future::async_drop::async_drop_in_place::<mono_api::Envelope<mono_api::AsyncRecord>>"
 

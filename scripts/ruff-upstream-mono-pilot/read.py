@@ -6,6 +6,9 @@ from pathlib import Path
 import sys
 import subprocess
 sys.path.insert(0,str(Path(__file__).resolve().parent))
+import os
+import normal_registry
+import orders
 import live_family
 
 def read(path):
@@ -16,12 +19,22 @@ def require(ok, why):
         raise ValueError(why)
 
 def check(root, head):
+    placement = normal_registry.reopen(root)
+    if os.environ["OHM_STUDY"] == "ruff-qualify":
+        family = live_family.certify(root)
+        require(family == read(root / "native-family.json"), "physical clean output proof differs")
+        (root / "qualified-shared.json").write_text(json.dumps(dict(head=head, placement=placement, family=family), sort_keys=True, indent=2)+"\n")
+        return
     result = read(root / "pilot.json")
     require(result["head"] == head, "wrong pilot provenance")
     family = live_family.certify(root)
     require(family == read(root / "native-family.json") and result["native_refs"] == {r: v["refs"] for r, v in family.items()},
             "independent clean ELF proof differs")
-    require(set(result["history"]) == {"0-P", "0-C", "1-C", "1-P"}, "missing ordered history")
+    expected = list(orders.assigned())
+    blocks = [str(i) for i in range(len(expected))]
+    require(result["orders"] == expected and set(result["history"]) == {i+"-"+arm for i in blocks for arm in "PC"}
+            and all(result["history"][i+"-"+arm]["order"] == expected[int(i)] for i in blocks for arm in "PC"),
+            "incorrect preregistered compiler order")
     manifest = {a: read(root / ("clean-A-" + a) / "visit.json") for a in "PC"}
     output = {}
     for name, history in result["history"].items():
@@ -74,10 +87,10 @@ def check(root, head):
         with subprocess.Popen(["zstd", "-dcq", bodies/(digest+".zst")], stdout=subprocess.PIPE) as reader:
             require(hashlib.file_digest(reader.stdout, "sha256").hexdigest()==digest and reader.wait()==0,
                     "physical clean ELF digest disagrees")
-    for i in "01":
+    for i in blocks:
         (pb, pr), (cb, cr) = output[i+"-P"]["B"], output[i+"-C"]["B"]
         require(pb["reader"]==cb["reader"] and pr==cr, "independent B reader or roster differs")
-    rates={p:[1-output[f"{i}-C"]["counts"][p]/output[f"{i}-P"]["counts"][p] for i in "01"] for p in ("B","A","unchanged")}
+    rates={p:[1-output[f"{i}-C"]["counts"][p]/output[f"{i}-P"]["counts"][p] for i in blocks] for p in ("B","A","unchanged")}
     packet=dict(head=head,pairs=output,paired_reductions=rates)
     (root/"reopened.json").write_text(json.dumps(packet,sort_keys=True,indent=2)+"\n")
     print(json.dumps(rates))

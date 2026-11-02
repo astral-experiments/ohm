@@ -19,8 +19,10 @@ NATIVE = WS / "oracle/scripts/ohm-packed-ruff"
 sys.path.insert(0, str(NATIVE / "full-cli"))
 import native
 sys.path.insert(0, str(HERE))
+import orders
 import live_family
 import graph_costs
+import normal_registry
 
 CASE, = REG["source"]
 CMD = ["cargo", "+ohm", "build", "-p", "ruff", "--bin", "ruff", "--locked", "--offline", "-j4", "--message-format=json"]
@@ -64,7 +66,7 @@ def setup():
     (m.RUSTUP / "settings.toml").write_text('version = "12"\nprofile = "minimal"\n')
     m.PROXIES.mkdir()
     rustup = Path(shutil.which("rustup")).resolve(strict=True)
-    for n in ("cargo", "rustc", "rustup"):
+    for n in ("cargo", "rustc", "rustdoc", "rustup"):
         (m.PROXIES / n).symlink_to(rustup)
     for n in ("cargo-home", "temp"):
         (WORK / n).mkdir()
@@ -205,6 +207,10 @@ def cargo(env, folder, rev, counted, *, invalid=False, cold=False):
     roster = sorted((r["package_id"], r["target"]["name"], tuple(r["target"]["kind"]), tuple(r["features"]),
                      r["profile"]["test"]) for r in products)
     roster_sha = hashlib.sha256(json.dumps(roster, separators=(",", ":")).encode()).hexdigest()
+    if cold and not counted:
+        placement = normal_registry.capture(rows, STATE, True)
+        json_save(folder / "registry.json", placement)
+        normal_registry.require(placement)
     desc, paths = native.observed(rows, rev, CASE[rev], env, ROOT, SRC, STATE, folder)
     result = dict(rev=rev, roster=roster_sha, whole={k: v["whole"] for k, v in desc.items() if k in ("cli", "reader")},
                   count=count, dirty=sum(not r["fresh"] for r in products), storage=allocations())
@@ -228,7 +234,9 @@ def main():
                 native.preserve(path, desc[kind], ROOT / "reference-bytes", LOG / "reference-bodies")
     family = live_family.certify(LOG, ROOT / "reference-bytes")
     json_save(LOG / "native-family.json", family)
-    for block, order in enumerate(("PC", "CP")):
+    if os.environ["OHM_STUDY"] == "ruff-qualify":
+        return
+    for block, order in enumerate(orders.assigned()):
         for role in order:
             name = f"{block}-{role}"
             out = LOG / name
@@ -268,7 +276,7 @@ def main():
                                                                for k, v in objects.items()})
             json_save(out / "summary.json", history[name])
     json_save(LOG / "pilot.json", dict(head=os.environ["REVIEWED_HEAD"], history=history,
-                                      native_refs={rev: value["refs"] for rev, value in family.items()}))
+                                      orders=orders.assigned(), native_refs={rev: value["refs"] for rev, value in family.items()}))
 
 
 

@@ -31,7 +31,7 @@ def save(path, obj):
 def native_files(capsule, role):
     files = json.loads((capsule / (role + ".json")).read_bytes())["files"].copy()
     need(
-        "bin/rustc" in files and all(n not in files for n in REG["signed_cargo"]["members"]),
+        {"bin/rustc", "bin/rustdoc"} <= files.keys() and all(n not in files for n in REG["signed_cargo"]["members"]),
         "wrong compiler kit",
     )
     for n, (_member, mode, size, digest) in REG["signed_cargo"]["members"].items():
@@ -67,7 +67,7 @@ def inventory(rows):
             and not path.is_absolute()
             and ".." not in path.parts
             and (
-                name in ("bin/cargo", "bin/rustc")
+                name in ("bin/cargo", "bin/rustc", "bin/rustdoc")
                 or name.startswith("lib/")
                 and (len(path.parts) == 2 or name.startswith(host))
             ),
@@ -133,7 +133,7 @@ def admit(capsule):
             ("different bootstrap", item),
         )
     common = lambda rows: {
-        n: v for n, v in rows.items() if n != "bin/rustc" and not n.startswith("lib/librustc_driver-")
+        n: v for n, v in rows.items() if n not in ("bin/rustc", "bin/rustdoc") and not n.startswith("lib/librustc_driver-")
     }
     need(
         common(normal) == common(defer),

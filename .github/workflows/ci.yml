@@ -12,7 +12,7 @@ run-name: Ruff upstream monomorphization experiment ${{ inputs.reviewed_head }}
         required: true
         type: choice
         default: ruff
-        options: [ruff, providers, async-providers, compatibility, native, rejected-runs]
+        options: [ruff, ruff-qualify, ruff-confirm, providers, async-providers, compatibility, native, rejected-runs]
 permissions: {}
 concurrency:
   group: ohm-upstream-mono-pilot-${{ github.sha }}-${{ inputs.study }}
@@ -21,11 +21,17 @@ jobs:
   ordinary:
     if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-upstream-mono-ruff-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
+    strategy:
+      fail-fast: false
+      matrix:
+        observation: ${{ fromJSON(inputs.study == 'ruff-confirm' && '[0,1,2,3,4,5]' || '[0]') }}
     timeout-minutes: 90
     permissions:
       actions: read
       contents: read
     env:
+      OHM_STUDY: ${{ inputs.study }}
+      OHM_OBSERVATION: ${{ matrix.observation }}
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
@@ -40,7 +46,7 @@ jobs:
           scripts/ruff-matched-stage
         persist-credentials: false
     - name: Check out the calibrated inherited hardware reader
-      if: inputs.study == 'ruff'
+      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         ref: 17981f5b807be81496282dd5a58e579e71586962
@@ -48,7 +54,7 @@ jobs:
         sparse-checkout: scripts/gnu-example-ceiling
         persist-credentials: false
     - name: Check out Ruff ast A
-      if: inputs.study == 'ruff'
+      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         repository: astral-sh/ruff
@@ -56,7 +62,7 @@ jobs:
         path: ast-A
         persist-credentials: false
     - name: Check out Ruff ast B
-      if: inputs.study == 'ruff'
+      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         repository: astral-sh/ruff
@@ -65,7 +71,7 @@ jobs:
         fetch-depth: 2
         persist-credentials: false
     - name: Check out the previously qualified complete native oracle
-      if: inputs.study == 'ruff'
+      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         ref: bd7b58765ae44b21a1c9273b3ff0be8e923adc47
@@ -86,10 +92,10 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: python3 -IB qa/scripts/ruff-indexed-check-pmu/acquire.py
     - name: Require real native outputs and measure two opposite-order build pairs
-      if: inputs.study == 'ruff'
+      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
       run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/pilot.py
     - name: Verify the accepted build histories from raw receipts
-      if: inputs.study == 'ruff'
+      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
       run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/read.py "$RUNNER_TEMP/upstream-mono-study/logs" "$REVIEWED_HEAD"
     - name: Check the selected provider and its actual linked symbols in both compilers
       if: inputs.study == 'providers'
@@ -114,7 +120,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ruff-upstream-mono-${{ inputs.study }}
+        name: ruff-upstream-mono-${{ inputs.study }}${{ inputs.study == 'ruff-confirm' && format('-{0}', matrix.observation) || '' }}
         path: ${{ runner.temp }}/upstream-mono-study/logs
         retention-days: 7
         if-no-files-found: warn
