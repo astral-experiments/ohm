@@ -22,7 +22,7 @@ EXPECTED = {
           "C": "91a5bccd7fc01cbee01fe9ce94561ab7f0557efd7acd12d6036cef25dad86b55"},
 }
 ALLOWED = {".debug_str", ".debug_info", ".debug_macro", ".note.gnu.build-id"}
-STRP = re.compile(rb"^(\s*<[0-9a-f]+>\s+DW_AT_\w+\s+: \(strp\) \(offset: )0x[0-9a-f]+(\): )")
+STRP = re.compile(rb"^\s*<([0-9a-f]+)>\s+DW_AT_\w+\s*:\s+\(strp\) \(offset: (0x[0-9a-f]+|0)\): ")
 
 def need(ok, why):
     if not ok:
@@ -49,22 +49,48 @@ def struct_sections(data):
     need(parts.keys() == ALLOWED, "missing expected debug sections")
     return parts
 
-def debug_dump(file, mode, original):
-    argv = ["readelf", "--wide", "--debug-dump=" + mode, "--debug-dump=no-follow-links", file]
+def resolved_info(left, pinfo, cinfo, pstrings, cstrings, old, new):
+    """Verify all changed physical bytes are actual DW_FORM_strp fields for equivalent strings."""
+    rewritten = bytearray(pinfo)
+    counts = dict(attributes=0, changed_offsets=0, directory_uses=0)
+    argv = ["readelf", "--wide", "--debug-dump=info", "--debug-dump=no-follow-links", left]
+    proc = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            env={**os.environ, "LC_ALL":"C", "DEBUGINFOD_URLS":""})
+    with proc:
+        for line in proc.stdout:
+            match = STRP.match(line)
+            if not match:
+                continue
+            at, shown = int(match[1],16), int(match[2],0)
+            before, = struct.unpack_from("<I", pinfo, at)
+            after, = struct.unpack_from("<I", cinfo, at)
+            need(before==shown and before<len(pstrings) and after<len(cstrings), "unexpected DWARF32 string reference")
+            ptext=pstrings[before:pstrings.index(0,before)]
+            ctext=cstrings[after:cstrings.index(0,after)]
+            need(ptext==ctext or (ptext,ctext)==(old,new), ("different resolved DWARF attribute",at,ptext[:260],ctext[:260]))
+            counts["attributes"]+=1
+            counts["changed_offsets"]+=int(before!=after)
+            counts["directory_uses"]+=int((ptext,ctext)==(old,new))
+            struct.pack_into("<I",rewritten,at,after)
+        errors=proc.stderr.read()
+        need(proc.wait()==0 and not errors,("failed DWARF info reader",errors[:1000]))
+    need(counts["attributes"]>1000 and counts["changed_offsets"]>0 and counts["directory_uses"]>0,"incomplete DWARF coverage")
+    need(rewritten==cinfo,"non-string-reference DWARF info byte changed")
+    counts["rewritten_sha256"]=hashlib.sha256(rewritten).hexdigest()
+    return counts
+
+def macro_dump(file, original):
+    argv = ["readelf", "--wide", "--debug-dump=macro", "--debug-dump=no-follow-links", file]
     digest = hashlib.sha256()
-    line_count = strp = paths = 0
+    line_count = 0
     with subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={**os.environ, "LC_ALL":"C","DEBUGINFOD_URLS":""}) as p:
         for line in p.stdout:
-            if mode == "info":
-                line, n = STRP.subn(rb"\g<1>string-table-index\g<2>", line)
-                strp += n
-            paths += line.count(original)
             digest.update(line.replace(original, b"<jemalloc-build-directory>"))
             line_count += 1
-        err = p.stderr.read()
-        need(p.wait() == 0 and not err, ("debug reader failed", err[:1000]))
-    need(line_count>1000 and (mode != "info" or strp>1000 and paths>0), ("incomplete debugger dump", mode,line_count,strp,paths))
-    return dict(lines=line_count, string_offsets=strp, directory_uses=paths, sha256=digest.hexdigest())
+        err=p.stderr.read()
+        need(p.wait()==0 and not err,("failed DWARF macro reader",err[:1000]))
+    need(line_count>1000,"incomplete macro records")
+    return dict(lines=line_count,sha256=digest.hexdigest())
 
 def compare(left, right, old, new):
     need(len(old)==len(new) and old!=new, "expected distinct equal-width Cargo directories")
@@ -77,16 +103,16 @@ def compare(left, right, old, new):
             prev=stop
         need(a[prev:]==b[prev:], "unexpected trailing ELF bytes")
         lo,hi=parts[".debug_str"]
-        ac=collections.Counter(a[lo:hi].split(b"\0"));bc=collections.Counter(b[lo:hi].split(b"\0"))
+        ps,cs=a[lo:hi],b[lo:hi]
+        ac=collections.Counter(ps.split(b"\0"));bc=collections.Counter(cs.split(b"\0"))
         need(ac-bc=={old:1} and bc-ac=={new:1}, "debug string table differs beyond the recorded jemalloc directory")
         lo,hi=parts[".note.gnu.build-id"]
         need(a[lo:lo+16]==b[lo:lo+16]==struct.pack("<III4s",4,32,3,b"GNU\0") and hi-lo==48, "invalid GNU build ID")
-    info={}
-    for mode in ("info","macro"):
-        first=debug_dump(left,mode,old);second=debug_dump(right,mode,new)
-        need(first==second, ("different resolved DWARF records",mode,first,second))
-        info[mode]=first
-    return dict(debug=info, ranges=parts, old=old.decode(),new=new.decode(), strings=sum(ac.values()))
+        lo,hi=parts[".debug_info"]
+        info=resolved_info(left,a[lo:hi],b[lo:hi],ps,cs,old,new)
+    macro=macro_dump(left,old)
+    need(macro==macro_dump(right,new),"different resolved DWARF macro records")
+    return dict(debug=dict(info=info,macro=macro),ranges=parts,old=old.decode(),new=new.decode(),strings=sum(ac.values()))
 
 def body(z, value):
     return json.loads(gzip.decompress(z.read(value)))

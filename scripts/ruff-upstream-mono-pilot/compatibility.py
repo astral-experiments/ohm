@@ -19,12 +19,3 @@ subprocess.run([
     "--child-sdk", arms["defer"]["root"], "--child-commit", REG["compiler_candidate"], "--child-format", "26655",
     "--equal-header-diagnostic", "--work", ROOT / "compat-work", "--out", LOG / "compatibility",
 ], check=True)
-for role, label, commit in (("P", "normal", REG["compiler_parent"]), ("C", "defer", REG["compiler_candidate"])):
-    arm = arms[label]
-    driver, = [v for k, v in arm["files"].items() if k.startswith("lib/librustc_driver-") and k.endswith(".so")]
-    subprocess.run([
-        sys.executable, "-IB", HERE / "async-provider/verify_async.py",
-        "--shared-fixture", HERE / "providers", "--sdk-root", arm["root"], "--expect-commit", commit,
-        "--expect-driver-sha256", driver, "--factory-receipts", ROOT / "factory-receipts.zip",
-        "--expect-factory-sha256", receipt[2][7:], "--work", ROOT / "async-work", "--out", LOG / ("async-" + role),
-    ], check=True)

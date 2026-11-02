@@ -12,7 +12,7 @@ run-name: Ruff upstream monomorphization experiment ${{ inputs.reviewed_head }}
         required: true
         type: choice
         default: ruff
-        options: [ruff, providers, compatibility, native]
+        options: [ruff, providers, async-providers, compatibility, native]
 permissions: {}
 concurrency:
   group: ohm-upstream-mono-pilot-${{ github.sha }}-${{ inputs.study }}
@@ -94,9 +94,12 @@ jobs:
     - name: Check the selected provider and its actual linked symbols in both compilers
       if: inputs.study == 'providers'
       run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/providers.py
-    - name: Exercise the saved graph in both mixed-compiler directions and check async-drop providers
+    - name: Exercise the saved graph in both mixed-compiler directions
       if: inputs.study == 'compatibility'
       run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/compatibility.py
+    - name: Require the actual async-drop constructor from the selected provider
+      if: inputs.study == 'async-providers'
+      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/async_providers.py
     - name: Resolve every differing native debug section to its complete debug records
       if: inputs.study == 'native'
       env:

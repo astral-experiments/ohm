@@ -77,10 +77,16 @@ def factory(h, a, sizes, relative, files, versions):
     return {"role": role, "zip_sha256": a.expect_factory_sha256, "source_manifests": {n: h.digest(b) for n, b in raw.items()}}
 
 
-def inputs(h, src, shared, owners, bias):
+def inputs(h, src, shared, owners, bias, order):
     api = (HERE / "api.rs").read_text()
     h.require(api.count("wrapping_add(5)") == 1, "ambiguous async destructor body")
-    sources = {"mono_api": api.replace("wrapping_add(5)", f"wrapping_add({bias})"), "mono_consumer": (HERE / "consumer.rs").read_text()}
+    h.require(len(order) == 2 and set(order) == set(h.PROVIDERS), "not the two registered dependencies")
+    consumer = (HERE / "consumer.rs").read_text()
+    mark, extra = "#![feature(async_drop)]", "mono_left::anchor(x) + mono_right::anchor(x)"
+    h.require(consumer.count(mark) == 1 and consumer.count(extra) == 1, "consumer declaration fixture changed")
+    consumer = consumer.replace(mark, mark + "\n" + "\n".join("extern crate " + p + ";" for p in order))
+    consumer = consumer.replace(extra, " + ".join(p + "::anchor(x)" for p in order))
+    sources = {"mono_api": api.replace("wrapping_add(5)", f"wrapping_add({bias})"), "mono_consumer": consumer}
     for p in h.PROVIDERS:
         anchor = (shared / "source" / p / "src/lib.rs").read_text()
         sources[p] = "#![feature(async_drop)]\n" + anchor + ((HERE / "offer.rs").read_text() if p in owners else "")
@@ -142,10 +148,21 @@ def build(h, work, env, out, state, source):
         h.require(native[crate], "missing real native Cargo units")
     h.require(set(ids) == set(h.PROVIDERS) and len(set(ids.values())) == 2 and set(definitions) == set(state["owners"]), "provider or symbol custody mismatch")
     winner = min(state["owners"], key=lambda p: int(ids[p], 16))
+    listing = h.command(["rustc", "+ohm", "-Zls=root", str(archives["mono_consumer"])], env, work/"src", out, "consumer-metadata")
+    h.require(listing["returncode"] == 0, "could not inspect the actual consumer metadata")
+    _, deps = (out / "consumer-metadata.stdout").read_text().split("=External Dependencies=")
+    ordinals = {}
+    for crate in h.PROVIDERS:
+        binary_name = archives[crate].name.removeprefix("lib").removesuffix(".rlib")
+        number, = re.findall(r"^(\d+) " + re.escape(binary_name) + r" hash [0-9a-f]+ host_hash \S+ kind Unconditional ", deps, re.M)
+        ordinals[crate] = int(number)
+    h.require(len(set(ordinals.values())) == 2, "ambiguous physical dependency ordinals")
+    if state["name"] in ("both-later-owner", "winner-restored"):
+        h.require(ordinals[winner] == max(ordinals.values()), "the smaller-ID owner must replace an earlier eligible owner")
     raw = definitions[winner]["symbol"]
     h.require(len({d["symbol"] for d in definitions.values()}) == len(definitions), "duplicated provider-qualified constructor")
     h.require(references and all(r["symbol"] == raw for r in references) and raw.encode() in linked, "consumer did not link the smallest stable eligible provider")
-    result = {"state": state, "source": source, "output": verdict, "native": native, "binary_sha256": cli_sha, "provider_ids": ids, "definitions": definitions, "consumer_relocations": references, "winner": winner, "raw": raw}
+    result = {"state": state, "source": source, "output": verdict, "native": native, "binary_sha256": cli_sha, "provider_ids": ids, "metadata_crate_nums": ordinals, "definitions": definitions, "consumer_relocations": references, "winner": winner, "raw": raw}
     h.store(out / "result.json", {**result, "cargo": run, "fresh": {p:a["fresh"] for p,a in arts.items()}})
     return result, archives
 
@@ -174,7 +191,7 @@ def run(a):
     h.new_cache(work, env)
     sdk_registration = identity(h, a, sdk, env)
     h.store(out / "registration.json", {"sdk": sdk_registration, "argv": h.CARGO, "profile": 0, "source_files": {n:h.file_sha(HERE/n) for n in ("verify_async.py","offer.rs","api.rs","consumer.rs")}, "shared_observer": SHARED_SCRIPT, "shared_source": SHARED_SOURCE, "runtime_floor_bytes": 8*h.GIB})
-    plan = [dict(name="both", owners=list(h.PROVIDERS), bias=5)]
+    plan = [dict(name="both", owners=list(h.PROVIDERS), bias=5, order=list(h.PROVIDERS))]
     histories = {}
     try:
         for history in ("warm", "clean"):
@@ -185,28 +202,33 @@ def run(a):
                 if history == "clean":
                     h.new_cache(work, env)
                 key = state["name"]
-                r, archives = build(h, work, env, dest / key, state, inputs(h, src, shared, state["owners"], state["bias"]))
+                r, archives = build(h, work, env, dest / key, state, inputs(h, src, shared, state["owners"], state["bias"], state["order"]))
                 histories[history][key] = r
                 if history == "warm" and key == "both":
-                    available = [p for p in h.PROVIDERS if p != r["winner"]]
-                    plan.extend((dict(name="winner-withdrawn", owners=available, bias=5), dict(name="async-body-changed", owners=available, bias=19), dict(name="winner-restored", owners=list(h.PROVIDERS), bias=19)))
+                    # Only the measured stable IDs control source order, independently of the selected reference.
+                    earlier, later = sorted(h.PROVIDERS, key=lambda p: int(r["provider_ids"][p], 16), reverse=True)
+                    order = [earlier, later]
+                    plan.extend((dict(name="both-later-owner", owners=list(h.PROVIDERS), bias=5, order=order), dict(name="winner-withdrawn", owners=[earlier], bias=5, order=order), dict(name="async-body-changed", owners=[earlier], bias=19, order=order), dict(name="winner-restored", owners=list(h.PROVIDERS), bias=19, order=order)))
                     h.store(out / "enrolled.json", plan)
                 elif history == "warm" and key == "winner-withdrawn":
-                    both = histories[history]["both"]
+                    both = histories[history]["both-later-owner"]
                     prior = {"selected": {"async": {"raw": both["raw"]}}, "objects": {"mono_consumer": {k: {"sha256": v} for k,v in both["native"]["mono_consumer"].items()}}}
                     current = {"selected": {"async": {"raw": r["raw"]}}, "output": {int(k): v for k,v in r["output"].items()}}
                     link = out / "native-link-control"
                     link.mkdir()
-                    h.stale_link(src, env, link, work, current, archives, prior, dest / "both")
+                    h.stale_link(src, env, link, work, current, archives, prior, dest / "both-later-owner")
                 if history == "clean":
                     h.require(histories["warm"][key] == r, f"warm/fully independent clean mismatch at {key}")
                 print(history, key, r["winner"], r["output"], flush=True)
         states = histories["warm"]
-        both, removed, changed, restored = states.values()
+        both, later, removed, changed, restored = states.values()
+        h.require(both["raw"] == later["raw"] and both["output"] == later["output"], "dependency order changed the selected minimum or the async verdict")
+        survivor = removed["winner"]
+        h.require(later["definitions"][survivor] == removed["definitions"][survivor] and later["native"][survivor] == removed["native"][survivor] and later["metadata_crate_nums"] == removed["metadata_crate_nums"], "the competing earlier provider or its position changed at withdrawal")
         h.require(both["raw"] != removed["raw"] == changed["raw"] and restored["raw"] == both["raw"], "constructor relocation did not follow withdrawal and restoration")
         h.require(both["output"] == removed["output"] and changed["output"] == restored["output"] and all(changed["output"][x] != removed["output"][x] for x in changed["output"]), "async destructor body did not change both verdicts")
         h.require(removed["binary_sha256"] != changed["binary_sha256"], "semantic body edit returned the old executable")
-        h.store(out / "terminal.json", {"success": True, "stale_link_receipt": h.file_sha(out / "native-link-control/result.json"), "commit": a.expect_commit, "driver": sdk_registration["driver"], "registration_sha256": h.file_sha(out/"registration.json"), "states": {k:{"winner": r["winner"], "output": r["output"], "refs": len(r["consumer_relocations"]), "warm": h.file_sha(out/"warm"/k/"result.json"), "clean": h.file_sha(out/"clean"/k/"result.json")} for k,r in states.items()}})
+        h.store(out / "terminal.json", {"success": True, "stale_link_receipt": h.file_sha(out / "native-link-control/result.json"), "commit": a.expect_commit, "driver": sdk_registration["driver"], "registration_sha256": h.file_sha(out/"registration.json"), "states": {k:{"winner": r["winner"], "crate_nums": r["metadata_crate_nums"], "provider_ids": r["provider_ids"], "output": r["output"], "refs": len(r["consumer_relocations"]), "warm": h.file_sha(out/"warm"/k/"result.json"), "clean": h.file_sha(out/"clean"/k/"result.json")} for k,r in states.items()}})
         h.require(marker.read_text() == nonce, "private ownership changed")
         shutil.rmtree(work)
     except Exception as error:
