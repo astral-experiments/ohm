@@ -94,7 +94,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 682930c7b58a62cd46c6f951b60d8cab8d3c7869
+        test "$(git rev-parse HEAD^)" = 267065b0c12d6131cd9f0bb7fb241484bc375518
 
         '
     - name: Verify the frozen stage1 baseline and the inventory source pack
