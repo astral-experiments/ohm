@@ -1,0 +1,103 @@
+{
+ "admission": {
+  "affected": "signed R, ordinary edited B on #22536",
+  "all_64_externs": 54157438,
+  "archived_input_local_8_1_1_8_qualification": "732e8951c6270e68253bc684394112368b6458ab0929dfda9fce95bedef0495a",
+  "compared_real_cold_argv": 1019,
+  "exact_synthetic_moves": {
+   "OpaqueLifetime": 54,
+   "SyntheticCoroutineBody": 3
+  },
+  "matched_full_argv": 1020,
+  "owner": "uv_client",
+  "prospective_sources": {
+   "fixed_input.py": "3f5d3134ba5dd7bab539f77bb919b38f4fae15aa6099b5389a3dd3acc7ed0d35",
+   "live_metadata.py": "22a1616e8dbb1f33fe41f4417b8b29a938e3a483ff6cb860ef8d0f4e44fdcdb7",
+   "live_review.py": "df287f62508583f251c41c91dc038f9af01d5476396452aadc0eb5e77e3868be",
+   "session.py": "a880fa7d798f3cd0b692c30f7320c7cb4a9b14751ecc4828a41742c45fd8b3db"
+  },
+  "real_unchanged_owner_F_coverage_and_two_archives": "dcf06e8a5dbc3e77c1cf7f45583209231fdcaf0211ad508b43f13c4f00ffcfd6",
+  "recorded_dep_info": [
+   1699,
+   "69a53493abdaa68635a524d8a30d4ad29b576e04d13c72caacf6405cb300c624"
+  ],
+  "source_producer_stage": "literal warm iff actually edited; otherwise literal cold A"
+ },
+ "closed_run": {
+  "additional_arms": 1,
+  "completed_pairs": 2,
+  "failure": "d70c617de38cef46b2a93c3b1d766b566e605300c8d5aa3cb8b8a7152cbdb7ab",
+  "head": "b9396475c5c973c931fabd8c95ab9548104dbdc4",
+  "id": 41523955754,
+  "inner_original_sha256": "ded09239da1d159e757f38d22ba1f3d4bcf443aac8f53daaedec9435c5729f60",
+  "job": 125546777079,
+  "machine": {
+   "boot": "9d23133e-bce4-4fe7-b854-ea066fec2c98",
+   "name": "nsc-runner-c0tu3e2asrb94",
+   "runner": 1796
+  },
+  "native_calibration": {
+   "boot": "9d23133e-bce4-4fe7-b854-ea066fec2c98",
+   "head": "b9396475c5c973c931fabd8c95ab9548104dbdc4",
+   "id": 13179072121,
+   "job": 125546777079,
+   "prior": "7b8e29547e5e5948d72e566f77849bbdea36dd858551af29ad820cc4cc33495b",
+   "receipt": "c3ee50373d6eb60c93a6533a23720458583e51d98f1ddbb08151227e814f7c66",
+   "run": 41523955754,
+   "service": "46161455c9cd43dcff8dcafb5eda5d241bcca54804e75cbdcfa9d711022fb62c",
+   "zip": "0dd233f402cd2b55f7667ab98aa51459c68012b887a69ddfc3c863588a6bc0d1"
+  },
+  "scored_pairs": 0,
+  "service_original_sha256": "ed9dd3b989b6bea01c886811021909f2b74ca704d28e3d29cea9cf913220a338",
+  "service_receipt": "a701b0537026d1f2417c8c1c6ec6b59521cd4207389871bef96e850a075cd926"
+ },
+ "custody": "One 128 MiB compressed original maximum. Original refusal raw retrieval prefers both metadata forms and every selected external input. No historic acceptances or samples may enter the future score.",
+ "holdout": {
+  "command": [
+   "cargo",
+   "check",
+   "-p",
+   "uv-client",
+   "--locked",
+   "--offline",
+   "-j8"
+  ],
+  "commits": {
+   "A": {
+    "is_scored_code_change": false,
+    "meaning": "Clean original parent",
+    "source": "19556e6656a3219a8c339930fe6a6a8a1ba4df4f",
+    "tree": "1660a2961f1dfdc84e5ab8dbbadf1b4a9a9241d1"
+   },
+   "B": {
+    "is_scored_code_change": true,
+    "meaning": "Add real wheel variant scoring and integrate selection",
+    "source": "9ae82bd77a74025fee2c81cdbe217e0d10785672",
+    "tree": "cd92df19a3d355119b0b7df6fd075bb297e41bc1"
+   },
+   "C": {
+    "is_scored_code_change": false,
+    "meaning": "Keep actual docs/indentation review and execute ordinary check",
+    "source": "d3e07ee0e803733501d30cf23066bfec86ec4822",
+    "tree": "01d21e8347d631b306d00bdb1995f7ae27f6b0fb"
+   },
+   "D": {
+    "is_scored_code_change": true,
+    "meaning": "Rename the public preferences type and update its production resolver caller",
+    "source": "d9ed4be043e33e1494d17fa555bc0f6d9af9ed06",
+    "tree": "b964cfd977218aa7cbea0cdbd7c1867128b2b6b6"
+   }
+  },
+  "prior_evidence": "Every prior arm remains excluded: eight new independent A histories/role and two real code transitions B and D plus auxiliary C per history. Published signed release checked before startup and scoring."
+ },
+ "previous_source_enrollment": {
+  "compressed": "1b9aa1ff85d95854b85bcb629f1494e799855b6d4e3582d64761584cdc875581",
+  "file": "kit/pre-mode-enrollment.json.gz",
+  "oid": "365600d05d98b8f2a313c540f8f81040bbf2ec6c",
+  "sha256": "7b8e29547e5e5948d72e566f77849bbdea36dd858551af29ad820cc4cc33495b"
+ },
+ "protocol": "8ce5b388b9e5ca2a3543abbdf572aff97bf4a7958aa0be69813978d330eaf803",
+ "schema": 1,
+ "score": "5f8b7f93684dcbb9e0b7fea4a1d506eb9fdc3287de5c75808e122e015c59cfa9",
+ "workflow_blob": "675849e85269c7162c64fc4b5f085a826429e2ef"
+}

@@ -86,7 +86,8 @@ def arm(e,role,armname,index,cal,ref):
                 rec=kernel(e,dest,'edited');form[state]=changed_forms(rec);assert form[state]==ref[state][2],(role,index,state,'literal per-role argv changed');assert rec['workspace_rmeta_from_argv']=={n:paths[n]for n in SIX};golden[state]=products(e,paths,store=True);writez(dest/'products.json.gz',golden[state]);oracle=probe(e,state,form[state],dest)
                 fixed_products.changed(before,fixed_products.ordinary_stats(e.target),expected);ordinary[state]=fixed_products.recorded(e.target,expected);writez(dest/'fixed-products.json.gz',ordinary[state])
                 cert=ref[state][1];coverage={n:r['coverage']for n,r in cert['covered'].items()}if cert else {}
-                assert live_metadata.qualify(e,role,state,dest,paths,cold['forms']|rec['forms'],ref[state][3],golden[state],ref[state][0],oracle,coverage)['accepted'];kernel(e,d/('noedit-'+state),'unchanged');assert products(e,paths)==golden[state]
+                reference=(ref['_cold_forms'],ref[state][2],ref[state][3])
+                assert live_metadata.qualify(e,role,state,dest,paths,cold['forms']|rec['forms'],reference,golden[state],ref[state][0],oracle,coverage)['accepted'];kernel(e,d/('noedit-'+state),'unchanged');assert products(e,paths)==golden[state]
             else:
                 value=capture(e,state,mode,dest,form[state],mask);observed=products(e,paths);assert observed==golden[state],(role,index,state,mode,'same-seed product mismatch');writez(dest/'products.json.gz',observed);rows.setdefault(state,{})[mode]=value
                 stable=fixed_products.recorded(e.target,expected);assert stable==ordinary[state],(role,index,state,mode,'Cargo fixed output mismatch');writez(dest/'fixed-products.json.gz',stable)

@@ -21,15 +21,31 @@ def missing(row,existing):
         assert n in owners or v['all_semantic_guards_passed']
     return result
 
+def producer_reference(owner, forms, reference):
+    """Verify the actual producer against the independent opening in its own Cargo mode."""
+    opening_a, edited, clean = reference
+    actual, = forms[owner]
+    matched, = edited[owner] if owner in edited else opening_a[owner]
+    independent, = clean[owner]
+    assert actual == matched
+    adaptive = actual != independent
+    if adaptive:
+        assert owner in edited and actual[1:5] == ['-Zohm-shared-stages', '-Zpublic-api-hash', '-Zthreads=8', '-Zthreads=1']
+        assert actual[:4] + actual[5:] == independent
+        assert [s for s in independent if s.startswith('-Zthreads=')] == ['-Zthreads=8']
+    return {'stage': 'edited' if owner in edited else 'cold-A', 'selected_argv': digest(canon(actual)),
+            'fresh_argv': digest(canon(independent)), 'adaptive_threads': adaptive}
+
 def reproduce(e,role,state,d,paths,forms,source_forms,prod,oracle,want):
     from session import targetsha,stamps
     assert e.source(state)==CASE['states'][state]['source']and d.parent.is_dir()and not d.exists()
-    for owner in want:
-        assert len(forms[owner])==1 and forms[owner]==source_forms[owner]and prod['workspace'][owner][0]==paths[owner]
+    references = {owner: producer_reference(owner, forms, source_forms) for owner in want}
+    assert all(prod['workspace'][owner][0] == paths[owner] for owner in want)
     # Keep all originals at their exact inodes. Only diagnostic clones run
     # through RUSTC_WRAPPER and the four registered thread settings.
     old=e.target.stat();hash_before=targetsha(e.target);mtimes=stamps(e)
-    result=fixed_input.certify(e,role,state,d,paths,forms,prod,oracle,want,preserve_original=True)
+    result=fixed_input.certify(e,role,state,d,paths,forms,prod,oracle,want,preserve_original=True,
+                              adaptive_owners={owner for owner, r in references.items() if r['adaptive_threads']})
     after=e.target.stat();assert (old.st_dev,old.st_ino)==(after.st_dev,after.st_ino)and hash_before==targetsha(e.target)and stamps(e)==mtimes and set(result['covered'])==set(want)
     keep={}
     for owner,classes in want.items():
@@ -37,7 +53,7 @@ def reproduce(e,role,state,d,paths,forms,source_forms,prod,oracle,want):
         assert [r['threads']for r in cert['rows']]==fixed_input.RULE['sequence'] and len({tuple(r['result'])for r in cert['rows']})>=2
         assert all(r['argv']==digest(canon(orig+['-Zthreads='+str(r['threads'])])) and r['inputs']==digest(canon(cert['held_inputs']))for r in cert['rows'])
         assert cert['original_native_header']==digest(fixed_input.native_header(e,e.target/paths[owner]))
-        keep[owner]={'source':CASE['states'][state]['source'],'real_baseline':baseline,'forms':digest(canon(orig)),'externs':cert['held_inputs'],'wanted':classes,'proof':cert['coverage']}
+        keep[owner]={'source':CASE['states'][state]['source'],'real_baseline':baseline,'forms':digest(canon(orig)),'externs':cert['held_inputs'],'wanted':classes,'proof':cert['coverage'],'reference':references[owner]}
     writez(d/'live-input-bounds.json.gz',{'role':role,'state':state,'source':e.source(state),'target_before_and_after':hash_before,'source_mtimes_before_and_after':digest(canon(mtimes)),'restored_original_inode':[old.st_dev,old.st_ino],'owners':keep})
     return result
 

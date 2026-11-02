@@ -14,8 +14,9 @@ def native_header(e,p):
     # This invocation only reads the finished .rmeta. Its private environment
     # is never inherited by the Cargo child producing either compared artifact.
     z=subprocess.run([e.bin,'-Zls=root',p],env=dict(e.env,RUSTC_BOOTSTRAP='1'),capture_output=True,check=True);assert not z.stderr and z.stdout;return z.stdout
-def certify(e,role,state,folder,paths,forms,before,oracle,needs,*,preserve_original=False):
+def certify(e,role,state,folder,paths,forms,before,oracle,needs,*,preserve_original=False,adaptive_owners=frozenset()):
     assert role in('R','S','F')and state in'BCD'and filehash(WRAP)==RULE['wrapper']and os.access(WRAP,os.X_OK)
+    assert not adaptive_owners or preserve_original and adaptive_owners <= needs.keys()
     src=e.source(state);folder.mkdir();saved=e.bank/('fixed-'+role+'-'+state);assert not saved.exists()
     form_file=folder/'forms.json';write(form_file,forms);complete={}
     def restore():
@@ -28,9 +29,21 @@ def certify(e,role,state,folder,paths,forms,before,oracle,needs,*,preserve_origi
             restore()
             known=RULE['known_prior_physical_kinds'][owner];assert set(wanted)<=set(known);orig,=forms[owner];unit=Path(orig[orig.index('--out-dir')+1]).parent;assert unit.parent==e.target/'debug/build'/owner.replace('_','-')and len(unit.name)==16
             p=e.target/paths[owner];ref=before['workspace'][owner][1:];old_header=native_header(e,p);fixed=inputs(orig);seen=set();coverage=set();w=[]
+            prior_dep = None
+            if owner in adaptive_owners:
+                # Signed Cargo's prepare_rustc reads this file's size to choose the frontend thread count.
+                # Preserve only that actual scheduling input while rebuilding the owner from scratch.
+                rel_dep = unit.relative_to(e.target)/'fingerprint'/('dep-lib-'+owner)
+                prior_dep = saved/rel_dep
+                assert prior_dep.is_file() and not prior_dep.is_symlink() and 0 < prior_dep.stat().st_size <= 16*1024
+                writez(folder/(owner+'-cargo-dep-info.json.gz'), {'path':str(rel_dep),'contents_hex':prior_dep.read_bytes().hex(),'sha256':filehash(prior_dep)})
             for i,n in enumerate(RULE['sequence']):
                 restore();assert e.source(state)==src and stash(e,p)==ref and inputs(orig)==fixed;inc,=(e.target/'debug/incremental').glob(owner+'-*');assert inc.is_dir()and(unit/'fingerprint').is_dir()
-                shutil.rmtree(inc);shutil.rmtree(unit);d=folder/(owner+'-'+str(i));d.mkdir();logs=d/'argv';logs.mkdir()
+                shutil.rmtree(inc);shutil.rmtree(unit)
+                if prior_dep is not None:
+                    dest=e.target/rel_dep;dest.parent.mkdir(parents=True);shutil.copy2(prior_dep,dest)
+                    assert dest.read_bytes()==prior_dep.read_bytes() and not inc.exists()
+                d=folder/(owner+'-'+str(i));d.mkdir();logs=d/'argv';logs.mkdir()
                 env=dict(e.env,RUSTC_WRAPPER=str(WRAP),OHM_22958_FORMS=str(form_file),OHM_22958_OWNER=owner,OHM_22958_THREADS=str(n),OHM_22958_LOGS=str(logs));assert 'RUSTC_BOOTSTRAP'not in env and env.keys()-e.env.keys()=={'RUSTC_WRAPPER','OHM_22958_FORMS','OHM_22958_OWNER','OHM_22958_THREADS','OHM_22958_LOGS'}
                 with (d/'stdout').open('xb')as so,(d/'stderr').open('xb')as se:z=subprocess.run(e.argv,cwd=e.src,env=env,stdout=so,stderr=se,timeout=900)
                 assert z.returncode==0 and not(d/'stdout').stat().st_size

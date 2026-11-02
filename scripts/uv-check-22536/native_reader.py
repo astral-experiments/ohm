@@ -6,7 +6,7 @@ from basis import CASE,HERE,LOCK,PLAN,SIX,WORKSPACE,canon,digest,filehash,read,r
 import fixed_products,producer_map,live_review
 def affirm(root):
     cal=read(root/'calibration/accepted.json');qual=read(root/'qualification/accepted.json');selected=qual['control'];mat=read(root/'actual-inputs.json');bounds=read(root/'compatibility.json');dc=root/'calibration';assert cal['protocol']==qual['plan']==CASE['protocol']and cal['boot']not in cal['excluded']and len(cal['excluded'])==len(set(cal['excluded']))>24 and len(cal['cpus'])==len(set(cal['cpus']))==8
-    assert set(cal['excluded'])==set(read(HERE/'dispatch-enrollment.json')['excluded_boots'])and len(cal['excluded'])==27
+    assert set(cal['excluded'])==set(read(HERE/'dispatch-enrollment.json')['excluded_boots'])and len(cal['excluded'])==28
     assert filehash(dc/'scoped/calibration.json')==cal['scoped']and filehash(dc/'wall/passed.json')==cal['blocking'];sc=read(dc/'scoped/calibration.json');assert sc['reexec_rejected']and set(sc['known_two_instruction_loop'])=={'serial','threads','fork'}
     for key,expected in {'serial':22000000,'threads':66000000,'fork':0}.items():
         v=sc['known_two_instruction_loop'][key];assert v['expected_delta']==expected and v['counts'][1]-v['counts'][0]==v['measured_delta']and abs(v['measured_delta']-expected)<=100000
