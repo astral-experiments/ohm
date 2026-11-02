@@ -94,7 +94,7 @@ def report(out):
                        observer.parts[-3:]==(path.name,"pmu","whole-clock.json"),"wrong PMU boundary");counts["user_instructions"]=counter(p/"whole-clock.json")
             t=m.read(path/"typed/observed.json");m.guard(t["argv"]==ref["argv"] and t["details"]==ref["edit"] and
                     (t["rows"],t["build_scripts"],t["workspace"],t["diagnostics"])==(641,51,70,[]),"typed events/arguments")
-            t=m.read(path/"scoped/parsed.json");kids=[r for r in t["tree"]["exec"] if r["path"]==str(m.RUSTC)]
+            t=m.read(path/"scoped/compiler-execs.json");kids=t["compilations"]
             m.guard(t["score"] is False and t["command"]==m.ARGS and len({r["pid"] for r in kids})==len(kids)==18 and sorted(r["argv"] for r in kids)==ref["argv"],"genuine rustc PIDs/arguments")
             same=raw(path/"native");m.guard(all(m.read(path/k/"workspace-products.json")==same for k in ("typed","pmu","scoped")) and
                 m.digest(m.canon(same))==a["same_seed_raw_sha256"],"same-seed raw mismatch")

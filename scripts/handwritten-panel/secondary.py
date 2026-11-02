@@ -3,7 +3,7 @@ import gzip,inspect,json,os,re,shutil,subprocess,sys
 from pathlib import Path
 from fractions import Fraction
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-import material as m, run, score, scope, identity
+import material as m, run, score, scope, identity, receipt
 from enroll import ROLES
 PKG=[str(m.SDK/'bin/cargo'),'check','--locked','--offline','-j8','-p','uv','--lib']
 ORDERS=[{'hold':1,'pair':1,'roles':list(ROLES),'modes':['native','pmu']},{'hold':1,'pair':2,'roles':list(reversed(ROLES)),'modes':['pmu','native']}]
@@ -50,12 +50,15 @@ def discover(role,out,bank,delta,o,api):
     m.erase(seed,m.SRC,m.TARGET,m.CARGO_HOME,m.HOME)
     return shape,bg,er,ga
 def traced(opening,tmp,argv):
-    import lifecycle
-    d=tmp/'package-strace';d.mkdir();src=(opening/'trace.py').read_bytes()
-    assert m.digest(src)==m.P['pinned_opening']['trace.py']
-    (d/'trace.py').write_bytes(lifecycle.source(src,len(argv)))
-    case=m.read(opening/'case.json');assert case['unscored_argv']==m.P['argv'];case['unscored_argv']=PKG;m.save(d/'case.json',case);m.save(d/'reference.json',{'argv':argv})
-    return lifecycle.attach(m.load('secondary_scoped_exec',d/'trace.py'))
+    from compiler_observer import Observer
+    return Observer(PKG,argv)
+def package_receipt(native,stored):
+    # The package owns exactly 64 names. Preserve the complete raw JSON equality,
+    # then pass the same receipt structure through the origin's typed 70-name reader.
+    def named(record):
+        assert set(record)=={"all_64_roots_and_deps_equal","actual_downstream","raw_drift","deep"}
+        return {("all_70_roots_and_deps_equal" if k=="all_64_roots_and_deps_equal" else k):v for k,v in record.items()}
+    return receipt.canonical(native)==receipt.canonical(stored) and receipt.matches(named(native),named(stored))
 def stamped(path,mode,ready,meter,progress):
     receipt=m.read(path/'ordinary.json');assert receipt['mode']==mode and receipt['boot']==ready['boot'] and receipt['cpus']==ready['affinity'] and receipt['argv']==PKG and receipt['exit']==0
     assert receipt['env']==m.ENV and not (path/'cargo.stdout').read_bytes()
@@ -87,12 +90,13 @@ def main():
     run.typed=typed;tr=traced(opening,fresh,ref['argv']);tr.calibrate(out/'trace-calibration');tr.mutations(out/'trace-calibration')
     cold={}
     for role in ROLES:
-        m.choose(role,bank,installed);q=out/('qualification-'+role);cold[role]=run.qualify(role,bank,delta,q,o,api,parser,ref)
+        m.choose(role,bank,installed);q=out/('qualification-'+role);cold[role]=run.qualify(role,bank,delta,q,o,api,parser,ref,tr)
         m.save(q/'virtual-project.json',identity.check(role,q,parser))
+        tr.replay(q/'preclock-exec');assert m.read(q/'preclock-exec/workspace-products.json')==m.read(q/'A-to-B/workspace-products.json')
         replay(q/'preclock-edit',graph,o,api,'edit',ed,shape);replay(q/'settled-A',graph,o,api,'background',bg,shape)
         four=m.read(q/'four-state.json')['comparisons']
         for k,left,right in [('cold-B1','A-to-B','cold-B1'),('cold-B2','A-to-B','cold-B2'),('both-independent-cold','cold-B1','cold-B2')]:
-            assert run.compared(q/left,q/right,shape,api,parser)==four[k]
+            assert package_receipt(run.compared(q/left,q/right,shape,api,parser),four[k])
         for v in ('A','B'):score.fixture(q/('fixture-'+v),v)
     rows=[];previous_stop=0
     for design in ORDERS:
@@ -104,7 +108,7 @@ def main():
                 clock=m.read(p/mode/'ordinary.json');assert previous_stop<clock['start_ns']<clock['end_ns'];previous_stop=clock['end_ns']
             a=m.read(p/'accepted.json');assert a['genuine_children']==len(ref['argv']) and a['mode_order']==design['modes'];tr.replay(p/'scoped');replay(p/'typed',graph,o,api,'edit',ed,shape)
             expected=m.read(p/'native/workspace-products.json');assert len(expected)==64 and all(m.read(p/k/'workspace-products.json')==expected for k in ['pmu','typed','scoped'])
-            assert run.compared(p/'native',cold[role],shape,api,parser)==a['independent_cold']
+            assert package_receipt(run.compared(p/'native',cold[role],shape,api,parser),a['independent_cold'])
             vals[role]={'user_instructions':stamped(p/'pmu','pmu',ready,meter,ed['details']['progress']),'wall_nanoseconds':stamped(p/'native','native',ready,meter,ed['details']['progress'])}
         rows.append({'design':design,'values':vals})
     for role in ROLES:

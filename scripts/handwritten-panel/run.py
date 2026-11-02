@@ -89,7 +89,7 @@ def witness(path,state,o):
     m.save(path/"receipt.json",{"argv":argv,"exit":r.returncode,"passed":passed,"tree":m.history()[0],"workspace_rs_sha256":m.filesha(ws)})
     m.erase(target)
 
-def qualify(role,bank,delta,path,o,api,parser,ref):
+def qualify(role,bank,delta,path,o,api,parser,ref,observer):
     path.mkdir();m.reset(bank,"A",delta);command(path/"ordinary-A",m.ARGS,"cold-A")
     shape=m.shape();a=capture(path/"ordinary-A",shape,o,api)["raws"]
     measured=typed(path/"settled-A","background",ref,o,api);m.guard(measured==shape and rawproof.require(path/"ordinary-A",path/"settled-A",a,inventory(path/"settled-A",shape)),"observed A differs from ordinary A")
@@ -97,7 +97,9 @@ def qualify(role,bank,delta,path,o,api,parser,ref):
     seed=m.freeze();stamp=m.seed_state(seed,role);m.restore(seed,delta,role,stamp)
     command(path/"A-to-B",m.ARGS,"qualifying-edit");ordinary=capture(path/"A-to-B",shape,o,api)["raws"]
     m.restore(seed,delta,role,stamp);observed=typed(path/"preclock-edit","edit",ref,o,api)
-    m.guard(observed==shape and rawproof.require(path/"A-to-B",path/"preclock-edit",ordinary,inventory(path/"preclock-edit",shape)),"unmeasured diagnostic changed outputs");m.erase(seed)
+    m.guard(observed==shape and rawproof.require(path/"A-to-B",path/"preclock-edit",ordinary,inventory(path/"preclock-edit",shape)),"unmeasured diagnostic changed outputs")
+    m.restore(seed,delta,role,stamp);forwarded=path/"preclock-exec";observer.execute(forwarded,m.ARGS,m.ENV,m.SRC);observer.replay(forwarded)
+    rawproof.require(path/"A-to-B",forwarded,ordinary,inventory(forwarded,shape));m.erase(seed)
     witness(path/"fixture-B","B",o)
     comparisons={}
     for i in (1,2):
@@ -160,7 +162,7 @@ def main():
         src=tmp/"ctfe22-root-sdks"/role;m.guard(src.is_dir() and src.resolve()==src,"invalid installed SDK");shutil.move(src,bank/("sdk-"+role))
     m.choose("fa7a_stack_ctfe318",bank,installed);m.provision(o,bank,out);baseline={}
     for role in m.P["roles"]:
-        m.choose(role,bank,installed);baseline[role]=qualify(role,bank,delta,out/("qualification-"+role),o,api,parser,ref)
+        m.choose(role,bank,installed);baseline[role]=qualify(role,bank,delta,out/("qualification-"+role),o,api,parser,ref,trace)
     import identity
     for role in m.P["roles"]:
         q=out/("qualification-"+role);m.save(q/"virtual-project.json",identity.check(role,q,parser))

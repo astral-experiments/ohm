@@ -151,7 +151,7 @@ jobs:
         /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/run.py run 2>&1 | tee trait-results/experiment.log
 
         '
-    - name: Read back the raw clocks, Cargo streams, process trees and metadata independently
+    - name: Read back the raw clocks, Cargo streams, compiler invocations and metadata independently
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/audit.py hosted
     - name: Screen two independently warmed uv production-library checks on the same boot
       run: 'set -euo pipefail
@@ -161,7 +161,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-20988-handwritten-stage1-check-1
+        name: uv-20988-handwritten-stage1-exec-check-1
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
