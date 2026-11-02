@@ -16,14 +16,42 @@
     "rust.download-rustc=false"
   ],
   "bundle": {
-    "branch": "refs/heads/charlie/llvm-defer-dev-live-intervals",
-    "bytes": 966,
-    "sha256": "cb524cab328b30c17ee20b5314e58cfe7836eac0d552127e1e02ffdb2d0931e4"
+    "branch": "refs/heads/charlie/rc23-repair-rematerialized-copy-intervals",
+    "bytes": 35358,
+    "sha256": "46a0615fb3085d14bdf97183a1db27dcdf64729a21d8932662f965bb7cfded6b"
   },
   "changed_sources": {
-    "compiler/rustc_codegen_llvm/src/llvm_util.rs": {
-      "C": "f411e041cb5b8ae2134e31a85ce0a67965cf43b5",
-      "P": "82ddcca3e15305e8a49fae4a444c437a4b9acb68"
+    "compiler/rustc_codegen_llvm/src/back/write.rs": {
+      "C": "385ff25cf813bcb0750deceb6fd2d02af72abc1b",
+      "P": "cdd7cc428661af9997b7c109112f73a6727de826"
+    },
+    "compiler/rustc_codegen_llvm/src/llvm/ffi.rs": {
+      "C": "3672cb2a0c6501500f54610bc5d2dde73c74ccc7",
+      "P": "b467035eb64ebddc5d70933c8f7aadb5be80f325"
+    },
+    "compiler/rustc_codegen_ssa/src/back/write.rs": {
+      "C": "ac27800108159f5615c9a0c3e691d1b9a5a7ec65",
+      "P": "ef7fcf1d770c0822abb0f5e85919652f13fe4995"
+    },
+    "compiler/rustc_llvm/build.rs": {
+      "C": "18b9b1188c347b725837484329316dcd9b0dedeb",
+      "P": "c6a4013db3913681ef9caf3b652e886bce5ef684"
+    },
+    "compiler/rustc_llvm/llvm-wrapper/OhmRegisterCoalescer.cpp": {
+      "C": "d5b947430bf30e307e6f2a53ca4bf520c3454425",
+      "P": null
+    },
+    "compiler/rustc_llvm/llvm-wrapper/ohm-register-coalescer/RegisterCoalescer.patch": {
+      "C": "0ab37470bed49e6e7c810920cbf084de878dea65",
+      "P": null
+    },
+    "src/bootstrap/src/core/build_steps/compile.rs": {
+      "C": "477f804cf18f920a2aa25e816ec27bcc82c840cd",
+      "P": "e58d418a1717e7ec6e47770d19bedf22948ac679"
+    },
+    "src/bootstrap/src/core/download.rs": {
+      "C": "74fef130b69fe8c573199adb2e12300645d9f8bf",
+      "P": "0b3f43a7e79ef5f0e9b04fa8e326ba12afb12810"
     }
   },
   "kit": {
@@ -33,9 +61,9 @@
   },
   "roles": {
     "C": {
-      "compiler": "43ed11f0d8dc3801c7928c7f8892138b3fdd0d26",
-      "revision": "554704972388b58870ecd3a51c0c2f4eb88d2a58",
-      "tree": "cb31f67642f2123200353a2c19ac72dbe423b12c"
+      "compiler": "5d0ffc99bf5cfa430ab17ea6ee214bbd0d0485dd",
+      "revision": "7a66ed4470584acd4ca637d47562ae88d2dc941f",
+      "tree": "7cb60259a9a373bd8f78ea69fa34dce3cd1549bf"
     },
     "P": {
       "compiler": "992fea2dd7c2a88fca8a3b34bb6aa34fc925d1ac",
@@ -69,5 +97,6 @@
     "tag": "ohm-1.99.0-22"
   },
   "source_epoch": 1793555546,
-  "target": "x86_64-unknown-linux-gnu"
+  "target": "x86_64-unknown-linux-gnu",
+  "treatment": "guarded-public-register-coalescer"
 }

@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   matched:
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-remat-matched-stage-20261102'
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-remat-public-rustc-20261102'
       && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
@@ -140,7 +140,7 @@ jobs:
     - name: Build the isolated stage1 pair and verify ordinary Cargo
       run: |-
         set -euo pipefail
-        command -v git curl cmake ninja cc rustup gh zstd
+        command -v git curl cmake ninja cc rustup gh zstd nm patch
         python3 -IB qa-code/scripts/ruff-matched-stage/build.py build
     - name: Package authenticated content-addressed compiler objects
       run: |-

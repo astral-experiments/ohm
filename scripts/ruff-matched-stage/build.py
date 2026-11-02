@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-remat-matched-stage-20261102"
+BRANCH = "charlie/qa-remat-public-rustc-20261102"
 BASE = "00f4192b5507f8c028898ce5bd66958d20f341c5"
 
 
@@ -49,21 +49,35 @@ def bundle(repo):
         and git(repo, "rev-list", c, "^" + p).splitlines() == [c],
         "not the single prepared compiler commit",
     )
-    changed = sorted(REG["changed_sources"])
-    need(
-        git(repo, "diff", "--name-status", "--no-renames", p, c).splitlines()
-        == ["M\t" + path for path in changed],
-        "different treatment paths",
-    )
+    changes = REG["changed_sources"]
+    paths = sorted(changes)
+    expected = [("A" if changes[path]["P"] is None else "M") + "\t" + path for path in paths]
+    need(git(repo, "diff", "--name-status", "--no-renames", p, c).splitlines() == expected,
+         "different treatment paths")
     for role, entry in REG["roles"].items():
-        rev = entry["revision"]
-        need(
-            git(
-                repo, "rev-parse", rev + "^{tree}", rev + ":compiler", *(rev + ":" + p for p in changed)
-            ).splitlines()
-            == [entry["tree"], entry["compiler"], *(REG["changed_sources"][p][role] for p in changed)],
-            "incorrect compiler source trees",
-        )
+        revision = entry["revision"]
+        trees = git(repo, "rev-parse", revision + "^{tree}", revision + ":compiler").splitlines()
+        need(trees == [entry["tree"], entry["compiler"]], "incorrect compiler source trees")
+        entries = {}
+        for line in git(repo, "ls-tree", "-r", revision, "--", *paths).splitlines():
+            description, path = line.split("\t", 1)
+            mode, kind, blob = description.split()
+            need((mode, kind) == ("100644", "blob") and path not in entries, "unexpected source entry")
+            entries[path] = blob
+        need(entries == {path: changes[path][role] for path in paths if changes[path][role] is not None},
+             "unregistered coalescer source")
+
+
+def driver_coalescer(stage, role):
+    driver, = (stage / "lib").glob("librustc_driver-*.so")
+    with subprocess.Popen(["nm", "--defined-only", "--demangle", driver], stdout=subprocess.PIPE, text=True) as process:
+        symbols = [line.split(maxsplit=2)[-1].strip() for line in process.stdout
+                   if "RustCoalescerManager::add(" in line or line.rstrip().endswith(" LLVMRustCreateCoalescingPassManager")]
+        need(process.wait() == 0, "unreadable stage1 driver symbol inventory")
+    installed = any("RustCoalescerManager::add(" in item for item in symbols)
+    factory = "LLVMRustCreateCoalescingPassManager" in symbols
+    need(installed == factory == (role == "C"), ("wrong product coalescer in the actual driver", role, symbols))
+    return {"driver": driver.name, "sha256": sha(driver), "custom_manager": installed, "symbols": symbols}
 
 
 def control(workspace, root):
@@ -281,6 +295,7 @@ def build(workspace, root):
         )
         print("Starting clean stage1", role, rev, flush=True)
         guarded(argv, rust, env, root / "logs" / ("build-" + role + ".log"), root)
+        save(root / "logs" / ("driver-coalescer-" + role + ".json"), driver_coalescer(directory / HOST / "stage1", role))
         kit.freeze(directory / HOST / "stage1", role, rev)
         need(
             json.loads(json.dumps(layout.checked(rust, rev, desc["tree"], substitutions))) == full,
