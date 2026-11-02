@@ -3,6 +3,7 @@ import gzip
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -26,8 +27,11 @@ uid_t getuid(void) { return (uid_t)syscall(SYS_getuid); }
 uid_t geteuid(void) { return (uid_t)syscall(SYS_geteuid); }
 
 __attribute__((constructor)) static void identify_provider(void) {
-    if (getenv("OHM_RUFF_NATIVE_WITNESS"))
-        (void)write(2, "OHM_RUFF_NATIVE_" ROLE "\n", sizeof("OHM_RUFF_NATIVE_" ROLE "\n") - 1);
+    if (getenv("OHM_RUFF_NATIVE_WITNESS")) {
+        const char message[] = "OHM_RUFF_NATIVE_" ROLE "\n";
+        if (write(2, message, sizeof(message) - 1) != sizeof(message) - 1)
+            _exit(123);
+    }
 }
 '''
 
@@ -48,22 +52,23 @@ def compile_libraries(loader):
     assert len(result['A'])==len(result['B']) and result['A']!=result['B']
     return result
 
-def test_binary(path,env,letter):
+def test_binary(path,env):
     dyn=subprocess.check_output(['readelf','-dW',path])
     needed=[l for l in dyn.splitlines() if b'(NEEDED)' in l and b'libohm-ruff-db-' in l]
-    expected=('libohm-ruff-db-'+letter+'.so').encode() if letter else None
-    if letter:
-        assert len(needed)==1 and expected in needed[0],(letter,needed)
-    else:
-        assert not needed
+    assert len(needed)<=1
+    letter=''
+    if needed:
+        match=re.search(rb'\[libohm-ruff-db-([AB])\.so\]',needed[0])
+        assert match,needed
+        letter=match[1].decode()
     p=subprocess.run([path,'--list','--format','terse'],cwd=SRC,env=dict(env,OHM_RUFF_NATIVE_WITNESS='1'),capture_output=True,check=True)
     marker=('OHM_RUFF_NATIVE_'+letter+'\n').encode() if letter else b''
     assert p.stderr==marker and sum(l.endswith(b': test') for l in p.stdout.splitlines())==126
-    return dict(dynamic=dyn.decode(),stderr=p.stderr.decode(),list_sha256=hashlib.sha256(p.stdout).hexdigest())
+    return dict(witness=letter,dynamic=dyn.decode(),stderr=p.stderr.decode(),list_sha256=hashlib.sha256(p.stdout).hexdigest())
 
-def main():
+def main(role):
     assert git('rev-parse','HEAD')==NEW and not git('status','--porcelain')
-    assert json.loads((RECORDS/'accepted.json').read_text())['role']=='23'
+    assert role in ('23','253') and json.loads((RECORDS/'accepted.json').read_text())['role']==role
     wild=SDK/'lib/rustlib'/HOST/'bin/wild-ld/ld.bfd'
     assert sha(wild)==WILD
     provider=wild.with_name('libutil.so')
@@ -74,59 +79,79 @@ def main():
     libs=compile_libraries(ROOT/'native-loader')
     proof=RECORDS/'provider';proof.mkdir()
     reference={}; rows={}
-    def observe(label, letter, want_valid=True):
+    def observe(label, allowed, *, may_fail=False, must_fail=False):
         folder=proof/label;folder.mkdir()
-        with (folder/'stdout.gz').open('xb') as out,(folder/'stderr.gz').open('xb') as err:
-            p=subprocess.run(COMMAND,cwd=SRC,env=env,capture_output=True,timeout=720)
-            out.write(gzip.compress(p.stdout));err.write(gzip.compress(p.stderr))
+        p=subprocess.run(COMMAND,cwd=SRC,env=env,capture_output=True,timeout=720)
+        (folder/'stdout.gz').write_bytes(gzip.compress(p.stdout))
+        (folder/'stderr.gz').write_bytes(gzip.compress(p.stderr))
         result=dict(code=p.returncode,provider=identity(provider) if provider.exists() else None)
-        if not want_valid:
+        if p.returncode:
             diagnostics=p.stdout+b'\n'+p.stderr
-            assert p.returncode==101 and str(provider).encode() in diagnostics,diagnostics[-4000:]
+            assert (may_fail or must_fail) and p.returncode==101 and str(provider).encode() in diagnostics,diagnostics[-4000:]
             assert any(t in diagnostics.lower() for t in (b'wild',b'unknown input',b'unsupported',b'invalid'))
         else:
-            if p.returncode:raise RuntimeError((label,p.returncode,p.stderr[-3000:]))
+            assert not must_fail,label
             exe,roster,dirty=test_artifact([json.loads(l) for l in p.stdout.splitlines()])
             assert roster==ordinary['roster']
             assert native(exe,folder,env)==ordinary['tests']
-            if not letter:
-                assert sha(exe)==ordinary['sha256']
-            result.update(native=test_binary(exe,env,letter),binary=identity(exe),dirty=dirty,units=len(roster))
+            outcome=test_binary(exe,env)
+            letter=outcome['witness']
+            assert letter in allowed,(label,letter,allowed)
+            product=sha(exe)
+            if not letter:assert product==ordinary['sha256']
+            result.update(native=outcome,binary=identity(exe),path=str(exe),dirty=dirty,units=len(roster))
             if letter not in reference:
                 target=proof/('test-'+(letter or 'absent')+'.elf.gz')
-                with exe.open('rb') as src, gzip.open(target,'xb',compresslevel=2) as dst:shutil.copyfileobj(src,dst)
-                reference[letter]=(result['binary']['sha256'],result['native']['list_sha256'])
-            assert reference[letter]==(result['binary']['sha256'],result['native']['list_sha256'])
-        rows[label]=result;save('provider/visits.json',rows)
+                with exe.open('rb') as src,gzip.open(target,'xb',compresslevel=2) as dst:
+                    shutil.copyfileobj(src,dst)
+                reference[letter]=(product,outcome['list_sha256'])
+            assert reference[letter]==(product,outcome['list_sha256'])
+        rows[label]=result
+        save('provider/visits.json',rows)
+        return result
+
     def write_same(payload,times):
         with provider.open('r+b') as f:
             assert os.fstat(f.fileno()).st_size==len(payload)
             f.write(payload);f.flush();os.fsync(f.fileno())
         os.utime(provider,ns=times)
-    observe('absent','')
-    with provider.open('xb') as f:f.write(libs['A']);f.flush();os.fsync(f.fileno())
+    observe('absent',{''})
+    with provider.open('xb') as f:
+        f.write(libs['A']);f.flush();os.fsync(f.fileno())
     stat=provider.stat();times=(stat.st_atime_ns,stat.st_mtime_ns)
     identity_a=identity(provider)
     try:
-        observe('A','A')
-        write_same(libs['B'],times);observe('B','B')
+        observe('insert-A',{'','A'})
+        STATE.rename(ROOT/'prior-native-A')
+        clean_a=observe('clean-A',{'A'})
+        write_same(libs['B'],times)
+        warm_b=observe('swap-B',{'A','B'})
+        write_same(b'\xff' * len(libs['B']),times)
+        broken=observe('broken',{'A','B'},may_fail=True)
+        if not broken['code']:
+            # Set the prior complete output aside to require a genuine new link.
+            Path(broken['path']).rename(ROOT/'kept-before-invalid-fresh-link')
+            observe('fresh-link-broken',set(),must_fail=True)
+        write_same(libs['B'],times)
+        observe('repaired',{'B'})
+        STATE.rename(ROOT/'prior-native-B')
+        observe('clean-B',{'B'})
         assert len({r[0] for r in reference.values()})==3
-        # A retained prior binary continues to require A even when the selected native input now requires B.
-        old=ROOT/'old-native-test'
-        with gzip.open(proof/'test-A.elf.gz','rb') as inf,old.open('xb') as outf:shutil.copyfileobj(inf,outf)
-        old.chmod(0o700);assert test_binary(old,env,'A')['stderr']!=rows['B']['native']['stderr']
-        write_same(b'\xff' * len(libs['B']),times);observe('broken','',False)
-        write_same(libs['B'],times);observe('repaired','B')
-        # Rebuild every Cargo artifact with the real provider at the very same paths.
-        STATE.rename(ROOT/'prior-native-B');observe('clean-B','B')
-        write_same(libs['A'],times);STATE.rename(ROOT/'prior-native-A');observe('clean-A','A')
-        identity_last=identity(provider)
-        assert all(identity_a[k]==identity_last[k] for k in ('dev','ino','size','mtime','sha256'))
+        assert clean_a['binary']['sha256']==reference['A'][0]
+        # The two distinct SONAMEs keep the old executable observable after a change.
+        if warm_b['native']['witness']=='A':
+            assert warm_b['binary']['sha256']==clean_a['binary']['sha256']
+        for label in ('swap-B','broken','repaired','clean-B'):
+            assert all(rows[label]['provider'][k]==identity_a[k] for k in ('dev','ino','size','mtime'))
     finally:
         provider.unlink(missing_ok=True)
-    observe('removed','')
+    observe('removed',{'','B'})
+    STATE.rename(ROOT/'prior-native-absent')
+    observe('clean-removed',{''})
     assert sha(wild)==WILD
-    save('provider/accepted.json',dict(role='23',wild=WILD,source=NEW,head=os.environ['GITHUB_SHA'],
-         valueA=reference['A'][0],valueB=reference['B'][0],absent=reference[''][0],
-         malformed=rows['broken']['code'],files_changed='task-owned native provider only'))
-if __name__=='__main__':main()
+    save('provider/accepted.json',dict(role=role,wild=WILD,source=NEW,head=os.environ['GITHUB_SHA'],
+         values={k:v[0] for k,v in reference.items()},insert=rows['insert-A']['native']['witness'],
+         swap=rows['swap-B']['native']['witness'],malformed=broken['code'],removed=rows['removed']['native']['witness'],
+         files_changed='task-owned native provider only'))
+
+if __name__=='__main__':main(sys.argv[1])

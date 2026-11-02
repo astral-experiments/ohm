@@ -77,7 +77,7 @@ def native(executable,folder,env):
     return hashlib.sha256(listing).hexdigest()
 
 def main(role):
-    assert role in ('22','23') and git('rev-parse',NEW+'^')==OLD and len(git('diff','--name-only',OLD,NEW).splitlines())==2
+    assert role in ('22','23','253') and git('rev-parse',NEW+'^')==OLD and len(git('diff','--name-only',OLD,NEW).splitlines())==2
     assert sha(SRC/'Cargo.lock')==LOCK and not git('status','--porcelain')
     env=environment()
     save("environment.json",env)
