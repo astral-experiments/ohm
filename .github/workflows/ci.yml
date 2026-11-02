@@ -21,6 +21,7 @@ name: Screen handwritten impl stability on ordinary uv cargo check
 permissions:
   contents: read
   actions: read
+  attestations: read
 jobs:
   root:
     if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-handwritten-stage1-check'
