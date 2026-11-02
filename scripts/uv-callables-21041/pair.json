@@ -39,19 +39,19 @@
       },
       "source_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
     },
-    "fa7a_stack_ctfe318": {
+    "stock_ctfe318": {
       "artifact": {
-        "bytes": 359918996,
-        "id": 13112830698,
-        "sha256": "58f52e43662a7df4fccd2be9820471be002a146c6cc75b1d16123c68cd54e7d8"
+        "bytes": 359881451,
+        "id": 13112756183,
+        "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
       },
       "builder_tree": "85761b7d3b377c90c26c635f7231c29df024e9ff",
-      "driver": "3f8168fac2af20edf3ca51d940b4653df40746ff2ef43be50fcd0090ba260a7b",
-      "role_sha256": "72d366265342c92095c94c174181b7837c19add96cd0ef5719755c115e6273a2",
+      "driver": "165ecb764f6ea877c24b8620243a0ad31376fbf45d5a44e853638f1375da05e2",
+      "role_sha256": "f690831cea34edfe64585a0b92b8fc9338d39e447482eba83dc45554426b7e80",
       "service": {
         "branch": "charlie/codex-ctfe22-standard-20988",
         "head": "cddb036d81e4313a8e422171f39f0840b44110db",
-        "job": 125052685273,
+        "job": 125052685479,
         "jobs": {
           "Production GNU SDK (fa7a_stack_ctfe318)": 125052685273,
           "Production GNU SDK (stock_ctfe318)": 125052685479,
@@ -85,18 +85,23 @@
           }
         },
         "run": 41374825846,
-        "runner": 1429,
-        "runner_name": "nsc-runner-qf17h1b297vk4"
+        "runner": 1430,
+        "runner_name": "nsc-runner-lv7fc7j7t2v5i"
       },
       "source": {
-        "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
-        "epoch": 43309,
-        "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
+        "commit": "10d56274a98801b5ef8f80aab734e835749458e1",
+        "epoch": 43310,
+        "tree": "1a0e58a855e1782a93cdf8c56b337fb4354142ef"
       },
-      "source_sha256": "039577238fed403d7043209f042157c38a781cf14073ff8250b0c2dbcb17661b"
+      "source_sha256": "50bafe359e2819504ec7af9207f4e830a23b043885129cd96df93e487d6e0cd7"
     }
   },
-  "plan": "8caeed692f00e805c89a2e71f9ed932b717e2c8d794ea125ff5f0a9fedb8933f",
+  "overlay_parent": {
+    "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
+    "epoch": 43309,
+    "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
+  },
+  "plan": "6ab4910153ebdbc331926d553941166dbefca464e96fb0794927852261e91bb1",
   "prior_boots": {
     "41379994255": {
       "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
@@ -117,11 +122,80 @@
     "41403723884": {
       "boot": "8287559a-635a-47d0-bc39-859bb3efd4f2",
       "raw_sha256": "2fb75a9fc058b58a7dddc2ab3706432d3cc3410ddef8b5c4743c1b4895e96471"
+    },
+    "41404703005": {
+      "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
+      "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
     }
+  },
+  "prior_case": {
+    "all_eight_valid": true,
+    "branch": "charlie/codex-21041-callables-production-check",
+    "calibration": {
+      "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
+      "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
+    },
+    "candidate_sdk": {
+      "bytes": 359917871,
+      "id": 13122178340,
+      "sha256": "8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1"
+    },
+    "candidate_source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+    "decision_sha256": "75840a4e38a9b4db7c3e60942994a8ab96a608d19c9ad4e07f27f15be2104a13",
+    "explicit_full_stack_go": true,
+    "first_independent_reduction": "1cd678085e16f5d6e5f9d555e0d6b2ba76483174be80d1e5b004c85065275e70",
+    "first_registered_qualifiers": [
+      {
+        "above": 8,
+        "below": 0,
+        "hold_medians_clear": true,
+        "holm_p": 0.01171875,
+        "holm_reject_at_0_05": true,
+        "name": "uv_client",
+        "p": 0.00390625,
+        "threshold": "1",
+        "ties": 0
+      },
+      {
+        "above": 8,
+        "below": 0,
+        "hold_medians_clear": true,
+        "holm_p": 0.01171875,
+        "holm_reject_at_0_05": true,
+        "name": "sum_of_eight",
+        "p": 0.00390625,
+        "threshold": "1",
+        "ties": 0
+      },
+      {
+        "above": 8,
+        "below": 0,
+        "hold_medians_clear": true,
+        "holm_p": 0.01171875,
+        "holm_reject_at_0_05": true,
+        "name": "uv_install_wheel",
+        "p": 0.00390625,
+        "threshold": "5/4",
+        "ties": 0
+      }
+    ],
+    "head": "9720d7075f8b88e1122f4fc258419e58584f4b69",
+    "job": 125143989895,
+    "original": {
+      "bytes": 36278721,
+      "id": 13123092911,
+      "sha256": "5755698027a2a18ffc8706b413b5ed6d799ea683b7c5297718768a6069023331"
+    },
+    "qualifying_test": "uv_install_wheel",
+    "registration": "33b7e39680bdb05b7f98369c736f7ae01f5b413dff5015c57d83ab8213bf0002",
+    "release_date": "2026-11-01T14:14:23Z",
+    "release_id": 430629054,
+    "release_tag": "ohm-1.99.0-22",
+    "run": 41404703005
   },
   "relative_source": "f6b55d2817bb059f9c0bd65de1fd33b0381225c0bcb721459514b49cf5e7d146",
   "roles": [
-    "fa7a_stack_ctfe318",
+    "stock_ctfe318",
     "callables_ctfe318"
   ],
   "scope": "separate original production jobs, original signed Cargo, instance-specific service SDK archives and native QA"

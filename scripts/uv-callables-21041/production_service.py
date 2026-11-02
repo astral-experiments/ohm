@@ -2,7 +2,7 @@
 import re
 
 REPO = "astral-experiments/ohm"
-ROLES = ("fa7a_stack_ctfe318", "callables_ctfe318")
+ROLES = ("stock_ctfe318", "callables_ctfe318")
 COMMON = {
     "Admit this production workspace and allocate its physical emergency reserve",
     "Reconstruct and verify the exact compiler source",
@@ -14,9 +14,9 @@ COMMON = {
 }
 PRODUCERS = {
     ROLES[0]: dict(run=41374825846, head="cddb036d81e4313a8e422171f39f0840b44110db",
-                   branch="charlie/codex-ctfe22-standard-20988", job="Production GNU SDK (fa7a_stack_ctfe318)",
-                   id=125052685273, sdk="ctfe22-gnu-sdk-fa7a_stack_ctfe318",
-                   qa="ctfe22-gnu-build-fa7a_stack_ctfe318-attempt-1",
+                   branch="charlie/codex-ctfe22-standard-20988", job="Production GNU SDK (stock_ctfe318)",
+                   id=125052685479, sdk="ctfe22-gnu-sdk-stock_ctfe318",
+                   qa="ctfe22-gnu-build-stock_ctfe318-attempt-1",
                    prior_pair="ctfe22-gnu-pair-qa-attempt-1"),
     ROLES[1]: dict(run=41398925829, head="4e34ea9c7232977f95498d7bf48d382157e8558b",
                    branch="charlie/codex-21041-callable-production22", job="Production GNU callable SDK",

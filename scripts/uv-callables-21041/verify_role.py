@@ -38,7 +38,7 @@ def main(role, builder, image, qa, scratch, fixed, dest, pool):
     source=read(qa/"source.json")
     rv=read(qa/"role.json")
     need(all(rv[k]==expected[v] for k,v in (("source_commit","commit"),("source_tree","tree"),("epoch","epoch")))
-         and {k:source["source"][k] for k in expected}==expected and rv["epoch"]==43309
+         and {k:source["source"][k] for k in expected}==expected and rv["epoch"]==(43310 if role==ROLES[0] else 43309)
          and rv["driver"]["sha256"]==arm["driver"] and sha(qa/"role.json")==arm["role_sha256"]
          and sha(qa/"source.json")==arm["source_sha256"], "source, driver, or QA record does not match independent enrollment")
     ctx=dict(evidence_repository=REPO,reviewed_head=p["head"],workflow_ref=REPO+"/.github/workflows/ci.yml@refs/heads/"+p["branch"],
@@ -50,10 +50,10 @@ def main(role, builder, image, qa, scratch, fixed, dest, pool):
         need(cfg["source_role_sha256"]==sha(HERE/"production-source.json") and cfg["source"]==source["source"]
              and cfg["files"]==spec["files"] and cfg["pack_sha256"]==sha(compiler/"callable-production.pack")
              ==spec["sha256"][spec["pack_file"]]==source["source_pack_sha256"]
-             and cfg["pack_objects"]==spec["pack_objects"]==38 and cfg["source"]["parent"]==spec["parent"]==read(HERE/"pair.json")["arms"][ROLES[0]]["source"]["commit"]
-             and cfg["source"]["parent_tree"]==spec["parent_tree"]==read(HERE/"pair.json")["arms"][ROLES[0]]["source"]["tree"]
+             and cfg["pack_objects"]==spec["pack_objects"]==38 and cfg["source"]["parent"]==spec["parent"]==read(HERE/"pair.json")["overlay_parent"]["commit"]
+             and cfg["source"]["parent_tree"]==spec["parent_tree"]==read(HERE/"pair.json")["overlay_parent"]["tree"]
              and source["overlay_description_sha256"]==sha(compiler/"callable-source.json")
-             and prior["source"]==pair.native.S["arms"][ROLES[0]] and prior["source_pack_sha256"]==pair.native.S["pack_sha256"]
+             and prior["source"]==pair.native.S["arms"]["fa7a_stack_ctfe318"] and prior["source_pack_sha256"]==pair.native.S["pack_sha256"]
              =="d2b0cf8e4623519d3870a4fc97d028c25f164bc0f52364a3be6945e682ea488f"
              and source["previous_qualified_source_sha256"]==sha(qa/"previous-production-source.json"),"unqualified overlaid production source")
         need({k:prior[k]for k in ctx}==ctx and all(prior[k]==source[k] for k in ("released_coordinator","training_objects","component_git","recipe","signed_manifest_sha256")),

@@ -69,7 +69,7 @@ def reduce(panel,raw,baseline,read_products,output_controls):
                 value=lambda role:sum(arms[role].values())if label=='sum_of_eight'else arms[role][label]
                 values.append([value(ctrl),value(child)])
             metrics[label]=dict(metric(values),raw_control_candidate=values)
-    return {'scope':'Eight true Cargo-dispatched rustc images and their threads, separately restored first edits; forked non-rustc children excluded','primary':'uv_client','complete':complete,'refused':failed,'raw_pairs':all_pairs,'metrics':metrics}
+    return {'scope':'Eight true Cargo-dispatched rustc images and their threads, separately restored first edits; forked non-rustc children excluded','confirmatory_process_endpoint':'sum_of_eight','complete':complete,'refused':failed,'raw_pairs':all_pairs,'metrics':metrics}
 
 def preregistered_tests(metrics):
     tests=[]

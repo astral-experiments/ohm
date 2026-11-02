@@ -1,4 +1,4 @@
-name: Measure callable trait recovery on a real uv-client check with matched production compilers
+name: Can the cumulative corrected Ohm compiler halve an ordinary uv-client check?
 'on':
   workflow_dispatch:
     inputs:
@@ -24,9 +24,9 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-callables-production-check'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-cumulative-production-check'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41398925829' && inputs.build_head == '4e34ea9c7232977f95498d7bf48d382157e8558b'
-      && inputs.sdk_lock_sha256 == 'c8cef3c955e3dfaa319ba15d551d8a5961c95f8411cfb8ee54aac46b6abe7ebb'
+      && inputs.sdk_lock_sha256 == '4fa28d0a3026871350a13a19f04e05de53d97a84ca4538a80a24d176a4ff86f5'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
     env:
@@ -162,7 +162,7 @@ jobs:
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py admit 2>&1 | tee trait-results/intake.log
 
         '
-    - name: Verify both normal and shared-version directions of the native incremental transition
+    - name: Verify only natural cross-epoch isolation, same-compiler reuse and known-negative assertions
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py migration
     - name: Qualify native roots and collect eight balanced pairs for each independent physical metric
       run: 'set -euo pipefail
@@ -176,7 +176,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-callables-production-eight-pair-1
+        name: uv-21041-cumulative-production-eight-pair-1
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

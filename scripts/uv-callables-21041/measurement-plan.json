@@ -1,76 +1,48 @@
 {
-  "authority": "Production confirmation chosen after the local exploratory #21041 screen and before physical effects for the broader patch. The wheel endpoint was selected from the exploratory eight.",
-  "case": {
-    "argv": [
-      "cargo",
-      "check",
-      "-p",
-      "uv-client",
-      "--locked",
-      "--offline",
-      "-j8"
-    ],
-    "changed_units": [
-      "uv_cache",
-      "uv_client",
-      "uv_configuration",
-      "uv_distribution_types",
-      "uv_install_wheel",
-      "uv_metadata",
-      "uv_pypi_types",
-      "uv_torch"
-    ],
-    "declared_units": 530,
-    "edit": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
-    "emitted_units": 486,
+  "registered_utc": "2026-11-02T06:52:53Z",
+  "purpose": "Can the cumulative rustc stack halve the wall time of a real normal uv-client check? This is separate from measuring the additional callable change.",
+  "selection": "Use the already admitted uv #21041 edit and all eight actual rustcs. The new production SDK is not yet available. No full-stack hardware numbers for this case were consulted. The previous laboratory comparison measures only the additional callable change.",
+  "uv": {
     "parent": "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
-    "schedule_change": "Record and audit any physical divergence without fabricating missing denominators.",
-    "workspace_products": 37
+    "child": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
+    "command": "cargo check -p uv-client --locked --offline -j8"
   },
-  "compiler": "same GNU Ohm \u221222 production PGO/BOLT/ThinLTO recipe and original signed Cargo. Each arm has #296, #306 and #318. The only compiler delta is the six-source-file callable receiver patch.",
   "control": {
-    "commit": "4cc83ad906d8cd570c15b4508bc82ec3712cfb81",
-    "epoch": 43309,
-    "producer": 41374825846,
-    "producer_head": "cddb036d81e4313a8e422171f39f0840b44110db",
-    "role": "fa7a_stack_ctfe318",
-    "tree": "cb977189205aa931f080b57b9a8bb62ef98a316e"
-  },
-  "design": {
-    "holds": 2,
-    "hypotheses": {
-      "all_eight_sum": "control/treatment > 1",
-      "terminal_uv_client": "control/treatment > 1",
-      "uv_install_wheel": "control/treatment > 1.25"
+    "scope": "Ohm -22 sources plus the independent #318 CTFE correctness fix, with the production PGO+BOLT recipe and original signed -22 Cargo. The literal shipped compiler already showed a warm/cold metadata mismatch on this source.",
+    "source": "10d56274a98801b5ef8f80aab734e835749458e1",
+    "tree": "1a0e58a855e1782a93cdf8c56b337fb4354142ef",
+    "epoch": 43310,
+    "role": "stock_ctfe318",
+    "producer_run": 41374825846,
+    "artifact": {
+      "bytes": 359881451,
+      "id": 13112756183,
+      "sha256": "e212f89f71851d2313315a9fe9723d46a2d1a2f4844c5f818ff308cb27976c50"
     },
-    "order": "fixed alternation AB/BA within each hold, independently seeded A per role and hold and separate first-B restores for each visit",
-    "other_endpoints": "whole-Cargo wall and instructions reported separately with their actual paired intervals and direction counts. No automatic claim of a 2\u00d7 wall win.",
-    "pair_count": 8,
-    "pairs_per_hold": 4,
-    "statistics": "three one-sided paired sign tests, Holm FWER 0.05, ties treated conservatively, complete eight processes disclosed. Per host and no pooling with software or stage1.",
-    "visits": [
-      "ordinary bare wall",
-      "inherited whole-command user-mode instructions",
-      "per actual rustc user-mode instructions excluding forked siblings"
-    ]
+    "role_sha256": "f690831cea34edfe64585a0b92b8fc9338d39e447482eba83dc45554426b7e80",
+    "historical_cold_headers": {
+      "global_public_hash": 0,
+      "private_svh": 0,
+      "public_svh": 0,
+      "stable_crate_id": 0
+    }
   },
-  "exploratory_result": "14521b4aea204de94889de09734108089d91849a5f0b1fbdf8832fc5eacd9e92",
-  "gates": [
-    "verified source ancestry and entire scope of compiler changes",
-    "exact distribution, component hashes, true PGO/BOLT recipe and signed Cargo, native suite and cache-family compatibility",
-    "same historical uv input and unmodified ordinary command, real process/argv and product/semantic lineage and PyPI plus Pyx linked behavior on both clean and first edit",
-    "kernel PMU slope, thread accounting and no multiplexing, independent host boot and balanced order; report real schedule change if present"
-  ],
-  "local_source_and_case_protocol": "c1adc8e29a6b23492bd8bd94f358e8d2395e86b3cc58e375402836ed63596cdf",
-  "prepared_from_sha256": "4e45d65e10901cd8f33aacd827746c5601ede2e04006f28c1cbdcb810b7a578e",
-  "preregistration_utc": "2026-11-02T06:22:14+00:00",
-  "reviewable_maintained_rust": "0c49e2eb0459eb2db9b39bc3820b2fa3027fefb8",
-  "treatment": {
-    "commit": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
-    "epoch": 43309,
-    "producer": 41398925829,
-    "producer_head": "4e34ea9c7232977f95498d7bf48d382157e8558b",
+  "candidate": {
+    "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+    "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4",
     "role": "callables_ctfe318",
-    "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4"
-  }
+    "epoch": 43309,
+    "producer_run": 41398925829,
+    "source_registration_sha256": "f5d914ee1f1359e1990ce0f755110caa076ff00b3ff8ac77067f895451adf235"
+  },
+  "condition": "Proceed after the additional callable change passes the clean production comparison and if the source release is still the current signed release. Reassess the baseline before dispatch if Ohm has released a newer compiler.",
+  "design": "Eight within-host, independently restored pairs in two separately cold-built holds of four. Run order is balanced 2/2 in both holds. Require a new boot, bare ordinary clocks in their own visits, independent kernel-traced whole userspace instructions and per-process counters for exactly the same eight true compiler execs with no multiplexing. No time spent running uv tests is included.",
+  "native_admission": "Replay each producer and its source-specific epoch. No cross-format forced sharing: the stock and treatment file epochs differ. Real parent histories are isolated by role. Require real first edit, zero no-op recompiles, exact same-seed emitted products and argv, semantic equality of all 37 workspace products against independent cold B, real linked parser and API controls, and known-positive and known-negative controls of the actual hosted checker. Preserve every raw mismatch, and reject any missing or changed semantic property.",
+  "inference": {
+    "primary": "Paired control/candidate bare wall ratios against 2.0. To call it repeatable 2x, require all eight pairs above 2.0, both independently prepared holds above 2.0 and a passing exact threshold test.",
+    "secondary": "Paired control/candidate ratio of summed kernel user instructions for all eight actual rustcs against 1.25, i.e. a 20% cut. Report the terminal and all individual processes descriptively.",
+    "multiplicity": "Holm-correct the two exact one-sided sign tests at 0.05, counting ties as misses. Show all eight ratios and separate hold medians. Do not pool the increment-only study, #22958, or the #20988 numbers."
+  },
+  "research_boundary": "Separate measurement, with no change to uv, existing locked protocols or the candidate source. A failed qualification or unmet wall threshold is retained. No third SDK build.",
+  "preflight": "The producer source role spelling was corrected against the sealed release workflow before any production result. Both full source OIDs, epochs, tests and thresholds are unchanged."
 }

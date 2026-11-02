@@ -68,7 +68,7 @@ def score():
                 else:
                     clock=meter.clock(at/'whole-clock.json',0);c.guard(rec['invoked']==[ready['plain'],str(at/'whole-clock.json'),*c.CHECK]and clock['running']==clock['enabled']>0 and v['value']==clock['instructions'],'inherited unmultiplexed whole-command instructions')
     import physical
-    report={'scope':'matched release-optimized PGO+BOLT corrected Ohm -22, complete callable recovery patch, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
+    report={'scope':'matched release-optimized PGO+BOLT corrected Ohm -22, cumulative trait and callable recovery vs stock with the same CTFE correction, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
         'verified_unique_workspace_products':len(checked),'metrics':None if refusals else summary(raw),'branch':P['branch']}
     if report['metrics']:
         for mode in ('wall','clock'):
@@ -76,9 +76,12 @@ def score():
             report['metrics'][mode]['paired_statistics']=physical.metric(list(zip(x[c.ROLES[0]],x[c.ROLES[1]],strict=True)))
     m.save(panel/'ordinary-score.json',report)
     perf=physical.reduce(panel,raw,data,check_products,output_controls)
-    if perf['complete']:perf['holm_family']=physical.preregistered_tests(perf['metrics'])
+    from full_inference import family
+    if perf['complete'] and report['metrics']:
+        wall=report['metrics']['wall']['raw_by_role'];bare=[list(x)for x in zip(wall[c.ROLES[0]],wall[c.ROLES[1]],strict=True)]
+        perf['cumulative_inference']=family(bare,perf['metrics']['sum_of_eight']['raw_control_candidate'])
     m.save(panel/'native-rustc.json',perf)
-    combined=dict(report,native_scope=perf['scope'],physical_complete=perf['complete'],holm=perf.get('holm_family'))
+    combined=dict(report,native_scope=perf['scope'],physical_complete=perf['complete'],cumulative_inference=perf.get('cumulative_inference'))
     m.save(panel/'score.json',combined);print(json.dumps(combined,sort_keys=True))
     c.guard(not refusals and perf['complete'],'at least one required visit could not be qualified')
 if __name__=='__main__':score()

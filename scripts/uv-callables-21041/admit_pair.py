@@ -11,6 +11,8 @@ def admit():
     w,tmp=c.host(); _,previous=m.check_sources(w); old=m.load("signed_release_intake",previous/"intake.py")
     out=w/"trait-results";proof=out/"intake";proof.mkdir();meta=proof/"role-material";meta.mkdir()
     temp=tmp/"production-callable-incoming";temp.mkdir();pool=tmp/"ctfe22-root-sdks";pool.mkdir()
+    import prior_case
+    prior_case.gate(c,old,proof)
     old.released(temp,proof)
     (signed,)=(temp/"signed").glob("*.tar.gz")
     fixed=archive.official_cargo(signed,temp)
@@ -54,5 +56,5 @@ def admit():
     m.save(out/"intake.json",{"installed":result,"sdk_lock_sha256":m.filesha(c.HERE/"pair.json"),"signed_cargo_sha256":m.filesha(fixed)})
 
 def migration():
-    import foreign
-    foreign.gate()
+    import epoch_transition
+    epoch_transition.gate()

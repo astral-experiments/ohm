@@ -38,9 +38,10 @@ def acquire_context():
     c.guard(set(sdk)==set(c.ROLES)and load['sdk_lock_sha256']==P['sdk_lock_sha256'],'SDK roles')
     for r in c.ROLES:
         actual=sdk[r];c.guard(actual['server']==gate[r]['artifact']and gate[r]['driver']in actual['runtime'].values(),('same qualified binary',r))
-    trans=m.read(out/'intake/coroutine-transition/passed.json')
-    c.guard(trans['self_check'] is False and len(trans['modes'])==4 and all(len(v)==7 for v in trans['modes'].values()),'both directions, both real version modes')
-    c.guard((out/'intake/foreign-transition/passed.json').is_file(),'verified real two-SDK foreign transition')
+    from epoch_transition import validate
+    tr=m.read(out/'intake/natural-epoch-transition/passed.json');c.guard(tr['ordinary_only'] is True and tr['positive_native_calls']==8 and tr['negative_native_calls']==2,'native default epoch isolation')
+    source={r:c.PAIR['arms'][r]['source']for r in c.ROLES}
+    for a,b in (c.ROLES,list(reversed(c.ROLES))):validate(tr['histories'][a+'-to-'+b],[a,b],source)
     read=parser(w,tmp);bank=m.ROOT/'bank';a=h.open_source(w,bank);m.save(out/'real-A.json',a)
     pool=tmp/'ctfe22-root-sdks'
     for r in c.ROLES:shutil.move(str(pool/r),str(bank/('sdk-'+r)))
