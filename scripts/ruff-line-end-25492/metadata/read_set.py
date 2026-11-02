@@ -13,6 +13,7 @@ import acquire as a
 import worker as w
 from audit import run,save,sha
 import contact
+import native_replay
 
 ARGS=['build','-p','ruff_macros','--lib','--locked','--offline','-j4']
 
@@ -42,11 +43,10 @@ def state(case,root,env,archive,args):
     phase=w.LOG/'host-read-set'/case
     phase.mkdir();root.mkdir(exist_ok=True)
     assert w.git('rev-parse','HEAD')==(w.OLD if case=='old' else w.NEW) and sha(w.SRC/'Cargo.lock')==w.LOCK and not w.git('status','--porcelain','--untracked-files=no')
-    tools=json.loads((w.LOG/'tools.json').read_text())['sha256']
-    env={**env,'CARGO_TARGET_DIR':str(root/'target'),'CARGO_BUILD_BUILD_DIR':str(root/'build'),'CARGO_NET_OFFLINE':'true',
-         'RUSTC_WRAPPER':str(HERE/'reader_owner.py'),'OHM_READ_RECEIPT':str(phase),'OHM_READ_STATE':str(root),
-         'OHM_READ_SIGNED':str(w.SDK/'bin/rustc'),'OHM_READ_SIGNED_SHA':tools['bin/rustc']}
-    status=run(['cargo','+ohm',*args,'--message-format=json'],env,w.SRC,exact=None)
+    private=native_replay.inputs(case,root,phase);trace=private/'trace';trace.mkdir()
+    env={**env,'CARGO_TARGET_DIR':str(root/'target'),'CARGO_BUILD_BUILD_DIR':str(root/'build'),'CARGO_NET_OFFLINE':'true'}
+    cmd=['strace','-ff','-qq','-v','-s','131072','-e','trace=execve','-o',trace/'exec','--','cargo','+ohm',*args,'--message-format=json']
+    status=run(cmd,env,w.SRC,exact=None)
     w.gz(phase/'stdout.gz',status.stdout);w.gz(phase/'stderr.gz',status.stderr)
     assert status.returncode==0,status.stderr[-4200:]
     rows=[json.loads(x) for x in status.stdout.splitlines()]
@@ -69,6 +69,7 @@ def state(case,root,env,archive,args):
         expected=(json.loads((HERE.parent/'ordinary.json').read_bytes())['phases'][case]['typed_by_features']['no-features'] if lib=='ruff_source_file' else '"> é\\r\\n>\\n> β\\r"\n"> A\\n> B"\n""\n')
         assert replay.stdout.decode()==expected,(lib,replay.stdout,expected)
         (phase/(lib+'-typed.txt')).write_bytes(replay.stdout)
+    native_replay.collect(case,root,phase,private,trace,dirs,env)
     if not (phase/'process.json').is_file():
         save(phase/'unobserved.json',{'phase':case,'dirty':[r['target']['name'] for r in products if not r['fresh']],'products':ids})
         return False
