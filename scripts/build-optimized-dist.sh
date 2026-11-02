@@ -36,12 +36,12 @@ if [[ ! -f "$bootstrap_config" ]]; then
   exit 1
 fi
 
-rust_checkout="$(cd -- "$rust_checkout" && pwd -P)"
+# A NUL delimiter preserves trailing newlines in the physical directory name.
+IFS= read -r -d '' rust_checkout < <(cd -P -- "$rust_checkout" && printf '%s\0' "$PWD")
 script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-bootstrap_config="$(
-  cd -- "$(dirname -- "$bootstrap_config")"
-  printf '%s/%s\n' "$PWD" "$(basename -- "$bootstrap_config")"
-)"
+if [[ "$bootstrap_config" != /* ]]; then
+  bootstrap_config="$PWD/$bootstrap_config"
+fi
 
 # Older immutable Rust source revisions only train rustc. Detect the explicit
 # component-training contract before bootstrapping so those releases remain
@@ -70,7 +70,7 @@ if [[ "$use_bolt" == true ]]; then
     exit 1
   fi
 
-  bolt_llvm_dir="$(cd -- "$OHM_BOLT_LLVM_DIR" && pwd -P)"
+  IFS= read -r -d '' bolt_llvm_dir < <(cd -P -- "$OHM_BOLT_LLVM_DIR" && printf '%s\0' "$PWD")
   for bolt_binary in llvm-bolt merge-fdata; do
     if [[ ! -x "$bolt_llvm_dir/bin/$bolt_binary" ]]; then
       echo "required LLVM BOLT executable not found: $bolt_llvm_dir/bin/$bolt_binary" >&2

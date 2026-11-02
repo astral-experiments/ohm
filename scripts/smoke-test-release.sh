@@ -6,7 +6,7 @@ if [[ $# -ne 4 ]]; then
   echo "usage: smoke-test-release.sh RELEASE_DIRECTORY TOOLCHAIN TARGET CLIPPY_REVISION" >&2
   exit 2
 fi
-RELEASE_DIRECTORY="$(cd -- "$1" && pwd)"
+IFS= read -r -d '' RELEASE_DIRECTORY < <(cd -- "$1" && printf '%s\0' "$PWD")
 OHM_TOOLCHAIN=$2
 OHM_TARGET=$3
 CLIPPY_REVISION=$4
