@@ -21,3 +21,5 @@ The previous stack cleared 2× in six of eight pairs on this edit. This comparis
 Run `python3 -ISB verify.py` in this directory to recompute all eight pairs from the 394 retained original records. To verify every one of the 3,703 original members against its SHA-256, download the Actions artifact identified in `original-service.json` and run `python3 -ISB verify.py --original PATH/TO/ORIGINAL.zip`. The raw service ZIP is 130,607,791 bytes with SHA-256 `7448509275ec704eb383bf9803ce93769f9eba5c4894b77ef983427782c9dcde`.
 
 The immutable workflow head, original public uv commits, both SDK sources, signed Cargo digest, run order, cold controls and timing rules are in the registration and release lock. The accompanying replication plan holds these fixed for another fresh worker. [Original workflow](https://github.com/astral-experiments/ohm/blob/651801e3029fb35b79768116c57bfe3e8d36d57a/.github/workflows/ci.yml)
+
+The second worker measured 2.181×, with 8/8 ordinary wall pairs above 2×. [Independent replication and all sixteen pairs](independent-replication/README.md)
