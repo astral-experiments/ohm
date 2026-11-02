@@ -1,5 +1,5 @@
-name: Recover real Ruff Unicode display exports from both locked revisions
-run-name: Ruff 29206 source scout ${{ inputs.reviewed_head }}
+name: Check real Ruff Unicode exports and downstream compiler reuse
+run-name: Ruff 29206 ${{ inputs.study }} at ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
@@ -7,20 +7,33 @@ run-name: Ruff 29206 source scout ${{ inputs.reviewed_head }}
         description: Reviewed nonrelease diagnostic commit
         required: true
         type: string
+      study:
+        description: Signed library scout or unmetered downstream admission
+        required: true
+        type: choice
+        options: [source, ordinary]
+        default: source
 permissions: {}
 jobs:
   source:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-literal-29206-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 24
+    timeout-minutes: 95
     permissions:
       contents: read
+      actions: read
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ github.sha }}
           path: qa
-          sparse-checkout: scripts/ruff-literal-map-source
+          sparse-checkout: |
+            scripts/ruff-literal-map-source
+            scripts/ruff-indexed-check-pmu
+            scripts/ruff-matched-stage
+            scripts/ruff-upstream-mono-pilot
           persist-credentials: false
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -47,12 +60,45 @@ jobs:
           tar -xzf ohm-sdk.tar.gz
           rust-1.99.0-dev-x86_64-unknown-linux-gnu/install.sh --prefix="$RUNNER_TEMP/signed-sdk" --components=rustc,rust-std-x86_64-unknown-linux-gnu,cargo --disable-ldconfig
       - name: Read real library exports and execute the changed typed Unicode witness
+        if: inputs.study == 'source'
         run: python3 -IB qa/scripts/ruff-literal-map-source/scout.py
+      - name: Authenticate the signed native preflight and hydrate both full compiler SDKs
+        if: inputs.study == 'ordinary'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! command -v zstd >/dev/null || ! command -v ar >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq zstd binutils
+          fi
+          original="$RUNNER_TEMP/signed-literal-scout.zip"
+          gh api repos/astral-experiments/ohm/actions/artifacts/13137570548 --jq '[.name,.size_in_bytes,.digest,.workflow_run.id,.workflow_run.head_sha]|@tsv' > "$RUNNER_TEMP/signed-literal-scout.tsv"
+          expected=$'ruff-29206-literal-native\t4722145\tsha256:80b89441167c1f779dd9450e09268e04ba563cd3221200157f331a2d78cb4e67\t41437313975\tb1fb354eb738e41509eeb52be4b256f617fbedd7'
+          test "$(cat "$RUNNER_TEMP/signed-literal-scout.tsv")" = "$expected"
+          gh api repos/astral-experiments/ohm/actions/artifacts/13137570548/zip > "$original"
+          python3 -IB qa/scripts/ruff-literal-map-source/test_native.py "$original"
+          python3 -IB qa/scripts/ruff-indexed-check-pmu/acquire.py
+      - name: Observe complete ordinary linter libraries across the actual edit
+        if: inputs.study == 'ordinary'
+        run: python3 -IB qa/scripts/ruff-literal-map-source/ordinary.py
+      - name: Reassemble every rlib and repeat source-specific Unicode and linter verdicts
+        if: inputs.study == 'ordinary'
+        run: python3 -IB qa/scripts/ruff-literal-map-source/ordinary_read.py
       - name: Retain signed-input and ordinary Cargo records plus native proof
-        if: always()
+        if: always() && inputs.study == 'source'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ruff-29206-literal-native
           path: ${{ runner.temp }}/literal-scout/records
           if-no-files-found: warn
+          retention-days: 7
+      - name: Retain the retrievable native objects and unmetered decision
+        if: always() && inputs.study == 'ordinary'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ruff-29206-ordinary-objects
+          path: ${{ runner.temp }}/upstream-mono-study/logs
+          if-no-files-found: warn
+          compression-level: 0
           retention-days: 7
