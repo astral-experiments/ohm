@@ -3,6 +3,10 @@ run-name: Reopen Ruff 25492 at ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
+      reader:
+        description: Probe the matched seven-unit host ruff_python_trivia dependency closure
+        type: boolean
+        default: false
       metadata:
         description: Capture only immutable OLD/edited/empty-NEW ruff_source_file metadata
         type: boolean
@@ -19,7 +23,7 @@ permissions: {}
 jobs:
   readback:
     name: Read the two complete recorded packets without running a compiler
-    if: inputs.report == false && inputs.metadata == false && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    if: inputs.report == false && inputs.metadata == false && inputs.reader == false && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     permissions:
@@ -102,6 +106,48 @@ jobs:
         if: always()
         with:
           name: ruff-line-end-25492-real-metadata
+          path: ${{ runner.temp }}/ruff-db-link-reason/records
+          if-no-files-found: error
+          retention-days: 14
+  reader:
+    name: Record the seven-unit real host trivia reader
+    if: inputs.reader && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 25
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: qa
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-db-link-reason
+            scripts/ruff-line-end-25492
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: 88d851449d2345e11da991794f3e9bfbbd666719
+          fetch-depth: 2
+          path: ruff
+          persist-credentials: false
+      - name: Install process tracing
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends strace
+      - name: Verify and install the original proposal 253 SDK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB qa/scripts/ruff-db-link-reason/install.py 253
+      - name: Authenticate the independently verified full Ruff command record
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB qa/scripts/ruff-line-end-25492/contact.py enroll
+      - name: Profile the three original host readers and match all their incoming arguments
+        run: python3 -IB qa/scripts/ruff-line-end-25492/metadata/read_set.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ruff-line-end-25492-trivia-read-set
           path: ${{ runner.temp }}/ruff-db-link-reason/records
           if-no-files-found: error
           retention-days: 14
