@@ -18,7 +18,10 @@ def extract(packet,dest,inner):
 def check_role(dest,rec,role,ctx):
     assert rec["schema"]==1 and rec["role"]==role and rec["context"]==ctx and rec["files_manifest"]==s.file_map() and rec["role_source"]==s.S["arms"][role]
     src=g.load(dest/"source.json");s.match_source(src,role,ctx);ident=g.load(dest/"identity.json")
-    assert ident["source_label"]==src["source"]["commit"] and "commit-hash: "+src["source"]["commit"] in ident["rustc_vV"].splitlines()
+    assert ident["source_label"]==src["source"]["commit"]
+    assert (dest/"rustc-vV.txt").read_bytes()==ident["rustc_vV"].encode()
+    s.verified_version(ident["rustc_vV"],src["source"]["commit"])
+    assert (dest/"bootstrap.toml").read_text()==s.config(Path(ident["path"]).parents[1])
     root=dest/"observed";obs=g.load(root/"probe.json")
     assert ident["path"]==obs["sdk"] and "rustc "+obs["version"]==ident["rustc_vV"].splitlines()[0]
     sdk=Path(obs["sdk"]);build=sdk.parents[1];assert (dest/"bootstrap.toml").read_text()==s.config(build)

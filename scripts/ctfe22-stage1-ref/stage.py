@@ -18,7 +18,22 @@ def file_map():
     assert set(record)=={v.name for v in H.iterdir() if v.is_file() and v!=p}
     assert all(g.file_hash(H/k)==v for k,v in record.items());return g.file_hash(p)
 def config(path):
-    return '[build]\nbuild-dir = '+json.dumps(str(path))+'\nsubmodules = false\ncompiler-docs = false\n[llvm]\ndownload-ci-llvm = true\n[rust]\nchannel = "dev"\ndownload-rustc = false\nlto = "off"\noptimize = true\ndebug-assertions = false\nverbose-tests = true\n'
+    return '[build]\nbuild-dir = '+json.dumps(str(path))+'\nsubmodules = false\ncompiler-docs = false\n[llvm]\ndownload-ci-llvm = true\n[rust]\nchannel = "dev"\nomit-git-hash = false\ndownload-rustc = false\nlto = "off"\noptimize = true\ndebug-assertions = false\nverbose-tests = true\n'
+def verified_version(vv, commit):
+    lines = vv.splitlines()
+    assert re.fullmatch("[0-9a-f]{40}", commit)
+    def field(key):
+        value, = [line[len(key)+2:] for line in lines if line.startswith(key + ": ")]
+        return value
+    assert field("binary") == "rustc" and field("host") == HOST
+    assert field("release") == "1.99.0-dev" and field("commit-hash") == commit
+    date = field("commit-date")
+    assert re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", date)
+    fields = lines[0].split()
+    assert len(fields) >= 4 and fields[:2] == ["rustc", "1.99.0-dev"] and fields[3] == date+")"
+    short = fields[2].removeprefix("(")
+    assert fields[2] == "("+short and 9 <= len(short) <= 40 and commit.startswith(short)
+    return lines[0].removeprefix("rustc ")
 def suites(role):
     assert role in (BASE,CAND)
     return [NATIVE,REG+"rdr-public-hash-native-exports",REG+"trait-impl-bucket-projection"]+([QUERY] if role==CAND else [])
@@ -52,8 +67,8 @@ def run(role):
         if key!="build":passed(log.read_bytes(),key,role)
     sdk=build/HOST/"stage1";senv={"PATH":"/usr/bin:/bin","LC_ALL":"C","RUSTC_BOOTSTRAP":"1","LD_LIBRARY_PATH":str(sdk/"lib")}
     ident=g.sdk_identity(sdk,senv,arm["commit"],None);vv=ident["rustc_vV"]
-    assert "commit-hash: "+arm["commit"] in vv.splitlines()
-    version=vv.splitlines()[0].removeprefix("rustc ");assert version.startswith("1.99.0-dev")
+    (out/"rustc-vV.txt").write_bytes(vv.encode())
+    version=verified_version(vv, arm["commit"])
     libs=subprocess.check_output(["ldd",sdk/"bin/rustc"],env=senv,text=True);assert "not found" not in libs
     driver,=[name.split(" => ",1)[1].split()[0] for name in libs.splitlines() if name.lstrip().startswith(ident["driver"]+" => ")]
     assert Path(driver).samefile(sdk/"lib"/ident["driver"]) and g.file_hash(Path(driver))==ident["driver_sha256"]
