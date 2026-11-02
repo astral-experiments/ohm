@@ -1055,3 +1055,20 @@ See:
 
 - [Cargo #156](https://github.com/astral-sh/ohm-cargo/pull/156)
 - [Cargo #168](https://github.com/astral-sh/ohm-cargo/pull/168)
+
+## Documentation tests
+
+### 28. Cache inline doctests
+
+In Ohm 1.99.0-23, `cargo test --doc` caches supported examples in Rust 2024 libraries when
+testing for the host platform. Cargo can reuse the extracted examples and compiled object
+files on a warm run. It still runs every selected example and repeats the final link to pick
+up changes to native archives. An edit to an example or its included Markdown invalidates the cache.
+
+Rustdoc handles libraries with `compile_fail` examples, custom rustdoc flags, or unsupported
+test arguments. Use `-Zohm-cached-doctests=no` to run eligible examples through rustdoc as well.
+
+On 16 Ruff crates, caching reduced median warm doctest time from 19.171 s to 1.425 s across
+five alternating pairs. Both modes passed 207 examples and ignored nine. This comparison used
+the patched Cargo with the released Ohm 1.99.0-22 compiler.
+[Cargo #429](https://github.com/astral-experiments/ohm-cargo/pull/429)
