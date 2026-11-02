@@ -12,6 +12,7 @@ on:
           - price
           - bytes
           - wild-source
+          - signed-reference
           - confirm-examples
       reviewed_head:
         description: Exact reviewed nonrelease QA commit
@@ -128,7 +129,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
   inspect-bytes:
-    if: (inputs.phase == 'bytes' || inputs.phase == 'wild-source') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-example-replay-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    if: (inputs.phase == 'bytes' || inputs.phase == 'wild-source' || inputs.phase == 'signed-reference') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-example-replay-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     name: Genuine warm and clean integration harnesses on signed and matched Cargo
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 95
@@ -167,6 +168,8 @@ jobs:
           sha256sum --strict --check SHA256SUMS
           if [[ "$NATIVE_DIAGNOSTIC" == wild-source ]]; then
             python3 -IB wild_probe.py
+          elif [[ "$NATIVE_DIAGNOSTIC" == signed-reference ]]; then
+            python3 -IB reference.py
           else
             python3 -IB byte_probe.py
           fi

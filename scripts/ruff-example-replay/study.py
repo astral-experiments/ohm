@@ -126,10 +126,11 @@ def footprint(env):
                               for name in ("rlink", "manifest", "object", "other"))}
 
 
-def execute(root, src, env, out, args, *, error=None, trace=False, clock=None, provider_dir=None):
+def execute(root, src, env, out, args, *, error=None, trace=False, clock=None, provider_dir=None, jobs=4):
     out.mkdir()
     need(clock is None or not trace, "tracing excluded from hardware interval")
-    cmd = ["cargo", "+ohm", *args, "--locked", "--offline", "-j4", "--message-format=json"]
+    need(jobs in (1,4), "registered Cargo job count")
+    cmd = ["cargo", "+ohm", *args, "--locked", "--offline", f"-j{jobs}", "--message-format=json"]
     actual = cmd
     if trace:
         logs = out / "trace"
