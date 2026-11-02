@@ -34,6 +34,22 @@ def inventory(sdk):
     for rel,x in expected.items():
         f=sdk/rel;assert not f.is_symlink() and f.resolve().is_relative_to(sdk.resolve()) and f.stat().st_size==x['bytes'] and f.stat().st_mode&0o777==x['mode'] and m.filesha(f)==x['sha256']
     return m.digest(m.canon(expected))
+def complete_helpers(sdk,fixed,native):
+    signed=m.read(m.HERE/'helpers.json')
+    prefix='lib/rustlib/x86_64-unknown-linux-gnu/bin/'
+    present={prefix+n for n in ('gcc-ld/ld.lld','gcc-ld/ld64.lld','gcc-ld/lld-link','gcc-ld/wasm-ld','rust-lld','rust-objcopy')}
+    assert set(fixed)==set(signed) and set(native)&set(fixed)==present and set(fixed)-present=={'bin/cargo',prefix+'wild-ld/ld.bfd'}
+    for rel,src in fixed.items():
+        f=sdk/rel;expected=signed[rel];f.parent.mkdir(parents=True,exist_ok=True)
+        assert (src.stat().st_size,m.filesha(src))==(expected['bytes'],expected['sha256']) and not src.is_symlink()
+        if rel in present:
+            item=native[rel]
+            assert f.is_file() and not f.is_symlink() and f.resolve().is_relative_to(sdk.resolve())
+            assert (f.stat().st_size,f.stat().st_mode&0o777,m.filesha(f))==(item['bytes'],item['mode'],item['sha256'])
+        else:
+            assert not f.exists() and not f.is_symlink()
+        shutil.copy2(src,f)
+        assert f.stat().st_size==expected['bytes'] and m.filesha(f)==expected['sha256']
 def admit():
     w,tmp=scope();out=w/'trait-results';proof=out/'intake';proof.mkdir();scratch=tmp/'client-rdr-intake';scratch.mkdir();h.guard_space(w,tmp)
     _,previous=m.check_sources(w);old=m.load('previous_release_intake',previous/'intake.py');parts=[]
@@ -49,9 +65,8 @@ def admit():
     role=m.read(capsule/'role.json');assert (role['source']['commit'],role['source']['tree'],role['source']['epoch'])==(P['rustc'],P['tree'],43311)
     smoke=m.read(capsule/'observer-smoke.json');assert smoke['visits']==['native','observer','native'] and smoke['trace_sha256']==m.filesha(capsule/'observer-fixture.rdr')
     old.released(scratch,proof);official,=(scratch/'signed').glob('*.tar.gz');fixed=enroll.signed(scratch/'fixed',official)
-    sdk=tmp/'rdr-22874-admitted-sdk';enroll.extract(capsule,sdk)
-    for rel,src in fixed.items():
-        f=sdk/rel;f.parent.mkdir(parents=True,exist_ok=True);assert not f.exists();shutil.copy2(src,f)
+    sdk=tmp/'rdr-22874-admitted-sdk';native=enroll.extract(capsule,sdk)
+    complete_helpers(sdk,fixed,native)
     inv=inventory(sdk);e={'PATH':'/usr/bin:/bin','HOME':str(scratch),'LC_ALL':'C.UTF-8'}
     def run(*args):return subprocess.check_output(args,env=e,text=True)
     ident=m.read(capsule/'identity.json')
