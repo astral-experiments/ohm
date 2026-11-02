@@ -1,10 +1,8 @@
 # Published benchmarks
 
-We compared published Ohm 1.99.0-17 with stock Rust 1.99.0 on x86_64 Linux. Each project ran both toolchains on the same machine. The four recorded session means totaled 983.26 s with Ohm and 1,884.42 s with stock Rust, a 47.82% reduction. Some steps took longer with Ohm. The Codex rendering regression module averaged 4.26 s with Ohm and 3.94 s with stock Rust; its active-cell removal test averaged 3.77 s and 3.71 s. Ruff’s semantic mdtests after the fixed-point rewrite averaged 5.88 s and 5.73 s. [Recorded sessions](sessions.json) · [ty session and worktree startup](ty-worktree.md)
+We compared published Ohm 1.99.0-22 with stock Rust 1.99.0 on x86_64 Linux. Each project ran both toolchains on the same machine. The four recorded session means totaled 1,742.64 s with Ohm and 1,823.43 s with stock Rust. Ohm took 4.43% less time across the four sessions. [Release results](1.99.0-22.md) · [Recorded sessions](sessions.json) · [ty session and worktree startup](ty-worktree.md)
 
-The individual-command study includes all 216 accepted samples across uv and Codex. A Codex Clippy run after an edit to `codex-utils-string` had a median of 1.63 s with Ohm and 55.42 s with stock Rust. The developer-workflow table covers five workflows each for Ruff and uv. After a uv dependency edit, the downstream test took a median 2.84 s with Ohm and 23.98 s with stock Rust. [Individual commands](workflow.json) · [Developer workflows](developer-workflows.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
-
-The Codex developer suite stopped when its unchanged host-activity guard detected unrelated CPU usage. Its 20 partial samples are excluded from the published developer comparisons while that suite is recovered. The completed Ruff and uv developer runs discarded one and two attempts, respectively. The ty report records its exclusions separately. [ty audit](ty-worktree.json)
+The individual-command study covers 216 samples across uv and Codex. The developer study covers five workflows per project for Ruff, uv, and Codex, with four repetitions per toolchain. [Individual commands](workflow.json) · [Developer workflows](developer-workflows.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
 
 The APFS disk study compares Ohm 1.99.0-11 with stock Rust 1.99.0. All eight cohorts completed in that release. The formatter comparison below measures -10 against -11. [Disk measurements](disk.json) · [Formatter measurements](formatting-comparison.json)
 
@@ -14,17 +12,17 @@ The [historical reports and fixtures](https://github.com/astral-sh/ohm/tree/9cbe
 
 The separate [Ruff edited-check study](ruff-edited-check.json) retains 64 matched pairs for an earlier experimental version of the [public-API metadata optimization](https://github.com/astral-sh/ohm-rust/pull/194), which is included in Ohm 1.99.0-7. Its [build record](ruff-edited-check-build.json) identifies that experimental compiler. The release tables exclude this earlier study.
 
-## Linux session replays with 1.99.0-17
+## Linux session replays with 1.99.0-22
 
 Each entry gives the wall time in seconds for a complete session replay. The last column compares the mean time for each toolchain on the same host.
 
-| Session         |          Stock Rust 1.99.0 (s) |              Ohm 1.99.0-17 (s) | Time saved |
+| Session         |          Stock Rust 1.99.0 (s) |              Ohm 1.99.0-22 (s) | Time saved |
 | --------------- | -----------------------------: | -----------------------------: | ---------: |
-| Codex           |                 806.23, 810.59 |                 392.70, 398.91 |     51.04% |
-| Ruff            |                 556.18, 537.71 |                 304.23, 295.50 |     45.18% |
-| Ruff historical |                 520.87, 515.03 |                 342.11, 338.21 |     34.33% |
-| uv              |                 186.83, 189.82 |                   96.86, 94.89 |     49.09% |
-| ty              | 344.98, 341.46, 337.48, 339.06 | 191.91, 193.39, 191.14, 190.45 |     43.73% |
+| Codex           |                 611.75, 623.73 |             1,082.46, 1,069.30 |    -74.17% |
+| Ruff            |                 712.84, 647.14 |                 370.48, 355.39 |     46.63% |
+| Ruff historical |                 592.28, 551.03 |                 373.51, 370.88 |     34.89% |
+| uv              |                 173.58, 172.99 |                  101.65, 96.15 |     42.93% |
+| ty              | 352.65, 355.39, 354.21, 347.46 | 203.09, 204.10, 205.78, 206.73 |     41.85% |
 
 ## Ruff compiler and Cargo changes in 1.99.0-15
 
