@@ -1,0 +1,107 @@
+{
+  "closed_decision": {
+    "id": 13165276406,
+    "job": 125439401962,
+    "qa": "4a3ded3a2146849d02efe70c5163395193c7b038",
+    "run": 41492659316,
+    "sha256": "be91ea85e6bd89fb10d829f644dc759e11bab7ef124a672252c007d7b3c48e49",
+    "size": 5748
+  },
+  "drivers": {
+    "C": "dd34aec89ef43e54b3ba6bd82003701ef7f5fb89b723625742a307d2a6601fc6",
+    "P": "cb6bd1e8074cfb4c092b270fa1450fcbf59941315615a5af48d537edeaf1933b"
+  },
+  "failed_final_receiver": {
+    "job": 125433103066,
+    "log_sha256": "bac7bbca5f1017584185b5d7ccbd9f0ba1bae72dc5e6cb700577051ca280b230",
+    "reason": "The Ubuntu receiver stopped at its registered 15-GiB disk reserve before reading the score.",
+    "run": 41485360543
+  },
+  "projections": [
+    {
+      "boot": "dc29cb00-8747-48f6-a8d6-edc262835ce6",
+      "file": "admit-1.zip",
+      "original": {
+        "digest": "sha256:0076aef44e53b5fcd6c647e1630357f5f2fa0e3558c2b7fa8b994cb74b6db374",
+        "id": 13159253849,
+        "name": "placement-admit-raw-1",
+        "size_in_bytes": 203340395
+      },
+      "reader": {
+        "digest": "sha256:fa0e034f029bd74f147b39f1667112d3cd6bb61736fdf19128b209bce48043ae",
+        "id": 13160528805,
+        "name": "placement-admit-verified-1",
+        "size_in_bytes": 14408
+      },
+      "reader_run": 41484352206,
+      "role": "admit",
+      "slot": 1,
+      "terminal": "4bd45c3aedebef1230dff2487bda354889130fbcc661901ce0b58de5ee7338e7"
+    },
+    {
+      "boot": "065da095-4a84-4de2-96cd-2d4f0b70555a",
+      "file": "admit-2.zip",
+      "original": {
+        "digest": "sha256:db0b4eb91950f9d4e229e6baac054d0f079896c3ab2c4c827f1daea39994afbc",
+        "id": 13160176061,
+        "name": "placement-admit-raw-2",
+        "size_in_bytes": 171259521
+      },
+      "reader": {
+        "digest": "sha256:c84a3208c19741f1f265a4778e91c0d20746e4da412a90aa4d8335d3aff653bc",
+        "id": 13161936261,
+        "name": "placement-admit-verified-2",
+        "size_in_bytes": 14828
+      },
+      "reader_run": 41484352206,
+      "role": "admit",
+      "slot": 2,
+      "terminal": "a5633c1a9898b48084d5e36c0c3c175d2470ab5e7e37c3f85ba690423b16eb52"
+    },
+    {
+      "boot": "3f64a170-7993-4ae2-8611-7f4fdf1c4dcf",
+      "file": "score-1.zip",
+      "original": {
+        "digest": "sha256:6574b675833ddef95aff40946257bb8112928fe43558b1dfff7cf183dbc481f5",
+        "id": 13163776811,
+        "name": "placement-score-raw-1",
+        "size_in_bytes": 252718290
+      },
+      "reader": {
+        "digest": "sha256:bbc90688b95faeda4a156dcd94ba20b2356e6e824f439cb013fc1a7ea24fcf60",
+        "id": 13163862389,
+        "name": "placement-score-verified-1",
+        "size_in_bytes": 15103
+      },
+      "reader_run": 41485360543,
+      "role": "score",
+      "slot": 1,
+      "terminal": "49c41cb87f67b3ed6182bffdd9dab2192152225de1d65f036d76408769d9b8bd"
+    },
+    {
+      "boot": "cafb2a31-6761-485e-8f73-1e0554166885",
+      "file": "score-2.zip",
+      "original": {
+        "digest": "sha256:516454e78c35fbda05a36f4e7ad38648f1ed6b23e49a93f1582de98c5d5e21ea",
+        "id": 13164880180,
+        "name": "placement-score-raw-2",
+        "size_in_bytes": 252722225
+      },
+      "reader": {
+        "digest": "sha256:d5fbf2fd1d42c2fa4fc94c80c3ecea33152af6ca81ecb0a29bce8ec30721a8fd",
+        "id": 13163637519,
+        "name": "placement-score-verified-2",
+        "size_in_bytes": 15045
+      },
+      "reader_run": 41485360543,
+      "role": "score",
+      "slot": 2,
+      "terminal": "65cdce307a04a46df7fbd0bd3a70c2ae8c59b58162370865538cd9e9f81454a4"
+    }
+  ],
+  "schema": "whole-Cargo-C2-W-closed-1",
+  "source": {
+    "C": "4e546b27c311f29d99f9528e64420887f57c7538",
+    "P": "531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5"
+  }
+}
