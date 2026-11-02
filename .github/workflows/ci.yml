@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-cached-stderr, ldv-physical-reopen]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score]
         default: single-22
       ldv_admission:
         description: Same-commit successful wrapper-free native workflow run ID for scoring
@@ -616,3 +616,152 @@ jobs:
           path: ${{ runner.temp }}/retained-ldv-stage/logs
           retention-days: 7
           if-no-files-found: warn
+  ldv-source-workflow:
+    if: (inputs.mode == 'ldv-source-admit' || inputs.mode == 'ldv-source-score') && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-workspace-link-census-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    name: Real source-built ordinary Ruff Cargo ${{ inputs.mode }} block ${{ matrix.slot }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        slot: ${{ fromJSON(inputs.mode == 'ldv-source-admit' && '[1,2]' || '[1,2,3,4,5,6]') }}
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      STAGE: ${{ inputs.mode == 'ldv-source-admit' && 'admit' || 'score' }}
+      ADMISSION_RUN: ${{ inputs.ldv_admission }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          path: enrolled
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ruff-ldv-physical-stage
+            scripts/ruff-ldv-physical-workflow
+            scripts/ruff-ldv-needed
+            scripts/ruff-ldv-pilot
+            scripts/ruff-default-owner-pmu
+            scripts/ruff-workspace-link-census
+            scripts/ruff-workspace-remat
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-cgu-inputs
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: 088b7b5f77fcb05994fd2a17cbc940cd9edb341a
+          path: ruff-option
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: f9115b8deefa56b18b79449f8acafe25475c54d3
+          path: ruff-e2e
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify the complete source-bound QA worker and preregistration
+        working-directory: enrolled
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          (cd scripts/ruff-ldv-physical-stage && sha256sum --strict --quiet -c SHA256SUMS)
+          (cd scripts/ruff-ldv-physical-workflow && sha256sum --strict --quiet -c SHA256SUMS)
+          python3 -IB scripts/ruff-ldv-physical-workflow/tests.py
+          python3 -IB scripts/ruff-ldv-physical-stage/tests.py
+      - name: Install stock kernel tracing and native prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends binutils build-essential libssl-dev pkg-config strace zstd
+      - name: Reopen the complete independent Ruff native admissions
+        if: inputs.mode == 'ldv-source-score'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-ldv-physical-workflow/decision.py gate "$ADMISSION_RUN" "$RUNNER_TEMP/physical-native-admission.json"
+      - name: Materialize previously authenticated physical source stage1 parent and child
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-ldv-physical-workflow/transport.py "$RUNNER_TEMP/ldv-qualified-sdks"
+      - name: Run ordinary non-wrapped Cargo with original native and failure controls
+        run: python3 -IB -u enrolled/scripts/ruff-ldv-physical-workflow/acquire.py "$STAGE" "${{ matrix.slot }}" "$GITHUB_WORKSPACE/ruff-option" "$GITHUB_WORKSPACE/ruff-e2e"
+      - name: Retain every original native stream, including a refused enrollment
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ldv-physical-${{ env.STAGE }}-originals-${{ matrix.slot }}
+          path: ${{ runner.temp }}/ohm-ruff-whole-census/evidence
+          if-no-files-found: warn
+          compression-level: 5
+          retention-days: 7
+  ldv-source-readback:
+    needs: ldv-source-workflow
+    if: inputs.mode == 'ldv-source-admit' || inputs.mode == 'ldv-source-score'
+    name: Independently reopen source-built actual native/PMU files ${{ inputs.mode }} block ${{ matrix.slot }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        slot: ${{ fromJSON(inputs.mode == 'ldv-source-admit' && '[1,2]' || '[1,2,3,4,5,6]') }}
+    env:
+      STAGE: ${{ inputs.mode == 'ldv-source-admit' && 'admit' || 'score' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-ldv-physical-stage
+            scripts/ruff-ldv-physical-workflow
+            scripts/ruff-ldv-needed
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-workspace-remat
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Check the incoming immutable original archive including all native/ELF/argv/PMU evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB -u scripts/ruff-ldv-physical-workflow/raw.py "$STAGE" "${{ matrix.slot }}" "$RUNNER_TEMP/reopened.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ldv-physical-${{ env.STAGE }}-independent-${{ matrix.slot }}
+          path: ${{ runner.temp }}/reopened.json
+          if-no-files-found: error
+          retention-days: 14
+  ldv-source-decision:
+    needs: ldv-source-readback
+    if: inputs.mode == 'ldv-source-score'
+    name: Analyze all twelve physically reopened edited observations and their secondary controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ADMISSION_RUN: ${{ inputs.ldv_admission }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-ldv-physical-stage
+            scripts/ruff-ldv-physical-workflow
+            scripts/ruff-ldv-needed
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-workspace-remat
+      - name: Apply the prior six-block estimator and holdout gate after all independent readers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/ruff-ldv-physical-workflow/decision.py analyze "$ADMISSION_RUN" "$RUNNER_TEMP/source-results.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-ldv-six-independent-ordinary-boots
+          path: ${{ runner.temp }}/source-results.json
+          if-no-files-found: error
+          retention-days: 30
