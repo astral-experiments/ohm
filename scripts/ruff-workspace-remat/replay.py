@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import shutil
 import subprocess
@@ -140,7 +141,9 @@ def verify_argv(lines, flags, compiler=None):
             need([s for s in args if s in leaves] == (flags if line == selected[0] else []), ("wrong codegen flags", line))
             if compiler is not None:
                 position = args.index("--crate-name")
-                need(position > 0 and Path(args[position - 1]).samefile(compiler), ("wrong compiler", args[:position]))
+                command = next((a for a in args[:position] if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", a)), None)
+                need(command is not None and Path(command).is_absolute() and Path(command).is_file()
+                     and Path(command).samefile(compiler), ("wrong compiler", args[:position]))
     return selected[0]
 
 
