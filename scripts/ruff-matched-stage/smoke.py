@@ -155,14 +155,15 @@ def smoke(root, manifest, base):
         graph_sizes = {}
         for i, f in enumerate(sorted(graph_files)):
             data = f.read_bytes()
-            need(data[:4] == b"RSIC" and data.endswith(b"rust-end-file"), "not a rustc graph")
+            need(data[:4] == (b"RSIC" if label == "normal" else b"RSIG")
+                 and data.endswith(b"rust-end-file"), "not the registered rustc graph")
             version = int.from_bytes(data[4:6], "little")
             end = len(data) - len(b"rust-end-file")
             marker = data[end - 32:end - 24]
             need((version, marker if label == "normal" else marker[2:]) ==
-                 ((10, b"OHMIDX01") if label == "normal" else (11, b"OHMF11")),
+                 ((26655, b"OHMIDX01") if label == "normal" else (26655, b"OHMF11")),
                  ("wrong physical check format", label, version, marker))
-            graph_sizes[str(i)] = {"bytes": len(data), "sha256": sha(f), "version": version}
+            graph_sizes[str(i)] = {"bytes": len(data), "sha256": sha(f), "version": version, "magic": data[:4].decode()}
         save(root / "logs" / ("check-format-" + label + ".json"), graph_sizes)
         rows = []
         for value in (17, 29):

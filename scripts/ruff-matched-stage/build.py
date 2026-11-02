@@ -49,6 +49,11 @@ def bundle(repo):
         and git(repo, "rev-list", c, "^" + p).splitlines() == [c],
         "not the single prepared compiler commit",
     )
+    need(
+        git(repo, "rev-list", "--reverse", p, "^" + entry["prerequisite"]).splitlines()
+        == entry["baseline_commits"],
+        "wrong packaging pin history between the prepared source and the parent",
+    )
     changed = sorted(REG["changed_sources"])
     need(
         git(repo, "diff", "--name-status", "--no-renames", p, c).splitlines()

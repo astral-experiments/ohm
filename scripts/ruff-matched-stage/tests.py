@@ -95,7 +95,7 @@ class Protocol(unittest.TestCase):
         b = c.HERE / "candidate.bundle"
         self.assertEqual(c.sha(b), c.REG["bundle"]["sha256"])
         header = b.read_bytes().split(b"\n\n", 1)[0].decode().splitlines()
-        self.assertEqual(header[1].split()[0], "-" + c.REG["roles"]["P"]["revision"])
+        self.assertEqual(header[1].split()[0], "-" + c.REG["bundle"]["prerequisite"])
         self.assertEqual(header[2], c.REG["roles"]["C"]["revision"] + " " + c.REG["bundle"]["branch"])
         self.assertEqual(len(header), 3)
 
