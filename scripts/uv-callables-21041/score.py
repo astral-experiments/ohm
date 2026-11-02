@@ -1,30 +1,16 @@
-"""Independently reopen raw clocks, source, outputs and the qualified per-role native histories."""
-from fractions import Fraction
-from statistics import median
+"""Independently replay the existing native products and every wall/resource/process observation."""
 from pathlib import Path
-import gzip,json,sys
+import gzip,sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-import core as c
-from origin.checkpoints import enroll as enroll_seed
+import core as c,wall_clock
 from products import comparable
 from screen import output_controls
+from wall_tail import policy,visit,resources
+from wall_tail.policy import enroll as enroll_seed
 m=c.m;P=c.P
-def num(v):return {'fraction':str(v),'factor':round(float(v),6)}
-def summary(rows):
-    c.guard(len(rows)==8,'eight preregistered pairs');result={}
-    for metric in ('wall','clock'):
-        ratios=[];holds=[[],[]];arms={r:[] for r in c.ROLES}
-        for i,row in enumerate(rows):
-            c.guard(row['pair']==i and row['order']==P['orders'][i] and row['hold']==P['independent_holds'][i] and row['modes']==P['mode_orders'][i],'pair design')
-            values=[row['values'][r][metric]['value']for r in c.ROLES];c.guard(all(type(x)is int and x>0 for x in values),'positive raw clocks')
-            for r,x in zip(c.ROLES,values):arms[r].append(x)
-            ratio=Fraction(*values);ratios.append(ratio);holds[row['hold']].append(ratio)
-        result[metric]={'raw_by_role':arms,'paired_control_over_candidate':[num(x)for x in ratios],'median_paired_factor':num(median(ratios)),
-            'hold_medians':[num(median(v))for v in holds],'above_parity':sum(x>1 for x in ratios),'above_double':sum(x>2 for x in ratios),'n':8}
-    return result
 def score():
-    w,tmp=c.host();out=w/'trait-results';panel=out/'uv-client';raw=m.read(panel/'raw-pairs.json');ready=m.read(out/'calibration.json')['ready'];_,meter=m.pmu(w,tmp)
-    data={};refusals=[];checked={}
+    w,tmp=c.host();out=w/'trait-results';panel=out/'uv-client';raw=m.read(panel/'raw-pairs.json');ready=m.read(out/'calibration.json')['ready'];wall_plan=policy.plan();visit.boot()
+    checked={};resources_by_pair=[]
     parser=c.deep.parser(tmp/'uv22874-readers/check-root-20261101/ctfe-root-attribution/metadata.py')
     def check_products(at):
         obj=m.read(at/'products.json');c.guard(len(obj['public_sidecars'])==415,'wrong sidecar inventory')
@@ -39,7 +25,7 @@ def score():
         return obj
     from derive import panel as derive_panel
     opened_seeds = set()
-    for i,hold in enumerate(P['independent_holds']):
+    for i,hold in enumerate(wall_plan['blocks']):
         derive_panel.verify_hold(out,tmp,i,c.ROLES,parser,independent=True)
         for r in c.ROLES:
             q=panel/f'opening-{i}-{r}';a=check_products(q/'ordinary-A');b=check_products(q/'warm-B')
@@ -52,9 +38,8 @@ def score():
                 c.guard(units['logical_sha256']==P['native_complete_unit_sha256']and units['count']==P['native_cargo_artifacts']==486 and len(units['workspace'])==37,'complete actual package closure')
                 c.guard(roster['artifact_crates']==({n:1 for n in P['edited_workspace_roster']}if actual else {}),'actual native rustc set')
                 c.guard({k:v['rmeta']for k,v in units['workspace'].items()}==a['relative_paths'],'Cargo unit to original path')
-            if i in (0,4):
-                wits=[m.read(q/('behavior-'+phase)/'witness.json')for phase in('A','B','cold-B')]
-                c.guard(all(x['exact'] and x['fixture_sha256']==m.filesha(c.HERE/'witness.rs') for x in wits)and len({x['output_sha256']for x in wits})==1,'independently linked native behavior')
+            wits=[m.read(q/('behavior-'+phase)/'witness.json')for phase in('A','B','cold-B')]
+            c.guard(all(x['exact'] and x['fixture_sha256']==m.filesha(c.HERE/'witness.rs') for x in wits)and len({x['output_sha256']for x in wits})==1,'independently linked native behavior')
             import domain_control
             for phase,original in [('A',a),('B',b)]:
                 p=q/('unchanged-kernel-'+phase);domain_control.check_zero(p,phase)
@@ -63,36 +48,24 @@ def score():
                 c.guard(check_products(p)==original,'unchanged original byte set differs')
             streams=output_controls(q/'warm-B');c.guard(streams==m.read(q/'ordinary-controls.json'),'opening command outputs')
             seal=enroll_seed(opened_seeds,m.read(q/'checkpoint.json'),i,r)
-            data[(i,r)]=(b,seal,streams)
-    c.guard(len(opened_seeds)==16,'incomplete independent A seeds')
-    for i,row in enumerate(raw):
-        for r in c.ROLES:
-            expected,seal,streams=data[(i,r)];q=panel/f'pair-{i}-{r}'
-            for mode in P['mode_orders'][i]:
-                if mode=='scoped':continue
-                at=q/mode;v=row['values'][r][mode];rec=m.read(at/'ordinary.json');s=m.read(at/'source.json')
-                c.guard(rec['exit']==0 and rec['argv']==c.CHECK and rec['boot']==ready['boot'] and rec['cpus']==ready['affinity']and rec['ns']==rec['end_ns']-rec['start_ns']>0,'authentic whole-command timing')
-                c.guard(s['head']==P['A']and s['working_tree']==P['B_tree']and s['source']==v['source_sha256']==P['B_file']and s['lock']==P['lock_sha256']and v['checkpoint_sha256']==seal,'source/checkpoint')
-                c.guard(output_controls(at)==m.read(at/'ordinary-controls.json')==streams,'same-seed command diagnostics or package roster changed')
-                observed=check_products(at);ok=observed==expected;c.guard(ok==v['same_seed_qualified']==m.read(at/'same-seed-equivalence.json')['passed'],'recorded raw/semantic gate')
-                if not ok:refusals.append([i,r,mode])
-                if mode=='wall':c.guard(rec['timer']=='CLOCK_MONOTONIC; waitpid blocking; ITIMER_REAL watchdog'and rec['deadline_fired']is False and rec['invoked']==c.CHECK and rec['mode']=='native'and not(at/'whole-clock.json').exists()and v['value']==rec['ns'],'uninstrumented whole wall')
-                else:
-                    clock=meter.clock(at/'whole-clock.json',0);c.guard(rec['invoked']==[ready['plain'],str(at/'whole-clock.json'),*c.CHECK]and clock['running']==clock['enabled']>0 and v['value']==clock['instructions'],'inherited unmultiplexed whole-command instructions')
-    import physical
-    perf=physical.reduce(panel,raw,data,check_products,output_controls)
-    report={'scope':'matched signed-release production builds, trait-defining crate query, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
-        'verified_unique_workspace_products':len(checked),'metrics':None if refusals else summary(raw),'branch':P['branch']}
-    if report['metrics']:
-        for mode in ('wall','clock'):
-            x=report['metrics'][mode]['raw_by_role']
-            report['metrics'][mode]['paired_statistics']=physical.metric(list(zip(x[c.ROLES[0]],x[c.ROLES[1]],strict=True)))
-    m.save(panel/'ordinary-score.json',report)
-    left=m.read(out/'blocking-clock/passed.json');right=m.read(out/'blocking-clock-post/passed.json')
-    c.guard(left['machine']==right['machine']=={'boot':ready['boot'],'cpus':ready['affinity']} and left['probe']==right['probe'] and all(len(t['samples'])==25 and t['nonzero_exit']==17 and t['deadline_exit']==-9 for t in (left,right)),'different pre/post wait calibration')
-    if perf['complete']:perf['primary_test']=physical.preregistered_tests(perf['metrics'])
-    m.save(panel/'native-rustc.json',perf)
-    combined=dict(report,native_scope=perf['scope'],physical_complete=perf['complete'],primary_test=perf.get('primary_test'))
-    m.save(panel/'score.json',combined);print(json.dumps(combined,sort_keys=True))
-    c.guard(not refusals and perf['complete'],'at least one required visit could not be qualified')
+            renderer=wall_clock.current()
+            target=q/'edited-kernel-B';forms=m.read(q/'typed-B/roster.json')['commands'];enrollment=m.read(target/'enrollment.json');installed=m.read(out/'intake.json')['installed'][r]
+            c.guard(enrollment['compiler_sha256']==installed['runtime']['bin/rustc'] and enrollment['compiler']==str(m.RUSTC) and enrollment['original_argv']==c.CHECK,'wrong real kernel binaries')
+            actual=visit.kernel_receipt(m.read(target/'kernel-events.json'),enrollment,forms,c.CHECK,domain_control.ev['decode'])
+            c.guard(actual==m.read(target/'actual-rustcs.json') and output_controls(target)==streams and check_products(target)==b,'changed separate kernel process, product or diagnostics')
+            at=q/'warm-B';kv=m.read(at/'resources.json');rec=m.read(at/'ordinary.json');state=m.read(at/'source.json')
+            backed=m.read(target/'source.json');invariant=set(state)-{'source_mtime_ns'};c.guard(set(backed)==set(state)and all(state[k]==backed[k]for k in invariant),'different actual original source state for the kernel replay')
+            c.guard(state['head']==P['A'] and state['working_tree']==P['B_tree'] and state['source']==P['B_file'] and state['lock']==P['lock_sha256'] and state['index']==P['A_tree'] and state['patch_sha256']==P['edit_sha256'],'actual edited source')
+            c.guard(rec['exit']==0 and rec['argv']==rec['invoked']==c.CHECK and rec['boot']==ready['boot']==renderer['boot'] and rec['cpus']==ready['affinity'] and rec['ns']==rec['end_ns']-rec['start_ns']>0 and rec['mode']=='native' and rec['deadline_fired'] is False and rec['timer']=='CLOCK_MONOTONIC; waitpid blocking; ITIMER_REAL watchdog','bare ordinary clock')
+            c.guard(not {'RUSTC_WRAPPER','RUSTC_WORKSPACE_WRAPPER','CARGO_LOG','RUSTC_LOG','LD_PRELOAD'}.intersection(rec['env']) and not (at/'kernel-events.json').exists()and not(at/'whole-clock.json').exists(),'instrumented timed Cargo')
+            ares,bres=kv['before'],kv['after'];c.guard(ares['end_ns']<=rec['start_ns']<rec['end_ns']<=bres['start_ns']and ares['affinity']==rec['cpus']==bres['affinity']and resources.delta(ares,bres)==kv['delta'],'changed resource scope, boundaries or delta')
+            assert len(raw)==16 and raw[i]['pair']==i and raw[i]['block']==hold and raw[i]['order']==wall_plan['order'][i]
+            info=raw[i]['values'][r];assert info=={'wall_ns':rec['ns'],'checkpoint':seal,'source':state['source'],'resources_sha256':m.filesha(at/'resources.json'),'kernel_sha256':m.filesha(target/'kernel-events.json')}
+            resources_by_pair.append({'pair':i,'block':hold,'role':r,'start_ns':rec['start_ns'],'end_ns':rec['end_ns'],'wall_ns':rec['ns'],'checkpoint':seal,'pid':rec['pid'],'diagnostics_sha256':m.filesha(at/'cargo.stderr'),'finished':[x.strip()for x in (at/'cargo.stderr').read_text().splitlines()if 'Finished 'in x], 'resource_deltas':kv['delta'],'raw_resources_path':str((at/'resources.json').relative_to(out)),'separate_kernel_compilers':actual['rustcs']})
+    c.guard(len(opened_seeds)==32 and len(resources_by_pair)==32,'incomplete independent A seeds or resource samples')
+    resources_by_pair.sort(key=lambda v:(v['pair'],wall_plan['order'][v['pair']].index(v['role'])))
+    c.guard(all(x['end_ns']<y['start_ns'] for x,y in zip(resources_by_pair,resources_by_pair[1:])), 'actual time order changed')
+    report=policy.score([[row['values'][r]['wall_ns']for r in c.ROLES]for row in raw]);report.update(registration_sha256=policy.SHA,original_negative_pairs=wall_plan['old_ordinary_clocks'],ordered_visits=resources_by_pair,verified_unique_raw_workspace_products=len(checked),causal_limit='Each pressure or shared cgroup counter is a coincident observation. This on/off design has no within-visit scheduler or CPU-stack attribution.')
+    m.save(panel/'wall-tail-score.json',report)
+    print({'guard_passed':report['pass'],'block_medians':report['block_medians_C_over_P'],'below_1_20':report['strictly_below_1_20'],'at_least_twofold':report['candidate_slower']['at_least_2']},flush=True)
 if __name__=='__main__':score()
