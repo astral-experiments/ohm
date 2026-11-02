@@ -121,6 +121,30 @@ def manifest(root):
     return {str(p.relative_to(root)):sha(p) for p in sorted(root.rglob("*")) if p.is_file()}
 
 
+def literal_inputs(root, live_output, frozen, inputs):
+    live={}
+    for relative, recorded in inputs.items():
+        if relative=="run-with":
+            continue
+        path=Path("/")/relative
+        if not path.is_file():
+            parent=path.parent
+            need(path.name=="symbols.o" and parent.name.startswith("rustc") and
+                 parent.parent==live_output.parent and parent.parent.resolve(strict=True).is_relative_to(root),
+                 ("only restore the signed rustc invocation's private temporary object",str(path)))
+            parent.mkdir(mode=0o700,exist_ok=True)
+            need(not parent.is_symlink() and sha(frozen/relative)==recorded,"authentic saved physical file")
+            with path.open("xb") as dest,(frozen/relative).open("rb") as src:
+                shutil.copyfileobj(src,dest)
+        live[str(path)]=sha(path)
+        if live[str(path)]!=recorded:
+            # Wild's save feature relocates embedded absolute paths only in text linker scripts.
+            with path.open("rb") as stream:
+                start=stream.read(4096)
+            need(b"GROUP" in start or b"INPUT" in start,("raw file matches captured bytes",str(path)))
+    return live
+
+
 def main():
     ws=Path(os.environ["GITHUB_WORKSPACE"]).resolve(strict=True)
     head=os.environ["GITHUB_SHA"]
@@ -155,14 +179,23 @@ def main():
     save(out/"original-argv.json",programs[0])
     images={"ordinary":read_image(target,out/"ordinary-readelf.gz")}
     results={}
-    stable=root/"literal-output"
+    argv=programs[0]
+    stable=Path(argv[argv.index("-o")+1])
+    need(stable.is_file() and stable.resolve(strict=True).is_relative_to(root) and sha(stable)==sha(target),
+         "real private output path and original promoted file")
+    need(Path(argv[0]).samefile(wild),"actual signed executable")
+    live=literal_inputs(root,stable,script.parent,inputs)
+    save(out/"live-inputs.json",live)
+    # The upstream replay script rewrites the PT_INTERP string. The original command below
+    # reuses the actual GNU interpreter path and the exact original rustc temp input.
+    known_before=dict(live)
     cases=[("plain-a",[],None),("plain-b",[],None),("one",["--threads=1"],None),("four",["--threads=4"],None),
            ("single-file",["--threads=1"],"1"),("two-files",["--threads=1"],"2"),("eight-files",["--threads=1"],"8")]
     for label,opts,group in cases:
-        sub=dict(env,OUT=str(stable),WILD_WRITE_LAYOUT="1")
+        sub=dict(env,WILD_WRITE_LAYOUT="1")
         if group:sub["WILD_FILES_PER_GROUP"]=group
-        cmd=[str(script),str(wild),"--",*opts] if opts else [str(script),str(wild)]
-        proc=subprocess.run(cmd,cwd=script.parent,env=sub,capture_output=True,timeout=180)
+        cmd=[*argv,*opts]
+        proc=subprocess.run(cmd,cwd=src,env=sub,capture_output=True,timeout=180)
         study.compressed(out/(label+"-stderr.gz"),proc.stderr)
         need(proc.returncode==0,(label,proc.returncode,proc.stderr[-1500:]))
         image=read_image(stable,out/(label+"-readelf.gz"))
@@ -173,9 +206,53 @@ def main():
              all(v=="ok" for n,v in results[label]["cases"]),"72 real libtest verdicts")
         layout=Path(str(stable)+".layout")
         study.compressed(out/(label+"-layout.gz"),layout.read_bytes())
-        save(out/(label+"-contributors.json"),contributions(layout,image["rodata_range"],script.parent))
+        save(out/(label+"-contributors.json"),contributions(layout,image["rodata_range"],src))
         save(out/(label+"-image.json"),image)
         save(out/(label+"-case-verdict.json"),results[label])
+    need(all(image["digest_except_note_and_rodata_entsize"]==images["ordinary"]["digest_except_note_and_rodata_entsize"]
+             for image in images.values()) and
+         images["ordinary"]["sha256"] in {image["sha256"] for name,image in images.items() if name!="ordinary"},
+         "literal replay preserves every original byte outside the observed fields, and one entire signed control")
+    need(images["one"]["rodata_entsize"]==0 and images["single-file"]["rodata_entsize"]==8,
+         "one mixed group vs last single-file group")
+    groups=json.loads((out/"single-file-contributors.json").read_bytes())["contributors"]
+    winner=groups[-1]
+    path=Path(winner["file"])
+    member=winner["member"]
+    placed=winner["placed"]
+    need(member and path.name.startswith("libcompiler_builtins-") and len(placed)==1 and
+         placed[0][1:3]==[".rodata.cst8",8] and str(path) in argv,"original terminal contributor")
+    private=root/"single-input-control"
+    private.mkdir()
+    copy=private/path.name
+    shutil.copyfile(path,copy)
+    need(not copy.samefile(path) and sha(copy)==live[str(path)],"private immutable-input copy")
+    args=[str(copy) if v==str(path) else v for v in argv]
+    control_env=dict(env,WILD_FILES_PER_GROUP="1")
+    intervention={}
+    for version in ("original-copy","four-byte-entity"):
+        if version=="four-byte-entity":
+            with copy.open("r+b") as stream:
+                stream.seek(member[0]);body=stream.read(member[1]-member[0])
+                need(hashlib.sha256(body).hexdigest()==winner["input_sha256"],"specific loaded archive member")
+                sec,original,hdr=sections(body)[placed[0][0]]
+                need(sec==".rodata.cst8" and original[9]==8 and original[5]%4==0,
+                     "precise input section and valid retained entity width")
+                stream.seek(member[0]+hdr+56);stream.write(struct.pack("<Q",4))
+        proc=subprocess.run([*args,"--threads=1"],cwd=src,env=control_env,capture_output=True,timeout=180)
+        study.compressed(out/(version+"-stderr.gz"),proc.stderr)
+        need(proc.returncode==0,(version,proc.returncode,proc.stderr[-1500:]))
+        measured=read_image(stable,out/(version+"-readelf.gz"))
+        verdict=byte_probe.verdicts(src,env,out/(version+"-verdict"),{"rustc_tests":(str(stable),measured["sha256"],measured["size"])})
+        intervention[version]={"private_input_sha256":sha(copy),"image":measured,"verdict":verdict["rustc_tests"]}
+        save(out/(version+"-input-control.json"),intervention[version])
+    need(intervention["original-copy"]["image"]["sha256"]==images["single-file"]["sha256"] and
+         intervention["four-byte-entity"]["image"]["rodata_entsize"]==4 and
+         all(row["verdict"]["exit"]==0 and len(row["verdict"]["cases"])==72 and
+             all(v=="ok" for n,v in row["verdict"]["cases"]) for row in intervention.values()),
+         "actual two-width input influence and complete behavior")
+    need(all(sha(Path(name))==digest for name,digest in known_before.items()),"literal original inputs stayed unchanged")
+    save(out/"input-influence.json",{"winner":winner,"intervention":intervention})
     save(out/"images.json",images)
     save(out/"verdicts.json",results)
     need(manifest(script.parent)==inputs,"unchanged physical input closure across all links")
