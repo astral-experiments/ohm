@@ -1,54 +1,21 @@
-name: Inspect a Ruff workspace option edit
-run-name: Signed GNU Ruff workspace option edit ${{ inputs.reviewed_head }}
+name: Inspect signed Ruff workspace test links
+run-name: Signed GNU Ruff workspace link census ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed nonrelease QA commit
+        description: Exact reviewed QA commit
         required: true
         type: string
-      pair_order:
-        description: Order for the independent complete builds on this worker
-        required: true
-        type: choice
-        options:
-          - normal,defer
-          - defer,normal
-      suite:
-        description: Ruff dev workflow to replay
-        required: true
-        default: build
-        type: choice
-        options:
-          - build
-          - e2e
-      compiler_mode:
-        description: Use the released flag control or the two source-built compilers
-        required: true
-        default: matched
-        type: choice
-        options:
-          - matched
-          - profile-control
-      trace_unchanged:
-        description: Trace the ordinary signed test build after its measured edit history
-        type: boolean
-        default: false
 permissions:
-  actions: read
   contents: read
 jobs:
-  diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-workspace-option-edit-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-    name: Signed GNU Ruff workspace option edit
+  census:
+    name: Signed Ohm workspace link census
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 150
+    timeout-minutes: 140
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PAIR_ORDER: ${{ inputs.pair_order }}
-      PAIR_SUITE: ${{ inputs.suite }}
-      COMPILER_MODE: ${{ inputs.compiler_mode }}
-      TRACE_UNCHANGED: ${{ inputs.trace_unchanged }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -57,140 +24,40 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
-            scripts/ruff-workspace-option-edit
-            scripts/ruff-workspace-remat
-            scripts/ruff-cgu-inputs
+            scripts/ruff-workspace-link-census
             scripts/ruff-default-owner-pmu
-            scripts/ohm-packed-ruff
-            scripts/branch-return-pmu
-            scripts/branch-storage-e-confirmation/review
-            scripts/ruff-repair-tables-pilot
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        if: inputs.compiler_mode == 'matched'
-        with:
-          ref: c35134e3bd55d5c7766de493b8d87aa8cde8565d
-          path: factory
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-matched-stage
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-          path: collector
-          persist-credentials: false
-          sparse-checkout: scripts/gnu-example-ceiling
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 42ab30fd5e6bcdcf908df81de9baac65ca64fbf9
-          path: contract
-          persist-credentials: false
-          sparse-checkout: scripts/notebook-fanout-ceiling
+            scripts/ruff-workspace-remat
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: astral-sh/ruff
-          ref: 088b7b5f77fcb05994fd2a17cbc940cd9edb341a
-          fetch-depth: 2
+          ref: 93526150df078af7dd8fc4226cdcc469539d2001
           path: ruff
-          persist-credentials: false
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        if: inputs.suite == 'e2e'
-        with:
-          repository: astral-sh/ruff
-          ref: f9115b8deefa56b18b79449f8acafe25475c54d3
-          fetch-depth: 2
-          path: ruff-e2e
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify sources, physical capture and counter contract
+      - name: Verify the fixed sources and the native tracing facility
+        working-directory: enrolled
         run: |
           set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          test ! -e "$base"
-          mkdir -p "$base/work" "$base/logs"
-          printf '%s' "$base" > "$base/work/.owned-by-packed-study"
-          findmnt --target "$base/work" > "$base/logs/filesystem.txt"
-          test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
-          test -z "$(git -C enrolled status --porcelain=v1 --untracked-files=all)"
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py sources
+          test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          sha256sum --strict -c scripts/ruff-workspace-link-census/SHA256SUMS
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends binutils build-essential git libssl-dev zstd
-          if [[ "$TRACE_UNCHANGED" == true ]]; then
-            test "$PAIR_SUITE" = e2e && test "$COMPILER_MODE" = profile-control
-            sudo apt-get install -y --no-install-recommends strace
-            strace -ff -qq -e trace=execve,execveat -o "$base/logs/ptrace-admission" -- /bin/true
-            grep -F 'execve("/bin/true"' "$base"/logs/ptrace-admission.*
-          fi
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py compile "$base"
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/tests.py "$GITHUB_WORKSPACE/ruff" "$base/workspace-cgu" | tee "$base/logs/controls.txt"
-      - name: Enroll the one fresh worker and install the original signed GNU SDK
+          sudo apt-get install -y --no-install-recommends binutils build-essential cmake libssl-dev pkg-config strace
+          strace -ff -qq -e trace=%process -o "$RUNNER_TEMP/census-trace-admission" -- /bin/true
+          grep -F 'execve("/bin/true"' "$RUNNER_TEMP"/census-trace-admission.*
+      - name: Authenticate all 79 signed GNU SDK files
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py acquire
-      - name: Verify and reopen both registered compilers
-        if: inputs.compiler_mode == 'matched'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-workspace-remat/receive_pair.py \
-            enrolled/scripts/ruff-workspace-remat/factory.json "$GITHUB_WORKSPACE/factory" \
-            "$RUNNER_TEMP/ohm-remat-compilers" > "$base/logs/received-compilers.json"
-      - name: Verify the root archive and typed client on the installed SDK
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/test_native.py "$GITHUB_WORKSPACE/ruff" "$base/fixture" "$base/home/.rustup" "$base/home/.cargo/bin" "$base/workspace-cgu" > "$base/logs/signed-fixture.stdout"
-          cp "$base/fixture/qualified.json" "$base/logs/signed-fixture.json"
-      - name: Meter ordinary Cargo first and collect independent physical evidence
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ruff-workspace-option-edit/worker.py "$GITHUB_WORKSPACE/ruff" "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
-      - name: Reopen raw clocks, signed executable behavior, fresh bitcode and archive members
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/reopen.py "$base/logs" "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract" "$REVIEWED_HEAD" --execute > "$base/accepted.json"
-          mv "$base/accepted.json" "$base/logs/accepted.json"
-      - name: Compare full Ruff builds and run the linked option readers
-        timeout-minutes: 100
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          root="$RUNNER_TEMP/ohm-remat-comparison"
-          mkdir "$root" "$root/guard" "$root/driver"
-          cp -a enrolled/scripts/ruff-workspace-remat/. "$root/driver/"
-          (cd "$root/driver" && sha256sum --check --strict SHA256SUMS)
-          args=(--suite "$PAIR_SUITE")
-          if [[ "$PAIR_SUITE" == e2e ]]; then args+=(--e2e-source "$GITHUB_WORKSPACE/ruff-e2e"); fi
-          if [[ "$TRACE_UNCHANGED" == true ]]; then args+=(--trace-unchanged); fi
-          case "$COMPILER_MODE" in
-            matched) args+=(--matched-rustcs "$RUNNER_TEMP/ohm-remat-compilers/roots/rustcs.json") ;;
-            profile-control) ;;
-            *) exit 2 ;;
-          esac
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch \
-            "$root" "$root/guard" "$root/guard/resources" \
-            python3 -IB "$root/driver/replay.py" \
-            --qa "$GITHUB_WORKSPACE/enrolled" --source "$GITHUB_WORKSPACE/ruff" \
-            --original "$base" --scratch "$root/work" --results "$root/observations" \
-            --order "$PAIR_ORDER" "${args[@]}"
-      - name: Preserve hardware clocks, counter settings, compiler argv and runnable results
+        run: python3 -IB enrolled/scripts/ruff-workspace-link-census/census.py install
+      - name: Build the complete workspace and trace the unchanged command
+        run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/census.py "$GITHUB_WORKSPACE/ruff"
+      - name: Retain the native process tree, Cargo products, link markers and verdicts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ruff-deferred-intervals
-          path: |
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/received-compilers.json
-            ${{ runner.temp }}/ohm-remat-comparison/observations
-            ${{ runner.temp }}/ohm-remat-comparison/guard
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/accepted.json
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/enrollment.json
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/cpus.json
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/sdk.json
-          retention-days: 7
-          include-hidden-files: true
-          compression-level: 5
+          name: signed-ruff-workspace-link-census
+          path: ${{ runner.temp }}/ohm-ruff-whole-census/evidence
           if-no-files-found: warn
+          retention-days: 14
