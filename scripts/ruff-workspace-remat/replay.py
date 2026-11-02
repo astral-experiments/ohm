@@ -224,6 +224,8 @@ def main(args):
     shutil.copyfile(Path(__file__).with_name("toml-reader.rs"),here/"toml-reader.rs")
     bodies = out / "client-bodies"
     bodies.mkdir()
+    archives = out / "archive-bodies"
+    archives.mkdir()
     base_env = {**w.ENV, "CARGO_HOME": str(work / "cargo-home"), "CARGO_TARGET_DIR": str(work / "target"),
                 "CARGO_BUILD_BUILD_DIR": str(work / "build")}
     for prog, commit in (("cargo", w.c.SDK["cargo"]), ("rustc", w.c.SDK["rust"])):
@@ -303,6 +305,10 @@ def main(args):
                         objects,metadata=members(ar.read_bytes(),p.OWNER)
                         results={"cargo":count,"unfresh":dirty,"consumer":native,"archive_bytes":ar.stat().st_size,
                                  "archive_sha256":sha(ar),"objects":objects,"metadata":metadata}
+                        if phase in ("new", "clean-new"):
+                            saved = w.physical.keep(ar, archives, b"!<arch>\n")
+                            need(saved["sha256"] == results["archive_sha256"], "library changed during preservation")
+                            results["original_archive"] = saved
                     else:
                         results = {"cargo": count, "error": "E0308"}
                     results["native"] = native_evidence
