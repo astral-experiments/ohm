@@ -25,15 +25,8 @@ def filehash(p):
 
 def host():
     e = os.environ
-    guard(
-        PAIR["roles"] == ROLES
-        and ROLES
-        == [
-            "stock_ctfe318",
-            "callables_ctfe318_incoherent_domain_proc_derive",
-        ],
-        "wrong physical roles",
-    )
+    from direct.cumulative_gate import admit as admit_direct
+    admit_direct(HERE, P, PAIR)
     guard(
         m.P["branch"] in ("charlie/codex-20988-handwritten-stage1-check", P["branch"]),
         "source scope",
@@ -62,23 +55,6 @@ def host():
         == filehash(HERE / "pair.json"),
         "unregistered private experiment",
     )
-    guard(
-        PAIR["arms"][ROLES[0]]["source"]["epoch"] == 43310
-        and PAIR["arms"][ROLES[1]]["source"]["epoch"] == 43319,
-        "cache/metadata epochs",
-    )
-    guard(filehash(HERE / "measurement-plan.json") == P["measurement_plan_sha256"] == PAIR["measurement_plan_sha256"], "different preregistered study")
-    gate=__import__("runpy").run_path(str(HERE / "stage1-prerequisite.py"))["verify"]
-    guard(filehash(HERE / "stage1-qualified.json")==PAIR["qualified_stage1_sha256"] and gate(m.read(HERE / "stage1-qualified.json"))[0]==8, "unqualified prior native study")
-    guard(filehash(HERE/"derive/qualified.json")==PAIR["generated_stage1_qualification_sha256"] and filehash(HERE/"derive/source-role.json")==PAIR["production_overlay_source_sha256"], "different generated-derive source or prior real histories")
-    guard(PAIR["format_versions"]=={"incremental":[43310,43319],"metadata":[3,43319]} and filehash(HERE/"derive/intent.json")==PAIR["measurement_plan_sha256"], "different native formats or prospective admission")
-    from derive.cumulative_gates import require as cumulative_gates
-    cumulative_gates(HERE,PAIR)
-    for run, item in PAIR["prior_boots"].items():
-        if "attestation_sha256" in item:
-            certificate=HERE / "domain" / ("prior-boot-"+run+".json")
-            witness=m.read(certificate)
-            guard(filehash(certificate)==item["attestation_sha256"] and witness["boot"]==item["boot"] and str(witness["run"])==run and witness["coordinator"]==item["head"], "different additional physical run")
     return w, tmp
 
 

@@ -8,11 +8,21 @@ import core as c
 m=c.m;S=c.HERE;D=S/'domain';ev=runpy.run_path(str(S/'thread-meter/exec_events.py'))
 def migration():
  w,tmp=c.host();pool=tmp/'ctfe22-root-sdks';o=w/'trait-results/intake/domain-native';o.mkdir()
- source=[pool/r for r in c.ROLES];e=runpy.run_path(str(D/'epoch.py'))['run'];e(*source,o/'epoch','actual')
+ source=[pool/r for r in c.ROLES];e=runpy.run_path(str(D/'epoch.py'))['run'];e(*source,o/'epoch','actual',expected=[(c.PAIR['arms'][r]['source']['commit'],c.PAIR['arms'][r]['source']['epoch']) for r in c.ROLES])
  proof=m.read(o/'epoch/passed.json');c.guard(proof['signed_argv_refusal_both_directions']and proof['same_sdk_self_loaded_before_and_after']and proof['no_header_edit']and proof['no_compiler_version_override']and proof['reader_compilations']==10,'cross-epoch refusal')
- from derive.metadata_epoch import metadata,EPOCHS
- real={commit:sdk for commit,sdk in zip(EPOCHS,source,strict=True)}
- md=metadata(real,o/'metadata');c.guard(md['own_crate_reads']==md['own_native_typecheck_errors']==md['cross_crate_E0514']==2,'external metadata rejection or own genuine source diagnostic')
+ from direct.cumulative_gate import P,C
+ from derive.metadata_epoch import metadata
+ direct={P:(43310,3),C:(43323,43319)}
+ real=dict(zip(direct,source,strict=True))
+ md=metadata(real,o/'metadata',expected=direct)
+ c.guard(md['own_crate_reads']==md['own_native_typecheck_errors']==md['cross_crate_E0514']==2,'cross-compiler rmeta or own typecheck changed')
+ from direct.common_epoch import check as common_epoch
+ import tempfile
+ with tempfile.TemporaryDirectory(dir=o) as scratch:
+  parent,child=[sdk/'bin/rustc' for sdk in source]
+  shared=common_epoch(Path(scratch),[('parent-to-candidate',parent,43310,child,43323),('candidate-to-parent',child,43323,parent,43310)])
+ c.guard(all(r['other_epoch_rejected']['diagnostics'] for r in shared.values()),'forced shared compiler version needs two real old-session refusals')
+ m.save(o/'common-version-incremental.json',shared)
  f=runpy.run_path(str(D/'fixture/oracle.py'))['main'];outputs={}
  for role,root in zip(c.ROLES,source,strict=True):
   semantic='control' if role==c.ROLES[0] else 'candidate'

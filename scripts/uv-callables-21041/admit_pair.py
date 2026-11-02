@@ -29,4 +29,6 @@ def admit():
             c.guard(pair['roles'][role]=={k:m.read(dest/(k+'.json'))for k in ('source','role')}and pair['cross_sdk_cache_rejection_sha256']==m.filesha(proof/'cache-transition.json')and transition['native_processes']==16 and pair['required_benchmark_cargo_sha256']==m.filesha(fixed)and all(pair['artifacts'][role][k]=={key:current['members'][names[k]][key]for key in ('id','sha256')}for k in ('sdk','qa')),'stock producer pair qualification')
     left,right=[m.read(meta/r/'source.json')for r in roles];a,b=[m.read(meta/r/'role.json')for r in roles]
     c.guard(all(left[k]==right[k]for k in ('component_git','recipe','training_objects','released_coordinator','signed_manifest_sha256'))and a['execution_pgo']==b['execution_pgo']and a['bolt_note']is b['bolt_note']is True and a['effective_benchmark_cargo_sha256']==b['effective_benchmark_cargo_sha256']==m.filesha(fixed)and a['driver']['sha256']!=b['driver']['sha256']and a['archive_sha256']!=b['archive_sha256'],'unmatched production recipe or native artifacts')
+    from direct.cumulative_gate import all_installed
+    all_installed(pool, c.HERE/'direct', c.PAIR, m.filesha)
     m.save(out/'intake.json',dict(installed=result,sdk_lock_sha256=m.filesha(c.HERE/'pair.json'),signed_cargo_sha256=m.filesha(fixed)))

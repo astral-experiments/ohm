@@ -1,9 +1,10 @@
-"""Eight paired screening draws over two independently built earlier revisions."""
+"""Measure eight pairs on sixteen independent previous-revision compiler histories."""
 import gzip,os,re,shutil,subprocess,sys
 from collections import Counter
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import domain_control,wall_clock
+from origin.checkpoints import enroll as enroll_seed
 import core as c,history as h,products as prod,cargo_log as logs
 m=c.m;P=c.P
 import scoped,typed21041,behavior21041,physical
@@ -63,11 +64,13 @@ def run():
         derive_panel.capture(m.TARGET,m.SDK,m.SRC,path,value,role,out,tmp)
         return value
     from derive.launcher import snapshot as launcher_snapshot
-    for hold in(0,1):
+    from time import monotonic_ns
+    opened_seeds = set();actual_order=[]
+    for i,hold in enumerate(P['independent_holds']):
         histories={};baseline={};launcher_bindings={}
-        for role in (c.ROLES if hold==0 else reversed(c.ROLES)):
+        for role in P['orders'][i]:
             h.clean(m.TARGET);h.write('A',atime);h.guard_space(w,tmp)
-            q=panel/f'hold-{hold}-{role}';q.mkdir();m.choose(role,bank,sdks)
+            q=panel/f'opening-{i}-{role}';q.mkdir();m.choose(role,bank,sdks)
             m.save(q/'A-unit-graph.json',h.graph())
             primary.command(q/'ordinary-A',c.CHECK,'cold-A');a=products(q/'ordinary-A');c.guard(h.state('A')['working_tree']==P['A_tree'],'cold A affected source')
             primary.command(q/'settled-A',c.CHECK,'settled-A');settled=products(q/'settled-A')
@@ -76,8 +79,9 @@ def run():
             c.guard(prod.compare(q/'fresh-A-equivalence.json',a,typed_a,True),'fresh A audit changed products')
             domain_control.zero(q/'unchanged-kernel-A','A')
             c.guard(prod.compare(q/'unchanged-kernel-A-equivalence.json',a,products(q/'unchanged-kernel-A'),True),'unchanged command changed products')
-            if hold==0:h.clean(m.ROOT/'behavior');behavior21041.run(q/'behavior-A','A')
-            seed,seal=h.checkpoint(role,hold,bank);rr=a['relative_paths']['uv_pypi_types@check'];m.save(q/'checkpoint.json',seal)
+            if i in (0,4):h.clean(m.ROOT/'behavior');behavior21041.run(q/'behavior-A','A')
+            seed,seal=h.checkpoint(role,i,bank);rr=a['relative_paths']['uv_pypi_types@check'];m.save(q/'checkpoint.json',seal)
+            enroll_seed(opened_seeds,seal,i,role)
             launcher_bindings[role]=launcher_snapshot(m.RUSTC,seed/'.rustc_info.json');m.save(q/'A-launcher-binding.json',launcher_bindings[role])
             h.restore(seed,seal,rr,atime);primary.command(q/'warm-B',c.CHECK,'first-edit');b=products(q/'warm-B');m.save(q/'B-unit-graph.json',h.graph())
             primary.command(q/'settled-B',c.CHECK,'settled-B');settled_b=products(q/'settled-B')
@@ -86,10 +90,10 @@ def run():
             c.guard(prod.compare(q/'fresh-B-equivalence.json',b,typed_noop,True),'fresh B audit changed products')
             domain_control.zero(q/'unchanged-kernel-B','B')
             c.guard(prod.compare(q/'unchanged-kernel-B-equivalence.json',b,products(q/'unchanged-kernel-B'),True),'unchanged command changed products')
-            if hold==0:behavior21041.run(q/'behavior-B','B')
+            if i in (0,4):behavior21041.run(q/'behavior-B','B')
             h.clean(m.TARGET);h.state('B');primary.command(q/'cold-B',c.CHECK,'independent-cold-B');cold=products(q/'cold-B')
             c.guard(prod.compare(q/'independent-B-equivalence.json',b,cold,False),'independent cold B program differs from warm B')
-            if hold==0:
+            if i in (0,4):
                 h.clean(m.ROOT/'behavior');behavior21041.run(q/'behavior-cold-B','B')
                 warm=m.read(q/'behavior-B/witness.json');fresh=m.read(q/'behavior-cold-B/witness.json')
                 c.guard(warm['output_sha256']==fresh['output_sha256'] and warm['fixture_sha256']==fresh['fixture_sha256'] and warm['state']==fresh['state'],'independent native B behavior differs')
@@ -103,43 +107,47 @@ def run():
             streams=output_controls(q/'warm-B');m.save(q/'ordinary-controls.json',streams)
             m.save(q/'actual-cargo-opening.json',{'ordinary_progress':normal,'typed_active':proof['artifact_crates'],'actual_typed_commands':len(proof['commands'])})
             histories[role]=(seed,seal,rr);baseline[role]=(b,streams)
-        derive_panel.verify_hold(out,tmp,hold,c.ROLES,parse)
+        derive_panel.verify_hold(out,tmp,i,c.ROLES,parse)
         for phase in ('ordinary-A','warm-B','cold-B'):
-            left,right=[m.read(panel/f'hold-{hold}-{r}'/phase/'products.json')for r in c.ROLES]
+            left,right=[m.read(panel/f'opening-{i}-{r}'/phase/'products.json')for r in c.ROLES]
             same=(left['structural']==right['structural'])
-            m.save(panel/f'hold-{hold}-{phase}-cross-role.json',{'all_defs_and_reachable_shape_equal':same,'different':[k for k in left['structural']if left['structural'][k]!=right['structural'][k]],'absolute_headers':{role:{k:v['header'] for k,v in product['semantic'].items()}for role,product in zip(c.ROLES,(left,right))}})
+            m.save(panel/f'opening-{i}-{phase}-cross-role.json',{'all_defs_and_reachable_shape_equal':same,'different':[k for k in left['structural']if left['structural'][k]!=right['structural'][k]],'absolute_headers':{role:{k:v['header'] for k,v in product['semantic'].items()}for role,product in zip(c.ROLES,(left,right))}})
             c.guard(left['relative_paths']==right['relative_paths'] and len(left['structural'])==len(right['structural'])==37,'unmatched native workspace product')
-        for i in [n for n,x in enumerate(P['independent_holds'])if x==hold]:
-            values={}
-            for role in P['orders'][i]:
-                m.choose(role,bank,sdks);roleout=panel/f'pair-{i}-{role}';roleout.mkdir();values[role]={}
-                seed,seal,rr=histories[role];expected,scheduled=baseline[role]
-                for mode in P['mode_orders'][i]:
-                    s=h.restore(seed,seal,rr,atime);path=roleout/mode
-                    identity=launcher_snapshot(m.RUSTC,m.TARGET/'.rustc_info.json');c.guard(identity==launcher_bindings[role],'restored rustc info or canonical compiler inode changed');m.save(roleout/(mode+'-launcher-binding.json'),identity)
-                    if mode=='scoped':
-                        q=panel/f'hold-{hold}-{role}'
-                        scoped_result=physical.visit(role,roleout,q,sdks,s,expected,scheduled,products,output_controls,per_meter_ready)
-                        values[role][mode]=dict(scoped_result,checkpoint_sha256=seal['sha256'])
-                        continue
-                    if mode=='wall':
-                        wall_clock.command(path,c.CHECK,'native',m.SRC,m.ENV)
-                    elif mode=='clock':
-                        primary.command(path,c.CHECK,'pmu',binary)
-                    else:raise ValueError(('unregistered visit mode',mode))
-                    rec=m.read(path/'ordinary.json');c.guard(rec['boot']==ready['boot']and rec['cpus']==ready['affinity']and rec['argv']==c.CHECK,'command/boot/cores')
-                    result=products(path);m.save(path/'source.json',h.state('B'));c.guard(h.state('B')==s,'command changed source')
-                    ok=prod.compare(path/'same-seed-equivalence.json',expected,result,True)
-                    observed=output_controls(path);m.save(path/'ordinary-controls.json',observed);c.guard(observed==scheduled,'ordinary roster or output changed within role')
-                    val=rec['ns']
-                    if mode=='clock':
-                        counter=meter.clock(path/'whole-clock.json',0);c.guard(counter['enabled']==counter['running']>0,'multiplexed PMU');val=counter['instructions']
-                    values[role][mode]={'value':val,'same_seed_qualified':ok,'source_sha256':s['source'],'checkpoint_sha256':seal['sha256']}
-            reports.append({'pair':i,'hold':hold,'order':P['orders'][i],'modes':P['mode_orders'][i],'values':values})
+        values={}
+        for role in P['orders'][i]:
+            m.choose(role,bank,sdks);roleout=panel/f'pair-{i}-{role}';roleout.mkdir();values[role]={}
+            seed,seal,rr=histories[role];expected,scheduled=baseline[role]
+            for mode in P['mode_orders'][i]:
+                s=h.restore(seed,seal,rr,atime);path=roleout/mode
+                identity=launcher_snapshot(m.RUSTC,m.TARGET/'.rustc_info.json');c.guard(identity==launcher_bindings[role],'restored rustc identification or canonical compiler inode changed');m.save(roleout/(mode+'-launcher-binding.json'),identity)
+                outer_start=monotonic_ns()
+                if mode=='scoped':
+                    q=panel/f'opening-{i}-{role}'
+                    scoped_result=physical.visit(role,roleout,q,sdks,s,expected,scheduled,products,output_controls,per_meter_ready)
+                    actual_order.append([i,role,mode,outer_start,monotonic_ns()])
+                    values[role][mode]=dict(scoped_result,checkpoint_sha256=seal['sha256'])
+                    continue
+                if mode=='wall':
+                    wall_clock.command(path,c.CHECK,'native',m.SRC,m.ENV)
+                elif mode=='clock':
+                    primary.command(path,c.CHECK,'pmu',binary)
+                else:raise ValueError(('unregistered visit mode',mode))
+                actual_order.append([i,role,mode,outer_start,monotonic_ns()])
+                rec=m.read(path/'ordinary.json');c.guard(rec['boot']==ready['boot']and rec['cpus']==ready['affinity']and rec['argv']==c.CHECK,'command/boot/cores')
+                result=products(path);m.save(path/'source.json',h.state('B'));c.guard(h.state('B')==s,'command changed source')
+                ok=prod.compare(path/'same-seed-equivalence.json',expected,result,True)
+                observed=output_controls(path);m.save(path/'ordinary-controls.json',observed);c.guard(observed==scheduled,'ordinary roster or output changed within role')
+                val=rec['ns']
+                if mode=='clock':
+                    counter=meter.clock(path/'whole-clock.json',0);c.guard(counter['enabled']==counter['running']>0,'multiplexed PMU');val=counter['instructions']
+                values[role][mode]={'value':val,'same_seed_qualified':ok,'source_sha256':s['source'],'checkpoint_sha256':seal['sha256']}
+        reports.append({'pair':i,'hold':hold,'order':P['orders'][i],'modes':P['mode_orders'][i],'values':values})
         h.clean(m.TARGET)
         for seed,_,_ in histories.values():h.clean(seed)
+    c.guard(len(opened_seeds)==16,'need 16 independently built and content/time-sealed A checkpoints')
     for role in c.ROLES:
         m.choose(role,bank,sdks);primary.final_sdk(role,sdks,m.SDK,out)
+    m.save(panel/'observed-physical-order.json',actual_order)
     m.save(panel/'raw-pairs.json',reports)
     domain_control.post_clock(out,ready)
 if __name__=='__main__':run()

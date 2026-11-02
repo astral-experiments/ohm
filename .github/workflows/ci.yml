@@ -13,7 +13,7 @@ name: Does the full production compiler halve the eight rustc instruction counts
       build_head:
         required: true
         type: string
-        description: Reviewed production generated-derive SDK producer commit
+        description: Reviewed production trait-origin SDK producer commit
       sdk_lock_sha256:
         required: true
         type: string
@@ -24,8 +24,8 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-proc-derive-cumulative-check' && github.sha == inputs.reviewed_head
-      && github.run_attempt == 1 && inputs.build_run_id == '41434876352' && inputs.build_head == '731d81a4cb3498cf4221d53a267bbf4a76ca250f' && inputs.sdk_lock_sha256 == '51d3b6c65b320f8e7d40021e805475a64ad8de9fa3257530f3069804a7fb1ce0'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-trait-origin-cumulative-check' && github.sha == inputs.reviewed_head
+      && github.run_attempt == 1 && inputs.build_run_id == '41459079009' && inputs.build_head == 'b1d42cb19bed32c5c8e045b55a2a0aecb6da7315' && inputs.sdk_lock_sha256 == '9a1c597ae62df01b46ec709501d7fc8b02dd09c09bed4800abd26bddc568c677'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 170
     env:
@@ -55,7 +55,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: treatment-builder
-        ref: 731d81a4cb3498cf4221d53a267bbf4a76ca250f
+        ref: b1d42cb19bed32c5c8e045b55a2a0aecb6da7315
         persist-credentials: 'false'
         sparse-checkout: scripts/ctfe22-gnu
     - name: Check out opening
@@ -144,7 +144,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: derive-authority
-        ref: e12e6778ebfaf38ea35fdd8a4084230f6bf1b937
+        ref: 0aecea4345b011433b5f65daf055a924946605ae
         persist-credentials: 'false'
         sparse-checkout: 'scripts/handwritten-panel
 
@@ -178,7 +178,7 @@ jobs:
     - name: Retain the calibrated unique runner before acquiring the compilers
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-derive-cumulative-production-boot
+        name: uv-21041-trait-origin-cumulative-production-boot
         path: trait-results/fresh-boot.json
         if-no-files-found: error
         retention-days: 7
@@ -192,7 +192,7 @@ jobs:
         '
     - name: Exercise the eleven real foreign transitions, separate epochs and same-role reuse
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py migration
-    - name: Open two independent histories and collect eight separately restored scoped, whole-Cargo and blocking-wall pairs
+    - name: Build sixteen independent cold histories and measure eight separately restored scoped, whole-Cargo and blocking-wall pairs
       run: 'set -euo pipefail
 
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/screen.py 2>&1 | tee trait-results/experiment.log'
@@ -204,7 +204,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-derive-cumulative-production-eight-pair
+        name: uv-21041-trait-origin-cumulative-production-eight-pair
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

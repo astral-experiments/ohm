@@ -11,18 +11,18 @@ def snapshot(launcher,info):
             'rustc_fingerprint':entry['rustc_fingerprint'],'cached_queries':len(entry['outputs'])}
 
 def replay(panel,raw,roles,intake,decode):
-    """Recheck four seeds and every just-restored Cargo identification cache, then count all actual compiler execs."""
+    """Recheck sixteen independently built seeds and every just-restored Cargo identification cache, then count all actual compiler execs."""
     read=lambda p:json.loads(p.read_bytes())
     checks={};active={}
-    for h in (0,1):
+    for h in range(8):
         for r in roles:
-            bindings=read(panel/f'hold-{h}-{r}/A-launcher-binding.json')
+            bindings=read(panel/f'opening-{h}-{r}/A-launcher-binding.json')
             assert bindings['launcher']=='/tmp/uv-workflow-search/sdk/bin/rustc' and bindings['launcher_sha256']==intake[r]['runtime']['bin/rustc']and bindings['cached_queries']>0
             assert all(bindings[k]>0 for k in ('dev','inode','ctime_ns','mtime_ns','size','rustc_fingerprint'))and len(bindings['rustc_info_sha256'])==64
             active[h,r]=bindings
     for i,row in enumerate(raw):
         for r in roles:
-            q=panel/f'pair-{i}-{r}';bound=active[row['hold'],r]
+            q=panel/f'pair-{i}-{r}';bound=active[i,r]
             for name in ('scoped','clock','wall'):assert read(q/(name+'-launcher-binding.json'))==bound
             tr=decode(read(q/'scoped/kernel-events.json'));units=read(q/'scoped/per-rustc.json')['targets']
             fp=[bound['dev'],bound['inode'],bound['size']];rows=[v for v in tr['images']if v['file']==fp or Path(v['exe']).name=='rustc' or v.get('argv') and Path(v['argv'][0]).name=='rustc']

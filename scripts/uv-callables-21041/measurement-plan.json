@@ -1,62 +1,79 @@
 {
-  "candidate": {
-    "commit": "ac67101cb973e35ce8ff044cc8014c2c76bab69e",
-    "description": "production -22 recipe, #296, #306, #318, #327, #328 and the generated-derive change; signed -22 Cargo"
-  },
-  "control": {
-    "commit": "10d56274a98801b5ef8f80aab734e835749458e1",
-    "description": "release-optimized corrected Ohm -22, including the #318 repair, using signed -22 Cargo"
-  },
-  "eligibility": "Only after the repeated stage1 screen, cold/build safeguards, actual production compiler correctness, marginal production measurement and both cumulative roles native warm/cold admission on the original uv histories. Evidence-only; the first stage1 pair alone cannot qualify.",
-  "endpoint": "sum of userspace instructions retired by all eight actual rustc processes in the ordinary first cargo check -p uv-client --locked --offline -j8 after uv #21041",
-  "historical_2x_target": 8622701851.25,
-  "historical_328_median": 9018384043.5,
-  "historical_additional_reduction_needed": 0.04387506568154942,
-  "historical_control_median": 17245403702.5,
-  "historical_sources": {
-    "new_328_paired": "fffef7e21059b13f437ba8f63c749bb6dadb699131f0f20d87010f71c84c1b2a",
-    "new_328_raw_origin": "4b92e74d60c4406dfd2ee3cd889322e6d13771dd210c76f3ba6552451a40426c",
-    "verified_cumulative_raw_zip_sha256": "8fad7bbcaf6c98871ef35da167083f3d15700d7b70c78fb1a12e98921026d5f6"
-  },
-  "measurement": {
-    "C": "qualified production candidate",
-    "P": "corrected -22 control",
-    "all_outputs": "bare blocking-wait wall separately, enclosing Cargo userspace instructions, all eight individual compiler counters, sum; actual payloads and oracles",
-    "fresh_boot": true,
-    "independent_of_marginal": true,
-    "no_dropped_pairs": true,
-    "orders": [
-      [
-        "PC",
-        "CP",
-        "CP",
-        "PC"
-      ],
-      [
-        "CP",
-        "PC",
-        "PC",
-        "CP"
-      ]
-    ],
-    "pairs": 8,
-    "success": "Require all eight paired sums control/candidate strictly above 2, and both independently prepared four-pair hold medians above 2. Exact one-sided sign p=1/256 if successful. Report an unsuccessful threshold as well.",
-    "two_independent_A_only_seed_holds": true,
-    "wall_claim": "This endpoint alone can establish a 2x compiler-instruction reduction. The ordinary wall-time endpoint on uv #22958 remains separately registered."
-  },
-  "prior_plan": "b2801bb8a8f30b4facd5cc4c1a7b0b9142a7841906f17fd241629504a9273ab2",
-  "schema": 1,
-  "selection": "Conditional instruction endpoint chosen after the first positive stage1 pair and before any production candidate compiler build. Historical endpoints identify an opportunity only.",
-  "source_edit": {
+  "case": {
     "A": "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
+    "A_file": "e736f839051326a7a7121a51715a769ddf51d339d58827c9877cbe960c95156e",
+    "A_tree": "60dae645a3625ac747f2a93110a9c0aaa6175769",
     "B": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
-    "file": "crates/uv-pypi-types/src/simple_json.rs",
-    "landed_pr": 21041,
-    "lock_sha256": "84893face6e0c3f1641af8ce022475d859b99bb43c3ccfb540e2e9cee98095f9",
-    "original_blob_A": "6b712c74dabbee079ab7fe19ec38364b9b8ac0ff",
-    "original_blob_B": "a5561a2ad9e48fdd98c0bc8a8d578e63bfa6d580",
-    "patch_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
-    "session_edit_unmerged": "63251e5ce54f03363a10c088d7f9f6d6ba268302",
-    "session_ref": "a5882b33dad7d963569bd7a7fe69844164bcbad7"
+    "B_file": "3d91d5195930020a6740f68341549629681eb8654048962cc618fe02e7130360",
+    "B_tree": "ce502617cfbf3fd59980e29731c10b5391d12139"
+  },
+  "changed_path": "crates/uv-pypi-types/src/simple_json.rs",
+  "child_marginal_native": "df678ad4d64fe12a41ace9a8c4e1e0cd3ad7b0e0d239e3b59c64199d5abb9645",
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "uv-client",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "compilers": [
+    {
+      "commit": "10d56274a98801b5ef8f80aab734e835749458e1",
+      "epoch": 43310,
+      "tree": "1a0e58a855e1782a93cdf8c56b337fb4354142ef"
+    },
+    {
+      "commit": "e4edbdd943f2ceac098ddde880e8f97a3bb3270f",
+      "epoch": 43323,
+      "tree": "8fdc0aa6f4833c25814f97056ed639212e53b6d5"
+    }
+  ],
+  "enrollment": {
+    "balanced_orders_within_each_hold": [
+      "PC",
+      "CP",
+      "CP",
+      "PC"
+    ],
+    "chronological_holds": [
+      4,
+      4
+    ],
+    "closure": "Both compilers actually execute the same eight expected rustc jobs and verify all 37 native workspace products",
+    "fresh_boot": "Exclude every previously enrolled production boot including the two entry studies",
+    "independent_empty_target_cold_A_builds": 16,
+    "paired_first_B_visits": 8,
+    "per_visit": "Bare ordinary first B, pristine A restore for each separate hardware instrument"
+  },
+  "entry_conditions": [
+    "Original ac671 to e4ed controlled eight-pair hardware scorer admits both halves",
+    "Original controlled uv #20992 ordinary-build and native product guards pass",
+    "Both natural and forced incremental migration directions and both rmeta directions replay"
+  ],
+  "fixed_signed_cargo_sha256": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+  "incremental_epochs": [
+    43310,
+    43323
+  ],
+  "original_child_receipt_sha256": "675610b1e46a0801e74eef0d2e9461337868b5d27add801840a0f4b293099132",
+  "original_parent_role_sha256": "f690831cea34edfe64585a0b92b8fc9338d39e447482eba83dc45554426b7e80",
+  "physically_compared_sdk_files": [
+    142,
+    142
+  ],
+  "previous_completed_control_capsule": "1c09d403e702da036a80a1d4ac54937b57bde9ad",
+  "protocol_before_rust_change": "d6f293599dceb1079fbf3ba6b534b2a263824210278c009773c3367b79fc7aa8",
+  "purpose": "Direct independent corrected release to e4ed actual first-edit cargo check",
+  "rmeta_epochs": [
+    3,
+    43319
+  ],
+  "score": {
+    "comparison": "Use actual paired measurements against corrected release, without composing ratios from other jobs",
+    "primary": "For each pair sum all eight real per-rustc retired instruction counts, then require 2 * child < parent in all eight pairs and in each four-pair hold median",
+    "twofold_wall": "All eight ordinary pairs must exceed 2x and a separately enrolled fresh worker must independently reproduce this result",
+    "wall": "Publish ordinary uninstrumented clocks and each paired ratio separately. Require both hold medians and at least seven of eight pairs faster for a repeatable wall improvement."
   }
 }

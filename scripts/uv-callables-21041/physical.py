@@ -41,7 +41,7 @@ def reduce(panel,raw,baseline,read_products,output_controls):
     for i,row in enumerate(raw):
         counts={}
         for role in c.ROLES:
-            directory=panel/f'pair-{i}-{role}';qual=panel/f"hold-{row['hold']}-{role}";path=directory/'scoped'
+            directory=panel/f'pair-{i}-{role}';qual=panel/f'opening-{i}-{role}';path=directory/'scoped'
             result=row['values'][role]['scoped']
             if not result['qualified']:
                 c.guard((directory/'scoped-refused.json').is_file(),'missing scoped refusal')
@@ -52,7 +52,7 @@ def reduce(panel,raw,baseline,read_products,output_controls):
             c.guard(req['command']==c.CHECK and req['cwd']==str(m.SRC) and req['compiler_path']==str(m.RUSTC) and req['selectors']==selected and req['environment']==m.ENV,'changed process capture settings')
             y=scoped.read(path,req)
             c.guard(set(y)==set(P['edited_workspace_roster'])and y==result['counts']==m.read(path/'counts.json')and all(type(n)is int and n>0 for n in y.values()),'raw eight-PID PMUs or complete roster')
-            expected,seal,streams=baseline[row['hold'],role];source=m.read(path/'source.json')
+            expected,seal,streams=baseline[i,role];source=m.read(path/'source.json')
             c.guard(source['head']==P['A']and source['working_tree']==P['B_tree']and source['source']==P['B_file']and source['lock']==P['lock_sha256'] and result['checkpoint_sha256']==seal,'wrong first edit or complete parent')
             c.guard(read_products(path)==expected and m.read(path/'same-seed-equivalence.json')['passed'] and output_controls(path)==streams,'PMU source, diagnostics, metadata or output changed')
             counts[role]=y
