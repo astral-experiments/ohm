@@ -57,3 +57,5 @@ python3 -IB verify.py --original /path/to/ordinary-13109144871.zip \
 `--actor` exercises 92 original native verdicts. `--post-o1-actor` executes 84 additional checks using the second compiler’s native records. `--recount` additionally repeats the 26 measured regions and reports both the fresh instructions and their equality with the recorded values. The stored build and engine digests distinguish the original compiler, ELF and profiler from a new local build. The option can be omitted to rerun the object checks alone.
 
 A fresh build from the exported source reproduced all 26 original guest counts. Invoking a byte-identical copy of the original actor from a different pathname on the same worker reproduced all 176 physical verdicts and counted 342,964,310 instructions across the 21 cases (7,185 fewer, or 0.0021%). The report retains the literal counts and the actor paths for both repetitions.
+
+The revised live-key native measurements and hostile coordinate replays are available separately. [Continuous live post-O1 result](post-o1-live.md)
