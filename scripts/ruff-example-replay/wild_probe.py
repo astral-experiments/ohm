@@ -174,7 +174,10 @@ def main():
         layout=Path(str(stable)+".layout")
         study.compressed(out/(label+"-layout.gz"),layout.read_bytes())
         save(out/(label+"-contributors.json"),contributions(layout,image["rodata_range"],script.parent))
-        save(out/"images.json",images);save(out/"verdicts.json",results)
+        save(out/(label+"-image.json"),image)
+        save(out/(label+"-case-verdict.json"),results[label])
+    save(out/"images.json",images)
+    save(out/"verdicts.json",results)
     need(manifest(script.parent)==inputs,"unchanged physical input closure across all links")
     save(out/"terminal.json",{"boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
          "run":os.environ["GITHUB_RUN_ID"],"head":head,"released_cargo":sha(bins["released"]),"wild":sha(wild),
