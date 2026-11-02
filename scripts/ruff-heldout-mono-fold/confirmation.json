@@ -1,0 +1,43 @@
+{
+  "changing_broad_rows": {
+    "6b2d3e11764d06344787cb84ba97ca49": "core::ops::function::impls::{impl#4}::call_once",
+    "6b2d3e11764d063472c0de6f9eec9bd5": "core::cmp::max_by",
+    "6b2d3e11764d063489043ca85b0c24dd": "core::cmp::min_by",
+    "6b2d3e11764d0634b39f3d5781bf495f": "core::option::{impl#47}::branch",
+    "6b2d3e11764d0634c598c86c910999ef": "core::iter::traits::iterator::Iterator::max_by::fold::{closure#0}",
+    "6b2d3e11764d0634f0c1385a54df69db": "core::iter::traits::iterator::Iterator::min_by::fold::{closure#0}"
+  },
+  "controls": [
+    "old",
+    "unchanged"
+  ],
+  "endpoint": "edit",
+  "interval": "[minimum,maximum] paired reduction, 96.875% distribution-free coverage for the median of six independent observations",
+  "named_source": "metadata of the exact source-built core ae2fc0940bd903f3dfa072adc7330089167b7354b91a9a9318954528ee8cf992",
+  "orders": [
+    "PC",
+    "CP",
+    "PC",
+    "CP",
+    "PC",
+    "CP"
+  ],
+  "pilot_artifact": 13140381246,
+  "pilot_boot": "8720021a-b368-4e82-bea6-b33ac5c00801",
+  "pilot_driver_source_sha256": "2a1903ba57603618a7cb5b868f3b044db7950b67e32d69232748ce8881da74a6",
+  "pilot_hardware_protocol_sha256": "cef0f83b48d132d9cdc3f6d65731933e83871b27080b6dfb9ebf761d7c126027",
+  "pilot_job": 125260325111,
+  "pilot_orders": [
+    "PC",
+    "CP"
+  ],
+  "pilot_run": 41440338258,
+  "pilot_sha256": "sha256:b2bad38ca467e2427849e94a1921c16a5ad0828b8da44a89f35be15d65873b0a",
+  "preselected_map": "null",
+  "qualification": "all bound sources, counter and native controls; all six workers retained more verified Old objects with zero loss; lower exact median bound exceeds zero and two-sided sign p < 0.05",
+  "scheduler": "Independently draw the first slot from a uniform single bit and alternate the six simultaneously assigned slots; each fresh worker owns one order only",
+  "scheduler_seed": "1a65edba1e718533175ecf55df8b54e714bc2581d7d9e626ad37afb1e511b118",
+  "schema": 1,
+  "source_pilot_head": "4bf9bfd5897cbe01b9d5b7be64b98e30c957dcbf",
+  "test": "two-sided exact sign test at 0.05 across the six boot-level paired edited-command reductions, discarding zero differences only for computing the p-value"
+}

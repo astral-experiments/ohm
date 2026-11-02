@@ -1,10 +1,10 @@
-name: Measure matched Rust compilers on Ruff's library test
-run-name: Ruff held-out library test with verified unchanged link ${{ inputs.reviewed_head }}
+name: Confirm matched Rust compilers on Ruff's library test
+run-name: Six independent Ruff library-test builds ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed nonrelease hardware pilot commit
+        description: Exact reviewed nonrelease confirmation commit
         required: true
         type: string
 permissions: {}
@@ -13,7 +13,12 @@ concurrency:
   cancel-in-progress: false
 jobs:
   heldout:
-    name: Whole-command Ruff library-test instructions
+    name: Ruff library-test confirmation boot ${{ matrix.slot }}
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        slot: [1, 2, 3, 4, 5, 6]
     if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-heldout-mono-fold-27470-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     permissions:
@@ -21,6 +26,7 @@ jobs:
       contents: read
     timeout-minutes: 80
     env:
+      HELDOUT_SLOT: ${{ matrix.slot }}
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
@@ -77,23 +83,21 @@ jobs:
         run: |
           set -euo pipefail
           python3 -IB factory/scripts/ruff-indexed-check-pmu/acquire.py
-          python3 -IB qa/scripts/ruff-heldout-mono-fold/hardware.py host
+          python3 -IB qa/scripts/ruff-heldout-mono-fold/confirmation.py host
       - name: Reopen the normal graph and calibrate inherited hardware instructions
         run: python3 -IB qa/scripts/ruff-heldout-mono-fold/hardware.py setup
-      - name: Measure parent then candidate on independently initialized Old to New histories
-        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/hardware.py block 0
-      - name: Measure candidate then parent on independently initialized Old to New histories
-        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/hardware.py block 1
-      - name: Compare admitted matched samples after all native checks
-        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/hardware.py finish
+      - name: Measure this boot's two preassigned compiler histories
+        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/confirmation.py block
+      - name: Seal the pair after every native, invalid and independent clean result
+        run: python3 -IB qa/scripts/ruff-heldout-mono-fold/confirmation.py finish
       - name: Retain raw PMU records, object and executable bodies, graph and storage receipts
         if: always()
         run: python3 -IB qa/scripts/ruff-heldout-mono-fold/hardware.py pack
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruff-27470-matched-hardware-pilot
+          name: ruff-27470-matched-confirmation-${{ matrix.slot }}
           path: ${{ runner.temp }}/upstream-mono-study/matched-heldout-proof.tar
-          retention-days: 14
+          retention-days: 90
           compression-level: 0
           if-no-files-found: error
