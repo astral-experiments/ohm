@@ -27,7 +27,7 @@ def api(path):
     return json.loads(subprocess.check_output(["gh", "api", "repos/astral-experiments/ohm/" + path]))
 
 
-def admit_worker(out, head, position):
+def admit_worker(out, head, position, scope="confirm-examples"):
     raw = Path("/proc/sys/kernel/random/boot_id").read_text().strip()
     need(str(uuid.UUID(raw)) == raw, "actual canonical Linux boot identity")
     evidence = {"head":head,"run":int(os.environ["GITHUB_RUN_ID"]),"position":position,
@@ -35,7 +35,13 @@ def admit_worker(out, head, position):
                 "affinity":sorted(os.sched_getaffinity(0))}
     save(out / "admission.json", evidence)
     old = json.loads((HERE / "refused-original.json").read_bytes())
-    name = f"Matched Cargo confirm-examples ({position})"
+    need(scope in ("confirm-examples","confirm-tests"),"registered six-position scope")
+    excluded = list(old["workers"])
+    if scope=="confirm-tests":
+        completed=json.loads((HERE/"example-build-result.json").read_bytes())
+        excluded.extend(completed["workers"])
+        need(raw not in {r["boot"]for r in completed["workers"]},"fresh kernel after example confirmation")
+    name = f"Matched Cargo {scope} ({position})"
     for attempt in range(12):
         jobs = api(f"actions/runs/{evidence['run']}/jobs?per_page=100")["jobs"]
         current = [job for job in jobs if job["name"] == name]
@@ -48,7 +54,7 @@ def admit_worker(out, head, position):
     need(job["head_sha"]==head and job["run_id"]==evidence["run"] and job["run_attempt"]==1 and
          job["runner_name"]==evidence["runner"] and job["runner_id"]>0 and
          not any(job["runner_name"]==v["runner"] or job["runner_id"]==v["runner_id"]
-                 for v in old["workers"]), "fresh machine assignment distinct from abandoned cohort")
+                 for v in excluded), "fresh machine assignment distinct from abandoned cohort")
     save(out / "authenticated-worker.json", job)
     return evidence
 
@@ -148,7 +154,7 @@ def behaviors(images, src, env, names, workflow):
     return results
 
 
-def history(root, src, env, out, w, seed, binaries, clock, arm, workflow, inspect):
+def history(root, src, env, out, w, seed, binaries, clock, arm, workflow, inspect, validate=None):
     study.select(root, binaries, arm)
     study.reset(env, seed, w)
     patch = Path(w.__file__).parent / "renderer.patch"
@@ -160,6 +166,8 @@ def history(root, src, env, out, w, seed, binaries, clock, arm, workflow, inspec
     cold = receipt(*raw["cold"], out, "cold", root)
     old_images = behaviors(cold["images"], src, env, w.NAMES, workflow)
     old_storage = study.footprint(env)
+    if validate is not None:
+        validate("old",cold["images"],old_images,out)
     w.git(src, "apply", patch)
     w.sources(src, "corrected")
     for phase in ("edit", "first-unchanged", "settled"):
@@ -172,6 +180,8 @@ def history(root, src, env, out, w, seed, binaries, clock, arm, workflow, inspec
          "complete Cargo unit roster across the real edit")
     images = behaviors(changed["images"], src, env, w.NAMES, workflow)
     storage = study.footprint(env)
+    if validate is not None:
+        validate("new",changed["images"],images,out)
     if inspect:
         traced = study.execute(root, src, env, out / "traced-settled", args, trace=True)
         owners = {}

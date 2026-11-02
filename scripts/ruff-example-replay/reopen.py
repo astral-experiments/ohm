@@ -7,6 +7,7 @@ import io
 import itertools
 import json
 import math
+import re
 from pathlib import Path
 import statistics
 import tarfile
@@ -116,8 +117,31 @@ def effect(pairs):
             "sign_randomization_p":extreme/2**n, "per_boot":[1-math.exp(v) for v in logs]}
 
 
-def prices(paths, confirmation=False):
-    workflows = ("examples",) if confirmation else ("examples","tests")
+def signed_images(z, path, state, rows, bank):
+    refs=bank["families"][state]
+    need(set(rows)==set(refs) and len(refs)==17 and all(v[0]in refs[k] and
+         v[1]==bank["terminal"]["objects"][v[0]]["size"] for k,v in rows.items()),
+         ("each entire executable matches signed input state",path,state))
+    proof=read(z,path+"/"+state+"-validated.json")
+    need(proof["images"]=={k:v[:2]for k,v in rows.items()} and proof["verdicts"]==bank["cases"][state],
+         "authenticated exact state and behavior inventory")
+    prefix=path+"/"+state+"-real-tests/"
+    for name,expected in bank["cases"][state].items():
+        raw=gzip.decompress(z.read(prefix+name+"/stdout.gz"))
+        observed=sorted([a.decode(),b.decode()]for a,b in re.findall(
+            rb"^test (.*?) \.\.\. (ok|FAILED|ignored)(?:[^\n]*)$",raw,re.M))
+        need(expected["exit"]==0 and observed==expected["cases"] and b"test result: ok." in raw,
+             ("original physical test case result",name,path,state))
+    stdout=gzip.decompress(z.read(prefix+"renderer-stdout.gz"))
+    stderr=gzip.decompress(z.read(prefix+"renderer-stderr.gz"))
+    need(b"1 passed; 0 failed" in stdout and (b"panicked"in stderr)==(state=="old") and
+         (state!="old" or b"index out of bounds"in stderr),"actual original caught panic / fixed render")
+
+
+def prices(paths, confirmation=False, test_confirmation=False):
+    need(not test_confirmation or confirmation,"test confirmation requires registered boot identity")
+    scope="confirm-tests" if test_confirmation else "confirm-examples"
+    workflows = (("tests",) if test_confirmation else ("examples",)) if confirmation else ("examples","tests")
     workers = []
     hosts = {}
     common = []
@@ -129,29 +153,45 @@ def prices(paths, confirmation=False):
             if confirmation:
                 admission = read(z,"admission.json")
                 job = read(z,"authenticated-worker.json")
-                need(term["scope"]=="confirm-examples" and term["workflows"]==["examples"] and
+                need(term["scope"]==scope and term["workflows"]==list(workflows) and
                      term["runner"]==admission["runner"]==job["runner_name"] and
                      term["boot"]==admission["boot"] and term["head"]==admission["head"]==job["head_sha"] and
                      int(term["run"])==admission["run"]==job["run_id"] and
                      pos==admission["position"] and term["cpus"]==admission["affinity"][:4] and
                      term["ordering"]==(["parent","candidate"] if pos%2 else ["candidate","parent"]) and
-                     job["name"]==f"Matched Cargo confirm-examples ({pos})", "registration and physical assignment")
+                     job["name"]==f"Matched Cargo {scope} ({pos})", "registration and physical assignment")
                 workers.append({k:job[k] for k in ("id","runner_name","runner_id")})
             common.append([term[k] for k in ("head","run","signed","wild","cargo")])
             groups = {}
+            if test_confirmation:
+                bank=read(z,"signed-reference.json")
+                need(bank["record"]==term["reference"] and len(bank["families"]["old"])==len(bank["families"]["new"])==17
+                     and all(len(v)==(2 if k in ("test/formatter/True","test/ruff/True","test/rustc_tests/True") else 1)
+                             for m in bank["families"].values()for k,v in m.items()),"preexisting complete signed family")
+                common[-1].append(bank["record"])
+                for arm in ("parent","candidate"):
+                    for phase,state in (("old","old"),("edit","new"),("first-unchanged","new")):
+                        name="immediate-"+arm+"-"+phase
+                        raw=read(z,name+"/result.json")
+                        refs=bank["families"][state]
+                        values={k:v for k,v in raw["executables"].items()if k.startswith(("test/","example/"))}
+                        lines=gzip.decompress(z.read(name+"/stdout.gz")).splitlines()
+                        need(raw["returncode"]==0 and json.loads(lines[-1])=={"reason":"build-finished","success":True}
+                             and set(values)==set(refs) and all(v[1] in refs[k] and v[2]==bank["terminal"]["objects"][v[1]]["size"]
+                             for k,v in values.items()),"physical immediate OLD/NEW verdict before a later build")
             for workflow in workflows:
                 for arm in ("candidate","parent"):
                     rows = []
                     trace = workflow + "-0-" + arm + "/traced-settled"
                     _, _, actual = physical(z, trace)
-                    if workflow == "examples":
-                        examples = set()
+                    if workflow == "examples" or test_confirmation:
+                        examples = []
                         for kind,_,args,_ in actual:
                             if kind == "wild" and "-o" in args:
-                                examples.add(Path(args[args.index("-o")+1]).name)
+                                examples.append(Path(args[args.index("-o")+1]).name)
                         images = read(z, workflow+"-0-"+arm+".json")["new_images"]
                         names = {k.split("/")[1] for k in images if k.startswith("example/")}
-                        need(len(names)==12 and names <= examples, "independent twelve native Wild links")
+                        need(len(names)==12 and all(examples.count(name)==1 for name in names), "independent twelve native Wild links")
                         for name in names:
                             rustc, = [row[2] for row in actual if row[0]=="rustc" and "--crate-name" in row[2]
                                       and row[2][row[2].index("--crate-name")+1] == name]
@@ -161,6 +201,9 @@ def prices(paths, confirmation=False):
                         label=workflow+"-"+str(repeat)+"-"+arm
                         r = read(z,label+".json")
                         need(r["arm"]==arm and r["workflow"]==workflow, "worker assignment")
+                        if test_confirmation:
+                            for state in ("old","new"):
+                                signed_images(z,label,state,r[state+"_images"],bank)
                         phases = {}
                         for phase in ("cold","edit","first-unchanged","settled"):
                             count = read(z,label+"/"+phase+"-clock.json")
@@ -176,8 +219,14 @@ def prices(paths, confirmation=False):
                 clean = read(z,workflow+"-independent-new/result.json")["executables"]
                 clean = {k:v[1:] for k,v in clean.items() if k.startswith("example/") or k.endswith("/True")}
                 histories = groups[workflow,"parent"] + groups[workflow,"candidate"]
-                need(all({k:v[:2] for k,v in h["images"].items()}==clean for h in histories) and
-                     all(h["images"]==histories[0]["images"] for h in histories), "clean matched bytes and behaviors")
+                if test_confirmation:
+                    signed_images(z,workflow+"-independent-new","new",clean,bank)
+                    need(all(all(h["images"][k][:2]==v and h["images"][k]==histories[0]["images"][k]
+                                 for k,v in clean.items()if k.startswith("example/"))for h in histories),
+                         "strict twelve real clean examples and natural outputs")
+                else:
+                    need(all({k:v[:2] for k,v in h["images"].items()}==clean for h in histories) and
+                         all(h["images"]==histories[0]["images"] for h in histories), "clean matched bytes and behaviors")
             hosts[pos] = {"boot":term["boot"],"groups":groups}
     need(set(hosts)==set(range(1,7)) and all(x==common[0] for x in common), "six matched independent workers")
     if confirmation:
@@ -212,7 +261,7 @@ def prices(paths, confirmation=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("pilot","price","confirm-examples"))
+    parser.add_argument("mode", choices=("pilot","price","confirm-examples","confirm-tests"))
     parser.add_argument("files", nargs="+", type=Path)
     args = parser.parse_args()
-    print(json.dumps(pilot(args.files[0]) if args.mode=="pilot" else prices(args.files, args.mode=="confirm-examples"), indent=2))
+    print(json.dumps(pilot(args.files[0]) if args.mode=="pilot" else prices(args.files, args.mode.startswith("confirm-"), args.mode=="confirm-tests"), indent=2))
