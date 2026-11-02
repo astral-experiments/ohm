@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import shutil
 import subprocess
@@ -130,7 +131,7 @@ def cargo_rows(raw, graph=None):
     return records
 
 
-def verify_argv(lines, flags, compiler=None):
+def verify_argv(lines, flags, compiler, wrapper):
     from study import OWNER
     selected = [l for l in lines.splitlines() if "Running " in l and "--crate-name " + OWNER + " " in l]
     need(len(selected) == 1 and "-C opt-level=1" in selected[0], ("missing actual signed owner argv", selected))
@@ -139,9 +140,12 @@ def verify_argv(lines, flags, compiler=None):
         if "Running " in line and "--crate-name " in line:
             args = shlex.split(line.split("Running \x60",1)[1].removesuffix("\x60"))
             need([s for s in args if s in leaves] == (flags if line == selected[0] else []), ("wrong codegen flags", line))
-            if compiler is not None:
-                position = args.index("--crate-name")
-                need(position > 0 and Path(args[position - 1]).samefile(compiler), ("wrong compiler", args[:position]))
+            prefix = args[:args.index("--crate-name")]
+            start = next((i for i, a in enumerate(prefix) if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", a)), None)
+            need(start is not None and len(prefix) >= start + 2, ("missing compiler launcher", prefix))
+            for actual, expected in zip(prefix[start:start + 2], (wrapper, compiler), strict=True):
+                path = Path(actual)
+                need(path.is_absolute() and path.is_file() and path.samefile(expected), ("wrong compiler launcher", actual, str(expected)))
     return selected[0]
 
 
@@ -322,7 +326,7 @@ def main(args):
                         if phase == "new":
                             need(p.OWNER in dirty, ("changed source did not rebuild its owner", dirty))
                         if phase == "clean-new":
-                            put(dest / "actual-argv.json", verify_argv((dest / "outer.stderr").read_text(), flags, compiler))
+                            put(dest / "actual-argv.json", verify_argv((dest / "outer.stderr").read_text(), flags, compiler, env["RUSTC_WRAPPER"]))
                         native = w.native.client(dest, rows, products, here, work, client_env, gold[rev], bodies)
                         ar = p.artifact(products, p.OWNER)
                         dyn = runtime(here, work, client_env, dest, out, clock, gold[rev]) if phase in ("new","clean-new") else None
