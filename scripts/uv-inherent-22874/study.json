@@ -5,9 +5,20 @@
   "B": "d952be66482a298658f39f314ba8c337154ed0e7",
   "B_file": "25afafa4ea1dcdc0869e8c43e7af792fb4e68bda3461afbc7efedc547ffc6fd0",
   "B_tree": "9bac8e6c00a22b32f02979033db2658dc0fe6fee",
-  "branch": "charlie/codex-22874-handwritten-uv-client",
+  "branch": "charlie/codex-22874-inventory-uv-client",
   "candidate_selection": "036d126f38e391572595a90acecc542c6053fcbcb39f71b2fc6164a8dcfa2f74",
   "edit_sha256": "1c5ad6b10c74b51d05d3e68bfa8b4b403d0a5f6aaf0094a370398af49b3c91c8",
+  "edited_workspace_roster": [
+    "uv_cache",
+    "uv_client",
+    "uv_configuration",
+    "uv_distribution_types",
+    "uv_extract",
+    "uv_install_wheel",
+    "uv_metadata",
+    "uv_pypi_types",
+    "uv_torch"
+  ],
   "encoded_methods": {
     "HashDigest": {
       "algorithm": "algorithm",
@@ -47,6 +58,14 @@
     1
   ],
   "lock_sha256": "dc5e3909e4c4b6c3c03f8d929b77754670373358790e8ec4d3cce61b763de2e8",
+  "meter_files": {
+    "SHA256SUMS": "c6713c7ef2878aa70a927e845e41ec9f4d237091b6c7a6c45d4799de047fb0d1",
+    "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
+    "per_rustc.py": "92d46fc2443a1af027a01890c03d4450ad562a45b82608d815b281facec1d99e",
+    "pmu.c": "ac49b8795708a9054bb2fb258729734a6e8a9304b5cd92f138c97de45af034cc",
+    "preflight.py": "801b589108ddbcbd41d3cfd5757586ff85cb9223623b99cf86aa649f6245706f",
+    "workload.c": "ab9d81c8202657bfe9cf93add0e3607c18c6b75ebe337c922a36db286eec016a"
+  },
   "mode_orders": [
     [
       "clock",
@@ -67,23 +86,25 @@
   ],
   "orders": [
     [
-      "fa7a_stack_ctfe318",
+      "fa7a_stack_ctfe318_handwritten",
+      "fa7a_stack_ctfe318_handwritten_foreign_inventory"
+    ],
+    [
+      "fa7a_stack_ctfe318_handwritten_foreign_inventory",
+      "fa7a_stack_ctfe318_handwritten"
+    ],
+    [
+      "fa7a_stack_ctfe318_handwritten_foreign_inventory",
       "fa7a_stack_ctfe318_handwritten"
     ],
     [
       "fa7a_stack_ctfe318_handwritten",
-      "fa7a_stack_ctfe318"
-    ],
-    [
-      "fa7a_stack_ctfe318_handwritten",
-      "fa7a_stack_ctfe318"
-    ],
-    [
-      "fa7a_stack_ctfe318",
-      "fa7a_stack_ctfe318_handwritten"
+      "fa7a_stack_ctfe318_handwritten_foreign_inventory"
     ]
   ],
-  "parent": "68fc92832c0f47cf2fcfd151d0c57bb85bf809ea",
+  "parent": "854ea27d0c9b1fc4f4c188886b16f788b0c9d2c3",
+  "per_rustc_threshold": ">=20% fewer terminal uv_client instructions within both independently warmed A histories (discovery)",
+  "physical_scope": "optimized stage1, private, real uv #22874 -p uv-client",
   "plan_units": 543,
   "predicted": {
     "HashDigest": {
@@ -142,13 +163,13 @@
       "sha256": "daf25441ca01bc83cde27629354059b90fdcee6bae8924361108da9616954ea0"
     }
   },
-  "producer_head": "682930c7b58a62cd46c6f951b60d8cab8d3c7869",
-  "producer_run": 41371136314,
+  "producer_head": "70cf505327e6f7f433b8f45797bf4ee6220722f1",
+  "producer_run": 41389169358,
   "registry_uncompressed_sha256": "9599bdf8a1c4c9b161a8655860d2f33072e6fcc7dd408e1d6c9e40bc49942565",
   "repo": "astral-experiments/ohm",
   "roles": [
-    "fa7a_stack_ctfe318",
-    "fa7a_stack_ctfe318_handwritten"
+    "fa7a_stack_ctfe318_handwritten",
+    "fa7a_stack_ctfe318_handwritten_foreign_inventory"
   ],
   "root_features": [],
   "root_unit": "75f1c692e46018b83f24c8dc631603253658a90aeb924d41c13388f096f6ed74",
@@ -161,7 +182,7 @@
     "-p",
     "uv-client"
   ],
-  "sdk_lock_sha256": "3579524fb6031aba5b9621fbd7414b3ab8e30aec4b6fe8853eb3398f0b840e9f",
+  "sdk_lock_sha256": "c5cd93910f3b1d4300d58e916625adff2e1e49106acc77518388f765d13f1f8a",
   "structural_graph_sha256": "fb2b5c51b8d5c05509b9765fda01098d7f49711ed72326add84d6283a68e5912",
   "study": "First edit uv-client. Four paired comparisons across two independently built holds; each role and mode restores the complete pre-edit checkpoint afresh. Screening only.",
   "workspace_check_libraries": {

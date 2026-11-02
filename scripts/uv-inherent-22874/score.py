@@ -21,6 +21,7 @@ def summary(rows):
         result[metric]={'raw_by_role':arms,'paired_control_over_candidate':[num(x)for x in ratios],'median_paired_factor':num(median(ratios)),
             'hold_medians':[num(median(v))for v in holds],'above_parity':sum(x>1 for x in ratios),'above_double':sum(x>2 for x in ratios),'n':4}
     return result
+import mechanism
 def score():
     w,tmp=c.host();out=w/'trait-results';panel=out/'uv-client';raw=m.read(panel/'raw-pairs.json');ready=m.read(out/'calibration.json')['ready'];_,meter=m.pmu(w,tmp)
     data={};refusals=[];checked={}
@@ -60,5 +61,10 @@ def score():
                     clock=meter.clock(at/'whole-clock.json',0);c.guard(rec['invoked']==[ready['plain'],str(at/'whole-clock.json'),*c.CHECK]and clock['running']==clock['enabled']>0 and v['value']==clock['instructions'],'inherited unmultiplexed whole-command instructions')
     report={'scope':'optimized stage1, ordinary cargo check -p uv-client after uv #22874, screening only','eligible':not refusals,'same_seed_refusals':refusals,
             'verified_unique_workspace_products':len(checked),'metrics':None if refusals else summary(raw),'branch':P['branch'],'two_sided_sign_test_best_possible_with_four_pairs':0.125}
+    ordinary=dict(report,per_rustc_endpoint='independently guarded');m.save(panel/'ordinary-score.json',ordinary)
+    physical=mechanism.reduce(parser,out,panel);m.save(panel/'native-rustc.json',physical)
+    terminal=[Fraction(row['user_instructions'][c.ROLES[1]]['uv_client'],row['user_instructions'][c.ROLES[0]]['uv_client'])for row in physical['per_hold']]
+    sums=[Fraction(row['sum_of_nine_disjoint_compilers'][c.ROLES[1]],row['sum_of_nine_disjoint_compilers'][c.ROLES[0]])for row in physical['per_hold']]
+    report['promotion']={'preregistered_primary_rustc':'terminal uv_client','terminal_user_instructions_child_over_parent':[str(v)for v in terminal],'all_nine_disjoint_ratio':[str(v)for v in sums],'terminal_20_percent_fewer_in_both_independent_histories':not refusals and all(x<=Fraction(4,5)for x in terminal),'confirmation':'four whole-Cargo screening pairs only; new held cohorts and the independent #21041 edit needed before any durable claim'}
     m.save(panel/'score.json',report);print(json.dumps(report,sort_keys=True));c.guard(not refusals,'same-seed raw or decoded product mismatch; clocks ineligible')
 if __name__=='__main__':score()

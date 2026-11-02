@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import core as c,history as h,products as prod,cargo_log as logs
 m=c.m;P=c.P
+import mechanism,scoped
 import run as primary
 def parser(work,tmp):
     opening,_=m.check_sources(work)
@@ -47,10 +48,10 @@ def acquire_context():
     c.guard(mask and mask<=os.sched_getaffinity(0),'enrolled calibration CPU set unavailable');os.sched_setaffinity(0,mask)
     current=old.cpu_receipt(out);c.guard(current['cpus']==ready['affinity']and current['boot']==ready['boot']and cal['unmultiplexed_calibration_clocks']==28,'counter qualification/host')
     binary=Path(ready['plain']);c.guard(m.filesha(binary)==cal['plain_sha256'],'calibrated inherited meter')
-    load=m.read(out/'intake.json');sdk=load['installed'];gate=m.read(c.HERE/'provider-gate.json')['roles']
+    load=m.read(out/'intake.json');sdk=load['installed'];gate=c.PAIR['arms']
     c.guard(set(sdk)==set(c.ROLES)and load['sdk_lock_sha256']==P['sdk_lock_sha256'],'SDK roles')
     for r in c.ROLES:
-        actual=sdk[r];c.guard(actual['server']['id']==gate[r]['artifact_id']and actual['server']['sha256']==gate[r]['archive']and gate[r]['driver']in actual['runtime'].values(),('same qualified binary',r))
+        actual=sdk[r];c.guard(actual['server']==gate[r]['artifact']and gate[r]['driver']in actual['runtime'].values(),('same qualified binary',r))
     sourcegate=m.read(out/'intake/cache-transition/passed.json');wire=m.read(out/'intake/metadata-transition/passed.json')
     c.guard(sourcegate['native_processes']==wire['cache_native_processes']==16 and wire['one_byte_per_role'] is True and wire['native_processes']==len(wire['rows'])>0,'both native cache and metadata epoch directions')
     read=parser(w,tmp);bank=m.ROOT/'bank';a=h.open_source(w,bank);m.save(out/'real-A.json',a)
@@ -63,6 +64,9 @@ def acquire_context():
     m.save(out/'full-unit-graph.json',h.graph());return w,tmp,out,vault,bank,sdk,a['source_mtime_ns'],read,ready,binary,meter
 def run():
     w,tmp,out,store,bank,sdks,atime,parse,ready,binary,meter=acquire_context();panel=out/'uv-client';panel.mkdir();reports=[]
+    try:scoped.calibrate();per_meter_ready=True
+    except (OSError,ValueError,AssertionError,RuntimeError,subprocess.SubprocessError)as error:
+        per_meter_ready=False;m.save(panel/'per-rustc-calibration-refused.json',{'type':type(error).__name__,'error':str(error),'per_rustc_endpoint':False})
     def products(path):return prod.aggregate(m.TARGET,path,store,parse,prod.identities)
     for hold in(0,1):
         histories={};baseline={}
@@ -85,7 +89,19 @@ def run():
             c.guard(normal==progress((q/'typed-B/cargo.stderr').read_bytes()),'typed and ordinary actual package roster differs')
             streams=output_controls(q/'warm-B');m.save(q/'ordinary-controls.json',streams)
             m.save(q/'actual-cargo-opening.json',{'ordinary_progress':normal,'typed_active':proof['artifact_crates'],'actual_typed_commands':len(proof['commands']),'native_selected':movement})
+            mechanism.role(parse,store,q)
             histories[role]=(seed,seal,rr);baseline[role]=(b,streams)
+        mechanism.holds(panel,hold)
+        for r in (c.ROLES if hold==0 else reversed(c.ROLES)):
+            m.choose(r,bank,sdks);seed,seal,rr=histories[r];q=panel/f'hold-{hold}-{r}';expected,streams=baseline[r];s=h.restore(seed,seal,rr,atime)
+            path=q/'scoped-B';roster=m.read(q/'typed-B/roster.json')
+            if not per_meter_ready:continue
+            try:scoped.measure(path,roster['commands'],sdks[r]['runtime'])
+            except (OSError,ValueError,AssertionError,RuntimeError,subprocess.SubprocessError)as error:
+                m.save(q/'scoped-refused.json',{'type':type(error).__name__,'error':str(error),'per_rustc_endpoint':False})
+                c.guard(h.state('B')==s,'failed trace modified the source');continue
+            got=products(path);c.guard(h.state('B')==s and output_controls(path)==streams,'scoped native source/progress/diagnostics')
+            c.guard(prod.compare(q/'scoped-equivalence.json',expected,got,True),'kernel visit changed restored same-seed output')
         for i in [n for n,x in enumerate(P['independent_holds'])if x==hold]:
             values={}
             for role in P['orders'][i]:

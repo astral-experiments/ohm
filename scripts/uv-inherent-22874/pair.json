@@ -1,0 +1,106 @@
+{
+  "actual_build": [
+    "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "/home/runner/work/ohm/ohm/source/rust/x.py",
+    "--ci",
+    "false",
+    "--config",
+    "/home/runner/work/ohm/ohm/trait-evidence/bootstrap.toml",
+    "build",
+    "--stage",
+    "1",
+    "-j8",
+    "--host",
+    "x86_64-unknown-linux-gnu",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "compiler/rustc",
+    "library",
+    "src/tools/rustdoc"
+  ],
+  "arms": {
+    "fa7a_stack_ctfe318_handwritten": {
+      "artifact": {
+        "bytes": 214194187,
+        "id": 13109193886,
+        "sha256": "9d5bc0ce4af1a2a48292dc93475a83df2147af95f7079f3370eca9018d63ae60"
+      },
+      "artifact_name": "handwritten-stage1-fa7a_stack_ctfe318_handwritten",
+      "branch": "charlie/codex-20988-handwritten-stage1",
+      "checked_files": {
+        ".github/workflows/ci.yml": "13cf3a47b2badf9b77b3236c01504ba99220a17b81f1ccb44325791bd2091113",
+        "scripts/handwritten-stage1/arms.json": "22e5b5f32c48ff2f11d1657d9d8d270fcceeb37f1c5be70ebe0989aa8d5550bd",
+        "scripts/handwritten-stage1/candidates.pack": "39f77995d828e3c5f40e933dc203013c0a7c74a3448e73b7024cbdc05861a46b",
+        "scripts/handwritten-stage1/export_sdk.py": "241cead5c7c6db7021ca075888c9795001374f1b624ee1ba294fe317b75dc7b1",
+        "scripts/handwritten-stage1/files.json": "21ca65f8ffc5c0a428211f9dfe33b84df0ddfdf60f4d48739212f7a9d9c9444a",
+        "scripts/handwritten-stage1/gate.py": "63c6941c5f59c353a6beac9873f7cb517a5f97f355a256d098b3cb5dbb148123",
+        "scripts/handwritten-stage1/materialize.py": "63144bce9dd445d79e074d4e309a02dc876b45a158a65c0c2647ce9320515147",
+        "scripts/handwritten-stage1/stage.py": "69b532906a01824004757e27ead0fbc36b8cbcabde51deb956713870e9413d9f"
+      },
+      "checkout": "builder",
+      "command_log": "1709972ab393ad20dc6c63a0cc91e7346ff8dcc8ff27082f1583f27ad2e63fc7",
+      "driver": "0119b70bef5389051016022b671b2af262aa9df103c36176791512280b6da116",
+      "head": "682930c7b58a62cd46c6f951b60d8cab8d3c7869",
+      "job_id": 125041656652,
+      "job_name": "Handwritten stage1 SDK (fa7a_stack_ctfe318_handwritten)",
+      "parent": "413e2cb249d4d25309c75a8d06fdd6712ff54091",
+      "required_steps": [
+        "Build optimized compiler and host std, run correctness suites, and export the SDK"
+      ],
+      "rid": 41371136314,
+      "scripts": "scripts/handwritten-stage1",
+      "source": {
+        "commit": "26210096e48c5c62ef4a5e8fd1aa612631b2f7d7",
+        "epoch": 43311,
+        "tree": "414066f99d9ebc4f7a857d178b7ef5c733835482"
+      }
+    },
+    "fa7a_stack_ctfe318_handwritten_foreign_inventory": {
+      "artifact": {
+        "bytes": 214241202,
+        "id": 13116768246,
+        "sha256": "1b96c1493caa239dfeede8d38a2e5e78fffcdc6c961d0c6a956f86fb44e060a1"
+      },
+      "artifact_name": "trait-inventory-stage1-fa7a_stack_ctfe318_handwritten_foreign_inventory",
+      "branch": "charlie/codex-22874-trait-inventory-stage1",
+      "checked_files": {
+        ".github/workflows/ci.yml": "154ce3bf4467216fa02630bf20235ee8fe412babaf0760571647b4011c656285",
+        "scripts/trait-inventory-stage1/arms.json": "aae15bda86e4db73183b37eed9b1210045d5faa28bdf5991f34efae87dd8a6b2",
+        "scripts/trait-inventory-stage1/candidates.pack": "39f77995d828e3c5f40e933dc203013c0a7c74a3448e73b7024cbdc05861a46b",
+        "scripts/trait-inventory-stage1/export_sdk.py": "241cead5c7c6db7021ca075888c9795001374f1b624ee1ba294fe317b75dc7b1",
+        "scripts/trait-inventory-stage1/files.json": "c878f92a99427bcbe67af4b7a7e5df50b4751c24002567b2eb568928b5e132b4",
+        "scripts/trait-inventory-stage1/gate.py": "63c6941c5f59c353a6beac9873f7cb517a5f97f355a256d098b3cb5dbb148123",
+        "scripts/trait-inventory-stage1/inventory-source.json": "500c2d04dd509322c6f9353fc0a272210dcd7a073427bee8a085c6cbe7774e2c",
+        "scripts/trait-inventory-stage1/inventory.pack": "6c4ccce109da81fbfbfd862a62e6fdf65d72dc08126b508ee16d009a85add5dd",
+        "scripts/trait-inventory-stage1/materialize.py": "0b0adffb9e408385500b74903df75e39e3067a90c3fbf8720eb924e49abb5623",
+        "scripts/trait-inventory-stage1/stage.py": "7887be38d86e897b29703fcafa761e6f23f53476e02ed3640d17b9ab45c59f24"
+      },
+      "checkout": "inventory-builder",
+      "command_log": "732becf1ac55d294c5f78b9991d7e2226e9848901851829a1c358523ea21ce2c",
+      "driver": "4af9729a6966af2ef35eea6e198a5e062845e594d80bb6c9e22e3ccc8b07c9db",
+      "head": "70cf505327e6f7f433b8f45797bf4ee6220722f1",
+      "job_id": 125096552079,
+      "job_name": "Foreign inventory stage1 SDK (fa7a_stack_ctfe318_handwritten_foreign_inventory)",
+      "parent": "26d6d777cfe19c2160aeaf5f1a0f097589d9d560",
+      "required_steps": [
+        "Verify the frozen stage1 baseline and the inventory source pack",
+        "Build optimized compiler and host std, run correctness suites, and export the SDK"
+      ],
+      "rid": 41389169358,
+      "scripts": "scripts/trait-inventory-stage1",
+      "source": {
+        "commit": "afd2fba313b4a5e1106853477920bd50786c0298",
+        "epoch": 43420,
+        "tree": "cabdf6254f1e7f36d7f4b3cb9d0e30d52563ca79"
+      }
+    }
+  },
+  "bootstrap_sha256": "45880ce3806d4ce13439f4235d2d8af43465b6f685244b39419252851f91692f",
+  "capsules_from_independent_source_enrollments": true,
+  "native_receipt_sha256": "d5774173f34ce4eddcee6d298bf935807ffcca212060fc84e8eeb1d0faa831ad",
+  "producer": "separately built same recipe optimized stage1 with signed -22 Cargo",
+  "roles": [
+    "fa7a_stack_ctfe318_handwritten",
+    "fa7a_stack_ctfe318_handwritten_foreign_inventory"
+  ]
+}

@@ -54,7 +54,7 @@ def identities(data,parse):
         result[receiver]={'type_id':prefix+owner,'impl_id':prefix+imp,'slot':rows[imp][4],'methods':{name:symbols[key]for name,key in item.items()}}
     return result
 def movement(role,a,b):
-    expected=role==c.ROLES[0];rows={}
+    c.guard(role in c.ROLES,'unregistered source');expected=False;rows={}
     for name,block in c.P['predicted'].items():
         l=a[name];r=b[name];c.guard(l['type_id']==r['type_id']and l['methods'].keys()==r['methods'].keys(),'same nominal/methods')
         changed=[n for n in block['pub']if l['methods'][n]!=r['methods'][n]]

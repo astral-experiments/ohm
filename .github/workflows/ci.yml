@@ -1,4 +1,4 @@
-name: 'Screen handwritten impl identities on the uv-client check after uv #22874'
+name: Check a phase-owned foreign trait inventory on uv 22874
 'on':
   workflow_dispatch:
     inputs:
@@ -9,24 +9,24 @@ name: 'Screen handwritten impl identities on the uv-client check after uv #22874
       build_run_id:
         required: true
         type: string
-        description: Completed two-role optimized stage1 build run
+        description: Completed arena compiler build
       build_head:
         required: true
         type: string
-        description: Reviewed full SHA of that build workflow
+        description: Reviewed arena producer commit
       sdk_lock_sha256:
         required: true
         type: string
-        description: SHA256 of the independently enrolled Actions receipt
+        description: SHA-256 of both authenticated production inputs and native qualification
 permissions:
   contents: read
   actions: read
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22874-handwritten-uv-client'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41371136314' && inputs.build_head == '682930c7b58a62cd46c6f951b60d8cab8d3c7869'
-      && inputs.sdk_lock_sha256 == '3579524fb6031aba5b9621fbd7414b3ab8e30aec4b6fe8853eb3398f0b840e9f'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22874-inventory-uv-client'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41389169358' && inputs.build_head == '70cf505327e6f7f433b8f45797bf4ee6220722f1'
+      && inputs.sdk_lock_sha256 == 'c5cd93910f3b1d4300d58e916625adff2e1e49106acc77518388f765d13f1f8a'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
     env:
@@ -49,11 +49,20 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: builder
-        ref: ${{ inputs.build_head }}
+        ref: 682930c7b58a62cd46c6f951b60d8cab8d3c7869
         persist-credentials: 'false'
         sparse-checkout: |-
           .github/workflows
           scripts/handwritten-stage1
+    - name: Check out exact inventory builder
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        path: inventory-builder
+        ref: ${{ inputs.build_head }}
+        persist-credentials: 'false'
+        sparse-checkout: |-
+          .github/workflows
+          scripts/trait-inventory-stage1
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -132,7 +141,7 @@ jobs:
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/core.py admit 2>&1 | tee trait-results/intake.log
     - name: Check both incremental and metadata migration directions
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/core.py migration
-    - name: Qualify the real 543-unit consumer and collect four first-edit pairs
+    - name: Qualify native roots and collect four ordinary pairs plus two independent nine-compiler pairs
       run: |-
         set -euo pipefail
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/screen.py 2>&1 | tee trait-results/experiment.log
@@ -144,7 +153,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22874-handwritten-client-screen-1
+        name: uv-22874-arena-inventory-client-screen-1
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
