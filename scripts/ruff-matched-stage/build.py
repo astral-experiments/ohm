@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-remat-public-rustc-20261102"
+BRANCH = "charlie/qa-remat-live-pin-20261102"
 BASE = "00f4192b5507f8c028898ce5bd66958d20f341c5"
 
 
@@ -49,6 +49,9 @@ def bundle(repo):
         and git(repo, "rev-list", c, "^" + p).splitlines() == [c],
         "not the single prepared compiler commit",
     )
+    pin = REG["upstream_pin"]
+    need(git(repo, "rev-list", "--reverse", p, "^"+pin["transport_base"]).splitlines() == pin["commits"],
+         "incorrect lineage between the source carrier and proposed release")
     changes = REG["changed_sources"]
     paths = sorted(changes)
     expected = [("A" if changes[path]["P"] is None else "M") + "\t" + path for path in paths]
@@ -100,6 +103,11 @@ def control(workspace, root):
         ),
         "unexpected packaging changes",
     )
+    proposed = workspace / "proposed-pin"
+    spec = json.loads((proposed / "toolchains/1.99.0/23.json").read_bytes())
+    need(git(proposed, "rev-parse", "HEAD") == REG["upstream_pin"]["packaging"]
+         and spec["sources"]["rust"]["revision"] == REG["roles"]["P"]["revision"],
+         "different proposed release compiler")
     reg = json.loads((qa / "scripts/rc23-expanded-inputs/registration.json").read_bytes())
     need(
         git(workspace, "rev-parse", "HEAD") == reg["coordinator"]

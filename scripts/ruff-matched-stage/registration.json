@@ -17,8 +17,8 @@
   ],
   "bundle": {
     "branch": "refs/heads/charlie/rc23-repair-rematerialized-copy-intervals",
-    "bytes": 35366,
-    "sha256": "4833d6aadf4a3f4256f6b7ee3383cf21a54fa449ec551e8340a53126d9715f0d"
+    "bytes": 51641,
+    "sha256": "da99b4d928dfc0544210d4d81d50973243ff731f1c74447ae77c2a5d144a7c3e"
   },
   "changed_sources": {
     "compiler/rustc_codegen_llvm/src/back/write.rs": {
@@ -61,14 +61,14 @@
   },
   "roles": {
     "C": {
-      "compiler": "5d0ffc99bf5cfa430ab17ea6ee214bbd0d0485dd",
-      "revision": "59a1762e3432b01637b9a988e373cbd8268f923f",
-      "tree": "7123d736eae05d243c3447fee831e2e7229b9208"
+      "compiler": "ce40b162559dd250a33987af9fad9838106c5861",
+      "revision": "d1c2e85990d0d9fdb34052af19a1b3cf8ebba36b",
+      "tree": "624a77f28674329dd114216b3f1329c35eeedaea"
     },
     "P": {
-      "compiler": "992fea2dd7c2a88fca8a3b34bb6aa34fc925d1ac",
-      "revision": "28b64bc39032c1786908d98ea2df92f855226d0f",
-      "tree": "8bbc9c69e3672969514c0eb395f81d8f5230c715"
+      "compiler": "5f25f548bfc4983f74a29f0796093191b2220c1f",
+      "revision": "a3fc6da13921586bc374586dee00883e9210aecd",
+      "tree": "736b983382d446c40bd5bd853df881bef65cb6ad"
     }
   },
   "schema": "ohm-remat-builder-registration-v1",
@@ -98,5 +98,21 @@
   },
   "source_epoch": 1793555546,
   "target": "x86_64-unknown-linux-gnu",
-  "treatment": "guarded-public-register-coalescer"
+  "treatment": "guarded-public-register-coalescer",
+  "upstream_pin": {
+    "commits": [
+      "0a38b3aa6d1bbb55ec5e8c01c9e88d1cf0f9f118",
+      "f12924d918dbc66898325531940a20aa8cf4f5fc",
+      "330c6efbef5fd49b2797c8f1f084630343cd117d",
+      "203c98e2df20b6afff4b0f512896c14c44942b82",
+      "764eb1cd92bb67b2f9a88eb17ba67766569ab2f3",
+      "dc0db7275adb2dbe921ce5df0811108e84d6408d",
+      "5c3cea67eca46acbb95bf62a97485200f6c00c44",
+      "c6b5bef8a0b36608968c568637529c68069d494f",
+      "a3fc6da13921586bc374586dee00883e9210aecd"
+    ],
+    "packaging": "e6fe4399e188e6d86a32a750585936800ce0d99a",
+    "ref": "refs/heads/charlie/musl-register-comments",
+    "transport_base": "28b64bc39032c1786908d98ea2df92f855226d0f"
+  }
 }

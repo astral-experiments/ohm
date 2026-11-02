@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   matched:
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-remat-public-rustc-20261102'
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-remat-live-pin-20261102'
       && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
@@ -30,6 +30,13 @@ jobs:
       with:
         persist-credentials: false
         ref: 634d090f0f565936996a817bcb884c64cbe7e6cc
+    - name: Authenticate the proposed release Rust pin
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: e6fe4399e188e6d86a32a750585936800ce0d99a
+        path: proposed-pin
+        sparse-checkout: toolchains/1.99.0
+        persist-credentials: false
     - name: Check out qa-code
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:

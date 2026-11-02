@@ -95,7 +95,7 @@ class Protocol(unittest.TestCase):
         b = c.HERE / "candidate.bundle"
         self.assertEqual(c.sha(b), c.REG["bundle"]["sha256"])
         header = b.read_bytes().split(b"\n\n", 1)[0].decode().splitlines()
-        self.assertEqual(header[1].split()[0], "-" + c.REG["roles"]["P"]["revision"])
+        self.assertEqual(header[1].split()[0], "-" + c.REG["upstream_pin"]["transport_base"])
         self.assertEqual(header[2], c.REG["roles"]["C"]["revision"] + " " + c.REG["bundle"]["branch"])
         self.assertEqual(len(header), 3)
 
@@ -151,12 +151,12 @@ def source_control(clean):
         subprocess.run(["git", "init", "-q", "--bare", repo], check=True)
         common = Path(build.git(clean, "rev-parse", "--path-format=absolute", "--git-common-dir"))
         (repo / "objects/info/alternates").write_text(str(common / "objects") + "\n")
-        parent = c.REG["roles"]["P"]["revision"]
+        parent = c.REG["upstream_pin"]["transport_base"]
         (repo / "shallow").write_text(parent + "\n")
         build.git(repo, "update-ref", "refs/heads/parent", parent)
         build.bundle(repo)
         print(
-            "Exact parent, child, compiler trees, worktree blobs, sole candidate ref and direct-parent bundle passed."
+            "Exact nine-commit release lineage, direct product parent, compiler trees and eight changed source blobs passed."
         )
 
 
