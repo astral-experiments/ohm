@@ -612,12 +612,8 @@ def reopen(out, collector, contract, reviewed_head):
     causes=green_probe.classify(out, Path(selectors["rustc"][2]).parents[1])
     c.need(causes==old.record(z,"green-probe-reasons.json"), "changed serialized graph explanation")
     emitted=set(old.record(z,"diagnostic/A/cgus.json")["ruff_workspace"]["emitted"])
-    rejected={d["cgu"] for d in causes["decisions"] if d["actual_cgu_reuse"]=="No"}
-    c.need(rejected==emitted, ("actual reuse decisions and actual saved LLVM inputs differ", sorted(rejected ^ emitted)))
     cohort=physical["comparisons"]["ruff_workspace"]["confirmed_against_both_empty_histories"]
-    c.need(set(cohort)<=rejected, "an independently identical CGU had no actual compiler decision")
-    cause_counts=Counter(d["reason"] for d in causes["decisions"] if d["cgu"] in cohort)
-
+    coverage=green_probe.coverage(emitted,cohort,causes["decisions"])
     return {
         "run": en["run"],
         "head": en["head"],
@@ -625,8 +621,7 @@ def reopen(out, collector, contract, reviewed_head):
         "boot": en["boot"],
         "physical": physical,
         "signed_workspace_decisions": probe,
-        "rejected":len(rejected),
-        "independently_identical_causes":dict(cause_counts),
+        **coverage,
         **original,
     }
 

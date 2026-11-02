@@ -200,3 +200,41 @@ def classify(out, sdk):
                 "accepted donor absent from the otherwise independent physical inventory",
             )
     return result
+
+
+def coverage(emitted, comparable, decisions):
+    """Match full physical module identities to the signed reuse call's work-product name."""
+    import re
+    from collections import Counter
+
+    ids = {}
+    crate_hashes = set()
+    for identity in emitted:
+        match = re.fullmatch(
+            r"ruff_workspace\.([0-9a-f]{16})\.([a-z0-9]{25})", identity
+        )
+        require(
+            match is not None and match[2] not in ids,
+            "invalid or ambiguous native module",
+        )
+        crate_hashes.add(match[1])
+        ids[match[2]] = identity
+    require(len(crate_hashes) == 1, "multiple physical workspace crate identities")
+    names = [row["cgu"] for row in decisions if row["actual_cgu_reuse"] == "No"]
+    require(
+        len(names) == len(set(names)) and set(names) == ids.keys(),
+        "signed no-reuse decisions differ from the independently observed LLVM inputs",
+    )
+    targets = set(comparable)
+    require(
+        targets <= set(emitted),
+        "an independently identical CGU has no observed LLVM input",
+    )
+    return dict(
+        rejected=len(names),
+        independently_identical_causes=dict(
+            Counter(
+                row["reason"] for row in decisions if ids.get(row["cgu"]) in targets
+            )
+        ),
+    )

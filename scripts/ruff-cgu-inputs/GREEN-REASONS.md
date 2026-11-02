@@ -17,3 +17,5 @@ The published GNU -22 compiler's driver digest is `4c8ccf0072e8f382a3a3756fd60e4
 Additional native controls preserved a real `global_asm!` veto, recognized an exact donor file withdrawn after publication, and verified a green PostLto reuse. The probe covers the published compiler's regular and cold executable sections.
 
 The private descriptor handoff uses a fixed record of 24 fully assigned bytes. The kernel, loader and VEX client independently check access direction as well as identity. Both Cargo jobserver pipe ends share an inode. The fixture confirms one read-only and one write-only endpoint. The loader unlinks the handoff before the diagnostic starts, and the artifact omits this internal file on every exit.
+
+The compiler names a work product by its 25-character basename. Archive identities additionally contain the crate name and the 16-digit crate metadata hash. The coverage reader requires one exact workspace crate identity and a one-to-one basename match before it counts a reuse decision. This representation check is independent of the observed reason or output.

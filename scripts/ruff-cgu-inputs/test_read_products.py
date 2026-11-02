@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from green_probe import coverage
 from read_products import recorded_products
 
 
@@ -28,6 +29,23 @@ class WorkProducts(unittest.TestCase):
         self.assertTrue(row["all_present"])
         self.assertEqual(row["saved"]["o"]["physical"], files["example.o"])
         self.assertFalse(recorded_products(raw, {})[KEY.hex()]["all_present"])
+
+    def test_signed_cgu_and_qualified_native_identity(self):
+        cgu = "app6md24z3cxw0zevcj31kxdh"
+        native = "ruff_workspace.74f136ef346eb9fb." + cgu
+        row = dict(cgu=cgu, actual_cgu_reuse="No", reason="already-red")
+        self.assertEqual(
+            coverage([native], [native], [row]),
+            dict(rejected=1, independently_identical_causes={"already-red": 1}),
+        )
+        for args in (
+            ([native], [], []),
+            ([native, native.replace("74f1", "84f1")], [], [row]),
+            ([native], ["other"], [row]),
+            ([native], [], [row, row]),
+        ):
+            with self.subTest(args=args), self.assertRaises(ValueError):
+                coverage(*args)
 
     def test_malformed_or_wrong_release(self):
         one = b"\x01" + RECORD
