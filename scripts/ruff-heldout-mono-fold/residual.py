@@ -93,12 +93,30 @@ def sample_rows(case):
                 rows.append((pid,tid,at,period,leaf,stack))
     return frames, rows
 
+def restore(env, command):
+    keys={'HOME','TMPDIR','RUSTUP_HOME','RUSTUP_AUTO_INSTALL','CARGO_HOME','CARGO_TARGET_DIR','CARGO_BUILD_BUILD_DIR','CARGO_NET_OFFLINE','CARGO_CACHE_AUTO_CLEAN_FREQUENCY','LC_ALL','CARGO_TERM_COLOR','PATH','LD_LIBRARY_PATH','GIT_CONFIG_NOSYSTEM','GIT_CONFIG_GLOBAL','SSL_CERT_FILE'}
+    need(env.keys()==keys,'unexpected variable in the deliberately isolated role environment')
+    return ['/usr/bin/env','-i',*(key+'='+value for key,value in env.items()),*map(str,command)]
+
+def verify_environment(perf,env,period):
+    case=B/'environment-control';case.mkdir();probe=m.W/'environment-probe';(probe/'src').mkdir(parents=True);(probe/'Cargo.toml').write_text('[package]\nname="normal_cargo_attribution"\nversion="0.0.0"\nedition="2024"\n');(probe/'Cargo.lock').write_text('version = 4\n\n[[package]]\nname = "normal_cargo_attribution"\nversion = "0.0.0"\n');(probe/'src/lib.rs').write_text('#[inline(never)] pub fn answer() -> u32 { 42 }\n#[test] fn actual() { assert_eq!(answer(),42) }\n');local=env|{'CARGO_TARGET_DIR':str(probe/'target'),'CARGO_BUILD_BUILD_DIR':str(probe/'build')};plain=['/usr/bin/env','-0'];mapping={}
+    for name,command in [('ordinary',plain),('mutated',record(perf,case/'environment-mutated.data',plain,period)),('restored',record(perf,case/'environment-restored.data',restore(local,plain),period))]:
+        res=subprocess.run(command,env=local,cwd=probe,check=True,capture_output=True);mapping[name]=dict(item.split(b'=',1)for item in res.stdout.rstrip(b'\0').split(b'\0'))
+    declared={k.encode():v.encode()for k,v in local.items()};need(declared==mapping['ordinary']==mapping['restored'] and mapping['mutated'].get(b'PATH')!=declared[b'PATH'],'profiler did not expose and then restore the exact environment');diff=sorted(k.decode()for k in mapping['mutated'].keys()|declared.keys()if mapping['mutated'].get(k)!=declared.get(k));cargo=['cargo','+ohm','test','--no-run','--lib','--locked','--offline','-j2','--message-format=json'];ledger={}
+    for name in ('old','ordinary','mutated','restored'):
+        cmd=cargo
+        if name=='mutated':cmd=record(perf,case/'project-mutated.data',cargo,period)
+        if name=='restored':
+            trace=case/'exec';trace.mkdir();cmd=record(perf,case/'project-restored.data',restore(local,[m.W/'count-exec',trace,h.meter.WORK/'watch',case/'clock.json',*cargo]),period)
+        proc=subprocess.run(cmd,env=local,cwd=probe,check=True,capture_output=True,timeout=90);artifact,=[r for r in map(json.loads,proc.stdout.splitlines())if r.get('reason')=='compiler-artifact'];exe=Path(artifact['executable']);space,=[part for part in exe.parts if part.startswith('v2-')];st=exe.stat();test=subprocess.run([exe,'actual','--exact'],cwd=probe,env=local,check=True,capture_output=True);need(b'1 passed' in test.stdout,'wrong sacrificial native result');ledger[name]=dict(namespace=space,identity=[st.st_dev,st.st_ino],elf=sha(exe),fresh=artifact['fresh'])
+    old,ordinary,bad,restored=(ledger[k]for k in ('old','ordinary','mutated','restored'));need(ordinary==restored and old['namespace']==ordinary['namespace']!=bad['namespace'] and old['identity']==ordinary['identity']!=bad['identity'] and ordinary['fresh'] and not bad['fresh'] and len({x['elf']for x in ledger.values()})==1,'different real signed-Cargo namespace, target freshness or actual native file');save(case/'terminal.json',dict(changed_keys=diff,exact_role_environment=h.canonical(local),all_values_restored=True,actual_paths=ledger))
+
 def calibrate_images(perf,observer,env,period):
     # Constant sample density across rates. Only these external loop controls choose the Ruff sampling period.
     case=B/f'source-control-{period}';case.mkdir();(case/'exec').mkdir();iterations=str((period or 50009)*520+1)
     cmd=[str(observer),str(case/'exec'),str(h.meter.WORK/'watch'),str(case/'clock.json'),str(h.meter.WORK/'loop'),'1',iterations,'2']
     with (case/'stderr').open('wb')as e:
-        subprocess.run(record(perf,case/'perf.data',cmd,period) if period else cmd,env=env,stdout=subprocess.DEVNULL,stderr=e,check=True,timeout=90)
+        subprocess.run(record(perf,case/'perf.data',restore(env,cmd),period) if period else cmd,env=env,stdout=subprocess.DEVNULL,stderr=e,check=True,timeout=90)
     events=u.trace(case/'exec');by_image={r['sequence']:r for r in events};clock=json.loads((case/'clock.json').read_bytes());parts=Counter()
     for line in (case/'exec/epochs.tsv').read_text().splitlines():
         cells=line.split()
@@ -119,6 +137,7 @@ def setup():
         except (ValueError,OSError,subprocess.SubprocessError)as err:refused[str(n)]=repr(err);print('Rejected loop sample period',n,repr(err),flush=True)
     # Use a verified lower sampling rate than the densest admissible calibration when available.
     selected=successful[1] if len(successful)>1 else next(iter(successful),None)
+    verify_environment(perf,env,selected or periods[-1])
     save(B/'capability.json',dict(period=selected,tested=periods,passed=successful,refused=refused,exact_counters=True));print('Selected actual source-independent sample period',selected,flush=True)
 
 def map_or_tag(cells):
@@ -157,7 +176,7 @@ def measure(argv,env,src,case,state):
     period=json.loads((B/'capability.json').read_bytes())['period']
     if period is None:
         m.old.command(list(map(str,cmd)),env,src,case,state);save(case/'profile-refusal.json',dict(reason='no admitted hardware sampling period'));return
-    m.old.command(record(perf,raw,cmd,period),env,src,case,state);need(0<raw.stat().st_size<192<<20,'unbounded profile')
+    m.old.command(record(perf,raw,restore(env,cmd),period),env,src,case,state);need(0<raw.stat().st_size<192<<20,'unbounded profile')
     try:decode(perf,raw,case)
     except (ValueError,OSError,subprocess.SubprocessError)as err:save(case/'profile-refusal.json',dict(reason=repr(err)))
     with (case/'perf.data.zst').open('xb')as f:subprocess.run(['zstd','-q','-2','-c',raw],stdout=f,check=True)
