@@ -1,189 +1,119 @@
-name: Do generated derive impl identities reduce uv-client rustc instructions after the actual uv edit?
+name: 'Ordinary uv-cli build after the landed #20992 edit'
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
+        description: Exact inspected coordinator commit
         required: true
         type: string
-        description: Reviewed full SHA of this benchmark
-      build_run_id:
-        required: true
-        type: string
-        description: Qualified new production SDK build
-      build_head:
-        required: true
-        type: string
-        description: Reviewed foreign-impl domain producer commit
-      sdk_lock_sha256:
-        required: true
-        type: string
-        description: SHA-256 of both authenticated production inputs and native qualification
 permissions:
   contents: read
   actions: read
   attestations: read
+concurrency:
+  group: uv-20992-derive-production-build-guard
+  cancel-in-progress: false
 jobs:
-  root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-proc-derive-production-check' && github.sha == inputs.reviewed_head
-      && github.run_attempt == 1 && inputs.build_run_id == '41434876352' && inputs.build_head == '731d81a4cb3498cf4221d53a267bbf4a76ca250f' && inputs.sdk_lock_sha256 == 'dbb190765a6be6f2ef90be903efaf63c1feb7bf817c142cdaacc0cb0b9f067ae'
+  guard:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20992-production-build-guard' && github.run_attempt == 1 && github.sha == inputs.reviewed_head
+    name: Eight paired ordinary linked-library builds on production rustc
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 170
+    timeout-minutes: 120
     env:
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      BUILD_RUN_ID: ${{ inputs.build_run_id }}
-      BUILD_HEAD: ${{ inputs.build_head }}
-      SDK_LOCK_SHA256: ${{ inputs.sdk_lock_sha256 }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      INPUT_SOURCE: ${{ inputs.reviewed_head }}
     steps:
-    - name: Check out coordinator
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: coordinator
-        ref: ${{ github.sha }}
-        persist-credentials: 'false'
-        sparse-checkout: 'scripts/handwritten-panel
+      - name: Check out the exact reviewed study and existing release readers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: measure
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify the complete carrier before any physical visit
+        shell: bash
+        run: |
+          set -eu
+          printf 'OHM20992_RESULT=%s/build-results\nOHM20992_TRANSIENT=%s/ohm-20992-native-state\n' "$GITHUB_WORKSPACE" "$RUNNER_TEMP" >> "$GITHUB_ENV"
+          python3 -ISB measure/scripts/uv-library-build-20992/source_guard.py
+      - name: Check out the existing inherited counter
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: pilot
+          ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
+          sparse-checkout: |
+            scripts/ctfe-crossover-pilot
+            scripts/branch-return-pmu
+          persist-credentials: false
+      - name: Check out authenticated PMU calibration and observers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: calibrator
+          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
+          sparse-checkout: scripts/gnu-renderer-pfc-hardware
+          persist-credentials: false
+      - name: Enroll original retired-instruction calibrator source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: observers
+          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
+          sparse-checkout: |
+            scripts/gnu-example-ceiling
+            scripts/gnu-renderer-library-workers
+          persist-credentials: false
+      - name: Calibrate whole-tree instructions, compiler threads and the blocking native clock
+        run: python3 -ISBu measure/scripts/uv-library-build-20992/worker.py calibrate
+      - name: Retain the fresh physical boot and all three calibration identities
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: uv-20992-production-early-boot
+          path: build-results/calibration.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Check out the production parent verifier
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: control-builder
+          ref: 5f7e5680285caa6b9a848db810b63ef58dfe0143
+          sparse-checkout: scripts/ctfe22-gnu
+          persist-credentials: false
+      - name: Check out the generated-derive production verifier
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: treatment-builder
+          ref: 731d81a4cb3498cf4221d53a267bbf4a76ca250f
+          sparse-checkout: scripts/ctfe22-gnu
+          persist-credentials: false
+      - name: Verify original service metadata, PGO+BOLT packages, native QA, and official signed Cargo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -ISBu measure/scripts/uv-library-build-20992/sdk_intake.py
+      - name: Check out the real landed uv change and its previous history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: uv-donor
+          repository: astral-sh/uv
+          ref: 544157b31dbc6007bfdfe2789d3d068278fdb57d
+          fetch-depth: 80
+          fetch-tags: true
+          persist-credentials: false
+      - name: Prepare and authenticate the 658 locked packages
+        run: |
+          set -eu
+          git -C uv-donor fetch --no-tags --depth=1 origin +refs/tags/0.12.2:refs/tags/0.12.2
+          python3 -ISBu measure/scripts/uv-library-build-20992/registry_intake.py
+      - name: Open four independent native histories and exhaustively verify archives, linked CLI, Cargo graph and kernel process identities
+        run: python3 -ISBu measure/scripts/uv-library-build-20992/worker.py enroll
+      - name: Run all eight opening-order pairs of ordinary Cargo builds and the separate hardware visits
+        run: python3 -ISBu measure/scripts/uv-library-build-20992/worker.py measure
+      - name: Reopen the original package outputs, counters and blocking clocks
+        run: python3 -ISBu measure/scripts/uv-library-build-20992/replay.py "$OHM20992_RESULT"
+      - name: Retain complete raw products, process records, clocks, counters and refused inputs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: uv-20992-production-original
+          path: build-results
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 7
 
-          scripts/uv-callables-21041'
-        fetch-depth: '2'
-    - name: Check out the exact control-builder
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: control-builder
-        ref: 5f7e5680285caa6b9a848db810b63ef58dfe0143
-        persist-credentials: 'false'
-        sparse-checkout: scripts/ctfe22-gnu
-    - name: Check out the exact treatment-builder
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: treatment-builder
-        ref: 731d81a4cb3498cf4221d53a267bbf4a76ca250f
-        persist-credentials: 'false'
-        sparse-checkout: scripts/ctfe22-gnu
-    - name: Check out opening
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: opening
-        ref: 341cd92e5d381a50bd380467075f31e780ee6296
-        persist-credentials: 'false'
-        sparse-checkout: 'scripts/uv-root-20991-opening
-
-          '
-    - name: Check out previous
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: previous
-        ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
-        persist-credentials: 'false'
-        sparse-checkout: 'scripts/uv-resolver-whole-pmu
-
-          '
-    - name: Check out qualified
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: qualified
-        ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
-        persist-credentials: 'false'
-        sparse-checkout: 'scripts/rc23-trait-qualification
-
-          '
-    - name: Check out pilot
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: pilot
-        ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
-        persist-credentials: 'false'
-        sparse-checkout: 'scripts/ctfe-crossover-pilot
-
-          scripts/branch-return-pmu
-
-          '
-    - name: Check out calibrator
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: calibrator
-        ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
-        persist-credentials: 'false'
-        sparse-checkout: 'scripts/gnu-renderer-pfc-hardware
-
-          '
-    - name: Check out observers
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: observers
-        ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-        persist-credentials: 'false'
-        sparse-checkout: 'scripts/gnu-example-ceiling
-
-          scripts/gnu-renderer-library-workers
-
-          '
-    - name: Check out uv at the actual landed edit
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        repository: astral-sh/uv
-        ref: 9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3
-        fetch-depth: '64'
-        fetch-tags: 'false'
-        persist-credentials: 'false'
-        path: uv-source
-    - name: Fetch and verify the historical release tag for the real uv build script
-      run: 'git -C uv-source fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.3:refs/tags/0.12.3
-
-        test "$(git -C uv-source rev-parse ''refs/tags/0.12.3^{}'')" = 507230998c9541d67814b57463ac00e454ff6991
-
-        '
-    - name: Verify the two rooted benchmark manifests
-      run: 'set -euo pipefail
-
-        (cd coordinator/scripts/handwritten-panel && sha256sum --strict --check SHA256SUMS)
-
-        (cd coordinator/scripts/uv-callables-21041 && sha256sum --strict --check SHA256SUMS)
-
-        '
-    - name: Prepare the host and preserve prerequisites
-      run: 'set -euo pipefail
-
-        mkdir trait-results
-
-        /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-
-        '
-    - name: Calibrate inherited and per-rustc hardware counters, the current machine and the native blocking wait
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py calibrate 2>&1 | tee trait-results/calibration.log
-
-        '
-    - name: Retain the calibrated unique runner before acquiring the compilers
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: uv-21041-proc-derive-production-boot
-        path: trait-results/fresh-boot.json
-        if-no-files-found: error
-        retention-days: 7
-    - name: Admit both independently qualified production compilers and the original Gnu/Linux Cargo
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py admit 2>&1 | tee trait-results/intake.log
-
-        '
-    - name: Exercise the eleven real foreign transitions, separate epochs and same-role reuse
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py migration
-    - name: Open two independent histories and collect eight separately restored scoped, whole-Cargo and blocking-wall pairs
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/screen.py 2>&1 | tee trait-results/experiment.log'
-    - name: Reopen 128 compiler counters, 16 whole-Cargo counters, 16 separate blocking waits and the native derive inventories
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/score.py 2>&1 | tee trait-results/reduction.log'
-    - name: Preserve raw clocks, source qualification and any incomplete attempt
-      if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: uv-21041-proc-derive-production-eight-pair
-        path: trait-results/
-        if-no-files-found: error
-        compression-level: '1'
-        retention-days: 7
