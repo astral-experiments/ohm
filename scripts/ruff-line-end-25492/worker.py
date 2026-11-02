@@ -12,11 +12,13 @@ import resource
 import shutil
 import statistics
 import subprocess
+import sys
 import tomllib
 
+HERE=Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 from audit import exec_roster, incremental, probe_sampler, run, save, sha
 
-HERE=Path(__file__).resolve().parent
 ROOT=Path(os.environ['RUNNER_TEMP'])/'ruff-db-link-reason'
 SRC=Path(os.environ['GITHUB_WORKSPACE'])/'ruff'
 LOG=ROOT/'records'
