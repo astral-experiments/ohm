@@ -3,6 +3,10 @@ run-name: Reopen Ruff 25492 at ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
+      report:
+        description: Render the accepted original receiver report
+        type: boolean
+        default: false
       reviewed_head:
         description: Exact reader commit
         type: string
@@ -11,7 +15,7 @@ permissions: {}
 jobs:
   readback:
     name: Read the two complete recorded packets without running a compiler
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    if: inputs.report == false && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     permissions:
@@ -30,5 +34,28 @@ jobs:
         with:
           name: ruff-line-end-25492-readback
           path: ${{ runner.temp }}/report
+          if-no-files-found: error
+          retention-days: 14
+  summarize:
+    name: Print the original qualified results
+    if: inputs.report && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-line-end-25492
+      - name: Print the authenticated readback
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/ruff-line-end-25492/report.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ruff-line-end-25492-summary
+          path: ${{ runner.temp }}/summary.json
           if-no-files-found: error
           retention-days: 14
