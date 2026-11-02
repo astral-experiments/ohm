@@ -38,7 +38,7 @@ def host(g):
     assert all(g['units'][u]['features']==[] for u in (owner,src,macro))
     return macro,owner,src
 
-def state(case,root,env,archive):
+def state(case,root,env,archive,args):
     phase=w.LOG/'host-read-set'/case
     phase.mkdir();root.mkdir(exist_ok=True)
     assert w.git('rev-parse','HEAD')==(w.OLD if case=='old' else w.NEW) and sha(w.SRC/'Cargo.lock')==w.LOCK and not w.git('status','--porcelain','--untracked-files=no')
@@ -46,7 +46,7 @@ def state(case,root,env,archive):
     env={**env,'CARGO_TARGET_DIR':str(root/'target'),'CARGO_BUILD_BUILD_DIR':str(root/'build'),'CARGO_NET_OFFLINE':'true',
          'RUSTC_WRAPPER':str(HERE/'reader_owner.py'),'OHM_READ_RECEIPT':str(phase),'OHM_READ_STATE':str(root),
          'OHM_READ_SIGNED':str(w.SDK/'bin/rustc'),'OHM_READ_SIGNED_SHA':tools['bin/rustc']}
-    status=run(['cargo','+ohm',*ARGS,'--message-format=json'],env,w.SRC,exact=None)
+    status=run(['cargo','+ohm',*args,'--message-format=json'],env,w.SRC,exact=None)
     w.gz(phase/'stdout.gz',status.stdout);w.gz(phase/'stderr.gz',status.stderr)
     assert status.returncode==0,status.stderr[-4200:]
     rows=[json.loads(x) for x in status.stdout.splitlines()]
@@ -69,6 +69,9 @@ def state(case,root,env,archive):
         expected=(json.loads((HERE.parent/'ordinary.json').read_bytes())['phases'][case]['typed_by_features']['no-features'] if lib=='ruff_source_file' else '"> é\\r\\n>\\n> β\\r"\n"> A\\n> B"\n""\n')
         assert replay.stdout.decode()==expected,(lib,replay.stdout,expected)
         (phase/(lib+'-typed.txt')).write_bytes(replay.stdout)
+    if not (phase/'process.json').is_file():
+        save(phase/'unobserved.json',{'phase':case,'dirty':[r['target']['name'] for r in products if not r['fresh']],'products':ids})
+        return False
     original=json.loads((phase/'original.json').read_bytes())
     argv=original['argv'];phref=[p['args'] for p in json.loads(archive.read(case+'/processes.json'))['compilers'] if p['crate']=='ruff_python_trivia']
     assert len(phref)==2, len(phref)
@@ -77,21 +80,33 @@ def state(case,root,env,archive):
     save(phase/'history.json',{'case':case,'source':w.git('rev-parse','HEAD'),'product_ids':ids,'products':len(products),
                                'dirty':[r['target']['name'] for r in products if not r['fresh']],'full_arguments':phref,
                                'matches':matches,'focused':wanted,'default_macro_env':{k:env.get(k) for k in ('RUSTFLAGS','RUSTC_WORKSPACE_WRAPPER','CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST','CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST')},'canonical_sha256':contact.digest(wanted)})
-    assert len(matches)==1,('genuine full host owner argv did not match',case,matches)
     assert 'ruff_source_file='+original['provider_path'] in argv
+    return len(matches)==1
 
 def main():
     private,env=w.env_and_calibrate();w.fetch(private,env)
     out=w.LOG/'host-read-set';out.mkdir()
     h=private/'history';e=private/'empty-new'
     common={**env,'CARGO_TARGET_DIR':str(h/'target'),'CARGO_BUILD_BUILD_DIR':str(h/'build'),'CARGO_NET_OFFLINE':'true'}
-    big=a.graph(common,w.CMD[2:-1]);small=a.graph(common,ARGS)
-    m,u,s=host(big);m2,u2,s2=host(small)
-    full,focused=a.closure(big,u),a.closure(small,u2)
-    save(out/'graph.json',{'full':big,'focused':small,'role':[m,u,s,m2,u2,s2],'full_nodes':len(full),'focused_nodes':len(focused),'same_edges':edge_closure(big,u)==edge_closure(small,u2),
-                           'only_full':sorted(set(full)-set(focused)),'only_focused':sorted(set(focused)-set(full))})
-    assert len(a.closure(big,m))==20 and len(full)==7 and len(small['units'])<=22 and focused==full and edge_closure(big,u)==edge_closure(small,u2),(len(small['units']),len(focused),len(full),sorted(set(full)^set(focused)))
+    big=a.graph(common,w.CMD[2:-1]);m,u,s=host(big);full=a.closure(big,u)
+    assert len(a.closure(big,m))==20 and len(full)==7
+    focus_packages=('memchr','itertools','either','ruff_python_trivia','unicode-ident')
+    five=[x for name in focus_packages for x in ('--config',f'profile.dev.package.{name}.debug="line-tables-only"')]
+    build_override=['--config','profile.dev.build-override.debug="line-tables-only"']
+    two=[x for name in ('ruff_source_file','ruff_text_size') for x in ('--config',f'profile.dev.package.{name}.debug=0')]
+    options=[('five-host-units',five),('build-override-with-two-exceptions',build_override+two)]
+    cases=[]
+    for name,config in options:
+        args=[*ARGS,*config];small=a.graph(common,args);m2,u2,s2=host(small);focused=a.closure(small,u2)
+        exact=(len(small['units'])<=22 and focused==full and edge_closure(big,u)==edge_closure(small,u2))
+        cases.append({'name':name,'config':config,'focused':small,'role':[m2,u2,s2],'nodes':len(focused),'same_edges':edge_closure(big,u)==edge_closure(small,u2),
+                      'only_full':sorted(set(full)-set(focused)),'only_focused':sorted(set(focused)-set(full)),'matched':exact})
+        if exact:break
+    save(out/'graph.json',{'full':big,'role':[m,u,s],'full_nodes':len(full),'plans':cases})
+    assert exact,('no exact matching seven-unit graph',[(r['name'],len(r['only_full']),len(r['only_focused'])) for r in cases])
     with zipfile.ZipFile(contact.REF) as archive:
-        state('old',h,env,archive);w.git('checkout','--detach',w.NEW);state('edit',h,env,archive);state('clean',e,env,archive)
+        accepted=[state('old',h,env,archive,args)];w.git('checkout','--detach',w.NEW)
+        accepted.append(state('edit',h,env,archive,args));accepted.append(state('clean',e,env,archive,args))
+    assert all(accepted),('host history physically did not match all three original full commands',accepted)
     print('All three real host readers and typed native controls completed.',flush=True)
 if __name__=='__main__':main()
