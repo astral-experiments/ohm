@@ -8,4 +8,6 @@ def materialize(root,pack,plan):
         assert g('rev-parse','HEAD:'+directory).strip().decode()==tree
         for line in g('ls-tree','-r','-z',tree).split(b'\0')[:-1]:
             meta,n=line.split(b'\t',1);mode,kind,oid=meta.split();assert kind==b'blob'and mode in(b'100644',b'100755');relative=Path(n.decode());assert not relative.is_absolute()and all(x not in ('.','..','.git')for x in relative.parts);body=g('cat-file','blob',oid.decode());assert len(body)<2<<20 and hashlib.sha1(b'blob '+str(len(body)).encode()+b'\0'+body).hexdigest()==oid.decode();dest=root/directory/relative;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(body);os.chmod(dest,int(mode,8)&0o777);total+=1
+    for path,oid in plan['support_files'].items():
+        assert path=='src/stage0' and g('rev-parse','HEAD:'+path).strip().decode()==oid;body=g('cat-file','blob',oid);assert len(body)<128<<10 and hashlib.sha1(b'blob '+str(len(body)).encode()+b'\0'+body).hexdigest()==oid;(root/path).write_bytes(body);total+=1
     assert total==expected['regular_source_files'];return root

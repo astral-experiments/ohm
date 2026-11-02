@@ -18,6 +18,7 @@ fn compile() -> Rustc {
         .crate_type("rlib")
         .arg("--emit=dep-info,metadata,link")
         .arg("-Copt-level=1")
+        .arg("-Clto=off")
         .arg("-Cdebug-assertions=on")
         .arg("-Cdebuginfo=line-tables-only")
         .arg("-Cembed-bitcode=no")
