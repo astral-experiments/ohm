@@ -16,6 +16,7 @@ run-name: Ruff test link reason ${{ inputs.reviewed_head }}
           - rc23
           - rc253
           - candidates
+          - callable
       native_witness:
         type: boolean
         description: Exercise a real higher-priority and malformed native provider on the RC
@@ -32,7 +33,7 @@ permissions: {}
 jobs:
   diagnose:
     name: Inspect Ruff test link on Ohm ${{ matrix.role }}
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    if: inputs.distributions != 'callable' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 55
     permissions:
@@ -115,3 +116,74 @@ jobs:
           path: ${{ runner.temp }}/ruff-db-link-reason/records
           retention-days: 14
           if-no-files-found: error
+  callable:
+    name: Compare the historical ty callable edit with both source-built compilers
+    if: inputs.distributions == 'callable' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PLACEMENT_FACTORY: '41475100027'
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          path: qa
+          sparse-checkout: scripts/ruff-callable-placement
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-experiments/ohm
+          ref: b1dc1a4f68436a260a4c15e2562aec5f4c550434
+          path: reader
+          sparse-checkout: |
+            scripts/ruff-source-placement
+            scripts/ruff-ldv-physical-stage
+            scripts/ruff-ldv-physical-workflow
+            scripts/ruff-ldv-needed
+            scripts/ruff-ldv-pilot
+            scripts/ruff-default-owner-pmu
+            scripts/ruff-workspace-link-census
+            scripts/ruff-workspace-remat
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-cgu-inputs
+            scripts/ruff-repair-tables-pilot
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: 7cc9f1ed53e5ce175f17fde3a75fe792ac41e8cd
+          path: ruff
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Verify the prospectively selected historical edit and native reader
+        run: |
+          set -euo pipefail
+          python3 -IB qa/scripts/ruff-callable-placement/verify_source.py ruff
+          (cd reader/scripts/ruff-source-placement && sha256sum --strict --quiet -c factory.sha256 && sha256sum --strict --quiet -c worker.sha256)
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends binutils build-essential gdb libssl-dev pkg-config strace zstd
+      - name: Build and verify the two native histories and a separate instruction-count pair
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB -u qa/scripts/ruff-callable-placement/run.py reader ruff
+      - name: Preserve the original diagnostic evidence even if a check refused
+        if: always()
+        run: |
+          folder="$RUNNER_TEMP/ohm-callable-placement/evidence"
+          if test -d "$folder"; then
+            tar --use-compress-program='zstd -T2 -3' -cf "$RUNNER_TEMP/callable-placement.tar.zst" -C "$folder" .
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: callable-placement-diagnostic
+          path: ${{ runner.temp }}/callable-placement.tar.zst
+          retention-days: 14
+          if-no-files-found: warn
