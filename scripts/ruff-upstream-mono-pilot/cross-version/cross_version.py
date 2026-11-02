@@ -66,9 +66,107 @@ def spare():
                     physical = min(physical, int(cap) - int((p / usage).read_text().strip()))
     return physical
 
+def elf_build_id(path):
+    """Return the file offset and exact immutable GNU build-ID note from ELF64."""
+    notes = []
+    with path.open("rb") as f:
+        head = f.read(64)
+        need(head[:6] == b"\x7fELF\x02\x01", "expected little-endian ELF64 driver")
+        phoff = struct.unpack_from("<Q", head, 32)[0]
+        stride, count = struct.unpack_from("<HH", head, 54)
+        need(stride == 56 and 0 < count < 256, "invalid ELF program header table")
+        f.seek(phoff)
+        headers = f.read(stride * count)
+        for i in range(count):
+            kind, _, offset, _, _, size, _, _ = struct.unpack_from("<IIQQQQQQ", headers, i*stride)
+            if kind != 4:
+                continue
+            need(size < 1 << 20, "oversized ELF notes")
+            f.seek(offset)
+            data, pos = f.read(size), 0
+            while pos + 12 <= len(data):
+                n, d, typ = struct.unpack_from("<III", data, pos)
+                pos += 12
+                label = data[pos:pos+n]
+                pos += (n+3) & ~3
+                need(pos+d <= len(data), "truncated ELF note")
+                if label == b"GNU\0" and typ == 3:
+                    need(8 <= d <= 64, "invalid GNU build ID")
+                    notes.append({"offset": offset+pos, "hex": data[pos:pos+d].hex()})
+                pos += (d+3) & ~3
+    need(len(notes) == 1, "expected exactly one loadable driver build ID")
+    return notes[0]
+
+
+class DriverRefusal(RuntimeError):
+    def __init__(self, message, evidence):
+        super().__init__(message)
+        self.evidence = {"error": message, **evidence}
+
+
+def verify_mapping(proc, rows, active):
+    # Only path-backed driver DSOs are executable identities. Anonymous BSS and debug sidecars
+    # may include the same file name. On a layered filesystem /proc/maps can name a backing inode.
+    candidates = {}
+    ignored = []
+    for row in rows:
+        c = row.split(None, 5)
+        if len(c) != 6 or b"librustc_driver" not in c[5].split(b"/")[-1]:
+            continue
+        name = os.fsdecode(c[5])
+        part = name.removesuffix(" (deleted)").rsplit("/", 1)[-1]
+        if not name.startswith("/") or int(c[4]) == 0 or not re.fullmatch(r"librustc_driver[^/]*\.so(?:\.\d+)*", part):
+            ignored.append(name)
+            continue
+        major, minor = (int(v, 16) for v in c[3].split(b":"))
+        file_id = os.makedev(major, minor), int(c[4])
+        lo, hi = (int(v,16) for v in c[0].split(b"-"))
+        candidates.setdefault((name, file_id), []).append((lo, hi, int(c[2],16), c[1]))
+    if not candidates:
+        return None
+    evidence = {"pid": int(proc.name), "registered_sha256": active["sha256"], "registered_path": active["path"], "registered_inode": list(active["inode"]), "expected_build_id": active["note"], "ignored_side_mappings": sorted(set(ignored)), "file_mappings": []}
+    def refuse(message):
+        raise DriverRefusal(message, evidence)
+    note = active["note"]
+    expected = bytes.fromhex(note["hex"])
+    seen = False
+    for (name, reported), mappings in candidates.items():
+        contact = {"path": name, "maps_inode": list(reported)}
+        evidence["file_mappings"].append(contact)
+        if name.endswith(" (deleted)"):
+            refuse("rustc mapped a deleted compiler driver")
+        st = (proc / "root" / name.lstrip("/")).stat()
+        physical = st.st_dev, st.st_ino
+        contact["resolved_inode"] = list(physical)
+        if physical != active["inode"]:
+            refuse("mapped compiler driver path resolves to a different file")
+        note_address = next((lo + note["offset"] - off for lo, hi, off, perms in mappings if perms.startswith(b"r") and off <= note["offset"] and note["offset"]+len(expected) <= off+hi-lo), None)
+        if note_address is None:
+            return None
+        try:
+            fd = os.open(proc/"mem", os.O_RDONLY | os.O_CLOEXEC)
+            try:
+                actual = os.pread(fd, len(expected), note_address)
+            finally:
+                os.close(fd)
+        except PermissionError as error:
+            contact["memory_errno"] = error.errno
+            if reported != active["inode"]:
+                refuse("cannot establish the backing-file identity without its mapped ELF note")
+            contact["method"] = "kernel-file-id-and-resolved-file"
+        else:
+            if len(actual) != len(expected):
+                return None
+            contact["mapped_build_id"] = actual.hex()
+            if actual != expected:
+                refuse("mapped compiler ELF build ID differs from the SHA-bound role")
+            contact["method"] = "mapped-elf-build-id-and-resolved-file"
+        seen = True
+    return evidence if seen else None
+
+
 def mapped_driver(pid):
-    """Read only the launched rustc's mappings, never its environment or unrelated processes."""
-    executable, driver, registered = ACTIVE_DRIVER
+    """Read the ELF identity of the launched rustc, without inspecting its environment."""
     pending, seen = [pid], set()
     while pending:
         child = pending.pop()
@@ -77,20 +175,13 @@ def mapped_driver(pid):
         seen.add(child)
         proc = Path("/proc") / str(child)
         try:
-            tasks = (proc / "task" / str(child) / "children").read_text().split()
-            pending.extend(int(p) for p in tasks)
+            pending.extend(int(p) for p in (proc / "task" / str(child) / "children").read_text().split())
             st = (proc / "exe").stat()
-            if (st.st_dev, st.st_ino) != executable:
+            if (st.st_dev, st.st_ino) != ACTIVE_DRIVER["executable"]:
                 continue
-            identities = set()
-            for row in (proc / "maps").read_bytes().splitlines():
-                cols = row.split(None, 5)
-                if len(cols) == 6 and b"librustc_driver" in cols[5].split(b"/")[-1]:
-                    major, minor = (int(v, 16) for v in cols[3].split(b":"))
-                    identities.add((os.makedev(major, minor), int(cols[4])))
-            if identities:
-                need(identities == {driver}, "actual rustc mapped another compiler driver")
-                return {"pid": child, "inode": list(driver), "registered_sha256": registered}
+            evidence = verify_mapping(proc, (proc/"maps").read_bytes().splitlines(), ACTIVE_DRIVER)
+            if evidence:
+                return evidence
         except (FileNotFoundError, ProcessLookupError):
             continue
     return None
@@ -109,7 +200,11 @@ def invoke(argv, env, cwd, receipt):
         try:
             while p.poll() is None:
                 if mapped is None:
-                    mapped = mapped_driver(p.pid)
+                    try:
+                        mapped = mapped_driver(p.pid)
+                    except DriverRefusal as refusal:
+                        save(receipt / "driver-mapping-refusal.json", refusal.evidence)
+                        raise
                 low = min(low, spare())
                 need(low >= 8 * GIB and time.monotonic() - t < 120, "compiler crossed its private time/memory limit")
                 time.sleep(.012 if mapped is None else .04)
@@ -232,7 +327,7 @@ def switch(work, env, role):
     r = Path(role["sdk"])
     dso, = (r / "lib").glob("librustc_driver*.so")
     a, b = (r / "bin/rustc").stat(), dso.stat()
-    ACTIVE_DRIVER = ((a.st_dev, a.st_ino), (b.st_dev, b.st_ino), role["driver"])
+    ACTIVE_DRIVER = {"executable": (a.st_dev, a.st_ino), "inode": (b.st_dev, b.st_ino), "path": str(dso.resolve(strict=True)), "sha256": role["driver"], "note": role["elf_build_id"]}
     return subprocess.check_output(["rustc", "+ohm", "-vV"], env=env, text=True)
 
 def reset(work):
@@ -413,6 +508,11 @@ def run(a):
         need(a.parent_commit != a.child_commit and (a.parent_format == a.child_format) == a.equal_header_diagnostic, "equal formats may only be explicitly enrolled as diagnostic")
         roles = role_receipts(a)
         mode = "equal-format-diagnostic" if a.equal_header_diagnostic else "different-format"
+    for role in roles.values():
+        driver, = (Path(role["sdk"]) / "lib").glob("librustc_driver*.so")
+        role["elf_build_id"] = elf_build_id(driver)
+    if not a.self_sdk:
+        need(roles["P"]["elf_build_id"]["hex"] != roles["C"]["elf_build_id"]["hex"], "source-built roles share the same ELF build ID")
     for r in roles.values():
         need(re.fullmatch("[0-9a-f]{40}", r["commit"]) and 0 <= r["expected_format"] <= 65535, "unregistered compiler revision or format")
     for path in (HERE, Path(roles["P"]["sdk"]), Path(roles["C"]["sdk"]), out):
