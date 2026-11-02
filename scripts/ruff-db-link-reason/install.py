@@ -38,7 +38,10 @@ def download(endpoint, path, *, release=False):
         subprocess.run([*args,REPO+endpoint],stdout=f,check=True)
 
 def main(role):
-    if role not in ('22','23','253') or os.environ['GITHUB_REF']!='refs/heads/charlie/qa-ruff-db-link-cause-20261102':
+    ref = os.environ['GITHUB_REF']
+    source = ref == 'refs/heads/charlie/qa-ruff-db-link-cause-20261102'
+    line_end = role == '253' and ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102'
+    if role not in ('22','23','253') or not (source or line_end):
         raise ValueError('wrong experimental source or distribution')
     RECORDS.mkdir(parents=True)
     assert shutil.disk_usage(ROOT).free>16<<30
