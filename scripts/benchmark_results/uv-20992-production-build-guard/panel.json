@@ -1,0 +1,811 @@
+{
+  "advisory_retired_instruction_changes": {
+    "build_script_build": {
+      "candidate_over_parent": [
+        1.000475526104733,
+        0.999995322459231,
+        0.995172131488125,
+        1.0001062746827343,
+        1.0008350077620707,
+        1.0060558219740148,
+        0.9996939315420558,
+        1.001850048330813
+      ],
+      "hold_median_reductions": [
+        -5.079857098255758e-05,
+        -0.0013425280464418599
+      ],
+      "median_reduction": -0.0002909003937334731
+    },
+    "uv_cli": {
+      "candidate_over_parent": [
+        0.9390977445244184,
+        0.9390269154867951,
+        0.9389625126159629,
+        0.9390470311020517,
+        0.939023287499704,
+        0.939164481832371,
+        0.9380451194771654,
+        0.9397118257605518
+      ],
+      "hold_median_reductions": [
+        0.06096302670557663,
+        0.06090611533396251
+      ],
+      "median_reduction": 0.06096302670557663
+    },
+    "uv_python": {
+      "candidate_over_parent": [
+        0.9999873871301017,
+        1.0003445789539527,
+        1.0007842964793945,
+        1.0000653796539132,
+        0.9996595081133641,
+        0.999554995433878,
+        1.000803594884121,
+        1.0005061633762315
+      ],
+      "hold_median_reductions": [
+        -0.0002049793039329284,
+        -8.283574479772682e-05
+      ],
+      "median_reduction": -0.0002049793039329284
+    },
+    "whole": {
+      "candidate_over_parent": [
+        0.9470562103835822,
+        0.9472323975962438,
+        0.9473705661787399,
+        0.9468199338308256,
+        0.9473734456743476,
+        0.9478700778913116,
+        0.9476388760681552,
+        0.947350628819562
+      ],
+      "hold_median_reductions": [
+        0.052855696010086994,
+        0.05249383912874861
+      ],
+      "median_reduction": 0.052639402500848975
+    }
+  },
+  "hold_median_ratios": [
+    0.9775432387363772,
+    0.9888396827879453
+  ],
+  "measurement_boundaries": "Unwrapped blocking wait on Cargo. Whole-Cargo PMU and each rustc process's thread-group PMU come from separate restored-A visits. Each named counter is measured directly.",
+  "one_sided_sign": 0.00390625,
+  "primary_qualifies": true,
+  "raw_original": "bdba29b6c838c990db09061d970c9eafa72ac63cb8110a9964ea2c843b17fe72",
+  "rows": [
+    {
+      "candidate": {
+        "cargo_seconds": 1.69,
+        "clock_original": {
+          "stderr": "d80d57df1bc39372b2c23ca6a9a3904ed120431e72a4853ccf51f792c53ae873",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 1907,
+            "instructions": 79118437,
+            "pid": 78976,
+            "time_enabled_ns": 45016770
+          },
+          "uv_cli": {
+            "event_id": 2162,
+            "instructions": 25291448754,
+            "pid": 79251,
+            "time_enabled_ns": 3461020244
+          },
+          "uv_python": {
+            "event_id": 1974,
+            "instructions": 1783314700,
+            "pid": 79058,
+            "time_enabled_ns": 330551675
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1098984,
+          "ru_minflt": 297058,
+          "ru_nivcsw": 1034,
+          "ru_nvcsw": 7779,
+          "ru_oublock": 362632,
+          "ru_stime": 0.43579399999999996,
+          "ru_utime": 3.604881
+        },
+        "wall_ns": 1712216790,
+        "whole_observed_cpu_us": 4073744,
+        "whole_userspace_retired_instructions": 29659607539
+      },
+      "hold": 1,
+      "pair": 1,
+      "parent": {
+        "cargo_seconds": 1.75,
+        "clock_original": {
+          "stderr": "96cfda184613c6043d71ac124c8cfe7e1822d32cfaba0e4100b4dacb163b78b5",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 1427,
+            "instructions": 79080832,
+            "pid": 78426,
+            "time_enabled_ns": 40899311
+          },
+          "uv_cli": {
+            "event_id": 1685,
+            "instructions": 26931646787,
+            "pid": 78704,
+            "time_enabled_ns": 3801737904
+          },
+          "uv_python": {
+            "event_id": 1494,
+            "instructions": 1783337193,
+            "pid": 78508,
+            "time_enabled_ns": 333413566
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1065424,
+          "ru_minflt": 289225,
+          "ru_nivcsw": 1051,
+          "ru_nvcsw": 6133,
+          "ru_oublock": 384792,
+          "ru_stime": 0.425435,
+          "ru_utime": 3.975968
+        },
+        "wall_ns": 1775615216,
+        "whole_observed_cpu_us": 4296910,
+        "whole_userspace_retired_instructions": 31317684435
+      },
+      "positions": {
+        "1": "parent",
+        "2": "candidate"
+      },
+      "ratio": 0.9642949522910599
+    },
+    {
+      "candidate": {
+        "cargo_seconds": 1.7,
+        "clock_original": {
+          "stderr": "41e5163a305727219916dd4696124c1587ef598774668fb109f02dff0fc25e2b",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 3389,
+            "instructions": 79101025,
+            "pid": 81748,
+            "time_enabled_ns": 46884086
+          },
+          "uv_cli": {
+            "event_id": 3644,
+            "instructions": 25283900472,
+            "pid": 82023,
+            "time_enabled_ns": 3605865287
+          },
+          "uv_python": {
+            "event_id": 3456,
+            "instructions": 1784202914,
+            "pid": 81830,
+            "time_enabled_ns": 331891287
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1075460,
+          "ru_minflt": 292451,
+          "ru_nivcsw": 687,
+          "ru_nvcsw": 7141,
+          "ru_oublock": 362840,
+          "ru_stime": 0.387962,
+          "ru_utime": 3.6697379999999997
+        },
+        "wall_ns": 1725456686,
+        "whole_observed_cpu_us": 4087426,
+        "whole_userspace_retired_instructions": 29649020385
+      },
+      "hold": 1,
+      "pair": 2,
+      "parent": {
+        "cargo_seconds": 1.74,
+        "clock_original": {
+          "stderr": "efc66b6cfe1775143574e28cedfa8f7ef438a4f7292bbe5b00b37d7ede6e56f9",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 3866,
+            "instructions": 79101395,
+            "pid": 82297,
+            "time_enabled_ns": 39794440
+          },
+          "uv_cli": {
+            "event_id": 4124,
+            "instructions": 26925639782,
+            "pid": 82575,
+            "time_enabled_ns": 3696257070
+          },
+          "uv_python": {
+            "event_id": 3933,
+            "instructions": 1783588327,
+            "pid": 82379,
+            "time_enabled_ns": 328889379
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1078848,
+          "ru_minflt": 290585,
+          "ru_nivcsw": 860,
+          "ru_nvcsw": 5687,
+          "ru_oublock": 384784,
+          "ru_stime": 0.369332,
+          "ru_utime": 3.9547660000000002
+        },
+        "wall_ns": 1762376601,
+        "whole_observed_cpu_us": 4383084,
+        "whole_userspace_retired_instructions": 31300682346
+      },
+      "positions": {
+        "1": "candidate",
+        "2": "parent"
+      },
+      "ratio": 0.9790510637856568
+    },
+    {
+      "candidate": {
+        "cargo_seconds": 1.71,
+        "clock_original": {
+          "stderr": "8388149e8be911f60ca77f8c975485d7ae412b81bc57e27e9b2da57e5b739c29",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 5351,
+            "instructions": 78868921,
+            "pid": 85076,
+            "time_enabled_ns": 45965648
+          },
+          "uv_cli": {
+            "event_id": 5606,
+            "instructions": 25282745406,
+            "pid": 85351,
+            "time_enabled_ns": 3575080570
+          },
+          "uv_python": {
+            "event_id": 5418,
+            "instructions": 1784990959,
+            "pid": 85158,
+            "time_enabled_ns": 327069463
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1098140,
+          "ru_minflt": 296246,
+          "ru_nivcsw": 852,
+          "ru_nvcsw": 6742,
+          "ru_oublock": 362888,
+          "ru_stime": 0.48131999999999997,
+          "ru_utime": 3.55641
+        },
+        "wall_ns": 1729091679,
+        "whole_observed_cpu_us": 4164602,
+        "whole_userspace_retired_instructions": 29665122791
+      },
+      "hold": 1,
+      "pair": 3,
+      "parent": {
+        "cargo_seconds": 1.72,
+        "clock_original": {
+          "stderr": "fbf3600183786125169a9c4239803e957198a210063658eb2f973726a35ac5a4",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 5828,
+            "instructions": 79251537,
+            "pid": 85624,
+            "time_enabled_ns": 44688461
+          },
+          "uv_cli": {
+            "event_id": 6086,
+            "instructions": 26926256444,
+            "pid": 85902,
+            "time_enabled_ns": 3778964575
+          },
+          "uv_python": {
+            "event_id": 5895,
+            "instructions": 1783592094,
+            "pid": 85706,
+            "time_enabled_ns": 337373809
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1064872,
+          "ru_minflt": 287611,
+          "ru_nivcsw": 731,
+          "ru_nvcsw": 5754,
+          "ru_oublock": 384784,
+          "ru_stime": 0.437177,
+          "ru_utime": 3.831052
+        },
+        "wall_ns": 1738839718,
+        "whole_observed_cpu_us": 4330257,
+        "whole_userspace_retired_instructions": 31313114266
+      },
+      "positions": {
+        "1": "candidate",
+        "2": "parent"
+      },
+      "ratio": 0.9943939404540333
+    },
+    {
+      "candidate": {
+        "cargo_seconds": 1.7,
+        "clock_original": {
+          "stderr": "41e5163a305727219916dd4696124c1587ef598774668fb109f02dff0fc25e2b",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 7793,
+            "instructions": 79133557,
+            "pid": 88952,
+            "time_enabled_ns": 44188561
+          },
+          "uv_cli": {
+            "event_id": 8048,
+            "instructions": 25291878677,
+            "pid": 89227,
+            "time_enabled_ns": 3517201615
+          },
+          "uv_python": {
+            "event_id": 7860,
+            "instructions": 1782521196,
+            "pid": 89034,
+            "time_enabled_ns": 326997625
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1083404,
+          "ru_minflt": 293415,
+          "ru_nivcsw": 632,
+          "ru_nvcsw": 7063,
+          "ru_oublock": 362848,
+          "ru_stime": 0.425797,
+          "ru_utime": 3.716595
+        },
+        "wall_ns": 1726066990,
+        "whole_observed_cpu_us": 4060832,
+        "whole_userspace_retired_instructions": 29666733854
+      },
+      "hold": 1,
+      "pair": 4,
+      "parent": {
+        "cargo_seconds": 1.75,
+        "clock_original": {
+          "stderr": "96cfda184613c6043d71ac124c8cfe7e1822d32cfaba0e4100b4dacb163b78b5",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 7313,
+            "instructions": 79125148,
+            "pid": 88402,
+            "time_enabled_ns": 41881909
+          },
+          "uv_cli": {
+            "event_id": 7571,
+            "instructions": 26933559065,
+            "pid": 88680,
+            "time_enabled_ns": 3774477917
+          },
+          "uv_python": {
+            "event_id": 7380,
+            "instructions": 1782404663,
+            "pid": 88484,
+            "time_enabled_ns": 328313067
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1072000,
+          "ru_minflt": 290782,
+          "ru_nivcsw": 777,
+          "ru_nvcsw": 7415,
+          "ru_oublock": 384792,
+          "ru_stime": 0.38956599999999997,
+          "ru_utime": 4.033267
+        },
+        "wall_ns": 1768447093,
+        "whole_observed_cpu_us": 4451513,
+        "whole_userspace_retired_instructions": 31333026264
+      },
+      "positions": {
+        "1": "parent",
+        "2": "candidate"
+      },
+      "ratio": 0.9760354136870975
+    },
+    {
+      "candidate": {
+        "cargo_seconds": 1.71,
+        "clock_original": {
+          "stderr": "8388149e8be911f60ca77f8c975485d7ae412b81bc57e27e9b2da57e5b739c29",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 9275,
+            "instructions": 79146735,
+            "pid": 91725,
+            "time_enabled_ns": 41398836
+          },
+          "uv_cli": {
+            "event_id": 9530,
+            "instructions": 25279652799,
+            "pid": 92000,
+            "time_enabled_ns": 3475949976
+          },
+          "uv_python": {
+            "event_id": 9342,
+            "instructions": 1782657037,
+            "pid": 91807,
+            "time_enabled_ns": 337454869
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1086196,
+          "ru_minflt": 293965,
+          "ru_nivcsw": 843,
+          "ru_nvcsw": 6706,
+          "ru_oublock": 362856,
+          "ru_stime": 0.470746,
+          "ru_utime": 3.585716
+        },
+        "wall_ns": 1731264218,
+        "whole_observed_cpu_us": 4082104,
+        "whole_userspace_retired_instructions": 29674059498
+      },
+      "hold": 2,
+      "pair": 5,
+      "parent": {
+        "cargo_seconds": 1.75,
+        "clock_original": {
+          "stderr": "96cfda184613c6043d71ac124c8cfe7e1822d32cfaba0e4100b4dacb163b78b5",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 9752,
+            "instructions": 79080702,
+            "pid": 92272,
+            "time_enabled_ns": 42832961
+          },
+          "uv_cli": {
+            "event_id": 10010,
+            "instructions": 26921220310,
+            "pid": 92550,
+            "time_enabled_ns": 3864589055
+          },
+          "uv_python": {
+            "event_id": 9819,
+            "instructions": 1783264224,
+            "pid": 92354,
+            "time_enabled_ns": 341439270
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1080708,
+          "ru_minflt": 292642,
+          "ru_nivcsw": 732,
+          "ru_nvcsw": 5905,
+          "ru_oublock": 384584,
+          "ru_stime": 0.39272999999999997,
+          "ru_utime": 4.008224
+        },
+        "wall_ns": 1775427776,
+        "whole_observed_cpu_us": 4525695,
+        "whole_userspace_retired_instructions": 31322452232
+      },
+      "positions": {
+        "1": "candidate",
+        "2": "parent"
+      },
+      "ratio": 0.9751251171143106
+    },
+    {
+      "candidate": {
+        "cargo_seconds": 1.73,
+        "clock_original": {
+          "stderr": "10e8a1dd262e239a8e5f5fc06534c60fb9bd84e32d6c17c6cacef8134c415764",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 11717,
+            "instructions": 79247001,
+            "pid": 95599,
+            "time_enabled_ns": 44954823
+          },
+          "uv_cli": {
+            "event_id": 11972,
+            "instructions": 25279077451,
+            "pid": 95874,
+            "time_enabled_ns": 4418448460
+          },
+          "uv_python": {
+            "event_id": 11784,
+            "instructions": 1783205784,
+            "pid": 95681,
+            "time_enabled_ns": 335025539
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1096044,
+          "ru_minflt": 296541,
+          "ru_nivcsw": 776,
+          "ru_nvcsw": 8076,
+          "ru_oublock": 362856,
+          "ru_stime": 0.47599199999999997,
+          "ru_utime": 3.624459
+        },
+        "wall_ns": 1749028360,
+        "whole_observed_cpu_us": 4100936,
+        "whole_userspace_retired_instructions": 29682530291
+      },
+      "hold": 2,
+      "pair": 6,
+      "parent": {
+        "cargo_seconds": 1.73,
+        "clock_original": {
+          "stderr": "10e8a1dd262e239a8e5f5fc06534c60fb9bd84e32d6c17c6cacef8134c415764",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 11237,
+            "instructions": 78769984,
+            "pid": 95050,
+            "time_enabled_ns": 40277478
+          },
+          "uv_cli": {
+            "event_id": 11495,
+            "instructions": 26916560347,
+            "pid": 95328,
+            "time_enabled_ns": 3889070949
+          },
+          "uv_python": {
+            "event_id": 11304,
+            "instructions": 1783999672,
+            "pid": 95132,
+            "time_enabled_ns": 330288037
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1061516,
+          "ru_minflt": 287164,
+          "ru_nivcsw": 1266,
+          "ru_nvcsw": 6649,
+          "ru_oublock": 384768,
+          "ru_stime": 0.37762799999999996,
+          "ru_utime": 4.001162
+        },
+        "wall_ns": 1754484407,
+        "whole_observed_cpu_us": 4406944,
+        "whole_userspace_retired_instructions": 31314977636
+      },
+      "positions": {
+        "1": "parent",
+        "2": "candidate"
+      },
+      "ratio": 0.9968902277055119
+    },
+    {
+      "candidate": {
+        "cargo_seconds": 1.72,
+        "clock_original": {
+          "stderr": "fbf3600183786125169a9c4239803e957198a210063658eb2f973726a35ac5a4",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 13679,
+            "instructions": 79036546,
+            "pid": 98922,
+            "time_enabled_ns": 42188716
+          },
+          "uv_cli": {
+            "event_id": 13934,
+            "instructions": 25272712527,
+            "pid": 99197,
+            "time_enabled_ns": 3494312033
+          },
+          "uv_python": {
+            "event_id": 13746,
+            "instructions": 1783602523,
+            "pid": 99004,
+            "time_enabled_ns": 340470140
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1070372,
+          "ru_minflt": 289559,
+          "ru_nivcsw": 672,
+          "ru_nvcsw": 7071,
+          "ru_oublock": 362848,
+          "ru_stime": 0.415672,
+          "ru_utime": 3.720751
+        },
+        "wall_ns": 1741210651,
+        "whole_observed_cpu_us": 4097052,
+        "whole_userspace_retired_instructions": 29675052964
+      },
+      "hold": 2,
+      "pair": 7,
+      "parent": {
+        "cargo_seconds": 1.74,
+        "clock_original": {
+          "stderr": "efc66b6cfe1775143574e28cedfa8f7ef438a4f7292bbe5b00b37d7ede6e56f9",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 13199,
+            "instructions": 79060744,
+            "pid": 98373,
+            "time_enabled_ns": 41455990
+          },
+          "uv_cli": {
+            "event_id": 13457,
+            "instructions": 26941894374,
+            "pid": 98651,
+            "time_enabled_ns": 3704151939
+          },
+          "uv_python": {
+            "event_id": 13266,
+            "instructions": 1782170380,
+            "pid": 98455,
+            "time_enabled_ns": 335320931
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1073460,
+          "ru_minflt": 290628,
+          "ru_nivcsw": 768,
+          "ru_nvcsw": 5786,
+          "ru_oublock": 384768,
+          "ru_stime": 0.40616199999999997,
+          "ru_utime": 4.003823
+        },
+        "wall_ns": 1766414191,
+        "whole_observed_cpu_us": 4428097,
+        "whole_userspace_retired_instructions": 31314727280
+      },
+      "positions": {
+        "1": "parent",
+        "2": "candidate"
+      },
+      "ratio": 0.9857318062046752
+    },
+    {
+      "candidate": {
+        "cargo_seconds": 1.71,
+        "clock_original": {
+          "stderr": "8388149e8be911f60ca77f8c975485d7ae412b81bc57e27e9b2da57e5b739c29",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 15161,
+            "instructions": 79211777,
+            "pid": 101695,
+            "time_enabled_ns": 39257645
+          },
+          "uv_cli": {
+            "event_id": 15416,
+            "instructions": 25296464235,
+            "pid": 101970,
+            "time_enabled_ns": 3513174221
+          },
+          "uv_python": {
+            "event_id": 15228,
+            "instructions": 1784923823,
+            "pid": 101777,
+            "time_enabled_ns": 325378095
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1094284,
+          "ru_minflt": 295634,
+          "ru_nivcsw": 799,
+          "ru_nvcsw": 6714,
+          "ru_oublock": 362856,
+          "ru_stime": 0.429069,
+          "ru_utime": 3.587031
+        },
+        "wall_ns": 1728955971,
+        "whole_observed_cpu_us": 4188664,
+        "whole_userspace_retired_instructions": 29669698818
+      },
+      "hold": 2,
+      "pair": 8,
+      "parent": {
+        "cargo_seconds": 1.72,
+        "clock_original": {
+          "stderr": "fbf3600183786125169a9c4239803e957198a210063658eb2f973726a35ac5a4",
+          "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "rustc_thread_groups": {
+          "build_script_build": {
+            "event_id": 15638,
+            "instructions": 79065502,
+            "pid": 102243,
+            "time_enabled_ns": 40172049
+          },
+          "uv_cli": {
+            "event_id": 15896,
+            "instructions": 26919384796,
+            "pid": 102521,
+            "time_enabled_ns": 3886206028
+          },
+          "uv_python": {
+            "event_id": 15705,
+            "instructions": 1784020817,
+            "pid": 102325,
+            "time_enabled_ns": 330675065
+          }
+        },
+        "wait4": {
+          "ru_inblock": 0,
+          "ru_majflt": 0,
+          "ru_maxrss": 1075200,
+          "ru_minflt": 289988,
+          "ru_nivcsw": 1044,
+          "ru_nvcsw": 6096,
+          "ru_oublock": 384768,
+          "ru_stime": 0.41914999999999997,
+          "ru_utime": 3.865449
+        },
+        "wall_ns": 1742991305,
+        "whole_observed_cpu_us": 4448526,
+        "whole_userspace_retired_instructions": 31318603604
+      },
+      "positions": {
+        "1": "candidate",
+        "2": "parent"
+      },
+      "ratio": 0.9919475593712156
+    }
+  ],
+  "strictly_below_1p10": 8
+}
