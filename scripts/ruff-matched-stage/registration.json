@@ -27,22 +27,46 @@
       "c6b5bef8a0b36608968c568637529c68069d494f",
       "a3fc6da13921586bc374586dee00883e9210aecd"
     ],
-    "branch": "refs/heads/charlie/rc23-track-monomorphization-owner",
-    "bytes": 18085,
+    "branch": "refs/heads/charlie/rc23-recover-upstream-mono-buckets",
+    "bytes": 20603,
     "prerequisite": "28b64bc39032c1786908d98ea2df92f855226d0f",
-    "sha256": "358cfe6014aaf8f0e1cf17062dd9742a12e74f3ba9da61597216fa3da4f4bb7b"
+    "sha256": "ad8f5bd8fd3d91f0a115c78881a0fbd5347e4afa85b681bce5c9f00bf09d1758"
   },
   "changed_sources": {
     "compiler/rustc_codegen_ssa/src/back/symbol_export.rs": {
-      "C": "f479aca7190f7edb632f8891d09ccf626b23250f",
+      "C": "01c312eaffebd2a0a327d5644ddc7d3616849295",
       "P": "6af2626bab17fa20c1f0cf4bc7a98e886896f345"
     },
+    "compiler/rustc_incremental/src/persist/file_format.rs": {
+      "C": "f1cc605908e55162469ad0dfd0c0efb0b2c8c238",
+      "P": "f96e27d853eaf23289d72479b990780eda43eacc"
+    },
+    "compiler/rustc_middle/src/dep_graph/dep_node.rs": {
+      "C": "9cb8b625a6c8ca6775851f1d0bb5875536ec053c",
+      "P": "8b4564c2ed0260bc1a644ebc8c40f2ac1004cbf3"
+    },
+    "compiler/rustc_middle/src/dep_graph/dep_node_key.rs": {
+      "C": "49515352b6a70647a0e086e74008891567684467",
+      "P": "9d03057235279f2ae21cd363554fd82d2fded34e"
+    },
+    "compiler/rustc_middle/src/dep_graph/mod.rs": {
+      "C": "49567c61e0d340ae47cad3c2e91c2004998540a4",
+      "P": "60c4b55ec6d348a3489cc6b06e50a5638b360147"
+    },
+    "compiler/rustc_middle/src/mono.rs": {
+      "C": "8e74b07bc8bcf630f6805eded2875d9182b14f12",
+      "P": "6ab4725289c190fa8743ac0b69c544572df5af93"
+    },
     "compiler/rustc_middle/src/queries.rs": {
-      "C": "7b2f126794843b099bec8edd82626baa35c40f09",
+      "C": "bd94799143ac12d72291a53457e8d618e7701d86",
       "P": "b3dbd5b04f80a33909f190a5cef829d904523c37"
     },
+    "compiler/rustc_middle/src/query/keys.rs": {
+      "C": "4b261517443a0ca79204bb493e977d98dc88514d",
+      "P": "7e18b765fd54901860a14f2583a5a2800f8355c5"
+    },
     "compiler/rustc_middle/src/ty/instance.rs": {
-      "C": "fc55281a9327ba546628a59dca45549e8b66409c",
+      "C": "223ff96515c56401b621a8d39fa4f288631647c9",
       "P": "dcd0ee601aa9da5a91c35048bfdddb86e31199ea"
     }
   },
@@ -53,9 +77,9 @@
   },
   "roles": {
     "C": {
-      "compiler": "65f499969b96d09adaffa9a5fe8b6eaebaa774f0",
-      "revision": "dc0e99bfb6606cfbdca107c81c6a0e475b7cb40e",
-      "tree": "59ad0a1a51af51c1fb17ae6d6d471bb771967f02"
+      "compiler": "d0262da6fe48ab665147e0e12014d92574897bdc",
+      "revision": "259ad7069e47eaf08cf106f187b2b6393f7fd7c2",
+      "tree": "2583ceb1254796772d3ae9099ed07a8a53747d2b"
     },
     "P": {
       "compiler": "5f25f548bfc4983f74a29f0796093191b2220c1f",

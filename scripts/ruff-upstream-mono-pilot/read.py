@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import subprocess
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-import qualified
+import live_family
 
 def read(path):
     return json.loads(path.read_bytes())
@@ -17,7 +17,10 @@ def require(ok, why):
 
 def check(root, head):
     result = read(root / "pilot.json")
-    require(result["head"] == head and result["cross_role_native_qualified"] == {"A":True,"B":True} and result["native_family_sha256"] == qualified.SHA256, "wrong pilot provenance")
+    require(result["head"] == head, "wrong pilot provenance")
+    family = live_family.certify(root)
+    require(family == read(root / "native-family.json") and result["native_refs"] == {r: v["refs"] for r, v in family.items()},
+            "independent clean ELF proof differs")
     require(set(result["history"]) == {"0-P", "0-C", "1-C", "1-P"}, "missing ordered history")
     manifest = {a: read(root / ("clean-A-" + a) / "visit.json") for a in "PC"}
     output = {}
@@ -38,12 +41,13 @@ def check(root, head):
             native=json.loads(gzip.decompress((p/"native.json.gz").read_bytes()))
             require(len(rows)==375 and {"cli":native["cli"]["whole"],"reader":native["reader"]["whole"]}==entry["whole"], "native/inventory mismatch")
             revision = "B" if phase == "B" else "A"
-            require(entry["whole"]["cli"] == qualified.expected()[revision][role], "different complete qualified CLI")
+            require(entry["whole"]["cli"] == family[revision]["refs"][role], "different complete qualified CLI")
             want=56 if phase=="B" else 64
             require(native["typed"]==f"Expr={want} valid=1 rejected", "wrong observable Ruff revision")
             key = (entry["whole"],entry["roster"])
             if phase != "B":
                 require(key==(manifest[role]["whole"],manifest[role]["roster"]), "different source-specific reference")
+            require(entry["roster"] == family[revision]["roster"] and entry["whole"]["reader"] == family[revision]["reader"], "clean reference differs")
             states[phase]=key
             if phase in ("B","A","unchanged"):
                 raw=read(p/"clock.json")

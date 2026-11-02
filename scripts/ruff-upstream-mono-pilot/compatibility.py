@@ -11,11 +11,11 @@ from acquire import LOG, REG, ROOT, need
 arms = json.loads((LOG / "compiler-installations.json").read_bytes())["arms"]
 receipt, = [a for name, a in REG["factory_artifacts"].items() if name.endswith("-receipts")]
 need(receipt[2].startswith("sha256:"), "unregistered factory receipt")
-# This experiment deliberately exercises the two prototype compilers with equal format versions.
+# The receiver must decline the previous compiler’s incremental file format in both directions.
 subprocess.run([
     sys.executable, "-IB", HERE / "cross-version/cross_version.py",
     "--factory-receipts", ROOT / "factory-receipts.zip", "--expect-factory-sha256", receipt[2][7:],
     "--parent-sdk", arms["normal"]["root"], "--parent-commit", REG["compiler_parent"], "--parent-format", "26655",
-    "--child-sdk", arms["defer"]["root"], "--child-commit", REG["compiler_candidate"], "--child-format", "26655",
-    "--equal-header-diagnostic", "--work", ROOT / "compat-work", "--out", LOG / "compatibility",
+    "--child-sdk", arms["defer"]["root"], "--child-commit", REG["compiler_candidate"], "--child-format", "24450",
+    "--work", ROOT / "compat-work", "--out", LOG / "compatibility",
 ], check=True)

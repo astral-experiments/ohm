@@ -19,7 +19,8 @@ NATIVE = WS / "oracle/scripts/ohm-packed-ruff"
 sys.path.insert(0, str(NATIVE / "full-cli"))
 import native
 sys.path.insert(0, str(HERE))
-import qualified
+import live_family
+import graph_costs
 
 CASE, = REG["source"]
 CMD = ["cargo", "+ohm", "build", "-p", "ruff", "--bin", "ruff", "--locked", "--offline", "-j4", "--message-format=json"]
@@ -125,7 +126,15 @@ def current(owner, exclude=()):
     return new.pop()
 
 
-def pin_outputs(stack):
+def graph_files(session, commit):
+    costs = graph_costs.session_costs(session, commit)
+    paired = session / "ohm-build-dep-graph.bin"
+    if paired.is_file():
+        costs["paired_build_dep_graph"] = graph_costs.graph_costs(paired, commit)
+    return costs
+
+
+def pin_outputs(stack, commit):
     old = {}
     for owner in OWNERS:
         session = current(owner)
@@ -137,13 +146,13 @@ def pin_outputs(stack):
             files[path.name] = (raw, [identity.st_dev, identity.st_ino, identity.st_size], digest)
             raw.seek(0)
         need(len(files) > 20, ("no native CGU donors", owner))
-        old[owner] = session, files
+        old[owner] = session, files, graph_files(session, commit)
     return old
 
 
-def measure_outputs(old):
+def measure_outputs(old, commit):
     report = {}
-    for owner, (prior, files) in old.items():
+    for owner, (prior, files, prior_cost) in old.items():
         present = {p.parent for p in STATE.rglob("dep-graph.bin") if p.parent.parent.name.startswith(owner + "-")}
         session = current(owner, (prior,)) if present - {prior} else prior
         new = {p.name: p for p in session.glob("*.o")}
@@ -163,7 +172,8 @@ def measure_outputs(old):
                               before_sha256=digest, after_sha256=sha(path) if path else None)
             need(not rows[name]["same_inode"] or rows[name]["before_sha256"] == rows[name]["after_sha256"],
                  "same donor acquired different bytes")
-        report[owner] = dict(prior=str(prior), current=str(session), objects=rows)
+        report[owner] = dict(prior=str(prior), current=str(session), objects=rows,
+                             before_graphs=prior_cost, after_graphs=graph_files(session, commit))
     return report
 
 
@@ -206,15 +216,18 @@ def main():
     env0 = setup()
     references = {}
     history = {}
-    for role in "PC":
-        fresh()
-        switch("A")
-        env = m.set_arm(role, env0)
-        folder = LOG / ("clean-A-" + role)
-        desc, paths, row = cargo(env, folder, "A", False, cold=True)
-        references[role, "A"] = desc, row["roster"]
-        for kind, path in paths.items():
-            native.preserve(path, desc[kind], ROOT / "reference-bytes", LOG / "reference-bodies")
+    for rev in "AB":
+        for role in "PC":
+            fresh()
+            switch(rev)
+            env = m.set_arm(role, env0)
+            folder = LOG / f"clean-{rev}-{role}"
+            desc, paths, row = cargo(env, folder, rev, False, cold=True)
+            references[role, rev] = desc, row["roster"]
+            for kind, path in paths.items():
+                native.preserve(path, desc[kind], ROOT / "reference-bytes", LOG / "reference-bodies")
+    family = live_family.certify(LOG, ROOT / "reference-bytes")
+    json_save(LOG / "native-family.json", family)
     for block, order in enumerate(("PC", "CP")):
         for role in order:
             name = f"{block}-{role}"
@@ -224,18 +237,15 @@ def main():
             fresh()
             switch("B")
             desc, paths, cold = cargo(env, out / "B", "B", True, cold=True)
-            if (role, "B") not in references:
-                references[role, "B"] = desc, cold["roster"]
-                for kind, path in paths.items():
-                    native.preserve(path, desc[kind], ROOT / "reference-bytes", LOG / "reference-bodies")
             for kind, path in paths.items():
                 native.same_file(path, desc[kind], references[role, "B"][0][kind], ROOT / "reference-bytes", out / "B")
             need((desc, cold["roster"]) == references[role, "B"], "different clean B behavior")
             with ExitStack() as stack:
-                old = pin_outputs(stack)
+                commit = REG["compiler_parent" if role == "P" else "compiler_candidate"]
+                old = pin_outputs(stack, commit)
                 switch("A")
                 desc, paths, edit = cargo(env, out / "A", "A", True)
-                objects = measure_outputs(old)
+                objects = measure_outputs(old, commit)
                 json_save(out / "objects.json", objects)
             def exact(visit, observed, expected_roster):
                 data, files, row = observed
@@ -257,10 +267,8 @@ def main():
                                  steady=steady["count"], same={k: sum(rec["same_inode"] for rec in v["objects"].values())
                                                                for k, v in objects.items()})
             json_save(out / "summary.json", history[name])
-    approved = {rev: qualified.accepted(rev, references["P", rev], references["C", rev]) for rev in ("A", "B")}
     json_save(LOG / "pilot.json", dict(head=os.environ["REVIEWED_HEAD"], history=history,
-             native_family_sha256=qualified.SHA256, cross_role_native_qualified=approved))
-    need(all(approved.values()), "complete native outputs differ from the independently qualified reference family")
+                                      native_refs={rev: value["refs"] for rev, value in family.items()}))
 
 
 

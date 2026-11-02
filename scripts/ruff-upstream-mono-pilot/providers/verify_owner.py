@@ -340,14 +340,14 @@ def new_cache(work, env):
         p.mkdir()
 
 
-FACTORY_ZIP = "6feff128f07f69f7973dedf9688752f35cd0add0a71df30b8121f217cde25c6a"
+FACTORY_ZIP = "5d237e932f6a1e4e6a25eda991d07005ae182c73af241e4916a8e9a55b6e488b"
 FACTORY_COMMON = {
-    "rustcs.json": "2545fc16315fcf147b3d55df4b47bef2ca965104764b489fa8d10ab2e1432093",
-    "registration.json": "cb5e2e6129f15d3feccdccf9bdc75c5225f476629c61c42ad1c00ecb1b8a16ba",
+    "rustcs.json": "7a046a3009da7cd465d172ac096e723501cd514aae09a1e37ced435a0053d24b",
+    "registration.json": "c2a92eed2b5b7543c2b589411ce54a7f543afc3ba7f4af4836a920335cdf995c"
 }
 FACTORY_ROLES = {
     "a3fc6da13921586bc374586dee00883e9210aecd": ("P", "normal", "d40b2b774df8ca19bc96bc933ffac5bed38178bc3940de144f199efa1cb8f713"),
-    "dc0e99bfb6606cfbdca107c81c6a0e475b7cb40e": ("C", "defer", "0372611f588a80500258103e3573c6f49e37dc5ae70392ab43a334b4f3e648c5"),
+    "259ad7069e47eaf08cf106f187b2b6393f7fd7c2": ("C", "defer", "a3277d441942adc988583f6608b8000d3526f70a04b3f8b6aa3112f71a28d826"),
 }
 
 def factory_identity(receipts, commit, inputs, driver_name, driver_bytes, rustc_version):
