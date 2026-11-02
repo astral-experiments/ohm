@@ -16,7 +16,7 @@ import tempfile
 import zipfile
 
 HERE = Path(__file__).resolve().parent
-PACKET = 'a04934154b8cc8fccee2438468ed05fbf1c24376a0ca6f61f1c579d4c43aef3a'
+PACKET = '8bca19cebeeeb4cb460751e8f582d13bfd4ddf561482e49b18f4029b588111e6'
 ZIP = '53ede61bc14ac8e524813b6cac9d1cfbbcd595b5380fae363e681406aa7b404b'
 OLD_RLIB = '2e7b9912290964a811f1ab91935f7d4a6808bfc1be37d6791ff1e37788af1af8'
 OLD_CHECKOUT = '/home/dev-user/code/oss/ohm-rust-source-coordinate-codegen-20261102/compiler/rustc_codegen_llvm/src/back/source_placement/mod.rs'
@@ -53,6 +53,42 @@ def count(raw):
     return int(totals[0])
 
 
+def post_o1(raw, plan, fixed):
+    after = json.loads(raw['post-o1/native-verdicts.json'])
+    producer = json.loads(raw['post-o1/actual-producer.json'])
+    entries = [line.split() for line in raw['post-o1/SHA256SUMS'].decode().splitlines()]
+    digests = {name.lstrip('*'): digest for digest, name in entries}
+    require(sha(raw['post-o1/actual-producer.json']) == after['independent_postopt_source'], 'post-O1 producer changed')
+    require(sha(raw['post-o1/SHA256SUMS']) == after['actual_osp_manifest'] and len(digests) == len(entries) == 42, 'different post-O1 wire roster')
+    native = json.loads(raw['post-o1/native-build.json'])
+    require(sha(raw['post-o1/maps.rs']) == native['actual_rust']['maps.rs'] and native['binary'] == after['actor'], 'different post-O1 native implementation')
+    for name in ('dwarf.rs', 'mod.rs'):
+        require(sha(raw['product/' + name]) == native['actual_rust'][name], 'different post-O1 native source')
+    wires = {}
+    hits = set()
+    for unit, (old, warm, clean) in plan['inputs'].items():
+        observed = after['rows'][unit]
+        pair = []
+        for role in ('old', 'new'):
+            digest = digests[f'wires/{role}/{unit}.wire']
+            wire = raw['post-o1/osp/' + digest + '.wire']
+            require(sha(wire) == digest == observed['actual_' + role + '_osp'], 'different post-O1 wire')
+            require(wire[:4] == b'OSP\x01' and wire[4:36].hex() == producer['rows'][unit][role]['key'], 'different optimized module key')
+            pair.append(wire)
+        wires[unit] = pair
+        same = pair[0][4:36] == pair[1][4:36]
+        require(same == observed['key_equal'] == producer['rows'][unit]['equal'], 'different optimized admission')
+        events = observed['events']
+        require(events['old_identity']['out'] == old and events['new_identity']['out'] == warm == clean, 'different optimized identity control')
+        require(events['forward']['out'] == (clean if same else None) and events['reverse']['out'] == (old if same else None), 'different optimized physical output')
+        if same:
+            hits.add(unit)
+    require(len(hits) == 16 and after['mismatch'] is None, 'different optimized native scope')
+    live = json.loads(raw['post-o1/live-original-control.json'])
+    require(live['live_status'] and live['live'][2] != live['serialize_parse'][2] and live['live'][3] == live['serialize_parse'][3], 'live/reparsed control differs')
+    return wires, sum(fixed[k]['machine_emission'] for k in hits)
+
+
 def verify(raw):
     plan, logged, evidence, fixed, compiler, stems = [json.loads(raw[k]) for k in ('registered.json', 'reported.json', 'native-verdicts.json', 'original-phases.json', 'llvm-reader-costs.json', 'wire-descriptions.json')]
     reopened = json.loads(raw['reopened.json'])
@@ -65,6 +101,9 @@ def verify(raw):
         require(sha(raw['harness/' + n]) == h, 'counter actor source differs')
     for n, h in plan['product_sources'].items():
         require(sha(raw['product/' + n]) == h == evidence['compiler_files'][n], 'compiler helper source differs')
+    callbacks = json.loads(raw['c1-literal-callbacks.json'])
+    current_inputs = json.loads(raw['c1-bitcode-keys.json'])
+    require(sha(raw['c1-literal-callbacks.json']) == plan['full_product_ffi'] == evidence['actual_product_ffi'], 'C++ producer custody differs')
     wires = {}
     accepted = set()
     for k in roster:
@@ -72,10 +111,13 @@ def verify(raw):
         trial = []
         for role, envelope in [('old', 'previous_envelope'), ('new', 'current_envelope')]:
             info = stems[k][role]
-            wire = raw['wires/' + info['wire'] + '.bin']
-            require(sha(wire) == info['wire'] and len(wire) == info['bytes'] and wire.startswith(b'CGU-GLOBAL-LINES\x01'), 'wrong physical placement payload')
-            osp = b'OSP\x01' + bytes.fromhex(info['key']) + wire
-            require(sha(osp) == proof[envelope], 'wrong product OSP envelope')
+            produced = callbacks['wires'][k][role]
+            osp = raw['c1-osp/' + produced + '.wire']
+            require(sha(osp) == produced == proof[envelope], 'different literal C++ callback envelope')
+            require(osp[:4] == b'OSP\x01' and osp[36:].startswith(b'CGU-GLOBAL-LINES\x01'), 'wrong placement protocol')
+            module_key = current_inputs[k][role]['module_sha256']
+            require(osp[4:36].hex() == module_key and module_key != info['key'], 'confused raw module and contextual hashes')
+            require(sha(osp[36:]) == info['wire'] and len(osp) == 36 + info['bytes'], 'different typed C++ placements')
             trial.append(osp)
         wires[k] = tuple(trial)
         old, edited, clean = plan['inputs'][k]
@@ -119,7 +161,7 @@ def verify(raw):
     self_cost = sum(primary.values())
     key_cost = compiler['in_memory_policy_21_Ir']
     require(normal == compiler['all_21_fixed_parent_backend_Ir'] == plan['expected_baseline'] == 120906271208, 'wrong complete baseline')
-    require(saved == compiler['measured_baseline_work_in_15_hits_Ir'] == 83908903279 and self_cost == logged['aggregate'] == 342971484 and key_cost == 7842462241, 'component costs differ')
+    require(saved == compiler['measured_baseline_work_in_15_hits_Ir'] == 83908903279 and self_cost == logged['aggregate'] == 342971495 and key_cost == 7842462241, 'component costs differ')
     require(all(n == logged['groups'][c]['guest_ir'] for c, n in by_class.items()), 'classification cost differs')
     for n, result in json.loads(raw['width/receipt.json']).items():
         require(sha(raw[f'width/line-{n}.o']) == result['elf'], 'wrong signed width control')
@@ -127,10 +169,17 @@ def verify(raw):
     before = json.loads(raw['width/earlier.json'])['controls']
     require({k for k, row in before.items() if row['previous_emits_different']} == {'256-255', '65536-65535'}, 'prior width falsification differs')
     total = normal - saved + key_cost + self_cost
-    return plan, evidence, wires, dict(prior_backend_Ir=normal, covered_backend_Ir=saved, current_module_Ir=key_cost, native_rewrite_all_21_Ir=self_cost, modeled_backend_Ir=total, modeled_fixed_backend_ratio=normal / total, emitted=len(accepted), scoped_observations=len(observations), old_packet_bytes=sum(len(s[0]) for s in wires.values()), new_packet_bytes=sum(len(s[1]) for s in wires.values()))
+    earlier = json.loads(raw['older-context-counts.json'])
+    require(earlier['aggregate'] == 342971484, 'earlier contextual-digest count differs')
+    allocation = json.loads(raw['allocsize-native.json'])
+    stale = {kind for kind, directions in allocation['rows'].items() if all(x['stale'] and x['projected'] == x['previous_object'] and x['projected_value'] == x['old_value'] != x['clean_value'] for x in directions.values())}
+    require(stale == {'definition-and-call', 'definition-only'} and allocation['stale_directions'] == 4, 'observable stale executable control differs')
+    require(all(x['identical'] and x['clean_value'] == 2**64 - 1 for x in allocation['rows']['no-allocsize'].values()), 'allocation control differs')
+    after_wires, after_weight = post_o1(raw, plan, fixed)
+    return plan, evidence, wires, after_wires, dict(observed_stale_allocsize_directions=4, reparsed_post_O1_native_hits=16, reparsed_post_O1_gross_machine_Ir=after_weight, prior_backend_Ir=normal, covered_backend_Ir=saved, current_module_Ir=key_cost, native_rewrite_all_21_Ir=self_cost, unsafe_preopt_fixed_backend_model_Ir=total, unsafe_preopt_fixed_backend_ratio=normal / total, emitted=len(accepted), scoped_observations=len(observations), old_packet_bytes=sum(len(s[0]) for s in wires.values()), new_packet_bytes=sum(len(s[1]) for s in wires.values()))
 
 
-def extract(raw, dest):
+def extract(raw, dest, post_o1_version=False):
     if dest.exists():
         require(dest.is_dir() and not any(dest.iterdir()), 'requested harness directory is not empty')
     dest.mkdir(parents=True, exist_ok=True)
@@ -142,8 +191,9 @@ def extract(raw, dest):
         else:
             continue
         if k == 'harness/src/main.rs':
-            require(body.count(OLD_CHECKOUT.encode()) == 1, 'unexpected frozen actor path')
-            body = body.replace(OLD_CHECKOUT.encode(), b'source_placement/mod.rs')
+            require(body.count(b'source_placement/mod.rs') == 1, 'unexpected frozen actor source path')
+        if post_o1_version and k == 'product/maps.rs':
+            body = raw['post-o1/maps.rs']
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(body)
 
@@ -167,7 +217,9 @@ def execute(exe, buffers, expected, profile=None):
             stack.callback(os.close, fd)
             require(os.write(fd, data) == len(data), 'short write')
             os.lseek(fd, 0, os.SEEK_SET)
-            fcntl.fcntl(fd, fcntl.F_ADD_SEALS, fcntl.F_SEAL_SEAL | fcntl.F_SEAL_SHRINK | fcntl.F_SEAL_GROW | fcntl.F_SEAL_WRITE)
+            # Linux UAPI values for ADD/GET_SEALS, available even when the Python build omits their names.
+            fcntl.fcntl(fd, 1033, 15)
+            require(fcntl.fcntl(fd, 1034) & 15 == 15, 'input file descriptor is not sealed')
             fds.append(fd)
         if profile is None:
             cmd = [str(exe), 'rebase']
@@ -181,16 +233,20 @@ def execute(exe, buffers, expected, profile=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--extract-harness', type=Path, help='write a standalone Cargo QA crate into an empty directory')
+    parser.add_argument('--post-o1-harness', type=Path, help='export the exact post-O1 Rust source actor')
+    parser.add_argument('--post-o1-actor', type=Path, help='execute the second actor on all optimized-module records')
     parser.add_argument('--original', type=Path, help='full original GitHub artifact 13109144871 ZIP')
     parser.add_argument('--actor', type=Path, help='execute a built QA binary on the original members and signed width controls')
     parser.add_argument('--recount', action='store_true', help='repeat 26 counter regions on this machine with the supplied actor')
     options = parser.parse_args()
-    require(not options.actor or options.original, '--actor needs the original artifact')
+    require(not (options.actor or options.post_o1_actor) or options.original, '--actor needs the original artifact')
     require(not options.recount or options.actor, '--recount needs the actor and original artifact')
     raw = members()
-    plan, evidence, wires, result = verify(raw)
+    plan, evidence, wires, after_wires, result = verify(raw)
     if options.extract_harness:
         extract(raw, options.extract_harness)
+    if options.post_o1_harness:
+        extract(raw, options.post_o1_harness, post_o1_version=True)
     if options.original:
         old, warm, clean = originals(options.original, plan['ordinary_order'], evidence)
         for k, hashes in plan['inputs'].items():
@@ -205,6 +261,13 @@ def main():
         for a, b, compatible in [(254, 255, True), (255, 254, True), (256, 257, True), (257, 256, True), (255, 256, False), (256, 255, False), (65535, 65536, False), (65536, 65535, False)]:
             execute(exe, [raw[f'width/line-{a}.o'], raw[f'width/line-{a}.osp'], raw[f'width/line-{b}.osp']], raw[f'width/line-{b}.o'] if compatible else None)
         result['native_responses_reexecuted'] = 92
+    if options.post_o1_actor:
+        second = options.post_o1_actor.resolve(strict=True)
+        for k, (a, b) in after_wires.items():
+            hit = a[4:36] == b[4:36]
+            for source, left, right, wanted in [(old[k], a, a, old[k]), (warm[k], b, b, clean[k]), (old[k], a, b, clean[k] if hit else None), (warm[k], b, a, old[k] if hit else None)]:
+                execute(second, [source, left, right], wanted)
+        result['post_O1_native_responses_reexecuted'] = 84
     if options.recount:
         require(subprocess.check_output(['valgrind', '--version'], text=True).strip() == 'valgrind-3.22.0', 'use the declared counter version')
         order = [None, *plan['ordinary_order'], *plan['reverse_size_controls'], None]
