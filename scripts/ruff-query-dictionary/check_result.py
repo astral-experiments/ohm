@@ -24,7 +24,7 @@ def checksum(path):
         return hashlib.file_digest(f, "sha256").hexdigest()
 
 
-def check(frozen=None, previous=None, llvm_dis=None, cxxfilt=None):
+def check(frozen=None, previous=None, llvm_dis=None, cxxfilt=None, accepted_trace=None):
     saved = read(HERE / "results/names-v1.json.gz")
     q = read(HERE / "results/qualification-v1.json.gz")
     selection = json.loads((HERE / "keys.json").read_bytes())
@@ -45,6 +45,19 @@ def check(frozen=None, previous=None, llvm_dis=None, cxxfilt=None):
     count = collections.Counter(len({r["branch"] for r in n["rows"] if r["item"]}) for n in saved["context"])
     assert count == {0:110,2:1286}
     assert q["stable_occurrences"] == {"empty ordinary item":3, "erased lifetimes only":4, "concrete generic type or const":27, "drop glue":1}
+    trace = read(HERE / "results/admitted-v1.json.gz")
+    assert trace["counts"] == {"green":75,"already-red":13,"unforceable":36}
+    assert trace["registered_fds"] == 326 and trace["context_count"] == 1426
+    inherited = {(v["cgu"],r["kind"],r["key"],v["reason"],v["node"]["previous_value"],v["node"]["current_value"]) for r in primary for v in r["selection"]}
+    assert inherited == {(v["cgu"],v["kind"],v["key"],v["reason"],v["previous_value"],v["current_value"]) for v in trace["primary"]}
+    if accepted_trace:
+        import reopen_trace
+        assert checksum(accepted_trace) == trace["digest"] == reopen_trace.DIGEST
+        with zipfile.ZipFile(accepted_trace) as z:
+            for name, digest in trace["actual_member_sha256"].items():
+                assert hashlib.sha256(z.read(name)).hexdigest() == digest, name
+            actual_trace=reopen_trace.examine(z,saved)
+            assert actual_trace == {k:trace[k] for k in actual_trace}
     if frozen:
         actual = reopen.inspect(frozen)
         for k in ("states","primary","context","selection","selection_sha256","status"):
@@ -79,15 +92,17 @@ def check(frozen=None, previous=None, llvm_dis=None, cxxfilt=None):
                         assert re.sub(r'\[[a-f0-9]{4,16}\]',"",full) == v["concrete_declaration"]
     print("30/30 identities, 60/60 output fingerprints, 1,286 additional identities in both cold builds")
     print("35 ABI/symbol occurrences",q["stable_occurrences"])
+    print("Independent accepted trace",trace["accepted_run"],"matched all 49 original assignments")
 
 
 if __name__=="__main__":
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("artifact",nargs="?",type=Path,help="extracted complete diagnostic artifact")
     p.add_argument("--unprofiled-artifact",type=Path,help="complete first-A original ZIP from run 41362345812")
+    p.add_argument("--admitted-trace",type=Path,help="complete accepted high-FD trace ZIP from run 41417607187")
     p.add_argument("--llvm-dis",help="compatible CI LLVM 22 llvm-dis")
     p.add_argument("--cxxfilt",default="c++filt")
     args=p.parse_args()
     if args.llvm_dis and not args.unprofiled_artifact:
         p.error("--llvm-dis requires --unprofiled-artifact")
-    check(args.artifact,args.unprofiled_artifact,args.llvm_dis,args.cxxfilt)
+    check(args.artifact,args.unprofiled_artifact,args.llvm_dis,args.cxxfilt,args.admitted_trace)

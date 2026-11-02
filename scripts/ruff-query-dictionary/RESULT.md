@@ -1,6 +1,6 @@
 # Which Ruff dependency keys can rustc recover from an item?
 
-The two independent cold `ruff_workspace` compilers identified all 30 sampled stable keys. Each key has exactly one named row in each cold graph. All 60 output fingerprints match the corresponding row of the original graph at the same Ruff revision. The 49 original codegen-unit decisions were selected from a trace that missed 75 inherited file descriptors and failed admission. This result establishes the names and values in that provisional sample. [Signed dictionary run](https://github.com/astral-experiments/ohm/actions/runs/41418298879) · [Original selection run](https://github.com/astral-experiments/ohm/actions/runs/41414492188)
+The two independent cold `ruff_workspace` compilers identified all 30 sampled stable keys. Each key has exactly one named row in each cold graph. All 60 output fingerprints match the corresponding row of the original graph at the same Ruff revision. The 49 original codegen-unit decisions were selected from a trace that missed 75 inherited file descriptors and failed admission. A fresh worker later preserved all 326 original descriptors and reproduced every codegen-unit assignment, stable key, and prior and current output value. [Signed dictionary run](https://github.com/astral-experiments/ohm/actions/runs/41418298879) · [Original selection run](https://github.com/astral-experiments/ohm/actions/runs/41414492188) · [Admitted replication](https://github.com/astral-experiments/ohm/actions/runs/41417607187)
 
 ## ABI and symbol inputs
 
@@ -19,6 +19,10 @@ All 21 contain a foreign definition from the perspective of the `ruff_workspace`
 - All 16 symbol-name occurrences have concrete type or const substitutions. Five are `Iterator::eq` instantiated for two reversed path-component iterators and three are cloning `Vec<u8>`. Seven distinct `<&T as Debug>::fmt` inputs include `Range<usize>`, `IntErrorKind`, `&str`, `OsString`, `Path`, `()`, and Ruff’s `ImportSection`. Each is independently visible in the matching codegen unit’s mangled symbols. The remaining symbol formats a vector of strings.
 
 The other nine distinct identities are seven upstream-monomorphization definitions (12 occurrences), one layout, and one codegen unit. All seven upstream-monomorphization values changed between revisions. The layout is the `IntoIterator::IntoIter` associated type for a borrowed slice of Serde’s private `Content<'_>`. Its value stayed equal. All 30 sparse indices changed between the original revisions, so the join used the full dependency kind and 128-bit key. A reuse experiment would still have to validate the remaining ordered dependencies of each codegen unit.
+
+## Admitted replication
+
+An independent reader authenticated the entire 700,154,273-byte trace artifact, both original graphs, the work-products table, compiler arguments and inherited descriptor state. It reopened all 124 codegen-unit decisions and every original saved-object entry. Rustc marked 75 units green, found 36 unforceable inputs and recorded 13 units with an already-red input. All 49 terminal (codegen unit, reason, kind, stable key, prior value, current value) records matched the registered selection exactly, as did all 1,426 context pairs. The complete archive SHA-256 is `39f0cc2151dbfd7825e60097c77a9cc9a53d5b4393dce69a6e41ce00287b7ec8`. [Accepted original artifact](https://github.com/astral-experiments/ohm/actions/runs/41417607187/artifacts/13129072831)
 
 ## Controls and replay
 
@@ -39,5 +43,6 @@ To independently reopen the two complete original profiles, compare executable s
 ```sh
 python3 -IB scripts/ruff-query-dictionary/check_result.py /path/to/dictionary \
   --unprofiled-artifact /path/to/41362345812-13105414337.zip \
+  --admitted-trace /path/to/41417607187-13129072831.zip \
   --llvm-dis /path/to/llvm-22/bin/llvm-dis
 ```
