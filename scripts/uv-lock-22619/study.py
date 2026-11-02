@@ -109,12 +109,33 @@ def graph(target,argv,dest):
         f.seek(-13,2);need(f.read()==b"rust-end-file","truncated graph")
     write(dest/"graph.json",dict(packed(g,dest/"uv-lock.dep-graph.bin.gz",target),rmeta=str(rmeta.relative_to(target)),rmeta_sha256=sha(rmeta),stable_crate_id=int(sid),public_hash=pub.decode(),epoch=P["sdk_media"]["cache_epoch"]))
 
+def cargo_running_commands(stderr):
+    pending = []
+    for line in stderr.decode().splitlines():
+        begin = re.match(r"^[ \t]*Running `(.*)$", line)
+        if begin:
+            need(not pending, "unterminated Cargo command before next invocation")
+            pending.append(begin[1])
+        elif pending:
+            pending.append(line)
+        else:
+            continue
+        if not pending[-1].endswith("`"):
+            continue
+        try:
+            args = shlex.split("\n".join(pending)[:-1])
+        except ValueError:
+            # A quoted multiline package description can itself end a line with a backtick.
+            continue
+        need(bool(args), "empty Cargo command")
+        yield args
+        pending.clear()
+    need(not pending, "incomplete Cargo command")
+
 def running_rustcs(stderr,rustc):
     cmds=[]
-    for line in stderr.decode().splitlines():
-        m=re.match(r"^\s*Running `(.*)`$",line)
-        if not m:continue
-        vals=shlex.split(m.group(1));ids=[i for i,v in enumerate(vals) if v==str(rustc)]
+    for vals in cargo_running_commands(stderr):
+        ids=[i for i,v in enumerate(vals) if v==str(rustc)]
         if not ids:continue
         need(len(ids)==1,"ambiguous rustc");args=vals[ids[0]:]
         if "--crate-name" in args:cmds.append(args)
@@ -128,8 +149,39 @@ def parse_argv(stderr,rustc):
 def execution(receipt,original,flags):
     row=read(receipt);pid=row.get("pid");need(type(pid)is int and pid>0 and receipt.name==str(pid)+".json" and set(row)=={"pid","original","executed"} and row["original"]==original and row["executed"]==original+flags,"wrong selected real compiler invocation")
     return row
+def cargo_messages(data):
+    from urllib.parse import unquote, urlsplit
+
+    events = []
+    scripts = set()
+    printed = set()
+    rows = data.splitlines()
+    allowed = {"compiler-artifact", "compiler-message", "build-script-executed", "build-finished"}
+    for line in rows:
+        if line.startswith(b"{"):
+            event = json.loads(line)
+            need(isinstance(event, dict) and event.get("reason") in allowed, "unknown Cargo JSON record")
+            events.append(event)
+            if event["reason"] == "build-script-executed":
+                source, fragment = event["package_id"].rsplit("#", 1)
+                if "@" in fragment:
+                    name, version = fragment.rsplit("@", 1)
+                else:
+                    name = unquote(urlsplit(source).path).rstrip("/").rsplit("/", 1)[-1]
+                    version = fragment
+                scripts.add((name, version))
+        else:
+            match = re.fullmatch(rb"\[([A-Za-z0-9_-]+) ([0-9A-Za-z.+-]+)\](?: .*)?", line)
+            need(match is not None, "unexpected non-JSON Cargo stdout")
+            printed.add((match[1].decode(), match[2].decode()))
+    need(printed <= scripts, "verbose line has no matching Cargo build-script record")
+    need(bool(events) and rows[-1].startswith(b"{") and sum(e["reason"] == "build-finished" for e in events) == 1,
+         "missing or duplicate Cargo completion")
+    need(events[-1].get("success") is True and events[-1]["reason"] == "build-finished", "typed completion")
+    return events
+
 def observe(data,err,rustc,target,members):
-    events=[json.loads(x)for x in data.splitlines()];need(events[-1].get("success")is True and events[-1]["reason"]=="build-finished","typed completion")
+    events=cargo_messages(data)
     roster=[];wm={};direct=0;diags=[]
     for e in events:
         if e["reason"]=="compiler-message" and e["package_id"]in members:diags.append(e)
