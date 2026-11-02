@@ -147,7 +147,10 @@ def smoke(root, manifest, base):
         )
         lib.write_text("pub fn value()->u32 {17}\n")
         cargo_result(["check"], work, env)
-        graph_files = list((work / "build").rglob("ohm-check-dep-graph.bin"))
+        graph_files = [
+            path for directory in ("target", "build")
+            for path in (work / directory).rglob("ohm-check-dep-graph.bin")
+        ]
         need(graph_files, "ordinary check did not produce a cross-stage graph")
         graph_sizes = {}
         for i, f in enumerate(sorted(graph_files)):
