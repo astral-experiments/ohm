@@ -1,0 +1,73 @@
+{
+  "bootstrap_flags": [
+    "--ci",
+    "false",
+    "--set",
+    "build.submodules=false",
+    "--set",
+    "rust.omit-git-hash=true",
+    "--set",
+    "rust.debug-assertions=false",
+    "--set",
+    "rust.lto=off",
+    "--set",
+    "llvm.download-ci-llvm=true",
+    "--set",
+    "rust.download-rustc=false"
+  ],
+  "bundle": {
+    "branch": "refs/heads/charlie/llvm-defer-dev-live-intervals",
+    "bytes": 966,
+    "sha256": "cb524cab328b30c17ee20b5314e58cfe7836eac0d552127e1e02ffdb2d0931e4"
+  },
+  "changed_sources": {
+    "compiler/rustc_codegen_llvm/src/llvm_util.rs": {
+      "C": "f411e041cb5b8ae2134e31a85ce0a67965cf43b5",
+      "P": "82ddcca3e15305e8a49fae4a444c437a4b9acb68"
+    }
+  },
+  "kit": {
+    "commit": "9ac49614c2ff13df0489a22a51dd62aeaf72a995",
+    "prepare.sh": "de6653dc519f7bc22d8115b87fe8fc9a21bacac9843690f4651a7fc24afe54ec",
+    "runtime.py": "abc0a05c278f83688f2e0b4901d3760528aa3212cb14c04bf6a4a67ce931cb35"
+  },
+  "roles": {
+    "C": {
+      "compiler": "43ed11f0d8dc3801c7928c7f8892138b3fdd0d26",
+      "revision": "554704972388b58870ecd3a51c0c2f4eb88d2a58",
+      "tree": "cb31f67642f2123200353a2c19ac72dbe423b12c"
+    },
+    "P": {
+      "compiler": "992fea2dd7c2a88fca8a3b34bb6aa34fc925d1ac",
+      "revision": "28b64bc39032c1786908d98ea2df92f855226d0f",
+      "tree": "8bbc9c69e3672969514c0eb395f81d8f5230c715"
+    }
+  },
+  "schema": "ohm-remat-builder-registration-v1",
+  "signed_cargo": {
+    "asset": {
+      "id": 698533704,
+      "name": "ohm-1.99.0-22-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7",
+      "size": 359852703
+    },
+    "members": {
+      "bin/cargo": [
+        "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo",
+        493,
+        39041072,
+        "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871"
+      ],
+      "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": [
+        "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd",
+        493,
+        10319072,
+        "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+      ]
+    },
+    "revision": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
+    "tag": "ohm-1.99.0-22"
+  },
+  "source_epoch": 1793555546,
+  "target": "x86_64-unknown-linux-gnu"
+}
