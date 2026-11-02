@@ -1,0 +1,8 @@
+[workspace]
+resolver="2"
+members=["mono_api","mono_left","mono_right","mono_consumer"]
+
+[profile.dev]
+opt-level=1
+debug="line-tables-only"
+lto="off"

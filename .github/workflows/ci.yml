@@ -7,9 +7,15 @@ run-name: Ruff upstream monomorphization experiment ${{ inputs.reviewed_head }}
         description: Exact reviewed nonrelease QA commit
         required: true
         type: string
+      study:
+        description: Run the full Ruff pilot or the provider-selection controls
+        required: true
+        type: choice
+        default: ruff
+        options: [ruff, providers]
 permissions: {}
 concurrency:
-  group: ohm-upstream-mono-pilot-${{ github.sha }}
+  group: ohm-upstream-mono-pilot-${{ github.sha }}-${{ inputs.study }}
   cancel-in-progress: false
 jobs:
   ordinary:
@@ -34,6 +40,7 @@ jobs:
           scripts/ruff-matched-stage
         persist-credentials: false
     - name: Check out the calibrated inherited hardware reader
+      if: inputs.study == 'ruff'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         ref: 17981f5b807be81496282dd5a58e579e71586962
@@ -41,6 +48,7 @@ jobs:
         sparse-checkout: scripts/gnu-example-ceiling
         persist-credentials: false
     - name: Check out Ruff ast A
+      if: inputs.study == 'ruff'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         repository: astral-sh/ruff
@@ -48,6 +56,7 @@ jobs:
         path: ast-A
         persist-credentials: false
     - name: Check out Ruff ast B
+      if: inputs.study == 'ruff'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         repository: astral-sh/ruff
@@ -56,6 +65,7 @@ jobs:
         fetch-depth: 2
         persist-credentials: false
     - name: Check out the previously qualified complete native oracle
+      if: inputs.study == 'ruff'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         ref: bd7b58765ae44b21a1c9273b3ff0be8e923adc47
@@ -75,14 +85,19 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: python3 -IB qa/scripts/ruff-indexed-check-pmu/acquire.py
     - name: Require real native outputs and measure two opposite-order build pairs
+      if: inputs.study == 'ruff'
       run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/pilot.py
     - name: Verify the accepted build histories from raw receipts
+      if: inputs.study == 'ruff'
       run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/read.py "$RUNNER_TEMP/upstream-mono-study/logs" "$REVIEWED_HEAD"
+    - name: Check the selected provider and its actual linked symbols in both compilers
+      if: inputs.study == 'providers'
+      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/providers.py
     - name: Retain raw counters, Cargo inventories, typed verdicts and provenance
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ruff-upstream-mono-pilot
+        name: ruff-upstream-mono-${{ inputs.study }}
         path: ${{ runner.temp }}/upstream-mono-study/logs
         retention-days: 7
         if-no-files-found: warn

@@ -1,0 +1,13 @@
+[package]
+name="mono_consumer"
+version="0.1.0"
+edition="2021"
+
+[dependencies]
+mono_api={path="../mono_api"}
+mono_left={path="../mono_left"}
+mono_right={path="../mono_right"}
+
+[[bin]]
+name="mono_client"
+path="src/main.rs"

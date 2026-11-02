@@ -113,7 +113,10 @@ def main():
                 ):
                     shutil.copyfileobj(inp, output, 2**20)
                 need(sha(compressed) == expected.split()[0], "changed capsule archive")
-        zip_path.unlink()
+        if name.endswith("-receipts"):
+            zip_path.rename(ROOT / "factory-receipts.zip")
+        else:
+            zip_path.unlink()
     cap = ROOT / "capsule"
     (cap / "objects").mkdir(parents=True)
     seen = set()
