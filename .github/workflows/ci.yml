@@ -24,16 +24,6 @@ jobs:
         with:
           path: qa
           persist-credentials: false
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: astral-experiments/ohm-rust
-          ref: 531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5
-          path: rust-source
-          persist-credentials: false
-          sparse-checkout: |
-            src/build_helper
-            src/rustdoc-json-types
-            src/tools/run-make-support
       - name: Run the repository test with the physically authenticated toolkit
         run: python3 -IB qa/scripts/placed-object-run-make/worker.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

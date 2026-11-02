@@ -113,15 +113,24 @@ fn main() {
 
     rfs::write("lib.rs", moved.replace("17", "\"wrong\""));
     compile().run_fail().assert_stderr_contains("E0308");
-    rfs::write("lib.rs", moved.replace("17", "line!()"));
-    assert!(
-        !compile_and_observe_placement(),
-        "line!() changed the executable result"
-    );
+    let semantic = moved.replace("17", "line!()");
+    rfs::write("lib.rs", &semantic);
+    compile().run();
     let line_number = moved
         .lines()
         .position(|s| s.contains("wrapping_add(17)"))
         .unwrap() as u32
         + 1;
     run_caller(20 + line_number);
+
+    // Moving only the line!() call changes runtime behavior, unlike moving an ordinary expression.
+    rfs::write(
+        "lib.rs",
+        semantic.replace("    input.wrapping_add", "\n    input.wrapping_add"),
+    );
+    assert!(
+        !compile_and_observe_placement(),
+        "line!() made the source move observable"
+    );
+    run_caller(21 + line_number);
 }
