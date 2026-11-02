@@ -1,0 +1,50 @@
+{
+  "boot": {
+    "attempt": "1",
+    "blocking_clock": "5a452f00c776946601b40fb1fdcbc3ffd3686d623d0f37dce1b46c168ca3f1c3",
+    "boot": "d4ad8776-10c1-4fc1-a536-531abb953a1d",
+    "calibration": "9a178af73856f68788f5d73f43c29b48c5b48b61005151c0ae9960d9d1be47c9",
+    "coordinator": "226ff01f857cd86ecc72000299d5bf3fac338ecd",
+    "excluded": [
+      "105d4e65-c7e4-4912-b8be-39318a1ebd61",
+      "13895848-ed2e-435a-b313-9e006b9ff3e2",
+      "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
+      "506f4994-718c-4517-b6ed-eb970a5570d6",
+      "7bf853cc-35d6-49bd-ab54-994d55b3d111",
+      "8287559a-635a-47d0-bc39-859bb3efd4f2",
+      "8461ebca-9583-4d70-8eac-198744186904",
+      "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
+      "b48533ba-18c2-433d-a56e-5d7d03110bab",
+      "d5aa006d-e248-44bf-8635-a0f26186c053",
+      "db4d2941-1bd1-402f-8099-cc50036b6df3",
+      "e23076e2-fe81-4d25-a110-edecaa347f15",
+      "fc71919f-27b4-4483-ab95-9bcac5e7131b"
+    ],
+    "plan": "09ec3ea51019662303a4dac96e8c6fa64714d55207c78cac1dacb37052387748",
+    "run": "41421756085",
+    "thread_calibration": "46e71f4b24bc49923a2a57b2a1d6d6cc439e8657c4a00b3cc24e3859f957f79a"
+  },
+  "completed_ordinary_B": true,
+  "early": {
+    "artifact_id": 13129453930,
+    "entry_sha256": "01ac32df72d824b5246762f54593da80db3e7cc1c7ba50946692f1bce0ad6f21",
+    "sha256": "e63dd51c35d3672d416ba3716299cb77d85e7d0af8f14bdb5ea53b214a804b36",
+    "size": 735
+  },
+  "head": "226ff01f857cd86ecc72000299d5bf3fac338ecd",
+  "independent_cold_B": true,
+  "job": 125198701783,
+  "original": {
+    "artifact_id": 13130027952,
+    "name": "uv-21041-domain-production-eight-pair",
+    "sha256": "4b1776b9243e54fb048a2953dfc13dc81bafdb399524c34e119b40b23bcfebab",
+    "size": 17906325,
+    "zip_members": 867
+  },
+  "prior_full_plan": "1a4cd14fc2776f0e73625fe205f197e044b7b5f68dc6ff2cc64f9a763848dd8e",
+  "raw_argv": "2c6a09f122e5293f696ffb63d11e6469d88491bfd5a331897765c6a916e384fc",
+  "registration": "17d5169055d5c683eab646bc9cd0d15bb07d3ce79d61c844fd9387664490772e",
+  "rejection": "Traceback (most recent call last):\n  File \"/home/runner/work/ohm/ohm/coordinator/scripts/uv-callables-21041/screen.py\", line 131, in <module>\n    if __name__=='__main__':run()\n                            ^^^^^\n  File \"/home/runner/work/ohm/ohm/coordinator/scripts/uv-callables-21041/screen.py\", line 91, in run\n    c.guard(len(proof['commands'])==8 and m.digest(m.canon(sorted(proof['commands'])))==P['prior_actual_argv_sha256'],'different actual rustc argv before enrollment')\n                                                                                        ~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nKeyError: 'prior_actual_argv_sha256'\n",
+  "run": 41421756085,
+  "scored_pairs": 0
+}

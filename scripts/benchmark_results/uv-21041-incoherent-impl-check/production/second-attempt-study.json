@@ -1,0 +1,1341 @@
+{
+  "A": "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
+  "A_file": "e736f839051326a7a7121a51715a769ddf51d339d58827c9877cbe960c95156e",
+  "A_tree": "60dae645a3625ac747f2a93110a9c0aaa6175769",
+  "B": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
+  "B_file": "3d91d5195930020a6740f68341549629681eb8654048962cc618fe02e7130360",
+  "B_tree": "ce502617cfbf3fd59980e29731c10b5391d12139",
+  "branch": "charlie/codex-21041-domain-prod-open2",
+  "candidate_selection": {
+    "parent_service": {
+      "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
+      "producer": 41398925829,
+      "qa": {
+        "digest": "sha256:9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
+        "id": 13122138377,
+        "name": "callable-production-qa-attempt-1",
+        "size_in_bytes": 296464
+      },
+      "role_record_sha256": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
+      "sdk": {
+        "digest": "sha256:8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1",
+        "id": 13122178340,
+        "name": "callable-production-sdk",
+        "size_in_bytes": 359917871
+      },
+      "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+      "source_record_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
+    },
+    "relative_pack": "7dfc978d69b648546d46bbd5cadd53586ca173756e60c4963ccf22915fa68749",
+    "source_replay_sha256": "7adabe7ed9341a13a2bf2281d5d3b817816d6155c96b335847f31627a2b5d354",
+    "stage1_prerequisite_run": 41412729838,
+    "stage1_registration_sha256": "4ee4df862fa133649f49f07a92ed4ba6279f9b96a95f78751a35b68dc3da0df8",
+    "treatment": "69f19f63eb905f7103aca35ad1b4ea532260b7e25771766d05323b0095d6b3be"
+  },
+  "describe_A": "0.12.3-27-ga2a0242",
+  "describe_B": "0.12.3-28-g9049e07",
+  "edit_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
+  "edited_workspace_roster": [
+    "uv_cache",
+    "uv_client",
+    "uv_configuration",
+    "uv_distribution_types",
+    "uv_install_wheel",
+    "uv_metadata",
+    "uv_pypi_types",
+    "uv_torch"
+  ],
+  "file": "crates/uv-pypi-types/src/simple_json.rs",
+  "independent_holds": [
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1
+  ],
+  "local_selection": {
+    "qualified_stage1_process": "uv_metadata",
+    "receipt_sha256": "78fa58ed82d6c7f2d3beefdd42a28e6988819292e64670347a99c03f17da3ee5"
+  },
+  "lock_sha256": "84893face6e0c3f1641af8ce022475d859b99bb43c3ccfb540e2e9cee98095f9",
+  "measurement_plan_sha256": "1a4cd14fc2776f0e73625fe205f197e044b7b5f68dc6ff2cc64f9a763848dd8e",
+  "meter_files": {
+    "SHA256SUMS": "c6713c7ef2878aa70a927e845e41ec9f4d237091b6c7a6c45d4799de047fb0d1",
+    "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
+    "per_rustc.py": "92d46fc2443a1af027a01890c03d4450ad562a45b82608d815b281facec1d99e",
+    "pmu.c": "ac49b8795708a9054bb2fb258729734a6e8a9304b5cd92f138c97de45af034cc",
+    "preflight.py": "801b589108ddbcbd41d3cfd5757586ff85cb9223623b99cf86aa649f6245706f",
+    "workload.c": "ab9d81c8202657bfe9cf93add0e3607c18c6b75ebe337c922a36db286eec016a"
+  },
+  "mode_orders": [
+    [
+      "wall",
+      "scoped"
+    ],
+    [
+      "scoped",
+      "wall"
+    ],
+    [
+      "wall",
+      "scoped"
+    ],
+    [
+      "scoped",
+      "wall"
+    ],
+    [
+      "wall",
+      "scoped"
+    ],
+    [
+      "scoped",
+      "wall"
+    ],
+    [
+      "wall",
+      "scoped"
+    ],
+    [
+      "scoped",
+      "wall"
+    ]
+  ],
+  "native_cargo_artifacts": 486,
+  "native_complete_unit_sha256": "cc0c29b3aa3ddbd3ab296d68ad19d238f7a0e4367790bbfa8a9ffe17c7e5ccf7",
+  "native_workspace_units": {
+    "uv_auth@check": {
+      "crate": "uv_auth",
+      "features": [],
+      "folder": "crates/uv-auth",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_auth",
+        "src_path": "ws/crates/uv-auth/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_cache@check": {
+      "crate": "uv_cache",
+      "features": [],
+      "folder": "crates/uv-cache",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_cache",
+        "src_path": "ws/crates/uv-cache/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_cache_info@check": {
+      "crate": "uv_cache_info",
+      "features": [],
+      "folder": "crates/uv-cache-info",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_cache_info",
+        "src_path": "ws/crates/uv-cache-info/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_cache_key@check": {
+      "crate": "uv_cache_key",
+      "features": [],
+      "folder": "crates/uv-cache-key",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_cache_key",
+        "src_path": "ws/crates/uv-cache-key/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_client@check": {
+      "crate": "uv_client",
+      "features": [],
+      "folder": "crates/uv-client",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_client",
+        "src_path": "ws/crates/uv-client/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_configuration@check": {
+      "crate": "uv_configuration",
+      "features": [
+        "default"
+      ],
+      "folder": "crates/uv-configuration",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_configuration",
+        "src_path": "ws/crates/uv-configuration/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_dirs@check": {
+      "crate": "uv_dirs",
+      "features": [],
+      "folder": "crates/uv-dirs",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_dirs",
+        "src_path": "ws/crates/uv-dirs/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_distribution_filename@check": {
+      "crate": "uv_distribution_filename",
+      "features": [],
+      "folder": "crates/uv-distribution-filename",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_distribution_filename",
+        "src_path": "ws/crates/uv-distribution-filename/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_distribution_types@check": {
+      "crate": "uv_distribution_types",
+      "features": [],
+      "folder": "crates/uv-distribution-types",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_distribution_types",
+        "src_path": "ws/crates/uv-distribution-types/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_errors@check": {
+      "crate": "uv_errors",
+      "features": [],
+      "folder": "crates/uv-errors",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_errors",
+        "src_path": "ws/crates/uv-errors/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_fastid@check": {
+      "crate": "uv_fastid",
+      "features": [
+        "default",
+        "serde"
+      ],
+      "folder": "crates/uv-fastid",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_fastid",
+        "src_path": "ws/crates/uv-fastid/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_flags@check": {
+      "crate": "uv_flags",
+      "features": [
+        "default"
+      ],
+      "folder": "crates/uv-flags",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_flags",
+        "src_path": "ws/crates/uv-flags/src/lib.rs",
+        "test": false
+      }
+    },
+    "uv_fs@check": {
+      "crate": "uv_fs",
+      "features": [
+        "default",
+        "serde",
+        "tokio"
+      ],
+      "folder": "crates/uv-fs",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_fs",
+        "src_path": "ws/crates/uv-fs/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_git@check": {
+      "crate": "uv_git",
+      "features": [],
+      "folder": "crates/uv-git",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_git",
+        "src_path": "ws/crates/uv-git/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_git_types@check": {
+      "crate": "uv_git_types",
+      "features": [],
+      "folder": "crates/uv-git-types",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_git_types",
+        "src_path": "ws/crates/uv-git-types/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_install_wheel@check": {
+      "crate": "uv_install_wheel",
+      "features": [],
+      "folder": "crates/uv-install-wheel",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_install_wheel",
+        "src_path": "ws/crates/uv-install-wheel/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_keyring@check": {
+      "crate": "uv_keyring",
+      "features": [
+        "apple-native",
+        "default",
+        "secret-service",
+        "windows-native"
+      ],
+      "folder": "crates/uv-keyring",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": true,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_keyring",
+        "src_path": "ws/crates/uv-keyring/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_metadata@check": {
+      "crate": "uv_metadata",
+      "features": [],
+      "folder": "crates/uv-metadata",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_metadata",
+        "src_path": "ws/crates/uv-metadata/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_netrc@check": {
+      "crate": "uv_netrc",
+      "features": [],
+      "folder": "crates/uv-netrc",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_netrc",
+        "src_path": "ws/crates/uv-netrc/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_normalize@check": {
+      "crate": "uv_normalize",
+      "features": [],
+      "folder": "crates/uv-normalize",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_normalize",
+        "src_path": "ws/crates/uv-normalize/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_once_map@check": {
+      "crate": "uv_once_map",
+      "features": [],
+      "folder": "crates/uv-once-map",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_once_map",
+        "src_path": "ws/crates/uv-once-map/src/lib.rs",
+        "test": false
+      }
+    },
+    "uv_pep440@check": {
+      "crate": "uv_pep440",
+      "features": [
+        "rkyv",
+        "tracing",
+        "version-ranges"
+      ],
+      "folder": "crates/uv-pep440",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": true,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_pep440",
+        "src_path": "ws/crates/uv-pep440/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_pep508@check": {
+      "crate": "uv_pep508",
+      "features": [
+        "default",
+        "non-pep508-extensions",
+        "rkyv"
+      ],
+      "folder": "crates/uv-pep508",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": true,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_pep508",
+        "src_path": "ws/crates/uv-pep508/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_platform@check": {
+      "crate": "uv_platform",
+      "features": [],
+      "folder": "crates/uv-platform",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_platform",
+        "src_path": "ws/crates/uv-platform/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_platform_tags@check": {
+      "crate": "uv_platform_tags",
+      "features": [],
+      "folder": "crates/uv-platform-tags",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_platform_tags",
+        "src_path": "ws/crates/uv-platform-tags/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_preview@check": {
+      "crate": "uv_preview",
+      "features": [
+        "default"
+      ],
+      "folder": "crates/uv-preview",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_preview",
+        "src_path": "ws/crates/uv-preview/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_pypi_types@check": {
+      "crate": "uv_pypi_types",
+      "features": [],
+      "folder": "crates/uv-pypi-types",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_pypi_types",
+        "src_path": "ws/crates/uv-pypi-types/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_redacted@check": {
+      "crate": "uv_redacted",
+      "features": [],
+      "folder": "crates/uv-redacted",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": true,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_redacted",
+        "src_path": "ws/crates/uv-redacted/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_shell@check": {
+      "crate": "uv_shell",
+      "features": [],
+      "folder": "crates/uv-shell",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_shell",
+        "src_path": "ws/crates/uv-shell/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_small_str@check": {
+      "crate": "uv_small_str",
+      "features": [],
+      "folder": "crates/uv-small-str",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_small_str",
+        "src_path": "ws/crates/uv-small-str/src/lib.rs",
+        "test": false
+      }
+    },
+    "uv_state@check": {
+      "crate": "uv_state",
+      "features": [],
+      "folder": "crates/uv-state",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_state",
+        "src_path": "ws/crates/uv-state/src/lib.rs",
+        "test": false
+      }
+    },
+    "uv_static@check": {
+      "crate": "uv_static",
+      "features": [],
+      "folder": "crates/uv-static",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_static",
+        "src_path": "ws/crates/uv-static/src/lib.rs",
+        "test": false
+      }
+    },
+    "uv_torch@check": {
+      "crate": "uv_torch",
+      "features": [],
+      "folder": "crates/uv-torch",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_torch",
+        "src_path": "ws/crates/uv-torch/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_trampoline_builder@check": {
+      "crate": "uv_trampoline_builder",
+      "features": [
+        "default",
+        "production"
+      ],
+      "folder": "crates/uv-trampoline-builder",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_trampoline_builder",
+        "src_path": "ws/crates/uv-trampoline-builder/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_version@check": {
+      "crate": "uv_version",
+      "features": [],
+      "folder": "crates/uv-version",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_version",
+        "src_path": "ws/crates/uv-version/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_version@rlib": {
+      "crate": "uv_version",
+      "features": [],
+      "folder": "crates/uv-version",
+      "mode": "rlib",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_version",
+        "src_path": "ws/crates/uv-version/src/lib.rs",
+        "test": true
+      }
+    },
+    "uv_warnings@check": {
+      "crate": "uv_warnings",
+      "features": [],
+      "folder": "crates/uv-warnings",
+      "mode": "check",
+      "profile": {
+        "debug_assertions": true,
+        "debuginfo": "line-tables-only",
+        "opt_level": "0",
+        "overflow_checks": true,
+        "test": false
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2024",
+        "kind": [
+          "lib"
+        ],
+        "name": "uv_warnings",
+        "src_path": "ws/crates/uv-warnings/src/lib.rs",
+        "test": true
+      }
+    }
+  },
+  "orders": [
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ]
+  ],
+  "original_patch_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
+  "parent": "070b201d526382408acb684f7f6f778f567becb0",
+  "per_rustc_threshold": {
+    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
+    "effect": "candidate/control < 4/5",
+    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
+    "order_per_hold": "two per order",
+    "pairs": 8,
+    "scope": "actual uv_metadata library rustc only",
+    "two_independent_A_histories": true
+  },
+  "physical_primary": {
+    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
+    "effect": "candidate/control < 4/5",
+    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
+    "order_per_hold": "two per order",
+    "pairs": 8,
+    "scope": "actual uv_metadata library rustc only",
+    "two_independent_A_histories": true
+  },
+  "physical_scope": "Per-rustc userspace retired instructions on all eight kernel-verified rustc processes and their own threads; separately restored uninstrumented blocking whole Cargo wall",
+  "physical_secondary": {
+    "per_rustc": [
+      "uv_cache",
+      "uv_client",
+      "uv_configuration",
+      "uv_distribution_types",
+      "uv_install_wheel",
+      "uv_metadata",
+      "uv_pypi_types",
+      "uv_torch"
+    ],
+    "statistics": "descriptive with ratios/hold splits and full cohort, no other threshold promotion",
+    "sum": "all eight certified distinct rustc processes, same edit, raw instructions",
+    "wall": "separate restored ordinary Cargo visits, blocking wait and independent signal watchdog; pre and post real short-child calibration"
+  },
+  "plan_units": 530,
+  "producer_head": "5f7e5680285caa6b9a848db810b63ef58dfe0143",
+  "producer_run": 41414598941,
+  "reference_features": {
+    "uv_auth": [],
+    "uv_cache": [],
+    "uv_cache_info": [],
+    "uv_cache_key": [],
+    "uv_client": [],
+    "uv_configuration": [
+      "default"
+    ],
+    "uv_dirs": [],
+    "uv_distribution_filename": [],
+    "uv_distribution_types": [],
+    "uv_errors": [],
+    "uv_fastid": [
+      "default",
+      "serde"
+    ],
+    "uv_flags": [
+      "default"
+    ],
+    "uv_fs": [
+      "default",
+      "serde",
+      "tokio"
+    ],
+    "uv_git": [],
+    "uv_git_types": [],
+    "uv_install_wheel": [],
+    "uv_keyring": [
+      "apple-native",
+      "default",
+      "secret-service",
+      "windows-native"
+    ],
+    "uv_metadata": [],
+    "uv_netrc": [],
+    "uv_normalize": [],
+    "uv_once_map": [],
+    "uv_pep440": [
+      "rkyv",
+      "tracing",
+      "version-ranges"
+    ],
+    "uv_pep508": [
+      "default",
+      "non-pep508-extensions",
+      "rkyv"
+    ],
+    "uv_platform": [],
+    "uv_platform_tags": [],
+    "uv_preview": [
+      "default"
+    ],
+    "uv_pypi_types": [],
+    "uv_redacted": [],
+    "uv_shell": [],
+    "uv_small_str": [],
+    "uv_state": [],
+    "uv_static": [],
+    "uv_torch": [],
+    "uv_trampoline_builder": [
+      "default",
+      "production"
+    ],
+    "uv_version": [],
+    "uv_warnings": []
+  },
+  "registry_archives": 660,
+  "registry_uncompressed_sha256": "cb48aafbd06b0f81d56dc44f61476fc2fe2a609c2637e33b6569f8290ac64fc0",
+  "repo": "astral-experiments/ohm",
+  "roles": [
+    "callables_ctfe318",
+    "callables_ctfe318_incoherent_domain"
+  ],
+  "root_features": [],
+  "root_unit": "73295104ae181bf6a8a99b926325f476c7036c7d1edebd997fde08b2f3c7625e",
+  "score_commands": [
+    "check",
+    "-p",
+    "uv-client",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "sdk_lock_sha256": "5a7c86d42439a1aac1554c4206d7b1a317c123eec3502071a4e16c852d6758d7",
+  "source_case_sha256": "576103c648f8b31662b0ddf1d49632573023a9cbe699bb1811df57d4f2a6cfd2",
+  "source_mode": "real unstaged edit at A and genuine 0.12.3 ancestry; same absolute source/target for each restoration",
+  "structural_graph_sha256": "17277138e393245b99609f9da43bfcfdf091f2c57ea8bdf2217669cd6b1fe74f",
+  "study": "Eight matched production pairs on uv #21041 after the same real edit",
+  "tag": "0.12.3",
+  "tag_commit": "507230998c9541d67814b57463ac00e454ff6991",
+  "workspace_check_libraries": {
+    "uv_auth": "crates/uv-auth",
+    "uv_cache": "crates/uv-cache",
+    "uv_cache_info": "crates/uv-cache-info",
+    "uv_cache_key": "crates/uv-cache-key",
+    "uv_client": "crates/uv-client",
+    "uv_configuration": "crates/uv-configuration",
+    "uv_dirs": "crates/uv-dirs",
+    "uv_distribution_filename": "crates/uv-distribution-filename",
+    "uv_distribution_types": "crates/uv-distribution-types",
+    "uv_errors": "crates/uv-errors",
+    "uv_fastid": "crates/uv-fastid",
+    "uv_flags": "crates/uv-flags",
+    "uv_fs": "crates/uv-fs",
+    "uv_git": "crates/uv-git",
+    "uv_git_types": "crates/uv-git-types",
+    "uv_install_wheel": "crates/uv-install-wheel",
+    "uv_keyring": "crates/uv-keyring",
+    "uv_metadata": "crates/uv-metadata",
+    "uv_netrc": "crates/uv-netrc",
+    "uv_normalize": "crates/uv-normalize",
+    "uv_once_map": "crates/uv-once-map",
+    "uv_pep440": "crates/uv-pep440",
+    "uv_pep508": "crates/uv-pep508",
+    "uv_platform": "crates/uv-platform",
+    "uv_platform_tags": "crates/uv-platform-tags",
+    "uv_preview": "crates/uv-preview",
+    "uv_pypi_types": "crates/uv-pypi-types",
+    "uv_redacted": "crates/uv-redacted",
+    "uv_shell": "crates/uv-shell",
+    "uv_small_str": "crates/uv-small-str",
+    "uv_state": "crates/uv-state",
+    "uv_static": "crates/uv-static",
+    "uv_torch": "crates/uv-torch",
+    "uv_trampoline_builder": "crates/uv-trampoline-builder",
+    "uv_version": "crates/uv-version",
+    "uv_warnings": "crates/uv-warnings"
+  }
+}

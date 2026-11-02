@@ -1,0 +1,204 @@
+{
+  "boot_rule": "forbid all prior registered hosts; a newly authenticated overlapping host may only add a new exclusion before intake",
+  "build": {
+    "parent_service": {
+      "driver": "45e7dd531359ec0a8d455ddc0d277016b4ccb84bacf4d63d6112734d5dcc4d27",
+      "producer": 41398925829,
+      "qa": {
+        "digest": "sha256:9398c86152519cd4c7d9090b2670c7254c745c7ed11017d08875584961a17512",
+        "id": 13122138377,
+        "name": "callable-production-qa-attempt-1",
+        "size_in_bytes": 296464
+      },
+      "role_record_sha256": "8e3182e16d30ba6207415da9f3857849241fea0b5a13aa965ae76a3c879b56be",
+      "sdk": {
+        "digest": "sha256:8e531195ef30eab2c51e9cb2f57ec0a5624af43fdfe664a7bd74a0a283c3abb1",
+        "id": 13122178340,
+        "name": "callable-production-sdk",
+        "size_in_bytes": 359917871
+      },
+      "source": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+      "source_record_sha256": "e63c4063f2c855674444e11d9fc1018e032540e936a4b43c77c497c50c44540e"
+    },
+    "relative_pack": "7dfc978d69b648546d46bbd5cadd53586ca173756e60c4963ccf22915fa68749",
+    "source_replay_sha256": "7adabe7ed9341a13a2bf2281d5d3b817816d6155c96b335847f31627a2b5d354",
+    "stage1_prerequisite_run": 41412729838,
+    "stage1_registration_sha256": "4ee4df862fa133649f49f07a92ed4ba6279f9b96a95f78751a35b68dc3da0df8",
+    "treatment": "69f19f63eb905f7103aca35ad1b4ea532260b7e25771766d05323b0095d6b3be"
+  },
+  "case": {
+    "all_cargo_artifacts": 486,
+    "all_public_sidecars": 415,
+    "all_workspace_rmeta": 37,
+    "complete_native_argv_sha256": "2c6a09f122e5293f696ffb63d11e6469d88491bfd5a331897765c6a916e384fc",
+    "control": "ordinary seed A, edited B, independent cold B, full allocated semantic and rooted products, all 37 exact raw plus 415 sidecars within each seed, unchanged repeat no rustc, real parser linked, source checked after every visit",
+    "declared_unit_surface_sha256": "cc0c29b3aa3ddbd3ab296d68ad19d238f7a0e4367790bbfa8a9ffe17c7e5ccf7"
+  },
+  "command": [
+    "check",
+    "-p",
+    "uv-client",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "holds": [
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1
+  ],
+  "orders": [
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318",
+      "callables_ctfe318_incoherent_domain"
+    ],
+    [
+      "callables_ctfe318_incoherent_domain",
+      "callables_ctfe318"
+    ]
+  ],
+  "prespecified_physical": {
+    "intake": "exact real SDK production source+PGO+BOLT+ThinLTO, installed native tests and cache-epoch boundaries, shared signed Cargo and one distinct calibrated physical host",
+    "original": "one run, all original bytes kept even on refusal; no migration of timers from failed visits",
+    "per_role_per_trio": "independently restored PID-PMU capture then independently restored ordinary wall, with both fixture/compile controls; zero profiler, wrapper or logging in bare wall"
+  },
+  "primary": {
+    "decision": "all 8 valid, exact one-sided sign p <= .05 over strictly below 4/5 (ties count against), and both four-pair median candidate/control < 4/5",
+    "effect": "candidate/control < 4/5",
+    "event": "PERF_COUNT_HW_INSTRUCTIONS, userspace, actual exec PID and its threads, inherited-thread; exclude child processes",
+    "order_per_hold": "two per order",
+    "pairs": 8,
+    "scope": "actual uv_metadata library rustc only",
+    "two_independent_A_histories": true
+  },
+  "prior_boots": {
+    "41379994255": {
+      "boot": "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
+      "raw_sha256": "f3f19e05c29b16520b996d0b1557555522465fc99b213af4e789befb721c2ade"
+    },
+    "41385306015": {
+      "boot": "fc71919f-27b4-4483-ab95-9bcac5e7131b",
+      "raw_sha256": "c6abea2a2978d98c8ecd250e42cf1b6f7ce2b2e4bb41964a0ee1b5f1c4bca376"
+    },
+    "41393501771": {
+      "boot": "db4d2941-1bd1-402f-8099-cc50036b6df3",
+      "raw_sha256": "e0c2483d07ffb8f81a44209a016ee0187f07a78a85399d9fb7a5693b008d8842"
+    },
+    "41399090905": {
+      "boot": "8461ebca-9583-4d70-8eac-198744186904",
+      "raw_sha256": "f67f1edcb62f453d08caa7d8efa8996281277b4e17e13c112d87da825f00f92f"
+    },
+    "41403723884": {
+      "boot": "8287559a-635a-47d0-bc39-859bb3efd4f2",
+      "raw_sha256": "2fb75a9fc058b58a7dddc2ab3706432d3cc3410ddef8b5c4743c1b4895e96471"
+    },
+    "41404703005": {
+      "boot": "506f4994-718c-4517-b6ed-eb970a5570d6",
+      "raw_sha256": "fac3093afbdfa8d34eca74788cb9de2f8db7e3bae17b28ae32cac12dca523c7a"
+    },
+    "41406359806": {
+      "boot": "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
+      "raw_sha256": "725410f6d7202a0922756cfcad85e421c24e9b9ef23886f43aff111732ea22ab"
+    },
+    "41407544748": {
+      "artifact": 13124530356,
+      "boot": "13895848-ed2e-435a-b313-9e006b9ff3e2",
+      "raw_sha256": "5fa8a1a93165f1ca3f4e2fdf339be44368feb5d360b810d36c61b26a29abf769"
+    },
+    "41411015186": {
+      "artifact": 13125113101,
+      "boot": "105d4e65-c7e4-4912-b8be-39318a1ebd61",
+      "boot_record_sha256": "4a2b72ff1493d6f4525591b973c6483a50008e5f1f066b89eadd0695c69f1609",
+      "job": 125163844234,
+      "run": 41411015186,
+      "zip_sha256": "fd2fd1436baffae76492e472b67c9073607cf00af8767b48ad33a8c5e36834d7"
+    },
+    "41411252543": {
+      "artifact": 13125512762,
+      "boot": "7bf853cc-35d6-49bd-ab54-994d55b3d111",
+      "boot_record_sha256": "7d452270c6bee2b67b9aa8d45863ed4fceae292e0e7ea26164d8f94734ed8723",
+      "job": 125164580588,
+      "run": 41411252543,
+      "zip_sha256": "60f88028ed66d67fa439a5401cd5ae82b33a0f21664465134b9c1497d1b43faf"
+    },
+    "41412729838": {
+      "artifact": 13125969207,
+      "boot": "b48533ba-18c2-433d-a56e-5d7d03110bab",
+      "boot_record_sha256": "027b9c6dc740093b034571d78bf87145e01855beee4d796d1f9de1ab02974abb",
+      "job": 125169398989,
+      "run": 41412729838,
+      "zip_sha256": "ea3ebe0bd78c33bf8cf4ca39bac9bbd586d606b690b6a6f971d1339c035a4a19"
+    }
+  },
+  "released_reference": {
+    "id": 430629054,
+    "tag": "ohm-1.99.0-22"
+  },
+  "roles": [
+    "callables_ctfe318",
+    "callables_ctfe318_incoherent_domain"
+  ],
+  "schema": "ordinary uv-client production rustc instruction confirmation v1",
+  "secondary": {
+    "per_rustc": [
+      "uv_cache",
+      "uv_client",
+      "uv_configuration",
+      "uv_distribution_types",
+      "uv_install_wheel",
+      "uv_metadata",
+      "uv_pypi_types",
+      "uv_torch"
+    ],
+    "statistics": "descriptive with ratios/hold splits and full cohort, no other threshold promotion",
+    "sum": "all eight certified distinct rustc processes, same edit, raw instructions",
+    "wall": "separate restored ordinary Cargo visits, blocking wait and independent signal watchdog; pre and post real short-child calibration"
+  },
+  "signed_cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+  "source": {
+    "callables_ctfe318": {
+      "commit": "f53496e2dd363b1455fc7e0a9d2dedea1bf7650e",
+      "epoch": 43309,
+      "tree": "e82be4c1942342a6a5f1dad4ec7dedd3eeb5a0b4"
+    },
+    "callables_ctfe318_incoherent_domain": {
+      "commit": "77ce0545653df71f43e601c28dde01a5e4f02b09",
+      "epoch": 43317,
+      "tree": "66a77158e627f9fd637dd42eb84f228739d2bef2"
+    }
+  },
+  "uv_edit": [
+    "a2a02424dcba3c3f37cf6b8de5484497dd48651e",
+    "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
+    "crates/uv-pypi-types/src/simple_json.rs"
+  ]
+}

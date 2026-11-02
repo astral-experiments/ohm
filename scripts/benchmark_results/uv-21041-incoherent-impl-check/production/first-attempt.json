@@ -1,0 +1,56 @@
+{
+  "boot": {
+    "attempt": "1",
+    "blocking_clock": "842ee535e4af7ac13772f80ff289e3ab2f67764072a4a8936e73b6dba7481c3e",
+    "boot": "d5aa006d-e248-44bf-8635-a0f26186c053",
+    "calibration": "24dcb5fcdcde516b9e89271d3c9389d87a969b202b091881e087cf899f25c95e",
+    "coordinator": "070b201d526382408acb684f7f6f778f567becb0",
+    "excluded": [
+      "105d4e65-c7e4-4912-b8be-39318a1ebd61",
+      "13895848-ed2e-435a-b313-9e006b9ff3e2",
+      "2b8e013f-6ea8-4aa6-9ede-17b2f60a1e84",
+      "506f4994-718c-4517-b6ed-eb970a5570d6",
+      "7bf853cc-35d6-49bd-ab54-994d55b3d111",
+      "8287559a-635a-47d0-bc39-859bb3efd4f2",
+      "8461ebca-9583-4d70-8eac-198744186904",
+      "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
+      "b48533ba-18c2-433d-a56e-5d7d03110bab",
+      "db4d2941-1bd1-402f-8099-cc50036b6df3",
+      "e23076e2-fe81-4d25-a110-edecaa347f15",
+      "fc71919f-27b4-4483-ab95-9bcac5e7131b"
+    ],
+    "plan": "43d18a3ba106d28747e1c9f3f6c57225db33cec03abcab0cbe05bfabbb92bf03",
+    "run": "41420397868",
+    "thread_calibration": "65d5d08c6f86c246b8cb19fad4dfd0f02e92ae0445cfa7dea6322e07ff7adbfa"
+  },
+  "early": {
+    "artifact_id": 13130075925,
+    "entry_sha256": "24760437bcd0af8c6d9dbdd47b6fb103864cf2d74996d3968a775d428c0c9433",
+    "sha256": "24e612309cd512c85476df50d6a9ccf0516ec1ab24949d0fd85312f10bdbca8b",
+    "size": 716
+  },
+  "experiment_log_sha256": "f01e6a3ca5ddc5fd544eeab4c60113c7d12459638424578fb0b06b0e2b6a0a86",
+  "first_edit_completed": false,
+  "head": "070b201d526382408acb684f7f6f778f567becb0",
+  "job": 125194285297,
+  "original": {
+    "artifact_id": 13130191096,
+    "name": "uv-21041-domain-production-eight-pair",
+    "sha256": "17a0f34b437ec14f7dadc86e9c549b36c6f7b0f867a5d5a6e1cee3c895e73b3f",
+    "size": 13693654,
+    "zip_members": 796
+  },
+  "registration": "1e05085b9c64161f669fffd580787c63e15ad354e7c2b5d512fe0732fc785e93",
+  "rejection": "Traceback (most recent call last):\n  File \"/home/runner/work/ohm/ohm/coordinator/scripts/uv-callables-21041/screen.py\", line 132, in <module>\n    if __name__=='__main__':run()\n                            ^^^^^\n  File \"/home/runner/work/ohm/ohm/coordinator/scripts/uv-callables-21041/screen.py\", line 71, in run\n    domain_control.zero(q/'unchanged-kernel-A','A')\n    ^^^^^^^^^^^^^^\nUnboundLocalError: cannot access local variable 'domain_control' where it is not associated with a value\n",
+  "run": 41420397868,
+  "scored_pairs": 0,
+  "tree": "bee9eaac7f23b3ffd425d29b9776725c31190a8e",
+  "verified_before_stop": [
+    "signed Cargo and both measured SDKs",
+    "both native compiler suites",
+    "calibration",
+    "ordinary cold A",
+    "settled A",
+    "typed unchanged A"
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "actual_invocation": "screen.run()",
+  "cases": {
+    "dirty": {
+      "actual_caller_sha256": "2339a6ff16fbf50c04c633c2dbda1a2fab100280e65da614b9e6bda84a435a8b",
+      "actual_preceding_a_checks": [
+        "58cce4dc757788e070cbfed958825ae894a4f2b1f725350f0d96506815334700",
+        "58cce4dc757788e070cbfed958825ae894a4f2b1f725350f0d96506815334700"
+      ],
+      "actual_zero_function": "e9a2a79a52b5ad9a52c29741cda68bff366bcb7e04e93e7de7b9ec34ca8680bb",
+      "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+      "outcome": "dirty package correctly rejected",
+      "peer_names_resolved_as_global": true,
+      "rustc": "cf214fa73954e2f498f19c94afdcc3ba2c93f47dedab13db722c2d9133eeacf1",
+      "rustc_command": [
+        "/tmp/uv-workflow-search/sdk/bin/rustc",
+        "-Zohm-shared-stages",
+        "-Zpublic-api-hash",
+        "-Zthreads=8",
+        "-Zthreads=1",
+        "-Zohm-caller-local-cgus",
+        "-Zohm-stable-cgu-merging",
+        "-Zohm-incremental-mono-partitions",
+        "-Zremap-cwd-prefix=/ohm-workspace/v7",
+        "--crate-name",
+        "uv_client",
+        "--edition=2024",
+        "src/lib.rs",
+        "--error-format=json",
+        "--json=diagnostic-rendered-ansi,artifacts,future-incompat",
+        "--crate-type",
+        "lib",
+        "--emit=dep-info,metadata",
+        "-C",
+        "embed-bitcode=no",
+        "-C",
+        "debuginfo=line-tables-only",
+        "--check-cfg",
+        "cfg(docsrs,test)",
+        "--check-cfg",
+        "cfg(feature, values())",
+        "-C",
+        "metadata=3dcd6be60b76964f",
+        "-C",
+        "extra-filename=-2f09d12f757adbfb",
+        "--out-dir",
+        "/tmp/uv-workflow-search/target/debug/build/uv-client/2f09d12f757adbfb/out",
+        "-C",
+        "incremental=/tmp/uv-workflow-search/target/debug/incremental",
+        "-Zohm-early-metadata",
+        "-Clinker-features=-lld",
+        "-Clink-self-contained=-linker",
+        "-Clink-arg=-B/tmp/uv-workflow-search/sdk/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld",
+        "-Clink-arg=-fuse-ld=bfd",
+        "-Z",
+        "checksum-hash-algorithm=blake3",
+        "-Zohm-check-relink-inputs"
+      ]
+    },
+    "fixed": {
+      "actual_caller_sha256": "2339a6ff16fbf50c04c633c2dbda1a2fab100280e65da614b9e6bda84a435a8b",
+      "actual_preceding_a_checks": [
+        "58cce4dc757788e070cbfed958825ae894a4f2b1f725350f0d96506815334700",
+        "58cce4dc757788e070cbfed958825ae894a4f2b1f725350f0d96506815334700"
+      ],
+      "actual_zero_function": "e9a2a79a52b5ad9a52c29741cda68bff366bcb7e04e93e7de7b9ec34ca8680bb",
+      "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+      "outcome": "fixed caller ran real unchanged Cargo with zero compiler images",
+      "peer_names_resolved_as_global": true,
+      "rustc": "cf214fa73954e2f498f19c94afdcc3ba2c93f47dedab13db722c2d9133eeacf1"
+    },
+    "shadow": {
+      "actual_caller_sha256": "beca46ec3e72d3f7d68da8c2880924e66bf578a626dd2d472dcb0fe17af63164",
+      "actual_preceding_a_checks": [
+        "58cce4dc757788e070cbfed958825ae894a4f2b1f725350f0d96506815334700",
+        "58cce4dc757788e070cbfed958825ae894a4f2b1f725350f0d96506815334700"
+      ],
+      "actual_zero_function": "e9a2a79a52b5ad9a52c29741cda68bff366bcb7e04e93e7de7b9ec34ca8680bb",
+      "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+      "outcome": "original exact UnboundLocalError",
+      "peer_names_resolved_as_global": false,
+      "rustc": "cf214fa73954e2f498f19c94afdcc3ba2c93f47dedab13db722c2d9133eeacf1",
+      "source_line": 71
+    }
+  },
+  "combined_original": "17a0f34b437ec14f7dadc86e9c549b36c6f7b0f867a5d5a6e1cee3c895e73b3f",
+  "native_fixture_command": [
+    "/tmp/uv-workflow-search/sdk/bin/cargo",
+    "check",
+    "-p",
+    "uv-client",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "programs": {
+    "caller.py": "53f79c4727e858bf8bd71d186408e9bdc68d2f5e5ab6e20da558e5531e8e0953",
+    "test-caller.py": "514f0affd8abd40426c2544dbde7b35900e3c0254d693f42382c2ffe34f40fb2"
+  },
+  "small_native_crate": true
+}
