@@ -19,6 +19,8 @@ if sys.argv[1:2] == ["reopen"]:
     # Archived paths in the standalone reader come from the authenticated worker records.
     os.environ.setdefault("RUNNER_TEMP", tempfile.gettempdir())
 import green_inputs
+import green_probe
+import read_products
 import acquire_cgu as a
 import worker as w
 from acquire_cgu import c
@@ -31,6 +33,7 @@ HISTORIES = {
     "ordinary-observed": ("B", "A"),
     "diagnostic-empty": ("B", "A"),
     "diagnostic": ("B", "A", "unchanged", "invalid", "repair"),
+    "green-reasons": ("B", "A"),
 }
 TRACED = {"ordinary-observed": "observe", "diagnostic-empty": "capture", "diagnostic": "capture"}
 OWNERS = ("ruff_linter", "ruff_workspace")
@@ -63,9 +66,15 @@ def module(name, path):
 def ordinary_env(env):
     c.need(
         not any(k in env for k in (*FORBIDDEN, REQUEST))
-        and not any("TRUST" in k or "BRANCH_CACHE" in k for k in env),
+        and not any("TRUST" in k or "BRANCH_CACHE" in k or k.startswith("OHM_CGUR_") or k=="VALGRIND_LIB" for k in env),
         "unexpected compiler, trust or credential environment",
     )
+
+
+def trace_mode(lane, phase):
+    if lane == "green-reasons":
+        return "cgured" if phase == "A" else "observe"
+    return TRACED.get(lane)
 
 
 def is_empty(lane, phase):
@@ -91,7 +100,7 @@ def visit(lane, phase, refs, tools, topo, capture, store, physical):
     stage = where / "stage"
     original, env = w.invoke, w.ENV
     ordinary_env(env)
-    mode = TRACED.get(lane)
+    mode = trace_mode(lane, phase)
     called = False
 
     def run_cargo(folder, cmd, want, sampler=None):
@@ -107,10 +116,11 @@ def visit(lane, phase, refs, tools, topo, capture, store, physical):
         cmd = list(cmd)
         if mode:
             stage.mkdir(mode=0o700)
-            cmd = [capture, stage, w.b.SDK / "bin/rustc", mode, *cmd]
+            tracer = w.ROOT/"green-kit/capture" if mode == "cgured" else capture
+            cmd = [tracer, stage, w.b.SDK / "bin/rustc", mode, *cmd]
         c.save(where / "cargo-environment.json", w.ENV)
         physical.assert_empty(w.WORK)
-        green_lane = lane in ("ordinary-observed", "diagnostic") and phase in ("A","B")
+        green_lane = lane in ("ordinary-observed", "diagnostic", "green-reasons") and phase in ("A","B")
         if green_lane and phase == "A":
             green_inputs.capture(where,where.parent/"B/stage/ruff_workspace/original.nul",
                                  w.WORK,w.OUT/"green-originals","before")
@@ -128,6 +138,8 @@ def visit(lane, phase, refs, tools, topo, capture, store, physical):
     w.invoke = run_cargo
     if mode:
         w.ENV = {**env, REQUEST: FLAG}
+        if mode == "cgured":
+            w.ENV.update(green_probe.environment(w.ROOT, stage, w.WORK, w.b.SDK/"bin/rustc"))
     try:
         w.run_visit(lane, phase, refs, tools, topo, None)
         c.need(called, "missing actual Cargo invocation")
@@ -226,8 +238,12 @@ def worker(collector, contract):
     store = w.OUT / "cgu-originals"
     store.mkdir()
     physical = module("physical", HERE / "physical.py")
+    c.save(w.OUT/"green-probe-build.json", green_probe.build(w.ROOT, w.b.SDK, w.ENV))
     histories(tools, topo, capture, store, physical)
-    c.save(w.OUT / "green-inputs-verified.json",green_inputs.verify(w.OUT))
+    c.save(w.OUT/"green-probe-trace.json", green_probe.records(w.OUT/"green-reasons/A/stage/ruff_workspace"))
+    c.save(w.OUT/"green-probe-reasons.json",green_probe.classify(w.OUT, w.b.SDK))
+    c.save(w.OUT / "green-inputs-verified.json",green_inputs.verify(w.OUT, ("ordinary-observed", "diagnostic", "green-reasons")))
+    c.save(w.OUT / "green-work-products.json", read_products.read_history(w.OUT, ("ordinary-observed", "diagnostic", "green-reasons")))
     after = w.acquire.verify_sdk(w.b.SDK)
     c.save(w.OUT / "sdk-after.json", after)
     c.need(after == c.read(w.OUT / "sdk.json"), "signed SDK changed")
@@ -395,7 +411,7 @@ def visit_evidence(z, old, root, work, selectors):
             prefix = f"{lane}/{phase}"
             branch = "B" if phase == "B" else "A"
             bad = phase == "invalid"
-            mode = TRACED.get(lane)
+            mode = trace_mode(lane, phase)
             clock = (lane, phase) == ("plain-1", "A")
 
             def record(n, visit_prefix=prefix):
@@ -404,7 +420,7 @@ def visit_evidence(z, old, root, work, selectors):
             cmd = list(c.CMD)
             if mode:
                 cmd = [
-                    str(root / "cgu-capture"),
+                    str(root / ("green-kit/capture" if mode=="cgured" else "cgu-capture")),
                     str(root / "logs" / prefix / "stage"),
                     selectors["rustc"][2],
                     mode,
@@ -419,7 +435,8 @@ def visit_evidence(z, old, root, work, selectors):
                 "unregistered Cargo invocation",
             )
             c.need(
-                record("cargo-environment.json") == (parent_env | ({REQUEST: FLAG} if mode else {})),
+                record("cargo-environment.json") == (parent_env | ({REQUEST: FLAG} if mode else {}) |
+                    (green_probe.environment(root, root/"logs"/prefix/"stage",work,selectors["rustc"][2]) if mode=="cgured" else {})),
                 "different actual Cargo environment",
             )
             before = record("source-before.json")
@@ -529,10 +546,11 @@ def visit_evidence(z, old, root, work, selectors):
                 c.need(visit["whole"] == count, "incorrect ordinary PMU total")
                 summaries[prefix]["whole_instructions"] = count
     c.need(
-        dirties["plain-1"] == dirties["ordinary-observed"] == dirties["diagnostic"],
+        dirties["plain-1"] == dirties["ordinary-observed"] == dirties["diagnostic"] == dirties["green-reasons"],
         "first-A Cargo dirty identities differ",
     )
     same_vectors(vectors["ordinary-observed"], vectors["diagnostic"])
+    same_vectors(vectors["ordinary-observed"], vectors["green-reasons"])
     return {
         "visits": summaries,
         "first_A_kernel_argv": sorted(
@@ -589,12 +607,27 @@ def reopen(out, collector, contract, reviewed_head):
     original = visit_evidence(z, old, root, work, selectors)
     module("physical", HERE / "physical.py")
     physical = module("cgu_packet_reader", HERE / "reader.py").verify(out)
+    owner=out/"green-reasons/A/stage/ruff_workspace"
+    probe=green_probe.records(owner)
+    c.need(probe==old.record(z,"green-probe-trace.json"), "changed original execution receipt")
+    causes=green_probe.classify(out, Path(selectors["rustc"][2]).parents[1])
+    c.need(causes==old.record(z,"green-probe-reasons.json"), "changed serialized graph explanation")
+    emitted=set(old.record(z,"diagnostic/A/cgus.json")["ruff_workspace"]["emitted"])
+    rejected={d["cgu"] for d in causes["decisions"] if d["actual_cgu_reuse"]=="No"}
+    c.need(rejected==emitted, ("actual reuse decisions and actual saved LLVM inputs differ", sorted(rejected ^ emitted)))
+    cohort=physical["comparisons"]["ruff_workspace"]["confirmed_against_both_empty_histories"]
+    c.need(set(cohort)<=rejected, "an independently identical CGU had no actual compiler decision")
+    cause_counts=Counter(d["reason"] for d in causes["decisions"] if d["cgu"] in cohort)
+
     return {
         "run": en["run"],
         "head": en["head"],
         "job": en["job"],
         "boot": en["boot"],
         "physical": physical,
+        "signed_workspace_decisions": probe,
+        "rejected":len(rejected),
+        "independently_identical_causes":dict(cause_counts),
         **original,
     }
 

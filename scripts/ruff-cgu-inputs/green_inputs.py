@@ -124,13 +124,13 @@ def capture(where, original, work, store, moment):
     )
 
 
-def verify(out):
+def verify(out, lanes=("ordinary-observed", "diagnostic")):
     import gzip
     from collections import Counter
 
     packets = {}
     objects = {}
-    for lane in ("ordinary-observed", "diagnostic"):
+    for lane in lanes:
         packets[lane] = {}
         for phase, moment in (("B", "after"), ("A", "before"), ("A", "after")):
             row = json.loads(

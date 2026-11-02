@@ -88,6 +88,7 @@ def verify_physical(root):
         ("reference", ("B", "A")),
         ("plain-1", ("B", "A")),
         ("ordinary-observed", ("B", "A")),
+        ("green-reasons", ("B", "A")),
         ("diagnostic-empty", ("B", "A")),
         ("diagnostic", ("B", "A", "unchanged", "invalid", "repair")),
     ]:
@@ -199,7 +200,7 @@ def verify_physical(root):
                 elif not lane.startswith("diagnostic"):
                     call = row["call"]
                     need(
-                        not bc and ((call is not None) == (lane == "ordinary-observed")),
+                        not bc and ((call is not None) == (lane in ("ordinary-observed","green-reasons"))),
                         "unexpected ordinary compiler observation",
                     )
                     if call:
@@ -249,19 +250,22 @@ def verify_physical(root):
             and before["bc"][k] == cold_b["bc"][k] == cold_a["bc"].get(k)
             and all(
                 visits[lane, state, owner]["obj"].get(k) == before["obj"][k]
-                for lane in ("reference", "plain-1", "ordinary-observed", "diagnostic-empty")
+                for lane in ("reference", "plain-1", "ordinary-observed", "diagnostic-empty", "green-reasons")
                 for state in ("B", "A")
             )
         ]
         history_parity = {}
         for reference, observed in [
             ("plain-1", "ordinary-observed"),
+            ("ordinary-observed", "green-reasons"),
             ("ordinary-observed", "diagnostic"),
             ("reference", "diagnostic-empty"),
         ]:
             for state in ("B", "A"):
                 left = visits[reference, state, owner]["obj"]
                 right = visits[observed, state, owner]["obj"]
+                if observed == "green-reasons":
+                    need(left == right, ("probe changed native objects", owner, state))
                 history_parity[f"{reference}/{observed}/{state}"] = {
                     "reference": len(left),
                     "observed": len(right),

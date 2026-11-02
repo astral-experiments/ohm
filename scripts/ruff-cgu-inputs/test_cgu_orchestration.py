@@ -132,7 +132,7 @@ class Orchestration(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "multisets"):
             run.same_vectors(ordinary, missing)
 
-    def test_thirteen_visits_and_independent_empties(self):
+    def test_fifteen_visits_and_independent_empties(self):
         seen = []
         empty = []
 
@@ -146,7 +146,7 @@ class Orchestration(unittest.TestCase):
             patch.object(run.w.b, "fresh_outputs", side_effect=lambda: empty.append(len(seen))),
         ):
             run.histories(None, None, None, None, None)
-        self.assertEqual(len(seen), 13)
+        self.assertEqual(len(seen), 15)
         self.assertEqual(
             [seen[i] for i in empty],
             [
@@ -157,6 +157,7 @@ class Orchestration(unittest.TestCase):
                 ("diagnostic-empty", "B"),
                 ("diagnostic-empty", "A"),
                 ("diagnostic", "B"),
+                ("green-reasons", "B"),
             ],
         )
 
@@ -250,7 +251,7 @@ class Orchestration(unittest.TestCase):
         self.assertIn(run.a.BRANCH, t)
         self.assertEqual(t.count("persist-credentials: false"), 3)
         self.assertEqual(t.count("${{ github.token }}"), 1)
-        self.assertIn("timeout-minutes: 75", t)
+        self.assertIn("timeout-minutes: 120", t)
         self.assertNotIn("GH_TOKEN", t[t.index("      - name: Run the ordinary") :])
         self.assertNotIn("write", t)
         for key in (*run.FORBIDDEN, run.REQUEST, "CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST"):

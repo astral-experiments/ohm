@@ -19,7 +19,7 @@ jobs:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-cgu-green-reasons-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     name: Signed GNU Ruff workspace dependency and work-product inputs
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 75
+    timeout-minutes: 120
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
@@ -64,14 +64,16 @@ jobs:
           test -z "$(git -C enrolled status --porcelain=v1 --untracked-files=all)"
           python3 -IB enrolled/scripts/ruff-cgu-inputs/acquire_cgu.py --sources
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential git libssl-dev zstd
-          dpkg-query -W b3sum binutils build-essential git libssl-dev zstd > "$base/logs/packages.tsv"
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential git libssl-dev valgrind zstd
+          dpkg-query -W b3sum binutils build-essential git libssl-dev valgrind zstd > "$base/logs/packages.tsv"
           python3 -IB enrolled/scripts/ruff-default-owner-pmu/test_attribution.py "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
           python3 -IB enrolled/scripts/ruff-cgu-inputs/worker_cgu.py compile-capture
           python3 -IB enrolled/scripts/ruff-cgu-inputs/test_files.py | tee "$base/logs/cgu-files-fixture.stdout"
           python3 -IB enrolled/scripts/ruff-cgu-inputs/test_capture.py "$base/cgu-capture" | tee "$base/logs/cgu-capture-fixture.stdout"
           python3 -IB enrolled/scripts/ruff-cgu-inputs/test_cgu_orchestration.py
           python3 -IB enrolled/scripts/ruff-cgu-inputs/test_green_inputs.py
+          python3 -IB enrolled/scripts/ruff-cgu-inputs/test_read_products.py
+          python3 -IB enrolled/scripts/ruff-cgu-inputs/cgu-probe/test_duplicate_keys.py "$base/duplicate-graph-fixture"
       - name: Authenticate the single worker and install the published 79-file GNU release
         env:
           GH_TOKEN: ${{ github.token }}
