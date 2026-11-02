@@ -1,4 +1,4 @@
-name: Screen handwritten impl stability on ordinary uv cargo check
+name: 'Screen handwritten impl identities on the uv-client check after uv #22874'
 'on':
   workflow_dispatch:
     inputs:
@@ -24,10 +24,11 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-handwritten-stage1-check'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22874-handwritten-uv-client'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41371136314' && inputs.build_head == '682930c7b58a62cd46c6f951b60d8cab8d3c7869'
+      && inputs.sdk_lock_sha256 == '3579524fb6031aba5b9621fbd7414b3ab8e30aec4b6fe8853eb3398f0b840e9f'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 350
+    timeout-minutes: 175
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       BUILD_RUN_ID: ${{ inputs.build_run_id }}
@@ -40,129 +41,111 @@ jobs:
         path: coordinator
         ref: ${{ github.sha }}
         persist-credentials: 'false'
-        sparse-checkout: scripts/handwritten-panel
+        sparse-checkout: |-
+          scripts/handwritten-panel
+          scripts/uv-inherent-22874
+        fetch-depth: '2'
     - name: Check out builder
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: builder
         ref: ${{ inputs.build_head }}
         persist-credentials: 'false'
-        sparse-checkout: '.github/workflows
-
-          scripts/handwritten-stage1'
+        sparse-checkout: |-
+          .github/workflows
+          scripts/handwritten-stage1
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: opening
         ref: 341cd92e5d381a50bd380467075f31e780ee6296
         persist-credentials: 'false'
-        sparse-checkout: 'scripts/uv-root-20991-opening
-
-          '
+        sparse-checkout: |
+          scripts/uv-root-20991-opening
     - name: Check out previous
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: previous
         ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
         persist-credentials: 'false'
-        sparse-checkout: 'scripts/uv-resolver-whole-pmu
-
-          '
+        sparse-checkout: |
+          scripts/uv-resolver-whole-pmu
     - name: Check out qualified
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: qualified
         ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
         persist-credentials: 'false'
-        sparse-checkout: 'scripts/rc23-trait-qualification
-
-          '
+        sparse-checkout: |
+          scripts/rc23-trait-qualification
     - name: Check out pilot
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: pilot
         ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
         persist-credentials: 'false'
-        sparse-checkout: 'scripts/ctfe-crossover-pilot
-
+        sparse-checkout: |
+          scripts/ctfe-crossover-pilot
           scripts/branch-return-pmu
-
-          '
     - name: Check out calibrator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: calibrator
         ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
         persist-credentials: 'false'
-        sparse-checkout: 'scripts/gnu-renderer-pfc-hardware
-
-          '
+        sparse-checkout: |
+          scripts/gnu-renderer-pfc-hardware
     - name: Check out observers
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: observers
         ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
         persist-credentials: 'false'
-        sparse-checkout: 'scripts/gnu-example-ceiling
-
+        sparse-checkout: |
+          scripts/gnu-example-ceiling
           scripts/gnu-renderer-library-workers
-
-          '
     - name: Check out uv at the actual landed edit
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: astral-sh/uv
-        ref: 1979349b68dbaa936b98c0f409c1df0598fa72f1
-        fetch-depth: '16'
+        ref: d952be66482a298658f39f314ba8c337154ed0e7
+        fetch-depth: '2'
         fetch-tags: 'false'
         persist-credentials: 'false'
         path: uv-source
-    - name: Restore the real release tag used by uv's build script
-      run: git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.2:refs/tags/0.12.2
     - name: Check the private payload and host prerequisites
-      run: 'set -euo pipefail
-
+      run: |
+        set -euo pipefail
         mkdir trait-results
-
         (cd coordinator/scripts/handwritten-panel && sha256sum --strict --check SHA256SUMS)
-
+        (cd coordinator/scripts/uv-inherent-22874 && sha256sum --strict --check SHA256SUMS)
         /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-
-        '
     - name: Calibrate inherited userspace instructions for real fork, exec and threads
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/run.py calibrate 2>&1 | tee trait-results/calibration.log
-
-        '
+      run: |
+        set -euo pipefail
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/core.py calibrate 2>&1 | tee trait-results/calibration.log
     - name: Admit the two qualified stage1 SDKs and the signed Cargo binary
       env:
         GH_TOKEN: ${{ github.token }}
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/enroll.py admit 2>&1 | tee trait-results/intake.log
-
-        '
+      run: |
+        set -euo pipefail
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/core.py admit 2>&1 | tee trait-results/intake.log
     - name: Check both incremental and metadata migration directions
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/migration.py
-    - name: Qualify both compiler histories and execute all four independently warmed pairs
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/run.py run 2>&1 | tee trait-results/experiment.log
-
-        '
-    - name: Read back the raw clocks, Cargo streams, process trees and metadata independently
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/audit.py hosted
-    - name: Screen two independently warmed uv production-library checks on the same boot
-      run: 'set -euo pipefail
-
-        /usr/bin/python3.12 -ISBu coordinator/scripts/handwritten-panel/secondary.py 2>&1 | tee trait-results/secondary.log'
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/core.py migration
+    - name: Qualify the real 543-unit consumer and collect four first-edit pairs
+      run: |-
+        set -euo pipefail
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/screen.py 2>&1 | tee trait-results/experiment.log
+    - name: Verify original restored outputs, PMU clocks and separate uninstrumented wall
+      run: |-
+        set -euo pipefail
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-inherent-22874/score.py 2>&1 | tee trait-results/reduction.log
     - name: Preserve raw clocks, source qualification and any incomplete attempt
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-20988-handwritten-stage1-check-1
+        name: uv-22874-handwritten-client-screen-1
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
-        retention-days: '14'
+        retention-days: 5
