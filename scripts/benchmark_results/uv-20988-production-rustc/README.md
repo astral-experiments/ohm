@@ -24,3 +24,14 @@ python3 -I verify.py --original /path/to/original.zip
 ```
 
 A fresh physical rerun needs the pinned producer artifacts and a calibrated host. The workflow reapplies uv `b60da7ad468d5bb8a6b3dee7d7e54a47981f23c7` → `1979349b68dbaa936b98c0f409c1df0598fa72f1` at the same path for each visit and qualifies independently cold builds and two behavior fixtures. The two measurements represent the combined trait-lookup patches on this edit. [Measurement workflow](https://github.com/astral-experiments/ohm/blob/13294dce75bfc4959f4d1636730fa7a27082deb1/.github/workflows/ci.yml)
+
+## Independent rerun
+
+The same eight pairs ran on a second hosted Linux runner with a different boot ID. The dirty workspace libraries, signed Cargo and both optimized compilers matched the first run.
+
+| Actual compiler | First runner | Second runner |
+| --- | ---: | ---: |
+| Terminal `uv` library | 1.64887× | 1.64875× |
+| Workspace-featured `uv-resolver` library | 2.69582× | 2.69582× |
+
+Each ratio is the paired median of retired user-mode instructions before versus after the combined patches. Both compilers exceeded a 20% reduction in every pair on both runners. Each runner independently gave an adjusted one-sided sign-test p-value of 0.0078125 per compiler. Run `python3 -I second-runner/verify.py` to replay the second sample. [Original second run](https://github.com/astral-experiments/ohm/actions/runs/41389598173) · [Second-runner counters and verifier](second-runner/)
