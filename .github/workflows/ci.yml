@@ -1,4 +1,4 @@
-name: Characterize shared-reference lookup on two Ohm stage1 compilers
+name: Build optimized stage1 SDKs for the uv handwritten-impl screen
 'on':
   workflow_dispatch:
     inputs:
@@ -9,10 +9,11 @@ name: Characterize shared-reference lookup on two Ohm stage1 compilers
 permissions: {}
 jobs:
   base:
-    name: Stage1 fa7a_stack_ctfe318
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-sharedref-stage1-probe' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    name: Handwritten stage1 SDK (fa7a_stack_ctfe318)
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-handwritten-stage1'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 180
+    timeout-minutes: '180'
     permissions:
       contents: read
     env:
@@ -85,7 +86,7 @@ jobs:
 
         test ! -e stage1-ref-build
 
-        test ! -e /tmp/ohm-shared-reference-stage1-v1
+        test ! -e stage1-capsule
 
         mkdir trait-evidence
 
@@ -93,45 +94,47 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 341cd92e5d381a50bd380467075f31e780ee6296
+        test "$(git rev-parse HEAD^)" = 6b6ea23a315feb005f06e86e67e24c609b10557e
 
         '
-    - name: Verify the 90-object compiler sources
-      run: python3 -IB scripts/ctfe22-stage1-ref/materialize.py "$BENCH_ARM"
+    - name: Verify both compiler sources and the authenticated 105-object delta
+      run: python3 -IB scripts/handwritten-stage1/materialize.py "$BENCH_ARM"
     - name: Install native GNU bootstrap prerequisites
       run: 'sudo apt-get -qq update
 
-        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd
+        clang lld curl
 
         '
-    - name: Build stage1, run original native tests, and observe the getter
+    - name: Build optimized compiler and host std, run correctness suites, and export the SDK
       id: probe
-      run: python3 -ISB scripts/ctfe22-stage1-ref/stage.py "$BENCH_ARM"
+      run: python3 -ISB scripts/handwritten-stage1/stage.py "$BENCH_ARM"
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ctfe22-stage1-ref-base-${{ github.run_id }}-${{ github.run_attempt }}
-        path: qualified-role.zip
+        name: handwritten-stage1-fa7a_stack_ctfe318
+        path: stage1-capsule/
         if-no-files-found: error
         compression-level: 0
-        retention-days: 14
+        retention-days: '14'
       id: bundle
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ctfe22-stage1-ref-incomplete-base-${{ github.run_id }}-${{ github.run_attempt }}
+        name: handwritten-stage1-incomplete-fa7a_stack_ctfe318
         path: trait-evidence/
         if-no-files-found: warn
-        compression-level: 0
-        retention-days: 14
+        compression-level: '0'
+        retention-days: '14'
       if: failure()
   child:
-    name: Stage1 fa7a_stack_ctfe318_incoherent_ref
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-sharedref-stage1-probe' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    name: Handwritten stage1 SDK (fa7a_stack_ctfe318_handwritten)
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-handwritten-stage1'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 180
+    timeout-minutes: '180'
     permissions:
       contents: read
     env:
-      BENCH_ARM: fa7a_stack_ctfe318_incoherent_ref
+      BENCH_ARM: fa7a_stack_ctfe318_handwritten
       OHM_TOOLCHAIN: ohm-1.99.0-22
       OHM_TARGET: x86_64-unknown-linux-gnu
       PYTHONDONTWRITEBYTECODE: '1'
@@ -200,7 +203,7 @@ jobs:
 
         test ! -e stage1-ref-build
 
-        test ! -e /tmp/ohm-shared-reference-stage1-v1
+        test ! -e stage1-capsule
 
         mkdir trait-evidence
 
@@ -208,79 +211,34 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 341cd92e5d381a50bd380467075f31e780ee6296
+        test "$(git rev-parse HEAD^)" = 6b6ea23a315feb005f06e86e67e24c609b10557e
 
         '
-    - name: Verify the 90-object compiler sources
-      run: python3 -IB scripts/ctfe22-stage1-ref/materialize.py "$BENCH_ARM"
+    - name: Verify both compiler sources and the authenticated 105-object delta
+      run: python3 -IB scripts/handwritten-stage1/materialize.py "$BENCH_ARM"
     - name: Install native GNU bootstrap prerequisites
       run: 'sudo apt-get -qq update
 
-        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd
+        clang lld curl
 
         '
-    - name: Build stage1, run original native tests, and observe the getter
+    - name: Build optimized compiler and host std, run correctness suites, and export the SDK
       id: probe
-      run: python3 -ISB scripts/ctfe22-stage1-ref/stage.py "$BENCH_ARM"
+      run: python3 -ISB scripts/handwritten-stage1/stage.py "$BENCH_ARM"
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ctfe22-stage1-ref-child-${{ github.run_id }}-${{ github.run_attempt }}
-        path: qualified-role.zip
+        name: handwritten-stage1-fa7a_stack_ctfe318_handwritten
+        path: stage1-capsule/
         if-no-files-found: error
         compression-level: 0
-        retention-days: 14
+        retention-days: '14'
       id: bundle
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ctfe22-stage1-ref-incomplete-child-${{ github.run_id }}-${{ github.run_attempt }}
+        name: handwritten-stage1-incomplete-fa7a_stack_ctfe318_handwritten
         path: trait-evidence/
         if-no-files-found: warn
-        compression-level: 0
-        retention-days: 14
+        compression-level: '0'
+        retention-days: '14'
       if: failure()
-  pair:
-    name: Compare the named getter providers
-    needs:
-    - base
-    - child
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-sharedref-stage1-probe' && github.sha == inputs.reviewed_head && github.run_attempt == 1
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      actions: read
-    env:
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      BASE_ID: ${{ needs.base.outputs.id }}
-      BASE_SHA: ${{ needs.base.outputs.sha }}
-      BASE_INNER: ${{ needs.base.outputs.inner }}
-      CHILD_ID: ${{ needs.child.outputs.id }}
-      CHILD_SHA: ${{ needs.child.outputs.sha }}
-      CHILD_INNER: ${{ needs.child.outputs.inner }}
-    steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        persist-credentials: 'false'
-        ref: ${{ github.sha }}
-        fetch-depth: '2'
-    - name: Read immutable base role capsule
-      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-      with:
-        artifact-ids: ${{ needs.base.outputs.id }}
-        path: intake/BASE
-        merge-multiple: true
-    - name: Read immutable child role capsule
-      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-      with:
-        artifact-ids: ${{ needs.child.outputs.id }}
-        path: intake/CHILD
-        merge-multiple: true
-    - name: Reopen both profiles and matched native controls
-      run: python3 -ISB scripts/ctfe22-stage1-ref/pair.py
-    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: ctfe22-stage1-ref-pair-${{ github.run_id }}-${{ github.run_attempt }}
-        path: paired-proof/
-        if-no-files-found: error
-        compression-level: 0
-        retention-days: 14
