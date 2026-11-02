@@ -41,3 +41,14 @@ python3 -IB reopen330.py 13119753687.zip 9e2e6231b0c115e473c25f9915125edf5abd74b
 gzip -dc signed-18-22-results.json.gz | cmp - signed.json
 gzip -dc source-330-results.json.gz | cmp - source.json
 ```
+
+## The ordinary Ruff constructors program sees implicit system providers
+
+Both Cargo sources linked the same Rust sources and unchanged signed -22 SDK on a new worker. An isolated, read-only overlay presented a single additional file in the actual GCC system directory, without changing any host-system or SDK files. The unchanged `-lutil` initially selected an 8-byte system archive. A previously absent `/usr/lib/gcc/x86_64-linux-gnu/13/libutil.so` containing an 85-byte GNU script selected a 2,168-byte native object. The actual Ruff test still passed and printed 29 from that object's initializer. The parent reused its old executable, which printed no initializer message. #330 ran Wild and matched the independent empty executable byte for byte. A malformed earlier script and a missing script-selected object both made the clean build and the separately forced Ruff target fail; the parent returned Cargo 0 in both cases. #330 correctly returned 101. Repair printed 41, and removing the override restored the original whole ELF. #330 performed full rustc after the preceding link failure on the missing/repair visits. All ordinary, unaffected and successful fresh references are included. [Native acquisition and 32 builds](https://github.com/astral-experiments/ohm/actions/runs/41398651348) · [Full syscall and ELF readback](constructors-inputs-results.json.gz)
+
+The genuine unchanged Wild and its nine worker tasks observed 58 distinct failed library names with ENOENT, nine of them for `libutil` alone, plus three EINVAL readlinks on existing scripts. It successfully opened 74 distinct path spellings for reading. Of those, 70 unique regular inodes holding 25,286,010 bytes remained observable at link return. Twenty were root-owned. The 1,784-byte temporary `symbols.o` that Wild mapped had already disappeared. Five warm-page scans of the 70 files took 10.81–13.23 ms (median 10.96 ms), and lstat of the 61 native-name spellings took 92–106 µs. This explicitly excludes unavailable inputs and measures a post-link scanner. It gives no evidence for treating sequential hashes or file metadata as a coherent snapshot. Cargo's declared-archive shortcut covers plain executable targets with declarations; the constructors test had none. Wild's reference-link test cache also supplies no production Linux receipt. [Cargo #382](https://github.com/astral-experiments/ohm-cargo/pull/382) · [Wild #131](https://github.com/astral-experiments/ohm-wild/pull/131/files)
+
+```sh
+python3 -IB reopen_inputs.py 13120196874.zip c0bdfe211bae6b52ad1a5bd0b14c5428024ecfa5e6afca88204dbd39e939f42b > constructors-inputs.json
+gzip -dc constructors-inputs-results.json.gz | cmp - constructors-inputs.json
+```
