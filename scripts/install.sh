@@ -189,16 +189,9 @@ case "$installation_prefix" in
         fail 'refusing to install into a broad or managed directory'
         ;;
 esac
-printf '%s\n' "$installation_prefix" | awk '
-    {
-        count = split($0, components, "/")
-        for (component_number = 1; component_number <= count; component_number++) {
-            if (components[component_number] == "." || components[component_number] == "..") {
-                exit 1
-            }
-        }
-    }
-' || fail 'OHM_INSTALL_DIR must not contain relative path components'
+case "$installation_prefix/" in
+    */./*|*/../*) fail 'OHM_INSTALL_DIR must not contain relative path components' ;;
+esac
 
 info 'verifying archive checksum'
 if command -v sha256sum >/dev/null 2>&1; then
