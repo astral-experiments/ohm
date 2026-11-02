@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import subprocess
 
 def read(path):
     return json.loads(path.read_bytes())
@@ -57,6 +58,14 @@ def check(root, head):
             same[owner]=matched
         require(same==history["same"],"incorrect reused object count")
         output[name]=dict(counts=counts,same=same,storage=read(root/name/"A/visit.json")["storage"],B=states["B"])
+    expected_bodies = {v for record in manifest.values() for v in record["whole"].values()}
+    expected_bodies.update(v for result in output.values() for v in result["B"][0].values())
+    bodies = root / "reference-bodies"
+    require({p.name for p in bodies.iterdir()} == {v+".zst" for v in expected_bodies}, "unregistered clean body")
+    for digest in expected_bodies:
+        with subprocess.Popen(["zstd", "-dcq", bodies/(digest+".zst")], stdout=subprocess.PIPE) as reader:
+            require(hashlib.file_digest(reader.stdout, "sha256").hexdigest()==digest and reader.wait()==0,
+                    "physical clean ELF digest disagrees")
     for i in "01":
         require(output[i+"-P"]["B"]==output[i+"-C"]["B"],"independent B references differ")
     rates={p:[1-output[f"{i}-C"]["counts"][p]/output[f"{i}-P"]["counts"][p] for i in "01"] for p in ("B","A","unchanged")}
