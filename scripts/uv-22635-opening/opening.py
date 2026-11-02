@@ -133,6 +133,7 @@ def run():
     outputs,_=raw(out/'metadata',[PLAIN[0],'metadata','--locked','--offline','--format-version','1']);meta=json.loads(outputs)
     require(meta['workspace_root']==str(SRC)and meta['target_directory']==str(TARGET),'canonical native paths')
     require(len(plain(out/'cold-A')['progress'])>400,'independent cold-A compile');a=unchanged('A',meta,out)
+    require(a['roster_sha256']==C['actual_A_roster_sha256'] and len(a['dirty'])==C['actual_A_dirty_count'],'reproduce original signed A before measuring the edit')
     keep_outputs(out/'parent-workspace.zip',a);seed=w/'seed';seed.mkdir()
     for p in (SRC,TARGET,CARGO_HOME,USER_HOME):p.rename(seed/p.name)
     def restore():

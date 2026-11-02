@@ -117,21 +117,10 @@ def read_flags(argv, recorded, actual, needed, meta, *, check_files=True):
 
 
 def compiler_commands(stderr, rustc):
-    """Read Cargo's verbose, shell-quoted Linux command stream without changing its graph."""
-    import shlex
-    commands = []
-    for raw in stderr.splitlines():
-        line = raw.strip()
-        if not (line.startswith("Running `") and line.endswith("`")):
-            continue
-        tokens = shlex.split(line[len("Running `"):-1])
-        if str(rustc) in tokens:
-            i = tokens.index(str(rustc))
-            argv = tokens[i:]
-            if "--crate-name" in argv and "--out-dir" in argv:
-                commands.append(argv)
-    assert commands, "Cargo produced no full compiler command lines at -vv"
-    return commands
+    """Read full Cargo -vv invocations, including multiline package metadata."""
+    import runpy
+    parser = runpy.run_path(str(Path(__file__).with_name("native.py")))["commands"]
+    return parser(stderr, rustc)
 
 
 def verbose_events(proc, lane):
