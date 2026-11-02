@@ -36,7 +36,7 @@ def inventory(sdk):
     return m.digest(m.canon(expected))
 def admit():
     w,tmp=scope();out=w/'trait-results';proof=out/'intake';proof.mkdir();scratch=tmp/'client-rdr-intake';scratch.mkdir();h.guard_space(w,tmp)
-    old,_=m.pmu(w,tmp);parts=[]
+    _,previous=m.check_sources(w);old=m.load('previous_release_intake',previous/'intake.py');parts=[]
     for name,tail in [('run',''),('jobs','/jobs?per_page=100'),('artifacts','/artifacts?per_page=100')]:
         data=old.gh_json('api','--method','GET',f"repos/{REPO}/actions/runs/{P['run']}"+tail);m.save(proof/(name+'.json'),data);parts.append(data)
     service(*parts);art=P['artifact'];zpath=scratch/'observer.zip';old.gh_bytes(f"repos/{REPO}/actions/artifacts/{art['id']}/zip",zpath,art['bytes'],art['sha256'])
