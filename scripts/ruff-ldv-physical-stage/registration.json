@@ -1,0 +1,108 @@
+{
+  "bootstrap_flags": [
+    "--ci",
+    "false",
+    "--set",
+    "build.submodules=false",
+    "--set",
+    "rust.omit-git-hash=true",
+    "--set",
+    "rust.debug-assertions=false",
+    "--set",
+    "rust.lto=off",
+    "--set",
+    "llvm.download-ci-llvm=true",
+    "--set",
+    "rust.download-rustc=false"
+  ],
+  "bundle": {
+    "baseline_commits": [
+      "0a38b3aa6d1bbb55ec5e8c01c9e88d1cf0f9f118",
+      "f12924d918dbc66898325531940a20aa8cf4f5fc",
+      "330c6efbef5fd49b2797c8f1f084630343cd117d",
+      "203c98e2df20b6afff4b0f512896c14c44942b82",
+      "764eb1cd92bb67b2f9a88eb17ba67766569ab2f3",
+      "dc0db7275adb2dbe921ce5df0811108e84d6408d",
+      "5c3cea67eca46acbb95bf62a97485200f6c00c44",
+      "c6b5bef8a0b36608968c568637529c68069d494f",
+      "a3fc6da13921586bc374586dee00883e9210aecd",
+      "74d8eeab285ee9e1b7b6ea00c94ae0d2dc21ecb6",
+      "1589b5884e0a690776147e3a72223843ab83dccb"
+    ],
+    "branch": "refs/heads/charlie/rc23-skip-variable-free-line-table-debug-values",
+    "bytes": 54915,
+    "prerequisite": "28b64bc39032c1786908d98ea2df92f855226d0f",
+    "sha256": "79613ece575280bb46b4bfb100f76bf3c6ffcb26306dac978521c3f77081e8d6"
+  },
+  "bundle_and_layout_factory": "eb9a39839aea21c67380644a1b2ba00a9afac79b",
+  "changed_sources": {
+    "compiler/rustc_codegen_llvm/src/back/write.rs": {
+      "C": "c2a7482e714cc6b76388934c46fc1e894c704019",
+      "P": "385ff25cf813bcb0750deceb6fd2d02af72abc1b"
+    },
+    "compiler/rustc_codegen_llvm/src/llvm/ffi.rs": {
+      "C": "9fb2a524273dc9b402b71dbdf1184e8e1a3b7a5d",
+      "P": "3672cb2a0c6501500f54610bc5d2dde73c74ccc7"
+    },
+    "compiler/rustc_llvm/llvm-wrapper/OhmRegisterCoalescer.cpp": {
+      "C": "a0b171cfc923491bbaa316ef643b32f2908a0469",
+      "P": "d5b947430bf30e307e6f2a53ca4bf520c3454425"
+    }
+  },
+  "kit": {
+    "commit": "bc0e3e18ccf825c4eeaece4727b9ac3b4ecd8a89",
+    "prepare.sh": "de6653dc519f7bc22d8115b87fe8fc9a21bacac9843690f4651a7fc24afe54ec",
+    "runtime.py": "abc0a05c278f83688f2e0b4901d3760528aa3212cb14c04bf6a4a67ce931cb35"
+  },
+  "parent_case": {
+    "product_patch_sha256": "d675e481354ca4ae9bdb2f4187d553332d6ae0a37b3a325ddd9187e7dcfbcca6",
+    "unmodified_tree_comparison": {
+      "compiler/rustc_llvm/build.rs": "bf397c724aa2823d74dfc7ef4d32d2960f7e7b45",
+      "compiler/rustc_llvm/llvm-wrapper/ohm-register-coalescer/RegisterCoalescer.patch": "0ab37470bed49e6e7c810920cbf084de878dea65",
+      "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+      "src/bootstrap": "4c7df39d6ad9a8ab254a4eeb587acf8ed4e1b2f5",
+      "src/llvm-project": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145"
+    }
+  },
+  "roles": {
+    "C": {
+      "compiler": "2a47fea6f16cf23729168513509540abc4db4056",
+      "revision": "531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5",
+      "tree": "e23fcbbde57dc251d92d3b052c8f7d088eac1ea9"
+    },
+    "P": {
+      "compiler": "0fda038c2fbd3c23ffa881ad2e2e064d428c9ea6",
+      "revision": "1589b5884e0a690776147e3a72223843ab83dccb",
+      "tree": "1c05e647c4619661ca8726a0b91552af3a04c67e"
+    }
+  },
+  "schema": "ohm-remat-builder-registration-v1",
+  "signed_cargo": {
+    "asset": {
+      "id": 698533704,
+      "name": "ohm-1.99.0-22-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7",
+      "size": 359852703
+    },
+    "members": {
+      "bin/cargo": [
+        "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo",
+        493,
+        39041072,
+        "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871"
+      ],
+      "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": [
+        "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd",
+        493,
+        10319072,
+        "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+      ]
+    },
+    "revision": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
+    "tag": "ohm-1.99.0-22"
+  },
+  "source_epoch": 1793600737,
+  "source_factory": "55de4a630a58095ecd359831c75a2bb16dc4f69c",
+  "target": "x86_64-unknown-linux-gnu",
+  "treatment": "variable-free-line-table-only-llvm23-on-public-coalescer"
+}
