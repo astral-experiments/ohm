@@ -108,22 +108,78 @@ def role_sdk(role,path,proof):
     data={"source":s.SOURCES[role],"runtime":runtime,"effective_inventory":digest,"files":len(seen),"banners":banners,"libraries":libs}
     m.save(proof/"registered.json",data);return data
 
+def stock_production(proof,temp,donor):
+    anchor=s.lock["stock"];role=anchor["role"];registered=role["service"]
+    route="repos/"+REPO+"/actions/runs/"+str(registered["run"])
+    def original(tail,name):
+        data=donor.gh_json("api","--method","GET",route+tail);m.save(proof/(name+".json"),data);return data
+    run=original("","run")
+    assert run["id"]==registered["run"] and run["head_sha"]==registered["head"] and run["head_branch"]==registered["branch"] and run["run_attempt"]==1
+    assert run["status"]=="completed"and run["conclusion"]=="success" and run["repository"]["id"]==run["head_repository"]["id"]==1319437234
+    jobs=original("/attempts/1/jobs?per_page=100","jobs");assert len(jobs["jobs"])==jobs["total_count"]==3
+    actual_jobs={str(j["id"]):{k:j[k]for k in ("name","runner_name","labels")}for j in jobs["jobs"]}
+    assert actual_jobs==anchor["jobs"] and all(j["head_sha"]==registered["head"]and j["run_id"]==run["id"] and j["run_attempt"]==1 and j["status"]=="completed"and j["conclusion"]=="success"for j in jobs["jobs"])
+    arts=original("/artifacts?per_page=100","artifacts");assert len(arts["artifacts"])==arts["total_count"]==5
+    rows={a["name"]:a for a in arts["artifacts"]};assert set(rows)==set(registered["members"])
+    for name,c in registered["members"].items():
+        a=rows[name];r=a["workflow_run"]
+        assert a["digest"]=="sha256:"+c["sha256"] and a["id"]==c["id"] and a["size_in_bytes"]==c["bytes"] and not a["expired"]
+        assert r["id"]==registered["run"]and r["head_sha"]==registered["head"]and r["repository_id"]==r["head_repository_id"]==1319437234
+    target=temp/"stock.tar.gz"
+    for name in (anchor["qa"],anchor["pair"],anchor["sdk"]):
+        c=registered["members"][name];dst=temp/(name+".zip")
+        donor.gh_bytes("repos/"+REPO+"/actions/artifacts/"+str(c["id"])+"/zip",dst,c["bytes"],c["sha256"])
+        sdk=name==anchor["sdk"];locked=anchor["files"]if sdk else anchor["archives"][name]
+        with zipfile.ZipFile(dst)as z:
+            files={i.filename:i for i in z.infolist()if not i.is_dir()}
+            assert len(files)==sum(not i.is_dir()for i in z.infolist()) and set(files)==set(locked)|({"ohm.tar.gz"}if sdk else set())
+            for path,h in locked.items():
+                assert files[path].file_size<80<<20 and not PurePosixPath(path).is_absolute()and ".."not in PurePosixPath(path).parts
+                raw=z.read(path);assert m.digest(raw)==h
+                if sdk:(proof/path).write_bytes(raw)
+            if sdk:
+                with z.open("ohm.tar.gz")as content:copy_checked(content,target,anchor["tar"]["bytes"],anchor["tar"]["sha256"])
+    source=m.read(proof/"source.json");native=m.read(proof/"role.json")
+    assert m.filesha(proof/"source.json")==role["source_sha256"]and m.filesha(proof/"role.json")==role["role_sha256"]
+    assert {k:source["source"][k]for k in s.SOURCES["S"]}==s.SOURCES["S"]and source["run_id"]==registered["run"]
+    assert source["source"]["parent"]==s.lock["signed_release"]["rustc"] and source["source"]["upstream_ctfe_commit"]=="df2c077a113a709ab379c8ec34e62c94c7513325"
+    assert native["role"]=="stock_ctfe318"and native["source_commit"]==s.SOURCES["S"]["commit"]and native["source_tree"]==s.SOURCES["S"]["tree"]
+    assert native["epoch"]==s.SOURCES["S"]["epoch"]and native["bolt_note"]is True and native["execution_pgo"]and native["installed_original_runmake"]
+    assert native["effective_benchmark_cargo_sha256"]==s.lock["signed_cargo"]and m.read(proof/"sdk-inventory.json")==s.lock["raw"]["S"]
+    return target
+
+def signed_cargo(archive,target):
+    row=s.lock["signed_cargo_row"];assert row["sha256"]==s.lock["signed_cargo"]
+    matches=0;manifest=None
+    with tarfile.open(archive,"r|gz")as t:
+        for item in t:
+            if item.name==DIST+"/cargo/manifest.in":
+                assert item.isfile()and manifest is None;manifest=t.extractfile(item).read().decode().splitlines()
+            elif item.name==DIST+"/cargo/bin/cargo":
+                matches+=1;assert matches==1 and item.isfile()and item.size==row["bytes"]and item.mode&0o111
+                copy_checked(t.extractfile(item),target,row["bytes"],row["sha256"]);target.chmod(0o755)
+    assert matches==1 and manifest.count("file:bin/cargo")==1
+    return target
+
 def admit():
     w,tmp,_=s.host();out=w/"trait-results";proof=out/"intake";proof.mkdir();temp=tmp/"release-22958-incoming";temp.mkdir()
     sdk=tmp/"ctfe22-root-sdks";sdk.mkdir();old=transport()
     latest(proof/"latest.json");old.released(temp,proof)
     signed,=(temp/"signed").glob("*.tar.gz");assert m.filesha(signed)==s.lock["signed_release"]["sha256"]
+    cargo=signed_cargo(signed,temp/"official-22-cargo")
     product=proof/"production";product.mkdir();full=production(product,temp,old)
-    install_archive(signed,sdk/"R","R");install_archive(full,sdk/"F","F")
-    assert m.filesha(sdk/"R/bin/cargo")==s.lock["signed_cargo"] and m.filesha(sdk/"F/bin/cargo")==s.lock["raw"]["F"]["bin/cargo"]["sha256"]
-    shutil.copy2(sdk/"R/bin/cargo",sdk/"F/bin/cargo")
+    stock=proof/"corrected-stock";stock.mkdir();control=stock_production(stock,temp,old)
+    for r,a in (("S",control),("F",full)):
+        install_archive(a,sdk/r,r)
+        assert m.filesha(sdk/r/"bin/cargo")==s.lock["raw"][r]["bin/cargo"]["sha256"]
+        shutil.copy2(cargo,sdk/r/"bin/cargo")
     result={r:role_sdk(r,sdk/r,proof/"role-material"/r)for r in s.ROLES}
     m.save(out/"intake.json",{"installed":result,"signed_cargo_sha256":s.lock["signed_cargo"],"release_lock":m.filesha(s.HERE/"release-lock.json")})
 
 def migration():
     w,tmp,_=s.host();pool=tmp/"ctfe22-root-sdks";out=w/"trait-results/intake";env={"PATH":"/usr/bin:/bin","LC_ALL":"C","RUSTC_BOOTSTRAP":"1"}
     results={}
-    for first,second in (("R","F"),("F","R")):
+    for first,second in (("S","F"),("F","S")):
         scope=tmp/("fixture-22958-"+first+second);scope.mkdir();src=scope/"main.rs";bin=scope/"fixture";rows=[]
         for role,val,cache in ((first,7,"shared"),(second,19,"shared"),(second,19,"independent")):
             src.write_text('const VALUE: i32 = '+str(val)+'; fn main() { println!("{}", VALUE); }\n')

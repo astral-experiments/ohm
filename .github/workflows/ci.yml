@@ -1,4 +1,4 @@
-name: Ordinary uv 22958 check on signed and optimized production Rust
+name: Check uv 22958 with corrected stock and full production Rust
 'on':
   workflow_dispatch:
     inputs:
@@ -6,39 +6,22 @@ name: Ordinary uv 22958 check on signed and optimized production Rust
         required: true
         type: string
         description: Reviewed full SHA of this benchmark
-      build_run_id:
-        required: true
-        type: string
-        description: Completed callable compiler build
-      build_head:
-        required: true
-        type: string
-        description: Reviewed callable producer commit
-      sdk_lock_sha256:
-        required: true
-        type: string
-        description: SHA-256 of both authenticated production inputs and native qualification
-      excluded_production_boot:
-        required: true
-        type: string
-        description: Comma-separated verified physical production runner boot UUIDs
 permissions:
   contents: read
   actions: read
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-signed22-release-wall'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41398925829' && inputs.build_head == '4e34ea9c7232977f95498d7bf48d382157e8558b'
-      && inputs.sdk_lock_sha256 == '85632299e566d66e0c04b507506ed141641eb192a414f448a412c31514c552ac'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-ctfe-wall'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      EXCLUDED_PRODUCTION_BOOT: ${{ inputs.excluded_production_boot }}
-      BUILD_RUN_ID: ${{ inputs.build_run_id }}
-      BUILD_HEAD: ${{ inputs.build_head }}
-      RELEASE_LOCK: ${{ inputs.sdk_lock_sha256 }}
+      EXCLUDED_PRODUCTION_BOOT: 'd3374b9ab2b529dfe6e07ddc79d43a5b40a3fb50b3f4d13617d7d55a8dbc4c73'
+      BUILD_RUN_ID: '41398925829'
+      BUILD_HEAD: '4e34ea9c7232977f95498d7bf48d382157e8558b'
+      RELEASE_LOCK: 'ad322fe1ef836071a6be332070b4055c68c3e29568297b56f554aca3913ae2f3'
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -127,11 +110,11 @@ jobs:
     - name: Seal the fresh physical runner and its blocking wall calibration
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-signed22-release-runner-boot
+        name: uv-22958-corrected-production-runner-boot
         path: trait-results/boot-attestation.json
         if-no-files-found: error
         retention-days: 5
-    - name: Verify the signed release and the original optimized GNU distribution
+    - name: Admit the two original optimized GNU packages and the released Cargo binary
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
@@ -153,7 +136,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-signed22-release-wall-eight-pairs
+        name: uv-22958-corrected-production-wall-eight-pairs
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

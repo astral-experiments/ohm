@@ -150,7 +150,7 @@ def run():
         and len(scoped.cal_raw(out / "per-rustc-calibration")) == 3
     )
     migration=m.read(out/"intake/release-migration.json")
-    assert migration["fixtures_only"] and migration["ordinary_benchmark_caches_separate"] and set(migration["roles"]) == {"R-F","F-R"}
+    assert migration["fixtures_only"] and migration["ordinary_benchmark_caches_separate"] and set(migration["roles"]) == {"S-F","F-S"}
     clk=m.read(out/"blocking-clock-pre/verified.json")
     assert clk["eligible_blocking_calibration"] and clk["boot"]==boot and clk["affinity"]==sorted(mask)
     load = m.read(out / "intake.json")

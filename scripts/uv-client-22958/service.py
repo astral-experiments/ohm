@@ -1,4 +1,4 @@
-"""Enforce the independently registered signed-versus-production ordinary Cargo check."""
+"""Enforce the corrected stock and full production comparison on one genuine edited Cargo check."""
 from pathlib import Path
 import json
 import os
@@ -14,18 +14,18 @@ m=old.m
 register=m.read(HERE/"registration.json")
 case=m.read(HERE/"case.json")
 lock=m.read(HERE/"release-lock.json")
-ROLES=("R","F")
+ROLES=("S","F")
 SOURCES=lock["sources"]
-ORDERS=register["design"]["pair_orders"]
-assert ORDERS==[["R","F"],["F","R"],["F","R"],["R","F"],["F","R"],["R","F"],["R","F"],["F","R"]]
-assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="3c4868aaf179d6b4512d344d0ded13955ab1bf6b66e4911d50ccb16201438de8"
+ORDERS=register["orders"]
+assert ORDERS==[["S","F"],["F","S"],["F","S"],["S","F"],["F","S"],["S","F"],["S","F"],["F","S"]]
+assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="99f08c48eda8e9592d46b7a4a8ce732eb5117ffb6185a2a377f87eb6b7c4913a"
 assert m.filesha(HERE/"clock-amendment.json")==lock["clock"] and m.filesha(HERE/"trigger-carrier-addendum.json")==lock["trigger"]
 prior=m.read(HERE/"heldout-passed.json")
 assert prior["primary_and_secondary"]==[True,True] and prior["raw_sha256"]==lock["heldout_original"]
-assert {k:w["commit"] for k,w in SOURCES.items()}=={"R":"008a21ac0d750dc9a1c18b7959d7e7984c03d887","F":"f53496e2dd363b1455fc7e0a9d2dedea1bf7650e"}
+assert {k:w["commit"] for k,w in SOURCES.items()}=={"S":"10d56274a98801b5ef8f80aab734e835749458e1","F":"f53496e2dd363b1455fc7e0a9d2dedea1bf7650e"}
 m.P.update(branch=case["branch"],roles=SOURCES)
 old.P["edited_workspace_roster"]=["uv_client","uv_configuration"]
-CHECK=old.CHECK=[str(m.SDK/"bin/cargo"),*register["cargo_command"][1:]]
+CHECK=old.CHECK=[str(m.SDK/"bin/cargo"),*register["argv"][1:]]
 assert CHECK[1:]==["check","-p","uv-client","--locked","--offline","-j8"]
 m.ENV.update(LC_ALL="C",GIT_CONFIG_NOSYSTEM="1",GIT_CONFIG_GLOBAL="/dev/null",GIT_ALLOW_PROTOCOL="file",GIT_NO_LAZY_FETCH="1",RUSTC_BOOTSTRAP="1")
 m.ENV.pop("CARGO_TERM_COLOR",None)
@@ -36,8 +36,7 @@ def host():
     assert m.sha_git(co,"rev-parse","HEAD").decode().strip()==e["REVIEWED_HEAD"] and m.sha_git(co,"rev-parse","HEAD^").decode().strip()==case["parent"]
     absent={r["boot"] for r in lock["excluded"].values()};boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
     assert len(absent)==len(lock["excluded"])>=11 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
-    requested=e["EXCLUDED_PRODUCTION_BOOT"].split(",")
-    assert len(requested)==len(set(requested)) and set(requested)==absent
+    assert e["EXCLUDED_PRODUCTION_BOOT"]==lock["boot_list_sha256"]==m.digest(("\n".join(sorted(absent))+"\n").encode())
     assert e["BUILD_RUN_ID"]==str(lock["production_compiler"]["run"]) and e["BUILD_HEAD"]==lock["production_compiler"]["coordinator"]
     return w,t,boot
 

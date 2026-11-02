@@ -175,7 +175,7 @@ def verify(out, meter, check_binary=False):
         independent_histories=len(history),
         registered=s.case["registered"],
         release_lock=m.filesha(s.HERE/"release-lock.json"),
-        scope="Eight-pair ordinary blocking wall primary with separately restored userspace whole-Cargo and thread-group counters. The comparison covers the complete compiler stacks.",
+        scope="The two private production compilers share the signed −22 source and CTFE serializer fix. The comparison covers the cumulative performance stack. It measures eight paired ordinary blocking Cargo wall visits and separately restored userspace counters.",
     )
 
 
