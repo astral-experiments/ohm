@@ -1,0 +1,7 @@
+# LLVM stage instruction counts
+
+After saving the ordinary Ruff build artifact, the same GNU worker reopens the exact pre-optimization bitcode emitted for Ruff #28106's four-line option edit. It selects the smallest, median, and largest module up to 6 MiB from each of two groups, according to whether the old bitcode digest changed. It admits a warm module only when the independently clean new build emitted identical bitcode. The report records the selection before measuring.
+
+The signed LLVM library runs the default O1 IR pipeline or a short pipeline containing always-inlining, scalar replacement, early CSE, instruction combining, CFG simplification, and global dead-code elimination. Each pipeline emits machine code at LLVM's Less and None machine optimization levels. A fresh process parses the same bitcode for each interval. A pinned user-mode hardware counter measures optimization and object emission separately. Each arm runs in forward and reverse order with a sham and a calibrated loop at each end.
+
+The separate `signed-gnu-ruff-llvm-dev-pipeline` artifact contains the original counter readings, source and DSO identities, emitted objects and section sizes. A native arithmetic control executes 30 independently calculated verdicts. The C API replay prices these stages under a generic x86-64 target. Whole-command claims require the actual Rust compiler, Cargo entry point, and resulting Ruff programs.

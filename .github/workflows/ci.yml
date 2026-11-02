@@ -100,3 +100,25 @@ jobs:
           include-hidden-files: true
           compression-level: 1
           if-no-files-found: warn
+      - name: Count LLVM IR optimization and machine emission on actual Ruff modules
+        id: llvm
+        if: success()
+        timeout-minutes: 12
+        run: |
+          set -euo pipefail
+          base="$RUNNER_TEMP/ohm-branch-object-qa"
+          post="$RUNNER_TEMP/ohm-llvm-stages"
+          test -s "$base/logs/accepted.json"
+          mkdir "$post" "$post/logs"
+          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$post" "$post/logs" "$post/logs/resource" \
+            python3 -IB enrolled/scripts/ruff-workspace-option-edit/backend/run_backend.py "$base" "$post/work" "$post/logs/llvm"
+      - name: Save the native LLVM counters and emitted objects
+        if: always() && steps.llvm.outcome != 'skipped'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: signed-gnu-ruff-llvm-dev-pipeline
+          path: ${{ runner.temp }}/ohm-llvm-stages/logs
+          retention-days: 14
+          include-hidden-files: true
+          compression-level: 1
+          if-no-files-found: warn
