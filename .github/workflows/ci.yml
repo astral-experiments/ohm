@@ -18,10 +18,10 @@ jobs:
     timeout-minutes: 120
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      EXCLUDED_PRODUCTION_BOOT: 'aef9a206e08bc559c82fdfdc0091178e1f0e8880aebb5678f8bff9c12e224db2'
+      EXCLUDED_PRODUCTION_BOOT: 'a4ae4d4e697c0194607498504549ca5b8ab8e2c05ec57145dab66abacdf546e7'
       BUILD_RUN_ID: '41434876352'
       BUILD_HEAD: '731d81a4cb3498cf4221d53a267bbf4a76ca250f'
-      RELEASE_LOCK: 'cdac6743a87dcf8f9379ba6cef70732f142c88926ce58c83ca06e6741ce5980c'
+      RELEASE_LOCK: '58addfb4f602da689af4f716cded474d4642d0c5d7d6998f71a33a0afe968efd'
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1

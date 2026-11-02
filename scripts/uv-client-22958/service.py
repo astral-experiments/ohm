@@ -18,7 +18,7 @@ ROLES=("S","F")
 SOURCES=lock["sources"]
 ORDERS=register["orders"]
 assert ORDERS==[["S","F"],["F","S"],["F","S"],["S","F"],["F","S"],["S","F"],["S","F"],["F","S"]]
-assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="d3044a1fdf0d4c244095e43e4d7fba0bdfff26041a0f1db92f0f0b09aa296b73"
+assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="9746c053f4c503b1254da422fe3fe0d6c240b75801baec7fe987e0f1ae0436bf"
 assert m.filesha(HERE/"clock-amendment.json")==lock["clock"] and m.filesha(HERE/"trigger-carrier-addendum.json")==lock["trigger"]
 assert m.filesha(HERE/"prespecified-transfer.json") == register["authority_sha256"]
 assert m.filesha(HERE/"eligibility-addendum.json") == register["eligibility_addendum"]
@@ -37,7 +37,7 @@ def host():
     assert e["GITHUB_REPOSITORY_ID"]=="1319437234" and e["RELEASE_LOCK"]==m.filesha(HERE/"release-lock.json")
     assert m.sha_git(co,"rev-parse","HEAD").decode().strip()==e["REVIEWED_HEAD"] and m.sha_git(co,"rev-parse","HEAD^").decode().strip()==case["parent"]
     absent={r["boot"] for r in lock["excluded"].values()};boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
-    assert len(absent)==len(lock["excluded"])>=16 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
+    assert len(absent)==len(lock["excluded"])>=17 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
     assert e["EXCLUDED_PRODUCTION_BOOT"]==lock["boot_list_sha256"]==m.digest(("\n".join(sorted(absent))+"\n").encode())
     assert e["BUILD_RUN_ID"]==str(lock["production_compiler"]["run"]) and e["BUILD_HEAD"]==lock["production_compiler"]["coordinator"]
     return w,t,boot
