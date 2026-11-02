@@ -3,6 +3,10 @@ run-name: Reopen Ruff 25492 at ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
+      semantic:
+        description: Independently verify the frozen ordinary metadata read set without compiling
+        type: boolean
+        default: false
       reader:
         description: Probe the matched seven-unit host ruff_python_trivia dependency closure
         type: boolean
@@ -23,7 +27,7 @@ permissions: {}
 jobs:
   readback:
     name: Read the two complete recorded packets without running a compiler
-    if: inputs.report == false && inputs.metadata == false && inputs.reader == false && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    if: inputs.semantic == false && inputs.report == false && inputs.metadata == false && inputs.reader == false && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     permissions:
@@ -149,5 +153,40 @@ jobs:
         with:
           name: ruff-line-end-25492-trivia-read-set
           path: ${{ runner.temp }}/ruff-db-link-reason/records
+          if-no-files-found: error
+          retention-days: 14
+
+  semantic:
+    name: Independently compare all native metadata reads without building Ruff
+    if: inputs.semantic && inputs.report == false && inputs.metadata == false && inputs.reader == false && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-line-end-25492-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          path: qa
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-line-end-25492
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: 88d851449d2345e11da991794f3e9bfbbd666719
+          path: ruff
+          fetch-depth: 2
+          persist-credentials: false
+          sparse-checkout: crates/ruff_source_file
+      - name: Reopen both pinned native packets and compare the complete verdict
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -IB qa/scripts/ruff-line-end-25492/metadata/reopen_semantic.py hosted ruff "$RUNNER_TEMP/observed.json"
+          cmp qa/scripts/ruff-line-end-25492/metadata/actual-reads.json "$RUNNER_TEMP/observed.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ruff-line-end-25492-semantic-readback
+          path: ${{ runner.temp }}/observed.json
           if-no-files-found: error
           retention-days: 14

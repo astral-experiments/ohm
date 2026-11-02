@@ -8,9 +8,20 @@ from pathlib import Path
 import sys
 import zipfile
 HERE=Path(__file__).resolve().parent
-sys.path.insert(0,str(HERE))
+sys.path[:0]=[str(HERE),str(HERE.parent)]
+from contact import INVOC
 from rows import definitions,fingerprints,rmeta
 from query_values import NO_HASH,ZERO,graph,stable
+
+def native_roster(members):
+    rows=[];seeds=set()
+    for name,size,digest in members:
+        if not name.endswith('.o'):continue
+        seed,=INVOC.findall(name);seeds.add(seed)
+        assert Path(name).name==name and size>0 and len(digest)==64
+        rows.append((INVOC.sub('<invocation>',name),size,digest))
+    assert rows and len(seeds)==1 and len(set(name for name,_,_ in rows))==len(rows)
+    return rows
 
 def required(z,prefix,name,rec):
     raw=z.read(prefix+name+'.gz');assert hashlib.sha256(raw).hexdigest()==rec['gzip_sha256']
@@ -41,16 +52,22 @@ def phase(z,case):
     for role,data in [('ordinary',normal),('profiled',profiled)]:
         nodes,s=graph(data,h['stamp'])
         guard,=[i for i,r in nodes.items() if r[0:2]==('external_metadata_input_hash',root)]
-        enum,=[i for i,r in nodes.items() if r[0:2]==('module_children',target)]
-        edges=[];parents=[]
+        enum_indices=[i for i,r in nodes.items() if r[0:2]==('module_children',target)]
+        assert len(enum_indices)<=1
+        enum=next(iter(enum_indices),None)
+        edges=[];parents=[];keyed=[]
         for i,(kind,key,value,start,width,number) in nodes.items():
             refs=[int.from_bytes(data[p:p+width],'little') for p in range(start,start+width*number,width)]
+            if key in keys:
+                name,fp=keys[key];keyed.append({'kind':kind,'key':key,'value':value,'index':i,'def_path':name,'rdr':fp,'guard_edge':guard in refs})
             if guard in refs:
                 name,fp=keys.get(key,(None,None));edges.append({'kind':kind,'key':key,'value':value,'def_path':name,'rdr':fp,'index':i})
             if enum in refs:parents.append({'kind':kind,'key':key,'value':value,'index':i,'def_path':keys.get(key,(None,None))[0]})
-        assert any(r['key']==target and r['kind']=='module_children' for r in edges)
-        sides[role]={'graph':s,'guard_index':guard,'guard_key':root,'guard_value':nodes[guard][2],'target_index':enum,'target_key':target,'target_value':nodes[enum][2],
-                     'direct_guard_reads':edges,'direct_enum_callers':parents}
+        enum_reads=any(r['key']==target and r['kind']=='module_children' for r in edges)
+        assert not enum_reads or enum is not None
+        sides[role]={'graph':s,'guard_index':guard,'guard_key':root,'guard_value':nodes[guard][2],'target_index':enum,'target_key':target,'target_value':nodes[enum][2] if enum is not None else None,'target_uses_guard':enum_reads,
+                     'direct_guard_reads':edges,'direct_enum_callers':parents,'direct_src_def_keys':keyed,
+                     'root_key_queries':[v for v in keyed if v['key']==root]}
     return {'source':hist['source'],'regular_pid':original['pid'],'diagnostic_pid':process['pid'],'signed_rustc':process['rustc'],
             'provider':original['provider_sha256'],'ordinary_graph':original['graph'],'profile_graph':process['graph'],'query_profile':process['profile'],'argv_sha':hist['canonical_sha256'],
             'native':{k:v for k,v in json.loads(z.read(base+'native-replayed.json')).items() if k!='members'},
@@ -87,7 +104,8 @@ def extract(z):
         for x,y in (('old','edit'),('edit','clean'),('old','clean')):
             a,b=(states[c]['observations'][role] for c in (x,y))
             summaries[role+'_'+x+'_'+y]=compare(a['direct_guard_reads'],b['direct_guard_reads'])
-            summaries[role+'_'+x+'_'+y+'_enum_callers']=compare(a['direct_enum_callers'],b['direct_enum_callers'])
+            for qualifier,reads in [('enum_callers','direct_enum_callers'),('source_def_keys','direct_src_def_keys'),('root_key_only','root_key_queries')]:
+                summaries[role+'_'+x+'_'+y+'_'+qualifier]=compare(a[reads],b[reads])
     return {'states':states,'summaries':summaries}
 if __name__=='__main__':
     with zipfile.ZipFile(sys.argv[1]) as z:Path(sys.argv[2]).write_text(json.dumps(extract(z),indent=2,sort_keys=True)+'\n')

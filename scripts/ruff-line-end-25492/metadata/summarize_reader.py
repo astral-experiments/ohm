@@ -33,10 +33,12 @@ def summarize(z,repo):
                    'original_files':{k:v[k] for k in ('ordinary_graph','profile_graph','query_profile')},'compiler':v['signed_rustc'],
                    'normal_graph':obs['graph'],'profiled_graph':diag['graph'],'native_members':v['native_members'],'native':v['native'],
                    'input_root':obs['guard_key'],'normal_reads':len(obs['direct_guard_reads']),'profiled_reads':len(diag['direct_guard_reads']),
-                   'profile_direct_anchors':p['anchors'],'target_key':obs['target_key'],'target_value':obs['target_value'],'direct_parent':obs['direct_enum_callers'],
+                   'profile_direct_anchors':p['anchors'],'target_key':obs['target_key'],'target_value':obs['target_value'],'ordinary_enum_present':obs['target_index'] is not None,'profile_enum_present':diag['target_index'] is not None,
+                   'ordinary_enum_reads_guard':obs['target_uses_guard'],'profile_enum_reads_guard':diag['target_uses_guard'],'direct_parent':obs['direct_enum_callers'],
                    'query_time':times,'enum':enum[case]}
     counts={k:r['counts'] for k,r in ordinary['summaries'].items()}
     return dict(cases=row,counts=counts,ordinary_old_edit=ordinary['summaries']['ordinary_old_edit'],ordinary_edit_clean=ordinary['summaries']['ordinary_edit_clean'],
+                ordinary_root_changes=ordinary['summaries']['ordinary_old_edit_root_key_only'],
                 native_hardware=ref['sampled_host_trivia_pids']),ordinary,profiled
 
 def main(z,repo,out):

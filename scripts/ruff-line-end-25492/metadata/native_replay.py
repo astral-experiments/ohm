@@ -13,6 +13,7 @@ HERE=Path(__file__).resolve().parent;sys.path[:0]=[str(HERE),str(HERE.parent)]
 import worker as w
 from audit import checked_exec,exec_environment,run,save,sha
 from reader_owner import freeze
+from ordinary_edges import native_roster
 from contact import ar_members
 
 def tree(path):
@@ -119,9 +120,10 @@ def collect(case,root,phase,private,trace,dirs,typed_env):
         def objects(m):return [(n,s,h) for n,s,h in m if n.endswith('.o')]
         assert objects(before_members)
         results={'rlib':sha(normal_rlib),'members':after_members,'original_native_equal_in_order':objects(before_members)==objects(after_members),
-                 'sorted_original_native_equal':sorted(objects(before_members))==sorted(objects(after_members))}
+                 'sorted_original_native_equal':sorted(objects(before_members))==sorted(objects(after_members)),
+                 'normalized_names_and_order_and_payloads_equal':native_roster(before_members)==native_roster(after_members)}
         save(phase/'native-replayed.json',results)
-        native_equal=results['sorted_original_native_equal']
+        native_equal=results['normalized_names_and_order_and_payloads_equal']
         cmd=['rustc','+ohm','--edition=2024',HERE/'trivia.rs','--extern','ruff_python_trivia='+str(normal_rlib)]
         for d in dirs:cmd+=['-L','dependency='+str(d)]
         exe=private/'typed-replayed';run([*cmd,'-o',exe],typed_env,w.SRC)
