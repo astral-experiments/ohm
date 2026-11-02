@@ -1,0 +1,8 @@
+Compare the unmodified frozen C candidate FFI's complete wire and the ordinary
+LLVM 23 default<O1> pipeline for allocsize(0) arguments 16 and 32 on a function
+which reserves 64 bytes. The caller observes the allocation through LLVM
+objectsize. Print the real linked executable's value. Record whether each FFI
+accepts, whether the wires match, and full normal objects/allocated bytes.
+Repeat after removing allocsize from the call only and after removing it from
+both definition and call. The actual experimental Rust object parser must
+admit an old/new pair before claiming an erroneous materialization.
