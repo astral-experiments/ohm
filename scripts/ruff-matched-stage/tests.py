@@ -151,9 +151,9 @@ def source_control(clean):
         subprocess.run(["git", "init", "-q", "--bare", repo], check=True)
         common = Path(build.git(clean, "rev-parse", "--path-format=absolute", "--git-common-dir"))
         (repo / "objects/info/alternates").write_text(str(common / "objects") + "\n")
-        parent = c.REG["roles"]["P"]["revision"]
-        (repo / "shallow").write_text(parent + "\n")
-        build.git(repo, "update-ref", "refs/heads/parent", parent)
+        prerequisite = c.REG["bundle"]["prerequisite"]
+        (repo / "shallow").write_text(prerequisite + "\n")
+        build.git(repo, "update-ref", "refs/heads/base", prerequisite)
         build.bundle(repo)
         print(
             "Exact parent, child, compiler trees, worktree blobs, sole candidate ref and direct-parent bundle passed."

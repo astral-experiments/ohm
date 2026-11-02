@@ -147,24 +147,6 @@ def smoke(root, manifest, base):
         )
         lib.write_text("pub fn value()->u32 {17}\n")
         cargo_result(["check"], work, env)
-        graph_files = [
-            path for directory in ("target", "build")
-            for path in (work / directory).rglob("ohm-check-dep-graph.bin")
-        ]
-        need(graph_files, "ordinary check did not produce a cross-stage graph")
-        graph_sizes = {}
-        for i, f in enumerate(sorted(graph_files)):
-            data = f.read_bytes()
-            need(data[:4] == (b"RSIC" if label == "normal" else b"RSIG")
-                 and data.endswith(b"rust-end-file"), "not the registered rustc graph")
-            version = int.from_bytes(data[4:6], "little")
-            end = len(data) - len(b"rust-end-file")
-            marker = data[end - 32:end - 24]
-            need((version, marker if label == "normal" else marker[2:]) ==
-                 ((26655, b"OHMIDX01") if label == "normal" else (26655, b"OHMF11")),
-                 ("wrong physical check format", label, version, marker))
-            graph_sizes[str(i)] = {"bytes": len(data), "sha256": sha(f), "version": version, "magic": data[:4].decode()}
-        save(root / "logs" / ("check-format-" + label + ".json"), graph_sizes)
         rows = []
         for value in (17, 29):
             lib.write_text(f"pub fn value()->u32 {{{value}}}\n")

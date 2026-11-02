@@ -1,5 +1,5 @@
-name: Build the matched indexed check graph compilers
-run-name: Matched indexed check graph compilers ${{ inputs.reviewed_head }}
+name: Build the matched upstream monomorphization compilers
+run-name: Matched upstream monomorphization compilers ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
@@ -9,11 +9,11 @@ run-name: Matched indexed check graph compilers ${{ inputs.reviewed_head }}
         type: string
 permissions: {}
 concurrency:
-  group: ohm-indexed-check-matched-stage1-${{ github.sha }}
+  group: ohm-upstream-mono-owner-stage1-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   matched:
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-indexed-check-matched-stage-20261102'
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-upstream-mono-owner-20261102'
       && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
@@ -152,7 +152,7 @@ jobs:
     - name: Retain the matched compiler capsule
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ohm-indexed-check-matched-stage1
+        name: ohm-upstream-mono-owner-stage1
         path: ${{ runner.temp }}/ohm-branch-object-qa/matched-stage.tar.zst
         compression-level: 0
         retention-days: 7
@@ -161,7 +161,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ohm-indexed-check-matched-stage1-receipts
+        name: ohm-upstream-mono-owner-stage1-receipts
         path: ${{ runner.temp }}/ohm-branch-object-qa/logs
         retention-days: 7
         if-no-files-found: warn
