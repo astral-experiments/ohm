@@ -1,26 +1,22 @@
-name: Unscored uv 20991 direct root opening
-run-name: Verify direct uv root edit at ${{ inputs.reviewed_head }}
+name: Open uv 22635 on signed Ohm
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed private coordinator commit for the unscored opening
         type: string
         required: true
-permissions: {}
+        description: Exact private coordinator SHA
+permissions:
+  contents: read
+  attestations: read
 concurrency:
-  group: unscored-uv-20991-root-opening
+  group: unscored-uv-22635-signed-opening
   cancel-in-progress: false
 jobs:
   opening:
-    name: Verify independent cold histories and the actual ordinary-root compiler execs
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-20991-root-opening' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    if: github.repository == 'astral-experiments/ohm' && github.event.repository.private == true && github.ref == 'refs/heads/charlie/codex-uv-22635-root-opening' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 75
-    permissions:
-      contents: read
-      actions: read
-      attestations: read
+    timeout-minutes: 200
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PYTHONDONTWRITEBYTECODE: '1'
@@ -28,59 +24,49 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.sha }}
+          path: coordinator
           persist-credentials: false
-          sparse-checkout: |
-            scripts/uv-root-20991-opening
-            .github/workflows
+          sparse-checkout: scripts/uv-22635-opening
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
           path: previous
           persist-credentials: false
           sparse-checkout: scripts/uv-resolver-whole-pmu
-      - name: Admit the pinned system Python, disk budget, offline readers and scoped descendant trace
-        run: |
-          set -euo pipefail
-          mkdir -p trait-results
-          (
-            cd scripts/uv-root-20991-opening
-            sha256sum -c SHA256SUMS
-          )
-          /usr/bin/bash scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py early 2>&1 | tee trait-results/initial.log
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/uv
-          ref: 5d4a62d7461c7708f3e65d08cef0e99bad94c004
+          ref: 05e1cc1dc13dc58713c5d049af855a9d2d618b51
           path: uv-source
-          # The real edit is sixteen linear commits after the last release tag.
-          fetch-depth: 17
+          fetch-depth: 58
           fetch-tags: false
           persist-credentials: false
-      - name: Admit the actual historical uv tag used by its build script
-        env:
-          GIT_TERMINAL_PROMPT: '0'
+      - name: Verify the historical tag read by uv itself
+        run: git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.13.1:refs/tags/0.13.1
+      - name: Find or install the system Python used by the frozen witness
         run: |
           set -euo pipefail
-          git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.2:refs/tags/0.12.2
-          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py history uv-source | tee trait-results/source-git-history.json
-      - name: Admit the signed release and final production distribution with the original verifier
+          if ! test -x /usr/bin/python3.12; then
+            sudo apt-get -o Acquire::Retries=3 update
+            sudo apt-get -o Acquire::Retries=3 -y --no-install-recommends install python3.12
+          fi
+          /usr/bin/python3.12 --version
+      - name: Verify the signed SDK and all 142 installed components
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py intake 2>&1 | tee trait-results/acquire.log
-      - name: Run the two genuine root openings and re-read all evidence
-        run: |
-          set -euo pipefail
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py run 2>&1 | tee trait-results/opening.log
-          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py verify trait-results
-      - name: Preserve full or partial unscored evidence
+          cd coordinator/scripts/uv-22635-opening
+          sha256sum -c SHA256SUMS
+          /usr/bin/python3.12 -ISBu opening.py prepare
+      - name: Verify the first edit, independent cold builds and native workspace behavior
+        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-22635-opening/opening.py run
+      - name: Retain original unscored evidence including failed gates
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-20991-independent-root-opening-${{ github.run_id }}-${{ github.run_attempt }}
-          path: trait-results/
+          name: uv-22635-signed-opening-${{ github.run_id }}-${{ github.run_attempt }}
+          path: results/
           retention-days: 14
           compression-level: 2
           if-no-files-found: warn

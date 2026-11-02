@@ -1,0 +1,75 @@
+{
+  "A": "1456bba7a9afaceb97194dddcf2e317e77e1104d",
+  "B": "05e1cc1dc13dc58713c5d049af855a9d2d618b51",
+  "branch": "charlie/codex-uv-22635-root-opening",
+  "case": {
+    "A_tree": "a874079637b5c7bd96b7f7f9ed1fb64420ee3e09",
+    "B_tree": "c70e163af6d37b5019ecbc4ae52c434c52be63b5",
+    "changed_paths": [
+      "crates/uv-workspace/src/workspace.rs"
+    ]
+  },
+  "chain_sha256": "695385450c39674948d39744907f5c1a1e8c5add61531a55162eb9916bc13603",
+  "coordinator": "8bf1d2c61fa3bb23ccf44a329e74e0359d98848c",
+  "eligibility": "unscored enrollment only. Five unchanged native/typed visits at A and B; same-seed ordinary and verbose first edit; A, warm-B, and independent fresh-B original native witnesses; cold/warm B raw changed-provider agreement required. A failed gate remains failed.",
+  "minimum_initial_free_gib": 126,
+  "native_argv": [
+    "/tmp/uv-workflow-search/sdk/bin/cargo",
+    "check",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "old_files": {
+    "intake.py": "88bf7f852c5616c2b09d395fd4cb662a3c6303c79f8e8866dee25bee621be57f",
+    "protocol.json": "c6be5c49d904060c300e0910b57bc86a07d7c14839dee1e98f50e011fb29e959",
+    "run.py": "ccd44c276d5d3660b361cca9f8c816602536239f6986264a88daa02340b514da"
+  },
+  "opening_registration_sha256": "5c9d3e94c64a65eb85252f823ff1a2be6916f03100e62dd1608d1786d893779e",
+  "registry_entries": 654,
+  "registry_sha256": "5656bb80e3b3d189535f39d40004245440456a49f39f2b123b06cf9fb3a3cb34",
+  "repo": "astral-experiments/ohm",
+  "sdk": {
+    "signed": {
+      "bundled_archive": "bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7",
+      "bytes": 570106827,
+      "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+      "driver": "4c8ccf0072e8f382a3a3756fd60e46936a2bd206996201c55caffe58d29725db",
+      "inventory_sha256": "662972c0aaaf87e482298f461ce0d172267ee22b4b1740c6946152483c90bcc6",
+      "members": 142,
+      "rust": "008a21ac0d750dc9a1c18b7959d7e7984c03d887",
+      "rustc": "7e35096dab1b661924cb3c31982c870dd99c7c00a7fba28aa958f451e7c9474e"
+    }
+  },
+  "source_details": {
+    "descriptions": {
+      "A": "1456bba7a9afaceb97194dddcf2e317e77e1104d 1456bba7a 2026-10-16 0.13.1-56-g1456bba",
+      "B": "05e1cc1dc13dc58713c5d049af855a9d2d618b51 05e1cc1dc 2026-10-16 0.13.1-57-g05e1cc1"
+    },
+    "distance_from_tag": 57,
+    "git_patch_sha256": "2327b1cbdc99dcabf8637848239a5930b2c07c363b9d9f7fc7f19ca286d4a9be",
+    "lock_sha256": "8c722a2dc9f0839e97f3a96db990159f3770c074ef3ff2500d90096b6818e0c5",
+    "tag": "0.13.1",
+    "tag_commit": "62faed3351cfee2121b3c28b937b1f4b93233a93",
+    "trees": [
+      "a874079637b5c7bd96b7f7f9ed1fb64420ee3e09",
+      "c70e163af6d37b5019ecbc4ae52c434c52be63b5"
+    ]
+  },
+  "witness_sha256": "db55b224ba78dd9dd2195e73126cef2fed8638ffdd4460cda79e841364bf0211",
+  "workload_environment": {
+    "CARGO_HOME": "/tmp/uv-workflow-search/cargo",
+    "CARGO_NET_OFFLINE": "true",
+    "CARGO_TARGET_DIR": "/tmp/uv-workflow-search/target",
+    "CARGO_TERM_COLOR": "never",
+    "GIT_ALLOW_PROTOCOL": "file",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_NO_LAZY_FETCH": "1",
+    "HOME": "/tmp/uv-workflow-search/home",
+    "LC_ALL": "C.UTF-8",
+    "PATH": "/tmp/uv-workflow-search/sdk/bin:/usr/bin:/bin",
+    "RUSTC": "/tmp/uv-workflow-search/sdk/bin/rustc",
+    "RUSTDOC": "/tmp/uv-workflow-search/sdk/bin/rustdoc"
+  }
+}
