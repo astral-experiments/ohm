@@ -205,7 +205,9 @@ def case(phase,private,base_env,state,old=None,retain=None,profiler=None):
     cp=folder/'clock.json'
     argv += [private/'watch',cp,*CMD]
     save(folder/'command.json',{'argv':list(map(str,argv)),'env':env,'source':git('rev-parse','HEAD'),'prior_storage':storage(state)})
+    save(folder/'tools-before-cargo.json',profile_work.tool_state(SDK,private,env))
     p=run(argv,env,SRC,exact=None)
+    save(folder/'tools-after-cargo.json',profile_work.tool_state(SDK,private,env))
     gz(folder/'cargo.stdout.gz',p.stdout);gz(folder/'cargo.stderr.gz',p.stderr)
     if p.returncode!=0:
         raise RuntimeError((phase,p.returncode,p.stderr[-2800:].decode(errors='replace')))
@@ -219,7 +221,7 @@ def case(phase,private,base_env,state,old=None,retain=None,profiler=None):
     libs,units=source_variants(phase,products,procs)
     save(folder/'source-units.json',units)
     contact.outputs(products,procs,folder)
-    sampled=profile_work.write(folder,private,env,profiler,trace,procs,links,price) if profiler else None
+    sampled=None
     if phase in ('old','clean'):
         assert all(not r['fresh'] for r in products)
         assert set(OWNERS)<={r['crate'] for r in procs if not r['link_only']}
@@ -266,6 +268,16 @@ def main():
     assert new_elf['cli_cases']==same['cli_cases']==empty['cli_cases']
     assert new_elf['cli_version']==same['cli_version']==empty['cli_version']
     assert all(r['products']==o['products'] for r in readbacks.values())
+    before_symbolize=profile_work.tool_state(SDK,private,env)
+    all_snapshots=[json.loads((LOG/ph/file).read_text()) for ph in ('old','edit','unchanged','clean') for file in ('tools-before-cargo.json','tools-after-cargo.json')]
+    save(LOG/'tools-before-symbolize.json',before_symbolize)
+    edit_procs=json.loads((LOG/'edit/processes.json').read_text())
+    edit_env=json.loads((LOG/'edit/command.json').read_text())['env']
+    readbacks['edit']['sampled']=profile_work.write(LOG/'edit',private,edit_env,perf,private/'trace-edit',edit_procs['compilers'],edit_procs['wild'],readbacks['edit']['price'])
+    edit_summary=json.loads((LOG/'edit/summary.json').read_text())
+    edit_summary['sampled']=readbacks['edit']['sampled'];save(LOG/'edit/summary.json',edit_summary)
+    after_symbolize=profile_work.tool_state(SDK,private,env)
+    save(LOG/'tools-after-symbolize.json',after_symbolize)
     gates={}
     assert sha(contact.REF)==contact.DIGEST
     with zipfile.ZipFile(contact.REF) as original:
@@ -285,7 +297,9 @@ def main():
         shape=lambda r:(r['roster'],r['products'],r['dirty'],r['wild'])
         gates['four_phases']={'same_dirty_owners_and_wild':all(shape(readbacks[k])==shape(previous[k]) for k in previous),
            'one_namespace':len({tuple(sorted(r['native_output_namespaces'])) for r in readbacks.values()})==1,
-           'sample_counts':bool(readbacks['edit']['sampled'])}
+           'sample_counts':bool(readbacks['edit']['sampled']),
+           'tools_immutable_in_four_histories':all(s==all_snapshots[0] for s in [*all_snapshots,before_symbolize]),
+           'tools_immutable_after_symbolization':before_symbolize==after_symbolize}
     save(LOG/'comparison-gates.json',gates)
     save(LOG/'complete.json',{'visits':readbacks,'typed':[old_elf['typed'],new_elf['typed']],'fixed_cli':new_elf['cli_cases'],
                               'cli_sha256s':[v['cli_sha256'] for v in (old_elf,new_elf,same,empty)],'qa':os.environ['GITHUB_SHA']})
