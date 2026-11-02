@@ -1,0 +1,82 @@
+{
+  "archive_bytes": 50584,
+  "archive_sha256": "57a5a095d38903e93c14bb28f09c18832e16b83f9e7743a8887b5e5888f9b031",
+  "artifact": 13154767213,
+  "candidate_locations": [
+    "--> compiler/rustc_codegen_llvm/src/back/source_placement/maps.rs:9:5",
+    "--> compiler/rustc_codegen_llvm/src/back/source_placement/maps.rs:15:5",
+    "--> compiler/rustc_codegen_llvm/src/back/source_placement/maps.rs:18:5",
+    "--> compiler/rustc_codegen_llvm/src/back/source_placement/maps.rs:44:5"
+  ],
+  "compiler_candidate": "d5541719a447bbf9c853981296b182265ebf79d3",
+  "compiler_parent": "531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5",
+  "native_subjects": 0,
+  "parent_constructors": {
+    "cxx": {
+      "OhmRegisterCoalescer.cpp": [
+        {
+          "pid": 10873,
+          "sha256": "728d0ae84fb50df0dc8517e7ce3992798bb92330074d32b6a870f870adcb7ac1"
+        }
+      ],
+      "OhmSourcePlacement.cpp": []
+    },
+    "native_selection": "55855526421d942de876f0739e0fa5c36c2eeb599af2be5f7e19cb0a1258ca50",
+    "role": "P",
+    "rustc_crates": {
+      "rustc_codegen_llvm": [
+        {
+          "path": "compiler/rustc_codegen_llvm/src/lib.rs",
+          "pid": 11524
+        }
+      ],
+      "rustc_codegen_ssa": [
+        {
+          "path": "compiler/rustc_codegen_ssa/src/lib.rs",
+          "pid": 11486
+        }
+      ],
+      "rustc_incremental": [
+        {
+          "path": "compiler/rustc_incremental/src/lib.rs",
+          "pid": 10994
+        }
+      ],
+      "rustc_llvm": [
+        {
+          "path": "compiler/rustc_llvm/src/lib.rs",
+          "pid": 11047
+        }
+      ],
+      "rustc_middle": [
+        {
+          "path": "compiler/rustc_middle/src/lib.rs",
+          "pid": 10820
+        }
+      ]
+    },
+    "source": {
+      "compiler": "2a47fea6f16cf23729168513509540abc4db4056",
+      "revision": "531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5",
+      "tree": "e23fcbbde57dc251d92d3b052c8f7d088eac1ea9"
+    },
+    "stage0_rustc": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2",
+    "total_physical_execs": 1667
+  },
+  "qa": "b8af7343b319923efcc8aa29cc562ada676e4a81",
+  "raw_files": {
+    "C-inputs.json": "49df8f9cac3705d8e4503c51743f3282003618dbaa1d769f01ef668bd5086036",
+    "P-constructed.json": "70466bada23e80ad19dbcba25acbce391e940f275a53601822fb81de38e2b3a4",
+    "P-constructors.jsonl.gz": "55855526421d942de876f0739e0fa5c36c2eeb599af2be5f7e19cb0a1258ca50",
+    "P-docs.json": "8d4bc412c3525a9116d4c7c534005a0fd671a6b242364b4d0d03115d2e682468",
+    "P-driver.json": "6e1a430ca00ba234b9ace68d59512a73e331d627be16409fc402d8e3995995fe",
+    "P-inputs.json": "4baebb08848c2b8ce3818934aad2607a814834398118fe17b1120bbba1735469",
+    "build-C.log": "436bed8e8246b0df32cf89f46d68be56453d32224c23e4e3929df437bf2916d8",
+    "build-P.log": "7552aec2d2597296ff5e5394a45d405db7bf070f8746036b8c8911ac9b1b4c8a",
+    "entry.json": "243a5eb187d5a8af2c9f74a0c66981f055c4b1df5052ac0c0d92640bcb48a9a7",
+    "source.json": "462d8cb5d3ab87ceb893059cbce16b5f8052155a03e6ca114526941063640d2e"
+  },
+  "run": 41468482219,
+  "scored_subjects": 0,
+  "status": "failed candidate compilation under the ordinary source bootstrap with deny(warnings)"
+}
