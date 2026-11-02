@@ -134,6 +134,26 @@ def check_products(z, stem, suite):
         )
 
 
+def check_executables(records, arm, suite):
+    def digest(history, phase):
+        row = records[arm, history, phase]
+        if suite == "e2e":
+            return row["executable_sha256"]
+        assert row["consumer"]["name"] == "option-client"
+        return row["consumer"]["sha256"]
+
+    before, after = digest("edit", "old"), digest("clean", "clean-new")
+    assert len(before) == len(after) == 64 and before != after
+    assert all(
+        digest("edit", phase) == after for phase in ("new", "unchanged", "repair")
+    )
+    if suite == "e2e":
+        negative = digest("clean", "negative")
+        assert negative != after == digest("clean", "restored-new")
+        return before, after, negative
+    return before, after
+
+
 def read_pair(directory, pair, registry, factory, fetch):
     with archive(directory, pair, fetch) as z:
         assert len(z.namelist()) == len(set(z.namelist()))
@@ -166,8 +186,10 @@ def read_pair(directory, pair, registry, factory, fetch):
             == (12 if pair["suite"] == "build" else 16)
         )
         clocks = {}
+        native = {}
         for index, arm in enumerate(order):
             check_products(z, f"{OBS}/{index}-{arm}", pair["suite"])
+            native[arm] = check_executables(records, arm, pair["suite"])
             values = {}
             for phase in PHASES:
                 path = f"{OBS}/{index}-{arm}-edit/{phase}"
@@ -178,7 +200,8 @@ def read_pair(directory, pair, registry, factory, fetch):
                 assert qualified == row
                 values[phase] = check_command(z, path, pair["suite"], phase, row)
             clocks[arm] = values
-    return enrollment, clocks
+        assert native["defer"] == native["normal"]
+    return enrollment, clocks, native["normal"]
 
 
 def report(directory, fetch):
@@ -193,13 +216,17 @@ def report(directory, fetch):
     )
     boots = set()
     workers = set()
+    executables = {}
     reductions = []
     edit_and_next = []
     print(
         "Run          Suite    Order         Parent instructions   Candidate instructions   Reduction"
     )
     for pair in registry["pairs"]:
-        enrollment, clocks = read_pair(directory, pair, registry, factory, fetch)
+        enrollment, clocks, native = read_pair(
+            directory, pair, registry, factory, fetch
+        )
+        assert executables.setdefault(pair["suite"], native) == native
         assert enrollment["boot"] not in boots and enrollment["runner"] not in workers
         boots.add(enrollment["boot"])
         workers.add(enrollment["runner"])
