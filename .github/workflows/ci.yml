@@ -9,15 +9,15 @@ name: Build the incoherent-directory compiler for uv 21041
 permissions: {}
 jobs:
   domain:
-    name: Incoherent-directory stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain)
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-incoherent-domain-stage1'
+    name: Proc-derive identity stage1 SDK (fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive)
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-proc-derive-stage1'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     permissions:
       contents: read
     env:
-      BENCH_ARM: fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain
+      BENCH_ARM: fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive
       OHM_TOOLCHAIN: ohm-1.99.0-22
       OHM_TARGET: x86_64-unknown-linux-gnu
       PYTHONDONTWRITEBYTECODE: '1'
@@ -111,7 +111,7 @@ jobs:
       run: python3 -ISB scripts/incoherent-domain-stage1/stage.py "$BENCH_ARM"
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: domain-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain
+        name: proc-derive-stage1-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive
         path: stage1-capsule/
         if-no-files-found: error
         compression-level: 0
@@ -119,7 +119,7 @@ jobs:
       id: bundle
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: domain-stage1-incomplete-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain
+        name: proc-derive-stage1-incomplete-fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain_proc_derive
         path: trait-evidence/
         if-no-files-found: warn
         compression-level: '0'

@@ -5,8 +5,8 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 import gate as g
 import export_sdk
 
-H=Path(__file__).resolve().parent;S=g.load(H/"arms.json");BASE="fa7a_stack_ctfe318";CAND=BASE+"_handwritten_coroutine_callables_incoherent_domain"
-BRANCH="charlie/codex-21041-incoherent-domain-stage1"; HOST="x86_64-unknown-linux-gnu";UNIT="only_the_original_ctfe_literal_id_is_restored"
+H=Path(__file__).resolve().parent;S=g.load(H/"arms.json");BASE="fa7a_stack_ctfe318";CAND=BASE+"_handwritten_coroutine_callables_incoherent_domain_proc_derive"
+BRANCH="charlie/codex-21041-proc-derive-stage1"; HOST="x86_64-unknown-linux-gnu";UNIT="only_the_original_ctfe_literal_id_is_restored"
 NATIVE=S["fixture_directory"];QUERY=S["arms"][CAND]["query_fixture"];REG="tests/run-make/"
 def context():
     e=os.environ
@@ -37,20 +37,20 @@ def verified_version(vv, commit):
     return lines[0].removeprefix("rustc ")
 def suites(role):
     assert role in (BASE,CAND)
-    return [NATIVE, REG+"rdr-public-hash-native-exports", REG+"trait-impl-bucket-projection", QUERY, REG+"trait-impl-bucket-coroutine", REG+"trait-impl-bucket-callables", REG+"crate-incoherent-impl-domain"]
+    return [NATIVE, REG+"rdr-public-hash-native-exports", REG+"trait-impl-bucket-projection", QUERY, REG+"trait-impl-bucket-coroutine", REG+"trait-impl-bucket-callables", REG+"crate-incoherent-impl-domain", S["arms"][CAND]["derive_fixture"]]
 def passed(raw,which,role):
     text=raw.decode(errors="replace");assert "test result: FAILED" not in text and re.search(r"(?m)^test result: ok\. [1-9]\d* passed; 0 failed; 0 ignored;",text)
     expected=["test mir::interpret::tests::"+UNIT+" ... ok"] if which=="unit" else ["test [run-make] "+test+" ... ok" for test in suites(role)]
     if which=="allocator":
         names = re.findall(r"(?m)^test definitions::impl_disambiguator_tests::(\w+)(?: - should panic)? \.\.\. ok$", text)
-        assert sorted(names)==sorted(["different_receivers_and_fallback_impls_preserve_both_siblings","impl_hints_share_the_dense_namespace","impl_hints_cannot_wrap_the_dense_cursor"])
+        assert sorted(names)==sorted(['different_receivers_and_fallback_impls_preserve_both_siblings', 'impl_hints_share_the_dense_namespace', 'impl_hints_cannot_wrap_the_dense_cursor', 'derived_and_handwritten_hints_cannot_claim_the_same_impl', 'a_derived_slot_reserves_the_dense_ordinal_and_preserves_full_hash_collision_errors'])
     else:
         assert all(text.splitlines().count(x)==1 for x in expected)
 def match_source(v,role,ctx):
     arm=S["arms"][role]
     assert v["role"]==role and v["source"]==arm and v["released_coordinator"]==S["released_coordinator"] and v["signed_manifest_sha256"]==S["signed_manifest_sha256"] and v["source_pack_sha256"]==S["pack_sha256"]
     assert v["reviewed_head"]==ctx["GITHUB_SHA"] and str(v["run_id"])==ctx["GITHUB_RUN_ID"] and str(v["run_attempt"])==ctx["GITHUB_RUN_ATTEMPT"] and v["workflow_ref"]==ctx["GITHUB_WORKFLOW_REF"] and v["evidence_repository"]==ctx["GITHUB_REPOSITORY"]
-    assert v["classification"]=="private optimized stage1 incoherent-directory experiment"
+    assert v["classification"]=="private optimized stage1 procedural derive identity experiment"
 def git(repo,*args):return subprocess.check_output(["git","-C",repo,*args],text=True).strip()
 def run(role):
     assert __debug__ and role==CAND;ctx=context();bundle=file_map()
