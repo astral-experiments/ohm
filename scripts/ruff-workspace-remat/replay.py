@@ -179,15 +179,21 @@ def runtime(here, work, env, phase, batch, clock, gold):
     return {"counts": rows, "bytes": binary.stat().st_size, "sha256": sha(binary)}
 
 
+def frozen_sources(qa):
+    """Verify every input before preparing the worker or starting a measured history."""
+    need(sha(QA_LEDGER) == "fc52bc8aaac6e9cde0e19a6f406c4951667a8a6779099d411e8404f19d8bd6c0", "changed pinned QA ledger")
+    ledger = read(QA_LEDGER)
+    for file, expected in ledger.items():
+        need(sha(qa/file) == expected, ("changed frozen QA input", file))
+    return ledger
+
+
 def main(args):
     qa, src, original, scratch, out = (v.resolve() for v in
                                       (args.qa, args.source, args.original, args.scratch, args.results))
     need(original.name == "ohm-branch-object-qa", original)
     os.environ["RUNNER_TEMP"] = str(original.parent)
-    need(sha(QA_LEDGER) == "f06a602f6520bd74935fd4e09e523cef18ff9b7810bb20c9818a25a5f8751969", "changed pinned QA ledger")
-    ledger = read(QA_LEDGER)
-    for file, expected in ledger.items():
-        need(sha(qa/file) == expected, ("changed frozen QA input", file))
+    ledger = frozen_sources(qa)
     sys.path[:0] = [str(qa / "scripts/ruff-workspace-option-edit"), str(qa / "scripts/ruff-repair-tables-pilot")]
     import guards
     import worker as w
@@ -341,6 +347,9 @@ def main(args):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "verify-sources":
+        frozen_sources(Path(sys.argv[2]).resolve())
+        sys.exit(0)
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("qa", "source", "original", "scratch", "results"):
         parser.add_argument("--" + name, type=Path, required=True)
