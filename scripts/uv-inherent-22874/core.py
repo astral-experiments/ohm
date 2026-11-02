@@ -5,7 +5,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 BASE = HERE.parent / "handwritten-panel"
-sys.path.insert(0, str(BASE))
+sys.path[:0] = [str(HERE), str(BASE)]
 import material as m
 import deep, scope
 
