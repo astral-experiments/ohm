@@ -26,9 +26,10 @@ CONSTRUCTORS = ["cargo","+ohm","test","-p","ruff_text_size","--test","constructo
 FIXTURE = ["cargo","+ohm","build","--locked","--offline","-j8","--message-format=json"]
 
 
-def fetch():
+def fetch(roles=SOURCE):
     census.install()
-    for role,(run,head,aid,size,digest) in ARTIFACT.items():
+    for role in roles:
+        run,head,aid,size,digest=ARTIFACT[role]
         url = "repos/astral-experiments/ohm/actions"
         def api(p):
             return json.loads(subprocess.check_output(["gh","api",url+p]))
@@ -211,8 +212,9 @@ def run(ruff):
 if __name__=="__main__":
     import argparse
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("phase",choices=("fetch","run"))
+    parser.add_argument("phase",choices=("fetch","fetch-child","run"))
     parser.add_argument("source",type=Path,nargs="?")
     args=parser.parse_args()
     if args.phase=="fetch":fetch()
+    elif args.phase=="fetch-child":fetch(("child",))
     else:run(args.source.resolve(strict=True))

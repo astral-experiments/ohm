@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight]
         default: single-22
       reviewed_head:
         description: Exact reviewed QA commit
@@ -42,6 +42,13 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        if: inputs.mode == 'constructors-wild-preflight'
+        with:
+          repository: wild-linker/wild
+          ref: e856d81f6683cad80b9fe0ebf1a0c3c403c6fe11
+          path: upstream-wild
+          persist-credentials: false
       - name: Verify the fixed sources and the native tracing facility
         working-directory: enrolled
         run: |
@@ -88,6 +95,19 @@ jobs:
       - name: Trace the actual constructors link and qualify the earlier implicit provider in a private view
         if: inputs.mode == 'constructors-implicit-input'
         run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/constructors_inputs.py run "$GITHUB_WORKSPACE/ruff"
+      - name: Prepare an authenticated stock kit and source-bound Cargo 330 for the single linker study
+        if: inputs.mode == 'constructors-wild-preflight'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB enrolled/scripts/ruff-workspace-link-census/bisect330.py fetch-child
+      - name: Build the same-process observation tool from the original Wild source
+        if: inputs.mode == 'constructors-wild-preflight'
+        run: |
+          sudo apt-get install -y --no-install-recommends valgrind
+          python3 -IB -u enrolled/scripts/ruff-workspace-link-census/wild_preflight.py build "$GITHUB_WORKSPACE/upstream-wild"
+      - name: Price actual constructors links and test incumbent and input integrity
+        if: inputs.mode == 'constructors-wild-preflight'
+        run: python3 -IB -u enrolled/scripts/ruff-workspace-link-census/wild_preflight.py run "$GITHUB_WORKSPACE/ruff"
       - name: Retain the native process tree, Cargo products, link markers and verdicts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
