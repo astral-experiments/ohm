@@ -1,144 +1,39 @@
-name: Real uv 20988 root check on corrected production compilers
+name: Calibrate instruction counters on the threads of a single compiler image
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
+        description: Reviewed commit of the private calibration tool
         required: true
         type: string
-        description: Reviewed full SHA of this benchmark
-      build_run_id:
-        required: true
-        type: string
-        description: Completed corrected two-role production build run
-      build_head:
-        required: true
-        type: string
-        description: Reviewed full SHA of that build workflow
-      sdk_lock_sha256:
-        required: true
-        type: string
-        description: SHA256 of the independently enrolled Actions receipt
 permissions:
   contents: read
-  actions: read
-  attestations: read
 jobs:
-  root:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-ctfe22-root-hardware' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+  calibrate:
+    if: github.event.repository.private && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rustc-thread-instructions' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 350
-    env:
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      BUILD_RUN_ID: ${{ inputs.build_run_id }}
-      BUILD_HEAD: ${{ inputs.build_head }}
-      SDK_LOCK_SHA256: ${{ inputs.sdk_lock_sha256 }}
+    timeout-minutes: 8
     steps:
-      - name: Check out coordinator
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          path: coordinator
           ref: ${{ github.sha }}
           persist-credentials: false
-          sparse-checkout: |
-            scripts/uv-20988-ctfe-hw
-      - name: Check out builder
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          path: builder
-          ref: ${{ inputs.build_head }}
-          persist-credentials: false
-          sparse-checkout: |
-            .github/workflows
-            scripts/ctfe22-gnu
-      - name: Check out opening
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          path: opening
-          ref: 341cd92e5d381a50bd380467075f31e780ee6296
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/uv-root-20991-opening
-      - name: Check out previous
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          path: previous
-          ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/uv-resolver-whole-pmu
-      - name: Check out qualified
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          path: qualified
-          ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/rc23-trait-qualification
-      - name: Check out pilot
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          path: pilot
-          ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/ctfe-crossover-pilot
-            scripts/branch-return-pmu
-      - name: Check out calibrator
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          path: calibrator
-          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/gnu-renderer-pfc-hardware
-      - name: Check out observers
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          path: observers
-          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/gnu-example-ceiling
-            scripts/gnu-renderer-library-workers
-      - name: Check out uv at the actual landed edit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-sh/uv
-          ref: 1979349b68dbaa936b98c0f409c1df0598fa72f1
-          fetch-depth: 16
-          fetch-tags: false
-          persist-credentials: false
-          path: uv-source
-      - name: Restore the real release tag used by uv's build script
-        run: git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.2:refs/tags/0.12.2
-      - name: Check the private payload and host prerequisites
+          sparse-checkout: scripts/rustc-thread-instructions
+      - name: Compile and verify native probes
+        working-directory: scripts/rustc-thread-instructions
         run: |
           set -euo pipefail
-          mkdir trait-results
-          (cd coordinator/scripts/uv-20988-ctfe-hw && sha256sum --strict --check SHA256SUMS)
-          /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-      - name: Calibrate inherited userspace instructions for real fork, exec and threads
-        run: |
-          set -euo pipefail
-          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/run.py calibrate 2>&1 | tee trait-results/calibration.log
-      - name: Admit the two qualified production SDKs and the signed Cargo binary
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/enroll.py admit 2>&1 | tee trait-results/intake.log
-      - name: Qualify both compiler histories and execute all 12 first-edit pairs
-        run: |
-          set -euo pipefail
-          /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/run.py run 2>&1 | tee trait-results/experiment.log
-      - name: Read back the raw clocks, Cargo streams, process trees and metadata independently
-        run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-20988-ctfe-hw/audit.py hosted
-      - name: Preserve raw clocks, source qualification and any incomplete attempt
+          mkdir -p "$GITHUB_WORKSPACE/evidence/pmu"
+          sha256sum -c SHA256SUMS
+          { uname -a; cat /proc/sys/kernel/perf_event_paranoid; cc --version; } > "$GITHUB_WORKSPACE/evidence/host.txt"
+          cc -O2 -Wall -Wextra -Werror -fPIC -shared pmu.c -o libohm_pmu.so
+          cc -O2 -Wall -Wextra -Werror -pthread workload.c -o workload
+          python3 -ISB preflight.py "$GITHUB_WORKSPACE/evidence/uninstrumented"
+          python3 -ISB per_rustc.py calibrate "$GITHUB_WORKSPACE/evidence/pmu" ./libohm_pmu.so ./workload
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-20988-ctfe-production-root-attempt-1
-          path: trait-results/
+          name: rustc-thread-instructions-${{ github.run_id }}-1
+          path: evidence
           if-no-files-found: error
-          compression-level: 1
           retention-days: 14
