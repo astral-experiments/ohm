@@ -304,7 +304,7 @@ def run(r, args, w, registry, expected_registry, original_cargo, clock):
     for ix, arm in enumerate(order):
         env, flags, compiler, identity = compiler_arm(r, w, manifest, arm, base_env)
         cli = CARGO
-        if manifest is None:
+        if manifest is None and not (args.trace_unchanged and arm == "normal"):
             profile.write_text("[profile.test.package.ty_server]\nrustflags = " + json.dumps(flags) + "\n")
             cli = [*CARGO[:2], "-Zprofile-rustflags", "--config", str(profile), *CARGO[2:]]
         r.put(out/(arm+"-compiler.json"), identity)
@@ -376,6 +376,12 @@ def run(r, args, w, registry, expected_registry, original_cargo, clock):
                     dirt.setdefault(phase, {})[arm] = dirty
                     observed.append(result)
                     r.put(dest/"qualified.json", result)
+                if args.trace_unchanged and history == "edit" and arm == "normal":
+                    import link_trace
+                    import sys
+                    need(manifest is None and cli == CARGO, "trace requires the ordinary signed compiler")
+                    link_trace.collect(r, sys.modules[__name__], w, cli, repo, env, work, case/"link-trace",
+                                       graph, expected, owners, blobs, dirt["unchanged"][arm], binary)
                 need(registry(home) == expected_registry, "modified private registry")
         need(compiler_arm(r, w, manifest, arm, base_env)[3] == identity, "compiler changed during its histories")
     need(set(catalogs["new"]) - set(catalogs["old"]) == {ADDED}

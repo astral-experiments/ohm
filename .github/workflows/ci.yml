@@ -30,6 +30,10 @@ on:
         options:
           - matched
           - profile-control
+      trace_unchanged:
+        description: Trace the ordinary signed test build after its measured edit history
+        type: boolean
+        default: false
 permissions:
   actions: read
   contents: read
@@ -44,6 +48,7 @@ jobs:
       PAIR_ORDER: ${{ inputs.pair_order }}
       PAIR_SUITE: ${{ inputs.suite }}
       COMPILER_MODE: ${{ inputs.compiler_mode }}
+      TRACE_UNCHANGED: ${{ inputs.trace_unchanged }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -110,6 +115,12 @@ jobs:
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py sources
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends binutils build-essential git libssl-dev zstd
+          if [[ "$TRACE_UNCHANGED" == true ]]; then
+            test "$PAIR_SUITE" = e2e && test "$COMPILER_MODE" = profile-control
+            sudo apt-get install -y --no-install-recommends strace
+            strace -ff -qq -e trace=execve,execveat -o "$base/logs/ptrace-admission" -- /bin/true
+            grep -F 'execve("/bin/true"' "$base"/logs/ptrace-admission.*
+          fi
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py compile "$base"
           python3 -IB enrolled/scripts/ruff-workspace-option-edit/tests.py "$GITHUB_WORKSPACE/ruff" "$base/workspace-cgu" | tee "$base/logs/controls.txt"
       - name: Enroll the one fresh worker and install the original signed GNU SDK
@@ -154,6 +165,7 @@ jobs:
           (cd "$root/driver" && sha256sum --check --strict SHA256SUMS)
           args=(--suite "$PAIR_SUITE")
           if [[ "$PAIR_SUITE" == e2e ]]; then args+=(--e2e-source "$GITHUB_WORKSPACE/ruff-e2e"); fi
+          if [[ "$TRACE_UNCHANGED" == true ]]; then args+=(--trace-unchanged); fi
           case "$COMPILER_MODE" in
             matched) args+=(--matched-rustcs "$RUNNER_TEMP/ohm-remat-compilers/roots/rustcs.json") ;;
             profile-control) ;;

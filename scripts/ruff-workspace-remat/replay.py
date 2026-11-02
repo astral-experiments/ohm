@@ -345,5 +345,6 @@ if __name__ == "__main__":
     parser.add_argument("--order", required=True, choices=orders)
     parser.add_argument("--suite", choices=["build", "e2e"], default="build")
     parser.add_argument("--e2e-source", type=Path)
+    parser.add_argument("--trace-unchanged", action="store_true")
     parser.add_argument("--matched-rustcs", type=Path, dest="e2e_rustcs")
     main(parser.parse_args())
