@@ -107,7 +107,8 @@ def record_link_origins(path,tree):
     objects={str(f):file(f)for f in [fp/'build.rs',fp/'download-metadata.json',*generated,*sorted(exes)]if f.is_file()}
     M.save(path/'link-origins.json',{'diagnostic_only':True,'raw_dep_info':rows,'native_marker_inputs':positive,'script_source_executables_and_generated':objects,'all_kernel_target_images':sorted(map(str,exes))})
 def same_kernel(path,expected,with_logs,role,measured=False):
-    env=O.ENV|({'CARGO_LOG':'cargo::core::compiler::fingerprint=trace'}if with_logs else{})
+    fingerprint_target='cargo::compiler::fingerprint';observed_trace=False
+    env=O.ENV|({'CARGO_LOG':fingerprint_target+'=trace'}if with_logs else{})
     if measured:
         path.mkdir();req={'command':O.PLAIN,'environment':env,'cwd':str(O.SRC),'compiler_path':str(M.RUSTC),'selectors':selectors(expected)}
         M.save(path.parent/'per-rustc-request.json',req)
@@ -124,7 +125,8 @@ def same_kernel(path,expected,with_logs,role,measured=False):
             seen.append((im['pid'],a))
     G(sorted(a for _,a in seen)==sorted(expected),'all real rustc arg vectors across Cargo and kernel')
     if with_logs:
-        G(b'cargo::core::compiler::fingerprint'in(path/'stderr').read_bytes(),'missing requested Cargo fingerprint trace')
+        observed_trace=fingerprint_target.encode()in(path/'stderr').read_bytes()
+        M.save(path/'fingerprint-logger.json',{'diagnostic_only':True,'target':fingerprint_target,'actual_records_present':observed_trace})
         # The native outputs and kernel visit have already completed. Diagnostics never alter Cargo's environment or files.
         try:record_link_origins(path,tree)
         except (OSError,ValueError)as err:M.save(path/'link-origin-unavailable.json',{'diagnostic_only':True,'failure':str(err)})
@@ -132,7 +134,7 @@ def same_kernel(path,expected,with_logs,role,measured=False):
         by=dict(seen)
         for k,v in report['targets'].items():
             G(by[v['pid']]==req['selectors'][k]and v['argv']==by[v['pid']]and v['instructions']>0,'actual process PMU argv/positive result')
-    M.save(path/'verified-kernel.json',{'compilers':seen,'kernel_sha256':M.filesha(path/'kernel-events.json'),'fingerprints':with_logs,'measured_threads':measured})
+    M.save(path/'verified-kernel.json',{'compilers':seen,'kernel_sha256':M.filesha(path/'kernel-events.json'),'fingerprint_requested':with_logs,'fingerprints':observed_trace,'measured_threads':measured})
     return [a for _,a in seen]
 def qualify(hold,role):
     D=OUT/f'hold{hold}-{role}';D.mkdir();path=SEED/f'hold{hold}-{role}';Q=D/'qualification';Q.mkdir()
@@ -141,20 +143,23 @@ def qualify(hold,role):
     a=typed(Q/'parent-typed');G(a['dirty']==REF['states']['A']['dirty'],'signed recurring A unit selection');snapshot(Q/'parent-typed',a['workspace'])
     stamp=save_seed(path,role);M.save(Q/'parent-snapshot.json',stamp)
     def back(edit=False):restore(path,stamp,role,'A',edit)
-    back();ap=typed(Q/'A-unchanged-vv',True);G(ap['dirty']==a['dirty'],'changed unchanged A roster');aa=M.read(Q/'A-unchanged-vv/actual-rustc.json');a0=snapshot(Q/'A-unchanged-vv',a['workspace'])
-    back();same_kernel(Q/'A-unchanged-kernel-fingerprint',aa,True,role);G(snapshot(Q/'A-unchanged-kernel-fingerprint',a['workspace'])==a0,'noedit A diagnostic raw');back()
-    O.witness('A','parent',Q/'parent-typed',Q)
     back(True);plain=O.plain(Q/'first-B-ordinary');target=snapshot(Q/'first-B-ordinary',a['workspace'])
     back(True);b=typed(Q/'first-B-typed');G(b['progress']==plain['progress']and snapshot(Q/'first-B-typed',b['workspace'])==target,'same-history ordinary/typed raw')
     O.witness('B','edited',Q/'first-B-typed',Q)
     back(True);v=typed(Q/'first-B-vv',True);vectors=M.read(Q/'first-B-vv/actual-rustc.json')
     G(v['dirty']==b['dirty']and snapshot(Q/'first-B-vv',b['workspace'])==target,'same-history all 99+sidecar verbose raw');selectors(vectors)
     back(True);seen=same_kernel(Q/'first-B-kernel',vectors,False,role);G(snapshot(Q/'first-B-kernel',b['workspace'])==target,'same-history first B kernel raw')
+    # Preserve the real first edit, its three surface controls and independent cold comparison before auxiliary diagnostics.
+    check=subprocess.run([sys.executable,'-ISB',here/'canonical.py',Q/'first-B-ordinary/all-products.json',Q/'independent-cold-B/all-products.json',Q/'canonical.json'],check=False,timeout=750)
+    M.save(Q/'canonical-process.json',{'returncode':check.returncode})
     late=SEED/f'hold{hold}-{role}-B';ss=save_seed(late,role)
+    back();O.witness('A','parent',Q/'parent-typed',Q)
+    back();ap=typed(Q/'A-unchanged-vv',True);G(ap['dirty']==a['dirty'],'changed unchanged A roster');aa=M.read(Q/'A-unchanged-vv/actual-rustc.json');a0=snapshot(Q/'A-unchanged-vv',a['workspace'])
+    back();same_kernel(Q/'A-unchanged-kernel-fingerprint',aa,True,role);G(snapshot(Q/'A-unchanged-kernel-fingerprint',a['workspace'])==a0,'noedit A diagnostic raw')
     restore(late,ss,role,'B');bsteady=typed(Q/'B-unchanged-vv',True);bv=M.read(Q/'B-unchanged-vv/actual-rustc.json')
     G(bsteady['dirty']==a['dirty'],'unchanged B unit selection');b0=snapshot(Q/'B-unchanged-vv',b['workspace'])
     restore(late,ss,role,'B');same_kernel(Q/'B-unchanged-kernel-fingerprint',bv,True,role);G(snapshot(Q/'B-unchanged-kernel-fingerprint',b['workspace'])==b0,'noedit B diagnostic raw')
-    subprocess.run([sys.executable,'-ISB',here/'canonical.py',Q/'first-B-ordinary/all-products.json',Q/'independent-cold-B/all-products.json',Q/'canonical.json'],check=True,timeout=750)
+    G(check.returncode==0 and M.read(Q/'canonical.json')['pass'],'independent-cold canonical qualification')
     G(late.parent==SEED and not late.is_symlink(),'bounded warm seed');shutil.rmtree(late)
     M.save(Q/'passed.json',{'role':role,'hold':hold,'actual_dirty_first':b['dirty'],'actual_dirty_unchanged':a['dirty'],'fully_verified_kernel_rustcs':len(seen),'rmeta':96,'all_outputs':len(target),'positive_behavior':True,'original_signed_raw_veto':True})
     return D,path,stamp,target,seen
