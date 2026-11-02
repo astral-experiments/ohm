@@ -592,6 +592,11 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
+      - name: Install the same small observation tools as the source factory
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends binutils build-essential zstd gdb
+          for tool in gdb cc nm zstd gh; do command -v "$tool"; done
       - name: Verify the reader and genuine incorrect-file and changed-code controls
         run: |
           set -euo pipefail
