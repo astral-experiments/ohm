@@ -286,9 +286,9 @@ def graphs(case, role):
         end = len(data) - len(b"rust-end-file")
         version = int.from_bytes(data[4:6], "little")
         need(
-            data[:4] == b"RSIC"
+            data[:4] == (b"RSIC" if role == "P" else b"RSIG")
             and data.endswith(b"rust-end-file")
-            and version == (10 if role == "P" else 11),
+            and version == 26655,
             (keys, role, "wrong check graph version"),
         )
         mark = data[end - 32 : end - 24]

@@ -16,22 +16,34 @@
     "rust.download-rustc=false"
   ],
   "bundle": {
-    "branch": "refs/heads/charlie/qa-indexed-check-wire-source-20261102",
-    "bytes": 11501,
-    "sha256": "af36339f5f1cef45180c5b57d8e48649b6ab10eee4760ff960abf5ecbf8fd6f6"
+    "baseline_commits": [
+      "0a38b3aa6d1bbb55ec5e8c01c9e88d1cf0f9f118",
+      "f12924d918dbc66898325531940a20aa8cf4f5fc",
+      "330c6efbef5fd49b2797c8f1f084630343cd117d",
+      "203c98e2df20b6afff4b0f512896c14c44942b82",
+      "764eb1cd92bb67b2f9a88eb17ba67766569ab2f3",
+      "dc0db7275adb2dbe921ce5df0811108e84d6408d",
+      "5c3cea67eca46acbb95bf62a97485200f6c00c44",
+      "c6b5bef8a0b36608968c568637529c68069d494f",
+      "a3fc6da13921586bc374586dee00883e9210aecd"
+    ],
+    "branch": "refs/heads/charlie/qa-indexed-check-pin228-wire-20261102",
+    "bytes": 28000,
+    "prerequisite": "28b64bc39032c1786908d98ea2df92f855226d0f",
+    "sha256": "408e4b2918877fbd808c84b3c47187733ab977674e792f8dc994452690c745e3"
   },
   "changed_sources": {
     "compiler/rustc_incremental/src/persist/file_format.rs": {
-      "C": "6991813104e616818d1843c8b65874bfedb4e61d",
-      "P": "9a0ba14e7641b0402d6eb79c26510016b42de241"
+      "C": "916c26ef690c68d20ffb3d916514f41bafb3545d",
+      "P": "f96e27d853eaf23289d72479b990780eda43eacc"
     },
     "compiler/rustc_incremental/src/persist/load.rs": {
       "C": "699fb28edae9c4db8fc7c80f348e46bee05b428b",
       "P": "cc1f8e52e4182a8f3c578cbe159fd3cc44841329"
     },
     "compiler/rustc_middle/src/dep_graph/graph.rs": {
-      "C": "a302bd97a97dc884a32ffd96441813dafeb7ba36",
-      "P": "e5d07fdcf43601fd735dd731f0570c5678a8e782"
+      "C": "e01f220c58933f834396435ffb721f9152b9b4b3",
+      "P": "82df919f85b05bc85e6a9fcb5f115124eacef42b"
     },
     "compiler/rustc_middle/src/dep_graph/serialized.rs": {
       "C": "19e3dc103810fa79d2831dc4ba006a94ed7fe4ed",
@@ -57,14 +69,14 @@
   },
   "roles": {
     "C": {
-      "compiler": "6d4ca9403d7dd07207283d8c4c3a7b726a85c3c4",
-      "revision": "33e2c4ae062fff0c8dbaf1726160ca4dce6b482a",
-      "tree": "d61a8d8a922879c1fc5dc628573a74400b86aa1f"
+      "compiler": "46f206852fb2b03d640e74a0e1e23a04cb4bbde8",
+      "revision": "1cec164aceaa9e8a301ab24a8d1295ac638e04b9",
+      "tree": "6c6c08e336f8e27c1959b935318a3049b9af5299"
     },
     "P": {
-      "compiler": "992fea2dd7c2a88fca8a3b34bb6aa34fc925d1ac",
-      "revision": "28b64bc39032c1786908d98ea2df92f855226d0f",
-      "tree": "8bbc9c69e3672969514c0eb395f81d8f5230c715"
+      "compiler": "5f25f548bfc4983f74a29f0796093191b2220c1f",
+      "revision": "a3fc6da13921586bc374586dee00883e9210aecd",
+      "tree": "736b983382d446c40bd5bd853df881bef65cb6ad"
     }
   },
   "schema": "ohm-remat-builder-registration-v1",

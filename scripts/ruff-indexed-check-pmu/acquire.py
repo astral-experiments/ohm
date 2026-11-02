@@ -94,8 +94,8 @@ def main():
                 json_save(LOG / "physical-formats.json", fmt)
                 need(
                     all(
-                        set(v["version"] for v in fmt[k].values()) == {version}
-                        for k, version in [("normal", 10), ("defer", 11)]
+                        {(v["version"], v["magic"]) for v in fmt[k].values()} == {(26655, magic)}
+                        for k, magic in [("normal", "RSIC"), ("defer", "RSIG")]
                     ),
                     "factory missed graph versions",
                 )
