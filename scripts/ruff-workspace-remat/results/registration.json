@@ -1,0 +1,30 @@
+{
+  "endpoint": "instructions for the ordinary cargo build after the Ruff #28106 edit",
+  "expected_storage": "no extra cache or project output; record exact compiler driver size change",
+  "factory_run": 41391043311,
+  "parent": "a3fc6da13921586bc374586dee00883e9210aecd",
+  "previous_design_sha256": "2576c593029bd94faaf5683b2f876648d0b1218681cddf34dc0566c73edade3d",
+  "product": "d1c2e85990d0d9fdb34052af19a1b3cf8ebba36b",
+  "qa_source": "17478bb9302862956cba976484838630b4e57976",
+  "reason_for_new_base": "The current proposed release pin is nine commits ahead of the original control; no ordinary Cargo results from the public physical candidate had been inspected when the new pin was selected.",
+  "registered_utc": "2026-11-02T04:55:50Z",
+  "release_manifest_commit": "e6fe4399e188e6d86a32a750585936800ce0d99a",
+  "release_pin_pr": 228,
+  "replications": {
+    "defer_then_normal": 3,
+    "exclude": "only failed identity, wrong Rust source, bad PMU, different graph, corrupt artifacts, or wrong clean/error verdict; retain every failed receipt",
+    "independent_workers": 6,
+    "normal_then_defer": 3
+  },
+  "schema": "ohm-ruff-real-coalescer-prereg-v1",
+  "secondary": [
+    "edit plus next unchanged command",
+    "cold and invalid phases, all raw counts",
+    "two counterbalanced Ruff #27836 cargo test --no-run workers with positive and negative test behavior outside the measured interval"
+  ],
+  "statistic": "paired reduction 1 - candidate / parent, median and all pairs; exact two-sided sign test and distribution-free interval",
+  "terms": {
+    "defer": "independently built physical candidate stage1 rustc on the same SDK; historical arm label",
+    "normal": "parent stage1 rustc at exact pinned compiler source"
+  }
+}

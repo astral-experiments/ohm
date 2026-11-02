@@ -1,0 +1,39 @@
+diff --git a/compiler/rustc_llvm/build.rs b/compiler/rustc_llvm/build.rs
+index bf397c724aa28..18b9b1188c347 100644
+--- a/compiler/rustc_llvm/build.rs
++++ b/compiler/rustc_llvm/build.rs
+@@ -7 +7 @@
+-use std::{env, fs, io};
++use std::{env, fs};
+@@ -76 +76 @@ fn tracked_env_var_os<K: AsRef<OsStr> + Display>(key: K) -> Option<OsString> {
+-fn prepare_ohm_coalescer(cfg: &mut cc::Build, sources: &Path) -> io::Result<()> {
++fn prepare_ohm_coalescer(cfg: &mut cc::Build, sources: &Path) {
+@@ -78 +78 @@ fn prepare_ohm_coalescer(cfg: &mut cc::Build, sources: &Path) -> io::Result<()>
+-    fs::create_dir_all(&out)?;
++    fs::create_dir_all(&out).unwrap();
+@@ -82 +82,2 @@ fn prepare_ohm_coalescer(cfg: &mut cc::Build, sources: &Path) -> io::Result<()>
+-    let patch = fs::File::open("llvm-wrapper/ohm-register-coalescer/RegisterCoalescer.patch")?;
++    let patch =
++        fs::File::open("llvm-wrapper/ohm-register-coalescer/RegisterCoalescer.patch").unwrap();
+@@ -84 +85 @@ fn prepare_ohm_coalescer(cfg: &mut cc::Build, sources: &Path) -> io::Result<()>
+-        .args(["--batch", "--fuzz=0", "--quiet", "--output=-", "--reject-file=-"])
++        .args(["--batch", "--fuzz=0", "--quiet", "--output=-"])
+@@ -87,5 +88,4 @@ fn prepare_ohm_coalescer(cfg: &mut cc::Build, sources: &Path) -> io::Result<()>
+-        .stdout(fs::File::create(out.join("RegisterCoalescer.cpp"))?)
+-        .status()?;
+-    if !status.success() {
+-        return Err(io::Error::other(format!("could not apply the LLVM patch ({status})")));
+-    }
++        .stdout(fs::File::create(out.join("RegisterCoalescer.cpp")).unwrap())
++        .status()
++        .expect("could not apply the Ohm LLVM patch");
++    assert!(status.success(), "the Ohm patch did not apply to the pinned LLVM source");
+@@ -93 +92,0 @@ fn prepare_ohm_coalescer(cfg: &mut cc::Build, sources: &Path) -> io::Result<()>
+-    Ok(())
+@@ -346,4 +345,2 @@ fn main() {
+-    if let Some(sources) = tracked_env_var_os("LLVM_RUSTC_OHM_COALESCER_SOURCE")
+-        && let Err(err) = prepare_ohm_coalescer(&mut cfg, Path::new(&sources))
+-    {
+-        println!("cargo:warning=using LLVM's original register coalescer: {err}");
++    if let Some(sources) = tracked_env_var_os("LLVM_RUSTC_OHM_COALESCER_SOURCE") {
++        prepare_ohm_coalescer(&mut cfg, Path::new(&sources));
