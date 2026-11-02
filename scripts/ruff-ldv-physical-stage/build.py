@@ -70,7 +70,7 @@ def bundle(repo):
             need(git(repo, "ls-tree", rev, "--", path) == expected, ("different source blob", role, path))
 
 
-def control(workspace, root):
+def control(workspace, root, docs=False):
     qa = workspace / "qa-code"
     need(
         os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
@@ -82,7 +82,8 @@ def control(workspace, root):
         "incorrect nonrelease receiver",
     )
     need(not git(qa, "status", "--porcelain", "--untracked-files=all"), "modified builder checkout")
-    changed = git(qa, "diff", "--name-only", BASE, "HEAD").splitlines()
+    base = "23d0c5673dd3eb9565f058a3c1ffce778e6684c4" if docs else BASE
+    changed = git(qa, "diff", "--name-only", base, "HEAD").splitlines()
     need(
         changed
         and all(
@@ -223,7 +224,7 @@ def signed_tools(root):
     return {"asset": asset, "members": members}
 
 
-def build(workspace, root):
+def build(workspace, root, docs=False):
     rust = workspace / "source/rust"
     kit = load("freeze_kit", workspace / "packed/scripts/ohm-packed-ruff/runtime.py")
     layout = load("qa_layout", workspace / "legacy/scripts/dep-graph-slots/layout.py")
@@ -290,6 +291,9 @@ def build(workspace, root):
         from physical import symbol_inventory
         save(root / "logs" / ("ldv-driver-" + role + ".json"), symbol_inventory(directory / HOST / "stage1", role))
         kit.freeze(directory / HOST / "stage1", role, rev)
+        if docs:
+            from docs import freeze as freeze_doc
+            freeze_doc(role, root, rust, env, argv, guarded)
         need(
             json.loads(json.dumps(layout.checked(rust, rev, desc["tree"], substitutions))) == full,
             "bootstrap changed enrolled source",
@@ -325,4 +329,5 @@ if __name__ == "__main__":
     workspace = Path(os.environ["GITHUB_WORKSPACE"]).resolve(strict=True)
     root = Path(os.environ["RUNNER_TEMP"]).resolve(strict=True) / "ohm-branch-object-qa"
     (mode,) = sys.argv[1:]
-    {"preflight": control, "build": build}[mode](workspace, root)
+    action=mode.removesuffix("-docs")
+    {"preflight": control, "build": build}[action](workspace, root, docs=mode.endswith("-docs"))
