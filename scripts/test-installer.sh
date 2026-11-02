@@ -32,6 +32,14 @@ if [ -z "$prefix" ]; then
   exit 1
 fi
 
+# The distribution installer splits its script path and evaluates --prefix.
+case "$0:$prefix" in
+  *[[:space:]]*|*'$('*)
+    echo 'unsafe characters in the distribution installer arguments' >&2
+    exit 1
+    ;;
+esac
+
 mkdir -p "$prefix/bin"
 for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; do
   if [ "$binary" = rustdoc ] && [ "${OHM_TEST_RUSTDOC:-present}" = missing ]; then
@@ -457,6 +465,11 @@ assert_no_links unsafe-prefix
 OHM_TEST_INSTALL_DIR="$temporary_directory/cases/multiline-dot-component/"$'line\n..'"/toolchain"
 run_case multiline-dot-component success
 unset OHM_TEST_INSTALL_DIR
+
+mkdir -p "$temporary_directory/temp with spaces"
+TMPDIR="$temporary_directory/temp with spaces" \
+  OHM_TEST_INSTALL_DIR="$temporary_directory/cases/space in parent/\$(false)/toolchain" \
+  run_case literal-staging-path success
 
 for component in . ..; do
   OHM_TEST_INSTALL_DIR="$temporary_directory/cases/relative-component/$component"
