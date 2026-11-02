@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-admit, ldv-placement-reopen, ldv-placement-score]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-admit, ldv-placement-reopen, ldv-placement-score, ldv-placement-decision-reopen]
         default: single-22
       ldv_admission:
         description: Same-commit successful wrapper-free native workflow run ID for scoring
@@ -1124,6 +1124,33 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: placement-two-pair-pilot
+          path: ${{ runner.temp }}/placement-pilot.json
+          if-no-files-found: error
+          retention-days: 30
+
+  placement-closed-decision:
+    if: inputs.mode == 'ldv-placement-decision-reopen' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-workspace-link-census-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && inputs.placement_source == '4e546b27c311f29d99f9528e64420887f57c7538'
+    name: Reopen four existing checked projections with the original reserve and decision
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 20
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PLACEMENT_SOURCE: ${{ inputs.placement_source }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-source-placement
+            scripts/ruff-ldv-physical-stage
+      - name: Independently check all registered source files and apply the frozen rule
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/ruff-source-placement/closed_score.py "$RUNNER_TEMP/placement-pilot.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: placement-closed-two-pair-pilot
           path: ${{ runner.temp }}/placement-pilot.json
           if-no-files-found: error
           retention-days: 30
