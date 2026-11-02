@@ -1,86 +1,100 @@
-name: Unscored uv 20991 direct root opening
-run-name: Verify direct uv root edit at ${{ inputs.reviewed_head }}
+name: Characterize uv-lock after actual uv edit 22619
+run-name: Unscored uv-lock 22619 at ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed private coordinator commit for the unscored opening
+        description: Exact reviewed private coordinator revision
         type: string
         required: true
 permissions: {}
 concurrency:
-  group: unscored-uv-20991-root-opening
+  group: uv-lock-22619-characterization
   cancel-in-progress: false
 jobs:
-  opening:
-    name: Verify independent cold histories and the actual ordinary-root compiler execs
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-20991-root-opening' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+  characterize:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-22619-lock-characterization' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 75
+    timeout-minutes: 85
     permissions:
-      contents: read
       actions: read
+      contents: read
       attestations: read
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONDONTWRITEBYTECODE: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
           sparse-checkout: |
-            scripts/uv-root-20991-opening
             .github/workflows
+            scripts/uv-lock-22619
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
           path: previous
           persist-credentials: false
           sparse-checkout: scripts/uv-resolver-whole-pmu
-      - name: Admit the pinned system Python, disk budget, offline readers and scoped descendant trace
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
+          path: qualified
+          persist-credentials: false
+          sparse-checkout: scripts/rc23-trait-qualification
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
+          path: pilot
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ctfe-crossover-pilot
+            scripts/branch-return-pmu
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
+          path: calibrator
+          persist-credentials: false
+          sparse-checkout: scripts/gnu-renderer-pfc-hardware
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
+          path: observers
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/gnu-example-ceiling
+            scripts/gnu-renderer-library-workers
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.13"
+      - name: Check enrolled source and calibrate inherited user-mode instructions
         run: |
           set -euo pipefail
-          mkdir -p trait-results
-          (
-            cd scripts/uv-root-20991-opening
-            sha256sum -c SHA256SUMS
-          )
-          /usr/bin/bash scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py early 2>&1 | tee trait-results/initial.log
+          (cd scripts/uv-lock-22619 && sha256sum --strict -c SHA256SUMS)
+          python3 -ISBu scripts/uv-lock-22619/study.py calibrate
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/uv
-          ref: 5d4a62d7461c7708f3e65d08cef0e99bad94c004
+          ref: c36f60ababfe55a451ad439837471d56ab0e455c
           path: uv-source
-          # The real edit is sixteen linear commits after the last release tag.
-          fetch-depth: 17
+          fetch-depth: 70
           fetch-tags: false
           persist-credentials: false
-      - name: Admit the actual historical uv tag used by its build script
-        env:
-          GIT_TERMINAL_PROMPT: '0'
-        run: |
-          set -euo pipefail
-          git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.2:refs/tags/0.12.2
-          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py history uv-source | tee trait-results/source-git-history.json
-      - name: Admit the signed release and final production distribution with the original verifier
+      - name: Admit the historical public tag
+        run: git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.13.1:refs/tags/0.13.1
+      - name: Verify signed Cargo and the exact prior qualified f129 distribution
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py intake 2>&1 | tee trait-results/acquire.log
-      - name: Run the two genuine root openings and re-read all evidence
-        run: |
-          set -euo pipefail
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py run 2>&1 | tee trait-results/opening.log
-          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py verify trait-results
-      - name: Preserve full or partial unscored evidence
+        run: python3 -ISBu scripts/uv-lock-22619/study.py intake
+      - name: Validate cold and edited outputs, then separate native and observed visits
+        run: python3 -ISBu scripts/uv-lock-22619/study.py run
+      - name: Preserve all complete or partial native evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: uv-20991-independent-root-opening-${{ github.run_id }}-${{ github.run_attempt }}
+          name: uv-lock-22619-${{ github.run_id }}-${{ github.run_attempt }}
           path: trait-results/
-          retention-days: 14
-          compression-level: 2
           if-no-files-found: warn
+          compression-level: 4
+          retention-days: 14

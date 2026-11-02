@@ -1,0 +1,86 @@
+{
+  "branch": "charlie/codex-uv-22619-lock-characterization",
+  "command": [
+    "check",
+    "--locked",
+    "--offline",
+    "-j8",
+    "-p",
+    "uv-lock"
+  ],
+  "coordinator": "8bf1d2c61fa3bb23ccf44a329e74e0359d98848c",
+  "fixture_files": {
+    "fixture/bare.rs": "c517defd1abcc472bdecba3e70708acf2b5e5c5e8be1432ea709287a5196ba5c",
+    "fixture/behavior.rs": "2156b586c9830dc40045ee14455cd6e01ded4da8c1d80cdbcedfa6d229913485",
+    "fixture/safe.rs": "88282572283b48ee5e3f93edfb6a9137de5c90366f7698bac1c0e25e1f72bbbb",
+    "witness.py": "040896ba0f8ea4f173d4ac4fa85b69616ad02ac87fab799e9faa7be8b6eb42e9"
+  },
+  "old_files": {
+    "intake.py": "88bf7f852c5616c2b09d395fd4cb662a3c6303c79f8e8866dee25bee621be57f",
+    "protocol.json": "c6be5c49d904060c300e0910b57bc86a07d7c14839dee1e98f50e011fb29e959",
+    "run.py": "ccd44c276d5d3660b361cca9f8c816602536239f6986264a88daa02340b514da"
+  },
+  "profile": "generic-activity,query-provider,incr-cache-load,incr-result-hashing,query-keys",
+  "registry_sha256": "c7b465aebfeaad55b07fc19525f7c0c1c4249b2f8d4ebdec4691ee3c74f8ea88",
+  "repo": "astral-experiments/ohm",
+  "required_free_gib": 40,
+  "sdk": {
+    "rebased": {
+      "bundled_archive": "93936b4afa72b94ebbb3054e3bd095fea2edff0c5a54f019925459698c474aaa",
+      "bytes": 570055654,
+      "cargo": "afebcdeb6a33870db2dccb57234501fdb0e60ad1cb241474135bb3d0f3f5782e",
+      "driver": "2e338b37afd5e291cfc7213286e9653e7b0533a2186c4ed39548b33fa8194383",
+      "inventory_sha256": "bd2bea6876b6713caf319daef74c7864737404532d552c93878c10f4c7e0fc58",
+      "members": 142,
+      "rust": "f12924d918dbc66898325531940a20aa8cf4f5fc",
+      "rustc": "664c3bcb15013312755d73e6bf298466d553bd7cf5dc392e2a00996cb313670f"
+    },
+    "signed": {
+      "bundled_archive": "bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7",
+      "bytes": 570106827,
+      "cargo": "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871",
+      "driver": "4c8ccf0072e8f382a3a3756fd60e46936a2bd206996201c55caffe58d29725db",
+      "inventory_sha256": "662972c0aaaf87e482298f461ce0d172267ee22b4b1740c6946152483c90bcc6",
+      "members": 142,
+      "rust": "008a21ac0d750dc9a1c18b7959d7e7984c03d887",
+      "rustc": "7e35096dab1b661924cb3c31982c870dd99c7c00a7fba28aa958f451e7c9474e"
+    }
+  },
+  "sdk_media": {
+    "artifact_bytes": 356863009,
+    "artifact_id": 13098437385,
+    "cache_epoch": 26655,
+    "coordinator": "634d090f0f565936996a817bcb884c64cbe7e6cc",
+    "event_head": "00f4192b5507f8c028898ce5bd66958d20f341c5",
+    "github_run_id": 41340119846,
+    "original_intake_deadline": "2026-11-04T00:00:00+00:00",
+    "source": "f12924d918dbc66898325531940a20aa8cf4f5fc",
+    "zip_sha256": "cc805992f95550eba1c6864c48cf62793b6c4dd6d812739d0900783950ea582d"
+  },
+  "source_rust": "f12924d918dbc66898325531940a20aa8cf4f5fc",
+  "test": "test::remote_source_redacts_missing_path_segments",
+  "uv": {
+    "A": "6a5a11d5cae510c7630d87267a338af44084a349",
+    "B": "c36f60ababfe55a451ad439837471d56ab0e455c",
+    "blobs": [
+      "a540ba0ec877ac121627292217a48d28bb27e285",
+      "fbe844aa7c424c5ef4d6a510f75130ce7ce34fd2"
+    ],
+    "describe": [
+      "0.13.1-64-g6a5a11d5c",
+      "0.13.1-65-gc36f60aba"
+    ],
+    "file": "crates/uv-distribution-types/src/lib.rs",
+    "lock_blob": "f89a4548081e7d8b82844e87bbc1cff807847c0e",
+    "lock_sha256": "783ebcd6ca3494df731d4f3e79b53d3d8473bceb646634a18cdfa3f793842a5f",
+    "patch_sha256": "95af500f4af3b94fb251693ef43a22f61426048b186ef32b37cf4dab8fa21188",
+    "registration_sha256": "efa309f31f5f95565bf5dc2121ba30539da6c598b04c4c42403805253e656c4a",
+    "tag": "0.13.1",
+    "tag_commit": "62faed3351cfee2121b3c28b937b1f4b93233a93",
+    "trees": [
+      "746c3ceda2d1c6abb6ba3af17f566104de631558",
+      "ef74aa7fe394125a0a0a47ddc24272aa4f99a94e"
+    ]
+  },
+  "workflow_sha256": "7132fd4e16dca4b6f23da68e6ea2a182cd5791261e14bfe9a412dcd5cee4888b"
+}
