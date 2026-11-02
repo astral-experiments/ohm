@@ -1,0 +1,98 @@
+{
+  "base": "ed0262f9bdc384576925229764971f23a141c95f",
+  "base_tree": "d4a6f3ab70185bec03263086863376298c293360",
+  "compiler": "40915350f36a28a76846edd5eefd5d925cb6db4c",
+  "physical_files": {
+    "compiler/rustc_codegen_llvm/src/back/placed_object.rs": {
+      "guarded": {
+        "blob": "2c0ce759e55dbe2223b4538becc0071de91e7a92",
+        "bytes": 8289,
+        "sha256": "3bf7f1dd73199607ebd6d5a71b29eb06699de59d84d737591a191570f799bcf1"
+      },
+      "selected": {
+        "blob": "b93c3dc4b2a3f2f8951260bb5c54b3384b217ed9",
+        "bytes": 8411,
+        "sha256": "ee1804cdb4140a3b09c461ed7c2a2e2048d49c92c155b6fd18a3c5b1daba2910"
+      }
+    },
+    "compiler/rustc_codegen_llvm/src/back/source_placement/maps.rs": {
+      "guarded": {
+        "blob": "5cfbb8f248432358aea2f6b639d37065f96e1294",
+        "bytes": 10571,
+        "sha256": "831c0792d05b1b765aaf024b154b0d911d02076f0442bb0b01eb762745e679bc"
+      },
+      "selected": {
+        "blob": "15b9a63f96b86bf7694206d18a15d458b9c984a6",
+        "bytes": 10571,
+        "sha256": "4ca5c7cd7af87bc715b4aa68a238af90015097c55b530a849676c4c5c2c0684f"
+      }
+    },
+    "compiler/rustc_codegen_llvm/src/back/write.rs": {
+      "guarded": {
+        "blob": "3510076bafeb310658d339a1ff60539cc4ea9cdb",
+        "bytes": 58658,
+        "sha256": "148681d428c99ffc0d550f56010eaf58bc1c5797b1ac348f59774f607d7a0867"
+      },
+      "selected": {
+        "blob": "6ac75ac66b930fa940978c9b327c798e0fa54ab4",
+        "bytes": 58666,
+        "sha256": "dcae8079e87064ec319edfa0af92adc665944e651732de9e7cac24bd4e96c05f"
+      }
+    },
+    "compiler/rustc_codegen_llvm/src/llvm/ffi.rs": {
+      "guarded": {
+        "blob": "09666ab143772e9b90e6920e1eb1e94a8b9f76b8",
+        "bytes": 83480,
+        "sha256": "2d0c2360abb20b268d1bd05efa2ac4d673baaa3f9bed82c0840a739820dd8539"
+      },
+      "selected": {
+        "blob": "9de5d57dca0f14548e9c2fb005077a7c9cd1c207",
+        "bytes": 83484,
+        "sha256": "1b2f4b4f261f8f3c05186eb2737cb7f893f070c1a501bcd8f24214a8ea30a20e"
+      }
+    },
+    "compiler/rustc_llvm/build.rs": {
+      "guarded": {
+        "blob": "c4d283d166d2ac41d5323006a14a9da52d40abfc",
+        "bytes": 22631,
+        "sha256": "a90f714e8bacb5313171e1a79faeba8609607c5771660931431e3a0a526f79c8"
+      },
+      "selected": {
+        "blob": "1bb6f1e709f8b073e60052fea5bebe585ba10e5b",
+        "bytes": 22906,
+        "sha256": "55c80900accd5ee42e4fcc8dbe21ea1b02820fc773e1b1b91c33af081e715685"
+      }
+    },
+    "compiler/rustc_llvm/llvm-wrapper/OhmSourcePlacement.cpp": {
+      "guarded": {
+        "blob": "f1a02abd0fd87e5ee737587768e31be2d1b855a9",
+        "bytes": 21485,
+        "sha256": "6d3e776e9582f1f27cea2fd8715562b6f9fdbcc13d660591c665171218f3c2c9"
+      },
+      "selected": {
+        "blob": "fd72767b743e35078b677bd1b06906574f0d790e",
+        "bytes": 25028,
+        "sha256": "a77736dfe65c89b92ff6f316f56a31cf54efb60a6480011a9e7954f520fef077"
+      }
+    }
+  },
+  "reviewed_sha256": {
+    "compiler/rustc_codegen_llvm/src/back/placed_object.rs": "ee1804cdb4140a3b09c461ed7c2a2e2048d49c92c155b6fd18a3c5b1daba2910",
+    "compiler/rustc_codegen_llvm/src/back/source_placement/maps.rs": "4ca5c7cd7af87bc715b4aa68a238af90015097c55b530a849676c4c5c2c0684f",
+    "compiler/rustc_codegen_llvm/src/back/write.rs": "dcae8079e87064ec319edfa0af92adc665944e651732de9e7cac24bd4e96c05f",
+    "compiler/rustc_codegen_llvm/src/llvm/ffi.rs": "1b2f4b4f261f8f3c05186eb2737cb7f893f070c1a501bcd8f24214a8ea30a20e",
+    "compiler/rustc_llvm/build.rs": "55c80900accd5ee42e4fcc8dbe21ea1b02820fc773e1b1b91c33af081e715685",
+    "compiler/rustc_llvm/llvm-wrapper/OhmSourcePlacement.cpp": "a77736dfe65c89b92ff6f316f56a31cf54efb60a6480011a9e7954f520fef077"
+  },
+  "schema": "explicit-stock-b3-source-1",
+  "subject": "a9d85b2241b2661d6b6615a0ed1aaf5ca7558b2b",
+  "tree": "4b757e42a457031d7ed7fc32ddb2da1dbe06d783",
+  "unchanged": {
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "src/bootstrap": "4c7df39d6ad9a8ab254a4eeb587acf8ed4e1b2f5",
+    "src/librustdoc": "c50cbe6d4c881e5627ada1b3109e32dc37fd09a3",
+    "src/llvm-project": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145",
+    "src/tools/cargo": "159be68484a7f8cb05debf82bee89e594b7f19b6",
+    "x.py": "928a7496cb70ef2a6caf8e890fb09f12883a26e3"
+  }
+}
