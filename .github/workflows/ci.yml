@@ -1,4 +1,4 @@
-name: Build the incoherent-directory compiler for uv 21041
+name: Build the procedural derive identity compiler for uv 21041
 'on':
   workflow_dispatch:
     inputs:
@@ -94,10 +94,10 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = acfa00adf70348b8555820e03c038731b847f351
+        test "$(git rev-parse HEAD^)" = fe4508b67b49a062bfcc4c2ee39addcec6d9d644
 
         '
-    - name: Verify all four source packs and the direct f228 child
+    - name: Verify the source packs and direct procedural derive child
       run: python3 -IB scripts/incoherent-domain-stage1/materialize.py "$BENCH_ARM"
     - name: Install native GNU bootstrap prerequisites
       run: 'sudo apt-get -qq update
