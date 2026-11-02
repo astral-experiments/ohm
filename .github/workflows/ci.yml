@@ -12,7 +12,7 @@ run-name: Ruff upstream monomorphization experiment ${{ inputs.reviewed_head }}
         required: true
         type: choice
         default: ruff
-        options: [ruff, providers, async-providers, compatibility, native]
+        options: [ruff, providers, async-providers, compatibility, native, rejected-runs]
 permissions: {}
 concurrency:
   group: ohm-upstream-mono-pilot-${{ github.sha }}-${{ inputs.study }}
@@ -81,7 +81,7 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install -y --no-install-recommends build-essential zstd valgrind binutils pkg-config libssl-dev
     - name: Authenticate the actual factory tar and reopen both compiler installations
-      if: inputs.study != 'native'
+      if: inputs.study != 'native' && inputs.study != 'rejected-runs'
       env:
         GH_TOKEN: ${{ github.token }}
       run: python3 -IB qa/scripts/ruff-indexed-check-pmu/acquire.py
@@ -105,6 +105,11 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/native_reference.py
+    - name: Reopen both rejected prototypes and compare their compiler output across boots
+      if: inputs.study == 'rejected-runs'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/rejected_runs.py
     - name: Retain raw counters, Cargo inventories, typed verdicts and provenance
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

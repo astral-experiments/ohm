@@ -117,13 +117,13 @@ def compare(left, right, old, new):
 def body(z, value):
     return json.loads(gzip.decompress(z.read(value)))
 
-def main():
+def main(artifact_name="ruff-upstream-mono-pilot"):
     root=Path(os.environ["RUNNER_TEMP"])/"upstream-mono-study"
     root.mkdir(exist_ok=True)
     out=root/"logs";out.mkdir(exist_ok=True)
     endpoint="repos/astral-experiments/ohm/actions/artifacts/"+str(ZIP[0])
     a=json.loads(subprocess.check_output(["gh","api",endpoint]))
-    need(a["workflow_run"]["id"]==RUN and a["workflow_run"]["head_sha"]==HEAD and a["name"]=="ruff-upstream-mono-pilot"
+    need(a["workflow_run"]["id"]==RUN and a["workflow_run"]["head_sha"]==HEAD and a["name"]==artifact_name
          and not a["expired"] and a["size_in_bytes"]==ZIP[1] and a["digest"]=="sha256:"+ZIP[2], "wrong original archive")
     raw=root/"failed-pilot.zip"
     with raw.open("xb") as f: subprocess.run(["gh","api",endpoint+"/zip"],stdout=f,check=True)
