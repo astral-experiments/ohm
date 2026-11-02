@@ -549,7 +549,13 @@ staged_checkout="$test_directory/staged-checkout"
 cp -R "$rust_checkout" "$staged_checkout"
 git -C "$staged_checkout" submodule deinit --quiet -f -- src/tools/rustc-perf
 git -C "$staged_checkout" update-index --force-remove -- src/tools/rustc-perf
-rust_checkout="$staged_checkout" run_optimized_build "$macos_target" "$test_directory/staged-checkout.log"
+# Receive hooks set both repository paths and a quarantine for incoming objects.
+hook_repo="$test_directory/hook.git"
+git init --bare --quiet "$hook_repo"
+quarantine="$(mktemp -d "$hook_repo/objects/incoming.XXXXXX")"
+rust_checkout="$staged_checkout" run_optimized_build "$macos_target" "$test_directory/staged-checkout.log" \
+  "GIT_DIR=$hook_repo" "GIT_COMMON_DIR=$hook_repo" "GIT_WORK_TREE=$test_directory" \
+  "GIT_OBJECT_DIRECTORY=$quarantine" "GIT_ALTERNATE_OBJECT_DIRECTORIES=$hook_repo/objects" "GIT_QUARANTINE_PATH=$quarantine"
 [[ -z "$(git -C "$staged_checkout" ls-files -- src/tools/rustc-perf)" ]]
 
 toolchain=ohm-1.99.0-21
