@@ -112,6 +112,12 @@ can use `cargo::rerun-if-changed` to tell Cargo which native library or search d
 Cargo uses modification times for these declarations, as stock Cargo does.
 [Rust #255](https://github.com/astral-experiments/ohm-rust/pull/255) · [Rust #267](https://github.com/astral-experiments/ohm-rust/pull/267) · [Rust #268](https://github.com/astral-experiments/ohm-rust/pull/268) · [Cargo #294](https://github.com/astral-experiments/ohm-cargo/pull/294)
 
+In 1.99.0-23, a procedural macro stays fresh when one of its dependencies contains register-only
+assembly. Previously, Cargo could recompile the macro and its consumers on every build. In the
+release test, replacing a declared native library relinks both executables. Building again leaves
+both executables fresh.
+[Cargo change](https://github.com/astral-experiments/ohm-cargo/pull/424) · [Release test](https://github.com/astral-experiments/ohm/pull/253)
+
 On Linux, three successive unchanged builds of Ruff's CLI and integration tests invoked no
 compiler or linker. Changing a declared static library relinked both executables. Restoring the
 library reproduced both original executables byte for byte. [Release qualification](https://github.com/astral-experiments/ohm/pull/206)
@@ -762,6 +768,13 @@ edit regenerated two of 95 units. Its first repeat regenerated one. The edit and
 8.24 s with the -22 compiler changes and Cargo #328, down from 12.23 s with -21 across six matched
 pairs. [Compiler change](https://github.com/astral-experiments/ohm-rust/pull/280) · [Source comparison](https://github.com/astral-experiments/ohm/pull/223)
 
+In 1.99.0-23, rustc recognizes more assembly that reads no files. On GNU AArch64 this includes
+register-only comments, literal Linux system calls and the atomic loops used by Ruff. Across two
+Linux hosts, a Ruff CLI edit and its first repeat took 9.95 s with these changes, down from 25.09 s.
+On x86-64 musl, recognizing two register-only comments cut a Ruff parser edit and its first repeat
+from 1.89 s to 0.83 s. Both comparisons used eight paired trials.
+[GNU AArch64 timings](https://github.com/astral-experiments/ohm/actions/runs/41343305124) · [x86-64 musl timings](https://github.com/astral-experiments/ohm/actions/runs/41342471218)
+
 Rustc also invalidates cached metadata when a private item’s native export name changes. An incremental
 build could previously use the old symbol or panic. [Rust #300](https://github.com/astral-experiments/ohm-rust/pull/300)
 
@@ -853,6 +866,12 @@ their declarations, avoiding a second walk and temporary lists.
 Similarly, when checking an opaque return type such as `impl Iterator`, rustc can reuse its
 declared bounds each time it compares two lifetimes. When looking for implementations of a trait,
 it skips crates whose metadata lists none for that trait.
+
+Starting in 1.99.0-23, rustc can reuse a trait lookup after an unrelated implementation changes.
+This also applies to primitive types and small tuples. Across 12 paired trials on Linux, the
+median first check of uv’s resolver after a workspace edit fell from 2.88 s to 1.33 s with the
+two changes. Cargo rebuilt the same crates in both cases.
+[Trait lookup](https://github.com/astral-experiments/ohm-rust/pull/296) · [Primitive types and tuples](https://github.com/astral-experiments/ohm-rust/pull/306) · [Qualification](https://github.com/astral-experiments/ohm/actions/runs/41327099284)
 
 When a node has no attributes, the early lint visitor can keep using the enclosing lint settings.
 Rustc also walks the packed dependency indexes from the previous build without updating a separate
