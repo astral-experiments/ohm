@@ -25,6 +25,8 @@ esac
   grep '  ohm-installer\.sh$' SHA256SUMS | shasum -a 256 --check
 )
 
+# Install the test toolchain with permissions that allow its native link driver to run.
+umask 077
 smoke_root="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/ohm-smoke.XXXXXX")"
 trap 'rm -rf "$smoke_root"' EXIT
 
