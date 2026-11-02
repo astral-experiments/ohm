@@ -55,7 +55,7 @@ def stamps(label, run, jobs, art):
         == len(jobs["jobs"])
         == art["total_count"]
         == len(art["artifacts"])
-        == (2 if label == C else 1),
+        == 1,
         "extra or missing producer outputs",
     )
     (job,) = [j for j in jobs["jobs"] if j["id"] == q["job_id"]]
@@ -173,11 +173,8 @@ def admit():
         )
         e.ROLES = ("unused", role)
         origin = scratch / role
-        if role==G:
-            import receipt
-            receipt.unpack_candidate(e,arc,origin,role)
-            receipt.oracle(origin)
-        else:e.unpack(arc,origin,role)
+        import domain_control
+        domain_control.unpack(e,arc,origin,role)
         ident = e.check_archive(role, origin, stage, ctx, bundle)
         sdk = pool / role
         inv = e.extract(origin, sdk)

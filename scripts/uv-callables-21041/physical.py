@@ -68,18 +68,8 @@ def reduce(panel,raw,baseline,read_products,output_controls):
                 value=lambda role:sum(arms[role].values())if label=='sum_of_eight'else arms[role][label]
                 values.append([value(ctrl),value(child)])
             metrics[label]=dict(metric(values),raw_control_candidate=values)
-    return {'scope':'Eight true Cargo-dispatched rustc images and their threads, separately restored first edits; forked non-rustc children excluded','primary':'uv_client','complete':complete,'refused':failed,'raw_pairs':all_pairs,'metrics':metrics}
+    return {'scope':'Eight true Cargo-dispatched rustc images and their threads, separately restored first edits; forked non-rustc children excluded','primary':'uv_metadata','complete':complete,'refused':failed,'raw_pairs':all_pairs,'metrics':metrics}
 
 def preregistered_tests(metrics):
-    tests=[]
-    for name,threshold in [('uv_client',Fraction(1)),('sum_of_eight',Fraction(1)),('uv_install_wheel',Fraction(5,4))]:
-        xs=[Fraction(a,b)for a,b in metrics[name]['raw_control_candidate']]
-        up=sum(x>threshold for x in xs);down=sum(x<threshold for x in xs);n=up+down
-        p=Fraction(sum(comb(n,k)for k in range(up,n+1)),2**n)if n else Fraction(1)
-        tests.append(dict(name=name,threshold=str(threshold),above=up,below=down,ties=len(xs)-n,p=p,
-                          hold_medians_clear=all(median(x)>threshold for x in (xs[:4],xs[4:]))))
-    adjusted=Fraction(0)
-    for i,row in enumerate(sorted(tests,key=lambda j:j['p'])):
-        adjusted=min(Fraction(1),max(adjusted,row['p']*(len(tests)-i)))
-        row['holm_p']=float(adjusted);row['holm_reject_at_0_05']=adjusted<=Fraction(1,20);row['p']=float(row['p'])
-    return tests
+    from domain_control import hypothesis
+    return hypothesis(metrics)

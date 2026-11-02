@@ -1,4 +1,4 @@
-name: Check callable trait recovery on uv 21041
+name: Check foreign impl directories on uv 21041
 'on':
   workflow_dispatch:
     inputs:
@@ -9,11 +9,11 @@ name: Check callable trait recovery on uv 21041
       build_run_id:
         required: true
         type: string
-        description: Completed callable compiler build
+        description: Completed source-matched compiler build
       build_head:
         required: true
         type: string
-        description: Reviewed callable producer commit
+        description: Reviewed crate-directory compiler producer commit
       sdk_lock_sha256:
         required: true
         type: string
@@ -24,9 +24,9 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-callables-uv-client'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41395027122' && inputs.build_head == 'ee90d022e7abb6c2c2f61b751c49de06bba29aed'
-      && inputs.sdk_lock_sha256 == '08b0f933ed9dda4bc7079d63e81321e7c8ff279e321b47888da4408781ebdacf'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-incoherent-domain-hardware'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41407590585' && inputs.build_head == 'ce2c32fb7121fce03a303e46c4be3f05935ec265'
+      && inputs.sdk_lock_sha256 == 'bc04f4657463deb80d3ca7acf1d02dc20fa7f907d766d7131f5d48390bae26db'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 175
     env:
@@ -49,12 +49,12 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: builder
-        ref: 682930c7b58a62cd46c6f951b60d8cab8d3c7869
+        ref: ee90d022e7abb6c2c2f61b751c49de06bba29aed
         persist-credentials: 'false'
         sparse-checkout: |-
           .github/workflows
-          scripts/handwritten-stage1
-    - name: Check out exact callable builder
+          scripts/callables-stage1
+    - name: Check out exact incoherent-directory builder
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: inventory-builder
@@ -62,7 +62,7 @@ jobs:
         persist-credentials: 'false'
         sparse-checkout: |-
           .github/workflows
-          scripts/callables-stage1
+          scripts/incoherent-domain-stage1
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -137,13 +137,24 @@ jobs:
       run: |
         set -euo pipefail
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py calibrate 2>&1 | tee trait-results/calibration.log
+    - name: Preserve the calibrated physical boot
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: uv-21041-incoherent-domain-hardware-boot
+        path: trait-results/fresh-boot.json
+        if-no-files-found: error
+        retention-days: 5
+    - name: Run the blocking waitpid and independent deadline controls
+      run: |
+        set -euo pipefail
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/hardware_clock.py
     - name: Admit the two qualified stage1 SDKs and the signed Cargo binary
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
         set -euo pipefail
         /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py admit 2>&1 | tee trait-results/intake.log
-    - name: Verify both normal and shared-version directions of the native incremental transition
+    - name: Verify native method behavior, real incompatible cache retirement, and same-version reuse
       run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py migration
     - name: Qualify native roots and collect eight balanced pairs for each independent physical metric
       run: |-
@@ -157,7 +168,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-callables-eight-pair-relocation-1
+        name: uv-21041-incoherent-domain-hardware-original
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

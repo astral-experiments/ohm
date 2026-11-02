@@ -3,6 +3,7 @@ import gzip,os,re,shutil,subprocess,sys
 from collections import Counter
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
+import domain_control,wall_clock
 import core as c,history as h,products as prod,cargo_log as logs
 m=c.m;P=c.P
 import scoped,typed21041,behavior21041,physical
@@ -37,9 +38,10 @@ def acquire_context():
     c.guard(set(sdk)==set(c.ROLES)and load['sdk_lock_sha256']==P['sdk_lock_sha256'],'SDK roles')
     for r in c.ROLES:
         actual=sdk[r];c.guard(actual['server']==gate[r]['artifact']and gate[r]['driver']in actual['runtime'].values(),('same qualified binary',r))
-    trans=m.read(out/'intake/coroutine-transition/passed.json')
-    c.guard(trans['self_check'] is False and len(trans['modes'])==4 and all(len(v)==7 for v in trans['modes'].values()),'both directions, both real version modes')
-    c.guard((out/'intake/foreign-transition/passed.json').is_file(),'verified real two-SDK foreign transition')
+    import domain_control
+    accepted=m.read(out/'intake/domain-native/accepted.json')
+    c.guard(set(accepted['roles'])==set(c.ROLES)and accepted['modes']==10 and accepted['canonical_inputs']==P['sdk_lock_sha256'],'missing source, method transition or real cache retirement')
+    c.guard(m.read(out/'fresh-boot.json')['boot']==ready['boot'],'calibration boot changed')
     read=parser(w,tmp);bank=m.ROOT/'bank';a=h.open_source(w,bank);m.save(out/'real-A.json',a)
     pool=tmp/'ctfe22-root-sdks'
     for r in c.ROLES:shutil.move(str(pool/r),str(bank/('sdk-'+r)))
@@ -65,6 +67,8 @@ def run():
             c.guard(not progress((q/'settled-A/cargo.stderr').read_bytes())and prod.compare(q/'settled-A-equivalence.json',a,settled,True),'ordinary A did not settle')
             proof_a=typed21041.run(q/'typed-fresh-A','A',False);typed_a=products(q/'typed-fresh-A')
             c.guard(prod.compare(q/'fresh-A-equivalence.json',a,typed_a,True),'fresh A audit changed products')
+            domain_control.zero(q/'unchanged-kernel-A','A')
+            c.guard(prod.compare(q/'unchanged-kernel-A-equivalence.json',a,products(q/'unchanged-kernel-A'),True),'unchanged command changed products')
             if hold==0:h.clean(m.ROOT/'behavior');behavior21041.run(q/'behavior-A','A')
             seed,seal=h.checkpoint(role,hold,bank);rr=a['relative_paths']['uv_pypi_types@check'];m.save(q/'checkpoint.json',seal)
             h.restore(seed,seal,rr,atime);primary.command(q/'warm-B',c.CHECK,'first-edit');b=products(q/'warm-B');m.save(q/'B-unit-graph.json',h.graph())
@@ -72,6 +76,8 @@ def run():
             c.guard(not progress((q/'settled-B/cargo.stderr').read_bytes())and prod.compare(q/'settled-B-equivalence.json',b,settled_b,True),'ordinary B did not settle')
             typed21041.run(q/'typed-fresh-B','B',False);typed_noop=products(q/'typed-fresh-B')
             c.guard(prod.compare(q/'fresh-B-equivalence.json',b,typed_noop,True),'fresh B audit changed products')
+            domain_control.zero(q/'unchanged-kernel-B','B')
+            c.guard(prod.compare(q/'unchanged-kernel-B-equivalence.json',b,products(q/'unchanged-kernel-B'),True),'unchanged command changed products')
             if hold==0:behavior21041.run(q/'behavior-B','B')
             h.clean(m.TARGET);h.state('B');primary.command(q/'cold-B',c.CHECK,'independent-cold-B');cold=products(q/'cold-B')
             c.guard(prod.compare(q/'independent-B-equivalence.json',b,cold,False),'independent cold B program differs from warm B')
@@ -105,7 +111,8 @@ def run():
                         scoped_result=physical.visit(role,roleout,q,sdks,s,expected,scheduled,products,output_controls,per_meter_ready)
                         values[role][mode]=dict(scoped_result,checkpoint_sha256=seal['sha256'])
                         continue
-                    primary.command(path,c.CHECK,'pmu'if mode=='clock'else'native',binary if mode=='clock'else None)
+                    if mode=='wall':wall_clock.command(path,c.CHECK,'native',m.SRC,m.ENV)
+                    else:primary.command(path,c.CHECK,'pmu',binary)
                     rec=m.read(path/'ordinary.json');c.guard(rec['boot']==ready['boot']and rec['cpus']==ready['affinity']and rec['argv']==c.CHECK,'command/boot/cores')
                     result=products(path);m.save(path/'source.json',h.state('B'));c.guard(h.state('B')==s,'command changed source')
                     ok=prod.compare(path/'same-seed-equivalence.json',expected,result,True)

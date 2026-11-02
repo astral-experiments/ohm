@@ -51,6 +51,12 @@ def score():
             if hold==0:
                 wits=[m.read(q/('behavior-'+phase)/'witness.json')for phase in('A','B','cold-B')]
                 c.guard(all(x['exact'] and x['fixture_sha256']==m.filesha(c.HERE/'witness.rs') for x in wits)and len({x['output_sha256']for x in wits})==1,'independently linked native behavior')
+            import domain_control
+            for phase,original in [('A',a),('B',b)]:
+                p=q/('unchanged-kernel-'+phase);domain_control.check_zero(p,phase)
+                compiler=m.read(p/'compiler-image.json');installed=m.read(w/'trait-results/intake.json')['installed'][r]
+                c.guard(compiler['sha256']==installed['runtime']['bin/rustc'],'unchanged kernel trace enrolled another executable')
+                c.guard(check_products(p)==original,'unchanged original byte set differs')
             streams=output_controls(q/'warm-B');c.guard(streams==m.read(q/'ordinary-controls.json'),'opening command outputs')
             seal=m.read(q/'checkpoint.json')['sha256'];data[(hold,r)]=(b,seal,streams)
     for i,row in enumerate(raw):
@@ -64,11 +70,11 @@ def score():
                 c.guard(output_controls(at)==m.read(at/'ordinary-controls.json')==streams,'same-seed command diagnostics or package roster changed')
                 observed=check_products(at);ok=observed==expected;c.guard(ok==v['same_seed_qualified']==m.read(at/'same-seed-equivalence.json')['passed'],'recorded raw/semantic gate')
                 if not ok:refusals.append([i,r,mode])
-                if mode=='wall':c.guard(rec['invoked']==c.CHECK and rec['mode']=='native'and not(at/'whole-clock.json').exists()and v['value']==rec['ns'],'uninstrumented whole wall')
+                if mode=='wall':c.guard(rec['timer']=='CLOCK_MONOTONIC; waitpid blocking; ITIMER_REAL watchdog'and rec['deadline_fired']is False and rec['invoked']==c.CHECK and rec['mode']=='native'and not(at/'whole-clock.json').exists()and v['value']==rec['ns'],'uninstrumented whole wall')
                 else:
                     clock=meter.clock(at/'whole-clock.json',0);c.guard(rec['invoked']==[ready['plain'],str(at/'whole-clock.json'),*c.CHECK]and clock['running']==clock['enabled']>0 and v['value']==clock['instructions'],'inherited unmultiplexed whole-command instructions')
     import physical
-    report={'scope':'optimized stage1, complete recovery patch, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
+    report={'scope':'optimized stage1, foreign incoherent directory input, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
         'verified_unique_workspace_products':len(checked),'metrics':None if refusals else summary(raw),'branch':P['branch']}
     if report['metrics']:
         for mode in ('wall','clock'):
@@ -76,9 +82,9 @@ def score():
             report['metrics'][mode]['paired_statistics']=physical.metric(list(zip(x[c.ROLES[0]],x[c.ROLES[1]],strict=True)))
     m.save(panel/'ordinary-score.json',report)
     perf=physical.reduce(panel,raw,data,check_products,output_controls)
-    if perf['complete']:perf['holm_family']=physical.preregistered_tests(perf['metrics'])
+    if perf['complete']:perf['primary_test']=physical.preregistered_tests(perf['metrics'])
     m.save(panel/'native-rustc.json',perf)
-    combined=dict(report,native_scope=perf['scope'],physical_complete=perf['complete'],holm=perf.get('holm_family'))
+    combined=dict(report,native_scope=perf['scope'],physical_complete=perf['complete'],primary_test=perf.get('primary_test'))
     m.save(panel/'score.json',combined);print(json.dumps(combined,sort_keys=True))
     c.guard(not refusals and perf['complete'],'at least one required visit could not be qualified')
 if __name__=='__main__':score()

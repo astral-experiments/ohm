@@ -29,8 +29,8 @@ def host():
         PAIR["roles"] == ROLES
         and ROLES
         == [
-            "fa7a_stack_ctfe318_handwritten",
             "fa7a_stack_ctfe318_handwritten_coroutine_callables",
+            "fa7a_stack_ctfe318_handwritten_coroutine_callables_incoherent_domain",
         ],
         "wrong physical roles",
     )
@@ -64,7 +64,7 @@ def host():
     )
     guard(
         PAIR["arms"][ROLES[0]]["source"]["epoch"] == 43311
-        and PAIR["arms"][ROLES[1]]["source"]["epoch"] == 43311,
+        and PAIR["arms"][ROLES[1]]["source"]["epoch"] == 43317,
         "cache/metadata epochs",
     )
     q = m.read(HERE / "local-native.json")
@@ -84,6 +84,8 @@ def main():
     if cmd == ["calibrate"]:
         old, _ = m.pmu(w, tmp)
         old.calibrate()
+        import domain_control
+        domain_control.boot()
     elif cmd == ["admit"]:
         import admit_pair
 
@@ -91,7 +93,8 @@ def main():
     elif cmd == ["migration"]:
         import admit_pair
 
-        admit_pair.migration()
+        import domain_control
+        domain_control.migration()
     else:
         raise ValueError(cmd)
 
