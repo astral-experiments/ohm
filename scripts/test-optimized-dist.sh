@@ -545,6 +545,13 @@ if grep -Fq '.run_rustc(false)' "$original_collector"; then
   echo 'profile training modified the original collector' >&2
   exit 1
 fi
+staged_checkout="$test_directory/staged-checkout"
+cp -R "$rust_checkout" "$staged_checkout"
+git -C "$staged_checkout" submodule deinit --quiet -f -- src/tools/rustc-perf
+git -C "$staged_checkout" update-index --force-remove -- src/tools/rustc-perf
+rust_checkout="$staged_checkout" run_optimized_build "$macos_target" "$test_directory/staged-checkout.log"
+[[ -z "$(git -C "$staged_checkout" ls-files -- src/tools/rustc-perf)" ]]
+
 toolchain=ohm-1.99.0-21
 
 jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/19.json" > "$rust_checkout/.git/HEAD"

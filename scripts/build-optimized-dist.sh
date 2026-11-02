@@ -258,15 +258,21 @@ if [[ "$prepare_relocated_dependencies" == true ]]; then
   perf_path=src/tools/rustc-perf
   perf_revision="$(git -C "$rust_checkout" rev-parse "HEAD:$perf_path")"
   perf_source="$rust_checkout/$perf_path"
+  perf_checkout="$(mktemp -d "${TMPDIR:-/tmp}/ohm-rustc-perf.XXXXXX")"
+  trap 'rm -rf -- "$perf_checkout"' EXIT
   if [[ ! -e "$perf_source/.git" ]]; then
-    git -C "$rust_checkout" submodule update --init --checkout --depth 1 -- "$perf_path"
+    # Read the committed gitlink even if the caller staged a different revision or removal.
+    (
+      export GIT_INDEX_FILE="$perf_checkout/index"
+      git -C "$rust_checkout" read-tree HEAD
+      git -C "$rust_checkout" submodule update --init --checkout --depth 1 -- "$perf_path"
+    )
+    rm -- "$perf_checkout/index"
   fi
   if ! git -C "$perf_source" cat-file -e "$perf_revision^{commit}" 2>/dev/null; then
     # Supply the revision on stdin so Git selects the checkout's usual fetch remote.
     git -C "$perf_source" fetch --depth 1 --no-tags --no-write-fetch-head --stdin <<< "$perf_revision"
   fi
-  perf_checkout="$(mktemp -d "${TMPDIR:-/tmp}/ohm-rustc-perf.XXXXXX")"
-  trap 'rm -rf -- "$perf_checkout"' EXIT
   git -C "$perf_source" archive "$perf_revision" | tar -x -C "$perf_checkout"
   patch -d "$perf_checkout" -t -N -F 0 -p1 -i "$script_directory/../release/rustc-perf-relocated-dependencies.patch"
   opt_dist_arguments+=(--rustc-perf-checkout-dir "$perf_checkout")
