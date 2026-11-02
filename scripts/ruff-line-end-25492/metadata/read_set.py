@@ -69,7 +69,7 @@ def state(case,root,env,archive,args):
         expected=(json.loads((HERE.parent/'ordinary.json').read_bytes())['phases'][case]['typed_by_features']['no-features'] if lib=='ruff_source_file' else '"> é\\r\\n>\\n> β\\r"\n"> A\\n> B"\n""\n')
         assert replay.stdout.decode()==expected,(lib,replay.stdout,expected)
         (phase/(lib+'-typed.txt')).write_bytes(replay.stdout)
-    native_replay.collect(case,root,phase,private,trace,dirs,env)
+    native_equal=native_replay.collect(case,root,phase,private,trace,dirs,env)
     if not (phase/'process.json').is_file():
         save(phase/'unobserved.json',{'phase':case,'dirty':[r['target']['name'] for r in products if not r['fresh']],'products':ids})
         return False
@@ -82,7 +82,7 @@ def state(case,root,env,archive,args):
                                'dirty':[r['target']['name'] for r in products if not r['fresh']],'full_arguments':phref,
                                'matches':matches,'focused':wanted,'default_macro_env':{k:env.get(k) for k in ('RUSTFLAGS','RUSTC_WORKSPACE_WRAPPER','CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST','CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST')},'canonical_sha256':contact.digest(wanted)})
     assert 'ruff_source_file='+original['provider_path'] in argv
-    return len(matches)==1
+    return len(matches)==1 and native_equal
 
 def main():
     private,env=w.env_and_calibrate();w.fetch(private,env)

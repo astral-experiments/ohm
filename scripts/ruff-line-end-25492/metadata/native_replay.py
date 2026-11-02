@@ -88,6 +88,10 @@ def collect(case,root,phase,private,trace,dirs,typed_env):
     assert provider.is_relative_to(root) and provider.suffix=='.rmeta'
     original={'argv':argv,'provider_path':str(provider),'provider_sha256':sha(provider),'pid':regular_pid,
               'env_sha256':hashlib.sha256(json.dumps(env,sort_keys=True).encode()).hexdigest(),'env':env}
+    prior_sessions={p.parent.name for p in (private/'prior-inc').glob('s-*/dep-graph.bin')}
+    regular_graph,=[p for p in inc.glob('s-*/dep-graph.bin') if not p.parent.name.endswith('-working') and p.parent.name not in prior_sessions]
+    original['graph_path']=str(regular_graph);original['prior_sessions']=sorted(prior_sessions)
+    original['graph']=freeze(regular_graph,phase/'regular-graph.gz')
     save(phase/'original.json',original)
     normal_rlib,=output.glob('libruff_python_trivia-*.rlib')
     before_members=ar_members(normal_rlib)
@@ -104,7 +108,8 @@ def collect(case,root,phase,private,trace,dirs,typed_env):
         child,fds=execute(cmd,env,phase)
         graph,=[p for p in inc.glob('s-*/dep-graph.bin') if not p.parent.name.endswith('-working') and before.get(p)!=p.stat().st_ino]
         profile,=profiles.glob('*.mm_profdata')
-        assert profile.stem.rsplit('-',1)[1]==str(child)
+        suffix=profile.stem.rsplit('-',1)[1]
+        assert suffix.isdigit() and int(suffix)==child,(profile.name,child)
         rec={'pid':child,'argv':cmd,'rustc':sha(signed),'graph_path':str(graph),'profile_path':str(profile),'cwd':str(w.SRC),
              'regular_pid':regular_pid,'jobserver':fds,'original_env_sha256':original['env_sha256'],'alias':graph.with_name('ohm-build-dep-graph.bin').exists()}
         if rec['alias']:assert sha(graph)==sha(graph.with_name('ohm-build-dep-graph.bin'))
@@ -116,7 +121,7 @@ def collect(case,root,phase,private,trace,dirs,typed_env):
         results={'rlib':sha(normal_rlib),'members':after_members,'original_native_equal_in_order':objects(before_members)==objects(after_members),
                  'sorted_original_native_equal':sorted(objects(before_members))==sorted(objects(after_members))}
         save(phase/'native-replayed.json',results)
-        assert results['sorted_original_native_equal'],('profiled replay emitted changed native object',case)
+        native_equal=results['sorted_original_native_equal']
         cmd=['rustc','+ohm','--edition=2024',HERE/'trivia.rs','--extern','ruff_python_trivia='+str(normal_rlib)]
         for d in dirs:cmd+=['-L','dependency='+str(d)]
         exe=private/'typed-replayed';run([*cmd,'-o',exe],typed_env,w.SRC)
@@ -126,3 +131,4 @@ def collect(case,root,phase,private,trace,dirs,typed_env):
         for what,p in files.items():
             if p.exists():p.rename(private/('replayed-'+what))
             (private/('ordinary-'+what)).rename(p)
+    return native_equal
