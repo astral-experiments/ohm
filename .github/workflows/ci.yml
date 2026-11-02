@@ -1,31 +1,21 @@
-name: Qualify the source register coalescer on Ruff TOML deserialization
-run-name: Ruff 27924 source coalescer ${{ inputs.pair_order }} at ${{ inputs.reviewed_head }}
+name: Qualify saved code generation for Ruff executable examples
+run-name: Ruff example replay pilot at ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
         description: Exact reviewed nonrelease QA commit
-        required: true
         type: string
-      pair_order:
-        description: Order of the signed, stock-source and strict-source complete histories
         required: true
-        type: choice
-        options:
-          - signed,stock,strict
-          - strict,stock,signed
 permissions:
   actions: read
   contents: read
 jobs:
-  diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-llvm-remat-toml-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-    name: Signed GNU Ruff workspace option edit
+  qualify:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-example-replay-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    name: Physical matched Cargo and one genuine Ruff example
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 210
-    env:
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PAIR_ORDER: ${{ inputs.pair_order }}
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -33,149 +23,61 @@ jobs:
           path: enrolled
           persist-credentials: false
           sparse-checkout: |
-            .github/workflows
-            scripts/ruff-workspace-option-edit
-            scripts/ruff-workspace-remat
-            scripts/ruff-source-pass
-            scripts/ruff-cgu-inputs
+            scripts/ruff-example-replay
             scripts/ruff-default-owner-pmu
-            scripts/ohm-packed-ruff
-            scripts/branch-return-pmu
-            scripts/branch-storage-e-confirmation/review
-            scripts/ruff-repair-tables-pilot
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
-          path: collector
-          persist-credentials: false
-          sparse-checkout: scripts/gnu-example-ceiling
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 42ab30fd5e6bcdcf908df81de9baac65ca64fbf9
-          path: contract
-          persist-credentials: false
-          sparse-checkout: scripts/notebook-fanout-ceiling
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: astral-sh/ruff
-          ref: 088b7b5f77fcb05994fd2a17cbc940cd9edb341a
-          fetch-depth: 2
-          path: ruff
-          persist-credentials: false
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: astral-sh/ruff
-          ref: e0eb7b07632fce04d24d128c0e10a2d31c9e8282
-          fetch-depth: 2
-          path: ruff-toml
-          persist-credentials: false
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: rust-lang/llvm-project
-          ref: 1b9c0d5ff9bbe7634aead059efe6b11a7eeba145
-          path: llvm
+          ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
+          path: seed
           persist-credentials: false
           sparse-checkout: |
-            llvm/include
-            llvm/lib/CodeGen
+            scripts/cargo-diagnostic-fix
+            scripts/ohm-apple-zmij/cargo293
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 17981f5b807be81496282dd5a58e579e71586962
+          path: historical
+          persist-credentials: false
+          sparse-checkout: scripts/gnu-example-ceiling
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Verify sources, physical capture and counter contract
+      - name: Install and record the GNU source-build tools
         run: |
           set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          test ! -e "$base"
-          mkdir -p "$base/work" "$base/logs"
-          printf '%s' "$base" > "$base/work/.owned-by-packed-study"
-          findmnt --target "$base/work" > "$base/logs/filesystem.txt"
-          test "$(git -C enrolled rev-parse HEAD)" = "$REVIEWED_HEAD"
-          test -z "$(git -C enrolled status --porcelain=v1 --untracked-files=all)"
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends binutils build-essential clang-18 g++-13 libstdc++-13-dev git libssl-dev
-          (cd enrolled/scripts/ruff-source-pass && sha256sum --check --strict SHA256SUMS)
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py sources
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py compile "$base"
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/tests.py "$GITHUB_WORKSPACE/ruff" "$base/workspace-cgu" | tee "$base/logs/controls.txt"
-      - name: Enroll the one fresh worker and install the original signed GNU SDK
+          sudo apt-get install -y --no-install-recommends ninja-build strace build-essential cmake pkg-config libssl-dev perl
+          command -v gh rustup cargo git strace ninja cc cmake pkg-config perl
+          df -h "$RUNNER_TEMP"
+      - name: Build release-feature Cargo twice and check real native provider resolution
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB enrolled/scripts/ruff-workspace-option-edit/setup.py acquire
-      - name: Build the stock and patched register coalescers from the authenticated LLVM source
-        timeout-minutes: 12
+          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         run: |
           set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-source-pass/build.py \
-            --llvm-source "$GITHUB_WORKSPACE/llvm" --sdk "$base/home/.rustup/toolchains/ohm" \
-            --output "$RUNNER_TEMP/ohm-source-pass-kit"
-      - name: Verify direct signed, unchanged, native receipt and cross-target controls
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-source-pass/check.py \
-            --work "$RUNNER_TEMP/ohm-source-pass-fixture" --manifest "$RUNNER_TEMP/ohm-source-pass-kit/manifest.json" \
-            --rustup-home "$base/home/.rustup" --proxies "$base/home/.cargo/bin"
-      - name: Check the independently rebuilt ABI and both target controls outside all clocks
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-source-pass/check.py --host-rebuild-control \
-            --work "$RUNNER_TEMP/ohm-host-pass-fixture" --manifest "$RUNNER_TEMP/ohm-source-pass-kit/rebuilt/manifest.json" \
-            --rustup-home "$base/home/.rustup" --proxies "$base/home/.cargo/bin"
-      - name: Verify the root archive and typed client on the installed SDK
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/test_native.py "$GITHUB_WORKSPACE/ruff" "$base/fixture" "$base/home/.rustup" "$base/home/.cargo/bin" "$base/workspace-cgu" > "$base/logs/signed-fixture.stdout"
-          cp "$base/fixture/qualified.json" "$base/logs/signed-fixture.json"
-      - name: Meter ordinary Cargo first and collect independent physical evidence
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch "$base/work" "$base/logs" "$base/logs/resource" python3 -IB enrolled/scripts/ruff-workspace-option-edit/worker.py "$GITHUB_WORKSPACE/ruff" "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract"
-      - name: Reopen raw clocks, signed executable behavior, fresh bitcode and archive members
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          python3 -IB enrolled/scripts/ruff-workspace-option-edit/reopen.py "$base/logs" "$GITHUB_WORKSPACE/collector" "$GITHUB_WORKSPACE/contract" "$REVIEWED_HEAD" --execute > "$base/accepted.json"
-          mv "$base/accepted.json" "$base/logs/accepted.json"
-      - name: Compare full Ruff builds and execute the held-out TOML caller
-        timeout-minutes: 160
-        run: |
-          set -euo pipefail
-          base="$RUNNER_TEMP/ohm-branch-object-qa"
-          root="$RUNNER_TEMP/ohm-remat-comparison"
-          mkdir "$root" "$root/guard" "$root/driver"
-          cp -a enrolled/scripts/ruff-workspace-remat/. "$root/driver/"
-          (cd "$root/driver" && sha256sum --check --strict SHA256SUMS)
-          python3 -IB enrolled/scripts/ruff-repair-tables-pilot/guards.py watch \
-            "$root" "$root/guard" "$root/guard/resources" \
-            python3 -IB "$root/driver/replay.py" \
-            --qa "$GITHUB_WORKSPACE/enrolled" --source "$GITHUB_WORKSPACE/ruff" \
-            --original "$base" --scratch "$root/work" --results "$root/observations" \
-            --source-pass "$RUNNER_TEMP/ohm-source-pass-kit/manifest.json" \
-            --order "$PAIR_ORDER" --toml-source "$GITHUB_WORKSPACE/ruff-toml"
-      - name: Preserve hardware clocks, counter settings, compiler argv and runnable results
+          cd enrolled/scripts/ruff-example-replay
+          sha256sum --strict --check SHA256SUMS
+          python3 -IB study.py
+      - name: Keep raw diagnostics and original physical process records
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ruff-toml-source-register-coalescer
-          path: |
-            ${{ runner.temp }}/ohm-remat-comparison/observations
-            ${{ runner.temp }}/ohm-remat-comparison/guard
-            ${{ runner.temp }}/ohm-source-pass-kit/manifest.json
-            ${{ runner.temp }}/ohm-source-pass-fixture/passed.json
-            ${{ runner.temp }}/ohm-host-pass-fixture/passed.json
-            ${{ runner.temp }}/ohm-source-pass-kit/rebuilt/manifest.json
-            ${{ runner.temp }}/ohm-source-pass-kit/rebuilt/*-plain.so
-            ${{ runner.temp }}/ohm-source-pass-kit/host-default-stock.so
-            ${{ runner.temp }}/ohm-source-pass-kit/provenance.json
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/accepted.json
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/enrollment.json
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/cpus.json
-            ${{ runner.temp }}/ohm-branch-object-qa/logs/sdk.json
-          retention-days: 7
-          include-hidden-files: true
-          compression-level: 5
+          name: ruff-example-replay-pilot
+          path: ${{ runner.temp }}/ruff-example-replay/evidence
           if-no-files-found: warn
+          retention-days: 14
+      - name: Pass the two measured Cargo programs to independent PMU workers
+        if: success()
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/ruff-example-replay"
+          mkdir matched
+          cp cargo-parent cargo-candidate evidence/terminal.json matched/
+          tar -I 'zstd -5 -T2' -cf matched-cargo.tar.zst -C matched cargo-parent cargo-candidate terminal.json
+      - if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ruff-example-replay-cargo-pair
+          path: ${{ runner.temp }}/ruff-example-replay/matched-cargo.tar.zst
+          if-no-files-found: error
+          retention-days: 7
