@@ -216,26 +216,46 @@ def matrix(sdk, work, env, case, seed, output, sources, data):
     return {"source_A_graphs": previous, "arms": states, "profiles": records}
 
 
-def bucket_states(sdk, work, env, data):
+def bucket_states(sdk, work, env, data, journal=None):
     work.mkdir()
+    if journal is not None:
+        with journal.open("x"): pass
     for name in ("roster.rs", "reader.rs"):
         shutil.copyfile(HERE / name, work / name)
     rows = []
     for i, state in enumerate(data["states"]):
+        def capture(args, phase, cache=None, executable=None):
+            pid, code, out, err = process(args, work, env, allow_error=True)
+            streams = {"stdout_hex": out.hex(), "stderr_hex": err.hex()}
+            if journal is not None:
+                record = {"state": i, "phase": phase, "cache": cache, "cwd": str(work),
+                          "pid": pid, "argv": args, "exit": code, "streams": streams,
+                          "reader_binary": executable}
+                with journal.open("a") as f:
+                    print(json.dumps(record, sort_keys=True), file=f)
+            assert code == 0, (i, phase, cache, code)
+            return out, err, streams
+
         cfg = [value for name in state["cfgs"] for value in ("--cfg", name)]
         driver = [str(sdk / "bin/rustc"), "--sysroot", str(sdk)]
-        _, _, out, err = process(driver + ["--crate-type=rlib", "roster.rs", *cfg], work, env)
+        out, err, roster = capture(driver + ["--crate-type=rlib", "roster.rs", *cfg], "roster")
         assert not out and not err
         stamps = {}
+        visits = {}
+        previous = None
         for cache in ("history", "cold-" + str(i)):
-            _, _, out, err = process(driver + ["-Cincremental=" + cache, "-Zincremental-verify-ich",
-                                                 "--extern", "roster=libroster.rlib", "reader.rs"], work, env)
-            assert not out and not err
-            _, _, answer, err = process([str(work / "reader")], work, env)
-            assert answer.decode().strip() == state["stdout"] and not err
-            stamps[cache] = file_hash(work / "reader")
-        assert len(set(stamps.values())) == 1, (i, stamps)
-        rows.append(state | {"binaries": stamps})
+            out, err, compiled = capture(driver + ["-Cincremental=" + cache, "-Zincremental-verify-ich",
+                                         "--extern", "roster=libroster.rlib", "reader.rs"], "compile", cache)
+            assert not out and err == state.get("reader_stderr", "").encode(), (i, cache, compiled)
+            binary = (work / "reader").read_bytes()
+            assert binary and (previous is None or binary == previous), (i, cache)
+            previous = binary
+            stamps[cache] = digest(binary)
+            answer, err, ran = capture([str(work / "reader")], "run", cache, stamps[cache])
+            assert answer == (state["stdout"]+"\n").encode() and not err
+            visits[cache] = {"compile": compiled, "run": ran}
+        assert visits["history"] == visits["cold-" + str(i)]
+        rows.append(state | {"binaries": stamps, "roster": roster, "visits": visits})
     return rows
 
 

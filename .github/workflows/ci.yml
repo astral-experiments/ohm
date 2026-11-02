@@ -93,7 +93,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 6b6ea23a315feb005f06e86e67e24c609b10557e
+        test "$(git rev-parse HEAD^)" = c9c27ce66ec5ca6ffd6273e75d96d319e7cf9128
 
         '
     - name: Verify the 90-object compiler sources
@@ -208,7 +208,7 @@ jobs:
 
         python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
 
-        test "$(git rev-parse HEAD^)" = 6b6ea23a315feb005f06e86e67e24c609b10557e
+        test "$(git rev-parse HEAD^)" = c9c27ce66ec5ca6ffd6273e75d96d319e7cf9128
 
         '
     - name: Verify the 90-object compiler sources

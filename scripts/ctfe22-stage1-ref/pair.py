@@ -1,6 +1,6 @@
 """Reopen both uploaded capsules by immutable job outputs and report actual providers."""
 from pathlib import Path,PurePosixPath
-import os,re,stat,sys,tempfile,zipfile
+import json,os,re,stat,sys,tempfile,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import stage as s
 g=s.g;probe=s.probe
@@ -15,6 +15,36 @@ def extract(packet,dest,inner):
             with target.open("xb") as f:f.write(z.read(x))
     v=g.load(dest/"role.json");assert v["files"]=={p.relative_to(dest).as_posix():g.file_hash(p) for p in dest.rglob("*") if p.is_file() and p!=dest/"role.json"}
     return v
+def check_methods(dest,sdk):
+    specs=g.load(s.H/"methods.json")["states"]
+    rows=g.load(dest/"methods.json")
+    journal=[json.loads(line) for line in (dest/"methods-streams.jsonl").read_bytes().splitlines()]
+    assert len(rows)==len(specs)==7 and len(journal)==35
+    assert [i for i,row in enumerate(specs) if "reader_stderr" in row]==[3] and specs[3]["cfgs"]==["shared","mutable"]
+    empty={"stdout_hex":"","stderr_hex":""}
+    ledger=iter(journal)
+    work=Path(journal[0]["cwd"]);assert work.is_absolute() and work.name=="live" and work.parent.name.startswith("ohm-method-states-v1-")
+    driver=[str(sdk/"bin/rustc"),"--sysroot",str(sdk)]
+    def actual(i,phase,cache,args,streams,binary=None):
+        record=next(ledger)
+        assert type(record["pid"]) is int and record["pid"]>0
+        assert record=={"state":i,"phase":phase,"cache":cache,"cwd":str(work),"pid":record["pid"],
+                        "argv":args,"exit":0,"streams":streams,"reader_binary":binary}
+    for i,(row,spec) in enumerate(zip(rows,specs,strict=True)):
+        assert set(row)==set(spec)|{"binaries","roster","visits"} and all(row[k]==v for k,v in spec.items())
+        cfg=[item for flag in spec["cfgs"] for item in ("--cfg",flag)]
+        assert row["roster"]==empty
+        actual(i,"roster",None,driver+["--crate-type=rlib","roster.rs",*cfg],empty)
+        caches=("history","cold-"+str(i))
+        assert set(row["visits"])==set(row["binaries"])==set(caches) and len(set(row["binaries"].values()))==1
+        expected={"compile":{"stdout_hex":"","stderr_hex":spec.get("reader_stderr","").encode().hex()},
+                  "run":{"stdout_hex":(spec["stdout"]+"\n").encode().hex(),"stderr_hex":""}}
+        for cache in caches:
+            digest=row["binaries"][cache];assert re.fullmatch(r"[0-9a-f]{64}",digest)
+            assert row["visits"][cache]==expected
+            actual(i,"compile",cache,driver+["-Cincremental="+cache,"-Zincremental-verify-ich","--extern","roster=libroster.rlib","reader.rs"],expected["compile"])
+            actual(i,"run",cache,[str(work/"reader")],expected["run"],digest)
+
 def check_role(dest,rec,role,ctx):
     assert rec["schema"]==1 and rec["role"]==role and rec["context"]==ctx and rec["files_manifest"]==s.file_map() and rec["role_source"]==s.S["arms"][role]
     src=g.load(dest/"source.json");s.match_source(src,role,ctx);ident=g.load(dest/"identity.json")
@@ -29,9 +59,7 @@ def check_role(dest,rec,role,ctx):
     opts=cmds["build"][:-2];assert opts[-8:]==["build","--stage","1","-j8","--host",s.HOST,"--target",s.HOST] and cmds["build"][-2:]==["compiler/rustc","library"]
     for key,extras in (("unit",["compiler/rustc_middle","--test-args",s.UNIT]),("run-make",s.suites(role))):
         assert cmds[key]==opts[:-8]+["test",*opts[-7:],*extras];s.passed((dest/(key+".log")).read_bytes(),key,role)
-    methods=g.load(dest/"methods.json");expect=g.load(s.H/"methods.json")["states"];assert len(methods)==len(expect)==7
-    for i,(row,exp) in enumerate(zip(methods,expect,strict=True)):
-        assert {k:row[k] for k in exp}==exp and set(row["binaries"])=={"history","cold-"+str(i)} and len(set(row["binaries"].values()))==1
+    check_methods(dest,sdk)
     counts=probe.verify(root);assert counts==rec["observed"];return counts,obs,src,ident
 def evidence():
     ctx=s.context();w=Path(os.environ["GITHUB_WORKSPACE"]);out=w/"paired-proof";out.mkdir();data={};inputs={};ids=set()

@@ -78,7 +78,7 @@ def run(role):
     g.put(out/"identity.json",ident)
     root=out/"observed";root.mkdir();counts=probe.run(sdk,version.encode(),root)
     with tempfile.TemporaryDirectory(prefix="ohm-method-states-v1-") as t:
-        methods=g.bucket_states(sdk,Path(t)/"live",senv,g.load(H/"methods.json"))
+        methods=g.bucket_states(sdk,Path(t)/"live",senv,g.load(H/"methods.json"),out/"methods-streams.jsonl")
     assert [row["stdout"] for row in methods]==["0 0","13 0","13 0","13 29","0 29","0 0","13 0"]
     assert len({method["stdout"] for method in methods})==4
     g.put(out/"methods.json",methods)
