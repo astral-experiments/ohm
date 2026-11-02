@@ -77,7 +77,9 @@ def collect(r, e, w, cli, repo, env, work, out, expected, owners, blobs, stable_
         e.executed((dest/"native/outer.stdout").read_text(),(dest/"native/outer.stderr").read_text(),e.ADDED,False)
         e.need(not (dest/"clock.json").exists(), "diagnostic command was metered")
         result[phase] = {"dirty_keys":dirty, "products":len(keys), "binary":digest, "same_product":same_product}
+        r.put(dest/"result.json",result[phase])
         if phase == "traced":
             result["processes"] = execs(out)
             result["matches_original_unchanged"] = all(result[p]["dirty_keys"] == stable_dirty for p in ("ordinary","traced"))
-        r.put(out/"trace.json",result)
+            r.put(out/"ordinary-trace.json",result)
+    r.put(out/"trace.json",result)
