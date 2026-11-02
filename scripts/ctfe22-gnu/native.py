@@ -2,7 +2,7 @@
 import hashlib,json,os,re,shutil,subprocess,sys
 from pathlib import Path
 H=Path(__file__).resolve().parent;sys.path.insert(0,str(H));import sdk as s
-S=s.read(H/"arms.json");HOST=s.TARGET;UNIT="only_the_original_ctfe_literal_id_is_restored";PGO="verified executed PGO profile coverage for rustc, rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt"
+S=s.read(H/"arms.json");S["arms"]["callables_ctfe318"]=s.read(H/"callable-source.json")["source"];HOST=s.TARGET;UNIT="only_the_original_ctfe_literal_id_is_restored";PGO="verified executed PGO profile coverage for rustc, rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt"
 def out(*a,env=None):return subprocess.check_output(a,text=True,env=env).strip()
 def obj(data):return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 def fixture(role,where):
@@ -12,7 +12,8 @@ def fixture(role,where):
  return expected
 def suites(role):
  names=[S["fixture_directory"],"tests/run-make/rdr-public-hash-native-exports"]
- if role=="fa7a_stack_ctfe318":names.append("tests/run-make/trait-impl-bucket-projection")
+ assert role=="callables_ctfe318"
+ names.extend(['tests/run-make/trait-impl-bucket-projection', 'tests/run-make/trait-impl-bucket-coroutine', 'tests/run-make/trait-impl-bucket-callables', 'tests/run-make/trait-impl-bucket-sparse-foreign'])
  return names
 def gate_suites(log,role):
  for test in suites(role):assert log.splitlines().count("test [run-make] "+test+" ... ok")==1
@@ -65,6 +66,16 @@ def native(role):
  linked=subprocess.check_output([native_fixture/"main"],cwd=native_fixture,env=env);assert linked==b"LShift Or false 17\n"
  h=out(sdk/"bin/rustc","-Zls=public_hash",native_fixture/"libdep.rlib",env=env);assert re.search(r"[0-9a-f]{32}",h),h
  product={"role":role,"source_commit":arm["commit"],"source_tree":arm["tree"],"epoch":arm["epoch"],"archive_sha256":sha,"archive_bytes":archive.stat().st_size,"source_sha256":s.sha(dest/"source.json"),"sdk_inventory_sha256":s.sha(inv),"component_inventory_sha256":s.sha(tmp/"component-inventory.json"),"launcher":db["bin/rustc"]|{"path":"bin/rustc"},"driver":db[driver]|{"path":driver},"llvm":db[llvm]|{"path":llvm},"bundled_cargo":db["bin/cargo"]|{"path":"bin/cargo"},"effective_benchmark_cargo_sha256":S["signed_cargo_binary_sha256"],"unit_and_original_runmake":test_info,"installed_original_runmake":{"original_files":fixture(role,H/"fixture"),"binary_sha256":s.sha(recipes[0]),"compiler_sha256":s.sha(sdk/"bin/rustc"),"driver_sha256":s.sha(sdk/driver),"log_sha256":s.sha(actual),"exit":0,"final_linked_output":linked.decode(),"final_crate_public_hash":h},"execution_pgo":PGO,"bolt_note":True,"release_recipe":source["recipe"],"training_objects":source["training_objects"],"rustc_banner":rc,"cargo_banner":cg,"resolved_libraries":ld}
+ installed_callable={}
+ for name in ['trait-impl-bucket-coroutine', 'trait-impl-bucket-callables', 'trait-impl-bucket-sparse-foreign']:
+  path="tests/run-make/"+name
+  recipe,=[p for p in testdir.rglob("rmake") if p.is_file() and p.parent.name.split(".",1)[0]==name]
+  case=tmp/("optimized-"+name);shutil.copytree(R/path,case)
+  proof=qa/("optimized-"+name+".log")
+  with proof.open("xb") as stream:
+   subprocess.run([recipe],cwd=case,env=env,stdout=stream,stderr=subprocess.STDOUT,check=True)
+  installed_callable[name]={"exit":0,"log_sha256":s.sha(proof),"recipe_sha256":s.sha(recipe),"driver_sha256":s.sha(sdk/driver)}
+ product["installed_callable_tests"]=installed_callable
  s.save(dest/"role.json",product)
  members=("ohm.tar.gz","source.json","role.json","sdk-inventory.json","component-inventory.json")
  (dest/"SHA256SUMS").write_text("".join(s.sha(dest/n)+"  "+n+"\n" for n in members));shutil.copyfile(dest/"role.json",qa/"role.json")

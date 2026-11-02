@@ -1,4 +1,4 @@
-name: Build corrected Ohm -22 GNU compilers for the uv root benchmark
+name: Build the callable lookup compiler with the signed Ohm -22 production recipe
 on:
   workflow_dispatch:
     inputs:
@@ -9,29 +9,14 @@ on:
 permissions: {}
 jobs:
   build:
-    name: Production GNU SDK (${{ matrix.arm }})
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-standard-20988' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    name: Production GNU callable SDK
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-callable-production22' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     permissions:
       contents: read
-    outputs:
-      stock_sdk_id: ${{ steps.binding.outputs.stock_sdk_id }}
-      stock_sdk_sha: ${{ steps.binding.outputs.stock_sdk_sha }}
-      stock_qa_id: ${{ steps.binding.outputs.stock_qa_id }}
-      stock_qa_sha: ${{ steps.binding.outputs.stock_qa_sha }}
-      traits_sdk_id: ${{ steps.binding.outputs.traits_sdk_id }}
-      traits_sdk_sha: ${{ steps.binding.outputs.traits_sdk_sha }}
-      traits_qa_id: ${{ steps.binding.outputs.traits_qa_id }}
-      traits_qa_sha: ${{ steps.binding.outputs.traits_qa_sha }}
-    strategy:
-      fail-fast: false
-      matrix:
-        arm:
-          - stock_ctfe318
-          - fa7a_stack_ctfe318
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 360
     env:
-      BENCH_ARM: ${{ matrix.arm }}
+      BENCH_ARM: callables_ctfe318
       OHM_TOOLCHAIN: ohm-1.99.0-22
       OHM_TARGET: x86_64-unknown-linux-gnu
       PYTHONDONTWRITEBYTECODE: "1"
@@ -94,7 +79,7 @@ jobs:
         run: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py init
       - name: Reconstruct and verify the exact compiler source
         shell: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py watch materialize {0}
-        run: python3 -IB scripts/ctfe22-gnu/materialize.py "$BENCH_ARM"
+        run: python3 -IB scripts/ctfe22-gnu/materialize-callable.py "$BENCH_ARM"
       - name: Install native GNU bootstrap prerequisites
         shell: python3 -ISB scripts/ctfe22-gnu/standard-capacity.py watch prerequisites {0}
         run: |
@@ -197,7 +182,7 @@ jobs:
         id: sdk
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ctfe22-gnu-sdk-${{ matrix.arm }}
+          name: callable-production-sdk
           path: trait-sdk/
           if-no-files-found: error
           compression-level: 0
@@ -207,96 +192,7 @@ jobs:
         id: qa
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ctfe22-gnu-build-${{ matrix.arm }}-attempt-${{ github.run_attempt }}
+          name: callable-production-qa-attempt-${{ github.run_attempt }}
           path: trait-evidence/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Bind successful role inputs to the artifact service receipts
-        id: binding
-        env:
-          SDK_ID: ${{ steps.sdk.outputs.artifact-id }}
-          SDK_SHA: ${{ steps.sdk.outputs.artifact-digest }}
-          QA_ID: ${{ steps.qa.outputs.artifact-id }}
-          QA_SHA: ${{ steps.qa.outputs.artifact-digest }}
-        run: |-
-          python3 -ISB - <<'PYTHON'
-          import os,re
-          e=os.environ
-          key={'stock_ctfe318':'stock','fa7a_stack_ctfe318':'traits'}[e['BENCH_ARM']]
-          with open(e['GITHUB_OUTPUT'],'a') as f:
-              for k in ('SDK_ID','SDK_SHA','QA_ID','QA_SHA'):
-                  v=e[k].removeprefix('sha256:')
-                  assert re.fullmatch(r'[1-9]\d*' if k.endswith('_ID') else '[0-9a-f]{64}',v)
-                  print(key+'_'+k.lower()+'='+v,file=f)
-          PYTHON
-  pair:
-    name: Qualify both cache migration directions
-    needs: build
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-standard-20988' && github.sha == inputs.reviewed_head && github.run_attempt == 1
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      actions: read
-    timeout-minutes: 30
-    env:
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      STOCK_SDK_ID: ${{ needs.build.outputs.stock_sdk_id }}
-      STOCK_SDK_SHA: ${{ needs.build.outputs.stock_sdk_sha }}
-      STOCK_QA_ID: ${{ needs.build.outputs.stock_qa_id }}
-      STOCK_QA_SHA: ${{ needs.build.outputs.stock_qa_sha }}
-      TRAITS_SDK_ID: ${{ needs.build.outputs.traits_sdk_id }}
-      TRAITS_SDK_SHA: ${{ needs.build.outputs.traits_sdk_sha }}
-      TRAITS_QA_ID: ${{ needs.build.outputs.traits_qa_id }}
-      TRAITS_QA_SHA: ${{ needs.build.outputs.traits_qa_sha }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          ref: ${{ github.sha }}
-      - name: Check pair input IDs and available space
-        run: |
-          python3 -ISB - <<'PYTHON'
-          import os,re,shutil
-          e=os.environ
-          ids=[e[r+'_'+k+'_ID'] for r in ('STOCK','TRAITS') for k in ('SDK','QA')]
-          assert len(set(ids))==4 and all(re.fullmatch(r'[1-9]\d*',v) for v in ids)
-          assert shutil.disk_usage(e['GITHUB_WORKSPACE']).free >= 6*2**30, 'need 6 GiB free for both compiler archives and validated installs'
-          PYTHON
-      - name: Download stock_ctfe318 sdk by immutable service ID
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          artifact-ids: ${{ needs.build.outputs.stock_sdk_id }}
-          path: intake/stock_ctfe318
-          merge-multiple: true
-      - name: Download stock_ctfe318 qa by immutable service ID
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          artifact-ids: ${{ needs.build.outputs.stock_qa_id }}
-          path: intake/stock_ctfe318-qa
-          merge-multiple: true
-      - name: Download fa7a_stack_ctfe318 sdk by immutable service ID
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          artifact-ids: ${{ needs.build.outputs.traits_sdk_id }}
-          path: intake/fa7a_stack_ctfe318
-          merge-multiple: true
-      - name: Download fa7a_stack_ctfe318 qa by immutable service ID
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          artifact-ids: ${{ needs.build.outputs.traits_qa_id }}
-          path: intake/fa7a_stack_ctfe318-qa
-          merge-multiple: true
-      - name: Independently replay the two raw capacity histories
-        run: python3 -ISB scripts/ctfe22-gnu/capacity-audit.py 52779265edb1486bceb9f6abf0c7a24dfc0f234caea4a067653b0eceb514772b
-      - name: Verify the archives and exercise bidirectional cache rejection
-        run: python3 -ISB scripts/ctfe22-gnu/pair.py
-      - name: Bind the two capacity proofs to the native pair qualification
-        run: install -m 644 capacity-pair.json pair-evidence/capacity-admission.json
-      - name: Retain paired source and cache qualification
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: ctfe22-gnu-pair-qa-attempt-${{ github.run_attempt }}
-          path: pair-evidence/
           if-no-files-found: warn
           retention-days: 14
