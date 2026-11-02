@@ -1,0 +1,145 @@
+{
+ "previous": "a9d85b2241b2661d6b6615a0ed1aaf5ca7558b2b",
+ "previous_source": "55c80900accd5ee42e4fcc8dbe21ea1b02820fc773e1b1b91c33af081e715685",
+ "new_source": "ac73ece6038d1f63f44814457e5420f2df5a4e2e50c78c2b13541f166c683f85",
+ "lock": "bf05895eec4ef857cfca30aff62c57e8d8d178d0f9b66de69bed9b2941d97bc4",
+ "manifest": "2ae8fd59bbd658cc8dda4aeae8a23ad0befe6069276778d08f7dfad78ff1af8c",
+ "deps": {
+  "shlex": {
+   "version": "1.3.0",
+   "registry_sha256": "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
+  },
+  "cc": {
+   "version": "1.2.16",
+   "registry_sha256": "be714c154be609ec7f5dad223a33bf1482fff90472de28f7362806e6d4832b8c"
+  }
+ },
+ "processes": {
+  "signed-version": {
+   "argv": [
+    "/home/dev-user/.cargo/bin/rustc",
+    "+ohm",
+    "-vV"
+   ],
+   "exit": 0,
+   "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stdout": "6b77866794a441eb3fc79f1f0b977493b7cbf7648a309dd4ea7d2c7eccae6bff",
+   "minimum_observed_effective_bytes": 9425592320
+  },
+  "dependency-shlex": {
+   "argv": [
+    "/home/dev-user/.cargo/bin/rustc",
+    "+ohm",
+    "--edition=2015",
+    "--cap-lints=allow",
+    "--crate-name",
+    "shlex",
+    "--crate-type=lib",
+    "--emit=metadata",
+    "$PRIVATE/shlex-1.3.0/src/lib.rs",
+    "-o",
+    "$PRIVATE/deps/libshlex.rmeta",
+    "--cfg",
+    "feature=\"std\""
+   ],
+   "exit": 0,
+   "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "minimum_observed_effective_bytes": 9396600832
+  },
+  "dependency-cc": {
+   "argv": [
+    "/home/dev-user/.cargo/bin/rustc",
+    "+ohm",
+    "--edition=2018",
+    "--cap-lints=allow",
+    "--crate-name",
+    "cc",
+    "--crate-type=lib",
+    "--emit=metadata",
+    "$PRIVATE/cc-1.2.16/src/lib.rs",
+    "-o",
+    "$PRIVATE/deps/libcc.rmeta",
+    "--extern",
+    "shlex=$PRIVATE/deps/libshlex.rmeta",
+    "-L",
+    "dependency=$PRIVATE/deps"
+   ],
+   "exit": 0,
+   "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "minimum_observed_effective_bytes": 9346748416
+  },
+  "previous": {
+   "argv": [
+    "/home/dev-user/.cargo/bin/rustc",
+    "+ohm",
+    "--edition=2024",
+    "--crate-name",
+    "build_script_build",
+    "--crate-type=bin",
+    "--emit=metadata",
+    "--error-format=json",
+    "$PRIVATE/previous.rs",
+    "-L",
+    "dependency=$PRIVATE/deps",
+    "--extern",
+    "cc=$PRIVATE/deps/libcc.rmeta",
+    "--extern",
+    "shlex=$PRIVATE/deps/libshlex.rmeta",
+    "-o",
+    "$PRIVATE/previous.rmeta"
+   ],
+   "exit": 1,
+   "stderr": "2d6774fa414bd3ecfda5003abb98726d1bf681c3cfb412cca2528fe9657b08ec",
+   "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "minimum_observed_effective_bytes": 9398636544,
+   "errors": [
+    {
+     "code": "E0599",
+     "line": [
+      269
+     ],
+     "message": "no method named `iter` found for enum `LlvmConfigOutput` in the current scope"
+    },
+    {
+     "code": "E0599",
+     "line": [
+      270
+     ],
+     "message": "no method named `iter` found for enum `LlvmConfigOutput` in the current scope"
+    }
+   ]
+  },
+  "fixed": {
+   "argv": [
+    "/home/dev-user/.cargo/bin/rustc",
+    "+ohm",
+    "--edition=2024",
+    "--crate-name",
+    "build_script_build",
+    "--crate-type=bin",
+    "--emit=metadata",
+    "--error-format=json",
+    "/home/dev-user/code/oss/ohm-rust-stock-shadow-placement-20261102/compiler/rustc_llvm/build.rs",
+    "-L",
+    "dependency=$PRIVATE/deps",
+    "--extern",
+    "cc=$PRIVATE/deps/libcc.rmeta",
+    "--extern",
+    "shlex=$PRIVATE/deps/libshlex.rmeta",
+    "-o",
+    "$PRIVATE/fixed.rmeta"
+   ],
+   "exit": 0,
+   "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "minimum_observed_effective_bytes": 9388789760,
+   "errors": []
+  }
+ },
+ "signed_rustc_sha256": "7e35096dab1b661924cb3c31982c870dd99c7c00a7fba28aa958f451e7c9474e",
+ "rejected_factory": "https://github.com/astral-experiments/ohm/actions/runs/41505848219",
+ "coverage": "Both entire original Rust scripts (ordinary code, edition 2024) typechecked with signed -22 rustc and authenticated cc/shlex sources. A full stage1 build is a separate factory gate.",
+ "rustc_version": "rustc 1.99.0-dev (008a21ac0 2026-11-01) (ohm-1.99.0-22)\nbinary: rustc\ncommit-hash: 008a21ac0d750dc9a1c18b7959d7e7984c03d887\ncommit-date: 2026-11-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+}
