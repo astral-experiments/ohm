@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--locked",
+    "--offline",
+    "-j8",
+    "-p",
+    "uv",
+    "--lib"
+  ],
+  "performance_eligible": false,
+  "planned_native_qa": "pre-timing capture of original Cargo JSON/verbose units and all sibling argv, normalized across compilers; root must be uv production lib, no test/bench/bin; exact target, features, profile, dirty set and output paths match across compilers; independently cold semantic B equals warm B for each compiler, same named behavior + diagnostics; record metadata size/hash within each compiler and triage any difference; compare driver, Cargo, and native method/ABI gates separately",
+  "planner": "append -Z unstable-options --unit-graph to unmeasured normal command on corrected parent only; require complete unit+dependency graph byte-for-byte equal between A and B",
+  "role": "secondary package, primary remains plain workspace",
+  "runtime_witness": "unchanged upstream VirtualProject named methods still resolve, genuine inserted WorkspaceExclusions complete bool branches; exact unchanged ordinary case witness and real typed mutation control in separate build, no synthetic use in timed command",
+  "selection": "843e3aed5a2ea271683813afd08aecb9adef58430ab1d73ba241e6936224db48",
+  "source": "two genuine Git trees, same active source path; manifests and lock content fixed"
+}
