@@ -104,14 +104,34 @@ class Controls(unittest.TestCase):
         f={key+"33":b'clone(child_stack=NULL, flags=1) = 34\nexecve("/count", ["/count"], []) = 0\n',
            key+"34":b'execve("/x/cargo", ["cargo", "+ohm", "build"], []) = 0\nexecve("/sdk/bin/cargo", ["/sdk/bin/cargo", "build"], []) = 0\n'}
         with archive(f) as z:
-            parents,execs=raw.fresh_trace(z,"x",list(f))
+            parents,execs,exports=raw.fresh_trace(z,"x",list(f),"/sdk",{})
+        self.assertEqual(exports,{"execs_with_export":0,"build_scripts":0})
         self.assertEqual(parents,{34:33})
         self.assertTrue(raw.descendant(34,33,parents))
         self.assertFalse(raw.descendant(33,34,parents))
         self.assertEqual(len(execs[34]),2)
         bad=f|{key+"34":f[key+"34"].replace(b'[]) = 0',b'["LD_PRELOAD=/tmp/lib.so"]) = 0')}
         with archive(bad) as z,self.assertRaises(ValueError):
-            raw.fresh_trace(z,"x",list(bad))
+            raw.fresh_trace(z,"x",list(bad),"/sdk",{})
+
+    def test_signed_cargo_build_script_flags(self):
+        sdk="/sdk"
+        flags=raw.childenv.flags(sdk)
+        key="CARGO_ENCODED_RUSTFLAGS"
+        base={"CARGO_BUILD_BUILD_DIR":"/private/build"}
+        generated=[(33,"/private/build/pkg/41/out/build_script_build"),(35,"/sdk/bin/rustc"),(37,"/usr/bin/cc")]
+        graph={33:30,35:33,37:34,34:33}
+        self.assertTrue(raw.childenv.check({key:flags},sdk))
+        self.assertEqual(raw.childenv.owners(generated,graph,{30},base),{"execs_with_export":3,"build_scripts":1})
+        for env,kit in (({key:flags},None),({key:flags+"x"},sdk),({key:flags[::-1]},sdk),({key:flags},"/different"),
+                        ({"RUSTFLAGS":flags},sdk),({"CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST":"all"},sdk)):
+            with self.assertRaises(ValueError):
+                raw.childenv.check(env,kit)
+        for events,parents,actual,entry in ((generated,graph,{31},base),(generated,graph|{35:30},{30},base),
+                (generated,graph,{30},base|{key:flags}),(generated,graph,{30},{"CARGO_BUILD_BUILD_DIR":"/other"}),
+                (generated+[(30,"/sdk/bin/cargo")],graph,{30},base)):
+            with self.assertRaises(ValueError):
+                raw.childenv.owners(events,parents,actual,entry)
 
     def test_sort_out_the_pmu_proxy(self):
         ordinary=["cargo","+ohm","build"]

@@ -14,6 +14,7 @@ import zipfile
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import transport as t
+import childenv
 sys.path.insert(0,str(HERE.parent/"ruff-ldv-needed"))
 import reopen
 sys.path.insert(0,str(HERE.parent/"ruff-workspace-remat"))
@@ -27,10 +28,6 @@ PLAN=json.loads((t.STAGE/"confirmation.json").read_bytes())
 CHILD=re.compile(r"^(?:clone3?\(|fork\(|vfork\(|<\.\.\. (?:clone3?|fork|vfork) resumed>).* = (\d+)\s*$")
 MAGIC={"native-bodies":b"\x7fELF","probe-owners":b"\x7fELF","owner-archives":b"!<arch>\n"}
 STORE=re.compile(r"physical/(native-bodies|probe-owners|owner-archives)/([0-9a-f]{64})\.gz")
-BAD_ENV={"LD_PRELOAD","LD_AUDIT","RUSTC_WRAPPER","RUSTC_WORKSPACE_WRAPPER","CARGO_BUILD_RUSTC_WRAPPER",
-         "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER","OHM_LDV_GUARD"}
-
-
 def read(z,member):
     return json.loads(z.read(member))
 
@@ -89,7 +86,8 @@ def calibration(z):
     return {k:v["instructions"] for k,v in events.items()}
 
 
-def fresh_trace(z,folder,files):
+def fresh_trace(z,folder,files,sdk,entry):
+    generated=[]
     parents={}
     execs={}
     prefix=folder+"/trace/exec."
@@ -106,11 +104,11 @@ def fresh_trace(z,folder,files):
                     need(m,"unparsed successful kernel exec")
                     exe,args,env=(ast.literal_eval(v) for v in m.groups())
                     keys={s.partition("=")[0]:s.partition("=")[2] for s in env}
-                    need(not any(n.startswith("QA_LDV_") or n in BAD_ENV or (n.startswith("CARGO_") and "TRUST" in n)
-                                 or (n in ("RUSTFLAGS","CARGO_ENCODED_RUSTFLAGS") and v) for n,v in keys.items()),
-                         "different actual compiler or build environment")
+                    if childenv.check(keys,sdk):
+                        generated.append((tid,exe))
                     execs.setdefault(tid,[]).append((exe,args))
-    return parents,execs
+    signed={pid for pid,rows in execs.items() if any(p==str(Path(sdk)/"bin/cargo") for p,_ in rows)}
+    return parents,execs,childenv.owners(generated,parents,signed,entry)
 
 
 def descendant(pid,ancestor,parents):
@@ -219,7 +217,9 @@ def phase_read(z,folder,phase,suite,stage,role,obs,actual_role,sdk,bodies,files)
     links=checked_json(z,folder+"/linker-argv.json",obs["linker_argv_sha256"])
     opened=checked_json(z,folder+"/actual-libraries.json",obs["source_libraries_sha"])
     need(read(z,folder+"/result.json")==obs and {"rustc":k["rustc"],"linkers":k["linkers"]}==obs["raw_roster"],"different phase/roster")
-    parents,executions=fresh_trace(z,folder,files)
+    entry=read(z,folder+"/command.json")["environment"]
+    parents,executions,exports=fresh_trace(z,folder,files,sdk,entry)
+    need(exports==read(z,folder+"/build-script-flags.json"),"different Cargo build script exports")
     need(parents=={int(c):p for c,p in k["tree"]["parents"].items()} and
          Counter((pid,p) for pid,rs in executions.items() for p,_ in rs)==
          Counter((e["pid"],e["path"]) for e in k["tree"]["processes"]),"unreported actual exec or process hierarchy")

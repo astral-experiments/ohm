@@ -12,20 +12,14 @@ import sys
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import transport
+import childenv
 sys.path.insert(0,str(HERE.parent/"ruff-ldv-needed"))
 import needed
 import probes
 import support
 from support import census,guards,need,put,sha
 
-DENY={"LD_PRELOAD","LD_AUDIT","RUSTC_WRAPPER","RUSTC_WORKSPACE_WRAPPER","CARGO_BUILD_RUSTC_WRAPPER",
-      "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER","OHM_LDV_GUARD"}
-
-
-def clean(env):
-    need(not any(k.startswith("QA_LDV_") or (k.startswith("CARGO_") and "TRUST" in k)
-                 or k in DENY or (k in ("RUSTFLAGS","CARGO_ENCODED_RUSTFLAGS") and v) for k,v in env.items()),
-         "unregistered compiler/plugin/wrapper environment")
+clean=childenv.check
 
 
 def stat_id(path):
@@ -155,6 +149,7 @@ def visit(kit,dest,work,repo,env,cmd,wanted,*,score,cold,observe):
     linkids={(r["pid"],r["path"]) for r in tree["linkers"]}
     links=[]
     loads={}
+    generated=[]
     for trace in sorted((dest/"trace").glob("exec.*")):
         pid=int(trace.suffix[1:])
         with trace.open() as opened:
@@ -165,11 +160,14 @@ def visit(kit,dest,work,repo,env,cmd,wanted,*,score,cold,observe):
                 need(m,("unparsed successful exec",line[:180]))
                 exe,args,raw=(ast.literal_eval(s) for s in m.groups())
                 environ=dict(p.split("=",1) for p in raw)
-                clean(environ)
+                if childenv.check(environ,kit.sdk):
+                    generated.append((pid,exe))
                 if (pid,exe) in linkids:
                     links.append({"pid":pid,"path":exe,"argv":args,"sha256":sha(Path(exe)),
                                   "signed_wild":support.real_program(exe,kit.wild)})
     need(sorted((p["pid"],p["path"]) for p in links)==sorted(linkids),"unaccounted link exec")
+    signed={p["pid"] for p in tree["processes"] if p["path"]==str(kit.cargo)}
+    put(dest/"build-script-flags.json",childenv.owners(generated,{int(c):p for c,p in tree["parents"].items()},signed,env))
     if observe:
         for r in rusts:
             if r["kind"]=="full":

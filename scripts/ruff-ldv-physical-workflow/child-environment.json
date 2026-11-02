@@ -1,0 +1,73 @@
+{
+  "code": {
+    "export": "src/compiler/custom_build.rs:486",
+    "flags": "src/compiler/mod.rs:148-149; src/compiler/build_context/target_info.rs:825-842",
+    "native": "src/compiler/ohm_linker.rs:60-65"
+  },
+  "entry": "no caller-selected rustflags; no trust, wrapper or loader intervention",
+  "raw_evidence": {
+    "e2e": {
+      "exact_ordered_stock_export_sha256": "85d389652b693919d42d3091ed2f374044f031e95a689a17e6f4760e45d93553",
+      "refused_native": {
+        "affected": {
+          "ar": 2,
+          "as": 1,
+          "build-script": 32,
+          "cc": 3,
+          "cc1": 2,
+          "rustc": 28
+        },
+        "all_exec_transitions": 526,
+        "artifact": 13134345142,
+        "caller_exported_flags": false,
+        "execs_with_stock_export": 68,
+        "run": 41429121227,
+        "sha256": "7f990c88f302fec5df2ed899f64ee15085b0f5ca2c9ebf2f54bf12f44cadb30d",
+        "size": 3515573,
+        "unrelated_nonscript": 0,
+        "verified_script_owners": 32
+      },
+      "signed_plain": {
+        "caller_exported_flags": false,
+        "phase": "plain-A-edit/old",
+        "quote_physical_exec_member": "ldv/plain-A-edit/old/trace/exec.2349",
+        "run": 41415820650,
+        "sha256": "fbf25e918ac425c32ca2cec989501914c859edbaf307fce79f437e686ec4952b",
+        "suite": "e2e",
+        "trace_sha256": "7ce67ba1349e75900f2c4ed2cca4c8337ba14df6c02ee8e2c845251cf64d9d2c"
+      }
+    },
+    "option": {
+      "exact_ordered_stock_export_sha256": "85d389652b693919d42d3091ed2f374044f031e95a689a17e6f4760e45d93553",
+      "refused_native": {
+        "affected": {
+          "ar": 2,
+          "as": 1,
+          "build-script": 29,
+          "cc": 3,
+          "cc1": 2,
+          "rustc": 27
+        },
+        "all_exec_transitions": 543,
+        "artifact": 13133771669,
+        "caller_exported_flags": false,
+        "execs_with_stock_export": 64,
+        "run": 41429121227,
+        "sha256": "e96accc22b09e1fe0e2a1c4c3f51d84c62308bc73fa51f22d642ff8d30393ede",
+        "size": 3463095,
+        "unrelated_nonscript": 0,
+        "verified_script_owners": 29
+      },
+      "signed_plain": {
+        "caller_exported_flags": false,
+        "phase": "plain-A-edit/old",
+        "quote_physical_exec_member": "ldv/plain-A-edit/old/trace/exec.2341",
+        "run": 41415820650,
+        "sha256": "69b4b9c1dd9737690519021215c0b9319475876f52bde847d75e0c3f972658f5",
+        "suite": "option",
+        "trace_sha256": "57e2f2fe294adcccd00b142384001d93dd4cdbe445f0c23356df1e6d1fdd6b7c"
+      }
+    }
+  },
+  "source_cargo": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770"
+}
