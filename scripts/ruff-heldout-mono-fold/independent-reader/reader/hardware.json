@@ -1,0 +1,150 @@
+{
+  "collector": "17981f5b807be81496282dd5a58e579e71586962",
+  "different_broad_row": {
+    "clean": [
+      {
+        "index": 312007,
+        "key": "6b2d3e11764d0634b39f3d5781bf495f",
+        "kind": "upstream_monomorphizations_for",
+        "value": "6a8b5bc984935b1e9f1917b5f338d5d0"
+      }
+    ],
+    "current": [
+      {
+        "index": 311786,
+        "key": "6b2d3e11764d0634b39f3d5781bf495f",
+        "kind": "upstream_monomorphizations_for",
+        "value": "6a8b5bc984935b1e9f1917b5f338d5d0"
+      }
+    ],
+    "old": {
+      "index": 311971,
+      "key": "6b2d3e11764d0634b39f3d5781bf495f",
+      "kind": "upstream_monomorphizations_for",
+      "value": "5af7f040b897641c8fd40ad04b5bdafe"
+    },
+    "ordinal": 2942,
+    "status": [
+      "changed",
+      "changed"
+    ]
+  },
+  "expected": {
+    "new": {
+      "elf_sha256": "aa84b0d508890e24f77047e42e32d7f53e72c9e6d4e1b97d72e8d9a669d0ec2a",
+      "native_renderer_objects": 118,
+      "native_renderer_objects_sha256": "64da05c3ad41c6bbd933155bd5b9cf1005383fec1624ba6dbd3600a897c37be1",
+      "native_roster": "18f084937045fd74ddac9d3a2ec3b24a1c95756ddd79eed894500ae48cb57b26",
+      "oracle": {
+        "multiple_insertions": {
+          "exit": 0,
+          "frames": [
+            [
+              "56824e6c67c6f3b4802441380dfc6e5beb0714b2858c03aa229630541291f0c5",
+              250
+            ],
+            [
+              "bf44f50ffcfa9baccbc13b19bcaecec6c755e17cbdd351146db0a16a14156c93",
+              300
+            ]
+          ]
+        },
+        "snippet_with_cell": {
+          "exit": 0,
+          "frames": [
+            [
+              "8107245c9b6484aa48b669385796eb7b9a2bf02b0d876eba38a5bae63a7eafc4",
+              57
+            ],
+            [
+              "7562ecc7c13f70e1350ae8638a3de4c6825d9a21ec5f689d0712d3fefc6db72a",
+              77
+            ]
+          ]
+        }
+      },
+      "provider_fold_exports": 4,
+      "ruff_db_cgu_sha_by_role": {
+        "C": "e0fd5fc93939c531a2a6192cec851d9a9840f40b8b8c24a080fc4b4c79f26a7e",
+        "P": "e0fd5fc93939c531a2a6192cec851d9a9840f40b8b8c24a080fc4b4c79f26a7e"
+      }
+    },
+    "old": {
+      "elf_sha256": "0f7ca6a672a16d35475eeb9b700c3b0f372933fa4a52d169cccbfd6c7c97895f",
+      "native_renderer_objects": 118,
+      "native_renderer_objects_sha256": "c9b0073b02a28f3a85c9e3e7ee4832a2ee9d401058d801c036bcdd360ee2dc7a",
+      "native_roster": "18f084937045fd74ddac9d3a2ec3b24a1c95756ddd79eed894500ae48cb57b26",
+      "oracle": {
+        "multiple_insertions": {
+          "exit": 101,
+          "frames": []
+        },
+        "snippet_with_cell": {
+          "exit": 0,
+          "frames": [
+            [
+              "8107245c9b6484aa48b669385796eb7b9a2bf02b0d876eba38a5bae63a7eafc4",
+              57
+            ],
+            [
+              "7562ecc7c13f70e1350ae8638a3de4c6825d9a21ec5f689d0712d3fefc6db72a",
+              77
+            ]
+          ]
+        }
+      },
+      "provider_fold_exports": 2,
+      "ruff_db_cgu_sha_by_role": {
+        "C": "e0fd5fc93939c531a2a6192cec851d9a9840f40b8b8c24a080fc4b4c79f26a7e",
+        "P": "e0fd5fc93939c531a2a6192cec851d9a9840f40b8b8c24a080fc4b4c79f26a7e"
+      }
+    }
+  },
+  "historical_38_sha256": "17c8484af791139dcff84646287881ef75a09460be38b2ebf96baa1d92de582a",
+  "invalid_append": "\nconst _: () = 1_u8;\n",
+  "invalid_source": "crates/ruff_db/src/lib.rs",
+  "job": 125241858312,
+  "minimum_reduction_each": 0.02,
+  "order": [
+    "PC",
+    "CP"
+  ],
+  "pc_cp_requires_positive": true,
+  "previous_head": "b7d53a3392cb308ab642c5ae97fa6248af1330f0",
+  "primary": "edit",
+  "prior_map_fold_null": {
+    "key": "6b2d3e11764d0634955ff0cc783c6650",
+    "value": "94f8dffa7985636dc52aad126c347dd9"
+  },
+  "qa": "single prospective unscored-controls-then-one-boot test hardware pilot",
+  "raw_artifact": 13136661434,
+  "raw_artifact_sha256": "05fd8f85b79dace931f91c7cbec1b46ca5677e298888ac90f3027123d9eb842a",
+  "role_registration_sha256": "a561d691a987633836e18591b7fdddfeb6fa4ce9e608d07cd9d93a6d29884580",
+  "run": 41434803416,
+  "scored": [
+    "old",
+    "edit",
+    "unchanged"
+  ],
+  "stable_caller_count": 216,
+  "unchanged_rehearsal": {
+    "all_cgus": 216,
+    "all_objects_same_inode_mtime_bytes": true,
+    "artifact": 13139010488,
+    "bytes": 174459044,
+    "existing_incremental_session": true,
+    "final_test_elf_new_mtime": true,
+    "final_test_elf_same_inode_and_bytes": true,
+    "fresh_other": 170,
+    "head": "643e4f16b599bd7b8560cb0b29437e3451284705",
+    "job": 125254941733,
+    "link_replay": "-Z link-only using an existing .rlink",
+    "linker": "Wild 0.11.0",
+    "linker_sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+    "nonfresh_target": "ruff_db",
+    "renderer_same_inode_mtime_bytes": true,
+    "run": 41438722392,
+    "sha256": "cf72044dd34041a19338778eb6fa5ce5d7bc3b2350c657222acddb1c262a5a56",
+    "verified_ordinary_repeats": 12
+  }
+}
