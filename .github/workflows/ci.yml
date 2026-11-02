@@ -1,86 +1,286 @@
-name: Unscored uv 20991 direct root opening
-run-name: Verify direct uv root edit at ${{ inputs.reviewed_head }}
+name: Characterize shared-reference lookup on two Ohm stage1 compilers
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed private coordinator commit for the unscored opening
         type: string
         required: true
+        description: Exact qualification commit
 permissions: {}
-concurrency:
-  group: unscored-uv-20991-root-opening
-  cancel-in-progress: false
 jobs:
-  opening:
-    name: Verify independent cold histories and the actual ordinary-root compiler execs
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-uv-20991-root-opening' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+  base:
+    name: Stage1 fa7a_stack_ctfe318
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-sharedref-stage1-probe' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 75
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    env:
+      BENCH_ARM: fa7a_stack_ctfe318
+      OHM_TOOLCHAIN: ohm-1.99.0-22
+      OHM_TARGET: x86_64-unknown-linux-gnu
+      PYTHONDONTWRITEBYTECODE: '1'
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+    outputs:
+      inner: ${{ steps.probe.outputs.inner }}
+      id: ${{ steps.bundle.outputs.artifact-id }}
+      sha: ${{ steps.bundle.outputs.artifact-digest }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: 'false'
+        ref: ${{ github.sha }}
+        fetch-depth: '2'
+    - name: Check out the pinned release build scripts
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: 'false'
+        ref: 8c7d5b4500fdfa6e2234417340aa190e5787e513
+        path: release-reference
+        sparse-checkout: 'scripts
+
+          release
+
+          toolchains'
+    - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      with:
+        enable-cache: 'false'
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+      with:
+        python-version: '3.13'
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 0c9c558ce24212e5da6fb66150790b0af3cee90b
+        path: source-carrier
+        persist-credentials: 'false'
+        sparse-checkout: scripts/rc22-private-export-ice
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 7bc72b798b019a9ec0de6eeea3bc22b783917b27
+        path: transport
+        persist-credentials: 'false'
+        sparse-checkout: scripts/rc22-native
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a
+        path: public-seed
+        persist-credentials: 'false'
+        sparse-checkout: scripts/ohm-apple-zmij/source-transport
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
+        path: signed-rust
+        persist-credentials: 'false'
+        sparse-checkout: scripts/strict-mixed-generics
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
+        path: cargo-seed
+        persist-credentials: 'false'
+        sparse-checkout: 'scripts/cargo-diagnostic-fix
+
+          scripts/ohm-apple-zmij/cargo293'
+    - name: Admit a fresh hosted stage1 workspace
+      run: 'set -euo pipefail
+
+        test ! -e stage1-ref-build
+
+        test ! -e /tmp/ohm-shared-reference-stage1-v1
+
+        mkdir trait-evidence
+
+        df -B1 "$GITHUB_WORKSPACE" > trait-evidence/capacity-initial.txt
+
+        python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
+
+        test "$(git rev-parse HEAD^)" = 341cd92e5d381a50bd380467075f31e780ee6296
+
+        '
+    - name: Verify the 90-object compiler sources
+      run: python3 -IB scripts/ctfe22-stage1-ref/materialize.py "$BENCH_ARM"
+    - name: Install native GNU bootstrap prerequisites
+      run: 'sudo apt-get -qq update
+
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
+
+        '
+    - name: Build stage1, run original native tests, and observe the getter
+      id: probe
+      run: python3 -ISB scripts/ctfe22-stage1-ref/stage.py "$BENCH_ARM"
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: ctfe22-stage1-ref-base-${{ github.run_id }}-${{ github.run_attempt }}
+        path: qualified-role.zip
+        if-no-files-found: error
+        compression-level: 0
+        retention-days: 14
+      id: bundle
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: ctfe22-stage1-ref-incomplete-base-${{ github.run_id }}-${{ github.run_attempt }}
+        path: trait-evidence/
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 14
+      if: failure()
+  child:
+    name: Stage1 fa7a_stack_ctfe318_incoherent_ref
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-sharedref-stage1-probe' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    env:
+      BENCH_ARM: fa7a_stack_ctfe318_incoherent_ref
+      OHM_TOOLCHAIN: ohm-1.99.0-22
+      OHM_TARGET: x86_64-unknown-linux-gnu
+      PYTHONDONTWRITEBYTECODE: '1'
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+    outputs:
+      inner: ${{ steps.probe.outputs.inner }}
+      id: ${{ steps.bundle.outputs.artifact-id }}
+      sha: ${{ steps.bundle.outputs.artifact-digest }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: 'false'
+        ref: ${{ github.sha }}
+        fetch-depth: '2'
+    - name: Check out the pinned release build scripts
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: 'false'
+        ref: 8c7d5b4500fdfa6e2234417340aa190e5787e513
+        path: release-reference
+        sparse-checkout: 'scripts
+
+          release
+
+          toolchains'
+    - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      with:
+        enable-cache: 'false'
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+      with:
+        python-version: '3.13'
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 0c9c558ce24212e5da6fb66150790b0af3cee90b
+        path: source-carrier
+        persist-credentials: 'false'
+        sparse-checkout: scripts/rc22-private-export-ice
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 7bc72b798b019a9ec0de6eeea3bc22b783917b27
+        path: transport
+        persist-credentials: 'false'
+        sparse-checkout: scripts/rc22-native
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a
+        path: public-seed
+        persist-credentials: 'false'
+        sparse-checkout: scripts/ohm-apple-zmij/source-transport
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
+        path: signed-rust
+        persist-credentials: 'false'
+        sparse-checkout: scripts/strict-mixed-generics
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
+        path: cargo-seed
+        persist-credentials: 'false'
+        sparse-checkout: 'scripts/cargo-diagnostic-fix
+
+          scripts/ohm-apple-zmij/cargo293'
+    - name: Admit a fresh hosted stage1 workspace
+      run: 'set -euo pipefail
+
+        test ! -e stage1-ref-build
+
+        test ! -e /tmp/ohm-shared-reference-stage1-v1
+
+        mkdir trait-evidence
+
+        df -B1 "$GITHUB_WORKSPACE" > trait-evidence/capacity-initial.txt
+
+        python3 -c ''import os,shutil; assert shutil.disk_usage(os.environ["GITHUB_WORKSPACE"]).free >= 60*(1<<30)''
+
+        test "$(git rev-parse HEAD^)" = 341cd92e5d381a50bd380467075f31e780ee6296
+
+        '
+    - name: Verify the 90-object compiler sources
+      run: python3 -IB scripts/ctfe22-stage1-ref/materialize.py "$BENCH_ARM"
+    - name: Install native GNU bootstrap prerequisites
+      run: 'sudo apt-get -qq update
+
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
+
+        '
+    - name: Build stage1, run original native tests, and observe the getter
+      id: probe
+      run: python3 -ISB scripts/ctfe22-stage1-ref/stage.py "$BENCH_ARM"
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: ctfe22-stage1-ref-child-${{ github.run_id }}-${{ github.run_attempt }}
+        path: qualified-role.zip
+        if-no-files-found: error
+        compression-level: 0
+        retention-days: 14
+      id: bundle
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: ctfe22-stage1-ref-incomplete-child-${{ github.run_id }}-${{ github.run_attempt }}
+        path: trait-evidence/
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 14
+      if: failure()
+  pair:
+    name: Compare the named getter providers
+    needs:
+    - base
+    - child
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-ctfe22-sharedref-stage1-probe' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     permissions:
       contents: read
       actions: read
-      attestations: read
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PYTHONDONTWRITEBYTECODE: '1'
+      BASE_ID: ${{ needs.base.outputs.id }}
+      BASE_SHA: ${{ needs.base.outputs.sha }}
+      BASE_INNER: ${{ needs.base.outputs.inner }}
+      CHILD_ID: ${{ needs.child.outputs.id }}
+      CHILD_SHA: ${{ needs.child.outputs.sha }}
+      CHILD_INNER: ${{ needs.child.outputs.inner }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/uv-root-20991-opening
-            .github/workflows
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
-          path: previous
-          persist-credentials: false
-          sparse-checkout: scripts/uv-resolver-whole-pmu
-      - name: Admit the pinned system Python, disk budget, offline readers and scoped descendant trace
-        run: |
-          set -euo pipefail
-          mkdir -p trait-results
-          (
-            cd scripts/uv-root-20991-opening
-            sha256sum -c SHA256SUMS
-          )
-          /usr/bin/bash scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py early 2>&1 | tee trait-results/initial.log
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-sh/uv
-          ref: 5d4a62d7461c7708f3e65d08cef0e99bad94c004
-          path: uv-source
-          # The real edit is sixteen linear commits after the last release tag.
-          fetch-depth: 17
-          fetch-tags: false
-          persist-credentials: false
-      - name: Admit the actual historical uv tag used by its build script
-        env:
-          GIT_TERMINAL_PROMPT: '0'
-        run: |
-          set -euo pipefail
-          git -C uv-source -c credential.helper= fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.2:refs/tags/0.12.2
-          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py history uv-source | tee trait-results/source-git-history.json
-      - name: Admit the signed release and final production distribution with the original verifier
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py intake 2>&1 | tee trait-results/acquire.log
-      - name: Run the two genuine root openings and re-read all evidence
-        run: |
-          set -euo pipefail
-          /usr/bin/python3.12 -ISBu scripts/uv-root-20991-opening/opening.py run 2>&1 | tee trait-results/opening.log
-          /usr/bin/python3.12 -ISB scripts/uv-root-20991-opening/opening.py verify trait-results
-      - name: Preserve full or partial unscored evidence
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: uv-20991-independent-root-opening-${{ github.run_id }}-${{ github.run_attempt }}
-          path: trait-results/
-          retention-days: 14
-          compression-level: 2
-          if-no-files-found: warn
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: 'false'
+        ref: ${{ github.sha }}
+        fetch-depth: '2'
+    - name: Read immutable base role capsule
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+      with:
+        artifact-ids: ${{ needs.base.outputs.id }}
+        path: intake/BASE
+        merge-multiple: true
+    - name: Read immutable child role capsule
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+      with:
+        artifact-ids: ${{ needs.child.outputs.id }}
+        path: intake/CHILD
+        merge-multiple: true
+    - name: Reopen both profiles and matched native controls
+      run: python3 -ISB scripts/ctfe22-stage1-ref/pair.py
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: ctfe22-stage1-ref-pair-${{ github.run_id }}-${{ github.run_attempt }}
+        path: paired-proof/
+        if-no-files-found: error
+        compression-level: 0
+        retention-days: 14

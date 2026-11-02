@@ -1,0 +1,44 @@
+{
+  "states": [
+    {
+      "cfgs": [],
+      "stdout": "0 0"
+    },
+    {
+      "cfgs": [
+        "shared"
+      ],
+      "stdout": "13 0"
+    },
+    {
+      "cfgs": [
+        "shared",
+        "unrelated"
+      ],
+      "stdout": "13 0"
+    },
+    {
+      "cfgs": [
+        "shared",
+        "mutable"
+      ],
+      "stdout": "13 29"
+    },
+    {
+      "cfgs": [
+        "mutable"
+      ],
+      "stdout": "0 29"
+    },
+    {
+      "cfgs": [],
+      "stdout": "0 0"
+    },
+    {
+      "cfgs": [
+        "shared"
+      ],
+      "stdout": "13 0"
+    }
+  ]
+}
