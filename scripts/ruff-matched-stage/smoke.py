@@ -31,7 +31,7 @@ def smoke(root, manifest, base):
     proxy = Path(shutil.which("rustup", path=base["PATH"])).resolve(strict=True)
     proxies = root / "proxies"
     proxies.mkdir()
-    for name in ("rustup", "cargo", "rustc"):
+    for name in ("rustup", "cargo", "rustc", "rustdoc"):
         (proxies / name).symlink_to(proxy)
     alias = Path(base["RUSTUP_HOME"]) / "toolchains/ohm"
     alias.parent.mkdir(parents=True, exist_ok=True)
@@ -57,7 +57,7 @@ def smoke(root, manifest, base):
         }
         env.pop("CARGO_INCREMENTAL", None)
         ver = {}
-        for tool in ("rustc", "cargo"):
+        for tool in ("rustc", "cargo", "rustdoc"):
             physical = (
                 execute(["rustup", "which", "--toolchain", "ohm", tool], work, env).stdout.decode().strip()
             )
@@ -70,6 +70,12 @@ def smoke(root, manifest, base):
             and "LLVM version:" in ver["rustc"],
             "foreign compiler/Cargo",
         )
+        source = work / "describe.rs"
+        source.write_text("/// Verifies the matching documentation tool.\npub fn observed() -> u32 { 29 }\n")
+        execute(["rustdoc", "+ohm", "--edition=2024", "--crate-name", "qa_doc", source,
+                 "--out-dir", work / "docs"], work, env)
+        html = work / "docs/qa_doc/fn.observed.html"
+        need(b"Verifies the matching documentation tool" in html.read_bytes(), "rustdoc did not produce source documentation")
         libtrace = execute(["ldd", target / "bin/rustc"], work, env).stdout.decode()
         for family in ("librustc_driver", "libLLVM"):
             actual = [

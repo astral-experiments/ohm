@@ -269,6 +269,7 @@ def build(workspace, root):
             "-j8",
             "compiler/rustc",
             "library",
+            "src/tools/rustdoc",
         ]
         save(
             root / "logs" / ("inputs-" + role + ".json"),
@@ -285,7 +286,23 @@ def build(workspace, root):
         )
         print("Starting clean stage1", role, rev, flush=True)
         guarded(argv, rust, env, root / "logs" / ("build-" + role + ".log"), root)
-        kit.freeze(directory / HOST / "stage1", role, rev)
+        stage = directory / HOST / "stage1"
+        kit.freeze(stage, role, rev)
+        # Keep the rustdoc built against this exact driver. Cargo authenticates it
+        # before sharing registry products, including for ordinary cargo build.
+        doc = stage / "bin/rustdoc"
+        need(doc.is_file() and doc.stat().st_mode & 0o111, "missing source-built rustdoc")
+        digest = sha(doc)
+        blob = root / "capsule/objects" / digest
+        if not blob.exists():
+            shutil.copyfile(doc, blob)
+        need(sha(blob) == digest, "rustdoc changed during enrollment")
+        path = root / "capsule" / (role + ".json")
+        manifest = json.loads(path.read_bytes())
+        need("bin/rustdoc" not in manifest["files"], "duplicate executable")
+        manifest["files"]["bin/rustdoc"] = [digest, doc.stat().st_size, doc.stat().st_mode & 0o777]
+        path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
         need(
             json.loads(json.dumps(layout.checked(rust, rev, desc["tree"], substitutions))) == full,
             "bootstrap changed enrolled source",

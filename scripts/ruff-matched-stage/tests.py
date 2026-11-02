@@ -35,6 +35,7 @@ class Protocol(unittest.TestCase):
             files = {}
             for n in (
                 "bin/rustc",
+                "bin/rustdoc",
                 "lib/librustc_driver-test.so",
                 "lib/libLLVM-test.so",
                 *(
@@ -45,7 +46,7 @@ class Protocol(unittest.TestCase):
                 b = (n + (role if "driver" in n else "")).encode()
                 key = hashlib.sha256(b).hexdigest()
                 (self.obj / key).write_bytes(b)
-                files[n] = [key, len(b), 0o755 if n == "bin/rustc" else 0o644]
+                files[n] = [key, len(b), 0o755 if n in ("bin/rustc", "bin/rustdoc") else 0o644]
             r = {
                 "role": role,
                 "commit": d["revision"],
