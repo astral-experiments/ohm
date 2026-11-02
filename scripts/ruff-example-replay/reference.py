@@ -37,7 +37,7 @@ def outcomes(root,src,env,dest,actual,state):
                  CARGO_BUILD_BUILD_DIR=str(root/"behavior-build"),CARGO_NET_OFFLINE="true")
     selected={tag.split("/")[1]:v for tag,v in actual.items() if tag.startswith("test/")}
     observations=byte_probe.verdicts(src,private,dest,selected)
-    # Ruff catches the old renderer panic and still reports a passing libtest case. Observe
+    # The OLD regression is annotated should_panic. Libtest catches its panic and passes. Observe
     # the original emitted stderr explicitly so both signed and treatment histories discriminate it.
     exe,digest,_=selected["ruff"]
     need(sha(Path(exe))==digest,"same actual renderer ELF")
@@ -52,7 +52,8 @@ def outcomes(root,src,env,dest,actual,state):
 
 def compare_behavior(state,rows):
     need(state in ("old","new") and all(r["exit"]==0 and r["cases"] and all(v=="ok" for n,v in r["cases"])
-         for r in rows.values()) and any(n=="multiple_insertions" for n,v in rows["ruff"]["cases"]),
+         for r in rows.values()) and any(n==("multiple_insertions - should panic" if state=="old" else "multiple_insertions")
+         for n,v in rows["ruff"]["cases"]),
          ("all actual signed integration tests pass",state))
 
 
