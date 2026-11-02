@@ -180,6 +180,43 @@ def fresh_state():
     subprocess.run(['cp','-a','--reflink=auto',ROOT/'prefetched-cargo',cargo],check=True)
 
 
+def tree_identity(base):
+    """Verify every file and symlink at the inherited fixed-path pre-check snapshot."""
+    h=hashlib.sha256(); total=0; files=0; links={}
+    for folder, dirs, names in os.walk(base, followlinks=False):
+        dirs.sort(); names.sort()
+        for name in sorted([*dirs,*names]):
+            path=Path(folder)/name; rel=path.relative_to(base).as_posix(); stat=path.lstat()
+            if path.is_symlink():body=['link',os.readlink(path)]
+            elif path.is_file():
+                identity=(stat.st_dev,stat.st_ino); first=links.setdefault(identity,rel)
+                body=['file',first,stat.st_size,sha(path)];total+=stat.st_size;files+=1
+            else:
+                need(path.is_dir(),'unexpected Old special file');body=['dir']
+            h.update(json.dumps([rel,stat.st_mode,stat.st_mtime_ns,body],separators=(',',':')).encode()+b'\n')
+    return dict(sha256=h.hexdigest(),files=files,bytes=total)
+
+
+def make_snapshot():
+    snap=ROOT/'before-edit';snap.mkdir(); parts={}
+    for name,src in [('state',STATE),('cargo',ROOT/'cargo'),('home',ROOT/'home'),('temp',ROOT/'temp')]:
+        parts[name]=tree_identity(src)
+        need(shutil.disk_usage(ROOT).free > 15*GIB+parts[name]['bytes']+2*GIB,'snapshot storage reserve')
+        subprocess.run(['cp','-a','--reflink=auto',src,snap/name],check=True)
+        need(tree_identity(snap/name)==parts[name],'physical Old snapshot for '+name)
+    times={f:(SRC/f).stat().st_mtime_ns for f in FILES};save(OUT/'original-donor.json',dict(source=OLD,parts=parts,source_mtimes=times));return parts,times
+
+
+def restore_snapshot(parts,times):
+    checkout(OLD)
+    for name,mtime in times.items():
+        path=SRC/name;os.utime(path,ns=(path.stat().st_atime_ns,mtime))
+    for name,dst in [('state',STATE),('cargo',ROOT/'cargo'),('home',ROOT/'home'),('temp',ROOT/'temp')]:
+        origin=ROOT/'before-edit'/name; need(dst.parent==ROOT and dst.is_dir()and not dst.is_symlink(),'sacrificial restore location')
+        shutil.rmtree(dst);subprocess.run(['cp','-a','--reflink=auto',origin,dst],check=True)
+        need(tree_identity(dst)==parts[name],'restored prior bytes/mtimes/hardlinks for '+name)
+
+
 def checkout(revision):
     subprocess.run(['git','-C',SRC,'switch','--detach',revision],check=True,stdout=subprocess.DEVNULL); source(revision)
 
@@ -198,16 +235,24 @@ def setup_perf():
 
 def study():
     checked_head(); source(NEW); path,observer=setup_perf(); env=environment(); summaries={}; saved_epochs={}
+    fresh_state();checkout(OLD);out=OUT/'prepare-old';run(CMD,env,out);_,meta,dirs=cargo_result(out);native(out,OLD,meta,dirs,env)
+    parts,times=make_snapshot();edit_times={}
     for role in ('ordinary','profiled'):
-        fresh_state(); checkout(OLD); d=OUT/role;d.mkdir(); totals={}
+        restore_snapshot(parts,times);d=OUT/role;d.mkdir(); totals={}
         for stage,rev in (('old',OLD),('old-unchanged',OLD),('edit',NEW),('new-unchanged',NEW)):
-            if stage=='edit':checkout(NEW)
+            if stage=='edit':
+                checkout(NEW)
+                if role=='ordinary':
+                    edit_times={f:(SRC/f).stat().st_mtime_ns for f in FILES};save(OUT/'changed-source-mtimes.json',edit_times)
+                else:
+                    for f,t in edit_times.items():
+                        file=SRC/f;os.utime(file,ns=(file.stat().st_atime_ns,t))
             out=d/stage; cmd=CMD
             if role=='profiled' and stage=='edit':
                 epochs=d/'epochs';epochs.mkdir();raw=d/'edit.perf.data';restore=['/usr/bin/env','-i',*(k+'='+v for k,v in env.items())];cmd=perf.record(path,raw,[*restore,observer,epochs,*CMD],perf.PERIOD)
             run(cmd,env,out); inventory,meta,dirs=cargo_result(out)
             if stage=='edit':need(any(r[1]=='ruff_linter' and not r[-1]for r in inventory),'root genuinely changed')
-            if stage.endswith('unchanged'):need(all(r[-1]for r in inventory),'unexpected unchanged compiler artifact')
+            if stage=='old' or stage.endswith('unchanged'):need(all(r[-1]for r in inventory),'unexpected unchanged compiler artifact')
             totals[stage]=dict(inventory=inventory,metadata=json.loads((out/'cargo.json').read_bytes())['metadata'],native=native(out,rev,meta,dirs,env))
             if role=='profiled' and stage=='edit':
                 need(0<raw.stat().st_size<256<<20,'profile size');count=perf.decode(path,raw,out)
@@ -220,12 +265,19 @@ def study():
     finally:
         (SRC/SOURCE).write_bytes(real)
     source(NEW);out=OUT/'repair';run(CMD,env,out);_,meta,dirs=cargo_result(out); repaired=native(out,NEW,meta,dirs,env)
+    root_paths=[p for p in STATE.rglob('libruff_linter*.rmeta')if p.is_file()];need(meta in root_paths,'missing selected root before its empty control')
+    out=OUT/'remove-root';run(['cargo','+ohm','clean','-p','ruff_linter','--offline','--locked'],env,out)
+    need(not any(p.exists()for p in root_paths),'Cargo retained the selected root metadata after clean')
+    leftovers=[str(p)for p in STATE.rglob('*')if p.is_file()and p.name in ('dep-graph.bin','work-products.bin','query-cache.bin')and any(bit.startswith('ruff_linter-')for bit in p.parts)]
+    save(out/'empty-root.json',dict(removed=[str(p)for p in root_paths],leftovers=leftovers));need(not leftovers,'Cargo retained an incremental root session after clean')
+    out=OUT/'pinned-empty-new';run(CMD,env,out);inv,meta,dirs=cargo_result(out);need([r[1]for r in inv if not r[-1]]==['ruff_linter'],'empty root must retain the pinned dependency products');pinned=native(out,NEW,meta,dirs,env)
     fresh_state();out=OUT/'empty-new';run(CMD,env,out);_,meta,dirs=cargo_result(out); clean=native(out,NEW,meta,dirs,env)
     for stage in ('old','old-unchanged','edit','new-unchanged'):
         need(summaries['ordinary'][stage]==summaries['profiled'][stage],'plain versus observed artifact or native mismatch at '+stage)
-    need(summaries['ordinary']['edit']['native']==repaired==clean,'warm, repaired or clean native output mismatch')
+    need(summaries['ordinary']['edit']['native']==repaired==pinned,'warm, repaired or dependency-pinned clean root mismatch')
+    need(all(pinned[k]==clean[k]for k in ('native_object','executable','messages')),'independent complete clean native output mismatch')
     need(summaries['ordinary']['old']['native']['metadata']!=clean['metadata'] and summaries['ordinary']['old']['native']['native_object']!=clean['native_object'],'edit did not change real outputs')
-    save(OUT/'admission.json',dict(ordinary=summaries['ordinary'],profile=saved_epochs,repair=repaired,empty=clean,scope='Unscored signed compiler attribution; no treatment or gain.',resources=resources()))
+    save(OUT/'admission.json',dict(ordinary=summaries['ordinary'],profile=saved_epochs,repair=repaired,pinned_empty=pinned,independent_empty=clean,scope='Unscored signed compiler attribution from one fixed prior state. Independent all-dependency clean native output checked; its rmeta envelope is recorded independently.',resources=resources()))
     print('Admitted complete original and profiled edit, unchanged controls, E0308 repair and empty native proofs.',flush=True)
 
 
