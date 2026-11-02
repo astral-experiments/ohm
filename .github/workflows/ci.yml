@@ -11,6 +11,7 @@ on:
           - gate
           - price
           - bytes
+          - confirm-examples
       reviewed_head:
         description: Exact reviewed nonrelease QA commit
         type: string
@@ -75,8 +76,8 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
   price:
-    if: inputs.phase == 'price' && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-example-replay-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-    name: Ordinary examples and test builds on matched Cargo (${{ matrix.position }})
+    if: (inputs.phase == 'price' || inputs.phase == 'confirm-examples') && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-example-replay-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    name: Matched Cargo ${{ inputs.phase }} (${{ matrix.position }})
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 115
     strategy:
@@ -112,6 +113,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REVIEWED_HEAD: ${{ inputs.reviewed_head }}
           POSITION: ${{ matrix.position }}
+          PRICE_SCOPE: ${{ inputs.phase }}
         run: |
           set -euo pipefail
           cd enrolled/scripts/ruff-example-replay
@@ -120,7 +122,7 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ruff-example-replay-price-${{ matrix.position }}
+          name: ruff-example-replay-${{ inputs.phase }}-${{ matrix.position }}
           path: ${{ runner.temp }}/ruff-example-price/evidence
           if-no-files-found: warn
           retention-days: 14

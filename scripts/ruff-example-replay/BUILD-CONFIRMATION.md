@@ -1,0 +1,13 @@
+# Independent GNU example build confirmation
+
+The original two-command registration ended in failure in all six jobs of [run 41407781135](https://github.com/astral-experiments/ohm/actions/runs/41407781135). Two integration-test binaries differed between the edited and empty NEW target even with matched baseline Cargo. Three jobs reached the separate examples command first. All twelve examples matched clean on those three hosts and the approximate 27.6% first-unchanged instruction reduction motivates this confirmation. The original attempt recorded its current boot ID only after both workflows succeeded. Its jobs and their counts are excluded from this confirmation. The test command remains unqualified. Original job/artifact identities are frozen in `refused-original.json`.
+
+## Enrollment
+
+Use six newly allocated first-attempt GNU workers. Record the kernel boot ID, machine hostname, runner identity, authenticated GitHub run and job, position and CPU affinity before recoveries, calibration or Cargo. Every VM assignment must differ from the six original assignments. Admission and completion records must agree and all six new boot IDs, runner IDs, runner names and job IDs must differ. Bind both Cargo programs to the two exact physically qualified binaries at the recorded signed SDK and Ruff revision. Use the same canonical paths, four CPUs and ordinary Cargo flags as the original plan. Preserve a refused or incomplete worker as an outcome.
+
+## Costs and native outputs
+
+Each position executes `cargo +ohm build -p ruff_annotate_snippets --examples --locked --offline -j4` (JSON reader enabled) through cold OLD, a real upstream edit, first unchanged, and settled. Pair parent and candidate twice in reversed order, alternating which arm goes first across the six positions. Then compare to an independent empty NEW target. Capture each example's complete binary, sizes and runtime stream digests. All twelve must match. The one-example native-provider shadow, corruption, type error, repair and independent-clean gate remains required. Every observed settled example must link through real Wild. Parent compiles the owner and candidate reads a genuine saved link. Report storage counts, logical sizes and allocated blocks.
+
+The single primary endpoint is retired inherited user instructions on the first unchanged command. Each boot supplies one paired log ratio averaged over both orders. Require all six positive reductions, two-sided exact paired sign randomization p < 0.05 and a positive lower endpoint of the enumerated 95% bootstrap interval. Publish cold, edit, edit plus first, and settled unconditionally alongside that primary outcome. The original three example observations and six rejected test-workflow observations remain separate.

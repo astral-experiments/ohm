@@ -116,7 +116,9 @@ def effect(pairs):
             "sign_randomization_p":extreme/2**n, "per_boot":[1-math.exp(v) for v in logs]}
 
 
-def prices(paths):
+def prices(paths, confirmation=False):
+    workflows = ("examples",) if confirmation else ("examples","tests")
+    workers = []
     hosts = {}
     common = []
     for path in paths:
@@ -124,9 +126,20 @@ def prices(paths):
             term = read(z,"terminal.json")
             pos = term["position"]
             need(pos not in hosts and term["boot"] not in [v["boot"] for v in hosts.values()], "distinct boots")
+            if confirmation:
+                admission = read(z,"admission.json")
+                job = read(z,"authenticated-worker.json")
+                need(term["scope"]=="confirm-examples" and term["workflows"]==["examples"] and
+                     term["runner"]==admission["runner"]==job["runner_name"] and
+                     term["boot"]==admission["boot"] and term["head"]==admission["head"]==job["head_sha"] and
+                     int(term["run"])==admission["run"]==job["run_id"] and
+                     pos==admission["position"] and term["cpus"]==admission["affinity"][:4] and
+                     term["ordering"]==(["parent","candidate"] if pos%2 else ["candidate","parent"]) and
+                     job["name"]==f"Matched Cargo confirm-examples ({pos})", "registration and physical assignment")
+                workers.append({k:job[k] for k in ("id","runner_name","runner_id")})
             common.append([term[k] for k in ("head","run","signed","wild","cargo")])
             groups = {}
-            for workflow in ("examples","tests"):
+            for workflow in workflows:
                 for arm in ("candidate","parent"):
                     rows = []
                     trace = workflow + "-0-" + arm + "/traced-settled"
@@ -167,8 +180,11 @@ def prices(paths):
                      all(h["images"]==histories[0]["images"] for h in histories), "clean matched bytes and behaviors")
             hosts[pos] = {"boot":term["boot"],"groups":groups}
     need(set(hosts)==set(range(1,7)) and all(x==common[0] for x in common), "six matched independent workers")
+    if confirmation:
+        need(all(len({v[k] for v in workers})==6 for k in ("id","runner_name","runner_id")),
+             "six distinct authenticated VM assignments")
     answer = {}
-    for workflow in ("examples","tests"):
+    for workflow in workflows:
         measures = {}
         for phase in ("cold","edit","first-unchanged","settled","edit+first"):
             pairs = []
@@ -196,7 +212,7 @@ def prices(paths):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("pilot","price"))
+    parser.add_argument("mode", choices=("pilot","price","confirm-examples"))
     parser.add_argument("files", nargs="+", type=Path)
     args = parser.parse_args()
-    print(json.dumps(pilot(args.files[0]) if args.mode=="pilot" else prices(args.files), indent=2))
+    print(json.dumps(pilot(args.files[0]) if args.mode=="pilot" else prices(args.files, args.mode=="confirm-examples"), indent=2))

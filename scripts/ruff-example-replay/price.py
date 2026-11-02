@@ -7,6 +7,8 @@ import platform
 import shutil
 import subprocess
 import sys
+import time
+import uuid
 from zipfile import ZipFile
 
 HERE = Path(__file__).resolve().parent
@@ -23,6 +25,32 @@ WORKFLOWS = {
 
 def api(path):
     return json.loads(subprocess.check_output(["gh", "api", "repos/astral-experiments/ohm/" + path]))
+
+
+def admit_worker(out, head, position):
+    raw = Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+    need(str(uuid.UUID(raw)) == raw, "actual canonical Linux boot identity")
+    evidence = {"head":head,"run":int(os.environ["GITHUB_RUN_ID"]),"position":position,
+                "boot":raw,"runner":os.environ["RUNNER_NAME"],"host":platform.node(),
+                "affinity":sorted(os.sched_getaffinity(0))}
+    save(out / "admission.json", evidence)
+    old = json.loads((HERE / "refused-original.json").read_bytes())
+    name = f"Matched Cargo confirm-examples ({position})"
+    for attempt in range(12):
+        jobs = api(f"actions/runs/{evidence['run']}/jobs?per_page=100")["jobs"]
+        current = [job for job in jobs if job["name"] == name]
+        if len(current) == 1 and current[0]["runner_id"]:
+            break
+        if attempt < 11:
+            time.sleep(2)
+    need(len(current)==1, "authenticated active hosted matrix job")
+    job = current[0]
+    need(job["head_sha"]==head and job["run_id"]==evidence["run"] and job["run_attempt"]==1 and
+         job["runner_name"]==evidence["runner"] and job["runner_id"]>0 and
+         not any(job["runner_name"]==v["runner"] or job["runner_id"]==v["runner_id"]
+                 for v in old["workers"]), "fresh machine assignment distinct from abandoned cohort")
+    save(out / "authenticated-worker.json", job)
+    return evidence
 
 
 def enroll(root, ws, out, pilot):
@@ -183,6 +211,10 @@ def main():
     need(shutil.disk_usage(root).free > 6 * 2**30, "private hosted comparison storage")
     out = root / "evidence"
     out.mkdir()
+    scope = os.environ["PRICE_SCOPE"]
+    need(scope in ("price", "confirm-examples"), "registered comparison scope")
+    if scope == "confirm-examples":
+        admit_worker(out, head, position)
     binaries = enroll(root, ws, out, json.loads((HERE / "official-pilot.json").read_bytes()))
     cpus = sorted(os.sched_getaffinity(0))
     need(len(cpus) >= 4, "four available paired CPUs")
@@ -195,6 +227,8 @@ def main():
     seed = w.prepare_registry(root, src, env, out)
     arm_order = ["parent","candidate"] if position % 2 else ["candidate","parent"]
     actions = ["examples","tests"] if position in (1,4,5) else ["tests","examples"]
+    if scope == "confirm-examples":
+        actions = ["examples"]
     all_results = []
     for workflow in actions:
         by_arm = {}
@@ -214,7 +248,7 @@ def main():
         need(all(item["new_images"] == images for items in by_arm.values() for item in items) and
              len({json.dumps(item["old_images"],sort_keys=True) for items in by_arm.values() for item in items})==1,
              ("independent clean full bytes and behavior", workflow))
-    save(out / "terminal.json", {"schema":1,"head":head,"run":os.environ["GITHUB_RUN_ID"],
+    save(out / "terminal.json", {"schema":2,"scope":scope,"head":head,"run":os.environ["GITHUB_RUN_ID"],
          "job":os.environ["GITHUB_JOB"],"position":position,"boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
          "runner":os.environ["RUNNER_NAME"],"cpus":cpus[:4],"platform":platform.platform(),
          "ordering":arm_order,"workflows":actions,"signed":sha(root/"distribution/bin/rustc"),
