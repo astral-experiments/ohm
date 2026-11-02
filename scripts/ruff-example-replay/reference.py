@@ -22,23 +22,38 @@ SUBSET=["test","-p",study.PACKAGE,*[v for n in byte_probe.AFFECTED for v in ("--
 TESTS={"color","examples","formatter","ruff","rustc_tests"}
 
 
-def outcomes(root,src,env,dest,actual):
+def prepare_runtime(root,env,seed,w):
+    for name in ("behavior-home","behavior-temp"):
+        (root/name).mkdir()
+    w.registry(dict(env,CARGO_HOME=str(root/"behavior-cargo-home")),seed)
+
+
+def outcomes(root,src,env,dest,actual,state):
     # The real examples integration suite compiles a separate testing-colors variant. Its
     # nested Cargo processes and their target files must never enter a timed history.
-    private=dict(env,CARGO_TARGET_DIR=str(root/"behavior-target"),
+    private=dict(env,HOME=str(root/"behavior-home"),TMPDIR=str(root/"behavior-temp"),
+                 CARGO=str(root/"sdk/bin/cargo"),RUSTUP_TOOLCHAIN="ohm",
+                 CARGO_HOME=str(root/"behavior-cargo-home"),CARGO_TARGET_DIR=str(root/"behavior-target"),
                  CARGO_BUILD_BUILD_DIR=str(root/"behavior-build"),CARGO_NET_OFFLINE="true")
     selected={tag.split("/")[1]:v for tag,v in actual.items() if tag.startswith("test/")}
     observations=byte_probe.verdicts(src,private,dest,selected)
+    # Ruff catches the old renderer panic and still reports a passing libtest case. Observe
+    # the original emitted stderr explicitly so both signed and treatment histories discriminate it.
+    exe,digest,_=selected["ruff"]
+    need(sha(Path(exe))==digest,"same actual renderer ELF")
+    run=subprocess.run([exe,"--exact","multiple_insertions","--nocapture","--test-threads=1"],
+                       cwd=src/"crates"/study.PACKAGE,env=private,capture_output=True,timeout=180)
+    need(run.returncode==0 and b"1 passed; 0 failed" in run.stdout and
+         (b"panicked" in run.stderr)==(state=="old") and (state!="old" or b"index out of bounds" in run.stderr),
+         "actual caught OLD panic and successful NEW render")
+    study.compressed(dest/"renderer-stdout.gz",run.stdout);study.compressed(dest/"renderer-stderr.gz",run.stderr)
     return {name:{"exit":r["exit"],"cases":r["cases"]} for name,r in observations.items()}
 
 
 def compare_behavior(state,rows):
-    if state=="new":
-        need(all(r["exit"]==0 and r["cases"] and all(v=="ok" for n,v in r["cases"])
-                 for r in rows.values()),"every signed NEW test case passes")
-    else:
-        need(rows["ruff"]["exit"]!=0 and any("multiple_insertions" in n and v=="FAILED"
-             for n,v in rows["ruff"]["cases"]),"real clean OLD renderer failure")
+    need(state in ("old","new") and all(r["exit"]==0 and r["cases"] and all(v=="ok" for n,v in r["cases"])
+         for r in rows.values()) and any(n=="multiple_insertions" for n,v in rows["ruff"]["cases"]),
+         ("all actual signed integration tests pass",state))
 
 
 def source_gate():
@@ -79,6 +94,7 @@ def main():
     binaries["released"]=root/"distribution/bin/cargo";study.select(root,binaries,"released")
     cpu=sorted(os.sched_getaffinity(0));need(len(cpu)>=4,"four available CPUs");os.sched_setaffinity(0,cpu[:4])
     src=w.source(root);env=w.env_for(root);seed=w.prepare_registry(root,src,env,out)
+    prepare_runtime(root,env,seed,w)
     patch=Path(w.__file__).parent/"renderer.patch";families={};reference_cases={};all_objects={}
     for state in ("old","new"):
         if state=="old":w.git(src,"apply","--reverse",patch)
@@ -114,7 +130,7 @@ def main():
                     need(image["rodata_flags"]==50 and image["rodata_entsize"] in (0,8),
                          "only the two independently explained signed section header forms")
                     widths.setdefault(key,[]).append(image)
-            actual_cases=outcomes(root,src,sub,stage/"real-tests",actual)
+            actual_cases=outcomes(root,src,sub,stage/"real-tests",actual,state)
             compare_behavior(state,actual_cases)
             if baseline is None:baseline=actual_cases
             else:need(all(actual_cases[n]==baseline[n]for n in actual_cases),"same actual tests and dispositions")
