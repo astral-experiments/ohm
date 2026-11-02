@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tomllib
 import zipfile
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import census
 
 H = census.HERE
@@ -199,5 +200,10 @@ def run(ruff):
     print("source pair, original signed driver, native witness and independent empty controls captured",flush=True)
 
 if __name__=="__main__":
-    if sys.argv[1]=="fetch":fetch()
-    else:run(Path(sys.argv[2]).resolve(strict=True))
+    import argparse
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("phase",choices=("fetch","run"))
+    parser.add_argument("source",type=Path,nargs="?")
+    args=parser.parse_args()
+    if args.phase=="fetch":fetch()
+    else:run(args.source.resolve(strict=True))
