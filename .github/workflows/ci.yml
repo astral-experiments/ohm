@@ -1,126 +1,58 @@
-name: Observe whole Ruff builds after an upstream instantiation changes
-run-name: Ruff upstream monomorphization experiment ${{ inputs.reviewed_head }}
+name: Recover real Ruff Unicode display exports from both locked revisions
+run-name: Ruff 29206 source scout ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed nonrelease QA commit
+        description: Reviewed nonrelease diagnostic commit
         required: true
         type: string
-      study:
-        description: Run the full Ruff pilot or the provider-selection controls
-        required: true
-        type: choice
-        default: ruff
-        options: [ruff, ruff-qualify, ruff-confirm, providers, async-providers, compatibility, native, rejected-runs]
 permissions: {}
-concurrency:
-  group: ohm-upstream-mono-pilot-${{ github.sha }}-${{ inputs.study }}
-  cancel-in-progress: false
 jobs:
-  ordinary:
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-upstream-mono-ruff-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+  source:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-literal-29206-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1'
     runs-on: namespace-profile-ubuntu-24-04-16
-    strategy:
-      fail-fast: false
-      matrix:
-        observation: ${{ fromJSON(inputs.study == 'ruff-confirm' && '[0,1,2,3,4,5]' || '[0]') }}
-    timeout-minutes: 90
+    timeout-minutes: 24
     permissions:
-      actions: read
       contents: read
-    env:
-      OHM_STUDY: ${{ inputs.study }}
-      OHM_OBSERVATION: ${{ matrix.observation }}
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PYTHONDONTWRITEBYTECODE: '1'
     steps:
-    - name: Check out the reviewed measurement and matched source manifest
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: ${{ github.sha }}
-        path: qa
-        sparse-checkout: |
-          scripts/ruff-indexed-check-pmu
-          scripts/ruff-upstream-mono-pilot
-          scripts/ruff-matched-stage
-        persist-credentials: false
-    - name: Check out the calibrated inherited hardware reader
-      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 17981f5b807be81496282dd5a58e579e71586962
-        path: collector
-        sparse-checkout: scripts/gnu-example-ceiling
-        persist-credentials: false
-    - name: Check out Ruff ast A
-      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        repository: astral-sh/ruff
-        ref: b5dba861cc38e3f7fb4524c9ceba3e01a474ea13
-        path: ast-A
-        persist-credentials: false
-    - name: Check out Ruff ast B
-      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        repository: astral-sh/ruff
-        ref: 7b13f01ba1569887a25670820764b24c206da8e5
-        path: ast-B
-        fetch-depth: 2
-        persist-credentials: false
-    - name: Check out the previously qualified complete native oracle
-      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: bd7b58765ae44b21a1c9273b3ff0be8e923adc47
-        path: oracle
-        sparse-checkout: |
-          scripts/ohm-packed-ruff/full-cli
-          scripts/ohm-packed-ruff/harness
-        persist-credentials: false
-    - name: Prepare native measurement tools
-      run: |
-        set -euo pipefail
-        test "$(git -C qa rev-parse HEAD)" = "$REVIEWED_HEAD"
-        sudo apt-get update -qq
-        sudo apt-get install -y --no-install-recommends build-essential zstd valgrind binutils pkg-config libssl-dev
-    - name: Authenticate the actual factory tar and reopen both compiler installations
-      if: inputs.study != 'native' && inputs.study != 'rejected-runs'
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-indexed-check-pmu/acquire.py
-    - name: Require real native outputs and measure two opposite-order build pairs
-      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
-      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/pilot.py
-    - name: Verify the accepted build histories from raw receipts
-      if: inputs.study == 'ruff' || inputs.study == 'ruff-confirm' || inputs.study == 'ruff-qualify'
-      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/read.py "$RUNNER_TEMP/upstream-mono-study/logs" "$REVIEWED_HEAD"
-    - name: Check the selected provider and its actual linked symbols in both compilers
-      if: inputs.study == 'providers'
-      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/providers.py
-    - name: Exercise the saved graph in both mixed-compiler directions
-      if: inputs.study == 'compatibility'
-      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/compatibility.py
-    - name: Require the actual async-drop constructor from the selected provider
-      if: inputs.study == 'async-providers'
-      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/async_providers.py
-    - name: Resolve every differing native debug section to its complete debug records
-      if: inputs.study == 'native'
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/native_reference.py
-    - name: Reopen both rejected prototypes and compare their compiler output across boots
-      if: inputs.study == 'rejected-runs'
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-upstream-mono-pilot/rejected_runs.py
-    - name: Retain raw counters, Cargo inventories, typed verdicts and provenance
-      if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: ruff-upstream-mono-${{ inputs.study }}${{ inputs.study == 'ruff-confirm' && format('-{0}', matrix.observation) || '' }}
-        path: ${{ runner.temp }}/upstream-mono-study/logs
-        retention-days: 7
-        if-no-files-found: warn
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          path: qa
+          sparse-checkout: scripts/ruff-literal-map-source
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: a7b52a15654cd991d7a2e212ee0cd579cd714450
+          fetch-depth: 2
+          path: ruff
+          persist-credentials: false
+      - name: Install the complete registered Ohm toolchain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git -C qa rev-parse HEAD)" = "$GITHUB_SHA"
+          cd "$RUNNER_TEMP"
+          test "$(df --output=avail -B1 . | tail -1)" -gt 16106127360
+          gh api repos/astral-experiments/ohm/releases/assets/698533704 --jq '[.name,.size,.digest]|@tsv' > ohm-asset.tsv
+          test "$(cut -f1 ohm-asset.tsv)" = ohm-1.99.0-22-x86_64-unknown-linux-gnu.tar.gz
+          test "$(cut -f2 ohm-asset.tsv)" = 359852703
+          sha=bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7
+          test "$(cut -f3 ohm-asset.tsv)" = "sha256:$sha"
+          gh api -H 'Accept: application/octet-stream' repos/astral-experiments/ohm/releases/assets/698533704 > ohm-sdk.tar.gz
+          echo "$sha  ohm-sdk.tar.gz" | sha256sum --check
+          tar -xzf ohm-sdk.tar.gz
+          rust-1.99.0-dev-x86_64-unknown-linux-gnu/install.sh --prefix="$RUNNER_TEMP/signed-sdk" --components=rustc,rust-std-x86_64-unknown-linux-gnu,cargo --disable-ldconfig
+      - name: Read real library exports and execute the changed typed Unicode witness
+        run: python3 -IB qa/scripts/ruff-literal-map-source/scout.py
+      - name: Retain signed-input and ordinary Cargo records plus native proof
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ruff-29206-literal-native
+          path: ${{ runner.temp }}/literal-scout/records
+          if-no-files-found: warn
+          retention-days: 7
