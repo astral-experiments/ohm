@@ -18,6 +18,7 @@ sys.path.insert(0, str(HERE))
 if sys.argv[1:2] == ["reopen"]:
     # Archived paths in the standalone reader come from the authenticated worker records.
     os.environ.setdefault("RUNNER_TEMP", tempfile.gettempdir())
+import green_inputs
 import acquire_cgu as a
 import worker as w
 from acquire_cgu import c
@@ -109,6 +110,10 @@ def visit(lane, phase, refs, tools, topo, capture, store, physical):
             cmd = [capture, stage, w.b.SDK / "bin/rustc", mode, *cmd]
         c.save(where / "cargo-environment.json", w.ENV)
         physical.assert_empty(w.WORK)
+        green_lane = lane in ("ordinary-observed", "diagnostic") and phase in ("A","B")
+        if green_lane and phase == "A":
+            green_inputs.capture(where,where.parent/"B/stage/ruff_workspace/original.nul",
+                                 w.WORK,w.OUT/"green-originals","before")
         try:
             rows = original(folder, cmd, want, sampler=None)
         finally:
@@ -116,6 +121,8 @@ def visit(lane, phase, refs, tools, topo, capture, store, physical):
             w.ENV = env
         w.ownership.check_roots(rows, w.WORK)
         physical.snapshot(where, rows, stage, store, w.WORK, mode == "capture")
+        if green_lane:
+            green_inputs.capture(where,stage/"ruff_workspace/original.nul",w.WORK,w.OUT/"green-originals","after")
         return rows
 
     w.invoke = run_cargo
@@ -215,10 +222,12 @@ def prepare(collector, contract):
 def worker(collector, contract):
     a.verify_inherited_sources()
     tools, topo, capture = prepare(collector, contract)
+    (w.OUT / "green-originals").mkdir()
     store = w.OUT / "cgu-originals"
     store.mkdir()
     physical = module("physical", HERE / "physical.py")
     histories(tools, topo, capture, store, physical)
+    c.save(w.OUT / "green-inputs-verified.json",green_inputs.verify(w.OUT))
     after = w.acquire.verify_sdk(w.b.SDK)
     c.save(w.OUT / "sdk-after.json", after)
     c.need(after == c.read(w.OUT / "sdk.json"), "signed SDK changed")

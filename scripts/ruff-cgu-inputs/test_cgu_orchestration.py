@@ -221,6 +221,7 @@ class Orchestration(unittest.TestCase):
                 seen.append("native")
 
             with (
+                patch.object(run.green_inputs, "capture", side_effect=lambda *args: seen.append("graphs-"+args[-1])),
                 patch.object(run.w, "OUT", out),
                 patch.object(run.w, "invoke", invoke),
                 patch.object(run.w, "ENV", env),
@@ -233,7 +234,15 @@ class Orchestration(unittest.TestCase):
                     run.visit(lane, phase, {}, tools, None, capture, out, Physical)
                 self.assertIs(run.w.invoke, invoke)
                 self.assertIs(run.w.ENV, env)
-            self.assertEqual(seen, ["before", "Cargo", "snapshot"] + ([] if failure else ["native"]))
+            expected = ["before"]
+            if lane == "ordinary-observed" and phase == "A":
+                expected.append("graphs-before")
+            expected.extend(["Cargo", "snapshot"])
+            if not failure:
+                if lane == "ordinary-observed":
+                    expected.append("graphs-after")
+                expected.append("native")
+            self.assertEqual(seen, expected)
 
     def test_sources_and_credential_boundaries(self):
         run.a.verify_inherited_sources()

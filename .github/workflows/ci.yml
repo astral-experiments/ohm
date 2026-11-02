@@ -1,5 +1,5 @@
-name: Inspect signed Ruff first-A native codegen inputs
-run-name: Signed GNU Ruff two-library CGU inputs ${{ inputs.reviewed_head }}
+name: Inspect signed Ruff workspace dependency inputs
+run-name: Signed GNU Ruff workspace dependency inputs ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -16,8 +16,8 @@ permissions:
   contents: read
 jobs:
   diagnostic:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-first-a-cgu-inputs-20261101' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-    name: Signed GNU Ruff first-A two-library codegen inputs
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruff-cgu-green-reasons-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    name: Signed GNU Ruff workspace dependency and work-product inputs
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 75
     env:
@@ -71,6 +71,7 @@ jobs:
           python3 -IB enrolled/scripts/ruff-cgu-inputs/test_files.py | tee "$base/logs/cgu-files-fixture.stdout"
           python3 -IB enrolled/scripts/ruff-cgu-inputs/test_capture.py "$base/cgu-capture" | tee "$base/logs/cgu-capture-fixture.stdout"
           python3 -IB enrolled/scripts/ruff-cgu-inputs/test_cgu_orchestration.py
+          python3 -IB enrolled/scripts/ruff-cgu-inputs/test_green_inputs.py
       - name: Authenticate the single worker and install the published 79-file GNU release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -90,7 +91,7 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: signed-gnu-ruff-first-a-cgu-inputs
+          name: signed-gnu-ruff-workspace-green-inputs
           path: ${{ runner.temp }}/ohm-branch-object-qa/logs
           retention-days: 14
           include-hidden-files: true

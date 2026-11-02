@@ -13,9 +13,9 @@ sys.path.insert(0, str(BASE))
 import acquire
 import common as c
 
-BRANCH = "charlie/qa-ruff-first-a-cgu-inputs-20261101"
-JOB = "Signed GNU Ruff first-A two-library codegen inputs"
-ARTIFACT = "signed-gnu-ruff-first-a-cgu-inputs"
+BRANCH = "charlie/qa-ruff-cgu-green-reasons-20261102"
+JOB = "Signed GNU Ruff workspace dependency and work-product inputs"
+ARTIFACT = "signed-gnu-ruff-workspace-green-inputs"
 PARENT = "0eb852b6abb026160a89243aa2a47fca0f4bbc7b"
 SIX_DIGEST = "ecce6fb6cfb765bc272f8333fd809eace1d5cd3fa2b3d101723cb57d962ec6e9"
 PARENT_MANIFEST = "d040541042531489d77c3f66bc16032db864121657791650e86a92ca1d31fe15"
