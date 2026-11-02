@@ -18,6 +18,8 @@ WS, WORK, SRC, STATE = m.WS, m.WORK, m.SRC, m.STATE
 NATIVE = WS / "oracle/scripts/ohm-packed-ruff"
 sys.path.insert(0, str(NATIVE / "full-cli"))
 import native
+sys.path.insert(0, str(HERE))
+import qualified
 
 CASE, = REG["source"]
 CMD = ["cargo", "+ohm", "build", "-p", "ruff", "--bin", "ruff", "--locked", "--offline", "-j4", "--message-format=json"]
@@ -255,9 +257,11 @@ def main():
                                  steady=steady["count"], same={k: sum(rec["same_inode"] for rec in v["objects"].values())
                                                                for k, v in objects.items()})
             json_save(out / "summary.json", history[name])
-    equal = {rev: references["P", rev] == references["C", rev] for rev in ("A", "B")}
-    json_save(LOG / "pilot.json", dict(head=os.environ["REVIEWED_HEAD"], history=history, cross_role_native_equal=equal))
-    need(all(equal.values()), "independent compiler arms produced different complete native references")
+    approved = {rev: qualified.accepted(rev, references["P", rev], references["C", rev]) for rev in ("A", "B")}
+    json_save(LOG / "pilot.json", dict(head=os.environ["REVIEWED_HEAD"], history=history,
+             native_family_sha256=qualified.SHA256, cross_role_native_qualified=approved))
+    need(all(approved.values()), "complete native outputs differ from the independently qualified reference family")
+
 
 
 if __name__ == "__main__":

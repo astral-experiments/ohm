@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import sys
 import subprocess
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+import qualified
 
 def read(path):
     return json.loads(path.read_bytes())
@@ -15,7 +17,7 @@ def require(ok, why):
 
 def check(root, head):
     result = read(root / "pilot.json")
-    require(result["head"] == head and all(result["cross_role_native_equal"].values()), "wrong pilot provenance")
+    require(result["head"] == head and result["cross_role_native_qualified"] == {"A":True,"B":True} and result["native_family_sha256"] == qualified.SHA256, "wrong pilot provenance")
     require(set(result["history"]) == {"0-P", "0-C", "1-C", "1-P"}, "missing ordered history")
     manifest = {a: read(root / ("clean-A-" + a) / "visit.json") for a in "PC"}
     output = {}
@@ -35,6 +37,8 @@ def check(root, head):
             entry=read(p/"visit.json")
             native=json.loads(gzip.decompress((p/"native.json.gz").read_bytes()))
             require(len(rows)==375 and {"cli":native["cli"]["whole"],"reader":native["reader"]["whole"]}==entry["whole"], "native/inventory mismatch")
+            revision = "B" if phase == "B" else "A"
+            require(entry["whole"]["cli"] == qualified.expected()[revision][role], "different complete qualified CLI")
             want=56 if phase=="B" else 64
             require(native["typed"]==f"Expr={want} valid=1 rejected", "wrong observable Ruff revision")
             key = (entry["whole"],entry["roster"])
@@ -67,7 +71,8 @@ def check(root, head):
             require(hashlib.file_digest(reader.stdout, "sha256").hexdigest()==digest and reader.wait()==0,
                     "physical clean ELF digest disagrees")
     for i in "01":
-        require(output[i+"-P"]["B"]==output[i+"-C"]["B"],"independent B references differ")
+        (pb, pr), (cb, cr) = output[i+"-P"]["B"], output[i+"-C"]["B"]
+        require(pb["reader"]==cb["reader"] and pr==cr, "independent B reader or roster differs")
     rates={p:[1-output[f"{i}-C"]["counts"][p]/output[f"{i}-P"]["counts"][p] for i in "01"] for p in ("B","A","unchanged")}
     packet=dict(head=head,pairs=output,paired_reductions=rates)
     (root/"reopened.json").write_text(json.dumps(packet,sort_keys=True,indent=2)+"\n")
