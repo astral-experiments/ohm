@@ -3,15 +3,15 @@ import os, re, shutil, subprocess, sys, tarfile
 from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-import material as m
+import material as m, capacity
 
-REPO=m.P["coordinator_repo"];BRANCH="charlie/codex-ctfe22-gnu-20988";WF=".github/workflows/ci.yml"
+REPO=m.P["coordinator_repo"];BRANCH="charlie/codex-ctfe22-standard-20988";WF=".github/workflows/ci.yml"
 TARGET="x86_64-unknown-linux-gnu"
 PREFIX={"stock_ctfe318":"STOCK","fa7a_stack_ctfe318":"TRAITS"}
 REQUIRED={"ohm.tar.gz","SHA256SUMS","source.json","role.json","sdk-inventory.json","component-inventory.json"}
 def lock(run,jobs,artifacts):
     ident=run["id"];head=run["head_sha"]
-    m.guard((ident,head)==(41363057393,"38a40f2c4293ab0b5a1bf1d1e614ab90d39281fd"),"unregistered capacity-successor build run/head")
+    m.guard((ident,head)==(capacity.RID,capacity.HEAD),"unregistered capacity-successor build run/head")
     m.guard(type(ident) is int and ident>0 and re.fullmatch("[a-f0-9]{40}",head) and
             run["repository"]["full_name"]==REPO and run["repository"]["private"] is True and run["head_repository"]["full_name"]==REPO and
             run["head_branch"]==BRANCH and run["path"]==WF and run["event"]=="workflow_dispatch" and run["run_attempt"]==1 and
@@ -20,6 +20,7 @@ def lock(run,jobs,artifacts):
     expect={f"Production GNU SDK ({r})" for r in PREFIX}|{"Qualify both cache migration directions"}
     m.guard({j["name"] for j in jr}==expect and all(j["status"]=="completed" and j["conclusion"]=="success" and
             j["run_id"]==ident and j["run_attempt"]==1 and j["head_sha"]==head for j in jr),"wrong/missing/unsuccessful producer")
+    capacity.jobs(jr)
     ar=artifacts["artifacts"];names=set(m.P["sdk_artifacts"])
     m.guard(len(ar)==artifacts["total_count"]==len(names) and {a["name"] for a in ar}==names,"unrecognized artifact set")
     members={}
@@ -117,5 +118,6 @@ def main():
         result[role]={"runtime":runtime,"production_archive":rv["archive_sha256"],"source":m.P["roles"][role],
                       "original_bundled_cargo":rv["bundled_cargo"]["sha256"],"unmodified_component_inventory":m.filesha(work/"sdk-inventory.json")}
     m.guard(len({v["production_archive"] for v in result.values()})==2,"duplicated SDK")
+    capacity.capture(proof,builder,unpacked)
     m.save(out/"intake.json",{"installed":result,"sdk_lock_sha256":pin,"signed_cargo_sha256":m.P["signed_cargo_sha256"],"build_head":head,"build_run":int(rid)})
 if __name__=="__main__":main()

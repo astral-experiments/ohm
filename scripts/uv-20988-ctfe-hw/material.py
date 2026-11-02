@@ -38,13 +38,8 @@ def check_sources(w):
     previous=w/"previous/scripts/uv-resolver-whole-pmu"
     return opening,previous
 def trace_observer(opening,tmp):
-    instrument=tmp/"root-20988-trace";instrument.mkdir()
-    raw=(opening/"trace.py").read_bytes();guard(digest(raw)==P["pinned_opening"]["trace.py"],"unregistered trace observer")
-    needle=b'len({r["pid"] for r in found}) == len(found) == 3'
-    guard(raw.count(needle)==1,"unavailable scoped PID guard")
-    (instrument/"trace.py").write_bytes(raw.replace(needle,needle[:-1]+b"18"))
-    shutil.copyfile(opening/"case.json",instrument/"case.json");save(instrument/"reference.json",{"argv":reference()["argv"]})
-    return load("root_20988_exec_scope",instrument/"trace.py")
+    from compiler_observer import Observer
+    return Observer(ARGS,reference()["argv"])
 def readers(opening,tmp):
     for name,sha in P["pinned_opening"].items():guard(filesha(opening/name)==sha,("prior admitted reader",name))
     sys.path.insert(0,str(opening));o=load("pinned_opening",opening/"opening.py")

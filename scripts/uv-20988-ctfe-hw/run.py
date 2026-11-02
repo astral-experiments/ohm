@@ -4,7 +4,7 @@ from pathlib import Path
 from zipfile import ZipFile
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import material as m
-import deep
+import deep, rawproof
 
 def command(path,argv,mode,clock=None):
     path.mkdir(); mask=sorted(os.sched_getaffinity(0));boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
@@ -89,19 +89,24 @@ def witness(path,state,o):
     m.save(path/"receipt.json",{"argv":argv,"exit":r.returncode,"passed":passed,"tree":m.history()[0],"workspace_rs_sha256":m.filesha(ws)})
     m.erase(target)
 
-def qualify(role,bank,delta,path,o,api,parser,ref):
+def qualify(role,bank,delta,path,o,api,parser,ref,observer):
     path.mkdir();m.reset(bank,"A",delta);command(path/"ordinary-A",m.ARGS,"cold-A")
     shape=m.shape();a=capture(path/"ordinary-A",shape,o,api)["raws"]
-    measured=typed(path/"settled-A","background",ref,o,api);m.guard(measured==shape and inventory(path/"settled-A",shape)==a,"observed A differs from ordinary A")
+    measured=typed(path/"settled-A","background",ref,o,api);m.guard(measured==shape and rawproof.require(path/"ordinary-A",path/"settled-A",a,inventory(path/"settled-A",shape)),"observed A differs from ordinary A")
     witness(path/"fixture-A","A",o)
-    m.edit(delta);command(path/"A-to-B",m.ARGS,"qualifying-edit");capture(path/"A-to-B",shape,o,api)
+    seed=m.freeze();stamp=m.seed_state(seed,role);m.restore(seed,delta,role,stamp)
+    command(path/"A-to-B",m.ARGS,"qualifying-edit");ordinary=capture(path/"A-to-B",shape,o,api)["raws"]
+    m.restore(seed,delta,role,stamp);observed=typed(path/"preclock-edit","edit",ref,o,api)
+    m.guard(observed==shape and rawproof.require(path/"A-to-B",path/"preclock-edit",ordinary,inventory(path/"preclock-edit",shape)),"unmeasured diagnostic changed outputs")
+    m.restore(seed,delta,role,stamp);forwarded=path/"preclock-exec";observer.execute(forwarded,m.ARGS,m.ENV,m.SRC);observer.replay(forwarded)
+    rawproof.require(path/"A-to-B",forwarded,ordinary,inventory(forwarded,shape));m.erase(seed)
     witness(path/"fixture-B","B",o)
     comparisons={}
     for i in (1,2):
         label=f"cold-B{i}";m.reset(bank,"B",delta);command(path/label,m.ARGS,"cold-B")
         physical=capture(path/label,shape,o,api)["raws"]
         variant=typed(path/(label+"-typed"),"background",ref,o,api)
-        m.guard(shape==variant and inventory(path/(label+"-typed"),shape)==physical,"unchanged cold visit changed raw data or graph")
+        m.guard(shape==variant and rawproof.require(path/label,path/(label+"-typed"),physical,inventory(path/(label+"-typed"),shape)),"unchanged cold visit changed raw data or graph")
         comparisons[label]=compared(path/"A-to-B",path/label,shape,api,parser)
     comparisons["both-independent-cold"]=compared(path/"cold-B1",path/"cold-B2",shape,api,parser)
     m.save(path/"four-state.json",{"role":role,"A_tree":m.CASE["A_tree"],"B_tree":m.CASE["B_tree"],"comparisons":comparisons})
@@ -131,6 +136,9 @@ def trial(role,order,bank,delta,path,baseline,o,api,parser,trace,cal,meter,ref):
                 mode_raw[mode]=inventory(here,shape)
             else:
                 m.guard(mode=="native","unknown mode");native=here;mode_raw[mode]=capture(here,shape,o,api)["raws"]
+        first=next(iter(mode_raw))
+        if first==mode:rawproof.hold(here,mode_raw[mode])
+        else:rawproof.require(path/first,here,mode_raw[first],mode_raw[mode])
         m.guard(m.history()==(m.CASE["B_tree"],delta),"observed visit modified source")
     m.guard(all(v==mode_raw["native"] for v in mode_raw.values()),"native/PMU/typed/scoped B same-seed raw mismatch")
     cold=compared(native,baseline,shape,api,parser)
@@ -154,7 +162,7 @@ def main():
         src=tmp/"ctfe22-root-sdks"/role;m.guard(src.is_dir() and src.resolve()==src,"invalid installed SDK");shutil.move(src,bank/("sdk-"+role))
     m.choose("stock_ctfe318",bank,installed);m.provision(o,bank,out);baseline={}
     for role in m.P["roles"]:
-        m.choose(role,bank,installed);baseline[role]=qualify(role,bank,delta,out/("qualification-"+role),o,api,parser,ref)
+        m.choose(role,bank,installed);baseline[role]=qualify(role,bank,delta,out/("qualification-"+role),o,api,parser,ref,trace)
     for order in m.P["orders"]:
         for role in order["roles"]:
             print("hold",order["hold"],"pair",order["pair"],role,flush=True)

@@ -21,6 +21,7 @@ on:
 permissions:
   contents: read
   actions: read
+  attestations: read
 jobs:
   root:
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-20988-ctfe22-root-hardware' && github.sha == inputs.reviewed_head && github.run_attempt == 1
