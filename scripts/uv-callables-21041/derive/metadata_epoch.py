@@ -6,8 +6,8 @@ def sh(p):return sha256(p.read_bytes()).hexdigest()
 def save(p,x):
     with p.open('x')as f:json.dump(x,f,indent=1,sort_keys=True);f.write('\n')
 records=json.loads(Path(__file__).with_name('epoch-sources.json').read_bytes())
-EPOCHS={'77ce0545653df71f43e601c28dde01a5e4f02b09': (43317, 3), 'ac67101cb973e35ce8ff044cc8014c2c76bab69e': (43319, 43319)}
-label={'77ce0545653df71f43e601c28dde01a5e4f02b09': 'parent', 'ac67101cb973e35ce8ff044cc8014c2c76bab69e': 'candidate'}
+EPOCHS={'10d56274a98801b5ef8f80aab734e835749458e1': (43310, 3), 'ac67101cb973e35ce8ff044cc8014c2c76bab69e': (43319, 43319)}
+label={'10d56274a98801b5ef8f80aab734e835749458e1': 'parent', 'ac67101cb973e35ce8ff044cc8014c2c76bab69e': 'candidate'}
 
 def banner_and_epoch(metadata):
     data = metadata.read_bytes()

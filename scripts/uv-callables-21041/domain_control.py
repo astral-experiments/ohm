@@ -15,8 +15,9 @@ def migration():
  md=metadata(real,o/'metadata');c.guard(md['own_crate_reads']==md['own_native_typecheck_errors']==md['cross_crate_E0514']==2,'external metadata rejection or own genuine source diagnostic')
  f=runpy.run_path(str(D/'fixture/oracle.py'))['main'];outputs={}
  for role,root in zip(c.ROLES,source,strict=True):
-  f(root,D/'fixture',o/role,'candidate',inherited_source=c.PAIR['arms'][role]['source']['commit']);res=m.read(o/role/'qualified.json')
-  c.guard(res['role']=='candidate' and res['actual_empty_edit_typeck']==dict.fromkeys(('read_adt','read_reference','read_str'),0)and res['registered_foreign_transitions']==11,'either compiler lost the existing native domain treatment')
+  semantic='control' if role==c.ROLES[0] else 'candidate'
+  f(root,D/'fixture',o/role,semantic,inherited_source=c.PAIR['arms'][role]['source']['commit']);res=m.read(o/role/'qualified.json')
+  c.guard(res['role']==semantic and res['actual_empty_edit_typeck']==dict.fromkeys(('read_adt','read_reference','read_str'),int(semantic=='control'))and res['registered_foreign_transitions']==11,'wrong real stock vs full-stack domain controls')
   outputs[role]={'oracle':m.filesha(o/role/'qualified.json'),'actual_empty_edit_typeck':res['actual_empty_edit_typeck']}
  m.save(o/'accepted.json',{'roles':outputs,'epochs':m.filesha(o/'epoch/passed.json'),'rmeta_epochs':m.filesha(o/'metadata/passed.json'),'modes':10,'canonical_inputs':m.filesha(S/'pair.json')})
 def boot():

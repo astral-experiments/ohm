@@ -62,8 +62,9 @@ def run():
         value=prod.aggregate(m.TARGET,path,store,parse)
         derive_panel.capture(m.TARGET,m.SDK,m.SRC,path,value,role,out,tmp)
         return value
+    from derive.launcher import snapshot as launcher_snapshot
     for hold in(0,1):
-        histories={};baseline={}
+        histories={};baseline={};launcher_bindings={}
         for role in (c.ROLES if hold==0 else reversed(c.ROLES)):
             h.clean(m.TARGET);h.write('A',atime);h.guard_space(w,tmp)
             q=panel/f'hold-{hold}-{role}';q.mkdir();m.choose(role,bank,sdks)
@@ -77,6 +78,7 @@ def run():
             c.guard(prod.compare(q/'unchanged-kernel-A-equivalence.json',a,products(q/'unchanged-kernel-A'),True),'unchanged command changed products')
             if hold==0:h.clean(m.ROOT/'behavior');behavior21041.run(q/'behavior-A','A')
             seed,seal=h.checkpoint(role,hold,bank);rr=a['relative_paths']['uv_pypi_types@check'];m.save(q/'checkpoint.json',seal)
+            launcher_bindings[role]=launcher_snapshot(m.RUSTC,seed/'.rustc_info.json');m.save(q/'A-launcher-binding.json',launcher_bindings[role])
             h.restore(seed,seal,rr,atime);primary.command(q/'warm-B',c.CHECK,'first-edit');b=products(q/'warm-B');m.save(q/'B-unit-graph.json',h.graph())
             primary.command(q/'settled-B',c.CHECK,'settled-B');settled_b=products(q/'settled-B')
             c.guard(not progress((q/'settled-B/cargo.stderr').read_bytes())and prod.compare(q/'settled-B-equivalence.json',b,settled_b,True),'ordinary B did not settle')
@@ -114,6 +116,7 @@ def run():
                 seed,seal,rr=histories[role];expected,scheduled=baseline[role]
                 for mode in P['mode_orders'][i]:
                     s=h.restore(seed,seal,rr,atime);path=roleout/mode
+                    identity=launcher_snapshot(m.RUSTC,m.TARGET/'.rustc_info.json');c.guard(identity==launcher_bindings[role],'restored rustc info or canonical compiler inode changed');m.save(roleout/(mode+'-launcher-binding.json'),identity)
                     if mode=='scoped':
                         q=panel/f'hold-{hold}-{role}'
                         scoped_result=physical.visit(role,roleout,q,sdks,s,expected,scheduled,products,output_controls,per_meter_ready)

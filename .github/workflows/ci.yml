@@ -1,4 +1,4 @@
-name: Do generated derive impl identities reduce uv-client rustc instructions after the actual uv edit?
+name: Does the full production compiler halve the eight rustc instruction counts in uv-client check?
 'on':
   workflow_dispatch:
     inputs:
@@ -13,7 +13,7 @@ name: Do generated derive impl identities reduce uv-client rustc instructions af
       build_head:
         required: true
         type: string
-        description: Reviewed foreign-impl domain producer commit
+        description: Reviewed production generated-derive SDK producer commit
       sdk_lock_sha256:
         required: true
         type: string
@@ -24,8 +24,8 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-proc-derive-production-check' && github.sha == inputs.reviewed_head
-      && github.run_attempt == 1 && inputs.build_run_id == '41434876352' && inputs.build_head == '731d81a4cb3498cf4221d53a267bbf4a76ca250f' && inputs.sdk_lock_sha256 == 'dbb190765a6be6f2ef90be903efaf63c1feb7bf817c142cdaacc0cb0b9f067ae'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-proc-derive-cumulative-check' && github.sha == inputs.reviewed_head
+      && github.run_attempt == 1 && inputs.build_run_id == '41434876352' && inputs.build_head == '731d81a4cb3498cf4221d53a267bbf4a76ca250f' && inputs.sdk_lock_sha256 == '51d3b6c65b320f8e7d40021e805475a64ad8de9fa3257530f3069804a7fb1ce0'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 170
     env:
@@ -48,7 +48,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: control-builder
-        ref: 5f7e5680285caa6b9a848db810b63ef58dfe0143
+        ref: cddb036d81e4313a8e422171f39f0840b44110db
         persist-credentials: 'false'
         sparse-checkout: scripts/ctfe22-gnu
     - name: Check out the exact treatment-builder
@@ -131,12 +131,34 @@ jobs:
         test "$(git -C uv-source rev-parse ''refs/tags/0.12.3^{}'')" = 507230998c9541d67814b57463ac00e454ff6991
 
         '
+    - name: Check out the verified original stock-authority reader
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        path: stock-authority
+        ref: 125cef4f90f572d8a8d19da42b0bc2b1fcae87a8
+        persist-credentials: 'false'
+        sparse-checkout: 'scripts/handwritten-panel
+
+          scripts/uv-callables-21041'
+    - name: Check out the verified original derive-authority reader
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        path: derive-authority
+        ref: e12e6778ebfaf38ea35fdd8a4084230f6bf1b937
+        persist-credentials: 'false'
+        sparse-checkout: 'scripts/handwritten-panel
+
+          scripts/uv-callables-21041'
     - name: Verify the two rooted benchmark manifests
       run: 'set -euo pipefail
 
         (cd coordinator/scripts/handwritten-panel && sha256sum --strict --check SHA256SUMS)
 
         (cd coordinator/scripts/uv-callables-21041 && sha256sum --strict --check SHA256SUMS)
+
+        (cd stock-authority/scripts/uv-callables-21041 && sha256sum --strict --check SHA256SUMS)
+
+        (cd derive-authority/scripts/uv-callables-21041 && sha256sum --strict --check SHA256SUMS)
 
         '
     - name: Prepare the host and preserve prerequisites
@@ -156,7 +178,7 @@ jobs:
     - name: Retain the calibrated unique runner before acquiring the compilers
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-proc-derive-production-boot
+        name: uv-21041-derive-cumulative-production-boot
         path: trait-results/fresh-boot.json
         if-no-files-found: error
         retention-days: 7
@@ -182,7 +204,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-proc-derive-production-eight-pair
+        name: uv-21041-derive-cumulative-production-eight-pair
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

@@ -5,8 +5,9 @@
   "B": "9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3",
   "B_file": "3d91d5195930020a6740f68341549629681eb8654048962cc618fe02e7130360",
   "B_tree": "ce502617cfbf3fd59980e29731c10b5391d12139",
-  "branch": "charlie/codex-21041-proc-derive-production-check",
-  "candidate_selection": "Prior native resolved-derive/impl DefPathHash preservation on six real shifts, two independent stage1 guest holds and both cold/build correctness qualifications; no native retired threshold inferred.",
+  "branch": "charlie/codex-21041-proc-derive-cumulative-check",
+  "candidate_selection": "previously registered production stack; no current live endpoints used for selection",
+  "compiler_identification_guard": "Pin A launcher ctime/inode/digest and genuine .rustc_info fingerprint on all 48 restores, and reject any of the 16 scoped visits with extra compiler processes.",
   "describe_A": "0.12.3-27-ga2a0242",
   "describe_B": "0.12.3-28-g9049e07",
   "edit_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
@@ -31,17 +32,10 @@
     1,
     1
   ],
-  "local_selection": {
-    "eight_rustcs_guest_percent_cut": 4.89,
-    "scope": "two independent rooted histories in opposite order; candidate selection only",
-    "stage1_sources": [
-      "b9b3f6bb",
-      "bd03d570"
-    ],
-    "uv_client_guest_percent_cut": 12.03
-  },
+  "local_selection": "frozen all-eight 2x cumulative rule; no conditional individual-crate selection",
   "lock_sha256": "84893face6e0c3f1641af8ce022475d859b99bb43c3ccfb540e2e9cee98095f9",
-  "measurement_plan_sha256": "098184b8463f2852b641a0317266c084b3326fbe8d5c954aa90074818f608f1c",
+  "marginal_completion_condition": "Original eight-pair production marginal ran to completion and passed all native/cold admissions. Its standalone 20% terminal gate was missed.",
+  "measurement_plan_sha256": "dd1751984497e64146992dd6d07e264176ef6079e9d0f282d181741a82e40997",
   "meter_files": {
     "SHA256SUMS": "c6713c7ef2878aa70a927e845e41ec9f4d237091b6c7a6c45d4799de047fb0d1",
     "exec_events.py": "b0a7e0121309e008280def6db77ad8c59730196667e0a698a9872af6a03a0a63",
@@ -1126,55 +1120,44 @@
   },
   "orders": [
     [
-      "callables_ctfe318_incoherent_domain",
+      "stock_ctfe318",
       "callables_ctfe318_incoherent_domain_proc_derive"
     ],
     [
       "callables_ctfe318_incoherent_domain_proc_derive",
-      "callables_ctfe318_incoherent_domain"
+      "stock_ctfe318"
     ],
     [
       "callables_ctfe318_incoherent_domain_proc_derive",
-      "callables_ctfe318_incoherent_domain"
+      "stock_ctfe318"
     ],
     [
-      "callables_ctfe318_incoherent_domain",
+      "stock_ctfe318",
       "callables_ctfe318_incoherent_domain_proc_derive"
     ],
     [
       "callables_ctfe318_incoherent_domain_proc_derive",
-      "callables_ctfe318_incoherent_domain"
+      "stock_ctfe318"
     ],
     [
-      "callables_ctfe318_incoherent_domain",
+      "stock_ctfe318",
       "callables_ctfe318_incoherent_domain_proc_derive"
     ],
     [
-      "callables_ctfe318_incoherent_domain",
+      "stock_ctfe318",
       "callables_ctfe318_incoherent_domain_proc_derive"
     ],
     [
       "callables_ctfe318_incoherent_domain_proc_derive",
-      "callables_ctfe318_incoherent_domain"
+      "stock_ctfe318"
     ]
   ],
   "original_patch_sha256": "785d2b56538ec325fb46be7e71d8fb71a61cb6f2f053bc44e85026361ac2605e",
-  "parent": "37eb27d53652479648be37ff573e142b99b122f8",
-  "per_rustc_threshold": {
-    "other_metrics": [
-      "both absolute arm medians",
-      "median paired ratios and ratio of medians",
-      "all eight actual rustc thread-PMUs separately and their sum",
-      "inherited whole-Cargo userspace PMU on separate restored A",
-      "bare native CLOCK_MONOTONIC blocking wait on separate restored A",
-      "2\u00d7 wall count explicitly descriptive"
-    ],
-    "rule": "all eight valid, both hold medians of treatment/control strictly <4/5 and one-sided exact sign tail at 4/5 \u22640.05; ties go against",
-    "sole_threshold_primary": "retired userspace instructions in Cargo-selected terminal uv_client --crate-type lib and its threads"
-  },
-  "physical_primary": "uv_client actual kernel-selected rustc threads only, < 4/5 in both four-pair median ratios plus one-sided sign threshold p<=0.05 across exactly eight",
-  "physical_scope": "ordinary cargo check -p uv-client --locked --offline -j8 on the landed uv edit, release-matched 77ce versus its one-commit ac671 child, fixed signed -22 Cargo",
-  "physical_secondary": "All eight named rustcs, sum, full inherited Cargo instructions, and separate uninstrumented blocking whole-command wall, including counts above 2x",
+  "parent": "e12e6778ebfaf38ea35fdd8a4084230f6bf1b937",
+  "per_rustc_threshold": null,
+  "physical_primary": "sum_of_eight",
+  "physical_scope": "ordinary cargo check -p uv-client --locked --offline -j8 after landed uv #21041, corrected signed-release stock 10d56274 versus full ac67101c, same signed -22 Cargo",
+  "physical_secondary": "eight actual individual rustcs, separate uninstrumented blocking wait, overall inherited Cargo retired userspace instructions",
   "plan_units": 530,
   "prior_actual_argv_sha256": "2c6a09f122e5293f696ffb63d11e6469d88491bfd5a331897765c6a916e384fc",
   "producer_head": "731d81a4cb3498cf4221d53a267bbf4a76ca250f",
@@ -1250,7 +1233,7 @@
   "registry_uncompressed_sha256": "cb48aafbd06b0f81d56dc44f61476fc2fe2a609c2637e33b6569f8290ac64fc0",
   "repo": "astral-experiments/ohm",
   "roles": [
-    "callables_ctfe318_incoherent_domain",
+    "stock_ctfe318",
     "callables_ctfe318_incoherent_domain_proc_derive"
   ],
   "root_features": [],
@@ -1263,11 +1246,11 @@
     "--offline",
     "-j8"
   ],
-  "sdk_lock_sha256": "dbb190765a6be6f2ef90be903efaf63c1feb7bf817c142cdaacc0cb0b9f067ae",
+  "sdk_lock_sha256": "51d3b6c65b320f8e7d40021e805475a64ad8de9fa3257530f3069804a7fb1ce0",
   "source_case_sha256": "576103c648f8b31662b0ddf1d49632573023a9cbe699bb1811df57d4f2a6cfd2",
   "source_mode": "real unstaged edit at A and genuine 0.12.3 ancestry; same absolute source/target for each restoration",
   "structural_graph_sha256": "17277138e393245b99609f9da43bfcfdf091f2c57ea8bdf2217669cd6b1fe74f",
-  "study": "Eight matched production pairs on uv #21041 after the same real edit",
+  "study": "independent production cumulative 10d56274 / ac671, real uv #21041",
   "tag": "0.12.3",
   "tag_commit": "507230998c9541d67814b57463ac00e454ff6991",
   "workspace_check_libraries": {

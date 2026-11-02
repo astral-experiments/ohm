@@ -13,7 +13,7 @@ from native_units import NativeUnits
 from six import confirm,object_id
 
 PHASES={"ordinary-A":"A","warm-B":"B","cold-B":"cold"}
-SOURCES=("77ce0545653df71f43e601c28dde01a5e4f02b09","ac67101cb973e35ce8ff044cc8014c2c76bab69e")
+SOURCES=("10d56274a98801b5ef8f80aab734e835749458e1","ac67101cb973e35ce8ff044cc8014c2c76bab69e")
 SCHEMAS=(3,43319)
 EDIT=Path("crates/uv-pypi-types/src/simple_json.rs")
 def digest(b):return sha256(b).hexdigest()

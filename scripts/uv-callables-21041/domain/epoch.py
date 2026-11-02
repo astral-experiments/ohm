@@ -17,7 +17,7 @@ def bins(root):
  return ret
 def run(control,candidate,out,mode,*,expected=None):
  roots=[Path(control).resolve(),Path(candidate).resolve()];out=Path(out).resolve();out.mkdir();assert mode in('actual','fixture')
- assert mode=="actual";shim=[('77ce0545653df71f43e601c28dde01a5e4f02b09', 43317), ('ac67101cb973e35ce8ff044cc8014c2c76bab69e', 43319)]
+ assert mode=="actual";shim=[('10d56274a98801b5ef8f80aab734e835749458e1', 43310), ('ac67101cb973e35ce8ff044cc8014c2c76bab69e', 43319)]
  if expected is not None:shim=list(expected)
  assert len(shim)==2 and len({rev for rev,ep in shim})==len({ep for rev,ep in shim})==2 and all(re.fullmatch(r'[0-9a-f]{40}',rev) and type(ep) is int and 0<ep<65536 for rev,ep in shim)
  zz={}

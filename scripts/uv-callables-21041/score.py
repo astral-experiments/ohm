@@ -75,9 +75,13 @@ def score():
                 if mode=='wall':c.guard(rec['timer']=='CLOCK_MONOTONIC; waitpid blocking; ITIMER_REAL watchdog'and rec['deadline_fired']is False and rec['invoked']==c.CHECK and rec['mode']=='native'and not(at/'whole-clock.json').exists()and v['value']==rec['ns'],'uninstrumented whole wall')
                 else:
                     clock=meter.clock(at/'whole-clock.json',0);c.guard(rec['invoked']==[ready['plain'],str(at/'whole-clock.json'),*c.CHECK]and clock['running']==clock['enabled']>0 and v['value']==clock['instructions'],'inherited unmultiplexed whole-command instructions')
+    from derive.launcher import replay as replay_launchers
+    decoder=__import__('runpy').run_path(str(c.HERE/'thread-meter/exec_events.py'))['decode']
+    bindings=replay_launchers(panel,raw,c.ROLES,m.read(out/'intake.json')['installed'],decoder)
+    m.save(panel/'complete-rustc-identification-bindings.json',bindings)
     import physical
     perf=physical.reduce(panel,raw,data,check_products,output_controls)
-    report={'scope':'matched signed-release production builds, procedural derive impl identity, ordinary cargo check -p uv-client after actual uv edit #21041','eligible':not refusals,'same_seed_refusals':refusals,
+    report={'scope':'new matched production 10d56274 vs ac67101c, all eight actual rustcs after ordinary cargo check -p uv-client at uv #21041','eligible':not refusals,'same_seed_refusals':refusals,
         'verified_unique_workspace_products':len(checked),'metrics':None if refusals else summary(raw),'branch':P['branch']}
     if report['metrics']:
         for mode in ('wall','clock'):
