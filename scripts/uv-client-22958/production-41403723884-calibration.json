@@ -1,0 +1,37 @@
+{
+  "abi": {
+    "config": "PERF_COUNT_HW_INSTRUCTIONS",
+    "cpu": -1,
+    "disabled": 1,
+    "enable_on_exec": 1,
+    "exclude_hv": 1,
+    "exclude_kernel": 1,
+    "group_fd": -1,
+    "inherit": 1,
+    "pid": "fork child blocked on its one-byte pipe before execvp cargo +ohm",
+    "read_bytes": 24,
+    "read_format": [
+      "PERF_FORMAT_TOTAL_TIME_ENABLED",
+      "PERF_FORMAT_TOTAL_TIME_RUNNING"
+    ],
+    "type": "PERF_TYPE_HARDWARE"
+  },
+  "plain_sha256": "09269e316b90e6abb741803c5e8fe698f11269a4d14f7e359dbe3f2862a01d06",
+  "ready": {
+    "affinity": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14
+    ],
+    "boot": "8287559a-635a-47d0-bc39-859bb3efd4f2",
+    "calibrator": "2f413ca94b84af2dbd6d6231bcf8d860c97ebee8",
+    "observer": "8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc",
+    "plain": "/home/runner/work/_temp/ohm-branch-object-qa/logs/observers/plain"
+  },
+  "unmultiplexed_calibration_clocks": 28
+}

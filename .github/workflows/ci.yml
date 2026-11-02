@@ -1,4 +1,4 @@
-name: Check callable trait recovery on uv 21041
+name: Confirm callable trait recovery on uv 22958
 'on':
   workflow_dispatch:
     inputs:
@@ -18,19 +18,24 @@ name: Check callable trait recovery on uv 21041
         required: true
         type: string
         description: SHA-256 of both authenticated production inputs and native qualification
+      excluded_production_boot:
+        required: true
+        type: string
+        description: Comma-separated verified physical production runner boot UUIDs
 permissions:
   contents: read
   actions: read
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21041-callables-uv-client'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-callables-native'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.build_run_id == '41395027122' && inputs.build_head == 'ee90d022e7abb6c2c2f61b751c49de06bba29aed'
       && inputs.sdk_lock_sha256 == '08b0f933ed9dda4bc7079d63e81321e7c8ff279e321b47888da4408781ebdacf'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 175
+    timeout-minutes: 90
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      EXCLUDED_PRODUCTION_BOOT: ${{ inputs.excluded_production_boot }}
       BUILD_RUN_ID: ${{ inputs.build_run_id }}
       BUILD_HEAD: ${{ inputs.build_head }}
       SDK_LOCK_SHA256: ${{ inputs.sdk_lock_sha256 }}
@@ -44,6 +49,7 @@ jobs:
         sparse-checkout: |-
           scripts/handwritten-panel
           scripts/uv-callables-21041
+          scripts/uv-client-22958
         fetch-depth: '2'
     - name: Check out builder
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -117,47 +123,53 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: astral-sh/uv
-        ref: 9049e07fa6b8e4863807b3a6e6e1293cbf68d0c3
+        ref: 362613dbf38f60fe285cdd6bca53641149a23c04
         fetch-depth: '64'
         fetch-tags: 'false'
         persist-credentials: 'false'
         path: uv-source
     - name: Fetch and verify the historical release tag for the real uv build script
       run: |
-        git -C uv-source fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.12.3:refs/tags/0.12.3
-        test "$(git -C uv-source rev-parse 'refs/tags/0.12.3^{}')" = 507230998c9541d67814b57463ac00e454ff6991
+        git -C uv-source fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.13.6:refs/tags/0.13.6
+        test "$(git -C uv-source rev-parse 'refs/tags/0.13.6^{}')" = 329bf9448afd9f9088d14a4d57fbc61eb454f117
     - name: Check the private payload and host prerequisites
       run: |
         set -euo pipefail
         mkdir trait-results
-        (cd coordinator/scripts/handwritten-panel && sha256sum --strict --check SHA256SUMS)
-        (cd coordinator/scripts/uv-callables-21041 && sha256sum --strict --check SHA256SUMS)
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-client-22958/manifest.py
         /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
     - name: Calibrate inherited userspace instructions for real fork, exec and threads
       run: |
         set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py calibrate 2>&1 | tee trait-results/calibration.log
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py calibrate 2>&1 | tee trait-results/calibration.log
+    - name: Provide the actual independent machine to the production qualification
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: uv-22958-runner-boot
+        path: trait-results/boot-attestation.json
+        if-no-files-found: error
+        retention-days: 5
     - name: Admit the two qualified stage1 SDKs and the signed Cargo binary
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
         set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py admit 2>&1 | tee trait-results/intake.log
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py admit 2>&1 | tee trait-results/intake.log
     - name: Verify both normal and shared-version directions of the native incremental transition
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/core.py migration
-    - name: Qualify native roots and collect eight balanced pairs for each independent physical metric
-      run: |-
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py migration
+    - name: Admit all twelve native histories and gather separately restored hardware and plain wall
+      run: |
         set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/screen.py 2>&1 | tee trait-results/experiment.log
-    - name: Verify original restored outputs, PMU clocks and separate uninstrumented wall
-      run: |-
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py study 2>&1 | tee trait-results/experiment.log
+    - name: Independently reduce both actual compiler processes and ordinary Cargo
+      run: |
         set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-callables-21041/score.py 2>&1 | tee trait-results/reduction.log
+        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py reduce 2>&1 | tee trait-results/reduction.log
     - name: Preserve raw clocks, source qualification and any incomplete attempt
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21041-callables-eight-pair-relocation-1
+        name: uv-22958-native-instructions-six-pairs
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
