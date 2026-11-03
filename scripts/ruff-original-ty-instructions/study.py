@@ -11,8 +11,10 @@ import sys
 here=Path(__file__).resolve().parent
 sys.path.insert(0,str(here.parent/'ruff-foreign-span-observer'))
 import worker as w
+sys.path.insert(0,str(here))
+import live_tasks
 
-order=['whole','tasks','tasks','whole','whole','tasks']
+order=['whole','simultaneous','simultaneous','whole','whole','simultaneous','simultaneous','whole']
 schedule=['check','build']
 tree=w.proof/'instructions';tree.mkdir()
 def save(path, obj):
@@ -41,7 +43,7 @@ def capture(cmd, method, dst, env, cwd):
     actual=list(cmd)
     path=shutil.which(cmd[0],path=env['PATH'])
     assert path is not None
-    if method=='whole':
+    if method in ('whole','simultaneous'):
         actual=[str(whole),str(dst/'hardware.json'),path,*cmd]
     elif method=='tasks':
         (dst/'tasks').mkdir()
@@ -49,9 +51,13 @@ def capture(cmd, method, dst, env, cwd):
     else:assert method=='ordinary'
     w.guard()
     with (dst/'stdout').open('wb')as o,(dst/'stderr').open('wb')as e:
-        answer=subprocess.run(actual,cwd=cwd,env=env,stdout=o,stderr=e)
-    assert answer.returncode==0,(dst,(dst/'stderr').read_text()[-1800:])
-    if method=='whole':
+        if method=='simultaneous':
+            observation=live_tasks.observe(actual,library=library,sdk=w.sdk,dst=dst,cwd=cwd,env=env,stdout=o,stderr=e)
+            save(dst/'live-threads.json',observation)
+        else:
+            answer=subprocess.run(actual,cwd=cwd,env=env,stdout=o,stderr=e)
+            assert answer.returncode==0,(dst,(dst/'stderr').read_text()[-1800:])
+    if method in ('whole','simultaneous'):
         obs=json.loads((dst/'hardware.json').read_text())
         assert obs['status']==0 and obs['enabled']==obs['running']>0 and obs['instructions']>0
         return obs['instructions']
@@ -96,20 +102,11 @@ def run_phase(mode,label,method):
         expected=[1,0,1,0] if data['source']==w.OLD else [0,1,1,0]
         assert [r[0]for r in result.values()]==expected
         data.update(binary=w.hf(exe),probes=result)
-    if method=='tasks':
-        images,counts,creates=cost(dst/'tasks')
-        distribution=Counter(); rustcs=[]
-        for i,(device,exe,argv) in images.items():
-            who=Path(exe).name
-            if device==runtime_ids['rustc'] and '--crate-name' in argv and any(x=='--emit' or x.startswith('--emit=')for x in argv):
-                crate=argv[argv.index('--crate-name')+1];who='rustc:'+crate
-                if creates[i]=='exec':rustcs.append(crate)
-            elif device==runtime_ids['wild']:who='Wild'
-            elif device==runtime_ids['cargo']:who='Cargo'
-            distribution[who]+=counts[i]
-        assert rustcs.count('ty_python_semantic')==1 and distribution['rustc:ty_python_semantic']>0
-        assert sum(distribution.values())==total
-        data.update(categories=dict(distribution),actual_rustcs=sorted(rustcs))
+    if method=='simultaneous':
+        observation=json.loads((dst/'live-threads.json').read_text())
+        lower=observation['instructions']
+        assert 0<lower<=total
+        data.update(ty_lower=lower,ty_fraction=lower/total)
     save(dst/'result.json',data)
     print(mode,label,method,'retired',total,'nonfresh',len(data['dirty']),flush=True)
     return data
@@ -117,8 +114,8 @@ def run_phase(mode,label,method):
 assert w.git('rev-parse','HEAD')==w.NEW and w.git('rev-parse','HEAD^')==w.OLD and w.hf(w.work/'Cargo.lock')==w.OLDLOCK and not w.git('status','--porcelain')
 assert os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD'] and os.uname().machine=='x86_64'
 pre={'source':[w.OLD,w.NEW],'lock':w.OLDLOCK,'order':order,'modes':schedule,'sdk_manifest':w.hf(w.src/'sdk.json'),
-     'counter_sha256':{p.name:w.hf(p)for p in here.glob('*.c')},'purpose':'unscored stock ceiling from actual ty rustc share, no candidate or speedup claim',
-     'admit':'identical settled source, artifacts, rosters, original RUF009 verdicts, fully scheduled user counters, task totals within 5% of ordinary median, same actual rustc roster across repetitions'}
+     'counter_sha256':{p.name:w.hf(p)for p in here.glob('*.c')},'purpose':'unscored stock work attribution, simultaneous inherited whole counter and lower bound on ty tasks; no candidate or speedup claim',
+     'admit':'identical settled source, artifacts, rosters, original RUF009 verdicts, fully scheduled user counters, one live rustc with authenticated executable, driver, Cargo parent and ty argv for each concurrent observation; non-inherited counters opened on its live verified threads only. Require a majority in every run to call this a possible 2x instruction opportunity. Always preserve four independent control totals and their range.'}
 save(tree/'registered.json',pre)
 env=w.install()
 whole=w.root/'whole_count';tasks=w.root/'exec_count'
@@ -126,7 +123,21 @@ for program in (whole,tasks):
     subprocess.run(['/usr/bin/cc','-O2','-Wall','-Wextra','-Werror',here/(program.name+'.c'),'-o',program],check=True)
 runtime_ids={'rustc':identity(w.sdk/'bin/rustc'),'cargo':identity(w.sdk/'bin/cargo'),'wild':identity(next((w.sdk/'lib/rustlib').glob('*/bin/wild-ld/ld.bfd')))}
 save(tree/'runtime-file-ids.json',runtime_ids)
-for method in order[:2]:
+library_path=w.root/'libtask_count.so'
+subprocess.run(['/usr/bin/cc','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',here/'task_count.c','-o',library_path],check=True)
+library=live_tasks.load_library(library_path)
+fd=live_tasks.attach(library,os.getpid())
+before=live_tasks.count(fd)['instructions']
+sum(range(2000000))
+after=live_tasks.count(fd)['instructions']
+assert after>before+10000000
+child_before=live_tasks.count(fd)['instructions']
+subprocess.run(['/usr/bin/python3','-IB','-c','sum(range(6000000))'],check=True)
+child_after=live_tasks.count(fd)['instructions']
+os.close(fd)
+assert child_after-child_before<5000000
+save(tree/'single-thread-calibration.json',{'self_delta':after-before,'external_child_delta':child_after-child_before})
+for method in ('whole','tasks'):
     for kind in ('thread','child'):
         vals=[]
         for heavy in (False,True):
@@ -137,7 +148,6 @@ for method in order[:2]:
 w.git('switch','--detach',w.OLD)
 subprocess.run(['cargo','+ohm','fetch','--locked','--target','x86_64-unknown-linux-gnu'],env=env,cwd=w.work,check=True)
 env['CARGO_NET_OFFLINE']='true'
-import statistics
 for mode in schedule:
     w.git('switch','--detach',w.OLD)
     old=run_phase(mode,'old','ordinary')
@@ -148,8 +158,11 @@ for mode in schedule:
     for r in runs:
         for k in ('source','roster_sha256','dirty','ty_rmeta','ty_depinfo')+(('binary','probes') if mode=='build' else ()):
             assert r[k]==settled[k],(mode,r['label'],k)
-    baseline=statistics.median(r['total']for r in runs if r['method']=='whole')
-    attributed=[r for r in runs if r['method']=='tasks']
-    assert all(abs(r['total']/baseline-1)<.05 and r['actual_rustcs']==attributed[0]['actual_rustcs'] for r in attributed)
-    save(tree/(mode+'-summary.json'),{'whole':[r['total']for r in runs if r['method']=='whole'],'task_totals':[r['total'] for r in attributed],
-         'ty':[r['categories']['rustc:ty_python_semantic']for r in attributed],'actual_rustcs':attributed[0]['actual_rustcs']})
+    controls=[r['total'] for r in runs if r['method']=='whole']
+    paired=[{'whole':r['total'],'ty_lower':r['ty_lower'],'ty_fraction':r['ty_fraction']} for r in runs if r['method']=='simultaneous']
+    save(tree/(mode+'-summary.json'),{'ordinary_whole':controls,'simultaneous':paired,'all_ty_majority':all(r['ty_fraction']>.5 for r in paired),
+         'within_five_percent_of_control_range':all(min(controls)*.95<r['whole']<max(controls)*1.05 for r in paired)})
+
+for mode in schedule:
+    summary=json.loads((tree/(mode+'-summary.json')).read_text())
+    assert summary['within_five_percent_of_control_range'], (mode,summary)
